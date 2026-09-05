@@ -1,12 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
+import { useIsPresent } from 'framer-motion';
 import { speak } from '@wordpress/a11y';
 import {
 	useEffect,
@@ -17,16 +11,13 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
+import ExternalLink from '../external-link';
 import type { SnackbarProps } from './types';
 import type { NoticeAction } from '../notice/types';
 import type { WordPressComponentProps } from '../context';
 
-const NOTICE_TIMEOUT = 10000;
+const NOTICE_TIMEOUT = 6000;
 
 /**
  * Custom hook which announces the message with the given politeness, if a
@@ -67,6 +58,8 @@ function UnforwardedSnackbar(
 	}: WordPressComponentProps< SnackbarProps, 'div' >,
 	ref: ForwardedRef< any >
 ) {
+	const isPresent = useIsPresent();
+
 	function dismissMe( event: KeyboardEvent | MouseEvent ) {
 		if ( event && event.preventDefault ) {
 			event.preventDefault();
@@ -80,7 +73,7 @@ function UnforwardedSnackbar(
 	}
 
 	function onActionClick(
-		event: MouseEvent< HTMLButtonElement >,
+		event: MouseEvent< HTMLButtonElement | HTMLAnchorElement >,
 		onClick: NoticeAction[ 'onClick' ]
 	) {
 		event.stopPropagation();
@@ -102,16 +95,17 @@ function UnforwardedSnackbar(
 	} );
 
 	useEffect( () => {
-		// Only set up the timeout dismiss if we're not explicitly dismissing.
+		if ( explicitDismiss || ! isPresent ) {
+			return;
+		}
+
 		const timeoutHandle = setTimeout( () => {
-			if ( ! explicitDismiss ) {
-				callbacksRef.current.onDismiss?.();
-				callbacksRef.current.onRemove?.();
-			}
+			callbacksRef.current.onDismiss?.();
+			callbacksRef.current.onRemove?.();
 		}, NOTICE_TIMEOUT );
 
 		return () => clearTimeout( timeoutHandle );
-	}, [ explicitDismiss ] );
+	}, [ explicitDismiss, isPresent ] );
 
 	const classes = clsx( className, 'components-snackbar', {
 		'components-snackbar-explicit-dismiss': !! explicitDismiss,
@@ -147,22 +141,34 @@ function UnforwardedSnackbar(
 					<div className="components-snackbar__icon">{ icon }</div>
 				) }
 				{ children }
-				{ actions.map( ( { label, onClick, url }, index ) => {
-					return (
-						<Button
-							__next40pxDefaultSize
-							key={ index }
-							href={ url }
-							variant="link"
-							onClick={ (
-								event: MouseEvent< HTMLButtonElement >
-							) => onActionClick( event, onClick ) }
-							className="components-snackbar__action"
-						>
-							{ label }
-						</Button>
-					);
-				} ) }
+				{ actions.map(
+					( { label, onClick, url, openInNewTab = false }, index ) =>
+						url !== undefined && openInNewTab ? (
+							<ExternalLink
+								key={ index }
+								href={ url }
+								onClick={ ( event ) =>
+									onActionClick( event, onClick )
+								}
+								className="components-snackbar__action"
+							>
+								{ label }
+							</ExternalLink>
+						) : (
+							<Button
+								__next40pxDefaultSize
+								key={ index }
+								href={ url }
+								variant="link"
+								onClick={ (
+									event: MouseEvent< HTMLButtonElement >
+								) => onActionClick( event, onClick ) }
+								className="components-snackbar__action"
+							>
+								{ label }
+							</Button>
+						)
+				) }
 				{ explicitDismiss && (
 					<span
 						role="button"
@@ -193,5 +199,6 @@ function UnforwardedSnackbar(
  * ```
  */
 export const Snackbar = forwardRef( UnforwardedSnackbar );
+Snackbar.displayName = 'Snackbar';
 
 export default Snackbar;

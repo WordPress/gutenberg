@@ -15,25 +15,62 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
 jobs:
     check:
-        name: All
-        runs-on: ubuntu-latest
+        name: All${{ (matrix.node != '20' || matrix.os != 'ubuntu-24.04') && format(' (Node.js {0} on {1})', matrix.node, contains(matrix.os, 'macos-') && 'MacOS' || contains(matrix.os, 'windows-') && 'Windows' || 'Linux') || '' }}
+        runs-on: ${{ matrix.os }}
+        env:
+            NODE_OPTIONS: --max-old-space-size=4096
+        permissions:
+            contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 30
+        strategy:
+            matrix:
+                event: ['${{ github.event_name }}']
+                node: ['20', '22', '24']
+                os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
+
+                include:
+                    # Only generate annotations once.
+                    - node: '24'
+                      os: 'ubuntu-24.04'
+                      annotations: true
+                exclude:
+                    # On PRs: Only test Node 20 on Ubuntu and Windows
+                    - event: 'pull_request'
+                      node: '22'
+                    - event: 'pull_request'
+                      os: 'macos-15'
 
         steps:
-            - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+            # The parent commit must be present for dependency and test-routing
+            # checks that compare the current change with its baseline.
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  fetch-depth: 2
+                  persist-credentials: false
+
+            - name: Validate labeler config
+              if: ${{ matrix.annotations }}
+              run: .github/scripts/validate-labeler-config.sh
 
             - name: Use desired version of Node.js
-              uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
+              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
               with:
-                  node-version-file: '.nvmrc'
-                  check-latest: true
+                  node-version: ${{ matrix.node }}
                   cache: npm
 
-            - name: Npm install
+            - name: Set up npm
+              uses: ./.github/setup-npm
+
+            - name: npm install
               # A "full" install is executed, since `npm ci` does not always exit
               # with an error status code if the lock file is inaccurate. This also
               # helps to catch dependencies not being installed with exact version.
@@ -42,14 +79,152 @@ jobs:
               # See: https://github.com/WordPress/gutenberg/pull/39865
               run: npm install
 
-            - name: Lint JavaScript and Styles
-              run: npm run lint
+            - name: Lint package.json files
+              run: npm run lint:pkg-json
+
+            - name: Lint dependency versions across workspaces
+              run: npm run lint:deps
+
+            - name: Check root dependencies
+              if: ${{ matrix.annotations && github.event_name == 'pull_request' }}
+              run: |
+                  BASE_SHA="$(git rev-parse HEAD^1)"
+                  npm run --workspace @wordpress/validation-tools check-root-dependencies -- --base "$BASE_SHA"
+
+            - name: Lint package-lock.json file
+              run: npm run lint:lockfile
+
+            - name: Validate TypeScript config
+              run: npm run lint:tsconfig
+
+            - name: Lint JavaScript
+              if: ${{ matrix.annotations }}
+              # `--quiet` reports only errors so they aren't buried under warnings in the CI log.
+              # `--prune-suppressions` ensures `suppressions.json` stays in sync.
+              run: npm run lint:js -- --format compact --quiet --prune-suppressions
+
+            - name: Test agent skill setup
+              run: npm run test:unit:vitest -- --project=node tools/agents/test/setup-skills.test.js
+
+            - name: Lint Styles
+              if: ${{ matrix.annotations }}
+              # Stylelint has no separate prune flag. Run lint first so new violations fail,
+              # then `--suppress` to prune stale suppressions (same outcome as ESLint's
+              # `--prune-suppressions` + check-local-changes).
+              run: |
+                  npm run lint:css -- --formatter compact
+                  npm run lint:css:update-suppressions
 
             - name: Type checking
-              run: npm run build:package-types
+              run: npm run typecheck
+
+            - name: Validate JavaScript test routing
+              if: ${{ matrix.node == '20' && matrix.os == 'ubuntu-24.04' }}
+              run: npm run test:unit:routing -- --base="$(git rev-parse HEAD^1)"
+
+            - name: Build packages
+              run: npm run build
+
+            - name: Validate Vitest conventions and TypeScript test graph
+              run: npm run test:unit:conventions
+
+            - name: Check type declaration files
+              # Runs against the final package output, including the built
+              # declarations and runtime files.
+              run: npm run check:type-declarations
+
+            - name: Validate package contents
+              run: npm run lint:package-contents
+
+            - name: Audit published dependencies
+              if: ${{ matrix.annotations }}
+              run: npm run lint:published-deps -- --fail-unused-ignores
 
             - name: Check local changes
               run: npm run other:check-local-changes
 
             - name: License compatibility
               run: npm run other:check-licenses
+
+    agent-development:
+        name: AI development tests (Node.js ${{ matrix.node }} on ${{ contains(matrix.os, 'macos-') && 'MacOS' || contains(matrix.os, 'windows-') && 'Windows' || 'Linux' }})
+        runs-on: ${{ matrix.os }}
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 15
+        strategy:
+            matrix:
+                include:
+                    - os: ubuntu-24.04
+                      node: '22'
+                    - os: macos-15
+                      node: '22'
+                    - os: windows-2025
+                      node: '22'
+                    - os: ubuntu-24.04
+                      node: '24'
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+              with:
+                  node-version: ${{ matrix.node }}
+                  package-manager-cache: false
+
+            - name: Install AI development test dependencies
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+              run: npm ci --prefix test/ai-development
+
+            - name: Audit AI development test dependencies
+              if: matrix.os == 'ubuntu-24.04' && matrix.node == '22'
+              run: npm --prefix test/ai-development audit --audit-level=high
+
+            - name: Test AI development utilities
+              run: npm --prefix test/ai-development run test:utils
+
+            - name: Validate AI development configs
+              run: npm --prefix test/ai-development run validate
+
+    # Fails when a bundled package pulls @wordpress/private-apis into its
+    # module graph, including transitively through another package.
+    check-private-apis:
+        name: Check private API usage in bundled packages
+        runs-on: ubuntu-24.04
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 10
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+              with:
+                  node-version-file: '.nvmrc'
+                  # No cache restoration: this workflow also runs on push,
+                  # and the job doesn't need the install speed.
+                  package-manager-cache: false
+
+            - name: Set up npm
+              uses: ./.github/setup-npm
+
+            - name: npm install
+              # Not the setup-node composite action: its cached node_modules
+              # path skips `prepare` scripts, and bundling from source needs
+              # what they generate (e.g. the icons `src/library`).
+              run: npm install
+
+            - name: Check private API usage in bundled packages
+              run: npm run --workspace @wordpress/validation-tools check-private-apis

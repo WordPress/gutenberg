@@ -2,6 +2,109 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Admin.visitSiteEditor()`: When the `GUTENBERG_E2E_SITE_EDITOR_V2` environment variable is set, visit the extensible site editor (`admin.php?page=site-editor-v2`) instead of `site-editor.php`, translating the classic query args to the equivalent v2 route, and wait for the lazily loaded editor to finish initializing on edit routes. `RequestUtils.setGutenbergExperiments()` keeps the `gutenberg-extensible-site-editor` experiment enabled in that mode so specs that reset experiments do not turn the v2 editor off mid-run.
+
+### Bug Fixes
+
+-   `Editor.saveSiteEditorEntities()`: Wait for the save button to mount before deciding between its `Save` and `Publish` variants, instead of sampling visibility immediately — the extensible site editor only renders it once an entity is dirty.
+
+### Internal
+
+-   `setGutenbergExperiments`: Remove the special handling for the removed `active_templates` experiment ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
+
+## 1.54.0 (2026-08-26)
+
+## 1.53.0 (2026-08-12)
+
+### Bug Fixes
+
+-   `Metrics.startTracing()`: Run a trivial script in every frame once tracing is on, to absorb the isolate interrupt that enabling the V8 sampling profiler queues. Its cost otherwise lands in the first thing the test does, usually the interaction being measured, and grows through a spec's iterations: a stable 220ms interaction reported anywhere from 200ms to 650ms ([#81264](https://github.com/WordPress/gutenberg/pull/81264)).
+-   `Metrics.getSelectionEventDurations()`: Dispatches that nest inside another dispatch now contribute only the time not already covered by it, so summing the returned durations no longer counts the nested work twice.
+
+## 1.52.0 (2026-07-29)
+
+### Bug Fixes
+
+-   `Metrics.getSelectionEventDurations()`: Also collect `pointerup` and `selectionchange` durations, and omit event types that did not fire. Selecting a block within an editing host no longer fires `focus`/`focusin`, which made the metric report zero.
+
+## 1.51.0 (2026-07-14)
+
+## 1.50.0 (2026-07-01)
+
+## 1.49.0 (2026-06-24)
+
+### Enhancements
+
+-   Added `RequestUtils.resetThemeGlobalStyles()` to reset the current theme's user global styles to an empty config for test isolation.
+
+### Bug Fixes
+
+-   Resolve root-relative `page.goto()` URLs against the full `baseURL`, including any subdirectory path, so tests work against WordPress installs served from a subdirectory.
+
+## 1.48.1 (2026-06-16)
+
+## 1.48.0 (2026-06-10)
+
+## 1.47.0 (2026-05-27)
+
+## 1.46.0 (2026-05-14)
+
+## 1.45.0 (2026-04-29)
+
+## 1.44.0 (2026-04-15)
+
+## 1.43.0 (2026-04-01)
+
+## 1.42.0 (2026-03-18)
+
+## 1.41.0 (2026-03-04)
+
+## 1.40.0 (2026-02-18)
+
+## 1.39.0 (2026-01-29)
+
+## 1.38.0 (2026-01-16)
+
+## 1.36.0 (2025-11-26)
+
+## 1.35.0 (2025-11-12)
+
+## 1.34.0 (2025-10-29)
+
+## 1.33.0 (2025-10-17)
+
+## 1.32.0 (2025-10-01)
+
+## 1.31.0 (2025-09-17)
+
+## 1.30.0 (2025-09-03)
+
+## 1.29.0 (2025-08-20)
+
+## 1.28.0 (2025-08-07)
+
+## 1.27.0 (2025-07-23)
+
+## 1.26.0 (2025-06-25)
+
+## 1.25.0 (2025-06-04)
+
+## 1.24.0 (2025-05-22)
+
+## 1.23.0 (2025-05-07)
+
+## 1.22.0 (2025-04-11)
+
+### Enhancements
+
+* Added new `PageUtils.emulateNetworkConditions()` helper to emulate network conditions such as Slow 3G, Fast 4G or Broadband ([#69865](https://github.com/WordPress/gutenberg/pull/69865)).
+
+## 1.21.0 (2025-03-27)
+
+## 1.20.0 (2025-03-13)
+
 ## 1.19.0 (2025-02-28)
 
 ## 1.18.0 (2025-02-12)

@@ -20,7 +20,7 @@ npm install @wordpress/scripts --save-dev
 
 ## Setup
 
-This package offers a command-line interface and exposes a binary called `wp-scripts` so you can call it directly with `npx` – an npm package runner. However, this module is designed to be configured using the `scripts` section in the `package.json` file of your project. This comprehensive example demonstrates the most of the capabilities included.
+This package offers a command-line interface and exposes a binary called `wp-scripts` so you can call it directly with `npm exec --no -- wp-scripts`. However, this module is designed to be configured using the `scripts` section in the `package.json` file of your project. This comprehensive example demonstrates the most of the capabilities included.
 
 _Example:_
 
@@ -44,13 +44,13 @@ _Example:_
 }
 ```
 
-It might also be a good idea to get familiar with the [JavaScript Build Setup tutorial](https://github.com/WordPress/gutenberg/tree/HEAD/docs/how-to-guides/javascript/js-build-setup.md) for setting up a development environment to use ESNext syntax. It gives a very in-depth explanation of how to use the [build](#build) and [start](#start) scripts.
+It might also be a good idea to get familiar with [Working with JavaScript for the Block Editor](/docs/getting-started/fundamentals/javascript-in-the-block-editor.md) for setting up a development environment to use ESNext syntax. It gives a very in-depth explanation of how to use the [build](#build) and [start](#start) scripts.
 
 ## Updating to New Release
 
-To update an existing project to a new version of `@wordpress/scripts`, open the [changelog](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), find the version you’re currently on (check `package.json` in the top-level directory of your project), and apply the migration instructions for the newer versions.
+To update an existing project to a new version of `@wordpress/scripts`, open the [changelog](/packages/scripts/CHANGELOG.md), find the version you’re currently on (check `package.json` in the top-level directory of your project), and apply the migration instructions for the newer versions.
 
-In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md) for potential breaking changes. There is also `packages-update` script included in this package that aims to automate the process of updating WordPress dependencies in your projects.
+In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](/packages/scripts/CHANGELOG.md) for potential breaking changes. There is also `packages-update` script included in this package that aims to automate the process of updating WordPress dependencies in your projects.
 
 We commit to keeping the breaking changes minimal so you can upgrade `@wordpress/scripts` as seamless as possible.
 
@@ -89,6 +89,7 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
 -   `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
 -   `--webpack-no-externals` – disables scripts’ assets generation, and omits the list of default externals.
+-   `--blocks-manifest` – generates a PHP file containing block metadata from all `block.json` files in the project. This is useful for enhancing performance when registering multiple block types, as it allows you to use `wp_register_block_metadata_collection()` and `wp_register_block_types_from_metadata_collection()` in WordPress.
 -   `--source-path` – allows customization of the source directory. The default is the project root `.` when [entry points are listed](#listing-entry-points) in the command, or `src` otherwise.
 -   `--output-path` – allows customization of the output directory. The default is the `build` folder.
 
@@ -105,10 +106,7 @@ This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll l
 
 ### `build-blocks-manifest`
 
-This script generates a PHP file containing block metadata from all
-`block.json` files in the project. This is useful for enhancing performance
-when registering multiple block types, as it allows you to use
-`wp_register_block_metadata_collection()` in WordPress.
+This script generates a PHP file containing block metadata from all `block.json` files in the project. This is useful for enhancing performance when registering multiple block types, as it allows you to use `wp_register_block_metadata_collection()` and `wp_register_block_types_from_metadata_collection()` in WordPress.
 
 Usage: `wp-scripts build-blocks-manifest [options]`
 
@@ -138,6 +136,20 @@ wp_register_block_metadata_collection(
 Using this approach can improve performance when registering multiple block
 types, especially for plugins with several custom blocks. Note that this
 feature is only available in WordPress 6.7 and later versions.
+
+Alternatively, you can use `wp_register_block_types_from_metadata_collection()`
+to have all block types from your plugin automatically registered in the same
+function call. This way you no longer need to call `register_block_type()` for
+every block type in your plugin.
+
+```php
+wp_register_block_types_from_metadata_collection(
+    plugin_dir_path( __FILE__ ) . 'dist',
+    plugin_dir_path( __FILE__ ) . 'dist/blocks-manifest.php'
+);
+```
+
+Note that this feature is only available in WordPress 6.8 and later versions.
 
 ### `check-engines`
 
@@ -232,7 +244,13 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 #### Advanced information
 
-It uses [eslint](https://eslint.org/) with the set of recommended rules defined in [@wordpress/eslint-plugin](https://www.npmjs.com/package/@wordpress/eslint-plugin) npm package. You can override default rules with your own as described in [eslint docs](https://eslint.org/docs/rules/). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [ESLint](https://eslint.org/) with the set of recommended rules defined in [@wordpress/eslint-plugin](https://www.npmjs.com/package/@wordpress/eslint-plugin) npm package. It detects flat config files (`eslint.config.*`) first, falling back to legacy `.eslintrc.*` files if present. You can override default rules with your own as described in the [ESLint configuration docs](https://eslint.org/docs/latest/use/configure/). Learn more in the [Advanced Usage](#advanced-usage) section.
+
+**Breaking changes in ESLint v10:**
+
+-   The default config path has changed from `config/.eslintrc.js` to `config/eslint.config.cjs`. If you were extending the default config, update your import path.
+-   The `--ignore-path` CLI flag was removed along with the eslintrc system. Use `ignores` arrays in your flat config instead.
+-   Legacy `.eslintrc.*` fallback detection is deprecated and will be removed in a future version. Migrate to `eslint.config.*` files.
 
 ### `lint-pkg-json`
 
@@ -284,7 +302,7 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 #### Advanced information
 
-It uses [markdownlint](https://github.com/DavidAnson/markdownlint) with the [.markdownlint.json](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/config/.markdownlint.json) configuration. This configuration tunes the linting rules to match WordPress standard, you can override with your own config, see [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli/) for command-line parameters.
+It uses [markdownlint](https://github.com/DavidAnson/markdownlint) with the [.markdownlint.json](/packages/scripts/config/.markdownlint.json) configuration. This configuration tunes the linting rules to match WordPress standard, you can override with your own config, see [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli/) for command-line parameters.
 
 ### `lint-style`
 
@@ -411,6 +429,7 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
 -   `--webpack-devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.
 -   `--webpack-no-externals` – disables scripts’ assets generation, and omits the list of default externals.
+-   `--blocks-manifest` – generates a PHP file containing block metadata from all `block.json` files in the project. This is useful for enhancing performance when registering multiple block types, as it allows you to use `wp_register_block_metadata_collection()` and `wp_register_block_types_from_metadata_collection()` in WordPress.
 -   `--source-path` – allows customization of the source directory. The default is the project root `.` when [entry points are listed](#listing-entry-points) in the command, or `src` otherwise.
 -   `--output-path` – allows customization of the output directory. The default is the `build` folder.
 
@@ -424,62 +443,6 @@ Learn more about [using build scripts](#using-build-scripts) to optimize the dev
 #### Advanced information
 
 This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll look for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it’ll use the default config provided by `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
-
-### `test-e2e`
-
-Launches the End-To-End (E2E) test runner. Writing tests can be done using the [Jest API](https://jestjs.io/docs/en/api) in combination with the [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/HEAD/docs/api.md):
-
-> [Jest](https://jestjs.io/) is a delightful JavaScript Testing Framework with a focus on simplicity.
-
-> [Puppeteer](https://pptr.dev/) is a Node library which provides a high-level API to control Chrome or Chromium over the [DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/). Puppeteer runs [headless](https://developers.google.com/web/updates/2017/04/headless-chrome) by default, but can be configured to run full (non-headless) Chrome or Chromium.
-
-_Example:_
-
-```json
-{
-	"scripts": {
-		"test:e2e": "wp-scripts test-e2e",
-		"test:e2e:help": "wp-scripts test-e2e --help",
-		"test:e2e:debug": "wp-scripts --inspect-brk test-e2e --puppeteer-devtools"
-	}
-}
-```
-
-This is how you execute those scripts using the presented setup:
-
--   `npm run test:e2e` - runs all e2e tests.
--   `npm run test:e2e:help` - prints all available options to configure e2e test runner.
--   `npm run test:e2e -- --puppeteer-interactive` - runs all e2e tests interactively.
--   `npm run test:e2e FILE_NAME -- --puppeteer-interactive` - runs one test file interactively.
--   `npm run test:e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
--   `npm run test:e2e:debug` - runs all tests interactively and enables [debugging tests](#debugging-e2e-tests).
-
-Jest will look for test files with any of the following popular naming conventions:
-
--   Files with `.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix at any level of depth in `spec` folders.
--   Files with `.spec.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix.
-
-This script automatically detects the best config to start Puppeteer but sometimes you may need to specify custom options:
-
--   You can add a `jest-puppeteer.config.js` at the root of the project or define a custom path using `JEST_PUPPETEER_CONFIG` environment variable. Check [jest-puppeteer](https://github.com/smooth-code/jest-puppeteer#jest-puppeteerconfigjs) for more details.
-
-We enforce that all tests run serially in the current process using [--runInBand](https://jestjs.io/docs/en/cli#runinband) Jest CLI option to avoid conflicts between tests caused by the fact that they share the same WordPress instance.
-
-#### Failed Test Artifacts
-
-When tests fail, both a screenshot and an HTML snapshot will be taken of the page and stored in the `artifacts/` directory at the root of your project. These snapshots may help debug failed tests during development or when running tests in a CI environment.
-
-The `artifacts/` directory can be customized by setting the `WP_ARTIFACTS_PATH` environment variable to the relative path of the desired directory within your project’s root. For example: to change the default directory from `artifacts/` to `my/custom/artifacts`, you could use `WP_ARTIFACTS_PATH=my/custom/artifacts npm run test:e2e`.
-
-#### Advanced information
-
-It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:e2e --help` or `npm run test:e2e:help` (as mentioned above) to view all of the available options. Learn more in the [Advanced Usage](#advanced-usage) section.
-
-Should there be any situation where you want to provide your own Jest config, you can do so.
-
--   the command receives a `--config` argument. Example: `wp-scripts test-e2e --config my-jest-config.js`.
--   there is a file called `jest-e2e.config.js`, `jest-e2e.config.json`, `jest.config.js`, or `jest.config.json` in the top-level directory of your package (at the same level than your `package.json`).
--   a `jest` object can be provided in the `package.json` file with the test configuration.
 
 ### `test-unit-js`
 
@@ -523,9 +486,11 @@ Should there be any situation where you want to provide your own Jest config, yo
 -   there is a file called `jest-unit.config.js`, `jest-unit.config.json`, `jest.config.js`, or `jest.config.json` in the top-level directory of your package (at the same level than your `package.json`).
 -   a `jest` object can be provided in the `package.json` file with the test configuration.
 
-### `test-playwright`
+### `test-e2e`
 
-Launches the Playwright End-To-End (E2E) test runner. Similar to Puppeteer, it provides a high-level API to control a headless browser.
+_Alias_: `test-playwright`
+
+Launches the End-To-End (E2E) test runner, powered by [Playwright](https://playwright.dev/). It provides a high-level API to control a headless browser. `test-playwright` remains available as an alias that runs the same command.
 
 Refer to the [Getting Started guide](https://playwright.dev/docs/writing-tests) to learn how to write tests.
 
@@ -534,20 +499,20 @@ _Example:_
 ```json
 {
 	"scripts": {
-		"test:playwright": "wp-scripts test-playwright",
-		"test:playwright:help": "wp-scripts test-playwright --help",
-		"test:playwright:debug": "wp-scripts test-playwright --debug"
+		"test:e2e": "wp-scripts test-e2e",
+		"test:e2e:help": "wp-scripts test-e2e --help",
+		"test:e2e:debug": "wp-scripts test-e2e --debug"
 	}
 }
 ```
 
 This is how you execute those scripts using the presented setup:
 
--   `npm run test:playwright` - runs all tests.
--   `npm run test:playwright:help` - prints all available options to configure the test runner.
--   `npm run test:playwright:debug` - runs all tests interactively with the Playwright inspector.
--   `npm run test:playwright FILE_NAME` - runs a specific test file.
--   `npm run test:playwright -- --watch` - runs all tests interactively with watch mode and enhanced debugging.
+-   `npm run test:e2e` - runs all tests.
+-   `npm run test:e2e:help` - prints all available options to configure the test runner.
+-   `npm run test:e2e:debug` - runs all tests interactively with the Playwright inspector.
+-   `npm run test:e2e FILE_NAME` - runs a specific test file.
+-   `npm run test:e2e -- --watch` - runs all tests interactively with watch mode and enhanced debugging.
 
 By default, Playwright looks for JavaScript or TypeScript files with `.test` or `.spec` suffix in the project root-level `/specs` folder, for example `/specs/login-screen.wrong-credentials.spec.ts`.
 
@@ -558,11 +523,11 @@ To do so, you can add a file called `playwright.config.ts` or `playwright.config
 
 When tests fail, snapshots will be taken of the page and stored in the `artifacts/` directory at the root of your project. These snapshots may help debug failed tests during development or when running tests in a CI environment.
 
-The `artifacts/` directory can be customized by setting the `WP_ARTIFACTS_PATH` environment variable to the relative path of the desired directory within your project’s root. For example: to change the default directory from `artifacts/` to `my/custom/artifacts`, you could use `WP_ARTIFACTS_PATH=my/custom/artifacts npm run test:playwright`.
+The `artifacts/` directory can be customized by setting the `WP_ARTIFACTS_PATH` environment variable to the relative path of the desired directory within your project’s root. For example: to change the default directory from `artifacts/` to `my/custom/artifacts`, you could use `WP_ARTIFACTS_PATH=my/custom/artifacts npm run test:e2e`.
 
 #### Advanced information
 
-You are able to use all of Playwright’s [CLI options](https://playwright.dev/docs/test-cli#reference). You can also run `./node_modules/.bin/wp-scripts test-playwright --help` or `npm run test:playwright:help` (as mentioned above) to view all the available options. Learn more in the [Advanced Usage](#advanced-usage) section.
+You are able to use all of Playwright’s [CLI options](https://playwright.dev/docs/test-cli#reference). You can also run `./node_modules/.bin/wp-scripts test-e2e --help` or `npm run test:e2e:help` (as mentioned above) to view all the available options. Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ## Passing Node.js options
 
@@ -603,18 +568,6 @@ Then open npm scripts in the explorer or run `Explorer: Focus on NPM Scripts Vie
 The tests will start running, and execution will pause on your selected line so you can inspect the current scope and call stack within the editor.
 
 See [Debugging in Visual Studio Code](https://code.visualstudio.com/Docs/editor/debugging) for more details on using the Visual Studio Code debugger.
-
-#### Debugging e2e tests
-
-Since e2e tests run both in the node context _and_ the (usually headless) browser context, not all lines of code can have breakpoints set within the inspector client—only the node context is debugged in the inspector client.
-
-The code executed in the node context includes all of the test files _excluding_ code within `page.evaluate` functions. The `page.evaluate` functions and the rest of your app code is executed within the browser context.
-
-Test code (node context) can be debugged normally using the instructions above.
-
-To also debug the browser context, run `wp-scripts --inspect-brk test-e2e --puppeteer-devtools`. The `--puppeteer-devtools` option (or the `PUPPETEER_DEVTOOLS="true"` environment variable when used with `PUPPETEER_HEADLESS="false"`) will disable headless mode and launch the browser with the devtools already open. Breakpoints can then be set in the browser context using these devtools.
-
-For more e2e debugging tips check out the [Puppeteer debugging docs](https://developers.google.com/web/tools/puppeteer/debugging).
 
 ## Using build scripts
 
@@ -752,7 +705,7 @@ This package should generally be used with the set of recommended config files. 
 -   [Plugins](https://webpack.js.org/configuration/plugins) (among others):
     -   [`CopyWebpackPlugin`](https://webpack.js.org/plugins/copy-webpack-plugin/) copies all `block.json` files discovered in the `src` directory to the build directory.
     -   [`MiniCssExtractPlugin`](https://webpack.js.org/plugins/mini-css-extract-plugin/) extracts CSS into separate files. It creates a CSS file per JavaScript entry point which contains CSS.
-    -   [`@wordpress/dependency-extraction-webpack-plugin`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/dependency-extraction-webpack-plugin/README.md) is used with the default configuration to ensure that WordPress provided scripts are not included in the built bundle.
+    -   [`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md) is used with the default configuration to ensure that WordPress provided scripts are not included in the built bundle.
 
 ### Provide your own webpack config
 
@@ -792,7 +745,7 @@ module.exports = {
 If you follow this approach, please, be aware that:
 
 -   You should keep using the `wp-scripts` commands (`start` and `build`). Do not use `webpack` directly.
--   Future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
+-   Future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
 
 ## Contributing to this package
 

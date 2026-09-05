@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type {
 	Context,
 	ContextualField,
@@ -11,17 +8,62 @@ import type {
 	CommentingStatus,
 	PingStatus,
 } from './helpers';
-
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 interface MediaDetails {
-	width: number;
-	height: number;
-	file: string;
-	filesize: number;
-	sizes: { [ key: string ]: Size };
-	image_meta: ImageMeta;
+	width?: number;
+	height?: number;
+	file?: string;
+	filesize?: number;
+	sizes?: { [ key: string ]: Size };
+	image_meta?: ImageMeta;
 	original_image?: string;
+	// Audio/video metadata
+	bitrate?: number;
+	mime_type?: string;
+	length?: number;
+	length_formatted?: string;
+	fileformat?: string;
+	dataformat?: string;
+	// Audio-specific
+	channels?: number;
+	sample_rate?: number;
+	codec?: string;
+	encoder?: string;
+	lossless?: boolean;
+	encoder_options?: string;
+	compression_ratio?: number;
+	channelmode?: string;
+	bitrate_mode?: string;
+	// Video-specific
+	audio?: {
+		dataformat?: string;
+		bitrate?: number;
+		codec?: string;
+		sample_rate?: number;
+		channels?: number;
+		bits_per_sample?: number;
+		lossless?: boolean;
+		channelmode?: string;
+		compression_ratio?: number;
+	};
+	created_timestamp?: number;
+	// Audio metadata fields
+	title?: string;
+	artist?: string;
+	track_number?: string;
+	album?: string;
+	recording_time?: string;
+	genre?: string;
+	date?: string;
+	comment?: string;
+	band?: string;
+	year?: string;
+	image?: {
+		mime?: string;
+		width?: number;
+		height?: number;
+	};
 }
 interface ImageMeta {
 	aperture: string;
@@ -123,7 +165,7 @@ declare module './base-entity-records' {
 			 * Meta fields.
 			 */
 			meta: ContextualField<
-				Record< string, string >,
+				Record< string, unknown > | [],
 				'view' | 'edit',
 				C
 			>;
@@ -138,7 +180,7 @@ declare module './base-entity-records' {
 			/**
 			 * The attachment caption.
 			 */
-			caption: ContextualField< string, 'edit', C >;
+			caption: RenderedText< C >;
 			/**
 			 * The attachment description.
 			 */
@@ -162,7 +204,7 @@ declare module './base-entity-records' {
 			/**
 			 * The ID for the associated post of the attachment.
 			 */
-			post: ContextualField< number, 'view' | 'edit', C >;
+			post: ContextualField< number | null, 'view' | 'edit', C >;
 			/**
 			 * URL to the original attachment file.
 			 */
@@ -171,10 +213,49 @@ declare module './base-entity-records' {
 			 * List of the missing image sizes of the attachment.
 			 */
 			missing_image_sizes: ContextualField< string[], 'edit', C >;
+			/**
+			 * The ID of the featured media of the attachment.
+			 */
+			featured_media: number;
+			/**
+			 * An array of class names for the post.
+			 */
+			class_list: ContextualField< string[], 'view' | 'edit', C >;
+			/**
+			 * Links to related resources.
+			 */
+			_links?: Record< string, unknown >;
 		}
 	}
 }
 
+type AttachmentFileDetails< C extends Context > = C extends 'view' | 'edit'
+	? {
+			/** Original attachment file name. */
+			filename?: string | null;
+			/** Attachment file size in bytes, or null when unavailable. */
+			filesize?: number | null;
+	  }
+	: Record< never, never >;
+
+type AttachmentEditDetails< C extends Context > = C extends 'edit'
+	? {
+			/** EXIF orientation value from the original image. */
+			exif_orientation?: number;
+			/** Output MIME type, or null when no conversion is needed. */
+			image_output_format?: string | null;
+			/** Whether to use progressive or interlaced encoding. */
+			image_save_progressive?: boolean;
+			/** Encode quality for the full image and registered sizes. */
+			image_quality?: {
+				default: number;
+				sizes: Record< string, number >;
+			};
+	  }
+	: Record< never, never >;
+
 export type Attachment< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.Attachment< C >
->;
+> &
+	AttachmentFileDetails< C > &
+	AttachmentEditDetails< C >;

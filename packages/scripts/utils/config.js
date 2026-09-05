@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const { readFileSync } = require( 'fs' );
 const { basename, dirname, extname, join, sep } = require( 'path' );
 const { sync: glob } = require( 'fast-glob' );
-
-/**
- * Internal dependencies
- */
 const {
 	getArgFromCLI,
 	getArgsFromCLI,
@@ -86,6 +79,7 @@ const hasPrettierConfig = () =>
 	hasProjectFile( '.prettierrc.yaml' ) ||
 	hasProjectFile( '.prettierrc.yml' ) ||
 	hasProjectFile( 'prettier.config.js' ) ||
+	hasProjectFile( 'prettier.config.mjs' ) ||
 	hasProjectFile( '.prettierrc' ) ||
 	hasPackageProp( 'prettier' );
 
@@ -114,6 +108,7 @@ const hasPostCSSConfig = () =>
 const getWebpackArgs = () => {
 	// Gets all args from CLI without those prefixed with `--webpack`.
 	let webpackArgs = getArgsFromCLI( [
+		'--blocks-manifest',
 		'--experimental-modules',
 		'--source-path',
 		'--webpack',
@@ -146,6 +141,10 @@ const getWebpackArgs = () => {
 		process.env.WP_NO_EXTERNALS = true;
 	}
 
+	if ( hasArgInCLI( '--blocks-manifest' ) ) {
+		process.env.WP_BLOCKS_MANIFEST = true;
+	}
+
 	const hasWebpackOutputOption =
 		hasArgInCLI( '-o' ) || hasArgInCLI( '--output' );
 	if (
@@ -155,15 +154,15 @@ const getWebpackArgs = () => {
 	) {
 		/**
 		 * Converts a legacy path to the entry pair supported by webpack, e.g.:
-		 * `./entry-one.js` -> `[ 'entry-one', './entry-one.js] ]`
-		 * `entry-two.js` -> `[ 'entry-two', './entry-two.js' ]`
+		 * `./entry-one.jsx` -> `[ 'entry-one', './entry-one.jsx' ]`
+		 * `entry-two.tsx` -> `[ 'entry-two', './entry-two.tsx' ]`
 		 *
 		 * @param {string} path The path provided.
 		 *
 		 * @return {string[]} The entry pair of its name and the file path.
 		 */
 		const pathToEntry = ( path ) => {
-			const entryName = basename( path, '.js' );
+			const entryName = basename( path, extname( path ) );
 
 			return [ entryName, path ];
 		};
@@ -267,7 +266,7 @@ function getWebpackEntryPoints( buildType ) {
 				// at which point they are completely empty and therefore not valid JSON
 				try {
 					parsedBlockJson = JSON.parse( fileContents );
-				} catch ( error ) {
+				} catch {
 					warn(
 						`Not scanning "${ blockMetadataFile.replace(
 							fromProjectRoot( sep ),
@@ -397,7 +396,7 @@ function getPhpFilePaths( context, props ) {
 		let parsedBlockJson;
 		try {
 			parsedBlockJson = JSON.parse( readFileSync( blockMetadataFile ) );
-		} catch ( error ) {
+		} catch {
 			warn(
 				`Not scanning "${ blockMetadataFile.replace(
 					fromProjectRoot( sep ),

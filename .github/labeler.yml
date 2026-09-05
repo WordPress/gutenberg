@@ -1,0 +1,367 @@
+# Package labeling rules - only labels that exist on GitHub
+
+'[Package] A11y':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/a11y/**'
+
+'[Package] Abilities':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/abilities/**'
+
+'[Package] Admin UI':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/admin-ui/**'
+
+'[Package] API fetch':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/api-fetch/**'
+
+'[Package] Autop':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/autop/**'
+
+'[Package] Base styles':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/base-styles/**'
+
+'[Package] Blob':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/blob/**'
+
+'[Package] Block editor':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/block-editor/**'
+
+'[Package] Block library':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/block-library/**'
+
+'[Package] Blocks':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/blocks/**'
+
+'[Package] Boot':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/boot/**'
+
+'[Package] Commands':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/commands/**'
+
+'[Package] Components':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/components/**'
+
+'[Package] Compose':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/compose/**'
+
+'[Package] Core commands':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/core-commands/**'
+
+'[Package] Core data':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/core-data/**'
+
+'[Package] Data Controls':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/data-controls/**'
+
+'[Package] Data':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/data/**'
+
+'[Package] DataViews':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/dataviews/**'
+
+'[Package] Date':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/date/**'
+
+'[Package] Deprecated':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/deprecated/**'
+
+'[Package] Design System MCP':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/design-system-mcp/**'
+
+'[Package] DOM ready':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/dom-ready/**'
+
+'[Package] DOM':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/dom/**'
+
+'[Package] E2E Tests':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/e2e-tests/**'
+
+'[Package] Edit Post':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/edit-post/**'
+
+'[Package] Edit Site':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/edit-site/**'
+
+'[Package] Edit Widgets':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/edit-widgets/**'
+
+'[Package] Editor':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/editor/**'
+
+'[Package] Element':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/element/**'
+
+'[Package] Escape HTML':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/escape-html/**'
+
+'[Package] Fields':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/fields/**'
+
+'[Package] Format library':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/format-library/**'
+
+'[Package] Grid':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/grid/**'
+
+'[Package] Hooks':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/hooks/**'
+
+'[Package] HTML entities':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/html-entities/**'
+
+'[Package] i18n':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/i18n/**'
+
+'[Package] Icons':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/icons/**'
+
+'[Package] Image Cropper':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/image-cropper/**'
+
+'[Package] Interactivity':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/interactivity/**'
+
+'[Package] Interactivity Router':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/interactivity-router/**'
+
+'[Package] Interface':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/interface/**'
+
+'[Package] is-shallow-equal':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/is-shallow-equal/**'
+
+'[Package] Keyboard Shortcuts':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/keyboard-shortcuts/**'
+
+'[Package] Keycodes':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/keycodes/**'
+
+'[Package] Lazy import':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/lazy-import/**'
+
+'[Package] Media Utils':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/media-utils/**'
+
+'[Package] Notices':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/notices/**'
+
+'[Package] Patterns':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/patterns/**'
+
+'[Package] Plugins':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/plugins/**'
+
+'[Package] Preferences':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/preferences/**'
+
+'[Package] Primitives':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/primitives/**'
+
+'[Package] Priority Queue':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/priority-queue/**'
+
+'[Package] Private APIs':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/private-apis/**'
+
+'[Package] Project management automation':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/project-management-automation/**'
+
+'[Package] React i18n':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/react-i18n/**'
+
+'[Package] Redux Routine':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/redux-routine/**'
+
+'[Package] Rich text':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/rich-text/**'
+
+'[Package] Router':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/router/**'
+
+'[Package] Server Side Render':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/server-side-render/**'
+
+'[Package] Style Engine':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/style-engine/**'
+
+'[Package] Sync':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/sync/**'
+
+'[Package] Theme':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/theme/**'
+
+'[Package] Token List':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/token-list/**'
+
+'[Package] UI':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/ui/**'
+
+'[Package] Url':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/url/**'
+
+'[Package] Viewport':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/viewport/**'
+
+'[Package] Views':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/views/**'
+
+'[Package] Warning':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/warning/**'
+
+'[Package] Widget Dashboard':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/widget-dashboard/**'
+
+'[Package] Widget primitives':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/widget-primitives/**'
+
+'[Package] Word count':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/wordcount/**'
+
+'[Package] wp-build':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/wp-build/**'
+
+# Tool labeling rules
+
+'[Tool] Babel plugin import JSX pragma':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/babel-plugin-import-jsx-pragma/**'
+
+'[Tool] Babel plugin makepot':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/babel-plugin-makepot/**'
+
+'[Tool] Babel preset':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/babel-preset-default/**'
+
+'[Tool] Browserslist config':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/browserslist-config/**'
+
+'[Tool] Create Block':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/create-block/**'
+
+'[Tool] Dependency Extraction Webpack Plugin':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/dependency-extraction-webpack-plugin/**'
+
+'[Tool] Docgen':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/docgen/**'
+
+'[Tool] E2E Test Utils':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/e2e-test-utils-playwright/**'
+
+'[Tool] Env':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/env/**'
+
+'[Tool] ESLint plugin':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/eslint-plugin/**'
+
+'[Tool] Jest console':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/jest-console/**'
+
+'[Tool] Jest preset':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/jest-preset-default/**'
+
+'[Tool] npm-package-json-lint config':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/npm-package-json-lint-config/**'
+
+'[Tool] PostCSS Plugins Preset':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/postcss-plugins-preset/**'
+
+'[Tool] Prettier config':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/prettier-config/**'
+
+'[Tool] Readable JS Assets Webpack Plugin':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/readable-js-assets-webpack-plugin/**'
+
+'[Tool] stylelint config':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/stylelint-config/**'
+
+'[Tool] WP Scripts':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/scripts/**'

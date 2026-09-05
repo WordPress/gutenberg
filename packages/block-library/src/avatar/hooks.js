@@ -1,10 +1,7 @@
-/**
- * WordPress dependencies
- */
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore, useEntityProp } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { useDefaultAvatar } from '../utils/hooks';
 
 function getAvatarSizes( sizes ) {
 	const minSize = sizes ? sizes[ 0 ] : 24;
@@ -14,15 +11,6 @@ function getAvatarSizes( sizes ) {
 		minSize,
 		maxSize: maxSizeBuffer,
 	};
-}
-
-function useDefaultAvatar() {
-	const { avatarURL: defaultAvatarUrl } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const { __experimentalDiscussionSettings } = getSettings();
-		return __experimentalDiscussionSettings;
-	} );
-	return defaultAvatarUrl;
 }
 
 export function useCommentAvatar( { commentId } ) {

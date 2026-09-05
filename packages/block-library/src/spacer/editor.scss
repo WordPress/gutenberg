@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .block-editor-block-list__block[data-type="core/spacer"] {
 	// This generates an invisible field above the spacer, which makes its minimum clickable-to-select height larger.
 	&::before {

@@ -1,12 +1,5 @@
-/**
- * Internal dependencies
- */
+import { prependHTTPS } from '@wordpress/url';
 import { NEW_TAB_REL, NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
-
-/**
- * WordPress dependencies
- */
-import { prependHTTP } from '@wordpress/url';
 
 /**
  * Updates the link attributes.
@@ -47,7 +40,7 @@ export function getUpdatedLinkAttributes( {
 	}
 
 	return {
-		url: prependHTTP( url ),
+		url: prependHTTPS( url ),
 		linkTarget: newLinkTarget,
 		rel: updatedRel || undefined,
 	};

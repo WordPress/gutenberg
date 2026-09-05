@@ -2,6 +2,97 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Normalize special characters in exported reusable block filenames to prevent broken or unreadable files. ([#77033](https://github.com/WordPress/gutenberg/pull/77033))
+
+## 5.54.0 (2026-08-26)
+
+## 5.53.0 (2026-08-12)
+
+
+## 5.52.0 (2026-07-29)
+
+### Internal
+
+-   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
+
+## 5.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 5.50.0 (2026-07-01)
+
+## 5.49.0 (2026-06-24)
+
+## 5.48.1 (2026-06-16)
+
+## 5.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 5.47.0 (2026-05-27)
+
+### Internal
+
+-   Import form: remove `Notice` margin and padding overrides ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+
+## 5.46.0 (2026-05-14)
+
+## 5.45.0 (2026-04-29)
+
+## 5.44.0 (2026-04-15)
+
+## 5.43.0 (2026-04-01)
+
+## 5.42.0 (2026-03-18)
+
+## 5.41.0 (2026-03-04)
+
+## 5.40.0 (2026-02-18)
+
+## 5.39.0 (2026-01-29)
+
+## 5.38.0 (2026-01-16)
+
+## 5.36.0 (2025-11-26)
+
+## 5.35.0 (2025-11-12)
+
+## 5.34.0 (2025-10-29)
+
+## 5.33.0 (2025-10-17)
+
+## 5.32.0 (2025-10-01)
+
+## 5.31.0 (2025-09-17)
+
+## 5.30.0 (2025-09-03)
+
+## 5.29.0 (2025-08-20)
+
+## 5.28.0 (2025-08-07)
+
+## 5.27.0 (2025-07-23)
+
+## 5.26.0 (2025-06-25)
+
+## 5.25.0 (2025-06-04)
+
+## 5.24.0 (2025-05-22)
+
+## 5.23.0 (2025-05-07)
+
+## 5.22.0 (2025-04-11)
+
+## 5.21.0 (2025-03-27)
+
+## 5.20.0 (2025-03-13)
+
 ## 5.19.0 (2025-02-28)
 
 ## 5.18.0 (2025-02-12)

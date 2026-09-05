@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
 import * as Ariakit from '@ariakit/react';
-
-/**
- * Internal dependencies
- */
-import { COLORS, CONFIG } from '../utils';
+import { COLORS, CONFIG, font } from '../utils';
 import { space } from '../utils/space';
 import Icon from '../icon';
 
@@ -58,7 +51,7 @@ export const StyledTabList = styled( Ariakit.TabList )`
 			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
 	--antialiasing-factor: 100;
 	&[aria-orientation='horizontal'] {
-		--fade-width: 4rem;
+		--fade-width: 64px;
 		--fade-gradient-base: transparent 0%, black var( --fade-width );
 		--fade-gradient-composed: var( --fade-gradient-base ), black 60%,
 			transparent 50%;
@@ -99,7 +92,7 @@ export const StyledTabList = styled( Ariakit.TabList )`
 					)
 				);
 			border-bottom: var( --wp-admin-border-width-focus ) solid
-				${ COLORS.theme.accent };
+				${ COLORS.theme.gray[ 700 ] };
 		}
 	}
 	&[aria-orientation='vertical'] {
@@ -124,11 +117,7 @@ export const StyledTabList = styled( Ariakit.TabList )`
 							var( --antialiasing-factor )
 					)
 				);
-			background-color: color-mix(
-				in srgb,
-				${ COLORS.theme.accent },
-				transparent 96%
-			);
+			background-color: ${ COLORS.theme.gray[ 100 ] };
 		}
 		&[data-select-on-move='true']:has(
 				:is( :focus-visible, [data-focus-visible] )
@@ -162,7 +151,9 @@ export const Tab = styled( Ariakit.Tab )`
 		align-items: center;
 		cursor: pointer;
 		line-height: 1.2; // Characters in some languages (e.g. Japanese) may have a native higher line-height.
+		font-family: ${ font( 'default.fontFamily' ) };
 		font-weight: 400;
+		font-size: ${ font( 'default.fontSize' ) };
 		color: ${ COLORS.theme.foreground };
 
 		&[aria-disabled='true'] {
@@ -171,7 +162,7 @@ export const Tab = styled( Ariakit.Tab )`
 		}
 
 		&:not( [aria-disabled='true'] ):is( :hover, [data-focus-visible] ) {
-			color: ${ COLORS.theme.accent };
+			color: ${ COLORS.theme.foreground };
 		}
 
 		&:focus:not( :disabled ) {
@@ -220,7 +211,6 @@ export const Tab = styled( Ariakit.Tab )`
 		min-height: ${ space( 10 ) };
 
 		&[aria-selected='true'] {
-			color: ${ COLORS.theme.accent };
 			fill: currentColor;
 		}
 	}

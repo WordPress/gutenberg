@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	store as blocksStore,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
@@ -9,10 +6,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { loadAssets } from './load-assets';
 import getPluginUrl from './utils/get-plugin-url';
 
@@ -91,16 +84,20 @@ export const installBlockType =
 				'title',
 				'category',
 				'parent',
+				'ancestor',
 				'icon',
 				'description',
 				'keywords',
 				'attributes',
 				'provides_context',
 				'uses_context',
+				'selectors',
 				'supports',
 				'styles',
 				'example',
 				'variations',
+				'allowed_blocks',
+				'block_hooks',
 			];
 			await apiFetch( {
 				path: addQueryArgs( `/wp/v2/block-types/${ name }`, {

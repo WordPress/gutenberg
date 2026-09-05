@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block Renaming', () => {
@@ -146,11 +143,6 @@ test.describe( 'Block Renaming', () => {
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/group',
-					attributes: {
-						metadata: {
-							name: undefined,
-						},
-					},
 				},
 			] );
 		} );

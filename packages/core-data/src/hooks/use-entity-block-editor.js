@@ -1,19 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from '../name';
 import useEntityId from './use-entity-id';
 import { updateFootnotesFromMeta } from '../footnotes';
+import { getCachedBlocks, setCachedBlocks } from '../parsed-blocks-cache';
 
 const EMPTY_ARRAY = [];
-const parsedBlocksCache = new WeakMap();
 
 /**
  * Hook that returns block content getters and setters for
@@ -36,7 +29,6 @@ const parsedBlocksCache = new WeakMap();
 export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
-	const { getEntityRecord, getEntityRecordEdits } = useSelect( STORE_NAME );
 	const { content, editedBlocks, meta } = useSelect(
 		( select ) => {
 			if ( ! id ) {
@@ -68,28 +60,19 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			return EMPTY_ARRAY;
 		}
 
-		// If there's an edit, cache the parsed blocks by the edit.
-		// If not, cache by the original entity record.
-		const edits = getEntityRecordEdits( kind, name, id );
-		const isUnedited = ! edits || ! Object.keys( edits ).length;
-		const cackeKey = isUnedited ? getEntityRecord( kind, name, id ) : edits;
-		let _blocks = parsedBlocksCache.get( cackeKey );
+		// The cache validates the content and the registered block types, so
+		// an entry parsed from other content — or before the block types were
+		// registered, as happens when a record resolves while the editor's
+		// assets are still loading — is re-parsed instead of adopted.
+		let _blocks = getCachedBlocks( kind, name, id, content );
 
 		if ( ! _blocks ) {
 			_blocks = parse( content );
-			parsedBlocksCache.set( cackeKey, _blocks );
+			setCachedBlocks( kind, name, id, content, _blocks );
 		}
 
 		return _blocks;
-	}, [
-		kind,
-		name,
-		id,
-		editedBlocks,
-		content,
-		getEntityRecord,
-		getEntityRecordEdits,
-	] );
+	}, [ kind, name, id, editedBlocks, content ] );
 
 	const onChange = useCallback(
 		( newBlocks, options ) => {
@@ -128,8 +111,10 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const onInput = useCallback(
 		( newBlocks, options ) => {
 			const { selection, ...rest } = options;
-			const footnotesChanges = updateFootnotesFromMeta( newBlocks, meta );
-			const edits = { selection, ...footnotesChanges };
+			const edits = {
+				selection,
+				...updateFootnotesFromMeta( newBlocks, meta ),
+			};
 
 			editEntityRecord( kind, name, id, edits, {
 				isCached: true,

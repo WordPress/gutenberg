@@ -180,6 +180,10 @@ _Returns_
 
 -   `RichTextValue`: A rich text value.
 
+### EventListenersProps
+
+The callback-Set refs the private event-listener helpers dispatch from.
+
 ### getActiveFormat
 
 Gets the format object by type at the start of the selection. This can be used to get e.g. the URL of a link format at the current selection, but also to check if a format is active at the selection. Returns undefined if there is no format at the selection.
@@ -299,6 +303,10 @@ _Returns_
 
 -   `RichTextValue`: A new combined value.
 
+### privateApis
+
+Private @wordpress/rich-text APIs.
+
 ### registerFormatType
 
 Registers a new format provided a unique name and an object defining its behavior.
@@ -306,7 +314,7 @@ Registers a new format provided a unique name and an object defining its behavio
 _Parameters_
 
 -   _name_ `string`: Format name.
--   _settings_ `WPFormat`: Format settings.
+-   _settings_ `Omit<WPFormat, 'name'>`: Format settings. `name` is injected from the first argument.
 
 _Returns_
 
@@ -349,7 +357,7 @@ _Parameters_
 
 -   _value_ `RichTextValue`: The value to modify.
 -   _pattern_ `RegExp|string`: A RegExp object or literal. Can also be a string. It is treated as a verbatim string and is not interpreted as a regular expression. Only the first occurrence will be replaced.
--   _replacement_ `Function|string`: The match or matches are replaced with the specified or the value returned by the specified function.
+-   _replacement_ `Function|string|RichTextValue`: The match or matches are replaced with the specified value, the value returned by the specified function, or the given rich text value.
 
 _Returns_
 
@@ -367,6 +375,10 @@ document.querySelector( 'p' ) )`.
 -   Create one from plain text: `RichTextData.fromPlainText( '1\n2' )`.
 -   Create one from a rich text value: `new RichTextData( { text: '...',
 formats: [ ... ] } )`.
+
+### RichTextFormat
+
+A single format, such as `core/bold`, applied to a range of characters within a `RichTextValue`. See main `@wordpress/rich-text` documentation for more information.
 
 ### RichTextValue
 
@@ -456,13 +468,13 @@ This hook, to be used in a format type's Edit component, returns the active elem
 
 _Parameters_
 
--   _$1_ `Object`: Named parameters.
--   _$1.editableContentElement_ `HTMLElement|null`: The element containing the editable content.
--   _$1.settings_ `WPFormat=`: The format type's settings.
+-   _obj_ `{ editableContentElement: HTMLElement | null; settings?: WPFormat; }`: Named parameters.
+-   _obj.editableContentElement_ `HTMLElement | null`: The element containing the editable content.
+-   _obj.settings_ `WPFormat`: The format type's settings.
 
 _Returns_
 
--   `Element|VirtualAnchorElement|undefined|null`: The active element or selection range.
+-   `Element | VirtualAnchorElement | undefined | null`: The active element or selection range.
 
 ### useAnchorRef
 

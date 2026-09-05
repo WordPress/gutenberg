@@ -1,20 +1,37 @@
-/**
- * WordPress dependencies
- */
 import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import { resolveSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
 import type { BasePostWithEmbeddedAuthor } from '../../types';
 import AuthorView from './author-view';
+
+interface Author {
+	id: number;
+	name: string;
+}
 
 const authorField: Field< BasePostWithEmbeddedAuthor > = {
 	label: __( 'Author' ),
 	id: 'author',
 	type: 'integer',
-	elements: [],
+	getElements: async () => {
+		const authors: Author[] =
+			( await resolveSelect( coreDataStore ).getEntityRecords< Author >(
+				'root',
+				'user',
+				{
+					per_page: -1,
+					who: 'authors',
+					_fields: 'id,name',
+					context: 'view',
+				}
+			) ) ?? [];
+		return authors.map( ( { id, name } ) => ( {
+			value: id,
+			label: name,
+		} ) );
+	},
+	setValue: ( { value } ) => ( { author: Number( value ) } ),
 	render: AuthorView,
 	sort: ( a, b, direction ) => {
 		const nameA = a._embedded?.author?.[ 0 ]?.name || '';
@@ -23,6 +40,9 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 		return direction === 'asc'
 			? nameA.localeCompare( nameB )
 			: nameB.localeCompare( nameA );
+	},
+	filterBy: {
+		operators: [ 'isAny', 'isNone' ],
 	},
 };
 

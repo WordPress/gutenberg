@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 
 export const PREFERENCES_DEFAULTS = {
@@ -27,6 +24,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {string}        titlePlaceholder                       Empty title placeholder
  * @property {boolean}       canLockBlocks                          Whether the user can manage Block Lock state
  * @property {boolean}       codeEditingEnabled                     Whether or not the user can switch to the code editor
+ * @property {boolean}       blockStatesEditingEnabled              Whether or not block style states editing is enabled
  * @property {boolean}       generateAnchors                        Enable/Disable auto anchor generation for Heading blocks
  * @property {boolean}       enableOpenverseMediaCategory           Enable/Disable the Openverse media category in the inserter.
  * @property {boolean}       clearBlockSelection                    Whether the block editor should clear selection on mousedown when a block is not clicked.
@@ -157,6 +155,13 @@ export const SETTINGS_DEFAULTS = {
 
 	// Allows to disable block locking interface.
 	canLockBlocks: true,
+
+	// Allows to disable the block-level style states interface.
+	blockStatesEditingEnabled: true,
+
+	// Whether the user can edit custom CSS (requires edit_css capability).
+	// Defaults to false for safety - PHP passes true when user has capability.
+	canEditCSS: false,
 
 	// Allows to disable Openverse media category in the inserter.
 	enableOpenverseMediaCategory: true,

@@ -1,19 +1,7 @@
-/**
- * External dependencies
- */
-import type { StoryObj, Meta } from '@storybook/react';
-import { css } from '@emotion/react';
-
-/**
- * WordPress dependencies
- */
+import type { StoryObj, Meta } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { customLink, formatCapitalize } from '@wordpress/icons';
 import { useState, useMemo, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { useCx } from '../../utils';
 import { Menu } from '..';
 import Icon from '../../icon';
 import Button from '../../button';
@@ -24,44 +12,40 @@ import type { Props } from '../types';
 
 const meta: Meta< typeof Menu > = {
 	id: 'components-menu',
-	title: 'Components (Experimental)/Actions/Menu',
+	title: 'Components/Actions/Menu',
 	component: Menu,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Item: Menu.Item,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		CheckboxItem: Menu.CheckboxItem,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Group: Menu.Group,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		GroupLabel: Menu.GroupLabel,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Separator: Menu.Separator,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Context: Menu.Context,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		RadioItem: Menu.RadioItem,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		ItemLabel: Menu.ItemLabel,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		ItemHelpText: Menu.ItemHelpText,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		TriggerButton: Menu.TriggerButton,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		SubmenuTriggerItem: Menu.SubmenuTriggerItem,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Popover: Menu.Popover,
+	},
+	args: {
+		onOpenChange: fn(),
 	},
 	argTypes: {
 		children: { control: false },
 	},
 	tags: [ 'status-private' ],
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },
 			source: { excludeDecorators: true },
+		},
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'When building for the Gutenberg repo, use this component instead of `DropdownMenu`. Otherwise, continue using `DropdownMenu` for now.',
 		},
 	},
 };
@@ -404,19 +388,9 @@ export const WithRadios: StoryObj< typeof Menu > = {
 	},
 };
 
-const modalOnTopOfMenuPopover = css`
-	&& {
-		z-index: 1000000;
-	}
-`;
-
-export const WithModals: StoryObj< typeof Menu > = {
-	render: function WithModals( props: Props ) {
-		const [ isOuterModalOpen, setOuterModalOpen ] = useState( false );
-		const [ isInnerModalOpen, setInnerModalOpen ] = useState( false );
-
-		const cx = useCx();
-		const modalOverlayClassName = cx( modalOnTopOfMenuPopover );
+export const WithModal: StoryObj< typeof Menu > = {
+	render: function WithModal( props: Props ) {
+		const [ isModalOpen, setModalOpen ] = useState( false );
 
 		return (
 			<>
@@ -429,42 +403,15 @@ export const WithModals: StoryObj< typeof Menu > = {
 						Open menu
 					</Menu.TriggerButton>
 					<Menu.Popover>
-						<Menu.Item
-							onClick={ () => setOuterModalOpen( true ) }
-							hideOnClick={ false }
-						>
-							<Menu.ItemLabel>Open outer modal</Menu.ItemLabel>
+						<Menu.Item onClick={ () => setModalOpen( true ) }>
+							<Menu.ItemLabel>Open modal</Menu.ItemLabel>
 						</Menu.Item>
-						<Menu.Item
-							onClick={ () => setInnerModalOpen( true ) }
-							hideOnClick={ false }
-						>
-							<Menu.ItemLabel>Open inner modal</Menu.ItemLabel>
-						</Menu.Item>
-						{ isInnerModalOpen && (
-							<Modal
-								onRequestClose={ () =>
-									setInnerModalOpen( false )
-								}
-								overlayClassName={ modalOverlayClassName }
-							>
-								Modal&apos;s contents
-								<button
-									onClick={ () => setInnerModalOpen( false ) }
-								>
-									Close
-								</button>
-							</Modal>
-						) }
 					</Menu.Popover>
 				</Menu>
-				{ isOuterModalOpen && (
-					<Modal
-						onRequestClose={ () => setOuterModalOpen( false ) }
-						overlayClassName={ modalOverlayClassName }
-					>
+				{ isModalOpen && (
+					<Modal onRequestClose={ () => setModalOpen( false ) }>
 						Modal&apos;s contents
-						<button onClick={ () => setOuterModalOpen( false ) }>
+						<button onClick={ () => setModalOpen( false ) }>
 							Close
 						</button>
 					</Modal>
@@ -516,7 +463,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
 				const { forwardedContext = [] } = fillProps;
 
 				return forwardedContext.reduce(
-					( inner: JSX.Element, [ Provider, props ] ) => (
+					( inner: React.JSX.Element, [ Provider, props ] ) => (
 						<Provider { ...props }>{ inner }</Provider>
 					),
 					innerMarkup
@@ -674,7 +621,10 @@ export const InsideModal: StoryObj< typeof Menu > = {
 								</Menu>
 							</Menu.Popover>
 						</Menu>
-						<Button onClick={ () => setModalOpen( false ) }>
+						<Button
+							__next40pxDefaultSize
+							onClick={ () => setModalOpen( false ) }
+						>
 							Close modal
 						</Button>
 					</Modal>

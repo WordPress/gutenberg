@@ -1,6 +1,6 @@
 # Metadata in block.json
 
-Starting with the WordPress 5.8 release, we recommend using the `block.json` metadata file as the canonical way to register block types with both PHP (server-side) and JavaScript (client-side). Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
+Starting with the WordPress 5.8 release, we recommend using the `block.json` metadata file as the canonical way to register block types with both PHP (server-side) and JavaScript (client-side). Here is an example `block.json` file that would define the metadata for a plugin creating a notice block.
 
 **Example:**
 
@@ -100,7 +100,7 @@ This section describes all the properties that can be added to the `block.json` 
 
 The version of the Block API used by the block. The most recent version is `3` and it was introduced in WordPress 6.3.
 
-See [the API versions documentation](/docs/reference-guides/block-api/block-api-versions.md) for more details.
+See [the API versions documentation](/docs/reference-guides/block-api/block-api-versions/README.md) for more details.
 
 ### Name
 

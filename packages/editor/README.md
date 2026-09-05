@@ -130,27 +130,19 @@ Example:
 
 Monitors the changes made to the edited post and triggers autosave if necessary.
 
-The logic is straightforward: a check is performed every `props.interval` seconds. If any changes are detected, `props.autosave()` is called. The time between the change and the autosave varies but is no larger than `props.interval` seconds. Refer to the code below for more details, such as the specific way of detecting changes.
-
-There are two caveats:
-
--   If `props.isAutosaveable` happens to be false at a time of checking for changes, the check is retried every second.
--   The timer may be disabled by setting `props.disableIntervalChecks` to `true`. In that mode, any change will immediately trigger `props.autosave()`.
+The post is checked every `interval` seconds and autosaved when there is something new to save.
 
 _Usage_
 
 ```jsx
-<AutosaveMonitor interval={ 30000 } />
+<AutosaveMonitor interval={ 30 } />
 ```
 
 _Parameters_
 
--   _props_ `Object`: - The properties passed to the component.
--   _props.autosave_ `Function`: - The function to call when changes need to be saved.
--   _props.interval_ `number`: - The maximum time in seconds between an unsaved change and an autosave.
--   _props.isAutosaveable_ `boolean`: - If false, the check for changes is retried every second.
--   _props.disableIntervalChecks_ `boolean`: - If true, disables the timer and any change will immediately trigger `props.autosave()`.
--   _props.isDirty_ `boolean`: - Indicates if there are unsaved changes.
+-   _props_ `Object`: The component props.
+-   _props.interval_ `[number]`: Time in seconds between checks. Defaults to the editor's `autosaveInterval` setting.
+-   _props.autosave_ `[Function]`: Function to call when changes need to be saved. Defaults to the editor store's `autosave` action.
 
 ### BlockAlignmentToolbar
 
@@ -341,17 +333,7 @@ _Returns_
 
 ### EditorNotices
 
-This component renders the notices displayed in the editor. It displays pinned notices first, followed by dismissible
-
-_Usage_
-
-```jsx
-<EditorNotices />
-```
-
-_Returns_
-
--   `React.ReactNode`: The rendered EditorNotices component.
+> **Deprecated** since 7.0, use `wp.notices.InlineNotices` instead.
 
 ### EditorProvider
 
@@ -387,26 +369,11 @@ _Returns_
 
 ### EditorSnackbars
 
-Renders the editor snackbars component.
-
-_Returns_
-
--   `React.ReactNode`: The rendered component.
+> **Deprecated** since 7.0, use `wp.notices.SnackbarNotices` instead.
 
 ### EntitiesSavedStates
 
-Renders the component for managing saved states of entities.
-
-_Parameters_
-
--   _props_ `Object`: The component props.
--   _props.close_ `Function`: The function to close the dialog.
--   _props.renderDialog_ `boolean`: Whether to render the component with modal dialog behavior.
--   _props.variant_ `string`: Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
-
-_Returns_
-
--   `React.ReactNode`: The rendered component.
+Undocumented declaration.
 
 ### ErrorBoundary
 
@@ -440,18 +407,6 @@ getDerivedStateFromError is used to render a fallback UI after an error has been
 
 > **Deprecated** since 5.3, use `wp.blockEditor.getFontSizeClass` instead.
 
-### getTemplatePartIcon
-
-Helper function to retrieve the corresponding icon by name.
-
-_Parameters_
-
--   _iconName_ `string`: The name of the icon.
-
-_Returns_
-
--   `Object`: The corresponding icon.
-
 ### InnerBlocks
 
 > **Deprecated** since 5.3, use `wp.blockEditor.InnerBlocks` instead.
@@ -467,6 +422,14 @@ _Returns_
 ### InspectorControls
 
 > **Deprecated** since 5.3, use `wp.blockEditor.InspectorControls` instead.
+
+### linkAutocompleter
+
+A link completer for posts and pages.
+
+_Type_
+
+-   `Object`
 
 ### LocalAutosaveMonitor
 
@@ -489,7 +452,7 @@ The module also checks for sessionStorage support and conditionally exports the 
 
 ### mediaUpload
 
-Upload a media file when the file upload button is activated. Wrapper around mediaUpload() that injects the current post ID.
+Upload a media file when the file upload button is activated. Wrapper around uploadMedia() that injects the current post ID.
 
 _Parameters_
 
@@ -502,6 +465,7 @@ _Parameters_
 -   _$0.onFileChange_ `Function`: Function called each time a file or a temporary representation of the file is available.
 -   _$0.onSuccess_ `Function`: Function called after the final representation of the file is available.
 -   _$0.multiple_ `boolean`: Whether to allow multiple files to be uploaded.
+-   _$0.isTransportOnly_ `boolean`: Whether the caller owns the upload lifecycle UX (progress tracking and save locking) and uses this function only as its server transport. Set by the `@wordpress/upload-media` queue, which counts its own items for the progress snackbar and locks saving via `useUploadSaveLock`.
 
 ### MediaUploadCheck
 
@@ -745,7 +709,7 @@ _Parameters_
 -   _props.href_ `[string]`: When `href` is provided then the menu item is represented as an anchor rather than button. It corresponds to the `href` attribute of the anchor.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
 -   _props.onClick_ `[Function]`: The callback function to be executed when the user clicks the menu item.
--   _props.other_ `[...*]`: Any additional props are passed through to the underlying [Button](/packages/components/src/button/README.md) component.
+-   _props.other_ `[...*]`: Any additional props are passed through to the underlying menu item component, except for `as`, which is deprecated and ignored.
 
 _Returns_
 
@@ -858,7 +822,7 @@ _Parameters_
 -   _props.className_ `[string]`: An optional class name added to the panel.
 -   _props.title_ `[string]`: Title displayed at the top of the panel.
 -   _props.initialOpen_ `[boolean]`: Whether to have the panel initially opened. When no title is provided it is always opened.
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+-   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar. If `false` is passed, no icon will be rendered.
 -   _props.children_ `React.ReactNode`: Children to be rendered
 
 _Returns_
@@ -897,7 +861,7 @@ _Parameters_
 -   _props.href_ `[string]`: When `href` is provided, the menu item is rendered as an anchor instead of a button. It corresponds to the `href` attribute of the anchor.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The icon to be rendered to the left of the menu item label. Can be a Dashicon slug or an SVG WP element.
 -   _props.onClick_ `[Function]`: The callback function to be executed when the user clicks the menu item.
--   _props.other_ `[...*]`: Any additional props are passed through to the underlying MenuItem component.
+-   _props.other_ `[...*]`: Any additional props are passed through to the underlying menu item component, except for `as`, which is deprecated and ignored.
 
 _Returns_
 
@@ -1256,6 +1220,18 @@ _Returns_
 
 Renders a panel for publishing a post.
 
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.forceIsDirty_ `[boolean]`: Whether to force the dirty state.
+-   _props.onClose_ `()=>void`: Called when the panel requests to close.
+-   _props.PostPublishExtension_ `[React.ComponentType]`: Component rendered after publishing.
+-   _props.PrePublishExtension_ `[React.ComponentType]`: Component rendered before publishing.
+
+_Returns_
+
+-   `React.JSX.Element`: The post publish panel.
+
 ### PostSavedState
 
 Component showing whether the post is saved or not and providing save buttons.
@@ -1267,7 +1243,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').ComponentType`: The component.
+-   `React.ComponentType`: The component.
 
 ### PostSchedule
 
@@ -1386,7 +1362,6 @@ _Parameters_
 
 -   _props_ `Object`: The component props.
 -   _props.slug_ `string`: The slug of the taxonomy.
--   _props.\_\_nextHasNoMarginBottom_ `boolean`: Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0. (The prop can be safely removed once this happens.)
 
 _Returns_
 
@@ -1724,11 +1699,7 @@ _Returns_
 
 ### useEntitiesSavedStatesIsDirty
 
-Custom hook that determines if any entities are dirty (edited) and provides a way to manage selected/unselected entities.
-
-_Returns_
-
--   `Object`: An object containing the following properties: - dirtyEntityRecords: An array of dirty entity records. - isDirty: A boolean indicating if there are any dirty entity records. - setUnselectedEntities: A function to set the unselected entities. - unselectedEntities: An array of unselected entities.
+Undocumented declaration.
 
 ### usePostScheduleLabel
 
