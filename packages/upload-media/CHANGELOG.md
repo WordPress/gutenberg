@@ -4,6 +4,7 @@
 
 ### Internal
 
+-   Rebuild the upload queue on an operation registry. The steps an item goes through are now looked up by name in the `core/upload-media` store instead of a closed `switch`, core registers its own steps through the same registry, and each step declares its concurrency pool. Operation handlers follow one contract: resolve with updates for the item, or throw to cancel it. This is groundwork for letting plugins add, replace and reorder steps; no public API is exposed yet. The `useSubRegistry` prop of `MediaUploadProvider` is removed so there is a single upload store per page. Image format transcoding now counts against the image processing pool alongside resizing and rotating, so the vips worker is no longer recycled while a transcode is in flight ([#82474](https://github.com/WordPress/gutenberg/pull/82474)).
 -   Add a private `getFailureCount` selector, a running tally of top-level items cancelled because they failed. Failed items leave the queue just like successful ones, so this is the only record that an upload did not make it ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).
 -   Remove unused dependency `@wordpress/preferences` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).

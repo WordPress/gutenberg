@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 import {
 	cloneFile,
@@ -21,6 +21,14 @@ import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
 import { ErrorCode, UploadError } from '../upload-error';
 import { debug, measure } from './utils/debug-logger';
+import {
+	getConcurrencyPool,
+	getOperationArgs,
+	getOperationName,
+	planOperations,
+} from './utils/operations';
+import { IMAGE_PROCESSING_POOL } from './operations';
+import type { PrivilegedOperationContext } from './operations';
 import {
 	vipsResizeImage,
 	vipsRotateImage,
@@ -52,18 +60,24 @@ import type {
 	OnSuccessHandler,
 	Operation,
 	OperationArgs,
+	OperationContext,
+	OperationDefinition,
 	OperationFinishAction,
+	OperationName,
+	OperationResult,
 	OperationStartAction,
 	PauseItemAction,
 	PauseQueueAction,
 	QueueItem,
 	QueueItemId,
+	RegisterOperationAction,
 	ResumeQueueAction,
 	RevokeBlobUrlsAction,
 	SideloadAdditionalData,
 	Settings,
 	State,
 	SubSizeData,
+	UnregisterOperationAction,
 	UpdateProgressAction,
 	UpdateSettingsAction,
 } from './types';
@@ -82,7 +96,17 @@ const DEFAULT_OUTPUT_QUALITY = 0.82;
  */
 const ultraHdrItems = new Set< QueueItemId >();
 
-type ActionCreators = {
+/**
+ * Maps a thunk action creator to what `dispatch.<name>()` returns: the
+ * thunk's own result rather than the thunk function.
+ */
+type Dispatched< F > = F extends (
+	...args: infer P
+) => ( thunkArgs: any ) => infer R
+	? ( ...args: P ) => R
+	: F;
+
+type RawActionCreators = {
 	cancelItem: typeof cancelItem;
 	executeRetry: typeof executeRetry;
 	addItem: typeof addItem;
@@ -103,6 +127,14 @@ type ActionCreators = {
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	detectUltraHdr: typeof detectUltraHdr;
+	runOperation: typeof runOperation;
+	registerOperation: typeof registerOperation;
+	unregisterOperation: typeof unregisterOperation;
+};
+
+export type ActionCreators = {
+	[ K in keyof RawActionCreators ]: Dispatched< RawActionCreators[ K ] >;
+} & {
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
@@ -111,11 +143,11 @@ type AllSelectors = typeof import('./selectors') &
 type CurriedState< F > = F extends ( state: State, ...args: infer P ) => infer R
 	? ( ...args: P ) => R
 	: F;
-type Selectors = {
+export type Selectors = {
 	[ key in keyof AllSelectors ]: CurriedState< AllSelectors[ key ] >;
 };
 
-type ThunkArgs = {
+export type ThunkArgs = {
 	select: Selectors;
 	dispatch: ActionCreators;
 	registry: WPDataRegistry;
@@ -299,50 +331,51 @@ export function processItem( id: QueueItemId ) {
 			parentId,
 		} = item;
 
-		const operation = Array.isArray( item.operations?.[ 0 ] )
-			? item.operations[ 0 ][ 0 ]
-			: item.operations?.[ 0 ];
-		const operationArgs = Array.isArray( item.operations?.[ 0 ] )
-			? item.operations[ 0 ][ 1 ]
-			: undefined;
+		const nextOperation = item.operations?.[ 0 ];
+		const operation =
+			nextOperation !== undefined
+				? getOperationName( nextOperation )
+				: undefined;
+		const operationArgs =
+			nextOperation !== undefined
+				? getOperationArgs( nextOperation )
+				: undefined;
 
-		/*
-		 * If the next operation is an upload, check concurrency limit.
-		 * If at capacity, the item remains queued and will be processed
-		 * when another upload completes.
-		 */
-		if ( operation === OperationType.Upload ) {
-			const settings = select.getSettings();
-			const activeCount = select.getActiveUploadCount();
-			if ( activeCount >= settings.maxConcurrentUploads ) {
+		let definition: OperationDefinition | undefined;
+		if ( operation !== undefined ) {
+			definition = select.getOperation( operation );
+
+			// A step nothing registered a handler for cannot run. This is a
+			// programming error (the operation was unregistered, or added to
+			// an item under a wrong name), so fail the item loudly rather
+			// than leave it stuck in the queue.
+			if ( ! definition ) {
+				dispatch.cancelItem(
+					id,
+					new UploadError( {
+						code: ErrorCode.UNKNOWN_OPERATION,
+						message: sprintf(
+							/* translators: %s: upload operation name */
+							__( 'Unknown upload operation "%s".' ),
+							operation
+						),
+						file: item.file,
+					} )
+				);
 				return;
 			}
-		}
 
-		/*
-		 * If the next operation is image processing (resize/crop/rotate),
-		 * check the image processing concurrency limit.
-		 * If at capacity, the item remains queued and will be processed
-		 * when another image processing operation completes.
-		 */
-		if (
-			operation === OperationType.ResizeCrop ||
-			operation === OperationType.Rotate
-		) {
-			const settings = select.getSettings();
-			const activeCount = select.getActiveImageProcessingCount();
-			if ( activeCount >= settings.maxConcurrentImageProcessing ) {
-				return;
-			}
-		}
-
-		/*
-		 * GIF-to-video conversion is memory-intensive (WebCodecs encode).
-		 * Limit to 1 concurrent transcoding operation.
-		 */
-		if ( operation === OperationType.TranscodeGif ) {
-			const activeCount = select.getActiveVideoProcessingCount();
-			if ( activeCount >= 1 ) {
+			/*
+			 * If the next operation belongs to a concurrency pool that is at
+			 * capacity, the item remains queued and will be processed when
+			 * another operation of that pool completes.
+			 */
+			const pool = getConcurrencyPool( definition );
+			if (
+				pool !== undefined &&
+				select.getActiveCountByPool( pool ) >=
+					select.getConcurrencyPoolLimit( pool )
+			) {
 				return;
 			}
 		}
@@ -428,6 +461,11 @@ export function processItem( id: QueueItemId ) {
 			return;
 		}
 
+		// Unreachable: an operation without a definition was cancelled above.
+		if ( ! definition ) {
+			return;
+		}
+
 		dispatch< OperationStartAction >( {
 			type: Type.OperationStart,
 			id,
@@ -435,62 +473,219 @@ export function processItem( id: QueueItemId ) {
 		} );
 
 		debug(
-			`Starting operation ${ operation } for ${ item.file.name } (item ${ item.id })`
+			`Starting operation ${ operation } (${ definition.label }) for ${ item.file.name } (item ${ item.id })`
 		);
 
-		switch ( operation ) {
-			case OperationType.Prepare:
-				dispatch.prepareItem( item.id );
-				break;
+		dispatch.runOperation( id, operation, operationArgs );
+	};
+}
 
-			case OperationType.ResizeCrop:
-				dispatch.resizeCropItem(
-					item.id,
-					operationArgs as OperationArgs[ OperationType.ResizeCrop ]
+/**
+ * Builds the context an operation handler receives.
+ *
+ * Handlers do not get the store: everything they may do to the queue goes
+ * through the methods on the context. Operations in the `core/` namespace
+ * additionally receive `select` and `dispatch`, because the steps that
+ * ship with the package fan out sideloads and pick endpoints in ways the
+ * public context deliberately does not allow.
+ *
+ * @param item               Queue item the handler runs for.
+ * @param thunkArgs          Store access.
+ * @param thunkArgs.select   Store selectors.
+ * @param thunkArgs.dispatch Store action dispatchers.
+ * @param isPrivileged       Whether to expose the store on the context.
+ *
+ * @return Operation context.
+ */
+function createOperationContext(
+	item: QueueItem,
+	{ select, dispatch }: Pick< ThunkArgs, 'select' | 'dispatch' >,
+	isPrivileged: boolean
+): OperationContext {
+	const context: OperationContext = {
+		signal: item.abortController?.signal,
+		settings: select.getSettings(),
+		updateProgress: ( progress ) => {
+			dispatch.updateItemProgress( item.id, progress );
+		},
+		addOperations: ( operations ) => {
+			dispatch< AddOperationsAction >( {
+				type: Type.AddOperations,
+				id: item.id,
+				operations,
+			} );
+		},
+		addSideloadItem: ( { file, additionalData, operations, batchId } ) => {
+			// Read the live item: the attachment ID only exists once the
+			// upload step has finished.
+			const attachmentId = select.getItem( item.id )?.attachment?.id;
+			if ( ! attachmentId ) {
+				throw new Error(
+					'A companion file can only be sideloaded once the item has been uploaded.'
 				);
-				break;
+			}
+			dispatch.addSideloadItem( {
+				file,
+				batchId: batchId ?? uuidv4(),
+				parentId: item.id,
+				additionalData: {
+					...additionalData,
+					post: attachmentId,
+				},
+				operations: operations ?? [ OperationType.Upload ],
+			} );
+		},
+	};
 
-			case OperationType.Rotate:
-				dispatch.rotateItem(
-					item.id,
-					operationArgs as OperationArgs[ OperationType.Rotate ]
-				);
-				break;
+	if ( isPrivileged ) {
+		const privilegedContext: PrivilegedOperationContext = {
+			...context,
+			select,
+			dispatch,
+		};
+		return privilegedContext;
+	}
 
-			case OperationType.TranscodeImage:
-				dispatch.transcodeImageItem(
-					item.id,
-					operationArgs as OperationArgs[ OperationType.TranscodeImage ]
-				);
-				break;
+	return context;
+}
 
-			case OperationType.TranscodeGif:
-				dispatch.transcodeGifItem(
-					item.id,
-					operationArgs as OperationArgs[ OperationType.TranscodeGif ]
-				);
-				break;
-
-			case OperationType.Upload:
-				if ( item.parentId ) {
-					dispatch.sideloadItem( id );
-				} else {
-					dispatch.uploadItem( id );
-				}
-				break;
-
-			case OperationType.ThumbnailGeneration:
-				dispatch.generateThumbnails( id );
-				break;
-
-			case OperationType.Finalize:
-				dispatch.finalizeItem( id );
-				break;
-
-			case OperationType.DetectUltraHdr:
-				dispatch.detectUltraHdr( id );
-				break;
+/**
+ * Runs an operation's handler for an item and settles the item afterwards.
+ *
+ * This is the single dispatch path for core and third-party operations:
+ * when the handler resolves, the operation is finished with the updates it
+ * returned; when it rejects, the item is cancelled with the error.
+ *
+ * @param id     Item ID.
+ * @param name   Operation name.
+ * @param [args] Arguments for this run of the operation.
+ */
+export function runOperation(
+	id: QueueItemId,
+	name: OperationName,
+	args?: unknown
+) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		const definition = select.getOperation( name );
+		if ( ! item || ! definition ) {
+			return;
 		}
+
+		const context = createOperationContext(
+			item,
+			{ select, dispatch },
+			name.startsWith( 'core/' )
+		);
+
+		let result: OperationResult | void;
+		try {
+			result = await definition.handler( item, args, context );
+		} catch ( error ) {
+			// Hand the rejection to cancelItem as is. Upload transports do
+			// not always reject with an Error: the editor's media-upload
+			// wrapper forwards only the message string, and a REST failure
+			// can be a plain object. cancelItem, the retry classifier and
+			// the `onError` callbacks all handle those, and wrapping them
+			// here would replace the message the user is meant to see.
+			const silent = error instanceof UploadError && error.silent;
+			dispatch.cancelItem( id, error as Error, silent );
+			return;
+		}
+
+		// The item may have been cancelled while the handler was running.
+		if ( ! select.getItem( id ) ) {
+			return;
+		}
+
+		dispatch.finishOperation( id, result ?? {} );
+	};
+}
+
+const OPERATION_NAME_PATTERN = /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/;
+
+/**
+ * Registers an operation so items can run it as a step of their pipeline.
+ *
+ * Names are namespaced like block names (`namespace/operation-name`) and
+ * must be unique: to replace an operation, including one that ships with
+ * the package, unregister it first.
+ *
+ * @param definition Operation definition.
+ *
+ * @return The registered definition, or undefined if it was rejected.
+ */
+export function registerOperation( definition: OperationDefinition ) {
+	return ( { select, dispatch }: ThunkArgs ): OperationDefinition | void => {
+		if (
+			typeof definition?.name !== 'string' ||
+			! OPERATION_NAME_PATTERN.test( definition.name )
+		) {
+			// eslint-disable-next-line no-console
+			console.error(
+				'Upload operation names must be strings in the form "namespace/operation-name", like "core/upload".'
+			);
+			return;
+		}
+
+		if ( select.getOperation( definition.name ) ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Upload operation "${ definition.name }" is already registered.`
+			);
+			return;
+		}
+
+		if ( typeof definition.handler !== 'function' ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Upload operation "${ definition.name }" must have a "handler" function.`
+			);
+			return;
+		}
+
+		if ( typeof definition.label !== 'string' || ! definition.label ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Upload operation "${ definition.name }" must have a "label" string.`
+			);
+			return;
+		}
+
+		dispatch< RegisterOperationAction >( {
+			type: Type.RegisterOperation,
+			operation: definition,
+		} );
+
+		return definition;
+	};
+}
+
+/**
+ * Unregisters an operation.
+ *
+ * Items that still list the operation in their pipeline will fail with an
+ * `UNKNOWN_OPERATION` error when they reach it.
+ *
+ * @param name Operation name.
+ *
+ * @return The removed definition, or undefined if it was not registered.
+ */
+export function unregisterOperation( name: OperationName ) {
+	return ( { select, dispatch }: ThunkArgs ): OperationDefinition | void => {
+		const definition = select.getOperation( name );
+		if ( ! definition ) {
+			// eslint-disable-next-line no-console
+			console.error( `Upload operation "${ name }" is not registered.` );
+			return;
+		}
+
+		dispatch< UnregisterOperationAction >( {
+			type: Type.UnregisterOperation,
+			name,
+		} );
+
+		return definition;
 	};
 }
 
@@ -606,38 +801,17 @@ export function finishOperation(
 		dispatch.processItem( id );
 
 		/*
-		 * If an upload just finished, there may be items waiting in the queue
-		 * due to concurrency limits. Trigger processing for them.
+		 * If an operation with a concurrency limit just finished, a slot in
+		 * its pool freed up. Trigger processing for items waiting on it.
 		 */
-		if ( previousOperation === OperationType.Upload ) {
-			const pendingUploads = select.getPendingUploads();
-			for ( const pendingItem of pendingUploads ) {
-				dispatch.processItem( pendingItem.id );
-			}
-		}
-
-		/*
-		 * If an image processing operation just finished, there may be items
-		 * waiting in the queue due to the image processing concurrency limit.
-		 * Trigger processing for them.
-		 */
-		if (
-			previousOperation === OperationType.ResizeCrop ||
-			previousOperation === OperationType.Rotate
-		) {
-			const pendingItems = select.getPendingImageProcessing();
-			for ( const pendingItem of pendingItems ) {
-				dispatch.processItem( pendingItem.id );
-			}
-		}
-
-		/*
-		 * If a video processing operation just finished, there may be items
-		 * waiting due to the video processing concurrency limit.
-		 */
-		if ( previousOperation === OperationType.TranscodeGif ) {
-			const pendingItems = select.getPendingVideoProcessing();
-			for ( const pendingItem of pendingItems ) {
+		const previousPool =
+			previousOperation !== undefined
+				? getConcurrencyPool( select.getOperation( previousOperation ) )
+				: undefined;
+		if ( previousPool !== undefined ) {
+			for ( const pendingItem of select.getPendingItemsByPool(
+				previousPool
+			) ) {
 				dispatch.processItem( pendingItem.id );
 			}
 		}
@@ -645,12 +819,10 @@ export function finishOperation(
 		// Track vips operations across success and failure paths so a
 		// burst of failures can't bypass the recycle budget; the cancel
 		// path calls the same helper.
-		if (
-			previousOperation === OperationType.ResizeCrop ||
-			previousOperation === OperationType.Rotate ||
-			previousOperation === OperationType.TranscodeImage
-		) {
-			maybeRecycleVipsWorker( select.getActiveImageProcessingCount() );
+		if ( previousPool === IMAGE_PROCESSING_POOL ) {
+			maybeRecycleVipsWorker(
+				select.getActiveCountByPool( IMAGE_PROCESSING_POOL )
+			);
 		}
 	};
 }
@@ -750,8 +922,12 @@ export function prepareItem( id: QueueItemId ) {
 		}
 		const { file } = item;
 
-		const operations: Operation[] = [];
 		const settings = select.getSettings();
+
+		// The pipeline core decides on, before registered operations get to
+		// adjust it, and the updates to apply to the item alongside it.
+		let operations: Operation[] | undefined;
+		let updates: Partial< QueueItem > = {};
 
 		// Animated GIF → video. WebCodecs is required; client-side media
 		// already runs only under cross-origin isolation, so this is a
@@ -799,109 +975,177 @@ export function prepareItem( id: QueueItemId ) {
 				}
 
 				if ( ! hasTransparency ) {
-					operations.push(
+					operations = [
 						OperationType.Upload,
 						OperationType.ThumbnailGeneration,
-						OperationType.Finalize
-					);
-
-					dispatch< AddOperationsAction >( {
-						type: Type.AddOperations,
-						id,
-						operations,
-					} );
+						OperationType.Finalize,
+					];
 
 					// Keep the original GIF so generateThumbnails can
 					// transcode and sideload it once the attachment exists.
-					dispatch.finishOperation( id, {
+					updates = {
 						animatedGifFile: item.file,
-					} );
-					return;
+					};
 				}
 			}
 		}
 
-		let heicJpeg: File | null = null;
+		if ( operations === undefined ) {
+			operations = [];
 
-		const isImage = file.type.startsWith( 'image/' );
-		const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
-			file.type
-		);
-		const isHeic = HEIC_MIME_TYPES.includes( file.type );
+			let heicJpeg: File | null = null;
 
-		// Gate very large images out of client-side processing. wasm-vips is
-		// capped at 1 GiB of memory, so high-megapixel images, especially
-		// interlaced/progressive ones, which can't be decoded with
-		// shrink-on-load, can exhaust it and fail. These are routed to the
-		// server, which has no comparable per-image ceiling. If dimensions
-		// can't be determined, the image stays on the client-side path.
-		let tooLargeForClient = false;
-		if ( isImage && isVipsSupported ) {
-			const dimensions = await getImageDimensions( file );
-			if ( dimensions && exceedsClientProcessingMemory( dimensions ) ) {
-				tooLargeForClient = true;
-			}
-		}
-
-		// Check for UltraHDR in JPEG files before other operations. Skipped for
-		// images routed to the server: the gain map is only preserved by the
-		// client-side resize path, and the probe runs wasm-vips, which the
-		// large-image gate above is specifically meant to avoid.
-		if ( file.type === 'image/jpeg' && ! tooLargeForClient ) {
-			operations.push( OperationType.DetectUltraHdr );
-		}
-
-		// For images that can be processed by vips, upload the original and
-		// let generateThumbnails() handle threshold scaling as a sideload.
-		//
-		// Uploading the original (rather than a pre-scaled copy) preserves
-		// the un-suffixed basename in attachment.filename, so sub-size
-		// names are derived from the original — matching WordPress core's
-		// wp_create_image_subsizes() naming convention where only the
-		// scaled-down full-size copy carries the `-scaled` suffix and the
-		// original is kept alongside it as `original_image`.
-		//
-		// Main-file format conversion is handled server-side via the
-		// image_editor_output_format filter during create_item.
-		// The response carries image_output_format so generateThumbnails
-		// can transcode sub-sizes to the same target format.
-		if ( isImage && isVipsSupported && ! tooLargeForClient ) {
-			operations.push(
-				OperationType.Upload,
-				OperationType.ThumbnailGeneration,
-				OperationType.Finalize
+			const isImage = file.type.startsWith( 'image/' );
+			const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
+				file.type
 			);
-		} else if ( isImage && isHeic ) {
-			// HEIC/HEIF: convert to JPEG client-side before upload.
-			// The server may not support HEIC, so decode it using the
-			// browser's native HEVC codec (createImageBitmap or VideoDecoder)
-			// and upload the resulting JPEG. The server then handles it like
-			// any normal JPEG (threshold scaling, sub-sizes, etc.).
-			// This matches iOS behavior where HEIC is converted on the fly.
-			try {
-				heicJpeg = await canvasConvertToJpeg(
-					file,
-					settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY
+			const isHeic = HEIC_MIME_TYPES.includes( file.type );
+
+			// Gate very large images out of client-side processing. wasm-vips is
+			// capped at 1 GiB of memory, so high-megapixel images, especially
+			// interlaced/progressive ones, which can't be decoded with
+			// shrink-on-load, can exhaust it and fail. These are routed to the
+			// server, which has no comparable per-image ceiling. If dimensions
+			// can't be determined, the image stays on the client-side path.
+			let tooLargeForClient = false;
+			if ( isImage && isVipsSupported ) {
+				const dimensions = await getImageDimensions( file );
+				if (
+					dimensions &&
+					exceedsClientProcessingMemory( dimensions )
+				) {
+					tooLargeForClient = true;
+				}
+			}
+
+			// Check for UltraHDR in JPEG files before other operations. Skipped for
+			// images routed to the server: the gain map is only preserved by the
+			// client-side resize path, and the probe runs wasm-vips, which the
+			// large-image gate above is specifically meant to avoid.
+			if ( file.type === 'image/jpeg' && ! tooLargeForClient ) {
+				operations.push( OperationType.DetectUltraHdr );
+			}
+
+			// For images that can be processed by vips, upload the original and
+			// let generateThumbnails() handle threshold scaling as a sideload.
+			//
+			// Uploading the original (rather than a pre-scaled copy) preserves
+			// the un-suffixed basename in attachment.filename, so sub-size
+			// names are derived from the original — matching WordPress core's
+			// wp_create_image_subsizes() naming convention where only the
+			// scaled-down full-size copy carries the `-scaled` suffix and the
+			// original is kept alongside it as `original_image`.
+			//
+			// Main-file format conversion is handled server-side via the
+			// image_editor_output_format filter during create_item.
+			// The response carries image_output_format so generateThumbnails
+			// can transcode sub-sizes to the same target format.
+			if ( isImage && isVipsSupported && ! tooLargeForClient ) {
+				operations.push(
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+					OperationType.Finalize
 				);
-			} catch {
-				dispatch.cancelItem(
-					id,
-					new UploadError( {
+			} else if ( isImage && isHeic ) {
+				// HEIC/HEIF: convert to JPEG client-side before upload.
+				// The server may not support HEIC, so decode it using the
+				// browser's native HEVC codec (createImageBitmap or VideoDecoder)
+				// and upload the resulting JPEG. The server then handles it like
+				// any normal JPEG (threshold scaling, sub-sizes, etc.).
+				// This matches iOS behavior where HEIC is converted on the fly.
+				try {
+					heicJpeg = await canvasConvertToJpeg(
+						file,
+						settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY
+					);
+				} catch {
+					throw new UploadError( {
 						code: ErrorCode.HEIC_DECODE_ERROR,
 						message: getHeicUnsupportedMessage(),
 						file,
-					} )
+					} );
+				}
+
+				operations.push(
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+					OperationType.Finalize
 				);
-				return;
+			} else {
+				operations.push( OperationType.Upload );
 			}
 
-			operations.push(
-				OperationType.Upload,
-				OperationType.ThumbnailGeneration,
-				OperationType.Finalize
-			);
-		} else {
-			operations.push( OperationType.Upload );
+			// Tell the server whether to generate sub-sizes.
+			// When vips handles processing client-side, set generate_sub_sizes
+			// to false so the server skips the image-type support check
+			// (allowing formats like AVIF that the server can't process).
+			if ( isHeic && heicJpeg ) {
+				// HEIC was converted to JPEG client-side. Upload the JPEG
+				// and let the server handle it normally (threshold scaling,
+				// sub-sizes, format conversion). Keep the original HEIC in
+				// a separate field so it can be sideloaded as the "original"
+				// after upload, preserving the user's file without leaking it
+				// into paths that expect an editor-supported image.
+				const vipsAvailable = isClientSideMediaSupported();
+				updates = {
+					file: heicJpeg,
+					sourceFile: heicJpeg,
+					originalHeicFile: item.file,
+					additionalData: {
+						...item.additionalData,
+						generate_sub_sizes: ! vipsAvailable,
+						convert_format: true,
+					},
+				};
+			} else if ( ! isVipsSupported || ! isImage || tooLargeForClient ) {
+				// Either the format isn't vips-processable, it isn't an image, or
+				// it's too large for client-side processing. Let the server
+				// generate sub-sizes and handle format conversion.
+				updates = {
+					additionalData: {
+						...item.additionalData,
+						generate_sub_sizes: true,
+						convert_format: true,
+					},
+				};
+			} else {
+				updates = {
+					additionalData: {
+						...item.additionalData,
+						generate_sub_sizes: false,
+					},
+				};
+			}
+		}
+
+		// Let registered operations insert themselves into, or reshape, the
+		// pipeline core decided on.
+		operations = await planOperations(
+			item,
+			operations,
+			select.getOperations(),
+			settings
+		);
+
+		// Fail now rather than when the item reaches the missing step, so
+		// nothing is uploaded on behalf of a pipeline that cannot complete.
+		const unknownOperations = Array.from(
+			new Set(
+				operations
+					.map( getOperationName )
+					.filter( ( name ) => ! select.getOperation( name ) )
+			)
+		);
+		if ( unknownOperations.length > 0 ) {
+			throw new UploadError( {
+				code: ErrorCode.UNKNOWN_OPERATION,
+				message: sprintf(
+					/* translators: %s: comma-separated list of upload operation names */
+					__( 'Unknown upload operation "%s".' ),
+					unknownOperations.join( '", "' )
+				),
+				file,
+			} );
 		}
 
 		dispatch< AddOperationsAction >( {
@@ -910,50 +1154,7 @@ export function prepareItem( id: QueueItemId ) {
 			operations,
 		} );
 
-		// Tell the server whether to generate sub-sizes.
-		// When vips handles processing client-side, set generate_sub_sizes
-		// to false so the server skips the image-type support check
-		// (allowing formats like AVIF that the server can't process).
-		let updates: Partial< QueueItem >;
-		if ( isHeic && heicJpeg ) {
-			// HEIC was converted to JPEG client-side. Upload the JPEG
-			// and let the server handle it normally (threshold scaling,
-			// sub-sizes, format conversion). Keep the original HEIC in
-			// a separate field so it can be sideloaded as the "original"
-			// after upload, preserving the user's file without leaking it
-			// into paths that expect an editor-supported image.
-			const vipsAvailable = isClientSideMediaSupported();
-			updates = {
-				file: heicJpeg,
-				sourceFile: heicJpeg,
-				originalHeicFile: item.file,
-				additionalData: {
-					...item.additionalData,
-					generate_sub_sizes: ! vipsAvailable,
-					convert_format: true,
-				},
-			};
-		} else if ( ! isVipsSupported || ! isImage || tooLargeForClient ) {
-			// Either the format isn't vips-processable, it isn't an image, or
-			// it's too large for client-side processing. Let the server
-			// generate sub-sizes and handle format conversion.
-			updates = {
-				additionalData: {
-					...item.additionalData,
-					generate_sub_sizes: true,
-					convert_format: true,
-				},
-			};
-		} else {
-			updates = {
-				additionalData: {
-					...item.additionalData,
-					generate_sub_sizes: false,
-				},
-			};
-		}
-
-		dispatch.finishOperation( id, updates );
+		return updates;
 	};
 }
 
@@ -965,7 +1166,7 @@ export function prepareItem( id: QueueItemId ) {
  * @param id Item ID.
  */
 export function detectUltraHdr( id: QueueItemId ) {
-	return async ( { select, dispatch }: ThunkArgs ) => {
+	return async ( { select }: ThunkArgs ) => {
 		const item = select.getItem( id );
 		if ( ! item ) {
 			return;
@@ -987,7 +1188,7 @@ export function detectUltraHdr( id: QueueItemId ) {
 			ultraHdrItems.add( id );
 		}
 
-		dispatch.finishOperation( id, {} );
+		return {};
 	};
 }
 
@@ -997,54 +1198,59 @@ export function detectUltraHdr( id: QueueItemId ) {
  * @param id Item ID.
  */
 export function uploadItem( id: QueueItemId ) {
-	return async ( { select, dispatch }: ThunkArgs ) => {
+	return async ( {
+		select,
+	}: ThunkArgs ): Promise< OperationResult | void > => {
 		const item = select.getItem( id );
 		if ( ! item ) {
 			return;
 		}
 
 		const startTime = performance.now();
-		let finished = false;
 
-		const finishUpload = ( attachment: Partial< Attachment > ) => {
-			if ( finished ) {
-				return;
-			}
-			finished = true;
+		return new Promise< OperationResult >( ( resolve, reject ) => {
+			let finished = false;
 
-			measure( {
-				measureName: `Upload ${ item.file.name }`,
-				startTime,
-				tooltipText: item.file.name,
-				properties: [
-					[ 'Item ID', item.id ],
-					[ 'File name', item.file.name ],
-				],
-			} );
-
-			dispatch.finishOperation( id, { attachment } );
-		};
-
-		select.getSettings().mediaUpload( {
-			filesList: [ item.file ],
-			additionalData: item.additionalData,
-			signal: item.abortController?.signal,
-			// The queue's own items drive upload progress UI and save
-			// locking; without this, consumers that track uploads themselves
-			// (e.g. the editor's progress snackbar) would count this file a
-			// second time.
-			isTransportOnly: true,
-			onFileChange: ( [ attachment ] ) => {
-				if ( attachment && ! isBlobURL( attachment.url ) ) {
-					finishUpload( attachment );
+			const finishUpload = ( attachment: Partial< Attachment > ) => {
+				if ( finished ) {
+					return;
 				}
-			},
-			onSuccess: ( [ attachment ] ) => {
-				finishUpload( attachment );
-			},
-			onError: ( error ) => {
-				dispatch.cancelItem( id, error );
-			},
+				finished = true;
+
+				measure( {
+					measureName: `Upload ${ item.file.name }`,
+					startTime,
+					tooltipText: item.file.name,
+					properties: [
+						[ 'Item ID', item.id ],
+						[ 'File name', item.file.name ],
+					],
+				} );
+
+				resolve( { attachment } );
+			};
+
+			select.getSettings().mediaUpload( {
+				filesList: [ item.file ],
+				additionalData: item.additionalData,
+				signal: item.abortController?.signal,
+				// The queue's own items drive upload progress UI and save
+				// locking; without this, consumers that track uploads themselves
+				// (e.g. the editor's progress snackbar) would count this file a
+				// second time.
+				isTransportOnly: true,
+				onFileChange: ( [ attachment ] ) => {
+					if ( attachment && ! isBlobURL( attachment.url ) ) {
+						finishUpload( attachment );
+					}
+				},
+				onSuccess: ( [ attachment ] ) => {
+					finishUpload( attachment );
+				},
+				onError: ( error ) => {
+					reject( error );
+				},
+			} );
 		} );
 	};
 }
@@ -1055,7 +1261,10 @@ export function uploadItem( id: QueueItemId ) {
  * @param id Item ID.
  */
 export function sideloadItem( id: QueueItemId ) {
-	return async ( { select, dispatch }: ThunkArgs ) => {
+	return async ( {
+		select,
+		dispatch,
+	}: ThunkArgs ): Promise< OperationResult | void > => {
 		const item = select.getItem( id );
 		if ( ! item ) {
 			return;
@@ -1067,41 +1276,42 @@ export function sideloadItem( id: QueueItemId ) {
 		const mediaSideload = select.getSettings().mediaSideload;
 		if ( ! mediaSideload ) {
 			// If sideloading is not supported, skip this operation.
-			dispatch.finishOperation( id, {} );
-			return;
+			return {};
 		}
 
 		const startTime = performance.now();
 
-		mediaSideload( {
-			file: item.file,
-			attachmentId: post as number,
-			additionalData,
-			signal: item.abortController?.signal,
-			onSuccess: ( subSize: SubSizeData ) => {
-				measure( {
-					measureName: `Sideload ${ item.file.name }`,
-					startTime,
-					tooltipText: item.file.name,
-					properties: [
-						[ 'Item ID', item.id ],
-						[ 'File name', item.file.name ],
-					],
-				} );
-
-				// Accumulate sub-size data on the parent item for finalize.
-				if ( item.parentId ) {
-					dispatch< AccumulateSubSizeAction >( {
-						type: Type.AccumulateSubSize,
-						id: item.parentId,
-						subSize,
+		return new Promise< OperationResult >( ( resolve, reject ) => {
+			mediaSideload( {
+				file: item.file,
+				attachmentId: post as number,
+				additionalData,
+				signal: item.abortController?.signal,
+				onSuccess: ( subSize: SubSizeData ) => {
+					measure( {
+						measureName: `Sideload ${ item.file.name }`,
+						startTime,
+						tooltipText: item.file.name,
+						properties: [
+							[ 'Item ID', item.id ],
+							[ 'File name', item.file.name ],
+						],
 					} );
-				}
-				dispatch.finishOperation( id, {} );
-			},
-			onError: ( error ) => {
-				dispatch.cancelItem( id, error );
-			},
+
+					// Accumulate sub-size data on the parent item for finalize.
+					if ( item.parentId ) {
+						dispatch< AccumulateSubSizeAction >( {
+							type: Type.AccumulateSubSize,
+							id: item.parentId,
+							subSize,
+						} );
+					}
+					resolve( {} );
+				},
+				onError: ( error ) => {
+					reject( error );
+				},
+			} );
 		} );
 	};
 }
@@ -1122,10 +1332,7 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		}
 
 		if ( ! args?.resize ) {
-			dispatch.finishOperation( id, {
-				file: item.file,
-			} );
-			return;
+			return { file: item.file };
 		}
 
 		const startTime = performance.now();
@@ -1172,24 +1379,21 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				blobUrl,
 			} );
 
-			dispatch.finishOperation( id, {
+			return {
 				file,
 				attachment: {
 					url: blobUrl,
 				},
-			} );
+			};
 		} catch ( error ) {
-			dispatch.cancelItem(
-				id,
-				new UploadError( {
-					code: ErrorCode.IMAGE_TRANSCODING_ERROR,
-					message: __(
-						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
-					),
-					file: item.file,
-					cause: error instanceof Error ? error : undefined,
-				} )
-			);
+			throw new UploadError( {
+				code: ErrorCode.IMAGE_TRANSCODING_ERROR,
+				message: __(
+					'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
+				),
+				file: item.file,
+				cause: error instanceof Error ? error : undefined,
+			} );
 		}
 	};
 }
@@ -1215,10 +1419,7 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 
 		// If no orientation provided or orientation is 1 (normal), skip rotation.
 		if ( ! args?.orientation || args.orientation === 1 ) {
-			dispatch.finishOperation( id, {
-				file: item.file,
-			} );
-			return;
+			return { file: item.file };
 		}
 
 		const startTime = performance.now();
@@ -1248,24 +1449,21 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 				blobUrl,
 			} );
 
-			dispatch.finishOperation( id, {
+			return {
 				file,
 				attachment: {
 					url: blobUrl,
 				},
-			} );
+			};
 		} catch ( error ) {
-			dispatch.cancelItem(
-				id,
-				new UploadError( {
-					code: ErrorCode.IMAGE_ROTATION_ERROR,
-					message: __(
-						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
-					),
-					file: item.file,
-					cause: error instanceof Error ? error : undefined,
-				} )
-			);
+			throw new UploadError( {
+				code: ErrorCode.IMAGE_ROTATION_ERROR,
+				message: __(
+					'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
+				),
+				file: item.file,
+				cause: error instanceof Error ? error : undefined,
+			} );
 		}
 	};
 }
@@ -1293,10 +1491,7 @@ export function transcodeImageItem(
 
 		// If no output format specified, skip transcoding.
 		if ( ! args?.outputFormat ) {
-			dispatch.finishOperation( id, {
-				file: item.file,
-			} );
-			return;
+			return { file: item.file };
 		}
 
 		const startTime = performance.now();
@@ -1344,23 +1539,19 @@ export function transcodeImageItem(
 				blobUrl,
 			} );
 
-			dispatch.finishOperation( id, {
+			return {
 				file,
 				attachment: {
 					url: blobUrl,
 				},
-			} );
+			};
 		} catch ( error ) {
-			dispatch.cancelItem(
-				id,
-				new UploadError( {
-					code: ErrorCode.MEDIA_TRANSCODING_ERROR,
-					message:
-						'Image could not be transcoded to the target format',
-					file: item.file,
-					cause: error instanceof Error ? error : undefined,
-				} )
-			);
+			throw new UploadError( {
+				code: ErrorCode.MEDIA_TRANSCODING_ERROR,
+				message: 'Image could not be transcoded to the target format',
+				file: item.file,
+				cause: error instanceof Error ? error : undefined,
+			} );
 		}
 	};
 }
@@ -1393,8 +1584,8 @@ export function transcodeGifItem(
 		const outputMimeType = `video/${ outputFormat }`;
 
 		/*
-		 * item.file is the original GIF until finishOperation swaps in the
-		 * transcoded video below; capture it for the poster sideload.
+		 * item.file is the original GIF until the video returned below is
+		 * swapped in; capture it for the poster sideload.
 		 */
 		const gifFile = item.file;
 
@@ -1408,11 +1599,6 @@ export function transcodeGifItem(
 					maxTotalPixels: args?.maxTotalPixels,
 				}
 			);
-
-			// Hand the transcoded video to the next Upload op as the
-			// sideload's payload. The parent attachment (the GIF) is
-			// already uploaded; no blob URL is needed for any block.
-			dispatch.finishOperation( id, { file } );
 
 			/*
 			 * Only now that the video exists, sideload a static first-frame
@@ -1446,6 +1632,11 @@ export function transcodeGifItem(
 					OperationType.Upload,
 				],
 			} );
+
+			// Hand the transcoded video to the next Upload op as the
+			// sideload's payload. The parent attachment (the GIF) is
+			// already uploaded; no blob URL is needed for any block.
+			return { file };
 		} catch ( error ) {
 			// An "Unsupported" outcome is a graceful skip, not a failure:
 			// the parent GIF attachment already exists and stays as-is, so
@@ -1467,12 +1658,12 @@ export function transcodeGifItem(
 						}`
 					);
 				}
-				dispatch.cancelItem(
-					id,
-					new Error( 'Animated GIF conversion unsupported' ),
-					true
-				);
-				return;
+				throw new UploadError( {
+					code: ErrorCode.GIF_TRANSCODING_ERROR,
+					message: 'Animated GIF conversion unsupported',
+					file: item.file,
+					silent: true,
+				} );
 			}
 			/*
 			 * The conversion ran past the allowed time and was abandoned:
@@ -1486,12 +1677,12 @@ export function transcodeGifItem(
 						error instanceof Error ? error.message : error
 					}`
 				);
-				dispatch.cancelItem(
-					id,
-					new Error( 'Animated GIF conversion timed out' ),
-					true
-				);
-				return;
+				throw new UploadError( {
+					code: ErrorCode.GIF_TRANSCODING_ERROR,
+					message: 'Animated GIF conversion timed out',
+					file: item.file,
+					silent: true,
+				} );
 			}
 			// Real engine failure. The parent GIF attachment is fine —
 			// the user just won't get a companion video. Log the cause
@@ -1503,16 +1694,13 @@ export function transcodeGifItem(
 				'[video-conversion] GIF to video conversion failed:',
 				error
 			);
-			dispatch.cancelItem(
-				id,
-				new UploadError( {
-					code: ErrorCode.GIF_TRANSCODING_ERROR,
-					message: 'Animated GIF could not be converted to video',
-					file: item.file,
-					cause: error instanceof Error ? error : undefined,
-				} ),
-				true
-			);
+			throw new UploadError( {
+				code: ErrorCode.GIF_TRANSCODING_ERROR,
+				message: 'Animated GIF could not be converted to video',
+				file: item.file,
+				cause: error instanceof Error ? error : undefined,
+				silent: true,
+			} );
 		}
 	};
 }
@@ -1533,8 +1721,7 @@ export function generateThumbnails( id: QueueItemId ) {
 		}
 
 		if ( ! item.attachment ) {
-			dispatch.finishOperation( id, {} );
-			return;
+			return {};
 		}
 		const attachment = item.attachment;
 		const settings = select.getSettings();
@@ -1876,7 +2063,7 @@ export function generateThumbnails( id: QueueItemId ) {
 			}
 		}
 
-		dispatch.finishOperation( id, {} );
+		return {};
 	};
 }
 
@@ -1890,7 +2077,7 @@ export function generateThumbnails( id: QueueItemId ) {
  * @param id Item ID.
  */
 export function finalizeItem( id: QueueItemId ) {
-	return async ( { select, dispatch }: ThunkArgs ) => {
+	return async ( { select }: ThunkArgs ) => {
 		const item = select.getItem( id );
 		if ( ! item ) {
 			return;
@@ -1933,19 +2120,15 @@ export function finalizeItem( id: QueueItemId ) {
 				// end cannot build a srcset) and whose file references are
 				// inconsistent. Fail the item instead so the error surfaces
 				// to the user rather than showing "upload complete".
-				dispatch.cancelItem(
-					id,
-					new UploadError( {
-						code: ErrorCode.MEDIA_FINALIZE_ERROR,
-						message: __( 'Could not finalize the upload.' ),
-						file: item.file,
-					} )
-				);
-				return;
+				throw new UploadError( {
+					code: ErrorCode.MEDIA_FINALIZE_ERROR,
+					message: __( 'Could not finalize the upload.' ),
+					file: item.file,
+				} );
 			}
 		}
 
-		dispatch.finishOperation( id, updates );
+		return updates;
 	};
 }
 
