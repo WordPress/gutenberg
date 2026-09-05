@@ -14,6 +14,7 @@
 
 -   Remove unused dependencies `@wordpress/escape-html`, `@wordpress/wordcount` and `deepmerge` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+-   Remove the private `NoteIconSlotFill` API and its slot in the block settings dropdown. The "Add note" action now renders as a dedicated block toolbar button through `NoteIconToolbarSlotFill` ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
 
 ### Bug Fixes
 

@@ -6005,11 +6005,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/collab-sidebar/add-note-menu-item.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/collab-sidebar/add-note.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1

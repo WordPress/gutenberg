@@ -59,6 +59,15 @@
 	}
 }
 
+// The floating card renders at `opacity: 0` until `useFloatingBoard` has
+// measured its anchor, so dropping that inline style is what reveals it.
+// Fade across that step instead of hard-cutting the card into place.
+.editor-collab-sidebar-panel__add-note.is-floating {
+	@media not (prefers-reduced-motion) {
+		transition: opacity 0.12s ease-out;
+	}
+}
+
 .editor-collab-sidebar-panel__user-info {
 	flex: 1;
 }
