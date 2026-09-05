@@ -55,6 +55,11 @@ export interface ResizeImageOptions {
 	 * Defaults to 16.
 	 */
 	maxBitdepth?: number;
+	/**
+	 * Whether to use interlaced/progressive mode. Only used if the output type
+	 * supports it. Defaults to false.
+	 */
+	interlaced?: boolean;
 }
 
 /**

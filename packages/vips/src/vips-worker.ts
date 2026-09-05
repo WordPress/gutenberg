@@ -154,20 +154,22 @@ export async function vipsGetUltraHdrInfo( buffer: ArrayBuffer ): Promise< {
  * @param buffer      Original file buffer.
  * @param type        Mime type.
  * @param orientation EXIF orientation value (1-8).
+ * @param options     Save options for the rotated file.
  * @return Rotated file data plus the new dimensions.
  */
 export async function vipsRotateImage(
 	id: ItemId,
 	buffer: ArrayBuffer,
 	type: string,
-	orientation: number
+	orientation: number,
+	options: ConvertImageOptions = {}
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
 	height: number;
 } > {
 	const api = getWorkerAPI();
-	return api.rotateImage( id, buffer, type, orientation );
+	return api.rotateImage( id, buffer, type, orientation, options );
 }
 
 /**

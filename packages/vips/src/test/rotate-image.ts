@@ -192,4 +192,88 @@ describe( 'rotateImage', () => {
 			);
 		} );
 	} );
+
+	async function rotateJpeg( options = {} ) {
+		const file = new File( [ '<BLOB>' ], 'example.jpeg', {
+			type: 'image/jpeg',
+		} );
+
+		await rotateImage(
+			'itemId',
+			await file.arrayBuffer(),
+			'image/jpeg',
+			6,
+			options
+		);
+	}
+
+	describe( 'image_strip_meta', () => {
+		it( 'strips metadata except color profiles and gain maps by default', async () => {
+			await rotateJpeg();
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.objectContaining( { keep: 'icc|gainmap' } )
+			);
+		} );
+
+		it( 'keeps all metadata when stripping is disabled', async () => {
+			await rotateJpeg( { stripMeta: false } );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.objectContaining( { keep: 'all' } )
+			);
+		} );
+	} );
+
+	describe( 'wp_editor_set_quality', () => {
+		it( 'writes at the requested quality', async () => {
+			await rotateJpeg( { quality: 0.82 } );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.objectContaining( { Q: 82 } )
+			);
+		} );
+
+		it( 'does not pass a quality to a format that has none', async () => {
+			const file = new File( [ '<BLOB>' ], 'example.png', {
+				type: 'image/png',
+			} );
+
+			await rotateImage(
+				'itemId',
+				await file.arrayBuffer(),
+				'image/png',
+				6,
+				{ quality: 0.82 }
+			);
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.not.objectContaining( { Q: expect.anything() } )
+			);
+		} );
+	} );
+
+	describe( 'image_save_progressive', () => {
+		it( 'writes a progressive JPEG when interlacing is requested', async () => {
+			await rotateJpeg( { interlaced: true } );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.objectContaining( { interlace: true } )
+			);
+		} );
+
+		it( 'writes a baseline JPEG otherwise', async () => {
+			await rotateJpeg();
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.not.objectContaining( { interlace: expect.anything() } )
+			);
+		} );
+	} );
 } );

@@ -371,6 +371,11 @@ export interface OperationArgs {
 		 * when omitted.
 		 */
 		quality?: number;
+		/**
+		 * Whether to use interlaced/progressive encoding, from the
+		 * `image_save_progressive` filter.
+		 */
+		interlaced?: boolean;
 	};
 	[ OperationType.Rotate ]: {
 		/**
