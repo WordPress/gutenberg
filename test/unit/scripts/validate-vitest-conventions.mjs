@@ -213,7 +213,7 @@ function getTypecheckConfigPath( testFile ) {
 		directory = path.dirname( directory );
 	}
 
-	return path.join( ROOT_DIR, 'tsconfig.base.json' );
+	return path.join( ROOT_DIR, 'tools/configs/tsconfig/base.json' );
 }
 
 let typescriptTestCount = 0;

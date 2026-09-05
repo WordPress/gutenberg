@@ -17,6 +17,7 @@ afterEach( () => {
 } );
 
 function writeJson( path, contents ) {
+	mkdirSync( dirname( path ), { recursive: true } );
 	writeFileSync( path, JSON.stringify( contents, null, '\t' ) + '\n' );
 }
 
@@ -35,8 +36,16 @@ function createRepo( { packages, routes, build, root } ) {
 	const repoRoot = mkdtempSync( join( tmpdir(), 'validate-tsconfig-' ) );
 	temporaryRoots.push( repoRoot );
 
-	writeJson( join( repoRoot, 'tsconfig.base.json' ), {
-		exclude: [ '**/benchmark', '**/test/**', '**/stories/**' ],
+	/*
+	 * Patterns carry the prefix that walks back to the repo root, as they do
+	 * in the real config: the validator has to compare them without it.
+	 */
+	writeJson( join( repoRoot, 'tools', 'configs', 'tsconfig', 'base.json' ), {
+		exclude: [
+			'../../../**/benchmark',
+			'../../../**/test/**',
+			'../../../**/stories/**',
+		],
 	} );
 	writeJson( join( repoRoot, 'tsconfig.build.json' ), {
 		references: build.map( ( path ) => ( { path } ) ),
@@ -320,7 +329,7 @@ test( 'fails when the root solution does not reference the build solution', () =
 const devOnlyPackage = {
 	tsconfigs: {
 		'tsconfig.json': {
-			extends: '../../tsconfig.dev.base.json',
+			extends: '@wordpress/config-tools/tsconfig/dev.base.json',
 			references: [],
 		},
 	},
@@ -440,7 +449,7 @@ function typedSplitPackage( buildTypes, devTypes ) {
 	return {
 		tsconfigs: {
 			'tsconfig.json': {
-				extends: '../../tsconfig.dev.base.json',
+				extends: '@wordpress/config-tools/tsconfig/dev.base.json',
 				compilerOptions: { types: devTypes },
 				references: [ './tsconfig.build.json' ],
 			},
@@ -503,7 +512,8 @@ test( 'checks the stories project of a package without a build project', () => {
 				icons: {
 					tsconfigs: {
 						'tsconfig.json': {
-							extends: '../../tsconfig.dev.base.json',
+							extends:
+								'@wordpress/config-tools/tsconfig/dev.base.json',
 							references: [],
 						},
 						'tsconfig.stories.json': [],
@@ -528,7 +538,8 @@ test( 'fails when a build project exclude omits a dev-file pattern of the base',
 				blob: {
 					tsconfigs: {
 						'tsconfig.json': {
-							extends: '../../tsconfig.dev.base.json',
+							extends:
+								'@wordpress/config-tools/tsconfig/dev.base.json',
 							references: [ './tsconfig.build.json' ],
 						},
 						'tsconfig.build.json': {
@@ -560,7 +571,8 @@ test( 'passes when a build project keeps every dev-file pattern of the base', ()
 				blob: {
 					tsconfigs: {
 						'tsconfig.json': {
-							extends: '../../tsconfig.dev.base.json',
+							extends:
+								'@wordpress/config-tools/tsconfig/dev.base.json',
 							references: [ './tsconfig.build.json' ],
 						},
 						'tsconfig.build.json': {

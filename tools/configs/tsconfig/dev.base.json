@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "./tsconfig.base.json",
+	"extends": "./base.json",
 	"compilerOptions": {
 		"noEmit": true,
 		"emitDeclarationOnly": false,
@@ -23,5 +23,5 @@
 		"${configDir}/src/**/*.story.ts",
 		"${configDir}/src/**/*.story.tsx"
 	],
-	"exclude": [ "**/benchmark" ]
+	"exclude": [ "../../../**/benchmark" ]
 }

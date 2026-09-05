@@ -1,0 +1,29 @@
+{
+	"name": "@wordpress/config-tools",
+	"version": "1.0.0",
+	"description": "Shared tooling configuration for the repo.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"config",
+		"typescript"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/configs",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/configs"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"exports": {
+		"./tsconfig/*": "./tsconfig/*"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

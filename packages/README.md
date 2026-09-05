@@ -350,7 +350,7 @@ Both extend shared base configurations (comments are not necessary):
 // tsconfig.build.json
 {
 	// Extends a base configuration common to most packages.
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/config-tools/tsconfig/base.json",
 
 	// Dependencies that have opted in to TypeScript are referenced here: a
 	// split one by its build project, one on a single config by its
@@ -367,7 +367,7 @@ Both extend shared base configurations (comments are not necessary):
 {
 	// Extends the shared dev project configuration (noEmit, jest types,
 	// test and story includes).
-	"extends": "../../tsconfig.dev.base.json",
+	"extends": "@wordpress/config-tools/tsconfig/dev.base.json",
 
 	// The dev project checks against the build project's declarations.
 	"references": [ { "path": "./tsconfig.build.json" } ]

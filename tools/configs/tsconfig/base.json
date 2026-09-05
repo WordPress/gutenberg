@@ -4,19 +4,19 @@
 		"allowJs": true,
 		"paths": {
 			"@wordpress/commands": [
-				"./typings/untyped-packages/wordpress-commands.d.ts"
+				"../../../typings/untyped-packages/wordpress-commands.d.ts"
 			],
 			"@wordpress/block-editor": [
-				"./typings/untyped-packages/any-module.d.ts"
+				"../../../typings/untyped-packages/any-module.d.ts"
 			],
 			"@wordpress/block-library": [
-				"./typings/untyped-packages/any-module.d.ts"
+				"../../../typings/untyped-packages/any-module.d.ts"
 			],
 			"@wordpress/patterns": [
-				"./typings/untyped-packages/any-module.d.ts"
+				"../../../typings/untyped-packages/any-module.d.ts"
 			],
 			"@wordpress/interface": [
-				"./typings/untyped-packages/any-module.d.ts"
+				"../../../typings/untyped-packages/any-module.d.ts"
 			]
 		},
 		"checkJs": true,
@@ -45,7 +45,7 @@
 
 		"resolveJsonModule": true,
 
-		"typeRoots": [ "./typings", "./node_modules/@types" ],
+		"typeRoots": [ "../../../typings", "../../../node_modules/@types" ],
 		"types": [],
 
 		"rootDir": "${configDir}/src",
@@ -53,13 +53,13 @@
 	},
 	"include": [ "${configDir}/src" ],
 	"exclude": [
-		"**/benchmark",
-		"packages/*/build-*/**",
-		"packages/*/build/**",
-		"**/test/**",
-		"**/tests/**",
-		"**/__tests__/**",
-		"**/stories/**",
-		"**/*.story.*"
+		"../../../**/benchmark",
+		"../../../packages/*/build-*/**",
+		"../../../packages/*/build/**",
+		"../../../**/test/**",
+		"../../../**/tests/**",
+		"../../../**/__tests__/**",
+		"../../../**/stories/**",
+		"../../../**/*.story.*"
 	]
 }

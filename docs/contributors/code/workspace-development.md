@@ -73,7 +73,7 @@ If the workspace contains TypeScript, extend the shared base config:
 
 ```json
 {
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/config-tools/tsconfig/base.json",
 	"compilerOptions": {
 		"rootDir": "./",
 		"outDir": "./build"
