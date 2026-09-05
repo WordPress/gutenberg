@@ -193,6 +193,26 @@ describe( 'filters', () => {
 		expect( result[ 1 ].name.title ).toBe( 'Uranus' );
 	} );
 
+	it( 'should search using IS ANY filter for NUMBER values', () => {
+		const { data: result } = filterSortAndPaginate(
+			data,
+			{
+				filters: [
+					{
+						field: 'satellites',
+						operator: 'isAny',
+						value: [ 16, 2 ],
+					},
+				],
+			},
+			fields
+		);
+		expect( result ).toHaveLength( 3 );
+		expect( result[ 0 ].name.title ).toBe( 'Neptune' );
+		expect( result[ 1 ].name.title ).toBe( 'Mars' );
+		expect( result[ 2 ].name.title ).toBe( 'Haumea' );
+	} );
+
 	it( 'should search using IS NONE filter for STRING values', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
@@ -221,6 +241,30 @@ describe( 'filters', () => {
 		expect( result[ 10 ].name.title ).toBe(
 			'TheRoguePlanetWithAVeryLongNameToTestTitleOverflow'
 		);
+	} );
+
+	it( 'should search using IS NONE filter for NUMBER values', () => {
+		const { data: result } = filterSortAndPaginate(
+			data,
+			{
+				filters: [
+					{
+						field: 'satellites',
+						operator: 'isNone',
+						value: [ 0, 16, 2 ],
+					},
+				],
+			},
+			fields
+		);
+		expect( result ).toHaveLength( 7 );
+		expect( result[ 0 ].name.title ).toBe( 'Earth' );
+		expect( result[ 1 ].name.title ).toBe( 'Jupiter' );
+		expect( result[ 2 ].name.title ).toBe( 'Saturn' );
+		expect( result[ 3 ].name.title ).toBe( 'Uranus' );
+		expect( result[ 4 ].name.title ).toBe( 'Makemake' );
+		expect( result[ 5 ].name.title ).toBe( 'Sun' );
+		expect( result[ 6 ].name.title ).toBe( 'Pluto' );
 	} );
 
 	it( 'should search using IS ANY filter for ARRAY values', () => {

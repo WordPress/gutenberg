@@ -108,6 +108,20 @@ describe( 'Link', () => {
 			).toHaveAttribute( 'target', '_blank' );
 		} );
 
+		it( 'treats target="_BLANK" as opening in a new tab', () => {
+			render(
+				<Link href="https://example.com" target="_BLANK">
+					External
+				</Link>
+			);
+
+			expect(
+				screen.getByRole( 'link', {
+					name: 'External (opens in a new tab)',
+				} )
+			).toHaveAttribute( 'target', '_BLANK' );
+		} );
+
 		it( 'forwards a named target without adding a new tab notice', () => {
 			render(
 				<Link href="https://example.com" target="wp-preview-123">
