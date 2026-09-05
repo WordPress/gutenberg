@@ -60,7 +60,7 @@
 	display: block;
 	color: $gray-700;
 	font-size: $helptext-font-size;
-	overflow-wrap: break-word;
+	overflow-wrap: anywhere;
 }
 
 .editor-post-publish-panel__header-publish-button,
