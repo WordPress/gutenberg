@@ -33,14 +33,14 @@ test.describe( 'Collaboration - Notes Sync', () => {
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
 			.pressSequentially( 'Hello from User A' );
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
 
 		// Verify the note appears locally for User A first.
 		await expect(
 			page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', { name: 'Note: Hello from User A' } )
 		).toBeVisible();
 
@@ -107,14 +107,14 @@ test.describe( 'Collaboration - Notes Sync', () => {
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
 			.pressSequentially( 'Note from User B' );
 		await page2
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
 
 		// Verify the note appears locally for User B.
 		await expect(
 			page2
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', { name: 'Note: Note from User B' } )
 		).toBeVisible();
 
@@ -166,14 +166,14 @@ test.describe( 'Collaboration - Notes Sync', () => {
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
 			.pressSequentially( 'Main note' );
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
 
 		// Wait for note to be saved before adding a reply.
 		await expect(
 			page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', { name: 'Note: Main note' } )
 		).toBeVisible();
 
@@ -193,7 +193,7 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await replyTextbox.click();
 		await replyTextbox.pressSequentially( 'A reply to the note' );
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'button', { name: 'Reply', exact: true } )
 			.click();
 
