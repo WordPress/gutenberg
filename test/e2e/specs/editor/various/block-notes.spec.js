@@ -1220,9 +1220,8 @@ test.describe( 'Block Notes', () => {
 				'.editor-collab-sidebar-panel__thread'
 			);
 
-			// The trigger sits where the reactions will, at the end of the
-			// note, and floats over it rather than claiming a row: the note
-			// is no taller for carrying it.
+			// The trigger floats in the note's top corner rather than
+			// claiming a row: the note is no taller for carrying it.
 			const reactionRow = page.locator(
 				'.editor-collab-sidebar-panel__reactions'
 			);
@@ -1240,6 +1239,20 @@ test.describe( 'Block Notes', () => {
 			expect( ( await noteBody.boundingBox() ).height ).toBe(
 				( await noteText.boundingBox() ).height
 			);
+
+			// It lines up under the note's other actions, and the text keeps
+			// clear of it rather than running underneath.
+			const triggerBox = await trigger.boundingBox();
+			const actionsBox = await page
+				.getByRole( 'button', { name: 'Actions' } )
+				.boundingBox();
+			expect( triggerBox.x ).toBe( actionsBox.x );
+			const textRight = await noteText.evaluate( ( element ) => {
+				const range = document.createRange();
+				range.selectNodeContents( element );
+				return range.getBoundingClientRect().right;
+			} );
+			expect( textRight ).toBeLessThanOrEqual( triggerBox.x );
 
 			// Park the pointer outside the sidebar: adding the note leaves it
 			// over the thread, which would hold the trigger open.

@@ -87,8 +87,8 @@ export function Note( {
 
 	const canResolve = note.parent === 0;
 	const hasReactions = getReactedSlugs( reactions ).length > 0;
-	// Not while editing: the trigger floats over the end of the note, which
-	// during an edit is the form's own buttons.
+	// Not while editing: the trigger floats over the note's corner, which
+	// during an edit is the form's own text field.
 	const canReact =
 		isSelected && !! onToggleReaction && actionState !== 'edit';
 	const isResolutionNote =
@@ -234,25 +234,13 @@ export function Note( {
 								'editor-collab-sidebar-panel__reactions',
 								{
 									// Nothing to sit beside yet, so the
-									// trigger floats over the end of the note
+									// trigger floats in the note's top corner
 									// rather than making the card taller for
 									// an option nobody has taken up.
 									'is-floating': ! hasReactions,
 								}
 							) }
 						>
-							{ canReact && (
-								<AddReactionButton
-									noteId={ note.id }
-									disabled={ isThreadResolved }
-									onToggleReaction={ ( emoji ) =>
-										onToggleReaction( {
-											commentId: note.id,
-											emoji,
-										} )
-									}
-								/>
-							) }
 							{ /*
 							 * Reactions are information about the note, so
 							 * unlike its actions they stay visible once the
@@ -268,7 +256,27 @@ export function Note( {
 										emoji,
 									} )
 								}
-							/>
+							>
+								{ /*
+								 * Trails the pills, in the same tree position
+								 * whether or not there are any: a different
+								 * position once the first reaction lands would
+								 * remount the open picker's trigger and drop
+								 * focus to the body.
+								 */ }
+								{ canReact && (
+									<AddReactionButton
+										noteId={ note.id }
+										disabled={ isThreadResolved }
+										onToggleReaction={ ( emoji ) =>
+											onToggleReaction( {
+												commentId: note.id,
+												emoji,
+											} )
+										}
+									/>
+								) }
+							</ReactionDisplay>
 						</div>
 					</ThemeProvider>
 				) }

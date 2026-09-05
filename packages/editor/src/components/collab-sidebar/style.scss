@@ -96,6 +96,11 @@
 
 .editor-collab-sidebar-panel__note-content {
 	overflow-wrap: break-word;
+	// Keep clear of the add-reaction trigger floating in the note's top
+	// corner. Reserved on every note, selected or not, so the text does not
+	// rewrap under the reader as a note is selected or gains its first
+	// reaction.
+	padding-right: $button-size-small + $grid-unit-10;
 
 	p:last-child {
 		margin-bottom: 0;
@@ -270,8 +275,8 @@ mark.wp-note {
 }
 
 // The note's text and, below it, the reaction row. Anchors the trigger while
-// it floats, so it lands on the end of the note itself rather than on
-// whatever else the card carries underneath.
+// it floats, so it lands on the note itself rather than on whatever else the
+// card carries underneath.
 .editor-collab-sidebar-panel__note-body {
 	position: relative;
 	display: flex;
@@ -280,31 +285,23 @@ mark.wp-note {
 }
 
 .editor-collab-sidebar-panel__reactions {
-	display: flex;
-	align-items: flex-start;
-	gap: $grid-unit-10;
-
 	// Until the note has a reaction to show, the trigger is the whole row, and
-	// it floats over the note's last line rather than making every note taller
+	// it floats in the note's top corner rather than making every note taller
 	// for an option nobody has taken up. Once a reaction lands, the row drops
-	// into the flow and the trigger takes its place at the head of it.
+	// into the flow and the trigger trails the pills.
 	//
-	// Against the right edge rather than the left, where the row itself sits:
-	// a paragraph's last line rarely reaches the right edge, so the trigger
-	// lands on the run-out instead of on the words.
+	// The top corner lines up with the Resolve and Actions buttons in the
+	// header above, so the trigger reads as one more action in that column
+	// rather than a control parked wherever the text happened to end. The
+	// note's text keeps a safe area on that side (see `__note-content`), so
+	// nothing runs underneath it.
 	&.is-floating {
 		position: absolute;
-		bottom: 0;
 		right: 0;
-
-		// A short last line still leaves it over text, so it needs its own
-		// ground. On the trigger rather than the row: the row is always
-		// opaque, and a white patch would blank out the text under a trigger
-		// at rest.
-		.editor-collab-sidebar-panel__add-reaction {
-			background-color: $white;
-			border-radius: $radius-full;
-		}
+		// Centered on the first line of text, so a one-line note reads as a
+		// single row with its trigger. The row shares the text's font and
+		// line height, so its own `lh` is the text's line box.
+		top: calc((1lh - #{$button-size-small}) / 2);
 	}
 }
 
