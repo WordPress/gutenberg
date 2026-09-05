@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   Block icons: Color icons with `color` alongside `fill` in forced colors mode, so stroke-based block icons stay visible in high contrast mode. Affects the block icon, list view and inserter icons ([#82477](https://github.com/WordPress/gutenberg/pull/82477)).
 -   Flex layout: Output `flex-direction: row` when a viewport override switches a vertical layout to horizontal, so the base `flex-direction: column` no longer keeps applying on that viewport ([#82364](https://github.com/WordPress/gutenberg/pull/82364)).
 -   `BlockManager`: Color library block icons with `color` while retaining a `fill` fallback for custom icons that do not use `currentColor`. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   Block List Appender: Show the appender button as a drop target when dragging a block over an empty container such as a Column, restoring the reveal that the `visibility`-to-`opacity` migration left behind ([#77852](https://github.com/WordPress/gutenberg/pull/77852)).

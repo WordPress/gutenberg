@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   `Button`, `Placeholder`: Color icons with `color` alongside `fill` in forced colors mode, so stroke-based icons stay visible in high contrast mode ([#82477](https://github.com/WordPress/gutenberg/pull/82477)).
 -   `ColorPalette`: Apply the computed contrast color to the selected checkmark now that the icon is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   `CheckboxControl`: Color the checked and indeterminate icons with `color` rather than `fill`, so they stay visible now that those icons are stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   `BorderBoxControl`: Give the group of border controls an accessible name from the `label` prop, by rendering the wrapper as a `role="group"` associated with the label through `aria-labelledby`. A consumer-supplied `aria-labelledby` or `aria-label` takes precedence over `label` and names the group instead; the wrapper is only given the `group` role when one of the three provides a name. A hidden label (`hideLabelFromVision`) now renders as a `span` rather than a `label` element, matching the visible one ([#82279](https://github.com/WordPress/gutenberg/pull/82279)).
