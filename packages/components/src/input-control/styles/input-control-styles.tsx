@@ -47,6 +47,18 @@ const backdropBorderColor = ( {
 	return COLORS.ui.border;
 };
 
+const backdropDisabledStyles = ( { disabled }: BackdropProps ) => {
+	if ( ! disabled ) {
+		return undefined;
+	}
+
+	return css`
+		@media ( forced-colors: active ) {
+			border-color: GrayText;
+		}
+	`;
+};
+
 export const BackdropUI = styled.div< BackdropProps >`
 	&&& {
 		box-sizing: border-box;
@@ -64,6 +76,7 @@ export const BackdropUI = styled.div< BackdropProps >`
 		top: 0;
 
 		${ rtl( { paddingLeft: 2 } ) }
+		${ backdropDisabledStyles }
 	}
 `;
 
@@ -75,7 +88,17 @@ export const Root = styled( Flex )`
 `;
 
 const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
-	return disabled ? css( { color: COLORS.ui.textDisabled } ) : undefined;
+	if ( ! disabled ) {
+		return undefined;
+	}
+
+	return css`
+		color: ${ COLORS.ui.textDisabled };
+
+		@media ( forced-colors: active ) {
+			color: GrayText;
+		}
+	`;
 };
 
 const containerWidthStyles = ( {
