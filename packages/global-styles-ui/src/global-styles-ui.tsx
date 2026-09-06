@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Navigator, useNavigator } from '@wordpress/components';
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
@@ -13,10 +10,6 @@ import {
 	mergeGlobalStyles,
 } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesProvider } from './provider';
 import ScreenRoot from './screen-root';
 import ScreenBlockList from './screen-block-list';
@@ -253,8 +246,17 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/typography/caption">
 						<ScreenTypographyElement element="caption" />
 					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/cite">
+						<ScreenTypographyElement element="cite" />
+					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/typography/button">
 						<ScreenTypographyElement element="button" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/textInput">
+						<ScreenTypographyElement element="textInput" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/select">
+						<ScreenTypographyElement element="select" />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks">
 						<ScreenBlockList />

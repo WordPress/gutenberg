@@ -1,12 +1,6 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
 import { css, keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
-/**
- * Internal dependencies
- */
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
 import { chevronIconSize } from '../select-control/styles/select-control-styles';

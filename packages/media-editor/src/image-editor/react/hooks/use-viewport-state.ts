@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useReducer, useCallback, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { ViewportState } from '../../core/types';
 import {
 	viewportReducer,

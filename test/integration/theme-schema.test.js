@@ -1,12 +1,7 @@
-/**
- * External dependencies
- */
+import { readFileSync } from 'node:fs';
 import Ajv from 'ajv';
 import glob from 'fast-glob';
-
-/**
- * Internal dependencies
- */
+import { describe, expect, it, test } from 'vitest';
 import themeSchema from '../../schemas/json/theme.json';
 
 describe( 'theme.json schema', () => {
@@ -40,7 +35,9 @@ describe( 'theme.json schema', () => {
 
 	test.each( jsonFiles )( 'validates schema for `%s`', ( filepath ) => {
 		// We want to validate the theme.json file using the local schema.
-		const { $schema, ...metadata } = require( filepath );
+		const { $schema, ...metadata } = JSON.parse(
+			readFileSync( filepath, 'utf8' )
+		);
 
 		// we expect the $schema property to be present in the theme.json file
 		expect( $schema ).toBeTruthy();
@@ -52,7 +49,9 @@ describe( 'theme.json schema', () => {
 
 	test.each( invalidFiles )( 'invalidates schema for `%s`', ( filepath ) => {
 		// We want to validate the theme.json file using the local schema.
-		const { $schema, ...metadata } = require( filepath );
+		const { $schema, ...metadata } = JSON.parse(
+			readFileSync( filepath, 'utf8' )
+		);
 
 		const result = ajv.validate( themeSchema, metadata );
 

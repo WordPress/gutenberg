@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import clearUnchangedEdits from '../clear-unchanged-edits';
 
 describe( 'clearUnchangedEdits', () => {

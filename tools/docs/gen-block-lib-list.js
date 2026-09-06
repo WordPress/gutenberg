@@ -3,10 +3,6 @@
  * Reads from  : packages/block-library/src
  * Publishes to: docs/reference-guides/core-blocks/README.md
  */
-
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs' );
 const glob = require( 'fast-glob' );

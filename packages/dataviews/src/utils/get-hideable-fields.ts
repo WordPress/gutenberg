@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { NormalizedField, View } from '../types';
 
 export default function getHideableFields< Item >(

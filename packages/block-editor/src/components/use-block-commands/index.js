@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	hasBlockSupport,
@@ -20,10 +17,6 @@ import {
 	unseen,
 	blockDefault as blockDefaultIcon,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
 import { unlock } from '../../lock-unlock';

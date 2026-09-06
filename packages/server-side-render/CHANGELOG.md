@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependency `@wordpress/deprecated` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 6.30.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 6.29.0 (2026-08-12)
+
+## 6.28.0 (2026-07-29)
+
 ## 6.27.0 (2026-07-14)
 
 ### Enhancements

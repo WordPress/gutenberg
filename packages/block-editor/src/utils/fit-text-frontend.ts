@@ -3,15 +3,7 @@
  * Automatically detects and initializes fit text on blocks with the has-fit-text class.
  * Supports both initial page load and Interactivity API client-side navigation.
  */
-
-/**
- * WordPress dependencies
- */
 import { store, getElement, getContext } from '@wordpress/interactivity';
-
-/**
- * Internal dependencies
- */
 import { optimizeFitText } from './fit-text-utils';
 
 interface FitTextContext {

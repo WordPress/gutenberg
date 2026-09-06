@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import { Link } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { NewsList } from './components';
 import styles from './render.module.css';
 

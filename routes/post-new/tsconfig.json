@@ -1,0 +1,18 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"rootDir": ".",
+		"noEmit": true,
+		"emitDeclarationOnly": false,
+		"composite": false,
+		"types": []
+	},
+	"references": [
+		{ "path": "../../packages/core-data/tsconfig.build.json" },
+		{ "path": "../../packages/data" }
+	],
+	"include": [ "**/*.ts", "**/*.tsx" ],
+	"exclude": [ "build", "node_modules" ]
+}

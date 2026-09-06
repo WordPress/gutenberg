@@ -299,6 +299,34 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * The `wp_navigation` post type provides its own list-based default view.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_wp_navigation_default_view() {
+		// Admin: reading wp_navigation config requires `edit_theme_options`.
+		wp_set_current_user( self::$admin_id );
+
+		$response = $this->dispatch_request( 'postType', 'wp_navigation' );
+		$this->assertSame( 200, $response->get_status() );
+
+		$data = json_decode( wp_json_encode( $response->get_data() ), true );
+
+		$this->assertSame( 'list', $data['default_view']['type'] );
+		$this->assertSame(
+			array(
+				'field'     => 'date',
+				'direction' => 'desc',
+			),
+			$data['default_view']['sort']
+		);
+		$this->assertSame( 'title', $data['default_view']['titleField'] );
+		$this->assertSame( array( 'list' ), array_keys( $data['default_layouts'] ) );
+		$this->assertCount( 1, $data['view_list'] );
+		$this->assertSame( 'all', $data['view_list'][0]['slug'] );
+	}
+
+	/**
 	 * Empty object-typed config values serialize as JSON objects ({}), not arrays ([]).
 	 *
 	 * @covers ::get_items
@@ -380,5 +408,30 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 			array( 'kind', 'name', 'version', 'default_view', 'default_layouts', 'view_list', 'form' ),
 			array_keys( $schema['properties'] )
 		);
+	}
+
+	/**
+	 * `search` and `page` are not part of the view schema: they are managed via
+	 * the URL, which is their only source of truth.
+	 *
+	 * @covers ::get_item_schema
+	 */
+	public function test_get_item_schema_excludes_url_managed_view_properties() {
+		$controller = new Gutenberg_REST_View_Config_Controller_7_1();
+		$schema     = $controller->get_item_schema();
+
+		$views = array(
+			'default_view'             => $schema['properties']['default_view']['properties'],
+			'view_list item view'      => $schema['properties']['view_list']['items']['properties']['view']['properties'],
+			'default_layouts.table'    => $schema['properties']['default_layouts']['properties']['table']['properties'],
+			'default_layouts.grid'     => $schema['properties']['default_layouts']['properties']['grid']['properties'],
+			'default_layouts.list'     => $schema['properties']['default_layouts']['properties']['list']['properties'],
+			'default_layouts.activity' => $schema['properties']['default_layouts']['properties']['activity']['properties'],
+		);
+
+		foreach ( $views as $label => $properties ) {
+			$this->assertArrayNotHasKey( 'search', $properties, "$label should not declare a `search` property." );
+			$this->assertArrayNotHasKey( 'page', $properties, "$label should not declare a `page` property." );
+		}
 	}
 }

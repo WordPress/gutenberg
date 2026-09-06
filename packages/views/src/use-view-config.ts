@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { View, SupportedLayouts, Form } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import { unlock } from './lock-unlock';
 
 /**
@@ -47,9 +40,15 @@ export function useViewConfig( {
 		: undefined;
 	return useSelect(
 		( select ) => {
-			return unlock( select( coreStore ) ).getViewConfig( kind, name, {
-				fields: fieldsKey,
-			} );
+			return unlock( select( coreStore ) ).getViewConfig(
+				kind,
+				name,
+				fieldsKey
+					? {
+							fields: fieldsKey,
+					  }
+					: undefined
+			);
 		},
 		[ kind, name, fieldsKey ]
 	);

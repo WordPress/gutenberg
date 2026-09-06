@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState, useLayoutEffect, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { computeLanePlacements } from './lane-placement';
 import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 

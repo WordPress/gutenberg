@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import type { TreeGridRowProps } from './types';
 

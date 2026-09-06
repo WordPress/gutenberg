@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { registerFormatType } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import {
 	NOTE_FORMAT_NAME,
 	noteFormat,

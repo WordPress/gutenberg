@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { dispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import SidebarAdapter from '../components/sidebar-block-editor/sidebar-adapter';
 import getInserterOuterSection from './inserter-outer-section';
 import { store as customizeWidgetsStore } from '../store';

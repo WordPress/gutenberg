@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { getActiveFormats } from '../../get-active-formats';
 import { isCollapsed } from '../../is-collapsed';
 import { updateFormats } from '../../update-formats';
@@ -348,8 +341,8 @@ export default ( props ) => ( element ) => {
 	// `handleSelectionChange` checks whether the element is focused itself,
 	// and the shared underlying delegated listener keeps the number of native
 	// listeners constant.
-	const unsubscribeSelectionChange = subscribeDelegatedListener(
-		ownerDocument,
+	const unsubscribeSelectionChange = subscribeOwnedListener(
+		element,
 		'selectionchange',
 		handleSelectionChange
 	);
@@ -370,8 +363,8 @@ export default ( props ) => ( element ) => {
 		'cut',
 		'paste',
 	].map( ( eventType ) =>
-		subscribeDelegatedListener(
-			ownerDocument,
+		subscribeOwnedListener(
+			element,
 			eventType,
 			handleSelectionChange,
 			true

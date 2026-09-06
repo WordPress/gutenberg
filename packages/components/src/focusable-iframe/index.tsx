@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
-/**
- * Internal dependencies
- */
 import type { FocusableIframeProps } from './types';
 
 export default function FocusableIframe( {

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,

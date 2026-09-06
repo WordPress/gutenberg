@@ -15,7 +15,8 @@
 				var(--wpds-border-width-xs) solid
 				var(--wpds-color-stroke-interactive-neutral);
 			padding: 0;
-			background-color: var(--wpds-color-background-interactive-neutral-weak);
+			/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
+			background-color: var(--wpds-color-background-interactive-neutral, var(--wpds-color-background-surface-neutral-strong));
 
 			&:not([data-disabled]) {
 				cursor: var(--wpds-cursor-control);
@@ -23,6 +24,8 @@
 
 			[data-highlighted] &,
 			&:hover {
+				/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
+				background-color: var(--wpds-color-background-interactive-neutral-active, var(--wpds-color-background-surface-neutral-strong));
 				border-color: var(--wpds-color-stroke-interactive-neutral-active);
 			}
 
@@ -34,7 +37,8 @@
 			}
 
 			&[data-disabled] {
-				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
+				/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
+				background-color: var(--wpds-color-background-interactive-neutral-disabled, var(--wpds-color-background-surface-neutral-strong));
 				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 

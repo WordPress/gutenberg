@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-
-/**
  * Follow the WordPress version guidelines to compute
  * the version to be used By default, increase the "minor"
  * number but if we reach 9, bump to the next major.

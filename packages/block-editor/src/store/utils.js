@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { parse } from '@wordpress/blocks';
 import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
-
-/**
- * Internal dependencies
- */
 import {
 	selectBlockPatternsKey,
 	userPatternCategoriesSelectKey,

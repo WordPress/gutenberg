@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { defineConfig, type PlaywrightTestConfig } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import baseConfig from './playwright.config';
 
 const wsPort = process.env.GUTENBERG_RTC_TEST_WS_PORT || '18991';

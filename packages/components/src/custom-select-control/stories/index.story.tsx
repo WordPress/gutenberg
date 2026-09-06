@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import CustomSelectControl from '..';
 
 const meta: Meta< typeof CustomSelectControl > = {

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../navigation/constants';
 
 /**

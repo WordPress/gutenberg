@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import normalizeForm from '../normalize-form';
 import type { Form } from '../../../types';
 
@@ -308,17 +306,15 @@ describe( 'normalizeFormFields', () => {
 		} );
 
 		it( 'card: enforces isOpened=true and summary=[] when withHeader=false', () => {
-			const form: Form = {
-				// @ts-ignore - Test intentionally uses invalid type to verify runtime behavior.
+			const form = {
 				layout: {
 					type: 'card',
 					withHeader: false,
-					// @ts-ignore - Test intentionally uses invalid type to verify runtime behavior.
 					isOpened: false,
 					summary: [ { id: 'field1', visibility: 'always' } ],
 				},
 				fields: [ 'field1' ],
-			};
+			} as unknown as Form;
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
 				layout: {

@@ -1,10 +1,3 @@
-/**
- * External dependencies
- */
-
-/**
- * Internal dependencies
- */
 import { getLazyWidgetComponent } from '../../tools/get-lazy-widget-component';
 import type { ResolveWidgetModule, WidgetType } from '../../types';
 

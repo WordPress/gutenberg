@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Point the scaffolding output at the generated `env` script (`npm run env start`) instead of `npx wp-env start` ([#82331](https://github.com/WordPress/gutenberg/pull/82331)).
+
+### Internal
+
+-   Remove unused dependency `@wordpress/lazy-import` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 4.97.0 (2026-08-26)
+
+## 4.96.0 (2026-08-12)
+
+
+## 4.95.0 (2026-07-29)
+
 ## 4.94.0 (2026-07-14)
 
 ## 4.93.0 (2026-07-01)

@@ -1,10 +1,11 @@
 {
-	"$schema": "https://json.schemastore.org/tsconfig",
-	"extends": "../../tsconfig.base.json",
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"references": [
+		{ "path": "./tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../hooks" },
-		{ "path": "../i18n" },
+		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../rich-text" }
 	]
 }

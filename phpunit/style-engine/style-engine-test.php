@@ -2,7 +2,7 @@
 /**
  * Tests the Style Engine global functions that interact with the WP_Style_Engine class.
  *
- * @package    Gutenberg
+ * @package    gutenberg
  * @subpackage style-engine
  */
 

@@ -714,30 +714,6 @@
 		"parent": "core-blocks-text"
 	},
 	{
-		"title": "Input Field",
-		"slug": "core-block-form-input",
-		"markdown_source": "../packages/block-library/src/form-input/README.md",
-		"parent": "core-blocks-widgets"
-	},
-	{
-		"title": "Form Submission Notification",
-		"slug": "core-block-form-submission-notification",
-		"markdown_source": "../packages/block-library/src/form-submission-notification/README.md",
-		"parent": "core-blocks-widgets"
-	},
-	{
-		"title": "Form Submit Button",
-		"slug": "core-block-form-submit-button",
-		"markdown_source": "../packages/block-library/src/form-submit-button/README.md",
-		"parent": "core-blocks-widgets"
-	},
-	{
-		"title": "Form",
-		"slug": "core-block-form",
-		"markdown_source": "../packages/block-library/src/form/README.md",
-		"parent": "core-blocks-widgets"
-	},
-	{
 		"title": "Classic",
 		"slug": "core-block-freeform",
 		"markdown_source": "../packages/block-library/src/freeform/README.md",
@@ -1446,6 +1422,12 @@
 		"parent": "theme-json-reference"
 	},
 	{
+		"title": "View Configuration Reference",
+		"slug": "view-config-reference",
+		"markdown_source": "../docs/reference-guides/view-config-reference.md",
+		"parent": "reference-guides"
+	},
+	{
 		"title": "Component Reference",
 		"slug": "components",
 		"markdown_source": "../packages/components/README.md",
@@ -1509,18 +1491,6 @@
 		"title": "Button",
 		"slug": "button",
 		"markdown_source": "../packages/components/src/button/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "DateCalendar",
-		"slug": "date-calendar",
-		"markdown_source": "../packages/components/src/calendar/date-calendar/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "DateRangeCalendar",
-		"slug": "date-range-calendar",
-		"markdown_source": "../packages/components/src/calendar/date-range-calendar/README.md",
 		"parent": "components"
 	},
 	{
@@ -2616,6 +2586,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/kebab-case",
+		"slug": "packages-kebab-case",
+		"markdown_source": "../packages/kebab-case/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/keyboard-shortcuts",
 		"slug": "packages-keyboard-shortcuts",
 		"markdown_source": "../packages/keyboard-shortcuts/README.md",
@@ -3036,12 +3012,6 @@
 		"parent": "data"
 	},
 	{
-		"title": "Reusable blocks",
-		"slug": "data-core-reusable-blocks",
-		"markdown_source": "../docs/reference-guides/data/data-core-reusable-blocks.md",
-		"parent": "data"
-	},
-	{
 		"title": "Rich Text",
 		"slug": "data-core-rich-text",
 		"markdown_source": "../docs/reference-guides/data/data-core-rich-text.md",
@@ -3216,9 +3186,21 @@
 		"parent": "code"
 	},
 	{
+		"title": "Testing published packages across WordPress versions",
+		"slug": "package-runtime-compatibility",
+		"markdown_source": "../docs/contributors/code/package-runtime-compatibility.md",
+		"parent": "code"
+	},
+	{
 		"title": "Workspace Development",
 		"slug": "workspace-development",
 		"markdown_source": "../docs/contributors/code/workspace-development.md",
+		"parent": "code"
+	},
+	{
+		"title": "Required changes from trunk",
+		"slug": "required-changes-from-trunk",
+		"markdown_source": "../docs/contributors/code/required-changes-from-trunk.md",
 		"parent": "code"
 	},
 	{
@@ -3274,6 +3256,12 @@
 		"slug": "design",
 		"markdown_source": "../docs/contributors/design/README.md",
 		"parent": "contributors"
+	},
+	{
+		"title": "Working with WordPress Design System packages",
+		"slug": "design-system-packages",
+		"markdown_source": "../docs/contributors/design/design-system-packages.md",
+		"parent": "design"
 	},
 	{
 		"title": "Blocks are the Interface",

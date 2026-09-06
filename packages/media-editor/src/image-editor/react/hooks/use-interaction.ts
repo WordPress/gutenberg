@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { CropperState, Size } from '../../core/types';
 import {
 	InteractionController,

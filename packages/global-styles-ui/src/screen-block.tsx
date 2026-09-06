@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getBlockType } from '@wordpress/blocks';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -18,10 +15,6 @@ import {
 	setSetting as setSettingHelper,
 } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from './screen-header';
 import BlockPreviewPanel from './block-preview-panel';
 import { Subtitle } from './subtitle';
@@ -29,7 +22,7 @@ import {
 	useBlockVariations,
 	VariationsPanel,
 } from './variations/variations-panel';
-import { useStyle, useSetting } from './hooks';
+import { useStyle, useSetting, useStyleWithResolvedBackground } from './hooks';
 import { GlobalStylesContext } from './context';
 import { unlock } from './lock-unlock';
 import { getValidPseudoStates, getValidViewportStates } from './utils';
@@ -163,6 +156,8 @@ function ScreenBlock( {
 		false,
 		hasSelectedState ? stateParam : undefined
 	);
+	const inheritedStyleWithResolvedBackground =
+		useStyleWithResolvedBackground( inheritedStyle );
 
 	const [ userSettings ] = useSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useSetting( '', name );
@@ -411,7 +406,7 @@ function ScreenBlock( {
 			) }
 			{ hasBackgroundPanel && (
 				<StylesBackgroundPanel
-					inheritedValue={ inheritedStyle }
+					inheritedValue={ inheritedStyleWithResolvedBackground }
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }

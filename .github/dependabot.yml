@@ -6,7 +6,7 @@ updates:
     - package-ecosystem: 'github-actions'
       directories:
           - '.github/workflows'
-          - '.github/setup-node'
+          - '.github/setup-*'
       schedule:
           interval: 'daily'
       open-pull-requests-limit: 20

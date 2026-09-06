@@ -1,5 +1,4 @@
 import { readFileSync } from 'node:fs';
-
 import { FORMAT_ID } from '@terrazzo/plugin-css';
 import type { Plugin } from '@terrazzo/parser';
 

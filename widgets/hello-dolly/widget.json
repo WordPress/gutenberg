@@ -9,14 +9,10 @@
 		{
 			"id": "plugin-page",
 			"label": "WordPress.org plugin page",
+			"icon": "core/external",
+			"relevance": "low",
 			"href": "https://wordpress.org/plugins/hello-dolly/",
 			"openInNewTab": true
-		},
-		{
-			"id": "download-lyrics",
-			"label": "Download lyrics",
-			"href": "hello-dolly-lyrics.txt",
-			"download": "hello-dolly-lyrics.txt"
 		}
 	],
 	"textdomain": "default"

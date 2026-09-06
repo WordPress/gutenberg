@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import EquivalentKeyMap from 'equivalent-key-map';
-
-/**
- * Internal dependencies
- */
 import getQueryParts from './get-query-parts';
 import { setNestedValue } from '../utils';
 

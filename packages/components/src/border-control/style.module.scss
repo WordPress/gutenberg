@@ -1,0 +1,93 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
+.border-control {
+	border: 0;
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: inherit;
+	}
+}
+.inner-wrapper {
+	height: 40px;
+
+	:global(.components-unit-control) {
+		flex: 1 1 40%;
+	}
+
+	/* Raised specificity to beat UnitSelect's runtime-injected Emotion min-height. */
+	&#{&}
+	:global(.components-unit-control__select):global(.components-unit-control__select) {
+		min-height: 0;
+	}
+}
+
+/* Forces a set UnitControl width instead of the default 40/60 split with RangeControl. */
+.inner-wrapper-has-width {
+	:global(.components-unit-control) {
+		flex: 0 0 auto;
+	}
+}
+
+.dropdown {
+	background: #fff;
+
+	/* Raised specificity to stay ahead of the Emotion Button base styles. */
+	&#{&} > button {
+		aspect-ratio: 1;
+		padding: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-start-start-radius: $radius-small;
+		border-end-start-radius: $radius-small;
+		border-start-end-radius: 0;
+		border-end-end-radius: 0;
+		border: $border-width solid $components-color-border;
+
+		&:focus,
+		&:hover:not(:disabled) {
+			box-shadow: inset 0 0 0 0.5px $components-color-accent;
+			border-color: $components-color-accent;
+			z-index: 1;
+			position: relative;
+		}
+	}
+}
+
+.color-indicator-wrapper {
+	border-radius: $radius-full;
+	border: 2px solid transparent;
+	/* border-style / border-color are applied inline by the dropdown hook. */
+	width: 24px;
+	height: 24px;
+	padding: 2px;
+
+	/* Transparent gradient keeps the indicator visible over the active toggle. */
+	& > span {
+		height: $grid-unit-20;
+		width: $grid-unit-20;
+		background: linear-gradient(-45deg, transparent 48%, rgb(0 0 0 / 20%) 48%, rgb(0 0 0 / 20%) 52%, transparent 52%);
+	}
+}
+
+.popover-controls {
+	/* $swatch-size * 6 + $swatch-gap * 5, matching $color-palette-circle-size. */
+	width: 228px;
+}
+
+.reset-button-wrapper {
+	display: flex;
+	justify-content: flex-end;
+	margin-block-start: $grid-unit-15;
+}
+
+.slider {
+	flex: 1 1 60%;
+	margin-inline-end: $grid-unit-15;
+}

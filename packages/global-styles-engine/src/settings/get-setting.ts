@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import type { GlobalStylesConfig } from '../types';
 

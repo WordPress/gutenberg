@@ -1,12 +1,6 @@
-/**
- * Internal dependencies
- */
-import { createI18n } from '..';
-
-/**
- * WordPress dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { createHooks } from '@wordpress/hooks';
+import { createI18n } from '..';
 
 describe( 'i18n updates', () => {
 	it( 'updates on setLocaleData', () => {

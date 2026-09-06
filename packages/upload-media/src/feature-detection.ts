@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { ImageDimensions } from './get-image-dimensions';
 
 interface NavigatorNetworkInformation {

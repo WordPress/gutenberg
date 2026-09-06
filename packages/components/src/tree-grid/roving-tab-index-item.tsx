@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useRef, forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useRovingTabIndexContext } from './roving-tab-index-context';
 import type { RovingTabIndexItemProps } from './types';
 

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { Snackbar } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { UPLOAD_DONE, UPLOAD_SPINNER } from '../index';
 
 /**

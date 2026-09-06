@@ -29,7 +29,11 @@ jobs:
 
 ## Outputs
 
-_None._
+Each is empty unless the event it belongs to produced it, so a consumer should check before using one.
+
+-   `welcome-prompt`: Message welcoming a first-time contributor. Set when a pull request is opened by someone whose first it is.
+-   `first-time-contributor-prompt`: Message asking a first-time contributor to link their WordPress.org profile. Set on a push that merged their first pull request, and only when no profile was found for them.
+-   `first-time-contributor-pr-number`: Pull request the account link prompt belongs to. Set alongside `first-time-contributor-prompt`, since a push payload carries no pull request number of its own.
 
 ## Contributing to this package
 

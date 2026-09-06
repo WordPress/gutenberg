@@ -1,15 +1,10 @@
-'use strict';
-/**
- * Internal dependencies
- */
+import { createRequire } from 'node:module';
+import { describe, expect, it } from 'vitest';
+const require = createRequire( import.meta.url );
 const { ValidationError } = require( '..' );
 const postProcessConfig = require( '../post-process-config' );
 
 describe( 'postProcessConfig', () => {
-	afterEach( () => {
-		jest.clearAllMocks();
-	} );
-
 	it( 'should merge relevant root options into environment options', async () => {
 		const processed = await postProcessConfig( {
 			port: 123,

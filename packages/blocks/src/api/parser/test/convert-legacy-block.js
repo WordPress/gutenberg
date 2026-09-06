@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { normalizeStyleStateAliases } from '../convert-legacy-block';
 
 describe( 'normalizeStyleStateAliases', () => {

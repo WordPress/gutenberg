@@ -1,17 +1,9 @@
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const childProcess = require( 'child_process' );
 const { randomUUID } = require( 'crypto' );
 const path = require( 'path' );
 const os = require( 'os' );
-// @ts-ignore
 const { confirm } = require( '@inquirer/prompts' );
-
-/**
- * Internal dependencies
- */
 const { log, formats } = require( './logger' );
 
 /**

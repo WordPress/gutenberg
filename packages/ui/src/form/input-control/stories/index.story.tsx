@@ -6,8 +6,8 @@ import { IconButton } from '../../../icon-button';
 import { InputLayout } from '../../primitives/input-layout';
 import { Stack } from '../../../stack';
 import {
-	WithPrefix,
-	WithSuffixControl,
+	WithPrefix as InputWithPrefix,
+	WithSuffixControl as InputWithSuffixControl,
 } from '../../primitives/input/stories/index.story';
 import {
 	WITH_DETAILS_DESCRIPTION,
@@ -15,6 +15,7 @@ import {
 } from '../../stories/shared';
 
 const meta: Meta< typeof InputControl > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/InputControl',
 	component: InputControl,
 	argTypes: {
@@ -25,9 +26,8 @@ const meta: Meta< typeof InputControl > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -61,15 +61,24 @@ export const WithDetails: Story = {
 	},
 };
 
-WithPrefix.args = {
-	...WithPrefix.args,
-	...Default.args,
+export const WithPrefix: Story = {
+	args: {
+		...InputWithPrefix.args,
+		ref: undefined,
+		...Default.args,
+	},
 };
-WithSuffixControl.args = {
-	...WithSuffixControl.args,
-	...Default.args,
+
+export const WithSuffixControl: Story = {
+	args: {
+		...InputWithSuffixControl.args,
+		ref: undefined,
+		...Default.args,
+	},
+	parameters: {
+		a11y: { test: 'error' },
+	},
 };
-export { WithPrefix, WithSuffixControl };
 
 export const Password: Story = {
 	render: function Template( args ) {

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { click, press } from '@ariakit/test';
 
 // TODO: may need to be tested with Playwright; further context:

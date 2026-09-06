@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useMemo,
@@ -8,10 +5,6 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	DEFAULT_STATE,
 	ORIGINAL_ASPECT_RATIO,

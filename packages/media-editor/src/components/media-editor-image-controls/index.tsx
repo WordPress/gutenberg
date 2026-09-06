@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	DropdownMenu,
@@ -18,10 +15,6 @@ import {
 	lineSolid,
 	plus,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { useMediaEditor } from '../../state';
 import {
 	MAX_ZOOM,

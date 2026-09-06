@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import moveFeaturePreferences from './move-feature-preferences';
 import moveThirdPartyFeaturePreferences from './move-third-party-feature-preferences';
 import moveIndividualPreference from './move-individual-preference';

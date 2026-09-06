@@ -12,10 +12,6 @@
  *
  * MIT License: https://opensource.org/licenses/MIT
  */
-
-/**
- * Internal dependencies
- */
 import { type ModuleLoad } from './loader';
 
 const fetching = ( url: string, parent?: string ) => {

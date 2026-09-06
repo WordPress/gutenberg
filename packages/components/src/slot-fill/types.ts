@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode, RefObject } from 'react';
-
-/**
- * WordPress dependencies
- */
 import type { ObservableMap } from '@wordpress/compose';
 
 export type DistributiveOmit< T, K extends keyof any > = T extends any

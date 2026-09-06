@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { useGlobalStylesOutput } from '../../hooks/use-global-styles-output';
 

@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import { h, type ComponentChild, type JSX } from 'preact';
-/**
- * Internal dependencies
- */
 import { warn } from './utils';
 import { type DirectiveEntry } from './hooks';
 

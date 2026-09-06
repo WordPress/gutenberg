@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useNavigate } from '@wordpress/route';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';

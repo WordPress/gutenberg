@@ -8,5 +8,13 @@
 	"icon": "dashboard-widgets/drafts",
 	"category": "dashboard",
 	"presentation": "content-bleed",
+	"actions": [
+		{
+			"id": "view-drafts",
+			"label": "View all drafts",
+			"relevance": "high",
+			"href": "edit.php?post_status=draft"
+		}
+	],
 	"textdomain": "default"
 }

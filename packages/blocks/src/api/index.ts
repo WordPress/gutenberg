@@ -1,9 +1,5 @@
-/**
- * Internal dependencies
- */
 import { lock } from '../lock-unlock';
 import { isContentBlock } from './utils';
-
 // The blocktype is the most important concept within the block API. It defines
 // all aspects of the block configuration and its interfaces, including `edit`
 // and `save`. The transforms specification allows converting one blocktype to
@@ -22,7 +18,6 @@ export {
 	findTransform,
 	getBlockFromExample,
 } from './factory';
-
 // The block tree is composed of a collection of block nodes. Blocks contained
 // within other blocks are called inner blocks. An important design
 // consideration is that inner blocks are -- conceptually -- not part of the
@@ -46,7 +41,6 @@ export {
 	getBlockAttributes,
 	parseWithAttributeSchema,
 } from './parser/get-block-attributes';
-
 // While block transformations account for a specific surface of the API, there
 // are also raw transformations which handle arbitrary sources not made out of
 // blocks but producing block basaed on various heuristics. This includes
@@ -56,7 +50,6 @@ export {
 	rawHandler,
 	deprecatedGetPhrasingContentSchema as getPhrasingContentSchema,
 } from './raw-handling';
-
 // The process of serialization aims to deflate the internal memory of the block
 // editor and its state representation back into an HTML valid string. This
 // process restores the document integrity and inserts invisible delimiters
@@ -73,7 +66,6 @@ export {
 	getInnerBlocksProps as __unstableGetInnerBlocksProps,
 	__unstableSerializeAndClean,
 } from './serializer';
-
 // Validation is the process of comparing a block source with its output before
 // there is any user input or interaction with a block. When this operation
 // fails -- for whatever reason -- the block is to be considered invalid. As
@@ -98,7 +90,6 @@ export {
 // adequate to spend more time determining validity before throwing a conflict.
 export { isValidBlockContent, validateBlock } from './validation';
 export { getCategories, setCategories, updateCategory } from './categories';
-
 // Blocks are inherently indifferent about where the data they operate with ends
 // up being saved. For example, all blocks can have a static and dynamic aspect
 // to them depending on the needs. The static nature of a block is the `save()`
@@ -159,7 +150,6 @@ export {
 	getBlockAttributesNamesByRole,
 	__experimentalGetBlockAttributesNamesByRole,
 } from './utils';
-
 // Templates are, in a general sense, a basic collection of block nodes with any
 // given set of predefined attributes that are supplied as the initial state of
 // an inner blocks group. These nodes can, in turn, contain any number of nested
@@ -177,19 +167,16 @@ export {
 	__EXPERIMENTAL_ELEMENTS,
 	__EXPERIMENTAL_PATHS_WITH_OVERRIDE,
 } from './constants';
-
 // Allows blocks to declare private keys (fields form)
 // that we can use to generate UI controls for them via DataForm.
 const fieldsKey = Symbol( 'fields' );
 const formKey = Symbol( 'form' );
-
 // A private block setting, opted into by core text blocks, that makes the
 // editor canvas the contentEditable editing host (see `useEditableRoot`). It's
 // a Symbol rather than a `supports` key so it stays private for now: it can't
 // be set from `block.json` and third-party blocks can't opt in yet. It may
 // become a public support once the feature has settled.
 const editableRootKey = Symbol( 'editableRoot' );
-
 import { parseRawBlock as _parseRawBlock } from './parser';
 
 export const privateApis = {};

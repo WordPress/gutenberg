@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getFileBasename } from '../../utils';
 import type { QueueItemId } from '../types';
 

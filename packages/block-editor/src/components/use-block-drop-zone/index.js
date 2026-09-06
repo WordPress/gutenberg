@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
 import {
@@ -13,10 +10,6 @@ import {
 	isUnmodifiedDefaultBlock as getIsUnmodifiedDefaultBlock,
 	store as blocksStore,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import useOnBlockDrop from '../use-on-block-drop';
 import {
 	getDistanceToNearestEdge,
@@ -158,7 +151,7 @@ export function getDropTargetPosition(
 				rect,
 				allowedEdges
 			);
-			// If the the point is close to a side, prioritize that side.
+			// If the point is close to a side, prioritize that side.
 			const [ sideDistance, sideEdge ] = getDistanceToNearestEdge(
 				position,
 				rect,
@@ -579,7 +572,7 @@ export default function useBlockDropZone( {
 		onDrop: onBlockDrop,
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being
-			// handled, so get it now and pass it to the thottled function.
+			// handled, so get it now and pass it to the throttled function.
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
 			throttled( event, event.currentTarget.ownerDocument );
 		},

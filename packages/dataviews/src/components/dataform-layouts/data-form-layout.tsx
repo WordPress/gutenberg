@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useMemo } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type {
 	FieldValidity,
 	FormValidity,

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { shouldSkipSerialization } from './utils';
 
 /**

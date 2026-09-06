@@ -1,3 +1,17 @@
+// The button element's user agent styles set `font` and `color`, which breaks
+// inheritance, so both are explicitly inherited from the overlay. Specificity is
+// lowered so that theme.json and Global Styles block level values still win.
+:where(.wp-block-navigation-overlay-close) {
+	color: inherit;
+	font-family: inherit;
+	font-size: inherit;
+	font-style: inherit;
+	font-weight: inherit;
+	letter-spacing: inherit;
+	line-height: inherit;
+	text-transform: inherit;
+}
+
 .wp-block-navigation-overlay-close {
 	display: inline-flex;
 	align-items: center;

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useEffect,
 	useLayoutEffect,
@@ -12,10 +9,6 @@ import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 

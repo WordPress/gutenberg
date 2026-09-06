@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { NormalizedField } from '../../types';
 
 type DataFormContextType< Item > = {

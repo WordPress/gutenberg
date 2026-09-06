@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from '../../../name';
 
 /**
@@ -44,11 +37,15 @@ export const useIsDirty = () => {
 
 		const siteEntityLabels = siteEntityConfig?.meta?.labels ?? {};
 		const {
+			title: siteTitleEdit,
+			description: siteDescriptionEdit,
 			site_logo: siteLogoEdit,
 			site_icon: siteIconEdit,
 			...otherSiteEdits
 		} = siteEdits ?? {};
 		const orderedSiteProperties = [
+			siteTitleEdit !== undefined && 'title',
+			siteDescriptionEdit !== undefined && 'description',
 			siteLogoEdit !== undefined && 'site_logo',
 			siteIconEdit !== undefined && 'site_icon',
 			...Object.keys( otherSiteEdits ),

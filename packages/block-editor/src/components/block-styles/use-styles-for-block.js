@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	cloneBlock,
@@ -9,10 +6,6 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { getActiveStyle, getRenderedStyles, replaceActiveStyle } from './utils';
 import { store as blockEditorStore } from '../../store';
 

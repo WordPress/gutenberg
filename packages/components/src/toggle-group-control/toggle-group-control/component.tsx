@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect, useContextSystem } from '../../context';
 import BaseControl, { useBaseControlProps } from '../../base-control';
@@ -36,6 +25,7 @@ function UnconnectedToggleGroupControl(
 		isAdaptiveWidth = false,
 		isBlock = false,
 		isDeselectable = false,
+		disabled = false,
 		id,
 		label,
 		hideLabelFromVision = false,
@@ -94,6 +84,7 @@ function UnconnectedToggleGroupControl(
 				onChange={ onChange }
 				ref={ refs }
 				value={ value }
+				disabled={ disabled }
 			>
 				{ children }
 			</MainControl>

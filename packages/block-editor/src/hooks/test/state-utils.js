@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import {
 	getRelativeRootSelector,
 	buildScopedBlockSelector,

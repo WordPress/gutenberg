@@ -1,11 +1,13 @@
-/**
- * External dependencies
- */
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import deepFreeze from 'deep-freeze';
-
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -13,10 +15,6 @@ import {
 	privateApis,
 } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	hasSameKeys,
 	isUpdatingSameBlockAttribute,
@@ -51,18 +49,38 @@ import { sectionRootClientIdKey, isIsolatedEditorKey } from '.././private-keys';
 
 const { isContentBlock } = unlock( privateApis );
 
-jest.mock( '@wordpress/data/src/select', () => {
-	const actualSelect = jest.requireActual( '@wordpress/data/src/select' );
+const { mockIsContentBlock } = vi.hoisted( () => ( {
+	mockIsContentBlock: vi.fn(),
+} ) );
+
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
+	const actualData = await importOriginal();
 
 	return {
-		select: jest.fn( ( ...args ) => actualSelect.select( ...args ) ),
+		...actualData,
+		select: vi.fn( ( ...args ) => actualData.select( ...args ) ),
 	};
 } );
 
-jest.mock( '@wordpress/blocks/src/api/utils', () => {
+vi.mock( import( '../../lock-unlock' ), async ( importOriginal ) => {
+	const actualLockUnlock = await importOriginal();
+
 	return {
-		...jest.requireActual( '@wordpress/blocks/src/api/utils' ),
-		isContentBlock: jest.fn(),
+		...actualLockUnlock,
+		unlock: ( value ) => {
+			const unlocked = actualLockUnlock.unlock( value );
+			if (
+				unlocked &&
+				typeof unlocked === 'object' &&
+				'isContentBlock' in unlocked
+			) {
+				return {
+					...unlocked,
+					isContentBlock: mockIsContentBlock,
+				};
+			}
+			return unlocked;
+		},
 	};
 } );
 
@@ -3456,9 +3474,9 @@ describe( 'state', () => {
 
 	describe( 'settings', () => {
 		it( 'should warn about __unstableIsPreviewMode deprecation', () => {
-			const consoleWarn = jest
+			const consoleWarn = vi
 				.spyOn( global.console, 'warn' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 
 			const settingsObject = settings( undefined, {
 				type: 'UPDATE_SETTINGS',
@@ -6102,6 +6120,36 @@ describe( 'state', () => {
 				{
 					type: 'SELECTION_CHANGE',
 					clientId: 'client-2',
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps the selected state for selection changes within the same block', () => {
+			const originalState = {
+				clientId: 'client-1',
+				value: { viewport: 'default', pseudo: ':hover' },
+			};
+			const state = selectedBlockStyleState( originalState, {
+				type: 'SELECTION_CHANGE',
+				start: { clientId: 'client-1' },
+				end: { clientId: 'client-1' },
+			} );
+
+			expect( state ).toBe( originalState );
+		} );
+
+		it( 'clears the selected state for selection changes across multiple blocks', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+				{
+					type: 'SELECTION_CHANGE',
+					start: { clientId: 'client-1' },
+					end: { clientId: 'client-2' },
 				}
 			);
 

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { getSettings as getDateSettings } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
 import Tooltip from '../../tooltip';
 import { TimeZone as StyledComponent } from './styles';
 

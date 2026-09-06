@@ -87,6 +87,7 @@ While this prop doesn't change any styles for the inner blocks themselves, it do
 ### `template`
 
 -   **Type:** `Array<Array<Object>>`
+-   **Deprecated:** Declare `template` in the block type settings passed to `registerBlockType` instead, which also applies the template when the block is inserted.
 
 The template is defined as a list of block items. Such blocks can have predefined attributes, placeholder, content, etc. Block templates allow specifying a default initial state for an InnerBlocks area.
 More information about templates can be found in [template docs](/docs/reference-guides/block-api/block-templates.md).
@@ -112,6 +113,7 @@ The previous example creates an InnerBlocks area containing two columns one with
 
 -   **Type:** `Boolean`
 -   **Default:** `false`
+-   **Deprecated:** Declare `templateInsertUpdatesSelection` in the block type settings passed to `registerBlockType` instead.
 
 If true when child blocks in the template are inserted the selection is updated.
 If false the selection should not be updated when child blocks specified in the template are inserted.

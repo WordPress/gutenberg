@@ -9,13 +9,7 @@ import type { ComboboxItemProps } from './types';
 
 export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 	function Item(
-		{
-			className,
-			children,
-			size = 'default',
-			variant = 'default',
-			...restProps
-		},
+		{ className, children, variant = 'default', ...restProps },
 		ref
 	) {
 		return (
@@ -23,7 +17,6 @@ export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
 					itemPopupStyles.item,
-					itemPopupStyles[ `is-size-${ size }` ],
 					className
 				) }
 				ref={ ref }

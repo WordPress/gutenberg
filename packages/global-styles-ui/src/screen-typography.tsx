@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from './screen-header';
 import { ScreenBody } from './screen-body';
 import TypographyElements from './typography-elements';

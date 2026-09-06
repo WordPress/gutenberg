@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { TransformOperation, CropperState } from '../types';
 import { DEFAULT_STATE } from '../constants';
 import { cropperReducer } from '../state';

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { getBlockTypes } from '@wordpress/blocks';
 
@@ -56,6 +49,11 @@ const translationMap: TranslationMap = {
 	'styles.spacing': __( 'Spacing' ),
 	'styles.background': __( 'Background' ),
 	'styles.typography': __( 'Typography' ),
+	'styles.border': __( 'Border' ),
+	'styles.shadow': __( 'Shadow' ),
+	'styles.outline': __( 'Outline' ),
+	'styles.filter': __( 'Filter' ),
+	'styles.dimensions': __( 'Dimensions' ),
 };
 const styleStateLabelMap: TranslationMap = {
 	'@tablet': __( 'Tablet' ),
@@ -230,6 +228,39 @@ function deepCompare(
 	return diffs;
 }
 
+/*
+ * The top-level style properties reported as changes.
+ * `blocks` and `elements` changes are named after the block or element rather
+ * than the property.
+ *
+ * Deliberately a separate list rather than a reuse of `STYLE_KEYS` in
+ * `core/render.tsx`, because the order here is the order the changes are read
+ * in, so it is sorted by what a person is most likely to have changed.
+ */
+const COMPARED_STYLE_KEYS = [
+	'background',
+	'color',
+	'typography',
+	'spacing',
+	'border',
+	'shadow',
+	'outline',
+	'filter',
+	'dimensions',
+] as const;
+
+/**
+ * Picks the style properties that are compared for changes.
+ *
+ * @param config A global styles config.
+ * @return The subset of `config.styles` that is compared.
+ */
+function pickComparedStyles( config: any ): Record< string, any > {
+	return Object.fromEntries(
+		COMPARED_STYLE_KEYS.map( ( key ) => [ key, config?.styles?.[ key ] ] )
+	);
+}
+
 /**
  * Returns summarized global styles changes with style-state keys.
  * Results are cached using a Map() key of `JSON.stringify( { next, previous } )`.
@@ -256,23 +287,13 @@ export function getGlobalStylesChangelist(
 	 */
 	const changedValueTree = deepCompare(
 		{
-			styles: {
-				background: next?.styles?.background,
-				color: next?.styles?.color,
-				typography: next?.styles?.typography,
-				spacing: next?.styles?.spacing,
-			},
+			styles: pickComparedStyles( next ),
 			blocks: next?.styles?.blocks,
 			elements: next?.styles?.elements,
 			settings: next?.settings,
 		},
 		{
-			styles: {
-				background: previous?.styles?.background,
-				color: previous?.styles?.color,
-				typography: previous?.styles?.typography,
-				spacing: previous?.styles?.spacing,
-			},
+			styles: pickComparedStyles( previous ),
 			blocks: previous?.styles?.blocks,
 			elements: previous?.styles?.elements,
 			settings: previous?.settings,

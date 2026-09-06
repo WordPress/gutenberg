@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { useContext, useMemo } from '@wordpress/element';
 import { isRTL as isRTLFn } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useContextSystem, contextConnectWithoutRef } from '../context';
 import type { ContextProps, Props } from './types';
 import { Context } from './context';

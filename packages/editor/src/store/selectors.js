@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
@@ -17,10 +14,6 @@ import {
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import {
 	ATTACHMENT_POST_TYPE,
 	EDIT_MERGE_PROPERTIES,

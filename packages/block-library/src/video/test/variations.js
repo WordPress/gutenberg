@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import variations, { isGifVariation } from '../variations';
 
 const GIF_ATTRIBUTES = {

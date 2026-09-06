@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { Card, CollapsibleCard } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { GuidelineAccordionProps } from '../types';
 
 export default function GuidelineAccordion( {

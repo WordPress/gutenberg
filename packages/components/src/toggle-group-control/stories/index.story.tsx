@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
@@ -50,8 +39,9 @@ const Template: StoryFn< typeof ToggleGroupControl > = ( {
 	onChange,
 	...props
 } ) => {
-	const [ value, setValue ] =
-		useState< ToggleGroupControlProps[ 'value' ] >();
+	const [ value, setValue ] = useState< ToggleGroupControlProps[ 'value' ] >(
+		props.value
+	);
 
 	return (
 		<ToggleGroupControl
@@ -145,4 +135,16 @@ export const Deselectable: StoryFn< typeof ToggleGroupControl > = Template.bind(
 Deselectable.args = {
 	...WithIcons.args,
 	isDeselectable: true,
+};
+
+/**
+ * When the `disabled` prop is true, the control is unselectable.
+ */
+export const Disabled: StoryFn< typeof ToggleGroupControl > = Template.bind(
+	{}
+);
+Disabled.args = {
+	...Default.args,
+	disabled: true,
+	value: 'left',
 };

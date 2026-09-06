@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	ifCondition,
 	compose,
 	createHigherOrderComponent,
 } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import withViewportMatch from './with-viewport-match';
 import type { ViewportQuery } from './types';
 

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createReduxStore, register, select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import reducer from './reducer';
 import * as selectors from './selectors';
 import * as privateSelectors from './private-selectors';
@@ -41,7 +34,5 @@ export const store = createReduxStore( STORE_NAME, {
 if ( ! select( store ) ) {
 	register( store );
 }
-// @ts-ignore
 unlock( store ).registerPrivateActions( privateActions );
-// @ts-ignore
 unlock( store ).registerPrivateSelectors( privateSelectors );

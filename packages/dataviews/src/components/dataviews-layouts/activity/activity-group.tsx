@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { NormalizedField } from '../../../types';
 
 interface ActivityGroupProps< Item > {

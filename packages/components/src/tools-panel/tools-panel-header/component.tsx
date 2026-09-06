@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { check, moreVertical, plus } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import DropdownMenu from '../../dropdown-menu';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';

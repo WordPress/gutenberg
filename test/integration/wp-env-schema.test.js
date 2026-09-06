@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
 import Ajv from 'ajv';
-
-/**
- * Internal dependencies
- */
+import { describe, expect, test } from 'vitest';
 import wpEnvSchema from '../../schemas/json/wp-env.json';
 import wpEnvJsonFile from '../../.wp-env.json';
 

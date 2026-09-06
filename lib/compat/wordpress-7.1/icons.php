@@ -2,7 +2,7 @@
 /**
  * Icons API functions.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 if ( ! function_exists( 'wp_register_icon_collection' ) ) {

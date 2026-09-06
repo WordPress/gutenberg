@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { RgbInput } from './rgb-input';
 import { HslInput } from './hsl-input';
 import { HexInput } from './hex-input';

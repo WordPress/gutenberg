@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as commandsStore } from '../store';
 import { unlock } from '../lock-unlock';
 

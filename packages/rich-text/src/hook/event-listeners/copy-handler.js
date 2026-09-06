@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { toHTMLString } from '../../to-html-string';
 import { isCollapsed } from '../../is-collapsed';
 import { slice } from '../../slice';

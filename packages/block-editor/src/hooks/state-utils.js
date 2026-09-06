@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getBlockType } from '@wordpress/blocks';
 import { splitSelectorList } from '@wordpress/global-styles-engine';
 

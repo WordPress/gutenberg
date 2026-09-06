@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Page, Response } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 type RestPost = {

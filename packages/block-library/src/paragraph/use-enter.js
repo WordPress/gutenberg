@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
@@ -13,10 +10,6 @@ import {
 	cloneBlock,
 	getDefaultBlockName,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );

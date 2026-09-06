@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { IconButton } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { useWidgetSettingsToggle } from './use-widget-settings-toggle';
 import type { DashboardWidget } from '../../types';
 

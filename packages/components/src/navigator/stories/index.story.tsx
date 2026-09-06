@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { VStack } from '../../v-stack';
 import { HStack } from '../../h-stack';
@@ -19,11 +12,6 @@ const meta: Meta< typeof Navigator > = {
 		Button: Navigator.Button,
 		BackButton: Navigator.BackButton,
 	},
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <Navigator { ...args } />,
 	title: 'Components/Navigation/Navigator',
 	id: 'components-navigator',
 	argTypes: {

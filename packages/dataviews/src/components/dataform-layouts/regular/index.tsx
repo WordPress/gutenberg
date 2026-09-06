@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useContext, useMemo } from '@wordpress/element';
 import {
 	__experimentalHeading as Heading,
 	BaseControl,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type {
 	FieldLayoutProps,
 	NormalizedForm,

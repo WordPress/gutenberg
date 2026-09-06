@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const spawn = require( 'cross-spawn' );
-
-/**
- * Internal dependencies
- */
 const { getArgFromCLI } = require( '../utils' );
 
 /**

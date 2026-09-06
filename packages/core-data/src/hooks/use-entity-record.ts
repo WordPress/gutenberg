@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as coreStore } from '../';
 import type { Status } from './constants';
 import { getResolutionStatus } from './utils';

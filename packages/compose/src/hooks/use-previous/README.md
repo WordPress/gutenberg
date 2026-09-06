@@ -5,9 +5,6 @@ Sometimes you need to get the value something had on the previous render. `usePr
 ## Usage
 
 ```jsx
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from 'react';
 import { usePrevious } from '@wordpress/compose';
 

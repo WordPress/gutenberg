@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createRoot, StrictMode, type ComponentType } from '@wordpress/element';
 import { dispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import Router from './router';
 import RootSinglePage from '../root/single-page';
 import { store } from '../../store';

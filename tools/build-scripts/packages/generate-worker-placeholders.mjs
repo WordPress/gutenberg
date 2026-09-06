@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
 import { readFile, writeFile, access, mkdir } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';

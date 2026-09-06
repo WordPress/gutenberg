@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	formatBold,
 	formatItalic,
@@ -14,10 +7,6 @@ import {
 	more,
 	wordpress,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Button from '..';
 
 const meta: Meta< typeof Button > = {

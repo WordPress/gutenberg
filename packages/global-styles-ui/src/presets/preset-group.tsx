@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalItemGroup as ItemGroup,
 	Button,
@@ -17,10 +14,6 @@ import {
 } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { Subtitle } from '../subtitle';
 import { NavigationButtonAsItem } from '../navigation-button';
 import { unlock } from '../lock-unlock';

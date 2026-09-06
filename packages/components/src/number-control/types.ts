@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { InputControlProps } from '../input-control/types';
 
 export type NumberControlProps = Omit<

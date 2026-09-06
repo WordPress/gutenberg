@@ -75,7 +75,7 @@ html.interface-interface-skeleton__html-container {
 	// Footer overlap prevention
 	.has-footer & {
 		@include break-medium() {
-			padding-bottom: $button-size-small + $border-width;
+			padding-bottom: calc(var(--wpds-dimension-size-md) + #{$border-width});
 		}
 	}
 }
@@ -174,7 +174,7 @@ html.interface-interface-skeleton__html-container {
 		z-index: z-index(".edit-post-layout__footer");
 		display: flex;
 		background: $white;
-		height: $button-size-small;
+		height: var(--wpds-dimension-size-md);
 		align-items: center;
 		font-size: $default-font-size;
 		padding: 0 ($grid-unit-15 + 6px);

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import LineHeightControl from '../';
 
 export default {

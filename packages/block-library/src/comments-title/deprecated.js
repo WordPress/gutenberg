@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import migrateTextAlign from '../utils/migrate-text-align';
 
 const v2 = {

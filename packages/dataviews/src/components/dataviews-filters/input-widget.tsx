@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { useEvent } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 import { Flex } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import type {
 	View,
 	NormalizedFilter,

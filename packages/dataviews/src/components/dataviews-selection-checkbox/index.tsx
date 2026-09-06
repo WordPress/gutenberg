@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { SetSelection } from '../../types/private';
 import type { NormalizedField } from '../../types';
 

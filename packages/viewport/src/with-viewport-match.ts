@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import type { ComponentType } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { createElement } from '@wordpress/element';
 import {
 	createHigherOrderComponent,
 	useViewportMatch,
 } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { ViewportQueries, BreakpointName, QueryOperator } from './types';
 
 /**

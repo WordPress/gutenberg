@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSyncExternalStore } from '@wordpress/element';
 
 type MQLSubscriber = {

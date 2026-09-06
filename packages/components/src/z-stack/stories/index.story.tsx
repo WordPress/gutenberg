@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { Elevation } from '../../elevation';
 import { View } from '../../view';
 import { ZStack } from '..';

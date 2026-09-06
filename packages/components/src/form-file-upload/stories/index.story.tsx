@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { upload as uploadIcon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import FormFileUpload from '..';
 
 const meta: Meta< typeof FormFileUpload > = {

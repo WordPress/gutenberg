@@ -1110,7 +1110,7 @@ Responsive overrides can be placed directly on a block node:
 @media (width <= 480px) { :root :where(.wp-block-group) { color: hotpink; } }
 ```
 
-They can also be placed on element nodes within a block:
+A breakpoint can also carry styles for a block's elements, including their pseudo selectors:
 
 ```json
 {
@@ -1143,10 +1143,10 @@ They can also be placed on element nodes within a block:
 ```
 
 ```css
-:root :where(.wp-block-group a)        { color: blue; }
-@media (width <= 480px) { :root :where(.wp-block-group a)       { color: red; } }
-:root :where(.wp-block-group a:hover)  { color: navy; }
-@media (width <= 480px) { :root :where(.wp-block-group a:hover) { color: darkred; } }
+:root :where(.wp-block-group a:where(:not(.wp-element-button))) { color: blue; }
+@media (width <= 480px) { :root :where(.wp-block-group a:where(:not(.wp-element-button))) { color: red; } }
+:root :where(.wp-block-group a:where(:not(.wp-element-button)):hover) { color: navy; }
+@media (width <= 480px) { :root :where(.wp-block-group a:where(:not(.wp-element-button)):hover) { color: darkred; } }
 ```
 
 Responsive overrides are always output after the default styles they override, so the cascade order is preserved without needing to increase specificity.

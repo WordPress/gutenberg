@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -17,9 +10,6 @@ import { useState, useRef, useLayoutEffect } from '@wordpress/element';
 import type { Attachment } from '@wordpress/core-data';
 import { getFilename } from '@wordpress/url';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
-/**
- * Internal dependencies
- */
 import { getMediaTypeFromMimeType } from '../utils/get-media-type-from-mime-type';
 import type { MediaItem } from '../types';
 
@@ -179,7 +169,7 @@ export default function MediaThumbnailView( {
 			if ( ! item.featured_media ) {
 				return;
 			}
-			return select( coreStore ).getEntityRecord< Attachment >(
+			return select( coreStore ).getEntityRecord(
 				'postType',
 				'attachment',
 				item.featured_media

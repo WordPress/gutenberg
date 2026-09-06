@@ -1,19 +1,13 @@
-/**
- * Internal dependencies
- */
-import getGlobalStylesChanges, {
-	getGlobalStylesChangelist,
-	getGlobalStylesChangeGroups,
-} from '../utils/get-global-styles-changes';
-
-/**
- * WordPress dependencies
- */
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
+import getGlobalStylesChanges, {
+	getGlobalStylesChangelist,
+	getGlobalStylesChangeGroups,
+} from '../utils/get-global-styles-changes';
 
 describe( 'getGlobalStylesChanges and utils', () => {
 	const next = {
@@ -61,6 +55,19 @@ describe( 'getGlobalStylesChanges and utils', () => {
 			},
 			color: {
 				text: 'var(--wp--preset--color--tomato)',
+			},
+			border: {
+				width: '2px',
+			},
+			shadow: 'var(--wp--preset--shadow--natural)',
+			outline: {
+				style: 'dotted',
+			},
+			filter: {
+				opacity: '40',
+			},
+			dimensions: {
+				minHeight: '10px',
 			},
 			blocks: {
 				'core/test-fiori-di-zucca': {
@@ -196,6 +203,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 	beforeEach( () => {
 		registerBlockType( 'core/test-fiori-di-zucca', {
 			apiVersion: 3,
+			attributes: {},
 			save: () => {},
 			category: 'text',
 			title: 'Test pumpkin flowers',
@@ -227,7 +235,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 		it( 'returns a list of changes', () => {
 			const result = getGlobalStylesChanges( next, previous );
 			expect( result ).toEqual( [
-				'Background, Colors, Typography styles.',
+				'Background, Colors, Typography, Border, Shadow, Outline, Filter, Dimensions styles.',
 				'Test pumpkin flowers block.',
 				'H3, Caption, H6, Link elements.',
 				'Color, Typography settings.',
@@ -239,8 +247,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 				maxResults: 4,
 			} );
 			expect( resultA ).toEqual( [
-				'Background, Colors, Typography styles.',
-				'Test pumpkin flowers block.',
+				'Background, Colors, Typography, Border styles.',
 			] );
 		} );
 
@@ -478,6 +485,11 @@ describe( 'getGlobalStylesChanges and utils', () => {
 				{ group: 'styles', label: 'Background', ...defaultStateEntry },
 				{ group: 'styles', label: 'Colors', ...defaultStateEntry },
 				{ group: 'styles', label: 'Typography', ...defaultStateEntry },
+				{ group: 'styles', label: 'Border', ...defaultStateEntry },
+				{ group: 'styles', label: 'Shadow', ...defaultStateEntry },
+				{ group: 'styles', label: 'Outline', ...defaultStateEntry },
+				{ group: 'styles', label: 'Filter', ...defaultStateEntry },
+				{ group: 'styles', label: 'Dimensions', ...defaultStateEntry },
 				{
 					group: 'blocks',
 					label: 'Test pumpkin flowers',

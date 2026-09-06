@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { DataFormControlProps } from '@wordpress/dataviews';
 
 type PostStatus =

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	Component,
 	cloneElement,
@@ -16,10 +9,6 @@ import { hasFilter, applyFilters } from '@wordpress/hooks';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { removep } from '@wordpress/autop';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import {
 	getBlockType,
 	getFreeformContentHandlerName,

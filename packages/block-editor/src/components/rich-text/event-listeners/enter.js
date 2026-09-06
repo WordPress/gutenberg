@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { ENTER } from '@wordpress/keycodes';
 import {
 	insert,
@@ -8,29 +5,72 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../../lock-unlock';
 
 const { subscribeOwnedListener, ownsSelection } = unlock( richTextPrivateApis );
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
-	function onKeyDownDeprecated( event ) {
+	function onKeyDown( event ) {
 		if ( event.keyCode !== ENTER ) {
 			return;
 		}
 
-		const { onReplace, onSplit } = props.current;
+		const {
+			onReplace,
+			onSplit,
+			supportsSplitting,
+			disableLineBreaks,
+			onChange,
+			getValue,
+			onSplitAtDoubleLineEnd,
+			registry,
+			onSplitAtEnd,
+		} = props.current;
+		// The rendered value can lag the record: the capture phase listener
+		// that syncs the selection runs on this event, and a re-render with
+		// the new selection has not happened yet.
+		const value = getValue();
+		const { text, start, end } = value;
 
-		if ( onReplace && onSplit ) {
+		if ( event.shiftKey ) {
+			if ( ! disableLineBreaks ) {
+				event.preventDefault();
+				onChange( insert( value, '\n' ) );
+			}
+		} else if ( onSplitAtEnd && start === end && end === text.length ) {
+			event.preventDefault();
+			onSplitAtEnd();
+		} else if ( onReplace && onSplit ) {
 			event.__deprecatedOnSplit = true;
+		} else if (
+			! supportsSplitting &&
+			! disableLineBreaks &&
+			! event.defaultPrevented
+		) {
+			event.preventDefault();
+			if (
+				// For some blocks it's desirable to split at the end of the
+				// block when there are two line breaks at the end of the
+				// block, so triple Enter exits the block.
+				onSplitAtDoubleLineEnd &&
+				start === end &&
+				end === text.length &&
+				text.slice( -2 ) === '\n\n'
+			) {
+				registry.batch( () => {
+					const _value = { ...value };
+					_value.start = _value.end - 2;
+					onChange( remove( _value ) );
+					onSplitAtDoubleLineEnd();
+				} );
+			} else {
+				onChange( insert( value, '\n' ) );
+			}
 		}
 	}
 
-	function onKeyDown( event ) {
+	function onDefaultKeyDown( event ) {
 		if ( event.defaultPrevented ) {
 			return;
 		}
@@ -46,64 +86,30 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		const {
-			value,
-			onChange,
-			disableLineBreaks,
-			onSplitAtEnd,
-			onSplitAtDoubleLineEnd,
-			registry,
-		} = props.current;
-
+		// On ENTER, we ALWAYS want to prevent the default browser behaviour
+		// at this last interception point.
 		event.preventDefault();
-
-		const { text, start, end } = value;
-
-		if ( event.shiftKey ) {
-			if ( ! disableLineBreaks ) {
-				onChange( insert( value, '\n' ) );
-			}
-		} else if ( onSplitAtEnd && start === end && end === text.length ) {
-			onSplitAtEnd();
-		} else if (
-			// For some blocks it's desirable to split at the end of the
-			// block when there are two line breaks at the end of the
-			// block, so triple Enter exits the block.
-			onSplitAtDoubleLineEnd &&
-			start === end &&
-			end === text.length &&
-			text.slice( -2 ) === '\n\n'
-		) {
-			registry.batch( () => {
-				const _value = { ...value };
-				_value.start = _value.end - 2;
-				onChange( remove( _value ) );
-				onSplitAtDoubleLineEnd();
-			} );
-		} else if ( ! disableLineBreaks ) {
-			onChange( insert( value, '\n' ) );
-		}
 	}
 
 	const { defaultView } = element.ownerDocument;
 
 	// Attach the listener to the window so parent elements have the chance to
 	// prevent the default behavior.
-	const unsubscribeKeyDown = subscribeDelegatedListener(
+	const unsubscribeDefaultKeyDown = subscribeDelegatedListener(
 		defaultView,
 		'keydown',
-		onKeyDown
+		onDefaultKeyDown
 	);
 	// Capture phase so this runs before ancestor (writing flow) bubble
 	// handlers, matching the timing of the previous raw element listener.
-	const unsubscribeKeyDownDeprecated = subscribeOwnedListener(
+	const unsubscribeKeyDown = subscribeOwnedListener(
 		element,
 		'keydown',
-		onKeyDownDeprecated,
+		onKeyDown,
 		true
 	);
 	return () => {
+		unsubscribeDefaultKeyDown();
 		unsubscribeKeyDown();
-		unsubscribeKeyDownDeprecated();
 	};
 };

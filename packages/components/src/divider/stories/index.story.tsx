@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { Text } from '../../text';
 import { Divider } from '..';
 import { Flex } from '../../flex';

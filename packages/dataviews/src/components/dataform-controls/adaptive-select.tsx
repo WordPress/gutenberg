@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
 import useElements from '../../hooks/use-elements';
 import Combobox from './combobox';

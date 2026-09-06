@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	useContext,
 	useEffect,
 	useInsertionEffect,
 	useRef,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { getEventHandlers } from '../../writing-flow/use-editable-root-event-handlers';
 import { BlockRefs } from '../../provider/block-refs-provider';
 

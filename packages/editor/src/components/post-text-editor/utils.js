@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { diffChars } from 'diff/lib/diff/character.js';
 import { diffLines } from 'diff/lib/diff/line.js';
 

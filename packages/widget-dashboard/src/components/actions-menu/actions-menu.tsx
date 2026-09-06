@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Button, IconButton, Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );

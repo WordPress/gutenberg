@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'Collaboration - Code editor selection', () => {

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ComponentProps, ReactElement, ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { createContext, createRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type {
 	View,
 	Action,
@@ -54,7 +43,7 @@ type DataViewsContextType< Item > = {
 	filters: NormalizedFilter[];
 	isShowingFilter: boolean;
 	setIsShowingFilter: ( value: boolean ) => void;
-	config: { perPageSizes: number[] };
+	config: { perPageSizes: number[]; mediaFitControl?: boolean };
 	empty?: ReactNode;
 	hasInitiallyLoaded?: boolean;
 	itemListLabel?: string;

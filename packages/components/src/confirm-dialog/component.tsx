@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Modal from '../modal';
 import type { ConfirmDialogProps, DialogInputEvent } from './types';
 import type { WordPressComponentProps } from '../context';
@@ -29,6 +22,8 @@ const UnconnectedConfirmDialog = (
 		confirmButtonText,
 		cancelButtonText,
 		isBusy,
+		title,
+		__experimentalHideHeader = true,
 		...otherProps
 	} = useContextSystem( props, 'ConfirmDialog' );
 
@@ -88,7 +83,11 @@ const UnconnectedConfirmDialog = (
 					isDismissible
 					ref={ forwardedRef }
 					overlayClassName={ wrapperClassName }
-					__experimentalHideHeader
+					title={ title }
+					contentLabel={
+						__experimentalHideHeader ? title : undefined
+					}
+					__experimentalHideHeader={ __experimentalHideHeader }
 					{ ...otherProps }
 				>
 					<VStack spacing={ 8 }>

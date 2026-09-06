@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import FONT from './font-values';
 
 /**

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type {
 	Colord,
 	HslColor,
@@ -10,9 +7,6 @@ import type {
 	RgbColor,
 } from 'colord';
 import type { HslaColor } from 'react-colorful';
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import type { useDeprecatedProps } from './use-deprecated-props';
 

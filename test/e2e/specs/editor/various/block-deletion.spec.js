@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block deletion', () => {
@@ -67,9 +64,12 @@ test.describe( 'Block deletion', () => {
 		editor,
 		page,
 	} ) => {
-		// Add a group with a paragraph in it.
+		// Add a group with a paragraph in it. The anchor keeps the group
+		// from being removed along with its last child: emptying an
+		// unmodified wrapper removes the wrapper too.
 		await editor.insertBlock( {
 			name: 'core/group',
+			attributes: { anchor: 'group' },
 			innerBlocks: [
 				{
 					name: 'core/paragraph',
@@ -95,7 +95,9 @@ test.describe( 'Block deletion', () => {
 		// Ensure the paragraph was removed.
 		await expect
 			.poll( editor.getBlocks )
-			.toMatchObject( [ { name: 'core/group', attributes: {} } ] );
+			.toMatchObject( [
+				{ name: 'core/group', attributes: { anchor: 'group' } },
+			] );
 
 		// Ensure the group block is focused.
 		await expect(

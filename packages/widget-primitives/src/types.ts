@@ -8,15 +8,7 @@
  * widget binds its attribute shape once and gets typed `attributes`,
  * `example`, and `setAttributes`.
  */
-
-/**
- * External dependencies
- */
 import type { ComponentProps, ComponentType, ReactElement } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ResolvableField } from './field-types';
 
 /**
@@ -70,17 +62,17 @@ export interface WidgetHelp {
 }
 
 /**
- * How relevant an attribute is. Hosts may promote `'high'` to a prominent
- * surface; `'low'` (the default) is not. The widget declares importance,
- * not a surface.
+ * How relevant a declaration is. The widget declares importance, not a
+ * surface; hosts map the scale to surfaces of decreasing prominence.
+ * `'low'` is the default.
  */
-type WidgetAttributeRelevance = 'high' | 'low';
+export type WidgetRelevance = 'high' | 'medium' | 'low';
 
 /**
  * A user-triggerable verb a widget type declares. The declaration is
- * serializable data: an envelope (`id`, `label`) plus exactly one
- * fulfillment, named by the key carrying it. Today the only key is `href`,
- * so the only fulfillment is a link.
+ * serializable data: an envelope (`id`, `label`, optional `icon` and
+ * `relevance`) plus exactly one fulfillment, named by the key carrying it.
+ * Today the only key is `href`, so the only fulfillment is a link.
  *
  * The host owns what follows: which primitive materializes the fulfillment,
  * and where the affordance is placed. For a link that means mounting a real
@@ -99,14 +91,28 @@ export interface WidgetAction {
 	label: string;
 
 	/**
+	 * Icon for the action, a rendered element. On the wire an action
+	 * declares a registered icon name instead (`WidgetActionRecord`);
+	 * `useWidgetTypes` resolves it, so hosts only receive renderable
+	 * elements.
+	 */
+	icon?: WidgetIcon;
+
+	/**
+	 * How relevant the action is among the widget's actions.
+	 */
+	relevance?: WidgetRelevance;
+
+	/**
 	 * Link fulfillment: the destination. A URL, an admin path, or a
 	 * widget-local file.
 	 */
 	href: string;
 
 	/**
-	 * Link only. When set, the destination downloads instead of navigating.
-	 * A string supplies the suggested filename.
+	 * Link only. When present and not `false`, downloads instead of
+	 * navigating. A string sets the filename; `true` or `''` keeps the
+	 * original.
 	 */
 	download?: string | boolean;
 
@@ -117,13 +123,25 @@ export interface WidgetAction {
 }
 
 /**
+ * Wire form of a `WidgetAction`, as carried by a `WidgetModuleRecord`:
+ * the same envelope and fulfillment, with `icon` as a registered icon
+ * name rather than a rendered element.
+ */
+export interface WidgetActionRecord extends Omit< WidgetAction, 'icon' > {
+	/**
+	 * Registered icon name (`collection/icon-name`); never an element.
+	 */
+	icon?: WidgetIconReference;
+}
+
+/**
  * A DataViews `Field` plus the widget-layer `relevance` hint; what hosts
  * read. Its `type` may also reference a registered field type by name
  * (see `registerFieldType`); `useWidgetTypes` resolves such references
  * into plain `Field` props.
  */
 type WidgetAttribute< Item = unknown > = ResolvableField< Item > & {
-	relevance?: WidgetAttributeRelevance;
+	relevance?: WidgetRelevance;
 };
 
 /**
@@ -305,7 +323,6 @@ type WidgetModuleRecordOverrides = {
 		| 'category'
 		| 'presentation'
 		| 'keywords'
-		| 'actions'
 	> ]?: WidgetTypeMetadata[ K ] | null;
 };
 
@@ -335,4 +352,10 @@ export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	 * `null`/absent means the module's icon stands.
 	 */
 	icon?: WidgetIconReference | null;
+
+	/**
+	 * Declarative actions in wire form, icons as registered icon names.
+	 * `null`/absent means the module's actions stand.
+	 */
+	actions?: WidgetActionRecord[] | null;
 }

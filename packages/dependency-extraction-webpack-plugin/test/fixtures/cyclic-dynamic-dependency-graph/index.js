@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { identity as bIdentity, store as bStore } from './b.js';
 
 const { identity: aIdentity, store: aStore } = await import( './a.js' );

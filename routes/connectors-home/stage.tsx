@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Page } from '@wordpress/admin-ui';
 import {
 	Button,
@@ -19,10 +16,6 @@ import { store as coreStore } from '@wordpress/core-data';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Notice } from '@wordpress/ui';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import './style.scss';
 import { AiPluginCallout } from './ai-plugin-callout';
 import {
@@ -72,7 +65,9 @@ function ConnectorsPage() {
 					( connector: ConnectorConfig ) =>
 						connector.plugin?.file?.split( '/' )[ 0 ]
 				)
-				.filter( ( slug ): slug is string => !! slug )
+				.filter(
+					( slug: string | undefined ): slug is string => !! slug
+				)
 		)
 	).sort();
 	const installedPluginSlugs = new Set(

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useContext } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from '../name';
 import { DEFAULT_ENTITY_KEY } from '../entities';
 import { EntityContext } from '../entity-context';

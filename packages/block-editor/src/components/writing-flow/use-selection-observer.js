@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import {
@@ -8,10 +5,6 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { isSelectionForward } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
 import { setContentEditableWrapper } from './utils';

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { cleanEmptyObject } from './utils';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 

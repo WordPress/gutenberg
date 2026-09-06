@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import ResponsiveWrapper from '..';
 
 const meta: Meta< typeof ResponsiveWrapper > = {

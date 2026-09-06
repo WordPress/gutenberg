@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
-
-/**
- * Internal dependencies
- */
 const DependencyExtractionWebpackPlugin = require( '../../..' );
 
 module.exports = {

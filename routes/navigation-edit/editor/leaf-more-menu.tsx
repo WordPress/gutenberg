@@ -1,18 +1,10 @@
-/**
- * WordPress dependencies
- */
-
 import { chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
-import {
-	hasBlockSupport,
-	store as blocksStore,
-	// @ts-expect-error - No type declarations available for @wordpress/blocks
-} from '@wordpress/blocks';
+import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -20,12 +12,11 @@ const POPOVER_PROPS = {
 };
 
 export default function LeafMoreMenu( {
-	block,
+	clientId,
 	...props
 }: {
-	block: { clientId: string; name: string };
+	clientId: string;
 } ) {
-	const { clientId } = block;
 	const {
 		moveBlocksDown,
 		moveBlocksUp,
@@ -46,6 +37,7 @@ export default function LeafMoreMenu( {
 			( select ) => {
 				const {
 					getBlockRootClientId,
+					getBlockName,
 					canInsertBlockType,
 					getDirectInsertBlock,
 					getBlockIndex,
@@ -54,6 +46,7 @@ export default function LeafMoreMenu( {
 				const { getDefaultBlockName } = select( blocksStore );
 
 				const _rootClientId = getBlockRootClientId( clientId );
+				const _blockName = getBlockName( clientId );
 				const canInsertDefaultBlock = canInsertBlockType(
 					getDefaultBlockName(),
 					_rootClientId
@@ -65,20 +58,18 @@ export default function LeafMoreMenu( {
 				return {
 					rootClientId: _rootClientId,
 					canDuplicate:
-						!! block &&
-						hasBlockSupport( block.name, 'multiple', true ) &&
-						canInsertBlockType( block.name, _rootClientId ),
+						hasBlockSupport( _blockName, 'multiple', true ) &&
+						canInsertBlockType( _blockName, _rootClientId ),
 					canInsertBlock:
 						( canInsertDefaultBlock || !! directInsertBlock ) &&
-						!! block &&
-						canInsertBlockType( block.name, _rootClientId ),
+						canInsertBlockType( _blockName, _rootClientId ),
 					isFirst: getBlockIndex( clientId ) === 0,
 					isLast:
 						getBlockIndex( clientId ) ===
 						getBlockCount( _rootClientId ) - 1,
 				};
 			},
-			[ clientId, block ]
+			[ clientId ]
 		);
 
 	return (
@@ -96,7 +87,6 @@ export default function LeafMoreMenu( {
 						<MenuItem
 							icon={ chevronUp }
 							disabled={ isFirst }
-							accessibleWhenDisabled
 							onClick={ () => {
 								moveBlocksUp( [ clientId ], rootClientId );
 								onClose();
@@ -107,7 +97,6 @@ export default function LeafMoreMenu( {
 						<MenuItem
 							icon={ chevronDown }
 							disabled={ isLast }
-							accessibleWhenDisabled
 							onClick={ () => {
 								moveBlocksDown( [ clientId ], rootClientId );
 								onClose();

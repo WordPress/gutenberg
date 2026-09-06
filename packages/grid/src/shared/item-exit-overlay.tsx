@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { GRID_ITEM_DATA_KEY } from './grid-item-key';
 import exitStyles from './item-exit-animation.module.css';
 import type { RectSnapshot } from './use-layout-shift-animation';

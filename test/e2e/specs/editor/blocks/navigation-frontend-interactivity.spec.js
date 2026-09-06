@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block - Frontend interactivity', () => {
@@ -197,7 +194,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( innerElement ).toBeVisible();
 
 			// Test: submenu closes on click outside submenu
-			await page.click( 'body' );
+			await page.locator( 'body' ).click();
 			await expect( innerElement ).toBeHidden();
 
 			// Test: nested submenu opens on click
@@ -212,7 +209,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( secondLevelElement ).toBeVisible();
 
 			// Test: nested submenus close on click outside submenu
-			await page.click( 'body' );
+			await page.locator( 'body' ).click();
 			await expect( firstLevelElement ).toBeHidden();
 			await expect( secondLevelElement ).toBeHidden();
 
@@ -350,7 +347,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( secondLevelElement ).toBeHidden();
 
 			// Close the menu via click on the body
-			await page.click( 'body' );
+			await page.locator( 'body' ).click();
 			await expect( firstLevelElement ).toBeHidden();
 
 			// Test: nested submenu closes on ESC key and focuses parent menu item:
@@ -445,7 +442,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( secondLevelElement ).toBeHidden();
 
 			// Close menu via click on the body
-			await page.click( 'body' );
+			await page.locator( 'body' ).click();
 			await expect( firstLevelElement ).toBeHidden();
 			await expect( secondLevelElement ).toBeHidden();
 		} );
@@ -503,7 +500,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( innerElement ).toBeVisible();
 
 			// page-list submenu closes on click outside
-			await page.click( 'body' );
+			await page.locator( 'body' ).click();
 			await expect( innerElement ).toBeHidden();
 
 			// page-list submenu opens on enter keypress

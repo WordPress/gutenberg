@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import { Heading } from '../heading';
 import { space } from '../utils/space';

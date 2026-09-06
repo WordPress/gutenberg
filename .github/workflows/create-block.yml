@@ -23,6 +23,7 @@ jobs:
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 10
         strategy:
             fail-fast: false
             matrix:

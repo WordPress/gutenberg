@@ -1,9 +1,5 @@
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 /** @typedef {import('./types').RichTextFormatList} RichTextFormatList */
-
-/**
- * Internal dependencies
- */
 import { isFormatEqual } from './is-format-equal';
 
 /**

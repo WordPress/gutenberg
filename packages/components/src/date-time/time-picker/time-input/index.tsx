@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	TimeWrapper,
 	TimeSeparator,

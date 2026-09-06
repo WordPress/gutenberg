@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const { existsSync, readdirSync } = require( 'fs' );
 const path = require( 'path' );
-
-/**
- * Internal dependencies
- */
 const { getPackagePath } = require( './package' );
 
 const fromProjectRoot = ( fileName ) =>

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlobURL } from '@wordpress/blob';
 
 export default function imageCorrector( img: Node ): void {

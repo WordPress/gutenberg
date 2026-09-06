@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import type React from 'react';
-
-/**
- * Internal dependencies
- */
 import type { UseServerSideRenderArgs } from './hook';
 
 export interface PlaceholderProps {

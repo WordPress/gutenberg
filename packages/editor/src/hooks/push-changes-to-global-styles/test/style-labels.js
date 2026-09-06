@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { capitalCase } from 'change-case';
-
-/**
- * Internal dependencies
- */
 import { getStyleLabel, STYLE_LABELS } from '../style-labels';
 
 describe( 'getStyleLabel', () => {

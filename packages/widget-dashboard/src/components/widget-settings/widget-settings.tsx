@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
@@ -8,10 +5,6 @@ import { __ } from '@wordpress/i18n';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Button, Drawer } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { getWidgetSettingsTitle } from './utils';
@@ -38,11 +31,25 @@ export function WidgetSettings(): React.ReactNode {
 		commit,
 		cancel: cancelStaging,
 		hasUncommittedChanges,
+		canPerform,
 	} = useDashboardInternalContext();
 	const { settingsWidgetUuid, setSettingsWidgetUuid } =
 		useDashboardUIContext();
 
-	const open = settingsWidgetUuid !== null;
+	// A trigger composed by the host can ask for any instance; the surface
+	// itself checks the policy, so a denied `edit` never opens it.
+	const requestedWidget = settingsWidgetUuid
+		? layout.find( ( instance ) => instance.uuid === settingsWidgetUuid )
+		: undefined;
+	const open =
+		!! requestedWidget &&
+		canPerform( {
+			operation: 'edit',
+			widget: requestedWidget,
+			widgetType: widgetTypes.find(
+				( type ) => type.name === requestedWidget.type
+			),
+		} );
 
 	// Keep the last opened instance resolved while the drawer animates
 	// closed so its form and title don't blank out mid-transition. While
@@ -123,6 +130,15 @@ export function WidgetSettings(): React.ReactNode {
 		},
 		[ cancelStaging, close ]
 	);
+
+	// A denied `edit` closes the surface by prop, outside `handleOpenChange`.
+	// Discard its staged edits the same way, so a later grant reopens clean.
+	useEffect( () => {
+		if ( requestedWidget && ! open ) {
+			cancelStaging();
+			close();
+		}
+	}, [ requestedWidget, open, cancelStaging, close ] );
 
 	const hasForm = !! widget && !! widgetType && fields.length > 0;
 

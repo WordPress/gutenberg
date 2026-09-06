@@ -4,6 +4,14 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/a11y/**'
 
+'[Package] Abilities':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/abilities/**'
+
+'[Package] Admin UI':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/admin-ui/**'
+
 '[Package] API fetch':
     - changed-files:
           - any-glob-to-any-file: 'packages/api-fetch/**'
@@ -31,6 +39,10 @@
 '[Package] Blocks':
     - changed-files:
           - any-glob-to-any-file: 'packages/blocks/**'
+
+'[Package] Boot':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/boot/**'
 
 '[Package] Commands':
     - changed-files:
@@ -72,6 +84,10 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/deprecated/**'
 
+'[Package] Design System MCP':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/design-system-mcp/**'
+
 '[Package] DOM ready':
     - changed-files:
           - any-glob-to-any-file: 'packages/dom-ready/**'
@@ -82,7 +98,7 @@
 
 '[Package] E2E Tests':
     - changed-files:
-          - any-glob-to-any-file: 'packages/e2e-test-utils-playwright/**'
+          - any-glob-to-any-file: 'packages/e2e-tests/**'
 
 '[Package] Edit Post':
     - changed-files:
@@ -116,6 +132,10 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/format-library/**'
 
+'[Package] Grid':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/grid/**'
+
 '[Package] Hooks':
     - changed-files:
           - any-glob-to-any-file: 'packages/hooks/**'
@@ -131,6 +151,10 @@
 '[Package] Icons':
     - changed-files:
           - any-glob-to-any-file: 'packages/icons/**'
+
+'[Package] Image Cropper':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/image-cropper/**'
 
 '[Package] Interactivity':
     - changed-files:
@@ -212,10 +236,6 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/router/**'
 
-'[Package] Sanitize':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/sanitize/**'
-
 '[Package] Server Side Render':
     - changed-files:
           - any-glob-to-any-file: 'packages/server-side-render/**'
@@ -248,10 +268,100 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/viewport/**'
 
+'[Package] Views':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/views/**'
+
 '[Package] Warning':
     - changed-files:
           - any-glob-to-any-file: 'packages/warning/**'
 
+'[Package] Widget Dashboard':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/widget-dashboard/**'
+
+'[Package] Widget primitives':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/widget-primitives/**'
+
 '[Package] Word count':
     - changed-files:
           - any-glob-to-any-file: 'packages/wordcount/**'
+
+'[Package] wp-build':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/wp-build/**'
+
+# Tool labeling rules
+
+'[Tool] Babel plugin import JSX pragma':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/babel-plugin-import-jsx-pragma/**'
+
+'[Tool] Babel plugin makepot':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/babel-plugin-makepot/**'
+
+'[Tool] Babel preset':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/babel-preset-default/**'
+
+'[Tool] Browserslist config':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/browserslist-config/**'
+
+'[Tool] Create Block':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/create-block/**'
+
+'[Tool] Dependency Extraction Webpack Plugin':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/dependency-extraction-webpack-plugin/**'
+
+'[Tool] Docgen':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/docgen/**'
+
+'[Tool] E2E Test Utils':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/e2e-test-utils-playwright/**'
+
+'[Tool] Env':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/env/**'
+
+'[Tool] ESLint plugin':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/eslint-plugin/**'
+
+'[Tool] Jest console':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/jest-console/**'
+
+'[Tool] Jest preset':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/jest-preset-default/**'
+
+'[Tool] npm-package-json-lint config':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/npm-package-json-lint-config/**'
+
+'[Tool] PostCSS Plugins Preset':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/postcss-plugins-preset/**'
+
+'[Tool] Prettier config':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/prettier-config/**'
+
+'[Tool] Readable JS Assets Webpack Plugin':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/readable-js-assets-webpack-plugin/**'
+
+'[Tool] stylelint config':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/stylelint-config/**'
+
+'[Tool] WP Scripts':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/scripts/**'

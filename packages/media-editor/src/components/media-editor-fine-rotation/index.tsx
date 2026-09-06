@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useMediaEditor } from '../../state';
 import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
 import { MAX_ROTATION_OFFSET } from '../../image-editor/core/constants';

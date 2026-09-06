@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, getContext } from '@wordpress/interactivity';
 
 const { callbacks } = store( 'test/generator-scope', {

@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import removeAccents from 'remove-accents';
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { createSelector } from '@wordpress/data';
 import { RichTextData } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { getValueFromObjectPath, matchesAttributes } from './utils';
 import { hasContentRoleAttribute as privateHasContentRoleAttribute } from './private-selectors';
 import type {

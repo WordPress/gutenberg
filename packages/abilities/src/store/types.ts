@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Ability, AbilityCategory } from '../types';
 
 /**

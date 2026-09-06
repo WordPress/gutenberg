@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	createPortal,
 	useState,
@@ -46,10 +39,6 @@ import {
 	mimeTypeField,
 } from '@wordpress/media-fields';
 import { store as noticesStore, SnackbarNotices } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import type { Attachment, RestAttachment } from '../../utils/types';
 import { transformAttachment } from '../../utils/transform-attachment';
 import { uploadMedia } from '../../utils/upload-media';
@@ -103,6 +92,10 @@ const defaultView: View = {
 	layout: {
 		previewSize: 170,
 		density: 'compact',
+		// Fit each thumbnail inside its square cell rather than cropping it,
+		// so the media's own orientation is visible before it's inserted.
+		// Users can switch back to cropped in the view options.
+		mediaFit: 'contain',
 	},
 };
 
@@ -113,6 +106,7 @@ const defaultLayouts: SupportedLayouts = {
 		layout: {
 			previewSize: 170,
 			density: 'compact',
+			mediaFit: 'contain',
 		},
 	},
 	[ LAYOUT_PICKER_TABLE ]: {
@@ -125,6 +119,15 @@ const defaultLayouts: SupportedLayouts = {
 		],
 		showTitle: true,
 	},
+};
+
+const dataViewsConfig = {
+	// Repeats `DataViewsPicker`'s own default, which passing `config` at all
+	// would otherwise replace.
+	perPageSizes: [ 10, 20, 50, 100 ],
+	// Seeing whether a media item is portrait or landscape before inserting
+	// it matters here, so offer the crop/fit switch in the view options.
+	mediaFitControl: true,
 };
 
 interface MediaUploadModalProps {
@@ -642,6 +645,7 @@ export function MediaUploadModal( {
 				isLoading={ isLoading }
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
+				config={ dataViewsConfig }
 				getItemId={ ( item: RestAttachment ) => String( item.id ) }
 				itemListLabel={ __( 'Media items' ) }
 				onReset={ isModified ? resetToDefault : false }

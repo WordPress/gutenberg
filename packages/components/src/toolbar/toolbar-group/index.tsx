@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import ToolbarButton from '../toolbar-button';
 import ToolbarGroupContainer from './toolbar-group-container';
 import ToolbarGroupCollapsed from './toolbar-group-collapsed';

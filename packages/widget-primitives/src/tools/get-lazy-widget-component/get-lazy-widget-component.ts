@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ComponentType } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { lazy } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type {
 	ResolveWidgetModule,
 	WidgetModule,

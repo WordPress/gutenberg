@@ -1,15 +1,5 @@
-/**
- * WordPress dependencies
- */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import type { FontFamily, FontFace } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-const { kebabCase } = unlock( componentsPrivateApis );
+import { kebabCase } from '@wordpress/kebab-case';
 
 export default function makeFamiliesFromFaces(
 	fontFaces: FontFace[]
@@ -24,7 +14,7 @@ export default function makeFamiliesFromFaces(
 					fontFace: [],
 				};
 			}
-			// @ts-expect-error
+			// @ts-expect-error `acc[ item.fontFamily ]` is possibly `undefined`.
 			acc[ item.fontFamily ].fontFace.push( item );
 			return acc;
 		},

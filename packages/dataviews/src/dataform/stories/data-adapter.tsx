@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import deepMerge from 'deepmerge';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataForm from '../index';
 import type { Field } from '../../types';
 

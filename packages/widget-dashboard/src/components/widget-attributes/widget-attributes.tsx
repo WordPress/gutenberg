@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useReserveHeaderSpace } from '../widget-header/widget-header-fit';
 import { WidgetSettingsTrigger } from '../widget-settings';

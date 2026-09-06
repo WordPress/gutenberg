@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
-
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useState,
 	useCallback,
@@ -18,10 +10,6 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type {
 	CropperState,
 	HandlePosition,

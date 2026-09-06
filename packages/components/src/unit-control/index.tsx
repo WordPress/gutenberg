@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { KeyboardEvent, ForwardedRef, SyntheticEvent } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';

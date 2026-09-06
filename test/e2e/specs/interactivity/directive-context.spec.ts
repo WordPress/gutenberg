@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import type { Locator } from '@playwright/test';
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 const parseContent = async ( loc: Locator ) =>

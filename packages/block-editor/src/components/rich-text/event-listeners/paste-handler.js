@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { pasteHandler } from '@wordpress/blocks';
 import {
 	isEmpty,
@@ -10,10 +7,6 @@ import {
 } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
 import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { addActiveFormats } from '../utils';
 import { getPasteEventData } from '../../../utils/pasting';

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Page, Response } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 import { SECOND_USER } from './fixtures/collaboration-utils';
 
@@ -95,7 +88,7 @@ test.describe( 'Collaboration - auto-draft collaborator autosave retention', () 
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( title );
 		await collaboratorEditor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await collaboratorPage.keyboard.type( marker );
 

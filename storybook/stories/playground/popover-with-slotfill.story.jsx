@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createPortal, useState } from '@wordpress/element';
 import { SlotFillProvider, Slot } from '@wordpress/components';
 import { Popover } from '@wordpress/ui';

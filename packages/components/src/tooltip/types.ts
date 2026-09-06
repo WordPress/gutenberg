@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Placement } from '@floating-ui/react-dom';
-
-/**
- * Internal dependencies
- */
 import type { PopoverProps } from '../popover/types';
 import type { ShortcutProps } from '../shortcut/types';
 

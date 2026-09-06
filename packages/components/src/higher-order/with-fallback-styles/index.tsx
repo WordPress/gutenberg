@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { useState, useRef } from '@wordpress/element';
 import {
 	createHigherOrderComponent,

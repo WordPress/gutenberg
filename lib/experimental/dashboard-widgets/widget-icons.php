@@ -53,5 +53,14 @@ function gutenberg_register_dashboard_widget_icons() {
 			'file_path' => gutenberg_dir_path() . 'packages/icons/src/library/site-logo.svg',
 		)
 	);
+
+	// Register temporary seen icon since it's still a core private icon
+	wp_register_icon(
+		'dashboard-widgets/seen',
+		array(
+			'label'     => __( 'Seen', 'gutenberg' ),
+			'file_path' => gutenberg_dir_path() . 'packages/icons/src/library/seen.svg',
+		)
+	);
 }
 add_action( 'init', 'gutenberg_register_dashboard_widget_icons' );

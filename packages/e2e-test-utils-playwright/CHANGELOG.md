@@ -2,9 +2,32 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Admin.visitSiteEditor()`: When the `GUTENBERG_E2E_SITE_EDITOR_V2` environment variable is set, visit the extensible site editor (`admin.php?page=site-editor-v2`) instead of `site-editor.php`, translating the classic query args to the equivalent v2 route, and wait for the lazily loaded editor to finish initializing on edit routes. `RequestUtils.setGutenbergExperiments()` keeps the `gutenberg-extensible-site-editor` experiment enabled in that mode so specs that reset experiments do not turn the v2 editor off mid-run.
+
 ### Bug Fixes
 
--   `Metrics.getSelectionEventDurations()`: Also collect `pointerup` and `selectionchange` durations, and omit event types that did not fire. Selecting a block within an editing host no longer fires `focus`/`focusin`, which made the metric report zero. Dispatches that nest inside another dispatch now contribute only the time not already covered by it, so summing the returned durations no longer counts the nested work twice.
+-   `Editor.saveSiteEditorEntities()`: Wait for the save button to mount before deciding between its `Save` and `Publish` variants, instead of sampling visibility immediately — the extensible site editor only renders it once an entity is dirty.
+
+### Internal
+
+-   `setGutenbergExperiments`: Remove the special handling for the removed `active_templates` experiment ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
+
+## 1.54.0 (2026-08-26)
+
+## 1.53.0 (2026-08-12)
+
+### Bug Fixes
+
+-   `Metrics.startTracing()`: Run a trivial script in every frame once tracing is on, to absorb the isolate interrupt that enabling the V8 sampling profiler queues. Its cost otherwise lands in the first thing the test does, usually the interaction being measured, and grows through a spec's iterations: a stable 220ms interaction reported anywhere from 200ms to 650ms ([#81264](https://github.com/WordPress/gutenberg/pull/81264)).
+-   `Metrics.getSelectionEventDurations()`: Dispatches that nest inside another dispatch now contribute only the time not already covered by it, so summing the returned durations no longer counts the nested work twice.
+
+## 1.52.0 (2026-07-29)
+
+### Bug Fixes
+
+-   `Metrics.getSelectionEventDurations()`: Also collect `pointerup` and `selectionchange` durations, and omit event types that did not fire. Selecting a block within an editing host no longer fires `focus`/`focusin`, which made the metric report zero.
 
 ## 1.51.0 (2026-07-14)
 

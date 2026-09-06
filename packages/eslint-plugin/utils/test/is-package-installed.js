@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, test } from 'vitest';
 import isPackageInstalled from '../is-package-installed';
 
 describe( 'isPackageInstalled', () => {
