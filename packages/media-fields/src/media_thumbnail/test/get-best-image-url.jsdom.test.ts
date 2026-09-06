@@ -19,6 +19,7 @@ const baseMedia: Media = {
 	title: { raw: 'Test Image', rendered: 'Test Image' },
 	author: 1,
 	featured_media: 0,
+	original_attachment: 0,
 	comment_status: 'open',
 	ping_status: 'closed',
 	template: '',
