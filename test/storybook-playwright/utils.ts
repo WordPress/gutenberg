@@ -7,6 +7,9 @@ type Decorators = {
 	css?: 'none' | 'basic' | 'wordpress';
 	direction?: 'ltr' | 'rtl';
 	customE2EControls?: 'show' | 'hide';
+	dsColorTheme?: 'light' | 'dark' | 'custom';
+	dsPrimaryColor?: string;
+	dsBackgroundColor?: string;
 };
 type Options = { decorators?: Decorators };
 
