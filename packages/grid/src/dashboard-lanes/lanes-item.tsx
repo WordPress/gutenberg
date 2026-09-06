@@ -223,7 +223,7 @@ export function LanesItem( {
 
 			<div
 				ref={ setActivatorNodeRef }
-				{ ...attributes }
+				{ ...( dragDisabled ? {} : attributes ) }
 				{ ...listeners }
 				style={ {
 					height: '100%',
