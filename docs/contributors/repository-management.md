@@ -36,6 +36,7 @@ Here are some labels you might commonly see:
 
 -   [Good First Issue](https://github.com/WordPress/gutenberg/labels/Good%20First%20Issue) - Issues identified as good for new contributors to work on. Comment to note that you intend to work on the issue and reference the issue number in the pull request you submit.
 -   [Good First Review](https://github.com/WordPress/gutenberg/labels/Good%20First%20Review) - Pull requests identified as good for new contributors who are interested in doing code reviews.
+-   [Require PR update](https://github.com/WordPress/gutenberg/labels/Require%20PR%20update) - Applied by committers to a pull request whose change requires all open pull requests to update once it merges (see [Required changes from trunk](/docs/contributors/code/required-changes-from-trunk.md)).
 -   [Needs Accessibility Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Accessibility%20Feedback) - Changes that impact accessibility and need corresponding review (e.g. markup changes).
 -   [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) - Changes that modify the design or user experience in some way and need sign-off.
 -   [[Type] Bug](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Bug) - An existing feature is broken in some way.

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { getCachedBlocks, setCachedBlocks } from '../parsed-blocks-cache';
 

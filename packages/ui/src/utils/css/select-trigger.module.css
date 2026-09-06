@@ -52,9 +52,13 @@
 			text-overflow: ellipsis;
 			white-space: nowrap;
 
-			/* Supports placeholder styling for both Select and Combobox triggers. */
-			.trigger[data-placeholder] & {
-				color: var(--wpds-color-foreground-interactive-neutral-disabled);
+			/*
+			 * An enabled placeholder is live text, so it must meet the text
+			 * contrast minimum that the disabled token falls short of. When
+			 * disabled, the token inherited from `.trigger` applies.
+			 */
+			.trigger[data-placeholder]:not([data-disabled]) & {
+				color: var(--wpds-color-foreground-interactive-neutral-weak);
 			}
 		}
 

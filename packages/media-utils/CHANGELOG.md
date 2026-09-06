@@ -4,6 +4,17 @@
 
 ### Bug Fixes
 
+-   Preserve array-valued fields in multipart form data so grouped image-size sideload requests reach the REST API as arrays ([#82353](https://github.com/WordPress/gutenberg/pull/82353)).
+
+## 5.54.0 (2026-08-26)
+
+### Enhancements
+
+-   Media upload modal: Show thumbnails at their original aspect ratio inside the grid cell rather than cropping them to a square, so a media item's orientation is visible before it is inserted. Adds an "Original aspect ratio" toggle to the view options for switching back to cropped previews ([#81604](https://github.com/WordPress/gutenberg/pull/81604)).
+
+### Bug Fixes
+
+-   Report a server-side upload failure in plain language instead of passing on the REST client's `invalid_json` and `unknown_error` messages ([#81735](https://github.com/WordPress/gutenberg/pull/81735)).
 -   Prevent editor block removal by stopping undo/redo event propagation when the Media Library modal is open ([#79898](https://github.com/WordPress/gutenberg/pull/79898)).
 
 ### Internal

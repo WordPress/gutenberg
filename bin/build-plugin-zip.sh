@@ -98,18 +98,10 @@ fi
 
 # Generate the plugin zip file.
 status "Creating archive... 🎁"
+# shellcheck disable=SC2046 # The list holds globs that must expand.
 zip --recurse-paths --no-dir-entries \
 	gutenberg.zip \
-	gutenberg.php \
-	lib \
-	packages/block-serialization-default-parser/*.php \
-	packages/icons/src/manifest.php \
-	packages/icons/src/library/*.svg \
-	build \
-	build-module \
-	readme.txt \
-	changelog.txt \
-	README.md
+	$(grep -v '^#' bin/plugin-files.txt)
 
 status "Restoring non-public icons... 🔁"
 git diff --name-only --diff-filter=D -- packages/icons/src | sed 's|^|  Restoring |'

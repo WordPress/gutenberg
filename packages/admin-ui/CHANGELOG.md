@@ -2,9 +2,16 @@
 
 ## Unreleased
 
+### Internal
+
+-   Stop publishing the `src` directory to npm. The package's `exports` field only exposes the built artifacts, so the source files were unreachable by consumers and only inflated the package size ([#77285](https://github.com/WordPress/gutenberg/pull/77285)).
+
+## 2.9.0 (2026-08-26)
+
 ### Bug Fixes
 
 -   `getAdminThemeColors`: Fix the primary color of the Fresh scheme ([#81618](https://github.com/WordPress/gutenberg/pull/81618)).
+-   `Page`: Truncate long titles with an ellipsis instead of overflowing the page horizontally ([#81954](https://github.com/WordPress/gutenberg/pull/81954)).
 
 ### New Features
 

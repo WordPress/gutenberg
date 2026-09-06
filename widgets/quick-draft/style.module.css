@@ -7,7 +7,7 @@
 	height: 100%;
 }
 
-.primaryPane {
+.primary-pane {
 	flex: 1;
 	min-width: 0;
 	min-height: 0;
@@ -15,26 +15,26 @@
 	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
-.listPane {
+.list-pane {
 	flex: 1;
 	min-width: 0;
 	min-height: 0;
 }
 
 /* Compact reveal: Back control pinned below the scrolling drafts list. */
-.backRow {
+.back-row {
 	padding: var(--wpds-dimension-padding-sm);
 	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
 /* Wide tile: drafts list sits beside the form, split by a vertical rule. */
-.row .primaryPane {
+.row .primary-pane {
 	border-inline-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 	max-width: var(--wpds-dimension-surface-width-md);
 	margin: 0 auto;
 }
 
-.formContainer {
+.form-container {
 	flex: 1;
 	min-height: 0;
 }
@@ -48,7 +48,7 @@
  * `grow`-style field row absorb the remaining vertical space. Drop once
  * `@wordpress/dataviews` exposes a public hook for this.
  */
-.formContainer > :global(.dataforms-layouts__wrapper) {
+.form-container > :global(.dataforms-layouts__wrapper) {
 	flex: 1;
 	min-height: 0;
 }

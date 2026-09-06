@@ -13,7 +13,6 @@ const useMenuContext = () => useContext( MenuContext );
 
 type MenuItemContentContextValue = {
 	labelId?: string;
-	descriptionId?: string;
 	labelTrailing?: ReactNode;
 };
 

@@ -3,7 +3,9 @@ import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Icon, IconButton, Link } from '@wordpress/ui';
+import { useWidgetHost } from '@wordpress/widget-primitives';
 import type { WidgetAction } from '@wordpress/widget-primitives';
+import { getActionRoute } from './get-action-route';
 import { useReserveHeaderSpace } from '../widget-header/widget-header-fit';
 import styles from './widget-actions.module.css';
 import { unlock } from '../../lock-unlock';
@@ -25,6 +27,10 @@ type WidgetActionsProps = {
  * link fulfillment, so middle-click and copy address survive; the menu exposes
  * it as a menu item rather than as a link.
  *
+ * A target the host recognizes as one of its own routes (the `links`
+ * capability from `useWidgetHost`) mounts the host router's link instead,
+ * so it navigates client-side.
+ *
  * As a trailing header section it reserves its own footprint, so the
  * collapsible controls beside it never plan for space it occupies.
  *
@@ -34,6 +40,7 @@ export function WidgetActions( {
 	actions,
 }: WidgetActionsProps ): React.ReactNode {
 	const reserveRef = useReserveHeaderSpace< HTMLSpanElement >( 'actions' );
+	const { links } = useWidgetHost();
 
 	if ( actions.length === 0 ) {
 		return null;
@@ -56,28 +63,50 @@ export function WidgetActions( {
 
 				<Menu.Popover>
 					<Menu.Group className={ styles[ 'widget-action-items' ] }>
-						{ actions.map( ( action ) => (
-							<Menu.Item
-								key={ action.id }
-								prefix={
-									action.icon ? (
-										<Icon icon={ action.icon } />
-									) : undefined
-								}
-								render={
-									<Link
-										href={ action.href }
-										download={ action.download }
-										openInNewTab={ action.openInNewTab }
-										className={
-											styles[ 'widget-action-link' ]
-										}
-									/>
-								}
-							>
-								{ action.label }
-							</Menu.Item>
-						) ) }
+						{ actions.map( ( action ) => {
+							const path = getActionRoute( links, action );
+							const HostLink = links?.Link;
+
+							return (
+								<Menu.Item
+									key={ action.id }
+									prefix={
+										action.icon ? (
+											<Icon icon={ action.icon } />
+										) : undefined
+									}
+									render={
+										path !== null && HostLink ? (
+											<Link
+												className={
+													styles[
+														'widget-action-link'
+													]
+												}
+												render={
+													<HostLink path={ path } />
+												}
+											/>
+										) : (
+											<Link
+												href={ action.href }
+												download={ action.download }
+												openInNewTab={
+													action.openInNewTab
+												}
+												className={
+													styles[
+														'widget-action-link'
+													]
+												}
+											/>
+										)
+									}
+								>
+									{ action.label }
+								</Menu.Item>
+							);
+						} ) }
 					</Menu.Group>
 				</Menu.Popover>
 			</Menu>

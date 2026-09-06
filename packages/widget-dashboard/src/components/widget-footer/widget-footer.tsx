@@ -1,7 +1,9 @@
 import { __, sprintf } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Icon, Link, LinkButton, Stack, Tooltip } from '@wordpress/ui';
+import { useWidgetHost } from '@wordpress/widget-primitives';
 import type { WidgetAction, WidgetIcon } from '@wordpress/widget-primitives';
+import { getActionRoute } from '../widget-actions/get-action-route';
 import styles from './widget-footer.module.css';
 
 type IconActionProps = {
@@ -9,6 +11,12 @@ type IconActionProps = {
 	 * The action to materialize.
 	 */
 	action: WidgetAction & { icon: WidgetIcon };
+
+	/**
+	 * Host router link to mount instead of the plain anchor, when the
+	 * action's target is one of the host's own routes.
+	 */
+	routeRender?: React.ReactElement;
 };
 
 /**
@@ -18,7 +26,10 @@ type IconActionProps = {
  *
  * @param {IconActionProps} props Component props.
  */
-function IconAction( { action }: IconActionProps ): React.ReactNode {
+function IconAction( {
+	action,
+	routeRender,
+}: IconActionProps ): React.ReactNode {
 	const label = action.openInNewTab
 		? sprintf(
 				/* translators: %s: action label. */
@@ -37,14 +48,19 @@ function IconAction( { action }: IconActionProps ): React.ReactNode {
 						size="compact"
 						className={ styles[ 'icon-action' ] }
 						aria-label={ label }
-						href={ action.href }
-						download={ action.download }
+						{ ...( routeRender
+							? {}
+							: {
+									href: action.href,
+									download: action.download,
+							  } ) }
 						render={
-							action.openInNewTab ? (
+							routeRender ??
+							( action.openInNewTab ? (
 								/* href and content merge in at runtime. */
 								// eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid
 								<a target="_blank" rel="noopener noreferrer" />
-							) : undefined
+							) : undefined )
 						}
 					/>
 				}
@@ -74,12 +90,19 @@ type WidgetFooterProps = {
  * trailing compact affordances, icon-only when they declare an icon. Every
  * affordance is a real anchor.
  *
+ * A target the host recognizes as one of its own routes (the `links`
+ * capability from `useWidgetHost`) mounts the host router's link instead,
+ * so it navigates client-side.
+ *
  * @param {WidgetFooterProps} props Component props.
  */
 export function WidgetFooter( {
 	actions,
 	editMode = false,
 }: WidgetFooterProps ): React.ReactNode {
+	const { links } = useWidgetHost();
+	const HostLink = links?.Link;
+
 	if ( actions.length === 0 ) {
 		return null;
 	}
@@ -101,22 +124,38 @@ export function WidgetFooter( {
 		>
 			{ highActions.length > 0 && (
 				<Stack direction="row" align="center" gap="lg" wrap="wrap">
-					{ highActions.map( ( action ) => (
-						<Link
-							key={ action.id }
-							href={ action.href }
-							download={ action.download }
-							openInNewTab={ action.openInNewTab }
-							className={
-								action.icon
-									? styles[ 'prefixed-action' ]
-									: undefined
-							}
-						>
-							{ action.icon && <Icon icon={ action.icon } /> }
-							{ action.label }
-						</Link>
-					) ) }
+					{ highActions.map( ( action ) => {
+						const path = getActionRoute( links, action );
+						const className = action.icon
+							? styles[ 'prefixed-action' ]
+							: undefined;
+						const children = (
+							<>
+								{ action.icon && <Icon icon={ action.icon } /> }
+								{ action.label }
+							</>
+						);
+
+						return path !== null && HostLink ? (
+							<Link
+								key={ action.id }
+								className={ className }
+								render={ <HostLink path={ path } /> }
+							>
+								{ children }
+							</Link>
+						) : (
+							<Link
+								key={ action.id }
+								href={ action.href }
+								download={ action.download }
+								openInNewTab={ action.openInNewTab }
+								className={ className }
+							>
+								{ children }
+							</Link>
+						);
+					} ) }
 				</Stack>
 			) }
 
@@ -128,15 +167,30 @@ export function WidgetFooter( {
 					className={ styles[ 'compact-actions' ] }
 				>
 					<Tooltip.Provider>
-						{ mediumActions.map( ( action ) =>
-							action.icon ? (
-								<IconAction
-									key={ action.id }
-									action={ {
-										...action,
-										icon: action.icon,
-									} }
-								/>
+						{ mediumActions.map( ( action ) => {
+							const path = getActionRoute( links, action );
+							const routeRender =
+								path !== null && HostLink ? (
+									<HostLink path={ path } />
+								) : undefined;
+
+							if ( action.icon ) {
+								return (
+									<IconAction
+										key={ action.id }
+										action={ {
+											...action,
+											icon: action.icon,
+										} }
+										routeRender={ routeRender }
+									/>
+								);
+							}
+
+							return routeRender ? (
+								<Link key={ action.id } render={ routeRender }>
+									{ action.label }
+								</Link>
 							) : (
 								<Link
 									key={ action.id }
@@ -146,8 +200,8 @@ export function WidgetFooter( {
 								>
 									{ action.label }
 								</Link>
-							)
-						) }
+							);
+						} ) }
 					</Tooltip.Provider>
 				</Stack>
 			) }

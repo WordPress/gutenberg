@@ -53,7 +53,7 @@ The layout types the user can switch between. Each key is a layout type (`table`
 | grid | View overrides applied when the grid layout is selected. | `object` |
 | list | View overrides applied when the list layout is selected. | `object` |
 
-Common overrides are `layout` (layout-specific configuration, such as per-field column `styles` for tables or `badgeFields` for grids) and view properties like `showMedia`:
+Common overrides are `layout` (layout-specific configuration, such as per-field column `styles` for tables or `badgeFields` for grids) and view properties like `showMedia`. Table column `styles` are keyed by field id and apply to the columns listed in `fields`; the primary column (the one rendering `titleField`, `mediaField`, and `descriptionField`) takes the width the other columns leave over, so styles keyed by those field ids are ignored. When the view has no primary column, the last column in `fields` takes the leftover width instead:
 
 ```php
 $default_layouts = array(

@@ -1,8 +1,14 @@
 import { useSelect, createSelector } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
-import { privateApis as patternPrivateApis } from '@wordpress/patterns';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	privateApis as patternPrivateApis,
+	// @ts-expect-error - No type declarations available for @wordpress/patterns
+} from '@wordpress/patterns';
+import {
+	privateApis as blockEditorPrivateApis,
+	// @ts-expect-error - No type declarations available for @wordpress/block-editor
+} from '@wordpress/block-editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { filterOutDuplicatesByName } from './utils';
 

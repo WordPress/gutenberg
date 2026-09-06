@@ -81,6 +81,14 @@ function Example() {
 
 ## Props
 
+### `__experimentalHideHeader`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `true`
+
+Whether the underlying `Modal` should hide its header, `title` included.
+
 ### `children`
 
  - Type: `ReactNode`
@@ -150,3 +158,11 @@ dialog to close when the user cancels.
  - Required: No
 
 Size of the underlying Modal. See `Modal`'s `size` prop.
+
+### `title`
+
+ - Type: `string`
+ - Required: No
+
+The title of the underlying `Modal`: its accessible name, and the
+visible heading unless `__experimentalHideHeader` is `true`.

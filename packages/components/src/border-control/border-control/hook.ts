@@ -1,9 +1,9 @@
-import { useCallback, useMemo, useState } from '@wordpress/element';
-import * as styles from '../styles';
+import clsx from 'clsx';
+import { useCallback, useState } from '@wordpress/element';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import { useCx } from '../../utils/hooks/use-cx';
+import styles from '../style.module.scss';
 import type { Border, BorderControlProps } from '../types';
 
 // If either width or color are defined, the border is considered valid
@@ -110,11 +110,7 @@ export function useBorderControl(
 		[ onWidthChange, widthUnit ]
 	);
 
-	// Generate class names.
-	const cx = useCx();
-	const classes = useMemo( () => {
-		return cx( styles.borderControl, className );
-	}, [ className, cx ] );
+	const classes = clsx( styles[ 'border-control' ], className );
 
 	let wrapperWidth = width;
 	if ( isCompact ) {
@@ -122,17 +118,12 @@ export function useBorderControl(
 		// Taller controls contain greater internal padding, thus greater width.
 		wrapperWidth = '116px';
 	}
-	const innerWrapperClassName = useMemo( () => {
-		return cx(
-			styles.getInnerWrapperStyles( {
-				hasWidth: !! wrapperWidth,
-			} )
-		);
-	}, [ wrapperWidth, cx ] );
+	const innerWrapperClassName = clsx(
+		styles[ 'inner-wrapper' ],
+		!! wrapperWidth && styles[ 'inner-wrapper-has-width' ]
+	);
 
-	const sliderClassName = useMemo( () => {
-		return cx( styles.borderSlider() );
-	}, [ cx ] );
+	const sliderClassName = styles.slider;
 
 	return {
 		...otherProps,

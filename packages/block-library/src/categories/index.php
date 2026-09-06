@@ -23,6 +23,10 @@ function render_block_core_categories( $attributes, $content, $block ) {
 
 	$taxonomy = get_taxonomy( $attributes['taxonomy'] );
 
+	if ( ! $taxonomy ) {
+		return '';
+	}
+
 	$args = array(
 		'echo'         => false,
 		'hierarchical' => ! empty( $attributes['showHierarchy'] ),

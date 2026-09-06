@@ -6,9 +6,9 @@ import { TZDate } from '@date-fns/tz';
  * displays.
  *
  * @param date     The date to express in the calendar's time zone.
- * @param timeZone The calendar's IANA time zone. When empty, the date is
- *                 returned unchanged, matching the calendar's own fallback
- *                 to the browser time zone.
+ * @param timeZone The calendar's IANA time zone or UTC offset. When empty, the
+ *                 date is returned unchanged, matching the calendar's own
+ *                 fallback to the browser time zone.
  * @return The date to use for calendar month computations.
  */
 export default function toCalendarDate( date: Date, timeZone?: string ): Date {

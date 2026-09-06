@@ -57,7 +57,11 @@ test.describe( 'Template Part', () => {
 		page,
 	} ) => {
 		// Visit the index.
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 		const headerTemplateParts = editor.canvas.locator(
 			'[data-type="core/template-part"]'
 		);
@@ -84,7 +88,11 @@ test.describe( 'Template Part', () => {
 	} ) => {
 		const paragraphText = 'Test 2';
 
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 		// Add a block and select it.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -126,7 +134,11 @@ test.describe( 'Template Part', () => {
 		const paragraphText1 = 'Test 3';
 		const paragraphText2 = 'Test 4';
 
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 		// Add a block and select it.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -204,7 +216,11 @@ test.describe( 'Template Part', () => {
 		} );
 
 		// Visit the index.
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 		// Check that the header contains the paragraph added earlier.
 		const paragraph = editor.canvas.locator(
 			`p >> text="${ paragraphText }"`
@@ -293,8 +309,11 @@ test.describe( 'Template Part', () => {
 		} );
 
 		// Visit the index.
-		await admin.visitSiteEditor();
-		await editor.canvas.locator( 'body' ).click();
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 		const paragraph = editor.canvas.locator(
 			`p >> text="${ paragraphText }"`
 		);
@@ -352,7 +371,11 @@ test.describe( 'Template Part', () => {
 		editor,
 		page,
 	} ) => {
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 
 		// Add a block and select it.
 		await editor.insertBlock( {
@@ -392,7 +415,11 @@ test.describe( 'Template Part', () => {
 		editor,
 		page,
 	} ) => {
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 
 		// Select existing header template part.
 		await editor.selectBlocks(

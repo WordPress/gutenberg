@@ -1,3 +1,4 @@
+import type { KeyboardEvent, ReactNode } from 'react';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -18,7 +19,21 @@ const { MediaEditor } = unlock( mediaEditorPrivateApis );
 const MEDIA_LIST_PATH = '/types/attachment/list/all';
 const MEDIA_LIBRARY_ADMIN_PATH = 'upload.php';
 const MEDIA_EDITOR_ADMIN_PAGE = 'media-editor-wp-admin';
-const MEDIA_EDITOR_SCOPE = 'media-editor-route';
+
+/*
+ * The `MediaEditor` callback arguments this route reads. The private API
+ * does not publish its types, so these stay local until it stabilizes.
+ */
+interface SaveResult {
+	id: number;
+}
+
+interface FrameProps {
+	children: ReactNode;
+	isImage: boolean;
+	layout: 'wide' | 'narrow';
+	onKeyDown: ( event: KeyboardEvent< HTMLElement > ) => void;
+}
 
 function isMediaEditorAdminPage() {
 	return (
@@ -46,15 +61,16 @@ function MediaEditorRoute() {
 
 	const media = useSelect(
 		( select ) =>
+			/* The record of an attachment is always assignable to `Media`. */
 			select( coreStore ).getEditedEntityRecord(
 				'postType',
 				'attachment',
 				attachmentId
-			),
+			) as Media | false,
 		[ attachmentId ]
 	);
 
-	const title = getMediaTitle( media ?? null );
+	const title = getMediaTitle( media || null );
 	const navigateBack = () => {
 		if ( typeof window !== 'undefined' && window.history.length > 1 ) {
 			window.history.back();
@@ -71,22 +87,22 @@ function MediaEditorRoute() {
 		<MediaEditor
 			id={ attachmentId }
 			fields={ fields }
-			// A scope of its own, so that the details sidebar opens by default
-			// here regardless of whether it was last collapsed in the modal.
-			scope={ MEDIA_EDITOR_SCOPE }
 			onClose={ navigateBack }
-			onSaved={ ( { id: savedId } ) => {
+			onSaved={ ( { id: savedId }: SaveResult ) => {
 				if ( savedId !== attachmentId ) {
 					navigate( { to: `/media-editor/${ savedId }` } );
 				}
 			} }
-			renderFrame={ ( { children, isImage, layout, onKeyDown } ) => {
-				// Below the sidebar-collapse breakpoint the header has no room
-				// for the history cluster: it already carries the breadcrumbs,
-				// Cancel/Save, and (under `medium`) the framework's navigation
-				// toggle, in a single row that does not wrap. History joins the
-				// transform controls in a bar under the canvas instead, which
-				// is what the modal's narrow footer does.
+			renderFrame={ ( {
+				children,
+				isImage,
+				layout,
+				onKeyDown,
+			}: FrameProps ) => {
+				// Below `small` the page header already carries the
+				// breadcrumbs, Cancel/Save and (under `medium`) the
+				// framework's navigation toggle, in a row that does not wrap,
+				// so History moves to a bar under the canvas instead.
 				const isNarrow = layout === 'narrow';
 				return (
 					// The keydown handler covers the whole frame, not just the
@@ -135,7 +151,6 @@ function MediaEditorRoute() {
 							</div>
 							{ isNarrow && isImage && (
 								<div className="media-editor-route__toolbar">
-									<MediaEditor.ImageControls />
 									<MediaEditor.HistoryActions />
 								</div>
 							) }

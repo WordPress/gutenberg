@@ -7,6 +7,9 @@ import { LAYOUT_DEFINITIONS } from './definitions';
 export default {
 	name: 'default',
 	label: __( 'Flow' ),
+	hasInspectorControls() {
+		return false;
+	},
 	inspectorControls: function DefaultLayoutInspectorControls() {
 		return null;
 	},

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { useEvent, useIsomorphicLayoutEffect } from '@wordpress/compose';
-import { ThemeContext } from './context';
-import { useThemeProviderStyles } from './use-theme-provider-styles';
-import { type ThemeProviderProps } from './types';
+import { ThemeContext } from './context.ts';
+import { useThemeProviderStyles } from './use-theme-provider-styles.ts';
+import { type ThemeProviderProps } from './types.ts';
 import styles from './style.module.css';
 
 // Dev-only: count active root providers per document so we can warn when more
@@ -145,7 +145,7 @@ export const ThemeProvider = ( {
 			ref={ wrapperRef }
 			data-wpds-root-provider={ isRoot || undefined }
 			data-wpds-corner-radius={ cornerRadiusPreset }
-			className={ styles.root }
+			className={ styles.wrapper }
 			style={ themeProviderStyles }
 		>
 			<ThemeContext.Provider value={ contextValue }>

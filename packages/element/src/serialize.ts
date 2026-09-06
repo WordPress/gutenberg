@@ -31,7 +31,14 @@ import {
 	escapeAttribute,
 	isValidAttributeName,
 } from '@wordpress/escape-html';
-import { createContext, Fragment, StrictMode, forwardRef } from './react';
+import {
+	createContext,
+	createElement,
+	Fragment,
+	StrictMode,
+	forwardRef,
+	memo,
+} from './react';
 import RawHTML from './raw-html';
 
 /** @typedef {React.ReactElement} ReactElement */
@@ -68,6 +75,10 @@ interface HTMLProps {
 const { Provider, Consumer } = Context;
 
 const ForwardRef = forwardRef( () => {
+	return null;
+} );
+
+const Memo = memo( () => {
 	return null;
 } );
 
@@ -622,6 +633,15 @@ export function renderElement(
 		case ForwardRef.$$typeof:
 			return renderElement(
 				type.render( props ),
+				context,
+				legacyContext
+			);
+
+		case Memo.$$typeof:
+			// Memoization is meaningless for a static, one-off serialization,
+			// so the wrapped type is rendered directly.
+			return renderElement(
+				createElement( type.type, props ),
 				context,
 				legacyContext
 			);

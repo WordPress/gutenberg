@@ -2,10 +2,13 @@
  * Stores the type of a rich text format, such as core/bold.
  */
 export type RichTextFormat = {
+	title?: string;
+	attributes?: Record< string, string >;
+	innerHTML?: string;
 	type:
 		| 'core/bold'
 		| 'core/italic'
-		| 'core/link '
+		| 'core/link'
 		| 'core/strikethrough'
 		| 'core/image'
 		| string;

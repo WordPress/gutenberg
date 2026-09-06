@@ -1,5 +1,14 @@
-'use strict';
-const { readFile, writeFile } = require( 'fs' ).promises;
+import { createRequire } from 'node:module';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
+const fs = require( 'node:fs' );
+const readFile = vi
+	.spyOn( fs.promises, 'readFile' )
+	.mockImplementation( () => undefined );
+const writeFile = vi
+	.spyOn( fs.promises, 'writeFile' )
+	.mockImplementation( () => undefined );
+const mkdir = vi.spyOn( fs.promises, 'mkdir' ).mockResolvedValue();
 const {
 	didCacheChange,
 	setCache,
@@ -7,13 +16,9 @@ const {
 	getCacheFile,
 } = require( '../cache' );
 
-jest.mock( 'fs', () => ( {
-	promises: {
-		readFile: jest.fn(),
-		writeFile: jest.fn(),
-		mkdir: jest.fn(),
-	},
-} ) );
+afterAll( () => {
+	vi.restoreAllMocks();
+} );
 
 const cacheOptions = {
 	workDirectoryPath: '/a/b/c',
@@ -38,7 +43,10 @@ function setupWriteFile() {
 
 describe( 'cache file', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		readFile.mockReset().mockImplementation( () => undefined );
+		writeFile.mockReset().mockImplementation( () => undefined );
+		mkdir.mockReset().mockResolvedValue();
+		setupWriteFile();
 	} );
 
 	describe( 'didCacheChange', () => {
@@ -75,7 +83,6 @@ describe( 'cache file', () => {
 
 	describe( 'setCache', () => {
 		it( 'saves a new cache value to the file', async () => {
-			setupWriteFile();
 			await setCache( 'test', 'abc', cacheOptions );
 			const result = await getCacheFile( cacheOptions );
 			expect( result ).toEqual( { test: 'abc' } );

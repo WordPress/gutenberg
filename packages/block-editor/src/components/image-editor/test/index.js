@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import { ratioToNumber } from '../aspect-ratio-dropdown';
 
 test( 'ratioToNumber', () => {

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/env",
-	"version": "11.13.0",
+	"version": "11.14.0",
 	"description": "A zero-config, self contained local WordPress environment for development and testing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -56,6 +56,9 @@
 		"rimraf": "^5.0.10",
 		"simple-git": "^3.32.3",
 		"yargs": "^17.3.0"
+	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

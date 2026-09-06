@@ -55,7 +55,8 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 	const globalStyles = useEntityRecord< GlobalStylesConfig >(
 		'root',
 		'globalStyles',
-		globalStylesId
+		globalStylesId ?? 0,
+		{ enabled: globalStylesId !== undefined }
 	);
 
 	const [ isInstalling, setIsInstalling ] = useState( false );

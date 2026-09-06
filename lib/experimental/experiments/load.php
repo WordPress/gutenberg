@@ -25,11 +25,6 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables experimental blocks on a rolling basis as they are developed. (Warning: these blocks may have significant changes during development that cause validation errors and display issues.)', 'gutenberg' ),
 				),
 				array(
-					'id'          => 'gutenberg-form-blocks',
-					'label'       => __( 'Form and input blocks', 'gutenberg' ),
-					'description' => __( 'Enables new blocks to allow building forms. You are likely to experience UX issues that are being addressed.', 'gutenberg' ),
-				),
-				array(
 					'id'          => 'gutenberg-global-styles-inheritance-ui',
 					'label'       => __( 'Global Styles inheritance in the block inspector', 'gutenberg' ),
 					'description' => __( 'Shows the value a block inherits from Global Styles in the block inspector when nothing is set on the block itself, and adds a control to clear a value you set back to the inherited one.', 'gutenberg' ),
@@ -96,18 +91,6 @@ function gutenberg_initialize_experiments_settings() {
 			),
 		),
 		array(
-			'slug'  => 'templates',
-			'label' => _x( 'Templates', 'experiments group name', 'gutenberg' ),
-			'items' => array(
-				array(
-					'id'             => 'active_templates',
-					'label'          => __( 'Template Activation', 'gutenberg' ),
-					'description'    => __( 'Allows multiple templates of the same type to be created, of which one can be active at a time. (Warning: when you deactivate this experiment, it is best to delete all created templates except for the active ones.)', 'gutenberg' ),
-					'separateOption' => true,
-				),
-			),
-		),
-		array(
 			'slug'  => 'other',
 			'label' => _x( 'Other', 'experiments group name', 'gutenberg' ),
 			'items' => array(
@@ -156,14 +139,6 @@ function gutenberg_initialize_experiments_settings() {
 				'group'       => $group['slug'],
 				'group_label' => $group['label'],
 			);
-
-			// Metadata-only entry: values for separateOption experiments live in
-			// their own option (e.g. `active_templates`). Surfaced here so the UI
-			// can render them from the settings schema.
-			if ( ! empty( $experiment['separateOption'] ) ) {
-				$property['separate_option'] = true;
-				$property['option_name']     = $experiment['id'];
-			}
 
 			$properties[ $experiment['id'] ] = $property;
 		}
