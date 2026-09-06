@@ -27,11 +27,6 @@
 			"via": "packages/patterns/src/index.js"
 		},
 		{
-			"comment": "Unlocks private APIs of @wordpress/components. Remove when the unlocked surface goes public.",
-			"package": "fields",
-			"via": "packages/components/src/private-apis.ts"
-		},
-		{
 			"comment": "The package's own private cross-package API usage, tracked file-by-file by the private-apis lint suppressions. Remove when the package stops using private APIs.",
 			"package": "fields",
 			"via": "packages/fields/src/lock-unlock.ts"
