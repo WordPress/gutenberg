@@ -3968,6 +3968,11 @@ class WP_Theme_JSON_Gutenberg {
 
 					// Process base properties for this breakpoint.
 					$breakpoint_declarations = static::compute_style_properties( $breakpoint_node, $settings, null, $this->theme_json );
+
+					if ( 'core/column' === $block_name ) {
+						$breakpoint_declarations = static::update_column_width_declarations( $breakpoint_declarations );
+					}
+
 					if ( ! empty( $breakpoint_declarations ) ) {
 						$base_ruleset              = static::to_ruleset( ':root :where(' . $style_variation['selector'] . ')', $breakpoint_declarations );
 						$variation_responsive_css .= $breakpoint_media . '{' . $base_ruleset . '}';

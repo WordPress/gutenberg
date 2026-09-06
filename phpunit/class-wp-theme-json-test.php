@@ -6682,6 +6682,246 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Tests that column block width declarations are output as `flex-basis`.
+	 *
+	 * @dataProvider data_update_column_width_declarations
+	 *
+	 * @param array  $theme_json_args Theme JSON arguments including styles and optional settings.
+	 * @param string $expected_output Expected CSS output.
+	 */
+	public function test_update_column_width_declarations( $theme_json_args, $expected_output ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array_merge(
+				array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA ),
+				$theme_json_args
+			),
+			'default'
+		);
+
+		$column_node = array(
+			'name'       => 'core/column',
+			'path'       => array( 'styles', 'blocks', 'core/column' ),
+			'selector'   => '.wp-block-column',
+			'selectors'  => array(
+				'root' => '.wp-block-column',
+			),
+			'duotone'    => null,
+			'variations' => array(),
+			'css'        => '.wp-block-column',
+		);
+
+		$this->assertSame( $expected_output, $theme_json->get_styles_for_block( $column_node ) );
+	}
+
+	/**
+	 * Data provider for column width declaration tests.
+	 *
+	 * @return array
+	 */
+	public function data_update_column_width_declarations() {
+		return array(
+			'percentage width'               => array(
+				array(
+					'styles' => array(
+						'blocks' => array(
+							'core/column' => array(
+								'dimensions' => array(
+									'width' => '25%',
+								),
+							),
+						),
+					),
+				),
+				'expected_output' => ':root :where(.wp-block-column){flex-basis: 25%;flex-grow: 0;}',
+			),
+			'fixed width'                    => array(
+				array(
+					'styles' => array(
+						'blocks' => array(
+							'core/column' => array(
+								'dimensions' => array(
+									'width' => '200px',
+								),
+							),
+						),
+					),
+				),
+				'expected_output' => ':root :where(.wp-block-column){flex-basis: 200px;flex-grow: 0;}',
+			),
+			'preset width'                   => array(
+				array(
+					'settings' => array(
+						'dimensions' => array(
+							'dimensionSizes' => array(
+								array(
+									'slug' => '50',
+									'name' => '50%',
+									'size' => '50%',
+								),
+							),
+						),
+					),
+					'styles'   => array(
+						'blocks' => array(
+							'core/column' => array(
+								'dimensions' => array(
+									'width' => 'var:preset|dimension|50',
+								),
+							),
+						),
+					),
+				),
+				'expected_output' => ':root :where(.wp-block-column){flex-basis: var(--wp--preset--dimension--50);flex-grow: 0;}',
+			),
+			'width alongside other styles'   => array(
+				array(
+					'styles' => array(
+						'blocks' => array(
+							'core/column' => array(
+								'color'      => array(
+									'text' => 'red',
+								),
+								'dimensions' => array(
+									'width' => '25%',
+								),
+							),
+						),
+					),
+				),
+				'expected_output' => ':root :where(.wp-block-column){color: red;flex-basis: 25%;flex-grow: 0;}',
+			),
+			'no width leaves flex untouched' => array(
+				array(
+					'styles' => array(
+						'blocks' => array(
+							'core/column' => array(
+								'color' => array(
+									'text' => 'red',
+								),
+							),
+						),
+					),
+				),
+				'expected_output' => ':root :where(.wp-block-column){color: red;}',
+			),
+		);
+	}
+
+	/**
+	 * Tests that a column width set within a responsive breakpoint is output as
+	 * `flex-basis` within the matching media query.
+	 */
+	public function test_update_column_width_declarations_for_breakpoints() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/column' => array(
+							'@mobile' => array(
+								'dimensions' => array(
+									'width' => '100%',
+								),
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		// Mirrors the responsive block node built by get_block_nodes().
+		$column_breakpoint_node = array(
+			'name'        => 'core/column',
+			'path'        => array( 'styles', 'blocks', 'core/column', '@mobile' ),
+			'media_query' => '@media (width <= 480px)',
+			'selector'    => '.wp-block-column',
+			'selectors'   => array(
+				'root' => '.wp-block-column',
+			),
+			'variations'  => array(),
+			'css'         => '.wp-block-column',
+		);
+
+		$this->assertSame(
+			'@media (width <= 480px){:root :where(.wp-block-column){flex-basis: 100%;flex-grow: 0;}}',
+			$theme_json->get_styles_for_block( $column_breakpoint_node )
+		);
+	}
+
+	/**
+	 * Tests that a column width set on a block style variation is output as
+	 * `flex-basis`, including when set within a responsive breakpoint.
+	 */
+	public function test_update_column_width_declarations_for_style_variations() {
+		register_block_style(
+			'core/column',
+			array(
+				'name'  => 'foo',
+				'label' => 'Foo',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/column' => array(
+							'variations' => array(
+								'foo' => array(
+									'dimensions' => array(
+										'width' => '25%',
+									),
+									'@mobile'    => array(
+										'dimensions' => array(
+											'width' => '100%',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$column_node = array(
+			'name'       => 'core/column',
+			'path'       => array( 'styles', 'blocks', 'core/column' ),
+			'selector'   => '.wp-block-column',
+			'selectors'  => array(
+				'root' => '.wp-block-column',
+			),
+			'duotone'    => null,
+			'variations' => array(
+				array(
+					'name'     => 'foo',
+					'path'     => array( 'styles', 'blocks', 'core/column', 'variations', 'foo' ),
+					'selector' => '.is-style-foo',
+				),
+			),
+			'css'        => '.wp-block-column',
+		);
+
+		$styles = $theme_json->get_styles_for_block( $column_node );
+
+		unregister_block_style( 'core/column', 'foo' );
+
+		$this->assertStringContainsString(
+			':root :where(.is-style-foo){flex-basis: 25%;flex-grow: 0;}',
+			$styles,
+			'The variation column width should be output as flex-basis.'
+		);
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.is-style-foo){flex-basis: 100%;flex-grow: 0;}}',
+			$styles,
+			'The responsive variation column width should be output as flex-basis.'
+		);
+	}
+
 	public function test_shadow_preset_styles() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
