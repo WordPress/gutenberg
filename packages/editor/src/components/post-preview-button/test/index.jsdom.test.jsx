@@ -1,7 +1,25 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSelect, useDispatch } from '@wordpress/data';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Menu } from '@wordpress/ui';
 import PostPreviewButton, { PostPreviewMenuItem } from '..';
+
+function renderMenu( children ) {
+	return render(
+		<Menu.Root>
+			<Menu.Trigger>View test menu</Menu.Trigger>
+			<Menu.Popup>{ children }</Menu.Popup>
+		</Menu.Root>
+	);
+}
+
+async function openMenu( user ) {
+	await user.click(
+		screen.getByRole( 'button', { name: 'View test menu' } )
+	);
+	await screen.findByRole( 'menu', { name: 'View test menu' } );
+}
 
 jest.useRealTimers();
 
@@ -128,17 +146,19 @@ describe( 'PostPreviewButton', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'should render the menu variant as a link with the shared menu item pattern.', () => {
+	it( 'should render the menu variant as a link with the shared menu item pattern.', async () => {
+		const user = userEvent.setup();
 		const url = 'https://wordpress.org';
 		mockUseSelect( {
 			getEditedPostPreviewLink: () => url,
 			isEditedPostSaveable: () => true,
 		} );
 
-		render( <PostPreviewMenuItem /> );
+		renderMenu( <PostPreviewMenuItem /> );
+		await openMenu( user );
 
 		const menuItem = screen.getByRole( 'menuitem', {
-			name: 'Preview in new tab',
+			name: 'Preview (opens in a new tab)',
 		} );
 		expect( menuItem.tagName ).toBe( 'A' );
 		expect( menuItem ).toHaveAttribute( 'href', url );

@@ -19,15 +19,18 @@ exports[`PluginPostPublishPanel renders fill properly 1`] = `
           <svg
             aria-hidden="true"
             class="components-panel__arrow"
-            fill="currentColor"
             focusable="false"
             height="24"
+            stroke="currentColor"
+            stroke-width="1.5"
+            style="fill: none;"
             viewBox="0 0 24 24"
             width="24"
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z"
+              d="M7 13L12 9L17 13"
+              vector-effect="non-scaling-stroke"
             />
           </svg>
         </span>

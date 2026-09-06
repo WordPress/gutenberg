@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { escape } from '../utils';
 
 describe( 'core/code', () => {

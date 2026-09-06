@@ -95,6 +95,7 @@
 		"@wordpress/patterns": "file:../patterns",
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/preferences": "file:../preferences",
+		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
@@ -123,7 +124,8 @@
 		"@testing-library/user-event": "^14.6.1",
 		"@types/jest": "^30.0.0",
 		"@wordpress/block-library": "file:../block-library",
-		"deep-freeze": "^0.0.1"
+		"deep-freeze": "^0.0.1",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

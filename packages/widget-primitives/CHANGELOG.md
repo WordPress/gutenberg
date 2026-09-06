@@ -8,6 +8,9 @@
     route's query when the href has one; docblock, README, Storybook page
     and seam diagram say so
     ([#82066](https://github.com/WordPress/gutenberg/pull/82066)).
+-   `WidgetAction.download`: any value but `false` downloads; `true` or `''`
+    keep the original filename
+    ([#82073](https://github.com/WordPress/gutenberg/pull/82073)).
 
 ## 0.6.0 (2026-08-26)
 

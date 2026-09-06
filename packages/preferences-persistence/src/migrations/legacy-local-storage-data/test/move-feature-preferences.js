@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import moveFeaturePreferences from '../move-feature-preferences';
 
 describe( 'moveFeaturePreferences', () => {

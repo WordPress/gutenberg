@@ -7,6 +7,7 @@ import useEditableRoot from './use-editable-root';
 import useHomeEnd from './use-home-end';
 import useMultiSelection from './use-multi-selection';
 import useTabNav from './use-tab-nav';
+import useUndoAutomaticChange from './use-undo-automatic-change';
 import useArrowNav from './use-arrow-nav';
 import { usePreviewModeNav } from './use-preview-mode-nav';
 import useSelectAll from './use-select-all';
@@ -28,6 +29,10 @@ export function useWritingFlow() {
 	return [
 		before,
 		useMergeRefs( [
+			// Same-node listeners run in registration order, and the undo of
+			// an automatic change must claim Escape before the tab-nav
+			// listeners step out of the canvas.
+			useUndoAutomaticChange(),
 			ref,
 			useEditableRootEventHandlers(),
 			useClipboardHandler(),

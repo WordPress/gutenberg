@@ -107,6 +107,7 @@ export const SearchableChipSelect = forwardRef<
 						ref={ ref }
 						render={
 							<input
+								type="text"
 								className={ clsx(
 									defenseStyles.input,
 									styles.input
@@ -121,7 +122,7 @@ export const SearchableChipSelect = forwardRef<
 				</Combobox.Chips>
 			</Combobox.InputGroup>
 
-			<Combobox.Popup popupWidth={ popupWidth }>
+			<Combobox.Popup width={ popupWidth }>
 				<Combobox.Empty>{ emptyContent }</Combobox.Empty>
 				<Combobox.List>
 					<Combobox.ListBody>

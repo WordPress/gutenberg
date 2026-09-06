@@ -68,6 +68,7 @@ describe( 'Combobox', () => {
 		const chipWithRemoveRef = createRef< HTMLDivElement >();
 		const clearRef = createRef< HTMLButtonElement >();
 		const emptyRef = createRef< HTMLDivElement >();
+		const statusRef = createRef< HTMLDivElement >();
 
 		render(
 			<Combobox.Root items={ ITEMS } defaultValue={ ITEMS[ 0 ] }>
@@ -87,6 +88,9 @@ describe( 'Combobox', () => {
 							<Combobox.Clear ref={ clearRef } />
 						</Combobox.Chips>
 					</Combobox.Value>
+					<Combobox.Status ref={ statusRef }>
+						Loading...
+					</Combobox.Status>
 					<Combobox.Empty ref={ emptyRef }>
 						No results found.
 					</Combobox.Empty>
@@ -135,6 +139,7 @@ describe( 'Combobox', () => {
 		expect( chipWithRemoveRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( statusRef.current ).toBeInstanceOf( HTMLDivElement );
 	} );
 
 	it( 'uses a custom positioner', async () => {

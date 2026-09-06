@@ -31,6 +31,7 @@ describe( 'Autocomplete', () => {
 		const itemRef = createRef< HTMLDivElement >();
 		const clearRef = createRef< HTMLButtonElement >();
 		const emptyRef = createRef< HTMLDivElement >();
+		const statusRef = createRef< HTMLDivElement >();
 
 		render(
 			<Autocomplete.Root items={ ITEMS }>
@@ -38,6 +39,9 @@ describe( 'Autocomplete', () => {
 					<Autocomplete.Input ref={ inputRef } placeholder="Search" />
 				</Autocomplete.InputGroup>
 				<Autocomplete.Popup ref={ popupRef }>
+					<Autocomplete.Status ref={ statusRef }>
+						Loading...
+					</Autocomplete.Status>
 					<Autocomplete.Empty ref={ emptyRef }>
 						No results found.
 					</Autocomplete.Empty>
@@ -78,6 +82,7 @@ describe( 'Autocomplete', () => {
 		expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( statusRef.current ).toBeInstanceOf( HTMLDivElement );
 	} );
 
 	describe( 'portal', () => {

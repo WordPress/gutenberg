@@ -6,15 +6,17 @@ import { normaliseFormats } from './normalise-formats';
  * Search a Rich Text value and replace the match(es) with `replacement`. This
  * is similar to `String.prototype.replace`.
  *
- * @param {RichTextValue}   value       The value to modify.
- * @param {RegExp|string}   pattern     A RegExp object or literal. Can also be
- *                                      a string. It is treated as a verbatim
- *                                      string and is not interpreted as a
- *                                      regular expression. Only the first
- *                                      occurrence will be replaced.
- * @param {Function|string} replacement The match or matches are replaced with
- *                                      the specified or the value returned by
- *                                      the specified function.
+ * @param {RichTextValue}                 value       The value to modify.
+ * @param {RegExp|string}                 pattern     A RegExp object or literal. Can also be
+ *                                                    a string. It is treated as a verbatim
+ *                                                    string and is not interpreted as a
+ *                                                    regular expression. Only the first
+ *                                                    occurrence will be replaced.
+ * @param {Function|string|RichTextValue} replacement The match or matches are
+ *                                                    replaced with the specified
+ *                                                    value, the value returned by
+ *                                                    the specified function, or
+ *                                                    the given rich text value.
  *
  * @return {RichTextValue} A new value with replacements applied.
  */

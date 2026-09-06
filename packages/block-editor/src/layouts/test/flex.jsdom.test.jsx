@@ -34,6 +34,51 @@ describe( 'getLayoutStyle', () => {
 
 		expect( result ).toBe( expected );
 	} );
+
+	it( 'should output flex-direction row when a viewport override switches a vertical layout to horizontal', () => {
+		const result = flex.getLayoutStyle( {
+			selector: '.my-container',
+			layout: {
+				type: 'flex',
+				orientation: 'vertical',
+				flexWrap: 'nowrap',
+				justifyContent: 'center',
+			},
+			viewportOverrides: {
+				orientation: 'horizontal',
+				justifyContent: 'left',
+			},
+			style: {},
+			blockName: 'test-block',
+			hasBlockGapSupport: false,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).toBe(
+			'.my-container {\n\t\t\t\tflex-direction: row; justify-content: flex-start;\n\t\t\t}'
+		);
+	} );
+
+	it( 'should keep flex-direction implicit when a viewport override does not change a horizontal orientation', () => {
+		const result = flex.getLayoutStyle( {
+			selector: '.my-container',
+			layout: {
+				type: 'flex',
+				orientation: 'horizontal',
+				justifyContent: 'left',
+			},
+			viewportOverrides: {
+				justifyContent: 'right',
+			},
+			style: {},
+			blockName: 'test-block',
+			hasBlockGapSupport: false,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).not.toContain( 'flex-direction' );
+		expect( result ).toContain( 'justify-content: flex-end' );
+	} );
 } );
 
 describe( 'FlexLayoutInspectorControls', () => {

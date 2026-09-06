@@ -9,6 +9,7 @@ on:
             - '.github/workflows/**'
             - '.github/*/action.yml'
             - 'packages/**/action.yml'
+            - 'tools/**/action.yml'
     pull_request:
         branches:
             - trunk
@@ -17,6 +18,7 @@ on:
             - '.github/workflows/**'
             - '.github/*/action.yml'
             - 'packages/**/action.yml'
+            - 'tools/**/action.yml'
     workflow_dispatch:
 
 # Cancels all previous workflow runs for pull requests that have not completed.

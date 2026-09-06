@@ -20,6 +20,7 @@ interface HarnessProps {
 	onLayoutChange?: ( next: DashboardWidget[] ) => void;
 	canPerform?: CanPerformDashboardOperation;
 	layout?: DashboardWidget[];
+	onLayoutReset?: () => Promise< void >;
 }
 
 function Harness( {
@@ -28,6 +29,7 @@ function Harness( {
 	onLayoutChange = () => {},
 	canPerform,
 	layout: initialLayout = layout,
+	onLayoutReset,
 }: HarnessProps ) {
 	const [ editMode, setEditMode ] = useState( initialEditMode );
 
@@ -41,6 +43,7 @@ function Harness( {
 				setEditMode( next );
 				onEditChange?.( next );
 			} }
+			onLayoutReset={ onLayoutReset }
 		>
 			<WidgetDashboard.Actions />
 		</WidgetDashboard>
@@ -57,6 +60,9 @@ function Harness( {
 
 const denyCustomize: CanPerformDashboardOperation = ( request ) =>
 	request.operation !== 'customize';
+
+const denyReset: CanPerformDashboardOperation = ( request ) =>
+	request.operation !== 'reset';
 
 describe( 'WidgetDashboard.Actions', () => {
 	let user: ReturnType< typeof userEvent.setup >;
@@ -187,6 +193,34 @@ describe( 'WidgetDashboard.Actions', () => {
 			/>
 		);
 		expect( onEditChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'offers Reset to default when the policy allows it', async () => {
+		render( <Harness onLayoutReset={ async () => {} } /> );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'More options' } )
+		);
+
+		expect(
+			await screen.findByRole( 'menuitem', { name: 'Reset to default' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'hides Reset to default and its menu when the policy denies reset', () => {
+		render(
+			<Harness
+				onLayoutReset={ async () => {} }
+				canPerform={ denyReset }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Customize' } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'More options' } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'throws when used outside a WidgetDashboard subtree', () => {

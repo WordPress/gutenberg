@@ -347,7 +347,7 @@ $block-inserter-tabs-height: 44px;
 	.block-editor-block-patterns-list {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		grid-gap: $grid-unit-10;
+		gap: $grid-unit-10;
 		.block-editor-block-patterns-list__list-item {
 			margin-bottom: 0;
 		}
@@ -410,7 +410,7 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-block-patterns-explorer .block-editor-block-patterns-list {
 	display: grid;
-	grid-gap: $grid-unit-40;
+	gap: $grid-unit-40;
 	grid-template-columns: repeat(1, 1fr);
 	margin-bottom: $grid-unit-20;
 

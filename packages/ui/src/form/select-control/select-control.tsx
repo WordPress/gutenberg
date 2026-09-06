@@ -39,7 +39,7 @@ export const SelectControl = forwardRef<
 				>
 					{ triggerContent }
 				</Select.Trigger>
-				<Select.Popup popupWidth={ popupWidth }>
+				<Select.Popup width={ popupWidth }>
 					{ children !== undefined
 						? children
 						: items?.map( ( item ) => (

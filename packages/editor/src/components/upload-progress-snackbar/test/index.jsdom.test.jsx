@@ -1,7 +1,9 @@
 import { render, act } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
 import UploadProgressSnackbar from '../';
-import { addFiles, advance, reset } from '../tracker';
+import { lock } from '../../../lock-unlock';
+import { addFiles, advance, advanceFailed, reset } from '../tracker';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
 	const mock = jest.fn();
@@ -25,12 +27,16 @@ jest.mock( '@wordpress/a11y', () => ( {
 	speak: jest.fn(),
 } ) );
 
-function mockQueue( items ) {
+function mockQueue( items, failureCount = 0 ) {
+	const storeSelect = {
+		getItems: () => items,
+		isUploading: () => items.length > 0,
+	};
+	// `getFailureCount` is a private selector, so the component reads it
+	// through `unlock`.
+	lock( storeSelect, { getFailureCount: () => failureCount } );
 	useSelect.mockImplementation( ( mapSelect ) =>
-		mapSelect( () => ( {
-			getItems: () => items,
-			isUploading: () => items.length > 0,
-		} ) )
+		mapSelect( () => storeSelect )
 	);
 }
 
@@ -151,6 +157,113 @@ describe( 'UploadProgressSnackbar', () => {
 		} finally {
 			jest.useRealTimers();
 		}
+	} );
+
+	it( 'announces completion when every upload succeeded', () => {
+		mockQueue( [] );
+		act( () => {
+			addFiles( [ 'a.jpg' ] );
+		} );
+		render( <UploadProgressSnackbar /> );
+		speak.mockClear();
+
+		act( () => {
+			advance( 1 );
+		} );
+
+		expect( speak ).toHaveBeenCalledWith(
+			'Media upload complete',
+			'polite'
+		);
+	} );
+
+	it( 'does not show a completion notice when every tracked upload failed', () => {
+		mockQueue( [] );
+		act( () => {
+			addFiles( [ 'broken.heic' ] );
+		} );
+		render( <UploadProgressSnackbar /> );
+		mockCreateNotice.mockClear();
+
+		act( () => {
+			advanceFailed( 1 );
+		} );
+
+		expect( mockCreateNotice ).not.toHaveBeenCalled();
+		// The in-progress notice has to come down, since nothing replaces it.
+		expect( mockRemoveNotice ).toHaveBeenCalledWith( 'upload-progress' );
+		// Claiming completion here is the bug this fixes, for screen readers too.
+		expect( speak ).toHaveBeenCalledWith( 'Media upload failed', 'polite' );
+		expect( speak ).not.toHaveBeenCalledWith(
+			'Media upload complete',
+			'polite'
+		);
+	} );
+
+	it( 'reports how many files uploaded when only some of them failed', () => {
+		mockQueue( [] );
+		act( () => {
+			addFiles( [ 'a.jpg', 'broken.heic', 'c.jpg' ] );
+		} );
+		render( <UploadProgressSnackbar /> );
+		mockCreateNotice.mockClear();
+
+		act( () => {
+			advance( 1 );
+		} );
+		act( () => {
+			advanceFailed( 1 );
+		} );
+		mockCreateNotice.mockClear();
+		act( () => {
+			advance( 1 );
+		} );
+
+		expect( mockCreateNotice ).toHaveBeenCalledWith(
+			'info',
+			'Uploaded 2 of 3',
+			expect.objectContaining( {
+				id: 'upload-progress',
+				// A checkmark would overstate a batch that partly failed.
+				icon: undefined,
+			} )
+		);
+		// The announcement has to say the same thing the notice says.
+		expect( speak ).toHaveBeenCalledWith( 'Uploaded 2 of 3', 'polite' );
+		expect( speak ).not.toHaveBeenCalledWith(
+			'Media upload complete',
+			'polite'
+		);
+	} );
+
+	it( 'does not show a completion notice when every CSM upload failed', () => {
+		mockQueue( [ makeItem( '1', 'broken.heic' ) ] );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+		mockCreateNotice.mockClear();
+
+		// The queue empties on failure exactly as it does on success — the
+		// failure tally is the only thing that tells them apart.
+		mockQueue( [], 1 );
+		rerender( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).not.toHaveBeenCalled();
+		expect( mockRemoveNotice ).toHaveBeenCalledWith( 'upload-progress' );
+	} );
+
+	it( 'ignores failures from earlier batches', () => {
+		// A previous batch already failed once, so the tally starts above zero.
+		mockQueue( [ makeItem( '1', 'photo.jpg' ) ], 1 );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+		mockCreateNotice.mockClear();
+
+		mockQueue( [], 1 );
+		rerender( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).toHaveBeenCalledWith(
+			'info',
+			'Upload complete',
+			expect.objectContaining( { id: 'upload-progress' } )
+		);
 	} );
 
 	it( 'middle-truncates a long filename while keeping the extension', () => {

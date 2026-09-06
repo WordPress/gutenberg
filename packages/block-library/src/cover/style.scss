@@ -342,9 +342,9 @@ section.wp-block-cover-image > h2,
 // the deprecated version). In the color background or gradient option we don't
 // need the z-index because the elements are in the expected order.
 body:not(.editor-styles-wrapper) .wp-block-cover:not(
-.wp-block-cover:has(
-	.wp-block-cover__background + .wp-block-cover__inner-container
-)
+	.wp-block-cover:has(
+		.wp-block-cover__background + .wp-block-cover__inner-container
+	)
 ) {
 	.wp-block-cover__video-background {
 		// Background media sits at the base of the stack.

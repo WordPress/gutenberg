@@ -13,8 +13,8 @@
 				0 16px 16px rgba(0, 0, 0, 0.02);
 
 			display: grid;
-			grid-template-rows: auto minmax(0, 1fr);
-			grid-template-areas: "header" "main";
+			grid-template-rows: auto auto minmax(0, 1fr);
+			grid-template-areas: "header" "status" "main";
 			max-height: min(var(--available-height), 480px, 60dvh);
 			min-width: var(--anchor-width);
 			max-width: var(--available-width);
@@ -156,13 +156,21 @@
 			flex-shrink: 0;
 		}
 
-		/* Only style when there is content, because otherwise the element would block clicks
-		on the .list beneath it (both share grid-area: main and overlap). */
+		.status {
+			grid-area: status;
+		}
+
+		/* Empty shares main with the list. A VisuallyHidden child still makes
+		   Status :not(:empty). Chrome only when it would not cover the list. */
 		.empty:not(:empty) {
+			grid-area: main;
+		}
+
+		.empty:not(:empty),
+		.status:not(:empty):not(:has([data-visually-hidden])) {
 			--wp-ui-popup-empty-min-height: var(--wpds-dimension-size-md);
 			--wp-ui-popup-empty-padding-inline: var(--wpds-dimension-padding-md);
 
-			grid-area: main;
 			display: flex;
 			align-items: center;
 			min-height: var(--wp-ui-popup-empty-min-height);

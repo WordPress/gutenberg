@@ -58,7 +58,8 @@
 		"mediabunny": "^1.45.2"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0"
+		"@types/jest": "^30.0.0",
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

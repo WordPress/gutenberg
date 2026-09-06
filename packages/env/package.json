@@ -57,6 +57,9 @@
 		"simple-git": "^3.32.3",
 		"yargs": "^17.3.0"
 	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	},

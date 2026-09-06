@@ -4,107 +4,68 @@ import {
 	useEffect,
 	useMemo,
 	useReducer,
-	useRef,
+	useState,
 } from '@wordpress/element';
 import styles from '../style.module.scss';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import type {
-	ToolsPanelItem,
+	RegisteredToolsPanelItem,
 	ToolsPanelMenuItemKey,
 	ToolsPanelMenuItems,
-	ToolsPanelMenuItemsConfig,
 	ToolsPanelProps,
 	ResetAllFilter,
 } from '../types';
 
 type PanelItemsState = {
-	panelItems: ToolsPanelItem[];
+	panelItems: RegisteredToolsPanelItem[];
 	menuItemOrder: string[];
-	menuItems: ToolsPanelMenuItems;
+	/**
+	 * Menu state that can't be read back off the items: an optional item the
+	 * user has shown, or a default item flagged as customized. Anything absent
+	 * here falls back to whether the item currently holds a value.
+	 */
+	menuItemValues: Record< string, boolean >;
 };
 
 type PanelItemsAction =
-	| { type: 'REGISTER_PANEL'; item: ToolsPanelItem }
-	| { type: 'UNREGISTER_PANEL'; label: string }
+	| { type: 'REGISTER_PANEL'; item: RegisteredToolsPanelItem }
 	| {
-			type: 'UPDATE_VALUE';
-			group: ToolsPanelMenuItemKey;
+			type: 'UNREGISTER_PANEL';
 			label: string;
-			value: boolean;
+			item?: RegisteredToolsPanelItem;
 	  }
+	| { type: 'UPDATE_VALUE'; label: string; value: boolean }
 	| { type: 'TOGGLE_VALUE'; label: string }
 	| { type: 'RESET_ALL' };
 
-function emptyMenuItems(): ToolsPanelMenuItems {
-	return { default: {}, optional: {} };
-}
-
 function emptyState(): PanelItemsState {
-	return { panelItems: [], menuItemOrder: [], menuItems: emptyMenuItems() };
+	return { panelItems: [], menuItemOrder: [], menuItemValues: {} };
 }
 
-const generateMenuItems = ( {
-	panelItems,
-	shouldReset,
-	currentMenuItems,
-	menuItemOrder,
-}: ToolsPanelMenuItemsConfig ) => {
-	const newMenuItems: ToolsPanelMenuItems = emptyMenuItems();
-	const menuItems: ToolsPanelMenuItems = emptyMenuItems();
+// An item is always shown while it has a value. `defaultShown` only opts an
+// optional item in when it has none.
+const getSeedValue = ( item: RegisteredToolsPanelItem ) =>
+	item.hasValue() || ( ! item.isShownByDefault && !! item.defaultShown );
 
-	panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
-		const group = isShownByDefault ? 'default' : 'optional';
-
-		// If a menu item for this label has already been flagged as customized
-		// (for default controls), or toggled on (for optional controls), do not
-		// overwrite its value as those controls would lose that state.
-		const existingItemValue = currentMenuItems?.[ group ]?.[ label ];
-		const value = existingItemValue ? existingItemValue : hasValue();
-
-		newMenuItems[ group ][ label ] = shouldReset ? false : value;
-	} );
-
-	// Loop the known, previously registered items first to maintain menu order.
-	menuItemOrder.forEach( ( key ) => {
-		if ( newMenuItems.default.hasOwnProperty( key ) ) {
-			menuItems.default[ key ] = newMenuItems.default[ key ];
-		}
-
-		if ( newMenuItems.optional.hasOwnProperty( key ) ) {
-			menuItems.optional[ key ] = newMenuItems.optional[ key ];
-		}
-	} );
-
-	// Loop newMenuItems object adding any that aren't in the known items order.
-	Object.keys( newMenuItems.default ).forEach( ( key ) => {
-		if ( ! menuItems.default.hasOwnProperty( key ) ) {
-			menuItems.default[ key ] = newMenuItems.default[ key ];
-		}
-	} );
-
-	Object.keys( newMenuItems.optional ).forEach( ( key ) => {
-		if ( ! menuItems.optional.hasOwnProperty( key ) ) {
-			menuItems.optional[ key ] = newMenuItems.optional[ key ];
-		}
-	} );
-
-	return menuItems;
-};
+const getMenuGroup = (
+	item: RegisteredToolsPanelItem
+): ToolsPanelMenuItemKey => ( item.isShownByDefault ? 'default' : 'optional' );
 
 function panelItemsReducer(
-	panelItems: ToolsPanelItem[],
+	panelItems: RegisteredToolsPanelItem[],
 	action: PanelItemsAction
 ) {
 	switch ( action.type ) {
 		case 'REGISTER_PANEL': {
-			const newItems = [ ...panelItems ];
-			// If an item with this label has already been registered, remove it
-			// first. This can happen when an item is moved between the default
-			// and optional groups.
-			const existingIndex = newItems.findIndex(
-				( oldItem ) => oldItem.label === action.item.label
+			// An existing registration is replaced rather than appended, so
+			// that an item moving between the default and optional groups
+			// doesn't end up in the list twice.
+			const existingIndex = panelItems.findIndex(
+				( item ) => item.label === action.item.label
 			);
+
+			const newItems = [ ...panelItems ];
 			if ( existingIndex !== -1 ) {
 				newItems.splice( existingIndex, 1 );
 			}
@@ -115,12 +76,17 @@ function panelItemsReducer(
 			const index = panelItems.findIndex(
 				( item ) => item.label === action.label
 			);
-			if ( index !== -1 ) {
-				const newItems = [ ...panelItems ];
-				newItems.splice( index, 1 );
-				return newItems;
+			if ( index === -1 ) {
+				return panelItems;
 			}
-			return panelItems;
+			// A replacement may already hold this label, in which case this is
+			// a late cleanup for a registration that is no longer current.
+			if ( action.item && panelItems[ index ] !== action.item ) {
+				return panelItems;
+			}
+			const newItems = [ ...panelItems ];
+			newItems.splice( index, 1 );
+			return newItems;
 		}
 		default:
 			return panelItems;
@@ -133,12 +99,11 @@ function menuItemOrderReducer(
 ) {
 	switch ( action.type ) {
 		case 'REGISTER_PANEL': {
-			// Track the initial order of item registration. This is used for
-			// maintaining menu item order later.
+			// Append-only: an item that unregisters and comes back keeps its
+			// original place in the menu.
 			if ( menuItemOrder.includes( action.item.label ) ) {
 				return menuItemOrder;
 			}
-
 			return [ ...menuItemOrder, action.item.label ];
 		}
 		default:
@@ -146,76 +111,86 @@ function menuItemOrderReducer(
 	}
 }
 
-function menuItemsReducer( state: PanelItemsState, action: PanelItemsAction ) {
+function menuItemValuesReducer(
+	state: PanelItemsState,
+	action: PanelItemsAction
+) {
+	const values = state.menuItemValues;
+
 	switch ( action.type ) {
-		case 'REGISTER_PANEL':
-		case 'UNREGISTER_PANEL':
-			// generate new menu items from original `menuItems` and updated `panelItems` and `menuItemOrder`
-			return generateMenuItems( {
-				currentMenuItems: state.menuItems,
-				panelItems: state.panelItems,
-				menuItemOrder: state.menuItemOrder,
-				shouldReset: false,
-			} );
-		case 'RESET_ALL':
-			return generateMenuItems( {
-				panelItems: state.panelItems,
-				menuItemOrder: state.menuItemOrder,
-				shouldReset: true,
-			} );
-		case 'UPDATE_VALUE': {
-			const oldValue = state.menuItems[ action.group ][ action.label ];
-			if ( action.value === oldValue ) {
-				return state.menuItems;
+		case 'REGISTER_PANEL': {
+			// A new registration starts from its own value rather than
+			// inheriting what an item it replaces recorded under the same
+			// label. Clearing here rather than on deregistration covers both
+			// orderings, since the two are not guaranteed to arrive in one.
+			// Relies on re-registering also re-reporting the value.
+			if ( ! values.hasOwnProperty( action.item.label ) ) {
+				return values;
 			}
-			return {
-				...state.menuItems,
-				[ action.group ]: {
-					...state.menuItems[ action.group ],
-					[ action.label ]: action.value,
-				},
-			};
+			const { [ action.item.label ]: unusedValue, ...rest } = values;
+			return rest;
+		}
+		case 'UPDATE_VALUE': {
+			if ( values[ action.label ] === action.value ) {
+				return values;
+			}
+			return { ...values, [ action.label ]: action.value };
 		}
 		case 'TOGGLE_VALUE': {
-			const currentItem = state.panelItems.find(
-				( item ) => item.label === action.label
+			const item = state.panelItems.find(
+				( { label } ) => label === action.label
+			);
+			if ( ! item ) {
+				return values;
+			}
+			const current = values[ action.label ] ?? getSeedValue( item );
+			return { ...values, [ action.label ]: ! current };
+		}
+		case 'RESET_ALL': {
+			// Optional items are set to false so they hide right away.
+			// Default items are left alone: a reset can leave a value in
+			// place, since `onDeselect` and `resetAllFilter` are optional and
+			// `resetAll` need not cover every attribute. Each item reports its
+			// value again if the reset changed it.
+			const hidden = state.panelItems.filter(
+				( item ) =>
+					! item.isShownByDefault && values[ item.label ] !== false
 			);
 
-			if ( ! currentItem ) {
-				return state.menuItems;
+			if ( ! hidden.length ) {
+				return values;
 			}
 
-			const menuGroup = currentItem.isShownByDefault
-				? 'default'
-				: 'optional';
-
-			const newMenuItems = {
-				...state.menuItems,
-				[ menuGroup ]: {
-					...state.menuItems[ menuGroup ],
-					[ action.label ]:
-						! state.menuItems[ menuGroup ][ action.label ],
-				},
-			};
-			return newMenuItems;
+			const next = { ...values };
+			hidden.forEach( ( { label } ) => {
+				next[ label ] = false;
+			} );
+			return next;
 		}
-
 		default:
-			return state.menuItems;
+			return values;
 	}
 }
 
 function panelReducer( state: PanelItemsState, action: PanelItemsAction ) {
 	const panelItems = panelItemsReducer( state.panelItems, action );
 	const menuItemOrder = menuItemOrderReducer( state.menuItemOrder, action );
-	// `menuItemsReducer` is a bit unusual because it generates new state from original `menuItems`
-	// and the updated `panelItems` and `menuItemOrder`.
-	const menuItems = menuItemsReducer(
-		{ panelItems, menuItemOrder, menuItems: state.menuItems },
+	const menuItemValues = menuItemValuesReducer(
+		{ ...state, panelItems },
 		action
 	);
 
-	return { panelItems, menuItemOrder, menuItems };
+	// Items dispatch far more often than they change anything. Holding onto
+	// the existing state lets React skip the render.
+	if (
+		panelItems === state.panelItems &&
+		menuItemOrder === state.menuItemOrder &&
+		menuItemValues === state.menuItemValues
+	) {
+		return state;
+	}
+
+	return { panelItems, menuItemOrder, menuItemValues };
 }
 
 function resetAllFiltersReducer(
@@ -251,45 +226,43 @@ export function useToolsPanel(
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanel' );
 
-	const isResettingRef = useRef( false );
-	const wasResetting = isResettingRef.current;
+	// Marks the render that follows a reset so items can tell a reset apart
+	// from the user switching them off. Clearing it from an effect rather than
+	// as each control updates keeps the whole reset within one pass; otherwise
+	// later controls see it already cleared and reset themselves again from
+	// stale data.
+	const [ isResetting, setIsResetting ] = useState( false );
 
-	// `isResettingRef` is cleared via this hook to effectively batch together
-	// the resetAll task. Without this, the flag is cleared after the first
-	// control updates and forces a rerender with subsequent controls then
-	// believing they need to reset, unfortunately using stale data.
 	useEffect( () => {
-		if ( wasResetting ) {
-			isResettingRef.current = false;
+		if ( isResetting ) {
+			setIsResetting( false );
 		}
-	}, [ wasResetting ] );
+	}, [ isResetting ] );
 
-	// Allow panel items to register themselves.
-	const [ { panelItems, menuItems }, panelDispatch ] = useReducer(
-		panelReducer,
-		undefined,
-		emptyState
-	);
+	const [ { panelItems, menuItemOrder, menuItemValues }, panelDispatch ] =
+		useReducer( panelReducer, undefined, emptyState );
 
-	const [ resetAllFilters, dispatchResetAllFilters ] = useReducer(
+	// Reset all filters registered against the context directly, by consumers
+	// that aren't themselves a panel item. Items supply theirs when they
+	// register.
+	const [ externalResetAllFilters, dispatchResetAllFilters ] = useReducer(
 		resetAllFiltersReducer,
 		[]
 	);
 
-	const registerPanelItem = useCallback( ( item: ToolsPanelItem ) => {
-		// Add item to panel items.
-		panelDispatch( { type: 'REGISTER_PANEL', item } );
-	}, [] );
+	const registerPanelItem = useCallback(
+		( item: RegisteredToolsPanelItem ) => {
+			panelDispatch( { type: 'REGISTER_PANEL', item } );
+		},
+		[]
+	);
 
-	// Panels need to deregister on unmount to avoid orphans in menu state.
-	// This is an issue when panel items are being injected via SlotFills.
-	const deregisterPanelItem = useCallback( ( label: string ) => {
-		// When switching selections between components injecting matching
-		// controls, e.g. both panels have a "padding" control, the
-		// deregistration of the first panel doesn't occur until after the
-		// registration of the next.
-		panelDispatch( { type: 'UNREGISTER_PANEL', label } );
-	}, [] );
+	const deregisterPanelItem = useCallback(
+		( label: string, item?: RegisteredToolsPanelItem ) => {
+			panelDispatch( { type: 'UNREGISTER_PANEL', label, item } );
+		},
+		[]
+	);
 
 	const registerResetAllFilter = useCallback( ( filter: ResetAllFilter ) => {
 		dispatchResetAllFilters( { type: 'REGISTER', filter } );
@@ -302,24 +275,38 @@ export function useToolsPanel(
 		[]
 	);
 
-	// Updates the status of the panel’s menu items. For default items the
-	// value represents whether it differs from the default and for optional
-	// items whether the item is shown.
+	// Argument order is unchanged from before this hook derived the menu; only
+	// the group argument is gone, since it follows from `isShownByDefault`.
 	const flagItemCustomization = useCallback(
-		(
-			value: boolean,
-			label: string,
-			group: ToolsPanelMenuItemKey = 'default'
-		) => {
-			panelDispatch( { type: 'UPDATE_VALUE', group, label, value } );
+		( value: boolean, label: string ) => {
+			panelDispatch( { type: 'UPDATE_VALUE', label, value } );
 		},
 		[]
 	);
 
-	// Whether all optional menu items are hidden or not must be tracked
-	// in order to later determine if the panel display is empty and handle
-	// conditional display of a plus icon to indicate the presence of further
-	// menu items.
+	// Derived during render so the panel can never paint a half-built menu.
+	// See: https://github.com/WordPress/gutenberg/pull/65564
+	const menuItems = useMemo( () => {
+		const result: ToolsPanelMenuItems = { default: {}, optional: {} };
+		const byLabel = new Map(
+			panelItems.map( ( item ) => [ item.label, item ] )
+		);
+
+		// `menuItemOrder` holds every registered label, so it alone drives
+		// the menu.
+		menuItemOrder.forEach( ( label ) => {
+			const item = byLabel.get( label );
+			if ( ! item ) {
+				return;
+			}
+			result[ getMenuGroup( item ) ][ label ] =
+				menuItemValues[ label ] ?? getSeedValue( item );
+		} );
+
+		return result;
+	}, [ panelItems, menuItemOrder, menuItemValues ] );
+
+	// Drives the plus icon and the empty panel styling.
 	const areAllOptionalControlsHidden = useMemo( () => {
 		return (
 			isMenuItemTypeEmpty( menuItems.default ) &&
@@ -338,26 +325,53 @@ export function useToolsPanel(
 		className
 	);
 
-	// Toggle the checked state of a menu item which is then used to determine
-	// display of the item within the panel.
-	const toggleItem = useCallback( ( label: string ) => {
-		panelDispatch( { type: 'TOGGLE_VALUE', label } );
-	}, [] );
+	// `onShownChange` is invoked from here rather than in response to the
+	// resulting state change, so that it only ever reports an explicit menu
+	// action by the user.
+	const toggleItem = useCallback(
+		( label: string ) => {
+			const currentItem = panelItems.find(
+				( item ) => item.label === label
+			);
 
-	// Resets display of children and executes resetAll callback if available.
+			if ( ! currentItem ) {
+				return;
+			}
+
+			panelDispatch( { type: 'TOGGLE_VALUE', label } );
+
+			// Default items stay visible when toggled off, which resets them
+			// instead of hiding them. Only optional items have a show or hide
+			// transition to report.
+			if ( currentItem.isShownByDefault ) {
+				return;
+			}
+
+			currentItem.onShownChange?.( ! menuItems.optional[ label ] );
+		},
+		[ menuItems, panelItems ]
+	);
+
+	const resetAllFilters = useMemo( () => {
+		const itemFilters = panelItems
+			.map( ( item ) => item.resetAllFilter )
+			.filter( ( filter ): filter is ResetAllFilter => !! filter );
+
+		return [ ...itemFilters, ...externalResetAllFilters ];
+	}, [ panelItems, externalResetAllFilters ] );
+
 	const resetAllItems = useCallback( () => {
 		if ( typeof resetAll === 'function' ) {
-			isResettingRef.current = true;
+			setIsResetting( true );
 			resetAll( resetAllFilters );
 		}
 
-		// Turn off display of all non-default items.
 		panelDispatch( { type: 'RESET_ALL' } );
 	}, [ resetAllFilters, resetAll ] );
 
-	// Assist ItemGroup styling when there are potentially hidden placeholder
-	// items by identifying first & last items that are toggled on for display.
-	const getFirstVisibleItemLabel = ( items: ToolsPanelItem[] ) => {
+	// Lets `ItemGroup` style the visible ends of the panel when hidden
+	// placeholder items sit among the children.
+	const getFirstVisibleItemLabel = ( items: RegisteredToolsPanelItem[] ) => {
 		const optionalItems = menuItems.optional || {};
 		const firstItem = items.find(
 			( item ) => item.isShownByDefault || optionalItems[ item.label ]
@@ -381,7 +395,7 @@ export function useToolsPanel(
 			firstDisplayedItem,
 			flagItemCustomization,
 			hasMenuItems,
-			isResetting: isResettingRef.current,
+			isResetting,
 			lastDisplayedItem,
 			menuItems,
 			panelId,
@@ -397,6 +411,7 @@ export function useToolsPanel(
 			deregisterResetAllFilter,
 			firstDisplayedItem,
 			flagItemCustomization,
+			isResetting,
 			lastDisplayedItem,
 			menuItems,
 			panelId,

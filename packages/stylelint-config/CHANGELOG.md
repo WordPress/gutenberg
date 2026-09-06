@@ -2,10 +2,17 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Upgrade the supported Stylelint versions to `stylelint ^17.14.1` and `stylelint-scss ^7.2.0`, with `@stylistic/stylelint-plugin ^5.2.1`, `stylelint-config-recommended ^18.0.0`, and `stylelint-config-recommended-scss ^17.0.1`. This changes the inherited rules, including enabling `media-type-no-deprecated` and `no-invalid-position-declaration` ([#80738](https://github.com/WordPress/gutenberg/pull/80738)).
+
+### Bug Fixes
+
+-   Fix invalid RegEx for the `@stylistic/max-line-length` rule in the `stylistic` config ([#80738](https://github.com/WordPress/gutenberg/pull/80738)).
+
 ## 24.3.0 (2026-08-26)
 
 ## 24.2.0 (2026-08-12)
-
 
 ## 24.1.0 (2026-07-29)
 

@@ -1,5 +1,5 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import {
 	Button,
 	Notice,
@@ -19,6 +19,7 @@ import {
 	__experimentalUseBlockPreview as useBlockPreview,
 } from '@wordpress/block-editor';
 import { sharedIcon } from './shared-icon';
+import { isGalleryFlexLayout } from './shared';
 import { Caption } from '../utils/caption';
 import { DEFAULT_ORDERBY, DEFAULT_ORDER, MAX_IMAGES } from './dynamic-source';
 
@@ -282,12 +283,21 @@ export function GallerySourcePanel( {
  * stays editable. This relies on the gallery's image styles using descendant
  * (not direct-child) selectors, which the box-less wrapper leaves intact.
  *
+ * The gallery's layout is passed through so the previewed images see the same
+ * parent layout that real inner blocks would (`useBlockPreview` provides it to
+ * their layout context). Without it they resolve to the default flow layout and
+ * behave as if they weren't in a gallery — most visibly, an image inside a
+ * cropped gallery would keep its baseline `height: auto` and defeat the
+ * gallery's cropping CSS.
+ *
  * @param {Object}   props
  * @param {Object[]} props.imageBlocks Non-persisted `core/image` blocks to preview.
+ * @param {Object}   props.layout      The gallery's layout, for the preview's layout context.
  */
-function GalleryImagesPreview( { imageBlocks } ) {
+function GalleryImagesPreview( { imageBlocks, layout } ) {
 	const { children, ref, className } = useBlockPreview( {
 		blocks: imageBlocks,
+		layout,
 	} );
 	return (
 		<div
@@ -353,6 +363,19 @@ export function GalleryDynamicView( {
 
 	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 
+	// The layout the previewed images sit in. Normalized the same way the
+	// gallery's own classes are (`isGalleryFlexLayout`), so a layout that the
+	// wrapper treats as flex — including a missing or typeless one — is reported
+	// as flex to the images rather than resolving to the default flow layout.
+	// Memoized because it becomes the preview's layout context value.
+	const previewLayout = useMemo(
+		() =>
+			isGalleryFlexLayout( attributes.layout )
+				? { ...attributes.layout, type: 'flex' }
+				: attributes.layout,
+		[ attributes.layout ]
+	);
+
 	// Empty-state copy for the preview. Framed as forward-looking ("… will appear
 	// here") rather than as an error, since the same empty result covers both a
 	// post with no matching images and a template with no post in context yet —
@@ -396,6 +419,7 @@ export function GalleryDynamicView( {
 					<BlockContextProvider value={ galleryContext }>
 						<GalleryImagesPreview
 							imageBlocks={ dynamicImageBlocks }
+							layout={ previewLayout }
 						/>
 					</BlockContextProvider>
 				) : (

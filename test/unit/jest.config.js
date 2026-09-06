@@ -7,17 +7,6 @@ const testMigration = require( './test-migration.json' );
  */
 const ROOT_DIR = path.resolve( __dirname, '../..' );
 
-const escapeRegExp = ( value ) =>
-	value.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
-const vitestTestPathIgnorePatterns = [
-	...testMigration.vitest.files.map(
-		( testPath ) => `<rootDir>/${ escapeRegExp( testPath ) }$`
-	),
-	...testMigration.vitest.directories.map(
-		( directoryPath ) => `<rootDir>/${ escapeRegExp( directoryPath ) }/`
-	),
-];
-
 // Ensure Babel config resolution works from the repo root,
 // even when Jest runs from the workspace directory.
 process.chdir( ROOT_DIR );
@@ -114,7 +103,6 @@ const commonProjectConfig = {
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.*/build-types/',
 		'<rootDir>/.+\\.d\\.ts$',
-		...vitestTestPathIgnorePatterns,
 	],
 	resolver: '<rootDir>/test/unit/scripts/resolver.js',
 	transform: {
@@ -139,21 +127,14 @@ module.exports = {
 	projects: [
 		{
 			...commonProjectConfig,
-			displayName: 'node',
-			testEnvironment: 'node',
-			testPathIgnorePatterns: [
-				...commonProjectConfig.testPathIgnorePatterns,
-				'\\.(?:browser|jsdom)\\.test\\.[jt]sx?$',
-			],
-		},
-		{
-			...commonProjectConfig,
 			displayName: 'jsdom',
 			testEnvironment: require.resolve( 'jest-environment-jsdom' ),
 			testEnvironmentOptions: {
 				url: 'http://localhost/',
 			},
-			testMatch: [ '**/*.jsdom.test.[jt]s?(x)' ],
+			testMatch: testMigration.jest.files.map(
+				( testPath ) => `<rootDir>/${ testPath }`
+			),
 		},
 	],
 	watchPlugins: [

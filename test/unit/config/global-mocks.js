@@ -2,6 +2,8 @@ import { TextDecoder, TextEncoder } from 'node:util';
 import { Blob as BlobPolyfill, File as FilePolyfill } from 'node:buffer';
 import timezoneMock from 'timezone-mock';
 
+globalThis.wpJest = jest;
+
 /**
  * Configure timezone-mock to handle Date subclasses (like UTCDateMini) correctly.
  * MockDate constructor normally rejects object arguments, but date-fns v4

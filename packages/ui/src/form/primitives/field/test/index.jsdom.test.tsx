@@ -78,4 +78,16 @@ describe( 'Field', () => {
 
 		expect( screen.getByRole( 'link', { name: 'Details' } ) ).toBeVisible();
 	} );
+
+	it( 'forwards ref on Field.VisualLabel', () => {
+		const visualLabelRef = createRef< HTMLSpanElement >();
+
+		render(
+			<Field.VisualLabel ref={ visualLabelRef }>
+				Visual label
+			</Field.VisualLabel>
+		);
+
+		expect( visualLabelRef.current ).toBeInstanceOf( HTMLSpanElement );
+	} );
 } );

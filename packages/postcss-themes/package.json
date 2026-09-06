@@ -35,6 +35,9 @@
 		".": "./index.js",
 		"./package.json": "./package.json"
 	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"peerDependencies": {
 		"postcss": "^8.0.0"
 	},

@@ -66,14 +66,31 @@ exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and
       },
       "description": "A link to a category.",
       "icon": <SVG
-        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        style={
+          {
+            "fill": "none",
+          }
+        }
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >
         <Path
-          clipRule="evenodd"
-          d="M6 5.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM4 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm11-.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5h-3a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM13 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2h-3a2 2 0 01-2-2V6zm5 8.5h-3a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-3a.5.5 0 00-.5-.5zM15 13a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2v-3a2 2 0 00-2-2h-3zm-9 1.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5v-3a.5.5 0 01.5-.5zM4 15a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H6a2 2 0 01-2-2v-3z"
-          fillRule="evenodd"
+          d="M4.75 6C4.75 5.30964 5.30964 4.75 6 4.75H9C9.69036 4.75 10.25 5.30964 10.25 6V9C10.25 9.69036 9.69036 10.25 9 10.25H6C5.30964 10.25 4.75 9.69036 4.75 9V6Z"
+          vectorEffect="non-scaling-stroke"
+        />
+        <Path
+          d="M4.75 15C4.75 14.3096 5.30964 13.75 6 13.75H9C9.69036 13.75 10.25 14.3096 10.25 15V18C10.25 18.6904 9.69036 19.25 9 19.25H6C5.30964 19.25 4.75 18.6904 4.75 18V15Z"
+          vectorEffect="non-scaling-stroke"
+        />
+        <Path
+          d="M13.75 6C13.75 5.30964 14.3096 4.75 15 4.75H18C18.6904 4.75 19.25 5.30964 19.25 6V9C19.25 9.69036 18.6904 10.25 18 10.25H15C14.3096 10.25 13.75 9.69036 13.75 9V6Z"
+          vectorEffect="non-scaling-stroke"
+        />
+        <Path
+          d="M13.75 15C13.75 14.3096 14.3096 13.75 15 13.75H18C18.6904 13.75 19.25 14.3096 19.25 15V18C19.25 18.6904 18.6904 19.25 18 19.25H15C14.3096 19.25 13.75 18.6904 13.75 18V15Z"
+          vectorEffect="non-scaling-stroke"
         />
       </SVG>,
       "isActive": [Function],

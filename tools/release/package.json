@@ -35,6 +35,9 @@
 		"simple-git": "^3.32.3",
 		"sprintf-js": "^1.1.1"
 	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	},
