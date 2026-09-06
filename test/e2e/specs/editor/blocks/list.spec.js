@@ -1107,7 +1107,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=document[name="Add default block"i]' )
+			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( '* a' );
