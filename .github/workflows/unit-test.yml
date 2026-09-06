@@ -56,6 +56,24 @@ jobs:
                           # Other workflows, and everything under .github that this one does not use.
                           - '!.github/{*,!(workflows|setup-node|setup-playwright)/**,workflows/!(unit-test.yml)}'
 
+    svn-release:
+        name: SVN release recovery
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+                  sparse-checkout: tools/release
+
+            - name: Install Subversion
+              run: sudo apt-get update -y && sudo apt-get install -y subversion
+
+            - name: Test SVN publication and recovery
+              run: bash tools/release/test/publish-to-svn.sh
+
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: 'ubuntu-24.04'
