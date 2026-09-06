@@ -1,0 +1,24 @@
+import type { FontFamily, FontFace } from '@wordpress/core-data';
+import { kebabCase } from '@wordpress/kebab-case';
+
+export default function makeFamiliesFromFaces(
+	fontFaces: FontFace[]
+): FontFamily[] {
+	const fontFamiliesObject = fontFaces.reduce(
+		( acc: Record< string, FontFamily >, item: FontFace ) => {
+			if ( ! acc[ item.fontFamily ] ) {
+				acc[ item.fontFamily ] = {
+					name: item.fontFamily,
+					fontFamily: item.fontFamily,
+					slug: kebabCase( item.fontFamily.toLowerCase() ),
+					fontFace: [],
+				};
+			}
+			// @ts-expect-error `acc[ item.fontFamily ]` is possibly `undefined`.
+			acc[ item.fontFamily ].fontFace.push( item );
+			return acc;
+		},
+		{}
+	);
+	return Object.values( fontFamiliesObject ) as FontFamily[];
+}

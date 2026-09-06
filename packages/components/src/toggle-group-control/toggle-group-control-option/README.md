@@ -1,8 +1,6 @@
 # `ToggleGroupControlOption`
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 `ToggleGroupControlOption` is a form component and is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md).
 
@@ -16,13 +14,7 @@ import {
 
 function Example() {
 	return (
-		<ToggleGroupControl
-			label="my label"
-			value="vertical"
-			isBlock
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
-		>
+		<ToggleGroupControl label="my label" value="vertical" isBlock>
 			<ToggleGroupControlOption
 				value="horizontal"
 				label="Horizontal"
@@ -53,3 +45,10 @@ The value of the `ToggleGroupControlOption`.
 Whether to show a tooltip when hovering over the option. The tooltip will attempt to use the `aria-label` prop text first, then the `label` prop text if no `aria-label` prop is found.
 
 -   Required: No
+
+### `disabled`: `boolean`
+
+If true, this option is unselectable.
+
+-   Required: No
+-   Default: `false`

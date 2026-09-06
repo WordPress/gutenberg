@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { symbol as icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';

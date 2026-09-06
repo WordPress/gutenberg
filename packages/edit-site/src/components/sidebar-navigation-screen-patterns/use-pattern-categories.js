@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import useDefaultPatternCategories from './use-default-pattern-categories';
 import useThemePatterns from './use-theme-patterns';
 import usePatterns from '../page-patterns/use-patterns';

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createInterpolateElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { escapeRegExp } from '../utils/strings';
 import type { TextHighlightProps } from './types';
 
@@ -41,5 +34,7 @@ export const TextHighlight = ( props: TextHighlightProps ) => {
 		mark: <mark />,
 	} );
 };
+
+TextHighlight.displayName = 'TextHighlight';
 
 export default TextHighlight;

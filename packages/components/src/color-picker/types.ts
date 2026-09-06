@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type {
 	Colord,
 	HslColor,
@@ -10,9 +7,6 @@ import type {
 	RgbColor,
 } from 'colord';
 import type { HslaColor } from 'react-colorful';
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import type { useDeprecatedProps } from './use-deprecated-props';
 
@@ -56,15 +50,19 @@ export type ColorPickerProps = WordPressComponentProps<
 >;
 
 export interface PickerProps {
-	color: Colord;
+	hsla: HslaColor;
 	enableAlpha: boolean;
-	onChange: ( nextColor: Colord ) => void;
+	onChange: ( nextHsla: HslaColor ) => void;
+	onInteractionStart?: () => void;
+	onInteractionEnd?: () => void;
 }
 
 export interface ColorInputProps {
 	colorType: 'hsl' | 'hex' | 'rgb';
 	color: Colord;
+	hsla: HslaColor;
 	onChange: ( nextColor: Colord ) => void;
+	onHSLChange: ( nextHsla: HslaColor ) => void;
 	enableAlpha: boolean;
 }
 
@@ -84,8 +82,8 @@ export interface HexInputProps {
 }
 
 export interface HslInputProps {
-	color: Colord;
-	onChange: ( nextColor: Colord ) => void;
+	hsla: HslaColor;
+	onChange: ( nextHsla: HslaColor ) => void;
 	enableAlpha: boolean;
 }
 

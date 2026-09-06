@@ -1,4 +1,8 @@
-$actions-height: 92px;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+$actions-height: 72px;
 
 .editor-start-page-options__modal {
 	.editor-start-page-options__modal__actions {
@@ -7,12 +11,13 @@ $actions-height: 92px;
 		width: 100%;
 		height: $actions-height;
 		background-color: $white;
-		margin-left: - $grid-unit-40;
-		margin-right: - $grid-unit-40;
-		padding-left: $grid-unit-40;
-		padding-right: $grid-unit-40;
+		margin-left: - $grid-unit-30;
+		margin-right: - $grid-unit-30;
+		padding-left: $grid-unit-30;
+		padding-right: $grid-unit-30;
 		border-top: 1px solid $gray-300;
-		z-index: z-index(".editor-start-page-options__modal__actions");
+		// Ensure modal footer actions appear above the modal's scrolling content.
+		z-index: 1;
 	}
 
 	.block-editor-block-patterns-list {

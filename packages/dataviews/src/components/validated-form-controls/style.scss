@@ -1,0 +1,53 @@
+%red-focus-ring {
+	--focus-color: var(--wpds-color-stroke-interactive-error);
+}
+
+%red-error-border {
+	@extend %red-focus-ring;
+
+	border-color: var(--wpds-color-stroke-interactive-error);
+}
+
+.dataviews-validated-control {
+	// For components based on InputBase
+	&:has(:is(input, select):invalid[data-validity-visible]) {
+		.components-input-control__backdrop {
+			@extend %red-error-border;
+		}
+	}
+
+	// For ComboboxControl
+	.components-combobox-control__suggestions-container {
+		&:has(input:invalid[data-validity-visible]) {
+			&:not(:has([aria-expanded="true"])) {
+				@extend %red-error-border;
+			}
+		}
+	}
+}
+
+.dataviews-validated-control__wrapper-with-error-delegate {
+	position: relative;
+
+	// For FormTokenField
+	&:has(input:invalid[data-validity-visible])
+		.components-form-token-field__input-container:not(
+			:has([aria-expanded="true"])
+		) {
+		@extend %red-error-border;
+	}
+
+	// For ToggleGroupControl
+	&:has(input[type="radio"]:invalid[data-validity-visible]) {
+		@extend %red-focus-ring;
+	}
+}
+
+.dataviews-validated-control__error-delegate {
+	position: absolute;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	opacity: 0;
+	pointer-events: none;
+}

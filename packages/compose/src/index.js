@@ -7,6 +7,9 @@ export * from './utils/throttle';
 // The `ObservableMap` data structure
 export * from './utils/observable-map';
 
+// Private APIs.
+export { privateApis } from './private-apis';
+
 // The `compose` and `pipe` helpers (inspired by `flowRight` and `flow` from Lodash).
 export { default as compose } from './higher-order/compose';
 export { default as pipe } from './higher-order/pipe';
@@ -27,7 +30,7 @@ export { default as __experimentalUseDialog } from './hooks/use-dialog';
 export { default as useDisabled } from './hooks/use-disabled';
 export { default as useEvent } from './hooks/use-event';
 export { default as __experimentalUseDragging } from './hooks/use-dragging';
-export { default as useFocusOnMount } from './hooks/use-focus-on-mount';
+export { useFocusOnMount } from './hooks/use-focus-on-mount';
 export { default as __experimentalUseFocusOutside } from './hooks/use-focus-outside';
 export { default as useFocusReturn } from './hooks/use-focus-return';
 export { default as useInstanceId } from './hooks/use-instance-id';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 // The `timezone` setting exposed via REST API only accepts `UTC`
@@ -11,6 +8,7 @@ test.describe( 'Scheduling', () => {
 	TIMEZONES.forEach( ( timezone ) => {
 		test.describe( `Timezone ${ timezone }`, () => {
 			let originalTimezone;
+
 			test.beforeAll( async ( { requestUtils } ) => {
 				originalTimezone = ( await requestUtils.getSiteSettings() )
 					.timezone;

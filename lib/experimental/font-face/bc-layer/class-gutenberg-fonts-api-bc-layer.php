@@ -5,7 +5,7 @@
  * BACKPORT NOTE: Do not backport this file to Core.
  * This file is now part of the API's Backwards-Compatibility (BC) layer.
  *
- * @package    Gutenberg
+ * @package    gutenberg
  * @subpackage Fonts API
  * @since      15.7.0
  */

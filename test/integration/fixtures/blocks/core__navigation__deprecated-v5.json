@@ -4,8 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"showSubmenuIcon": true,
-			"openSubmenusOnClick": false,
 			"overlayMenu": "never",
+			"submenuVisibility": "hover",
 			"layout": {
 				"type": "flex",
 				"justifyContent": "center",

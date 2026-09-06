@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { UploadError } from './upload-error';
 
 /**
@@ -15,7 +8,7 @@ import { UploadError } from './upload-error';
  * @param allowedTypes List of allowed mime types.
  */
 export function validateMimeType( file: File, allowedTypes?: string[] ) {
-	if ( ! allowedTypes ) {
+	if ( ! allowedTypes || allowedTypes.includes( '*' ) ) {
 		return;
 	}
 

@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { capitalCase } from 'change-case';
 import type { Page } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import type { PageUtils } from './';
 import { modifiers as baseModifiers, SHIFT, ALT, CTRL } from './keycodes';
 
@@ -24,7 +17,6 @@ let clipboardDataHolder: {
  * Sets the clipboard data that can be pasted with
  * `pressKeys( 'primary+v' )`.
  *
- * @param this
  * @param clipboardData
  * @param clipboardData.plainText
  * @param clipboardData.html
@@ -44,7 +36,7 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 	const output = await page.evaluate(
 		( [ _type, _clipboardData ] ) => {
 			const canvasDoc =
-				// @ts-ignore
+				// @ts-expect-error `activeElement` is typed as `Element`, which does not declare `contentDocument`.
 				document.activeElement?.contentDocument ?? document;
 			const event = new ClipboardEvent( _type, {
 				bubbles: true,

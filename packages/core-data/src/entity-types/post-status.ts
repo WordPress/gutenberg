@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Context, OmitNevers } from './helpers';
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
@@ -52,5 +49,5 @@ declare module './base-entity-records' {
 }
 
 export type PostStatusObject< C extends Context = 'edit' > = OmitNevers<
-	_BaseEntityRecords.Type< C >
+	_BaseEntityRecords.PostStatusObject< C >
 >;

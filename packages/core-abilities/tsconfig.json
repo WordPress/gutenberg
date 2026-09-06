@@ -1,0 +1,13 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"declarationDir": "build-types",
+		"rootDir": "src"
+	},
+	"references": [
+		{ "path": "../abilities/tsconfig.build.json" },
+		{ "path": "../api-fetch/tsconfig.build.json" },
+		{ "path": "../url" }
+	],
+	"include": [ "src/**/*" ]
+}

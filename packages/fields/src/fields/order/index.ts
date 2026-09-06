@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../../types';
 
 const orderField: Field< BasePost > = {
@@ -15,6 +8,9 @@ const orderField: Field< BasePost > = {
 	label: __( 'Order' ),
 	description: __( 'Determines the order of pages.' ),
 	filterBy: false,
+	isValid: {
+		required: true,
+	},
 };
 
 /**

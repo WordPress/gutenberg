@@ -1,8 +1,6 @@
-/**
- * Internal dependencies
- */
-const engine = require( '../lib/engine' );
-const getExportEntries = require( '../lib/get-export-entries' );
+import { describe, expect, it } from 'vitest';
+import engine from '../lib/engine';
+import getExportEntries from '../lib/get-export-entries';
 
 /**
  * Parses sample code into testable structure.
@@ -114,9 +112,6 @@ describe( 'Export entries', () => {
 	it( 'default import (named)', () => {
 		const testCode = firstExport(
 			`
-			/**
-			 * Internal dependencies
-			 */
 			import { functionDeclaration as fnDeclaration } from './module-code';
 
 			export default fnDeclaration;
@@ -143,9 +138,6 @@ describe( 'Export entries', () => {
 		expect(
 			firstExport(
 				`
-				/**
-				 * Internal dependencies
-				 */
 				import fnDeclaration from './module-code';
 
 				export default fnDeclaration;
@@ -406,9 +398,6 @@ describe( 'Export entries', () => {
 		expect(
 			firstExport(
 				`
-				/**
-				 * Internal dependencies
-				 */
 				import * as variables from './module-code';
 
 				export { variables };
@@ -499,6 +488,32 @@ describe( 'Export entries', () => {
 				localName: '*',
 				exportName: null,
 				module: './module-code',
+			} ),
+		] );
+	} );
+
+	it( 're-exporting node module for external use', () => {
+		expect(
+			firstExport(
+				`
+				export * as Y from 'yjs';
+			`,
+				`
+				/**
+				 * Exports the entire API of Yjs.
+				 *
+				 * @module yjs
+				 */
+				export { Doc, Transaction, YArray as Array, YMap as Map, YText as Text, YXmlText as XmlText, YXmlHook as XmlHook, YXmlElement as XmlElement, YXmlFragment as XmlFragment, YXmlEvent, YMapEvent, YArrayEvent, YTextEvent, YEvent, Item, AbstractStruct, GC, Skip, ContentBinary, ContentDeleted, ContentDoc, ContentEmbed, ContentFormat, ContentJSON, ContentAny, ContentString, ContentType, AbstractType, getTypeChildren, createRelativePositionFromTypeIndex, createRelativePositionFromJSON, createAbsolutePositionFromRelativePosition, compareRelativePositions, AbsolutePosition, RelativePosition, ID, createID, compareIDs, getState, Snapshot, createSnapshot, createDeleteSet, createDeleteSetFromStructStore, cleanupYTextFormatting, snapshot, emptySnapshot, findRootTypeKey, findIndexSS, getItem, getItemCleanStart, getItemCleanEnd, typeListToArraySnapshot, typeMapGetSnapshot, typeMapGetAllSnapshot, createDocFromSnapshot, iterateDeletedStructs, applyUpdate, applyUpdateV2, readUpdate, readUpdateV2, encodeStateAsUpdate, encodeStateAsUpdateV2, encodeStateVector, UndoManager, decodeSnapshot, encodeSnapshot, decodeSnapshotV2, encodeSnapshotV2, decodeStateVector, logUpdate, logUpdateV2, decodeUpdate, decodeUpdateV2, relativePositionToJSON, isDeleted, isParentOf, equalSnapshots, PermanentUserData, tryGc, transact, AbstractConnector, logType, mergeUpdates, mergeUpdatesV2, parseUpdateMeta, parseUpdateMetaV2, encodeStateVectorFromUpdate, encodeStateVectorFromUpdateV2, encodeRelativePosition, decodeRelativePosition, diffUpdate, diffUpdateV2, convertUpdateFormatV1ToV2, convertUpdateFormatV2ToV1, obfuscateUpdate, obfuscateUpdateV2, UpdateEncoderV1, UpdateEncoderV2, UpdateDecoderV1, UpdateDecoderV2, equalDeleteSets, mergeDeleteSets, snapshotContainsUpdate } from "./internals.js";
+			`
+			)
+		).toEqual( [
+			expect.objectContaining( {
+				lineStart: 1,
+				lineEnd: 1,
+				localName: undefined,
+				exportName: 'Y',
+				module: 'yjs',
 			} ),
 		] );
 	} );

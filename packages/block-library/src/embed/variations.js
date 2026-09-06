@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import {
 	embedContentIcon,
 	embedAudioIcon,
@@ -48,10 +41,10 @@ function getTitle( providerName ) {
 const variations = [
 	{
 		name: 'twitter',
-		title: getTitle( 'Twitter' ),
+		title: getTitle( 'X' ),
 		icon: embedTwitterIcon,
-		keywords: [ 'tweet', __( 'social' ) ],
-		description: __( 'Embed a tweet.' ),
+		keywords: [ 'x', 'twitter', 'tweet', __( 'social' ) ],
+		description: __( 'Embed an X post.' ),
 		patterns: [ /^https?:\/\/(www\.)?twitter\.com\/.+/i ],
 		attributes: { providerNameSlug: 'twitter', responsive: true },
 	},

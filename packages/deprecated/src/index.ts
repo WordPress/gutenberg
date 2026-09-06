@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { doAction } from '@wordpress/hooks';
 
 /**

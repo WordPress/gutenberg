@@ -67,7 +67,7 @@
 			data-testid="multiple handlers button"
 			data-wp-on--click="actions.setClicked"
 			data-wp-on--click--counter="actions.countClick"
-			data-wp-on--click--toggle="actions.toggle"
+			data-wp-on--click---toggle="actions.toggle"
 		>Click me!</button>
 	</div>
 </div>

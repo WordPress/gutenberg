@@ -1,0 +1,9 @@
+import { Meta, Markdown } from '@storybook/addon-docs/blocks';
+import WidgetHostDoc from './widget-host.md?raw';
+import widgetHostSeam from './assets/widget-host-seam.svg';
+
+<Meta title="Widget Primitives/Widget Host" />
+
+<Markdown>
+	{ WidgetHostDoc.replace( './assets/widget-host-seam.svg', widgetHostSeam ) }
+</Markdown>

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import migrateFontFamily from '../utils/migrate-font-family';
 
 const v1 = {

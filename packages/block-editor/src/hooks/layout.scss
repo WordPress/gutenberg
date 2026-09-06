@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-hooks__layout-constrained {
 	.components-base-control {
 		margin-bottom: 0; // Cancel out margins added by block inspector
@@ -8,6 +11,12 @@
 	color: $gray-700;
 	font-size: $helptext-font-size;
 	margin-bottom: 0; // Cancel out margins added by common.css
+}
+
+.layout-block-support-panel {
+	.block-editor-hooks__flex-layout-controls {
+		grid-column: 1 / -1;
+	}
 }
 
 .block-editor-hooks__flex-layout-justification-controls,

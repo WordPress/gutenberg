@@ -1,0 +1,41 @@
+[
+	{
+		"name": "core/comment-edit-link",
+		"isValid": true,
+		"attributes": {
+			"linkTarget": "_self",
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/comment-edit-link",
+		"isValid": true,
+		"attributes": {
+			"linkTarget": "_self",
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/comment-edit-link",
+		"isValid": true,
+		"attributes": {
+			"linkTarget": "_self",
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

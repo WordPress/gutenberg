@@ -1,0 +1,91 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as UsageGuidelinesStories from './usage-guidelines.story';
+
+<Meta of={ UsageGuidelinesStories } />
+
+# Tooltip usage guidelines
+
+## Usage guidelines
+
+-   **Use tooltips as visual labels only.** Tooltips should act as
+    supplementary visual labels for sighted mouse and keyboard users.
+    Tooltip popups are not exposed to assistive technologies — the
+    trigger's accessible name (e.g. `aria-label`) is what provides the
+    label for screen reader users.
+    See [_Alternatives to tooltips_](#alternatives-to-tooltips) below for
+    more details.
+-   **Provide an accessible name for the trigger.** Tooltips are visual-only
+    elements and are not a replacement for labeling the trigger. The
+    tooltip's trigger must have an `aria-label` that matches or is a concise
+    equivalent of the tooltip's content to ensure consistency for screen
+    reader users. If the tooltip also displays a keyboard shortcut, use
+    `aria-keyshortcuts` on the trigger.
+
+<Canvas of={ UsageGuidelinesStories.RecommendedUsage } />
+
+`IconButton` has built-in tooltip support via the `label` prop, making it
+the easiest way to provide a tooltip for icon-only actions.
+
+<Canvas of={ UsageGuidelinesStories.IconButtonWithTooltip } />
+
+## Alternatives to tooltips
+
+Tooltips should be supplementary popups that provide non-essential clarity in
+high-density UIs. A user should not miss critical information if they never
+see a tooltip.
+
+Tooltips don't work well with touch input. Unlike mouse pointers with hover
+capability, there's no easily discoverable way to reveal a tooltip before
+tapping its trigger on a touch device.
+
+iOS doesn't provide a system-standard, touch-friendly tooltip affordance,
+while Android may show a tooltip on long press. However, on the web,
+long press is often used to trigger contextual menus in the browser, which
+can lead to potential conflicts. For this reason, tooltips are disabled on
+touch devices.
+
+### Infotips
+
+Popups that open when hovering an info icon should use
+[Popover](?path=/docs/design-system-components-popover--docs) with the
+`openOnHover` prop on the trigger instead of a tooltip. This way, touch
+users and screen reader users can access the content.
+
+To know when to reach for a popover instead of a tooltip, consider the
+**purpose** of the trigger element: if the trigger's purpose is to open the
+popup itself, it's a popover. If the trigger's purpose is unrelated to
+opening the popup, it's a tooltip.
+
+<Canvas of={ UsageGuidelinesStories.InfotipWithPopover } />
+
+See also the [Popover Infotip story](?path=/story/design-system-components-popover--infotip).
+
+Infotips opened on hover can be dismissed by pressing `Escape`.
+
+### Description text
+
+Tooltips are designed for sighted mouse and keyboard users and are not a reliable way to deliver
+important information to touch users or assistive technologies. If the
+description is important to understanding the element, don't hide it behind a
+tooltip — use inline text or
+[Popover](?path=/docs/design-system-components-popover--docs) if space is
+limited, so the information is accessible to everyone.
+
+Since tooltips serve sighted mouse and keyboard users, iconography should
+clearly communicate the purpose of icon-only triggers, especially on mobile
+where the text label may not be visible.
+
+If the description is not critical, a tooltip can still be used to provide
+extra clarity for sighted mouse or keyboard users.
+
+### Contextual feedback messages
+
+For contextual feedback after an action (e.g. "Copied!"), prefer a pattern
+that ensures the message is announced to screen readers and supports complex
+content, such as a
+[Notice](?path=/docs/design-system-components-notice--docs).
+
+## References
+
+-   [WCAG 1.4.13: Content on Hover or Focus](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html) — tooltips must be dismissible (Escape), hoverable, and persistent.
+-   [WAI-ARIA APG: Tooltip pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/) — note that this component intentionally diverges from the traditional `role="tooltip"` + `aria-describedby` pattern. The trigger's `aria-label` is the source of truth for assistive technologies, and the tooltip popup is a visual-only supplement.

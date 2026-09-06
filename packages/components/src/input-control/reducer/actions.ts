@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { SyntheticEvent } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { DragProps } from '../types';
 
 export const CHANGE = 'CHANGE';

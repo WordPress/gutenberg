@@ -6,7 +6,7 @@ Prior to the block editor, custom meta boxes were used to extend the editor. Now
 
 The block editor does support most existing meta boxes, see [the backward compatibility section below](#backward-compatibility) for details .
 
-If you are interested in working with the post meta outside the editor, check out the [Sidebar Tutorial](/docs/how-to-guides/sidebar-tutorial/plugin-sidebar-0.md).
+If you are interested in working with the post meta outside the editor, check out the [Sidebar Tutorial](/docs/how-to-guides/plugin-sidebar-0.md).
 
 ### Use blocks to store meta
 
@@ -91,8 +91,6 @@ registerBlockType( 'myguten/meta-block', {
 		return (
 			<div { ...blockProps }>
 				<TextControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize				
 					label="Meta Block Field"
 					value={ metaFieldValue }
 					onChange={ updateMetaValue }

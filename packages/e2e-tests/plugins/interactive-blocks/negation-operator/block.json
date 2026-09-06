@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "test/negation-operator",
 	"title": "E2E Interactivity tests - negation operator",
 	"category": "text",

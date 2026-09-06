@@ -1,55 +1,37 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import { ControlWithError } from '../control-with-error';
+import deprecated from '@wordpress/deprecated';
+import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 import TextareaControl from '../../textarea-control';
-import type { TextareaControlProps } from '../../textarea-control/types';
-
-type Value = TextareaControlProps[ 'value' ];
 
 const UnforwardedValidatedTextareaControl = (
 	{
 		required,
-		customValidator,
-		onChange,
+		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof TextareaControl >,
-		'__nextHasNoMarginBottom'
-	> &
-		ValidatedControlProps< Value >,
+	}: React.ComponentProps< typeof TextareaControl > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLTextAreaElement >
 ) => {
+	deprecated( 'wp.components.privateApis.ValidatedTextareaControl', {
+		since: '7.2',
+		alternative: 'ValidatedTextareaControl from @wordpress/ui',
+		hint: 'This private API will be completely removed within a few Gutenberg plugin releases.',
+	} );
+
 	const validityTargetRef = useRef< HTMLTextAreaElement >( null );
 	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
-	const valueRef = useRef< Value >( restProps.value );
 
 	return (
 		<ControlWithError
+			className="components-validated-control"
 			required={ required }
 			markWhenOptional={ markWhenOptional }
-			customValidator={ () => {
-				return customValidator?.( valueRef.current );
-			} }
+			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<TextareaControl
-				__nextHasNoMarginBottom
-				ref={ mergedRefs }
-				onChange={ ( value ) => {
-					valueRef.current = value;
-					onChange?.( value );
-				} }
-				{ ...restProps }
-			/>
+			<TextareaControl ref={ mergedRefs } { ...restProps } />
 		</ControlWithError>
 	);
 };
@@ -57,3 +39,4 @@ const UnforwardedValidatedTextareaControl = (
 export const ValidatedTextareaControl = forwardRef(
 	UnforwardedValidatedTextareaControl
 );
+ValidatedTextareaControl.displayName = 'ValidatedTextareaControl';

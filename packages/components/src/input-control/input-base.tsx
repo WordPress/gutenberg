@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Backdrop from './backdrop';
 import Label from './label';
 import { Container, Root, Prefix, Suffix } from './styles/input-control-styles';
@@ -22,7 +11,6 @@ import {
 	contextConnect,
 	useContextSystem,
 } from '../context';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputBase );
@@ -63,7 +51,6 @@ function InputBase(
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const {
-		__next40pxDefaultSize,
 		__unstableInputWidth,
 		children,
 		className,
@@ -77,19 +64,17 @@ function InputBase(
 		size = 'default',
 		suffix,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp(
-		useContextSystem( props, 'InputBase' )
-	);
+	} = useContextSystem( props, 'InputBase' );
 
 	const id = useUniqueId( idProp );
 	const hideLabel = hideLabelFromVision || ! label;
 
 	const prefixSuffixContextValue = useMemo( () => {
 		return {
-			InputControlPrefixWrapper: { __next40pxDefaultSize, size },
-			InputControlSuffixWrapper: { __next40pxDefaultSize, size },
+			InputControlPrefixWrapper: { size },
+			InputControlSuffixWrapper: { size },
 		};
-	}, [ __next40pxDefaultSize, size ] );
+	}, [ size ] );
 
 	return (
 		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.

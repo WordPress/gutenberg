@@ -1,0 +1,22 @@
+<!--
+	Global preview iframe CSS (this file is injected for every story).
+
+	Intentional blast radius: styles apply to the whole monorepo canvas (see
+	storybook/main.ts), not only @wordpress/ui, so any package's portaled overlays
+	get predictable layout: relative positioning on body and a stacking boundary
+	on the preview root. Matches @wordpress/ui README guidance for using the
+	library outside the standard editor ("Elsewhere").
+
+	#storybook-root is Storybook's preview mount target; if a future Storybook major
+	changes the DOM, update this selector. isolation: isolate creates a stacking
+	context (z-index / compositing) for descendants and portaled layers.
+-->
+<style>
+	body {
+		position: relative;
+	}
+
+	#storybook-root {
+		isolation: isolate;
+	}
+</style>

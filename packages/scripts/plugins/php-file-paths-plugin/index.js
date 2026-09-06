@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const { validate } = require( 'schema-utils' );
-
-/**
- * Internal dependencies
- */
 const { getPhpFilePaths } = require( '../../utils' );
 
 const phpFilePathsPluginSchema = {

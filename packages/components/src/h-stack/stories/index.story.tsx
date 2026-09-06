@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
-import type { StoryFn, Meta } from '@storybook/react';
-/**
- * Internal dependencies
- */
+import type { StoryFn, Meta } from '@storybook/react-vite';
 import { View } from '../../view';
 import { HStack } from '..';
 
@@ -42,8 +36,8 @@ const JUSTIFICATIONS = {
 
 const meta: Meta< typeof HStack > = {
 	component: HStack,
-	title: 'Components (Experimental)/Layout/HStack',
-	id: 'components-experimental-hstack',
+	title: 'Components/Layout/HStack',
+	id: 'components-hstack',
 	argTypes: {
 		as: {
 			control: false,
@@ -70,9 +64,15 @@ const meta: Meta< typeof HStack > = {
 			control: { type: 'text' },
 		},
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`Stack`](?path=/docs/design-system-components-stack--docs) from `@wordpress/ui` instead.',
+		},
 	},
 };
 export default meta;

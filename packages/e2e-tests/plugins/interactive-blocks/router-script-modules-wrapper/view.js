@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, getElement } from '@wordpress/interactivity';
 
 const { state } = store( 'test/router-script-modules', {

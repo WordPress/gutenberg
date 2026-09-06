@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ItemProps } from '../types';
 import { useItem } from './hook';
 import type { WordPressComponentProps } from '../../context';

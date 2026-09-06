@@ -1,2 +1,3 @@
-@import "./blocks/legacy-widget/editor.scss";
-@import "./blocks/widget-group/editor.scss";
+@use "@wordpress/base-styles/default-custom-properties";
+@use "./blocks/legacy-widget/editor.scss" as *;
+@use "./blocks/widget-group/editor.scss" as *;

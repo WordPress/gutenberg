@@ -1,0 +1,41 @@
+{
+	"wpds-border": {
+		"radius": {
+			"xs": {
+				"$type": "dimension",
+				"$value": {
+					"value": 6,
+					"unit": "px"
+				}
+			},
+			"sm": {
+				"$type": "dimension",
+				"$value": {
+					"value": 8,
+					"unit": "px"
+				}
+			},
+			"md": {
+				"$type": "dimension",
+				"$value": {
+					"value": 12,
+					"unit": "px"
+				}
+			},
+			"lg": {
+				"$type": "dimension",
+				"$value": {
+					"value": 16,
+					"unit": "px"
+				}
+			},
+			"xl": {
+				"$type": "dimension",
+				"$value": {
+					"value": 20,
+					"unit": "px"
+				}
+			}
+		}
+	}
+}

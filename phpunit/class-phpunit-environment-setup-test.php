@@ -2,7 +2,7 @@
 /**
  * Tests that the environment is configured as expected.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class Phpunit_Environment_Setup_Test extends WP_UnitTestCase {

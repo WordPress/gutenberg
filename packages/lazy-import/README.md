@@ -77,7 +77,7 @@ try {
 -   Type: `string`
 -   Required: No
 
-Local path pointing to a file or directory that can be used when other script that `main` needs to be imported.
+Local path pointing to a file or directory that can be used when other script than `main` needs to be imported.
 
 #### `onInstall`
 

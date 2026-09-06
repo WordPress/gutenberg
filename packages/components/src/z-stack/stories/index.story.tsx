@@ -1,28 +1,27 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { Elevation } from '../../elevation';
 import { View } from '../../view';
 import { ZStack } from '..';
 
 const meta: Meta< typeof ZStack > = {
 	component: ZStack,
-	title: 'Components (Experimental)/ZStack',
+	title: 'Components/ZStack',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		children: { control: false },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation. Write your own CSS instead.',
+		},
 	},
 };
 export default meta;

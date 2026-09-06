@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, test } from 'vitest';
 import {
 	serializeGradientColor,
 	serializeGradientPosition,
@@ -24,6 +22,27 @@ describe( 'It should serialize a gradient', () => {
 				value: [ '255', '0', '0' ],
 			} )
 		).toBe( 'rgb(255,0,0)' );
+
+		expect(
+			serializeGradientColor( {
+				type: 'hsl',
+				value: [ '1', '2', '3' ],
+			} )
+		).toBe( 'hsl(1,2%,3%)' );
+
+		expect(
+			serializeGradientColor( {
+				type: 'hsla',
+				value: [ '1', '2', '3', '0.5' ],
+			} )
+		).toBe( 'hsla(1,2%,3%,0.5)' );
+
+		expect(
+			serializeGradientColor( {
+				type: 'var',
+				value: '--my-color',
+			} as any )
+		).toBe( 'var(--my-color)' );
 	} );
 
 	test( 'serializeGradientPosition', () => {
@@ -38,6 +57,10 @@ describe( 'It should serialize a gradient', () => {
 		expect( serializeGradientPosition( { type: 'px', value: '4' } ) ).toBe(
 			'4px'
 		);
+
+		expect(
+			serializeGradientPosition( { type: 'calc', value: '50% + 10px' } )
+		).toBe( 'calc(50% + 10px)' );
 	} );
 
 	test( 'serializeGradientColorStop', () => {

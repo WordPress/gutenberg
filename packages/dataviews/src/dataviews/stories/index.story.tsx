@@ -1,0 +1,335 @@
+import type { Meta } from '@storybook/react-vite';
+import DataViews from '../index';
+import LayoutActivityComponent from './layout-activity';
+import LayoutTableComponent from './layout-table';
+import LayoutGridComponent from './layout-grid';
+import LayoutListComponent from './layout-list';
+import LayoutCustomComponent from './layout-custom';
+import HierarchicalLevelsComponent from './hierarchical-levels';
+import InfiniteScrollComponent from './infinite-scroll';
+import AsyncInfiniteScrollComponent from './async-infinite-scroll';
+import WithCardComponent from './with-card';
+import FreeCompositionComponent from './free-composition';
+import MinimalUIComponent from './minimal-ui';
+import EmptyComponent from './empty';
+import './style.css';
+
+const meta = {
+	tags: [ 'manifest' ],
+	title: 'DataViews/DataViews',
+	component: DataViews,
+	args: {
+		containerHeight: 'auto',
+	},
+	argTypes: {
+		containerHeight: {
+			control: 'select',
+			options: [ 'auto', '600px', '80vh' ],
+			description: 'Height of the container',
+		},
+	},
+	// Use fullscreen layout and a wrapper div with padding to resolve conflicts
+	// between Ariakit's Dialog (usePreventBodyScroll) and Storybook's body padding
+	// (sb-main-padding class). This ensures consistent layout in DataViews stories
+	// when clicking actions menus. Without this the padding on the body will jump.
+	parameters: {
+		layout: 'fullscreen',
+	},
+	decorators: [
+		( Story, { args, parameters }: { args: any; parameters: any } ) => (
+			<div style={ { padding: '1rem' } }>
+				<div
+					style={ {
+						height:
+							parameters.containerHeight ?? args.containerHeight,
+						minHeight: 0,
+					} }
+				>
+					<Story containerHeight={ args.containerHeight } />
+				</div>
+			</div>
+		),
+	],
+} as Meta< typeof DataViews >;
+export default meta;
+
+export const LayoutTable = {
+	render: LayoutTableComponent,
+	args: {
+		groupBy: false,
+		groupByLabel: true,
+		hasClickableItems: true,
+		perPageSizes: [ 10, 25, 50, 100 ],
+		showMedia: true,
+	},
+	argTypes: {
+		backgroundColor: {
+			control: 'color',
+			description: 'Background color of the DataViews component',
+		},
+		groupBy: {
+			control: 'boolean',
+			description: 'Whether items are grouped by field',
+		},
+		groupByLabel: {
+			control: 'boolean',
+			description:
+				'Whether to show the groupBy field label in headers (e.g., "Date: Dec 15" vs just "Dec 15")',
+		},
+		hasClickableItems: {
+			control: 'boolean',
+			description: 'Are the items clickable',
+		},
+		perPageSizes: {
+			control: 'object',
+			description: 'Array of available page sizes',
+		},
+		showMedia: {
+			control: 'boolean',
+			description: 'Whether to display the media field',
+		},
+	},
+};
+
+export const LayoutGrid = {
+	parameters: {
+		// FIXME: Grid media buttons lack names (button-name).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+	render: LayoutGridComponent,
+	args: {
+		groupBy: false,
+		groupByLabel: true,
+		hasClickableItems: true,
+		mediaFit: 'cover',
+		mediaFitControl: true,
+		perPageSizes: [ 10, 25, 50, 100 ],
+		showMedia: true,
+	},
+	argTypes: {
+		backgroundColor: {
+			control: 'color',
+			description: 'Background color of the DataViews component',
+		},
+		groupBy: {
+			control: 'boolean',
+			description: 'Whether items are grouped by field',
+		},
+		groupByLabel: {
+			control: 'boolean',
+			description:
+				'Whether to show the groupBy field label in headers (e.g., "Date: Dec 15" vs just "Dec 15")',
+		},
+		hasClickableItems: {
+			control: 'boolean',
+			description: 'Are the items clickable',
+		},
+		mediaFit: {
+			control: 'select',
+			options: [ 'cover', 'contain' ],
+			description:
+				'How the media field fills the preview box: cropped to fill it ("cover") or fitted inside it ("contain"), letterboxing the media so its own aspect ratio stays visible',
+		},
+		mediaFitControl: {
+			control: 'boolean',
+			description:
+				'Whether the view options offer the "Original aspect ratio" toggle, letting users switch the media fit themselves',
+		},
+		perPageSizes: {
+			control: 'object',
+			description: 'Array of available page sizes',
+		},
+		showMedia: {
+			control: 'boolean',
+			description: 'Whether to display the media field',
+		},
+	},
+};
+
+export const LayoutList = {
+	render: LayoutListComponent,
+	args: {
+		fullWidth: false,
+		groupBy: false,
+		groupByLabel: true,
+		hasClickableItems: true,
+		perPageSizes: [ 10, 25, 50, 100 ],
+		showMedia: true,
+	},
+	argTypes: {
+		backgroundColor: {
+			control: 'color',
+			description: 'Background color of the DataViews component',
+		},
+		fullWidth: {
+			control: 'boolean',
+			description:
+				'Whether to use full width or a contained layout (400px)',
+		},
+		groupBy: {
+			control: 'boolean',
+			description: 'Whether items are grouped by field',
+		},
+		groupByLabel: {
+			control: 'boolean',
+			description:
+				'Whether to show the groupBy field label in headers (e.g., "Date: Dec 15" vs just "Dec 15")',
+		},
+		hasClickableItems: {
+			control: 'boolean',
+			description: 'Are the items clickable',
+		},
+		perPageSizes: {
+			control: 'object',
+			description: 'Array of available page sizes',
+		},
+		showMedia: {
+			control: 'boolean',
+			description: 'Whether to display the media field',
+		},
+	},
+};
+
+export const LayoutActivity = {
+	render: LayoutActivityComponent,
+	args: {
+		fullWidth: false,
+		groupBy: false,
+		groupByLabel: true,
+		hasClickableItems: true,
+		perPageSizes: [ 10, 25, 50, 100 ],
+		showMedia: true,
+	},
+	argTypes: {
+		backgroundColor: {
+			control: 'color',
+			description: 'Background color of the DataViews component',
+		},
+		fullWidth: {
+			control: 'boolean',
+			description:
+				'Whether to use full width or a contained layout (400px)',
+		},
+		groupBy: {
+			control: 'boolean',
+			description: 'Whether items are grouped by field',
+		},
+		groupByLabel: {
+			control: 'boolean',
+			description:
+				'Whether to show the groupBy field label in headers (e.g., "Date: Dec 15" vs just "Dec 15")',
+		},
+		hasClickableItems: {
+			control: 'boolean',
+			description: 'Are the items clickable',
+		},
+		perPageSizes: {
+			control: 'object',
+			description: 'Array of available page sizes',
+		},
+		showMedia: {
+			control: 'boolean',
+			description: 'Whether to display the media field',
+		},
+	},
+};
+
+export const LayoutCustom = {
+	render: LayoutCustomComponent,
+};
+
+export const HierarchicalLevels = {
+	render: HierarchicalLevelsComponent,
+	args: {
+		showLevels: true,
+	},
+	argTypes: {
+		showLevels: {
+			control: 'boolean',
+			description:
+				'Whether the table indents each item by its level (`view.showLevels`). When enabled, each item is placed below its parent; when disabled, items follow the sort order only',
+		},
+	},
+};
+
+export const Empty = {
+	render: EmptyComponent,
+	args: {
+		customEmpty: false,
+		isLoading: false,
+	},
+	argTypes: {
+		customEmpty: {
+			control: 'boolean',
+			description: 'Use custom empty state with planet illustration',
+		},
+		isLoading: {
+			control: 'boolean',
+			description: 'Show loading state',
+		},
+	},
+};
+
+export const MinimalUI = {
+	parameters: {
+		// FIXME: Scroll region is not keyboard-accessible (scrollable-region-focusable).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+	render: MinimalUIComponent,
+	argTypes: {
+		layout: {
+			control: 'select',
+			options: [ 'table', 'list', 'grid', 'activity' ],
+			defaultValue: 'table',
+		},
+	},
+};
+
+export const FreeComposition = {
+	render: FreeCompositionComponent,
+};
+
+export const WithCard = {
+	render: WithCardComponent,
+};
+
+export const InfiniteScroll = {
+	render: InfiniteScrollComponent,
+	parameters: {
+		containerHeight: '600px',
+	},
+	argTypes: {
+		containerHeight: {
+			control: false,
+			table: {
+				disable: true,
+			},
+		},
+	},
+};
+
+/**
+ * Infinite scroll where pages load asynchronously (with `isLoading`), like a
+ * real network-backed consumer that fetches one window at a time. Reproduces
+ * the scroll-position jump that the synchronous story does not.
+ */
+export const AsyncInfiniteScroll = {
+	render: AsyncInfiniteScrollComponent,
+	parameters: {
+		// FIXME: List items lack a required parent (aria-required-parent).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+		// Fill the viewport so the list bottom is the window bottom.
+		containerHeight: 'calc(100vh - 2rem)',
+	},
+	argTypes: {
+		containerHeight: {
+			control: false,
+			table: {
+				disable: true,
+			},
+		},
+	},
+};

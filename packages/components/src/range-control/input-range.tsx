@@ -1,13 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { InputRange as BaseInputRange } from './styles/range-control-styles';
-
 import type { InputRangeProps } from './types';
 import type { WordPressComponentProps } from '../context';
 

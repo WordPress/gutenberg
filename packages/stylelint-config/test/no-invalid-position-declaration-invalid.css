@@ -1,0 +1,6 @@
+background: #fff;
+--foo: #fff;
+
+@media screen {
+	background: #fff;
+}

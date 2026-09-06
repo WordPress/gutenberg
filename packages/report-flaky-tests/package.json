@@ -2,7 +2,7 @@
 	"name": "@wordpress/report-flaky-tests",
 	"version": "0.0.0",
 	"private": true,
-	"description": "A GitHub action to report flaky E2E tests to GitHub issues.",
+	"description": "A GitHub action to render a report of flaky E2E tests as markdown.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -23,12 +23,25 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
+	"type": "module",
+	"main": "src/index.ts",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./src/index.ts"
+		},
+		"./package.json": "./package.json"
+	},
 	"types": "build-types",
 	"dependencies": {
-		"@actions/core": "^1.8.0",
-		"@actions/github": "^5.0.1",
-		"jest-message-util": "^29.6.2"
+		"@actions/core": "^1.9.1",
+		"@jest/test-result": "^30.5.0",
+		"@playwright/test": "^1.62.1",
+		"jest-message-util": "^30.5.0"
+	},
+	"devDependencies": {
+		"@types/node": "^20.19.39",
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

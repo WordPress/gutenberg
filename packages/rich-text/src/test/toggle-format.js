@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
+import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
-
 import { toggleFormat } from '../toggle-format';
 import { getSparseArrayLength } from './helpers';
 

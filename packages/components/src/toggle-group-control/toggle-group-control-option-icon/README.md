@@ -1,8 +1,6 @@
 # `ToggleGroupControlOptionIcon`
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 `ToggleGroupControlOptionIcon` is a form component which is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md) and displays an icon.
 
@@ -17,7 +15,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
 
 function Example() {
 	return (
-		<ToggleGroupControl __nextHasNoMarginBottom __next40pxDefaultSize>
+		<ToggleGroupControl>
 			<ToggleGroupControlOptionIcon
 				value="uppercase"
 				icon={ formatUppercase }
@@ -52,3 +50,10 @@ Icon displayed as the content of the option. Usually one of the icons from the `
 The text to accessibly label the icon option. Will also be shown in a tooltip.
 
 -   Required: Yes
+
+### `disabled`: `boolean`
+
+If true, this option is unselectable.
+
+-   Required: No
+-   Default: `false`

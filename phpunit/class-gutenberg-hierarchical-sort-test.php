@@ -3,7 +3,7 @@
 /**
  * Test the build_post_ids_to_display function.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 class GutenbergHierarchicalSortTest extends WP_UnitTestCase {
 

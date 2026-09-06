@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useContext } from '@wordpress/element';
 
 const RovingTabIndexContext = createContext<
@@ -12,6 +9,8 @@ const RovingTabIndexContext = createContext<
 	  }
 	| undefined
 >( undefined );
+RovingTabIndexContext.displayName = 'RovingTabIndexContext';
+
 export const useRovingTabIndexContext = () =>
 	useContext( RovingTabIndexContext );
 export const RovingTabIndexProvider = RovingTabIndexContext.Provider;

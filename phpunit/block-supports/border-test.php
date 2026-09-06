@@ -3,7 +3,7 @@
 /**
  * Test the border block supports.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
