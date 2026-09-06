@@ -14,6 +14,9 @@ class Gutenberg_Privacy_Policy_Page_Setting_Test extends WP_Test_REST_TestCase {
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
 	}
 
 	public static function wpTearDownAfterClass() {
