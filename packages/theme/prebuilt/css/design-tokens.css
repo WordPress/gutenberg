@@ -51,6 +51,12 @@
 	--wpds-color-background-surface-error: #f6e6e3;
 	/* Background color for surfaces with error tone and weak emphasis. */
 	--wpds-color-background-surface-error-weak: #fff6f5;
+	/* Solid background color for neutral interactive controls, such as input fields and unchecked checkboxes. */
+	--wpds-color-background-interactive-neutral: #fff;
+	/* Solid background color for neutral interactive controls that are hovered, focused, or active. */
+	--wpds-color-background-interactive-neutral-active: #fff;
+	/* Solid background color for neutral interactive controls in their disabled state. */
+	--wpds-color-background-interactive-neutral-disabled: #fff;
 	/* Background color for interactive elements with neutral tone and strong emphasis. */
 	--wpds-color-background-interactive-neutral-strong: #2d2d2d;
 	/* Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active. */
