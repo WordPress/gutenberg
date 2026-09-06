@@ -322,7 +322,9 @@ export default function LayoutWithGlobalStylesProvider( props ) {
 					} }
 				>
 					<ThemeProvider color={ themeColors }>
-						<Layout { ...props } />
+						<ErrorBoundary>
+							<Layout { ...props } />
+						</ErrorBoundary>
 					</ThemeProvider>
 				</ThemeProvider>
 			</Tooltip.Provider>

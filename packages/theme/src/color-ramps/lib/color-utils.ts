@@ -4,13 +4,22 @@ import {
 	to,
 	toGamut,
 	serialize,
-	contrastWCAG21,
+	clone,
+	equals,
+	getLuminance,
 	sRGB,
 	OKLCH,
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 
 const ALLOWED_SEED_COLOR_SPACES = [ sRGB ];
+const objectLuminanceCache = new WeakMap<
+	PlainColorObject,
+	{
+		color: PlainColorObject;
+		luminance: number;
+	}
+>();
 
 /**
  * Get string representation of a color.
@@ -34,8 +43,47 @@ export function getContrast(
 	colorA: string | PlainColorObject,
 	colorB: string | PlainColorObject
 ): number {
-	ColorSpace.register( sRGB );
-	return contrastWCAG21( colorA, colorB );
+	return getContrastFromLuminances(
+		getRelativeLuminance( colorA ),
+		getRelativeLuminance( colorB )
+	);
+}
+
+/**
+ * Return a color's non-negative relative luminance. Color objects use a weak
+ * cache with snapshots to detect mutations.
+ *
+ * @param color Color to measure.
+ */
+function getRelativeLuminance( color: string | PlainColorObject ): number {
+	if ( typeof color === 'string' ) {
+		ColorSpace.register( sRGB );
+		return Math.max( getLuminance( color ), 0 );
+	}
+
+	const cachedLuminance = objectLuminanceCache.get( color );
+	if ( cachedLuminance && equals( cachedLuminance.color, color ) ) {
+		return cachedLuminance.luminance;
+	}
+
+	const luminance = Math.max( getLuminance( color ), 0 );
+	objectLuminanceCache.set( color, {
+		color: clone( color ),
+		luminance,
+	} );
+	return luminance;
+}
+
+/**
+ * Calculate a WCAG 2.1 contrast ratio from precomputed relative luminances.
+ *
+ * @param first  First relative luminance.
+ * @param second Second relative luminance.
+ */
+function getContrastFromLuminances( first: number, second: number ): number {
+	return first > second
+		? ( first + 0.05 ) / ( second + 0.05 )
+		: ( second + 0.05 ) / ( first + 0.05 );
 }
 
 /**
