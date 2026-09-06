@@ -1,10 +1,6 @@
 import clsx from 'clsx';
-import {
-	Button,
-	Icon as WCIcon,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
-import { Text, Stack } from '@wordpress/ui';
+import { Button, Icon as WCIcon } from '@wordpress/components';
+import { Badge, Text, Stack } from '@wordpress/ui';
 import { useDispatch, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
@@ -18,8 +14,6 @@ import { getBlockType } from '@wordpress/blocks';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
-
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 function OptionalParentSelectButton( { children, onClick } ) {
 	if ( ! onClick ) {
@@ -185,7 +179,7 @@ function BlockCard( {
 									{ ! parentClientId &&
 										! isChild &&
 										!! name?.length && (
-											<WCBadge>{ title }</WCBadge>
+											<Badge intent="draft">{ title }</Badge>
 										) }
 								</TitleElement>
 								{ children }
