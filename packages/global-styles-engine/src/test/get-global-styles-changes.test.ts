@@ -211,6 +211,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 		} );
 		registerBlockType( 'core/test-title', {
 			apiVersion: 3,
+			attributes: {},
 			save: () => {},
 			category: 'text',
 			title: 'Title',
@@ -218,6 +219,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 		} );
 		registerBlockType( 'core/test-button', {
 			apiVersion: 3,
+			attributes: {},
 			save: () => {},
 			category: 'text',
 			title: 'Button',
