@@ -102,6 +102,8 @@ export function taperChroma(
 
 /* ---------------- helpers & caches ---------------- */
 
+const maxChromaCache = new Map< string, number >();
+
 function clamp01( x: number ): number {
 	if ( x < 0 ) {
 		return 0;
@@ -117,6 +119,10 @@ function normalizeHue( h: number ): number {
 		hue += 360;
 	}
 	return hue;
+}
+function quantize( x: number, step: number ): number {
+	const k = Math.round( x / step );
+	return k * step;
 }
 function raisedCosine( u: number ): number {
 	const x = clamp01( u );
@@ -154,38 +160,30 @@ function continuousTaper(
 	return 1 - ( 1 - opts.kDark ) * w;
 }
 
-/* ---- chroma-capacity queries with small caches ---- */
-
-const maxChromaCache = new Map< string, number >();
-function keyMax( l: number, h: number, gamut: string, cap: number ): string {
-	// Quantize to keep cache compact
-	const lq = quantize( l, 0.05 );
-	const hq = quantize( normalizeHue( h ), 10 );
-	const cq = quantize( cap, 0.05 );
-	return `${ gamut }|L:${ lq }|H:${ hq }|cap:${ cq }`;
-}
-
-function quantize( x: number, step: number ): number {
-	const k = Math.round( x / step );
-	return k * step;
-}
-
 function getCachedMaxChromaAtLH(
 	l: number,
 	h: number,
 	gamutSpace: ColorSpace,
 	cap: number
 ): number {
-	const gamut = gamutSpace.id;
-	const key = keyMax( l, h, gamut, cap );
-	const hit = maxChromaCache.get( key );
-	if ( typeof hit === 'number' ) {
-		return hit;
+	const roundedLightness = quantize( l, 0.05 );
+	const roundedHue = quantize( normalizeHue( h ), 10 );
+	const roundedCap = quantize( cap, 0.05 );
+	const cacheKey = `${ gamutSpace.id }|L:${ roundedLightness }|H:${ roundedHue }|cap:${ roundedCap }`;
+	const cachedChroma = maxChromaCache.get( cacheKey );
+	if ( cachedChroma !== undefined ) {
+		return cachedChroma;
 	}
 
-	const computed = maxInGamutChromaAtLH( l, h, gamutSpace, cap );
-	maxChromaCache.set( key, computed );
-	return computed;
+	const chroma = maxInGamutChromaAtLH(
+		roundedLightness,
+		roundedHue,
+		gamutSpace,
+		roundedCap
+	);
+	maxChromaCache.set( cacheKey, chroma );
+
+	return chroma;
 }
 
 /**
