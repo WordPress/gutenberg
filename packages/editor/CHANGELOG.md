@@ -33,6 +33,7 @@
 -   Remove the template activation (`active_templates`) experiment: the post-save activation notice, the "Edit template" auto-activation, and template duplication in the actions list ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
 -   Remove unused dependencies `@wordpress/reusable-blocks`, `client-zip` and `fast-deep-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Edit palette colors from the block inspector: Change values for theme and default swatches. Add, rename, and delete for custom colors. Changes are saved to global styles ([#79266](https://github.com/WordPress/gutenberg/pull/79266)).
 
 ## 14.54.0 (2026-08-26)
 
@@ -71,7 +72,6 @@
 -   Notes: Move the rich text control the note form renders from `@wordpress/dataviews` into this package, where `@wordpress/rich-text` is the same copy the block editor uses ([#81430](https://github.com/WordPress/gutenberg/pull/81430)).
 -   Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
 -   Vendor a local copy of the `normalizeTextString` utility instead of unlocking it from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
--   Edit palette colors from the block inspector: Change values for theme and default swatches. Add, rename, and delete for custom colors. Changes are saved to global styles ([#79266](https://github.com/WordPress/gutenberg/pull/79266)).
 
 ### Enhancements
 
