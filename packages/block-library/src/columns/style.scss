@@ -84,7 +84,7 @@
 // Add low specificity default padding to columns blocks with backgrounds.
 :where(.wp-block-columns.has-background) {
 	// Matches paragraph block padding.
-	padding: $block-bg-padding--v $block-bg-padding--h;
+	padding: $block-bg-padding;
 }
 
 
@@ -95,6 +95,7 @@
 	min-width: 0;
 
 	// Prevent long unbroken words from overflowing.
+	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
 	word-break: break-word; // For back-compat.
 	overflow-wrap: break-word; // New standard.
 

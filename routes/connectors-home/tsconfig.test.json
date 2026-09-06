@@ -18,7 +18,6 @@
 		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
 		{ "path": "../../packages/notices/tsconfig.build.json" },
-		{ "path": "../../packages/private-apis" },
 		{ "path": "../../packages/ui/tsconfig.build.json" },
 		{ "path": "../../packages/url" }
 	]

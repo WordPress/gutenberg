@@ -8146,6 +8146,92 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that responsive pseudo-states are kept only for supported blocks.
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::sanitize
+	 */
+	public function test_sanitize_keeps_responsive_pseudo_states_on_supported_blocks_only() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/button'          => array(
+							'@mobile' => array(
+								':hover' => array(
+									'color' => array(
+										'text' => 'blue',
+									),
+								),
+							),
+						),
+						'core/paragraph'       => array(
+							'color'   => array(
+								'text' => 'black',
+							),
+							'@mobile' => array(
+								'color'  => array(
+									'text' => 'green',
+								),
+								':hover' => array(
+									'color' => array(
+										'text' => 'red',
+									),
+								),
+							),
+						),
+						'core/navigation-link' => array(
+							'-current' => array(
+								'color' => array(
+									'text' => 'purple',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual = $theme_json->get_raw_data();
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'blocks' => array(
+					'core/button'          => array(
+						'@mobile' => array(
+							':hover' => array(
+								'color' => array(
+									'text' => 'blue',
+								),
+							),
+						),
+					),
+					'core/paragraph'       => array(
+						'color'   => array(
+							'text' => 'black',
+						),
+						'@mobile' => array(
+							'color' => array(
+								'text' => 'green',
+							),
+						),
+					),
+					'core/navigation-link' => array(
+						'-current' => array(
+							'color' => array(
+								'text' => 'purple',
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	/**
 	 * Test that block pseudo selectors work with elements within blocks.
 	 */
 	public function test_block_pseudo_selectors_with_elements() {

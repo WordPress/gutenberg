@@ -13,9 +13,10 @@ import type {
  */
 export interface WidgetHostLinks {
 	/**
-	 * Returns the in-app route path for a href, or `null` when the href
-	 * points outside the host's registered routes. Consumers hand the
-	 * path back to `Link` without interpreting it.
+	 * Returns the in-app route for a href, path and query as the host's
+	 * router takes them, or `null` when the href points outside the host's
+	 * registered routes. Consumers hand the string back to `Link` without
+	 * interpreting it.
 	 */
 	match: ( href: string ) => string | null;
 

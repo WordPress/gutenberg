@@ -12,7 +12,6 @@
 	"references": [
 		{ "path": "../../packages/admin-ui/tsconfig.build.json" },
 		{ "path": "../../packages/block-editor/tsconfig.build.json" },
-		{ "path": "../../packages/blocks" },
 		{ "path": "../../packages/components/tsconfig.build.json" },
 		{ "path": "../../packages/core-data/tsconfig.build.json" },
 		{ "path": "../../packages/data" },

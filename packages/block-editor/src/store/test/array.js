@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { insertAt, moveTo } from '../array';
 
 describe( 'array', () => {

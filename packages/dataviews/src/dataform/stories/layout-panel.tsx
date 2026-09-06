@@ -355,6 +355,12 @@ const LayoutPanelComponent = ( {
 					id: 'status',
 					label: 'Status & visibility',
 					children: [ 'status', 'password' ],
+					layout: getPanelLayoutFromStoryArgs( {
+						summary: [ 'status' ],
+						labelPosition,
+						openAs,
+						editVisibility,
+					} ),
 				},
 				'order',
 				'author',
@@ -365,11 +371,23 @@ const LayoutPanelComponent = ( {
 					id: 'discussion',
 					label: 'Discussion',
 					children: [ 'comment_status', 'ping_status' ],
+					layout: getPanelLayoutFromStoryArgs( {
+						summary: [ 'discussion' ],
+						labelPosition,
+						openAs,
+						editVisibility,
+					} ),
 				},
 				{
 					id: 'address1',
 					label: 'Combined address',
 					children: [ 'address1', 'address2', 'city' ],
+					layout: getPanelLayoutFromStoryArgs( {
+						summary: [ 'address1' ],
+						labelPosition,
+						openAs,
+						editVisibility,
+					} ),
 				},
 				{
 					id: 'flight_info',

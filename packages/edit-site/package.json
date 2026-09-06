@@ -86,6 +86,9 @@
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.1"
 	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"peerDependencies": {
 		"react": "^18 || ^19",
 		"react-dom": "^18 || ^19"

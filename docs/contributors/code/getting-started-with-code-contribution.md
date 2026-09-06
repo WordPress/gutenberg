@@ -239,6 +239,9 @@ You can start with this workspace settings file:
 		"editor.formatOnSave": true,
 		"editor.defaultFormatter": "obliviousharmony.vscode-php-codesniffer"
 	},
+	"eslint.bulkSuppression.enable": true,
+	"eslint.bulkSuppression.location": "tools/eslint/suppressions.json",
+	"eslint.bulkSuppression.severity": "hint",
 	"intelephense.environment.phpVersion": "7.4.0",
 	"intelephense.files.exclude": [
 		"**/.cache/**",

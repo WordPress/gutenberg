@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { arrayMoveWithPinned } from '../array-move-with-pinned';
 
 const pinned = new Set( [ 'p' ] );

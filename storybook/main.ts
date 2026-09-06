@@ -1,11 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-	type InlineConfig,
-	type PluginOption,
-	mergeConfig,
-	transformWithOxc,
-} from 'vite';
+import { type InlineConfig, type PluginOption, mergeConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
@@ -27,18 +22,18 @@ const stories = [
 	'./stories/playground/**/*.story.@(jsx|tsx)',
 	'./stories/**/*.mdx',
 	'./stories/design-system/**/*.story.@(ts|tsx)',
-	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
-	'../packages/editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
-	'../packages/global-styles-ui/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
+	'../packages/block-editor/src/**/stories/*.story.@(jsx|tsx|mdx)',
+	'../packages/editor/src/**/stories/*.story.@(jsx|tsx|mdx)',
+	'../packages/global-styles-ui/src/**/stories/*.story.@(jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
-	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/icons/src/**/stories/*.story.@(tsx|mdx)',
 	'./stories/icons/**/*.story.@(ts|tsx)',
-	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/image-cropper/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/media-editor/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/media-fields/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/dataviews/src/**/stories/*.story.@(tsx|mdx)',
+	'../packages/fields/src/**/stories/*.story.@(tsx|mdx)',
+	'../packages/image-cropper/src/**/stories/*.story.@(tsx|mdx)',
+	'../packages/media-editor/src/**/stories/*.story.@(tsx|mdx)',
+	'../packages/media-fields/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/theme/src/**/stories/*.mdx',
 	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/grid/src/**/stories/*.story.@(ts|tsx)',
@@ -150,30 +145,6 @@ const config: StorybookConfig = {
 					],
 					plugins: [ getAbsolutePath( '@emotion/babel-plugin' ) ],
 				} ),
-				{
-					name: 'load-js-files-as-jsx',
-					enforce: 'pre',
-					async transform( code: string, id: string ) {
-						if ( ! id.match( /.*\.js$/ ) ) {
-							return null;
-						}
-
-						const result = await transformWithOxc( code, id, {
-							lang: 'jsx',
-							jsx: { runtime: 'automatic' },
-						} );
-
-						for ( const warning of result.warnings ) {
-							this.warn( warning );
-						}
-
-						return {
-							code: result.code,
-							map: result.map,
-							moduleType: 'js',
-						};
-					},
-				},
 				// Stub the vips and wasm-vips packages for Storybook since they use WASM modules that Vite can't handle.
 				{
 					name: 'stub-vips',
@@ -300,13 +271,6 @@ const config: StorybookConfig = {
 							},
 						},
 					],
-				},
-			},
-			optimizeDeps: {
-				rolldownOptions: {
-					moduleTypes: {
-						'.js': 'tsx',
-					},
 				},
 			},
 		} satisfies InlineConfig );

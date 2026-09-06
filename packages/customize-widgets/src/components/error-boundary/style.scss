@@ -1,0 +1,16 @@
+.customize-widgets-error-boundary {
+	font-family: var(--wpds-typography-font-family-body);
+	padding: var(--wpds-dimension-padding-md);
+}
+
+.customize-widgets-error-boundary__report {
+	max-height: 420px;
+	overflow: auto;
+	overflow-anchor: none;
+}
+
+.customize-widgets-error-boundary__report-section {
+	margin: 0;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}

@@ -12,7 +12,6 @@ import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
-import { useBorderPanelLabel } from '../../hooks/border';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
 import {
 	getInheritanceProps,
@@ -365,24 +364,18 @@ export default function BorderPanel( {
 	const showBorderByDefault =
 		defaultControls?.color || defaultControls?.width;
 
-	const hasBorderControl =
-		showBorderColor ||
-		showBorderStyle ||
-		showBorderWidth ||
-		showBorderRadius;
-
-	const label = useBorderPanelLabel( {
-		hasShadowControl,
-		hasBorderControl,
-	} );
-
 	return (
 		<Wrapper
 			resetAllFilter={ resetAllFilter }
 			value={ value }
 			onChange={ onChange }
 			panelId={ panelId }
-			label={ label }
+			// A shadow is treated as a soft border, so the panel keeps one
+			// name whichever of its controls a theme or block opts into.
+			// A stable title is what lets each control show its own label
+			// unconditionally, which in turn keeps their unlink toggles
+			// aligned.
+			label={ __( 'Borders' ) }
 		>
 			{ ( showBorderWidth || showBorderColor ) && (
 				<InheritanceToolsPanelItem
@@ -394,37 +387,23 @@ export default function BorderPanel( {
 					) }
 					hasValue={ () => isDefinedBorder( value?.border ) }
 					label={ __( 'Border' ) }
+					hasInlineEndToggle
 					onDeselect={ () => resetBorder() }
 					isShownByDefault={ showBorderByDefault }
 					panelId={ panelId }
 				>
-					{ ( showInheritanceLabelIndicators ||
-						hasShadowControl ) && (
-						// Render the visible label as `BaseControl.VisualLabel`
-						// (which produces `.components-base-control__label`)
-						// rather than passing `label` to `BorderBoxControl`,
-						// whose internal `<StyledLabel>` carries no stable
-						// className. The inheritance treatment and the
-						// local-override reset affordance both target
-						// `.components-base-control__label`, so the visible
-						// "Border" label has to be a `BaseControl` label to
-						// receive them.
-						//
-						// Render it whenever a Shadow control is also present so
-						// the two controls stay disambiguated (mirrors the
-						// Shadow label's `hasBorderControl` guard below, and
-						// trunk's `hideLabelFromVision={ ! hasShadowControl }`),
-						// even when inheritance indicators are off (e.g. in
-						// Global Styles).
-						<BaseControl.VisualLabel as="legend">
-							{ __( 'Border' ) }
-						</BaseControl.VisualLabel>
-					) }
+					{ /* The visible label is always rendered, so the control's
+					    linked/unlinked toggle sits in a label row and lines up
+					    with the Radius control's. `BorderBoxControl` renders the
+					    label as `BaseControl.VisualLabel`, which is what the
+					    inheritance treatment and the local-override reset
+					    affordance target. */ }
 					<BorderBoxControl
 						colors={ colors }
 						disableCustomColors={ ! areCustomSolidsEnabled }
 						enableAlpha
 						enableStyle={ showBorderStyle }
+						label={ __( 'Border' ) }
 						onChange={ onBorderChange }
 						popoverOffset={ 40 }
 						popoverPlacement="left-start"
@@ -472,11 +451,9 @@ export default function BorderPanel( {
 					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>
-					{ hasBorderControl ? (
-						<BaseControl.VisualLabel as="legend">
-							{ __( 'Shadow' ) }
-						</BaseControl.VisualLabel>
-					) : null }
+					<BaseControl.VisualLabel>
+						{ __( 'Shadow' ) }
+					</BaseControl.VisualLabel>
 
 					<ShadowPopover
 						shadow={ shadow }

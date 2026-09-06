@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { calculateRetryDelay, shouldRetryError } from '../utils/retry';
 import { UploadError } from '../../upload-error';
 
@@ -6,7 +7,7 @@ describe( 'calculateRetryDelay', () => {
 
 	beforeEach( () => {
 		// Force the jitter factor to 1 (no offset) for deterministic results.
-		Math.random = jest.fn( () => 0.5 );
+		Math.random = vi.fn( () => 0.5 );
 	} );
 
 	afterEach( () => {
@@ -79,7 +80,7 @@ describe( 'calculateRetryDelay', () => {
 		expect( delayWithMiddleJitter ).toBe( 1000 );
 
 		// Math.random = 0 → jitter factor = 1 + (0 * 2 - 1) * 0.1 = 0.9.
-		Math.random = jest.fn( () => 0 );
+		Math.random = vi.fn( () => 0 );
 		const delayWithMinJitter = calculateRetryDelay( {
 			attempt: 1,
 			initialDelay: 1000,
@@ -90,7 +91,7 @@ describe( 'calculateRetryDelay', () => {
 		expect( delayWithMinJitter ).toBe( 900 );
 
 		// Math.random = 1 → jitter factor = 1 + (1 * 2 - 1) * 0.1 = 1.1.
-		Math.random = jest.fn( () => 1 );
+		Math.random = vi.fn( () => 1 );
 		const delayWithMaxJitter = calculateRetryDelay( {
 			attempt: 1,
 			initialDelay: 1000,

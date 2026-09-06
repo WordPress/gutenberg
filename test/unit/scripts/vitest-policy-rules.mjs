@@ -1,5 +1,6 @@
 import { isBuiltin } from 'node:module';
 import typescriptEslintParser from '@typescript-eslint/parser';
+import { hasTestEnvironmentOverride } from './test-environment-overrides.mjs';
 
 const browserApiIdentifiers = new Set( [
 	'IntersectionObserver',
@@ -2331,12 +2332,7 @@ export function validateVitestPolicy( {
 		report( 'vitest-import', 'no explicit Vitest collector import' );
 	}
 
-	if (
-		isVitestTest &&
-		ast.comments?.some( ( comment ) =>
-			/^\s*\*?\s*@(jest|vitest)-environment\b/m.test( comment.value )
-		)
-	) {
+	if ( isVitestTest && hasTestEnvironmentOverride( ast.comments ) ) {
 		report(
 			'test-environment-override',
 			'per-file test environment overrides are not allowed; use the filename suffix'

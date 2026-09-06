@@ -161,7 +161,8 @@ export default function Root() {
 								<ThemeProvider
 									color={ {
 										...themeColors,
-										background: '#ffffff',
+										// Reset to the default background color.
+										background: '#fcfcfc',
 									} }
 								>
 									<Outlet />

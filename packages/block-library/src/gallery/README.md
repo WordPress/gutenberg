@@ -55,7 +55,12 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout):
   - [`allowSwitching`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowswitching): `false`
   - [`allowInheriting`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowinheriting): `false`
-  - [`allowEditing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowediting): `false`
+  - [`allowEditing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowediting): `true`
+  - [`allowOrientation`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-alloworientation): `false`
+  - [`allowJustification`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowjustification): `false`
+  - [`allowVerticalAlignment`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowverticalalignment): `false`
+  - [`allowWrap`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowwrap): `false`
+  - [`allowSizingOnChildren`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowsizingonchildren): `true`
   - [`default`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex"}`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`

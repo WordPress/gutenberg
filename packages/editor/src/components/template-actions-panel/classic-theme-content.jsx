@@ -66,7 +66,7 @@ export default function ClassicThemeContent() {
 	const notificationAction = hasGoBack
 		? [
 				{
-					label: __( 'Go back' ),
+					label: __( 'Back' ),
 					onClick: () =>
 						getEditorSettings().onNavigateToPreviousEntityRecord(),
 				},

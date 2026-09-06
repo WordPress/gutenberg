@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { Caption } from '../utils/caption';
+import { isGalleryFlexLayout } from './shared';
 
 export default function Gallery( props ) {
 	const {
@@ -14,7 +15,8 @@ export default function Gallery( props ) {
 		multiGallerySelection,
 	} = props;
 
-	const { align, columns, imageCrop } = attributes;
+	const { align, columns, imageCrop, layout } = attributes;
+	const isFlexLayout = isGalleryFlexLayout( layout );
 
 	return (
 		<figure
@@ -25,9 +27,11 @@ export default function Gallery( props ) {
 				'blocks-gallery-grid',
 				{
 					[ `align${ align }` ]: align,
-					[ `columns-${ columns }` ]: columns !== undefined,
-					[ `columns-default` ]: columns === undefined,
-					'is-cropped': imageCrop,
+					[ `columns-${ columns }` ]:
+						isFlexLayout && columns !== undefined,
+					[ `columns-default` ]:
+						isFlexLayout && columns === undefined,
+					'is-cropped': isFlexLayout && imageCrop,
 				}
 			) }
 		>

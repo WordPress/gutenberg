@@ -98,11 +98,13 @@ export default function SidebarGlobalStyles() {
 			title={ __( 'Styles' ) }
 			headingLevel={ 2 }
 		>
-			<GlobalStylesUIWrapper
-				path={ section }
-				onPathChange={ onChangeSection }
-				settings={ settings }
-			/>
+			<div className="edit-site-styles__content">
+				<GlobalStylesUIWrapper
+					path={ section }
+					onPathChange={ onChangeSection }
+					settings={ settings }
+				/>
+			</div>
 		</Page>
 	);
 }

@@ -3,8 +3,15 @@ import apiFetch from '@wordpress/api-fetch';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import type { Field, View } from '@wordpress/dataviews';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { Fragment, useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	Fragment,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { useNavigate, useSearch } from '@wordpress/route';
 import { Badge, Stack, Text } from '@wordpress/ui';
 import type { ComponentProps } from 'react';
 
@@ -73,6 +80,19 @@ function isHealthCheckStatus( value: unknown ): value is HealthCheckStatus {
 	);
 }
 
+/* The status filter lives in the `status` search param, a comma-separated
+   list with unknown values dropped, so a reload or a copied URL keeps it.
+   The site-health widget links here with the statuses that have items. */
+function statusesFromSearch( value: unknown ): HealthCheckStatus[] {
+	if ( typeof value !== 'string' ) {
+		return [];
+	}
+
+	return Array.from(
+		new Set( value.split( ',' ).filter( isHealthCheckStatus ) )
+	);
+}
+
 /* One line per block element, so paragraphs and list items keep their
    own line instead of running together. */
 function descriptionToLines( html: string ): string[] {
@@ -136,6 +156,16 @@ function toMessage( reason: unknown ): string | null {
 	return null;
 }
 
+/* The route tree is assembled at runtime, so TanStack has no search schema
+   to infer and types `search` against a placeholder. Describe the one call
+   this page makes instead. */
+type Navigate = ( options: {
+	search?: (
+		previous: Record< string, unknown >
+	) => Record< string, unknown >;
+	replace?: boolean;
+} ) => void;
+
 const DEFAULT_VIEW: View = {
 	type: 'table',
 	page: 1,
@@ -147,11 +177,77 @@ const DEFAULT_VIEW: View = {
 	sort: { field: 'status', direction: 'asc' },
 };
 
+function statusesFromView( view: View ): HealthCheckStatus[] {
+	const filter = view.filters?.find( ( { field } ) => field === 'status' );
+	if ( ! filter || ! Array.isArray( filter.value ) ) {
+		return [];
+	}
+
+	return filter.value.filter( isHealthCheckStatus );
+}
+
+/* Puts the URL's statuses into the view: a status filter for them, or none
+   when the URL carries none. */
+function withStatuses( view: View, statuses: HealthCheckStatus[] ): View {
+	const filters = ( view.filters ?? [] ).filter(
+		( { field } ) => field !== 'status'
+	);
+	if ( statuses.length > 0 ) {
+		filters.push( { field: 'status', operator: 'isAny', value: statuses } );
+	}
+
+	return { ...view, filters };
+}
+
 function SiteHealthPage() {
+	const search = useSearch( { from: '/site-health' } ) as {
+		status?: unknown;
+	};
+	const navigate = useNavigate() as Navigate;
+	const statuses = useMemo(
+		() => statusesFromSearch( search.status ),
+		[ search.status ]
+	);
 	const [ checks, setChecks ] = useState< HealthCheck[] | null >( null );
 	const [ unavailable, setUnavailable ] = useState( 0 );
 	const [ errorMessage, setErrorMessage ] = useState< string | null >( null );
-	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
+	const [ view, setView ] = useState< View >( () =>
+		withStatuses( DEFAULT_VIEW, statuses )
+	);
+
+	/* Back/forward, or a link into this route, changes the URL under the
+	   mounted page; the view follows. Writes from the view below leave the
+	   two already equal. */
+	useEffect( () => {
+		setView( ( current ) =>
+			statusesFromView( current ).join( ',' ) === statuses.join( ',' )
+				? current
+				: withStatuses( current, statuses )
+		);
+	}, [ statuses ] );
+
+	const onChangeView = useCallback(
+		( next: View ) => {
+			setView( next );
+
+			const nextStatuses = statusesFromView( next );
+			if ( nextStatuses.join( ',' ) === statuses.join( ',' ) ) {
+				return;
+			}
+
+			navigate( {
+				search: ( previous ) => ( {
+					...previous,
+					status:
+						nextStatuses.length > 0
+							? nextStatuses.join( ',' )
+							: undefined,
+				} ),
+				replace: true,
+			} );
+		},
+		[ navigate, statuses ]
+	);
 
 	useEffect( () => {
 		let cancelled = false;
@@ -211,6 +307,7 @@ function SiteHealthPage() {
 				id: 'status',
 				label: __( 'Status' ),
 				elements: STATUS_ELEMENTS,
+				filterBy: { operators: [ 'isAny' ] },
 				render: ( { item }: { item: HealthCheck } ) => (
 					<Badge intent={ STATUS_INTENTS[ item.status ] }>
 						{ STATUS_LABELS[ item.status ] }
@@ -328,7 +425,7 @@ function SiteHealthPage() {
 					data={ data }
 					fields={ fields }
 					view={ view }
-					onChangeView={ setView }
+					onChangeView={ onChangeView }
 					isLoading={ isLoading }
 					defaultLayouts={ { table: {} } }
 					paginationInfo={ paginationInfo }

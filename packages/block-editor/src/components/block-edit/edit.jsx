@@ -113,7 +113,7 @@ const EditWithGeneratedProps = ( props ) => {
 					let values = {};
 					if ( ! source.getValues ) {
 						Object.keys( bindings ).forEach( ( attr ) => {
-							// Default to the the source label when `getValues` doesn't exist.
+							// Default to the source label when `getValues` doesn't exist.
 							values[ attr ] = source.label;
 						} );
 					} else {

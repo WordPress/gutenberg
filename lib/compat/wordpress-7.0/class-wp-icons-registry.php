@@ -1,5 +1,63 @@
 <?php
 
+/**
+ * Returns the SVG elements and attributes allowed for registered icons.
+ *
+ * @return array[] Allowed SVG elements and attributes.
+ * @phpstan-return array<non-falsy-string, array<non-falsy-string, true>>
+ */
+function gutenberg_get_allowed_icon_svg_tags(): array {
+	$stroke_attributes = array(
+		'style'             => true,
+		'stroke'            => true,
+		'stroke-width'      => true,
+		'stroke-linecap'    => true,
+		'stroke-linejoin'   => true,
+		'stroke-miterlimit' => true,
+		'vector-effect'     => true,
+	);
+
+	return array(
+		'svg'     => array_merge(
+			array(
+				'class'       => true,
+				'xmlns'       => true,
+				'width'       => true,
+				'height'      => true,
+				'viewbox'     => true,
+				'aria-hidden' => true,
+				'role'        => true,
+				'focusable'   => true,
+				'fill'        => true,
+				'fill-rule'   => true,
+				'clip-rule'   => true,
+			),
+			$stroke_attributes
+		),
+		'path'    => array_merge(
+			array(
+				'fill'      => true,
+				'fill-rule' => true,
+				'clip-rule' => true,
+				'd'         => true,
+				'transform' => true,
+			),
+			$stroke_attributes
+		),
+		'polygon' => array_merge(
+			array(
+				'fill'      => true,
+				'fill-rule' => true,
+				'clip-rule' => true,
+				'points'    => true,
+				'transform' => true,
+				'focusable' => true,
+			),
+			$stroke_attributes
+		),
+	);
+}
+
 if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 	class WP_Icons_Registry {
 		/**
@@ -180,32 +238,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 * @return string The sanitized icon SVG content.
 		 */
 		protected function sanitize_icon_content( $icon_content ) {
-			$allowed_tags = array(
-				'svg'     => array(
-					'class'       => true,
-					'xmlns'       => true,
-					'width'       => true,
-					'height'      => true,
-					'viewbox'     => true,
-					'aria-hidden' => true,
-					'role'        => true,
-					'focusable'   => true,
-				),
-				'path'    => array(
-					'fill'      => true,
-					'fill-rule' => true,
-					'd'         => true,
-					'transform' => true,
-				),
-				'polygon' => array(
-					'fill'      => true,
-					'fill-rule' => true,
-					'points'    => true,
-					'transform' => true,
-					'focusable' => true,
-				),
-			);
-			return wp_kses( $icon_content, $allowed_tags );
+			return wp_kses( $icon_content, gutenberg_get_allowed_icon_svg_tags() );
 		}
 
 		/**

@@ -1,4 +1,6 @@
+import { describe, expect, test } from 'vitest';
 import { resolveStyle, privateHelpers } from '../resolve-style';
+import type { GlobalStylesConfig } from '../types';
 
 const {
 	isExplicitEmpty,
@@ -38,8 +40,8 @@ describe( 'resolveStyle – merged output', () => {
 				},
 			};
 			const out = pickLayerRootContribution( layer );
-			expect( out.typography ).toEqual( { lineHeight: '1.2' } );
-			expect( out.elements ).toBe( layer.elements );
+			expect( out?.typography ).toEqual( { lineHeight: '1.2' } );
+			expect( out?.elements ).toBe( layer.elements );
 		} );
 
 		test( 'pickLayerRootContribution returns null for empty layers', () => {
@@ -135,7 +137,7 @@ describe( 'resolveStyle – merged output', () => {
 		} );
 
 		test( 'deepMergeDroppingEmpties records a single source entry for backgroundImage', () => {
-			const sources = {};
+			const sources: Record< string, { layer: string } > = {};
 			deepMergeDroppingEmpties(
 				{},
 				{ background: { backgroundImage: { id: 1, url: 'a.jpg' } } },
@@ -732,14 +734,14 @@ describe( 'resolveStyle – memoization', () => {
 				},
 			},
 		};
-		const buildWithLinks = ( href ) =>
+		const buildWithLinks = ( href: string ) =>
 			resolveStyle(
 				{
 					...gs,
 					_links: {
 						'wp:theme-file': [ { name: 'file:./img.jpg', href } ],
 					},
-				},
+				} as GlobalStylesConfig,
 				{ blockName: 'core/paragraph' }
 			).value.background.backgroundImage.url;
 
@@ -794,14 +796,14 @@ describe( 'resolveStyle – memoization', () => {
 describe( 'resolveStyle – non-cascading root drop', () => {
 	// Each call builds against a fresh `globalStyles` object so the
 	// identity-keyed memo never returns a cross-test cache hit.
-	const build = ( styles, extra = {} ) =>
-		resolveStyle(
-			{ styles },
-			{
-				blockName: 'core/paragraph',
-				...extra,
-			}
-		);
+	const build = (
+		styles: Record< string, unknown >,
+		extra: Parameters< typeof resolveStyle >[ 1 ] = {}
+	) =>
+		resolveStyle( { styles } as GlobalStylesConfig, {
+			blockName: 'core/paragraph',
+			...extra,
+		} );
 
 	test( 'drops a root-sourced background color and its source', () => {
 		const { value, sources } = build( {
@@ -888,7 +890,7 @@ describe( 'resolveStyle – non-cascading root drop', () => {
 						},
 					],
 				},
-			},
+			} as GlobalStylesConfig,
 			{ blockName: 'core/paragraph' }
 		);
 		expect( value.background.backgroundImage.url ).toBe(

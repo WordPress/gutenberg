@@ -167,8 +167,8 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 
 		// It should display a different allowed block list.
 		await expect( blockListBox.getByRole( 'option' ) ).toHaveText( [
-			'Gallery',
 			'List',
+			'Gallery',
 			'Video',
 		] );
 	} );

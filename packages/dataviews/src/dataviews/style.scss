@@ -41,6 +41,11 @@
 
 .dataviews__search {
 	flex-grow: 1;
+
+	.dataviews-search {
+		// Fixed width to ensure the control doesn't resize with the reset button.
+		flex-basis: 210px;
+	}
 }
 
 .dataviews-no-results,

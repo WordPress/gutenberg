@@ -30,9 +30,9 @@ links: {
 }
 ```
 
-`match` answers one question: does this href target one of the application's own routes? On a hit it returns the in-app route path, `'/reports'`, and the consumer mounts `Link` with it, so the navigation is client-side. On `null` the consumer falls back to a plain anchor.
+`match` answers one question: does this href target one of the application's own routes? On a hit it returns the in-app route, `'/sales?by=day'`, path and query as the router takes them, and the consumer mounts `Link` with it, so the navigation is client-side. On `null` the consumer falls back to a plain anchor.
 
-The action declaration does not change either way. A widget declares the portable URL of its target, `admin.php?page=analytics&p=/reports`; in the owning application that materializes as a router link, everywhere else as a plain anchor that full-loads to the same place. Recognition is the application's: reachability depends on the routes it registered, which change per application and over time.
+The action declaration does not change either way. A widget declares the portable URL of its target, `admin.php?page=analytics&p=%2Fsales%3Fby%3Dday`, the route encoded inside `p` with its query; in the owning application that materializes as a router link, everywhere else as a plain anchor that full-loads to the same place. Recognition is the application's: reachability depends on the routes it registered, which change per application and over time.
 
 Only plain navigations are matched. `download` and `openInNewTab` keep the plain anchor: both mean a new document, so a router link buys nothing.
 

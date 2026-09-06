@@ -1,0 +1,191 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`BlockAlignmentUI should match snapshot when controls are hidden 1`] = `
+<div>
+  <div
+    class="components-dropdown components-dropdown-menu components-toolbar"
+    tabindex="-1"
+  >
+    <button
+      aria-expanded="false"
+      aria-haspopup="true"
+      aria-label="Align block"
+      class="components-button components-dropdown-menu__toggle has-icon"
+      data-toolbar-item="true"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        height="24"
+        stroke="currentColor"
+        stroke-width="1.5"
+        style="fill: none;"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5 4.75H13M5 19.25H13"
+          vector-effect="non-scaling-stroke"
+        />
+        <rect
+          fill="currentColor"
+          height="6"
+          stroke="none"
+          width="14"
+          x="5"
+          y="9"
+        />
+      </svg>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = `
+<div>
+  <div
+    class="components-toolbar"
+    icon="[object Object]"
+    label="Align block"
+  >
+    <div>
+      <button
+        aria-label="None"
+        aria-pressed="false"
+        class="components-button components-toolbar__control is-compact has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          style="fill: none;"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M5 5H19M5 19H19"
+            vector-effect="non-scaling-stroke"
+          />
+          <rect
+            fill="currentColor"
+            height="6"
+            stroke="none"
+            width="14"
+            x="5"
+            y="9"
+          />
+        </svg>
+      </button>
+    </div>
+    <div>
+      <button
+        aria-label="Align left"
+        aria-pressed="true"
+        class="components-button components-toolbar__control is-compact is-pressed has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          style="fill: none;"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M5 4.75H13M5 19.25H13"
+            vector-effect="non-scaling-stroke"
+          />
+          <rect
+            fill="currentColor"
+            height="6"
+            stroke="none"
+            width="14"
+            x="5"
+            y="9"
+          />
+        </svg>
+      </button>
+    </div>
+    <div>
+      <button
+        aria-label="Align center"
+        aria-pressed="false"
+        class="components-button components-toolbar__control is-compact has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          style="fill: none;"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M5 4.75H19M5 19.25H19"
+            vector-effect="non-scaling-stroke"
+          />
+          <rect
+            fill="currentColor"
+            height="6"
+            stroke="none"
+            width="10"
+            x="7"
+            y="9"
+          />
+        </svg>
+      </button>
+    </div>
+    <div>
+      <button
+        aria-label="Align right"
+        aria-pressed="false"
+        class="components-button components-toolbar__control is-compact has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          style="fill: none;"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M11 4.75H19M11 19.25H19"
+            vector-effect="non-scaling-stroke"
+          />
+          <rect
+            fill="currentColor"
+            height="6"
+            stroke="none"
+            width="14"
+            x="5"
+            y="9"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+`;

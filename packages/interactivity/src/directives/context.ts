@@ -51,7 +51,7 @@ directive(
 				return;
 			}
 
-			// If the namespace doesn't exist yet, initalizes an empty
+			// If the namespace doesn't exist yet, initializes an empty
 			// proxified state for that namespace's client context.
 			if ( ! client.current[ namespace ] ) {
 				client.current[ namespace ] = proxifyState( namespace, {} );

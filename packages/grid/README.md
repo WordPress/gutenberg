@@ -138,7 +138,7 @@ interface DashboardGridLayoutItem {
 
 -   `number`: span that many columns (clamped to the grid's column count).
 -   `'fill'`: fill the remaining columns in the current row.
--   `'full'`: span every column (`grid-column: 1 / -1`), forcing a row break.
+-   `'full'`: span every column and force a row break; an `itemLimits` maximum caps the span.
 
 `'fill'` is resolved per-row against the remaining free space.
 
@@ -151,6 +151,7 @@ interface DashboardGridLayoutItem {
 | `columns`            | `number`                                   | `6`      | Total columns (fixed mode).                                                                                                                             |
 | `minColumnWidth`     | `number`                                   | —        | If set, enables responsive mode: columns derived from container width. Mutually exclusive with `columns`.                                               |
 | `rowHeight`          | `number \| 'auto'`                         | `'auto'` | Row height in pixels, or `'auto'` to let content size rows.                                                                                             |
+| `itemLimits`         | `Record< string, GridItemLimits >`         | —        | Per-item minimum and maximum tile sizes in pixels, keyed by layout item key. See [Size limits](#size-limits).                                           |
 | `editMode`           | `boolean`                                  | `false`  | Enables drag-to-reorder and resize handles.                                                                                                             |
 | `onChangeLayout`     | `( layout ) => void`                       | —        | Fired when the user commits a drag or resize.                                                                                                           |
 | `onPreviewLayout`    | `( layout ) => void`                       | —        | Fired continuously during a drag or resize with the in-progress layout. Use for live feedback; `onChangeLayout` still emits the committed result.       |
@@ -314,6 +315,7 @@ items flow around them; out-of-range values (negative, or beyond
 | `minColumnWidth`     | `number`                                   | —       | If set, enables responsive mode: lane count derived from container width. Mutually exclusive with `columns`.                                                                                            |
 | `flowTolerance`      | `number`                                   | `16`    | Pixel tolerance for source-order tiebreaking when two candidate lanes have similar baselines. Larger values keep tiles closer to reading order at the cost of bigger empty regions.                     |
 | `rowUnit`            | `number`                                   | `4`     | Snap unit for the polyfill's `grid-row-start` math. Smaller values produce sharper placement at the cost of a larger implicit row count. Ignored on browsers with native `display: grid-lanes` support. |
+| `itemLimits`         | `Record< string, GridItemWidthLimits >`    | —       | Per-item minimum and maximum tile widths in pixels, keyed by layout item key. See [Size limits](#size-limits).                                                                                          |
 | `editMode`           | `boolean`                                  | `false` | Enables drag-to-reorder and horizontal resize.                                                                                                                                                          |
 | `onChangeLayout`     | `( layout ) => void`                       | —       | Fired when the user commits a drag or resize.                                                                                                                                                           |
 | `onPreviewLayout`    | `( layout ) => void`                       | —       | Fired continuously during a drag or resize.                                                                                                                                                             |
@@ -378,6 +380,43 @@ Without it the surface still works but walks the children on every
 preview update; the overhead is minor up to ~50 tiles and grows
 from there. For `DashboardLanes`, placement runs in a
 `useLayoutEffect` throttled to one frame per measurement burst.
+
+### Size limits
+
+`itemLimits` declares per-item floors and ceilings in pixels, keyed by
+layout item key:
+
+```jsx
+<DashboardGrid
+	layout={ layout }
+	rowHeight={ 80 }
+	itemLimits={ {
+		chart: { minWidth: 320, minHeight: 200 },
+		note: { maxWidth: 500 },
+	} }
+>
+	{ tiles }
+</DashboardGrid>
+```
+
+Each surface quantizes a limit to whole tracks of its current
+geometry: minimums round up, maximums round down, and a quantized
+minimum wins over a smaller quantized maximum. The result bounds the
+rendered span and the resize gesture, so a resize never commits a
+span outside it.
+
+Limits are not written into the layout. A stored span outside the
+limits renders bounded while the stored data stays untouched, so a
+limit change applies to every existing layout. A resize commits the
+resized tile at its new span and a reorder commits only the order;
+every other tile keeps its stored span, even while it renders bounded.
+
+`'full'` and `'fill'` widths respect a maximum: `'full'` renders at the
+capped span and places like a fixed item of that width, and `'fill'`
+reserves at least its minimum and never exceeds its maximum.
+Height limits apply when `rowHeight` is numeric and stay open with
+`'auto'` rows. `DashboardLanes` takes `GridItemWidthLimits`: lane
+heights are content-driven.
 
 ### Accessibility
 

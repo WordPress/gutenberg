@@ -96,7 +96,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 					align="center"
 				>
 					<_AlertDialog.Close
-						render={ <Button variant="minimal" /> }
+						render={ <Button variant="minimal" tone="neutral" /> }
 						disabled={ buttonsDisabled }
 					>
 						{ cancelButtonText }

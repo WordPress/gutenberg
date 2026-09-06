@@ -31,6 +31,12 @@
 	}
 }
 
+.edit-site-styles__content {
+	flex-grow: 1;
+	min-height: 0;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+}
+
 // Show button text labels when preference is enabled.
 .show-icon-labels {
 	.edit-site-styles__header-actions {

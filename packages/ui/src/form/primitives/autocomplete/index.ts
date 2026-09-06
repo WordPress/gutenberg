@@ -13,4 +13,5 @@ export { Portal } from './portal';
 export { Positioner } from './positioner';
 export { Root } from './root';
 export { Row } from './row';
+export { Status } from './status';
 export { Value } from './value';
