@@ -870,7 +870,7 @@ async function publishVersionedPackagesToNpm(
 		gitWorkingDirectoryPath
 	);
 	const publishCommit = await git.revparse( [ 'HEAD' ] );
-	const publishCommand = `npx lerna publish from-package --dist-tag ${ distTag } --git-head ${ publishCommit } ${ yesFlag } ${ noVerifyAccessFlag }`;
+	const publishCommand = `npm exec --no -- lerna publish from-package --dist-tag ${ distTag } --git-head ${ publishCommit } ${ yesFlag } ${ noVerifyAccessFlag }`;
 	const getPublishedPackageNames = () =>
 		runNpmPublishPreflightFn( {
 			distTag,
@@ -982,7 +982,7 @@ async function publishPackagesToNpm(
 		);
 
 		await commandFn(
-			`npx lerna version pre${ minimumVersionBump } --preid next.v.${ timestamp } --no-private --no-push ${ yesFlag }`,
+			`npm exec --no -- lerna version pre${ minimumVersionBump } --preid next.v.${ timestamp } --no-private --no-push ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -993,7 +993,7 @@ async function publishPackagesToNpm(
 			'>> Bumping version of public packages changed since the last release.'
 		);
 		await commandFn(
-			`npx lerna version ${ minimumVersionBump } --no-private --no-push ${ yesFlag }`,
+			`npm exec --no -- lerna version ${ minimumVersionBump } --no-private --no-push ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',

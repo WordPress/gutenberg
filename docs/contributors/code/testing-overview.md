@@ -39,7 +39,7 @@ During the Jest-to-Vitest migration, run both `npm run test:unit` and `npm run t
 
 Keep your tests in a `test` folder in your working directory. The test file should have the same name as the test subject file.
 
-Use `*.jsdom.test.*` for tests that only require a virtual DOM. Use `*.browser.test.*` for tests that require Vitest Browser Mode. Leave Node-compatible test names without an environment suffix. Node tests run in Vitest automatically. The filename selects the test environment in both Jest and Vitest. During the remaining migration, the manifest selects the runner only for JSDOM and Browser Mode tests. Do not use per-file environment overrides.
+Use `*.jsdom.test.*` for tests that only require a virtual DOM. Use `*.browser.test.*` for tests that require Vitest Browser Mode. Leave Node-compatible test names without an environment suffix. Every new test runs in Vitest automatically. The filename selects its environment. During the remaining migration, the manifest lists only legacy JSDOM tests that still run in Jest. Do not use per-file environment overrides.
 
 ```
 +-- test
@@ -634,16 +634,16 @@ npm run test:performance
 
 This gives you the result for the current branch/code on the running environment.
 
-In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `npm exec release-cli -- perf [branches]`, example:
+In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `npm exec --no release-cli -- perf [branches]`, example:
 
-```
-npm exec release-cli -- perf trunk v8.1.0 v8.0.0
+```sh
+npm exec --no release-cli -- perf trunk v8.1.0 v8.0.0
 ```
 
 Finally, you can pass an additional `--tests-branch` argument to specify which branch's performance test files you'd like to run. This is particularly useful when modifying/extending the perf tests:
 
-```
-npm exec release-cli -- perf trunk v8.1.0 v8.0.0 --tests-branch add/perf-tests-coverage
+```sh
+npm exec --no release-cli -- perf trunk v8.1.0 v8.0.0 --tests-branch add/perf-tests-coverage
 ```
 
 **Note** This command needs may take some time to perform the benchmark. While running make sure to avoid using your computer or have a lot of background process to minimize external factors that can impact the results across branches.

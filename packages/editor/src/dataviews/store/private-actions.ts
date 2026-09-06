@@ -259,7 +259,10 @@ export const registerPostTypeSchema =
 				! isDesignPostType && dateField,
 				! isDesignPostType && scheduledDateField,
 				lastEditedDateField,
-				! isDesignPostType && slugField,
+				// There is no post type support flag for permalinks, and
+				// `viewable` alone is not the full condition (the type must
+				// also be public), so the field also checks each post.
+				! isDesignPostType && postTypeConfig.viewable && slugField,
 				! isDesignPostType &&
 					postTypeConfig.supports?.excerpt &&
 					excerptField,

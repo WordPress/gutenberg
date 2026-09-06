@@ -1,6 +1,7 @@
 import type { ComponentProps } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useId } from '@wordpress/element';
 import { BorderBoxControl } from '..';
 
 const colors = [
@@ -50,6 +51,102 @@ function TestBorderBoxControl(
 }
 
 describe( 'BorderBoxControl', () => {
+	describe( 'Labelling', () => {
+		it( 'should give the group of controls an accessible name from the label', () => {
+			render( <TestBorderBoxControl { ...props } /> );
+
+			expect(
+				screen.getByRole( 'group', { name: props.label } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should name the group of controls even when the label is hidden', () => {
+			render( <TestBorderBoxControl { ...props } hideLabelFromVision /> );
+
+			expect(
+				screen.getByRole( 'group', { name: props.label } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should let a consumer-provided `aria-label` take precedence over the label', () => {
+			render(
+				<TestBorderBoxControl { ...props } aria-label="Outer borders" />
+			);
+
+			expect(
+				screen.getByRole( 'group', { name: 'Outer borders' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should let a consumer-provided `aria-labelledby` take precedence over the label', () => {
+			const ExternallyLabelledControl = () => {
+				const id = useId();
+				return (
+					<>
+						<span id={ id }>Outer borders</span>
+						<TestBorderBoxControl
+							{ ...props }
+							aria-labelledby={ id }
+						/>
+					</>
+				);
+			};
+
+			render( <ExternallyLabelledControl /> );
+
+			expect(
+				screen.getByRole( 'group', { name: 'Outer borders' } )
+			).toBeInTheDocument();
+
+			// With an external name in play, the internal label is no longer
+			// referenced, so it shouldn't carry a generated ID either.
+			expect( screen.getByText( props.label ) ).not.toHaveAttribute(
+				'id'
+			);
+		} );
+
+		it( 'should form a group when named only by `aria-label`', () => {
+			render(
+				<TestBorderBoxControl
+					{ ...props }
+					label={ undefined }
+					aria-label="Outer borders"
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'group', { name: 'Outer borders' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should fall back to the label when an ARIA naming prop is empty', () => {
+			// An empty `aria-label` is skipped by the accessible name
+			// computation, so it shouldn't suppress the label association and
+			// leave the group unnamed.
+			render( <TestBorderBoxControl { ...props } aria-label="" /> );
+
+			expect(
+				screen.getByRole( 'group', { name: props.label } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should give each instance its own label association', () => {
+			render(
+				<>
+					<TestBorderBoxControl { ...props } label="First" />
+					<TestBorderBoxControl { ...props } label="Second" />
+				</>
+			);
+
+			expect(
+				screen.getByRole( 'group', { name: 'First' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'group', { name: 'Second' } )
+			).toBeInTheDocument();
+		} );
+	} );
+
 	describe( 'Linked view rendering', () => {
 		it( 'should render correctly when no value provided', () => {
 			render( <TestBorderBoxControl { ...props } /> );

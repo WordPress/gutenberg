@@ -6,9 +6,9 @@ import MoreMenuItem from './more-menu-item';
 
 type MoreMenuGroupProps = {
 	/**
-	 * Label of the group.
+	 * Label of the group. Omit it for a group that needs no heading.
 	 */
-	label: string;
+	label?: string;
 
 	/**
 	 * Fills of the slot.
@@ -17,7 +17,7 @@ type MoreMenuGroupProps = {
 };
 
 /**
- * Renders the fills of an action item slot as a group of the more menu.
+ * Renders the fills of an action item slot as a group of a menu.
  */
 export default function MoreMenuGroup( {
 	label,
@@ -27,7 +27,7 @@ export default function MoreMenuGroup( {
 		<>
 			<Menu.Separator />
 			<Menu.Group>
-				<Menu.GroupLabel>{ label }</Menu.GroupLabel>
+				{ label && <Menu.GroupLabel>{ label }</Menu.GroupLabel> }
 				{ toMenuItems( children ) }
 			</Menu.Group>
 		</>

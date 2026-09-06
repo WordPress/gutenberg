@@ -18,10 +18,10 @@ const ARTIFACTS_PATH =
 const RAW_RESULTS_FILE_SUFFIX = '.performance-results.raw.json';
 const RESULTS_FILE_SUFFIX = '.performance-results.json';
 /*
- * Read from the CLI's own checkout, so every branch under test builds with the
- * npm version trunk requires rather than whichever npm the runner happens to ship.
+ * Read from the CLI's own checkout so every branch under test builds with the npm
+ * version trunk requires, narrowed to that major so a new one cannot land mid-run.
  */
-const NPM_VERSION = devEngines.packageManager.version;
+const NPM_VERSION = devEngines.packageManager.version.replace( '>=', '^' );
 
 /**
  * @typedef WPPerformanceCommandOptions
@@ -311,7 +311,7 @@ async function runPerformanceTests( branches, options ) {
 		logAtIndent( 2, 'Using checkout:', formats.success( testRunnerDir ) );
 		logAtIndent( 2, 'Building test utilities' );
 		await runShellScript(
-			`bash -c "npm run build --workspace @wordpress/e2e-test-utils-playwright && npx playwright install chromium --with-deps"`,
+			`bash -c "npm run build --workspace @wordpress/e2e-test-utils-playwright && npm exec --no --workspace @wordpress/e2e-tests-playwright -- playwright install chromium --with-deps"`,
 			testRunnerDir
 		);
 	} else {
@@ -385,7 +385,7 @@ async function runPerformanceTests( branches, options ) {
 
 		logAtIndent( 2, 'Installing dependencies and building' );
 		await runShellScript(
-			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm install --global npm@'${ NPM_VERSION }' && npm ci && npm run build --workspace @wordpress/e2e-test-utils-playwright && npx playwright install chromium --with-deps"`,
+			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm install --global npm@'${ NPM_VERSION }' && npm ci && npm run build --workspace @wordpress/e2e-test-utils-playwright && npm exec --no --workspace @wordpress/e2e-tests-playwright -- playwright install chromium --with-deps"`,
 			testRunnerDir
 		);
 	}

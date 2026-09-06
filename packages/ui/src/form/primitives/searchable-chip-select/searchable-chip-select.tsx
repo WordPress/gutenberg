@@ -107,6 +107,7 @@ export const SearchableChipSelect = forwardRef<
 						ref={ ref }
 						render={
 							<input
+								type="text"
 								className={ clsx(
 									defenseStyles.input,
 									styles.input

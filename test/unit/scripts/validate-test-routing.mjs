@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
 	discoverTestFiles,
+	findAddedLegacyJestTests,
 	findOverlappingVitestProjectTests,
 	getTestEnvironmentName,
 	getVitestTests,
@@ -13,6 +14,7 @@ import {
 	VITEST_PROJECT_NAMES,
 } from './discover-test-files.mjs';
 import { resolvePackageBin } from './resolve-package-bin.mjs';
+import { collectJestInfrastructureEntries } from './test-infrastructure-policy.mjs';
 import { sourceHasTestEnvironmentOverride } from './test-environment-overrides.mjs';
 
 const ROOT_DIR = path.resolve(
@@ -37,6 +39,19 @@ function normalizeTestPath( testPath ) {
 }
 
 function listTests( packageName, args ) {
+	const lines = runTestList( packageName, args );
+
+	return new Set(
+		lines
+			.map( ( testPath ) => testPath.replace( /^\[[^\]]+\]\s+/, '' ) )
+			.filter( ( testPath ) =>
+				existsSync( path.resolve( ROOT_DIR, testPath ) )
+			)
+			.map( normalizeTestPath )
+	);
+}
+
+function runTestList( packageName, args ) {
 	const result = spawnSync(
 		process.execPath,
 		[ resolvePackageBin( packageName ), ...args ],
@@ -58,17 +73,42 @@ function listTests( packageName, args ) {
 		process.exit( result.status ?? 1 );
 	}
 
-	return new Set(
-		result.stdout
-			.trim()
-			.split( /\r?\n/ )
-			.filter( Boolean )
-			.map( ( testPath ) => testPath.replace( /^\[[^\]]+\]\s+/, '' ) )
-			.filter( ( testPath ) =>
-				existsSync( path.resolve( ROOT_DIR, testPath ) )
-			)
-			.map( normalizeTestPath )
+	return result.stdout.trim().split( /\r?\n/ ).filter( Boolean );
+}
+
+function listVitestTestsByProject() {
+	const testsByProject = Object.fromEntries(
+		VITEST_PROJECT_NAMES.map( ( projectName ) => [
+			projectName,
+			new Set(),
+		] )
 	);
+	const lines = runTestList( 'vitest', [
+		'list',
+		'--config',
+		VITEST_CONFIG,
+		'--filesOnly',
+		'--passWithNoTests',
+	] );
+
+	for ( const line of lines ) {
+		const match = line.match( /^\[([^\]]+)\]\s+(.+)$/ );
+		assert.ok( match, `Unexpected Vitest list output: ${ line }` );
+		const [ , projectName, testPath ] = match;
+		assert.ok(
+			testsByProject[ projectName ],
+			`Unexpected Vitest project \`${ projectName }\`. Expected only: ${ VITEST_PROJECT_NAMES.join(
+				', '
+			) }`
+		);
+		assert.ok(
+			existsSync( path.resolve( ROOT_DIR, testPath ) ),
+			`Vitest ${ projectName } listed a missing test: ${ testPath }`
+		);
+		testsByProject[ projectName ].add( normalizeTestPath( testPath ) );
+	}
+
+	return testsByProject;
 }
 
 function assertUniquePaths( label, testPaths ) {
@@ -87,13 +127,6 @@ function assertUniquePaths( label, testPaths ) {
 	}
 }
 
-function isWithinDirectory( testPath, directoryPath ) {
-	return (
-		testPath === directoryPath ||
-		testPath.startsWith( `${ directoryPath }/` )
-	);
-}
-
 function isValidManifestPath( testPath, expectedType ) {
 	const resolvedPath = path.resolve( ROOT_DIR, testPath );
 	const relativePath = path.relative( ROOT_DIR, resolvedPath );
@@ -107,6 +140,84 @@ function isValidManifestPath( testPath, expectedType ) {
 		existsSync( resolvedPath ) &&
 		statSync( resolvedPath )[ expectedType ]()
 	);
+}
+
+function getCommandArgument( name ) {
+	const inlinePrefix = `--${ name }=`;
+	const inlineArgument = process.argv.find( ( argument ) =>
+		argument.startsWith( inlinePrefix )
+	);
+	if ( inlineArgument ) {
+		return inlineArgument.slice( inlinePrefix.length );
+	}
+
+	const argumentIndex = process.argv.indexOf( `--${ name }` );
+	return argumentIndex === -1 ? null : process.argv[ argumentIndex + 1 ];
+}
+
+function runGit( args ) {
+	return spawnSync( 'git', args, {
+		cwd: ROOT_DIR,
+		encoding: 'utf8',
+	} );
+}
+
+function getBaselineRef() {
+	const explicitBase = getCommandArgument( 'base' );
+	if ( explicitBase ) {
+		return explicitBase;
+	}
+	assert.notEqual(
+		process.env.GITHUB_ACTIONS,
+		'true',
+		'CI must pass an explicit --base=<commit> to validate that the legacy Jest allowlist did not grow.'
+	);
+
+	const mergeBase = runGit( [ 'merge-base', 'HEAD', 'origin/trunk' ] );
+	return mergeBase.status === 0 ? mergeBase.stdout.trim() : 'HEAD';
+}
+
+function readBaselineMigrationManifest( baselineRef ) {
+	const result = runGit( [
+		'show',
+		`${ baselineRef }:test/unit/test-migration.json`,
+	] );
+
+	if ( result.status !== 0 ) {
+		assert.notEqual(
+			process.env.GITHUB_ACTIONS,
+			'true',
+			`CI must fetch the baseline commit ${ baselineRef } to validate that the legacy Jest allowlist did not grow.`
+		);
+		return null;
+	}
+
+	return JSON.parse( result.stdout );
+}
+
+function getChangedFiles( baselineRef ) {
+	const result = runGit( [
+		'diff',
+		'--name-only',
+		'--diff-filter=ACMR',
+		baselineRef,
+		'--',
+	] );
+	assert.equal(
+		result.status,
+		0,
+		'Could not compare Jest infrastructure with ' +
+			baselineRef +
+			':\n' +
+			result.stderr
+	);
+
+	return result.stdout.trim().split( /\r?\n/ ).filter( Boolean );
+}
+
+function readBaselineFile( baselineRef, file ) {
+	const result = runGit( [ 'show', `${ baselineRef }:${ file }` ] );
+	return result.status === 0 ? result.stdout : null;
 }
 
 const staticInventory = discoverTestFiles( ROOT_DIR );
@@ -128,13 +239,8 @@ const expectedVitestTestsByProject = getVitestTestsByProject(
 	manifest
 );
 const expectedVitestTests = getVitestTests( staticInventory, manifest );
-const expectedVitestTestSet = new Set( expectedVitestTests );
 const expectedJestTestsByProject = {
-	jsdom: staticInventory.filter(
-		( testPath ) =>
-			! expectedVitestTestSet.has( testPath ) &&
-			getTestEnvironmentName( testPath ) === 'jsdom'
-	),
+	jsdom: [ ...manifest.jest.files ].sort(),
 };
 const jestConfig = require( path.join( ROOT_DIR, JEST_CONFIG ) );
 const jestProjectNames = jestConfig.projects.map( ( project ) =>
@@ -173,22 +279,14 @@ const jestTests = new Set(
 		...projectTests,
 	] )
 );
-const vitestTestsByProject = Object.fromEntries(
-	VITEST_PROJECT_NAMES.map( ( projectName ) => [
-		projectName,
-		existsSync( path.join( ROOT_DIR, VITEST_CONFIG ) )
-			? listTests( 'vitest', [
-					'list',
-					'--config',
-					VITEST_CONFIG,
-					'--project',
-					projectName,
-					'--filesOnly',
-					'--passWithNoTests',
-			  ] )
-			: new Set(),
-	] )
-);
+const vitestTestsByProject = existsSync( path.join( ROOT_DIR, VITEST_CONFIG ) )
+	? listVitestTestsByProject()
+	: Object.fromEntries(
+			VITEST_PROJECT_NAMES.map( ( projectName ) => [
+				projectName,
+				new Set(),
+			] )
+	  );
 const overlappingVitestProjectTests =
 	findOverlappingVitestProjectTests( vitestTestsByProject );
 assert.deepEqual(
@@ -213,61 +311,60 @@ const vitestTests = new Set(
 	] )
 );
 
-const migratedTestFiles = manifest.vitest.files;
-const migratedDirectories = manifest.vitest.directories;
+const legacyJestTestFiles = manifest.jest.files;
+const baselineRef = getBaselineRef();
+const baselineMigrationManifest = readBaselineMigrationManifest( baselineRef );
 
-assertUniquePaths( 'vitest.files', migratedTestFiles );
-assertUniquePaths( 'vitest.directories', migratedDirectories );
+assertUniquePaths( 'jest.files', legacyJestTestFiles );
 
-const overlappingManifestEntries = [
-	...migratedTestFiles.filter( ( testPath ) =>
-		migratedDirectories.some( ( directoryPath ) =>
-			isWithinDirectory( testPath, directoryPath )
-		)
-	),
-	...migratedDirectories.filter( ( directoryPath, index ) =>
-		migratedDirectories.some(
-			( otherDirectoryPath, otherIndex ) =>
-				otherIndex !== index &&
-				isWithinDirectory( directoryPath, otherDirectoryPath )
-		)
-	),
-];
+if ( baselineMigrationManifest?.jest?.files ) {
+	const addedLegacyJestTests = findAddedLegacyJestTests(
+		legacyJestTestFiles,
+		baselineMigrationManifest.jest.files
+	);
+	assert.deepEqual(
+		addedLegacyJestTests,
+		[],
+		`jest.files is shrink-only. New tests must run in Vitest:\n${ addedLegacyJestTests.join(
+			'\n'
+		) }`
+	);
+}
+
+const changedFiles = getChangedFiles( baselineRef );
+const currentJestInfrastructure = collectJestInfrastructureEntries(
+	changedFiles,
+	( file ) => {
+		const filename = path.join( ROOT_DIR, file );
+		return existsSync( filename ) ? readFileSync( filename, 'utf8' ) : null;
+	}
+);
+const baselineJestInfrastructure = new Set(
+	collectJestInfrastructureEntries( changedFiles, ( file ) =>
+		readBaselineFile( baselineRef, file )
+	)
+);
+const addedJestInfrastructure = currentJestInfrastructure.filter(
+	( entry ) => ! baselineJestInfrastructure.has( entry )
+);
 assert.deepEqual(
-	overlappingManifestEntries,
+	addedJestInfrastructure,
 	[],
-	`Vitest migration manifest entries must be disjoint:\n${ overlappingManifestEntries.join(
+	`New Jest-only configuration, dependencies, and commands are not allowed:\n${ addedJestInfrastructure.join(
 		'\n'
 	) }`
 );
 
-const invalidMigratedEntries = [
-	...migratedTestFiles.filter(
-		( testPath ) => ! isValidManifestPath( testPath, 'isFile' )
-	),
-	...migratedDirectories.filter(
-		( directoryPath ) =>
-			! isValidManifestPath( directoryPath, 'isDirectory' )
-	),
-];
-assert.deepEqual(
-	invalidMigratedEntries,
-	[],
-	`Migrated files or directories must exist inside the repository and match their declared type:\n${ invalidMigratedEntries.join(
-		'\n'
-	) }`
-);
-
-const emptyMigratedDirectories = migratedDirectories.filter(
-	( directoryPath ) =>
-		! staticInventory.some( ( testPath ) =>
-			isWithinDirectory( testPath, directoryPath )
-		)
+const invalidLegacyJestEntries = legacyJestTestFiles.filter(
+	( testPath ) =>
+		! isValidManifestPath( testPath, 'isFile' ) ||
+		! staticInventory.includes( testPath ) ||
+		getTestEnvironmentName( testPath ) !== 'jsdom'
 );
 assert.deepEqual(
-	emptyMigratedDirectories,
+	invalidLegacyJestEntries,
 	[],
-	`Migrated directories must contain at least one test:\n${ emptyMigratedDirectories.join(
+	`Legacy Jest entries must be discovered JSDOM test files inside the repository:\n${ invalidLegacyJestEntries.join(
 		'\n'
 	) }`
 );
@@ -286,7 +383,7 @@ assert.deepEqual(
 assert.deepEqual(
 	[ ...vitestTests ].sort(),
 	expectedVitestTests,
-	`Vitest discovery does not match the migration manifest.`
+	`Vitest discovery does not match the legacy Jest allowlist.`
 );
 
 const runnerInventory = [

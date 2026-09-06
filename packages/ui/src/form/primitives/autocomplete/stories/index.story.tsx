@@ -60,7 +60,11 @@ export const Default: Story = {
 	args: {
 		items: URLS,
 		children: [
-			<Autocomplete.Input placeholder="Enter a URL" key="input" />,
+			<Autocomplete.Input
+				aria-label="URL"
+				placeholder="Enter a URL"
+				key="input"
+			/>,
 			<Autocomplete.Popup key="popup">
 				<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
 				<Autocomplete.List>
@@ -109,7 +113,10 @@ export const OpenOnlyOnMatch: Story = {
 				} }
 				filteredItems={ filteredItems }
 			>
-				<Autocomplete.Input placeholder="Enter a URL" />
+				<Autocomplete.Input
+					aria-label="URL"
+					placeholder="Enter a URL"
+				/>
 				<Autocomplete.Popup>
 					<Autocomplete.List>
 						<Autocomplete.ListBody>
@@ -217,7 +224,7 @@ function AsyncItemsTemplate( {
 				}, 500 );
 			} }
 		>
-			<Autocomplete.Input placeholder="Enter a URL" />
+			<Autocomplete.Input aria-label="URL" placeholder="Enter a URL" />
 			<Autocomplete.Popup>
 				<AsyncStatus
 					loading={ loading }
@@ -294,7 +301,10 @@ export const Inline: Story = {
 				value={ value }
 				onValueChange={ setValue }
 			>
-				<Autocomplete.Input placeholder="Type a command" />
+				<Autocomplete.Input
+					aria-label="Command"
+					placeholder="Type a command"
+				/>
 				<div
 					style={ {
 						minHeight: '200px',
@@ -328,6 +338,7 @@ export const WithSearchIconAndClearButton: Story = {
 		children: [
 			<Autocomplete.InputGroup key="inputGroup">
 				<Autocomplete.Input
+					aria-label="Search URLs"
 					placeholder="Search URLs"
 					render={
 						<Input
@@ -470,6 +481,7 @@ export const InlineMentionAutocomplete: Story = {
 			>
 				<Autocomplete.Input
 					ref={ inputRef }
+					aria-label="Comment"
 					placeholder="Type @ to mention someone"
 				/>
 
@@ -515,7 +527,11 @@ export const WithCustomZIndex: Story = {
 	args: {
 		items: URLS,
 		children: [
-			<Autocomplete.Input placeholder="Enter a URL" key="input" />,
+			<Autocomplete.Input
+				aria-label="URL"
+				placeholder="Enter a URL"
+				key="input"
+			/>,
 			<Autocomplete.Popup
 				portal={
 					<Autocomplete.Portal
@@ -551,7 +567,11 @@ export const Grouped: Story = {
 	args: {
 		items: GROUPED_COMMANDS,
 		children: [
-			<Autocomplete.Input placeholder="Type a command" key="input" />,
+			<Autocomplete.Input
+				aria-label="Command"
+				placeholder="Type a command"
+				key="input"
+			/>,
 			<Autocomplete.Popup key="popup">
 				<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
 				<Autocomplete.List>
@@ -636,7 +656,10 @@ export const Grid: Story = {
 	render: function Template( args ) {
 		return (
 			<Autocomplete.Root { ...args }>
-				<Autocomplete.Input placeholder="Search emojis" />
+				<Autocomplete.Input
+					aria-label="Search emojis"
+					placeholder="Search emojis"
+				/>
 				<div
 					style={ {
 						marginTop: 'var(--wpds-dimension-gap-sm)',

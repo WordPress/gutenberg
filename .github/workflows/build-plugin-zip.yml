@@ -116,6 +116,11 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: true
 
+            # `semver` comes from the release-tools workspace, so the job needs
+            # the dependency tree before it can compute the next version.
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
             - name: Compute old and new version
               id: get_version
               env:
@@ -124,17 +129,17 @@ jobs:
                   OLD_VERSION="$(jq --raw-output '.version' package.json)"
                   echo "old_version=${OLD_VERSION}" >> "$GITHUB_OUTPUT"
                   if [[ "$VERSION" == 'stable' ]]; then
-                    NEW_VERSION="$(npx semver "$OLD_VERSION" -i patch)"
+                    NEW_VERSION="$(npm exec --no --workspace @wordpress/release-tools -- semver "$OLD_VERSION" -i patch)"
                   else
                     if [[ "$OLD_VERSION" == *"rc"* ]]; then
-                      NEW_VERSION="$(npx semver "$OLD_VERSION" -i prerelease)"
+                      NEW_VERSION="$(npm exec --no --workspace @wordpress/release-tools -- semver "$OLD_VERSION" -i prerelease)"
                     else
                       # WordPress version guidelines: If minor is 9, bump major instead.
                       IFS='.' read -r -a OLD_VERSION_ARRAY <<< "$OLD_VERSION"
                       if [[ ${OLD_VERSION_ARRAY[1]} == "9" ]]; then
-                        NEW_VERSION="$(npx semver "$OLD_VERSION" -i major)-rc.1"
+                        NEW_VERSION="$(npm exec --no --workspace @wordpress/release-tools -- semver "$OLD_VERSION" -i major)-rc.1"
                       else
-                        NEW_VERSION="$(npx semver "$OLD_VERSION" -i minor)-rc.1"
+                        NEW_VERSION="$(npm exec --no --workspace @wordpress/release-tools -- semver "$OLD_VERSION" -i minor)-rc.1"
                       fi
                     fi
                   fi

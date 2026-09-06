@@ -96,13 +96,18 @@ const MediaReplaceFlow = ( {
 	};
 
 	const selectMedia = ( media, closeMenu ) => {
+		const hasMedia = !! ( mediaURL || mediaId || mediaIds?.length );
 		if ( useFeaturedImage && onToggleFeaturedImage ) {
 			onToggleFeaturedImage();
 		}
 		closeMenu();
 		// Calling `onSelect` after the state update since it might unmount the component.
 		onSelect( media );
-		speak( __( 'The media file has been replaced' ) );
+		speak(
+			hasMedia
+				? __( 'The media file has been replaced' )
+				: __( 'The media file has been added' )
+		);
 		removeNotice( errorNoticeID );
 	};
 

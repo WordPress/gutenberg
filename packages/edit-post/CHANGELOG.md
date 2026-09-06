@@ -4,7 +4,8 @@
 
 ### Bug Fixes
 
--   `WelcomeGuide`: Keep the modal close icon white now that it is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
+-   `WelcomeGuide`: Keep the modal close icon white now that it is stroke-based ([#78812](https://github.com/WordPress/gutenberg/pull/78812)).
+-   Meta Boxes: Fix classic (TinyMCE) editors in meta boxes becoming unusable, by moving the meta box markup with `moveBefore` where it is available ([#82243](https://github.com/WordPress/gutenberg/pull/82243)).
 
 ### Internal
 

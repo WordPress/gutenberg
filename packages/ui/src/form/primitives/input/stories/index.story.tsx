@@ -32,6 +32,7 @@ type Story = StoryObj< typeof Input >;
 export const Default: Story = {
 	args: {
 		placeholder: 'Placeholder',
+		'aria-label': 'Value',
 	},
 };
 
@@ -42,18 +43,15 @@ export const Default: Story = {
 export const WithPrefix: Story = {
 	args: {
 		placeholder: 'username',
+		'aria-label': 'Username',
 		prefix: <InputLayout.Slot>@</InputLayout.Slot>,
 	},
 };
 
 export const WithSuffixControl: Story = {
 	args: {
+		'aria-label': 'Value',
 		suffix: InputLayoutWithSuffixControl.args?.suffix,
-	},
-	parameters: {
-		// FIXME: Story shows Input without a visible label (label).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
 	},
 };
 
