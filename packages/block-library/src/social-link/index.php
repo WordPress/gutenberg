@@ -349,7 +349,6 @@ function block_core_social_link_services( $service = '', $field = '' ) {
 	 * @since 6.9.0
 	 *
 	 * @param array $services_data The list of services. Each item is an array containing a 'name' and 'icon' key.
-	 * @return array The list of social services.
 	 */
 	$services_data = apply_filters( 'block_core_social_link_get_services', $services_data );
 
