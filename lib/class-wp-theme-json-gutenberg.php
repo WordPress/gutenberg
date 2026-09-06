@@ -4363,6 +4363,10 @@ class WP_Theme_JSON_Gutenberg {
 						$variation_responsive_css .= $breakpoint_media . '{' . $feature_ruleset . '}';
 					}
 
+					if ( 'core/column' === $block_name ) {
+						$breakpoint_declarations = static::update_column_width_declarations( $breakpoint_declarations );
+					}
+
 					if ( ! empty( $breakpoint_declarations ) ) {
 						$base_ruleset              = static::to_ruleset( ':root :where(' . $style_variation['selector'] . ')', $breakpoint_declarations );
 						$variation_responsive_css .= $breakpoint_media . '{' . $base_ruleset . '}';
