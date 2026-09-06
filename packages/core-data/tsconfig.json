@@ -4,6 +4,7 @@
 	"compilerOptions": {
 		"types": [ "jest", "node" ]
 	},
+	"files": [ "global.d.ts" ],
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
