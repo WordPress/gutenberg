@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Regenerate the WPDS fallback map with the solid neutral interactive background state tokens. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
+
 ### Enhancements
 
 -   Add a `$block-bg-padding` variable that resolves the default background padding through the `--wp--style--block-background-padding` custom property, keeping the existing values as its fallback ([#82024](https://github.com/WordPress/gutenberg/pull/82024)).

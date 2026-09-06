@@ -75,7 +75,9 @@ export default function PostTemplateEdit( {
 		query: {
 			perPage,
 			offset = 0,
-			postType,
+			// Match `build_query_vars_from_query_block()`, which queries posts when
+			// `query` has no post type.
+			postType = 'post',
 			order,
 			orderBy,
 			author,
