@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Show a "Privacy Policy Page" badge in the document bar and the post card panel for the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
+-   `PostCardPanel`: Migrate the page-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82500](https://github.com/WordPress/gutenberg/pull/82500)).
 
 ### Breaking Changes
 
@@ -33,7 +34,6 @@
 -   Remove the template activation (`active_templates`) experiment: the post-save activation notice, the "Edit template" auto-activation, and template duplication in the actions list ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
 -   Remove unused dependencies `@wordpress/reusable-blocks`, `client-zip` and `fast-deep-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
--   `PostCardPanel`: Migrate the page-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82440](https://github.com/WordPress/gutenberg/issues/82440)).
 
 ## 14.54.0 (2026-08-26)
 
