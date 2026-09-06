@@ -3,6 +3,24 @@ import { createRef } from '@wordpress/element';
 import * as Fieldset from '../';
 
 describe( 'Fieldset', () => {
+	it( 'throws when Fieldset.Description is outside Fieldset.Root', () => {
+		expect( () =>
+			render( <Fieldset.Description>Description</Fieldset.Description> )
+		).toThrow(
+			'Fieldset.Description: Missing parent <Fieldset.Root>. Render <Fieldset.Description> inside <Fieldset.Root>.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
+	it( 'throws when Fieldset.Details is outside Fieldset.Root', () => {
+		expect( () =>
+			render( <Fieldset.Details>Details</Fieldset.Details> )
+		).toThrow(
+			'Fieldset.Details: Missing parent <Fieldset.Root>. Render <Fieldset.Details> inside <Fieldset.Root>.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
 	it( 'forwards ref', () => {
 		const rootRef = createRef< HTMLFieldSetElement >();
 		const legendRef = createRef< HTMLDivElement >();

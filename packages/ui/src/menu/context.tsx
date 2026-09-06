@@ -12,6 +12,7 @@ const MenuContext = createContext< MenuContextValue >( {
 const useMenuContext = () => useContext( MenuContext );
 
 type MenuItemContentContextValue = {
+	descriptionIds: readonly string[];
 	labelId?: string;
 	labelTrailing?: ReactNode;
 };

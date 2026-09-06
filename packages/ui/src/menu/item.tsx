@@ -121,6 +121,7 @@ function useItemContent(
 	return {
 		contentChildren,
 		contentContextValue: {
+			descriptionIds: resolvedDescriptionIds,
 			labelId: resolvedLabelId,
 			labelTrailing,
 		},

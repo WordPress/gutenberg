@@ -1,6 +1,7 @@
 import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import type { AutocompleteRootProps } from './types';
 import { DirectionProvider } from '../../../utils/direction-provider';
+import { AutocompleteGridContext } from './context';
 
 /**
  * Low-level primitive for an autocomplete input that suggests options as
@@ -13,8 +14,10 @@ import { DirectionProvider } from '../../../utils/direction-provider';
  */
 export function Root( props: AutocompleteRootProps ) {
 	return (
-		<DirectionProvider>
-			<_Autocomplete.Root { ...props } />
-		</DirectionProvider>
+		<AutocompleteGridContext.Provider value={ Boolean( props.grid ) }>
+			<DirectionProvider>
+				<_Autocomplete.Root { ...props } />
+			</DirectionProvider>
+		</AutocompleteGridContext.Provider>
 	);
 }

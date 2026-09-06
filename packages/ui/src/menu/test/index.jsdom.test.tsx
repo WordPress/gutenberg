@@ -910,6 +910,38 @@ describe( 'Menu', () => {
 		expect( screen.getByText( 'separate' ).tagName ).toBe( 'STRONG' );
 	} );
 
+	it( 'throws when ItemDescription is outside a menu item', () => {
+		expect( () =>
+			render( <Menu.ItemDescription>Description</Menu.ItemDescription> )
+		).toThrow(
+			'Menu.ItemDescription: Missing direct menu item parent. Render <Menu.ItemDescription> as a direct child of a menu item.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
+	it( 'throws when ItemDescription is nested inside a menu item', () => {
+		expect( () =>
+			render(
+				<Menu.Root defaultOpen>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>
+								Duplicate
+								<Menu.ItemDescription>
+									Description
+								</Menu.ItemDescription>
+							</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			)
+		).toThrow(
+			'Menu.ItemDescription: Missing direct menu item parent. Render <Menu.ItemDescription> as a direct child of a menu item.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
 	it( 'combines multiple item descriptions in DOM order', async () => {
 		const user = userEvent.setup();
 
