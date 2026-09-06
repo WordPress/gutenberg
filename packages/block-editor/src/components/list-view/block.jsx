@@ -656,6 +656,7 @@ function ListViewBlock( {
 							tabIndex={ getListViewBlockTabIndex( tabIndex ) }
 							onFocus={ onFocus }
 							isExpanded={ canEditBlock ? isExpanded : undefined }
+							isSelected={ isSelected }
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
 							visibilityLabel={ blockVisibilityDescription }
