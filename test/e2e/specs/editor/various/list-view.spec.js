@@ -331,7 +331,7 @@ test.describe( 'List View', () => {
 	// If list view sidebar is open and focus is not inside the sidebar, move
 	// focus to the sidebar when using the shortcut. If focus is inside the
 	// sidebar, shortcut should close the sidebar.
-	test.skip( 'ensures List View global shortcut works properly', async ( {
+	test( 'ensures List View global shortcut works properly', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -353,7 +353,7 @@ test.describe( 'List View', () => {
 			name: 'Block navigation structure',
 		} );
 
-		// The paragraph item should be selected.
+		// The paragraph item should be selected and focused.
 		await expect(
 			listView.getByRole( 'gridcell', {
 				name: 'Paragraph',
@@ -361,6 +361,9 @@ test.describe( 'List View', () => {
 				selected: true,
 			} )
 		).toBeVisible();
+		await expect(
+			listView.getByRole( 'link', { name: 'Paragraph' } )
+		).toBeFocused();
 
 		// Navigate to the image block item.
 		await page.keyboard.press( 'ArrowUp' );
@@ -400,6 +403,7 @@ test.describe( 'List View', () => {
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
+		await expect( imageItem ).toBeFocused();
 
 		// Focus the list view close button and make sure the shortcut will
 		// close the list view. This is to catch a bug where elements could be
@@ -421,6 +425,7 @@ test.describe( 'List View', () => {
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
+		await expect( imageItem ).toBeFocused();
 
 		// Focus the outline tab and select it. This test ensures the outline
 		// tab receives similar focus events based on the shortcut.
@@ -493,6 +498,33 @@ test.describe( 'List View', () => {
 			listView.getByRole( 'link', {
 				name: 'Image',
 			} )
+		).toBeFocused();
+	} );
+
+	test( 'should place focus on the first block when no block is selected', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		// Clicking the title deselects the blocks.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+
+		// Open List View.
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await expect(
+			listView.getByRole( 'link', { name: 'First' } )
 		).toBeFocused();
 	} );
 
@@ -1321,6 +1353,11 @@ test.describe( 'List View', () => {
 		const optionsForFileMenu = page.getByRole( 'menu', {
 			name: 'Options',
 		} );
+		// The menu moves focus to its first item on mount. Keys sent before
+		// that lands are handled by the toggle button instead of the menu.
+		const firstMenuItem = optionsForFileMenu
+			.getByRole( 'menuitem' )
+			.first();
 		await expect(
 			optionsForFileToggle,
 			'Pressing arrow right should move focus to the menu dropdown toggle button'
@@ -1331,6 +1368,7 @@ test.describe( 'List View', () => {
 			optionsForFileMenu,
 			'Pressing Enter should open the menu dropdown'
 		).toBeVisible();
+		await expect( firstMenuItem ).toBeFocused();
 
 		await page.keyboard.press( 'Escape' );
 		await expect(
@@ -1347,6 +1385,7 @@ test.describe( 'List View', () => {
 			optionsForFileMenu,
 			'Pressing Space should also open the menu dropdown'
 		).toBeVisible();
+		await expect( firstMenuItem ).toBeFocused();
 
 		await pageUtils.pressKeys( 'primaryAlt+t' ); // Keyboard shortcut for Insert before.
 		await expect
@@ -1368,6 +1407,7 @@ test.describe( 'List View', () => {
 			optionsForFileMenu,
 			'Pressing Space should also open the menu dropdown'
 		).toBeVisible();
+		await expect( firstMenuItem ).toBeFocused();
 		await pageUtils.pressKeys( 'access+z' ); // Keyboard shortcut for Delete.
 		await expect
 			.poll(
@@ -1388,6 +1428,7 @@ test.describe( 'List View', () => {
 			optionsForFileMenu.getByRole( 'menuitem', { name: 'Delete' } ),
 			'The delete menu item should be hidden for locked blocks'
 		).toBeHidden();
+		await expect( firstMenuItem ).toBeFocused();
 		await pageUtils.pressKeys( 'access+z' );
 		await expect
 			.poll(
@@ -1404,7 +1445,7 @@ test.describe( 'List View', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should place the caret at the end of the block when activating from List View', async ( {
+	test( 'should place the caret at the start of the block when activating from List View', async ( {
 		editor,
 		page,
 		listViewUtils,
@@ -1424,8 +1465,8 @@ test.describe( 'List View', () => {
 
 		// Click the first paragraph in List View to select it,
 		// then press Enter to activate it (transfer focus to canvas).
-		// Keyboard activation (Enter/Space) places the caret at the end
-		// of the block, while mouse click keeps focus in the list view.
+		// Keyboard activation places the caret at the start of the first
+		// field. Mouse click keeps focus in the list view.
 		await listView
 			.getByRole( 'gridcell', { name: 'Paragraph' } )
 			.first()
@@ -1433,21 +1474,72 @@ test.describe( 'List View', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Press Enter to split the block at the caret position.
-		// If the caret is at the end, this creates a new block after the first paragraph.
-		// If the caret is at the start, this creates a new block before the first paragraph.
+		// With the caret at the start, this creates a new block before
+		// the first paragraph.
 		await page.keyboard.press( 'Enter' );
 
-		// Verify the block order: if the caret was at the end, the new empty
-		// block should be after the first paragraph, not before it.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: '' } },
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'First paragraph' },
 			},
-			{ name: 'core/paragraph', attributes: { content: '' } },
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'Second paragraph' },
+			},
+		] );
+	} );
+
+	test( 'should focus the first cell of a Table when activating from List View', async ( {
+		editor,
+		page,
+		listViewUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/table',
+			attributes: {
+				body: [
+					{
+						cells: [
+							{ content: 'R1C1', tag: 'td' },
+							{ content: 'R1C2', tag: 'td' },
+						],
+					},
+					{
+						cells: [
+							{ content: 'R2C1', tag: 'td' },
+							{ content: 'R2C2', tag: 'td' },
+						],
+					},
+				],
+			},
+		} );
+
+		const listView = await listViewUtils.openListView();
+		await listView.getByRole( 'gridcell', { name: 'Table' } ).click();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'X' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/table',
+				attributes: {
+					body: [
+						{
+							cells: [
+								{ content: 'XR1C1', tag: 'td' },
+								{ content: 'R1C2', tag: 'td' },
+							],
+						},
+						{
+							cells: [
+								{ content: 'R2C1', tag: 'td' },
+								{ content: 'R2C2', tag: 'td' },
+							],
+						},
+					],
+				},
 			},
 		] );
 	} );

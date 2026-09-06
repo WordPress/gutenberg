@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { TextareaControl } from '@wordpress/components';
+import { TextareaControl as WCTextareaControl } from '@wordpress/components';
 import { Link } from '@wordpress/ui';
 import type { Field } from '@wordpress/dataviews';
 import type { Attachment, Updatable } from '@wordpress/core-data';
@@ -12,7 +12,7 @@ const altTextField: Partial< Field< Updatable< Attachment > > > = {
 	render: ( { item } ) => item?.alt_text || '-',
 	Edit: ( { field, onChange, data } ) => {
 		return (
-			<TextareaControl
+			<WCTextareaControl
 				label={ field.label }
 				value={ data.alt_text || '' }
 				onChange={ ( value ) => onChange( { alt_text: value } ) }

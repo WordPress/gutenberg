@@ -2,6 +2,27 @@
 
 ## Unreleased
 
+### Internal
+
+-   Regenerate the WPDS fallback map with the solid neutral interactive background state tokens. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
+
+### Enhancements
+
+-   Add a `$block-bg-padding` variable that resolves the default background padding through the `--wp--style--block-background-padding` custom property, keeping the existing values as its fallback ([#82024](https://github.com/WordPress/gutenberg/pull/82024)).
+
+## 13.0.0 (2026-08-26)
+
+### Breaking Changes
+
+-   Remove the `input-style__focus` mixin. Use `outset-ring__focus` instead ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
+
+### Enhancements
+
+-   `input-control`: Use `outset-ring__focus` for focus styling, WPDS tokens for border styling, and a hover border treatment aligned with `@wordpress/ui`. If you also define custom `:focus` box-shadow styles on the same selector, remove them to avoid duplicate focus rings ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
+-   `outset-ring__focus`: Use a `--focus-color` fallback in the outline instead of declaring the custom property locally, so ancestor overrides apply correctly ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
+
+## 12.1.0 (2026-08-12)
+
 
 ## 12.0.0 (2026-07-29)
 

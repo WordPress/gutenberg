@@ -1,0 +1,165 @@
+{
+	"comment": "The direct-import counterpart of the lock-unlock entries lives in tools/eslint/suppressions.json (no-restricted-imports). The two lists are enforced independently — a stale entry fails CI in each — but a package dropping private APIs needs an edit in both.",
+	"exceptions": [
+		{
+			"comment": "ThemeProvider falls back to the WP 7.2 theme/ui private APIs when the public API is unavailable. Remove when the fallback is deleted (scheduled for WP 7.3; see the TODO in the file).",
+			"package": "dataviews",
+			"via": "packages/ui/src/utils/theme-provider.ts"
+		},
+		{
+			"comment": "ThemeProvider falls back to the WP 7.2 theme/ui private APIs when the public API is unavailable. Remove when the fallback is deleted (scheduled for WP 7.3; see the TODO in the file).",
+			"package": "fields",
+			"via": "packages/ui/src/utils/theme-provider.ts"
+		},
+		{
+			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, sync, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
+			"package": "fields",
+			"via": "packages/core-data/src/index.js"
+		},
+		{
+			"comment": "Depends on @wordpress/blocks, whose store unlocks private APIs internally (and pulls rich-text, reviving the components/compose private registries). Remove when those internals stop using private APIs.",
+			"package": "fields",
+			"via": "packages/blocks/src/index.ts"
+		},
+		{
+			"comment": "Depends on @wordpress/patterns (see the pattern-sync-status field), whose store pulls block-editor and its private-API cascade (rich-text, global-styles-engine, upload-media, commands). Remove when the patterns dependency is dropped or its store no longer pulls block-editor.",
+			"package": "fields",
+			"via": "packages/patterns/src/index.js"
+		},
+		{
+			"comment": "Unlocks private APIs of @wordpress/components. Remove when the unlocked surface goes public.",
+			"package": "fields",
+			"via": "packages/components/src/private-apis.ts"
+		},
+		{
+			"comment": "The package's own private cross-package API usage, tracked file-by-file by the private-apis lint suppressions. Remove when the package stops using private APIs.",
+			"package": "fields",
+			"via": "packages/fields/src/lock-unlock.ts"
+		},
+		{
+			"comment": "Unlocks private APIs of @wordpress/media-utils (see its media-edit component). Remove when the unlocked surface goes public.",
+			"package": "fields",
+			"via": "packages/media-utils/src/private-apis.ts"
+		},
+		{
+			"comment": "Depends on @wordpress/api-fetch, whose internals unlock private APIs. Remove when api-fetch no longer does.",
+			"package": "fields",
+			"via": "packages/api-fetch/src/index.ts"
+		},
+		{
+			"comment": "The package's own private cross-package API usage, tracked file-by-file by the private-apis lint suppressions. Remove when the package stops using private APIs.",
+			"package": "global-styles-engine",
+			"via": "packages/global-styles-engine/src/lock-unlock.ts"
+		},
+		{
+			"comment": "Depends on @wordpress/blocks, whose store unlocks private APIs internally. Remove when blocks' store no longer does.",
+			"package": "global-styles-engine",
+			"via": "packages/blocks/src/index.ts"
+		},
+		{
+			"comment": "ThemeProvider falls back to the WP 7.2 theme/ui private APIs when the public API is unavailable. Remove when the fallback is deleted (scheduled for WP 7.3; see the TODO in the file).",
+			"package": "global-styles-ui",
+			"via": "packages/ui/src/utils/theme-provider.ts"
+		},
+		{
+			"comment": "Depends on @wordpress/blocks, whose store unlocks private APIs internally (and pulls rich-text, reviving the components/compose private registries). Remove when those internals stop using private APIs.",
+			"package": "global-styles-ui",
+			"via": "packages/blocks/src/index.ts"
+		},
+		{
+			"comment": "Depends on @wordpress/block-editor, which unlocks private APIs throughout its store and components. Remove when the block-editor dependency is dropped or that stops.",
+			"package": "global-styles-ui",
+			"via": "packages/block-editor/src/index.js"
+		},
+		{
+			"comment": "Depends on @wordpress/global-styles-engine, which has its own private API surface. Remove when that surface goes public.",
+			"package": "global-styles-ui",
+			"via": "packages/global-styles-engine/src/index.ts"
+		},
+		{
+			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, sync, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
+			"package": "global-styles-ui",
+			"via": "packages/core-data/src/index.js"
+		},
+		{
+			"comment": "Depends on @wordpress/api-fetch, whose internals unlock private APIs. Remove when api-fetch no longer does.",
+			"package": "global-styles-ui",
+			"via": "packages/api-fetch/src/index.ts"
+		},
+		{
+			"comment": "Unlocks private APIs of @wordpress/components. Remove when the unlocked surface goes public.",
+			"package": "global-styles-ui",
+			"via": "packages/components/src/private-apis.ts"
+		},
+		{
+			"comment": "The package's own private cross-package API usage, tracked file-by-file by the private-apis lint suppressions. Remove when the package stops using private APIs.",
+			"package": "global-styles-ui",
+			"via": "packages/global-styles-ui/src/lock-unlock.ts"
+		},
+		{
+			"comment": "ThemeProvider falls back to the WP 7.2 theme/ui private APIs when the public API is unavailable. Remove when the fallback is deleted (scheduled for WP 7.3; see the TODO in the file).",
+			"package": "media-editor",
+			"via": "packages/ui/src/utils/theme-provider.ts"
+		},
+		{
+			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, sync, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
+			"package": "media-editor",
+			"via": "packages/core-data/src/index.js"
+		},
+		{
+			"comment": "Depends on @wordpress/api-fetch, whose internals unlock private APIs. Remove when api-fetch no longer does.",
+			"package": "media-editor",
+			"via": "packages/api-fetch/src/index.ts"
+		},
+		{
+			"comment": "The package's own private cross-package API usage, tracked file-by-file by the private-apis lint suppressions. Remove when the package stops using private APIs.",
+			"package": "media-editor",
+			"via": "packages/media-editor/src/lock-unlock.ts"
+		},
+		{
+			"comment": "ThemeProvider falls back to the WP 7.2 theme/ui private APIs when the public API is unavailable. Remove when the fallback is deleted (scheduled for WP 7.3; see the TODO in the file).",
+			"package": "media-fields",
+			"via": "packages/ui/src/utils/theme-provider.ts"
+		},
+		{
+			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, sync, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
+			"package": "media-fields",
+			"via": "packages/core-data/src/index.js"
+		},
+		{
+			"comment": "ThemeProvider falls back to the WP 7.2 theme/ui private APIs when the public API is unavailable. Remove when the fallback is deleted (scheduled for WP 7.3; see the TODO in the file).",
+			"package": "ui",
+			"via": "packages/ui/src/utils/theme-provider.ts"
+		},
+		{
+			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, sync, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
+			"package": "views",
+			"via": "packages/core-data/src/index.js"
+		},
+		{
+			"comment": "The package's own private cross-package API usage, tracked file-by-file by the private-apis lint suppressions. Remove when the package stops using private APIs.",
+			"package": "views",
+			"via": "packages/views/src/lock-unlock.ts"
+		},
+		{
+			"comment": "ThemeProvider falls back to the WP 7.2 theme/ui private APIs when the public API is unavailable. Remove when the fallback is deleted (scheduled for WP 7.3; see the TODO in the file).",
+			"package": "widget-dashboard",
+			"via": "packages/ui/src/utils/theme-provider.ts"
+		},
+		{
+			"comment": "Unlocks private APIs of @wordpress/components (see its actions-menu component). Remove when the unlocked components go public.",
+			"package": "widget-dashboard",
+			"via": "packages/components/src/private-apis.ts"
+		},
+		{
+			"comment": "Depends on @wordpress/commands, whose store and private surface use private APIs. Remove when commands no longer does or the dependency is dropped.",
+			"package": "widget-dashboard",
+			"via": "packages/commands/src/index.js"
+		},
+		{
+			"comment": "The package's own private cross-package API usage, tracked file-by-file by the private-apis lint suppressions. Remove when the package stops using private APIs.",
+			"package": "widget-dashboard",
+			"via": "packages/widget-dashboard/src/lock-unlock.ts"
+		}
+	]
+}

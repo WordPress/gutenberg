@@ -65,7 +65,9 @@ function ConnectorsPage() {
 					( connector: ConnectorConfig ) =>
 						connector.plugin?.file?.split( '/' )[ 0 ]
 				)
-				.filter( ( slug ): slug is string => !! slug )
+				.filter(
+					( slug: string | undefined ): slug is string => !! slug
+				)
 		)
 	).sort();
 	const installedPluginSlugs = new Set(

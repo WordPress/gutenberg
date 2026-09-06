@@ -1,4 +1,3 @@
-// @ts-expect-error -- is-plain-object types don't resolve with package.json "exports".
 import { isPlainObject } from 'is-plain-object';
 import deepmerge from 'deepmerge';
 import defaultStorage from './storage/default';

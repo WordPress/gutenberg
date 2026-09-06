@@ -257,6 +257,48 @@ const receiveQueries = compose( [
 } );
 
 /**
+ * Removes items from a query's item IDs, keeping the pagination metadata in
+ * sync. Every removed item the query listed was counted by the endpoint in
+ * `totalItems`, so the total shrinks by that many. Nothing else refreshes the
+ * totals until the next fetch, and a consumer whose page has just emptied
+ * would otherwise keep requesting a page that no longer exists.
+ *
+ * `totalPages` can't be recomputed here — the page size that produced the
+ * `X-WP-TotalPages` header isn't known to the reducer — so it is reset to
+ * `null` ("unknown") rather than left next to a fresh `totalItems` it no
+ * longer matches. Queries that set `per_page` are unaffected: the selectors
+ * derive their page count from `totalItems` and never read the header value.
+ *
+ * @param {Object} queryItems   Query state, with `itemIds` and optional `meta`.
+ * @param {Object} removedItems Removed item IDs, as object keys.
+ *
+ * @return {Object} Updated query state.
+ */
+function removeQueryItems( queryItems, removedItems ) {
+	const itemIds = queryItems.itemIds.filter(
+		( itemId ) => ! removedItems[ itemId ]
+	);
+	const removedCount = queryItems.itemIds.length - itemIds.length;
+	if ( removedCount === 0 ) {
+		return queryItems;
+	}
+
+	const nextQueryItems = { ...queryItems, itemIds };
+	if ( Number.isFinite( queryItems.meta?.totalItems ) ) {
+		nextQueryItems.meta = {
+			...queryItems.meta,
+			totalItems: Math.max(
+				0,
+				queryItems.meta.totalItems - removedCount
+			),
+			totalPages: null,
+		};
+	}
+
+	return nextQueryItems;
+}
+
+/**
  * Reducer tracking queries state.
  *
  * @param {Object} state  Current state.
@@ -282,13 +324,10 @@ const queries = ( state = {}, action ) => {
 							Object.entries( contextQueries ).map(
 								( [ query, queryItems ] ) => [
 									query,
-									{
-										...queryItems,
-										itemIds: queryItems.itemIds.filter(
-											( queryId ) =>
-												! removedItems[ queryId ]
-										),
-									},
+									removeQueryItems(
+										queryItems,
+										removedItems
+									),
 								]
 							)
 						),

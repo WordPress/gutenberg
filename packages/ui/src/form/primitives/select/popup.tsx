@@ -4,33 +4,35 @@ import { forwardRef } from '@wordpress/element';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
-import { ThemeProvider } from '../../../utils/theme-provider';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import { getItemPopupWidthClassName } from '../../../utils/css/item-popup';
 import type { SelectPopupProps } from './types';
 
 export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 	function Popup(
-		{ className, portal, positioner, children, ...restProps },
+		{ className, portal, positioner, width, children, ...restProps },
 		ref
 	) {
 		const popupContent = (
-			<ThemeProvider>
-				<_Select.Popup
-					ref={ ref }
-					className={ clsx( itemPopupStyles.popup, className ) }
-					{ ...restProps }
-				>
-					<_Select.List className={ itemPopupStyles.list }>
-						<div
-							className={
-								itemPopupStyles[ 'list-scrollable-container' ]
-							}
-						>
-							{ children }
-						</div>
-					</_Select.List>
-				</_Select.Popup>
-			</ThemeProvider>
+			<_Select.Popup
+				ref={ ref }
+				className={ clsx(
+					itemPopupStyles.popup,
+					getItemPopupWidthClassName( width ),
+					className
+				) }
+				{ ...restProps }
+			>
+				<_Select.List className={ itemPopupStyles.list }>
+					<div
+						className={
+							itemPopupStyles[ 'list-scrollable-container' ]
+						}
+					>
+						{ children }
+					</div>
+				</_Select.List>
+			</_Select.Popup>
 		);
 
 		const positionedPopup = renderSlotWithChildren(

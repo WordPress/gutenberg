@@ -1,10 +1,8 @@
 import clsx from 'clsx';
-import { Button, Icon as WCIcon } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
-import { error as errorIcon, pencil } from '@wordpress/icons';
+import { pencil } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
-import { Tooltip } from '@wordpress/ui';
-import { useRef } from '@wordpress/element';
 import type {
 	FieldValidity,
 	NormalizedField,
@@ -12,7 +10,7 @@ import type {
 	NormalizedPanelLayout,
 } from '../../../types';
 import getLabelClassName from './utils/get-label-classname';
-import getLabelContent from './utils/get-label-content';
+import FieldLabelContent from './field-label-content';
 import getFirstValidationError from './utils/get-first-validation-error';
 
 export default function SummaryButton< Item >( {
@@ -41,7 +39,7 @@ export default function SummaryButton< Item >( {
 	const errorMessage = getFirstValidationError( validity );
 	const showError = touched && !! errorMessage;
 	const labelClassName = getLabelClassName( labelPosition, showError );
-	const labelContent = getLabelContent( showError, errorMessage, fieldLabel );
+
 	const className = clsx(
 		'dataforms-layouts-panel__field-trigger',
 		`dataforms-layouts-panel__field-trigger--label-${ labelPosition }`,
@@ -56,6 +54,7 @@ export default function SummaryButton< Item >( {
 		SummaryButton,
 		'dataforms-layouts-panel__field-control'
 	);
+	const errorId = `${ controlId }-error`;
 
 	const ariaLabel = showError
 		? sprintf(
@@ -69,61 +68,24 @@ export default function SummaryButton< Item >( {
 				fieldLabel || ''
 		  );
 
-	const rowRef = useRef< HTMLDivElement >( null );
-	const editButtonRef = useRef< HTMLButtonElement >( null );
-
-	const handleRowClick = ( event: React.MouseEvent ) => {
-		// Prevent a drag-to-select from opening the flyout — focus could move
-		// in and lose the selection. Skip the guard for double-clicks (standard
-		// button behavior), an already-open flyout, and the edit button.
-		if (
-			! isOpen &&
-			event.detail < 2 &&
-			! editButtonRef.current?.contains( event.target as Node ) &&
-			rowRef.current?.ownerDocument.defaultView
-				?.getSelection()
-				?.toString()
-		) {
-			return;
-		}
-		onClick();
-	};
-
-	const handleKeyDown = ( event: React.KeyboardEvent ) => {
-		if (
-			event.target === event.currentTarget &&
-			( event.key === 'Enter' || event.key === ' ' )
-		) {
-			event.preventDefault();
-			onClick();
-		}
-	};
-
 	return (
-		<div
-			ref={ rowRef }
-			className={ className }
-			onClick={ ! disabled ? handleRowClick : undefined }
-			onKeyDown={ ! disabled ? handleKeyDown : undefined }
-		>
+		<div className={ className }>
 			{ labelPosition !== 'none' && (
-				<span className={ labelClassName }>{ labelContent }</span>
+				<span className={ labelClassName }>
+					<FieldLabelContent
+						showError={ showError }
+						errorMessage={ errorMessage }
+						fieldLabel={ fieldLabel }
+						errorId={ errorId }
+					/>
+				</span>
 			) }
 			{ labelPosition === 'none' && showError && (
-				<Tooltip.Root>
-					<Tooltip.Trigger
-						render={
-							<span
-								className="dataforms-layouts-panel__field-label-error-content"
-								role="img"
-								aria-label={ errorMessage }
-							>
-								<WCIcon icon={ errorIcon } size={ 16 } />
-							</span>
-						}
-					/>
-					<Tooltip.Popup>{ errorMessage }</Tooltip.Popup>
-				</Tooltip.Root>
+				<FieldLabelContent
+					showError
+					errorMessage={ errorMessage }
+					errorId={ errorId }
+				/>
 			) }
 			<span
 				id={ `${ controlId }` }
@@ -163,14 +125,16 @@ export default function SummaryButton< Item >( {
 			</span>
 			{ ! disabled && (
 				<Button
-					ref={ editButtonRef }
 					className="dataforms-layouts-panel__field-trigger-icon"
 					label={ ariaLabel }
 					icon={ pencil }
 					size="small"
 					aria-expanded={ isOpen }
 					aria-haspopup="dialog"
-					aria-describedby={ `${ controlId }` }
+					aria-describedby={
+						showError ? `${ controlId } ${ errorId }` : controlId
+					}
+					onClick={ onClick }
 				/>
 			) }
 		</div>

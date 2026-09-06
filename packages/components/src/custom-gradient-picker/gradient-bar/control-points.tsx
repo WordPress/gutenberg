@@ -36,6 +36,7 @@ function ControlPointButton( {
 	isOpen,
 	position,
 	color,
+	disablePositioning,
 	...additionalProps
 }: WordPressComponentProps< ControlPointButtonProps, 'button', true > ) {
 	const instanceId = useInstanceId( ControlPointButton );
@@ -64,9 +65,11 @@ function ControlPointButton( {
 				{ ...additionalProps }
 			/>
 			<VisuallyHidden id={ descriptionId }>
-				{ __(
-					'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.'
-				) }
+				{ disablePositioning
+					? __( 'Press the button to change the color.' )
+					: __(
+							'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.'
+					  ) }
 			</VisuallyHidden>
 		</>
 	);
@@ -109,6 +112,7 @@ function GradientColorPickerDropdown( {
 function ControlPoints( {
 	disableRemove,
 	disableAlpha,
+	disablePositioning,
 	gradientPickerDomRef,
 	ignoreMarkerPosition,
 	value: controlPoints,
@@ -206,6 +210,9 @@ function ControlPoints( {
 										onToggle();
 									} }
 									onMouseDown={ () => {
+										if ( disablePositioning ) {
+											return;
+										}
 										if (
 											window &&
 											window.addEventListener
@@ -228,6 +235,19 @@ function ControlPoints( {
 										}
 									} }
 									onKeyDown={ ( event ) => {
+										if ( disablePositioning ) {
+											// The point cannot move, but the
+											// arrow keys are still consumed so
+											// they do not bubble away and move
+											// focus to another editor area.
+											if (
+												event.code === 'ArrowLeft' ||
+												event.code === 'ArrowRight'
+											) {
+												event.stopPropagation();
+											}
+											return;
+										}
 										if ( event.code === 'ArrowLeft' ) {
 											// Stop propagation of the key press event to avoid focus moving
 											// to another editor area.
@@ -263,6 +283,7 @@ function ControlPoints( {
 									isOpen={ isOpen }
 									position={ point.position }
 									color={ point.color }
+									disablePositioning={ disablePositioning }
 								/>
 							) }
 							renderContent={ ( { onClose } ) => (

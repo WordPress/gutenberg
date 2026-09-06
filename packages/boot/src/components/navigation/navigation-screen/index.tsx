@@ -9,7 +9,7 @@ import {
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { useReducedMotion } from '@wordpress/compose';
-import './style.scss';
+import styles from './style.module.scss';
 
 const ANIMATION_DURATION = 0.3;
 const slideVariants = {
@@ -66,7 +66,7 @@ export default function NavigationScreen( {
 
 	return (
 		<div
-			className="boot-navigation-screen"
+			className={ styles.screen }
 			style={ {
 				overflow: 'hidden',
 				position: 'relative',
@@ -94,10 +94,7 @@ export default function NavigationScreen( {
 						gridRow: '1',
 					} }
 				>
-					<HStack
-						spacing={ 2 }
-						className="boot-navigation-screen__title-icon"
-					>
+					<HStack spacing={ 2 } className={ styles[ 'title-icon' ] }>
 						{ ! isRoot && (
 							<Button
 								ref={ backButtonRef }
@@ -109,24 +106,18 @@ export default function NavigationScreen( {
 							/>
 						) }
 						<Heading
-							className="boot-navigation-screen__title"
+							className={ styles.title }
 							level={ 1 }
 							size="15px"
 						>
 							{ title }
 						</Heading>
 						{ actions && (
-							<div className="boot-navigation-screen__actions">
-								{ actions }
-							</div>
+							<div className={ styles.actions }>{ actions }</div>
 						) }
 					</HStack>
 
-					{ description && (
-						<div className="boot-navigation-screen__description">
-							{ description }
-						</div>
-					) }
+					{ description && <div>{ description }</div> }
 
 					{ content }
 				</motion.div>

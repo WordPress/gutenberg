@@ -21,7 +21,7 @@ const meta: Meta< typeof InputControl > = {
 		type: { control: { type: 'text' } },
 		value: { control: { disable: true } },
 	},
-	tags: [ 'status-experimental', 'manifest' ],
+	tags: [ 'status-experimental' ],
 	args: {
 		onChange: fn(),
 		onValidate: fn(),
@@ -31,9 +31,9 @@ const meta: Meta< typeof InputControl > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'recommended',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by [`InputControl`](?path=/docs/design-system-components-form-inputcontrol--docs) in `@wordpress/ui`, but continue using for now.',
+			notes: 'Use [`InputControl`](?path=/docs/design-system-components-form-inputcontrol--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-inputcontrol--migration-guide).',
 		},
 	},
 };

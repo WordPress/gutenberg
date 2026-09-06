@@ -47,3 +47,26 @@ export function scopeSelector( scope, selector ) {
 
 	return selectorsScoped.join( ', ' );
 }
+
+/**
+ * Reads the preset slug out of a duotone style value.
+ *
+ * Two presets can hold the same pair of colors, so the slug is the only thing
+ * that identifies which one is applied. The colors alone do not.
+ *
+ * Lives here rather than beside its siblings in `hooks/duotone` because that
+ * module imports the filters panel, so the panel cannot import back from it.
+ *
+ * @param {string|string[]|undefined} duotone A duotone style value.
+ *
+ * @return {string|undefined} The preset slug, if the value references one.
+ */
+export function getDuotoneSlugFromPreset( duotone ) {
+	if ( typeof duotone !== 'string' ) {
+		return undefined;
+	}
+
+	const [ , slug ] = duotone.match( /^var:preset\|duotone\|(.+)$/ ) ?? [];
+
+	return slug;
+}

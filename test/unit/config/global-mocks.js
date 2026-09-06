@@ -2,6 +2,8 @@ import { TextDecoder, TextEncoder } from 'node:util';
 import { Blob as BlobPolyfill, File as FilePolyfill } from 'node:buffer';
 import timezoneMock from 'timezone-mock';
 
+globalThis.wpJest = jest;
+
 /**
  * Configure timezone-mock to handle Date subclasses (like UTCDateMini) correctly.
  * MockDate constructor normally rejects object arguments, but date-fns v4
@@ -118,12 +120,23 @@ function hasAssociatedLayoutBox( element ) {
 	return true;
 }
 
-// The following jsdom-targeted setup is skipped when a test opts into
-// `@jest-environment node` so SSR-style tests can run under this config.
+// The following jsdom-targeted setup is skipped for Node tests.
 if ( typeof window !== 'undefined' ) {
 	// jsdom lacks Element.getAnimations (needed by Base UI ScrollArea ≥1.3)
 	if ( ! global.HTMLElement.prototype.getAnimations ) {
 		global.HTMLElement.prototype.getAnimations = () => [];
+	}
+
+	// jsdom lacks PointerEvent (needed by Base UI keyboard activation ≥1.7).
+	if ( ! global.PointerEvent ) {
+		global.PointerEvent = class PointerEvent extends global.MouseEvent {
+			constructor( type, init = {} ) {
+				super( type, init );
+				this.pointerId = init.pointerId ?? 0;
+				this.pointerType = init.pointerType ?? '';
+				this.isPrimary = init.isPrimary ?? false;
+			}
+		};
 	}
 
 	// jsdom lacks CSS.supports (needed by Ariakit's modal scroll locking).
@@ -197,9 +210,9 @@ global.File = FilePolyfill;
  * @see https://github.com/testing-library/user-event/pull/1265
  *
  * Kept at the module top-level so babel-jest hoists it above imports. The
- * factory falls back to a passthrough when there is no DOM (`@jest-environment
- * node`), since the real `@testing-library/user-event` requires a browser-like
- * global and the prototype patching would also fail.
+ * factory falls back to a passthrough when there is no DOM, since the real
+ * `@testing-library/user-event` requires a browser-like global and the
+ * prototype patching would also fail.
  */
 jest.mock( '@testing-library/user-event', () => {
 	if ( typeof globalThis.window === 'undefined' ) {

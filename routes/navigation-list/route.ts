@@ -1,6 +1,8 @@
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { notFound } from '@wordpress/route';
+import { loadNavigationViewConfig } from './view-utils';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
@@ -12,6 +14,14 @@ const PRELOADED_NAVIGATION_MENUS_QUERY = {
 };
 
 export const route = {
+	async beforeLoad() {
+		// Only block themes render `wp_navigation` posts. Classic themes manage
+		// their menus through Appearance > Menus instead.
+		const theme = await resolveSelect( coreStore ).getCurrentTheme();
+		if ( ! theme?.is_block_theme ) {
+			throw notFound();
+		}
+	},
 	title: () => __( 'Navigation' ),
 	canvas: async ( {
 		search,
@@ -22,13 +32,12 @@ export const route = {
 			search?: string;
 		};
 	} ) => {
-		const [ firstNavigation ] = await resolveSelect(
-			coreStore
-		).getEntityRecords(
+		const navigations = ( await resolveSelect( coreStore ).getEntityRecords(
 			'postType',
 			NAVIGATION_POST_TYPE,
 			PRELOADED_NAVIGATION_MENUS_QUERY
-		);
+		) ) as { id: number }[] | null;
+		const firstNavigation = navigations?.[ 0 ];
 
 		if ( ! firstNavigation ) {
 			return { postType: NAVIGATION_POST_TYPE, isPreview: true };
@@ -42,11 +51,12 @@ export const route = {
 			postType: NAVIGATION_POST_TYPE,
 			postId,
 			isPreview: true,
-			editLink: `/types/wp_navigation/edit/${ postId }`,
 		};
 	},
 	loader: async () => {
 		await Promise.all( [
+			// Preload the view configuration the stage resolves its view from.
+			loadNavigationViewConfig(),
 			// Preload navigation menus
 			resolveSelect( coreStore ).getEntityRecords(
 				'postType',

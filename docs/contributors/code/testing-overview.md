@@ -19,7 +19,7 @@ When writing tests consider the following:
 
 ## JavaScript testing
 
-Tests for JavaScript use [Jest](https://jestjs.io/) as the test runner and its API for [globals](https://jestjs.io/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on) [assertions](https://jestjs.io/docs/en/expect.html), [mocks](https://jestjs.io/docs/en/mock-functions.html), [spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname) and [mock functions](https://jestjs.io/docs/en/mock-function-api.html). If needed, you can also use [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) for React component testing.
+JavaScript unit tests are partitioned between Jest and Vitest during the [Vitest migration](/test/unit/VITEST_MIGRATION.md). Jest-owned tests use the Jest API for [globals](https://jestjs.io/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on), [assertions](https://jestjs.io/docs/en/expect.html), [mocks](https://jestjs.io/docs/en/mock-functions.html), [spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname), and [mock functions](https://jestjs.io/docs/en/mock-function-api.html). If needed, you can also use [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) for React component testing.
 
 _It should be noted that in the past, React components were unit tested with [Enzyme](https://github.com/airbnb/enzyme). However, React Testing Library (RTL) is now used for all existing and new tests instead._
 
@@ -33,11 +33,13 @@ Linting is static code analysis used to enforce coding standards and to avoid po
 
 To improve your developer workflow, you should setup an editor linting integration. See the [getting started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for additional information.
 
-To run unit tests only, without the linter, use `npm run test:unit` instead.
+During the Jest-to-Vitest migration, run both `npm run test:unit` and `npm run test:unit:vitest` to execute all JavaScript unit tests without the linter. The runner-specific commands continue to accept their own CLI options.
 
 ### Folder structure
 
 Keep your tests in a `test` folder in your working directory. The test file should have the same name as the test subject file.
+
+Use `*.jsdom.test.*` for tests that only require a virtual DOM. Use `*.browser.test.*` for tests that require Vitest Browser Mode. Leave Node-compatible test names without an environment suffix. Every new test runs in Vitest automatically. The filename selects its environment. During the remaining migration, the manifest lists only legacy JSDOM tests that still run in Jest. Do not use per-file environment overrides.
 
 ```
 +-- test
@@ -291,11 +293,11 @@ test( 'fires onChange when a new value is typed', async () => {
 
 ### Integration testing for block UI
 
-Integration testing is defined as a type of testing where different parts are tested as a group. In this case, the parts that we want to test are the different components that are required to be rendered for a specific block or editor logic. In the end, they are very similar to unit tests as they are run with the same command using the Jest library. The main difference is that for the integration tests the blocks are run within a [`special instance of the block editor`](https://github.com/WordPress/gutenberg/blob/trunk/test/integration/helpers/integration-test-editor.js#L60).
+Integration testing is defined as a type of testing where different parts are tested as a group. In this case, the parts that we want to test are the different components that are required to be rendered for a specific block or editor logic. In the end, they are very similar to unit tests as they are run with the same command using the Jest library. The main difference is that for the integration tests the blocks are run within a [`special instance of the block editor`](https://github.com/WordPress/gutenberg/blob/trunk/test/integration/helpers/integration-test-editor.jsx#L60).
 
 The advantage of this approach is that the bulk of a block editor's functionality (block toolbar and inspector panel interactions, etc.) can be tested without having to fire up the full e2e test framework. This means the tests can run much faster and more reliably. It is suggested that as much of a block's UI functionality as possible is covered with integration tests, with e2e tests used for interactions that require a full browser environment, eg. file uploads, drag and drop, etc.
 
-[`The Cover block`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/test/edit.js) is an example of a block that uses this level of testing to provide coverage for a large percentage of the editor interactions.
+[`The Cover block`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/test/edit.jsdom.test.js) is an example of a block that uses this level of testing to provide coverage for a large percentage of the editor interactions.
 
 To set up a jest file for integration tests:
 
@@ -323,8 +325,12 @@ When a snapshot test fails, it just means that a component's rendering has chang
 However, if the change was intentional, follow these steps to update the snapshot. Run the following to update the snapshots:
 
 ```sh
-# --testPathPatterns is optional but will be much faster by only running matching tests
-npm run test:unit -- --updateSnapshot --testPathPatterns path/to/tests
+# Update snapshots for Node or Vitest-owned DOM tests
+npm run test:unit:vitest:update -- path/to/tests
+
+# Update snapshots for Jest-owned JSDOM tests
+# --testPathPatterns is optional but runs only matching tests
+npm run test:unit:update -- --testPathPatterns path/to/tests
 
 # Update snapshot for e2e tests
 npm run test:e2e -- --update-snapshots path/to/spec
@@ -400,15 +406,29 @@ Reducer tests are also a great fit for snapshots. They are often large, complex 
 
 #### Working with snapshots
 
-You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. The quick and dirty solution is to invoke Jest with `--updateSnapshot`. That can be done as follows:
+You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. Use the command for the test's runner:
 
 ```sh
-npm run test:unit -- --updateSnapshot --testPathPatterns path/to/tests
+# Node or Vitest-owned DOM tests
+npm run test:unit:vitest:update -- path/to/tests
+
+# Jest-owned JSDOM tests
+npm run test:unit:update -- --testPathPatterns path/to/tests
 ```
 
-`--testPathPatterns` is not required, but specifying a path will speed things up by running a subset of tests.
+The path is not required, but specifying one runs only matching tests and is faster.
 
-It's a great idea to keep `npm run test:unit:watch` running in the background as you work. Jest will run only the relevant tests for changed files, and when snapshot tests fail, just hit `u` to update a snapshot!
+Keep the applicable watch command running in the background as you work:
+
+```sh
+# Node or Vitest-owned DOM tests
+npm run test:unit:vitest:watch -- path/to/tests
+
+# Jest-owned JSDOM tests
+npm run test:unit:watch -- --testPathPatterns path/to/tests
+```
+
+When a snapshot test fails in either runner, press `u` to update the snapshot.
 
 #### Pain points
 
@@ -478,7 +498,7 @@ In that case, you might see test failures and `TypeError` reported by Jest in th
 
 ### Debugging Jest unit tests
 
-Running `npm run test:unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
+Running `npm run test:unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/learn/getting-started/debugging#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
 
 ## End-to-end testing
 
@@ -614,16 +634,16 @@ npm run test:performance
 
 This gives you the result for the current branch/code on the running environment.
 
-In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `npm exec release-cli -- perf [branches]`, example:
+In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `npm exec --no release-cli -- perf [branches]`, example:
 
-```
-npm exec release-cli -- perf trunk v8.1.0 v8.0.0
+```sh
+npm exec --no release-cli -- perf trunk v8.1.0 v8.0.0
 ```
 
 Finally, you can pass an additional `--tests-branch` argument to specify which branch's performance test files you'd like to run. This is particularly useful when modifying/extending the perf tests:
 
-```
-npm exec release-cli -- perf trunk v8.1.0 v8.0.0 --tests-branch add/perf-tests-coverage
+```sh
+npm exec --no release-cli -- perf trunk v8.1.0 v8.0.0 --tests-branch add/perf-tests-coverage
 ```
 
 **Note** This command needs may take some time to perform the benchmark. While running make sure to avoid using your computer or have a lot of background process to minimize external factors that can impact the results across branches.

@@ -1,12 +1,22 @@
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { notFound } from '@wordpress/route';
 import { ensureView, viewToQuery } from './view-utils';
 
 /**
  * Route configuration for template list.
  */
 export const route = {
+	async beforeLoad() {
+		// Block themes and classic themes shipping a `theme.json` file opt in
+		// automatically, other classic themes have to call
+		// `add_theme_support( 'block-templates' )`.
+		const theme = await resolveSelect( coreStore ).getCurrentTheme();
+		if ( ! theme?.theme_supports?.[ 'block-templates' ] ) {
+			throw notFound();
+		}
+	},
 	title: () => __( 'Templates' ),
 	async canvas( context: {
 		params: {
@@ -38,9 +48,6 @@ export const route = {
 				postType: 'wp_template',
 				postId,
 				isPreview: true,
-				editLink: `/types/wp_template/edit/${ encodeURIComponent(
-					postId
-				) }`,
 			};
 		}
 
@@ -59,9 +66,6 @@ export const route = {
 				postType: 'wp_template',
 				postId,
 				isPreview: true,
-				editLink: `/types/wp_template/edit/${ encodeURIComponent(
-					postId
-				) }`,
 			};
 		}
 

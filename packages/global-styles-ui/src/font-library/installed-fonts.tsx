@@ -98,7 +98,8 @@ function InstalledFonts() {
 	const globalStyles = useEntityRecord< GlobalStylesConfig >(
 		'root',
 		'globalStyles',
-		globalStylesId
+		globalStylesId ?? 0,
+		{ enabled: globalStylesId !== undefined }
 	);
 	const editedFontFamilies =
 		globalStyles?.edits?.settings?.typography?.fontFamilies;

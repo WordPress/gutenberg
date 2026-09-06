@@ -222,15 +222,16 @@ function ShadowEditor( { shadow, onChange }: ShadowEditorProps ) {
 			<Spacer />
 			<ItemGroup isBordered isSeparated>
 				{ shadowParts.map( ( part, index ) => (
-					<ShadowItem
-						key={ index }
-						shadow={ part }
-						onChange={ ( value ) =>
-							onChangeShadowPart( index, value )
-						}
-						canRemove={ shadowParts.length > 1 }
-						onRemove={ () => onRemoveShadowPart( index ) }
-					/>
+					<div key={ index } role="listitem">
+						<ShadowItem
+							shadow={ part }
+							onChange={ ( value ) =>
+								onChangeShadowPart( index, value )
+							}
+							canRemove={ shadowParts.length > 1 }
+							onRemove={ () => onRemoveShadowPart( index ) }
+						/>
+					</div>
 				) ) }
 			</ItemGroup>
 		</>

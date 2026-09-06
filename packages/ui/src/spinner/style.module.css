@@ -1,0 +1,45 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.spinner {
+			width: var(--wpds-dimension-size-2xs);
+			height: var(--wpds-dimension-size-2xs);
+			display: inline-block;
+			position: relative;
+			overflow: visible;
+			opacity: 1;
+			background-color: transparent;
+		}
+
+		.track,
+		.indicator {
+			fill: transparent;
+			stroke-width: 1.5px;
+		}
+
+		.track {
+			stroke: var(--wpds-color-background-track-neutral);
+		}
+
+		.indicator {
+			stroke: var(--wpds-color-background-thumb-brand);
+			stroke-linecap: round;
+			transform-origin: 50% 50%;
+
+			/* Intentionally kept even for prefers-reduced-motion.
+			See Note 4 of https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html */
+			animation: spinner-spin 1.4s linear infinite both;
+		}
+
+		@keyframes spinner-spin {
+			from {
+				transform: rotate(0deg);
+			}
+
+			to {
+				transform: rotate(360deg);
+			}
+		}
+	}
+}

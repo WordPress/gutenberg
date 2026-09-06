@@ -20,9 +20,6 @@ const CONTROL_PROPS = {
 // TypeScript type declarations.
 export default Object.assign( {}, CONTROL_PROPS, {
 	colorDivider: 'rgba(0, 0, 0, 0.1)',
-	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
-	colorScrollbarThumbHover: 'rgba(0, 0, 0, 0.5)',
-	colorScrollbarTrack: 'rgba(0, 0, 0, 0.04)',
 	elevationIntensity: 1,
 	radiusXSmall: '1px',
 	radiusSmall: '2px',

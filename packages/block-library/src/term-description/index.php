@@ -23,7 +23,7 @@ function render_block_core_term_description( $attributes, $content, $block ) {
 	if ( isset( $block->context['termId'] ) && isset( $block->context['taxonomy'] ) ) {
 		$term = get_term( $block->context['termId'], $block->context['taxonomy'] );
 		if ( $term && ! is_wp_error( $term ) ) {
-			$term_description = $term->description;
+			$term_description = get_term_field( 'description', $term );
 		}
 	} elseif ( is_category() || is_tag() || is_tax() ) {
 		$term_description = term_description();

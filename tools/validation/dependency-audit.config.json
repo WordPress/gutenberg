@@ -24,6 +24,11 @@
 			"comment": "@wordpress/e2e-tests ships test-fixture plugins under plugins/ (imports of @wordpress/connectors as test data and sibling `test/*` script-modules registered by the harness, not real npm packages). Scoped to that package and path so it can never mask a real finding elsewhere.",
 			"target": "@wordpress/e2e-tests",
 			"path": "plugins/**"
+		},
+		{
+			"comment": "@wordpress/dataviews `./wp` bundle (build-wp/, built by packages/dataviews/build.cjs) inlines other @wordpress/* packages but keeps their third-party imports external, so they are undeclared. Not fixing: the bundle is about to be removed along with the private APIs, see https://github.com/WordPress/gutenberg/pull/81843#issuecomment-5354950365",
+			"target": "@wordpress/dataviews",
+			"path": "build-wp/**"
 		}
 	]
 }

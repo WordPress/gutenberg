@@ -20,11 +20,8 @@ runs:
                   package-lock.json
                   patches/**
 
-        - name: Pin npm version for consistency
-          run: |
-              npm install --global npm@10
-              npm --version
-          shell: bash
+        - name: Set up npm
+          uses: ./.github/setup-npm
 
         - name: Get Node.js and npm version
           id: node-version
@@ -69,5 +66,5 @@ runs:
               # Run the post-install script for the root project.
               npm run postinstall
               # Run the post-install scripts for workspaces.
-              npx lerna run postinstall
+              npm exec --no -- lerna run postinstall
           shell: bash

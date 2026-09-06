@@ -28,13 +28,17 @@ import {
 	video,
 	file,
 	closeSmall,
-	error as errorIcon,
 	chevronUp,
 	chevronDown,
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
-import { VisuallyHidden, Tooltip } from '@wordpress/ui';
+import {
+	Stack,
+	Tooltip,
+	ValidityIndicator,
+	VisuallyHidden,
+} from '@wordpress/ui';
 import { speak } from '@wordpress/a11y';
 import {
 	MediaUpload,
@@ -853,7 +857,7 @@ export default function MediaEdit< Item >( {
 		[ isTouched ]
 	);
 	return (
-		<div onBlur={ onBlur }>
+		<Stack direction="column" gap="sm" onBlur={ onBlur }>
 			<fieldset className="fields__media-edit" data-field-id={ field.id }>
 				<ConditionalMediaUpload
 					onSelect={ ( selectedMedia: any ) => {
@@ -961,24 +965,11 @@ export default function MediaEdit< Item >( {
 				/>
 			</VisuallyHidden>
 			{ customValidity && (
-				<p
-					className={ clsx(
-						'components-validated-control__indicator',
-						{
-							'is-invalid': customValidity.type === 'invalid',
-							'is-valid': customValidity.type === 'valid',
-						}
-					) }
-				>
-					<WCIcon
-						className="components-validated-control__indicator-icon"
-						icon={ errorIcon }
-						size={ 16 }
-						fill="currentColor"
-					/>
-					{ customValidity.message }
-				</p>
+				<ValidityIndicator
+					type={ customValidity.type }
+					message={ customValidity.message }
+				/>
 			) }
-		</div>
+		</Stack>
 	);
 }

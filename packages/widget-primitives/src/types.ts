@@ -62,11 +62,11 @@ export interface WidgetHelp {
 }
 
 /**
- * How relevant a declaration is. Hosts may promote `'high'` to a prominent
- * surface; `'low'` (the default) is not. The widget declares importance,
- * not a surface.
+ * How relevant a declaration is. The widget declares importance, not a
+ * surface; hosts map the scale to surfaces of decreasing prominence.
+ * `'low'` is the default.
  */
-export type WidgetRelevance = 'high' | 'low';
+export type WidgetRelevance = 'high' | 'medium' | 'low';
 
 /**
  * A user-triggerable verb a widget type declares. The declaration is
@@ -99,9 +99,7 @@ export interface WidgetAction {
 	icon?: WidgetIcon;
 
 	/**
-	 * How relevant the action is among the widget's actions. Hosts may
-	 * surface `'high'` prominently; `'low'` (the default) belongs in a
-	 * secondary surface such as a menu.
+	 * How relevant the action is among the widget's actions.
 	 */
 	relevance?: WidgetRelevance;
 
@@ -112,8 +110,9 @@ export interface WidgetAction {
 	href: string;
 
 	/**
-	 * Link only. When set, the destination downloads instead of navigating.
-	 * A string supplies the suggested filename.
+	 * Link only. When present and not `false`, downloads instead of
+	 * navigating. A string sets the filename; `true` or `''` keeps the
+	 * original.
 	 */
 	download?: string | boolean;
 

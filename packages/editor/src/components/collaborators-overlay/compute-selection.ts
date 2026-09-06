@@ -47,7 +47,7 @@ export interface SelectionVisual {
  * @param resolvedSelection - The resolved selection.
  * @return The target element (RichText editable or block), or null.
  */
-function resolveTargetElement(
+export function resolveTargetElement(
 	editorDocument: Document,
 	resolvedSelection: ResolvedSelection
 ): HTMLElement | null {

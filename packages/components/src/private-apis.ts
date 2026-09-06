@@ -5,21 +5,11 @@ import { ComponentsContext } from './context/context-system-provider';
 import { Tabs } from './tabs';
 import { lock } from './lock-unlock';
 import Badge from './badge';
-import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
 import {
-	ValidatedCheckboxControl,
-	ValidatedComboboxControl,
 	ValidatedInputControl,
-	ValidatedNumberControl,
-	ValidatedSelectControl,
-	ValidatedRadioControl,
 	ValidatedContentEditableControl,
-	ValidatedTextControl,
 	ValidatedTextareaControl,
-	ValidatedToggleControl,
-	ValidatedToggleGroupControl,
 } from './validated-form-controls';
-import { ValidatedFormTokenField } from './validated-form-controls/components/form-token-field';
 import { colorEditingKey } from './color-palette/private-keys';
 import { isColorEditingEnabled } from './color-palette/utils';
 import ContentEditableControl from './content-editable-control';
@@ -32,22 +22,10 @@ lock( privateApis, {
 	Tabs,
 	Menu,
 	Badge,
-	DateCalendar,
-	DateRangeCalendar,
-	TZDate,
 	useDrag,
 	ValidatedInputControl,
-	ValidatedCheckboxControl,
-	ValidatedComboboxControl,
-	ValidatedNumberControl,
-	ValidatedSelectControl,
-	ValidatedRadioControl,
 	ValidatedContentEditableControl,
-	ValidatedTextControl,
 	ValidatedTextareaControl,
-	ValidatedToggleControl,
-	ValidatedToggleGroupControl,
-	ValidatedFormTokenField,
 	colorEditingKey,
 	isColorEditingEnabled,
 } );

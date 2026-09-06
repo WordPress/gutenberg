@@ -5,6 +5,9 @@ const meta = {
 	title: 'BlockEditor/PlainText',
 	component: PlainText,
 	parameters: {
+		// FIXME: Story renders PlainText without a label (label).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		docs: {
 			canvas: { sourceState: 'shown' },
 			description: {

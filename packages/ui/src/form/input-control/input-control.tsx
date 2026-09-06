@@ -1,5 +1,7 @@
+import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { Input, Field } from '../primitives';
+import styles from './style.module.css';
 import type { InputControlProps } from './types';
 
 /**
@@ -18,7 +20,7 @@ export const InputControl = forwardRef< HTMLInputElement, InputControlProps >(
 		ref
 	) {
 		return (
-			<Field.Root className={ className }>
+			<Field.Root className={ clsx( styles.root, className ) }>
 				<Field.Label hideFromVision={ hideLabelFromVision }>
 					{ label }
 				</Field.Label>

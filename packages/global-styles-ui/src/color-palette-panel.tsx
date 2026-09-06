@@ -52,8 +52,10 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 
 	return (
 		<VStack className="global-styles-ui-color-palette-panel" spacing={ 8 }>
-			<VStack spacing={ 4 }>
-				{ !! themeColors && !! themeColors.length && (
+			{ /* Both children need theme colors, so without them the wrapper
+			   renders empty and still takes a slot in the parent's gap. */ }
+			{ !! themeColors?.length && (
+				<VStack spacing={ 4 }>
 					<PaletteEdit
 						canReset={ themeColors !== baseThemeColors }
 						canOnlyChangeValues
@@ -63,20 +65,19 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 						paletteLabelHeadingLevel={ 3 }
 						popoverProps={ popoverProps }
 					/>
-				) }
-				{ ( window as any ).__experimentalEnableColorRandomizer &&
-					themeColors?.length > 0 &&
-					randomizeThemeColors && (
-						<Button
-							__next40pxDefaultSize
-							variant="secondary"
-							icon={ shuffle }
-							onClick={ randomizeThemeColors }
-						>
-							{ __( 'Randomize colors' ) }
-						</Button>
-					) }
-			</VStack>
+					{ ( window as any ).__experimentalEnableColorRandomizer &&
+						randomizeThemeColors && (
+							<Button
+								__next40pxDefaultSize
+								variant="secondary"
+								icon={ shuffle }
+								onClick={ randomizeThemeColors }
+							>
+								{ __( 'Randomize colors' ) }
+							</Button>
+						) }
+				</VStack>
+			) }
 			{ !! defaultColors &&
 				!! defaultColors.length &&
 				!! defaultPaletteEnabled && (

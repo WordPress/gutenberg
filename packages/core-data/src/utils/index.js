@@ -16,3 +16,4 @@ export {
 export { RECEIVE_INTERMEDIATE_RESULTS } from './receive-intermediate-results';
 export { default as normalizeQueryForResolution } from './normalize-query-for-resolution';
 export { saveCRDTDoc } from './save-crdt-doc';
+export { default as getPaginationMeta } from './get-pagination-meta';

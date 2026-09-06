@@ -1,4 +1,3 @@
-import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -17,6 +16,10 @@ const PALETTE_PATHS = {
 // instead of stacking up.
 const COLOR_PALETTE_NOTICE_ID = 'editor/color-palette-editor';
 
+function arePalettesEqual( a, b ) {
+	return JSON.stringify( a ) === JSON.stringify( b );
+}
+
 export function getOptimisticPaletteValue(
 	paletteSlug,
 	nextPalette,
@@ -25,7 +28,7 @@ export function getOptimisticPaletteValue(
 	if ( paletteSlug === 'custom' ) {
 		return nextPalette.length ? nextPalette : undefined;
 	}
-	if ( fastDeepEqual( nextPalette, basePalette ) ) {
+	if ( arePalettesEqual( nextPalette, basePalette ) ) {
 		return undefined;
 	}
 	return nextPalette;
@@ -179,7 +182,7 @@ export default function useColorPaletteEditing() {
 			if ( paletteSlug === 'custom' ) {
 				paletteValue = nextPalette?.length ? nextPalette : undefined;
 			} else if (
-				fastDeepEqual(
+				arePalettesEqual(
 					nextPalette,
 					getBaseOriginPalette( paletteSlug )
 				)

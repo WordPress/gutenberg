@@ -501,7 +501,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 					// Updates the URL in the state.
 					state.url = href;
 
-					// Updates the navigation status once the the new page rendering
+					// Updates the navigation status once the new page rendering
 					// has been completed.
 					if ( loadingAnimation ) {
 						navigation.hasStarted = false;

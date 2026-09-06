@@ -1,3 +1,10 @@
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { unlock } from '../../lock-unlock';
+
+const { isElementVisible } = unlock( blockEditorPrivateApis );
+
 export interface SelectionRect {
 	x: number;
 	y: number;
@@ -10,6 +17,36 @@ export interface CursorCoords {
 	y: number;
 	height: number;
 }
+
+/**
+ * Walk up from a hidden element (e.g. text inside a collapsed core/details
+ * or an inactive core/accordion panel) to the nearest [data-block] ancestor
+ * that's actually visible — always the collapsed container's own wrapper,
+ * since only its *inner* content collapses, never the wrapper itself.
+ *
+ * Used to give collaborators a visible presence indicator (avatar/outline)
+ * on the container when their cursor/selection is inside hidden content, in
+ * place of a cursor that would otherwise have nowhere valid to render.
+ *
+ * @param element - The hidden element to walk up from.
+ * @return The nearest visible [data-block] ancestor, or null if none found.
+ */
+export const getNearestVisibleBlockAncestor = (
+	element: HTMLElement
+): HTMLElement | null => {
+	let current = element.closest< HTMLElement >( '[data-block]' );
+
+	while ( current ) {
+		if ( isElementVisible( current ) ) {
+			return current;
+		}
+		current =
+			current.parentElement?.closest< HTMLElement >( '[data-block]' ) ??
+			null;
+	}
+
+	return null;
+};
 
 const MAX_NODE_OFFSET_COUNT = 500;
 
@@ -57,6 +94,14 @@ const getOffsetPositionInBlock = (
 	editorDocument: Document,
 	overlayRect: DOMRect
 ) => {
+	// The target may be hidden inside collapsed content (e.g. a closed
+	// core/details or an inactive core/accordion panel). Its range then has
+	// no layout box, so don't draw a cursor at a fallback position — suppress
+	// it entirely rather than misplacing it at the collapsed wrapper.
+	if ( ! isElementVisible( blockElement ) ) {
+		return null;
+	}
+
 	const { node, offset } = findInnerBlockOffset(
 		blockElement,
 		charOffset,
@@ -126,6 +171,13 @@ export const getSelectionRects = (
 	editorDocument: Document,
 	overlayRect: DOMRect
 ): SelectionRect[] | null => {
+	// Same rationale as getOffsetPositionInBlock: a hidden target has no
+	// layout box to derive rects from, so skip it rather than draw a
+	// misplaced or empty selection.
+	if ( ! isElementVisible( blockElement ) ) {
+		return null;
+	}
+
 	// Normalize direction.
 	let normalizedStart = startOffset;
 	let normalizedEnd = endOffset;

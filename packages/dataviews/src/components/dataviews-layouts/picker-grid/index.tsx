@@ -322,6 +322,12 @@ function ViewPickerGrid< Item >( {
 	const perPage = view?.perPage ?? 0;
 	const setSize = isInfiniteScroll ? paginationInfo?.totalItems : undefined;
 
+	// Consumer-configured fill for item previews, surfaced as a class rather
+	// than a custom property because it switches the preview box's background
+	// token as well as its `object-fit`. Anything other than `contain` (an
+	// unsupported value included) leaves the previews cropped.
+	const isMediaContain = view.layout?.mediaFit === 'contain';
+
 	// Calculate placeholders needed for infinite scroll
 	const gridColumns = useGridColumns();
 	const placeholdersNeeded = usePlaceholdersNeeded(
@@ -349,6 +355,7 @@ function ViewPickerGrid< Item >( {
 									[ 'compact', 'comfortable' ].includes(
 										view.layout.density
 									),
+								'has-media-fit-contain': isMediaContain,
 							}
 						) }
 						aria-label={ itemListLabel }
@@ -373,11 +380,6 @@ function ViewPickerGrid< Item >( {
 								>
 									<GridItems
 										previewSize={ usedPreviewSize }
-										style={ {
-											gridTemplateColumns:
-												usedPreviewSize &&
-												`repeat(auto-fill, minmax(${ usedPreviewSize }px, 1fr))`,
-										} }
 										aria-busy={ isLoading }
 										ref={
 											resizeObserverRef as React.RefObject< HTMLDivElement >
@@ -444,6 +446,7 @@ function ViewPickerGrid< Item >( {
 												'compact',
 												'comfortable',
 											].includes( view.layout.density ),
+										'has-media-fit-contain': isMediaContain,
 									}
 								) }
 								previewSize={ usedPreviewSize }

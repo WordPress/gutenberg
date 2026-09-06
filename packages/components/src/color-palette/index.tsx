@@ -15,8 +15,10 @@ import { Stack } from '@wordpress/ui';
 import Dropdown from '../dropdown';
 import CircularOptionPicker, {
 	getComputeCircularOptionPickerCommonProps,
+	warnIfCircularOptionPickerAsButtonsIsSet,
 } from '../circular-option-picker';
-import { ColorHeading } from './styles';
+import { Heading } from '../heading';
+import styles from './style.module.scss';
 import type {
 	ColorPaletteInternalProps,
 	ColorPaletteProps,
@@ -48,15 +50,22 @@ function SinglePalette( {
 	onChange,
 	value,
 	selectedSlug,
+	presentation,
 	addAction,
 	...additionalProps
 }: SinglePaletteProps ) {
 	const colorOptions = useMemo( () => {
 		const options = colors.map( ( { color, name, slug }, index ) => {
 			const colordColor = colord( color );
-			const isSelected = selectedSlug
-				? slug === selectedSlug
-				: value === color;
+			// When a non-empty selectedSlug is provided, selection is decided
+			// strictly by slug — entries without a slug or with a different slug
+			// are not selected, even when their color value matches `value`.
+			// This correctly handles mixed palettes where some entries have slugs
+			// and others don't. Fall back to color value matching otherwise
+			// (including when selectedSlug is an empty string).
+			const isSelected =
+				presentation !== 'command-buttons' &&
+				( selectedSlug ? slug === selectedSlug : value === color );
 
 			return (
 				<CircularOptionPicker.Option
@@ -65,7 +74,7 @@ function SinglePalette( {
 					selectedIconProps={
 						isSelected
 							? {
-									fill:
+									color:
 										colordColor.contrast() >
 										colordColor.contrast( '#000' )
 											? '#fff'
@@ -94,7 +103,15 @@ function SinglePalette( {
 			);
 		}
 		return options;
-	}, [ colors, value, selectedSlug, onChange, clearColor, addAction ] );
+	}, [
+		colors,
+		value,
+		selectedSlug,
+		onChange,
+		clearColor,
+		presentation,
+		addAction,
+	] );
 
 	return (
 		<CircularOptionPicker.OptionGroup
@@ -113,6 +130,7 @@ function MultiplePalettes( {
 	value,
 	selectedSlug,
 	headingLevel,
+	presentation,
 	canAddCustomColor,
 	onAddCustom,
 }: MultiplePalettesProps ) {
@@ -137,9 +155,13 @@ function MultiplePalettes( {
 							gap="sm"
 							key={ paletteSlug ?? name ?? index }
 						>
-							<ColorHeading id={ id } level={ headingLevel }>
+							<Heading
+								className={ styles[ 'color-heading' ] }
+								id={ id }
+								level={ headingLevel }
+							>
 								{ name }
-							</ColorHeading>
+							</Heading>
 							<SinglePalette
 								clearColor={ clearColor }
 								colors={ colorPalette }
@@ -148,6 +170,7 @@ function MultiplePalettes( {
 								}
 								value={ value }
 								selectedSlug={ selectedSlug }
+								presentation={ presentation }
 								aria-labelledby={ id }
 								addAction={
 									isCustomPalette &&
@@ -212,6 +235,7 @@ function UnforwardedColorPalette(
 ) {
 	const {
 		asButtons,
+		presentation,
 		loop,
 		clearable = true,
 		colors = [],
@@ -228,6 +252,7 @@ function UnforwardedColorPalette(
 		'aria-labelledby': ariaLabelledby,
 		...additionalProps
 	} = props as ColorPaletteInternalProps;
+	warnIfCircularOptionPickerAsButtonsIsSet( 'ColorPalette', asButtons );
 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
 
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
@@ -292,11 +317,21 @@ function UnforwardedColorPalette(
 		  )
 		: __( 'Custom color picker' );
 
+	const { metaProps, labelProps, resolvedPresentation } =
+		getComputeCircularOptionPickerCommonProps(
+			asButtons,
+			loop,
+			ariaLabel,
+			ariaLabelledby,
+			presentation
+		);
+
 	const paletteCommonProps = {
 		clearColor,
 		onChange,
 		value,
 		selectedSlug,
+		presentation: resolvedPresentation,
 	};
 
 	const actions = !! clearable && (
@@ -307,13 +342,6 @@ function UnforwardedColorPalette(
 		>
 			{ __( 'Clear' ) }
 		</CircularOptionPicker.ButtonAction>
-	);
-
-	const { metaProps, labelProps } = getComputeCircularOptionPickerCommonProps(
-		asButtons,
-		loop,
-		ariaLabel,
-		ariaLabelledby
 	);
 
 	const shouldDisplayMultiplePalettes =
@@ -357,6 +385,8 @@ function UnforwardedColorPalette(
 	const shouldRenderCustomColorPicker = ! disableCustomColors;
 	const shouldRenderPalette = displayedColors.length > 0 || !! actions;
 
+	// Avoid rendering an empty palette wrapper when there is neither a custom
+	// color picker nor anything to show in the palette.
 	if ( ! shouldRenderCustomColorPicker && ! shouldRenderPalette ) {
 		return null;
 	}

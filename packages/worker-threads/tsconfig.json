@@ -1,10 +1,5 @@
 {
-	"extends": "../../tsconfig.base.json",
-	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types"
-	},
-	"references": [],
-	"include": [ "src/**/*" ],
-	"exclude": [ "src/test/**" ]
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.dev.base.json",
+	"references": [ { "path": "./tsconfig.build.json" } ]
 }

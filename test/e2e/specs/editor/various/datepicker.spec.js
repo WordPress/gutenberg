@@ -102,7 +102,7 @@ TIMEZONES.forEach( ( timezone ) => {
 			await datepicker.click();
 			await page
 				.getByLabel( 'Change publish date' )
-				.getByRole( 'button', { name: 'Now' } )
+				.getByRole( 'button', { name: 'Reset' } )
 				.click();
 
 			await expect(

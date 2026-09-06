@@ -72,7 +72,6 @@ function Navigation() {
 								<DropdownItem
 									key={ item.id }
 									id={ item.id }
-									className="boot-navigation-item"
 									icon={ item.icon }
 									shouldShowPlaceholder={ hasRealIcons }
 									isExpanded={ parentDropdownId === item.id }

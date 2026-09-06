@@ -5,5 +5,21 @@
 	"icon": "core/calendar",
 	"category": "dashboard",
 	"presentation": "content-bleed",
+	"actions": [
+		{
+			"id": "meetups",
+			"label": "Meetups",
+			"relevance": "high",
+			"href": "https://make.wordpress.org/community/meetups-landing-page",
+			"openInNewTab": true
+		},
+		{
+			"id": "wordcamps",
+			"label": "WordCamps",
+			"relevance": "high",
+			"href": "https://central.wordcamp.org/schedule/",
+			"openInNewTab": true
+		}
+	],
 	"textdomain": "default"
 }

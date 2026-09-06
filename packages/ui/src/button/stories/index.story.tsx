@@ -1,4 +1,4 @@
-import { Fragment, useId } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { wordpress } from '@wordpress/icons';
 import {
@@ -6,9 +6,13 @@ import {
 	shortcutAriaLabel,
 	ariaKeyShortcut,
 } from '@wordpress/keycodes';
+import {
+	KeyboardShortcutDescription,
+	KeyboardShortcutDisplay,
+	useKeyboardShortcutProps,
+} from '@wordpress/ui';
 import { Button } from '../index';
 import * as Tooltip from '../../tooltip';
-import { VisuallyHidden } from '../../visually-hidden';
 
 const meta: Meta< typeof Button > = {
 	title: 'Design System/Components/Button',
@@ -191,8 +195,8 @@ export const Pressed: Story = {
 };
 
 /**
- * `Button` has no dedicated `shortcut` prop, so keyboard shortcuts must be
- * composed manually: a visual hint in the tooltip, `aria-keyshortcuts` for
+ * `Button` has no dedicated `shortcut` prop. Use the keyboard shortcut
+ * utilities to compose a visual hint in the tooltip, `aria-keyshortcuts` for
  * assistive technology, and a visually hidden description. Consumers remain
  * responsible for registering the shortcut and handling the corresponding
  * keyboard event.
@@ -200,37 +204,41 @@ export const Pressed: Story = {
 export const WithKeyboardShortcut: Story = {
 	args: {
 		children: 'Save',
-		'aria-keyshortcuts': ariaKeyShortcut.primary( 's' ),
 	},
 	render: ( {
 		children,
 		'aria-describedby': consumerDescribedBy,
+		'aria-keyshortcuts': consumerKeyShortcuts,
 		...args
 	} ) => {
-		const descriptionId = useId();
+		const shortcut = {
+			displayShortcut: displayShortcut.primary( 's' ),
+			ariaKeyShortcut: ariaKeyShortcut.primary( 's' ),
+			label: shortcutAriaLabel.primary( 's' ),
+		};
+		const { descriptionId, targetProps } = useKeyboardShortcutProps( {
+			'aria-describedby': consumerDescribedBy,
+			'aria-keyshortcuts': consumerKeyShortcuts,
+			shortcut,
+		} );
 
 		return (
 			<Tooltip.Root>
 				<Tooltip.Trigger
 					render={ <Button { ...args } /> }
-					aria-describedby={ [ consumerDescribedBy, descriptionId ]
-						.filter( Boolean )
-						.join( ' ' ) }
+					{ ...targetProps }
 				>
 					{ children }
-					<VisuallyHidden
-						id={ descriptionId }
-						aria-hidden="true"
-						render={ <span /> }
-					>
-						Keyboard shortcut: { shortcutAriaLabel.primary( 's' ) }
-					</VisuallyHidden>
+					{ descriptionId && (
+						<KeyboardShortcutDescription
+							descriptionId={ descriptionId }
+							shortcut={ shortcut }
+						/>
+					) }
 				</Tooltip.Trigger>
 				<Tooltip.Popup>
 					{ children }{ ' ' }
-					<span aria-hidden="true" dir="ltr">
-						{ displayShortcut.primary( 's' ) }
-					</span>
+					<KeyboardShortcutDisplay shortcut={ shortcut } />
 				</Tooltip.Popup>
 			</Tooltip.Root>
 		);

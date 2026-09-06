@@ -5,8 +5,8 @@
 		"types": [ "gutenberg-env" ]
 	},
 	"references": [
-		{ "path": "../compose" },
-		{ "path": "../element" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../url" }
 	]

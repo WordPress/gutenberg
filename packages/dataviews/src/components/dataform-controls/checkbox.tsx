@@ -1,10 +1,7 @@
-import { privateApis } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import type { DataFormControlProps } from '../../types';
-import { unlock } from '../../lock-unlock';
+import { ValidatedCheckboxControl } from '../validated-form-controls';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { ValidatedCheckboxControl } = unlock( privateApis );
 
 export default function Checkbox< Item >( {
 	field,

@@ -1,13 +1,16 @@
-import type { Meta, StoryFn } from '@storybook/react-vite';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
 import { DuotonePicker } from '..';
-import type { DuotonePickerProps } from '../types';
 
 const meta: Meta< typeof DuotonePicker > = {
 	title: 'Components/DuotonePicker',
 	component: DuotonePicker,
+	args: {
+		onChange: fn(),
+	},
 	argTypes: {
-		onChange: { action: 'onChange' },
+		selectedSlug: { control: false },
 		value: { control: false },
 	},
 	parameters: {
@@ -20,6 +23,8 @@ const meta: Meta< typeof DuotonePicker > = {
 	},
 };
 export default meta;
+
+type DuotonePickerStory = StoryObj< typeof DuotonePicker >;
 
 const DUOTONE_PALETTE = [
 	{
@@ -34,6 +39,22 @@ const DUOTONE_PALETTE = [
 	},
 ];
 
+// Two presets holding the same colors. Adding duotones with the `+` button in
+// the Global Styles palette editor seeds each one from the palette's darkest
+// and lightest colors, so this is the normal case rather than a contrived one.
+const DUPLICATE_DUOTONE_PALETTE = [
+	{
+		colors: [ '#000000', '#ffffff' ],
+		name: 'Dark background',
+		slug: 'dark-background',
+	},
+	{
+		colors: [ '#000000', '#ffffff' ],
+		name: 'Dark text',
+		slug: 'dark-text',
+	},
+];
+
 const COLOR_PALETTE = [
 	{ color: '#ff4747', name: 'Red', slug: 'red' },
 	{ color: '#fcff41', name: 'Yellow', slug: 'yellow' },
@@ -41,23 +62,50 @@ const COLOR_PALETTE = [
 	{ color: '#8c00b7', name: 'Purple', slug: 'purple' },
 ];
 
-const Template: StoryFn< typeof DuotonePicker > = ( { onChange, ...args } ) => {
-	const [ value, setValue ] = useState< DuotonePickerProps[ 'value' ] >();
-
+const Template = ( {
+	onChange,
+	value,
+	selectedSlug,
+	...props
+}: React.ComponentProps< typeof DuotonePicker > ) => {
+	const [ duotone, setDuotone ] =
+		useState< React.ComponentProps< typeof DuotonePicker >[ 'value' ] >(
+			value
+		);
+	const [ slug, setSlug ] = useState< string | undefined >( selectedSlug );
 	return (
 		<DuotonePicker
-			{ ...args }
-			onChange={ ( ...changeArgs ) => {
-				setValue( ...changeArgs );
-				onChange( ...changeArgs );
+			{ ...props }
+			value={ duotone }
+			selectedSlug={ slug }
+			onChange={ ( newValue, index, newSlug ) => {
+				setDuotone( newValue );
+				setSlug( newSlug );
+				onChange?.( newValue, index, newSlug );
 			} }
-			value={ value }
 		/>
 	);
 };
 
-export const Default = Template.bind( {} );
-Default.args = {
-	colorPalette: COLOR_PALETTE,
-	duotonePalette: DUOTONE_PALETTE,
+export const Default: DuotonePickerStory = {
+	render: Template,
+	args: {
+		colorPalette: COLOR_PALETTE,
+		duotonePalette: DUOTONE_PALETTE,
+	},
+};
+
+export const DuplicateDuotones: DuotonePickerStory = {
+	render: Template,
+	args: {
+		colorPalette: COLOR_PALETTE,
+		duotonePalette: DUPLICATE_DUOTONE_PALETTE,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: 'Two presets can hold the same pair of colors. Selection is tracked by slug, so picking one marks only that preset rather than both.',
+			},
+		},
+	},
 };

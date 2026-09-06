@@ -53,6 +53,14 @@ Error handling and chrome stay with the host, which wraps the lazy render in a `
 
 It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading) and imports each one's metadata module. It returns `[ widgetTypes, isResolvingWidgetTypes ]`; the flag stays `true` until they resolve.
 
+### `WidgetHostProvider` / `useWidgetHost`
+
+It's the seam through which the embedding application provides what only it knows, as a `WidgetHost` bag of optional capabilities. The provider merges its value over the inherited one; an absent capability degrades to the host-agnostic behavior.
+
+The first capability is `links` (`WidgetHostLinks`): `match` resolves a href to an in-app route (a string, path and query as the router takes them, or `null` for anything the application does not own), and `Link` is the router's primitive, which must render a real anchor and forward `ref` to it. A matched link action navigates client-side; `null`, `download`, and `openInNewTab` keep the plain anchor.
+
+Consumers reach the anchor through that ref: a link that drops it is skipped by keyboard navigation and loses its tooltip. The Widget Host Storybook page carries the one test that pins it.
+
 ### Contract types
 
 `WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, and `WidgetModuleRecord`. `WidgetIcon` is a rendered SVG element that hosts pass to their icon primitive as-is; in `widget.json` a widget declares a registered icon name instead, resolved before it reaches hosts.
@@ -60,11 +68,11 @@ It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading)
 ### `WidgetAttributeField< Item >`
 
 It's an authoring helper: a DataViews `Field` whose `id` is narrowed to the widget's attribute keys.
-Its optional `relevance` hint (`'high' | 'low'`) marks attributes a host may promote to a prominent surface.
+Its optional `relevance` hint (`'high' | 'medium' | 'low'`) marks attributes a host may promote to a prominent surface.
 
 ### `WidgetAction`
 
-It's a declarative verb a widget type exposes: an envelope (`id`, `label`) plus exactly one fulfillment, named by the key carrying it.
+It's a declarative verb a widget type exposes: an envelope (`id`, `label`, optional `icon` and `relevance`) plus exactly one fulfillment, named by the key carrying it.
 Today the only key is `href`, a link target, with optional `download` / `openInNewTab`.
 `data:` and `javascript:` hrefs are rejected at registration. Prefer a file next to the widget, an absolute URL, or `downloadBlob` for generated content.
 

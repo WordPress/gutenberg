@@ -82,6 +82,7 @@ import {
 	isHashLink,
 	isRelativePath,
 } from './components/link-control/is-url-like';
+import { isElementVisible } from './utils/dom';
 
 const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 
@@ -161,4 +162,5 @@ lock( privateApis, {
 	InnerContent,
 	useNativeUndo,
 	usesNativeUndo,
+	isElementVisible,
 } );

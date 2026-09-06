@@ -24,9 +24,15 @@ const test = base.extend< Fixtures >( {
 		} );
 
 		await setCollaboration( requestUtils, true );
-		await use( utils );
-		await utils.teardown();
-		await setCollaboration( requestUtils, false );
+		try {
+			await use( utils );
+		} finally {
+			try {
+				await utils.teardown();
+			} finally {
+				await setCollaboration( requestUtils, false );
+			}
+		}
 	},
 	collaboratorUser: async (
 		{ collaborationUtils, requestUtils },

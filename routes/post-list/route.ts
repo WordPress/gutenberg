@@ -57,7 +57,6 @@ export const route = {
 				postType: params.type,
 				postId,
 				isPreview: true,
-				editLink: `/types/${ params.type }/edit/${ postId }`,
 			};
 		}
 
@@ -76,7 +75,6 @@ export const route = {
 				postType: params.type,
 				postId,
 				isPreview: true,
-				editLink: `/types/${ params.type }/edit/${ postId }`,
 			};
 		}
 
