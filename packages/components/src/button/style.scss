@@ -59,19 +59,19 @@
 
 	&.is-primary {
 		white-space: nowrap;
-		background: $components-color-accent;
-		color: $components-color-accent-inverted;
+		background: $components-button-color-background-primary;
+		color: $components-button-color-foreground-primary;
 		text-decoration: none;
 		text-shadow: none;
 
 		&:hover:not(:disabled) {
-			background: $components-color-accent-darker-10;
-			color: $components-color-accent-inverted;
+			background: $components-button-color-background-primary-hover;
+			color: $components-button-color-foreground-primary-active;
 		}
 
 		&:active:not(:disabled) {
-			background: $components-color-accent-darker-20;
-			color: $components-color-accent-inverted;
+			background: $components-button-color-background-primary-active;
+			color: $components-button-color-foreground-primary-active;
 		}
 
 		&:disabled,
@@ -87,15 +87,15 @@
 		&.is-busy,
 		&.is-busy:disabled,
 		&.is-busy[aria-disabled="true"] {
-			color: $components-color-accent-inverted;
+			color: $components-button-color-foreground-primary;
 			background-size: 100px 100%;
 			/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
 			background-image: linear-gradient(
 				-45deg,
-				$components-color-accent 33%,
-				$components-color-accent-darker-20 33%,
-				$components-color-accent-darker-20 70%,
-				$components-color-accent 70%
+				$components-button-color-background-primary 33%,
+				$components-button-color-background-primary-active 33%,
+				$components-button-color-background-primary-active 70%,
+				$components-button-color-background-primary 70%
 			);
 			/* stylelint-enable */
 		}
@@ -183,6 +183,10 @@
 		--wp-components-color-accent: #{$alert-red};
 		--wp-components-color-accent-darker-10: #{color.adjust($alert-red, $lightness: -10%)};
 		--wp-components-color-accent-darker-20: #{color.adjust($alert-red, $lightness: -20%)};
+
+		&.is-primary:not(:disabled, [aria-disabled="true"]) {
+			color: $components-button-color-foreground-destructive;
+		}
 
 		// Only the default variant is styled differently from the non-destructive counterparts.
 		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link) {

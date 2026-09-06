@@ -214,18 +214,38 @@ describe( 'useThemeProviderStyles', () => {
 			);
 		} );
 
-		it( 'aliases the wp-components colors onto the wp-admin and semantic tokens', () => {
+		it( 'provides state-specific Button colors without masking legacy overrides', () => {
 			const { result } = renderHook( () =>
 				useThemeProviderStyles( { color: { primary: '#1e90ff' } } )
 			);
 			const styles = result.current.themeProviderStyles;
 
-			expect( styles[ '--wp-components-color-accent' ] ).toBe(
-				'var(--wp-admin-theme-color)'
+			expect( styles ).not.toHaveProperty(
+				'--wp-components-color-accent'
 			);
-			expect( styles[ '--wp-components-color-accent-inverted' ] ).toBe(
-				'var(--wpds-color-foreground-interactive-brand-strong)'
+			expect( styles ).not.toHaveProperty(
+				'--wp-components-color-accent-inverted'
 			);
+			expect(
+				styles[ '--wp-components-button-color-background-primary' ]
+			).toBe( 'var(--wpds-color-background-interactive-brand-strong)' );
+			expect(
+				styles[
+					'--wp-components-button-color-background-primary-active'
+				]
+			).toBe(
+				'var(--wpds-color-background-interactive-brand-strong-active)'
+			);
+			expect(
+				styles[
+					'--wp-components-button-color-foreground-primary-active'
+				]
+			).toBe(
+				'var(--wpds-color-foreground-interactive-brand-strong-active)'
+			);
+			expect(
+				styles[ '--wp-components-button-color-foreground-primary' ]
+			).toBe( 'var(--wpds-color-foreground-interactive-brand-strong)' );
 			expect( styles[ '--wp-components-color-background' ] ).toBe(
 				'var(--wpds-color-background-surface-neutral-strong)'
 			);
