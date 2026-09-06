@@ -33,19 +33,17 @@ $indeterminate-indicator-width: 50%;
 	outline-offset: -2px;
 
 	width: var(--indicator-width);
-	transition: width 0.4s ease-in-out;
+
+	@media not (prefers-reduced-motion) {
+		transition: width 0.4s ease-in-out;
+	}
 
 	&.is-indeterminate {
 		--indicator-width: #{$indeterminate-indicator-width};
 		animation: indeterminate-slide 1.5s ease-in-out infinite;
 		transition: none;
-	}
 
-	@media (prefers-reduced-motion: reduce) {
-		transition-duration: 0.8s;
-		transition-timing-function: steps(4, end);
-
-		&.is-indeterminate {
+		@media (prefers-reduced-motion: reduce) {
 			animation-duration: 3s;
 			animation-timing-function: steps(4, end);
 		}
