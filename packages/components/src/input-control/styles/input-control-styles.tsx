@@ -9,6 +9,7 @@ import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
 import type { LabelPosition, Size, PrefixSuffixWrapperProps } from '../types';
 
 type ContainerProps = {
+	disabled?: boolean;
 	hideLabel?: boolean;
 	__unstableInputWidth?: CSSProperties[ 'width' ];
 	labelPosition?: LabelPosition;
@@ -73,6 +74,10 @@ export const Root = styled( Flex )`
 	padding-top: 0;
 `;
 
+const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
+	return disabled ? css( { color: COLORS.ui.textDisabled } ) : undefined;
+};
+
 const containerWidthStyles = ( {
 	__unstableInputWidth,
 	labelPosition,
@@ -103,6 +108,7 @@ export const Container = styled.div< ContainerProps >`
 	position: relative;
 	background-color: ${ COLORS.ui.background };
 
+	${ containerDisabledStyles }
 	${ containerWidthStyles }
 `;
 
