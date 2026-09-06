@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const snapshotDiff = require( 'snapshot-diff' );
 
 const getStyleSheets = () =>
@@ -21,7 +18,7 @@ const getStyleRulesForElement = ( element, styleSheets ) => {
 					found.push( rule.style );
 				}
 			} );
-		} catch ( e ) {}
+		} catch {}
 
 		return [ ...matchingRules, ...found ];
 	}, [] );

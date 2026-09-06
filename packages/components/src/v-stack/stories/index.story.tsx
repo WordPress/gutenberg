@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import { VStack } from '..';
 
@@ -42,6 +35,11 @@ const meta: Meta< typeof VStack > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`Stack`](?path=/docs/design-system-components-stack--docs) from `@wordpress/ui` instead.',
+		},
 	},
 };
 export default meta;

@@ -12,22 +12,10 @@
  *
  * @see https://ariakit.org/components/composite
  */
-
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { Composite as Current } from '..';
 
 type Orientation = 'horizontal' | 'vertical';

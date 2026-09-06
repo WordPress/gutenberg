@@ -7,9 +7,6 @@
 	"description": "The author name.",
 	"textdomain": "default",
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"isLink": {
 			"type": "boolean",
 			"default": false,
@@ -44,6 +41,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

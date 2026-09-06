@@ -1,7 +1,7 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+// Whether the run targets the extensible site editor (v2).
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
 test.use( {
 	blockTemplateRegistrationUtils: async ( { editor, page }, use ) => {
@@ -15,19 +15,17 @@ test.describe( 'Block template registration', () => {
 		await requestUtils.activatePlugin(
 			'gutenberg-test-block-template-registration'
 		);
-		// Enable the template activation feature.
-		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
 	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await requestUtils.deleteAllPosts();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-block-template-registration'
 		);
-		// Disable the template activation experiment.
-		await requestUtils.setGutenbergExperiments( [] );
-	} );
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await requestUtils.deleteAllPosts();
 	} );
 
 	test( 'templates can be registered and edited', async ( {
@@ -45,26 +43,23 @@ test.describe( 'Block template registration', () => {
 		// Verify template is listed in the Site Editor.
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
-			activeView: 'Gutenberg',
 		} );
 		await blockTemplateRegistrationUtils.searchForTemplate(
 			'Plugin Template'
 		);
 		await expect( page.getByText( 'Plugin Template' ) ).toBeVisible();
 		await expect(
-			page.getByText( 'A template registered by a plugin.' )
+			// The v2 grid also renders the description in a hidden
+			// accessible-description node, so match the visible one.
+			page
+				.getByText( 'A template registered by a plugin.' )
+				.filter( { visible: true } )
+				.first()
 		).toBeVisible();
+		await expect( page.getByText( 'AuthorGutenberg' ) ).toBeVisible();
 
 		// Verify the template contents are rendered in the editor.
 		await page.getByText( 'Plugin Template' ).click();
-		await page.getByRole( 'button', { name: 'Duplicate' } ).click();
-		await page.waitForURL(
-			'/wp-admin/site-editor.php?p=%2Ftemplate&activeView=user'
-		);
-		await page
-			.getByRole( 'button', { name: 'Plugin Template (Copy)' } )
-			.first()
-			.click();
 		await expect(
 			editor.canvas.getByText( 'This is a plugin-registered template.' )
 		).toBeVisible();
@@ -77,26 +72,16 @@ test.describe( 'Block template registration', () => {
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty: true,
 		} );
-		await page
-			.getByRole( 'region', { name: 'Editor content' } )
-			.getByRole( 'button', { name: 'Activate' } )
-			.click();
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor content' } )
-				.getByText( 'Template activated.' )
-		).toBeVisible();
 		await page.goto( '/?cat=1' );
 		await expect( page.getByText( 'User-edited template' ) ).toBeVisible();
 
 		// Verify template can be reset.
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
-			activeView: 'user',
 		} );
 		const resetNotice = page
 			.getByLabel( 'Dismiss this notice' )
-			.getByText( `"Plugin Template (Copy)" moved to the trash.` );
+			.getByText( `"Plugin Template" reset.` );
 		const savedButton = page.getByRole( 'button', {
 			name: 'Saved',
 		} );
@@ -105,11 +90,14 @@ test.describe( 'Block template registration', () => {
 		);
 		const searchResults = page.getByLabel( 'Actions' );
 		await searchResults.first().click();
-		await page.getByRole( 'menuitem', { name: 'Trash' } ).click();
-		await page.getByRole( 'button', { name: 'Trash' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Reset' } ).click();
+		await page.getByRole( 'button', { name: 'Reset' } ).click();
 
 		await expect( resetNotice ).toBeVisible();
-		await expect( savedButton ).toBeVisible();
+		if ( ! isSiteEditorV2 ) {
+			// Only the classic editor shows the save hub on list screens.
+			await expect( savedButton ).toBeVisible();
+		}
 		await page.goto( '/?cat=1' );
 		await expect(
 			page.getByText( 'Content edited template.' )
@@ -129,6 +117,7 @@ test.describe( 'Block template registration', () => {
 		} );
 
 		// Change template.
+		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'button', { name: 'Post', exact: true } ).click();
 		await page.getByRole( 'button', { name: 'Template options' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
@@ -156,6 +145,7 @@ test.describe( 'Block template registration', () => {
 		} );
 
 		// Change template.
+		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'button', { name: 'Post', exact: true } ).click();
 		await page.getByRole( 'button', { name: 'Template options' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
@@ -176,7 +166,6 @@ test.describe( 'Block template registration', () => {
 		// Verify the plugin-registered template doesn't appear in the Site Editor.
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
-			activeView: 'Emptytheme',
 		} );
 		await blockTemplateRegistrationUtils.searchForTemplate( 'Custom' );
 		await expect(
@@ -184,10 +173,17 @@ test.describe( 'Block template registration', () => {
 		).toBeHidden();
 		// Verify the template description fall backs to the plugin registered description.
 		await expect(
-			page.getByText(
-				'A custom template registered by a plugin and overridden by a theme.'
-			)
+			page
+				.getByText(
+					'A custom template registered by a plugin and overridden by a theme.'
+				)
+				// The v2 grid also renders the description in a hidden
+				// accessible-description node, so match the visible one.
+				.filter( { visible: true } )
+				.first()
 		).toBeVisible();
+		// Verify the theme template shows the theme name as the author.
+		await expect( page.getByText( 'AuthorEmptytheme' ) ).toBeVisible();
 	} );
 
 	test( 'templates can be deleted if the registered plugin is deactivated', async ( {
@@ -200,20 +196,11 @@ test.describe( 'Block template registration', () => {
 		// Make an edit to the template.
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
-			activeView: 'Gutenberg',
 		} );
 		await blockTemplateRegistrationUtils.searchForTemplate(
 			'Plugin Template'
 		);
 		await page.getByText( 'Plugin Template' ).click();
-		await page.getByRole( 'button', { name: 'Duplicate' } ).click();
-		await page.waitForURL(
-			'/wp-admin/site-editor.php?p=%2Ftemplate&activeView=user'
-		);
-		await page
-			.getByRole( 'button', { name: 'Plugin Template (Copy)' } )
-			.first()
-			.click();
 		await expect(
 			editor.canvas.getByText( 'This is a plugin-registered template.' )
 		).toBeVisible();
@@ -233,11 +220,10 @@ test.describe( 'Block template registration', () => {
 		// Verify template can be deleted.
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
-			activeView: 'user',
 		} );
 		const deletedNotice = page
 			.getByLabel( 'Dismiss this notice' )
-			.getByText( `"Plugin Template (Copy)" moved to the trash.` );
+			.getByText( `"Plugin Template" deleted.` );
 		const savedButton = page.getByRole( 'button', {
 			name: 'Saved',
 		} );
@@ -246,11 +232,14 @@ test.describe( 'Block template registration', () => {
 		);
 		const searchResults = page.getByLabel( 'Actions' );
 		await searchResults.first().click();
-		await page.getByRole( 'menuitem', { name: 'Trash' } ).click();
-		await page.getByRole( 'button', { name: 'Trash' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
+		await page.getByRole( 'button', { name: 'Delete' } ).click();
 
 		await expect( deletedNotice ).toBeVisible();
-		await expect( savedButton ).toBeVisible();
+		if ( ! isSiteEditorV2 ) {
+			// Only the classic editor shows the save hub on list screens.
+			await expect( savedButton ).toBeVisible();
+		}
 
 		// Expect template to no longer appear in the Site Editor.
 		await expect( page.getByLabel( 'Actions' ) ).toBeHidden();
@@ -321,15 +310,6 @@ test.describe( 'Block template registration', () => {
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty: true,
 		} );
-		await page
-			.getByRole( 'region', { name: 'Editor content' } )
-			.getByRole( 'button', { name: 'Activate' } )
-			.click();
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor content' } )
-				.getByText( 'Template activated.' )
-		).toBeVisible();
 
 		await requestUtils.activatePlugin(
 			'gutenberg-test-block-template-registration'
@@ -353,26 +333,34 @@ test.describe( 'Block template registration', () => {
 		);
 		await expect( page.getByText( 'Plugin Author Template' ) ).toBeHidden();
 
-		await admin.visitSiteEditor( {
-			postType: 'wp_template',
-			activeView: 'user',
-		} );
-
 		// Reset the user-modified template.
 		const resetNotice = page
 			.getByLabel( 'Dismiss this notice' )
-			.getByText( `"Author: Admin" moved to the trash.` );
+			.getByText( `"Author: Admin" reset.` );
 		await page.getByPlaceholder( 'Search' ).fill( 'Author: admin' );
 		await page
 			.locator( '.fields-field__title', { hasText: 'Author: Admin' } )
 			.click();
+		// The Actions button lives in the settings sidebar.
+		await editor.openDocumentSettingsSidebar();
 		const actions = page.getByLabel( 'Actions' );
 		await actions.first().click();
-		await page.getByRole( 'menuitem', { name: 'Trash' } ).click();
-		await page.getByRole( 'button', { name: 'Trash' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Reset' } ).click();
+		await page.getByRole( 'button', { name: 'Reset' } ).click();
 
 		await expect( resetNotice ).toBeVisible();
 
+		// Verify the template registered by the plugin is applied in the editor...
+		await expect(
+			editor.canvas.getByText( 'Author template customized by the user.' )
+		).toBeHidden();
+		await expect(
+			editor.canvas.getByText(
+				'This is a plugin-registered author template.'
+			)
+		).toBeVisible();
+
+		// ... and the frontend.
 		await page.goto( '?author=1' );
 		await expect(
 			page.getByText( 'Author template customized by the user.' )
@@ -390,16 +378,27 @@ class BlockTemplateRegistrationUtils {
 
 	async searchForTemplate( searchTerm ) {
 		const searchResults = this.page.getByLabel( 'Actions' );
+		// The list is fetched client-side after the route loads, which can
+		// take a while on slower CI runners.
 		await expect
-			.poll( async () => await searchResults.count() )
+			.poll( async () => await searchResults.count(), {
+				timeout: 15_000,
+			} )
 			.toBeGreaterThan( 0 );
 		const initialSearchResultsCount = await searchResults.count();
 		await this.page.getByPlaceholder( 'Search' ).fill( searchTerm );
 		await expect
 			.poll( async () => await searchResults.count() )
 			.toBeLessThanOrEqual( initialSearchResultsCount );
+		// Normalise the URL before matching: the extensible site editor nests
+		// the route query inside the `p` param (encoding it a second time) and
+		// encodes spaces as `+`.
 		await expect
-			.poll( async () => this.page.url() )
-			.toContain( `search=${ encodeURIComponent( searchTerm ) }` );
+			.poll( async () =>
+				decodeURIComponent(
+					decodeURIComponent( this.page.url() )
+				).replace( /\+/g, ' ' )
+			)
+			.toContain( `search=${ searchTerm }` );
 	}
 }

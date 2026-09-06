@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-import { useStyle, useSetting } from './hooks';
+import { useStyle, useSetting, useStyleWithResolvedBackground } from './hooks';
 import { unlock } from './lock-unlock';
 
 // Initial control values where no block style is set.
@@ -42,15 +35,18 @@ export default function BackgroundPanel() {
 		'merged',
 		false
 	);
+	const resolvedInheritedStyle =
+		useStyleWithResolvedBackground( inheritedStyle );
 	const [ settings ] = useSetting( '' );
 
 	return (
 		<StylesBackgroundPanel
-			inheritedValue={ inheritedStyle }
+			inheritedValue={ resolvedInheritedStyle }
 			value={ style }
 			onChange={ setStyle }
 			settings={ settings }
 			defaultValues={ BACKGROUND_DEFAULT_VALUES }
+			showInheritanceLabelIndicators={ false }
 		/>
 	);
 }

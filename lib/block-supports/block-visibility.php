@@ -15,17 +15,21 @@
 function gutenberg_render_block_visibility_support( $block_content, $block ) {
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 
-	if ( ! $block_type || ! block_has_support( $block_type, 'visibility', true ) ) {
+	if ( ! $block_type ) {
 		return $block_content;
 	}
 
 	$block_visibility = $block['attrs']['metadata']['blockVisibility'] ?? null;
 
+	// Hide the block whenever the value is boolean false, regardless of the
+	// block's current visibility support. This prevents blocks that previously
+	// supported visibility from unintentionally appearing on the front end
+	// after their support was disabled.
 	if ( false === $block_visibility ) {
 		return '';
 	}
 
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-hide-blocks-based-on-screen-size' ) ) {
+	if ( ! block_has_support( $block_type, 'visibility', true ) ) {
 		return $block_content;
 	}
 
@@ -38,60 +42,24 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 			return $block_content;
 		}
 
-		/*
-		 * Viewport size definitions are in several places in WordPress packages.
-		 * The following are taken from: https://github.com/WordPress/gutenberg/blob/trunk/packages/base-styles/_breakpoints.scss
-		 * The array is in a future, potential JSON format, and will be centralized
-		 * as the feature is developed.
-		 *
-		 * Viewport sizes as array items are defined sequentially. The first item's size is the max value.
-		 * Each subsequent item starts after the previous size (using > operator), and its size is the max.
-		 * The last item starts after the previous size (using > operator), and it has no max.
-		 */
-		$viewport_sizes = array(
+		$viewport_settings      = gutenberg_get_global_settings( array( 'viewport' ) );
+		$viewport_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
+			$viewport_settings,
 			array(
-				'name' => 'Mobile',
-				'slug' => 'mobile',
-				'size' => '480px',
-			),
-			array(
-				'name' => 'Tablet',
-				'slug' => 'tablet',
-				'size' => '782px',
-			),
-			array(
-				'name' => 'Desktop',
-				'slug' => 'desktop',
-				/*
-				 * Note: the last item in the $viewport_sizes array does not technically require a 'size' key,
-				 * as the last item's media query is calculated using `width > previous size`.
-				 * The last item is present for validating the attribute values, and in order to indicate
-				 * that this is the final viewport size, and to calculate the previous media query accordingly.
-				 */
-			),
+				'include_desktop' => true,
+			)
 		);
 
 		/*
-		 * Build media queries from viewport size definitions using the CSS range syntax.
-		 * Could be absorbed into the style engine,
-		 * as well as classname building, and declaration of the display property, if required.
+		 * Viewport media queries are keyed by style-state names (`@mobile`,
+		 * `@tablet`, and `@desktop`). Block visibility metadata and generated
+		 * classes use plain viewport names, so map the keys at this boundary.
 		 */
-		$viewport_media_queries = array();
-		$previous_size          = null;
-		foreach ( $viewport_sizes as $index => $viewport_size ) {
-			// First item: width <= size.
-			if ( 0 === $index ) {
-				$viewport_media_queries[ $viewport_size['slug'] ] = "@media (width <= {$viewport_size['size']})";
-			} elseif ( count( $viewport_sizes ) - 1 === $index && $previous_size ) {
-				// Last item: width > previous size.
-				$viewport_media_queries[ $viewport_size['slug'] ] = "@media (width > $previous_size)";
-			} else {
-				// Middle items: previous size < width <= size.
-				$viewport_media_queries[ $viewport_size['slug'] ] = "@media ({$previous_size} < width <= {$viewport_size['size']})";
-			}
-
-			$previous_size = $viewport_size['size'] ?? null;
+		$block_visibility_media_queries = array();
+		foreach ( $viewport_media_queries as $viewport_state => $media_query ) {
+			$block_visibility_media_queries[ ltrim( $viewport_state, '@' ) ] = $media_query;
 		}
+		$viewport_media_queries = $block_visibility_media_queries;
 
 		$hidden_on = array();
 
@@ -141,6 +109,16 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 			$processor = new WP_HTML_Tag_Processor( $block_content );
 			if ( $processor->next_tag() ) {
 				$processor->add_class( implode( ' ', $class_names ) );
+
+				/*
+				 * Set all IMG tags to be `fetchpriority=auto` so that wp_get_loading_optimization_attributes() won't add
+				 * `fetchpriority=high` or increment the media count to affect whether subsequent IMG tags get `loading=lazy`.
+				 */
+				do {
+					if ( 'IMG' === $processor->get_tag() ) {
+						$processor->set_attribute( 'fetchpriority', 'auto' );
+					}
+				} while ( $processor->next_tag() );
 				$block_content = $processor->get_updated_html();
 			}
 		}

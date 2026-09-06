@@ -4,7 +4,7 @@
 
 ## Usage
 
-`Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
+`Flex` is used with any of its two sub-components, `FlexItem` and `FlexBlock`.
 
 ```jsx
 import { Flex, FlexBlock, FlexItem } from '@wordpress/components';

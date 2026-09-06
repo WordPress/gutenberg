@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { NormalizedFilter, View } from '../../types';
 
 interface ResetFilterProps {

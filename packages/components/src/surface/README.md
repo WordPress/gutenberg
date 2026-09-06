@@ -1,8 +1,6 @@
 # Surface
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This component is deprecated. Write your own CSS instead, preferably using the <a href="https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-introduction--docs">design tokens</a> available in <code>@wordpress/theme</code>.</p>
 
 `Surface` is a core component that renders a primary background color.
 

@@ -1,17 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
-import { privateApis } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
+import { Badge } from '@wordpress/ui';
 import DataForm from '../index';
 import type { Field, Form } from '../../types';
-import { unlock } from '../../lock-unlock';
-
-const { Badge } = unlock( privateApis );
 
 const LayoutCardComponent = ( {
 	withHeader,
@@ -44,7 +34,7 @@ const LayoutCardComponent = ( {
 	const customerFields: Field< Customer >[] = [
 		{
 			id: 'name',
-			label: 'Customer Name',
+			label: 'Customer name',
 			type: 'text',
 		},
 		{
@@ -70,17 +60,17 @@ const LayoutCardComponent = ( {
 		},
 		{
 			id: 'shippingAddress',
-			label: 'Shipping Address',
+			label: 'Shipping address',
 			type: 'text',
 		},
 		{
 			id: 'billingAddress',
-			label: 'Billing Address',
+			label: 'Billing address',
 			type: 'text',
 		},
 		{
 			id: 'displayPayments',
-			label: 'Display Payments?',
+			label: 'Display payments?',
 			type: 'boolean',
 		},
 		{
@@ -112,10 +102,10 @@ const LayoutCardComponent = ( {
 		},
 		{
 			id: 'dueDate',
-			label: 'Due Date',
+			label: 'Due date',
 			type: 'text',
 			render: ( { item } ) => {
-				return <Badge>Due on: { item.dueDate }</Badge>;
+				return <Badge>{ `Due on: ${ item.dueDate }` }</Badge>;
 			},
 		},
 		{
@@ -152,7 +142,7 @@ const LayoutCardComponent = ( {
 		isCollapsible: collapsible,
 		isOpened: opened,
 	}: {
-		summary?: string | { id: string; visibility: 'always' }[];
+		summary?: string | string[] | { id: string; visibility: 'always' }[];
 		withSummary?: boolean;
 		withHeader?: boolean;
 		isCollapsible?: boolean;
@@ -178,7 +168,7 @@ const LayoutCardComponent = ( {
 				{
 					id: 'customerCard',
 					layout: getCardLayoutFromStoryArgs( {
-						summary: 'plan-summary',
+						summary: [ 'name', 'plan-summary' ],
 						withHeader: withHeader ?? true,
 						withSummary,
 						isCollapsible,

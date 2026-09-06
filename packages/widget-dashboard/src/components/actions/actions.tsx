@@ -1,0 +1,179 @@
+import { useSelect } from '@wordpress/data';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { plus } from '@wordpress/icons';
+import { store as viewportStore } from '@wordpress/viewport';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Button, Stack } from '@wordpress/ui';
+import { useDashboardInternalContext } from '../../context/dashboard-context';
+import { useDashboardUIContext } from '../../context/ui-context';
+import { ActionsMenu } from '../actions-menu';
+import type { ActionsMenuItem } from '../actions-menu';
+import styles from './actions.module.css';
+
+/**
+ * Edit toolbar for the dashboard. In customize mode it surfaces Add widget,
+ * Layout settings (when grid settings are editable), Cancel, and Done;
+ * otherwise a single Customize button. Buttons and the overflow menu are
+ * triggers that flip the shared UI state the overlays react to.
+ *
+ * Returns `null` when mounted without `onEditChange`, so hosts that don't
+ * expose edit mode can keep `Actions` in their tree unconditionally. The
+ * Customize button also needs the policy in effect to allow `customize`,
+ * and the Reset to default item needs it to allow `reset`.
+ */
+export function Actions(): React.ReactNode {
+	const {
+		editMode,
+		onEditChange,
+		onLayoutReset,
+		commit,
+		cancel: cancelStaging,
+		hasUncommittedChanges,
+		canPerform,
+		widgetTypes,
+	} = useDashboardInternalContext();
+
+	// The trigger shows only while something can be inserted.
+	const canInsertAny = useMemo(
+		() =>
+			widgetTypes.some( ( widgetType ) =>
+				canPerform( { operation: 'insert', widgetType } )
+			),
+		[ widgetTypes, canPerform ]
+	);
+
+	const [ isEditActionsMounted, setIsEditActionsMounted ] =
+		useState( editMode );
+	const [ isExitingEditActions, setIsExitingEditActions ] = useState( false );
+
+	useEffect( () => {
+		if ( editMode ) {
+			setIsEditActionsMounted( true );
+			setIsExitingEditActions( false );
+			return;
+		}
+
+		if ( ! isEditActionsMounted ) {
+			return;
+		}
+
+		setIsExitingEditActions( true );
+		const exitTimeout = setTimeout( () => {
+			setIsEditActionsMounted( false );
+			setIsExitingEditActions( false );
+		}, 220 );
+
+		return () => clearTimeout( exitTimeout );
+	}, [ editMode, isEditActionsMounted ] );
+
+	const { setInserterOpen, setResetDialogOpen } = useDashboardUIContext();
+	// @TODO: switch to using Admin UI declaratively for mobile viewport support once available.
+	// https://github.com/WordPress/gutenberg/issues/77628
+	const isMobileViewport = useSelect(
+		( select ) => select( viewportStore ).isViewportMatch( '< small' ),
+		[]
+	);
+
+	const handleEditMode = useCallback( () => {
+		onEditChange?.( ! editMode );
+	}, [ editMode, onEditChange ] );
+
+	const insert = useCallback( () => {
+		setInserterOpen( true );
+	}, [ setInserterOpen ] );
+
+	const cancel = useCallback( () => {
+		cancelStaging();
+	}, [ cancelStaging ] );
+
+	const done = useCallback( () => {
+		commit();
+	}, [ commit ] );
+
+	// A denied reset is hidden; a missing handler is disabled.
+	const menuItems: ActionsMenuItem[] = canPerform( { operation: 'reset' } )
+		? [
+				{
+					label: __( 'Reset to default' ),
+					onClick: () => setResetDialogOpen( true ),
+					disabled: ! onLayoutReset,
+				},
+		  ]
+		: [];
+
+	if ( ! onEditChange ) {
+		return null;
+	}
+
+	const canCustomize = canPerform( { operation: 'customize' } );
+
+	return (
+		<Stack direction="row" gap="sm">
+			{ isEditActionsMounted ? (
+				<Stack
+					direction="row"
+					gap="sm"
+					className={
+						isExitingEditActions
+							? styles[ 'edit-actions-exit' ]
+							: styles[ 'edit-actions-enter' ]
+					}
+				>
+					{ canInsertAny && (
+						<>
+							<Button
+								variant="minimal"
+								tone="brand"
+								size="compact"
+								onClick={ insert }
+							>
+								{ ! isMobileViewport && (
+									<Button.Icon icon={ plus } />
+								) }
+								{ __( 'Add widget' ) }
+							</Button>
+
+							<div
+								className={ styles[ 'edit-actions-divider' ] }
+								aria-hidden="true"
+							/>
+						</>
+					) }
+
+					<Button
+						variant="minimal"
+						tone="brand"
+						size="compact"
+						onClick={ cancel }
+					>
+						{ __( 'Cancel' ) }
+					</Button>
+
+					<Button
+						variant="solid"
+						tone="brand"
+						size="compact"
+						onClick={ done }
+						disabled={ ! hasUncommittedChanges }
+					>
+						{ __( 'Done' ) }
+					</Button>
+				</Stack>
+			) : (
+				canCustomize && (
+					<Button
+						variant="minimal"
+						tone="brand"
+						size="compact"
+						onClick={ handleEditMode }
+					>
+						{ __( 'Customize' ) }
+					</Button>
+				)
+			) }
+
+			<ActionsMenu items={ menuItems } />
+		</Stack>
+	);
+}

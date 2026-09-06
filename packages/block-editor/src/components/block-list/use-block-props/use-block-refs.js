@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useState, useLayoutEffect } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { BlockRefs } from '../../provider/block-refs-provider';
 
 /** @typedef {import('@wordpress/element').RefCallback} RefCallback */

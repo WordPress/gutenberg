@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import getNestedValue from '../get-nested-value';
 
 describe( 'getNestedValue', () => {

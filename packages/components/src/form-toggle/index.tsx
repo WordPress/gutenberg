@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { FormToggleProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -79,5 +68,6 @@ function UnforwardedFormToggle(
  * ```
  */
 export const FormToggle = forwardRef( UnforwardedFormToggle );
+FormToggle.displayName = 'FormToggle';
 
 export default FormToggle;

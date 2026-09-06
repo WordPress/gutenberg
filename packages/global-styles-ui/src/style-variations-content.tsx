@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import StyleVariationsContainer from './style-variations-container';
 import TypographyVariations from './variations/variations-typography';
 import ColorVariations from './variations/variations-color';

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
 
 const maxWidthWrapperMap = {
@@ -18,7 +15,7 @@ const Indicator = styled.div`
 	background: #e0e0e0;
 	text-transform: uppercase;
 	font-size: 11px;
-	font-weight: 500;
+	font-weight: var( --wpds-typography-font-weight-emphasis );
 	color: #757575;
 	margin-top: 24px;
 `;

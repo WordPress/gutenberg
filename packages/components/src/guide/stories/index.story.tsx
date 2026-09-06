@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import Guide from '..';
 
@@ -23,6 +12,12 @@ const meta: Meta< typeof Guide > = {
 		nextButtonText: { control: 'text' },
 		previousButtonText: { control: 'text' },
 		onFinish: { action: 'onFinish' },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;

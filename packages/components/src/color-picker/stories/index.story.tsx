@@ -1,15 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * Internal dependencies
- */
 import { ColorPicker } from '../component';
 
 const meta: Meta< typeof ColorPicker > = {
+	tags: [ 'manifest' ],
 	component: ColorPicker,
 	title: 'Components/Selection & Input/Color/ColorPicker',
 	id: 'components-colorpicker',
@@ -25,6 +19,10 @@ const meta: Meta< typeof ColorPicker > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

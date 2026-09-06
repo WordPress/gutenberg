@@ -4,7 +4,7 @@
 
 <p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-basecontrol--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
 
-`BaseControl` is a component used to generate labels and help text for components handling user inputs.
+`BaseControl` is a low-level component used to generate labels and help text for components handling user inputs.
 
 ```jsx
 import { BaseControl, useBaseControlProps } from '@wordpress/components';
@@ -30,10 +30,10 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
 
 ### `as`
 
- - Type: `"symbol" | "object" | "label" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | ... 516 more ... | ("view" & FunctionComponent<...>)`
- - Required: No
+ - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
+ - Required: Yes
 
-The HTML element or React component to render the component as.
+The HTML element to render the component as.
 
 ### `className`
 
@@ -107,7 +107,7 @@ const MyBaseControl = () => (
 
 ##### `as`
 
- - Type: `"symbol" | "object" | "label" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | ...`
+ - Type: `keyof IntrinsicElements | JSXElementConstructor<any>`
  - Required: No
 
 The HTML element or React component to render the component as.

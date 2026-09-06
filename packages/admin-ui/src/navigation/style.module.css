@@ -1,0 +1,44 @@
+.list {
+	/**
+	 * Give the scrollport room for the outset focus ring (outline width plus
+	 * offset), which the overflow clipping would otherwise cut off. The
+	 * negative margin cancels the padding out of the surrounding layout.
+	 */
+	--focus-ring-size: calc(2 * var(--wpds-border-width-focus));
+
+	list-style: none;
+	padding: var(--focus-ring-size);
+	margin: calc(-1 * var(--focus-ring-size));
+	/**
+	 * Scroll horizontally rather than wrap or shrink when items overflow.
+	 */
+	overflow-x: auto;
+	scroll-padding: var(--focus-ring-size);
+}
+
+.li {
+	flex-shrink: 0;
+}
+
+.item {
+	display: flex;
+	align-items: center;
+	/**
+	 * Meet the 44x44px pointer target size of WCAG 2.5.5 Target Size
+	 * (Enhanced). No design token maps to this accessibility constant.
+	 */
+	min-block-size: 44px;
+	min-inline-size: 44px;
+	color: var(--wpds-color-foreground-interactive-neutral-weak);
+	font-weight: var(--wpds-typography-font-weight-default);
+	text-decoration: none;
+}
+
+.item:hover {
+	color: var(--wpds-color-foreground-interactive-neutral-weak-active);
+}
+
+.item[aria-current="page"] {
+	color: var(--wpds-color-foreground-interactive-neutral-weak-active);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}

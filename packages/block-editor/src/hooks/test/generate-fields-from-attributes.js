@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { generateFieldsFromAttributes } from '../generate-fields-from-attributes';
 
 /**
@@ -8,12 +6,12 @@ import { generateFieldsFromAttributes } from '../generate-fields-from-attributes
  * In production, this marker is added by PHP during block registration.
  *
  * @param {Object} attrs - Attributes object
- * @return {Object} Attributes with __experimentalAutoInspectorControl marker
+ * @return {Object} Attributes with autoGenerateControl marker
  */
 function markForAutoInspectorControl( attrs ) {
 	const result = {};
 	for ( const [ name, def ] of Object.entries( attrs ) ) {
-		result[ name ] = { ...def, __experimentalAutoInspectorControl: true };
+		result[ name ] = { ...def, autoGenerateControl: true };
 	}
 	return result;
 }
@@ -117,33 +115,6 @@ describe( 'generateFieldsFromAttributes', () => {
 		} );
 	} );
 
-	it( 'should skip unsupported attribute types', () => {
-		const attributes = markForAutoInspectorControl( {
-			message: {
-				type: 'string',
-				default: 'Hello',
-			},
-			items: {
-				type: 'array',
-				default: [],
-			},
-			config: {
-				type: 'object',
-				default: {},
-			},
-			unionType: {
-				type: [ 'string', 'null' ],
-				default: null,
-			},
-		} );
-
-		const result = generateFieldsFromAttributes( attributes );
-
-		// Only string attribute should generate a field
-		expect( result.fields ).toHaveLength( 1 );
-		expect( result.fields[ 0 ].id ).toBe( 'message' );
-	} );
-
 	it( 'should return empty fields array for empty attributes', () => {
 		const result = generateFieldsFromAttributes( {} );
 
@@ -164,11 +135,11 @@ describe( 'generateFieldsFromAttributes', () => {
 		expect( result.fields[ 0 ].label ).toBe( 'Background Color' );
 	} );
 
-	it( 'should skip attributes without __experimentalAutoInspectorControl marker', () => {
+	it( 'should skip attributes without autoGenerateControl marker', () => {
 		const attributes = {
 			userDefined: {
 				type: 'string',
-				__experimentalAutoInspectorControl: true,
+				autoGenerateControl: true,
 			},
 			supportAdded: {
 				type: 'string',

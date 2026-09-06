@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { ShortcutProps } from '../shortcut/types';
 import type { ButtonAsButtonProps } from '../button/types';
 

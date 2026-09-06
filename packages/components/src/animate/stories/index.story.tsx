@@ -1,21 +1,19 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { Animate } from '..';
 import Notice from '../../notice';
 
 const meta: Meta< typeof Animate > = {
-	title: 'Components/Utilities/Animate',
+	title: 'Components/Deprecated/Animate',
 	id: 'components-animate',
 	component: Animate,
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Deprecated. Write your own CSS animations instead, preferably using the [`motion tokens`](?path=/docs/design-system-tokens-introduction--docs) available in `@wordpress/theme`.',
+		},
 	},
 };
 export default meta;
@@ -75,16 +73,6 @@ AppearBottomRight.args = {
 	children: ( { className } ) => (
 		<Notice className={ className } status="success">
 			<p>Appear animation. Origin: bottom right.</p>
-		</Notice>
-	),
-};
-
-export const Loading = Template.bind( {} );
-Loading.args = {
-	type: 'loading',
-	children: ( { className } ) => (
-		<Notice className={ className } status="success">
-			<p>Loading animation.</p>
 		</Notice>
 	),
 };

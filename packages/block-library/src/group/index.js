@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { group as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -43,7 +36,11 @@ export const settings = {
 				name: 'core/heading',
 				attributes: {
 					content: __( 'La Mancha' ),
-					textAlign: 'center',
+					style: {
+						typography: {
+							textAlign: 'center',
+						},
+					},
 				},
 			},
 			{

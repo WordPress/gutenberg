@@ -6,9 +6,11 @@
 
 .components-guide {
 	$image-height: 300px;
+	// TODO: Replace with a --wpds-dimension-surface-width-* token.
 	$image-width: 320px;
 
 	@include break-small() {
+		// TODO: Replace with a --wpds-dimension-surface-width-* token.
 		width: 600px;
 	}
 
@@ -86,6 +88,7 @@
 
 .components-modal__frame.components-guide {
 	border: none;
+	// TODO: Replace with a --wpds-dimension-surface-width-* token.
 	min-width: 312px;
 	max-height: 575px;
 

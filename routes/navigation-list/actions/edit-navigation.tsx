@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useNavigate } from '@wordpress/route';
 import type { Action } from '@wordpress/dataviews';
 import type { Post } from '@wordpress/core-data';

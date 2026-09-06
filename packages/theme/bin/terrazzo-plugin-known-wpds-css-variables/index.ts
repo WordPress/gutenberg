@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { FORMAT_ID } from '@terrazzo/plugin-css';
 import type { Plugin } from '@terrazzo/parser';
 

@@ -1,16 +1,8 @@
-/**
- * External dependencies
- */
 import { get, OKLCH, type PlainColorObject } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
-import './register-color-spaces';
-import { solveWithBisect } from './utils';
-import { WHITE, BLACK, CONTRAST_EPSILON } from './constants';
-import { clampToGamut, getContrast } from './color-utils';
-import { type TaperChromaOptions, taperChroma } from './taper-chroma';
+import { solveWithBisect } from './utils.ts';
+import { WHITE, BLACK, CONTRAST_EPSILON } from './constants.ts';
+import { clampToGamut, getContrast } from './color-utils.ts';
+import { type TaperChromaOptions, taperChroma } from './taper-chroma.ts';
 
 /**
  * Difference of contrast values that grows linearly with the Y luminance.
@@ -86,8 +78,9 @@ export function findColorMeetingRequirements(
 		}
 
 		return clampToGamut( {
-			spaceId: 'oklch',
+			space: OKLCH,
 			coords: [ newL, newC, get( seed, [ OKLCH, 'h' ] ) ],
+			alpha: seed.alpha,
 		} );
 	}
 

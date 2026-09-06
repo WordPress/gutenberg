@@ -22,7 +22,7 @@ export function getFilename( url: string ): string | void {
 		filename = new URL( url, 'http://example.com' ).pathname
 			.split( '/' )
 			.pop();
-	} catch ( error ) {}
+	} catch {}
 
 	if ( filename ) {
 		return filename;

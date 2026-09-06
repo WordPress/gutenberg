@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalItemGroup as ItemGroup,
 	FlexItem,
@@ -13,10 +10,6 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import type { Color } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { Subtitle } from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
 import ColorIndicatorWrapper from './color-indicator-wrapper';

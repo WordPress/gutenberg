@@ -14,6 +14,10 @@ npm install @wordpress/core-data --save
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
+## Requirements
+
+TypeScript consumers require TypeScript 5 or newer.
+
 ## Example
 
 Below is an example of a component which simply renders a list of authors:
@@ -174,6 +178,20 @@ _Returns_
 
 -   `Object`: Action object.
 
+### clearEntityRecordEdits
+
+Action triggered to clear all edits from an entity record.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the entity.
+-   _name_ `string`: Name of the entity.
+-   _recordId_ `[number|string]`: Is omitted for keyless entities.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### deleteEntityRecord
 
 Action triggered to delete an entity record.
@@ -196,10 +214,11 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the edited entity record.
 -   _name_ `string`: Name of the edited entity record.
--   _recordId_ `number|string`: Record ID of the edited entity record.
+-   _recordId_ `number|string|undefined`: Pass `undefined` for keyless entities.
 -   _edits_ `Object`: The edits.
 -   _options_ `Object`: Options for the edit.
 -   _options.undoIgnore_ `[boolean]`: Whether to ignore the edit in undo history or not.
+-   _options.isCached_ `[boolean]`: Whether the edit is transient (e.g. typing). Transient edits are staged and eventually merged into the preceding undo level instead of creating a new one.
 
 _Returns_
 
@@ -298,8 +317,8 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the entity.
 -   _name_ `string`: Name of the entity.
--   _recordId_ `Object`: ID of the record.
--   _options_ `Object=`: Saving options.
+-   _recordId_ `[number|string]`: Is omitted for keyless entities.
+-   _options_ `[Object]`: Saving options.
 
 ### saveEntityRecord
 
@@ -495,7 +514,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
@@ -581,7 +600,7 @@ _Parameters_
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _key_ `EntityRecordKey`: Optional record's key. If requesting a global record (e.g. site settings), the key can be omitted. If requesting a specific item, the key must always be included.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 -   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available "Retrieve a [Entity kind]".
 
 _Returns_
@@ -597,7 +616,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
@@ -614,7 +633,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
@@ -689,7 +708,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
@@ -704,7 +723,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _key_ `EntityRecordKey`: Record's key.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
@@ -836,7 +855,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
@@ -853,7 +872,7 @@ _Parameters_
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _key_ `EntityRecordKey`: Record's key.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 -   _query_ `GetRecordsHttpQuery`: Optional query.
 
 _Returns_
@@ -900,6 +919,25 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether there is a next edit or not.
+
+### hasRevision
+
+Returns true if a revision has been received for the given set of parameters, or false otherwise.
+
+Note: This does not trigger a request for the revision from the API if it's not available in the local state.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordKey_ `EntityRecordKey`: The key of the entity record whose revision you want to check.
+-   _revisionKey_ `EntityRecordKey`: The revision's key.
+-   _query_ `GetRecordsHttpQuery`: Optional query.
+
+_Returns_
+
+-   `boolean`: Whether a revision has been received.
 
 ### hasUndo
 
@@ -980,7 +1018,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
@@ -1101,7 +1139,6 @@ function PageRenameForm( { id } ) {
 	return (
 		<form onSubmit={ onRename }>
 			<TextControl
-				__next40pxDefaultSize
 				label={ __( 'Name' ) }
 				value={ page.editedRecord.title }
 				onChange={ setTitle }

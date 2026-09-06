@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 
 export default ( props ) => ( element ) => {

@@ -30,6 +30,12 @@ if ( file_exists( $routes_file ) ) {
 	require_once $routes_file;
 }
 
+// Load widgets registration.
+$widgets_file = __DIR__ . '/widgets.php';
+if ( file_exists( $widgets_file ) ) {
+	require_once $widgets_file;
+}
+
 // Load pages registration.
 $pages_file = __DIR__ . '/pages.php';
 if ( file_exists( $pages_file ) ) {

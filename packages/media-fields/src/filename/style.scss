@@ -1,0 +1,23 @@
+// Truncation is a DataViews layout concern, so it's scoped to the table/grid/
+// list containers. The same `FileNameView` render is also used in a DataForm
+// (e.g. the media editor modal Details panel) where there's room to show the
+// full name — outside these containers the filename is left to wrap naturally.
+//
+// CSS-based truncation (rather than `__experimentalTruncate`) keeps the full
+// filename in the DOM — available to assistive technology reading the row, and
+// lets the cell respond to column width changes.
+.dataviews-view-table,
+.dataviews-view-grid,
+.dataviews-view-list {
+	.dataviews-media-field__filename {
+		display: inline-block;
+		max-inline-size: 15ch;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		// Snap to the top of the line box so the cell aligns correctly in the
+		// DataViews Grid layout — without this the inline-block sits on the
+		// baseline and pushes the row out of alignment.
+		vertical-align: top;
+	}
+}

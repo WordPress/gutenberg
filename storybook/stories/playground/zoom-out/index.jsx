@@ -9,9 +9,11 @@ import {
 } from '@wordpress/block-editor';
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 import { parse } from '@wordpress/blocks';
+// Reason: Styles are contained in BlockCanvas iframe.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import contentCss from '@wordpress/block-editor/build-style/content.css?raw';
 import { pattern } from './pattern';
 import { editorStyles } from '../editor-styles';
-import contentCss from '../../../../packages/block-editor/build-style/content.css?raw';
 
 // Temporary hack to access private APIs before stabilizing zoom level.
 const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(

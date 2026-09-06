@@ -1,0 +1,151 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ItemGroup Item should read the value of the size prop from context when the prop is not defined 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -8,11 +8,11 @@
+      <div
+        class="style-item-wrapper"
+        role="listitem"
+      >
+        <div
+-         class="style-item style-is-size-medium style-is-spaced-around components-item"
++         class="style-item style-is-size-large style-is-spaced-around components-item"
+          data-wp-c16t="true"
+          data-wp-component="Item"
+        >
+          Code
+        </div>
+@@ -20,11 +20,11 @@
+      <div
+        class="style-item-wrapper"
+        role="listitem"
+      >
+        <div
+-         class="style-item style-is-size-medium style-is-spaced-around components-item"
++         class="style-item style-is-size-large style-is-spaced-around components-item"
+          data-wp-c16t="true"
+          data-wp-component="Item"
+        >
+          Is
+        </div>
+`;
+
+exports[`ItemGroup Item should use different amounts of padding depending on the value of the size prop 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -2,11 +2,11 @@
+    <div
+      class="style-item-wrapper"
+      role="listitem"
+    >
+      <div
+-       class="style-item style-is-size-medium components-item"
++       class="style-item style-is-size-large components-item"
+        data-wp-c16t="true"
+        data-wp-component="Item"
+      >
+        Code is poetry
+      </div>
+`;
+
+exports[`ItemGroup ItemGroup component should render correctly 1`] = `
+<div>
+  <div
+    class="style-item-group style-is-rounded components-item-group"
+    data-wp-c16t="true"
+    data-wp-component="ItemGroup"
+    role="list"
+  >
+    <div
+      class="style-item-wrapper"
+      role="listitem"
+    >
+      <div
+        class="style-item style-is-size-medium style-is-spaced-around components-item"
+        data-wp-c16t="true"
+        data-wp-component="Item"
+      >
+        Code is poetry
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ItemGroup ItemGroup component should render items individually when the isSeparated prop is true 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,18 +1,18 @@
+  <div>
+    <div
+-     class="style-item-group style-is-rounded components-item-group"
++     class="style-item-group style-is-separated style-is-rounded components-item-group"
+      data-wp-c16t="true"
+      data-wp-component="ItemGroup"
+      role="list"
+    >
+      <div
+        class="style-item-wrapper"
+        role="listitem"
+      >
+        <div
+-         class="style-item style-is-size-medium style-is-spaced-around components-item"
++         class="style-item style-is-size-medium components-item"
+          data-wp-c16t="true"
+          data-wp-component="Item"
+        >
+          Code is poetry
+        </div>
+`;
+
+exports[`ItemGroup ItemGroup component should show borders when the isBordered prop is true 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,18 +1,18 @@
+  <div>
+    <div
+-     class="style-item-group style-is-rounded components-item-group"
++     class="style-item-group style-is-bordered style-is-rounded components-item-group"
+      data-wp-c16t="true"
+      data-wp-component="ItemGroup"
+      role="list"
+    >
+      <div
+        class="style-item-wrapper"
+        role="listitem"
+      >
+        <div
+-         class="style-item style-is-size-medium style-is-spaced-around components-item"
++         class="style-item style-is-size-medium components-item"
+          data-wp-c16t="true"
+          data-wp-component="Item"
+        >
+          Code is poetry
+        </div>
+`;
+
+exports[`ItemGroup ItemGroup component should show rounded corners when the isRounded prop is true 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,8 +1,8 @@
+  <div>
+    <div
+-     class="style-item-group style-is-rounded components-item-group"
++     class="style-item-group components-item-group"
+      data-wp-c16t="true"
+      data-wp-component="ItemGroup"
+      role="list"
+    >
+      <div
+`;

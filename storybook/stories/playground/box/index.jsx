@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import {
@@ -8,10 +5,6 @@ import {
 	BlockCanvas,
 	BlockToolbar,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { editorStyles } from '../editor-styles';
 import './style.css';
 

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useId } from '@wordpress/element';
 import { CheckboxControl, Flex } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { getFontFaceVariantName } from './utils';
 import FontDemo from './font-demo';
 import type { CollectionFontVariantProps } from './types';

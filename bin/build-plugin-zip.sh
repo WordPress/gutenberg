@@ -63,6 +63,14 @@ if [ -z "$NO_CHECKS" ]; then
 			exit 1
 		fi
 	fi
+
+	# WordPress Core builds prune non-public icons using jq, which is expected to be
+	# present on the system running this script.
+	if [ "$IS_WORDPRESS_CORE" = "true" ] && ! command -v jq > /dev/null 2>&1; then
+		error "ERROR: jq is required to build for WordPress Core but was not found. 🫥
+		Install jq (https://jqlang.org/) and try again."
+		exit 1
+	fi
 fi
 
 # Run the build.
@@ -70,20 +78,33 @@ status "Installing dependencies... 📦"
 npm cache verify
 npm ci
 status "Generating build... 👷‍♀️"
-npm run build -- --skip-types
+npm run build
+
+# Only including public icons when building for WordPress Core.
+#
+# This runs before creating the archive but after the build so icon collection validation passes as expected. Plugin
+# builds keep the full library.
+if [ "$IS_WORDPRESS_CORE" = "true" ]; then
+	status "Pruning non-public icons for WordPress Core... ✂️"
+	(
+  	cd packages/icons/src
+  	non_public_icons=$(comm -13 \
+  		<(jq -r "map(select(.public) | .filePath)[]" manifest.json | sort) \
+  		<(ls library/*.svg))
+  	echo "$non_public_icons" | sed 's|^|  Deleting packages/icons/src/|'
+  	echo "$non_public_icons" | xargs rm
+  )
+fi
 
 # Generate the plugin zip file.
 status "Creating archive... 🎁"
+# shellcheck disable=SC2046 # The list holds globs that must expand.
 zip --recurse-paths --no-dir-entries \
 	gutenberg.zip \
-	gutenberg.php \
-	lib \
-	packages/block-serialization-default-parser/*.php \
-	post-content.php \
-	build \
-	build-module \
-	readme.txt \
-	changelog.txt \
-	README.md
+	$(grep -v '^#' bin/plugin-files.txt)
+
+status "Restoring non-public icons... 🔁"
+git diff --name-only --diff-filter=D -- packages/icons/src | sed 's|^|  Restoring |'
+git restore packages/icons/src
 
 success "Done. You've built Gutenberg! 🎉 "

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'deferred store', () => {
@@ -8,9 +5,11 @@ test.describe( 'deferred store', () => {
 		await utils.activatePlugins();
 		await utils.addPostWithBlock( 'test/deferred-store' );
 	} );
+
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
 		await page.goto( utils.getLink( 'test/deferred-store' ) );
 	} );
+
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
 		await utils.deleteAllPosts();

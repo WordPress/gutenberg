@@ -3,14 +3,15 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/admin-ui',
 	'@wordpress/dataviews',
 	'@wordpress/dataviews/wp',
+	'@wordpress/fields',
+	'@wordpress/grid',
 	'@wordpress/icons',
 	'@wordpress/interface',
-	'@wordpress/sync',
-	'@wordpress/undo-manager',
-	'@wordpress/upload-media',
-	'@wordpress/fields',
-	'@wordpress/views',
+	'@wordpress/kebab-case',
+	'@wordpress/style-runtime',
 	'@wordpress/ui',
+	'@wordpress/undo-manager',
+	'@wordpress/views',
 ];
 
 /**
@@ -43,6 +44,7 @@ function defaultRequestToExternal( request ) {
 			return 'React';
 
 		case 'react-dom':
+		case 'react-dom/client':
 			return 'ReactDOM';
 
 		case 'react/jsx-runtime':
@@ -124,6 +126,9 @@ function defaultRequestToHandle( request ) {
 
 		case 'lodash-es':
 			return 'lodash';
+
+		case 'react-dom/client':
+			return 'react-dom';
 
 		case 'react/jsx-runtime':
 			return 'react-jsx-runtime';

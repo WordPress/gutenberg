@@ -8,6 +8,8 @@
 /**
  * Renders the `core/navigation-overlay-close` block on server.
  *
+ * @since 7.0.0
+ *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the block content.

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { MouseEvent, KeyboardEvent, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ModalProps } from '../modal/types';
 
 export type DialogInputEvent =
@@ -18,6 +11,10 @@ export type ConfirmDialogProps = {
 	 * The actual message for the dialog. It's passed as children and any valid `ReactNode` is accepted.
 	 */
 	children: ReactNode;
+	/**
+	 * Size of the underlying Modal. See `Modal`'s `size` prop.
+	 */
+	size?: ModalProps[ 'size' ];
 	/**
 	 * The callback that's called when the user confirms.
 	 * A confirmation can happen when the `OK` button is clicked or when `Enter` is pressed.
@@ -56,4 +53,15 @@ export type ConfirmDialogProps = {
 	 * Both buttons will be disabled.
 	 */
 	isBusy?: boolean;
+	/**
+	 * The title of the underlying `Modal`: its accessible name, and the
+	 * visible heading unless `__experimentalHideHeader` is `true`.
+	 */
+	title?: ModalProps[ 'title' ];
+	/**
+	 * Whether the underlying `Modal` should hide its header, `title` included.
+	 *
+	 * @default true
+	 */
+	__experimentalHideHeader?: ModalProps[ '__experimentalHideHeader' ];
 };

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Panel from '../';
 import PanelRow from '../row';
 import PanelBody from '../body';
@@ -27,6 +16,11 @@ const meta: Meta< typeof Panel > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+			notes: 'Intended for the block inspector sidebar. For collapsible sections elsewhere, use [`CollapsibleCard`](?path=/docs/design-system-components-collapsiblecard--docs) from `@wordpress/ui` instead.',
+		},
 	},
 };
 export default meta;
@@ -73,12 +67,12 @@ _PanelRow.args = {
 	children: (
 		<PanelBody title="My Profile">
 			<PanelRow>
-				<InputControl label="First name" __next40pxDefaultSize />
-				<InputControl label="Last name" __next40pxDefaultSize />
+				<InputControl label="First name" />
+				<InputControl label="Last name" />
 			</PanelRow>
 			<PanelRow>
 				<div style={ { flex: 1 } }>
-					<InputControl label="Email" __next40pxDefaultSize />
+					<InputControl label="Email" />
 				</div>
 			</PanelRow>
 		</PanelBody>

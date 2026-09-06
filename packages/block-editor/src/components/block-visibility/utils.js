@@ -1,7 +1,25 @@
-/**
- * Internal dependencies
- */
-import { BLOCK_VISIBILITY_VIEWPORT_ENTRIES } from './constants';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import { __, sprintf } from '@wordpress/i18n';
+import {
+	BLOCK_VISIBILITY_VIEWPORT_ENTRIES,
+	BLOCK_VISIBILITY_VIEWPORTS,
+} from './constants';
+import { unlock } from '../../lock-unlock';
+
+const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
+
+export function getBlockVisibilityViewportEntries( viewportSettings ) {
+	const breakpoints = getViewportBreakpoints( viewportSettings );
+
+	// Desktop has no breakpoint, so only filter mobile/tablet by configured viewport support.
+	return BLOCK_VISIBILITY_VIEWPORT_ENTRIES.filter(
+		( [ viewport ] ) =>
+			( viewport !== BLOCK_VISIBILITY_VIEWPORTS.tablet.key ||
+				breakpoints.tablet !== undefined ) &&
+			( viewport !== BLOCK_VISIBILITY_VIEWPORTS.mobile.key ||
+				breakpoints.mobile !== undefined )
+	);
+}
 
 /**
  * Checks if a block is hidden for a specific viewport.
@@ -100,4 +118,44 @@ export function getHideEverywhereCheckboxState( blocks ) {
 	}
 
 	return null; // Indeterminate: some but not all
+}
+
+/**
+ * Get a human-readable label describing which viewports a block is hidden on.
+ *
+ * @param {boolean|Object} blockVisibility  The block's visibility metadata.
+ * @param {Object}         viewportSettings Viewport breakpoint settings.
+ * @return {string|null} A descriptive label, or null if the block is not hidden.
+ */
+export function getBlockVisibilityLabel( blockVisibility, viewportSettings ) {
+	// Not hidden at all
+	if ( ! blockVisibility && blockVisibility !== false ) {
+		return null;
+	}
+
+	if ( blockVisibility === false ) {
+		// Hidden on all viewports
+		return __( 'Block is hidden' );
+	}
+
+	if ( blockVisibility?.viewport ) {
+		// Hidden on specific viewports - list them
+		const hiddenViewports = getBlockVisibilityViewportEntries(
+			viewportSettings
+		)
+			.filter(
+				( [ key ] ) => blockVisibility.viewport?.[ key ] === false
+			)
+			.map( ( [ , viewport ] ) => viewport.label );
+
+		if ( hiddenViewports.length > 0 ) {
+			return sprintf(
+				/* translators: %s: comma-separated list of viewport names (Desktop, Tablet, Mobile) */
+				__( 'Block is hidden on %s' ),
+				hiddenViewports.join( ', ' )
+			);
+		}
+	}
+
+	return null;
 }

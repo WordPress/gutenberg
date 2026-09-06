@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
 type AddPostWithBlockOptions = {
@@ -41,12 +38,10 @@ export default class InteractivityUtils {
 		this.requestUtils = requestUtils;
 	}
 
-	getLink( blockName: string ) {
-		const link = this.links.get( blockName );
+	getLink( alias: string ) {
+		const link = this.links.get( alias );
 		if ( ! link ) {
-			throw new Error(
-				`No link found for post with block '${ blockName }'`
-			);
+			throw new Error( `No link found for post with alias '${ alias }'` );
 		}
 
 		/*

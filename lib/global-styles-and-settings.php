@@ -338,7 +338,7 @@ function gutenberg_add_global_styles_for_blocks() {
 }
 
 /**
- * Private function to clean the caches used by gutenberg_get_global_settings method.
+ * Private function to clean the caches used by the theme JSON APIs.
  *
  * @access private
  */
@@ -347,6 +347,10 @@ function _gutenberg_clean_theme_json_caches() {
 	wp_cache_delete( 'gutenberg_get_global_stylesheet', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_settings_custom', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_settings_theme', 'theme_json' );
+	wp_cache_delete( 'gutenberg_get_global_styles_custom', 'theme_json' );
+	wp_cache_delete( 'gutenberg_get_global_styles_custom_resolved', 'theme_json' );
+	wp_cache_delete( 'gutenberg_get_global_styles_theme', 'theme_json' );
+	wp_cache_delete( 'gutenberg_get_global_styles_theme_resolved', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_custom_css', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_styles_base_custom_css', 'theme_json' );
 	WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
@@ -393,11 +397,22 @@ function gutenberg_get_global_styles( $path = array(), $context = array() ) {
 	&& is_array( $context['transforms'] )
 	&& in_array( 'resolve-variables', $context['transforms'], true );
 
-	$merged_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin );
+	$cache_group = 'theme_json';
+	$cache_key   = 'gutenberg_get_global_styles_' . $origin;
 	if ( $resolve_variables ) {
-		$merged_data = WP_Theme_JSON_Gutenberg::resolve_variables( $merged_data );
+		$cache_key .= '_resolved';
 	}
-	$styles = $merged_data->get_raw_data()['styles'];
+	$styles = wp_cache_get( $cache_key, $cache_group );
+
+	if ( false === $styles || WP_DEBUG ) {
+		$merged_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin );
+		if ( $resolve_variables ) {
+			$merged_data = WP_Theme_JSON_Gutenberg::resolve_variables( $merged_data );
+		}
+		$styles = $merged_data->get_raw_data()['styles'];
+		wp_cache_set( $cache_key, $styles, $cache_group );
+	}
+
 	return _wp_array_get( $styles, $path, $styles );
 }
 

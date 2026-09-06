@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { DisclosureContentProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -40,4 +29,5 @@ const UnforwardedDisclosureContent = (
 };
 
 export const DisclosureContent = forwardRef( UnforwardedDisclosureContent );
+DisclosureContent.displayName = 'DisclosureContent';
 export default DisclosureContent;

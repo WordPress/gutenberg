@@ -5,7 +5,7 @@
 .components-tooltip {
 	background: $black;
 	font-family: $default-font;
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-md);
 	color: $gray-100;
 	text-align: center;
 	line-height: 1.4;

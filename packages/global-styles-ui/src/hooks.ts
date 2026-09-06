@@ -1,28 +1,22 @@
-/**
- * External dependencies
- */
 import { colord, extend } from 'colord';
 import a11yPlugin from 'colord/plugins/a11y';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useContext, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import {
+	getResolvedValue,
 	getStyle,
 	setStyle,
 	getSetting,
 	setSetting,
 	mergeGlobalStyles,
 } from '@wordpress/global-styles-engine';
-import type { StyleVariation, Color } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
+import type {
+	GlobalStylesConfig,
+	StyleVariation,
+	Color,
+} from '@wordpress/global-styles-engine';
 import { GlobalStylesContext } from './context';
 import { removePropertiesFromObject, isVariationWithProperties } from './utils';
 
@@ -34,21 +28,36 @@ extend( [ a11yPlugin ] );
  *
  * @param path               The path to the style value.
  * @param blockName          The name of the block, if applicable.
- * @param readFrom           Which source to read from: "base" (theme), "user" (customizations), or "merged" (final result).
+ * @param readFrom           Which source to read from: "base" (theme), "user" (customizations), or "merged" (final result). Defaults to "merged".
  * @param shouldDecodeEncode Whether to decode and encode the style value.
+ * @param state              Optional style state path. Supports viewport states (e.g. `@mobile`),
+ *                           pseudo-selector states (e.g. `:hover`) or both (e.g. `@mobile.:hover`).
+ *                           Pseudo selectors are always read/written as nested keys.
  * @return An array containing the style value and a function to set the style
  * value.
  *
  * @example
  * const [ color, setColor ] = useStyle<string>( 'color.text', 'core/button', 'merged' );
+ * const [ hoverColor, setHoverColor ] = useStyle<string>( 'color.text', 'core/button', 'user', true, ':hover' );
  */
 export function useStyle< T = any >(
 	path: string,
 	blockName?: string,
 	readFrom: 'base' | 'user' | 'merged' = 'merged',
-	shouldDecodeEncode: boolean = true
+	shouldDecodeEncode: boolean = true,
+	state?: string
 ) {
 	const { user, base, merged, onChange } = useContext( GlobalStylesContext );
+	const statePathParts = state?.split( '.' ).filter( Boolean ) ?? [];
+	const pseudoSelectorState = statePathParts.find( ( value ) =>
+		value.startsWith( ':' )
+	);
+	const statePathWithoutPseudo = statePathParts
+		.filter( ( value ) => ! value.startsWith( ':' ) )
+		.join( '.' );
+	const stylePath = [ path, statePathWithoutPseudo ]
+		.filter( Boolean )
+		.join( '.' );
 
 	let sourceValue = merged;
 	if ( readFrom === 'base' ) {
@@ -57,22 +66,53 @@ export function useStyle< T = any >(
 		sourceValue = user;
 	}
 
-	const styleValue = useMemo(
-		() => getStyle< T >( sourceValue, path, blockName, shouldDecodeEncode ),
-		[ sourceValue, path, blockName, shouldDecodeEncode ]
-	);
+	const styleValue = useMemo< T | undefined >( () => {
+		const rawValue = getStyle< T >(
+			sourceValue,
+			stylePath,
+			blockName,
+			shouldDecodeEncode
+		);
+		if ( pseudoSelectorState ) {
+			return (
+				( rawValue as Record< string, T | undefined > )?.[
+					pseudoSelectorState
+				] ?? ( {} as T )
+			);
+		}
+		return rawValue;
+	}, [
+		sourceValue,
+		stylePath,
+		blockName,
+		shouldDecodeEncode,
+		pseudoSelectorState,
+	] );
 
 	const setStyleValue = useCallback(
 		( newValue: T | undefined ) => {
-			const newGlobalStyles = setStyle< T >(
+			let valueToSet: any = newValue;
+			if ( pseudoSelectorState ) {
+				const fullCurrentValue = getStyle(
+					user,
+					stylePath,
+					blockName,
+					false
+				);
+				valueToSet = {
+					...( fullCurrentValue as object ),
+					[ pseudoSelectorState ]: newValue,
+				};
+			}
+			const newGlobalStyles = setStyle< any >(
 				user,
-				path,
-				newValue,
+				stylePath,
+				valueToSet,
 				blockName
 			);
 			onChange( newGlobalStyles );
 		},
-		[ user, onChange, path, blockName ]
+		[ user, onChange, stylePath, blockName, pseudoSelectorState ]
 	);
 
 	return [ styleValue, setStyleValue ] as const;
@@ -83,7 +123,7 @@ export function useStyle< T = any >(
  *
  * @param path      The path to the setting value.
  * @param blockName The name of the block, if applicable.
- * @param readFrom  Which source to read from: "base" (theme), "user" (customizations), or "merged" (final result).
+ * @param readFrom  Which source to read from: "base" (theme), "user" (customizations), or "merged" (final result). Defaults to "merged".
  * @return An array containing the setting value and a function to set the
  * setting value.
  *
@@ -248,4 +288,40 @@ export function useColorRandomizer( blockName?: string ): [ () => void ] | [] {
 	return ( window as any ).__experimentalEnableColorRandomizer
 		? [ randomizeColors ]
 		: [];
+}
+
+/**
+ * Resolves `ref` pointers and theme-relative (`file:./…`) URLs in a style
+ * object's `background` sub-tree, for display. The Global Styles screens
+ * render inside the package's own public `BlockEditorProvider`, which strips
+ * the Symbol-keyed settings the background panel would otherwise resolve
+ * these against, so the screens resolve them before passing styles down.
+ *
+ * @param style A style object whose `background` values may contain `ref`
+ *              pointers or theme-relative URLs.
+ * @return The style object with its `background` values resolved.
+ */
+export function useStyleWithResolvedBackground(
+	style: GlobalStylesConfig[ 'styles' ]
+) {
+	const { merged } = useContext( GlobalStylesContext );
+	return useMemo( () => {
+		if ( ! style?.background ) {
+			return style;
+		}
+		const tree = { styles: merged?.styles, _links: merged?._links };
+		const background: Record< string, any > = {};
+		for ( const [ key, value ] of Object.entries(
+			style.background as Record< string, any >
+		) ) {
+			// getResolvedValue writes the resolved URL onto the object it is
+			// given: pass a copy so the context config keeps its
+			// theme-relative path.
+			background[ key ] = getResolvedValue(
+				value && typeof value === 'object' ? { ...value } : value,
+				tree
+			);
+		}
+		return { ...style, background };
+	}, [ style, merged ] );
 }

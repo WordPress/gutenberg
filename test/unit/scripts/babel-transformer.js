@@ -1,14 +1,9 @@
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const babelJest = require( 'babel-jest' );
 
-// Remove this workaround when https://github.com/facebook/jest/issues/11444 gets resolved in Jest.
-const babelJestInterop = babelJest.__esModule ? babelJest.default : babelJest;
-
-const babelJestTransformer = babelJestInterop.createTransformer( {
-	presets: [ '@wordpress/babel-preset-default' ],
+const babelJestTransformer = babelJest.createTransformer( {
+	presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
+	plugins: [ require.resolve( 'babel-plugin-transform-import-meta' ) ],
 } );
 
 module.exports = {
@@ -28,13 +23,16 @@ module.exports = {
 	 */
 	getCacheKey( src, filename, ...args ) {
 		const isBlockIndex =
-			/block-library[\/\\]src[\/\\].+[\/\\]index\.js/.test( filename );
+			/block-library[\/\\]src[\/\\].+[\/\\]index\.jsx?$/.test( filename );
 
 		if ( ! isBlockIndex ) {
 			return babelJestTransformer.getCacheKey( src, filename, ...args );
 		}
 
-		const blockJSONFilename = filename.replace( 'index.js', 'block.json' );
+		const blockJSONFilename = filename.replace(
+			/index\.jsx?$/,
+			'block.json'
+		);
 
 		if ( ! fs.existsSync( blockJSONFilename ) ) {
 			return babelJestTransformer.getCacheKey( src, filename, ...args );

@@ -1,24 +1,11 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../base-control';
 import { Select, StyledInputBase } from './styles/select-control-styles';
 import type { WordPressComponentProps } from '../context';
 import type { SelectControlProps } from './types';
 import SelectControlChevronDown from './chevron-down';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( SelectControl );
@@ -48,6 +35,10 @@ function UnforwardedSelectControl< V extends string >(
 	ref: React.ForwardedRef< HTMLSelectElement >
 ) {
 	const {
+		// Prevent passing legacy props to internal components.
+		__nextHasNoMarginBottom: _,
+		__next40pxDefaultSize: _next40pxDefaultSize,
+		__next36pxDefaultSize: _next36pxDefaultSize,
 		className,
 		disabled = false,
 		help,
@@ -64,11 +55,8 @@ function UnforwardedSelectControl< V extends string >(
 		prefix,
 		suffix,
 		variant = 'default',
-		__next40pxDefaultSize = false,
-		__nextHasNoMarginBottom: _, // Prevent passing to internal component
-		__shouldNotWarnDeprecated36pxSize,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp( props );
+	} = props;
 	const id = useUniqueId( idProp );
 	const helpId = help ? `${ id }__help` : undefined;
 
@@ -95,13 +83,6 @@ function UnforwardedSelectControl< V extends string >(
 
 	const classes = clsx( 'components-select-control', className );
 
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'SelectControl',
-		__next40pxDefaultSize,
-		size,
-		__shouldNotWarnDeprecated36pxSize,
-	} );
-
 	return (
 		<BaseControl help={ help } id={ id } className={ classes }>
 			<StyledInputBase
@@ -120,11 +101,9 @@ function UnforwardedSelectControl< V extends string >(
 					variant === 'minimal' ? 'auto' : undefined
 				}
 				variant={ variant }
-				__next40pxDefaultSize={ __next40pxDefaultSize }
 			>
 				<Select
 					{ ...restProps }
-					__next40pxDefaultSize={ __next40pxDefaultSize }
 					aria-describedby={ helpId }
 					className="components-select-control__input"
 					disabled={ disabled }
@@ -156,7 +135,6 @@ function UnforwardedSelectControl< V extends string >(
  *
  *   return (
  *     <SelectControl
- *       __next40pxDefaultSize
  *       label="Size"
  *       value={ size }
  *       options={ [
@@ -179,5 +157,8 @@ export const SelectControl = forwardRef( UnforwardedSelectControl ) as <
 		false
 	> & { ref?: React.Ref< HTMLSelectElement > }
 ) => React.JSX.Element | null;
+
+// @ts-expect-error TS says: "Property 'displayName' does not exist on type ..."
+SelectControl.displayName = 'SelectControl';
 
 export default SelectControl;

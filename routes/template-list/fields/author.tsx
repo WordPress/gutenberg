@@ -1,12 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
+import {
+	Icon as WCIcon,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
@@ -16,7 +12,12 @@ function useAddedBy( type: string, id: any ) {
 	const { author, authorText } = useSelect(
 		( select ) => {
 			const { getUser, getEditedEntityRecord } = select( coreStore );
-			const _record = getEditedEntityRecord( 'postType', type, id );
+			/* Templates carry `author`/`author_text`, which the selector's
+			   entity record union does not know about. */
+			const _record = ( getEditedEntityRecord( 'postType', type, id ) ||
+				undefined ) as
+				| { author?: number; author_text?: string }
+				| undefined;
 			return {
 				author: _record?.author ? getUser( _record.author ) : null,
 				authorText: _record?.author_text,
@@ -72,7 +73,7 @@ function AuthorField( { item }: { item: any } ) {
 			) }
 			{ ! imageUrl && (
 				<div className="routes-template-list-author-field__icon">
-					<Icon icon={ icon } />
+					<WCIcon icon={ icon } />
 				</div>
 			) }
 			<span className="routes-template-list-author-field__name">

@@ -1,0 +1,9 @@
+import { Meta, Markdown } from '@storybook/addon-docs/blocks';
+import AnatomyDoc from './anatomy.md?raw';
+import dashboardAnatomy from './assets/dashboard-anatomy.svg';
+
+<Meta title="Widget Dashboard/Anatomy" />
+
+<Markdown>
+	{ AnatomyDoc.replace( './assets/dashboard-anatomy.svg', dashboardAnatomy ) }
+</Markdown>

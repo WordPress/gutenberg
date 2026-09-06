@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * Internal dependencies
- */
 import { NavigableMenu } from '..';
 
 const meta: Meta< typeof NavigableMenu > = {
@@ -25,6 +18,10 @@ const meta: Meta< typeof NavigableMenu > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'unaudited',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

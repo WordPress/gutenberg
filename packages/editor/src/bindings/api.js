@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { registerBlockBindingsSource } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import patternOverrides from './pattern-overrides';
 import postData from './post-data';
 import postMeta from './post-meta';

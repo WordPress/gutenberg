@@ -43,7 +43,7 @@
 }
 
 .document-outline__button {
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	background: none;
 	border: none;
 	display: flex;

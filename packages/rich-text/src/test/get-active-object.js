@@ -1,7 +1,4 @@
-/**
- * Internal dependencies
- */
-
+import { describe, expect, it } from 'vitest';
 import { getActiveObject } from '../get-active-object';
 import { OBJECT_REPLACEMENT_CHARACTER } from '../special-characters';
 

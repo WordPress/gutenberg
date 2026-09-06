@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { addQueryArgs } from '@wordpress/url';
 import { __, sprintf } from '@wordpress/i18n';
 import type { Action } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { Post } from '../types';
 
 const viewPostRevisions: Action< Post > = {

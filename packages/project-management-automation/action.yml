@@ -5,6 +5,20 @@ inputs:
     github_token:
         description: Secret GitHub API token to use for making API requests.
         required: true
+outputs:
+    welcome-prompt:
+        description: >
+            Message welcoming a first-time contributor. Empty unless the pull
+            request is their first.
+    first-time-contributor-prompt:
+        description: >
+            Message asking a first-time contributor to link their WordPress.org
+            profile. Empty unless the push merged their first pull request and
+            no profile was found.
+    first-time-contributor-pr-number:
+        description: >
+            Pull request the prompt belongs to. A push payload carries no pull
+            request number, so a consumer needs this one.
 runs:
     using: node20
     main: lib/index.js

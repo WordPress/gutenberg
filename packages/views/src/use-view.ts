@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
 import { dequal } from 'dequal';
-
-/**
- * Internal dependencies
- */
-import { generatePreferenceKey } from './preference-keys';
-import type { ViewConfig } from './types';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import type { View } from '@wordpress/dataviews';
-// @ts-ignore - Preferences package is not typed
 import { store as preferencesStore } from '@wordpress/preferences';
+import { generatePreferenceKey } from './preference-keys';
+import { getUserModifications, resolveView } from './resolve-view';
+import type { ViewConfig, ViewOverrides } from './types';
 
 interface UseViewReturn {
 	view: View;
@@ -25,93 +14,103 @@ interface UseViewReturn {
 	resetToDefault: () => void;
 }
 
-function omit< T extends object, K extends keyof T >(
-	obj: T,
-	keys: K[]
-): Omit< T, K > {
-	const result = { ...obj };
-	for ( const key of keys ) {
-		delete result[ key ];
-	}
-	return result;
-}
-
 /**
  * Hook for managing DataViews view state with local persistence.
  *
- * @param config                     Configuration object for loading the view.
- * @param config.kind                Entity kind (e.g., 'postType', 'taxonomy', 'root').
- * @param config.name                Specific entity name.
- * @param config.slug                View identifier.
- * @param config.defaultView         Default view configuration.
- * @param config.queryParams         Object with `page` and/or `search` from URL.
- * @param config.onChangeQueryParams Optional callback to update URL parameters.
+ * Only the properties the user actually modified are persisted: every other
+ * property keeps resolving out of the layers below, so a change to the default
+ * view, to the layout defaults or to the active view overrides keeps showing
+ * through.
+ *
+ * @param config Configuration object for loading the view.
  *
  * @return Object with current view, modification state, and update functions.
  */
 export function useView( config: ViewConfig ): UseViewReturn {
-	const { kind, name, slug, defaultView, queryParams, onChangeQueryParams } =
-		config;
+	const {
+		kind,
+		name,
+		slug,
+		defaultView,
+		defaultLayouts,
+		activeViewOverrides,
+		queryParams,
+		onChangeQueryParams,
+	} = config;
 
 	const preferenceKey = generatePreferenceKey( kind, name, slug );
-	const persistedView: View | undefined = useSelect(
+	const persistedView: ViewOverrides | undefined = useSelect(
 		( select ) => {
 			return select( preferencesStore ).get(
 				'core/views',
 				preferenceKey
-			) as View | undefined;
+			) as ViewOverrides | undefined;
 		},
 		[ preferenceKey ]
 	);
 	const { set } = useDispatch( preferencesStore );
 
-	const baseView: View = persistedView ?? defaultView;
-	const page = Number( queryParams?.page ?? baseView.page ?? 1 );
-	const search = queryParams?.search ?? baseView.search ?? '';
+	const page = Number( queryParams?.page ?? 1 );
+	const search = queryParams?.search ?? '';
 
-	// Merge URL query parameters (page, search) into the view
-	const view: View = useMemo( () => {
-		return {
-			...baseView,
+	const view = useMemo(
+		() =>
+			resolveView( {
+				defaultView,
+				defaultLayouts,
+				activeViewOverrides,
+				persistedView,
+				page,
+				search,
+			} ),
+		[
+			defaultView,
+			defaultLayouts,
+			activeViewOverrides,
+			persistedView,
 			page,
 			search,
-		};
-	}, [ baseView, page, search ] );
+		]
+	);
 
-	const isModified = !! persistedView;
+	const isModified =
+		!! persistedView && Object.keys( persistedView ).length > 0;
 
 	const updateView = useCallback(
 		( newView: View ) => {
-			// Extract URL params (page, search) from the new view
-			const urlParams: { page?: number; search?: string } = {
-				page: newView?.page,
-				search: newView?.search,
+			// `page` and `search` live in the URL, not in the preference: they
+			// are reported back to the consumer instead of being persisted.
+			const newQueryParams = {
+				page: Number( newView?.page ?? 1 ),
+				search: newView?.search ?? '',
 			};
-			const preferenceView = omit( newView, [ 'page', 'search' ] );
-
-			// If we have URL handling enabled, separate URL state from preference state
 			if (
 				onChangeQueryParams &&
-				! dequal( urlParams, { page, search } )
+				! dequal( newQueryParams, { page, search } )
 			) {
-				onChangeQueryParams( urlParams );
+				onChangeQueryParams( newQueryParams );
 			}
 
-			// Only persist non-URL preferences if different from baseView
-			if ( ! dequal( baseView, preferenceView ) ) {
-				if ( dequal( preferenceView, defaultView ) ) {
-					set( 'core/views', preferenceKey, undefined );
-				} else {
-					set( 'core/views', preferenceKey, preferenceView );
-				}
+			const modifications = getUserModifications( newView, {
+				defaultView,
+				defaultLayouts,
+				activeViewOverrides,
+				persistedView,
+			} );
+			if ( ! dequal( modifications, persistedView ) ) {
+				// `undefined` clears the preference: the user reverted every
+				// property they had modified.
+				set( 'core/views', preferenceKey, modifications );
 			}
 		},
 		[
 			onChangeQueryParams,
 			page,
 			search,
-			baseView,
 			defaultView,
+			defaultLayouts,
+			activeViewOverrides,
+			persistedView,
 			set,
 			preferenceKey,
 		]

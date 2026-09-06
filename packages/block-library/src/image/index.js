@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
 import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -35,7 +28,10 @@ export const settings = {
 	__experimentalLabel( attributes, { context } ) {
 		const customName = attributes?.metadata?.name;
 
-		if ( context === 'list-view' && customName ) {
+		if (
+			( context === 'list-view' || context === 'breadcrumb' ) &&
+			customName
+		) {
 			return customName;
 		}
 
@@ -105,21 +101,40 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 				rel: value.rel,
 				linkTarget: value.linkTarget,
 			} ),
+			isVisible: ( item ) => ! item.isDecorative,
 		},
 		{
 			id: 'caption',
 			label: __( 'Caption' ),
 			type: 'text',
 			Edit: 'rich-text', // TODO: replace with custom component
+			isVisible: ( item ) => ! item.isDecorative,
 		},
 		{
 			id: 'alt',
 			label: __( 'Alt text' ),
 			type: 'text',
+			isVisible: ( item ) => ! item.isDecorative,
+		},
+		{
+			id: 'isDecorative',
+			label: __( 'Mark as decorative' ),
+			type: 'boolean',
+			setValue: ( { value } ) => ( {
+				isDecorative: value || undefined,
+				...( value && {
+					alt: '',
+					caption: undefined,
+					href: undefined,
+					linkDestination: undefined,
+					linkTarget: undefined,
+					rel: undefined,
+				} ),
+			} ),
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'image', 'link', 'caption', 'alt' ],
+		fields: [ 'image', 'link', 'caption', 'alt', 'isDecorative' ],
 	};
 }
 

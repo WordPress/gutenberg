@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { paragraph as icon } from '@wordpress/icons';
 import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -34,7 +27,10 @@ export const settings = {
 	__experimentalLabel( attributes, { context } ) {
 		const customName = attributes?.metadata?.name;
 
-		if ( context === 'list-view' && customName ) {
+		if (
+			( context === 'list-view' || context === 'breadcrumb' ) &&
+			customName
+		) {
 			return customName;
 		}
 

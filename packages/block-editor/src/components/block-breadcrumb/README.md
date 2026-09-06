@@ -8,9 +8,9 @@ The block breadcrumb trail displays the hierarchy of the current block selection
 
 ## Development guidelines
 
-#### Props
+### Props
 
-##### rootLabelText
+#### rootLabelText
 
 Label text for the root element (the first `<li />`) of the breadcrumb trail.
 

@@ -31,6 +31,14 @@
 	// when rows later receive the is-displacement-up or is-displacement-down class.
 	transform: translateY(0);
 
+	// The transform above makes each row its own stacking context, so the focus
+	// ring cannot escape it. Lift the focused row above the siblings that would
+	// otherwise paint over it.
+	&:focus-within,
+	&.is-nesting {
+		z-index: 1;
+	}
+
 	&.is-draggable,
 	&.is-draggable .block-editor-list-view-block-contents {
 		cursor: grab;
@@ -49,11 +57,6 @@
 
 		svg {
 			fill: currentColor;
-			// Optimize for high contrast modes.
-			// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
-			@media (forced-colors: active) {
-				fill: CanvasText;
-			}
 		}
 	}
 
@@ -81,33 +84,54 @@
 		.block-editor-block-icon {
 			color: var(--wp-block-synced-color);
 		}
-
-		&:focus::after {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
-		}
+	}
+	&.is-synced .block-editor-list-view-block-contents:focus::after {
+		--focus-color: var(--wp-block-synced-color);
+	}
+	&.is-synced:not(.is-selected) .block-editor-list-view-block__menu:focus {
+		--focus-color: var(--wp-block-synced-color);
+		@include outset-ring__focus();
 	}
 	&.is-selected .block-editor-list-view-block-contents,
 	&.is-selected .components-button.has-icon {
 		color: $white;
 	}
-	&.is-selected .block-editor-list-view-block-contents:focus {
-		&::after {
-			box-shadow:
-				inset 0 0 0 1px $white,
-				0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-admin-theme-color);
-		}
-	}
-	&.is-selected.is-synced .block-editor-list-view-block-contents:focus {
-		&::after {
-			box-shadow:
-				inset 0 0 0 1px $white,
-				0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-block-synced-color);
-		}
-	}
 	&.is-selected .block-editor-list-view-block__menu:focus {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
+		--focus-color: var(--wpds-color-foreground-interactive-brand-strong);
+		@include outset-ring__focus();
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+	}
+	@media (forced-colors: active) {
+		&.is-selected td,
+		&.is-selected.is-synced td {
+			background: SelectedItem;
+		}
+
+		&.is-selected .block-editor-list-view-block-contents,
+		&.is-selected .components-button.has-icon {
+			color: SelectedItemText;
+		}
+
+		&.is-selected svg,
+		&.is-selected .block-editor-block-icon.has-colors svg {
+			fill: SelectedItemText;
+		}
+
+		// Prevent backplate with same color as text in dark mode.
+		// Opt-out scoped to only the row title.
+		&.is-selected .block-editor-list-view-block-select-button__title {
+			forced-color-adjust: none;
+		}
+
+		// The row-wide ring sits outside the selected background.
+		&.is-selected .block-editor-list-view-block-contents:focus::after {
+			--focus-color: CanvasText;
+		}
+
+		// The menu ring is inset over the selected background.
+		&.is-selected .block-editor-list-view-block__menu:focus {
+			--focus-color: SelectedItemText;
+		}
 	}
 
 	// Border radius for corners of the selected item.
@@ -261,18 +285,21 @@
 	&.is-nesting .block-editor-list-view-block-contents,
 	.block-editor-list-view-block-contents:focus {
 		box-shadow: none;
+		outline: none;
 
 		&::after {
 			content: "";
 			position: absolute;
 			top: 0;
-			right: -(24px + 5px); // Icon size + padding.
+			right: -(24px + 4px); // Icon size + padding.
 			bottom: 0;
 			left: 0;
 			border-radius: inherit;
+			@include outset-ring__focus();
+			outline-offset: 1px;
 			box-shadow:
-				inset 0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-admin-theme-color);
+				0 0 0 calc(var(--wpds-border-width-focus) + 2px)
+				var(--wpds-color-background-surface-neutral-strong);
 			z-index: 2;
 			pointer-events: none;
 		}
@@ -281,14 +308,6 @@
 	// Fix focus styling width when one row has fewer cells.
 	&.has-single-cell .block-editor-list-view-block-contents:focus::after {
 		right: 0;
-	}
-
-	&.is-nesting .block-editor-list-view__menu,
-	.block-editor-list-view-block__menu:focus {
-		box-shadow:
-			inset 0 0 0 var(--wp-admin-border-width-focus)
-			var(--wp-admin-theme-color);
-		z-index: 1;
 	}
 
 	&.is-visible .block-editor-list-view-block-contents {
@@ -383,10 +402,18 @@
 		}
 	}
 
-	// Style lock and position icons in line with image previews.
-	.block-editor-list-view-block-select-button__label-wrapper svg {
-		left: $grid-unit-05 * 0.5; // 2px.
-		position: relative;
+	.block-editor-list-view-block-select-button__label-wrapper {
+		width: 100%;
+
+		> * {
+			min-width: 0;
+		}
+
+		// Style lock and position icons in line with image previews.
+		svg {
+			left: $grid-unit-05 * 0.5; // 2px.
+			position: relative;
+		}
 	}
 
 	.block-editor-list-view-block-select-button__title {
@@ -410,6 +437,17 @@
 		position: absolute;
 		right: 0;
 		transform: translateY(-50%);
+		box-sizing: border-box;
+		max-width: 100%;
+		padding: 2px $grid-unit-10;
+		border-radius: $radius-small;
+		background: $gray-100;
+		color: $gray-800;
+		font-size: $font-size-small;
+		line-height: $font-line-height-small;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	&.is-selected .block-editor-list-view-block-select-button__anchor {
@@ -447,6 +485,25 @@
 			box-shadow: 0 0 0 $radius-small var(--wp-admin-theme-color);
 		}
 	}
+
+	&.is-disabled {
+		opacity: 0.2;
+		@media not ( prefers-reduced-motion ) {
+			transition: opacity 0.1s linear;
+		}
+
+		&:hover {
+			opacity: 0.2;
+		}
+
+		.block-editor-list-view__expander {
+			cursor: default;
+		}
+
+		.block-editor-list-view-block-select-button:hover {
+			color: inherit;
+		}
+	}
 }
 
 // First level of indentation is aria-level 2, max indent is 8.
@@ -469,7 +526,7 @@ $block-navigation-max-indent: 8;
 .block-editor-list-view__expander {
 	height: $icon-size;
 	width: $icon-size;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 }
 
 .block-editor-list-view-leaf[aria-level] .block-editor-list-view__expander {
@@ -550,6 +607,7 @@ svg {
 .block-editor-list-view-placeholder {
 	padding: 0;
 	margin: 0;
+	// One row. Spacers standing in for several rows set their height inline.
 	height: 32px;
 }
 

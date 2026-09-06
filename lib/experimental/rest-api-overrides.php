@@ -32,7 +32,7 @@ function gutenberg_boot_allow_auto_draft_in_rest_api() {
 	foreach ( $post_types as $post_type ) {
 		$supports_editor   = post_type_supports( $post_type->name, 'editor' );
 		$supports_title    = post_type_supports( $post_type->name, 'title' );
-		$is_wp_core_system = strpos( $post_type->name, 'wp_' ) === 0;
+		$is_wp_core_system = str_starts_with( $post_type->name, 'wp_' );
 		$is_attachment     = 'attachment' === $post_type->name;
 
 		// Only add auto-draft to content post types:

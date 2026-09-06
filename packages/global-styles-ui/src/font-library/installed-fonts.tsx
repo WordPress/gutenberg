@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -9,7 +6,7 @@ import {
 	Navigator,
 	useNavigator,
 	__experimentalSpacer as Spacer,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	Flex,
 	Notice,
@@ -18,7 +15,7 @@ import {
 } from '@wordpress/components';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useContext, useEffect, useState } from '@wordpress/element';
+import { useContext, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import type {
@@ -26,10 +23,6 @@ import type {
 	GlobalStylesConfig,
 } from '@wordpress/global-styles-engine';
 import type { FontFamily } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import LibraryFontVariant from './library-font-variant';
@@ -41,6 +34,34 @@ import {
 	getDisplaySrcFromFontFace,
 } from './utils';
 import { useSetting } from '../hooks';
+
+/**
+ * Comparison key for font families. Sorts families by slug and faces
+ * by style+weight so order differences don't produce false positives.
+ *
+ * @param fontFamilies Font families record keyed by source (e.g. "theme", "custom").
+ */
+function getFontFamiliesKey(
+	fontFamilies: Record< string, FontFamilyPreset[] > | undefined
+): string {
+	if ( ! fontFamilies ) {
+		return '';
+	}
+	const normalized: Record< string, unknown[] > = {};
+	for ( const source of Object.keys( fontFamilies ).sort() ) {
+		normalized[ source ] = ( fontFamilies[ source ] ?? [] )
+			.map( ( family ) => ( {
+				slug: family.slug,
+				fontFace: ( family.fontFace ?? [] )
+					.map(
+						( face ) => `${ face.fontStyle }-${ face.fontWeight }`
+					)
+					.sort(),
+			} ) )
+			.sort( ( a, b ) => a.slug.localeCompare( b.slug ) );
+	}
+	return JSON.stringify( normalized );
+}
 
 function InstalledFonts() {
 	const {
@@ -57,6 +78,10 @@ function InstalledFonts() {
 	const [ fontFamilies, setFontFamilies ] = useSetting<
 		Record< string, FontFamilyPreset[] > | undefined
 	>( 'typography.fontFamilies' );
+	const [ lastSelectedFontSlug, setLastSelectedFontSlug ] = useState<
+		string | undefined
+	>( undefined );
+
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] =
 		useState< boolean >( false );
 	const [ notice, setNotice ] = useState< {
@@ -73,10 +98,22 @@ function InstalledFonts() {
 	const globalStyles = useEntityRecord< GlobalStylesConfig >(
 		'root',
 		'globalStyles',
-		globalStylesId
+		globalStylesId ?? 0,
+		{ enabled: globalStylesId !== undefined }
 	);
-	const fontFamiliesHasChanges =
-		!! globalStyles?.edits?.settings?.typography?.fontFamilies;
+	const editedFontFamilies =
+		globalStyles?.edits?.settings?.typography?.fontFamilies;
+	const savedFontFamilies =
+		globalStyles?.record?.settings?.typography?.fontFamilies;
+	const fontFamiliesHasChanges = useMemo( () => {
+		if ( editedFontFamilies === undefined ) {
+			return false;
+		}
+		return (
+			getFontFamiliesKey( editedFontFamilies ) !==
+			getFontFamiliesKey( savedFontFamilies )
+		);
+	}, [ editedFontFamilies, savedFontFamilies ] );
 
 	const themeFonts = fontFamilies?.theme
 		? fontFamilies.theme
@@ -167,7 +204,7 @@ function InstalledFonts() {
 		).length;
 		return sprintf(
 			/* translators: 1: Active font variants, 2: Total font variants. */
-			__( '%1$d/%2$d variants active' ),
+			__( '%1$d of %2$d active' ),
 			variantsActive,
 			variantsInstalled
 		);
@@ -238,7 +275,6 @@ function InstalledFonts() {
 					<ProgressBar />
 				</div>
 			) }
-
 			{ ! isResolvingLibrary && (
 				<>
 					<Navigator
@@ -257,9 +293,9 @@ function InstalledFonts() {
 									</Notice>
 								) }
 								{ ! hasFonts && (
-									<Text as="p">
+									<WCText as="p">
 										{ __( 'No fonts installed.' ) }
-									</Text>
+									</WCText>
 								) }
 								{ baseThemeFonts.length > 0 && (
 									<VStack>
@@ -289,6 +325,10 @@ function InstalledFonts() {
 														variantsText={ getFontCardVariantsText(
 															font
 														) }
+														shouldFocus={
+															font.slug ===
+															lastSelectedFontSlug
+														}
 														onClick={ () => {
 															setNotice( null );
 															handleSetLibraryFontSelected(
@@ -330,6 +370,10 @@ function InstalledFonts() {
 														variantsText={ getFontCardVariantsText(
 															font
 														) }
+														shouldFocus={
+															font.slug ===
+															lastSelectedFontSlug
+														}
 														onClick={ () => {
 															setNotice( null );
 															handleSetLibraryFontSelected(
@@ -367,6 +411,9 @@ function InstalledFonts() {
 									}
 									size="small"
 									onClick={ () => {
+										setLastSelectedFontSlug(
+											libraryFontSelected?.slug
+										);
 										handleSetLibraryFontSelected(
 											undefined
 										);
@@ -395,11 +442,11 @@ function InstalledFonts() {
 								</>
 							) }
 							<Spacer margin={ 4 } />
-							<Text>
+							<WCText>
 								{ __(
 									'Choose font variants. Keep in mind that too many variants could make your site slower.'
 								) }
-							</Text>
+							</WCText>
 							<Spacer margin={ 4 } />
 							<VStack spacing={ 0 }>
 								<CheckboxControl

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { heading as icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -8,10 +5,6 @@ import {
 	getBlockType,
 	unregisterBlockVariation,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -33,7 +26,11 @@ export const settings = {
 		attributes: {
 			content: __( 'Code is Poetry' ),
 			level: 2,
-			textAlign: 'center',
+			style: {
+				typography: {
+					textAlign: 'center',
+				},
+			},
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
@@ -46,6 +43,10 @@ export const settings = {
 		// If the content is empty, fall back to the default label.
 		if ( context === 'list-view' && ( customName || hasContent ) ) {
 			return customName || content;
+		}
+
+		if ( context === 'breadcrumb' && customName ) {
+			return customName;
 		}
 
 		if ( context === 'accessibility' ) {

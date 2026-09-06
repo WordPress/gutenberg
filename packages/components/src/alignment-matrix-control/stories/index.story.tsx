@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { Icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import AlignmentMatrixControl from '..';
 import { HStack } from '../../h-stack';
 import type { AlignmentMatrixControlProps } from '../types';
@@ -33,6 +22,10 @@ const meta: Meta< typeof AlignmentMatrixControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;

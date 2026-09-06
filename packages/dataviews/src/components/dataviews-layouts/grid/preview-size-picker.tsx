@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useContext, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../../dataviews-context';
 import type { ViewGrid } from '../../../types';
 
@@ -84,7 +77,6 @@ export default function PreviewSizePicker() {
 
 	return (
 		<RangeControl
-			__next40pxDefaultSize
 			showTooltip={ false }
 			label={ __( 'Preview size' ) }
 			value={ previewSizeToUse }

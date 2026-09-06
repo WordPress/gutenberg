@@ -6,6 +6,24 @@ import { Meta, ColorPalette, ColorItem } from '@storybook/addon-docs/blocks';
 
 This document outlines the default color set of the WordPress component system as it ships. The page is a work in progress. 
 
+## Accent
+
+WordPress components style accent colors using the `--wp-admin-theme-color` variable. If this variable is not found, then the components default to Blueberry:
+
+<ColorPalette>
+	<ColorItem
+		title="Blueberry"
+		subtitle=""
+		colors={{
+			'--wp-admin-theme-color': '#3858e9',
+		}}
+	/>
+</ColorPalette>
+
+In WordPress admin contexts, this variable is always pre-defined with the user color scheme. 
+
+The design system doesn’t dictate what the accent color “should” be, it just provides a default in case a color isn’t set explicitly. So it’s up to the designer whether to honor the user’s color in a given context or instead use a chosen brand color.
+
 ## Colors
 
 <ColorPalette>

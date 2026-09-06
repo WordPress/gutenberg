@@ -1,20 +1,18 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import KeyboardShortcuts from '..';
 
 const meta: Meta< typeof KeyboardShortcuts > = {
+	tags: [ 'manifest' ],
 	component: KeyboardShortcuts,
 	title: 'Components/Utilities/KeyboardShortcuts',
 	id: 'components-keyboardshortcuts',
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -36,7 +34,7 @@ Default.args = {
 			{ /* eslint-disable react/no-unescaped-entities */ }
 			<p>Hit the "a" or "b" key in this textarea:</p>
 			{ /* eslint-enable react/no-unescaped-entities */ }
-			<textarea />
+			<textarea aria-label="Keyboard shortcuts demo" />
 		</div>
 	),
 };
@@ -54,7 +52,7 @@ Default.parameters = {
     <p>
       Hit the "a" or "b" key in this textarea:
     </p>
-    <textarea />
+    <textarea aria-label="Keyboard shortcuts demo" />
   </div>
 </KeyboardShortcuts>
 			`,

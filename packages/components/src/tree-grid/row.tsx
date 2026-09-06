@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import type { TreeGridRowProps } from './types';
 
@@ -43,5 +36,6 @@ function UnforwardedTreeGridRow(
  * @see {@link https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html}
  */
 export const TreeGridRow = forwardRef( UnforwardedTreeGridRow );
+TreeGridRow.displayName = 'TreeGridRow';
 
 export default TreeGridRow;

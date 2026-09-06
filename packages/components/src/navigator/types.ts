@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ButtonAsButtonProps } from '../button/types';
 
 export type MatchParams = Record< string, string | string[] >;

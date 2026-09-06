@@ -1,11 +1,9 @@
-/**
- * Internal dependencies
- */
+const { setOutput } = require( '@actions/core' );
 const debug = require( '../../debug' );
 const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
 const hasWordPressProfile = require( '../../has-wordpress-profile' );
 
-/** @typedef {ReturnType<import('@actions/github').getOctokit>} GitHub */
+/** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
 /** @typedef {import('@octokit/webhooks-types').EventPayloadMap['push']} WebhookPayloadPush */
 /** @typedef {import('../../get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
 
@@ -112,15 +110,19 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 	}
 
 	debug(
-		'first-time-contributor-account-link: User not known. Adding comment to prompt for account link.'
+		'first-time-contributor-account-link: User not known. Prompting for account link.'
 	);
 
-	await octokit.rest.issues.createComment( {
-		owner,
-		repo,
-		issue_number: pullRequest,
-		body: getPromptMessageText( author ),
-	} );
+	/*
+	 * The workflow posts this, so the prompt joins the single automation
+	 * comment rather than adding one of its own. A push payload carries no
+	 * pull request number, so the writer needs this one.
+	 */
+	setOutput(
+		'first-time-contributor-prompt',
+		getPromptMessageText( author )
+	);
+	setOutput( 'first-time-contributor-pr-number', pullRequest );
 }
 
 module.exports = firstTimeContributorAccountLink;

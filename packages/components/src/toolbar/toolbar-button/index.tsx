@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef, MouseEvent as ReactMouseEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useContext, forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
@@ -132,4 +121,5 @@ function UnforwardedToolbarButton(
  * ```
  */
 export const ToolbarButton = forwardRef( UnforwardedToolbarButton );
+ToolbarButton.displayName = 'ToolbarButton';
 export default ToolbarButton;

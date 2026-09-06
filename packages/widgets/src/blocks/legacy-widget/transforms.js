@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 
 const legacyWidgetTransforms = [
@@ -15,9 +12,8 @@ const legacyWidgetTransforms = [
 	{
 		block: 'core/html',
 		widget: 'custom_html',
-		transform: ( { content } ) => ( {
-			content,
-		} ),
+		transformBlock: ( { content } ) =>
+			createBlock( 'core/html', {}, [], [ content ] ),
 	},
 	{
 		block: 'core/archives',
@@ -160,7 +156,7 @@ const legacyWidgetTransforms = [
 			};
 		},
 	},
-].map( ( { block, widget, transform } ) => {
+].map( ( { block, widget, transform, transformBlock } ) => {
 	return {
 		type: 'block',
 		blocks: [ block ],
@@ -168,10 +164,12 @@ const legacyWidgetTransforms = [
 			return idBase === widget && !! instance?.raw;
 		},
 		transform: ( { instance } ) => {
-			const transformedBlock = createBlock(
-				block,
-				transform ? transform( instance.raw ) : undefined
-			);
+			const transformedBlock = transformBlock
+				? transformBlock( instance.raw )
+				: createBlock(
+						block,
+						transform ? transform( instance.raw ) : undefined
+				  );
 			if ( ! instance.raw?.title ) {
 				return transformedBlock;
 			}

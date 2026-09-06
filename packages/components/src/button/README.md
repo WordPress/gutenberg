@@ -77,7 +77,7 @@ If provided, renders `a` instead of `button`.
 
 ### `icon`
 
- - Type: `IconType`
+ - Type: `IconType | null`
  - Required: No
 
 If provided, renders an Icon component inside the button.

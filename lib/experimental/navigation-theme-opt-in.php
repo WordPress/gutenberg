@@ -27,7 +27,7 @@
  * This shim can be removed when the Gutenberg plugin requires a WordPress
  * version that has the ticket below.
  *
- * @see https://core.trac.wordpress.org/ticket/50544
+ * @link https://core.trac.wordpress.org/ticket/50544
  *
  * @global WP_Customize_Manager $wp_customize
  *
@@ -82,7 +82,7 @@ add_action( 'wp_update_nav_menu_item', 'gutenberg_update_nav_menu_item_content',
  * This shim can be removed when the Gutenberg plugin requires a WordPress
  * version that has the ticket below.
  *
- * @see https://core.trac.wordpress.org/ticket/50544
+ * @link https://core.trac.wordpress.org/ticket/50544
  *
  * @param object $menu_item The menu item object.
  *
@@ -91,7 +91,7 @@ add_action( 'wp_update_nav_menu_item', 'gutenberg_update_nav_menu_item_content',
 function gutenberg_setup_block_nav_menu_item( $menu_item ) {
 	if ( 'block' === $menu_item->type ) {
 		$menu_item->type_label = __( 'Block', 'gutenberg' );
-		$menu_item->content    = ! isset( $menu_item->content ) ? get_post_meta( $menu_item->db_id, '_menu_item_content', true ) : $menu_item->content;
+		$menu_item->content    = $menu_item->content ?? get_post_meta( $menu_item->db_id, '_menu_item_content', true );
 
 		// Set to make the menu item display nicely in nav-menus.php.
 		$menu_item->object = 'block';
@@ -115,7 +115,7 @@ add_filter( 'wp_setup_nav_menu_item', 'gutenberg_setup_block_nav_menu_item' );
  * This shim can be removed when the Gutenberg plugin requires a WordPress
  * version that has the ticket below.
  *
- * @see https://core.trac.wordpress.org/ticket/50544
+ * @link https://core.trac.wordpress.org/ticket/50544
  *
  * @param string   $item_output The menu item's starting HTML output.
  * @param WP_Post  $item        Menu item data object.
@@ -147,7 +147,7 @@ add_filter( 'walker_nav_menu_start_el', 'gutenberg_output_block_nav_menu_item', 
  * This shim can be removed when the Gutenberg plugin requires a WordPress
  * version that has the ticket below.
  *
- * @see https://core.trac.wordpress.org/ticket/50544
+ * @link https://core.trac.wordpress.org/ticket/50544
  *
  * @param array $menu_items The menu items, sorted by each menu item's menu order.
  *
@@ -155,7 +155,7 @@ add_filter( 'walker_nav_menu_start_el', 'gutenberg_output_block_nav_menu_item', 
  */
 function gutenberg_remove_block_nav_menu_items( $menu_items ) {
 	// We should uncomment the line below when the block-nav-menus feature becomes stable.
-	// @see https://github.com/WordPress/gutenberg/issues/34265.
+	// @link https://github.com/WordPress/gutenberg/issues/34265.
 	/*if ( current_theme_supports( 'block-nav-menus' ) ) {*/
 	if ( false ) {
 		return $menu_items;
@@ -241,7 +241,7 @@ function gutenberg_convert_menu_items_to_blocks(
  * This shim can be removed when the Gutenberg plugin requires a WordPress
  * version that has the ticket below.
  *
- * @see https://core.trac.wordpress.org/ticket/50544
+ * @link https://core.trac.wordpress.org/ticket/50544
  *
  * @param string|null $output Nav menu output to short-circuit with. Default null.
  * @param stdClass    $args   An object containing wp_nav_menu() arguments.
@@ -250,7 +250,7 @@ function gutenberg_convert_menu_items_to_blocks(
  */
 function gutenberg_output_block_nav_menu( $output, $args ) {
 	// We should uncomment the line below when the block-nav-menus feature becomes stable.
-	// @see https://github.com/WordPress/gutenberg/issues/34265.
+	// @link https://github.com/WordPress/gutenberg/issues/34265.
 	/*if ( ! current_theme_supports( 'block-nav-menus' ) ) {*/
 	if ( true ) {
 		return null;
@@ -305,10 +305,7 @@ function gutenberg_output_block_nav_menu( $output, $args ) {
 		$menu_items_by_parent_id[ $menu_item->menu_item_parent ][] = $menu_item;
 	}
 
-	$block_attributes = array();
-	if ( isset( $args->block_attributes ) ) {
-		$block_attributes = $args->block_attributes;
-	}
+	$block_attributes = $args->block_attributes ?? array();
 
 	$navigation_block = array(
 		'blockName'   => 'core/navigation',
@@ -334,7 +331,7 @@ add_filter( 'pre_wp_nav_menu', 'gutenberg_output_block_nav_menu', 10, 2 );
  * This shim can be removed when the Gutenberg plugin requires a WordPress
  * version that has the ticket below.
  *
- * @see https://core.trac.wordpress.org/ticket/50544
+ * @link https://core.trac.wordpress.org/ticket/50544
  *
  * @param int     $item_id Menu item ID.
  * @param WP_Post $item    Menu item data object.
@@ -361,7 +358,7 @@ add_action( 'wp_nav_menu_item_custom_fields', 'gutenberg_output_block_menu_item_
  * This shim can be removed when the Gutenberg plugin requires a WordPress
  * version that has the ticket below.
  *
- * @see https://core.trac.wordpress.org/ticket/50544
+ * @link https://core.trac.wordpress.org/ticket/50544
  *
  * @param string $hook The current admin page.
  */

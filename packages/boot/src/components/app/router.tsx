@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ComponentType } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { Page } from '@wordpress/admin-ui';
@@ -15,11 +8,9 @@ import {
 } from '@wordpress/route';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import Root from '../root';
+import styles from '../root/style.module.scss';
+import ErrorBoundary from '../error-boundary';
 import type { Route, RouteConfig, RouteLoaderContext } from '../../store/types';
 import { unlock } from '../../lock-unlock';
 
@@ -37,7 +28,7 @@ const {
 // Not found component
 function NotFoundComponent() {
 	return (
-		<div className="boot-layout__stage">
+		<div className={ styles.stage }>
 			<Page title={ __( 'Route not found' ) } hasPadding>
 				{ __( "The page you're looking for does not exist" ) }
 			</Page>
@@ -105,10 +96,16 @@ function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
 				inspector = await routeConfig.inspector( context );
 			}
 
+			let stage = true;
+			if ( routeConfig.stage ) {
+				stage = await routeConfig.stage( context );
+			}
+
 			return {
 				...( loaderData as any ),
 				canvas: canvasData,
 				inspector,
+				stage,
 				title: titleData,
 				routeContentModule: route.content_module,
 			};
@@ -127,19 +124,23 @@ function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
 
 		return createLazyRoute( route.path )( {
 			component: function RouteComponent() {
-				const { inspector: showInspector } =
+				const { inspector: showInspector, stage: showStage } =
 					useLoaderData( { from: route.path } ) ?? {};
 
 				return (
 					<>
-						{ Stage && (
-							<div className="boot-layout__stage">
-								<Stage />
+						{ Stage && showStage && (
+							<div className={ styles.stage }>
+								<ErrorBoundary>
+									<Stage />
+								</ErrorBoundary>
 							</div>
 						) }
 						{ Inspector && showInspector && (
-							<div className="boot-layout__inspector">
-								<Inspector />
+							<div className={ styles.inspector }>
+								<ErrorBoundary>
+									<Inspector />
+								</ErrorBoundary>
 							</div>
 						) }
 					</>

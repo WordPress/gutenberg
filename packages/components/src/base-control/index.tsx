@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { VisuallyHidden } from '../visually-hidden';
 import type { BaseControlProps, BaseControlVisualLabelProps } from './types';
 import {
@@ -96,7 +85,7 @@ const UnforwardedVisualLabel = (
 export const VisualLabel = forwardRef( UnforwardedVisualLabel );
 
 /**
- * `BaseControl` is a component used to generate labels and help text for components handling user inputs.
+ * `BaseControl` is a low-level component used to generate labels and help text for components handling user inputs.
  *
  * ```jsx
  * import { BaseControl, useBaseControlProps } from '@wordpress/components';

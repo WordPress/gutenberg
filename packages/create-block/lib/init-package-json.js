@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const { command } = require( 'execa' );
 const npmPackageArg = require( 'npm-package-arg' );
 const writePkg = require( 'write-pkg' );
-
-/**
- * Internal dependencies
- */
 const { info, error } = require( './log' );
 
 module.exports = async ( {

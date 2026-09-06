@@ -1,15 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import BaseControl, { useBaseControlProps } from '..';
 import Button from '../../button';
 
 const meta: Meta< typeof BaseControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Common/BaseControl',
 	id: 'components-basecontrol',
 	component: BaseControl,
@@ -24,6 +18,11 @@ const meta: Meta< typeof BaseControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) from `@wordpress/ui` instead. For a purely visual label outside `Field.Root`, use `Field.VisualLabel`. For a group legend, use [`Fieldset`](?path=/docs/design-system-components-form-primitives-fieldset--docs) and `Fieldset.Legend`.',
+		},
 	},
 };
 export default meta;

@@ -6,14 +6,19 @@ import {
 	Subtitle,
 	Title,
 } from '@storybook/addon-docs/blocks';
-
-/**
- * Internal dependencies
- */
 import { WithGlobalCSS } from './decorators/with-global-css';
 import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
 import { WithDesignSystemTheme } from './decorators/with-design-system-theme';
+import { ComponentStatusIndicator } from './components/component-status-indicator';
+import { handlePreloadError } from './load-error-recovery';
+import theme from './theme';
+
+if ( typeof window !== 'undefined' ) {
+	window.addEventListener( 'vite:preloadError', handlePreloadError, {
+		once: true,
+	} );
+}
 
 export const globalTypes = {
 	direction: {
@@ -60,7 +65,10 @@ export const globalTypes = {
 		},
 	},
 	dsColorTheme: {},
-	dsDensity: {},
+	dsPrimaryColor: {},
+	dsBackgroundColor: {},
+	dsCursorControl: {},
+	dsCornerRadius: {},
 };
 
 export const decorators = [
@@ -71,6 +79,9 @@ export const decorators = [
 ];
 
 export const parameters = {
+	a11y: {
+		test: 'error',
+	},
 	controls: {
 		sort: 'requiredFirst',
 	},
@@ -78,6 +89,7 @@ export const parameters = {
 		disable: true,
 	},
 	docs: {
+		theme,
 		controls: {
 			sort: 'requiredFirst',
 		},
@@ -87,6 +99,7 @@ export const parameters = {
 			<>
 				<Title />
 				<Subtitle />
+				<ComponentStatusIndicator />
 				<Primary />
 				<Description />
 				<Controls />
@@ -111,9 +124,14 @@ export const parameters = {
 					'Selection & Input',
 					'Typography',
 					'Utilities',
+					'Deprecated',
 				],
 				'Icons',
 				'Design System',
+				'Widget Primitives',
+				[ 'Introduction', 'Anatomy', 'System Architecture' ],
+				'Widget Dashboard',
+				[ 'Introduction', 'Anatomy', 'Widget Chrome', 'Playground' ],
 			];
 			const PRIORITIZED_MDX_DOCS = [ 'Introduction', 'Overview' ];
 
@@ -209,8 +227,8 @@ export const parameters = {
 					if ( aIndex !== bIndex ) {
 						return aIndex - bIndex;
 					}
-					// Same index (both not in order list), sort alphabetically
-					return aSegment.localeCompare( bSegment );
+					// Same index (both not in order list), preserve export order
+					return 0;
 				}
 
 				// Same segment, descend into nested order
@@ -243,10 +261,10 @@ export const parameters = {
 				return aPriority - bPriority;
 			}
 
-			// Same priority, sort alphabetically by name
-			return a.name.localeCompare( b.name );
+			// Same priority, preserve export order
+			return 0;
 		},
 	},
 };
 
-export const tags = [ 'autodocs' ];
+export const tags = [ 'autodocs', '!manifest' ];

@@ -19,7 +19,7 @@ It is responsible for managing the state of the tabs, and rendering one instance
 
 ### `activeTabId`
 
- - Type: `string`
+ - Type: `string | null`
  - Required: No
 
 The current active tab `id`. The active tab is the tab element within the
@@ -42,7 +42,7 @@ components as there are `Tabs.Tab` components.
 
 ### `defaultTabId`
 
- - Type: `string`
+ - Type: `string | null`
  - Required: No
 
 The id of the tab whose panel is currently visible.
@@ -56,7 +56,7 @@ provided (meaning the component will be used in "controlled" mode).
 
 ### `defaultActiveTabId`
 
- - Type: `string`
+ - Type: `string | null`
  - Required: No
 
 The tab id that should be active by default when the composite widget is
@@ -69,14 +69,14 @@ provided.
 
 ### `onSelect`
 
- - Type: `(selectedId: string) => void`
+ - Type: `((selectedId: string | null) => void)`
  - Required: No
 
 The function called when the `selectedTabId` changes.
 
 ### `onActiveTabIdChange`
 
- - Type: `(activeId: string) => void`
+ - Type: `((activeId: string | null) => void)`
  - Required: No
 
 A callback that gets called when the `activeTabId` state changes.
@@ -107,7 +107,7 @@ for more info.
 
 ### `selectedTabId`
 
- - Type: `string`
+ - Type: `string | null`
  - Required: No
 
 The id of the tab whose panel is currently visible.

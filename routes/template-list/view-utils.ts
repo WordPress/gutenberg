@@ -1,17 +1,14 @@
-/**
- * WordPress dependencies
- */
 import { loadView } from '@wordpress/views';
-import type { View } from '@wordpress/dataviews';
+import type { View, Filter } from '@wordpress/dataviews';
 
-const DEFAULT_VIEW: View = {
+export const DEFAULT_VIEW: View = {
 	type: 'grid' as const,
 	perPage: 20,
 	sort: {
 		field: 'title',
 		direction: 'asc' as const,
 	},
-	fields: [ 'author', 'active', 'slug' ],
+	fields: [ 'author' ],
 	titleField: 'title',
 	descriptionField: 'description',
 	mediaField: 'preview',
@@ -30,29 +27,19 @@ export const DEFAULT_LAYOUTS = {
 	},
 };
 
-export function getDefaultView( activeView?: string ): View {
-	// User view: sort by date, newest first, include theme field
-	if ( activeView === 'user' ) {
-		return {
-			...DEFAULT_VIEW,
-			sort: {
-				field: 'date',
-				direction: 'desc' as const,
-			},
-			fields: [ 'author', 'active', 'slug', 'theme' ],
-		};
-	}
+type ActiveViewOverrides = {
+	filters?: Filter[];
+	sort?: View[ 'sort' ];
+};
 
-	// Active view: default sorting
-	if ( activeView === 'active' || ! activeView ) {
-		return {
-			...DEFAULT_VIEW,
-		};
+export function getActiveViewOverridesForTab(
+	activeView: string
+): ActiveViewOverrides {
+	if ( activeView === 'all' ) {
+		return {};
 	}
-
-	// Author-based view: filter by author
+	// Author-based view
 	return {
-		...DEFAULT_VIEW,
 		filters: [
 			{
 				field: 'author',
@@ -67,49 +54,14 @@ export async function ensureView(
 	activeView?: string,
 	search?: { page?: number; search?: string }
 ) {
-	const defaultView = getDefaultView( activeView );
 	return loadView( {
 		kind: 'postType',
 		name: 'wp_template',
-		slug: activeView ?? 'active',
-		defaultView,
-		queryParams: search,
-	} );
-}
-
-export function getDefaultViewLegacy( activeView?: string ): View {
-	// All templates view (default) - remove 'active' and 'slug' fields
-	if ( activeView === 'all' || ! activeView ) {
-		return {
-			...DEFAULT_VIEW,
-			fields: [ 'author' ], // Remove 'active' and 'slug' fields
-		};
-	}
-
-	// Author-based view: filter by author
-	return {
-		...DEFAULT_VIEW,
-		fields: [ 'author' ],
-		filters: [
-			{
-				field: 'author',
-				operator: 'isAny',
-				value: [ activeView ],
-			},
-		],
-	};
-}
-
-export async function ensureViewLegacy(
-	activeView?: string,
-	search?: { page?: number; search?: string }
-) {
-	const defaultView = getDefaultViewLegacy( activeView );
-	return loadView( {
-		kind: 'postType',
-		name: 'wp_template',
-		slug: activeView ?? 'all',
-		defaultView,
+		slug: 'default-new',
+		defaultView: DEFAULT_VIEW,
+		activeViewOverrides: getActiveViewOverridesForTab(
+			activeView ?? 'all'
+		),
 		queryParams: search,
 	} );
 }

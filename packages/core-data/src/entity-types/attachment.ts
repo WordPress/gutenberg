@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type {
 	Context,
 	ContextualField,
@@ -11,7 +8,6 @@ import type {
 	CommentingStatus,
 	PingStatus,
 } from './helpers';
-
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 interface MediaDetails {
@@ -19,7 +15,7 @@ interface MediaDetails {
 	height?: number;
 	file?: string;
 	filesize?: number;
-	sizes: { [ key: string ]: Size };
+	sizes?: { [ key: string ]: Size };
 	image_meta?: ImageMeta;
 	original_image?: string;
 	// Audio/video metadata
@@ -184,7 +180,7 @@ declare module './base-entity-records' {
 			/**
 			 * The attachment caption.
 			 */
-			caption: ContextualField< RenderedText< C >, 'edit', C >;
+			caption: RenderedText< C >;
 			/**
 			 * The attachment description.
 			 */
@@ -224,7 +220,7 @@ declare module './base-entity-records' {
 			/**
 			 * An array of class names for the post.
 			 */
-			class_list: string[];
+			class_list: ContextualField< string[], 'view' | 'edit', C >;
 			/**
 			 * Links to related resources.
 			 */
@@ -233,6 +229,33 @@ declare module './base-entity-records' {
 	}
 }
 
+type AttachmentFileDetails< C extends Context > = C extends 'view' | 'edit'
+	? {
+			/** Original attachment file name. */
+			filename?: string | null;
+			/** Attachment file size in bytes, or null when unavailable. */
+			filesize?: number | null;
+	  }
+	: Record< never, never >;
+
+type AttachmentEditDetails< C extends Context > = C extends 'edit'
+	? {
+			/** EXIF orientation value from the original image. */
+			exif_orientation?: number;
+			/** Output MIME type, or null when no conversion is needed. */
+			image_output_format?: string | null;
+			/** Whether to use progressive or interlaced encoding. */
+			image_save_progressive?: boolean;
+			/** Encode quality for the full image and registered sizes. */
+			image_quality?: {
+				default: number;
+				sizes: Record< string, number >;
+			};
+	  }
+	: Record< never, never >;
+
 export type Attachment< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.Attachment< C >
->;
+> &
+	AttachmentFileDetails< C > &
+	AttachmentEditDetails< C >;

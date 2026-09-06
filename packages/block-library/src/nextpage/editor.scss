@@ -18,7 +18,7 @@
 		font-size: $default-font-size;
 		position: relative;
 		text-transform: uppercase;
-		font-weight: 600;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		font-family: $default-font;
 		color: $gray-700;
 		border-radius: 4px;

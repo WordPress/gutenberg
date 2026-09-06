@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { useDispatch } from '@wordpress/data';
 import { Toolbar } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import BlockMover from '../';
 import { ExperimentalBlockEditorProvider } from '../../provider';
 import { store as blockEditorStore } from '../../../store';

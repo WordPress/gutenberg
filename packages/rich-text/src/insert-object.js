@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { insert } from './insert';
 import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
 

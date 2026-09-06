@@ -6,7 +6,7 @@
 .components-menu-item__button,
 .components-menu-item__button.components-button {
 	width: 100%;
-	font-weight: $font-weight-regular;
+	font-weight: var(--wpds-typography-font-weight-default);
 
 	&[role="menuitemradio"],
 	&[role="menuitemcheckbox"] {

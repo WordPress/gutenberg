@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'Router navigate', () => {
@@ -78,15 +75,29 @@ test.describe( 'Router navigate', () => {
 		await expect( navigations ).toHaveText( '0' );
 		await expect( status ).toHaveText( 'idle' );
 
-		let resolveLink1: Function;
-		let resolveLink2: Function;
+		let resolveLink1: () => void;
+		let resolveLink2: () => void;
+		let resolveLink1Request: () => void;
+		let resolveLink2Request: () => void;
+		const link1Request = new Promise< void >( ( resolve ) => {
+			resolveLink1Request = resolve;
+		} );
+		const link2Request = new Promise< void >( ( resolve ) => {
+			resolveLink2Request = resolve;
+		} );
 
 		await page.route( link1, async ( route ) => {
-			await new Promise( ( r ) => ( resolveLink1 = r ) );
+			resolveLink1Request();
+			await new Promise< void >( ( resolve ) => {
+				resolveLink1 = resolve;
+			} );
 			await route.continue();
 		} );
 		await page.route( link2, async ( route ) => {
-			await new Promise( ( r ) => ( resolveLink2 = r ) );
+			resolveLink2Request();
+			await new Promise< void >( ( resolve ) => {
+				resolveLink2 = resolve;
+			} );
 			await route.continue();
 		} );
 
@@ -96,6 +107,7 @@ test.describe( 'Router navigate', () => {
 		await expect( navigations ).toHaveText( '2' );
 		await expect( status ).toHaveText( 'busy' );
 		await expect( title ).toHaveText( 'Main' );
+		await Promise.all( [ link1Request, link2Request ] );
 
 		await Promise.resolve().then( () => resolveLink2() );
 
@@ -309,7 +321,7 @@ test.describe( 'Router navigate', () => {
 		// Navigate to a page without clientNavigationDisabled.
 		await page.getByTestId( 'link 4' ).click();
 
-		// Check the page has updated and the navigation was successfull.
+		// Check the page has updated and the navigation was successful.
 		await expect( status ).toHaveText( 'idle' );
 		await expect( title ).toHaveText( 'Link with derivedStateClosure' );
 		await expect( count ).toHaveText( '1' );

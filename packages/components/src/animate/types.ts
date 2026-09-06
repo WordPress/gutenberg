@@ -28,5 +28,5 @@ type DistributiveTypeAndOptions< T extends { type?: any } > = T extends any
 	: never;
 
 export type AnimateProps = DistributiveTypeAndOptions< GetAnimateOptions > & {
-	children: ( props: { className?: string } ) => JSX.Element;
+	children: ( props: { className?: string } ) => React.JSX.Element;
 };

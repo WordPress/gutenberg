@@ -1,8 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { Navigator, useNavigator } from '@wordpress/components';
-// @ts-expect-error: Not typed yet.
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 // @ts-expect-error: Not typed yet.
@@ -13,14 +9,7 @@ import {
 	generateGlobalStyles,
 	mergeGlobalStyles,
 } from '@wordpress/global-styles-engine';
-import type {
-	GlobalStylesConfig,
-	BlockType,
-} from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { GlobalStylesProvider } from './provider';
 import ScreenRoot from './screen-root';
 import ScreenBlockList from './screen-block-list';
@@ -41,12 +30,18 @@ interface BlockStylesNavigationScreensProps {
 	parentMenu: string;
 	blockStyles: any[];
 	blockName: string;
+	selectedViewport?: string;
+	showResponsiveStateControls?: boolean;
+	showBlockStateControls?: boolean;
 }
 
 function BlockStylesNavigationScreens( {
 	parentMenu,
 	blockStyles,
 	blockName,
+	selectedViewport,
+	showResponsiveStateControls,
+	showBlockStateControls,
 }: BlockStylesNavigationScreensProps ) {
 	return (
 		<>
@@ -55,7 +50,15 @@ function BlockStylesNavigationScreens( {
 					key={ index }
 					path={ parentMenu + '/variations/' + style.name }
 				>
-					<ScreenBlock name={ blockName } variation={ style.name } />
+					<ScreenBlock
+						name={ blockName }
+						variation={ style.name }
+						selectedViewport={ selectedViewport }
+						showResponsiveStateControls={
+							showResponsiveStateControls
+						}
+						showBlockStateControls={ showBlockStateControls }
+					/>
 				</Navigator.Screen>
 			) ) }
 		</>
@@ -65,6 +68,9 @@ function BlockStylesNavigationScreens( {
 interface ContextScreensProps {
 	name?: string;
 	parentMenu?: string;
+	selectedViewport?: string;
+	showResponsiveStateControls?: boolean;
+	showBlockStateControls?: boolean;
 }
 
 interface GlobalStylesNavigationScreenProps {
@@ -72,7 +78,13 @@ interface GlobalStylesNavigationScreenProps {
 	children: React.ReactNode;
 }
 
-function ContextScreens( { name, parentMenu = '' }: ContextScreensProps ) {
+function ContextScreens( {
+	name,
+	parentMenu = '',
+	selectedViewport,
+	showResponsiveStateControls,
+	showBlockStateControls,
+}: ContextScreensProps ) {
 	const blockStyleVariations = useSelect(
 		( select ) => {
 			if ( ! name ) {
@@ -93,6 +105,9 @@ function ContextScreens( { name, parentMenu = '' }: ContextScreensProps ) {
 			parentMenu={ parentMenu }
 			blockStyles={ blockStyleVariations }
 			blockName={ name || '' }
+			selectedViewport={ selectedViewport }
+			showResponsiveStateControls={ showResponsiveStateControls }
+			showBlockStateControls={ showBlockStateControls }
 		/>
 	);
 }
@@ -114,6 +129,12 @@ interface GlobalStylesUIProps {
 	serverCSS?: { isGlobalStyles?: boolean }[];
 	/** Server settings for BlockEditorProvider (optional) */
 	serverSettings?: { __unstableResolvedAssets: Record< string, unknown > };
+	/** Selected viewport state (optional) */
+	selectedViewport?: string;
+	/** Whether to show responsive state controls (optional) */
+	showResponsiveStateControls?: boolean;
+	/** Whether to show block state controls (optional) */
+	showBlockStateControls?: boolean;
 }
 
 export function GlobalStylesUI( {
@@ -125,6 +146,9 @@ export function GlobalStylesUI( {
 	fontLibraryEnabled = false,
 	serverCSS,
 	serverSettings,
+	selectedViewport,
+	showResponsiveStateControls = true,
+	showBlockStateControls = true,
 }: GlobalStylesUIProps ) {
 	const blocks = getBlockTypes();
 
@@ -222,13 +246,22 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/typography/caption">
 						<ScreenTypographyElement element="caption" />
 					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/cite">
+						<ScreenTypographyElement element="cite" />
+					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/typography/button">
 						<ScreenTypographyElement element="button" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/textInput">
+						<ScreenTypographyElement element="textInput" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/select">
+						<ScreenTypographyElement element="select" />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks">
 						<ScreenBlockList />
 					</GlobalStylesNavigationScreen>
-					{ blocks.map( ( block: BlockType ) => (
+					{ blocks.map( ( block ) => (
 						<Fragment key={ block.name }>
 							<GlobalStylesNavigationScreen
 								path={
@@ -236,13 +269,29 @@ export function GlobalStylesUI( {
 									encodeURIComponent( block.name )
 								}
 							>
-								<ScreenBlock name={ block.name } />
+								<ScreenBlock
+									name={ block.name }
+									selectedViewport={ selectedViewport }
+									showResponsiveStateControls={
+										showResponsiveStateControls
+									}
+									showBlockStateControls={
+										showBlockStateControls
+									}
+								/>
 							</GlobalStylesNavigationScreen>
 							<ContextScreens
 								name={ block.name }
 								parentMenu={
 									'/blocks/' +
 									encodeURIComponent( block.name )
+								}
+								selectedViewport={ selectedViewport }
+								showResponsiveStateControls={
+									showResponsiveStateControls
+								}
+								showBlockStateControls={
+									showBlockStateControls
 								}
 							/>
 						</Fragment>

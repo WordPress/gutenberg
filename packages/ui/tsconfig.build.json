@@ -1,0 +1,24 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"types": [
+			"gutenberg-env",
+			"style-imports",
+			"react-css-custom-properties"
+		]
+	},
+	"references": [
+		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../icons/tsconfig.build.json" },
+		{ "path": "../keycodes/tsconfig.build.json" },
+		{ "path": "../primitives" },
+		{ "path": "../private-apis" },
+		{ "path": "../style-runtime/tsconfig.build.json" },
+		{ "path": "../theme/tsconfig.build.json" },
+		{ "path": "../warning" }
+	]
+}

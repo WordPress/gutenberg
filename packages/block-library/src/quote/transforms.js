@@ -1,8 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { RichText } from '@wordpress/block-editor';
-import { createBlock, switchToBlockType } from '@wordpress/blocks';
+import {
+	createBlock,
+	cloneSanitizedBlock,
+	switchToBlockType,
+} from '@wordpress/blocks';
 
 const transforms = {
 	from: [
@@ -92,17 +93,36 @@ const transforms = {
 				createBlock(
 					'core/quote',
 					{},
-					blocks.map( ( block ) =>
-						createBlock(
-							block.name,
-							block.attributes,
-							block.innerBlocks
-						)
-					)
+					blocks.map( ( block ) => cloneSanitizedBlock( block ) )
 				),
 		},
 	],
 	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/pullquote' ],
+			isMatch: ( {}, block ) => {
+				return block.innerBlocks.every(
+					( { name } ) => name === 'core/paragraph'
+				);
+			},
+			transform: (
+				{ align, citation, anchor, fontSize, style },
+				innerBlocks
+			) => {
+				const value = innerBlocks
+					.map( ( { attributes } ) => `${ attributes.content }` )
+					.join( '<br>' );
+				return createBlock( 'core/pullquote', {
+					value,
+					align,
+					citation,
+					anchor,
+					fontSize,
+					style,
+				} );
+			},
+		},
 		{
 			type: 'block',
 			blocks: [ 'core/verse' ],

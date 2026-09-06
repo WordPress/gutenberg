@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { createContext, useCallback, useMemo } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { VisuallyHidden } from '../visually-hidden';
 import * as Styled from './styles';
 import type {
@@ -19,7 +8,7 @@ import type {
 	CustomSelectStore,
 	CustomSelectButtonProps,
 	CustomSelectButtonSize,
-	_CustomSelectInternalProps,
+	CustomSelectInternalProps,
 	_CustomSelectProps,
 } from './types';
 import InputBase from '../input-control/input-base';
@@ -31,7 +20,7 @@ export const CustomSelectContext =
 CustomSelectContext.displayName = 'CustomSelectContext';
 
 function defaultRenderSelectedValue(
-	value: CustomSelectButtonProps[ 'value' ]
+	value: CustomSelectButtonProps[ 'defaultValue' ]
 ) {
 	const isValueEmpty = Array.isArray( value )
 		? value.length === 0
@@ -85,8 +74,8 @@ const CustomSelectButton = ( {
 	);
 };
 
-function _CustomSelect(
-	props: _CustomSelectInternalProps &
+function CustomSelect(
+	props: CustomSelectInternalProps &
 		_CustomSelectProps &
 		CustomSelectStore &
 		CustomSelectButtonSize
@@ -131,11 +120,7 @@ function _CustomSelect(
 			>
 				{ label }
 			</Ariakit.SelectLabel>
-			<InputBase
-				__next40pxDefaultSize
-				size={ size }
-				suffix={ <SelectControlChevronDown /> }
-			>
+			<InputBase size={ size } suffix={ <SelectControlChevronDown /> }>
 				<CustomSelectButton
 					{ ...restProps }
 					size={ size }
@@ -161,4 +146,4 @@ function _CustomSelect(
 	);
 }
 
-export default _CustomSelect;
+export default CustomSelect;

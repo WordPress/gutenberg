@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { getUpdatedLinkAttributes } from '../get-updated-link-attributes';
 
 describe( 'getUpdatedLinkAttributes method', () => {
@@ -13,9 +11,9 @@ describe( 'getUpdatedLinkAttributes method', () => {
 
 		const result = getUpdatedLinkAttributes( options );
 
-		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.url ).toEqual( 'https://example.com' );
 		expect( result.linkTarget ).toEqual( '_blank' );
-		expect( result.rel ).toEqual( 'noreferrer noopener' );
+		expect( result.rel ).toEqual( 'noopener' );
 	} );
 
 	it( 'should return empty rel value as undefined', () => {
@@ -27,7 +25,7 @@ describe( 'getUpdatedLinkAttributes method', () => {
 
 		const result = getUpdatedLinkAttributes( options );
 
-		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.url ).toEqual( 'https://example.com' );
 		expect( result.linkTarget ).toEqual( undefined );
 		expect( result.rel ).toEqual( undefined );
 	} );
@@ -42,11 +40,9 @@ describe( 'getUpdatedLinkAttributes method', () => {
 
 		const result = getUpdatedLinkAttributes( options );
 
-		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.url ).toEqual( 'https://example.com' );
 		expect( result.linkTarget ).toEqual( '_blank' );
-		expect( result.rel ).toEqual(
-			'rel_value noreferrer noopener nofollow'
-		);
+		expect( result.rel ).toEqual( 'rel_value noopener nofollow' );
 	} );
 
 	it( 'should correctly update link attributes with opensInNewTab', () => {
@@ -59,9 +55,9 @@ describe( 'getUpdatedLinkAttributes method', () => {
 
 		const result = getUpdatedLinkAttributes( options );
 
-		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.url ).toEqual( 'https://example.com' );
 		expect( result.linkTarget ).toEqual( '_blank' );
-		expect( result.rel ).toEqual( 'rel_value noreferrer noopener' );
+		expect( result.rel ).toEqual( 'rel_value noopener' );
 	} );
 
 	it( 'should correctly update link attributes with nofollow', () => {
@@ -74,7 +70,7 @@ describe( 'getUpdatedLinkAttributes method', () => {
 
 		const result = getUpdatedLinkAttributes( options );
 
-		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.url ).toEqual( 'https://example.com' );
 		expect( result.linkTarget ).toEqual( undefined );
 		expect( result.rel ).toEqual( 'rel_value nofollow' );
 	} );
@@ -89,7 +85,7 @@ describe( 'getUpdatedLinkAttributes method', () => {
 
 		const result = getUpdatedLinkAttributes( options );
 
-		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.url ).toEqual( 'https://example.com' );
 		expect( result.linkTarget ).toEqual( undefined );
 		expect( result.rel ).toEqual( 'nofollow' );
 	} );
@@ -104,11 +100,9 @@ describe( 'getUpdatedLinkAttributes method', () => {
 
 		const result = getUpdatedLinkAttributes( options );
 
-		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.url ).toEqual( 'https://example.com' );
 		expect( result.linkTarget ).toEqual( '_blank' );
-		expect( result.rel ).toEqual(
-			'rel_value nofollow noreferrer noopener'
-		);
+		expect( result.rel ).toEqual( 'rel_value nofollow noopener' );
 	} );
 
 	it( 'should correctly handle rel with existing new tab values and remove duplicates', () => {
@@ -116,13 +110,13 @@ describe( 'getUpdatedLinkAttributes method', () => {
 			url: 'example.com',
 			opensInNewTab: true,
 			nofollow: false,
-			rel: 'rel_value noreferrer noopener',
+			rel: 'rel_value noopener',
 		};
 
 		const result = getUpdatedLinkAttributes( options );
 
-		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.url ).toEqual( 'https://example.com' );
 		expect( result.linkTarget ).toEqual( '_blank' );
-		expect( result.rel ).toEqual( 'rel_value noreferrer noopener' );
+		expect( result.rel ).toEqual( 'rel_value noopener' );
 	} );
 } );

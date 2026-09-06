@@ -1,0 +1,13 @@
+.editor-save-error-details {
+	display: inline;
+}
+
+.editor-save-error-details summary {
+	display: inline;
+	cursor: var(--wpds-cursor-control);
+	margin-left: 0.35em;
+}
+
+.editor-save-error-details__message {
+	white-space: break-spaces;
+}

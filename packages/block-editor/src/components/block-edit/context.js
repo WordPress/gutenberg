@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useContext } from '@wordpress/element';
 
 export const mayDisplayControlsKey = Symbol( 'mayDisplayControls' );
@@ -11,6 +8,9 @@ export const mayDisplayPatternEditingControlsKey = Symbol(
 export const blockEditingModeKey = Symbol( 'blockEditingMode' );
 export const blockBindingsKey = Symbol( 'blockBindings' );
 export const isPreviewModeKey = Symbol( 'isPreviewMode' );
+export const isInListViewBlockSupportTreeKey = Symbol(
+	'isInListViewBlockSupportTree'
+);
 
 export const DEFAULT_BLOCK_EDIT_CONTEXT = {
 	name: '',

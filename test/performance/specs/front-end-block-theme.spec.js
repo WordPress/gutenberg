@@ -1,8 +1,4 @@
 /* eslint-disable playwright/expect-expect */
-
-/**
- * WordPress dependencies
- */
 import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
 
 const results = {

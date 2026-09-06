@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { applyFilters } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import '../generated-class-name';
 
 const noop = () => {};

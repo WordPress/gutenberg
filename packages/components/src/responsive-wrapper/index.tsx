@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { cloneElement, Children } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { ResponsiveWrapperProps } from './types';
 
 /**

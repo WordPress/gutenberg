@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useDebounce from '../use-debounce';
 
 /**

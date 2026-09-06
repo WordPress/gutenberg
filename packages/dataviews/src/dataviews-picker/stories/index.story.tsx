@@ -1,25 +1,15 @@
-/**
- * External dependencies
- */
 import type { Meta } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
-import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 import { Modal, Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsPicker from '../index';
-import { LAYOUT_PICKER_GRID, LAYOUT_PICKER_TABLE } from '../../constants';
+import { LAYOUT_PICKER_GRID } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
-import type { ActionButton, View } from '../../types';
+import type { ActionButton, MediaFit, View } from '../../types';
 import { data, fields, type SpaceObject } from './fixtures';
 
 const meta = {
+	tags: [ 'manifest' ],
 	title: 'DataViews/DataViewsPicker',
 	component: DataViewsPicker,
 } as Meta< typeof DataViewsPicker >;
@@ -31,6 +21,8 @@ const storyArgs = {
 	isMultiselectable: false,
 	isGrouped: false,
 	infiniteScrollEnabled: false,
+	mediaFit: 'cover',
+	mediaFitControl: true,
 };
 
 const storyArgTypes = {
@@ -51,6 +43,17 @@ const storyArgTypes = {
 		description:
 			'Whether the infinite scroll is enabled. Enabling this disables the "Is grouped" option',
 	},
+	mediaFit: {
+		control: 'select',
+		options: [ 'cover', 'contain' ],
+		description:
+			'How the media field fills the preview box: cropped to fill it ("cover") or fitted inside it ("contain"), letterboxing the media so its own aspect ratio stays visible',
+	},
+	mediaFitControl: {
+		control: 'boolean',
+		description:
+			'Whether the view options offer the "Original aspect ratio" toggle, letting users switch the media fit themselves',
+	},
 };
 
 interface PickerContentProps {
@@ -58,6 +61,8 @@ interface PickerContentProps {
 	isMultiselectable: boolean;
 	isGrouped: boolean;
 	infiniteScrollEnabled: boolean;
+	mediaFit?: MediaFit;
+	mediaFitControl?: boolean;
 	actions?: ActionButton< SpaceObject >[];
 	selection?: string[];
 }
@@ -67,36 +72,76 @@ const DataViewsPickerContent = ( {
 	isMultiselectable,
 	isGrouped,
 	infiniteScrollEnabled,
+	mediaFit = 'cover',
+	mediaFitControl = true,
 	actions: customActions,
 	selection: customSelection,
 }: PickerContentProps ) => {
-	const [ view, setView ] = useState< View >( {
-		fields: [],
-		titleField: 'title',
-		mediaField: 'image',
-		search: '',
-		page: 1,
-		perPage: 10,
-		filters: [],
-		type: LAYOUT_PICKER_GRID,
-		groupBy: isGrouped ? { field: 'type', direction: 'asc' } : undefined,
-		infiniteScrollEnabled,
+	const [ view, setView ] = useState< View >( () => {
+		const baseView: View = {
+			fields: [],
+			titleField: 'title',
+			mediaField: 'image',
+			search: '',
+			filters: [],
+			type: LAYOUT_PICKER_GRID,
+			groupBy: isGrouped
+				? { field: 'type', direction: 'asc' as const }
+				: undefined,
+			infiniteScrollEnabled,
+			layout: { mediaFit },
+		};
+
+		if ( infiniteScrollEnabled ) {
+			return {
+				...baseView,
+				startPosition: 1,
+				perPage: 10,
+			};
+		}
+
+		return {
+			...baseView,
+			page: 1,
+			perPage: 10,
+		};
 	} );
-	const { data: shownData, paginationInfo: normalPaginationInfo } =
-		useMemo( () => {
-			return filterSortAndPaginate( data, view, fields );
-		}, [ view ] );
+	const { data: shownData, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( data, view, fields );
+	}, [ view ] );
 
 	useEffect( () => {
-		setView( ( prevView ) => ( {
-			...prevView,
-			groupBy:
-				isGrouped && ! infiniteScrollEnabled
-					? { field: 'type', direction: 'asc' }
-					: undefined,
-			infiniteScrollEnabled,
-		} ) );
-	}, [ isGrouped, infiniteScrollEnabled ] );
+		setView( ( prevView ) => {
+			const baseUpdates = {
+				groupBy:
+					isGrouped && ! infiniteScrollEnabled
+						? { field: 'type', direction: 'asc' as const }
+						: undefined,
+				infiniteScrollEnabled,
+				// Spread the previous layout so a change made through the
+				// view options popover survives an unrelated arg change.
+				layout: { ...prevView.layout, mediaFit },
+			};
+
+			if ( infiniteScrollEnabled ) {
+				return {
+					...prevView,
+					...baseUpdates,
+					startPosition: 1,
+					perPage: 15,
+					page: undefined,
+				} as View;
+			}
+
+			return {
+				...prevView,
+				...baseUpdates,
+				page: prevView.page ?? 1,
+				perPage: prevView.perPage ?? 10,
+				startPosition: undefined,
+			} as View;
+		} );
+	}, [ isGrouped, infiniteScrollEnabled, mediaFit ] );
 
 	const [ selection, setSelection ] = useState< string[] >(
 		customSelection || []
@@ -129,24 +174,12 @@ const DataViewsPickerContent = ( {
 		},
 	];
 
-	const {
-		data: infiniteScrollData,
-		paginationInfo: infiniteScrollPaginationInfo,
-		isLoadingMore,
-	} = useInfiniteScroll( {
-		view,
-		setView,
-		data: shownData,
-		getItemId: ( item ) => item.id.toString(),
-		totalDataLength: data.length,
-	} );
-
 	return (
 		<>
 			{ infiniteScrollEnabled && (
 				<style>{ `
 					.dataviews-picker-wrapper {
-						height: 600px;
+						height: 750px;
 						overflow: auto;
 					}
 				` }</style>
@@ -158,22 +191,18 @@ const DataViewsPickerContent = ( {
 					setSelection( selectedIds );
 				} }
 				getItemId={ ( item ) => item.id.toString() }
-				paginationInfo={
-					infiniteScrollEnabled
-						? infiniteScrollPaginationInfo
-						: normalPaginationInfo
-				}
-				data={ infiniteScrollEnabled ? infiniteScrollData : shownData }
-				isLoading={ infiniteScrollEnabled ? isLoadingMore : undefined }
+				paginationInfo={ paginationInfo }
+				data={ shownData }
 				view={ view }
 				fields={ fields }
 				onChangeView={ setView }
-				config={ { perPageSizes } }
-				itemListLabel="Galactic Bodies"
+				config={ { perPageSizes, mediaFitControl } }
 				defaultLayouts={ {
-					[ LAYOUT_PICKER_GRID ]: {},
-					[ LAYOUT_PICKER_TABLE ]: { perPage: 20 },
+					pickerGrid: true,
+					pickerTable: true,
+					pickerActivity: true,
 				} }
+				itemListLabel="Galactic Bodies"
 			/>
 		</>
 	);
@@ -184,33 +213,48 @@ export const Default = ( {
 	isMultiselectable,
 	isGrouped,
 	infiniteScrollEnabled,
+	mediaFit,
+	mediaFitControl,
 }: {
 	perPageSizes: number[];
 	isMultiselectable: boolean;
 	isGrouped: boolean;
 	infiniteScrollEnabled: boolean;
+	mediaFit?: MediaFit;
+	mediaFitControl?: boolean;
 } ) => (
 	<DataViewsPickerContent
 		perPageSizes={ perPageSizes }
 		isMultiselectable={ isMultiselectable }
 		isGrouped={ isGrouped }
 		infiniteScrollEnabled={ infiniteScrollEnabled }
+		mediaFit={ mediaFit }
+		mediaFitControl={ mediaFitControl }
 	/>
 );
 
 Default.args = storyArgs;
 Default.argTypes = storyArgTypes;
+Default.parameters = {
+	// FIXME: Picker UI nests interactive controls (nested-interactive).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
 
 export const WithModal = ( {
 	perPageSizes = [ 10, 25, 50, 100 ],
 	isMultiselectable,
 	isGrouped,
 	infiniteScrollEnabled,
+	mediaFit,
+	mediaFitControl,
 }: {
 	perPageSizes: number[];
 	isMultiselectable: boolean;
 	isGrouped: boolean;
 	infiniteScrollEnabled: boolean;
+	mediaFit?: MediaFit;
+	mediaFitControl?: boolean;
 } ) => {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ selectedItems, setSelectedItems ] = useState< SpaceObject[] >( [] );
@@ -238,9 +282,10 @@ export const WithModal = ( {
 
 	return (
 		<>
-			<Stack direction="row" justify="left" gap="xs">
+			<Stack direction="row" justify="left" gap="sm">
 				<Button
 					variant="primary"
+					__next40pxDefaultSize
 					onClick={ () => setIsModalOpen( true ) }
 				>
 					Open Picker Modal
@@ -249,6 +294,7 @@ export const WithModal = ( {
 					onClick={ () => setSelectedItems( [] ) }
 					disabled={ ! selectedItems.length }
 					accessibleWhenDisabled
+					__next40pxDefaultSize
 				>
 					Clear Selection
 				</Button>
@@ -282,6 +328,8 @@ export const WithModal = ( {
 							isMultiselectable={ isMultiselectable }
 							isGrouped={ isGrouped }
 							infiniteScrollEnabled={ infiniteScrollEnabled }
+							mediaFit={ mediaFit }
+							mediaFitControl={ mediaFitControl }
 							actions={ modalActions }
 							selection={ selectedItems.map( ( item ) =>
 								String( item.id )
@@ -296,87 +344,3 @@ export const WithModal = ( {
 
 WithModal.args = storyArgs;
 WithModal.argTypes = storyArgTypes;
-
-function useInfiniteScroll( {
-	view,
-	setView,
-	data: shownData,
-	getItemId,
-	totalDataLength,
-}: {
-	view: View;
-	setView: ( view: View ) => void;
-	data: SpaceObject[];
-	getItemId: ( item: SpaceObject ) => string;
-	totalDataLength: number;
-} ): {
-	data: SpaceObject[];
-	paginationInfo: {
-		totalItems: number;
-		totalPages: number;
-		infiniteScrollHandler?: ( () => void ) | undefined;
-	};
-	isLoadingMore: boolean;
-	hasMoreData: boolean;
-} {
-	// Custom pagination handler that simulates server-side pagination
-	const [ allLoadedRecords, setAllLoadedRecords ] = useState< SpaceObject[] >(
-		[]
-	);
-	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
-
-	const totalItems = totalDataLength;
-	const totalPages = Math.ceil( totalItems / ( view.perPage || 10 ) );
-	const currentPage = view.page || 1;
-	const hasMoreData = currentPage < totalPages;
-
-	const infiniteScrollHandler = useCallback( () => {
-		if ( isLoadingMore || currentPage >= totalPages ) {
-			return;
-		}
-
-		setIsLoadingMore( true );
-
-		setView( {
-			...view,
-			page: currentPage + 1,
-		} );
-	}, [ isLoadingMore, currentPage, totalPages, view, setView ] );
-
-	// Initialize data on first load or when view changes significantly
-	useEffect( () => {
-		if ( currentPage === 1 || ! view.infiniteScrollEnabled ) {
-			// First page - replace all data
-			setAllLoadedRecords( shownData );
-		} else {
-			// Subsequent pages - append to existing data
-			setAllLoadedRecords( ( prev ) => {
-				const existingIds = new Set( prev.map( getItemId ) );
-				const newRecords = shownData.filter(
-					( record ) => ! existingIds.has( getItemId( record ) )
-				);
-				return [ ...prev, ...newRecords ];
-			} );
-		}
-		setIsLoadingMore( false );
-	}, [
-		view.search,
-		view.filters,
-		view.perPage,
-		currentPage,
-		view.infiniteScrollEnabled,
-	] );
-
-	const paginationInfo = {
-		totalItems,
-		totalPages,
-		infiniteScrollHandler,
-	};
-
-	return {
-		data: allLoadedRecords,
-		paginationInfo,
-		isLoadingMore,
-		hasMoreData,
-	};
-}
