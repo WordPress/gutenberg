@@ -134,8 +134,9 @@ export interface DashboardLanesProps
 	onChangeLayout?: ( newLayout: DashboardLanesLayoutItem[] ) => void;
 
 	/**
-	 * Fired continuously during a gesture with the in-progress
-	 * layout. The committed result still emits via `onChangeLayout`.
+	 * Fired continuously during a pointer drag or resize with the in-progress
+	 * layout. The committed result still emits via `onChangeLayout`. Keyboard
+	 * reordering commits on drop without intermediate preview updates.
 	 */
 	onPreviewLayout?: ( previewLayout: DashboardLanesLayoutItem[] ) => void;
 

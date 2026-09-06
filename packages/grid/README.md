@@ -144,22 +144,22 @@ interface DashboardGridLayoutItem {
 
 ### Props
 
-| Prop                 | Type                                       | Default  | Description                                                                                                                                             |
-| -------------------- | ------------------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `layout`             | `DashboardGridLayoutItem[]`                | —        | Required. Positions and sizes keyed by child `key`.                                                                                                     |
-| `children`           | `ReactNode`                                | —        | Required. Each child needs a `key` matching a layout entry.                                                                                             |
-| `columns`            | `number`                                   | `6`      | Total columns (fixed mode).                                                                                                                             |
-| `minColumnWidth`     | `number`                                   | —        | If set, enables responsive mode: columns derived from container width. Mutually exclusive with `columns`.                                               |
-| `rowHeight`          | `number \| 'auto'`                         | `'auto'` | Row height in pixels, or `'auto'` to let content size rows.                                                                                             |
-| `itemLimits`         | `Record< string, GridItemLimits >`         | —        | Per-item minimum and maximum tile sizes in pixels, keyed by layout item key. See [Size limits](#size-limits).                                           |
-| `editMode`           | `boolean`                                  | `false`  | Enables drag-to-reorder and resize handles.                                                                                                             |
-| `onChangeLayout`     | `( layout ) => void`                       | —        | Fired when the user commits a drag or resize.                                                                                                           |
-| `onPreviewLayout`    | `( layout ) => void`                       | —        | Fired continuously during a drag or resize with the in-progress layout. Use for live feedback; `onChangeLayout` still emits the committed result.       |
-| `renderResizeHandle` | `ComponentType< ResizeHandleRenderProps >` | —        | Override the default corner-triangle resize handle. See [Custom resize handle](#custom-resize-handle).                                                  |
-| `renderDragPreview`  | `ComponentType< DragPreviewRenderProps >`  | —        | Wrap the dragged-clone visual mounted inside `<DragOverlay>`. See [Custom drag preview](#custom-drag-preview).                                          |
-| `renderGridOverlay`  | `ComponentType< GridOverlayRenderProps >`  | —        | Override the default edit-mode overlay that visualizes the column and row tracks. Receives the resolved `columns`, `rows`, `rowHeight`, and `isActive`. |
-| `className`          | `string`                                   | —        | Extra class on the grid root.                                                                                                                           |
-| `style`              | `CSSProperties`                            | —        | Inline styles on the grid root; the grid's own layout styles win over them.                                                                             |
+| Prop                 | Type                                       | Default  | Description                                                                                                                                               |
+| -------------------- | ------------------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `layout`             | `DashboardGridLayoutItem[]`                | —        | Required. Positions and sizes keyed by child `key`.                                                                                                       |
+| `children`           | `ReactNode`                                | —        | Required. Each child needs a `key` matching a layout entry.                                                                                               |
+| `columns`            | `number`                                   | `6`      | Total columns (fixed mode).                                                                                                                               |
+| `minColumnWidth`     | `number`                                   | —        | If set, enables responsive mode: columns derived from container width. Mutually exclusive with `columns`.                                                 |
+| `rowHeight`          | `number \| 'auto'`                         | `'auto'` | Row height in pixels, or `'auto'` to let content size rows.                                                                                               |
+| `itemLimits`         | `Record< string, GridItemLimits >`         | —        | Per-item minimum and maximum tile sizes in pixels, keyed by layout item key. See [Size limits](#size-limits).                                             |
+| `editMode`           | `boolean`                                  | `false`  | Enables drag-to-reorder and resize handles.                                                                                                               |
+| `onChangeLayout`     | `( layout ) => void`                       | —        | Fired when the user commits a drag or resize.                                                                                                             |
+| `onPreviewLayout`    | `( layout ) => void`                       | —        | Fired continuously during a pointer drag or resize with the in-progress layout. Use for live feedback; `onChangeLayout` still emits the committed result. |
+| `renderResizeHandle` | `ComponentType< ResizeHandleRenderProps >` | —        | Override the default corner-triangle resize handle. See [Custom resize handle](#custom-resize-handle).                                                    |
+| `renderDragPreview`  | `ComponentType< DragPreviewRenderProps >`  | —        | Wrap the dragged-clone visual mounted inside `<DragOverlay>`. See [Custom drag preview](#custom-drag-preview).                                            |
+| `renderGridOverlay`  | `ComponentType< GridOverlayRenderProps >`  | —        | Override the default edit-mode overlay that visualizes the column and row tracks. Receives the resolved `columns`, `rows`, `rowHeight`, and `isActive`.   |
+| `className`          | `string`                                   | —        | Extra class on the grid root.                                                                                                                             |
+| `style`              | `CSSProperties`                            | —        | Inline styles on the grid root; the grid's own layout styles win over them.                                                                               |
 
 `DashboardGrid` forwards refs to its root `<div>`, and standard
 `<div>` attributes (`id`, `aria-*`, `data-*`, event handlers,
@@ -217,7 +217,7 @@ When `editMode` is true:
     on every tile is set `inert` so hovers on other tiles can't steal
     the gesture.
 -   `onChangeLayout` fires after drop or resize with the new layout.
--   `onPreviewLayout` fires continuously during the interaction for
+-   `onPreviewLayout` fires continuously during pointer drag or resize for
     live feedback; the committed layout is still emitted via
     `onChangeLayout`.
 -   Sibling tiles animate into their new positions when the layout
@@ -318,7 +318,7 @@ items flow around them; out-of-range values (negative, or beyond
 | `itemLimits`         | `Record< string, GridItemWidthLimits >`    | —       | Per-item minimum and maximum tile widths in pixels, keyed by layout item key. See [Size limits](#size-limits).                                                                                          |
 | `editMode`           | `boolean`                                  | `false` | Enables drag-to-reorder and horizontal resize.                                                                                                                                                          |
 | `onChangeLayout`     | `( layout ) => void`                       | —       | Fired when the user commits a drag or resize.                                                                                                                                                           |
-| `onPreviewLayout`    | `( layout ) => void`                       | —       | Fired continuously during a drag or resize.                                                                                                                                                             |
+| `onPreviewLayout`    | `( layout ) => void`                       | —       | Fired continuously during a pointer drag or resize.                                                                                                                                                     |
 | `renderResizeHandle` | `ComponentType< ResizeHandleRenderProps >` | —       | Override the default side-grip resize handle. See [Custom resize handle](#custom-resize-handle).                                                                                                        |
 | `renderDragPreview`  | `ComponentType< DragPreviewRenderProps >`  | —       | Wrap the dragged-clone visual mounted inside `<DragOverlay>`. See [Custom drag preview](#custom-drag-preview).                                                                                          |
 | `renderGridOverlay`  | `ComponentType< GridOverlayRenderProps >`  | —       | Override the default edit-mode overlay that visualizes the lane tracks. Receives the resolved `columns` and `isActive`; lanes pass no row metrics because heights are content-driven.                   |
@@ -422,6 +422,10 @@ heights are content-driven.
 
 Drag-to-reorder is operable from the keyboard via `@dnd-kit`'s
 keyboard sensor:
+
+Keyboard movement updates the drag overlay and target announcement. Dropping
+commits the final target through `onChangeLayout`; Escape discards the move.
+Keyboard reordering does not emit intermediate `onPreviewLayout` updates.
 
 -   `Tab` to focus a tile.
 -   `Space` to pick it up.

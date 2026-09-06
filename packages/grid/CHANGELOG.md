@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Commit keyboard reordering to the final drop target in `DashboardGrid` and `DashboardLanes`, preserving pinned items and cancellation. Keyboard layout previews now commit on drop ([#82508](https://github.com/WordPress/gutenberg/issues/82508)).
+
 ### New Features
 
 -   Layout items accept `draggable` and `resizable` flags. A non-draggable
