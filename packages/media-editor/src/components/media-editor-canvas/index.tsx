@@ -14,6 +14,17 @@ export interface MediaEditorCanvasProps {
 	onGestureStart?: () => void;
 	/** Fires when a canvas cropper gesture ends. */
 	onGestureEnd?: () => void;
+	/**
+	 * When set, load this image into the cropper instead of the media's own
+	 * `source_url` — used by "Restore original image" to preview the lineage
+	 * root before saving. Swapping the source resets the cropper baseline, so
+	 * the restore counts as clean until the user re-crops.
+	 */
+	srcOverride?: {
+		url: string;
+		width: number;
+		height: number;
+	};
 }
 
 /**
@@ -28,11 +39,13 @@ export interface MediaEditorCanvasProps {
  * @param props.isPlacementActive
  * @param props.onGestureStart
  * @param props.onGestureEnd
+ * @param props.srcOverride
  */
 export default function MediaEditorCanvas( {
 	isPlacementActive = false,
 	onGestureStart,
 	onGestureEnd,
+	srcOverride,
 }: MediaEditorCanvasProps ) {
 	const { media } = useMediaEditorContext();
 	const controller = useMediaEditor();
@@ -66,28 +79,41 @@ export default function MediaEditorCanvas( {
 		onGestureEnd?.();
 	}, [ endGesture, onGestureEnd ] );
 
-	const mediaUrl = media?.source_url;
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type );
-	const mediaWidth = Number( media?.media_details?.width );
-	const mediaHeight = Number( media?.media_details?.height );
+
+	// When a restore is active, the cropper shows the lineage root instead of
+	// the media's own file. `loadUrl`/`loadWidth`/`loadHeight` are whichever
+	// source is currently in play.
+	const loadUrl = srcOverride?.url ?? media?.source_url;
+	const loadWidth = srcOverride
+		? srcOverride.width
+		: Number( media?.media_details?.width );
+	const loadHeight = srcOverride
+		? srcOverride.height
+		: Number( media?.media_details?.height );
 
 	useEffect( () => {
 		if (
-			cropperImage ||
-			! mediaUrl ||
-			! Number.isFinite( mediaWidth ) ||
-			! Number.isFinite( mediaHeight ) ||
-			mediaWidth <= 0 ||
-			mediaHeight <= 0
+			! loadUrl ||
+			! Number.isFinite( loadWidth ) ||
+			! Number.isFinite( loadHeight ) ||
+			loadWidth <= 0 ||
+			loadHeight <= 0
 		) {
 			return;
 		}
+		// Idempotent: skip when the cropper already holds this source. When the
+		// source changes (initial load, or a restore swapping in the original)
+		// this re-runs and `setImage` refreshes the clean baseline.
+		if ( cropperImage?.src === loadUrl ) {
+			return;
+		}
 		setImage( {
-			src: mediaUrl,
-			naturalWidth: mediaWidth,
-			naturalHeight: mediaHeight,
+			src: loadUrl,
+			naturalWidth: loadWidth,
+			naturalHeight: loadHeight,
 		} );
-	}, [ cropperImage, mediaUrl, mediaWidth, mediaHeight, setImage ] );
+	}, [ cropperImage, loadUrl, loadWidth, loadHeight, setImage ] );
 
 	const isImage = mediaType.type === 'image';
 
@@ -96,14 +122,14 @@ export default function MediaEditorCanvas( {
 	// cropper's own `<img>`, so this adds no network cost. The cropper stays
 	// framework-pure — load/error handling lives here in the wrapper layer.
 	useEffect( () => {
-		if ( ! mediaUrl || ! isImage ) {
+		if ( ! loadUrl || ! isImage ) {
 			return;
 		}
 		setStatus( 'loading' );
 		const probe = new window.Image();
 		probe.onload = () => setStatus( 'loaded' );
 		probe.onerror = () => setStatus( 'error' );
-		probe.src = mediaUrl;
+		probe.src = loadUrl;
 		// Cached images may already be complete before listeners attach.
 		if ( probe.complete ) {
 			setStatus( probe.naturalWidth > 0 ? 'loaded' : 'error' );
@@ -112,9 +138,9 @@ export default function MediaEditorCanvas( {
 			probe.onload = null;
 			probe.onerror = null;
 		};
-	}, [ mediaUrl, isImage ] );
+	}, [ loadUrl, isImage ] );
 
-	if ( ! mediaUrl || ! isImage ) {
+	if ( ! loadUrl || ! isImage ) {
 		return null;
 	}
 
@@ -151,7 +177,7 @@ export default function MediaEditorCanvas( {
 				} ) }
 			>
 				<Cropper
-					src={ mediaUrl }
+					src={ loadUrl }
 					controller={ controller }
 					aspectRatio={ aspectRatio }
 					freeformCrop

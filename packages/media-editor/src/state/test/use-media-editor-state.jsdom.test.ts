@@ -307,6 +307,29 @@ describe( 'useMediaEditorState', () => {
 			expect( result.current.isDirty ).toBe( false );
 		} );
 
+		it( 'resets geometry and crop options for a new image', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.setRotation( 45 ) );
+			act( () => result.current.setAspectRatioValue( '1' ) );
+			expect( result.current.state.rotation ).toBe( 45 );
+			expect( result.current.cropOptions.aspectRatioValue ).toBe( '1' );
+
+			act( () =>
+				result.current.setImage( {
+					src: 'other.jpg',
+					naturalWidth: 800,
+					naturalHeight: 800,
+				} )
+			);
+
+			// A crop drawn on the previous image must not survive onto the
+			// new one — "Restore original image" swaps the source and counts
+			// on getting a fresh canvas.
+			expect( result.current.state.rotation ).toBe( 0 );
+			expect( result.current.cropOptions.aspectRatioValue ).toBe( '0' );
+		} );
+
 		it( 'does not clear history when the same image is reported again', () => {
 			const { result } = setupHook();
 

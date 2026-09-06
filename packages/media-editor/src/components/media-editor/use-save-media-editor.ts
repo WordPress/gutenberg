@@ -42,6 +42,17 @@ interface UseSaveMediaEditorArgs {
 	isImage: boolean;
 	media?: Media | null;
 	onSaved?: ( result: MediaEditorSaveResult ) => void;
+	/**
+	 * When the user has restored the lineage root, the save targets that
+	 * original attachment instead of the currently-edited one:
+	 * - with no fresh crop, the block is repointed at the original (no `/edit`);
+	 * - with a fresh crop, `/edit` runs against the original's id and url.
+	 */
+	restoredSource?: {
+		id: number;
+		url?: string;
+		media: Media;
+	};
 }
 
 interface UseSaveMediaEditorReturn {
@@ -85,6 +96,7 @@ export function useSaveMediaEditor( {
 	isImage,
 	media,
 	onSaved,
+	restoredSource,
 }: UseSaveMediaEditorArgs ): UseSaveMediaEditorReturn {
 	const registry = useRegistry();
 	const {
@@ -101,8 +113,16 @@ export function useSaveMediaEditor( {
 		try {
 			let saved: Media | null | undefined;
 			const modifiers = getCropModifiers( cropper );
+
+			// A restore retargets the save at the lineage root; without one the
+			// current attachment is both source and target as before.
+			const targetId = restoredSource?.id ?? id;
+			const targetUrl = restoredSource?.url ?? media?.source_url;
+
+			// Both a fresh crop and a bare restore swap the block's image, so
+			// both offer an Undo back to the current attachment.
 			const previous =
-				modifiers.length > 0 && media
+				( modifiers.length > 0 || restoredSource ) && media
 					? {
 							id,
 							url: media.source_url,
@@ -120,10 +140,10 @@ export function useSaveMediaEditor( {
 				const metadataEdits = getMetadataEdits( pendingEdits, media );
 
 				saved = ( await apiFetch( {
-					path: `/wp/v2/media/${ id }/edit`,
+					path: `/wp/v2/media/${ targetId }/edit`,
 					method: 'POST',
 					data: {
-						src: media?.source_url,
+						src: targetUrl,
 						modifiers,
 						...metadataEdits,
 					},
@@ -138,6 +158,13 @@ export function useSaveMediaEditor( {
 						true
 					);
 				}
+			} else if ( restoredSource ) {
+				// Restore with no fresh crop: repoint the block at the original
+				// attachment, which already exists — no `/edit` request. Drop
+				// staged metadata edits, which were made against the cropped
+				// version the user is discarding.
+				clearEntityRecordEdits( 'postType', 'attachment', id );
+				saved = restoredSource.media;
 			} else {
 				saved = ( await saveEditedEntityRecord(
 					'postType',
@@ -200,6 +227,7 @@ export function useSaveMediaEditor( {
 		receiveEntityRecords,
 		registry,
 		removeAllNotices,
+		restoredSource,
 		saveEditedEntityRecord,
 	] );
 
