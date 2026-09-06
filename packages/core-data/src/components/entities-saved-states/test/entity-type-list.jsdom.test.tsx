@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesChanges } from '../entity-type-list';
 
 describe( 'GlobalStylesChanges', () => {
