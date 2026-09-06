@@ -42,6 +42,10 @@
 	font-weight: var(--_gcd-input-font-weight, inherit);
 	margin: var(--_gcd-input-margin, 0);
 
+	&::placeholder {
+		color: var(--_gcd-input-placeholder-color, var(--wpds-color-foreground-interactive-neutral-weak));
+	}
+
 	/* Also targets textarea elements, which the `Input` primitive can render as. We combine these textarea defenses
 	   into the input defenses to minimize the number of tokens, but they should be split if it ever becomes necessary. */
 	&:is(textarea, [type="text"], [type="password"], [type="color"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]) {
@@ -62,10 +66,6 @@
 			border-color: var(--_gcd-input-border-color-disabled, transparent);
 			box-shadow: var(--_gcd-input-box-shadow-disabled, none);
 			color: var(--_gcd-input-color-disabled, var(--wpds-color-foreground-interactive-neutral-disabled));
-		}
-
-		&::placeholder {
-			color: var(--_gcd-input-placeholder-color, var(--wpds-color-foreground-interactive-neutral-disabled));
 		}
 	}
 

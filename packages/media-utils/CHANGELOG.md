@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Preserve array-valued fields in multipart form data so grouped image-size sideload requests reach the REST API as arrays ([#82353](https://github.com/WordPress/gutenberg/pull/82353)).
+
 ## 5.54.0 (2026-08-26)
 
 ### Enhancements

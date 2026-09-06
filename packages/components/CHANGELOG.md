@@ -4,9 +4,12 @@
 
 ### Enhancements
 
+-   `ToggleGroupControl`: Honor the root `disabled` prop so the whole control is unselectable ([#82259](https://github.com/WordPress/gutenberg/pull/82259)).
+-   Validated form controls: Use `--wpds-color-stroke-interactive-error` for the invalid-state focus ring and border ([#82410](https://github.com/WordPress/gutenberg/pull/82410)).
 -   `Popover`: Widen `offset` to also accept an object with separate main and cross axis offsets. The same applies to `BorderBoxControl`'s `popoverOffset` prop ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
 -   `ToolsPanelItem`: Add `defaultShown` to show an optional item that has no value, and an `onShownChange` callback that fires only when the user toggles the item in the panel's menu ([#78010](https://github.com/WordPress/gutenberg/pull/78010)).
 -   `BorderBoxControl`: render the linked/unlinked toggle in a row alongside the label when a visible label is present, so it lines up with the equivalent toggle on sibling controls. Without a visible label the toggle stays beside the inputs, as before. The visible label is now a `BaseControl.VisualLabel`, so it renders as a `span` rather than a `label` element; it was never associated with an input in either form ([#82163](https://github.com/WordPress/gutenberg/pull/82163)).
+-   `TabPanel`: Updated to show outline via design system's mixin for focus ring instead of legacy box-shadow implementation ([#82421](https://github.com/WordPress/gutenberg/pull/82421)).
 
 ### Bug Fixes
 
@@ -18,6 +21,7 @@
 -   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `ItemGroup`: Drop the blanket `path { fill: currentColor }` rule that was overriding stroke-based icons' intended fill via inheritance bypass. Paths without an explicit fill still inherit `currentColor` from the surrounding SVG. Custom paths that specify a fill now retain it instead of being overridden by ItemGroup. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `Tip`: Preserve the intended yellow color after its icon became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   `Button`, `Placeholder`: Remove the obsolete `fill: CanvasText` override for forced colors mode. ([#82481](https://github.com/WordPress/gutenberg/pull/82481))
 
 ### Internal
 

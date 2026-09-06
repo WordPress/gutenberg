@@ -1,21 +1,19 @@
 import clsx from 'clsx';
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	MenuItemsChoice,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { desktop, mobile, tablet, external, check } from '@wordpress/icons';
+import { desktop, mobile, tablet } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem, store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-import { VisuallyHidden } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Menu } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
+import MoreMenuGroup from '../more-menu/more-menu-group';
+import MoreMenuItem from '../more-menu/more-menu-item';
 import { PostPreviewMenuItem } from '../post-preview-button';
 import { sidebars } from '../sidebar/constants';
 import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
@@ -23,7 +21,7 @@ import { unlock } from '../../lock-unlock';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
-export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
+function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 	const {
 		deviceType,
 		homeUrl,
@@ -87,8 +85,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		resetZoomLevel();
 	};
 
-	const handleResponsiveEditingChange = () => {
-		const newIsResponsiveEditing = ! isResponsiveEditing;
+	const handleResponsiveEditingChange = ( newIsResponsiveEditing ) => {
 		setResponsiveEditing( newIsResponsiveEditing );
 		setStyleStateViewport(
 			newIsResponsiveEditing
@@ -104,26 +101,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		) {
 			enableComplementaryArea( 'core', sidebars.block );
 		}
-	};
-
-	const isMobile = useViewportMatch( 'medium', '<' );
-	if ( isMobile ) {
-		return null;
-	}
-
-	const popoverProps = {
-		placement: 'bottom-end',
-	};
-	const toggleProps = {
-		className: 'editor-preview-dropdown__toggle',
-		iconPosition: 'right',
-		size: 'compact',
-		showTooltip: ! showIconLabels,
-		disabled,
-		accessibleWhenDisabled: disabled,
-	};
-	const menuProps = {
-		'aria-label': __( 'View options' ),
 	};
 
 	const deviceIcons = {
@@ -143,7 +120,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		{
 			value: 'Desktop',
 			label: __( 'Desktop' ),
-			icon: desktop,
 			info: isResponsiveEditing
 				? __( 'Style all viewports.' )
 				: __( 'Preview desktop viewport.' ),
@@ -153,7 +129,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 					{
 						value: 'Tablet',
 						label: __( 'Tablet' ),
-						icon: tablet,
 						info: isResponsiveEditing
 							? __( 'Style tablet only.' )
 							: __( 'Preview tablet viewport.' ),
@@ -165,7 +140,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 					{
 						value: 'Mobile',
 						label: __( 'Mobile' ),
-						icon: mobile,
 						info: isResponsiveEditing
 							? __( 'Style mobile only.' )
 							: __( 'Preview mobile viewport.' ),
@@ -175,69 +149,94 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	];
 
 	return (
-		<DropdownMenu
-			className={ clsx(
-				'editor-preview-dropdown',
-				`editor-preview-dropdown--${ deviceType.toLowerCase() }`,
-				{ 'is-responsive-editing': isResponsiveEditing }
-			) }
-			popoverProps={ popoverProps }
-			toggleProps={ toggleProps }
-			menuProps={ menuProps }
-			icon={ deviceIcons[ deviceType.toLowerCase() ] }
-			label={ __( 'View' ) }
-			disableOpenOnArrowDown={ disabled }
-		>
-			{ ( { onClose } ) => (
-				<>
-					<MenuGroup>
-						<MenuItemsChoice
-							choices={ choices }
-							value={ deviceType }
-							onSelect={ handleDevicePreviewChange }
-						/>
-					</MenuGroup>
-					{ isResponsiveEditingEnabled && (
-						<MenuGroup>
-							<MenuItem
-								icon={ isResponsiveEditing ? check : undefined }
-								isSelected={ isResponsiveEditing }
-								role="menuitemcheckbox"
-								onClick={ handleResponsiveEditingChange }
-								info={ __(
-									'Style changes apply only to the selected viewport.'
-								) }
+		<Menu.Root modal={ false } disabled={ disabled }>
+			<Menu.Trigger
+				render={
+					<Button
+						className={ clsx( 'editor-preview-dropdown__toggle', {
+							'is-responsive-editing': isResponsiveEditing,
+						} ) }
+						size="compact"
+						icon={ deviceIcons[ deviceType.toLowerCase() ] }
+						label={ __( 'View' ) }
+						showTooltip={ ! showIconLabels }
+						disabled={ disabled }
+						accessibleWhenDisabled={ disabled }
+					/>
+				}
+			/>
+			<Menu.Popup
+				className="editor-preview-dropdown__popup"
+				positioner={ <Menu.Positioner align="end" /> }
+			>
+				<Menu.RadioGroup
+					value={ deviceType }
+					onValueChange={ ( value ) =>
+						handleDevicePreviewChange( value )
+					}
+				>
+					<Menu.Group>
+						{ choices.map( ( choice ) => (
+							<Menu.RadioItem
+								key={ choice.value }
+								value={ choice.value }
 							>
-								{ __( 'Responsive styles' ) }
-							</MenuItem>
-						</MenuGroup>
-					) }
-					{ isTemplate && (
-						<MenuGroup>
-							<MenuItem
+								<Menu.ItemLabel>
+									{ choice.label }
+								</Menu.ItemLabel>
+								<Menu.ItemDescription>
+									{ choice.info }
+								</Menu.ItemDescription>
+							</Menu.RadioItem>
+						) ) }
+					</Menu.Group>
+				</Menu.RadioGroup>
+				{ isResponsiveEditingEnabled && (
+					<>
+						<Menu.Separator />
+						<Menu.Group>
+							<Menu.CheckboxItem
+								checked={ isResponsiveEditing }
+								onCheckedChange={
+									handleResponsiveEditingChange
+								}
+							>
+								<Menu.ItemLabel>
+									{ __( 'Responsive styles' ) }
+								</Menu.ItemLabel>
+								<Menu.ItemDescription>
+									{ __(
+										'Style changes apply only to the selected viewport.'
+									) }
+								</Menu.ItemDescription>
+							</Menu.CheckboxItem>
+						</Menu.Group>
+					</>
+				) }
+				{ isTemplate && (
+					<>
+						<Menu.Separator />
+						<Menu.Group>
+							<Menu.LinkItem
 								href={ homeUrl }
-								target="_blank"
-								icon={ external }
-								onClick={ onClose }
+								openInNewTab
+								closeOnClick
 							>
-								{ __( 'View site' ) }
-								<VisuallyHidden render={ <span /> }>
-									{
-										/* translators: accessibility text */
-										__( '(opens in a new tab)' )
-									}
-								</VisuallyHidden>
-							</MenuItem>
-						</MenuGroup>
-					) }
-					{ ! isTemplate && !! templateId && (
-						<MenuGroup>
-							<MenuItem
-								icon={ ! isTemplateHidden ? check : undefined }
-								isSelected={ ! isTemplateHidden }
-								role="menuitemcheckbox"
-								onClick={ () => {
-									const newRenderingMode = isTemplateHidden
+								<Menu.ItemLabel>
+									{ __( 'View site' ) }
+								</Menu.ItemLabel>
+							</Menu.LinkItem>
+						</Menu.Group>
+					</>
+				) }
+				{ ! isTemplate && !! templateId && (
+					<>
+						<Menu.Separator />
+						<Menu.Group>
+							<Menu.CheckboxItem
+								checked={ ! isTemplateHidden }
+								onCheckedChange={ ( checked ) => {
+									const newRenderingMode = checked
 										? 'template-locked'
 										: 'post-only';
 									setRenderingMode( newRenderingMode );
@@ -245,24 +244,39 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 									resetZoomLevel();
 								} }
 							>
-								{ __( 'Show template' ) }
-							</MenuItem>
-						</MenuGroup>
-					) }
-					{ isViewable && (
-						<MenuGroup>
+								<Menu.ItemLabel>
+									{ __( 'Show template' ) }
+								</Menu.ItemLabel>
+							</Menu.CheckboxItem>
+						</Menu.Group>
+					</>
+				) }
+				{ isViewable && (
+					<>
+						<Menu.Separator />
+						<Menu.Group>
 							<PostPreviewMenuItem
 								forceIsAutosaveable={ forceIsAutosaveable }
-								onPreview={ onClose }
 							/>
-						</MenuGroup>
-					) }
-					<ActionItem.Slot
-						name="core/plugin-preview-menu"
-						fillProps={ { onClick: onClose } }
-					/>
-				</>
-			) }
-		</DropdownMenu>
+						</Menu.Group>
+					</>
+				) }
+				<ActionItem.Slot
+					name="core/plugin-preview-menu"
+					fillProps={ { as: MoreMenuItem } }
+				>
+					{ ( items ) => <MoreMenuGroup>{ items }</MoreMenuGroup> }
+				</ActionItem.Slot>
+			</Menu.Popup>
+		</Menu.Root>
 	);
+}
+
+export default function PreviewDropdown( props ) {
+	const isMobile = useViewportMatch( 'medium', '<' );
+	if ( isMobile ) {
+		return null;
+	}
+
+	return <PreviewMenu { ...props } />;
 }

@@ -1,3 +1,4 @@
+import { useEvent } from '@wordpress/compose';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 
 /**
@@ -9,11 +10,10 @@ import { useCallback, useEffect, useRef } from '@wordpress/element';
  * and calls after unmount are silently ignored.
  *
  * @param validate Callback that performs the actual validation.
- *                 Stored in a ref — safe to pass an unstable closure.
+ *                 Wrapped in `useEvent`, so it can be an unstable closure.
  */
 export function useScheduleValidation( validate: () => void ) {
-	const validateRef = useRef( validate );
-	validateRef.current = validate;
+	const validateEvent = useEvent( validate );
 
 	const timerRef = useRef< ReturnType< typeof setTimeout > | null >( null );
 	const unmountedRef = useRef( false );
@@ -26,10 +26,10 @@ export function useScheduleValidation( validate: () => void ) {
 			clearTimeout( timerRef.current );
 		}
 		timerRef.current = setTimeout( () => {
-			validateRef.current();
+			validateEvent();
 			timerRef.current = null;
 		}, 0 );
-	}, [] );
+	}, [ validateEvent ] );
 
 	useEffect( () => {
 		unmountedRef.current = false;

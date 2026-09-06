@@ -12,6 +12,12 @@ export type ToggleGroupControlOptionBaseProps = {
 	isIcon?: boolean;
 	value: string | number;
 	/**
+	 * Whether this option is unselectable.
+	 *
+	 * @default false
+	 */
+	disabled?: boolean;
+	/**
 	 * Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
 	 * show the aria-label or the label prop text.
 	 *
@@ -22,7 +28,7 @@ export type ToggleGroupControlOptionBaseProps = {
 
 export type ToggleGroupControlOptionIconProps = Pick<
 	ToggleGroupControlOptionBaseProps,
-	'value'
+	'value' | 'disabled'
 > & {
 	/**
 	 * Icon displayed as the content of the option. Usually one of the icons from
@@ -37,7 +43,7 @@ export type ToggleGroupControlOptionIconProps = Pick<
 
 export type ToggleGroupControlOptionProps = Pick<
 	ToggleGroupControlOptionBaseProps,
-	'value' | 'showTooltip'
+	'value' | 'showTooltip' | 'disabled'
 > & {
 	/**
 	 * Label for the option. If needed, the `aria-label` prop can be used in addition
@@ -111,6 +117,8 @@ export type ToggleGroupControlProps = Pick<
 	children: ReactNode;
 	/**
 	 * Whether the control is disabled.
+	 *
+	 * @default false
 	 */
 	disabled?: boolean;
 	/**
@@ -137,10 +145,11 @@ export type ToggleGroupControlContextProps = {
 	value: ToggleGroupControlProps[ 'value' ];
 	setValue: ( newValue: string | number | undefined ) => void;
 	setSelectedElement: ( element: HTMLElement | undefined ) => void;
+	disabled: boolean;
 };
 
 export type ToggleGroupControlMainControlProps = Pick<
 	ToggleGroupControlProps,
-	'children' | 'isAdaptiveWidth' | 'label' | 'onChange' | 'value'
+	'children' | 'isAdaptiveWidth' | 'label' | 'onChange' | 'value' | 'disabled'
 > &
 	Pick< ToggleGroupControlContextProps, 'setSelectedElement' >;

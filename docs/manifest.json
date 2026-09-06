@@ -714,30 +714,6 @@
 		"parent": "core-blocks-text"
 	},
 	{
-		"title": "Input Field",
-		"slug": "core-block-form-input",
-		"markdown_source": "../packages/block-library/src/form-input/README.md",
-		"parent": "core-blocks-widgets"
-	},
-	{
-		"title": "Form Submission Notification",
-		"slug": "core-block-form-submission-notification",
-		"markdown_source": "../packages/block-library/src/form-submission-notification/README.md",
-		"parent": "core-blocks-widgets"
-	},
-	{
-		"title": "Form Submit Button",
-		"slug": "core-block-form-submit-button",
-		"markdown_source": "../packages/block-library/src/form-submit-button/README.md",
-		"parent": "core-blocks-widgets"
-	},
-	{
-		"title": "Form",
-		"slug": "core-block-form",
-		"markdown_source": "../packages/block-library/src/form/README.md",
-		"parent": "core-blocks-widgets"
-	},
-	{
 		"title": "Classic",
 		"slug": "core-block-freeform",
 		"markdown_source": "../packages/block-library/src/freeform/README.md",
