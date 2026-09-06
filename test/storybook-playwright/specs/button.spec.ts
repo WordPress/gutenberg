@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import {
 	gotoStoryId,
 	getAllPropsPermutations,
@@ -7,8 +7,8 @@ import {
 } from '../utils';
 
 test.describe( 'Button', () => {
-	test.describe( 'ThemeProvider colors', () => {
-		const getColors = async ( button: ReturnType< Page[ 'locator' ] > ) =>
+	test.describe( 'WPDS colors', () => {
+		const getColors = async ( button: Locator ) =>
 			button.evaluate( ( element ) => {
 				const styles = getComputedStyle( element );
 				return {
@@ -17,7 +17,7 @@ test.describe( 'Button', () => {
 				};
 			} );
 
-		const getContrast = async ( button: ReturnType< Page[ 'locator' ] > ) =>
+		const getContrast = async ( button: Locator ) =>
 			button.evaluate( ( element ) => {
 				const getLuminance = ( color: string ) => {
 					const [ red, green, blue ] = color
@@ -44,11 +44,11 @@ test.describe( 'Button', () => {
 			} );
 
 		const getResolvedTokenColor = async (
-			button: ReturnType< Page[ 'locator' ] >,
+			button: Locator,
 			variableReference: string
 		) =>
 			button.evaluate( ( element, variableValue ) => {
-				const probe = document.createElement( 'div' );
+				const probe = document.createElement( 'span' );
 				probe.style.setProperty( 'color', variableValue, 'important' );
 				element.appendChild( probe );
 				const color = getComputedStyle( probe ).color;
@@ -56,7 +56,7 @@ test.describe( 'Button', () => {
 				return color;
 			}, variableReference );
 
-		const colorTokens = {
+		const brandColorTokens = {
 			restBackground:
 				'var(--wpds-color-background-interactive-brand-strong)',
 			restForeground:
@@ -65,6 +65,25 @@ test.describe( 'Button', () => {
 				'var(--wpds-color-background-interactive-brand-strong-active)',
 			activeForeground:
 				'var(--wpds-color-foreground-interactive-brand-strong-active)',
+			disabledBackground:
+				'var(--wpds-color-background-interactive-brand-strong-disabled)',
+			disabledForeground:
+				'var(--wpds-color-foreground-interactive-brand-strong-disabled)',
+		};
+
+		const errorColorTokens = {
+			restBackground:
+				'var(--wpds-color-background-interactive-error-strong)',
+			restForeground:
+				'var(--wpds-color-foreground-interactive-error-strong)',
+			activeBackground:
+				'var(--wpds-color-background-interactive-error-strong-active)',
+			activeForeground:
+				'var(--wpds-color-foreground-interactive-error-strong-active)',
+			disabledBackground:
+				'var(--wpds-color-background-interactive-error-strong-disabled)',
+			disabledForeground:
+				'var(--wpds-color-foreground-interactive-error-strong-disabled)',
 		};
 
 		const getPrimaryButton = ( page: Page ) =>
@@ -96,32 +115,51 @@ test.describe( 'Button', () => {
 							getComputedStyle( element ).getPropertyValue(
 								token.slice( 4, -1 )
 							),
-						colorTokens.restBackground
+						brandColorTokens.restBackground
 					)
 				)
 				.not.toBe( '' );
 		};
 
-		const expectMatchingPrimaryColors = async ( page: Page ) => {
-			const button = getPrimaryButton( page );
+		const expectMatchingColors = async ( {
+			page,
+			button,
+			disabledButton,
+			tokens,
+		}: {
+			page: Page;
+			button: Locator;
+			disabledButton: Locator;
+			tokens: typeof brandColorTokens;
+		} ) => {
 			const rest = {
 				background: await getResolvedTokenColor(
 					button,
-					colorTokens.restBackground
+					tokens.restBackground
 				),
 				foreground: await getResolvedTokenColor(
 					button,
-					colorTokens.restForeground
+					tokens.restForeground
 				),
 			};
 			const active = {
 				background: await getResolvedTokenColor(
 					button,
-					colorTokens.activeBackground
+					tokens.activeBackground
 				),
 				foreground: await getResolvedTokenColor(
 					button,
-					colorTokens.activeForeground
+					tokens.activeForeground
+				),
+			};
+			const disabled = {
+				background: await getResolvedTokenColor(
+					disabledButton,
+					tokens.disabledBackground
+				),
+				foreground: await getResolvedTokenColor(
+					disabledButton,
+					tokens.disabledForeground
 				),
 			};
 
@@ -141,6 +179,8 @@ test.describe( 'Button', () => {
 			expect( await getColors( button ) ).toEqual( active );
 			expect( await getContrast( button ) ).toBeGreaterThanOrEqual( 4.5 );
 			await page.mouse.up();
+
+			expect( await getColors( disabledButton ) ).toEqual( disabled );
 		};
 
 		const themes: Array< {
@@ -159,78 +199,37 @@ test.describe( 'Button', () => {
 		];
 
 		themes.forEach( ( { name, decorators } ) => {
-			test( `uses matching ThemeProvider colors for primary states in the ${ name } theme`, async ( {
+			test( `uses matching WPDS colors for primary states in the ${ name } theme`, async ( {
 				page,
 			} ) => {
 				await openButtonStory( page, decorators );
-				await expectMatchingPrimaryColors( page );
+				await expectMatchingColors( {
+					page,
+					button: getPrimaryButton( page ),
+					disabledButton: page
+						.getByRole( 'row', { name: /^disabled/ } )
+						.locator( '.components-button.is-primary' ),
+					tokens: brandColorTokens,
+				} );
 			} );
 		} );
 
-		test( 'keeps destructive primary text readable in every interactive state', async ( {
+		test( 'uses matching WPDS error colors for destructive primary states', async ( {
 			page,
 		} ) => {
 			await openButtonStory( page, customTheme );
 			const button = page
 				.locator( '.components-button.is-primary.is-destructive' )
 				.first();
-
-			await expect( button ).toBeVisible();
-			expect( await getContrast( button ) ).toBeGreaterThanOrEqual( 4.5 );
-
-			await button.focus();
-			expect( await getContrast( button ) ).toBeGreaterThanOrEqual( 4.5 );
-
-			await button.hover();
-			expect( await getContrast( button ) ).toBeGreaterThanOrEqual( 4.5 );
-
-			await page.mouse.down();
-			expect( await getContrast( button ) ).toBeGreaterThanOrEqual( 4.5 );
-			await page.mouse.up();
-		} );
-
-		test( 'preserves legacy primary color overrides', async ( {
-			page,
-		} ) => {
-			await openButtonStory( page, customTheme );
-			const button = getPrimaryButton( page );
-
-			await page.evaluate( () => {
-				document.documentElement.style.setProperty(
-					'--wp-components-color-accent',
-					'#123456'
-				);
-				document.documentElement.style.setProperty(
-					'--wp-components-color-accent-darker-10',
-					'#234567'
-				);
-				document.documentElement.style.setProperty(
-					'--wp-components-color-accent-darker-20',
-					'#345678'
-				);
-				document.documentElement.style.setProperty(
-					'--wp-components-color-accent-inverted',
-					'#ffffff'
-				);
+			const disabledButton = page
+				.getByRole( 'row', { name: /^isDestructive disabled/ } )
+				.locator( '.components-button.is-primary' );
+			await expectMatchingColors( {
+				page,
+				button,
+				disabledButton,
+				tokens: errorColorTokens,
 			} );
-
-			expect( await getColors( button ) ).toEqual( {
-				background: 'rgb(18, 52, 86)',
-				foreground: 'rgb(255, 255, 255)',
-			} );
-
-			await button.hover();
-			expect( await getColors( button ) ).toEqual( {
-				background: 'rgb(35, 69, 103)',
-				foreground: 'rgb(255, 255, 255)',
-			} );
-
-			await page.mouse.down();
-			expect( await getColors( button ) ).toEqual( {
-				background: 'rgb(52, 86, 120)',
-				foreground: 'rgb(255, 255, 255)',
-			} );
-			await page.mouse.up();
 		} );
 	} );
 

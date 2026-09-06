@@ -59,19 +59,15 @@
 
 	&.is-primary {
 		white-space: nowrap;
-		background: $components-button-color-background-primary;
-		color: $components-button-color-foreground-primary;
+		background: var(--wpds-color-background-interactive-brand-strong);
+		color: var(--wpds-color-foreground-interactive-brand-strong);
 		text-decoration: none;
 		text-shadow: none;
 
-		&:hover:not(:disabled) {
-			background: $components-button-color-background-primary-hover;
-			color: $components-button-color-foreground-primary-active;
-		}
-
+		&:hover:not(:disabled),
 		&:active:not(:disabled) {
-			background: $components-button-color-background-primary-active;
-			color: $components-button-color-foreground-primary-active;
+			background: var(--wpds-color-background-interactive-brand-strong-active);
+			color: var(--wpds-color-foreground-interactive-brand-strong-active);
 		}
 
 		&:disabled,
@@ -79,23 +75,22 @@
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
-			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
-			color: rgba($white, 0.4);
-			background: $components-color-accent;
+			color: var(--wpds-color-foreground-interactive-brand-strong-disabled);
+			background: var(--wpds-color-background-interactive-brand-strong-disabled);
 		}
 
 		&.is-busy,
 		&.is-busy:disabled,
 		&.is-busy[aria-disabled="true"] {
-			color: $components-button-color-foreground-primary;
+			color: var(--wpds-color-foreground-interactive-brand-strong);
 			background-size: 100px 100%;
 			/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
 			background-image: linear-gradient(
 				-45deg,
-				$components-button-color-background-primary 33%,
-				$components-button-color-background-primary-active 33%,
-				$components-button-color-background-primary-active 70%,
-				$components-button-color-background-primary 70%
+				var(--wpds-color-background-interactive-brand-strong) 33%,
+				var(--wpds-color-background-interactive-brand-strong-active) 33%,
+				var(--wpds-color-background-interactive-brand-strong-active) 70%,
+				var(--wpds-color-background-interactive-brand-strong) 70%
 			);
 			/* stylelint-enable */
 		}
@@ -184,10 +179,6 @@
 		--wp-components-color-accent-darker-10: #{color.adjust($alert-red, $lightness: -10%)};
 		--wp-components-color-accent-darker-20: #{color.adjust($alert-red, $lightness: -20%)};
 
-		&.is-primary:not(:disabled, [aria-disabled="true"]) {
-			color: $components-button-color-foreground-destructive;
-		}
-
 		// Only the default variant is styled differently from the non-destructive counterparts.
 		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link) {
 			color: $alert-red;
@@ -203,6 +194,44 @@
 			&:disabled,
 			&[aria-disabled="true"] {
 				color: $gray-600;
+			}
+		}
+
+		&.is-primary {
+			background: var(--wpds-color-background-interactive-error-strong);
+			color: var(--wpds-color-foreground-interactive-error-strong);
+
+			&:hover:not(:disabled),
+			&:active:not(:disabled) {
+				background: var(--wpds-color-background-interactive-error-strong-active);
+				color: var(--wpds-color-foreground-interactive-error-strong-active);
+			}
+
+			&:disabled,
+			&:disabled:active:enabled,
+			&[aria-disabled="true"],
+			&[aria-disabled="true"]:enabled,
+			&[aria-disabled="true"]:active:enabled {
+				color: var(--wpds-color-foreground-interactive-error-strong-disabled);
+				background: var(--wpds-color-background-interactive-error-strong-disabled);
+			}
+
+			&.is-busy,
+			&.is-busy:disabled,
+			&.is-busy[aria-disabled="true"] {
+				color: var(--wpds-color-foreground-interactive-error-strong);
+				background-size: 100px 100%;
+				/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
+				background-image: linear-gradient(
+					-45deg,
+					var(--wpds-color-background-interactive-error-strong) 33%,
+					var(--wpds-color-background-interactive-error-strong-active)
+						33%,
+					var(--wpds-color-background-interactive-error-strong-active)
+						70%,
+					var(--wpds-color-background-interactive-error-strong) 70%
+				);
+				/* stylelint-enable */
 			}
 		}
 

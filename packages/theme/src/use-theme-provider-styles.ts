@@ -35,21 +35,18 @@ const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
 const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
 
 const legacyWpComponentsOverridesCSS: Entry[] = [
+	[ '--wp-components-color-accent', 'var(--wp-admin-theme-color)' ],
 	[
-		'--wp-components-button-color-background-primary',
-		'var(--wpds-color-background-interactive-brand-strong)',
+		'--wp-components-color-accent-darker-10',
+		'var(--wp-admin-theme-color-darker-10)',
 	],
 	[
-		'--wp-components-button-color-background-primary-active',
-		'var(--wpds-color-background-interactive-brand-strong-active)',
+		'--wp-components-color-accent-darker-20',
+		'var(--wp-admin-theme-color-darker-20)',
 	],
 	[
-		'--wp-components-button-color-foreground-primary',
+		'--wp-components-color-accent-inverted',
 		'var(--wpds-color-foreground-interactive-brand-strong)',
-	],
-	[
-		'--wp-components-button-color-foreground-primary-active',
-		'var(--wpds-color-foreground-interactive-brand-strong-active)',
 	],
 	[
 		'--wp-components-color-background',
