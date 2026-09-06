@@ -28,16 +28,6 @@
 	align-items: start;
 }
 
-.workflows-workflow-menu__header {
-	padding: 0 $grid-unit-20;
-}
-
-.workflows-workflow-menu__header-search-icon {
-	&:dir(ltr) {
-		transform: scaleX(-1);
-	}
-}
-
 .workflows-workflow-menu__container {
 	// the style here is a hack to force safari to repaint to avoid a style glitch
 	will-change: transform;
@@ -45,89 +35,26 @@
 	&:focus {
 		outline: none;
 	}
+}
 
-	[cmdk-input] {
-		border: none;
-		width: 100%;
-		padding: $grid-unit-20 $grid-unit-05;
+.workflows-workflow-menu__input {
+	border: none;
+	margin: $grid-unit-10 0;
+
+	&:focus-within {
 		outline: none;
-		color: $gray-900;
-		margin: 0;
-		font-size: 15px;
-		line-height: 28px;
-		border-radius: 0;
-
-		&::placeholder {
-			color: $gray-700;
-		}
-
-		&:focus {
-			box-shadow: none;
-			outline: none;
-		}
-	}
-
-	[cmdk-item] {
-		border-radius: $radius-small;
-		cursor: var(--wpds-cursor-control);
-		display: flex;
-		align-items: center;
-		color: $gray-900;
-		font-size: $default-font-size;
-
-		&[aria-selected="true"],
-		&:active {
-			background: var(--wp-admin-theme-color);
-			color: $white;
-		}
-
-		&[aria-disabled="true"] {
-			color: $gray-600;
-			cursor: not-allowed;
-		}
-
-		> div {
-			min-height: $button-size-next-default-40px;
-			padding: $grid-unit-05;
-			padding-left: $grid-unit-20;
-		}
-	}
-
-	[cmdk-root] > [cmdk-list] {
-		max-height: 376px; // Specific to not have workflows overflow oddly.
-		overflow: auto;
-
-		// Ensures there is always padding bottom on the last group, when there are workflows.
-		&
-		[cmdk-list-sizer] > [cmdk-group]:last-child
-		[cmdk-group-items]:not(:empty) {
-			padding-bottom: $grid-unit-10;
-		}
-
-		& [cmdk-list-sizer] > [cmdk-group] > [cmdk-group-items]:not(:empty) {
-			padding: 0 $grid-unit-10;
-		}
-	}
-
-	[cmdk-empty] {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		white-space: pre-wrap;
-		color: $gray-900;
-		padding: $grid-unit-10 0 $grid-unit-40;
-	}
-
-	[cmdk-loading] {
-		padding: $grid-unit-20;
-	}
-
-	[cmdk-list-sizer] {
-		position: relative;
 	}
 }
 
-.workflows-workflow-menu__item span {
+.workflows-workflow-menu__list {
+	max-height: 376px; // Specific to not have workflows overflow oddly.
+}
+
+.workflows-workflow-menu__list-body {
+	padding: 0 $grid-unit-10 $grid-unit-10;
+}
+
+.workflows-workflow-menu__item-label {
 	// Ensure workflows do not run off the edge (great for post titles).
 	display: inline-block;
 	overflow: hidden;
@@ -195,8 +122,8 @@
 	}
 }
 
-.workflows-workflow-menu__executing {
-	padding: $grid-unit-30 $grid-unit-20;
-	color: $gray-700;
-	font-size: 14px;
+.workflows-workflow-menu__empty:not(:empty),
+.workflows-workflow-menu__executing:not(:empty) {
+	justify-content: center;
+	padding: $grid-unit-10 0 $grid-unit-20;
 }

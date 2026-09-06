@@ -1,18 +1,14 @@
-import { Command, useCommandState } from 'cmdk';
+import { Autocomplete, Icon, Input, InputLayout } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect, useRef, useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import {
-	Modal,
-	TextHighlight,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { __, isRTL } from '@wordpress/i18n';
+import { Modal, TextHighlight } from '@wordpress/components';
 import {
 	store as keyboardShortcutsStore,
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
 import { withIgnoreIMEEvents } from '@wordpress/keycodes';
-import { Icon, search as inputIcon } from '@wordpress/icons';
+import { search as inputIcon } from '@wordpress/icons';
 import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
 import './workflow-menu.scss';
 
@@ -21,31 +17,6 @@ import './workflow-menu.scss';
  */
 const EMPTY_ARRAY = [];
 const inputLabel = __( 'Run abilities and workflows' );
-
-function WorkflowInput( { isOpen, search, setSearch, abilities } ) {
-	const workflowMenuInput = useRef();
-	const _value = useCommandState( ( state ) => state.value );
-	const selectedItemId = useMemo( () => {
-		// Find the ability whose label matches the selected value
-		const ability = abilities.find( ( a ) => a.label === _value );
-		return ability?.name;
-	}, [ _value, abilities ] );
-	useEffect( () => {
-		// Focus the workflow palette input when mounting the modal.
-		if ( isOpen ) {
-			workflowMenuInput.current.focus();
-		}
-	}, [ isOpen ] );
-	return (
-		<Command.Input
-			ref={ workflowMenuInput }
-			value={ search }
-			onValueChange={ setSearch }
-			placeholder={ inputLabel }
-			aria-activedescendant={ selectedItemId }
-		/>
-	);
-}
 
 /**
  * @ignore
@@ -57,6 +28,7 @@ export function WorkflowMenu() {
 	const [ abilityOutput, setAbilityOutput ] = useState( null );
 	const [ isExecuting, setIsExecuting ] = useState( false );
 	const containerRef = useRef();
+	const inputRef = useRef();
 
 	const abilities = useSelect( ( select ) => {
 		const allAbilities = select( abilitiesStore ).getAbilities();
@@ -81,6 +53,12 @@ export function WorkflowMenu() {
 			containerRef.current.focus();
 		}
 	}, [ abilityOutput ] );
+
+	useEffect( () => {
+		if ( isOpen && ! abilityOutput ) {
+			inputRef.current?.focus();
+		}
+	}, [ isOpen, abilityOutput ] );
 
 	useEffect( () => {
 		registerShortcut( {
@@ -174,6 +152,9 @@ export function WorkflowMenu() {
 		return null;
 	}
 
+	const items = isExecuting ? EMPTY_ARRAY : filteredAbilities;
+	const showEmpty = ! isExecuting && !! search && ! filteredAbilities.length;
+
 	return (
 		<Modal
 			className="workflows-workflow-menu"
@@ -217,61 +198,73 @@ export function WorkflowMenu() {
 						</div>
 					</div>
 				) : (
-					<Command label={ inputLabel } shouldFilter={ false }>
-						<HStack className="workflows-workflow-menu__header">
-							<Icon
-								className="workflows-workflow-menu__header-search-icon"
-								icon={ inputIcon }
-							/>
-							<WorkflowInput
-								search={ search }
-								setSearch={ setSearch }
-								isOpen={ isOpen }
-								abilities={ abilities }
-							/>
-						</HStack>
-						<Command.List label={ __( 'Workflow suggestions' ) }>
-							{ isExecuting && (
-								<HStack
-									className="workflows-workflow-menu__executing"
-									align="center"
-								>
-									{ __( 'Executing ability…' ) }
-								</HStack>
-							) }
-							{ ! isExecuting &&
-								search &&
-								filteredAbilities.length === 0 && (
-									<Command.Empty>
-										{ __( 'No results found.' ) }
-									</Command.Empty>
-								) }
-							{ ! isExecuting && filteredAbilities.length > 0 && (
-								<Command.Group>
-									{ filteredAbilities.map( ( ability ) => (
-										<Command.Item
-											key={ ability.name }
-											value={ ability.label }
+					<Autocomplete.Root
+						items={ items }
+						mode="none"
+						value={ search }
+						onValueChange={ setSearch }
+						open
+						inline
+						autoHighlight="always"
+					>
+						<Autocomplete.Input
+							ref={ inputRef }
+							placeholder={ inputLabel }
+							aria-label={ inputLabel }
+							className="workflows-workflow-menu__input"
+							render={
+								<Input
+									prefix={
+										<InputLayout.Slot>
+											<Icon
+												icon={ inputIcon }
+												style={
+													isRTL()
+														? undefined
+														: {
+																transform:
+																	'scaleX(-1)',
+														  }
+												}
+											/>
+										</InputLayout.Slot>
+									}
+								/>
+							}
+						/>
+						<Autocomplete.Status className="workflows-workflow-menu__executing">
+							{ isExecuting ? __( 'Executing ability…' ) : null }
+						</Autocomplete.Status>
+						<Autocomplete.Empty className="workflows-workflow-menu__empty">
+							{ showEmpty ? __( 'No results found.' ) : null }
+						</Autocomplete.Empty>
+						<Autocomplete.List
+							className="workflows-workflow-menu__list"
+							aria-label={ __( 'Workflow suggestions' ) }
+						>
+							<Autocomplete.ListBody className="workflows-workflow-menu__list-body">
+								<Autocomplete.Collection>
+									{ ( item ) => (
+										<Autocomplete.Item
+											key={ item.name }
+											value={ item }
 											className="workflows-workflow-menu__item"
-											onSelect={ () =>
-												handleExecuteAbility( ability )
+											onClick={ () =>
+												handleExecuteAbility( item )
 											}
-											id={ ability.name }
 										>
-											<HStack alignment="left">
-												<span>
-													<TextHighlight
-														text={ ability.label }
-														highlight={ search }
-													/>
-												</span>
-											</HStack>
-										</Command.Item>
-									) ) }
-								</Command.Group>
-							) }
-						</Command.List>
-					</Command>
+											<span className="workflows-workflow-menu__item-label">
+												<TextHighlight
+													text={ item.label }
+													highlight={ search }
+												/>
+											</span>
+										</Autocomplete.Item>
+									) }
+								</Autocomplete.Collection>
+							</Autocomplete.ListBody>
+						</Autocomplete.List>
+					</Autocomplete.Root>
 				) }
 			</div>
 		</Modal>

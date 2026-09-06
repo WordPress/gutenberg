@@ -8062,9 +8062,6 @@
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		},
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

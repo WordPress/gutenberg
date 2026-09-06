@@ -57,7 +57,7 @@
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/private-apis": "file:../private-apis",
-		"cmdk": "^1.0.0"
+		"@wordpress/ui": "file:../ui"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",
