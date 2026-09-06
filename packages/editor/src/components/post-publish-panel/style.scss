@@ -60,6 +60,7 @@
 	display: block;
 	color: $gray-700;
 	font-size: $helptext-font-size;
+	word-break: normal;
 	overflow-wrap: anywhere;
 }
 
@@ -126,7 +127,8 @@
 .post-publish-panel__postpublish .components-panel__body {
 	border-bottom: $border-width solid $gray-200;
 	border-top: none;
-	overflow-wrap: break-word;
+	word-break: normal;
+	overflow-wrap: anywhere;
 }
 
 .post-publish-panel__postpublish-buttons {
