@@ -70,7 +70,10 @@ export default function FormRegularField< Item >( {
 		( fieldDef ) => fieldDef.id === field.id
 	);
 
-	if ( ! fieldDefinition || ! fieldDefinition.Edit ) {
+	if (
+		! fieldDefinition ||
+		( fieldDefinition.readOnly !== true && ! fieldDefinition.Edit )
+	) {
 		return null;
 	}
 
@@ -98,15 +101,17 @@ export default function FormRegularField< Item >( {
 							field={ fieldDefinition }
 						/>
 					) : (
-						<fieldDefinition.Edit
-							key={ fieldDefinition.id }
-							data={ data }
-							field={ fieldDefinition }
-							onChange={ onChange }
-							hideLabelFromVision
-							markWhenOptional={ markWhenOptional }
-							validity={ validity }
-						/>
+						fieldDefinition.Edit && (
+							<fieldDefinition.Edit
+								key={ fieldDefinition.id }
+								data={ data }
+								field={ fieldDefinition }
+								onChange={ onChange }
+								hideLabelFromVision
+								markWhenOptional={ markWhenOptional }
+								validity={ validity }
+							/>
+						)
 					) }
 				</div>
 			</Stack>
@@ -130,16 +135,20 @@ export default function FormRegularField< Item >( {
 					</>
 				</>
 			) : (
-				<fieldDefinition.Edit
-					data={ data }
-					field={ fieldDefinition }
-					onChange={ onChange }
-					hideLabelFromVision={
-						labelPosition === 'none' ? true : hideLabelFromVision
-					}
-					markWhenOptional={ markWhenOptional }
-					validity={ validity }
-				/>
+				fieldDefinition.Edit && (
+					<fieldDefinition.Edit
+						data={ data }
+						field={ fieldDefinition }
+						onChange={ onChange }
+						hideLabelFromVision={
+							labelPosition === 'none'
+								? true
+								: hideLabelFromVision
+						}
+						markWhenOptional={ markWhenOptional }
+						validity={ validity }
+					/>
+				)
 			) }
 		</div>
 	);

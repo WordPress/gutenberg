@@ -98,6 +98,59 @@ const fieldsSelector = {
 
 describe( 'DataForm component', () => {
 	describe( 'in regular mode', () => {
+		it.each( [ 'top', 'side', 'none' ] as const )(
+			'renders a read-only field without an edit control with %s labels',
+			( labelPosition ) => {
+				render(
+					<Dataform
+						onChange={ noop }
+						fields={ [
+							{
+								id: 'status',
+								label: 'Account status',
+								readOnly: true,
+								render: () => <span>Account connected</span>,
+							},
+						] }
+						form={ {
+							layout: { type: 'regular', labelPosition },
+							fields: [ 'status' ],
+						} }
+						data={ {} }
+					/>
+				);
+
+				expect( screen.getByText( 'Account connected' ) ).toBeVisible();
+				expect(
+					screen.queryAllByText( 'Account status' )
+				).toHaveLength( labelPosition === 'none' ? 0 : 1 );
+			}
+		);
+
+		it( 'keeps an editable field without an edit control hidden', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'status',
+							label: 'Account status',
+							render: () => <span>Account connected</span>,
+						},
+					] }
+					form={ { fields: [ 'status' ] } }
+					data={ {} }
+				/>
+			);
+
+			expect(
+				screen.queryByText( 'Account connected' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Account status' )
+			).not.toBeInTheDocument();
+		} );
+
 		it( 'should display fields', () => {
 			render(
 				<Dataform
