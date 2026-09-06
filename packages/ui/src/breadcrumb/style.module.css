@@ -1,0 +1,123 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			position: relative;
+			display: block;
+			min-inline-size: 0;
+			max-inline-size: 100%;
+		}
+
+		.list {
+			--wp-ui-breadcrumb-ring-space: var(--wpds-dimension-padding-xs);
+
+			display: flex;
+			align-items: center;
+			min-inline-size: 0;
+			min-block-size: calc(var(--wpds-dimension-size-sm) + var(--wp-ui-breadcrumb-ring-space) * 2);
+			max-inline-size: 100%;
+			margin: 0;
+			padding-block: var(--wp-ui-breadcrumb-ring-space);
+			padding-inline: var(--wp-ui-breadcrumb-ring-space);
+			overflow-x: auto;
+			overflow-y: hidden;
+			list-style: none;
+			white-space: nowrap;
+		}
+
+		.item {
+			display: flex;
+			flex: 0 0 auto;
+			align-items: center;
+			min-inline-size: 0;
+		}
+
+		.label {
+			font-family: var(--wpds-typography-font-family-body);
+			font-size: var(--wpds-typography-font-size-md);
+			font-weight: var(--wpds-typography-font-weight-default);
+			line-height: var(--wpds-typography-line-height-sm);
+			white-space: nowrap;
+		}
+
+		.link {
+			display: inline-block;
+			min-inline-size: 0;
+			max-inline-size: 100%;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.current-item {
+			max-inline-size: 100%;
+		}
+
+		.current-item--truncating {
+			flex: 1 1 auto;
+		}
+
+		.current {
+			display: block;
+			min-inline-size: 0;
+			max-inline-size: 100%;
+			overflow: hidden;
+			color: var(--wpds-color-foreground-content-neutral);
+			text-overflow: ellipsis;
+		}
+
+		.separator {
+			flex: 0 0 auto;
+			padding-inline: var(--wpds-dimension-gap-sm);
+			color: var(--wpds-color-stroke-surface-neutral-strong);
+			user-select: none;
+
+			@media (forced-colors: active) {
+				color: CanvasText;
+			}
+		}
+
+		.measurement {
+			position: absolute;
+			inset-block-start: 0;
+			inset-inline-start: 0;
+			visibility: hidden;
+			inline-size: 0;
+			block-size: 0;
+			overflow: hidden;
+			pointer-events: none;
+		}
+
+		.measurement-row,
+		.measurement-item,
+		.measurement-content {
+			display: inline-flex;
+			align-items: center;
+			inline-size: max-content;
+		}
+
+		.measurement-label {
+			display: inline-block;
+			max-inline-size: none;
+			overflow: visible;
+			color: var(--wpds-color-foreground-content-neutral);
+		}
+
+		.measurement-overflow-trigger {
+			position: absolute;
+			inset-block-start: 0;
+			inset-inline-start: 0;
+		}
+
+		.root .list {
+			--_gcd-ol-padding-block: var(--wp-ui-breadcrumb-ring-space);
+			--_gcd-ol-padding-inline: var(--wp-ui-breadcrumb-ring-space);
+		}
+	}
+
+	@layer compositions {
+		.overflow-trigger {
+			--wp-ui-button-min-width: unset;
+		}
+	}
+}

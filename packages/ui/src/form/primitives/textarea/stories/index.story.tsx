@@ -24,6 +24,7 @@ type Story = StoryObj< typeof Textarea >;
 export const Default: Story = {
 	args: {
 		placeholder: 'Placeholder',
+		'aria-label': 'Value',
 	},
 };
 

@@ -1,9 +1,12 @@
+import { describe, expect, test, vi } from 'vitest';
 import { getCollaboratorDisplayName } from '../get-collaborator-display-name';
 
-jest.mock( '@wordpress/i18n', () => ( {
-	...jest.requireActual( '@wordpress/i18n' ),
-	__: ( text: string ) =>
-		'Anonymous User' === text ? 'Translated Anonymous User' : text,
+vi.mock( import( '@wordpress/i18n' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	__: ( ( text: string ) =>
+		'Anonymous User' === text
+			? 'Translated Anonymous User'
+			: text ) as typeof import('@wordpress/i18n').__,
 } ) );
 
 describe( 'getCollaboratorDisplayName', () => {

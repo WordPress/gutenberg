@@ -17,7 +17,6 @@
 		{ "path": "../../packages/data" },
 		{ "path": "../../packages/dataviews/tsconfig.build.json" },
 		{ "path": "../../packages/element/tsconfig.build.json" },
-		{ "path": "../../packages/hooks" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
 		{ "path": "../../packages/icons/tsconfig.build.json" },
 		{ "path": "../../packages/notices/tsconfig.build.json" },
@@ -25,7 +24,6 @@
 		{ "path": "../../packages/route" },
 		{ "path": "../../packages/ui/tsconfig.build.json" },
 		{ "path": "../../packages/viewport" },
-		{ "path": "../../packages/warning" },
 		{ "path": "../../packages/widget-dashboard/tsconfig.build.json" },
 		{ "path": "../../packages/widget-primitives/tsconfig.build.json" }
 	],

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { serialize, to, HSL, sRGB } from 'colorjs.io/fn';
 import { buildAccentRamp, buildBgRamp, checkAccessibleCombinations } from '..';
 import { buildRamp } from '../lib';

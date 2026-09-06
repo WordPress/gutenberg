@@ -53,7 +53,6 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/warning": "file:../warning",
 		"clsx": "^2.1.1",
 		"cmdk": "^1.0.0"
 	},

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { UploadError } from '../upload-error';
 
 describe( 'UploadError', () => {

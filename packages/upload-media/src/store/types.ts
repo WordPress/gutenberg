@@ -64,6 +64,15 @@ export interface State {
 	queueStatus: QueueStatus;
 	blobUrls: Record< QueueItemId, string[] >;
 	settings: Settings;
+	/**
+	 * Running tally of top-level items cancelled because they failed.
+	 *
+	 * Cancelled items leave the queue exactly like successful ones, so this is
+	 * the only record that an upload did not make it. It only ever increases;
+	 * consumers interested in a single batch compare it against its value when
+	 * that batch started.
+	 */
+	failureCount: number;
 }
 
 export enum Type {

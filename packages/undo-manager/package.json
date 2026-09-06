@@ -47,7 +47,8 @@
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal"
 	},
 	"devDependencies": {
-		"@types/node": "^20.19.39"
+		"@types/node": "^20.19.39",
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -56,7 +56,6 @@
 		"@wordpress/grid": "file:../grid",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
-		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"@wordpress/ui": "file:../ui",
@@ -73,7 +72,9 @@
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1",
 		"@types/jest": "^30.0.0",
-		"storybook": "^10.5.3"
+		"@wordpress/admin-ui": "file:../admin-ui",
+		"storybook": "^10.5.3",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

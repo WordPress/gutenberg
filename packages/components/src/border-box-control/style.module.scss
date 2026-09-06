@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .linked-border-control {
 	/* Preserve the original `&&` specificity so this beats BorderControl's margin reset. */
 	&#{&} {
@@ -6,14 +8,43 @@
 	}
 }
 
+/* No inline-end gutter is needed when the toggle sits in the header row. */
+.linked-border-control-full-width {
+	&#{&} {
+		margin-inline-end: 0;
+	}
+}
+
+/* The label row the linked/unlinked toggle joins when a visible label is
+   rendered. Laid out as a content-driven grid like `BoxControl`'s label row, so
+   a label that wraps grows the row rather than overflowing a fixed height. */
+.header {
+	/* The row is as tall as the toggle (24px, `Button` `size="small"`), so 4px
+	   here leaves the same 28px between label and inputs as the sibling
+	   controls, which instead pair a fixed 16px row with a 12px margin. */
+	margin-bottom: $grid-unit-05;
+
+	/* The label (a `BaseControl.VisualLabel`, so a `span`) supplies its own
+	   bottom margin as the gap to the input below. In the header row that gap
+	   comes from the row itself, and the margin would both pull the vertically
+	   centred label off centre and pad the row out once the label wraps. */
+	> span {
+		margin-bottom: 0;
+	}
+}
+
 .wrapper {
 	position: relative;
+
+	/* Without a header row the toggle is positioned against the input instead. */
+	.linked-button {
+		position: absolute;
+		top: 8px;
+		inset-inline-end: 0;
+	}
 }
 
 .linked-button {
-	position: absolute;
-	top: 8px;
-	inset-inline-end: 0;
 	line-height: 0;
 }
 

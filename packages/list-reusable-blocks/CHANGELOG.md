@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Normalize special characters in exported reusable block filenames to prevent broken or unreadable files. ([#77033](https://github.com/WordPress/gutenberg/pull/77033))
+
 ## 5.54.0 (2026-08-26)
 
 ## 5.53.0 (2026-08-12)

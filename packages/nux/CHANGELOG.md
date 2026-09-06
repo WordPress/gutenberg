@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependency `@testing-library/user-event` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
 ## 10.6.0 (2026-08-26)
 
 ## 10.5.0 (2026-08-12)

@@ -44,6 +44,7 @@ export const Default: Story = {
 	args: {
 		defaultValue: [ ITEMS[ 0 ], ITEMS[ 1 ] ],
 		items: ITEMS,
+		'aria-label': 'Fruit',
 	},
 };
 
@@ -100,6 +101,7 @@ export const WithCustomEmptyContent: Story = {
  */
 export const Grouped: Story = {
 	args: {
+		'aria-label': 'Fruit',
 		items: GROUPED_ITEMS,
 		children: ( group: FixtureGroup ) => (
 			<SearchableChipSelect.Group

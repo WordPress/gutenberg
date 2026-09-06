@@ -14,6 +14,5 @@
 -   [**core/keyboard-shortcuts**: The Keyboard Shortcuts Data](/docs/reference-guides/data/data-core-keyboard-shortcuts.md)
 -   [**core/notices**: Notices Data](/docs/reference-guides/data/data-core-notices.md)
 -   [**core/preferences**: Preferences](/docs/reference-guides/data/data-core-preferences.md)
--   [**core/reusable-blocks**: Reusable blocks](/docs/reference-guides/data/data-core-reusable-blocks.md)
 -   [**core/rich-text**: Rich Text](/docs/reference-guides/data/data-core-rich-text.md)
 -   [**core/viewport**: The Viewport Data](/docs/reference-guides/data/data-core-viewport.md)

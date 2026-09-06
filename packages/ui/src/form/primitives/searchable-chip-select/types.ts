@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { ItemPopupWidth } from '../../../utils/css/item-popup';
 import type {
 	ComboboxCollectionProps,
 	ComboboxEmptyProps,
@@ -154,6 +155,22 @@ export type SearchableChipSelectProps = Omit<
 			'aria-label' | 'aria-labelledby' | 'aria-describedby'
 		>
 	> & {
+		/**
+		 * Controls how the popup width is constrained relative to its anchor.
+		 *
+		 * For all presets, the popup is never narrower than its anchor.
+		 *
+		 * - `'anchor'`: Fixed width matching the anchor width.
+		 * - `'content'`: Width grows with item labels between the anchor and available
+		 *   viewport bounds.
+		 * - `'sm'`: Fixed width at the small surface width token (`--wpds-dimension-surface-width-sm`).
+		 * - `'md'`: Fixed width at the medium surface width token (`--wpds-dimension-surface-width-md`).
+		 * - `'lg'`: Fixed width at the large surface width token (`--wpds-dimension-surface-width-lg`).
+		 * - `'available'`: Fixed width at the available viewport width (`--available-width`).
+		 *
+		 * @default 'anchor'
+		 */
+		popupWidth?: ItemPopupWidth;
 		/**
 		 * The array of option items.
 		 *
