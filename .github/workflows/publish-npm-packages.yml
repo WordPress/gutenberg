@@ -21,7 +21,7 @@ on:
 concurrency:
     # Scope package release dispatches by target npm release branch.
     # `latest` and `bugfix` both target wp/latest and must serialize.
-    group: ${{ github.workflow }}-wp-${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version || github.event.inputs.release_type == 'development' && 'next' || 'latest' }}
+    group: npm-publish-wp-${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version || github.event.inputs.release_type == 'development' && 'next' || 'latest' }}
     cancel-in-progress: false
 
 # Disable permissions for all available scopes by default.

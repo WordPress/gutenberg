@@ -867,12 +867,18 @@ async function pushNpmReleaseGitMetadata(
  *
  * @param {string} npmReleaseBranch Npm release branch.
  *
- * @return {{base: string, commit: string, tags: string}} Prepared ref names.
+ * @return {{base: string, commit: string, pluginReleaseBranch: string, releaseType: string, tags: string}} Prepared ref names.
  */
 function getNpmReleasePreparedRefs( npmReleaseBranch ) {
 	const slug = npmReleaseBranch.replace( /\//g, '-' );
 	const base = `${ NPM_RELEASE_PREPARED_REF_PREFIX }/${ slug }`;
-	return { base, commit: `${ base }/commit`, tags: `${ base }/tags` };
+	return {
+		base,
+		commit: `${ base }/commit`,
+		pluginReleaseBranch: `${ base }/plugin-release-branch`,
+		releaseType: `${ base }/release-type`,
+		tags: `${ base }/tags`,
+	};
 }
 
 /**
@@ -887,12 +893,21 @@ function getNpmReleasePreparedRefs( npmReleaseBranch ) {
  * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
  * @param {string}   options.npmReleaseBranch        Npm release branch.
  * @param {string[]} options.packageTags             Package tag names.
+ * @param {?string}  options.pluginReleaseBranch     Plugin release branch.
  * @param {string}   options.publishCommit           Publish commit SHA.
+ * @param {string}   options.releaseType             Release route.
  * @param {Object}   deps                            Dependencies.
  * @param {Object}   deps.git                        Git client.
  */
 async function pushNpmReleasePreparedCommit(
-	{ gitWorkingDirectoryPath, npmReleaseBranch, packageTags, publishCommit },
+	{
+		gitWorkingDirectoryPath,
+		npmReleaseBranch,
+		packageTags,
+		pluginReleaseBranch,
+		publishCommit,
+		releaseType,
+	},
 	deps = {}
 ) {
 	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
@@ -904,6 +919,7 @@ async function pushNpmReleasePreparedCommit(
 	) ) {
 		await git.raw(
 			'push',
+			'--no-follow-tags',
 			'--force',
 			'origin',
 			...packageTagChunk.map(
@@ -912,6 +928,21 @@ async function pushNpmReleasePreparedCommit(
 			)
 		);
 	}
+	const releaseRouteRefspecs = [
+		`${ publishCommit }:${ refs.releaseType }/${ releaseType }`,
+	];
+	if ( pluginReleaseBranch ) {
+		releaseRouteRefspecs.push(
+			`${ publishCommit }:${ refs.pluginReleaseBranch }/${ pluginReleaseBranch }`
+		);
+	}
+	await git.raw(
+		'push',
+		'--no-follow-tags',
+		'--force',
+		'origin',
+		...releaseRouteRefspecs
+	);
 	/*
 	 * Publish the commit ref last. Its presence is the completeness marker for
 	 * the prepared state, so a failed tag batch cannot expose a partial release
@@ -919,10 +950,63 @@ async function pushNpmReleasePreparedCommit(
 	 */
 	await git.raw(
 		'push',
+		'--no-follow-tags',
 		'--force',
 		'origin',
 		`${ publishCommit }:${ refs.commit }`
 	);
+}
+
+/**
+ * Reads and validates the route persisted for a prepared release.
+ *
+ * @param {string} gitWorkingDirectoryPath Git working directory path.
+ * @param {string} npmReleaseBranch        Npm release branch.
+ * @param {string} preparedCommit          Prepared commit SHA.
+ * @param {Object} deps                    Dependencies.
+ * @param {Object} deps.git                Git client.
+ *
+ * @return {Promise<{pluginReleaseBranch: ?string, releaseType: string}>} Prepared release route.
+ */
+async function getNpmReleasePreparedState(
+	gitWorkingDirectoryPath,
+	npmReleaseBranch,
+	preparedCommit,
+	deps = {}
+) {
+	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
+	const output = await git.raw(
+		'ls-remote',
+		'--refs',
+		'origin',
+		`${ refs.releaseType }/*`,
+		`${ refs.pluginReleaseBranch }/*`
+	);
+	const entries = output
+		.split( '\n' )
+		.map( ( line ) => line.trim().split( /\s+/ ) )
+		.filter( ( [ sha, ref ] ) => sha && ref );
+	if ( entries.some( ( [ sha ] ) => sha !== preparedCommit ) ) {
+		throw new Error(
+			'Prepared release route does not point to the prepared commit.'
+		);
+	}
+	const releaseTypes = entries
+		.map( ( [ , ref ] ) => ref )
+		.filter( ( ref ) => ref.startsWith( `${ refs.releaseType }/` ) )
+		.map( ( ref ) => ref.slice( `${ refs.releaseType }/`.length ) );
+	const pluginReleaseBranches = entries
+		.map( ( [ , ref ] ) => ref )
+		.filter( ( ref ) => ref.startsWith( `${ refs.pluginReleaseBranch }/` ) )
+		.map( ( ref ) => ref.slice( `${ refs.pluginReleaseBranch }/`.length ) );
+	if ( releaseTypes.length !== 1 || pluginReleaseBranches.length > 1 ) {
+		throw new Error( 'Prepared release route metadata is incomplete.' );
+	}
+	return {
+		pluginReleaseBranch: pluginReleaseBranches[ 0 ] || null,
+		releaseType: releaseTypes[ 0 ],
+	};
 }
 
 /**
@@ -964,7 +1048,12 @@ async function getNpmReleasePreparedTagNames(
 ) {
 	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
 	const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
-	const output = await git.raw( 'ls-remote', 'origin', `${ refs.tags }/*` );
+	const output = await git.raw(
+		'ls-remote',
+		'--refs',
+		'origin',
+		`${ refs.tags }/*`
+	);
 	return output
 		.split( '\n' )
 		.map( ( line ) => line.trim().split( /\s+/ )[ 1 ] )
@@ -1011,32 +1100,54 @@ async function deleteNpmReleasePreparedCommit(
 ) {
 	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
 	const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
-	const tagNames = await getNpmReleasePreparedTagNames(
-		gitWorkingDirectoryPath,
-		npmReleaseBranch,
-		{ git }
+	const output = await git.raw(
+		'ls-remote',
+		'--refs',
+		'origin',
+		`${ refs.base }/*`
 	);
-	for ( const tagChunk of chunk(
-		tagNames,
+	const preparedRefs = output
+		.split( '\n' )
+		.map( ( line ) => line.trim().split( /\s+/ )[ 1 ] )
+		.filter( Boolean );
+	const tagRefs = preparedRefs.filter( ( ref ) =>
+		ref.startsWith( `${ refs.tags }/` )
+	);
+	for ( const refChunk of chunk(
+		tagRefs,
 		NPM_RELEASE_TAG_PUSH_BATCH_SIZE
 	) ) {
 		await git.raw(
 			'push',
+			'--atomic',
+			'--no-follow-tags',
 			'origin',
 			'--delete',
-			...tagChunk.map( ( tagName ) => `${ refs.tags }/${ tagName }` )
+			...refChunk
 		);
 	}
-	await git.raw( 'push', 'origin', '--delete', refs.commit );
+	const stateRefs = preparedRefs.filter(
+		( ref ) => ! tagRefs.includes( ref )
+	);
+	if ( stateRefs.length ) {
+		await git.raw(
+			'push',
+			'--atomic',
+			'--no-follow-tags',
+			'origin',
+			'--delete',
+			...stateRefs
+		);
+	}
 }
 
 /**
- * Reports whether a prepared commit belongs to a release that already finished.
+ * Reports whether the release branch and package tags contain the prepared commit.
  *
  * Containment in the release branch is not sufficient. Git metadata pushes the
  * branch before the package tags, so a run that lost the tag push leaves the
- * commit on the branch with tags still outstanding; treating that as finished
- * would delete the recovery data for a release that never completed.
+ * commit on the branch with tags still outstanding. Treating that metadata as
+ * complete would skip the outstanding package tag publication.
  *
  * @param {Object}   options                         Options.
  * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
@@ -1048,9 +1159,9 @@ async function deleteNpmReleasePreparedCommit(
  * @param {Object}   deps.git                        Git client.
  * @param {Function} deps.verifyRemotePackageTagsFn  Verifies remote package tags.
  *
- * @return {Promise<boolean>} True when the prepared release already completed.
+ * @return {Promise<boolean>} True when the release Git metadata is published.
  */
-async function isNpmReleasePreparedCommitStale(
+async function isNpmReleaseGitMetadataPublished(
 	{ gitWorkingDirectoryPath, npmReleaseBranch, preparedCommit },
 	deps = {}
 ) {
@@ -1068,14 +1179,8 @@ async function isNpmReleasePreparedCommitStale(
 	if ( ! remoteSha ) {
 		return false;
 	}
-	try {
-		await git.raw(
-			'merge-base',
-			'--is-ancestor',
-			preparedCommit,
-			remoteSha
-		);
-	} catch {
+	const mergeBase = await git.raw( 'merge-base', preparedCommit, remoteSha );
+	if ( mergeBase.trim() !== preparedCommit ) {
 		return false;
 	}
 	const packageTags = await getPreparedTagNamesFn(
@@ -1182,12 +1287,12 @@ function getNpmReleasePreparedPluginBranch(
 async function resumePreparedNpmRelease( config, deps = {} ) {
 	const {
 		commandFn = command,
-		deletePreparedCommitFn = deleteNpmReleasePreparedCommit,
 		getPreparedChangelogCommitFn = getNpmReleasePreparedChangelogCommit,
 		getPreparedCommitFn = getNpmReleasePreparedCommit,
 		getPreparedPluginReleaseBranchFn = getNpmReleasePreparedPluginBranch,
+		getPreparedStateFn = getNpmReleasePreparedState,
 		git = SimpleGit( config.gitWorkingDirectoryPath ),
-		isPreparedCommitStaleFn = isNpmReleasePreparedCommitStale,
+		isGitMetadataPublishedFn = isNpmReleaseGitMetadataPublished,
 		publishVersionedPackagesToNpmFn = publishVersionedPackagesToNpm,
 		restorePreparedTagsFn = restoreNpmReleasePreparedTags,
 	} = deps;
@@ -1209,31 +1314,43 @@ async function resumePreparedNpmRelease( config, deps = {} ) {
 
 	const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
 	await git.fetch( 'origin', refs.commit );
-	if (
-		await isPreparedCommitStaleFn(
-			{ gitWorkingDirectoryPath, npmReleaseBranch, preparedCommit },
-			{ git }
-		)
-	) {
-		log(
-			`>> Ignoring the stale prepared commit ${ preparedCommit }; it is already on ${ npmReleaseBranch }.`
+	const preparedState = await getPreparedStateFn(
+		gitWorkingDirectoryPath,
+		npmReleaseBranch,
+		preparedCommit,
+		{ git }
+	);
+	if ( preparedState.releaseType !== releaseType ) {
+		throw new Error(
+			`Prepared release route is "${ preparedState.releaseType }", but this run requested "${ releaseType }".`
 		);
-		await deletePreparedCommitFn(
-			gitWorkingDirectoryPath,
-			npmReleaseBranch,
-			{ git }
-		);
-		return null;
 	}
-
 	log(
 		`>> Resuming the prepared release commit ${ preparedCommit } from a previous run.`
 	);
 	await git.checkout( preparedCommit );
-	const pluginReleaseBranch =
-		releaseType === 'latest'
-			? getPreparedPluginReleaseBranchFn( gitWorkingDirectoryPath )
-			: undefined;
+	let expectedPluginReleaseBranch = null;
+	if ( releaseType === 'latest' ) {
+		expectedPluginReleaseBranch = getPreparedPluginReleaseBranchFn(
+			gitWorkingDirectoryPath
+		);
+	} else if ( releaseType === 'next' ) {
+		expectedPluginReleaseBranch = 'trunk';
+	}
+	if ( preparedState.pluginReleaseBranch !== expectedPluginReleaseBranch ) {
+		throw new Error(
+			`Prepared plugin release branch is "${
+				preparedState.pluginReleaseBranch || 'none'
+			}", but the prepared commit requires "${
+				expectedPluginReleaseBranch || 'none'
+			}".`
+		);
+	}
+	await git.fetch( 'origin', npmReleaseBranch );
+	const gitMetadataPublished = await isGitMetadataPublishedFn(
+		{ gitWorkingDirectoryPath, npmReleaseBranch, preparedCommit },
+		{ git }
+	);
 	const changelogCommit = await getPreparedChangelogCommitFn(
 		gitWorkingDirectoryPath,
 		preparedCommit,
@@ -1244,21 +1361,33 @@ async function resumePreparedNpmRelease( config, deps = {} ) {
 	 * derived from the tags at HEAD. Restore them or this run computes an empty
 	 * release and completes without pushing any of them.
 	 */
-	await restorePreparedTagsFn( gitWorkingDirectoryPath, npmReleaseBranch, {
-		git,
-	} );
-	await installNpmReleaseDependencies( config, { commandFn } );
-	await publishVersionedPackagesToNpmFn( {
-		distTag,
-		gitWorkingDirectoryPath,
-		noVerifyAccessFlag: interactive ? '' : '--no-verify-access',
-		npmReleaseBranch,
-		yesFlag: interactive ? '' : '--yes',
-	} );
+	if ( ! gitMetadataPublished ) {
+		await restorePreparedTagsFn(
+			gitWorkingDirectoryPath,
+			npmReleaseBranch,
+			{
+				git,
+			}
+		);
+		await installNpmReleaseDependencies( config, { commandFn } );
+		await publishVersionedPackagesToNpmFn( {
+			distTag,
+			gitWorkingDirectoryPath,
+			noVerifyAccessFlag: interactive ? '' : '--no-verify-access',
+			npmReleaseBranch,
+			pluginReleaseBranch: preparedState.pluginReleaseBranch,
+			releaseType,
+			yesFlag: interactive ? '' : '--yes',
+		} );
+	} else {
+		log(
+			`>> Git metadata is already published on ${ npmReleaseBranch }; continuing finalization.`
+		);
+	}
 
 	return {
 		changelogCommit,
-		pluginReleaseBranch,
+		pluginReleaseBranch: preparedState.pluginReleaseBranch,
 		publishCommit: preparedCommit,
 	};
 }
@@ -1271,6 +1400,8 @@ async function resumePreparedNpmRelease( config, deps = {} ) {
  * @param {string}   options.gitWorkingDirectoryPath  Git working directory path.
  * @param {string}   options.noVerifyAccessFlag       Lerna no-verify-access flag.
  * @param {string}   options.npmReleaseBranch         Npm release branch.
+ * @param {?string}  options.pluginReleaseBranch      Plugin release branch.
+ * @param {string}   options.releaseType              Release route.
  * @param {string}   options.yesFlag                  Lerna yes flag.
  * @param {Object}   deps                             Dependencies.
  * @param {Function} deps.commandFn                   Command runner.
@@ -1286,13 +1417,14 @@ async function publishVersionedPackagesToNpm(
 		gitWorkingDirectoryPath,
 		noVerifyAccessFlag,
 		npmReleaseBranch,
+		pluginReleaseBranch,
+		releaseType,
 		yesFlag,
 	},
 	deps = {}
 ) {
 	const {
 		commandFn = command,
-		deletePreparedCommitFn = deleteNpmReleasePreparedCommit,
 		git = SimpleGit( gitWorkingDirectoryPath ),
 		getNpmReleasePackagesFn = getNpmReleasePackages,
 		pushNpmReleaseGitMetadataFn = pushNpmReleaseGitMetadata,
@@ -1336,7 +1468,9 @@ async function publishVersionedPackagesToNpm(
 			gitWorkingDirectoryPath,
 			npmReleaseBranch,
 			packageTags: releasePackages.map( ( { tagName } ) => tagName ),
+			pluginReleaseBranch,
 			publishCommit,
+			releaseType,
 		},
 		{ git }
 	);
@@ -1394,11 +1528,6 @@ async function publishVersionedPackagesToNpm(
 		packageTags: releasePackages.map( ( { tagName } ) => tagName ),
 		publishCommit,
 	} );
-
-	// The release is durable in Git now, so the scratch ref has served its purpose.
-	await deletePreparedCommitFn( gitWorkingDirectoryPath, npmReleaseBranch, {
-		git,
-	} );
 }
 
 /**
@@ -1416,6 +1545,7 @@ async function publishPackagesToNpm(
 		interactive,
 		minimumVersionBump,
 		npmReleaseBranch,
+		pluginReleaseBranch,
 		releaseType,
 	},
 	deps = {}
@@ -1473,6 +1603,8 @@ async function publishPackagesToNpm(
 		gitWorkingDirectoryPath,
 		noVerifyAccessFlag,
 		npmReleaseBranch,
+		pluginReleaseBranch,
+		releaseType,
 		yesFlag,
 	} );
 
@@ -1521,14 +1653,20 @@ async function prepareNpmRelease( config, deps = {} ) {
 /**
  * Publishes the packages prepared in the current checkout.
  *
- * @param {WPPackagesConfig} config Command config.
- * @param {Object}           deps   Dependencies.
+ * @param {WPPackagesConfig} config                           Command config.
+ * @param {Object}           releaseState                     Prepared release state.
+ * @param {?string}          releaseState.pluginReleaseBranch Plugin release branch.
+ * @param {Object}           deps                             Dependencies.
  *
  * @return {Promise<?string>} The npm version commit hash.
  */
-async function publishPreparedPackagesToNpm( config, deps = {} ) {
+async function publishPreparedPackagesToNpm(
+	config,
+	{ pluginReleaseBranch },
+	deps = {}
+) {
 	const { publishPackagesToNpmFn = publishPackagesToNpm } = deps;
-	return publishPackagesToNpmFn( config );
+	return publishPackagesToNpmFn( { ...config, pluginReleaseBranch } );
 }
 
 /**
@@ -1556,6 +1694,33 @@ async function finalizePreparedNpmRelease(
 	if ( config.releaseType === 'latest' && pluginReleaseBranch ) {
 		await backportCommitsToBranchFn( pluginReleaseBranch, commits, config );
 	}
+}
+
+/**
+ * Checks whether a branch contains the same patch as a commit.
+ *
+ * @param {Object} repo       Git client.
+ * @param {string} branchName Branch or ref to compare.
+ * @param {string} commitHash Commit SHA.
+ *
+ * @return {Promise<boolean>} Whether the patch is already present.
+ */
+async function isCommitPatchOnBranch( repo, branchName, commitHash ) {
+	const fullCommitHash = await repo.revparse( [ commitHash ] );
+	const mergeBase = await repo.raw(
+		'merge-base',
+		fullCommitHash,
+		branchName
+	);
+	if ( mergeBase.trim() === fullCommitHash ) {
+		return true;
+	}
+	const output = await repo.raw( 'cherry', branchName, fullCommitHash );
+	const commitStatus = output
+		.trim()
+		.split( '\n' )
+		.find( ( line ) => line.endsWith( ` ${ fullCommitHash }` ) );
+	return commitStatus?.startsWith( '-' ) || false;
 }
 
 /**
@@ -1597,10 +1762,35 @@ async function backportCommitsToBranch(
 	await repo.fetch().checkout( branchName ).pull( 'origin', branchName );
 
 	for ( const commitHash of commits ) {
+		if (
+			await isCommitPatchOnBranch(
+				repo,
+				`origin/${ branchName }`,
+				commitHash
+			)
+		) {
+			log(
+				`>> Commit ${ commitHash } is already backported to "${ branchName }".`
+			);
+			continue;
+		}
 		await repo.raw( 'cherry-pick', commitHash );
 	}
 
 	await repo.push( 'origin', branchName );
+	for ( const commitHash of commits ) {
+		if (
+			! ( await isCommitPatchOnBranch(
+				repo,
+				`origin/${ branchName }`,
+				commitHash
+			) )
+		) {
+			throw new Error(
+				`Backport verification failed for ${ commitHash } on "${ branchName }".`
+			);
+		}
+	}
 
 	log( `>> Backporting successfully finished.` );
 }
@@ -1616,6 +1806,7 @@ async function backportCommitsToBranch(
  */
 async function runPackagesRelease( config, customMessages, deps = {} ) {
 	const {
+		deletePreparedCommitFn = deleteNpmReleasePreparedCommit,
 		finalizePreparedNpmReleaseFn = finalizePreparedNpmRelease,
 		prepareNpmReleaseFn = prepareNpmRelease,
 		publishPreparedPackagesToNpmFn = publishPreparedPackagesToNpm,
@@ -1658,10 +1849,16 @@ async function runPackagesRelease( config, customMessages, deps = {} ) {
 	let releaseState = await resumePreparedNpmReleaseFn( config );
 	if ( ! releaseState ) {
 		releaseState = await prepareNpmReleaseFn( config );
-		releaseState.publishCommit =
-			await publishPreparedPackagesToNpmFn( config );
+		releaseState.publishCommit = await publishPreparedPackagesToNpmFn(
+			config,
+			releaseState
+		);
 	}
 	await finalizePreparedNpmReleaseFn( config, releaseState );
+	await deletePreparedCommitFn(
+		config.gitWorkingDirectoryPath,
+		config.npmReleaseBranch
+	);
 
 	await runStep(
 		'Cleaning the temporary folders',
@@ -1761,12 +1958,14 @@ async function publishNpmNext( options ) {
 }
 
 module.exports = {
+	backportCommitsToBranch,
 	deleteNpmReleasePreparedCommit,
 	finalizePreparedNpmRelease,
 	getNpmReleasePreparedCommit,
 	getNpmReleasePreparedPluginBranch,
 	getNpmReleasePreparedRefs,
 	getNpmReleasePreparedTagNames,
+	getNpmReleasePreparedState,
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
 	getRemoteBranchSha,
@@ -1778,7 +1977,7 @@ module.exports = {
 	publishPreparedPackagesToNpm,
 	publishVersionedPackagesToNpm,
 	pushNpmReleaseGitMetadata,
-	isNpmReleasePreparedCommitStale,
+	isNpmReleaseGitMetadataPublished,
 	pushNpmReleasePreparedCommit,
 	restoreNpmReleasePreparedTags,
 	publishNpmGutenbergPlugin,
