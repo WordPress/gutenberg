@@ -1,13 +1,23 @@
 .editor-save-error-details {
-	display: inline;
+	margin-top: var(--wpds-dimension-gap-sm);
 }
 
-.editor-save-error-details summary {
-	display: inline;
-	cursor: var(--wpds-cursor-control);
-	margin-left: 0.35em;
+.editor-save-error-details__actions {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-sm);
 }
 
 .editor-save-error-details__message {
+	margin: var(--wpds-dimension-gap-sm) 0 0;
 	white-space: break-spaces;
+}
+
+.editor-save-error-details__inline {
+	display: inline;
+}
+
+.editor-save-error-details__inline .editor-save-error-details__copy.components-button {
+	margin-left: 0.35em;
+	vertical-align: middle;
 }

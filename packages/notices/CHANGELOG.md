@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `InlineNotices`: Render nothing when several children are passed and each one renders nothing. The check for renderable children did not look inside the array that more than one child arrives as, so `[ false, false ]` counted as content and left an empty wrapper in the DOM ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+
 ## 5.54.0 (2026-08-26)
 
 ### Internal

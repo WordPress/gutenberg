@@ -761,3 +761,23 @@ export function selectNote( noteId, options = { focus: false } ) {
 		options,
 	};
 }
+
+/**
+ * Returns an action object used to set, or clear, the notice for the last
+ * failed save.
+ *
+ * @param {?Object} notice         The notice, or `null` to clear it.
+ * @param {string}  notice.message The message shown to the user.
+ * @param {?string} notice.detail  The failure detail reported by the server,
+ *                                 shown behind a disclosure and offered for
+ *                                 copying. `null` when there is none worth
+ *                                 disclosing.
+ *
+ * @return {Object} Action object.
+ */
+export function setSaveErrorNotice( notice ) {
+	return {
+		type: 'SET_SAVE_ERROR_NOTICE',
+		notice,
+	};
+}

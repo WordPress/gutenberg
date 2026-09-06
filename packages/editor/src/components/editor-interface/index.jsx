@@ -26,6 +26,7 @@ import {
 } from '../post-revisions-preview';
 import { CollaboratorsOverlay } from '../collaborators-overlay';
 import { useCollaboratorNotifications } from '../collaborators-presence/use-collaborator-notifications';
+import SaveErrorNotice from '../save-error-notice';
 import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
@@ -56,6 +57,7 @@ function Notices() {
 				pinnedNoticesClassName="editor-notices__pinned"
 				dismissibleNoticesClassName="editor-notices__dismissible"
 			>
+				<SaveErrorNotice />
 				{ ! isValidTemplate && <TemplateValidationNotice /> }
 			</InlineNotices>
 		</ThemeProvider>

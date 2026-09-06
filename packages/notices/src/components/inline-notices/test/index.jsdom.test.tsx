@@ -35,6 +35,25 @@ describe( 'InlineNotices', () => {
 		expect( container ).toBeEmptyDOMElement();
 	} );
 
+	it( 'should return null when every child renders nothing and there are no notices', () => {
+		const { container } = renderInlineNotices( {
+			children: [ false, null ],
+		} );
+
+		expect( container ).toBeEmptyDOMElement();
+	} );
+
+	it( 'should render when only one of several children renders something', () => {
+		const { container } = renderInlineNotices( {
+			children: [ false, <div key="notice">Extra notice</div> ],
+		} );
+
+		expect( screen.getByText( 'Extra notice' ) ).toBeVisible();
+		expect( getInlineNoticesWrapper( container ) ).toHaveClass(
+			'notices-inline-notices-wrapper'
+		);
+	} );
+
 	it( 'should render the inline notices wrapper with a custom class name', () => {
 		const { container } = renderInlineNotices( {
 			className: 'my-inline-notices',

@@ -1,6 +1,6 @@
 import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
-import { escapeHTML } from '@wordpress/escape-html';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import deprecated from '@wordpress/deprecated';
 import {
 	parse,
@@ -37,6 +37,35 @@ const { getEntitySnapshot } = unlock( coreDataPrivateApis );
 // the server. Their messages restate what the notice already says, so there are
 // no details worth disclosing.
 const CLIENT_GENERATED_ERROR_CODES = [ 'offline_error', 'fetch_error' ];
+
+/**
+ * Returns the failure detail worth showing the user alongside a save failure
+ * notice, or `null` when the failure carries nothing the notice doesn't say.
+ *
+ * @param {any} error The failure a save rejected with.
+ *
+ * @return {?string} The detail, as plain text.
+ */
+function getSaveErrorDetail( error ) {
+	if (
+		typeof error?.message !== 'string' ||
+		CLIENT_GENERATED_ERROR_CODES.includes( error.code )
+	) {
+		return null;
+	}
+
+	// Server messages can carry markup. Strip it rather than dropping the
+	// message, which is usually the only account of what actually went wrong.
+	// Block boundaries become line breaks first: stripping the tags on their
+	// own would run the last sentence of one block into the next one.
+	const detail = stripHTML(
+		error.message.replace( /<br\s*\/?>|<\/(?:p|div|li|h[1-6])>/gi, '\n' )
+	)
+		.replace( /\n{3,}/g, '\n\n' )
+		.trim();
+
+	return detail || null;
+}
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -313,32 +342,16 @@ export const savePost =
 			} );
 			if ( args.length ) {
 				const [ noticeMessage ] = args;
-				if (
-					error.message &&
-					! CLIENT_GENERATED_ERROR_CODES.includes( error.code ) &&
-					! /<\/?[^>]*>/.test( error.message )
-				) {
-					args[ 0 ] = `${ escapeHTML(
-						noticeMessage
-					) } <details class="editor-save-error-details"><summary>${ escapeHTML(
-						__( 'Show details' )
-					) }</summary><span class="editor-save-error-details__message">${ escapeHTML(
-						error.message
-					) }</span></details>`;
-					args[ 1 ] = {
-						...args[ 1 ],
-						__unstableHTML: true,
-						speak: false,
-					};
-					// The notices store doesn't support a separate spoken message
-					// when rendering raw HTML content, so announce the plain text
-					// manually to avoid reading the markup aloud.
-					speak( noticeMessage, 'assertive' );
-				}
-
-				registry.dispatch( noticesStore ).createErrorNotice( ...args );
+				dispatch( {
+					type: 'SET_SAVE_ERROR_NOTICE',
+					notice: {
+						message: noticeMessage,
+						detail: getSaveErrorDetail( error ),
+					},
+				} );
 			}
 		} else {
+			dispatch( { type: 'SET_SAVE_ERROR_NOTICE', notice: null } );
 			const updatedRecord = select.getCurrentPost();
 			const args = getNotificationArgumentsForSaveSuccess( {
 				previousPost: previousRecord,
