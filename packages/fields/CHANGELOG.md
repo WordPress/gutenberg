@@ -6,7 +6,7 @@
 
 -   Show a "Privacy Policy Page" badge next to the title of the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
 -   Append an ellipsis (`…`) to the labels of the actions that open a dialog requiring further input or confirmation (`Delete…`, `Trash…`, `Permanently delete…`, `Rename…`, `Duplicate…`, `Reset…`, `Order…`), following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
--   `PageTitleView`: Migrate the page-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82440](https://github.com/WordPress/gutenberg/issues/82440))
+-   `PageTitleView`: Migrate the page-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82499](https://github.com/WordPress/gutenberg/pull/82499))
 
 ### Bug Fixes
 
