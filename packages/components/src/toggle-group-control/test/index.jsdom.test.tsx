@@ -99,6 +99,32 @@ const optionsWithDisabledOption = (
 	</>
 );
 
+describe( 'required context', () => {
+	it( 'throws when ToggleGroupControlOption is outside ToggleGroupControl', () => {
+		expect( () =>
+			render( <ToggleGroupControlOption value="value" label="Label" /> )
+		).toThrow(
+			'ToggleGroupControlOption can only be rendered inside ToggleGroupControl.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
+	it( 'throws when ToggleGroupControlOptionIcon is outside ToggleGroupControl', () => {
+		expect( () =>
+			render(
+				<ToggleGroupControlOptionIcon
+					value="value"
+					label="Label"
+					icon={ formatUppercase }
+				/>
+			)
+		).toThrow(
+			'ToggleGroupControlOptionIcon can only be rendered inside ToggleGroupControl.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+} );
+
 describe.each( [
 	[ 'uncontrolled', ToggleGroupControl ],
 	[ 'controlled', ControlledToggleGroupControl ],

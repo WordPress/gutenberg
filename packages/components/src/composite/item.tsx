@@ -14,6 +14,11 @@ export const CompositeItem = forwardRef<
 	// legacy compat layer. The `store` prop is documented, but its type is
 	// obfuscated to discourage its use outside of the component's internals.
 	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
+	if ( ! store ) {
+		throw new Error(
+			'Composite.Item can only be rendered with composite state from Composite or an explicit store prop.'
+		);
+	}
 
 	return <Ariakit.CompositeItem store={ store } { ...props } ref={ ref } />;
 } );

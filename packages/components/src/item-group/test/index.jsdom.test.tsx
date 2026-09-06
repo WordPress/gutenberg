@@ -4,6 +4,43 @@ import { Item, ItemGroup } from '..';
 
 describe( 'ItemGroup', () => {
 	describe( 'ItemGroup component', () => {
+		it( 'throws when an Item with list semantics is not a direct child', () => {
+			expect( () =>
+				render(
+					<ItemGroup>
+						<div>
+							<Item>Nested item</Item>
+						</div>
+					</ItemGroup>
+				)
+			).toThrow(
+				'Item must be rendered as a direct child of ItemGroup when both components use list semantics.'
+			);
+			expect( console ).toHaveErrored();
+		} );
+
+		it( 'accepts custom children', () => {
+			render(
+				<ItemGroup>
+					<div>Custom item</div>
+				</ItemGroup>
+			);
+
+			expect( screen.getByText( 'Custom item' ) ).toBeVisible();
+		} );
+
+		it( 'preserves custom roles', () => {
+			render(
+				<ItemGroup role="group">
+					<div>
+						<Item role="presentation">Custom item</Item>
+					</div>
+				</ItemGroup>
+			);
+
+			expect( screen.getByRole( 'group' ) ).toBeVisible();
+		} );
+
 		it( 'should render correctly', () => {
 			const { container } = render(
 				<ItemGroup>

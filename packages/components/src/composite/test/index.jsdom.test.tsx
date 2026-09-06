@@ -1,5 +1,6 @@
 import { queryByAttribute, render, screen } from '@testing-library/react';
 import { click, press, waitFor } from '@ariakit/test';
+import * as Ariakit from '@ariakit/react';
 import type { ComponentProps } from 'react';
 import { useState } from '@wordpress/element';
 import { Composite } from '..';
@@ -698,6 +699,51 @@ describe( 'Composite', () => {
 				// C2 is disabled
 				expect( itemB2 ).toHaveFocus();
 			} );
+		} );
+	} );
+
+	describe( 'required context', () => {
+		it( 'throws when Composite.Item has no composite state', () => {
+			expect( () =>
+				render( <Composite.Item>Item</Composite.Item> )
+			).toThrow(
+				'Composite.Item can only be rendered with composite state from Composite or an explicit store prop.'
+			);
+			expect( console ).toHaveErrored();
+		} );
+
+		it( 'supports an explicit store prop for Composite.Item', () => {
+			function ItemWithStore() {
+				const store = Ariakit.useCompositeStore();
+
+				return (
+					<Composite.Item
+						// @ts-expect-error The store prop is intentionally omitted from the public types.
+						store={ store }
+					>
+						Item
+					</Composite.Item>
+				);
+			}
+
+			render( <ItemWithStore /> );
+
+			expect(
+				screen.getByRole( 'button', { name: 'Item' } )
+			).toBeVisible();
+		} );
+
+		it( 'throws when Composite.GroupLabel is outside Composite.Group', () => {
+			expect( () =>
+				render(
+					<Composite>
+						<Composite.GroupLabel>Label</Composite.GroupLabel>
+					</Composite>
+				)
+			).toThrow(
+				'Composite.GroupLabel can only be rendered inside Composite.Group.'
+			);
+			expect( console ).toHaveErrored();
 		} );
 	} );
 } );

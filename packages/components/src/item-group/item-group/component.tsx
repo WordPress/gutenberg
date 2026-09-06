@@ -1,4 +1,6 @@
 import type { ForwardedRef } from 'react';
+import { useRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useItemGroup } from './hook';
@@ -16,6 +18,8 @@ function UnconnectedItemGroup(
 		size: sizeProp,
 		...otherProps
 	} = useItemGroup( props );
+	const itemGroupRef = useRef< HTMLElement >( null );
+	const refs = useMergeRefs( [ itemGroupRef, forwardedRef ] );
 
 	const { size: contextSize } = useItemGroupContext();
 
@@ -23,13 +27,15 @@ function UnconnectedItemGroup(
 	const size = sizeProp || contextSize;
 
 	const contextValue = {
+		itemGroupRef,
+		isList: otherProps.role === 'list',
 		spacedAround,
 		size,
 	};
 
 	return (
 		<ItemGroupContext.Provider value={ contextValue }>
-			<View { ...otherProps } ref={ forwardedRef } />
+			<View { ...otherProps } ref={ refs } />
 		</ItemGroupContext.Provider>
 	);
 }

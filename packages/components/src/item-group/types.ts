@@ -46,6 +46,14 @@ export interface ItemProps {
 
 export type ItemGroupContext = {
 	/**
+	 * The element that owns items with list semantics.
+	 */
+	itemGroupRef?: React.RefObject< HTMLElement | null >;
+	/**
+	 * Whether items should use list semantics.
+	 */
+	isList: boolean;
+	/**
 	 * When true, each `Item` will be styled as an individual item (e.g. with rounded
 	 * borders), instead of being part of the same UI block with the rest of the items.
 	 *
