@@ -738,6 +738,46 @@ export function getStylesDeclarations(
 }
 
 /**
+ * Converts `width` declarations to `flex-basis` for column blocks.
+ *
+ * The column block sizes itself with `flex-basis` rather than `width` because
+ * it lives in a flex container. This post-processes the computed declarations
+ * so the correct CSS property is output.
+ *
+ * Keep in sync with `WP_Theme_JSON_Gutenberg::update_column_width_declarations`.
+ *
+ * @param declarations CSS declarations.
+ * @return The updated declarations.
+ */
+function updateColumnWidthDeclarations( declarations: string[] ): string[] {
+	let hasWidth = false;
+
+	const updated = declarations.map( ( declaration ) => {
+		const separatorIndex = declaration.indexOf( ':' );
+		if (
+			separatorIndex === -1 ||
+			declaration.slice( 0, separatorIndex ).trim() !== 'width'
+		) {
+			return declaration;
+		}
+
+		hasWidth = true;
+		return `flex-basis:${ declaration.slice( separatorIndex + 1 ) }`;
+	} );
+
+	/*
+	 * Columns without a width divide the remaining space between them via
+	 * `flex-grow`. A column given a width should keep it instead, matching
+	 * the behaviour of a width set on the block itself.
+	 */
+	if ( hasWidth ) {
+		updated.push( 'flex-grow: 0' );
+	}
+
+	return updated;
+}
+
+/**
  * Get generated CSS for layout styles by looking up layout definitions provided
  * in theme.json, and outputting common layout styles, and specific blockGap values.
  *
@@ -1711,17 +1751,8 @@ function renderStylesNode(
 		} );
 	}
 
-	// Column blocks size themselves with flex-basis rather than width because
-	// they live in a flex container. Extract the width before generating
-	// declarations so it can be output as flex-basis instead.
-	let columnFlexBasis: string | undefined;
-	if ( name === 'core/column' && styles?.dimensions?.width ) {
-		columnFlexBasis = getCSSValueFromRawStyle( styles.dimensions.width );
-		delete styles.dimensions.width;
-	}
-
 	// Process the remaining block styles (they use either normal block class or __experimentalSelector).
-	const styleDeclarations = getStylesDeclarations(
+	let styleDeclarations = getStylesDeclarations(
 		styles,
 		effectiveSelector,
 		useRootPaddingAlign,
@@ -1729,14 +1760,8 @@ function renderStylesNode(
 		disableRootPadding
 	);
 
-	if ( columnFlexBasis ) {
-		// Columns without a width divide the remaining space between them via
-		// `flex-grow`. A column given a width should keep it instead, matching
-		// the behaviour of a width set on the block itself.
-		styleDeclarations.push(
-			`flex-basis:${ columnFlexBasis }`,
-			'flex-grow:0'
-		);
+	if ( name === 'core/column' ) {
+		styleDeclarations = updateColumnWidthDeclarations( styleDeclarations );
 	}
 
 	if ( styleDeclarations?.length ) {

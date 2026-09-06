@@ -2050,4 +2050,189 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 	} );
+
+	describe( 'column width declarations', () => {
+		const columnSelectors = {
+			'core/column': {
+				selector: '.wp-block-column',
+			},
+		};
+
+		const columnStyleOptions = {
+			blockGap: false,
+			blockStyles: true,
+			layoutStyles: false,
+			marginReset: false,
+			presets: false,
+			rootPadding: false,
+		};
+
+		const renderColumnStyles = (
+			tree: GlobalStylesConfig,
+			styleOptions = columnStyleOptions
+		) =>
+			transformToStyles(
+				Object.freeze( tree ),
+				columnSelectors,
+				false,
+				false,
+				true,
+				true,
+				styleOptions
+			);
+
+		it( 'should output width as flex-basis and stop the column growing', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/column': {
+							dimensions: {
+								width: '25%',
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			expect( renderColumnStyles( tree ) ).toBe(
+				':root :where(.wp-block-column){flex-basis: 25%;flex-grow: 0;}'
+			);
+		} );
+
+		it( 'should output a preset width as flex-basis', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/column': {
+							dimensions: {
+								width: 'var:preset|dimension|50',
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			expect( renderColumnStyles( tree ) ).toBe(
+				':root :where(.wp-block-column){flex-basis: var(--wp--preset--dimension--50);flex-grow: 0;}'
+			);
+		} );
+
+		it( 'should leave other column styles untouched', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/column': {
+							color: {
+								text: 'red',
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const result = renderColumnStyles( tree );
+
+			expect( result ).toBe(
+				':root :where(.wp-block-column){color: red;}'
+			);
+			expect( result ).not.toContain( 'flex-grow' );
+		} );
+
+		it( 'should not convert width for other blocks', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							dimensions: {
+								width: '25%',
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				{ 'core/group': { selector: '.wp-block-group' } },
+				false,
+				false,
+				true,
+				true,
+				columnStyleOptions
+			);
+
+			expect( result ).toBe(
+				':root :where(.wp-block-group){width: 25%;}'
+			);
+		} );
+
+		it( 'should convert width set within a responsive breakpoint', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/column': {
+							dimensions: {
+								width: '25%',
+							},
+							'@mobile': {
+								dimensions: {
+									width: '100%',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			expect( renderColumnStyles( tree ) ).toBe(
+				':root :where(.wp-block-column){flex-basis: 25%;flex-grow: 0;}' +
+					'@media (width <= 480px){:root :where(.wp-block-column){flex-basis: 100%;flex-grow: 0;}}'
+			);
+		} );
+
+		it( 'should convert width set on a block style variation, including its breakpoints', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/column': {
+							variations: {
+								foo: {
+									dimensions: {
+										width: '25%',
+									},
+									'@mobile': {
+										dimensions: {
+											width: '100%',
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				{
+					'core/column': {
+						selector: '.wp-block-column',
+						styleVariationSelectors: {
+							foo: '.wp-block-column.is-style-foo',
+						},
+					},
+				},
+				false,
+				false,
+				true,
+				true,
+				{ ...columnStyleOptions, variationStyles: true }
+			);
+
+			expect( result ).toBe(
+				':root :where(.wp-block-column.is-style-foo){flex-basis: 25%;flex-grow: 0;}' +
+					'@media (width <= 480px){:root :where(.wp-block-column.is-style-foo){flex-basis: 100%;flex-grow: 0;}}'
+			);
+		} );
+	} );
 } );
