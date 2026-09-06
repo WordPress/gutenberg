@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Composite } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import DownloadableBlockListItem from '../';
 import { plugin } from '../../test/fixtures';
@@ -10,6 +11,14 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 	return mock;
 } );
 
+function renderItem( props ) {
+	return render(
+		<Composite>
+			<DownloadableBlockListItem { ...props } />
+		</Composite>
+	);
+}
+
 describe( 'DownloadableBlockListItem', () => {
 	it( 'should render a block item', () => {
 		useSelect.mockImplementation( () => ( {
@@ -17,9 +26,7 @@ describe( 'DownloadableBlockListItem', () => {
 			isInstallable: true,
 		} ) );
 
-		render(
-			<DownloadableBlockListItem onClick={ jest.fn() } item={ plugin } />
-		);
+		renderItem( { onClick: jest.fn(), item: plugin } );
 		const author = screen.queryByText( `by ${ plugin.author }` );
 		const description = screen.queryByText( plugin.description );
 		expect( author ).toBeInTheDocument();
@@ -32,9 +39,7 @@ describe( 'DownloadableBlockListItem', () => {
 			isInstallable: true,
 		} ) );
 
-		render(
-			<DownloadableBlockListItem onClick={ jest.fn() } item={ plugin } />
-		);
+		renderItem( { onClick: jest.fn(), item: plugin } );
 		const statusLabel = screen.queryByText( 'Installing…' );
 		expect( statusLabel ).toBeInTheDocument();
 	} );
@@ -45,9 +50,7 @@ describe( 'DownloadableBlockListItem', () => {
 			isInstallable: false,
 		} ) );
 
-		render(
-			<DownloadableBlockListItem onClick={ jest.fn() } item={ plugin } />
-		);
+		renderItem( { onClick: jest.fn(), item: plugin } );
 		const button = screen.getByRole( 'option' );
 		// Keeping it false to avoid focus loss and disable it using aria-disabled.
 		expect( button ).toBeEnabled();
@@ -62,9 +65,7 @@ describe( 'DownloadableBlockListItem', () => {
 			isInstallable: true,
 		} ) );
 		const onClick = jest.fn();
-		render(
-			<DownloadableBlockListItem onClick={ onClick } item={ plugin } />
-		);
+		renderItem( { onClick, item: plugin } );
 
 		await user.click( screen.getByRole( 'option' ) );
 
