@@ -20,7 +20,6 @@ import {
 } from './color-ramps/index.ts';
 import { getColorString } from './color-ramps/lib/color-utils.ts';
 import { DEFAULT_RAMPS } from './color-ramps/lib/default-ramps.ts';
-import type { AccentRampResult } from './color-ramps/lib/types.ts';
 import type { ThemeProviderProps } from './types.ts';
 import {
 	collectThemeProviderColorWarnings,
@@ -154,10 +153,7 @@ function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
 }
 
 function colorTokensCSS(
-	computedColorRamps: Map<
-		ThemeProviderColorRampName,
-		RampResult | AccentRampResult
-	>
+	computedColorRamps: Map< ThemeProviderColorRampName, RampResult >
 ): Entry[] {
 	const entries: Entry[] = [];
 
@@ -208,7 +204,7 @@ function generateThemeProviderColors(
 	};
 	const computedColorRamps = new Map<
 		ThemeProviderColorRampName,
-		RampResult | AccentRampResult
+		RampResult
 	>();
 	const bgRamp = getBgRamp( seeds.background );
 

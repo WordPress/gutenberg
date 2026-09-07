@@ -32,9 +32,6 @@ export type RampDirection = 'lighter' | 'darker';
 // FGS4/FGS5 are produced by the foreground pass, not the base constraint solve.
 export type BaseRamp = Omit< Ramp, 'fgSurface4' | 'fgSurface5' >;
 export type BaseRampStep = keyof BaseRamp;
-// Internal calculation profiles. ThemeProvider chooses from semantic usage;
-// full ramps remain available for generation and diagnostics.
-export type AccentRampPurpose = 'full' | 'interactive' | 'status';
 export type FollowDirection = 'main' | 'opposite' | 'best' | RampDirection;
 export type ContrastRequirement = {
 	/** The reference color against which to calculate the contrast */
@@ -141,10 +138,3 @@ export type RampResult< Colors = Ramp > = {
 };
 
 export type BaseRampResult = RampResult< BaseRamp >;
-
-export type AccentRampResult = RampResult<
-	Omit< Ramp, 'surface6' | 'stroke2' | 'stroke4' | 'fgSurface5' > &
-		Partial<
-			Pick< Ramp, 'surface6' | 'stroke2' | 'stroke4' | 'fgSurface5' >
-		>
->;
