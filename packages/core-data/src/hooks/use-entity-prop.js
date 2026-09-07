@@ -25,7 +25,9 @@ export default function useEntityProp( kind, name, prop, _id ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 	const context = useContext( EntityContext );
-	const revisionId = context?.revisionId;
+	// A revision applies only to the record it was provided for.
+	const revisionId =
+		id === providerId ? context?.revision?.[ kind ]?.[ name ] : undefined;
 
 	const { value, fullValue } = useSelect(
 		( select ) => {

@@ -1009,3 +1009,60 @@ test.describe( 'Post autosave shareable URLs with revisions disabled', () => {
 			.toBe( String( autosave.id ) );
 	} );
 } );
+
+test.describe( 'Post revisions with nested entities', () => {
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
+	// The revision ID must not leak to other entities, such as the posts
+	// listed by a Query Loop.
+	test( 'should render entities other than the revised post', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.createPost( {
+			title: 'Loop post',
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/query',
+			innerBlocks: [
+				{
+					name: 'core/post-template',
+					innerBlocks: [ { name: 'core/post-title' } ],
+				},
+			],
+		} );
+		await editor.saveDraft();
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second revision' },
+		} );
+		await editor.saveDraft();
+
+		await editor.openDocumentSettingsSidebar();
+		const settingsSidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
+		await settingsSidebar
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+				exact: true,
+			} )
+			.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Title' } )
+		).toHaveText( 'Loop post' );
+	} );
+} );
