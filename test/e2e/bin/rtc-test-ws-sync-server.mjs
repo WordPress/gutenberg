@@ -24,6 +24,11 @@ import { WebSocketServer } from 'ws';
 
 const DEFAULT_PORT = 18991;
 const PORT = parsePortArg();
+const RTC_WS_DELAY = Number.parseInt( process.env.RTC_WS_DELAY || '0', 10 );
+
+if ( ! Number.isInteger( RTC_WS_DELAY ) || RTC_WS_DELAY < 0 ) {
+	throw new Error( `Invalid RTC_WS_DELAY: ${ process.env.RTC_WS_DELAY }` );
+}
 
 function parsePortArg() {
 	const portIndex = process.argv.indexOf( '--port' );
@@ -54,6 +59,16 @@ setPersistence( {
 const wss = new WebSocketServer( { noServer: true } );
 
 wss.on( 'connection', ( ws, request ) => {
+	if ( RTC_WS_DELAY > 0 ) {
+		const originalSend = ws.send.bind( ws );
+		ws.send = ( data, ...args ) => {
+			setTimeout( () => {
+				if ( ws.readyState === ws.OPEN ) {
+					originalSend( data, ...args );
+				}
+			}, RTC_WS_DELAY );
+		};
+	}
 	setupWSConnection( ws, request );
 } );
 
@@ -70,7 +85,9 @@ function reset( response ) {
 }
 
 const server = http.createServer( ( request, response ) => {
-	if ( request.url === '/health' ) {
+	const url = new URL( request.url, `http://${ request.headers.host }` );
+
+	if ( url.pathname === '/health' ) {
 		response.writeHead( 200, { 'content-type': 'application/json' } );
 		response.end(
 			JSON.stringify( {
@@ -83,7 +100,7 @@ const server = http.createServer( ( request, response ) => {
 		return;
 	}
 
-	if ( request.method === 'POST' && request.url === '/reset' ) {
+	if ( request.method === 'POST' && url.pathname === '/reset' ) {
 		reset( response );
 		return;
 	}

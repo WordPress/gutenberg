@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const babelJest = require( 'babel-jest' );
 
 // Remove this workaround when https://github.com/facebook/jest/issues/11444 gets resolved in Jest.

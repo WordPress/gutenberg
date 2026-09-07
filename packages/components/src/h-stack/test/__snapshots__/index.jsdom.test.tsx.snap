@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`props should render alignment 1`] = `
+<div>
+  <div
+    class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
+    data-wp-c16t="true"
+    data-wp-component="HStack"
+    style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 2); --wp-components-flex-justify: center;"
+  >
+    <div />
+    <div />
+  </div>
+</div>
+`;
+
+exports[`props should render correctly 1`] = `
+<div>
+  <div
+    class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
+    data-wp-c16t="true"
+    data-wp-component="HStack"
+    style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 2); --wp-components-flex-justify: space-between;"
+  >
+    <div />
+    <div />
+  </div>
+</div>
+`;
+
+exports[`props should render spacing 1`] = `
+<div>
+  <div
+    class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
+    data-wp-c16t="true"
+    data-wp-component="HStack"
+    style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 5); --wp-components-flex-justify: space-between;"
+  >
+    <div />
+    <div />
+  </div>
+</div>
+`;

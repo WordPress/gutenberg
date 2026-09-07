@@ -8,9 +8,10 @@ Existing patches should be described and justified here.
 
 ## Patches
 
-### `patches/lighthouse+10.4.0.patch`
+### `patches/@arraypress+waveform-player+1.26.0.patch`
 
-No notes.
+This patch requires initialization to be requested explicitly and removes passing custom SVG icons
+through HTML data attributes.
 
 ### `patches/react-autosize-textarea+7.1.0.patch`
 
@@ -24,19 +25,3 @@ See https://github.com/facebook/react/pull/17883.
 
 The package also uses a way of doing default exports from a CJS package that is not compatible with
 Node.js ES modules. The patch also fixes this.
-
-### `patches/react-devtools-core+4.28.5.patch`
-
-The mobile editor relies upon `jsdom-jscore-rn` to create a partial DOM
-environment, which causes `react-devtools-core` to believe it's running in a
-browser environment. We added a custom conditional to disable browser-specific
-features when running in a `jsdom-jscore-rn` environment.
-
-See https://github.com/WordPress/gutenberg/pull/47616.
-
-### `patches/react-native+0.73.3.patch`
-
-Accessibility changes in React Native 0.73.0 resulted in a broken braille screen
-input on iOS. This patch is a workaround to restore the previous behavior.
-
-See https://github.com/WordPress/gutenberg/pull/53895.

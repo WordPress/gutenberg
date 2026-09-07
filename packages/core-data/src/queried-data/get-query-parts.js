@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { withWeakMapCache, getNormalizedCommaSeparable } from '../utils';
 
 /**

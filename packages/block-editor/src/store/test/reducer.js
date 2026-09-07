@@ -1,11 +1,13 @@
-/**
- * External dependencies
- */
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import deepFreeze from 'deep-freeze';
-
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -13,10 +15,6 @@ import {
 	privateApis,
 } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	hasSameKeys,
 	isUpdatingSameBlockAttribute,
@@ -43,6 +41,7 @@ import {
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
 	selectedBlockStyleState,
+	styleStateViewport,
 } from '../reducer';
 import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
@@ -50,18 +49,38 @@ import { sectionRootClientIdKey, isIsolatedEditorKey } from '.././private-keys';
 
 const { isContentBlock } = unlock( privateApis );
 
-jest.mock( '@wordpress/data/src/select', () => {
-	const actualSelect = jest.requireActual( '@wordpress/data/src/select' );
+const { mockIsContentBlock } = vi.hoisted( () => ( {
+	mockIsContentBlock: vi.fn(),
+} ) );
+
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
+	const actualData = await importOriginal();
 
 	return {
-		select: jest.fn( ( ...args ) => actualSelect.select( ...args ) ),
+		...actualData,
+		select: vi.fn( ( ...args ) => actualData.select( ...args ) ),
 	};
 } );
 
-jest.mock( '@wordpress/blocks/src/api/utils', () => {
+vi.mock( import( '../../lock-unlock' ), async ( importOriginal ) => {
+	const actualLockUnlock = await importOriginal();
+
 	return {
-		...jest.requireActual( '@wordpress/blocks/src/api/utils' ),
-		isContentBlock: jest.fn(),
+		...actualLockUnlock,
+		unlock: ( value ) => {
+			const unlocked = actualLockUnlock.unlock( value );
+			if (
+				unlocked &&
+				typeof unlocked === 'object' &&
+				'isContentBlock' in unlocked
+			) {
+				return {
+					...unlocked,
+					isContentBlock: mockIsContentBlock,
+				};
+			}
+			return unlocked;
+		},
 	};
 } );
 
@@ -834,7 +853,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'ribs',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -880,7 +899,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'wings',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -888,7 +907,7 @@ describe( 'state', () => {
 
 			expect( state.byClientId.size ).toBe( 1 );
 			expect( state.byClientId.get( 'wings' ).name ).toBe(
-				'core/freeform'
+				'core/registered-block'
 			);
 			expect( state.byClientId.get( 'wings' ).clientId ).toBe( 'wings' );
 			expect( Object.fromEntries( state.order ) ).toEqual( {
@@ -903,7 +922,7 @@ describe( 'state', () => {
 			);
 			expect( state.tree.get( 'wings' ) ).toEqual( {
 				clientId: 'wings',
-				name: 'core/freeform',
+				name: 'core/registered-block',
 				innerBlocks: [],
 			} );
 		} );
@@ -955,7 +974,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'wings',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -974,7 +993,7 @@ describe( 'state', () => {
 			);
 			expect( state.tree.get( 'wings' ) ).toEqual( {
 				clientId: 'wings',
-				name: 'core/freeform',
+				name: 'core/registered-block',
 				innerBlocks: [],
 			} );
 		} );
@@ -1037,7 +1056,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'chicken',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -1048,7 +1067,7 @@ describe( 'state', () => {
 				'core/test-block'
 			);
 			expect( replacedState.byClientId.get( 'chicken' ).name ).toBe(
-				'core/freeform'
+				'core/registered-block'
 			);
 			expect( replacedState.byClientId.get( 'chicken' ).clientId ).toBe(
 				'chicken'
@@ -1072,7 +1091,7 @@ describe( 'state', () => {
 			] );
 			const replacementNestedBlock = {
 				clientId: 'chicken',
-				name: 'core/freeform',
+				name: 'core/registered-block',
 				attributes: {},
 				innerBlocks: [],
 			};
@@ -1098,7 +1117,7 @@ describe( 'state', () => {
 				'core/test-block'
 			);
 			expect( replacedNestedState.byClientId.get( 'chicken' ).name ).toBe(
-				'core/freeform'
+				'core/registered-block'
 			);
 		} );
 
@@ -1603,7 +1622,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'persimmon',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -2234,6 +2253,52 @@ describe( 'state', () => {
 					} );
 
 					expect( subsequentState.isPersistentChange ).toBe( true );
+				} );
+
+				it( 'should flag ignored history for an explicitly marked not persistent change', () => {
+					let original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
+					original = blocks( original, {
+						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+						history: 'ignore',
+					} );
+
+					const nextState = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( nextState.isPersistentChange ).toBe( false );
+					expect( nextState.lastBlockChangeHistoryMode ).toBe(
+						'ignore'
+					);
+
+					// A subsequent change should clear the ignored history.
+					const subsequentState = blocks( nextState, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							other: true,
+						},
+					} );
+
+					expect( subsequentState.isPersistentChange ).toBe( true );
+					expect(
+						subsequentState.lastBlockChangeHistoryMode
+					).toBeUndefined();
 				} );
 
 				it( 'should retain reference for same state, same persistence', () => {
@@ -3409,9 +3474,9 @@ describe( 'state', () => {
 
 	describe( 'settings', () => {
 		it( 'should warn about __unstableIsPreviewMode deprecation', () => {
-			const consoleWarn = jest
+			const consoleWarn = vi
 				.spyOn( global.console, 'warn' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 
 			const settingsObject = settings( undefined, {
 				type: 'UPDATE_SETTINGS',
@@ -5814,6 +5879,57 @@ describe( 'state', () => {
 				);
 			} );
 		} );
+
+		describe( 'template parts with disableContentOnlyForTemplateParts enabled', () => {
+			let initialState;
+			beforeAll( () => {
+				initialState = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								disableContentOnlyForTemplateParts: true,
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/template-part',
+									clientId: 'template-part',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'template-part',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'template-part',
+							blocks: [
+								{
+									name: 'core/paragraph',
+									clientId: 'template-part-paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+			} );
+
+			it( 'returns no derived editing modes for template parts when disableContentOnlyForTemplateParts is true', () => {
+				expect( initialState.derivedBlockEditingModes ).toEqual(
+					new Map()
+				);
+			} );
+		} );
 	} );
 
 	describe( 'selectedBlockStyleState', () => {
@@ -5827,14 +5943,14 @@ describe( 'state', () => {
 			const state = selectedBlockStyleState( undefined, {
 				type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 				clientId: 'client-1',
-				value: { viewport: 'mobile' },
+				value: { viewport: '@mobile' },
 			} );
 
 			expect( state ).toEqual( {
 				clientId: 'client-1',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'mobile',
+					viewport: '@mobile',
 					pseudo: 'default',
 				},
 			} );
@@ -5851,7 +5967,6 @@ describe( 'state', () => {
 				clientId: 'client-1',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'default',
 					pseudo: ':hover',
 				},
 			} );
@@ -5861,7 +5976,7 @@ describe( 'state', () => {
 			const state = selectedBlockStyleState(
 				{
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: 'default' },
+					value: { viewport: '@mobile', pseudo: 'default' },
 				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
@@ -5874,7 +5989,7 @@ describe( 'state', () => {
 				clientId: 'client-1',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'mobile',
+					viewport: '@mobile',
 					pseudo: ':hover',
 				},
 			} );
@@ -5884,7 +5999,7 @@ describe( 'state', () => {
 			const state = selectedBlockStyleState(
 				{
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: ':hover' },
+					value: { viewport: '@mobile', pseudo: ':hover' },
 				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
@@ -5897,7 +6012,6 @@ describe( 'state', () => {
 				clientId: 'client-2',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'default',
 					pseudo: ':focus',
 				},
 			} );
@@ -5907,7 +6021,7 @@ describe( 'state', () => {
 			const state = selectedBlockStyleState(
 				{
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: ':hover' },
+					value: { viewport: '@mobile', pseudo: ':hover' },
 				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
@@ -6006,6 +6120,36 @@ describe( 'state', () => {
 				{
 					type: 'SELECTION_CHANGE',
 					clientId: 'client-2',
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps the selected state for selection changes within the same block', () => {
+			const originalState = {
+				clientId: 'client-1',
+				value: { viewport: 'default', pseudo: ':hover' },
+			};
+			const state = selectedBlockStyleState( originalState, {
+				type: 'SELECTION_CHANGE',
+				start: { clientId: 'client-1' },
+				end: { clientId: 'client-1' },
+			} );
+
+			expect( state ).toBe( originalState );
+		} );
+
+		it( 'clears the selected state for selection changes across multiple blocks', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+				{
+					type: 'SELECTION_CHANGE',
+					start: { clientId: 'client-1' },
+					end: { clientId: 'client-2' },
 				}
 			);
 
@@ -6140,7 +6284,7 @@ describe( 'state', () => {
 			const state = selectedBlockStyleState(
 				{
 					clientId: 'client-1',
-					value: { viewport: 'mobile', pseudo: ':hover' },
+					value: { viewport: '@mobile', pseudo: ':hover' },
 				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW',
@@ -6152,7 +6296,7 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				clientId: 'client-1',
 				showStateOnCanvas: false,
-				value: { viewport: 'mobile', pseudo: ':hover' },
+				value: { viewport: '@mobile', pseudo: ':hover' },
 			} );
 		} );
 
@@ -6161,7 +6305,7 @@ describe( 'state', () => {
 				{
 					clientId: 'client-1',
 					showStateOnCanvas: false,
-					value: { viewport: 'mobile', pseudo: 'default' },
+					value: { viewport: '@mobile', pseudo: 'default' },
 				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
@@ -6173,8 +6317,37 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				clientId: 'client-1',
 				showStateOnCanvas: false,
-				value: { viewport: 'mobile', pseudo: ':hover' },
+				value: { viewport: '@mobile', pseudo: ':hover' },
 			} );
+		} );
+	} );
+
+	describe( 'styleStateViewport', () => {
+		it( 'defaults to "default"', () => {
+			expect( styleStateViewport( undefined, {} ) ).toBe( 'default' );
+		} );
+
+		it( 'stores the selected viewport', () => {
+			expect(
+				styleStateViewport( 'default', {
+					type: 'SET_STYLE_STATE_VIEWPORT',
+					viewport: '@tablet',
+				} )
+			).toBe( '@tablet' );
+		} );
+
+		it( 'falls back to "default" when no viewport is provided', () => {
+			expect(
+				styleStateViewport( '@tablet', {
+					type: 'SET_STYLE_STATE_VIEWPORT',
+				} )
+			).toBe( 'default' );
+		} );
+
+		it( 'ignores unrelated actions', () => {
+			expect(
+				styleStateViewport( '@mobile', { type: 'SOME_OTHER_ACTION' } )
+			).toBe( '@mobile' );
 		} );
 	} );
 

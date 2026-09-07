@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { processBlockType } from './process-block-type';
 import type { BlockBindingsSource, BlockType } from '../types';
 import type { Action, BlocksStoreThunkArgs } from './types';

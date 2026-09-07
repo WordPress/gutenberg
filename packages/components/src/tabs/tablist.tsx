@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
-import * as Ariakit from '@ariakit/react';
+import { useStoreState } from '@ariakit/react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import warning from '@wordpress/warning';
 import { forwardRef, useLayoutEffect, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { TabListProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import type { ElementOffsetRect } from '../utils/element-rect';
@@ -73,15 +62,14 @@ export const TabList = forwardRef<
 >( function TabList( { children, ...otherProps }, ref ) {
 	const { store } = useTabsContext() ?? {};
 
-	const selectedId = Ariakit.useStoreState( store, 'selectedId' );
-	const activeId = Ariakit.useStoreState( store, 'activeId' );
-	const selectOnMove = Ariakit.useStoreState( store, 'selectOnMove' );
-	const items = Ariakit.useStoreState( store, 'items' );
+	const selectedId = useStoreState( store, 'selectedId' );
+	const selectOnMove = useStoreState( store, 'selectOnMove' );
+	const items = useStoreState( store, 'items' );
 	const [ parent, setParent ] = useState< HTMLElement >();
 	const refs = useMergeRefs( [ ref, setParent ] );
 
 	const selectedItem = store?.item( selectedId );
-	const renderedItems = Ariakit.useStoreState( store, 'renderedItems' );
+	const renderedItems = useStoreState( store, 'renderedItems' );
 
 	const selectedItemIndex =
 		renderedItems && selectedItem
@@ -110,20 +98,6 @@ export const TabList = forwardRef<
 	// Make sure selected tab is scrolled into view.
 	useScrollRectIntoView( parent, selectedRect );
 
-	const onBlur = () => {
-		if ( ! selectOnMove ) {
-			return;
-		}
-
-		// When automatic tab selection is on, make sure that the active tab is up
-		// to date with the selected tab when leaving the tablist. This makes sure
-		// that the selected tab will receive keyboard focus when tabbing back into
-		// the tablist.
-		if ( selectedId !== activeId ) {
-			store?.setActiveId( selectedId );
-		}
-	};
-
 	if ( ! store ) {
 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
 		return null;
@@ -133,7 +107,7 @@ export const TabList = forwardRef<
 		<StyledTabList
 			ref={ refs }
 			store={ store }
-			render={ ( props: React.HTMLAttributes< HTMLDivElement > ) => (
+			render={ ( props ) => (
 				<div
 					{ ...props }
 					// Fallback to -1 to prevent browsers from making the tablist
@@ -141,7 +115,6 @@ export const TabList = forwardRef<
 					tabIndex={ props.tabIndex ?? -1 }
 				/>
 			) }
-			onBlur={ onBlur }
 			data-select-on-move={ selectOnMove ? 'true' : 'false' }
 			{ ...otherProps }
 			className={ clsx(

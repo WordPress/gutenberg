@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { FieldType } from '../types/private';
 import {
 	OPERATOR_CONTAINS,

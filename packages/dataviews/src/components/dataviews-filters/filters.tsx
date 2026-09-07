@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { memo, useContext, useRef } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import Filter from './filter';
 import { default as AddFilter } from './add-filter';
 import ResetFilters from './reset-filters';

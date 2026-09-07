@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { dispatch } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 

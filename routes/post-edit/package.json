@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"private": true,
 	"route": {
-		"path": "/types/$type/edit/$id",
+		"path": "/types/$type/edit/$",
 		"page": "site-editor-v2"
 	},
 	"dependencies": {

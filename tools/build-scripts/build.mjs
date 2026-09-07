@@ -1,11 +1,7 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
-import spawn from 'cross-spawn';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import spawn from 'cross-spawn';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
@@ -78,27 +74,43 @@ function exec( command, args = [], options = {} ) {
  * Main build orchestration function.
  */
 async function build() {
-	const skipTypes = process.argv.includes( '--skip-types' );
-
 	console.log( '🔨 Starting build process...\n' );
 
 	const startTime = Date.now();
 
 	try {
-		// Step 0: Verify node_modules is in sync with package-lock.json
-		console.log( '🔍 Checking dependencies...' );
-		await exec( 'npm', [
-			'run',
-			'check-installed-deps',
-			'--workspace',
-			'@wordpress/validation-tools',
-			'--silent',
-		] ).catch( () => {
-			throw new Error( 'Run `npm install` to update.' );
-		} );
+		/*
+		 * Step 0: Verify node_modules is in sync with package-lock.json.
+		 *
+		 * GUTENBERG_CHECK_INSTALLED_DEPS controls when this runs:
+		 *   - `BEFORE_BUILD` (default): pre-build gate.
+		 *   - `NEVER`: skip entirely (sticky opt-out for power users).
+		 */
+		if ( process.env.GUTENBERG_CHECK_INSTALLED_DEPS === 'NEVER' ) {
+			console.log(
+				'🔍 Skipping dependency check (GUTENBERG_CHECK_INSTALLED_DEPS=NEVER).'
+			);
+		} else {
+			console.log( '🔍 Checking dependencies...' );
+			await exec( 'npm', [
+				'run',
+				'check-installed-deps',
+				'--workspace',
+				'@wordpress/validation-tools',
+				'--silent',
+			] ).catch( () => {
+				throw new Error(
+					'Run `npm install` to update, or set GUTENBERG_CHECK_INSTALLED_DEPS=NEVER to skip this check.'
+				);
+			} );
+		}
 
 		console.log( '\n🧹 Cleaning packages...' );
-		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
+		await exec(
+			'node',
+			[ path.join( __dirname, 'clean.mjs' ), '--packages' ],
+			{ silent: true }
+		);
 
 		console.log( '\n📦 Building workspaces...' );
 		await exec(
@@ -113,26 +125,24 @@ async function build() {
 			path.join( __dirname, 'packages/generate-worker-placeholders.mjs' ),
 		] );
 
-		if ( ! skipTypes ) {
-			console.log( '\n📘 Building TypeScript types...\n' );
-			const tsStartTime = Date.now();
-			await exec( 'tsgo', [ '--build' ] ).catch( () => {
-				console.error(
-					'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
-				);
-				throw new Error( 'TypeScript compilation failed' );
-			} );
-			const buildTime = Date.now() - tsStartTime;
-			console.log( `   ✔ Built TypeScript types (${ buildTime }ms)` );
-
-			console.log( '\n✅ Checking type declaration files...' );
-			await exec( 'node', [
-				path.join(
-					__dirname,
-					'packages/check-build-type-declaration-files.cjs'
-				),
-			] );
-		}
+		/*
+		 * Emit declarations without type checking; `npm run typecheck` owns
+		 * that. Only parse and declaration emit errors can fail this step.
+		 */
+		console.log( '\n📘 Building TypeScript types...\n' );
+		const tsStartTime = Date.now();
+		await exec( 'tsc', [
+			'--build',
+			'tsconfig.build.json',
+			'--noCheck',
+		] ).catch( () => {
+			console.error(
+				'\n❌ TypeScript declaration emit failed. Try cleaning up first: `npm run clean:package-types`'
+			);
+			throw new Error( 'TypeScript declaration emit failed' );
+		} );
+		const buildTime = Date.now() - tsStartTime;
+		console.log( `   ✔ Built TypeScript types (${ buildTime }ms)` );
 
 		console.log( '\n📦 Building vendor files...' );
 		await exec( 'node', [
@@ -140,10 +150,7 @@ async function build() {
 		] );
 
 		console.log( '\n📦 Building packages (production mode)...' );
-		const buildArgs = process.argv
-			.slice( 2 )
-			.filter( ( arg ) => arg !== '--skip-types' );
-		await exec( 'wp-build', buildArgs, {
+		await exec( 'wp-build', process.argv.slice( 2 ), {
 			env: { ...process.env, NODE_ENV: 'production' },
 		} );
 

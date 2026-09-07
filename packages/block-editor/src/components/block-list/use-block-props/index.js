@@ -1,21 +1,12 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import useMovingAnimation from '../../use-moving-animation';
+import { store as blockEditorStore } from '../../../store';
 import { PrivateBlockContext } from '../private-block-context';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
@@ -24,6 +15,7 @@ import {
 	useBlockEditContext,
 } from '../../block-edit/context';
 import { useFocusHandler } from './use-focus-handler';
+import { useRegisterBlockEventHandlers } from './use-register-block-event-handlers';
 import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
@@ -31,6 +23,50 @@ import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
 import { useBlockVisibility } from '../../block-visibility/';
+
+/**
+ * Returns a ref that inserts a ghost block when the user enters it: the
+ * same block object the ghost has rendered from all along, so nothing
+ * about the element changes. Native listeners, so blocks' own handlers
+ * are never clashed with.
+ *
+ * @param {string}  rootClientId The block's root client ID.
+ * @param {?Object} ghostBlock   The ghost block object, while not inserted.
+ *
+ * @return {Function} Ref effect for the block element.
+ */
+function useGhostMaterialize( rootClientId, ghostBlock ) {
+	const { insertBlocks } = useDispatch( blockEditorStore );
+
+	return useRefEffect(
+		( element ) => {
+			if ( ! ghostBlock ) {
+				return;
+			}
+			function remove() {
+				element.removeEventListener( 'pointerdown', materialize, true );
+				element.removeEventListener( 'focusin', materialize, true );
+			}
+			function materialize() {
+				// One gesture fires both events; insert once.
+				remove();
+				// Update the selection: the ghost is empty, so the caret
+				// can only be at its start, and the undo level records it.
+				insertBlocks(
+					[ ghostBlock ],
+					undefined,
+					rootClientId,
+					true,
+					0
+				);
+			}
+			element.addEventListener( 'pointerdown', materialize, true );
+			element.addEventListener( 'focusin', materialize, true );
+			return remove;
+		},
+		[ ghostBlock, rootClientId, insertBlocks ]
+	);
+}
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -105,7 +141,14 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		canMove,
 		blockVisibility,
 		deviceType,
+		viewportSettings,
+		ariaLabel,
+		ghostBlock,
+		rootClientId,
 	} = useContext( PrivateBlockContext );
+	const ghostRef = useGhostMaterialize( rootClientId, ghostBlock );
+
+	useRegisterBlockEventHandlers( clientId, wrapperProps );
 
 	const defaultViewRef = useRefEffect( ( element ) => {
 		if ( element ) {
@@ -122,6 +165,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const isHoverEnabled = ! isWithinSectionBlock;
 	const mergedRefs = useMergeRefs( [
 		props.ref,
+		ghostRef,
 		defaultViewRef,
 		useFocusFirstElement( { clientId, initialPosition } ),
 		useBlockRefProvider( clientId ),
@@ -153,6 +197,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const { isBlockCurrentlyHidden } = useBlockVisibility( {
 		blockVisibility,
 		deviceType,
+		viewportSettings,
 		view: defaultViewRef.current,
 	} );
 
@@ -181,11 +226,17 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
 		role: 'document',
-		'aria-label': blockLabel,
+		'aria-label':
+			ariaLabel ??
+			( clientId === ghostBlock?.clientId
+				? __( 'Add default block' )
+				: undefined ) ??
+			props[ 'aria-label' ] ??
+			blockLabel,
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
-		inert: isSubtreeDisabled ? true : undefined,
+		inert: isSubtreeDisabled ? 'true' : undefined,
 		className: clsx(
 			'block-editor-block-list__block',
 			{

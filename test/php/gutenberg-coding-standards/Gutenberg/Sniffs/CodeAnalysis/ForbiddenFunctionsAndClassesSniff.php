@@ -65,8 +65,8 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	 * Detects whether a given string token represents a function call or class usage.
 	 * It then delegates further processing based on the type of usage detected.
 	 *
-	 * @param File $phpcs_file The file being scanned.
-	 * @param int  $stack_pointer  The position of the current token in the token stack.
+	 * @param File $phpcs_file    The file being scanned.
+	 * @param int  $stack_pointer The position of the current token in the token stack.
 	 */
 	private function process_string_token( File $phpcs_file, $stack_pointer ) {
 		if ( empty( $this->forbidden_functions ) && empty( $this->forbidden_classes ) ) {
@@ -173,7 +173,6 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	 *
 	 * @param File $phpcs_file    File being scanned.
 	 * @param int  $stack_pointer Position of the text token in the token stack.
-	 *
 	 * @return bool               Returns true if the token is guarded.
 	 */
 	private function check_if_token_guarded( File $phpcs_file, $stack_pointer ) {
@@ -219,7 +218,6 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	 * Sanitize an array of values by trimming each element and removing empty elements.
 	 *
 	 * @param array $values The values being sanitized.
-	 *
 	 * @return array
 	 */
 	private static function sanitize( $values ) {

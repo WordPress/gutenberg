@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useMediaEditor } from '../../state';
 import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
 import { MAX_ROTATION_OFFSET } from '../../image-editor/core/constants';
@@ -14,18 +7,26 @@ import RotationRuler from '../rotation-ruler';
 export interface MediaEditorFineRotationProps {
 	/** Signal that a placement-oriented control is being adjusted. */
 	onPlacementControlInteraction?: () => void;
+	/**
+	 * Disable the ruler. Set while the edit is saving; `RotationRuler`
+	 * cancels an in-flight drag when this flips.
+	 */
+	disabled?: boolean;
 }
 
 /**
- * Fine-rotation slider for the media-editor footer. Lives separately from
- * the snap-rotate / flip buttons so the footer can place the two halves on
- * different rows at intermediate viewport widths.
+ * Fine-rotation slider for the media editor. It renders under the canvas so it
+ * stays constrained to the canvas column at all viewport sizes. Lives
+ * separately from the snap-rotate / flip buttons so the two can be placed
+ * independently per viewport.
  *
  * @param props
  * @param props.onPlacementControlInteraction
+ * @param props.disabled
  */
 export default function MediaEditorFineRotation( {
 	onPlacementControlInteraction,
+	disabled = false,
 }: MediaEditorFineRotationProps ) {
 	const { state, setRotation } = useMediaEditor();
 	// `commitOnKeyUp: false` lets rapid arrow-key adjustments coalesce
@@ -68,6 +69,7 @@ export default function MediaEditorFineRotation( {
 				max={ MAX_ROTATION_OFFSET }
 				value={ fineOffset }
 				onChange={ handleRotationSlider }
+				disabled={ disabled }
 			/>
 		</div>
 	);

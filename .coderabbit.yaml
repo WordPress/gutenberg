@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+reviews:
+    # Post the summary in CodeRabbit's own walkthrough comment rather than
+    # editing the pull request description.
+    high_level_summary_in_walkthrough: true
+    auto_review:
+        # Don't review every pull request. Reviews run when someone comments
+        # `@coderabbitai review`, or when the keyword below is in the description.
+        enabled: false
+        description_keyword: '@coderabbitai review'

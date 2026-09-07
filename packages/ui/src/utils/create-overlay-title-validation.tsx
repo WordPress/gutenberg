@@ -46,7 +46,7 @@ export function createOverlayTitleValidation( componentName: string ) {
 	function ValidationProviderDev( {
 		children,
 	}: OverlayValidationProviderProps ) {
-		const titleElementRef = useRef< HTMLElement >( null );
+		const titleElementRef = useRef< HTMLElement | null >( null );
 
 		const scheduleValidation = useScheduleValidation( () => {
 			const titleElement = titleElementRef.current;

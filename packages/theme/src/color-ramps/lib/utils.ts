@@ -7,9 +7,9 @@ import {
 	ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS,
 	MAX_BISECTION_ITERATIONS,
 	CONTRAST_EPSILON,
-} from './constants';
-import type { Ramp, RampConfig, RampDirection } from './types';
-import { getContrast } from './color-utils';
+} from './constants.ts';
+import type { Ramp, RampConfig, RampDirection } from './types.ts';
+import { getContrast } from './color-utils.ts';
 
 /**
  * Build a dependency graph from the steps configuration
@@ -176,7 +176,7 @@ export function clampAccentScaleReferenceLightness(
 }
 
 /**
- * Find the value of of `L` (luminance) that produces a `C` (color) that has a
+ * Find the value of `L` (luminance) that produces a `C` (color) that has a
  * `value` (contrast delta) equal to zero.
  * @param calculateC     Calculate `C` from a given `L`.
  * @param calculateValue Calculate value (delta) for a given `C`.

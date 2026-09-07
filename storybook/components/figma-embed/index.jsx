@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import './style.scss';
 
 // See https://www.figma.com/developers/embed#embed-a-figma-file

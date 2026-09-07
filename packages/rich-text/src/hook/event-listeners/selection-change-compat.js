@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { isRangeEqual } from '../../is-range-equal';
 import { unlock } from '../../lock-unlock';
 

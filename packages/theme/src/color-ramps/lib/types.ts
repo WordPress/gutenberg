@@ -1,4 +1,4 @@
-import type { TaperChromaOptions } from './taper-chroma';
+import type { TaperChromaOptions } from './taper-chroma.ts';
 
 export type Ramp = {
 	// Backgrounds for surfaces (nuanced, slight variations compared to bg)
@@ -77,6 +77,6 @@ export type RampConfig = Record< keyof Ramp, RampStepConfig >;
 
 export type RampResult = {
 	ramp: Record< keyof Ramp, string >;
-	warnings?: string[];
+	warnings?: ( keyof Ramp )[];
 	direction: RampDirection;
 };

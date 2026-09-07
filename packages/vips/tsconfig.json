@@ -1,11 +1,11 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types"
+		"types": [ "jest", "node" ]
 	},
-	"references": [ { "path": "../worker-threads" } ],
-	"include": [ "src/**/*" ],
-	"exclude": [ "src/test/**" ]
+	"references": [
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../worker-threads/tsconfig.build.json" }
+	]
 }

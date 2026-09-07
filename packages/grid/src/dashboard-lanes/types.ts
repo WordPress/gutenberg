@@ -1,8 +1,6 @@
-/**
- * Internal dependencies
- */
 import type {
 	DragPreviewRenderProps,
+	GridItemWidthLimits,
 	GridOverlayRenderProps,
 	ResizeHandleRenderProps,
 } from '../shared/types';
@@ -37,6 +35,22 @@ export type DashboardLanesLayoutItem = {
 	 * clamped to the available range.
 	 */
 	lane?: number;
+
+	/**
+	 * Whether the item can be dragged while the surface is in edit mode.
+	 * When `false`, the item is pinned: it also holds its index while the
+	 * other items reorder around it.
+	 *
+	 * @default true
+	 */
+	draggable?: boolean;
+
+	/**
+	 * Whether the item can be resized while the surface is in edit mode.
+	 *
+	 * @default true
+	 */
+	resizable?: boolean;
 
 	/**
 	 * Display order. Lower values render first. When omitted, the
@@ -161,23 +175,22 @@ export interface DashboardLanesProps
 	renderGridOverlay?: React.ComponentType< GridOverlayRenderProps >;
 
 	/**
-	 * Target lane count (cap). When set alone, the surface renders
-	 * this many lanes and tiles scale with the container.
-	 *
-	 * Composes with `minColumnWidth`: if both are set, the effective
-	 * lane count is `min( columns, fitsAtMinWidth )`. When omitted but
-	 * `minColumnWidth` is set, the count is uncapped and derives purely
-	 * from container width. When both are omitted, the surface
-	 * renders six lanes.
+	 * Target lane count, used as a cap. Defaults to six when neither
+	 * `columns` nor `minColumnWidth` is set; with `minColumnWidth` set
+	 * it can resolve lower on narrow containers.
 	 */
 	columns?: number;
 
 	/**
-	 * Per-tile minimum width in pixels. The effective lane count is
-	 * derived from container width, floored by this value, down to 1.
-	 *
-	 * Composes with `columns`: when both are set, this acts as a floor
-	 * that can reduce the count below `columns` on narrow containers.
+	 * Per-tile minimum width in pixels. Enables responsive mode: the
+	 * lane count derives from container width, floored by this value,
+	 * down to 1.
 	 */
 	minColumnWidth?: number;
+
+	/**
+	 * Per-item width limits in pixels, keyed by layout item key. Lane
+	 * heights are content-driven, so there is no height axis.
+	 */
+	itemLimits?: Record< string, GridItemWidthLimits >;
 }

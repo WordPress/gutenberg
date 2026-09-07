@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
+import { afterEach, describe, expect, it } from 'vitest';
 import { logged } from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import {
 	getComputedFluidTypographyValue,
 	getTypographyValueAndUnit,

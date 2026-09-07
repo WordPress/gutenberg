@@ -1,12 +1,7 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
-
-/**
- * Internal dependencies
- */
 import { COLORS, CONFIG } from '../utils';
+import { getPaddingBySize } from './get-padding-by-size';
+import type { BodyProps, FooterProps, HeaderProps, Props } from './types';
 
 // Since the border for `Card` is rendered via the `box-shadow` property
 // (as opposed to the `border` property), the value of the border radius needs
@@ -46,6 +41,16 @@ export const Body = css`
 	height: auto;
 	max-height: 100%;
 `;
+
+const ScrollableBody = css`
+	height: 100%;
+`;
+
+export function getCardBodyStyles( {
+	isScrollable,
+}: Pick< BodyProps, 'isScrollable' > ) {
+	return isScrollable ? css( Body, ScrollableBody ) : Body;
+}
 
 export const Media = css`
 	box-sizing: border-box;
@@ -97,3 +102,50 @@ export const rounded = css`
 export const shady = css`
 	background-color: ${ COLORS.ui.backgroundDisabled };
 `;
+
+export function getCardStyles( {
+	isBorderless,
+	isRounded,
+}: Pick< Props, 'isBorderless' | 'isRounded' > ) {
+	const cardStyles = css(
+		Card,
+		isBorderless && boxShadowless,
+		isRounded && rounded
+	);
+
+	return cardStyles;
+}
+
+export function getCardHeaderStyles( {
+	isBorderless,
+	isShady,
+	size,
+}: Pick< HeaderProps, 'isBorderless' | 'isShady' | 'size' > ) {
+	const headerStyles = css(
+		Header,
+		borderRadius,
+		borderColor,
+		getPaddingBySize( size ),
+		isBorderless && borderless,
+		isShady && shady
+	);
+
+	return headerStyles;
+}
+
+export function getCardFooterStyles( {
+	isBorderless,
+	isShady,
+	size,
+}: Pick< FooterProps, 'isBorderless' | 'isShady' | 'size' > ) {
+	const footerStyles = css(
+		Footer,
+		borderRadius,
+		borderColor,
+		getPaddingBySize( size ),
+		isBorderless && borderless,
+		isShady && shady
+	);
+
+	return footerStyles;
+}

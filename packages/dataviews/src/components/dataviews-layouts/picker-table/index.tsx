@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Spinner, Composite } from '@wordpress/components';
 import {
@@ -15,10 +8,6 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../../dataviews-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import { useIsMultiselectPicker } from '../../dataviews-picker-footer';
@@ -33,6 +22,8 @@ import type { SetSelection } from '../../../types/private';
 import ColumnHeaderMenu from '../table/column-header-menu';
 import ColumnPrimary from '../table/column-primary';
 import getDataByGroup from '../utils/get-data-by-group';
+import useSelectionProps from '../utils/use-selection-props';
+import type { SelectionProps } from '../utils/use-selection-props';
 import { useIntersectionObserver } from '../utils/use-infinite-scroll';
 
 interface TableColumnFieldProps< Item > {
@@ -53,7 +44,7 @@ interface TableRowProps< Item > {
 	selection: string[];
 	getItemId: ( item: Item ) => string;
 	onChangeSelection: SetSelection;
-	multiselect: boolean;
+	selectionProps: SelectionProps;
 	posinset?: number;
 }
 
@@ -92,7 +83,7 @@ function TableRow< Item >( {
 	selection,
 	getItemId,
 	onChangeSelection,
-	multiselect,
+	selectionProps,
 	posinset,
 }: TableRowProps< Item > ) {
 	const { paginationInfo } = useContext( DataViewsContext );
@@ -142,6 +133,8 @@ function TableRow< Item >( {
 			aria-setsize={ paginationInfo.totalItems || undefined }
 			aria-posinset={ posinset }
 			role={ infiniteScrollEnabled ? 'article' : 'option' }
+			onClickCapture={ selectionProps.onClickCapture }
+			onClick={ selectionProps.onClick }
 			onMouseDown={ ( event ) => {
 				if ( event.button !== 0 ) {
 					return;
@@ -156,19 +149,7 @@ function TableRow< Item >( {
 				event.currentTarget.parentElement?.focus( {
 					preventScroll: true,
 				} );
-			} }
-			onClick={ () => {
-				// Toggle in/out of selection array
-				if ( isSelected ) {
-					onChangeSelection(
-						selection.filter( ( itemId ) => id !== itemId )
-					);
-				} else {
-					const newSelection = multiselect
-						? [ ...selection, id ]
-						: [ id ];
-					onChangeSelection( newSelection );
-				}
+				selectionProps.onMouseDown( event );
 			} }
 		>
 			<td
@@ -269,6 +250,19 @@ function ViewPickerTable< Item >( {
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+
+	const orderedData = dataByGroup
+		? Array.from( dataByGroup.values() ).flat()
+		: data;
+	const { getSelectionProps } = useSelectionProps( {
+		data: orderedData,
+		getItemId,
+		isItemSelectable: () => true,
+		selection,
+		onChangeSelection,
+		selectionMode: isMultiselect ? 'multi' : 'single-clearable',
+		shouldSelectOnClick: true,
+	} );
 
 	const tableNoticeId = useId();
 
@@ -443,25 +437,32 @@ function ViewPickerTable< Item >( {
 											  ) }
 									</td>
 								</tr>
-								{ groupItems.map( ( item, index ) => (
-									<TableRow
-										key={ getItemId( item ) }
-										item={ item }
-										fields={ fields }
-										id={
-											getItemId( item ) ||
-											index.toString()
-										}
-										view={ view }
-										titleField={ titleField }
-										mediaField={ mediaField }
-										descriptionField={ descriptionField }
-										selection={ selection }
-										getItemId={ getItemId }
-										onChangeSelection={ onChangeSelection }
-										multiselect={ isMultiselect }
-									/>
-								) ) }
+								{ groupItems.map( ( item, index ) => {
+									const id =
+										getItemId( item ) || index.toString();
+									return (
+										<TableRow
+											key={ getItemId( item ) }
+											item={ item }
+											fields={ fields }
+											id={ id }
+											view={ view }
+											titleField={ titleField }
+											mediaField={ mediaField }
+											descriptionField={
+												descriptionField
+											}
+											selection={ selection }
+											getItemId={ getItemId }
+											onChangeSelection={
+												onChangeSelection
+											}
+											selectionProps={ getSelectionProps(
+												id
+											) }
+										/>
+									);
+								} ) }
 							</Composite>
 						)
 					)
@@ -474,6 +475,7 @@ function ViewPickerTable< Item >( {
 						{ hasData &&
 							data.map( ( item, index ) => {
 								const itemId = getItemId( item );
+								const id = itemId || index.toString();
 								// Use position from item for accessibility in infinite scroll mode.
 								const posinset = ( item as any ).position;
 
@@ -482,7 +484,7 @@ function ViewPickerTable< Item >( {
 										key={ itemId }
 										item={ item }
 										fields={ fields }
-										id={ itemId || index.toString() }
+										id={ id }
 										view={ view }
 										titleField={ titleField }
 										mediaField={ mediaField }
@@ -490,7 +492,9 @@ function ViewPickerTable< Item >( {
 										selection={ selection }
 										getItemId={ getItemId }
 										onChangeSelection={ onChangeSelection }
-										multiselect={ isMultiselect }
+										selectionProps={ getSelectionProps(
+											id
+										) }
 										posinset={ posinset }
 									/>
 								);

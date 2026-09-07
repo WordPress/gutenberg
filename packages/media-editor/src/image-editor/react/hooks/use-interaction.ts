@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { CropperState, Size } from '../../core/types';
 import {
 	InteractionController,
@@ -53,6 +46,11 @@ export interface UseInteractionOptions {
 	onGestureStart?: () => void;
 	/** Fires when a continuous gesture ends (pointer release). */
 	onGestureEnd?: () => void;
+	/**
+	 * Ignore all interaction. Any gesture already in flight is torn down,
+	 * so a drag started before this flipped cannot keep moving the image.
+	 */
+	disabled?: boolean;
 }
 
 /** How long keyboard placement stays active after the latest handled key. */
@@ -108,9 +106,8 @@ export function useInteraction(
 	const [ isZooming, setIsZooming ] = useState( false );
 	const [ isGestureActive, setIsGestureActive ] = useState( false );
 	const [ isKeyboardPanning, setIsKeyboardPanning ] = useState( false );
-	const keyboardInteractionTimerRef = useRef<
-		ReturnType< typeof setTimeout > | undefined
-	>( undefined );
+	const keyboardInteractionTimerRef =
+		useRef< ReturnType< typeof setTimeout > >();
 	// Tracks whether a keyboard gesture (pan or zoom) is currently active so
 	// onGestureStart is only fired once per gesture, not on every key repeat.
 	const isKeyboardGestureActiveRef = useRef( false );
@@ -208,12 +205,48 @@ export function useInteraction(
 		};
 	}, [ startPlacementGesture, stopPlacementGesture ] );
 
+	// Cancel any gesture already in flight when interaction is switched off,
+	// so a drag that started before the flip cannot keep moving the image.
+	// `destroy()` releases the pointer/touch listeners and the pending rAF;
+	// the controller keeps working for later gestures once re-enabled.
+	//
+	// It does not signal the end of the gesture it just cut short, so that
+	// is done here: a caller told a gesture began is otherwise left waiting
+	// for an end that never comes, which keeps undo/redo disabled and leaves
+	// the cropper's history batch open after a failed save.
+	const isDisabled = options?.disabled ?? false;
+	useEffect( () => {
+		if ( ! isDisabled ) {
+			return;
+		}
+		controllerRef.current?.destroy();
+		setIsDragging( false );
+		setIsZooming( false );
+		setIsKeyboardPanning( false );
+		const wasGestureOpen =
+			isGestureActive || isKeyboardGestureActiveRef.current;
+		if ( isKeyboardGestureActiveRef.current ) {
+			isKeyboardGestureActiveRef.current = false;
+			clearTimeout( keyboardInteractionTimerRef.current );
+		}
+		stopPlacementGesture();
+		if ( wasGestureOpen ) {
+			optionsRef.current?.onGestureEnd?.();
+		}
+	}, [ isDisabled, isGestureActive, stopPlacementGesture ] );
+
 	const onPointerDown = useCallback( ( e: React.PointerEvent ) => {
+		if ( optionsRef.current?.disabled ) {
+			return;
+		}
 		const el = e.currentTarget as HTMLElement;
 		controllerRef.current?.handlePointerDown( e.nativeEvent, el );
 	}, [] );
 
 	const onTouchStart = useCallback( ( e: React.TouchEvent ) => {
+		if ( optionsRef.current?.disabled ) {
+			return;
+		}
 		const el = e.currentTarget as HTMLElement;
 		const rect = el.getBoundingClientRect();
 		controllerRef.current?.handleTouchStart(
@@ -225,6 +258,9 @@ export function useInteraction(
 
 	const onKeyDown = useCallback(
 		( e: React.KeyboardEvent ) => {
+			if ( optionsRef.current?.disabled ) {
+				return;
+			}
 			if ( isHandledKeyboardPan( e.nativeEvent ) ) {
 				setIsKeyboardPanning( true );
 				signalKeyboardGesture();
@@ -237,6 +273,9 @@ export function useInteraction(
 	);
 
 	const onWheelNative = useCallback( ( e: WheelEvent ) => {
+		if ( optionsRef.current?.disabled ) {
+			return;
+		}
 		controllerRef.current?.handleWheel( e );
 	}, [] );
 

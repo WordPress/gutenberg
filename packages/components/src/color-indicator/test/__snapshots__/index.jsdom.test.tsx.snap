@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ColorIndicator matches the snapshot 1`] = `
+<div>
+  <span
+    aria-label="sample label"
+    class="component-color-indicator"
+    style="background: rgb(255, 255, 255);"
+  />
+</div>
+`;

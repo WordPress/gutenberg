@@ -2,11 +2,6 @@ import { Popover as _Popover } from '@base-ui/react/popover';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import {
-	type ThemeProvider as ThemeProviderType,
-	privateApis as themePrivateApis,
-} from '@wordpress/theme';
-import { unlock } from '../lock-unlock';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { PopoverValidationProvider } from './context';
@@ -14,9 +9,6 @@ import { Portal } from './portal';
 import { Positioner } from './positioner';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
-
-const ThemeProvider: typeof ThemeProviderType =
-	unlock( themePrivateApis ).ThemeProvider;
 
 const CLOSE_ATTR = 'data-wp-ui-popover-close';
 
@@ -48,28 +40,35 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		deprioritizedAttributes: [ CLOSE_ATTR ],
 	} );
 	const mergedPopupRef = useMergeRefs( [ ref, popupRef ] );
+	const useDefaultSurface = variant !== 'unstyled';
+
+	const validatedChildren = (
+		<PopoverValidationProvider>{ children }</PopoverValidationProvider>
+	);
+
+	// The popup is the (transformed) motion layer; visual chrome lives on the
+	// inner surface so the arrow's containing block stays borderless. See
+	// `style.module.css` for the full rationale.
+	const popupChildren = useDefaultSurface ? (
+		<div className={ styles.surface }>{ validatedChildren }</div>
+	) : (
+		validatedChildren
+	);
 
 	const backdropElement = backdrop ? (
 		<_Popover.Backdrop className={ styles.backdrop } />
 	) : null;
 
 	const popupContent = (
-		<ThemeProvider>
-			<_Popover.Popup
-				ref={ mergedPopupRef }
-				initialFocus={ resolvedInitialFocus }
-				finalFocus={ finalFocus }
-				className={ clsx(
-					variant !== 'unstyled' && styles.popup,
-					className
-				) }
-				{ ...props }
-			>
-				<PopoverValidationProvider>
-					{ children }
-				</PopoverValidationProvider>
-			</_Popover.Popup>
-		</ThemeProvider>
+		<_Popover.Popup
+			ref={ mergedPopupRef }
+			initialFocus={ resolvedInitialFocus }
+			finalFocus={ finalFocus }
+			className={ clsx( useDefaultSurface && styles.popup, className ) }
+			{ ...props }
+		>
+			{ popupChildren }
+		</_Popover.Popup>
 	);
 
 	const positionedPopup = renderSlotWithChildren(

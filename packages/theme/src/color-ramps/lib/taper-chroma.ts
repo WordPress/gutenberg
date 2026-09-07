@@ -1,9 +1,9 @@
 import {
-	ColorSpace,
 	get,
-	toGamut,
+	toGamutCSS,
 	OKLCH,
 	sRGB,
+	type ColorSpace,
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 
@@ -36,10 +36,6 @@ export function taperChroma(
 	lTarget: number, // [0..1]
 	options: TaperChromaOptions = {}
 ): { l: number; c: number } | PlainColorObject {
-	// Workaround for upstream toGamut(method:'css') bug.
-	// https://github.com/color-js/color.js/pull/734
-	ColorSpace.register( OKLCH );
-
 	const gamut = options.gamut ?? sRGB;
 	const alpha = options.alpha ?? 0.65; // 0.7-0.8 works well for accent surface
 	const carry = options.carry ?? 0.5;
@@ -213,7 +209,7 @@ function maxInGamutChromaAtLH(
 	};
 
 	// Let `toGamut` reduce the chroma to the gamut maximum.
-	const clamped = toGamut( probe, { space: gamutSpace, method: 'css' } );
+	const clamped = toGamutCSS( probe, { space: gamutSpace } );
 
 	return get( clamped, [ OKLCH, 'c' ] );
 }

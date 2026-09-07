@@ -1,18 +1,9 @@
-/**
- * WordPress dependencies
- */
-import { privateApis, Spinner } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
-import { unlock } from '../../lock-unlock';
+import { ValidatedFormTokenField } from '../validated-form-controls';
 import getCustomValidity from './utils/get-custom-validity';
 import useElements from '../../hooks/use-elements';
-
-const { ValidatedFormTokenField } = unlock( privateApis );
 
 export default function ArrayControl< Item >( {
 	data,

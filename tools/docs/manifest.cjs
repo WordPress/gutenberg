@@ -1,20 +1,25 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
-
-/**
- * External dependencies
- */
-const { pascalCase } = require( 'change-case' );
 const fs = require( 'fs' );
-const glob = require( 'glob' ).sync;
-const { join, resolve } = require( 'path' );
+const path = require( 'path' );
+const { join, resolve } = path;
+const { pascalCase } = require( 'change-case' );
+const { globSync } = require( 'glob' );
 
 const ROOT_DIR = resolve( __dirname, '../..' );
 const baseRepoUrl = '..';
-const componentPaths = glob( 'packages/components/src/*/**/README.md', {
+const blockJsonPaths = globSync( 'packages/block-library/src/*/block.json', {
 	cwd: ROOT_DIR,
-	// Don't expose documentation for mobile only and private components just yet.
+	posix: true,
+} ).sort();
+const blockCategoryPaths = globSync(
+	'docs/reference-guides/core-blocks/category-*.md',
+	{ cwd: ROOT_DIR, posix: true }
+).sort();
+const componentPaths = globSync( 'packages/components/src/*/**/README.md', {
+	cwd: ROOT_DIR,
+	posix: true,
+	// Don't expose documentation for private components just yet.
 	ignore: [
-		'**/src/mobile/**/README.md',
 		'packages/components/src/theme/README.md',
 		'packages/components/src/view/README.md',
 		'packages/components/src/menu/README.md',
@@ -22,8 +27,12 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
 		'packages/components/src/custom-select-control-v2/README.md',
 		'packages/components/src/badge/README.md',
 	],
-} );
-const packagePaths = glob( 'packages/*/package.json', { cwd: ROOT_DIR } )
+} ).sort( ( a, b ) => a.localeCompare( b ) );
+const packagePaths = globSync( 'packages/*/package.json', {
+	cwd: ROOT_DIR,
+	posix: true,
+} )
+	.sort()
 	.filter(
 		// Ignore private packages.
 		( fileName ) => ! require( join( ROOT_DIR, fileName ) ).private
@@ -39,7 +48,7 @@ const packagePaths = glob( 'packages/*/package.json', { cwd: ROOT_DIR } )
  */
 function getPackageManifest( packageFolderNames ) {
 	return packageFolderNames.reduce( ( manifest, folderName ) => {
-		const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
+		const readmePath = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
 		const packageJson = require(
 			join( ROOT_DIR, 'packages', folderName, 'package.json' )
 		);
@@ -48,7 +57,7 @@ function getPackageManifest( packageFolderNames ) {
 		manifest.push( {
 			title: packageJson.name,
 			slug: `packages-${ folderName }`,
-			markdown_source: path,
+			markdown_source: readmePath,
 			parent: 'packages',
 		} );
 
@@ -86,6 +95,70 @@ function getComponentManifest( paths ) {
 			parent: 'components',
 		};
 	} );
+}
+
+/**
+ * Generates the block manifest with a 3-level hierarchy:
+ *   core-blocks → category pages → individual block pages.
+ *
+ * Reads block metadata directly from block.json (the single source of truth)
+ * and points markdown_source to each block's README.md in its source directory.
+ *
+ * @param {Array} jsonPaths Paths to block.json files.
+ * @param {Array} catPaths  Paths to category index markdown files.
+ *
+ * @return {Array}          Manifest
+ */
+function getBlockManifest( jsonPaths, catPaths ) {
+	const manifest = [];
+
+	// Add category pages (parent: core-blocks).
+	catPaths.forEach( ( filePath ) => {
+		const category = path
+			.basename( filePath, '.md' )
+			.replace( 'category-', '' );
+		const content = fs.readFileSync(
+			join( __dirname, '..', '..', filePath ),
+			'utf8'
+		);
+		const titleMatch = content.match( /^#\s(.+)$/m );
+		const title = titleMatch ? titleMatch[ 1 ] : pascalCase( category );
+		manifest.push( {
+			title,
+			slug: `core-blocks-${ category }`,
+			markdown_source: `${ baseRepoUrl }/${ filePath }`,
+			parent: 'core-blocks',
+		} );
+	} );
+
+	// Add block pages (parent: core-blocks-{category}).
+	// Block slugs use "core-block-" (singular) to avoid collisions
+	// with category slugs which use "core-blocks-" (plural).
+	// Deprecated blocks (description starts with "This block is deprecated.")
+	// are added directly under core-blocks, outside any category.
+	jsonPaths.forEach( ( jsonPath ) => {
+		const blockDir = path.basename( path.dirname( jsonPath ) );
+		const readmePath = `packages/block-library/src/${ blockDir }/README.md`;
+
+		// Only include blocks that have a README.
+		if ( ! fs.existsSync( join( __dirname, '..', '..', readmePath ) ) ) {
+			return;
+		}
+
+		const blockJson = require( join( __dirname, '..', '..', jsonPath ) );
+
+		const title = blockJson.title || pascalCase( blockDir );
+		const category = blockJson.category || 'uncategorized';
+
+		manifest.push( {
+			title,
+			slug: `core-block-${ blockDir }`,
+			markdown_source: `${ baseRepoUrl }/${ readmePath }`,
+			parent: `core-blocks-${ category }`,
+		} );
+	} );
+
+	return manifest;
 }
 
 function getRootManifest( tocFileName ) {
@@ -134,6 +207,10 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 		} else if ( children === '{{components}}' ) {
 			pageItems = pageItems.concat(
 				getComponentManifest( componentPaths )
+			);
+		} else if ( children === '{{blocks}}' ) {
+			pageItems = pageItems.concat(
+				getBlockManifest( blockJsonPaths, blockCategoryPaths )
 			);
 		} else if ( children === '{{packages}}' ) {
 			pageItems = pageItems.concat( getPackageManifest( packagePaths ) );

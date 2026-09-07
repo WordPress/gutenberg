@@ -1,10 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useRef } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import useEvent from '../use-event';
 
 // This is the current implementation of `useResizeObserver`.
@@ -18,7 +12,7 @@ export function useResizeObserver< T extends HTMLElement >(
 ): ( element?: T | null ) => void {
 	const callbackEvent = useEvent( callback );
 
-	const observedElementRef = useRef< T >( null );
+	const observedElementRef = useRef< T | null >( null );
 	const resizeObserverRef = useRef< ResizeObserver >( undefined );
 	return useEvent( ( element?: T | null ) => {
 		if ( element === observedElementRef.current ) {

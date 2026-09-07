@@ -164,7 +164,7 @@ still be accessed via the keyboard when navigating through the tablist.
 
 ##### `render`
 
- - Type: `RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }> | ReactElement<unknown, string | JSXElementConstructor<any>>`
+ - Type: `RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }> | ReactElement<any, string | JSXElementConstructor<any>>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React

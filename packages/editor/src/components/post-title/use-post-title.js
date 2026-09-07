@@ -1,10 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 /**

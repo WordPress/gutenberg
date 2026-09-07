@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createHigherOrderComponent, useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 

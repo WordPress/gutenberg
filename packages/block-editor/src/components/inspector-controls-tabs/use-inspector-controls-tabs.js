@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import InspectorControlsGroups from '../inspector-controls/groups';
 import { InspectorAdvancedControls } from '../inspector-controls';
 import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES, TAB_CONTENT } from './utils';

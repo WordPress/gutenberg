@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const browserslist = require( 'browserslist' );
-
-/**
- * Internal dependencies
- */
 const exclusions = require( './polyfill-exclusions' );
 const replacePolyfills = require( './replace-polyfills' );
 

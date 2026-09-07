@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-
-/**
- * Internal dependencies
- */
 import CONFIG from './config-values';
 
 export type HeadingSize =

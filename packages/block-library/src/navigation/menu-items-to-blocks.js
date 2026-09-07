@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createBlock, parse } from '@wordpress/blocks';
 import { applyFilters } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import { buildNavigationLinkEntityBinding } from '../navigation-link/shared/use-entity-binding';
 
 /**

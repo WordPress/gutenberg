@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useEffect,
@@ -8,10 +5,6 @@ import {
 	useRef,
 } from '@wordpress/element';
 import { throttle } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { View } from '../types';
 
 /**
@@ -28,6 +21,7 @@ function captureAnchorElement(
 	anchorElementRef: React.MutableRefObject< {
 		posinset: number;
 		viewportOffset: number;
+		scrollTop: number;
 		direction: 'up' | 'down' | null;
 	} | null >,
 	direction: 'up' | 'down'
@@ -61,6 +55,7 @@ function captureAnchorElement(
 	anchorElementRef.current = {
 		posinset,
 		viewportOffset: anchorRect.top - containerRect.top,
+		scrollTop: container.scrollTop,
 		direction,
 	};
 	return true;
@@ -95,6 +90,7 @@ export function useInfiniteScroll( {
 	const anchorElementRef = useRef< {
 		posinset: number;
 		viewportOffset: number;
+		scrollTop: number;
 		direction: 'up' | 'down' | null;
 	} | null >( null );
 	const viewRef = useRef( view );
@@ -174,8 +170,13 @@ export function useInfiniteScroll( {
 			const anchorRect = anchorElement.getBoundingClientRect();
 			const currentOffset = anchorRect.top - containerRect.top;
 
-			// Calculate how much the anchor has moved and adjust scroll to compensate
-			const scrollAdjustment = currentOffset - anchor.viewportOffset;
+			// Compensate only for the content shift, not for scrolling the user
+			// did during an async load. Adding back the scroll delta since capture
+			// keeps the list from snapping back to the capture-time position.
+			const scrollAdjustment =
+				currentOffset -
+				anchor.viewportOffset +
+				( container.scrollTop - anchor.scrollTop );
 
 			if ( Math.abs( scrollAdjustment ) > 1 ) {
 				container.scrollTop += scrollAdjustment;

@@ -1,0 +1,40 @@
+.flex {
+	align-items: var(--wp-components-flex-align);
+	display: flex;
+	flex-direction: var(--wp-components-flex-direction);
+	flex-wrap: var(--wp-components-flex-wrap);
+	gap: var(--wp-components-flex-gap);
+	justify-content: var(--wp-components-flex-justify);
+}
+
+.expanded-column {
+	height: 100%;
+}
+
+.expanded-row {
+	width: 100%;
+}
+
+.item {
+	display: var(--wp-components-flex-item-display);
+	max-height: 100%;
+	max-width: 100%;
+	min-height: 0;
+	min-width: 0;
+}
+
+.block {
+	flex: 1;
+}
+
+.items-column {
+	> * {
+		min-height: 0;
+	}
+}
+
+.items-row {
+	> * {
+		min-width: 0;
+	}
+}

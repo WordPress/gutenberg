@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { proxifyState, proxifyStore, deepMerge, peek } from './proxies';
 import { PENDING_GETTER } from './proxies/state';
 import { getNamespace } from './namespaces';

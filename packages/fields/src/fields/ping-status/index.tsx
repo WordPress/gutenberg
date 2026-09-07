@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import type { DataFormControlProps, Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { CheckboxControl, ExternalLink } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../../types';
 
 function PingStatusEdit( {

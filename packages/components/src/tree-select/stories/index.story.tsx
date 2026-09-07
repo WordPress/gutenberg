@@ -1,16 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TreeSelect from '../';
 
 const meta: Meta< typeof TreeSelect > = {
@@ -45,7 +35,6 @@ const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
 
 	return (
 		<TreeSelect
-			__next40pxDefaultSize
 			{ ...props }
 			onChange={ setSelection }
 			selectedId={ selection }
@@ -55,7 +44,6 @@ const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
 
 export const Default = TreeSelectWithState.bind( {} );
 Default.args = {
-	__next40pxDefaultSize: true,
 	label: 'Label Text',
 	noOptionLabel: 'No parent page',
 	help: 'Help text to explain the select control.',

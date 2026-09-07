@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Preview } from '@wordpress/lazy-editor';
-
-/**
- * Internal dependencies
- */
 import type { NormalizedPattern } from '../use-patterns';
 
 function PreviewField( { item }: { item: NormalizedPattern } ) {

@@ -1,9 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
-// @ts-ignore No exported types.
 import { serialize } from '@wordpress/blocks';
 import {
 	store as coreDataStore,
@@ -21,10 +17,6 @@ import {
 import { applyFilters } from '@wordpress/hooks';
 import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import {
 	getSyncErrorMessages,
 	PROTOCOL_MISMATCH,

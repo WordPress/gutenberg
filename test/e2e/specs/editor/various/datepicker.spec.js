@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 // Set browser to a timezone that's different to `timezone`.
@@ -105,7 +102,7 @@ TIMEZONES.forEach( ( timezone ) => {
 			await datepicker.click();
 			await page
 				.getByLabel( 'Change publish date' )
-				.getByRole( 'button', { name: 'Now' } )
+				.getByRole( 'button', { name: 'Reset' } )
 				.click();
 
 			await expect(

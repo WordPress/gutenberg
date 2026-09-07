@@ -85,16 +85,20 @@ Callback called when a color is selected.
 
 -   Required: Yes
 
-### `asButtons`: `boolean`
+### `presentation`: `'listbox' | 'toggle-buttons' | 'command-buttons'`
 
-Whether the control should present as a set of buttons, each with its own tab stop.
+Controls the predefined swatches' interaction and accessibility semantics.
 
-- Required: No
-- Default: `false`
+-   `listbox` uses one tab stop for the palette. Arrow keys move between options. Options expose selection with `aria-selected`.
+-   `toggle-buttons` uses a tab stop for each swatch. Swatches expose selection with `aria-pressed`.
+-   `command-buttons` uses a tab stop for each swatch. Swatches do not expose selection. The `value` and `selectedSlug` props do not mark predefined swatches as selected, and activating a swatch always calls `onChange` with that swatch. The `value` prop still controls the custom color picker.
+
+-   Required: No
+-   Default: `listbox`
 
 ### `loop`: `boolean`
 
-Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
+Prevents arrow-key navigation from wrapping around. Only used with the `listbox` presentation.
 
-- Required: No
-- Default: `true`
+-   Required: No
+-   Default: `true`

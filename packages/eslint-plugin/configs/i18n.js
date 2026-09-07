@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const wpRules = require( '../rules' );
 
 const wpPlugin = { rules: wpRules };
