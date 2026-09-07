@@ -121,6 +121,21 @@ class Test_Blocks_RenderReusable extends WP_UnitTestCase {
 	/**
 	 * @covers ::gutenberg_render_block_core_block
 	 */
+	public function test_render_wraps_output_in_tag_name() {
+		$this->assertSame(
+			'<header class="wp-block-block"><p class="wp-block-paragraph">Hello from a registered pattern!</p></header>',
+			do_blocks( '<!-- wp:block {"slug":"test/greeting","tagName":"header"} /-->' )
+		);
+		// Unknown elements are ignored rather than rendered.
+		$this->assertSame(
+			'<p class="wp-block-paragraph">Hello from a registered pattern!</p>',
+			do_blocks( '<!-- wp:block {"slug":"test/greeting","tagName":"script"} /-->' )
+		);
+	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_block
+	 */
 	public function test_render_unregistered_slug_renders_nothing() {
 		$this->assertSame( '', do_blocks( '<!-- wp:block {"slug":"test/does-not-exist"} /-->' ) );
 	}
