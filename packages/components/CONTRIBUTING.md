@@ -422,7 +422,7 @@ Place component-local styles in a `style.module.scss` file next to the component
 
 Legacy components may still use Emotion while they are being migrated, but new Emotion usage should not be added.
 
-Before migrating existing styles, read [Migrating components from Emotion to SCSS Modules](/docs/contributors/code/emotion-to-scss-modules.md) for compatibility checks, cascade and custom-property pitfalls, verification, and examples from merged migrations.
+Before migrating existing styles, read [Migrating components from Emotion to SCSS Modules](./emotion-to-scss-modules.md) for compatibility checks, cascade and custom-property pitfalls, verification, and examples from merged migrations.
 
 ### Deprecating styles
 

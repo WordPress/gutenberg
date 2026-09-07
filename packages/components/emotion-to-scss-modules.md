@@ -2,7 +2,7 @@
 
 An Emotion migration should preserve the component's public API, rendered elements, interactions, and resulting styles. Use the existing SCSS Modules and `@wordpress/style-runtime` pipeline. A component migration does not require a new CSS extraction pipeline.
 
-This guide collects the [migration guidelines in #66806](https://github.com/WordPress/gutenberg/issues/66806) and lessons from its merged PRs. The [reference migrations](#reference-migrations) identify useful examples and their limitations. Read the current implementation before copying an older diff. Some merged PRs include explicitly agreed visual or behavior changes that are not part of a mechanical migration.
+This temporary guide collects the [migration guidelines in #66806](https://github.com/WordPress/gutenberg/issues/66806) and lessons from its merged PRs. The [reference migrations](#reference-migrations) identify useful examples and their limitations. Read the current implementation before copying an older diff. Some merged PRs include explicitly agreed visual or behavior changes that are not part of a mechanical migration.
 
 ## Establish the component and consumer contract
 
@@ -114,7 +114,7 @@ Keep new tests focused on the migrated component's integration. A wrapper test c
 
 Remove obsolete Emotion imports, files, lint/type suppressions, and utilities that become unused because of this migration. Search all consumers before deleting shared constants. Preserve useful comments explaining layout calculations or compatibility workarounds. Leave unrelated cleanup and global Emotion dependencies, Babel wiring, serializers, `useCx`, and the `rtl` utility until their remaining users are gone.
 
-Follow [worktree setup](/docs/contributors/code/getting-started-with-code-contribution.md#set-up-each-worktree) and read the [testing overview](/docs/contributors/code/testing-overview.md) before adding tests. New tests use Vitest; the migration manifest identifies legacy tests still owned by Jest. Use the appropriate focused command below, then run lint and the repository gates:
+Follow [worktree setup](/docs/contributors/code/getting-started-with-code-contribution.md#set-up-each-worktree) and read the [testing overview](/docs/contributors/code/testing-overview.md) before adding tests. New tests use Vitest; the migration manifest identifies legacy tests still owned by Jest. From the repository root, use the appropriate focused command below, then run lint and the repository gates:
 
 ```sh
 npm run test:unit -- <legacy-jest-test-path> --runInBand
