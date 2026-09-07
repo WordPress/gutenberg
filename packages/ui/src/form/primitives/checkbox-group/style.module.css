@@ -1,0 +1,9 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.nested-items {
+			padding-inline-start: calc(var(--wp-ui-checkbox-input-size, 16px) + var(--wpds-dimension-gap-sm));
+		}
+	}
+}
