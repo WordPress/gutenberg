@@ -220,21 +220,35 @@ export const ControlWithError = forwardRef<
 		setShowMessage( true );
 	}, [ isTouched, customValidity?.type, showMessage ] );
 
-	// Mark blurred fields as touched.
+	// Mark blurred fields as touched, and re-read the native validity once
+	// the control has settled.
 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
-		if ( isTouched ) {
-			return;
-		}
-
 		// Only consider "blurred from the component" if focus has fully left the wrapping div.
 		// This prevents unnecessary blurs from components with multiple focusable elements.
 		if (
-			! event.relatedTarget ||
-			! event.currentTarget.contains( event.relatedTarget )
+			event.relatedTarget &&
+			event.currentTarget.contains( event.relatedTarget )
 		) {
+			return;
+		}
+
+		if ( ! isTouched ) {
 			setIsTouched( true );
 			getValidityTarget()?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
 		}
+
+		// A control that commits an adjusted value on blur (e.g. a number
+		// control clamping to its `min`) can take a few more commits to settle
+		// while its controlled value catches up with the parent, so a message
+		// sampled in the render triggered by this event may be stale. Re-read
+		// it once React has flushed the blur's work.
+		const validityTarget = getValidityTarget();
+		const isValidating = customValidity?.type === 'validating';
+		window.queueMicrotask( () => {
+			if ( ! isValidating ) {
+				setErrorMessage( validityTarget?.validationMessage );
+			}
+		} );
 	};
 
 	const messageId = useId();

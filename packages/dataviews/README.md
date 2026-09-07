@@ -1993,7 +1993,7 @@ Or multi-selection operators:
 		{ value: 'd', label: 'Product D' },
 	],
 	filterBy: {
-		operators: [ `isAny`, `isNone`, `isAll` ];
+		operators: [ `isAny`, `isNone` ];
 	}
 }
 ```
@@ -2033,15 +2033,15 @@ Valid operators per field type:
 -   color: `is`, `isNot`, `isAny`, `isNone`.
 -   date: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`, `between`.
 -   datetime: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`.
--   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
--   integer: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`.
+-   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`.
+-   integer: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`.
 -   media: none.
--   number: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`.
+-   number: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`.
 -   password: none.
--   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
--   text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   telephone: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`.
+-   text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`.
 -   time: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `between`.
--   url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`.
 -   fields with no type: any operator.
 
 `time` shares the ordering operators with `date` and `datetime`, which compare temporal values generically: a date or datetime compares by its position on the calendar, a time by its position within the day. Comparisons are precision-insensitive, so a filter for `'09:00'` matches a stored `'09:00:00'`.

@@ -46,9 +46,11 @@
 		}
 
 		.list {
+			--_wp-ui-menu-item-label-line-height: var(--wpds-typography-line-height-sm);
+
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
-			line-height: var(--wpds-typography-line-height-sm);
+			line-height: var(--_wp-ui-menu-item-label-line-height);
 			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 
@@ -130,7 +132,8 @@
 				[content-end] var(--wp-ui-menu-item-padding-inline)
 				[item-padding-end];
 			gap: 0;
-			align-items: center;
+			/* Keep every slot anchored to the label's first line. */
+			align-items: start;
 			justify-content: stretch;
 			min-width: 0;
 			min-height: var(--wp-ui-menu-item-height);
@@ -187,19 +190,23 @@
 
 		.item-selection-indicator {
 			grid-column: selection-start / selection-end;
-			align-self: center;
 			justify-self: center;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			width: var(--wp-ui-menu-selection-indicator-size);
-			height: var(--wp-ui-menu-selection-indicator-size);
+			height: var(--_wp-ui-menu-item-label-line-height);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 			pointer-events: none;
 
 			&[data-unchecked] {
 				opacity: 0;
 			}
+		}
+
+		.checkbox-selection-icon {
+			/* Optical alignment with the item label. */
+			translate: 0 1px;
 		}
 
 		.radio-selection-icon {
@@ -216,6 +223,13 @@
 			gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
 			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
+		.prefix-icon {
+			flex-shrink: 0;
+			/* Center a known-size icon on the first label line. */
+			align-self: flex-start;
+			margin-block-start: calc((var(--_wp-ui-menu-item-label-line-height) - var(--_wp-ui-menu-prefix-icon-size)) / 2);
 		}
 
 		.item-content {
@@ -237,6 +251,7 @@
 
 		.item-children {
 			grid-column: label-start / label-end;
+			align-self: start;
 			display: inline-flex;
 			flex-direction: column;
 			gap: 2px; /* var(--wpds-dimension-gap-xs); */
@@ -245,10 +260,12 @@
 
 		.item-label {
 			--_gcd-heading-color: currentColor;
+			--_gcd-p-line-height: var(--_wp-ui-menu-item-label-line-height);
 
 			min-width: 0;
 			overflow-wrap: anywhere;
 			color: inherit;
+			line-height: var(--_wp-ui-menu-item-label-line-height);
 		}
 
 		.item-description {
