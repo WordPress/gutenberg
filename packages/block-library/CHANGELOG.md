@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Pattern: Add an optional `tagName` attribute that wraps the rendered pattern in a `header`, `main`, `section`, `article`, `aside`, `footer` or `div` element, with an HTML element control under Advanced, so a pattern standing in for a header or footer keeps its landmark ([#ZZZZZ](https://github.com/WordPress/gutenberg/pull/ZZZZZ)).
+-   Pattern: Add an optional `tagName` attribute that wraps the rendered pattern in a `header`, `main`, `section`, `article`, `aside`, `footer` or `div` element, with an HTML element control under Advanced, so a pattern standing in for a header or footer keeps its landmark ([#82551](https://github.com/WordPress/gutenberg/pull/82551)).
 -   Pattern: Resolve a registered pattern referenced by `slug` to its edited copy (a `wp_block` post carrying the `wp_pattern_slug` meta) when one exists, and offer "Edit original" on such blocks, creating the copy on first use ([#82549](https://github.com/WordPress/gutenberg/pull/82549)).
 -   Pattern: Add a `slug` attribute so a `core/block` can reference a registered pattern (theme, plugin or core) by name, with pattern overrides working the same way as for user patterns ([#82544](https://github.com/WordPress/gutenberg/pull/82544)).
 
