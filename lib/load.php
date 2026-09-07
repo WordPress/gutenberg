@@ -90,7 +90,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/rest-api.php';
 
 	require_once __DIR__ . '/experimental/rest-api.php';
-	require_once __DIR__ . '/experimental/kses-allowed-html.php';
 
 	require_once __DIR__ . '/experimental/class-gutenberg-hierarchical-sort.php';
 }

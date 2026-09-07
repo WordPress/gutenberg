@@ -2,21 +2,22 @@
 
 ## Unreleased
 
-### New Features
-
--   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
-
 ### Breaking Changes
 
+-   `Menu`: `--wp-ui-menu-selection-indicator-size` now controls the selection indicator width only. Its height follows the item label line height. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
 -   `Autocomplete.Popup`, `Combobox.Popup`, `Select.Popup`, `SearchableChipSelect`, and `SearchableChipSelectControl`: The popup now defaults to a fixed anchor width. Use `width="content"` on Popups, or `popupWidth="content"` on composites, to restore content-sized width between the anchor and available viewport bounds ([#82087](https://github.com/WordPress/gutenberg/pull/82087), [#82193](https://github.com/WordPress/gutenberg/pull/82193)).
 -   Portaled overlays (`AlertDialog`, `Autocomplete`, `Combobox`, `Dialog`, `Drawer`, `Menu`, `Popover`, and `Select`) now inherit the theme from their portal destination instead of re-emitting the trigger's nearest contextual theme. Default portals use the document root theme; custom portal containers use their DOM ancestry ([#82038](https://github.com/WordPress/gutenberg/pull/82038)).
 
 ### New Features
 
+-   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
+-   Add `SearchableSelect` form primitive ([#80961](https://github.com/WordPress/gutenberg/pull/80961)).
 -   Add `Field.VisualLabel` for a purely visual label outside `Field.Root` ([#82095](https://github.com/WordPress/gutenberg/pull/82095)).
+-   `Menu`: Add `PrefixIcon` for label-aligned prefix icons, with a default size of 24px. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
 
 ### Enhancements
 
+-   Give input fields and checkboxes solid, state-aware themed backgrounds while keeping minimal Select triggers transparent. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
 -   `AlertDialog`, `Dialog`, `Drawer`, `Popover`, and `Tooltip`: Derive Trigger props from the corresponding Base UI components. ([#81824](https://github.com/WordPress/gutenberg/pull/81824))
 -   `Autocomplete.Status`, `Combobox.Status`: Add a `Status` subcomponent that announces async list status to screen readers. Item popups give Status its own collapsing grid row so a visible result count sits above the list without overlaying items ([#82195](https://github.com/WordPress/gutenberg/pull/82195)).
 -   `Autocomplete.Popup`, `Combobox.Popup`, `SearchableChipSelect`, `SearchableChipSelectControl`, `Select.Popup`, and `SelectControl`: Add `width` on Popups and `popupWidth` on composites, with preset width constraints (`anchor`, `content`, `sm`, `md`, `lg`, and `available`) for the item popup. `SelectControl` defaults to `content` to preserve prior popup sizing ([#82087](https://github.com/WordPress/gutenberg/pull/82087), [#82193](https://github.com/WordPress/gutenberg/pull/82193)).
@@ -27,16 +28,27 @@
 
 ### Bug Fixes
 
+-   `Select` (`variant="minimal"`): Keep the trigger borderless and unfilled when disabled. InputLayout no longer applies disabled field chrome to `.is-borderless`. ([#82468](https://github.com/WordPress/gutenberg/pull/82468))
+-   `Link`: Show the new-tab indicator and accessible notice when `target` is an ASCII case-insensitive match for `"_blank"`. ([#82447](https://github.com/WordPress/gutenberg/pull/82447))
+-   `AlertDialog`, `Dialog`, `Drawer`: Keep descendant focus rings visible at pinned header and footer edges. ([#82443](https://github.com/WordPress/gutenberg/pull/82443))
+-   `Menu.LinkItem`: Show the new-tab indicator and accessible notice when `target` is an ASCII case-insensitive match for `"_blank"`. ([#82442](https://github.com/WordPress/gutenberg/pull/82442))
 -   `Input`, `Textarea`, `InputControl`, `TextareaControl`: Use `--wpds-color-foreground-interactive-neutral-weak` for enabled placeholder text so it meets the 4.5:1 contrast minimum ([#82304](https://github.com/WordPress/gutenberg/pull/82304)).
 -   `SearchableChipSelect`, `SearchableChipSelectControl`: Fix the gray background on disabled search fields in WordPress admin ([#82304](https://github.com/WordPress/gutenberg/pull/82304)).
 -   `ValidityIndicator`: Remove the built-in outer margin. Spacing belongs on the consumer. `ControlWithError` now uses `Stack` with `gap="sm"` so validated controls keep the same gap. ([#82267](https://github.com/WordPress/gutenberg/pull/82267))
+-   `ControlWithError`: Re-read the native validity after the control blurs, so a control that commits an adjusted value on blur (e.g. a number control clamping to its `min`) doesn't keep showing a stale error message ([#82376](https://github.com/WordPress/gutenberg/pull/82376)).
 -   `AlertDialog`: Use a neutral tone for the cancel button. ([#82261](https://github.com/WordPress/gutenberg/pull/82261))
 -   `Input`: Hide the field focus ring when a prefix or suffix slot control is focused. ([#82257](https://github.com/WordPress/gutenberg/pull/82257))
 -   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   `Menu`: Align selection indicators and prefix icons with the first label line, including wrapped labels and items with descriptions, and improve checkbox checkmarks' optical alignment. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
 
 ### Documentation
 
 -   Add a Form best practices Storybook page for labeling composed controls ([#82197](https://github.com/WordPress/gutenberg/pull/82197)).
+
+### Internal
+
+-   `AlertDialog`: Move confirmation lifecycle state to a private external store so event handlers and React renders read the same synchronous snapshot. ([#82131](https://github.com/WordPress/gutenberg/pull/82131))
+-   Use stable event callbacks and remove the remaining `react-hooks/refs` ESLint suppressions. ([#82131](https://github.com/WordPress/gutenberg/pull/82131))
 
 ## 0.21.0 (2026-08-26)
 

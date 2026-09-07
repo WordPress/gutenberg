@@ -7,7 +7,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { useMergeRefs } from '@wordpress/compose';
+import { useIsomorphicLayoutEffect, useMergeRefs } from '@wordpress/compose';
 import { ControlWithError } from '../index';
 
 const ValidatedInput = forwardRef<
@@ -558,6 +558,88 @@ describe( 'ControlWithError', () => {
 			await waitFor( () => {
 				expect( input ).not.toHaveAttribute( 'aria-describedby' );
 			} );
+		} );
+	} );
+
+	describe( 'Controls that commit their value on blur', () => {
+		it( 'should clear a stale native error once the control commits a valid value on blur', async () => {
+			const user = userEvent.setup();
+
+			// Mimics controls like `NumberControl`: the value is clamped on
+			// blur, and the committed value is synced into the control's own
+			// state (and the DOM) in a layout effect, a render later.
+			const ClampedNumberInput = forwardRef<
+				HTMLInputElement,
+				{
+					label?: string;
+					value: string;
+					onChange: ( value: string ) => void;
+				}
+			>( function ClampedNumberInput( { label, value, onChange }, ref ) {
+				const [ innerValue, setInnerValue ] = useState( value );
+				useIsomorphicLayoutEffect( () => {
+					setInnerValue( value );
+				}, [ value ] );
+				return (
+					<input
+						ref={ ref }
+						type="number"
+						min={ 1 }
+						aria-label={ label }
+						value={ innerValue }
+						onChange={ ( event ) =>
+							setInnerValue( event.target.value )
+						}
+						onBlur={ () =>
+							onChange(
+								String( Math.max( 1, Number( innerValue ) ) )
+							)
+						}
+					/>
+				);
+			} );
+
+			function Harness() {
+				const [ value, setValue ] = useState( '10' );
+				const ref = useRef< HTMLInputElement >( null );
+				const getValidityTarget = useCallback( () => ref.current, [] );
+				return (
+					<ControlWithError getValidityTarget={ getValidityTarget }>
+						<ClampedNumberInput
+							ref={ ref }
+							label="Number"
+							value={ value }
+							onChange={ setValue }
+						/>
+					</ControlWithError>
+				);
+			}
+
+			render( <Harness /> );
+
+			const input = screen.getByRole< HTMLInputElement >( 'spinbutton', {
+				name: 'Number',
+			} );
+			await user.clear( input );
+			await user.type( input, '0' );
+			// The message has to be showing before the blur for the assertion below
+			// to mean anything. Surface it the way a save action would, by validating
+			// the form while the field is still focused.
+			act( () => {
+				input.reportValidity();
+			} );
+			expect(
+				screen.getByText( 'Constraints not satisfied' )
+			).toBeVisible();
+
+			await user.tab();
+
+			await waitFor( () => {
+				expect( input ).toHaveValue( 1 );
+			} );
+			expect(
+				screen.queryByText( 'Constraints not satisfied' )
+			).not.toBeInTheDocument();
 		} );
 	} );
 

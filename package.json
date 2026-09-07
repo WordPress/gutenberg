@@ -201,6 +201,7 @@
 		"test:unit:php:multisite:debug": "npm run test:unit:php:setup:debug && npm run test:unit:php:multisite:base",
 		"test:unit:update": "npm run --workspace @wordpress/unit-tests test:unit -- --updateSnapshot",
 		"test:unit:watch": "npm run --workspace @wordpress/unit-tests test:unit:watch --",
+		"test:agent-evals": "npm --prefix test/ai-development run eval --",
 		"pretypecheck": "npm run --workspace @wordpress/build-scripts generate-worker-placeholders --",
 		"typecheck": "npm run --workspace @wordpress/build-scripts typecheck --",
 		"wp-env": "wp-env",
@@ -212,6 +213,7 @@
 		"storybook",
 		"test/*",
 		"tools/*",
-		"widgets/*"
+		"widgets/*",
+		"!test/ai-development"
 	]
 }
