@@ -1184,10 +1184,19 @@ async function deleteNpmReleasePreparedCommit(
 	const tagRefs = preparedRefs.filter( ( ref ) =>
 		ref.startsWith( `${ refs.tags }/` )
 	);
-	for ( const refChunk of chunk(
+	const preparedCommitRef = preparedRefs.find(
+		( ref ) => ref === refs.commit
+	);
+	const refsDeletedWithTags = new Set( tagRefs );
+	const tagRefChunks = chunk(
 		tagRefs,
-		NPM_RELEASE_TAG_PUSH_BATCH_SIZE
-	) ) {
+		NPM_RELEASE_TAG_PUSH_BATCH_SIZE - ( preparedCommitRef ? 1 : 0 )
+	);
+	for ( const [ index, tagRefChunk ] of tagRefChunks.entries() ) {
+		const refChunk =
+			index === 0 && preparedCommitRef
+				? [ preparedCommitRef, ...tagRefChunk ]
+				: tagRefChunk;
 		await git.raw(
 			'push',
 			'--atomic',
@@ -1196,9 +1205,12 @@ async function deleteNpmReleasePreparedCommit(
 			'--delete',
 			...refChunk
 		);
+		if ( index === 0 && preparedCommitRef ) {
+			refsDeletedWithTags.add( preparedCommitRef );
+		}
 	}
 	const stateRefs = preparedRefs.filter(
-		( ref ) => ! tagRefs.includes( ref )
+		( ref ) => ! refsDeletedWithTags.has( ref )
 	);
 	if ( stateRefs.length ) {
 		await git.raw(

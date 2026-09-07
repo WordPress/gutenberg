@@ -4,8 +4,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 const require = createRequire( import.meta.url );
-const logger = require( '../../lib/logger' );
 const SimpleGit = require( 'simple-git' );
+const logger = require( '../../lib/logger' );
 let {
 	backportCommitsToBranch,
 	deleteNpmReleasePreparedCommit,
@@ -1550,6 +1550,36 @@ describe( 'prepared release refs', () => {
 			'refs/npm-release/wp-latest/release-type/*',
 			'refs/npm-release/wp-latest/plugin-release-branch/*'
 		);
+	} );
+
+	it( 'deletes the prepared commit marker with the first tag batch', async () => {
+		const refs = getNpmReleasePreparedRefs( 'wp/latest' );
+		const tagRef = `${ refs.tags }/@wordpress/a11y@4.54.0`;
+		const releaseTypeRef = `${ refs.releaseType }/latest`;
+		const git = {
+			raw: vi
+				.fn()
+				.mockResolvedValueOnce(
+					[
+						`prepared-sha\t${ refs.commit }`,
+						`prepared-sha\t${ tagRef }`,
+						`prepared-sha\t${ releaseTypeRef }`,
+					].join( '\n' )
+				)
+				.mockResolvedValueOnce()
+				.mockRejectedValueOnce( new Error( 'state cleanup failed' ) ),
+		};
+
+		await expect(
+			deleteNpmReleasePreparedCommit( '/repo', 'wp/latest', { git } )
+		).rejects.toThrow( 'state cleanup failed' );
+		expect( git.raw.mock.calls[ 1 ] ).toEqual(
+			expect.arrayContaining( [ refs.commit, tagRef ] )
+		);
+		expect( git.raw.mock.calls[ 2 ] ).toEqual(
+			expect.arrayContaining( [ releaseTypeRef ] )
+		);
+		expect( git.raw.mock.calls[ 2 ] ).not.toContain( refs.commit );
 	} );
 
 	it( 'cleans annotated package tags from a real scratch remote', async () => {
