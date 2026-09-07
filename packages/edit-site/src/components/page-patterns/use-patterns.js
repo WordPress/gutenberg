@@ -2,6 +2,7 @@ import { parse } from '@wordpress/blocks';
 import { useSelect, createSelector } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { filterOutDuplicatesByName } from './utils';
 import {
 	EXCLUDED_PATTERN_SOURCES,
@@ -13,6 +14,9 @@ import {
 import { unlock } from '../../lock-unlock';
 import { searchItems } from './search-items';
 import { store as editSiteStore } from '../../store';
+
+const { isPatternCustomization, applyPatternCustomization } =
+	unlock( patternsPrivateApis );
 
 const EMPTY_PATTERN_LIST = [];
 
@@ -77,6 +81,13 @@ const selectTemplateParts = createSelector(
 	]
 );
 
+const selectPatternOverrides = ( select ) =>
+	(
+		select( coreStore ).getEntityRecords( 'postType', PATTERN_TYPES.user, {
+			per_page: -1,
+		} ) ?? EMPTY_PATTERN_LIST
+	).filter( isPatternCustomization );
+
 const selectThemePatterns = createSelector(
 	( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
@@ -87,6 +98,7 @@ const selectThemePatterns = createSelector(
 			settings.__experimentalBlockPatterns;
 
 		const restBlockPatterns = select( coreStore ).getBlockPatterns();
+		const customizations = selectPatternOverrides( select );
 
 		const patterns = [
 			...( blockPatterns || [] ),
@@ -98,14 +110,22 @@ const selectThemePatterns = createSelector(
 			)
 			.filter( filterOutDuplicatesByName )
 			.filter( ( pattern ) => pattern.inserter !== false )
-			.map( ( pattern ) => ( {
-				...pattern,
-				keywords: pattern.keywords || [],
-				type: PATTERN_TYPES.theme,
-				blocks: parse( pattern.content, {
-					__unstableSkipMigrationLogs: true,
-				} ),
-			} ) );
+			.map( ( pattern ) => {
+				// The edited copy of a registered pattern, when it exists, is
+				// the source of its title and content.
+				const resolved = applyPatternCustomization(
+					pattern,
+					customizations
+				);
+				return {
+					...resolved,
+					keywords: pattern.keywords || [],
+					type: PATTERN_TYPES.theme,
+					blocks: parse( resolved.content, {
+						__unstableSkipMigrationLogs: true,
+					} ),
+				};
+			} );
 		return {
 			patterns,
 			isResolving: isResolvingSelector( 'getBlockPatterns' ),
@@ -115,6 +135,9 @@ const selectThemePatterns = createSelector(
 		select( coreStore ).getBlockPatterns(),
 		select( coreStore ).isResolving( 'getBlockPatterns' ),
 		unlock( select( editSiteStore ) ).getSettings(),
+		select( coreStore ).getEntityRecords( 'postType', PATTERN_TYPES.user, {
+			per_page: -1,
+		} ),
 	]
 );
 
@@ -217,7 +240,11 @@ const selectUserPatterns = createSelector(
 		userPatternCategories.forEach( ( userCategory ) =>
 			categories.set( userCategory.id, userCategory )
 		);
-		let patterns = patternPosts ?? EMPTY_PATTERN_LIST;
+		// Edited copies of registered patterns are listed as the registered
+		// pattern itself, not as user patterns.
+		let patterns = ( patternPosts ?? EMPTY_PATTERN_LIST ).filter(
+			( record ) => ! isPatternCustomization( record )
+		);
 		const isResolving = isResolvingSelector( 'getEntityRecords', [
 			'postType',
 			PATTERN_TYPES.user,

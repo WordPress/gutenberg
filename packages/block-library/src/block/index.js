@@ -1,6 +1,7 @@
 import { symbol as icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as patternsStore } from '@wordpress/patterns';
 import { select } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import initBlock from '../utils/init-block';
@@ -28,6 +29,19 @@ export const settings = {
 		}
 
 		if ( slug ) {
+			const customization = unlock(
+				select( patternsStore )
+			).getPatternCustomization( slug );
+			if ( customization ) {
+				const entity = select( coreStore ).getEditedEntityRecord(
+					'postType',
+					'wp_block',
+					customization.id
+				);
+				if ( entity?.title ) {
+					return decodeEntities( entity.title );
+				}
+			}
 			const pattern = unlock(
 				select( blockEditorStore )
 			).getPatternBySlug( slug );

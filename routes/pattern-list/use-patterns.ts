@@ -17,6 +17,8 @@ const {
 	PATTERN_SYNC_TYPES,
 	EXCLUDED_PATTERN_SOURCES,
 	PATTERN_DEFAULT_CATEGORY,
+	isPatternCustomization,
+	applyPatternCustomization,
 } = unlock( patternPrivateApis );
 
 const { extractWords, getNormalizedSearchTerms, normalizeString } = unlock(
@@ -54,6 +56,7 @@ interface UserPattern {
 	description?: string;
 	wp_pattern_sync_status?: string;
 	wp_pattern_category?: number[];
+	meta?: Record< string, any >;
 	blocks?: any[];
 }
 
@@ -74,6 +77,10 @@ export interface NormalizedPattern {
 	blocks?: any[];
 	// Internal property for permissions lookup (user patterns only)
 	_recordId?: number;
+	// Registered patterns only: the `wp_block` post holding the edited copy.
+	customizationId?: number;
+	// Registered patterns only: needed to create the edited copy.
+	name?: string;
 }
 
 /**
@@ -88,14 +95,24 @@ interface PatternCategory {
 /**
  * Normalize theme pattern to unified structure.
  *
- * @param pattern Theme pattern object.
+ * @param pattern        Theme pattern object.
+ * @param customizations The `wp_block` records that are customizations of
+ *                       registered patterns; a matching one is the source
+ *                       of the title and content.
  * @return Normalized pattern object.
  */
-function normalizeThemePattern( pattern: ThemePattern ): NormalizedPattern {
+function normalizeThemePattern(
+	pattern: ThemePattern,
+	customizations: UserPattern[]
+): NormalizedPattern {
+	const resolved: ThemePattern & { customizationId?: number } =
+		applyPatternCustomization( pattern, customizations );
 	return {
 		id: pattern.name,
-		title: pattern.title,
-		content: pattern.content,
+		name: pattern.name,
+		customizationId: resolved.customizationId,
+		title: resolved.title,
+		content: resolved.content,
 		keywords: pattern.keywords || [],
 		type: PATTERN_TYPES.theme,
 		// Normalize categories to always be an array of slugs
@@ -283,6 +300,15 @@ function searchItems(
 
 const selectThemePatterns = createSelector(
 	( select ) => {
+		const customizations = (
+			( select( coreStore ).getEntityRecords(
+				'postType',
+				PATTERN_TYPES.user,
+				{
+					per_page: -1,
+				}
+			) as UserPattern[] | null ) ?? []
+		).filter( isPatternCustomization );
 		const { getBlockPatterns } = select( coreStore );
 		const { isResolving: isResolvingSelector } = select( coreStore );
 
@@ -295,7 +321,9 @@ const selectThemePatterns = createSelector(
 			)
 			.filter( filterOutDuplicatesByName )
 			.filter( ( pattern ) => pattern.inserter !== false )
-			.map( normalizeThemePattern );
+			.map( ( pattern: ThemePattern ) =>
+				normalizeThemePattern( pattern, customizations )
+			);
 		return {
 			patterns,
 			isResolving: isResolvingSelector( 'getBlockPatterns' ),
@@ -304,6 +332,9 @@ const selectThemePatterns = createSelector(
 	( select ) => [
 		select( coreStore ).getBlockPatterns(),
 		select( coreStore ).isResolving( 'getBlockPatterns' ),
+		select( coreStore ).getEntityRecords( 'postType', PATTERN_TYPES.user, {
+			per_page: -1,
+		} ),
 	]
 );
 
@@ -323,9 +354,13 @@ const selectUserPatterns = createSelector(
 		) as UserPattern[] | null;
 		const userPatternCategories =
 			getUserPatternCategories() as PatternCategory[];
-		let patterns = ( patternPosts ?? [] ).map( ( pattern ) =>
-			normalizeUserPattern( pattern, userPatternCategories )
-		);
+		// Edited copies of registered patterns are listed as the registered
+		// pattern itself, not as user patterns.
+		let patterns = ( patternPosts ?? [] )
+			.filter( ( record ) => ! isPatternCustomization( record ) )
+			.map( ( pattern ) =>
+				normalizeUserPattern( pattern, userPatternCategories )
+			);
 		const isResolving = isResolvingSelector( 'getEntityRecords', [
 			'postType',
 			PATTERN_TYPES.user,

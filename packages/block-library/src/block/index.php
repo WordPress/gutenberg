@@ -46,14 +46,21 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 		$seen_key = 'ref:' . $ref;
 		$content  = $reusable_block->post_content;
 	} else {
-		// A registered pattern, referenced by its name.
-		$pattern = WP_Block_Patterns_Registry::get_instance()->get_registered( $slug );
-		if ( ! $pattern ) {
-			return '';
-		}
-
 		$seen_key = 'slug:' . $slug;
-		$content  = $pattern['content'];
+
+		// A registered pattern, referenced by its name. An edited copy saved
+		// as a `wp_block` post wins over the registry.
+		$reusable_block = block_core_block_get_pattern_customization( $slug );
+
+		if ( $reusable_block ) {
+			$content = $reusable_block->post_content;
+		} else {
+			$pattern = WP_Block_Patterns_Registry::get_instance()->get_registered( $slug );
+			if ( ! $pattern ) {
+				return '';
+			}
+			$content = $pattern['content'];
+		}
 	}
 
 	if ( isset( $seen_refs[ $seen_key ] ) ) {
@@ -115,6 +122,32 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 	unset( $seen_refs[ $seen_key ] );
 
 	return $content;
+}
+
+/**
+ * Returns the `wp_block` post that is the edited copy of a registered pattern.
+ *
+ * The copy is linked to the registered pattern by its `wp_pattern_slug` meta,
+ * the same way an edited template part is linked to its theme file by slug.
+ *
+ * @since 7.2.0
+ *
+ * @param string $pattern_name Registered pattern name.
+ * @return WP_Post|null The published copy, or null when the pattern is not edited.
+ */
+function block_core_block_get_pattern_customization( $pattern_name ) {
+	$posts = get_posts(
+		array(
+			'post_type'      => 'wp_block',
+			'post_status'    => 'publish',
+			'posts_per_page' => 1,
+			'meta_key'       => 'wp_pattern_slug',
+			'meta_value'     => $pattern_name,
+			'no_found_rows'  => true,
+		)
+	);
+
+	return $posts ? $posts[0] : null;
 }
 
 /**

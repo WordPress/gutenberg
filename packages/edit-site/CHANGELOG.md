@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Patterns: Registered patterns can be edited from the Patterns page; the edit creates a linked copy that stands in for the registered pattern, and "Reset" reverts it ([#82549](https://github.com/WordPress/gutenberg/pull/82549)).
 -   Add New Template: Use the Button component's focus ring instead of the legacy `box-shadow` ones ([#80138](https://github.com/WordPress/gutenberg/issues/80138)).
 
 ### Bug Fixes

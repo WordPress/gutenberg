@@ -96,6 +96,30 @@ class Test_Blocks_RenderReusable extends WP_UnitTestCase {
 
 	/**
 	 * @covers ::gutenberg_render_block_core_block
+	 * @covers ::gutenberg_block_core_block_get_pattern_customization
+	 */
+	public function test_render_registered_pattern_uses_edited_copy() {
+		$customization_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_block',
+				'post_status'  => 'publish',
+				'post_title'   => 'Greeting',
+				'post_content' => '<!-- wp:paragraph --><p>Edited copy</p><!-- /wp:paragraph -->',
+				'meta_input'   => array( 'wp_pattern_slug' => 'test/greeting' ),
+			)
+		);
+
+		$this->assertSame( '<p class="wp-block-paragraph">Edited copy</p>', do_blocks( '<!-- wp:block {"slug":"test/greeting"} /-->' ) );
+
+		// Trashing the copy reverts to the registered pattern.
+		wp_trash_post( $customization_id );
+		$this->assertSame( '<p class="wp-block-paragraph">Hello from a registered pattern!</p>', do_blocks( '<!-- wp:block {"slug":"test/greeting"} /-->' ) );
+
+		wp_delete_post( $customization_id, true );
+	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_block
 	 */
 	public function test_render_unregistered_slug_renders_nothing() {
 		$this->assertSame( '', do_blocks( '<!-- wp:block {"slug":"test/does-not-exist"} /-->' ) );

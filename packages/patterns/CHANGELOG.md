@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the private `customizePattern` action and `getPatternCustomization` selector to create and find the editable copy of a registered pattern ([#82549](https://github.com/WordPress/gutenberg/pull/82549)).
+
 ### Internal
 
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).

@@ -162,18 +162,19 @@ export default function DataviewsPatterns() {
 					getItemId={ ( item ) => item.name ?? item.id }
 					isLoading={ isResolving }
 					isItemClickable={ ( item ) =>
-						item.type !== PATTERN_TYPES.theme
+						item.type !== PATTERN_TYPES.theme ||
+						!! item.customizationId
 					}
 					onClickItem={ ( item ) => {
+						// An edited registered pattern opens its editable copy.
+						if ( item.type === PATTERN_TYPES.theme ) {
+							history.navigate(
+								`/${ PATTERN_TYPES.user }/${ item.customizationId }?canvas=edit`
+							);
+							return;
+						}
 						history.navigate(
-							`/${ item.type }/${
-								[
-									PATTERN_TYPES.user,
-									TEMPLATE_PART_POST_TYPE,
-								].includes( item.type )
-									? item.id
-									: item.name
-							}?canvas=edit`
+							`/${ item.type }/${ item.id }?canvas=edit`
 						);
 					} }
 					view={ view }

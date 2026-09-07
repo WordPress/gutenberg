@@ -24,6 +24,29 @@ function gutenberg_is_block_pattern_synced( $pattern ) {
 }
 
 /**
+ * Registers the `wp_pattern_slug` meta on `wp_block` posts.
+ *
+ * A `wp_block` post carrying this meta is the customization (an edited copy) of
+ * the registered pattern with that name. It wins over the registry when the
+ * pattern is rendered, inserted or previewed, the same way a `wp_template_part`
+ * post wins over the theme file. Trashing the post reverts to the registry.
+ */
+function gutenberg_register_block_pattern_slug_meta() {
+	register_post_meta(
+		'wp_block',
+		'wp_pattern_slug',
+		array(
+			'type'         => 'string',
+			'single'       => true,
+			'show_in_rest' => true,
+			'label'        => __( 'Registered pattern name', 'gutenberg' ),
+			'description'  => __( 'The name of the registered pattern this pattern is an edited copy of.', 'gutenberg' ),
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_block_pattern_slug_meta' );
+
+/**
  * Applies the `Synced` header of the active theme's `patterns/` files.
  *
  * Core's `WP_Theme::get_block_patterns()` only reads a fixed list of headers,

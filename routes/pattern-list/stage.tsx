@@ -14,11 +14,12 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import {
 	privateApis as patternPrivateApis,
+	store as patternsStore,
 	// @ts-expect-error - No type declarations available for @wordpress/patterns
 } from '@wordpress/patterns';
 import { __ } from '@wordpress/i18n';
@@ -212,8 +213,32 @@ function PatternList() {
 		},
 	} );
 
+	const { customizePattern } = unlock( useDispatch( patternsStore ) );
+	const editRegisteredPatternAction: Action< NormalizedPattern > = useMemo(
+		() => ( {
+			id: 'edit-registered-pattern',
+			label: __( 'Edit' ),
+			isEligible: ( item ) => item.type === PATTERN_TYPES.theme,
+			// A registered pattern is edited through its editable copy,
+			// created on first edit.
+			callback: async ( items ) => {
+				const [ item ] = items;
+				const customization = item.customizationId
+					? { id: item.customizationId }
+					: await customizePattern( item );
+				navigate( {
+					to: `/types/wp_block/edit/${ encodeURIComponent(
+						customization.id
+					) }`,
+				} );
+			},
+		} ),
+		[ customizePattern, navigate ]
+	);
+
 	const actions = useMemo( () => {
 		return [
+			editRegisteredPatternAction,
 			...postTypeActions?.flatMap< Action< any > >( ( action ) => {
 				// Skip revisions as the admin does not support it
 				if ( action.id === 'view-post-revisions' ) {
@@ -223,7 +248,7 @@ function PatternList() {
 				return [ action ];
 			} ),
 		];
-	}, [ postTypeActions ] );
+	}, [ postTypeActions, editRegisteredPatternAction ] );
 
 	const handleTabChange = useCallback(
 		( typeSlug: string ) => {
@@ -323,7 +348,7 @@ function PatternList() {
 					} );
 				} }
 				isItemClickable={ ( item ) =>
-					item.type !== PATTERN_TYPES.theme
+					item.type !== PATTERN_TYPES.theme || !! item.customizationId
 				}
 				renderItemLink={ ( {
 					item,
@@ -333,12 +358,13 @@ function PatternList() {
 				} ) => (
 					<Link
 						to={ `/types/wp_block/edit/${ encodeURIComponent(
-							item.id
+							// An edited registered pattern opens its copy.
+							item.customizationId ?? item.id
 						) }` }
 						{ ...props }
 						onClick={ ( event ) => {
 							// Temporary fix to prevent triggering
-							// onChangeSelection, which would override the URL.
+							// onChangeSelection, which would customization the URL.
 							event.stopPropagation();
 						} }
 					/>
