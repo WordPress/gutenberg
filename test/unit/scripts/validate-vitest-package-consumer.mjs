@@ -39,6 +39,7 @@ const CONSUMER_DEPENDENCIES = [
 	'@testing-library/jest-dom',
 	'@testing-library/react',
 	'@typescript/native',
+	'playwright',
 	'react',
 	'react-dom',
 ];
@@ -536,7 +537,7 @@ try {
 	);
 	assert.equal(
 		packedPackages.get( 'scripts' ).packageJson.engines.node,
-		'^20.19.0 || >=22.12.0'
+		'^20.19.0 || >=22.13.0'
 	);
 
 	installPackedPackages( packedPackages );

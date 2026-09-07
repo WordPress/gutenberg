@@ -347,6 +347,16 @@ const baselineJestInfrastructure = new Set(
 		readBaselineFile( baselineRef, file )
 	)
 );
+// `test-unit-js` becomes the Vitest command in the tooling cutover. Preserve
+// existing transitional Jest scripts by renaming their runner explicitly,
+// without treating the rename as newly introduced Jest infrastructure.
+for ( const entry of baselineJestInfrastructure ) {
+	if ( entry.startsWith( 'command:' ) && entry.includes( 'test-unit-js' ) ) {
+		baselineJestInfrastructure.add(
+			entry.replaceAll( 'test-unit-js', 'test-unit-jest' )
+		);
+	}
+}
 const addedJestInfrastructure = currentJestInfrastructure.filter(
 	( entry ) => ! baselineJestInfrastructure.has( entry )
 );

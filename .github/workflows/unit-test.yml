@@ -89,10 +89,10 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
-			- name: Run build scripts
-			  # Native Vite transforms do not require the full Gutenberg build.
-			  # Some packages have custom build tasks that their tests consume.
-			  run: npm exec --no -- lerna run build
+            - name: Run build scripts
+              # Native Vite transforms do not require the full Gutenberg build.
+              # Some packages have custom build tasks that their tests consume.
+              run: npm exec --no -- lerna run build
 
             - name: Run the remaining Jest partition
               env:
@@ -149,10 +149,10 @@ jobs:
                   workspace: '@wordpress/unit-tests'
                   browsers: chromium
 
-			- name: Run build scripts
-			  # Native Vite transforms do not require the full Gutenberg build.
-			  # Some packages have custom build tasks that their tests consume.
-			  run: npm exec --no -- lerna run build
+            - name: Run build scripts
+              # Native Vite transforms do not require the full Gutenberg build.
+              # Some packages have custom build tasks that their tests consume.
+              run: npm exec --no -- lerna run build
 
             - name: Validate packed Vitest package consumers
               run: npm run test:unit:packages
