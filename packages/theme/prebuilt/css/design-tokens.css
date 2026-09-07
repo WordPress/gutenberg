@@ -30,27 +30,33 @@
 	/* Background color for surfaces with weak emphasis. */
 	--wpds-color-background-surface-neutral-weak: #f7f7f7;
 	/* Background color for surfaces with brand tone and normal emphasis. */
-	--wpds-color-background-surface-brand: #edf1fb;
+	--wpds-color-background-surface-brand: #ecf1fc;
 	/* Background color for surfaces with success tone and normal emphasis. */
-	--wpds-color-background-surface-success: #c5fbcd;
+	--wpds-color-background-surface-success: #cef6d4;
 	/* Background color for surfaces with success tone and weak emphasis. */
-	--wpds-color-background-surface-success-weak: #ebffed;
+	--wpds-color-background-surface-success-weak: #f8f8f8;
 	/* Background color for surfaces with info tone and normal emphasis. */
-	--wpds-color-background-surface-info: #e0edfc;
+	--wpds-color-background-surface-info: #e2edfa;
 	/* Background color for surfaces with info tone and weak emphasis. */
-	--wpds-color-background-surface-info-weak: #f3f9ff;
+	--wpds-color-background-surface-info-weak: #f8f8f8;
 	/* Background color for surfaces with warning tone and normal emphasis. */
-	--wpds-color-background-surface-warning: #ffe8c0;
+	--wpds-color-background-surface-warning: #fceac9;
 	/* Background color for surfaces with warning tone and weak emphasis. */
-	--wpds-color-background-surface-warning-weak: #fff7e1;
+	--wpds-color-background-surface-warning-weak: #f8f8f8;
 	/* Background color for surfaces with caution tone and normal emphasis. */
-	--wpds-color-background-surface-caution: #ffea96;
+	--wpds-color-background-surface-caution: #ffec91;
 	/* Background color for surfaces with caution tone and weak emphasis. */
-	--wpds-color-background-surface-caution-weak: #fff9ca;
+	--wpds-color-background-surface-caution-weak: #f8f8f8;
 	/* Background color for surfaces with error tone and normal emphasis. */
-	--wpds-color-background-surface-error: #fce7e3;
+	--wpds-color-background-surface-error: #f9e8e5;
 	/* Background color for surfaces with error tone and weak emphasis. */
-	--wpds-color-background-surface-error-weak: #fff6f5;
+	--wpds-color-background-surface-error-weak: #f8f8f8;
+	/* Solid background color for neutral interactive controls, such as input fields and unchecked checkboxes. */
+	--wpds-color-background-interactive-neutral: #fff;
+	/* Solid background color for neutral interactive controls that are hovered, focused, or active. */
+	--wpds-color-background-interactive-neutral-active: #fff;
+	/* Solid background color for neutral interactive controls in their disabled state. */
+	--wpds-color-background-interactive-neutral-disabled: #fff;
 	/* Background color for interactive elements with neutral tone and strong emphasis. */
 	--wpds-color-background-interactive-neutral-strong: #2d2d2d;
 	/* Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active. */
@@ -72,13 +78,13 @@
 	/* Background color for interactive elements with brand tone and weak emphasis. */
 	--wpds-color-background-interactive-brand-weak: #0000;
 	/* Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active. */
-	--wpds-color-background-interactive-brand-weak-active: #e6ebf8;
+	--wpds-color-background-interactive-brand-weak-active: #e7ebf6;
 	/* Background color for interactive elements with brand tone and weak emphasis, in their disabled state. */
 	--wpds-color-background-interactive-brand-weak-disabled: #0000;
 	/* Background color for interactive elements with error tone and normal emphasis. */
 	--wpds-color-background-interactive-error: #0000;
 	/* Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active. */
-	--wpds-color-background-interactive-error-active: #fff6f5;
+	--wpds-color-background-interactive-error-active: #f8f8f8;
 	/* Background color for interactive elements with error tone and normal emphasis, in their disabled state. */
 	--wpds-color-background-interactive-error-disabled: #0000;
 	/* Background color for interactive elements with error tone and strong emphasis. */
@@ -90,7 +96,7 @@
 	/* Background color for interactive elements with error tone and weak emphasis. */
 	--wpds-color-background-interactive-error-weak: #0000;
 	/* Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active. */
-	--wpds-color-background-interactive-error-weak-active: #fce7e3;
+	--wpds-color-background-interactive-error-weak-active: #f9e8e5;
 	/* Background color for interactive elements with error tone and weak emphasis, in their disabled state. */
 	--wpds-color-background-interactive-error-weak-disabled: #0000;
 	/* Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track). */
@@ -116,27 +122,27 @@
 	/* Foreground color for content like text with success tone and normal emphasis. */
 	--wpds-color-foreground-content-success: #215b2f;
 	/* Foreground color for content like text with success tone and weak emphasis. */
-	--wpds-color-foreground-content-success-weak: #307e44;
+	--wpds-color-foreground-content-success-weak: #307d43;
 	/* Foreground color for content like text with info tone and normal emphasis. */
 	--wpds-color-foreground-content-info: #005092;
 	/* Foreground color for content like text with info tone and weak emphasis. */
 	--wpds-color-foreground-content-info-weak: #006fc7;
 	/* Foreground color for content like text with warning tone and normal emphasis. */
-	--wpds-color-foreground-content-warning: #654c19;
+	--wpds-color-foreground-content-warning: #654c1a;
 	/* Foreground color for content like text with warning tone and weak emphasis. */
-	--wpds-color-foreground-content-warning-weak: #886726;
+	--wpds-color-foreground-content-warning-weak: #8a6826;
 	/* Foreground color for content like text with caution tone and normal emphasis. */
-	--wpds-color-foreground-content-caution: #5c4f16;
+	--wpds-color-foreground-content-caution: #5d5016;
 	/* Foreground color for content like text with caution tone and weak emphasis. */
-	--wpds-color-foreground-content-caution-weak: #7c6c21;
+	--wpds-color-foreground-content-caution-weak: #7d6c22;
 	/* Foreground color for content like text with error tone and normal emphasis. */
 	--wpds-color-foreground-content-error: #980f0f;
 	/* Foreground color for content like text with error tone and weak emphasis. */
-	--wpds-color-foreground-content-error-weak: #d81a1a;
+	--wpds-color-foreground-content-error-weak: #d71a1a;
 	/* Foreground color for interactive elements with neutral tone and normal emphasis. */
 	--wpds-color-foreground-interactive-neutral: #505050;
 	/* Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active. */
-	--wpds-color-foreground-interactive-neutral-active: #141414;
+	--wpds-color-foreground-interactive-neutral-active: #505050;
 	/* Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-neutral-disabled: #8d8d8d;
 	/* Foreground color for interactive elements with neutral tone and strong emphasis. */
@@ -148,31 +154,31 @@
 	/* Foreground color for interactive elements with neutral tone and weak emphasis. */
 	--wpds-color-foreground-interactive-neutral-weak: #717171;
 	/* Foreground color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active. */
-	--wpds-color-foreground-interactive-neutral-weak-active: #141414;
+	--wpds-color-foreground-interactive-neutral-weak-active: #505050;
 	/* Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-neutral-weak-disabled: #8d8d8d;
 	/* Foreground color for interactive elements with brand tone and normal emphasis. */
-	--wpds-color-foreground-interactive-brand: #222eda;
+	--wpds-color-foreground-interactive-brand: #3f61ea;
 	/* Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active. */
-	--wpds-color-foreground-interactive-brand-active: #03063b;
+	--wpds-color-foreground-interactive-brand-active: #222eda;
 	/* Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-brand-disabled: #8d8d8d;
 	/* Foreground color for interactive elements with brand tone and strong emphasis. */
-	--wpds-color-foreground-interactive-brand-strong: #e7e8eb;
+	--wpds-color-foreground-interactive-brand-strong: #e7e8ea;
 	/* Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active. */
-	--wpds-color-foreground-interactive-brand-strong-active: #e7e8eb;
+	--wpds-color-foreground-interactive-brand-strong-active: #e7e8ea;
 	/* Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-brand-strong-disabled: #8d8d8d;
 	/* Foreground color for interactive elements with error tone and normal emphasis. */
-	--wpds-color-foreground-interactive-error: #980f0f;
+	--wpds-color-foreground-interactive-error: #d71a1a;
 	/* Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active. */
-	--wpds-color-foreground-interactive-error-active: #260101;
+	--wpds-color-foreground-interactive-error-active: #980f0f;
 	/* Foreground color for interactive elements with error tone and normal emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-error-disabled: #8d8d8d;
 	/* Foreground color for interactive elements with error tone and strong emphasis. */
-	--wpds-color-foreground-interactive-error-strong: #eae6e5;
+	--wpds-color-foreground-interactive-error-strong: #eae6e6;
 	/* Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active. */
-	--wpds-color-foreground-interactive-error-strong-active: #eae6e5;
+	--wpds-color-foreground-interactive-error-strong-active: #eae6e6;
 	/* Foreground color for interactive elements with error tone and strong emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-error-strong-disabled: #8d8d8d;
 	/* Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis. */
@@ -182,27 +188,27 @@
 	/* Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-neutral-strong: #8d8d8d;
 	/* Decorative stroke color used to define brand-toned surface boundaries with normal emphasis. */
-	--wpds-color-stroke-surface-brand: #aebbda;
+	--wpds-color-stroke-surface-brand: #afbbda;
 	/* Decorative stroke color used to define brand-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-brand-strong: #3858e9;
 	/* Decorative stroke color used to define success-toned surface boundaries with normal emphasis. */
-	--wpds-color-stroke-surface-success: #92d39d;
+	--wpds-color-stroke-surface-success: #92d19d;
 	/* Decorative stroke color used to define success-toned surface boundaries with strong emphasis. */
-	--wpds-color-stroke-surface-success-strong: #008030;
+	--wpds-color-stroke-surface-success-strong: #007f2f;
 	/* Decorative stroke color used to define info-toned surface boundaries with normal emphasis. */
-	--wpds-color-stroke-surface-info: #adc6e2;
+	--wpds-color-stroke-surface-info: #aac6e5;
 	/* Decorative stroke color used to define info-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-info-strong: #006bd7;
 	/* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
-	--wpds-color-stroke-surface-warning: #e1bd7c;
+	--wpds-color-stroke-surface-warning: #e1be80;
 	/* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
-	--wpds-color-stroke-surface-warning-strong: #936300;
+	--wpds-color-stroke-surface-warning-strong: #936400;
 	/* Decorative stroke color used to define caution-toned surface boundaries with normal emphasis. */
-	--wpds-color-stroke-surface-caution: #d0c28b;
+	--wpds-color-stroke-surface-caution: #d0c38b;
 	/* Decorative stroke color used to define caution-toned surface boundaries with strong emphasis. */
-	--wpds-color-stroke-surface-caution-strong: #836a00;
+	--wpds-color-stroke-surface-caution-strong: #836b00;
 	/* Decorative stroke color used to define error-toned surface boundaries with normal emphasis. */
-	--wpds-color-stroke-surface-error: #e0afa7;
+	--wpds-color-stroke-surface-error: #dfafa8;
 	/* Decorative stroke color used to define error-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-error-strong: #cc1818;
 	/* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis. */
