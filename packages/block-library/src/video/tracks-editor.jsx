@@ -56,7 +56,7 @@ function TrackList( { tracks, onEditPress } ) {
 				<span>{ track.label }</span>
 				<HStack justify="flex-end">
 					{ track.default && (
-						<Badge intent="draft">{ __( 'Default' ) }</Badge>
+						<Badge intent="none">{ __( 'Default' ) }</Badge>
 					) }
 					<Button
 						__next40pxDefaultSize
