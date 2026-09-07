@@ -12,8 +12,8 @@ import {
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getUndoManager } from './private-selectors';
 import {
+	getFilteredItem,
 	getNormalizedCommaSeparable,
-	setNestedValue,
 	isNumericID,
 	getUserPermissionCacheKey,
 } from './utils';
@@ -443,17 +443,7 @@ export const getEntityRecord = createSelector(
 			return item;
 		}
 
-		const filteredItem = {};
-		const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
-		for ( let f = 0; f < fields.length; f++ ) {
-			const field = fields[ f ].split( '.' );
-			let value = item;
-			field.forEach( ( fieldName ) => {
-				value = value?.[ fieldName ];
-			} );
-			setNestedValue( filteredItem, field, value );
-		}
-		return filteredItem as EntityRecord;
+		return getFilteredItem< EntityRecord >( item, query._fields );
 	} ) as GetEntityRecord,
 	( state: State, kind, name, recordId, query ) => {
 		const context = query?.context ?? 'default';
@@ -1754,19 +1744,7 @@ export const getRevision = createSelector(
 			return item;
 		}
 
-		const filteredItem = {};
-		const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
-
-		for ( let f = 0; f < fields.length; f++ ) {
-			const field = fields[ f ].split( '.' );
-			let value = item;
-			field.forEach( ( fieldName ) => {
-				value = value?.[ fieldName ];
-			} );
-			setNestedValue( filteredItem, field, value );
-		}
-
-		return filteredItem;
+		return getFilteredItem( item, query._fields );
 	},
 	( state: State, kind, name, recordKey, revisionKey, query ) => {
 		const context = query?.context ?? 'default';
