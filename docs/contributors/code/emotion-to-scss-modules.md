@@ -92,21 +92,23 @@ Test mixed Emotion/Module composition in both the root and iframe documents when
 
 ## Verify CSS delivery and behavior
 
+Reuse existing tests and stories first. Add or extend a test only for a concrete migration risk that existing coverage does not protect. Choose the smallest check that observes the behavior and would fail if it regressed. A behavior-preserving migration may need no new tests. When automated tests cannot observe the real styling path, document a focused before/after browser check instead of adding a test that cannot detect the regression.
+
 [`StyleProvider`](/packages/components/src/style-provider/index.tsx) both supplies an Emotion cache and registers a document with `@wordpress/style-runtime`. Keep the relevant provider and registration path while either responsibility is needed. Removing a component's Emotion import does not make this infrastructure redundant.
 
 For SlotFill or portals, use an attached iframe with a real `contentDocument` and `defaultView`. Assert a computed style in the destination document. A class on the element or a style tag in the parent document does not prove delivery. [#80384](https://github.com/WordPress/gutenberg/pull/80384) pairs a registration test with a Storybook example that renders migrated Spacer styles in an iframe.
 
-Choose verification that can fail for the regression under investigation:
+Match the evidence to the behavior at risk:
 
 | What needs proof | Suitable evidence |
 | --- | --- |
-| DOM, public classes, refs, props, variants, and interactions | Focused component tests. Assert the actual styled node, including the outer Grid child when an inner wrapper has the same class. |
+| DOM, public classes, refs, props, variants, and interactions | Existing component tests; extend them only for an uncovered integration risk. Assert the actual styled node, including the outer Grid child when an inner wrapper has the same class. |
 | Real SCSS declarations, specificity, custom-property resolution, dimensions, and animation | Storybook or editor comparison using production styles, computed styles, and relevant interactions. Include a consumer override and the affected document/RTL states. |
-| Cross-document registration or a particular mixed-style composition mechanism | A focused test may register a small fixture stylesheet explicitly. Keep its claim limited to that mechanism and pair it with a real-style check. |
+| Cross-document registration or a particular mixed-style composition mechanism | Reuse shared registration coverage. Add a component-specific test only for an uncovered registration or composition risk. A small fixture stylesheet can test that mechanism; pair it with a real-style check. |
 
-Jest mocks stylesheet imports. Class assertions establish wiring, not that the real CSS loads or wins. Do not inject the desired production selector into a test and claim it protects that selector: the test would still pass if the SCSS rule were deleted. This distinction led to removing tests in [#81792](https://github.com/WordPress/gutenberg/pull/81792#discussion_r3811746653).
+Jest mocks stylesheet imports. Public-class assertions can protect a compatibility contract; private module-class assertions establish wiring only. Neither proves that the real CSS loads or wins. Do not add class assertions or snapshots solely to mirror the implementation. Do not inject the desired production selector into a test and claim it protects that selector: the test would still pass if the SCSS rule were deleted. This distinction led to removing tests in [#81792](https://github.com/WordPress/gutenberg/pull/81792#discussion_r3811746653).
 
-Keep new tests focused on the migrated component's integration. Do not copy PolymorphicElement's entire filtering suite into every wrapper, duplicate a full editor setup for a small assertion, or introduce a new Storybook testing convention just for the migration. When a real-style assertion is unavailable, state the gap and give reproducible manual steps.
+Keep new tests focused on the migrated component's integration. A wrapper test can protect its `as`, ref, or prop forwarding even when the shared helper is already tested. Do not copy PolymorphicElement's entire filtering suite into every wrapper, duplicate a full editor setup for a small assertion, or introduce a new Storybook testing convention just for the migration. Check the relevant states and combinations from the contract audit; do not generate every prop combination or supported tag. When a real-style assertion is unavailable, state the gap and give reproducible manual steps.
 
 ## Complete the migration
 
@@ -128,43 +130,20 @@ git diff --check
 
 The snapshot updates are for the whole repository because downstream consumers can change. Jest and Vitest own separate suites, so neither command covers both. Review every snapshot change for removed or duplicated public classes, changed elements, forwarded props, and consumer output. Do not accept a snapshot solely because Emotion classes disappeared. Rerun the exact failing file or shard before attributing a broad failure to the migration.
 
-Run `npm run other:check-local-changes` from a clean committed worktree to detect generated-file drift. Inspect and include required generated updates, then rerun it. Recheck the final selectors and consumers after the last edit or rebase; a previous visual check does not cover a later specificity change. Preserve newer trunk changes, such as focus-ring updates, when moving declarations out of an old style file.
+For generated-file verification, start from a clean committed worktree and run the applicable generators and suppression updates. `npm run other:check-local-changes` runs the documentation and theme generators through its npm prehook, then checks the unstaged diff. It does not run every generator or suppression update; consult the current [static-checks workflow](/.github/workflows/static-checks.yml) for those required by the migration. Inspect generated changes before staging them, since staged changes are invisible to the checker. Commit required updates, then repeat the applicable generation and check commands from the clean worktree.
+
+Recheck the final selectors and consumers after the last edit or rebase; a previous visual check does not cover a later specificity change. Preserve newer trunk changes, such as focus-ring updates, when moving declarations out of an old style file.
 
 Follow [package changelog guidance](/docs/contributors/code/managing-packages.md). For production migrations, use the current unreleased section and this PR's link. The merged migrations record the `cx()` composition limitation under **Breaking Changes**, even when normal component usage is visually unchanged. Do not copy an early pilot's `Internal` entry as the only release note. Record any separately agreed behavior change and its verification independently, as #80715 did for Reset focus retention.
 
 ## Reference migrations
 
-These are the 26 merged component migration PRs linked from #66806 when this guide was researched on September 7, 2026. The notes describe useful cases, not a guarantee that every historical implementation or PR description is current guidance.
+Choose an example for the risk in the current migration, then check it against current source. The full migration history is maintained in [#66806](https://github.com/WordPress/gutenberg/issues/66806).
 
-| Component or family | Merged PR | Useful case |
+| Migration risk | Merged example | What to inspect |
 | --- | --- | --- |
-| View | [#79443](https://github.com/WordPress/gutenberg/pull/79443) | Shared polymorphic replacement, legacy `css` no-op, and downstream Emotion composition. |
-| Divider | [#79444](https://github.com/WordPress/gutenberg/pull/79444) | Orientation and dynamic margins; read the specificity correction in #79534 too. |
-| Surface | [#79445](https://github.com/WordPress/gutenberg/pull/79445) | Physical border props, pattern sizes, and explicitly documented token changes. |
-| Truncate | [#79446](https://github.com/WordPress/gutenberg/pull/79446) | Conditional line clamping and browser-specific declarations. |
-| Theme | [#79447](https://github.com/WordPress/gutenberg/pull/79447) | Generated variables, consumer style precedence, and the CanvasLoader/ProgressBar consumer. |
-| Spacer | [#79449](https://github.com/WordPress/gutenberg/pull/79449) | Nested custom-property resets and shorthand/longhand fallback. |
-| Flex | [#79450](https://github.com/WordPress/gutenberg/pull/79450) | Family-wide layout styles, dynamic values, and row/column variants. |
-| BaseControl styled wrappers | [#80001](https://github.com/WordPress/gutenberg/pull/80001) | Public-class ownership, global ancestor selectors, and legend rendering. |
-| ToggleGroupControl | [#80381](https://github.com/WordPress/gutenberg/pull/80381) | State classes, indicator offsets, and explicitly agreed focus/token changes. |
-| ConfirmDialog | [#80394](https://github.com/WordPress/gutenberg/pull/80394) | Doubled overlay specificity and the shared Sass z-index map. |
-| BorderControl and BorderBoxControl | [#80437](https://github.com/WordPress/gutenberg/pull/80437) | Mixed-style overrides, CSS-wide values, and the linked-control gutter. |
-| ToolsPanel | [#80445](https://github.com/WordPress/gutenberg/pull/80445) | Heading precedence, existing Grid props, and shared BaseControl selectors. |
-| ComboboxControl | [#80471](https://github.com/WordPress/gutenberg/pull/80471) | Replace a styled Flex wrapper while retaining its layout. |
-| FormTokenField | [#80472](https://github.com/WordPress/gutenberg/pull/80472) | Static padding and a Sass reset replacing the Emotion box-sizing utility. |
-| ColorPalette and GradientPicker | [#80473](https://github.com/WordPress/gutenberg/pull/80473) | Shared module ownership and Heading line-height precedence. |
-| SearchControl | [#80474](https://github.com/WordPress/gutenberg/pull/80474) | Public input class composition, WebKit decorations, and directional icon styling. |
-| Spinner | [#80511](https://github.com/WordPress/gutenberg/pull/80511) | SVG styling, local keyframes, and removal of an unused size constant. |
-| ProgressBar | [#80512](https://github.com/WordPress/gutenberg/pull/80512) | Sass animation constants, RTL motion, and determinate-only transitions. |
-| ZStack | [#80514](https://github.com/WordPress/gutenberg/pull/80514) | `as` support, child-selector specificity, and overridable dynamic z-index. |
-| Disabled | [#80643](https://github.com/WordPress/gutenberg/pull/80643) | Conditional wrapper classes and descendant pointer-event styles. |
-| Scrollable | [#80694](https://github.com/WordPress/gutenberg/pull/80694) | CardBody height in root/iframe documents and scrollbar cleanup. |
-| BoxControl | [#80715](https://github.com/WordPress/gutenberg/pull/80715) | Styled-node assertions and a separately documented Reset behavior change. |
-| ItemGroup and Item | [#80797](https://github.com/WordPress/gutenberg/pull/80797) | Modifier ownership, size calculations, and unchanged border values. |
-| TextareaControl | [#81353](https://github.com/WordPress/gutenberg/pull/81353) | Native pseudo-classes, global dark-theme selectors, and concurrent focus-ring changes. |
-| DropdownContentWrapper | [#81522](https://github.com/WordPress/gutenberg/pull/81522) | Padding variants and physical offsets against Popover content. |
-| ResizableBox resize tooltip | [#81792](https://github.com/WordPress/gutenberg/pull/81792) | Polymorphic root, Text overrides, and limits of copied-CSS tests. |
-
-Supporting work includes [the guardrails, #79442](https://github.com/WordPress/gutenberg/pull/79442), [Divider's correction, #79534](https://github.com/WordPress/gutenberg/pull/79534), [BorderBoxControl's correction, #79967](https://github.com/WordPress/gutenberg/pull/79967), [SlotFill validation, #80384](https://github.com/WordPress/gutenberg/pull/80384), and [the polymorphic type follow-up, #80705](https://github.com/WordPress/gutenberg/pull/80705).
-
-[#81164](https://github.com/WordPress/gutenberg/pull/81164) removed a Menu story's Emotion styles while fixing focus return. It did not migrate Menu's production styles. The closed Popover and Modal attempts, #80382 and #80393, and the superseded #80720 and #80750 are not completed migrations. The issue's build upgrades and older Theme consumer history are related context, not additional component migrations.
+| Polymorphic wrappers | View, [#79443](https://github.com/WordPress/gutenberg/pull/79443) | Shared polymorphic replacement, legacy `css` no-op, and downstream consumers. |
+| Dynamic spacing | Spacer, [#79449](https://github.com/WordPress/gutenberg/pull/79449) | Nested custom-property resets and shorthand/longhand fallback. |
+| Selector specificity | Divider, [#79444](https://github.com/WordPress/gutenberg/pull/79444), and [#79534](https://github.com/WordPress/gutenberg/pull/79534) | Orientation selectors and the correction that restored consumer overrides. |
+| Mixed Emotion composition | Border controls, [#80437](https://github.com/WordPress/gutenberg/pull/80437) | Overrides, CSS-wide values, and the linked-control gutter. |
+| Root and iframe delivery | Scrollable, [#80694](https://github.com/WordPress/gutenberg/pull/80694) | CardBody height and stylesheet insertion order in each document. |
