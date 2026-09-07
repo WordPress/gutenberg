@@ -73,6 +73,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// WordPress 7.2 compat.
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-templates-controller-7-2.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-template-parts-controller-7-2.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-block-patterns-controller-7-2.php';
 	require __DIR__ . '/compat/wordpress-7.2/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-view-config-controller-7-2.php';
@@ -132,6 +133,7 @@ require __DIR__ . '/compat/wordpress-7.1/icons.php';
 // WordPress 7.2 compat.
 require __DIR__ . '/compat/wordpress-7.2/block-patterns.php';
 require __DIR__ . '/compat/wordpress-7.2/template-parts-as-patterns.php';
+require __DIR__ . '/compat/wordpress-7.2/template-parts-compat.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
