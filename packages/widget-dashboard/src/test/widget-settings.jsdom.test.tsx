@@ -1,7 +1,8 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
+import { describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
 import type {
 	ResolveWidgetModule,
@@ -10,6 +11,10 @@ import type {
 } from '@wordpress/widget-primitives';
 import { WidgetDashboard } from '../widget-dashboard';
 import type { DashboardWidget } from '../types';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+globalThis.wpVitest.mockResizeObserver();
 
 type Attrs = { greeting: string };
 
@@ -91,7 +96,7 @@ describe( 'WidgetDashboard widget settings', () => {
 
 	it( 'stages attribute edits behind the drawer and publishes them on Save', async () => {
 		const user = userEvent.setup();
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		render( <Harness onLayoutChange={ onLayoutChange } /> );
 		await screen.findByTestId( 'greeting' );
 
@@ -135,7 +140,7 @@ describe( 'WidgetDashboard widget settings', () => {
 
 	it( 'discards staged edits when the drawer is dismissed', async () => {
 		const user = userEvent.setup();
-		const onLayoutChange = jest.fn();
+		const onLayoutChange = vi.fn();
 		render( <Harness onLayoutChange={ onLayoutChange } /> );
 		await screen.findByTestId( 'greeting' );
 

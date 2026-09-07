@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, beforeEach, expect, vi } from 'vitest';
+import { aroundEach, beforeAll, beforeEach, expect, vi } from 'vitest';
 
 const supportedMatchers = {
 	error: 'toHaveErrored',
@@ -87,11 +87,16 @@ expect.extend(
 );
 
 function setConsoleMethodSpy( [ methodName, matcherName ] ) {
-	const spy = vi
-		.spyOn( console, methodName )
-		.mockName( `console.${ methodName }` );
+	let spy;
 
 	function resetSpy() {
+		// eslint-disable-next-line no-console
+		if ( console[ methodName ] !== spy ) {
+			spy = vi.fn().mockName( `console.${ methodName }` );
+			// eslint-disable-next-line no-console
+			console[ methodName ] = spy;
+		}
+
 		spy.mockReset();
 		spy.mockImplementation( () => undefined );
 		spy.assertionsNumber = 0;
@@ -108,7 +113,13 @@ function setConsoleMethodSpy( [ methodName, matcherName ] ) {
 		assertExpectedCalls();
 		resetSpy();
 	} );
-	afterEach( assertExpectedCalls );
+	aroundEach( async ( runTest ) => {
+		try {
+			await runTest();
+		} finally {
+			assertExpectedCalls();
+		}
+	} );
 }
 
 Object.entries( supportedMatchers ).forEach( setConsoleMethodSpy );

@@ -16,6 +16,7 @@ const captionField: Partial< Field< Updatable< Attachment > > > = {
 				label={ field.label }
 				value={ getRawContent( data.caption ) || '' }
 				onChange={ ( value ) => onChange( { caption: value } ) }
+				disabled={ field.isDisabled( { item: data, field } ) }
 				rows={ 2 }
 			/>
 		);

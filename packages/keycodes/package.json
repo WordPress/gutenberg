@@ -45,7 +45,6 @@
 		"@wordpress/i18n": "file:../i18n"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0",
 		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
