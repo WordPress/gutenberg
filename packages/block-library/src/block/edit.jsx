@@ -530,13 +530,18 @@ function ReusableBlockEdit( {
 				<SelectControl
 					label={ __( 'Area' ) }
 					help={
-						pattern?.area && ! areaAttribute
+						pattern?.area
 							? __( 'Set by the registered pattern.' )
 							: undefined
 					}
 					value={ area || '' }
 					options={ [
-						{ label: __( 'None' ), value: '' },
+						// An area set by the registration can be changed
+						// but not removed: clearing the attribute falls
+						// back to the registered area.
+						...( pattern?.area
+							? []
+							: [ { label: __( 'None' ), value: '' } ] ),
 						...areas
 							.filter(
 								( { area: _area } ) =>
