@@ -4615,16 +4615,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/card/get-padding-by-size.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/card/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/color-picker/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
