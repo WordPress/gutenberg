@@ -24,7 +24,7 @@ import { BLACK, CONTRAST_COMBINATIONS, WHITE } from './lib/constants.ts';
 export { DEFAULT_SEED_COLORS } from './lib/constants.ts';
 
 // Only solve both polarities near the black/white WCAG crossover. This keeps
-// light and dark seeds keep their initial direction without a second solve.
+// the extra work and possible direction change away from decisive seeds.
 const MAXIMUM_AMBIGUOUS_ENDPOINT_CONTRAST_DIFFERENCE = 1;
 // Allow the alternate direction only when its semantic anchor remains nearly
 // as faithful to the supplied seed as the initially preferred direction.
