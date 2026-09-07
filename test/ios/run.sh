@@ -24,6 +24,9 @@ for _ in $( seq 1 180 ); do
 	sleep 1
 done
 curl -sf -o /dev/null "$WP_BASE_URL/" || { echo "WordPress did not start"; exit 1; }
+# Warm up: the first request to the editor does the one-time work of a
+# fresh site, which would otherwise count against the test's timeout.
+curl -sL -o /dev/null -c /dev/null "$WP_BASE_URL/wp-admin/post-new.php"
 
 # A booted iPhone if there is one, otherwise any available iPhone.
 UDID=$( xcrun simctl list devices available -j | python3 -c '
