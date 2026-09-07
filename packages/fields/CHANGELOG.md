@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add the `resetPattern` action, which reverts an edited registered pattern to its registered version ([#YYYYY](https://github.com/WordPress/gutenberg/pull/YYYYY)).
+-   Add the `resetPattern` action, which reverts an edited registered pattern to its registered version ([#82549](https://github.com/WordPress/gutenberg/pull/82549)).
 
 ### Enhancements
 

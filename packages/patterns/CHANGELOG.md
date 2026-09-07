@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add the private `createPatternOverride` action and `getPatternOverride` selector to create and find the editable copy of a registered pattern ([#YYYYY](https://github.com/WordPress/gutenberg/pull/YYYYY)).
+-   Add the private `createPatternOverride` action and `getPatternOverride` selector to create and find the editable copy of a registered pattern ([#82549](https://github.com/WordPress/gutenberg/pull/82549)).
 
 ### Internal
 
