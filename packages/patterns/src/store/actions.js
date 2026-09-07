@@ -120,10 +120,6 @@ export const createPatternOverride =
 			},
 			{ throwOnError: true }
 		);
-		// The patterns REST endpoint now serves the copy's content.
-		registry
-			.dispatch( coreStore )
-			.invalidateResolution( 'getBlockPatterns' );
 		return record;
 	};
 

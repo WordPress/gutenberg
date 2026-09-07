@@ -94,20 +94,21 @@ interface PatternCategory {
 /**
  * Normalize theme pattern to unified structure.
  *
- * @param pattern    Theme pattern object.
- * @param overrideId Id of the `wp_block` post holding the edited copy, if any.
+ * @param pattern  Theme pattern object.
+ * @param override The `wp_block` post holding the edited copy, if any. It is
+ *                 the source of the title and content when present.
  * @return Normalized pattern object.
  */
 function normalizeThemePattern(
 	pattern: ThemePattern,
-	overrideId?: number
+	override?: UserPattern
 ): NormalizedPattern {
 	return {
 		id: pattern.name,
 		name: pattern.name,
-		overrideId,
-		title: pattern.title,
-		content: pattern.content,
+		overrideId: override?.id,
+		title: override?.title?.raw ?? pattern.title,
+		content: override?.content?.raw ?? pattern.content,
 		keywords: pattern.keywords || [],
 		type: PATTERN_TYPES.theme,
 		// Normalize categories to always be an array of slugs
@@ -323,7 +324,7 @@ const selectThemePatterns = createSelector(
 						( record ) =>
 							record.meta?.[ PATTERN_OVERRIDE_META_KEY ] ===
 							pattern.name
-					)?.id
+					)
 				)
 			);
 		return {

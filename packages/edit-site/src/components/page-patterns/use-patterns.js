@@ -107,20 +107,28 @@ const selectThemePatterns = createSelector(
 			)
 			.filter( filterOutDuplicatesByName )
 			.filter( ( pattern ) => pattern.inserter !== false )
-			.map( ( pattern ) => ( {
-				...pattern,
-				keywords: pattern.keywords || [],
-				type: PATTERN_TYPES.theme,
-				// The edited copy of a registered pattern, when it exists.
-				overrideId: overrides.find(
+			.map( ( pattern ) => {
+				// The edited copy of a registered pattern, when it exists, is
+				// the source of its title and content.
+				const override = overrides.find(
 					( record ) =>
 						record.meta[ PATTERN_OVERRIDE_META_KEY ] ===
 						pattern.name
-				)?.id,
-				blocks: parse( pattern.content, {
-					__unstableSkipMigrationLogs: true,
-				} ),
-			} ) );
+				);
+				const title = override?.title?.raw ?? pattern.title;
+				const content = override?.content?.raw ?? pattern.content;
+				return {
+					...pattern,
+					title,
+					content,
+					keywords: pattern.keywords || [],
+					type: PATTERN_TYPES.theme,
+					overrideId: override?.id,
+					blocks: parse( content, {
+						__unstableSkipMigrationLogs: true,
+					} ),
+				};
+			} );
 		return {
 			patterns,
 			isResolving: isResolvingSelector( 'getBlockPatterns' ),

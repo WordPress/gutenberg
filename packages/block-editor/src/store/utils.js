@@ -30,6 +30,31 @@ export function isPatternOverride( userPattern ) {
 	return !! userPattern?.meta?.wp_pattern_slug;
 }
 
+/**
+ * Returns a registered pattern with the title and content of its edited copy
+ * (a `wp_block` record carrying the `wp_pattern_slug` meta) when one exists.
+ * The record is the single source of the edited data, so anything derived
+ * from it follows edits to the copy.
+ *
+ * @param {Object}   pattern        Registered pattern.
+ * @param {Object[]} reusableBlocks The `wp_block` records.
+ * @return {Object} The pattern, merged with its copy when edited.
+ */
+export function applyPatternOverride( pattern, reusableBlocks ) {
+	const override = reusableBlocks?.find(
+		( record ) => record.meta?.wp_pattern_slug === pattern.name
+	);
+	if ( ! override ) {
+		return pattern;
+	}
+	return {
+		...pattern,
+		title: override.title?.raw ?? pattern.title,
+		content: override.content?.raw ?? pattern.content,
+		overrideId: override.id,
+	};
+}
+
 export function mapUserPattern(
 	userPattern,
 	__experimentalUserPatternCategories = []

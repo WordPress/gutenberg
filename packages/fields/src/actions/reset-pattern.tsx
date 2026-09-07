@@ -20,8 +20,7 @@ const resetPattern: Action< Pattern > = {
 	hideModalHeader: true,
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
-		const { deleteEntityRecord, invalidateResolution } =
-			useDispatch( coreStore );
+		const { deleteEntityRecord } = useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 
@@ -34,7 +33,6 @@ const resetPattern: Action< Pattern > = {
 					{},
 					{ throwOnError: true }
 				);
-				invalidateResolution( 'getBlockPatterns', [] );
 				createSuccessNotice(
 					sprintf(
 						/* translators: %s: The pattern's title. */

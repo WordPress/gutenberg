@@ -26,6 +26,7 @@ import {
 	getGrammar,
 	mapUserPattern,
 	isPatternOverride,
+	applyPatternOverride,
 } from './utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
@@ -622,12 +623,18 @@ export const getPatternBySlug = createRegistrySelector( ( select ) =>
 				);
 			}
 
-			return [
+			const pattern = [
 				// This setting is left for back compat.
 				...( state.settings.__experimentalBlockPatterns ?? [] ),
 				...( state.settings[ selectBlockPatternsKey ]?.( select ) ??
 					[] ),
 			].find( ( { name } ) => name === patternName );
+			return pattern
+				? applyPatternOverride(
+						pattern,
+						unlock( select( STORE_NAME ) ).getReusableBlocks()
+				  )
+				: pattern;
 		},
 		( state, patternName ) =>
 			patternName?.startsWith( 'core/block/' )
@@ -638,15 +645,18 @@ export const getPatternBySlug = createRegistrySelector( ( select ) =>
 				: [
 						state.settings.__experimentalBlockPatterns,
 						state.settings[ selectBlockPatternsKey ]?.( select ),
+						unlock( select( STORE_NAME ) ).getReusableBlocks(),
 				  ]
 	)
 );
 
 export const getAllPatterns = createRegistrySelector( ( select ) =>
 	createSelector( ( state ) => {
+		const reusableBlocks = unlock(
+			select( STORE_NAME )
+		).getReusableBlocks();
 		return [
-			...unlock( select( STORE_NAME ) )
-				.getReusableBlocks()
+			...reusableBlocks
 				// Edited copies of registered patterns are represented by
 				// the registered pattern itself.
 				.filter( ( userPattern ) => ! isPatternOverride( userPattern ) )
@@ -658,9 +668,14 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 						) ?? state.settings.__experimentalUserPatternCategories
 					)
 				),
-			// This setting is left for back compat.
-			...( state.settings.__experimentalBlockPatterns ?? [] ),
-			...( state.settings[ selectBlockPatternsKey ]?.( select ) ?? [] ),
+			...[
+				// This setting is left for back compat.
+				...( state.settings.__experimentalBlockPatterns ?? [] ),
+				...( state.settings[ selectBlockPatternsKey ]?.( select ) ??
+					[] ),
+			].map( ( pattern ) =>
+				applyPatternOverride( pattern, reusableBlocks )
+			),
 		].filter(
 			( x, index, arr ) =>
 				index === arr.findIndex( ( y ) => x.name === y.name )
