@@ -85,6 +85,14 @@ jobs:
             - name: Install xcodegen
               run: brew install xcodegen
 
+            # The image defaults to an older Xcode; the newest Xcode 26 has
+            # the same UI testing stack as the iOS 26 simulator runtime.
+            - name: Select the newest Xcode 26
+              run: |
+                  ls -d /Applications/Xcode*.app
+                  sudo xcode-select -s "$( ls -d /Applications/Xcode_26*.app | sort -V | tail -1 )"
+                  xcodebuild -version
+
             - name: Run the tests
               run: ./test/ios/run.sh
 

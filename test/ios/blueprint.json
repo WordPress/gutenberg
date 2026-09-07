@@ -5,6 +5,11 @@
 		{
 			"step": "runPHP",
 			"code": "<?php require '/wordpress/wp-load.php'; update_user_meta( 1, 'wp_persisted_preferences', array( 'core/edit-post' => array( 'welcomeGuide' => false, 'fullscreenMode' => false ), '_modified' => gmdate( 'c' ) ) );"
+		},
+		{
+			"step": "writeFile",
+			"path": "/wordpress/wp-content/mu-plugins/ios-diagnostics.php",
+			"data": "<?php add_action( 'admin_enqueue_scripts', function () { foreach ( glob( WP_PLUGIN_DIR . '/*/test/ios/diagnostics.js' ) as $file ) { wp_enqueue_script( 'ios-diagnostics', plugins_url( str_replace( WP_PLUGIN_DIR . '/', '', $file ) ), array(), null, true ); } } );"
 		}
 	]
 }
