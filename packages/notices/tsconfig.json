@@ -14,7 +14,7 @@
 	// Listed files have pre-existing type errors; include them once fixed.
 	"exclude": [
 		"**/benchmark",
-		"src/components/inline-notices/test/index.test.tsx",
+		"src/components/inline-notices/test/index.jsdom.test.tsx",
 		"src/store/test/reducer.ts"
 	]
 }

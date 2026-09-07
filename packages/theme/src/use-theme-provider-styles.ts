@@ -10,21 +10,21 @@ import {
 } from 'colorjs.io/fn';
 import memoize from 'memize';
 import { useMemo, useContext } from '@wordpress/element';
-import { ThemeContext } from './context';
-import colorTokens from './prebuilt/ts/color-tokens';
+import { ThemeContext } from './context.ts';
+import colorTokens from './prebuilt/ts/color-tokens.ts';
 import {
 	buildBgRamp,
 	buildAccentRamp,
 	DEFAULT_SEED_COLORS,
 	type RampResult,
-} from './color-ramps';
-import { getColorString } from './color-ramps/lib/color-utils';
-import type { ThemeProviderProps } from './types';
+} from './color-ramps/index.ts';
+import { getColorString } from './color-ramps/lib/color-utils.ts';
+import type { ThemeProviderProps } from './types.ts';
 import {
 	collectThemeProviderColorWarnings,
 	type ThemeProviderColorRampName,
 	type ThemeProviderColorWarning,
-} from './theme-provider-color-warnings';
+} from './theme-provider-color-warnings.ts';
 
 type Entry = [ string, string ];
 

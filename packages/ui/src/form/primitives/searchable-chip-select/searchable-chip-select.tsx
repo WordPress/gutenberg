@@ -17,11 +17,13 @@ import {
 } from './types';
 
 /**
- * A searchable multi-selection component with chips, with support for
- * a footer item to create new items.
+ * A low-level primitive for a searchable multi-selection field with chips, with
+ * support for a footer item to create new items.
+ *
+ * Prefer `SearchableChipSelectControl` when using with a standard label and description.
  */
 export const SearchableChipSelect = forwardRef<
-	HTMLDivElement,
+	HTMLInputElement,
 	SearchableChipSelectProps
 >( function SearchableChipSelect(
 	{
@@ -31,6 +33,7 @@ export const SearchableChipSelect = forwardRef<
 		items,
 		chipsContent,
 		searchPlaceholder = __( 'Search' ),
+		popupWidth,
 		showClearButton = true,
 		clearButtonLabel = __( 'Clear all' ),
 		'aria-label': ariaLabel,
@@ -63,7 +66,6 @@ export const SearchableChipSelect = forwardRef<
 							visuallyDisabled={ disabled }
 						/>
 					}
-					ref={ ref }
 				>
 					<Combobox.Value>
 						{ ( value: Item[] ) => (
@@ -102,8 +104,10 @@ export const SearchableChipSelect = forwardRef<
 					</Combobox.Value>
 
 					<Combobox.Input
+						ref={ ref }
 						render={
 							<input
+								type="text"
 								className={ clsx(
 									defenseStyles.input,
 									styles.input
@@ -118,7 +122,7 @@ export const SearchableChipSelect = forwardRef<
 				</Combobox.Chips>
 			</Combobox.InputGroup>
 
-			<Combobox.Popup>
+			<Combobox.Popup width={ popupWidth }>
 				<Combobox.Empty>{ emptyContent }</Combobox.Empty>
 				<Combobox.List>
 					<Combobox.ListBody>

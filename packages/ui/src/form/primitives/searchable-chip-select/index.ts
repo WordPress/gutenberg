@@ -10,6 +10,12 @@ ChipWithRemove.displayName = 'SearchableChipSelect.ChipWithRemove';
 Group.displayName = 'SearchableChipSelect.Group';
 GroupLabel.displayName = 'SearchableChipSelect.GroupLabel';
 
+/**
+ * A low-level primitive for a searchable multi-selection field with chips, with
+ * support for a footer item to create new items.
+ *
+ * Prefer `SearchableChipSelectControl` when using with a standard label and description.
+ */
 export const SearchableChipSelect = Object.assign( _SearchableChipSelect, {
 	Item,
 	ChipWithRemove,

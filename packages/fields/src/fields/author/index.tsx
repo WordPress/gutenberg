@@ -16,7 +16,7 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 	type: 'integer',
 	getElements: async () => {
 		const authors: Author[] =
-			( await resolveSelect( coreDataStore ).getEntityRecords(
+			( await resolveSelect( coreDataStore ).getEntityRecords< Author >(
 				'root',
 				'user',
 				{

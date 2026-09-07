@@ -59,7 +59,7 @@ export const route = {
 		const posts = await resolveSelect( coreStore ).getEntityRecords(
 			'postType',
 			'wp_template_part',
-			{ ...query, per_page: 1 }
+			query
 		);
 
 		// Return first template part if available

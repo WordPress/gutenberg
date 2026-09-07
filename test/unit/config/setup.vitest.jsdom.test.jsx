@@ -26,4 +26,8 @@ describe( 'Vitest repository setup', () => {
 	it( 'cleans up Testing Library renders between tests', () => {
 		expect( screen.queryByText( 'Setup content' ) ).not.toBeInTheDocument();
 	} );
+
+	it( 'enables React act-environment diagnostics', () => {
+		expect( globalThis.IS_REACT_ACT_ENVIRONMENT ).toBe( true );
+	} );
 } );

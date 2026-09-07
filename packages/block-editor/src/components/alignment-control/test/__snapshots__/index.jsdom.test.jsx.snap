@@ -1,0 +1,193 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`AlignmentUI should allow custom alignment controls to be specified 1`] = `
+<div>
+  <div
+    class="components-toolbar"
+    icon="[object Object]"
+    label="Align text"
+  >
+    <div>
+      <button
+        align="custom-left"
+        aria-label="My custom left"
+        aria-pressed="false"
+        class="components-button components-toolbar__control is-compact has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          style="fill: none;"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 5H13M4 12H20M4 19H13"
+            vector-effect="non-scaling-stroke"
+          />
+        </svg>
+      </button>
+    </div>
+    <div>
+      <button
+        align="custom-right"
+        aria-label="My custom right"
+        aria-pressed="true"
+        class="components-button components-toolbar__control is-compact is-pressed has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          style="fill: none;"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M7.5 5H16.5M4 12H20M7.5 19H16.5"
+            vector-effect="non-scaling-stroke"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`AlignmentUI should match snapshot when controls are hidden 1`] = `
+<div>
+  <div
+    class="components-dropdown components-dropdown-menu components-toolbar"
+    tabindex="-1"
+  >
+    <button
+      aria-expanded="false"
+      aria-haspopup="true"
+      aria-label="Align text"
+      class="components-button components-dropdown-menu__toggle has-icon"
+      data-toolbar-item="true"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        height="24"
+        stroke="currentColor"
+        stroke-width="1.5"
+        style="fill: none;"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M4 5H13M4 12H20M4 19H13"
+          vector-effect="non-scaling-stroke"
+        />
+      </svg>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
+<div>
+  <div
+    class="components-toolbar"
+    icon="[object Object]"
+    label="Align text"
+  >
+    <div>
+      <button
+        align="left"
+        aria-label="Align text left"
+        aria-pressed="true"
+        class="components-button components-toolbar__control is-compact is-pressed has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          style="fill: none;"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 5H13M4 12H20M4 19H13"
+            vector-effect="non-scaling-stroke"
+          />
+        </svg>
+      </button>
+    </div>
+    <div>
+      <button
+        align="center"
+        aria-label="Align text center"
+        aria-pressed="false"
+        class="components-button components-toolbar__control is-compact has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          style="fill: none;"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M7.5 5H16.5M4 12H20M7.5 19H16.5"
+            vector-effect="non-scaling-stroke"
+          />
+        </svg>
+      </button>
+    </div>
+    <div>
+      <button
+        align="right"
+        aria-label="Align text right"
+        aria-pressed="false"
+        class="components-button components-toolbar__control is-compact has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          style="fill: none;"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M11 5H20M4 12H20M11 19H20"
+            vector-effect="non-scaling-stroke"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+`;

@@ -34,7 +34,6 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/format-library',
 	'@wordpress/patterns',
 	'@wordpress/preferences',
-	'@wordpress/reusable-blocks',
 	'@wordpress/rich-text',
 	'@wordpress/route',
 	'@wordpress/router',
@@ -42,6 +41,10 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/storybook',
 	'@wordpress/sync',
 	'@wordpress/theme',
+	// Do not remove: older `@wordpress/dataviews` versions published to npm
+	// call the opt-in at module load, so a plugin bundling one of those
+	// copies throws at load time if this entry is missing.
+	'@wordpress/dataviews',
 	'@wordpress/fields',
 	'@wordpress/lazy-editor',
 	'@wordpress/media-editor',

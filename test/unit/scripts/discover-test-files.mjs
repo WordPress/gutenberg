@@ -1,7 +1,5 @@
 import path from 'node:path';
-import globPackage from 'glob';
-
-const { sync: glob } = globPackage;
+import { globSync } from 'glob';
 
 export const TEST_PATTERNS = [
 	'**/__tests__/**/*.[jt]s?(x)',
@@ -34,7 +32,7 @@ export function discoverTestFiles( rootDir ) {
 	return [
 		...new Set(
 			TEST_PATTERNS.flatMap( ( pattern ) =>
-				glob( pattern, {
+				globSync( pattern, {
 					absolute: false,
 					cwd: rootDir,
 					dot: true,
@@ -47,20 +45,22 @@ export function discoverTestFiles( rootDir ) {
 }
 
 export function getVitestTests( discoveredTests, manifest ) {
-	const directoryTests = discoveredTests.filter( ( testPath ) =>
-		manifest.vitest.directories.some(
-			( directoryPath ) =>
-				testPath === directoryPath ||
-				testPath.startsWith( `${ directoryPath }/` )
-		)
-	);
+	const jestTests = new Set( manifest.jest.files );
 
-	return [
-		...new Set( [ ...manifest.vitest.files, ...directoryTests ] ),
-	].sort();
+	return discoveredTests
+		.filter( ( testPath ) => ! jestTests.has( testPath ) )
+		.sort();
 }
 
-export function getVitestProjectName( testPath ) {
+export function findAddedLegacyJestTests( currentTests, baselineTests ) {
+	const baselineTestSet = new Set( baselineTests );
+
+	return currentTests
+		.filter( ( testPath ) => ! baselineTestSet.has( testPath ) )
+		.sort();
+}
+
+export function getTestEnvironmentName( testPath ) {
 	if ( BROWSER_TEST_PATH_PATTERN.test( testPath ) ) {
 		return 'browser';
 	}
@@ -78,7 +78,7 @@ export function getVitestTestsByProject( discoveredTests, manifest ) {
 	);
 
 	for ( const testPath of getVitestTests( discoveredTests, manifest ) ) {
-		testsByProject[ getVitestProjectName( testPath ) ].push( testPath );
+		testsByProject[ getTestEnvironmentName( testPath ) ].push( testPath );
 	}
 
 	return testsByProject;

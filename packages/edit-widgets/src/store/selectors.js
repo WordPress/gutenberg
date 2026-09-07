@@ -287,6 +287,10 @@ export const canInsertBlockInWidgetArea = createRegistrySelector(
 		// widget area can be inserted into any widget area. Uses the first
 		// widget area for testing whether the block can be inserted.
 		const [ firstWidgetArea ] = widgetAreas;
+		if ( ! firstWidgetArea ) {
+			return false;
+		}
+
 		return select( blockEditorStore ).canInsertBlockType(
 			blockName,
 			firstWidgetArea.clientId

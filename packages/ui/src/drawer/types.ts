@@ -34,12 +34,17 @@ export interface RootProps
 	children?: ReactNode;
 }
 
-export interface TriggerProps extends ComponentProps< 'button' > {
+// Detached triggers require handle and payload APIs that Drawer does not
+// expose.
+export type TriggerProps = Omit<
+	ComponentProps< typeof _Drawer.Trigger >,
+	'handle' | 'payload'
+> & {
 	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
-}
+};
 
 export interface PopupProps
 	extends ComponentProps< 'div' >,

@@ -6,7 +6,7 @@
 	display: block;
 	background: $components-color-background;
 	color: $components-color-foreground;
-	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve Emotion `resize: vertical`; `block` is not equivalent in vertical writing modes. */
+	/* stylelint-disable-next-line logical-css/require-logical-keywords -- Preserve Emotion `resize: vertical`; `block` is not equivalent in vertical writing modes. */
 	resize: vertical;
 
 	@include input-control;

@@ -1,8 +1,13 @@
 import { useRender } from '@base-ui/react';
-import type { CalendarDay, RootProps } from '@daypicker/react';
+import {
+	useDayPicker,
+	type CalendarDay,
+	type RootProps,
+} from '@daypicker/react';
 import { useContext } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
+import { __, sprintf } from '@wordpress/i18n';
 import { IconButton } from '../../icon-button';
 import { RootContext } from './root-context';
 import type { Modifiers } from '../types';
@@ -140,7 +145,24 @@ export function Day(
  * @see https://daypicker.dev/guides/custom-components
  */
 export function Root( { rootRef, ...props }: RootProps ) {
-	const { render, ref } = useContext( RootContext );
+	const { render, ref, role, defaultAriaLabel } = useContext( RootContext );
+	const { months, labels } = useDayPicker();
+	const hasExplicitLabel =
+		props[ 'aria-label' ] !== undefined ||
+		props[ 'aria-labelledby' ] !== undefined;
+	let ariaLabel = props[ 'aria-label' ];
+
+	if ( ! hasExplicitLabel && defaultAriaLabel && role === 'application' ) {
+		const currentMonth = months[ 0 ];
+		ariaLabel = currentMonth
+			? sprintf(
+					// translators: 1: Calendar type. 2: Current month and year.
+					__( '%1$s, %2$s' ),
+					defaultAriaLabel,
+					labels.labelGrid( currentMonth.date )
+			  )
+			: defaultAriaLabel;
+	}
 
 	// `rootRef` is only set by `@daypicker/react` when `animate` is enabled.
 	const mergedRef = useMergeRefs( [ rootRef ?? null, ref ?? null ] );
@@ -149,7 +171,7 @@ export function Root( { rootRef, ...props }: RootProps ) {
 		render,
 		defaultTagName: 'div',
 		ref: mergedRef,
-		props,
+		props: { ...props, role, 'aria-label': ariaLabel },
 	} );
 }
 

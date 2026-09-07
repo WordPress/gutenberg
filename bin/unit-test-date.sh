@@ -17,7 +17,7 @@ for timezone in "${timezones[@]}"; do
         TZ=$timezone LANG=$locale \
             FK_ENV_TZ=$timezone FK_ENV_LANG=$locale \
             FLAKINESS_OUTPUT_DIR="flakiness-report-$timezone-$locale" \
-            npm run test:unit -- packages/date "$@" &
+            npm run test:unit:vitest -- packages/date "$@" &
         pids+=($!)
         pidsTimezones+=($timezone)
         pidsLocales+=($locale)

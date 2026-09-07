@@ -1,12 +1,6 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
-// Define interface for template with optional styles_id
-interface Template {
-	styles_id?: string;
-	[ key: string ]: any;
-}
-
 /**
  * This is a React hook that provides the styles ID.
  * Styles ID can be associated with a template.
@@ -21,17 +15,24 @@ export function useStylesId( { templateId }: { templateId?: string } = {} ) {
 		( select ) => {
 			const coreDataSelect = select( coreStore );
 			const template = templateId
-				? ( coreDataSelect.getEntityRecord(
+				? coreDataSelect.getEntityRecord(
 						'postType',
 						'wp_template',
 						templateId
-				  ) as Template | null )
+				  )
 				: null;
 
 			return {
 				globalStylesId:
 					coreDataSelect.__experimentalGetCurrentGlobalStylesId(),
-				stylesId: template?.styles_id,
+				/*
+				 * `styles_id` is not part of the template REST schema, so it
+				 * cannot come from the record type. It is read defensively in
+				 * case a filtered response carries one; without it the hook
+				 * falls back to the global styles ID below.
+				 */
+				stylesId: ( template as { styles_id?: string } | null )
+					?.styles_id,
 			};
 		},
 		[ templateId ]

@@ -16,6 +16,7 @@
 	padding: 6px 0; // Matches button to ensure alignment
 	line-height: $grid-unit-05 * 5;
 	hyphens: auto;
+	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
 	word-break: break-word;
 }
 

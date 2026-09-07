@@ -1,8 +1,8 @@
-const {
-	camelCaseDash,
-	defaultRequestToExternal,
-	defaultRequestToHandle,
-} = require( '../lib/util' );
+import { createRequire } from 'node:module';
+import { describe, expect, test } from 'vitest';
+
+const { camelCaseDash, defaultRequestToExternal, defaultRequestToHandle } =
+	createRequire( import.meta.url )( '../lib/util' );
 
 describe( 'camelCaseDash', () => {
 	test( 'does not change a single word', () => {

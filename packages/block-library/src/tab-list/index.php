@@ -9,14 +9,14 @@
  * Render callback for core/tab-list.
  *
  * Injects IAPI directives into the saved button HTML. The buttons already
- * carry color/border/padding styles from save.js; this callback adds
+ * carry color/border/padding styles from save.jsx; this callback adds
  * tab-specific attributes (id, aria-controls, context) and interactivity
  * directives using data from the tabs-list context.
  *
  * @since 7.1.0
  *
  * @param array     $attributes Block attributes.
- * @param string    $content    Block content (rendered buttons from save.js).
+ * @param string    $content    Block content (rendered buttons from save.jsx).
  * @param \WP_Block $block      WP_Block instance.
  *
  * @return string Updated HTML.

@@ -1,62 +1,45 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as core from '@actions/core';
 import { run } from '../run';
 
-const mockPushEventContext = {
-	runId: 100,
-	repo: {
-		owner: 'WordPress',
-		repo: 'gutenberg',
-	},
-	ref: 'refs/heads/trunk',
-	sha: 'commitSHA',
-	eventName: 'push',
-};
-const mockPullRequestEventContext = {
-	runId: 100,
-	repo: {
-		owner: 'WordPress',
-		repo: 'gutenberg',
-	},
-	ref: 'refs/pull/10/merge',
-	sha: 'mergeSHA',
-	eventName: 'pull_request',
-	payload: {
-		number: 10,
-		pull_request: {
-			head: {
-				ref: 'headBranch',
-				sha: 'headSHA',
-			},
-		},
-	},
-};
-const mockGetContext = jest.fn(
-	(): typeof mockPushEventContext | typeof mockPullRequestEventContext =>
-		mockPullRequestEventContext
+const { mockMkdir, mockReadFile, mockReaddir, mockWriteFile } = vi.hoisted(
+	() => ( {
+		mockMkdir: vi.fn(),
+		mockReadFile:
+			vi.fn< ( path: string, encoding: string ) => Promise< string > >(),
+		mockReaddir: vi.fn< ( path: string ) => Promise< string[] > >(),
+		mockWriteFile: vi.fn(),
+	} )
 );
-jest.mock( '@actions/github', () => ( {
-	get context() {
-		return mockGetContext();
-	},
+
+vi.mock( import( '@actions/core' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	error: vi.fn(),
+	info: vi.fn(),
+	getInput: vi.fn(),
 } ) );
 
-jest.mock( '@actions/core', () => ( {
-	error: jest.fn(),
-	info: jest.fn(),
-	getInput: jest.fn(),
-} ) );
+vi.mock( import( 'fs/promises' ), async ( importOriginal ) => {
+	const original = await importOriginal();
 
-const mockAPI = {
-	createCommentOnPR: jest.fn(),
-};
-jest.mock( '../github-api', () => ( {
-	GitHubAPI: jest.fn( () => mockAPI ),
-} ) );
+	return {
+		...original,
+		mkdir: mockMkdir as unknown as typeof original.mkdir,
+		readFile: mockReadFile as unknown as typeof original.readFile,
+		readdir: mockReaddir as unknown as typeof original.readdir,
+		writeFile: mockWriteFile as unknown as typeof original.writeFile,
+	};
+} );
 
-jest.mock( 'fs/promises', () => ( {
-	readdir: jest.fn(),
-	readFile: jest.fn(),
-} ) );
+const mockedGetInput = vi.mocked( core.getInput );
+
+function mockInputs() {
+	mockedGetInput
+		// artifact-path
+		.mockReturnValueOnce( 'flaky-tests' )
+		// output-path
+		.mockReturnValueOnce( 'pr-meta/body.md' );
+}
 
 async function mockFlakyTestsArtifact() {
 	const playwrightFlakyTest = await import(
@@ -66,11 +49,7 @@ async function mockFlakyTestsArtifact() {
 		'../__fixtures__/Should insert new template part on creation.json'
 	).then( ( json ) => json.default );
 
-	( core.getInput as jest.Mock )
-		// token
-		.mockReturnValueOnce( 'repo-token' )
-		// artifact-path
-		.mockReturnValueOnce( 'flaky-tests' );
+	mockInputs();
 
 	// Replacing the cwd for the test for consistent snapshot results.
 	playwrightFlakyTest.path = playwrightFlakyTest.path.replace(
@@ -78,14 +57,13 @@ async function mockFlakyTestsArtifact() {
 		process.cwd()
 	);
 
-	const mockedFs = require( 'fs/promises' );
-	mockedFs.readdir.mockImplementationOnce( () =>
+	mockReaddir.mockImplementationOnce( () =>
 		Promise.resolve( [
 			`${ playwrightFlakyTest.title }.json`,
 			`${ jestFlakyTest.title }.json`,
 		] )
 	);
-	mockedFs.readFile
+	mockReadFile
 		.mockImplementationOnce( () =>
 			Promise.resolve( JSON.stringify( playwrightFlakyTest ) )
 		)
@@ -95,48 +73,56 @@ async function mockFlakyTestsArtifact() {
 }
 
 describe( 'Report flaky tests', () => {
-	afterEach( () => {
-		jest.clearAllMocks();
+	beforeEach( () => {
+		vi.resetAllMocks();
 	} );
 
-	it( 'should comment on the pull request', async () => {
+	it( 'should write the report', async () => {
 		await mockFlakyTestsArtifact();
 
-		mockAPI.createCommentOnPR.mockImplementationOnce( () => ( {
-			html_url: 'comment_html_url',
-		} ) );
-
 		await run();
 
-		expect( mockAPI.createCommentOnPR ).toHaveBeenCalledTimes( 1 );
-		expect( mockAPI.createCommentOnPR.mock.calls[ 0 ][ 0 ] ).toBe( 10 );
-		expect(
-			mockAPI.createCommentOnPR.mock.calls[ 0 ][ 1 ]
-		).toMatchSnapshot();
+		expect( mockWriteFile ).toHaveBeenCalledTimes( 1 );
+		expect( mockWriteFile.mock.calls[ 0 ][ 0 ] ).toBe( 'pr-meta/body.md' );
+		expect( mockWriteFile.mock.calls[ 0 ][ 1 ] ).toMatchSnapshot();
 	} );
 
-	it( 'should skip events other than pull requests', async () => {
-		mockGetContext.mockImplementation( () => mockPushEventContext );
+	it( 'should write nothing when there are no flaky tests', async () => {
+		mockInputs();
+		mockReaddir.mockImplementationOnce( () => Promise.resolve( [] ) );
 
 		await run();
 
-		// It bails out before even reading the artifact.
-		expect( require( 'fs/promises' ).readdir ).not.toHaveBeenCalled();
-		expect( mockAPI.createCommentOnPR ).not.toHaveBeenCalled();
-
-		mockGetContext.mockImplementation( () => mockPullRequestEventContext );
+		expect( mockWriteFile ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should not comment when there are no flaky tests', async () => {
-		( core.getInput as jest.Mock )
-			.mockReturnValueOnce( 'repo-token' )
-			.mockReturnValueOnce( 'flaky-tests' );
+	/*
+	 * A clean run produces no artifact at all. The writer treats the missing
+	 * file as an empty section, which is what clears a stale report.
+	 */
+	it( 'should write nothing when the artifact is missing', async () => {
+		mockInputs();
 
-		const mockedFs = require( 'fs/promises' );
-		mockedFs.readdir.mockImplementationOnce( () => Promise.resolve( [] ) );
+		const missing = Object.assign( new Error( 'ENOENT' ), {
+			code: 'ENOENT',
+		} );
+		mockReaddir.mockImplementationOnce( () => Promise.reject( missing ) );
 
 		await run();
 
-		expect( mockAPI.createCommentOnPR ).not.toHaveBeenCalled();
+		expect( mockWriteFile ).not.toHaveBeenCalled();
+	} );
+
+	/* Anything else would clear a report that nothing had disproved. */
+	it( 'should fail rather than report clean when the artifact is unreadable', async () => {
+		mockInputs();
+
+		const denied = Object.assign( new Error( 'EACCES' ), {
+			code: 'EACCES',
+		} );
+		mockReaddir.mockImplementationOnce( () => Promise.reject( denied ) );
+
+		await expect( run() ).rejects.toThrow( 'EACCES' );
+		expect( mockWriteFile ).not.toHaveBeenCalled();
 	} );
 } );

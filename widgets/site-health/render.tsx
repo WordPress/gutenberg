@@ -3,6 +3,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
 import { Link, Stack, Text } from '@wordpress/ui';
+import { useWidgetHost } from '@wordpress/widget-primitives';
 import { CircleProgress, type HealthTone } from './components';
 import styles from './style.module.css';
 
@@ -81,9 +82,29 @@ function statusMessage( counts: IssueCounts ): string {
 	);
 }
 
+/**
+ * Builds the href of the dashboard's Site Health page, the same target as
+ * the Details action, filtered to the statuses that have items. The query
+ * travels inside `p`, so a full load and the host's route link read the
+ * same filter.
+ *
+ * @param {IssueCounts} counts Aggregated issue counts.
+ */
+function reviewHref( counts: IssueCounts ): string {
+	const statuses = ( [ 'critical', 'recommended' ] as const ).filter(
+		( status ) => counts[ status ] > 0
+	);
+	const route = `/site-health?status=${ statuses.join( ',' ) }`;
+
+	return `admin.php?page=dashboard-wp-admin&p=${ encodeURIComponent(
+		route
+	) }`;
+}
+
 export default function SiteHealth() {
 	const [ counts, setCounts ] = useState< IssueCounts | null >( null );
 	const [ isLoading, setIsLoading ] = useState( true );
+	const { links } = useWidgetHost();
 
 	useEffect( () => {
 		let ignore = false;
@@ -140,6 +161,15 @@ export default function SiteHealth() {
 		total > 0 ? Math.round( ( counts.good / total ) * 100 ) : 0;
 	const issuesTotal = counts.recommended + counts.critical;
 	const tone = toneForPercentage( percentage );
+	const href = reviewHref( counts );
+
+	const path = links?.match( href ) ?? null;
+	const HostLink = links?.Link;
+	const reviewLabel = sprintf(
+		/* translators: %d: Number of issues to address. */
+		_n( 'Review %d item', 'Review %d items', issuesTotal ),
+		issuesTotal
+	);
 
 	return (
 		<Stack
@@ -151,15 +181,14 @@ export default function SiteHealth() {
 		>
 			<CircleProgress percentage={ percentage } tone={ tone } />
 			<Text variant="body-lg">{ statusMessage( counts ) }</Text>
-			{ issuesTotal > 0 && (
-				<Link href="site-health.php">
-					{ sprintf(
-						/* translators: %d: Number of issues to address. */
-						_n( 'Review %d item', 'Review %d items', issuesTotal ),
-						issuesTotal
-					) }
-				</Link>
-			) }
+			{ issuesTotal > 0 &&
+				( path !== null && HostLink ? (
+					<Link render={ <HostLink path={ path } /> }>
+						{ reviewLabel }
+					</Link>
+				) : (
+					<Link href={ href }>{ reviewLabel }</Link>
+				) ) }
 		</Stack>
 	);
 }

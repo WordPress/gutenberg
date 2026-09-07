@@ -53,6 +53,34 @@ The package follows [semantic versioning](https://semver.org/), and the followin
 -   Component props (e.g. renaming, removing, or changing a props supported types such that existing usage would break in an update)
 -   CSS properties prefixed with `--wp-ui-` (e.g. changing a CSS property such that it would negatively impact a user's experience)
 
+### Controlled and uncontrolled props
+
+When designing props for a new component:
+
+-   Always offer both controlled and uncontrolled modes when the component has user-facing state.
+-   Name the uncontrolled prop `defaultX`, the controlled prop `x`, and the callback `onXChange`.
+-   In JSDoc comments, indicate which mode each prop is for and cross-reference the alternative:
+
+    ```ts
+    /**
+     * Whether the panel is currently open (controlled).
+     *
+     * To render an uncontrolled component, use the `defaultOpen` prop instead.
+     */
+    open?: boolean;
+    /**
+     * Whether the panel is initially open (uncontrolled).
+     * @default false
+     */
+    defaultOpen?: boolean;
+    /**
+     * Event handler called when the open state changes.
+     */
+    onOpenChange?: ( open: boolean ) => void;
+    ```
+
+-   Provide a `@default` JSDoc tag for the uncontrolled prop when there is a sensible default.
+
 ## Compound Components
 
 This package follows the [compound component approach outlined in the `@wordpress/components` contributing guidelines](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/CONTRIBUTING.md#compound-components).

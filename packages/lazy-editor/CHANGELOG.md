@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Allow `useEditorSettings` callers to omit `stylesId` or pass an unresolved global styles ID, and defer loading user styles until the ID resolves. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+
+## 1.20.0 (2026-08-26)
+
 ### New Features
 
 -   Render the editor's Export tool, so a theme can be downloaded with the user's changes while editing a template or a template part ([#81992](https://github.com/WordPress/gutenberg/pull/81992)).

@@ -1,12 +1,13 @@
 import { execFileSync } from 'node:child_process';
+import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import spawn from 'cross-spawn';
 import { spawnWatchProcess, stopWatchProcess } from '../process.mjs';
 
-jest.mock( 'node:child_process', () => ( {
-	...jest.requireActual( 'node:child_process' ),
-	execFileSync: jest.fn(),
+vi.mock( 'node:child_process', async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	execFileSync: vi.fn(),
 } ) );
-jest.mock( 'cross-spawn', () => jest.fn() );
+vi.mock( 'cross-spawn', () => ( { default: vi.fn() } ) );
 
 const platformDescriptor = Object.getOwnPropertyDescriptor(
 	process,
@@ -14,7 +15,7 @@ const platformDescriptor = Object.getOwnPropertyDescriptor(
 );
 
 beforeEach( () => {
-	jest.clearAllMocks();
+	vi.clearAllMocks();
 	Object.defineProperty( process, 'platform', { value: 'win32' } );
 } );
 

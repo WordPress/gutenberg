@@ -8,6 +8,14 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 Both are built for accessibility and follow ARIA best practices for calendar widgets: keyboard navigation, screen reader support, and customizable labels for internationalization.
 
+## Root role
+
+`Calendar` and `RangeCalendar` use [`role="application"`](https://www.w3.org/TR/wai-aria-1.2/#application) by default to help screen readers pass navigation keys to the calendar. The accessible name includes the current month.
+
+Changing the role can affect screen-reader keyboard navigation. Only override it for a tested composition. Apply roles that require additional behavior, such as `dialog`, to a wrapper.
+
+When using `application`, include the current month in any custom `aria-label` or `aria-labelledby`.
+
 ## Usage
 
 ### Uncontrolled Mode
