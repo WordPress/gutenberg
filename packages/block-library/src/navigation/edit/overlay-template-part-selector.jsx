@@ -14,9 +14,14 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as noticesStore } from '@wordpress/notices';
 import { plus } from '@wordpress/icons';
 import { Text } from '@wordpress/ui';
+import { store as patternsStore } from '@wordpress/patterns';
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 import useCreateOverlayTemplatePart from './use-create-overlay';
 import DeletedOverlayWarning from './deleted-overlay-warning';
+import useOverlayPatterns, {
+	areTemplatePartsPatterns,
+} from './use-overlay-patterns';
+import { unlock } from '../../lock-unlock';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 
 /**
@@ -44,15 +49,31 @@ export default function OverlayTemplatePartSelector( {
 		'wp-block-navigation__overlay-selector-heading'
 	);
 
+	const partsArePatterns = areTemplatePartsPatterns();
 	const {
 		records: templateParts,
-		isResolving,
-		hasResolved,
+		isResolving: isResolvingTemplateParts,
+		hasResolved: hasResolvedTemplateParts,
 	} = useEntityRecords( 'postType', 'wp_template_part', {
 		per_page: -1,
+		// Where template parts are registered patterns, the overlays come
+		// from the pattern registry instead.
+		...( partsArePatterns ? { per_page: 1 } : {} ),
 	} );
+	const {
+		overlays: overlayPatterns,
+		isResolving: isResolvingPatterns,
+		hasResolved: hasResolvedPatterns,
+	} = useOverlayPatterns();
+	const isResolving = partsArePatterns
+		? isResolvingPatterns
+		: isResolvingTemplateParts;
+	const hasResolved = partsArePatterns
+		? hasResolvedPatterns
+		: hasResolvedTemplateParts;
 
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { createPatternOverride } = unlock( useDispatch( patternsStore ) );
 
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
@@ -70,6 +91,9 @@ export default function OverlayTemplatePartSelector( {
 
 	// Filter template parts by overlay area
 	const overlayTemplateParts = useMemo( () => {
+		if ( partsArePatterns ) {
+			return overlayPatterns;
+		}
 		if ( ! templateParts ) {
 			return [];
 		}
@@ -77,7 +101,7 @@ export default function OverlayTemplatePartSelector( {
 			( templatePart ) =>
 				templatePart.area === NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
 		);
-	}, [ templateParts ] );
+	}, [ partsArePatterns, overlayPatterns, templateParts ] );
 
 	// Hook to create overlay template part
 	const createOverlayTemplatePart =
@@ -146,7 +170,7 @@ export default function OverlayTemplatePartSelector( {
 		} );
 	};
 
-	const handleEditClick = () => {
+	const handleEditClick = async () => {
 		if (
 			! overlay ||
 			! selectedTemplatePart ||
@@ -155,15 +179,23 @@ export default function OverlayTemplatePartSelector( {
 			return;
 		}
 
-		// Resolve the full template part ID using theme
-		// Default to current theme if not set
-		const theme = selectedTemplatePart.theme || currentTheme;
-		const templatePartId = createTemplatePartId( theme, overlay );
-
-		const params = {
-			postId: templatePartId,
-			postType: 'wp_template_part',
-		};
+		let params;
+		if ( partsArePatterns ) {
+			// A registered pattern is edited through its copy, created on
+			// first edit.
+			const copy = await createPatternOverride(
+				selectedTemplatePart.pattern
+			);
+			params = { postId: copy.id, postType: 'wp_block' };
+		} else {
+			// Resolve the full template part ID using theme
+			// Default to current theme if not set
+			const theme = selectedTemplatePart.theme || currentTheme;
+			params = {
+				postId: createTemplatePartId( theme, overlay ),
+				postType: 'wp_template_part',
+			};
+		}
 		if ( overlayMenu === 'mobile' ) {
 			params.viewport = 'mobile';
 		}
@@ -184,14 +216,15 @@ export default function OverlayTemplatePartSelector( {
 			// Create the full ID using theme and slug
 			if ( onNavigateToEntityRecord ) {
 				const theme = templatePart.theme || currentTheme;
-				const templatePartId = createTemplatePartId(
-					theme,
-					templatePart.slug
-				);
-				const params = {
-					postId: templatePartId,
-					postType: 'wp_template_part',
-				};
+				const params = partsArePatterns
+					? { postId: templatePart.id, postType: 'wp_block' }
+					: {
+							postId: createTemplatePartId(
+								theme,
+								templatePart.slug
+							),
+							postType: 'wp_template_part',
+					  };
 				if ( overlayMenu === 'mobile' ) {
 					params.viewport = 'mobile';
 				}
@@ -223,6 +256,7 @@ export default function OverlayTemplatePartSelector( {
 		currentTheme,
 		setIsCreating,
 		overlayMenu,
+		partsArePatterns,
 	] );
 
 	const handleClearOverlay = useCallback( () => {

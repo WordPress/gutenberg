@@ -427,106 +427,6 @@ function _gutenberg_get_entity_view_config_posttype_wp_block( $data ) {
 }
 
 /**
- * Provides the view configuration for the `wp_template_part` post type.
- *
- * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
- * @return Gutenberg_View_Config_Data The updated view configuration container.
- */
-function _gutenberg_get_entity_view_config_posttype_wp_template_part( $data ) {
-	$default_layouts = array(
-		'table' => array(
-			'layout' => array(
-				'styles' => array(
-					'author' => array(
-						'width' => '1%',
-					),
-				),
-			),
-		),
-		'grid'  => array(
-			'layout' => array(),
-		),
-	);
-
-	$default_view = array(
-		'type'       => 'grid',
-		'perPage'    => 20,
-		'titleField' => 'title',
-		'mediaField' => 'preview',
-		'fields'     => array( 'author' ),
-		'filters'    => array(),
-		'layout'     => $default_layouts['grid']['layout'],
-	);
-
-	$view_list = array(
-		array(
-			'title' => __( 'All template parts', 'gutenberg' ),
-			'slug'  => 'all-parts',
-		),
-	);
-
-	$areas = get_allowed_block_template_part_areas();
-
-	// Ensure default areas appear in a consistent order.
-	$preferred_order = array( 'header', 'footer', 'sidebar', 'navigation-overlay', 'uncategorized' );
-	$ordered_areas   = array();
-	$remaining_areas = array();
-	foreach ( $areas as $area ) {
-		$position = array_search( $area['area'], $preferred_order, true );
-		if ( false !== $position ) {
-			$ordered_areas[ $position ] = $area;
-		} else {
-			$remaining_areas[] = $area;
-		}
-	}
-	ksort( $ordered_areas );
-	$areas = array_merge( array_values( $ordered_areas ), $remaining_areas );
-
-	foreach ( $areas as $area ) {
-		$view_list[] = array(
-			'title' => $area['label'],
-			'slug'  => $area['area'],
-			'view'  => array(
-				'filters' => array(
-					array(
-						'field'    => 'area',
-						'operator' => 'is',
-						'value'    => $area['area'],
-						'isLocked' => true,
-					),
-				),
-			),
-		);
-	}
-
-	$form = array(
-		'layout' => array( 'type' => 'panel' ),
-		'fields' => array(
-			array(
-				'id'     => 'last_edited_date',
-				'layout' => array(
-					'type'          => 'panel',
-					'labelPosition' => 'none',
-				),
-			),
-			'revisions',
-		),
-	);
-
-	$data->set(
-		array(
-			'default_view'    => $default_view,
-			'default_layouts' => $default_layouts,
-			'view_list'       => $view_list,
-			'form'            => $form,
-		),
-		1
-	);
-
-	return $data;
-}
-
-/**
  * Provides the view configuration for the `wp_template` post type.
  *
  * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
@@ -758,7 +658,7 @@ function _gutenberg_get_entity_view_config_posttype_wp_template( $data ) {
  * registers them at include time or lazily on a hook.
  */
 function gutenberg_register_entity_view_config_filters() {
-	$post_types = array( 'page', 'post', 'wp_block', 'wp_template_part', 'wp_template' );
+	$post_types = array( 'page', 'post', 'wp_block', 'wp_template' );
 
 	foreach ( $post_types as $post_type ) {
 		$hook        = gutenberg_get_entity_view_config_hook_name( 'postType', $post_type );

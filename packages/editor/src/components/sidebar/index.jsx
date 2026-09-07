@@ -19,7 +19,6 @@ import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
 import TemplateActionsPanel from '../template-actions-panel';
 import TemplateContentPanel from '../template-content-panel';
-import TemplatePartContentPanel from '../template-part-content-panel';
 import RevisionBlockDiffPanel from '../revision-block-diff';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
 import { sidebars } from './constants';
@@ -85,7 +84,6 @@ function Sidebar( { extraPanels, onActionPerformed } ) {
 				<PluginDocumentSettingPanel.Slot />
 				<TemplateContentPanel />
 				{ isDataFormInspectorEnabled && <TemplateActionsPanel /> }
-				<TemplatePartContentPanel />
 				<PostTransformPanel />
 				<PostTaxonomiesPanel />
 				<PatternOverridesPanel />

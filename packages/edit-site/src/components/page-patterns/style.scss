@@ -103,14 +103,6 @@
 	}
 }
 
-.dataviews-action-modal__duplicate-template-part {
-	.components-modal__frame {
-		@include break-small {
-			max-width: 500px;
-		}
-	}
-}
-
 @container (max-width: 430px) {
 	.edit-site-page-patterns-dataviews .edit-site-patterns__section-header {
 		padding-left: $grid-unit-30;

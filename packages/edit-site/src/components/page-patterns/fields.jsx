@@ -3,7 +3,6 @@ import { useMemo, useId } from '@wordpress/element';
 import { BlockPreview } from '@wordpress/block-editor';
 import { parse } from '@wordpress/blocks';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 
 const { useStyle } = unlock( editorPrivateApis );
@@ -11,7 +10,6 @@ const { useStyle } = unlock( editorPrivateApis );
 function PreviewField( { item } ) {
 	const descriptionId = useId();
 	const description = item.description || item?.excerpt?.raw;
-	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 	const backgroundColor = useStyle( 'color.background' );
 	const blocks = useMemo( () => {
 		return (
@@ -29,8 +27,7 @@ function PreviewField( { item } ) {
 			style={ { backgroundColor } }
 			aria-describedby={ !! description ? descriptionId : undefined }
 		>
-			{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
-			{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
+			{ isEmpty && __( 'Empty pattern' ) }
 			{ ! isEmpty && (
 				<BlockPreview.Async>
 					<BlockPreview

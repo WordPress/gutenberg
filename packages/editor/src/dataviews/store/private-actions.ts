@@ -16,7 +16,6 @@ import {
 	renamePost,
 	resetPost,
 	deletePost,
-	duplicateTemplatePart,
 	excerptField,
 	featuredImageField,
 	dateField,
@@ -29,7 +28,6 @@ import {
 	statusField,
 	authorField,
 	templateAuthorField,
-	templatePartAuthorField,
 	titleField,
 	templateField,
 	templateTitleField,
@@ -217,11 +215,6 @@ export const registerPostTypeSchema =
 				? viewPostRevisions
 				: undefined,
 			canDuplicate,
-			postTypeConfig.slug === 'wp_template_part' &&
-			canCreate &&
-			currentTheme?.is_block_theme
-				? duplicateTemplatePart
-				: undefined,
 			canCreate && postTypeConfig.slug === 'wp_block'
 				? duplicatePattern
 				: undefined,
@@ -256,7 +249,6 @@ export const registerPostTypeSchema =
 					postTypeConfig.supports?.author &&
 					authorField,
 				postTypeSlug === 'wp_template' && templateAuthorField,
-				postTypeSlug === 'wp_template_part' && templatePartAuthorField,
 				! isDesignPostType && statusField,
 				! isDesignPostType && dateField,
 				! isDesignPostType && scheduledDateField,

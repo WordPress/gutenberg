@@ -12,6 +12,7 @@
 
 ### Enhancements
 
+-   Remove the template part menu items, the template part content panel and the template part navigation edit button, now that template parts are registered patterns ([#82569](https://github.com/WordPress/gutenberg/pull/82569)).
 -   Registered patterns that have an edited copy (a `wp_block` post with the `wp_pattern_slug` meta) are passed to the block editor with the copy's title and content, and the copies are left out of the user patterns list ([#82549](https://github.com/WordPress/gutenberg/pull/82549)).
 -   Post actions: Append an ellipsis (`…`) to the "Set as homepage" and "Set as posts page" action labels, which open a confirmation dialog, following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
 

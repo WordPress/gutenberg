@@ -84,8 +84,32 @@ class Template_Parts_As_Patterns_Test extends WP_UnitTestCase {
 		);
 		wp_set_post_terms( $part_id, array( 'testtheme' ), 'wp_theme' );
 		wp_set_post_terms( $part_id, array( 'header' ), 'wp_template_part_area' );
+		// Navigation overlays migrate like any other part.
+		$overlay_id = self::factory()->post->create(
+			array(
+				'post_type'   => 'wp_template_part',
+				'post_status' => 'publish',
+				'post_name'   => 'overlay',
+				'post_title'  => 'Navigation Overlay',
+			)
+		);
+		wp_set_post_terms( $overlay_id, array( 'testtheme' ), 'wp_theme' );
+		wp_set_post_terms( $overlay_id, array( 'navigation-overlay' ), 'wp_template_part_area' );
 
 		gutenberg_migrate_template_parts_to_patterns();
+
+		$this->assertSame( 'trash', get_post_status( $overlay_id ) );
+		$overlay_copies = get_posts(
+			array(
+				'post_type'  => 'wp_block',
+				'meta_key'   => 'wp_pattern_slug',
+				'meta_value' => 'testtheme/part/overlay',
+			)
+		);
+		$this->assertCount( 1, $overlay_copies );
+		$this->assertSame( 'navigation-overlay', get_post_meta( $overlay_copies[0]->ID, 'wp_pattern_area', true ) );
+		wp_delete_post( $overlay_copies[0]->ID, true );
+		wp_delete_post( $overlay_id, true );
 
 		$copies = get_posts(
 			array(

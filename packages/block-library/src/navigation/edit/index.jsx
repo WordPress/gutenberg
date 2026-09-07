@@ -69,6 +69,9 @@ import {
 	DEFAULT_BLOCK,
 	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 } from '../constants';
+import useOverlayPatterns, {
+	areTemplatePartsPatterns,
+} from './use-overlay-patterns';
 
 const { isNavigationPostEditorKey } = unlock( blockEditorPrivateApis );
 
@@ -441,11 +444,13 @@ function Navigation( {
 			per_page: -1,
 		}
 	);
-	const hasOverlays =
-		overlayTemplateParts?.some(
-			( templatePart ) =>
-				templatePart.area === NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
-		) ?? false;
+	const { overlays: overlayPatterns } = useOverlayPatterns();
+	const hasOverlays = areTemplatePartsPatterns()
+		? overlayPatterns.length > 0
+		: overlayTemplateParts?.some(
+				( templatePart ) =>
+					templatePart.area === NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
+		  ) ?? false;
 
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] =
 		useState( false );

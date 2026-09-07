@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Remove the template part navigation commands: template parts are registered patterns in the Gutenberg plugin ([#82569](https://github.com/WordPress/gutenberg/pull/82569)).
+
 ### Internal
 
 -   Remove unused dependencies `@wordpress/block-editor` and `@wordpress/notices` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

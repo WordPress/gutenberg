@@ -7,13 +7,12 @@ import {
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_USER_CATEGORY,
-	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 } from '../../utils/constants';
 
 export default function usePatternCategories() {
 	const defaultCategories = useDefaultPatternCategories();
 	defaultCategories.push( {
-		name: TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
+		name: 'uncategorized',
 		label: __( 'Uncategorized' ),
 	} );
 	const themePatterns = useThemePatterns();

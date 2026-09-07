@@ -9,7 +9,6 @@ import { navigationRoute } from './navigation';
 import { navigationItemRoute } from './navigation-item';
 import { patternsRoute } from './patterns';
 import { patternItemRoute } from './pattern-item';
-import { templatePartItemRoute } from './template-part-item';
 import { templatesRoute } from './templates';
 import { templateItemRoute } from './template-item';
 import { pagesRoute } from './pages';
@@ -22,7 +21,6 @@ const routes = [
 	pagesRoute,
 	templateItemRoute,
 	templatesRoute,
-	templatePartItemRoute,
 	patternItemRoute,
 	patternsRoute,
 	navigationItemRoute,

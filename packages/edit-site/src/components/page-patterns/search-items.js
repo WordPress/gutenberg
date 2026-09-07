@@ -4,21 +4,15 @@ const { extractWords, getNormalizedSearchTerms, normalizeString } = unlock(
 	blockEditorPrivateApis
 );
 import {
-	TEMPLATE_PART_ALL_AREAS_CATEGORY,
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_USER_CATEGORY,
 	PATTERN_TYPES,
-	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
 
 // Default search helpers.
 const defaultGetName = ( item ) => {
 	if ( item.type === PATTERN_TYPES.user ) {
 		return item.slug;
-	}
-
-	if ( item.type === TEMPLATE_PART_POST_TYPE ) {
-		return '';
 	}
 
 	return item.name || '';
@@ -124,7 +118,6 @@ function getItemSearchRank( item, searchTerm, config ) {
 
 	let rank =
 		categoryId === PATTERN_DEFAULT_CATEGORY ||
-		categoryId === TEMPLATE_PART_ALL_AREAS_CATEGORY ||
 		( categoryId === PATTERN_USER_CATEGORY &&
 			item.type === PATTERN_TYPES.user ) ||
 		hasCategory( item, categoryId )

@@ -1,7 +1,7 @@
 import { DropdownMenu } from '@wordpress/components';
 import { useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { symbol, symbolFilled, upload } from '@wordpress/icons';
+import { symbol, upload } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
@@ -10,59 +10,33 @@ import {
 } from '@wordpress/patterns';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as blocksStore } from '@wordpress/blocks';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
-import {
-	PATTERN_TYPES,
-	PATTERN_DEFAULT_CATEGORY,
-	TEMPLATE_PART_POST_TYPE,
-} from '../../utils/constants';
+import { PATTERN_TYPES, PATTERN_DEFAULT_CATEGORY } from '../../utils/constants';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { CreatePatternModal, useAddPatternCategory } = unlock(
 	editPatternsPrivateApis
 );
-const { CreateTemplatePartModal } = unlock( editorPrivateApis );
 
 export default function AddNewPattern() {
 	const history = useHistory();
 	const location = useLocation();
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
-	const [ showTemplatePartModal, setShowTemplatePartModal ] =
-		useState( false );
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 	const { createPatternFromFile } = unlock( useDispatch( patternsStore ) );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const patternUploadInputRef = useRef();
-	const {
-		isBlockBasedTheme,
-		addNewPatternLabel,
-		addNewTemplatePartLabel,
-		canCreatePattern,
-		canCreateTemplatePart,
-	} = useSelect( ( select ) => {
-		const { getCurrentTheme, getPostType, canUser } = select( coreStore );
+	const { addNewPatternLabel, canCreatePattern } = useSelect( ( select ) => {
+		const { getPostType, canUser } = select( coreStore );
 		return {
-			isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
 			addNewPatternLabel: getPostType( PATTERN_TYPES.user )?.labels
 				?.add_new_item,
-			addNewTemplatePartLabel: getPostType( TEMPLATE_PART_POST_TYPE )
-				?.labels?.add_new_item,
 			// Blocks refers to the wp_block post type, this checks the ability to create a post of that type.
 			canCreatePattern: canUser( 'create', {
 				kind: 'postType',
 				name: PATTERN_TYPES.user,
 			} ),
-			// Template parts can only be created while the block exists; in the
-			// Gutenberg plugin they are registered patterns and the block is gone.
-			canCreateTemplatePart:
-				!! select( blocksStore ).getBlockType( 'core/template-part' ) &&
-				canUser( 'create', {
-					kind: 'postType',
-					name: TEMPLATE_PART_POST_TYPE,
-				} ),
 		};
 	}, [] );
 
@@ -73,16 +47,8 @@ export default function AddNewPattern() {
 		);
 	}
 
-	function handleCreateTemplatePart( templatePart ) {
-		setShowTemplatePartModal( false );
-		history.navigate(
-			`/${ TEMPLATE_PART_POST_TYPE }/${ templatePart.id }?canvas=edit`
-		);
-	}
-
 	function handleError() {
 		setShowPatternModal( false );
-		setShowTemplatePartModal( false );
 	}
 
 	const controls = [];
@@ -92,17 +58,6 @@ export default function AddNewPattern() {
 			onClick: () => setShowPatternModal( true ),
 			title: addNewPatternLabel,
 		} );
-	}
-
-	if ( isBlockBasedTheme && canCreateTemplatePart ) {
-		controls.push( {
-			icon: symbolFilled,
-			onClick: () => setShowTemplatePartModal( true ),
-			title: addNewTemplatePartLabel,
-		} );
-	}
-
-	if ( canCreatePattern ) {
 		controls.push( {
 			icon: upload,
 			onClick: () => {
@@ -139,14 +94,6 @@ export default function AddNewPattern() {
 					onError={ handleError }
 				/>
 			) }
-			{ showTemplatePartModal && (
-				<CreateTemplatePartModal
-					closeModal={ () => setShowTemplatePartModal( false ) }
-					blocks={ [] }
-					onCreate={ handleCreateTemplatePart }
-					onError={ handleError }
-				/>
-			) }
 
 			<input
 				type="file"
@@ -160,29 +107,22 @@ export default function AddNewPattern() {
 					}
 					try {
 						let currentCategoryId;
-						// When we're not handling template parts, we should
-						// add or create the proper pattern category.
-						if (
-							location.query.postType !== TEMPLATE_PART_POST_TYPE
-						) {
-							/*
-							 * categoryMap.values() returns an iterator.
-							 * Iterator.prototype.find() is not yet widely supported.
-							 * Convert to array to use the Array.prototype.find method.
-							 */
-							const currentCategory = Array.from(
-								categoryMap.values()
-							).find(
-								( term ) =>
-									term.name === location.query.categoryId
-							);
-							if ( currentCategory ) {
-								currentCategoryId =
-									currentCategory.id ||
-									( await findOrCreateTerm(
-										currentCategory.label
-									) );
-							}
+						/*
+						 * categoryMap.values() returns an iterator.
+						 * Iterator.prototype.find() is not yet widely supported.
+						 * Convert to array to use the Array.prototype.find method.
+						 */
+						const currentCategory = Array.from(
+							categoryMap.values()
+						).find(
+							( term ) => term.name === location.query.categoryId
+						);
+						if ( currentCategory ) {
+							currentCategoryId =
+								currentCategory.id ||
+								( await findOrCreateTerm(
+									currentCategory.label
+								) );
 						}
 						const pattern = await createPatternFromFile(
 							file,

@@ -43,12 +43,6 @@ function gutenberg_site_editor_register_default_menu_items() {
 		gutenberg_register_site_editor_v2_menu_item( 'templates', __( 'Templates', 'gutenberg' ), '/templates', '' );
 	}
 
-	// `block-template-parts` lets a classic theme opt into template parts alone,
-	// as the Template Part block itself allows.
-	if ( current_theme_supports( 'block-templates' ) || current_theme_supports( 'block-template-parts' ) ) {
-		gutenberg_register_site_editor_v2_menu_item( 'templateParts', __( 'Template Parts', 'gutenberg' ), '/template-parts', '' );
-	}
-
 	gutenberg_register_site_editor_v2_menu_item( 'patterns', __( 'Patterns', 'gutenberg' ), '/patterns', '' );
 }
 add_action( 'site-editor-v2_init', 'gutenberg_site_editor_register_default_menu_items', 5 );
