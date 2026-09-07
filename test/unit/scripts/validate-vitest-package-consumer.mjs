@@ -507,6 +507,49 @@ expect( console ).toHaveWarnedWith( 'typed warning' );
 	);
 }
 
+function createCustomJsdomConsumer() {
+	const fixture = tempDirectory;
+	writeFileSync(
+		path.join( fixture, 'vitest-custom.config.mjs' ),
+		`import { defineConfig } from 'vitest/config';
+
+delete process.env.WP_TESTS_SKIP_STYLE_INJECTION;
+
+export default defineConfig( {
+	test: {
+		environment: 'jsdom',
+		globals: false,
+		include: [ 'custom-style.jsdom.test.js' ],
+	},
+} );
+`
+	);
+	writeFileSync(
+		path.join( fixture, 'custom-style.jsdom.test.js' ),
+		`import { expect, test } from 'vitest';
+import builtStyles from '@wordpress/test-style-fixture';
+
+test( 'keeps generated style injection disabled in a custom jsdom setup', () => {
+	expect( process.env.WP_TESTS_SKIP_STYLE_INJECTION ).toBeUndefined();
+	expect( builtStyles.fixture ).toBeTruthy();
+	expect( document.head.textContent ).not.toContain(
+		'--wp-build-style-injection-test'
+	);
+} );
+`
+	);
+
+	const output = runWpScripts( fixture, [
+		'--config=vitest-custom.config.mjs',
+		'--run',
+		'--reporter=verbose',
+	] );
+	assert.match(
+		output,
+		/keeps generated style injection disabled in a custom jsdom setup/
+	);
+}
+
 try {
 	assert.ok(
 		process.env.npm_execpath,
@@ -545,6 +588,7 @@ try {
 
 	createDefaultConsumer();
 	createConfiguredConsumer();
+	createCustomJsdomConsumer();
 
 	console.log(
 		'Validated packed @wordpress/build, @wordpress/style-runtime, @wordpress/vitest-console, @wordpress/vitest-preset-default, and @wordpress/scripts consumer fixtures.'

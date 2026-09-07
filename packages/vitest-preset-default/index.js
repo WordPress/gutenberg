@@ -89,6 +89,9 @@ export default defineConfig( {
 				extends: true,
 				test: {
 					name: 'browser',
+					env: {
+						WP_TESTS_SKIP_STYLE_INJECTION: 'false',
+					},
 					exclude,
 					include: [ BROWSER_TEST_PATTERN ],
 					setupFiles: [ setupBrowser, setupTestFramework ],

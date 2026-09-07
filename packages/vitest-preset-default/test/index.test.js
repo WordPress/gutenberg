@@ -12,6 +12,9 @@ describe( '@wordpress/vitest-preset-default', () => {
 	test( 'uses Node unless a filename selects another environment', () => {
 		expect( preset.test.globals ).toBe( false );
 		expect( projects.node.test.environment ).toBe( 'node' );
+		expect( projects.node.test.env ).toEqual( {
+			WP_TESTS_SKIP_STYLE_INJECTION: 'true',
+		} );
 		expect( projects.node.test.exclude ).toContain(
 			'**/*.jsdom.test.{js,jsx,ts,tsx,mjs,mts,cjs,cts}'
 		);
@@ -20,10 +23,16 @@ describe( '@wordpress/vitest-preset-default', () => {
 		);
 		expect( projects.jsdom.test ).toMatchObject( {
 			name: 'jsdom',
+			env: {
+				WP_TESTS_SKIP_STYLE_INJECTION: 'true',
+			},
 			environment: 'jsdom',
 		} );
 		expect( projects.browser.test ).toMatchObject( {
 			name: 'browser',
+			env: {
+				WP_TESTS_SKIP_STYLE_INJECTION: 'false',
+			},
 			browser: {
 				enabled: true,
 				headless: true,
