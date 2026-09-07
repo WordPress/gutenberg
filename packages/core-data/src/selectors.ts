@@ -29,14 +29,14 @@ export interface State {
 	autosaves: Record< string | number, Array< unknown > >;
 	blockPatterns: Array< unknown >;
 	blockPatternCategories: Array< unknown >;
-	currentGlobalStylesId: string;
+	currentGlobalStylesId: number | undefined;
 	currentTheme: string;
 	currentUser: ET.User< 'view' >;
 	embedPreviews: Record< string, { html: string } >;
 	entities: EntitiesState;
 	themeBaseGlobalStyles: Record< string, Object >;
 	themeGlobalStyleVariations: Record< string, string >;
-	themeGlobalStyleRevisions: Record< number, Object >;
+	themeGlobalStyleRevisions: Record< number, Array< object > >;
 	undoManager: UndoManager;
 	syncUndoManagerState: {
 		hasRedo: boolean;
@@ -309,6 +309,27 @@ export function getEntityConfig(
  * See https://github.com/WordPress/gutenberg/pull/41578 for more details.
  */
 export interface GetEntityRecord {
+	/*
+	 * Infers the record type from the `kind` and `name` arguments. Falls back
+	 * to the union of all record types for pairs absent from the map, so
+	 * runtime-registered entities keep working.
+	 */
+	<
+		Kind extends ET.EntityKind,
+		Name extends ET.EntityNameOf< Kind >,
+		const Query extends GetRecordsHttpQuery | undefined = undefined,
+	>(
+		state: State,
+		kind: Kind,
+		name: Name,
+		recordId?: EntityRecordKey,
+		query?: Query
+	): ET.EntityRecordOfQuery< Kind, Name, Query > | undefined;
+
+	/*
+	 * Retained so call sites that name the record type explicitly, and any
+	 * type not reachable through the map, continue to compile.
+	 */
 	<
 		EntityRecord extends
 			| ET.EntityRecord< any >
@@ -321,16 +342,56 @@ export interface GetEntityRecord {
 		query?: GetRecordsHttpQuery
 	): EntityRecord | undefined;
 
-	CurriedSignature: <
-		EntityRecord extends
-			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >,
-	>(
-		kind: string,
-		name: string,
-		recordId?: EntityRecordKey,
-		query?: GetRecordsHttpQuery
-	) => EntityRecord | undefined;
+	CurriedSignature: {
+		<
+			Kind extends ET.EntityKind,
+			Name extends ET.EntityNameOf< Kind >,
+			const Query extends GetRecordsHttpQuery | undefined = undefined,
+		>(
+			kind: Kind,
+			name: Name,
+			recordId?: EntityRecordKey,
+			query?: Query
+		): ET.EntityRecordOfQuery< Kind, Name, Query > | undefined;
+		<
+			EntityRecord extends
+				| ET.EntityRecord< any >
+				| Partial< ET.EntityRecord< any > >,
+		>(
+			kind: string,
+			name: string,
+			recordId?: EntityRecordKey,
+			query?: GetRecordsHttpQuery
+		): EntityRecord | undefined;
+	};
+	/*
+	 * `resolveSelect` looks for this signature specifically. Without it the
+	 * overloaded `CurriedSignature` collapses to its last overload, and every
+	 * `resolveSelect( coreStore ).getEntityRecord()` call falls back to the
+	 * union instead of resolving through the map.
+	 */
+	PromiseCurriedSignature: {
+		<
+			Kind extends ET.EntityKind,
+			Name extends ET.EntityNameOf< Kind >,
+			const Query extends GetRecordsHttpQuery | undefined = undefined,
+		>(
+			kind: Kind,
+			name: Name,
+			recordId?: EntityRecordKey,
+			query?: Query
+		): Promise< ET.EntityRecordOfQuery< Kind, Name, Query > | undefined >;
+		<
+			EntityRecord extends
+				| ET.EntityRecord< any >
+				| Partial< ET.EntityRecord< any > >,
+		>(
+			kind: string,
+			name: string,
+			recordId?: EntityRecordKey,
+			query?: GetRecordsHttpQuery
+		): Promise< EntityRecord | undefined >;
+	};
 	__unstableNormalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
 }
 
@@ -591,6 +652,26 @@ export function hasEntityRecords(
  * @see https://github.com/WordPress/gutenberg/pull/41578
  */
 export interface GetEntityRecords {
+	/*
+	 * Infers the record type from the `kind` and `name` arguments. Falls back
+	 * to the union of all record types for pairs absent from the map, so
+	 * runtime-registered entities keep working.
+	 */
+	<
+		Kind extends ET.EntityKind,
+		Name extends ET.EntityNameOf< Kind >,
+		const Query extends GetRecordsHttpQuery | undefined = undefined,
+	>(
+		state: State,
+		kind: Kind,
+		name: Name,
+		query?: Query
+	): ET.EntityRecordOfQuery< Kind, Name, Query >[] | null;
+
+	/*
+	 * Retained so call sites that name the record type explicitly, and any
+	 * type not reachable through the map, continue to compile.
+	 */
 	<
 		EntityRecord extends
 			| ET.EntityRecord< any >
@@ -602,25 +683,47 @@ export interface GetEntityRecords {
 		query?: GetRecordsHttpQuery
 	): EntityRecord[] | null;
 
-	CurriedSignature: <
-		EntityRecord extends
-			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >,
-	>(
-		kind: string,
-		name: string,
-		query?: GetRecordsHttpQuery
-	) => EntityRecord[] | null;
+	CurriedSignature: {
+		<
+			Kind extends ET.EntityKind,
+			Name extends ET.EntityNameOf< Kind >,
+			const Query extends GetRecordsHttpQuery | undefined = undefined,
+		>(
+			kind: Kind,
+			name: Name,
+			query?: Query
+		): ET.EntityRecordOfQuery< Kind, Name, Query >[] | null;
+		<
+			EntityRecord extends
+				| ET.EntityRecord< any >
+				| Partial< ET.EntityRecord< any > >,
+		>(
+			kind: string,
+			name: string,
+			query?: GetRecordsHttpQuery
+		): EntityRecord[] | null;
+	};
 
-	PromiseCurriedSignature: <
-		EntityRecord extends
-			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >,
-	>(
-		kind: string,
-		name: string,
-		query?: GetRecordsHttpQuery
-	) => Promise< EntityRecord[] | null >;
+	PromiseCurriedSignature: {
+		<
+			Kind extends ET.EntityKind,
+			Name extends ET.EntityNameOf< Kind >,
+			const Query extends GetRecordsHttpQuery | undefined = undefined,
+		>(
+			kind: Kind,
+			name: Name,
+			query?: Query
+		): Promise< ET.EntityRecordOfQuery< Kind, Name, Query >[] | null >;
+		<
+			EntityRecord extends
+				| ET.EntityRecord< any >
+				| Partial< ET.EntityRecord< any > >,
+		>(
+			kind: string,
+			name: string,
+			query?: GetRecordsHttpQuery
+		): Promise< EntityRecord[] | null >;
+	};
 }
 
 /**
@@ -1198,7 +1301,9 @@ export function getCurrentTheme( state: State ): any {
  *
  * @return The current global styles ID.
  */
-export function __experimentalGetCurrentGlobalStylesId( state: State ): string {
+export function __experimentalGetCurrentGlobalStylesId(
+	state: State
+): number | undefined {
 	return state.currentGlobalStylesId;
 }
 

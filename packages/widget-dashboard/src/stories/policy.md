@@ -35,12 +35,16 @@ The Customize button, the command palette entries, the tile controls, and the in
 | `customize` | none                    | The Customize button, the `core/dashboard/customize` command, the `core/dashboard/add-widgets` command outside edit mode, and the automatic entry into customize mode on an empty layout.         |
 | `reset`     | none                    | The Reset to default entry in the overflow menu, the `core/dashboard/reset-to-default` command, and the confirmation prompt they open. A denied reset is hidden, not disabled.                    |
 | `insert`    | `widgetType`            | Whether the inserter offers the type; a rejected type keeps rendering where already placed. The Add widget button and command show only while some registered type is insertable.                 |
-| `remove`    | `widget`, `widgetType?` | The Remove control in customize mode. The staging layer re-asserts, in place, a locked instance dropped by any trigger.                                                                           |
+| `remove`    | `widget`, `widgetType?` | The Remove control in customize mode.                                                                                                                                                             |
 | `move`      | `widget`, `widgetType?` | Dragging the tile in customize mode. A denied tile is pinned: it holds its index while the other tiles reorder around it; a change ahead of it can still reflow the cell it lands in.             |
 | `resize`    | `widget`, `widgetType?` | The resize handle and the width menu.                                                                                                                                                             |
 | `edit`      | `widget`, `widgetType?` | Attribute editing: the inline fields and the settings trigger in the header, the settings surface, and the widget's `setAttributes`, which is absent when denied so the widget renders read-only. |
 
 The vocabulary grows with what the engine enforces. Return `true` for operations you do not govern: policies compose restrictively, so a default `false` would deny every operation added later.
+
+The staging layer enforces the same answers. Every mutation is diffed per instance on arrival, whichever trigger staged it, and each change the policy denies is re-asserted before it lands: a removed locked instance returns at its index, a denied move holds its index, a denied resize keeps its spans, a denied edit keeps its attributes, and a new instance of a rejected type is dropped. What the interface hides, the staging layer rejects.
+
+Instance operations carry `widgetType` only while that type is still in `widgetTypes`. A plugin that is gone, or a render module that failed to load, leaves the field absent: the engine still asks, because the instance is still on the board, but a policy that keys its locks on the type has nothing to match. Locks that must survive that case belong on the instance itself. The same absence is why a new instance of an unregistered type is not dropped: there is no type to ask about.
 
 ## Composition
 

@@ -290,4 +290,91 @@ describe( 'DateTime control', () => {
 			} )
 		).toBeInTheDocument();
 	} );
+
+	describe( 'timezone help', () => {
+		it( 'is not rendered when the site and browser timezones match', () => {
+			render(
+				<DateTimeHarness initialValue="2026-08-15T12:30:00.000Z" />
+			);
+
+			expect(
+				screen.getByLabelText( 'Date time' )
+			).not.toHaveAccessibleDescription();
+		} );
+
+		it( 'names the timezone for a site with a named timezone', () => {
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					offset: -6,
+					offsetFormatted: '-6',
+					string: 'America/Costa_Rica',
+					abbr: 'CST',
+				},
+			} );
+
+			render(
+				<DateTimeHarness initialValue="2026-08-15T12:30:00.000Z" />
+			);
+
+			// Underscores in the zone name are replaced for display.
+			expect(
+				screen.getByLabelText( 'Date time' )
+			).toHaveAccessibleDescription(
+				'Timezone: (CST) America/Costa Rica'
+			);
+		} );
+
+		// The manual offset reaches Calendar as a raw offset identifier,
+		// which Node 20 rejects — see `supportsOffsetTimeZones`.
+		describeWithOffsetTimeZones( 'on a site with a manual offset', () => {
+			it( 'falls back to the UTC offset', () => {
+				setSiteOffset( 14 );
+
+				render(
+					<DateTimeHarness initialValue="2026-08-15T12:30:00.000Z" />
+				);
+
+				expect(
+					screen.getByLabelText( 'Date time' )
+				).toHaveAccessibleDescription( 'Timezone: UTC+14' );
+			} );
+		} );
+
+		it( 'spells out a UTC site timezone for a non-UTC visitor', () => {
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					offset: 0,
+					offsetFormatted: '0',
+					string: 'UTC',
+					abbr: 'UTC',
+				},
+			} );
+			// Jest pins the browser to UTC, so this mismatch is created from
+			// the browser side: UTC+1, i.e. an offset of -60 minutes.
+			const offsetSpy = jest
+				.spyOn( Date.prototype, 'getTimezoneOffset' )
+				.mockReturnValue( -60 );
+
+			try {
+				render(
+					<DateTime
+						data={ { published: '2026-08-15T12:30:00.000Z' } }
+						field={ field }
+						onChange={ noop }
+						config={ { compact: true } }
+					/>
+				);
+
+				expect(
+					screen.getByLabelText( 'Date time' )
+				).toHaveAccessibleDescription(
+					'Timezone: Coordinated Universal Time'
+				);
+			} finally {
+				offsetSpy.mockRestore();
+			}
+		} );
+	} );
 } );

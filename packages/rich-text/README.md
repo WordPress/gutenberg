@@ -314,7 +314,7 @@ Registers a new format provided a unique name and an object defining its behavio
 _Parameters_
 
 -   _name_ `string`: Format name.
--   _settings_ `WPFormat`: Format settings.
+-   _settings_ `Omit<WPFormat, 'name'>`: Format settings. `name` is injected from the first argument.
 
 _Returns_
 
@@ -357,7 +357,7 @@ _Parameters_
 
 -   _value_ `RichTextValue`: The value to modify.
 -   _pattern_ `RegExp|string`: A RegExp object or literal. Can also be a string. It is treated as a verbatim string and is not interpreted as a regular expression. Only the first occurrence will be replaced.
--   _replacement_ `Function|string`: The match or matches are replaced with the specified or the value returned by the specified function.
+-   _replacement_ `Function|string|RichTextValue`: The match or matches are replaced with the specified value, the value returned by the specified function, or the given rich text value.
 
 _Returns_
 
@@ -375,6 +375,10 @@ document.querySelector( 'p' ) )`.
 -   Create one from plain text: `RichTextData.fromPlainText( '1\n2' )`.
 -   Create one from a rich text value: `new RichTextData( { text: '...',
 formats: [ ... ] } )`.
+
+### RichTextFormat
+
+A single format, such as `core/bold`, applied to a range of characters within a `RichTextValue`. See main `@wordpress/rich-text` documentation for more information.
 
 ### RichTextValue
 

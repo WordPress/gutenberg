@@ -1,3 +1,4 @@
+import deprecated from '@wordpress/deprecated';
 import { usePluginContext } from '@wordpress/plugins';
 import { ActionItem } from '@wordpress/interface';
 
@@ -10,7 +11,7 @@ import { ActionItem } from '@wordpress/interface';
  * @param {string}                [props.href]                          When `href` is provided then the menu item is represented as an anchor rather than button. It corresponds to the `href` attribute of the anchor.
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
  * @param {Function}              [props.onClick=noop]                  The callback function to be executed when the user clicks the menu item.
- * @param {...*}                  [props.other]                         Any additional props are passed through to the underlying menu item component.
+ * @param {...*}                  [props.other]                         Any additional props are passed through to the underlying menu item component, except for `as`, which is deprecated and ignored.
  *
  * @example
  * ```js
@@ -60,11 +61,22 @@ import { ActionItem } from '@wordpress/interface';
  */
 export default function PluginMoreMenuItem( props ) {
 	const context = usePluginContext();
+	// The menu renders the item itself, so `as` is dropped rather than
+	// forwarded.
+	const { as, ...itemProps } = props;
+
+	if ( as ) {
+		deprecated( 'The `as` prop of wp.editor.PluginMoreMenuItem', {
+			since: '7.2',
+			hint: 'The menu renders the item itself. The prop is ignored.',
+		} );
+	}
+
 	return (
 		<ActionItem
 			name="core/plugin-more-menu"
-			icon={ props.icon || context.icon }
-			{ ...props }
+			icon={ itemProps.icon || context.icon }
+			{ ...itemProps }
 		/>
 	);
 }

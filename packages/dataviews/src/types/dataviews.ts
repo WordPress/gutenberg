@@ -1,6 +1,7 @@
 import type { ReactElement, ReactNode, ComponentProps } from 'react';
 import type { useFocusOnMount } from '@wordpress/compose';
 import type {
+	Field,
 	NormalizedField,
 	Operator,
 	Option,
@@ -8,6 +9,189 @@ import type {
 } from './field-api';
 import type { SetSelection } from './private';
 import type { MEDIA_ASPECT_RATIOS } from '../constants';
+
+/**
+ * An item with an intrinsic string `id` property. When the dataset's items
+ * conform to this shape, the `getItemId` prop becomes optional and the `id`
+ * property is used by default.
+ */
+export type ItemWithId = { id: string };
+
+export type DataViewsProps< Item > = {
+	/**
+	 * The current view configuration: layout type, filters, sorting,
+	 * pagination, search term, and visible fields.
+	 */
+	view: View;
+
+	/**
+	 * Callback invoked with the new view whenever the user changes it
+	 * (filtering, sorting, switching layout, changing page, etc.).
+	 * Consumers own the view state and must store the new value.
+	 */
+	onChangeView: ( view: View ) => void;
+
+	/**
+	 * The fields describing each item's data: how to get and render a value,
+	 * plus its sorting and filtering capabilities.
+	 */
+	fields: Field< Item >[];
+
+	/**
+	 * Whether the global search input is displayed.
+	 *
+	 * @default true
+	 */
+	search?: boolean;
+
+	/**
+	 * The accessible label and placeholder for the search input.
+	 *
+	 * @default 'Search'
+	 */
+	searchLabel?: string;
+
+	/**
+	 * The actions that can be performed on items, shown per item and, for
+	 * actions supporting bulk, on multi-selections.
+	 */
+	actions?: Action< Item >[];
+
+	/**
+	 * The dataset to render, already filtered, sorted, and paginated
+	 * according to the current view.
+	 */
+	data: Item[];
+
+	/**
+	 * Whether the data is loading, in which case a loading state is shown.
+	 *
+	 * @default false
+	 */
+	isLoading?: boolean;
+
+	/**
+	 * Pagination totals for the full dataset (not just the current page).
+	 */
+	paginationInfo: {
+		/**
+		 * The total number of items in the dataset.
+		 */
+		totalItems: number;
+
+		/**
+		 * The total number of pages, given the current items per page.
+		 */
+		totalPages: number;
+	};
+
+	/**
+	 * The layouts the user can switch between, mapping each supported layout
+	 * type to view settings applied when switching to it (or `true` for
+	 * defaults).
+	 */
+	defaultLayouts?: SupportedLayouts;
+
+	/**
+	 * The currently selected items, as a list of item ids. When provided
+	 * (together with `onChangeSelection`), selection is controlled.
+	 */
+	selection?: string[];
+
+	/**
+	 * Callback invoked with the new list of selected item ids whenever the
+	 * selection changes.
+	 */
+	onChangeSelection?: ( items: string[] ) => void;
+
+	/**
+	 * Callback invoked when the user clicks an item's title or media.
+	 * Ignored when `renderItemLink` is provided.
+	 */
+	onClickItem?: ( item: Item ) => void;
+
+	/**
+	 * Renders the item's title and media as a link. Receives the item along
+	 * with anchor props to spread onto the link element. Takes precedence
+	 * over `onClickItem`.
+	 */
+	renderItemLink?: (
+		props: {
+			item: Item;
+		} & ComponentProps< 'a' >
+	) => ReactElement;
+
+	/**
+	 * Whether an item is clickable, i.e. whether `onClickItem` or
+	 * `renderItemLink` applies to it.
+	 *
+	 * @default () => true
+	 */
+	isItemClickable?: ( item: Item ) => boolean;
+
+	/**
+	 * Extra content rendered in the toolbar area, next to the view
+	 * configuration controls.
+	 */
+	header?: ReactNode;
+
+	/**
+	 * Returns the hierarchical depth of an item, used to indent items when
+	 * the view's `showLevels` option is enabled.
+	 */
+	getItemLevel?: ( item: Item ) => number;
+
+	/**
+	 * Custom component tree rendered instead of the default layout
+	 * composition, using the internal `DataViews.*` sub-components.
+	 */
+	children?: ReactNode;
+
+	/**
+	 * Static configuration of the component's UI.
+	 */
+	config?: {
+		/**
+		 * The options offered in the "items per page" control.
+		 */
+		perPageSizes: number[];
+		/**
+		 * Whether the view config popover offers the "Original aspect ratio"
+		 * control for grid layouts, letting users switch item previews
+		 * between cropped (`cover`) and fitted (`contain`).
+		 */
+		mediaFitControl?: boolean;
+	};
+
+	/**
+	 * Content rendered when the dataset is empty (no items match the
+	 * current view).
+	 */
+	empty?: ReactNode;
+
+	/**
+	 * Callback to reset the view to its initial state, wired to the
+	 * "Reset view" button in the view options popover. When provided, the
+	 * view options toggle also shows a "modified" indicator. Pass `false` to
+	 * render the button disabled (the view is not modified); omit the prop
+	 * to hide the button altogether (no reset support).
+	 */
+	onReset?: ( () => void ) | false;
+} & ( Item extends ItemWithId
+	? {
+			/**
+			 * Returns a unique id for an item. Optional when items already
+			 * have a string `id` property, which is used by default.
+			 */
+			getItemId?: ( item: Item ) => string;
+	  }
+	: {
+			/**
+			 * Returns a unique id for an item. Required when items have no
+			 * string `id` property.
+			 */
+			getItemId: ( item: Item ) => string;
+	  } );
 
 /**
  * The filters applied to the dataset.
@@ -202,6 +386,14 @@ interface ViewBase {
 	startPosition?: number;
 }
 
+/**
+ * Sizing and alignment for one table column. Applies to the columns listed in
+ * `fields`; neither the `table` nor the `pickerTable` layout applies it to the
+ * primary column (`titleField`, `mediaField`, `descriptionField`), so styles
+ * keyed by those field ids are ignored. In the `table` layout the primary
+ * column is sized by the table itself, taking the width the other columns
+ * leave over; without a primary column, the last column in `fields` does.
+ */
 export interface ColumnStyle {
 	/**
 	 * The width of the field column.
@@ -209,12 +401,12 @@ export interface ColumnStyle {
 	width?: string | number;
 
 	/**
-	 * The minimum width of the field column.
+	 * The maximum width of the field column.
 	 */
 	maxWidth?: string | number;
 
 	/**
-	 * The maximum width of the field column.
+	 * The minimum width of the field column.
 	 */
 	minWidth?: string | number;
 
@@ -244,11 +436,18 @@ export type MediaAspectRatio = ( typeof MEDIA_ASPECT_RATIOS )[ number ];
 export type MediaFit = 'cover' | 'contain';
 
 export interface ViewTable extends ViewBase {
+	/**
+	 * The layout discriminant: a table view.
+	 */
 	type: 'table';
 
+	/**
+	 * The table-specific configuration.
+	 */
 	layout?: {
 		/**
-		 * The styles for the columns.
+		 * The styles for the columns listed in `fields`, keyed by field id.
+		 * Not applied to the primary column; see `ColumnStyle`.
 		 */
 		styles?: Record< string, ColumnStyle >;
 
@@ -272,8 +471,14 @@ export interface ViewTable extends ViewBase {
 }
 
 export interface ViewList extends ViewBase {
+	/**
+	 * The layout discriminant: a list view.
+	 */
 	type: 'list';
 
+	/**
+	 * The list-specific configuration.
+	 */
 	layout?: {
 		/**
 		 * The density of the view.
@@ -283,8 +488,14 @@ export interface ViewList extends ViewBase {
 }
 
 export interface ViewActivity extends ViewBase {
+	/**
+	 * The layout discriminant: an activity view.
+	 */
 	type: 'activity';
 
+	/**
+	 * The activity-specific configuration.
+	 */
 	layout?: {
 		/**
 		 * The density of the view.
@@ -294,8 +505,14 @@ export interface ViewActivity extends ViewBase {
 }
 
 export interface ViewGrid extends ViewBase {
+	/**
+	 * The layout discriminant: a grid view.
+	 */
 	type: 'grid';
 
+	/**
+	 * The grid-specific configuration.
+	 */
 	layout?: {
 		/**
 		 * The fields to use as badge fields.
@@ -330,8 +547,14 @@ export interface ViewGrid extends ViewBase {
 }
 
 export interface ViewPickerGrid extends ViewBase {
+	/**
+	 * The layout discriminant: a grid view for the picker variant.
+	 */
 	type: 'pickerGrid';
 
+	/**
+	 * The picker-grid-specific configuration.
+	 */
 	layout?: {
 		/**
 		 * The fields to use as badge fields.
@@ -359,11 +582,18 @@ export interface ViewPickerGrid extends ViewBase {
 }
 
 export interface ViewPickerTable extends ViewBase {
+	/**
+	 * The layout discriminant: a table view for the picker variant.
+	 */
 	type: 'pickerTable';
 
+	/**
+	 * The picker-table-specific configuration.
+	 */
 	layout?: {
 		/**
-		 * The styles for the columns.
+		 * The styles for the columns listed in `fields`, keyed by field id.
+		 * Not applied to the primary column; see `ColumnStyle`.
 		 */
 		styles?: Record< string, ColumnStyle >;
 
@@ -380,8 +610,14 @@ export interface ViewPickerTable extends ViewBase {
 }
 
 export interface ViewPickerActivity extends ViewBase {
+	/**
+	 * The layout discriminant: an activity view for the picker variant.
+	 */
 	type: 'pickerActivity';
 
+	/**
+	 * The picker-activity-specific configuration.
+	 */
 	layout?: {
 		/**
 		 * The density of the view.
@@ -446,9 +682,24 @@ interface ActionBase< Item > {
 	context?: 'list' | 'single';
 }
 
+/**
+ * The props passed to a modal action's `RenderModal` component.
+ */
 export interface RenderModalProps< Item > {
+	/**
+	 * The items the action was triggered on.
+	 */
 	items: Item[];
+
+	/**
+	 * Closes the modal.
+	 */
 	closeModal?: () => void;
+
+	/**
+	 * Callback to invoke with the affected items once the action has been
+	 * performed.
+	 */
 	onActionPerformed?: ( items: Item[] ) => void;
 }
 
@@ -502,29 +753,107 @@ export interface ActionButton< Item > extends ActionBase< Item > {
 
 export type Action< Item > = ActionModal< Item > | ActionButton< Item >;
 
+/**
+ * The props passed to every layout component (table, grid, list, etc.).
+ */
 export interface ViewBaseProps< Item > {
+	/**
+	 * Extra class name applied to the layout's root element.
+	 */
 	className?: string;
+
+	/**
+	 * The actions that can be performed on items.
+	 */
 	actions: Action< Item >[];
+
+	/**
+	 * The dataset to render, already filtered, sorted, and paginated.
+	 */
 	data: Item[];
+
+	/**
+	 * The normalized fields describing each item's data.
+	 */
 	fields: NormalizedField< Item >[];
+
+	/**
+	 * Returns a unique id for an item.
+	 */
 	getItemId: ( item: Item ) => string;
+
+	/**
+	 * Returns the hierarchical depth of an item, used to indent items when
+	 * the view's `showLevels` option is enabled.
+	 */
 	getItemLevel?: ( item: Item ) => number;
+
+	/**
+	 * Whether the data is loading, in which case a loading state is shown.
+	 */
 	isLoading?: boolean;
+
+	/**
+	 * Callback invoked with the new view whenever the user changes it.
+	 */
 	onChangeView: ( view: View ) => void;
+
+	/**
+	 * Callback invoked with the new list of selected item ids whenever the
+	 * selection changes.
+	 */
 	onChangeSelection: SetSelection;
+
+	/**
+	 * The currently selected items, as a list of item ids.
+	 */
 	selection: string[];
+
+	/**
+	 * Opens the filter editor for the given field, e.g. when the user picks
+	 * a filterable field from a layout's column menu.
+	 */
 	setOpenedFilter: ( fieldId: string ) => void;
+
+	/**
+	 * Callback invoked when the user clicks an item's title or media.
+	 * Ignored when `renderItemLink` is provided.
+	 */
 	onClickItem?: ( item: Item ) => void;
+
+	/**
+	 * Renders the item's title and media as a link. Takes precedence over
+	 * `onClickItem`.
+	 */
 	renderItemLink?: (
 		props: {
 			item: Item;
 		} & ComponentProps< 'a' >
 	) => ReactElement;
+
+	/**
+	 * Whether an item is clickable, i.e. whether `onClickItem` or
+	 * `renderItemLink` applies to it.
+	 */
 	isItemClickable: ( item: Item ) => boolean;
+
+	/**
+	 * The current view configuration.
+	 */
 	view: View;
+
+	/**
+	 * Content rendered when the dataset is empty.
+	 */
 	empty: ReactNode;
 }
 
+/**
+ * The props passed to every picker layout component. Same as
+ * `ViewBaseProps`, minus the props pickers don't support: the item-click
+ * ones (`onClickItem`, `renderItemLink`, `isItemClickable`) and the
+ * hierarchy one (`getItemLevel`).
+ */
 export type ViewPickerBaseProps< Item > = Omit<
 	ViewBaseProps< Item >,
 	| 'view'
@@ -535,38 +864,66 @@ export type ViewPickerBaseProps< Item > = Omit<
 	| 'renderItemLink'
 	| 'getItemLevel'
 > & {
+	/**
+	 * The current view configuration.
+	 */
 	view: View;
+
+	/**
+	 * Callback invoked with the new view whenever the user changes it.
+	 */
 	onChangeView: ( view: View ) => void;
 };
 
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {
+	/**
+	 * The current view configuration, narrowed to the table layout.
+	 */
 	view: ViewTable;
 }
 
 export interface ViewListProps< Item > extends ViewBaseProps< Item > {
+	/**
+	 * The current view configuration, narrowed to the list layout.
+	 */
 	view: ViewList;
 }
 
 export interface ViewActivityProps< Item > extends ViewBaseProps< Item > {
+	/**
+	 * The current view configuration, narrowed to the activity layout.
+	 */
 	view: ViewActivity;
 }
 
 export interface ViewGridProps< Item > extends ViewBaseProps< Item > {
+	/**
+	 * The current view configuration, narrowed to the grid layout.
+	 */
 	view: ViewGrid;
 }
 
 export interface ViewPickerGridProps< Item >
 	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+	/**
+	 * The current view configuration, narrowed to the picker grid layout.
+	 */
 	view: ViewPickerGrid;
 }
 
 export interface ViewPickerTableProps< Item >
 	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+	/**
+	 * The current view configuration, narrowed to the picker table layout.
+	 */
 	view: ViewPickerTable;
 }
 
 export interface ViewPickerActivityProps< Item >
 	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+	/**
+	 * The current view configuration, narrowed to the picker activity layout.
+	 */
 	view: ViewPickerActivity;
 }
 
@@ -581,22 +938,93 @@ export type ViewPickerProps< Item > =
 	| ViewPickerTableProps< Item >
 	| ViewPickerActivityProps< Item >;
 
+/**
+ * The layouts the user can switch between. Each key enables that layout;
+ * its value is the view settings applied when switching to it, or `true`
+ * to use the defaults.
+ */
 export interface SupportedLayouts {
+	/**
+	 * Enables the list layout, with the view settings applied when
+	 * switching to it (or `true` for defaults).
+	 */
 	list?: Omit< ViewList, 'type' > | true;
+
+	/**
+	 * Enables the grid layout, with the view settings applied when
+	 * switching to it (or `true` for defaults).
+	 */
 	grid?: Omit< ViewGrid, 'type' > | true;
+
+	/**
+	 * Enables the table layout, with the view settings applied when
+	 * switching to it (or `true` for defaults).
+	 */
 	table?: Omit< ViewTable, 'type' > | true;
+
+	/**
+	 * Enables the activity layout, with the view settings applied when
+	 * switching to it (or `true` for defaults).
+	 */
 	activity?: Omit< ViewActivity, 'type' > | true;
+
+	/**
+	 * Enables the picker grid layout, with the view settings applied when
+	 * switching to it (or `true` for defaults).
+	 */
 	pickerGrid?: Omit< ViewPickerGrid, 'type' > | true;
+
+	/**
+	 * Enables the picker table layout, with the view settings applied when
+	 * switching to it (or `true` for defaults).
+	 */
 	pickerTable?: Omit< ViewPickerTable, 'type' > | true;
+
+	/**
+	 * Enables the picker activity layout, with the view settings applied
+	 * when switching to it (or `true` for defaults).
+	 */
 	pickerActivity?: Omit< ViewPickerActivity, 'type' > | true;
 }
 
+/**
+ * `SupportedLayouts` after normalization: `true` shorthands are resolved
+ * into view settings objects.
+ */
 export interface NormalizedSupportedLayouts {
+	/**
+	 * The view settings applied when switching to the list layout.
+	 */
 	list?: Omit< ViewList, 'type' >;
+
+	/**
+	 * The view settings applied when switching to the grid layout.
+	 */
 	grid?: Omit< ViewGrid, 'type' >;
+
+	/**
+	 * The view settings applied when switching to the table layout.
+	 */
 	table?: Omit< ViewTable, 'type' >;
+
+	/**
+	 * The view settings applied when switching to the activity layout.
+	 */
 	activity?: Omit< ViewActivity, 'type' >;
+
+	/**
+	 * The view settings applied when switching to the picker grid layout.
+	 */
 	pickerGrid?: Omit< ViewPickerGrid, 'type' >;
+
+	/**
+	 * The view settings applied when switching to the picker table layout.
+	 */
 	pickerTable?: Omit< ViewPickerTable, 'type' >;
+
+	/**
+	 * The view settings applied when switching to the picker activity
+	 * layout.
+	 */
 	pickerActivity?: Omit< ViewPickerActivity, 'type' >;
 }

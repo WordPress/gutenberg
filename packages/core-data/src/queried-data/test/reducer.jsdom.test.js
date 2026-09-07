@@ -306,6 +306,46 @@ describe( 'reducer', () => {
 		} );
 	} );
 
+	it( 'keeps the pagination totals in sync when deleting an item', () => {
+		const kind = 'postType';
+		const name = 'page';
+		const original = deepFreeze( {
+			items: {
+				default: {
+					1: { id: 1 },
+					2: { id: 2 },
+					3: { id: 3 },
+				},
+			},
+			queries: {
+				default: {
+					'': {
+						itemIds: [ 1, 2, 3 ],
+						meta: { totalItems: 3, totalPages: 2 },
+					},
+					's=a': {
+						itemIds: [ 1, 2 ],
+						meta: { totalItems: 2, totalPages: 1 },
+					},
+				},
+			},
+		} );
+		const state = reducer( original, removeItems( kind, name, 3 ) );
+
+		expect( state.queries ).toEqual( {
+			default: {
+				'': {
+					itemIds: [ 1, 2 ],
+					meta: { totalItems: 2, totalPages: null },
+				},
+				's=a': {
+					itemIds: [ 1, 2 ],
+					meta: { totalItems: 2, totalPages: 1 },
+				},
+			},
+		} );
+	} );
+
 	it( 'deletes an item with string ID', () => {
 		const kind = 'postType';
 		const name = 'wp_template';

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `esnext` ruleset no longer configures a parser, so JavaScript and JSX files are parsed by ESLint's default parser instead of `@babel/eslint-parser` ([#82144](https://github.com/WordPress/gutenberg/pull/82144)).
+
 ### Enhancements
 
 -   Update `use-recommended-components` rule to prefer `@wordpress/ui` `Field` and `Fieldset` over legacy `@wordpress/components` `BaseControl` ([#82095](https://github.com/WordPress/gutenberg/pull/82095)).
@@ -9,6 +13,7 @@
 ### Bug Fixes
 
 -   Apply test-only DOM global exceptions to both JavaScript and JSX test files ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Fix `no-unused-vars-before-return` false positive on variables used only in JSX ([#82144](https://github.com/WordPress/gutenberg/pull/82144)).
 
 ### Internal
 

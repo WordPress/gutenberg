@@ -88,11 +88,14 @@ import normalizeUrl from './normalize-url';
  * @property {boolean=}                   forceIsEditingLink         If passed as either `true` or `false`, controls the
  *                                                                   internal editing state of the component to respective
  *                                                                   show or not show the URL input field.
+ * @property {string=}                    searchInputPlaceholder     Placeholder text for the search input.
  * @property {WPLinkControlValue=}        value                      Current link value.
  * @property {WPLinkControlOnChangeProp=} onChange                   Value change handler, called with the updated value if
  *                                                                   the user selects a new link or updates settings.
  * @property {Function=}                  onInputChange              Callback fired when the search input value changes.
  *                                                                   Use this for observation only (e.g., to track search state).
+ * @property {Function=}                  onRemove                   Callback invoked when the link is removed.
+ * @property {Function=}                  onCancel                   Callback invoked when editing is cancelled.
  * @property {string=}                    inputValue                 Initial value for the search input (uncontrolled).
  * @property {boolean=}                   noDirectEntry              Whether to allow turning a URL-like search query directly into a link.
  * @property {boolean=}                   showSuggestions            Whether to present suggestions when typing the URL.

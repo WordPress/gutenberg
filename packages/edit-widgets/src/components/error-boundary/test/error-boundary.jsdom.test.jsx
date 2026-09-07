@@ -10,7 +10,7 @@ const ChildComponent = () => {
 
 describe( 'Error Boundary', () => {
 	describe( 'when error is thrown from a Child component', () => {
-		it( 'calls the `editor.ErrorBoundary.errorLogged` hook action with the error object', () => {
+		it( 'calls the `editor.ErrorBoundary.errorLogged` hook action with the error object and error info', () => {
 			const doAction = jest.spyOn( wpHooks, 'doAction' );
 
 			render(
@@ -21,7 +21,10 @@ describe( 'Error Boundary', () => {
 
 			expect( doAction ).toHaveBeenCalledWith(
 				'editor.ErrorBoundary.errorLogged',
-				theError
+				theError,
+				expect.objectContaining( {
+					componentStack: expect.any( String ),
+				} )
 			);
 			expect( console ).toHaveErrored();
 		} );
