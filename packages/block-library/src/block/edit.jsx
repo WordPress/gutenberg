@@ -288,11 +288,11 @@ function RegisteredPatternEdit( props ) {
 		[ content ]
 	);
 
-	if ( override ) {
+	if ( customization ) {
 		return (
 			<UserPatternEdit
 				{ ...props }
-				recordId={ override.id }
+				recordId={ customization.id }
 				pattern={ pattern }
 			/>
 		);
