@@ -66,6 +66,12 @@ export const LayoutPanel = {
 			description: 'Chooses when the edit icon is visible.',
 			options: [ 'default', 'always', 'on-hover' ],
 		},
+		empty: {
+			control: { type: 'select' },
+			description:
+				'Chooses what the summary shows when the field value is empty.',
+			options: [ 'default', 'render', 'placeholder' ],
+		},
 		applyLabel: {
 			control: { type: 'text' },
 			description:

@@ -6,6 +6,7 @@ import type {
 	Layout,
 	PanelLayout,
 	EditVisibility,
+	EmptySummary,
 } from '../../types';
 
 type SamplePost = {
@@ -39,6 +40,7 @@ const fields: Field< SamplePost >[] = [
 		id: 'title',
 		label: 'Title',
 		type: 'text',
+		placeholder: 'Add a title',
 	},
 	{
 		id: 'order',
@@ -272,11 +274,13 @@ const getPanelLayoutFromStoryArgs = ( {
 	labelPosition,
 	openAs,
 	editVisibility,
+	empty,
 }: {
 	summary?: string[];
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
 	openAs?: PanelLayout[ 'openAs' ];
 	editVisibility?: 'default' | EditVisibility;
+	empty?: 'default' | EmptySummary;
 } ): Layout | undefined => {
 	const panelLayout: PanelLayout = {
 		type: 'panel',
@@ -298,6 +302,10 @@ const getPanelLayoutFromStoryArgs = ( {
 		panelLayout.editVisibility = editVisibility;
 	}
 
+	if ( empty !== 'default' ) {
+		panelLayout.empty = empty;
+	}
+
 	return panelLayout;
 };
 
@@ -305,6 +313,7 @@ const LayoutPanelComponent = ( {
 	labelPosition,
 	openAs: openAsArg,
 	editVisibility,
+	empty,
 	applyLabel,
 	cancelLabel,
 }: {
@@ -312,6 +321,7 @@ const LayoutPanelComponent = ( {
 	labelPosition: 'default' | 'top' | 'side' | 'none';
 	openAs: 'default' | 'dropdown' | 'modal';
 	editVisibility: 'default' | EditVisibility;
+	empty: 'default' | EmptySummary;
 	applyLabel?: string;
 	cancelLabel?: string;
 } ) => {
@@ -356,6 +366,7 @@ const LayoutPanelComponent = ( {
 				labelPosition,
 				openAs,
 				editVisibility,
+				empty,
 			} ),
 			fields: [
 				'title',
@@ -368,6 +379,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						empty,
 					} ),
 				},
 				'order',
@@ -385,6 +397,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						empty,
 					} ),
 				},
 				{
@@ -396,6 +409,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						empty,
 					} ),
 				},
 				{
@@ -412,6 +426,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						empty,
 					} ),
 				},
 				{
@@ -423,11 +438,19 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						empty,
 					} ),
 				},
 			],
 		};
-	}, [ labelPosition, openAsArg, applyLabel, cancelLabel, editVisibility ] );
+	}, [
+		labelPosition,
+		openAsArg,
+		applyLabel,
+		cancelLabel,
+		editVisibility,
+		empty,
+	] );
 
 	return (
 		<DataForm< SamplePost >

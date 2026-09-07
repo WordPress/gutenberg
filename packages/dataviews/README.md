@@ -2200,6 +2200,7 @@ For example:
 -   `type`: `panel`. Required.
 -   `labelPosition`: one of `side`, `top`, or `none`. Optional. `side` by default.
 -   `editVisibility`: one of `always`, or `on-hover`. Optional. `on-hover` by default.
+-   `empty`: one of `render`, or `placeholder`. Optional. `render` by default. What the summary shows when the field's value is `undefined`, `null`, or an empty string: the field's `render` output, or the field's `placeholder`.
 -   `openAs`: one of `dropdown`, `modal`. Optional. `dropdown` by default.
 -   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
     -   A string (single field ID)

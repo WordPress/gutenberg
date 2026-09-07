@@ -77,6 +77,7 @@ function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			openAs: normalizedOpenAs,
 			summary: normalizedSummary,
 			editVisibility: layout?.editVisibility ?? 'on-hover',
+			empty: layout?.empty ?? 'render',
 		} satisfies NormalizedPanelLayout;
 	} else if ( layout?.type === 'card' ) {
 		if ( layout.withHeader === false ) {

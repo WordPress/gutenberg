@@ -658,6 +658,108 @@ describe( 'DataForm component', () => {
 			expect( authorField ).toBeInTheDocument();
 		} );
 
+		it( 'should show the placeholder of an empty field when the layout opts in', () => {
+			const fieldsWithPlaceholder = fields.map( ( field ) =>
+				field.id === 'title'
+					? { ...field, placeholder: 'Add a title' }
+					: field
+			);
+			const formWithPlaceholder = {
+				...formPanelMode,
+				layout: {
+					...formPanelMode.layout,
+					empty: 'placeholder' as const,
+				},
+			};
+
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithPlaceholder }
+					form={ formWithPlaceholder }
+					data={ { ...data, title: '' } }
+				/>
+			);
+
+			expect( screen.getByText( 'Add a title' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should render the value of a non-empty field instead of its placeholder', () => {
+			const fieldsWithPlaceholder = fields.map( ( field ) =>
+				field.id === 'title'
+					? { ...field, placeholder: 'Add a title' }
+					: field
+			);
+			const formWithPlaceholder = {
+				...formPanelMode,
+				layout: {
+					...formPanelMode.layout,
+					empty: 'placeholder' as const,
+				},
+			};
+
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithPlaceholder }
+					form={ formWithPlaceholder }
+					data={ data }
+				/>
+			);
+
+			expect( screen.getByText( 'Hello World' ) ).toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Add a title' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should render an empty field without a placeholder when the layout opts in', () => {
+			const fieldsWithCustomRender = fields.map( ( field ) =>
+				field.id === 'title'
+					? { ...field, render: () => <span>No title yet</span> }
+					: field
+			);
+			const formWithPlaceholder = {
+				...formPanelMode,
+				layout: {
+					...formPanelMode.layout,
+					empty: 'placeholder' as const,
+				},
+			};
+
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithCustomRender }
+					form={ formWithPlaceholder }
+					data={ { ...data, title: '' } }
+				/>
+			);
+
+			expect( screen.getByText( 'No title yet' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should not show the placeholder of an empty field by default', () => {
+			const fieldsWithPlaceholder = fields.map( ( field ) =>
+				field.id === 'title'
+					? { ...field, placeholder: 'Add a title' }
+					: field
+			);
+
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithPlaceholder }
+					form={ formPanelMode }
+					data={ { ...data, title: '' } }
+				/>
+			);
+
+			expect(
+				screen.queryByText( 'Add a title' )
+			).not.toBeInTheDocument();
+		} );
+
 		it( 'should render custom Edit component', async () => {
 			const fieldsWithTitleCustomEditComponent = fields.map(
 				( field ) => {

@@ -66,6 +66,12 @@ export type NormalizedRegularLayout = {
 export type EditVisibility = 'always' | 'on-hover';
 
 /**
+ * What the summary of a panel field shows when the field's value is empty:
+ * the field's `render` output, or the field's `placeholder`.
+ */
+export type EmptySummary = 'render' | 'placeholder';
+
+/**
  * Configuration to open a panel's edit control in a dropdown.
  */
 type PanelOpenAsDropdown = {
@@ -129,6 +135,13 @@ export type PanelLayout = {
 	 * When the edit trigger is visible: always, or only on hover/focus (default).
 	 */
 	editVisibility?: EditVisibility;
+
+	/**
+	 * What the summary shows when the field's value is `undefined`, `null`,
+	 * or an empty string: the field's `render` output (default), or the
+	 * field's `placeholder`.
+	 */
+	empty?: EmptySummary;
 };
 
 /**
@@ -159,6 +172,11 @@ export type NormalizedPanelLayout = {
 	 * When the edit trigger is visible.
 	 */
 	editVisibility: EditVisibility;
+
+	/**
+	 * What the summary shows when the field's value is empty.
+	 */
+	empty: EmptySummary;
 };
 
 /**
