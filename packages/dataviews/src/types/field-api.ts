@@ -532,7 +532,7 @@ export type FormatInteger = {
  */
 export type NormalizedField< Item > = Omit<
 	Field< Item >,
-	'Edit' | 'isValid' | 'sort'
+	'Edit' | 'isValid'
 > & {
 	/**
 	 * The label of the field. Defaults to the id.
@@ -577,8 +577,10 @@ export type NormalizedField< Item > = Omit<
 	/**
 	 * Callback used to sort the field. Defaults to the sorter
 	 * of the field's type.
+	 *
+	 * Receives the field valuesof the two items being compared.
 	 */
-	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
+	sort: ( a: any, b: any, direction: SortDirection ) => number;
 
 	/**
 	 * The validation rules of the field, normalized.
