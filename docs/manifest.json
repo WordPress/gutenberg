@@ -1176,12 +1176,6 @@
 		"parent": "core-blocks-widgets"
 	},
 	{
-		"title": "Template Part",
-		"slug": "core-block-template-part",
-		"markdown_source": "../packages/block-library/src/template-part/README.md",
-		"parent": "core-blocks-theme"
-	},
-	{
 		"title": "Term Count",
 		"slug": "core-block-term-count",
 		"markdown_source": "../packages/block-library/src/term-count/README.md",

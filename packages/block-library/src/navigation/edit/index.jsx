@@ -65,13 +65,8 @@ import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 import useLayoutCustomProperties from './use-layout-custom-properties';
-import {
-	DEFAULT_BLOCK,
-	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
-} from '../constants';
-import useOverlayPatterns, {
-	areTemplatePartsPatterns,
-} from './use-overlay-patterns';
+import { DEFAULT_BLOCK } from '../constants';
+import useOverlayPatterns from './use-overlay-patterns';
 
 const { isNavigationPostEditorKey } = unlock( blockEditorPrivateApis );
 
@@ -436,21 +431,9 @@ function Navigation( {
 		[ innerBlocks ]
 	);
 
-	// Check if any overlay template parts exist
-	const { records: overlayTemplateParts } = useEntityRecords(
-		'postType',
-		'wp_template_part',
-		{
-			per_page: -1,
-		}
-	);
+	// Check if any overlays exist: patterns of the overlay area.
 	const { overlays: overlayPatterns } = useOverlayPatterns();
-	const hasOverlays = areTemplatePartsPatterns()
-		? overlayPatterns.length > 0
-		: overlayTemplateParts?.some(
-				( templatePart ) =>
-					templatePart.area === NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
-		  ) ?? false;
+	const hasOverlays = overlayPatterns.length > 0;
 
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] =
 		useState( false );

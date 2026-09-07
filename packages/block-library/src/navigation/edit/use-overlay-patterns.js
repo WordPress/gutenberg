@@ -5,18 +5,20 @@ import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 const EMPTY_ARRAY = [];
 
 /**
- * Whether template parts are registered patterns here (Gutenberg plugin).
+ * The registered pattern name of an overlay: `theme/part/slug`. A value that
+ * already is a pattern name is returned as is.
  *
- * @return {boolean} True when overlays are patterns of the overlay area.
+ * @param {string} theme The active theme's stylesheet.
+ * @param {string} slug  The overlay slug, as stored in the `overlay` attribute.
+ * @return {string} The pattern name.
  */
-export function areTemplatePartsPatterns() {
-	return !! window?.__wpTemplatePartsAsPatterns;
+export function getOverlayPatternName( theme, slug ) {
+	return slug.includes( '/part/' ) ? slug : `${ theme }/part/${ slug }`;
 }
 
 /**
- * The registered patterns of the `navigation-overlay` area, normalized to
- * the shape the overlay selector expects from template parts: a `slug`
- * (the last segment of `theme/part/slug`) and a rendered title.
+ * The registered patterns of the `navigation-overlay` area, normalized to a
+ * `slug` (the last segment of `theme/part/slug`) and a rendered title.
  *
  * @return {{overlays: Object[], isResolving: boolean, hasResolved: boolean}} Overlays.
  */

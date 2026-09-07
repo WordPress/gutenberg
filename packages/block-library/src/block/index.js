@@ -6,7 +6,7 @@ import { select } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { addFilter } from '@wordpress/hooks';
 import initBlock from '../utils/init-block';
-import { getTemplatePartIcon } from '../template-part/edit/utils/get-template-part-icon';
+import { getTemplatePartAreaIcon } from '../utils/get-template-part-area-icon';
 import { unlock } from '../lock-unlock';
 import metadata from './block.json';
 import edit from './edit';
@@ -88,7 +88,7 @@ export function enhancePatternAreaVariations( blockSettings, blockName ) {
 			...variation,
 			...( ! variation.isActive && { isActive } ),
 			...( typeof variation.icon === 'string' && {
-				icon: getTemplatePartIcon( variation.icon ),
+				icon: getTemplatePartAreaIcon( variation.icon ),
 			} ),
 		} ) ),
 	};

@@ -4368,53 +4368,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/template-part/edit/advanced-controls.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/template-part/edit/import-controls.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 4
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/template-part/edit/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/template-part/edit/inner-blocks.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/template-part/edit/placeholder.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/template-part/edit/selection-modal.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/template-part/edit/title-modal.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/term-count/edit.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -5840,11 +5793,6 @@
 			"count": 1
 		}
 	},
-	"packages/edit-site/src/components/site-editor-routes/template-part-item.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/site-editor-routes/templates.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7162,26 +7110,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/template-part-content-panel/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/template-part-menu-items/convert-to-regular.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/template-part-menu-items/convert-to-template-part.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/template-part-menu-items/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/template-validation-notice/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7268,11 +7196,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/hooks/template-part-navigation-edit-button.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/store/test/selectors.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7342,11 +7265,6 @@
 	"packages/fields/src/actions/trash-post.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		}
-	},
-	"packages/fields/src/components/create-template-part-modal/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 4
 		}
 	},
 	"packages/fields/src/components/media-edit/index.tsx": {
@@ -8301,14 +8219,6 @@
 	"routes/template-list/stage.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 2
-		},
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"routes/template-part-list/stage.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
 		},
 		"@wordpress/use-recommended-components": {
 			"count": 1
