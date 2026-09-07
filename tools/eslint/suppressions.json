@@ -913,6 +913,11 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/content-group-heading/index.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/components/contrast-checker/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1

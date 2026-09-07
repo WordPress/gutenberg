@@ -1,0 +1,15 @@
+@use "@wordpress/base-styles/variables";
+
+.block-editor-content-group-heading {
+	display: flex;
+	flex-wrap: wrap;
+	gap: variables.$grid-unit-05;
+	padding: variables.$grid-unit-30 0 variables.$grid-unit-05;
+	margin: 0 !important;
+	font-size: var(--wpds-typography-font-size-sm);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
+.block-editor-content-group-heading__separator {
+	opacity: 0.6;
+}

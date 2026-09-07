@@ -19,6 +19,8 @@ import {
 	isBlockSubtreeDisabled,
 	getEnabledClientIdsTree,
 	getListViewClientIdsTree,
+	getContentGroupsForBlock,
+	getContentGroupHeadingClientIds,
 	getEnabledBlockParents,
 	getExpandedBlock,
 	isDragging,
@@ -1273,6 +1275,140 @@ describe( 'private selectors', () => {
 
 		// The memoization above is only reachable if the reducer preserves
 		// these references through a keystroke.
+
+		// A pattern whose grid contains two named cards, each holding one
+		// editable heading. Nothing is being edited, so the pattern is
+		// flattened and only the named containers hold the list together.
+		const createGroupedState = () => ( {
+			settings: {},
+			blocks: {
+				byClientId: new Map( [
+					[ 'pattern', { name: TEST_STRUCTURE_BLOCK } ],
+					[ 'grid', { name: TEST_STRUCTURE_BLOCK } ],
+					[ 'card-a', { name: TEST_STRUCTURE_BLOCK } ],
+					[ 'card-b', { name: TEST_STRUCTURE_BLOCK } ],
+					[ 'heading-a', { name: TEST_CONTENT_BLOCK } ],
+					[ 'heading-b', { name: TEST_CONTENT_BLOCK } ],
+				] ),
+				attributes: new Map( [
+					[
+						'pattern',
+						{ metadata: { patternName: 'test/pattern' } },
+					],
+					[ 'grid', { metadata: { name: 'Pricing table' } } ],
+					[ 'card-a', { metadata: { name: 'Lite' } } ],
+					[ 'card-b', { metadata: { name: 'Premium' } } ],
+				] ),
+				order: new Map( [
+					[ '', [ 'pattern' ] ],
+					[ 'pattern', [ 'grid' ] ],
+					[ 'grid', [ 'card-a', 'card-b' ] ],
+					[ 'card-a', [ 'heading-a' ] ],
+					[ 'card-b', [ 'heading-b' ] ],
+					[ 'heading-a', [] ],
+					[ 'heading-b', [] ],
+				] ),
+				parents: new Map( [
+					[ 'pattern', '' ],
+					[ 'grid', 'pattern' ],
+					[ 'card-a', 'grid' ],
+					[ 'card-b', 'grid' ],
+					[ 'heading-a', 'card-a' ],
+					[ 'heading-b', 'card-b' ],
+				] ),
+				blockEditingModes: new Map(),
+			},
+			blockListSettings: new Map(),
+			editedContentOnlySection: null,
+			blockMetadataRevision: 0,
+			derivedBlockEditingModes: new Map( [
+				[ 'pattern', 'disabled' ],
+				[ 'grid', 'disabled' ],
+				[ 'card-a', 'disabled' ],
+				[ 'card-b', 'disabled' ],
+				[ 'heading-a', 'contentOnly' ],
+				[ 'heading-b', 'contentOnly' ],
+			] ),
+		} );
+
+		it( 'surfaces named containers as grouping rows, nested to any depth', () => {
+			expect( getListViewClientIdsTree( createGroupedState() ) ).toEqual(
+				[
+					{
+						clientId: 'grid',
+						innerBlocks: [
+							{
+								clientId: 'card-a',
+								innerBlocks: [
+									{ clientId: 'heading-a', innerBlocks: [] },
+								],
+							},
+							{
+								clientId: 'card-b',
+								innerBlocks: [
+									{ clientId: 'heading-b', innerBlocks: [] },
+								],
+							},
+						],
+					},
+				]
+			);
+		} );
+
+		it( 'omits a named container that groups no editable content', () => {
+			const state = createGroupedState();
+			state.derivedBlockEditingModes.set( 'heading-a', 'disabled' );
+			state.derivedBlockEditingModes.set( 'heading-b', 'disabled' );
+
+			expect( getListViewClientIdsTree( state ) ).toEqual( [] );
+		} );
+
+		it( 'omits an unnamed container while keeping the named ones', () => {
+			const state = createGroupedState();
+			state.blocks.attributes.delete( 'grid' );
+
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{
+					clientId: 'card-a',
+					innerBlocks: [ { clientId: 'heading-a', innerBlocks: [] } ],
+				},
+				{
+					clientId: 'card-b',
+					innerBlocks: [ { clientId: 'heading-b', innerBlocks: [] } ],
+				},
+			] );
+		} );
+
+		it( 'rebuilds when a block is renamed', () => {
+			const state = createGroupedState();
+			const before = getListViewClientIdsTree( state );
+
+			const renamed = {
+				...state,
+				blocks: {
+					...state.blocks,
+					attributes: new Map( state.blocks.attributes ),
+				},
+				blockMetadataRevision: 1,
+			};
+			renamed.blocks.attributes.delete( 'card-a' );
+
+			expect( getListViewClientIdsTree( renamed ) ).not.toBe( before );
+			expect( getListViewClientIdsTree( renamed ) ).toEqual( [
+				{
+					clientId: 'grid',
+					innerBlocks: [
+						{ clientId: 'heading-a', innerBlocks: [] },
+						{
+							clientId: 'card-b',
+							innerBlocks: [
+								{ clientId: 'heading-b', innerBlocks: [] },
+							],
+						},
+					],
+				},
+			] );
+		} );
 		it( 'should keep its dependants referentially stable while typing', () => {
 			const block = ( clientId ) => ( {
 				clientId,
@@ -1299,6 +1435,98 @@ describe( 'private selectors', () => {
 			expect( getListViewClientIdsTree( next ) ).toBe(
 				getListViewClientIdsTree( state )
 			);
+		} );
+	} );
+
+	describe( 'content group paths', () => {
+		const TEST_CONTENT_BLOCK = 'core/test-group-path-content-block';
+		const TEST_STRUCTURE_BLOCK = 'core/test-group-path-structure-block';
+
+		const createState = () => ( {
+			settings: {},
+			blocks: {
+				byClientId: new Map( [
+					[ 'pattern', { name: TEST_STRUCTURE_BLOCK } ],
+					[ 'grid', { name: TEST_STRUCTURE_BLOCK } ],
+					[ 'card-a', { name: TEST_STRUCTURE_BLOCK } ],
+					[ 'card-b', { name: TEST_STRUCTURE_BLOCK } ],
+					[ 'heading-a', { name: TEST_CONTENT_BLOCK } ],
+					[ 'text-a', { name: TEST_CONTENT_BLOCK } ],
+					[ 'heading-b', { name: TEST_CONTENT_BLOCK } ],
+				] ),
+				attributes: new Map( [
+					[
+						'pattern',
+						{ metadata: { patternName: 'test/pattern' } },
+					],
+					[ 'grid', { metadata: { name: 'Pricing table' } } ],
+					[ 'card-a', { metadata: { name: 'Lite' } } ],
+					[ 'card-b', { metadata: { name: 'Premium' } } ],
+				] ),
+				order: new Map( [
+					[ '', [ 'pattern' ] ],
+					[ 'pattern', [ 'grid' ] ],
+					[ 'grid', [ 'card-a', 'card-b' ] ],
+					[ 'card-a', [ 'heading-a', 'text-a' ] ],
+					[ 'card-b', [ 'heading-b' ] ],
+					[ 'heading-a', [] ],
+					[ 'text-a', [] ],
+					[ 'heading-b', [] ],
+				] ),
+				parents: new Map( [
+					[ 'pattern', '' ],
+					[ 'grid', 'pattern' ],
+					[ 'card-a', 'grid' ],
+					[ 'card-b', 'grid' ],
+					[ 'heading-a', 'card-a' ],
+					[ 'text-a', 'card-a' ],
+					[ 'heading-b', 'card-b' ],
+				] ),
+				blockEditingModes: new Map(),
+			},
+			blockListSettings: new Map(),
+			editedContentOnlySection: null,
+			blockMetadataRevision: 0,
+			derivedBlockEditingModes: new Map( [
+				[ 'pattern', 'disabled' ],
+				[ 'grid', 'disabled' ],
+				[ 'card-a', 'disabled' ],
+				[ 'card-b', 'disabled' ],
+				[ 'heading-a', 'contentOnly' ],
+				[ 'text-a', 'contentOnly' ],
+				[ 'heading-b', 'contentOnly' ],
+			] ),
+		} );
+
+		it( 'returns the group path outermost first', () => {
+			expect(
+				getContentGroupsForBlock( createState(), 'heading-a' )
+			).toEqual( [ 'grid', 'card-a' ] );
+		} );
+
+		it( 'returns an empty path for a block outside any named group', () => {
+			const state = createState();
+			state.blocks.attributes.delete( 'grid' );
+			state.blocks.attributes.delete( 'card-a' );
+
+			expect( getContentGroupsForBlock( state, 'heading-a' ) ).toEqual(
+				[]
+			);
+		} );
+
+		it( 'heads only the first content row of each group', () => {
+			const state = createState();
+
+			expect(
+				getContentGroupHeadingClientIds( state, 'heading-a' )
+			).toEqual( [ 'grid', 'card-a' ] );
+			// Same group as heading-a, so it sits under a heading already rendered.
+			expect(
+				getContentGroupHeadingClientIds( state, 'text-a' )
+			).toEqual( [] );
+			expect(
+				getContentGroupHeadingClientIds( state, 'heading-b' )
+			).toEqual( [ 'grid', 'card-b' ] );
 		} );
 	} );
 

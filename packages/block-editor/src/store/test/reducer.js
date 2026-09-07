@@ -34,6 +34,7 @@ import {
 	blockListSettings,
 	settings,
 	lastBlockAttributesChange,
+	blockMetadataRevision,
 	lastBlockInserted,
 	expandedBlock,
 	zoomLevel,
@@ -3717,6 +3718,76 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( new Map() );
+		} );
+	} );
+
+	describe( 'blockMetadataRevision', () => {
+		it( 'defaults to 0', () => {
+			expect( blockMetadataRevision( undefined, {} ) ).toBe( 0 );
+		} );
+
+		it( 'does not change while typing into a block', () => {
+			expect(
+				blockMetadataRevision( 3, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					clientIds: [ 'chicken' ],
+					attributes: { content: 'ribs' },
+				} )
+			).toBe( 3 );
+		} );
+
+		it( 'changes when an attribute update includes metadata', () => {
+			expect(
+				blockMetadataRevision( 3, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					clientIds: [ 'chicken' ],
+					attributes: { metadata: { name: 'Lite' } },
+				} )
+			).toBe( 4 );
+		} );
+
+		it( 'changes when metadata is cleared', () => {
+			expect(
+				blockMetadataRevision( 3, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					clientIds: [ 'chicken' ],
+					attributes: { metadata: undefined },
+				} )
+			).toBe( 4 );
+		} );
+
+		it( 'changes when any block in a per-block update includes metadata', () => {
+			expect(
+				blockMetadataRevision( 3, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					clientIds: [ 'chicken', 'ribs' ],
+					attributes: {
+						chicken: { content: 'ribs' },
+						ribs: { metadata: { name: 'Premium' } },
+					},
+					options: { uniqueByBlock: true },
+				} )
+			).toBe( 4 );
+		} );
+
+		it( 'changes when a whole-block update includes metadata', () => {
+			expect(
+				blockMetadataRevision( 3, {
+					type: 'UPDATE_BLOCK',
+					clientId: 'chicken',
+					updates: { attributes: { metadata: { name: 'Lite' } } },
+				} )
+			).toBe( 4 );
+		} );
+
+		it( 'does not change when a whole-block update omits attributes', () => {
+			expect(
+				blockMetadataRevision( 3, {
+					type: 'UPDATE_BLOCK',
+					clientId: 'chicken',
+					updates: {},
+				} )
+			).toBe( 3 );
 		} );
 	} );
 

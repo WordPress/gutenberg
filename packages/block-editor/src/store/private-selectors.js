@@ -41,6 +41,8 @@ import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/const
 const { isContentBlock, editableRootKey } = unlock( blocksPrivateApis );
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
+const EMPTY_ARRAY = [];
+
 export { getBlockSettings } from './get-block-settings';
 
 function isViewportAvailable( state, viewport ) {
@@ -159,48 +161,25 @@ function hasContentOnlyDescendant( state, clientId ) {
 }
 
 /**
- * Returns whether any ancestor of the block is already surfaced as a grouping
- * row, so that only the top-most named container in a pattern becomes a group
- * and the inspector does not nest groups within groups.
- *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client ID of the block.
- *
- * @return {boolean} Whether an ancestor already groups content.
- */
-function hasContentGroupAncestor( state, clientId ) {
-	let parent = state.blocks.parents.get( clientId );
-
-	while ( parent !== undefined ) {
-		if (
-			getBlockEditingMode( state, parent ) === 'disabled' &&
-			!! getBlockAttributes( state, parent )?.metadata?.name
-		) {
-			return true;
-		}
-
-		parent = state.blocks.parents.get( parent );
-	}
-
-	return false;
-}
-
-/**
  * Returns whether a disabled block should be surfaced in List View as a row
  * that groups the content blocks beneath it. A pattern author opts a container
  * in by naming it (the block rename feature), and the name is only meaningful
- * as a group when there is editable content under it to group. Only the
- * top-most named container becomes a group, to keep the flattened list flat.
+ * as a group when there is editable content under it to group.
+ *
+ * Groups nest to any depth, so a named card inside a named grid keeps both
+ * rows. Nesting mirrors the markup the author wrote: a container only becomes
+ * a row by being named, so the depth of the result is the depth the author
+ * asked for rather than the depth of the block tree.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the block.
  *
  * @return {boolean} Whether the block groups content in List View.
  */
-function isContentGroupBlock( state, clientId ) {
+export function isContentGroupBlock( state, clientId ) {
 	return (
+		getBlockEditingMode( state, clientId ) === 'disabled' &&
 		!! getBlockAttributes( state, clientId )?.metadata?.name &&
-		! hasContentGroupAncestor( state, clientId ) &&
 		hasContentOnlyDescendant( state, clientId )
 	);
 }
@@ -464,6 +443,10 @@ export const getListViewClientIdsTree = createSelector(
 		state.blocks.blockEditingModes,
 		state.blocks.parents,
 		state.editedContentOnlySection,
+		// Bumped only when a block's `metadata` changes, so that reading
+		// `metadata.name` to decide whether a container groups content does
+		// not rebuild the tree on every keystroke.
+		state.blockMetadataRevision,
 		// The state below is only read to resolve a block's parent section,
 		// which the tree does only while a content-only section is being
 		// edited. Depending on it otherwise rebuilds the tree on every
@@ -479,28 +462,29 @@ export const getListViewClientIdsTree = createSelector(
 	]
 );
 
-function getTopMostNamedContentGroupForBlockUnmemoized( state, clientId ) {
+function getContentGroupsForBlockUnmemoized( state, clientId ) {
 	const sectionClientId = getParentSectionBlock( state, clientId );
 	if ( ! sectionClientId ) {
-		return null;
+		return EMPTY_ARRAY;
 	}
 
 	const parents = getBlockParents( state, clientId );
 	const sectionIndex = parents.indexOf( sectionClientId );
 	if ( sectionIndex === -1 ) {
-		return null;
+		return EMPTY_ARRAY;
 	}
 
-	for ( const parent of parents.slice( sectionIndex + 1 ) ) {
-		const isNamedDisabledParent =
-			getBlockEditingMode( state, parent ) === 'disabled' &&
-			!! getBlockAttributes( state, parent )?.metadata?.name;
-		if ( isNamedDisabledParent ) {
-			return parent;
-		}
-	}
+	// `getBlockParents` returns ancestors outermost first, so slicing past the
+	// section keeps the path within the pattern, in the order it reads.
+	const groups = parents
+		.slice( sectionIndex + 1 )
+		.filter(
+			( parent ) =>
+				getBlockEditingMode( state, parent ) === 'disabled' &&
+				!! getBlockAttributes( state, parent )?.metadata?.name
+		);
 
-	return null;
+	return groups.length ? groups : EMPTY_ARRAY;
 }
 
 /**
@@ -540,7 +524,6 @@ export const getContentClientIdsForSection = createSelector(
 	( state ) => [
 		state.blocks.order,
 		state.blocks.byClientId,
-		state.blocks.attributes,
 		state.derivedBlockEditingModes,
 		state.blocks.blockEditingModes,
 		state.blockListSettings,
@@ -548,61 +531,79 @@ export const getContentClientIdsForSection = createSelector(
 );
 
 /**
- * Returns the top-most named disabled grouping block for a content block.
+ * Returns the named containers that group a content block, outermost first.
+ *
+ * Groups nest, so a heading built from this reads as a path — "Pricing table
+ * / Premium" — which is what distinguishes two identically named cards under
+ * different parents.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the content block.
  *
- * @return {?string} Client ID of the grouping block, or null.
+ * @return {string[]} Client IDs of the grouping blocks, outermost first.
  */
-export const getTopMostNamedContentGroupForBlock = createSelector(
-	getTopMostNamedContentGroupForBlockUnmemoized,
+export const getContentGroupsForBlock = createSelector(
+	getContentGroupsForBlockUnmemoized,
 	( state ) => [
 		state.blocks.parents,
 		state.blocks.byClientId,
-		state.blocks.attributes,
 		state.derivedBlockEditingModes,
 		state.blocks.blockEditingModes,
 		state.blockListSettings,
 		state.editedContentOnlySection,
 		state.settings,
+		state.blockMetadataRevision,
 	]
 );
 
 /**
- * Returns a group heading client ID for the first content row in a named group.
- * Later content rows in the same group return null.
+ * Returns the innermost named container that groups a content block.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the content block.
  *
  * @return {?string} Client ID of the grouping block, or null.
  */
-export const getContentGroupHeaderClientId = createSelector(
+export function getContentGroupForBlock( state, clientId ) {
+	const groups = getContentGroupsForBlock( state, clientId );
+	return groups.length ? groups[ groups.length - 1 ] : null;
+}
+
+/**
+ * Returns the group path to render as a heading above a content row, or an
+ * empty array when the row is not the first of its group and so sits under a
+ * heading that has already been rendered.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the content block.
+ *
+ * @return {string[]} Client IDs of the grouping blocks, outermost first.
+ */
+export const getContentGroupHeadingClientIds = createSelector(
 	( state, clientId ) => {
-		const groupClientId = getTopMostNamedContentGroupForBlock(
-			state,
-			clientId
-		);
+		const groupClientId = getContentGroupForBlock( state, clientId );
 		if ( ! groupClientId ) {
-			return null;
+			return EMPTY_ARRAY;
 		}
 
 		const sectionClientId = getParentSectionBlock( state, clientId );
 		if ( ! sectionClientId ) {
-			return null;
+			return EMPTY_ARRAY;
 		}
 
+		// A group's content rows are consecutive in document order, so the
+		// first row carrying this group is the one the heading belongs above.
 		const firstClientIdInGroup = getContentClientIdsForSection(
 			state,
 			sectionClientId
 		).find(
 			( current ) =>
-				getTopMostNamedContentGroupForBlock( state, current ) ===
-				groupClientId
+				getContentGroupForBlock( state, current ) === groupClientId
 		);
 
-		return firstClientIdInGroup === clientId ? groupClientId : null;
+		return firstClientIdInGroup === clientId
+			? getContentGroupsForBlock( state, clientId )
+			: EMPTY_ARRAY;
 	},
 	( state ) => [
 		state.blocks.order,
@@ -614,6 +615,7 @@ export const getContentGroupHeaderClientId = createSelector(
 		state.blockListSettings,
 		state.editedContentOnlySection,
 		state.settings,
+		state.blockMetadataRevision,
 	]
 );
 
@@ -875,8 +877,6 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 		);
 	}, getAllPatternsDependants( select ) )
 );
-
-const EMPTY_ARRAY = [];
 
 export const getReusableBlocks = createRegistrySelector(
 	( select ) => ( state ) => {
