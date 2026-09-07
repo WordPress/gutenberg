@@ -4,6 +4,21 @@ import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { Elevation } from '..';
 
+function ConsumerShadow( { value }: { value: number } ) {
+	return (
+		<>
+			<style>{ `@layer elevation-consumer {
+				.elevation-consumer-shadow { box-shadow: 0 0 0 3px green; }
+			}` }</style>
+			<Elevation
+				value={ value }
+				className="elevation-consumer-shadow"
+				data-testid="elevation"
+			/>
+		</>
+	);
+}
+
 describe( 'Elevation', () => {
 	it( 'renders the base elevation styles', async () => {
 		await render( <Elevation data-testid="elevation" /> );
@@ -186,6 +201,37 @@ describe( 'Elevation', () => {
 		await userEvent.keyboard( '[Space>]' );
 		await expect.poll( getShadow ).toBe( active );
 		await userEvent.keyboard( '[/Space]' );
+	}
+);
+
+	it.each( [
+	{ name: 'negative', value: -1 },
+	{ name: 'NaN', value: NaN },
+	{ name: 'infinite', value: Infinity },
+] )(
+	'preserves a consumer shadow when the base value is $name',
+	async ( { value } ) => {
+		await render( <ConsumerShadow value={ value } /> );
+
+		expect(
+			getComputedStyle( page.getByTestId( 'elevation' ).element() )
+				.boxShadow
+		).toBe( 'rgb(0, 128, 0) 0px 0px 0px 3px' );
+	}
+);
+
+	it.each( [
+	{ value: 0, shadow: 'rgba(0, 0, 0, 0) 0px 0px 0px 0px' },
+	{ value: 5, shadow: 'rgba(0, 0, 0, 0.25) 0px 5px 10px 0px' },
+] )(
+	'applies the base shadow above a consumer layer for value $value',
+	async ( { value, shadow } ) => {
+		await render( <ConsumerShadow value={ value } /> );
+
+		expect(
+			getComputedStyle( page.getByTestId( 'elevation' ).element() )
+				.boxShadow
+		).toBe( shadow );
 	}
 );
 } );
