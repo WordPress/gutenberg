@@ -8,14 +8,14 @@ function getAriaOwners( element: HTMLElement ) {
 		return [];
 	}
 
+	const escapedId = element.id
+		.replaceAll( '\\', '\\\\' )
+		.replaceAll( '"', '\\"' );
+
 	return Array.from(
-		element.ownerDocument.querySelectorAll< HTMLElement >( '[aria-owns]' )
-	).filter(
-		( owner ) =>
-			owner
-				.getAttribute( 'aria-owns' )
-				?.split( /\s+/ )
-				.includes( element.id )
+		element.ownerDocument.querySelectorAll< HTMLElement >(
+			`[aria-owns~="${ escapedId }"]`
+		)
 	);
 }
 
@@ -86,5 +86,5 @@ export function useValidateTreeGridStructure(
 					: 'TreeGridCell must be rendered as a cell in a row that belongs to an element with role="treegrid".'
 			);
 		}
-	} );
+	}, [ componentName, elementRef ] );
 }
