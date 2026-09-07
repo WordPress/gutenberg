@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getSettings, setSettings } from '@wordpress/date';
@@ -6,7 +7,12 @@ import normalizeFields from '../../../field-types';
 import DateTime from '../datetime';
 import type { DataFormControlProps } from '../../../types';
 
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
+vi.mock(
+	import( '@wordpress/a11y' ),
+	() => ( { speak: vi.fn() } ) as unknown as typeof import('@wordpress/a11y')
+);
+
+globalThis.wpVitest.mockMatchMedia();
 
 const noop = () => {};
 
@@ -66,7 +72,7 @@ describe( 'DateTime control', () => {
 
 	afterEach( () => {
 		setSettings( originalSettings );
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
 	it( 'should move the calendar to the month of a value changed from outside the control', () => {
@@ -133,7 +139,7 @@ describe( 'DateTime control', () => {
 	} );
 
 	/**
-	 * Jest pins the browser timezone to UTC, so the mismatch is created from
+	 * The test environment pins the browser timezone to UTC, so the mismatch is created from
 	 * the WordPress side. A site configured with a manual UTC offset reports an
 	 * empty `timezone.string`, and the control passes the offset to Calendar.
 	 *
@@ -223,11 +229,9 @@ describe( 'DateTime control', () => {
 			setSiteOffset( -8 );
 			// Freeze the clock: with no value the calendar opens on the
 			// current month, and the day clicked below must be in it.
-			jest.useFakeTimers();
-			jest.setSystemTime( new Date( '2026-08-15T12:00:00.000Z' ) );
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			vi.useFakeTimers( { toFake: [ 'Date' ] } );
+			vi.setSystemTime( new Date( '2026-08-15T12:00:00.000Z' ) );
+			const user = userEvent.setup();
 
 			render( <DateTimeHarness initialValue="" /> );
 
@@ -241,9 +245,9 @@ describe( 'DateTime control', () => {
 		} );
 
 		it( "should mark the site's today", () => {
-			jest.useFakeTimers();
+			vi.useFakeTimers();
 			// 20:00 UTC on Aug 15 is already Aug 16 on a UTC+14 site.
-			jest.setSystemTime( new Date( '2026-08-15T20:00:00.000Z' ) );
+			vi.setSystemTime( new Date( '2026-08-15T20:00:00.000Z' ) );
 			setSiteOffset( 14 );
 
 			render(
@@ -351,9 +355,9 @@ describe( 'DateTime control', () => {
 					abbr: 'UTC',
 				},
 			} );
-			// Jest pins the browser to UTC, so this mismatch is created from
-			// the browser side: UTC+1, i.e. an offset of -60 minutes.
-			const offsetSpy = jest
+			// The test environment pins the browser to UTC. Create the mismatch
+			// from the browser side: UTC+1, i.e. an offset of -60 minutes.
+			const offsetSpy = vi
 				.spyOn( Date.prototype, 'getTimezoneOffset' )
 				.mockReturnValue( -60 );
 

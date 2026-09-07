@@ -2,13 +2,13 @@ import { createRequire } from 'node:module';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 const require = createRequire( import.meta.url );
 const fs = require( 'node:fs' );
-const readFile = vi
+let readFile = vi
 	.spyOn( fs.promises, 'readFile' )
 	.mockImplementation( () => undefined );
-const writeFile = vi
+let writeFile = vi
 	.spyOn( fs.promises, 'writeFile' )
 	.mockImplementation( () => undefined );
-const mkdir = vi.spyOn( fs.promises, 'mkdir' ).mockResolvedValue();
+let mkdir = vi.spyOn( fs.promises, 'mkdir' ).mockResolvedValue();
 const {
 	didCacheChange,
 	setCache,
@@ -43,6 +43,9 @@ function setupWriteFile() {
 
 describe( 'cache file', () => {
 	beforeEach( () => {
+		readFile = vi.spyOn( fs.promises, 'readFile' );
+		writeFile = vi.spyOn( fs.promises, 'writeFile' );
+		mkdir = vi.spyOn( fs.promises, 'mkdir' );
 		readFile.mockReset().mockImplementation( () => undefined );
 		writeFile.mockReset().mockImplementation( () => undefined );
 		mkdir.mockReset().mockResolvedValue();
