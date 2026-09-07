@@ -7809,11 +7809,6 @@
 			"count": 1
 		}
 	},
-	"packages/media-fields/src/alt_text/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/media-fields/src/author/view.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
