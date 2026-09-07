@@ -183,14 +183,14 @@ describe( 'canvasConvertToJpeg', () => {
 
 			// Strategy 2 supports the type, so the browser can decode HEIC.
 			// The decode itself fails, which a damaged file does.
-			( global as any ).ImageDecoder = vi
-				.fn()
-				.mockImplementation( () => ( {
+			( global as any ).ImageDecoder = vi.fn( function () {
+				return {
 					decode: vi
 						.fn()
 						.mockRejectedValue( new Error( 'Corrupt image data' ) ),
 					close: vi.fn(),
-				} ) );
+				};
+			} );
 			( global as any ).ImageDecoder.isTypeSupported = vi
 				.fn()
 				.mockResolvedValue( true );
