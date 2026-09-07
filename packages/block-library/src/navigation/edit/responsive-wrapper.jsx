@@ -16,10 +16,10 @@ import { getOverlayPatternName } from './use-overlay-patterns';
 /**
  * The action creating (or reusing) the edited copy of a registered pattern.
  *
- * @return {Function} The `createPatternOverride` action.
+ * @return {Function} The `customizePattern` action.
  */
-function useCreatePatternOverride() {
-	return unlock( useDispatch( patternsStore ) ).createPatternOverride;
+function useCustomizePattern() {
+	return unlock( useDispatch( patternsStore ) ).customizePattern;
 }
 
 export default function ResponsiveWrapper( {
@@ -49,7 +49,7 @@ export default function ResponsiveWrapper( {
 				: null,
 		[ overlay, currentTheme ]
 	);
-	const createPatternOverride = useCreatePatternOverride();
+	const customizePattern = useCustomizePattern();
 
 	if ( ! isResponsive ) {
 		return children;
@@ -110,7 +110,7 @@ export default function ResponsiveWrapper( {
 		// a registered pattern is edited through its copy, created on first
 		// edit.
 		if ( overlay && overlayPattern && onNavigateToEntityRecord ) {
-			const copy = await createPatternOverride( overlayPattern );
+			const copy = await customizePattern( overlayPattern );
 			onNavigateToEntityRecord( {
 				postId: copy.id,
 				postType: 'wp_block',

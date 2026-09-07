@@ -16,10 +16,10 @@ jest.mock( '@wordpress/patterns', () => ( {
 } ) );
 
 // Mock lock-unlock: editing a registered overlay creates its copy.
-const mockCreatePatternOverride = jest.fn();
+const mockCustomizePattern = jest.fn();
 jest.mock( '../../../lock-unlock', () => ( {
 	unlock: () => ( {
-		createPatternOverride: mockCreatePatternOverride,
+		customizePattern: mockCustomizePattern,
 	} ),
 } ) );
 
@@ -99,7 +99,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			isResolving: false,
 			hasResolved: false,
 		} );
-		mockCreatePatternOverride.mockResolvedValue( { id: 123 } );
+		mockCustomizePattern.mockResolvedValue( { id: 123 } );
 		useCreateOverlayTemplatePart.mockReturnValue(
 			mockCreateOverlayTemplatePart
 		);
@@ -407,7 +407,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			// Should create (or reuse) the copy of the overlay pattern and
 			// open it.
-			expect( mockCreatePatternOverride ).toHaveBeenCalledWith(
+			expect( mockCustomizePattern ).toHaveBeenCalledWith(
 				templatePart1.pattern
 			);
 			await waitFor( () =>

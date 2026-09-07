@@ -21,11 +21,11 @@ jest.mock( '@wordpress/patterns', () => ( {
 
 // Mock lock-unlock: the overlay pattern lookup and the copy creation.
 const mockGetPatternBySlug = jest.fn();
-const mockCreatePatternOverride = jest.fn();
+const mockCustomizePattern = jest.fn();
 jest.mock( '../../../lock-unlock', () => ( {
 	unlock: () => ( {
 		getPatternBySlug: mockGetPatternBySlug,
-		createPatternOverride: mockCreatePatternOverride,
+		customizePattern: mockCustomizePattern,
 	} ),
 } ) );
 
@@ -73,7 +73,7 @@ describe( 'ResponsiveWrapper', () => {
 			title: 'My Overlay',
 			area: 'navigation-overlay',
 		} ) );
-		mockCreatePatternOverride.mockResolvedValue( { id: 123 } );
+		mockCustomizePattern.mockResolvedValue( { id: 123 } );
 		// Mock useSelect - component calls: select( coreStore ).getCurrentTheme()?.stylesheet
 		useSelect.mockImplementation( ( selector ) => {
 			if ( typeof selector === 'function' ) {
@@ -117,7 +117,7 @@ describe( 'ResponsiveWrapper', () => {
 					postType: 'wp_block',
 				} )
 			);
-			expect( mockCreatePatternOverride ).toHaveBeenCalledWith(
+			expect( mockCustomizePattern ).toHaveBeenCalledWith(
 				expect.objectContaining( {
 					name: 'twentytwentyfive/part/my-overlay',
 				} )
