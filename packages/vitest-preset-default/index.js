@@ -1,6 +1,10 @@
+import { createRequire } from 'node:module';
 import react from '@vitejs/plugin-react-swc';
 import { playwright } from '@vitest/browser-playwright';
 import { configDefaults, defineConfig } from 'vitest/config';
+
+const require = createRequire( import.meta.url );
+const emotionPlugin = require.resolve( '@swc/plugin-emotion' );
 
 const TEST_EXTENSIONS = '{js,jsx,ts,tsx,mjs,mts,cjs,cts}';
 const DEFAULT_TEST_PATTERNS = [
@@ -29,7 +33,7 @@ export default defineConfig( {
 		react( {
 			plugins: [
 				[
-					'@swc/plugin-emotion',
+					emotionPlugin,
 					{
 						autoLabel: 'always',
 						labelFormat: '[local]',
