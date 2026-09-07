@@ -34,14 +34,20 @@
 
 			&.is-disabled,
 			&:has([data-can-disable-input-layout][data-disabled]) {
-				/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
-				background-color: var(--wpds-color-background-interactive-neutral-disabled, var(--wpds-color-background-surface-neutral-strong));
-				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media (forced-colors: active) {
-					border-color: GrayText;
 					color: GrayText;
+				}
+
+				&:not(.is-borderless) {
+					/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
+					background-color: var(--wpds-color-background-interactive-neutral-disabled, var(--wpds-color-background-surface-neutral-strong));
+					border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+
+					@media (forced-colors: active) {
+						border-color: GrayText;
+					}
 				}
 			}
 

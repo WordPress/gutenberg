@@ -1,5 +1,24 @@
 == Changelog ==
 
+= 23.9.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+- Upgrade React 19 to 19.2.8, read version from package.json. ([82439](https://github.com/WordPress/gutenberg/pull/82439))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@jsnajdr
+
+
 = 23.9.0 =
 
 ### Enhancements

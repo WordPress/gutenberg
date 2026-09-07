@@ -79,7 +79,7 @@ export const Minimal: Story = {
 				aria-label="Item"
 				key="trigger"
 			/>,
-			<Select.Popup key="popup">
+			<Select.Popup width="content" key="popup">
 				{ Array.from( { length: 6 }, ( _, index ) => (
 					<Select.Item
 						key={ index }
