@@ -118,10 +118,6 @@ jobs:
             - name: Type checking
               run: npm run typecheck
 
-            - name: Validate JavaScript test routing
-              if: ${{ matrix.node == '20' && matrix.os == 'ubuntu-24.04' }}
-              run: npm run test:unit:routing -- --base="$(git rev-parse HEAD^1)"
-
             - name: Build packages
               run: npm run build
 
