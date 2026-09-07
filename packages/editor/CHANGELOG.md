@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   User autocompleter: Don't open the mention popup when the `@` follows other text, such as while typing an email address; mentions still trigger at the start of a line or after a space ([#47249](https://github.com/WordPress/gutenberg/pull/47249)).
+
 ### Enhancements
 
 -   Show a "Privacy Policy Page" badge in the document bar and the post card panel for the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).

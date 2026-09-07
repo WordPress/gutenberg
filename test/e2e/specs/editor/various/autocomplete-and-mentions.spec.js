@@ -82,17 +82,29 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		const [ completer, type ] = completerAndOptionType;
 
 		if ( type === 'mention' ) {
-			test( `${ completer }: should not trigger ${ type } if when the immediately preceding character is not a space`, async ( {
+			test( `${ completer }: should not trigger ${ type } when the immediately preceding character is not a space`, async ( {
 				page,
 				editor,
 			} ) => {
 				await editor.canvas
-					.locator( 'role=button[name="Add default block"i]' )
+					.getByRole( 'document', { name: 'Add default block' } )
 					.click();
 				await page.keyboard.type( 'email@da' );
+
+				// Allow time for the autocomplete trigger effects to settle.
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+				await page.waitForTimeout( 100 );
+				await expect( page.getByRole( 'listbox' ) ).toBeHidden();
+
+				// Enter must break the line rather than accept a completion.
+				await page.keyboard.press( 'Enter' );
 				await expect.poll( editor.getEditedPostContent )
 					.toBe( `<!-- wp:paragraph -->
 <p>email@da</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
 <!-- /wp:paragraph -->` );
 			} );
 		}
