@@ -9,6 +9,10 @@ description: Use when writing, running, or debugging tests in the Gutenberg repo
 
 Before writing any test bodies, draft the test names — behavior from the user's perspective, one behavior per case (see [Describing tests](../../../docs/contributors/code/testing-overview.md#describing-tests)) — and confirm the list with the author. Every proposed case must trace to the behavior being added or changed; do not pad the list with adjacent or unrelated coverage. If working unattended, put the proposed list in your summary for review instead.
 
+## Prepare isolated worktrees once
+
+Before the first focused test or commit in a fresh or isolated worktree, complete the setup in the root `AGENTS.md`. Confirm that the required test runner and generated package artifacts are available. Do not use dependencies or generated artifacts from another lockfile revision as verification evidence; run the repository setup in this worktree instead. If installation skipped lifecycle scripts and a commit is in scope, run `npm run prepare` before committing. Build only the package artifacts required by the focused test.
+
 ## Never make a failing test pass by weakening it
 
 No loosened assertions, no added waits or timeouts, no skipped cases without saying so. Diagnose the root cause, or report the failure honestly.
