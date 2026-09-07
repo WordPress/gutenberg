@@ -4,6 +4,7 @@
 
 ### New Features
 
+-   Pattern: Add `hasWrapper`, `tagName` and `area` attributes. New instances render inside an element like template parts (`hasWrapper`), instances created earlier keep their markup. The element is `tagName`, else the element of the `area` (a template part area such as `header`, from the instance or from the pattern's registration), else `div`. The area also provides the icon and title, and a "Replace" action listing patterns of the same area. `area` and `tagName` have controls under Advanced ([#82551](https://github.com/WordPress/gutenberg/pull/82551)).
 -   Pattern: Resolve a registered pattern referenced by `slug` to its edited copy (a `wp_block` post carrying the `wp_pattern_slug` meta) when one exists, and offer "Edit original" on such blocks, creating the copy on first use ([#82549](https://github.com/WordPress/gutenberg/pull/82549)).
 -   Pattern: Add a `slug` attribute so a `core/block` can reference a registered pattern (theme, plugin or core) by name, with pattern overrides working the same way as for user patterns ([#82544](https://github.com/WordPress/gutenberg/pull/82544)).
 

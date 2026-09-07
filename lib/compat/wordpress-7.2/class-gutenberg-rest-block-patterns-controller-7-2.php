@@ -25,11 +25,14 @@ class Gutenberg_REST_Block_Patterns_Controller_7_2 extends Gutenberg_REST_Block_
 		}
 
 		$fields = $this->get_fields_for_response( $request );
+		$data   = $response->get_data();
 		if ( rest_is_field_included( 'synced', $fields ) ) {
-			$data           = $response->get_data();
 			$data['synced'] = gutenberg_is_block_pattern_synced( $item );
-			$response->set_data( $data );
 		}
+		if ( rest_is_field_included( 'area', $fields ) && ! empty( $item['area'] ) ) {
+			$data['area'] = (string) $item['area'];
+		}
+		$response->set_data( $data );
 
 		return $response;
 	}
@@ -49,6 +52,12 @@ class Gutenberg_REST_Block_Patterns_Controller_7_2 extends Gutenberg_REST_Block_
 		$schema['properties']['synced'] = array(
 			'description' => __( 'Whether inserting the pattern references it instead of copying its content.', 'gutenberg' ),
 			'type'        => 'boolean',
+			'readonly'    => true,
+			'context'     => array( 'view', 'edit', 'embed' ),
+		);
+		$schema['properties']['area']   = array(
+			'description' => __( 'The template part area the pattern stands in for, e.g. header.', 'gutenberg' ),
+			'type'        => 'string',
 			'readonly'    => true,
 			'context'     => array( 'view', 'edit', 'embed' ),
 		);

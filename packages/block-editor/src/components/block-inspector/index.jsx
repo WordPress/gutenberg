@@ -527,6 +527,10 @@ const BlockInspectorSingleBlock = ( {
 					<InspectorControls.Slot group="list" ref={ listViewRef } />
 					<ListViewContentPopover listViewRef={ listViewRef } />
 					{ ! isSectionBlock && <StyleInspectorSlots /> }
+					{ /* A section block without content blocks has no tabs,
+					     but its own settings (e.g. a template part's or pattern
+					     instance's wrapper element) still need a home. */ }
+					{ isSectionBlock && <AdvancedControls /> }
 				</>
 			) }
 			{ ! isEditingStyleState && <InspectorControlsLastItem.Slot /> }

@@ -1,18 +1,22 @@
 import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRef, useMemo } from '@wordpress/element';
+import { useRef, useMemo, useState } from '@wordpress/element';
 import {
 	useEntityRecord,
 	store as coreStore,
 	useEntityBlockEditor,
 } from '@wordpress/core-data';
 import {
+	MenuItem,
+	Modal,
 	Placeholder,
+	SelectControl,
 	Spinner,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import {
 	useInnerBlocksProps,
 	RecursionProvider,
@@ -22,7 +26,10 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 	BlockControls,
+	BlockSettingsMenuControls,
 	InnerBlocks,
+	InspectorControls,
+	__experimentalBlockPatternsList as BlockPatternsList,
 } from '@wordpress/block-editor';
 import {
 	privateApis as patternsPrivateApis,
@@ -31,7 +38,104 @@ import {
 import { getBlockBindingsSource, parse } from '@wordpress/blocks';
 import { unlock } from '../lock-unlock';
 
-const { useLayoutClasses } = unlock( blockEditorPrivateApis );
+const { useLayoutClasses, HTMLElementControl } = unlock(
+	blockEditorPrivateApis
+);
+
+// Elements a pattern instance can render as, so a pattern standing in for a
+// header or footer keeps its landmark. The default is no wrapper at all.
+const TAG_NAME_OPTIONS = [
+	{ label: '<header>', value: 'header' },
+	{ label: '<main>', value: 'main' },
+	{ label: '<section>', value: 'section' },
+	{ label: '<article>', value: 'article' },
+	{ label: '<aside>', value: 'aside' },
+	{ label: '<footer>', value: 'footer' },
+	{ label: '<div>', value: 'div' },
+];
+
+/**
+ * Returns the theme's definition of a template part area: its label, icon
+ * and default element.
+ *
+ * @param {string|undefined} area Area name.
+ * @return {{label: string, tagName: string|undefined, areas: Object[]}} The area definition and all areas.
+ */
+function useAreaDefinition( area ) {
+	return useSelect(
+		( select ) => {
+			const areas =
+				select( coreStore ).getCurrentTheme()
+					?.default_template_part_areas || [];
+			const definition = areas.find(
+				( { area: _area } ) => _area === area
+			);
+			return {
+				areas,
+				label: definition?.label,
+				tagName: definition?.area_tag,
+			};
+		},
+		[ area ]
+	);
+}
+
+/**
+ * Registered patterns sharing an area with the instance, to replace it with.
+ *
+ * @param {string|undefined} area     Area name.
+ * @param {string|undefined} slug     The instance's pattern name, excluded.
+ * @param {string}           clientId Block client id.
+ * @return {Object[]} Parsed patterns.
+ */
+function useAlternativePatterns( area, slug, clientId ) {
+	return useSelect(
+		( select ) => {
+			if ( ! area ) {
+				return EMPTY_ARRAY;
+			}
+			const { __experimentalGetAllowedPatterns, getBlockRootClientId } =
+				select( blockEditorStore );
+			return __experimentalGetAllowedPatterns(
+				getBlockRootClientId( clientId )
+			).filter(
+				( pattern ) =>
+					pattern.area === area &&
+					pattern.name !== slug &&
+					! pattern.name.startsWith( 'core/block/' )
+			);
+		},
+		[ area, slug, clientId ]
+	);
+}
+
+function ReplaceModal( {
+	area,
+	areaLabel,
+	slug,
+	clientId,
+	onSelect,
+	onClose,
+} ) {
+	const patterns = useAlternativePatterns( area, slug, clientId );
+	return (
+		<Modal
+			overlayClassName="block-editor-template-part__selection-modal"
+			title={ sprintf(
+				// Translators: %s as area title ("Header", "Footer", etc.).
+				__( 'Choose a %s' ),
+				( areaLabel || area ).toLowerCase()
+			) }
+			onRequestClose={ onClose }
+			isFullScreen
+		>
+			<BlockPatternsList
+				blockPatterns={ patterns }
+				onClickPattern={ onSelect }
+			/>
+		</Modal>
+	);
+}
 const EMPTY_ARRAY = [];
 const { isOverridableBlock } = unlock( patternsPrivateApis );
 
@@ -185,12 +289,19 @@ function RegisteredPatternEdit( props ) {
 	);
 
 	if ( customization ) {
-		return <UserPatternEdit { ...props } recordId={ customization.id } />;
+		return (
+			<UserPatternEdit
+				{ ...props }
+				recordId={ customization.id }
+				pattern={ pattern }
+			/>
+		);
 	}
 
 	return (
 		<ReusableBlockEdit
 			{ ...props }
+			pattern={ pattern }
 			blocks={ blocks }
 			hasResolved={ hasResolved }
 			isMissing={ hasResolved && ! pattern }
@@ -243,7 +354,15 @@ const EMPTY_OBJECT = {};
 
 function ReusableBlockEdit( {
 	name,
-	attributes: { ref, content },
+	clientId,
+	attributes: {
+		ref,
+		slug,
+		content,
+		tagName,
+		area: areaAttribute,
+		hasWrapper,
+	},
 	__unstableParentLayout: parentLayout,
 	setAttributes,
 	blocks,
@@ -251,7 +370,19 @@ function ReusableBlockEdit( {
 	isMissing,
 	canUserEdit,
 	onEditOriginal,
+	pattern,
 } ) {
+	// The instance's own area wins, else the referenced pattern's. Without
+	// either, the instance is in the "General" (uncategorized) area.
+	const area = areaAttribute || pattern?.area;
+	const {
+		areas,
+		label: areaLabel,
+		tagName: areaTagName,
+	} = useAreaDefinition( area );
+	const alternatives = useAlternativePatterns( area, slug, clientId );
+	const [ isReplaceOpen, setIsReplaceOpen ] = useState( false );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -288,9 +419,21 @@ function ReusableBlockEdit( {
 		return hasPatternOverridesSource && hasOverridableBlocks( blocks );
 	}, [ hasPatternOverridesSource, blocks, supportedBlockTypesRaw ] );
 
-	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
+	// A wrapper-less instance renders nothing around the pattern on the
+	// front end, so its full-width root blocks sit directly in the parent
+	// layout. The editor always has a wrapper: infer its alignment and the
+	// parent layout so it behaves as if it weren't there. An instance with
+	// a wrapper renders the same element on both sides, so no inference.
+	const inferred = useInferredLayout( blocks, parentLayout );
+	const { alignment, layout } = hasWrapper ? EMPTY_OBJECT : inferred;
 	const layoutClasses = useLayoutClasses( { layout }, name );
 
+	// The wrapper element: the instance's `tagName`, else the area's element,
+	// else a div. In the editor the block always needs one; on the front end
+	// it is only rendered when `hasWrapper` is set. Instances created before
+	// the attribute existed have none, so their markup is unchanged.
+	const defaultTagName = areaTagName || 'div';
+	const TagName = tagName || defaultTagName;
 	const blockProps = useBlockProps( {
 		className: clsx(
 			'block-library-block__reusable-block-container',
@@ -361,10 +504,97 @@ function ReusableBlockEdit( {
 				/>
 			) }
 
+			{ !! alternatives.length && (
+				<BlockSettingsMenuControls>
+					<MenuItem
+						onClick={ () => setIsReplaceOpen( true ) }
+						aria-expanded={ isReplaceOpen }
+						aria-haspopup="dialog"
+					>
+						{ __( 'Replace' ) }
+					</MenuItem>
+				</BlockSettingsMenuControls>
+			) }
+			{ isReplaceOpen && (
+				<ReplaceModal
+					area={ area }
+					areaLabel={ areaLabel }
+					slug={ slug }
+					clientId={ clientId }
+					onClose={ () => setIsReplaceOpen( false ) }
+					onSelect={ ( replacement ) => {
+						// Keep the instance's own settings; overrides belong
+						// to the previous pattern's blocks.
+						setAttributes( {
+							slug: replacement.name,
+							ref: undefined,
+							content: undefined,
+						} );
+						setIsReplaceOpen( false );
+						createSuccessNotice(
+							sprintf(
+								/* translators: %s: pattern title. */
+								__( 'Pattern "%s" inserted.' ),
+								replacement.title
+							),
+							{ type: 'snackbar' }
+						);
+					} }
+				/>
+			) }
+
+			<InspectorControls group="advanced">
+				<SelectControl
+					label={ __( 'Area' ) }
+					help={
+						pattern?.area
+							? __( 'Set by the registered pattern.' )
+							: undefined
+					}
+					value={ area || 'uncategorized' }
+					options={ areas.map( ( { label, area: _area } ) => ( {
+						label,
+						value: _area,
+					} ) ) }
+					onChange={ ( value ) =>
+						setAttributes( {
+							// "General" is the default: only store it when
+							// it overrides an area set by the registration.
+							area:
+								value === 'uncategorized' && ! pattern?.area
+									? undefined
+									: value,
+						} )
+					}
+				/>
+				{ /* Instances created before `hasWrapper` existed render no
+				     element, so there is nothing to pick for them. */ }
+				{ hasWrapper && (
+					<HTMLElementControl
+						tagName={ tagName || '' }
+						onChange={ ( value ) =>
+							setAttributes( { tagName: value || undefined } )
+						}
+						clientId={ clientId }
+						options={ [
+							{
+								label: sprintf(
+									/* translators: %s: HTML tag based on area. */
+									__( 'Default based on area (%s)' ),
+									`<${ defaultTagName }>`
+								),
+								value: '',
+							},
+							...TAG_NAME_OPTIONS,
+						] }
+					/>
+				) }
+			</InspectorControls>
+
 			{ children === null ? (
-				<div { ...innerBlocksProps } />
+				<TagName { ...innerBlocksProps } />
 			) : (
-				<div { ...blockProps }>{ children }</div>
+				<TagName { ...blockProps }>{ children }</TagName>
 			) }
 		</>
 	);
