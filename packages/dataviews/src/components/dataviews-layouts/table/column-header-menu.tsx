@@ -4,7 +4,7 @@ import { arrowLeft, arrowRight, unseen, funnel } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { forwardRef, Children, Fragment, useContext } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Icon, Menu } from '@wordpress/ui';
+import { Menu } from '@wordpress/ui';
 import { SORTING_DIRECTIONS, sortArrows, sortLabels } from '../../../constants';
 import type {
 	NormalizedField,
@@ -155,7 +155,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 					{ canAddFilter && (
 						<Menu.Group>
 							<Menu.Item
-								prefix={ <Icon icon={ funnel } /> }
+								prefix={ <Menu.PrefixIcon icon={ funnel } /> }
 								onClick={ () => {
 									setOpenedFilter( fieldId );
 									setIsShowingFilter( true );
@@ -183,7 +183,9 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 						<Menu.Group>
 							{ canMove && (
 								<Menu.Item
-									prefix={ <Icon icon={ arrowLeft } /> }
+									prefix={
+										<Menu.PrefixIcon icon={ arrowLeft } />
+									}
 									disabled={
 										isRtl
 											? index >=
@@ -217,7 +219,9 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							) }
 							{ canMove && (
 								<Menu.Item
-									prefix={ <Icon icon={ arrowRight } /> }
+									prefix={
+										<Menu.PrefixIcon icon={ arrowRight } />
+									}
 									disabled={
 										isRtl
 											? index < 1
@@ -331,7 +335,9 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							) }
 							{ isHidable && field && (
 								<Menu.Item
-									prefix={ <Icon icon={ unseen } /> }
+									prefix={
+										<Menu.PrefixIcon icon={ unseen } />
+									}
 									onClick={ () => {
 										onHide( field );
 										onChangeView( {

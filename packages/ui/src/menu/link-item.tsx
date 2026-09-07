@@ -30,7 +30,8 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 	},
 	ref
 ) {
-	const shouldShowNewTabIndicator = openInNewTab || target === '_blank';
+	const shouldShowNewTabIndicator =
+		openInNewTab || /^_blank$/i.test( target ?? '' );
 	const externalLinkIndicator = shouldShowNewTabIndicator ? (
 		<span
 			className={ styles[ 'external-link-indicator' ] }

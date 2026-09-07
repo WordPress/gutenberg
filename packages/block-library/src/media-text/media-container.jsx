@@ -53,6 +53,7 @@ function ToolbarEditButton( {
 				onSelect={ onSelectMedia }
 				onToggleFeaturedImage={ toggleUseFeaturedImage }
 				useFeaturedImage={ useFeaturedImage }
+				name={ mediaUrl ? __( 'Replace' ) : __( 'Add media' ) }
 				onReset={ () => onSelectMedia( undefined ) }
 			/>
 		</BlockControls>
@@ -122,6 +123,20 @@ function MediaContainer( props, ref ) {
 
 	const { toggleSelection } = useDispatch( blockEditorStore );
 
+	const toolbarEditButton = (
+		<ToolbarEditButton
+			onSelectMedia={ onSelectMedia }
+			mediaUrl={
+				useFeaturedImage && featuredImageURL
+					? featuredImageURL
+					: mediaUrl
+			}
+			mediaId={ mediaId }
+			toggleUseFeaturedImage={ toggleUseFeaturedImage }
+			useFeaturedImage={ useFeaturedImage }
+		/>
+	);
+
 	if ( mediaUrl || featuredImageURL || useFeaturedImage ) {
 		const onResizeStart = () => {
 			toggleSelection( false );
@@ -185,17 +200,7 @@ function MediaContainer( props, ref ) {
 				isStackedOnMobile={ isStackedOnMobile }
 				ref={ ref }
 			>
-				<ToolbarEditButton
-					onSelectMedia={ onSelectMedia }
-					mediaUrl={
-						useFeaturedImage && featuredImageURL
-							? featuredImageURL
-							: mediaUrl
-					}
-					mediaId={ mediaId }
-					toggleUseFeaturedImage={ toggleUseFeaturedImage }
-					useFeaturedImage={ useFeaturedImage }
-				/>
+				{ toolbarEditButton }
 				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
 				{ isTemporaryMedia && <Spinner /> }
 				{ ! useFeaturedImage && <PlaceholderContainer { ...props } /> }
@@ -210,7 +215,12 @@ function MediaContainer( props, ref ) {
 		);
 	}
 
-	return <PlaceholderContainer { ...props } />;
+	return (
+		<>
+			{ toolbarEditButton }
+			<PlaceholderContainer { ...props } />
+		</>
+	);
 }
 
 export default forwardRef( MediaContainer );
