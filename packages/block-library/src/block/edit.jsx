@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRef, useMemo, useState, useEffect } from '@wordpress/element';
+import { useRef, useMemo, useState } from '@wordpress/element';
 import {
 	useEntityRecord,
 	store as coreStore,
@@ -433,19 +433,13 @@ function ReusableBlockEdit( {
 		area: areaAttribute,
 		hasWrapper,
 		layout,
-		className,
 		style,
 	} = attributes;
+	// Layout, additional class names and custom CSS live on the wrapper
+	// element; instances created before `hasWrapper` existed have none, so
+	// the layout panel is not offered to them and the class name and custom
+	// CSS supports (whose controls always show) have no effect on them.
 	const hasOwnLayout = !! layout && Object.keys( layout ).length > 0;
-	// Additional class names and custom CSS come from block supports whose
-	// controls are always shown; they live on the wrapper element, so
-	// setting one switches the wrapper on.
-	const hasWrapperSettings = hasOwnLayout || !! className || !! style?.css;
-	useEffect( () => {
-		if ( hasWrapperSettings && ! hasWrapper ) {
-			setAttributes( { hasWrapper: true } );
-		}
-	}, [ hasWrapperSettings, hasWrapper, setAttributes ] );
 	const { createPatternOverride } = unlock( useDispatch( patternsStore ) );
 	const { editEntityRecord } = useDispatch( coreStore );
 	// The instance's own area wins, else the referenced pattern's. Without
