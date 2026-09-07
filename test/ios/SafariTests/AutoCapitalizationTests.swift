@@ -26,20 +26,6 @@ final class AutoCapitalizationTests: XCTestCase {
 		return web
 	}
 
-	/// A tap while another field has the keyboard does not always move it,
-	/// so tap until the field has the keyboard focus.
-	func focus( _ field: XCUIElement ) {
-		for _ in 1...3 {
-			field.tap()
-			let focused = NSPredicate( format: "hasKeyboardFocus == true" )
-			let done = XCTNSPredicateExpectation( predicate: focused, object: field )
-			if XCTWaiter.wait( for: [ done ], timeout: 2 ) == .completed {
-				return
-			}
-		}
-		XCTFail( "The field did not receive focus" )
-	}
-
 	/// Letters are keys, labelled in the case the keyboard currently shows;
 	/// shift and return are buttons.
 	func key( _ label: String ) -> XCUIElement {
@@ -48,38 +34,58 @@ final class AutoCapitalizationTests: XCTestCase {
 			.firstMatch
 	}
 
-	func shiftIsOn() -> Bool {
-		key( "shift" ).isSelected
-	}
-
-	func testReturnStartsTheNextParagraphCapitalized() throws {
-		let web = openNewPost()
-		// A new post has no blocks yet: the appender inserts the paragraph.
-		let appender = web.textViews[ "Add default block" ]
-		XCTAssertTrue( appender.waitForExistence( timeout: 60 ), "The new post did not show the appender" )
-		appender.tap()
-		// Fields in document order: the title, then the paragraphs.
-		let paragraph = web.textViews.element( boundBy: 1 )
-		XCTAssertTrue( paragraph.waitForExistence( timeout: 10 ), "No paragraph was inserted" )
-
-		focus( paragraph )
-		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "No software keyboard" )
-		XCTAssertTrue( shiftIsOn(), "An empty paragraph should start capitalized" )
-
-		for letter in "Hello" {
+	func type( _ word: String ) {
+		for letter in word {
 			key( String( letter ) ).tap()
 		}
-		XCTAssertEqual( paragraph.value as? String, "Hello" )
-		XCTAssertFalse( shiftIsOn(), "After a word the keyboard should be lowercase" )
+	}
+
+	func waitForFocus( _ field: XCUIElement, _ message: String ) {
+		let focused = NSPredicate( format: "hasKeyboardFocus == true" )
+		let done = XCTNSPredicateExpectation( predicate: focused, object: field )
+		XCTAssertEqual( XCTWaiter.wait( for: [ done ], timeout: 10 ), .completed, message )
+	}
+
+	/// The keyboard updates shortly after focus moves.
+	func assertCapitalized( _ message: String ) {
+		let upperCase = NSPredicate( format: "label == 'A'" )
+		XCTAssertTrue( keyboard.keys.matching( upperCase ).firstMatch.waitForExistence( timeout: 5 ), message )
+		XCTAssertTrue( key( "shift" ).isSelected, message )
+	}
+
+	func testReturnStartsTheNextFieldCapitalized() throws {
+		let web = openNewPost()
+		// Fields in document order: the title, then the paragraphs.
+		let title = web.textViews.element( boundBy: 0 )
+		let firstParagraph = web.textViews.element( boundBy: 1 )
+		let secondParagraph = web.textViews.element( boundBy: 2 )
+
+		// A new post focuses the title.
+		XCTAssertTrue( title.waitForExistence( timeout: 60 ), "The new post has no title field" )
+		waitForFocus( title, "The title is not focused" )
+		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "No software keyboard" )
+		assertCapitalized( "An empty title should start capitalized" )
+
+		type( "Title" )
+		XCTAssertEqual( title.value as? String, "Title" )
+		XCTAssertFalse( key( "shift" ).isSelected, "After a word the keyboard should be lowercase" )
 
 		key( "return" ).tap()
-		let next = web.textViews.element( boundBy: 2 )
-		XCTAssertTrue( next.waitForExistence( timeout: 10 ), "Return did not create a paragraph" )
-		// The keyboard updates shortly after focus moves.
-		XCTAssertTrue(
-			keyboard.keys.matching( NSPredicate( format: "label == 'A'" ) ).firstMatch.waitForExistence( timeout: 5 ),
-			"The paragraph after Return should start capitalized"
-		)
-		XCTAssertTrue( shiftIsOn() )
+		XCTAssertTrue( firstParagraph.waitForExistence( timeout: 10 ), "Return in the title did not create a paragraph" )
+		waitForFocus( firstParagraph, "The paragraph after the title is not focused" )
+		assertCapitalized( "The paragraph after the title should start capitalized" )
+
+		type( "Hello" )
+		XCTAssertEqual( firstParagraph.value as? String, "Hello" )
+		XCTAssertFalse( key( "shift" ).isSelected, "After a word the keyboard should be lowercase" )
+
+		key( "return" ).tap()
+		XCTAssertTrue( secondParagraph.waitForExistence( timeout: 10 ), "Return did not create a paragraph" )
+		waitForFocus( secondParagraph, "The new paragraph is not focused" )
+		assertCapitalized( "The paragraph after Return should start capitalized" )
+
+		// The earlier fields kept their text.
+		XCTAssertEqual( title.value as? String, "Title" )
+		XCTAssertEqual( firstParagraph.value as? String, "Hello" )
 	}
 }
