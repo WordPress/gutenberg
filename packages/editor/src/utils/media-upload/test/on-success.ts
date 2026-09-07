@@ -1,22 +1,28 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { dispatch } from '@wordpress/data';
 import mediaUploadOnSuccess from '../on-success';
 import { receiveFinalizedAttachment } from '../finalized-attachments';
 
-jest.mock( '@wordpress/data', () => ( {
-	dispatch: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	dispatch: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/core-data', () => ( {
-	store: 'core',
-} ) );
+vi.mock(
+	import( '@wordpress/core-data' ),
+	() =>
+		( {
+			store: 'core',
+		} ) as unknown as typeof import('@wordpress/core-data')
+);
 
-const invalidateResolution = jest.fn();
-const receiveEntityRecords = jest.fn();
+const invalidateResolution = vi.fn();
+const receiveEntityRecords = vi.fn();
 
 describe( 'mediaUploadOnSuccess', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
-		dispatch.mockReturnValue( {
+		vi.clearAllMocks();
+		( dispatch as unknown as Mock ).mockReturnValue( {
 			invalidateResolution,
 			receiveEntityRecords,
 		} );

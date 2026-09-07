@@ -1,23 +1,29 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { dispatch } from '@wordpress/data';
 import {
 	receiveFinalizedAttachment,
 	consumeFinalizedAttachment,
 } from '../finalized-attachments';
 
-jest.mock( '@wordpress/data', () => ( {
-	dispatch: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	dispatch: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/core-data', () => ( {
-	store: 'core',
-} ) );
+vi.mock(
+	import( '@wordpress/core-data' ),
+	() =>
+		( {
+			store: 'core',
+		} ) as unknown as typeof import('@wordpress/core-data')
+);
 
-const receiveEntityRecords = jest.fn();
+const receiveEntityRecords = vi.fn();
 
 describe( 'receiveFinalizedAttachment', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
-		( dispatch as unknown as jest.Mock ).mockReturnValue( {
+		vi.clearAllMocks();
+		( dispatch as unknown as Mock ).mockReturnValue( {
 			receiveEntityRecords,
 		} );
 	} );
@@ -67,8 +73,8 @@ describe( 'receiveFinalizedAttachment', () => {
 
 describe( 'consumeFinalizedAttachment', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
-		( dispatch as unknown as jest.Mock ).mockReturnValue( {
+		vi.clearAllMocks();
+		( dispatch as unknown as Mock ).mockReturnValue( {
 			receiveEntityRecords,
 		} );
 	} );
