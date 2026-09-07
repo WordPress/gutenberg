@@ -705,7 +705,10 @@ describe.each( [
 
 			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
 
-			await click( screen.getByRole( 'radio', { name: 'J' } ) );
+			// A real user cannot activate a disabled control. Dispatch the native
+			// method to verify the platform still suppresses its click handler.
+			// eslint-disable-next-line testing-library/no-node-access
+			screen.getByRole( 'radio', { name: 'J' } ).click();
 
 			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
 			expect(
@@ -713,7 +716,7 @@ describe.each( [
 			).not.toBeChecked();
 			expect( mockOnChange ).not.toHaveBeenCalled();
 
-			await press.ArrowRight();
+			await userEvent.keyboard( '{ArrowRight}' );
 			expect( mockOnChange ).not.toHaveBeenCalled();
 		} );
 
@@ -728,14 +731,14 @@ describe.each( [
 				</>
 			);
 
-			await press.Tab();
+			await userEvent.tab();
 			expect(
 				screen.getByRole( 'button', {
 					name: 'Before ToggleGroupControl',
 				} )
 			).toHaveFocus();
 
-			await press.Tab();
+			await userEvent.tab();
 
 			const expectedFocusTarget =
 				mode === 'uncontrolled'
@@ -760,7 +763,7 @@ describe.each( [
 			).not.toBeChecked();
 		} );
 
-		it( 'should not call onChange when a disabled control is clicked', async () => {
+		it( 'should not call onChange when a disabled control is clicked', () => {
 			const mockOnChange = vi.fn();
 
 			render(
@@ -774,8 +777,10 @@ describe.each( [
 				</Component>
 			);
 
-			await click( screen.getByRole( 'radio', { name: 'J' } ) );
-			await click( screen.getByRole( 'radio', { name: 'R' } ) );
+			// eslint-disable-next-line testing-library/no-node-access
+			screen.getByRole( 'radio', { name: 'J' } ).click();
+			// eslint-disable-next-line testing-library/no-node-access
+			screen.getByRole( 'radio', { name: 'R' } ).click();
 
 			expect( mockOnChange ).not.toHaveBeenCalled();
 		} );
@@ -802,7 +807,7 @@ describe.each( [
 			).toBeDisabled();
 		} );
 
-		it( 'should not deselect the pressed option when the control is disabled', async () => {
+		it( 'should not deselect the pressed option when the control is disabled', () => {
 			const mockOnChange = vi.fn();
 
 			render(
@@ -828,7 +833,7 @@ describe.each( [
 			expect( pressed ).toBeVisible();
 			expect( pressed ).toBeDisabled();
 
-			await click( pressed );
+			pressed.click();
 
 			expect(
 				screen.getByRole( 'button', {
@@ -855,14 +860,14 @@ describe.each( [
 				</>
 			);
 
-			await press.Tab();
+			await userEvent.tab();
 			expect(
 				screen.getByRole( 'button', {
 					name: 'Before ToggleGroupControl',
 				} )
 			).toHaveFocus();
 
-			await press.Tab();
+			await userEvent.tab();
 
 			const expectedFocusTarget =
 				mode === 'uncontrolled'
@@ -874,7 +879,7 @@ describe.each( [
 			expect( expectedFocusTarget ).toHaveFocus();
 		} );
 
-		it( 'should not call onChange when a deselectable disabled control is clicked', async () => {
+		it( 'should not call onChange when a deselectable disabled control is clicked', () => {
 			const mockOnChange = vi.fn();
 
 			render(
@@ -889,18 +894,10 @@ describe.each( [
 				</Component>
 			);
 
-			await click(
-				screen.getByRole( 'button', {
-					name: 'R',
-					pressed: true,
-				} )
-			);
-			await click(
-				screen.getByRole( 'button', {
-					name: 'J',
-					pressed: false,
-				} )
-			);
+			// eslint-disable-next-line testing-library/no-node-access
+			screen.getByRole( 'button', { name: 'R', pressed: true } ).click();
+			// eslint-disable-next-line testing-library/no-node-access
+			screen.getByRole( 'button', { name: 'J', pressed: false } ).click();
 
 			expect( mockOnChange ).not.toHaveBeenCalled();
 		} );

@@ -4,8 +4,12 @@ import { createPortal, useState } from '@wordpress/element';
 import { registerStyle } from '@wordpress/style-runtime';
 import { Slot, Fill, Provider } from '../';
 
-function IframePortal( { children } ) {
-	const [ iframe, setIframe ] = useState( null );
+type GlobalScopeWithStyleRuntime = typeof globalThis & {
+	__wpStyleRuntime?: unknown;
+};
+
+function IframePortal( { children }: { children: React.ReactNode } ) {
+	const [ iframe, setIframe ] = useState< HTMLIFrameElement | null >( null );
 	const body = iframe?.contentDocument?.body;
 
 	return (
@@ -16,8 +20,10 @@ function IframePortal( { children } ) {
 }
 
 describe( 'Slot cross-document styles', () => {
+	const globalScope = globalThis as GlobalScopeWithStyleRuntime;
+
 	afterEach( () => {
-		delete globalThis.__wpStyleRuntime;
+		delete globalScope.__wpStyleRuntime;
 		document.head.innerHTML = '';
 	} );
 
@@ -39,9 +45,11 @@ describe( 'Slot cross-document styles', () => {
 				</Fill>
 			</Provider>
 		);
-		const iframe = screen.getByTitle( 'Slot document' );
-		const iframeDocument = iframe.contentDocument;
-		const iframeWindow = iframe.contentWindow;
+		const iframe = screen.getByTitle(
+			'Slot document'
+		) as HTMLIFrameElement;
+		const iframeDocument = iframe.contentDocument!;
+		const iframeWindow = iframe.contentWindow!;
 
 		const styledElement = within( iframeDocument.body ).getByText(
 			'Styled content'

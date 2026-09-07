@@ -31,7 +31,7 @@ function readProp( element: Element, property: string ) {
 
 // The `ThemeProvider` wrapper element that scopes the given descendant.
 function getScopingProvider( element: Element ) {
-	return element.closest< HTMLElement >( `.${ styles.root }` )!;
+	return element.closest< HTMLElement >( `.${ styles.wrapper }` )!;
 }
 
 describe( 'ThemeProvider', () => {
@@ -113,10 +113,10 @@ describe( 'ThemeProvider', () => {
 	} );
 
 	it( 'does not report warnings for accessible active fill pairs', () => {
-		const onColorWarnings = vi.fn<
-			void,
-			[ readonly ThemeProviderColorWarning[] ]
-		>();
+		const onColorWarnings =
+			vi.fn<
+				( warnings: readonly ThemeProviderColorWarning[] ) => void
+			>();
 		const { rerender } = render(
 			<ThemeProvider
 				color={ {
@@ -144,10 +144,10 @@ describe( 'ThemeProvider', () => {
 	} );
 
 	it( 'does not report warnings again when only the callback identity changes', () => {
-		const onColorWarnings = vi.fn<
-			void,
-			[ readonly ThemeProviderColorWarning[] ]
-		>();
+		const onColorWarnings =
+			vi.fn<
+				( warnings: readonly ThemeProviderColorWarning[] ) => void
+			>();
 		const renderProvider = () => (
 			<ThemeProvider
 				color={ {

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import { Component } from '@wordpress/element';
 import { Slot, Fill, Provider, useSlotFills } from '../';
 

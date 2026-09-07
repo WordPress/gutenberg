@@ -133,7 +133,9 @@ describe( 'Icon', () => {
 			/>
 		);
 
-		expect( screen.getByTestId( testId ) ).toHaveStyle( 'fill: red' );
+		expect( screen.getByTestId( testId ) ).toHaveStyle( {
+			fill: 'rgb(255, 0, 0)',
+		} );
 	} );
 
 	it( "merges a consumer 'style' with a non-svg element's intrinsic style", () => {

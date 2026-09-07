@@ -3,9 +3,9 @@ import { render, screen } from '@testing-library/react';
 import BaseInputControl from '../';
 import InputControlPrefixWrapper from '../input-prefix-wrapper';
 
-const InputControl = ( props ) => (
-	<BaseInputControl { ...props } data-testid="input" />
-);
+const InputControl = (
+	props: React.ComponentProps< typeof BaseInputControl >
+) => <BaseInputControl { ...props } data-testid="input" />;
 
 const comparedProperties = [
 	'height',
@@ -17,9 +17,9 @@ const comparedProperties = [
 	'fontSize',
 	'lineHeight',
 	'borderRadius',
-];
+] as const;
 
-function getComparedStyles( element ) {
+function getComparedStyles( element: HTMLElement ) {
 	const styles = window.getComputedStyle( element );
 	return Object.fromEntries(
 		comparedProperties.map( ( property ) => [
@@ -38,7 +38,9 @@ describe( 'InputControl legacy size support', () => {
 			<InputControl
 				label="Test"
 				prefix={ prefix }
-				{ ...{ size: '__unstable-large' } }
+				{ ...( {
+					size: '__unstable-large',
+				} as unknown as React.ComponentProps< typeof InputControl > ) }
 			/>
 		);
 
