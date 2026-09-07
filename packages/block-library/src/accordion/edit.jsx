@@ -14,15 +14,12 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ACCORDION_BLOCK_NAME = 'core/accordion-item';
-const ACCORDION_HEADING_BLOCK_NAME = 'core/accordion-heading';
 const ACCORDION_BLOCK = {
 	name: ACCORDION_BLOCK_NAME,
 };
@@ -45,8 +42,7 @@ export default function Edit( {
 		role: 'group',
 	} );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const { updateBlockAttributes, insertBlock } =
-		useDispatch( blockEditorStore );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
@@ -54,17 +50,6 @@ export default function Edit( {
 		defaultBlock: ACCORDION_BLOCK,
 		directInsert: true,
 	} );
-
-	const addAccordionItemBlock = () => {
-		// When adding, set the header's level to current headingLevel
-		const newAccordionItem = createBlock( ACCORDION_BLOCK_NAME, {}, [
-			createBlock( ACCORDION_HEADING_BLOCK_NAME, {
-				level: headingLevel,
-			} ),
-			createBlock( 'core/accordion-panel', {} ),
-		] );
-		insertBlock( newAccordionItem, undefined, clientId );
-	};
 
 	/**
 	 * Update all child Accordion Header blocks with a new heading level
@@ -102,11 +87,6 @@ export default function Edit( {
 								onChange={ updateHeadingLevel }
 							/>
 						</ToolbarGroup>
-					</BlockControls>
-					<BlockControls group="other">
-						<ToolbarButton onClick={ addAccordionItemBlock }>
-							{ __( 'Add item' ) }
-						</ToolbarButton>
 					</BlockControls>
 				</>
 			) }

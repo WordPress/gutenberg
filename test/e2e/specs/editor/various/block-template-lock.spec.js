@@ -241,10 +241,14 @@ test.describe( 'Template Lock', () => {
 		} ) => {
 			await editor.selectBlocks( editor.canvas.getByText( 'Col 1' ) );
 
+			// A column shows no add button in the toolbar; insertion
+			// being allowed shows through the block options menu.
+			await editor.clickBlockToolbarButton( 'Options' );
+
 			await expect(
 				page
-					.getByRole( 'toolbar', { name: 'Block tools' } )
-					.getByRole( 'button', { name: 'Add block' } )
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Add after' } )
 			).toBeVisible();
 		} );
 

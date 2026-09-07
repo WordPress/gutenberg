@@ -11,6 +11,7 @@ import {
 } from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
 import BlockMover from '../block-mover';
+import BlockAppenderButton from '../block-appender-button';
 import BlockParentSelector from '../block-parent-selector';
 import BlockControls from '../block-controls';
 import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
@@ -301,7 +302,11 @@ export function PrivateBlockToolbar( {
 						</>
 					) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
-				<BlockSettingsMenu clientIds={ blockClientIds } />
+				<BlockSettingsMenu clientIds={ blockClientIds }>
+					{ ! isMultiToolbar && isDefaultEditingMode && (
+						<BlockAppenderButton clientId={ blockClientId } />
+					) }
+				</BlockSettingsMenu>
 			</div>
 		</NavigableToolbar>
 	);

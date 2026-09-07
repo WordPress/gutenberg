@@ -14,7 +14,6 @@ import {
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	useBlockEditingMode,
-	BlockControls,
 } from '@wordpress/block-editor';
 import {
 	EntityProvider,
@@ -30,13 +29,9 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Spinner,
 	Notice,
-	ToolbarButton,
-	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { page } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import useNavigationMenu from '../use-navigation-menu';
 import Placeholder from './placeholder';
@@ -65,52 +60,9 @@ import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 import useLayoutCustomProperties from './use-layout-custom-properties';
-import {
-	DEFAULT_BLOCK,
-	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
-} from '../constants';
+import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 
 const { isNavigationPostEditorKey } = unlock( blockEditorPrivateApis );
-
-/**
- * Component that renders the Add page button for the Navigation block.
- *
- * @param {Object} props          Component props.
- * @param {string} props.clientId Block client ID.
- * @return {React.JSX.Element} The Add page button component or null if not applicable.
- */
-function NavigationAddPageButton( { clientId } ) {
-	const { insertBlock } = useDispatch( blockEditorStore );
-	const { getBlockCount } = useSelect( blockEditorStore );
-
-	const onAddPage = useCallback( () => {
-		// Get the current number of blocks to insert at the end
-		const blockCount = getBlockCount( clientId );
-
-		// Create a new navigation link block (default block)
-		const newBlock = createBlock( DEFAULT_BLOCK.name, {
-			kind: DEFAULT_BLOCK.attributes.kind,
-			type: DEFAULT_BLOCK.attributes.type,
-		} );
-
-		// Insert the block at the end of the navigation
-		insertBlock( newBlock, blockCount, clientId );
-	}, [ clientId, insertBlock, getBlockCount ] );
-
-	return (
-		<BlockControls>
-			<ToolbarGroup>
-				<ToolbarButton
-					name="add-page"
-					icon={ page }
-					onClick={ onAddPage }
-				>
-					{ __( 'Add page' ) }
-				</ToolbarButton>
-			</ToolbarGroup>
-		</BlockControls>
-	);
-}
 
 function ColorTools( {
 	textColor,
@@ -1101,10 +1053,6 @@ function Navigation( {
 			{ blockEditingMode === 'default' && stylingInspectorControls }
 			<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 				<RecursionProvider uniqueId={ recursionId }>
-					{ blockEditingMode === 'contentOnly' &&
-						isEntityAvailable && (
-							<NavigationAddPageButton clientId={ clientId } />
-						) }
 					{ blockEditingMode === 'default' && isEntityAvailable && (
 						<InspectorControls group="advanced">
 							{ hasResolvedCanUserUpdateNavigationMenu &&

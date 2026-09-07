@@ -1,9 +1,8 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { useDispatch, useSelect } from '@wordpress/data';
 import PlaylistEdit from '../edit';
 
 let mediaPlaceholderProps;
-let mediaReplaceFlowProps;
 // The tracks the playlist holds. The inner blocks mock renders these, so a
 // test can look at what ended up in the tracklist.
 let mockTracks = [];
@@ -16,22 +15,6 @@ jest.mock( '@wordpress/block-editor', () => ( {
 	MediaPlaceholder: ( props ) => {
 		mediaPlaceholderProps = props;
 		return <div />;
-	},
-	MediaReplaceFlow: ( props ) => {
-		mediaReplaceFlowProps = props;
-		return (
-			<button
-				onClick={ () =>
-					props.onSelect( {
-						id: 2,
-						url: 'https://example.com/second-track.mp3',
-						title: 'Second track',
-					} )
-				}
-			>
-				{ props.name }
-			</button>
-		);
 	},
 	useBlockProps: () => ( { className: 'wp-block-playlist' } ),
 	useInnerBlocksProps: ( blockProps ) => ( {
@@ -140,7 +123,6 @@ describe( 'PlaylistEdit', () => {
 
 	beforeEach( () => {
 		mediaPlaceholderProps = undefined;
-		mediaReplaceFlowProps = undefined;
 		replaceInnerBlocks = jest.fn();
 		insertBlocks = jest.fn();
 		selectBlock = jest.fn();
@@ -190,7 +172,9 @@ describe( 'PlaylistEdit', () => {
 			/>
 		);
 
-		expect( mediaReplaceFlowProps.multiple ).toBe( 'add' );
+		// With tracks present, the rendered placeholder is the add-more
+		// drop zone.
+		expect( mediaPlaceholderProps.multiple ).toBe( 'add' );
 	} );
 
 	it( 'keeps track blocks mounted when the tracklist is hidden', () => {
@@ -239,7 +223,13 @@ describe( 'PlaylistEdit', () => {
 			/>
 		);
 
-		fireEvent.click( screen.getByRole( 'button', { name: 'Add track' } ) );
+		act( () =>
+			mediaPlaceholderProps.onSelect( {
+				id: 2,
+				url: 'https://example.com/second-track.mp3',
+				title: 'Second track',
+			} )
+		);
 
 		expect( trackClientIds() ).toEqual( [
 			'track-1',
@@ -248,7 +238,7 @@ describe( 'PlaylistEdit', () => {
 		] );
 	} );
 
-	it( 'adds tracks from the add track control', () => {
+	it( 'adds tracks picked in the media placeholder', () => {
 		render(
 			<PlaylistEdit
 				attributes={ defaultAttributes }
@@ -259,9 +249,11 @@ describe( 'PlaylistEdit', () => {
 			/>
 		);
 
-		fireEvent.click(
-			screen.getByRole( 'button', {
-				name: 'Add track',
+		act( () =>
+			mediaPlaceholderProps.onSelect( {
+				id: 2,
+				url: 'https://example.com/second-track.mp3',
+				title: 'Second track',
 			} )
 		);
 

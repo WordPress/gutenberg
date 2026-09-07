@@ -484,10 +484,9 @@ test.describe( 'Buttons', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Buttons' } )
 		);
 
-		// Insert a sibling via the appender; should auto-insert a button.
-		await editor.canvas
-			.getByRole( 'button', { name: 'Add button' } )
-			.click();
+		// Insert a sibling via the toolbar appender; should auto-insert a
+		// button.
+		await editor.clickBlockToolbarButton( 'Add button' );
 
 		// The new button should inherit color attributes from its sibling.
 		await expect.poll( editor.getBlocks ).toMatchObject( [

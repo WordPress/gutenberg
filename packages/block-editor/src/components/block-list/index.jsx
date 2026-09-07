@@ -271,8 +271,12 @@ function Items( {
 				// whether or not the block is selected.
 				ghostBlockName: appenderAllowed ? _ghostBlockName : undefined,
 				ghostBlockAttributes: _ghostBlockAttributes,
+				// An appender only fills an empty block list. A filled one
+				// grows from the inserter in the block toolbar, so no
+				// appender is rendered in the canvas.
 				shouldRenderAppender:
 					appenderAllowed &&
+					! _order.length &&
 					( hasCustomAppender ||
 						hasSelectedRoot ||
 						showRootAppender ),
