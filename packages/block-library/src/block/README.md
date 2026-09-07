@@ -27,6 +27,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 
 _Defined via the [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) property in block.json._
 
+- [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [`inserter`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#inserter): `false`
 - [`renaming`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#renaming): `false`

@@ -200,6 +200,11 @@ class Test_Blocks_RenderReusable extends WP_UnitTestCase {
 		$this->assertStringStartsWith( '<div class="', $output );
 		$this->assertStringContainsString( 'is-layout-constrained', $output );
 		$this->assertStringContainsString( 'wp-block-block-is-layout-constrained', $output );
+		// Alignment lands on the wrapper, as on a Group block.
+		$this->assertSame(
+			'<div class="alignfull wp-block-block"><p class="wp-block-paragraph">Hello from a registered pattern!</p></div>',
+			do_blocks( '<!-- wp:block {"slug":"test/greeting","hasWrapper":true,"align":"full"} /-->' )
+		);
 		// Without the wrapper, the settings have nowhere to go and the
 		// pattern's own blocks are left untouched.
 		$this->assertSame(

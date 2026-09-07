@@ -35,6 +35,7 @@
 		"pattern/overrides": "content"
 	},
 	"supports": {
+		"align": [ "wide", "full" ],
 		"html": false,
 		"inserter": false,
 		"renaming": false,
