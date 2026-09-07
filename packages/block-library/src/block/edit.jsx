@@ -542,16 +542,10 @@ function ReusableBlockEdit( {
 						...( pattern?.area
 							? []
 							: [ { label: __( 'None' ), value: '' } ] ),
-						...areas
-							.filter(
-								( { area: _area } ) =>
-									_area !== 'uncategorized' &&
-									_area !== 'navigation-overlay'
-							)
-							.map( ( { label, area: _area } ) => ( {
-								label,
-								value: _area,
-							} ) ),
+						...areas.map( ( { label, area: _area } ) => ( {
+							label,
+							value: _area,
+						} ) ),
 					] }
 					onChange={ ( value ) =>
 						setAttributes( { area: value || undefined } )
