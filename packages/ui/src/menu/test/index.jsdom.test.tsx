@@ -942,6 +942,36 @@ describe( 'Menu', () => {
 		expect( console ).toHaveErrored();
 	} );
 
+	it( 'throws when a nested ItemDescription reuses a direct sibling ID', () => {
+		function MenuWithDuplicateDescriptionId() {
+			const descriptionId = useId();
+
+			return (
+				<Menu.Root defaultOpen>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>
+								Duplicate
+								<Menu.ItemDescription id={ descriptionId }>
+									Nested description
+								</Menu.ItemDescription>
+							</Menu.ItemLabel>
+							<Menu.ItemDescription id={ descriptionId }>
+								Direct description
+							</Menu.ItemDescription>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			);
+		}
+
+		expect( () => render( <MenuWithDuplicateDescriptionId /> ) ).toThrow(
+			'Menu.ItemDescription: Missing direct menu item parent. Render <Menu.ItemDescription> as a direct child of a menu item.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
 	it( 'combines multiple item descriptions in DOM order', async () => {
 		const user = userEvent.setup();
 
