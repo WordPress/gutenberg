@@ -233,10 +233,7 @@ export function useInteraction(
 		if ( wasGestureOpen ) {
 			optionsRef.current?.onGestureEnd?.();
 		}
-		// `isGestureActive` is read to decide whether a gesture was open;
-		// it must not re-run this effect, which keys off `isDisabled`.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ isDisabled, stopPlacementGesture ] );
+	}, [ isDisabled, isGestureActive, stopPlacementGesture ] );
 
 	const onPointerDown = useCallback( ( e: React.PointerEvent ) => {
 		if ( optionsRef.current?.disabled ) {

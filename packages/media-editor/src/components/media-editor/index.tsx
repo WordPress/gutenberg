@@ -738,12 +738,14 @@ function MediaEditorContent( {
 			value={ media ?? undefined }
 			onChange={ handleChange }
 			settings={ {
-				// Show the fields as read-only while saving, so the guard
-				// in `handleChange` is not silently swallowing typing.
+				// Disable the fields while saving, so the guard in
+				// `handleChange` is not silently swallowing typing.
+				// `readOnly` would swap the field's layout mid-save;
+				// disabled keeps it in place and greys it out.
 				fields: isSaving
 					? fields.map( ( field ) => ( {
 							...field,
-							readOnly: true,
+							isDisabled: true,
 					  } ) )
 					: fields,
 			} }

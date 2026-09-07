@@ -757,7 +757,9 @@ describe( 'Cropper', () => {
 
 		// Without this the caller is left believing a gesture is still
 		// running, which keeps undo/redo disabled after a failed save.
-		expect( onGestureEnd ).toHaveBeenCalled();
+		// Exactly once: a second call would close a gesture that is no
+		// longer open.
+		expect( onGestureEnd ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'does not signal a gesture end when disabling with no gesture running', async () => {

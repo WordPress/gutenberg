@@ -152,25 +152,6 @@ export function RectangleStencil( {
 		};
 	}, [] );
 
-	useEffect( () => {
-		if ( ! isResizeDisabled ) {
-			return;
-		}
-		activePointerResizeRef.current?.cancel();
-		// A keyboard resize settles on a timer rather than a pointer
-		// release, so close it here too: otherwise the pending timer
-		// fires `onResizeEnd` after the resize was already cancelled.
-		if ( keyboardResizeActiveRef.current ) {
-			clearTimeout( keyboardSettleTimerRef.current );
-			keyboardResizeActiveRef.current = false;
-			onResizeEnd?.();
-		}
-		// Keyed on the disabled flag alone; `onResizeEnd` is only read
-		// when it fires, and re-running on a new callback identity would
-		// close the gesture twice.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ isResizeDisabled ] );
-
 	// Latest callbacks for the drag listeners. The drag closure in
 	// handlePointerDown reads from this ref so it always sees current
 	// props without having to re-attach listeners mid-drag. Previously,
@@ -425,6 +406,24 @@ export function RectangleStencil( {
 		onResizeEnd,
 		snapCropRect,
 	};
+
+	// Cancel an in-flight resize when the handles are disabled. Reads
+	// `onResizeEnd` from the ref above so a new callback identity does
+	// not re-run this and close the gesture twice.
+	useEffect( () => {
+		if ( ! isResizeDisabled ) {
+			return;
+		}
+		activePointerResizeRef.current?.cancel();
+		// A keyboard resize settles on a timer rather than a pointer
+		// release, so close it here too: otherwise the pending timer
+		// fires `onResizeEnd` after the resize was already cancelled.
+		if ( keyboardResizeActiveRef.current ) {
+			clearTimeout( keyboardSettleTimerRef.current );
+			keyboardResizeActiveRef.current = false;
+			latestHandlersRef.current?.onResizeEnd?.();
+		}
+	}, [ isResizeDisabled ] );
 
 	/**
 	 * Handle keyboard events on a resize handle.
