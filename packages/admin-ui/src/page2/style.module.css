@@ -1,0 +1,137 @@
+.page2 {
+	--admin-ui-page2-padding-inline: var(--wpds-dimension-padding-2xl);
+	--admin-ui-page2-padding-block: var(--wpds-dimension-padding-lg);
+
+	display: flex;
+	height: 100%;
+	background-color: var(--wpds-color-background-surface-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
+	position: relative;
+	z-index: 1;
+	flex-flow: column;
+	text-wrap: pretty;
+}
+
+.header {
+	padding: var(--admin-ui-page2-padding-block) var(--admin-ui-page2-padding-inline);
+	border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	background: var(--wpds-color-background-surface-neutral-strong);
+	position: sticky;
+	inset-block-start: 0;
+	z-index: 1;
+}
+
+.header-content {
+	min-height: var(--wpds-dimension-size-md);
+}
+
+/* Let the title cluster shrink below its content width, so a long title
+truncates instead of overflowing the page horizontally. */
+.header-lockup {
+	min-width: 0;
+}
+
+/*
+ * Never CSS-shrink the actions group: `Page2ActionsGroup` decides, in JS,
+ * which of its two natural sizes (expanded or collapsed) to render, and that
+ * decision already accounts for the space the title cluster needs. Letting
+ * flex also shrink this box would fight that decision and clip buttons.
+ */
+.actions {
+	flex-shrink: 0;
+}
+
+.actions-probe {
+	position: absolute;
+	visibility: hidden;
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs);
+	white-space: nowrap;
+	pointer-events: none;
+}
+
+/* @TODO: Remove truncation styles once `Text` supports truncation natively. See https://github.com/WordPress/gutenberg/issues/77391 */
+.header-title {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.header-visual {
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr;
+	flex-shrink: 0;
+	width: var(--wpds-dimension-size-sm);
+	height: var(--wpds-dimension-size-sm);
+
+	> * {
+		grid-column: 1 / -1;
+		grid-row: 1 / -1;
+		max-width: 100%;
+		max-height: 100%;
+	}
+}
+
+.header-subtitle {
+	padding-block-end: var(--wpds-dimension-padding-xs);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.header.has-navigation,
+.header.has-navigation .header-subtitle {
+	padding-block-end: 0;
+}
+
+.header-navigation {
+	margin-block-start: var(--wpds-dimension-gap-md);
+}
+
+.content {
+	flex-grow: 1;
+	overflow: auto;
+	display: flex;
+	flex-direction: column;
+	padding: var(--admin-ui-page2-padding-block) var(--admin-ui-page2-padding-inline);
+
+	/*
+	 * `position: sticky` resolves its inset against the padding box of the
+	 * nearest scrolling ancestor (this element), so a sticky `Page2.Footer`
+	 * can only sit flush with the true bottom edge once that padding is
+	 * removed; `Page2.Footer` restores the equivalent spacing with its own
+	 * padding.
+	 */
+	&:has(> .footer) {
+		padding-block-end: 0;
+	}
+}
+
+.full-bleed {
+	box-sizing: border-box;
+	margin-inline: calc(-1 * var(--admin-ui-page2-padding-inline));
+	width: calc(100% + 2 * var(--admin-ui-page2-padding-inline));
+}
+
+.narrow {
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 680px;
+	margin-inline: auto;
+}
+
+.footer {
+	box-sizing: border-box;
+	position: sticky;
+	inset-block-end: 0;
+	inset-inline: 0;
+	margin-block-start: auto;
+	margin-inline: calc(-1 * var(--admin-ui-page2-padding-inline));
+	width: calc(100% + 2 * var(--admin-ui-page2-padding-inline));
+	flex-shrink: 0;
+	padding: var(--admin-ui-page2-padding-block) var(--admin-ui-page2-padding-inline);
+	border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	background: var(--wpds-color-background-surface-neutral-strong);
+	z-index: 1;
+}
