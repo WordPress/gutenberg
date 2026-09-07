@@ -1,14 +1,11 @@
 {
 	"jest": {
 		"files": [
-			"packages/components/src/resizable-box/resize-tooltip/test/index.jsdom.test.tsx",
-			"packages/components/src/resizable-box/resize-tooltip/test/label.jsdom.test.tsx",
 			"packages/editor/src/components/collaborators-overlay/test/cursor-dom-utils.jsdom.test.ts",
 			"packages/editor/src/store/utils/attach-media-in-post/test/index.jsdom.test.js",
 			"packages/editor/src/store/utils/attach-media-in-post/test/invalidate-attachment-resolutions.jsdom.test.js",
 			"packages/grid/src/dashboard-grid/test/item-limits.jsdom.test.tsx",
 			"packages/grid/src/dashboard-lanes/test/item-limits.jsdom.test.tsx",
-			"packages/icons/src/icon/test/index.jsdom.test.tsx",
 			"packages/ui/src/breadcrumb/test/index.jsdom.test.tsx"
 		]
 	}
