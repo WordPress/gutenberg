@@ -32,21 +32,27 @@ export default function useEntityProp( kind, name, prop, _id ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 	const context = useContext( EntityContext );
-	// A revision applies only to the record it was provided for.
+	// A revision applies only to the record it was provided for. The ID can be
+	// given as a string or a number, so compare the two loosely.
 	const revisionId =
-		id === providerId ? context?.revision?.[ kind ]?.[ name ] : undefined;
+		String( id ) === String( providerId )
+			? context?.revision?.[ kind ]?.[ name ]
+			: undefined;
 
 	const { value, fullValue } = useSelect(
 		( select ) => {
 			if ( revisionId ) {
-				const revision = select( STORE_NAME ).getRevision(
+				const { getRevision, hasRevision } = select( STORE_NAME );
+				const revision = getRevision(
 					kind,
 					name,
 					id,
 					revisionId,
 					REVISION_QUERY
-				);
-				return revision
+				); // Trigger resolver.
+				// `getRevision` returns the requested fields as `undefined`
+				// until they are received, so wait for the full record.
+				return hasRevision( kind, name, id, revisionId, REVISION_QUERY )
 					? {
 							value: revision[ prop ]?.raw ?? revision[ prop ],
 							fullValue: revision[ prop ],

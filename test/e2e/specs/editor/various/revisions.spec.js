@@ -1011,6 +1011,11 @@ test.describe( 'Post autosave shareable URLs with revisions disabled', () => {
 } );
 
 test.describe( 'Post revisions with nested entities', () => {
+	// The Query Loop lists every published post, so start from a clean slate.
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllPosts();
 	} );
