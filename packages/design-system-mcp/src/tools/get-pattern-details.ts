@@ -1,7 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 import { getPatternDetail } from '../data.ts';
-import { formatPatternDetail } from '../format.ts';
 
 const inputSchema = z.object( {
 	slug: z
@@ -22,7 +21,7 @@ export async function handler( { slug }: z.infer< typeof inputSchema > ) {
 	for ( const patternSlug of slugs ) {
 		const detail = await getPatternDetail( patternSlug );
 		if ( detail ) {
-			sections.push( formatPatternDetail( detail ) );
+			sections.push( detail.content );
 		} else {
 			missing.push( patternSlug );
 		}

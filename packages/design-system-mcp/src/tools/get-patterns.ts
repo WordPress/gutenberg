@@ -23,7 +23,7 @@ export function register( server: McpServer ): void {
 				content: [
 					{
 						type: 'text',
-						text: formatPatterns( getPatterns() ),
+						text: formatPatterns( await getPatterns() ),
 					},
 				],
 			};

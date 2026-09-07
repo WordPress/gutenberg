@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { handler } from '../get-pattern-details';
 import { getPatternDetail } from '../../data';
-import { formatPatternDetail } from '../../format';
 import type { PatternDetail } from '../../types';
 
 vi.mock( import( '../../data' ), async ( importOriginal ) => ( {
@@ -16,7 +15,7 @@ function fakeDetail( slug: string ): PatternDetail {
 		slug,
 		title: slug,
 		description: `${ slug } description.`,
-		content: `import { Meta } from '@storybook/addon-docs/blocks';\n\n<Meta title="Design System/Patterns/${ slug }" />\n\n# ${ slug }\n\nGuidance.\n`,
+		content: `# ${ slug }\n\nGuidance.`,
 	};
 }
 
@@ -35,22 +34,8 @@ describe( 'handler', () => {
 			'destructive-actions'
 		);
 		expect( result ).toEqual( {
-			content: [
-				{ type: 'text', text: formatPatternDetail( destructive ) },
-			],
+			content: [ { type: 'text', text: destructive.content } ],
 		} );
-	} );
-
-	it( 'strips the MDX framing from the document', async () => {
-		mockGetPatternDetail.mockResolvedValueOnce(
-			fakeDetail( 'destructive-actions' )
-		);
-
-		const result = await handler( { slug: 'destructive-actions' } );
-
-		expect( result.content[ 0 ].text ).toBe(
-			'# destructive-actions\n\nGuidance.'
-		);
 	} );
 
 	it( 'joins multiple patterns with the section separator', async () => {
@@ -72,9 +57,7 @@ describe( 'handler', () => {
 			content: [
 				{
 					type: 'text',
-					text: `${ formatPatternDetail(
-						destructive
-					) }\n\n---\n\n${ formatPatternDetail( errors ) }`,
+					text: `${ destructive.content }\n\n---\n\n${ errors.content }`,
 				},
 			],
 		} );
@@ -94,9 +77,7 @@ describe( 'handler', () => {
 			content: [
 				{
 					type: 'text',
-					text: `${ formatPatternDetail(
-						destructive
-					) }\n\n---\n\n_No patterns were found for: "nope"._`,
+					text: `${ destructive.content }\n\n---\n\n_No patterns were found for: "nope"._`,
 				},
 			],
 		} );

@@ -3,7 +3,6 @@ import {
 	parseComponents,
 	parseComponentDetail,
 } from './parse-components.ts';
-import { findPattern, PATTERNS } from './patterns.ts';
 import type {
 	Component,
 	ComponentDetail,
@@ -20,13 +19,13 @@ const DESIGN_TOKENS_URL =
 	process.env.DESIGN_TOKENS_URL ||
 	'https://raw.githubusercontent.com/WordPress/gutenberg/refs/heads/trunk/packages/theme/docs/tokens.md';
 
-const PATTERNS_BASE_URL =
-	process.env.PATTERNS_BASE_URL ||
-	'https://raw.githubusercontent.com/WordPress/gutenberg/refs/heads/trunk/storybook/stories/design-system/patterns/';
+const PATTERNS_MANIFEST_URL =
+	process.env.PATTERNS_MANIFEST_URL ||
+	'https://wordpress.github.io/gutenberg/manifests/patterns.json';
 
 let cachedComponents: Record< string, ManifestComponent > | null = null;
 let cachedTokens: string | null = null;
-const cachedPatterns = new Map< string, string >();
+let cachedPatterns: Record< string, PatternDetail > | null = null;
 
 /**
  * Clear cached data. Intended for testing.
@@ -34,7 +33,7 @@ const cachedPatterns = new Map< string, string >();
 export function resetCache(): void {
 	cachedComponents = null;
 	cachedTokens = null;
-	cachedPatterns.clear();
+	cachedPatterns = null;
 }
 
 /**
@@ -117,16 +116,46 @@ export async function getDesignTokens(): Promise< { content: string } > {
 }
 
 /**
+ * Fetch and cache the patterns manifest, which the Storybook build generates
+ * from every document in `storybook/stories/design-system/patterns`.
+ *
+ * @return The patterns, keyed by slug.
+ */
+async function fetchPatterns(): Promise< Record< string, PatternDetail > > {
+	if ( cachedPatterns ) {
+		return cachedPatterns;
+	}
+
+	const response = await fetch( PATTERNS_MANIFEST_URL );
+	if ( ! response.ok ) {
+		throw new Error(
+			`Failed to fetch patterns manifest: ${ response.status } ${ response.statusText }`
+		);
+	}
+
+	const manifest: {
+		v: number;
+		patterns: Record< string, PatternDetail >;
+	} = await response.json();
+
+	cachedPatterns = manifest.patterns;
+	return cachedPatterns;
+}
+
+/**
  * Get the list of available design system patterns.
  *
  * @return The pattern list.
  */
-export function getPatterns(): Pattern[] {
-	return PATTERNS;
+export async function getPatterns(): Promise< Pattern[] > {
+	const patterns = await fetchPatterns();
+	return Object.values( patterns ).map(
+		( { slug, title, description } ) => ( { slug, title, description } )
+	);
 }
 
 /**
- * Get a single pattern document by slug, including its source content.
+ * Get a single pattern document by slug, including its markdown content.
  *
  * @param slug - The pattern slug (case-insensitive).
  * @return The pattern detail, or null if there is no such pattern.
@@ -134,25 +163,6 @@ export function getPatterns(): Pattern[] {
 export async function getPatternDetail(
 	slug: string
 ): Promise< PatternDetail | null > {
-	const pattern = findPattern( slug );
-	if ( ! pattern ) {
-		return null;
-	}
-
-	let content = cachedPatterns.get( pattern.slug );
-	if ( content === undefined ) {
-		const response = await fetch(
-			`${ PATTERNS_BASE_URL }${ pattern.slug }.mdx`
-		);
-		if ( ! response.ok ) {
-			throw new Error(
-				`Failed to fetch pattern "${ pattern.slug }": ${ response.status } ${ response.statusText }`
-			);
-		}
-
-		content = await response.text();
-		cachedPatterns.set( pattern.slug, content );
-	}
-
-	return { ...pattern, content };
+	const patterns = await fetchPatterns();
+	return patterns[ slug.trim().toLowerCase() ] ?? null;
 }
