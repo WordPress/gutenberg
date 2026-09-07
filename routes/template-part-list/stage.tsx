@@ -13,6 +13,7 @@ import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
+import { store as blocksStore } from '@wordpress/blocks';
 import {
 	Button,
 	privateApis as componentsPrivateApis,
@@ -56,8 +57,11 @@ function TemplatePartList() {
 	);
 
 	const labels = postTypeObject?.labels;
+	// Template parts can only be created while the block exists; the
+	// "template parts as patterns" experiment removes it.
 	const canCreateRecord = useSelect(
 		( select ) =>
+			!! select( blocksStore ).getBlockType( 'core/template-part' ) &&
 			select( coreStore ).canUser( 'create', {
 				kind: 'postType',
 				name: 'wp_template_part',
