@@ -23,12 +23,13 @@ describe( 'BoxControlIcon', () => {
 		expect( icon ).toHaveClass( 'custom-icon' );
 	} );
 
+	/* eslint-disable jest-dom/prefer-to-have-style -- These tests assert inline props, not computed styles. */
 	it( 'scales the icon to the requested size', () => {
 		render( <BoxControlIcon size={ 36 } title="Selected sides" /> );
 
-		expect( screen.getByTitle( 'Selected sides' ) ).toHaveStyle( {
-			transform: 'scale(1.5)',
-		} );
+		expect( screen.getByTitle( 'Selected sides' ).style.transform ).toBe(
+			'scale(1.5)'
+		);
 	} );
 
 	it( 'lets consumer styles replace the generated scale', () => {
@@ -41,7 +42,8 @@ describe( 'BoxControlIcon', () => {
 		);
 
 		const icon = screen.getByTitle( 'Selected sides' );
-		expect( icon ).toHaveStyle( { color: 'rgb(255, 0, 0)' } );
-		expect( icon ).toHaveStyle( { transform: '' } );
+		expect( icon.style.color ).toBe( 'red' );
+		expect( icon.style.transform ).toBe( '' );
 	} );
+	/* eslint-enable jest-dom/prefer-to-have-style */
 } );
