@@ -10,6 +10,7 @@
 
 ### New Features
 
+-   Add `CheckboxControl` component ([#82213](https://github.com/WordPress/gutenberg/pull/82213)).
 -   Add `Radio` form primitive ([#82214](https://github.com/WordPress/gutenberg/pull/82214)).
 -   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
 -   Add `SearchableSelect` form primitive ([#80961](https://github.com/WordPress/gutenberg/pull/80961)).
@@ -29,6 +30,7 @@
 
 ### Bug Fixes
 
+-   `Field.Label`: Reset `variant="plain"` to the default font weight so it no longer inherits the uppercase label emphasis weight ([#82213](https://github.com/WordPress/gutenberg/pull/82213)).
 -   `Select` (`variant="minimal"`): Keep the trigger borderless and unfilled when disabled. InputLayout no longer applies disabled field chrome to `.is-borderless`. ([#82468](https://github.com/WordPress/gutenberg/pull/82468))
 -   `Link`: Show the new-tab indicator and accessible notice when `target` is an ASCII case-insensitive match for `"_blank"`. ([#82447](https://github.com/WordPress/gutenberg/pull/82447))
 -   `AlertDialog`, `Dialog`, `Drawer`: Keep descendant focus rings visible at pinned header and footer edges. ([#82443](https://github.com/WordPress/gutenberg/pull/82443))
