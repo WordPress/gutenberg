@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Show a "Privacy Policy Page" badge in the document bar and the post card panel for the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
+-   Post editor: Show the inline inserter in the gap between the post title and the first block ([#82301](https://github.com/WordPress/gutenberg/pull/82301)).
 
 ### Breaking Changes
 

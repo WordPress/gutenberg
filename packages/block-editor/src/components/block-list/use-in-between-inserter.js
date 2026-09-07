@@ -167,7 +167,8 @@ export function useInBetweenInserter() {
 				const index = getBlockIndex( clientId );
 
 				// Don't show the in-between inserter before the first block in
-				// the list (preserves the original behaviour).
+				// the list. Insertion at index 0 in the post editor is handled
+				// separately via the title gap inserter.
 				if ( index === 0 ) {
 					hideInsertionPoint();
 					return;
