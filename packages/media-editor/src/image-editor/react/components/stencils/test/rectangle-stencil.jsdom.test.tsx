@@ -18,6 +18,8 @@ const CONTAINER_SIZE: Size = { width: 600, height: 400 };
 const IMAGE_SIZE: Size = { width: 500, height: 300 };
 const CROP_BOUNDS = { minX: 0, minY: 0, maxX: 1, maxY: 1 };
 
+globalThis.wpVitest.mockPointerEvent();
+
 /**
  * Render a RectangleStencil in freeform mode with sensible defaults.
  * Returns the mock callbacks; use `screen` for DOM queries.
@@ -57,30 +59,13 @@ function renderStencil(
 }
 
 describe( 'RectangleStencil', () => {
-	// jsdom does not implement PointerEvent or pointer capture — stub both so
-	// handle drag tests work. Same pattern as core/test/interaction-controller.ts.
+	// jsdom does not implement pointer capture, so stub it for handle drag tests.
 	beforeAll( () => {
 		if ( ! HTMLElement.prototype.setPointerCapture ) {
 			HTMLElement.prototype.setPointerCapture = vi.fn();
 		}
 		if ( ! HTMLElement.prototype.releasePointerCapture ) {
 			HTMLElement.prototype.releasePointerCapture = vi.fn();
-		}
-		// Without a PointerEvent constructor, fireEvent.pointerDown falls back to
-		// the base Event class which has no `button` property. The stencil's
-		// handler guards on `event.button !== 0` and returns early, so no native
-		// listeners are ever registered. Providing a minimal stub (extending
-		// MouseEvent so `button` comes from MouseEventInit) fixes this.
-		if ( typeof ( globalThis as any ).PointerEvent === 'undefined' ) {
-			( globalThis as any ).PointerEvent = class PointerEvent extends (
-				MouseEvent
-			) {
-				pointerId: number;
-				constructor( type: string, init: PointerEventInit = {} ) {
-					super( type, init );
-					this.pointerId = init.pointerId ?? 0;
-				}
-			};
 		}
 	} );
 

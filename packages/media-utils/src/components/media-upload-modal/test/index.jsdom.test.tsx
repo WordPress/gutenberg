@@ -85,14 +85,14 @@ function mockRecords( records: unknown[] ) {
 }
 
 type ModalProps = {
-	isOpen?: boolean;
+	isOpen: boolean;
 	value?: number | number[];
 	postId?: number;
 	postType?: string;
 };
 
 function renderModal(
-	{ isOpen = true, value, postId, postType }: ModalProps = {},
+	{ isOpen = true, value, postId, postType }: Partial< ModalProps > = {},
 	persistedView?: Record< string, unknown >
 ) {
 	const registry = createRegistry();

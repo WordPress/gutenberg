@@ -4,6 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { pxToValueDelta, clampValue, quantize } from '../use-ruler-drag';
 import RotationRuler from '../index';
 
+globalThis.wpVitest.mockPointerEvent();
+
 describe( 'rotation-ruler math', () => {
 	describe( 'pxToValueDelta', () => {
 		it( 'converts pointer delta to a value delta using pixelsPerStep × step', () => {
