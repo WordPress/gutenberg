@@ -10,13 +10,26 @@
 	--wp-components-grid-row-gap: initial;
 	--wp-components-grid-column-gap: initial;
 
-	align-items: var(--wp-components-grid-align);
 	display: grid;
-	grid-template-columns: var(--wp-components-grid-template-columns);
-	grid-template-rows: var(--wp-components-grid-template-rows);
 	row-gap: var(--wp-components-grid-row-gap, calc(#{$grid-unit-05} * var(--wp-components-grid-gap)));
 	column-gap: var(--wp-components-grid-column-gap, calc(#{$grid-unit-05} * var(--wp-components-grid-gap)));
+}
+
+// Omitted props leave consumer stylesheet declarations intact.
+.has-align {
+	align-items: var(--wp-components-grid-align);
+}
+
+.has-justify {
 	justify-content: var(--wp-components-grid-justify);
+}
+
+.has-template-columns {
+	grid-template-columns: var(--wp-components-grid-template-columns);
+}
+
+.has-template-rows {
+	grid-template-rows: var(--wp-components-grid-template-rows);
 }
 
 .is-inline {

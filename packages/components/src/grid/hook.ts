@@ -46,9 +46,9 @@ export default function useGrid(
 	const row = useResponsiveValue( rowsAsArray );
 
 	const gridTemplateColumns =
-		templateColumns || ( !! columns && `repeat( ${ column }, 1fr )` );
+		templateColumns || ( !! column && `repeat( ${ column }, 1fr )` );
 	const gridTemplateRows =
-		templateRows || ( !! rows && `repeat( ${ row }, 1fr )` );
+		templateRows || ( !! row && `repeat( ${ row }, 1fr )` );
 	const alignmentProps = getAlignmentProps( alignment );
 	const values = {
 		align: alignmentProps.alignItems ?? align,
@@ -63,7 +63,17 @@ export default function useGrid(
 		...otherProps,
 		className: clsx(
 			styles.grid,
-			{ [ styles[ 'is-inline' ] ]: isInline },
+			{
+				[ styles[ 'is-inline' ] ]: isInline,
+				[ styles[ 'has-align' ] ]: !! values.align?.trim(),
+				[ styles[ 'has-justify' ] ]: !! values.justify?.trim(),
+				[ styles[ 'has-template-columns' ] ]: !! toCSSValue(
+					values[ 'template-columns' ]
+				),
+				[ styles[ 'has-template-rows' ] ]: !! toCSSValue(
+					values[ 'template-rows' ]
+				),
+			},
 			// CSS-wide keywords apply to custom properties themselves. Use the
 			// matching declaration instead so, for example, rowGap="inherit"
 			// inherits the parent's row gap rather than its internal variable.
