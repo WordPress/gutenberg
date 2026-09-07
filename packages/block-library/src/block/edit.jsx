@@ -419,7 +419,13 @@ function ReusableBlockEdit( {
 		return hasPatternOverridesSource && hasOverridableBlocks( blocks );
 	}, [ hasPatternOverridesSource, blocks, supportedBlockTypesRaw ] );
 
-	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
+	// A wrapper-less instance renders nothing around the pattern on the
+	// front end, so its full-width root blocks sit directly in the parent
+	// layout. The editor always has a wrapper: infer its alignment and the
+	// parent layout so it behaves as if it weren't there. An instance with
+	// a wrapper renders the same element on both sides, so no inference.
+	const inferred = useInferredLayout( blocks, parentLayout );
+	const { alignment, layout } = hasWrapper ? EMPTY_OBJECT : inferred;
 	const layoutClasses = useLayoutClasses( { layout }, name );
 
 	// The wrapper element: the instance's `tagName`, else the area's element,
