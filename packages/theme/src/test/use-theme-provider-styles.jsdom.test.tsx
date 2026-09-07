@@ -17,11 +17,7 @@ import { renderHook } from '@testing-library/react';
 import { type ReactNode } from 'react';
 import { ThemeProvider } from '../theme-provider';
 import { useThemeProviderStyles } from '../use-theme-provider-styles';
-import {
-	buildAccentRamp,
-	buildBgRamp,
-	DEFAULT_SEED_COLORS,
-} from '../color-ramps';
+import { DEFAULT_SEED_COLORS } from '../color-ramps';
 
 describe( 'useThemeProviderStyles', () => {
 	describe( 'resolvedSettings', () => {
@@ -112,41 +108,6 @@ describe( 'useThemeProviderStyles', () => {
 	} );
 
 	describe( 'color styles', () => {
-		it( 'keeps interactive colors when a brand seed was previously cached as a status color', () => {
-			const background = '#fafafa';
-			const { result, rerender } = renderHook(
-				( { primary } ) =>
-					useThemeProviderStyles( {
-						color: { primary, background },
-					} ),
-				{ initialProps: { primary: '#abcdef' } }
-			);
-
-			for ( const primary of [
-				DEFAULT_SEED_COLORS.info,
-				DEFAULT_SEED_COLORS.success,
-				DEFAULT_SEED_COLORS.info,
-			] ) {
-				rerender( { primary } );
-				const interactive = buildAccentRamp(
-					primary,
-					buildBgRamp( background ),
-					'interactive'
-				);
-				expect(
-					result.current.themeProviderStyles[
-						'--wpds-color-foreground-interactive-brand-active'
-					]
-				).toBe( interactive.ramp.fgSurface4 );
-				expect(
-					result.current.themeProviderStyles[
-						'--wpds-color-stroke-interactive-brand-active'
-					]
-				).toBe( interactive.ramp.stroke4 );
-				expect( result.current.colorWarnings ).toEqual( [] );
-			}
-		} );
-
 		it( 'omits color custom properties by default', () => {
 			const { result } = renderHook( () => useThemeProviderStyles() );
 

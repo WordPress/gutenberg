@@ -16,8 +16,6 @@ import {
 	solveWithBisect,
 } from './utils.ts';
 import type {
-	AccentRampPurpose,
-	AccentRampResult,
 	BaseRamp,
 	BaseRampStep,
 	FollowDirection,
@@ -218,30 +216,21 @@ type BuildRampOptions = {
 	pinLightness?: { stepName: BaseRampStep; value: number };
 	backgroundRamp?: RampResult;
 	rescaleToFitContrastTargets?: boolean;
-	purpose?: AccentRampPurpose;
 };
 
 /**
  * Solve base constraints, rebuild surfaces and strokes, then position the
  * foreground scale. Seed lightness may shift to make the base constraints fit.
- * Purpose-specific outputs omit unused steps only after preserving their
- * constraint dependencies and spacing contributions.
  *
- * @param seedArg Original opaque sRGB seed string.
- * @param config  Base constraints and foreground policy.
- * @param options Direction, seed adjustment, background, and output profile.
+ * @param seedArg                             Original opaque sRGB seed string.
+ * @param config                              Base constraints and foreground policy.
+ * @param options                             Direction, seed adjustment, and background.
+ * @param options.mainDirection               Main ramp direction override.
+ * @param options.pinLightness                Optional pinned step lightness.
+ * @param options.backgroundRamp              Background behind an accent ramp.
+ * @param options.rescaleToFitContrastTargets Whether seed rescaling is allowed.
  * @return Generated colors, direction, and any remaining ramp warnings.
  */
-export function buildRamp(
-	seedArg: string,
-	config: RampConfig,
-	options?: BuildRampOptions & { purpose?: 'full' }
-): RampResult;
-export function buildRamp(
-	seedArg: string,
-	config: RampConfig,
-	options: BuildRampOptions
-): AccentRampResult;
 export function buildRamp(
 	seedArg: string,
 	config: RampConfig,
@@ -250,9 +239,8 @@ export function buildRamp(
 		pinLightness,
 		backgroundRamp,
 		rescaleToFitContrastTargets = true,
-		purpose = 'full',
 	}: BuildRampOptions = {}
-): AccentRampResult {
+): RampResult {
 	// Validate here: the single point where user-supplied color strings enter.
 	// Internal seed-adjustment passes use already validated color objects.
 	assertValidSeedColor( seedArg );
@@ -372,34 +360,12 @@ export function buildRamp(
 			warnings: bestWarnings,
 			direction: mainDir,
 		},
-		backgroundRamp,
-		purpose
+		backgroundRamp
 	);
 
-	if ( purpose === 'full' ) {
-		return buildForegroundScale(
-			rampResult,
-			backgroundRamp ?? rampResult,
-			config.foregroundScale
-		);
-	}
-	const foregroundResult = buildForegroundScale(
+	return buildForegroundScale(
 		rampResult,
 		backgroundRamp ?? rampResult,
-		config.foregroundScale,
-		purpose !== 'status'
+		config.foregroundScale
 	);
-	// Do not expose base colors whose final reconstruction was intentionally
-	// skipped. Their base constraints and spacing contributions remain intact.
-	const pruned: AccentRampResult = {
-		...foregroundResult,
-		ramp: { ...foregroundResult.ramp },
-	};
-	delete pruned.ramp.surface6;
-	delete pruned.ramp.stroke2;
-	if ( purpose === 'status' ) {
-		delete pruned.ramp.stroke4;
-		delete pruned.ramp.fgSurface5;
-	}
-	return pruned;
 }
