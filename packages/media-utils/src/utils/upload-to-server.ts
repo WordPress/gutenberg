@@ -12,11 +12,7 @@ export async function uploadToServer(
 	const data = new FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
 	for ( const [ key, value ] of Object.entries( additionalData ) ) {
-		flattenFormData(
-			data,
-			key,
-			value as string | Record< string, string > | undefined
-		);
+		flattenFormData( data, key, value );
 	}
 
 	return transformAttachment(
