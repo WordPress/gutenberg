@@ -876,6 +876,32 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		] );
 		expect( cancelled ).toBe( true );
 
+		// The caret is at the very start of the new field: not after the
+		// padding character and not in the placeholder, which the keyboard
+		// would read as a character before the caret.
+		const caret = await editor.canvas.locator( ':root' ).evaluate( () => {
+			const { anchorNode, anchorOffset } = window.getSelection();
+			const element =
+				anchorNode.nodeType === anchorNode.ELEMENT_NODE
+					? anchorNode
+					: anchorNode.parentElement;
+			const field = element.closest(
+				'.block-editor-rich-text__editable'
+			);
+			// A range only to read what precedes the caret; the selection
+			// is left as Enter placed it.
+			const beforeCaret = document.createRange();
+			beforeCaret.setStart( field, 0 );
+			beforeCaret.setEnd( anchorNode, anchorOffset );
+			return {
+				textBefore: beforeCaret.toString(),
+				inPlaceholder: !! element.closest(
+					'[data-rich-text-placeholder]'
+				),
+			};
+		} );
+		expect( caret ).toEqual( { textBefore: '', inPlaceholder: false } );
+
 		await page.keyboard.type( '‸' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{ name: 'core/paragraph', attributes: { content: 'First' } },
