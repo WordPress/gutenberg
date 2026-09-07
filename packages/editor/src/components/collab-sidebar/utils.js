@@ -431,6 +431,47 @@ export function pickPrimaryNote( threads ) {
 }
 
 /**
+ * Selects unresolved threads for the indicator, falling back to all threads
+ * so resolved notes remain accessible when no unresolved threads remain.
+ *
+ * @param {Array} threads Threads belonging to the selected block.
+ * @return {Array} Threads represented by the indicator.
+ */
+export function pickIndicatorNotes( threads ) {
+	const unresolved = threads.filter( ( thread ) => thread.status === 'hold' );
+	return unresolved.length ? unresolved : threads;
+}
+
+/**
+ * Collects distinct authors and repliers across threads in order of their
+ * first contribution, without changing the threads or their replies.
+ *
+ * @param {Array} threads Thread objects with optional reply arrays.
+ * @return {Array} Participants with an id, name, and avatar URL.
+ */
+export function getThreadParticipants( threads ) {
+	const entries = threads
+		.flatMap( ( thread ) => [ thread, ...( thread.reply ?? [] ) ] )
+		.sort( ( a, b ) => new Date( a.date ) - new Date( b.date ) );
+	const participants = new Map();
+
+	for ( const entry of entries ) {
+		if ( ! entry.author_name || participants.has( entry.author ) ) {
+			continue;
+		}
+		participants.set( entry.author, {
+			id: entry.author,
+			name: entry.author_name,
+			avatar:
+				entry.author_avatar_urls?.[ '48' ] ||
+				entry.author_avatar_urls?.[ '96' ],
+		} );
+	}
+
+	return Array.from( participants.values() );
+}
+
+/**
  * Removes a note ID from the metadata.
  *
  * @param {Object} metadata Existing block metadata
