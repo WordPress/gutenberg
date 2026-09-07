@@ -68,10 +68,40 @@ export function mediaEditorReducer(
 				cropOptions: nextCropOptions,
 			};
 		}
+		case 'SET_CROP_SHAPE': {
+			const { shape, visualSize } = action.payload;
+			const nextCropOptions: CropOptionsSlice = {
+				...state.cropOptions,
+				cropShape: shape,
+			};
+			const shouldReshape =
+				shape === 'circle' &&
+				visualSize.width > 0 &&
+				visualSize.height > 0;
+			const nextCropper = shouldReshape
+				? cropperReducer( state.cropper, {
+						type: 'SET_CROP_RECT',
+						payload: computeInscribedRect( 1, visualSize ),
+				  } )
+				: state.cropper;
+
+			if (
+				nextCropper === state.cropper &&
+				state.cropOptions.cropShape === shape
+			) {
+				return state;
+			}
+
+			return {
+				cropper: nextCropper,
+				cropOptions: nextCropOptions,
+			};
+		}
 		case 'RESET_CROP_OPTIONS': {
 			if (
 				state.cropOptions.aspectRatioValue ===
-				DEFAULT_CROP_OPTIONS.aspectRatioValue
+					DEFAULT_CROP_OPTIONS.aspectRatioValue &&
+				state.cropOptions.cropShape === DEFAULT_CROP_OPTIONS.cropShape
 			) {
 				return state;
 			}
@@ -112,7 +142,8 @@ export function areMediaEditorStatesEqual(
 	}
 	return (
 		areCropperStatesEqual( a.cropper, b.cropper ) &&
-		a.cropOptions.aspectRatioValue === b.cropOptions.aspectRatioValue
+		a.cropOptions.aspectRatioValue === b.cropOptions.aspectRatioValue &&
+		a.cropOptions.cropShape === b.cropOptions.cropShape
 	);
 }
 

@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	aspectRatio as aspectRatioIcon,
 	check,
+	crop as cropIcon,
 	rotateLeft,
 	rotateRight,
 	flipHorizontal,
@@ -46,6 +47,12 @@ export interface MediaEditorImageControlsProps {
 	 * renders the full aspect-ratio select control.
 	 */
 	showAspectRatioControl?: boolean;
+	/**
+	 * When `true`, include a crop-shape dropdown in the flat toolbar.
+	 * Omitted from the labelled panel layout because the Crop panel already
+	 * renders the full shape control.
+	 */
+	showCropShapeControl?: boolean;
 	/** Optional caller-supplied aspect-ratio presets. */
 	aspectRatioPresets?: AspectRatioPreset[];
 	/**
@@ -65,19 +72,27 @@ export interface MediaEditorImageControlsProps {
  * @param props
  * @param props.withLabels
  * @param props.showAspectRatioControl
+ * @param props.showCropShapeControl
  * @param props.aspectRatioPresets
  * @param props.zoomFactor
  */
 export default function MediaEditorImageControls( {
 	withLabels = false,
 	showAspectRatioControl = false,
+	showCropShapeControl = false,
 	aspectRatioPresets,
 	zoomFactor = DEFAULT_ZOOM_FACTOR,
 }: MediaEditorImageControlsProps ) {
 	const { state, setFlip, snapRotate90, setZoom } = useMediaEditor();
-	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
-		useCropOptions( { aspectRatioPresets } );
+	const {
+		aspectRatioValue,
+		setAspectRatioValue,
+		cropShape,
+		setCropShape,
+		aspectRatioOptions,
+	} = useCropOptions( { aspectRatioPresets } );
 	const hasAspectRatioControl = ! withLabels && showAspectRatioControl;
+	const hasCropShapeControl = ! withLabels && showCropShapeControl;
 	const minZoom = getMinZoom( state );
 	const zoomByFactor = ( factor: number ) => {
 		setZoom(
@@ -163,7 +178,13 @@ export default function MediaEditorImageControls( {
 			icon={ aspectRatioIcon }
 			label={ __( 'Aspect ratio' ) }
 			popoverProps={ { placement: 'top' } }
-			toggleProps={ { size: 'compact' } }
+			// Circle crops are locked to 1:1, so the aspect-ratio control is
+			// greyed out rather than removed to keep the toolbar stable.
+			toggleProps={ {
+				size: 'compact',
+				disabled: cropShape === 'circle',
+				accessibleWhenDisabled: true,
+			} }
 		>
 			{ ( { onClose } ) => (
 				<MenuGroup label={ __( 'Aspect ratio' ) }>
@@ -185,6 +206,42 @@ export default function MediaEditorImageControls( {
 							</MenuItem>
 						);
 					} ) }
+				</MenuGroup>
+			) }
+		</DropdownMenu>
+	) : null;
+
+	const cropShapeDropdown = hasCropShapeControl ? (
+		<DropdownMenu
+			icon={ cropIcon }
+			label={ __( 'Crop shape' ) }
+			popoverProps={ { placement: 'top' } }
+			toggleProps={ { size: 'compact' } }
+		>
+			{ ( { onClose } ) => (
+				<MenuGroup label={ __( 'Crop shape' ) }>
+					<MenuItem
+						role="menuitemradio"
+						isSelected={ cropShape === 'rectangle' }
+						icon={ cropShape === 'rectangle' ? check : undefined }
+						onClick={ () => {
+							setCropShape( 'rectangle' );
+							onClose();
+						} }
+					>
+						{ __( 'Rectangle' ) }
+					</MenuItem>
+					<MenuItem
+						role="menuitemradio"
+						isSelected={ cropShape === 'circle' }
+						icon={ cropShape === 'circle' ? check : undefined }
+						onClick={ () => {
+							setCropShape( 'circle' );
+							onClose();
+						} }
+					>
+						{ __( 'Circle' ) }
+					</MenuItem>
 				</MenuGroup>
 			) }
 		</DropdownMenu>
@@ -249,6 +306,7 @@ export default function MediaEditorImageControls( {
 			{ rotateButtons }
 			{ flipButtons }
 			{ zoomButtons }
+			{ cropShapeDropdown }
 			{ aspectRatioDropdown }
 		</div>
 	);

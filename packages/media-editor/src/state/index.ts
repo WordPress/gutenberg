@@ -15,6 +15,7 @@ export {
 export { DEFAULT_CROP_OPTIONS } from './types';
 export type {
 	CropOptionsSlice,
+	CropShape,
 	MediaEditorState,
 	MediaEditorAction,
 } from './types';

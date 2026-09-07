@@ -4,7 +4,7 @@ import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
-import { Cropper } from '../../image-editor';
+import { CircleStencil, Cropper } from '../../image-editor';
 import { useMediaEditor, resolveAspectRatio } from '../../state';
 
 export interface MediaEditorCanvasProps {
@@ -36,7 +36,7 @@ export default function MediaEditorCanvas( {
 }: MediaEditorCanvasProps ) {
 	const { media } = useMediaEditorContext();
 	const controller = useMediaEditor();
-	const { aspectRatioValue } = controller.cropOptions;
+	const { aspectRatioValue, cropShape } = controller.cropOptions;
 	const cropperImage = controller.state.image;
 	const { beginGesture, endGesture, setImage } = controller;
 
@@ -50,7 +50,8 @@ export default function MediaEditorCanvas( {
 	// Resolved aspect ratio is derived from the preset key + the
 	// loaded image (for the "Original" preset). The reducer doesn't
 	// store this number — only the preset key — so it's a render-time
-	// derivation here.
+	// derivation here. Circle crops force a 1:1 ratio inside `Cropper`
+	// via `stencilShape`, so no shape branch is needed here.
 	const aspectRatio = useMemo(
 		() => resolveAspectRatio( aspectRatioValue, cropperImage ),
 		[ aspectRatioValue, cropperImage ]
@@ -154,6 +155,10 @@ export default function MediaEditorCanvas( {
 					src={ mediaUrl }
 					controller={ controller }
 					aspectRatio={ aspectRatio }
+					stencil={
+						cropShape === 'circle' ? CircleStencil : undefined
+					}
+					stencilShape={ cropShape }
 					freeformCrop
 					showGrid="interactive"
 					isPlacementActive={ isPlacementActive }

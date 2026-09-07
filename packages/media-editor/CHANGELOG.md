@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+<<<<<<< HEAD
 ### Internal
 
 -   Remove unused dependency `@wordpress/date` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
@@ -28,6 +29,11 @@
 ## 0.16.0 (2026-08-12)
 
 ## 0.15.0 (2026-07-29)
+=======
+### New Features
+
+-   Add circular crop support to the media editor, saved as a transparent PNG (or another alpha-capable format negotiated via `image_editor_output_format`).
+>>>>>>> 085b16b0782 (Harden circle mask for production and refine aspect-ratio UI)
 
 ## 0.14.0 (2026-07-14)
 
