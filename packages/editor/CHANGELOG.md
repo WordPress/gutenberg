@@ -21,6 +21,8 @@
 
 ### Bug Fixes
 
+-   Notes: Show distinct authors and repliers across all unresolved threads on a block in the toolbar avatar indicator, retaining access to resolved threads when none remain unresolved ([#82357](https://github.com/WordPress/gutenberg/pull/82357)).
+
 -   More menu: Align SVG prefix icons with item labels using `Menu.PrefixIcon`, preserving Dashicon and custom component support. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
 -   Attach media an Image or Gallery block displays to the post on save, when it is not already attached to another post, matching what uploading into that post has always done ([#81977](https://github.com/WordPress/gutenberg/pull/81977)).
 -   Color the welcome guide's hovered button icon with `color` rather than `fill`, so stroke-based icons follow it. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))

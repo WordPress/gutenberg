@@ -5,7 +5,20 @@ The Notes sidebar (a.k.a. collab sidebar) lets users attach threaded notes to in
 - **All notes** - a full sidebar (opened from the editor's More menu) listing every note thread on the current post.
 - **Floating notes** - on larger viewports, unresolved notes also float next to their associated blocks in the canvas, positioned to track scroll and avoid overlap.
 
-Notes are stored as WordPress comments (`type: 'note'`) attached to the post. A block references its thread via `metadata.noteId` on block attributes. Each thread has a top-level note plus replies; threads can be resolved (stored as status `approved`) or reopened.
+Notes are stored as WordPress comments (`type: 'note'`) attached to the post. A block references its threads via `metadata.noteId` on block attributes. Each thread has a top-level note plus replies; threads can be resolved (stored as status `approved`) or reopened.
+
+## Toolbar participants
+
+The “View notes” button shows distinct authors and repliers across every unresolved
+thread on the selected block, including block-level and inline notes. Participants
+appear in order of their first contribution. When all threads are resolved, the
+button includes participants from those resolved threads so the notes remain
+accessible.
+
+Up to three participants appear as avatars. With more participants, two avatars
+appear alongside the remaining count. Activating the button opens the first
+unresolved thread, falling back to the first resolved thread. Aggregating avatars
+does not change the sidebar’s thread ordering or focus behavior.
 
 ## File structure
 
@@ -39,7 +52,7 @@ collab-sidebar/
 NotesSidebarContainer (index.jsx)         - gates on post type support
  └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + sidebar registration
       ├── AddNoteMenuItem                - slot fill in the block toolbar
-      ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars)
+      ├── NoteAvatarIndicator            - slot fill in the block toolbar (participants across the block’s threads)
       ├── PluginSidebar (all-notes)      - full sidebar
       │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
       │         ├── AddNote              - rendered when no threads (template-locked) or selectedNote === 'new'
