@@ -13,6 +13,7 @@
 
 ### Internal
 
+-   Allowed Blocks Modal: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` ([#78119](https://github.com/WordPress/gutenberg/pull/78119)).
 -   Block Switcher: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` for the bindings hint ([#77366](https://github.com/WordPress/gutenberg/pull/77366)).
 -   Inspector Popover Header: Use `Text` from `@wordpress/ui` instead of `__experimentalHeading` and `__experimentalText` from `@wordpress/components` ([#77449](https://github.com/WordPress/gutenberg/pull/77449)).
 -   Remove unused dependencies `@wordpress/escape-html`, `@wordpress/wordcount` and `deepmerge` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
