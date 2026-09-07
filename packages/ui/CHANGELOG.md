@@ -33,6 +33,7 @@
 ### Bug Fixes
 
 -   `Fieldset`: Fix gap token to match spec ([#75479](https://github.com/WordPress/gutenberg/pull/75479)).
+-   `Link`: Defend `text-decoration` against unlayered global CSS, so the underline survives host rules such as `.some-admin-page a { text-decoration: none; }` ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
 -   `Field.Label`: Reset `variant="plain"` to the default font weight so it no longer inherits the uppercase label emphasis weight ([#82213](https://github.com/WordPress/gutenberg/pull/82213)).
 -   `Select` (`variant="minimal"`): Keep the trigger borderless and unfilled when disabled. InputLayout no longer applies disabled field chrome to `.is-borderless`. ([#82468](https://github.com/WordPress/gutenberg/pull/82468))
 -   `Link`: Show the new-tab indicator and accessible notice when `target` is an ASCII case-insensitive match for `"_blank"`. ([#82447](https://github.com/WordPress/gutenberg/pull/82447))
