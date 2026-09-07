@@ -66,7 +66,9 @@ describe( 'useCreateOverlayTemplatePart', () => {
 				if ( store === require( '@wordpress/block-editor' ).store ) {
 					return {}; // Return mock block editor store
 				}
-				return {};
+				return {
+					getCurrentTheme: () => ( { stylesheet: 'theme' } ),
+				};
 			} );
 			return selector( mockSelect );
 		} );

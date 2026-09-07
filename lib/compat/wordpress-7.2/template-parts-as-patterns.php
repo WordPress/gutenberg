@@ -72,7 +72,9 @@ function gutenberg_get_template_part_pattern_properties( $title, $area ) {
 		'blockTypes' => array( 'core/template-part/' . $area ),
 		'inserter'   => 'navigation-overlay' !== $area,
 	);
-	if ( WP_TEMPLATE_PART_AREA_UNCATEGORIZED !== $area ) {
+	// Navigation overlays belong to the Navigation block, not to a pattern
+	// category.
+	if ( WP_TEMPLATE_PART_AREA_UNCATEGORIZED !== $area && 'navigation-overlay' !== $area ) {
 		$properties['categories'] = array( $area );
 	}
 	return $properties;

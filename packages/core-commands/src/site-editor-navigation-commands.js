@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { useMemo, useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { post, page, layout, symbolFilled } from '@wordpress/icons';
+import { post, page, layout } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { addQueryArgs, getPath } from '@wordpress/url';
 import { useDebounce } from '@wordpress/compose';
@@ -17,7 +17,6 @@ const icons = {
 	post,
 	page,
 	wp_template: layout,
-	wp_template_part: symbolFilled,
 };
 
 function useDebouncedValue( value ) {
@@ -54,10 +53,6 @@ function mapRoute( path ) {
 	// Check if path needs mapping
 	for ( const [ oldPath, newPath ] of Object.entries( ROUTE_MAPPING ) ) {
 		if ( path === oldPath || path.startsWith( oldPath + '?' ) ) {
-			// Handle template parts special case
-			if ( path.includes( 'postType=wp_template_part' ) ) {
-				return '/template-parts';
-			}
 			// Replace the base path
 			return path.replace( oldPath, newPath );
 		}
@@ -226,10 +221,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 		}, [ records, search ] );
 
 		const commands = useMemo( () => {
-			if (
-				! canCreateTemplate ||
-				( ! isBlockBasedTheme && ! templateType === 'wp_template_part' )
-			) {
+			if ( ! canCreateTemplate || ! isBlockBasedTheme ) {
 				return [];
 			}
 			const isSiteEditor = getPath( window.location.href )?.includes(
@@ -266,35 +258,6 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 				} )
 			);
 
-			if (
-				orderedRecords?.length > 0 &&
-				templateType === 'wp_template_part'
-			) {
-				result.push( {
-					name: 'core/edit-site/open-template-parts',
-					label: __( 'Go to: Template parts' ),
-					category: 'view',
-					callback: ( { close } ) => {
-						if ( isSiteEditor ) {
-							history.navigate(
-								mapRoute(
-									'/pattern?postType=wp_template_part&categoryId=all-parts'
-								)
-							);
-						} else {
-							document.location = addQueryArgs(
-								getSiteEditorPage(),
-								{
-									p: mapRoute( '/pattern' ),
-									postType: 'wp_template_part',
-									categoryId: 'all-parts',
-								}
-							);
-						}
-						close();
-					},
-				} );
-			}
 			return result;
 		}, [ canCreateTemplate, isBlockBasedTheme, orderedRecords, history ] );
 
@@ -499,11 +462,6 @@ export function useSiteEditorNavigationCommands( isNetworkAdmin ) {
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-templates',
 		hook: getNavigationCommandLoaderPerTemplate( 'wp_template' ),
-		disabled: isNetworkAdmin,
-	} );
-	useCommandLoader( {
-		name: 'core/edit-site/navigate-template-parts',
-		hook: getNavigationCommandLoaderPerTemplate( 'wp_template_part' ),
 		disabled: isNetworkAdmin,
 	} );
 	useCommandLoader( {

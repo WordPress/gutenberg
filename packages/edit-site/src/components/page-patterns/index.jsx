@@ -1,19 +1,12 @@
 import { Page } from '@wordpress/admin-ui';
-import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useView, useViewConfig } from '@wordpress/views';
-import { useSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
-import {
-	PATTERN_TYPES,
-	TEMPLATE_PART_POST_TYPE,
-	PATTERN_DEFAULT_CATEGORY,
-} from '../../utils/constants';
+import { PATTERN_TYPES, PATTERN_DEFAULT_CATEGORY } from '../../utils/constants';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
@@ -31,22 +24,8 @@ const VIEW_CONFIG_FIELDS = [ 'default_view', 'default_layouts' ];
 
 function usePagePatternsHeader( type, categoryId ) {
 	const { patternCategories } = usePatternCategories();
-	const templatePartAreas = useSelect(
-		( select ) =>
-			select( coreStore ).getCurrentTheme()
-				?.default_template_part_areas || [],
-		[]
-	);
 	let title, description, patternCategory;
-	if ( type === TEMPLATE_PART_POST_TYPE ) {
-		const templatePartArea = templatePartAreas.find(
-			( area ) => area.area === categoryId
-		);
-		title = templatePartArea?.label || __( 'All Template Parts' );
-		description =
-			templatePartArea?.description ||
-			__( 'Includes every template part defined for any area.' );
-	} else if ( type === PATTERN_TYPES.user && !! categoryId ) {
+	if ( type === PATTERN_TYPES.user && !! categoryId ) {
 		patternCategory = patternCategories.find(
 			( category ) => category.name === categoryId
 		);
@@ -103,33 +82,24 @@ export default function DataviewsPatterns() {
 
 	const { data, paginationInfo } = useMemo( () => {
 		// Search is managed server-side as well as filters for patterns.
-		// However, the author filter in template parts is done client-side.
 		const viewWithoutFilters = { ...view };
 		delete viewWithoutFilters.search;
-		if ( postType !== TEMPLATE_PART_POST_TYPE ) {
-			viewWithoutFilters.filters = [];
-		}
+		viewWithoutFilters.filters = [];
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
-	}, [ patterns, view, fields, postType ] );
+	}, [ patterns, view, fields ] );
 
 	const dataWithPermissions = useAugmentPatternsWithPermissions( data );
 
-	const templatePartActions = usePostActions( {
-		postType: TEMPLATE_PART_POST_TYPE,
-		context: 'list',
-	} );
 	const patternActions = usePostActions( {
 		postType: PATTERN_TYPES.user,
 		context: 'list',
 	} );
 	const editAction = useEditPostAction();
 
-	const actions = useMemo( () => {
-		if ( postType === TEMPLATE_PART_POST_TYPE ) {
-			return [ editAction, ...templatePartActions ].filter( Boolean );
-		}
-		return [ editAction, ...patternActions ].filter( Boolean );
-	}, [ editAction, postType, templatePartActions, patternActions ] );
+	const actions = useMemo(
+		() => [ editAction, ...patternActions ].filter( Boolean ),
+		[ editAction, patternActions ]
+	);
 	const settings = usePatternSettings();
 	const { title, description } = usePagePatternsHeader(
 		postType,

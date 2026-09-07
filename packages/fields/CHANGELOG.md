@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the `CreateTemplatePartModal` component, the `duplicateTemplatePart` action and the `templatePartAuthorField` field, now that template parts are registered patterns ([#82569](https://github.com/WordPress/gutenberg/pull/82569)).
+
 ### New Features
 
 -   Add the `resetPattern` action, which reverts an edited registered pattern to its registered version ([#82549](https://github.com/WordPress/gutenberg/pull/82549)).

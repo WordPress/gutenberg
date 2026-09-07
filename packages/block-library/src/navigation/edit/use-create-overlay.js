@@ -7,6 +7,7 @@ import { parse, serialize, createBlock } from '@wordpress/blocks';
 import { getUniqueTemplatePartTitle, getCleanTemplatePartSlug } from './utils';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 import { unlock } from '../../lock-unlock';
+import { areTemplatePartsPatterns } from './use-overlay-patterns';
 
 /**
  * Hook to create a new overlay template part.
@@ -16,7 +17,11 @@ import { unlock } from '../../lock-unlock';
  *                                      The function returns a Promise that resolves to the created template part object.
  */
 export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
+	const stylesheet = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
+		[]
+	);
 	const pattern = useSelect(
 		( select ) =>
 			unlock( select( blockEditorStore ) ).getPatternBySlug(
@@ -51,6 +56,35 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 		}
 
 		// Create the template part
+		// Where template parts are registered patterns, an overlay is the
+		// edited copy of a part pattern (`theme/part/slug`) in the overlay
+		// area; the plugin registers it from the copy on the next request.
+		if ( areTemplatePartsPatterns() ) {
+			const name = `${ stylesheet }/part/${ cleanSlug }`;
+			const copy = await saveEntityRecord(
+				'postType',
+				'wp_block',
+				{
+					title: uniqueTitle,
+					content: initialContent,
+					status: 'publish',
+					meta: {
+						wp_pattern_slug: name,
+						wp_pattern_area: NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
+					},
+				},
+				{ throwOnError: true }
+			);
+			invalidateResolution( 'getBlockPatterns' );
+			return {
+				id: copy.id,
+				slug: cleanSlug,
+				name,
+				theme: stylesheet,
+				title: { rendered: uniqueTitle },
+			};
+		}
+
 		const templatePart = await saveEntityRecord(
 			'postType',
 			'wp_template_part',
@@ -64,7 +98,13 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 		);
 
 		return templatePart;
-	}, [ overlayTemplateParts, saveEntityRecord, pattern ] );
+	}, [
+		overlayTemplateParts,
+		saveEntityRecord,
+		invalidateResolution,
+		pattern,
+		stylesheet,
+	] );
 
 	return createOverlayTemplatePart;
 }

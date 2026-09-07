@@ -23,11 +23,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { decodeEntities } from '@wordpress/html-entities';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
-import {
-	PATTERN_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_POST_TYPE,
-} from '../../store/constants';
+import { PATTERN_POST_TYPE, TEMPLATE_POST_TYPE } from '../../store/constants';
 import { modalName as patternRenameModalName } from '../pattern-rename-modal';
 import { modalName as patternDuplicateModalName } from '../pattern-duplicate-modal';
 import isTemplateRevertable from '../../store/utils/is-template-revertable';
@@ -68,11 +64,8 @@ function getTogglePatternEditingCommand( {
 	};
 }
 
-function isPatternOrTemplatePartBlock( blockName, attributes ) {
-	return (
-		!! attributes?.metadata?.patternName ||
-		blockName === 'core/template-part'
-	);
+function isPatternBlock( attributes ) {
+	return !! attributes?.metadata?.patternName;
 }
 
 const getEditorCommandLoader = () =>
@@ -374,12 +367,11 @@ const getPatternEditingContextualCommands = () =>
 	function usePatternEditingContextualCommands( { search } ) {
 		const {
 			disableContentOnlyForPatternsAndTemplateParts,
-			hasPatternOrTemplatePartSelection,
+			hasPatternSelection,
 			isPreviewMode,
 		} = useSelect( ( select ) => {
 			const {
 				getBlockAttributes,
-				getBlockName,
 				getBlockParents,
 				getSelectedBlockClientId,
 				getSelectedBlockClientIds,
@@ -401,12 +393,8 @@ const getPatternEditingContextualCommands = () =>
 				disableContentOnlyForPatternsAndTemplateParts:
 					!! editorSettings.disableContentOnlyForUnsyncedPatterns &&
 					!! editorSettings.disableContentOnlyForTemplateParts,
-				hasPatternOrTemplatePartSelection: clientIdsToCheck.some(
-					( clientId ) =>
-						isPatternOrTemplatePartBlock(
-							getBlockName( clientId ),
-							getBlockAttributes( clientId )
-						)
+				hasPatternSelection: clientIdsToCheck.some( ( clientId ) =>
+					isPatternBlock( getBlockAttributes( clientId ) )
 				),
 				isPreviewMode: getSettings().isPreviewMode,
 			};
@@ -418,10 +406,10 @@ const getPatternEditingContextualCommands = () =>
 		);
 
 		// Keep the disable command available after full pattern editing is enabled,
-		// even when the current selection is no longer inside a pattern or template part.
+		// even when the current selection is no longer inside a pattern.
 		if (
 			search ||
-			( ! hasPatternOrTemplatePartSelection &&
+			( ! hasPatternSelection &&
 				! disableContentOnlyForPatternsAndTemplateParts ) ||
 			isPreviewMode
 		) {
@@ -575,30 +563,18 @@ const getManipulateDocumentCommands = () =>
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 		const { revertTemplate } = unlock( useDispatch( editorStore ) );
 
-		if (
-			! hasResolved ||
-			! [ TEMPLATE_PART_POST_TYPE, TEMPLATE_POST_TYPE ].includes(
-				postType
-			)
-		) {
+		if ( ! hasResolved || TEMPLATE_POST_TYPE !== postType ) {
 			return { isLoading: true, commands: [] };
 		}
 
 		const commands = [];
 
 		if ( isTemplateRevertable( template ) ) {
-			const label =
-				template.type === TEMPLATE_POST_TYPE
-					? sprintf(
-							/* translators: %s: template title */
-							__( 'Reset template: %s' ),
-							decodeEntities( template.title )
-					  )
-					: sprintf(
-							/* translators: %s: template part title */
-							__( 'Reset template part: %s' ),
-							decodeEntities( template.title )
-					  );
+			const label = sprintf(
+				/* translators: %s: template title */
+				__( 'Reset template: %s' ),
+				decodeEntities( template.title )
+			);
 			commands.push( {
 				name: 'core/reset-template',
 				label,

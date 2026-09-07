@@ -265,7 +265,6 @@ Private exports:
 ## editor
 
 Private exports:
-- `CreateTemplatePartModal`
 - `BackButton`
 - `Editor`
 - `PluginPostExcerpt`

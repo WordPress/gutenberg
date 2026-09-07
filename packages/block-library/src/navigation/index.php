@@ -443,6 +443,37 @@ class WP_Navigation_Block_Renderer {
 			return new WP_Block_List( array(), $attributes );
 		}
 
+		// Where template parts are registered patterns (`theme/part/slug`),
+		// the overlay is the part's edited copy, else its registered pattern.
+		$pattern_name   = str_contains( $overlay_template_part_id, '/part/' ) ? $overlay_template_part_id : $theme . '/part/' . $slug;
+		$pattern_markup = null;
+		$pattern_copies = get_posts(
+			array(
+				'post_type'      => 'wp_block',
+				'post_status'    => 'publish',
+				'posts_per_page' => 1,
+				'meta_key'       => 'wp_pattern_slug',
+				'meta_value'     => $pattern_name,
+				'no_found_rows'  => true,
+			)
+		);
+		$pattern_copy   = $pattern_copies ? $pattern_copies[0] : null;
+		if ( $pattern_copy ) {
+			$pattern_markup = apply_block_hooks_to_content_from_post_object( $pattern_copy->post_content, $pattern_copy );
+		} else {
+			$pattern = WP_Block_Patterns_Registry::get_instance()->get_registered( $pattern_name );
+			if ( $pattern ) {
+				$pattern_markup = $pattern['content'];
+			}
+		}
+		if ( null !== $pattern_markup ) {
+			$pattern_markup = shortcode_unautop( $pattern_markup );
+			$pattern_markup = do_shortcode( $pattern_markup );
+			$blocks         = block_core_navigation_filter_out_empty_blocks( parse_blocks( $pattern_markup ) );
+			$blocks         = static::disable_overlay_menu_for_nested_navigation_blocks( $blocks );
+			return new WP_Block_List( $blocks, $attributes );
+		}
+
 		// Query for the template part post.
 		$template_part_query = new WP_Query(
 			array(

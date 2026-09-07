@@ -235,10 +235,7 @@ export default function DocumentBar( props ) {
 							</span>
 							{ unlockedPatternInfo && (
 								<span className="editor-document-bar__post-type-label">
-									{ unlockedPatternInfo.type ===
-									'template-part'
-										? `· ${ __( 'Template Part' ) }`
-										: `· ${ __( 'Pattern' ) }` }
+									{ `· ${ __( 'Pattern' ) }` }
 								</span>
 							) }
 							{ ! unlockedPatternInfo && pageTypeBadge && (

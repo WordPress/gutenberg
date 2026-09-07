@@ -83,8 +83,6 @@
 		{ "path": "routes/styles" },
 		{ "path": "routes/template" },
 		{ "path": "routes/template-list" },
-		{ "path": "routes/template-part" },
-		{ "path": "routes/template-part-list" },
 		{ "path": "storybook" },
 		{ "path": "tools/pr-meta" },
 		{ "path": "test/e2e" },

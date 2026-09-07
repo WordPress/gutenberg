@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Patterns: Only offer to create a template part while the Template Part block is registered ([#82569](https://github.com/WordPress/gutenberg/pull/82569)).
+-   Remove the template part user interface from the site editor: the template part route, the template part areas in the patterns sidebar, and the template part listing, actions and creation controls on the patterns page ([#82569](https://github.com/WordPress/gutenberg/pull/82569)).
 -   Patterns: Registered patterns can be edited from the Patterns page; the edit creates a linked copy that stands in for the registered pattern, and "Reset" reverts it ([#82549](https://github.com/WordPress/gutenberg/pull/82549)).
 -   Add New Template: Use the Button component's focus ring instead of the legacy `box-shadow` ones ([#80138](https://github.com/WordPress/gutenberg/issues/80138)).
 
