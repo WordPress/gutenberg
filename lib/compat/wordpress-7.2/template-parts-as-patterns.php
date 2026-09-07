@@ -156,11 +156,45 @@ function gutenberg_register_template_parts_as_patterns() {
 add_action( 'init', 'gutenberg_register_template_parts_as_patterns', 12 );
 
 /**
+ * Migrates one `wp_template_part` post: a `wp_block` copy carrying the
+ * `wp_pattern_slug` meta (`<theme>/part/<slug>`) and the part's area is
+ * created, and the original is moved to the trash so the migration can be
+ * undone by hand.
+ *
+ * @param WP_Post $part The template part post.
+ * @return int|WP_Error The copy's post id, or an error.
+ */
+function gutenberg_migrate_template_part_post( $part ) {
+	$theme_terms = get_the_terms( $part->ID, 'wp_theme' );
+	$theme       = ( is_array( $theme_terms ) && ! empty( $theme_terms ) ) ? $theme_terms[0]->name : get_stylesheet();
+	$area_terms  = get_the_terms( $part->ID, 'wp_template_part_area' );
+	$area        = ( is_array( $area_terms ) && ! empty( $area_terms ) ) ? $area_terms[0]->name : WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
+
+	$copy_id = wp_insert_post(
+		array(
+			'post_type'    => 'wp_block',
+			'post_status'  => 'publish' === $part->post_status ? 'publish' : 'draft',
+			'post_title'   => $part->post_title,
+			'post_content' => $part->post_content,
+			'post_excerpt' => $part->post_excerpt,
+			'post_author'  => $part->post_author,
+			'meta_input'   => array(
+				'wp_pattern_slug'               => gutenberg_get_template_part_pattern_name( $theme, $part->post_name ),
+				GUTENBERG_PATTERN_AREA_META_KEY => $area,
+			),
+		),
+		true
+	);
+	if ( ! is_wp_error( $copy_id ) ) {
+		wp_trash_post( $part->ID );
+	}
+	return $copy_id;
+}
+
+/**
  * Migrates `wp_template_part` posts to `wp_block` copies of their pattern.
  *
- * Each part post becomes a `wp_block` post carrying the `wp_pattern_slug`
- * meta (`<theme>/part/<slug>`) and the part's area, and the original is moved
- * to the trash so the migration can be undone by hand. Runs once.
+ * Runs once; parts that appear later are migrated when saved.
  */
 function gutenberg_migrate_template_parts_to_patterns() {
 	if ( get_option( 'gutenberg_template_parts_migrated' ) ) {
@@ -175,30 +209,7 @@ function gutenberg_migrate_template_parts_to_patterns() {
 		)
 	);
 	foreach ( $parts as $part ) {
-		$theme_terms = get_the_terms( $part->ID, 'wp_theme' );
-		$theme       = ( is_array( $theme_terms ) && ! empty( $theme_terms ) ) ? $theme_terms[0]->name : get_stylesheet();
-		$area_terms  = get_the_terms( $part->ID, 'wp_template_part_area' );
-		$area        = ( is_array( $area_terms ) && ! empty( $area_terms ) ) ? $area_terms[0]->name : WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
-
-		$copy_id = wp_insert_post(
-			array(
-				'post_type'    => 'wp_block',
-				'post_status'  => 'publish' === $part->post_status ? 'publish' : 'draft',
-				'post_title'   => $part->post_title,
-				'post_content' => $part->post_content,
-				'post_excerpt' => $part->post_excerpt,
-				'post_author'  => $part->post_author,
-				'meta_input'   => array(
-					'wp_pattern_slug'               => gutenberg_get_template_part_pattern_name( $theme, $part->post_name ),
-					GUTENBERG_PATTERN_AREA_META_KEY => $area,
-				),
-			),
-			true
-		);
-		if ( is_wp_error( $copy_id ) ) {
-			continue;
-		}
-		wp_trash_post( $part->ID );
+		gutenberg_migrate_template_part_post( $part );
 	}
 	update_option( 'gutenberg_template_parts_migrated', 1 );
 }
