@@ -27,6 +27,7 @@ import {
 	setBackgroundStyleDefaults,
 	useLayoutClasses,
 	useLayoutStyles,
+	LayoutPanelPure,
 	BlockStyleVariationOverridesWithConfig,
 	useZoomOut,
 } from './hooks';
@@ -115,6 +116,7 @@ lock( privateApis, {
 	BlockRemovalWarningModal,
 	useLayoutClasses,
 	useLayoutStyles,
+	LayoutPanel: LayoutPanelPure,
 	DimensionsTool,
 	ResolutionTool,
 	TabbedSidebar,

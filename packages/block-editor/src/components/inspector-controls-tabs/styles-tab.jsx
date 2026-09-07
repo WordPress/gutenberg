@@ -13,6 +13,11 @@ import { ColorToolsPanel } from '../global-styles/color-panel';
 import { TypographyToolsPanel } from '../global-styles/typography-panel';
 import { BackgroundToolsPanel } from '../global-styles/background-panel';
 
+// Section blocks that carry their own styles (layout, custom CSS) and get the
+// full style panel set instead of the section style controls: template parts
+// and pattern instances.
+const FULL_STYLES_SECTION_BLOCKS = [ 'core/template-part', 'core/block' ];
+
 // Section blocks present a curated subset of the normal block style panels.
 // Their block-support fills are gated off by editing mode (see
 // `BlockStyleControls` in hooks/style.js), so each panel is direct-rendered
@@ -105,20 +110,22 @@ const StylesTab = ( {
 	return (
 		<>
 			{ hasBlockStyles && <BlockStyles clientId={ clientId } /> }
-			{ isSectionBlock && blockName !== 'core/template-part' && (
-				<SectionStyleControls
-					blockName={ blockName }
-					clientId={ clientId }
-					contentClientIds={ contentClientIds }
-				/>
-			) }
+			{ isSectionBlock &&
+				! FULL_STYLES_SECTION_BLOCKS.includes( blockName ) && (
+					<SectionStyleControls
+						blockName={ blockName }
+						clientId={ clientId }
+						contentClientIds={ contentClientIds }
+					/>
+				) }
 			{
 				// Extenders have in the past always been allowed to add controls to group
 				// the restrictions are lessened for that block. Template parts are
 				// excluded from the curated section controls above and fall through
 				// to the full panel set here.
 			 }
-			{ ( ! isSectionBlock || blockName === 'core/template-part' ) && (
+			{ ( ! isSectionBlock ||
+				FULL_STYLES_SECTION_BLOCKS.includes( blockName ) ) && (
 				<>
 					<InspectorControls.Slot
 						group="typography"
