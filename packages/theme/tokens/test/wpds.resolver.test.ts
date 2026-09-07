@@ -79,6 +79,10 @@ function getCustomPropertyValue(
 }
 
 describe( 'WordPress Design System token resolver', () => {
+	it( 'keeps modifier application order-independent', () => {
+		expect( resolver.orthogonal ).toBe( true );
+	} );
+
 	it( 'resolves the default border values', () => {
 		const tokens = resolver.apply( {} );
 
