@@ -12,7 +12,6 @@ import {
 	Placeholder,
 	SelectControl,
 	Spinner,
-	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -562,16 +561,8 @@ function ReusableBlockEdit( {
 						} )
 					}
 				/>
-				<ToggleControl
-					label={ __( 'Wrapper element' ) }
-					help={ __(
-						'Render the pattern inside an element, like a template part. Patterns inserted before this option existed have none.'
-					) }
-					checked={ !! hasWrapper }
-					onChange={ ( value ) =>
-						setAttributes( { hasWrapper: value || undefined } )
-					}
-				/>
+				{ /* Instances created before `hasWrapper` existed render no
+				     element, so there is nothing to pick for them. */ }
 				{ hasWrapper && (
 					<HTMLElementControl
 						tagName={ tagName || '' }
