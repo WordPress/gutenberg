@@ -33,6 +33,7 @@ const altTextField: Partial< Field< Updatable< Attachment > > > = {
 						{ __( 'Leave empty if decorative.' ) }
 					</>
 				}
+				disabled={ field.isDisabled( { item: data, field } ) }
 				rows={ 2 }
 			/>
 		);
