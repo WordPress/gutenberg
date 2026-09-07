@@ -29,6 +29,29 @@
 		return name + '@' + selection.anchorOffset;
 	}
 
+	function editorState() {
+		try {
+			const select = window.wp.data.select( 'core/block-editor' );
+			return (
+				'blocks=' +
+				select.getBlockOrder().length +
+				' selected=' +
+				( select.getSelectedBlockClientId() ? 'yes' : 'no' )
+			);
+		} catch {
+			return 'no-store';
+		}
+	}
+
+	function activeElement( doc ) {
+		const element = doc.activeElement;
+		return element
+			? element.tagName +
+					'.' +
+					( element.className || '' ).split( ' ' )[ 0 ]
+			: 'none';
+	}
+
 	function record( doc, name ) {
 		log.push(
 			Math.round( performance.now() - start ) +
@@ -45,9 +68,34 @@
 			return;
 		}
 		doc.__iosDiag = true;
+		const proto = doc.defaultView.KeyboardEvent.prototype;
+		const preventDefault = proto.preventDefault;
+		proto.preventDefault = function () {
+			if ( this.type === 'keydown' && this.key === 'Enter' ) {
+				const stack = new Error().stack
+					.split( '\n' )
+					.slice( 1, 5 )
+					.map( ( line ) =>
+						line.replace( /^.*\/build\/scripts\//, '' ).trim()
+					)
+					.join( ' < ' );
+				record( doc, 'preventDefault ' + stack );
+			}
+			return preventDefault.call( this );
+		};
 		doc.addEventListener(
 			'keydown',
-			( event ) => event.key === 'Enter' && record( doc, 'keydown' ),
+			( event ) =>
+				event.key === 'Enter' &&
+				record(
+					doc,
+					'keydown target=' +
+						event.target.tagName +
+						' active=' +
+						activeElement( doc ) +
+						' ' +
+						editorState()
+				),
 			true
 		);
 		// Bubble phase: after the handlers that may cancel the key.
