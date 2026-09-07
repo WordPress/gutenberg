@@ -92,6 +92,29 @@ function MediaThumbnail( { data, field, attachment, config } ) {
 	return <WCIcon icon={ mediaIcon } size={ 20 } />;
 }
 
+/**
+ * Resolves the specific media type for a selected attachment.
+ *
+ * Selections made in the media library already carry a normalized `type`, while
+ * uploads return a REST attachment whose `media_type` is only ever `image` or
+ * `file`. Deriving from the mime type keeps video, audio and documents from all
+ * collapsing into `file`.
+ *
+ * @param {Object} media The selected media object.
+ * @return {string|undefined} The media type, e.g. `image`, `video` or `audio`.
+ */
+function getMediaType( media ) {
+	if ( media?.type ) {
+		return media.type;
+	}
+
+	if ( media?.mime_type ) {
+		return media.mime_type.split( '/' )[ 0 ];
+	}
+
+	return media?.media_type;
+}
+
 export default function Media( { data, field, onChange, config = {} } ) {
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
@@ -182,7 +205,7 @@ export default function Media( { data, field, onChange, config = {} } ) {
 						if ( selectedMedia.id && selectedMedia.url ) {
 							const newValue = {
 								...selectedMedia,
-								mediaType: selectedMedia.media_type,
+								mediaType: getMediaType( selectedMedia ),
 							};
 
 							// Turn off featured image when manually selecting media

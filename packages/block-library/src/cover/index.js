@@ -78,7 +78,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 				id: value.id,
 				url: value.url,
 				alt: value.alt,
-				mediaType: value.backgroundType,
+				backgroundType: value.mediaType,
 				useFeaturedImage: value.featuredImage,
 			} ),
 		},
