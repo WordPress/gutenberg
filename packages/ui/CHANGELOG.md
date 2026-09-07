@@ -10,6 +10,7 @@
 
 ### New Features
 
+-   Add `Radio` form primitive ([#82214](https://github.com/WordPress/gutenberg/pull/82214)).
 -   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
 -   Add `SearchableSelect` form primitive ([#80961](https://github.com/WordPress/gutenberg/pull/80961)).
 -   Add `Field.VisualLabel` for a purely visual label outside `Field.Root` ([#82095](https://github.com/WordPress/gutenberg/pull/82095)).
