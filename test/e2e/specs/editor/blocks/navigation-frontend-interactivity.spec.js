@@ -130,6 +130,125 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 	} );
 
+	test.describe( 'Overlay menu with submenus set to open on click', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+				canvas: 'edit',
+			} );
+			await requestUtils.createNavigationMenu( {
+				title: 'Overlay menu with a submenu',
+				content: `
+					<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-submenu {"label":"Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- /wp:navigation-submenu -->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					overlayMenu: 'always',
+					submenuVisibility: 'click',
+				},
+			} );
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
+		} );
+
+		test( 'Submenus stay collapsed inside the overlay until toggled', async ( {
+			page,
+			pageUtils,
+		} ) => {
+			await page.goto( '/' );
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Submenu',
+			} );
+			const submenuLink = page.getByRole( 'link', {
+				name: 'Submenu Link',
+			} );
+
+			await openMenuButton.click();
+
+			// Test: the submenu is collapsed even though the overlay is open.
+			await expect( submenuButton ).toBeVisible();
+			await expect( submenuButton ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+			await expect( submenuLink ).toBeHidden();
+
+			// Test: submenu opens on click.
+			await submenuButton.click();
+			await expect( submenuButton ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect( submenuLink ).toBeVisible();
+
+			// Test: submenu closes on a second click.
+			await submenuButton.click();
+			await expect( submenuButton ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+			await expect( submenuLink ).toBeHidden();
+
+			// Test: submenu closes on ESC key without closing the overlay.
+			await submenuButton.click();
+			await expect( submenuLink ).toBeVisible();
+			await pageUtils.pressKeys( 'Escape' );
+			await expect( submenuLink ).toBeHidden();
+			await expect( submenuButton ).toBeVisible();
+			await expect( submenuButton ).toBeFocused();
+		} );
+
+		test( 'An expanded submenu is reachable by keyboard inside the overlay', async ( {
+			page,
+			pageUtils,
+		} ) => {
+			await page.goto( '/' );
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			const closeMenuButton = page.getByRole( 'button', {
+				name: 'Close menu',
+			} );
+			const firstItem = page.getByRole( 'link', { name: 'Item 1' } );
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Submenu',
+			} );
+			const submenuLink = page.getByRole( 'link', {
+				name: 'Submenu Link',
+			} );
+
+			await openMenuButton.click();
+			await expect( firstItem ).toBeFocused();
+
+			// The submenu is the last item, so expanding it adds a focusable
+			// element past the end of the overlay's focus trap.
+			await pageUtils.pressKeys( 'Tab' );
+			await expect( submenuButton ).toBeFocused();
+			await pageUtils.pressKeys( 'Enter' );
+			await expect( submenuLink ).toBeVisible();
+
+			// Test: tabbing reaches the newly revealed submenu item.
+			await pageUtils.pressKeys( 'Tab' );
+			await expect( submenuLink ).toBeFocused();
+
+			// Test: the submenu stays expanded while focus moves past it, and
+			// the focus trap wraps back to the start of the overlay.
+			await pageUtils.pressKeys( 'Tab' );
+			await expect( closeMenuButton ).toBeFocused();
+			await expect( submenuLink ).toBeVisible();
+		} );
+	} );
+
 	test.describe( 'Submenu mouse and keyboard interactions', () => {
 		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
 			await admin.visitSiteEditor( {
