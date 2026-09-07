@@ -17,6 +17,8 @@ import {
 	removeNoteIdFromMetadata,
 	calculateNotePositions,
 	pickPrimaryNote,
+	pickIndicatorNotes,
+	getThreadParticipants,
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
 	getNoteMarkerSelector,
@@ -1051,5 +1053,65 @@ describe( 'getNoteMarkerSelector / noteFormat', () => {
 		marker.setAttribute( noteFormat.attributes[ 'data-id' ], '7' );
 
 		expect( marker.matches( getNoteMarkerSelector( 7 ) ) ).toBe( true );
+	} );
+} );
+
+describe( 'note indicator participants', () => {
+	const makeNote = ( author, date, reply = [] ) => ( {
+		author,
+		author_name: `User ${ author }`,
+		date,
+		reply,
+		status: 'hold',
+		author_avatar_urls: { 48: `avatar-${ author }` },
+	} );
+
+	it( 'includes authors and repliers once in first-contribution order', () => {
+		const reply = makeNote( 2, '2026-01-03T00:00:00' );
+		const threads = [
+			makeNote( 1, '2026-01-02T00:00:00', [ reply ] ),
+			makeNote( 2, '2026-01-01T00:00:00' ),
+			makeNote( 3, '2026-01-04T00:00:00' ),
+		];
+		const original = JSON.parse( JSON.stringify( threads ) );
+		expect( getThreadParticipants( threads ) ).toEqual( [
+			{ id: 2, name: 'User 2', avatar: 'avatar-2' },
+			{ id: 1, name: 'User 1', avatar: 'avatar-1' },
+			{ id: 3, name: 'User 3', avatar: 'avatar-3' },
+		] );
+		expect( threads ).toEqual( original );
+	} );
+
+	it( 'excludes resolved-only participants while unresolved threads remain', () => {
+		const unresolved = makeNote( 1, '2026-01-01T00:00:00' );
+		const resolved = {
+			...makeNote( 2, '2026-01-02T00:00:00' ),
+			status: 'approved',
+		};
+		expect(
+			getThreadParticipants(
+				pickIndicatorNotes( [ resolved, unresolved ] )
+			)
+		).toEqual( [ { id: 1, name: 'User 1', avatar: 'avatar-1' } ] );
+	} );
+
+	it( 'keeps every resolved thread accessible when none are unresolved', () => {
+		const threads = [ { status: 'approved' }, { status: 'approved' } ];
+		expect( pickIndicatorNotes( threads ) ).toEqual( threads );
+	} );
+
+	it( 'returns no participants when there are no threads', () => {
+		expect( getThreadParticipants( pickIndicatorNotes( [] ) ) ).toEqual(
+			[]
+		);
+	} );
+
+	it( 'skips unnamed entries and supports missing replies and avatar sizes', () => {
+		const thread = makeNote( 1, '2026-01-01T00:00:00' );
+		delete thread.reply;
+		thread.author_avatar_urls = { 96: 'large-avatar' };
+		expect(
+			getThreadParticipants( [ { ...thread, author_name: '' }, thread ] )
+		).toEqual( [ { id: 1, name: 'User 1', avatar: 'large-avatar' } ] );
 	} );
 } );
