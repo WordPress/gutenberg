@@ -8,7 +8,6 @@
 
 ### Enhancements
 
--   Inserter: Hide the edited copies of registered patterns from the user patterns lists; they are represented by the registered pattern itself ([#82549](https://github.com/WordPress/gutenberg/pull/82549)).
 -   Inserter: Registered patterns that opt in with `synced` are inserted as a Pattern block referencing them by `slug` instead of as a copy of their blocks ([#82544](https://github.com/WordPress/gutenberg/pull/82544)).
 -   Borders: rename the "Border & Shadow" panel to "Borders", whichever of its controls are available, and always show the Border and Shadow controls' visible labels. A stable panel title is what lets the Border label render unconditionally, so its "Unlink sides" toggle lines up with the border radius one ([#82163](https://github.com/WordPress/gutenberg/pull/82163)).
 

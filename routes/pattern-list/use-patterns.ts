@@ -17,7 +17,8 @@ const {
 	PATTERN_SYNC_TYPES,
 	EXCLUDED_PATTERN_SOURCES,
 	PATTERN_DEFAULT_CATEGORY,
-	PATTERN_OVERRIDE_META_KEY,
+	isPatternOverride,
+	resolvePatternOverride,
 } = unlock( patternPrivateApis );
 
 const { extractWords, getNormalizedSearchTerms, normalizeString } = unlock(
@@ -94,21 +95,24 @@ interface PatternCategory {
 /**
  * Normalize theme pattern to unified structure.
  *
- * @param pattern  Theme pattern object.
- * @param override The `wp_block` post holding the edited copy, if any. It is
- *                 the source of the title and content when present.
+ * @param pattern   Theme pattern object.
+ * @param overrides The `wp_block` records that are edited copies of
+ *                  registered patterns; a matching one is the source of
+ *                  the title and content.
  * @return Normalized pattern object.
  */
 function normalizeThemePattern(
 	pattern: ThemePattern,
-	override?: UserPattern
+	overrides: UserPattern[]
 ): NormalizedPattern {
+	const resolved: ThemePattern & { overrideId?: number } =
+		resolvePatternOverride( pattern, overrides );
 	return {
 		id: pattern.name,
 		name: pattern.name,
-		overrideId: override?.id,
-		title: override?.title?.raw ?? pattern.title,
-		content: override?.content?.raw ?? pattern.content,
+		overrideId: resolved.overrideId,
+		title: resolved.title,
+		content: resolved.content,
 		keywords: pattern.keywords || [],
 		type: PATTERN_TYPES.theme,
 		// Normalize categories to always be an array of slugs
@@ -304,7 +308,7 @@ const selectThemePatterns = createSelector(
 					per_page: -1,
 				}
 			) as UserPattern[] | null ) ?? []
-		).filter( ( record ) => !! record.meta?.[ PATTERN_OVERRIDE_META_KEY ] );
+		).filter( isPatternOverride );
 		const { getBlockPatterns } = select( coreStore );
 		const { isResolving: isResolvingSelector } = select( coreStore );
 
@@ -318,14 +322,7 @@ const selectThemePatterns = createSelector(
 			.filter( filterOutDuplicatesByName )
 			.filter( ( pattern ) => pattern.inserter !== false )
 			.map( ( pattern: ThemePattern ) =>
-				normalizeThemePattern(
-					pattern,
-					overrides.find(
-						( record ) =>
-							record.meta?.[ PATTERN_OVERRIDE_META_KEY ] ===
-							pattern.name
-					)
-				)
+				normalizeThemePattern( pattern, overrides )
 			);
 		return {
 			patterns,
@@ -360,9 +357,7 @@ const selectUserPatterns = createSelector(
 		// Edited copies of registered patterns are listed as the registered
 		// pattern itself, not as user patterns.
 		let patterns = ( patternPosts ?? [] )
-			.filter(
-				( record ) => ! record.meta?.[ PATTERN_OVERRIDE_META_KEY ]
-			)
+			.filter( ( record ) => ! isPatternOverride( record ) )
 			.map( ( pattern ) =>
 				normalizeUserPattern( pattern, userPatternCategories )
 			);

@@ -13,19 +13,15 @@ function IsolatedEditButton( {
 	isTemplatePartBlock,
 } ) {
 	const { ref, theme, slug } = attributes;
-	// A registered pattern referenced by slug is edited through its edited
-	// copy (a `wp_block` post); creating that copy is handled by the block's
-	// own toolbar button.
+	// A pattern referenced by slug is edited through its edited copy when it
+	// has one (`overrideId`); creating the copy is up to the block's own
+	// toolbar button.
 	const overrideId = useSelect(
-		( select ) => {
-			if ( isTemplatePartBlock || ref || ! slug ) {
-				return undefined;
-			}
-			return unlock( select( blockEditorStore ) )
-				.getReusableBlocks()
-				.find( ( record ) => record.meta?.wp_pattern_slug === slug )
-				?.id;
-		},
+		( select ) =>
+			! isTemplatePartBlock && ! ref && slug
+				? unlock( select( blockEditorStore ) ).getPatternBySlug( slug )
+						?.overrideId
+				: undefined,
 		[ isTemplatePartBlock, ref, slug ]
 	);
 	const entityId = isTemplatePartBlock

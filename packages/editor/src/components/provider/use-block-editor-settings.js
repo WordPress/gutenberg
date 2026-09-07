@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, createSelector } from '@wordpress/data';
 import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
@@ -15,6 +15,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import getInserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import mediaUploadOnSuccess from '../../utils/media-upload/on-success';
@@ -30,7 +31,10 @@ const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
 const EMPTY_OBJECT = {};
 
-function __experimentalReusableBlocksSelect( select ) {
+const { isPatternOverride, resolvePatternOverride } =
+	unlock( patternsPrivateApis );
+
+function getUserPatternRecords( select ) {
 	const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreDataPrivateApis );
 	const { getEntityRecords } = select( coreStore );
 	return getEntityRecords( 'postType', 'wp_block', {
@@ -38,6 +42,37 @@ function __experimentalReusableBlocksSelect( select ) {
 		[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
 	} );
 }
+
+// Edited copies of registered patterns stand behind the registered pattern:
+// they are dropped from the user patterns the block editor lists, and their
+// title and content are merged into the registered pattern they override.
+const __experimentalReusableBlocksSelect = createSelector(
+	( select ) => {
+		const records = getUserPatternRecords( select );
+		return records?.filter( ( record ) => ! isPatternOverride( record ) );
+	},
+	( select ) => [ getUserPatternRecords( select ) ]
+);
+
+const selectBlockPatterns = createSelector(
+	( select, postType ) => {
+		const { hasFinishedResolution, getBlockPatternsForPostType } = unlock(
+			select( coreStore )
+		);
+		if ( ! hasFinishedResolution( 'getBlockPatterns' ) ) {
+			return undefined;
+		}
+		const records = getUserPatternRecords( select );
+		return getBlockPatternsForPostType( postType ).map( ( pattern ) =>
+			resolvePatternOverride( pattern, records )
+		);
+	},
+	( select, postType ) => [
+		unlock( select( coreStore ) ).getBlockPatternsForPostType( postType ),
+		select( coreStore ).hasFinishedResolution( 'getBlockPatterns' ),
+		getUserPatternRecords( select ),
+	]
+);
 
 function __experimentalUserPatternCategoriesSelect( select ) {
 	return select( coreStore ).getUserPatternCategories();
@@ -396,14 +431,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			mediaFinalize: hasUploadPermissions ? mediaFinalize : undefined,
 			mediaDelete: hasUploadPermissions ? mediaDelete : undefined,
 			__experimentalBlockPatterns: blockPatterns,
-			[ selectBlockPatternsKey ]: ( select ) => {
-				const { hasFinishedResolution, getBlockPatternsForPostType } =
-					unlock( select( coreStore ) );
-				const patterns = getBlockPatternsForPostType( postType );
-				return hasFinishedResolution( 'getBlockPatterns' )
-					? patterns
-					: undefined;
-			},
+			[ selectBlockPatternsKey ]: ( select ) =>
+				selectBlockPatterns( select, postType ),
 			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
 			[ userPatternCategoriesSelectKey ]:
 				__experimentalUserPatternCategoriesSelect,

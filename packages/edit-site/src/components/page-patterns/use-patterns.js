@@ -2,18 +2,21 @@ import { parse } from '@wordpress/blocks';
 import { useSelect, createSelector } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { filterOutDuplicatesByName } from './utils';
 import {
 	EXCLUDED_PATTERN_SOURCES,
 	PATTERN_TYPES,
 	PATTERN_SYNC_TYPES,
-	PATTERN_OVERRIDE_META_KEY,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { searchItems } from './search-items';
 import { store as editSiteStore } from '../../store';
+
+const { isPatternOverride, resolvePatternOverride } =
+	unlock( patternsPrivateApis );
 
 const EMPTY_PATTERN_LIST = [];
 
@@ -83,7 +86,7 @@ const selectPatternOverrides = ( select ) =>
 		select( coreStore ).getEntityRecords( 'postType', PATTERN_TYPES.user, {
 			per_page: -1,
 		} ) ?? EMPTY_PATTERN_LIST
-	).filter( ( record ) => !! record.meta?.[ PATTERN_OVERRIDE_META_KEY ] );
+	).filter( isPatternOverride );
 
 const selectThemePatterns = createSelector(
 	( select ) => {
@@ -110,21 +113,12 @@ const selectThemePatterns = createSelector(
 			.map( ( pattern ) => {
 				// The edited copy of a registered pattern, when it exists, is
 				// the source of its title and content.
-				const override = overrides.find(
-					( record ) =>
-						record.meta[ PATTERN_OVERRIDE_META_KEY ] ===
-						pattern.name
-				);
-				const title = override?.title?.raw ?? pattern.title;
-				const content = override?.content?.raw ?? pattern.content;
+				const resolved = resolvePatternOverride( pattern, overrides );
 				return {
-					...pattern,
-					title,
-					content,
+					...resolved,
 					keywords: pattern.keywords || [],
 					type: PATTERN_TYPES.theme,
-					overrideId: override?.id,
-					blocks: parse( content, {
+					blocks: parse( resolved.content, {
 						__unstableSkipMigrationLogs: true,
 					} ),
 				};
@@ -246,7 +240,7 @@ const selectUserPatterns = createSelector(
 		// Edited copies of registered patterns are listed as the registered
 		// pattern itself, not as user patterns.
 		let patterns = ( patternPosts ?? EMPTY_PATTERN_LIST ).filter(
-			( record ) => ! record.meta?.[ PATTERN_OVERRIDE_META_KEY ]
+			( record ) => ! isPatternOverride( record )
 		);
 		const isResolving = isResolvingSelector( 'getEntityRecords', [
 			'postType',

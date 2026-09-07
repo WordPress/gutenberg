@@ -26,7 +26,6 @@ export const {
 	PATTERN_USER_CATEGORY,
 	EXCLUDED_PATTERN_SOURCES,
 	PATTERN_SYNC_TYPES,
-	PATTERN_OVERRIDE_META_KEY,
 } = unlock( patternPrivateApis );
 
 // Entities that are editable in focus mode.

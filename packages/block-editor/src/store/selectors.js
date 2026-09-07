@@ -23,7 +23,6 @@ import {
 	getParsedPattern,
 	getGrammar,
 	mapUserPattern,
-	isPatternOverride,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -2482,7 +2481,6 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 			)
 				? unlock( select( STORE_NAME ) )
 						.getReusableBlocks()
-						.filter( ( block ) => ! isPatternOverride( block ) )
 						.map( buildReusableBlockInserterItem )
 				: [];
 
