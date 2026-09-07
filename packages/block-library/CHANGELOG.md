@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Pattern: Add a `slug` attribute so a `core/block` can reference a registered pattern (theme, plugin or core) by name, with pattern overrides working the same way as for user patterns ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   Pattern: Add a `slug` attribute so a `core/block` can reference a registered pattern (theme, plugin or core) by name, with pattern overrides working the same way as for user patterns ([#82544](https://github.com/WordPress/gutenberg/pull/82544)).
 
 ### Enhancements
 
