@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Pattern: Add a `slug` attribute so a `core/block` can reference a registered pattern (theme, plugin or core) by name, with pattern overrides working the same way as for user patterns ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ### Enhancements
 
 -   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).

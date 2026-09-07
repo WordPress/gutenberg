@@ -24,7 +24,9 @@ const SYNC_STATUS_FILTERS = [
 
 function getPatternSyncStatus( item: Pattern ) {
 	if ( item.type && item.type !== PATTERN_TYPES.user ) {
-		return PATTERN_SYNC_TYPES.unsynced;
+		return item.synced
+			? PATTERN_SYNC_TYPES.full
+			: PATTERN_SYNC_TYPES.unsynced;
 	}
 	// When a pattern is first created directly from the post editor
 	// (`post-new.php?post_type=wp_block`), the top-level sync status is not

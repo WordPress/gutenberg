@@ -28,6 +28,7 @@ const { extractWords, getNormalizedSearchTerms, normalizeString } = unlock(
  */
 interface ThemePattern {
 	name: string;
+	synced?: boolean;
 	title: string;
 	content: string;
 	description: string;
@@ -99,8 +100,9 @@ function normalizeThemePattern( pattern: ThemePattern ): NormalizedPattern {
 		type: PATTERN_TYPES.theme,
 		// Normalize categories to always be an array of slugs
 		categories: pattern.categories || [],
-		// Theme patterns are always unsynced
-		syncStatus: PATTERN_SYNC_TYPES.unsynced,
+		syncStatus: pattern.synced
+			? PATTERN_SYNC_TYPES.full
+			: PATTERN_SYNC_TYPES.unsynced,
 		description: pattern.description || '',
 	};
 }

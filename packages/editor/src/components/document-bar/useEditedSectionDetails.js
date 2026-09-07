@@ -18,7 +18,7 @@ export default function useEditedSectionDetails() {
 			__experimentalGetParsedPattern,
 		} = select( blockEditorStore );
 		const { getEditedEntityRecord, getCurrentTheme } = select( coreStore );
-		const { getEditedContentOnlySection } = unlock(
+		const { getEditedContentOnlySection, getPatternBySlug } = unlock(
 			select( blockEditorStore )
 		);
 
@@ -59,6 +59,18 @@ export default function useEditedSectionDetails() {
 				return {
 					patternName: attributes.ref,
 					patternTitle: decodeEntities( entity.title ),
+					type: 'synced-pattern',
+				};
+			}
+		}
+
+		// Handle registered patterns referenced by slug (core/block)
+		if ( blockName === 'core/block' && !! attributes?.slug ) {
+			const pattern = getPatternBySlug( attributes.slug );
+			if ( pattern?.title ) {
+				return {
+					patternName: attributes.slug,
+					patternTitle: decodeEntities( pattern.title ),
 					type: 'synced-pattern',
 				};
 			}

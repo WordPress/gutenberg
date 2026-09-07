@@ -12,23 +12,51 @@
  *
  * @global WP_Embed $wp_embed
  *
- * @param array $attributes The block attributes.
+ * @param array    $attributes     The block attributes. Either `ref`, the ID of a
+ *                                 `wp_block` post, or `slug`, the name of a
+ *                                 registered pattern.
+ * @param string   $content        The block content.
+ * @param WP_Block $block_instance The block instance.
  *
  * @return string Rendered HTML of the referenced block.
  */
 function render_block_core_block( $attributes, $content, $block_instance ) {
 	static $seen_refs = array();
 
-	if ( empty( $attributes['ref'] ) ) {
+	$ref  = ! empty( $attributes['ref'] ) ? (int) $attributes['ref'] : 0;
+	$slug = ! empty( $attributes['slug'] ) ? (string) $attributes['slug'] : '';
+
+	if ( ! $ref && ! $slug ) {
 		return '';
 	}
 
-	$reusable_block = get_post( $attributes['ref'] );
-	if ( ! $reusable_block || 'wp_block' !== $reusable_block->post_type ) {
-		return '';
+	$reusable_block = null;
+
+	if ( $ref ) {
+		// A user pattern: a `wp_block` post.
+		$reusable_block = get_post( $ref );
+		if ( ! $reusable_block || 'wp_block' !== $reusable_block->post_type ) {
+			return '';
+		}
+
+		if ( 'publish' !== $reusable_block->post_status || ! empty( $reusable_block->post_password ) ) {
+			return '';
+		}
+
+		$seen_key = 'ref:' . $ref;
+		$content  = $reusable_block->post_content;
+	} else {
+		// A registered pattern, referenced by its name.
+		$pattern = WP_Block_Patterns_Registry::get_instance()->get_registered( $slug );
+		if ( ! $pattern ) {
+			return '';
+		}
+
+		$seen_key = 'slug:' . $slug;
+		$content  = $pattern['content'];
 	}
 
-	if ( isset( $seen_refs[ $attributes['ref'] ] ) ) {
+	if ( isset( $seen_refs[ $seen_key ] ) ) {
 		// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
 		// is set in `wp_debug_mode()`.
 		$is_debug = WP_DEBUG && WP_DEBUG_DISPLAY;
@@ -39,15 +67,11 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 			'';
 	}
 
-	if ( 'publish' !== $reusable_block->post_status || ! empty( $reusable_block->post_password ) ) {
-		return '';
-	}
-
-	$seen_refs[ $attributes['ref'] ] = true;
+	$seen_refs[ $seen_key ] = true;
 
 	// Handle embeds for reusable blocks.
 	global $wp_embed;
-	$content = $wp_embed->run_shortcode( $reusable_block->post_content );
+	$content = $wp_embed->run_shortcode( $content );
 	$content = $wp_embed->autoembed( $content );
 
 	// Back compat.
@@ -73,8 +97,10 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 		$attributes['content'] = $attributes['overrides'];
 	}
 
-	// Apply Block Hooks.
-	$content = apply_block_hooks_to_content_from_post_object( $content, $reusable_block );
+	// Apply Block Hooks. Registered patterns already have them applied by the registry.
+	if ( $reusable_block ) {
+		$content = apply_block_hooks_to_content_from_post_object( $content, $reusable_block );
+	}
 
 	/**
 	 * We attach the blocks from $content as inner blocks to the Synced Pattern block instance.
@@ -86,7 +112,7 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 	$block_instance->refresh_context_dependents();
 
 	$content = $block_instance->render( array( 'dynamic' => false ) );
-	unset( $seen_refs[ $attributes['ref'] ] );
+	unset( $seen_refs[ $seen_key ] );
 
 	return $content;
 }

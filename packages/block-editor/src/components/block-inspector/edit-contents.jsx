@@ -16,11 +16,11 @@ function IsolatedEditButton( {
 		? theme && slug && `${ theme }//${ slug }`
 		: ref;
 
-	const handleClick = () => {
-		if ( ! entityId ) {
-			return;
-		}
+	if ( ! entityId ) {
+		return null;
+	}
 
+	const handleClick = () => {
 		onNavigateToEntityRecord( {
 			postId: entityId,
 			postType: isTemplatePartBlock ? 'wp_template_part' : 'wp_block',
@@ -37,8 +37,6 @@ function IsolatedEditButton( {
 				__next40pxDefaultSize
 				variant="secondary"
 				onClick={ handleClick }
-				accessibleWhenDisabled
-				disabled={ ! entityId }
 			>
 				{ __( 'Edit original' ) }
 			</Button>

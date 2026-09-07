@@ -10,6 +10,7 @@ import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import BlockPatternsList from '../block-patterns-list';
+import { isPatternSynced } from '../inserter/block-patterns-tab/utils';
 
 const EMPTY_ARRAY = [];
 const MAX_PATTERNS_TO_SHOW = 6;
@@ -67,7 +68,7 @@ export default function ChangeDesign( { clientId } ) {
 						return categories.includes( category );
 					} ) &&
 					// Check if the pattern is not a synced pattern.
-					( pattern.syncStatus === 'unsynced' || ! pattern.id )
+					! isPatternSynced( pattern )
 				);
 			} )
 			.slice( 0, MAX_PATTERNS_TO_SHOW );

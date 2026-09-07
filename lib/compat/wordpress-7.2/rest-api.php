@@ -35,3 +35,16 @@ function gutenberg_modify_template_post_type_args_7_2( $args ) {
 }
 add_filter( 'register_wp_template_post_type_args', 'gutenberg_modify_template_post_type_args_7_2' );
 add_filter( 'register_wp_template_part_post_type_args', 'gutenberg_modify_template_post_type_args_7_2' );
+
+/**
+ * Registers the block patterns REST API route.
+ *
+ * Replaces the 7.0 registration so the route is served by the 7.2 controller,
+ * which adds the `synced` field.
+ */
+function gutenberg_register_block_patterns_controller_endpoints_7_2() {
+	$block_patterns_controller = new Gutenberg_REST_Block_Patterns_Controller_7_2();
+	$block_patterns_controller->register_routes();
+}
+remove_action( 'rest_api_init', 'gutenberg_register_block_patterns_controller_endpoints' );
+add_action( 'rest_api_init', 'gutenberg_register_block_patterns_controller_endpoints_7_2' );

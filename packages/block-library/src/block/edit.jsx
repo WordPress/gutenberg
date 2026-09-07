@@ -25,10 +25,11 @@ import {
 	InnerBlocks,
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-import { getBlockBindingsSource } from '@wordpress/blocks';
+import { getBlockBindingsSource, parse } from '@wordpress/blocks';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
+const EMPTY_ARRAY = [];
 const { isOverridableBlock } = unlock( patternsPrivateApis );
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
@@ -79,37 +80,117 @@ const NOOP = () => {};
 // that allows short-circuiting rendering as early as possible, before any
 // of the other effects in the block edit have run.
 export default function ReusableBlockEditRecursionWrapper( props ) {
-	const { ref } = props.attributes;
-	const hasAlreadyRendered = useHasRecursion( ref );
+	const { ref, slug } = props.attributes;
+	// `ref` points at a user pattern (a `wp_block` post), `slug` at a
+	// registered pattern. `ref` wins when both are set.
+	const uniqueId = ref || slug;
+	const hasAlreadyRendered = useHasRecursion( uniqueId );
 
 	if ( hasAlreadyRendered ) {
 		return <RecursionWarning />;
 	}
 
 	return (
-		<RecursionProvider uniqueId={ ref }>
-			<ReusableBlockEdit { ...props } />
+		<RecursionProvider uniqueId={ uniqueId }>
+			{ ref ? (
+				<UserPatternEdit { ...props } />
+			) : (
+				<RegisteredPatternEdit { ...props } />
+			) }
 		</RecursionProvider>
 	);
 }
 
-function ReusableBlockControl( {
-	recordId,
-	canOverrideBlocks,
-	hasContent,
-	handleEditOriginal,
-	resetContent,
-} ) {
+/**
+ * Loads a user pattern (a `wp_block` post) referenced by `ref`.
+ *
+ * @param {Object} props Block edit props.
+ */
+function UserPatternEdit( props ) {
+	const { ref } = props.attributes;
+	const { record, hasResolved } = useEntityRecord(
+		'postType',
+		'wp_block',
+		ref
+	);
+	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
+		id: ref,
+	} );
 	const canUserEdit = useSelect(
 		( select ) =>
 			!! select( coreStore ).canUser( 'update', {
 				kind: 'postType',
 				name: 'wp_block',
-				id: recordId,
+				id: ref,
 			} ),
-		[ recordId ]
+		[ ref ]
 	);
 
+	return (
+		<ReusableBlockEdit
+			{ ...props }
+			blocks={ blocks }
+			hasResolved={ hasResolved }
+			isMissing={ hasResolved && ! record }
+			canUserEdit={ canUserEdit }
+		/>
+	);
+}
+
+/**
+ * Loads a registered pattern (theme, plugin or core) referenced by `slug`.
+ *
+ * @param {Object} props Block edit props.
+ */
+function RegisteredPatternEdit( props ) {
+	const { slug } = props.attributes;
+	const { pattern, hasResolved } = useSelect(
+		( select ) => {
+			const _pattern = unlock(
+				select( blockEditorStore )
+			).getPatternBySlug( slug );
+			return {
+				pattern: _pattern,
+				hasResolved:
+					!! _pattern ||
+					select( coreStore ).hasFinishedResolution(
+						'getBlockPatterns'
+					),
+			};
+		},
+		[ slug ]
+	);
+	const content = pattern?.content;
+	// Parse the raw content rather than using the shared parsed pattern, so
+	// the root block isn't stamped with `metadata.patternName` and treated as
+	// an unsynced pattern instance.
+	const blocks = useMemo(
+		() =>
+			content
+				? parse( content, { __unstableSkipMigrationLogs: true } )
+				: EMPTY_ARRAY,
+		[ content ]
+	);
+
+	return (
+		<ReusableBlockEdit
+			{ ...props }
+			blocks={ blocks }
+			hasResolved={ hasResolved }
+			isMissing={ hasResolved && ! pattern }
+			// Editing a registered pattern in place is not supported yet.
+			canUserEdit={ false }
+		/>
+	);
+}
+
+function ReusableBlockControl( {
+	canUserEdit,
+	canOverrideBlocks,
+	hasContent,
+	handleEditOriginal,
+	resetContent,
+} ) {
 	return (
 		<>
 			{ canUserEdit && !! handleEditOriginal && (
@@ -145,17 +226,11 @@ function ReusableBlockEdit( {
 	attributes: { ref, content },
 	__unstableParentLayout: parentLayout,
 	setAttributes,
+	blocks,
+	hasResolved,
+	isMissing,
+	canUserEdit,
 } ) {
-	const { record, hasResolved } = useEntityRecord(
-		'postType',
-		'wp_block',
-		ref
-	);
-	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
-		id: ref,
-	} );
-	const isMissing = hasResolved && ! record;
-
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -233,7 +308,11 @@ function ReusableBlockEdit( {
 	if ( isMissing ) {
 		children = (
 			<Warning>
-				{ __( 'Block has been deleted or is unavailable.' ) }
+				{ ref
+					? __( 'Block has been deleted or is unavailable.' )
+					: __(
+							'The pattern this block references is not registered by the active theme or plugins.'
+					  ) }
 			</Warning>
 		);
 	}
@@ -250,7 +329,7 @@ function ReusableBlockEdit( {
 		<>
 			{ hasResolved && ! isMissing && (
 				<ReusableBlockControl
-					recordId={ ref }
+					canUserEdit={ canUserEdit }
 					canOverrideBlocks={ canOverrideBlocks }
 					hasContent={ !! content }
 					handleEditOriginal={

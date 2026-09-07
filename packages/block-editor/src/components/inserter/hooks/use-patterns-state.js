@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from '@wordpress/element';
-import { cloneBlock, createBlock } from '@wordpress/blocks';
+import { cloneBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -9,7 +9,10 @@ import {
 	isNavigationOverlayContextKey,
 	userPatternCategoriesSelectKey,
 } from '../../../store/private-keys';
-import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
+import {
+	isPatternSynced,
+	createSyncedPatternBlock,
+} from '../block-patterns-tab/utils';
 import { isFiltered } from '../../../store/utils';
 
 /**
@@ -109,11 +112,9 @@ const usePatternsState = (
 			if ( destinationRootClientId === null ) {
 				return;
 			}
-			const patternBlocks =
-				pattern.type === INSERTER_PATTERN_TYPES.user &&
-				pattern.syncStatus !== 'unsynced'
-					? [ createBlock( 'core/block', { ref: pattern.id } ) ]
-					: blocks;
+			const patternBlocks = isPatternSynced( pattern )
+				? [ createSyncedPatternBlock( pattern ) ]
+				: blocks;
 			onInsert(
 				( patternBlocks ?? [] ).map( ( block ) => {
 					const clonedBlock = cloneBlock( block );

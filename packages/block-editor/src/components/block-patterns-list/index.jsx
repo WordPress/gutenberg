@@ -12,7 +12,10 @@ import { Icon, symbol } from '@wordpress/icons';
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
 import BlockPatternsPaging from '../block-patterns-paging';
-import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
+import {
+	INSERTER_PATTERN_TYPES,
+	isPatternSynced,
+} from '../inserter/block-patterns-tab/utils';
 
 const WithToolTip = ( { showTooltip, title, children } ) => {
 	if ( showTooltip ) {
@@ -105,9 +108,7 @@ function BlockPattern( {
 										'block-editor-block-patterns-list__item',
 										{
 											'block-editor-block-patterns-list__list-item-synced':
-												pattern.type ===
-													INSERTER_PATTERN_TYPES.user &&
-												! pattern.syncStatus,
+												isPatternSynced( pattern ),
 											'is-selected': isSelected,
 										}
 									) }
@@ -139,7 +140,7 @@ function BlockPattern( {
 									className="block-editor-patterns__pattern-details"
 									spacing={ 2 }
 								>
-									{ isUserPattern && ! pattern.syncStatus && (
+									{ isPatternSynced( pattern ) && (
 										<div className="block-editor-patterns__pattern-icon-wrapper">
 											<Icon
 												className="block-editor-patterns__pattern-icon"

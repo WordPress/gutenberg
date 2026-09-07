@@ -1,4 +1,5 @@
 import { __, _x } from '@wordpress/i18n';
+import { createBlock } from '@wordpress/blocks';
 
 export const INSERTER_PATTERN_TYPES = {
 	user: 'user',
@@ -25,6 +26,37 @@ export const starterPatternsCategory = {
 	name: 'core/starter-content',
 	label: __( 'Starter content' ),
 };
+
+/**
+ * Whether inserting a pattern adds a reference to it (a `core/block`) rather
+ * than a copy of its blocks. User patterns carry a `syncStatus`; registered
+ * patterns carry a `synced` flag from the REST API.
+ *
+ * @param {Object} pattern Pattern object.
+ * @return {boolean} Whether the pattern is synced.
+ */
+export function isPatternSynced( pattern ) {
+	if ( pattern.type === INSERTER_PATTERN_TYPES.user ) {
+		return pattern.syncStatus !== INSERTER_SYNC_TYPES.unsynced;
+	}
+	return !! pattern.synced;
+}
+
+/**
+ * Creates the `core/block` that references a synced pattern: by `ref` for a
+ * user pattern, by `slug` for a registered one.
+ *
+ * @param {Object} pattern Pattern object.
+ * @return {Object} Block object.
+ */
+export function createSyncedPatternBlock( pattern ) {
+	return createBlock(
+		'core/block',
+		pattern.type === INSERTER_PATTERN_TYPES.user
+			? { ref: pattern.id }
+			: { slug: pattern.name }
+	);
+}
 
 export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	const isUserPattern = pattern.name.startsWith( 'core/block' );
@@ -61,15 +93,14 @@ export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	// Filter by sync status.
 	if (
 		syncFilter === INSERTER_SYNC_TYPES.full &&
-		pattern.syncStatus !== ''
+		! isPatternSynced( pattern )
 	) {
 		return true;
 	}
 
 	if (
 		syncFilter === INSERTER_SYNC_TYPES.unsynced &&
-		pattern.syncStatus !== 'unsynced' &&
-		isUserPattern
+		isPatternSynced( pattern )
 	) {
 		return true;
 	}

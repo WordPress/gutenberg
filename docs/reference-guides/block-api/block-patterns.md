@@ -25,6 +25,7 @@ The properties available for block patterns are:
 -   `templateTypes` (optional): An array of template types where the pattern makes sense, for example, `404` if the pattern is for a 404 page, `single-post` if the pattern is for showing a single post.
 -   `inserter` (optional): By default, all patterns will appear in the inserter. To hide a pattern so that it can only be inserted programmatically, set the `inserter` to `false`.
 -   `source` (optional): A string that denotes the source of the pattern. For a plugin registering a pattern, pass the string `plugin`. For a theme, pass the string `theme`.
+-   `synced` (optional): When `true`, inserting the pattern adds a Pattern block (`core/block`) that references the pattern by its name instead of copying its blocks, so every instance follows the registered content and changes to the registered pattern show up everywhere. Blocks inside a synced pattern are only editable per instance through pattern overrides (a `core/pattern-overrides` binding). Defaults to `false`. In a theme's `patterns/` file, use the `Synced: yes` header.
 
 The following code sample registers a block pattern named `my-plugin/my-awesome-pattern`:
 

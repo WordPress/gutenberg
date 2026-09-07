@@ -119,6 +119,8 @@ export interface Pattern extends CommonPost {
 	excerpt?: string | { raw: string; rendered: string };
 	meta?: Record< string, any >;
 	wp_pattern_sync_status?: string;
+	// Registered (theme, plugin, core) patterns only.
+	synced?: boolean;
 }
 
 export interface SiteSettings {

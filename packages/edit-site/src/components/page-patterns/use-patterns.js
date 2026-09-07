@@ -136,13 +136,20 @@ const selectPatterns = createSelector(
 		];
 
 		if ( syncStatus ) {
-			// User patterns can have their sync statuses checked directly
-			// Non-user patterns are all unsynced for the time being.
+			// User patterns carry `wp_pattern_sync_status`; registered
+			// patterns carry a `synced` flag.
 			patterns = patterns.filter( ( pattern ) => {
-				return pattern.type === PATTERN_TYPES.user
-					? ( pattern.wp_pattern_sync_status ||
+				if ( pattern.type === PATTERN_TYPES.user ) {
+					return (
+						( pattern.wp_pattern_sync_status ||
 							PATTERN_SYNC_TYPES.full ) === syncStatus
-					: syncStatus === PATTERN_SYNC_TYPES.unsynced;
+					);
+				}
+				return (
+					( pattern.synced
+						? PATTERN_SYNC_TYPES.full
+						: PATTERN_SYNC_TYPES.unsynced ) === syncStatus
+				);
 			} );
 		}
 

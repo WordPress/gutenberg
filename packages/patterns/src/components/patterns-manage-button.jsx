@@ -33,14 +33,18 @@ function PatternsManageButton( { clientId, onClose } ) {
 			const _isUnsyncedPattern =
 				!! block?.attributes?.metadata?.patternName;
 
+			// A registered pattern (referenced by `slug`) has no post to
+			// check permissions against; detaching it only touches the
+			// current post.
 			const _isSyncedPattern =
 				!! block &&
 				isReusableBlock( block ) &&
-				!! canUser( 'update', {
-					kind: 'postType',
-					name: 'wp_block',
-					id: block.attributes.ref,
-				} );
+				( !! block.attributes.slug ||
+					!! canUser( 'update', {
+						kind: 'postType',
+						name: 'wp_block',
+						id: block.attributes.ref,
+					} ) );
 
 			return {
 				attributes: block.attributes,
