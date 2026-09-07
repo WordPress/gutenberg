@@ -1,7 +1,6 @@
 import { useCallback, useContext } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { STORE_NAME } from '../name';
-import { DEFAULT_ENTITY_KEY } from '../entities';
 import { EntityContext } from '../entity-context';
 import useEntityId from './use-entity-id';
 
@@ -31,29 +30,16 @@ export default function useEntityProp( kind, name, prop, _id ) {
 	const { value, fullValue } = useSelect(
 		( select ) => {
 			if ( revisionId ) {
-				// Use getRevisions (not getRevision) to read from the
-				// already-cached collection. Using getRevision would
-				// trigger a redundant single-revision API fetch that
-				// can wipe the collection due to a race condition.
-				// See https://github.com/WordPress/gutenberg/pull/76043.
-				const revisions = select( STORE_NAME ).getRevisions(
+				const revision = select( STORE_NAME ).getRevision(
 					kind,
 					name,
 					id,
+					revisionId,
 					{
-						per_page: -1,
 						context: 'edit',
 						_fields:
 							'id,date,author,meta,title.raw,excerpt.raw,content.raw',
 					}
-				);
-				const entityConfig = select( STORE_NAME ).getEntityConfig(
-					kind,
-					name
-				);
-				const revKey = entityConfig?.revisionKey || DEFAULT_ENTITY_KEY;
-				const revision = revisions?.find(
-					( r ) => r[ revKey ] === revisionId
 				);
 				return revision
 					? {
