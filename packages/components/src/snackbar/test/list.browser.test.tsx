@@ -1,15 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { act, render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import SnackbarList from '../list';
 
 vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
