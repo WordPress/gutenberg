@@ -85,6 +85,12 @@ function clearPreloadedData() {
 	}
 }
 
+/**
+ * The default fetch handler, using `window.fetch`. Exposed so it can be
+ * restored after `setFetchHandler` overrides it.
+ *
+ * @param nextOptions The options for the fetch.
+ */
 const defaultFetchHandler: FetchHandler = ( nextOptions ) => {
 	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
 	let { body, headers } = nextOptions;
@@ -168,6 +174,7 @@ export interface ApiFetch {
 	use: ( middleware: APIFetchMiddleware ) => void;
 	unregister: ( middleware: APIFetchMiddleware ) => boolean;
 	setFetchHandler: ( newFetchHandler: FetchHandler ) => void;
+	defaultFetchHandler: FetchHandler;
 	createNonceMiddleware: typeof createNonceMiddleware;
 	createPreloadingMiddleware: typeof createPreloadingMiddleware;
 	createRootURLMiddleware: typeof createRootURLMiddleware;
@@ -224,6 +231,7 @@ const apiFetch: ApiFetch = ( options ) => {
 apiFetch.use = registerMiddleware;
 apiFetch.unregister = unregisterMiddleware;
 apiFetch.setFetchHandler = setFetchHandler;
+apiFetch.defaultFetchHandler = defaultFetchHandler;
 
 // Attached to the function (rather than a named export) because
 // `wpScriptDefaultExport: true` flattens this module to its default
