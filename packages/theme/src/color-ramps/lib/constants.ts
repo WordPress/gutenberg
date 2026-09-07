@@ -23,12 +23,18 @@ export const BLACK: PlainColorObject = {
 //   multiplies the target by 1.02 for a 2% reserve; log tolerance is separate.
 export const CONTRAST_ROUNDING_MARGIN = 0.02;
 
-// With preferLighter, choose black only when its minimum contrast exceeds
-// white's by this amount. This changes the choice, not the required contrast.
+// When enabling "lighter direction" bias, this is the amount by which
+// black text contrast needs to be greater than white text contrast.
+// The higher the value, the stronger the preference for white text.
+// The current value has been determined empirically as the highest value
+// that won't cause the algo not to be able to correctly solve all contrasts.
 export const WHITE_TEXT_CONTRAST_MARGIN = 3.1;
 
-// Keep the accent SF2 anchor out of the middle-lightness range, where there
-// is little contrast room for either foreground direction.
+// These values are used as thresholds when trying to match the background
+// ramp's lightness while calculating an accent ramp. They prevent the accent
+// scale from being pinned to lightness values in the middle of the range,
+// which would cause the algorithm to struggle to satisfy the accent scale
+// constraints and therefore produce unexpected results.
 export const ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS = {
 	lighter: { min: 0.2, max: 0.4 },
 	darker: { min: 0.75, max: 0.98 },
@@ -41,7 +47,6 @@ export const CONTRAST_EPSILON = 4e-3;
 
 export const MAX_BISECTION_ITERATIONS = 10;
 
-// Full-ramp diagnostic pairs, broader than the semantic token pair checks.
 export const CONTRAST_COMBINATIONS: {
 	bgs: ( keyof Ramp )[];
 	fgs: ( keyof Ramp )[];
@@ -74,7 +79,7 @@ export const CONTRAST_COMBINATIONS: {
 	},
 ];
 
-// Shared defaults for token generation and runtime ThemeProvider calculations.
+// Used when generating the DTCG tokens and the static color ramps.
 export const DEFAULT_SEED_COLORS = {
 	background: '#fcfcfc',
 	primary: '#3858e9',

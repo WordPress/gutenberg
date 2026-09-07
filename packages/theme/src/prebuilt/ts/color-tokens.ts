@@ -21,6 +21,7 @@ export default {
 		'foreground-interactive-brand-strong-active',
 	],
 	'primary-surface4': [ 'background-interactive-brand-weak-active' ],
+	'primary-fgSurface3': [ 'foreground-interactive-brand' ],
 	'primary-stroke3': [
 		'background-indicator-brand',
 		'background-thumb-brand',
@@ -32,8 +33,7 @@ export default {
 	'primary-stroke4': [ 'stroke-interactive-brand-active' ],
 	'primary-stroke1': [ 'stroke-surface-brand' ],
 	'primary-surface1': [ 'background-surface-brand' ],
-	'primary-fgSurface4': [ 'foreground-interactive-brand' ],
-	'primary-fgSurface5': [ 'foreground-interactive-brand-active' ],
+	'primary-fgSurface4': [ 'foreground-interactive-brand-active' ],
 	'info-surface2': [ 'background-surface-info-weak' ],
 	'info-surface4': [ 'background-surface-info' ],
 	'info-fgSurface3': [ 'foreground-content-info-weak' ],
@@ -68,7 +68,10 @@ export default {
 		'background-interactive-error-weak-active',
 		'background-surface-error',
 	],
-	'error-fgSurface3': [ 'foreground-content-error-weak' ],
+	'error-fgSurface3': [
+		'foreground-content-error-weak',
+		'foreground-interactive-error',
+	],
 	'error-stroke3': [
 		'stroke-interactive-error',
 		'stroke-interactive-error-strong',
@@ -81,9 +84,8 @@ export default {
 	'error-stroke1': [ 'stroke-surface-error' ],
 	'error-fgSurface4': [
 		'foreground-content-error',
-		'foreground-interactive-error',
+		'foreground-interactive-error-active',
 	],
-	'error-fgSurface5': [ 'foreground-interactive-error-active' ],
 	'bg-surface2': [ 'background-surface-neutral' ],
 	'bg-surface5': [
 		'background-interactive-brand-strong-disabled',
@@ -91,7 +93,12 @@ export default {
 		'background-interactive-neutral-strong-disabled',
 	],
 	'bg-surface4': [ 'background-interactive-neutral-weak-active' ],
-	'bg-surface3': [ 'background-surface-neutral-strong' ],
+	'bg-surface3': [
+		'background-interactive-neutral',
+		'background-interactive-neutral-active',
+		'background-interactive-neutral-disabled',
+		'background-surface-neutral-strong',
+	],
 	'bg-fgSurface3': [
 		'foreground-content-neutral-weak',
 		'foreground-interactive-neutral-weak',
@@ -139,8 +146,6 @@ export default {
 		'background-thumb-neutral',
 		'foreground-content-neutral',
 		'foreground-interactive-neutral',
-	],
-	'bg-fgSurface5': [
 		'foreground-interactive-neutral-active',
 		'foreground-interactive-neutral-weak-active',
 	],
