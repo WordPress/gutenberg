@@ -11,6 +11,7 @@ import type {
 	NormalizedRegularLayout,
 } from '../../../types';
 import DataFormContext from '../../dataform-context';
+import { canRenderField } from '../can-render-field';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 
@@ -70,10 +71,7 @@ export default function FormRegularField< Item >( {
 		( fieldDef ) => fieldDef.id === field.id
 	);
 
-	if (
-		! fieldDefinition ||
-		( fieldDefinition.readOnly !== true && ! fieldDefinition.Edit )
-	) {
+	if ( ! canRenderField( fieldDefinition ) ) {
 		return null;
 	}
 

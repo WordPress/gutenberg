@@ -95,9 +95,9 @@ const LayoutCardComponent = ( {
 			readOnly: true,
 		},
 		{
+			// No type and no Edit: a read-only field rendered as its own card.
 			id: 'payments',
 			label: 'Payments',
-			type: 'text',
 			readOnly: true, // Triggers using the render method instead of Edit.
 			isVisible: ( item ) => item.displayPayments,
 			render: ( { item } ) => {

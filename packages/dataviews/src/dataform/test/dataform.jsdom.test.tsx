@@ -757,6 +757,56 @@ describe( 'DataForm component', () => {
 	} );
 
 	describe( 'in card mode', () => {
+		it( 'renders a read-only field without an edit control as its own card', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'status',
+							label: 'Account status',
+							readOnly: true,
+							render: () => <span>Account connected</span>,
+						},
+					] }
+					form={ { layout: { type: 'card' }, fields: [ 'status' ] } }
+					data={ {} }
+				/>
+			);
+
+			expect( screen.getByText( 'Account connected' ) ).toBeVisible();
+			expect( screen.getAllByText( 'Account status' ) ).toHaveLength( 1 );
+		} );
+
+		it( 'does not render an empty card for an editable field without an edit control', () => {
+			const { container } = render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'status',
+							label: 'Account status',
+							render: () => <span>Account connected</span>,
+						},
+					] }
+					form={ { layout: { type: 'card' }, fields: [ 'status' ] } }
+					data={ {} }
+				/>
+			);
+
+			expect(
+				screen.queryByText( 'Account connected' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Account status' )
+			).not.toBeInTheDocument();
+			expect(
+				// An empty card has no accessible role or text to query.
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				container.querySelector( '.dataforms-layouts-card__field' )
+			).not.toBeInTheDocument();
+		} );
+
 		const fieldsWithRequiredTitle = fields.map( ( field ) =>
 			field.id === 'title'
 				? { ...field, isValid: { required: true } }
