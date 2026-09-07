@@ -335,6 +335,36 @@ describe( 'normalizeFields: default getValue', () => {
 				operators: [ 'lessThan' ],
 			} );
 		} );
+
+		it.each( [
+			'integer',
+			'number',
+			'text',
+			'email',
+			'url',
+			'telephone',
+		] as const )(
+			'removes the isAll operator for %s fields, whose values are scalars',
+			( type ) => {
+				const fields: Field< {} >[] = [
+					{
+						id: 'author',
+						type,
+						filterBy: {
+							operators: [ 'isAny', 'isNone', 'isAll' ],
+						},
+					},
+				];
+				const normalizedFields = normalizeFields( fields );
+				expect( normalizedFields[ 0 ].filterBy ).toStrictEqual( {
+					isPrimary: false,
+					operators: [ 'isAny', 'isNone' ],
+				} );
+				expect( normalizedFields[ 0 ].filter ).not.toHaveProperty(
+					'isAll'
+				);
+			}
+		);
 	} );
 
 	describe( 'validation normalization', () => {
