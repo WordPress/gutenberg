@@ -1846,6 +1846,48 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that finalize fails when the attachment no longer exists by the
+	 * time its response is prepared.
+	 *
+	 * A 'wp_generate_attachment_metadata' callback that rejects the file and
+	 * deletes the attachment must not be answered with a 200 built from the row
+	 * as it was before the callback ran: the editor would store that stale
+	 * record and report the upload as complete.
+	 *
+	 * @link https://github.com/WordPress/gutenberg/issues/81844
+	 *
+	 * @covers ::finalize_item
+	 */
+	public function test_finalize_fails_when_metadata_filter_deletes_attachment() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=deleted-while-finalizing.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+
+		$attachment_id = rest_get_server()->dispatch( $request )->get_data()['id'];
+
+		add_filter(
+			'wp_generate_attachment_metadata',
+			static function ( $metadata, $id ) {
+				wp_delete_attachment( $id, true );
+				return $metadata;
+			},
+			10,
+			2
+		);
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
+		$request->set_param( 'sub_sizes', array() );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_post_invalid_id', $response, 404 );
+	}
+
+	/**
 	 * Verifies that finalize writes scaled sub-size metadata correctly.
 	 *
 	 * @covers ::finalize_item

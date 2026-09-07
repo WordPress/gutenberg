@@ -1747,11 +1747,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		 * converted the file, say - would otherwise be missing from this
 		 * response. The editor stores the response as its copy of the record
 		 * rather than reading the attachment again, so a stale row here is
-		 * what it keeps.
+		 * what it keeps. A callback that deleted the attachment instead leaves
+		 * nothing to respond with, so that is reported as the error it is.
 		 */
-		$refreshed = $this->get_post( $attachment_id );
-		if ( ! is_wp_error( $refreshed ) ) {
-			$post = $refreshed;
+		$post = $this->get_post( $attachment_id );
+		if ( is_wp_error( $post ) ) {
+			return $post;
 		}
 
 		return $this->prepare_item_for_response( $post, $response_request );
