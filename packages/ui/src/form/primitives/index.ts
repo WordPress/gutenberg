@@ -9,5 +9,6 @@ export { InputLayout } from './input-layout';
 export { Radio } from './radio';
 export * as Select from './select';
 export { SearchableChipSelect } from './searchable-chip-select';
+export { SearchableSelect } from './searchable-select';
 export { Textarea } from './textarea';
 export { ValidityIndicator } from './validity-indicator';

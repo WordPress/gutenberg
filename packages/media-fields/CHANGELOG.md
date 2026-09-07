@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `alt_text`, `caption`, `description`: Pass the field's disabled state to the textarea control, so disabling one of these fields stops it accepting input. ([#82516](https://github.com/WordPress/gutenberg/pull/82516))
+
 ### Internal
 
 -   Remove unused dependencies `@wordpress/date` and `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

@@ -72,7 +72,10 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
 
 	// WordPress 7.2 compat.
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-templates-controller-7-2.php';
 	require __DIR__ . '/compat/wordpress-7.2/view-config-api.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-view-config-controller-7-2.php';
+	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
 
 	// Real-time collaboration.
 	require __DIR__ . '/experimental/collaboration/class-gutenberg-rest-autosaves-controller.php';
@@ -87,7 +90,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/rest-api.php';
 
 	require_once __DIR__ . '/experimental/rest-api.php';
-	require_once __DIR__ . '/experimental/kses-allowed-html.php';
 
 	require_once __DIR__ . '/experimental/class-gutenberg-hierarchical-sort.php';
 }

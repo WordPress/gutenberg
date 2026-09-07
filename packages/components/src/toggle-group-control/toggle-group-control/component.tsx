@@ -25,6 +25,7 @@ function UnconnectedToggleGroupControl(
 		isAdaptiveWidth = false,
 		isBlock = false,
 		isDeselectable = false,
+		disabled = false,
 		id,
 		label,
 		hideLabelFromVision = false,
@@ -83,6 +84,7 @@ function UnconnectedToggleGroupControl(
 				onChange={ onChange }
 				ref={ refs }
 				value={ value }
+				disabled={ disabled }
 			>
 				{ children }
 			</MainControl>

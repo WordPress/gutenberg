@@ -110,6 +110,11 @@ const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
 
+// Capability required to view a generated page when the page config does not
+// declare one. Pages rendering outside the menu page callback flow must
+// enforce this themselves.
+const DEFAULT_PAGE_CAPABILITY = 'manage_options';
+
 /**
  * Interprets a configuration value as a boolean, where `"true"` and `"1"`
  * are considered true while all other values are false.
@@ -1296,6 +1301,7 @@ async function generatePagesPhp( pageData, replacements ) {
 			'{{PREFIX}}': prefixUnderscore,
 			'{{INIT_MODULES_PHP_ARRAY}}': initModulesPhp,
 			'{{INIT_MODULES_JSON}}': JSON.stringify( page.initModules ),
+			'{{CAPABILITY}}': page.capability || DEFAULT_PAGE_CAPABILITY,
 		};
 
 		// Generate both page.php and page-wp-admin.php
@@ -2352,13 +2358,19 @@ async function buildAll( baseUrlExpression ) {
 	// Normalize PAGES config to support both string and object formats
 	const normalizedPages = PAGES.map( ( page ) => {
 		if ( typeof page === 'string' ) {
-			return { id: page, init: [], title: undefined };
+			return {
+				id: page,
+				init: [],
+				title: undefined,
+				capability: DEFAULT_PAGE_CAPABILITY,
+			};
 		}
 		return {
 			id: page.id,
 			init: page.init || [],
 			title: page.title || undefined,
 			experimental: page.experimental || false,
+			capability: page.capability || DEFAULT_PAGE_CAPABILITY,
 		};
 	} );
 
@@ -2426,6 +2438,7 @@ async function buildAll( baseUrlExpression ) {
 			routes: pageRoutes,
 			initModules: page.init,
 			title: page.title,
+			capability: page.capability,
 		};
 	} );
 
