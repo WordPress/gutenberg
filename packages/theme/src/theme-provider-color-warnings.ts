@@ -1,10 +1,6 @@
 import type { DEFAULT_SEED_COLORS } from './color-ramps/lib/constants.ts';
 import { getContrast } from './color-ramps/lib/color-utils.ts';
-import type {
-	AccentRampResult,
-	Ramp,
-	RampResult,
-} from './color-ramps/lib/types.ts';
+import type { Ramp, RampResult } from './color-ramps/lib/types.ts';
 import {
 	getSemanticColorCustomProperty,
 	MINIMUM_TEXT_CONTRAST,
@@ -42,10 +38,7 @@ export type ThemeProviderColorWarning =
  * @param colorValues Semantic CSS custom properties and serialized colors.
  */
 export function collectThemeProviderColorWarnings(
-	ramps: ReadonlyMap<
-		ThemeProviderColorRampName,
-		RampResult | AccentRampResult
-	>,
+	ramps: ReadonlyMap< ThemeProviderColorRampName, RampResult >,
 	colorValues: ReadonlyMap< string, string >
 ): ThemeProviderColorWarning[] {
 	const warnings: ThemeProviderColorWarning[] = [];
