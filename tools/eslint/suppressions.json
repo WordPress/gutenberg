@@ -699,9 +699,6 @@
 		}
 	},
 	"packages/block-editor/src/components/block-toolbar/pattern-overrides-dropdown.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react-hooks/refs": {
 			"count": 1
 		},
