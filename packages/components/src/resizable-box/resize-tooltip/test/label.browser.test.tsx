@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import Label from '../label';
 import { POSITIONS } from '../utils';
@@ -20,6 +21,6 @@ describe( 'ResizeTooltip label', () => {
 		expect( label ).toHaveClass( 'components-text' );
 		expect( label ).toHaveClass( 'components-truncate' );
 		expect( label ).toHaveAttribute( 'data-wp-component', 'Text' );
-		expect( label ).toHaveStyle( { fontWeight: 'normal' } );
+		expect( getComputedStyle( label ).fontWeight ).toBe( '400' );
 	} );
 } );
