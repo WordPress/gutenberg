@@ -56,25 +56,48 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                     type="button"
                   />
                   <div
-                    class="style-flex style-items-column components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper"
-                    data-wp-c16t="true"
-                    data-wp-component="VStack"
-                    style="--wp-components-flex-align: stretch; --wp-components-flex-direction: column; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 0.5); --wp-components-flex-justify: center;"
+                    class="components-color-palette__custom-color-text-wrapper"
                   >
-                    <span
-                      class="style-truncate components-truncate components-color-palette__custom-color-name"
+                    <div
+                      class="style-flex style-items-column components-flex components-h-stack components-v-stack"
                       data-wp-c16t="true"
-                      data-wp-component="Truncate"
+                      data-wp-component="VStack"
+                      style="--wp-components-flex-align: stretch; --wp-components-flex-direction: column; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 0.5); --wp-components-flex-justify: center;"
                     >
-                      red
-                    </span>
-                    <span
-                      class="style-truncate components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex"
-                      data-wp-c16t="true"
-                      data-wp-component="Truncate"
+                      <span
+                        class="style-truncate components-truncate components-color-palette__custom-color-name"
+                        data-wp-c16t="true"
+                        data-wp-component="Truncate"
+                      >
+                        red
+                      </span>
+                      <span
+                        class="style-truncate components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex"
+                        data-wp-c16t="true"
+                        data-wp-component="Truncate"
+                      >
+                        #f00
+                      </span>
+                    </div>
+                    <button
+                      aria-label="Edit custom color"
+                      class="components-color-palette__custom-color-edit-button"
+                      type="button"
                     >
-                      #f00
-                    </span>
+                      <svg
+                        aria-hidden="true"
+                        fill="currentColor"
+                        focusable="false"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        width="20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="m19 7-3-3-8.5 8.5-1 4 4-1L19 7Zm-7 11.5H5V20h7v-1.5Z"
+                        />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
