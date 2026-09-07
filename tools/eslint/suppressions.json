@@ -7819,11 +7819,6 @@
 			"count": 1
 		}
 	},
-	"packages/media-fields/src/caption/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/media-fields/src/description/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
