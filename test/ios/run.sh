@@ -65,7 +65,9 @@ step "Generating the Xcode project"
 ( cd test/ios && xcodegen generate --quiet )
 step "Building and running the tests"
 rm -rf test/ios/build/results.xcresult
-TEST_RUNNER_WP_BASE_URL="$WP_BASE_URL" xcodebuild test \
+TEST_RUNNER_WP_BASE_URL="$WP_BASE_URL" \
+TEST_RUNNER_WP_PLUGIN_URL="$WP_BASE_URL/wp-content/plugins/$( basename "$PWD" )" \
+xcodebuild test \
 	-project test/ios/GutenbergIOS.xcodeproj \
 	-scheme SafariTests \
 	-destination "id=${UDID}" \
