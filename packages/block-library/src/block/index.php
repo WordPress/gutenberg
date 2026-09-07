@@ -122,29 +122,43 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 	$content = $block_instance->render( array( 'dynamic' => false ) );
 	unset( $seen_refs[ $seen_key ] );
 
-	// Wrap the output when the instance asks for an element, or when its area
-	// defines one, so a pattern standing in for a header or footer keeps its
-	// landmark. The instance's `tagName` wins over the area's default, and
-	// `none` opts out of the wrapper altogether.
-	$tag_name = $attributes['tagName'] ?? '';
-	if ( '' === $tag_name ) {
-		$area = block_core_block_get_area( $attributes, isset( $pattern ) ? $pattern : null );
-		// "General" (uncategorized) patterns render without a wrapper, unlike
-		// template parts, so existing pattern instances keep their markup.
-		if ( $area && 'uncategorized' !== $area ) {
-			foreach ( get_allowed_block_template_part_areas() as $area_definition ) {
-				if ( $area_definition['area'] === $area && ! empty( $area_definition['area_tag'] ) ) {
-					$tag_name = $area_definition['area_tag'];
-					break;
-				}
-			}
-		}
-	}
-	if ( in_array( $tag_name, array( 'header', 'main', 'section', 'article', 'aside', 'footer', 'div' ), true ) ) {
-		$content = "<$tag_name " . get_block_wrapper_attributes() . '>' . $content . "</$tag_name>";
+	// Instances with `hasWrapper` render inside an element, like a template
+	// part: the instance's `tagName`, else the area's element, else a div.
+	// Instances created before the attribute existed have none, so their
+	// markup is unchanged.
+	if ( ! empty( $attributes['hasWrapper'] ) ) {
+		$tag_name = block_core_block_get_tag_name( $attributes, isset( $pattern ) ? $pattern : null );
+		$content  = "<$tag_name " . get_block_wrapper_attributes() . '>' . $content . "</$tag_name>";
 	}
 
 	return $content;
+}
+
+/**
+ * Returns the element a pattern instance renders in: its `tagName` when it is
+ * an allowed element, else the element of its area, else `div`.
+ *
+ * @since 7.2.0
+ *
+ * @param array      $attributes The block attributes.
+ * @param array|null $pattern    The registered pattern, if any.
+ * @return string The element name.
+ */
+function block_core_block_get_tag_name( $attributes, $pattern ) {
+	$allowed  = array( 'header', 'main', 'section', 'article', 'aside', 'footer', 'div' );
+	$tag_name = $attributes['tagName'] ?? '';
+	if ( in_array( $tag_name, $allowed, true ) ) {
+		return $tag_name;
+	}
+	$area = block_core_block_get_area( $attributes, $pattern );
+	if ( $area ) {
+		foreach ( get_allowed_block_template_part_areas() as $area_definition ) {
+			if ( $area_definition['area'] === $area && in_array( $area_definition['area_tag'] ?? '', $allowed, true ) ) {
+				return $area_definition['area_tag'];
+			}
+		}
+	}
+	return 'div';
 }
 
 /**

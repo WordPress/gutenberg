@@ -129,16 +129,27 @@ class Test_Blocks_RenderReusable extends WP_UnitTestCase {
 
 	/**
 	 * @covers ::gutenberg_render_block_core_block
+	 * @covers ::gutenberg_block_core_block_get_tag_name
 	 */
-	public function test_render_wraps_output_in_tag_name() {
-		$this->assertSame(
-			'<header class="wp-block-block"><p class="wp-block-paragraph">Hello from a registered pattern!</p></header>',
-			do_blocks( '<!-- wp:block {"slug":"test/greeting","tagName":"header"} /-->' )
-		);
-		// Unknown elements are ignored rather than rendered.
+	public function test_render_wraps_output_when_has_wrapper() {
+		// Without the attribute, instances keep their markup.
 		$this->assertSame(
 			'<p class="wp-block-paragraph">Hello from a registered pattern!</p>',
-			do_blocks( '<!-- wp:block {"slug":"test/greeting","tagName":"script"} /-->' )
+			do_blocks( '<!-- wp:block {"slug":"test/greeting","tagName":"header"} /-->' )
+		);
+		// With it, the element is the instance's tagName, else a div.
+		$this->assertSame(
+			'<header class="wp-block-block"><p class="wp-block-paragraph">Hello from a registered pattern!</p></header>',
+			do_blocks( '<!-- wp:block {"slug":"test/greeting","hasWrapper":true,"tagName":"header"} /-->' )
+		);
+		$this->assertSame(
+			'<div class="wp-block-block"><p class="wp-block-paragraph">Hello from a registered pattern!</p></div>',
+			do_blocks( '<!-- wp:block {"slug":"test/greeting","hasWrapper":true} /-->' )
+		);
+		// Unknown elements fall back to the default rather than rendering.
+		$this->assertSame(
+			'<div class="wp-block-block"><p class="wp-block-paragraph">Hello from a registered pattern!</p></div>',
+			do_blocks( '<!-- wp:block {"slug":"test/greeting","hasWrapper":true,"tagName":"script"} /-->' )
 		);
 	}
 
@@ -150,27 +161,27 @@ class Test_Blocks_RenderReusable extends WP_UnitTestCase {
 		// The registered area provides the default element.
 		$this->assertSame(
 			'<header class="wp-block-block"><p class="wp-block-paragraph">Site header</p></header>',
-			do_blocks( '<!-- wp:block {"slug":"test/header"} /-->' )
+			do_blocks( '<!-- wp:block {"slug":"test/header","hasWrapper":true} /-->' )
 		);
 		// The instance's tagName wins over the area.
 		$this->assertSame(
+			'<section class="wp-block-block"><p class="wp-block-paragraph">Site header</p></section>',
+			do_blocks( '<!-- wp:block {"slug":"test/header","hasWrapper":true,"tagName":"section"} /-->' )
+		);
+		// The General area renders a div, like a template part.
+		$this->assertSame(
 			'<div class="wp-block-block"><p class="wp-block-paragraph">Site header</p></div>',
-			do_blocks( '<!-- wp:block {"slug":"test/header","tagName":"div"} /-->' )
-		);
-		// The General area renders no wrapper, unlike a template part.
-		$this->assertSame(
-			'<p class="wp-block-paragraph">Site header</p>',
-			do_blocks( '<!-- wp:block {"slug":"test/header","area":"uncategorized"} /-->' )
-		);
-		// `none` opts out of the area's element.
-		$this->assertSame(
-			'<p class="wp-block-paragraph">Site header</p>',
-			do_blocks( '<!-- wp:block {"slug":"test/header","tagName":"none"} /-->' )
+			do_blocks( '<!-- wp:block {"slug":"test/header","hasWrapper":true,"area":"uncategorized"} /-->' )
 		);
 		// The instance's area applies to a pattern registered without one.
 		$this->assertSame(
 			'<footer class="wp-block-block"><p class="wp-block-paragraph">Hello from a registered pattern!</p></footer>',
-			do_blocks( '<!-- wp:block {"slug":"test/greeting","area":"footer"} /-->' )
+			do_blocks( '<!-- wp:block {"slug":"test/greeting","hasWrapper":true,"area":"footer"} /-->' )
+		);
+		// Without the wrapper attribute the area adds no element.
+		$this->assertSame(
+			'<p class="wp-block-paragraph">Site header</p>',
+			do_blocks( '<!-- wp:block {"slug":"test/header"} /-->' )
 		);
 	}
 
