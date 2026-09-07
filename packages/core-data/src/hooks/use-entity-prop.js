@@ -18,10 +18,13 @@ const REVISION_QUERY = {
  * specified property of the nearest provided
  * entity of the specified type.
  *
- * @param {string}        kind  The entity kind.
- * @param {string}        name  The entity name.
- * @param {string}        prop  The property name.
- * @param {number|string} [_id] An entity ID to use instead of the context-provided one.
+ * @param {string}        kind               The entity kind.
+ * @param {string}        name               The entity name.
+ * @param {string}        prop               The property name.
+ * @param {number|string} [_id]              An entity ID to use instead of the context-provided one.
+ * @param {Object}        [options]          Options for the edits made by the setter.
+ * @param {boolean}       [options.coalesce] Whether consecutive edits to this property
+ *                                           should merge into a single undo level.
  *
  * @return {[*, Function, *]} An array where the first item is the
  *                            property value, the second is the
@@ -30,7 +33,8 @@ const REVISION_QUERY = {
  * 							  information like `raw`, `rendered` and
  * 							  `protected` props.
  */
-export default function useEntityProp( kind, name, prop, _id ) {
+export default function useEntityProp( kind, name, prop, _id, options = {} ) {
+	const { coalesce } = options;
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 	const context = useContext( EntityContext );
@@ -86,11 +90,17 @@ export default function useEntityProp( kind, name, prop, _id ) {
 			if ( revisionId ) {
 				return;
 			}
-			editEntityRecord( kind, name, id, {
-				[ prop ]: newValue,
-			} );
+			editEntityRecord(
+				kind,
+				name,
+				id,
+				{ [ prop ]: newValue },
+				{ coalesce }
+			);
 		},
-		[ editEntityRecord, kind, name, id, prop, revisionId ]
+		// `coalesce` rather than `options`, so that an inline object literal
+		// from the caller does not churn the callback.
+		[ editEntityRecord, kind, name, id, prop, revisionId, coalesce ]
 	);
 
 	return [ value, setValue, fullValue ];
