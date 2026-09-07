@@ -20,19 +20,18 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `tagName` | `string` | — | — |
 | `area` | `string` | — | — |
 | `hasWrapper` | `boolean` | — | — |
+| `layout` | `object` | — | — |
 | `content` | `object` | `{}` | — |
 
 ## Supports
 
 _Defined via the [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) property in block.json._
 
-- [`customClassName`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#customclassname): `false`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [`inserter`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#inserter): `false`
 - [`renaming`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
-- `customCSS`: `false`
 - [`visibility`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 
 ## Context

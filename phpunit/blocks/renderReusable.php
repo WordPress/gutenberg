@@ -187,6 +187,29 @@ class Test_Blocks_RenderReusable extends WP_UnitTestCase {
 
 	/**
 	 * @covers ::gutenberg_render_block_core_block
+	 * @covers ::gutenberg_block_core_block_apply_layout
+	 */
+	public function test_render_wrapper_carries_class_name_and_layout() {
+		// Additional class names land on the wrapper.
+		$this->assertSame(
+			'<div class="my-pattern wp-block-block"><p class="wp-block-paragraph">Hello from a registered pattern!</p></div>',
+			do_blocks( '<!-- wp:block {"slug":"test/greeting","hasWrapper":true,"className":"my-pattern"} /-->' )
+		);
+		// A layout is applied to the wrapper, as on a Group block.
+		$output = do_blocks( '<!-- wp:block {"slug":"test/greeting","hasWrapper":true,"layout":{"type":"constrained"}} /-->' );
+		$this->assertStringStartsWith( '<div class="', $output );
+		$this->assertStringContainsString( 'is-layout-constrained', $output );
+		$this->assertStringContainsString( 'wp-block-block-is-layout-constrained', $output );
+		// Without the wrapper, the settings have nowhere to go and the
+		// pattern's own blocks are left untouched.
+		$this->assertSame(
+			'<p class="wp-block-paragraph">Hello from a registered pattern!</p>',
+			do_blocks( '<!-- wp:block {"slug":"test/greeting","className":"my-pattern","layout":{"type":"constrained"}} /-->' )
+		);
+	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_block
 	 */
 	public function test_render_unregistered_slug_renders_nothing() {
 		$this->assertSame( '', do_blocks( '<!-- wp:block {"slug":"test/does-not-exist"} /-->' ) );

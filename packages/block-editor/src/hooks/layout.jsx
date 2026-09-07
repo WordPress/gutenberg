@@ -627,6 +627,8 @@ function LayoutPanelPure( {
 	);
 }
 
+export { LayoutPanelPure };
+
 export default {
 	shareWithChildBlocks: true,
 	edit: LayoutPanelPure,

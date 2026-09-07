@@ -23,6 +23,9 @@
 		"hasWrapper": {
 			"type": "boolean"
 		},
+		"layout": {
+			"type": "object"
+		},
 		"content": {
 			"type": "object",
 			"default": {}
@@ -32,14 +35,12 @@
 		"pattern/overrides": "content"
 	},
 	"supports": {
-		"customClassName": false,
 		"html": false,
 		"inserter": false,
 		"renaming": false,
 		"interactivity": {
 			"clientNavigation": true
 		},
-		"customCSS": false,
 		"visibility": false
 	}
 }
