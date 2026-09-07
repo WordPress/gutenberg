@@ -10,6 +10,7 @@
 
 -   Expose the layout inspector panel as the private `LayoutPanel`, for blocks that manage the `layout` attribute themselves ([#82557](https://github.com/WordPress/gutenberg/pull/82557)).
 -   Inspector: Give the Pattern block (`core/block`) the full style panel set, in the Styles tab and in the single-panel layout, as template parts get, so its layout and custom CSS controls are reachable ([#82557](https://github.com/WordPress/gutenberg/pull/82557)).
+-   Block toolbar: Keep the block control slots for template parts and pattern instances, which are section blocks whose wrapper element has controls of its own such as alignment ([#82557](https://github.com/WordPress/gutenberg/pull/82557)).
 -   Inspector: Let the Pattern block (`core/block`) show every inspector group while a section is being edited, as template parts already can, so its settings such as the wrapper element are reachable ([#82551](https://github.com/WordPress/gutenberg/pull/82551)).
 -   Inserter: Registered patterns that opt in with `synced` are inserted as a Pattern block referencing them by `slug` instead of as a copy of their blocks ([#82544](https://github.com/WordPress/gutenberg/pull/82544)).
 -   Borders: rename the "Border & Shadow" panel to "Borders", whichever of its controls are available, and always show the Border and Shadow controls' visible labels. A stable panel title is what lets the Border label render unconditionally, so its "Unlink sides" toggle lines up with the border radius one ([#82163](https://github.com/WordPress/gutenberg/pull/82163)).
