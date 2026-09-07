@@ -27,6 +27,12 @@ export async function saveSiteEditorEntities(
 	const publishButton = editorTopBar.getByRole( 'button', {
 		name: 'Publish',
 	} );
+	// The extensible site editor only mounts its save button once an entity
+	// is dirty, so wait for either variant before deciding which one to use.
+	await editorTopBar
+		.getByRole( 'button', { name: /^(Save|Publish)$/ } )
+		.first()
+		.waitFor();
 	const publishButtonIsVisible = ! ( await saveButton.isVisible() );
 	// First Save button in the top bar.
 	const buttonToClick = publishButtonIsVisible ? publishButton : saveButton;

@@ -1,0 +1,51 @@
+{
+	"name": "@wordpress/agent-skill-evals",
+	"version": "0.0.0",
+	"description": "Promptfoo evals that verify agent skills in this repository are discovered, followed, and produce output that meets our rules.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"agents",
+		"evals"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/test/ai-development",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "test/ai-development"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=22.22.0"
+	},
+	"type": "module",
+	"devDependencies": {
+		"@anthropic-ai/claude-agent-sdk": "^0.3.251",
+		"promptfoo": "0.122.1"
+	},
+	"overrides": {
+		"@huggingface/transformers": {
+			"sharp": "0.35.4"
+		},
+		"onnxruntime-node": {
+			"adm-zip": "0.6.0"
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"check:node": "node lib/check-node.mjs",
+		"prevalidate": "npm run check:node",
+		"validate": "node lib/run-configs.mjs validate",
+		"test:utils": "node --test \"lib/test/*.mjs\" \"utils/test/*.mjs\"",
+		"preeval": "npm run check:node",
+		"eval": "node lib/run-configs.mjs eval",
+		"view": "node lib/run-configs.mjs view"
+	}
+}

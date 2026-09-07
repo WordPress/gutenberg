@@ -1,5 +1,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// Whether the run targets the extensible site editor (v2).
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
+
 test.describe( 'Site Editor List View', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
@@ -51,9 +54,11 @@ test.describe( 'Site Editor List View', () => {
 		page,
 		pageUtils,
 	} ) => {
-		// Current starting focus should be at Open Navigation button.
+		// Current starting focus should be at the button leaving the editor:
+		// "Open Navigation" in the classic site editor, "Go back" in the
+		// extensible one.
 		const openNavigationButton = page.getByRole( 'button', {
-			name: 'Open Navigation',
+			name: isSiteEditorV2 ? 'Back' : 'Open Navigation',
 			exact: true,
 		} );
 		await openNavigationButton.focus();
