@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Preserve `DashboardGrid` layout items' `full` and `fill` widths when a resize ends at its starting horizontal span, including height-only resize gestures.
+
 ### New Features
 
 -   Layout items accept `draggable` and `resizable` flags. A non-draggable

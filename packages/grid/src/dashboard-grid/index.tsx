@@ -153,6 +153,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const resizeBaselineRef = useRef< {
 			width: number;
 			height: number;
+			storedWidth: DashboardGridLayoutItem[ 'width' ];
 		} | null >( null );
 		const captureLayoutSnapshotRef = useRef< () => void >( () => {} );
 		const childrenCacheRef = useRef< Map< string, React.ReactElement > >(
@@ -533,8 +534,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			if ( ! resizeBaselineRef.current ) {
 				const baseItem = layoutMap.get( id );
 				const resolvedItem = resolvedItemMap.get( id );
-				// `'fill'`/`'full'` resize from the rendered span
-				// and convert to a numeric width.
+				// `'fill'`/`'full'` resize from the rendered span. Keep
+				// their stored meaning unless the horizontal span changes.
 				let baseWidth: number;
 				if ( baseItem?.width === 'full' ) {
 					baseWidth = bounds?.maxWidth ?? effectiveColumns;
@@ -549,6 +550,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				resizeBaselineRef.current = {
 					width: baseWidth,
 					height: baseItem?.height ?? 1,
+					storedWidth: layout.find( ( item ) => item.key === id )
+						?.width,
 				};
 			}
 			const baseline = resizeBaselineRef.current;
@@ -562,6 +565,12 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				bounds?.minHeight ?? 1,
 				bounds?.maxHeight ?? Infinity
 			);
+			const committedWidth =
+				newWidth === baseline.width &&
+				( baseline.storedWidth === 'full' ||
+					baseline.storedWidth === 'fill' )
+					? baseline.storedWidth
+					: newWidth;
 
 			setResizeSnapPreview( {
 				id,
@@ -584,7 +593,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			const currentItem = pendingItem ?? layoutMap.get( id );
 			if (
 				currentItem &&
-				currentItem.width === newWidth &&
+				currentItem.width === committedWidth &&
 				( currentItem.height ?? 1 ) === newHeight
 			) {
 				return;
@@ -596,7 +605,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			const updatedLayout = ( latestLayoutRef.current ?? layout ).map(
 				( item ) =>
 					item.key === id
-						? { ...item, width: newWidth, height: newHeight }
+						? { ...item, width: committedWidth, height: newHeight }
 						: item
 			);
 
