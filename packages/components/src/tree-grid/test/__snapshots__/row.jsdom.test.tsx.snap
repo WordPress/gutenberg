@@ -2,7 +2,9 @@
 
 exports[`TreeGridRow forwards other props to the rendered tr element 1`] = `
 <div>
-  <table>
+  <table
+    role="treegrid"
+  >
     <tbody>
       <tr
         aria-level="1"
@@ -22,7 +24,9 @@ exports[`TreeGridRow forwards other props to the rendered tr element 1`] = `
 
 exports[`TreeGridRow renders a tr with support for level, positionInSet and setSize props 1`] = `
 <div>
-  <table>
+  <table
+    role="treegrid"
+  >
     <tbody>
       <tr
         aria-level="1"

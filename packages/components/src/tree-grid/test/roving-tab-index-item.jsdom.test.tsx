@@ -14,7 +14,9 @@ describe( 'RovingTabIndexItem', () => {
 	it( 'requires RovingTabIndex to be declared as a parent component somewhere in the component hierarchy', () => {
 		expect( () =>
 			render( <RovingTabIndexItem as={ TestButton } /> )
-		).toThrow();
+		).toThrow(
+			'TreeGridItem can only be rendered inside a TreeGrid component.'
+		);
 		expect( console ).toHaveErrored();
 	} );
 
