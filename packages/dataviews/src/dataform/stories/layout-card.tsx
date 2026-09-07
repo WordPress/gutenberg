@@ -28,6 +28,9 @@ const LayoutCardComponent = ( {
 		hasVat: boolean;
 		vat: number;
 		commission: number;
+		fileSize: number;
+		dimensions: string;
+		fileType: string;
 		dueDate: string;
 	};
 
@@ -72,6 +75,24 @@ const LayoutCardComponent = ( {
 			id: 'displayPayments',
 			label: 'Display payments?',
 			type: 'boolean',
+		},
+		{
+			id: 'fileSize',
+			label: 'File size',
+			type: 'integer',
+			readOnly: true,
+		},
+		{
+			id: 'dimensions',
+			label: 'Dimensions',
+			type: 'text',
+			readOnly: true,
+		},
+		{
+			// No type and no Edit: a read-only field without an edit control.
+			id: 'fileType',
+			label: 'File type',
+			readOnly: true,
 		},
 		{
 			id: 'payments',
@@ -128,6 +149,9 @@ const LayoutCardComponent = ( {
 		displayPayments: true,
 		totalOrders: 2,
 		totalRevenue: 1430,
+		fileSize: 1024,
+		dimensions: '1920x1080',
+		fileType: 'JPEG',
 		averageOrderValue: 715,
 		hasVat: true,
 		vat: 10,
@@ -229,6 +253,17 @@ const LayoutCardComponent = ( {
 					layout: getCardLayoutFromStoryArgs( {
 						withHeader: false,
 					} ),
+				},
+				{
+					id: 'fileDetails',
+					label: 'File details',
+					layout: getCardLayoutFromStoryArgs( {
+						withHeader,
+						withSummary,
+						isCollapsible,
+						isOpened,
+					} ),
+					children: [ 'fileSize', 'dimensions', 'fileType' ],
 				},
 				{
 					id: 'taxConfiguration',
