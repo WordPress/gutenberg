@@ -54,7 +54,9 @@ describe( 'PostPublishPanel', () => {
 
 		render( <PostPublishPanel /> );
 
-		expect( screen.getByRole( 'presentation' ) ).toBeInTheDocument();
+		expect( screen.getByRole( 'presentation' ) ).toHaveClass(
+			'components-spinner'
+		);
 	} );
 
 	it( 'should render the post-publish panel if the post is published', () => {

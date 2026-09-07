@@ -8,8 +8,11 @@
 		"rootDir": ".",
 		"types": [ "gutenberg-vitest-test-env", "style-imports" ]
 	},
-	"references": [ { "path": "./tsconfig.json" } ],
+	"references": [ { "path": "./tsconfig.build.json" } ],
 	"files": [],
 	"include": [ "src/**/test/**/*" ],
-	"exclude": []
+	"exclude": [
+		"src/dashboard-grid/test/item-limits.jsdom.test.tsx",
+		"src/dashboard-lanes/test/item-limits.jsdom.test.tsx"
+	]
 }

@@ -364,8 +364,8 @@ describe( 'apiFetch', () => {
 
 	describe( 'unregister', () => {
 		it( 'should stop calling a middleware once it is unregistered', async () => {
-			const middleware = jest.fn( ( options, next ) => next( options ) );
-			const fetchHandler = jest
+			const middleware = vi.fn( ( options, next ) => next( options ) );
+			const fetchHandler = vi
 				.fn()
 				.mockResolvedValue( DEFAULT_FETCH_MOCK_RETURN );
 			apiFetch.setFetchHandler( fetchHandler );

@@ -55,20 +55,20 @@ let originalSupports: typeof CSS.supports | undefined;
 let originalRaf: typeof requestAnimationFrame;
 
 function installMockObserver() {
-	originalResizeObserver = global.ResizeObserver;
+	originalResizeObserver = globalThis.ResizeObserver;
 	MockResizeObserver.reset();
-	( global as unknown as { ResizeObserver: unknown } ).ResizeObserver =
+	( globalThis as unknown as { ResizeObserver: unknown } ).ResizeObserver =
 		MockResizeObserver;
 }
 
 function restoreObserver() {
-	( global as unknown as { ResizeObserver: unknown } ).ResizeObserver =
+	( globalThis as unknown as { ResizeObserver: unknown } ).ResizeObserver =
 		originalResizeObserver;
 }
 
 function setNativeSupport( supported: boolean ) {
 	if ( typeof CSS === 'undefined' ) {
-		( global as unknown as { CSS: unknown } ).CSS = {
+		( globalThis as unknown as { CSS: unknown } ).CSS = {
 			supports: () => supported,
 		};
 		return;
@@ -106,15 +106,15 @@ function flushRaf() {
 
 beforeEach( () => {
 	installMockObserver();
-	originalRaf = global.requestAnimationFrame;
-	global.requestAnimationFrame = ( cb ) =>
+	originalRaf = globalThis.requestAnimationFrame;
+	globalThis.requestAnimationFrame = ( cb ) =>
 		setTimeout( () => cb( performance.now() ), 0 ) as unknown as number;
 	vi.useFakeTimers();
 } );
 
 afterEach( () => {
 	vi.useRealTimers();
-	global.requestAnimationFrame = originalRaf;
+	globalThis.requestAnimationFrame = originalRaf;
 	restoreObserver();
 	restoreSupport();
 } );

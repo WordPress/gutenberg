@@ -8,7 +8,7 @@
 		"rootDir": ".",
 		"types": [ "gutenberg-env", "gutenberg-vitest-test-env" ]
 	},
-	"references": [ { "path": "./tsconfig.json" } ],
+	"references": [ { "path": "./tsconfig.build.json" } ],
 	"files": [],
 	"include": [ "src/test/**/*.ts" ],
 	"exclude": []
