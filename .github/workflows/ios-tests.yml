@@ -92,8 +92,8 @@ jobs:
             # the same UI testing stack as the iOS 26 simulator runtime.
             - name: Select the newest Xcode 26
               run: |
-                  ls -d /Applications/Xcode*.app
-                  sudo xcode-select -s "$( ls -d /Applications/Xcode_26*.app | sort -V | tail -1 )"
+                  find /Applications -maxdepth 1 -name 'Xcode*.app'
+                  sudo xcode-select -s "$( find /Applications -maxdepth 1 -name 'Xcode_26*.app' | sort -V | tail -1 )"
                   xcodebuild -version
 
             - name: Run the tests
