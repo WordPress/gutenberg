@@ -164,6 +164,15 @@ export interface I18n< TextDomain extends string = string > {
 		context?: string,
 		domain?: TextDomain
 	) => boolean;
+
+	/**
+	 * Format a number based on locale settings.
+	 */
+	numberFormatI18n: (
+		number: number,
+		decimals?: number,
+		domain?: TextDomain
+	) => string;
 }
 
 export type DistributeSprintfArgs< T extends string > = T extends any

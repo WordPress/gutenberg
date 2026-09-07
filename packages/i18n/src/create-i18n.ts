@@ -4,6 +4,7 @@ import type { Hooks } from '@wordpress/hooks';
 import type {
 	getFilterDomain,
 	I18n,
+	I18nDomainMetadata,
 	LocaleData,
 	SubscribeCallback,
 	TransformedText,
@@ -26,6 +27,22 @@ const DEFAULT_LOCALE_DATA: LocaleData = {
  * `i18n.gettext_domain` or `i18n.ngettext_with_context` or `i18n.has_translation`.
  */
 const I18N_HOOK_REGEXP = /^i18n\.(n?gettext|has_translation)(_|$)/;
+
+/**
+ * Validates a locale string using Intl.getCanonicalLocales.
+ * Returns true if the locale is valid, false otherwise.
+ *
+ * @param locale The locale string to validate.
+ * @return Whether the locale is valid.
+ */
+const isValidLocale = ( locale: string ): boolean => {
+	try {
+		Intl.getCanonicalLocales( locale );
+		return true;
+	} catch {
+		return false;
+	}
+};
 
 /**
  * Create an i18n instance
@@ -380,6 +397,44 @@ export const createI18n = < TextDomain extends string >(
 		hooks.addAction( 'hookRemoved', 'core/i18n', onHookAddedOrRemoved );
 	}
 
+	const numberFormatI18n: I18n[ 'numberFormatI18n' ] = (
+		number,
+		decimals = 0,
+		domain = 'default' as TextDomain
+	) => {
+		const localeData = ( getLocaleData( domain as TextDomain )?.[
+			''
+		] as I18nDomainMetadata< TextDomain > ) ?? {
+			lang: 'en_US',
+			domain: 'default',
+			plural_forms: 'n === 1 ? 0 : 1',
+		};
+
+		const wpLocale = localeData.lang || 'en_US';
+		// Convert WordPress locale format to JavaScript locale format by replacing underscores with hyphens
+		let jsLocale = wpLocale.replace( /_/g, '-' );
+
+		// Validate the locale using Intl.getCanonicalLocales and fallback to en-US if invalid
+		if ( ! isValidLocale( jsLocale ) ) {
+			jsLocale = 'en-US';
+		}
+
+		/**
+		 * Range limit of `maximumFractionDigits` in Node.js is 0-20
+		 * Max limit of `maximumFractionDigits` in Browsers is 0-100 ( {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/NumberFormat#maximumfractiondigits} )
+		 *
+		 * Hence we limit the decimals to 20 to ensure compatibility across environments.
+		 */
+		const validDecimals = Math.max( 0, Math.min( decimals, 20 ) );
+
+		const options: Intl.NumberFormatOptions = {
+			minimumFractionDigits: validDecimals,
+			maximumFractionDigits: validDecimals,
+		};
+
+		return new Intl.NumberFormat( jsLocale, options ).format( number );
+	};
+
 	return {
 		getLocaleData,
 		setLocaleData,
@@ -392,5 +447,6 @@ export const createI18n = < TextDomain extends string >(
 		_nx,
 		isRTL,
 		hasTranslation,
+		numberFormatI18n,
 	};
 };

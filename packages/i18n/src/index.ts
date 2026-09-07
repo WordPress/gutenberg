@@ -13,4 +13,5 @@ export {
 	_nx,
 	isRTL,
 	hasTranslation,
+	numberFormatI18n,
 } from './default-i18n';
