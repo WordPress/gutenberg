@@ -60,8 +60,9 @@ final class AutoCapitalizationTests: XCTestCase {
 		let firstParagraph = web.textViews.element( boundBy: 1 )
 		let secondParagraph = web.textViews.element( boundBy: 2 )
 
-		// A new post focuses the title.
-		XCTAssertTrue( title.waitForExistence( timeout: 60 ), "The new post has no title field" )
+		// A new post focuses the title. The first load on a runner is slow:
+		// PHP runs in WebAssembly and nothing is cached yet.
+		XCTAssertTrue( title.waitForExistence( timeout: 240 ), "The new post has no title field" )
 		waitForFocus( title, "The title is not focused" )
 		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "No software keyboard" )
 		assertCapitalized( "An empty title should start capitalized" )
