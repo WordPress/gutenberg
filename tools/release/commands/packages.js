@@ -42,6 +42,8 @@ const NPM_RELEASE_TAG_PUSH_BATCH_SIZE = 25;
  */
 const NPM_RELEASE_PREPARED_REF_PREFIX = 'refs/npm-release';
 
+class NpmReleaseVerificationPendingError extends Error {}
+
 /**
  * Release type names.
  *
@@ -493,14 +495,16 @@ function getNpmReleaseGitRecoveryCommands( {
 /**
  * Runs a release phase with retry.
  *
- * @param {string}   label     Phase label.
- * @param {Function} task      Task to retry.
- * @param {Object}   deps      Dependencies.
- * @param {Function} deps.wait Wait function.
+ * @param {string}   label            Phase label.
+ * @param {Function} task             Task to retry.
+ * @param {Object}   deps             Dependencies.
+ * @param {Function} deps.shouldRetry Whether an error is safe to retry.
+ * @param {Function} deps.wait        Wait function.
  */
 async function runNpmReleasePhase( label, task, deps = {} ) {
 	const {
 		attempts = NPM_RELEASE_PHASE_ATTEMPTS,
+		shouldRetry = () => true,
 		wait = ( delay ) =>
 			new Promise( ( resolve ) => setTimeout( resolve, delay ) ),
 	} = deps;
@@ -509,7 +513,7 @@ async function runNpmReleasePhase( label, task, deps = {} ) {
 			await task();
 			return;
 		} catch ( err ) {
-			if ( attempt >= attempts ) {
+			if ( attempt >= attempts || ! shouldRetry( err ) ) {
 				throw err;
 			}
 			/*
@@ -555,6 +559,44 @@ async function getRemoteBranchSha(
 		.find( ( line ) => line.split( /\s+/ )[ 1 ] === branchRef );
 	const [ sha ] = ( matchingLine || '' ).split( /\s+/ );
 	return sha || null;
+}
+
+/**
+ * Reports whether a remote branch contains a commit.
+ *
+ * @param {Object}   options                         Options.
+ * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
+ * @param {string}   options.branchName              Remote branch name.
+ * @param {string}   options.commit                  Commit SHA.
+ * @param {Object}   deps                            Dependencies.
+ * @param {Function} deps.getRemoteBranchShaFn       Gets the remote branch SHA.
+ * @param {Object}   deps.git                        Git client.
+ *
+ * @return {Promise<boolean>} Whether the remote branch contains the commit.
+ */
+async function isCommitOnRemoteBranch(
+	{ gitWorkingDirectoryPath, branchName, commit },
+	deps = {}
+) {
+	const {
+		getRemoteBranchShaFn = getRemoteBranchSha,
+		git = SimpleGit( gitWorkingDirectoryPath ),
+	} = deps;
+	const remoteSha = await getRemoteBranchShaFn(
+		gitWorkingDirectoryPath,
+		branchName,
+		{ git }
+	);
+	if ( ! remoteSha ) {
+		return false;
+	}
+	if ( remoteSha === commit ) {
+		return true;
+	}
+	// `ls-remote` can report a branch tip that this checkout has not fetched yet.
+	await git.raw( 'fetch', 'origin', branchName );
+	const mergeBase = await git.raw( 'merge-base', commit, remoteSha );
+	return mergeBase.trim() === commit;
 }
 
 /**
@@ -611,22 +653,22 @@ async function getRemoteTagShas(
  * @param {string}   options.npmReleaseBranch        Npm release branch.
  * @param {string}   options.publishCommit           Expected commit SHA.
  * @param {Object}   deps                            Dependencies.
- * @param {Function} deps.getRemoteBranchShaFn       Gets the remote branch SHA.
+ * @param {Function} deps.isCommitOnRemoteBranchFn   Checks remote branch ancestry.
  */
 async function verifyRemoteNpmReleaseBranch(
 	{ gitWorkingDirectoryPath, npmReleaseBranch, publishCommit },
 	deps = {}
 ) {
-	const { getRemoteBranchShaFn = getRemoteBranchSha } = deps;
-	const remoteSha = await getRemoteBranchShaFn(
-		gitWorkingDirectoryPath,
-		npmReleaseBranch
-	);
-	if ( remoteSha !== publishCommit ) {
+	const { isCommitOnRemoteBranchFn = isCommitOnRemoteBranch } = deps;
+	if (
+		! ( await isCommitOnRemoteBranchFn( {
+			gitWorkingDirectoryPath,
+			branchName: npmReleaseBranch,
+			commit: publishCommit,
+		} ) )
+	) {
 		throw new Error(
-			`Expected origin/${ npmReleaseBranch } to point to ${ publishCommit }, got ${
-				remoteSha || 'nothing'
-			}.`
+			`Expected origin/${ npmReleaseBranch } to contain ${ publishCommit }.`
 		);
 	}
 }
@@ -793,6 +835,7 @@ async function runNpmPublishPreflight(
  * @param {string}   options.publishCommit               Publish commit SHA.
  * @param {Object}   deps                                Dependencies.
  * @param {Object}   deps.git                            Git client.
+ * @param {Function} deps.isCommitOnRemoteBranchFn       Checks remote branch ancestry.
  * @param {Function} deps.runPhase                       Runs a retryable phase.
  * @param {Function} deps.verifyRemoteNpmReleaseBranchFn Verifies the remote branch.
  * @param {Function} deps.verifyRemotePackageTagsFn      Verifies remote package tags.
@@ -803,12 +846,28 @@ async function pushNpmReleaseGitMetadata(
 ) {
 	const {
 		git = SimpleGit( gitWorkingDirectoryPath ),
+		isCommitOnRemoteBranchFn = isCommitOnRemoteBranch,
 		runPhase = runNpmReleasePhase,
 		verifyRemoteNpmReleaseBranchFn = verifyRemoteNpmReleaseBranch,
 		verifyRemotePackageTagsFn = verifyRemotePackageTags,
 	} = deps;
 	try {
 		await runPhase( 'Release branch push', async () => {
+			if (
+				await isCommitOnRemoteBranchFn(
+					{
+						gitWorkingDirectoryPath,
+						branchName: npmReleaseBranch,
+						commit: publishCommit,
+					},
+					{ git }
+				)
+			) {
+				log(
+					`>> The release branch already contains ${ publishCommit }; leaving its newer tip unchanged.`
+				);
+				return;
+			}
 			log( '>> Pushing release branch to remote.' );
 			await git.raw(
 				'push',
@@ -879,6 +938,18 @@ function getNpmReleasePreparedRefs( npmReleaseBranch ) {
 		releaseType: `${ base }/release-type`,
 		tags: `${ base }/tags`,
 	};
+}
+
+/**
+ * Returns safe inspection and cleanup guidance for a prepared release.
+ *
+ * @param {string} npmReleaseBranch Npm release branch.
+ *
+ * @return {string} Recovery guidance.
+ */
+function getNpmReleasePreparedStateRecoveryInstructions( npmReleaseBranch ) {
+	const { base } = getNpmReleasePreparedRefs( npmReleaseBranch );
+	return `Inspect it with \`git ls-remote --refs origin "${ base }/*"\`. Resume with the same release type, or, after verifying that the prepared release is no longer needed, delete each listed ref with \`git push origin --delete "<exact-ref>"\`.`;
 }
 
 /**
@@ -1157,6 +1228,7 @@ async function deleteNpmReleasePreparedCommit(
  * @param {Function} deps.getPreparedTagNamesFn      Reads persisted tag names.
  * @param {Function} deps.getRemoteBranchShaFn       Reads the remote branch SHA.
  * @param {Object}   deps.git                        Git client.
+ * @param {Function} deps.isCommitOnRemoteBranchFn   Checks remote branch ancestry.
  * @param {Function} deps.verifyRemotePackageTagsFn  Verifies remote package tags.
  *
  * @return {Promise<boolean>} True when the release Git metadata is published.
@@ -1169,18 +1241,19 @@ async function isNpmReleaseGitMetadataPublished(
 		getPreparedTagNamesFn = getNpmReleasePreparedTagNames,
 		getRemoteBranchShaFn = getRemoteBranchSha,
 		git = SimpleGit( gitWorkingDirectoryPath ),
+		isCommitOnRemoteBranchFn = isCommitOnRemoteBranch,
 		verifyRemotePackageTagsFn = verifyRemotePackageTags,
 	} = deps;
-	const remoteSha = await getRemoteBranchShaFn(
-		gitWorkingDirectoryPath,
-		npmReleaseBranch,
-		{ git }
-	);
-	if ( ! remoteSha ) {
-		return false;
-	}
-	const mergeBase = await git.raw( 'merge-base', preparedCommit, remoteSha );
-	if ( mergeBase.trim() !== preparedCommit ) {
+	if (
+		! ( await isCommitOnRemoteBranchFn(
+			{
+				gitWorkingDirectoryPath,
+				branchName: npmReleaseBranch,
+				commit: preparedCommit,
+			},
+			{ getRemoteBranchShaFn, git }
+		) )
+	) {
 		return false;
 	}
 	const packageTags = await getPreparedTagNamesFn(
@@ -1188,6 +1261,14 @@ async function isNpmReleaseGitMetadataPublished(
 		npmReleaseBranch,
 		{ git }
 	);
+	if ( packageTags.length === 0 ) {
+		const { base } = getNpmReleasePreparedRefs( npmReleaseBranch );
+		throw new Error(
+			`Prepared release state "${ base }" contains no package tags. ${ getNpmReleasePreparedStateRecoveryInstructions(
+				npmReleaseBranch
+			) }`
+		);
+	}
 	try {
 		await verifyRemotePackageTagsFn(
 			{
@@ -1287,6 +1368,7 @@ function getNpmReleasePreparedPluginBranch(
 async function resumePreparedNpmRelease( config, deps = {} ) {
 	const {
 		commandFn = command,
+		deletePreparedCommitFn = deleteNpmReleasePreparedCommit,
 		getPreparedChangelogCommitFn = getNpmReleasePreparedChangelogCommit,
 		getPreparedCommitFn = getNpmReleasePreparedCommit,
 		getPreparedPluginReleaseBranchFn = getNpmReleasePreparedPluginBranch,
@@ -1309,6 +1391,11 @@ async function resumePreparedNpmRelease( config, deps = {} ) {
 		{ git }
 	);
 	if ( ! preparedCommit ) {
+		await deletePreparedCommitFn(
+			gitWorkingDirectoryPath,
+			npmReleaseBranch,
+			{ git }
+		);
 		return null;
 	}
 
@@ -1321,8 +1408,13 @@ async function resumePreparedNpmRelease( config, deps = {} ) {
 		{ git }
 	);
 	if ( preparedState.releaseType !== releaseType ) {
+		const { base } = getNpmReleasePreparedRefs( npmReleaseBranch );
 		throw new Error(
-			`Prepared release route is "${ preparedState.releaseType }", but this run requested "${ releaseType }".`
+			`Prepared release state "${ base }" was created for "${
+				preparedState.releaseType
+			}", but this run requested "${ releaseType }". ${ getNpmReleasePreparedStateRecoveryInstructions(
+				npmReleaseBranch
+			) }`
 		);
 	}
 	log(
@@ -1490,27 +1582,28 @@ async function publishVersionedPackagesToNpm(
 	 * Lerna treats publish conflicts as successful "already published" results,
 	 * so verify registry identity again before attaching Git metadata.
 	 *
-	 * Each attempt only re-checks the packages still missing. Confirmed
-	 * packages are never looked up twice, which keeps retries cheap enough to
-	 * outlast slow registry propagation instead of timing out against it.
+	 * Retry attempts focus on the packages still missing. After they pass, one
+	 * full sweep confirms that every package still has the expected identity
+	 * before Git metadata is attached.
 	 */
 	let pendingPackages = releasePackages;
 	await runPhase(
 		'npm publication verification',
 		async () => {
+			const packagesToCheck = pendingPackages;
 			const confirmedPackageNames = new Set(
 				await runNpmPublishPreflightFn( {
 					distTag,
 					gitWorkingDirectoryPath,
 					publishCommit,
-					releasePackages: pendingPackages,
+					releasePackages: packagesToCheck,
 				} )
 			);
-			pendingPackages = pendingPackages.filter(
+			pendingPackages = packagesToCheck.filter(
 				( { name } ) => ! confirmedPackageNames.has( name )
 			);
 			if ( pendingPackages.length ) {
-				throw new Error(
+				throw new NpmReleaseVerificationPendingError(
 					`npm publication verification failed for ${ pendingPackages
 						.map(
 							( { name, version } ) => `${ name }@${ version }`
@@ -1518,8 +1611,36 @@ async function publishVersionedPackagesToNpm(
 						.join( ', ' ) }.`
 				);
 			}
+			if ( packagesToCheck.length !== releasePackages.length ) {
+				const finalConfirmedPackageNames = new Set(
+					await runNpmPublishPreflightFn( {
+						distTag,
+						gitWorkingDirectoryPath,
+						publishCommit,
+						releasePackages,
+					} )
+				);
+				pendingPackages = releasePackages.filter(
+					( { name } ) => ! finalConfirmedPackageNames.has( name )
+				);
+				if ( pendingPackages.length ) {
+					throw new NpmReleaseVerificationPendingError(
+						`npm publication verification failed for ${ pendingPackages
+							.map(
+								( { name, version } ) =>
+									`${ name }@${ version }`
+							)
+							.join( ', ' ) }.`
+					);
+				}
+			}
 		},
-		{ attempts: NPM_RELEASE_VERIFICATION_ATTEMPTS, wait }
+		{
+			attempts: NPM_RELEASE_VERIFICATION_ATTEMPTS,
+			shouldRetry: ( error ) =>
+				error instanceof NpmReleaseVerificationPendingError,
+			wait,
+		}
 	);
 
 	await pushNpmReleaseGitMetadataFn( {
@@ -1697,30 +1818,37 @@ async function finalizePreparedNpmRelease(
 }
 
 /**
- * Checks whether a branch contains the same patch as a commit.
+ * Reports whether a failed cherry-pick has no changes to commit.
  *
- * @param {Object} repo       Git client.
- * @param {string} branchName Branch or ref to compare.
- * @param {string} commitHash Commit SHA.
+ * @param {Object} repo Git client.
  *
- * @return {Promise<boolean>} Whether the patch is already present.
+ * @return {Promise<boolean>} Whether Git is waiting on an empty cherry-pick.
  */
-async function isCommitPatchOnBranch( repo, branchName, commitHash ) {
-	const fullCommitHash = await repo.revparse( [ commitHash ] );
-	const mergeBase = await repo.raw(
-		'merge-base',
-		fullCommitHash,
-		branchName
-	);
-	if ( mergeBase.trim() === fullCommitHash ) {
-		return true;
+async function isEmptyCherryPick( repo ) {
+	let cherryPickHead;
+	try {
+		cherryPickHead = await repo.raw(
+			'rev-parse',
+			'--verify',
+			'--quiet',
+			'CHERRY_PICK_HEAD'
+		);
+	} catch {
+		return false;
 	}
-	const output = await repo.raw( 'cherry', branchName, fullCommitHash );
-	const commitStatus = output
-		.trim()
-		.split( '\n' )
-		.find( ( line ) => line.endsWith( ` ${ fullCommitHash }` ) );
-	return commitStatus?.startsWith( '-' ) || false;
+	if ( ! cherryPickHead.trim() ) {
+		return false;
+	}
+	const conflicts = await repo.raw(
+		'diff',
+		'--name-only',
+		'--diff-filter=U'
+	);
+	if ( conflicts.trim() ) {
+		return false;
+	}
+	const stagedChanges = await repo.raw( 'diff', '--cached', '--name-only' );
+	return ! stagedChanges.trim();
 }
 
 /**
@@ -1762,34 +1890,35 @@ async function backportCommitsToBranch(
 	await repo.fetch().checkout( branchName ).pull( 'origin', branchName );
 
 	for ( const commitHash of commits ) {
-		if (
-			await isCommitPatchOnBranch(
-				repo,
-				`origin/${ branchName }`,
-				commitHash
-			)
-		) {
+		try {
+			await repo.raw( 'cherry-pick', commitHash );
+		} catch ( error ) {
+			if ( ! ( await isEmptyCherryPick( repo ) ) ) {
+				throw error;
+			}
+			await repo.raw( 'cherry-pick', '--skip' );
 			log(
 				`>> Commit ${ commitHash } is already backported to "${ branchName }".`
 			);
-			continue;
 		}
-		await repo.raw( 'cherry-pick', commitHash );
 	}
 
+	const backportTip = await repo.revparse( [ 'HEAD' ] );
 	await repo.push( 'origin', branchName );
-	for ( const commitHash of commits ) {
-		if (
-			! ( await isCommitPatchOnBranch(
-				repo,
-				`origin/${ branchName }`,
-				commitHash
-			) )
-		) {
-			throw new Error(
-				`Backport verification failed for ${ commitHash } on "${ branchName }".`
-			);
-		}
+	await repo.fetch( 'origin', branchName );
+	if (
+		! ( await isCommitOnRemoteBranch(
+			{
+				gitWorkingDirectoryPath,
+				branchName,
+				commit: backportTip,
+			},
+			{ git: repo }
+		) )
+	) {
+		throw new Error(
+			`Backport verification failed because origin/${ branchName } does not contain ${ backportTip }.`
+		);
 	}
 
 	log( `>> Backporting successfully finished.` );

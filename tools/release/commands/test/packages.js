@@ -698,6 +698,7 @@ describe( 'runNpmReleasePhase', () => {
 describe( 'pushNpmReleaseGitMetadata', () => {
 	it( 'pushes the branch before pushing and verifying package tags', async () => {
 		const git = { raw: vi.fn().mockResolvedValue() };
+		const isCommitOnRemoteBranchFn = vi.fn().mockResolvedValue( false );
 		const runPhase = vi.fn( async ( _label, task ) => task() );
 		const verifyRemoteNpmReleaseBranchFn = vi.fn();
 		const verifyRemotePackageTagsFn = vi.fn();
@@ -714,6 +715,7 @@ describe( 'pushNpmReleaseGitMetadata', () => {
 			},
 			{
 				git,
+				isCommitOnRemoteBranchFn,
 				runPhase,
 				verifyRemoteNpmReleaseBranchFn,
 				verifyRemotePackageTagsFn,
@@ -752,6 +754,39 @@ describe( 'pushNpmReleaseGitMetadata', () => {
 			],
 			publishCommit: 'publish-sha',
 		} );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'pushes missing tags without moving an advanced release branch backward', async () => {
+		const git = { raw: vi.fn().mockResolvedValue() };
+		const runPhase = vi.fn( async ( _label, task ) => task() );
+
+		await pushNpmReleaseGitMetadata(
+			{
+				gitWorkingDirectoryPath: '/repo',
+				npmReleaseBranch: 'wp/latest',
+				packageTags: [ '@wordpress/a11y@4.50.0' ],
+				publishCommit: 'publish-sha',
+			},
+			{
+				git,
+				isCommitOnRemoteBranchFn: vi.fn().mockResolvedValue( true ),
+				runPhase,
+				verifyRemoteNpmReleaseBranchFn: vi.fn(),
+				verifyRemotePackageTagsFn: vi.fn(),
+			}
+		);
+
+		expect( git.raw ).not.toHaveBeenCalledWith(
+			'push',
+			'origin',
+			'publish-sha:refs/heads/wp/latest'
+		);
+		expect( git.raw ).toHaveBeenCalledWith(
+			'push',
+			'origin',
+			'refs/tags/@wordpress/a11y@4.50.0:refs/tags/@wordpress/a11y@4.50.0'
+		);
 		expect( console ).toHaveLogged();
 	} );
 } );
@@ -1099,7 +1134,7 @@ describe( 'publishPackagesToNpm', () => {
 } );
 
 describe( 'npm publication verification resumability', () => {
-	it( 'only re-checks packages that are still missing from the registry', async () => {
+	it( 'checks only missing packages until a final full verification', async () => {
 		const releasePackages = [
 			{ name: '@wordpress/a11y', version: '4.54.0', tagName: 'a' },
 			{ name: '@wordpress/ui', version: '0.21.0', tagName: 'b' },
@@ -1111,7 +1146,12 @@ describe( 'npm publication verification resumability', () => {
 			.mockResolvedValueOnce( [] )
 			.mockResolvedValueOnce( [ '@wordpress/a11y' ] )
 			.mockResolvedValueOnce( [ '@wordpress/wordcount' ] )
-			.mockResolvedValueOnce( [ '@wordpress/ui' ] );
+			.mockResolvedValueOnce( [ '@wordpress/ui' ] )
+			.mockResolvedValueOnce( [
+				'@wordpress/a11y',
+				'@wordpress/ui',
+				'@wordpress/wordcount',
+			] );
 
 		await publishVersionedPackagesToNpm(
 			{
@@ -1151,6 +1191,52 @@ describe( 'npm publication verification resumability', () => {
 			'@wordpress/wordcount',
 		] );
 		expect( sweeps[ 2 ] ).toEqual( [ '@wordpress/ui' ] );
+		expect( sweeps[ 3 ] ).toEqual( [
+			'@wordpress/a11y',
+			'@wordpress/ui',
+			'@wordpress/wordcount',
+		] );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'does not retry a permanent registry identity failure', async () => {
+		const runNpmPublishPreflightFn = vi
+			.fn()
+			.mockResolvedValueOnce( [] )
+			.mockRejectedValueOnce( new Error( 'unexpected gitHead' ) );
+		const wait = vi.fn();
+
+		await expect(
+			publishVersionedPackagesToNpm(
+				{
+					distTag: 'latest',
+					gitWorkingDirectoryPath: '/repo',
+					noVerifyAccessFlag: '--no-verify-access',
+					npmReleaseBranch: 'wp/latest',
+					yesFlag: '--yes',
+				},
+				{
+					commandFn: vi.fn().mockResolvedValue(),
+					getNpmReleasePackagesFn: vi.fn().mockResolvedValue( [
+						{
+							name: '@wordpress/a11y',
+							version: '4.54.0',
+							tagName: 'a',
+						},
+					] ),
+					git: {
+						revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
+						raw: vi.fn().mockResolvedValue( '' ),
+					},
+					pushNpmReleaseGitMetadataFn: vi.fn(),
+					runNpmPublishPreflightFn,
+					wait,
+				}
+			)
+		).rejects.toThrow( 'unexpected gitHead' );
+
+		expect( runNpmPublishPreflightFn ).toHaveBeenCalledTimes( 2 );
+		expect( wait ).not.toHaveBeenCalled();
 		expect( console ).toHaveLogged();
 	} );
 
@@ -1359,6 +1445,31 @@ describe( 'npm publication verification resumability', () => {
 		expect( lernaVersionCalls ).toHaveLength( 0 );
 		expect( publishVersionedPackagesToNpmFn ).toHaveBeenCalled();
 		expect( console ).toHaveLogged();
+	} );
+
+	it( 'cleans incomplete prepared refs before starting a new release', async () => {
+		const deletePreparedCommitFn = vi.fn();
+		const git = {};
+
+		await expect(
+			resumePreparedNpmRelease(
+				{
+					gitWorkingDirectoryPath: '/repo',
+					npmReleaseBranch: 'wp/latest',
+				},
+				{
+					deletePreparedCommitFn,
+					getPreparedCommitFn: vi.fn().mockResolvedValue( null ),
+					git,
+				}
+			)
+		).resolves.toBeNull();
+
+		expect( deletePreparedCommitFn ).toHaveBeenCalledWith(
+			'/repo',
+			'wp/latest',
+			{ git }
+		);
 	} );
 } );
 
@@ -1606,7 +1717,7 @@ describe( 'prepared release refs', () => {
 				}
 			)
 		).rejects.toThrow(
-			'Prepared release route is "bugfix", but this run requested "latest".'
+			'Prepared release state "refs/npm-release/wp-latest" was created for "bugfix", but this run requested "latest".'
 		);
 		expect( git.checkout ).not.toHaveBeenCalled();
 	} );
@@ -1834,6 +1945,25 @@ describe( 'prepared release refs', () => {
 				}
 			)
 		).resolves.toBe( false );
+	} );
+
+	it( 'rejects prepared Git metadata without package tags', async () => {
+		await expect(
+			isNpmReleaseGitMetadataPublished(
+				{
+					gitWorkingDirectoryPath: '/repo',
+					npmReleaseBranch: 'wp/latest',
+					preparedCommit: 'prepared-sha',
+				},
+				{
+					getPreparedTagNamesFn: vi.fn().mockResolvedValue( [] ),
+					getRemoteBranchShaFn: vi
+						.fn()
+						.mockResolvedValue( 'branch-sha' ),
+					git: { raw: vi.fn().mockResolvedValue( 'prepared-sha' ) },
+				}
+			)
+		).rejects.toThrow( 'contains no package tags' );
 	} );
 
 	it( 'does not report published Git metadata when the branch lacks the commit', async () => {
