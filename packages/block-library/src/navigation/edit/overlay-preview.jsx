@@ -1,77 +1,83 @@
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
-import { Spinner } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { BlockPreview } from '@wordpress/block-editor';
-import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
+import {
+	BlockPreview,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { store as patternsStore } from '@wordpress/patterns';
+import { unlock } from '../../lock-unlock';
+import { getOverlayPatternName } from './use-overlay-patterns';
 
 /**
- * Component that displays a read-only visual preview of the selected overlay template part.
+ * Component that displays a read-only visual preview of the selected overlay.
+ *
+ * The overlay is a pattern of the `navigation-overlay` area: its edited copy
+ * (a `wp_block` post) when there is one, else the registered pattern.
  *
  * @param {Object} props              Component props.
- * @param {string} props.overlay      The overlay template part slug.
- * @param {string} props.currentTheme The current theme stylesheet name.
+ * @param {string} props.overlay      The overlay slug.
+ * @param {string} props.currentTheme The active theme's stylesheet.
  * @return {React.JSX.Element} The overlay preview component or null if no overlay is selected.
  */
 export default function OverlayPreview( { overlay, currentTheme } ) {
-	const templatePartId = useMemo( () => {
-		if ( ! overlay || ! currentTheme ) {
-			return null;
-		}
-		return createTemplatePartId( currentTheme, overlay );
-	}, [ currentTheme, overlay ] );
+	const patternName = useMemo(
+		() =>
+			overlay && currentTheme
+				? getOverlayPatternName( currentTheme, overlay )
+				: null,
+		[ currentTheme, overlay ]
+	);
 
 	const { content, editedBlocks, hasResolved } = useSelect(
 		( select ) => {
-			if ( ! templatePartId ) {
+			if ( ! patternName ) {
+				return { content: null, editedBlocks: null, hasResolved: true };
+			}
+			const copy = unlock( select( patternsStore ) ).getPatternOverride(
+				patternName
+			);
+			if ( copy ) {
+				const editedRecord = select( coreStore ).getEditedEntityRecord(
+					'postType',
+					'wp_block',
+					copy.id
+				);
 				return {
-					content: null,
-					editedBlocks: null,
+					content: editedRecord?.content,
+					editedBlocks: editedRecord?.blocks,
 					hasResolved: true,
 				};
 			}
-
-			const { getEditedEntityRecord, hasFinishedResolution } =
-				select( coreStore );
-
-			const editedRecord = getEditedEntityRecord(
-				'postType',
-				'wp_template_part',
-				templatePartId,
-				{ context: 'view' }
-			);
-
+			const pattern = unlock(
+				select( blockEditorStore )
+			).getPatternBySlug( patternName );
 			return {
-				content: editedRecord?.content,
-				editedBlocks: editedRecord?.blocks,
-				hasResolved: hasFinishedResolution( 'getEditedEntityRecord', [
-					'postType',
-					'wp_template_part',
-					templatePartId,
-					{ context: 'view' },
-				] ),
+				content: pattern?.content,
+				editedBlocks: null,
+				hasResolved:
+					!! pattern ||
+					select( coreStore ).hasFinishedResolution(
+						'getBlockPatterns'
+					),
 			};
 		},
-		[ templatePartId ]
+		[ patternName ]
 	);
 
 	const blocks = useMemo( () => {
-		if ( ! templatePartId ) {
+		if ( ! patternName ) {
 			return null;
 		}
-
 		if ( editedBlocks && editedBlocks.length > 0 ) {
 			return editedBlocks;
 		}
-
 		if ( content && typeof content === 'string' ) {
 			return parse( content );
 		}
-
 		return [];
-	}, [ templatePartId, editedBlocks, content ] );
+	}, [ patternName, editedBlocks, content ] );
 
 	if ( ! overlay ) {
 		return null;
@@ -80,28 +86,18 @@ export default function OverlayPreview( { overlay, currentTheme } ) {
 	if ( ! hasResolved ) {
 		return (
 			<div className="wp-block-navigation__overlay-preview-loading">
-				<Spinner />
+				{ null }
 			</div>
 		);
 	}
 
 	return (
-		<div
-			className="wp-block-navigation__overlay-preview"
-			aria-label={ __( 'Navigation Overlay template part preview' ) }
-			role="region"
-		>
-			<BlockPreview.Async
-				placeholder={
-					<div className="wp-block-navigation__overlay-preview-placeholder" />
-				}
-			>
-				<BlockPreview
-					blocks={ blocks }
-					viewportWidth={ 400 }
-					minHeight={ 200 }
-				/>
-			</BlockPreview.Async>
+		<div className="wp-block-navigation__overlay-preview">
+			{ blocks && blocks.length > 0 ? (
+				<BlockPreview blocks={ blocks } viewportWidth={ 400 } />
+			) : (
+				<div className="wp-block-navigation__overlay-preview-placeholder" />
+			) }
 		</div>
 	);
 }

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the Template Part block: template parts are registered patterns referenced by the Pattern block, and template part markup is converted at parse time ([#82569](https://github.com/WordPress/gutenberg/pull/82569)).
+
 ### New Features
 
 -   Pattern: Add `hasWrapper`, `tagName` and `area` attributes. New instances render inside an element like template parts (`hasWrapper`), instances created earlier keep their markup. The element is `tagName`, else the element of the `area` (a template part area such as `header`, from the instance or from the pattern's registration), else `div`. The area also provides the icon and title, and a "Replace" action listing patterns of the same area. `area` and `tagName` have controls under Advanced ([#82551](https://github.com/WordPress/gutenberg/pull/82551)).
@@ -11,7 +15,7 @@
 
 ### Enhancements
 
--   Pattern: Keep blocks hooked to the instance as first or last child around the pattern's own blocks instead of discarding them. In the Gutenberg plugin the Template Part block is not registered: template parts are registered patterns ([#82569](https://github.com/WordPress/gutenberg/pull/82569)).
+-   Pattern: Keep blocks hooked to the instance as first or last child around the pattern's own blocks instead of discarding them. The Template Part block is removed: template parts are registered patterns ([#82569](https://github.com/WordPress/gutenberg/pull/82569)).
 -   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
 -   Paragraph, List, Heading, Preformatted, Columns, Group, Template Part: Read the default padding these blocks add when they have a background color from the `--wp--style--block-background-padding` custom property, so themes can change or remove it ([#82024](https://github.com/WordPress/gutenberg/pull/82024)).
 -   Query: Show a snackbar notice instead of a blocking modal when "Reload full page" is turned on automatically because a block inside the Query block doesn't support client-side navigation ([#82246](https://github.com/WordPress/gutenberg/pull/82246)).

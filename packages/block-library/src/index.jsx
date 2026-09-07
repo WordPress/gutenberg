@@ -126,7 +126,6 @@ import * as tableOfContents from './table-of-contents';
 import * as tabList from './tab-list';
 import * as tabs from './tabs';
 import * as tagCloud from './tag-cloud';
-import * as templatePart from './template-part';
 import * as termCount from './term-count';
 import * as termDescription from './term-description';
 import * as termName from './term-name';
@@ -216,10 +215,6 @@ const getAllBlocks = () => {
 		siteTitle,
 		siteTagline,
 		query,
-		// In the Gutenberg plugin template parts are registered patterns: the
-		// parser converts template part blocks to pattern instances and the
-		// block itself is not registered.
-		! window?.__wpTemplatePartsAsPatterns && templatePart,
 		avatar,
 		postTitle,
 		postExcerpt,
