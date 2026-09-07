@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import normalizeFields from '../index';
 import type { Field } from '../../types';
 
@@ -522,7 +522,7 @@ describe( 'normalizeFields: default getValue', () => {
 		it( 'uses field.sort when provided and passes extracted values', () => {
 			const itemA = { measurements: { height: 120 } };
 			const itemB = { measurements: { height: 80 } };
-			const customSort = jest.fn( ( a, b, direction ) =>
+			const customSort = vi.fn( ( a, b, direction ) =>
 				direction === 'asc' ? a - b : b - a
 			);
 			const fields: Field< typeof itemA >[] = [
@@ -551,11 +551,7 @@ describe( 'normalizeFields: default getValue', () => {
 			];
 			const normalizedFields = normalizeFields( fields );
 
-			const resultAsc = normalizedFields[ 0 ].sort(
-				itemA,
-				itemB,
-				'asc'
-			);
+			const resultAsc = normalizedFields[ 0 ].sort( itemA, itemB, 'asc' );
 			expect( resultAsc ).toBe( -15 );
 
 			const resultDesc = normalizedFields[ 0 ].sort(
