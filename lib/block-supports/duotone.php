@@ -72,7 +72,7 @@ add_filter( 'block_type_metadata_settings', array( 'WP_Duotone_Gutenberg', 'migr
 function gutenberg_tinycolor_bound01( $n, $max ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
 
-	if ( 'string' === gettype( $n ) && str_contains( $n, '.' ) && 1 === (float) $n ) {
+	if ( 'string' === gettype( $n ) && str_contains( $n, '.' ) && 1.0 === (float) $n ) {
 		$n = '100%';
 	}
 
