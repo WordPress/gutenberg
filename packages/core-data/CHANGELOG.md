@@ -15,6 +15,7 @@
 
 ### Bug Fixes
 
+-   Resolve the default template from a post's saved slug rather than its edited one, so typing in the slug field no longer sends a `/templates/lookup` request per keystroke ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
 -   Keep a query's `totalItems` in sync when records are removed from it, so the page count is correct after a deletion instead of only after the next fetch ([#82244](https://github.com/WordPress/gutenberg/pull/82244)).
 
 ### Enhancements
