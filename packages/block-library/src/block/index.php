@@ -50,17 +50,17 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 		$seen_key = 'slug:' . $slug;
 
 		// A registered pattern, referenced by its name. An edited copy saved
-		// as a `wp_block` post wins over the registry.
-		$reusable_block = block_core_block_get_pattern_customization( $slug );
+		// as a `wp_block` post wins over the registry for the content; the
+		// registration still provides defaults such as the area.
+		$pattern        = WP_Block_Patterns_Registry::get_instance()->get_registered( $slug );
+		$reusable_block = block_core_block_get_pattern_override( $slug );
 
 		if ( $reusable_block ) {
 			$content = $reusable_block->post_content;
-		} else {
-			$pattern = WP_Block_Patterns_Registry::get_instance()->get_registered( $slug );
-			if ( ! $pattern ) {
-				return '';
-			}
+		} elseif ( $pattern ) {
 			$content = $pattern['content'];
+		} else {
+			return '';
 		}
 	}
 
@@ -122,14 +122,76 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 	$content = $block_instance->render( array( 'dynamic' => false ) );
 	unset( $seen_refs[ $seen_key ] );
 
-	// Wrap the output when the instance asks for an element, so a pattern
-	// standing in for a header or footer keeps its landmark.
+	// Wrap the output when the instance asks for an element, or when its area
+	// defines one, so a pattern standing in for a header or footer keeps its
+	// landmark. The instance's `tagName` wins over the area's default.
 	$tag_name = $attributes['tagName'] ?? '';
+	if ( '' === $tag_name ) {
+		$area = block_core_block_get_area( $attributes, isset( $pattern ) ? $pattern : null );
+		if ( $area ) {
+			foreach ( get_allowed_block_template_part_areas() as $area_definition ) {
+				if ( $area_definition['area'] === $area && ! empty( $area_definition['area_tag'] ) ) {
+					$tag_name = $area_definition['area_tag'];
+					break;
+				}
+			}
+		}
+	}
 	if ( in_array( $tag_name, array( 'header', 'main', 'section', 'article', 'aside', 'footer', 'div' ), true ) ) {
 		$content = "<$tag_name " . get_block_wrapper_attributes() . '>' . $content . "</$tag_name>";
 	}
 
 	return $content;
+}
+
+/**
+ * Returns the area of a pattern instance: the instance's `area` attribute,
+ * else the area the referenced pattern was registered with.
+ *
+ * @since 7.2.0
+ *
+ * @param array      $attributes The block attributes.
+ * @param array|null $pattern    The registered pattern, if any.
+ * @return string The area, or an empty string.
+ */
+function block_core_block_get_area( $attributes, $pattern ) {
+	if ( ! empty( $attributes['area'] ) && is_string( $attributes['area'] ) ) {
+		return $attributes['area'];
+	}
+	if ( $pattern && ! empty( $pattern['area'] ) && is_string( $pattern['area'] ) ) {
+		return $pattern['area'];
+	}
+	return '';
+}
+
+/**
+ * Returns one block variation per template part area, so a pattern instance
+ * standing in for a header or footer shows that area's icon and title.
+ *
+ * @since 7.2.0
+ *
+ * @return array Array containing the block variation objects.
+ */
+function block_core_block_build_area_variations() {
+	$variations = array();
+	foreach ( get_allowed_block_template_part_areas() as $area ) {
+		if ( 'uncategorized' === $area['area'] || 'navigation-overlay' === $area['area'] ) {
+			continue;
+		}
+		$variations[] = array(
+			'name'        => 'area_' . $area['area'],
+			'title'       => $area['label'],
+			'description' => $area['description'],
+			'attributes'  => array(
+				'area' => $area['area'],
+			),
+			// Patterns are inserted from the patterns inserter, not as
+			// area placeholders.
+			'scope'       => array(),
+			'icon'        => $area['icon'],
+		);
+	}
+	return $variations;
 }
 
 /**
@@ -167,7 +229,8 @@ function register_block_core_block() {
 	register_block_type_from_metadata(
 		__DIR__ . '/block',
 		array(
-			'render_callback' => 'render_block_core_block',
+			'render_callback'    => 'render_block_core_block',
+			'variation_callback' => 'block_core_block_build_area_variations',
 		)
 	);
 }

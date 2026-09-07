@@ -47,13 +47,15 @@ function gutenberg_register_block_pattern_slug_meta() {
 add_action( 'init', 'gutenberg_register_block_pattern_slug_meta' );
 
 /**
- * Applies the `Synced` header of the active theme's `patterns/` files.
+ * Applies the `Synced` and `Area` headers of the active theme's `patterns/`
+ * files.
  *
  * Core's `WP_Theme::get_block_patterns()` only reads a fixed list of headers,
- * so patterns that opt in with `Synced: yes` are re-registered here with
- * `synced => true`. Runs after `_register_theme_block_patterns()`.
+ * so patterns carrying `Synced: yes` or `Area: header` are re-registered here
+ * with the `synced` and `area` properties. Runs after
+ * `_register_theme_block_patterns()`.
  */
-function gutenberg_register_synced_theme_block_patterns() {
+function gutenberg_register_theme_block_pattern_headers() {
 	if ( empty( wp_get_active_and_valid_themes() ) ) {
 		return;
 	}
@@ -85,15 +87,28 @@ function gutenberg_register_synced_theme_block_patterns() {
 				continue;
 			}
 
-			$headers = get_file_data( $file_path, array( 'synced' => 'Synced' ) );
-			if ( ! in_array( strtolower( trim( $headers['synced'] ) ), array( 'yes', 'true', '1' ), true ) ) {
+			$headers = get_file_data(
+				$file_path,
+				array(
+					'synced' => 'Synced',
+					'area'   => 'Area',
+				)
+			);
+			$synced  = in_array( strtolower( trim( $headers['synced'] ) ), array( 'yes', 'true', '1' ), true );
+			$area    = sanitize_key( $headers['area'] );
+			if ( ! $synced && '' === $area ) {
 				continue;
 			}
 
 			// Mirror the registration in `_register_theme_block_patterns()`;
 			// `WP_Block_Patterns_Registry::register()` overwrites the entry.
 			$pattern_data['filePath'] = $file_path;
-			$pattern_data['synced']   = true;
+			if ( $synced ) {
+				$pattern_data['synced'] = true;
+			}
+			if ( '' !== $area ) {
+				$pattern_data['area'] = $area;
+			}
 			// phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralDomain,WordPress.WP.I18n.LowLevelTranslationFunction
 			$pattern_data['title'] = translate_with_gettext_context( $pattern_data['title'], 'Pattern title', $text_domain );
 			if ( ! empty( $pattern_data['description'] ) ) {
@@ -105,4 +120,4 @@ function gutenberg_register_synced_theme_block_patterns() {
 		}
 	}
 }
-add_action( 'init', 'gutenberg_register_synced_theme_block_patterns', 11 );
+add_action( 'init', 'gutenberg_register_theme_block_pattern_headers', 11 );
