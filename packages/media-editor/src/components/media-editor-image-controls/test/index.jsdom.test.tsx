@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { useState } from '@wordpress/element';
 import MediaEditorImageControls from '..';
 import type { MediaEditorImageControlsProps } from '..';
 import { MediaEditorStateProvider, useMediaEditor } from '../../../state';
@@ -127,6 +128,41 @@ describe( 'MediaEditorImageControls', () => {
 			expect(
 				screen.getByTestId( 'current-aspect-ratio' )
 			).toHaveTextContent( '1' )
+		);
+	} );
+
+	it( 'ignores an aspect ratio chosen from a menu left open when disabled', async () => {
+		function Harness() {
+			const [ locked, setLocked ] = useState( false );
+			return (
+				<MediaEditorStateProvider>
+					<MediaEditorImageControls
+						showAspectRatioControl
+						disabled={ locked }
+					/>
+					<button onClick={ () => setLocked( true ) }>lock</button>
+					<CurrentState />
+				</MediaEditorStateProvider>
+			);
+		}
+		render( <Harness /> );
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Aspect ratio' } )
+		);
+		const before = screen.getByTestId( 'current-aspect-ratio' ).textContent;
+
+		// The popover stays mounted when the toggle becomes disabled, so
+		// the items have to refuse the change themselves.
+		fireEvent.click( screen.getByRole( 'button', { name: 'lock' } ) );
+		fireEvent.click(
+			screen.getByRole( 'menuitemradio', { name: 'Square (1:1)' } )
+		);
+
+		await waitFor( () =>
+			expect(
+				screen.getByTestId( 'current-aspect-ratio' )
+			).toHaveTextContent( before ?? '' )
 		);
 	} );
 
