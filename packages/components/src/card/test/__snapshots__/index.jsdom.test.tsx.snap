@@ -305,33 +305,6 @@ exports[`Card Card component should render correctly 1`] = `
   border-bottom-right-radius: calc(8px - 1px);
 }
 
-.emotion-17 {
-  background: transparent;
-  display: block;
-  margin: 0!important;
-  pointer-events: none;
-  position: absolute;
-  will-change: box-shadow;
-  border-radius: inherit;
-  bottom: 0;
-  box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0);
-  opacity: 1;
-  left: 0;
-  right: 0;
-  top: 0;
-}
-
-@media not ( prefers-reduced-motion ) {
-  .emotion-17 {
-    -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
-    transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
-  }
-}
-
-.emotion-18 {
-  border-radius: 8px;
-}
-
 <div>
   <div
     class="style-surface components-surface emotion-0 components-card"
@@ -398,15 +371,19 @@ exports[`Card Card component should render correctly 1`] = `
     </div>
     <div
       aria-hidden="true"
-      class="emotion-17 components-elevation emotion-18"
+      class="style-elevation style-border-radius-inherit components-elevation"
       data-wp-c16t="true"
       data-wp-component="Elevation"
+      style="--wp-components-elevation-offset: 0px; --wp-components-elevation-shadow: 0 0px 0px 0
+	rgba(0, 0, 0, 0);"
     />
     <div
       aria-hidden="true"
-      class="emotion-17 components-elevation emotion-18"
+      class="style-elevation style-border-radius-inherit components-elevation"
       data-wp-c16t="true"
       data-wp-component="Elevation"
+      style="--wp-components-elevation-offset: 0px; --wp-components-elevation-shadow: 0 0px 0px 0
+	rgba(0, 0, 0, 0);"
     />
   </div>
 </div>
@@ -417,23 +394,26 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -9,17 +9,17 @@
-      >
-        Code is Poetry
-      </div>
+@@ -12,18 +12,18 @@
       <div
         aria-hidden="true"
--       class="css-197d7ue-Elevation-sx-Base-sx-Base-elevationStyles components-elevation css-1ymzf8v-elevationClassName"
-+       class="css-14gt6n6-Elevation-sx-Base-sx-Base-elevationStyles components-elevation css-1ymzf8v-elevationClassName"
+        class="style-elevation style-border-radius-inherit components-elevation"
         data-wp-c16t="true"
         data-wp-component="Elevation"
+-       style="--wp-components-elevation-offset: 0px; --wp-components-elevation-shadow: 0 1px 2px 0
+- 	rgba(0, 0, 0, 0.05);"
++       style="--wp-components-elevation-offset: 0px; --wp-components-elevation-shadow: 0 0px 0px 0
++ 	rgba(0, 0, 0, 0);"
       />
       <div
         aria-hidden="true"
--       class="css-3b6y06-Elevation-sx-Base-sx-Base-elevationStyles components-elevation css-1ymzf8v-elevationClassName"
-+       class="css-14gt6n6-Elevation-sx-Base-sx-Base-elevationStyles components-elevation css-1ymzf8v-elevationClassName"
+        class="style-elevation style-border-radius-inherit components-elevation"
         data-wp-c16t="true"
         data-wp-component="Elevation"
+-       style="--wp-components-elevation-offset: 0px; --wp-components-elevation-shadow: 0 2px 4px 0
+- 	rgba(0, 0, 0, 0.1);"
++       style="--wp-components-elevation-offset: 0px; --wp-components-elevation-shadow: 0 0px 0px 0
++ 	rgba(0, 0, 0, 0);"
       />
     </div>
   </div>
@@ -455,56 +435,6 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
   height: 100%;
 }
 
-.emotion-2 {
-  background: transparent;
-  display: block;
-  margin: 0!important;
-  pointer-events: none;
-  position: absolute;
-  will-change: box-shadow;
-  border-radius: inherit;
-  bottom: 0;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  opacity: 1;
-  left: 0;
-  right: 0;
-  top: 0;
-}
-
-@media not ( prefers-reduced-motion ) {
-  .emotion-2 {
-    -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
-    transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
-  }
-}
-
-.emotion-3 {
-  border-radius: 8px;
-}
-
-.emotion-4 {
-  background: transparent;
-  display: block;
-  margin: 0!important;
-  pointer-events: none;
-  position: absolute;
-  will-change: box-shadow;
-  border-radius: inherit;
-  bottom: 0;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-  opacity: 1;
-  left: 0;
-  right: 0;
-  top: 0;
-}
-
-@media not ( prefers-reduced-motion ) {
-  .emotion-4 {
-    -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
-    transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
-  }
-}
-
 <div>
   <div
     class="style-surface components-surface emotion-0 components-card"
@@ -518,15 +448,19 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
     </div>
     <div
       aria-hidden="true"
-      class="emotion-2 components-elevation emotion-3"
+      class="style-elevation style-border-radius-inherit components-elevation"
       data-wp-c16t="true"
       data-wp-component="Elevation"
+      style="--wp-components-elevation-offset: 0px; --wp-components-elevation-shadow: 0 1px 2px 0
+	rgba(0, 0, 0, 0.05);"
     />
     <div
       aria-hidden="true"
-      class="emotion-4 components-elevation emotion-3"
+      class="style-elevation style-border-radius-inherit components-elevation"
       data-wp-c16t="true"
       data-wp-component="Elevation"
+      style="--wp-components-elevation-offset: 0px; --wp-components-elevation-shadow: 0 2px 4px 0
+	rgba(0, 0, 0, 0.1);"
     />
   </div>
 </div>
