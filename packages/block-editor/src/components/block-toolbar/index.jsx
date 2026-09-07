@@ -60,6 +60,7 @@ export function PrivateBlockToolbar( {
 		showParentSelector,
 		isUsingBindings,
 		isSectionContainer,
+		isContentGroup,
 		hasContentOnlyLocking,
 		showShuffleButton,
 		showSlots,
@@ -85,6 +86,7 @@ export function PrivateBlockToolbar( {
 			getParentSectionBlock,
 			isZoomOut,
 			isSectionBlock,
+			isContentGroupBlock,
 			isBlockHiddenAtViewport,
 			getSelectedBlockStyleState,
 			isResponsiveEditing,
@@ -154,6 +156,11 @@ export function PrivateBlockToolbar( {
 				selectedBlockClientIds.length === 1,
 			isUsingBindings: _isUsingBindings,
 			isSectionContainer: _isSectionBlock,
+			// Dragging a grouping row has nowhere to land: the container it
+			// sits in is disabled, so it exposes no drop zone. Until that is
+			// supported, the movers are the only way to reorder a group and a
+			// drag handle would be an affordance that does nothing.
+			isContentGroup: isContentGroupBlock( selectedBlockClientId ),
 			hasContentOnlyLocking: _hasTemplateLock,
 			showShuffleButton: _isZoomOut,
 			showSlots: ! _isZoomOut && ! _isEditingResponsiveStyleState,
@@ -239,7 +246,9 @@ export function PrivateBlockToolbar( {
 								) }
 							<BlockMover
 								clientIds={ blockClientIds }
-								hideDragHandle={ hideDragHandle }
+								hideDragHandle={
+									hideDragHandle || isContentGroup
+								}
 							/>
 						</ToolbarGroup>
 					</div>

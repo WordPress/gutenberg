@@ -330,6 +330,13 @@ test.describe( 'Unsynced pattern', () => {
 			blockToolbar.getByRole( 'button', { name: 'Options' } )
 		).not.toBeAttached();
 
+		// No drag handle either: the container a grouping row sits in is
+		// disabled and so exposes no drop zone, which would leave the handle
+		// with nowhere to land. The movers are the way to reorder for now.
+		await expect(
+			blockToolbar.getByRole( 'button', { name: 'Drag' } )
+		).not.toBeAttached();
+
 		await moveRight.click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
