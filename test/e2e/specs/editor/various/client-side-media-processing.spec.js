@@ -637,6 +637,60 @@ test.describe( 'Client-side media processing', () => {
 		}
 	} );
 
+	test( 'registers one generated file under every image size sharing its dimensions', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-duplicate-image-sizes'
+		);
+
+		try {
+			await page.reload();
+			await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
+
+			// Sizes that share width, height and crop are generated once and
+			// sideloaded in a single request whose `image_size` is an array
+			// of names. Record how the server answers each sideload so a
+			// rejected request fails here with its status code rather than
+			// as a downstream symptom.
+			const sideloadStatuses = [];
+			page.on( 'response', ( response ) => {
+				if ( /\/wp\/v2\/media\/\d+\/sideload/.test( response.url() ) ) {
+					sideloadStatuses.push( response.status() );
+				}
+			} );
+
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				'1024x768_e2e_test_image_size.jpeg'
+			);
+
+			expect( sideloadStatuses.length ).toBeGreaterThan( 0 );
+			expect(
+				sideloadStatuses.filter( ( status ) => status >= 400 )
+			).toEqual( [] );
+
+			// Both registered names must be present in the attachment
+			// metadata and point at the same generated file.
+			const sizes = media.media_details.sizes;
+			expect( sizes[ 'duplicate-size-one' ] ).toBeDefined();
+			expect( sizes[ 'duplicate-size-two' ] ).toBeDefined();
+			expect( sizes[ 'duplicate-size-two' ].source_url ).toBe(
+				sizes[ 'duplicate-size-one' ].source_url
+			);
+			expect( sizes[ 'duplicate-size-one' ].width ).toBe( 400 );
+			expect( sizes[ 'duplicate-size-one' ].height ).toBe( 300 );
+		} finally {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-duplicate-image-sizes'
+			);
+		}
+	} );
+
 	test( 'renders srcset on the front end after publishing a CSM-uploaded image', async ( {
 		page,
 		editor,

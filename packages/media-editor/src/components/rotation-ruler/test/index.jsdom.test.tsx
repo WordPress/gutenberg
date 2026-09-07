@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { pxToValueDelta, clampValue, quantize } from '../use-ruler-drag';
 import RotationRuler from '../index';
@@ -82,6 +82,41 @@ describe( 'RotationRuler', () => {
 		await user.keyboard( '{Shift>}{ArrowRight}{/Shift}' );
 		expect( onChange ).toHaveBeenCalledWith( 0.5 );
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'stops an in-flight drag when it becomes disabled', () => {
+		const onChange = jest.fn();
+		const props = {
+			value: 0,
+			onChange,
+			label: 'Fine rotation',
+		};
+		const { rerender } = render( <RotationRuler { ...props } /> );
+		const strip = screen.getByTestId( 'rotation-ruler' );
+
+		if ( ! strip.hasPointerCapture ) {
+			strip.hasPointerCapture = () => false;
+		}
+		if ( ! strip.setPointerCapture ) {
+			strip.setPointerCapture = () => {};
+		}
+		if ( ! strip.releasePointerCapture ) {
+			strip.releasePointerCapture = () => {};
+		}
+
+		fireEvent.pointerDown( strip, {
+			button: 0,
+			clientX: 0,
+			pointerId: 1,
+		} );
+		fireEvent.pointerMove( strip, { clientX: 40, pointerId: 1 } );
+		expect( onChange ).toHaveBeenCalled();
+
+		rerender( <RotationRuler { ...props } disabled /> );
+		onChange.mockClear();
+
+		fireEvent.pointerMove( strip, { clientX: 90, pointerId: 1 } );
+		expect( onChange ).not.toHaveBeenCalled();
 	} );
 
 	it( 'does not fire onChange when disabled', async () => {

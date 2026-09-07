@@ -1296,6 +1296,14 @@ class WP_Theme_JSON_Gutenberg {
 
 		$schema_styles_blocks   = array();
 		$schema_settings_blocks = array();
+		$breakpoint_states      = array_keys( $responsive_media_queries );
+
+		$common_block_settings = static::VALID_SETTINGS;
+		// `viewport` and `blockVisibility` are global-only settings and cannot be set per block for now.
+		unset(
+			$common_block_settings['viewport'],
+			$common_block_settings['blockVisibility']
+		);
 
 		/*
 		 * Generate a schema for blocks.
@@ -1306,21 +1314,27 @@ class WP_Theme_JSON_Gutenberg {
 		 *
 		 * As each variation needs both a `blocks` schema and responsive `blocks` schemas
 		 * for further nested inner `blocks`, the overall schema is generated in multiple passes.
+		 *
+		 * All blocks start with the same style schema. Build that common schema
+		 * once, then add block-specific pseudo and custom states below.
 		 */
+		$responsive_block_schema             = $styles_non_top_level;
+		$responsive_block_schema['elements'] = $schema_styles_elements;
+
+		$common_block_schema             = $styles_non_top_level;
+		$common_block_schema['elements'] = $schema_styles_elements;
+
+		foreach ( $breakpoint_states as $breakpoint_state ) {
+			$common_block_schema[ $breakpoint_state ] = $responsive_block_schema;
+		}
+
 		foreach ( $valid_block_names as $block ) {
-			$schema_settings_blocks[ $block ] = static::VALID_SETTINGS;
-			// `viewport` and `blockVisibility` are global-only settings and cannot be set per block for now.
-			unset( $schema_settings_blocks[ $block ]['viewport'] );
-			unset( $schema_settings_blocks[ $block ]['blockVisibility'] );
-			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
-			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
+			$schema_settings_blocks[ $block ] = $common_block_settings;
+			$schema_styles_blocks[ $block ]   = $common_block_schema;
 
-			// Add responsive breakpoint states for all blocks.
-			foreach ( array_keys( $responsive_media_queries ) as $breakpoint_state ) {
-				$schema_styles_blocks[ $block ][ $breakpoint_state ]             = $styles_non_top_level;
-				$schema_styles_blocks[ $block ][ $breakpoint_state ]['elements'] = $schema_styles_elements;
-
-				if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
+			// Add responsive pseudo-selectors only to blocks that support them.
+			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
+				foreach ( $breakpoint_states as $breakpoint_state ) {
 					foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
 						$schema_styles_blocks[ $block ][ $breakpoint_state ][ $pseudo_selector ] = $styles_non_top_level;
 					}
@@ -3879,8 +3893,18 @@ class WP_Theme_JSON_Gutenberg {
 				// Only store if the variation has blockGap defined.
 				if ( isset( $style_variation_node['spacing']['blockGap'] ) ) {
 					// Append block selector to the variation selector for proper targeting.
-					$variation_metadata_with_selector                                = $style_variation;
-					$variation_metadata_with_selector['selector']                    = $style_variation['selector'] . $block_metadata['css'];
+					$variation_metadata_with_selector             = $style_variation;
+					$variation_metadata_with_selector['selector'] = $style_variation['selector'] . $block_metadata['css'];
+
+					/*
+					 * `get_layout_styles()` reads `name` as a block name, to check that the block
+					 * supports layout at all. A variation node's `name` is the variation slug,
+					 * which is never a registered block, so the check fails and every variation
+					 * gap rule is discarded. Pass the block the variation belongs to, so the
+					 * support check answers the question it is actually asking.
+					 */
+					$variation_metadata_with_selector['name'] = $block_name;
+
 					$style_variation_layout_metadata[ $style_variation['selector'] ] = array(
 						'metadata' => $variation_metadata_with_selector,
 						'node'     => $style_variation_node,
@@ -3936,7 +3960,11 @@ class WP_Theme_JSON_Gutenberg {
 					if ( isset( $breakpoint_node['spacing']['blockGap'] ) ) {
 						$variation_layout_metadata             = $style_variation;
 						$variation_layout_metadata['selector'] = $style_variation['selector'] . $block_metadata['css'];
-						$variation_responsive_css             .= $this->get_layout_styles(
+
+						// The variation slug is not a block name here either. See above.
+						$variation_layout_metadata['name'] = $block_name;
+
+						$variation_responsive_css .= $this->get_layout_styles(
 							$variation_layout_metadata,
 							array(
 								'node'        => $breakpoint_node,

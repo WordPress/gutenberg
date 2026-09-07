@@ -28,12 +28,14 @@ jobs:
             fail-fast: false
             matrix:
                 event: ['${{ github.event_name }}']
-                node: ['24', '26']
+                node: ['20', '22', '24']
                 os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
                 exclude:
-                    # Only test Node 24 on Ubuntu for pull requests.
+                    # On PRs: Only test Node 20 on Ubuntu
                     - event: 'pull_request'
-                      node: '26'
+                      node: '22'
+                    - event: 'pull_request'
+                      node: '24'
                     - event: 'pull_request'
                       os: 'macos-15'
                     - event: 'pull_request'

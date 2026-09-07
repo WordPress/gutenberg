@@ -10,7 +10,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
     >
       <label
         class="style-label components-base-control__label"
-        for="wp-components-base-control-19"
+        for="wp-components-base-control-27"
       >
         Test Toggle Group Control
       </label>
@@ -19,7 +19,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
         class="style-toggle-group-control style-has-enclosing-borders components-toggle-group-control"
         data-wp-c16t="true"
         data-wp-component="ToggleGroupControl"
-        id="wp-components-base-control-19"
+        id="wp-components-base-control-27"
         role="radiogroup"
       >
         <div
@@ -33,8 +33,8 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
             data-value="uppercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="wp-components-base-control-19-40"
-            name=":r3e:"
+            id="wp-components-base-control-27-57"
+            name=":r4k:"
             role="radio"
             type="button"
             value="uppercase"
@@ -68,8 +68,8 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
             data-value="lowercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="wp-components-base-control-19-41"
-            name=":r3e:"
+            id="wp-components-base-control-27-58"
+            name=":r4k:"
             role="radio"
             type="button"
             value="lowercase"
@@ -115,7 +115,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
     >
       <label
         class="style-label components-base-control__label"
-        for="wp-components-base-control-18"
+        for="wp-components-base-control-26"
       >
         Test Toggle Group Control
       </label>
@@ -124,7 +124,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
         class="style-toggle-group-control style-has-enclosing-borders components-toggle-group-control"
         data-wp-c16t="true"
         data-wp-component="ToggleGroupControl"
-        id="wp-components-base-control-18"
+        id="wp-components-base-control-26"
         role="radiogroup"
       >
         <div
@@ -137,8 +137,8 @@ exports[`ToggleGroupControl controlled should render correctly with text options
             data-value="rigas"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="wp-components-base-control-18-38"
-            name=":r37:"
+            id="wp-components-base-control-26-55"
+            name=":r4d:"
             role="radio"
             type="button"
             value="rigas"
@@ -160,8 +160,8 @@ exports[`ToggleGroupControl controlled should render correctly with text options
             data-value="jack"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="wp-components-base-control-18-39"
-            name=":r37:"
+            id="wp-components-base-control-26-56"
+            name=":r4d:"
             role="radio"
             type="button"
             value="jack"
