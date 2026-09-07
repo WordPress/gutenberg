@@ -20,7 +20,6 @@
 			"packages/components/src/popover/test/index.jsdom.test.tsx",
 			"packages/components/src/progress-bar/test/index.jsdom.test.tsx",
 			"packages/components/src/resizable-box/resize-tooltip/test/index.jsdom.test.tsx",
-			"packages/components/src/resizable-box/resize-tooltip/test/label.jsdom.test.tsx",
 			"packages/components/src/scrollable/test/index.jsdom.test.tsx",
 			"packages/components/src/search-control/test/index.jsdom.test.tsx",
 			"packages/components/src/select-control/test/select-control.jsdom.test.tsx",

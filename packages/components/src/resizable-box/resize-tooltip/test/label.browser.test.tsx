@@ -1,6 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it } from 'vitest';
 import Label from '../label';
 import { POSITIONS } from '../utils';
+
+afterEach( cleanup );
 
 describe( 'ResizeTooltip label', () => {
 	it( 'keeps the Text contract when an ancestor uses a bold font weight', () => {
@@ -20,6 +23,6 @@ describe( 'ResizeTooltip label', () => {
 		expect( label ).toHaveClass( 'components-text' );
 		expect( label ).toHaveClass( 'components-truncate' );
 		expect( label ).toHaveAttribute( 'data-wp-component', 'Text' );
-		expect( label ).toHaveStyle( { fontWeight: 'normal' } );
+		expect( getComputedStyle( label ).fontWeight ).toBe( '400' );
 	} );
 } );

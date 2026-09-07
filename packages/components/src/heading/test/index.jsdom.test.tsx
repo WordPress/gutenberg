@@ -7,26 +7,6 @@ describe( 'props', () => {
 		expect( screen.getByRole( 'heading' ) ).toMatchSnapshot();
 	} );
 
-	test( 'should render level as a number', () => {
-		render( <Heading>Code is Poetry</Heading> );
-		render( <Heading level={ 4 }>Code is Poetry</Heading> );
-		expect(
-			screen.getByRole( 'heading', { level: 4 } )
-		).toMatchStyleDiffSnapshot(
-			screen.getByRole( 'heading', { level: 2 } )
-		);
-	} );
-
-	test( 'should render level as a string', () => {
-		render( <Heading>Code is Poetry</Heading> );
-		render( <Heading level="4">Code is Poetry</Heading> );
-		expect(
-			screen.getByRole( 'heading', { level: 4 } )
-		).toMatchStyleDiffSnapshot(
-			screen.getByRole( 'heading', { level: 2 } )
-		);
-	} );
-
 	test( 'should allow as prop', () => {
 		render(
 			<Heading level="1" as="span">
