@@ -17,6 +17,7 @@
 ### Bug Fixes
 
 -   Make color ramp generation independent of cache population order. ([#82505](https://github.com/WordPress/gutenberg/pull/82505))
+-   Keep active fills darker than resting fills and preserve text contrast for both states. ([#82542](https://github.com/WordPress/gutenberg/pull/82542))
 
 ### Internal
 
