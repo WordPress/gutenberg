@@ -180,7 +180,7 @@
 	},
 	"packages/block-editor/src/components/block-allowed-blocks/modal.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
