@@ -41,6 +41,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `padding`: `true`
   - `blockGap`: `["horizontal","vertical"]`
 - [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - `aspectRatio`: `true`
   - `minHeight`: `true`
   - `minWidth`: `true`
 - [`position`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#position):
