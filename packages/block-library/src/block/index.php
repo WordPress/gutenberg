@@ -124,11 +124,14 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 
 	// Wrap the output when the instance asks for an element, or when its area
 	// defines one, so a pattern standing in for a header or footer keeps its
-	// landmark. The instance's `tagName` wins over the area's default.
+	// landmark. The instance's `tagName` wins over the area's default, and
+	// `none` opts out of the wrapper altogether.
 	$tag_name = $attributes['tagName'] ?? '';
 	if ( '' === $tag_name ) {
 		$area = block_core_block_get_area( $attributes, isset( $pattern ) ? $pattern : null );
-		if ( $area ) {
+		// "General" (uncategorized) patterns render without a wrapper, unlike
+		// template parts, so existing pattern instances keep their markup.
+		if ( $area && 'uncategorized' !== $area ) {
 			foreach ( get_allowed_block_template_part_areas() as $area_definition ) {
 				if ( $area_definition['area'] === $area && ! empty( $area_definition['area_tag'] ) ) {
 					$tag_name = $area_definition['area_tag'];

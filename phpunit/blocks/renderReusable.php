@@ -157,6 +157,16 @@ class Test_Blocks_RenderReusable extends WP_UnitTestCase {
 			'<div class="wp-block-block"><p class="wp-block-paragraph">Site header</p></div>',
 			do_blocks( '<!-- wp:block {"slug":"test/header","tagName":"div"} /-->' )
 		);
+		// The General area renders no wrapper, unlike a template part.
+		$this->assertSame(
+			'<p class="wp-block-paragraph">Site header</p>',
+			do_blocks( '<!-- wp:block {"slug":"test/header","area":"uncategorized"} /-->' )
+		);
+		// `none` opts out of the area's element.
+		$this->assertSame(
+			'<p class="wp-block-paragraph">Site header</p>',
+			do_blocks( '<!-- wp:block {"slug":"test/header","tagName":"none"} /-->' )
+		);
 		// The instance's area applies to a pattern registered without one.
 		$this->assertSame(
 			'<footer class="wp-block-block"><p class="wp-block-paragraph">Hello from a registered pattern!</p></footer>',

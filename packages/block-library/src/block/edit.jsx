@@ -365,8 +365,11 @@ function ReusableBlockEdit( {
 	onEditOriginal,
 	pattern,
 } ) {
-	// The instance's own area wins, else the referenced pattern's.
+	// The instance's own area wins, else the referenced pattern's. Without
+	// either, the instance is in the "General" (uncategorized) area, which
+	// for patterns means no wrapper element.
 	const area = areaAttribute || pattern?.area;
+	const hasAreaElement = !! area && area !== 'uncategorized';
 	const {
 		areas,
 		label: areaLabel,
@@ -415,8 +418,12 @@ function ReusableBlockEdit( {
 	const layoutClasses = useLayoutClasses( { layout }, name );
 
 	// In the editor the block always needs a wrapper; on the front end one is
-	// only rendered when `tagName` is set or the area defines an element.
-	const TagName = tagName || ( area && areaTagName ) || 'div';
+	// only rendered when `tagName` is an element or the area defines one.
+	// `tagName: "none"` opts out of the area's element.
+	const TagName =
+		tagName === 'none'
+			? 'div'
+			: tagName || ( hasAreaElement && areaTagName ) || 'div';
 	const blockProps = useBlockProps( {
 		className: clsx(
 			'block-library-block__reusable-block-container',
@@ -534,21 +541,20 @@ function ReusableBlockEdit( {
 							? __( 'Set by the registered pattern.' )
 							: undefined
 					}
-					value={ area || '' }
-					options={ [
-						// An area set by the registration can be changed
-						// but not removed: clearing the attribute falls
-						// back to the registered area.
-						...( pattern?.area
-							? []
-							: [ { label: __( 'None' ), value: '' } ] ),
-						...areas.map( ( { label, area: _area } ) => ( {
-							label,
-							value: _area,
-						} ) ),
-					] }
+					value={ area || 'uncategorized' }
+					options={ areas.map( ( { label, area: _area } ) => ( {
+						label,
+						value: _area,
+					} ) ) }
 					onChange={ ( value ) =>
-						setAttributes( { area: value || undefined } )
+						setAttributes( {
+							// "General" is the default: only store it when
+							// it overrides an area set by the registration.
+							area:
+								value === 'uncategorized' && ! pattern?.area
+									? undefined
+									: value,
+						} )
 					}
 				/>
 				<HTMLElementControl
@@ -560,7 +566,7 @@ function ReusableBlockEdit( {
 					options={ [
 						{
 							label:
-								area && areaTagName
+								hasAreaElement && areaTagName
 									? sprintf(
 											/* translators: %s: HTML tag based on area. */
 											__( 'Default based on area (%s)' ),
@@ -569,6 +575,7 @@ function ReusableBlockEdit( {
 									: __( 'Default (no wrapper)' ),
 							value: '',
 						},
+						{ label: __( 'None' ), value: 'none' },
 						...TAG_NAME_OPTIONS,
 					] }
 				/>
