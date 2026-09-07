@@ -282,9 +282,11 @@ describe( 'PaletteEdit', () => {
 			expect( swatch ).not.toHaveAttribute( 'aria-pressed' );
 
 			await userEvent.click( swatch );
-			expect(
-				screen.getByRole( editorRole, { name: editorName } )
-			).toBeVisible();
+			await waitFor( () => {
+				expect(
+					screen.getByRole( editorRole, { name: editorName } )
+				).toBeVisible();
+			} );
 		}
 	);
 
@@ -299,9 +301,11 @@ describe( 'PaletteEdit', () => {
 		expect( secondary ).toHaveFocus();
 
 		await userEvent.keyboard( '{Space}' );
-		expect(
-			screen.getByRole( 'textbox', { name: 'Hex color' } )
-		).toBeVisible();
+		await waitFor( () => {
+			expect(
+				screen.getByRole( 'textbox', { name: 'Hex color' } )
+			).toBeVisible();
+		} );
 	} );
 
 	it( 'opens a command swatch with Enter', async () => {
@@ -310,9 +314,11 @@ describe( 'PaletteEdit', () => {
 		screen.getByRole( 'button', { name: 'Primary' } ).focus();
 		await userEvent.keyboard( '{Enter}' );
 
-		expect(
-			screen.getByRole( 'textbox', { name: 'Hex color' } )
-		).toBeVisible();
+		await waitFor( () => {
+			expect(
+				screen.getByRole( 'textbox', { name: 'Hex color' } )
+			).toBeVisible();
+		} );
 	} );
 
 	it( 'shows empty message', () => {
