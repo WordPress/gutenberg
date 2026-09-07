@@ -10,6 +10,8 @@ const ICON_VIEW_BOX = '0 0 24 24';
  * - Each manifest entry has a matching SVG in library/, and vice versa.
  * - Each SVG uses currentColor so icons inherit text color.
  * - Each SVG uses viewBox="0 0 24 24".
+ * - Each stroke-based SVG contains at least one stroked graphical element.
+ * - Each stroked graphical element uses a non-scaling stroke.
  */
 async function validateCollection() {
 	const manifestPath = path.join( ICON_LIBRARY_DIR, '..', 'manifest.json' );
@@ -104,6 +106,35 @@ async function validateCollection() {
 			problems.push(
 				`- Icon ${ svgPath } must set viewBox="${ ICON_VIEW_BOX }"`
 			);
+		}
+
+		const svgTag = svgContent.match( /<svg\b[^>]*>/ )?.[ 0 ];
+		if ( svgTag?.includes( 'style="fill: none"' ) ) {
+			const graphicalElements = svgContent.match(
+				/<(?:circle|ellipse|line|path|polygon|polyline|rect)\b[^>]*>/g
+			);
+			const strokedElements = graphicalElements?.filter(
+				( element ) => ! element.includes( 'stroke="none"' )
+			);
+
+			if ( ! strokedElements?.length ) {
+				problems.push(
+					`- Stroke-based icon ${ svgPath } must contain a graphical element that does not set stroke="none"`
+				);
+			}
+
+			if (
+				strokedElements?.some(
+					( element ) =>
+						! element.includes(
+							'vector-effect="non-scaling-stroke"'
+						)
+				)
+			) {
+				problems.push(
+					`- Stroked elements in ${ svgPath } must set vector-effect="non-scaling-stroke"`
+				);
+			}
 		}
 	}
 

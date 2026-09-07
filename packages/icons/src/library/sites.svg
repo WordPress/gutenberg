@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">
-	<path d="M9 13C10.1046 13 11 13.8954 11 15V18C11 19.1046 10.1046 20 9 20H6C4.89543 20 4 19.1046 4 18V15C4 13.8954 4.89543 13 6 13H9ZM6 14.5C5.72386 14.5 5.5 14.7239 5.5 15V18C5.5 18.2761 5.72386 18.5 6 18.5H9C9.27614 18.5 9.5 18.2761 9.5 18V15C9.5 14.7239 9.27614 14.5 9 14.5H6Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor" stroke="none" />
-	<path d="M18 13C19.1046 13 20 13.8954 20 15V18C20 19.1046 19.1046 20 18 20H15C13.8954 20 13 19.1046 13 18V15C13 13.8954 13.8954 13 15 13H18ZM15 14.5C14.7239 14.5 14.5 14.7239 14.5 15V18C14.5 18.2761 14.7239 18.5 15 18.5H18C18.2761 18.5 18.5 18.2761 18.5 18V15C18.5 14.7239 18.2761 14.5 18 14.5H15Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor" stroke="none" />
-	<path d="M13.5 4C14.6046 4 15.5 4.89543 15.5 6V9C15.5 10.1046 14.6046 11 13.5 11H10.5C9.39543 11 8.5 10.1046 8.5 9V6C8.5 4.89543 9.39543 4 10.5 4H13.5ZM10.5 5.5C10.2239 5.5 10 5.72386 10 6V9C10 9.27614 10.2239 9.5 10.5 9.5H13.5C13.7761 9.5 14 9.27614 14 9V6C14 5.72386 13.7761 5.5 13.5 5.5H10.5Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor" stroke="none" />
+	<rect x="4.75" y="13.75" width="5.5" height="5.5" rx="1.25" vector-effect="non-scaling-stroke" />
+	<rect x="13.75" y="13.75" width="5.5" height="5.5" rx="1.25" vector-effect="non-scaling-stroke" />
+	<rect x="8.75" y="4.75" width="6" height="5.5" rx="1.25" vector-effect="non-scaling-stroke" />
 </svg>
