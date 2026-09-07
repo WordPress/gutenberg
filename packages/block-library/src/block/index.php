@@ -53,7 +53,7 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 		// as a `wp_block` post wins over the registry for the content; the
 		// registration still provides defaults such as the area.
 		$pattern        = WP_Block_Patterns_Registry::get_instance()->get_registered( $slug );
-		$reusable_block = block_core_block_get_pattern_override( $slug );
+		$reusable_block = block_core_block_get_pattern_customization( $slug );
 
 		if ( $reusable_block ) {
 			$content = $reusable_block->post_content;
