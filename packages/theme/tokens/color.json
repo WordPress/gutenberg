@@ -1162,6 +1162,18 @@
 				}
 			},
 			"interactive": {
+				"neutral": {
+					"$value": "{wpds-color.primitive.bg.surface3}",
+					"$description": "Solid background color for neutral interactive controls, such as input fields and unchecked checkboxes."
+				},
+				"neutral-active": {
+					"$value": "{wpds-color.primitive.bg.surface3}",
+					"$description": "Solid background color for neutral interactive controls that are hovered, focused, or active."
+				},
+				"neutral-disabled": {
+					"$value": "{wpds-color.primitive.bg.surface3}",
+					"$description": "Solid background color for neutral interactive controls in their disabled state."
+				},
 				"neutral-strong": {
 					"$value": "{wpds-color.primitive.bg.bgFillInverted1}",
 					"$description": "Background color for interactive elements with neutral tone and strong emphasis."

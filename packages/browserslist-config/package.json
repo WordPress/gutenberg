@@ -32,7 +32,8 @@
 		"./package.json": "./package.json"
 	},
 	"devDependencies": {
-		"browserslist": "^4.28.4"
+		"browserslist": "^4.28.4",
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

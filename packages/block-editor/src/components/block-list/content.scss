@@ -80,13 +80,16 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		}
 	}
 
-	// Block highlight, and navigation mode, and focus.
+	// Block highlight, and navigation mode, and focus, and hover where the
+	// grab cursor shows what a drag would take.
 	// This piece of code has gone back and forth between using a pseudo element
 	// vs. styling the block directly. Ultimately we likely need a pseudo element
 	// (unless styles like focus and selection overlay can be rendered as separate elements),
 	// since things like border-radius need to be able to be set on the block itself.
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-highlighted ~ .is-multi-selected,
+	.block-editor-block-list__block.is-hovered-draggable[draggable="true"]:not(.is-multi-selected),
+	.block-editor-block-list__block.is-hovered-draggable[data-draggable="true"]:not(.is-multi-selected),
 	.block-editor-block-list__block:not([contenteditable="true"]):focus {
 		outline: none;
 

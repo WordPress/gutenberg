@@ -47,6 +47,9 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/deprecated": "file:../deprecated"
 	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"peerDependencies": {
 		"react": "^18 || ^19"
 	},

@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'node:url';
+import { describe, expect, it, vi } from 'vitest';
 import pluginModeOverrides from '../index';
 
 const cwd = new URL( 'file:///virtual/' );
@@ -26,7 +27,7 @@ async function buildModeOverrides( {
 			{ [ modifierName ]: '.' },
 			{ [ modifierName ]: 'compact' },
 		],
-		apply: jest.fn(
+		apply: vi.fn(
 			(
 				input: Record< string, string >,
 				options?: { resolveAliases?: boolean }

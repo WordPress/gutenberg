@@ -1,24 +1,31 @@
-/* eslint-disable import/order -- The transformer must load after its dependency is mocked. */
-const fs = require( 'node:fs' );
-const os = require( 'node:os' );
-const path = require( 'node:path' );
-
-const mockGetCacheKey = jest.fn( ( source ) => source );
-
-jest.mock( 'babel-jest', () => ( {
-	createTransformer: () => ( {
-		getCacheKey: mockGetCacheKey,
-	} ),
-} ) );
-
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import os from 'node:os';
+import path from 'node:path';
+import { afterEach, describe, expect, it } from 'vitest';
+const require = createRequire( import.meta.url );
 const transformer = require( '../babel-transformer' );
-/* eslint-enable import/order */
+
+function getTransformOptions() {
+	return {
+		cacheFS: new Map(),
+		config: {
+			cwd: process.cwd(),
+			rootDir: process.cwd(),
+		},
+		configString: '{}',
+		instrument: false,
+		supportsDynamicImport: false,
+		supportsExportNamespaceFrom: false,
+		supportsStaticESM: false,
+		supportsTopLevelAwait: false,
+	};
+}
 
 describe( 'Babel transformer cache key', () => {
 	let temporaryDirectory;
 
 	afterEach( () => {
-		mockGetCacheKey.mockClear();
 		if ( temporaryDirectory ) {
 			fs.rmSync( temporaryDirectory, { force: true, recursive: true } );
 			temporaryDirectory = undefined;
@@ -26,7 +33,7 @@ describe( 'Babel transformer cache key', () => {
 	} );
 
 	it.each( [ 'js', 'jsx' ] )(
-		'includes block.json for block index.%s files',
+		'changes when block.json changes for block index.%s files',
 		( extension ) => {
 			temporaryDirectory = fs.mkdtempSync(
 				path.join( os.tmpdir(), 'gutenberg-babel-transformer-' )
@@ -38,17 +45,38 @@ describe( 'Babel transformer cache key', () => {
 				'example'
 			);
 			fs.mkdirSync( blockDirectory, { recursive: true } );
-			fs.writeFileSync(
-				path.join( blockDirectory, 'block.json' ),
-				'{"name":"core/example"}'
+			const blockJSONPath = path.join( blockDirectory, 'block.json' );
+			const blockIndexPath = path.join(
+				blockDirectory,
+				`index.${ extension }`
 			);
-
-			const cacheKey = transformer.getCacheKey(
+			fs.writeFileSync( blockJSONPath, '{"name":"core/example"}' );
+			const firstCacheKey = transformer.getCacheKey(
 				'block source',
-				path.join( blockDirectory, `index.${ extension }` )
+				blockIndexPath,
+				getTransformOptions()
 			);
 
-			expect( cacheKey ).toBe( 'block source\n{"name":"core/example"}' );
+			fs.writeFileSync(
+				blockJSONPath,
+				'{"name":"core/example","version":2}'
+			);
+			const secondCacheKey = transformer.getCacheKey(
+				'block source',
+				blockIndexPath,
+				getTransformOptions()
+			);
+
+			expect( secondCacheKey ).not.toBe( firstCacheKey );
+
+			fs.writeFileSync( blockJSONPath, '{"name":"core/example"}' );
+			const restoredCacheKey = transformer.getCacheKey(
+				'block source',
+				blockIndexPath,
+				getTransformOptions()
+			);
+
+			expect( restoredCacheKey ).toBe( firstCacheKey );
 		}
 	);
 } );

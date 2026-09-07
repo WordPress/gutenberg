@@ -38,7 +38,8 @@
 		"preact": "^10.29.1"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0"
+		"@types/jest": "^30.0.0",
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

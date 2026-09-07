@@ -1445,7 +1445,7 @@ test.describe( 'List View', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should place the caret at the end of the block when activating from List View', async ( {
+	test( 'should place the caret at the start of the block when activating from List View', async ( {
 		editor,
 		page,
 		listViewUtils,
@@ -1465,8 +1465,8 @@ test.describe( 'List View', () => {
 
 		// Click the first paragraph in List View to select it,
 		// then press Enter to activate it (transfer focus to canvas).
-		// Keyboard activation (Enter/Space) places the caret at the end
-		// of the block, while mouse click keeps focus in the list view.
+		// Keyboard activation places the caret at the start of the first
+		// field. Mouse click keeps focus in the list view.
 		await listView
 			.getByRole( 'gridcell', { name: 'Paragraph' } )
 			.first()
@@ -1474,21 +1474,72 @@ test.describe( 'List View', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Press Enter to split the block at the caret position.
-		// If the caret is at the end, this creates a new block after the first paragraph.
-		// If the caret is at the start, this creates a new block before the first paragraph.
+		// With the caret at the start, this creates a new block before
+		// the first paragraph.
 		await page.keyboard.press( 'Enter' );
 
-		// Verify the block order: if the caret was at the end, the new empty
-		// block should be after the first paragraph, not before it.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: '' } },
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'First paragraph' },
 			},
-			{ name: 'core/paragraph', attributes: { content: '' } },
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'Second paragraph' },
+			},
+		] );
+	} );
+
+	test( 'should focus the first cell of a Table when activating from List View', async ( {
+		editor,
+		page,
+		listViewUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/table',
+			attributes: {
+				body: [
+					{
+						cells: [
+							{ content: 'R1C1', tag: 'td' },
+							{ content: 'R1C2', tag: 'td' },
+						],
+					},
+					{
+						cells: [
+							{ content: 'R2C1', tag: 'td' },
+							{ content: 'R2C2', tag: 'td' },
+						],
+					},
+				],
+			},
+		} );
+
+		const listView = await listViewUtils.openListView();
+		await listView.getByRole( 'gridcell', { name: 'Table' } ).click();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'X' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/table',
+				attributes: {
+					body: [
+						{
+							cells: [
+								{ content: 'XR1C1', tag: 'td' },
+								{ content: 'R1C2', tag: 'td' },
+							],
+						},
+						{
+							cells: [
+								{ content: 'R2C1', tag: 'td' },
+								{ content: 'R2C2', tag: 'td' },
+							],
+						},
+					],
+				},
 			},
 		] );
 	} );

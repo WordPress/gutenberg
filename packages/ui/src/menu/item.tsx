@@ -2,10 +2,12 @@ import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import {
 	Children,
+	cloneElement,
 	forwardRef,
 	isValidElement,
 	useId,
 } from '@wordpress/element';
+import type { ReactElement } from 'react';
 import resetStyles from '../utils/css/resets.module.css';
 import {
 	KeyboardShortcutDescription,
@@ -16,7 +18,7 @@ import styles from './style.module.css';
 import { MenuItemContentContext } from './context';
 import { ItemDescription } from './item-description';
 import { ItemLabel } from './item-label';
-import type { ItemProps } from './types';
+import type { ItemDescriptionProps, ItemProps } from './types';
 
 type ItemAriaProps = Pick<
 	ItemProps,
@@ -31,27 +33,28 @@ const VALIDATION_ENABLED = process.env.NODE_ENV !== 'production';
 
 function getItemContent( children: ItemProps[ 'children' ] ) {
 	const childArray = Children.toArray( children );
-	const [ label, description, ...unexpectedChildren ] = childArray;
+	const [ label, ...descriptions ] = childArray;
 	const hasLabel =
 		isValidElement< { id?: string } >( label ) && label.type === ItemLabel;
-	const hasDescription =
-		isValidElement< { id?: string } >( description ) &&
-		description.type === ItemDescription;
+	const descriptionElements = descriptions.filter(
+		( description ): description is ReactElement< ItemDescriptionProps > =>
+			isValidElement< ItemDescriptionProps >( description ) &&
+			description.type === ItemDescription
+	);
 
 	if (
 		VALIDATION_ENABLED &&
-		( ! hasLabel ||
-			( description !== undefined && ! hasDescription ) ||
-			unexpectedChildren.length > 0 )
+		( ! hasLabel || descriptionElements.length !== descriptions.length )
 	) {
 		throw new Error(
-			'Menu.ItemLabel must be the first direct child of every menu item, followed only by an optional Menu.ItemDescription.'
+			'Menu.ItemLabel must be the first direct child of every menu item, followed only by Menu.ItemDescription components.'
 		);
 	}
 
 	return {
-		descriptionId: hasDescription ? description.props.id : undefined,
-		hasDescription,
+		descriptionIds: descriptionElements.map(
+			( description ) => description.props.id
+		),
 		hasLabel,
 		labelId: hasLabel ? label.props.id : undefined,
 	};
@@ -70,18 +73,34 @@ function useItemContent(
 ) {
 	const generatedLabelId = useId();
 	const generatedDescriptionId = useId();
-	const { descriptionId, hasDescription, hasLabel, labelId } =
-		getItemContent( children );
+	const { descriptionIds, hasLabel, labelId } = getItemContent( children );
 	const resolvedLabelId = hasLabel ? labelId ?? generatedLabelId : undefined;
-	const resolvedDescriptionId = hasDescription
-		? descriptionId ?? generatedDescriptionId
-		: undefined;
-	const itemDescribedBy = [
-		ariaDescribedBy,
-		hasDescription && resolvedDescriptionId,
-	]
-		.filter( Boolean )
-		.join( ' ' );
+	const resolvedDescriptionIds = descriptionIds.map(
+		( descriptionId, index ) =>
+			descriptionId ?? `${ generatedDescriptionId }-${ index }`
+	);
+	const itemDescribedBy = Array.from(
+		new Set( [
+			...( ariaDescribedBy?.split( /\s+/ ).filter( Boolean ) ?? [] ),
+			...resolvedDescriptionIds,
+		] )
+	).join( ' ' );
+	let descriptionIndex = 0;
+	// React widens the tuple while mapping; validation preserves the item-child
+	// contract and cloning changes only generated description IDs.
+	const contentChildren = Children.map( children, ( child ) => {
+		if (
+			! isValidElement< ItemDescriptionProps >( child ) ||
+			child.type !== ItemDescription
+		) {
+			return child;
+		}
+
+		const descriptionId = resolvedDescriptionIds[ descriptionIndex++ ];
+		return child.props.id === descriptionId
+			? child
+			: cloneElement( child, { id: descriptionId } );
+	} ) as ItemProps[ 'children' ];
 	const {
 		descriptionId: shortcutDescriptionId,
 		targetProps: shortcutAriaProps,
@@ -100,8 +119,8 @@ function useItemContent(
 		ariaLabelledBy ?? ( ariaLabel ? undefined : resolvedLabelId );
 
 	return {
+		contentChildren,
 		contentContextValue: {
-			descriptionId: resolvedDescriptionId,
 			labelId: resolvedLabelId,
 			labelTrailing,
 		},
@@ -195,14 +214,18 @@ const Item = forwardRef< HTMLDivElement, ItemProps >( function MenuItem(
 	},
 	ref
 ) {
-	const { contentContextValue, itemAriaProps, shortcutDescriptionId } =
-		useItemContent( children, {
-			'aria-describedby': ariaDescribedBy,
-			'aria-keyshortcuts': ariaKeyShortcuts,
-			'aria-label': ariaLabel,
-			'aria-labelledby': ariaLabelledBy,
-			shortcut,
-		} );
+	const {
+		contentChildren,
+		contentContextValue,
+		itemAriaProps,
+		shortcutDescriptionId,
+	} = useItemContent( children, {
+		'aria-describedby': ariaDescribedBy,
+		'aria-keyshortcuts': ariaKeyShortcuts,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledBy,
+		shortcut,
+	} );
 
 	return (
 		<_Menu.Item
@@ -222,7 +245,7 @@ const Item = forwardRef< HTMLDivElement, ItemProps >( function MenuItem(
 					shortcutDescriptionId={ shortcutDescriptionId }
 					suffix={ suffix }
 				>
-					{ children }
+					{ contentChildren }
 				</ItemContent>
 			</MenuItemContentContext.Provider>
 		</_Menu.Item>

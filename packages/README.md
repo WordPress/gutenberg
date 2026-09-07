@@ -250,6 +250,22 @@ Content within the HTML comment will be replaced by the generated documentation.
 
 It's very important to have a good plan for what a new package will include. All constants, methods, and components exposed from the package will ultimately become part of the public API in WordPress core (exposed via the `wp` global - eg: `wp.blockEditor`) and as such will need to be supported indefinitely. You should be very selective in what is exposed by your package and [ensure it is well documented](#maintaining-api-documentation).
 
+## Maintaining cross-version compatibility
+
+A plugin can bundle one `@wordpress/*` package while loading its dependencies from WordPress. The bundled package and its WordPress dependencies can then come from different releases.
+
+For example, a plugin might bundle a newer `@wordpress/dataviews` package but run on a WordPress version that provides an older `@wordpress/components` package. The reverse can also happen: an older plugin bundle can run on a newer WordPress version.
+
+Before changing an API or dependency in this setup:
+
+-   Confirm which packages the application bundles and which ones WordPress supplies.
+-   Test both mixed-version combinations: the new bundle with each supported WordPress version, and older supported bundles with the new WordPress package.
+-   Keep production public APIs compatible. Follow the [backward compatibility policy](/docs/contributors/code/backward-compatibility.md) if a break is unavoidable.
+-   Do not use private APIs in bundled packages. Private APIs can be removed, but first check that supported bundles no longer depend on them.
+-   Test the built package, not only its source. The built result can load dependencies and shared state differently.
+
+See [Testing published packages across WordPress versions](/docs/contributors/code/package-runtime-compatibility.md) for the test matrix and release procedure.
+
 ## Maintaining Changelogs
 
 When maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Unreleased") changes, if any exist.

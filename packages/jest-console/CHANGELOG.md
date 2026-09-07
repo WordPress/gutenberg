@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keep console spies active when Jest restores its own mocks ([#82211](https://github.com/WordPress/gutenberg/pull/82211)).
+
 ### Internal
 
 -   Update Jest matcher and mock dependencies to 30.5.0 ([#82181](https://github.com/WordPress/gutenberg/pull/82181)).

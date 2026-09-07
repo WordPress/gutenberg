@@ -7,5 +7,8 @@
 		{ "path": "../escape-html/tsconfig.build.json" }
 	],
 	// Listed files have pre-existing type errors; include them once fixed.
-	"exclude": [ "**/benchmark", "src/test/create-interpolate-element.tsx" ]
+	"exclude": [
+		"**/benchmark",
+		"src/test/create-interpolate-element.jsdom.test.tsx"
+	]
 }

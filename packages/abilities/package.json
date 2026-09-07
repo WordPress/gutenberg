@@ -52,7 +52,8 @@
 		"ajv-formats": "^3.0.1"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0"
+		"@types/jest": "^30.0.0",
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -1,0 +1,35 @@
+{
+	"name": "@wordpress/pr-meta-tools",
+	"version": "0.0.0",
+	"description": "A GitHub action that maintains a single unified automation comment on a pull request.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"GitHub Actions"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/pr-meta/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/pr-meta"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"type": "module",
+	"main": "src/index.ts",
+	"devDependencies": {
+		"@types/node": "^20.19.39",
+		"vitest": "^4.1.10"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

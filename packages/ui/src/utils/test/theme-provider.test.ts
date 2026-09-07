@@ -1,41 +1,54 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
 const consent =
 	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.';
 
-function loadThemeProvider( themeModule: object, privateApis = {} ) {
-	const unlock = jest.fn( () => privateApis );
-	jest.doMock( '@wordpress/theme', () => themeModule );
-	jest.doMock( '@wordpress/private-apis', () => ( {
-		__dangerousOptInToUnstableAPIsOnlyForCoreModules: jest.fn(
-			( optInConsent, moduleName ) => {
-				expect( optInConsent ).toBe( consent );
-				expect( moduleName ).toBe( '@wordpress/ui' );
+async function loadThemeProvider(
+	themeModule: Partial< typeof import('@wordpress/theme') >,
+	privateApis: object = {}
+) {
+	const unlockSpy = vi.fn();
+	const unlock = < T = unknown >( object: unknown ): T => {
+		unlockSpy( object );
+		return privateApis as T;
+	};
+	vi.doMock(
+		import( '@wordpress/theme' ),
+		() => themeModule as typeof import('@wordpress/theme')
+	);
+	vi.doMock(
+		import( '@wordpress/private-apis' ),
+		async ( importOriginal ) => ( {
+			...( await importOriginal() ),
+			__dangerousOptInToUnstableAPIsOnlyForCoreModules: vi.fn(
+				( optInConsent, moduleName ) => {
+					expect( optInConsent ).toBe( consent );
+					expect( moduleName ).toBe( '@wordpress/ui' );
 
-				return { unlock };
-			}
-		),
-	} ) );
+					return { lock: vi.fn(), unlock };
+				}
+			),
+		} )
+	);
 
-	let ThemeProvider: unknown;
-	jest.isolateModules( () => {
-		( { ThemeProvider } = require( '../theme-provider' ) );
-	} );
+	const { ThemeProvider } = await import( '../theme-provider' );
 
-	return { ThemeProvider, unlock };
+	return { ThemeProvider, unlock: unlockSpy };
 }
 
 describe( 'ThemeProvider compatibility', () => {
 	afterEach( () => {
-		jest.resetModules();
-		jest.dontMock( '@wordpress/theme' );
-		jest.dontMock( '@wordpress/private-apis' );
+		vi.resetModules();
+		vi.doUnmock( import( '@wordpress/theme' ) );
+		vi.doUnmock( import( '@wordpress/private-apis' ) );
 	} );
 
-	it( 'uses the public ThemeProvider when it is available', () => {
-		const PublicThemeProvider = jest.fn();
-		const PrivateThemeProvider = jest.fn();
+	it( 'uses the public ThemeProvider when it is available', async () => {
+		const PublicThemeProvider = vi.fn();
+		const PrivateThemeProvider = vi.fn();
 		const themePrivateApis = {};
 
-		const { ThemeProvider, unlock } = loadThemeProvider( {
+		const { ThemeProvider, unlock } = await loadThemeProvider( {
 			ThemeProvider: PublicThemeProvider,
 			privateApis: themePrivateApis,
 		} );
@@ -45,12 +58,13 @@ describe( 'ThemeProvider compatibility', () => {
 		expect( PrivateThemeProvider ).not.toHaveBeenCalled();
 	} );
 
-	it( 'falls back to privateApis.ThemeProvider for older @wordpress/theme runtimes', () => {
-		const PrivateThemeProvider = jest.fn();
+	it( 'falls back to privateApis.ThemeProvider for older @wordpress/theme runtimes', async () => {
+		const PrivateThemeProvider = vi.fn();
 		const themePrivateApis = {};
 
-		const { ThemeProvider, unlock } = loadThemeProvider(
+		const { ThemeProvider, unlock } = await loadThemeProvider(
 			{
+				ThemeProvider: undefined,
 				privateApis: themePrivateApis,
 			},
 			{

@@ -37,6 +37,7 @@
 		"mkdirp": "^3.0.1",
 		"rimraf": "^5.0.10",
 		"terser-webpack-plugin": "^5.3.10",
+		"vitest": "^4.1.10",
 		"webpack": "^5.108.1"
 	},
 	"peerDependencies": {

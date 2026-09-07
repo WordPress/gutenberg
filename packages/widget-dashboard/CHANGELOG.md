@@ -17,11 +17,41 @@
 -   The Add widget button and command show only while the policy lets some
     registered type be inserted
     ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
+-   `WidgetDashboard.Policy` governs `reset`: the Reset to default entry in
+    the overflow menu, the `core/dashboard/reset-to-default` command, and
+    the confirmation prompt are hidden while the policy denies it
+    ([#82255](https://github.com/WordPress/gutenberg/pull/82255)).
+
+### Enhancements
+
+-   `gridSettings.columns` now sets the wide-container column count (floored,
+    with a floor of one); the responsive steps scale from it.
+    `WIDGET_DASHBOARD_COLUMN_COUNT` is the default when the host sets
+    nothing, and the wp-admin dashboard pins it where it reads its stored
+    settings, so preferences persisted by the removed Columns control stay
+    inert ([#82204](https://github.com/WordPress/gutenberg/pull/82204)).
+-   The staging layer enforces the policy on every instance operation,
+    whichever trigger staged the mutation: a denied `move` holds the
+    instance's index, a denied `resize` keeps its spans, a denied `edit`
+    keeps its attributes, and a new instance of a rejected type is
+    dropped ([#82256](https://github.com/WordPress/gutenberg/pull/82256)).
+
+### Documentation
+
+-   Policy contract: instance operations carry `widgetType` only while
+    the type is registered; a gone plugin or a failed load leaves it
+    absent, so locks keyed on the type do not fire
+    ([#82256](https://github.com/WordPress/gutenberg/pull/82256)).
 
 ### Internal
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+### Bug Fixes
+
+-   Keep the plain anchor for a `download: ''` link action
+    ([#82073](https://github.com/WordPress/gutenberg/pull/82073)).
 
 ## 0.6.0 (2026-08-26)
 

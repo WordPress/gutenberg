@@ -25,7 +25,7 @@
 	display: grid;
 	align-items: center;
 	grid-template-columns: min-content 1fr min-content;
-	grid-gap: $grid-unit-05 $grid-unit-10;
+	gap: $grid-unit-05 $grid-unit-10;
 
 	color: $gray-900;
 
