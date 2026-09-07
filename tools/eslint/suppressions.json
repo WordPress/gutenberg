@@ -180,7 +180,7 @@
 	},
 	"packages/block-editor/src/components/block-allowed-blocks/modal.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -641,9 +641,6 @@
 		}
 	},
 	"packages/block-editor/src/components/block-switcher/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -699,9 +696,6 @@
 		}
 	},
 	"packages/block-editor/src/components/block-toolbar/pattern-overrides-dropdown.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react-hooks/refs": {
 			"count": 1
 		},
@@ -1577,7 +1571,7 @@
 	},
 	"packages/block-editor/src/components/inspector-popover-header/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 5
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1

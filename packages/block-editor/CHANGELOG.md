@@ -13,11 +13,16 @@
 
 ### Internal
 
+-   Pattern Overrides Dropdown: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` ([#77492](https://github.com/WordPress/gutenberg/pull/77492)).
+-   Allowed Blocks Modal: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` ([#78119](https://github.com/WordPress/gutenberg/pull/78119)).
+-   Block Switcher: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` for the bindings hint ([#77366](https://github.com/WordPress/gutenberg/pull/77366)).
+-   Inspector Popover Header: Use `Text` from `@wordpress/ui` instead of `__experimentalHeading` and `__experimentalText` from `@wordpress/components` ([#77449](https://github.com/WordPress/gutenberg/pull/77449)).
 -   Remove unused dependencies `@wordpress/escape-html`, `@wordpress/wordcount` and `deepmerge` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
 
 ### Bug Fixes
 
+-   `ListView`: Drop the block icon's variation colors while the row is selected, so the icon keeps contrast against the selection background ([#82498](https://github.com/WordPress/gutenberg/pull/82498)).
 -   Flex layout: Output `flex-direction: row` when a viewport override switches a vertical layout to horizontal, so the base `flex-direction: column` no longer keeps applying on that viewport ([#82364](https://github.com/WordPress/gutenberg/pull/82364)).
 -   `BlockManager`: Color library block icons with `color` while retaining a `fill` fallback for custom icons that do not use `currentColor`. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   Block List Appender: Show the appender button as a drop target when dragging a block over an empty container such as a Column, restoring the reveal that the `visibility`-to-`opacity` migration left behind ([#77852](https://github.com/WordPress/gutenberg/pull/77852)).

@@ -23,7 +23,7 @@ const env = {
 	LifecycleScriptError: originalEnv.LifecycleScriptError,
 };
 require.cache[ envPath ].exports = env;
-const processExit = vi.spyOn( process, 'exit' ).mockImplementation( () => {} );
+let processExit = vi.spyOn( process, 'exit' ).mockImplementation( () => {} );
 const cli = require( '../cli' );
 afterAll( () => {
 	require.cache[ oraPath ].exports = originalOra;
@@ -33,7 +33,12 @@ afterAll( () => {
 } );
 
 describe( 'env cli', () => {
-	beforeEach( vi.clearAllMocks );
+	beforeEach( () => {
+		processExit = vi
+			.spyOn( process, 'exit' )
+			.mockImplementation( () => {} );
+		vi.clearAllMocks();
+	} );
 
 	it( 'parses start commands.', () => {
 		cli().parse( [ 'start' ] );
