@@ -23,6 +23,7 @@ import {
 	store as blockEditorStore,
 	BlockControls,
 	InnerBlocks,
+	InspectorControls,
 } from '@wordpress/block-editor';
 import {
 	privateApis as patternsPrivateApis,
@@ -31,7 +32,21 @@ import {
 import { getBlockBindingsSource, parse } from '@wordpress/blocks';
 import { unlock } from '../lock-unlock';
 
-const { useLayoutClasses } = unlock( blockEditorPrivateApis );
+const { useLayoutClasses, HTMLElementControl } = unlock(
+	blockEditorPrivateApis
+);
+
+// Elements a pattern instance can render as, so a pattern standing in for a
+// header or footer keeps its landmark. The default is no wrapper at all.
+const TAG_NAME_OPTIONS = [
+	{ label: '<header>', value: 'header' },
+	{ label: '<main>', value: 'main' },
+	{ label: '<section>', value: 'section' },
+	{ label: '<article>', value: 'article' },
+	{ label: '<aside>', value: 'aside' },
+	{ label: '<footer>', value: 'footer' },
+	{ label: '<div>', value: 'div' },
+];
 const EMPTY_ARRAY = [];
 const { isOverridableBlock } = unlock( patternsPrivateApis );
 
@@ -243,7 +258,8 @@ const EMPTY_OBJECT = {};
 
 function ReusableBlockEdit( {
 	name,
-	attributes: { ref, content },
+	clientId,
+	attributes: { ref, content, tagName },
 	__unstableParentLayout: parentLayout,
 	setAttributes,
 	blocks,
@@ -291,6 +307,9 @@ function ReusableBlockEdit( {
 	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
 	const layoutClasses = useLayoutClasses( { layout }, name );
 
+	// In the editor the block always needs a wrapper; on the front end one is
+	// only rendered when `tagName` is set.
+	const TagName = tagName || 'div';
 	const blockProps = useBlockProps( {
 		className: clsx(
 			'block-library-block__reusable-block-container',
@@ -361,10 +380,24 @@ function ReusableBlockEdit( {
 				/>
 			) }
 
+			<InspectorControls group="advanced">
+				<HTMLElementControl
+					tagName={ tagName || '' }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value || undefined } )
+					}
+					clientId={ clientId }
+					options={ [
+						{ label: __( 'Default (no wrapper)' ), value: '' },
+						...TAG_NAME_OPTIONS,
+					] }
+				/>
+			</InspectorControls>
+
 			{ children === null ? (
-				<div { ...innerBlocksProps } />
+				<TagName { ...innerBlocksProps } />
 			) : (
-				<div { ...blockProps }>{ children }</div>
+				<TagName { ...blockProps }>{ children }</TagName>
 			) }
 		</>
 	);

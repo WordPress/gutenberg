@@ -14,7 +14,8 @@
  *
  * @param array    $attributes     The block attributes. Either `ref`, the ID of a
  *                                 `wp_block` post, or `slug`, the name of a
- *                                 registered pattern.
+ *                                 registered pattern. `tagName` optionally wraps
+ *                                 the output in an element.
  * @param string   $content        The block content.
  * @param WP_Block $block_instance The block instance.
  *
@@ -120,6 +121,13 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 
 	$content = $block_instance->render( array( 'dynamic' => false ) );
 	unset( $seen_refs[ $seen_key ] );
+
+	// Wrap the output when the instance asks for an element, so a pattern
+	// standing in for a header or footer keeps its landmark.
+	$tag_name = $attributes['tagName'] ?? '';
+	if ( in_array( $tag_name, array( 'header', 'main', 'section', 'article', 'aside', 'footer', 'div' ), true ) ) {
+		$content = "<$tag_name " . get_block_wrapper_attributes() . '>' . $content . "</$tag_name>";
+	}
 
 	return $content;
 }

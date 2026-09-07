@@ -19,6 +19,7 @@ import {
 import { ListViewContentFill } from './list-view-content-popover';
 
 const PATTERN_EDITING_GROUPS = [ 'content', 'list' ];
+const ANY_GROUP_BLOCKS = [ 'core/template-part', 'core/block' ];
 
 export default function InspectorControlsFill( {
 	children,
@@ -51,14 +52,17 @@ export default function InspectorControlsFill( {
 
 	// During pattern editing:
 	// - All blocks can show pattern editing groups (content, list).
-	// - Template parts can show any inspector group.
+	// - Template parts and pattern instances can show any inspector group.
 	// - Other blocks cannot show a settings tab.
 	if ( isPatternEditing ) {
 		// Template parts have also historically supported
 		// any block inspector groups for extenders. The settings
 		// tab is also used by core for the 'Design' panel. Specifically
 		// for that block the restrictions on allowed groups are lessened.
-		const isTemplatePart = context.name === 'core/template-part';
+		// Pattern instances (`core/block`) get the same treatment: they
+		// stand in for template parts and carry their own settings, such
+		// as the wrapper element.
+		const isTemplatePart = ANY_GROUP_BLOCKS.includes( context.name );
 		const isPatternEditingGroup = PATTERN_EDITING_GROUPS.includes( group );
 		const canShowGroup = isTemplatePart || isPatternEditingGroup;
 
