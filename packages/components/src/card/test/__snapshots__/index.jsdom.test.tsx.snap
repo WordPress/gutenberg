@@ -371,7 +371,7 @@ exports[`Card Card component should render correctly 1`] = `
     </div>
     <div
       aria-hidden="true"
-      class="style-elevation style-border-radius-inherit components-elevation"
+      class="style-elevation style-has-shadow style-border-radius-inherit components-elevation"
       data-wp-c16t="true"
       data-wp-component="Elevation"
       style="--wp-components-elevation-offset: 0px; --wp-components-elevation-shadow: 0 0px 0px 0
@@ -379,7 +379,7 @@ exports[`Card Card component should render correctly 1`] = `
     />
     <div
       aria-hidden="true"
-      class="style-elevation style-border-radius-inherit components-elevation"
+      class="style-elevation style-has-shadow style-border-radius-inherit components-elevation"
       data-wp-c16t="true"
       data-wp-component="Elevation"
       style="--wp-components-elevation-offset: 0px; --wp-components-elevation-shadow: 0 0px 0px 0
@@ -397,7 +397,7 @@ Snapshot Diff:
 @@ -12,18 +12,18 @@
       <div
         aria-hidden="true"
-        class="style-elevation style-border-radius-inherit components-elevation"
+        class="style-elevation style-has-shadow style-border-radius-inherit components-elevation"
         data-wp-c16t="true"
         data-wp-component="Elevation"
 -       style="--wp-components-elevation-offset: 0px; --wp-components-elevation-shadow: 0 1px 2px 0
@@ -407,7 +407,7 @@ Snapshot Diff:
       />
       <div
         aria-hidden="true"
-        class="style-elevation style-border-radius-inherit components-elevation"
+        class="style-elevation style-has-shadow style-border-radius-inherit components-elevation"
         data-wp-c16t="true"
         data-wp-component="Elevation"
 -       style="--wp-components-elevation-offset: 0px; --wp-components-elevation-shadow: 0 2px 4px 0
@@ -448,7 +448,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
     </div>
     <div
       aria-hidden="true"
-      class="style-elevation style-border-radius-inherit components-elevation"
+      class="style-elevation style-has-shadow style-border-radius-inherit components-elevation"
       data-wp-c16t="true"
       data-wp-component="Elevation"
       style="--wp-components-elevation-offset: 0px; --wp-components-elevation-shadow: 0 1px 2px 0
@@ -456,7 +456,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
     />
     <div
       aria-hidden="true"
-      class="style-elevation style-border-radius-inherit components-elevation"
+      class="style-elevation style-has-shadow style-border-radius-inherit components-elevation"
       data-wp-c16t="true"
       data-wp-component="Elevation"
       style="--wp-components-elevation-offset: 0px; --wp-components-elevation-shadow: 0 2px 4px 0

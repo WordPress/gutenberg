@@ -59,7 +59,9 @@ export function useElevation(
 			? undefined
 			: radiusValue,
 		'--wp-components-elevation-offset': `${ offset }px`,
-		'--wp-components-elevation-shadow': getBoxShadow( value ),
+		'--wp-components-elevation-shadow': hasValidShadow( value )
+			? getBoxShadow( value )
+			: undefined,
 		'--wp-components-elevation-hover-shadow': hasValidShadow( hoverValue )
 			? getBoxShadow( hoverValue )
 			: undefined,
@@ -77,6 +79,7 @@ export function useElevation(
 		className: clsx(
 			styles.elevation,
 			{
+				[ styles[ 'has-shadow' ] ]: hasValidShadow( value ),
 				[ styles[ 'has-hover' ] ]: hasValidShadow( hoverValue ),
 				[ styles[ 'has-focus' ] ]: hasValidShadow( focus ),
 				[ styles[ 'has-active' ] ]: hasValidShadow( activeValue ),

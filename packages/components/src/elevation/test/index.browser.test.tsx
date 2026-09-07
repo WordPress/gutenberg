@@ -71,3 +71,49 @@ test.each( [
 		await userEvent.keyboard( '[/Space]' );
 	}
 );
+
+function ConsumerShadow( { value }: { value: number } ) {
+	return (
+		<>
+			<style>{ `@layer elevation-consumer {
+				.elevation-consumer-shadow { box-shadow: 0 0 0 3px green; }
+			}` }</style>
+			<Elevation
+				value={ value }
+				className="elevation-consumer-shadow"
+				data-testid="elevation"
+			/>
+		</>
+	);
+}
+
+test.each( [
+	{ name: 'negative', value: -1 },
+	{ name: 'NaN', value: NaN },
+	{ name: 'infinite', value: Infinity },
+] )(
+	'preserves a consumer shadow when the base value is $name',
+	( { value } ) => {
+		render( <ConsumerShadow value={ value } /> );
+
+		expect(
+			getComputedStyle( page.getByTestId( 'elevation' ).element() )
+				.boxShadow
+		).toBe( 'rgb(0, 128, 0) 0px 0px 0px 3px' );
+	}
+);
+
+test.each( [
+	{ value: 0, shadow: 'rgba(0, 0, 0, 0) 0px 0px 0px 0px' },
+	{ value: 5, shadow: 'rgba(0, 0, 0, 0.25) 0px 5px 10px 0px' },
+] )(
+	'applies the base shadow above a consumer layer for value $value',
+	( { value, shadow } ) => {
+		render( <ConsumerShadow value={ value } /> );
+
+		expect(
+			getComputedStyle( page.getByTestId( 'elevation' ).element() )
+				.boxShadow
+		).toBe( shadow );
+	}
+);

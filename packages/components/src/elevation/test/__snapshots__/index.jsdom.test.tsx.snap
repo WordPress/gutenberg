@@ -3,7 +3,7 @@
 exports[`props should render active 1`] = `
 <div
   aria-hidden="true"
-  class="style-elevation style-has-hover style-has-active style-border-radius-inherit components-elevation"
+  class="style-elevation style-has-shadow style-has-hover style-has-active style-border-radius-inherit components-elevation"
   data-testid="elevation"
   data-wp-c16t="true"
   data-wp-component="Elevation"
@@ -17,7 +17,7 @@ exports[`props should render active 1`] = `
 exports[`props should render correctly 1`] = `
 <div
   aria-hidden="true"
-  class="style-elevation style-border-radius-inherit components-elevation"
+  class="style-elevation style-has-shadow style-border-radius-inherit components-elevation"
   data-testid="elevation"
   data-wp-c16t="true"
   data-wp-component="Elevation"
@@ -29,7 +29,7 @@ exports[`props should render correctly 1`] = `
 exports[`props should render hover 1`] = `
 <div
   aria-hidden="true"
-  class="style-elevation style-has-hover style-border-radius-inherit components-elevation"
+  class="style-elevation style-has-shadow style-has-hover style-border-radius-inherit components-elevation"
   data-testid="elevation"
   data-wp-c16t="true"
   data-wp-component="Elevation"
@@ -42,7 +42,7 @@ exports[`props should render hover 1`] = `
 exports[`props should render isInteractive 1`] = `
 <div
   aria-hidden="true"
-  class="style-elevation style-has-hover style-has-active style-border-radius-inherit components-elevation"
+  class="style-elevation style-has-shadow style-has-hover style-has-active style-border-radius-inherit components-elevation"
   data-testid="elevation"
   data-wp-c16t="true"
   data-wp-component="Elevation"
@@ -56,7 +56,7 @@ exports[`props should render isInteractive 1`] = `
 exports[`props should render offset 1`] = `
 <div
   aria-hidden="true"
-  class="style-elevation style-has-hover style-has-active style-border-radius-inherit components-elevation"
+  class="style-elevation style-has-shadow style-has-hover style-has-active style-border-radius-inherit components-elevation"
   data-testid="elevation"
   data-wp-c16t="true"
   data-wp-component="Elevation"
@@ -70,7 +70,7 @@ exports[`props should render offset 1`] = `
 exports[`props should render value 1`] = `
 <div
   aria-hidden="true"
-  class="style-elevation style-border-radius-inherit components-elevation"
+  class="style-elevation style-has-shadow style-border-radius-inherit components-elevation"
   data-testid="elevation"
   data-wp-c16t="true"
   data-wp-component="Elevation"
