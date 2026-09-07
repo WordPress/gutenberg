@@ -1,33 +1,34 @@
 import { renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import useColorPaletteEditing from '../use-color-palette-editor';
-const { useGlobalStyles } = require( '../hooks' );
+import { useGlobalStyles } from '../hooks';
 
-jest.mock( '@wordpress/data', () => ( {
-	useSelect: jest.fn(),
-	useDispatch: jest.fn(),
-	useRegistry: jest.fn(),
+vi.mock( '@wordpress/data', () => ( {
+	useSelect: vi.fn(),
+	useDispatch: vi.fn(),
+	useRegistry: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/notices', () => ( {
+vi.mock( '@wordpress/notices', () => ( {
 	store: 'core/notices',
 } ) );
 
-jest.mock( '@wordpress/core-data', () => ( {
+vi.mock( '@wordpress/core-data', () => ( {
 	store: 'core',
 } ) );
 
-jest.mock( '../hooks', () => ( {
-	useGlobalStyles: jest.fn(),
+vi.mock( '../hooks', () => ( {
+	useGlobalStyles: vi.fn(),
 } ) );
 
-const mockCreateSuccessNotice = jest.fn();
-const mockCreateErrorNotice = jest.fn();
-const mockCanUser = jest.fn();
+const mockCreateSuccessNotice = vi.fn();
+const mockCreateErrorNotice = vi.fn();
+const mockCanUser = vi.fn();
 
 describe( 'useColorPaletteEditing', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 
 		useGlobalStyles.mockReturnValue( {
 			merged: {
@@ -39,7 +40,7 @@ describe( 'useColorPaletteEditing', () => {
 					},
 				},
 			},
-			setUser: jest.fn(),
+			setUser: vi.fn(),
 			isReady: true,
 		} );
 
@@ -51,14 +52,14 @@ describe( 'useColorPaletteEditing', () => {
 		useRegistry.mockReturnValue( {
 			select: () => ( {
 				canUser: mockCanUser,
-				getEditedEntityRecord: jest.fn(),
-				getEntityRecord: jest.fn(),
-				__experimentalGetCurrentThemeBaseGlobalStyles: jest.fn(
+				getEditedEntityRecord: vi.fn(),
+				getEntityRecord: vi.fn(),
+				__experimentalGetCurrentThemeBaseGlobalStyles: vi.fn(
 					() => ( {} )
 				),
 			} ),
 			dispatch: () => ( {
-				saveEntityRecord: jest.fn(),
+				saveEntityRecord: vi.fn(),
 			} ),
 		} );
 

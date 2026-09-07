@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getCanManage } from '../use-color-palette-editor';
 
 describe( 'getCanManage', () => {
