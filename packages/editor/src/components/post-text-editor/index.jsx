@@ -3,7 +3,6 @@ import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
-import { TextareaControl } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import { adjustPosition, getDiff } from './utils';
@@ -71,8 +70,9 @@ export default function PostTextEditor() {
 		};
 	}, [ value ] );
 
-	const updateSelection = ( textarea ) => {
-		const { selectionStart, selectionEnd, selectionDirection } = textarea;
+	const updateSelection = ( event ) => {
+		const { selectionStart, selectionEnd, selectionDirection } =
+			event.target;
 		selectionRef.current = {
 			selectionStart,
 			selectionEnd,
@@ -88,27 +88,25 @@ export default function PostTextEditor() {
 			>
 				{ __( 'Type text or HTML' ) }
 			</VisuallyHidden>
-			<TextareaControl
+			<textarea
 				autoComplete="off"
 				dir="auto"
 				ref={ textareaRef }
 				value={ value }
-				onChange={ ( newContent ) => {
-					if ( textareaRef.current ) {
-						updateSelection( textareaRef.current );
-					}
-					previousValueRef.current = newContent;
+				onChange={ ( event ) => {
+					updateSelection( event );
+					previousValueRef.current = event.target.value;
 					editEntityRecord( 'postType', type, id, {
-						content: newContent,
+						content: event.target.value,
 						blocks: undefined,
 						selection: undefined,
 					} );
 				} }
-				onFocus={ ( event ) => updateSelection( event.target ) }
+				onFocus={ updateSelection }
 				// A click or arrow-key caret move does not fire `select` (only
 				// range selections do), so track those moves via mouseup/keyup.
-				onMouseUp={ ( event ) => updateSelection( event.target ) }
-				onKeyUp={ ( event ) => updateSelection( event.target ) }
+				onMouseUp={ updateSelection }
+				onKeyUp={ updateSelection }
 				className="editor-post-text-editor"
 				id={ `post-content-${ instanceId }` }
 				placeholder={ __( 'Start writing with text or HTML' ) }

@@ -16,7 +16,7 @@ You can also pass any extra prop to the textarea rendered by this component.
 
 ### `ref: Object`
 
-_Optional._ The component forwards the `ref` property to the `TextareaAutosize` component.
+_Optional._ The component forwards the `ref` property to the `textarea` element.
 
 ## Example
 

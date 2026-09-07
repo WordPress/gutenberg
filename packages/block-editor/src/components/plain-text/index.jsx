@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import { TextareaControl } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import EditableText from '../editable-text';
 
@@ -37,7 +36,7 @@ import EditableText from '../editable-text';
  * @param {Object}   props          Component props.
  * @param {string}   props.value    String value of the textarea.
  * @param {Function} props.onChange Function called when the text value changes.
- * @param {Object}   [props.ref]    The component forwards the `ref` property to the `TextareaAutosize` component.
+ * @param {Object}   [props.ref]    The component forwards the `ref` property to the `textarea` element.
  * @return {Element} Plain text component
  */
 const PlainText = forwardRef( ( { __experimentalVersion, ...props }, ref ) => {
@@ -45,12 +44,13 @@ const PlainText = forwardRef( ( { __experimentalVersion, ...props }, ref ) => {
 		return <EditableText ref={ ref } { ...props } />;
 	}
 
-	const { className, ...remainingProps } = props;
+	const { className, onChange, ...remainingProps } = props;
 
 	return (
-		<TextareaControl
+		<textarea
 			ref={ ref }
 			className={ clsx( 'block-editor-plain-text', className ) }
+			onChange={ ( event ) => onChange( event.target.value ) }
 			{ ...remainingProps }
 		/>
 	);

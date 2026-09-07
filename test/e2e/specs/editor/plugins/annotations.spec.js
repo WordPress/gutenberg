@@ -51,9 +51,7 @@ test.describe( 'Annotations', () => {
 
 		// There should be no <mark> tags in the raw content.
 		await expect(
-			block.locator(
-				'.block-editor-block-list__block-html-textarea textarea'
-			)
+			block.locator( '.block-editor-block-list__block-html-textarea' )
 		).toHaveValue( '<p>Paragraph to annotate</p>' );
 	} );
 
