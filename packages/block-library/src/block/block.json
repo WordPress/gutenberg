@@ -17,6 +17,9 @@
 		"tagName": {
 			"type": "string"
 		},
+		"area": {
+			"type": "string"
+		},
 		"content": {
 			"type": "object",
 			"default": {}

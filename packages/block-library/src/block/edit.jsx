@@ -1,18 +1,22 @@
 import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRef, useMemo } from '@wordpress/element';
+import { useRef, useMemo, useState } from '@wordpress/element';
 import {
 	useEntityRecord,
 	store as coreStore,
 	useEntityBlockEditor,
 } from '@wordpress/core-data';
 import {
+	MenuItem,
+	Modal,
 	Placeholder,
+	SelectControl,
 	Spinner,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import {
 	useInnerBlocksProps,
 	RecursionProvider,
@@ -22,8 +26,10 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 	BlockControls,
+	BlockSettingsMenuControls,
 	InnerBlocks,
 	InspectorControls,
+	__experimentalBlockPatternsList as BlockPatternsList,
 } from '@wordpress/block-editor';
 import {
 	privateApis as patternsPrivateApis,
@@ -47,6 +53,89 @@ const TAG_NAME_OPTIONS = [
 	{ label: '<footer>', value: 'footer' },
 	{ label: '<div>', value: 'div' },
 ];
+
+/**
+ * Returns the theme's definition of a template part area: its label, icon
+ * and default element.
+ *
+ * @param {string|undefined} area Area name.
+ * @return {{label: string, tagName: string|undefined, areas: Object[]}} The area definition and all areas.
+ */
+function useAreaDefinition( area ) {
+	return useSelect(
+		( select ) => {
+			const areas =
+				select( coreStore ).getCurrentTheme()
+					?.default_template_part_areas || [];
+			const definition = areas.find(
+				( { area: _area } ) => _area === area
+			);
+			return {
+				areas,
+				label: definition?.label,
+				tagName: definition?.area_tag,
+			};
+		},
+		[ area ]
+	);
+}
+
+/**
+ * Registered patterns sharing an area with the instance, to replace it with.
+ *
+ * @param {string|undefined} area     Area name.
+ * @param {string|undefined} slug     The instance's pattern name, excluded.
+ * @param {string}           clientId Block client id.
+ * @return {Object[]} Parsed patterns.
+ */
+function useAlternativePatterns( area, slug, clientId ) {
+	return useSelect(
+		( select ) => {
+			if ( ! area ) {
+				return EMPTY_ARRAY;
+			}
+			const { __experimentalGetAllowedPatterns, getBlockRootClientId } =
+				select( blockEditorStore );
+			return __experimentalGetAllowedPatterns(
+				getBlockRootClientId( clientId )
+			).filter(
+				( pattern ) =>
+					pattern.area === area &&
+					pattern.name !== slug &&
+					! pattern.name.startsWith( 'core/block/' )
+			);
+		},
+		[ area, slug, clientId ]
+	);
+}
+
+function ReplaceModal( {
+	area,
+	areaLabel,
+	slug,
+	clientId,
+	onSelect,
+	onClose,
+} ) {
+	const patterns = useAlternativePatterns( area, slug, clientId );
+	return (
+		<Modal
+			overlayClassName="block-editor-template-part__selection-modal"
+			title={ sprintf(
+				// Translators: %s as area title ("Header", "Footer", etc.).
+				__( 'Choose a %s' ),
+				( areaLabel || area ).toLowerCase()
+			) }
+			onRequestClose={ onClose }
+			isFullScreen
+		>
+			<BlockPatternsList
+				blockPatterns={ patterns }
+				onClickPattern={ onSelect }
+			/>
+		</Modal>
+	);
+}
 const EMPTY_ARRAY = [];
 const { isOverridableBlock } = unlock( patternsPrivateApis );
 
@@ -199,13 +288,20 @@ function RegisteredPatternEdit( props ) {
 		[ content ]
 	);
 
-	if ( customization ) {
-		return <UserPatternEdit { ...props } recordId={ customization.id } />;
+	if ( override ) {
+		return (
+			<UserPatternEdit
+				{ ...props }
+				recordId={ override.id }
+				pattern={ pattern }
+			/>
+		);
 	}
 
 	return (
 		<ReusableBlockEdit
 			{ ...props }
+			pattern={ pattern }
 			blocks={ blocks }
 			hasResolved={ hasResolved }
 			isMissing={ hasResolved && ! pattern }
@@ -259,7 +355,7 @@ const EMPTY_OBJECT = {};
 function ReusableBlockEdit( {
 	name,
 	clientId,
-	attributes: { ref, content, tagName },
+	attributes: { ref, slug, content, tagName, area: areaAttribute },
 	__unstableParentLayout: parentLayout,
 	setAttributes,
 	blocks,
@@ -267,7 +363,18 @@ function ReusableBlockEdit( {
 	isMissing,
 	canUserEdit,
 	onEditOriginal,
+	pattern,
 } ) {
+	// The instance's own area wins, else the referenced pattern's.
+	const area = areaAttribute || pattern?.area;
+	const {
+		areas,
+		label: areaLabel,
+		tagName: areaTagName,
+	} = useAreaDefinition( area );
+	const alternatives = useAlternativePatterns( area, slug, clientId );
+	const [ isReplaceOpen, setIsReplaceOpen ] = useState( false );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -308,8 +415,8 @@ function ReusableBlockEdit( {
 	const layoutClasses = useLayoutClasses( { layout }, name );
 
 	// In the editor the block always needs a wrapper; on the front end one is
-	// only rendered when `tagName` is set.
-	const TagName = tagName || 'div';
+	// only rendered when `tagName` is set or the area defines an element.
+	const TagName = tagName || ( area && areaTagName ) || 'div';
 	const blockProps = useBlockProps( {
 		className: clsx(
 			'block-library-block__reusable-block-container',
@@ -380,7 +487,71 @@ function ReusableBlockEdit( {
 				/>
 			) }
 
+			{ !! alternatives.length && (
+				<BlockSettingsMenuControls>
+					<MenuItem
+						onClick={ () => setIsReplaceOpen( true ) }
+						aria-expanded={ isReplaceOpen }
+						aria-haspopup="dialog"
+					>
+						{ __( 'Replace' ) }
+					</MenuItem>
+				</BlockSettingsMenuControls>
+			) }
+			{ isReplaceOpen && (
+				<ReplaceModal
+					area={ area }
+					areaLabel={ areaLabel }
+					slug={ slug }
+					clientId={ clientId }
+					onClose={ () => setIsReplaceOpen( false ) }
+					onSelect={ ( replacement ) => {
+						// Keep the instance's own settings; overrides belong
+						// to the previous pattern's blocks.
+						setAttributes( {
+							slug: replacement.name,
+							ref: undefined,
+							content: undefined,
+						} );
+						setIsReplaceOpen( false );
+						createSuccessNotice(
+							sprintf(
+								/* translators: %s: pattern title. */
+								__( 'Pattern "%s" inserted.' ),
+								replacement.title
+							),
+							{ type: 'snackbar' }
+						);
+					} }
+				/>
+			) }
+
 			<InspectorControls group="advanced">
+				<SelectControl
+					label={ __( 'Area' ) }
+					help={
+						pattern?.area && ! areaAttribute
+							? __( 'Set by the registered pattern.' )
+							: undefined
+					}
+					value={ area || '' }
+					options={ [
+						{ label: __( 'None' ), value: '' },
+						...areas
+							.filter(
+								( { area: _area } ) =>
+									_area !== 'uncategorized' &&
+									_area !== 'navigation-overlay'
+							)
+							.map( ( { label, area: _area } ) => ( {
+								label,
+								value: _area,
+							} ) ),
+					] }
+					onChange={ ( value ) =>
+						setAttributes( { area: value || undefined } )
+					}
+				/>
 				<HTMLElementControl
 					tagName={ tagName || '' }
 					onChange={ ( value ) =>
@@ -388,7 +559,17 @@ function ReusableBlockEdit( {
 					}
 					clientId={ clientId }
 					options={ [
-						{ label: __( 'Default (no wrapper)' ), value: '' },
+						{
+							label:
+								area && areaTagName
+									? sprintf(
+											/* translators: %s: HTML tag based on area. */
+											__( 'Default based on area (%s)' ),
+											`<${ areaTagName }>`
+									  )
+									: __( 'Default (no wrapper)' ),
+							value: '',
+						},
 						...TAG_NAME_OPTIONS,
 					] }
 				/>

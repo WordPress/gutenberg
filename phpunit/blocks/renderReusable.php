@@ -56,6 +56,14 @@ class Test_Blocks_RenderReusable extends WP_UnitTestCase {
 			)
 		);
 		register_block_pattern(
+			'test/header',
+			array(
+				'title'   => 'Header',
+				'area'    => 'header',
+				'content' => '<!-- wp:paragraph --><p>Site header</p><!-- /wp:paragraph -->',
+			)
+		);
+		register_block_pattern(
 			'test/nested',
 			array(
 				'title'   => 'Nested',
@@ -66,6 +74,7 @@ class Test_Blocks_RenderReusable extends WP_UnitTestCase {
 
 	public function tear_down() {
 		unregister_block_pattern( 'test/greeting' );
+		unregister_block_pattern( 'test/header' );
 		unregister_block_pattern( 'test/nested' );
 		parent::tear_down();
 	}
@@ -130,6 +139,28 @@ class Test_Blocks_RenderReusable extends WP_UnitTestCase {
 		$this->assertSame(
 			'<p class="wp-block-paragraph">Hello from a registered pattern!</p>',
 			do_blocks( '<!-- wp:block {"slug":"test/greeting","tagName":"script"} /-->' )
+		);
+	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_block
+	 * @covers ::gutenberg_block_core_block_get_area
+	 */
+	public function test_render_wraps_output_in_area_element() {
+		// The registered area provides the default element.
+		$this->assertSame(
+			'<header class="wp-block-block"><p class="wp-block-paragraph">Site header</p></header>',
+			do_blocks( '<!-- wp:block {"slug":"test/header"} /-->' )
+		);
+		// The instance's tagName wins over the area.
+		$this->assertSame(
+			'<div class="wp-block-block"><p class="wp-block-paragraph">Site header</p></div>',
+			do_blocks( '<!-- wp:block {"slug":"test/header","tagName":"div"} /-->' )
+		);
+		// The instance's area applies to a pattern registered without one.
+		$this->assertSame(
+			'<footer class="wp-block-block"><p class="wp-block-paragraph">Hello from a registered pattern!</p></footer>',
+			do_blocks( '<!-- wp:block {"slug":"test/greeting","area":"footer"} /-->' )
 		);
 	}
 
