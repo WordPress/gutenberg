@@ -170,7 +170,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @since 6.1.0
 		 *
-		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
+		 * @param WP_Theme_JSON_Data_Gutenberg $instance Class to access and update the underlying data.
 		 */
 		$theme_json   = apply_filters( 'wp_theme_json_data_default', new WP_Theme_JSON_Data_Gutenberg( $config, 'default' ) );
 		static::$core = $theme_json->get_theme_json();
@@ -276,7 +276,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			 *
 			 * @since 6.1.0
 			 *
-			 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
+			 * @param WP_Theme_JSON_Data_Gutenberg $instance Class to access and update the underlying data.
 			 */
 			$theme_json    = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
 			static::$theme = $theme_json->get_theme_json();
@@ -411,7 +411,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @since 6.1.0
 		 *
-		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
+		 * @param WP_Theme_JSON_Data_Gutenberg $instance Class to access and update the underlying data.
 		 */
 		$theme_json     = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'blocks' ) );
 		static::$blocks = $theme_json->get_theme_json();
@@ -536,7 +536,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				 *
 				 * @since 6.1.0
 				 *
-				 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
+				 * @param WP_Theme_JSON_Data_Gutenberg $instance Class to access and update the underlying data.
 				 */
 				$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
 
