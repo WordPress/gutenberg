@@ -141,6 +141,16 @@ export default ( props ) => ( element ) => {
 		const { start, end, text } = createRecord();
 		const oldRecord = record.current;
 
+		// An empty field has a single caret position, but browsers may
+		// resolve a caret after the padding character or on the placeholder
+		// element. The caret is then invisible, or the iOS keyboard sees a
+		// character before it and does not capitalize. Apply the record's
+		// position right away: this runs in the task that placed the caret
+		// (see the focus handler), which is what the keyboard requires.
+		if ( text.length === 0 ) {
+			applyRecord( { ...oldRecord, start, end } );
+		}
+
 		selectionSnapshot = {
 			anchorNode: selection.anchorNode,
 			anchorOffset: selection.anchorOffset,
@@ -155,16 +165,6 @@ export default ( props ) => ( element ) => {
 		if ( text !== oldRecord.text ) {
 			onInput();
 			return;
-		}
-
-		// An empty field has a single caret position, but browsers may
-		// resolve a caret after the padding character or on the placeholder
-		// element. The caret is then invisible, or the iOS keyboard sees a
-		// character before it and does not capitalize. Apply the record's
-		// position right away: this runs in the task that placed the caret
-		// (see the focus handler), which is what the keyboard requires.
-		if ( text.length === 0 ) {
-			applyRecord( { ...oldRecord, start, end } );
 		}
 
 		if ( start === oldRecord.start && end === oldRecord.end ) {
