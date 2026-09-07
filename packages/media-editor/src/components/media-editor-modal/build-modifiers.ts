@@ -1,4 +1,5 @@
 import type { CropperState, Size } from '../../image-editor';
+import { getCropPixelRect } from '../../image-editor/core/crop-geometry';
 import { getRotatedBBox } from '../../image-editor/core/camera';
 
 /**
@@ -85,7 +86,7 @@ export function buildModifiers(
 		return modifiers;
 	}
 
-	const { cropRect, pan, zoom, flip } = state;
+	const { flip } = state;
 	const hasFlipH = flip.horizontal;
 	const hasFlipV = flip.vertical;
 
@@ -120,12 +121,12 @@ export function buildModifiers(
 	// Stencil rect in snap-AABB pixels. Inverts `createExportCamera`'s
 	// pan/zoom composition to recover the pixel rectangle the stencil
 	// framed in that frame.
-	const imgLeft = 0.5 + pan.x - zoom / 2;
-	const imgTop = 0.5 + pan.y - zoom / 2;
-	const snapX = ( ( cropRect.x - imgLeft ) / zoom ) * snapW;
-	const snapY = ( ( cropRect.y - imgTop ) / zoom ) * snapH;
-	const widthPx = ( cropRect.width / zoom ) * snapW;
-	const heightPx = ( cropRect.height / zoom ) * snapH;
+	const {
+		left: snapX,
+		top: snapY,
+		width: widthPx,
+		height: heightPx,
+	} = getCropPixelRect( state, imageSize );
 
 	// Translate to the full AABB (both centered on source).
 	const offsetX = ( fullW - snapW ) / 2;

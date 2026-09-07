@@ -57,6 +57,7 @@ $handle-touch-target-size: 44px;
 	&__stencil {
 		position: absolute;
 		pointer-events: none;
+		transition: opacity 0.15s ease;
 	}
 
 	&__dimming {
@@ -135,6 +136,23 @@ $handle-touch-target-size: 44px;
 		box-sizing: border-box;
 		pointer-events: none;
 		transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	// Matches `__stencil-rect` deliberately. While a preview is active the
+	// real stencil is hidden so the preview rect stands in for it visually,
+	// reading as "the crop moved" rather than "a separate preview UI".
+	// No geometry transition: the dimming and grid update instantly when
+	// `cropRect` changes, so transitioning the rect alone makes the border
+	// visibly catch up to the rest of the framing.
+	&__preview-rect {
+		position: absolute;
+		border: 1px solid rgba(255, 255, 255, 0.7);
+		box-sizing: border-box;
+		pointer-events: none;
+	}
+
+	&__canvas--previewing &__stencil {
+		opacity: 0;
 	}
 
 	// Blue border on the crop rectangle when the canvas has keyboard focus.
