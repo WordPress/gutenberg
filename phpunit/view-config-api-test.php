@@ -89,8 +89,8 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 
 	/**
 	 * The `status` and `discussion` groups of the default post type form declare
-	 * their panel summary explicitly, and the `excerpt` field keeps its edit
-	 * trigger visible at rest, for built-in and custom post types alike.
+	 * their panel summary explicitly, and the `excerpt` field shows its
+	 * placeholder when empty, for built-in and custom post types alike.
 	 *
 	 * @dataProvider data_default_form_post_types
 	 *
@@ -120,12 +120,12 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		$excerpt = $this->get_form_field( $config, 'excerpt' );
 		$this->assertSame(
 			array(
-				'type'           => 'panel',
-				'labelPosition'  => 'top',
-				'editVisibility' => 'always',
+				'type'          => 'panel',
+				'labelPosition' => 'top',
+				'empty'         => 'placeholder',
 			),
 			$excerpt['layout'],
-			'The `excerpt` edit trigger is always visible.'
+			'The `excerpt` summary shows its placeholder when empty.'
 		);
 
 		if ( 'page' !== $post_type && 'post' !== $post_type ) {
@@ -170,6 +170,42 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 			'wp_block'         => array( 'wp_block' ),
 			'wp_template'      => array( 'wp_template' ),
 			'wp_template_part' => array( 'wp_template_part' ),
+		);
+	}
+
+	/**
+	 * The description fields of the post types with their own form show their
+	 * placeholder when empty: `excerpt` for `wp_block` and `description` for
+	 * `wp_template`.
+	 *
+	 * @dataProvider data_own_form_description_fields
+	 *
+	 * @param string $post_type The post type.
+	 * @param string $field_id  The form field id.
+	 */
+	public function test_own_form_description_shows_placeholder_when_empty( $post_type, $field_id ) {
+		$config = gutenberg_get_entity_view_config( 'postType', $post_type );
+		$field  = $this->get_form_field( $config, $field_id );
+
+		$this->assertSame(
+			array(
+				'type'          => 'panel',
+				'labelPosition' => 'top',
+				'empty'         => 'placeholder',
+			),
+			$field['layout']
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_own_form_description_fields() {
+		return array(
+			'wp_block'    => array( 'wp_block', 'excerpt' ),
+			'wp_template' => array( 'wp_template', 'description' ),
 		);
 	}
 

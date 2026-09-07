@@ -25,10 +25,9 @@ function _gutenberg_add_reading_settings_to_wp_template_view_config( $data ) {
 					array(
 						'id'     => 'description',
 						'layout' => array(
-							'type'           => 'panel',
-							'labelPosition'  => 'top',
-							// An empty description renders nothing, so the trigger is the only cue to edit.
-							'editVisibility' => 'always',
+							'type'          => 'panel',
+							'labelPosition' => 'top',
+							'empty'         => 'placeholder',
 						),
 					),
 					array(
@@ -154,16 +153,16 @@ function _gutenberg_add_group_summaries_to_default_posttype_form( $data ) {
 }
 
 /**
- * Keeps the edit trigger of the `excerpt` field visible at rest.
+ * Shows the placeholder of the `excerpt` field in its panel summary when the
+ * excerpt is empty.
  *
- * An empty excerpt renders nothing in the panel summary, so the trigger is the
- * only cue that the field can be edited. The patch merges into the existing
- * member by id, leaving the rest of its layout untouched.
+ * The patch merges into the existing member by id, leaving the rest of its
+ * layout untouched.
  *
  * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
  * @return Gutenberg_View_Config_Data The updated view configuration container.
  */
-function _gutenberg_always_show_excerpt_edit_trigger( $data ) {
+function _gutenberg_show_excerpt_placeholder_when_empty( $data ) {
 	return $data->merge(
 		array(
 			'form' => array(
@@ -171,8 +170,8 @@ function _gutenberg_always_show_excerpt_edit_trigger( $data ) {
 					array(
 						'id'     => 'excerpt',
 						'layout' => array(
-							'type'           => 'panel',
-							'editVisibility' => 'always',
+							'type'  => 'panel',
+							'empty' => 'placeholder',
 						),
 					),
 				),
@@ -183,9 +182,9 @@ function _gutenberg_always_show_excerpt_edit_trigger( $data ) {
 }
 
 /**
- * Layers the group summaries and the always-visible excerpt edit trigger on
- * top of the view configuration of every post type that uses the default form,
- * including custom post types registered at any point.
+ * Layers the group summaries and the excerpt placeholder on top of the view
+ * configuration of every post type that uses the default form, including
+ * custom post types registered at any point.
  *
  * The callbacks merge by member id, and a member that is absent would be
  * appended instead, so post types whose base definition provides its own form
@@ -206,7 +205,7 @@ function gutenberg_register_default_posttype_form_layers_7_2( $post_type ) {
 	);
 	add_filter(
 		gutenberg_get_entity_view_config_hook_name( 'postType', $post_type ),
-		'_gutenberg_always_show_excerpt_edit_trigger',
+		'_gutenberg_show_excerpt_placeholder_when_empty',
 		6,
 		1
 	);
@@ -228,7 +227,7 @@ function gutenberg_register_entity_view_config_filters_7_2() {
 	);
 	add_filter(
 		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_block' ),
-		'_gutenberg_always_show_excerpt_edit_trigger',
+		'_gutenberg_show_excerpt_placeholder_when_empty',
 		6,
 		1
 	);

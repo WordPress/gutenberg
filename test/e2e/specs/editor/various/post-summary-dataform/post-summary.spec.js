@@ -100,7 +100,7 @@ test.describe( 'Post Summary', () => {
 			} );
 		}
 
-		test( 'shows title and sync status while creating a new synced pattern in the post editor', async ( {
+		test( 'shows title, sync status and the description placeholder while creating a new synced pattern in the post editor', async ( {
 			admin,
 			editor,
 			page,
@@ -118,6 +118,11 @@ test.describe( 'Post Summary', () => {
 			await expect( fields.title ).toHaveText( title );
 			await expect(
 				fields.syncStatus.row.getByText( 'Synced', { exact: true } )
+			).toBeVisible();
+			await expect(
+				fields.description.row.getByText( 'Add a description', {
+					exact: true,
+				} )
 			).toBeVisible();
 		} );
 
@@ -409,13 +414,14 @@ test.describe( 'Post Summary', () => {
 			await admin.createNewPost();
 			const summary = await openPostSummary( { editor, page } );
 
-			const editButton = summary.getByRole( 'button', {
-				name: 'Edit Excerpt',
+			const placeholder = summary.getByText( 'Add an excerpt', {
+				exact: true,
 			} );
-			// An empty excerpt renders only the label next to the edit button.
-			await expect( editButton.locator( '..' ) ).toHaveText( 'Excerpt' );
+			await expect( placeholder ).toBeVisible();
 
-			await editButton.click();
+			await summary
+				.getByRole( 'button', { name: 'Edit Excerpt' } )
+				.click();
 			await page
 				.getByRole( 'textbox', { name: 'Excerpt' } )
 				.fill( 'A DataForm excerpt.' );
@@ -424,6 +430,7 @@ test.describe( 'Post Summary', () => {
 			await expect(
 				summary.getByText( 'A DataForm excerpt.', { exact: true } )
 			).toBeVisible();
+			await expect( placeholder ).toBeHidden();
 			await expect
 				.poll( () =>
 					page.evaluate( () =>
@@ -630,7 +637,46 @@ test.describe( 'Post Summary', () => {
 				default_comment_status: 'open',
 			} );
 			await requestUtils.deleteAllPages();
+			await requestUtils.deleteAllTemplates( 'wp_template' );
 			await requestUtils.activateTheme( 'twentytwentyone' );
+		} );
+
+		test( 'sets the description of a custom template from the summary panel', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await requestUtils.createTemplate( 'wp_template', {
+				slug: 'dataform-summary',
+				title: 'DataForm summary',
+			} );
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//dataform-summary',
+				postType: 'wp_template',
+				canvas: 'edit',
+			} );
+			const summary = await openPostSummary( { editor, page } );
+
+			const placeholder = summary.getByText( 'Add a description', {
+				exact: true,
+			} );
+			await expect( placeholder ).toBeVisible();
+
+			await summary
+				.getByRole( 'button', { name: 'Edit Description' } )
+				.click();
+			await page
+				.getByRole( 'textbox', { name: 'Description' } )
+				.fill( 'A DataForm template description.' );
+			await page.keyboard.press( 'Escape' );
+
+			await expect(
+				summary.getByText( 'A DataForm template description.', {
+					exact: true,
+				} )
+			).toBeVisible();
+			await expect( placeholder ).toBeHidden();
 		} );
 
 		test( 'edits the posts page and the site settings from the index template', async ( {
