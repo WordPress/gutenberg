@@ -133,6 +133,8 @@ export default function PatternConvertButton( {
 		} else {
 			const newBlock = createBlock( 'core/block', {
 				ref: pattern.id,
+				// New instances render inside an element, like template parts.
+				hasWrapper: true,
 			} );
 
 			replaceBlocks( clientIds, newBlock );

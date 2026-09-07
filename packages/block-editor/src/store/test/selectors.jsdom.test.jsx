@@ -3785,7 +3785,7 @@ describe( 'selectors', () => {
 					foreground: 'var(--wp-block-synced-color)',
 				},
 				id: 'core/block/1',
-				initialAttributes: { ref: 1 },
+				initialAttributes: { ref: 1, hasWrapper: true },
 				isDisabled: false,
 				keywords: [ 'reusable' ],
 				name: 'core/block',

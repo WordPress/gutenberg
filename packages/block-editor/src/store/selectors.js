@@ -2458,7 +2458,12 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 				return {
 					id: userPattern.name,
 					name: 'core/block',
-					initialAttributes: { ref: reusableBlock.id },
+					// New instances render inside an element, like template
+					// parts; instances that predate the attribute keep their markup.
+					initialAttributes: {
+						ref: reusableBlock.id,
+						hasWrapper: true,
+					},
 					title: userPattern.title,
 					icon,
 					category: 'reusable',
