@@ -373,23 +373,12 @@ test.describe( 'Post Meta source', () => {
 	} );
 
 	test.describe( 'Movie CPT post', () => {
-		test.beforeAll( async ( { requestUtils } ) => {
-			await requestUtils.setGutenbergExperiments( [
-				'gutenberg-content-only-inspector-fields',
-			] );
-		} );
-
 		test.beforeEach( async ( { admin } ) => {
 			// CHECK HOW TO CREATE A MOVIE.
 			await admin.createNewPost( {
 				postType: 'movie',
 				title: 'Test bindings',
 			} );
-		} );
-
-		test.afterAll( async ( { requestUtils } ) => {
-			// Ensure experiments are disabled after test.
-			await requestUtils.setGutenbergExperiments( [] );
 		} );
 
 		test( 'should show the custom field value of that specific post', async ( {
