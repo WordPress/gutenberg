@@ -143,6 +143,12 @@ describe( 'WordPress Design System token resolver', () => {
 		).toBe( '1.5px' );
 		expect(
 			getCustomPropertyValue( css!, {
+				selector: '[data-wpds-corner-radius="subtle"]',
+				property: '--wpds-border-radius-xl',
+			} )
+		).toBe( '12px' );
+		expect(
+			getCustomPropertyValue( css!, {
 				selector: '[data-wpds-corner-radius="moderate"]',
 				property: '--wpds-border-radius-xl',
 			} )

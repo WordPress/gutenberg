@@ -19,9 +19,7 @@
 			"default": "subtle",
 			"contexts": {
 				"none": [ { "$ref": "modes/border.corner-radius-none.json" } ],
-				"subtle": [
-					{ "$ref": "modes/border.corner-radius-subtle.json" }
-				],
+				"subtle": [],
 				"moderate": [
 					{ "$ref": "modes/border.corner-radius-moderate.json" }
 				],

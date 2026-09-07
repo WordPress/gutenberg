@@ -28,9 +28,8 @@ const config: Config = {
 	tokens: [ './tokens/wpds.resolver.json' ],
 	outDir: '.',
 
-	// Preserve source ordering of tokens in output. This is important because
-	// many of our tokens operate on a size scale (2xs → 2xl) and it's more easy
-	// to understand that size progression in the original order.
+	// Preserve source ordering in generated documentation and JavaScript/TypeScript
+	// artifacts. The CSS plugin alphabetizes custom properties independently.
 	alphabetize: false,
 
 	plugins: [
