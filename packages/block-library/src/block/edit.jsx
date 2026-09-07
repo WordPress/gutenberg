@@ -440,7 +440,7 @@ function ReusableBlockEdit( {
 	// the layout panel is not offered to them and the class name and custom
 	// CSS supports (whose controls always show) have no effect on them.
 	const hasOwnLayout = !! layout && Object.keys( layout ).length > 0;
-	const { createPatternOverride } = unlock( useDispatch( patternsStore ) );
+	const { customizePattern } = unlock( useDispatch( patternsStore ) );
 	const { editEntityRecord } = useDispatch( coreStore );
 	// The instance's own area wins, else the referenced pattern's. Without
 	// either, the instance is in the "General" (uncategorized) area.
@@ -550,7 +550,7 @@ function ReusableBlockEdit( {
 			if ( ! pattern ) {
 				return;
 			}
-			const record = await createPatternOverride( pattern );
+			const record = await customizePattern( pattern );
 			id = record.id;
 		}
 		const newBlocks = ( design.blocks ?? [] ).map( ( block ) =>
