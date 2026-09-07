@@ -1,4 +1,9 @@
-import type { Component, ComponentDetail } from './types.ts';
+import type {
+	Component,
+	ComponentDetail,
+	Pattern,
+	PatternDetail,
+} from './types.ts';
 
 /**
  * Format a component's name, package, and description as markdown.
@@ -88,4 +93,57 @@ export function formatComponentDetail( detail: ComponentDetail ): string {
 	}
 
 	return lines.join( '\n' );
+}
+
+/**
+ * Strip the Storybook-specific syntax from an MDX document, leaving plain
+ * markdown. Pattern documents use MDX only for their Storybook framing: module
+ * imports and self-closing blocks such as `<Meta />` and `<Canvas />`, none of
+ * which carry guidance an agent can act on.
+ *
+ * @param source - The raw MDX source.
+ * @return The document as markdown.
+ */
+export function stripMdx( source: string ): string {
+	return source
+		.replace( /^import\s[^\n]*\n/gm, '' )
+		.replace( /^<[A-Z][^>]*\/>\n/gm, '' )
+		.trim();
+}
+
+/**
+ * Format the pattern list as markdown.
+ *
+ * @param patterns - The patterns to format.
+ * @return Formatted markdown.
+ */
+export function formatPatterns( patterns: Pattern[] ): string {
+	const lines = [
+		'# WordPress Design System Patterns',
+		'',
+		'Call `get_pattern_details` with a slug for the full guidance.',
+	];
+
+	for ( const pattern of patterns ) {
+		lines.push(
+			'',
+			`## ${ pattern.title }`,
+			'',
+			`**Slug:** \`${ pattern.slug }\``,
+			'',
+			pattern.description
+		);
+	}
+
+	return lines.join( '\n' );
+}
+
+/**
+ * Format a single pattern document as markdown.
+ *
+ * @param detail - The pattern detail to format.
+ * @return Formatted markdown.
+ */
+export function formatPatternDetail( detail: PatternDetail ): string {
+	return stripMdx( detail.content );
 }

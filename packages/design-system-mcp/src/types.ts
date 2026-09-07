@@ -50,3 +50,13 @@ export interface ComponentDetail {
 		description?: string;
 	} >;
 }
+
+export interface Pattern {
+	slug: string;
+	title: string;
+	description: string;
+}
+
+export interface PatternDetail extends Pattern {
+	content: string;
+}

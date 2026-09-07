@@ -3,7 +3,14 @@ import {
 	parseComponents,
 	parseComponentDetail,
 } from './parse-components.ts';
-import type { Component, ComponentDetail, ManifestComponent } from './types.ts';
+import { findPattern, PATTERNS } from './patterns.ts';
+import type {
+	Component,
+	ComponentDetail,
+	ManifestComponent,
+	Pattern,
+	PatternDetail,
+} from './types.ts';
 
 const COMPONENTS_MANIFEST_URL =
 	process.env.COMPONENTS_MANIFEST_URL ||
@@ -13,8 +20,13 @@ const DESIGN_TOKENS_URL =
 	process.env.DESIGN_TOKENS_URL ||
 	'https://raw.githubusercontent.com/WordPress/gutenberg/refs/heads/trunk/packages/theme/docs/tokens.md';
 
+const PATTERNS_BASE_URL =
+	process.env.PATTERNS_BASE_URL ||
+	'https://raw.githubusercontent.com/WordPress/gutenberg/refs/heads/trunk/storybook/stories/design-system/patterns/';
+
 let cachedComponents: Record< string, ManifestComponent > | null = null;
 let cachedTokens: string | null = null;
+const cachedPatterns = new Map< string, string >();
 
 /**
  * Clear cached data. Intended for testing.
@@ -22,6 +34,7 @@ let cachedTokens: string | null = null;
 export function resetCache(): void {
 	cachedComponents = null;
 	cachedTokens = null;
+	cachedPatterns.clear();
 }
 
 /**
@@ -101,4 +114,45 @@ export async function getDesignTokens(): Promise< { content: string } > {
 	}
 
 	return { content: cachedTokens };
+}
+
+/**
+ * Get the list of available design system patterns.
+ *
+ * @return The pattern list.
+ */
+export function getPatterns(): Pattern[] {
+	return PATTERNS;
+}
+
+/**
+ * Get a single pattern document by slug, including its source content.
+ *
+ * @param slug - The pattern slug (case-insensitive).
+ * @return The pattern detail, or null if there is no such pattern.
+ */
+export async function getPatternDetail(
+	slug: string
+): Promise< PatternDetail | null > {
+	const pattern = findPattern( slug );
+	if ( ! pattern ) {
+		return null;
+	}
+
+	let content = cachedPatterns.get( pattern.slug );
+	if ( content === undefined ) {
+		const response = await fetch(
+			`${ PATTERNS_BASE_URL }${ pattern.slug }.mdx`
+		);
+		if ( ! response.ok ) {
+			throw new Error(
+				`Failed to fetch pattern "${ pattern.slug }": ${ response.status } ${ response.statusText }`
+			);
+		}
+
+		content = await response.text();
+		cachedPatterns.set( pattern.slug, content );
+	}
+
+	return { ...pattern, content };
 }
