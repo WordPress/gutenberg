@@ -4,11 +4,13 @@ import { STORE_NAME } from '../name';
 import { EntityContext } from '../entity-context';
 import useEntityId from './use-entity-id';
 
+// The same fields the editor loads revisions with, so that they are read from
+// the store rather than fetched again. `content` is the exception: the whole
+// field would pull `content.rendered` too.
 // A stable reference, because `getRevision` memoizes on the query's identity.
 const REVISION_QUERY = {
 	context: 'edit',
-	_fields:
-		'id,date,author,meta,title.raw,title.rendered,excerpt.raw,excerpt.rendered,content.raw',
+	_fields: 'id,date,author,meta,title,excerpt,content.raw',
 };
 
 /**
@@ -42,22 +44,27 @@ export default function useEntityProp( kind, name, prop, _id ) {
 	const { value, fullValue } = useSelect(
 		( select ) => {
 			if ( revisionId ) {
-				const { getRevision, hasRevision } = select( STORE_NAME );
-				const revision = getRevision(
+				const revision = select( STORE_NAME ).getRevision(
 					kind,
 					name,
 					id,
 					revisionId,
 					REVISION_QUERY
-				); // Trigger resolver.
-				// `getRevision` returns the requested fields as `undefined`
-				// until they are received, so wait for the full record.
-				return hasRevision( kind, name, id, revisionId, REVISION_QUERY )
-					? {
-							value: revision[ prop ]?.raw ?? revision[ prop ],
-							fullValue: revision[ prop ],
-					  }
-					: {};
+				);
+				const propValue = revision?.[ prop ];
+				if ( propValue === undefined ) {
+					return {};
+				}
+				// Raw attributes hold their value under `raw`, like the edited
+				// record does. Any other field is the value itself.
+				const isRawAttribute =
+					propValue !== null &&
+					typeof propValue === 'object' &&
+					'raw' in propValue;
+				return {
+					value: isRawAttribute ? propValue.raw : propValue,
+					fullValue: propValue,
+				};
 			}
 
 			const { getEntityRecord, getEditedEntityRecord } =
