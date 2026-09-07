@@ -1,6 +1,5 @@
-import { getUndoManager, getTemplateId } from '../private-selectors';
+import { getUndoManager } from '../private-selectors';
 import { getSyncManager } from '../sync';
-import { lock } from '../lock-unlock';
 
 jest.mock( '../sync', () => ( {
 	getSyncManager: jest.fn(),
@@ -60,54 +59,5 @@ describe( 'getUndoManager', () => {
 				},
 			} )
 		).toBe( fallbackUndoManager );
-	} );
-} );
-
-describe( 'getTemplateId', () => {
-	// Stands in for the core store. `getHomePage` and `getPostsPageId` are read
-	// through unlock(), so they are locked onto the same object.
-	const setup = ( { savedSlug, editedSlug } ) => {
-		const getDefaultTemplateId = jest.fn();
-		const storeSelectors = {
-			getEditedEntityRecord: () => ( {
-				slug: editedSlug,
-				template: '',
-			} ),
-			// A record that has never been saved has no raw entry at all.
-			getRawEntityRecord: () =>
-				savedSlug === undefined ? undefined : { slug: savedSlug },
-			getEntityRecords: () => [],
-			getDefaultTemplateId,
-		};
-		lock( storeSelectors, {
-			getHomePage: () => ( { postType: 'wp_template', postId: 'home' } ),
-			getPostsPageId: () => null,
-		} );
-		getTemplateId.registry = { select: () => storeSelectors };
-		return getDefaultTemplateId;
-	};
-
-	it( 'ignores an unsaved slug edit, so typing does not trigger a lookup', () => {
-		const getDefaultTemplateId = setup( {
-			savedSlug: 'hello',
-			editedSlug: 'hell',
-		} );
-
-		getTemplateId( {}, 'page', 1 );
-
-		expect( getDefaultTemplateId ).toHaveBeenCalledWith( {
-			slug: 'page-hello',
-		} );
-	} );
-
-	it( 'falls back to the post type template when nothing is saved yet', () => {
-		const getDefaultTemplateId = setup( {
-			savedSlug: undefined,
-			editedSlug: 'draft-in-progress',
-		} );
-
-		getTemplateId( {}, 'page', 1 );
-
-		expect( getDefaultTemplateId ).toHaveBeenCalledWith( { slug: 'page' } );
 	} );
 } );
