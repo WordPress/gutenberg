@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Parser: Under the Gutenberg "template parts as patterns" experiment (`window.__experimentalTemplatePartsAsPatterns`), `core/template-part` blocks are converted to `core/block` instances referencing the part's pattern (`theme/part/slug`) with a wrapper, plugin only ([#82569](https://github.com/WordPress/gutenberg/pull/82569)).
+-   Parser: In the Gutenberg plugin (`window.__wpTemplatePartsAsPatterns`), `core/template-part` blocks are converted to `core/block` instances referencing the part's pattern (`theme/part/slug`) with a wrapper, plugin only ([#82569](https://github.com/WordPress/gutenberg/pull/82569)).
 
 ### Breaking Changes
 

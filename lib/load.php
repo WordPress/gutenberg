@@ -131,6 +131,7 @@ require __DIR__ . '/compat/wordpress-7.1/icons.php';
 
 // WordPress 7.2 compat.
 require __DIR__ . '/compat/wordpress-7.2/block-patterns.php';
+require __DIR__ . '/compat/wordpress-7.2/template-parts-as-patterns.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -140,10 +141,6 @@ require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/collaboration/meta-box-rtc-compat.php';
-
-if ( gutenberg_is_experiment_enabled( 'gutenberg-template-parts-as-patterns' ) ) {
-	require __DIR__ . '/experimental/template-parts-as-patterns.php';
-}
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
 	require __DIR__ . '/experimental/extensible-site-editor.php';

@@ -1,11 +1,9 @@
 /* eslint-disable @wordpress/wp-global-usage */
 declare global {
 	var IS_GUTENBERG_PLUGIN: boolean | undefined;
-	// Set by the Gutenberg plugin while the "template parts as patterns"
-	// experiment is enabled; carries the active theme's stylesheet.
-	var __experimentalTemplatePartsAsPatterns:
-		| { stylesheet?: string }
-		| undefined;
+	// Set by the Gutenberg plugin, where template parts are registered
+	// patterns; carries the active theme's stylesheet.
+	var __wpTemplatePartsAsPatterns: { stylesheet?: string } | undefined;
 }
 /* eslint-enable @wordpress/wp-global-usage */
 
@@ -71,20 +69,20 @@ export function convertLegacyBlockNameAndAttributes(
 		name = 'core/cover';
 	}
 
-	// Gutenberg plugin experiment: template parts are registered patterns, and
-	// a template part block is a pattern instance referencing `theme/part/slug`.
+	// In the Gutenberg plugin template parts are registered patterns, and a
+	// template part block is a pattern instance referencing `theme/part/slug`.
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		const experiment = globalThis.__experimentalTemplatePartsAsPatterns;
+		const templatePartsAsPatterns = globalThis.__wpTemplatePartsAsPatterns;
 		if (
 			'core/template-part' === name &&
-			experiment &&
+			templatePartsAsPatterns &&
 			typeof newAttributes.slug === 'string' &&
 			newAttributes.slug
 		) {
 			const theme =
 				( typeof newAttributes.theme === 'string' &&
 					newAttributes.theme ) ||
-				experiment.stylesheet ||
+				templatePartsAsPatterns.stylesheet ||
 				'';
 			newAttributes.slug = `${ theme }/part/${ newAttributes.slug }`;
 			newAttributes.hasWrapper = true;
