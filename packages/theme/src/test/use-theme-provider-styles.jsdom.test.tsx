@@ -128,20 +128,21 @@ describe( 'useThemeProviderStyles', () => {
 				DEFAULT_SEED_COLORS.info,
 			] ) {
 				rerender( { primary } );
-				const full = buildAccentRamp(
+				const interactive = buildAccentRamp(
 					primary,
-					buildBgRamp( background )
+					buildBgRamp( background ),
+					'interactive'
 				);
 				expect(
 					result.current.themeProviderStyles[
 						'--wpds-color-foreground-interactive-brand-active'
 					]
-				).toBe( full.ramp.fgSurface5 );
+				).toBe( interactive.ramp.fgSurface4 );
 				expect(
 					result.current.themeProviderStyles[
 						'--wpds-color-stroke-interactive-brand-active'
 					]
-				).toBe( full.ramp.stroke4 );
+				).toBe( interactive.ramp.stroke4 );
 				expect( result.current.colorWarnings ).toEqual( [] );
 			}
 		} );

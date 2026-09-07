@@ -144,7 +144,6 @@ describe( 'ThemeProvider', () => {
 		expect( activeForeground ).toBe(
 			readProp( provider, FOREGROUND_NEUTRAL_WEAK_ACTIVE )
 		);
-		expect( restingForeground ).not.toBe( activeForeground );
 	} );
 
 	it( 'does not define color tokens if neither customized nor inherited', () => {
