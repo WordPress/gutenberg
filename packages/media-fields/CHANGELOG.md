@@ -10,6 +10,7 @@
 
 -   `caption`: Replace the custom `Edit` component with the built-in `textarea` control.
 -   `alt_text`: Replace the custom `Edit` component with the built-in `textarea` control, passing the help text as the field's `description`.
+-   `description`: Replace the custom `Edit` component with the built-in `textarea` control.
 -   Remove unused dependencies `@wordpress/date` and `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
 
