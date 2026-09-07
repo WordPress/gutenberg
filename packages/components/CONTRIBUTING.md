@@ -422,6 +422,8 @@ Place component-local styles in a `style.module.scss` file next to the component
 
 Legacy components may still use Emotion while they are being migrated, but new Emotion usage should not be added.
 
+Before migrating existing styles, read [Migrating components from Emotion to SCSS Modules](/docs/contributors/code/emotion-to-scss-modules.md) for compatibility checks, cascade and custom-property pitfalls, verification, and examples from merged migrations.
+
 ### Deprecating styles
 
 Changing the styles of a non-experimental component must be done with care. To prevent serious breakage in third-party usage, in some cases we may want a grace period before fully removing the old styles. This can be done by temporarily placing the new styles behind a feature flag prop prefixed by `__next`, accompanied by a `deprecate()` warning in the console. The feature flag should be opt-in (false by default), and have a reasonably descriptive name (**not** `__nextHasNewStyles`). A descriptive name allows for multiple deprecations to proceed in parallel, separated by concerns or by deprecation version.
