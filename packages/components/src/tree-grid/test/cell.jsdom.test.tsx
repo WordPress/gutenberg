@@ -86,6 +86,47 @@ describe( 'TreeGridCell', () => {
 		}
 	} );
 
+	it( 'accepts a cell inside a wrapper explicitly owned by a valid treegrid row', () => {
+		const portalTable = document.createElement( 'table' );
+		const portalBody = document.createElement( 'tbody' );
+		portalTable.append( portalBody );
+		document.body.append( portalTable );
+
+		function AriaOwnedCellWrapper() {
+			const wrapperId = useId();
+
+			return (
+				<TreeGrid>
+					<TreeGridRow
+						level={ 1 }
+						positionInSet={ 1 }
+						setSize={ 1 }
+						aria-owns={ wrapperId }
+					>
+						{ createPortal(
+							<tr id={ wrapperId } role="presentation">
+								<TreeGridCell withoutGridItem>
+									Test
+								</TreeGridCell>
+							</tr>,
+							portalBody
+						) }
+					</TreeGridRow>
+				</TreeGrid>
+			);
+		}
+
+		try {
+			render( <AriaOwnedCellWrapper /> );
+
+			expect( screen.getByRole( 'gridcell' ) ).toHaveTextContent(
+				'Test'
+			);
+		} finally {
+			portalTable.remove();
+		}
+	} );
+
 	it( 'uses a child render function to render children', () => {
 		const { container } = render(
 			<TreeGrid>

@@ -56,7 +56,7 @@ function isOwnedByRowInTreeGrid(
 	}
 	visited.add( element );
 
-	return getAriaOwners( element ).some( ( owner ) => {
+	const hasValidOwner = getAriaOwners( element ).some( ( owner ) => {
 		const row = owner.matches( ROW_SELECTOR )
 			? owner
 			: owner.closest< HTMLElement >( ROW_SELECTOR );
@@ -65,6 +65,13 @@ function isOwnedByRowInTreeGrid(
 			? isContainedInOrOwnedBy( row, TREE_GRID_SELECTOR )
 			: isOwnedByRowInTreeGrid( owner, visited );
 	} );
+	if ( hasValidOwner ) {
+		return true;
+	}
+
+	return element.parentElement
+		? isOwnedByRowInTreeGrid( element.parentElement, visited )
+		: false;
 }
 
 export function useValidateTreeGridStructure(
