@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`RovingTabIndex does not render any elements other than its children 1`] = `
+exports[`RovingTabIndex > does not render any elements other than its children 1`] = `
 <div>
   <div>
     child element

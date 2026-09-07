@@ -1,10 +1,11 @@
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BlockAlignmentUI from '../ui';
 
 describe( 'BlockAlignmentUI', () => {
 	const alignment = 'left';
-	const onChange = jest.fn();
+	const onChange = vi.fn();
 
 	afterEach( () => {
 		onChange.mockClear();

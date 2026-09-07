@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { press } from '@ariakit/test';
 import { logged } from '@wordpress/deprecated';
