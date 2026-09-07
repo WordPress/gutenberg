@@ -364,4 +364,7 @@
 
 '[Tool] WP Scripts':
     - changed-files:
-          - any-glob-to-any-file: 'packages/scripts/**'
+          - any-glob-to-any-file:
+                - 'packages/scripts/**'
+                - 'packages/vitest-console/**'
+                - 'packages/vitest-preset-default/**'
