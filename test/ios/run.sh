@@ -50,7 +50,14 @@ curl -sf -o /dev/null "$WP_BASE_URL/" || { echo "WordPress did not start"; exit 
 # Warm up: the first request to the editor does the one-time work of a
 # fresh site, which would otherwise count against the test's timeout.
 step "Loading the editor once"
-curl -sL -o /dev/null -c /dev/null "$WP_BASE_URL/wp-admin/post-new.php"
+COOKIES=$( mktemp )
+EDITOR_HTML=$( curl -sL -b "$COOKIES" -c "$COOKIES" "$WP_BASE_URL/wp-admin/post-new.php" )
+rm -f "$COOKIES"
+# The plugin only replaces core's bundles when its build exists.
+if ! grep -q "/build/scripts/rich-text/" <<< "$EDITOR_HTML"; then
+	echo "The editor does not load this checkout's build. Run npm run build first."
+	exit 1
+fi
 
 step "Waiting for the simulator"
 xcrun simctl bootstatus "$UDID" -b
