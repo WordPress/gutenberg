@@ -1,5 +1,6 @@
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { Fragment } from '@wordpress/element';
 import {
 	Button,
 	__experimentalVStack as VStack,
@@ -13,6 +14,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import ContentGroupHeading from '../content-group-heading';
 import { unlock } from '../../lock-unlock';
 
 export default function BlockQuickNavigation( {
@@ -28,54 +30,19 @@ export default function BlockQuickNavigation( {
 	return (
 		<VStack spacing={ 1 }>
 			{ clientIds.map( ( clientId ) => (
-				<BlockQuickNavigationGroup
-					key={ clientId }
-					clientId={ clientId }
-					showGroupHeadings={ showGroupHeadings }
-				>
+				<Fragment key={ clientId }>
+					{ showGroupHeadings && (
+						<ContentGroupHeading clientId={ clientId } />
+					) }
 					<BlockQuickNavigationItem
 						onSelect={ onSelect }
 						onSwitchToListView={ onSwitchToListView }
 						hasListViewTab={ hasListViewTab }
 						clientId={ clientId }
 					/>
-				</BlockQuickNavigationGroup>
+				</Fragment>
 			) ) }
 		</VStack>
-	);
-}
-
-function BlockQuickNavigationGroup( {
-	children,
-	clientId,
-	showGroupHeadings,
-} ) {
-	const groupHeaderClientId = useSelect(
-		( select ) => {
-			if ( ! showGroupHeadings ) {
-				return null;
-			}
-
-			return unlock(
-				select( blockEditorStore )
-			).getContentGroupHeaderClientId( clientId );
-		},
-		[ clientId, showGroupHeadings ]
-	);
-	const groupHeaderTitle = useBlockDisplayTitle( {
-		clientId: groupHeaderClientId,
-		context: 'list-view',
-	} );
-
-	return (
-		<>
-			{ groupHeaderTitle && (
-				<h2 className="block-editor-block-quick-navigation__group-heading">
-					{ groupHeaderTitle }
-				</h2>
-			) }
-			{ children }
-		</>
 	);
 }
 

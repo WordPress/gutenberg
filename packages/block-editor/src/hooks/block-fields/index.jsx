@@ -18,6 +18,7 @@ import { replacePatternOverridesDefaultBinding } from '../../utils/block-binding
 import BlockContext from '../../components/block-context';
 import BlockIcon from '../../components/block-icon';
 import useBlockDisplayTitle from '../../components/block-title/use-block-display-title';
+import ContentGroupHeading from '../../components/content-group-heading';
 import useBlockDisplayInformation from '../../components/use-block-display-information';
 const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 import FieldsDropdownMenu from './fields-dropdown-menu';
@@ -64,22 +65,6 @@ function BlockFields( {
 } ) {
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
-		context: 'list-view',
-	} );
-	const groupHeaderClientId = useSelect(
-		( select ) => {
-			if ( ! isMultiBlock ) {
-				return null;
-			}
-
-			return unlock(
-				select( blockEditorStore )
-			).getContentGroupHeaderClientId( clientId );
-		},
-		[ clientId, isMultiBlock ]
-	);
-	const groupHeaderTitle = useBlockDisplayTitle( {
-		clientId: groupHeaderClientId,
 		context: 'list-view',
 	} );
 	const blockInformation = useBlockDisplayInformation( clientId );
@@ -226,10 +211,11 @@ function BlockFields( {
 
 	return (
 		<>
-			{ groupHeaderTitle && (
-				<h2 className="block-editor-block-fields__group-heading">
-					{ groupHeaderTitle }
-				</h2>
+			{ isMultiBlock && (
+				<ContentGroupHeading
+					clientId={ clientId }
+					className="block-editor-block-fields__group-heading"
+				/>
 			) }
 			<div
 				className="block-editor-block-fields__container"

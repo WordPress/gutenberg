@@ -77,9 +77,9 @@ export function ListViewPanel( { clientId, name } ) {
 				return null;
 			}
 
-			return unlock(
-				select( blockEditorStore )
-			).getTopMostNamedContentGroupForBlock( clientId );
+			return unlock( select( blockEditorStore ) ).getContentGroupForBlock(
+				clientId
+			);
 		},
 		[ clientId, isSelectionWithinCurrentSection ]
 	);
