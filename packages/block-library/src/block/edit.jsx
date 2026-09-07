@@ -575,7 +575,11 @@ function ReusableBlockEdit( {
 									: __( 'Default (no wrapper)' ),
 							value: '',
 						},
-						{ label: __( 'None' ), value: 'none' },
+						// Opting out of the area's element; without one the
+						// default is already no wrapper.
+						...( hasAreaElement && areaTagName
+							? [ { label: __( 'No wrapper' ), value: 'none' } ]
+							: [] ),
 						...TAG_NAME_OPTIONS,
 					] }
 				/>
