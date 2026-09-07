@@ -251,6 +251,9 @@ export default defineConfig( {
 				},
 				test: {
 					name: 'browser',
+					env: {
+						WP_TESTS_SKIP_STYLE_INJECTION: 'false',
+					},
 					attachmentsDir: 'test-results/vitest-browser-attachments',
 					include: vitestTests.browser,
 					setupFiles: [
