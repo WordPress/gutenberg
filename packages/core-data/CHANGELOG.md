@@ -25,6 +25,7 @@
 -   Export `ContextualField` so plugins can describe context-sensitive fields when extending the entity record map. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 -   `PostStatus` accepts statuses registered by WordPress or plugins while preserving autocomplete for the built-in values. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 -   Add `page_for_privacy_policy` to the `Settings` entity type, exposed by the Gutenberg plugin from the `wp_page_for_privacy_policy` option ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
+-   `editEntityRecord` accepts a `coalesce` option that merges consecutive edits to the same properties of the same record into a single undo level, and starts a new one when an unrelated edit or a pause of more than a second interrupts the run. `useEntityProp` forwards it through a new options argument. ([#82564](https://github.com/WordPress/gutenberg/pull/82564))
 
 ### Internal
 

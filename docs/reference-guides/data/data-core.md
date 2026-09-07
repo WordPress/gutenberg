@@ -842,6 +842,7 @@ _Parameters_
 -   _options_ `Object`: Options for the edit.
 -   _options.undoIgnore_ `[boolean]`: Whether to ignore the edit in undo history or not.
 -   _options.isCached_ `[boolean]`: Whether the edit is transient (e.g. typing). Transient edits are staged and eventually merged into the preceding undo level instead of creating a new one.
+-   _options.coalesce_ `[boolean]`: Whether consecutive edits to the same properties of the same record should merge into a single undo level. An explicit `isCached` takes precedence.
 
 _Returns_
 
