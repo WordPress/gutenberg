@@ -14,7 +14,6 @@
 
 /* eslint-disable no-unused-expressions -- the assertions below are expression statements. */
 /* eslint-disable @typescript-eslint/no-unused-vars -- the values exist only so their inferred types can be asserted. */
-/* eslint-disable jest/expect-expect -- these tests contain compile-time assertions only. */
 import { dispatch, select, resolveSelect } from '@wordpress/data';
 import { describe, it } from 'vitest';
 import { store as coreStore } from '../../index';
@@ -878,6 +877,5 @@ describe( 'Entity record types', () => {
 	} );
 } );
 
-/* eslint-enable jest/expect-expect */
 /* eslint-enable no-unused-expressions */
 /* eslint-enable @typescript-eslint/no-unused-vars */
