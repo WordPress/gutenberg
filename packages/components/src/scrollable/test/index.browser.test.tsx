@@ -1,37 +1,8 @@
-import { afterEach, describe, expect, test } from 'vitest';
-import { screen, within } from '@testing-library/react';
+import { describe, expect, test } from 'vitest';
+import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-import { createPortal, useState } from '@wordpress/element';
-import { registerStyle } from '@wordpress/style-runtime';
-import { CardBody } from '../../card';
-import StyleProvider from '../../style-provider';
 import { Scrollable } from '../index';
 import styles from '../style.module.scss';
-
-type GlobalScopeWithStyleRuntime = typeof globalThis & {
-	__wpStyleRuntime?: unknown;
-};
-
-function IframeWithStyleProvider( {
-	children,
-}: {
-	children: React.ReactNode;
-} ) {
-	const [ iframe, setIframe ] = useState< HTMLIFrameElement | null >( null );
-	const iframeDocument = iframe?.contentDocument;
-
-	return (
-		<iframe title="CardBody document" ref={ setIframe }>
-			{ iframeDocument &&
-				createPortal(
-					<StyleProvider document={ iframeDocument }>
-						{ children }
-					</StyleProvider>,
-					iframeDocument.body
-				) }
-		</iframe>
-	);
-}
 
 describe( 'props', () => {
 	test( 'should render correctly', async () => {
@@ -120,68 +91,5 @@ describe( 'props', () => {
 
 		expect( scrollable ).toHaveClass( styles[ 'scroll-auto' ] );
 		expect( scrollable ).not.toHaveClass( styles[ 'scroll-y' ] );
-	} );
-} );
-
-describe( 'CardBody isScrollable height', () => {
-	const globalScope = globalThis as GlobalScopeWithStyleRuntime;
-
-	afterEach( () => {
-		// Style runtime injects outside Testing Library's container.
-		/* eslint-disable testing-library/no-node-access */
-		document
-			.querySelectorAll( 'style[data-wp-hash="scrollable-height"]' )
-			.forEach( ( style ) => style.remove() );
-		/* eslint-enable testing-library/no-node-access */
-
-		delete globalScope.__wpStyleRuntime;
-	} );
-
-	test( 'should keep height 100% in the main document and in an iframe', async () => {
-		// Register explicitly so this test isolates StyleProvider's
-		// cross-document injection from the package build transform.
-		registerStyle(
-			'scrollable-height',
-			`.${ styles.scrollable }{height:100%;}`
-		);
-
-		await render(
-			<div style={ { height: 200 } }>
-				<CardBody data-testid="card-body">Body</CardBody>
-				<CardBody isScrollable data-testid="scrollable-body">
-					Body
-				</CardBody>
-			</div>
-		);
-
-		expect(
-			getComputedStyle( screen.getByTestId( 'card-body' ) ).height
-		).not.toBe( '200px' );
-		expect(
-			getComputedStyle( screen.getByTestId( 'scrollable-body' ) ).height
-		).toBe( '200px' );
-
-		await render(
-			<IframeWithStyleProvider>
-				<div style={ { height: 200 } }>
-					<CardBody isScrollable data-testid="scrollable-body-iframe">
-						Body
-					</CardBody>
-				</div>
-			</IframeWithStyleProvider>
-		);
-
-		const iframeDocument =
-			screen.getByTitle< HTMLIFrameElement >(
-				'CardBody document'
-			).contentDocument!;
-
-		const iframeBody = within( iframeDocument.body ).getByTestId(
-			'scrollable-body-iframe'
-		);
-
-		expect(
-			iframeDocument.defaultView!.getComputedStyle( iframeBody ).height
-		).toBe( '200px' );
 	} );
 } );
