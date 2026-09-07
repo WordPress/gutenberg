@@ -29,14 +29,14 @@ export const settings = {
 		}
 
 		if ( slug ) {
-			const override = unlock(
+			const customization = unlock(
 				select( patternsStore )
-			).getPatternOverride( slug );
-			if ( override ) {
+			).getPatternCustomization( slug );
+			if ( customization ) {
 				const entity = select( coreStore ).getEditedEntityRecord(
 					'postType',
 					'wp_block',
-					override.id
+					customization.id
 				);
 				if ( entity?.title ) {
 					return decodeEntities( entity.title );

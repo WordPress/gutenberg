@@ -12,7 +12,7 @@ const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export const useEditPostAction = () => {
 	const history = useHistory();
-	const { createPatternOverride } = unlock( useDispatch( patternsStore ) );
+	const { customizePattern } = unlock( useDispatch( patternsStore ) );
 	return useMemo(
 		() => ( {
 			id: 'edit-post',
@@ -26,18 +26,18 @@ export const useEditPostAction = () => {
 				// A registered pattern is edited through its editable copy,
 				// created on first edit.
 				if ( post.type === PATTERN_TYPES.theme ) {
-					const override = post.overrideId
-						? { id: post.overrideId }
-						: await createPatternOverride( post );
+					const customization = post.customizationId
+						? { id: post.customizationId }
+						: await customizePattern( post );
 					history.navigate(
-						`/${ PATTERN_TYPES.user }/${ override.id }?canvas=edit`
+						`/${ PATTERN_TYPES.user }/${ customization.id }?canvas=edit`
 					);
 					return;
 				}
 				history.navigate( `/${ post.type }/${ post.id }?canvas=edit` );
 			},
 		} ),
-		[ history, createPatternOverride ]
+		[ history, customizePattern ]
 	);
 };
 

@@ -96,10 +96,10 @@ class Test_Blocks_RenderReusable extends WP_UnitTestCase {
 
 	/**
 	 * @covers ::gutenberg_render_block_core_block
-	 * @covers ::gutenberg_block_core_block_get_pattern_override
+	 * @covers ::gutenberg_block_core_block_get_pattern_customization
 	 */
 	public function test_render_registered_pattern_uses_edited_copy() {
-		$override_id = self::factory()->post->create(
+		$customization_id = self::factory()->post->create(
 			array(
 				'post_type'    => 'wp_block',
 				'post_status'  => 'publish',
@@ -112,10 +112,10 @@ class Test_Blocks_RenderReusable extends WP_UnitTestCase {
 		$this->assertSame( '<p class="wp-block-paragraph">Edited copy</p>', do_blocks( '<!-- wp:block {"slug":"test/greeting"} /-->' ) );
 
 		// Trashing the copy reverts to the registered pattern.
-		wp_trash_post( $override_id );
+		wp_trash_post( $customization_id );
 		$this->assertSame( '<p class="wp-block-paragraph">Hello from a registered pattern!</p>', do_blocks( '<!-- wp:block {"slug":"test/greeting"} /-->' ) );
 
-		wp_delete_post( $override_id, true );
+		wp_delete_post( $customization_id, true );
 	}
 
 	/**

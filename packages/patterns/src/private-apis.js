@@ -10,8 +10,8 @@ import {
 } from './components/duplicate-pattern-modal';
 import {
 	isOverridableBlock,
-	isPatternOverride,
-	resolvePatternOverride,
+	isPatternCustomization,
+	applyPatternCustomization,
 } from './api';
 import RenamePatternModal from './components/rename-pattern-modal';
 import PatternsMenuItems from './components';
@@ -25,7 +25,7 @@ import {
 	PATTERN_USER_CATEGORY,
 	EXCLUDED_PATTERN_SOURCES,
 	PATTERN_SYNC_TYPES,
-	PATTERN_OVERRIDE_META_KEY,
+	PATTERN_SLUG_META_KEY,
 } from './constants';
 
 export const privateApis = {};
@@ -35,8 +35,8 @@ lock( privateApis, {
 	CreatePatternModalContents,
 	DuplicatePatternModal,
 	isOverridableBlock,
-	isPatternOverride,
-	resolvePatternOverride,
+	isPatternCustomization,
+	applyPatternCustomization,
 	useDuplicatePatternProps,
 	RenamePatternModal,
 	PatternsMenuItems,
@@ -49,5 +49,5 @@ lock( privateApis, {
 	PATTERN_USER_CATEGORY,
 	EXCLUDED_PATTERN_SOURCES,
 	PATTERN_SYNC_TYPES,
-	PATTERN_OVERRIDE_META_KEY,
+	PATTERN_SLUG_META_KEY,
 } );

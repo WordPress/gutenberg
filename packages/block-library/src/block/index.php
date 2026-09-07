@@ -50,7 +50,7 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 
 		// A registered pattern, referenced by its name. An edited copy saved
 		// as a `wp_block` post wins over the registry.
-		$reusable_block = block_core_block_get_pattern_override( $slug );
+		$reusable_block = block_core_block_get_pattern_customization( $slug );
 
 		if ( $reusable_block ) {
 			$content = $reusable_block->post_content;
@@ -135,7 +135,7 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
  * @param string $pattern_name Registered pattern name.
  * @return WP_Post|null The published copy, or null when the pattern is not edited.
  */
-function block_core_block_get_pattern_override( $pattern_name ) {
+function block_core_block_get_pattern_customization( $pattern_name ) {
 	$posts = get_posts(
 		array(
 			'post_type'      => 'wp_block',

@@ -31,7 +31,7 @@ const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
 const EMPTY_OBJECT = {};
 
-const { isPatternOverride, resolvePatternOverride } =
+const { isPatternCustomization, applyPatternCustomization } =
 	unlock( patternsPrivateApis );
 
 function getUserPatternRecords( select ) {
@@ -45,11 +45,13 @@ function getUserPatternRecords( select ) {
 
 // Edited copies of registered patterns stand behind the registered pattern:
 // they are dropped from the user patterns the block editor lists, and their
-// title and content are merged into the registered pattern they override.
+// title and content are merged into the registered pattern they customize.
 const __experimentalReusableBlocksSelect = createSelector(
 	( select ) => {
 		const records = getUserPatternRecords( select );
-		return records?.filter( ( record ) => ! isPatternOverride( record ) );
+		return records?.filter(
+			( record ) => ! isPatternCustomization( record )
+		);
 	},
 	( select ) => [ getUserPatternRecords( select ) ]
 );
@@ -64,7 +66,7 @@ const selectBlockPatterns = createSelector(
 		}
 		const records = getUserPatternRecords( select );
 		return getBlockPatternsForPostType( postType ).map( ( pattern ) =>
-			resolvePatternOverride( pattern, records )
+			applyPatternCustomization( pattern, records )
 		);
 	},
 	( select, postType ) => [

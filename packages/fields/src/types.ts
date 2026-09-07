@@ -123,7 +123,7 @@ export interface Pattern extends CommonPost {
 	synced?: boolean;
 	// Registered patterns only: the id of the `wp_block` post that is the
 	// edited copy of the pattern, when it has been edited.
-	overrideId?: number;
+	customizationId?: number;
 }
 
 export interface SiteSettings {

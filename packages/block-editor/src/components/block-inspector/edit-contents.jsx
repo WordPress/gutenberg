@@ -14,19 +14,19 @@ function IsolatedEditButton( {
 } ) {
 	const { ref, theme, slug } = attributes;
 	// A pattern referenced by slug is edited through its edited copy when it
-	// has one (`overrideId`); creating the copy is up to the block's own
+	// has one (`customizationId`); creating the copy is up to the block's own
 	// toolbar button.
-	const overrideId = useSelect(
+	const customizationId = useSelect(
 		( select ) =>
 			! isTemplatePartBlock && ! ref && slug
 				? unlock( select( blockEditorStore ) ).getPatternBySlug( slug )
-						?.overrideId
+						?.customizationId
 				: undefined,
 		[ isTemplatePartBlock, ref, slug ]
 	);
 	const entityId = isTemplatePartBlock
 		? theme && slug && `${ theme }//${ slug }`
-		: ref ?? overrideId;
+		: ref ?? customizationId;
 
 	if ( ! entityId ) {
 		return null;

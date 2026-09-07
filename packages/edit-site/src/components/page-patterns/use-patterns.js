@@ -15,7 +15,7 @@ import { unlock } from '../../lock-unlock';
 import { searchItems } from './search-items';
 import { store as editSiteStore } from '../../store';
 
-const { isPatternOverride, resolvePatternOverride } =
+const { isPatternCustomization, applyPatternCustomization } =
 	unlock( patternsPrivateApis );
 
 const EMPTY_PATTERN_LIST = [];
@@ -86,7 +86,7 @@ const selectPatternOverrides = ( select ) =>
 		select( coreStore ).getEntityRecords( 'postType', PATTERN_TYPES.user, {
 			per_page: -1,
 		} ) ?? EMPTY_PATTERN_LIST
-	).filter( isPatternOverride );
+	).filter( isPatternCustomization );
 
 const selectThemePatterns = createSelector(
 	( select ) => {
@@ -98,7 +98,7 @@ const selectThemePatterns = createSelector(
 			settings.__experimentalBlockPatterns;
 
 		const restBlockPatterns = select( coreStore ).getBlockPatterns();
-		const overrides = selectPatternOverrides( select );
+		const customizations = selectPatternOverrides( select );
 
 		const patterns = [
 			...( blockPatterns || [] ),
@@ -113,7 +113,10 @@ const selectThemePatterns = createSelector(
 			.map( ( pattern ) => {
 				// The edited copy of a registered pattern, when it exists, is
 				// the source of its title and content.
-				const resolved = resolvePatternOverride( pattern, overrides );
+				const resolved = applyPatternCustomization(
+					pattern,
+					customizations
+				);
 				return {
 					...resolved,
 					keywords: pattern.keywords || [],
@@ -240,7 +243,7 @@ const selectUserPatterns = createSelector(
 		// Edited copies of registered patterns are listed as the registered
 		// pattern itself, not as user patterns.
 		let patterns = ( patternPosts ?? EMPTY_PATTERN_LIST ).filter(
-			( record ) => ! isPatternOverride( record )
+			( record ) => ! isPatternCustomization( record )
 		);
 		const isResolving = isResolvingSelector( 'getEntityRecords', [
 			'postType',

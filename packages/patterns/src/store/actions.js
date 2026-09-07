@@ -1,7 +1,7 @@
 import { getBlockType, cloneBlock } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { PATTERN_SYNC_TYPES, PATTERN_OVERRIDE_META_KEY } from '../constants';
+import { PATTERN_SYNC_TYPES, PATTERN_SLUG_META_KEY } from '../constants';
 
 /**
  * Returns a generator converting one or more static blocks into a pattern, or creating a new empty pattern.
@@ -48,18 +48,18 @@ export const createPattern =
  * @param {string[]} [pattern.categories] Registered pattern category slugs.
  * @return {Promise<Object>} The `wp_block` record.
  */
-export const createPatternOverride =
+export const customizePattern =
 	( pattern ) =>
 	async ( { registry } ) => {
 		const existing = await registry
 			.resolveSelect( coreStore )
 			.getEntityRecords( 'postType', 'wp_block', { per_page: -1 } );
-		const override = existing?.find(
+		const customization = existing?.find(
 			( record ) =>
-				record.meta?.[ PATTERN_OVERRIDE_META_KEY ] === pattern.name
+				record.meta?.[ PATTERN_SLUG_META_KEY ] === pattern.name
 		);
-		if ( override ) {
-			return override;
+		if ( customization ) {
+			return customization;
 		}
 
 		// Map the registered categories onto user pattern categories, creating
@@ -115,7 +115,7 @@ export const createPatternOverride =
 				title: pattern.title,
 				content: pattern.content,
 				status: 'publish',
-				meta: { [ PATTERN_OVERRIDE_META_KEY ]: pattern.name },
+				meta: { [ PATTERN_SLUG_META_KEY ]: pattern.name },
 				wp_pattern_category: categoryIds,
 			},
 			{ throwOnError: true }

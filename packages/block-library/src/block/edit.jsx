@@ -150,7 +150,7 @@ function UserPatternEdit( { recordId, ...props } ) {
  */
 function RegisteredPatternEdit( props ) {
 	const { slug } = props.attributes;
-	const { pattern, override, hasResolved, canCreate } = useSelect(
+	const { pattern, customization, hasResolved, canCreate } = useSelect(
 		( select ) => {
 			const _pattern = unlock(
 				select( blockEditorStore )
@@ -158,9 +158,9 @@ function RegisteredPatternEdit( props ) {
 			const { canUser, hasFinishedResolution } = select( coreStore );
 			return {
 				pattern: _pattern,
-				override: unlock( select( patternsStore ) ).getPatternOverride(
-					slug
-				),
+				customization: unlock(
+					select( patternsStore )
+				).getPatternCustomization( slug ),
 				hasResolved:
 					!! _pattern || hasFinishedResolution( 'getBlockPatterns' ),
 				canCreate: !! canUser( 'create', {
@@ -171,7 +171,7 @@ function RegisteredPatternEdit( props ) {
 		},
 		[ slug ]
 	);
-	const { createPatternOverride } = unlock( useDispatch( patternsStore ) );
+	const { customizePattern } = unlock( useDispatch( patternsStore ) );
 	const content = pattern?.content;
 	// Parse the raw content rather than using the shared parsed pattern, so
 	// the root block isn't stamped with `metadata.patternName` and treated as
@@ -184,8 +184,8 @@ function RegisteredPatternEdit( props ) {
 		[ content ]
 	);
 
-	if ( override ) {
-		return <UserPatternEdit { ...props } recordId={ override.id } />;
+	if ( customization ) {
+		return <UserPatternEdit { ...props } recordId={ customization.id } />;
 	}
 
 	return (
@@ -197,7 +197,7 @@ function RegisteredPatternEdit( props ) {
 			canUserEdit={ canCreate && !! pattern }
 			// Editing a registered pattern creates its editable copy first.
 			onEditOriginal={ async ( navigate ) => {
-				const record = await createPatternOverride( pattern );
+				const record = await customizePattern( pattern );
 				navigate( record.id );
 			} }
 		/>

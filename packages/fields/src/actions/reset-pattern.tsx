@@ -15,7 +15,7 @@ import { getItemTitle } from './utils';
 const resetPattern: Action< Pattern > = {
 	id: 'reset-pattern',
 	label: __( 'Reset' ),
-	isEligible: ( item ) => item.type === 'pattern' && !! item.overrideId,
+	isEligible: ( item ) => item.type === 'pattern' && !! item.customizationId,
 	supportsBulk: false,
 	hideModalHeader: true,
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
@@ -29,7 +29,7 @@ const resetPattern: Action< Pattern > = {
 				await deleteEntityRecord(
 					'postType',
 					'wp_block',
-					String( item.overrideId ),
+					String( item.customizationId ),
 					{},
 					{ throwOnError: true }
 				);

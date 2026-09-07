@@ -26,7 +26,7 @@ function gutenberg_is_block_pattern_synced( $pattern ) {
 /**
  * Registers the `wp_pattern_slug` meta on `wp_block` posts.
  *
- * A `wp_block` post carrying this meta is the edited copy (the "override") of
+ * A `wp_block` post carrying this meta is the customization (an edited copy) of
  * the registered pattern with that name. It wins over the registry when the
  * pattern is rendered, inserted or previewed, the same way a `wp_template_part`
  * post wins over the theme file. Trashing the post reverts to the registry.

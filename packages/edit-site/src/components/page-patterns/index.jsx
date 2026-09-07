@@ -162,13 +162,14 @@ export default function DataviewsPatterns() {
 					getItemId={ ( item ) => item.name ?? item.id }
 					isLoading={ isResolving }
 					isItemClickable={ ( item ) =>
-						item.type !== PATTERN_TYPES.theme || !! item.overrideId
+						item.type !== PATTERN_TYPES.theme ||
+						!! item.customizationId
 					}
 					onClickItem={ ( item ) => {
 						// An edited registered pattern opens its editable copy.
 						if ( item.type === PATTERN_TYPES.theme ) {
 							history.navigate(
-								`/${ PATTERN_TYPES.user }/${ item.overrideId }?canvas=edit`
+								`/${ PATTERN_TYPES.user }/${ item.customizationId }?canvas=edit`
 							);
 							return;
 						}

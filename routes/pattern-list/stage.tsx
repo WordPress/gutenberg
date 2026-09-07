@@ -213,7 +213,7 @@ function PatternList() {
 		},
 	} );
 
-	const { createPatternOverride } = unlock( useDispatch( patternsStore ) );
+	const { customizePattern } = unlock( useDispatch( patternsStore ) );
 	const editRegisteredPatternAction: Action< NormalizedPattern > = useMemo(
 		() => ( {
 			id: 'edit-registered-pattern',
@@ -223,17 +223,17 @@ function PatternList() {
 			// created on first edit.
 			callback: async ( items ) => {
 				const [ item ] = items;
-				const override = item.overrideId
-					? { id: item.overrideId }
-					: await createPatternOverride( item );
+				const customization = item.customizationId
+					? { id: item.customizationId }
+					: await customizePattern( item );
 				navigate( {
 					to: `/types/wp_block/edit/${ encodeURIComponent(
-						override.id
+						customization.id
 					) }`,
 				} );
 			},
 		} ),
-		[ createPatternOverride, navigate ]
+		[ customizePattern, navigate ]
 	);
 
 	const actions = useMemo( () => {
@@ -348,7 +348,7 @@ function PatternList() {
 					} );
 				} }
 				isItemClickable={ ( item ) =>
-					item.type !== PATTERN_TYPES.theme || !! item.overrideId
+					item.type !== PATTERN_TYPES.theme || !! item.customizationId
 				}
 				renderItemLink={ ( {
 					item,
@@ -359,12 +359,12 @@ function PatternList() {
 					<Link
 						to={ `/types/wp_block/edit/${ encodeURIComponent(
 							// An edited registered pattern opens its copy.
-							item.overrideId ?? item.id
+							item.customizationId ?? item.id
 						) }` }
 						{ ...props }
 						onClick={ ( event ) => {
 							// Temporary fix to prevent triggering
-							// onChangeSelection, which would override the URL.
+							// onChangeSelection, which would customization the URL.
 							event.stopPropagation();
 						} }
 					/>

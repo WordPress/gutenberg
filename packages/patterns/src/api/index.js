@@ -1,4 +1,4 @@
-import { PATTERN_OVERRIDE_META_KEY } from '../constants';
+import { PATTERN_SLUG_META_KEY } from '../constants';
 
 /**
  * Determines whether a block is overridable.
@@ -23,8 +23,8 @@ export function isOverridableBlock( block ) {
  * @param {Object} record The `wp_block` record.
  * @return {boolean} Whether the record is an edited copy.
  */
-export function isPatternOverride( record ) {
-	return !! record?.meta?.[ PATTERN_OVERRIDE_META_KEY ];
+export function isPatternCustomization( record ) {
+	return !! record?.meta?.[ PATTERN_SLUG_META_KEY ];
 }
 
 /**
@@ -36,21 +36,20 @@ export function isPatternOverride( record ) {
  *
  * @param {Object}   pattern The registered pattern.
  * @param {Object[]} records The `wp_block` records.
- * @return {Object} The pattern, with `title`, `content` and `overrideId` from
+ * @return {Object} The pattern, with `title`, `content` and `customizationId` from
  *                  the copy when edited.
  */
-export function resolvePatternOverride( pattern, records ) {
-	const override = records?.find(
-		( record ) =>
-			record.meta?.[ PATTERN_OVERRIDE_META_KEY ] === pattern.name
+export function applyPatternCustomization( pattern, records ) {
+	const customization = records?.find(
+		( record ) => record.meta?.[ PATTERN_SLUG_META_KEY ] === pattern.name
 	);
-	if ( ! override ) {
+	if ( ! customization ) {
 		return pattern;
 	}
 	return {
 		...pattern,
-		title: override.title?.raw ?? pattern.title,
-		content: override.content?.raw ?? pattern.content,
-		overrideId: override.id,
+		title: customization.title?.raw ?? pattern.title,
+		content: customization.content?.raw ?? pattern.content,
+		customizationId: customization.id,
 	};
 }
