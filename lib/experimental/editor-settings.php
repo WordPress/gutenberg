@@ -11,9 +11,6 @@
 function gutenberg_enable_experiments() {
 	global $pagenow;
 
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-color-randomizer' ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableColorRandomizer = true', 'before' );
-	}
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableGridInteractivity = true', 'before' );
 	}
