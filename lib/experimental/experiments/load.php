@@ -110,6 +110,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables the Workflow Palette for running workflows composed of abilities, from a unified interface.', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-template-parts-as-patterns',
+					'label'       => __( 'Template parts as patterns', 'gutenberg' ),
+					'description' => __( 'Registers the theme\'s template parts as synced patterns, migrates saved template parts to pattern copies, and renders template part blocks as Pattern blocks. Creating new template parts is disabled.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-extensible-site-editor',
 					'label'       => __( 'Extensible Site Editor', 'gutenberg' ),
 					'description' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),

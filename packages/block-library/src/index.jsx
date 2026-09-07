@@ -216,7 +216,9 @@ const getAllBlocks = () => {
 		siteTitle,
 		siteTagline,
 		query,
-		templatePart,
+		// Under the "template parts as patterns" experiment the parser converts
+		// template part blocks to pattern instances; the block itself is gone.
+		! window?.__experimentalTemplatePartsAsPatterns && templatePart,
 		avatar,
 		postTitle,
 		postExcerpt,

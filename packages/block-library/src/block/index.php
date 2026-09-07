@@ -115,7 +115,10 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 	 * This ensures that block context available to the Synced Pattern block instance is provided to
 	 * those blocks.
 	 */
-	$block_instance->parsed_block['innerBlocks']  = parse_blocks( $content );
+	// Blocks hooked to the instance as its first or last child arrive as inner
+	// blocks of the parsed block; keep them around the pattern's own blocks.
+	list( $hooked_first, $hooked_last )           = block_core_block_get_hooked_inner_blocks( $block_instance->parsed_block );
+	$block_instance->parsed_block['innerBlocks']  = array_merge( $hooked_first, parse_blocks( $content ), $hooked_last );
 	$block_instance->parsed_block['innerContent'] = array_fill( 0, count( $block_instance->parsed_block['innerBlocks'] ), null );
 	$block_instance->refresh_context_dependents();
 
@@ -135,6 +138,31 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 	}
 
 	return $content;
+}
+
+/**
+ * Splits the inner blocks a parsed pattern instance already carries (blocks
+ * hooked to it) into the ones hooked as first child and as last child.
+ *
+ * @since 7.2.0
+ *
+ * @param array $parsed_block The parsed block.
+ * @return array{0: array[], 1: array[]} First-child and last-child hooked blocks.
+ */
+function block_core_block_get_hooked_inner_blocks( $parsed_block ) {
+	$first = array();
+	$last  = array();
+	foreach ( $parsed_block['innerBlocks'] ?? array() as $inner_block ) {
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $inner_block['blockName'] ?? '' );
+		$hooks      = $block_type && is_array( $block_type->block_hooks ) ? $block_type->block_hooks : array();
+		$position   = $hooks['core/block'] ?? $hooks['core/template-part'] ?? 'last_child';
+		if ( 'first_child' === $position ) {
+			$first[] = $inner_block;
+		} else {
+			$last[] = $inner_block;
+		}
+	}
+	return array( $first, $last );
 }
 
 /**

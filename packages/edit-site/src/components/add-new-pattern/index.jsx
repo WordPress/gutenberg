@@ -10,6 +10,7 @@ import {
 } from '@wordpress/patterns';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
 import {
@@ -54,10 +55,14 @@ export default function AddNewPattern() {
 				kind: 'postType',
 				name: PATTERN_TYPES.user,
 			} ),
-			canCreateTemplatePart: canUser( 'create', {
-				kind: 'postType',
-				name: TEMPLATE_PART_POST_TYPE,
-			} ),
+			// Template parts can only be created while the block exists; the
+			// "template parts as patterns" experiment removes it.
+			canCreateTemplatePart:
+				!! select( blocksStore ).getBlockType( 'core/template-part' ) &&
+				canUser( 'create', {
+					kind: 'postType',
+					name: TEMPLATE_PART_POST_TYPE,
+				} ),
 		};
 	}, [] );
 
