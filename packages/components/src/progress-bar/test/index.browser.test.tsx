@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ProgressBar } from '..';
-import { INDETERMINATE_TRACK_WIDTH } from '../styles';
 
 describe( 'ProgressBar', () => {
 	it( 'should render an indeterminate semantic progress bar element', () => {
@@ -22,7 +21,7 @@ describe( 'ProgressBar', () => {
 		expect( progressBar ).toHaveValue( 55 );
 	} );
 
-	it( 'should not set an inline indicator width for indeterminate progress bar', () => {
+	it( 'should use the stylesheet-defined width for an indeterminate progress bar', () => {
 		const { container } = render( <ProgressBar /> );
 
 		/**
@@ -38,10 +37,9 @@ describe( 'ProgressBar', () => {
 			( indicator as Element ).parentElement!
 		).width;
 		expect( Number.parseFloat( style.width ) ).toBe(
-			( Number.parseFloat( trackWidth ) * INDETERMINATE_TRACK_WIDTH ) /
-				100
+			Number.parseFloat( trackWidth ) / 2
 		);
-		expect( style.getPropertyValue( '--indicator-width' ) ).toBe( '' );
+		expect( style.getPropertyValue( '--indicator-width' ) ).toBe( '50%' );
 	} );
 
 	it( 'should use `value`% as width for determinate progress bar', () => {

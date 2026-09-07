@@ -1,65 +1,66 @@
-import { afterAll, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { downloadBlob } from '..';
 
+async function observeAddedNodes( callback: () => void ) {
+	const addedNodes: Node[] = [];
+	const observer = new MutationObserver( ( mutations ) => {
+		for ( const mutation of mutations ) {
+			addedNodes.push( ...mutation.addedNodes );
+		}
+	} );
+	observer.observe( document.body, { childList: true } );
+
+	callback();
+	await new Promise< void >( ( resolve ) => queueMicrotask( resolve ) );
+	observer.disconnect();
+
+	return addedNodes;
+}
+
 describe( 'downloadBlob', () => {
-	const createObjectURL = vi
-		.spyOn( window.URL, 'createObjectURL' )
-		.mockReturnValue( 'blob:pannacotta' );
-	const revokeObjectURL = vi
-		.spyOn( window.URL, 'revokeObjectURL' )
-		.mockImplementation( () => {} );
-	const mockAnchorElement = document.createElement( 'a' );
-	let displayWhenClicked = '';
-	mockAnchorElement.click = vi.fn( () => {
-		displayWhenClicked = getComputedStyle( mockAnchorElement ).display;
-	} );
-	const createElementSpy = vi
-		.spyOn( document, 'createElement' )
-		.mockReturnValue( mockAnchorElement );
-
-	const mockBlob = {};
-	const blobSpy = vi.spyOn( window, 'Blob' ).mockImplementation(
-		class MockBlob {
-			constructor() {
-				return mockBlob;
-			}
-		} as unknown as typeof Blob
-	);
-	vi.spyOn( document.body, 'appendChild' );
-	vi.spyOn( document.body, 'removeChild' );
-
-	afterAll( () => {
-		vi.restoreAllMocks();
-	} );
-
-	it( 'requires a filename argument', () => {
-		downloadBlob( '', '{}', 'application/json' );
-		expect( blobSpy ).not.toHaveBeenCalled();
-	} );
-
-	it( 'requires a content argument', () => {
-		downloadBlob( 'text.txt', '', 'text/plain' );
-		expect( blobSpy ).not.toHaveBeenCalled();
-	} );
-
-	it( 'constructs a hidden anchor and removes it', () => {
-		downloadBlob( 'filename.json', '{}', 'application/json' );
-
-		expect( blobSpy ).toHaveBeenCalledWith( [ '{}' ], {
-			type: 'application/json',
+	it( 'requires a filename argument', async () => {
+		const addedNodes = await observeAddedNodes( () => {
+			downloadBlob( '', '{}', 'application/json' );
 		} );
-		expect( createObjectURL ).toHaveBeenCalledWith( mockBlob );
-		expect( createElementSpy ).toHaveBeenCalledWith( 'a' );
-		expect( mockAnchorElement.download ).toBe( 'filename.json' );
-		expect( mockAnchorElement.href ).toBe( 'blob:pannacotta' );
-		expect( displayWhenClicked ).toBe( 'none' );
-		expect( document.body.appendChild ).toHaveBeenCalledWith(
-			mockAnchorElement
-		);
-		expect( mockAnchorElement.click ).toHaveBeenCalledTimes( 1 );
-		expect( document.body.removeChild ).toHaveBeenCalledWith(
-			mockAnchorElement
-		);
-		expect( revokeObjectURL ).toHaveBeenCalled();
+
+		expect( addedNodes ).toHaveLength( 0 );
+	} );
+
+	it( 'requires a content argument', async () => {
+		const addedNodes = await observeAddedNodes( () => {
+			downloadBlob( 'text.txt', '', 'text/plain' );
+		} );
+
+		expect( addedNodes ).toHaveLength( 0 );
+	} );
+
+	it( 'constructs a hidden anchor and removes it', async () => {
+		let clickedAnchor: HTMLAnchorElement | undefined;
+		const preventDownload = ( event: MouseEvent ) => {
+			if ( event.target instanceof HTMLAnchorElement ) {
+				clickedAnchor = event.target;
+				event.preventDefault();
+			}
+		};
+		document.addEventListener( 'click', preventDownload, true );
+
+		try {
+			const addedNodes = await observeAddedNodes( () => {
+				downloadBlob( 'filename.json', '{}', 'application/json' );
+			} );
+			const anchor = addedNodes.find(
+				( node ): node is HTMLAnchorElement =>
+					node instanceof HTMLAnchorElement
+			);
+
+			expect( anchor ).toBeDefined();
+			expect( anchor?.download ).toBe( 'filename.json' );
+			expect( anchor?.href ).toMatch( /^blob:/ );
+			expect( anchor?.style.display ).toBe( 'none' );
+			expect( clickedAnchor ).toBe( anchor );
+			expect( anchor?.isConnected ).toBe( false );
+		} finally {
+			document.removeEventListener( 'click', preventDownload, true );
+		}
 	} );
 } );

@@ -155,23 +155,41 @@ describe( 'Popover', () => {
 		describe( 'offset', () => {
 			it( 'should displace the popover along its cross axis when passed an offset object', async () => {
 				render(
-					<Popover
-						placement="right-start"
-						offset={ { mainAxis: 16, crossAxis: 24 } }
-						animate={ false }
-						flip={ false }
-						shift={ false }
-						data-testid="popover-element"
-					>
-						Hello
-					</Popover>
+					<>
+						<Popover
+							placement="right-start"
+							offset={ { mainAxis: 0, crossAxis: 0 } }
+							animate={ false }
+							flip={ false }
+							shift={ false }
+							data-testid="baseline-popover"
+						>
+							Baseline
+						</Popover>
+						<Popover
+							placement="right-start"
+							offset={ { mainAxis: 16, crossAxis: 24 } }
+							animate={ false }
+							flip={ false }
+							shift={ false }
+							data-testid="offset-popover"
+						>
+							Offset
+						</Popover>
+					</>
 				);
-				const popover = screen.getByTestId( 'popover-element' );
+				const baseline = screen.getByTestId( 'baseline-popover' );
+				const offset = screen.getByTestId( 'offset-popover' );
 
-				await waitFor( () => expect( popover ).toBeVisible() );
-				expect( popover ).toHaveStyle(
-					'transform: translateX(16px) translateY(24px)'
-				);
+				await waitFor( () => {
+					expect( baseline ).toBeVisible();
+					expect( offset ).toBeVisible();
+				} );
+
+				const baselineRect = baseline.getBoundingClientRect();
+				const offsetRect = offset.getBoundingClientRect();
+				expect( offsetRect.left - baselineRect.left ).toBeCloseTo( 16 );
+				expect( offsetRect.top - baselineRect.top ).toBeCloseTo( 24 );
 			} );
 		} );
 

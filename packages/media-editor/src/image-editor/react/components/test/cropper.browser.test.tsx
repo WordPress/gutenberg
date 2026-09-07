@@ -684,8 +684,8 @@ describe( 'Cropper', () => {
 
 	it( 'ends the gesture when a drag is cancelled by disabling', async () => {
 		const controller = createController();
-		const onGestureStart = jest.fn();
-		const onGestureEnd = jest.fn();
+		const onGestureStart = vi.fn();
+		const onGestureEnd = vi.fn();
 		const props = {
 			src: 'test.jpg',
 			controller,
@@ -728,7 +728,7 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'does not signal a gesture end when disabling with no gesture running', async () => {
-		const onGestureEnd = jest.fn();
+		const onGestureEnd = vi.fn();
 		const props = {
 			src: 'test.jpg',
 			controller: createController(),
@@ -750,7 +750,7 @@ describe( 'Cropper', () => {
 
 	it( 'signals a fresh gesture on wheel zoom after a save interrupted one', async () => {
 		const controller = createController();
-		const onGestureStart = jest.fn();
+		const onGestureStart = vi.fn();
 		const props = {
 			src: 'test.jpg',
 			controller,
@@ -853,7 +853,7 @@ describe( 'Cropper', () => {
 		} );
 
 		rerender( <Cropper { ...props } disabled /> );
-		( controller.setPan as jest.Mock ).mockClear();
+		vi.mocked( controller.setPan ).mockClear();
 
 		fireEvent.pointerMove( canvas, {
 			button: 0,

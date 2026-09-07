@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, test } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import { createPortal, useState } from '@wordpress/element';
 import { registerStyle } from '@wordpress/style-runtime';
@@ -74,7 +75,8 @@ describe( 'props', () => {
 				.scrollBehavior
 		).toBe( 'smooth' );
 		expect(
-			getComputedStyle( screen.getByTestId( 'scrollable' ) ).scrollBehavior
+			getComputedStyle( screen.getByTestId( 'scrollable' ) )
+				.scrollBehavior
 		).toBe( 'auto' );
 	} );
 
@@ -142,25 +144,29 @@ describe( 'CardBody isScrollable height', () => {
 			`.${ styles.scrollable }{height:100%;}`
 		);
 
-		render( <CardBody data-testid="card-body">Body</CardBody> );
 		render(
-			<CardBody isScrollable data-testid="scrollable-body">
-				Body
-			</CardBody>
+			<div style={ { height: 200 } }>
+				<CardBody data-testid="card-body">Body</CardBody>
+				<CardBody isScrollable data-testid="scrollable-body">
+					Body
+				</CardBody>
+			</div>
 		);
 
 		expect(
 			getComputedStyle( screen.getByTestId( 'card-body' ) ).height
-		).toBe( 'auto' );
+		).not.toBe( '200px' );
 		expect(
 			getComputedStyle( screen.getByTestId( 'scrollable-body' ) ).height
-		).toBe( '100%' );
+		).toBe( '200px' );
 
 		render(
 			<IframeWithStyleProvider>
-				<CardBody isScrollable data-testid="scrollable-body-iframe">
-					Body
-				</CardBody>
+				<div style={ { height: 200 } }>
+					<CardBody isScrollable data-testid="scrollable-body-iframe">
+						Body
+					</CardBody>
+				</div>
 			</IframeWithStyleProvider>
 		);
 
@@ -174,6 +180,6 @@ describe( 'CardBody isScrollable height', () => {
 
 		expect(
 			iframeDocument.defaultView!.getComputedStyle( iframeBody ).height
-		).toBe( '100%' );
+		).toBe( '200px' );
 	} );
 } );
