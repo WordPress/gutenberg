@@ -15,6 +15,7 @@ import {
 	canInsertBlockType,
 	getBlockName,
 	getTemplateLock,
+	getClientIdsOfDescendants,
 	getClientIdsWithDescendants,
 	getBlockRootClientId,
 	getBlockAttributes,
@@ -136,6 +137,71 @@ function getClientIdWithClientIdsTreeUnmemoized( state, clientId ) {
 function getClientIdsTreeUnmemoized( state, rootClientId = '' ) {
 	return getBlockOrder( state, rootClientId ).map( ( clientId ) =>
 		getClientIdWithClientIdsTreeUnmemoized( state, clientId )
+	);
+}
+
+/**
+ * Returns whether any descendant of the block is editable as content. Used to
+ * tell a named container that actually groups editable content from one that
+ * only groups design, so that only the former is surfaced as a grouping row.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {boolean} Whether the block has a content-only descendant.
+ */
+function hasContentOnlyDescendant( state, clientId ) {
+	return getBlockOrder( state, clientId ).some(
+		( innerClientId ) =>
+			getBlockEditingMode( state, innerClientId ) === 'contentOnly' ||
+			hasContentOnlyDescendant( state, innerClientId )
+	);
+}
+
+/**
+ * Returns whether any ancestor of the block is already surfaced as a grouping
+ * row, so that only the top-most named container in a pattern becomes a group
+ * and the inspector does not nest groups within groups.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {boolean} Whether an ancestor already groups content.
+ */
+function hasContentGroupAncestor( state, clientId ) {
+	let parent = state.blocks.parents.get( clientId );
+
+	while ( parent !== undefined ) {
+		if (
+			getBlockEditingMode( state, parent ) === 'disabled' &&
+			!! getBlockAttributes( state, parent )?.metadata?.name
+		) {
+			return true;
+		}
+
+		parent = state.blocks.parents.get( parent );
+	}
+
+	return false;
+}
+
+/**
+ * Returns whether a disabled block should be surfaced in List View as a row
+ * that groups the content blocks beneath it. A pattern author opts a container
+ * in by naming it (the block rename feature), and the name is only meaningful
+ * as a group when there is editable content under it to group. Only the
+ * top-most named container becomes a group, to keep the flattened list flat.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {boolean} Whether the block groups content in List View.
+ */
+function isContentGroupBlock( state, clientId ) {
+	return (
+		!! getBlockAttributes( state, clientId )?.metadata?.name &&
+		! hasContentGroupAncestor( state, clientId ) &&
+		hasContentOnlyDescendant( state, clientId )
 	);
 }
 
@@ -320,6 +386,14 @@ function getListViewClientIdsTreeUnmemoized( state, rootClientId ) {
 				return false;
 			}
 
+			// A named container is surfaced as a row that groups the content
+			// blocks beneath it, so that a flattened pattern still shows which
+			// card or column a given content block belongs to. The row itself
+			// stays disabled: it is there for orientation, not for editing.
+			if ( isContentGroupBlock( _state, clientId ) ) {
+				return true;
+			}
+
 			// When a contentOnly section is being edited, there's some special handling.
 			if ( _state.editedContentOnlySection ) {
 				// Blocks within the edited content only section generally have their block
@@ -402,6 +476,144 @@ export const getListViewClientIdsTree = createSelector(
 					state.settings,
 			  ]
 			: [] ),
+	]
+);
+
+function getTopMostNamedContentGroupForBlockUnmemoized( state, clientId ) {
+	const sectionClientId = getParentSectionBlock( state, clientId );
+	if ( ! sectionClientId ) {
+		return null;
+	}
+
+	const parents = getBlockParents( state, clientId );
+	const sectionIndex = parents.indexOf( sectionClientId );
+	if ( sectionIndex === -1 ) {
+		return null;
+	}
+
+	for ( const parent of parents.slice( sectionIndex + 1 ) ) {
+		const isNamedDisabledParent =
+			getBlockEditingMode( state, parent ) === 'disabled' &&
+			!! getBlockAttributes( state, parent )?.metadata?.name;
+		if ( isNamedDisabledParent ) {
+			return parent;
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Returns content-only descendants for a content-only section.
+ * Descendants that are already represented inside a nested List View support
+ * block are excluded from the flat content panel list.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the section block.
+ *
+ * @return {string[]} Content-only client IDs for the section.
+ */
+export const getContentClientIdsForSection = createSelector(
+	( state, clientId ) => {
+		const descendants = getClientIdsOfDescendants( state, clientId );
+
+		const listViewDescendants = new Set();
+		descendants.forEach( ( descendant ) => {
+			if ( shouldRenderBlockListView( state, descendant ) ) {
+				const listViewChildren = getClientIdsOfDescendants(
+					state,
+					descendant
+				);
+				listViewChildren.forEach( ( childId ) =>
+					listViewDescendants.add( childId )
+				);
+			}
+		} );
+
+		return descendants.filter( ( current ) => {
+			return (
+				! listViewDescendants.has( current ) &&
+				getBlockEditingMode( state, current ) === 'contentOnly'
+			);
+		} );
+	},
+	( state ) => [
+		state.blocks.order,
+		state.blocks.byClientId,
+		state.blocks.attributes,
+		state.derivedBlockEditingModes,
+		state.blocks.blockEditingModes,
+		state.blockListSettings,
+	]
+);
+
+/**
+ * Returns the top-most named disabled grouping block for a content block.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the content block.
+ *
+ * @return {?string} Client ID of the grouping block, or null.
+ */
+export const getTopMostNamedContentGroupForBlock = createSelector(
+	getTopMostNamedContentGroupForBlockUnmemoized,
+	( state ) => [
+		state.blocks.parents,
+		state.blocks.byClientId,
+		state.blocks.attributes,
+		state.derivedBlockEditingModes,
+		state.blocks.blockEditingModes,
+		state.blockListSettings,
+		state.editedContentOnlySection,
+		state.settings,
+	]
+);
+
+/**
+ * Returns a group heading client ID for the first content row in a named group.
+ * Later content rows in the same group return null.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the content block.
+ *
+ * @return {?string} Client ID of the grouping block, or null.
+ */
+export const getContentGroupHeaderClientId = createSelector(
+	( state, clientId ) => {
+		const groupClientId = getTopMostNamedContentGroupForBlock(
+			state,
+			clientId
+		);
+		if ( ! groupClientId ) {
+			return null;
+		}
+
+		const sectionClientId = getParentSectionBlock( state, clientId );
+		if ( ! sectionClientId ) {
+			return null;
+		}
+
+		const firstClientIdInGroup = getContentClientIdsForSection(
+			state,
+			sectionClientId
+		).find(
+			( current ) =>
+				getTopMostNamedContentGroupForBlock( state, current ) ===
+				groupClientId
+		);
+
+		return firstClientIdInGroup === clientId ? groupClientId : null;
+	},
+	( state ) => [
+		state.blocks.order,
+		state.blocks.parents,
+		state.blocks.byClientId,
+		state.blocks.attributes,
+		state.derivedBlockEditingModes,
+		state.blocks.blockEditingModes,
+		state.blockListSettings,
+		state.editedContentOnlySection,
+		state.settings,
 	]
 );
 

@@ -22,6 +22,7 @@ const ContentTab = ( {
 						clientIds={ contentClientIds }
 						onSwitchToListView={ onSwitchToListView }
 						hasListViewTab={ hasListViewTab }
+						showGroupHeadings
 					/>
 				</PanelBody>
 			) }

@@ -129,7 +129,7 @@ test.describe( 'Unsynced pattern', () => {
 		pageUtils,
 	} ) => {
 		await editor.setContent( `<!-- wp:group {"metadata":{"patternName":"core/block/123","name":"My pattern"},"layout":{"type":"constrained"}} -->
-<div class="wp-block-group"><!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:group {"metadata":{"name":"Card"},"layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:heading -->
 <h2 class="wp-block-heading">Test heading</h2>
 <!-- /wp:heading -->
@@ -174,6 +174,19 @@ test.describe( 'Unsynced pattern', () => {
 				exact: true,
 			} )
 		).not.toBeAttached();
+
+		const namedGroup = listView.getByRole( 'gridcell', {
+			name: 'Card',
+		} );
+		await expect( namedGroup ).toBeVisible();
+		await expect( namedGroup.locator( 'a' ) ).toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+		await expect( namedGroup.locator( 'a' ) ).toHaveAttribute(
+			'href',
+			/#block-/
+		);
 
 		// Assert that content blocks are present in List View.
 		await expect(

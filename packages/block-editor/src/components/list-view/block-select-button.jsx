@@ -102,8 +102,20 @@ function ListViewBlockSelectButton(
 	 */
 	function onKeyDown( event ) {
 		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
+			if ( isDisabled ) {
+				event.preventDefault();
+				return;
+			}
 			onClick( event );
 		}
+	}
+
+	function onClickHandler( event ) {
+		if ( isDisabled ) {
+			event.preventDefault();
+			return;
+		}
+		onClick( event );
 	}
 
 	return (
@@ -114,7 +126,7 @@ function ListViewBlockSelectButton(
 				'block-editor-list-view-block-select-button',
 				className
 			) }
-			onClick={ onClick }
+			onClick={ onClickHandler }
 			onContextMenu={ onContextMenu }
 			onKeyDown={ onKeyDown }
 			onMouseDown={ onMouseDown }

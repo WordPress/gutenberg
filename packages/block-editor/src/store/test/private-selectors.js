@@ -601,6 +601,14 @@ describe( 'private selectors', () => {
 					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', {} ], // | |  Paragraph
 					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', {} ], // | |  Paragraph
 				] ),
+				attributes: new Map( [
+					[ '6cf70164-9097-4460-bcbf-200560546988', {} ],
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', {} ],
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', {} ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ],
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', {} ],
+					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', {} ],
+				] ),
 				order: new Map( [
 					[
 						'',
