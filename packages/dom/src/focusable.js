@@ -47,13 +47,21 @@ function buildSelector( sequential ) {
 
 /**
  * Returns true if the specified element is visible (i.e. neither display: none
- * nor visibility: hidden).
+ * nor visibility: hidden or collapse).
  *
  * @param {HTMLElement} element DOM element to test.
  *
  * @return {boolean} Whether element is visible.
  */
 function isVisible( element ) {
+	const visibility =
+		element.ownerDocument.defaultView?.getComputedStyle(
+			element
+		).visibility;
+	if ( visibility === 'hidden' || visibility === 'collapse' ) {
+		return false;
+	}
+
 	return (
 		element.offsetWidth > 0 ||
 		element.offsetHeight > 0 ||
