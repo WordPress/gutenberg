@@ -7,7 +7,8 @@ import useEntityId from './use-entity-id';
 // A stable reference, because `getRevision` memoizes on the query's identity.
 const REVISION_QUERY = {
 	context: 'edit',
-	_fields: 'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+	_fields:
+		'id,date,author,meta,title.raw,title.rendered,excerpt.raw,excerpt.rendered,content.raw',
 };
 
 /**
