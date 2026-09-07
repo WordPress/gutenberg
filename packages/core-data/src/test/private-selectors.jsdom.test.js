@@ -75,7 +75,10 @@ describe( 'getTemplateId', () => {
 				slug: editedSlug ?? savedSlug,
 				template: '',
 			} ),
-			getRawEntityRecord: () => ( { slug: savedSlug } ),
+			// An unsaved record has no raw entry at all, so the selector
+			// returns undefined rather than an object with an empty slug.
+			getRawEntityRecord: () =>
+				savedSlug === undefined ? undefined : { slug: savedSlug },
 			getEntityRecords: () => [],
 			getDefaultTemplateId,
 		};
