@@ -20,7 +20,6 @@ const CONTROL_PROPS = {
 // TypeScript type declarations.
 export default Object.assign( {}, CONTROL_PROPS, {
 	colorDivider: 'rgba(0, 0, 0, 0.1)',
-	elevationIntensity: 1,
 	radiusXSmall: '1px',
 	radiusSmall: '2px',
 	radiusMedium: '4px',
