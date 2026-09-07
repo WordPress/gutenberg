@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { serialize, to, HSL, sRGB } from 'colorjs.io/fn';
-import { buildAccentRamp, buildBgRamp, checkAccessibleCombinations } from '..';
+import { getLuminance, serialize, to, HSL, sRGB } from 'colorjs.io/fn';
+import { buildAccentRamp, buildBgRamp } from '..';
 import { buildRamp } from '../lib';
-import { getColorString } from '../lib/color-utils';
+import { clampToGamut, getColorString, getContrast } from '../lib/color-utils';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
+import {
+	computeBetterFgColorDirection,
+	sortByDependency,
+	stepsForStep,
+} from '../lib/utils';
 
 const lStops = [ 100, 90, 80, 70, 60, 50, 40, 30, 20, 10 ];
 const sStops = [ 100, 80, 60, 40, 20, 0 ];
@@ -130,18 +135,88 @@ describe( 'buildRamps', () => {
 		expect( result.warnings ).toBeUndefined();
 	} );
 
-	it( 'includes active fills when checking accessible combinations', () => {
+	it( 'meets fill contrast requirements after sRGB serialization', () => {
 		const bgRamp = buildBgRamp( '#4f386e' );
 		const accentRamp = buildAccentRamp( '#608010', bgRamp );
 
-		expect( checkAccessibleCombinations( { bgRamp: accentRamp } ) ).toEqual(
-			expect.arrayContaining( [
-				expect.objectContaining( {
-					bgName: 'bgFill2',
-					fgName: 'fgFill',
-					unmetContrast: 4.5,
-				} ),
-			] )
+		expect(
+			getContrast( accentRamp.ramp.bgFill1, accentRamp.ramp.fgFill )
+		).toBeGreaterThanOrEqual( 4.5 );
+		expect(
+			getContrast( accentRamp.ramp.bgFill2, accentRamp.ramp.fgFill )
+		).toBeGreaterThanOrEqual( 4.5 );
+	} );
+
+	it( 'keeps active fills darker than resting fills', () => {
+		const bgRamp = buildBgRamp( '#4f386e' );
+		const accentRamp = buildAccentRamp( '#608010', bgRamp );
+
+		expect( getLuminance( accentRamp.ramp.bgFill2 ) ).toBeLessThan(
+			getLuminance( accentRamp.ramp.bgFill1 )
 		);
+	} );
+
+	it( 'orders every contrast reference before its dependent step', () => {
+		const sortedSteps = sortByDependency( ACCENT_RAMP_CONFIG );
+
+		expect( sortedSteps.indexOf( 'bgFill1' ) ).toBeLessThan(
+			sortedSteps.indexOf( 'fgFill' )
+		);
+		expect( sortedSteps.indexOf( 'bgFill2' ) ).toBeLessThan(
+			sortedSteps.indexOf( 'fgFill' )
+		);
+	} );
+
+	it( 'uses every contrast reference when choosing a direction', () => {
+		expect( computeBetterFgColorDirection( '#333' ).better ).toBe(
+			'lighter'
+		);
+		expect(
+			computeBetterFgColorDirection( [
+				clampToGamut( '#333' ),
+				clampToGamut( '#eee' ),
+			] ).better
+		).toBe( 'darker' );
+	} );
+
+	it( 'checks every contrast reference before reusing a ramp color', () => {
+		const config = {
+			...ACCENT_RAMP_CONFIG,
+			fgFill: {
+				...ACCENT_RAMP_CONFIG.fgFill,
+				sameAsIfPossible: 'fgSurface4' as const,
+			},
+		};
+		const ramp = buildRamp( '#1fad1f', config );
+
+		expect(
+			getContrast( ramp.ramp.bgFill1, ramp.ramp.fgSurface4 )
+		).toBeGreaterThanOrEqual( 4.5 );
+		expect(
+			getContrast( ramp.ramp.bgFill2, ramp.ramp.fgSurface4 )
+		).toBeLessThan( 4.5 );
+		expect( ramp.ramp.fgFill ).not.toBe( ramp.ramp.fgSurface4 );
+		expect(
+			getContrast( ramp.ramp.bgFill2, ramp.ramp.fgFill )
+		).toBeGreaterThanOrEqual( 4.5 );
+	} );
+
+	it( 'rescales a seed using every contrast reference', () => {
+		const seed = '#85767a';
+		const ramp = buildAccentRamp(
+			seed,
+			buildBgRamp( DEFAULT_SEED_COLORS.background )
+		);
+
+		expect( stepsForStep( 'fgFill', ACCENT_RAMP_CONFIG ) ).toEqual(
+			expect.arrayContaining( [ 'bgFill1', 'bgFill2' ] )
+		);
+		expect( ramp.ramp.bgFill1 ).not.toBe( seed );
+		expect(
+			getContrast( ramp.ramp.bgFill1, ramp.ramp.fgFill )
+		).toBeGreaterThanOrEqual( 4.5 );
+		expect(
+			getContrast( ramp.ramp.bgFill2, ramp.ramp.fgFill )
+		).toBeGreaterThanOrEqual( 4.5 );
 	} );
 } );

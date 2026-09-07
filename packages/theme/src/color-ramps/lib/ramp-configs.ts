@@ -112,7 +112,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 	bgFill2: {
 		contrast: {
 			reference: 'bgFill1',
-			followDirection: 'main',
+			followDirection: 'darker',
 			target: 1.2,
 		},
 	},
@@ -201,11 +201,11 @@ export const BG_RAMP_CONFIG: RampConfig = {
 	fgFill: {
 		contrast: {
 			reference: 'bgFill1',
+			additionalReferences: [ 'bgFill2' ],
 			followDirection: 'best',
-			target: 4.5,
-			preferLighter: true,
+			// Preserve the 4.5:1 WCAG floor after 8-bit sRGB serialization.
+			target: 4.55,
 		},
-		lightness: lightnessConstraintForegroundHighContrast,
 		taperChromaOptions: FG_TAPER_CHROMA,
 	},
 	fgFillInverted: {
