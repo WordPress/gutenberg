@@ -50,16 +50,30 @@
 			( event ) => event.key === 'Enter' && record( doc, 'keydown' ),
 			true
 		);
+		// Bubble phase: after the handlers that may cancel the key.
+		doc.addEventListener(
+			'keydown',
+			( event ) =>
+				event.key === 'Enter' &&
+				record( doc, 'keydown-cancelled:' + event.defaultPrevented )
+		);
 		doc.addEventListener(
 			'beforeinput',
 			( event ) => {
-				if ( event.inputType !== 'insertParagraph' ) {
-					return;
+				record( doc, 'beforeinput:' + event.inputType );
+				if (
+					event.inputType === 'insertParagraph' ||
+					event.inputType === 'insertLineBreak'
+				) {
+					queueMicrotask( () => record( doc, 'microtask' ) );
+					setTimeout( () => record( doc, 'timeout' ), 0 );
 				}
-				record( doc, 'beforeinput' );
-				queueMicrotask( () => record( doc, 'microtask' ) );
-				setTimeout( () => record( doc, 'timeout' ), 0 );
 			},
+			true
+		);
+		doc.addEventListener(
+			'input',
+			( event ) => record( doc, 'input:' + event.inputType ),
 			true
 		);
 		doc.addEventListener( 'focusin', () => record( doc, 'focusin' ), true );
