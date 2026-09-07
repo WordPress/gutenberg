@@ -409,52 +409,41 @@ export interface GetEntityRecord {
  *
  * @return Record.
  */
-export const getEntityRecord = createSelector(
-	( <
-		EntityRecord extends
-			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >,
-	>(
-		state: State,
-		kind: string,
-		name: string,
-		recordId?: EntityRecordKey,
-		query?: GetRecordsHttpQuery
-	): EntityRecord | undefined => {
-		logEntityDeprecation( kind, name, 'getEntityRecord' );
-		const queriedState =
-			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
-		if ( ! queriedState ) {
+export const getEntityRecord = ( <
+	EntityRecord extends
+		| ET.EntityRecord< any >
+		| Partial< ET.EntityRecord< any > >,
+>(
+	state: State,
+	kind: string,
+	name: string,
+	recordId?: EntityRecordKey,
+	query?: GetRecordsHttpQuery
+): EntityRecord | undefined => {
+	logEntityDeprecation( kind, name, 'getEntityRecord' );
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.queriedData;
+	if ( ! queriedState ) {
+		return undefined;
+	}
+	const context = query?.context ?? 'default';
+
+	if ( ! query || ! query._fields ) {
+		// If expecting a complete item, validate that completeness.
+		if ( ! queriedState.itemIsComplete[ context ]?.[ recordId ] ) {
 			return undefined;
 		}
-		const context = query?.context ?? 'default';
 
-		if ( ! query || ! query._fields ) {
-			// If expecting a complete item, validate that completeness.
-			if ( ! queriedState.itemIsComplete[ context ]?.[ recordId ] ) {
-				return undefined;
-			}
-
-			return queriedState.items[ context ][ recordId ];
-		}
-
-		const item = queriedState.items[ context ]?.[ recordId ];
-		if ( ! item ) {
-			return item;
-		}
-
-		return getFilteredItem< EntityRecord >( item, query._fields );
-	} ) as GetEntityRecord,
-	( state: State, kind, name, recordId, query ) => {
-		const context = query?.context ?? 'default';
-		const queriedState =
-			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
-		return [
-			queriedState?.items[ context ]?.[ recordId ],
-			queriedState?.itemIsComplete[ context ]?.[ recordId ],
-		];
+		return queriedState.items[ context ][ recordId ];
 	}
-) as GetEntityRecord;
+
+	const item = queriedState.items[ context ]?.[ recordId ];
+	if ( ! item ) {
+		return item;
+	}
+
+	return getFilteredItem< EntityRecord >( item, query._fields );
+} ) as GetEntityRecord;
 
 /**
  * Normalizes `recordKey`s that look like numeric IDs to numbers.
@@ -1709,52 +1698,37 @@ export function hasRevision(
  *
  * @return Record.
  */
-export const getRevision = createSelector(
-	(
-		state: State,
-		kind: string,
-		name: string,
-		recordKey: EntityRecordKey,
-		revisionKey: EntityRecordKey,
-		query?: GetRecordsHttpQuery
-	): RevisionRecord | Record< PropertyKey, never > | undefined => {
-		logEntityDeprecation( kind, name, 'getRevision' );
-		const queriedState =
-			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[
-				recordKey
-			];
+export const getRevision = (
+	state: State,
+	kind: string,
+	name: string,
+	recordKey: EntityRecordKey,
+	revisionKey: EntityRecordKey,
+	query?: GetRecordsHttpQuery
+): RevisionRecord | Record< PropertyKey, never > | undefined => {
+	logEntityDeprecation( kind, name, 'getRevision' );
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ];
 
-		if ( ! queriedState ) {
+	if ( ! queriedState ) {
+		return undefined;
+	}
+
+	const context = query?.context ?? 'default';
+
+	if ( ! query || ! query._fields ) {
+		// If expecting a complete item, validate that completeness.
+		if ( ! queriedState.itemIsComplete[ context ]?.[ revisionKey ] ) {
 			return undefined;
 		}
 
-		const context = query?.context ?? 'default';
-
-		if ( ! query || ! query._fields ) {
-			// If expecting a complete item, validate that completeness.
-			if ( ! queriedState.itemIsComplete[ context ]?.[ revisionKey ] ) {
-				return undefined;
-			}
-
-			return queriedState.items[ context ][ revisionKey ];
-		}
-
-		const item = queriedState.items[ context ]?.[ revisionKey ];
-		if ( ! item ) {
-			return item;
-		}
-
-		return getFilteredItem( item, query._fields );
-	},
-	( state: State, kind, name, recordKey, revisionKey, query ) => {
-		const context = query?.context ?? 'default';
-		const queriedState =
-			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[
-				recordKey
-			];
-		return [
-			queriedState?.items?.[ context ]?.[ revisionKey ],
-			queriedState?.itemIsComplete?.[ context ]?.[ revisionKey ],
-		];
+		return queriedState.items[ context ][ revisionKey ];
 	}
-);
+
+	const item = queriedState.items[ context ]?.[ revisionKey ];
+	if ( ! item ) {
+		return item;
+	}
+
+	return getFilteredItem( item, query._fields );
+};
