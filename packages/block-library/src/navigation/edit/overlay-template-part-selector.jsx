@@ -51,7 +51,7 @@ export default function OverlayTemplatePartSelector( {
 	} = useOverlayPatterns();
 
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { createPatternOverride } = unlock( useDispatch( patternsStore ) );
+	const { customizePattern } = unlock( useDispatch( patternsStore ) );
 
 	// Check state for creating status if provided, otherwise use local state
 	const [ localIsCreating, setLocalIsCreating ] = useState( false );
@@ -139,9 +139,7 @@ export default function OverlayTemplatePartSelector( {
 		}
 		// A registered pattern is edited through its copy, created on first
 		// edit.
-		const copy = await createPatternOverride(
-			selectedTemplatePart.pattern
-		);
+		const copy = await customizePattern( selectedTemplatePart.pattern );
 		const params = { postId: copy.id, postType: 'wp_block' };
 		if ( overlayMenu === 'mobile' ) {
 			params.viewport = 'mobile';

@@ -35,9 +35,9 @@ export default function OverlayPreview( { overlay, currentTheme } ) {
 			if ( ! patternName ) {
 				return { content: null, editedBlocks: null, hasResolved: true };
 			}
-			const copy = unlock( select( patternsStore ) ).getPatternOverride(
-				patternName
-			);
+			const copy = unlock(
+				select( patternsStore )
+			).getPatternCustomization( patternName );
 			if ( copy ) {
 				const editedRecord = select( coreStore ).getEditedEntityRecord(
 					'postType',
