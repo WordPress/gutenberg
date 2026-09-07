@@ -206,7 +206,7 @@ class WP_Duotone_Gutenberg {
 				'r' => (int) base_convert( $hex[0] . $hex[0], 16, 10 ),
 				'g' => (int) base_convert( $hex[1] . $hex[1], 16, 10 ),
 				'b' => (int) base_convert( $hex[2] . $hex[2], 16, 10 ),
-				'a' => 4 === strlen( $hex ) ? round( base_convert( $hex[3] . $hex[3], 16, 10 ) / 255, 2 ) : 1,
+				'a' => 4 === strlen( $hex ) ? round( absint( base_convert( $hex[3] . $hex[3], 16, 10 ) ) / 255, 2 ) : 1,
 			);
 		}
 
