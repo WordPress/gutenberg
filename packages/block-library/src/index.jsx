@@ -216,9 +216,10 @@ const getAllBlocks = () => {
 		siteTitle,
 		siteTagline,
 		query,
-		// Under the "template parts as patterns" experiment the parser converts
-		// template part blocks to pattern instances; the block itself is gone.
-		! window?.__experimentalTemplatePartsAsPatterns && templatePart,
+		// In the Gutenberg plugin template parts are registered patterns: the
+		// parser converts template part blocks to pattern instances and the
+		// block itself is not registered.
+		! window?.__wpTemplatePartsAsPatterns && templatePart,
 		avatar,
 		postTitle,
 		postExcerpt,

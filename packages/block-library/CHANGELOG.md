@@ -13,7 +13,7 @@
 
 ### Enhancements
 
--   Pattern: Keep blocks hooked to the instance as first or last child around the pattern's own blocks instead of discarding them. Under the "template parts as patterns" experiment the Template Part block is not registered ([#82569](https://github.com/WordPress/gutenberg/pull/82569)).
+-   Pattern: Keep blocks hooked to the instance as first or last child around the pattern's own blocks instead of discarding them. In the Gutenberg plugin the Template Part block is not registered: template parts are registered patterns ([#82569](https://github.com/WordPress/gutenberg/pull/82569)).
 -   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
 -   Paragraph, List, Heading, Preformatted, Columns, Group, Template Part: Read the default padding these blocks add when they have a background color from the `--wp--style--block-background-padding` custom property, so themes can change or remove it ([#82024](https://github.com/WordPress/gutenberg/pull/82024)).
 -   Query: Show a snackbar notice instead of a blocking modal when "Reload full page" is turned on automatically because a block inside the Query block doesn't support client-side navigation ([#82246](https://github.com/WordPress/gutenberg/pull/82246)).

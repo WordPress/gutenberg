@@ -2,9 +2,8 @@
 /**
  * Template parts as registered patterns.
  *
- * Only loaded while the `gutenberg-template-parts-as-patterns` experiment is
- * enabled. Theme template part files (and plugin-registered parts) become
- * synced registered patterns named `<theme>/part/<slug>`, existing
+ * Theme template part files (and plugin-registered parts) become synced
+ * registered patterns named `<theme>/part/<slug>`, existing
  * `wp_template_part` posts become the edited copies of those patterns, and
  * `core/template-part` blocks are rendered as `core/block` instances.
  *
@@ -277,13 +276,14 @@ function gutenberg_filter_template_part_hooked_block( $parsed_hooked_block, $hoo
 add_filter( 'hooked_block', 'gutenberg_filter_template_part_hooked_block', 10, 4 );
 
 /**
- * Tells the editor the experiment is on, and which theme is active, so the
- * block parser can convert template part blocks to pattern instances.
+ * Tells the block parser that template parts are patterns here, and which
+ * theme is active, so it can convert template part blocks to pattern
+ * instances that reference `<theme>/part/<slug>`.
  */
 function gutenberg_enable_template_parts_as_patterns_script() {
 	wp_add_inline_script(
 		'wp-blocks',
-		'window.__experimentalTemplatePartsAsPatterns = ' . wp_json_encode( array( 'stylesheet' => get_stylesheet() ) ) . ';',
+		'window.__wpTemplatePartsAsPatterns = ' . wp_json_encode( array( 'stylesheet' => get_stylesheet() ) ) . ';',
 		'before'
 	);
 }

@@ -57,8 +57,8 @@ function TemplatePartList() {
 	);
 
 	const labels = postTypeObject?.labels;
-	// Template parts can only be created while the block exists; the
-	// "template parts as patterns" experiment removes it.
+	// Template parts can only be created while the block exists; in the
+	// Gutenberg plugin they are registered patterns and the block is gone.
 	const canCreateRecord = useSelect(
 		( select ) =>
 			!! select( blocksStore ).getBlockType( 'core/template-part' ) &&

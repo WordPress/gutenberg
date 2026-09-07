@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for the "template parts as patterns" experiment.
+ * Tests for template parts as patterns.
  *
  * @package Gutenberg
  * @group blocks
@@ -8,11 +8,13 @@
 class Template_Parts_As_Patterns_Test extends WP_UnitTestCase {
 
 	public static function wpSetUpBeforeClass() {
-		require_once __DIR__ . '/../lib/experimental/template-parts-as-patterns.php';
+		require_once __DIR__ . '/../lib/compat/wordpress-7.2/template-parts-as-patterns.php';
 	}
 
 	public function set_up() {
 		parent::set_up();
+		// The plugin runs the migration at bootstrap; let the test run it again.
+		delete_option( 'gutenberg_template_parts_migrated' );
 		register_block_pattern(
 			'testtheme/part/header',
 			array(
