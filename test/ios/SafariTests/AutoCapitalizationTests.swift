@@ -8,6 +8,11 @@ import XCTest
 final class AutoCapitalizationTests: XCTestCase {
 	let safari = XCUIApplication( bundleIdentifier: "com.apple.mobilesafari" )
 
+	// The fields' aria-labels, which tell a paragraph block from any other
+	// editable element.
+	let emptyParagraphLabel = "Empty block; start writing or type forward slash to choose a block"
+	let paragraphLabel = "Block: Paragraph"
+
 	var keyboard: XCUIElement { safari.keyboards.firstMatch }
 
 	override func setUpWithError() throws {
@@ -64,6 +69,7 @@ final class AutoCapitalizationTests: XCTestCase {
 		// PHP runs in WebAssembly and nothing is cached yet.
 		XCTAssertTrue( title.waitForExistence( timeout: 240 ), "The new post has no title field" )
 		waitForFocus( title, "The title is not focused" )
+		XCTAssertEqual( title.label, "Add title" )
 		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "No software keyboard" )
 		assertCapitalized( "An empty title should start capitalized" )
 
@@ -74,15 +80,18 @@ final class AutoCapitalizationTests: XCTestCase {
 		key( "return" ).tap()
 		XCTAssertTrue( firstParagraph.waitForExistence( timeout: 10 ), "Return in the title did not create a paragraph" )
 		waitForFocus( firstParagraph, "The paragraph after the title is not focused" )
+		XCTAssertEqual( firstParagraph.label, emptyParagraphLabel )
 		assertCapitalized( "The paragraph after the title should start capitalized" )
 
 		type( "Hello" )
 		XCTAssertEqual( firstParagraph.value as? String, "Hello" )
+		XCTAssertEqual( firstParagraph.label, paragraphLabel )
 		XCTAssertFalse( key( "shift" ).isSelected, "After a word the keyboard should be lowercase" )
 
 		key( "return" ).tap()
 		XCTAssertTrue( secondParagraph.waitForExistence( timeout: 10 ), "Return did not create a paragraph" )
 		waitForFocus( secondParagraph, "The new paragraph is not focused" )
+		XCTAssertEqual( secondParagraph.label, emptyParagraphLabel )
 		assertCapitalized( "The paragraph after Return should start capitalized" )
 
 		// The earlier fields kept their text.
