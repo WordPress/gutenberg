@@ -1,7 +1,9 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { globSync } from 'glob';
+import fastGlob from 'fast-glob';
 import typescript from 'typescript';
+
+const { sync: glob } = fastGlob;
 
 const SOURCE_IGNORES = [ '**/node_modules/**', 'vendor/**' ];
 const JEST_CONFIG_FILE_PATTERN = /(?:^|\/)[^/]*jest[^/]*\.config\.[^/]+$/;
@@ -212,7 +214,7 @@ export function validateVitestShuffleScripts(
 
 function findPackageScriptIsolationOptOuts( rootDir ) {
 	const violations = [];
-	const packageFiles = globSync( '**/package.json', {
+	const packageFiles = glob( '**/package.json', {
 		cwd: rootDir,
 		ignore: SOURCE_IGNORES,
 		nodir: true,
@@ -239,13 +241,10 @@ function findPackageScriptIsolationOptOuts( rootDir ) {
 
 function findWorkflowIsolationOptOuts( rootDir ) {
 	const violations = [];
-	const workflowFiles = globSync(
-		'.github/{actions,workflows}/**/*.{yml,yaml}',
-		{
-			cwd: rootDir,
-			nodir: true,
-		}
-	).sort();
+	const workflowFiles = glob( '.github/{actions,workflows}/**/*.{yml,yaml}', {
+		cwd: rootDir,
+		nodir: true,
+	} ).sort();
 
 	for ( const workflowFile of workflowFiles ) {
 		const source = readFileSync(
@@ -289,7 +288,7 @@ function getPropertyName( property ) {
 
 function findConfigIsolationOptOuts( rootDir ) {
 	const violations = [];
-	const configFiles = globSync(
+	const configFiles = glob(
 		'**/{vite,vitest}.config.{js,jsx,cjs,mjs,ts,tsx,cts,mts}',
 		{
 			cwd: rootDir,

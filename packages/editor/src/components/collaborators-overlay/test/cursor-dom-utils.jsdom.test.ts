@@ -1,3 +1,4 @@
+import { beforeAll, describe, expect, it } from 'vitest';
 import {
 	getCursorPosition,
 	getNearestVisibleBlockAncestor,
@@ -16,17 +17,18 @@ const OVERLAY_RECT = {
 } as DOMRect;
 
 function mockRect( element: HTMLElement, rect: Partial< DOMRect > ) {
-	element.getBoundingClientRect = jest.fn().mockReturnValue( {
-		left: 0,
-		top: 0,
-		right: 0,
-		bottom: 0,
-		width: 0,
-		height: 0,
-		x: 0,
-		y: 0,
-		...rect,
-	} );
+	element.getBoundingClientRect = () =>
+		( {
+			left: 0,
+			top: 0,
+			right: 0,
+			bottom: 0,
+			width: 0,
+			height: 0,
+			x: 0,
+			y: 0,
+			...rect,
+		} ) as DOMRect;
 }
 
 // jsdom performs no layout and doesn't implement Range.getBoundingClientRect
@@ -34,15 +36,16 @@ function mockRect( element: HTMLElement, rect: Partial< DOMRect > ) {
 // that lets getOffsetPositionInBlock create and measure a real Range needs
 // this polyfilled.
 beforeAll( () => {
-	Range.prototype.getBoundingClientRect = jest.fn().mockReturnValue( {
-		left: 0,
-		top: 0,
-		width: 0,
-		height: 0,
-		x: 0,
-		y: 0,
-	} );
-	Range.prototype.getClientRects = jest.fn().mockReturnValue( [] );
+	Range.prototype.getBoundingClientRect = () =>
+		( {
+			left: 0,
+			top: 0,
+			width: 0,
+			height: 0,
+			x: 0,
+			y: 0,
+		} ) as DOMRect;
+	Range.prototype.getClientRects = () => [] as unknown as DOMRectList;
 } );
 
 describe( 'cursor-dom-utils', () => {

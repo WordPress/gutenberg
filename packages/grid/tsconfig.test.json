@@ -11,8 +11,5 @@
 	"references": [ { "path": "./tsconfig.build.json" } ],
 	"files": [],
 	"include": [ "src/**/test/**/*" ],
-	"exclude": [
-		"src/dashboard-grid/test/item-limits.jsdom.test.tsx",
-		"src/dashboard-lanes/test/item-limits.jsdom.test.tsx"
-	]
+	"exclude": []
 }

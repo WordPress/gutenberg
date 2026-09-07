@@ -3,7 +3,6 @@
 	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
 		"types": [
-			"jest",
 			"gutenberg-env",
 			"gutenberg-vitest-test-env",
 			"style-imports"

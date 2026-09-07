@@ -58,7 +58,7 @@
 		"test:unit:no-jest": "node scripts/validate-no-jest.mjs",
 		"test:unit:packages": "node scripts/validate-vitest-package-consumer.mjs",
 		"test:unit:vitest": "npm run test:unit --",
-		"test:unit:vitest:shuffled": "npm run test:unit -- --sequence.shuffle.files --sequence.seed=80855",
+		"test:unit:vitest:shuffled": "npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855",
 		"test:unit:vitest:update": "vitest run --config vitest.config.mjs --update=true",
 		"test:unit:vitest:watch": "vitest --config vitest.config.mjs",
 		"test:unit:profile": "wp-scripts --cpu-prof test-unit-js --run --config vitest.config.mjs --no-file-parallelism --maxWorkers=1",

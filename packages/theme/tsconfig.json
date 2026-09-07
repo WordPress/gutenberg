@@ -5,7 +5,7 @@
 		"rootDir": ".",
 		"allowImportingTsExtensions": true,
 		"types": [
-			"jest",
+			"gutenberg-vitest-test-env",
 			"node",
 			"style-imports",
 			"react-css-custom-properties"

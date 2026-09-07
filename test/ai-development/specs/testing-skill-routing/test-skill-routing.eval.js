@@ -38,8 +38,8 @@ the block's serialized markup.`,
 					'Read the e2e reference'
 				),
 				assertNotRead(
-					`${ REFERENCES }/jest.md`,
-					'Skipped the Jest reference'
+					`${ REFERENCES }/vitest.md`,
+					'Skipped the Vitest reference'
 				),
 				assertNotRead(
 					`${ REFERENCES }/php.md`,

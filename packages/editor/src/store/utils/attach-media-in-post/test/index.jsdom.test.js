@@ -1,10 +1,13 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import attachMediaInPost from '..';
 
-jest.mock( '@wordpress/core-data', () => ( { store: {} } ) );
+vi.mock( '@wordpress/core-data', () => ( { store: {} } ) );
 
-const mockInvalidate = jest.fn();
+const { mockInvalidate } = vi.hoisted( () => ( {
+	mockInvalidate: vi.fn(),
+} ) );
 
-jest.mock( '../invalidate-attachment-resolutions', () => ( {
+vi.mock( '../invalidate-attachment-resolutions', () => ( {
 	__esModule: true,
 	default: ( ...args ) => mockInvalidate( ...args ),
 } ) );
@@ -26,9 +29,9 @@ const imageBlock = ( id ) => ( {
  * @param {Object}   [options.postType] What `getPostType` resolves to.
  */
 function createRegistry( { media = [], postType = { viewable: true } } = {} ) {
-	const getEntityRecords = jest.fn().mockResolvedValue( media );
-	const getPostType = jest.fn().mockResolvedValue( postType );
-	const saveEntityRecord = jest.fn().mockResolvedValue( {} );
+	const getEntityRecords = vi.fn().mockResolvedValue( media );
+	const getPostType = vi.fn().mockResolvedValue( postType );
+	const saveEntityRecord = vi.fn().mockResolvedValue( {} );
 
 	const registry = {
 		select: () => ( {} ),
@@ -48,7 +51,7 @@ const post = ( blocks ) => ( { id: 7, type: 'post', blocks } );
 
 describe( 'attachMediaInPost', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'attaches media that belongs to no post', async () => {

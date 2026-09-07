@@ -5,7 +5,7 @@
 		"jsx": "react-jsx",
 		"rootDir": ".",
 		"noEmit": true,
-		"types": [ "jest" ]
+		"types": [ "gutenberg-vitest-test-env" ]
 	},
 	"include": [ "**/*.tsx", "**/*.ts", "**/*.mjs" ],
 	"exclude": [

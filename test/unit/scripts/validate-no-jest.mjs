@@ -11,6 +11,11 @@ const ROOT_DIR = path.resolve(
 const SELF = 'test/unit/scripts/validate-no-jest.mjs';
 const LEGACY_REPORT_DIRECTORY = 'packages/report-flaky-tests/';
 const LEGACY_FIXTURE_DIRECTORY = 'tools/release/commands/test/fixtures/';
+const POLICY_FIXTURE_FILES = new Set( [
+	'test/unit/scripts/test/test-infrastructure-policy.test.js',
+	'test/unit/scripts/test/test-projects.test.js',
+	'test/unit/scripts/test/vitest-policy-rules.test.js',
+] );
 const ALLOWED_RUNNER_NEUTRAL_PACKAGES = new Set( [
 	'@emotion/jest',
 	'@testing-library/jest-dom',
@@ -121,6 +126,12 @@ const retiredUsagePatterns = [
 ];
 
 for ( const activeFile of activeFiles ) {
+	// These tests must name retired Jest patterns to prove that the migration
+	// policy rejects them and recognizes legacy environment directives.
+	if ( POLICY_FIXTURE_FILES.has( activeFile ) ) {
+		continue;
+	}
+
 	const basename = path.basename( activeFile ).toLowerCase();
 	if ( basename.includes( 'jest' ) ) {
 		violations.push( `${ activeFile }: Jest-named active file` );
@@ -143,7 +154,7 @@ for ( const activeFile of activeFiles ) {
 
 if ( violations.length ) {
 	throw new Error(
-		`Active Jest usage remains outside the legacy-report allowlist:\n${ violations.join(
+		`Active Jest usage remains outside the test-fixture and legacy-report allowlists:\n${ violations.join(
 			'\n'
 		) }`
 	);

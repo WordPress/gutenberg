@@ -1,4 +1,12 @@
-import '@testing-library/jest-dom';
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
 import { act, fireEvent, render } from '@testing-library/react';
 import { DashboardGrid } from '..';
 import type { DashboardGridLayoutItem } from '../types';
@@ -45,19 +53,19 @@ const ITEM_RECTS: Record< string, DOMRect > = {
 async function activateAndStepRight( activator: Element ) {
 	fireEvent.keyDown( activator, { code: 'Space' } );
 	act( () => {
-		jest.runOnlyPendingTimers();
+		vi.runOnlyPendingTimers();
 	} );
 	fireEvent.keyDown( activator, { code: 'ArrowRight' } );
 	fireEvent.keyDown( activator, { code: 'Space' } );
 	await act( async () => {
-		jest.runOnlyPendingTimers();
+		vi.runOnlyPendingTimers();
 	} );
 }
 
 beforeEach( () => {
-	jest.useFakeTimers();
-	originalResizeObserver = global.ResizeObserver;
-	( global as unknown as { ResizeObserver: unknown } ).ResizeObserver =
+	vi.useFakeTimers();
+	originalResizeObserver = globalThis.ResizeObserver;
+	( globalThis as unknown as { ResizeObserver: unknown } ).ResizeObserver =
 		MockResizeObserver;
 	originalGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect;
 	HTMLElement.prototype.getBoundingClientRect = function () {
@@ -70,13 +78,13 @@ beforeEach( () => {
 } );
 
 afterEach( () => {
-	( global as unknown as { ResizeObserver: unknown } ).ResizeObserver =
+	( globalThis as unknown as { ResizeObserver: unknown } ).ResizeObserver =
 		originalResizeObserver;
 	HTMLElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
-	jest.useRealTimers();
+	vi.useRealTimers();
 } );
 
-function renderGrid( onChangeLayout: jest.Mock ) {
+function renderGrid( onChangeLayout: Mock ) {
 	const layout: DashboardGridLayoutItem[] = [
 		{ key: 'a', width: 1, height: 1 },
 		{ key: 'b', width: 1, height: 1 },
@@ -98,13 +106,15 @@ function renderGrid( onChangeLayout: jest.Mock ) {
 /* eslint-disable testing-library/no-container, testing-library/no-node-access */
 describe( 'DashboardGrid item limits', () => {
 	it( 'renders a stored span below the floor lifted to it', () => {
-		const { container } = renderGrid( jest.fn() );
-		const itemA = container.querySelector( '[data-wp-grid-item-key="a"]' );
-		expect( itemA ).toHaveStyle( { gridColumnEnd: 'span 2' } );
+		const { container } = renderGrid( vi.fn() );
+		const itemA = container.querySelector< HTMLElement >(
+			'[data-wp-grid-item-key="a"]'
+		);
+		expect( itemA?.style.gridColumnEnd ).toBe( 'span 2' );
 	} );
 
 	it( 'resizing another tile leaves the stored span untouched', async () => {
-		const onChangeLayout = jest.fn();
+		const onChangeLayout = vi.fn();
 		const { container } = renderGrid( onChangeLayout );
 		const handleB = container.querySelector(
 			'[data-wp-grid-item-key="b"] [aria-roledescription="draggable"]'
@@ -125,7 +135,7 @@ describe( 'DashboardGrid item limits', () => {
 	} );
 
 	it( 'reordering leaves the stored span untouched', async () => {
-		const onChangeLayout = jest.fn();
+		const onChangeLayout = vi.fn();
 		const { container } = renderGrid( onChangeLayout );
 		const activatorA = container.querySelector(
 			'[data-wp-grid-item-key="a"] [aria-roledescription="sortable"]'

@@ -1,6 +1,7 @@
+import { describe, expect, it, vi } from 'vitest';
 import invalidateAttachmentResolutions from '../invalidate-attachment-resolutions';
 
-jest.mock( '@wordpress/core-data', () => ( { store: {} } ) );
+vi.mock( '@wordpress/core-data', () => ( { store: {} } ) );
 
 /**
  * Builds a registry stub whose `getCachedResolvers().getEntityRecords` returns
@@ -9,7 +10,7 @@ jest.mock( '@wordpress/core-data', () => ( { store: {} } ) );
  * @param {Map|undefined} entityRecords Cached `getEntityRecords` resolutions.
  */
 function createRegistry( entityRecords ) {
-	const invalidateResolution = jest.fn();
+	const invalidateResolution = vi.fn();
 
 	const registry = {
 		select: () => ( {

@@ -329,9 +329,9 @@ const devOnlyPackage = {
 test( 'passes when a package without a build project is in the root solution', () => {
 	const result = runValidator(
 		createRepo( {
-			packages: { 'jest-console': devOnlyPackage },
+			packages: { 'vitest-console': devOnlyPackage },
 			build: [],
-			root: [ './tsconfig.build.json', 'packages/jest-console' ],
+			root: [ './tsconfig.build.json', 'packages/vitest-console' ],
 		} )
 	);
 
@@ -341,7 +341,7 @@ test( 'passes when a package without a build project is in the root solution', (
 test( 'fails when a package without a build project is missing from the root solution', () => {
 	const result = runValidator(
 		createRepo( {
-			packages: { 'jest-console': devOnlyPackage },
+			packages: { 'vitest-console': devOnlyPackage },
 			build: [],
 			root: [ './tsconfig.build.json' ],
 		} )
@@ -349,7 +349,7 @@ test( 'fails when a package without a build project is missing from the root sol
 
 	expect( result.status ).not.toBe( 0 );
 	expect( result.stderr ).toContain(
-		'Missing reference to "packages/jest-console/tsconfig.json" in tsconfig.json'
+		'Missing reference to "packages/vitest-console/tsconfig.json" in tsconfig.json'
 	);
 } );
 
@@ -679,21 +679,21 @@ test( 'passes when a route references an unsplit dependency by directory', () =>
 		createRepo( {
 			packages: {
 				hooks: { tsconfigs: { 'tsconfig.json': [] } },
-				'jest-console': devOnlyPackage,
+				'vitest-console': devOnlyPackage,
 			},
 			routes: {
 				dashboard: {
 					tsconfigs: { 'tsconfig.json': [ '../../packages/hooks' ] },
 					dependencies: {
 						'@wordpress/hooks': 'file:../..',
-						'@wordpress/jest-console': 'file:../..',
+						'@wordpress/vitest-console': 'file:../..',
 					},
 				},
 			},
 			build: [ 'packages/hooks' ],
 			root: [
 				'./tsconfig.build.json',
-				'packages/jest-console',
+				'packages/vitest-console',
 				'routes/dashboard',
 			],
 		} )

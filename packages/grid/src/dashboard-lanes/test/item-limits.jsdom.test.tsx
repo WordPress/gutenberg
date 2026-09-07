@@ -1,4 +1,12 @@
-import '@testing-library/jest-dom';
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
 import { act, fireEvent, render } from '@testing-library/react';
 import { DashboardLanes } from '..';
 import type { DashboardLanesLayoutItem } from '../types';
@@ -49,19 +57,19 @@ function setGeometry( containerWidth: number ) {
 async function activateAndStepRight( activator: Element ) {
 	fireEvent.keyDown( activator, { code: 'Space' } );
 	act( () => {
-		jest.runOnlyPendingTimers();
+		vi.runOnlyPendingTimers();
 	} );
 	fireEvent.keyDown( activator, { code: 'ArrowRight' } );
 	fireEvent.keyDown( activator, { code: 'Space' } );
 	await act( async () => {
-		jest.runOnlyPendingTimers();
+		vi.runOnlyPendingTimers();
 	} );
 }
 
 beforeEach( () => {
-	jest.useFakeTimers();
-	originalResizeObserver = global.ResizeObserver;
-	( global as unknown as { ResizeObserver: unknown } ).ResizeObserver =
+	vi.useFakeTimers();
+	originalResizeObserver = globalThis.ResizeObserver;
+	( globalThis as unknown as { ResizeObserver: unknown } ).ResizeObserver =
 		MockResizeObserver;
 	originalGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect;
 	HTMLElement.prototype.getBoundingClientRect = function () {
@@ -74,13 +82,13 @@ beforeEach( () => {
 } );
 
 afterEach( () => {
-	( global as unknown as { ResizeObserver: unknown } ).ResizeObserver =
+	( globalThis as unknown as { ResizeObserver: unknown } ).ResizeObserver =
 		originalResizeObserver;
 	HTMLElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
-	jest.useRealTimers();
+	vi.useRealTimers();
 } );
 
-function renderLanes( onChangeLayout: jest.Mock ) {
+function renderLanes( onChangeLayout: Mock ) {
 	const layout: DashboardLanesLayoutItem[] = [ { key: 'a', width: 1 } ];
 	return render(
 		<DashboardLanes
@@ -107,14 +115,16 @@ function getResizeHandle( container: HTMLElement, key: string ) {
 describe( 'DashboardLanes item limits', () => {
 	it( 'renders a stored span below the floor lifted to it', () => {
 		setGeometry( 240 );
-		const { container } = renderLanes( jest.fn() );
-		const itemA = container.querySelector( '[data-wp-grid-item-key="a"]' );
-		expect( itemA ).toHaveStyle( { gridColumn: 'span 2' } );
+		const { container } = renderLanes( vi.fn() );
+		const itemA = container.querySelector< HTMLElement >(
+			'[data-wp-grid-item-key="a"]'
+		);
+		expect( itemA?.style.gridColumn ).toBe( 'span 2' );
 	} );
 
 	it( 'resizes from the rendered span, not the stored one', async () => {
 		setGeometry( 240 );
-		const onChangeLayout = jest.fn();
+		const onChangeLayout = vi.fn();
 		const { container } = renderLanes( onChangeLayout );
 
 		// One lane to the right of the rendered two-lane span.
@@ -130,7 +140,7 @@ describe( 'DashboardLanes item limits', () => {
 
 	it( 'commits nothing while the gesture stays inside the rendered span', async () => {
 		setGeometry( 360 );
-		const onChangeLayout = jest.fn();
+		const onChangeLayout = vi.fn();
 		const { container } = renderLanes( onChangeLayout );
 
 		await activateAndStepRight( getResizeHandle( container, 'a' ) );
