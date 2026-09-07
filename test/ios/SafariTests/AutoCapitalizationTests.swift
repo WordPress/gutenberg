@@ -65,12 +65,6 @@ final class AutoCapitalizationTests: XCTestCase {
 		XCTAssertEqual( XCTWaiter.wait( for: [ done ], timeout: 10 ), .completed, message )
 	}
 
-	/// What the diagnostics script recorded so far (see diagnostics.js).
-	func diagnostics( _ web: XCUIElement ) -> String {
-		let status = web.staticTexts.matching( NSPredicate( format: "label BEGINSWITH 'DIAG'" ) ).firstMatch
-		return status.exists ? status.label : "(no diagnostics)"
-	}
-
 	/// The keyboard updates shortly after focus moves.
 	func assertCapitalized( _ message: String ) {
 		let upperCase = NSPredicate( format: "label == 'A'" )
@@ -111,7 +105,6 @@ final class AutoCapitalizationTests: XCTestCase {
 		XCTAssertTrue( firstParagraph.waitForExistence( timeout: 10 ), "Return in the title did not create a paragraph" )
 		waitForFocus( firstParagraph, "The paragraph after the title is not focused" )
 		XCTAssertEqual( firstParagraph.label, emptyParagraphLabel )
-		print( "DIAG after the title: " + diagnostics( web ) )
 		assertCapitalized( "The paragraph after the title should start capitalized" )
 
 		type( "Hello", into: firstParagraph )
@@ -123,7 +116,6 @@ final class AutoCapitalizationTests: XCTestCase {
 		XCTAssertTrue( secondParagraph.waitForExistence( timeout: 10 ), "Return did not create a paragraph" )
 		waitForFocus( secondParagraph, "The new paragraph is not focused" )
 		XCTAssertEqual( secondParagraph.label, emptyParagraphLabel )
-		print( "DIAG after the paragraph: " + diagnostics( web ) )
 		assertCapitalized( "The paragraph after Return should start capitalized" )
 
 		// The earlier fields kept their text.
