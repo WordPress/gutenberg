@@ -24,6 +24,75 @@ function gutenberg_is_block_pattern_synced( $pattern ) {
 }
 
 /**
+ * Registers the `wp_pattern_slug` meta on `wp_block` posts.
+ *
+ * A `wp_block` post carrying this meta is the edited copy (the "override") of
+ * the registered pattern with that name. It wins over the registry when the
+ * pattern is rendered, inserted or previewed, the same way a `wp_template_part`
+ * post wins over the theme file. Trashing the post reverts to the registry.
+ */
+function gutenberg_register_block_pattern_slug_meta() {
+	register_post_meta(
+		'wp_block',
+		'wp_pattern_slug',
+		array(
+			'type'         => 'string',
+			'single'       => true,
+			'show_in_rest' => true,
+			'label'        => __( 'Registered pattern name', 'gutenberg' ),
+			'description'  => __( 'The name of the registered pattern this pattern is an edited copy of.', 'gutenberg' ),
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_block_pattern_slug_meta' );
+
+/**
+ * Returns the `wp_block` posts that are edited copies of registered patterns,
+ * keyed by registered pattern name.
+ *
+ * Loaded once per request: the block patterns REST endpoint needs the lookup
+ * for every registered pattern. Rendering a single `core/block` uses
+ * `block_core_block_get_pattern_override()` instead.
+ *
+ * @return WP_Post[] Published override posts keyed by pattern name.
+ */
+function gutenberg_get_block_pattern_overrides() {
+	static $overrides = null;
+
+	if ( null === $overrides ) {
+		$overrides = array();
+		$posts     = get_posts(
+			array(
+				'post_type'      => 'wp_block',
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+				'meta_key'       => 'wp_pattern_slug',
+				'no_found_rows'  => true,
+			)
+		);
+		foreach ( $posts as $post ) {
+			$name = get_post_meta( $post->ID, 'wp_pattern_slug', true );
+			if ( $name && ! isset( $overrides[ $name ] ) ) {
+				$overrides[ $name ] = $post;
+			}
+		}
+	}
+
+	return $overrides;
+}
+
+/**
+ * Returns the `wp_block` post that overrides a registered pattern, if any.
+ *
+ * @param string $pattern_name Registered pattern name.
+ * @return WP_Post|null The published override post, or null.
+ */
+function gutenberg_get_block_pattern_override( $pattern_name ) {
+	$overrides = gutenberg_get_block_pattern_overrides();
+	return $overrides[ $pattern_name ] ?? null;
+}
+
+/**
  * Applies the `Synced` header of the active theme's `patterns/` files.
  *
  * Core's `WP_Theme::get_block_patterns()` only reads a fixed list of headers,

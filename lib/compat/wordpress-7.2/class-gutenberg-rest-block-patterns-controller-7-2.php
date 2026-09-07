@@ -19,6 +19,14 @@ class Gutenberg_REST_Block_Patterns_Controller_7_2 extends Gutenberg_REST_Block_
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function prepare_item_for_response( $item, $request ) {
+		// An edited copy saved as a `wp_block` post stands in for the registered
+		// pattern: its content and title are what gets inserted and previewed.
+		$override = gutenberg_get_block_pattern_override( $item['name'] );
+		if ( $override ) {
+			$item['content'] = $override->post_content;
+			$item['title']   = $override->post_title;
+		}
+
 		$response = parent::prepare_item_for_response( $item, $request );
 		if ( is_wp_error( $response ) ) {
 			return $response;

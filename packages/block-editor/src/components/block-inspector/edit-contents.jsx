@@ -5,6 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 function IsolatedEditButton( {
 	attributes = {},
@@ -12,9 +13,24 @@ function IsolatedEditButton( {
 	isTemplatePartBlock,
 } ) {
 	const { ref, theme, slug } = attributes;
+	// A registered pattern referenced by slug is edited through its edited
+	// copy (a `wp_block` post); creating that copy is handled by the block's
+	// own toolbar button.
+	const overrideId = useSelect(
+		( select ) => {
+			if ( isTemplatePartBlock || ref || ! slug ) {
+				return undefined;
+			}
+			return unlock( select( blockEditorStore ) )
+				.getReusableBlocks()
+				.find( ( record ) => record.meta?.wp_pattern_slug === slug )
+				?.id;
+		},
+		[ isTemplatePartBlock, ref, slug ]
+	);
 	const entityId = isTemplatePartBlock
 		? theme && slug && `${ theme }//${ slug }`
-		: ref;
+		: ref ?? overrideId;
 
 	if ( ! entityId ) {
 		return null;

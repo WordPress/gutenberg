@@ -4,6 +4,7 @@ export { default as duplicatePost } from './duplicate-post';
 export { default as renamePost } from './rename-post';
 export { default as resetPost } from './reset-post';
 export { default as duplicatePattern } from './duplicate-pattern';
+export { default as resetPattern } from './reset-pattern';
 export { default as exportPattern } from './export-pattern';
 export { default as viewPostRevisions } from './view-post-revisions';
 export { default as permanentlyDeletePost } from './permanently-delete-post';

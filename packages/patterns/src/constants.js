@@ -16,3 +16,9 @@ export const PATTERN_SYNC_TYPES = {
 };
 
 export const PATTERN_OVERRIDES_BINDING_SOURCE = 'core/pattern-overrides';
+
+/**
+ * Post meta on a `wp_block` post holding the name of the registered pattern
+ * the post is an edited copy of.
+ */
+export const PATTERN_OVERRIDE_META_KEY = 'wp_pattern_slug';

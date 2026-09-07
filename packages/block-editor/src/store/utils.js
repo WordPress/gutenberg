@@ -18,6 +18,18 @@ export const isFiltered = Symbol( 'isFiltered' );
 const parsedPatternCache = new WeakMap();
 const grammarMapCache = new WeakMap();
 
+/**
+ * Whether a `wp_block` record is the edited copy of a registered pattern.
+ * Such records stand behind the registered pattern and are not listed as
+ * user patterns.
+ *
+ * @param {Object} userPattern The `wp_block` record.
+ * @return {boolean} Whether the record overrides a registered pattern.
+ */
+export function isPatternOverride( userPattern ) {
+	return !! userPattern?.meta?.wp_pattern_slug;
+}
+
 export function mapUserPattern(
 	userPattern,
 	__experimentalUserPatternCategories = []

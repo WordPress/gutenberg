@@ -7395,11 +7395,6 @@
 			"count": 1
 		}
 	},
-	"packages/fields/src/fields/pattern-title/view.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/fields/src/fields/ping-status/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1

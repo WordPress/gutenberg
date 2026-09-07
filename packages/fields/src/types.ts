@@ -121,6 +121,9 @@ export interface Pattern extends CommonPost {
 	wp_pattern_sync_status?: string;
 	// Registered (theme, plugin, core) patterns only.
 	synced?: boolean;
+	// Registered patterns only: the id of the `wp_block` post that is the
+	// edited copy of the pattern, when it has been edited.
+	overrideId?: number;
 }
 
 export interface SiteSettings {

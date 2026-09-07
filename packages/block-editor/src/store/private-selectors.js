@@ -25,6 +25,7 @@ import {
 	getInsertBlockTypeDependants,
 	getGrammar,
 	mapUserPattern,
+	isPatternOverride,
 } from './utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
@@ -646,6 +647,9 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 		return [
 			...unlock( select( STORE_NAME ) )
 				.getReusableBlocks()
+				// Edited copies of registered patterns are represented by
+				// the registered pattern itself.
+				.filter( ( userPattern ) => ! isPatternOverride( userPattern ) )
 				.map( ( userPattern ) =>
 					mapUserPattern(
 						userPattern,

@@ -234,6 +234,14 @@ Rename action for PostWithPermissions.
 
 Reorder action for BasePost.
 
+### resetPattern
+
+Reverts an edited registered pattern to the registered version by trashing the `wp_block` post that holds the edited copy.
+
+_Type_
+
+-   `Action< Pattern >`
+
 ### resetPost
 
 Reset action for Template and TemplatePart.

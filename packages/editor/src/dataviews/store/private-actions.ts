@@ -7,6 +7,7 @@ import {
 	viewPostRevisions,
 	duplicatePost,
 	duplicatePattern,
+	resetPattern,
 	reorderPage,
 	exportPattern,
 	permanentlyDeletePost,
@@ -229,6 +230,7 @@ export const registerPostTypeSchema =
 				? reorderPage
 				: undefined,
 			postTypeConfig.slug === 'wp_block' ? exportPattern : undefined,
+			postTypeConfig.slug === 'wp_block' ? resetPattern : undefined,
 			restorePost,
 			resetPost,
 			deletePost,

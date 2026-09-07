@@ -1,7 +1,7 @@
 import { getBlockType, cloneBlock } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { PATTERN_SYNC_TYPES } from '../constants';
+import { PATTERN_SYNC_TYPES, PATTERN_OVERRIDE_META_KEY } from '../constants';
 
 /**
  * Returns a generator converting one or more static blocks into a pattern, or creating a new empty pattern.
@@ -34,6 +34,97 @@ export const createPattern =
 			.saveEntityRecord( 'postType', 'wp_block', reusableBlock );
 
 		return updatedRecord;
+	};
+
+/**
+ * Creates the editable copy of a registered pattern: a `wp_block` post linked to
+ * the registered pattern by the `wp_pattern_slug` meta. Returns the existing
+ * copy when there is one.
+ *
+ * @param {Object}   pattern              The registered pattern.
+ * @param {string}   pattern.name         Registered pattern name.
+ * @param {string}   pattern.title        Pattern title.
+ * @param {string}   pattern.content      Serialized pattern content.
+ * @param {string[]} [pattern.categories] Registered pattern category slugs.
+ * @return {Promise<Object>} The `wp_block` record.
+ */
+export const createPatternOverride =
+	( pattern ) =>
+	async ( { registry } ) => {
+		const existing = await registry
+			.resolveSelect( coreStore )
+			.getEntityRecords( 'postType', 'wp_block', { per_page: -1 } );
+		const override = existing?.find(
+			( record ) =>
+				record.meta?.[ PATTERN_OVERRIDE_META_KEY ] === pattern.name
+		);
+		if ( override ) {
+			return override;
+		}
+
+		// Map the registered categories onto user pattern categories, creating
+		// terms as needed, so the copy keeps its place in the Patterns pages.
+		const [ coreCategories, userCategories ] = await Promise.all( [
+			registry.resolveSelect( coreStore ).getBlockPatternCategories(),
+			registry.resolveSelect( coreStore ).getUserPatternCategories(),
+		] );
+		const categoryIds = [];
+		for ( const slug of pattern.categories ?? [] ) {
+			const coreCategory = coreCategories?.find(
+				( { name } ) => name === slug
+			);
+			if ( ! coreCategory ) {
+				continue;
+			}
+			const userCategory = userCategories?.find(
+				( { label } ) =>
+					label.toLowerCase() === coreCategory.label.toLowerCase()
+			);
+			if ( userCategory ) {
+				categoryIds.push( userCategory.id );
+				continue;
+			}
+			try {
+				const term = await registry
+					.dispatch( coreStore )
+					.saveEntityRecord(
+						'taxonomy',
+						'wp_pattern_category',
+						{ name: coreCategory.label, slug: coreCategory.name },
+						{ throwOnError: true }
+					);
+				categoryIds.push( term.id );
+			} catch ( error ) {
+				if ( error?.code === 'term_exists' ) {
+					categoryIds.push( error.data.term_id );
+				} else {
+					throw error;
+				}
+			}
+		}
+		if ( categoryIds.length ) {
+			registry
+				.dispatch( coreStore )
+				.invalidateResolution( 'getUserPatternCategories' );
+		}
+
+		const record = await registry.dispatch( coreStore ).saveEntityRecord(
+			'postType',
+			'wp_block',
+			{
+				title: pattern.title,
+				content: pattern.content,
+				status: 'publish',
+				meta: { [ PATTERN_OVERRIDE_META_KEY ]: pattern.name },
+				wp_pattern_category: categoryIds,
+			},
+			{ throwOnError: true }
+		);
+		// The patterns REST endpoint now serves the copy's content.
+		registry
+			.dispatch( coreStore )
+			.invalidateResolution( 'getBlockPatterns' );
+		return record;
 	};
 
 /**

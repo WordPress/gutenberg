@@ -1,28 +1,21 @@
-import { __ } from '@wordpress/i18n';
-import { Icon, lockSmall } from '@wordpress/icons';
-// @ts-expect-error `@wordpress/patterns` is not typed yet.
-import { privateApis as patternPrivateApis } from '@wordpress/patterns';
-import { Tooltip, VisuallyHidden } from '@wordpress/ui';
-import type { CommonPost } from '../../types';
+import { _x } from '@wordpress/i18n';
+import { Badge } from '@wordpress/ui';
+import type { CommonPost, Pattern } from '../../types';
 import { BaseTitleView } from '../title/view';
-import { unlock } from '../../lock-unlock';
-
-export const { PATTERN_TYPES } = unlock( patternPrivateApis );
 
 export default function PatternTitleView( { item }: { item: CommonPost } ) {
-	const lockMessage = __( 'This pattern cannot be edited.' );
+	// A registered pattern that has been edited stands in for its edited
+	// copy; flag it so the user knows "Reset" applies.
+	const isEdited = !! ( item as Pattern ).overrideId;
 	return (
 		<BaseTitleView item={ item } className="fields-field__pattern-title">
-			{ item.type === PATTERN_TYPES.theme && (
-				<>
-					<VisuallyHidden>{ lockMessage }</VisuallyHidden>
-					<Tooltip.Root>
-						<Tooltip.Trigger
-							render={ <Icon icon={ lockSmall } size={ 24 } /> }
-						/>
-						<Tooltip.Popup>{ lockMessage }</Tooltip.Popup>
-					</Tooltip.Root>
-				</>
+			{ isEdited && (
+				<Badge intent="informational">
+					{ _x(
+						'Edited',
+						'registered pattern that has been edited'
+					) }
+				</Badge>
 			) }
 		</BaseTitleView>
 	);

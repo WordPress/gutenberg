@@ -17,6 +17,7 @@ const {
 	PATTERN_SYNC_TYPES,
 	EXCLUDED_PATTERN_SOURCES,
 	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_OVERRIDE_META_KEY,
 } = unlock( patternPrivateApis );
 
 const { extractWords, getNormalizedSearchTerms, normalizeString } = unlock(
@@ -54,6 +55,7 @@ interface UserPattern {
 	description?: string;
 	wp_pattern_sync_status?: string;
 	wp_pattern_category?: number[];
+	meta?: Record< string, any >;
 	blocks?: any[];
 }
 
@@ -74,6 +76,10 @@ export interface NormalizedPattern {
 	blocks?: any[];
 	// Internal property for permissions lookup (user patterns only)
 	_recordId?: number;
+	// Registered patterns only: the `wp_block` post holding the edited copy.
+	overrideId?: number;
+	// Registered patterns only: needed to create the edited copy.
+	name?: string;
 }
 
 /**
@@ -88,12 +94,18 @@ interface PatternCategory {
 /**
  * Normalize theme pattern to unified structure.
  *
- * @param pattern Theme pattern object.
+ * @param pattern    Theme pattern object.
+ * @param overrideId Id of the `wp_block` post holding the edited copy, if any.
  * @return Normalized pattern object.
  */
-function normalizeThemePattern( pattern: ThemePattern ): NormalizedPattern {
+function normalizeThemePattern(
+	pattern: ThemePattern,
+	overrideId?: number
+): NormalizedPattern {
 	return {
 		id: pattern.name,
+		name: pattern.name,
+		overrideId,
 		title: pattern.title,
 		content: pattern.content,
 		keywords: pattern.keywords || [],
@@ -283,6 +295,15 @@ function searchItems(
 
 const selectThemePatterns = createSelector(
 	( select ) => {
+		const overrides = (
+			( select( coreStore ).getEntityRecords(
+				'postType',
+				PATTERN_TYPES.user,
+				{
+					per_page: -1,
+				}
+			) as UserPattern[] | null ) ?? []
+		).filter( ( record ) => !! record.meta?.[ PATTERN_OVERRIDE_META_KEY ] );
 		const { getBlockPatterns } = select( coreStore );
 		const { isResolving: isResolvingSelector } = select( coreStore );
 
@@ -295,7 +316,16 @@ const selectThemePatterns = createSelector(
 			)
 			.filter( filterOutDuplicatesByName )
 			.filter( ( pattern ) => pattern.inserter !== false )
-			.map( normalizeThemePattern );
+			.map( ( pattern: ThemePattern ) =>
+				normalizeThemePattern(
+					pattern,
+					overrides.find(
+						( record ) =>
+							record.meta?.[ PATTERN_OVERRIDE_META_KEY ] ===
+							pattern.name
+					)?.id
+				)
+			);
 		return {
 			patterns,
 			isResolving: isResolvingSelector( 'getBlockPatterns' ),
@@ -304,6 +334,9 @@ const selectThemePatterns = createSelector(
 	( select ) => [
 		select( coreStore ).getBlockPatterns(),
 		select( coreStore ).isResolving( 'getBlockPatterns' ),
+		select( coreStore ).getEntityRecords( 'postType', PATTERN_TYPES.user, {
+			per_page: -1,
+		} ),
 	]
 );
 
@@ -323,9 +356,15 @@ const selectUserPatterns = createSelector(
 		) as UserPattern[] | null;
 		const userPatternCategories =
 			getUserPatternCategories() as PatternCategory[];
-		let patterns = ( patternPosts ?? [] ).map( ( pattern ) =>
-			normalizeUserPattern( pattern, userPatternCategories )
-		);
+		// Edited copies of registered patterns are listed as the registered
+		// pattern itself, not as user patterns.
+		let patterns = ( patternPosts ?? [] )
+			.filter(
+				( record ) => ! record.meta?.[ PATTERN_OVERRIDE_META_KEY ]
+			)
+			.map( ( pattern ) =>
+				normalizeUserPattern( pattern, userPatternCategories )
+			);
 		const isResolving = isResolvingSelector( 'getEntityRecords', [
 			'postType',
 			PATTERN_TYPES.user,

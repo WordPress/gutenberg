@@ -24,7 +24,10 @@ import {
 	BlockControls,
 	InnerBlocks,
 } from '@wordpress/block-editor';
-import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
+import {
+	privateApis as patternsPrivateApis,
+	store as patternsStore,
+} from '@wordpress/patterns';
 import { getBlockBindingsSource, parse } from '@wordpress/blocks';
 import { unlock } from '../lock-unlock';
 
@@ -93,7 +96,7 @@ export default function ReusableBlockEditRecursionWrapper( props ) {
 	return (
 		<RecursionProvider uniqueId={ uniqueId }>
 			{ ref ? (
-				<UserPatternEdit { ...props } />
+				<UserPatternEdit { ...props } recordId={ ref } />
 			) : (
 				<RegisteredPatternEdit { ...props } />
 			) }
@@ -104,26 +107,26 @@ export default function ReusableBlockEditRecursionWrapper( props ) {
 /**
  * Loads a user pattern (a `wp_block` post) referenced by `ref`.
  *
- * @param {Object} props Block edit props.
+ * @param {Object} props          Block edit props.
+ * @param {number} props.recordId The `wp_block` post id.
  */
-function UserPatternEdit( props ) {
-	const { ref } = props.attributes;
+function UserPatternEdit( { recordId, ...props } ) {
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
-		ref
+		recordId
 	);
 	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
-		id: ref,
+		id: recordId,
 	} );
 	const canUserEdit = useSelect(
 		( select ) =>
 			!! select( coreStore ).canUser( 'update', {
 				kind: 'postType',
 				name: 'wp_block',
-				id: ref,
+				id: recordId,
 			} ),
-		[ ref ]
+		[ recordId ]
 	);
 
 	return (
@@ -133,33 +136,42 @@ function UserPatternEdit( props ) {
 			hasResolved={ hasResolved }
 			isMissing={ hasResolved && ! record }
 			canUserEdit={ canUserEdit }
+			onEditOriginal={ ( navigate ) => navigate( recordId ) }
 		/>
 	);
 }
 
 /**
  * Loads a registered pattern (theme, plugin or core) referenced by `slug`.
+ * When the pattern has been edited, the edited copy (a `wp_block` post) is
+ * loaded instead so the instance follows edits live.
  *
  * @param {Object} props Block edit props.
  */
 function RegisteredPatternEdit( props ) {
 	const { slug } = props.attributes;
-	const { pattern, hasResolved } = useSelect(
+	const { pattern, override, hasResolved, canCreate } = useSelect(
 		( select ) => {
 			const _pattern = unlock(
 				select( blockEditorStore )
 			).getPatternBySlug( slug );
+			const { canUser, hasFinishedResolution } = select( coreStore );
 			return {
 				pattern: _pattern,
+				override: unlock( select( patternsStore ) ).getPatternOverride(
+					slug
+				),
 				hasResolved:
-					!! _pattern ||
-					select( coreStore ).hasFinishedResolution(
-						'getBlockPatterns'
-					),
+					!! _pattern || hasFinishedResolution( 'getBlockPatterns' ),
+				canCreate: !! canUser( 'create', {
+					kind: 'postType',
+					name: 'wp_block',
+				} ),
 			};
 		},
 		[ slug ]
 	);
+	const { createPatternOverride } = unlock( useDispatch( patternsStore ) );
 	const content = pattern?.content;
 	// Parse the raw content rather than using the shared parsed pattern, so
 	// the root block isn't stamped with `metadata.patternName` and treated as
@@ -172,14 +184,22 @@ function RegisteredPatternEdit( props ) {
 		[ content ]
 	);
 
+	if ( override ) {
+		return <UserPatternEdit { ...props } recordId={ override.id } />;
+	}
+
 	return (
 		<ReusableBlockEdit
 			{ ...props }
 			blocks={ blocks }
 			hasResolved={ hasResolved }
 			isMissing={ hasResolved && ! pattern }
-			// Editing a registered pattern in place is not supported yet.
-			canUserEdit={ false }
+			canUserEdit={ canCreate && !! pattern }
+			// Editing a registered pattern creates its editable copy first.
+			onEditOriginal={ async ( navigate ) => {
+				const record = await createPatternOverride( pattern );
+				navigate( record.id );
+			} }
 		/>
 	);
 }
@@ -230,6 +250,7 @@ function ReusableBlockEdit( {
 	hasResolved,
 	isMissing,
 	canUserEdit,
+	onEditOriginal,
 } ) {
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
@@ -289,10 +310,9 @@ function ReusableBlockEdit( {
 	} );
 
 	const handleEditOriginal = () => {
-		onNavigateToEntityRecord( {
-			postId: ref,
-			postType: 'wp_block',
-		} );
+		onEditOriginal( ( postId ) =>
+			onNavigateToEntityRecord( { postId, postType: 'wp_block' } )
+		);
 	};
 
 	const resetContent = () => {

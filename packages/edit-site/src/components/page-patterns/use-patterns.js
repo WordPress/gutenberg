@@ -7,6 +7,7 @@ import {
 	EXCLUDED_PATTERN_SOURCES,
 	PATTERN_TYPES,
 	PATTERN_SYNC_TYPES,
+	PATTERN_OVERRIDE_META_KEY,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 } from '../../utils/constants';
@@ -77,6 +78,13 @@ const selectTemplateParts = createSelector(
 	]
 );
 
+const selectPatternOverrides = ( select ) =>
+	(
+		select( coreStore ).getEntityRecords( 'postType', PATTERN_TYPES.user, {
+			per_page: -1,
+		} ) ?? EMPTY_PATTERN_LIST
+	).filter( ( record ) => !! record.meta?.[ PATTERN_OVERRIDE_META_KEY ] );
+
 const selectThemePatterns = createSelector(
 	( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
@@ -87,6 +95,7 @@ const selectThemePatterns = createSelector(
 			settings.__experimentalBlockPatterns;
 
 		const restBlockPatterns = select( coreStore ).getBlockPatterns();
+		const overrides = selectPatternOverrides( select );
 
 		const patterns = [
 			...( blockPatterns || [] ),
@@ -102,6 +111,12 @@ const selectThemePatterns = createSelector(
 				...pattern,
 				keywords: pattern.keywords || [],
 				type: PATTERN_TYPES.theme,
+				// The edited copy of a registered pattern, when it exists.
+				overrideId: overrides.find(
+					( record ) =>
+						record.meta[ PATTERN_OVERRIDE_META_KEY ] ===
+						pattern.name
+				)?.id,
 				blocks: parse( pattern.content, {
 					__unstableSkipMigrationLogs: true,
 				} ),
@@ -115,6 +130,9 @@ const selectThemePatterns = createSelector(
 		select( coreStore ).getBlockPatterns(),
 		select( coreStore ).isResolving( 'getBlockPatterns' ),
 		unlock( select( editSiteStore ) ).getSettings(),
+		select( coreStore ).getEntityRecords( 'postType', PATTERN_TYPES.user, {
+			per_page: -1,
+		} ),
 	]
 );
 
@@ -217,7 +235,11 @@ const selectUserPatterns = createSelector(
 		userPatternCategories.forEach( ( userCategory ) =>
 			categories.set( userCategory.id, userCategory )
 		);
-		let patterns = patternPosts ?? EMPTY_PATTERN_LIST;
+		// Edited copies of registered patterns are listed as the registered
+		// pattern itself, not as user patterns.
+		let patterns = ( patternPosts ?? EMPTY_PATTERN_LIST ).filter(
+			( record ) => ! record.meta?.[ PATTERN_OVERRIDE_META_KEY ]
+		);
 		const isResolving = isResolvingSelector( 'getEntityRecords', [
 			'postType',
 			PATTERN_TYPES.user,
