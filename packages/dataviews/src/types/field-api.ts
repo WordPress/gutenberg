@@ -350,8 +350,10 @@ export type Field< Item > = {
 
 	/**
 	 * Callback used to sort the field.
+	 *
+	 * Receives the field values of the two items being compared.
 	 */
-	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
+	sort?: ( a: any, b: any, direction: SortDirection ) => number;
 
 	/**
 	 * Validation config for the field.
@@ -530,7 +532,7 @@ export type FormatInteger = {
  */
 export type NormalizedField< Item > = Omit<
 	Field< Item >,
-	'Edit' | 'isValid'
+	'Edit' | 'isValid' | 'sort'
 > & {
 	/**
 	 * The label of the field. Defaults to the id.
