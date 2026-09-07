@@ -31,7 +31,7 @@
 
 ### Bug Fixes
 
--   `SearchableSelect`, `SearchableChipSelect`: Hide the creatable footer when the create action is not in the filtered results. It still renders in the footer (not the main list) when it remains in `items` and matches the query. To keep a create action after an unmatched query, keep that item in `items` with a label or `filter` that matches.
+-   `SearchableSelect`, `SearchableChipSelect`: Hide the creatable footer when the create action is not in the filtered results. It still renders in the footer (not the main list) when it remains in `items` and matches the query. To keep a create action after an unmatched query, keep that item in `items` with a label or `filter` that matches ([#82566](https://github.com/WordPress/gutenberg/pull/82566)).
 -   `Fieldset`: Fix gap token to match spec ([#75479](https://github.com/WordPress/gutenberg/pull/75479)).
 -   `Field.Label`: Reset `variant="plain"` to the default font weight so it no longer inherits the uppercase label emphasis weight ([#82213](https://github.com/WordPress/gutenberg/pull/82213)).
 -   `Select` (`variant="minimal"`): Keep the trigger borderless and unfilled when disabled. InputLayout no longer applies disabled field chrome to `.is-borderless`. ([#82468](https://github.com/WordPress/gutenberg/pull/82468))
