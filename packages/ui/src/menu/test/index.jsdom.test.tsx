@@ -574,11 +574,24 @@ describe( 'Menu', () => {
 			expect.any( Function ),
 			true
 		);
+		reloadedAddEventListener.mockClear();
+		reloadedRemoveEventListener.mockClear();
 
 		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
 		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+		await waitFor( () => {
+			expect( reloadedAddEventListener ).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any( Function ),
+				true
+			);
+		} );
 		unmount();
-		expect( reloadedRemoveEventListener ).toHaveBeenCalledTimes( 2 );
+		expect( reloadedRemoveEventListener ).toHaveBeenCalledWith(
+			'pointerdown',
+			expect.any( Function ),
+			true
+		);
 	} );
 
 	it( 'moves the listener when an iframe remounts while the menu is open', async () => {
@@ -607,6 +620,10 @@ describe( 'Menu', () => {
 			configurable: true,
 			get: () => firstDocument,
 		} );
+		const firstAddEventListener = vi.spyOn(
+			firstDocument,
+			'addEventListener'
+		);
 		const firstRemoveEventListener = vi.spyOn(
 			firstDocument,
 			'removeEventListener'
@@ -614,6 +631,13 @@ describe( 'Menu', () => {
 
 		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
 		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+		await waitFor( () => {
+			expect( firstAddEventListener ).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any( Function ),
+				true
+			);
+		} );
 
 		rerender( <MenuWithIframe iframeKey="second" /> );
 		await waitFor( () => {
