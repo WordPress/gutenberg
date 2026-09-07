@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -15,14 +16,13 @@ import {
 	isValueMixed,
 	LABELS,
 } from './utils';
-import {
-	FlexedBoxControlIcon,
-	FlexedRangeControl,
-	InputWrapper,
-	StyledUnitControl,
-} from './styles/box-control-styles';
+import BoxControlIcon from './icon';
 import type { BoxControlInputControlProps, BoxControlValue } from './types';
 import Button from '../button';
+import { HStack } from '../h-stack';
+import RangeControl from '../range-control';
+import UnitControl from '../unit-control';
+import styles from './style.module.scss';
 
 const noop = () => {};
 
@@ -191,15 +191,26 @@ export default function BoxInputControl( {
 		: [];
 
 	return (
-		<InputWrapper key={ `box-control-${ side }` } expanded>
-			<FlexedBoxControlIcon side={ side } sides={ sides } />
+		<HStack
+			key={ `box-control-${ side }` }
+			className={ styles[ 'input-wrapper' ] }
+			expanded
+		>
+			<BoxControlIcon
+				className={ styles.icon }
+				side={ side }
+				sides={ sides }
+			/>
 			{ showCustomValueControl && (
 				<>
 					<Tooltip placement="top-end" text={ LABELS[ side ] }>
-						<StyledUnitControl
+						<UnitControl
 							{ ...props }
 							min={ min }
-							className="component-box-control__unit-control"
+							className={ clsx(
+								styles[ 'unit-control' ],
+								'component-box-control__unit-control'
+							) }
 							id={ inputId }
 							isPressEnterToChange
 							disableUnits={ isMixed || isMixedUnit }
@@ -213,7 +224,8 @@ export default function BoxInputControl( {
 						/>
 					</Tooltip>
 
-					<FlexedRangeControl
+					<RangeControl
+						className={ styles[ 'range-control' ] }
 						aria-controls={ inputId }
 						label={ LABELS[ side ] }
 						hideLabelFromVision
@@ -240,8 +252,11 @@ export default function BoxInputControl( {
 			) }
 
 			{ hasPresets && ! showCustomValueControl && (
-				<FlexedRangeControl
-					className="spacing-sizes-control__range-control"
+				<RangeControl
+					className={ clsx(
+						styles[ 'range-control' ],
+						'spacing-sizes-control__range-control'
+					) }
 					value={ presetIndex !== undefined ? presetIndex + 1 : 0 }
 					onChange={ ( newIndex ) => {
 						const newValue =
@@ -289,6 +304,6 @@ export default function BoxInputControl( {
 					iconSize={ 24 }
 				/>
 			) }
-		</InputWrapper>
+		</HStack>
 	);
 }

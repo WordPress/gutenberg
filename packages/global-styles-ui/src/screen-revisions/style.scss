@@ -80,7 +80,7 @@
 		left: $grid-unit-20;
 		top: 0;
 		width: 0;
-		border: 0.5px solid $gray-300;
+		border: 0.5px solid var(--wpds-color-stroke-surface-neutral);
 	}
 
 	&:first-child::after {
@@ -188,6 +188,6 @@
 	bottom: 0;
 	background: $white;
 	padding: $grid-unit-15;
-	border-top: $border-width solid $gray-300;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 	box-sizing: border-box;
 }

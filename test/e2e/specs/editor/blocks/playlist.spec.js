@@ -1,14 +1,10 @@
-const path = require( 'path' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-const audioPath = path.join(
-	__dirname,
-	'../../../assets/playlist-e2e-test.wav'
-);
-const imagePath = path.join(
-	__dirname,
-	'../../../assets/10x10_e2e_test_image_green.png'
-);
+const audioPath = './assets/playlist-e2e-test.wav';
+const imagePath = './assets/10x10_e2e_test_image_green.png';
+// An audio file WordPress does not accept uploads for, so adding it always
+// fails after the track block has optimistically been created.
+const rejectedAudioPath = './assets/e2e-test-audio.aiff';
 
 test.describe( 'Playlist block', () => {
 	let uploadedAudio;
@@ -243,5 +239,87 @@ test.describe( 'Playlist block', () => {
 			player.getByRole( 'slider', { name: trackWithoutImageTitle } )
 		).toBeVisible();
 		await expect( playerArtwork ).toHaveCount( 0 );
+	} );
+
+	test( 'keeps the playlist when the only added track fails to upload', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/playlist' } );
+
+		const playlist = editor.canvas.locator(
+			'role=document[name="Block: Playlist"i]'
+		);
+		await expect( playlist ).toBeVisible();
+
+		const { dragOver, drop } =
+			await pageUtils.dragFiles( rejectedAudioPath );
+		await dragOver( playlist );
+		await drop();
+
+		await expect( page.locator( '.components-snackbar' ) ).toContainText(
+			/not allowed to upload this file type/
+		);
+
+		// Removing the failed track must not take the playlist with it, which
+		// is what removing the last inner block of a container does.
+		await expect( playlist ).toBeVisible();
+		await expect(
+			editor.canvas.locator( '[data-type="core/playlist-track"]' )
+		).toHaveCount( 0 );
+	} );
+
+	test( 'keeps the existing tracks when an added track fails to upload', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/playlist',
+			innerBlocks: [
+				{
+					name: 'core/playlist-track',
+					attributes: {
+						id: uploadedAudio.id,
+						src: uploadedAudio.source_url,
+						title: 'Existing Track',
+					},
+				},
+				// A track the user has added but not filled in yet.
+				{ name: 'core/playlist-track' },
+			],
+		} );
+
+		const playlist = editor.canvas.locator(
+			'role=document[name="Block: Playlist"i]'
+		);
+		const tracks = editor.canvas.locator(
+			'[data-type="core/playlist-track"]'
+		);
+		await expect( playlist ).toBeVisible();
+		await expect( tracks ).toHaveCount( 2 );
+
+		const { dragOver, drop } =
+			await pageUtils.dragFiles( rejectedAudioPath );
+		// Drop on the player, so the file lands on the playlist rather than
+		// on the placeholder track's own drop zone.
+		await dragOver( playlist, { position: { x: 10, y: 10 } } );
+		await drop();
+
+		await expect( page.locator( '.components-snackbar' ) ).toContainText(
+			/not allowed to upload this file type/
+		);
+
+		// The rejected file adds nothing, and neither the filled track nor
+		// the unfilled one is disturbed.
+		await expect( tracks ).toHaveCount( 2 );
+		await expect(
+			editor.canvas.getByRole( 'button', { name: /Existing Track/ } )
+		).toBeVisible();
 	} );
 } );

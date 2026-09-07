@@ -34,11 +34,11 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons",
 		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0"
+		"@types/jest": "^30.0.0",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

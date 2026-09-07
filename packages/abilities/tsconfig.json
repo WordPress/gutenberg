@@ -5,10 +5,7 @@
 	"exclude": [ "**/benchmark", "src/store/tests/reducer.test.ts" ],
 	"references": [
 		{ "path": "./tsconfig.build.json" },
-		{ "path": "../api-fetch/tsconfig.build.json" },
-		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../url" }
+		{ "path": "../i18n/tsconfig.build.json" }
 	]
 }

@@ -1,10 +1,7 @@
-import { privateApis } from '@wordpress/components';
+import { ValidatedInputControl } from '@wordpress/ui';
 import { useCallback } from '@wordpress/element';
 import type { DataFormControlProps } from '../../../types';
-import { unlock } from '../../../lock-unlock';
 import getCustomValidity from './get-custom-validity';
-
-const { ValidatedInputControl } = unlock( privateApis );
 
 export type DataFormValidatedTextControlProps< Item > =
 	DataFormControlProps< Item > & {
@@ -38,7 +35,7 @@ export default function ValidatedText< Item >( {
 	const value = getValue( { item: data } );
 	const disabled = field.isDisabled( { item: data, field } );
 
-	const onChangeControl = useCallback(
+	const onValueChangeControl = useCallback(
 		( newValue: string ) =>
 			onChange(
 				setValue( {
@@ -57,8 +54,13 @@ export default function ValidatedText< Item >( {
 			label={ label }
 			placeholder={ placeholder }
 			value={ value ?? '' }
-			help={ description }
-			onChange={ onChangeControl }
+			description={
+				typeof description === 'string' ? description : undefined
+			}
+			details={
+				typeof description === 'string' ? undefined : description
+			}
+			onValueChange={ onValueChangeControl }
 			hideLabelFromVision={ hideLabelFromVision }
 			type={ type }
 			prefix={ prefix }

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import moveIndividualPreference from '../move-individual-preference';
 
 describe( 'moveIndividualPreference', () => {

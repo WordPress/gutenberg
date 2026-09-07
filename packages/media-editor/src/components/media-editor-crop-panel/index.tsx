@@ -16,29 +16,21 @@ export interface MediaEditorCropPanelProps {
 	onAspectRatioChange: ( value: string ) => void;
 	/** Aspect-ratio presets to display in the selector. */
 	aspectRatioOptions: AspectRatioPreset[];
-	/**
-	 * When `true`, render the rotate/flip/zoom image controls at the top of
-	 * the panel. Used on wide viewports where the footer no longer carries
-	 * them.
-	 */
-	showTransformControls?: boolean;
 }
 
 /**
- * Sidebar panel for crop controls. Renders the aspect-ratio selector, plus the
- * rotate/flip and zoom controls on wide viewports (these move to the footer
- * toolbar when the sidebar collapses).
+ * Sidebar panel for crop controls: rotate, flip and zoom above the
+ * aspect-ratio selector. Rendered where the panel docks; below that the
+ * transform controls sit under the canvas instead, placed by the editor.
  * @param props
  * @param props.aspectRatioValue
  * @param props.onAspectRatioChange
  * @param props.aspectRatioOptions
- * @param props.showTransformControls
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
 	onAspectRatioChange,
 	aspectRatioOptions,
-	showTransformControls = false,
 }: MediaEditorCropPanelProps ) {
 	return (
 		// Tag the whole panel as a crop-control region so the modal's
@@ -52,7 +44,7 @@ export default function MediaEditorCropPanel( {
 			<VisuallyHidden render={ <h2 /> }>
 				{ __( 'Crop options' ) }
 			</VisuallyHidden>
-			{ showTransformControls && <MediaEditorImageControls withLabels /> }
+			<MediaEditorImageControls withLabels />
 			<SelectControl
 				label={ __( 'Aspect ratio' ) }
 				value={ aspectRatioValue }

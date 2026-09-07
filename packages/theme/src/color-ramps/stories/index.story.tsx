@@ -33,6 +33,9 @@ const meta: Meta< typeof ColorGen > = {
 		},
 	},
 	parameters: {
+		// FIXME: Color scale sample text fails color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},

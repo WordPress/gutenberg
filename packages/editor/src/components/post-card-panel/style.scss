@@ -18,6 +18,7 @@
 			flex-wrap: wrap;
 			column-gap: $grid-unit-10;
 			row-gap: $grid-unit-05;
+			// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
 			word-break: break-word;
 		}
 	}

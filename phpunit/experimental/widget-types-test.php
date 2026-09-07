@@ -396,6 +396,54 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Every download value but `false` keeps the download: a usable filename
+	 * survives sanitization, anything else falls back to the original name.
+	 */
+	public function test_sanitize_widget_actions_keeps_download_intent() {
+		$href = 'https://wordpress.org/export.csv';
+
+		$actions = gutenberg_sanitize_widget_actions(
+			array(
+				array(
+					'id'       => 'empty',
+					'label'    => 'Empty string',
+					'href'     => $href,
+					'download' => '',
+				),
+				array(
+					'id'       => 'zero',
+					'label'    => 'Zero',
+					'href'     => $href,
+					'download' => '0',
+				),
+				array(
+					'id'       => 'unusable',
+					'label'    => 'Unusable name',
+					'href'     => $href,
+					'download' => '???',
+				),
+				array(
+					'id'       => 'flag',
+					'label'    => 'Boolean true',
+					'href'     => $href,
+					'download' => true,
+				),
+				array(
+					'id'       => 'off',
+					'label'    => 'Boolean false',
+					'href'     => $href,
+					'download' => false,
+				),
+			)
+		);
+
+		$this->assertSame(
+			array( true, '0', true, true, false ),
+			array_column( $actions, 'download' )
+		);
+	}
+
+	/**
 	 * An empty or non-array actions list normalizes to null.
 	 */
 	public function test_sanitize_widget_actions_requires_entries() {

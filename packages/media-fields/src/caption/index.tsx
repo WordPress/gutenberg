@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { TextareaControl } from '@wordpress/components';
+import { TextareaControl as WCTextareaControl } from '@wordpress/components';
 import type { Attachment, Updatable } from '@wordpress/core-data';
 import type { Field } from '@wordpress/dataviews';
 import { getRawContent } from '../utils/get-raw-content';
@@ -12,7 +12,7 @@ const captionField: Partial< Field< Updatable< Attachment > > > = {
 	render: ( { item } ) => getRawContent( item?.caption ) || '-',
 	Edit: ( { field, onChange, data } ) => {
 		return (
-			<TextareaControl
+			<WCTextareaControl
 				label={ field.label }
 				value={ getRawContent( data.caption ) || '' }
 				onChange={ ( value ) => onChange( { caption: value } ) }

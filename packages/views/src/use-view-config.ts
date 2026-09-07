@@ -40,9 +40,15 @@ export function useViewConfig( {
 		: undefined;
 	return useSelect(
 		( select ) => {
-			return unlock( select( coreStore ) ).getViewConfig( kind, name, {
-				fields: fieldsKey,
-			} );
+			return unlock( select( coreStore ) ).getViewConfig(
+				kind,
+				name,
+				fieldsKey
+					? {
+							fields: fieldsKey,
+					  }
+					: undefined
+			);
 		},
 		[ kind, name, fieldsKey ]
 	);

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
-import { useNavigate } from '@wordpress/route';
+import { useNavigate, useSearch } from '@wordpress/route';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -11,7 +11,7 @@ import SitePreview from './site-preview';
 import useNavigateToEntityRecord, {
 	useActionPerformed,
 } from './use-navigate-to-entity-record';
-import useViewportSync from './use-viewport-sync';
+import { getDeviceType } from './viewport';
 
 interface CanvasProps {
 	canvas: CanvasData;
@@ -31,7 +31,15 @@ export default function Canvas( { canvas }: CanvasProps ) {
 		useNavigateToEntityRecord();
 	const onActionPerformed = useActionPerformed( canvas.postType );
 
-	useViewportSync();
+	/*
+	 * An entity can be asked to be edited at a particular width — a navigation
+	 * overlay meant for mobile — and carries the width it was left at when
+	 * returned to. Anything else opens at the default.
+	 */
+	const viewport = useSearch( {
+		strict: false,
+		select: ( search ) => ( search as { viewport?: string } ).viewport,
+	} ) as string | undefined;
 
 	/*
 	 * Where clicking a previewed canvas goes, resolved the same way the editor
@@ -159,6 +167,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 					settings={ settings }
 					backButton={ backButton }
 					onActionPerformed={ onActionPerformed }
+					initialViewport={ getDeviceType( viewport ) }
 				/>
 			</div>
 			{ canvas.isPreview && editLink && (

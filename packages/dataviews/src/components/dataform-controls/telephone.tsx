@@ -1,7 +1,4 @@
-import {
-	Icon as WCIcon,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-} from '@wordpress/components';
+import { Icon, InputLayout } from '@wordpress/ui';
 import { mobile } from '@wordpress/icons';
 import type { DataFormControlProps } from '../../types';
 import ValidatedText from './utils/validated-input';
@@ -25,9 +22,9 @@ export default function Telephone< Item >( {
 				validity,
 				type: 'tel',
 				prefix: (
-					<InputControlPrefixWrapper variant="icon">
-						<WCIcon icon={ mobile } />
-					</InputControlPrefixWrapper>
+					<InputLayout.Slot padding="minimal">
+						<Icon icon={ mobile } />
+					</InputLayout.Slot>
 				),
 			} }
 		/>

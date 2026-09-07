@@ -50,7 +50,7 @@ class PlaygroundRuntime {
 	 * @return {Promise<boolean>} True if Playground CLI is available.
 	 */
 	async isAvailable() {
-		// npx will fetch it if not installed locally
+		// @wp-playground/cli is a dependency of this package, so it is installed.
 		return true;
 	}
 

@@ -11,27 +11,25 @@ const getFieldDefinition = < Item >(
 	field: NormalizedFormField,
 	fields: NormalizedField< Item >[]
 ) => {
-	const fieldDefinition = fields.find( ( _field ) => _field.id === field.id );
+	// A combined form field is a layout container, not a field: its id is
+	// never resolved against the field definitions. Fall back to its first
+	// leaf child so the panel has a definition for the summary and
+	// `readOnly` state.
+	if ( !! field.children ) {
+		const simpleChildren = field.children.filter(
+			( child ) => ! child.children
+		);
 
-	if ( ! fieldDefinition ) {
-		return fields.find( ( _field ) => {
-			if ( !! field.children ) {
-				const simpleChildren = field.children.filter(
-					( child ) => ! child.children
-				);
+		if ( simpleChildren.length === 0 ) {
+			return undefined;
+		}
 
-				if ( simpleChildren.length === 0 ) {
-					return false;
-				}
-
-				return _field.id === simpleChildren[ 0 ].id;
-			}
-
-			return _field.id === field.id;
-		} );
+		return fields.find(
+			( _field ) => _field.id === simpleChildren[ 0 ].id
+		);
 	}
 
-	return fieldDefinition;
+	return fields.find( ( _field ) => _field.id === field.id );
 };
 
 /**
@@ -39,8 +37,8 @@ const getFieldDefinition = < Item >(
  *
  * Summary fields are determined with the following priority:
  * 1. Use layout.summary fields if they exist
- * 2. Fall back to the field definition that matches the form field's id
- * 3. If the form field id doesn't exist, pick the first child field
+ * 2. For a leaf form field, fall back to its field definition
+ * 3. For a combined form field, fall back to its first leaf child
  * 4. If no field definition is found, return empty summary fields
  *
  * @param field The form field to get definition for

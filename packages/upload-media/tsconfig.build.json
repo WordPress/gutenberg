@@ -5,13 +5,11 @@
 		"types": [ "gutenberg-env" ]
 	},
 	"references": [
-		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../preferences/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../url" },
 		{ "path": "../vips/tsconfig.build.json" },

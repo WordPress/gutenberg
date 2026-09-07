@@ -87,3 +87,15 @@ WithOptionDescriptions.args = {
 		},
 	],
 };
+
+export const WithDisabledOption: StoryFn< typeof RadioControl > = Template.bind(
+	{}
+);
+WithDisabledOption.args = {
+	...Default.args,
+	options: [
+		{ label: 'Public', value: 'public' },
+		{ label: 'Private', value: 'private', disabled: true },
+		{ label: 'Password Protected', value: 'password' },
+	],
+};

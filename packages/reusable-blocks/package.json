@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/reusable-blocks",
-	"version": "5.53.0",
-	"description": "Reusable blocks utilities.",
+	"version": "5.54.0",
+	"description": "Deprecated no-op reusable blocks compatibility module.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -49,23 +49,8 @@
 		"build-module/store/index.mjs"
 	],
 	"dependencies": {
-		"@wordpress/base-styles": "file:../base-styles",
-		"@wordpress/block-editor": "file:../block-editor",
-		"@wordpress/blocks": "file:../blocks",
-		"@wordpress/components": "file:../components",
-		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
-		"@wordpress/deprecated": "file:../deprecated",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons",
-		"@wordpress/notices": "file:../notices",
-		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/url": "file:../url"
-	},
-	"devDependencies": {
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/preferences": "file:../preferences"
+		"@wordpress/deprecated": "file:../deprecated"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",

@@ -101,6 +101,38 @@ test.describe( 'Plugins API', () => {
 			).toBeVisible();
 		} );
 
+		test( 'Should render a single More Menu item for a sidebar that renders one of its own', async ( {
+			page,
+		} ) => {
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+
+			// The menu item PluginSidebar injects is labelled with the sidebar
+			// title, the one the plugin renders with its own children.
+			await expect(
+				page.getByRole( 'menuitemcheckbox', {
+					name: 'Plugin more menu title',
+				} )
+			).toHaveCount( 1 );
+			await expect(
+				page.getByRole( 'menuitemcheckbox', { name: 'Plugin title' } )
+			).toBeHidden();
+
+			// Both are labelled the same here, so a duplicate shows up as a count.
+			await expect(
+				page.getByRole( 'menuitemcheckbox', { name: 'Annotations' } )
+			).toHaveCount( 1 );
+
+			// A sidebar that renders no menu item of its own still gets one.
+			await expect(
+				page.getByRole( 'menuitemcheckbox', {
+					name: 'Injected menu item',
+				} )
+			).toHaveCount( 1 );
+		} );
+
 		test( 'Should be pinned by default and can be opened and closed using pinned items', async ( {
 			page,
 		} ) => {

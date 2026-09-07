@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/rich-text",
-	"version": "7.53.0",
+	"version": "7.54.0",
 	"description": "Rich text value and manipulation API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -64,7 +64,8 @@
 		"colord": "^2.9.3"
 	},
 	"devDependencies": {
-		"deep-freeze": "^0.0.1"
+		"deep-freeze": "^0.0.1",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

@@ -231,31 +231,7 @@ The `onXChange` callback is distinct from the native DOM `onChange` event handle
 
 Components that wrap native form elements may still support native event handlers (like `onChange`, `onInput`) for interoperability, but `onXChange` is the recommended approach within this package.
 
-#### Guidelines for component authors
-
-When designing props for a new component:
-
--   Always offer both controlled and uncontrolled modes when the component has user-facing state.
--   Name the uncontrolled prop `defaultX`, the controlled prop `x`, and the callback `onXChange`.
--   In JSDoc comments, indicate which mode each prop is for and cross-reference the alternative:
-    ```ts
-    /**
-     * Whether the panel is currently open (controlled).
-     *
-     * To render an uncontrolled component, use the `defaultOpen` prop instead.
-     */
-    open?: boolean;
-    /**
-     * Whether the panel is initially open (uncontrolled).
-     * @default false
-     */
-    defaultOpen?: boolean;
-    /**
-     * Event handler called when the open state changes.
-     */
-    onOpenChange?: ( open: boolean ) => void;
-    ```
--   Provide a `@default` JSDoc tag for the uncontrolled prop when there is a sensible default.
+For guidance on implementing this pattern in new components, see [Controlled and uncontrolled props](./CONTRIBUTING.md#controlled-and-uncontrolled-props).
 
 ## Contributing to this package
 
