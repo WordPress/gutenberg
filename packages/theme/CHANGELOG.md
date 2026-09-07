@@ -12,6 +12,7 @@
 
 ### Enhancements
 
+-   Rebalance generated surface and stroke ramp steps with perceptual spacing while preserving WCAG contrast floors. ([#82543](https://github.com/WordPress/gutenberg/pull/82543))
 -   Add a Lightning CSS visitor plugin that injects design system token fallbacks, available as `@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks`, with an optional peer range of `>=1.33.0 <2.0.0`. ([#80401](https://github.com/WordPress/gutenberg/pull/80401))
 
 ### Bug Fixes
