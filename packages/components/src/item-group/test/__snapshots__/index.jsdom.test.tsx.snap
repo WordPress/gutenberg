@@ -38,10 +38,10 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -2,11 +2,11 @@
+@@ -1,11 +1,11 @@
+  <div>
     <div
       class="style-item-wrapper"
-      role="listitem"
     >
       <div
 -       class="style-item style-is-size-medium components-item"

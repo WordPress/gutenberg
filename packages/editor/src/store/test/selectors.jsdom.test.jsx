@@ -2692,7 +2692,45 @@ describe( 'selectors', () => {
 			expect( getEditedPostSlug( state ) ).toBe( 'edited-slug' );
 		} );
 
-		it( 'should return the cleaned title as slug if no saved or edited slug exists', () => {
+		it( 'should return the server-generated slug if no saved or edited slug exists', () => {
+			const state = {
+				currentPost: {
+					title: 'Sample Post',
+					generated_slug: 'server-generated-slug',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe(
+				'server-generated-slug'
+			);
+		} );
+
+		it( 'should prefer the server-generated slug over the cleaned title', () => {
+			const state = {
+				currentPost: {
+					title: 'Sample Post',
+					generated_slug: 'server-generated-slug',
+				},
+				editor: {
+					present: {
+						edits: {
+							title: 'Edited Title',
+						},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe(
+				'server-generated-slug'
+			);
+		} );
+
+		it( 'should return the cleaned title as slug if no saved, edited, or generated slug exists', () => {
 			const state = {
 				currentPost: {
 					title: 'Sample Post',
