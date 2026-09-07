@@ -224,10 +224,11 @@ This package is built in two steps. When `npm run build` is run at the root of t
 
 This step will:
 
-1. Generate primitive tokens.
-2. Build CSS and JavaScript token files.
-3. Update the design tokens documentation.
-4. Format all generated files.
+1. Generate default color ramps.
+2. Generate primitive tokens.
+3. Build CSS and JavaScript token files.
+4. Update the design tokens documentation.
+5. Format all generated files.
 
 The files generated in this step will all be committed to the repo.
 
