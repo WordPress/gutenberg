@@ -1,3 +1,4 @@
+import { beforeAll, describe, expect, it } from 'vitest';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import postDataBindings from '../post-data';
 
