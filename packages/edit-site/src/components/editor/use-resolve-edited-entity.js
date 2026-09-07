@@ -30,8 +30,6 @@ function getPostType( name ) {
 		postType = NAVIGATION_POST_TYPE;
 	} else if ( name === 'pattern-item' ) {
 		postType = PATTERN_TYPES.user;
-	} else if ( name === 'template-part-item' ) {
-		postType = TEMPLATE_PART_POST_TYPE;
 	} else if ( name === 'templates' ) {
 		postType = TEMPLATE_POST_TYPE;
 	} else if ( name === 'template-item' ) {

@@ -1,14 +1,32 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useEntityRecords } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import OverlayTemplatePartSelector from '../overlay-template-part-selector';
 import useCreateOverlayTemplatePart from '../use-create-overlay';
+import useOverlayPatterns from '../use-overlay-patterns';
 
-// Mock useEntityRecords
+// Mock core-data store
 jest.mock( '@wordpress/core-data', () => ( {
-	useEntityRecords: jest.fn(),
 	store: {},
+} ) );
+
+// Mock patterns store
+jest.mock( '@wordpress/patterns', () => ( {
+	store: {},
+} ) );
+
+// Mock lock-unlock: editing a registered overlay creates its copy.
+const mockCustomizePattern = jest.fn();
+jest.mock( '../../../lock-unlock', () => ( {
+	unlock: () => ( {
+		customizePattern: mockCustomizePattern,
+	} ),
+} ) );
+
+// Mock the overlays: the patterns of the overlay area.
+jest.mock( '../use-overlay-patterns', () => ( {
+	__esModule: true,
+	default: jest.fn(),
 } ) );
 
 // Mock useCreateOverlayTemplatePart hook
@@ -45,47 +63,43 @@ const defaultProps = {
 };
 
 const templatePart1 = {
-	id: 1,
-	theme: 'twentytwentyfive',
+	pattern: {
+		name: 'twentytwentyfive/part/my-overlay',
+		title: 'My Overlay',
+		area: 'navigation-overlay',
+	},
+	name: 'twentytwentyfive/part/my-overlay',
 	slug: 'my-overlay',
 	title: {
 		rendered: 'My Overlay',
 	},
-	area: 'navigation-overlay',
 };
 
 const templatePart2 = {
-	id: 2,
-	theme: 'twentytwentyfive',
+	pattern: {
+		name: 'twentytwentyfive/part/another-overlay',
+		title: 'Another Overlay',
+		area: 'navigation-overlay',
+	},
+	name: 'twentytwentyfive/part/another-overlay',
 	slug: 'another-overlay',
 	title: {
 		rendered: 'Another Overlay',
 	},
-	area: 'navigation-overlay',
-};
-
-const templatePartOtherArea = {
-	id: 3,
-	theme: 'twentytwentyfive',
-	slug: 'header-part',
-	title: {
-		rendered: 'Header Part',
-	},
-	area: 'header',
 };
 
 describe( 'OverlayTemplatePartSelector', () => {
 	const mockCreateOverlayTemplatePart = jest.fn();
 	const mockCreateErrorNotice = jest.fn();
-	const { useSelect } = require( '@wordpress/data' );
 
 	beforeEach( () => {
 		jest.clearAllMocks();
-		useEntityRecords.mockReturnValue( {
-			records: [],
+		useOverlayPatterns.mockReturnValue( {
+			overlays: [],
 			isResolving: false,
 			hasResolved: false,
 		} );
+		mockCustomizePattern.mockResolvedValue( { id: 123 } );
 		useCreateOverlayTemplatePart.mockReturnValue(
 			mockCreateOverlayTemplatePart
 		);
@@ -93,15 +107,12 @@ describe( 'OverlayTemplatePartSelector', () => {
 		useDispatch.mockReturnValue( {
 			createErrorNotice: mockCreateErrorNotice,
 		} );
-		// Mock useSelect to return current theme
-		// The component calls: select( coreStore ).getCurrentTheme()?.stylesheet
-		useSelect.mockReturnValue( 'twentytwentyfive' );
 	} );
 
 	describe( 'Loading state', () => {
 		it( 'should disable select control when template parts are resolving', () => {
-			useEntityRecords.mockReturnValue( {
-				records: null,
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [],
 				isResolving: true,
 				hasResolved: false,
 			} );
@@ -117,8 +128,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 	describe( 'Overlay selection', () => {
 		it( 'should show Create Overlay button when no overlays exist', () => {
-			useEntityRecords.mockReturnValue( {
-				records: [],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -140,14 +151,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 		} );
 
 		it( 'should show dropdown selector when theme overlays exist', () => {
-			// Theme overlays have a theme property
-			const themeOverlay = {
-				...templatePart1,
-				theme: 'twentytwentyfive',
-			};
-
-			useEntityRecords.mockReturnValue( {
-				records: [ themeOverlay, templatePartOtherArea ],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [ templatePart1 ],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -165,12 +170,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 		} );
 
 		it( 'should show dropdown selector when any overlays exist', () => {
-			useEntityRecords.mockReturnValue( {
-				records: [
-					templatePart1,
-					templatePart2,
-					templatePartOtherArea,
-				],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [ templatePart1, templatePart2 ],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -182,7 +183,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			} );
 			expect( select ).toBeInTheDocument();
 
-			// Should have Default + 2 overlays (not the header one)
+			// Should have Default + 2 overlays
 			const options = screen.getAllByRole( 'option' );
 			expect( options ).toHaveLength( 3 );
 
@@ -192,10 +193,6 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect(
 				screen.getByRole( 'option', { name: 'Another Overlay' } )
 			).toBeInTheDocument();
-			expect(
-				screen.queryByRole( 'option', { name: 'Header Part' } )
-			).not.toBeInTheDocument();
-
 			// Should show "Default" option (not "None (default)")
 			expect(
 				screen.getByRole( 'option', { name: 'Default' } )
@@ -208,8 +205,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 				title: null,
 			};
 
-			useEntityRecords.mockReturnValue( {
-				records: [ templatePartNoTitle ],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [ templatePartNoTitle ],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -224,8 +221,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 		it( 'should store slug only when an overlay is selected', async () => {
 			const user = userEvent.setup();
 
-			useEntityRecords.mockReturnValue( {
-				records: [ templatePart1 ],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [ templatePart1 ],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -246,8 +243,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 		it( 'unsets overlay when "Default" is selected', async () => {
 			const user = userEvent.setup();
 
-			useEntityRecords.mockReturnValue( {
-				records: [ templatePart1 ],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [ templatePart1 ],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -271,8 +268,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 		} );
 
 		it( 'should display selected overlay by slug', () => {
-			useEntityRecords.mockReturnValue( {
-				records: [ templatePart1 ],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [ templatePart1 ],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -294,8 +291,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 	describe( 'Edit button', () => {
 		it( 'should not render when no overlay is selected', () => {
-			useEntityRecords.mockReturnValue( {
-				records: [ templatePart1 ],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [ templatePart1 ],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -310,8 +307,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 		} );
 
 		it( 'should not display edit button while overlays templates are loading', () => {
-			useEntityRecords.mockReturnValue( {
-				records: [ templatePart1 ],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [ templatePart1 ],
 				isResolving: true,
 				hasResolved: false,
 			} );
@@ -339,8 +336,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 		} );
 
 		it( 'should be enabled when a valid overlay is selected', () => {
-			useEntityRecords.mockReturnValue( {
-				records: [ templatePart1 ],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [ templatePart1 ],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -362,8 +359,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 		} );
 
 		it( 'should be disabled when navigation to focused overlay editor is not available', () => {
-			useEntityRecords.mockReturnValue( {
-				records: [ templatePart1 ],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [ templatePart1 ],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -385,11 +382,11 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( editButton ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
-		it( 'should navigate to focused overlay editor with full ID when edit button is clicked', async () => {
+		it( 'should open the overlay copy in the focused editor when edit button is clicked', async () => {
 			const user = userEvent.setup();
 
-			useEntityRecords.mockReturnValue( {
-				records: [ templatePart1 ],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [ templatePart1 ],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -408,18 +405,24 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			await user.click( editButton );
 
-			// Should construct full ID from theme and slug
-			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
-				postId: 'twentytwentyfive//my-overlay',
-				postType: 'wp_template_part',
-			} );
+			// Should create (or reuse) the copy of the overlay pattern and
+			// open it.
+			expect( mockCustomizePattern ).toHaveBeenCalledWith(
+				templatePart1.pattern
+			);
+			await waitFor( () =>
+				expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
+					postId: 123,
+					postType: 'wp_block',
+				} )
+			);
 		} );
 
 		it( 'should not navigate to focused overlay editor when button is disabled', async () => {
 			const user = userEvent.setup();
 
-			useEntityRecords.mockReturnValue( {
-				records: [ templatePart1 ],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [ templatePart1 ],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -449,8 +452,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 	describe( 'Help text', () => {
 		it( 'should show prominent create button with help text when no overlays exist', () => {
-			useEntityRecords.mockReturnValue( {
-				records: [],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -473,8 +476,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 		} );
 
 		it( 'should show dropdown with help text when overlays are available', () => {
-			useEntityRecords.mockReturnValue( {
-				records: [ templatePart1 ],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [ templatePart1 ],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -501,22 +504,22 @@ describe( 'OverlayTemplatePartSelector', () => {
 	} );
 
 	describe( 'Create overlay', () => {
-		it( 'should store slug only and navigate with full ID when creating overlay via prominent button', async () => {
+		it( 'should store slug only and open the copy when creating overlay via prominent button', async () => {
 			const user = userEvent.setup();
 			const newOverlay = {
-				id: 'twentytwentyfive//overlay',
+				id: 45,
+				name: 'twentytwentyfive/part/overlay',
 				theme: 'twentytwentyfive',
 				slug: 'overlay',
 				title: {
 					rendered: 'Overlay',
 				},
-				area: 'navigation-overlay',
 			};
 
 			mockCreateOverlayTemplatePart.mockResolvedValue( newOverlay );
 
-			useEntityRecords.mockReturnValue( {
-				records: [],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -535,10 +538,10 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( mockSetAttributes ).toHaveBeenCalledWith( {
 				overlay: 'overlay',
 			} );
-			// Should navigate with full ID constructed from theme and slug
+			// Should open the created copy
 			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
-				postId: 'twentytwentyfive//overlay',
-				postType: 'wp_template_part',
+				postId: 45,
+				postType: 'wp_block',
 			} );
 		} );
 
@@ -550,8 +553,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			mockCreateOverlayTemplatePart.mockRejectedValue( error );
 
-			useEntityRecords.mockReturnValue( {
-				records: [],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [],
 				isResolving: false,
 				hasResolved: true,
 			} );
@@ -576,8 +579,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 		} );
 
 		it( 'should disable create button when overlays are resolving', () => {
-			useEntityRecords.mockReturnValue( {
-				records: [],
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [],
 				isResolving: true,
 				hasResolved: false,
 			} );

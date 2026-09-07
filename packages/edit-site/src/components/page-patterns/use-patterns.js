@@ -8,8 +8,6 @@ import {
 	EXCLUDED_PATTERN_SOURCES,
 	PATTERN_TYPES,
 	PATTERN_SYNC_TYPES,
-	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { searchItems } from './search-items';
@@ -19,67 +17,6 @@ const { isPatternCustomization, applyPatternCustomization } =
 	unlock( patternsPrivateApis );
 
 const EMPTY_PATTERN_LIST = [];
-
-const selectTemplateParts = createSelector(
-	( select, categoryId, search = '' ) => {
-		const {
-			getEntityRecords,
-			getCurrentTheme,
-			isResolving: isResolvingSelector,
-		} = select( coreStore );
-
-		const query = { per_page: -1 };
-		const templateParts =
-			getEntityRecords( 'postType', TEMPLATE_PART_POST_TYPE, query ) ??
-			EMPTY_PATTERN_LIST;
-
-		// In the case where a custom template part area has been removed we need
-		// the current list of areas to cross check against so orphaned template
-		// parts can be treated as uncategorized.
-		const knownAreas = getCurrentTheme()?.default_template_part_areas || [];
-
-		const templatePartAreas = knownAreas.map( ( area ) => area.area );
-
-		const templatePartHasCategory = ( item, category ) => {
-			if ( category !== TEMPLATE_PART_AREA_DEFAULT_CATEGORY ) {
-				return item.area === category;
-			}
-
-			return (
-				item.area === category ||
-				! templatePartAreas.includes( item.area )
-			);
-		};
-
-		const isResolving = isResolvingSelector( 'getEntityRecords', [
-			'postType',
-			TEMPLATE_PART_POST_TYPE,
-			query,
-		] );
-
-		const patterns = searchItems( templateParts, search, {
-			categoryId,
-			hasCategory: templatePartHasCategory,
-		} );
-
-		return { patterns, isResolving };
-	},
-	( select ) => [
-		select( coreStore ).getEntityRecords(
-			'postType',
-			TEMPLATE_PART_POST_TYPE,
-			{
-				per_page: -1,
-			}
-		),
-		select( coreStore ).isResolving( 'getEntityRecords', [
-			'postType',
-			TEMPLATE_PART_POST_TYPE,
-			{ per_page: -1 },
-		] ),
-		select( coreStore ).getCurrentTheme()?.default_template_part_areas,
-	]
-);
 
 const selectPatternOverrides = ( select ) =>
 	(
@@ -324,9 +261,7 @@ export const usePatterns = (
 ) => {
 	return useSelect(
 		( select ) => {
-			if ( postType === TEMPLATE_PART_POST_TYPE ) {
-				return selectTemplateParts( select, categoryId, search );
-			} else if ( postType === PATTERN_TYPES.user && !! categoryId ) {
+			if ( postType === PATTERN_TYPES.user && !! categoryId ) {
 				const appliedCategory =
 					categoryId === 'uncategorized' ? '' : categoryId;
 				return selectPatterns(

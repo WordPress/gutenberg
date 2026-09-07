@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { Fragment, useMemo } from '@wordpress/element';
+import { Fragment, useMemo, useCallback } from '@wordpress/element';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -12,6 +12,7 @@ function BlockHooksControlPure( {
 	name,
 	clientId,
 	metadata: { ignoredHookedBlocks = [] } = {},
+	slug,
 } ) {
 	const blockTypes = useSelect(
 		( select ) => select( blocksStore ).getBlockTypes(),
@@ -22,14 +23,36 @@ function BlockHooksControlPure( {
 	// type's `blockHooks` property; however, if the containing layout has been
 	// modified, it will be present in the anchor block's `ignoredHookedBlocks`
 	// metadata.
+	// A pattern instance referencing a template part's pattern
+	// (`theme/part/slug`) is also an anchor for blocks hooked to
+	// `core/template-part`.
+	const anchorNames = useMemo(
+		() =>
+			name === 'core/block' &&
+			typeof slug === 'string' &&
+			slug.includes( '/part/' )
+				? [ name, 'core/template-part' ]
+				: [ name ],
+		[ name, slug ]
+	);
+	const getRelativePosition = useCallback(
+		( blockHooks ) =>
+			blockHooks?.[
+				anchorNames.find( ( anchor ) => anchor in blockHooks ) ?? name
+			],
+		[ anchorNames, name ]
+	);
 	const hookedBlocksForCurrentBlock = useMemo(
 		() =>
 			blockTypes?.filter(
 				( { name: blockName, blockHooks } ) =>
-					( blockHooks && name in blockHooks ) ||
+					( blockHooks &&
+						anchorNames.some(
+							( anchor ) => anchor in blockHooks
+						) ) ||
 					ignoredHookedBlocks.includes( blockName )
 			),
-		[ blockTypes, name, ignoredHookedBlocks ]
+		[ blockTypes, anchorNames, ignoredHookedBlocks ]
 	);
 
 	const hookedBlockClientIds = useSelect(
@@ -46,7 +69,9 @@ function BlockHooksControlPure( {
 						return clientIds;
 					}
 
-					const relativePosition = block?.blockHooks?.[ name ];
+					const relativePosition = getRelativePosition(
+						block?.blockHooks
+					);
 					let candidates;
 
 					switch ( relativePosition ) {
@@ -103,7 +128,7 @@ function BlockHooksControlPure( {
 
 			return EMPTY_OBJECT;
 		},
-		[ hookedBlocksForCurrentBlock, name, clientId ]
+		[ hookedBlocksForCurrentBlock, getRelativePosition, clientId ]
 	);
 
 	const { getBlockIndex, getBlockCount, getBlockRootClientId } =
@@ -197,7 +222,9 @@ function BlockHooksControlPure( {
 											if ( ! checked ) {
 												// Create and insert block.
 												const relativePosition =
-													block.blockHooks[ name ];
+													getRelativePosition(
+														block.blockHooks
+													);
 												insertBlockIntoDesignatedLocation(
 													createBlock( block.name ),
 													relativePosition
@@ -226,7 +253,7 @@ function BlockHooksControlPure( {
 
 export default {
 	edit: BlockHooksControlPure,
-	attributeKeys: [ 'metadata' ],
+	attributeKeys: [ 'metadata', 'slug' ],
 	hasSupport() {
 		return true;
 	},

@@ -1,11 +1,12 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import ResponsiveWrapper from '../responsive-wrapper';
 
 // Mock block-editor to avoid private API issues
 jest.mock( '@wordpress/block-editor', () => ( {
 	getColorClassName: jest.fn( () => '' ),
+	store: {},
 } ) );
 
 // Mock core-data store
@@ -13,9 +14,25 @@ jest.mock( '@wordpress/core-data', () => ( {
 	store: {},
 } ) );
 
-// Mock useSelect
+// Mock patterns store
+jest.mock( '@wordpress/patterns', () => ( {
+	store: {},
+} ) );
+
+// Mock lock-unlock: the overlay pattern lookup and the copy creation.
+const mockGetPatternBySlug = jest.fn();
+const mockCustomizePattern = jest.fn();
+jest.mock( '../../../lock-unlock', () => ( {
+	unlock: () => ( {
+		getPatternBySlug: mockGetPatternBySlug,
+		customizePattern: mockCustomizePattern,
+	} ),
+} ) );
+
+// Mock useSelect and useDispatch
 jest.mock( '@wordpress/data', () => ( {
 	useSelect: jest.fn(),
+	useDispatch: jest.fn(),
 	createSelector: jest.fn( ( fn ) => fn ),
 	createRegistrySelector: jest.fn( ( fn ) => fn ),
 	createReduxStore: jest.fn( () => ( {} ) ),
@@ -50,6 +67,13 @@ describe( 'ResponsiveWrapper', () => {
 
 	beforeEach( () => {
 		jest.clearAllMocks();
+		useDispatch.mockReturnValue( {} );
+		mockGetPatternBySlug.mockImplementation( ( name ) => ( {
+			name,
+			title: 'My Overlay',
+			area: 'navigation-overlay',
+		} ) );
+		mockCustomizePattern.mockResolvedValue( { id: 123 } );
 		// Mock useSelect - component calls: select( coreStore ).getCurrentTheme()?.stylesheet
 		useSelect.mockImplementation( ( selector ) => {
 			if ( typeof selector === 'function' ) {
@@ -65,7 +89,7 @@ describe( 'ResponsiveWrapper', () => {
 	} );
 
 	describe( 'Overlay navigation', () => {
-		it( 'should navigate to custom overlay template part when custom overlay slug is provided', async () => {
+		it( 'should open the overlay pattern copy when a custom overlay slug is provided', async () => {
 			const user = userEvent.setup();
 
 			render(
@@ -82,11 +106,22 @@ describe( 'ResponsiveWrapper', () => {
 
 			await user.click( openButton );
 
-			// Should construct full ID from current theme and slug
-			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
-				postId: 'twentytwentyfive//my-overlay',
-				postType: 'wp_template_part',
-			} );
+			// Should resolve the overlay pattern from the current theme and
+			// slug, then open its edited copy.
+			expect( mockGetPatternBySlug ).toHaveBeenCalledWith(
+				'twentytwentyfive/part/my-overlay'
+			);
+			await waitFor( () =>
+				expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
+					postId: 123,
+					postType: 'wp_block',
+				} )
+			);
+			expect( mockCustomizePattern ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					name: 'twentytwentyfive/part/my-overlay',
+				} )
+			);
 			// Should not open default overlay when custom overlay is present
 			expect( mockOnToggle ).not.toHaveBeenCalled();
 		} );
@@ -128,7 +163,7 @@ describe( 'ResponsiveWrapper', () => {
 			expect( mockOnNavigateToEntityRecord ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should construct template part ID using current theme from useSelect', async () => {
+		it( 'should resolve the overlay pattern using the current theme from useSelect', async () => {
 			const user = userEvent.setup();
 
 			// Mock different theme
@@ -159,10 +194,15 @@ describe( 'ResponsiveWrapper', () => {
 			await user.click( openButton );
 
 			// Should use the current theme from useSelect
-			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
-				postId: 'custom-theme//my-overlay',
-				postType: 'wp_template_part',
-			} );
+			expect( mockGetPatternBySlug ).toHaveBeenCalledWith(
+				'custom-theme/part/my-overlay'
+			);
+			await waitFor( () =>
+				expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
+					postId: 123,
+					postType: 'wp_block',
+				} )
+			);
 		} );
 	} );
 } );

@@ -409,20 +409,21 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$current_theme = get_stylesheet();
 		$slug          = 'test-overlay-with-shortcode';
 
-		$template_part_id = wp_insert_post(
+		// An overlay is the edited copy of a part pattern in the overlay area.
+		$overlay_id = wp_insert_post(
 			array(
-				'post_type'    => 'wp_template_part',
+				'post_type'    => 'wp_block',
 				'post_status'  => 'publish',
 				'post_title'   => 'Test Overlay With Shortcode',
-				'post_name'    => $slug,
 				'post_content' => '<!-- wp:shortcode -->[gb_test_overlay_shortcode]<!-- /wp:shortcode -->',
+				'meta_input'   => array(
+					'wp_pattern_slug' => $current_theme . '/part/' . $slug,
+					'wp_pattern_area' => 'navigation-overlay',
+				),
 			),
 			true
 		);
-		$this->assertNotWPError( $template_part_id );
-
-		wp_set_post_terms( $template_part_id, array( $current_theme ), 'wp_theme' );
-		wp_set_post_terms( $template_part_id, array( 'navigation-overlay' ), 'wp_template_part_area' );
+		$this->assertNotWPError( $overlay_id );
 
 		$output = do_blocks(
 			'<!-- wp:navigation {"overlay":"' . $slug . '","overlayMenu":"always"} /-->'

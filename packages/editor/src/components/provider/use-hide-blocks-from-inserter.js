@@ -3,8 +3,8 @@ import { addFilter, removeFilter } from '@wordpress/hooks';
 
 // These post types are "structural" block lists.
 // We should be allowed to use
-// the post content and template parts blocks within them.
-const POST_TYPES_ALLOWING_POST_CONTENT_TEMPLATE_PART = [
+// the post content block within them.
+const POST_TYPES_ALLOWING_POST_CONTENT = [
 	'wp_block',
 	'wp_template',
 	'wp_template_part',
@@ -12,33 +12,12 @@ const POST_TYPES_ALLOWING_POST_CONTENT_TEMPLATE_PART = [
 
 /**
  * In some specific contexts,
- * the template part and post content blocks need to be hidden.
+ * the post content block needs to be hidden.
  *
  * @param {string} postType Post Type
- * @param {string} mode     Rendering mode
  */
-export function useHideBlocksFromInserter( postType, mode ) {
+export function useHideBlocksFromInserter( postType ) {
 	useEffect( () => {
-		/*
-		 * Prevent adding template part in the editor.
-		 */
-		addFilter(
-			'blockEditor.__unstableCanInsertBlockType',
-			'removeTemplatePartsFromInserter',
-			( canInsert, blockType ) => {
-				if (
-					! POST_TYPES_ALLOWING_POST_CONTENT_TEMPLATE_PART.includes(
-						postType
-					) &&
-					blockType.name === 'core/template-part' &&
-					mode === 'post-only'
-				) {
-					return false;
-				}
-				return canInsert;
-			}
-		);
-
 		/*
 		 * Prevent adding post content block (except in query block) in the editor.
 		 */
@@ -52,9 +31,7 @@ export function useHideBlocksFromInserter( postType, mode ) {
 				{ getBlockParentsByBlockName }
 			) => {
 				if (
-					! POST_TYPES_ALLOWING_POST_CONTENT_TEMPLATE_PART.includes(
-						postType
-					) &&
+					! POST_TYPES_ALLOWING_POST_CONTENT.includes( postType ) &&
 					blockType.name === 'core/post-content'
 				) {
 					return (
@@ -69,12 +46,8 @@ export function useHideBlocksFromInserter( postType, mode ) {
 		return () => {
 			removeFilter(
 				'blockEditor.__unstableCanInsertBlockType',
-				'removeTemplatePartsFromInserter'
-			);
-			removeFilter(
-				'blockEditor.__unstableCanInsertBlockType',
 				'removePostContentFromInserter'
 			);
 		};
-	}, [ postType, mode ] );
+	}, [ postType ] );
 }

@@ -2,11 +2,25 @@ import clsx from 'clsx';
 import { close, Icon } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { getColorClassName } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import {
+	getColorClassName,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as patternsStore } from '@wordpress/patterns';
 import OverlayMenuIcon from './overlay-menu-icon';
-import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
+import { unlock } from '../../lock-unlock';
+import { getOverlayPatternName } from './use-overlay-patterns';
+
+/**
+ * The action creating (or reusing) the edited copy of a registered pattern.
+ *
+ * @return {Function} The `customizePattern` action.
+ */
+function useCustomizePattern() {
+	return unlock( useDispatch( patternsStore ) ).customizePattern;
+}
 
 export default function ResponsiveWrapper( {
 	children,
@@ -26,6 +40,16 @@ export default function ResponsiveWrapper( {
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
 		[]
 	);
+	const overlayPattern = useSelect(
+		( select ) =>
+			overlay && currentTheme
+				? unlock( select( blockEditorStore ) ).getPatternBySlug(
+						getOverlayPatternName( currentTheme, overlay )
+				  )
+				: null,
+		[ overlay, currentTheme ]
+	);
+	const customizePattern = useCustomizePattern();
 
 	if ( ! isResponsive ) {
 		return children;
@@ -81,17 +105,15 @@ export default function ResponsiveWrapper( {
 		} ),
 	};
 
-	const handleToggleClick = () => {
-		// If an overlay template part is selected, navigate to it instead of toggling
-		if ( overlay && onNavigateToEntityRecord ) {
-			const templatePartId = createTemplatePartId(
-				currentTheme,
-				overlay
-			);
-
+	const handleToggleClick = async () => {
+		// If an overlay is selected, open it for editing instead of toggling:
+		// a registered pattern is edited through its copy, created on first
+		// edit.
+		if ( overlay && overlayPattern && onNavigateToEntityRecord ) {
+			const copy = await customizePattern( overlayPattern );
 			onNavigateToEntityRecord( {
-				postId: templatePartId,
-				postType: 'wp_template_part',
+				postId: copy.id,
+				postType: 'wp_block',
 			} );
 			return;
 		}

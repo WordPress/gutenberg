@@ -1,6 +1,9 @@
 /* eslint-disable @wordpress/wp-global-usage */
 declare global {
 	var IS_GUTENBERG_PLUGIN: boolean | undefined;
+	// Set by the Gutenberg plugin, where template parts are registered
+	// patterns; carries the active theme's stylesheet.
+	var __wpTemplatePartsAsPatterns: { stylesheet?: string } | undefined;
 }
 /* eslint-enable @wordpress/wp-global-usage */
 
@@ -64,6 +67,28 @@ export function convertLegacyBlockNameAndAttributes(
 	// Convert 'core/cover-image' block in existing content to 'core/cover'.
 	if ( 'core/cover-image' === name ) {
 		name = 'core/cover';
+	}
+
+	// In the Gutenberg plugin template parts are registered patterns, and a
+	// template part block is a pattern instance referencing `theme/part/slug`.
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		const templatePartsAsPatterns = globalThis.__wpTemplatePartsAsPatterns;
+		if (
+			'core/template-part' === name &&
+			templatePartsAsPatterns &&
+			typeof newAttributes.slug === 'string' &&
+			newAttributes.slug
+		) {
+			const theme =
+				( typeof newAttributes.theme === 'string' &&
+					newAttributes.theme ) ||
+				templatePartsAsPatterns.stylesheet ||
+				'';
+			newAttributes.slug = `${ theme }/part/${ newAttributes.slug }`;
+			newAttributes.hasWrapper = true;
+			delete newAttributes.theme;
+			name = 'core/block';
+		}
 	}
 
 	// Convert 'core/text' blocks in existing content to 'core/paragraph'.

@@ -17,7 +17,6 @@ export default function useEditedSectionDetails() {
 			getBlockName,
 			__experimentalGetParsedPattern,
 		} = select( blockEditorStore );
-		const { getEditedEntityRecord, getCurrentTheme } = select( coreStore );
 		const { getEditedContentOnlySection, getPatternBySlug } = unlock(
 			select( blockEditorStore )
 		);
@@ -50,6 +49,7 @@ export default function useEditedSectionDetails() {
 
 		// Handle synced patterns (core/block)
 		if ( blockName === 'core/block' && !! attributes?.ref ) {
+			const { getEditedEntityRecord } = select( coreStore );
 			const entity = getEditedEntityRecord(
 				'postType',
 				'wp_block',
@@ -73,28 +73,6 @@ export default function useEditedSectionDetails() {
 					patternTitle: decodeEntities( pattern.title ),
 					type: 'synced-pattern',
 				};
-			}
-		}
-
-		// Handle template parts (core/template-part)
-		if ( blockName === 'core/template-part' && !! attributes?.slug ) {
-			const theme = attributes.theme || getCurrentTheme()?.stylesheet;
-			const templatePartId = theme
-				? `${ theme }//${ attributes.slug }`
-				: null;
-			if ( templatePartId ) {
-				const entity = getEditedEntityRecord(
-					'postType',
-					'wp_template_part',
-					templatePartId
-				);
-				if ( entity?.title ) {
-					return {
-						patternName: attributes.slug,
-						patternTitle: decodeEntities( entity.title ),
-						type: 'template-part',
-					};
-				}
 			}
 		}
 

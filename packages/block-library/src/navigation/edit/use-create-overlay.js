@@ -9,14 +9,18 @@ import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 import { unlock } from '../../lock-unlock';
 
 /**
- * Hook to create a new overlay template part.
+ * Hook to create a new overlay: a pattern of the overlay area.
  *
- * @param {Array} overlayTemplateParts Array of existing overlay template parts.
- * @return {function(): Promise<Object>} Function to create a new overlay template part.
- *                                      The function returns a Promise that resolves to the created template part object.
+ * @param {Array} overlayTemplateParts Existing overlays, to keep the new title unique.
+ * @return {function(): Promise<Object>} Function to create a new overlay.
+ *                                      The function returns a Promise that resolves to the created overlay.
  */
 export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
+	const stylesheet = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
+		[]
+	);
 	const pattern = useSelect(
 		( select ) =>
 			unlock( select( blockEditorStore ) ).getPatternBySlug(
@@ -51,20 +55,39 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 		}
 
 		// Create the template part
-		const templatePart = await saveEntityRecord(
+		// An overlay is the edited copy of a part pattern (`theme/part/slug`)
+		// in the overlay area; it is registered from the copy on the next
+		// request.
+		const name = `${ stylesheet }/part/${ cleanSlug }`;
+		const copy = await saveEntityRecord(
 			'postType',
-			'wp_template_part',
+			'wp_block',
 			{
-				slug: cleanSlug,
 				title: uniqueTitle,
 				content: initialContent,
-				area: NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
+				status: 'publish',
+				meta: {
+					wp_pattern_slug: name,
+					wp_pattern_area: NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
+				},
 			},
 			{ throwOnError: true }
 		);
-
-		return templatePart;
-	}, [ overlayTemplateParts, saveEntityRecord, pattern ] );
+		invalidateResolution( 'getBlockPatterns' );
+		return {
+			id: copy.id,
+			slug: cleanSlug,
+			name,
+			theme: stylesheet,
+			title: { rendered: uniqueTitle },
+		};
+	}, [
+		overlayTemplateParts,
+		saveEntityRecord,
+		invalidateResolution,
+		pattern,
+		stylesheet,
+	] );
 
 	return createOverlayTemplatePart;
 }

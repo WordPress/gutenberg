@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Block hooks: A pattern instance referencing a template part's pattern (`theme/part/slug`) is also an anchor for blocks hooked to `core/template-part` ([#82569](https://github.com/WordPress/gutenberg/pull/82569)).
 -   Expose the layout inspector panel as the private `LayoutPanel`, for blocks that manage the `layout` attribute themselves ([#82557](https://github.com/WordPress/gutenberg/pull/82557)).
 -   Inspector: Give the Pattern block (`core/block`) the full style panel set, in the Styles tab and in the single-panel layout, as template parts get, so its layout and custom CSS controls are reachable ([#82557](https://github.com/WordPress/gutenberg/pull/82557)).
 -   Block toolbar: Keep the block control slots for template parts and pattern instances, which are section blocks whose wrapper element has controls of its own such as alignment ([#82557](https://github.com/WordPress/gutenberg/pull/82557)).

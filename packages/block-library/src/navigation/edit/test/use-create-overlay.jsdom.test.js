@@ -49,12 +49,14 @@ jest.mock( '../../../lock-unlock', () => ( {
 
 describe( 'useCreateOverlayTemplatePart', () => {
 	const mockSaveEntityRecord = jest.fn();
+	const mockInvalidateResolution = jest.fn();
 	const mockGetPatternBySlug = jest.fn();
 
 	beforeEach( () => {
 		jest.clearAllMocks();
 		useDispatch.mockReturnValue( {
 			saveEntityRecord: mockSaveEntityRecord,
+			invalidateResolution: mockInvalidateResolution,
 		} );
 
 		mockUnlock.mockReturnValue( {
@@ -66,7 +68,9 @@ describe( 'useCreateOverlayTemplatePart', () => {
 				if ( store === require( '@wordpress/block-editor' ).store ) {
 					return {}; // Return mock block editor store
 				}
-				return {};
+				return {
+					getCurrentTheme: () => ( { stylesheet: 'theme' } ),
+				};
 			} );
 			return selector( mockSelect );
 		} );
@@ -102,18 +106,31 @@ describe( 'useCreateOverlayTemplatePart', () => {
 			savedOverlay = await createOverlayTemplatePart.current();
 		} );
 
+		// The overlay is saved as the edited copy of a part pattern.
 		expect( mockSaveEntityRecord ).toHaveBeenCalledWith(
 			'postType',
-			'wp_template_part',
+			'wp_block',
 			expect.objectContaining( {
-				slug: 'navigation-overlay',
 				title: 'Navigation Overlay',
 				content: expect.any( String ),
-				area: 'navigation-overlay',
+				status: 'publish',
+				meta: {
+					wp_pattern_slug: 'theme/part/navigation-overlay',
+					wp_pattern_area: 'navigation-overlay',
+				},
 			} ),
 			{ throwOnError: true }
 		);
-		expect( savedOverlay ).toEqual( createdOverlay );
+		expect( mockInvalidateResolution ).toHaveBeenCalledWith(
+			'getBlockPatterns'
+		);
+		expect( savedOverlay ).toEqual(
+			expect.objectContaining( {
+				id: createdOverlay.id,
+				slug: 'navigation-overlay',
+				name: 'theme/part/navigation-overlay',
+			} )
+		);
 	} );
 
 	it( 'should generate unique title when overlays already exist', async () => {
@@ -150,12 +167,13 @@ describe( 'useCreateOverlayTemplatePart', () => {
 		// Verify it generates a unique title (Navigation Overlay 2) when Navigation Overlay already exists
 		expect( mockSaveEntityRecord ).toHaveBeenCalledWith(
 			'postType',
-			'wp_template_part',
+			'wp_block',
 			expect.objectContaining( {
 				title: 'Navigation Overlay 2',
-				slug: 'navigation-overlay-2',
 				content: expect.any( String ),
-				area: 'navigation-overlay',
+				meta: expect.objectContaining( {
+					wp_pattern_slug: 'theme/part/navigation-overlay-2',
+				} ),
 			} ),
 			{ throwOnError: true }
 		);
@@ -233,7 +251,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 
 		expect( mockSaveEntityRecord ).toHaveBeenCalledWith(
 			'postType',
-			'wp_template_part',
+			'wp_block',
 			expect.objectContaining( {
 				content: expect.any( String ),
 			} ),
@@ -260,7 +278,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 
 		expect( mockSaveEntityRecord ).toHaveBeenCalledWith(
 			'postType',
-			'wp_template_part',
+			'wp_block',
 			expect.any( Object ),
 			{ throwOnError: true }
 		);

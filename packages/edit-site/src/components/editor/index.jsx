@@ -45,8 +45,6 @@ function getListPathForPostType( postType ) {
 			return '/navigation';
 		case 'wp_block':
 			return '/pattern?postType=wp_block';
-		case 'wp_template_part':
-			return '/pattern?postType=wp_template_part';
 		case 'wp_template':
 			return '/template';
 		case 'page':
@@ -62,7 +60,6 @@ function getNavigationPath( location, postType ) {
 	if (
 		[
 			'pattern-item',
-			'template-part-item',
 			'page-item',
 			'template-item',
 			'static-template-item',

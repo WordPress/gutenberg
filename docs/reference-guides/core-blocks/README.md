@@ -1064,15 +1064,6 @@ A cloud of popular keywords, each sized by how often it appears.
 -	**Supports:** align, anchor, interactivity (clientNavigation), spacing (margin, padding), typography (lineHeight), ~~html~~
 -	**Attributes:** largestFontSize, numberOfTags, showTagCounts, smallestFontSize, taxonomy
 
-## Template Part
-
-Edit the different global regions of your site, like the header, footer, sidebar, or create your own.
-
--	**Name:** [core/template-part](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-template-part/)
--	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align, interactivity (clientNavigation), ~~html~~, ~~renaming~~, ~~reusable~~
--	**Attributes:** area, slug, tagName, theme
-
 ## Term Count
 
 Displays the post count of a taxonomy term.

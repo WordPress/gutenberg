@@ -1,10 +1,16 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-// TODO: this util should perhaps be refactored somewhere like core-data.
-import { createTemplatePartId } from '../template-part/edit/utils/create-template-part-id';
-import { getTemplatePartIcon } from '../template-part/edit/utils/get-template-part-icon';
+import { unlock } from '../lock-unlock';
 
+/**
+ * Returns the label of the template part area a navigation block sits in,
+ * looking at its parent pattern instances (`core/block`): the instance's own
+ * `area` attribute, else the area of the registered pattern it references.
+ *
+ * @param {string} clientId The navigation block's client id.
+ * @return {string|undefined} The area label, e.g. "Header".
+ */
 export default function useTemplatePartAreaLabel( clientId ) {
 	return useSelect(
 		( select ) => {
@@ -18,52 +24,32 @@ export default function useTemplatePartAreaLabel( clientId ) {
 				select( blockEditorStore );
 
 			const withAscendingResults = true;
-			const parentTemplatePartClientIds = getBlockParentsByBlockName(
+			const parentPatternClientIds = getBlockParentsByBlockName(
 				clientId,
-				'core/template-part',
+				'core/block',
 				withAscendingResults
 			);
 
-			if ( ! parentTemplatePartClientIds?.length ) {
+			if ( ! parentPatternClientIds?.length ) {
 				return;
 			}
 
-			const { getCurrentTheme, getEditedEntityRecord } =
-				select( coreStore );
-
-			const currentTheme = getCurrentTheme();
-			const defaultTemplatePartAreas =
-				currentTheme?.default_template_part_areas || [];
-
-			const definedAreas = defaultTemplatePartAreas.map( ( item ) => ( {
-				...item,
-				icon: getTemplatePartIcon( item.icon ),
-			} ) );
-
-			for ( const templatePartClientId of parentTemplatePartClientIds ) {
-				const templatePartBlock = getBlock( templatePartClientId );
-
-				// The 'area' usually isn't stored on the block, but instead
-				// on the entity.
-				const { theme = currentTheme?.stylesheet, slug } =
-					templatePartBlock.attributes;
-				const templatePartEntityId = createTemplatePartId(
-					theme,
-					slug
-				);
-				const templatePartEntity = getEditedEntityRecord(
-					'postType',
-					'wp_template_part',
-					templatePartEntityId
-				);
+			const { getPatternBySlug } = unlock( select( blockEditorStore ) );
+			for ( const patternClientId of parentPatternClientIds ) {
+				const { area: areaAttribute, slug } =
+					getBlock( patternClientId ).attributes;
+				const area =
+					areaAttribute ||
+					( slug ? getPatternBySlug( slug )?.area : undefined );
 
 				// Look up the `label` for the area in the defined areas so
 				// that an internationalized label can be used.
-				if ( templatePartEntity?.area ) {
+				if ( area && area !== 'uncategorized' ) {
+					const definedAreas =
+						select( coreStore ).getCurrentTheme()
+							?.default_template_part_areas || [];
 					return definedAreas.find(
-						( definedArea ) =>
-							definedArea.area !== 'uncategorized' &&
-							definedArea.area === templatePartEntity.area
+						( definedArea ) => definedArea.area === area
 					)?.label;
 				}
 			}

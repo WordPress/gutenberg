@@ -412,13 +412,15 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
-	 * Gets the inner blocks for the navigation block from an overlay template part.
+	 * Gets the inner blocks for the navigation block from an overlay: a
+	 * pattern of the overlay area (`theme/part/slug`), rendered from its
+	 * edited copy when there is one, else from the registered pattern.
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param string $overlay_template_part_id The overlay template part ID in format "theme//slug".
+	 * @param string $overlay_template_part_id The overlay slug, or its legacy ID in format "theme//slug".
 	 * @param array  $attributes                The block attributes.
-	 * @return WP_Block_List Returns the inner blocks for the overlay template part.
+	 * @return WP_Block_List Returns the inner blocks for the overlay.
 	 */
 	private static function get_overlay_blocks_from_template_part( $overlay_template_part_id, $attributes ) {
 		if ( empty( $overlay_template_part_id ) || ! is_string( $overlay_template_part_id ) ) {
@@ -443,73 +445,37 @@ class WP_Navigation_Block_Renderer {
 			return new WP_Block_List( array(), $attributes );
 		}
 
-		// Query for the template part post.
-		$template_part_query = new WP_Query(
+		// The overlay is the part's edited copy, else its registered pattern.
+		$pattern_name   = str_contains( $overlay_template_part_id, '/part/' ) ? $overlay_template_part_id : $theme . '/part/' . $slug;
+		$pattern_markup = null;
+		$pattern_copies = get_posts(
 			array(
-				'post_type'           => 'wp_template_part',
-				'post_status'         => 'publish',
-				'post_name__in'       => array( $slug ),
-				'tax_query'           => array(
-					array(
-						'taxonomy' => 'wp_theme',
-						'field'    => 'name',
-						'terms'    => $theme,
-					),
-				),
-				'posts_per_page'      => 1,
-				'no_found_rows'       => true,
-				'lazy_load_term_meta' => false, // Do not lazy load term meta, as template parts only have one term.
+				'post_type'      => 'wp_block',
+				'post_status'    => 'publish',
+				'posts_per_page' => 1,
+				'meta_key'       => 'wp_pattern_slug',
+				'meta_value'     => $pattern_name,
+				'no_found_rows'  => true,
 			)
 		);
-
-		$template_part_post = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
-
-		if ( ! $template_part_post ) {
-			// Try to get from theme file if not in database.
-			// Construct the full template part ID for get_block_file_template.
-			$full_template_part_id = $theme . '//' . $slug;
-			$block_template        = get_block_file_template( $full_template_part_id, 'wp_template_part' );
-			if ( isset( $block_template->content ) ) {
-				// Expand shortcodes before parsing blocks, matching the order in
-				// `render_block_core_template_part()`.
-				$content       = shortcode_unautop( $block_template->content );
-				$content       = do_shortcode( $content );
-				$parsed_blocks = parse_blocks( $content );
-				$blocks        = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
-				// Disable overlay menu for any navigation blocks within the overlay to prevent nested overlays.
-				$blocks = static::disable_overlay_menu_for_nested_navigation_blocks( $blocks );
-				return new WP_Block_List( $blocks, $attributes );
+		$pattern_copy   = $pattern_copies ? $pattern_copies[0] : null;
+		if ( $pattern_copy ) {
+			$pattern_markup = apply_block_hooks_to_content_from_post_object( $pattern_copy->post_content, $pattern_copy );
+		} else {
+			$pattern = WP_Block_Patterns_Registry::get_instance()->get_registered( $pattern_name );
+			if ( $pattern ) {
+				$pattern_markup = $pattern['content'];
 			}
-			return new WP_Block_List( array(), $attributes );
+		}
+		if ( null !== $pattern_markup ) {
+			$pattern_markup = shortcode_unautop( $pattern_markup );
+			$pattern_markup = do_shortcode( $pattern_markup );
+			$blocks         = block_core_navigation_filter_out_empty_blocks( parse_blocks( $pattern_markup ) );
+			$blocks         = static::disable_overlay_menu_for_nested_navigation_blocks( $blocks );
+			return new WP_Block_List( $blocks, $attributes );
 		}
 
-		// Get the template part content.
-		$block_template = _build_block_template_result_from_post( $template_part_post );
-		if ( ! isset( $block_template->content ) ) {
-			return new WP_Block_List( array(), $attributes );
-		}
-
-		$parsed_blocks = parse_blocks( $block_template->content );
-
-		// 'parse_blocks' includes a null block with '\n\n' as the content when
-		// it encounters whitespace. This code strips it.
-		$blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
-
-		// Re-serialize, and run Block Hooks algorithm to inject hooked blocks.
-		$markup = serialize_blocks( $blocks );
-		$markup = apply_block_hooks_to_content_from_post_object( $markup, $template_part_post );
-
-		// Expand shortcodes before parsing blocks, matching the order in
-		// `render_block_core_template_part()`.
-		$markup = shortcode_unautop( $markup );
-		$markup = do_shortcode( $markup );
-
-		$blocks = parse_blocks( $markup );
-
-		// Disable overlay menu for any navigation blocks within the overlay to prevent nested overlays.
-		$blocks = static::disable_overlay_menu_for_nested_navigation_blocks( $blocks );
-
-		return new WP_Block_List( $blocks, $attributes );
+		return new WP_Block_List( array(), $attributes );
 	}
 
 	/**
