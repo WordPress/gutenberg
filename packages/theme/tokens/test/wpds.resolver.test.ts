@@ -123,9 +123,11 @@ describe( 'WordPress Design System token resolver', () => {
 			config,
 			resolver: result.resolver,
 		} );
-		const css = outputFiles.find(
-			( file ) => file.filename === 'prebuilt/css/design-tokens.css'
-		)?.contents;
+		const css = outputFiles
+			.find(
+				( file ) => file.filename === 'prebuilt/css/design-tokens.css'
+			)
+			?.contents.toString();
 
 		expect( css ).toBeDefined();
 		expect(
