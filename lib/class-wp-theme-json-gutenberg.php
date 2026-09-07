@@ -1246,7 +1246,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$valid_block_names` and `$valid_element_name` parameters.
 	 * @since 6.6.0 Extended schema definition to allow enhanced block style variations.
-	 * @since 7.1.1 Updated schema to allow responsive breakpoint states at the top level of `styles`.
+	 * @since 7.1.1 Updated schema to allow responsive breakpoint states and pseudo-selectors
+	 *              at the top level of `styles` for block style variation partials.
 	 *
 	 * @param array $input               Structure to sanitize.
 	 * @param array $valid_block_names   List of valid block names.
@@ -1438,18 +1439,45 @@ class WP_Theme_JSON_Gutenberg {
 		$schema['settings']['typography']['fontFamilies'] = static::schema_in_root_and_per_origin( static::FONT_FAMILY_SCHEMA );
 
 		/*
-		 * Add responsive breakpoint states to the top-level styles schema.
+		 * Add block style variation states to the top-level styles schema.
 		 *
 		 * Block style variations defined in a standalone JSON partial within a
 		 * theme's `styles` directory declare their styles at the root of the
-		 * `styles` object. Those partials are sanitized against the top-level
-		 * schema, so it needs to allow the same responsive breakpoint states
-		 * that are allowed for variations declared inline in theme.json.
+		 * `styles` object, so they are sanitized against the top-level schema.
+		 * It needs to allow the same states that are allowed for variations
+		 * declared inline in theme.json, otherwise those states are silently
+		 * removed as unknown keys.
+		 *
+		 * The `blockTypes` property is only present on block style variation
+		 * partials, so it both identifies the config as a variation and
+		 * determines which pseudo-selectors are valid for it. Regular
+		 * theme.json files are unaffected.
 		 */
-		foreach ( $breakpoint_states as $breakpoint_state ) {
-			$schema['styles'][ $breakpoint_state ]             = $styles_non_top_level;
-			$schema['styles'][ $breakpoint_state ]['elements'] = $schema_styles_elements;
-			$schema['styles'][ $breakpoint_state ]['blocks']   = $schema_styles_blocks;
+		if ( ! empty( $input['blockTypes'] ) && is_array( $input['blockTypes'] ) ) {
+			$variation_pseudo_selectors = array();
+			foreach ( $input['blockTypes'] as $variation_block_type ) {
+				if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $variation_block_type ] ) ) {
+					$variation_pseudo_selectors = array_merge(
+						$variation_pseudo_selectors,
+						static::VALID_BLOCK_PSEUDO_SELECTORS[ $variation_block_type ]
+					);
+				}
+			}
+			$variation_pseudo_selectors = array_unique( $variation_pseudo_selectors );
+
+			foreach ( $breakpoint_states as $breakpoint_state ) {
+				$schema['styles'][ $breakpoint_state ]             = $styles_non_top_level;
+				$schema['styles'][ $breakpoint_state ]['elements'] = $schema_styles_elements;
+				$schema['styles'][ $breakpoint_state ]['blocks']   = $schema_styles_blocks;
+
+				foreach ( $variation_pseudo_selectors as $pseudo_selector ) {
+					$schema['styles'][ $breakpoint_state ][ $pseudo_selector ] = $styles_non_top_level;
+				}
+			}
+
+			foreach ( $variation_pseudo_selectors as $pseudo_selector ) {
+				$schema['styles'][ $pseudo_selector ] = $styles_non_top_level;
+			}
 		}
 
 		// Remove anything that's not present in the schema.
