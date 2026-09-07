@@ -74,14 +74,17 @@ describe( 'color-space registration', () => {
 		expect( result.warnings ).toBeUndefined();
 	} );
 
-	it( 'builds an accent ramp from a supplied background without prior registration', async () => {
-		const { buildBgRamp, buildAccentRamp } = await import( '..' );
-		const background = buildBgRamp( '#fcfcfc' );
-		ColorSpace.registry = {};
+	it.each( [ 'full', 'interactive', 'status' ] as const )(
+		'builds %s accent ramps from a supplied background without prior registration',
+		async ( purpose ) => {
+			const { buildBgRamp, buildAccentRamp } = await import( '..' );
+			const background = buildBgRamp( '#fcfcfc' );
+			ColorSpace.registry = {};
 
-		const result = buildAccentRamp( '#3858e9', background );
+			const result = buildAccentRamp( '#3858e9', background, purpose );
 
-		expect( result.ramp.fgSurface4 ).toMatch( /^#[\da-f]{6}$/ );
-		expect( result.warnings ).toBeUndefined();
-	} );
+			expect( result.ramp.fgSurface4 ).toMatch( /^#[\da-f]{6}$/ );
+			expect( result.warnings ).toBeUndefined();
+		}
+	);
 } );

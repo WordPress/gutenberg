@@ -12,6 +12,8 @@ import { clampToGamut, getColorString, getContrast } from './color-utils.ts';
 import { UNIVERSAL_CONTRAST_TOPUP } from './constants.ts';
 import { taperChroma } from './taper-chroma.ts';
 import type {
+	AccentRampResult,
+	BaseRamp,
 	BaseRampResult,
 	Ramp,
 	ForegroundScaleConfig,
@@ -271,20 +273,20 @@ function findColorAtPerceptualContrast( {
  * @param options                     Serialization inputs.
  * @param options.color               Foreground before serialization.
  * @param options.getColorAtLightness Color path indexed by OKLCH lightness.
- * @param options.strongColor         Strongest allowed fallback.
+ * @param options.getStrongColor      Resolve the strongest allowed fallback.
  * @param options.references          Background colors to check together.
  * @param options.target              Unpadded WCAG contrast floor.
  */
 function serializeColorMeetingContrast( {
 	color,
 	getColorAtLightness,
-	strongColor,
+	getStrongColor,
 	references,
 	target,
 }: {
 	color: PlainColorObject;
 	getColorAtLightness: GetColorForLightness;
-	strongColor: PlainColorObject;
+	getStrongColor: () => PlainColorObject;
 	references: readonly string[];
 	target: number;
 } ) {
@@ -293,6 +295,7 @@ function serializeColorMeetingContrast( {
 		return serializedColor;
 	}
 
+	const strongColor = getStrongColor();
 	const colorLightness = get( color, [ OKLCH, 'l' ] );
 	const strongLightness = get( strongColor, [ OKLCH, 'l' ] );
 	const direction = Math.sign( strongLightness - colorLightness );
@@ -395,15 +398,29 @@ function serializeColorMeetingPerceptualInterval( {
  * the intermediate steps within the available contrast range. WCAG floors
  * take priority across the configured surfaces; unresolved failures warn.
  *
- * @param ramp           Ramp whose foreground steps will be rebuilt.
- * @param backgroundRamp Background ramp on which the colors will appear.
- * @param config         Foreground scale anchors, targets, and constraints.
+ * @param ramp                    Ramp whose foreground steps will be rebuilt.
+ * @param backgroundRamp          Background ramp on which the colors will appear.
+ * @param config                  Foreground scale anchors, targets, and constraints.
+ * @param includeInteractionState Whether FGS5 is needed as an output color.
  */
 export function buildForegroundScale(
 	ramp: BaseRampResult,
 	backgroundRamp: BaseRampResult,
-	config: ForegroundScaleConfig
-): RampResult {
+	config: ForegroundScaleConfig,
+	includeInteractionState?: true
+): RampResult;
+export function buildForegroundScale(
+	ramp: BaseRampResult,
+	backgroundRamp: BaseRampResult,
+	config: ForegroundScaleConfig,
+	includeInteractionState: boolean
+): AccentRampResult;
+export function buildForegroundScale(
+	ramp: BaseRampResult,
+	backgroundRamp: BaseRampResult,
+	config: ForegroundScaleConfig,
+	includeInteractionState = true
+): AccentRampResult {
 	// APCA resolves sRGB by name, even for color objects.
 	ColorSpace.register( sRGB );
 	const seed = clampToGamut( ramp.ramp[ config.seed ] );
@@ -546,48 +563,62 @@ export function buildForegroundScale(
 			target: steps.fgSurface4.contrast.target,
 		} );
 	}
-	const normalContrast = getPerceptualContrastMagnitude(
-		displayBackground,
-		normalColor
-	);
-	const requestedStrongContrast = Math.min(
-		maximumStrongContrast,
-		Math.max(
-			normalContrast + normalToActiveTarget,
-			preferredActiveContrast
-		)
-	);
-	let strongColor = findColorAtPerceptualContrast( {
-		background: displayBackground,
-		getColorAtLightness,
-		weakColor: normalColor,
-		strongColor: strongEndpoint,
-		target: requestedStrongContrast,
-	} );
-	if (
-		! meetsContrastTarget(
-			strongColor,
-			references.fgSurface5,
-			strongStep.contrast.target
-		)
-	) {
-		strongColor = findColorAtContrastTarget( {
+	// Status ramps need the spacing budget above, but only need this color as
+	// a bound when serialization requires correction. Reuse it across corrections.
+	let strongColor: PlainColorObject | undefined;
+	function getStrongColor(): PlainColorObject {
+		if ( strongColor ) {
+			return strongColor;
+		}
+
+		const normalContrast = getPerceptualContrastMagnitude(
+			displayBackground,
+			normalColor
+		);
+		const requestedStrongContrast = Math.min(
+			maximumStrongContrast,
+			Math.max(
+				normalContrast + normalToActiveTarget,
+				preferredActiveContrast
+			)
+		);
+		strongColor = findColorAtPerceptualContrast( {
+			background: displayBackground,
 			getColorAtLightness,
-			weakColor: strongColor,
+			weakColor: normalColor,
 			strongColor: strongEndpoint,
-			references: references.fgSurface5,
-			target: strongStep.contrast.target,
+			target: requestedStrongContrast,
 		} );
+		if (
+			! meetsContrastTarget(
+				strongColor,
+				references.fgSurface5,
+				strongStep.contrast.target
+			)
+		) {
+			strongColor = findColorAtContrastTarget( {
+				getColorAtLightness,
+				weakColor: strongColor,
+				strongColor: strongEndpoint,
+				references: references.fgSurface5,
+				target: strongStep.contrast.target,
+			} );
+		}
+		return strongColor;
 	}
 
 	colors.set( 'fgSurface3', fgSurface3 );
 	colors.set( 'fgSurface4', normalColor );
-	colors.set( 'fgSurface5', strongColor );
+	if ( includeInteractionState ) {
+		colors.set( 'fgSurface5', getStrongColor() );
+	}
 
-	const nextRamp = { ...ramp.ramp } as Ramp;
-	for ( const step of config.steps ) {
+	const outputSteps = includeInteractionState
+		? config.steps
+		: config.steps.filter( ( step ) => step.name !== 'fgSurface5' );
+	function serializeStep( step: ForegroundScaleConfig[ 'steps' ][ number ] ) {
 		const color = colors.get( step.name )!;
-		nextRamp[ step.name ] = serializeColorMeetingContrast( {
+		return serializeColorMeetingContrast( {
 			color,
 			getColorAtLightness:
 				step.preserveAnchor && step !== strongStep
@@ -597,21 +628,32 @@ export function buildForegroundScale(
 								lightness
 							)
 					: getColorAtLightness,
-			strongColor,
+			getStrongColor,
 			references: references[ step.name ],
 			target: step.contrast.target,
 		} );
 	}
-	nextRamp.fgSurface5 = serializeColorMeetingPerceptualInterval( {
-		background: displayBackground,
-		normalColor: nextRamp.fgSurface4,
-		strongColor: nextRamp.fgSurface5,
-		strongEndpoint,
-		getColorAtLightness,
-		references: references.fgSurface5,
-		wcagTarget: strongStep.contrast.target,
-		perceptualTarget: normalToActive,
-	} );
+	const nextRamp: BaseRamp & { fgSurface4: string; fgSurface5?: string } = {
+		...ramp.ramp,
+		fgSurface4: serializeStep( steps.fgSurface4 ),
+	};
+	for ( const step of outputSteps ) {
+		if ( step.name !== 'fgSurface4' ) {
+			nextRamp[ step.name ] = serializeStep( step );
+		}
+	}
+	if ( includeInteractionState ) {
+		nextRamp.fgSurface5 = serializeColorMeetingPerceptualInterval( {
+			background: displayBackground,
+			normalColor: nextRamp.fgSurface4,
+			strongColor: nextRamp.fgSurface5!,
+			strongEndpoint,
+			getColorAtLightness,
+			references: references.fgSurface5,
+			wcagTarget: strongStep.contrast.target,
+			perceptualTarget: normalToActive,
+		} );
+	}
 
 	const foregroundStepNames = new Set< keyof Ramp >(
 		config.steps.map( ( { name } ) => name )
@@ -619,7 +661,7 @@ export function buildForegroundScale(
 	const warnings = ( ramp.warnings ?? [] ).filter(
 		( step ) => ! foregroundStepNames.has( step )
 	);
-	for ( const step of config.steps ) {
+	for ( const step of outputSteps ) {
 		if (
 			! meetsContrastFloor(
 				nextRamp[ step.name ]!,

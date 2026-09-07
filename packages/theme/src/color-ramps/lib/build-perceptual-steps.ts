@@ -12,7 +12,7 @@ import {
 } from 'colorjs.io/fn';
 import { clampToGamut, getColorString, getContrast } from './color-utils.ts';
 import { UNIVERSAL_CONTRAST_TOPUP } from './constants.ts';
-import type { BaseRamp, BaseRampResult } from './types.ts';
+import type { AccentRampPurpose, BaseRamp, BaseRampResult } from './types.ts';
 import { solveWithBisect } from './utils.ts';
 
 type GetColorAtLightness = ( lightness: number ) => PlainColorObject;
@@ -252,11 +252,12 @@ function findColorMeetingWcag( {
 /**
  * Balance SF1/SF3 around SF2 in OKLr lightness, clipping each endpoint
  * independently. Space SF4-SF6 beyond the elevation steps in the ramp direction
- * where room remains.
+ * where room remains. SF6 still sets that range when its output is not needed.
  *
- * @param ramp Base ramp with SF1-SF3 already ordered by elevation.
+ * @param ramp    Base ramp with SF1-SF3 already ordered by elevation.
+ * @param purpose Which surface outputs need reconstruction.
  */
-function rebuildSurfaces( ramp: BaseRampResult ) {
+function rebuildSurfaces( ramp: BaseRampResult, purpose: AccentRampPurpose ) {
 	const nextRamp = { ...ramp.ramp };
 	const surface1Lightness = getPerceptualLightness( ramp.ramp.surface1 );
 	const surface2Lightness = getPerceptualLightness( ramp.ramp.surface2 );
@@ -330,6 +331,10 @@ function rebuildSurfaces( ramp: BaseRampResult ) {
 	} as const;
 
 	for ( const [ step, lightness ] of Object.entries( targetLightnesses ) ) {
+		// Keep SF6's spacing anchor above, but avoid its unused output conversion.
+		if ( purpose !== 'full' && step === 'surface6' ) {
+			continue;
+		}
 		nextRamp[ step as keyof typeof targetLightnesses ] =
 			getColorForPerceptualLightness(
 				ramp.ramp[ step as keyof typeof targetLightnesses ],
@@ -357,16 +362,18 @@ function getStrokeReferences(
 }
 
 /**
- * Repair ST3 against the rebuilt surfaces, then reposition ST2 and ST4.
- * Preserve authored stroke differences where possible; WCAG correction takes
- * precedence over perceptual spacing.
+ * Repair ST3 against the rebuilt surfaces, then reposition ST2 and ST4 only
+ * when their purpose needs them. Preserve authored stroke differences where
+ * possible; WCAG correction takes precedence over perceptual spacing.
  *
  * @param ramp           Ramp with its surfaces already rebuilt.
  * @param backgroundRamp Additional surfaces behind accent strokes.
+ * @param purpose        Which stroke outputs need reconstruction.
  */
 function rebuildStrokes(
 	ramp: BaseRampResult,
-	backgroundRamp: BaseRampResult
+	backgroundRamp: BaseRampResult,
+	purpose: AccentRampPurpose
 ) {
 	const nextRamp = { ...ramp.ramp };
 	const references = getStrokeReferences( nextRamp, backgroundRamp );
@@ -377,36 +384,41 @@ function rebuildStrokes(
 	} );
 
 	const stroke3Lightness = getPerceptualLightness( nextRamp.stroke3 );
-	const stroke1Reference = to( clampToGamut( nextRamp.stroke1 ), OKLab );
-	const stroke1To3Difference = deltaEOK2(
-		stroke1Reference,
-		nextRamp.stroke3
-	);
-	const authoredStroke2Difference = deltaEOK2(
-		stroke1Reference,
-		ramp.ramp.stroke2
-	);
-	const stroke1Lightness = getPerceptualLightness( nextRamp.stroke1 );
-	const getStroke2AtLightness =
-		createAnchoredColorForStepAtPerceptualLightness( {
-			ramp: nextRamp,
-			step: 'stroke2',
-			anchor: nextRamp.stroke1,
-			startLightness: stroke1Lightness,
-			endLightness: stroke3Lightness,
-		} );
-	nextRamp.stroke2 = getColorString(
-		findColorAtDeltaE( {
-			reference: stroke1Reference,
-			getColorAtLightness: getStroke2AtLightness,
-			startLightness: stroke1Lightness,
-			endLightness: stroke3Lightness,
-			target: Math.min(
-				authoredStroke2Difference,
-				stroke1To3Difference * 0.95
-			),
-		} )
-	);
+	if ( purpose === 'full' ) {
+		const stroke1Reference = to( clampToGamut( nextRamp.stroke1 ), OKLab );
+		const stroke1To3Difference = deltaEOK2(
+			stroke1Reference,
+			nextRamp.stroke3
+		);
+		const authoredStroke2Difference = deltaEOK2(
+			stroke1Reference,
+			ramp.ramp.stroke2
+		);
+		const stroke1Lightness = getPerceptualLightness( nextRamp.stroke1 );
+		const getStroke2AtLightness =
+			createAnchoredColorForStepAtPerceptualLightness( {
+				ramp: nextRamp,
+				step: 'stroke2',
+				anchor: nextRamp.stroke1,
+				startLightness: stroke1Lightness,
+				endLightness: stroke3Lightness,
+			} );
+		nextRamp.stroke2 = getColorString(
+			findColorAtDeltaE( {
+				reference: stroke1Reference,
+				getColorAtLightness: getStroke2AtLightness,
+				startLightness: stroke1Lightness,
+				endLightness: stroke3Lightness,
+				target: Math.min(
+					authoredStroke2Difference,
+					stroke1To3Difference * 0.95
+				),
+			} )
+		);
+	}
+	if ( purpose === 'status' ) {
+		return nextRamp;
+	}
 
 	const stroke3Contrast = Math.abs(
 		contrastAPCA( nextRamp.surface3, nextRamp.stroke3 )
@@ -463,19 +475,25 @@ function rebuildStrokes(
  *
  * @param ramp           Base ramp to adjust.
  * @param backgroundRamp Background surfaces used by accent strokes.
+ * @param purpose        Which accent steps need their final reconstruction.
  */
 export function buildPerceptualSteps(
 	ramp: BaseRampResult,
-	backgroundRamp?: BaseRampResult
+	backgroundRamp?: BaseRampResult,
+	purpose: AccentRampPurpose = 'full'
 ): BaseRampResult {
 	ColorSpace.register( sRGB );
 	const surfaceResult = {
 		...ramp,
-		ramp: rebuildSurfaces( ramp ),
+		ramp: rebuildSurfaces( ramp, purpose ),
 	};
 
 	return {
 		...surfaceResult,
-		ramp: rebuildStrokes( surfaceResult, backgroundRamp ?? surfaceResult ),
+		ramp: rebuildStrokes(
+			surfaceResult,
+			backgroundRamp ?? surfaceResult,
+			purpose
+		),
 	};
 }
