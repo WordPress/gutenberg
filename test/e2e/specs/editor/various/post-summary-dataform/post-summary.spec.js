@@ -647,12 +647,24 @@ test.describe( 'Post Summary', () => {
 			page,
 			requestUtils,
 		} ) => {
-			await requestUtils.createTemplate( 'wp_template', {
-				slug: 'dataform-summary',
-				title: 'DataForm summary',
+			// `createTemplate` marks the template as a WordPress suggestion,
+			// which makes it not custom and hides the description field.
+			const template = await requestUtils.rest( {
+				method: 'POST',
+				path: '/wp/v2/templates',
+				params: {
+					slug: 'dataform-summary',
+					title: 'DataForm summary',
+					type: 'wp_template',
+					status: 'publish',
+					// An empty template opens the start-template pattern modal
+					// over the editor, which hides the sidebar from role queries.
+					content:
+						'<!-- wp:paragraph --><p>Template content.</p><!-- /wp:paragraph -->',
+				},
 			} );
 			await admin.visitSiteEditor( {
-				postId: 'emptytheme//dataform-summary',
+				postId: template.id,
 				postType: 'wp_template',
 				canvas: 'edit',
 			} );
