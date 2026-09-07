@@ -19,6 +19,7 @@ Browse [the issues list](https://github.com/wordpress/gutenberg/issues) to find 
 -   [Getting Started](/docs/contributors/code/getting-started-with-code-contribution.md) documents getting your development environment setup, this includes your test site and developer tools suggestions.
 -   [Git Workflow](/docs/contributors/code/git-workflow.md) documents the git process for deploying changes using pull requests.
 -   [Coding Guidelines](/docs/contributors/code/coding-guidelines.md) outline additional patterns and conventions used in the Gutenberg project.
+-   [Migrating components from Emotion to SCSS Modules](/docs/contributors/code/emotion-to-scss-modules.md) covers component compatibility, CSS behavior, and verification for the migration.
 -   [Testing Overview](/docs/contributors/code/testing-overview.md) for PHP and JavaScript development in Gutenberg.
 -   [Accessibility Testing](/docs/contributors/accessibility-testing.md) documents the process of testing accessibility in Gutenberg.
 -   [Managing Packages](/docs/contributors/code/managing-packages.md) documents the process for managing the npm packages.

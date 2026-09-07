@@ -3156,6 +3156,12 @@
 		"parent": "code"
 	},
 	{
+		"title": "Migrating components from Emotion to SCSS Modules",
+		"slug": "emotion-to-scss-modules",
+		"markdown_source": "../docs/contributors/code/emotion-to-scss-modules.md",
+		"parent": "code"
+	},
+	{
 		"title": "Testing Overview",
 		"slug": "testing-overview",
 		"markdown_source": "../docs/contributors/code/testing-overview.md",

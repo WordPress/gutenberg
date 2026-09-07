@@ -384,6 +384,9 @@
 					{ "docs/contributors/code/git-workflow.md": [] },
 					{ "docs/contributors/code/coding-guidelines.md": [] },
 					{
+						"docs/contributors/code/emotion-to-scss-modules.md": []
+					},
+					{
 						"docs/contributors/code/testing-overview.md": [
 							{
 								"docs/contributors/code/e2e/README.md": [
