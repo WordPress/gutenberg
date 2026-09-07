@@ -729,3 +729,7 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 .wp-block-navigation__overlay-help-text-wrapper {
 	margin-top: $grid-unit-10;
 }
+
+.wp-block-audio__autoplay-help-text {
+	grid-column: 1/-1;
+}

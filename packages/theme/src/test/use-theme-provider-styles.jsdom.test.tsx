@@ -135,6 +135,29 @@ describe( 'useThemeProviderStyles', () => {
 			).toBe( '#1e90ff' );
 		} );
 
+		it( 'emits neutral interactive background state properties from the background ramp', () => {
+			const { result } = renderHook( () =>
+				useThemeProviderStyles( { color: { background: '#222222' } } )
+			);
+			const styles = result.current.themeProviderStyles;
+
+			expect(
+				styles[ '--wpds-color-background-interactive-neutral' ]
+			).toBe(
+				styles[ '--wpds-color-background-surface-neutral-strong' ]
+			);
+			expect(
+				styles[ '--wpds-color-background-interactive-neutral-active' ]
+			).toBe(
+				styles[ '--wpds-color-background-surface-neutral-strong' ]
+			);
+			expect(
+				styles[ '--wpds-color-background-interactive-neutral-disabled' ]
+			).toBe(
+				styles[ '--wpds-color-background-surface-neutral-strong' ]
+			);
+		} );
+
 		it( 're-emits inherited color tokens so portaled subtrees can re-apply them', () => {
 			const wrapper = ( { children }: { children: ReactNode } ) => (
 				<ThemeProvider
