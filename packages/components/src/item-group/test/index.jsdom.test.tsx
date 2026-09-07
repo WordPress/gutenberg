@@ -1,22 +1,45 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createPortal } from '@wordpress/element';
 import { Item, ItemGroup } from '..';
 
 describe( 'ItemGroup', () => {
 	describe( 'ItemGroup component', () => {
-		it( 'throws when an Item with list semantics is not a direct child', () => {
-			expect( () =>
-				render(
-					<ItemGroup>
-						<div>
-							<Item>Nested item</Item>
-						</div>
-					</ItemGroup>
-				)
-			).toThrow(
-				'Item must be rendered as a direct child of ItemGroup when both components use list semantics.'
+		it( 'accepts an Item nested within a semantic list', () => {
+			render(
+				<ItemGroup>
+					<div>
+						<Item>Nested item</Item>
+					</div>
+				</ItemGroup>
 			);
-			expect( console ).toHaveErrored();
+
+			expect( screen.getByRole( 'listitem' ) ).toHaveTextContent(
+				'Nested item'
+			);
+		} );
+
+		it( 'throws when an Item with list semantics is outside a semantic list', () => {
+			const portalContainer = document.createElement( 'div' );
+			document.body.append( portalContainer );
+
+			try {
+				expect( () =>
+					render(
+						<ItemGroup>
+							{ createPortal(
+								<Item>Portaled item</Item>,
+								portalContainer
+							) }
+						</ItemGroup>
+					)
+				).toThrow(
+					'Item with list semantics must be rendered inside an element with role="list".'
+				);
+				expect( console ).toHaveErrored();
+			} finally {
+				portalContainer.remove();
+			}
 		} );
 
 		it( 'accepts custom children', () => {
@@ -103,6 +126,30 @@ describe( 'ItemGroup', () => {
 	} );
 
 	describe( 'Item', () => {
+		it( 'uses list semantics only within a list-semantic ItemGroup', () => {
+			const { rerender } = render( <Item>Standalone item</Item> );
+
+			expect( screen.queryByRole( 'listitem' ) ).not.toBeInTheDocument();
+
+			rerender(
+				<ItemGroup role="group">
+					<Item>Non-list item</Item>
+				</ItemGroup>
+			);
+
+			expect( screen.queryByRole( 'listitem' ) ).not.toBeInTheDocument();
+
+			rerender(
+				<ItemGroup>
+					<Item>Grouped item</Item>
+				</ItemGroup>
+			);
+
+			expect( screen.getByRole( 'listitem' ) ).toHaveTextContent(
+				'Grouped item'
+			);
+		} );
+
 		it( 'should render as a `button` if the `onClick` handler is specified', async () => {
 			const user = userEvent.setup();
 			const spy = jest.fn();

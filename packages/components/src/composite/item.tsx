@@ -1,5 +1,6 @@
 import * as Ariakit from '@ariakit/react';
 import { forwardRef } from '@wordpress/element';
+import warning from '@wordpress/warning';
 import type { WordPressComponentProps } from '../context';
 import { useCompositeContext } from './context';
 import type { CompositeItemProps } from './types';
@@ -15,8 +16,8 @@ export const CompositeItem = forwardRef<
 	// obfuscated to discourage its use outside of the component's internals.
 	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
 	if ( ! store ) {
-		throw new Error(
-			'Composite.Item can only be rendered with composite state from Composite or an explicit store prop.'
+		warning(
+			'Composite.Item: Missing composite state. Render inside Composite or provide a store prop to enable composite keyboard behavior.'
 		);
 	}
 

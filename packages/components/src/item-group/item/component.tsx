@@ -13,19 +13,21 @@ function UnconnectedItem(
 ) {
 	const { role, wrapperClassName, ...otherProps } = useItem( props );
 	const itemRef = useRef< HTMLDivElement >( null );
-	const { itemGroupRef, isList } = useItemGroupContext();
+	const { isList } = useItemGroupContext();
 
 	useEffect( () => {
 		if (
 			isList &&
 			role === 'listitem' &&
-			itemRef.current?.parentElement !== itemGroupRef?.current
+			! itemRef.current?.closest(
+				'ol, ul, menu, [role="list"], [role="directory"]'
+			)
 		) {
 			throw new Error(
-				'Item must be rendered as a direct child of ItemGroup when both components use list semantics.'
+				'Item with list semantics must be rendered inside an element with role="list".'
 			);
 		}
-	} );
+	}, [ isList, role ] );
 
 	return (
 		<div ref={ itemRef } role={ role } className={ wrapperClassName }>

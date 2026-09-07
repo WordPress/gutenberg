@@ -46,10 +46,6 @@ export interface ItemProps {
 
 export type ItemGroupContext = {
 	/**
-	 * The element that owns items with list semantics.
-	 */
-	itemGroupRef?: React.RefObject< HTMLElement | null >;
-	/**
 	 * Whether items should use list semantics.
 	 */
 	isList: boolean;

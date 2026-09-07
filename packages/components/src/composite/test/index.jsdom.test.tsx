@@ -703,13 +703,15 @@ describe( 'Composite', () => {
 	} );
 
 	describe( 'required context', () => {
-		it( 'throws when Composite.Item has no composite state', () => {
-			expect( () =>
-				render( <Composite.Item>Item</Composite.Item> )
-			).toThrow(
-				'Composite.Item can only be rendered with composite state from Composite or an explicit store prop.'
+		it( 'warns when Composite.Item has no composite state', () => {
+			render( <Composite.Item>Item</Composite.Item> );
+
+			expect(
+				screen.getByRole( 'button', { name: 'Item' } )
+			).toBeVisible();
+			expect( console ).toHaveWarnedWith(
+				'Composite.Item: Missing composite state. Render inside Composite or provide a store prop to enable composite keyboard behavior.'
 			);
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'supports an explicit store prop for Composite.Item', () => {
