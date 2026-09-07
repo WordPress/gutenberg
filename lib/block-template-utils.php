@@ -12,6 +12,8 @@
  *
  * @since 5.9.0
  * @since 6.0.0 Adds the whole theme to the export archive.
+ * @since 23.9.0 Ships template parts as pattern files, with their
+ *               customizations, and customized theme patterns.
  *
  * @global string $wp_version The WordPress version string.
  *
@@ -34,10 +36,16 @@ function gutenberg_generate_block_templates_export_file() {
 	}
 
 	$zip->addEmptyDir( 'templates' );
-	$zip->addEmptyDir( 'parts' );
+	$zip->addEmptyDir( 'patterns' );
 
 	// Get path of the theme.
 	$theme_path = wp_normalize_path( get_stylesheet_directory() );
+
+	// Template parts are patterns: they ship as pattern files instead of the
+	// parts folder, and a customized theme pattern ships its customization.
+	$folders       = get_block_theme_folders();
+	$parts_folder  = trailingslashit( $folders['wp_template_part'] );
+	$pattern_files = gutenberg_get_exported_pattern_files();
 
 	// Create recursive directory iterator.
 	$theme_files = new RecursiveIteratorIterator(
@@ -53,7 +61,11 @@ function gutenberg_generate_block_templates_export_file() {
 			$file_path     = wp_normalize_path( $file );
 			$relative_path = substr( $file_path, strlen( $theme_path ) + 1 );
 
-			if ( ! wp_is_theme_directory_ignored( $relative_path ) ) {
+			if (
+				! wp_is_theme_directory_ignored( $relative_path ) &&
+				! str_starts_with( $relative_path, $parts_folder ) &&
+				! isset( $pattern_files[ $relative_path ] )
+			) {
 				$zip->addFile( $file_path, $relative_path );
 			}
 		}
@@ -66,6 +78,11 @@ function gutenberg_generate_block_templates_export_file() {
 			parse_blocks( $template->content ),
 			'_remove_theme_attribute_from_template_part_block'
 		);
+		// Custom parts ship as pattern files: reference them by name.
+		$template->content = traverse_and_serialize_blocks(
+			parse_blocks( $template->content ),
+			'gutenberg_export_reference_custom_parts_by_slug'
+		);
 
 		$zip->addFromString(
 			'templates/' . $template->slug . '.html',
@@ -73,13 +90,9 @@ function gutenberg_generate_block_templates_export_file() {
 		);
 	}
 
-	// Load template parts into the zip file.
-	$template_parts = get_block_templates( array(), 'wp_template_part' );
-	foreach ( $template_parts as $template_part ) {
-		$zip->addFromString(
-			'parts/' . $template_part->slug . '.html',
-			$template_part->content
-		);
+	// Load the pattern files into the zip file.
+	foreach ( $pattern_files as $relative_path => $contents ) {
+		$zip->addFromString( $relative_path, $contents );
 	}
 
 	// Load theme.json into the zip file.
