@@ -33,6 +33,7 @@ import {
 	getSectionRootClientId,
 	isSectionBlock,
 	getParentSectionBlock,
+	isContentGroupBlock,
 	isZoomOut,
 	isContainerInsertableToInContentOnlyMode,
 	getClientIdWithClientIdsTree,
@@ -2141,6 +2142,23 @@ export function canMoveBlock( state, clientId ) {
 	}
 
 	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
+
+	// A named container inside a pattern is surfaced in List View as a row
+	// that groups the content beneath it, and reordering those rows among
+	// their siblings is the point of naming them. The rules below otherwise
+	// refuse it twice over: a container is not a content block, and its parent
+	// is disabled.
+	//
+	// This permits a reorder and nothing more. Every lock that could forbid
+	// the move — preview mode, static inner content, `lock.move`, a
+	// `templateLock` of 'all' — has already been applied above, and
+	// `moveBlocksToPosition` only skips its remove and insert checks when the
+	// move stays inside the same parent, so a group still cannot be lifted
+	// out of the pattern.
+	if ( isBlockWithinSection && isContentGroupBlock( state, clientId ) ) {
+		return true;
+	}
+
 	const isContentRoleBlock = isContentBlock(
 		getBlockName( state, clientId )
 	);

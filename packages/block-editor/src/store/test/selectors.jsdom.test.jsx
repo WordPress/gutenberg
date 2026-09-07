@@ -5164,6 +5164,75 @@ describe( 'selectors', () => {
 			expect( canMoveBlock( state, 'child' ) ).toBe( false );
 		} );
 
+		it( 'allows moving a named container that groups content inside a section', () => {
+			// A named container inside a pattern is surfaced in List View as a
+			// grouping row, and reordering those rows is the point of naming
+			// them. It is not a content block and its parent is disabled, so
+			// both section rules would otherwise refuse the move.
+			const buildState = ( cardMetadata ) => ( {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							section: { name: 'core/test-block-b' },
+							grid: { name: 'core/test-block-a' },
+							card: { name: 'core/test-block-a' },
+							heading: { name: 'core/test-content-block' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							section: {
+								// patternName makes this block a section.
+								metadata: { patternName: 'test-pattern' },
+							},
+							grid: { metadata: { name: 'Pricing table' } },
+							card: cardMetadata,
+							heading: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							section: '',
+							grid: 'section',
+							card: 'grid',
+							heading: 'card',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'section' ] ],
+						[ 'section', [ 'grid' ] ],
+						[ 'grid', [ 'card' ] ],
+						[ 'card', [ 'heading' ] ],
+					] ),
+					blockEditingModes: new Map(),
+				},
+				blockListSettings: new Map( [
+					[ 'section', {} ],
+					[ 'grid', {} ],
+					[ 'card', {} ],
+				] ),
+				settings: {
+					[ sectionRootClientIdKey ]: '',
+				},
+				derivedBlockEditingModes: new Map( [
+					[ 'grid', 'disabled' ],
+					[ 'card', 'disabled' ],
+					[ 'heading', 'contentOnly' ],
+				] ),
+			} );
+
+			expect(
+				canMoveBlock(
+					buildState( { metadata: { name: 'Lite' } } ),
+					'card'
+				)
+			).toBe( true );
+
+			// Without a name the container is not a grouping row, so the
+			// ordinary section rules still refuse the move.
+			expect( canMoveBlock( buildState( {} ), 'card' ) ).toBe( false );
+		} );
+
 		it( 'allows moving a content block within a content container inside a section', () => {
 			// When both the container and the child are content blocks,
 			// the contentOnly gating allows moving

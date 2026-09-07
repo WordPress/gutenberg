@@ -119,6 +119,7 @@ function ListViewBlock( {
 		positionLabel,
 		isSynced,
 		isLocked,
+		isContentGroup,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -129,6 +130,7 @@ function ListViewBlock( {
 				getEditedContentOnlySection,
 				isSyncedBlock,
 				isLockedBlock,
+				isContentGroupBlock,
 			} = unlock( select( blockEditorStore ) );
 			const settings = getSettings();
 			const attributes = getBlockAttributes( clientId );
@@ -146,12 +148,20 @@ function ListViewBlock( {
 				positionLabel: getPositionTypeLabel( attributes ),
 				isSynced: isSyncedBlock( clientId ),
 				isLocked: isLockedBlock( clientId ),
+				isContentGroup: isContentGroupBlock( clientId ),
 			};
 		},
 		[ clientId ]
 	);
 
 	const isDisabled = blockEditingMode === 'disabled';
+	// Both kinds of row are disabled, but only one of them is inert. A faded
+	// context row is outside the pattern being edited and cannot be acted on.
+	// A grouping row is inside it, and is selectable so that the block
+	// toolbar's mover can reorder the group among its siblings. Selecting it
+	// exposes no design controls: those are gated on the default editing mode,
+	// which a grouping row does not have.
+	const isFadedContext = isDisabled && ! isContentGroup;
 	const canRename =
 		!! blockName && hasBlockSupport( blockName, 'renaming', true );
 
@@ -428,6 +438,22 @@ function ListViewBlock( {
 		debouncedToggleBlockHighlight( clientId, false );
 	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
 
+	const toggleExpanded = useCallback(
+		( event ) => {
+			// Prevent shift+click from opening link in a new window when toggling.
+			event.preventDefault();
+			event.stopPropagation();
+			if ( isExpanded === undefined ) {
+				return;
+			}
+			updateExpansion( {
+				type: isExpanded ? 'collapse' : 'expand',
+				clientIds: [ clientId ],
+			} );
+		},
+		[ clientId, updateExpansion, isExpanded ]
+	);
+
 	const selectEditorBlock = useCallback(
 		( event ) => {
 			// For keyboard activation (Enter/Space on a link), transfer focus
@@ -451,22 +477,6 @@ function ListViewBlock( {
 			focusListItem( focusClientId, treeGridElementRef?.current );
 		},
 		[ selectBlock, treeGridElementRef ]
-	);
-
-	const toggleExpanded = useCallback(
-		( event ) => {
-			// Prevent shift+click from opening link in a new window when toggling.
-			event.preventDefault();
-			event.stopPropagation();
-			if ( isExpanded === undefined ) {
-				return;
-			}
-			updateExpansion( {
-				type: isExpanded ? 'collapse' : 'expand',
-				clientIds: [ clientId ],
-			} );
-		},
-		[ clientId, updateExpansion, isExpanded ]
 	);
 
 	// Allow right-clicking an item in the List View to open up the block settings dropdown.
@@ -559,7 +569,8 @@ function ListViewBlock( {
 
 	const hasSiblings = siblingBlockCount > 0;
 	const canShowBlockActions = showBlockActions && ! isDisabled;
-	const hasRenderedMovers = showBlockMovers && hasSiblings && ! isDisabled;
+	const hasRenderedMovers =
+		showBlockMovers && hasSiblings && ! isFadedContext;
 	const moverCellClassName = clsx(
 		'block-editor-list-view-block__mover-cell',
 		{ 'is-visible': isHovered || isSelected }
@@ -586,13 +597,14 @@ function ListViewBlock( {
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
 		'is-synced': isSynced,
-		'is-draggable': canMoveBlock && ! isDisabled,
+		'is-draggable': canMoveBlock && ! isFadedContext,
 		'is-displacement-normal': displacement === 'normal',
 		'is-displacement-up': displacement === 'up',
 		'is-displacement-down': displacement === 'down',
 		'is-after-dragged-blocks': isAfterDraggedBlocks,
 		'is-nesting': isNesting,
-		'is-disabled': isDisabled,
+		'is-disabled': isFadedContext,
+		'is-content-group': isContentGroup,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block
@@ -604,7 +616,7 @@ function ListViewBlock( {
 		: [ clientId ];
 
 	const getListViewBlockTabIndex = ( rovingTabIndex ) => {
-		if ( isDisabled ) {
+		if ( isFadedContext ) {
 			return -1;
 		}
 
@@ -621,10 +633,10 @@ function ListViewBlock( {
 			className={ classes }
 			isDragged={ isDragged }
 			onKeyDown={ onKeyDown }
-			onMouseEnter={ isDisabled ? undefined : onMouseEnter }
-			onMouseLeave={ isDisabled ? undefined : onMouseLeave }
-			onFocus={ isDisabled ? undefined : onMouseEnter }
-			onBlur={ isDisabled ? undefined : onMouseLeave }
+			onMouseEnter={ isFadedContext ? undefined : onMouseEnter }
+			onMouseLeave={ isFadedContext ? undefined : onMouseLeave }
+			onFocus={ isFadedContext ? undefined : onMouseEnter }
+			onBlur={ isFadedContext ? undefined : onMouseLeave }
 			level={ level }
 			position={ position }
 			rowCount={ rowCount }
@@ -650,7 +662,7 @@ function ListViewBlock( {
 							}
 							onMouseDown={ onMouseDown }
 							onToggleExpanded={
-								isDisabled ? undefined : toggleExpanded
+								isFadedContext ? undefined : toggleExpanded
 							}
 							ref={ ref }
 							tabIndex={ getListViewBlockTabIndex( tabIndex ) }
@@ -660,7 +672,7 @@ function ListViewBlock( {
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
 							visibilityLabel={ blockVisibilityDescription }
-							isDisabled={ isDisabled }
+							isDisabled={ isFadedContext }
 						/>
 						<AriaReferencedText id={ descriptionId }>
 							{ [

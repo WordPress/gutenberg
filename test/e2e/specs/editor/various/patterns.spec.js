@@ -175,11 +175,13 @@ test.describe( 'Unsynced pattern', () => {
 			} )
 		).not.toBeAttached();
 
+		// A named container is surfaced as a grouping row. It is actionable —
+		// it can be expanded and moved — so it is not announced as disabled.
 		const namedGroup = listView.getByRole( 'gridcell', {
 			name: 'Card',
 		} );
 		await expect( namedGroup ).toBeVisible();
-		await expect( namedGroup.locator( 'a' ) ).toHaveAttribute(
+		await expect( namedGroup.locator( 'a' ) ).not.toHaveAttribute(
 			'aria-disabled',
 			'true'
 		);
@@ -187,6 +189,12 @@ test.describe( 'Unsynced pattern', () => {
 			'href',
 			/#block-/
 		);
+
+		// The grouping row is a level of its own, so the content blocks it
+		// groups sit behind it and it has to be expanded to reach them.
+		await namedGroup
+			.getByTestId( 'list-view-expander' )
+			.click( { force: true } );
 
 		// Assert that content blocks are present in List View.
 		await expect(
@@ -236,6 +244,114 @@ test.describe( 'Unsynced pattern', () => {
 								},
 							},
 							{ name: 'core/image' },
+						],
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'nests and reorders named content groups in content only mode', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:group {"metadata":{"patternName":"core/block/123","name":"My pattern"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:group {"metadata":{"name":"Pricing table"},"layout":{"type":"flex"}} -->
+<div class="wp-block-group"><!-- wp:group {"metadata":{"name":"Lite"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:heading -->
+<h2 class="wp-block-heading">Lite plan</h2>
+<!-- /wp:heading --></div>
+<!-- /wp:group -->
+
+<!-- wp:group {"metadata":{"name":"Premium"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:heading -->
+<h2 class="wp-block-heading">Premium plan</h2>
+<!-- /wp:heading --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		const expand = async ( name ) =>
+			listView
+				.getByRole( 'gridcell', { name } )
+				.getByTestId( 'list-view-expander' )
+				.click( { force: true } );
+
+		// A named container inside another named container is a group of its
+		// own, so both levels are kept and each can be expanded in turn.
+		await expand( 'My pattern' );
+		const pricingTable = listView.getByRole( 'gridcell', {
+			name: 'Pricing table',
+		} );
+		await expect( pricingTable ).toBeVisible();
+
+		await expand( 'Pricing table' );
+		await expect(
+			listView.getByRole( 'gridcell', { name: 'Lite', exact: true } )
+		).toBeVisible();
+		await expect(
+			listView.getByRole( 'gridcell', { name: 'Premium', exact: true } )
+		).toBeVisible();
+
+		// A grouping row is selectable, so the block toolbar is what reorders
+		// it. The card is a plain group inside a pattern, which the editing
+		// rules would otherwise refuse to move.
+		const liteRow = listView.getByRole( 'row' ).filter( {
+			has: page.getByRole( 'gridcell', { name: 'Lite', exact: true } ),
+		} );
+		await liteRow
+			.getByRole( 'link', { name: 'Lite', exact: true } )
+			.click();
+		await expect(
+			liteRow.getByRole( 'gridcell', { name: 'Lite', exact: true } )
+		).toHaveAttribute( 'aria-selected', 'true' );
+
+		await editor.showBlockToolbar();
+		const blockToolbar = page.getByRole( 'toolbar', {
+			name: 'Block tools',
+		} );
+
+		// The movers follow the parent's layout, which is flex here.
+		const moveRight = blockToolbar.getByRole( 'button', {
+			name: 'Move right',
+		} );
+		await expect( moveRight ).toBeEnabled();
+
+		// Selecting the group must not come with a way to restyle, unlock or
+		// hide it. Those all live behind the settings menu, which is empty for
+		// a grouping row and so does not render.
+		await expect(
+			blockToolbar.getByRole( 'button', { name: 'Options' } )
+		).not.toBeAttached();
+
+		await moveRight.click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/group',
+						attributes: {
+							metadata: { name: 'Pricing table' },
+						},
+						innerBlocks: [
+							{
+								name: 'core/group',
+								attributes: {
+									metadata: { name: 'Premium' },
+								},
+							},
+							{
+								name: 'core/group',
+								attributes: { metadata: { name: 'Lite' } },
+							},
 						],
 					},
 				],

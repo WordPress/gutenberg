@@ -99,6 +99,7 @@ export function BlockSettingsDropdown( {
 				canMoveBlocks,
 				getBlockIndex,
 				getBlockCount,
+				isContentGroupBlock,
 			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -120,8 +121,15 @@ export function BlockSettingsDropdown( {
 				previousBlockClientId:
 					getPreviousBlockClientId( firstBlockClientId ),
 				selectedBlockClientIds: getSelectedBlockClientIds(),
+				// A named container inside a pattern is disabled rather than
+				// content-only, but it is restricted for the same reason: its
+				// design belongs to the pattern. It takes the same menu, so
+				// that reordering does not come with a way to restyle,
+				// unlock or hide the container.
 				isContentOnly:
-					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
+					getBlockEditingMode( firstBlockClientId ) ===
+						'contentOnly' ||
+					isContentGroupBlock( firstBlockClientId ),
 				isZoomOut: _isZoomOut(),
 				canEdit: canEditBlock( firstBlockClientId ),
 				canMove: canMoveBlocks( clientIds ),
