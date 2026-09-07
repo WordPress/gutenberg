@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import { act, fireEvent, render } from '@testing-library/react';
 import { DashboardLanes } from '..';
 import type { DashboardLanesLayoutItem } from '../types';

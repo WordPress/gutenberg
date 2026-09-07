@@ -1,5 +1,7 @@
 import attachMediaInPost from '..';
 
+jest.mock( '@wordpress/core-data', () => ( { store: {} } ) );
+
 const mockInvalidate = jest.fn();
 
 jest.mock( '../invalidate-attachment-resolutions', () => ( {

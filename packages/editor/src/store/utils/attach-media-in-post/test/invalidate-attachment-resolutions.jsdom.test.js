@@ -1,5 +1,7 @@
 import invalidateAttachmentResolutions from '../invalidate-attachment-resolutions';
 
+jest.mock( '@wordpress/core-data', () => ( { store: {} } ) );
+
 /**
  * Builds a registry stub whose `getCachedResolvers().getEntityRecords` returns
  * the supplied map, and records the invalidations.

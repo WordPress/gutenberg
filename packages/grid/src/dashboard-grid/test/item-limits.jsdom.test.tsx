@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import { act, fireEvent, render } from '@testing-library/react';
 import { DashboardGrid } from '..';
 import type { DashboardGridLayoutItem } from '../types';

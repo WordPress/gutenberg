@@ -1,4 +1,5 @@
 /* eslint-disable testing-library/no-container, testing-library/no-node-access -- Measurement behavior requires access to the hidden intrinsic tree and element geometry. */
+import '@testing-library/jest-dom';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
