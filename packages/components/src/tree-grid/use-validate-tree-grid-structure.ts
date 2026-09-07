@@ -33,11 +33,18 @@ function isContainedInOrOwnedBy(
 		return true;
 	}
 
-	return getAriaOwners( element ).some(
+	const hasValidOwner = getAriaOwners( element ).some(
 		( owner ) =>
 			owner.matches( selector ) ||
 			isContainedInOrOwnedBy( owner, selector, visited )
 	);
+	if ( hasValidOwner ) {
+		return true;
+	}
+
+	return element.parentElement
+		? isContainedInOrOwnedBy( element.parentElement, selector, visited )
+		: false;
 }
 
 function isOwnedByRowInTreeGrid(

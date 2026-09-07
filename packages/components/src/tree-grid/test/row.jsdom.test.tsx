@@ -61,6 +61,40 @@ describe( 'TreeGridRow', () => {
 		}
 	} );
 
+	it( 'accepts a row inside a rowgroup explicitly owned by the treegrid', () => {
+		const portalTable = document.createElement( 'table' );
+		document.body.append( portalTable );
+
+		function AriaOwnedRowGroup() {
+			const rowGroupId = useId();
+
+			return (
+				<TreeGrid aria-owns={ rowGroupId }>
+					{ createPortal(
+						<tbody id={ rowGroupId }>
+							<TreeGridRow
+								level={ 1 }
+								positionInSet={ 1 }
+								setSize={ 1 }
+							>
+								<td>Test</td>
+							</TreeGridRow>
+						</tbody>,
+						portalTable
+					) }
+				</TreeGrid>
+			);
+		}
+
+		try {
+			render( <AriaOwnedRowGroup /> );
+
+			expect( screen.getByRole( 'row' ) ).toHaveTextContent( 'Test' );
+		} finally {
+			portalTable.remove();
+		}
+	} );
+
 	it( 'renders a tr with support for level, positionInSet and setSize props', () => {
 		const { container } = render(
 			<table role="treegrid">

@@ -150,6 +150,18 @@ describe( 'ItemGroup', () => {
 			);
 		} );
 
+		it( 'uses list semantics within an ItemGroup with the directory role', () => {
+			render(
+				<ItemGroup role="directory">
+					<Item>Directory item</Item>
+				</ItemGroup>
+			);
+
+			expect( screen.getByRole( 'listitem' ) ).toHaveTextContent(
+				'Directory item'
+			);
+		} );
+
 		it( 'should render as a `button` if the `onClick` handler is specified', async () => {
 			const user = userEvent.setup();
 			const spy = jest.fn();
