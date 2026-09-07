@@ -1,0 +1,42 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.grid {
+	// Nested Grids only use their own layout props.
+	--wp-components-grid-align: initial;
+	--wp-components-grid-justify: initial;
+	--wp-components-grid-gap: initial;
+	--wp-components-grid-template-columns: initial;
+	--wp-components-grid-template-rows: initial;
+	--wp-components-grid-row-gap: initial;
+	--wp-components-grid-column-gap: initial;
+
+	align-items: var(--wp-components-grid-align);
+	display: grid;
+	grid-template-columns: var(--wp-components-grid-template-columns);
+	grid-template-rows: var(--wp-components-grid-template-rows);
+	row-gap: var(--wp-components-grid-row-gap, calc(#{$grid-unit-05} * var(--wp-components-grid-gap)));
+	column-gap: var(--wp-components-grid-column-gap, calc(#{$grid-unit-05} * var(--wp-components-grid-gap)));
+	justify-content: var(--wp-components-grid-justify);
+}
+
+.is-inline {
+	display: inline-grid;
+	vertical-align: middle;
+}
+
+// Preserve CSS-wide values without moving declarations into inline styles,
+// where they would override consumer stylesheets.
+@each $name, $property in (
+	align: align-items,
+	justify: justify-content,
+	template-columns: grid-template-columns,
+	template-rows: grid-template-rows,
+	row-gap: row-gap,
+	column-gap: column-gap
+) {
+	@each $keyword in (inherit, initial, unset, revert, revert-layer) {
+		.#{$name}-#{$keyword} {
+			#{$property}: $keyword;
+		}
+	}
+}

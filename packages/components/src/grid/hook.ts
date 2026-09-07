@@ -1,12 +1,24 @@
-import { css } from '@emotion/react';
-import { useMemo } from '@wordpress/element';
+import clsx from 'clsx';
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { getAlignmentProps } from './utils';
 import { useResponsiveValue } from '../utils/use-responsive-value';
-import CONFIG from '../utils/config-values';
-import { useCx } from '../utils/hooks/use-cx';
 import type { GridProps } from './types';
+import styles from './style.module.scss';
+
+const CSS_WIDE_KEYWORDS = new Set( [
+	'inherit',
+	'initial',
+	'unset',
+	'revert',
+	'revert-layer',
+] );
+
+function toCSSValue( value: string | number | undefined ) {
+	return typeof value === 'number'
+		? `${ value }px`
+		: value?.trim() || undefined;
+}
 
 export default function useGrid(
 	props: WordPressComponentProps< GridProps, 'div' >
@@ -22,6 +34,7 @@ export default function useGrid(
 		justify,
 		rowGap,
 		rows,
+		style,
 		templateColumns,
 		templateRows,
 		...otherProps
@@ -36,39 +49,47 @@ export default function useGrid(
 		templateColumns || ( !! columns && `repeat( ${ column }, 1fr )` );
 	const gridTemplateRows =
 		templateRows || ( !! rows && `repeat( ${ row }, 1fr )` );
+	const alignmentProps = getAlignmentProps( alignment );
+	const values = {
+		align: alignmentProps.alignItems ?? align,
+		justify: alignmentProps.justifyContent ?? justify,
+		'template-columns': gridTemplateColumns || undefined,
+		'template-rows': gridTemplateRows || undefined,
+		'row-gap': rowGap,
+		'column-gap': columnGap,
+	};
 
-	const cx = useCx();
-
-	const classes = useMemo( () => {
-		const alignmentProps = getAlignmentProps( alignment );
-
-		const gridClasses = css( {
-			alignItems: align,
-			display: isInline ? 'inline-grid' : 'grid',
-			gap: `calc( ${ CONFIG.gridBase } * ${ gap } )`,
-			gridTemplateColumns: gridTemplateColumns || undefined,
-			gridTemplateRows: gridTemplateRows || undefined,
-			gridRowGap: rowGap,
-			gridColumnGap: columnGap,
-			justifyContent: justify,
-			verticalAlign: isInline ? 'middle' : undefined,
-			...alignmentProps,
-		} );
-
-		return cx( gridClasses, className );
-	}, [
-		align,
-		alignment,
-		className,
-		columnGap,
-		cx,
-		gap,
-		gridTemplateColumns,
-		gridTemplateRows,
-		isInline,
-		justify,
-		rowGap,
-	] );
-
-	return { ...otherProps, className: classes };
+	return {
+		...otherProps,
+		className: clsx(
+			styles.grid,
+			{ [ styles[ 'is-inline' ] ]: isInline },
+			// CSS-wide keywords apply to custom properties themselves. Use the
+			// matching declaration instead so, for example, rowGap="inherit"
+			// inherits the parent's row gap rather than its internal variable.
+			Object.entries( values ).map( ( [ property, value ] ) => {
+				const keyword =
+					typeof value === 'string' ? value.trim().toLowerCase() : '';
+				return (
+					CSS_WIDE_KEYWORDS.has( keyword ) &&
+					styles[ `${ property }-${ keyword }` ]
+				);
+			} ),
+			className
+		),
+		style: {
+			'--wp-components-grid-align': values.align,
+			'--wp-components-grid-justify': values.justify,
+			'--wp-components-grid-gap': gap,
+			'--wp-components-grid-template-columns': toCSSValue(
+				values[ 'template-columns' ]
+			),
+			'--wp-components-grid-template-rows': toCSSValue(
+				values[ 'template-rows' ]
+			),
+			'--wp-components-grid-row-gap': toCSSValue( rowGap ),
+			'--wp-components-grid-column-gap': toCSSValue( columnGap ),
+			...style,
+		},
+	};
 }
