@@ -3177,11 +3177,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/navigation-link/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/navigation-link/link-ui/block-inserter.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
