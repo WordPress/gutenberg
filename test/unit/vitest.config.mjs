@@ -82,10 +82,10 @@ if (
 process.chdir( ROOT_DIR );
 process.env.TZ ||= 'UTC';
 
-const transpiledPackageNames = glob(
-	'packages/*/src/index.{js,jsx,ts,tsx}',
-	{ cwd: ROOT_DIR, absolute: true }
-)
+const transpiledPackageNames = glob( 'packages/*/src/index.{js,jsx,ts,tsx}', {
+	cwd: ROOT_DIR,
+	absolute: true,
+} )
 	.sort()
 	.map( ( fileName ) => {
 		const relative = path.relative( ROOT_DIR, fileName );

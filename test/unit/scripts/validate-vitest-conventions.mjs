@@ -12,7 +12,6 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import fastGlob from 'fast-glob';
 import typescript from 'typescript';
 import {
-	discoverTestFiles,
 	getVitestTestsByProject,
 	VITEST_PROJECT_NAMES,
 } from './test-projects.mjs';
