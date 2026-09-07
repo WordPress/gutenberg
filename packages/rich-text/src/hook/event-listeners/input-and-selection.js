@@ -146,7 +146,11 @@ export default ( props ) => ( element ) => {
 		// element. The caret is then invisible, or the iOS keyboard sees a
 		// character before it and does not capitalize. Apply the record's
 		// position right away: this runs in the task that placed the caret
-		// (see the focus handler), which is what the keyboard requires.
+		// (see the focus handler), which is what the keyboard requires. It
+		// must happen before the snapshot below, so that the selection
+		// change event it causes is recognized as processed. Applying again
+		// from that later task moves the caret on iOS and the keyboard
+		// loses the capital.
 		if ( text.length === 0 ) {
 			applyRecord( { ...oldRecord, start, end } );
 		}
