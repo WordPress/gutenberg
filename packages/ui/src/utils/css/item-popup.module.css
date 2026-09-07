@@ -49,7 +49,7 @@
 		}
 
 		/*
-		 * Slot + type for a list in `.popup`'s `main` grid area.
+		 * Slot and typography styles for a list in `.popup`'s `main` grid area.
 		 * Combobox and Autocomplete get this via `.list`. Select applies
 		 * it directly so Select.List can own overflow.
 		 */
@@ -63,7 +63,7 @@
 
 		/*
 		 * Footer layout for Combobox and Autocomplete. Select does not
-		 * use this class: Select.List must be the overflow box.
+		 * use this class, because Select.List must be the overflow box.
 		 */
 		.list {
 			composes: list-chrome;
