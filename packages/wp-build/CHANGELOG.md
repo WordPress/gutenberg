@@ -6,9 +6,10 @@
 
 -   `@wordpress/build` no longer parses JSX syntax in `.js` source files. Rename these files to `.jsx` or `.tsx` before building ([#82189](https://github.com/WordPress/gutenberg/pull/82189)).
 
--   Use `WP_TESTS_SKIP_STYLE_INJECTION=true` instead of `NODE_ENV=test` to
-    disable generated style injection in Node and jsdom tests. Browser Mode
-    keeps style injection enabled ([#82154](https://github.com/WordPress/gutenberg/pull/82154)).
+-   Add `WP_TESTS_SKIP_STYLE_INJECTION` to control generated style injection.
+    An absent value keeps the existing `NODE_ENV=test` behavior, while Browser
+    Mode can set it to `false` to enable styles
+    ([#82154](https://github.com/WordPress/gutenberg/pull/82154)).
 
 ### Enhancements
 

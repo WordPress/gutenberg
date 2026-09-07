@@ -59,16 +59,21 @@ export function compileInlineStyle( {
 			.update( css )
 			.digest( 'hex' )
 			.slice( 0, 10 );
+		const shouldInjectStyle =
+			`typeof process === 'undefined' || ` +
+			`process.env.WP_TESTS_SKIP_STYLE_INJECTION === 'false' || ` +
+			`(process.env.WP_TESTS_SKIP_STYLE_INJECTION !== 'true' && process.env.NODE_ENV !== 'test')`;
 
 		// Test runners that emulate the DOM can opt out of automatic style injection.
-		// Real browsers still receive styles even when NODE_ENV is "test".
+		// An explicit opt-in lets real browsers receive styles in test mode while an
+		// absent setting preserves the existing NODE_ENV="test" behavior.
 		let cssModule = cssModules
 			? `import { registerStyle } from '@wordpress/style-runtime';
-if (typeof process === 'undefined' || process.env.WP_TESTS_SKIP_STYLE_INJECTION !== 'true') {
+if (${ shouldInjectStyle }) {
 	registerStyle("${ hash }", ${ JSON.stringify( css ) });
 }
 `
-			: `if (typeof document !== 'undefined' && (typeof process === 'undefined' || process.env.WP_TESTS_SKIP_STYLE_INJECTION !== 'true') && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
+			: `if (typeof document !== 'undefined' && (${ shouldInjectStyle }) && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
 	const style = document.createElement("style");
 	style.setAttribute("data-wp-hash", "${ hash }");
 	style.appendChild(document.createTextNode(${ JSON.stringify( css ) }));
