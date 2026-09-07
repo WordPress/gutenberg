@@ -4,6 +4,12 @@ import { STORE_NAME } from '../name';
 import { EntityContext } from '../entity-context';
 import useEntityId from './use-entity-id';
 
+// A stable reference, because `getRevision` memoizes on the query's identity.
+const REVISION_QUERY = {
+	context: 'edit',
+	_fields: 'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+};
+
 /**
  * Hook that returns the value and a setter for the
  * specified property of the nearest provided
@@ -37,11 +43,7 @@ export default function useEntityProp( kind, name, prop, _id ) {
 					name,
 					id,
 					revisionId,
-					{
-						context: 'edit',
-						_fields:
-							'id,date,author,meta,title.raw,excerpt.raw,content.raw',
-					}
+					REVISION_QUERY
 				);
 				return revision
 					? {
