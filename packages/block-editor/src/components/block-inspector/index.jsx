@@ -40,6 +40,10 @@ import {
 	isDefaultBlockStyleState,
 } from '../../hooks/block-style-state';
 
+// Section blocks that carry their own styles (layout, custom CSS) and get the
+// full style panel set instead of only their Advanced controls.
+const FULL_STYLES_SECTION_BLOCKS = [ 'core/template-part', 'core/block' ];
+
 function StyleInspectorSlots( {
 	showAdvancedControls = true,
 	showPositionControls = true,
@@ -526,11 +530,17 @@ const BlockInspectorSingleBlock = ( {
 					<InspectorControls.Slot group="content" />
 					<InspectorControls.Slot group="list" ref={ listViewRef } />
 					<ListViewContentPopover listViewRef={ listViewRef } />
-					{ ! isSectionBlock && <StyleInspectorSlots /> }
 					{ /* A section block without content blocks has no tabs,
-					     but its own settings (e.g. a template part's or pattern
-					     instance's wrapper element) still need a home. */ }
-					{ isSectionBlock && <AdvancedControls /> }
+					     but its own settings still need a home: template parts
+					     and pattern instances carry styles of their own (layout,
+					     custom CSS) and get the full slot set; other sections
+					     only their Advanced controls. */ }
+					{ ! isSectionBlock ||
+					FULL_STYLES_SECTION_BLOCKS.includes( blockName ) ? (
+						<StyleInspectorSlots />
+					) : (
+						<AdvancedControls />
+					) }
 				</>
 			) }
 			{ ! isEditingStyleState && <InspectorControlsLastItem.Slot /> }

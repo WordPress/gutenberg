@@ -9,6 +9,7 @@ import {
 import {
 	MenuItem,
 	Modal,
+	PanelBody,
 	Placeholder,
 	SelectControl,
 	Spinner,
@@ -35,12 +36,17 @@ import {
 	privateApis as patternsPrivateApis,
 	store as patternsStore,
 } from '@wordpress/patterns';
-import { getBlockBindingsSource, parse } from '@wordpress/blocks';
+import {
+	getBlockBindingsSource,
+	parse,
+	cloneBlock,
+	serialize,
+} from '@wordpress/blocks';
+import { useInstanceId } from '@wordpress/compose';
 import { unlock } from '../lock-unlock';
 
-const { useLayoutClasses, HTMLElementControl } = unlock(
-	blockEditorPrivateApis
-);
+const { useLayoutClasses, HTMLElementControl, LayoutPanel, LayoutStyle } =
+	unlock( blockEditorPrivateApis );
 
 // Elements a pattern instance can render as, so a pattern standing in for a
 // header or footer keeps its landmark. The default is no wrapper at all.
@@ -106,6 +112,57 @@ function useAlternativePatterns( area, slug, clientId ) {
 			);
 		},
 		[ area, slug, clientId ]
+	);
+}
+
+/**
+ * Patterns designed for the instance's area, to apply as its design: the ones
+ * registered with that area, or targeting it through `blockTypes`, as
+ * template parts list in their Design panel.
+ *
+ * @param {string|undefined} area     Area name.
+ * @param {string|undefined} slug     The instance's pattern name, excluded.
+ * @param {string}           clientId Block client id.
+ * @return {Object[]} Parsed patterns.
+ */
+function useDesignPatterns( area, slug, clientId ) {
+	return useSelect(
+		( select ) => {
+			if ( ! area || area === 'uncategorized' ) {
+				return EMPTY_ARRAY;
+			}
+			const { __experimentalGetAllowedPatterns, getBlockRootClientId } =
+				select( blockEditorStore );
+			const blockType = `core/template-part/${ area }`;
+			return __experimentalGetAllowedPatterns(
+				getBlockRootClientId( clientId )
+			).filter(
+				( pattern ) =>
+					( pattern.area === area ||
+						pattern.blockTypes?.includes( blockType ) ) &&
+					pattern.name !== slug &&
+					! pattern.name.startsWith( 'core/block/' )
+			);
+		},
+		[ area, slug, clientId ]
+	);
+}
+
+function DesignPanel( { area, slug, clientId, onSelect } ) {
+	const patterns = useDesignPatterns( area, slug, clientId );
+	if ( ! patterns.length ) {
+		return null;
+	}
+	return (
+		<InspectorControls>
+			<PanelBody title={ __( 'Design' ) }>
+				<BlockPatternsList
+					blockPatterns={ patterns }
+					onClickPattern={ onSelect }
+					showTitlesAsTooltip
+				/>
+			</PanelBody>
+		</InspectorControls>
 	);
 }
 
@@ -215,6 +272,7 @@ export default function ReusableBlockEditRecursionWrapper( props ) {
  * @param {number} props.recordId The `wp_block` post id.
  */
 function UserPatternEdit( { recordId, ...props } ) {
+	const entityId = recordId;
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
@@ -240,6 +298,7 @@ function UserPatternEdit( { recordId, ...props } ) {
 			hasResolved={ hasResolved }
 			isMissing={ hasResolved && ! record }
 			canUserEdit={ canUserEdit }
+			entityId={ entityId }
 			onEditOriginal={ ( navigate ) => navigate( recordId ) }
 		/>
 	);
@@ -355,14 +414,7 @@ const EMPTY_OBJECT = {};
 function ReusableBlockEdit( {
 	name,
 	clientId,
-	attributes: {
-		ref,
-		slug,
-		content,
-		tagName,
-		area: areaAttribute,
-		hasWrapper,
-	},
+	attributes,
 	__unstableParentLayout: parentLayout,
 	setAttributes,
 	blocks,
@@ -371,7 +423,25 @@ function ReusableBlockEdit( {
 	canUserEdit,
 	onEditOriginal,
 	pattern,
+	entityId,
 } ) {
+	const {
+		ref,
+		slug,
+		content,
+		tagName,
+		area: areaAttribute,
+		hasWrapper,
+		layout,
+		style,
+	} = attributes;
+	// Layout, additional class names and custom CSS live on the wrapper
+	// element; instances created before `hasWrapper` existed have none, so
+	// the layout panel is not offered to them and the class name and custom
+	// CSS supports (whose controls always show) have no effect on them.
+	const hasOwnLayout = !! layout && Object.keys( layout ).length > 0;
+	const { customizePattern } = unlock( useDispatch( patternsStore ) );
+	const { editEntityRecord } = useDispatch( coreStore );
 	// The instance's own area wins, else the referenced pattern's. Without
 	// either, the instance is in the "General" (uncategorized) area.
 	const area = areaAttribute || pattern?.area;
@@ -423,10 +493,22 @@ function ReusableBlockEdit( {
 	// front end, so its full-width root blocks sit directly in the parent
 	// layout. The editor always has a wrapper: infer its alignment and the
 	// parent layout so it behaves as if it weren't there. An instance with
-	// a wrapper renders the same element on both sides, so no inference.
+	// a wrapper renders the same element on both sides, so no inference:
+	// its wrapper only takes the layout the instance sets itself.
 	const inferred = useInferredLayout( blocks, parentLayout );
-	const { alignment, layout } = hasWrapper ? EMPTY_OBJECT : inferred;
-	const layoutClasses = useLayoutClasses( { layout }, name );
+	const { alignment, layout: inferredLayout } = hasWrapper
+		? EMPTY_OBJECT
+		: inferred;
+	let usedLayout = inferredLayout;
+	if ( hasOwnLayout ) {
+		usedLayout =
+			layout.inherit || layout.contentSize || layout.wideSize
+				? { ...layout, type: 'constrained' }
+				: layout;
+	}
+	const layoutClasses = useLayoutClasses( { layout: usedLayout }, name );
+	const instanceId = useInstanceId( ReusableBlockEdit );
+	const containerClass = `wp-container-core-block-is-layout-${ instanceId }`;
 
 	// The wrapper element: the instance's `tagName`, else the area's element,
 	// else a div. In the editor the block always needs one; on the front end
@@ -437,13 +519,14 @@ function ReusableBlockEdit( {
 	const blockProps = useBlockProps( {
 		className: clsx(
 			'block-library-block__reusable-block-container',
-			layout && layoutClasses,
+			usedLayout && layoutClasses,
+			hasOwnLayout && containerClass,
 			{ [ `align${ alignment }` ]: alignment }
 		),
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		layout,
+		layout: usedLayout,
 		value: blocks,
 		onInput: NOOP,
 		onChange: NOOP,
@@ -455,6 +538,35 @@ function ReusableBlockEdit( {
 	const handleEditOriginal = () => {
 		onEditOriginal( ( postId ) =>
 			onNavigateToEntityRecord( { postId, postType: 'wp_block' } )
+		);
+	};
+
+	// Applies a pattern as the design of the referenced pattern, writing it
+	// into the user pattern or the registered pattern's copy, as a template
+	// part's Design panel writes into the part.
+	const applyDesign = async ( design ) => {
+		let id = entityId;
+		if ( ! id ) {
+			if ( ! pattern ) {
+				return;
+			}
+			const record = await customizePattern( pattern );
+			id = record.id;
+		}
+		const newBlocks = ( design.blocks ?? [] ).map( ( block ) =>
+			cloneBlock( block )
+		);
+		editEntityRecord( 'postType', 'wp_block', id, {
+			blocks: newBlocks,
+			content: serialize( newBlocks ),
+		} );
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: pattern title. */
+				__( 'Design "%s" applied.' ),
+				design.title
+			),
+			{ type: 'snackbar' }
 		);
 	};
 
@@ -540,6 +652,32 @@ function ReusableBlockEdit( {
 							{ type: 'snackbar' }
 						);
 					} }
+				/>
+			) }
+
+			{ hasResolved && ! isMissing && (
+				<DesignPanel
+					area={ area }
+					slug={ slug }
+					clientId={ clientId }
+					onSelect={ applyDesign }
+				/>
+			) }
+			{ hasWrapper && (
+				<LayoutPanel
+					layout={ layout }
+					style={ style }
+					setAttributes={ setAttributes }
+					name={ name }
+					clientId={ clientId }
+				/>
+			) }
+			{ hasOwnLayout && (
+				<LayoutStyle
+					blockName={ name }
+					selector={ `.${ containerClass }` }
+					layout={ usedLayout }
+					style={ style }
 				/>
 			) }
 

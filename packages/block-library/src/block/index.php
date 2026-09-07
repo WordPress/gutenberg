@@ -129,6 +129,9 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 	if ( ! empty( $attributes['hasWrapper'] ) ) {
 		$tag_name = block_core_block_get_tag_name( $attributes, isset( $pattern ) ? $pattern : null );
 		$content  = "<$tag_name " . get_block_wrapper_attributes() . '>' . $content . "</$tag_name>";
+		if ( ! empty( $attributes['layout'] ) ) {
+			$content = block_core_block_apply_layout( $content, $block_instance );
+		}
 	}
 
 	return $content;
@@ -159,6 +162,37 @@ function block_core_block_get_tag_name( $attributes, $pattern ) {
 		}
 	}
 	return 'div';
+}
+
+/**
+ * Applies the block's `layout` attribute to its wrapper element.
+ *
+ * The block does not declare the `layout` support: the layout support's
+ * render filter targets the first element of the output, which is one of the
+ * pattern's own blocks whenever no wrapper is rendered. The support is
+ * enabled for the duration of this call only, so the wrapper gets the same
+ * classes and styles a Group block would.
+ *
+ * @since 7.2.0
+ *
+ * @param string   $content        The wrapped block content.
+ * @param WP_Block $block_instance The block instance.
+ * @return string The content with layout classes and styles applied.
+ */
+function block_core_block_apply_layout( $content, $block_instance ) {
+	$block_type = $block_instance->block_type;
+	if ( ! $block_type || ! function_exists( 'wp_render_layout_support_flag' ) ) {
+		return $content;
+	}
+	$had_support = isset( $block_type->supports['layout'] );
+	if ( ! $had_support ) {
+		$block_type->supports['layout'] = array( 'allowInheriting' => true );
+	}
+	$content = wp_render_layout_support_flag( $content, $block_instance->parsed_block );
+	if ( ! $had_support ) {
+		unset( $block_type->supports['layout'] );
+	}
+	return $content;
 }
 
 /**

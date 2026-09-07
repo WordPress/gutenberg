@@ -31,6 +31,10 @@ import { deviceTypeKey } from '../../store/private-keys';
 import BlockToolbarIcon from './block-toolbar-icon';
 import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 
+// Section blocks whose wrapper element has controls of its own (alignment,
+// layout), so the block control slots stay in their toolbar.
+const SECTION_BLOCKS_WITH_OWN_CONTROLS = [ 'core/template-part', 'core/block' ];
+
 /**
  * Renders the block toolbar.
  *
@@ -153,7 +157,11 @@ export function PrivateBlockToolbar( {
 				) &&
 				selectedBlockClientIds.length === 1,
 			isUsingBindings: _isUsingBindings,
-			isSectionContainer: _isSectionBlock,
+			// Template parts and pattern instances carry their own block
+			// controls (alignment, layout) on their wrapper element.
+			isSectionContainer:
+				_isSectionBlock &&
+				! SECTION_BLOCKS_WITH_OWN_CONTROLS.includes( _blockName ),
 			hasContentOnlyLocking: _hasTemplateLock,
 			showShuffleButton: _isZoomOut,
 			showSlots: ! _isZoomOut && ! _isEditingResponsiveStyleState,
