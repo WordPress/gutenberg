@@ -116,8 +116,9 @@ export const WithDisabledOption: Story = {
 
 /**
  * Mark a creatable action with `creatable: true` on an item in `items`.
- * It renders in the list footer and is excluded from the main list
- * automatically. Handle creation in `onValueChange`.
+ * It renders in the list footer and is excluded from the main list.
+ * The footer follows the same filter as other items. Handle creation
+ * in `onValueChange`.
  */
 export const Creatable: Story = {
 	args: {
