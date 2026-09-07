@@ -13,8 +13,6 @@ import {
 } from './lib/utils.ts';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs.ts';
 import type {
-	AccentRampPurpose,
-	AccentRampResult,
 	RampResult as InternalRampResult,
 	RampDirection,
 	Ramp,
@@ -155,25 +153,13 @@ function getBgRampInfo( ramp: InternalRampResult ): {
  * Build an accent ramp. When a background is supplied, inherit its direction
  * and pin accent SF2 to a bounded version of the background's SF2 lightness.
  *
- * @param seed    Opaque sRGB seed for the accent.
- * @param bgRamp  Completed background ramp on which the accent appears.
- * @param purpose Internal profile selected by the caller's semantic usage.
+ * @param seed   Opaque sRGB seed for the accent.
+ * @param bgRamp Completed background ramp on which the accent appears.
  */
 export function buildAccentRamp(
 	seed: string,
-	bgRamp?: InternalRampResult,
-	purpose?: 'full'
-): InternalRampResult;
-export function buildAccentRamp(
-	seed: string,
-	bgRamp: InternalRampResult | undefined,
-	purpose: AccentRampPurpose
-): AccentRampResult;
-export function buildAccentRamp(
-	seed: string,
-	bgRamp?: InternalRampResult,
-	purpose: AccentRampPurpose = 'full'
-): AccentRampResult {
+	bgRamp?: InternalRampResult
+): InternalRampResult {
 	if ( typeof seed !== 'string' || seed.trim() === '' ) {
 		throw new Error( 'Seed color must be a non-empty string' );
 	}
@@ -181,7 +167,6 @@ export function buildAccentRamp(
 	const bgRampInfo = bgRamp ? getBgRampInfo( bgRamp ) : undefined;
 	return buildRamp( seed, ACCENT_RAMP_CONFIG, {
 		...bgRampInfo,
-		purpose,
 	} );
 }
 
@@ -192,7 +177,7 @@ export function buildAccentRamp(
  *
  * @param params             Full ramps to inspect.
  * @param params.bgRamp      Background ramp.
- * @param params.accentRamps Accent ramps; purpose-pruned outputs are not supported.
+ * @param params.accentRamps Accent ramps.
  */
 export function checkAccessibleCombinations( {
 	bgRamp,

@@ -36,7 +36,6 @@
 -   Generate the default ramps before derived token artifacts so one build uses the current ramp algorithm throughout. ([#82525](https://github.com/WordPress/gutenberg/pull/82525))
 -   Cache relative luminance calculations used by color-ramp contrast checks. ([#82445](https://github.com/WordPress/gutenberg/pull/82445))
 -   Register color spaces only when calculating colors, avoiding module-import side effects. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
--   Skip unused ramp outputs and redundant base foreground solves, and calculate status interaction colors only when contrast correction needs them. Preserve semantic colors and contrast checks. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Generate the default ramps before derived token artifacts so one build uses the current ramp algorithm throughout. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Enforce NodeNext module resolution in the build project so future declaration imports are checked against the package's published ESM resolution rules. ([#82088](https://github.com/WordPress/gutenberg/pull/82088))
 -   Update the `@types/node` development dependency to v24, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).

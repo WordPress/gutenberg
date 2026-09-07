@@ -31,8 +31,6 @@ Perceptual spacing is a preference; configured WCAG contrast floors take priorit
 
 Surface foregrounds use FGS2 for disabled controls, FGS3 for weak emphasis, FGS4 for normal content and resting controls, and FGS5 for interaction states. FGS5 can approach black or white at the expense of chroma. FGS1 is no longer generated. Strong fills use separate foregrounds. See [`tokens/color.json`](../../tokens/color.json) for exact mappings.
 
-Runtime accent profiles skip output work that semantic tokens do not use: `interactive` for primary/error and `status` for the other accents. They retain dependencies and spacing budgets that affect visible colors. Generation and diagnostics use `full` ramps.
-
 ## Checks and generated files
 
 Ramp warnings report unmet step constraints. [`theme-provider-color-warnings.ts`](../theme-provider-color-warnings.ts) also checks listed semantic text/background pairs. The separate `checkAccessibleCombinations` diagnostic checks a broader matrix, including cross-ramp pairs that semantic tokens may not use. Neither warning collector repairs colors or proves every possible pairing accessible.
