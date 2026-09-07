@@ -39,23 +39,9 @@ final class AutoCapitalizationTests: XCTestCase {
 			.firstMatch
 	}
 
-	/// Types letter by letter and checks each one arrived: Safari drops a
-	/// tap now and then, in particular the first one after a focus change.
-	func type( _ word: String, into field: XCUIElement ) {
-		var expected = ( field.value as? String ) ?? ""
-		if expected == "\u{FEFF}" {
-			expected = ""
-		}
+	func type( _ word: String ) {
 		for letter in word {
-			expected.append( letter )
-			for _ in 1...3 {
-				key( String( letter ) ).tap()
-				let arrived = NSPredicate( format: "value == %@", expected )
-				let done = XCTNSPredicateExpectation( predicate: arrived, object: field )
-				if XCTWaiter.wait( for: [ done ], timeout: 2 ) == .completed {
-					break
-				}
-			}
+			key( String( letter ) ).tap()
 		}
 	}
 
@@ -97,7 +83,7 @@ final class AutoCapitalizationTests: XCTestCase {
 		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "No software keyboard" )
 		assertCapitalized( "An empty title should start capitalized" )
 
-		type( "Title", into: title )
+		type( "Title" )
 		XCTAssertEqual( title.value as? String, "Title" )
 		XCTAssertFalse( key( "shift" ).isSelected, "After a word the keyboard should be lowercase" )
 
@@ -107,7 +93,7 @@ final class AutoCapitalizationTests: XCTestCase {
 		XCTAssertEqual( firstParagraph.label, emptyParagraphLabel )
 		assertCapitalized( "The paragraph after the title should start capitalized" )
 
-		type( "Hello", into: firstParagraph )
+		type( "Hello" )
 		XCTAssertEqual( firstParagraph.value as? String, "Hello" )
 		XCTAssertEqual( firstParagraph.label, paragraphLabel )
 		XCTAssertFalse( key( "shift" ).isSelected, "After a word the keyboard should be lowercase" )
