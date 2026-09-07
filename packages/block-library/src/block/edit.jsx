@@ -12,6 +12,7 @@ import {
 	Placeholder,
 	SelectControl,
 	Spinner,
+	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -355,7 +356,14 @@ const EMPTY_OBJECT = {};
 function ReusableBlockEdit( {
 	name,
 	clientId,
-	attributes: { ref, slug, content, tagName, area: areaAttribute },
+	attributes: {
+		ref,
+		slug,
+		content,
+		tagName,
+		area: areaAttribute,
+		hasWrapper,
+	},
 	__unstableParentLayout: parentLayout,
 	setAttributes,
 	blocks,
@@ -366,10 +374,8 @@ function ReusableBlockEdit( {
 	pattern,
 } ) {
 	// The instance's own area wins, else the referenced pattern's. Without
-	// either, the instance is in the "General" (uncategorized) area, which
-	// for patterns means no wrapper element.
+	// either, the instance is in the "General" (uncategorized) area.
 	const area = areaAttribute || pattern?.area;
-	const hasAreaElement = !! area && area !== 'uncategorized';
 	const {
 		areas,
 		label: areaLabel,
@@ -417,13 +423,12 @@ function ReusableBlockEdit( {
 	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
 	const layoutClasses = useLayoutClasses( { layout }, name );
 
-	// In the editor the block always needs a wrapper; on the front end one is
-	// only rendered when `tagName` is an element or the area defines one.
-	// `tagName: "none"` opts out of the area's element.
-	const TagName =
-		tagName === 'none'
-			? 'div'
-			: tagName || ( hasAreaElement && areaTagName ) || 'div';
+	// The wrapper element: the instance's `tagName`, else the area's element,
+	// else a div. In the editor the block always needs one; on the front end
+	// it is only rendered when `hasWrapper` is set. Instances created before
+	// the attribute existed have none, so their markup is unchanged.
+	const defaultTagName = areaTagName || 'div';
+	const TagName = tagName || defaultTagName;
 	const blockProps = useBlockProps( {
 		className: clsx(
 			'block-library-block__reusable-block-container',
@@ -557,32 +562,36 @@ function ReusableBlockEdit( {
 						} )
 					}
 				/>
-				<HTMLElementControl
-					tagName={ tagName || '' }
+				<ToggleControl
+					label={ __( 'Wrapper element' ) }
+					help={ __(
+						'Render the pattern inside an element, like a template part. Patterns inserted before this option existed have none.'
+					) }
+					checked={ !! hasWrapper }
 					onChange={ ( value ) =>
-						setAttributes( { tagName: value || undefined } )
+						setAttributes( { hasWrapper: value || undefined } )
 					}
-					clientId={ clientId }
-					options={ [
-						{
-							label:
-								hasAreaElement && areaTagName
-									? sprintf(
-											/* translators: %s: HTML tag based on area. */
-											__( 'Default based on area (%s)' ),
-											`<${ areaTagName }>`
-									  )
-									: __( 'Default (no wrapper)' ),
-							value: '',
-						},
-						// Opting out of the area's element; without one the
-						// default is already no wrapper.
-						...( hasAreaElement && areaTagName
-							? [ { label: __( 'No wrapper' ), value: 'none' } ]
-							: [] ),
-						...TAG_NAME_OPTIONS,
-					] }
 				/>
+				{ hasWrapper && (
+					<HTMLElementControl
+						tagName={ tagName || '' }
+						onChange={ ( value ) =>
+							setAttributes( { tagName: value || undefined } )
+						}
+						clientId={ clientId }
+						options={ [
+							{
+								label: sprintf(
+									/* translators: %s: HTML tag based on area. */
+									__( 'Default based on area (%s)' ),
+									`<${ defaultTagName }>`
+								),
+								value: '',
+							},
+							...TAG_NAME_OPTIONS,
+						] }
+					/>
+				) }
 			</InspectorControls>
 
 			{ children === null ? (

@@ -50,12 +50,14 @@ export function isPatternSynced( pattern ) {
  * @return {Object} Block object.
  */
 export function createSyncedPatternBlock( pattern ) {
-	return createBlock(
-		'core/block',
-		pattern.type === INSERTER_PATTERN_TYPES.user
+	return createBlock( 'core/block', {
+		...( pattern.type === INSERTER_PATTERN_TYPES.user
 			? { ref: pattern.id }
-			: { slug: pattern.name }
-	);
+			: { slug: pattern.name } ),
+		// New instances render inside an element, like template parts;
+		// instances that predate the attribute keep their markup.
+		hasWrapper: true,
+	} );
 }
 
 export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {

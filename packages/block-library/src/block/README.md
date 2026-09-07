@@ -19,6 +19,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `slug` | `string` | — | — |
 | `tagName` | `string` | — | — |
 | `area` | `string` | — | — |
+| `hasWrapper` | `boolean` | — | — |
 | `content` | `object` | `{}` | — |
 
 ## Supports

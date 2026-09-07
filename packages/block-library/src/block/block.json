@@ -20,6 +20,9 @@
 		"area": {
 			"type": "string"
 		},
+		"hasWrapper": {
+			"type": "boolean"
+		},
 		"content": {
 			"type": "object",
 			"default": {}
