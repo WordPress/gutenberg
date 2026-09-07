@@ -1255,50 +1255,8 @@ describe( 'npm publication verification resumability', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'keeps the scratch ref after git metadata is pushed', async () => {
-		const deletePreparedCommitFn = vi.fn();
-		const pushNpmReleaseGitMetadataFn = vi.fn();
-
-		await publishVersionedPackagesToNpm(
-			{
-				distTag: 'latest',
-				gitWorkingDirectoryPath: '/repo',
-				noVerifyAccessFlag: '--no-verify-access',
-				npmReleaseBranch: 'wp/latest',
-				yesFlag: '--yes',
-			},
-			{
-				commandFn: vi.fn().mockResolvedValue(),
-				deletePreparedCommitFn,
-				getNpmReleasePackagesFn: vi.fn().mockResolvedValue( [
-					{
-						name: '@wordpress/a11y',
-						version: '4.54.0',
-						tagName: 'a',
-					},
-				] ),
-				git: {
-					revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
-					raw: vi.fn().mockResolvedValue( '' ),
-				},
-				pushNpmReleaseGitMetadataFn,
-				pushPreparedCommitFn: vi.fn(),
-				runNpmPublishPreflightFn: vi
-					.fn()
-					.mockResolvedValueOnce( [] )
-					.mockResolvedValueOnce( [ '@wordpress/a11y' ] ),
-				wait: vi.fn(),
-			}
-		);
-
-		expect( pushNpmReleaseGitMetadataFn ).toHaveBeenCalled();
-		expect( deletePreparedCommitFn ).not.toHaveBeenCalled();
-		expect( console ).toHaveLogged();
-	} );
-
 	it( 'resumes finalization when git metadata is already published', async () => {
 		const commandFn = vi.fn().mockResolvedValue();
-		const deletePreparedCommitFn = vi.fn();
 		const publishVersionedPackagesToNpmFn = vi.fn();
 		const git = {
 			checkout: vi.fn(),
@@ -1318,7 +1276,6 @@ describe( 'npm publication verification resumability', () => {
 				},
 				{
 					commandFn,
-					deletePreparedCommitFn,
 					getPreparedCommitFn: vi
 						.fn()
 						.mockResolvedValue( 'prepared-sha' ),
@@ -1343,7 +1300,6 @@ describe( 'npm publication verification resumability', () => {
 			publishCommit: 'prepared-sha',
 		} );
 
-		expect( deletePreparedCommitFn ).not.toHaveBeenCalled();
 		expect( git.checkout ).toHaveBeenCalledWith( 'prepared-sha' );
 		expect( git.fetch ).toHaveBeenCalledWith( 'origin', 'wp/latest' );
 		expect( publishVersionedPackagesToNpmFn ).not.toHaveBeenCalled();
@@ -1702,7 +1658,6 @@ describe( 'prepared release refs', () => {
 			},
 			{
 				commandFn: vi.fn().mockResolvedValue(),
-				deletePreparedCommitFn: vi.fn(),
 				getNpmReleasePackagesFn: vi.fn().mockResolvedValue( [
 					{
 						name: '@wordpress/a11y',
