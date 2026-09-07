@@ -29,7 +29,8 @@ const finalized = new Set< number >();
  * the sub-size metadata collected from the sideloads and returns the attachment
  * as prepared *after* that write, so its `media_details.sizes` is the finished
  * set of generated sizes. Storing that response is what makes the editor's copy
- * of the record current, and it leaves nothing for a refetch to go and get.
+ * of the record current, so `mediaUploadOnSuccess` has nothing left to
+ * invalidate for it.
  *
  * The record is received under both queries the editor resolves attachments
  * with. It is prepared in the `edit` context, which for an attachment carries
