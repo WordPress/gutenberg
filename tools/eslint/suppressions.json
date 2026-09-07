@@ -4650,11 +4650,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/custom-gradient-picker/styles/custom-gradient-picker-styles.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/custom-select-control-v2/styles.ts": {
 		"no-restricted-imports": {
 			"count": 2

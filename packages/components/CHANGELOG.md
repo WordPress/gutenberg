@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `CustomGradientPicker`: Complete the migration to SCSS modules. Consumers that compose source-order-dependent Emotion fragments with `cx()` should pass those fragments in a single `css()` call ([#82576](https://github.com/WordPress/gutenberg/pull/82576)).
+
 ### Enhancements
 
 -   Compound components: Report missing state or accessible semantic structure with clear developer guidance ([#82509](https://github.com/WordPress/gutenberg/pull/82509)).
