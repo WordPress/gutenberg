@@ -1,8 +1,9 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
 import { render, screen } from '@testing-library/react';
-import { forwardRef } from '@wordpress/element';
+import { createPortal, forwardRef, useId } from '@wordpress/element';
 import TreeGrid from '..';
 import TreeGridCell from '../cell';
+import TreeGridRow from '../row';
 
 const TestButton = forwardRef(
 	(
@@ -41,6 +42,48 @@ describe( 'TreeGridCell', () => {
 		);
 
 		expect( screen.getByRole( 'gridcell' ) ).toHaveTextContent( 'Test' );
+	} );
+
+	it( 'accepts a cell explicitly owned by a valid treegrid row', () => {
+		const portalTable = document.createElement( 'table' );
+		const portalBody = document.createElement( 'tbody' );
+		const portalRow = document.createElement( 'tr' );
+		portalRow.setAttribute( 'role', 'presentation' );
+		portalBody.append( portalRow );
+		portalTable.append( portalBody );
+		document.body.append( portalTable );
+
+		function AriaOwnedCell() {
+			const cellId = useId();
+
+			return (
+				<TreeGrid>
+					<TreeGridRow
+						level={ 1 }
+						positionInSet={ 1 }
+						setSize={ 1 }
+						aria-owns={ cellId }
+					>
+						{ createPortal(
+							<TreeGridCell id={ cellId } withoutGridItem>
+								Test
+							</TreeGridCell>,
+							portalRow
+						) }
+					</TreeGridRow>
+				</TreeGrid>
+			);
+		}
+
+		try {
+			render( <AriaOwnedCell /> );
+
+			expect( screen.getByRole( 'gridcell' ) ).toHaveTextContent(
+				'Test'
+			);
+		} finally {
+			portalTable.remove();
+		}
 	} );
 
 	it( 'uses a child render function to render children', () => {

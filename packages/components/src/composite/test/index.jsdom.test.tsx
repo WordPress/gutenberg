@@ -710,7 +710,7 @@ describe( 'Composite', () => {
 				screen.getByRole( 'button', { name: 'Item' } )
 			).toBeVisible();
 			expect( console ).toHaveWarnedWith(
-				'Composite.Item: Missing composite state. Render inside Composite or provide a store prop to enable composite keyboard behavior.'
+				'Composite.Item: Missing composite state. Render inside Composite to enable composite keyboard behavior.'
 			);
 		} );
 

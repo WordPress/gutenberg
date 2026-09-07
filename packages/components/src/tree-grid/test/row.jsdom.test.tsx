@@ -1,6 +1,8 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import { createPortal, useId } from '@wordpress/element';
 import TreeGridRow from '../row';
+import TreeGrid from '..';
 
 describe( 'TreeGridRow', () => {
 	it( 'throws outside a treegrid', () => {
@@ -22,6 +24,41 @@ describe( 'TreeGridRow', () => {
 			'TreeGridRow must be rendered inside an element with role="treegrid".'
 		);
 		expect( console ).toHaveErrored();
+	} );
+
+	it( 'accepts a row explicitly owned by the treegrid', () => {
+		const portalTable = document.createElement( 'table' );
+		const portalBody = document.createElement( 'tbody' );
+		portalTable.append( portalBody );
+		document.body.append( portalTable );
+
+		function AriaOwnedRow() {
+			const rowId = useId();
+
+			return (
+				<TreeGrid aria-owns={ rowId }>
+					{ createPortal(
+						<TreeGridRow
+							id={ rowId }
+							level={ 1 }
+							positionInSet={ 1 }
+							setSize={ 1 }
+						>
+							<td>Test</td>
+						</TreeGridRow>,
+						portalBody
+					) }
+				</TreeGrid>
+			);
+		}
+
+		try {
+			render( <AriaOwnedRow /> );
+
+			expect( screen.getByRole( 'row' ) ).toHaveTextContent( 'Test' );
+		} finally {
+			portalTable.remove();
+		}
 	} );
 
 	it( 'renders a tr with support for level, positionInSet and setSize props', () => {
