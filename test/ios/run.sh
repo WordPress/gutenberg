@@ -14,6 +14,23 @@ cd "$( dirname "$0" )/../.."
 PORT="${WP_PORT:-9400}"
 export WP_BASE_URL="http://127.0.0.1:${PORT}"
 
+# A booted iPhone if there is one, otherwise any available iPhone.
+UDID="${SIMULATOR_UDID:-$( xcrun simctl list devices available -j | python3 -c '
+import json, sys
+runtimes = json.load( sys.stdin )[ "devices" ]
+phones = [
+	device
+	for runtime, devices in runtimes.items() if ".iOS-" in runtime
+	for device in devices if device[ "name" ].startswith( "iPhone" )
+]
+booted = [ device for device in phones if device[ "state" ] == "Booted" ]
+print( ( booted or phones )[ -1 ][ "udid" ] )
+' )}"
+step "Booting simulator $UDID"
+# The boot goes on in the background while WordPress starts.
+# The software keyboard only shows without a hardware keyboard.
+defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool false
+xcrun simctl boot "$UDID" 2>/dev/null || true
 # WordPress runs in Playground: PHP compiled to WebAssembly, no Docker.
 step "Starting WordPress"
 npx --yes @wp-playground/cli@3.1.53 server \
@@ -35,22 +52,7 @@ curl -sf -o /dev/null "$WP_BASE_URL/" || { echo "WordPress did not start"; exit 
 step "Loading the editor once"
 curl -sL -o /dev/null -c /dev/null "$WP_BASE_URL/wp-admin/post-new.php"
 
-# A booted iPhone if there is one, otherwise any available iPhone.
-UDID="${SIMULATOR_UDID:-$( xcrun simctl list devices available -j | python3 -c '
-import json, sys
-runtimes = json.load( sys.stdin )[ "devices" ]
-phones = [
-	device
-	for runtime, devices in runtimes.items() if ".iOS-" in runtime
-	for device in devices if device[ "name" ].startswith( "iPhone" )
-]
-booted = [ device for device in phones if device[ "state" ] == "Booted" ]
-print( ( booted or phones )[ -1 ][ "udid" ] )
-' )}"
-step "Booting simulator $UDID"
-# The software keyboard only shows without a hardware keyboard.
-defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool false
-xcrun simctl boot "$UDID" 2>/dev/null || true
+step "Waiting for the simulator"
 xcrun simctl bootstatus "$UDID" -b
 # Playground logs a browser in once and remembers that in a cookie, which
 # outlives the server: start Safari without cookies from an earlier run.
@@ -58,6 +60,7 @@ xcrun simctl terminate "$UDID" com.apple.mobilesafari 2>/dev/null || true
 SAFARI_DATA=$( xcrun simctl get_app_container "$UDID" com.apple.mobilesafari data )
 rm -f "$SAFARI_DATA"/Library/Cookies/*.binarycookies
 
+xcodebuild -version
 step "Generating the Xcode project"
 ( cd test/ios && xcodegen generate --quiet )
 step "Building and running the tests"
