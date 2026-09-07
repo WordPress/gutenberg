@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { DashboardLanes } from '..';
 
 class MockResizeObserver {
@@ -17,13 +18,13 @@ class MockResizeObserver {
 let originalResizeObserver: typeof ResizeObserver;
 
 beforeEach( () => {
-	originalResizeObserver = global.ResizeObserver;
-	( global as unknown as { ResizeObserver: unknown } ).ResizeObserver =
+	originalResizeObserver = globalThis.ResizeObserver;
+	( globalThis as unknown as { ResizeObserver: unknown } ).ResizeObserver =
 		MockResizeObserver;
 } );
 
 afterEach( () => {
-	( global as unknown as { ResizeObserver: unknown } ).ResizeObserver =
+	( globalThis as unknown as { ResizeObserver: unknown } ).ResizeObserver =
 		originalResizeObserver;
 } );
 

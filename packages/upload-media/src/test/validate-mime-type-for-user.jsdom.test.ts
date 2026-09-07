@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { UploadError } from '../upload-error';
 
@@ -7,7 +8,7 @@ const imageFile = new window.File( [ 'fake_file' ], 'test.jpeg', {
 
 describe( 'validateMimeTypeForUser', () => {
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'should not error if  wpAllowedMimeTypes is null or missing', async () => {
