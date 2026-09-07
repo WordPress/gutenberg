@@ -28,27 +28,27 @@
 	/* Background color for surfaces with strong emphasis. */
 	--wpds-color-background-surface-neutral-strong: #fff;
 	/* Background color for surfaces with weak emphasis. */
-	--wpds-color-background-surface-neutral-weak: #f4f4f4;
+	--wpds-color-background-surface-neutral-weak: #f7f7f7;
 	/* Background color for surfaces with brand tone and normal emphasis. */
-	--wpds-color-background-surface-brand: #ebf0fb;
+	--wpds-color-background-surface-brand: #ecf1fc;
 	/* Background color for surfaces with success tone and normal emphasis. */
-	--wpds-color-background-surface-success: #ccf4d2;
+	--wpds-color-background-surface-success: #cef6d4;
 	/* Background color for surfaces with success tone and weak emphasis. */
 	--wpds-color-background-surface-success-weak: #f8f8f8;
 	/* Background color for surfaces with info tone and normal emphasis. */
-	--wpds-color-background-surface-info: #e0ebf8;
+	--wpds-color-background-surface-info: #e2edfa;
 	/* Background color for surfaces with info tone and weak emphasis. */
 	--wpds-color-background-surface-info-weak: #f8f8f8;
 	/* Background color for surfaces with warning tone and normal emphasis. */
-	--wpds-color-background-surface-warning: #fae8c8;
+	--wpds-color-background-surface-warning: #fceac9;
 	/* Background color for surfaces with warning tone and weak emphasis. */
 	--wpds-color-background-surface-warning-weak: #f8f8f8;
 	/* Background color for surfaces with caution tone and normal emphasis. */
-	--wpds-color-background-surface-caution: #ffea8f;
+	--wpds-color-background-surface-caution: #ffec91;
 	/* Background color for surfaces with caution tone and weak emphasis. */
 	--wpds-color-background-surface-caution-weak: #f8f8f8;
 	/* Background color for surfaces with error tone and normal emphasis. */
-	--wpds-color-background-surface-error: #f7e6e3;
+	--wpds-color-background-surface-error: #f9e8e5;
 	/* Background color for surfaces with error tone and weak emphasis. */
 	--wpds-color-background-surface-error-weak: #f8f8f8;
 	/* Solid background color for neutral interactive controls, such as input fields and unchecked checkboxes. */
@@ -62,11 +62,11 @@
 	/* Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active. */
 	--wpds-color-background-interactive-neutral-strong-active: #1e1e1e;
 	/* Background color for interactive elements with neutral tone and strong emphasis, in their disabled state. */
-	--wpds-color-background-interactive-neutral-strong-disabled: #e6e6e6;
+	--wpds-color-background-interactive-neutral-strong-disabled: #e3e3e3;
 	/* Background color for interactive elements with neutral tone and weak emphasis. */
 	--wpds-color-background-interactive-neutral-weak: #0000;
 	/* Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active. */
-	--wpds-color-background-interactive-neutral-weak-active: #ededed;
+	--wpds-color-background-interactive-neutral-weak-active: #efefef;
 	/* Background color for interactive elements with neutral tone and weak emphasis, in their disabled state. */
 	--wpds-color-background-interactive-neutral-weak-disabled: #0000;
 	/* Background color for interactive elements with brand tone and strong emphasis. */
@@ -74,11 +74,11 @@
 	/* Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active. */
 	--wpds-color-background-interactive-brand-strong-active: #2e49d9;
 	/* Background color for interactive elements with brand tone and strong emphasis, in their disabled state. */
-	--wpds-color-background-interactive-brand-strong-disabled: #e6e6e6;
+	--wpds-color-background-interactive-brand-strong-disabled: #e3e3e3;
 	/* Background color for interactive elements with brand tone and weak emphasis. */
 	--wpds-color-background-interactive-brand-weak: #0000;
 	/* Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active. */
-	--wpds-color-background-interactive-brand-weak-active: #e6eaf5;
+	--wpds-color-background-interactive-brand-weak-active: #e7ebf6;
 	/* Background color for interactive elements with brand tone and weak emphasis, in their disabled state. */
 	--wpds-color-background-interactive-brand-weak-disabled: #0000;
 	/* Background color for interactive elements with error tone and normal emphasis. */
@@ -92,11 +92,11 @@
 	/* Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active. */
 	--wpds-color-background-interactive-error-strong-active: #b90000;
 	/* Background color for interactive elements with error tone and strong emphasis, in their disabled state. */
-	--wpds-color-background-interactive-error-strong-disabled: #e6e6e6;
+	--wpds-color-background-interactive-error-strong-disabled: #e3e3e3;
 	/* Background color for interactive elements with error tone and weak emphasis. */
 	--wpds-color-background-interactive-error-weak: #0000;
 	/* Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active. */
-	--wpds-color-background-interactive-error-weak-active: #f7e6e3;
+	--wpds-color-background-interactive-error-weak-active: #f9e8e5;
 	/* Background color for interactive elements with error tone and weak emphasis, in their disabled state. */
 	--wpds-color-background-interactive-error-weak-disabled: #0000;
 	/* Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track). */

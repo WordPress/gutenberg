@@ -6,6 +6,7 @@ import {
 	getColorString,
 } from './color-utils.ts';
 import { findColorMeetingRequirements } from './find-color-with-constraints.ts';
+import { buildPerceptualSteps } from './build-perceptual-steps.ts';
 import {
 	sortByDependency,
 	computeBetterFgColorDirection,
@@ -198,6 +199,7 @@ export function buildRamp(
 	{
 		mainDirection,
 		pinLightness,
+		backgroundRamp,
 		rescaleToFitContrastTargets = true,
 	}: {
 		mainDirection?: RampDirection;
@@ -205,6 +207,7 @@ export function buildRamp(
 			stepName: keyof Ramp;
 			value: number;
 		};
+		backgroundRamp?: RampResult;
 		rescaleToFitContrastTargets?: boolean;
 	} = {}
 ): RampResult {
@@ -321,9 +324,12 @@ export function buildRamp(
 		bestRamp.surface3 = tmpSurface1;
 	}
 
-	return {
-		ramp: bestRamp,
-		warnings: bestWarnings,
-		direction: mainDir,
-	};
+	return buildPerceptualSteps(
+		{
+			ramp: bestRamp,
+			warnings: bestWarnings,
+			direction: mainDir,
+		},
+		backgroundRamp
+	);
 }
