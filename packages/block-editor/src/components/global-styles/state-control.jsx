@@ -16,6 +16,7 @@ import { Stack } from '@wordpress/ui';
  * @param {Function} props.onChangePseudoState Callback when pseudo state selection changes.
  * @param {boolean}  props.showText            Whether to show text label on the toggle. Default true.
  * @param {Object}   props.popoverProps        Popover props for the dropdown menu.
+ * @param {Element}  props.children            Optional menu content rendered after the state groups.
  * @return {Element|null} State control component.
  */
 export default function StateControl( {
@@ -27,6 +28,7 @@ export default function StateControl( {
 	onChangePseudoState,
 	showText = true,
 	popoverProps = {},
+	children,
 } ) {
 	if ( ! viewportStates.length && ! pseudoStates.length ) {
 		return null;
@@ -111,19 +113,16 @@ export default function StateControl( {
 				text={ showText ? triggerLabel : undefined }
 				toggleProps={ toggleProps }
 			>
-				{ ( { onClose } ) => (
+				{ () => (
 					<>
 						{ hasViewportOptions && (
 							<MenuGroup label={ __( 'Viewport' ) }>
 								{ viewportOptions.map( ( option ) => (
 									<MenuItem
 										key={ `viewport-${ option.value }` }
-										onClick={ () => {
-											onChangeViewport?.( option.value );
-											if ( ! hasPseudoStateOptions ) {
-												onClose();
-											}
-										} }
+										onClick={ () =>
+											onChangeViewport?.( option.value )
+										}
 										icon={
 											viewportValue === option.value
 												? check
@@ -140,14 +139,11 @@ export default function StateControl( {
 								{ pseudoStateOptions.map( ( option ) => (
 									<MenuItem
 										key={ `pseudo-${ option.value }` }
-										onClick={ () => {
+										onClick={ () =>
 											onChangePseudoState?.(
 												option.value
-											);
-											if ( ! hasViewportOptions ) {
-												onClose();
-											}
-										} }
+											)
+										}
 										icon={
 											pseudoStateValue === option.value
 												? check
@@ -159,6 +155,7 @@ export default function StateControl( {
 								) ) }
 							</MenuGroup>
 						) }
+						{ children }
 					</>
 				) }
 			</DropdownMenu>
