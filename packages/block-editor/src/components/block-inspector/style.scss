@@ -51,6 +51,31 @@
 	text-align: center;
 }
 
+// Style state badges pin below the tabs header when scrolled past.
+// Scoped to complementary-area contexts (post editor, site editor, widgets
+// editor), which provide the scroll container and the sticky tabs header.
+// The Customizer portals the inspector elsewhere.
+.interface-complementary-area .block-editor-block-inspector__sticky-badges {
+	position: sticky;
+	// Overlap the tabs header by a pixel so no seam can open up.
+	top: calc(#{$panel-header-height} - #{$border-width});
+	// Above in-panel controls (which use z-index 1–2), below the sticky
+	// tabs header.
+	z-index: 3;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: $grid-unit-10;
+	background: $white;
+	border-bottom: $border-width solid $gray-200;
+	// Merge with the following panel's own border-top into a single line.
+	margin-bottom: -$border-width;
+}
+
+.block-editor-block-inspector__sticky-badges-label {
+	white-space: nowrap;
+}
+
 .block-editor-block-inspector__no-block-tools {
 	border-top: $border-width solid $gray-300;
 }

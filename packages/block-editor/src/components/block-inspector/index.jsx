@@ -11,6 +11,7 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
+import { Text } from '@wordpress/ui';
 import EditContents from './edit-contents';
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
@@ -473,15 +474,29 @@ const BlockInspectorSingleBlock = ( {
 					)
 				}
 			/>
-			{ blockEditingMode === 'default' && isEditingStyleState && (
-				<Spacer paddingX={ 4 } paddingY={ 2 }>
-					{ hasPseudoState && (
+			{ blockEditingMode === 'default' &&
+				isEditingStyleState &&
+				hasPseudoState && (
+					<Spacer paddingX={ 4 } paddingY={ 2 }>
 						<ToggleControl
 							label={ __( 'Show state on canvas' ) }
 							checked={ showStateOnCanvas }
 							onChange={ onShowStateOnCanvasChange }
 						/>
-					) }
+					</Spacer>
+				) }
+			{ blockEditingMode === 'default' && isEditingStyleState && (
+				<Spacer
+					className="block-editor-block-inspector__sticky-badges"
+					paddingX={ 4 }
+					paddingY={ 2 }
+				>
+					<Text
+						variant="body-sm"
+						className="block-editor-block-inspector__sticky-badges-label"
+					>
+						{ __( 'Editing:' ) }
+					</Text>
 					<BlockStateBadges
 						name={ blockName }
 						value={ selectedBlockStyleState }
