@@ -56,6 +56,7 @@
 
 ### Internal
 
+-   Declare the dependencies imported by the `./wp` bundle (`build-wp/index.js`) so they resolve without relying on hoisting. ([#81843](https://github.com/WordPress/gutenberg/pull/81843))
 -   DataViews: Use `Menu.PrefixIcon` for table column menu icons. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
 -   DataForm date control: Space `ValidityIndicator` with `Stack` now that the indicator has no outer margin. ([#82267](https://github.com/WordPress/gutenberg/pull/82267))
 -   Add a `HierarchicalLevels` story that demonstrates `getItemLevel` and `view.showLevels` in the table layout ([#82344](https://github.com/WordPress/gutenberg/pull/82344)).
