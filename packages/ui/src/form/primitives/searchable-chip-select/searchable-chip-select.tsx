@@ -30,6 +30,7 @@ export const SearchableChipSelect = forwardRef<
 		children,
 		disabled,
 		emptyContent = __( 'No results found.' ),
+		statusContent,
 		items,
 		chipsContent,
 		searchPlaceholder = __( 'Search' ),
@@ -123,6 +124,7 @@ export const SearchableChipSelect = forwardRef<
 			</Combobox.InputGroup>
 
 			<Combobox.Popup width={ popupWidth }>
+				<Combobox.Status>{ statusContent }</Combobox.Status>
 				<Combobox.Empty>{ emptyContent }</Combobox.Empty>
 				<Combobox.List>
 					<Combobox.ListBody>

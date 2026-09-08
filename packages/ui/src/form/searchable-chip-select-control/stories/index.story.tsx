@@ -186,6 +186,14 @@ export const WithCustomEmptyContent: Story = {
 	},
 };
 
+export const WithStatusContent: Story = {
+	...SearchableChipSelectStories.WithStatusContent,
+	args: {
+		...Default.args,
+		...SearchableChipSelectStories.WithStatusContent.args,
+	},
+};
+
 export const WithoutClearButton: Story = {
 	...SearchableChipSelectStories.WithoutClearButton,
 	args: {

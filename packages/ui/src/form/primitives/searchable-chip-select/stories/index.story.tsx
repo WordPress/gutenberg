@@ -93,6 +93,18 @@ export const WithCustomEmptyContent: Story = {
 };
 
 /**
+ * Use `statusContent` for async list status, such as loading.
+ * The status region stays mounted. Pass `null` when there is
+ * nothing to announce. Use `emptyContent` for the empty list.
+ */
+export const WithStatusContent: Story = {
+	args: {
+		...Default.args,
+		statusContent: 'Loading…',
+	},
+};
+
+/**
  * To render grouped items, pass an array of groups to `items` (each with
  * `label` and `items` properties) and provide `children` that renders each
  * group using `SearchableChipSelect.Group`, `SearchableChipSelect.GroupLabel`,
