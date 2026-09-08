@@ -5,7 +5,6 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import {
-	ToggleControl,
 	__experimentalSpacer as Spacer,
 	__unstableMotion as motion,
 } from '@wordpress/components';
@@ -420,7 +419,6 @@ const BlockInspectorSingleBlock = ( {
 } ) => {
 	const listViewRef = useRef( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
-	const hasPseudoState = hasPseudoBlockStyleState( selectedBlockStyleState );
 	const isEditingStyleState =
 		( hasViewportBlockStyleState( selectedBlockStyleState ) &&
 			isResponsiveEditing ) ||
@@ -470,21 +468,14 @@ const BlockInspectorSingleBlock = ( {
 							name={ blockName }
 							value={ selectedBlockStyleState }
 							onChange={ onBlockStyleStateChange }
+							canvasPreview={ {
+								checked: showStateOnCanvas,
+								onChange: onShowStateOnCanvasChange,
+							} }
 						/>
 					)
 				}
 			/>
-			{ blockEditingMode === 'default' &&
-				isEditingStyleState &&
-				hasPseudoState && (
-					<Spacer paddingX={ 4 } paddingY={ 2 }>
-						<ToggleControl
-							label={ __( 'Show state on canvas' ) }
-							checked={ showStateOnCanvas }
-							onChange={ onShowStateOnCanvasChange }
-						/>
-					</Spacer>
-				) }
 			{ blockEditingMode === 'default' && isEditingStyleState && (
 				<Spacer
 					className="block-editor-block-inspector__sticky-badges"
