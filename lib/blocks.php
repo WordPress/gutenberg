@@ -40,18 +40,12 @@ function gutenberg_reregister_core_block_types() {
 
 add_action( 'init', 'gutenberg_reregister_core_block_types' );
 
-/**
- * Removes the core/tabs context filter that WordPress Core registers, leaving
- * the plugin's own copy as the only one.
- *
- * Both callbacks generate a tabs ID, so keeping core's makes the `tabs_`
- * counter skip a number for every tabs block rendered.
+/*
+ * Remove the WordPress core filter to avoid generating a second tabs ID for
+ * every tabs block: `wp_unique_prefixed_id()` advances a counter, so running
+ * both copies makes the numbering skip.
  */
-function gutenberg_remove_core_tabs_context_filter() {
-	remove_filter( 'render_block_context', 'block_core_tabs_provide_context', 10 );
-}
-
-add_action( 'init', 'gutenberg_remove_core_tabs_context_filter' );
+remove_filter( 'render_block_context', 'block_core_tabs_provide_context', 10 );
 
 /**
  * Adds the defer loading strategy to all registered blocks.
