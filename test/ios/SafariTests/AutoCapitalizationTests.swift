@@ -42,15 +42,19 @@ final class AutoCapitalizationTests: XCTestCase {
 	/// Taps the letters as given, without touching shift: the keyboard's own
 	/// state decides the case that lands in the field.
 	func type( _ word: String ) {
+		if key( "letters" ).exists {
+			key( "letters" ).tap()
+		}
 		for letter in word {
 			key( String( letter ) ).tap()
 		}
 	}
 
-	/// Waits until the field with the keyboard is the one with this
+	/// Waits until the field with the keyboard is an empty one with this
 	/// aria-label.
 	func waitForFocus( on label: String, _ message: String ) {
-		let matches = NSPredicate( format: "label == %@", label )
+		// An empty field holds nothing or the padding character.
+		let matches = NSPredicate( format: "label == %@ AND value.length < 2", label )
 		let done = XCTNSPredicateExpectation( predicate: matches, object: focusedField )
 		XCTAssertEqual( XCTWaiter.wait( for: [ done ], timeout: 10 ), .completed, message )
 	}
@@ -97,6 +101,28 @@ final class AutoCapitalizationTests: XCTestCase {
 			"Return did not focus a new empty paragraph"
 		)
 		assertCapitalized( "The paragraph after Return should start capitalized" )
+
+		// A list item splits differently from a paragraph. Turn this paragraph
+		// into a list with the "- " prefix; the dash is on the numbers layout.
+		key( "numbers" ).tap()
+		key( "-" ).tap()
+		key( " " ).tap()
+		waitForFocus( on: "List text", "The prefix did not turn the paragraph into a list" )
+		type( "one" )
+		XCTAssertEqual( ( focusedField.value as? String )?.lowercased(), "one" )
+
+		key( "return" ).tap()
+		waitForFocus( on: "List text", "Return did not focus a new list item" )
+		assertCapitalized( "The list item after Return should start capitalized" )
+
+		// Return on an empty list item ends the list with a paragraph, a
+		// separate handler in the list item block.
+		key( "return" ).tap()
+		waitForFocus(
+			on: "Empty block; start writing or type forward slash to choose a block",
+			"Return on the empty list item did not focus a paragraph after the list"
+		)
+		assertCapitalized( "The paragraph after the list should start capitalized" )
 
 		// The earlier fields kept their text.
 		XCTAssertEqual( web.textViews[ "Add title" ].value as? String, "Title" )
