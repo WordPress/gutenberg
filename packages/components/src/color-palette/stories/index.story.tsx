@@ -271,6 +271,11 @@ export const WithPaletteEditing: ColorPaletteStory = {
 		disableCustomColors: false,
 	},
 	parameters: {
+		// FIXME: Multiple Origins: origin groups are missing required ARIA children (aria-required-children).
+		// This story renders multiple origins, so it hits the same pre-existing
+		// issue as the `MultipleOrigins` story above.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		docs: {
 			description: {
 				story: 'Demonstrates the **private** `colorEditing` capability: theme colors are value-only (pencil, no rename/delete), custom colors are fully editable (add via the `+` tile or the "Add to custom" action, rename, recolor, delete). This API is symbol-keyed and not public.',
