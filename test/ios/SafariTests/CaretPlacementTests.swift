@@ -64,9 +64,29 @@ final class CaretPlacementTests: SafariTestCase {
 	/// selection rather than a scroll. Scrolling back up returns to the top,
 	/// where it clamps, so the paragraph stays put over many attempts.
 	func scrollBesideTheText() {
-		let start = besideTheText()
+		// Anchored to the web view rather than to the paragraph, which stops
+		// being an element the moment this goes wrong: a coordinate taken
+		// from it would then raise instead of letting the check below report
+		// what the editor is left exposing.
+		let text = paragraph.frame
+		let canvas = web.frame
+		let start = web.coordinate( withNormalizedOffset: .zero )
+			.withOffset( CGVector( dx: text.minX - canvas.minX - 24, dy: text.midY - canvas.minY ) )
 		start.press( forDuration: 0.05, thenDragTo: start.withOffset( CGVector( dx: 0, dy: -120 ) ) )
 		start.press( forDuration: 0.05, thenDragTo: start.withOffset( CGVector( dx: 0, dy: 120 ) ) )
+	}
+
+	/// The blocks must stay editable fields. When the reported bug strikes,
+	/// the text is still on screen but nothing in the canvas takes a caret,
+	/// so a field that is gone is the finding, not an error reading it.
+	func assertTheParagraphsAreFields( _ when: String ) {
+		XCTAssertTrue(
+			paragraph.waitForExistence( timeout: 30 ),
+			"""
+			No paragraph is an editable field \( when ). \
+			The editor exposes: \( fieldLabels ).
+			"""
+		)
 	}
 
 	/// A point level with the first paragraph but just outside its text
@@ -145,7 +165,9 @@ final class CaretPlacementTests: SafariTestCase {
 		openSeededPost( scrollPost )
 
 		for attempt in 1...attempts {
+			assertTheParagraphsAreFields( "before the scroll on attempt \( attempt )" )
 			scrollBesideTheText()
+			assertTheParagraphsAreFields( "after the scroll on attempt \( attempt )" )
 			assertTheParagraphTakesTheCaret( attempt )
 		}
 	}
