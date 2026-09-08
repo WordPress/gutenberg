@@ -47,8 +47,11 @@ const backdropBorderColor = ( {
 	return COLORS.ui.border;
 };
 
-const backdropDisabledStyles = ( { disabled }: BackdropProps ) => {
-	if ( ! disabled ) {
+const backdropDisabledStyles = ( {
+	disabled,
+	isBorderless,
+}: BackdropProps ) => {
+	if ( ! disabled || isBorderless ) {
 		return undefined;
 	}
 
