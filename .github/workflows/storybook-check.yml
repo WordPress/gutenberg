@@ -41,6 +41,9 @@ jobs:
                   NODE_ENV: test
               run: npm run storybook:build
 
+            - name: Validate Storybook sidebar roots
+              run: npm run test:unit:vitest -- storybook/test/root-folders.test.ts
+
             - name: Validate manifest matches design-system-mcp contract
               run: node packages/design-system-mcp/scripts/validate-manifest.mjs
 
