@@ -671,7 +671,7 @@ describe( 'DataForm component', () => {
 						},
 					] }
 					form={ {
-						layout: { type: 'panel', empty: 'placeholder' },
+						layout: { type: 'panel', showPlaceholderIfEmpty: true },
 						fields: [ 'title' ],
 					} }
 					data={ { title: '' } }
@@ -694,7 +694,7 @@ describe( 'DataForm component', () => {
 						},
 					] }
 					form={ {
-						layout: { type: 'panel', empty: 'placeholder' },
+						layout: { type: 'panel', showPlaceholderIfEmpty: true },
 						fields: [ 'title' ],
 					} }
 					data={ { title: 'Hello World' } }
@@ -720,7 +720,7 @@ describe( 'DataForm component', () => {
 						},
 					] }
 					form={ {
-						layout: { type: 'panel', empty: 'placeholder' },
+						layout: { type: 'panel', showPlaceholderIfEmpty: true },
 						fields: [ 'title' ],
 					} }
 					data={ { title: '' } }

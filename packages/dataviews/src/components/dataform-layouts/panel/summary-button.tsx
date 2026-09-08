@@ -16,16 +16,16 @@ import getFirstValidationError from './utils/get-first-validation-error';
 function SummaryValue< Item >( {
 	item,
 	field,
-	showPlaceholder,
+	showPlaceholderIfEmpty,
 }: {
 	item: Item;
 	field: NormalizedField< Item >;
-	showPlaceholder: boolean;
+	showPlaceholderIfEmpty: boolean;
 } ) {
 	// The same notion of empty as the `required` validator: a field whose
 	// empty value differs (an id of `0`, an object) normalizes it in `getValue`.
 	if (
-		showPlaceholder &&
+		showPlaceholderIfEmpty &&
 		field.placeholder &&
 		[ undefined, null, '' ].includes( field.getValue( { item } ) )
 	) {
@@ -60,9 +60,8 @@ export default function SummaryButton< Item >( {
 	isOpen: boolean;
 	onClick: () => void;
 } ) {
-	const { labelPosition, editVisibility, empty } =
+	const { labelPosition, editVisibility, showPlaceholderIfEmpty } =
 		field.layout as NormalizedPanelLayout;
-	const showPlaceholder = empty === 'placeholder';
 	const errorMessage = getFirstValidationError( validity );
 	const showError = touched && !! errorMessage;
 	const labelClassName = getLabelClassName( labelPosition, showError );
@@ -136,7 +135,9 @@ export default function SummaryButton< Item >( {
 								<SummaryValue
 									item={ data }
 									field={ summaryField }
-									showPlaceholder={ showPlaceholder }
+									showPlaceholderIfEmpty={
+										showPlaceholderIfEmpty
+									}
 								/>
 							</span>
 						) ) }
@@ -147,7 +148,7 @@ export default function SummaryButton< Item >( {
 							key={ summaryField.id }
 							item={ data }
 							field={ summaryField }
-							showPlaceholder={ showPlaceholder }
+							showPlaceholderIfEmpty={ showPlaceholderIfEmpty }
 						/>
 					) )
 				) }

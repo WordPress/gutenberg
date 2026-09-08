@@ -6,7 +6,6 @@ import type {
 	Layout,
 	PanelLayout,
 	EditVisibility,
-	EmptySummary,
 } from '../../types';
 
 type SamplePost = {
@@ -274,13 +273,13 @@ const getPanelLayoutFromStoryArgs = ( {
 	labelPosition,
 	openAs,
 	editVisibility,
-	empty,
+	showPlaceholderIfEmpty,
 }: {
 	summary?: string[];
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
 	openAs?: PanelLayout[ 'openAs' ];
 	editVisibility?: 'default' | EditVisibility;
-	empty?: 'default' | EmptySummary;
+	showPlaceholderIfEmpty?: boolean;
 } ): Layout | undefined => {
 	const panelLayout: PanelLayout = {
 		type: 'panel',
@@ -302,8 +301,8 @@ const getPanelLayoutFromStoryArgs = ( {
 		panelLayout.editVisibility = editVisibility;
 	}
 
-	if ( empty !== 'default' ) {
-		panelLayout.empty = empty;
+	if ( showPlaceholderIfEmpty ) {
+		panelLayout.showPlaceholderIfEmpty = true;
 	}
 
 	return panelLayout;
@@ -313,7 +312,7 @@ const LayoutPanelComponent = ( {
 	labelPosition,
 	openAs: openAsArg,
 	editVisibility,
-	empty,
+	showPlaceholderIfEmpty,
 	applyLabel,
 	cancelLabel,
 }: {
@@ -321,7 +320,7 @@ const LayoutPanelComponent = ( {
 	labelPosition: 'default' | 'top' | 'side' | 'none';
 	openAs: 'default' | 'dropdown' | 'modal';
 	editVisibility: 'default' | EditVisibility;
-	empty: 'default' | EmptySummary;
+	showPlaceholderIfEmpty: boolean;
 	applyLabel?: string;
 	cancelLabel?: string;
 } ) => {
@@ -366,7 +365,7 @@ const LayoutPanelComponent = ( {
 				labelPosition,
 				openAs,
 				editVisibility,
-				empty,
+				showPlaceholderIfEmpty,
 			} ),
 			fields: [
 				'title',
@@ -379,7 +378,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
-						empty,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 				'order',
@@ -397,7 +396,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
-						empty,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 				{
@@ -409,7 +408,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
-						empty,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 				{
@@ -426,7 +425,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
-						empty,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 				{
@@ -438,7 +437,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
-						empty,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 			],
@@ -449,7 +448,7 @@ const LayoutPanelComponent = ( {
 		applyLabel,
 		cancelLabel,
 		editVisibility,
-		empty,
+		showPlaceholderIfEmpty,
 	] );
 
 	return (

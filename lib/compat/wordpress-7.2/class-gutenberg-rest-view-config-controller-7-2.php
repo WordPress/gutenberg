@@ -10,7 +10,8 @@
  * view configuration for a given entity type.
  *
  * Extends the 7.1 controller to describe the table column styles in the
- * item schema and to add the `empty` option of the panel form layout.
+ * item schema and to add the `showPlaceholderIfEmpty` option of the panel
+ * form layout.
  *
  * @since 7.2.0
  *
@@ -54,7 +55,7 @@ class Gutenberg_REST_View_Config_Controller_7_2 extends Gutenberg_REST_View_Conf
 	/**
 	 * Returns the schema for a form layout object.
 	 *
-	 * @since 7.2.0 Added the `empty` property to the panel layout.
+	 * @since 7.2.0 Added the `showPlaceholderIfEmpty` property to the panel layout.
 	 *
 	 * @return array Schema for a form layout object.
 	 */
@@ -63,9 +64,8 @@ class Gutenberg_REST_View_Config_Controller_7_2 extends Gutenberg_REST_View_Conf
 
 		foreach ( $schema['oneOf'] as $index => $layout ) {
 			if ( array( 'panel' ) === $layout['properties']['type']['enum'] ) {
-				$schema['oneOf'][ $index ]['properties']['empty'] = array(
-					'type' => 'string',
-					'enum' => array( 'render', 'placeholder' ),
+				$schema['oneOf'][ $index ]['properties']['showPlaceholderIfEmpty'] = array(
+					'type' => 'boolean',
 				);
 			}
 		}

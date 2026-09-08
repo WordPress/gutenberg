@@ -138,7 +138,7 @@ describe( 'normalizeFormFields', () => {
 					openAs: { type: 'dropdown' },
 					summary: [],
 					editVisibility: 'on-hover',
-					empty: 'render',
+					showPlaceholderIfEmpty: false,
 				},
 				fields: [
 					{
@@ -149,7 +149,7 @@ describe( 'normalizeFormFields', () => {
 							openAs: { type: 'dropdown' },
 							summary: [],
 							editVisibility: 'on-hover',
-							empty: 'render',
+							showPlaceholderIfEmpty: false,
 						},
 					},
 				],
@@ -169,7 +169,7 @@ describe( 'normalizeFormFields', () => {
 					openAs: { type: 'dropdown' },
 					summary: [],
 					editVisibility: 'on-hover',
-					empty: 'render',
+					showPlaceholderIfEmpty: false,
 				},
 				fields: [
 					{
@@ -180,7 +180,7 @@ describe( 'normalizeFormFields', () => {
 							openAs: { type: 'dropdown' },
 							summary: [],
 							editVisibility: 'on-hover',
-							empty: 'render',
+							showPlaceholderIfEmpty: false,
 						},
 					},
 				],
@@ -203,7 +203,7 @@ describe( 'normalizeFormFields', () => {
 				},
 				summary: [],
 				editVisibility: 'on-hover',
-				empty: 'render',
+				showPlaceholderIfEmpty: false,
 			} );
 		} );
 
@@ -230,7 +230,7 @@ describe( 'normalizeFormFields', () => {
 				},
 				summary: [],
 				editVisibility: 'on-hover',
-				empty: 'render',
+				showPlaceholderIfEmpty: false,
 			} );
 		} );
 
@@ -253,7 +253,7 @@ describe( 'normalizeFormFields', () => {
 				},
 				summary: [],
 				editVisibility: 'on-hover',
-				empty: 'render',
+				showPlaceholderIfEmpty: false,
 			} );
 		} );
 
@@ -280,7 +280,7 @@ describe( 'normalizeFormFields', () => {
 				},
 				summary: [],
 				editVisibility: 'on-hover',
-				empty: 'render',
+				showPlaceholderIfEmpty: false,
 			} );
 		} );
 
@@ -460,7 +460,7 @@ describe( 'normalizeFormFields', () => {
 							openAs: { type: 'dropdown' },
 							summary: [],
 							editVisibility: 'on-hover',
-							empty: 'render',
+							showPlaceholderIfEmpty: false,
 						},
 					},
 				],

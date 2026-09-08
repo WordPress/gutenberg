@@ -66,11 +66,10 @@ export const LayoutPanel = {
 			description: 'Chooses when the edit icon is visible.',
 			options: [ 'default', 'always', 'on-hover' ],
 		},
-		empty: {
-			control: { type: 'select' },
+		showPlaceholderIfEmpty: {
+			control: { type: 'boolean' },
 			description:
-				'Chooses what the summary shows when the field value is empty.',
-			options: [ 'default', 'render', 'placeholder' ],
+				'Whether the summary shows the field placeholder when the value is empty.',
 		},
 		applyLabel: {
 			control: { type: 'text' },
@@ -87,6 +86,7 @@ export const LayoutPanel = {
 	},
 	args: {
 		openAs: 'default',
+		showPlaceholderIfEmpty: false,
 	},
 };
 
