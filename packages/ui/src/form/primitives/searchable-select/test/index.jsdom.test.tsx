@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Combobox as BaseCombobox } from '@base-ui/react/combobox';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -41,6 +42,17 @@ vi.mock( import( '@wordpress/warning' ), async ( importOriginal ) => {
 } );
 
 const mockedWarning = vi.mocked( warning );
+
+function ResultCountStatus() {
+	const filteredItems = BaseCombobox.useFilteredItems< Item >();
+	const count = filteredItems.length;
+
+	if ( count === 0 ) {
+		return null;
+	}
+
+	return count === 1 ? '1 result found.' : `${ count } results found.`;
+}
 
 describe( 'SearchableSelect', () => {
 	beforeEach( () => {
@@ -320,6 +332,24 @@ describe( 'SearchableSelect', () => {
 		expect( status ).toBeVisible();
 		expect( status ).toHaveAttribute( 'role', 'status' );
 		expect( status ).toBeEmptyDOMElement();
+	} );
+
+	it( 'announces a result count from statusContent', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<SearchableSelect
+				aria-label="Fruit"
+				items={ ITEMS }
+				statusContent={ <ResultCountStatus /> }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
+
+		const status = await screen.findByText( '3 results found.' );
+		expect( status ).toBeVisible();
+		expect( status ).toHaveAttribute( 'role', 'status' );
 	} );
 
 	describe( 'creatable item', () => {

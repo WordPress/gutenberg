@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Combobox as BaseCombobox } from '@base-ui/react/combobox';
 import { fn } from 'storybook/test';
 import { SearchableChipSelect } from '../';
 import {
@@ -39,6 +40,18 @@ const meta: Meta< typeof SearchableChipSelect > = {
 export default meta;
 
 type Story = StoryObj< typeof SearchableChipSelect >;
+
+function ResultCountStatus() {
+	const filteredItems =
+		BaseCombobox.useFilteredItems< ( typeof ITEMS )[ number ] >();
+	const count = filteredItems.length;
+
+	if ( count === 0 ) {
+		return null;
+	}
+
+	return count === 1 ? '1 result found.' : `${ count } results found.`;
+}
 
 export const Default: Story = {
 	args: {
@@ -93,12 +106,13 @@ export const WithCustomEmptyContent: Story = {
 };
 
 /**
- * Use `statusContent` for async list status, such as loading.
+ * Use `statusContent` for list status, such as a result count or loading.
+ * Open the popup and type to see the count update.
  */
 export const WithStatusContent: Story = {
 	args: {
 		...Default.args,
-		statusContent: 'Loading…',
+		statusContent: <ResultCountStatus />,
 	},
 };
 

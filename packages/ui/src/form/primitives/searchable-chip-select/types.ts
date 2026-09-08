@@ -210,8 +210,8 @@ export type SearchableChipSelectProps = Omit<
 		/**
 		 * Content for the list status live region. There is no default.
 		 * The region stays mounted. Pass `null` when there is nothing to
-		 * announce. Use this for async loading. Use `emptyContent` for
-		 * the empty list.
+		 * announce. Use this for result-count updates and for async loading.
+		 * Use `emptyContent` for the empty list.
 		 */
 		statusContent?: ComboboxStatusProps[ 'children' ];
 		/**
