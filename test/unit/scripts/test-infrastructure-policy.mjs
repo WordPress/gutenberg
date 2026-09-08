@@ -212,6 +212,33 @@ export function validateVitestShuffleScripts(
 	return violations;
 }
 
+export function validateVitestShuffleWorkflow( workflowSource ) {
+	const commands = getWorkflowRunBlocks( workflowSource ).map(
+		( { command } ) => normalizeShellCommand( command )
+	);
+	const projectGroups = [
+		{
+			label: 'Node/jsdom',
+			matches: ( command ) =>
+				command.includes( '--project=node' ) &&
+				command.includes( '--project=jsdom' ),
+		},
+		{
+			label: 'Browser',
+			matches: ( command ) => command.includes( '--project=browser' ),
+		},
+	];
+
+	return projectGroups.flatMap( ( { label, matches } ) => {
+		const command = commands.find( matches );
+		return command?.includes( 'npm run test:unit:vitest:shuffled' )
+			? []
+			: [
+					`.github/workflows/unit-test.yml: ${ label } CI must run \`npm run test:unit:vitest:shuffled\``,
+			  ];
+	} );
+}
+
 function findPackageScriptIsolationOptOuts( rootDir ) {
 	const violations = [];
 	const packageFiles = glob( '**/package.json', {

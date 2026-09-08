@@ -21,6 +21,7 @@ import {
 	findVitestIsolationOptOuts,
 	validateVitestCleanupConfig,
 	validateVitestShuffleScripts,
+	validateVitestShuffleWorkflow,
 } from './test-infrastructure-policy.mjs';
 import {
 	validateVitestPolicy,
@@ -130,6 +131,10 @@ const rootPackageJson = JSON.parse(
 const unitTestPackageJson = JSON.parse(
 	readFileSync( path.join( ROOT_DIR, 'test/unit/package.json' ), 'utf8' )
 );
+const unitTestWorkflow = readFileSync(
+	path.join( ROOT_DIR, '.github/workflows/unit-test.yml' ),
+	'utf8'
+);
 const vitestConfig = (
 	await import(
 		pathToFileURL( path.join( ROOT_DIR, 'test/unit/vitest.config.mjs' ) )
@@ -138,7 +143,8 @@ const vitestConfig = (
 violations.push(
 	...findVitestIsolationOptOuts( ROOT_DIR ),
 	...validateVitestCleanupConfig( vitestConfig ),
-	...validateVitestShuffleScripts( rootPackageJson, unitTestPackageJson )
+	...validateVitestShuffleScripts( rootPackageJson, unitTestPackageJson ),
+	...validateVitestShuffleWorkflow( unitTestWorkflow )
 );
 
 const vitestVersions = new Map();

@@ -21,6 +21,7 @@ import {
 	validateRoutingScripts,
 	validateVitestCleanupConfig,
 	validateVitestShuffleScripts,
+	validateVitestShuffleWorkflow,
 } from '../test-infrastructure-policy.mjs';
 
 const temporaryDirectories = [];
@@ -192,6 +193,29 @@ describe( 'test infrastructure policy', () => {
 				validUnitTestPackageJson
 			)
 		).toEqual( [] );
+	} );
+
+	it( 'requires CI test jobs to use deterministic file-order shuffling', () => {
+		const unshuffledWorkflow = `
+jobs:
+  unit-js:
+    steps:
+      - run: npm run test:unit -- --project=node --project=jsdom
+  unit-js-browser:
+    steps:
+      - run: npm run test:unit:vitest:shuffled -- --project=browser
+`;
+		const shuffledWorkflow = unshuffledWorkflow.replace(
+			'npm run test:unit -- --project=node --project=jsdom',
+			'npm run test:unit:vitest:shuffled -- --project=node --project=jsdom'
+		);
+
+		expect( validateVitestShuffleWorkflow( unshuffledWorkflow ) ).toEqual( [
+			'.github/workflows/unit-test.yml: Node/jsdom CI must run `npm run test:unit:vitest:shuffled`',
+		] );
+		expect( validateVitestShuffleWorkflow( shuffledWorkflow ) ).toEqual(
+			[]
+		);
 	} );
 } );
 

@@ -12,7 +12,6 @@ interface GutenbergVitestMatchers {
 	toHaveWarned: () => void;
 	toHaveWarnedWith: ( ...args: unknown[] ) => void;
 	toMatchDiffSnapshot: ( expected: unknown ) => void;
-	toMatchStyleDiffSnapshot: ( expected: Element | null ) => void;
 }
 
 interface GutenbergVitestEnvironment {
