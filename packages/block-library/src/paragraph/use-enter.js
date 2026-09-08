@@ -1,6 +1,7 @@
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
@@ -28,12 +29,12 @@ export function useOnEnter( props ) {
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
-		function onBeforeInput( event ) {
+		function onKeyDown( event ) {
 			if ( event.defaultPrevented ) {
 				return;
 			}
 
-			if ( event.inputType !== 'insertParagraph' ) {
+			if ( event.keyCode !== ENTER ) {
 				return;
 			}
 
@@ -119,16 +120,8 @@ export function useOnEnter( props ) {
 			} );
 		}
 
-		// Enter is handled on beforeinput: moving focus while the keydown
-		// is still being handled leaves the iOS keyboard's
-		// auto-capitalization stale. Capture phase so we run before
-		// writing-flow's ancestor-bubble handler that gates on
-		// `event.defaultPrevented`.
-		return subscribeOwnedListener(
-			element,
-			'beforeinput',
-			onBeforeInput,
-			true
-		);
+		// Capture phase so we run before writing-flow's ancestor-bubble
+		// keydown handlers that gate on `event.defaultPrevented`.
+		return subscribeOwnedListener( element, 'keydown', onKeyDown, true );
 	}, [] );
 }
