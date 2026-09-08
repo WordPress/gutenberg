@@ -1,9 +1,6 @@
 import { dispatch } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
-
-type FinalizedAttachment = {
-	id?: number;
-};
+import type { Attachment } from '@wordpress/core-data';
 
 /**
  * The queries the editor resolves an attachment record with.
@@ -40,7 +37,7 @@ const finalized = new Set< number >();
  * @param record Attachment record as returned by the `finalize` endpoint.
  */
 export function receiveFinalizedAttachment(
-	record: FinalizedAttachment
+	record: Partial< Attachment >
 ): void {
 	if ( ! record?.id ) {
 		return;

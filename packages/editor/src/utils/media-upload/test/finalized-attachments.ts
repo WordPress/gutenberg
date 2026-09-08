@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
+import type { Attachment } from '@wordpress/core-data';
 import { dispatch } from '@wordpress/data';
 import {
 	receiveFinalizedAttachment,
@@ -34,7 +35,20 @@ describe( 'receiveFinalizedAttachment', () => {
 	} );
 
 	it( 'receives the record under both queries the editor resolves attachments with', () => {
-		const record = { id: 123, media_details: { sizes: { full: {} } } };
+		const record: Partial< Attachment > = {
+			id: 123,
+			media_details: {
+				sizes: {
+					full: {
+						file: 'image.jpg',
+						width: 1024,
+						height: 768,
+						mime_type: 'image/jpeg',
+						source_url: 'https://example.com/image.jpg',
+					},
+				},
+			},
+		};
 
 		receiveFinalizedAttachment( record );
 
@@ -65,7 +79,9 @@ describe( 'receiveFinalizedAttachment', () => {
 
 	it( 'ignores a response without an ID', () => {
 		receiveFinalizedAttachment( {} );
-		receiveFinalizedAttachment( undefined as unknown as { id?: number } );
+		receiveFinalizedAttachment(
+			undefined as unknown as Partial< Attachment >
+		);
 
 		expect( receiveEntityRecords ).not.toHaveBeenCalled();
 	} );
