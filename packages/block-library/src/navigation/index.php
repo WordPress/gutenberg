@@ -951,7 +951,7 @@ class WP_Navigation_Block_Renderer {
 				'type'             => 'overlay',
 				'roleAttribute'    => '',
 				'ariaLabel'        => __( 'Menu' ),
-				// The default overlay unfolds every submenu it contains, whereas a
+				// The default overlay displays every submenu it contains, whereas a
 				// custom overlay leaves submenus to their own visibility setting.
 				// Submenus inherit this so they know which of the two they are in.
 				'hasCustomOverlay' => $has_custom_overlay,
