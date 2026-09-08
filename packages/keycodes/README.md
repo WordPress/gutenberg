@@ -50,9 +50,9 @@ An object that contains functions to get shortcuts in a format compatible with t
 
 _Related_
 
--   <https://www.w3.org/TR/wai-aria-1.2/#aria-keyshortcuts>
--   <https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts>
--   <https://www.w3.org/TR/uievents-key/>
+- <https://www.w3.org/TR/wai-aria-1.2/#aria-keyshortcuts>
+- <https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts>
+- <https://www.w3.org/TR/uievents-key/>
 
 _Usage_
 
@@ -149,11 +149,11 @@ Return true if platform is MacOS.
 
 _Parameters_
 
--   _\_window_ `Window`: window object by default; used for DI testing.
+- _\_window_ `Window`: window object by default; used for DI testing.
 
 _Returns_
 
--   `boolean`: True if MacOS; false otherwise.
+- `boolean`: True if MacOS; false otherwise.
 
 ### isKeyboardEvent
 
@@ -179,7 +179,7 @@ Object that contains functions that return the available modifier depending on p
 
 _Type_
 
--   `WPModifierHandler< WPModifier >`
+- `WPModifierHandler< WPModifier >`
 
 ### PAGEDOWN
 
@@ -245,11 +245,11 @@ In CJK languages, an IME (Input Method Editor) is used to input complex characte
 
 _Parameters_
 
--   _handler_ `( event: E ) => void`: The keyboard event handler to execute after ensuring it was not an IME event.
+- _handler_ `( event: E ) => void`: The keyboard event handler to execute after ensuring it was not an IME event.
 
 _Returns_
 
--   A wrapped version of the given event handler that ignores IME events.
+- A wrapped version of the given event handler that ignores IME events.
 
 ### ZERO
 

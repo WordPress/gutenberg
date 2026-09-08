@@ -74,31 +74,31 @@ Unless you're [creating an editor](/docs/how-to-guides/platform/custom-block-edi
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/alignment-control/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/alignment-control/README.md>
 
 ### AlignmentToolbar
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/alignment-control/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/alignment-control/README.md>
 
 ### Autocomplete
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/autocomplete/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/autocomplete/README.md>
 
 ### BlockAlignmentControl
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
 ### BlockAlignmentToolbar
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
 ### BlockBindingsAttributeControl
 
@@ -106,14 +106,14 @@ Renders a control for viewing and editing a block attribute binding.
 
 _Parameters_
 
--   _root0_ `Object`: Component props.
--   _root0.attribute_ `string`: The block attribute name.
--   _root0.binding_ `[Object]`: The current block binding.
--   _root0.blockName_ `string`: The block type name.
+- _root0_ `Object`: Component props.
+- _root0.attribute_ `string`: The block attribute name.
+- _root0.binding_ `[Object]`: The current block binding.
+- _root0.blockName_ `string`: The block type name.
 
 _Returns_
 
--   `Element`: The block attribute binding control.
+- `Element`: The block attribute binding control.
 
 ### BlockBindingsSourceFieldsList
 
@@ -125,12 +125,12 @@ Block breadcrumb component, displaying the hierarchy of the current block select
 
 _Parameters_
 
--   _props_ `Object`: Component props.
--   _props.rootLabelText_ `string`: Translated label for the root element of the breadcrumb trail.
+- _props_ `Object`: Component props.
+- _props.rootLabelText_ `string`: Translated label for the root element of the breadcrumb trail.
 
 _Returns_
 
--   `Element`: Block Breadcrumb.
+- `Element`: Block Breadcrumb.
 
 ### BlockCanvas
 
@@ -155,14 +155,14 @@ function MyBlockEditor() {
 
 _Parameters_
 
--   _props_ `Object`: Component props.
--   _props.height_ `string`: Canvas height, defaults to 300px.
--   _props.styles_ `Array`: Content styles to inject into the iframe.
--   _props.children_ `Element`: Content of the canvas, defaults to the BlockList component.
+- _props_ `Object`: Component props.
+- _props.height_ `string`: Canvas height, defaults to 300px.
+- _props.styles_ `Array`: Content styles to inject into the iframe.
+- _props.children_ `Element`: Content of the canvas, defaults to the BlockList component.
 
 _Returns_
 
--   `Element`: Block Breadcrumb.
+- `Element`: Block Breadcrumb.
 
 ### BlockColorsStyleSelector
 
@@ -174,11 +174,11 @@ Component which merges passed value with current consumed block context.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-context/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-context/README.md>
 
 _Parameters_
 
--   _props_ `BlockContextProviderProps`:
+- _props_ `BlockContextProviderProps`:
 
 ### BlockControls
 
@@ -204,13 +204,13 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-icon/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-icon/README.md>
 
 ### BlockInspector
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-inspector/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-inspector/README.md>
 
 ### BlockList
 
@@ -220,7 +220,7 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-mover/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-mover/README.md>
 
 ### BlockNavigationDropdown
 
@@ -230,7 +230,7 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-popover/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-popover/README.md>
 
 ### BlockPreview
 
@@ -238,17 +238,17 @@ BlockPreview renders a preview of a block or array of blocks.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-preview/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-preview/README.md>
 
 _Parameters_
 
--   _preview_ `Object`: options for how the preview should be shown
--   _preview.blocks_ `Array|Object`: A block instance (object) or an array of blocks to be previewed.
--   _preview.viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
+- _preview_ `Object`: options for how the preview should be shown
+- _preview.blocks_ `Array|Object`: A block instance (object) or an array of blocks to be previewed.
+- _preview.viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
 
 _Returns_
 
--   `Component`: The component to be rendered.
+- `Component`: The component to be rendered.
 
 ### BlockSelectionClearer
 
@@ -262,15 +262,15 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md>
 
 _Parameters_
 
--   _props_ `Object`: Fill props.
+- _props_ `Object`: Fill props.
 
 _Returns_
 
--   `Element`: Element.
+- `Element`: Element.
 
 ### BlockStyles
 
@@ -291,14 +291,14 @@ _Usage_
 
 _Parameters_
 
--   _props_ `Object`:
--   _props.clientId_ `string`: Client ID of block.
--   _props.maximumLength_ `number|undefined`: The maximum length that the block title string may be before truncated.
--   _props.context_ `string|undefined`: The context to pass to `getBlockLabel`.
+- _props_ `Object`:
+- _props.clientId_ `string`: Client ID of block.
+- _props.maximumLength_ `number|undefined`: The maximum length that the block title string may be before truncated.
+- _props.context_ `string|undefined`: The context to pass to `getBlockLabel`.
 
 _Returns_
 
--   `React.JSX.Element`: Block title.
+- `React.JSX.Element`: Block title.
 
 ### BlockToolbar
 
@@ -306,13 +306,13 @@ Renders the block toolbar.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md>
 
 _Parameters_
 
--   _props_ `Object`: Components props.
--   _props.hideDragHandle_ `boolean`: Show or hide the Drag Handle for drag and drop functionality.
--   _props.variant_ `string`: Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
+- _props_ `Object`: Components props.
+- _props.hideDragHandle_ `boolean`: Show or hide the Drag Handle for drag and drop functionality.
+- _props.variant_ `string`: Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
 
 ### BlockTools
 
@@ -320,27 +320,27 @@ Renders block tools (the block toolbar, select/navigation mode toolbar, the inse
 
 _Parameters_
 
--   _$0_ `Object`: Props.
--   _$0.children_ `Object`: The block content and style container.
--   _$0.\_\_unstableContentRef_ `Object`: Ref holding the content scroll container.
+- _$0_ `Object`: Props.
+- _$0.children_ `Object`: The block content and style container.
+- _$0.\_\_unstableContentRef_ `Object`: Ref holding the content scroll container.
 
 ### BlockVerticalAlignmentControl
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
 
 ### BlockVerticalAlignmentToolbar
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
 
 ### ButtonBlockAppender
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/button-block-appender/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/button-block-appender/README.md>
 
 ### ButtonBlockerAppender
 
@@ -360,7 +360,7 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/contrast-checker/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/contrast-checker/README.md>
 
 ### CopyHandler
 
@@ -368,7 +368,7 @@ _Related_
 
 _Parameters_
 
--   _props_ `Object`:
+- _props_ `Object`:
 
 ### createCustomColorsHOC
 
@@ -393,11 +393,11 @@ export default compose(
 
 _Parameters_
 
--   _colorsArray_ `Array`: The array of color objects (name, slug, color, etc... ).
+- _colorsArray_ `Array`: The array of color objects (name, slug, color, etc... ).
 
 _Returns_
 
--   `Function`: Higher-order component.
+- `Function`: Higher-order component.
 
 ### DefaultBlockAppender
 
@@ -409,27 +409,27 @@ DimensionControl renders a linked unit control and range control for adjusting d
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/dimension-control/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/dimension-control/README.md>
 
 _Parameters_
 
--   _props_ `Object`:
--   _props.label_ `?string`: A label for the control.
--   _props.onChange_ `( value: string ) => void`: Called when the dimension value changes.
--   _props.value_ `string`: The current dimension value.
--   _props.placeholder_ `?string`: Placeholder text for the custom-value input.
--   _props.className_ `?string`: Additional CSS class on the wrapping fieldset.
--   _props.dimensionSizes_ `?Object`: Optional dimension size presets. Falls back to settings from the store.
+- _props_ `Object`:
+- _props.label_ `?string`: A label for the control.
+- _props.onChange_ `( value: string ) => void`: Called when the dimension value changes.
+- _props.value_ `string`: The current dimension value.
+- _props.placeholder_ `?string`: Placeholder text for the custom-value input.
+- _props.className_ `?string`: Additional CSS class on the wrapping fieldset.
+- _props.dimensionSizes_ `?Object`: Optional dimension size presets. Falls back to settings from the store.
 
 _Returns_
 
--   `Component`: The component to be rendered.
+- `Component`: The component to be rendered.
 
 ### FontSizePicker
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md>
 
 ### getColorClassName
 
@@ -437,12 +437,12 @@ Returns a class based on the context a color is being used and its slug.
 
 _Parameters_
 
--   _colorContextName_ `string`: Context/place where color is being used e.g: background, text etc...
--   _colorSlug_ `string`: Slug of the color.
+- _colorContextName_ `string`: Context/place where color is being used e.g: background, text etc...
+- _colorSlug_ `string`: Slug of the color.
 
 _Returns_
 
--   `?string`: String with the class corresponding to the color in the provided context. Returns undefined if either colorContextName or colorSlug are not provided.
+- `?string`: String with the class corresponding to the color in the provided context. Returns undefined if either colorContextName or colorSlug are not provided.
 
 ### getColorObjectByAttributeValues
 
@@ -450,13 +450,13 @@ Provided an array of color objects as set by the theme or by the editor defaults
 
 _Parameters_
 
--   _colors_ `Array`: Array of color objects as set by the theme or by the editor defaults.
--   _definedColor_ `?string`: A string containing the color slug.
--   _customColor_ `?string`: A string containing the customColor value.
+- _colors_ `Array`: Array of color objects as set by the theme or by the editor defaults.
+- _definedColor_ `?string`: A string containing the color slug.
+- _customColor_ `?string`: A string containing the customColor value.
 
 _Returns_
 
--   `?Object`: If definedColor is passed and the name is found in colors, the color object exactly as set by the theme or editor defaults is returned. Otherwise, an object that just sets the color is defined.
+- `?Object`: If definedColor is passed and the name is found in colors, the color object exactly as set by the theme or editor defaults is returned. Otherwise, an object that just sets the color is defined.
 
 ### getColorObjectByColorValue
 
@@ -464,12 +464,12 @@ Provided an array of color objects as set by the theme or by the editor defaults
 
 _Parameters_
 
--   _colors_ `Array`: Array of color objects as set by the theme or by the editor defaults.
--   _colorValue_ `?string`: A string containing the color value.
+- _colors_ `Array`: Array of color objects as set by the theme or by the editor defaults.
+- _colorValue_ `?string`: A string containing the color value.
 
 _Returns_
 
--   `?Object`: Color object included in the colors array whose color property equals colorValue. Returns undefined if no color object matches this requirement.
+- `?Object`: Color object included in the colors array whose color property equals colorValue. Returns undefined if no color object matches this requirement.
 
 ### getComputedFluidTypographyValue
 
@@ -493,18 +493,18 @@ const fontSize = getComputedFluidTypographyValue( {
 
 _Parameters_
 
--   _args_ `Object`:
--   _args.minimumViewportWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
--   _args.maximumViewportWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
--   _args.fontSize_ `[string|number]`: Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
--   _args.maximumFontSize_ `?string`: Maximum font size for any clamp() calculation. Optional.
--   _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
--   _args.scaleFactor_ `?number`: A scale factor to determine how fast a font scales within boundaries. Optional.
--   _args.minimumFontSizeLimit_ `?string`: The smallest a calculated font size may be. Optional.
+- _args_ `Object`:
+- _args.minimumViewportWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
+- _args.maximumViewportWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
+- _args.fontSize_ `[string|number]`: Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
+- _args.maximumFontSize_ `?string`: Maximum font size for any clamp() calculation. Optional.
+- _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
+- _args.scaleFactor_ `?number`: A scale factor to determine how fast a font scales within boundaries. Optional.
+- _args.minimumFontSizeLimit_ `?string`: The smallest a calculated font size may be. Optional.
 
 _Returns_
 
--   `string|null`: A font-size value using clamp().
+- `string|null`: A font-size value using clamp().
 
 ### getCustomValueFromPreset
 
@@ -512,12 +512,12 @@ Converts a spacing preset into a custom value.
 
 _Parameters_
 
--   _value_ `string`: Value to convert
--   _spacingSizes_ `Array`: Array of the current spacing preset objects
+- _value_ `string`: Value to convert
+- _spacingSizes_ `Array`: Array of the current spacing preset objects
 
 _Returns_
 
--   `string`: Mapping of the spacing preset to its equivalent custom value.
+- `string`: Mapping of the spacing preset to its equivalent custom value.
 
 ### getDimensionsClassesAndStyles
 
@@ -525,11 +525,11 @@ Provides the CSS class names and inline styles for a block's dimensions support 
 
 _Parameters_
 
--   _attributes_ `Object`: Block attributes.
+- _attributes_ `Object`: Block attributes.
 
 _Returns_
 
--   `Object`: Dimensions block support derived CSS classes & styles.
+- `Object`: Dimensions block support derived CSS classes & styles.
 
 ### getFontSize
 
@@ -537,13 +537,13 @@ Returns the font size object based on an array of named font sizes and the named
 
 _Parameters_
 
--   _fontSizes_ `Array`: Array of font size objects containing at least the "name" and "size" values as properties.
--   _fontSizeAttribute_ `?string`: Content of the font size attribute (slug).
--   _customFontSizeAttribute_ `?number`: Contents of the custom font size attribute (value).
+- _fontSizes_ `Array`: Array of font size objects containing at least the "name" and "size" values as properties.
+- _fontSizeAttribute_ `?string`: Content of the font size attribute (slug).
+- _customFontSizeAttribute_ `?number`: Contents of the custom font size attribute (value).
 
 _Returns_
 
--   `?Object`: If fontSizeAttribute is set and an equal slug is found in fontSizes it returns the font size object for that slug. Otherwise, an object with just the size value based on customFontSize is returned.
+- `?Object`: If fontSizeAttribute is set and an equal slug is found in fontSizes it returns the font size object for that slug. Otherwise, an object with just the size value based on customFontSize is returned.
 
 ### getFontSizeClass
 
@@ -551,11 +551,11 @@ Returns a class based on fontSizeName.
 
 _Parameters_
 
--   _fontSizeSlug_ `string`: Slug of the fontSize.
+- _fontSizeSlug_ `string`: Slug of the fontSize.
 
 _Returns_
 
--   `string | undefined`: String with the class corresponding to the fontSize passed. The class is generated by appending 'has-' followed by fontSizeSlug in kebabCase and ending with '-font-size'.
+- `string | undefined`: String with the class corresponding to the fontSize passed. The class is generated by appending 'has-' followed by fontSizeSlug in kebabCase and ending with '-font-size'.
 
 ### getFontSizeObjectByValue
 
@@ -563,12 +563,12 @@ Returns the corresponding font size object for a given value.
 
 _Parameters_
 
--   _fontSizes_ `Array`: Array of font size objects.
--   _value_ `number`: Font size value.
+- _fontSizes_ `Array`: Array of font size objects.
+- _value_ `number`: Font size value.
 
 _Returns_
 
--   `Object`: Font size object.
+- `Object`: Font size object.
 
 ### getGradientSlugByValue
 
@@ -576,12 +576,12 @@ Retrieves the gradient slug per slug.
 
 _Parameters_
 
--   _gradients_ `Array`: Gradient Palette
--   _value_ `string`: Gradient value
+- _gradients_ `Array`: Gradient Palette
+- _value_ `string`: Gradient value
 
 _Returns_
 
--   `string`: Gradient slug.
+- `string`: Gradient slug.
 
 ### getGradientValueBySlug
 
@@ -589,12 +589,12 @@ Retrieves the gradient value per slug.
 
 _Parameters_
 
--   _gradients_ `Array`: Gradient Palette
--   _slug_ `string`: Gradient slug
+- _gradients_ `Array`: Gradient Palette
+- _slug_ `string`: Gradient slug
 
 _Returns_
 
--   `string`: Gradient value.
+- `string`: Gradient value.
 
 ### getPxFromCssUnit
 
@@ -604,7 +604,7 @@ This function was accidentally exposed for mobile/native usage.
 
 _Returns_
 
--   `string`: Empty string.
+- `string`: Empty string.
 
 ### getSpacingPresetCssVar
 
@@ -612,11 +612,11 @@ Converts a spacing preset into a custom value.
 
 _Parameters_
 
--   _value_ `string`: Value to convert.
+- _value_ `string`: Value to convert.
 
 _Returns_
 
--   `string | undefined`: CSS var string for given spacing preset value.
+- `string | undefined`: CSS var string for given spacing preset value.
 
 ### getTypographyClassesAndStyles
 
@@ -624,12 +624,12 @@ Provides the CSS class names and inline styles for a block's typography support 
 
 _Parameters_
 
--   _attributes_ `Object`: Block attributes.
--   _settings_ `Object|boolean`: Merged theme.json settings
+- _attributes_ `Object`: Block attributes.
+- _settings_ `Object|boolean`: Merged theme.json settings
 
 _Returns_
 
--   `Object`: Typography block support derived CSS classes & styles.
+- `Object`: Typography block support derived CSS classes & styles.
 
 ### HeadingLevelDropdown
 
@@ -637,11 +637,11 @@ Dropdown for selecting a heading level (1 through 6) or paragraph (0).
 
 _Parameters_
 
--   _props_ `WPHeadingLevelDropdownProps`: Component props.
+- _props_ `WPHeadingLevelDropdownProps`: Component props.
 
 _Returns_
 
--   `ComponentType`: The toolbar.
+- `ComponentType`: The toolbar.
 
 ### HeightControl
 
@@ -651,24 +651,24 @@ HeightControl renders a linked unit control and range control for adjusting the 
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/height-control/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/height-control/README.md>
 
 _Parameters_
 
--   _props_ `Object`:
--   _props.label_ `?string`: A label for the control.
--   _props.onChange_ `( value: string ) => void`: Called when the height changes.
--   _props.value_ `string`: The current height value.
+- _props_ `Object`:
+- _props.label_ `?string`: A label for the control.
+- _props.onChange_ `( value: string ) => void`: Called when the height changes.
+- _props.value_ `string`: The current height value.
 
 _Returns_
 
--   `Component`: The component to be rendered.
+- `Component`: The component to be rendered.
 
 ### InnerBlocks
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md>
 
 ### Inserter
 
@@ -682,7 +682,7 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md>
 
 ### isValueSpacingPreset
 
@@ -690,29 +690,29 @@ Checks is given value is a spacing preset.
 
 _Parameters_
 
--   _value_ `string`: Value to check
+- _value_ `string`: Value to check
 
 _Returns_
 
--   `boolean`: Return true if value is string in format var:preset|spacing|.
+- `boolean`: Return true if value is string in format var:preset|spacing|.
 
 ### JustifyContentControl
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md>
 
 ### JustifyToolbar
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md>
 
 ### LineHeightControl
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/line-height-control/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/line-height-control/README.md>
 
 ### LinkControl
 
@@ -757,31 +757,31 @@ Pre-populate the search input with a default value:
 
 _Parameters_
 
--   _props_ `WPLinkControlProps`: Component props.
+- _props_ `WPLinkControlProps`: Component props.
 
 ### MediaPlaceholder
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-placeholder/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-placeholder/README.md>
 
 ### MediaReplaceFlow
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-replace-flow/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-replace-flow/README.md>
 
 ### MediaUpload
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md>
 
 ### MediaUploadCheck
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md>
 
 ### MultiSelectScrollIntoView
 
@@ -797,7 +797,7 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/observe-typing/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/observe-typing/README.md>
 
 ### PanelColorSettings
 
@@ -809,7 +809,7 @@ Render an auto-growing textarea allow users to fill any textual content.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
 
 _Usage_
 
@@ -840,14 +840,14 @@ registerBlockType( 'my-plugin/example-block', {
 
 _Parameters_
 
--   _props_ `Object`: Component props.
--   _props.value_ `string`: String value of the textarea.
--   _props.onChange_ `Function`: Function called when the text value changes.
--   _props.ref_ `[Object]`: The component forwards the `ref` property to the `textarea` element.
+- _props_ `Object`: Component props.
+- _props.value_ `string`: String value of the textarea.
+- _props.onChange_ `Function`: Function called when the text value changes.
+- _props.ref_ `[Object]`: The component forwards the `ref` property to the `textarea` element.
 
 _Returns_
 
--   `Element`: Plain text component
+- `Element`: Plain text component
 
 ### privateApis
 
@@ -861,20 +861,20 @@ Wrap block content with this provider and provide the same `uniqueId` prop as us
 
 _Parameters_
 
--   _props_ `Object`:
--   _props.uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
--   _props.blockName_ `string`: Optional block name.
--   _props.children_ `React.JSX.Element`: React children.
+- _props_ `Object`:
+- _props.uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
+- _props.blockName_ `string`: Optional block name.
+- _props.children_ `React.JSX.Element`: React children.
 
 _Returns_
 
--   `React.JSX.Element`: A React element.
+- `React.JSX.Element`: A React element.
 
 ### RichText
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md>
 
 ### RichTextShortcut
 
@@ -890,39 +890,39 @@ The default editor settings
 
 _Type Definition_
 
--   _SETTINGS_DEFAULT_ `Object`
+- _SETTINGS_DEFAULT_ `Object`
 
 _Properties_
 
--   _alignWide_ `boolean`: Enable/Disable Wide/Full Alignments
--   _supportsLayout_ `boolean`: Enable/disable layouts support in container blocks.
--   _imageEditing_ `boolean`: Image Editing settings set to false to disable.
--   _imageSizes_ `Array`: Available image sizes
--   _maxWidth_ `number`: Max width to constraint resizing
--   _allowedBlockTypes_ `boolean|Array`: Allowed block types
--   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
--   _distractionFree_ `boolean`: Whether or not the editor UI is distraction free
--   _focusMode_ `boolean`: Whether the focus mode is enabled or not
--   _styles_ `Array`: Editor Styles
--   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
--   _bodyPlaceholder_ `string`: Empty post placeholder
--   _titlePlaceholder_ `string`: Empty title placeholder
--   _canLockBlocks_ `boolean`: Whether the user can manage Block Lock state
--   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
--   _blockStatesEditingEnabled_ `boolean`: Whether or not block style states editing is enabled
--   _generateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
--   _enableOpenverseMediaCategory_ `boolean`: Enable/Disable the Openverse media category in the inserter.
--   _clearBlockSelection_ `boolean`: Whether the block editor should clear selection on mousedown when a block is not clicked.
--   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
--   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
--   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
--   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
+- _alignWide_ `boolean`: Enable/Disable Wide/Full Alignments
+- _supportsLayout_ `boolean`: Enable/disable layouts support in container blocks.
+- _imageEditing_ `boolean`: Image Editing settings set to false to disable.
+- _imageSizes_ `Array`: Available image sizes
+- _maxWidth_ `number`: Max width to constraint resizing
+- _allowedBlockTypes_ `boolean|Array`: Allowed block types
+- _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
+- _distractionFree_ `boolean`: Whether or not the editor UI is distraction free
+- _focusMode_ `boolean`: Whether the focus mode is enabled or not
+- _styles_ `Array`: Editor Styles
+- _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
+- _bodyPlaceholder_ `string`: Empty post placeholder
+- _titlePlaceholder_ `string`: Empty title placeholder
+- _canLockBlocks_ `boolean`: Whether the user can manage Block Lock state
+- _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
+- _blockStatesEditingEnabled_ `boolean`: Whether or not block style states editing is enabled
+- _generateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
+- _enableOpenverseMediaCategory_ `boolean`: Enable/Disable the Openverse media category in the inserter.
+- _clearBlockSelection_ `boolean`: Whether the block editor should clear selection on mousedown when a block is not clicked.
+- _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+- _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
+- _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
+- _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
 
 ### SkipToSelectedBlock
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/skip-to-selected-block/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/skip-to-selected-block/README.md>
 
 ### store
 
@@ -930,7 +930,7 @@ Store definition for the block editor namespace.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
 
 ### storeConfig
 
@@ -938,7 +938,7 @@ Block editor data store configuration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore>
 
 ### ToolSelector
 
@@ -950,13 +950,13 @@ Applies a series of CSS rule transforms to wrap selectors inside a given class a
 
 _Parameters_
 
--   _styles_ `EditorStyle[]`: CSS rules.
--   _wrapperSelector_ Wrapper selector.
--   _transformOptions_ `TransformOptions`: Additional options for style transformation.
+- _styles_ `EditorStyle[]`: CSS rules.
+- _wrapperSelector_ Wrapper selector.
+- _transformOptions_ `TransformOptions`: Additional options for style transformation.
 
 _Returns_
 
--   converted rules.
+- converted rules.
 
 ### Typewriter
 
@@ -968,23 +968,23 @@ Text field for entering a URL, with an autocomplete list of matching posts, page
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md>
 
 _Parameters_
 
--   _props_ `Object`: Component props.
+- _props_ `Object`: Component props.
 
 ### URLInputButton
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md>
 
 ### URLPopover
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
 
 ### useBlockBindingsUtils
 
@@ -992,8 +992,8 @@ Retrieves the existing utils needed to update the block `bindings` metadata. The
 
 It contains the following utils:
 
--   `updateBlockBindings`: Updates the value of the bindings connected to block attributes. It can be used to remove a specific binding by setting the value to `undefined`.
--   `removeAllBlockBindings`: Removes the bindings property of the `metadata` attribute.
+- `updateBlockBindings`: Updates the value of the bindings connected to block attributes. It can be used to remove a specific binding by setting the value to `undefined`.
+- `removeAllBlockBindings`: Removes the bindings property of the `metadata` attribute.
 
 _Usage_
 
@@ -1026,11 +1026,11 @@ removeAllBlockBindings();
 
 _Parameters_
 
--   _clientId_ `?string`: Optional block client ID. If not set, it will use the current block client ID from the context.
+- _clientId_ `?string`: Optional block client ID. If not set, it will use the current block client ID from the context.
 
 _Returns_
 
--   `?WPBlockBindingsUtils`: Object containing the block bindings utils.
+- `?WPBlockBindingsUtils`: Object containing the block bindings utils.
 
 _Changelog_
 
@@ -1048,11 +1048,11 @@ If for any reason a block variation match cannot be found, the returned informat
 
 _Parameters_
 
--   _clientId_ `string`: Block's client id.
+- _clientId_ `string`: Block's client id.
 
 _Returns_
 
--   `?WPBlockDisplayInformation`: Block's display information, or `null` when the block or its type not found.
+- `?WPBlockDisplayInformation`: Block's display information, or `null` when the block or its type not found.
 
 ### useBlockEditContext
 
@@ -1060,7 +1060,7 @@ The `useBlockEditContext` hook provides information about the block this hook is
 
 _Returns_
 
--   `Object`: Block edit context
+- `Object`: Block edit context
 
 ### useBlockEditingMode
 
@@ -1077,11 +1077,11 @@ function MyBlock( { attributes, setAttributes } ) {
 
 `mode` can be one of three options:
 
--   `'disabled'`: Prevents editing the block entirely, i.e. it cannot be
-    selected.
--   `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the
-    toolbar, the block movers, block settings.
--   `'default'`: Allows editing the block as normal.
+- `'disabled'`: Prevents editing the block entirely, i.e. it cannot be
+  selected.
+- `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the
+  toolbar, the block movers, block settings.
+- `'default'`: Allows editing the block as normal.
 
 The mode is inherited by all of the block's inner blocks, unless they have
 their own mode.
@@ -1090,11 +1090,11 @@ If called outside of a block context, the mode is applied to all blocks.
 
 _Parameters_
 
--   _mode_ `?BlockEditingMode`: The editing mode to apply. If undefined, the current editing mode is not changed.
+- _mode_ `?BlockEditingMode`: The editing mode to apply. If undefined, the current editing mode is not changed.
 
 _Returns_
 
--   `BlockEditingMode`: The current editing mode.
+- `BlockEditingMode`: The current editing mode.
 
 ### useBlockProps
 
@@ -1122,13 +1122,13 @@ export default function Edit() {
 
 _Parameters_
 
--   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
--   _options_ `Object`: Options for internal use only.
--   _options.\_\_unstableIsHtml_ `boolean`:
+- _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
+- _options_ `Object`: Options for internal use only.
+- _options.\_\_unstableIsHtml_ `boolean`:
 
 _Returns_
 
--   `Object`: Props to pass to the element to mark as a block.
+- `Object`: Props to pass to the element to mark as a block.
 
 ### useCachedTruthy
 
@@ -1136,11 +1136,11 @@ Keeps an up-to-date copy of the passed value and returns it. If value becomes fa
 
 _Parameters_
 
--   _value_ `any`:
+- _value_ `any`:
 
 _Returns_
 
--   `any`: value
+- `any`: value
 
 ### useHasRecursion
 
@@ -1150,12 +1150,12 @@ Use this with the `RecursionProvider` component, using the same `uniqueId` value
 
 _Parameters_
 
--   _uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
--   _blockName_ `string`: Optional block name.
+- _uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
+- _blockName_ `string`: Optional block name.
 
 _Returns_
 
--   `boolean`: A boolean describing whether the provided id has already been rendered.
+- `boolean`: A boolean describing whether the provided id has already been rendered.
 
 ### useInnerBlocksProps
 
@@ -1163,12 +1163,12 @@ This hook is used to lightly mark an element as an inner blocks wrapper element.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md>
 
 _Parameters_
 
--   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
--   _options_ `Object`: Optional. Inner blocks options.
+- _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
+- _options_ `Object`: Optional. Inner blocks options.
 
 ### useSetting
 
@@ -1186,11 +1186,11 @@ const isEnabled = useSetting( 'typography.dropCap' );
 
 _Parameters_
 
--   _path_ `string`: The path to the setting.
+- _path_ `string`: The path to the setting.
 
 _Returns_
 
--   `any`: Returns the value defined for the setting.
+- `any`: Returns the value defined for the setting.
 
 ### useSettings
 
@@ -1206,11 +1206,11 @@ const [ fixed, sticky ] = useSettings( 'position.fixed', 'position.sticky' );
 
 _Parameters_
 
--   _paths_ `string[]`: The paths to the settings.
+- _paths_ `string[]`: The paths to the settings.
 
 _Returns_
 
--   `any[]`: Returns the values defined for the settings.
+- `any[]`: Returns the values defined for the settings.
 
 ### useStyleOverride
 
@@ -1218,15 +1218,15 @@ Override a block editor settings style. Leave the ID blank to create a new style
 
 _Parameters_
 
--   _override_ `Object`: Override object.
--   _override.id_ `?string`: Id of the style override, leave blank to create a new style.
--   _override.css_ `string`: CSS to apply.
+- _override_ `Object`: Override object.
+- _override.id_ `?string`: Id of the style override, leave blank to create a new style.
+- _override.css_ `string`: CSS to apply.
 
 ### Warning
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/warning/README.md>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/warning/README.md>
 
 ### withColorContext
 
@@ -1249,11 +1249,11 @@ export default compose(
 
 _Parameters_
 
--   _colorTypes_ `...(Object|string)`: The arguments can be strings or objects. If the argument is an object, it should contain the color attribute name as key and the color context as value. If the argument is a string the value should be the color attribute name, the color context is computed by applying a kebab case transform to the value. Color context represents the context/place where the color is going to be used. The class name of the color is generated using 'has' followed by the color name and ending with the color context all in kebab case e.g: has-green-background-color.
+- _colorTypes_ `...(Object|string)`: The arguments can be strings or objects. If the argument is an object, it should contain the color attribute name as key and the color context as value. If the argument is a string the value should be the color attribute name, the color context is computed by applying a kebab case transform to the value. Color context represents the context/place where the color is going to be used. The class name of the color is generated using 'has' followed by the color name and ending with the color context all in kebab case e.g: has-green-background-color.
 
 _Returns_
 
--   `Function`: Higher-order component.
+- `Function`: Higher-order component.
 
 ### withFontSizes
 
@@ -1261,11 +1261,11 @@ Higher-order component, which handles font size logic for class generation, font
 
 _Parameters_
 
--   _fontSizeNames_ `...(Object|string)`: The arguments should all be strings. Each string contains the font size attribute name e.g: 'fontSize'.
+- _fontSizeNames_ `...(Object|string)`: The arguments should all be strings. Each string contains the font size attribute name e.g: 'fontSize'.
 
 _Returns_
 
--   `Function`: Higher-order component.
+- `Function`: Higher-order component.
 
 ### WritingFlow
 
@@ -1273,8 +1273,8 @@ Handles selection and navigation across blocks. This component should be wrapped
 
 _Parameters_
 
--   _props_ `Object`: Component properties.
--   _props.children_ `Element`: Children to be rendered.
+- _props_ `Object`: Component properties.
+- _props.children_ `Element`: Children to be rendered.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 

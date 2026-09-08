@@ -12,12 +12,12 @@ Checks if a given block has controlled inner blocks.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _clientId_ `string`: The block to check.
+- _state_ `Object`: Global application state.
+- _clientId_ `string`: The block to check.
 
 _Returns_
 
--   `boolean`: True if the block has controlled inner blocks.
+- `boolean`: True if the block has controlled inner blocks.
 
 ### canEditBlock
 
@@ -25,12 +25,12 @@ Determines if the given block is allowed to be edited.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: The block client Id.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: The block client Id.
 
 _Returns_
 
--   `boolean`: Whether the given block is allowed to be edited.
+- `boolean`: Whether the given block is allowed to be edited.
 
 ### canInsertBlocks
 
@@ -38,13 +38,13 @@ Determines if the given blocks are allowed to be inserted into the block list.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientIds_ `string[]`: The block client IDs to be inserted.
--   _rootClientId_ `?string`: Optional root client ID of block list.
+- _state_ `Object`: Editor state.
+- _clientIds_ `string[]`: The block client IDs to be inserted.
+- _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
--   `boolean`: Whether the given blocks are allowed to be inserted.
+- `boolean`: Whether the given blocks are allowed to be inserted.
 
 ### canInsertBlockType
 
@@ -52,13 +52,13 @@ Determines if the given block type is allowed to be inserted into the block list
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _blockName_ `string`: The name of the block type, e.g.' core/paragraph'.
--   _rootClientId_ `?string`: Optional root client ID of block list.
+- _state_ `Object`: Editor state.
+- _blockName_ `string`: The name of the block type, e.g.' core/paragraph'.
+- _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
--   `boolean`: Whether the given block type is allowed to be inserted.
+- `boolean`: Whether the given block type is allowed to be inserted.
 
 ### canLockBlockType
 
@@ -66,12 +66,12 @@ Determines if the given block type can be locked/unlocked by a user.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _nameOrType_ `(string|Object)`: Block name or type object.
+- _state_ `Object`: Editor state.
+- _nameOrType_ `(string|Object)`: Block name or type object.
 
 _Returns_
 
--   `boolean`: Whether a given block type can be locked/unlocked.
+- `boolean`: Whether a given block type can be locked/unlocked.
 
 ### canMoveBlock
 
@@ -79,12 +79,12 @@ Determines if the given block is allowed to be moved.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: The block client Id.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: The block client Id.
 
 _Returns_
 
--   `boolean`: Whether the given block is allowed to be moved.
+- `boolean`: Whether the given block is allowed to be moved.
 
 ### canMoveBlocks
 
@@ -92,12 +92,12 @@ Determines if the given blocks are allowed to be moved.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientIds_ `string`: The block client IDs to be moved.
+- _state_ `Object`: Editor state.
+- _clientIds_ `string`: The block client IDs to be moved.
 
 _Returns_
 
--   `boolean`: Whether the given blocks are allowed to be moved.
+- `boolean`: Whether the given blocks are allowed to be moved.
 
 ### canRemoveBlock
 
@@ -105,12 +105,12 @@ Determines if the given block is allowed to be deleted.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: The block client Id.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: The block client Id.
 
 _Returns_
 
--   `boolean`: Whether the given block is allowed to be removed.
+- `boolean`: Whether the given block is allowed to be removed.
 
 ### canRemoveBlocks
 
@@ -118,12 +118,12 @@ Determines if the given blocks are allowed to be removed.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientIds_ `string`: The block client IDs to be removed.
+- _state_ `Object`: Editor state.
+- _clientIds_ `string`: The block client IDs to be removed.
 
 _Returns_
 
--   `boolean`: Whether the given blocks are allowed to be removed.
+- `boolean`: Whether the given blocks are allowed to be removed.
 
 ### didAutomaticChange
 
@@ -131,11 +131,11 @@ Returns true if the last change was an automatic change, false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+- _state_ `Object`: Global application state.
 
 _Returns_
 
--   `boolean`: Whether the last change was automatic.
+- `boolean`: Whether the last change was automatic.
 
 ### getAdjacentBlockClientId
 
@@ -143,13 +143,13 @@ Returns the client ID of the block adjacent one at the given reference startClie
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _startClientId_ `?string`: Optional client ID of block from which to search.
--   _modifier_ `?number`: Directionality multiplier (1 next, -1 previous).
+- _state_ `Object`: Editor state.
+- _startClientId_ `?string`: Optional client ID of block from which to search.
+- _modifier_ `?number`: Directionality multiplier (1 next, -1 previous).
 
 _Returns_
 
--   `?string`: Return the client ID of the block, or null if none exists.
+- `?string`: Return the client ID of the block, or null if none exists.
 
 ### getAllowedBlocks
 
@@ -157,12 +157,12 @@ Returns the list of allowed inserter blocks for inner blocks children.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _rootClientId_ `?string`: Optional root client ID of block list.
+- _state_ `Object`: Editor state.
+- _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
--   `Array?`: The list of allowed block types.
+- `Array?`: The list of allowed block types.
 
 ### getBlock
 
@@ -181,12 +181,12 @@ A block is an inner block controller when its children belong to, and are synced
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block client ID.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block client ID.
 
 _Returns_
 
--   `Object`: Parsed block object.
+- `Object`: Parsed block object.
 
 ### getBlockAttributes
 
@@ -194,12 +194,12 @@ Returns a block's attributes given its client ID, or null if no block exists wit
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block client ID.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block client ID.
 
 _Returns_
 
--   `?Object`: Block attributes.
+- `?Object`: Block attributes.
 
 ### getBlockCount
 
@@ -207,12 +207,12 @@ Returns the number of blocks currently present in the post.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _rootClientId_ `?string`: Optional root client ID of block list.
+- _state_ `Object`: Editor state.
+- _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
--   `number`: Number of blocks in the post.
+- `number`: Number of blocks in the post.
 
 ### getBlockEditingMode
 
@@ -220,9 +220,9 @@ Returns the block editing mode for a given block.
 
 The mode can be one of three options:
 
--   `'disabled'`: Prevents editing the block entirely, i.e. it cannot be selected.
--   `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the toolbar, the block movers, block settings.
--   `'default'`: Allows editing the block as normal.
+- `'disabled'`: Prevents editing the block entirely, i.e. it cannot be selected.
+- `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the toolbar, the block movers, block settings.
+- `'default'`: Allows editing the block as normal.
 
 Blocks can set a mode using the `useBlockEditingMode` hook.
 
@@ -232,16 +232,16 @@ A template lock can also set a mode. If the template lock is `'contentOnly'`, th
 
 _Related_
 
--   useBlockEditingMode
+- useBlockEditingMode
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _clientId_ `string`: The block client ID, or `''` for the root container.
+- _state_ `Object`: Global application state.
+- _clientId_ `string`: The block client ID, or `''` for the root container.
 
 _Returns_
 
--   `BlockEditingMode`: The block editing mode. One of `'disabled'`, `'contentOnly'`, or `'default'`.
+- `BlockEditingMode`: The block editing mode. One of `'disabled'`, `'contentOnly'`, or `'default'`.
 
 ### getBlockHierarchyRootClientId
 
@@ -249,12 +249,12 @@ Given a block client ID, returns the root of the hierarchy from which the block 
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block from which to find root client ID.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block from which to find root client ID.
 
 _Returns_
 
--   `string`: Root client ID
+- `string`: Root client ID
 
 ### getBlockIndex
 
@@ -262,12 +262,12 @@ Returns the index at which the block corresponding to the specified client ID oc
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block client ID.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block client ID.
 
 _Returns_
 
--   `number`: Index at which block exists in order.
+- `number`: Index at which block exists in order.
 
 ### getBlockInsertionPoint
 
@@ -275,11 +275,11 @@ Returns the location of the insertion cue. Defaults to the last index.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+- _state_ `Object`: Editor state.
 
 _Returns_
 
--   `Object`: Insertion point object with `rootClientId`, `index`.
+- `Object`: Insertion point object with `rootClientId`, `index`.
 
 ### getBlockListSettings
 
@@ -287,12 +287,12 @@ Returns the Block List settings of a block, if any exist.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `?string`: Block client ID.
+- _state_ `Object`: Editor state.
+- _clientId_ `?string`: Block client ID.
 
 _Returns_
 
--   `?Object`: Block settings of the block if set.
+- `?Object`: Block settings of the block if set.
 
 ### getBlockMode
 
@@ -300,12 +300,12 @@ Returns the block's editing mode, defaulting to "visual" if not explicitly assig
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block client ID.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block client ID.
 
 _Returns_
 
--   `Object`: Block editing mode.
+- `Object`: Block editing mode.
 
 ### getBlockName
 
@@ -313,12 +313,12 @@ Returns a block's name given its client ID, or null if no block exists with the 
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block client ID.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block client ID.
 
 _Returns_
 
--   `string`: Block name.
+- `string`: Block name.
 
 ### getBlockNamesByClientId
 
@@ -326,12 +326,12 @@ Given an array of block client IDs, returns the corresponding array of block nam
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientIds_ `string[]`: Client IDs for which block names are to be returned.
+- _state_ `Object`: Editor state.
+- _clientIds_ `string[]`: Client IDs for which block names are to be returned.
 
 _Returns_
 
--   `string[]`: Block names.
+- `string[]`: Block names.
 
 ### getBlockOrder
 
@@ -339,12 +339,12 @@ Returns an array containing all block client IDs in the editor in the order they
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _rootClientId_ `?string`: Optional root client ID of block list.
+- _state_ `Object`: Editor state.
+- _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
--   `Array`: Ordered client IDs of editor blocks.
+- `Array`: Ordered client IDs of editor blocks.
 
 ### getBlockParents
 
@@ -352,13 +352,13 @@ Given a block client ID, returns the list of all its parents from top to bottom.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block from which to find root client ID.
--   _ascending_ `boolean`: Order results from bottom to top (true) or top to bottom (false).
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block from which to find root client ID.
+- _ascending_ `boolean`: Order results from bottom to top (true) or top to bottom (false).
 
 _Returns_
 
--   `Array`: ClientIDs of the parent blocks.
+- `Array`: ClientIDs of the parent blocks.
 
 ### getBlockParentsByBlockName
 
@@ -366,14 +366,14 @@ Given a block client ID and a block name, returns the list of all its parents fr
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block from which to find root client ID.
--   _blockName_ `string|string[]`: Block name(s) to filter.
--   _ascending_ `boolean`: Order results from bottom to top (true) or top to bottom (false).
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block from which to find root client ID.
+- _blockName_ `string|string[]`: Block name(s) to filter.
+- _ascending_ `boolean`: Order results from bottom to top (true) or top to bottom (false).
 
 _Returns_
 
--   `Array`: ClientIDs of the parent blocks.
+- `Array`: ClientIDs of the parent blocks.
 
 ### getBlockRootClientId
 
@@ -381,12 +381,12 @@ Given a block client ID, returns the root block from which the block is nested, 
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block from which to find root client ID.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block from which to find root client ID.
 
 _Returns_
 
--   `?string`: Root client ID, if exists
+- `?string`: Root client ID, if exists
 
 ### getBlocks
 
@@ -394,12 +394,12 @@ Returns all block objects for the current post being edited as an array in the o
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _rootClientId_ `?string`: Optional root client ID of block list.
+- _state_ `Object`: Editor state.
+- _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
--   `Object[]`: Post blocks.
+- `Object[]`: Post blocks.
 
 ### getBlocksByClientId
 
@@ -407,12 +407,12 @@ Given an array of block client IDs, returns the corresponding array of block obj
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientIds_ `string[]`: Client IDs for which blocks are to be returned.
+- _state_ `Object`: Editor state.
+- _clientIds_ `string[]`: Client IDs for which blocks are to be returned.
 
 _Returns_
 
--   `WPBlock[]`: Block objects.
+- `WPBlock[]`: Block objects.
 
 ### getBlocksByName
 
@@ -420,12 +420,12 @@ Returns all blocks that match a blockName. Results include nested blocks.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _blockName_ `string[]`: Block name(s) for which clientIds are to be returned.
+- _state_ `Object`: Global application state.
+- _blockName_ `string[]`: Block name(s) for which clientIds are to be returned.
 
 _Returns_
 
--   `Array`: Array of clientIds of blocks with name equal to blockName.
+- `Array`: Array of clientIds of blocks with name equal to blockName.
 
 ### getBlockSelectionEnd
 
@@ -433,11 +433,11 @@ Returns the current block selection end. This value may be null, and it may repr
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+- _state_ `Object`: Global application state.
 
 _Returns_
 
--   `?string`: Client ID of block selection end.
+- `?string`: Client ID of block selection end.
 
 ### getBlockSelectionStart
 
@@ -445,11 +445,11 @@ Returns the current block selection start. This value may be null, and it may re
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+- _state_ `Object`: Global application state.
 
 _Returns_
 
--   `?string`: Client ID of block selection start.
+- `?string`: Client ID of block selection start.
 
 ### getBlockTransformItems
 
@@ -463,27 +463,27 @@ Items are returned ordered descendingly by their 'frecency'.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _blocks_ `Object|Object[]`: Block object or array objects.
--   _rootClientId_ `?string`: Optional root client ID of block list.
+- _state_ `Object`: Editor state.
+- _blocks_ `Object|Object[]`: Block object or array objects.
+- _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
--   `WPEditorTransformItem[]`: Items that appear in inserter.
+- `WPEditorTransformItem[]`: Items that appear in inserter.
 
 _Type Definition_
 
--   _WPEditorTransformItem_ `Object`
+- _WPEditorTransformItem_ `Object`
 
 _Properties_
 
--   _id_ `string`: Unique identifier for the item.
--   _name_ `string`: The type of block to create.
--   _variationName_ `?string`: The target block variation name.
--   _title_ `string`: Title of the item, as it appears in the inserter.
--   _icon_ `string`: Dashicon for the item, as it appears in the inserter.
--   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
--   _frecency_ `number`: Heuristic that combines frequency and recency.
+- _id_ `string`: Unique identifier for the item.
+- _name_ `string`: The type of block to create.
+- _variationName_ `?string`: The target block variation name.
+- _title_ `string`: Title of the item, as it appears in the inserter.
+- _icon_ `string`: Dashicon for the item, as it appears in the inserter.
+- _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
+- _frecency_ `number`: Heuristic that combines frequency and recency.
 
 ### getClientIdsOfDescendants
 
@@ -491,12 +491,12 @@ Returns an array containing the clientIds of all descendants of the blocks given
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _rootIds_ `string|string[]`: Client ID(s) for which descendant blocks are to be returned.
+- _state_ `Object`: Global application state.
+- _rootIds_ `string|string[]`: Client ID(s) for which descendant blocks are to be returned.
 
 _Returns_
 
--   `Array`: Client IDs of descendants.
+- `Array`: Client IDs of descendants.
 
 ### getClientIdsWithDescendants
 
@@ -504,11 +504,11 @@ Returns an array containing the clientIds of the top-level blocks and their desc
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+- _state_ `Object`: Global application state.
 
 _Returns_
 
--   `Array`: ids of top-level and descendant blocks.
+- `Array`: ids of top-level and descendant blocks.
 
 ### getDirectInsertBlock
 
@@ -516,21 +516,21 @@ Returns the block to be directly inserted by the block appender.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _rootClientId_ `?string`: Optional root client ID of block list.
+- _state_ `Object`: Editor state.
+- _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
--   `WPDirectInsertBlock|undefined`: The block type to be directly inserted.
+- `WPDirectInsertBlock|undefined`: The block type to be directly inserted.
 
 _Type Definition_
 
--   _WPDirectInsertBlock_ `Object`
+- _WPDirectInsertBlock_ `Object`
 
 _Properties_
 
--   _name_ `string`: The type of block.
--   _attributes_ `?Object`: Attributes to pass to the newly created block.
+- _name_ `string`: The type of block.
+- _attributes_ `?Object`: Attributes to pass to the newly created block.
 
 ### getDraggedBlockClientIds
 
@@ -540,11 +540,11 @@ This does not include children of a parent being dragged.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+- _state_ `Object`: Global application state.
 
 _Returns_
 
--   `string[]`: Array of dragged block client ids.
+- `string[]`: Array of dragged block client ids.
 
 ### getFirstMultiSelectedBlockClientId
 
@@ -552,11 +552,11 @@ Returns the client ID of the first block in the multi-selection set, or null if 
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+- _state_ `Object`: Editor state.
 
 _Returns_
 
--   `?string`: First block client ID in the multi-selection set.
+- `?string`: First block client ID in the multi-selection set.
 
 ### getGlobalBlockCount
 
@@ -564,12 +564,12 @@ Returns the total number of blocks, or the total number of blocks with a specifi
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _blockName_ `?string`: Optional block name, if specified only blocks of that type will be counted.
+- _state_ `Object`: Global application state.
+- _blockName_ `?string`: Optional block name, if specified only blocks of that type will be counted.
 
 _Returns_
 
--   `number`: Number of blocks in the post, or number of blocks with name equal to blockName.
+- `number`: Number of blocks in the post, or number of blocks with name equal to blockName.
 
 ### getHoveredBlockClientId
 
@@ -589,28 +589,28 @@ Items are returned ordered descendingly by their 'utility' and 'frecency'.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _rootClientId_ `?string`: Optional root client ID of block list.
+- _state_ `Object`: Editor state.
+- _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
--   `WPEditorInserterItem[]`: Items that appear in inserter.
+- `WPEditorInserterItem[]`: Items that appear in inserter.
 
 _Type Definition_
 
--   _WPEditorInserterItem_ `Object`
+- _WPEditorInserterItem_ `Object`
 
 _Properties_
 
--   _id_ `string`: Unique identifier for the item.
--   _name_ `string`: The type of block to create.
--   _initialAttributes_ `Object`: Attributes to pass to the newly created block.
--   _title_ `string`: Title of the item, as it appears in the inserter.
--   _icon_ `string`: Dashicon for the item, as it appears in the inserter.
--   _category_ `string`: Block category that the item is associated with.
--   _keywords_ `string[]`: Keywords that can be searched to find this item.
--   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
--   _frecency_ `number`: Heuristic that combines frequency and recency.
+- _id_ `string`: Unique identifier for the item.
+- _name_ `string`: The type of block to create.
+- _initialAttributes_ `Object`: Attributes to pass to the newly created block.
+- _title_ `string`: Title of the item, as it appears in the inserter.
+- _icon_ `string`: Dashicon for the item, as it appears in the inserter.
+- _category_ `string`: Block category that the item is associated with.
+- _keywords_ `string[]`: Keywords that can be searched to find this item.
+- _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
+- _frecency_ `number`: Heuristic that combines frequency and recency.
 
 ### getLastMultiSelectedBlockClientId
 
@@ -618,11 +618,11 @@ Returns the client ID of the last block in the multi-selection set, or null if t
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+- _state_ `Object`: Editor state.
 
 _Returns_
 
--   `?string`: Last block client ID in the multi-selection set.
+- `?string`: Last block client ID in the multi-selection set.
 
 ### getLowestCommonAncestorWithSelectedBlock
 
@@ -630,12 +630,12 @@ Given a block client ID, returns the lowest common ancestor with selected client
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block from which to find common ancestor client ID.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block from which to find common ancestor client ID.
 
 _Returns_
 
--   `string`: Common ancestor client ID or undefined
+- `string`: Common ancestor client ID or undefined
 
 ### getMultiSelectedBlockClientIds
 
@@ -643,11 +643,11 @@ Returns the current multi-selection set of block client IDs, or an empty array i
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+- _state_ `Object`: Editor state.
 
 _Returns_
 
--   `Array`: Multi-selected block client IDs.
+- `Array`: Multi-selected block client IDs.
 
 ### getMultiSelectedBlocks
 
@@ -655,11 +655,11 @@ Returns the current multi-selection set of blocks, or an empty array if there is
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+- _state_ `Object`: Editor state.
 
 _Returns_
 
--   `Array`: Multi-selected block objects.
+- `Array`: Multi-selected block objects.
 
 ### getMultiSelectedBlocksEndClientId
 
@@ -669,15 +669,15 @@ This is not necessarily the last client ID in the selection.
 
 _Related_
 
--   getLastMultiSelectedBlockClientId
+- getLastMultiSelectedBlockClientId
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+- _state_ `Object`: Editor state.
 
 _Returns_
 
--   `?string`: Client ID of block ending multi-selection.
+- `?string`: Client ID of block ending multi-selection.
 
 ### getMultiSelectedBlocksStartClientId
 
@@ -687,15 +687,15 @@ This is not necessarily the first client ID in the selection.
 
 _Related_
 
--   getFirstMultiSelectedBlockClientId
+- getFirstMultiSelectedBlockClientId
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+- _state_ `Object`: Editor state.
 
 _Returns_
 
--   `?string`: Client ID of block beginning multi-selection.
+- `?string`: Client ID of block beginning multi-selection.
 
 ### getNextBlockClientId
 
@@ -703,12 +703,12 @@ Returns the next block's client ID from the given reference start ID. Defaults s
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _startClientId_ `?string`: Optional client ID of block from which to search.
+- _state_ `Object`: Editor state.
+- _startClientId_ `?string`: Optional client ID of block from which to search.
 
 _Returns_
 
--   `?string`: Adjacent block's client ID, or null if none exists.
+- `?string`: Adjacent block's client ID, or null if none exists.
 
 ### getPatternsByBlockTypes
 
@@ -716,13 +716,13 @@ Returns the list of patterns based on their declared `blockTypes` and a block's 
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _blockNames_ `string|string[]`: Block's name or array of block names to find matching patterns.
--   _rootClientId_ `?string`: Optional target root client ID.
+- _state_ `Object`: Editor state.
+- _blockNames_ `string|string[]`: Block's name or array of block names to find matching patterns.
+- _rootClientId_ `?string`: Optional target root client ID.
 
 _Returns_
 
--   `Array`: The list of matched block patterns based on declared `blockTypes` and block name.
+- `Array`: The list of matched block patterns based on declared `blockTypes` and block name.
 
 ### getPreviousBlockClientId
 
@@ -730,12 +730,12 @@ Returns the previous block's client ID from the given reference start ID. Defaul
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _startClientId_ `?string`: Optional client ID of block from which to search.
+- _state_ `Object`: Editor state.
+- _startClientId_ `?string`: Optional client ID of block from which to search.
 
 _Returns_
 
--   `?string`: Adjacent block's client ID, or null if none exists.
+- `?string`: Adjacent block's client ID, or null if none exists.
 
 ### getSelectedBlock
 
@@ -776,11 +776,11 @@ const getActiveBlockData = () => {
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+- _state_ `Object`: Global application state.
 
 _Returns_
 
--   `?Object`: Selected block.
+- `?Object`: Selected block.
 
 ### getSelectedBlockClientId
 
@@ -788,11 +788,11 @@ Returns the currently selected block client ID, or null if there is no selected 
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+- _state_ `Object`: Editor state.
 
 _Returns_
 
--   `?string`: Selected block client ID.
+- `?string`: Selected block client ID.
 
 ### getSelectedBlockClientIds
 
@@ -800,11 +800,11 @@ Returns the current selection set of block client IDs (multiselection or single 
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+- _state_ `Object`: Editor state.
 
 _Returns_
 
--   `Array`: Multi-selected block client IDs.
+- `Array`: Multi-selected block client IDs.
 
 ### getSelectedBlockCount
 
@@ -812,11 +812,11 @@ Returns the number of blocks currently selected in the post.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+- _state_ `Object`: Global application state.
 
 _Returns_
 
--   `number`: Number of blocks selected in the post.
+- `number`: Number of blocks selected in the post.
 
 ### getSelectedBlocksInitialCaretPosition
 
@@ -824,11 +824,11 @@ Returns the initial caret position for the selected block. This position is to u
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+- _state_ `Object`: Global application state.
 
 _Returns_
 
--   `0|-1|null`: Initial position.
+- `0|-1|null`: Initial position.
 
 ### getSelectionEnd
 
@@ -836,11 +836,11 @@ Returns the current selection end block client ID, attribute key and text offset
 
 _Parameters_
 
--   _state_ `Object`: Block editor state.
+- _state_ `Object`: Block editor state.
 
 _Returns_
 
--   `WPBlockSelection`: Selection end information.
+- `WPBlockSelection`: Selection end information.
 
 ### getSelectionStart
 
@@ -848,11 +848,11 @@ Returns the current selection start block client ID, attribute key and text offs
 
 _Parameters_
 
--   _state_ `Object`: Block editor state.
+- _state_ `Object`: Block editor state.
 
 _Returns_
 
--   `WPBlockSelection`: Selection start information.
+- `WPBlockSelection`: Selection start information.
 
 ### getSettings
 
@@ -860,11 +860,11 @@ Returns the editor settings.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+- _state_ `Object`: Editor state.
 
 _Returns_
 
--   `Object`: The editor settings object.
+- `Object`: The editor settings object.
 
 ### getTemplate
 
@@ -872,11 +872,11 @@ Returns the defined block template
 
 _Parameters_
 
--   _state_ `boolean`:
+- _state_ `boolean`:
 
 _Returns_
 
--   `?Array`: Block Template.
+- `?Array`: Block Template.
 
 ### getTemplateLock
 
@@ -884,12 +884,12 @@ Returns the defined block template lock. Optionally accepts a root block client 
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _rootClientId_ `?string`: Optional block root client ID.
+- _state_ `Object`: Editor state.
+- _rootClientId_ `?string`: Optional block root client ID.
 
 _Returns_
 
--   `string|false`: Block Template Lock
+- `string|false`: Block Template Lock
 
 ### hasBlockMovingClientId
 
@@ -903,13 +903,13 @@ Returns true if one of the block's inner blocks is dragged.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block client ID.
--   _deep_ `boolean`: Perform a deep check.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block client ID.
+- _deep_ `boolean`: Perform a deep check.
 
 _Returns_
 
--   `boolean`: Whether the block has an inner block dragged
+- `boolean`: Whether the block has an inner block dragged
 
 ### hasInserterItems
 
@@ -917,12 +917,12 @@ Determines whether there are items to show in the inserter.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _rootClientId_ `?string`: Optional root client ID of block list.
+- _state_ `Object`: Editor state.
+- _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
--   `boolean`: Items that appear in inserter.
+- `boolean`: Items that appear in inserter.
 
 ### hasMultiSelection
 
@@ -930,11 +930,11 @@ Returns true if a multi-selection has been made, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+- _state_ `Object`: Editor state.
 
 _Returns_
 
--   `boolean`: Whether multi-selection has been made.
+- `boolean`: Whether multi-selection has been made.
 
 ### hasSelectedBlock
 
@@ -942,11 +942,11 @@ Returns true if there is a single selected block, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+- _state_ `Object`: Editor state.
 
 _Returns_
 
--   `boolean`: Whether a single block is selected.
+- `boolean`: Whether a single block is selected.
 
 ### hasSelectedInnerBlock
 
@@ -954,13 +954,13 @@ Returns true if one of the block's inner blocks is selected.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block client ID.
--   _deep_ `boolean`: Perform a deep check.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block client ID.
+- _deep_ `boolean`: Perform a deep check.
 
 _Returns_
 
--   `boolean`: Whether the block has an inner block selected
+- `boolean`: Whether the block has an inner block selected
 
 ### isAncestorBeingDragged
 
@@ -968,12 +968,12 @@ Returns whether a parent/ancestor of the block is being dragged.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _clientId_ `string`: Client id for block to check.
+- _state_ `Object`: Global application state.
+- _clientId_ `string`: Client id for block to check.
 
 _Returns_
 
--   `boolean`: Whether the block's ancestor is being dragged.
+- `boolean`: Whether the block's ancestor is being dragged.
 
 ### isAncestorMultiSelected
 
@@ -981,12 +981,12 @@ Returns true if an ancestor of the block is multi-selected, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block client ID.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block client ID.
 
 _Returns_
 
--   `boolean`: Whether an ancestor of the block is in multi-selection set.
+- `boolean`: Whether an ancestor of the block is in multi-selection set.
 
 ### isBlockBeingDragged
 
@@ -996,12 +996,12 @@ Only returns true if the block is being directly dragged, not if the block is a 
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _clientId_ `string`: Client id for block to check.
+- _state_ `Object`: Global application state.
+- _clientId_ `string`: Client id for block to check.
 
 _Returns_
 
--   `boolean`: Whether the block is being dragged.
+- `boolean`: Whether the block is being dragged.
 
 ### isBlockHighlighted
 
@@ -1009,12 +1009,12 @@ Returns true if the current highlighted block matches the block clientId.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _clientId_ `string`: The block to check.
+- _state_ `Object`: Global application state.
+- _clientId_ `string`: The block to check.
 
 _Returns_
 
--   `boolean`: Whether the block is currently highlighted.
+- `boolean`: Whether the block is currently highlighted.
 
 ### isBlockInsertionPointVisible
 
@@ -1022,11 +1022,11 @@ Returns true if the block insertion point is visible.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+- _state_ `Object`: Global application state.
 
 _Returns_
 
--   `?boolean`: Whether the insertion point is visible or not.
+- `?boolean`: Whether the insertion point is visible or not.
 
 ### isBlockMultiSelected
 
@@ -1034,12 +1034,12 @@ Returns true if the client ID occurs within the block multi-selection, or false 
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block client ID.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block client ID.
 
 _Returns_
 
--   `boolean`: Whether block is in multi-selection set.
+- `boolean`: Whether block is in multi-selection set.
 
 ### isBlockSelected
 
@@ -1047,12 +1047,12 @@ Returns true if the block corresponding to the specified client ID is currently 
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block client ID.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block client ID.
 
 _Returns_
 
--   `boolean`: Whether block is selected and multi-selection exists.
+- `boolean`: Whether block is selected and multi-selection exists.
 
 ### isBlockValid
 
@@ -1060,12 +1060,12 @@ Returns whether a block is valid or not.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block client ID.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block client ID.
 
 _Returns_
 
--   `boolean`: Is Valid.
+- `boolean`: Is Valid.
 
 ### isBlockVisible
 
@@ -1073,12 +1073,12 @@ Tells if the block is visible on the canvas or not.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _clientId_ `Object`: Client Id of the block.
+- _state_ `Object`: Global application state.
+- _clientId_ `Object`: Client Id of the block.
 
 _Returns_
 
--   `boolean`: True if the block is visible.
+- `boolean`: True if the block is visible.
 
 ### isBlockWithinSelection
 
@@ -1086,12 +1086,12 @@ Returns true if the block corresponding to the specified client ID is currently 
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block client ID.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block client ID.
 
 _Returns_
 
--   `boolean`: Whether block is selected and not the last in the selection.
+- `boolean`: Whether block is selected and not the last in the selection.
 
 ### isCaretWithinFormattedText
 
@@ -1101,7 +1101,7 @@ Returns true if the caret is within formatted text, or false otherwise.
 
 _Returns_
 
--   `boolean`: Whether the caret is within formatted text.
+- `boolean`: Whether the caret is within formatted text.
 
 ### isDraggingBlocks
 
@@ -1109,11 +1109,11 @@ Returns true if the user is dragging blocks, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+- _state_ `Object`: Global application state.
 
 _Returns_
 
--   `boolean`: Whether user is dragging blocks.
+- `boolean`: Whether user is dragging blocks.
 
 ### isFirstMultiSelectedBlock
 
@@ -1121,12 +1121,12 @@ Returns true if a multi-selection exists, and the block corresponding to the spe
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block client ID.
+- _state_ `Object`: Editor state.
+- _clientId_ `string`: Block client ID.
 
 _Returns_
 
--   `boolean`: Whether block is first in multi-selection.
+- `boolean`: Whether block is first in multi-selection.
 
 ### isGroupable
 
@@ -1134,12 +1134,12 @@ Indicates if the provided blocks(by client ids) are groupable. We need to have a
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _clientIds_ `string[]`: Block client ids. If not passed the selected blocks client ids will be used.
+- _state_ `Object`: Global application state.
+- _clientIds_ `string[]`: Block client ids. If not passed the selected blocks client ids will be used.
 
 _Returns_
 
--   `boolean`: True if the blocks are groupable.
+- `boolean`: True if the blocks are groupable.
 
 ### isLastBlockChangePersistent
 
@@ -1147,11 +1147,11 @@ Returns true if the most recent block change is be considered persistent, or fal
 
 _Parameters_
 
--   _state_ `Object`: Block editor state.
+- _state_ `Object`: Block editor state.
 
 _Returns_
 
--   `boolean`: Whether the most recent block change was persistent.
+- `boolean`: Whether the most recent block change was persistent.
 
 ### isMultiSelecting
 
@@ -1159,15 +1159,15 @@ Whether in the process of multi-selecting or not. This flag is only true while t
 
 _Related_
 
--   hasMultiSelection
+- hasMultiSelection
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+- _state_ `Object`: Global application state.
 
 _Returns_
 
--   `boolean`: True if multi-selecting, false if not.
+- `boolean`: True if multi-selecting, false if not.
 
 ### isSelectionEnabled
 
@@ -1175,11 +1175,11 @@ Selector that returns if multi-selection is enabled or not.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+- _state_ `Object`: Global application state.
 
 _Returns_
 
--   `boolean`: True if it should be possible to multi-select blocks, false if multi-selection is disabled.
+- `boolean`: True if it should be possible to multi-select blocks, false if multi-selection is disabled.
 
 ### isTyping
 
@@ -1187,11 +1187,11 @@ Returns true if the user is typing, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+- _state_ `Object`: Global application state.
 
 _Returns_
 
--   `boolean`: Whether user is typing.
+- `boolean`: Whether user is typing.
 
 ### isUngroupable
 
@@ -1199,12 +1199,12 @@ Indicates if a block is ungroupable. A block is ungroupable if it is a single gr
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _clientId_ `string`: Client Id of the block. If not passed the selected block's client id will be used.
+- _state_ `Object`: Global application state.
+- _clientId_ `string`: Client Id of the block. If not passed the selected block's client id will be used.
 
 _Returns_
 
--   `boolean`: True if the block is ungroupable.
+- `boolean`: True if the block is ungroupable.
 
 ### isValidTemplate
 
@@ -1212,11 +1212,11 @@ Returns whether the blocks matches the template or not.
 
 _Parameters_
 
--   _state_ `boolean`:
+- _state_ `boolean`:
 
 _Returns_
 
--   `?boolean`: Whether the template is valid or not.
+- `?boolean`: Whether the template is valid or not.
 
 ### wasBlockJustInserted
 
@@ -1224,13 +1224,13 @@ Tells if the block with the passed clientId was just inserted.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _clientId_ `Object`: Client Id of the block.
--   _source_ `?string`: Optional insertion source of the block.
+- _state_ `Object`: Global application state.
+- _clientId_ `Object`: Client Id of the block.
+- _source_ `?string`: Optional insertion source of the block.
 
 _Returns_
 
--   `boolean`: True if the block matches the last block inserted from the specified source.
+- `boolean`: True if the block matches the last block inserted from the specified source.
 
 <!-- END TOKEN(Autogenerated selectors|../../../packages/block-editor/src/store/selectors.js) -->
 
@@ -1244,7 +1244,7 @@ Action that clears the block selection.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### duplicateBlocks
 
@@ -1252,8 +1252,8 @@ Action that duplicates a list of blocks.
 
 _Parameters_
 
--   _clientIds_ `string[]`:
--   _updateSelection_ `boolean`:
+- _clientIds_ `string[]`:
+- _updateSelection_ `boolean`:
 
 ### enterFormattedText
 
@@ -1263,7 +1263,7 @@ Returns an action object used in signalling that the caret has entered formatted
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### exitFormattedText
 
@@ -1273,7 +1273,7 @@ Returns an action object used in signalling that the user caret has exited forma
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### flashBlock
 
@@ -1281,8 +1281,8 @@ Action that "flashes" the block with a given `clientId` by rhythmically highligh
 
 _Parameters_
 
--   _clientId_ `string`: Target block client ID.
--   _timeout_ `number`: Duration in milliseconds to keep the highlight. Defaults to 150ms.
+- _clientId_ `string`: Target block client ID.
+- _timeout_ `number`: Duration in milliseconds to keep the highlight. Defaults to 150ms.
 
 ### hideInsertionPoint
 
@@ -1300,7 +1300,7 @@ Action that inserts a default block after a given block.
 
 _Parameters_
 
--   _clientId_ `string`:
+- _clientId_ `string`:
 
 ### insertBeforeBlock
 
@@ -1308,7 +1308,7 @@ Action that inserts a default block before a given block.
 
 _Parameters_
 
--   _clientId_ `string`:
+- _clientId_ `string`:
 
 ### insertBlock
 
@@ -1318,16 +1318,16 @@ Only allowed blocks are inserted. The action may fail silently for blocks that a
 
 _Parameters_
 
--   _block_ `Object`: Block object to insert.
--   _index_ `?number`: Index at which block should be inserted.
--   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
--   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to true.
--   _initialPosition_ `0|-1|null`: Initial focus position. Setting it to null prevent focusing the inserted block.
--   _meta_ `?Object`: Optional Meta values to be passed to the action object.
+- _block_ `Object`: Block object to insert.
+- _index_ `?number`: Index at which block should be inserted.
+- _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
+- _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to true.
+- _initialPosition_ `0|-1|null`: Initial focus position. Setting it to null prevent focusing the inserted block.
+- _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### insertBlocks
 
@@ -1337,16 +1337,16 @@ Only allowed blocks are inserted. The action may fail silently for blocks that a
 
 _Parameters_
 
--   _blocks_ `Object[]`: Block objects to insert.
--   _index_ `?number`: Index at which block should be inserted.
--   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
--   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to true.
--   _initialPosition_ `0|-1|null`: Initial focus position. Setting it to null prevent focusing the inserted block.
--   _meta_ `?Object`: Optional Meta values to be passed to the action object.
+- _blocks_ `Object[]`: Block objects to insert.
+- _index_ `?number`: Index at which block should be inserted.
+- _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
+- _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to true.
+- _initialPosition_ `0|-1|null`: Initial focus position. Setting it to null prevent focusing the inserted block.
+- _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### insertDefaultBlock
 
@@ -1354,9 +1354,9 @@ Action that adds a new block of the default type to the block list.
 
 _Parameters_
 
--   _attributes_ `?Object`: Optional attributes of the block to assign.
--   _rootClientId_ `?string`: Optional root client ID of block list on which to append.
--   _index_ `?number`: Optional index where to insert the default block.
+- _attributes_ `?Object`: Optional attributes of the block to assign.
+- _rootClientId_ `?string`: Optional root client ID of block list on which to append.
+- _index_ `?number`: Optional index where to insert the default block.
 
 ### mergeBlocks
 
@@ -1364,8 +1364,8 @@ Action that merges two blocks.
 
 _Parameters_
 
--   _firstBlockClientId_ `string`: Client ID of the first block to merge.
--   _secondBlockClientId_ `string`: Client ID of the second block to merge.
+- _firstBlockClientId_ `string`: Client ID of the first block to merge.
+- _secondBlockClientId_ `string`: Client ID of the second block to merge.
 
 ### moveBlocksDown
 
@@ -1377,10 +1377,10 @@ Action that moves given blocks to a new position.
 
 _Parameters_
 
--   _clientIds_ `?string`: The client IDs of the blocks.
--   _fromRootClientId_ `?string`: Root client ID source.
--   _toRootClientId_ `?string`: Root client ID destination.
--   _index_ `number`: The index to move the blocks to.
+- _clientIds_ `?string`: The client IDs of the blocks.
+- _fromRootClientId_ `?string`: Root client ID source.
+- _toRootClientId_ `?string`: Root client ID destination.
+- _index_ `number`: The index to move the blocks to.
 
 ### moveBlocksUp
 
@@ -1392,10 +1392,10 @@ Action that moves given block to a new position.
 
 _Parameters_
 
--   _clientId_ `?string`: The client ID of the block.
--   _fromRootClientId_ `?string`: Root client ID source.
--   _toRootClientId_ `?string`: Root client ID destination.
--   _index_ `number`: The index to move the block to.
+- _clientId_ `?string`: The client ID of the block.
+- _fromRootClientId_ `?string`: Root client ID source.
+- _toRootClientId_ `?string`: Root client ID destination.
+- _index_ `number`: The index to move the block to.
 
 ### multiSelect
 
@@ -1403,9 +1403,9 @@ Action that changes block multi-selection.
 
 _Parameters_
 
--   _start_ `string`: First block of the multi selection.
--   _end_ `string`: Last block of the multiselection.
--   _\_\_experimentalInitialPosition_ `number|null`: Optional initial position. Pass as null to skip focus within editor canvas.
+- _start_ `string`: First block of the multi selection.
+- _end_ `string`: Last block of the multiselection.
+- _\_\_experimentalInitialPosition_ `number|null`: Optional initial position. Pass as null to skip focus within editor canvas.
 
 ### receiveBlocks
 
@@ -1415,11 +1415,11 @@ Returns an action object used in signalling that blocks have been received. Unli
 
 _Parameters_
 
--   _blocks_ `Object[]`: Array of block objects.
+- _blocks_ `Object[]`: Array of block objects.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### registerInserterMediaCategory
 
@@ -1429,37 +1429,37 @@ The following interfaces are used:
 
 _Type Definition_
 
--   _InserterMediaRequest_ `Object`: Interface for inserter media requests.
+- _InserterMediaRequest_ `Object`: Interface for inserter media requests.
 
 _Properties_
 
--   _per_page_ `number`: How many items to fetch per page.
--   _page_ `[number]`: Which page of results to fetch. Defaults to the first page.
--   _search_ `string`: The search term to use for filtering the results.
+- _per_page_ `number`: How many items to fetch per page.
+- _page_ `[number]`: Which page of results to fetch. Defaults to the first page.
+- _search_ `string`: The search term to use for filtering the results.
 
 _Type Definition_
 
--   _InserterMediaItem_ `Object`: Interface for inserter media responses. Any media resource should map their response to this interface, in order to create the core WordPress media blocks (image, video, audio).
+- _InserterMediaItem_ `Object`: Interface for inserter media responses. Any media resource should map their response to this interface, in order to create the core WordPress media blocks (image, video, audio).
 
 _Properties_
 
--   _title_ `string`: The title of the media item.
--   _url_ \`string: The source url of the media item.
--   _previewUrl_ `[string]`: The preview source url of the media item to display in the media list.
--   _id_ `[number]`: The WordPress id of the media item.
--   _sourceId_ `[number|string]`: The id of the media item from external source.
--   _alt_ `[string]`: The alt text of the media item.
--   _caption_ `[string]`: The caption of the media item.
+- _title_ `string`: The title of the media item.
+- _url_ \`string: The source url of the media item.
+- _previewUrl_ `[string]`: The preview source url of the media item to display in the media list.
+- _id_ `[number]`: The WordPress id of the media item.
+- _sourceId_ `[number|string]`: The id of the media item from external source.
+- _alt_ `[string]`: The alt text of the media item.
+- _caption_ `[string]`: The caption of the media item.
 
 _Type Definition_
 
--   _InserterMediaResponse_ `Object`: Interface for paginated inserter media responses. A media category's `fetch` may return this instead of a plain array to opt into pagination, in which case the media tab renders paging controls for the category.
+- _InserterMediaResponse_ `Object`: Interface for paginated inserter media responses. A media category's `fetch` may return this instead of a plain array to opt into pagination, in which case the media tab renders paging controls for the category.
 
 _Properties_
 
--   _mediaItems_ `InserterMediaItem[]`: The media items for the requested page.
--   _totalItems_ `number`: The total number of items across all pages.
--   _totalPages_ `number`: The total number of pages available.
+- _mediaItems_ `InserterMediaItem[]`: The media items for the requested page.
+- _totalItems_ `number`: The total number of items across all pages.
+- _totalPages_ `number`: The total number of pages available.
 
 _Usage_
 
@@ -1517,23 +1517,23 @@ wp.data.dispatch( 'core/block-editor' ).registerInserterMediaCategory( {
 
 _Parameters_
 
--   _category_ `InserterMediaCategory`: The inserter media category to register.
+- _category_ `InserterMediaCategory`: The inserter media category to register.
 
 _Type Definition_
 
--   _InserterMediaCategory_ `Object`: Interface for inserter media category.
+- _InserterMediaCategory_ `Object`: Interface for inserter media category.
 
 _Properties_
 
--   _name_ `string`: The name of the media category, that should be unique among all media categories.
--   _labels_ `Object`: Labels for the media category.
--   _labels.name_ `string`: General name of the media category. It's used in the inserter media items list.
--   _labels.search_items_ `[string]`: Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
--   _mediaType_ `('image'|'audio'|'video')`: The media type of the media category.
--   _fetch_ `(InserterMediaRequest) => Promise<InserterMediaItem[]|InserterMediaResponse>`: The function to fetch media items for the category. Returning an `InserterMediaResponse` instead of a plain array opts the category into pagination.
--   _getReportUrl_ `[(InserterMediaItem) => string]`: If the media category supports reporting media items, this function should return the report url for the media item. It accepts the `InserterMediaItem` as an argument.
--   _isExternalResource_ `[boolean]`: If the media category is an external resource, this should be set to true. This is used to avoid making a request to the external resource when checking whether the category has any media items to display in the media tab.
--   _emptyMessage_ `[string]`: Optional message shown in place of the generic "No results found." when the source has no items and there is no active search. Providing it also keeps the source in the tab list while empty, so the message stays reachable.
+- _name_ `string`: The name of the media category, that should be unique among all media categories.
+- _labels_ `Object`: Labels for the media category.
+- _labels.name_ `string`: General name of the media category. It's used in the inserter media items list.
+- _labels.search_items_ `[string]`: Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
+- _mediaType_ `('image'|'audio'|'video')`: The media type of the media category.
+- _fetch_ `(InserterMediaRequest) => Promise<InserterMediaItem[]|InserterMediaResponse>`: The function to fetch media items for the category. Returning an `InserterMediaResponse` instead of a plain array opts the category into pagination.
+- _getReportUrl_ `[(InserterMediaItem) => string]`: If the media category supports reporting media items, this function should return the report url for the media item. It accepts the `InserterMediaItem` as an argument.
+- _isExternalResource_ `[boolean]`: If the media category is an external resource, this should be set to true. This is used to avoid making a request to the external resource when checking whether the category has any media items to display in the media tab.
+- _emptyMessage_ `[string]`: Optional message shown in place of the generic "No results found." when the source has no items and there is no active search. Providing it also keeps the source in the tab list while empty, so the message stays reachable.
 
 ### removeBlock
 
@@ -1541,12 +1541,12 @@ Returns an action object used in signalling that the block with the specified cl
 
 _Parameters_
 
--   _clientId_ `string`: Client ID of block to remove.
--   _selectPrevious_ `boolean`: True if the previous block should be selected when a block is removed.
+- _clientId_ `string`: Client ID of block to remove.
+- _selectPrevious_ `boolean`: True if the previous block should be selected when a block is removed.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### removeBlocks
 
@@ -1554,8 +1554,8 @@ Yields action objects used in signalling that the blocks corresponding to the se
 
 _Parameters_
 
--   _clientIds_ `string|string[]`: Client IDs of blocks to remove.
--   _selectPrevious_ `boolean`: True if the previous block or the immediate parent (if no previous block exists) should be selected when a block is removed.
+- _clientIds_ `string|string[]`: Client IDs of blocks to remove.
+- _selectPrevious_ `boolean`: True if the previous block or the immediate parent (if no previous block exists) should be selected when a block is removed.
 
 ### replaceBlock
 
@@ -1563,12 +1563,12 @@ Action that replaces a single block with one or more replacement blocks.
 
 _Parameters_
 
--   _clientId_ `(string|string[])`: Block client ID to replace.
--   _block_ `(Object|Object[])`: Replacement block(s).
+- _clientId_ `(string|string[])`: Block client ID to replace.
+- _block_ `(Object|Object[])`: Replacement block(s).
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### replaceBlocks
 
@@ -1576,15 +1576,15 @@ Action that replaces given blocks with one or more replacement blocks.
 
 _Parameters_
 
--   _clientIds_ `(string|string[])`: Block client ID(s) to replace.
--   _blocks_ `(Object|Object[])`: Replacement block(s).
--   _indexToSelect_ `number`: Index of replacement block to select.
--   _initialPosition_ `0|-1|null`: Index of caret after in the selected block after the operation.
--   _meta_ `?Object`: Optional Meta values to be passed to the action object.
+- _clientIds_ `(string|string[])`: Block client ID(s) to replace.
+- _blocks_ `(Object|Object[])`: Replacement block(s).
+- _indexToSelect_ `number`: Index of replacement block to select.
+- _initialPosition_ `0|-1|null`: Index of caret after in the selected block after the operation.
+- _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### replaceInnerBlocks
 
@@ -1592,14 +1592,14 @@ Returns an action object used in signalling that the inner blocks with the speci
 
 _Parameters_
 
--   _rootClientId_ `string`: Client ID of the block whose InnerBlocks will re replaced.
--   _blocks_ `Object[]`: Block objects to insert as new InnerBlocks
--   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to false.
--   _initialPosition_ `0|-1|null`: Initial block position.
+- _rootClientId_ `string`: Client ID of the block whose InnerBlocks will re replaced.
+- _blocks_ `Object[]`: Block objects to insert as new InnerBlocks
+- _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to false.
+- _initialPosition_ `0|-1|null`: Initial block position.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### resetBlocks
 
@@ -1607,7 +1607,7 @@ Action that resets blocks state to the specified array of blocks, taking precede
 
 _Parameters_
 
--   _blocks_ `Array`: Array of blocks.
+- _blocks_ `Array`: Array of blocks.
 
 ### resetSelection
 
@@ -1615,13 +1615,13 @@ Returns an action object used in signalling that selection state should be reset
 
 _Parameters_
 
--   _selectionStart_ `WPBlockSelection`: The selection start.
--   _selectionEnd_ `WPBlockSelection`: The selection end.
--   _initialPosition_ `0|-1|null`: Initial block position.
+- _selectionStart_ `WPBlockSelection`: The selection start.
+- _selectionEnd_ `WPBlockSelection`: The selection end.
+- _initialPosition_ `0|-1|null`: Initial block position.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### selectBlock
 
@@ -1629,12 +1629,12 @@ Returns an action object used in signalling that the block with the specified cl
 
 _Parameters_
 
--   _clientId_ `string`: Block client ID.
--   _initialPosition_ `0|-1|null`: Optional initial position. Pass -1 to reflect reverse selection or `null` to prevent focusing the block.
+- _clientId_ `string`: Block client ID.
+- _initialPosition_ `0|-1|null`: Optional initial position. Pass -1 to reflect reverse selection or `null` to prevent focusing the block.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### selectionChange
 
@@ -1642,14 +1642,14 @@ Action that changes the position of the user caret.
 
 _Parameters_
 
--   _clientId_ `string|WPSelection`: The selected block client ID.
--   _attributeKey_ `string`: The selected block attribute key.
--   _startOffset_ `number`: The start offset.
--   _endOffset_ `number`: The end offset.
+- _clientId_ `string|WPSelection`: The selected block client ID.
+- _attributeKey_ `string`: The selected block attribute key.
+- _startOffset_ `number`: The start offset.
+- _endOffset_ `number`: The end offset.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### selectNextBlock
 
@@ -1657,7 +1657,7 @@ Yields action objects used in signalling that the block following the given clie
 
 _Parameters_
 
--   _clientId_ `string`: Block client ID.
+- _clientId_ `string`: Block client ID.
 
 ### selectPreviousBlock
 
@@ -1665,8 +1665,8 @@ Yields action objects used in signalling that the block preceding the given clie
 
 _Parameters_
 
--   _clientId_ `string`: Block client ID.
--   _fallbackToParent_ `boolean`: If true, select the first parent if there is no previous block.
+- _clientId_ `string`: Block client ID.
+- _fallbackToParent_ `boolean`: If true, select the first parent if there is no previous block.
 
 ### setBlockEditingMode
 
@@ -1674,16 +1674,16 @@ Sets the block editing mode for a given block.
 
 _Related_
 
--   useBlockEditingMode
+- useBlockEditingMode
 
 _Parameters_
 
--   _clientId_ `string`: The block client ID, or `''` for the root container.
--   _mode_ `BlockEditingMode`: The block editing mode. One of `'disabled'`, `'contentOnly'`, or `'default'`.
+- _clientId_ `string`: The block client ID, or `''` for the root container.
+- _mode_ `BlockEditingMode`: The block editing mode. One of `'disabled'`, `'contentOnly'`, or `'default'`.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### setBlockMovingClientId
 
@@ -1693,7 +1693,7 @@ Set the block moving client ID.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### setBlockVisibility
 
@@ -1701,7 +1701,7 @@ Action that sets whether given blocks are visible on the canvas.
 
 _Parameters_
 
--   _updates_ `Record<string,boolean>`: For each block's clientId, its new visibility setting.
+- _updates_ `Record<string,boolean>`: For each block's clientId, its new visibility setting.
 
 ### setHasControlledInnerBlocks
 
@@ -1709,8 +1709,8 @@ Action that sets whether a block has controlled inner blocks.
 
 _Parameters_
 
--   _clientId_ `string`: The block's clientId.
--   _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
+- _clientId_ `string`: The block's clientId.
+- _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
 
 ### setTemplateValidity
 
@@ -1718,11 +1718,11 @@ Action that resets the template validity.
 
 _Parameters_
 
--   _isValid_ `boolean`: template validity flag.
+- _isValid_ `boolean`: template validity flag.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### showInsertionPoint
 
@@ -1730,18 +1730,18 @@ Action that shows the insertion point.
 
 _Parameters_
 
--   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
--   _index_ `?number`: Index at which block should be inserted.
--   _\_\_unstableOptions_ `?Object`: Additional options.
+- _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
+- _index_ `?number`: Index at which block should be inserted.
+- _\_\_unstableOptions_ `?Object`: Additional options.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 _Properties_
 
--   _\_\_unstableWithInserter_ `boolean`: Whether or not to show an inserter button.
--   _operation_ `WPDropOperation`: The operation to perform when applied, either 'insert' or 'replace' for now.
+- _\_\_unstableWithInserter_ `boolean`: Whether or not to show an inserter button.
+- _operation_ `WPDropOperation`: The operation to perform when applied, either 'insert' or 'replace' for now.
 
 ### startDraggingBlocks
 
@@ -1749,11 +1749,11 @@ Returns an action object used in signalling that the user has begun to drag bloc
 
 _Parameters_
 
--   _clientIds_ `string[]`: An array of client ids being dragged
+- _clientIds_ `string[]`: An array of client ids being dragged
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### startMultiSelect
 
@@ -1761,7 +1761,7 @@ Action that starts block multi-selection.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### startTyping
 
@@ -1769,7 +1769,7 @@ Returns an action object used in signalling that the user has begun to type.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### stopDraggingBlocks
 
@@ -1777,7 +1777,7 @@ Returns an action object used in signalling that the user has stopped dragging b
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### stopMultiSelect
 
@@ -1785,7 +1785,7 @@ Action that stops block multi-selection.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### stopTyping
 
@@ -1793,7 +1793,7 @@ Returns an action object used in signalling that the user has stopped typing.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### synchronizeTemplate
 
@@ -1801,7 +1801,7 @@ Action that synchronizes the template with the list of blocks.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### toggleBlockHighlight
 
@@ -1809,8 +1809,8 @@ Action that toggles the highlighted block state.
 
 _Parameters_
 
--   _clientId_ `string`: The block's clientId.
--   _isHighlighted_ `boolean`: The highlight state.
+- _clientId_ `string`: The block's clientId.
+- _isHighlighted_ `boolean`: The highlight state.
 
 ### toggleBlockMode
 
@@ -1818,11 +1818,11 @@ Returns an action object used to toggle the block editing mode between visual an
 
 _Parameters_
 
--   _clientId_ `string`: Block client ID.
+- _clientId_ `string`: Block client ID.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### toggleSelection
 
@@ -1830,11 +1830,11 @@ Action that enables or disables block selection.
 
 _Parameters_
 
--   _isSelectionEnabled_ `[boolean]`: Whether block selection should be enabled.
+- _isSelectionEnabled_ `[boolean]`: Whether block selection should be enabled.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### unsetBlockEditingMode
 
@@ -1842,15 +1842,15 @@ Clears the block editing mode for a given block.
 
 _Related_
 
--   useBlockEditingMode
+- useBlockEditingMode
 
 _Parameters_
 
--   _clientId_ `string`: The block client ID, or `''` for the root container.
+- _clientId_ `string`: The block client ID, or `''` for the root container.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### updateBlock
 
@@ -1858,12 +1858,12 @@ Action that updates the block with the specified client ID.
 
 _Parameters_
 
--   _clientId_ `string`: Block client ID.
--   _updates_ `Object`: Block attributes to be merged.
+- _clientId_ `string`: Block client ID.
+- _updates_ `Object`: Block attributes to be merged.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### updateBlockAttributes
 
@@ -1871,14 +1871,14 @@ Action that updates attributes of multiple blocks with the specified client IDs.
 
 _Parameters_
 
--   _clientIds_ `string|string[]`: Block client IDs.
--   _attributes_ `Object`: Block attributes to be merged. Should be keyed by clientIds if `options.uniqueByBlock` is true.
--   _options_ `Object`: Updating options.
--   _options.uniqueByBlock_ `[boolean]`: Whether each block in clientIds array has a unique set of attributes.
+- _clientIds_ `string|string[]`: Block client IDs.
+- _attributes_ `Object`: Block attributes to be merged. Should be keyed by clientIds if `options.uniqueByBlock` is true.
+- _options_ `Object`: Updating options.
+- _options.uniqueByBlock_ `[boolean]`: Whether each block in clientIds array has a unique set of attributes.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### updateBlockListSettings
 
@@ -1886,12 +1886,12 @@ Action that changes the nested settings of the given block(s).
 
 _Parameters_
 
--   _clientId_ `string | SettingsByClientId`: Client ID of the block whose nested setting are being received, or object of settings by client ID.
--   _settings_ `Object`: Object with the new settings for the nested block.
+- _clientId_ `string | SettingsByClientId`: Client ID of the block whose nested setting are being received, or object of settings by client ID.
+- _settings_ `Object`: Object with the new settings for the nested block.
 
 _Returns_
 
--   `Object`: Action object
+- `Object`: Action object
 
 ### updateSettings
 
@@ -1899,11 +1899,11 @@ Action that updates the block editor settings.
 
 _Parameters_
 
--   _settings_ `Object`: Updated settings
+- _settings_ `Object`: Updated settings
 
 _Returns_
 
--   `Object`: Action object
+- `Object`: Action object
 
 ### validateBlocksToTemplate
 
@@ -1911,6 +1911,6 @@ Block validity is a function of blocks state (at the point of a reset) and the t
 
 _Parameters_
 
--   _blocks_ `Array`: Array of blocks.
+- _blocks_ `Array`: Array of blocks.
 
 <!-- END TOKEN(Autogenerated actions|../../../packages/block-editor/src/store/actions.js) -->

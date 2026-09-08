@@ -20,11 +20,11 @@ Get the rectangle for the selection in a container.
 
 _Parameters_
 
--   _win_ `Window`: The window of the selection.
+- _win_ `Window`: The window of the selection.
 
 _Returns_
 
--   `DOMRect | null`: The rectangle.
+- `DOMRect | null`: The rectangle.
 
 ### documentHasSelection
 
@@ -32,11 +32,11 @@ Check whether the current document has a selection. This includes focus in input
 
 _Parameters_
 
--   _doc_ `Document`: The document to check.
+- _doc_ `Document`: The document to check.
 
 _Returns_
 
--   `boolean`: True if there is selection, false if not.
+- `boolean`: True if there is selection, false if not.
 
 ### documentHasTextSelection
 
@@ -46,11 +46,11 @@ See: <https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Relat
 
 _Parameters_
 
--   _doc_ `Document`: The document to check.
+- _doc_ `Document`: The document to check.
 
 _Returns_
 
--   `boolean`: True if there is selection, false if not.
+- `boolean`: True if there is selection, false if not.
 
 ### documentHasUncollapsedSelection
 
@@ -58,11 +58,11 @@ Check whether the current document has any sort of (uncollapsed) selection. This
 
 _Parameters_
 
--   _doc_ `Document`: The document to check.
+- _doc_ `Document`: The document to check.
 
 _Returns_
 
--   `boolean`: Whether there is any recognizable text selection in the document.
+- `boolean`: Whether there is any recognizable text selection in the document.
 
 ### focus
 
@@ -74,11 +74,11 @@ Gets all files from a DataTransfer object.
 
 _Parameters_
 
--   _dataTransfer_ `DataTransfer`: DataTransfer object to inspect.
+- _dataTransfer_ `DataTransfer`: DataTransfer object to inspect.
 
 _Returns_
 
--   `File[]`: An array containing all files.
+- `File[]`: An array containing all files.
 
 ### getOffsetParent
 
@@ -86,15 +86,15 @@ Returns the closest positioned element, or null under any of the conditions of t
 
 _Related_
 
--   <https://drafts.csswg.org/cssom-view/#dom-htmlelement-offsetparent>
+- <https://drafts.csswg.org/cssom-view/#dom-htmlelement-offsetparent>
 
 _Parameters_
 
--   _node_ `Node`: Node from which to find offset parent.
+- _node_ `Node`: Node from which to find offset parent.
 
 _Returns_
 
--   `Node | null`: Offset parent.
+- `Node | null`: Offset parent.
 
 ### getPhrasingContentSchema
 
@@ -102,15 +102,15 @@ Get schema of possible paths for phrasing content.
 
 _Related_
 
--   <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
+- <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
 
 _Parameters_
 
--   _context_ `[string]`: Set to "paste" to exclude invisible elements and sensitive data.
+- _context_ `[string]`: Set to "paste" to exclude invisible elements and sensitive data.
 
 _Returns_
 
--   `Partial<ContentSchema>`: Schema.
+- `Partial<ContentSchema>`: Schema.
 
 ### getRectangleFromRange
 
@@ -118,11 +118,11 @@ Get the rectangle of a given Range. Returns `null` if no suitable rectangle can 
 
 _Parameters_
 
--   _range_ `Range`: The range.
+- _range_ `Range`: The range.
 
 _Returns_
 
--   `DOMRect?`: The rectangle.
+- `DOMRect?`: The rectangle.
 
 ### getScrollContainer
 
@@ -130,12 +130,12 @@ Given a DOM node, finds the closest scrollable container node or the node itself
 
 _Parameters_
 
--   _node_ `Element | null`: Node from which to start.
--   _direction_ `?string`: Direction of scrollable container to search for ('vertical', 'horizontal', 'all'). Defaults to 'vertical'.
+- _node_ `Element | null`: Node from which to start.
+- _direction_ `?string`: Direction of scrollable container to search for ('vertical', 'horizontal', 'all'). Defaults to 'vertical'.
 
 _Returns_
 
--   `Element | undefined`: Scrollable container node, if found.
+- `Element | undefined`: Scrollable container node, if found.
 
 ### insertAfter
 
@@ -143,12 +143,12 @@ Given two DOM nodes, inserts the former in the DOM as the next sibling of the la
 
 _Parameters_
 
--   _newNode_ `Node`: Node to be inserted.
--   _referenceNode_ `Node`: Node after which to perform the insertion.
+- _newNode_ `Node`: Node to be inserted.
+- _referenceNode_ `Node`: Node after which to perform the insertion.
 
 _Returns_
 
--   `void`:
+- `void`:
 
 ### isEmpty
 
@@ -156,11 +156,11 @@ Recursively checks if an element is empty. An element is not empty if it contain
 
 _Parameters_
 
--   _element_ `Element`: The element to check.
+- _element_ `Element`: The element to check.
 
 _Returns_
 
--   `boolean`: Whether or not the element is empty.
+- `boolean`: Whether or not the element is empty.
 
 ### isEntirelySelected
 
@@ -168,11 +168,11 @@ Check whether the contents of the element have been entirely selected. Returns t
 
 _Parameters_
 
--   _element_ `HTMLElement`: The element to check.
+- _element_ `HTMLElement`: The element to check.
 
 _Returns_
 
--   `boolean`: True if entirely selected, false if not.
+- `boolean`: True if entirely selected, false if not.
 
 ### isFormElement
 
@@ -180,11 +180,11 @@ Detects if element is a form element.
 
 _Parameters_
 
--   _element_ `Element`: The element to check.
+- _element_ `Element`: The element to check.
 
 _Returns_
 
--   `boolean`: True if form element and false otherwise.
+- `boolean`: True if form element and false otherwise.
 
 ### isHorizontalEdge
 
@@ -192,12 +192,12 @@ Check whether the selection is horizontally at the edge of the container.
 
 _Parameters_
 
--   _container_ `HTMLElement`: Focusable element.
--   _isReverse_ `boolean`: Set to true to check left, false for right.
+- _container_ `HTMLElement`: Focusable element.
+- _isReverse_ `boolean`: Set to true to check left, false for right.
 
 _Returns_
 
--   `boolean`: True if at the horizontal edge, false if not.
+- `boolean`: True if at the horizontal edge, false if not.
 
 ### isNumberInput
 
@@ -205,11 +205,11 @@ Check whether the given element is an input field of type number.
 
 _Parameters_
 
--   _node_ `Node`: The HTML node.
+- _node_ `Node`: The HTML node.
 
 _Returns_
 
--   `node is HTMLInputElement`: True if the node is number input.
+- `node is HTMLInputElement`: True if the node is number input.
 
 ### isPhrasingContent
 
@@ -217,15 +217,15 @@ Find out whether or not the given node is phrasing content.
 
 _Related_
 
--   <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
+- <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
 
 _Parameters_
 
--   _node_ `Node`: The node to test.
+- _node_ `Node`: The node to test.
 
 _Returns_
 
--   `boolean`: True if phrasing content, false if not.
+- `boolean`: True if phrasing content, false if not.
 
 ### isRTL
 
@@ -233,11 +233,11 @@ Whether the element's text direction is right-to-left.
 
 _Parameters_
 
--   _element_ `Element`: The element to check.
+- _element_ `Element`: The element to check.
 
 _Returns_
 
--   `boolean`: True if rtl, false if ltr.
+- `boolean`: True if rtl, false if ltr.
 
 ### isSelectionForward
 
@@ -245,25 +245,25 @@ Returns true if the given selection object is in the forward direction, or false
 
 _Related_
 
--   <https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition>
+- <https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition>
 
 _Parameters_
 
--   _selection_ `Selection`: Selection object to check.
+- _selection_ `Selection`: Selection object to check.
 
 _Returns_
 
--   `boolean`: Whether the selection is forward.
+- `boolean`: Whether the selection is forward.
 
 ### isTextContent
 
 _Parameters_
 
--   _node_ `Node`:
+- _node_ `Node`:
 
 _Returns_
 
--   `boolean`: Node is text content
+- `boolean`: Node is text content
 
 ### isTextField
 
@@ -273,11 +273,11 @@ See: <https://html.spec.whatwg.org/#textFieldSelection>
 
 _Parameters_
 
--   _node_ `Node`: The HTML element.
+- _node_ `Node`: The HTML element.
 
 _Returns_
 
--   `node is HTMLElement`: True if the element is an text field, false if not.
+- `node is HTMLElement`: True if the element is an text field, false if not.
 
 ### isVerticalEdge
 
@@ -285,12 +285,12 @@ Check whether the selection is vertically at the edge of the container.
 
 _Parameters_
 
--   _container_ `HTMLElement`: Focusable element.
--   _isReverse_ `boolean`: Set to true to check top, false for bottom.
+- _container_ `HTMLElement`: Focusable element.
+- _isReverse_ `boolean`: Set to true to check top, false for bottom.
 
 _Returns_
 
--   `boolean`: True if at the vertical edge, false if not.
+- `boolean`: True if at the vertical edge, false if not.
 
 ### placeCaretAtHorizontalEdge
 
@@ -298,8 +298,8 @@ Places the caret at start or end of a given element.
 
 _Parameters_
 
--   _container_ `HTMLElement`: Focusable element.
--   _isReverse_ `boolean`: True for end, false for start.
+- _container_ `HTMLElement`: Focusable element.
+- _isReverse_ `boolean`: True for end, false for start.
 
 ### placeCaretAtVerticalEdge
 
@@ -307,9 +307,9 @@ Places the caret at the top or bottom of a given element.
 
 _Parameters_
 
--   _container_ `HTMLElement`: Focusable element.
--   _isReverse_ `boolean`: True for bottom, false for top.
--   _rect_ `[DOMRect]`: The rectangle to position the caret with.
+- _container_ `HTMLElement`: Focusable element.
+- _isReverse_ `boolean`: True for bottom, false for top.
+- _rect_ `[DOMRect]`: The rectangle to position the caret with.
 
 ### remove
 
@@ -317,11 +317,11 @@ Given a DOM node, removes it from the DOM.
 
 _Parameters_
 
--   _node_ `Node`: Node to be removed.
+- _node_ `Node`: Node to be removed.
 
 _Returns_
 
--   `void`:
+- `void`:
 
 ### removeInvalidHTML
 
@@ -329,13 +329,13 @@ Given a schema, unwraps or removes nodes, attributes and classes on HTML.
 
 _Parameters_
 
--   _HTML_ `string`: The HTML to clean up.
--   _schema_ `import('./clean-node-list').Schema`: Schema for the HTML.
--   _inline_ `boolean`: Whether to clean for inline mode.
+- _HTML_ `string`: The HTML to clean up.
+- _schema_ `import('./clean-node-list').Schema`: Schema for the HTML.
+- _inline_ `boolean`: Whether to clean for inline mode.
 
 _Returns_
 
--   `string`: The cleaned up HTML.
+- `string`: The cleaned up HTML.
 
 ### replace
 
@@ -343,12 +343,12 @@ Given two DOM nodes, replaces the former with the latter in the DOM.
 
 _Parameters_
 
--   _processedNode_ `Element`: Node to be removed.
--   _newNode_ `Element`: Node to be inserted in its place.
+- _processedNode_ `Element`: Node to be removed.
+- _newNode_ `Element`: Node to be inserted in its place.
 
 _Returns_
 
--   `void`:
+- `void`:
 
 ### replaceTag
 
@@ -356,12 +356,12 @@ Replaces the given node with a new node with the given tag name.
 
 _Parameters_
 
--   _node_ `Element`: The node to replace
--   _tagName_ `string`: The new tag name.
+- _node_ `Element`: The node to replace
+- _tagName_ `string`: The new tag name.
 
 _Returns_
 
--   `Element`: The new node.
+- `Element`: The new node.
 
 ### safeHTML
 
@@ -369,11 +369,11 @@ Strips scripts and on\* attributes from HTML.
 
 _Parameters_
 
--   _html_ `string`: HTML to sanitize.
+- _html_ `string`: HTML to sanitize.
 
 _Returns_
 
--   `string`: The sanitized HTML.
+- `string`: The sanitized HTML.
 
 ### unwrap
 
@@ -381,11 +381,11 @@ Unwrap the given node. This means any child nodes are moved to the parent.
 
 _Parameters_
 
--   _node_ `Node`: The node to unwrap.
+- _node_ `Node`: The node to unwrap.
 
 _Returns_
 
--   `void`:
+- `void`:
 
 ### wrap
 
@@ -393,8 +393,8 @@ Wraps the given node with a new node with the given tag name.
 
 _Parameters_
 
--   _newNode_ `Element`: The node to insert.
--   _referenceNode_ `Element`: The node to wrap.
+- _newNode_ `Element`: The node to insert.
+- _referenceNode_ `Element`: The node to wrap.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 
