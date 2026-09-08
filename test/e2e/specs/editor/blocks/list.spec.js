@@ -408,9 +408,6 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
-		// The toolbar button keeps focus, like the other block toolbar
-		// buttons; click the indented item to type in it.
-		await editor.canvas.locator( '.is-selected' ).click();
 		await page.keyboard.type( 'two' );
 		// Select all escalates: text → block → siblings → parent, repeat
 		// until the top-level list block is selected.
@@ -664,9 +661,6 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
-		// The toolbar button keeps focus, like the other block toolbar
-		// buttons; click the indented item to type in it.
-		await editor.canvas.locator( '.is-selected' ).click();
 		await page.keyboard.type( 'two' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'three' );
@@ -731,9 +725,6 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
-		// The toolbar button keeps focus, like the other block toolbar
-		// buttons; click the indented item to type in it.
-		await editor.canvas.locator( '.is-selected' ).click();
 		await page.keyboard.type( '1' );
 		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.clickBlockToolbarButton( 'Ordered' );
@@ -782,9 +773,6 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
-		// The toolbar button keeps focus, like the other block toolbar
-		// buttons; click the indented item to type in it.
-		await editor.canvas.locator( '.is-selected' ).click();
 		await page.keyboard.type( '1' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -943,15 +931,9 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
-		// The toolbar button keeps focus, like the other block toolbar
-		// buttons; click the indented item to type in it.
-		await editor.canvas.locator( '.is-selected' ).click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
-		// The toolbar button keeps focus, like the other block toolbar
-		// buttons; click the indented item to type in it.
-		await editor.canvas.locator( '.is-selected' ).click();
 		await page.keyboard.type( 'i' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -1071,15 +1053,9 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
-		// The toolbar button keeps focus, like the other block toolbar
-		// buttons; click the indented item to type in it.
-		await editor.canvas.locator( '.is-selected' ).click();
 		await page.keyboard.type( 'b' );
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
-		// The toolbar button keeps focus, like the other block toolbar
-		// buttons; click the indented item to type in it.
-		await editor.canvas.locator( '.is-selected' ).click();
 		await page.keyboard.type( 'c' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -1188,9 +1164,6 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'b' );
 		await editor.clickBlockToolbarButton( 'Indent' );
-		// The toolbar button keeps focus, like the other block toolbar
-		// buttons; click the indented item to type in it.
-		await editor.canvas.locator( '.is-selected' ).click();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'c' );
 
