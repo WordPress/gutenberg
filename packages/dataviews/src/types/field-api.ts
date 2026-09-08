@@ -350,8 +350,10 @@ export type Field< Item > = {
 
 	/**
 	 * Callback used to sort the field.
+	 *
+	 * Receives the field values of the two items being compared.
 	 */
-	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
+	sort?: ( a: any, b: any, direction: SortDirection ) => number;
 
 	/**
 	 * Validation config for the field.
@@ -575,8 +577,10 @@ export type NormalizedField< Item > = Omit<
 	/**
 	 * Callback used to sort the field. Defaults to the sorter
 	 * of the field's type.
+	 *
+	 * Receives the field valuesof the two items being compared.
 	 */
-	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
+	sort: ( a: any, b: any, direction: SortDirection ) => number;
 
 	/**
 	 * The validation rules of the field, normalized.

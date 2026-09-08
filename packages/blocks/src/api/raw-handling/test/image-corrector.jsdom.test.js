@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import imageCorrector from '../image-corrector';
 import { deepFilterHTML } from '../utils';
 

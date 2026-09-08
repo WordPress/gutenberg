@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSelect } from '@wordpress/data';
@@ -10,9 +11,19 @@ import EditPostPreferencesModal from '../';
 import { store as editorStore } from '../../../store';
 import { lock } from '../../../lock-unlock';
 
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+globalThis.wpVitest.mockResizeObserver();
+
 // This allows us to tweak the returned value on each test.
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-jest.mock( '@wordpress/compose/src/hooks/use-viewport-match', () => jest.fn() );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useViewportMatch: vi.fn(),
+} ) );
 
 function setupActiveModal( preferences = {} ) {
 	const user = userEvent.setup();
