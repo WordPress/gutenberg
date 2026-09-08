@@ -659,51 +659,45 @@ describe( 'DataForm component', () => {
 		} );
 
 		it( 'should show the placeholder of an empty field when the layout opts in', () => {
-			const fieldsWithPlaceholder = fields.map( ( field ) =>
-				field.id === 'title'
-					? { ...field, placeholder: 'Add a title' }
-					: field
-			);
-			const formWithPlaceholder = {
-				...formPanelMode,
-				layout: {
-					...formPanelMode.layout,
-					empty: 'placeholder' as const,
-				},
-			};
-
 			render(
 				<Dataform
 					onChange={ noop }
-					fields={ fieldsWithPlaceholder }
-					form={ formWithPlaceholder }
-					data={ { ...data, title: '' } }
+					fields={ [
+						{
+							id: 'title',
+							label: 'Title',
+							type: 'text',
+							placeholder: 'Add a title',
+						},
+					] }
+					form={ {
+						layout: { type: 'panel', empty: 'placeholder' },
+						fields: [ 'title' ],
+					} }
+					data={ { title: '' } }
 				/>
 			);
 
 			expect( screen.getByText( 'Add a title' ) ).toBeInTheDocument();
 		} );
 
-		it( 'should render the value of a non-empty field instead of its placeholder', () => {
-			const fieldsWithPlaceholder = fields.map( ( field ) =>
-				field.id === 'title'
-					? { ...field, placeholder: 'Add a title' }
-					: field
-			);
-			const formWithPlaceholder = {
-				...formPanelMode,
-				layout: {
-					...formPanelMode.layout,
-					empty: 'placeholder' as const,
-				},
-			};
-
+		it( 'should show the value of a non-empty field instead of its placeholder', () => {
 			render(
 				<Dataform
 					onChange={ noop }
-					fields={ fieldsWithPlaceholder }
-					form={ formWithPlaceholder }
-					data={ data }
+					fields={ [
+						{
+							id: 'title',
+							label: 'Title',
+							type: 'text',
+							placeholder: 'Add a title',
+						},
+					] }
+					form={ {
+						layout: { type: 'panel', empty: 'placeholder' },
+						fields: [ 'title' ],
+					} }
+					data={ { title: 'Hello World' } }
 				/>
 			);
 
@@ -713,26 +707,23 @@ describe( 'DataForm component', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'should render an empty field without a placeholder when the layout opts in', () => {
-			const fieldsWithCustomRender = fields.map( ( field ) =>
-				field.id === 'title'
-					? { ...field, render: () => <span>No title yet</span> }
-					: field
-			);
-			const formWithPlaceholder = {
-				...formPanelMode,
-				layout: {
-					...formPanelMode.layout,
-					empty: 'placeholder' as const,
-				},
-			};
-
+		it( 'should fall back to the render output when an empty field has no placeholder', () => {
 			render(
 				<Dataform
 					onChange={ noop }
-					fields={ fieldsWithCustomRender }
-					form={ formWithPlaceholder }
-					data={ { ...data, title: '' } }
+					fields={ [
+						{
+							id: 'title',
+							label: 'Title',
+							type: 'text',
+							render: () => <span>No title yet</span>,
+						},
+					] }
+					form={ {
+						layout: { type: 'panel', empty: 'placeholder' },
+						fields: [ 'title' ],
+					} }
+					data={ { title: '' } }
 				/>
 			);
 
@@ -740,18 +731,22 @@ describe( 'DataForm component', () => {
 		} );
 
 		it( 'should not show the placeholder of an empty field by default', () => {
-			const fieldsWithPlaceholder = fields.map( ( field ) =>
-				field.id === 'title'
-					? { ...field, placeholder: 'Add a title' }
-					: field
-			);
-
 			render(
 				<Dataform
 					onChange={ noop }
-					fields={ fieldsWithPlaceholder }
-					form={ formPanelMode }
-					data={ { ...data, title: '' } }
+					fields={ [
+						{
+							id: 'title',
+							label: 'Title',
+							type: 'text',
+							placeholder: 'Add a title',
+						},
+					] }
+					form={ {
+						layout: { type: 'panel' },
+						fields: [ 'title' ],
+					} }
+					data={ { title: '' } }
 				/>
 			);
 
