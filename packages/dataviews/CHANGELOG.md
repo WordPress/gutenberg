@@ -41,6 +41,7 @@
 -   DataForm: Communicate the timezone a `datetime` value is edited in. When the site timezone differs from the visitor's, the control renders help text under the input naming the site timezone: the zone name (e.g. `(CEST) Europe/Madrid`) or the UTC offset for sites pinned to one ([#82291](https://github.com/WordPress/gutenberg/pull/82291)).
 -   Export the `DataViewsProps` and `ItemWithId` types ([#82326](https://github.com/WordPress/gutenberg/pull/82326)).
 -   Export the `DataViewsProps` and `ItemWithId` types and document every type property ([#82326](https://github.com/WordPress/gutenberg/pull/82326)).
+-   The `./wp` bundle (`build-wp/index.js`) no longer inlines `@wordpress/ui` and, through it, `@wordpress/theme`: `@wordpress/ui` is not a WordPress script, so consumers bundle it themselves. The bundle shrinks by about a quarter, shares a single copy of `@wordpress/ui` and its theme context with the consumer, and the `@base-ui/react`, `@daypicker/react`, and `colorjs.io` dependencies are no longer declared. As `@wordpress/ui` resolves `@wordpress/theme` to the `wp.theme` script, the bundle now requires WordPress 7.0 or later ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
 
 ### Bug Fixes
 
