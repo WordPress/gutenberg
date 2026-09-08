@@ -1103,7 +1103,13 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		const editorSettings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		await editorSettings.getByRole( 'tab', { name: 'Styles' } ).click();
+		await expect(
+			editorSettings.getByText( '2 Blocks', { exact: true } )
+		).toBeVisible();
+		// Mixed non-text selections render the inspector without style tabs.
+		await expect(
+			editorSettings.getByRole( 'tab', { name: 'Styles' } )
+		).toBeHidden();
 		await expect(
 			editorSettings.getByRole( 'heading', { name: 'Typography' } )
 		).toBeHidden();
