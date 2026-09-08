@@ -35,12 +35,12 @@
 	"types": "build-types",
 	"dependencies": {
 		"@actions/core": "^1.9.1",
-		"@jest/test-result": "^30.5.0",
+		"@jest/test-result": "^29.6.2",
 		"@playwright/test": "^1.61.1",
-		"jest-message-util": "^30.5.0"
+		"jest-message-util": "^29.6.2"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0",
+		"@types/jest": "^29.5.14",
 		"@types/node": "^20.19.39"
 	},
 	"publishConfig": {
