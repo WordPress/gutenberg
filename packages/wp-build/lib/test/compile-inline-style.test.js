@@ -31,33 +31,17 @@ function executeStyleModule( source, processValue ) {
 }
 
 describe( 'compileInlineStyle', () => {
-	test( 'skips generated style injection when the opt-out is true', async () => {
-		const source = await compileStyleModule();
+	test( 'applies design token fallbacks by default', async () => {
+		const source = await compileInlineStyle( { minify: false } )(
+			'.fixture { gap: var(--wpds-dimension-gap-sm); }',
+			import.meta.dirname,
+			`${ import.meta.dirname }/fixture.css`
+		);
 
-		expect(
-			executeStyleModule( source, {
-				env: {
-					NODE_ENV: 'development',
-					WP_TESTS_SKIP_STYLE_INJECTION: 'true',
-				},
-			} )
-		).toBe( 0 );
+		expect( source ).toContain( 'var(--wpds-dimension-gap-sm, 8px)' );
 	} );
 
-	test( 'injects generated styles when the opt-out is false in test mode', async () => {
-		const source = await compileStyleModule();
-
-		expect(
-			executeStyleModule( source, {
-				env: {
-					NODE_ENV: 'test',
-					WP_TESTS_SKIP_STYLE_INJECTION: 'false',
-				},
-			} )
-		).toBe( 1 );
-	} );
-
-	test( 'keeps the test-mode skip when the opt-out is absent', async () => {
+	test( 'skips generated style injection in test mode', async () => {
 		const source = await compileStyleModule();
 
 		expect(
@@ -65,6 +49,16 @@ describe( 'compileInlineStyle', () => {
 				env: { NODE_ENV: 'test' },
 			} )
 		).toBe( 0 );
+	} );
+
+	test( 'injects generated styles outside test mode', async () => {
+		const source = await compileStyleModule();
+
+		expect(
+			executeStyleModule( source, {
+				env: { NODE_ENV: 'development' },
+			} )
+		).toBe( 1 );
 	} );
 
 	test( 'injects generated styles when process is absent', async () => {

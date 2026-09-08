@@ -3,19 +3,29 @@ import cssnano from 'cssnano';
 import postcss from 'postcss';
 import postcssModules from 'postcss-modules';
 
+/** @type {import('postcss').AcceptedPlugin | undefined} */
+let dsTokenFallbacks;
+try {
+	const { default: postcssPlugin } = await import(
+		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
+	);
+	dsTokenFallbacks = postcssPlugin;
+} catch {
+	// @wordpress/theme is optional; skip token fallbacks if not available.
+}
+export { dsTokenFallbacks };
+
 /**
  * Compile CSS into the JavaScript module emitted by wp-build.
  *
- * @param {Object}                             options
- * @param {boolean}                            [options.cssModules=false] Whether to emit CSS Module exports.
- * @param {boolean}                            [options.minify=true]      Whether to minify the CSS.
- * @param {import('postcss').AcceptedPlugin[]} [options.plugins=[]]       PostCSS plugins to run first.
+ * @param {Object}  options
+ * @param {boolean} [options.cssModules=false] Whether to emit CSS Module exports.
+ * @param {boolean} [options.minify=true]      Whether to minify the CSS.
  * @return {Function} esbuild-sass-plugin transform callback.
  */
 export function compileInlineStyle( {
 	cssModules = false,
 	minify = true,
-	plugins: additionalPlugins = [],
 } = {} ) {
 	/**
 	 * @param {string} cssText  CSS source to compile.
@@ -26,7 +36,7 @@ export function compileInlineStyle( {
 	return async function styleType( cssText, _dirname, filePath ) {
 		let moduleExports = null;
 
-		const plugins = [ ...additionalPlugins ];
+		const plugins = dsTokenFallbacks ? [ dsTokenFallbacks ] : [];
 		if ( cssModules ) {
 			plugins.push(
 				postcssModules( {
@@ -61,12 +71,10 @@ export function compileInlineStyle( {
 			.slice( 0, 10 );
 		const shouldInjectStyle =
 			`typeof process === 'undefined' || ` +
-			`process.env.WP_TESTS_SKIP_STYLE_INJECTION === 'false' || ` +
-			`(process.env.WP_TESTS_SKIP_STYLE_INJECTION !== 'true' && process.env.NODE_ENV !== 'test')`;
+			`process.env.NODE_ENV !== 'test'`;
 
-		// Test runners that emulate the DOM can opt out of automatic style injection.
-		// An explicit opt-in lets real browsers receive styles in test mode while an
-		// absent setting preserves the existing NODE_ENV="test" behavior.
+		// Skip automatic style injection in Node-based test environments, where DOM
+		// implementations do not reliably support modern CSS features like @layer.
 		let cssModule = cssModules
 			? `import { registerStyle } from '@wordpress/style-runtime';
 if (${ shouldInjectStyle }) {

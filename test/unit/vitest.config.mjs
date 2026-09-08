@@ -211,9 +211,6 @@ export default defineConfig( {
 				},
 				test: {
 					name: 'node',
-					env: {
-						WP_TESTS_SKIP_STYLE_INJECTION: 'true',
-					},
 					environment: 'node',
 					pool: 'threads',
 					include: vitestTests.node,
@@ -234,9 +231,6 @@ export default defineConfig( {
 				},
 				test: {
 					name: 'jsdom',
-					env: {
-						WP_TESTS_SKIP_STYLE_INJECTION: 'true',
-					},
 					environment: 'jsdom',
 					pool: 'threads',
 					environmentOptions: {

@@ -45,7 +45,10 @@ import {
 	buildWorkers,
 	generateWorkerCode,
 } from './worker-build.mjs';
-import { compileInlineStyle } from './compile-inline-style.mjs';
+import {
+	compileInlineStyle,
+	dsTokenFallbacks,
+} from './compile-inline-style.mjs';
 
 /**
  * Resolve the ESBuild target from the project's Browserslist config.
@@ -55,19 +58,14 @@ import { compileInlineStyle } from './compile-inline-style.mjs';
 function getEsbuildTarget() {
 	return browserslistToEsbuild( getBrowserslistQueries() );
 }
-// Optional dependency: @wordpress/theme provides plugins that inject fallback
-// values for design system tokens. Fails gracefully when the package is not
-// installed (it is an optional peerDependency).
-let dsTokenFallbacks;
+// Optional dependency: @wordpress/theme provides a plugin that injects fallback
+// values for design system tokens in JavaScript. Fails gracefully when the
+// package is not installed (it is an optional peerDependency).
 let dsTokenFallbacksJs;
 try {
-	const { default: postcssPlugin } = await import(
-		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
-	);
 	const { default: esbuildPlugin } = await import(
 		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
 	);
-	dsTokenFallbacks = postcssPlugin;
 	dsTokenFallbacksJs = esbuildPlugin;
 } catch {
 	// @wordpress/theme is optional; skip token fallbacks if not available.
@@ -228,10 +226,7 @@ function createStyleBundlingPlugins( workingDir ) {
 			embedded: true,
 			sourceMap: false,
 			filter: /\.module\.(css|scss)$/,
-			transform: compileInlineStyle( {
-				cssModules: true,
-				plugins: [ dsTokenFallbacks ].filter( Boolean ),
-			} ),
+			transform: compileInlineStyle( { cssModules: true } ),
 			type: inlineStyle,
 			...sassOptions,
 		} ),
@@ -241,9 +236,7 @@ function createStyleBundlingPlugins( workingDir ) {
 			embedded: true,
 			sourceMap: false,
 			filter: /\.(css|scss)$/,
-			transform: compileInlineStyle( {
-				plugins: [ dsTokenFallbacks ].filter( Boolean ),
-			} ),
+			transform: compileInlineStyle(),
 			type: inlineStyle,
 			...sassOptions,
 		} ),
