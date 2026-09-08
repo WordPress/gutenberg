@@ -26,7 +26,7 @@ A block instance (object) or a blocks array you would like to render a preview.
 
 Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview.
 
-`viewportWidth` can be used to simulate how blocks look on different device sizes or to make sure make sure multiple previews will be rendered with the same scale, regardless of their content.
+`viewportWidth` can be used to simulate how blocks look on different device sizes or to make sure multiple previews will be rendered with the same scale, regardless of their content.
 
 Set `viewportWidth` to `0` to make the viewport the same width as the container.
 

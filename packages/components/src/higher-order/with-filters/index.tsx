@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 import { addAction, applyFilters, removeAction } from '@wordpress/hooks';
 import { createHigherOrderComponent, debounce } from '@wordpress/compose';

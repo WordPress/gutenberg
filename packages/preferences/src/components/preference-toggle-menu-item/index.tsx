@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { MenuItem } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import { store as preferencesStore } from '../../store';
 
 type PreferenceToggleMenuItemProps = {

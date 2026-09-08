@@ -1,13 +1,11 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it, vi } from 'vitest';
 import {
 	getExamplesByCategory,
 	getTopLevelStyleBookCategories,
 } from '../categories';
 import { STYLE_BOOK_CATEGORIES } from '../constants';
 
-jest.mock( '@wordpress/blocks', () => {
+vi.mock( import( '@wordpress/blocks' ), () => {
 	return {
 		getCategories() {
 			return [

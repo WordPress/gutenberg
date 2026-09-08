@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { SelectControlSingleSelectionProps } from '../select-control/types';
 
 export type Truthy< T > = T extends false | '' | 0 | null | undefined

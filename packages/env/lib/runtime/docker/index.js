@@ -1,21 +1,10 @@
 'use strict';
-/**
- * External dependencies
- */
 const { spawn, execSync } = require( 'child_process' );
 const path = require( 'path' );
 const util = require( 'util' );
+const exec = util.promisify( require( 'child_process' ).exec );
 const { v2: dockerCompose } = require( 'docker-compose' );
 const { rimraf } = require( 'rimraf' );
-
-/**
- * Promisified dependencies
- */
-const exec = util.promisify( require( 'child_process' ).exec );
-
-/**
- * Internal dependencies
- */
 const {
 	writeDockerFiles,
 	ensureDockerInitialized,
@@ -173,7 +162,17 @@ class DockerRuntime {
 				// stop wp-env from working correctly.
 			}
 
-			await dockerCompose.pullAll( dockerComposeConfig );
+			try {
+				await dockerCompose.pullAll( dockerComposeConfig );
+			} catch {
+				// Note: pulling the images requires connecting to the Docker
+				// registry, which may be unavailable (e.g., offline or an
+				// outage). Locally cached images will be used instead, so this
+				// error should not stop wp-env from working correctly.
+				spinner.info(
+					'Could not pull docker images; using cached images instead.'
+				);
+			}
 			spinner.text = 'Downloading sources.';
 		}
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import {
 	Modal,
@@ -9,10 +6,6 @@ import {
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import type { FontCollection as FontCollectionType } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import InstalledFonts from './installed-fonts';
 import FontCollection from './font-collection';
 import UploadFonts from './upload-fonts';

@@ -1,8 +1,4 @@
-/**
- * Internal dependencies
- */
 import type { Context, OmitNevers } from './helpers';
-
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 declare module './base-entity-records' {
@@ -21,6 +17,10 @@ declare module './base-entity-records' {
 			 * The icon label.
 			 */
 			label: string;
+			/**
+			 * The slug of the collection this icon belongs to.
+			 */
+			collection?: string;
 		}
 	}
 }

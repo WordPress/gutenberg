@@ -1,6 +1,7 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/default-custom-properties";
 @use "./components/block-inspector-button/style.scss" as *;
+@use "./components/error-boundary/style.scss" as *;
 @use "./components/header/style.scss" as *;
 @use "./components/inserter/style.scss" as *;
 @use "./components/keyboard-shortcut-help-modal/style.scss" as *;
@@ -15,7 +16,9 @@
 }
 
 // Include reset CSS for the customizer.
+// stylelint-disable selector-class-pattern -- WordPress Customizer control class names use underscores by convention.
 .customize-control-sidebar_block_editor,
 .customize-widgets-layout__inspector {
 	@include reset;
 }
+// stylelint-enable selector-class-pattern

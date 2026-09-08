@@ -1,0 +1,82 @@
+.overlay {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	gap: var(--wp-grid-gap, var(--wpds-dimension-gap-xl));
+	pointer-events: none;
+	opacity: 0;
+	visibility: hidden;
+}
+
+.overlay.is-active {
+	opacity: 1;
+	visibility: visible;
+}
+
+/*
+ * Alpha wave: row-marker tiles (or column tracks on lanes) reveal in a
+ * diagonal sweep from the top-left using staggered delays.
+ */
+@media not (prefers-reduced-motion) {
+	.overlay.is-active .row,
+	.overlay.is-active:not(.has-rows) .column {
+		opacity: 0;
+		transform: scale(0.64);
+		animation:
+			grid-overlay-tile-in
+			var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle)
+			both;
+		animation-delay: calc(var(--wp-grid-overlay-wave-delay-step, 28ms) * (var(--wp-grid-overlay-column-index, 0) + var(--wp-grid-overlay-row-index, 0)));
+	}
+
+	@keyframes grid-overlay-tile-in {
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+
+	.overlay:not(.is-active) {
+		transition:
+			opacity var(--wpds-motion-duration-sm)
+			var(--wpds-motion-easing-subtle),
+			visibility 0s linear var(--wpds-motion-duration-sm);
+	}
+
+	.overlay:not(.is-active) .row,
+	.overlay:not(.is-active) .column {
+		animation: none;
+		transform: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.overlay {
+		transition:
+			opacity var(--wpds-motion-duration-sm)
+			var(--wpds-motion-easing-subtle),
+			visibility 0s linear var(--wpds-motion-duration-sm);
+	}
+
+	.overlay.is-active {
+		transition:
+			opacity var(--wpds-motion-duration-sm)
+			var(--wpds-motion-easing-subtle),
+			visibility 0s linear 0s;
+	}
+}
+
+.column {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wp-grid-gap, var(--wpds-dimension-gap-xl));
+	min-width: 0;
+}
+
+.row {
+	flex: 0 0 var(--wp-grid-overlay-row-height);
+	height: var(--wp-grid-overlay-row-height);
+	box-sizing: border-box;
+	border-radius: var(--wpds-border-radius-lg);
+	background-color: var(--wp-grid-overlay-tile-bg, var(--wpds-color-background-surface-neutral-weak));
+}

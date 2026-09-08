@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Notice from '..';
 import Button from '../../button';
 import NoticeList from '../list';
@@ -31,9 +20,9 @@ const meta: Meta< typeof Notice > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `Notice` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`Notice`](?path=/docs/design-system-components-notice--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };

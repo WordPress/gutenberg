@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * Internal dependencies
- */
 import Dropdown from '..';
 import Button from '../../button';
 import MenuGroup from '../../menu-group';
@@ -43,7 +36,7 @@ const meta: Meta< typeof Dropdown > = {
 			expanded: true,
 		},
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

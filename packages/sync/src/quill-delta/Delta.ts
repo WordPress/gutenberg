@@ -2,18 +2,9 @@
 // - fast-diff swapped out for 'diff',
 // - lodash.clonedeep is replaced with JSON parse / stringify
 // - lodash.isequal is replaced with fast-deep-equal.
-
-// @ts-ignore
-/**
- * External dependencies
- */
 import type { Change } from 'diff';
 import { diffChars, diffLines } from 'diff';
 import { default as isEqual } from 'fast-deep-equal/es6';
-
-/**
- * Internal dependencies
- */
 import AttributeMap from './AttributeMap';
 import Op from './Op';
 import OpIterator from './OpIterator';
@@ -616,6 +607,12 @@ class Delta {
 	/**
 	 * Given a Delta and a cursor position, do a diff and attempt to adjust
 	 * the diff to place insertions or deletions at the cursor position.
+	 *
+	 * @todo There are at least a few known cases where this produces a corrupted
+	 *       diff. When this is fixed, it should not be necessary to verify that the
+	 *       transformed diff applies cleanly.
+	 *
+	 * @see import("@wordpress/core-data/src/utils/crdt-blocks").mergeRichTextUpdate()
 	 *
 	 * @param other             - The other Delta to diff against.
 	 * @param cursorAfterChange - The cursor position index after the change.

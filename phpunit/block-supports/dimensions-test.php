@@ -358,4 +358,41 @@ class WP_Block_Supports_Dimensions_Test extends WP_UnitTestCase {
 
 		$this->assertSame( $expected, $actual );
 	}
+
+	public function test_default_aspect_ratio_does_not_unset_height_styles() {
+		$this->test_block_name = 'test/default-aspect-ratio-does-not-unset-height-styles';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'dimensions' => array(
+						'aspectRatio' => true,
+					),
+				),
+			)
+		);
+
+		$actual = gutenberg_render_dimensions_support(
+			'<div class="wp-block-test">Hello</div>',
+			array(
+				'blockName' => $this->test_block_name,
+				'attrs'     => array(
+					'style' => array(
+						'dimensions' => array(
+							'aspectRatio' => 'auto',
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertStringNotContainsString( 'height:unset', $actual );
+		$this->assertStringNotContainsString( 'min-height:unset', $actual );
+	}
 }

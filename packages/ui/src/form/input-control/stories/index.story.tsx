@@ -6,8 +6,8 @@ import { IconButton } from '../../../icon-button';
 import { InputLayout } from '../../primitives/input-layout';
 import { Stack } from '../../../stack';
 import {
-	WithPrefix,
-	WithSuffixControl,
+	WithPrefix as InputWithPrefix,
+	WithSuffixControl as InputWithSuffixControl,
 } from '../../primitives/input/stories/index.story';
 import {
 	WITH_DETAILS_DESCRIPTION,
@@ -15,6 +15,7 @@ import {
 } from '../../stories/shared';
 
 const meta: Meta< typeof InputControl > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/InputControl',
 	component: InputControl,
 	argTypes: {
@@ -22,6 +23,12 @@ const meta: Meta< typeof InputControl > = {
 		onValueChange: { action: 'onValueChange' },
 		value: { control: false },
 		type: { control: 'text' },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -54,15 +61,24 @@ export const WithDetails: Story = {
 	},
 };
 
-WithPrefix.args = {
-	...WithPrefix.args,
-	...Default.args,
+export const WithPrefix: Story = {
+	args: {
+		...InputWithPrefix.args,
+		ref: undefined,
+		...Default.args,
+	},
 };
-WithSuffixControl.args = {
-	...WithSuffixControl.args,
-	...Default.args,
+
+export const WithSuffixControl: Story = {
+	args: {
+		...InputWithSuffixControl.args,
+		ref: undefined,
+		...Default.args,
+	},
+	parameters: {
+		a11y: { test: 'error' },
+	},
 };
-export { WithPrefix, WithSuffixControl };
 
 export const Password: Story = {
 	render: function Template( args ) {
@@ -112,44 +128,31 @@ export const NumberWithSteppers: Story = {
 		const [ value, setValue ] = useState( 0 );
 
 		return (
-			<>
-				<style>
-					{ `
-					  .my-number-with-steppers input[type='number'] {
-							-moz-appearance: textfield;
-					  }
-						.my-number-with-steppers ::-webkit-inner-spin-button {
-							appearance: none;
-						}
-					` }
-				</style>
-				<InputControl
-					{ ...args }
-					value={ value }
-					onValueChange={ ( v ) => setValue( parseInt( v, 10 ) ) }
-					className="my-number-with-steppers"
-					suffix={
-						<InputLayout.Slot padding="minimal">
-							<Stack direction="row" gap="xs">
-								<IconButton
-									label="Increment"
-									icon={ plus }
-									onClick={ () => setValue( value + 1 ) }
-									size="small"
-									variant="minimal"
-								/>
-								<IconButton
-									label="Decrement"
-									icon={ reset }
-									onClick={ () => setValue( value - 1 ) }
-									size="small"
-									variant="minimal"
-								/>
-							</Stack>
-						</InputLayout.Slot>
-					}
-				/>
-			</>
+			<InputControl
+				{ ...args }
+				value={ value }
+				onValueChange={ ( v ) => setValue( parseInt( v, 10 ) ) }
+				suffix={
+					<InputLayout.Slot padding="minimal">
+						<Stack direction="row" gap="xs">
+							<IconButton
+								label="Increment"
+								icon={ plus }
+								onClick={ () => setValue( value + 1 ) }
+								size="small"
+								variant="minimal"
+							/>
+							<IconButton
+								label="Decrement"
+								icon={ reset }
+								onClick={ () => setValue( value - 1 ) }
+								size="small"
+								variant="minimal"
+							/>
+						</Stack>
+					</InputLayout.Slot>
+				}
+			/>
 		);
 	},
 	args: {

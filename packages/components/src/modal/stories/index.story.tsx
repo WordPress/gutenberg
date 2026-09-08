@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { StoryFn, Meta } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { fullscreen } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import InputControl from '../../input-control';
 import Modal from '../';
@@ -46,9 +35,9 @@ const meta: Meta< typeof Modal > = {
 	parameters: {
 		controls: { expanded: true },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `Dialog` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`Dialog`](?path=/docs/design-system-components-dialog--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };
@@ -85,10 +74,7 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
 						anim id est laborum.
 					</p>
 
-					<InputControl
-						__next40pxDefaultSize
-						style={ { marginBottom: '20px' } }
-					/>
+					<InputControl style={ { marginBottom: '20px' } } />
 
 					<Button
 						__next40pxDefaultSize

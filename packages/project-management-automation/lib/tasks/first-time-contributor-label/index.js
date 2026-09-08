@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+const { setOutput } = require( '@actions/core' );
 const debug = require( '../../debug' );
 
 /** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
@@ -34,7 +32,22 @@ async function firstTimeContributorLabel( payload, octokit ) {
 		author,
 	} );
 
-	if ( commits.length > 0 ) {
+	// The commits list matches an author only by the emails verified on their
+	// account, so it can miss commits made under a GitHub noreply address. When
+	// it finds nothing, confirm with a commit search, which matches by account.
+	// Search has a tighter rate limit, so it only runs in this rare fallback.
+	let hasPreviousCommits = commits.length > 0;
+	if ( ! hasPreviousCommits ) {
+		const {
+			data: { total_count: searchCount },
+		} = await octokit.rest.search.commits( {
+			q: `repo:${ owner }/${ repo } author:${ author }`,
+			per_page: 1,
+		} );
+		hasPreviousCommits = searchCount > 0;
+	}
+
+	if ( hasPreviousCommits ) {
 		debug(
 			`first-time-contributor-label: Not the first commit for author. Aborting`
 		);
@@ -54,20 +67,17 @@ async function firstTimeContributorLabel( payload, octokit ) {
 		labels: [ 'First-time Contributor' ],
 	} );
 
-	/**
-	 * Adds a welcome comment to the first time PR
+	/*
+	 * The workflow posts this, so the welcome joins the single automation
+	 * comment rather than adding one of its own.
 	 */
-
-	await octokit.rest.issues.createComment( {
-		owner,
-		repo,
-		issue_number: payload.pull_request.number,
-		body:
-			':wave: Thanks for your first Pull Request and for helping build the future of Gutenberg and WordPress, @' +
+	setOutput(
+		'welcome-prompt',
+		':wave: Thanks for your first Pull Request and for helping build the future of Gutenberg and WordPress, @' +
 			author +
 			"! In case you missed it, we'd love to have you join us in our [Slack community](https://make.wordpress.org/chat/).\n\n" +
-			'If you want to learn more about WordPress development in general, check out the [Core Handbook](https://make.wordpress.org/core/handbook/) full of helpful information.',
-	} );
+			'If you want to learn more about WordPress development in general, check out the [Core Handbook](https://make.wordpress.org/core/handbook/) full of helpful information.'
+	);
 }
 
 module.exports = firstTimeContributorLabel;

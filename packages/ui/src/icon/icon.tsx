@@ -5,8 +5,6 @@ import type { IconProps } from './types';
 /**
  * Renders an SVG icon with a 24px default size.
  *
- * If no `fill` colors are explicitly set on the icon itself, it will be rendered with a `currentColor` fill.
- *
  * ```jsx
  * import { wordpress } from '@wordpress/icons';
  *
@@ -14,15 +12,20 @@ import type { IconProps } from './types';
  * ```
  */
 export const Icon = forwardRef< SVGSVGElement, IconProps >( function Icon(
-	{ icon, size = 24, ...restProps },
+	{ icon, size = 24, style, ...restProps },
 	ref
 ) {
+	const mergedStyle =
+		icon.props.style || style
+			? { ...icon.props.style, ...style }
+			: undefined;
+
 	return (
 		<SVG
 			ref={ ref }
-			fill="currentColor"
 			{ ...icon.props }
 			{ ...restProps }
+			{ ...( mergedStyle ? { style: mergedStyle } : {} ) }
 			width={ size }
 			height={ size }
 		/>

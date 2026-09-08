@@ -1,18 +1,8 @@
-/**
- * External dependencies
- */
 import type { Moment } from 'moment';
 import momentLib from 'moment';
 import 'moment-timezone/moment-timezone.js';
 import 'moment-timezone/moment-timezone-utils.js';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
-/**
- * Internal dependencies
- */
 import type { DateSettings } from './types';
 
 export type * from './types';
@@ -114,7 +104,6 @@ export function setSettings( dateSettings: DateSettings ) {
 				.longDateFormat( 'LTS' ) === null
 		) {
 			// Delete the misconfigured locale.
-			// @ts-ignore Type definitions are incorrect - null is permitted.
 			momentLib.defineLocale( dateSettings.l10n.locale, null );
 		} else {
 			// We have a properly configured locale, so no need to create one.
@@ -626,7 +615,7 @@ export function humanTimeDiff(
  * @return A moment instance.
  */
 function buildMoment(
-	dateValue?: Moment | Date | string | number,
+	dateValue: Moment | Date | string | number,
 	timezone: string | number = ''
 ) {
 	const dateMoment = momentLib( dateValue );

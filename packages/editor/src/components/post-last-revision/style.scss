@@ -3,7 +3,7 @@
 
 .editor-post-last-revision__title {
 	width: 100%;
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 .editor-post-last-revision__title.components-button.has-icon {
@@ -32,6 +32,3 @@
 	}
 }
 
-.editor-private-post-last-revision__button {
-	display: inline-block;
-}

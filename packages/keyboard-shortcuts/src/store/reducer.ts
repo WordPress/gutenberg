@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { ShortcutAction } from './actions';
 import type { ShortcutsState } from './types';
 

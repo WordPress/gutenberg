@@ -1,16 +1,17 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useContext } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from '../name';
-import { DEFAULT_ENTITY_KEY } from '../entities';
 import { EntityContext } from '../entity-context';
 import useEntityId from './use-entity-id';
+
+// The same fields the editor loads revisions with, so that they are read from
+// the store rather than fetched again. `content` is the exception: the whole
+// field would pull `content.rendered` too.
+// A stable reference, because `getRevision` memoizes on the query's identity.
+const REVISION_QUERY = {
+	context: 'edit',
+	_fields: 'id,date,author,meta,title,excerpt,content.raw',
+};
 
 /**
  * Hook that returns the value and a setter for the
@@ -33,41 +34,37 @@ export default function useEntityProp( kind, name, prop, _id ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 	const context = useContext( EntityContext );
-	const revisionId = context?.revisionId;
+	// A revision applies only to the record it was provided for. The ID can be
+	// given as a string or a number, so compare the two loosely.
+	const revisionId =
+		String( id ) === String( providerId )
+			? context?.revision?.[ kind ]?.[ name ]
+			: undefined;
 
 	const { value, fullValue } = useSelect(
 		( select ) => {
 			if ( revisionId ) {
-				// Use getRevisions (not getRevision) to read from the
-				// already-cached collection. Using getRevision would
-				// trigger a redundant single-revision API fetch that
-				// can wipe the collection due to a race condition.
-				// See https://github.com/WordPress/gutenberg/pull/76043.
-				const revisions = select( STORE_NAME ).getRevisions(
+				const revision = select( STORE_NAME ).getRevision(
 					kind,
 					name,
 					id,
-					{
-						per_page: -1,
-						context: 'edit',
-						_fields:
-							'id,date,author,meta,title.raw,excerpt.raw,content.raw',
-					}
+					revisionId,
+					REVISION_QUERY
 				);
-				const entityConfig = select( STORE_NAME ).getEntityConfig(
-					kind,
-					name
-				);
-				const revKey = entityConfig?.revisionKey || DEFAULT_ENTITY_KEY;
-				const revision = revisions?.find(
-					( r ) => r[ revKey ] === revisionId
-				);
-				return revision
-					? {
-							value: revision[ prop ]?.raw ?? revision[ prop ],
-							fullValue: revision[ prop ],
-					  }
-					: {};
+				const propValue = revision?.[ prop ];
+				if ( propValue === undefined ) {
+					return {};
+				}
+				// Raw attributes hold their value under `raw`, like the edited
+				// record does. Any other field is the value itself.
+				const isRawAttribute =
+					propValue !== null &&
+					typeof propValue === 'object' &&
+					'raw' in propValue;
+				return {
+					value: isRawAttribute ? propValue.raw : propValue,
+					fullValue: propValue,
+				};
 			}
 
 			const { getEntityRecord, getEditedEntityRecord } =

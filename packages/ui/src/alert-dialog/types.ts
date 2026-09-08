@@ -1,11 +1,8 @@
 import type { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
-import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
-
+import type { ReactElement, ReactNode } from 'react';
 import type { ComponentProps } from '../utils/types';
 
-export type PortalProps = ComponentPropsWithoutRef<
-	typeof _AlertDialog.Portal
->;
+export type PortalProps = ComponentProps< typeof _AlertDialog.Portal >;
 
 /**
  * The return type of `onConfirm`. Return `void` (or nothing) to auto-close
@@ -56,12 +53,17 @@ export interface RootProps
 	onConfirm?: () => ConfirmResult | Promise< ConfirmResult >;
 }
 
-export interface TriggerProps extends ComponentProps< 'button' > {
+// Detached triggers require handle and payload APIs that AlertDialog does not
+// expose.
+export type TriggerProps = Omit<
+	ComponentProps< typeof _AlertDialog.Trigger >,
+	'handle' | 'payload'
+> & {
 	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
-}
+};
 
 export interface PopupProps
 	extends ComponentProps< 'div' >,

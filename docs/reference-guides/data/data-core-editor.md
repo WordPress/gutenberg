@@ -347,7 +347,7 @@ _Returns_
 
 ### getEditedPostSlug
 
-Returns the slug for the post being edited, preferring a manually edited value if one exists, then a sanitized version of the current post title, and finally the post ID.
+Returns the slug for the post being edited, preferring a manually edited value if one exists, then the server-generated slug from the post entity, then a JS approximation of the current post title, and finally the post ID.
 
 _Parameters_
 
@@ -770,14 +770,6 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether new post and unsaved values exist.
-
-### isCollaborationEnabledForCurrentPost
-
-Returns whether the collaboration is enabled for the current post.
-
-_Returns_
-
--   `boolean`: Whether collaboration is enabled.
 
 ### isCurrentPostPending
 

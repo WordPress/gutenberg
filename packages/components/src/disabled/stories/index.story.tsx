@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Disabled from '../';
 import SelectControl from '../../select-control/';
 import TextControl from '../../text-control/';
@@ -32,7 +21,7 @@ const meta: Meta< typeof Disabled > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},
@@ -46,7 +35,6 @@ const Form = () => {
 	return (
 		<VStack>
 			<TextControl
-				__next40pxDefaultSize
 				label="Text Control"
 				value={ textControlValue }
 				onChange={ setTextControlValue }
@@ -57,7 +45,6 @@ const Form = () => {
 				onChange={ setTextAreaValue }
 			/>
 			<SelectControl
-				__next40pxDefaultSize
 				label="Select Control"
 				onChange={ () => {} }
 				options={ [

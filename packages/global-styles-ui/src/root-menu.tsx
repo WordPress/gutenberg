@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import {
 	background,
@@ -13,10 +10,6 @@ import { __ } from '@wordpress/i18n';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import type { GlobalStylesSettings } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { NavigationButtonAsItem } from './navigation-button';
 import { useSetting } from './hooks';
 import { unlock } from './lock-unlock';

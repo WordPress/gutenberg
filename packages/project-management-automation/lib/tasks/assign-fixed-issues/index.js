@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const debug = require( '../../debug' );
 
 /** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */

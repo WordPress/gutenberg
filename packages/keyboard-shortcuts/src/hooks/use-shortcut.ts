@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useShortcutEventMatch from './use-shortcut-event-match';
 import { context } from '../context';
 

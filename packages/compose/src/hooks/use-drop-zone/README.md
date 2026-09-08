@@ -2,7 +2,7 @@
 
 A hook to facilitate drag and drop handling within a designated drop zone area. An optional `dropZoneElement` can be provided, however by default the drop zone is bound by the area where the returned `ref` is assigned.
 
-When using a `dropZoneElement`, it is expected that the `ref` will be attached to a node that is a descendent of the `dropZoneElement`. Additionally, the element passed to `dropZoneElement` should be stored in state rather than a plain ref to ensure reactive updating when it changes.
+When using a `dropZoneElement`, it is expected that the `ref` will be attached to a node that is a descendant of the `dropZoneElement`. Additionally, the element passed to `dropZoneElement` should be stored in state rather than a plain ref to ensure reactive updating when it changes.
 
 ## Usage
 

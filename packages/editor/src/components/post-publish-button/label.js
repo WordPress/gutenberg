@@ -1,15 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
-import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 
 /**
  * Renders the label for the publish button.
@@ -28,7 +20,6 @@ export default function PublishButtonLabel() {
 		hasNonPostEntityChanges,
 		postStatusHasChanged,
 		postStatus,
-		postType,
 		isPostSavingLocked,
 	} = useSelect( ( select ) => {
 		const {
@@ -37,7 +28,6 @@ export default function PublishButtonLabel() {
 			isSavingPost,
 			isPublishingPost,
 			getCurrentPost,
-			getCurrentPostType,
 			isAutosavingPost,
 			getPostEdits,
 			getEditedPostAttribute,
@@ -49,7 +39,6 @@ export default function PublishButtonLabel() {
 			isPublishing: isPublishingPost(),
 			hasPublishAction:
 				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
-			postType: getCurrentPostType(),
 			isAutosaving: isAutosavingPost(),
 			hasNonPostEntityChanges:
 				select( editorStore ).hasNonPostEntityChanges(),
@@ -70,13 +59,6 @@ export default function PublishButtonLabel() {
 		return __( 'Saving…' );
 	}
 	if ( ! hasPublishAction ) {
-		// For attachments, always show "Save" since they don't have a publish workflow
-		if (
-			postType === ATTACHMENT_POST_TYPE &&
-			window?.__experimentalMediaEditor
-		) {
-			return __( 'Save' );
-		}
 		// TODO: this is because "Submit for review" string is too long in some languages.
 		// @see https://github.com/WordPress/gutenberg/issues/10475
 		return isSmallerThanMediumViewport

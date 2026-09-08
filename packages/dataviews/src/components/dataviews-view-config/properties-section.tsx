@@ -1,20 +1,13 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	BaseControl,
-	Icon,
+	Icon as WCIcon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { NormalizedField } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import getHideableFields from '../../utils/get-hideable-fields';
@@ -32,7 +25,7 @@ function FieldItem( {
 		<Item onClick={ field.enableHiding ? onToggleVisibility : undefined }>
 			<Stack direction="row" gap="sm" justify="flex-start" align="center">
 				<div style={ { height: 24, width: 24 } }>
-					{ isVisible && <Icon icon={ check } /> }
+					{ isVisible && <WCIcon icon={ check } /> }
 				</div>
 				<span className="dataviews-view-config__label">
 					{ field.label }
@@ -80,7 +73,7 @@ export function PropertiesSection( {
 		},
 	].filter( ( { field } ) => isDefined( field ) ) as Array< {
 		field: NormalizedField< any >;
-		isVisibleFlag: string;
+		isVisibleFlag: 'showTitle' | 'showMedia' | 'showDescription';
 	} >;
 	const visibleFieldIds = view.fields ?? [];
 	const visibleRegularFieldsCount = regularFields.filter( ( f ) =>
@@ -88,9 +81,7 @@ export function PropertiesSection( {
 	).length;
 
 	const visibleLockedFields = lockedFields.filter(
-		( { isVisibleFlag } ) =>
-			// @ts-expect-error
-			view[ isVisibleFlag ] ?? true
+		( { isVisibleFlag } ) => view[ isVisibleFlag ] ?? true
 	);
 
 	// If only one field (locked or regular) is visible, prevent it from being hidden
@@ -112,7 +103,6 @@ export function PropertiesSection( {
 			>
 				<ItemGroup isBordered isSeparated size="medium">
 					{ lockedFields.map( ( { field, isVisibleFlag } ) => {
-						// @ts-expect-error
 						const isVisible = view[ isVisibleFlag ] ?? true;
 						const fieldToRender =
 							isSingleVisibleLockedField && isVisible

@@ -23,6 +23,7 @@ jobs:
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 10
         strategy:
             fail-fast: false
             matrix:
@@ -41,7 +42,7 @@ jobs:
                       os: 'windows-2025'
 
         steps:
-            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -52,5 +53,4 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Create block
-              shell: bash
-              run: bash ./bin/test-create-block.sh
+              run: npm run test:create-block

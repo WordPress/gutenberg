@@ -21,7 +21,11 @@ function {{PREFIX}}_register_script_modules() {
 	$already_registered = true;
 
 	// Load build constants
-	$build_constants = require __DIR__ . '/constants.php';
+	$constants_file = __DIR__ . '/constants.php';
+	if ( ! file_exists( $constants_file ) ) {
+		return;
+	}
+	$build_constants = require $constants_file;
 	$modules_dir     = __DIR__ . '/modules';
 	$modules_file    = $modules_dir . '/registry.php';
 

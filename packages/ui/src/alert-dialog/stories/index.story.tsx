@@ -1,9 +1,9 @@
-import { Menu } from '@base-ui/react/menu';
 import { useId, useState } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { action } from 'storybook/actions';
 import { fn } from 'storybook/test';
 import * as AlertDialog from '../';
+import * as Menu from '../../menu';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
 
@@ -12,11 +12,19 @@ const meta: Meta< typeof AlertDialog.Root > = {
 	component: AlertDialog.Root,
 	subcomponents: {
 		'AlertDialog.Trigger': AlertDialog.Trigger,
+		'AlertDialog.Portal': AlertDialog.Portal,
 		'AlertDialog.Popup': AlertDialog.Popup,
 	},
 	argTypes: {
 		onConfirm: { action: fn() },
 		onOpenChange: { action: fn() },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;
@@ -30,15 +38,16 @@ type Story = StoryObj< typeof AlertDialog.Root >;
  */
 export const Default: Story = {
 	args: {
-		children: (
-			<>
-				<AlertDialog.Trigger>Move to trash</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					title="Move to trash?"
-					description="This post will be moved to trash. You can restore it later."
-				/>
-			</>
-		),
+		children: [
+			<AlertDialog.Trigger key="trigger">
+				Move to trash
+			</AlertDialog.Trigger>,
+			<AlertDialog.Popup
+				title="Move to trash?"
+				description="This post will be moved to trash. You can restore it later."
+				key="popup"
+			/>,
+		],
 	},
 };
 
@@ -48,17 +57,18 @@ export const Default: Story = {
  */
 export const Irreversible: Story = {
 	args: {
-		children: (
-			<>
-				<AlertDialog.Trigger>Delete permanently</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					intent="irreversible"
-					title="Delete permanently?"
-					description="This action cannot be undone. All data will be lost."
-					confirmButtonText="Delete permanently"
-				/>
-			</>
-		),
+		children: [
+			<AlertDialog.Trigger key="trigger">
+				Delete permanently
+			</AlertDialog.Trigger>,
+			<AlertDialog.Popup
+				intent="irreversible"
+				title="Delete permanently?"
+				description="This action cannot be undone. All data will be lost."
+				confirmButtonText="Delete permanently"
+				key="popup"
+			/>,
+		],
 	},
 };
 
@@ -67,17 +77,18 @@ export const Irreversible: Story = {
  */
 export const CustomLabels: Story = {
 	args: {
-		children: (
-			<>
-				<AlertDialog.Trigger>Send feedback</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					title="Send feedback?"
-					description="Your feedback helps us improve. Would you like to send it now?"
-					confirmButtonText="Send feedback"
-					cancelButtonText="Not now"
-				/>
-			</>
-		),
+		children: [
+			<AlertDialog.Trigger key="trigger">
+				Send feedback
+			</AlertDialog.Trigger>,
+			<AlertDialog.Popup
+				title="Send feedback?"
+				description="Your feedback helps us improve. Would you like to send it now?"
+				confirmButtonText="Send feedback"
+				cancelButtonText="Not now"
+				key="popup"
+			/>,
+		],
 	},
 };
 
@@ -88,27 +99,28 @@ export const CustomLabels: Story = {
  */
 export const WithCustomContent: Story = {
 	args: {
-		children: (
-			<>
-				<AlertDialog.Trigger>Remove pages</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					title="Remove 3 pages?"
-					description="These pages will be moved to trash."
-					confirmButtonText="Delete pages"
+		children: [
+			<AlertDialog.Trigger key="trigger">
+				Remove pages
+			</AlertDialog.Trigger>,
+			<AlertDialog.Popup
+				title="Remove 3 pages?"
+				description="These pages will be moved to trash."
+				confirmButtonText="Delete pages"
+				key="popup"
+			>
+				<ul
+					style={ {
+						margin: 'var(--wpds-dimension-gap-sm) 0 0',
+						paddingInlineStart: 'var(--wpds-dimension-gap-lg)',
+					} }
 				>
-					<ul
-						style={ {
-							margin: 'var(--wpds-dimension-gap-sm) 0 0',
-							paddingInlineStart: 'var(--wpds-dimension-gap-lg)',
-						} }
-					>
-						<Text render={ <li /> }>About us</Text>
-						<Text render={ <li /> }>Contact</Text>
-						<Text render={ <li /> }>Privacy policy</Text>
-					</ul>
-				</AlertDialog.Popup>
-			</>
-		),
+					<Text render={ <li /> }>About us</Text>
+					<Text render={ <li /> }>Contact</Text>
+					<Text render={ <li /> }>Privacy policy</Text>
+				</ul>
+			</AlertDialog.Popup>,
+		],
 	},
 };
 
@@ -132,98 +144,57 @@ export const WithCustomContent: Story = {
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
 	args: {
-		children: (
-			<>
-				<AlertDialog.Trigger>Move to trash</AlertDialog.Trigger>
-				<AlertDialog.Popup
-					title="Move to trash?"
-					description="This post will be moved to trash. You can restore it later."
-					portal={
-						<AlertDialog.Portal
-							style={ { '--wp-ui-dialog-z-index': '9999' } }
-						/>
-					}
-				/>
-			</>
-		),
+		children: [
+			<AlertDialog.Trigger key="trigger">
+				Move to trash
+			</AlertDialog.Trigger>,
+			<AlertDialog.Popup
+				title="Move to trash?"
+				description="This post will be moved to trash. You can restore it later."
+				portal={
+					<AlertDialog.Portal
+						style={ { '--wp-ui-dialog-z-index': '9999' } }
+					/>
+				}
+				key="popup"
+			/>,
+		],
 	},
 };
 
-const menuPopupStyles: React.CSSProperties = {
-	background: 'var(--wpds-color-bg-surface-neutral-strong)',
-	border: '1px solid var(--wpds-color-stroke-surface-neutral)',
-	borderRadius: '8px',
-	padding: '4px',
-	minWidth: '160px',
-	boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-};
-
-const menuItemStyles: React.CSSProperties = {
-	display: 'block',
-	width: '100%',
-	padding: '8px 12px',
-	borderRadius: '4px',
-	border: 'none',
-	background: 'none',
-	textAlign: 'start',
-	fontSize: 'inherit',
-	userSelect: 'none',
-};
-
 /**
- * Example showing composition with a menu. The `AlertDialog.Trigger` is
- * composed with Base UI's `Menu.Item` using the `render` prop, allowing the
- * menu item to directly trigger the alert dialog.
- *
- * Note: the example currently uses the `Menu` component from BaseUI, although
- * consumers should not use BaseUI directly and instead use the DS `Menu`
- * component (not ready yet).
+ * Control the alert dialog when opening it from a menu item. This lets the
+ * menu close before the dialog opens and keeps the dialog mounted while the
+ * menu popup unmounts.
  */
 export const MenuTrigger: Story = {
 	render: () => {
-		const [ menuOpen, setMenuOpen ] = useState( false );
+		const [ dialogOpen, setDialogOpen ] = useState( false );
+
 		return (
-			<>
-				<Menu.Root onOpenChange={ setMenuOpen } open={ menuOpen }>
+			<AlertDialog.Root
+				open={ dialogOpen }
+				onOpenChange={ setDialogOpen }
+				onConfirm={ () => action( 'onConfirm' )() }
+			>
+				<Menu.Root>
 					<Menu.Trigger>Actions ▾</Menu.Trigger>
-					<Menu.Portal>
-						<Menu.Positioner>
-							<Menu.Popup style={ menuPopupStyles }>
-								<Menu.Item style={ menuItemStyles }>
-									Edit
-								</Menu.Item>
-								<AlertDialog.Root
-									onConfirm={ () => {
-										setMenuOpen( false );
-										action( 'onConfirm' )();
-									} }
-								>
-									<Menu.Item
-										render={
-											<AlertDialog.Trigger
-												// Quick fix to remove `button`-specific styles.
-												// This shouldn't be an issue once we use the DS `Menu`
-												// component, which will come with item styles.
-												render={ <div /> }
-											/>
-										}
-										style={ menuItemStyles }
-										closeOnClick={ false }
-									>
-										Delete...
-										<AlertDialog.Popup
-											intent="irreversible"
-											title="Delete permanently?"
-											description="This action cannot be undone. All data will be lost."
-											confirmButtonText="Delete permanently"
-										/>
-									</Menu.Item>
-								</AlertDialog.Root>
-							</Menu.Popup>
-						</Menu.Positioner>
-					</Menu.Portal>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>Edit</Menu.ItemLabel>
+						</Menu.Item>
+						<Menu.Item onClick={ () => setDialogOpen( true ) }>
+							<Menu.ItemLabel>Delete…</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
 				</Menu.Root>
-			</>
+				<AlertDialog.Popup
+					intent="irreversible"
+					title="Delete permanently?"
+					description="This action cannot be undone. All data will be lost."
+					confirmButtonText="Delete permanently"
+				/>
+			</AlertDialog.Root>
 		);
 	},
 };
@@ -330,6 +301,7 @@ function StickyToggle( {
 				checked={ value }
 				onChange={ ( event ) => onChange( event.target.checked ) }
 			/>
+
 			<label htmlFor={ id }>{ label }</label>
 		</Stack>
 	);
@@ -347,6 +319,7 @@ function ScrollableContent() {
 						value={ stickyHeader }
 						onChange={ setStickyHeader }
 					/>
+
 					<StickyToggle
 						label="Sticky footer"
 						value={ stickyFooter }
