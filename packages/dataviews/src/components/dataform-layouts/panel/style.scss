@@ -32,8 +32,7 @@
 			opacity: 1;
 		}
 
-		.dataforms-layouts-panel__field-label,
-		.dataforms-layouts-panel__field-placeholder {
+		.dataforms-layouts-panel__field-label {
 			color: var(--wpds-color-foreground-interactive-brand);
 		}
 	}
@@ -146,11 +145,6 @@
 	> * {
 		min-width: 0;
 	}
-}
-
-.dataforms-layouts-panel__field-placeholder {
-	color: var(--wpds-color-foreground-content-neutral-weak);
-	font-weight: var(--wpds-typography-font-weight-default);
 }
 
 .dataforms-layouts-panel__field-trigger--label-top
