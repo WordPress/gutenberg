@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   `BlockAlignmentControl`: List Wide and Full width as unavailable when the parent layout withholds them, instead of removing them from the menu without explanation. Blocks whose only alignments are wide and full, such as Group and Columns, now keep an alignment control in layouts that offer neither ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   `BlockAlignmentControl`: List Wide and Full width as unavailable when the parent layout withholds them, instead of removing them from the menu without explanation. Blocks whose only alignments are wide and full, such as Group and Columns, now keep an alignment control in layouts that offer neither ([#82600](https://github.com/WordPress/gutenberg/pull/82600)).
 -   Borders: rename the "Border & Shadow" panel to "Borders", whichever of its controls are available, and always show the Border and Shadow controls' visible labels. A stable panel title is what lets the Border label render unconditionally, so its "Unlink sides" toggle lines up with the border radius one ([#82163](https://github.com/WordPress/gutenberg/pull/82163)).
 -   `ListView`: Updated to use `outset-ring__focus()` mixin for focus outline wherever applicable instead of the previous box-shadow implementation. ([#82129](https://github.com/WordPress/gutenberg/pull/82129))
 
