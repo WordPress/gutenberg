@@ -43,19 +43,35 @@ step "Booting simulator $UDID"
 defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool false
 xcrun simctl boot "$UDID" 2>/dev/null || true
 # WordPress runs in Playground: PHP compiled to WebAssembly, no Docker.
+start_wordpress() {
+	PLAYGROUND_LOG=$( mktemp )
+	npx --yes @wp-playground/cli@3.1.53 server \
+		--auto-mount="$PWD" \
+		--blueprint=test/ios/blueprint.json \
+		--port "$PORT" > "$PLAYGROUND_LOG" 2>&1 &
+	PLAYGROUND_PID=$!
+	# Playground prints "Ready!" once it listens and the blueprint has run;
+	# the server answers earlier, before the plugin is active.
+	until grep -q "Ready!" "$PLAYGROUND_LOG"; do
+		kill -0 "$PLAYGROUND_PID" 2>/dev/null || return 1
+		sleep 1
+	done
+}
+
 step "Starting WordPress"
-PLAYGROUND_LOG=$( mktemp )
-npx --yes @wp-playground/cli@3.1.53 server \
-	--auto-mount="$PWD" \
-	--blueprint=test/ios/blueprint.json \
-	--port "$PORT" > "$PLAYGROUND_LOG" 2>&1 &
-PLAYGROUND_PID=$!
 trap 'kill "$PLAYGROUND_PID" 2>/dev/null || true' EXIT
-# Playground prints "Ready!" once it listens and the blueprint has run; the
-# server answers earlier, before the plugin is active.
-until grep -q "Ready!" "$PLAYGROUND_LOG"; do
-	kill -0 "$PLAYGROUND_PID" 2>/dev/null || { cat "$PLAYGROUND_LOG"; echo "WordPress did not start"; exit 1; }
-	sleep 1
+# npx fetches the server on first use, and the registry has reset the
+# connection on a runner before, which is worth another go rather than a
+# failed run.
+for TRY in 1 2 3; do
+	start_wordpress && break
+	cat "$PLAYGROUND_LOG"
+	if [ "$TRY" = 3 ]; then
+		echo "WordPress did not start"
+		exit 1
+	fi
+	echo "WordPress did not start, trying again"
+	sleep 5
 done
 cat "$PLAYGROUND_LOG"
 

@@ -108,7 +108,9 @@ jobs:
             # bundle is tarred because uploading it as a directory fails.
             - name: Archive the test results
               if: ${{ !success() }}
-              run: tar -czf test/ios/build/results.tar.gz -C test/ios/build results.xcresult
+              run: |
+                  test -d test/ios/build/results.xcresult || exit 0
+                  tar -czf test/ios/build/results.tar.gz -C test/ios/build results.xcresult
 
             - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               if: ${{ !success() }}
