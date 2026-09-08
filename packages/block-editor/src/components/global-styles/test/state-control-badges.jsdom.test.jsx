@@ -29,9 +29,9 @@ describe( 'StateControlBadges', () => {
 
 		const badge = screen.getByText( 'Tablet' );
 		expect( badge ).toBeVisible();
-		// The explanation is also embedded in the badge, visually hidden, so
+		// The explanation is also embedded next to the badge, visually hidden, so
 		// screen reader users perceive it without relying on the tooltip.
-		expect( badge ).toHaveTextContent(
+		expect( badge.parentElement ).toHaveTextContent(
 			'Style changes apply to the Tablet viewport.'
 		);
 		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent(
@@ -49,7 +49,7 @@ describe( 'StateControlBadges', () => {
 
 		const badge = screen.getByText( 'Hover' );
 		expect( badge ).toBeVisible();
-		expect( badge ).toHaveTextContent(
+		expect( badge.parentElement ).toHaveTextContent(
 			'Style changes apply to the Hover state.'
 		);
 		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent(

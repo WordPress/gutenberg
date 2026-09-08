@@ -1,9 +1,5 @@
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { Stack, Tooltip, VisuallyHidden } from '@wordpress/ui';
-import { unlock } from '../../lock-unlock';
-
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
+import { Badge, Stack, Tooltip, VisuallyHidden } from '@wordpress/ui';
 
 export default function StateControlBadges( {
 	viewportStates = [],
@@ -54,18 +50,13 @@ export default function StateControlBadges( {
 		>
 			{ activeStates.map( ( state ) => {
 				const badge = (
-					<WCBadge
+					<Badge
 						key={ state.key }
 						className="block-editor-global-styles-state-control__badge"
-						intent="info"
+						intent="informational"
 					>
 						{ state.label }
-						{ !! state.tooltipText && (
-							<VisuallyHidden render={ <span /> }>
-								{ state.tooltipText }
-							</VisuallyHidden>
-						) }
-					</WCBadge>
+					</Badge>
 				);
 
 				if ( ! state.tooltipText ) {
@@ -78,6 +69,9 @@ export default function StateControlBadges( {
 							render={
 								<span className="block-editor-global-styles-state-control__badge-tooltip-trigger">
 									{ badge }
+									<VisuallyHidden render={ <span /> }>
+										{ state.tooltipText }
+									</VisuallyHidden>
 								</span>
 							}
 						/>
