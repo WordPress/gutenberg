@@ -18,6 +18,10 @@ const ISOLATION_OPT_OUT_PATTERN =
 const ROOT_ROUTING_COMMAND =
 	'npm run --workspace @wordpress/unit-tests test:unit:routing --';
 const WORKSPACE_ROUTING_COMMAND = 'node scripts/validate-test-routing.mjs';
+const ROOT_SHUFFLED_COMMAND =
+	'npm run --workspace @wordpress/unit-tests test:unit:vitest:shuffled --';
+const WORKSPACE_SHUFFLED_COMMAND =
+	'npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855';
 
 function normalizeShellCommand( command ) {
 	return command
@@ -181,6 +185,31 @@ export function validateRoutingScripts( rootPackageJson, unitTestPackageJson ) {
 	return violations;
 }
 
+export function validateVitestShuffleScripts(
+	rootPackageJson,
+	unitTestPackageJson
+) {
+	const violations = [];
+	if (
+		rootPackageJson.scripts?.[ 'test:unit:vitest:shuffled' ] !==
+		ROOT_SHUFFLED_COMMAND
+	) {
+		violations.push(
+			`package.json: scripts.test:unit:vitest:shuffled must be exactly \`${ ROOT_SHUFFLED_COMMAND }\``
+		);
+	}
+	if (
+		unitTestPackageJson.scripts?.[ 'test:unit:vitest:shuffled' ] !==
+		WORKSPACE_SHUFFLED_COMMAND
+	) {
+		violations.push(
+			`test/unit/package.json: scripts.test:unit:vitest:shuffled must be exactly \`${ WORKSPACE_SHUFFLED_COMMAND }\``
+		);
+	}
+
+	return violations;
+}
+
 function findPackageScriptIsolationOptOuts( rootDir ) {
 	const violations = [];
 	const packageFiles = globSync( '**/package.json', {
@@ -311,4 +340,51 @@ export function findVitestIsolationOptOuts( rootDir ) {
 		...findPackageScriptIsolationOptOuts( rootDir ),
 		...findWorkflowIsolationOptOuts( rootDir ),
 	].sort();
+}
+
+export function validateVitestCleanupConfig( vitestConfig ) {
+	const violations = [];
+	const requiredOptions = [
+		'isolate',
+		'mockReset',
+		'restoreMocks',
+		'unstubEnvs',
+		'unstubGlobals',
+	];
+
+	for ( const option of requiredOptions ) {
+		if ( vitestConfig.test?.[ option ] !== true ) {
+			violations.push(
+				`test/unit/vitest.config.mjs: test.${ option } must be true`
+			);
+		}
+	}
+	if ( vitestConfig.test?.globals !== false ) {
+		violations.push(
+			'test/unit/vitest.config.mjs: test.globals must remain false'
+		);
+	}
+
+	for ( const project of vitestConfig.test?.projects ?? [] ) {
+		const projectName = project.test?.name ?? 'unnamed';
+		if ( project.extends !== true ) {
+			violations.push(
+				`test/unit/vitest.config.mjs: ${ projectName } must set extends: true to inherit the shared isolation defaults`
+			);
+		}
+		for ( const option of requiredOptions ) {
+			if ( project.test?.[ option ] === false ) {
+				violations.push(
+					`test/unit/vitest.config.mjs: ${ projectName } overrides test.${ option } with false`
+				);
+			}
+		}
+		if ( project.test?.globals === true ) {
+			violations.push(
+				`test/unit/vitest.config.mjs: ${ projectName } enables global Vitest APIs`
+			);
+		}
+	}
+
+	return violations;
 }
