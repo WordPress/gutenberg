@@ -13,6 +13,10 @@ export type Item = {
 	label: string;
 	value: string;
 	disabled?: boolean;
+	/**
+	 * When `true`, the item renders in the list footer, not the main list,
+	 * when it is in the filtered items.
+	 */
 	creatable?: boolean;
 };
 
@@ -95,8 +99,8 @@ export type SearchableSelectProps = Omit<
 		 * flat list of items. Grouped items require a custom `children` renderer.
 		 *
 		 * Mark a creatable action with `creatable: true`. It renders in the
-		 * list footer and is excluded from the main list. It follows the same
-		 * filter as other items, so an unmatched query hides the footer too.
+		 * list footer, not the main list, when it is in the filtered items.
+		 * Handle the creation of the item in `onValueChange`.
 		 */
 		items?: Item[] | ItemGroup[];
 		/**

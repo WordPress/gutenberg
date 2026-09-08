@@ -13,7 +13,7 @@ import type { Item, SearchableChipSelectProps } from './types';
 
 /**
  * A low-level primitive for a searchable multi-selection field with chips, with
- * support for a footer item to create new items.
+ * support for a creatable footer action.
  *
  * Prefer `SearchableChipSelectControl` when using with a standard label and description.
  */
