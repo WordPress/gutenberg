@@ -28,6 +28,17 @@ final class CaretPlacementTests: SafariTestCase {
 
 	var paragraph: XCUIElement { paragraphs.element( boundBy: 0 ) }
 
+	/// The field holding the keyboard, or a note that there is none. Reading
+	/// a query that matches nothing raises, which would swallow the failure
+	/// this is meant to describe.
+	var focusedFieldDescription: String {
+		let field = focusedField
+		guard field.exists else {
+			return "no field at all"
+		}
+		return "\"\( field.label )\" holding \"\( field.value as? String ?? "" )\""
+	}
+
 	/// The editable fields the editor exposes right now. Read only to
 	/// describe a failure: when a block stops being an editing host it stops
 	/// being a field, and the writing flow around it becomes one instead,
@@ -129,8 +140,8 @@ final class CaretPlacementTests: SafariTestCase {
 			XCTWaiter.wait( for: [ landed ], timeout: 10 ), .completed,
 			"""
 			The caret did not land in the tapped paragraph on attempt \( attempt ). \
-			The keyboard is in "\( focusedField.label )" holding \
-			"\( focusedField.value as? String ?? "" )".
+			The keyboard is in \( focusedFieldDescription ), \
+			and the editor exposes: \( fieldLabels ).
 			"""
 		)
 		XCTAssertTrue(
@@ -147,7 +158,7 @@ final class CaretPlacementTests: SafariTestCase {
 			XCTWaiter.wait( for: [ typed ], timeout: 5 ), .completed,
 			"""
 			Typing did not reach the paragraph on attempt \( attempt ). \
-			It holds "\( focusedField.value as? String ?? "" )".
+			The keyboard is in \( focusedFieldDescription ).
 			"""
 		)
 	}
