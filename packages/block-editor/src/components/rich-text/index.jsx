@@ -50,22 +50,6 @@ const {
 
 const instanceIdKey = Symbol( 'instanceId' );
 
-/**
- * Whether the document has focus but no element in it does: the element that
- * had focus was removed and focus fell back to the body.
- *
- * @param {Document=} doc The document.
- *
- * @return {boolean} Whether focus was lost.
- */
-function isFocusLost( doc ) {
-	return (
-		!! doc &&
-		doc.hasFocus() &&
-		( ! doc.activeElement || doc.activeElement === doc.body )
-	);
-}
-
 function RichTextWrapper(
 	{
 		children,
@@ -345,16 +329,15 @@ function RichTextWrapper(
 		]
 	);
 
-	// Focus follows the selection while focus is inside the canvas, or when
-	// focus was lost. A field does not take focus by itself, so when an
-	// action moves the selection into it (a split, a paste), the field that
-	// had focus keeps it; when the element that had focus was removed (a
-	// merge, a toolbar button that re-rendered with the block it moved),
-	// focus fell back to the body of its document. Focus outside the canvas
+	// Focus follows the selection while focus is inside the canvas. A field
+	// does not take focus by itself, so when an action moves the selection
+	// into it (a split, a paste), the field that had focus keeps it, and
+	// when the element that had focus was removed (a merge, a list item
+	// moved by Tab), focus fell back to the body. Focus outside the canvas
 	// (a toolbar button, a sidebar input, another window) was placed on
 	// purpose and stays, and so does focus on an editing host around the
 	// field, which applies the selection inside it. The canvas is the
-	// writing flow wrapper, the outermost editable ancestor of the field.
+	// writing flow wrapper, the nearest editable ancestor of the field.
 	// Declared before the hook, whose effect applies the selection only
 	// while the field has focus.
 	useLayoutEffect( () => {
@@ -365,34 +348,24 @@ function RichTextWrapper(
 		}
 
 		const { ownerDocument } = element;
-		const { activeElement } = ownerDocument;
-		const isHost =
-			activeElement?.isContentEditable &&
-			activeElement.contains( element );
+		const { activeElement, body } = ownerDocument;
+		const canvas = element.parentElement?.closest( '[contenteditable]' );
 
 		if (
-			isHost ||
+			! ownerDocument.hasFocus() ||
 			activeElement === element ||
-			element.contains( activeElement )
+			element.contains( activeElement ) ||
+			// A focused editing host around the field.
+			( activeElement?.isContentEditable &&
+				activeElement.contains( element ) )
 		) {
 			return;
 		}
 
-		let canvas = element.parentElement?.closest( '[contenteditable]' );
-		let outer;
-
-		while (
-			canvas &&
-			( outer = canvas.parentElement?.closest( '[contenteditable]' ) )
-		) {
-			canvas = outer;
-		}
-
 		if (
-			( ownerDocument.hasFocus() &&
-				( isFocusLost( ownerDocument ) ||
-					canvas?.contains( activeElement ) ) ) ||
-			isFocusLost( ownerDocument.defaultView.frameElement?.ownerDocument )
+			! activeElement ||
+			activeElement === body ||
+			canvas?.contains( activeElement )
 		) {
 			element.focus();
 		}

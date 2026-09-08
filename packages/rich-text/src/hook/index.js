@@ -172,39 +172,6 @@ function useRichTextBase( {
 		}
 	}, [ value ] );
 
-	/**
-	 * Whether the live selection is inside the element at the given offsets.
-	 * Positions are compared rather than DOM ranges: at a format boundary the
-	 * browser and the record place the same offset in different text nodes.
-	 *
-	 * @param {number} start Start offset.
-	 * @param {number} end   End offset.
-	 *
-	 * @return {boolean} Whether the live selection matches.
-	 */
-	function hasSelection( start, end ) {
-		const element = ref.current;
-		const selection = element.ownerDocument.defaultView.getSelection();
-
-		if ( ! selection.rangeCount ) {
-			return false;
-		}
-
-		const range = selection.getRangeAt( 0 );
-
-		if ( ! element.contains( range.commonAncestorContainer ) ) {
-			return false;
-		}
-
-		const record = create( {
-			element,
-			range,
-			__unstableIsEditableTree: true,
-		} );
-
-		return record.start === start && record.end === end;
-	}
-
 	// Apply the selection from props unless the element already holds it. A
 	// selection the element made itself is left alone: the live range keeps
 	// its direction and the side of a format boundary the caret sits on, which
@@ -218,20 +185,37 @@ function useRichTextBase( {
 			return;
 		}
 
-		const { activeElement } = ref.current.ownerDocument;
+		const element = ref.current;
+		const { ownerDocument } = element;
+		const { activeElement } = ownerDocument;
 
 		if (
-			activeElement !== ref.current &&
+			activeElement !== element &&
 			! (
 				activeElement?.contentEditable === 'true' &&
-				activeElement.contains( ref.current )
+				activeElement.contains( element )
 			)
 		) {
 			return;
 		}
 
-		if ( hasSelection( selectionStart, selectionEnd ) ) {
-			return;
+		const selection = ownerDocument.defaultView.getSelection();
+		const range =
+			selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
+
+		// Positions are compared rather than DOM ranges: at a format boundary
+		// the browser and the record place the same offset in different text
+		// nodes.
+		if ( range && element.contains( range.commonAncestorContainer ) ) {
+			const { start, end } = create( {
+				element,
+				range,
+				__unstableIsEditableTree: true,
+			} );
+
+			if ( start === selectionStart && end === selectionEnd ) {
+				return;
+			}
 		}
 
 		applyRecord( recordRef.current );
