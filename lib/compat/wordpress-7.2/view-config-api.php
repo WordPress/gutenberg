@@ -25,9 +25,9 @@ function _gutenberg_add_reading_settings_to_wp_template_view_config( $data ) {
 					array(
 						'id'     => 'description',
 						'layout' => array(
-							'type'          => 'panel',
-							'labelPosition' => 'top',
-							'empty'         => 'placeholder',
+							'type'                   => 'panel',
+							'labelPosition'          => 'top',
+							'showPlaceholderIfEmpty' => true,
 						),
 					),
 					array(
@@ -170,8 +170,8 @@ function _gutenberg_show_excerpt_placeholder_when_empty( $data ) {
 					array(
 						'id'     => 'excerpt',
 						'layout' => array(
-							'type'  => 'panel',
-							'empty' => 'placeholder',
+							'type'                   => 'panel',
+							'showPlaceholderIfEmpty' => true,
 						),
 					),
 				),

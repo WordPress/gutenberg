@@ -120,9 +120,9 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		$excerpt = $this->get_form_field( $config, 'excerpt' );
 		$this->assertSame(
 			array(
-				'type'          => 'panel',
-				'labelPosition' => 'top',
-				'empty'         => 'placeholder',
+				'type'                   => 'panel',
+				'labelPosition'          => 'top',
+				'showPlaceholderIfEmpty' => true,
 			),
 			$excerpt['layout'],
 			'The `excerpt` summary shows its placeholder when empty.'
@@ -189,9 +189,9 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 
 		$this->assertSame(
 			array(
-				'type'          => 'panel',
-				'labelPosition' => 'top',
-				'empty'         => 'placeholder',
+				'type'                   => 'panel',
+				'labelPosition'          => 'top',
+				'showPlaceholderIfEmpty' => true,
 			),
 			$field['layout']
 		);
