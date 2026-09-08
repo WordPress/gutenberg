@@ -15,6 +15,26 @@ const lStops = [ 100, 90, 80, 70, 60, 50, 40, 30, 20, 10 ];
 const sStops = [ 100, 80, 60, 40, 20, 0 ];
 const hStops = [ 0, 60, 120, 180, 240, 300 ];
 
+function expectAccessibleFillStates( ramp: ReturnType< typeof buildRamp > ) {
+	const restingLuminance = getLuminance( ramp.ramp.bgFill1 );
+	const activeLuminance = getLuminance( ramp.ramp.bgFill2 );
+
+	if ( ramp.direction === 'darker' ) {
+		expect( activeLuminance ).toBeLessThan( restingLuminance );
+	} else {
+		expect( activeLuminance ).toBeGreaterThan( restingLuminance );
+	}
+	expect(
+		getContrast( ramp.ramp.bgFill1, ramp.ramp.bgFill2 )
+	).toBeGreaterThanOrEqual( 1.2 );
+	expect(
+		getContrast( ramp.ramp.bgFill1, ramp.ramp.fgFill )
+	).toBeGreaterThanOrEqual( 4.5 );
+	expect(
+		getContrast( ramp.ramp.bgFill2, ramp.ramp.fgFill )
+	).toBeGreaterThanOrEqual( 4.5 );
+}
+
 describe( 'buildRamps', () => {
 	it( 'background ramp snapshots', () => {
 		// Generate a set of HSL colors across a broad perceivable range to test
@@ -47,6 +67,7 @@ describe( 'buildRamps', () => {
 				const ramp = buildRamp( bg, BG_RAMP_CONFIG );
 				const seedOriginal = getColorString( bg );
 				const seedComputed = getColorString( ramp.ramp.surface2 );
+				expectAccessibleFillStates( ramp );
 
 				return {
 					input: {
@@ -114,6 +135,7 @@ describe( 'buildRamps', () => {
 					const ramp = buildRamp( primary, ACCENT_RAMP_CONFIG, o );
 					const seedOriginal = getColorString( primary );
 					const seedComputed = getColorString( ramp.ramp.bgFill1 );
+					expectAccessibleFillStates( ramp );
 
 					return {
 						input: {
@@ -135,25 +157,53 @@ describe( 'buildRamps', () => {
 		expect( result.warnings ).toBeUndefined();
 	} );
 
-	it( 'meets fill contrast requirements after sRGB serialization', () => {
-		const bgRamp = buildBgRamp( '#4f386e' );
-		const accentRamp = buildAccentRamp( '#608010', bgRamp );
+	it.each( [
+		{
+			background: DEFAULT_SEED_COLORS.background,
+			primary: DEFAULT_SEED_COLORS.primary,
+			direction: 'darker',
+		},
+		{
+			background: '#1e1e1e',
+			primary: DEFAULT_SEED_COLORS.primary,
+			direction: 'lighter',
+		},
+		{
+			background: '#4f386e',
+			primary: '#608010',
+			direction: 'lighter',
+		},
+	] as const )(
+		'moves active fills in the $direction ramp direction and keeps both foreground pairs accessible',
+		( { background, primary, direction } ) => {
+			const bgRamp = buildBgRamp( background );
+			const accentRamp = buildAccentRamp( primary, bgRamp );
+			const restingLuminance = getLuminance( accentRamp.ramp.bgFill1 );
+			const activeLuminance = getLuminance( accentRamp.ramp.bgFill2 );
 
-		expect(
-			getContrast( accentRamp.ramp.bgFill1, accentRamp.ramp.fgFill )
-		).toBeGreaterThanOrEqual( 4.5 );
-		expect(
-			getContrast( accentRamp.ramp.bgFill2, accentRamp.ramp.fgFill )
-		).toBeGreaterThanOrEqual( 4.5 );
-	} );
+			expect( accentRamp.direction ).toBe( direction );
+			if ( direction === 'darker' ) {
+				expect( activeLuminance ).toBeLessThan( restingLuminance );
+			} else {
+				expect( activeLuminance ).toBeGreaterThan( restingLuminance );
+			}
+			expect(
+				getContrast( accentRamp.ramp.bgFill1, accentRamp.ramp.fgFill )
+			).toBeGreaterThanOrEqual( 4.5 );
+			expect(
+				getContrast( accentRamp.ramp.bgFill2, accentRamp.ramp.fgFill )
+			).toBeGreaterThanOrEqual( 4.5 );
+		}
+	);
 
-	it( 'keeps active fills darker than resting fills', () => {
-		const bgRamp = buildBgRamp( '#4f386e' );
-		const accentRamp = buildAccentRamp( '#608010', bgRamp );
-
-		expect( getLuminance( accentRamp.ramp.bgFill2 ) ).toBeLessThan(
-			getLuminance( accentRamp.ramp.bgFill1 )
+	it( 'retains the high-contrast foreground anchor when it satisfies both fill states', () => {
+		const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
+		const accentRamp = buildAccentRamp(
+			DEFAULT_SEED_COLORS.primary,
+			bgRamp
 		);
+
+		expect( accentRamp.ramp.fgFill ).toBe( '#eff0f2' );
 	} );
 
 	it( 'orders every contrast reference before its dependent step', () => {

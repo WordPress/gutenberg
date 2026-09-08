@@ -10,7 +10,7 @@ export const DEFAULT_RAMPS: Record<
 			surface2: '#fcfcfc',
 			bgFill1: '#555',
 			bgFill2: '#484848',
-			fgFill: '#cbcbcb',
+			fgFill: '#f0f0f0',
 			surface6: '#d6d6d6',
 			surface5: '#e6e6e6',
 			surface4: '#ededed',
@@ -36,7 +36,7 @@ export const DEFAULT_RAMPS: Record<
 		ramp: {
 			bgFill1: '#3858e9',
 			bgFill2: '#2e49d9',
-			fgFill: '#e7e8ea',
+			fgFill: '#eff0f2',
 			surface2: '#f8f8f8',
 			surface6: '#c6d2f1',
 			surface5: '#dae3f8',
@@ -90,7 +90,7 @@ export const DEFAULT_RAMPS: Record<
 		ramp: {
 			bgFill1: '#4ab866',
 			bgFill2: '#37a756',
-			fgFill: '#282d29',
+			fgFill: '#1b1f1c',
 			surface2: '#f8f8f8',
 			surface6: '#89e79b',
 			surface5: '#a4f5b2',
@@ -117,7 +117,7 @@ export const DEFAULT_RAMPS: Record<
 		ramp: {
 			bgFill1: '#f0d149',
 			bgFill2: '#dcbe2f',
-			fgFill: '#4f4e48',
+			fgFill: '#1f1e1b',
 			surface2: '#f8f8f8',
 			surface6: '#ead270',
 			surface5: '#f8e28a',
@@ -144,7 +144,7 @@ export const DEFAULT_RAMPS: Record<
 		ramp: {
 			bgFill1: '#f0b849',
 			bgFill2: '#dda633',
-			fgFill: '#45423d',
+			fgFill: '#201e1b',
 			surface2: '#f8f8f8',
 			surface6: '#f5cd86',
 			surface5: '#fcdfab',
@@ -171,7 +171,7 @@ export const DEFAULT_RAMPS: Record<
 		ramp: {
 			bgFill1: '#cc1818',
 			bgFill2: '#b90000',
-			fgFill: '#eae6e6',
+			fgFill: '#f3efef',
 			surface2: '#f8f8f8',
 			surface6: '#f7c8c1',
 			surface5: '#fbdbd6',
