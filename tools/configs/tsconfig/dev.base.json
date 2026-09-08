@@ -7,10 +7,6 @@
 		"checkJs": false,
 		"types": [ "jest" ]
 	},
-	/*
-	 * JavaScript dev files stay unchecked: `checkJs` would report errors in
-	 * files the build never checked either.
-	 */
 	"include": [
 		"${configDir}/src/**/test/**/*.ts",
 		"${configDir}/src/**/test/**/*.tsx",
@@ -23,5 +19,5 @@
 		"${configDir}/src/**/*.story.ts",
 		"${configDir}/src/**/*.story.tsx"
 	],
-	"exclude": [ "../../../**/benchmark" ]
+	"exclude": [ "**/benchmark" ]
 }

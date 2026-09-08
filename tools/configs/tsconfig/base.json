@@ -45,7 +45,11 @@
 
 		"resolveJsonModule": true,
 
-		"typeRoots": [ "../../../typings", "../../../node_modules/@types" ],
+		"typeRoots": [
+			"../../../typings",
+			"../../../test/unit/typings",
+			"../../../node_modules/@types"
+		],
 		"types": [],
 
 		"rootDir": "${configDir}/src",
@@ -53,13 +57,13 @@
 	},
 	"include": [ "${configDir}/src" ],
 	"exclude": [
-		"../../../**/benchmark",
-		"../../../packages/*/build-*/**",
-		"../../../packages/*/build/**",
-		"../../../**/test/**",
-		"../../../**/tests/**",
-		"../../../**/__tests__/**",
-		"../../../**/stories/**",
-		"../../../**/*.story.*"
+		"${configDir}/**/benchmark",
+		"${configDir}/build-*/**",
+		"${configDir}/build/**",
+		"${configDir}/**/test/**",
+		"${configDir}/**/tests/**",
+		"${configDir}/**/__tests__/**",
+		"${configDir}/**/stories/**",
+		"${configDir}/**/*.story.*"
 	]
 }

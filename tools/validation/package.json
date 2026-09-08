@@ -25,6 +25,7 @@
 	},
 	"devDependencies": {
 		"@mawesome/dependency-audit": "^0.4.6",
+		"@wordpress/config-tools": "file:../configs",
 		"@wordpress/create-block": "file:../../packages/create-block",
 		"@wordpress/scripts": "file:../../packages/scripts",
 		"chalk": "^4.1.1",
