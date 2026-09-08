@@ -248,9 +248,6 @@ export default defineConfig( {
 				extends: true,
 				test: {
 					name: 'browser',
-					env: {
-						WP_TESTS_SKIP_STYLE_INJECTION: 'false',
-					},
 					include: vitestTests.browser,
 					setupFiles: [
 						path.join(

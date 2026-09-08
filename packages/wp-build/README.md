@@ -57,7 +57,8 @@ or via npm script:
 Set `WP_TESTS_SKIP_STYLE_INJECTION` to `true` to skip automatic style injection
 in Node or jsdom tests. Set it to `false` to inject styles, including when
 `NODE_ENV` is `test`. The default Vitest configuration uses `true` for Node and
-jsdom projects and `false` for Browser Mode.
+jsdom projects. Browser Mode does not define `process`, so generated styles load
+there without an override.
 
 When the variable is absent, generated output keeps the existing behavior and
 skips injection when `NODE_ENV` is `test`. It injects styles in other
