@@ -1,4 +1,4 @@
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
 import {
 	focus,
 	isFormElement,
@@ -6,7 +6,7 @@ import {
 	placeCaretAtHorizontalEdge,
 } from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
-import { isInsideRootBlock } from '../../../utils/dom';
+import { getBlockClientId, isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -24,6 +24,70 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 	const ref = useRef();
 	const { isBlockSelected, isMultiSelecting, isZoomOut, getSelectionStart } =
 		unlock( useSelect( blockEditorStore ) );
+
+	// The field of this block the store selection starts in, if any, and the
+	// selection end, so a change of either runs the effect below.
+	const { attributeKey, startOffset, endClientId, endOffset } = useSelect(
+		( select ) => {
+			const selectionStart =
+				select( blockEditorStore ).getSelectionStart();
+			const selectionEnd = select( blockEditorStore ).getSelectionEnd();
+			return selectionStart.clientId === clientId
+				? {
+						attributeKey: selectionStart.attributeKey,
+						startOffset: selectionStart.offset,
+						endClientId: selectionEnd.clientId,
+						endOffset: selectionEnd.offset,
+				  }
+				: {};
+		},
+		[ clientId ]
+	);
+
+	// Focus the field the store selection names when it does not hold focus.
+	// A field selected by a split, a merge, a transform, undo, or a toolbar
+	// action does not receive focus by itself: the rich text hook applies the
+	// selection but does not manage focus.
+	useLayoutEffect( () => {
+		if ( ! attributeKey || ! ref.current ) {
+			return;
+		}
+
+		// The block element itself can be the field, when the block spreads
+		// its props onto its RichText. A field of an inner block is not this
+		// block's, so match the client ID rather than the nearest block
+		// element (the deprecated multiline RichText gives its lines the
+		// block's props).
+		const selector = `[data-wp-block-attribute-key="${ attributeKey }"]`;
+		const field = ref.current.matches( selector )
+			? ref.current
+			: Array.from( ref.current.querySelectorAll( selector ) ).find(
+					( element ) => getBlockClientId( element ) === clientId
+			  );
+
+		if ( ! field ) {
+			return;
+		}
+
+		const { ownerDocument } = ref.current;
+		const { activeElement } = ownerDocument;
+
+		if (
+			// The field has focus. When the document does not, the active
+			// element is stale (a toolbar button in the top document).
+			( ownerDocument.hasFocus() &&
+				( activeElement === field ||
+					field.contains( activeElement ) ) ) ||
+			// A focused editing host contains the field (the block supports
+			// `editableRoot`, or a multi selection is in progress).
+			( activeElement?.contentEditable === 'true' &&
+				activeElement.contains( field ) )
+		) {
+			return;
+		}
+
+		field.focus();
+	}, [ attributeKey, startOffset, endClientId, endOffset ] );
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.

@@ -218,9 +218,28 @@ function useRichTextBase( {
 	// selection the element made itself is left alone: the live range keeps
 	// its direction and the side of a format boundary the caret sits on, which
 	// the record does not represent. Focus is not managed here; the caller
-	// decides which element should receive keys.
+	// decides which element should receive keys. Until the element or an
+	// editing host around it has focus, the selection is not applied either:
+	// a selection set into an unfocused editable moves focus in some browsers,
+	// and the focus handler applies the record once focus arrives.
 	useLayoutEffect( () => {
-		if ( ! isSelected || hasSelection( selectionStart, selectionEnd ) ) {
+		if ( ! isSelected ) {
+			return;
+		}
+
+		const { activeElement } = ref.current.ownerDocument;
+
+		if (
+			activeElement !== ref.current &&
+			! (
+				activeElement?.contentEditable === 'true' &&
+				activeElement.contains( ref.current )
+			)
+		) {
+			return;
+		}
+
+		if ( hasSelection( selectionStart, selectionEnd ) ) {
 			return;
 		}
 

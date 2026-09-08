@@ -5,7 +5,6 @@ import {
 	useState,
 	useCallback,
 	useEffect,
-	useLayoutEffect,
 	useMemo,
 	forwardRef,
 	useContext,
@@ -270,10 +269,6 @@ function RichTextWrapper(
 	const hasFormats =
 		! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
 
-	// The selection this field last sent to the store, so a change coming back
-	// from it can be told from one made elsewhere. A dispatch that repeats
-	// the store's selection (the focus handler does this) is not a change.
-	const ownSelectionRef = useRef();
 	const onSelectionChange = useCallback(
 		( start, end ) => {
 			const selection = {};
@@ -285,20 +280,6 @@ function RichTextWrapper(
 					? identifier
 					: instanceId,
 			};
-
-			const isCurrent = ( position, offset ) =>
-				position.clientId === clientId &&
-				position.offset === offset &&
-				( identifier
-					? position.attributeKey === identifier
-					: position[ instanceIdKey ] === instanceId );
-
-			if (
-				! isCurrent( getSelectionStart(), start ) ||
-				! isCurrent( getSelectionEnd(), end )
-			) {
-				ownSelectionRef.current = [ start, end ];
-			}
 
 			if ( typeof start === 'number' || unset ) {
 				// If we are only setting the start (or the end below), which
@@ -346,45 +327,6 @@ function RichTextWrapper(
 			selectionChange,
 		]
 	);
-
-	// Focus the field when something other than the field itself selects it
-	// in the store: a split, a merge, a transform, undo, or a toolbar action
-	// that moved the block. The rich text hook applies the selection to the
-	// DOM but does not manage focus. Declared before the hook so this runs
-	// before its selection effect: applying a selection into an unfocused
-	// editable moves focus there, `apply` in `@wordpress/rich-text` moves it
-	// back, and the field that had focus claims the selection.
-	useLayoutEffect( () => {
-		const [ ownStart, ownEnd ] = ownSelectionRef.current ?? [];
-		ownSelectionRef.current = undefined;
-
-		if (
-			! isSelected ||
-			( selectionStart === ownStart && selectionEnd === ownEnd )
-		) {
-			return;
-		}
-
-		const element = anchorRef.current;
-
-		if ( ! element ) {
-			return;
-		}
-
-		const { activeElement } = element.ownerDocument;
-
-		if (
-			activeElement === element ||
-			// A focused editing host around the element keeps focus (the
-			// block supports `editableRoot`); the caret inside it is enough.
-			( activeElement?.contentEditable === 'true' &&
-				activeElement.contains( element ) )
-		) {
-			return;
-		}
-
-		element.focus();
-	}, [ selectionStart, selectionEnd, isSelected ] );
 
 	const {
 		value,
