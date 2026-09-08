@@ -1920,6 +1920,138 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				{ name: 'core/paragraph' },
 			] );
 	} );
+
+	test( 'should format text across blocks', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+		] );
+
+		// The same text on both lines, so the caret lands between the
+		// same letters one line up.
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		const getSelection = () =>
+			page.evaluate( () => {
+				const {
+					getSelectedBlockClientIds,
+					getSelectionStart,
+					getSelectionEnd,
+				} = window.wp.data.select( 'core/block-editor' );
+				return {
+					blocks: getSelectedBlockClientIds().length,
+					anchorOffset: getSelectionStart().offset,
+					focusOffset: getSelectionEnd().offset,
+				};
+			} );
+		await expect.poll( getSelection ).toEqual( {
+			blocks: 2,
+			anchorOffset: 1,
+			focusOffset: 1,
+		} );
+		// Browsers differ in how they separate the blocks.
+		const getSelectedText = () =>
+			editor.canvas
+				.locator( ':root' )
+				.evaluate( () =>
+					window.getSelection().toString().replace( /\s/g, '' )
+				);
+		await expect.poll( getSelectedText ).toBe( 'ba' );
+
+		await pageUtils.pressKeys( 'primary+b' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'a<strong>b</strong>' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '<strong>a</strong>b' },
+			},
+		] );
+
+		// The selection is kept, and the toolbar shows the format as
+		// active and removes it again.
+		await expect.poll( getSelection ).toEqual( {
+			blocks: 2,
+			anchorOffset: 1,
+			focusOffset: 1,
+		} );
+		await expect.poll( getSelectedText ).toBe( 'ba' );
+		const bold = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Bold' } );
+		await expect( bold ).toHaveAttribute( 'aria-pressed', 'true' );
+		await bold.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+		] );
+
+		// A link is one anchor per block, as it is one per line within a
+		// block.
+		await pageUtils.pressKeys( 'primary+k' );
+		await expect(
+			page.getByRole( 'combobox', { name: 'Search or type URL' } )
+		).toBeFocused();
+		await page.keyboard.type( 'https://example.com' );
+		await page.keyboard.press( 'Enter' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'a<a href="https://example.com">b</a>',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '<a href="https://example.com">a</a>b',
+				},
+			},
+		] );
+	} );
+
+	test( 'should not offer formatting when a selected block is more than its text', async ( {
+		editor,
+		page,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'ab' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/quote',
+			innerBlocks: [
+				{ name: 'core/paragraph', attributes: { content: 'cd' } },
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click();
+		await page.keyboard.press( 'Shift+ArrowDown' );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph' },
+				{ name: 'core/quote' },
+			] );
+		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
+		await expect( toolbar ).toBeVisible();
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Bold' } )
+		).toBeHidden();
+	} );
 } );
 
 class MultiBlockSelectionUtils {
