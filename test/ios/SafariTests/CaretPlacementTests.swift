@@ -10,9 +10,11 @@ import XCTest
 /// https://github.com/WordPress/gutenberg/issues/72230
 /// https://github.com/WordPress/gutenberg/issues/67986
 final class CaretPlacementTests: SafariTestCase {
-	/// The draft the blueprint seeds, so the editor opens on a post that
-	/// already has text, as in the reports.
-	let seededPost = 424242
+	/// The drafts the blueprint seeds, so the editor opens on a post that
+	/// already has text, as in the reports. One per test, because a test
+	/// leaves the post it used full of typed characters.
+	let tapPost = ( id: 424242, firstParagraph: "First paragraph." )
+	let scrollPost = ( id: 424243, firstParagraph: "Alpha paragraph." )
 
 	/// The bug is intermittent: one report needed twenty or thirty taps
 	/// beside the text before the caret stopped following them. Kept low
@@ -26,11 +28,11 @@ final class CaretPlacementTests: SafariTestCase {
 
 	var paragraph: XCUIElement { paragraphs.element( boundBy: 0 ) }
 
-	func openSeededPost( _ post: Int ) {
+	func openSeededPost( _ post: ( id: Int, firstParagraph: String ) ) {
 		// The report is from a tablet held either way; landscape leaves the
 		// widest canvas beside the text to tap in.
 		XCUIDevice.shared.orientation = .landscapeLeft
-		open( "/wp-admin/post.php?post=\( post )&action=edit" )
+		open( "/wp-admin/post.php?post=\( post.id )&action=edit" )
 
 		// The first load on a runner is slow: PHP runs in WebAssembly and
 		// nothing is cached yet.
@@ -38,6 +40,29 @@ final class CaretPlacementTests: SafariTestCase {
 			paragraph.waitForExistence( timeout: 240 ),
 			"The seeded post has no paragraphs"
 		)
+
+		// The drafts differ only in their text, so this is also what catches
+		// a navigation that never happened and left the previous post up.
+		let loaded = NSPredicate( format: "value == %@", post.firstParagraph )
+		let done = XCTNSPredicateExpectation( predicate: loaded, object: paragraph )
+		XCTAssertEqual(
+			XCTWaiter.wait( for: [ done ], timeout: 30 ), .completed,
+			"""
+			Post \( post.id ) did not load. The first paragraph holds \
+			"\( paragraph.value as? String ?? "" )".
+			"""
+		)
+	}
+
+	/// Scrolls the canvas with a touch that starts beside the text instead
+	/// of on it, the "hold to scroll but from the side of the text
+	/// container" of #67986. The press is short: a long one starts a text
+	/// selection rather than a scroll. Scrolling back up returns to the top,
+	/// where it clamps, so the paragraph stays put over many attempts.
+	func scrollBesideTheText() {
+		let start = besideTheText()
+		start.press( forDuration: 0.05, thenDragTo: start.withOffset( CGVector( dx: 0, dy: -120 ) ) )
+		start.press( forDuration: 0.05, thenDragTo: start.withOffset( CGVector( dx: 0, dy: 120 ) ) )
 	}
 
 	/// A point level with the first paragraph but just outside its text
@@ -90,10 +115,19 @@ final class CaretPlacementTests: SafariTestCase {
 	}
 
 	func testTappingBesideTheTextKeepsTapsInTheParagraphWorking() throws {
-		openSeededPost( seededPost )
+		openSeededPost( tapPost )
 
 		for attempt in 1...attempts {
 			besideTheText().tap()
+			assertTheParagraphTakesTheCaret( attempt )
+		}
+	}
+
+	func testScrollingBesideTheTextKeepsTapsInTheParagraphWorking() throws {
+		openSeededPost( scrollPost )
+
+		for attempt in 1...attempts {
+			scrollBesideTheText()
 			assertTheParagraphTakesTheCaret( attempt )
 		}
 	}

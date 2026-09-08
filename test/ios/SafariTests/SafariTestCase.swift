@@ -29,6 +29,16 @@ class SafariTestCase: XCTestCase {
 		XCUIDevice.shared.system.open( URL( string: baseURL + path )! )
 		safari.activate()
 		XCTAssertTrue( safari.wait( for: .runningForeground, timeout: 30 ) )
+
+		// A post whose edits were never saved asks before it goes. These
+		// tests never keep what they type, so leave.
+		let leave = safari.buttons
+			.matching( NSPredicate( format: "label BEGINSWITH 'Leave'" ) )
+			.firstMatch
+		if leave.waitForExistence( timeout: 5 ) {
+			leave.tap()
+		}
+
 		XCTAssertTrue( web.waitForExistence( timeout: 60 ), "The editor did not load" )
 	}
 

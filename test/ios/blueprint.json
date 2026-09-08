@@ -8,7 +8,7 @@
 		},
 		{
 			"step": "runPHP",
-			"code": "<?php require '/wordpress/wp-load.php'; wp_insert_post( array( 'import_id' => 424242, 'post_title' => 'Caret test', 'post_status' => 'draft', 'post_content' => \"<!-- wp:paragraph -->\\n<p>First paragraph.</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>Second paragraph.</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>Third paragraph.</p>\\n<!-- /wp:paragraph -->\" ) );"
+			"code": "<?php require '/wordpress/wp-load.php'; $posts = array( 424242 => array( 'First', 'Second', 'Third' ), 424243 => array( 'Alpha', 'Beta', 'Gamma' ) ); foreach ( $posts as $id => $words ) { $content = ''; foreach ( $words as $word ) { $content .= \"<!-- wp:paragraph -->\\n<p>$word paragraph.</p>\\n<!-- /wp:paragraph -->\\n\\n\"; } wp_insert_post( array( 'import_id' => $id, 'post_title' => 'Caret test ' . $id, 'post_status' => 'draft', 'post_content' => trim( $content ) ) ); }"
 		},
 		{
 			"step": "writeFile",
