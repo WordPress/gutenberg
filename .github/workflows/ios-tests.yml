@@ -103,10 +103,16 @@ jobs:
               env:
                   SIMULATOR_DEVICE: ${{ matrix.device }}
 
+            # Not `failure()`: a run over the job's timeout is cancelled, and
+            # the results of that run are the ones worth looking at. The
+            # bundle is tarred because uploading it as a directory fails.
             - name: Archive the test results
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-              if: ${{ failure() }}
+              if: ${{ !success() }}
+              run: tar -czf test/ios/build/results.tar.gz -C test/ios/build results.xcresult
+
+            - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              if: ${{ !success() }}
               with:
                   name: ios-test-results-${{ matrix.device }}-${{ matrix.suite }}
-                  path: test/ios/build/results.xcresult
+                  path: test/ios/build/results.tar.gz
                   if-no-files-found: ignore

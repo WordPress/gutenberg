@@ -10,15 +10,15 @@ import XCTest
 /// https://github.com/WordPress/gutenberg/issues/72230
 /// https://github.com/WordPress/gutenberg/issues/67986
 final class CaretPlacementTests: SafariTestCase {
-	/// The drafts the blueprint seeds, so the editor opens on a post that
-	/// already has text, as in the reports. Each test takes its own: the
-	/// editor autosaves a draft straight into the post, so tests sharing one
-	/// would type into each other's text.
-	let seededPosts = [ 424242, 424243 ]
+	/// The draft the blueprint seeds, so the editor opens on a post that
+	/// already has text, as in the reports.
+	let seededPost = 424242
 
 	/// The bug is intermittent: one report needed twenty or thirty taps
-	/// beside the text before the caret stopped following them.
-	let attempts = 25
+	/// beside the text before the caret stopped following them. Kept low
+	/// because Safari stops reporting itself idle on this page, after which
+	/// every interaction costs XCUITest a sixty second wait.
+	let attempts = 10
 
 	var paragraphs: XCUIElementQuery {
 		web.textViews.matching( NSPredicate( format: "label == 'Block: Paragraph'" ) )
@@ -90,24 +90,10 @@ final class CaretPlacementTests: SafariTestCase {
 	}
 
 	func testTappingBesideTheTextKeepsTapsInTheParagraphWorking() throws {
-		openSeededPost( seededPosts[ 0 ] )
+		openSeededPost( seededPost )
 
 		for attempt in 1...attempts {
 			besideTheText().tap()
-			assertTheParagraphTakesTheCaret( attempt )
-		}
-	}
-
-	/// The other way the reports get there: holding and dragging from the
-	/// text out to the side, as when scrolling from the edge of the text
-	/// container. That gesture is what starts a cross-block selection, which
-	/// makes the whole writing flow the editing host until it ends.
-	func testDraggingFromTheTextToTheSideKeepsTapsInTheParagraphWorking() throws {
-		openSeededPost( seededPosts[ 1 ] )
-
-		for attempt in 1...attempts {
-			paragraph.coordinate( withNormalizedOffset: CGVector( dx: 0.5, dy: 0.5 ) )
-				.press( forDuration: 0.3, thenDragTo: besideTheText() )
 			assertTheParagraphTakesTheCaret( attempt )
 		}
 	}

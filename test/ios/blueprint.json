@@ -8,7 +8,12 @@
 		},
 		{
 			"step": "runPHP",
-			"code": "<?php require '/wordpress/wp-load.php'; foreach ( array( 424242, 424243 ) as $id ) { wp_insert_post( array( 'import_id' => $id, 'post_title' => 'Caret test ' . $id, 'post_status' => 'draft', 'post_content' => \"<!-- wp:paragraph -->\\n<p>First paragraph.</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>Second paragraph.</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>Third paragraph.</p>\\n<!-- /wp:paragraph -->\" ) ); }"
+			"code": "<?php require '/wordpress/wp-load.php'; wp_insert_post( array( 'import_id' => 424242, 'post_title' => 'Caret test', 'post_status' => 'draft', 'post_content' => \"<!-- wp:paragraph -->\\n<p>First paragraph.</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>Second paragraph.</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>Third paragraph.</p>\\n<!-- /wp:paragraph -->\" ) );"
+		},
+		{
+			"step": "writeFile",
+			"path": "/wordpress/wp-content/mu-plugins/no-autosave.php",
+			"data": "<?php add_filter( 'block_editor_settings_all', function ( $settings ) { $settings['autosaveInterval'] = DAY_IN_SECONDS; return $settings; } );"
 		}
 	]
 }
