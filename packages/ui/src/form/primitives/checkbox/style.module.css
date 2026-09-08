@@ -48,7 +48,6 @@
 				}
 			}
 
-			/* Keep the painted box at 16px. The extra area is pointer geometry only. */
 			&[data-expanded-hit-area]::after {
 				content: "";
 				position: absolute;
