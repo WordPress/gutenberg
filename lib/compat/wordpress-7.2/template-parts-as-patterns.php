@@ -319,30 +319,26 @@ add_action( 'init', 'gutenberg_migrate_template_parts_to_patterns', 13 );
  * @return WP_Post|null The user pattern, or null.
  */
 function gutenberg_get_user_template_part( $slug ) {
-	static $cache = array();
-	if ( ! array_key_exists( $slug, $cache ) ) {
-		$posts          = get_posts(
-			array(
-				'post_type'      => 'wp_block',
-				'post_status'    => 'publish',
-				'name'           => $slug,
-				'posts_per_page' => 1,
-				'no_found_rows'  => true,
-				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-					array(
-						'key'     => GUTENBERG_PATTERN_AREA_META_KEY,
-						'compare' => 'EXISTS',
-					),
-					array(
-						'key'     => 'wp_pattern_slug',
-						'compare' => 'NOT EXISTS',
-					),
+	$posts = get_posts(
+		array(
+			'post_type'      => 'wp_block',
+			'post_status'    => 'publish',
+			'name'           => $slug,
+			'posts_per_page' => 1,
+			'no_found_rows'  => true,
+			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				array(
+					'key'     => GUTENBERG_PATTERN_AREA_META_KEY,
+					'compare' => 'EXISTS',
 				),
-			)
-		);
-		$cache[ $slug ] = $posts ? $posts[0] : null;
-	}
-	return $cache[ $slug ];
+				array(
+					'key'     => 'wp_pattern_slug',
+					'compare' => 'NOT EXISTS',
+				),
+			),
+		)
+	);
+	return $posts ? $posts[0] : null;
 }
 
 /**
