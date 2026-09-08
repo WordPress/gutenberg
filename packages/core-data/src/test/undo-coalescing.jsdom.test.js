@@ -17,20 +17,37 @@ const SITE_ENTITY = {
 	baseURL: '/wp/v2/settings',
 };
 
+// A keyed entity, so that the record ID takes part in the identity check.
+const POST_ENTITY = {
+	kind: 'postType',
+	name: 'post',
+	baseURL: '/wp/v2/posts',
+};
+
 const ORIGINAL = {
 	title: 'Original Title',
 	description: 'Original Tagline',
 };
+
+const ORIGINAL_POSTS = [
+	{ id: 1, title: 'First Post' },
+	{ id: 2, title: 'Second Post' },
+];
 
 const COALESCE = { coalesce: true };
 
 function createTestRegistry() {
 	const registry = createRegistry();
 	registry.register( coreDataStore );
-	registry.dispatch( coreDataStore ).addEntities( [ SITE_ENTITY ] );
+	registry
+		.dispatch( coreDataStore )
+		.addEntities( [ SITE_ENTITY, POST_ENTITY ] );
 	registry
 		.dispatch( coreDataStore )
 		.receiveEntityRecords( 'root', 'site', { ...ORIGINAL } );
+	registry
+		.dispatch( coreDataStore )
+		.receiveEntityRecords( 'postType', 'post', ORIGINAL_POSTS );
 	return registry;
 }
 
@@ -61,6 +78,24 @@ describe( 'undo coalescing', () => {
 
 	function editTitle( value, options ) {
 		edit( 'title', value, options );
+	}
+
+	function editPost( id, value, options ) {
+		registry
+			.dispatch( coreDataStore )
+			.editEntityRecord(
+				'postType',
+				'post',
+				id,
+				{ title: value },
+				options
+			);
+	}
+
+	function getPost( id ) {
+		return registry
+			.select( coreDataStore )
+			.getEditedEntityRecord( 'postType', 'post', id );
 	}
 
 	function getRecord( target = registry ) {
@@ -133,6 +168,25 @@ describe( 'undo coalescing', () => {
 			);
 
 		expect( countUndoLevels() ).toBe( 2 );
+	} );
+
+	it( 'starts a new level when the edited record changes', () => {
+		editPost( 1, 'Edited First', COALESCE );
+		editPost( 2, 'Edited Second', COALESCE );
+		editPost( 1, 'Edited First Again', COALESCE );
+
+		expect( countUndoLevels() ).toBe( 3 );
+	} );
+
+	it( 'folds into the matching record and leaves the others alone', () => {
+		editPost( 1, 'E', COALESCE );
+		editPost( 1, 'Ed', COALESCE );
+		editPost( 2, 'Edited Second', COALESCE );
+
+		registry.dispatch( coreDataStore ).undo();
+
+		expect( getPost( 2 ).title ).toBe( 'Second Post' );
+		expect( getPost( 1 ).title ).toBe( 'Ed' );
 	} );
 
 	it( 'stages an explicit `isCached` edit regardless of identity', () => {
