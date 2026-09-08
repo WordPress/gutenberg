@@ -45,9 +45,14 @@ xcrun simctl boot "$UDID" 2>/dev/null || true
 # WordPress runs in Playground: PHP compiled to WebAssembly, no Docker.
 start_wordpress() {
 	PLAYGROUND_LOG=$( mktemp )
+	# Playground defaults to min( 6, cpus - 1 ) workers and warns that fewer
+	# than six make a deadlock on its file locks more likely. Runners have
+	# three cores, so it would pick two and has been seen to stop answering
+	# for minutes at a time.
 	npx --yes @wp-playground/cli@3.1.53 server \
 		--auto-mount="$PWD" \
 		--blueprint=test/ios/blueprint.json \
+		--workers "${PLAYGROUND_WORKERS:-6}" \
 		--port "$PORT" > "$PLAYGROUND_LOG" 2>&1 &
 	PLAYGROUND_PID=$!
 	# Playground prints "Ready!" once it listens and the blueprint has run;
@@ -88,14 +93,14 @@ if ! grep -q "/build/scripts/rich-text/" <<< "$EDITOR_HTML"; then
 	exit 1
 fi
 
-# The pages the tests open, warmed here as well. The server has been seen to
-# stop answering for minutes at a time, and a test that meets that just sits
-# in front of Safari's start page until it times out.
+# The pages the tests open, warmed here as well, so that the one-time work
+# of a fresh site does not count against a test's timeout. Not fatal: the
+# tests open these pages again and ask a second time if they do not come up,
+# and a warm-up that failed is not reason enough to give up the whole run.
 for POST in $( grep -o "42424[0-9]" test/ios/blueprint.json | sort -u ); do
 	if ! curl -sfL -b "" --max-time 300 "$WP_BASE_URL/wp-admin/post.php?post=${POST}&action=edit" \
 		| grep -q "wp:paragraph"; then
-		echo "The editor did not serve seeded post ${POST}."
-		exit 1
+		echo "Warning: the editor did not serve seeded post ${POST}."
 	fi
 done
 
