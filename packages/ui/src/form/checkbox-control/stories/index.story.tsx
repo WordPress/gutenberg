@@ -37,14 +37,11 @@ export const WithLongLabel: Story = {
 	},
 };
 
+/**
+ * The label stays available to assistive technology. The checkbox hit target
+ * expands because the label is not visible.
+ */
 export const VisuallyHiddenLabel: Story = {
-	parameters: {
-		docs: {
-			description: {
-				story: 'The label stays available to assistive technology. The checkbox pointer target expands to 24px because the label is not visible.',
-			},
-		},
-	},
 	args: {
 		...Default.args,
 		hideLabelFromVision: true,

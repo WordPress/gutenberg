@@ -3,6 +3,6 @@ import type { ControlProps } from '../types';
 
 export type CheckboxControlProps = Omit<
 	React.ComponentProps< typeof Checkbox >,
-	'hasExpandedHitArea'
+	'expandHitTarget'
 > &
 	ControlProps;

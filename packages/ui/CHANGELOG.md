@@ -19,8 +19,8 @@
 
 ### Enhancements
 
--   `Checkbox`: Add `hasExpandedHitArea` to expand the pointer target without changing the visual size. ([#82597](https://github.com/WordPress/gutenberg/pull/82597))
--   `CheckboxControl`: Enable the expanded pointer target when `hideLabelFromVision` is set. ([#82597](https://github.com/WordPress/gutenberg/pull/82597))
+-   `Checkbox`: Add an `expandHitTarget` prop that enlarges the hit target without changing the visual size. ([#82597](https://github.com/WordPress/gutenberg/pull/82597))
+-   `CheckboxControl`: Enlarge the hit target when `hideLabelFromVision` is set. ([#82597](https://github.com/WordPress/gutenberg/pull/82597))
 -   Compound components: Throw clear development errors when required parent context is missing ([#82510](https://github.com/WordPress/gutenberg/pull/82510)).
 -   Give input fields and checkboxes solid, state-aware themed backgrounds while keeping minimal Select triggers transparent. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
 -   `AlertDialog`, `Dialog`, `Drawer`, `Popover`, and `Tooltip`: Derive Trigger props from the corresponding Base UI components. ([#81824](https://github.com/WordPress/gutenberg/pull/81824))

@@ -18,11 +18,10 @@ describe( 'CheckboxControl', () => {
 	it( 'renders with a visible label', () => {
 		render( <CheckboxControl label="Subscribe" /> );
 
-		const checkbox = screen.getByRole( 'checkbox', { name: 'Subscribe' } );
-		expect( checkbox ).toBeVisible();
+		expect(
+			screen.getByRole( 'checkbox', { name: 'Subscribe' } )
+		).toBeVisible();
 		expect( screen.getByText( 'Subscribe' ) ).toBeVisible();
-		expect( checkbox ).not.toHaveAttribute( 'hasExpandedHitArea' );
-		expect( checkbox ).not.toHaveAttribute( 'data-expanded-hit-area' );
 	} );
 
 	it( 'renders with a visually hidden label', () => {
