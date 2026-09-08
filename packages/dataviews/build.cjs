@@ -17,7 +17,9 @@ const wpExternals = {
 			// consumers bundle it themselves. Leaving it external keeps a
 			// single copy of the package (and of `@wordpress/theme`, which it
 			// imports) in the consumer bundle, and keeps its third-party
-			// dependencies out of this package's dependency list.
+			// dependencies out of this package's dependency list. That copy
+			// resolves `@wordpress/theme` to the `wp.theme` script, so the
+			// bundle requires WordPress 7.0 or later.
 			return { path: args.path, external: true };
 		} );
 		build.onResolve( { filter: /^@wordpress\// }, () => {
