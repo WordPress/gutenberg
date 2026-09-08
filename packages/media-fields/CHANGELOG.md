@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `author`: Drop the custom `sort` callback, which read `_embedded.author` from the arguments although `Field.sort` receives the field values (the author ids), so every comparison returned `0` and in-memory sorting by author was a no-op. The field now sorts by author id through the `integer` type, matching the order the REST API returns for `orderby=author` ([#82559](https://github.com/WordPress/gutenberg/pull/82559)).
 -   `alt_text`, `caption`, `description`: Pass the field's disabled state to the textarea control, so disabling one of these fields stops it accepting input. ([#82516](https://github.com/WordPress/gutenberg/pull/82516))
 
 ### Internal
@@ -23,6 +24,7 @@
 ### Bug Fixes
 
 -   `attached_to`: Reserve room for the suggestions so the field's DataForm panel dropdown is placed with space for them, instead of being sized to the row and then crushing them into a box too small to scroll comfortably. Also don't expand the suggestion list until the user searches, debounce the search so a request isn't fired per keystroke, allow re-attaching straight after detaching, and drop the detach link from the help text in favour of the field's own reset button ([#81122](https://github.com/WordPress/gutenberg/issues/81122)).
+
 ## 0.17.0 (2026-07-29)
 
 ## 0.16.0 (2026-07-14)
