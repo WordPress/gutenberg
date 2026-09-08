@@ -66,7 +66,12 @@ const mergedAttributeRecords: WidgetModuleRecord[] = [
 	{
 		...records[ 0 ],
 		attributes: [
-			{ id: 'location', label: 'Ubicación', relevance: 'high' },
+			{
+				id: 'location',
+				label: 'Ubicación',
+				relevance: 'high',
+				isValid: { required: true },
+			},
 			{ id: 'extra', type: 'text', label: 'Extra' },
 		],
 	},
@@ -219,6 +224,10 @@ describe( 'useWidgetTypes', () => {
 			relevance: 'high',
 			Edit: LocationControl,
 		} );
+		// `isValid` merges rule by rule: the record's rules keep the
+		// module's custom validator.
+		expect( attributes[ 0 ].isValid ).toMatchObject( { required: true } );
+		expect( attributes[ 0 ].isValid?.custom ).toBeTypeOf( 'function' );
 		expect( attributes[ 2 ] ).toMatchObject( { label: 'Label' } );
 	} );
 

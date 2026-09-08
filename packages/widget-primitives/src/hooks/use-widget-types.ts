@@ -54,7 +54,9 @@ type WidgetAttributes = NonNullable< WidgetType[ 'attributes' ] >;
 
 /*
  * Record entries lead, each completed by the module entry sharing its `id`
- * (the record wins a shared key); module-only entries follow.
+ * (the record wins a shared key); module-only entries follow. `isValid`
+ * merges rule by rule, so the record's serializable rules keep the
+ * module's `custom` validator.
  */
 function mergeAttributes(
 	recordAttributes: WidgetAttributeRecord[] | null | undefined,
@@ -77,10 +79,18 @@ function mergeAttributes(
 	);
 
 	return [
-		...recordAttributes.map( ( attribute ) => ( {
-			...moduleById.get( attribute.id ),
-			...attribute,
-		} ) ),
+		...recordAttributes.map( ( attribute ) => {
+			const moduleAttribute = moduleById.get( attribute.id );
+			if ( ! moduleAttribute?.isValid || ! attribute.isValid ) {
+				return { ...moduleAttribute, ...attribute };
+			}
+
+			return {
+				...moduleAttribute,
+				...attribute,
+				isValid: { ...moduleAttribute.isValid, ...attribute.isValid },
+			};
+		} ),
 		...moduleAttributes.filter(
 			( attribute ) => ! recordIds.has( attribute.id )
 		),
@@ -119,12 +129,13 @@ function recordOverlay( record: WidgetModuleRecord ) {
  * module's default export with the runtime fields (`name`, `renderModule`).
  * A record without a metadata module resolves from its own fields alone,
  * so a widget declared entirely by its manifest needs no module stub.
- * A record's `attributes` lead the module's, merged by `id`; the merged
- * schema passes through `resolveFields`, so attributes referencing
- * registered field types reach hosts as plain DataViews fields. Icon
- * references resolve through the registered icon resolver, off the loading
- * flag: widget types emit as soon as their modules land, and each resolved
- * icon patches in afterwards. Action icon references resolve the same way.
+ * A record's `attributes` lead the module's, merged by `id` with `isValid`
+ * merged rule by rule; the merged schema passes through `resolveFields`, so
+ * attributes referencing registered field types reach hosts as plain
+ * DataViews fields. Icon references resolve through the registered icon
+ * resolver, off the loading flag: widget types emit as soon as their modules
+ * land, and each resolved icon patches in afterwards. Action icon references
+ * resolve the same way.
  * Pass `null`/`undefined` while records are still loading.
  *
  * @param records Host-supplied records, or `null`/`undefined` while loading.

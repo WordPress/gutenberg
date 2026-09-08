@@ -69,7 +69,7 @@ Consumers reach the anchor through that ref: a link that drops it is skipped by 
 
 It's an authoring helper for a `widget.ts` entry: a DataViews `Field` whose `id` is narrowed to the widget's attribute keys.
 Its optional `relevance` hint (`'high' | 'medium' | 'low'`) marks attributes a host may promote to a prominent surface.
-`useWidgetTypes` merges such an entry by `id` over the one `widget.json` declares, so the module only carries what JSON cannot express.
+`useWidgetTypes` merges such an entry by `id` over the one `widget.json` declares, so the module only carries what JSON cannot express; `isValid` merges rule by rule, so a module `custom` validator survives the JSON rules.
 
 ### `WidgetAction`
 
