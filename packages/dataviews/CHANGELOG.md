@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   The `./wp` bundle (`@wordpress/dataviews/wp`) now requires WordPress 7.0 or later. It no longer inlines `@wordpress/ui` and, through it, `@wordpress/theme`: `@wordpress/ui` is not a WordPress script, so consumers bundle it themselves, and that copy resolves `@wordpress/theme` to the `wp.theme` script, which WordPress ships since 7.0. The bundle shrinks by about a quarter, shares a single copy of `@wordpress/ui` and its theme context with the consumer, and the `@base-ui/react`, `@daypicker/react`, and `colorjs.io` dependencies are no longer declared ([#82595](https://github.com/WordPress/gutenberg/pull/82595)).
 -   Removed the rich text options (`className`, `clientId`, `allowedFormats`, `disableFormats`, `withoutInteractiveFormatting`, `preserveWhiteSpace`, `disableLineBreaks`) from the `config` prop of `DataFormControlProps`. They were added for the built-in `richtext` control ([#78471](https://github.com/WordPress/gutenberg/pull/78471)), which has since moved to `@wordpress/editor` ([#81430](https://github.com/WordPress/gutenberg/pull/81430)), so nothing in this package sets or reads them ([#82330](https://github.com/WordPress/gutenberg/pull/82330)).
 -   DataForm: a combined form field (one with `children`) is now treated purely as a layout container. Its `id` is no longer resolved against the field definitions: a field sharing that `id` no longer contributes validation rules to the group, and the `panel` layout no longer uses it for the collapsed summary or `readOnly` state, falling back to the group's first leaf child instead ([#82175](https://github.com/WordPress/gutenberg/pull/82175)).
 
@@ -41,7 +42,6 @@
 -   DataForm: Communicate the timezone a `datetime` value is edited in. When the site timezone differs from the visitor's, the control renders help text under the input naming the site timezone: the zone name (e.g. `(CEST) Europe/Madrid`) or the UTC offset for sites pinned to one ([#82291](https://github.com/WordPress/gutenberg/pull/82291)).
 -   Export the `DataViewsProps` and `ItemWithId` types ([#82326](https://github.com/WordPress/gutenberg/pull/82326)).
 -   Export the `DataViewsProps` and `ItemWithId` types and document every type property ([#82326](https://github.com/WordPress/gutenberg/pull/82326)).
--   The `./wp` bundle (`build-wp/index.js`) no longer inlines `@wordpress/ui` and, through it, `@wordpress/theme`: `@wordpress/ui` is not a WordPress script, so consumers bundle it themselves. The bundle shrinks by about a quarter, shares a single copy of `@wordpress/ui` and its theme context with the consumer, and the `@base-ui/react`, `@daypicker/react`, and `colorjs.io` dependencies are no longer declared. As `@wordpress/ui` resolves `@wordpress/theme` to the `wp.theme` script, the bundle now requires WordPress 7.0 or later ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
 
 ### Bug Fixes
 
