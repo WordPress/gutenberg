@@ -260,13 +260,20 @@ function useToolbarFocus( {
 			// The last focused element is only recorded once focus has left
 			// the canvas, so fall back to the selected block. Without it
 			// escape leaves focus stranded in the toolbar, with no way back
-			// to the canvas by keyboard. When the recorded element was
-			// removed since (the block re-rendered after it moved), return
-			// to the block's first text field, where focus left from.
+			// to the canvas by keyboard. The recorded element may no longer
+			// take focus: it was removed (the block re-rendered after it
+			// moved), or it was an editing host that has since been
+			// disabled. Return to the block's first text field then, where
+			// focus left from.
 			const lastFocus = getLastFocus()?.current;
 			const blockElement = refsMap.get( getSelectedBlockClientId() );
 			let target = lastFocus ?? blockElement;
-			if ( lastFocus && ! lastFocus.isConnected && blockElement ) {
+			if (
+				lastFocus &&
+				blockElement &&
+				( ! lastFocus.isConnected ||
+					lastFocus.contentEditable === 'false' )
+			) {
 				target =
 					focus.tabbable.find( blockElement ).find( isTextField ) ??
 					blockElement;
