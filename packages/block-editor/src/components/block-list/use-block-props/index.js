@@ -170,7 +170,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useFocusFirstElement( { clientId, initialPosition } ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
-		useEventHandlers( { clientId, isSelected } ),
+		useEventHandlers( { clientId, isSelected, isMultiSelected } ),
 		useIsHovered( { isEnabled: isHoverEnabled } ),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
