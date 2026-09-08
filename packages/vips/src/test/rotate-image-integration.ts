@@ -157,11 +157,11 @@ describe( 'rotateImage EXIF orientation fixtures', () => {
 					? [
 							rotated.getpoint( 16, 16 ), // Top.
 							rotated.getpoint( 16, 48 ), // Bottom.
-					  ]
+						]
 					: [
 							rotated.getpoint( 16, 16 ), // Left.
 							rotated.getpoint( 48, 16 ), // Right.
-					  ];
+						];
 
 			const [ first, second ] =
 				orientation === 6 ? halves : halves.reverse();

@@ -183,7 +183,7 @@ export default function PostExcerptEditor( props ) {
 					: ( ! isTrimmed
 							? rawOrRenderedExcerpt
 							: trimmedExcerpt + ELLIPSIS ) ||
-					  __( 'No excerpt found' )
+						__( 'No excerpt found' )
 			}
 			onChange={ setExcerpt }
 			tagName="p"

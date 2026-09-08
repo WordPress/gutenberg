@@ -318,7 +318,7 @@ export function mergeSection(
 							? update.runUrl
 							: undefined,
 				},
-		  ]
+			]
 		: remaining;
 
 	if ( next.length === 0 ) {

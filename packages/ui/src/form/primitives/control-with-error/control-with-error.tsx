@@ -138,7 +138,7 @@ export const ControlWithError = forwardRef<
 						wrapperRef.current?.querySelectorAll< HTMLInputElement >(
 							`input[type="radio"][name="${ validityTarget?.name }"]`
 						) ?? []
-				  ).filter( ( sibling ) => sibling !== validityTarget )
+					).filter( ( sibling ) => sibling !== validityTarget )
 				: [];
 
 		validityTarget?.addEventListener( 'invalid', suppressNativePopover );

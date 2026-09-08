@@ -300,7 +300,7 @@ export function toTree( {
 				attributes: isEditableTree
 					? {
 							'data-rich-text-line-break': 'true',
-					  }
+						}
 					: undefined,
 				object: true,
 			} );

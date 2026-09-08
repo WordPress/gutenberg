@@ -35,7 +35,7 @@ function IconAction( {
 				/* translators: %s: action label. */
 				__( '%s (opens in a new tab)' ),
 				action.label
-		  )
+			)
 		: action.label;
 
 	return (
@@ -53,7 +53,7 @@ function IconAction( {
 							: {
 									href: action.href,
 									download: action.download,
-							  } ) }
+								} ) }
 						render={
 							routeRender ??
 							( action.openInNewTab ? (

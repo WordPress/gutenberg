@@ -40,7 +40,7 @@ export function DataViewsPagination() {
 								__( 'Page %1$d of %2$d' ),
 								currentPage,
 								totalPages
-						  )
+							)
 						: page.toString(),
 			};
 		}

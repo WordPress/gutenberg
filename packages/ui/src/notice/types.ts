@@ -62,17 +62,16 @@ export interface ActionsProps extends ComponentProps< 'div' > {
 	children?: ReactNode;
 }
 
-export interface CloseIconProps
-	extends Omit<
-		IconButtonProps,
-		| 'loading'
-		| 'loadingAnnouncement'
-		| 'variant'
-		| 'size'
-		| 'tone'
-		| 'label'
-		| 'icon'
-	> {
+export interface CloseIconProps extends Omit<
+	IconButtonProps,
+	| 'loading'
+	| 'loadingAnnouncement'
+	| 'variant'
+	| 'size'
+	| 'tone'
+	| 'label'
+	| 'icon'
+> {
 	/**
 	 * A label describing the button's action, shown as a tooltip and to
 	 * assistive technology.
@@ -85,8 +84,10 @@ export interface CloseIconProps
 	icon?: IconButtonProps[ 'icon' ];
 }
 
-export interface ActionButtonProps
-	extends Omit< ButtonProps, 'size' | 'tone' > {
+export interface ActionButtonProps extends Omit<
+	ButtonProps,
+	'size' | 'tone'
+> {
 	/**
 	 * The content to be rendered inside the component.
 	 */

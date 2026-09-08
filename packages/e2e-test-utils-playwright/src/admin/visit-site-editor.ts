@@ -161,11 +161,8 @@ async function visitSiteEditorV2( this: Admin, options: SiteEditorOptions ) {
 	// manipulate the block editor store right away without the editor
 	// provider resetting their changes.
 	if ( route.includes( '/edit/' ) ) {
-		await this.page.waitForFunction(
-			() =>
-				window.wp?.data
-					?.select( 'core/editor' )
-					?.__unstableIsEditorReady()
+		await this.page.waitForFunction( () =>
+			window.wp?.data?.select( 'core/editor' )?.__unstableIsEditorReady()
 		);
 	}
 

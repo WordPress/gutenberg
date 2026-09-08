@@ -155,7 +155,7 @@ module.exports = {
 						flakinessProject: 'WordPress/gutenberg',
 						duplicates: 'rename',
 					},
-			  ]
+				]
 			: undefined,
 	].filter( Boolean ),
 };

@@ -46,8 +46,8 @@ describe( 'ValidatedRangeControl', () => {
 								type: 'invalid',
 								message: 'Value out of range.',
 							} );
-							requestAnimationFrame(
-								() => ref.current?.reportValidity()
+							requestAnimationFrame( () =>
+								ref.current?.reportValidity()
 							);
 						} }
 					>

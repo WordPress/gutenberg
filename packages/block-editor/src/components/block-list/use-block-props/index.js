@@ -190,7 +190,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'--wp-admin-theme-color': 'var(--wp-block-synced-color)',
 				'--wp-admin-theme-color--rgb':
 					'var(--wp-block-synced-color--rgb)',
-		  }
+			}
 		: {};
 
 	// Use block visibility hook with data from context to avoid extra subscription.

@@ -789,7 +789,7 @@ export default function DimensionsPanel( {
 							isContentSizePlaceholder
 								? getNumericPlaceholder(
 										inheritedContentSizeValue
-								  )
+									)
 								: undefined
 						}
 						onChange={ ( nextContentSize ) => {
@@ -832,7 +832,7 @@ export default function DimensionsPanel( {
 							isWideSizePlaceholder
 								? getNumericPlaceholder(
 										inheritedWideSizeValue
-								  )
+									)
 								: undefined
 						}
 						onChange={ ( nextWideSize ) => {
@@ -1069,7 +1069,7 @@ export default function DimensionsPanel( {
 							isMinHeightPlaceholder
 								? getNumericPlaceholder(
 										inheritedMinHeightValue
-								  )
+									)
 								: undefined
 						}
 						dimensionSizes={ dimensions?.dimensionSizes }
@@ -1103,7 +1103,7 @@ export default function DimensionsPanel( {
 							isMinWidthPlaceholder
 								? getNumericPlaceholder(
 										inheritedMinWidthValue
-								  )
+									)
 								: undefined
 						}
 						dimensionSizes={ dimensions?.dimensionSizes }

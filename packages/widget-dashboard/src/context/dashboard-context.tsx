@@ -208,7 +208,7 @@ export function WidgetDashboardProvider( {
 							next,
 							canPerform,
 							widgetTypes,
-					  } )
+						} )
 			);
 		},
 		[ canPerform, widgetTypes ]

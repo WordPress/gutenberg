@@ -965,7 +965,7 @@ function getBranchPath( node, useNode, parentNodes ) {
 	}
 
 	const branches = [];
-	for ( let child = node; parentNodes.has( child );  ) {
+	for ( let child = node; parentNodes.has( child ); ) {
 		const parent = parentNodes.get( child );
 		if ( useAncestors.has( parent ) ) {
 			break;
@@ -1107,7 +1107,7 @@ function getReachableWrites(
 							useNode,
 							identifierVariables,
 							parentNodes
-					  );
+						);
 			return executionNodes.map( ( executionNode ) => ( {
 				expression: reference.writeExpr,
 				node: executionNode,
@@ -1161,7 +1161,7 @@ function getReachableMemberWrites(
 						useNode,
 						identifierVariables,
 						parentNodes
-				  );
+					);
 		return executionNodes
 			.filter(
 				( executionNode ) => executionNode.range[ 0 ] < usePosition
@@ -1394,7 +1394,7 @@ function getReachableLocalFunctions( node, identifierVariables, parentNodes ) {
 						type: 'BoundFunction',
 						functionNode: value,
 						boundArgumentCount: 0,
-				  }
+					}
 				: [];
 		} )
 	);
@@ -1798,7 +1798,7 @@ export function validateVitestPolicy( {
 							node.arguments[ 0 ],
 							identifierVariables,
 							parentNodes
-					  )
+						)
 					: new Set();
 			if (
 				node.type === 'CallExpression' &&
@@ -2051,7 +2051,7 @@ export function validateVitestPolicy( {
 					? getObjectPatternPropertyIdentifiers(
 							target,
 							'getComputedStyle'
-					  )
+						)
 					: [] ),
 			];
 			for ( const identifier of computedStyleTargets ) {

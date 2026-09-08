@@ -268,8 +268,7 @@ export default function createReduxStore< State, Actions, Selectors >(
 				),
 				...mapValues(
 					options.actions as
-						| Record< string, ActionCreator >
-						| undefined,
+						Record< string, ActionCreator > | undefined,
 					bindAction
 				),
 			};
@@ -307,7 +306,7 @@ export default function createReduxStore< State, Actions, Selectors >(
 					? mapValues(
 							options.resolvers as Record< string, any >,
 							mapResolver
-					  )
+						)
 					: {};
 
 			// Bind a selector to the store. Call the selector with the current state, correct registry,

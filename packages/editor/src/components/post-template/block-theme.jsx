@@ -90,7 +90,7 @@ export default function BlockThemeControl() {
 					onClick: () =>
 						getEditorSettings().onNavigateToPreviousEntityRecord(),
 				},
-		  ]
+			]
 		: undefined;
 
 	const mayShowTemplateEditNotice = () => {

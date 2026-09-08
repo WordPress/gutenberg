@@ -60,10 +60,10 @@ const MainContent = ( {
 				/* translators: %s: The name of a menu. */
 				__( 'Structure for Navigation Menu: %s' ),
 				navigationMenu?.title || __( 'Untitled menu' )
-		  )
+			)
 		: __(
 				'You have not yet created any menus. Displaying a list of your Pages'
-		  );
+			);
 
 	return (
 		<div className="wp-block-navigation__menu-inspector-controls">

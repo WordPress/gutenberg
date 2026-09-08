@@ -73,7 +73,7 @@ const baseConfigPath = resolve( repoRoot, 'tsconfig.base.json' );
 const REQUIRED_BUILD_EXCLUDES = existsSync( baseConfigPath )
 	? ( readTsconfig( baseConfigPath ).exclude ?? [] ).filter( ( pattern ) =>
 			/test|stories|story/.test( pattern )
-	  )
+		)
 	: [];
 
 const packagesWithTypes = globSync( 'packages/*/tsconfig.json', {

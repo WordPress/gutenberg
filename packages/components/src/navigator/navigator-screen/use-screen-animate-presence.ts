@@ -15,11 +15,7 @@ import * as styles from '../styles';
 // - 'ANIMATING_OUT': start exit animation
 // - 'OUT': the exit animation has ended
 type AnimationStatus =
-	| 'INITIAL'
-	| 'ANIMATING_IN'
-	| 'IN'
-	| 'ANIMATING_OUT'
-	| 'OUT';
+	'INITIAL' | 'ANIMATING_IN' | 'IN' | 'ANIMATING_OUT' | 'OUT';
 
 // Allow an extra 20% of the total animation duration to account for potential
 // event loop delays.

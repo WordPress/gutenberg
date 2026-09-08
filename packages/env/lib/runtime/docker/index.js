@@ -311,7 +311,7 @@ class DockerRuntime {
 					'phpmyadmin',
 					80,
 					dockerComposeConfig
-			  )
+				)
 			: null;
 
 		const message = [
@@ -334,7 +334,7 @@ class DockerRuntime {
 						'tests-phpmyadmin',
 						80,
 						dockerComposeConfig
-				  )
+					)
 				: null;
 
 			message.push(

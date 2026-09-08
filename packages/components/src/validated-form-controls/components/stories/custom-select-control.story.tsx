@@ -44,7 +44,7 @@ export const Default: StoryObj< typeof ValidatedCustomSelectControl > = {
 						? {
 								type: 'invalid',
 								message: 'Option A is not allowed.',
-						  }
+							}
 						: undefined
 				}
 			/>

@@ -4,12 +4,7 @@ import itemPopupStyles from './item-popup.module.css';
  * Preset width constraints for item popups.
  */
 export type ItemPopupWidth =
-	| 'anchor'
-	| 'content'
-	| 'sm'
-	| 'md'
-	| 'lg'
-	| 'available';
+	'anchor' | 'content' | 'sm' | 'md' | 'lg' | 'available';
 
 export type ItemPopupWidthProps = {
 	/**

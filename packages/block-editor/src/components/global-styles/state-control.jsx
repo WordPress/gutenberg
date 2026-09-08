@@ -102,7 +102,7 @@ export default function StateControl( {
 								/* translators: %s: Current state (e.g. "Hover", "Focus") */
 								__( 'State: %s' ),
 								currentStateLabel
-						  )
+							)
 				}
 				popoverProps={ {
 					placement: 'right-start',

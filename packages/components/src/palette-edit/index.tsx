@@ -160,9 +160,9 @@ function getNameInputLabel( variant: PaletteVariant ) {
 function getRemoveLabelFormat( variant: PaletteVariant ) {
 	return variant === 'duotone'
 		? /* translators: %s is a duotone name, e.g. "Purple and yellow". */
-		  __( 'Remove duotone: %s' )
+			__( 'Remove duotone: %s' )
 		: /* translators: %s is a color or gradient name, e.g. "Red". */
-		  __( 'Remove color: %s' );
+			__( 'Remove color: %s' );
 }
 
 /**
@@ -304,12 +304,12 @@ export function getNameAndSlugForPosition(
 						/* translators: %d: is an id for a custom duotone */
 						__( 'Duotone %d' ),
 						position
-				  )
+					)
 				: sprintf(
 						/* translators: %d: is an id for a custom color */
 						__( 'Color %d' ),
 						position
-				  ),
+					),
 		slug: `${ slugPrefix }${ stem }-${ position }`,
 	};
 }
@@ -476,7 +476,7 @@ function Option< T extends PaletteElement >( {
 							{ element.name.trim().length
 								? element.name
 								: /* Fall back to non-breaking space to maintain height */
-								  '\u00A0' }
+									'\u00A0' }
 						</NameContainer>
 					) }
 				</FlexBlock>

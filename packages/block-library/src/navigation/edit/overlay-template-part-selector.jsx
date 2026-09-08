@@ -255,7 +255,7 @@ export default function OverlayTemplatePartSelector( {
 					selectedTemplatePart.title?.rendered
 						? decodeEntities( selectedTemplatePart.title.rendered )
 						: selectedTemplatePart.slug
-			  )
+				)
 			: __( 'Edit overlay' );
 	}, [ selectedTemplatePart ] );
 

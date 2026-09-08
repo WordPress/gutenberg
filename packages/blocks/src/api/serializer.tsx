@@ -81,7 +81,7 @@ export function getBlockProps(
 				{ ...props },
 				blockType,
 				attributes
-		  ) as Record< string, unknown > );
+			) as Record< string, unknown > );
 }
 
 /**

@@ -36,12 +36,12 @@ export type WPEntityTypes< C extends ET.Context = 'edit' > = {
 type PluralizeEntity< T extends string > = T extends 'GlobalStyles'
 	? never
 	: T extends 'Media'
-	? 'MediaItems'
-	: T extends 'Status'
-	? 'Statuses'
-	: T extends `${ infer U }y`
-	? `${ U }ies`
-	: `${ T }s`;
+		? 'MediaItems'
+		: T extends 'Status'
+			? 'Statuses'
+			: T extends `${ infer U }y`
+				? `${ U }ies`
+				: `${ T }s`;
 
 /**
  * A simple utility that singularizes a string.
@@ -55,12 +55,12 @@ type PluralizeEntity< T extends string > = T extends 'GlobalStyles'
 type SingularizeEntity< T extends string > = T extends 'MediaItems'
 	? 'Media'
 	: T extends 'Statuses'
-	? 'Status'
-	: T extends `${ infer U }ies`
-	? `${ U }y`
-	: T extends `${ infer U }s`
-	? U
-	: T;
+		? 'Status'
+		: T extends `${ infer U }ies`
+			? `${ U }y`
+			: T extends `${ infer U }s`
+				? U
+				: T;
 
 export type SingularGetters = {
 	[ Key in `get${ keyof WPEntityTypes }` ]: (
@@ -93,7 +93,7 @@ export type SaveActions = {
 			? ET.GlobalStylesUpdate
 			: Partial<
 					WPEntityTypes[ Key extends `save${ infer E }` ? E : never ]
-			  >,
+				>,
 		options?: ActionOptions
 	) => Promise< void >;
 };

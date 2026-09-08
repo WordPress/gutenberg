@@ -130,7 +130,7 @@ function MediaEditorRoute() {
 														to: MEDIA_LIST_PATH,
 													},
 													{ label: title },
-											  ]
+												]
 									}
 								/>
 							}

@@ -210,7 +210,7 @@ export function PositionPanelPure( {
 						'The block will stick to the scrollable area of the parent %s block.'
 					),
 					blockInformation.title
-			  )
+				)
 			: null;
 
 	const options = useMemo( () => {

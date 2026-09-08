@@ -33,7 +33,7 @@ export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 				: patterns.filter(
 						( pattern ) =>
 							! isPatternFiltered( pattern, sourceFilter )
-				  ),
+					),
 		[ sourceFilter, patterns ]
 	);
 

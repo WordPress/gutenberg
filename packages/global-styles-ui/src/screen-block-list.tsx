@@ -231,13 +231,13 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 		? sortedBlockTypes
 		: sortedBlockTypes.filter( ( blockType ) =>
 				isMatchingSearchTerm( blockType, filterValue )
-		  );
+			);
 
 	const filteredBlockTypes =
 		styleFilter === 'customized'
 			? searchedBlockTypes.filter( ( blockType ) =>
 					customizedBlockNames.has( blockType.name )
-			  )
+				)
 			: searchedBlockTypes;
 
 	const blockTypesListRef = useRef< HTMLDivElement >( null );
