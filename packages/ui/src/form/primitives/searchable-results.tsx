@@ -21,10 +21,6 @@ function isItemGroup( entry: Item | ItemGroup ): entry is ItemGroup {
 	return 'items' in entry && Array.isArray( entry.items );
 }
 
-function isItem( entry: Item | ItemGroup ): entry is Item {
-	return ! isItemGroup( entry );
-}
-
 function isCreatableItem( item: Item ): item is CreatableItem {
 	return item.creatable === true;
 }
@@ -53,24 +49,20 @@ function findCreatableItem(
 	return undefined;
 }
 
-function shouldSkipCollectionEntry(
-	entry: Item | ItemGroup,
-	creatableItem: CreatableItem | undefined
-): boolean {
-	if ( ! creatableItem ) {
-		return false;
+function shouldSkipCollectionEntry( entry: Item | ItemGroup ): boolean {
+	if ( isItemGroup( entry ) ) {
+		return entry.items.length > 0 && entry.items.every( isCreatableItem );
 	}
 
-	if ( isItem( entry ) ) {
-		return isCreatableItem( entry );
-	}
-
-	return (
-		entry.items.length > 0 &&
-		entry.items.every( ( item ) => isCreatableItem( item ) )
-	);
+	return isCreatableItem( entry );
 }
 
+/**
+ * Empty state and filtered list for `SearchableSelect` and
+ * `SearchableChipSelect`. A `creatable: true` item still present in the
+ * filtered collection is omitted from the list body and remounted in
+ * `ListFooter`. Must render inside `Combobox.Root`.
+ */
 export function SearchableResults( {
 	emptyContent,
 	children,
@@ -88,12 +80,7 @@ export function SearchableResults( {
 				<Combobox.ListBody>
 					<Combobox.Collection>
 						{ ( entry: Item | ItemGroup, ...args ) => {
-							if (
-								shouldSkipCollectionEntry(
-									entry,
-									creatableItem
-								)
-							) {
+							if ( shouldSkipCollectionEntry( entry ) ) {
 								return null;
 							}
 
@@ -101,7 +88,7 @@ export function SearchableResults( {
 								return children( entry, ...args );
 							}
 
-							if ( ! isItem( entry ) ) {
+							if ( isItemGroup( entry ) ) {
 								return null;
 							}
 
