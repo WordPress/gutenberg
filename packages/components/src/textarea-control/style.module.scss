@@ -23,6 +23,8 @@
 	&:disabled {
 		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		// Core's `form.css` sets its own background on disabled textareas.
+		background: $components-color-background;
 	}
 
 	// Use opacity to work in various editor styles.
