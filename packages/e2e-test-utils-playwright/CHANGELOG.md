@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `@types/node` peer dependency now requires `^24.0.0`, matching the Node.js version the repository builds and tests against.
+
 ### New Features
 
 -   `Admin.visitSiteEditor()`: When the `GUTENBERG_E2E_SITE_EDITOR_V2` environment variable is set, visit the extensible site editor (`admin.php?page=site-editor-v2`) instead of `site-editor.php`, translating the classic query args to the equivalent v2 route, and wait for the lazily loaded editor to finish initializing on edit routes. `RequestUtils.setGutenbergExperiments()` keeps the `gutenberg-extensible-site-editor` experiment enabled in that mode so specs that reset experiments do not turn the v2 editor off mid-run.
