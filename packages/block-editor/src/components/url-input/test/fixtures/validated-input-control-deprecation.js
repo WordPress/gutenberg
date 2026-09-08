@@ -1,3 +1,5 @@
+import { expect } from 'vitest';
+
 /**
  * Temporary test helper while `URLInput` still unlocks the deprecated private
  * `ValidatedInputControl` from `@wordpress/components`.
