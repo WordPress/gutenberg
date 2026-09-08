@@ -1,9 +1,13 @@
-/**
- * Internal dependencies
- */
+import { setOutput } from '@actions/core';
 import firstTimeContributorLabel from '../';
 
+jest.mock( '@actions/core', () => ( { setOutput: jest.fn() } ) );
+
 describe( 'firstTimeContributorLabel', () => {
+	beforeEach( () => {
+		setOutput.mockReset();
+	} );
+
 	const payload = {
 		repository: {
 			owner: {
@@ -67,7 +71,6 @@ describe( 'firstTimeContributorLabel', () => {
 				},
 				issues: {
 					addLabels: jest.fn(),
-					createComment: jest.fn(),
 				},
 			},
 		};
@@ -81,7 +84,7 @@ describe( 'firstTimeContributorLabel', () => {
 		} );
 		expect( octokit.rest.search.commits ).not.toHaveBeenCalled();
 		expect( octokit.rest.issues.addLabels ).not.toHaveBeenCalled();
-		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
+		expect( setOutput ).not.toHaveBeenCalled();
 	} );
 
 	it( 'does nothing if the search fallback finds a previous commit', async () => {
@@ -108,7 +111,6 @@ describe( 'firstTimeContributorLabel', () => {
 				},
 				issues: {
 					addLabels: jest.fn(),
-					createComment: jest.fn(),
 				},
 			},
 		};
@@ -120,7 +122,7 @@ describe( 'firstTimeContributorLabel', () => {
 			per_page: 1,
 		} );
 		expect( octokit.rest.issues.addLabels ).not.toHaveBeenCalled();
-		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
+		expect( setOutput ).not.toHaveBeenCalled();
 	} );
 
 	it( 'adds the First Time Contributor label if neither finds a commit', async () => {
@@ -143,7 +145,6 @@ describe( 'firstTimeContributorLabel', () => {
 				},
 				issues: {
 					addLabels: jest.fn(),
-					createComment: jest.fn(),
 				},
 			},
 		};
@@ -161,11 +162,9 @@ describe( 'firstTimeContributorLabel', () => {
 			issue_number: 123,
 			labels: [ 'First-time Contributor' ],
 		} );
-		expect( octokit.rest.issues.createComment ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			issue_number: 123,
-			body: expectedComment,
-		} );
+		expect( setOutput ).toHaveBeenCalledWith(
+			'welcome-prompt',
+			expectedComment
+		);
 	} );
 } );

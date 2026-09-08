@@ -94,6 +94,7 @@
 		{ "path": "packages/worker-threads" },
 		{ "path": "packages/wp-build" },
 		{ "path": "storybook" },
+		{ "path": "tools/pr-meta" },
 		{ "path": "test/e2e" },
 		{ "path": "test/storybook-playwright" },
 		{ "path": "test/performance" },
