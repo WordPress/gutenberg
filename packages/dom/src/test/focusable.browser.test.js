@@ -20,11 +20,16 @@ describe( 'focusable.find() CSS visibility', () => {
 			'<div style="visibility: hidden"><input></div>',
 		],
 		[ 'visibility: collapse', '<input style="visibility: collapse">' ],
+		[
+			'content-visibility: hidden ancestor',
+			'<div style="content-visibility: hidden"><input></div>',
+		],
 	] )(
 		'excludes inputs with %s even when they have layout boxes',
 		( _, html ) => {
 			node.innerHTML = html;
 			const input = node.querySelector( 'input' );
+			const checkVisibility = vi.spyOn( input, 'checkVisibility' );
 
 			expect( input.offsetWidth ).toBeGreaterThan( 0 );
 			expect( input.offsetHeight ).toBeGreaterThan( 0 );
@@ -32,6 +37,9 @@ describe( 'focusable.find() CSS visibility', () => {
 			input.focus();
 			expect( document.activeElement ).not.toBe( input );
 			expect( find( node ) ).toEqual( [] );
+			expect( checkVisibility ).toHaveBeenCalledWith( {
+				visibilityProperty: true,
+			} );
 		}
 	);
 
@@ -45,7 +53,7 @@ describe( 'focusable.find() CSS visibility', () => {
 		expect( find( node ) ).toEqual( [ input ] );
 	} );
 
-	it( "checks visibility in the element's owning window", () => {
+	it( 'uses the owning window for the computed-style fallback', () => {
 		const iframe = document.createElement( 'iframe' );
 		node.appendChild( iframe );
 		const iframeDocument = iframe.contentDocument;
@@ -57,6 +65,12 @@ describe( 'focusable.find() CSS visibility', () => {
 		`;
 		const [ hiddenInput, visibleInput ] =
 			iframeDocument.querySelectorAll( 'input' );
+		Object.defineProperties( hiddenInput, {
+			checkVisibility: { value: undefined },
+		} );
+		Object.defineProperties( visibleInput, {
+			checkVisibility: { value: undefined },
+		} );
 		const getComputedStyle = vi.spyOn(
 			iframeDocument.defaultView,
 			'getComputedStyle'

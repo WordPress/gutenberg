@@ -46,20 +46,26 @@ function buildSelector( sequential ) {
 }
 
 /**
- * Returns true if the specified element is visible (i.e. neither display: none
- * nor visibility: hidden or collapse).
+ * Returns true if the specified element has a layout box and is not hidden by
+ * CSS visibility or content visibility.
  *
  * @param {HTMLElement} element DOM element to test.
  *
  * @return {boolean} Whether element is visible.
  */
 function isVisible( element ) {
-	const visibility =
-		element.ownerDocument.defaultView?.getComputedStyle(
-			element
-		).visibility;
-	if ( visibility === 'hidden' || visibility === 'collapse' ) {
-		return false;
+	if ( typeof element.checkVisibility === 'function' ) {
+		if ( ! element.checkVisibility( { visibilityProperty: true } ) ) {
+			return false;
+		}
+	} else {
+		const visibility =
+			element.ownerDocument.defaultView?.getComputedStyle(
+				element
+			).visibility;
+		if ( visibility === 'hidden' || visibility === 'collapse' ) {
+			return false;
+		}
 	}
 
 	return (
