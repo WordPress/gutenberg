@@ -10,9 +10,9 @@
  *
  * @access private
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function _gutenberg_add_block_level_presets_class( $block_content, $block ) {
 	if ( ! $block_content ) {

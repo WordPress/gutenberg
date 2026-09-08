@@ -65,9 +65,9 @@ add_filter( 'block_type_metadata_settings', array( 'WP_Duotone_Gutenberg', 'migr
  *
  * @deprecated 6.3.0
  *
- * @param  mixed $n   Number of unknown type.
- * @param  int   $max Upper value of the range to bound to.
- * @return float      Value in the range [0,1].
+ * @param mixed $n   Number of unknown type.
+ * @param int   $max Upper value of the range to bound to.
+ * @return float Value in the range [0,1].
  */
 function gutenberg_tinycolor_bound01( $n, $max ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -142,10 +142,10 @@ function gutenberg_tinycolor_rgb_to_rgb( $rgb_color ) {
  *
  * @deprecated 6.3.0
  *
- * @param  float $p first component.
- * @param  float $q second component.
- * @param  float $t third component.
- * @return float    R, G, or B component.
+ * @param float $p first component.
+ * @param float $q second component.
+ * @param float $t third component.
+ * @return float R, G, or B component.
  */
 function gutenberg_tinycolor_hue_to_rgb( $p, $q, $t ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -422,9 +422,9 @@ function gutenberg_register_duotone_support( $block_type ) {
  *
  * @deprecated 6.3.0 Use WP_Duotone_Gutenberg::render_duotone_support() instead.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function gutenberg_render_duotone_support( $block_content, $block ) {
 	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Duotone_Gutenberg::render_duotone_support' );

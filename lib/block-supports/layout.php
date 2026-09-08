@@ -1017,9 +1017,9 @@ function gutenberg_unique_id_from_values( array $data, string $prefix = '' ): st
 /**
  * Renders the layout config to the block wrapper.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
@@ -1536,9 +1536,9 @@ add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
  * to restore the inner div for the group block
  * to avoid breaking styles relying on that div.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	$tag_name_attr                    = $block['attrs']['tagName'] ?? null;
