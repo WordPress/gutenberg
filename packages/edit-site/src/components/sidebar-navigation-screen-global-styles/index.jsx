@@ -23,18 +23,25 @@ export default function SidebarNavigationScreenGlobalStyles() {
 		revisionsCount,
 	} = useGlobalStylesRevisions();
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
-	const { setStylesPath } = unlock( useDispatch( editorStore ) );
+	const editorDispatch = useDispatch( editorStore );
+	const { setRenderingMode } = editorDispatch;
+	const { setStylesPath } = unlock( editorDispatch );
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const openGlobalStyles = useCallback( async () => {
 		history.navigate( addQueryArgs( path, { canvas: 'edit' } ), {
 			transition: 'canvas-mode-edit-transition',
 		} );
+		// When the site uses a static front page, the canvas edits that page
+		// rather than a template, and the Styles sidebar is hidden. Render the
+		// template around the page so the sidebar is available, the same state
+		// the "Show template" option produces.
+		setRenderingMode( 'template-locked' );
 		return Promise.all( [
 			setPreference( 'core', 'distractionFree', false ),
 			openGeneralSidebar( 'edit-site/global-styles' ),
 		] );
-	}, [ path, history, openGeneralSidebar, setPreference ] );
+	}, [ path, history, openGeneralSidebar, setPreference, setRenderingMode ] );
 
 	const openRevisions = useCallback( async () => {
 		await openGlobalStyles();

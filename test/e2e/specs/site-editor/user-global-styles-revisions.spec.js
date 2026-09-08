@@ -178,6 +178,74 @@ test.describe( 'Style Revisions', () => {
 		).toBeVisible();
 	} );
 
+	test( 'should access from the site editor sidebar with a static front page', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+		userGlobalStylesRevisions,
+	} ) => {
+		// With a static front page the site editor canvas edits that page
+		// rather than a template, which used to hide the Styles sidebar and
+		// leave Revisions with nowhere to open. See
+		// https://github.com/WordPress/gutenberg/issues/82172.
+		const frontPage = await requestUtils.createPage( {
+			title: 'Home',
+			status: 'publish',
+		} );
+		await requestUtils.updateSiteSettings( {
+			show_on_front: 'page',
+			page_on_front: frontPage.id,
+		} );
+
+		try {
+			// The Revisions entry is only offered once revisions exist, so
+			// create one first — the shared `beforeEach` already opened the
+			// editor this helper saves through.
+			await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+				color: { background: 'blue' },
+			} );
+
+			if ( isSiteEditorV2 ) {
+				await admin.visitSiteEditor();
+				await page.getByRole( 'link', { name: 'Styles' } ).click();
+				await page
+					.getByRole( 'region', { name: 'Styles' } )
+					.getByRole( 'button', { name: 'Revisions' } )
+					.click();
+			} else {
+				// This flow starts from the browse-mode sidebar, not the edit
+				// mode the shared `beforeEach` opens.
+				await admin.visitSiteEditor();
+
+				const navigationContainer = page.getByRole( 'region', {
+					name: 'Navigation',
+				} );
+
+				await navigationContainer
+					.getByRole( 'button', { name: 'Styles' } )
+					.click();
+
+				// wait for the editor canvas to be ready (to contain a block)
+				await editor.canvas.locator( '.wp-block' ).first().waitFor();
+
+				await navigationContainer
+					.getByRole( 'button', { name: 'Revisions' } )
+					.click();
+			}
+
+			await expect(
+				page.getByLabel( 'Global styles revisions list' )
+			).toBeVisible();
+		} finally {
+			await requestUtils.updateSiteSettings( {
+				show_on_front: 'posts',
+				page_on_front: 0,
+			} );
+			await requestUtils.deleteAllPages();
+		}
+	} );
+
 	test( 'should allow switching to style book view', async ( {
 		page,
 		userGlobalStylesRevisions,
