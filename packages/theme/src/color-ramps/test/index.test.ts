@@ -36,16 +36,23 @@ function expectAccessibleFillStates( ramp: ReturnType< typeof buildRamp > ) {
 }
 
 describe( 'buildRamps', () => {
-	it( 'keeps weak intent backgrounds distinct', () => {
+	it( 'restores the weak intent background colors', () => {
 		const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
 		const intentColors = [ 'info', 'success', 'warning', 'error' ] as const;
-		const weakBackgrounds = intentColors.map(
-			( intent ) =>
+		const weakBackgrounds = Object.fromEntries(
+			intentColors.map( ( intent ) => [
+				intent,
 				buildAccentRamp( DEFAULT_SEED_COLORS[ intent ], bgRamp ).ramp
-					.surface2
+					.surface2,
+			] )
 		);
 
-		expect( new Set( weakBackgrounds ).size ).toBe( intentColors.length );
+		expect( weakBackgrounds ).toEqual( {
+			info: '#f3f9ff',
+			success: '#ebffed',
+			warning: '#fff7e1',
+			error: '#fff6f5',
+		} );
 	} );
 
 	it( 'background ramp snapshots', () => {

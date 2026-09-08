@@ -65,12 +65,8 @@ export function taperChroma(
 
 	// Capacity at seed and target
 	const lSeed = clamp01( get( seed, [ OKLCH, 'l' ] ) );
-	const cmaxSeed = getCachedMaxChromaAtLH( lSeed, hSeed, gamut );
-	const cmaxTarget = getCachedMaxChromaAtLH(
-		clamp01( lTarget ),
-		hSeed,
-		gamut
-	);
+	const cmaxSeed = getMaxChromaAtLH( lSeed, hSeed, gamut );
+	const cmaxTarget = getMaxChromaAtLH( clamp01( lTarget ), hSeed, gamut );
 
 	// Seed vividness ratio (hue-fair normalization)
 	let seedRelative = 0;
@@ -151,140 +147,19 @@ function continuousTaper(
 	return 1 - ( 1 - opts.kDark ) * w;
 }
 
-/* ---- chroma-capacity queries with small caches ---- */
+/* ---- chroma-capacity queries ---- */
 
 // Leave headroom above sRGB's maximum chroma of about 0.32.
 const MAX_CHROMA = 0.45;
-// Cosine spacing concentrates 31 lightness samples near the gamut boundaries,
-// where chroma capacity changes fastest. Together with four-degree hue
-// samples, this kept the measured error of fully vivid, default-alpha output
-// probes below the CSS Color 4 DeltaEOK just-noticeable difference of 0.02.
-const LIGHTNESS_INTERVAL_COUNT = 30;
-const HUE_SAMPLE_COUNT = 90;
-const SAMPLES_PER_GAMUT = ( LIGHTNESS_INTERVAL_COUNT + 1 ) * HUE_SAMPLE_COUNT;
-const maxChromaCache = new WeakMap< ColorSpace, Float64Array >();
-
-function interpolate( start: number, end: number, amount: number ): number {
-	return start + ( end - start ) * amount;
-}
-
-function getLightnessSample( index: number ): number {
-	return (
-		( 1 - Math.cos( ( Math.PI * index ) / LIGHTNESS_INTERVAL_COUNT ) ) / 2
-	);
-}
-
-function getInterpolatedChromaAtLightnessSample(
-	lightnessIndex: number,
-	hueLowerIndex: number,
-	hueUpperIndex: number,
-	hueAmount: number,
-	gamutSpace: ColorSpace
-): number {
-	const lower = getCachedMaxChromaAtSample(
-		lightnessIndex,
-		hueLowerIndex,
-		gamutSpace
-	);
-	if ( hueAmount === 0 ) {
-		return lower;
-	}
-	const upper = getCachedMaxChromaAtSample(
-		lightnessIndex,
-		hueUpperIndex,
-		gamutSpace
-	);
-	return interpolate( lower, upper, hueAmount );
-}
-
-function getCachedMaxChromaAtLH(
+function getMaxChromaAtLH(
 	l: number,
 	h: number,
 	gamutSpace: ColorSpace
-): number {
-	const lightness = clamp01( l );
-	const lightnessPosition =
-		( Math.acos( 1 - 2 * lightness ) / Math.PI ) * LIGHTNESS_INTERVAL_COUNT;
-	const lightnessLowerIndex = Math.floor( lightnessPosition );
-	const lightnessUpperIndex = Math.ceil( lightnessPosition );
-	const lightnessLower = getLightnessSample( lightnessLowerIndex );
-	const lightnessUpper = getLightnessSample( lightnessUpperIndex );
-	const lightnessAmount =
-		lightnessLower === lightnessUpper
-			? 0
-			: ( lightness - lightnessLower ) /
-			  ( lightnessUpper - lightnessLower );
-
-	const huePosition = ( normalizeHue( h ) / 360 ) * HUE_SAMPLE_COUNT;
-	const hueLowerIndex = Math.floor( huePosition );
-	const hueUpperIndex = ( hueLowerIndex + 1 ) % HUE_SAMPLE_COUNT;
-	const hueAmount = huePosition - hueLowerIndex;
-
-	const lower = getInterpolatedChromaAtLightnessSample(
-		lightnessLowerIndex,
-		hueLowerIndex,
-		hueUpperIndex,
-		hueAmount,
-		gamutSpace
-	);
-	if ( lightnessAmount === 0 ) {
-		return lower;
-	}
-	const upper = getInterpolatedChromaAtLightnessSample(
-		lightnessUpperIndex,
-		hueLowerIndex,
-		hueUpperIndex,
-		hueAmount,
-		gamutSpace
-	);
-	return interpolate( lower, upper, lightnessAmount );
-}
-
-function getCachedMaxChromaAtSample(
-	lightnessIndex: number,
-	hueIndex: number,
-	gamutSpace: ColorSpace
-): number {
-	let gamutCache = maxChromaCache.get( gamutSpace );
-	if ( ! gamutCache ) {
-		gamutCache = new Float64Array( SAMPLES_PER_GAMUT );
-		gamutCache.fill( Number.NaN );
-		maxChromaCache.set( gamutSpace, gamutCache );
-	}
-
-	const key = lightnessIndex * HUE_SAMPLE_COUNT + hueIndex;
-	const hit = gamutCache[ key ];
-	if ( ! Number.isNaN( hit ) ) {
-		return hit;
-	}
-
-	const computed = maxInGamutChromaAtLH(
-		getLightnessSample( lightnessIndex ),
-		( hueIndex * 360 ) / HUE_SAMPLE_COUNT,
-		gamutSpace,
-		MAX_CHROMA
-	);
-	gamutCache[ key ] = computed;
-	return computed;
-}
-
-/**
- * Find the max in-gamut chroma at fixed (L,H) in the target gamut
- * @param l
- * @param h
- * @param gamutSpace
- * @param cap
- */
-function maxInGamutChromaAtLH(
-	l: number,
-	h: number,
-	gamutSpace: ColorSpace,
-	cap: number
 ): number {
 	// Construct a color with maximum chroma.
 	const probe: PlainColorObject = {
 		space: OKLCH,
-		coords: [ l, cap, h ],
+		coords: [ clamp01( l ), MAX_CHROMA, normalizeHue( h ) ],
 		alpha: 1,
 	};
 

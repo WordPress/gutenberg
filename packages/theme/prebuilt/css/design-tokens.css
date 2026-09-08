@@ -74,7 +74,7 @@
 	/* Background color for surfaces with brand tone and normal emphasis. */
 	--wpds-color-background-surface-brand: #ecf0fa;
 	/* Background color for surfaces with caution tone and normal emphasis. */
-	--wpds-color-background-surface-caution: #fee996;
+	--wpds-color-background-surface-caution: #fee995;
 	/* Background color for surfaces with caution tone and weak emphasis. */
 	--wpds-color-background-surface-caution-weak: #fff9ca;
 	/* Background color for surfaces with error tone and normal emphasis. */
