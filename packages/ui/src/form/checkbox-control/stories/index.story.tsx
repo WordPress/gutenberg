@@ -37,10 +37,6 @@ export const WithLongLabel: Story = {
 	},
 };
 
-/**
- * Even when visually hidden, the label stays available to assistive
- * technology.
- */
 export const VisuallyHiddenLabel: Story = {
 	args: {
 		...Default.args,
