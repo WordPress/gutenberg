@@ -74,8 +74,8 @@ function gutenberg_register_typography_support( $block_type ) {
  * to the incoming attributes array. This will be applied to the block markup in
  * the front-end.
  *
- * @param  WP_Block_Type $block_type       Block type.
- * @param  array         $block_attributes Block attributes.
+ * @param WP_Block_Type $block_type       Block type.
+ * @param array         $block_attributes Block attributes.
  *
  * @return array Typography CSS classes and inline styles.
  */
@@ -247,9 +247,9 @@ function gutenberg_typography_get_preset_inline_style_value( $style_value, $css_
 /**
  * Renders typography styles/content to the block wrapper.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function gutenberg_render_typography_support( $block_content, $block ) {
 	if ( ! empty( $block['attrs']['fitText'] ) && $block['attrs']['fitText'] && ! is_admin() ) {
@@ -480,7 +480,7 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
  * @since 6.6.0 Deprecated bool argument $should_use_fluid_typography.
  * @since 6.7.0 Font size presets can enable fluid typography individually, even if it’s disabled globally.
  *
- * @param array $preset       {
+ * @param array      $preset   {
  *     Required. fontSizes preset value as seen in theme.json.
  *
  *     @type string           $name Name of the font size preset.

@@ -1,8 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
 import menuItemsToBlocks from '../menu-items-to-blocks';
 
 // Mock createBlock to avoid creating the blocks in test environment.
-jest.mock( '@wordpress/blocks', () => {
-	const blocks = jest.requireActual( '@wordpress/blocks' );
+vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
+	const blocks = await importOriginal();
 
 	return {
 		...blocks,
