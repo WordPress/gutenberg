@@ -6,12 +6,40 @@
  */
 
 /**
+ * Finds an available path in a ZIP archive by appending a numeric suffix if needed.
+ *
+ * @since 7.1.0
+ * @access private
+ *
+ * @param ZipArchive $zip  ZIP archive.
+ * @param string     $path Desired path in the ZIP archive.
+ * @return string Available path in the ZIP archive.
+ */
+function gutenberg_get_available_zip_path( $zip, $path ) {
+	$path       = ltrim( wp_normalize_path( $path ), '/' );
+	$path_info  = pathinfo( $path );
+	$directory  = ( ! empty( $path_info['dirname'] ) && '.' !== $path_info['dirname'] ) ? trailingslashit( $path_info['dirname'] ) : '';
+	$filename   = $path_info['filename'] ?? '';
+	$extension  = empty( $path_info['extension'] ) ? '' : '.' . $path_info['extension'];
+	$candidate  = $directory . $filename . $extension;
+	$file_index = 1;
+
+	while ( false !== $zip->locateName( $candidate ) || false !== $zip->locateName( trailingslashit( $candidate ) ) ) {
+		$candidate = $directory . $filename . '-' . $file_index . $extension;
+		++$file_index;
+	}
+
+	return $candidate;
+}
+
+/**
  * Creates an export of the current templates and
  * template parts from the site editor at the
  * specified path in a ZIP file.
  *
  * @since 5.9.0
  * @since 6.0.0 Adds the whole theme to the export archive.
+ * @since 7.1.0 Adds uploaded files to the export archive.
  *
  * @global string $wp_version The WordPress version string.
  *
@@ -95,9 +123,62 @@ function gutenberg_generate_block_templates_export_file() {
 		$theme_json_raw     = array_merge( $schema, $theme_json_raw );
 	}
 
+	// Find any uploaded files.
+	$uris_to_migrate = WP_Theme_JSON_Resolver_Gutenberg::get_migrated_relative_theme_uris(
+		$tree,
+		array(
+			'relative_path_prefix' => 'file:./assets/',
+		)
+	);
+	if ( ! empty( $uris_to_migrate ) ) {
+		$uploads              = wp_upload_dir();
+		$uploaded_asset_paths = array();
+		foreach ( $uris_to_migrate as $uri ) {
+			$relative_file_path = $uri['relative_path'] ?? '';
+			if ( ! is_string( $relative_file_path ) || '' === $relative_file_path || validate_file( $relative_file_path ) > 0 ) {
+				continue;
+			}
+
+			$file = wp_normalize_path( trailingslashit( $uploads['basedir'] ) . $relative_file_path );
+			if ( ! is_file( $file ) || ! is_readable( $file ) ) {
+				continue;
+			}
+
+			if ( ! isset( $uploaded_asset_paths[ $file ] ) ) {
+				$file_content = file_get_contents( $file );
+				if ( false === $file_content ) {
+					continue;
+				}
+
+				$asset_path = gutenberg_get_available_zip_path( $zip, 'assets/' . $relative_file_path );
+				if ( false === $zip->addFromString( $asset_path, $file_content ) ) {
+					continue;
+				}
+
+				$uploaded_asset_paths[ $file ] = $asset_path;
+			}
+
+			$href   = 'file:./' . $uploaded_asset_paths[ $file ];
+			$target = $uri['target'];
+			if ( str_ends_with( $target, 'background.backgroundImage.url' ) ) {
+				/*
+				 * For background images, reset the backgroundImage object
+				 * to remove upload "id", "source", and "title".
+				 * Done by removing .url from the path to get the target, and setting
+				 * href to replace the `background.backgroundImage` object.
+				 */
+				$target = substr( $target, 0, -strlen( '.url' ) );
+				$href   = array(
+					'url' => $href,
+				);
+			}
+			$path = explode( '.', $target );
+			_wp_array_set( $theme_json_raw, $path, $href );
+		}
+	}
+
 	// Convert to a string.
 	$theme_json_encoded = wp_json_encode( $theme_json_raw, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-
 	// Replace 4 spaces with a tab.
 	$theme_json_tabbed = preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json_encoded );
 

@@ -1360,6 +1360,162 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected_data, $actual );
 	}
 
+	public function test_get_migrated_relative_theme_uris() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'   => array(
+					'background' => array(
+						'backgroundImage' => array(
+							'id'    => 123,
+							'title' => 'A great image',
+							'url'   => 'https://example.org/wp-content/uploads/img/image.png?ver=123',
+						),
+					),
+					'blocks'     => array(
+						'core/quote' => array(
+							'background' => array(
+								'backgroundImage' => array(
+									'url' => 'https://example.org/wp-content/uploads/img/quote.jpg',
+								),
+							),
+						),
+						'core/verse' => array(
+							'background' => array(
+								'backgroundImage' => array(
+									'id'     => 123,
+									'source' => 'file',
+									'url'    => 'https://example.org/wp-content/uploads/img/verse.gif',
+								),
+							),
+						),
+						'core/group' => array(
+							'background' => array(
+								'backgroundImage' => array(
+									'url' => 'https://example.org/wp-content/uploads-private/img/group.jpg',
+								),
+							),
+						),
+					),
+				),
+				'settings' => array(
+					'typography' => array(
+						'fontFamilies' => array(
+							'theme'  => array(
+								array(
+									'name'       => 'Remote Sans',
+									'slug'       => 'remote-sans',
+									'fontFamily' => 'Remote Sans',
+									'fontFace'   => array(
+										array(
+											'fontFamily' => 'Remote Sans',
+											'src'        => 'https://example.com/fonts/remote-sans.woff2',
+										),
+									),
+								),
+								array(
+									'name'       => 'Remote Serif',
+									'slug'       => 'remote-serif',
+									'fontFamily' => 'Remote Serif',
+									'fontFace'   => array(
+										array(
+											'fontFamily' => 'Remote Serif',
+											'src'        => 'https://example.com/fonts/remote-serif.woff2',
+										),
+									),
+								),
+							),
+							'custom' => array(
+								array(
+									'name'       => 'Star Jedi',
+									'slug'       => 'star-jedi',
+									'fontFamily' => 'Star Jedi',
+									'fontFace'   => array(
+										array(
+											'fontFamily' => 'Star Jedi',
+											'src'        => 'https://example.org/wp-content/uploads/fonts/Starjedi.ttf',
+										),
+										array(
+											'fontFamily' => 'Star Jedi',
+											'src'        => array(
+												'https://example.org/wp-content/uploads/fonts/Starjedi.woff2',
+												'https://example.com/fonts/remote.woff2',
+												123,
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected_data = array(
+			array(
+				'name'          => 'https://example.org/wp-content/uploads/img/image.png?ver=123',
+				'href'          => 'file:./img/image.png',
+				'target'        => 'styles.background.backgroundImage.url',
+				'relative_path' => 'img/image.png',
+			),
+			array(
+				'name'          => 'https://example.org/wp-content/uploads/img/quote.jpg',
+				'href'          => 'file:./img/quote.jpg',
+				'target'        => 'styles.blocks.core/quote.background.backgroundImage.url',
+				'relative_path' => 'img/quote.jpg',
+			),
+			array(
+				'name'          => 'https://example.org/wp-content/uploads/img/verse.gif',
+				'href'          => 'file:./img/verse.gif',
+				'target'        => 'styles.blocks.core/verse.background.backgroundImage.url',
+				'relative_path' => 'img/verse.gif',
+			),
+			array(
+				'name'          => 'https://example.org/wp-content/uploads/fonts/Starjedi.ttf',
+				'href'          => 'file:./fonts/Starjedi.ttf',
+				'target'        => 'settings.typography.fontFamilies.2.fontFace.0.src',
+				'relative_path' => 'fonts/Starjedi.ttf',
+			),
+			array(
+				'name'          => 'https://example.org/wp-content/uploads/fonts/Starjedi.woff2',
+				'href'          => 'file:./fonts/Starjedi.woff2',
+				'target'        => 'settings.typography.fontFamilies.2.fontFace.1.src.0',
+				'relative_path' => 'fonts/Starjedi.woff2',
+			),
+		);
+
+		/*
+		 * This filter callback normalizes the return value from `wp_upload_dir`
+		 * to guard against changes in test environments.
+		 */
+		$filter_upload_dir_callback = function ( $param ) {
+			$param['baseurl'] = 'https://example.org/wp-content/uploads';
+			return $param;
+		};
+		add_filter( 'upload_dir', $filter_upload_dir_callback );
+		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_migrated_relative_theme_uris( $theme_json );
+		remove_filter( 'upload_dir', $filter_upload_dir_callback );
+
+		$this->assertSame( $expected_data, $actual );
+		$this->assertSame( array(), WP_Theme_JSON_Resolver_Gutenberg::get_migrated_relative_theme_uris( array() ) );
+
+		$exported_theme_json = $theme_json->get_data();
+		foreach ( $actual as $uri ) {
+			_wp_array_set( $exported_theme_json, explode( '.', $uri['target'] ), $uri['href'] );
+		}
+
+		$this->assertSame(
+			'file:./fonts/Starjedi.ttf',
+			$exported_theme_json['settings']['typography']['fontFamilies'][2]['fontFace'][0]['src']
+		);
+		$this->assertSame(
+			'file:./fonts/Starjedi.woff2',
+			$exported_theme_json['settings']['typography']['fontFamilies'][2]['fontFace'][1]['src'][0]
+		);
+		$this->assertArrayNotHasKey( 'custom', $exported_theme_json['settings']['typography']['fontFamilies'] );
+	}
+
 	/**
 	 * Tests that block style variations data gets merged in the following
 	 * priority order, from highest priority to lowest.
