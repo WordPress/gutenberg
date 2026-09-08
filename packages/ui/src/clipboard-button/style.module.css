@@ -1,0 +1,20 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer compositions {
+		.icon-only {
+			composes: icon-button from "../icon-button/style.module.css";
+		}
+
+		.icon {
+			pointer-events: none;
+		}
+
+		.icon-only-icon {
+			/* Compensate for the button's 1px border so the icon extends
+			   edge-to-edge and doesn't inflate the button's dimensions. */
+			margin: -1px;
+			pointer-events: none;
+		}
+	}
+}
