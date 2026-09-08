@@ -22,20 +22,6 @@ _Returns_
 
 > **Deprecated**
 
-### getCurrentTemplateTemplateParts
-
-> **Deprecated**
-
-Returns the template parts and their blocks for the current edited template.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `Array`: Template parts and their blocks in an array.
-
 ### getEditedPostContext
 
 > **Deprecated**
@@ -390,20 +376,6 @@ _Returns_
 ### setTemplate
 
 Action that sets a template, optionally fetching it from REST API.
-
-_Returns_
-
--   `Object`: Action object.
-
-### setTemplatePart
-
-> **Deprecated**
-
-Action that sets a template part.
-
-_Parameters_
-
--   _templatePartId_ `string`: The template part ID.
 
 _Returns_
 

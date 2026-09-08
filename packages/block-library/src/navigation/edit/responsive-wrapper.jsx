@@ -2,16 +2,12 @@ import clsx from 'clsx';
 import { close, Icon } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	getColorClassName,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { getColorClassName } from '@wordpress/block-editor';
+import { useDispatch } from '@wordpress/data';
 import { store as patternsStore } from '@wordpress/patterns';
 import OverlayMenuIcon from './overlay-menu-icon';
 import { unlock } from '../../lock-unlock';
-import { getOverlayPatternName } from './use-overlay-patterns';
+import useOverlayPatterns from './use-overlay-patterns';
 
 /**
  * The action creating (or reusing) the edited copy of a registered pattern.
@@ -36,19 +32,10 @@ export default function ResponsiveWrapper( {
 	overlay,
 	onNavigateToEntityRecord,
 } ) {
-	const currentTheme = useSelect(
-		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
-		[]
-	);
-	const overlayPattern = useSelect(
-		( select ) =>
-			overlay && currentTheme
-				? unlock( select( blockEditorStore ) ).getPatternBySlug(
-						getOverlayPatternName( currentTheme, overlay )
-				  )
-				: null,
-		[ overlay, currentTheme ]
-	);
+	const { overlays } = useOverlayPatterns();
+	const overlayEntry = overlay
+		? overlays.find( ( candidate ) => candidate.slug === overlay )
+		: undefined;
 	const customizePattern = useCustomizePattern();
 
 	if ( ! isResponsive ) {
@@ -107,14 +94,13 @@ export default function ResponsiveWrapper( {
 
 	const handleToggleClick = async () => {
 		// If an overlay is selected, open it for editing instead of toggling:
-		// a registered pattern is edited through its copy, created on first
-		// edit.
-		if ( overlay && overlayPattern && onNavigateToEntityRecord ) {
-			const copy = await customizePattern( overlayPattern );
-			onNavigateToEntityRecord( {
-				postId: copy.id,
-				postType: 'wp_block',
-			} );
+		// a user pattern as is, a registered pattern through its
+		// customization, created on first edit.
+		if ( overlay && overlayEntry && onNavigateToEntityRecord ) {
+			const postId = overlayEntry.isUser
+				? overlayEntry.id
+				: ( await customizePattern( overlayEntry.pattern ) ).id;
+			onNavigateToEntityRecord( { postId, postType: 'wp_block' } );
 			return;
 		}
 		// Otherwise, use normal toggle behavior

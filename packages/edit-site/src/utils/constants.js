@@ -10,7 +10,6 @@ export const NAVIGATION_POST_TYPE = 'wp_navigation';
 
 // Templates.
 export const TEMPLATE_POST_TYPE = 'wp_template';
-export const TEMPLATE_PART_POST_TYPE = 'wp_template_part';
 export const TEMPLATE_ORIGINS = {
 	custom: 'custom',
 	theme: 'theme',
@@ -27,15 +26,10 @@ export const {
 } = unlock( patternPrivateApis );
 
 // Entities that are editable in focus mode.
-export const FOCUSABLE_ENTITIES = [
-	TEMPLATE_PART_POST_TYPE,
-	NAVIGATION_POST_TYPE,
-	PATTERN_TYPES.user,
-];
+export const FOCUSABLE_ENTITIES = [ NAVIGATION_POST_TYPE, PATTERN_TYPES.user ];
 
 export const POST_TYPE_LABELS = {
 	[ TEMPLATE_POST_TYPE ]: __( 'Template' ),
-	[ TEMPLATE_PART_POST_TYPE ]: __( 'Template part' ),
 	[ PATTERN_TYPES.user ]: __( 'Pattern' ),
 	[ NAVIGATION_POST_TYPE ]: __( 'Navigation' ),
 };

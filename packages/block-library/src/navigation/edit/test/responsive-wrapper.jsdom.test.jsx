@@ -19,14 +19,19 @@ jest.mock( '@wordpress/patterns', () => ( {
 	store: {},
 } ) );
 
-// Mock lock-unlock: the overlay pattern lookup and the copy creation.
-const mockGetPatternBySlug = jest.fn();
+// Mock lock-unlock: the customization of a registered overlay.
 const mockCustomizePattern = jest.fn();
 jest.mock( '../../../lock-unlock', () => ( {
 	unlock: () => ( {
-		getPatternBySlug: mockGetPatternBySlug,
 		customizePattern: mockCustomizePattern,
 	} ),
+} ) );
+
+// Mock the overlays: a registered one and a user pattern.
+const mockUseOverlayPatterns = jest.fn();
+jest.mock( '../use-overlay-patterns', () => ( {
+	__esModule: true,
+	default: () => mockUseOverlayPatterns(),
 } ) );
 
 // Mock useSelect and useDispatch
@@ -68,11 +73,24 @@ describe( 'ResponsiveWrapper', () => {
 	beforeEach( () => {
 		jest.clearAllMocks();
 		useDispatch.mockReturnValue( {} );
-		mockGetPatternBySlug.mockImplementation( ( name ) => ( {
-			name,
-			title: 'My Overlay',
-			area: 'navigation-overlay',
-		} ) );
+		mockUseOverlayPatterns.mockReturnValue( {
+			overlays: [
+				{
+					slug: 'my-overlay',
+					name: 'twentytwentyfive/part/my-overlay',
+					pattern: { name: 'twentytwentyfive/part/my-overlay' },
+					title: { rendered: 'My Overlay' },
+				},
+				{
+					slug: 'custom-overlay',
+					id: 77,
+					isUser: true,
+					title: { rendered: 'Custom Overlay' },
+				},
+			],
+			isResolving: false,
+			hasResolved: true,
+		} );
 		mockCustomizePattern.mockResolvedValue( { id: 123 } );
 		// Mock useSelect - component calls: select( coreStore ).getCurrentTheme()?.stylesheet
 		useSelect.mockImplementation( ( selector ) => {
@@ -106,11 +124,7 @@ describe( 'ResponsiveWrapper', () => {
 
 			await user.click( openButton );
 
-			// Should resolve the overlay pattern from the current theme and
-			// slug, then open its edited copy.
-			expect( mockGetPatternBySlug ).toHaveBeenCalledWith(
-				'twentytwentyfive/part/my-overlay'
-			);
+			// Should open the registered overlay's customization.
 			await waitFor( () =>
 				expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
 					postId: 123,
@@ -163,26 +177,13 @@ describe( 'ResponsiveWrapper', () => {
 			expect( mockOnNavigateToEntityRecord ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should resolve the overlay pattern using the current theme from useSelect', async () => {
+		it( 'should open a user pattern overlay directly', async () => {
 			const user = userEvent.setup();
-
-			// Mock different theme
-			useSelect.mockImplementation( ( selector ) => {
-				if ( typeof selector === 'function' ) {
-					const mockSelect = () => ( {
-						getCurrentTheme: () => ( {
-							stylesheet: 'custom-theme',
-						} ),
-					} );
-					return selector( mockSelect );
-				}
-				return 'custom-theme';
-			} );
 
 			render(
 				<ResponsiveWrapper
 					{ ...defaultProps }
-					overlay="my-overlay"
+					overlay="custom-overlay"
 					onNavigateToEntityRecord={ mockOnNavigateToEntityRecord }
 				/>
 			);
@@ -193,16 +194,13 @@ describe( 'ResponsiveWrapper', () => {
 
 			await user.click( openButton );
 
-			// Should use the current theme from useSelect
-			expect( mockGetPatternBySlug ).toHaveBeenCalledWith(
-				'custom-theme/part/my-overlay'
-			);
 			await waitFor( () =>
 				expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
-					postId: 123,
+					postId: 77,
 					postType: 'wp_block',
 				} )
 			);
+			expect( mockCustomizePattern ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

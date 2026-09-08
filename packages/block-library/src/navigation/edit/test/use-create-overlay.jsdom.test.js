@@ -49,14 +49,12 @@ jest.mock( '../../../lock-unlock', () => ( {
 
 describe( 'useCreateOverlayTemplatePart', () => {
 	const mockSaveEntityRecord = jest.fn();
-	const mockInvalidateResolution = jest.fn();
 	const mockGetPatternBySlug = jest.fn();
 
 	beforeEach( () => {
 		jest.clearAllMocks();
 		useDispatch.mockReturnValue( {
 			saveEntityRecord: mockSaveEntityRecord,
-			invalidateResolution: mockInvalidateResolution,
 		} );
 
 		mockUnlock.mockReturnValue( {
@@ -86,8 +84,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 	it( 'should save a new overlay with correct parameters when no overlays exist', async () => {
 		const overlayTemplateParts = [];
 		const createdOverlay = {
-			id: 'twentytwentyfive//navigation-overlay',
-			theme: 'twentytwentyfive',
+			id: 91,
 			slug: 'navigation-overlay',
 			title: {
 				rendered: 'Navigation Overlay',
@@ -106,7 +103,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 			savedOverlay = await createOverlayTemplatePart.current();
 		} );
 
-		// The overlay is saved as the edited copy of a part pattern.
+		// The overlay is saved as a user pattern of the overlay area.
 		expect( mockSaveEntityRecord ).toHaveBeenCalledWith(
 			'postType',
 			'wp_block',
@@ -115,28 +112,23 @@ describe( 'useCreateOverlayTemplatePart', () => {
 				content: expect.any( String ),
 				status: 'publish',
 				meta: {
-					wp_pattern_slug: 'theme/part/navigation-overlay',
 					wp_pattern_area: 'navigation-overlay',
 				},
 			} ),
 			{ throwOnError: true }
 		);
-		expect( mockInvalidateResolution ).toHaveBeenCalledWith(
-			'getBlockPatterns'
-		);
 		expect( savedOverlay ).toEqual(
 			expect.objectContaining( {
 				id: createdOverlay.id,
 				slug: 'navigation-overlay',
-				name: 'theme/part/navigation-overlay',
+				isUser: true,
 			} )
 		);
 	} );
 
 	it( 'should generate unique title when overlays already exist', async () => {
 		const existingOverlay = {
-			id: 'twentytwentyfive//navigation-overlay',
-			theme: 'twentytwentyfive',
+			id: 91,
 			slug: 'navigation-overlay',
 			title: {
 				rendered: 'Navigation Overlay',
@@ -145,8 +137,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 		};
 		const overlayTemplateParts = [ existingOverlay ];
 		const createdOverlay = {
-			id: 'twentytwentyfive//navigation-overlay-2',
-			theme: 'twentytwentyfive',
+			id: 92,
 			slug: 'navigation-overlay-2',
 			title: {
 				rendered: 'Navigation Overlay 2',
@@ -171,9 +162,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 			expect.objectContaining( {
 				title: 'Navigation Overlay 2',
 				content: expect.any( String ),
-				meta: expect.objectContaining( {
-					wp_pattern_slug: 'theme/part/navigation-overlay-2',
-				} ),
+				meta: { wp_pattern_area: 'navigation-overlay' },
 			} ),
 			{ throwOnError: true }
 		);
@@ -182,8 +171,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 	it( 'should use pattern content when pattern is found', async () => {
 		const overlayTemplateParts = [];
 		const createdOverlay = {
-			id: 'twentytwentyfive//navigation-overlay',
-			theme: 'twentytwentyfive',
+			id: 91,
 			slug: 'navigation-overlay',
 			title: {
 				rendered: 'Navigation Overlay',
@@ -219,8 +207,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 	it( 'should use empty paragraph when pattern is not found', async () => {
 		const overlayTemplateParts = [];
 		const createdOverlay = {
-			id: 'twentytwentyfive//navigation-overlay',
-			theme: 'twentytwentyfive',
+			id: 91,
 			slug: 'navigation-overlay',
 			title: {
 				rendered: 'Navigation Overlay',

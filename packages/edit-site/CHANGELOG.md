@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the deprecated `getCurrentTemplateTemplateParts` selector and `setTemplatePart` action: template parts are patterns ([#82569](https://github.com/WordPress/gutenberg/pull/82569)).
+
 ### Enhancements
 
 -   Remove the template part user interface from the site editor: the template part route, the template part areas in the patterns sidebar, and the template part listing, actions and creation controls on the patterns page ([#82569](https://github.com/WordPress/gutenberg/pull/82569)).

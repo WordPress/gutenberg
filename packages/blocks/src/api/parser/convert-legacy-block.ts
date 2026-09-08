@@ -2,8 +2,15 @@
 declare global {
 	var IS_GUTENBERG_PLUGIN: boolean | undefined;
 	// Set by the Gutenberg plugin, where template parts are registered
-	// patterns; carries the active theme's stylesheet.
-	var __wpTemplatePartsAsPatterns: { stylesheet?: string } | undefined;
+	// patterns named `<stylesheet>/part/<slug>`: the active theme and its
+	// parent, and the custom parts, which are user patterns referenced by id.
+	var __wpTemplatePartsAsPatterns:
+		| {
+				stylesheet?: string;
+				template?: string;
+				customParts?: Record< string, { id: number; area?: string } >;
+		  }
+		| undefined;
 }
 /* eslint-enable @wordpress/wp-global-usage */
 
@@ -70,7 +77,8 @@ export function convertLegacyBlockNameAndAttributes(
 	}
 
 	// In the Gutenberg plugin template parts are registered patterns, and a
-	// template part block is a pattern instance referencing `theme/part/slug`.
+	// template part block is a pattern instance: a registered part by its
+	// pattern name, a custom part by its user pattern's id.
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		const templatePartsAsPatterns = globalThis.__wpTemplatePartsAsPatterns;
 		if (
@@ -79,14 +87,38 @@ export function convertLegacyBlockNameAndAttributes(
 			typeof newAttributes.slug === 'string' &&
 			newAttributes.slug
 		) {
-			const theme =
-				( typeof newAttributes.theme === 'string' &&
-					newAttributes.theme ) ||
-				templatePartsAsPatterns.stylesheet ||
-				'';
-			newAttributes.slug = `${ theme }/part/${ newAttributes.slug }`;
-			newAttributes.hasWrapper = true;
+			const {
+				stylesheet = '',
+				template,
+				customParts,
+			} = templatePartsAsPatterns;
+			const slug: string = newAttributes.slug;
+			const explicitTheme =
+				typeof newAttributes.theme === 'string'
+					? newAttributes.theme
+					: '';
+			// Parts are named after the active stylesheet, parent theme
+			// included.
+			const isActiveTheme =
+				! explicitTheme ||
+				explicitTheme === stylesheet ||
+				explicitTheme === template;
+			const customPart = isActiveTheme
+				? customParts?.[ slug ]
+				: undefined;
 			delete newAttributes.theme;
+			newAttributes.hasWrapper = true;
+			if ( customPart ) {
+				delete newAttributes.slug;
+				newAttributes.ref = customPart.id;
+				if ( customPart.area && ! newAttributes.area ) {
+					newAttributes.area = customPart.area;
+				}
+			} else {
+				newAttributes.slug = `${
+					isActiveTheme ? stylesheet : explicitTheme
+				}/part/${ slug }`;
+			}
 			name = 'core/block';
 		}
 	}

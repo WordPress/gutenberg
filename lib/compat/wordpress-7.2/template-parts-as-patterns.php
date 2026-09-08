@@ -4,8 +4,9 @@
  *
  * Theme template part files (and plugin-registered parts) become synced
  * registered patterns named `<theme>/part/<slug>`, existing
- * `wp_template_part` posts become the edited copies of those patterns, and
- * `core/template-part` blocks are rendered as `core/block` instances.
+ * `wp_template_part` posts become customizations of those patterns (or user
+ * patterns, for custom parts), and `core/template-part` blocks are rendered
+ * as `core/block` instances.
  *
  * @package gutenberg
  */
@@ -81,8 +82,8 @@ function gutenberg_get_template_part_pattern_properties( $title, $area ) {
 }
 
 /**
- * Registers the active theme's template part files, plugin-registered template
- * parts and migrated custom parts as synced patterns.
+ * Registers the active theme's template part files and plugin-registered
+ * template parts as synced patterns.
  *
  * Runs after the theme's own patterns are registered, so a theme cannot be
  * shadowed by its parts and parts get the `Synced`/`Area` treatment last.
@@ -93,9 +94,12 @@ function gutenberg_register_template_parts_as_patterns() {
 	}
 	$registry = WP_Block_Patterns_Registry::get_instance();
 
-	// Theme files, child theme first.
+	// Theme files: the child theme's and the parent's it does not override,
+	// all named after the active stylesheet, the way core resolved parts
+	// through both directories. The list is child theme first.
+	$stylesheet = get_stylesheet();
 	foreach ( _get_block_templates_files( 'wp_template_part' ) as $file ) {
-		$name = gutenberg_get_template_part_pattern_name( $file['theme'], $file['slug'] );
+		$name = gutenberg_get_template_part_pattern_name( $stylesheet, $file['slug'] );
 		if ( $registry->is_registered( $name ) ) {
 			continue;
 		}
@@ -121,13 +125,173 @@ function gutenberg_register_template_parts_as_patterns() {
 			register_block_pattern( $name, $properties );
 		}
 	}
+}
+add_action( 'init', 'gutenberg_register_template_parts_as_patterns', 12 );
 
-	// Custom parts that only ever existed in the database: their migrated copy
-	// is the source, registered so instances and the Patterns pages resolve.
+/**
+ * Whether a template part has a registered original for the migration to
+ * customize: a theme file (child or parent theme) or a plugin registration.
+ * Parts of an inactive theme cannot be checked and are treated as having one.
+ *
+ * @param string $theme Theme stylesheet the part belongs to.
+ * @param string $slug  Template part slug.
+ * @return bool
+ */
+function gutenberg_template_part_has_registered_original( $theme, $slug ) {
+	if ( get_stylesheet() !== $theme && get_template() !== $theme ) {
+		return true;
+	}
+	if ( null !== _get_block_template_file( 'wp_template_part', $slug ) ) {
+		return true;
+	}
+	if ( class_exists( 'WP_Block_Templates_Registry' ) ) {
+		foreach ( WP_Block_Templates_Registry::get_instance()->get_all_registered() as $template ) {
+			if ( 'wp_template_part' === $template->type && $template->slug === $slug ) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+/**
+ * Files a user pattern under the pattern category of its template part area,
+ * so the Patterns pages list it with the theme's parts of that area.
+ *
+ * @param int    $post_id The `wp_block` post id.
+ * @param string $area    Template part area.
+ */
+function gutenberg_assign_template_part_area_category( $post_id, $area ) {
+	if ( ! $area || WP_TEMPLATE_PART_AREA_UNCATEGORIZED === $area || 'navigation-overlay' === $area ) {
+		return;
+	}
+	$term = term_exists( $area, 'wp_pattern_category' );
+	if ( ! $term ) {
+		$label = $area;
+		foreach ( get_allowed_block_template_part_areas() as $definition ) {
+			if ( $definition['area'] === $area ) {
+				$label = $definition['label'];
+			}
+		}
+		$term = wp_insert_term( $label, 'wp_pattern_category', array( 'slug' => $area ) );
+	}
+	if ( ! is_wp_error( $term ) ) {
+		wp_set_object_terms( $post_id, (int) $term['term_id'], 'wp_pattern_category', true );
+	}
+}
+
+/**
+ * Migrates one `wp_template_part` post and moves the original to the trash,
+ * so the migration can be undone by hand.
+ *
+ * A part customizing a theme file or a plugin registration becomes the
+ * customization of that part's pattern: a `wp_block` post carrying the
+ * `wp_pattern_slug` meta (`<theme>/part/<slug>`). A custom part that only
+ * ever existed in the database becomes a regular user pattern, keeping its
+ * slug and its area (`wp_pattern_area` meta).
+ *
+ * @param WP_Post $part The template part post.
+ * @return int|WP_Error The `wp_block` post id, or an error.
+ */
+function gutenberg_migrate_template_part_post( $part ) {
+	$theme_terms = get_the_terms( $part->ID, 'wp_theme' );
+	$theme       = ( is_array( $theme_terms ) && ! empty( $theme_terms ) ) ? $theme_terms[0]->name : get_stylesheet();
+	if ( get_template() === $theme ) {
+		// Parts are named after the active stylesheet, parent theme included.
+		$theme = get_stylesheet();
+	}
+	$area_terms = get_the_terms( $part->ID, 'wp_template_part_area' );
+	$area       = ( is_array( $area_terms ) && ! empty( $area_terms ) ) ? $area_terms[0]->name : WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
+
+	$postarr   = array(
+		'post_type'    => 'wp_block',
+		'post_status'  => 'publish' === $part->post_status ? 'publish' : 'draft',
+		'post_title'   => $part->post_title,
+		'post_content' => $part->post_content,
+		'post_excerpt' => $part->post_excerpt,
+		'post_author'  => $part->post_author,
+		'meta_input'   => array(
+			GUTENBERG_PATTERN_AREA_META_KEY => $area,
+		),
+	);
+	$is_custom = ! gutenberg_template_part_has_registered_original( $theme, $part->post_name );
+	if ( $is_custom ) {
+		$postarr['post_name'] = $part->post_name;
+	} else {
+		$postarr['meta_input']['wp_pattern_slug'] = gutenberg_get_template_part_pattern_name( $theme, $part->post_name );
+	}
+
+	$copy_id = wp_insert_post( $postarr, true );
+	if ( is_wp_error( $copy_id ) ) {
+		return $copy_id;
+	}
+	if ( $is_custom ) {
+		gutenberg_assign_template_part_area_category( $copy_id, $area );
+	}
+	wp_trash_post( $part->ID );
+	return $copy_id;
+}
+
+/**
+ * Turns a customization whose registered original does not exist (an
+ * earlier migration of a custom part) into a regular user pattern.
+ *
+ * @param WP_Post $copy The `wp_block` post.
+ */
+function gutenberg_migrate_orphan_part_customization( $copy ) {
+	$name   = get_post_meta( $copy->ID, 'wp_pattern_slug', true );
+	$prefix = gutenberg_get_template_part_pattern_name( get_stylesheet(), '' );
+	if ( ! is_string( $name ) || ! str_starts_with( $name, $prefix ) ) {
+		return;
+	}
+	$slug = substr( $name, strlen( $prefix ) );
+	if ( WP_Block_Patterns_Registry::get_instance()->is_registered( $name ) || gutenberg_template_part_has_registered_original( get_stylesheet(), $slug ) ) {
+		return;
+	}
+	delete_post_meta( $copy->ID, 'wp_pattern_slug' );
+	wp_update_post(
+		array(
+			'ID'        => $copy->ID,
+			'post_name' => $slug,
+		)
+	);
+	gutenberg_assign_template_part_area_category( $copy->ID, get_post_meta( $copy->ID, GUTENBERG_PATTERN_AREA_META_KEY, true ) );
+}
+
+/**
+ * The version of the template part migration this code performs.
+ */
+define( 'GUTENBERG_TEMPLATE_PARTS_MIGRATION_VERSION', 2 );
+
+/**
+ * Migrates `wp_template_part` posts to `wp_block` posts: customizations of
+ * the parts' patterns, or user patterns for custom parts.
+ *
+ * Runs once per migration version; parts that appear later are migrated when
+ * saved.
+ */
+function gutenberg_migrate_template_parts_to_patterns() {
+	if ( (int) get_option( 'gutenberg_template_parts_migrated' ) >= GUTENBERG_TEMPLATE_PARTS_MIGRATION_VERSION ) {
+		return;
+	}
+	$parts = get_posts(
+		array(
+			'post_type'      => 'wp_template_part',
+			'post_status'    => array( 'publish', 'draft', 'future', 'pending', 'private' ),
+			'posts_per_page' => -1,
+			'no_found_rows'  => true,
+		)
+	);
+	foreach ( $parts as $part ) {
+		gutenberg_migrate_template_part_post( $part );
+	}
+
+	// Version 1 migrated custom parts to customizations of a pattern that
+	// does not exist; they are user patterns.
 	$copies = get_posts(
 		array(
 			'post_type'      => 'wp_block',
-			'post_status'    => 'publish',
+			'post_status'    => array( 'publish', 'draft' ),
 			'posts_per_page' => -1,
 			'no_found_rows'  => true,
 			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
@@ -140,74 +304,91 @@ function gutenberg_register_template_parts_as_patterns() {
 		)
 	);
 	foreach ( $copies as $copy ) {
-		$name = get_post_meta( $copy->ID, 'wp_pattern_slug', true );
-		if ( ! gutenberg_is_template_part_pattern_name( $name ) || $registry->is_registered( $name ) ) {
-			continue;
-		}
-		$properties            = gutenberg_get_template_part_pattern_properties(
-			$copy->post_title,
-			get_post_meta( $copy->ID, GUTENBERG_PATTERN_AREA_META_KEY, true )
-		);
-		$properties['content'] = $copy->post_content;
-		$properties['source']  = 'user';
-		register_block_pattern( $name, $properties );
+		gutenberg_migrate_orphan_part_customization( $copy );
 	}
-}
-add_action( 'init', 'gutenberg_register_template_parts_as_patterns', 12 );
-
-/**
- * Migrates `wp_template_part` posts to `wp_block` copies of their pattern.
- *
- * Each part post becomes a `wp_block` post carrying the `wp_pattern_slug`
- * meta (`<theme>/part/<slug>`) and the part's area, and the original is moved
- * to the trash so the migration can be undone by hand. Runs once.
- */
-function gutenberg_migrate_template_parts_to_patterns() {
-	if ( get_option( 'gutenberg_template_parts_migrated' ) ) {
-		return;
-	}
-	$parts = get_posts(
-		array(
-			'post_type'      => 'wp_template_part',
-			'post_status'    => array( 'publish', 'draft', 'future', 'pending', 'private' ),
-			'posts_per_page' => -1,
-			'no_found_rows'  => true,
-		)
-	);
-	foreach ( $parts as $part ) {
-		$theme_terms = get_the_terms( $part->ID, 'wp_theme' );
-		$theme       = ( is_array( $theme_terms ) && ! empty( $theme_terms ) ) ? $theme_terms[0]->name : get_stylesheet();
-		$area_terms  = get_the_terms( $part->ID, 'wp_template_part_area' );
-		$area        = ( is_array( $area_terms ) && ! empty( $area_terms ) ) ? $area_terms[0]->name : WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
-
-		$copy_id = wp_insert_post(
-			array(
-				'post_type'    => 'wp_block',
-				'post_status'  => 'publish' === $part->post_status ? 'publish' : 'draft',
-				'post_title'   => $part->post_title,
-				'post_content' => $part->post_content,
-				'post_excerpt' => $part->post_excerpt,
-				'post_author'  => $part->post_author,
-				'meta_input'   => array(
-					'wp_pattern_slug'               => gutenberg_get_template_part_pattern_name( $theme, $part->post_name ),
-					GUTENBERG_PATTERN_AREA_META_KEY => $area,
-				),
-			),
-			true
-		);
-		if ( is_wp_error( $copy_id ) ) {
-			continue;
-		}
-		wp_trash_post( $part->ID );
-	}
-	update_option( 'gutenberg_template_parts_migrated', 1 );
+	update_option( 'gutenberg_template_parts_migrated', GUTENBERG_TEMPLATE_PARTS_MIGRATION_VERSION );
 }
 add_action( 'init', 'gutenberg_migrate_template_parts_to_patterns', 13 );
 
 /**
- * Renders `core/template-part` blocks as `core/block` instances referencing
- * the part's pattern, so theme files and unconverted content keep working
- * without the template part block.
+ * Returns the user pattern standing in for a custom template part: the
+ * published `wp_block` post with the part's slug and an area, that is not the
+ * customization of a registered pattern.
+ *
+ * @param string $slug Template part slug.
+ * @return WP_Post|null The user pattern, or null.
+ */
+function gutenberg_get_user_template_part( $slug ) {
+	static $cache = array();
+	if ( ! array_key_exists( $slug, $cache ) ) {
+		$posts          = get_posts(
+			array(
+				'post_type'      => 'wp_block',
+				'post_status'    => 'publish',
+				'name'           => $slug,
+				'posts_per_page' => 1,
+				'no_found_rows'  => true,
+				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					array(
+						'key'     => GUTENBERG_PATTERN_AREA_META_KEY,
+						'compare' => 'EXISTS',
+					),
+					array(
+						'key'     => 'wp_pattern_slug',
+						'compare' => 'NOT EXISTS',
+					),
+				),
+			)
+		);
+		$cache[ $slug ] = $posts ? $posts[0] : null;
+	}
+	return $cache[ $slug ];
+}
+
+/**
+ * Returns the custom template parts (user patterns with an area) whose slug
+ * no registered part pattern takes, keyed by slug, for the block parser.
+ *
+ * @return array[] `{ id, area }` keyed by slug.
+ */
+function gutenberg_get_user_template_parts() {
+	$registry = WP_Block_Patterns_Registry::get_instance();
+	$parts    = array();
+	$posts    = get_posts(
+		array(
+			'post_type'      => 'wp_block',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'no_found_rows'  => true,
+			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				array(
+					'key'     => GUTENBERG_PATTERN_AREA_META_KEY,
+					'compare' => 'EXISTS',
+				),
+				array(
+					'key'     => 'wp_pattern_slug',
+					'compare' => 'NOT EXISTS',
+				),
+			),
+		)
+	);
+	foreach ( $posts as $post ) {
+		if ( $registry->is_registered( gutenberg_get_template_part_pattern_name( get_stylesheet(), $post->post_name ) ) ) {
+			continue;
+		}
+		$parts[ $post->post_name ] = array(
+			'id'   => $post->ID,
+			'area' => get_post_meta( $post->ID, GUTENBERG_PATTERN_AREA_META_KEY, true ),
+		);
+	}
+	return $parts;
+}
+
+/**
+ * Renders `core/template-part` blocks as `core/block` instances, so theme
+ * files and unconverted content keep working without the template part
+ * block: a registered part is referenced by its pattern name, a custom part
+ * by its user pattern's id.
  *
  * @param array $parsed_block The parsed block.
  * @return array The parsed block, remapped when it is a template part.
@@ -220,10 +401,23 @@ function gutenberg_map_template_part_block_to_pattern( $parsed_block ) {
 	if ( empty( $attrs['slug'] ) ) {
 		return $parsed_block;
 	}
-	$theme               = ! empty( $attrs['theme'] ) ? $attrs['theme'] : get_stylesheet();
-	$attrs['slug']       = gutenberg_get_template_part_pattern_name( $theme, $attrs['slug'] );
-	$attrs['hasWrapper'] = true;
+	// Parts are named after the active stylesheet, parent theme included.
+	$theme = ( ! empty( $attrs['theme'] ) && get_template() !== $attrs['theme'] ) ? $attrs['theme'] : get_stylesheet();
+	$name  = gutenberg_get_template_part_pattern_name( $theme, $attrs['slug'] );
 	unset( $attrs['theme'] );
+	$attrs['hasWrapper'] = true;
+
+	$user_part = WP_Block_Patterns_Registry::get_instance()->is_registered( $name ) ? null : gutenberg_get_user_template_part( $attrs['slug'] );
+	if ( $user_part ) {
+		unset( $attrs['slug'] );
+		$attrs['ref'] = $user_part->ID;
+		$area         = get_post_meta( $user_part->ID, GUTENBERG_PATTERN_AREA_META_KEY, true );
+		if ( $area && empty( $attrs['area'] ) ) {
+			$attrs['area'] = $area;
+		}
+	} else {
+		$attrs['slug'] = $name;
+	}
 
 	$parsed_block['blockName'] = 'core/block';
 	$parsed_block['attrs']     = $attrs;
@@ -278,16 +472,29 @@ function gutenberg_filter_template_part_hooked_block( $parsed_hooked_block, $hoo
 add_filter( 'hooked_block', 'gutenberg_filter_template_part_hooked_block', 10, 4 );
 
 /**
- * Tells the block parser that template parts are patterns here, and which
- * theme is active, so it can convert template part blocks to pattern
- * instances that reference `<theme>/part/<slug>`.
+ * Tells the block parser that template parts are patterns here, and what it
+ * needs to convert template part blocks to pattern instances: the active
+ * theme and its parent (parts are named `<stylesheet>/part/<slug>`), and the
+ * custom parts referenced by their user pattern's id.
+ *
+ * Attached to the `wp-blocks` script itself, so every context loading the
+ * parser converts.
+ *
+ * @param WP_Scripts $scripts The scripts registry.
  */
-function gutenberg_enable_template_parts_as_patterns_script() {
-	wp_add_inline_script(
+function gutenberg_enable_template_parts_as_patterns_script( $scripts ) {
+	if ( ! $scripts->query( 'wp-blocks', 'registered' ) ) {
+		return;
+	}
+	$data = array(
+		'stylesheet'  => get_stylesheet(),
+		'template'    => get_template(),
+		'customParts' => (object) gutenberg_get_user_template_parts(),
+	);
+	$scripts->add_inline_script(
 		'wp-blocks',
-		'window.__wpTemplatePartsAsPatterns = ' . wp_json_encode( array( 'stylesheet' => get_stylesheet() ) ) . ';',
+		'window.__wpTemplatePartsAsPatterns = ' . wp_json_encode( $data ) . ';',
 		'before'
 	);
 }
-add_action( 'admin_init', 'gutenberg_enable_template_parts_as_patterns_script' );
-add_action( 'site-editor-v2_init', 'gutenberg_enable_template_parts_as_patterns_script' );
+add_action( 'wp_default_scripts', 'gutenberg_enable_template_parts_as_patterns_script', 20 );

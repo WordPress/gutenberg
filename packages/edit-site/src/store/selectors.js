@@ -1,12 +1,9 @@
 import { store as coreDataStore } from '@wordpress/core-data';
-import { createRegistrySelector, createSelector } from '@wordpress/data';
+import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '@wordpress/editor';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { unlock } from '../lock-unlock';
-import { TEMPLATE_PART_POST_TYPE } from '../utils/constants';
-import getFilteredTemplatePartBlocks from '../utils/get-filtered-template-parts';
 
 /**
  * @typedef {'template'|'template_type'} TemplateType Template type.
@@ -249,48 +246,6 @@ export const isListViewOpened = createRegistrySelector( ( select ) => () => {
 export function isSaveViewOpened( state ) {
 	return state.saveViewPanel;
 }
-
-function getBlocksAndTemplateParts( select ) {
-	const templateParts = select( coreDataStore ).getEntityRecords(
-		'postType',
-		TEMPLATE_PART_POST_TYPE,
-		{ per_page: -1 }
-	);
-
-	const { getBlocksByName, getBlocksByClientId } = select( blockEditorStore );
-
-	const clientIds = getBlocksByName( 'core/template-part' );
-	const blocks = getBlocksByClientId( clientIds );
-	return [ blocks, templateParts ];
-}
-
-/**
- * Returns the template parts and their blocks for the current edited template.
- *
- * @deprecated
- * @param {Object} state Global application state.
- * @return {Array} Template parts and their blocks in an array.
- */
-export const getCurrentTemplateTemplateParts = createRegistrySelector(
-	( select ) =>
-		createSelector(
-			() => {
-				deprecated(
-					`select( 'core/edit-site' ).getCurrentTemplateTemplateParts()`,
-					{
-						since: '6.7',
-						version: '6.9',
-						alternative: `select( 'core/block-editor' ).getBlocksByName( 'core/template-part' )`,
-					}
-				);
-
-				return getFilteredTemplatePartBlocks(
-					...getBlocksAndTemplateParts( select )
-				);
-			},
-			() => getBlocksAndTemplateParts( select )
-		)
-);
 
 /**
  * Returns the current editing mode.

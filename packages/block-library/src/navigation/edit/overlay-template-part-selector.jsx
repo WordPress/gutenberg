@@ -137,10 +137,12 @@ export default function OverlayTemplatePartSelector( {
 		) {
 			return;
 		}
-		// A registered pattern is edited through its copy, created on first
-		// edit.
-		const copy = await customizePattern( selectedTemplatePart.pattern );
-		const params = { postId: copy.id, postType: 'wp_block' };
+		// A user pattern is edited as is; a registered pattern through its
+		// customization, created on first edit.
+		const postId = selectedTemplatePart.isUser
+			? selectedTemplatePart.id
+			: ( await customizePattern( selectedTemplatePart.pattern ) ).id;
+		const params = { postId, postType: 'wp_block' };
 		if ( overlayMenu === 'mobile' ) {
 			params.viewport = 'mobile';
 		}

@@ -418,6 +418,45 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 		} );
 
+		it( 'should open a user pattern overlay directly when edit button is clicked', async () => {
+			const user = userEvent.setup();
+
+			useOverlayPatterns.mockReturnValue( {
+				overlays: [
+					{
+						id: 77,
+						slug: 'custom-overlay',
+						title: { rendered: 'Custom Overlay' },
+						isUser: true,
+					},
+				],
+				isResolving: false,
+				hasResolved: true,
+			} );
+
+			render(
+				<OverlayTemplatePartSelector
+					{ ...defaultProps }
+					overlay="custom-overlay"
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', {
+					name: ( accessibleName ) =>
+						accessibleName.startsWith( 'Edit overlay' ),
+				} )
+			);
+
+			await waitFor( () =>
+				expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
+					postId: 77,
+					postType: 'wp_block',
+				} )
+			);
+			expect( mockCustomizePattern ).not.toHaveBeenCalled();
+		} );
+
 		it( 'should not navigate to focused overlay editor when button is disabled', async () => {
 			const user = userEvent.setup();
 
@@ -508,12 +547,11 @@ describe( 'OverlayTemplatePartSelector', () => {
 			const user = userEvent.setup();
 			const newOverlay = {
 				id: 45,
-				name: 'twentytwentyfive/part/overlay',
-				theme: 'twentytwentyfive',
 				slug: 'overlay',
 				title: {
 					rendered: 'Overlay',
 				},
+				isUser: true,
 			};
 
 			mockCreateOverlayTemplatePart.mockResolvedValue( newOverlay );

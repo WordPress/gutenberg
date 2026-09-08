@@ -2,72 +2,60 @@ import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { parse } from '@wordpress/blocks';
-import {
-	BlockPreview,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { BlockPreview } from '@wordpress/block-editor';
 import { store as patternsStore } from '@wordpress/patterns';
 import { unlock } from '../../lock-unlock';
-import { getOverlayPatternName } from './use-overlay-patterns';
+import useOverlayPatterns from './use-overlay-patterns';
+
+const EMPTY_OBJECT = {};
 
 /**
- * Component that displays a read-only visual preview of the selected overlay.
+ * Component that displays a read-only visual preview of the selected overlay:
+ * a user pattern, or a registered pattern of the overlay area through its
+ * customization when it has one.
  *
- * The overlay is a pattern of the `navigation-overlay` area: its edited copy
- * (a `wp_block` post) when there is one, else the registered pattern.
- *
- * @param {Object} props              Component props.
- * @param {string} props.overlay      The overlay slug.
- * @param {string} props.currentTheme The active theme's stylesheet.
+ * @param {Object} props         Component props.
+ * @param {string} props.overlay The overlay slug.
  * @return {React.JSX.Element} The overlay preview component or null if no overlay is selected.
  */
-export default function OverlayPreview( { overlay, currentTheme } ) {
-	const patternName = useMemo(
+export default function OverlayPreview( { overlay } ) {
+	const { overlays, hasResolved } = useOverlayPatterns();
+	const entry = useMemo(
 		() =>
-			overlay && currentTheme
-				? getOverlayPatternName( currentTheme, overlay )
-				: null,
-		[ currentTheme, overlay ]
+			overlay
+				? overlays.find( ( candidate ) => candidate.slug === overlay )
+				: undefined,
+		[ overlays, overlay ]
 	);
 
-	const { content, editedBlocks, hasResolved } = useSelect(
+	const { content, editedBlocks } = useSelect(
 		( select ) => {
-			if ( ! patternName ) {
-				return { content: null, editedBlocks: null, hasResolved: true };
+			if ( ! entry ) {
+				return EMPTY_OBJECT;
 			}
-			const copy = unlock(
-				select( patternsStore )
-			).getPatternCustomization( patternName );
-			if ( copy ) {
-				const editedRecord = select( coreStore ).getEditedEntityRecord(
+			const recordId = entry.isUser
+				? entry.id
+				: unlock( select( patternsStore ) ).getPatternCustomization(
+						entry.name
+				  )?.id;
+			if ( recordId ) {
+				const record = select( coreStore ).getEditedEntityRecord(
 					'postType',
 					'wp_block',
-					copy.id
+					recordId
 				);
 				return {
-					content: editedRecord?.content,
-					editedBlocks: editedRecord?.blocks,
-					hasResolved: true,
+					content: record?.content,
+					editedBlocks: record?.blocks,
 				};
 			}
-			const pattern = unlock(
-				select( blockEditorStore )
-			).getPatternBySlug( patternName );
-			return {
-				content: pattern?.content,
-				editedBlocks: null,
-				hasResolved:
-					!! pattern ||
-					select( coreStore ).hasFinishedResolution(
-						'getBlockPatterns'
-					),
-			};
+			return { content: entry.pattern?.content };
 		},
-		[ patternName ]
+		[ entry ]
 	);
 
 	const blocks = useMemo( () => {
-		if ( ! patternName ) {
+		if ( ! entry ) {
 			return null;
 		}
 		if ( editedBlocks && editedBlocks.length > 0 ) {
@@ -77,13 +65,13 @@ export default function OverlayPreview( { overlay, currentTheme } ) {
 			return parse( content );
 		}
 		return [];
-	}, [ patternName, editedBlocks, content ] );
+	}, [ entry, editedBlocks, content ] );
 
 	if ( ! overlay ) {
 		return null;
 	}
 
-	if ( ! hasResolved ) {
+	if ( ! entry && ! hasResolved ) {
 		return (
 			<div className="wp-block-navigation__overlay-preview-loading">
 				{ null }

@@ -7,7 +7,6 @@ import { unlock } from '../../lock-unlock';
 import {
 	ATTACHMENT_POST_TYPE,
 	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 	PATTERN_TYPES,
 } from '../../utils/constants';
@@ -17,7 +16,6 @@ const { useLocation } = unlock( routerPrivateApis );
 const postTypesWithoutParentTemplate = [
 	ATTACHMENT_POST_TYPE,
 	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 	PATTERN_TYPES.user,
 ];

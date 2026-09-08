@@ -4,7 +4,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { parse, serialize, createBlock } from '@wordpress/blocks';
-import { getUniqueTemplatePartTitle, getCleanTemplatePartSlug } from './utils';
+import { getUniqueTemplatePartTitle } from './utils';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 import { unlock } from '../../lock-unlock';
 
@@ -16,11 +16,7 @@ import { unlock } from '../../lock-unlock';
  *                                      The function returns a Promise that resolves to the created overlay.
  */
 export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
-	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
-	const stylesheet = useSelect(
-		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
-		[]
-	);
+	const { saveEntityRecord } = useDispatch( coreStore );
 	const pattern = useSelect(
 		( select ) =>
 			unlock( select( blockEditorStore ) ).getPatternBySlug(
@@ -39,7 +35,6 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 			__( 'Navigation Overlay' ),
 			templatePartsWithTitles
 		);
-		const cleanSlug = getCleanTemplatePartSlug( uniqueTitle );
 
 		let initialContent = '';
 
@@ -55,11 +50,9 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 		}
 
 		// Create the template part
-		// An overlay is the edited copy of a part pattern (`theme/part/slug`)
-		// in the overlay area; it is registered from the copy on the next
-		// request.
-		const name = `${ stylesheet }/part/${ cleanSlug }`;
-		const copy = await saveEntityRecord(
+		// An overlay is a user pattern filed under the overlay area; the
+		// Navigation block references it by its slug.
+		const overlayPattern = await saveEntityRecord(
 			'postType',
 			'wp_block',
 			{
@@ -67,27 +60,18 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 				content: initialContent,
 				status: 'publish',
 				meta: {
-					wp_pattern_slug: name,
 					wp_pattern_area: NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 				},
 			},
 			{ throwOnError: true }
 		);
-		invalidateResolution( 'getBlockPatterns' );
 		return {
-			id: copy.id,
-			slug: cleanSlug,
-			name,
-			theme: stylesheet,
+			id: overlayPattern.id,
+			slug: overlayPattern.slug,
 			title: { rendered: uniqueTitle },
+			isUser: true,
 		};
-	}, [
-		overlayTemplateParts,
-		saveEntityRecord,
-		invalidateResolution,
-		pattern,
-		stylesheet,
-	] );
+	}, [ overlayTemplateParts, saveEntityRecord, pattern ] );
 
 	return createOverlayTemplatePart;
 }

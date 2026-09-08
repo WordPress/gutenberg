@@ -159,4 +159,96 @@ class Template_Parts_As_Patterns_Test extends WP_UnitTestCase {
 			unregister_block_type( 'test/hooked-after-header' );
 		}
 	}
+
+	/**
+	 * The core test fixtures provide `block-theme` with a `small-header` part
+	 * and `block-theme-child` without parts of its own.
+	 *
+	 * @covers ::gutenberg_register_template_parts_as_patterns
+	 * @covers ::gutenberg_map_template_part_block_to_pattern
+	 */
+	public function test_child_theme_parts_register_under_the_child_stylesheet() {
+		$previous = get_stylesheet();
+		switch_theme( 'block-theme-child' );
+		$registry = WP_Block_Patterns_Registry::get_instance();
+		try {
+			gutenberg_register_template_parts_as_patterns();
+
+			$this->assertTrue( $registry->is_registered( 'block-theme-child/part/small-header' ), 'A part inherited from the parent theme registers under the child.' );
+			$this->assertFalse( $registry->is_registered( 'block-theme/part/small-header' ) );
+			$pattern = $registry->get_registered( 'block-theme-child/part/small-header' );
+			$this->assertSame( 'Small Header', $pattern['title'] );
+			$this->assertSame( 'header', $pattern['area'] );
+			$this->assertNotEmpty( $pattern['content'] );
+
+			// A reference to the parent theme resolves to the child's part.
+			$mapped = gutenberg_map_template_part_block_to_pattern(
+				array(
+					'blockName' => 'core/template-part',
+					'attrs'     => array(
+						'slug'  => 'small-header',
+						'theme' => 'block-theme',
+					),
+				)
+			);
+			$this->assertSame( 'block-theme-child/part/small-header', $mapped['attrs']['slug'] );
+			// Rendered as a pattern instance wrapped in the area's element.
+			$this->assertSame(
+				'<header class="wp-block-block">' . do_blocks( $pattern['content'] ) . '</header>',
+				do_blocks( '<!-- wp:template-part {"slug":"small-header"} /-->' )
+			);
+		} finally {
+			unregister_block_pattern( 'block-theme-child/part/small-header' );
+			switch_theme( $previous );
+		}
+	}
+
+	/**
+	 * @covers ::gutenberg_migrate_template_part_post
+	 * @covers ::gutenberg_map_template_part_block_to_pattern
+	 */
+	public function test_custom_part_migrates_to_a_user_pattern() {
+		$part_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_name'    => 'promo',
+				'post_title'   => 'Promo',
+				'post_content' => '<!-- wp:paragraph --><p>Promo content</p><!-- /wp:paragraph -->',
+			)
+		);
+		wp_set_post_terms( $part_id, array( get_stylesheet() ), 'wp_theme' );
+		wp_set_post_terms( $part_id, array( 'footer' ), 'wp_template_part_area' );
+
+		$copy_id = gutenberg_migrate_template_part_post( get_post( $part_id ) );
+
+		$this->assertIsInt( $copy_id );
+		$this->assertSame( 'trash', get_post_status( $part_id ) );
+		$copy = get_post( $copy_id );
+		$this->assertSame( 'wp_block', $copy->post_type );
+		$this->assertSame( 'promo', $copy->post_name );
+		$this->assertSame( '', get_post_meta( $copy_id, 'wp_pattern_slug', true ), 'A custom part is a user pattern, not a customization.' );
+		$this->assertSame( 'footer', get_post_meta( $copy_id, 'wp_pattern_area', true ) );
+		$this->assertContains( 'footer', wp_get_object_terms( $copy_id, 'wp_pattern_category', array( 'fields' => 'slugs' ) ) );
+
+		// Template part blocks reference it by id, with its area.
+		$mapped = gutenberg_map_template_part_block_to_pattern(
+			array(
+				'blockName' => 'core/template-part',
+				'attrs'     => array( 'slug' => 'promo' ),
+			)
+		);
+		$this->assertSame( 'core/block', $mapped['blockName'] );
+		$this->assertSame( $copy_id, $mapped['attrs']['ref'] );
+		$this->assertSame( 'footer', $mapped['attrs']['area'] );
+		$this->assertArrayNotHasKey( 'slug', $mapped['attrs'] );
+		$this->assertSame(
+			'<footer class="wp-block-block"><p class="wp-block-paragraph">Promo content</p></footer>',
+			do_blocks( '<!-- wp:template-part {"slug":"promo"} /-->' )
+		);
+		$this->assertArrayHasKey( 'promo', gutenberg_get_user_template_parts() );
+
+		wp_delete_post( $copy_id, true );
+		wp_delete_post( $part_id, true );
+	}
 }

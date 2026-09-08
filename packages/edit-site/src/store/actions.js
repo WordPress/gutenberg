@@ -7,11 +7,7 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	NAVIGATION_POST_TYPE,
-} from '../utils/constants';
+import { TEMPLATE_POST_TYPE, NAVIGATION_POST_TYPE } from '../utils/constants';
 import { unlock } from '../lock-unlock';
 
 const { interfaceStore } = unlock( editorPrivateApis );
@@ -131,26 +127,6 @@ export const removeTemplate =
 			template,
 		] );
 	};
-
-/**
- * Action that sets a template part.
- *
- * @deprecated
- * @param {string} templatePartId The template part ID.
- *
- * @return {Object} Action object.
- */
-export function setTemplatePart( templatePartId ) {
-	deprecated( "dispatch( 'core/edit-site' ).setTemplatePart", {
-		since: '6.8',
-	} );
-
-	return {
-		type: 'SET_EDITED_POST',
-		postType: TEMPLATE_PART_POST_TYPE,
-		id: templatePartId,
-	};
-}
 
 /**
  * Action that sets a navigation menu.

@@ -414,7 +414,8 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Gets the inner blocks for the navigation block from an overlay: a
 	 * pattern of the overlay area (`theme/part/slug`), rendered from its
-	 * edited copy when there is one, else from the registered pattern.
+	 * customization when there is one, else from the registered pattern, else
+	 * a user pattern of that area with the overlay's slug.
 	 *
 	 * @since 6.5.0
 	 *
@@ -465,6 +466,23 @@ class WP_Navigation_Block_Renderer {
 			$pattern = WP_Block_Patterns_Registry::get_instance()->get_registered( $pattern_name );
 			if ( $pattern ) {
 				$pattern_markup = $pattern['content'];
+			}
+		}
+		if ( null === $pattern_markup ) {
+			// A user pattern of the overlay area, referenced by its slug.
+			$user_overlays = get_posts(
+				array(
+					'post_type'      => 'wp_block',
+					'post_status'    => 'publish',
+					'name'           => $slug,
+					'posts_per_page' => 1,
+					'no_found_rows'  => true,
+					'meta_key'       => 'wp_pattern_area',
+					'meta_value'     => 'navigation-overlay',
+				)
+			);
+			if ( $user_overlays ) {
+				$pattern_markup = apply_block_hooks_to_content_from_post_object( $user_overlays[0]->post_content, $user_overlays[0] );
 			}
 		}
 		if ( null !== $pattern_markup ) {
