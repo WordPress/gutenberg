@@ -832,6 +832,14 @@ class WP_Navigation_Block_Renderer {
 			$responsive_container_content_directives = '
 				data-wp-watch="callbacks.focusFirstElement"
 			';
+
+			// The default overlay displays every submenu it contains; a custom overlay
+			// opts out through the `disable-default-overlay` class on this container.
+			// Submenus inherit this flag to tell the two apart, derived from the same
+			// value as that class so the markup and the styles cannot disagree.
+			if ( $has_custom_overlay ) {
+				$responsive_container_directives .= ' ' . wp_interactivity_data_wp_context( array( 'hasCustomOverlay' => true ) );
+			}
 		}
 
 		// Don't apply overlay inline styles if using a custom overlay template part.
@@ -920,7 +928,7 @@ class WP_Navigation_Block_Renderer {
 		$wrapper_attributes = get_block_wrapper_attributes( $extra_attributes );
 
 		if ( $is_responsive_menu ) {
-			$nav_element_directives = static::get_nav_element_directives( $is_interactive, ! empty( $attributes['overlay'] ) );
+			$nav_element_directives = static::get_nav_element_directives( $is_interactive );
 			$wrapper_attributes    .= ' ' . $nav_element_directives;
 		}
 
@@ -932,29 +940,24 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param bool $is_interactive     Whether the block is interactive.
-	 * @param bool $has_custom_overlay Whether the overlay is a custom overlay template part.
+	 * @param bool $is_interactive Whether the block is interactive.
 	 * @return string the directives for the navigation element.
 	 */
-	private static function get_nav_element_directives( $is_interactive, $has_custom_overlay = false ) {
+	private static function get_nav_element_directives( $is_interactive ) {
 		if ( ! $is_interactive ) {
 			return '';
 		}
 		// When adding to this array be mindful of security concerns.
-		$nav_element_context = wp_interactivity_data_wp_context(
+		$nav_element_context    = wp_interactivity_data_wp_context(
 			array(
-				'overlayOpenedBy'  => array(
+				'overlayOpenedBy' => array(
 					'click' => false,
 					'hover' => false,
 					'focus' => false,
 				),
-				'type'             => 'overlay',
-				'roleAttribute'    => '',
-				'ariaLabel'        => __( 'Menu' ),
-				// The default overlay displays every submenu it contains, whereas a
-				// custom overlay leaves submenus to their own visibility setting.
-				// Submenus inherit this so they know which of the two they are in.
-				'hasCustomOverlay' => $has_custom_overlay,
+				'type'            => 'overlay',
+				'roleAttribute'   => '',
+				'ariaLabel'       => __( 'Menu' ),
 			)
 		);
 		$nav_element_directives = '
