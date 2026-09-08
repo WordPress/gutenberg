@@ -10,7 +10,9 @@ vi.mock( import( '@wordpress/ui' ), async ( importOriginal ) => {
 		Tooltip: {
 			Root: ( { children } ) => <>{ children }</>,
 			Trigger: ( { render: trigger } ) => trigger,
-			Popup: ( { children } ) => <span role="tooltip">{ children }</span>,
+			Popup: ( { children } ) => (
+				<span role="tooltip">{ children }</span>
+			),
 		},
 	};
 } );
@@ -27,13 +29,16 @@ describe( 'StateControlBadges', () => {
 			/>
 		);
 
-		const badge = screen.getByText( 'Tablet' );
-		expect( badge ).toBeVisible();
-		// The explanation is also embedded in the badge, visually hidden, so
+		expect( screen.getByText( 'Tablet' ) ).toBeVisible();
+
+		// The explanation is rendered next to the badge, visually hidden, so
 		// screen reader users perceive it without relying on the tooltip.
-		expect( badge ).toHaveTextContent(
-			'Style changes apply to the Tablet viewport.'
-		);
+		expect(
+			screen.getAllByText(
+				'Style changes apply to the Tablet viewport.'
+			)
+		).toHaveLength( 2 );
+
 		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent(
 			'Style changes apply to the Tablet viewport.'
 		);
@@ -47,11 +52,12 @@ describe( 'StateControlBadges', () => {
 			/>
 		);
 
-		const badge = screen.getByText( 'Hover' );
-		expect( badge ).toBeVisible();
-		expect( badge ).toHaveTextContent(
-			'Style changes apply to the Hover state.'
-		);
+		expect( screen.getByText( 'Hover' ) ).toBeVisible();
+
+		expect(
+			screen.getAllByText( 'Style changes apply to the Hover state.' )
+		).toHaveLength( 2 );
+
 		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent(
 			'Style changes apply to the Hover state.'
 		);
