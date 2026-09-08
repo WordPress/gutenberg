@@ -85,3 +85,37 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
 
 	return alignments;
 }
+
+/**
+ * Splits the alignments a block supports into the ones the parent layout
+ * offers and the wide alignments it has taken away.
+ *
+ * A block whose only alignments are wide and full — Group is the common case —
+ * ends up with nothing offered at all in a layout that allows neither, and the
+ * control disappears rather than saying so. Reporting the two sets separately
+ * lets the menu render `None` alongside the alignments it cannot give.
+ *
+ * Flex and Grid parents place their children themselves and offer no alignments
+ * to anything, so there is no constraint worth explaining there and both sets
+ * come back empty.
+ *
+ * @param {string[]} controls Alignments the block supports.
+ *
+ * @return {{enabled: Object[], unavailable: string[]}} The split alignments.
+ */
+export function useAlignmentMenu( controls = DEFAULT_CONTROLS ) {
+	const enabled = useAvailableAlignments( controls );
+	const layoutOffersAlignments =
+		!! useAvailableAlignments( DEFAULT_CONTROLS ).length;
+
+	const enabledNames = enabled.map( ( { name } ) => name );
+	const unavailable = layoutOffersAlignments
+		? controls.filter(
+				( name ) =>
+					WIDE_CONTROLS.includes( name ) &&
+					! enabledNames.includes( name )
+		  )
+		: EMPTY_ARRAY;
+
+	return { enabled, unavailable };
+}
