@@ -57,5 +57,20 @@
 			}
 		}
 	},
+	"transforms": {
+		"from": [
+			{
+				"name": "from-raw",
+				"type": "raw",
+				"selector": "pre",
+				"priority": 20,
+				"schema": {
+					"pre": {
+						"children": "phrasing"
+					}
+				}
+			}
+		]
+	},
 	"style": "wp-block-preformatted"
 }

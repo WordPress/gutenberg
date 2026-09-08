@@ -74,6 +74,80 @@
 			"clientNavigation": true
 		}
 	},
+	"transforms": {
+		"from": [
+			{
+				"name": "from-raw",
+				"type": "raw",
+				"selector": "h1,h2,h3,h4,h5,h6",
+				"schema": {
+					"h1": {
+						"children": "phrasing",
+						"attributes": {
+							"default": [ "style", "id" ],
+							"paste": []
+						}
+					},
+					"h2": {
+						"children": "phrasing",
+						"attributes": {
+							"default": [ "style", "id" ],
+							"paste": []
+						}
+					},
+					"h3": {
+						"children": "phrasing",
+						"attributes": {
+							"default": [ "style", "id" ],
+							"paste": []
+						}
+					},
+					"h4": {
+						"children": "phrasing",
+						"attributes": {
+							"default": [ "style", "id" ],
+							"paste": []
+						}
+					},
+					"h5": {
+						"children": "phrasing",
+						"attributes": {
+							"default": [ "style", "id" ],
+							"paste": []
+						}
+					},
+					"h6": {
+						"children": "phrasing",
+						"attributes": {
+							"default": [ "style", "id" ],
+							"paste": []
+						}
+					}
+				},
+				"attributes": {
+					"style.typography.textAlign": {
+						"type": "string",
+						"source": "style",
+						"property": "text-align",
+						"enum": [ "left", "center", "right" ]
+					},
+					"level": {
+						"type": "number",
+						"source": "tag",
+						"selector": "h1,h2,h3,h4,h5,h6",
+						"map": {
+							"h1": 1,
+							"h2": 2,
+							"h3": 3,
+							"h4": 4,
+							"h5": 5,
+							"h6": 6
+						}
+					}
+				}
+			}
+		]
+	},
 	"editorStyle": "wp-block-heading-editor",
 	"style": "wp-block-heading"
 }

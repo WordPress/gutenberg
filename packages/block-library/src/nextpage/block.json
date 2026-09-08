@@ -18,5 +18,20 @@
 		},
 		"customCSS": false
 	},
+	"transforms": {
+		"from": [
+			{
+				"name": "from-raw",
+				"type": "raw",
+				"selector": "wp-block[data-block=\"core/nextpage\"]",
+				"schema": {
+					"wp-block": {
+						"attributes": [ "data-block" ]
+					}
+				},
+				"sourceAttributes": false
+			}
+		]
+	},
 	"editorStyle": "wp-block-nextpage-editor"
 }

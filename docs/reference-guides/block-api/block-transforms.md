@@ -2,6 +2,8 @@
 
 Block Transforms is the API that allows a block to be transformed _from_ and _to_ other blocks, as well as _from_ other entities. Existing entities that work with this API include shortcodes, files, regular expressions, and raw DOM nodes.
 
+`block`, `raw` and `shortcode` transforms that can be expressed as data may also be declared in a block's `block.json`, where both the editor and WordPress itself can read them — which is what lets the server convert markup and shortcodes into blocks outside the editor. See the [`transforms` property in the metadata documentation](/docs/reference-guides/block-api/block-metadata.md#transforms) for the declarative form; this page documents the JavaScript API, which remains the only way to write behavior a declaration cannot express, such as an `isMatch` predicate or a `transform` callback. A JavaScript transform registered under the same `name` as a declared one is merged over it.
+
 ## Transform direction: `to` and `from`
 
 A block declares which transformations it supports via the optional `transforms` key of the block configuration, whose subkeys `to` and `from` hold an array of available transforms for every direction. Example:

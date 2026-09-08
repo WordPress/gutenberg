@@ -44,5 +44,21 @@
 			"clientNavigation": true
 		}
 	},
+	"transforms": {
+		"from": [
+			{
+				"name": "from-archives",
+				"type": "block",
+				"blocks": [ "core/archives" ]
+			}
+		],
+		"to": [
+			{
+				"name": "to-archives",
+				"type": "block",
+				"blocks": [ "core/archives" ]
+			}
+		]
+	},
 	"style": "wp-block-calendar"
 }

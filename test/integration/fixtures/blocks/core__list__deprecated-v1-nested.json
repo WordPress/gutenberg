@@ -4,7 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"ordered": false,
-			"values": ""
+			"values": "",
+			"reversed": false
 		},
 		"innerBlocks": [
 			{
@@ -19,7 +20,8 @@
 						"isValid": true,
 						"attributes": {
 							"ordered": false,
-							"values": ""
+							"values": "",
+							"reversed": false
 						},
 						"innerBlocks": [
 							{
@@ -34,7 +36,8 @@
 										"isValid": true,
 										"attributes": {
 											"ordered": false,
-											"values": ""
+											"values": "",
+											"reversed": false
 										},
 										"innerBlocks": [
 											{
@@ -61,7 +64,8 @@
 										"isValid": true,
 										"attributes": {
 											"ordered": false,
-											"values": ""
+											"values": "",
+											"reversed": false
 										},
 										"innerBlocks": [
 											{
@@ -88,7 +92,8 @@
 										"isValid": true,
 										"attributes": {
 											"ordered": false,
-											"values": ""
+											"values": "",
+											"reversed": false
 										},
 										"innerBlocks": [
 											{

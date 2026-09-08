@@ -18,7 +18,7 @@ import { embedInstagramIcon } from '../icons';
 import variations from '../variations';
 import metadata from '../block.json';
 
-const { name: DEFAULT_EMBED_BLOCK, attributes } = metadata;
+const { name: DEFAULT_EMBED_BLOCK } = metadata;
 
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
@@ -27,13 +27,13 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 
 describe( 'utils', () => {
 	beforeAll( () => {
-		registerBlockType( DEFAULT_EMBED_BLOCK, {
-			apiVersion: 3,
-			title: 'Embed',
-			category: 'embed',
-			attributes,
-			variations,
-		} );
+		// Registered the way the block registers itself: the declared
+		// variations arrive from `block.json` and the JavaScript entries —
+		// icons and `isActive` — merge over them by name.
+		registerBlockType(
+			{ name: DEFAULT_EMBED_BLOCK, ...metadata },
+			{ variations }
+		);
 	} );
 
 	afterAll( () => {
@@ -192,13 +192,10 @@ describe( 'utils', () => {
 					} )
 				).toBeUndefined();
 
-				registerBlockType( DEFAULT_EMBED_BLOCK, {
-					apiVersion: 3,
-					title: 'Embed',
-					category: 'embed',
-					attributes,
-					variations,
-				} );
+				registerBlockType(
+					{ name: DEFAULT_EMBED_BLOCK, ...metadata },
+					{ variations }
+				);
 			} );
 
 			it( 'when block variation does not exist', () => {
@@ -212,10 +209,12 @@ describe( 'utils', () => {
 					} )
 				).toBeUndefined();
 
-				registerBlockVariation(
-					DEFAULT_EMBED_BLOCK,
-					variations.find( ( { name } ) => name === 'youtube' )
-				);
+				registerBlockVariation( DEFAULT_EMBED_BLOCK, {
+					...metadata.variations.find(
+						( { name } ) => name === 'youtube'
+					),
+					...variations.find( ( { name } ) => name === 'youtube' ),
+				} );
 			} );
 			it( 'when no url provided', () => {
 				expect(

@@ -29,7 +29,8 @@
 			"type": "number"
 		},
 		"reversed": {
-			"type": "boolean"
+			"type": "boolean",
+			"default": false
 		},
 		"placeholder": {
 			"type": "string"
@@ -84,6 +85,56 @@
 	},
 	"selectors": {
 		"border": ".wp-block-list:not(.wp-block-list .wp-block-list)"
+	},
+	"transforms": {
+		"from": [
+			{
+				"name": "from-raw",
+				"type": "raw",
+				"selector": "ol,ul",
+				"sourceAttributes": false,
+				"serverConversion": {
+					"requires": {
+						"ol": {
+							"attributes": [ "start", "reversed" ],
+							"children": {
+								"li": { "attributes": "*", "children": "*" }
+							}
+						},
+						"ul": {
+							"attributes": [],
+							"children": {
+								"li": { "attributes": "*", "children": "*" }
+							}
+						}
+					}
+				},
+				"innerBlocks": "li",
+				"attributes": {
+					"ordered": {
+						"type": "boolean",
+						"source": "tag",
+						"selector": "ol,ul",
+						"map": {
+							"ol": true,
+							"ul": false
+						}
+					},
+					"start": {
+						"type": "number",
+						"source": "attribute",
+						"selector": "ol",
+						"attribute": "start"
+					},
+					"reversed": {
+						"type": "boolean",
+						"source": "attribute",
+						"selector": "ol",
+						"attribute": "reversed"
+					}
+				}
+			}
+		]
 	},
 	"editorStyle": "wp-block-list-editor",
 	"style": "wp-block-list"

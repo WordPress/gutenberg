@@ -1,6 +1,5 @@
-import { createBlock, getBlockAttributes } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
-import { getLevelFromHeadingNodeName } from './shared';
 import { getTransformedAttributes } from '../utils/get-transformed-attributes';
 
 const transforms = {
@@ -49,49 +48,6 @@ const transforms = {
 						} ),
 					} );
 				} ),
-		},
-		{
-			type: 'raw',
-			selector: 'h1,h2,h3,h4,h5,h6',
-			schema: ( { phrasingContentSchema, isPaste } ) => {
-				const schema = {
-					children: phrasingContentSchema,
-					attributes: isPaste ? [] : [ 'style', 'id' ],
-				};
-				return {
-					h1: schema,
-					h2: schema,
-					h3: schema,
-					h4: schema,
-					h5: schema,
-					h6: schema,
-				};
-			},
-			transform( node ) {
-				const attributes = getBlockAttributes(
-					'core/heading',
-					node.outerHTML
-				);
-				const { textAlign } = node.style || {};
-
-				attributes.level = getLevelFromHeadingNodeName( node.nodeName );
-
-				if (
-					textAlign === 'left' ||
-					textAlign === 'center' ||
-					textAlign === 'right'
-				) {
-					attributes.style = {
-						...attributes.style,
-						typography: {
-							...attributes.style?.typography,
-							textAlign,
-						},
-					};
-				}
-
-				return createBlock( 'core/heading', attributes );
-			},
 		},
 		...[ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
 			type: 'prefix',

@@ -65,5 +65,21 @@
 				"style": true
 			}
 		}
+	},
+	"transforms": {
+		"from": [
+			{
+				"name": "from-categories",
+				"type": "block",
+				"blocks": [ "core/categories" ]
+			}
+		],
+		"to": [
+			{
+				"name": "to-categories",
+				"type": "block",
+				"blocks": [ "core/categories" ]
+			}
+		]
 	}
 }

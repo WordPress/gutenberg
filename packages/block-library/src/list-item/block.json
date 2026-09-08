@@ -66,5 +66,15 @@
 	"selectors": {
 		"root": ".wp-block-list > li",
 		"border": ".wp-block-list:not(.wp-block-list .wp-block-list) > li"
+	},
+	"transforms": {
+		"from": [
+			{
+				"name": "from-raw",
+				"type": "raw",
+				"selector": "ol > li, ul > li",
+				"innerBlocks": "ol,ul"
+			}
+		]
 	}
 }

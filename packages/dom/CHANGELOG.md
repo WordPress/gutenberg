@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `cleanNodeList`: A schema entry may declare `"attributes": "*"` to keep every attribute of the matched element ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+
 ## 4.54.0 (2026-08-26)
 
 ### Bug Fixes

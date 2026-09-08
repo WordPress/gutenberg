@@ -83,6 +83,33 @@
 			"textIndent": ".wp-block-paragraph + .wp-block-paragraph"
 		}
 	},
+	"transforms": {
+		"from": [
+			{
+				"name": "from-raw",
+				"type": "raw",
+				"selector": "p",
+				"priority": 20,
+				"attributes": {
+					"style.typography.textAlign": {
+						"type": "string",
+						"source": "style",
+						"property": "text-align",
+						"enum": [ "left", "center", "right" ]
+					}
+				},
+				"schema": {
+					"p": {
+						"children": "phrasing",
+						"attributes": {
+							"default": [ "style", "id" ],
+							"paste": []
+						}
+					}
+				}
+			}
+		]
+	},
 	"editorStyle": "wp-block-paragraph-editor",
 	"style": "wp-block-paragraph"
 }

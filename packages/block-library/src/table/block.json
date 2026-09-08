@@ -215,6 +215,16 @@
 		},
 		{ "name": "stripes", "label": "Stripes" }
 	],
+	"transforms": {
+		"from": [
+			{
+				"name": "from-raw",
+				"type": "raw",
+				"selector": "table",
+				"serverConversion": false
+			}
+		]
+	},
 	"editorStyle": "wp-block-table-editor",
 	"style": "wp-block-table"
 }

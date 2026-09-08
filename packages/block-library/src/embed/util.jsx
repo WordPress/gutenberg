@@ -29,12 +29,20 @@ export const getEmbedInfoByProvider = ( provider ) =>
 /**
  * Returns true if any of the regular expressions match the URL.
  *
+ * A pattern declared in `block.json` arrives as a string — a regular
+ * expression source without delimiters or flags, matched case-insensitively,
+ * the same way the server-side conversion compiles it.
+ *
  * @param {string} url      The URL to test.
  * @param {Array}  patterns The list of regular expressions to test against.
  * @return {boolean} True if any of the regular expressions match the URL.
  */
 export const matchesPatterns = ( url, patterns = [] ) =>
-	patterns.some( ( pattern ) => url.match( pattern ) );
+	patterns.some( ( pattern ) =>
+		url.match(
+			typeof pattern === 'string' ? new RegExp( pattern, 'i' ) : pattern
+		)
+	);
 
 /**
  * Finds the block variation that should be used for the URL,
