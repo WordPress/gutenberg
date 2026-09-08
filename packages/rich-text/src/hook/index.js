@@ -89,16 +89,12 @@ function useRichTextBase( {
 		recordRef.current.end = selectionEnd;
 	}
 
-	const hadSelectionUpdateRef = useRef( false );
-
 	if ( ! recordRef.current ) {
-		hadSelectionUpdateRef.current = isSelected;
 		setRecordFromProps();
 	} else if (
 		selectionStart !== recordRef.current.start ||
 		selectionEnd !== recordRef.current.end
 	) {
-		hadSelectionUpdateRef.current = isSelected;
 		recordRef.current = {
 			...recordRef.current,
 			start: selectionStart,
@@ -185,25 +181,51 @@ function useRichTextBase( {
 		}
 	}, [ value ] );
 
-	// Value updates must happen synchronously to avoid overwriting newer values.
+	/**
+	 * Whether the live selection is inside the element at the given offsets.
+	 * Positions are compared rather than DOM ranges: at a format boundary the
+	 * browser and the record place the same offset in different text nodes.
+	 *
+	 * @param {number} start Start offset.
+	 * @param {number} end   End offset.
+	 *
+	 * @return {boolean} Whether the live selection matches.
+	 */
+	function hasSelection( start, end ) {
+		const element = ref.current;
+		const selection = element.ownerDocument.defaultView.getSelection();
+
+		if ( ! selection.rangeCount ) {
+			return false;
+		}
+
+		const range = selection.getRangeAt( 0 );
+
+		if ( ! element.contains( range.commonAncestorContainer ) ) {
+			return false;
+		}
+
+		const record = create( {
+			element,
+			range,
+			__unstableIsEditableTree: true,
+		} );
+
+		return record.start === start && record.end === end;
+	}
+
+	// Apply the selection from props unless the element already holds it. A
+	// selection the element made itself is left alone: the live range keeps
+	// its direction and the side of a format boundary the caret sits on, which
+	// the record does not represent. Focus is not managed here; the caller
+	// decides which element should receive keys.
 	useLayoutEffect( () => {
-		if ( ! hadSelectionUpdateRef.current ) {
+		if ( ! isSelected || hasSelection( selectionStart, selectionEnd ) ) {
 			return;
 		}
 
-		// Do not steal focus from a focused editing host that contains the
-		// selection (the editable block editor canvas wrapper); the record
-		// can be applied while the host keeps focus.
-		if (
-			ref.current.ownerDocument.activeElement !== ref.current &&
-			! ownsSelection( ref.current )
-		) {
-			ref.current.focus();
-		}
-
 		applyRecord( recordRef.current );
-		hadSelectionUpdateRef.current = false;
-	}, [ hadSelectionUpdateRef.current ] );
+	}, [ selectionStart, selectionEnd, isSelected ] );
 
 	const mergedRefs = useMergeRefs( [
 		ref,

@@ -6,6 +6,10 @@
 
 -   Export the `RichTextFormat` type, describing a single format applied to a range of characters within a `RichTextValue` ([#79486](https://github.com/WordPress/gutenberg/pull/79486)).
 
+### Bug Fixes
+
+-   `useRichText`: apply every selection change from props, including the second of two consecutive ones. The hook no longer focuses the element when the selection changes; the caller decides which element receives focus.
+
 ## 7.54.0 (2026-08-26)
 
 ## 7.53.0 (2026-08-12)
