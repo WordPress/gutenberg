@@ -216,7 +216,7 @@ export function WorkflowMenu() {
 							render={
 								<Input
 									prefix={
-										<InputLayout.Slot>
+										<InputLayout.Slot padding="minimal">
 											<Icon
 												icon={ inputIcon }
 												style={
