@@ -181,6 +181,29 @@ describe( 'RectangleStencil', () => {
 			jest.useRealTimers();
 		} );
 
+		it( 'closes a pending keyboard resize when resizing becomes disabled', () => {
+			jest.useFakeTimers();
+			const { props, rerender, onResizeStart, onResizeEnd } =
+				renderStencil();
+			const eHandle = screen.getAllByRole( 'button' )[ 3 ];
+
+			fireEvent.keyDown( eHandle, { key: 'ArrowRight' } );
+			expect( onResizeStart ).toHaveBeenCalledTimes( 1 );
+			expect( onResizeEnd ).not.toHaveBeenCalled();
+
+			rerender( <RectangleStencil { ...props } isResizeDisabled /> );
+
+			// Closed straight away, not left to the settle timer.
+			expect( onResizeEnd ).toHaveBeenCalledTimes( 1 );
+
+			// And the cancelled timer must not fire a second one.
+			act( () => {
+				jest.advanceTimersByTime( 500 );
+			} );
+			expect( onResizeEnd ).toHaveBeenCalledTimes( 1 );
+			jest.useRealTimers();
+		} );
+
 		it( 'moves the right edge right by KEYBOARD_STEP on ArrowRight (no Shift)', () => {
 			const { onCropChange } = renderStencil();
 			// 'e' handle is the 4th button in clockwise order (nw, n, ne, e).

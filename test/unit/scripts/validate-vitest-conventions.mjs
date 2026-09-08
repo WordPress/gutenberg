@@ -17,6 +17,11 @@ import {
 	VITEST_PROJECT_NAMES,
 } from './discover-test-files.mjs';
 import { resolvePackageBin } from './resolve-package-bin.mjs';
+import { resolveTypeRoots } from './resolve-type-roots.mjs';
+import {
+	findVitestIsolationOptOuts,
+	validateRoutingScripts,
+} from './test-infrastructure-policy.mjs';
 import {
 	validateVitestPolicy,
 	validateVitestPolicyExceptions,
@@ -26,6 +31,7 @@ const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../../..'
 );
+const require = createRequire( import.meta.url );
 const migration = JSON.parse(
 	readFileSync(
 		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
@@ -126,6 +132,17 @@ violations.push(
 	} )
 );
 
+const rootPackageJson = JSON.parse(
+	readFileSync( path.join( ROOT_DIR, 'package.json' ), 'utf8' )
+);
+const unitTestPackageJson = JSON.parse(
+	readFileSync( path.join( ROOT_DIR, 'test/unit/package.json' ), 'utf8' )
+);
+violations.push(
+	...findVitestIsolationOptOuts( ROOT_DIR ),
+	...validateRoutingScripts( rootPackageJson, unitTestPackageJson )
+);
+
 const vitestVersions = new Map();
 for ( const file of vitestTests ) {
 	const packagePath = findWorkspacePackage( file );
@@ -173,34 +190,6 @@ const commonTypes = [
 	'react-css-custom-properties',
 	'style-imports',
 ];
-
-const require = createRequire( import.meta.url );
-
-/**
- * Resolve the directories holding the given `@types` packages.
- *
- * Non-hoisting installs keep them in the workspace that declares the
- * dependency, so the repository root is not a reliable type root.
- *
- * @param {string[]} typeNames Type package names, without the `@types/` scope.
- * @return {string[]} Absolute `@types` directories, without duplicates.
- */
-function resolveTypeRoots( typeNames ) {
-	const typeRoots = new Set();
-
-	for ( const typeName of typeNames ) {
-		try {
-			const packageJsonPath = require.resolve(
-				`@types/${ typeName }/package.json`
-			);
-			typeRoots.add( path.dirname( path.dirname( packageJsonPath ) ) );
-		} catch {
-			// Declared under `typings` rather than by a `@types` package.
-		}
-	}
-
-	return [ ...typeRoots ];
-}
 
 function importsNodeBuiltin( file ) {
 	const source =
@@ -291,7 +280,10 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 				typeRoots: [
 					path.join( ROOT_DIR, 'typings' ),
 					path.join( ROOT_DIR, 'test/unit/typings' ),
-					...resolveTypeRoots( [ ...commonTypes, 'node' ] ),
+					...resolveTypeRoots(
+						[ ...commonTypes, 'node' ],
+						( specifier ) => require.resolve( specifier )
+					),
 				],
 				types:
 					projectName === 'jsdom'

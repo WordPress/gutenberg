@@ -95,6 +95,7 @@
 		"@wordpress/patterns": "file:../patterns",
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/preferences": "file:../preferences",
+		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",

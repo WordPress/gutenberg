@@ -28,6 +28,7 @@ import DataViewsViewConfig, {
 import normalizeFields from '../field-types';
 import useData from '../hooks/use-data';
 import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
+import usePageClamp from '../hooks/use-page-clamp';
 import type { SupportedLayouts, DataViewsProps, ItemWithId } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
 
@@ -186,6 +187,13 @@ function DataViews< Item >( {
 		paginationInfo,
 		containerRef,
 		setVisibleEntries,
+	} );
+
+	usePageClamp( {
+		view,
+		onChangeView,
+		isLoading,
+		totalPages: paginationInfo.totalPages,
 	} );
 
 	useEffect( () => {

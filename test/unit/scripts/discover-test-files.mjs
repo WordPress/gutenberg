@@ -45,24 +45,19 @@ export function discoverTestFiles( rootDir ) {
 }
 
 export function getVitestTests( discoveredTests, manifest ) {
-	const nodeTests = discoveredTests.filter(
-		( testPath ) => getTestEnvironmentName( testPath ) === 'node'
-	);
-	const directoryTests = discoveredTests.filter( ( testPath ) =>
-		manifest.vitest.directories.some(
-			( directoryPath ) =>
-				testPath === directoryPath ||
-				testPath.startsWith( `${ directoryPath }/` )
-		)
-	);
+	const jestTests = new Set( manifest.jest.files );
 
-	return [
-		...new Set( [
-			...nodeTests,
-			...manifest.vitest.files,
-			...directoryTests,
-		] ),
-	].sort();
+	return discoveredTests
+		.filter( ( testPath ) => ! jestTests.has( testPath ) )
+		.sort();
+}
+
+export function findAddedLegacyJestTests( currentTests, baselineTests ) {
+	const baselineTestSet = new Set( baselineTests );
+
+	return currentTests
+		.filter( ( testPath ) => ! baselineTestSet.has( testPath ) )
+		.sort();
 }
 
 export function getTestEnvironmentName( testPath ) {

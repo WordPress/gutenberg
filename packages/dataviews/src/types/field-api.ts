@@ -350,8 +350,10 @@ export type Field< Item > = {
 
 	/**
 	 * Callback used to sort the field.
+	 *
+	 * Receives the field values of the two items being compared.
 	 */
-	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
+	sort?: ( a: any, b: any, direction: SortDirection ) => number;
 
 	/**
 	 * Validation config for the field.
@@ -575,8 +577,10 @@ export type NormalizedField< Item > = Omit<
 	/**
 	 * Callback used to sort the field. Defaults to the sorter
 	 * of the field's type.
+	 *
+	 * Receives the field valuesof the two items being compared.
 	 */
-	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
+	sort: ( a: any, b: any, direction: SortDirection ) => number;
 
 	/**
 	 * The validation rules of the field, normalized.
@@ -777,35 +781,6 @@ export type DataFormControlProps< Item > = {
 		 * (datetime control).
 		 */
 		compact?: boolean;
-		/**
-		 * CSS class name applied to the rich text control.
-		 * Rich text control options.
-		 */
-		className?: string;
-		/**
-		 * Client id of the block the rich text control belongs to.
-		 */
-		clientId?: string;
-		/**
-		 * The formats allowed in the rich text control.
-		 */
-		allowedFormats?: string[];
-		/**
-		 * Whether to disable all rich text formats.
-		 */
-		disableFormats?: boolean;
-		/**
-		 * Whether to disallow interactive formats (e.g. links).
-		 */
-		withoutInteractiveFormatting?: boolean;
-		/**
-		 * Whether to preserve white space in the rich text value.
-		 */
-		preserveWhiteSpace?: boolean;
-		/**
-		 * Whether to prevent line breaks in the rich text control.
-		 */
-		disableLineBreaks?: boolean;
 	};
 };
 
