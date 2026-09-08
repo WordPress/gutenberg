@@ -11,6 +11,7 @@
 
 ### Enhancements
 
+-   List each Global Styles change on its own line in the save confirmation panel, followed by badges for the style states it applies to (e.g. Default, Mobile, Tablet) ([#81027](https://github.com/WordPress/gutenberg/pull/81027)).
 -   Add `page_for_privacy_policy` to the `Settings` entity type, exposed by the Gutenberg plugin from the `wp_page_for_privacy_policy` option ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
 
 ### Bug Fixes
