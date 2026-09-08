@@ -149,9 +149,13 @@ const disabledStyles = ( { disabled }: InputProps ) => {
 		return '';
 	}
 
-	return css( {
-		color: COLORS.ui.textDisabled,
-	} );
+	return css`
+		color: ${ COLORS.ui.textDisabled };
+
+		@media ( forced-colors: active ) {
+			color: GrayText;
+		}
+	`;
 };
 
 export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
