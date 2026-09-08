@@ -86,27 +86,27 @@ cat "$PLAYGROUND_LOG"
 # does when its build exists.
 step "Loading the editor once"
 # Playground logs a browser in once, through a redirect, and remembers it in
-# a cookie. The hops within one request need the cookie, and so does every
-# request after the one that logged in, so they share a jar.
-COOKIES=$( mktemp )
-warm() {
-	# --keep-session-cookies: the login cookie has no expiry, and curl drops
-	# those from the jar without it, so only the first request was logged in.
-	curl -sL -c "$COOKIES" -b "$COOKIES" --keep-session-cookies \
-		--max-time 300 "$WP_BASE_URL/$1"
-}
-EDITOR_HTML=$( warm "wp-admin/post-new.php" )
-if ! grep -q "/build/scripts/rich-text/" <<< "$EDITOR_HTML"; then
+# a cookie with no expiry. One curl fetches every page, because cookies are
+# only kept between URLs of the same invocation: a second curl would start
+# without the login and be sent away from wp-admin.
+WARM=$( mktemp -d )
+CURL=( curl -sL -b "" --max-time 300 -o "$WARM/editor.html" "$WP_BASE_URL/wp-admin/post-new.php" )
+POSTS=$( grep -o "42424[0-9]" test/ios/blueprint.json | sort -u )
+for POST in $POSTS; do
+	CURL+=( -o "$WARM/$POST.html" "$WP_BASE_URL/wp-admin/post.php?post=${POST}&action=edit" )
+done
+"${CURL[@]}"
+
+if ! grep -q "/build/scripts/rich-text/" "$WARM/editor.html"; then
 	echo "The editor does not load this checkout's build. Run npm run build first."
 	exit 1
 fi
 
-# The pages the tests open, warmed here as well, so that the one-time work
-# of a fresh site does not count against a test's timeout. Not fatal: the
-# tests open these pages again and ask a second time if they do not come up,
-# and a warm-up that failed is not reason enough to give up the whole run.
-for POST in $( grep -o "42424[0-9]" test/ios/blueprint.json | sort -u ); do
-	if ! warm "wp-admin/post.php?post=${POST}&action=edit" | grep -q "wp:paragraph"; then
+# The seeded posts are warmed rather than checked: the tests open them again
+# and ask a second time if they do not come up, so a warm-up that missed is
+# not reason enough to give up the whole run.
+for POST in $POSTS; do
+	if ! grep -q "wp:paragraph" "$WARM/$POST.html"; then
 		echo "Warning: the editor did not serve seeded post ${POST}."
 	fi
 done
