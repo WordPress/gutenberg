@@ -4,7 +4,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # Calendar
 
-`Calendar` selects a **single date**. `RangeCalendar` selects a **date range**. Both share the same prop surface apart from the shape of `value` / `defaultValue` / `onValueChange`, and the range-only `min`, `max` and `excludeDisabled` props.
+`Calendar` selects a **single date**. `RangeCalendar` selects a **date range**. Both share the same prop surface apart from the shape of `value` / `defaultValue` / `onValueChange`, and the range-only `min`, `max`, `excludeDisabled`, and `resetOnSelect` props.
 
 Both are built for accessibility and follow ARIA best practices for calendar widgets: keyboard navigation, screen reader support, and customizable labels for internationalization.
 
@@ -64,6 +64,8 @@ const MyRangeCalendar = () => {
 ```
 
 Use `min` and `max` to constrain how many nights a range may span, and `excludeDisabled` to reset the range when a disabled day falls inside it.
+
+After a range is complete, selecting another date starts a new range. Set `resetOnSelect` to `false` to extend or shorten the completed range instead.
 
 ## Disabling Days
 

@@ -136,6 +136,7 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 			onValueChange,
 			numberOfMonths = 1,
 			excludeDisabled,
+			resetOnSelect = true,
 			min,
 			max,
 			disabled,
@@ -230,6 +231,7 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 					numberOfMonths={ clampNumberOfMonths( numberOfMonths ) }
 					disabled={ disabled }
 					excludeDisabled={ excludeDisabled }
+					resetOnSelect={ resetOnSelect }
 					min={ min }
 					max={ max }
 					labels={ labels }

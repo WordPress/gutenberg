@@ -360,6 +360,12 @@ export interface RangeProps {
 	 */
 	excludeDisabled?: boolean;
 	/**
+	 * When `true`, selecting a date starts a new range when there is no current
+	 * start date or when the current range is complete.
+	 * @default true
+	 */
+	resetOnSelect?: boolean;
+	/**
 	 * The minimum number of nights to include in the range.
 	 */
 	min?: number;
