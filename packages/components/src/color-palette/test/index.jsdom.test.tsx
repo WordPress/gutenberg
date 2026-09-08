@@ -5,7 +5,10 @@ import { useState } from '@wordpress/element';
 import ColorPalette from '..';
 import { colorEditingKey } from '../private-keys';
 
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	speak: vi.fn(),
+} ) );
 
 const withColorEditing = ( config: Record< string, unknown > ) => ( {
 	[ colorEditingKey ]: config,
@@ -559,7 +562,7 @@ describe( 'ColorPalette', () => {
 					colors={ MULTI_PALETTE }
 					value="#111111"
 					selectedSlug="custom-color-1"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 				/>
 			);
 
@@ -579,7 +582,7 @@ describe( 'ColorPalette', () => {
 					colors={ MULTI_PALETTE }
 					value="#111111"
 					selectedSlug="custom-color-1"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					{ ...withColorEditing( fullCustomEditing() ) }
 				/>
 			);
@@ -607,7 +610,7 @@ describe( 'ColorPalette', () => {
 					] }
 					value="#0073aa"
 					selectedSlug="brand"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					{ ...withColorEditing( fullCustomEditing() ) }
 				/>
 			);
@@ -625,7 +628,7 @@ describe( 'ColorPalette', () => {
 			render(
 				<ColorPalette
 					colors={ MULTI_PALETTE }
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					{ ...withColorEditing( fullCustomEditing() ) }
 				/>
 			);
@@ -648,7 +651,7 @@ describe( 'ColorPalette', () => {
 					colors={ MULTI_PALETTE }
 					value="#0073aa"
 					selectedSlug="brand"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					{ ...withColorEditing( fullCustomEditing() ) }
 				/>
 			);
@@ -670,7 +673,7 @@ describe( 'ColorPalette', () => {
 					colors={ MULTI_PALETTE }
 					value="#111111"
 					selectedSlug="custom-color-1"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					{ ...withColorEditing( fullCustomEditing() ) }
 				/>
 			);
@@ -689,13 +692,13 @@ describe( 'ColorPalette', () => {
 
 		it( 'cancels the edit form with the Escape key', async () => {
 			const user = userEvent.setup();
-			const onUpdateCustomColor = jest.fn();
+			const onUpdateCustomColor = vi.fn();
 			render(
 				<ColorPalette
 					colors={ MULTI_PALETTE }
 					value="#111111"
 					selectedSlug="custom-color-1"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					{ ...withColorEditing(
 						fullCustomEditing( {
 							onUpdate: onUpdateCustomColor,
@@ -726,8 +729,8 @@ describe( 'ColorPalette', () => {
 
 		it( 'asks for confirmation before deleting', async () => {
 			const user = userEvent.setup();
-			const onDeleteCustomColor = jest.fn();
-			const onChange = jest.fn();
+			const onDeleteCustomColor = vi.fn();
+			const onChange = vi.fn();
 			render(
 				<ColorPalette
 					colors={ MULTI_PALETTE }
@@ -766,8 +769,8 @@ describe( 'ColorPalette', () => {
 
 		it( 'shows an add-to-custom button for dirty values and routes it into the add form', async () => {
 			const user = userEvent.setup();
-			const onAddCustomColor = jest.fn();
-			const onChange = jest.fn();
+			const onAddCustomColor = vi.fn();
+			const onChange = vi.fn();
 			render(
 				<ColorPalette
 					colors={ MULTI_PALETTE }
@@ -820,8 +823,8 @@ describe( 'ColorPalette', () => {
 
 		it( 'uses a typed name when submitting the add form from a dirty value', async () => {
 			const user = userEvent.setup();
-			const onAddCustomColor = jest.fn();
-			const onChange = jest.fn();
+			const onAddCustomColor = vi.fn();
+			const onChange = vi.fn();
 			render(
 				<ColorPalette
 					colors={ MULTI_PALETTE }
@@ -862,7 +865,7 @@ describe( 'ColorPalette', () => {
 					colors={ MULTI_PALETTE }
 					value="#111111"
 					selectedSlug="custom-color-1"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					{ ...withColorEditing( fullCustomEditing() ) }
 				/>
 			);
@@ -874,14 +877,14 @@ describe( 'ColorPalette', () => {
 
 		it( 'keeps the edit form open and updates local preview visuals during drag', async () => {
 			const user = userEvent.setup();
-			const onUpdateCustomColor = jest.fn();
-			const onPreview = jest.fn();
+			const onUpdateCustomColor = vi.fn();
+			const onPreview = vi.fn();
 			render(
 				<ColorPalette
 					colors={ MULTI_PALETTE }
 					value="#111111"
 					selectedSlug="custom-color-1"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					{ ...withColorEditing(
 						fullCustomEditing( {
 							onUpdate: onUpdateCustomColor,
@@ -947,8 +950,8 @@ describe( 'ColorPalette', () => {
 
 		it( 'routes native picker changes to onPreview while editing a custom color', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
-			const onPreviewCustomColor = jest.fn();
+			const onChange = vi.fn();
+			const onPreviewCustomColor = vi.fn();
 			render(
 				<ColorPalette
 					colors={ MULTI_PALETTE }
@@ -957,7 +960,7 @@ describe( 'ColorPalette', () => {
 					onChange={ onChange }
 					{ ...withColorEditing(
 						fullCustomEditing( {
-							onUpdate: jest.fn(),
+							onUpdate: vi.fn(),
 							onPreview: onPreviewCustomColor,
 						} )
 					) }
@@ -998,10 +1001,10 @@ describe( 'ColorPalette', () => {
 					colors={ MULTI_PALETTE }
 					value="#0073aa"
 					selectedSlug="brand"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					{ ...withColorEditing( {
 						capabilities: { theme: 'value' },
-						onUpdate: jest.fn(),
+						onUpdate: vi.fn(),
 					} ) }
 				/>
 			);
@@ -1018,8 +1021,8 @@ describe( 'ColorPalette', () => {
 
 		it( 'renders the name as static text when editing a value-capability palette color', async () => {
 			const user = userEvent.setup();
-			const onUpdate = jest.fn();
-			const onChange = jest.fn();
+			const onUpdate = vi.fn();
+			const onChange = vi.fn();
 			render(
 				<ColorPalette
 					colors={ MULTI_PALETTE }
@@ -1088,10 +1091,10 @@ describe( 'ColorPalette', () => {
 					colors={ DEFAULT_PALETTE }
 					value="#000000"
 					selectedSlug="black"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					{ ...withColorEditing( {
 						capabilities: { custom: 'full' },
-						onAdd: jest.fn(),
+						onAdd: vi.fn(),
 					} ) }
 				/>
 			);
@@ -1111,10 +1114,10 @@ describe( 'ColorPalette', () => {
 				<ColorPalette
 					colors={ MULTI_PALETTE }
 					value="#ff00aa"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					{ ...withColorEditing( {
 						capabilities: { theme: 'value' },
-						onUpdate: jest.fn(),
+						onUpdate: vi.fn(),
 					} ) }
 				/>
 			);
