@@ -1,10 +1,8 @@
-import {
-	FormTokenField,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { __experimentalVStack as VStack } from '@wordpress/components';
+import { SearchableChipSelectControl } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useState, useEffect, Fragment } from '@wordpress/element';
+import { useState, useEffect, useMemo, Fragment } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { sprintf, __ } from '@wordpress/i18n';
@@ -13,33 +11,34 @@ import { useTaxonomies } from '../../utils';
 const EMPTY_ARRAY = [];
 const BASE_QUERY = {
 	order: 'asc',
+	orderby: 'name',
 	_fields: 'id,name',
 	context: 'view',
 };
 
-// Helper function to get the term id based on user input in terms `FormTokenField`.
-const getTermIdByTermValue = ( terms, termValue ) => {
-	// First we check for exact match by `term.id` or case sensitive `term.name` match.
-	const termId =
-		termValue?.id || terms?.find( ( term ) => term.name === termValue )?.id;
-	if ( termId ) {
-		return termId;
-	}
+/**
+ * How the limit for the browsable list of terms was chosen:
+ *  - Matches the `per_page` range set by the REST API.
+ *  - Mirrors the limit used by the post editor's flat term selector.
+ */
+const MAX_TERMS_TO_LIST = 100;
+const MAX_SEARCH_RESULTS = 20;
 
-	/**
-	 * Here we make an extra check for entered terms in a non case sensitive way,
-	 * to match user expectations, due to `FormTokenField` behaviour that shows
-	 * suggestions which are case insensitive.
-	 *
-	 * Although WP tries to discourage users to add terms with the same name (case insensitive),
-	 * it's still possible if you manually change the name, as long as the terms have different slugs.
-	 * In this edge case we always apply the first match from the terms list.
-	 */
-	const termValueLower = termValue.toLocaleLowerCase();
-	return terms?.find(
-		( term ) => term.name.toLocaleLowerCase() === termValueLower
-	)?.id;
-};
+/**
+ * Terms are listed and selected as `{ value, label }` items, where `value` is
+ * the stringified term id. Items come from different requests than the selected
+ * value, so they are never referentially equal and have to be matched by id.
+ *
+ * @param {{value: string}} item     An item from the list.
+ * @param {{value: string}} selected A currently selected item.
+ * @return {boolean} Whether both refer to the same term.
+ */
+const isItemEqualToValue = ( item, selected ) => item.value === selected.value;
+
+const termToItem = ( term ) => ( {
+	value: String( term.id ),
+	label: decodeEntities( term.name ),
+} );
 
 export function TaxonomyControls( { onChange, query } ) {
 	const { postType, taxQuery } = query;
@@ -114,7 +113,11 @@ export function TaxonomyControls( { onChange, query } ) {
 }
 
 /**
- * Renders a `FormTokenField` for a given taxonomy.
+ * Renders a `SearchableChipSelectControl` for a given taxonomy.
+ *
+ * The list of terms is browsable: opening the control lists the existing terms
+ * without requiring the user to remember and type their names. Typing narrows
+ * the list down through a server side search.
  *
  * @param {Object}   props                 The props for the component.
  * @param {Object}   props.taxonomy        The taxonomy object.
@@ -131,45 +134,52 @@ function TaxonomyItem( {
 	onChange,
 	label,
 } ) {
+	// The list of terms is only requested once the user opens the control, so
+	// that merely rendering the inspector does not fetch terms nobody browses.
+	// Once opened, it stays subscribed to avoid refetching on every reopen.
+	const [ hasOpened, setHasOpened ] = useState( false );
+	const [ inputValue, setInputValue ] = useState( '' );
 	const [ search, setSearch ] = useState( '' );
 	const [ value, setValue ] = useState( EMPTY_ARRAY );
-	const [ suggestions, setSuggestions ] = useState( EMPTY_ARRAY );
 	const debouncedSearch = useDebounce( setSearch, 250 );
-	const { searchResults, searchHasResolved } = useSelect(
+	const { listedTerms, listHasResolved } = useSelect(
 		( select ) => {
-			if ( ! search ) {
-				return { searchResults: EMPTY_ARRAY, searchHasResolved: true };
+			if ( ! hasOpened ) {
+				return { listedTerms: EMPTY_ARRAY, listHasResolved: false };
 			}
 			const { getEntityRecords, hasFinishedResolution } =
 				select( coreStore );
-
-			// Combine current terms and opposite terms for exclusion, to prevent
-			// users from selecting the same term in both include and exclude controls.
-			const combinedExclude = [ ...termIds, ...oppositeTermIds ];
 
 			const selectorArgs = [
 				'taxonomy',
 				taxonomy.slug,
 				{
 					...BASE_QUERY,
-					search,
-					orderby: 'name',
-					exclude: combinedExclude,
-					per_page: 20,
+					// Exclude the opposite control's terms, to prevent users
+					// from selecting the same term in both the include and the
+					// exclude control. The terms selected in this control stay
+					// listed, so that they can be deselected from the list and
+					// so that selecting one does not change the query, which
+					// would refetch the list mid-selection.
+					exclude: oppositeTermIds,
+					// Without a search, list the terms so they can be browsed.
+					...( search
+						? { search, per_page: MAX_SEARCH_RESULTS }
+						: { per_page: MAX_TERMS_TO_LIST } ),
 				},
 			];
 			return {
-				searchResults: getEntityRecords( ...selectorArgs ),
-				searchHasResolved: hasFinishedResolution(
+				listedTerms: getEntityRecords( ...selectorArgs ) || EMPTY_ARRAY,
+				listHasResolved: hasFinishedResolution(
 					'getEntityRecords',
 					selectorArgs
 				),
 			};
 		},
-		[ search, taxonomy.slug, termIds, oppositeTermIds ]
+		[ hasOpened, search, taxonomy.slug, oppositeTermIds ]
 	);
 	// `existingTerms` are the ones fetched from the API and their type is `{ id: number; name: string }`.
-	// They are used to extract the terms' names to populate the `FormTokenField` properly
+	// They are used to extract the terms' names to populate the control properly
 	// and to sanitize the provided `termIds`, by setting only the ones that exist.
 	const existingTerms = useSelect(
 		( select ) => {
@@ -199,43 +209,52 @@ function TaxonomyItem( {
 		const sanitizedValue = termIds.reduce( ( accumulator, id ) => {
 			const entity = existingTerms.find( ( term ) => term.id === id );
 			if ( entity ) {
-				accumulator.push( {
-					id,
-					value: entity.name,
-				} );
+				accumulator.push( termToItem( entity ) );
 			}
 			return accumulator;
 		}, [] );
 		setValue( sanitizedValue );
 	}, [ termIds, existingTerms ] );
-	// Update suggestions only when the query has resolved.
-	useEffect( () => {
-		if ( ! searchHasResolved ) {
-			return;
-		}
-		setSuggestions( searchResults.map( ( result ) => result.name ) );
-	}, [ searchResults, searchHasResolved ] );
-	const onTermsChange = ( newTermValues ) => {
-		const newTermIds = new Set();
-		for ( const termValue of newTermValues ) {
-			const termId = getTermIdByTermValue( searchResults, termValue );
-			if ( termId ) {
-				newTermIds.add( termId );
-			}
-		}
-		setSuggestions( EMPTY_ARRAY );
-		onChange( Array.from( newTermIds ) );
+	const items = useMemo(
+		() => listedTerms.map( termToItem ),
+		[ listedTerms ]
+	);
+	const onInputValueChange = ( nextInputValue ) => {
+		setInputValue( nextInputValue );
+		debouncedSearch( nextInputValue );
 	};
+	const onTermsChange = ( newValue ) => {
+		// Reset the search so that the full list is offered for the next
+		// selection, cancelling a search the debounce has not yet run.
+		debouncedSearch.cancel();
+		setInputValue( '' );
+		setSearch( '' );
+		onChange( newValue.map( ( item ) => Number( item.value ) ) );
+	};
+	// A request is pending either while the debounce has not caught up with what
+	// has been typed, or while the request it triggered is still resolving.
+	// Without this the control would claim there are no results before it has
+	// looked for any.
+	const isPending = inputValue !== search || ! listHasResolved;
 	return (
 		<div className="block-library-query-inspector__taxonomy-control">
-			<FormTokenField
+			<SearchableChipSelectControl
 				label={ label }
+				items={ items }
 				value={ value }
-				onInputChange={ debouncedSearch }
-				suggestions={ suggestions }
-				displayTransform={ decodeEntities }
-				onChange={ onTermsChange }
-				help=""
+				onValueChange={ onTermsChange }
+				inputValue={ inputValue }
+				onInputValueChange={ onInputValueChange }
+				onOpenChange={ ( isOpen ) => {
+					if ( isOpen ) {
+						setHasOpened( true );
+					}
+				} }
+				// Terms are searched server side, so opt out of the built-in
+				// client side filtering rather than filtering twice.
+				filter={ null }
+				isItemEqualToValue={ isItemEqualToValue }
+				emptyContent={ isPending ? __( 'Loading…' ) : undefined }
 			/>
 		</div>
 	);
