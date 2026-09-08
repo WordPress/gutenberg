@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Pass the Yjs module to sync provider creators as the `Y` property of the provider creator options. Providers should use it instead of the `window.wp.sync.Y` global, which will be removed in a future release ([#81736](https://github.com/WordPress/gutenberg/issues/81736)).
+
 ## 1.54.0 (2026-08-26)
 
 ### Internal
