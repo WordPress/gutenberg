@@ -180,7 +180,7 @@
 	},
 	"packages/block-editor/src/components/block-allowed-blocks/modal.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -641,9 +641,6 @@
 		}
 	},
 	"packages/block-editor/src/components/block-switcher/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -699,9 +696,6 @@
 		}
 	},
 	"packages/block-editor/src/components/block-toolbar/pattern-overrides-dropdown.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react-hooks/refs": {
 			"count": 1
 		},
@@ -1577,7 +1571,7 @@
 	},
 	"packages/block-editor/src/components/inspector-popover-header/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 5
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -2862,75 +2856,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/form-input/deprecated.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/form-input/edit.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react-hooks/refs": {
-			"count": 3
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/form-input/icons.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/form-input/save.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/form-submission-notification/edit.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/form-submission-notification/save.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/form-submit-button/edit.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/form-submit-button/save.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/form/deprecated.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/form/edit.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/form/icons.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/form/save.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/freeform/convert-to-blocks-button.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -3248,11 +3173,6 @@
 		}
 	},
 	"packages/block-library/src/navigation-link/icons.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/navigation-link/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -7375,11 +7295,6 @@
 			"count": 2
 		}
 	},
-	"packages/fields/src/fields/page-title/view.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/fields/src/fields/parent/parent-edit.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -7708,11 +7623,6 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/screen-revisions/revisions-buttons.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/screen-root.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 8
@@ -7889,22 +7799,7 @@
 			"count": 1
 		}
 	},
-	"packages/media-fields/src/alt_text/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/media-fields/src/author/view.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/media-fields/src/caption/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/media-fields/src/description/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -8022,21 +7917,6 @@
 	"packages/rich-text/src/hook/index.js": {
 		"react-hooks/refs": {
 			"count": 12
-		}
-	},
-	"packages/ui/src/alert-dialog/root.tsx": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
-	"packages/ui/src/utils/test/use-deprioritized-initial-focus.jsdom.test.tsx": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
-	"packages/ui/src/utils/use-schedule-validation.ts": {
-		"react-hooks/refs": {
-			"count": 1
 		}
 	},
 	"packages/viewport/src/test/if-viewport-matches.jsdom.test.jsx": {

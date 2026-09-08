@@ -34,7 +34,7 @@ When writing or migrating a test:
     exception is no longer needed.
 -   Before running Browser Mode tests locally for the first time, install
     Chromium with
-    `npm exec --workspace @wordpress/unit-tests -- playwright install chromium`.
+    `npm exec --no --workspace @wordpress/unit-tests -- playwright install chromium`.
 -   Do not use per-file Jest or Vitest environment overrides. The filename is
     the single source of truth.
 -   Run `npm test` for the complete lint and unit-test suite. For focused
@@ -50,3 +50,10 @@ also rejects Vitest isolation opt-outs and global Vitest APIs.
 
 `wpVitest` remains an explicit opt-in for jsdom suites that need hoist-safe
 helpers inside `vi.hoisted()`.
+
+Vitest clears mock call history, resets mock implementations, restores spies,
+resets stubbed globals and environment variables, and restores real timers
+between tests. Tests must configure required mock implementations in their own
+setup hooks. Mutable state held by an imported module is not reset
+automatically; reset it explicitly or use `vi.resetModules()` when a fresh
+module instance is required.

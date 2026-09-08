@@ -41,10 +41,10 @@ export default ( props ) => ( element ) => {
 		} else if ( onSplitAtEnd && start === end && end === text.length ) {
 			event.preventDefault();
 			onSplitAtEnd();
-		} else if ( onReplace && onSplit ) {
-			event.__deprecatedOnSplit = true;
 		} else if (
 			! supportsSplitting &&
+			// The deprecated onSplit is flagged on the beforeinput event.
+			! ( onReplace && onSplit ) &&
 			! disableLineBreaks &&
 			! event.defaultPrevented
 		) {
@@ -70,8 +70,22 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	function onDefaultKeyDown( event ) {
-		if ( event.defaultPrevented ) {
+	function onBeforeInput( event ) {
+		if ( event.inputType !== 'insertParagraph' ) {
+			return;
+		}
+		const { onReplace, onSplit } = props.current;
+		if ( onReplace && onSplit ) {
+			event.__deprecatedOnSplit = true;
+		}
+	}
+
+	function onDefaultBeforeInput( event ) {
+		if (
+			event.defaultPrevented ||
+			( event.inputType !== 'insertParagraph' &&
+				event.inputType !== 'insertLineBreak' )
+		) {
 			return;
 		}
 
@@ -82,12 +96,6 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		if ( event.keyCode !== ENTER ) {
-			return;
-		}
-
-		// On ENTER, we ALWAYS want to prevent the default browser behaviour
-		// at this last interception point.
 		event.preventDefault();
 	}
 
@@ -95,10 +103,10 @@ export default ( props ) => ( element ) => {
 
 	// Attach the listener to the window so parent elements have the chance to
 	// prevent the default behavior.
-	const unsubscribeDefaultKeyDown = subscribeDelegatedListener(
+	const unsubscribeDefaultBeforeInput = subscribeDelegatedListener(
 		defaultView,
-		'keydown',
-		onDefaultKeyDown
+		'beforeinput',
+		onDefaultBeforeInput
 	);
 	// Capture phase so this runs before ancestor (writing flow) bubble
 	// handlers, matching the timing of the previous raw element listener.
@@ -108,8 +116,15 @@ export default ( props ) => ( element ) => {
 		onKeyDown,
 		true
 	);
+	const unsubscribeBeforeInput = subscribeOwnedListener(
+		element,
+		'beforeinput',
+		onBeforeInput,
+		true
+	);
 	return () => {
-		unsubscribeDefaultKeyDown();
+		unsubscribeDefaultBeforeInput();
 		unsubscribeKeyDown();
+		unsubscribeBeforeInput();
 	};
 };
