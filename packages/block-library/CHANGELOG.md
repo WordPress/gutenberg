@@ -17,7 +17,7 @@
 -   Button: Only open the link popover from the toolbar button or keyboard shortcut instead of whenever a linked button is selected. The toolbar button now shows a pressed state when a link is set ([#30166](https://github.com/WordPress/gutenberg/pull/30166)).
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
 -   Image, Cover: Restore the previous attachment with snackbar Undo, including attachment-derived Image attributes while preserving Cover settings ([#81805](https://github.com/WordPress/gutenberg/pull/81805)).
--   Query: List the existing terms in the taxonomy filters, so categories and tags can be browsed and selected instead of recalled and typed. The controls now use `SearchableChipSelectControl` from `@wordpress/ui` ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   Query: List the existing terms in the taxonomy filters, so categories and tags can be browsed and selected instead of recalled and typed. The controls now use `SearchableChipSelectControl` from `@wordpress/ui` ([#82583](https://github.com/WordPress/gutenberg/pull/82583)).
 
 ### Bug Fixes
 
