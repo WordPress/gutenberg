@@ -50,7 +50,7 @@ jobs:
                   overwrite: true
 
     safari:
-        name: Safari on an iOS simulator
+        name: ${{ matrix.suite }} on an ${{ matrix.device }} simulator
         # Safari and the iOS keyboard only run on Apple hardware.
         runs-on: macos-15
         needs: build
@@ -58,6 +58,17 @@ jobs:
         if: ${{ !cancelled() && needs.build.result != 'skipped' }}
         permissions:
             contents: read
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    # The editor lays out by viewport width: a phone gets the
+                    # mobile editor, a tablet the desktop one. Each suite runs
+                    # on the device its behavior belongs to.
+                    - device: iPhone
+                      suite: AutoCapitalizationTests
+                    - device: iPad
+                      suite: CaretPlacementTests
 
         steps:
             - name: Fail if the build job failed
@@ -88,12 +99,14 @@ jobs:
                   xcodebuild -version
 
             - name: Run the tests
-              run: ./test/ios/run.sh
+              run: ./test/ios/run.sh -only-testing:SafariTests/${{ matrix.suite }}
+              env:
+                  SIMULATOR_DEVICE: ${{ matrix.device }}
 
             - name: Archive the test results
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               if: ${{ failure() }}
               with:
-                  name: ios-test-results
+                  name: ios-test-results-${{ matrix.device }}-${{ matrix.suite }}
                   path: test/ios/build/results.xcresult
                   if-no-files-found: ignore

@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Runs the Safari tests against the plugin in this checkout on an iOS
 # simulator. Needs macOS with Xcode, xcodegen and a built plugin
-# (npm run build). Set WP_PORT to serve WordPress on another port and
-# SIMULATOR_UDID to pick a device.
+# (npm run build). Set WP_PORT to serve WordPress on another port,
+# SIMULATOR_DEVICE to pick a device family and SIMULATOR_UDID to pick one
+# device. Arguments are passed on to xcodebuild, e.g.
+# -only-testing:SafariTests/CaretPlacementTests.
 set -euo pipefail
 
 # Steps print like the performance tests: elapsed time, then the step.
@@ -15,17 +17,25 @@ cd "$( dirname "$0" )/../.."
 PORT="${WP_PORT:-9400}"
 export WP_BASE_URL="http://127.0.0.1:${PORT}"
 
-# A booted iPhone if there is one, otherwise any available iPhone.
+# An iPhone unless asked otherwise. The editor lays out by viewport width,
+# so an iPad gets the desktop editor a tablet user sees and an iPhone the
+# mobile one.
+export SIMULATOR_DEVICE="${SIMULATOR_DEVICE:-iPhone}"
+
+# A booted matching device if there is one, otherwise any available one.
 UDID="${SIMULATOR_UDID:-$( xcrun simctl list devices available -j | python3 -c '
-import json, sys
+import json, os, sys
+wanted = os.environ[ "SIMULATOR_DEVICE" ]
 runtimes = json.load( sys.stdin )[ "devices" ]
-phones = [
+devices = [
 	device
-	for runtime, devices in runtimes.items() if ".iOS-" in runtime
-	for device in devices if device[ "name" ].startswith( "iPhone" )
+	for runtime, available in runtimes.items() if ".iOS-" in runtime
+	for device in available if device[ "name" ].startswith( wanted )
 ]
-booted = [ device for device in phones if device[ "state" ] == "Booted" ]
-print( ( booted or phones )[ -1 ][ "udid" ] )
+if not devices:
+	sys.exit( "No available %s simulator" % wanted )
+booted = [ device for device in devices if device[ "state" ] == "Booted" ]
+print( ( booted or devices )[ -1 ][ "udid" ] )
 ' )}"
 step "Booting simulator $UDID"
 # The boot goes on in the background while WordPress starts.

@@ -5,6 +5,10 @@
 		{
 			"step": "runPHP",
 			"code": "<?php require '/wordpress/wp-load.php'; update_user_meta( 1, 'wp_persisted_preferences', array( 'core/edit-post' => array( 'welcomeGuide' => false, 'fullscreenMode' => false ), '_modified' => gmdate( 'c' ) ) );"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require '/wordpress/wp-load.php'; wp_insert_post( array( 'import_id' => 424242, 'post_title' => 'Caret test', 'post_status' => 'draft', 'post_content' => \"<!-- wp:paragraph -->\\n<p>First paragraph.</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>Second paragraph.</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>Third paragraph.</p>\\n<!-- /wp:paragraph -->\" ) );"
 		}
 	]
 }
