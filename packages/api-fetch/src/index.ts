@@ -58,6 +58,21 @@ function registerMiddleware( middleware: APIFetchMiddleware ) {
 	middlewares.unshift( middleware );
 }
 
+/**
+ * Unregister a middleware
+ *
+ * @param middleware
+ * @return Whether the middleware was registered.
+ */
+function unregisterMiddleware( middleware: APIFetchMiddleware ) {
+	const index = middlewares.indexOf( middleware );
+	if ( index === -1 ) {
+		return false;
+	}
+	middlewares.splice( index, 1 );
+	return true;
+}
+
 function enablePreloadMultiUse() {
 	for ( const middleware of middlewares ) {
 		( middleware as any )[ PRELOADING_ENABLE_MULTI_USE ]?.();
@@ -151,11 +166,13 @@ export interface ApiFetch {
 	nonceEndpoint?: string;
 	nonceMiddleware?: ReturnType< typeof createNonceMiddleware >;
 	use: ( middleware: APIFetchMiddleware ) => void;
+	unregister: ( middleware: APIFetchMiddleware ) => boolean;
 	setFetchHandler: ( newFetchHandler: FetchHandler ) => void;
 	createNonceMiddleware: typeof createNonceMiddleware;
 	createPreloadingMiddleware: typeof createPreloadingMiddleware;
 	createRootURLMiddleware: typeof createRootURLMiddleware;
 	fetchAllMiddleware: typeof fetchAllMiddleware;
+	httpV1Middleware: typeof httpV1Middleware;
 	mediaUploadMiddleware: typeof mediaUploadMiddleware;
 	createThemePreviewMiddleware: typeof createThemePreviewMiddleware;
 	privateApis: object;
@@ -205,6 +222,7 @@ const apiFetch: ApiFetch = ( options ) => {
 };
 
 apiFetch.use = registerMiddleware;
+apiFetch.unregister = unregisterMiddleware;
 apiFetch.setFetchHandler = setFetchHandler;
 
 // Attached to the function (rather than a named export) because
@@ -222,6 +240,7 @@ apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
 apiFetch.fetchAllMiddleware = fetchAllMiddleware;
+apiFetch.httpV1Middleware = httpV1Middleware;
 apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
 apiFetch.createThemePreviewMiddleware = createThemePreviewMiddleware;
 

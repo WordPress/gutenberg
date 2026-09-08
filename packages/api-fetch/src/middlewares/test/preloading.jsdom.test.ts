@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import type { FetchHandler } from '../../types';
 import createPreloadingMiddleware, {
 	CLEAR,
@@ -50,7 +51,7 @@ describe( 'Preloading Middleware', () => {
 						method: 'GET',
 						path: 'wp/v2/posts',
 					};
-					const nextSpy = jest.fn();
+					const nextSpy = vi.fn();
 
 					preloadingMiddleware( requestOptions, nextSpy );
 					expect( nextSpy ).not.toHaveBeenCalled();
@@ -73,7 +74,7 @@ describe( 'Preloading Middleware', () => {
 						method: 'GET',
 						path: 'wp/v2/posts',
 					};
-					const nextSpy = jest.fn();
+					const nextSpy = vi.fn();
 
 					await expect(
 						preloadingMiddleware( requestOptions, nextSpy )
@@ -94,21 +95,7 @@ describe( 'Preloading Middleware', () => {
 			} );
 
 			describe( 'and the OPTIONS request has a parse flag', () => {
-				it( 'should return the full response if parse: false', () => {
-					const noResponseMock =
-						'undefined' === typeof window.Response;
-					if ( noResponseMock ) {
-						// @ts-expect-error The stub does not implement the full `Response` static side.
-						window.Response = class {
-							constructor( body, options ) {
-								// @ts-expect-error `body` is not a declared property on the stub.
-								this.body = JSON.parse( body );
-								// @ts-expect-error `headers` is not a declared property on the stub.
-								this.headers = options.headers;
-							}
-						};
-					}
-
+				it( 'should return the full response if parse: false', async () => {
 					const data = {
 						body: {
 							status: 'this is the preloaded response',
@@ -133,17 +120,18 @@ describe( 'Preloading Middleware', () => {
 						parse: false,
 					};
 
-					const response = preloadingMiddleware(
+					const response = await preloadingMiddleware(
 						requestOptions,
 						async () => {}
 					);
-					if ( noResponseMock ) {
-						// @ts-expect-error The operand of `delete` must be optional.
-						delete window.Response;
-					}
-					return response.then( ( value ) => {
-						expect( value ).toEqual( data );
-					} );
+
+					expect( response ).toBeInstanceOf( window.Response );
+					expect( response.headers.get( 'Allow' ) ).toBe(
+						'GET, POST'
+					);
+					await expect( response.json() ).resolves.toEqual(
+						data.body
+					);
 				} );
 
 				it( 'should return only the response body if parse: true', () => {
@@ -198,7 +186,7 @@ describe( 'Preloading Middleware', () => {
 					method: 'GET',
 					path: 'wp/v2/fake_resource',
 				};
-				const nextSpy = jest.fn();
+				const nextSpy = vi.fn();
 
 				preloadingMiddleware( requestOptions, nextSpy );
 				expect( nextSpy ).toHaveBeenCalled();
@@ -305,39 +293,18 @@ describe( 'Preloading Middleware', () => {
 			path: 'wp/v2/demo',
 		};
 
-		const firstMiddleware = jest.fn();
+		const firstMiddleware = vi.fn();
 		preloadingMiddleware( requestOptions, firstMiddleware );
 		expect( firstMiddleware ).not.toHaveBeenCalled();
 
 		await preloadingMiddleware( requestOptions, firstMiddleware );
 
-		const secondMiddleware = jest.fn();
+		const secondMiddleware = vi.fn();
 		await preloadingMiddleware( requestOptions, secondMiddleware );
 		expect( secondMiddleware ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should not throw an error when non-ASCII headers are present', async () => {
-		const noResponseMock = 'undefined' === typeof window.Response;
-		if ( noResponseMock ) {
-			window.Response = class {
-				constructor( body, options ) {
-					this.body = JSON.parse( body );
-					this.headers = options.headers;
-
-					// Check for non-ASCII characters in headers
-					for ( const [ key, value ] of Object.entries(
-						this.headers || {}
-					) ) {
-						if ( /[^\x00-\x7F]/.test( value ) ) {
-							throw new Error(
-								`Invalid non-ASCII character found in header: ${ key }`
-							);
-						}
-					}
-				}
-			};
-		}
-
 		const data = {
 			body: 'Hello',
 			headers: {
@@ -359,12 +326,8 @@ describe( 'Preloading Middleware', () => {
 		};
 
 		await expect(
-			preloadingMiddleware( requestOptions, () => {} )
+			preloadingMiddleware( requestOptions, async () => {} )
 		).resolves.not.toThrow();
-
-		if ( noResponseMock ) {
-			delete window.Response;
-		}
 	} );
 
 	describe.each( [ [ 'GET' ], [ 'OPTIONS' ] ] )( '%s', ( method ) => {
