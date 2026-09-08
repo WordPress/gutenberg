@@ -4,7 +4,6 @@ import {
 	useInnerBlocksProps,
 	BlockControls,
 	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { isRTL, __ } from '@wordpress/i18n';
 import { ToolbarButton } from '@wordpress/components';
@@ -15,11 +14,9 @@ import {
 	formatIndent,
 } from '@wordpress/icons';
 import { useMergeRefs } from '@wordpress/compose';
-import { flushSync } from '@wordpress/element';
 import { useSelect, useRegistry } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useEnter, useTab, useMultiSelectTab, useMerge } from './hooks';
-import { unlock } from '../lock-unlock';
 import {
 	indentListItems,
 	outdentListItems,
@@ -27,30 +24,8 @@ import {
 	getOutdentTarget,
 } from './utils';
 
-const { useBlockElement, focusSelectedField } = unlock(
-	blockEditorPrivateApis
-);
-
-/**
- * Runs a toolbar action that moves the item, then returns focus to the
- * item's text, the way format buttons return focus after they act. The item
- * re-mounts inside its new list, so it is looked up again after the update.
- *
- * @param {Object}   registry      Data registry.
- * @param {Function} action        Store action to run.
- * @param {Document} ownerDocument Document holding the item.
- */
-function actAndRefocus( registry, action, ownerDocument ) {
-	flushSync( action );
-	focusSelectedField(
-		ownerDocument,
-		registry.select( blockEditorStore ).getSelectionStart()
-	);
-}
-
 export function IndentUI( { clientId } ) {
 	const registry = useRegistry();
-	const blockElement = useBlockElement( clientId );
 	const { canIndent, canOutdent } = useSelect(
 		( select ) => {
 			const storeSelect = select( blockEditorStore );
@@ -70,13 +45,7 @@ export function IndentUI( { clientId } ) {
 				shortcut={ displayShortcut.shift( 'Tab' ) }
 				description={ __( 'Outdent list item' ) }
 				disabled={ ! canOutdent }
-				onClick={ () =>
-					actAndRefocus(
-						registry,
-						() => outdentListItems( registry ),
-						blockElement.ownerDocument
-					)
-				}
+				onClick={ () => outdentListItems( registry ) }
 			/>
 			<ToolbarButton
 				icon={ isRTL() ? formatIndentRTL : formatIndent }
@@ -84,13 +53,7 @@ export function IndentUI( { clientId } ) {
 				shortcut="Tab"
 				description={ __( 'Indent list item' ) }
 				disabled={ ! canIndent }
-				onClick={ () =>
-					actAndRefocus(
-						registry,
-						() => indentListItems( registry, clientId ),
-						blockElement.ownerDocument
-					)
-				}
+				onClick={ () => indentListItems( registry, clientId ) }
 			/>
 		</>
 	);
