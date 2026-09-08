@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Query: List the existing terms in the taxonomy filters, so categories and tags can be browsed and selected instead of recalled and typed. The controls now use `SearchableChipSelectControl` from `@wordpress/ui` ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ### Bug Fixes
 
 -   Image: Inject the lightbox trigger with a literal string replacement instead of `preg_replace`, so `$` and `\` sequences in author-controlled image attributes (such as a price in the alt text) are no longer interpreted as regex backreferences and silently removed ([#79369](https://github.com/WordPress/gutenberg/pull/79369)).
