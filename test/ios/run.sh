@@ -34,38 +34,33 @@ defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool false
 xcrun simctl boot "$UDID" 2>/dev/null || true
 # WordPress runs in Playground: PHP compiled to WebAssembly, no Docker.
 step "Starting WordPress"
+PLAYGROUND_LOG=$( mktemp )
 npx --yes @wp-playground/cli@3.1.53 server \
 	--auto-mount="$PWD" \
 	--blueprint=test/ios/blueprint.json \
-	--port "$PORT" &
+	--port "$PORT" > "$PLAYGROUND_LOG" 2>&1 &
 PLAYGROUND_PID=$!
 trap 'kill "$PLAYGROUND_PID" 2>/dev/null || true' EXIT
-
-for _ in $( seq 1 180 ); do
-	if curl -sf -o /dev/null "$WP_BASE_URL/"; then
-		break
-	fi
+# Playground prints "Ready!" once it listens and the blueprint has run; the
+# server answers earlier, before the plugin is active.
+until grep -q "Ready!" "$PLAYGROUND_LOG"; do
+	kill -0 "$PLAYGROUND_PID" 2>/dev/null || { cat "$PLAYGROUND_LOG"; echo "WordPress did not start"; exit 1; }
 	sleep 1
 done
-curl -sf -o /dev/null "$WP_BASE_URL/" || { echo "WordPress did not start"; exit 1; }
+cat "$PLAYGROUND_LOG"
+
 # Warm up: the first request to the editor does the one-time work of a
-# fresh site, which would otherwise count against the test's timeout.
+# fresh site, which would otherwise count against the test's timeout. It
+# also shows whether the plugin replaces core's bundles, which it only
+# does when its build exists.
 step "Loading the editor once"
-# The plugin only replaces core's bundles when its build exists. The first
-# requests may still be served while the plugin is being activated.
-for attempt in $( seq 1 10 ); do
-	COOKIES=$( mktemp )
-	EDITOR_HTML=$( curl -sL -b "$COOKIES" -c "$COOKIES" "$WP_BASE_URL/wp-admin/post-new.php" )
-	rm -f "$COOKIES"
-	if grep -q "/build/scripts/rich-text/" <<< "$EDITOR_HTML"; then
-		break
-	fi
-	if [ "$attempt" = 10 ]; then
-		echo "The editor does not load this checkout's build. Run npm run build first."
-		exit 1
-	fi
-	sleep 3
-done
+COOKIES=$( mktemp )
+EDITOR_HTML=$( curl -sL -b "$COOKIES" -c "$COOKIES" "$WP_BASE_URL/wp-admin/post-new.php" )
+rm -f "$COOKIES"
+if ! grep -q "/build/scripts/rich-text/" <<< "$EDITOR_HTML"; then
+	echo "The editor does not load this checkout's build. Run npm run build first."
+	exit 1
+fi
 
 step "Waiting for the simulator"
 xcrun simctl bootstatus "$UDID" -b
