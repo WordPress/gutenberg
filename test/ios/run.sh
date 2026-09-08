@@ -5,8 +5,9 @@
 # SIMULATOR_UDID to pick a device.
 set -euo pipefail
 
+# Steps print like the performance tests: elapsed time, then the step.
 step() {
-	echo "[$( date +%H:%M:%S )] $*"
+	printf '\n[%02d:%02d] ▶ %s\n' $(( SECONDS / 60 )) $(( SECONDS % 60 )) "$*"
 }
 
 cd "$( dirname "$0" )/../.."
