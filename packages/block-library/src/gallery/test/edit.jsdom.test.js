@@ -203,8 +203,6 @@ describe( 'Gallery block', () => {
 
 			// The ratio is rendered from the Gallery's own responsive CSS for
 			// the viewport, so the images keep their base inline style.
-			// toHaveStyle() requires a *.browser.test.* filename, so the
-			// inline style is checked directly instead.
 			screen.getAllByRole( 'img' ).forEach( ( image ) => {
 				// eslint-disable-next-line jest-dom/prefer-to-have-style -- toHaveStyle() is disallowed in jsdom tests.
 				expect( image.style.aspectRatio ).not.toBe( '16/9' );
