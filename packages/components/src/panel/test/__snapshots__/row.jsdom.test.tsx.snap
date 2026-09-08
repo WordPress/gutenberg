@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PanelRow > should render with the custom class name 1`] = `
+<div>
+  <div
+    class="components-panel__row custom"
+  />
+</div>
+`;
+
+exports[`PanelRow > should render with the default class name 1`] = `
+<div>
+  <div
+    class="components-panel__row"
+  />
+</div>
+`;

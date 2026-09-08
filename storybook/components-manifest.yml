@@ -114,6 +114,7 @@
             - positioner
             - render
             - style
+            - width
       - name: Autocomplete.Portal
         props:
             - className
@@ -139,6 +140,12 @@
             - sticky
             - style
       - name: Autocomplete.Row
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Status
         props:
             - children
             - className
@@ -217,6 +224,7 @@
       - onValueChange
       - render
       - required
+      - role
       - showOutsideDays
       - startMonth
       - style
@@ -335,7 +343,6 @@
       - aria-label
       - aria-labelledby
       - as
-      - asButtons
       - clearable
       - colors
       - disableCustomColors
@@ -343,6 +350,7 @@
       - headingLevel
       - loop
       - onChange
+      - presentation
       - selectedSlug
       - value
 - name: ColorPicker
@@ -617,6 +625,13 @@
             - render
             - style
             - variant
+      - name: Field.VisualLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+            - variant
 - name: Fieldset.Root
   props:
       - children
@@ -694,7 +709,6 @@
       - __nextHasNoMargin
       - aria-label
       - aria-labelledby
-      - asButtons
       - className
       - clearable
       - disableCustomGradients
@@ -703,6 +717,7 @@
       - headingLevel
       - loop
       - onChange
+      - presentation
       - selectedSlug
       - value
 - name: Icon
@@ -777,6 +792,7 @@
       - openInNewTab
       - render
       - style
+      - target
       - tone
       - variant
 - name: MenuGroup
@@ -968,6 +984,7 @@
       - onValueChange
       - render
       - required
+      - role
       - showOutsideDays
       - startMonth
       - style
@@ -1100,6 +1117,7 @@
       - onValueChange
       - open
       - openOnInputClick
+      - popupWidth
       - readOnly
       - ref
       - required
@@ -1191,6 +1209,7 @@
       - onValueChange
       - open
       - openOnInputClick
+      - popupWidth
       - readOnly
       - ref
       - required
@@ -1422,11 +1441,13 @@
   subcomponents:
       - name: ToggleGroupControlOption
         props:
+            - disabled
             - label
             - showTooltip
             - value
       - name: ToggleGroupControlOptionIcon
         props:
+            - disabled
             - icon
             - label
             - value
@@ -1477,6 +1498,10 @@
         props:
             - children
             - className
+            - closeDelay
+            - closeOnClick
+            - delay
+            - disabled
             - render
             - style
 - name: TreeGrid

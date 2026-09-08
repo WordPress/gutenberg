@@ -71,8 +71,6 @@ export const COMMON_PROPS = {
 	hideNavigation: false,
 	// Class names
 	classNames: CLASSNAMES,
-	// Default role
-	role: 'application',
 	components: {
 		Day,
 		Root,

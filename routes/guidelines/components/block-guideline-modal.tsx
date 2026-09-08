@@ -23,6 +23,7 @@ interface BlockGuidelineModalProps {
 	contentBlocks: ContentBlock[];
 	bySlug: Record< string, GuidelineRow >;
 	query: GuidelineQuery;
+	onRemoved?: () => void;
 }
 
 export default function BlockGuidelineModal( {
@@ -31,6 +32,7 @@ export default function BlockGuidelineModal( {
 	contentBlocks,
 	bySlug,
 	query,
+	onRemoved,
 }: BlockGuidelineModalProps ) {
 	const [ selectedBlock, setSelectedBlock ] = useState< string | undefined >(
 		initialBlock
@@ -101,10 +103,13 @@ export default function BlockGuidelineModal( {
 				setError( null );
 				createSuccessNotice(
 					value
-						? __( 'Guidelines saved.' )
-						: __( 'Guidelines removed.' ),
+						? __( 'Guideline saved.' )
+						: __( 'Guideline removed.' ),
 					{ type: 'snackbar' }
 				);
+				if ( ! value && existingId ) {
+					onRemoved?.();
+				}
 				closeModal();
 			} )
 			.catch( ( e: Error ) => setError( e.message ) )
@@ -113,7 +118,7 @@ export default function BlockGuidelineModal( {
 
 	const canSubmit = selectedBlock && guidelineText.trim().length > 0;
 
-	let submitButtonLabel: string = __( 'Save guidelines' );
+	let submitButtonLabel: string = __( 'Save' );
 	if ( isSaving ) {
 		submitButtonLabel = __( 'Saving…' );
 	}
@@ -121,9 +126,7 @@ export default function BlockGuidelineModal( {
 	return (
 		<Modal
 			className="block-guideline-modal"
-			title={
-				isEditing ? __( 'Edit guidelines' ) : __( 'Add guidelines' )
-			}
+			title={ isEditing ? __( 'Edit guideline' ) : __( 'Add guideline' ) }
 			onRequestClose={ closeModal }
 		>
 			<VStack spacing={ 4 }>
@@ -195,7 +198,7 @@ export default function BlockGuidelineModal( {
 			</VStack>
 			<ConfirmDialog
 				isOpen={ showRemoveConfirmation }
-				title={ __( 'Remove block guidelines' ) }
+				title={ __( 'Remove block guideline' ) }
 				__experimentalHideHeader={ false }
 				onConfirm={ () => {
 					handleSave( '' );
@@ -209,7 +212,7 @@ export default function BlockGuidelineModal( {
 				{ sprintf(
 					/* translators: %s: Block name. */
 					__(
-						'You are about to remove the block guidelines for the %s block.'
+						'You are about to remove the block guideline for the %s block.'
 					),
 					selectedBlockLabel
 				) }

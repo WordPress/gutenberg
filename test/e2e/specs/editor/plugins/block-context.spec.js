@@ -65,7 +65,7 @@ test.describe( 'Block context', () => {
 			} )
 			.click();
 		await editorPage
-			.getByRole( 'menuitem', { name: 'Preview in new tab' } )
+			.getByRole( 'menuitem', { name: 'Preview (opens in a new tab)' } )
 			.click();
 
 		// Check non-default context values are populated.

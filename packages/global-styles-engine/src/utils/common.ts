@@ -469,10 +469,18 @@ export function getResolvedValue(
 		'url' in resolvedValue &&
 		resolvedValue?.url
 	) {
-		resolvedValue.url = getResolvedThemeFilePath(
-			resolvedValue.url,
-			tree?._links?.[ 'wp:theme-file' ]
-		);
+		/*
+		 * Copy rather than write in place: `resolvedValue` is the caller's
+		 * own object or, when a `ref` was just resolved, the tree's — which
+		 * aliases the user or theme config.
+		 */
+		return {
+			...resolvedValue,
+			url: getResolvedThemeFilePath(
+				resolvedValue.url,
+				tree?._links?.[ 'wp:theme-file' ]
+			),
+		};
 	}
 
 	return resolvedValue;

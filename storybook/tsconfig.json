@@ -8,5 +8,8 @@
 		"types": [ "jest" ]
 	},
 	"include": [ "**/*.tsx", "**/*.ts", "**/*.mjs" ],
-	"exclude": [ "scripts/inject-legacy-docgen.mjs" ]
+	"exclude": [
+		"scripts/inject-legacy-docgen.mjs",
+		"scripts/sanitize-components-manifest.mjs"
+	]
 }

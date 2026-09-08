@@ -7,7 +7,7 @@
  * @since 6.9.0
  *
  * @param array{ openByDefault: bool } $attributes The block attributes.
- * @param string                        $content   The block content.
+ * @param string                       $content    The block content.
  * @return string Returns the updated markup.
  */
 function block_core_accordion_item_render( array $attributes, string $content ): string {

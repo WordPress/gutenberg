@@ -2,7 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "jest", "gutenberg-env", "gutenberg-test-env" ]
+		"types": [ "gutenberg-env", "gutenberg-vitest-test-env" ]
 	},
 	"files": [ "global.d.ts" ],
 	"references": [
@@ -12,11 +12,9 @@
 		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../dataviews/tsconfig.build.json" },
-		{ "path": "../date" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../primitives" },
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url" }
 	]

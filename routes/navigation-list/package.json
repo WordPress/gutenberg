@@ -15,12 +15,11 @@
 		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/editor": "file:../../packages/editor",
 		"@wordpress/element": "file:../../packages/element",
-		"@wordpress/html-entities": "file:../../packages/html-entities",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
-		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/notices": "file:../../packages/notices",
 		"@wordpress/route": "file:../../packages/route",
+		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/views": "file:../../packages/views"
 	}
 }

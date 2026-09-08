@@ -168,7 +168,9 @@ function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
  * plus optional `download` / `openInNewTab` / `icon` / `relevance`. Drops
  * incomplete or unsafe entries; dropped hrefs are reported through
  * `_doing_it_wrong()`. With `$dir_name`, resolves widget-local file hrefs
- * first. A malformed `icon` or `relevance` drops the key, never the action.
+ * first. A malformed `icon` or `relevance` drops the key, never the action;
+ * a `download` filename that sanitizes to nothing becomes `true`, the
+ * download under its original name.
  *
  * This is the registration gate for manifest-sourced widget types. Definitions
  * registered only on the client do not pass through it; any future CPT/API
@@ -224,10 +226,12 @@ function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
 			if ( is_bool( $action['download'] ) ) {
 				$entry['download'] = $action['download'];
 			} else {
-				$filename = sanitize_file_name( (string) $action['download'] );
-				if ( $filename ) {
-					$entry['download'] = $filename;
-				}
+				/*
+				 * A filename that sanitizes to nothing keeps the download
+				 * under the original name; only `false` means navigation.
+				 */
+				$filename          = sanitize_file_name( (string) $action['download'] );
+				$entry['download'] = '' !== $filename ? $filename : true;
 			}
 		}
 

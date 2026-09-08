@@ -5,8 +5,5 @@
 		"noImplicitAny": false,
 		"strictNullChecks": false
 	},
-	"references": [
-		{ "path": "../deprecated/tsconfig.build.json" },
-		{ "path": "../escape-html/tsconfig.build.json" }
-	]
+	"references": [ { "path": "../escape-html/tsconfig.build.json" } ]
 }

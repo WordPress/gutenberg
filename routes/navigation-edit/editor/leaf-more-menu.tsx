@@ -12,12 +12,11 @@ const POPOVER_PROPS = {
 };
 
 export default function LeafMoreMenu( {
-	block,
+	clientId,
 	...props
 }: {
-	block: { clientId: string; name: string };
+	clientId: string;
 } ) {
-	const { clientId } = block;
 	const {
 		moveBlocksDown,
 		moveBlocksUp,
@@ -38,6 +37,7 @@ export default function LeafMoreMenu( {
 			( select ) => {
 				const {
 					getBlockRootClientId,
+					getBlockName,
 					canInsertBlockType,
 					getDirectInsertBlock,
 					getBlockIndex,
@@ -46,6 +46,7 @@ export default function LeafMoreMenu( {
 				const { getDefaultBlockName } = select( blocksStore );
 
 				const _rootClientId = getBlockRootClientId( clientId );
+				const _blockName = getBlockName( clientId );
 				const canInsertDefaultBlock = canInsertBlockType(
 					getDefaultBlockName(),
 					_rootClientId
@@ -57,20 +58,18 @@ export default function LeafMoreMenu( {
 				return {
 					rootClientId: _rootClientId,
 					canDuplicate:
-						!! block &&
-						hasBlockSupport( block.name, 'multiple', true ) &&
-						canInsertBlockType( block.name, _rootClientId ),
+						hasBlockSupport( _blockName, 'multiple', true ) &&
+						canInsertBlockType( _blockName, _rootClientId ),
 					canInsertBlock:
 						( canInsertDefaultBlock || !! directInsertBlock ) &&
-						!! block &&
-						canInsertBlockType( block.name, _rootClientId ),
+						canInsertBlockType( _blockName, _rootClientId ),
 					isFirst: getBlockIndex( clientId ) === 0,
 					isLast:
 						getBlockIndex( clientId ) ===
 						getBlockCount( _rootClientId ) - 1,
 				};
 			},
-			[ clientId, block ]
+			[ clientId ]
 		);
 
 	return (

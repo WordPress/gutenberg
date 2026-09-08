@@ -1,6 +1,7 @@
 import type { Select as _Select } from '@base-ui/react/select';
 import type { ReactElement } from 'react';
 import type { ComponentProps } from '../../../utils/types';
+import type { ItemPopupWidthProps } from '../../../utils/css/item-popup';
 import type { InputLayoutProps } from '../input-layout/types';
 
 export type PortalProps = ComponentProps< typeof _Select.Portal >;
@@ -53,27 +54,28 @@ export type SelectGroupLabelProps = ComponentProps<
 	children?: React.ReactNode;
 };
 
-export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
-	/**
-	 * The content to be rendered inside the popup.
-	 */
-	children?: React.ReactNode;
-	/**
-	 * Optional portal element, typically `<Select.Portal />` with custom
-	 * `container`. When omitted, `Select.Popup` uses `Select.Portal` with
-	 * default props. Do not pass `children` on the portal element; they would
-	 * be ignored.
-	 */
-	portal?: ReactElement< Omit< PortalProps, 'children' > >;
-	/**
-	 * Optional positioner element, typically `<Select.Positioner />` with
-	 * custom positioning props (`side`, `align`, `sideOffset`, collision
-	 * settings, etc.). When omitted, `Select.Popup` uses `Select.Positioner`
-	 * with default props. Do not pass `children` on the positioner element;
-	 * they would be ignored.
-	 */
-	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
-};
+export type SelectPopupProps = ComponentProps< typeof _Select.Popup > &
+	ItemPopupWidthProps & {
+		/**
+		 * The content to be rendered inside the popup.
+		 */
+		children?: React.ReactNode;
+		/**
+		 * Optional portal element, typically `<Select.Portal />` with custom
+		 * `container`. When omitted, `Select.Popup` uses `Select.Portal` with
+		 * default props. Do not pass `children` on the portal element; they would
+		 * be ignored.
+		 */
+		portal?: ReactElement< Omit< PortalProps, 'children' > >;
+		/**
+		 * Optional positioner element, typically `<Select.Positioner />` with
+		 * custom positioning props (`side`, `align`, `sideOffset`, collision
+		 * settings, etc.). When omitted, `Select.Popup` uses `Select.Positioner`
+		 * with default props. Do not pass `children` on the positioner element;
+		 * they would be ignored.
+		 */
+		positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
+	};
 
 export type SelectItemProps = Omit<
 	ComponentProps< typeof _Select.Item >,

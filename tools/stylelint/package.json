@@ -25,8 +25,11 @@
 	"dependencies": {
 		"@wordpress/stylelint-config": "file:../../packages/stylelint-config",
 		"@wordpress/theme": "file:../../packages/theme",
-		"stylelint": "^16.26.1",
-		"stylelint-plugin-logical-css": "^1.2.3"
+		"stylelint": "^17.14.1",
+		"stylelint-plugin-logical-css": "^2.1.0"
+	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

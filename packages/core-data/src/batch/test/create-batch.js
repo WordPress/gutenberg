@@ -1,3 +1,4 @@
+import { describe, expect, test, vi } from 'vitest';
 import createBatch from '../create-batch';
 
 describe( 'createBatch', () => {
@@ -68,7 +69,7 @@ describe( 'createBatch', () => {
 	} );
 
 	test( 'running resets the batch when finished', async () => {
-		const processor = jest.fn( async ( inputs ) =>
+		const processor = vi.fn( async ( inputs ) =>
 			inputs.map( ( input ) => ( {
 				output: input,
 			} ) )

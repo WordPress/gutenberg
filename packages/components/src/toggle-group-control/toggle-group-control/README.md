@@ -18,11 +18,7 @@ import {
 
 function Example() {
 	return (
-		<ToggleGroupControl
-			label="my label"
-			value="vertical"
-			isBlock
-		>
+		<ToggleGroupControl label="my label" value="vertical" isBlock>
 			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
 			<ToggleGroupControlOption value="vertical" label="Vertical" />
 		</ToggleGroupControl>
@@ -84,3 +80,10 @@ Callback when a segment is selected.
 The value of the `ToggleGroupControl`.
 
 -   Required: No
+
+### `disabled`: `boolean`
+
+If true, every option is unselectable. The selected value is left as-is.
+
+-   Required: No
+-   Default: `false`
