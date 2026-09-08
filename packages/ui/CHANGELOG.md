@@ -19,6 +19,7 @@
 
 ### Enhancements
 
+-   `Select.Positioner`: Use Base UI's default `alignItemWithTrigger` positioning behavior ([#82043](https://github.com/WordPress/gutenberg/pull/82043)).
 -   `Select.Popup`: Put overflow on `Select.List` instead of a nested wrapper, so the listbox is the scroll container. ([#82470](https://github.com/WordPress/gutenberg/pull/82470))
 -   Compound components: Throw clear development errors when required parent context is missing ([#82510](https://github.com/WordPress/gutenberg/pull/82510)).
 -   Give input fields and checkboxes solid, state-aware themed backgrounds while keeping minimal Select triggers transparent. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
@@ -85,7 +86,6 @@
 -   `Menu`: Add shortcut display and accessibility metadata support. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
 -   `SearchableChipSelect`: Add grouped items support and export `Group`, `GroupLabel`, and `Collection` subcomponents ([#80989](https://github.com/WordPress/gutenberg/pull/80989)).
 -   `SearchableChipSelect`: Add development warnings for common misconfigurations ([#80989](https://github.com/WordPress/gutenberg/pull/80989)).
--   `Select.Positioner`: Use Base UI's default `alignItemWithTrigger` positioning behavior ([#82043](https://github.com/WordPress/gutenberg/pull/82043)).
 -   `Select.Item`, `Combobox.Item`, and `Autocomplete.Item`: Default item height is now 32px (previously 40px) ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 -   `InputLayout`-based controls show an error-colored border and focus ring while an invalid control's validity is reported, e.g. when wrapped in `ControlWithError` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
 
