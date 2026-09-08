@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Query: List the existing terms in the taxonomy filters, so categories and tags can be browsed and selected instead of recalled and typed. The controls now use `SearchableChipSelectControl` from `@wordpress/ui` ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   Query: List the existing terms in the taxonomy filters, so categories and tags can be browsed and selected instead of recalled and typed. The controls now use `SearchableChipSelectControl` from `@wordpress/ui` ([#82583](https://github.com/WordPress/gutenberg/pull/82583)).
 
 ### Bug Fixes
 
