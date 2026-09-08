@@ -40,28 +40,51 @@ const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,
 	replacement: path.join( ROOT_DIR, 'test/unit/config/style-mock.vitest.js' ),
 };
-const WP_BUILD_STYLE_FIXTURE_ID = 'virtual:wp-build-style-injection';
-const wpBuildStyleFixtureSource = await compileInlineStyle( {
-	cssModules: true,
-	minify: false,
-} )(
-	`@layer wp-build-test {
-	.fixture {
-		--wp-build-style-injection-test: true;
-		color: rgb(1, 2, 3);
-	}
-}`,
-	ROOT_DIR,
-	path.join( ROOT_DIR, 'test/unit/config/wp-build-style-fixture.module.css' )
-);
+const WP_BUILD_CSS_MODULE_STYLE_FIXTURE_ID = 'virtual:wp-build-style-injection';
+const WP_BUILD_ORDINARY_STYLE_FIXTURE_ID =
+	'virtual:wp-build-ordinary-style-injection';
+const wpBuildStyleFixtureSources = new Map( [
+	[
+		WP_BUILD_CSS_MODULE_STYLE_FIXTURE_ID,
+		await compileInlineStyle( {
+			cssModules: true,
+			minify: false,
+		} )(
+			`@layer wp-build-test {
+				.fixture {
+					--wp-build-style-injection-test: true;
+					color: rgb(1, 2, 3);
+				}
+			}`,
+			ROOT_DIR,
+			path.join(
+				ROOT_DIR,
+				'test/unit/config/wp-build-style-fixture.module.css'
+			)
+		),
+	],
+	[
+		WP_BUILD_ORDINARY_STYLE_FIXTURE_ID,
+		await compileInlineStyle( { minify: false } )(
+			`.ordinary-fixture {
+				background-color: rgb(4, 5, 6);
+			}`,
+			ROOT_DIR,
+			path.join(
+				ROOT_DIR,
+				'test/unit/config/wp-build-ordinary-style-fixture.css'
+			)
+		),
+	],
+] );
 const wpBuildStyleFixturePlugin = {
 	name: 'wp-build-style-injection-fixture',
 	resolveId( id ) {
-		return id === WP_BUILD_STYLE_FIXTURE_ID ? `\0${ id }` : null;
+		return wpBuildStyleFixtureSources.has( id ) ? `\0${ id }` : null;
 	},
 	load( id ) {
-		return id === `\0${ WP_BUILD_STYLE_FIXTURE_ID }`
-			? wpBuildStyleFixtureSource
+		return id.startsWith( '\0' )
+			? wpBuildStyleFixtureSources.get( id.slice( 1 ) ) ?? null
 			: null;
 	},
 };
