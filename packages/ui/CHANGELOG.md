@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `RangeCalendar`: Start a new range by default when selecting a date after the current range is complete. Set `resetOnSelect={ false }` to preserve the previous behavior. ([#82612](https://github.com/WordPress/gutenberg/pull/82612))
 -   `Menu`: `--wp-ui-menu-selection-indicator-size` now controls the selection indicator width only. Its height follows the item label line height. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
 -   `Autocomplete.Popup`, `Combobox.Popup`, `Select.Popup`, `SearchableChipSelect`, and `SearchableChipSelectControl`: The popup now defaults to a fixed anchor width. Use `width="content"` on Popups, or `popupWidth="content"` on composites, to restore content-sized width between the anchor and available viewport bounds ([#82087](https://github.com/WordPress/gutenberg/pull/82087), [#82193](https://github.com/WordPress/gutenberg/pull/82193)).
 -   Portaled overlays (`AlertDialog`, `Autocomplete`, `Combobox`, `Dialog`, `Drawer`, `Menu`, `Popover`, and `Select`) now inherit the theme from their portal destination instead of re-emitting the trigger's nearest contextual theme. Default portals use the document root theme; custom portal containers use their DOM ancestry ([#82038](https://github.com/WordPress/gutenberg/pull/82038)).
