@@ -217,10 +217,14 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				content: submenuMenuContent,
 			} );
 
+			// The same submenu setting as the test above, so that the overlay
+			// is the only difference between the two. The arrow toggle is not
+			// used here because the default overlay hides it with
+			// `display: none`, which takes it out of the accessibility tree.
 			await requestUtils.createTemplate( 'wp_template_part', {
 				slug: 'header',
 				title: 'Header',
-				content: `<!-- wp:navigation {"ref":${ menu.id },"overlayMenu":"always"} /-->`,
+				content: `<!-- wp:navigation {"ref":${ menu.id },"overlayMenu":"always","submenuVisibility":"click"} /-->`,
 			} );
 
 			await page.goto( '/' );
