@@ -33,7 +33,6 @@
 		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../kebab-case" },
 		{ "path": "../keycodes/tsconfig.build.json" },
-		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../primitives" },
 		{ "path": "../rich-text" },
 		{ "path": "../server-side-render/tsconfig.build.json" },
@@ -41,7 +40,6 @@
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../upload-media/tsconfig.build.json" },
 		{ "path": "../url" },
-		{ "path": "../viewport" },
 		{ "path": "../wordcount/tsconfig.build.json" }
 	],
 	"include": [ "src/**/*.ts", "src/**/*.tsx" ]

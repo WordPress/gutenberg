@@ -6,13 +6,11 @@
 	},
 	"references": [
 		{ "path": "./tsconfig.build.json" },
-		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../preferences/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../url" },
 		{ "path": "../vips/tsconfig.build.json" },
@@ -25,6 +23,6 @@
 		"src/store/test/actions.ts",
 		"src/store/test/selectors.ts",
 		"src/test/heic-parser.ts",
-		"src/store/test/vips.ts"
+		"src/store/test/vips.jsdom.test.ts"
 	]
 }

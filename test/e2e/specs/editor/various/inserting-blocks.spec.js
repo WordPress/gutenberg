@@ -806,6 +806,38 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		).toBeInViewport();
 	} );
 
+	test( 'keeps the block preview inside a short viewport', async ( {
+		admin,
+		page,
+	} ) => {
+		await page.setViewportSize( { width: 1280, height: 400 } );
+		await admin.createNewPost();
+		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'Cover' );
+		await page
+			.getByRole( 'listbox', { name: 'Blocks' } )
+			.getByRole( 'option', { name: 'Cover', exact: true } )
+			.hover();
+
+		// The popover grows to its final height once the preview has been
+		// measured, so wait for that before checking containment.
+		await expect(
+			page.locator(
+				'.block-editor-inserter__preview-content .block-editor-block-preview__content'
+			)
+		).toBeVisible();
+
+		await expect(
+			page.locator( '.block-editor-inserter__preview-container__popover' )
+		).toBeInViewport( { ratio: 1 } );
+	} );
+
 	[ 'large', 'small' ].forEach( ( viewport ) => {
 		test( `last-inserted block should be given and keep the selection (${ viewport } viewport)`, async ( {
 			admin,

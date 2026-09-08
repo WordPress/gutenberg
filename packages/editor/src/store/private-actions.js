@@ -60,7 +60,7 @@ export const createTemplate =
 					type: 'snackbar',
 					actions: [
 						{
-							label: __( 'Go back' ),
+							label: __( 'Back' ),
 							onClick: () =>
 								dispatch.setRenderingMode(
 									select.getEditorSettings()
@@ -689,8 +689,8 @@ export const restoreRevision =
 						'modified',
 						'author',
 						'meta',
-						'title.raw',
-						'excerpt.raw',
+						'title',
+						'excerpt',
 						'content.raw',
 						revisionKey,
 					] ),

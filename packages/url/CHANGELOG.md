@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.54.0 (2026-08-26)
+
 ### Bug Fixes
 
 -   `filterURLForDisplay`: Clamp the truncated file name's head slice at zero, so a small `maxLength` no longer returns a string longer than the untruncated one ([#81529](https://github.com/WordPress/gutenberg/pull/81529)).

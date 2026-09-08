@@ -1,5 +1,6 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 import TextareaControl from '../../textarea-control';
@@ -13,6 +14,12 @@ const UnforwardedValidatedTextareaControl = (
 	}: React.ComponentProps< typeof TextareaControl > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLTextAreaElement >
 ) => {
+	deprecated( 'wp.components.privateApis.ValidatedTextareaControl', {
+		since: '7.2',
+		alternative: 'ValidatedTextareaControl from @wordpress/ui',
+		hint: 'This private API will be completely removed within a few Gutenberg plugin releases.',
+	} );
+
 	const validityTargetRef = useRef< HTMLTextAreaElement >( null );
 	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
 

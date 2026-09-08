@@ -1,48 +1,77 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import type VipsFactory from 'wasm-vips';
 import { getUltraHdrInfo, resizeImage } from '../';
 
-const mockThumbnailImage = jest.fn();
-const mockThumbnailBuffer = jest.fn();
-const mockNewFromBuffer = jest.fn();
-const mockUhdrLoadBuffer = jest.fn();
-const mockWriteToBuffer = jest.fn( () => ( { buffer: new ArrayBuffer( 0 ) } ) );
-const mockGetDouble = jest.fn();
-const mockSetImage = jest.fn();
-const mockCrop = jest.fn();
+const {
+	MockImage,
+	MockVipsImage,
+	mockGetDouble,
+	mockNewFromBuffer,
+	mockSetImage,
+	mockThumbnailBuffer,
+	mockUhdrLoadBuffer,
+	mockWriteToBuffer,
+} = vi.hoisted( () => {
+	const thumbnailImageMock = vi.fn();
+	const thumbnailBufferMock = vi.fn();
+	const newFromBufferMock = vi.fn();
+	const uhdrLoadBufferMock = vi.fn();
+	const writeToBufferMock = vi.fn( () => ( {
+		buffer: new ArrayBuffer( 0 ),
+	} ) );
+	const getDoubleMock = vi.fn();
+	const setImageMock = vi.fn();
+	const cropMock = vi.fn();
 
-class MockImage {
-	width = 100;
-	height = 100;
-	pageHeight = 100;
-	gainmap: MockImage | undefined;
-	thumbnailImage = mockThumbnailImage.mockImplementation( () => this );
-	writeToBuffer = mockWriteToBuffer;
-	getDouble = mockGetDouble;
-	crop = mockCrop.mockImplementation( () => this );
-	copy = jest.fn( () => this );
-	setImage = mockSetImage;
-}
+	class ImageMock {
+		width = 100;
+		height = 100;
+		pageHeight = 100;
+		gainmap: ImageMock | undefined;
+		thumbnailImage = thumbnailImageMock.mockImplementation( () => this );
+		writeToBuffer = writeToBufferMock;
+		getDouble = getDoubleMock;
+		crop = cropMock.mockImplementation( () => this );
+		copy = vi.fn( () => this );
+		setImage = setImageMock;
+		// These sources are never indexed: libvips reports GType 0 for a field the
+		// image does not carry.
+		getTypeof = vi.fn( () => 0 );
+	}
 
-class MockVipsImage {
-	static thumbnailBuffer = mockThumbnailBuffer.mockImplementation(
-		() => new MockImage()
-	);
-	static newFromBuffer = mockNewFromBuffer.mockImplementation(
-		() => new MockImage()
-	);
-	static uhdrloadBuffer = mockUhdrLoadBuffer;
-}
+	class VipsImageMock {
+		static thumbnailBuffer = thumbnailBufferMock.mockImplementation(
+			() => new ImageMock()
+		);
+		static newFromBuffer = newFromBufferMock.mockImplementation(
+			() => new ImageMock()
+		);
+		static uhdrloadBuffer = uhdrLoadBufferMock;
+	}
 
-jest.mock( 'wasm-vips', () =>
-	jest.fn( () => ( {
+	return {
+		MockImage: ImageMock,
+		MockVipsImage: VipsImageMock,
+		mockGetDouble: getDoubleMock,
+		mockNewFromBuffer: newFromBufferMock,
+		mockSetImage: setImageMock,
+		mockThumbnailBuffer: thumbnailBufferMock,
+		mockUhdrLoadBuffer: uhdrLoadBufferMock,
+		mockWriteToBuffer: writeToBufferMock,
+	};
+} );
+
+vi.mock( import( 'wasm-vips' ), () => ( {
+	default: vi.fn( () => ( {
 		Image: MockVipsImage,
 		// getVips() calls Cache.max(0) to disable libvips's operation cache.
-		Cache: { max: jest.fn() },
-	} ) )
-);
+		Cache: { max: vi.fn() },
+	} ) ) as unknown as typeof VipsFactory,
+} ) );
 
 describe( 'UltraHDR helpers', () => {
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	describe( 'getUltraHdrInfo', () => {

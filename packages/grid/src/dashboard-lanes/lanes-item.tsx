@@ -47,6 +47,20 @@ export type LanesItemProps = {
 	disabled?: boolean;
 
 	/**
+	 * Whether the item can be dragged. Combined with `disabled`.
+	 *
+	 * @default true
+	 */
+	draggable?: boolean;
+
+	/**
+	 * Whether the item can be resized. Combined with `disabled`.
+	 *
+	 * @default true
+	 */
+	resizable?: boolean;
+
+	/**
 	 * Whether any tile in the surface is currently being dragged or
 	 * resized. Drives the drag activator cursor.
 	 */
@@ -77,6 +91,12 @@ export type LanesItemProps = {
 	 */
 	minResizeWidthPx: number;
 
+	/**
+	 * Maximum tile width while resizing, in pixels. Omitted when the
+	 * item declares no width limit.
+	 */
+	maxResizeWidthPx?: number;
+
 	onResizeEnd: () => void;
 
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
@@ -86,6 +106,8 @@ export function LanesItem( {
 	itemKey,
 	placementStyle,
 	disabled = false,
+	draggable = true,
+	resizable = true,
 	interacting = false,
 	children,
 	actionableArea = null,
@@ -93,6 +115,7 @@ export function LanesItem( {
 	onResizeEnd,
 	resizeSnapPreview = null,
 	minResizeWidthPx,
+	maxResizeWidthPx,
 	renderResizeHandle,
 	dragging = false,
 }: LanesItemProps ) {
@@ -106,6 +129,8 @@ export function LanesItem( {
 	const itemRef = useRef< HTMLDivElement >( null );
 	const contentRef = useRef< HTMLDivElement >( null );
 
+	const dragDisabled = disabled || ! draggable;
+	const resizeDisabled = disabled || ! resizable;
 	const {
 		attributes,
 		listeners,
@@ -114,7 +139,7 @@ export function LanesItem( {
 		isDragging,
 	} = useSortable( {
 		id: itemKey,
-		disabled,
+		disabled: dragDisabled,
 	} );
 	const mergedRef = useMergeRefs( [ itemRef, setNodeRef ] );
 	const contentMergedRef = useMergeRefs( [ contentRef ] );
@@ -141,9 +166,12 @@ export function LanesItem( {
 		}
 		let clamped: ResizeDelta = { width: delta.width, height: 0 };
 		if ( baselineSize ) {
-			clamped = clampResizeDelta( clamped, baselineSize, {
-				width: minResizeWidthPx,
-			} );
+			clamped = clampResizeDelta(
+				clamped,
+				baselineSize,
+				{ width: minResizeWidthPx },
+				{ width: maxResizeWidthPx }
+			);
 		}
 		setResizeDelta( clamped );
 		onResize( itemKey, clamped );
@@ -199,7 +227,7 @@ export function LanesItem( {
 				{ ...listeners }
 				style={ {
 					height: '100%',
-					cursor: getItemCursor( disabled, interacting ),
+					cursor: getItemCursor( dragDisabled, interacting ),
 				} }
 			>
 				<div
@@ -208,7 +236,7 @@ export function LanesItem( {
 					style={ continuousContentStyle }
 				>
 					{ children }
-					{ ! disabled && (
+					{ ! resizeDisabled && (
 						<ResizeHandle
 							itemId={ itemKey }
 							verticalResizable={ false }

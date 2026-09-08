@@ -1,33 +1,39 @@
-'use strict';
-const cli = require( '../cli' );
-const env = require( '../env' );
-
-/**
- * Mocked dependencies
- */
-jest.spyOn( process, 'exit' ).mockImplementation( () => {} );
-jest.mock( 'ora', () => () => {
-	const spinner = { text: '', succeed: jest.fn(), fail: jest.fn() };
+import { createRequire } from 'node:module';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
+const oraPath = require.resolve( 'ora' );
+const originalOra = require( oraPath );
+const createSpinner = vi.fn( () => {
+	const spinner = { text: '', succeed: vi.fn(), fail: vi.fn() };
 	spinner.start = () => spinner;
 	return spinner;
 } );
-jest.mock( '../env', () => {
-	const actual = jest.requireActual( '../env' );
-	return {
-		start: jest.fn( Promise.resolve.bind( Promise ) ),
-		stop: jest.fn( Promise.resolve.bind( Promise ) ),
-		reset: jest.fn( Promise.resolve.bind( Promise ) ),
-		clean: jest.fn( Promise.resolve.bind( Promise ) ),
-		run: jest.fn( Promise.resolve.bind( Promise ) ),
-		destroy: jest.fn( Promise.resolve.bind( Promise ) ),
-		cleanup: jest.fn( Promise.resolve.bind( Promise ) ),
-		ValidationError: actual.ValidationError,
-		LifecycleScriptError: actual.LifecycleScriptError,
-	};
+require.cache[ oraPath ].exports = createSpinner;
+const envPath = require.resolve( '../env' );
+const originalEnv = require( envPath );
+const env = {
+	start: vi.fn( Promise.resolve.bind( Promise ) ),
+	stop: vi.fn( Promise.resolve.bind( Promise ) ),
+	reset: vi.fn( Promise.resolve.bind( Promise ) ),
+	clean: vi.fn( Promise.resolve.bind( Promise ) ),
+	run: vi.fn( Promise.resolve.bind( Promise ) ),
+	destroy: vi.fn( Promise.resolve.bind( Promise ) ),
+	cleanup: vi.fn( Promise.resolve.bind( Promise ) ),
+	ValidationError: originalEnv.ValidationError,
+	LifecycleScriptError: originalEnv.LifecycleScriptError,
+};
+require.cache[ envPath ].exports = env;
+const processExit = vi.spyOn( process, 'exit' ).mockImplementation( () => {} );
+const cli = require( '../cli' );
+afterAll( () => {
+	require.cache[ oraPath ].exports = originalOra;
+	require.cache[ envPath ].exports = originalEnv;
+	processExit.mockRestore();
+	delete require.cache[ require.resolve( '../cli' ) ];
 } );
 
 describe( 'env cli', () => {
-	beforeEach( jest.clearAllMocks );
+	beforeEach( vi.clearAllMocks );
 
 	it( 'parses start commands.', () => {
 		cli().parse( [ 'start' ] );
@@ -151,20 +157,18 @@ describe( 'env cli', () => {
 		env.start.mockRejectedValueOnce( {
 			message: 'failure message',
 		} );
-		const consoleError = console.error;
-		console.error = jest.fn();
-		const processExit = process.exit;
-		process.exit = jest.fn();
+		const consoleError = vi
+			.spyOn( console, 'error' )
+			.mockImplementation( () => {} );
 
 		cli().parse( [ 'start' ] );
 		const { spinner } = env.start.mock.calls[ 0 ][ 0 ];
 		await env.start.mock.results[ 0 ].value.catch( () => {} );
 
 		expect( spinner.fail ).toHaveBeenCalledWith( 'failure message' );
-		expect( console.error ).toHaveBeenCalled();
-		expect( process.exit ).toHaveBeenCalledWith( 1 );
-		console.error = consoleError;
-		process.exit = processExit;
+		expect( consoleError ).toHaveBeenCalled();
+		expect( processExit ).toHaveBeenCalledWith( 1 );
+		consoleError.mockRestore();
 	} );
 	it( 'handles failed docker commands with errors.', async () => {
 		env.start.mockRejectedValueOnce( {
@@ -172,12 +176,12 @@ describe( 'env cli', () => {
 			out: 'message',
 			exitCode: 1,
 		} );
-		const consoleError = console.error;
-		console.error = jest.fn();
-		const processExit = process.exit;
-		process.exit = jest.fn();
-		const stderr = process.stderr.write;
-		process.stderr.write = jest.fn();
+		const stdout = vi
+			.spyOn( process.stdout, 'write' )
+			.mockImplementation( () => true );
+		const stderr = vi
+			.spyOn( process.stderr, 'write' )
+			.mockImplementation( () => true );
 
 		cli().parse( [ 'start' ] );
 		const { spinner } = env.start.mock.calls[ 0 ][ 0 ];
@@ -186,10 +190,10 @@ describe( 'env cli', () => {
 		expect( spinner.fail ).toHaveBeenCalledWith(
 			'Error while running docker compose command.'
 		);
-		expect( process.stderr.write ).toHaveBeenCalledWith( 'failure error' );
-		expect( process.exit ).toHaveBeenCalledWith( 1 );
-		console.error = consoleError;
-		process.exit = processExit;
-		process.stderr.write = stderr;
+		expect( stdout ).toHaveBeenCalledWith( 'message' );
+		expect( stderr ).toHaveBeenCalledWith( 'failure error' );
+		expect( processExit ).toHaveBeenCalledWith( 1 );
+		stdout.mockRestore();
+		stderr.mockRestore();
 	} );
 } );

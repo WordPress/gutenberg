@@ -86,6 +86,7 @@
 		{ "path": "routes/template-part" },
 		{ "path": "routes/template-part-list" },
 		{ "path": "storybook" },
+		{ "path": "tools/pr-meta" },
 		{ "path": "test/e2e" },
 		{ "path": "test/performance" },
 		{ "path": "test/storybook-playwright" },

@@ -182,6 +182,7 @@ function InputField(
 			{ ...props }
 			{ ...dragProps }
 			className="components-input-control__input"
+			data-empty-value={ value ? undefined : '' }
 			disabled={ disabled }
 			dragCursor={ dragCursor }
 			isDragging={ isDragging }

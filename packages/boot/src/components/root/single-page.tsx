@@ -67,7 +67,8 @@ export default function RootSinglePage() {
 							<ThemeProvider
 								color={ {
 									...themeColors,
-									background: '#ffffff',
+									// Reset to the default background color.
+									background: '#fcfcfc',
 								} }
 							>
 								<Outlet />

@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from '@wordpress/element';
 import DataViews from '../index';
 import { LAYOUT_GRID } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
-import type { View } from '../../types';
+import type { MediaFit, View } from '../../types';
 import { actions, data, fields, type SpaceObject } from './fixtures';
 
 export const LayoutTableComponent = ( {
@@ -10,6 +10,8 @@ export const LayoutTableComponent = ( {
 	hasClickableItems = true,
 	groupBy = false,
 	groupByLabel = true,
+	mediaFit = 'cover',
+	mediaFitControl = true,
 	perPageSizes = [ 10, 25, 50, 100 ],
 	showMedia = true,
 }: {
@@ -17,6 +19,8 @@ export const LayoutTableComponent = ( {
 	hasClickableItems?: boolean;
 	groupBy?: boolean;
 	groupByLabel?: boolean;
+	mediaFit?: MediaFit;
+	mediaFitControl?: boolean;
 	perPageSizes?: number[];
 	showMedia?: boolean;
 } ) => {
@@ -31,6 +35,7 @@ export const LayoutTableComponent = ( {
 		descriptionField: 'description',
 		mediaField: 'image',
 		showMedia,
+		layout: { mediaFit },
 	} );
 
 	useEffect( () => {
@@ -45,9 +50,12 @@ export const LayoutTableComponent = ( {
 					  }
 					: undefined,
 				showMedia,
-			};
+				// Spread the previous layout so a change made through the
+				// view options popover survives an unrelated arg change.
+				layout: { ...prevView.layout, mediaFit },
+			} as View;
 		} );
-	}, [ groupBy, groupByLabel, showMedia ] );
+	}, [ groupBy, groupByLabel, mediaFit, showMedia ] );
 
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
@@ -90,7 +98,7 @@ export const LayoutTableComponent = ( {
 				defaultLayouts={ {
 					[ LAYOUT_GRID ]: true,
 				} }
-				config={ { perPageSizes } }
+				config={ { perPageSizes, mediaFitControl } }
 			/>
 		</div>
 	);

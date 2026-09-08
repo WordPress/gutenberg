@@ -4,6 +4,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import ColorListPicker from './color-list-picker';
 import CircularOptionPicker, {
 	getComputeCircularOptionPickerCommonProps,
+	warnIfCircularOptionPickerAsButtonsIsSet,
 } from '../circular-option-picker';
 import { VStack } from '../v-stack';
 import CustomDuotoneBar from './custom-duotone-bar';
@@ -46,6 +47,7 @@ import type { DuotonePickerProps } from './types';
  */
 function DuotonePicker( {
 	asButtons,
+	presentation,
 	loop,
 	clearable = true,
 	unsetable = true,
@@ -60,24 +62,35 @@ function DuotonePicker( {
 	'aria-labelledby': ariaLabelledby,
 	...otherProps
 }: DuotonePickerProps ) {
+	warnIfCircularOptionPickerAsButtonsIsSet( 'DuotonePicker', asButtons );
+	const { metaProps, labelProps, resolvedPresentation } =
+		getComputeCircularOptionPickerCommonProps(
+			asButtons,
+			loop,
+			ariaLabel,
+			ariaLabelledby,
+			presentation
+		);
 	const [ defaultDark, defaultLight ] = useMemo(
 		() => getDefaultColors( colorPalette ),
 		[ colorPalette ]
 	);
 
 	const isUnset = value === 'unset';
+	const isUnsetSelected =
+		resolvedPresentation !== 'command-buttons' && isUnset;
 	const unsetOptionLabel = __( 'Unset' );
 
 	const unsetOption = (
 		<CircularOptionPicker.Option
 			key="unset"
 			value="unset"
-			isSelected={ isUnset }
+			isSelected={ isUnsetSelected }
 			tooltipText={ unsetOptionLabel }
 			aria-label={ unsetOptionLabel }
 			className="components-duotone-picker__color-indicator"
 			onClick={ () => {
-				onChange( isUnset ? undefined : 'unset' );
+				onChange( isUnsetSelected ? undefined : 'unset' );
 			} }
 		/>
 	);
@@ -106,9 +119,11 @@ function DuotonePicker( {
 			// strictly by slug, which keeps two presets holding the same
 			// colors apart. Otherwise selection falls back to matching the
 			// colors themselves.
-			const isSelected = selectedSlug
-				? slug === selectedSlug
-				: fastDeepEqual( colors, value );
+			const isSelected =
+				resolvedPresentation !== 'command-buttons' &&
+				( selectedSlug
+					? slug === selectedSlug
+					: fastDeepEqual( colors, value ) );
 
 			return (
 				<CircularOptionPicker.Option
@@ -130,13 +145,6 @@ function DuotonePicker( {
 				/>
 			);
 		}
-	);
-
-	const { metaProps, labelProps } = getComputeCircularOptionPickerCommonProps(
-		asButtons,
-		loop,
-		ariaLabel,
-		ariaLabelledby
 	);
 
 	const options = unsetable

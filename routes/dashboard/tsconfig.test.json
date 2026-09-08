@@ -8,12 +8,15 @@
 		"composite": false,
 		"types": [ "jest" ]
 	},
+	"files": [ "global.d.ts" ],
 	"include": [ "**/test/**/*.ts", "**/test/**/*.tsx" ],
 	"exclude": [ "build", "node_modules" ],
 	"references": [
 		{ "path": "../../packages/api-fetch/tsconfig.build.json" },
 		{ "path": "../../packages/data" },
+		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/preferences/tsconfig.build.json" },
-		{ "path": "../../packages/widget-dashboard/tsconfig.build.json" }
+		{ "path": "../../packages/widget-dashboard/tsconfig.build.json" },
+		{ "path": "../../packages/widget-primitives/tsconfig.build.json" }
 	]
 }

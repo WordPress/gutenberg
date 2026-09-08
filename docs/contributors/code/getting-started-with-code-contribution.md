@@ -42,6 +42,12 @@ npm run dev
 
 > Note: The install scripts require [Python](https://www.python.org/) to be installed and in the path of the local system. This might be installed by default for your operating system, or require downloading and installing.
 
+### Set up each worktree
+
+Install dependencies in each fresh Git worktree before you build, test, lint, or commit. Do not reuse `node_modules` or generated package files from a worktree whose `package-lock.json` is at a different revision. Results from that setup might not match the current checkout.
+
+If you install dependencies with `--ignore-scripts`, run `npm run prepare` before committing so Husky installs the repository Git hooks. If a focused command needs generated package files, build the affected package in the current worktree before you interpret its result.
+
 There are two ways to build your code. While developing, you probably will want to use `npm run dev` to run continuous builds automatically as source files change. The dev build also includes additional warnings and errors to help troubleshoot while developing. Once you are happy with your changes, you can run `npm run build` to create optimized production build.
 
 Once built, Gutenberg is ready to be used as a WordPress plugin!
@@ -239,6 +245,9 @@ You can start with this workspace settings file:
 		"editor.formatOnSave": true,
 		"editor.defaultFormatter": "obliviousharmony.vscode-php-codesniffer"
 	},
+	"eslint.bulkSuppression.enable": true,
+	"eslint.bulkSuppression.location": "tools/eslint/suppressions.json",
+	"eslint.bulkSuppression.severity": "hint",
 	"intelephense.environment.phpVersion": "7.4.0",
 	"intelephense.files.exclude": [
 		"**/.cache/**",

@@ -29,6 +29,7 @@ import { patternStatusField } from './fields/sync-status';
 import { usePatternCategoryField } from './fields/category';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import type { NormalizedPattern } from './use-patterns';
+import ImportPatternButton from './import-pattern-button';
 // Unlock WordPress private APIs
 const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
@@ -260,13 +261,16 @@ function PatternList() {
 			actions={
 				labels?.add_new_item &&
 				canCreateRecord && (
-					<Button
-						variant="primary"
-						onClick={ () => setShowPatternModal( true ) }
-						size="compact"
-					>
-						{ labels.add_new_item }
-					</Button>
+					<>
+						<ImportPatternButton />
+						<Button
+							variant="primary"
+							onClick={ () => setShowPatternModal( true ) }
+							size="compact"
+						>
+							{ labels.add_new_item }
+						</Button>
+					</>
 				)
 			}
 			hasPadding={ false }

@@ -47,8 +47,26 @@ const { actions, state } = store(
 				return activeTabIndex === tabIndex;
 			},
 			/**
-			 * The value of the tabindex attribute for tab buttons.
-			 * Only the active tab should be in the tab sequence.
+			 * The value of the hidden attribute for tab panels.
+			 *
+			 * Inactive panels use the `until-found` state rather than being
+			 * hidden outright, so their content stays reachable by the
+			 * browser's find-in-page and by fragment navigation. The browser
+			 * fires `beforematch` on the panel before revealing it, which is
+			 * where the matching tab gets activated.
+			 *
+			 * @type {string|null}
+			 */
+			get isHidden() {
+				return state.isActiveTab ? null : 'until-found';
+			},
+			/**
+			 * The value of the tabindex attribute for tab buttons and tab
+			 * panels. Only the active tab should be in the tab sequence.
+			 *
+			 * An inactive panel is hidden with `until-found`, which leaves it
+			 * in the layout, so it stays focusable unless it is taken out of
+			 * the tab sequence here.
 			 *
 			 * @type {number}
 			 */
@@ -96,6 +114,18 @@ const { actions, state } = store(
 					actions.setActiveTab( tabIndex );
 				}
 			} ),
+			/**
+			 * Activates the tab whose panel the browser is about to reveal.
+			 *
+			 * Fired on a panel hidden with `until-found` when find-in-page or
+			 * a fragment navigation matches content inside it.
+			 */
+			handleBeforeMatch: () => {
+				const { tabIndex } = state;
+				if ( tabIndex !== null ) {
+					actions.setActiveTab( tabIndex );
+				}
+			},
 			/**
 			 * Moves focus to a specific tab without activating it.
 			 *
@@ -156,23 +186,47 @@ const { actions, state } = store(
 			},
 		},
 		callbacks: {
-			/**
-			 * When the tabs are initialized, we need to check if there is a hash in the url and if so if it exists in the current tabsList, set the active tab to that index.
-			 *
-			 */
-			onTabsInit: () => {
+			activateTabByHash: () => {
 				const { tabsList } = state;
-				if ( tabsList.length === 0 ) {
+
+				if ( ! tabsList || tabsList.length === 0 ) {
 					return;
 				}
 
-				const { hash } = window.location;
-				const tabId = hash.replace( '#', '' );
-				const tabIndex = tabsList.findIndex( ( t ) => t === tabId );
-				// Check if tabIndex is a positive number and if so we'll auto activate that tab.
-				if ( tabIndex >= 0 ) {
-					actions.setActiveTab( tabIndex, true );
+				const targetElement = document.querySelector( ':target' );
+				if ( ! targetElement ) {
+					return;
 				}
+
+				const panelIndex = tabsList.findIndex(
+					( t ) => t === targetElement.id
+				);
+				if ( panelIndex >= 0 ) {
+					actions.setActiveTab( panelIndex, true );
+					return;
+				}
+
+				// Walk up the panels containing the target rather than taking
+				// the nearest one, so that nested tabs resolve to the panel
+				// belonging to this block.
+				let panel = targetElement.closest( '.wp-block-tab-panel' );
+				let tabIndex = -1;
+
+				while ( panel && tabIndex < 0 ) {
+					tabIndex = tabsList.findIndex( ( t ) => t === panel.id );
+					panel =
+						panel.parentElement?.closest( '.wp-block-tab-panel' ) ??
+						null;
+				}
+
+				if ( tabIndex < 0 ) {
+					return;
+				}
+
+				actions.setActiveTab( tabIndex );
+				window.setTimeout( () => {
+					targetElement.scrollIntoView();
+				}, 0 );
 			},
 		},
 	},

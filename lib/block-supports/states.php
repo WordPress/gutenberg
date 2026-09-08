@@ -32,8 +32,21 @@ function gutenberg_normalize_state_preset_vars( $value ) {
 		return $value;
 	}
 
-	$unwrapped_name = str_replace( '|', '--', substr( $value, strlen( 'var:' ) ) );
-	return "var(--wp--$unwrapped_name)";
+	$parts = explode( '|', substr( $value, strlen( 'var:' ) ) );
+
+	/*
+	 * The slug is kebab-cased when the preset's custom property is generated,
+	 * so a reference has to be converted the same way or it points at a
+	 * property that does not exist (`--wp--preset--font-size--3xl` for a preset
+	 * generated as `--wp--preset--font-size--3-xl`). Mirrors
+	 * `WP_Theme_JSON_Gutenberg::convert_custom_properties()` and the JS style
+	 * engine's `getCSSValueFromRawStyle()`.
+	 */
+	if ( 3 === count( $parts ) ) {
+		$parts[2] = _wp_to_kebab_case( $parts[2] );
+	}
+
+	return 'var(--wp--' . implode( '--', $parts ) . ')';
 }
 
 /**
@@ -514,16 +527,26 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	}
 
 	$block_name = $block['blockName'];
+
+	/*
+	 * Every CSS rule this function can produce is keyed off the block's `style`
+	 * attribute. Without it there is nothing to generate, so bail before doing
+	 * any of the lookups below — this runs for every block on every request.
+	 */
+	$raw_style = $block['attrs']['style'] ?? array();
+	if ( empty( $raw_style ) || ! is_array( $raw_style ) ) {
+		return $block_content;
+	}
+
+	// Keep the existing block registry lookup here.
+	$style = gutenberg_resolve_style_state_aliases( $raw_style, $block_name );
+
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 	if ( ! $block_type ) {
 		return $block_content;
 	}
 
 	$supported_pseudo_states  = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
-	$style                    = gutenberg_resolve_style_state_aliases(
-		$block['attrs']['style'] ?? array(),
-		$block_name
-	);
 	$css_rules                = array();
 	$viewport_settings        = gutenberg_get_global_settings( array( 'viewport' ) );
 	$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $viewport_settings );

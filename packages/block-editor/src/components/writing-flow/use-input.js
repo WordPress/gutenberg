@@ -82,6 +82,10 @@ export default function useInput() {
 					}
 
 					const clientId = getSelectedBlockClientId();
+					if ( ! clientId ) {
+						return;
+					}
+
 					const blockName = getBlockName( clientId );
 					const selectionStart = getSelectionStart();
 					const selectionEnd = getSelectionEnd();

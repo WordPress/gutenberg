@@ -79,3 +79,13 @@ Default.args = {
 	label: 'Borders',
 	enableStyle: true,
 };
+
+/**
+ * With no visible label there is no label row for the linked/unlinked toggle to
+ * join, so it is rendered alongside the border inputs instead.
+ */
+export const WithoutLabel = Template.bind( {} );
+WithoutLabel.args = {
+	...Default.args,
+	label: undefined,
+};
