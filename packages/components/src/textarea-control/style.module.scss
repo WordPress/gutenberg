@@ -52,4 +52,8 @@
 			color: $components-color-light-gray-placeholder;
 		}
 	}
+
+	&:disabled::placeholder {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+	}
 }

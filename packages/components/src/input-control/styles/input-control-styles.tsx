@@ -155,6 +155,10 @@ const disabledStyles = ( { disabled }: InputProps ) => {
 		@media ( forced-colors: active ) {
 			color: GrayText;
 		}
+
+		&:disabled::placeholder {
+			color: ${ COLORS.ui.textDisabled };
+		}
 	`;
 };
 
