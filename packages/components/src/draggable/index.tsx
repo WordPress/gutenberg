@@ -6,7 +6,7 @@ import type { DraggableProps } from './types';
 import styles from './style.module.scss';
 
 // Legacy class names preserved alongside the CSS-module hashed ones for
-// backwards compatibility. `filter(Boolean)` strips `undefined` from Jest's
+// backwards compatibility. `filter(Boolean)` strips `undefined` from the
 // CSS-module mock.
 const dragImageClasses = [
 	styles[ 'invisible-drag-image' ],

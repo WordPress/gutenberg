@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import createElement from './utils/create-element';
 import { find } from '../tabbable';
 

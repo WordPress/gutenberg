@@ -8,12 +8,14 @@
 
 ### Bug Fixes
 
+-   `Layout`: Add a root `ErrorBoundary`, so a throw outside the per-area ones no longer blanks the screen. ([#82486](https://github.com/WordPress/gutenberg/pull/82486))
 -   `WelcomeGuide`: Keep the modal close icon white on hover now that it is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   `SidebarNavigationItem`: Stop forcing `style={ { fill: 'currentcolor' } }` on the icon. The explicit override was clobbering stroke-based icons' intrinsic styling. Colour is inherited via CSS `color` and the icon's own declared fills/strokes. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `AddNewTemplate`: Preserve the admin theme color on the Author template icon after it became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 
 ### Internal
 
+-   `PostList`: Stop re-sorting the fetched page in memory when the view sorts by author. The author field now sorts by author id, the same order the REST API already returns for `orderby=author`, so the re-sort no longer changes anything ([#82559](https://github.com/WordPress/gutenberg/pull/82559)).
 -   Remove the template activation (`active_templates`) experiment: the Templates page and its sidebar always use the previous (non-activation) implementations ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
 -   Remove the `showListViewByDefault` handling from `useAdaptEditorToCanvas`; the `editor` package now applies the preference on the preview ↔ edit transition itself.
 -   Remove unused dependencies `@wordpress/blob`, `@wordpress/date`, `@wordpress/escape-html`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
