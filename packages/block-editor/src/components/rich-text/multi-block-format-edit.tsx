@@ -20,6 +20,7 @@ import {
 	mayDisplayControlsKey,
 } from '../block-edit/context';
 import FormatEdit from './format-edit';
+import { getFieldFormatSettings } from './field-format-settings';
 import FormatToolbarContainer from './format-toolbar-container';
 
 const {
@@ -173,7 +174,29 @@ export default function MultiBlockFormatEdit( {
 
 function Fields( { clientIds, keys, anchor, focus, contentRef }: FieldsProps ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { formatTypes } = useFormatTypes( {} );
+	// The formats every selected field allows.
+	const { allowedFormats, withoutInteractiveFormatting } = useMemo( () => {
+		const fields = clientIds.map( ( clientId, i ) =>
+			getFieldFormatSettings( clientId, keys[ i ] )
+		);
+		const lists: string[][] = fields
+			.map( ( field ) => field?.allowedFormats )
+			.filter( Boolean );
+		return {
+			allowedFormats: lists.length
+				? lists.reduce( ( a, b ) =>
+						a.filter( ( name ) => b.includes( name ) )
+				  )
+				: undefined,
+			withoutInteractiveFormatting: fields.some(
+				( field ) => field?.withoutInteractiveFormatting
+			),
+		};
+	}, [ clientIds, keys ] );
+	const { formatTypes } = useFormatTypes( {
+		allowedFormats,
+		withoutInteractiveFormatting,
+	} );
 	const keyboardShortcuts = useRef( new Set< ( event: Event ) => void >() );
 	const inputEvents = useRef( new Set< ( event: Event ) => void >() );
 	const values: unknown[] = useSelect(

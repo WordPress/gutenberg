@@ -28,6 +28,10 @@ import { store as blockEditorStore } from '../../store';
 import { useMarkPersistent } from './use-mark-persistent';
 import { useEventListeners } from './event-listeners';
 import FormatEdit from './format-edit';
+import {
+	setFieldFormatSettings,
+	deleteFieldFormatSettings,
+} from './field-format-settings';
 import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
@@ -268,6 +272,26 @@ function RichTextWrapper(
 	} );
 	const hasFormats =
 		! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
+
+	// For formatting a selection across blocks, which happens outside the
+	// fields.
+	useEffect( () => {
+		if ( ! identifier ) {
+			return;
+		}
+		setFieldFormatSettings( clientId, identifier, {
+			allowedFormats: adjustedAllowedFormats,
+			withoutInteractiveFormatting,
+		} );
+		return () => {
+			deleteFieldFormatSettings( clientId, identifier );
+		};
+	}, [
+		clientId,
+		identifier,
+		adjustedAllowedFormats,
+		withoutInteractiveFormatting,
+	] );
 
 	const onSelectionChange = useCallback(
 		( start, end ) => {

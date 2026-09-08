@@ -2020,6 +2020,96 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should offer the formats every selected block allows', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await page.evaluate( () => {
+			const { registerBlockType } = window.wp.blocks;
+			const { useBlockProps, RichText } = window.wp.blockEditor;
+			const el = window.wp.element.createElement;
+			registerBlockType( 'test/italic-only', {
+				apiVersion: 3,
+				title: 'Italic only',
+				category: 'text',
+				attributes: {
+					content: {
+						type: 'rich-text',
+						source: 'rich-text',
+						selector: 'p',
+					},
+				},
+				edit: function Edit( { attributes, setAttributes } ) {
+					return el( RichText, {
+						...useBlockProps(),
+						tagName: 'p',
+						identifier: 'content',
+						allowedFormats: [ 'core/italic' ],
+						value: attributes.content,
+						onChange( content ) {
+							setAttributes( { content } );
+						},
+					} );
+				},
+				save( { attributes } ) {
+					return el( RichText.Content, {
+						tagName: 'p',
+						value: attributes.content,
+					} );
+				},
+			} );
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'ab' },
+		} );
+		await editor.insertBlock( {
+			name: 'test/italic-only',
+			attributes: { content: 'ab' },
+		} );
+		// The inserted block starts with the caret at its start.
+		await page.keyboard.press( 'ArrowRight' );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const {
+						getSelectedBlockClientIds,
+						getSelectionStart,
+						getSelectionEnd,
+					} = window.wp.data.select( 'core/block-editor' );
+					return {
+						blocks: getSelectedBlockClientIds().length,
+						anchorOffset: getSelectionStart().offset,
+						focusOffset: getSelectionEnd().offset,
+					};
+				} )
+			)
+			.toEqual( { blocks: 2, anchorOffset: 1, focusOffset: 1 } );
+
+		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Italic' } )
+		).toBeVisible();
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Bold' } )
+		).toBeHidden();
+
+		await pageUtils.pressKeys( 'primary+b' );
+		await pageUtils.pressKeys( 'primary+i' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'a<em>b</em>' },
+			},
+			{
+				name: 'test/italic-only',
+				attributes: { content: '<em>a</em>b' },
+			},
+		] );
+	} );
+
 	test( 'should not offer formatting when a selected block is more than its text', async ( {
 		editor,
 		page,
