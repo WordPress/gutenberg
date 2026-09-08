@@ -25,6 +25,10 @@
 -   `Tip`: Preserve the intended yellow color after its icon became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `Button`, `Placeholder`: Remove the obsolete `fill: CanvasText` override for forced colors mode. ([#82481](https://github.com/WordPress/gutenberg/pull/82481))
 
+### Documentation
+
+-   Add an Emotion-to-SCSS Modules migration guide for contributors ([#82567](https://github.com/WordPress/gutenberg/pull/82567)).
+
 ### Internal
 
 -   Migrate JSX files to TypeScript and remove their ESLint filename suppressions ([#82132](https://github.com/WordPress/gutenberg/pull/82132)).

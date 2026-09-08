@@ -66,6 +66,27 @@ function _gutenberg_add_reading_settings_to_wp_template_view_config( $data ) {
 }
 
 /**
+ * Removes the `active`, `slug`, and `theme` fields from the `wp_template`
+ * default view.
+ *
+ * They were rendered by the template activation experiment, which has been
+ * removed. No field with those ids is registered for templates anymore.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_remove_stale_fields_from_wp_template_view_config( $data ) {
+	return $data->remove(
+		array(
+			'default_view' => array(
+				'fields' => array( 'active', 'slug', 'theme' ),
+			),
+		),
+		1
+	);
+}
+
+/**
  * Provides the view configuration for the `wp_navigation` post type.
  *
  * Core has no callback for this post type, so this is a base definition
@@ -192,6 +213,12 @@ function gutenberg_register_entity_view_config_filters_7_2() {
 	add_filter(
 		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_template' ),
 		'_gutenberg_add_reading_settings_to_wp_template_view_config',
+		6,
+		1
+	);
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_template' ),
+		'_gutenberg_remove_stale_fields_from_wp_template_view_config',
 		6,
 		1
 	);
