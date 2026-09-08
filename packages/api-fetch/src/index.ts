@@ -89,11 +89,11 @@ function clearPreloadedData() {
  * The default fetch handler, using `window.fetch`. Exposed so it can be
  * restored after `setFetchHandler` overrides it.
  *
- * @param nextOptions The options for the fetch.
+ * @param options The options for the fetch.
  */
-const defaultFetchHandler: FetchHandler = ( nextOptions ) => {
-	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
-	let { body, headers } = nextOptions;
+const defaultFetchHandler: FetchHandler = ( options ) => {
+	const { url, path, data, parse = true, ...remainingOptions } = options;
+	let { body, headers } = options;
 
 	// Merge explicitly-provided headers with default values.
 	headers = { ...DEFAULT_HEADERS, ...headers };
