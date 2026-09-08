@@ -9,12 +9,19 @@ import {
 } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { focus } from '@wordpress/dom';
+import { focus, isTextField } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '../../store';
 import { BlockRefs } from '../provider/block-refs-provider';
 import { unlock } from '../../lock-unlock';
+
+// A toolbar that unmounts while one of its items has focus hands the item's
+// position to a toolbar with the same label mounting in the same task. The
+// block toolbar is keyed on the selected block and its parent, so it
+// remounts when its block moves (a list item indented from it), and the
+// focused item is removed with it, which drops focus without an event.
+let handoff = null;
 
 function hasOnlyToolbarItem( elements ) {
 	const dataProp = 'toolbarItem';
@@ -149,11 +156,25 @@ function useToolbarFocus( {
 			! initialFocusOnMount &&
 			! hasFocusWithin( navigableToolbarRef )
 		) {
+			const received =
+				handoff?.label ===
+				navigableToolbarRef.getAttribute( 'aria-label' )
+					? handoff
+					: null;
 			raf = window.requestAnimationFrame( () => {
 				const items =
 					getAllFocusableToolbarItemsIn( navigableToolbarRef );
-				const index = initialIndex || 0;
-				if ( items[ index ] && hasFocusWithin( navigableToolbarRef ) ) {
+				const index = received
+					? Math.min( received.index, items.length - 1 )
+					: initialIndex || 0;
+				const { activeElement, body } =
+					navigableToolbarRef.ownerDocument;
+				if (
+					items[ index ] &&
+					( hasFocusWithin( navigableToolbarRef ) ||
+						( received &&
+							( ! activeElement || activeElement === body ) ) )
+				) {
 					items[ index ].focus( {
 						// When focusing newly mounted toolbars,
 						// the position of the popover is often not right on the first render
@@ -176,6 +197,53 @@ function useToolbarFocus( {
 		};
 	}, [ initialIndex, initialFocusOnMount, onIndexChange, toolbarRef ] );
 
+	// Track which item has focus, and hand its position over on unmount.
+	useEffect( () => {
+		const toolbar = toolbarRef.current;
+		let index = -1;
+
+		function onFocusIn( event ) {
+			index = getAllFocusableToolbarItemsIn( toolbar ).indexOf(
+				event.target
+			);
+		}
+
+		function onFocusOut( event ) {
+			// Focus moved somewhere on purpose.
+			if ( event.relatedTarget ) {
+				index = -1;
+				return;
+			}
+			// No related target: focus went to another document (the
+			// canvas), to something not focusable, or the item was
+			// removed. Chrome fires no event at all for a removal; the
+			// others report it before the item is detached.
+			const { target } = event;
+			window.queueMicrotask( () => {
+				if ( target.isConnected ) {
+					index = -1;
+				}
+			} );
+		}
+
+		toolbar.addEventListener( 'focusin', onFocusIn );
+		toolbar.addEventListener( 'focusout', onFocusOut );
+
+		return () => {
+			toolbar.removeEventListener( 'focusin', onFocusIn );
+			toolbar.removeEventListener( 'focusout', onFocusOut );
+
+			if ( index < 0 ) {
+				return;
+			}
+
+			handoff = { label: toolbar.getAttribute( 'aria-label' ), index };
+			window.queueMicrotask( () => {
+				handoff = null;
+			} );
+		};
+	}, [ toolbarRef ] );
+
 	/**
 	 * Handles returning focus to the block editor canvas when pressing escape.
 	 */
@@ -192,10 +260,17 @@ function useToolbarFocus( {
 			// The last focused element is only recorded once focus has left
 			// the canvas, so fall back to the selected block. Without it
 			// escape leaves focus stranded in the toolbar, with no way back
-			// to the canvas by keyboard.
-			const target =
-				getLastFocus()?.current ??
-				refsMap.get( getSelectedBlockClientId() );
+			// to the canvas by keyboard. When the recorded element was
+			// removed since (the block re-rendered after it moved), return
+			// to the block's first text field, where focus left from.
+			const lastFocus = getLastFocus()?.current;
+			const blockElement = refsMap.get( getSelectedBlockClientId() );
+			let target = lastFocus ?? blockElement;
+			if ( lastFocus && ! lastFocus.isConnected && blockElement ) {
+				target =
+					focus.tabbable.find( blockElement ).find( isTextField ) ??
+					blockElement;
+			}
 			if ( target ) {
 				event.preventDefault();
 				target.focus();
