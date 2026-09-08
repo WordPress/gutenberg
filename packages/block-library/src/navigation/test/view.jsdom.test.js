@@ -52,7 +52,7 @@ describe( 'Navigation view script', () => {
 	} );
 
 	it( 'keeps a submenu inside an open custom overlay closed until it is opened', () => {
-		// A custom overlay is excluded from the styles that unfold every
+		// A custom overlay is excluded from the styles that display every
 		// submenu, so opening the overlay must not report the submenu as open.
 		mockCurrentContext = {
 			type: 'submenu',
