@@ -584,7 +584,7 @@ Widgets provide a file-based discovery system for building self-contained UI com
 widgets/
   hello-world/
     widget.json     # Static discovery metadata (required)
-    widget.ts       # Runtime schema entry point (optional)
+    widget.ts       # Runtime values entry point (optional)
     render.tsx      # UI component entry point (optional)
     render.scss     # Optional styles (bundled inline when imported from render.tsx)
     package.json    # Optional npm dependencies manifest
@@ -626,7 +626,7 @@ Rule of thumb: anything the host needs before loading a widget's module — iden
 -   **`description`** (optional): Short description. Translated server-side using `textdomain`.
 -   **`help`** (optional): Contextual help note for compact surfaces. An object with `content` (may carry `<em>`/`<strong>`) and optional `links` (`label`, `href`). Translated server-side using `textdomain`.
 -   **`keywords`** (optional): Search aliases. Translated server-side using `textdomain`.
--   **`attributes`** (optional): Attribute schema, one entry per attribute with the JSON-expressible subset of a DataViews `Field` (`id`, `type`, `label`, `elements`, `isValid` without `custom`, ...) plus an optional `relevance` (`high`, `medium`, `low`). `type` may name a registered field type. `label`, `description`, `placeholder` and option labels are translated server-side using `textdomain`.
+-   **`attributes`** (optional): Attribute schema, one entry per attribute with the JSON-expressible subset of a DataViews `Field` (`id`, `type`, `label`, `elements`, `isValid` without `custom`, ...) plus an optional `relevance` (`high`, `medium`, `low`). `type` may name a registered field type. `label`, `header`, `description`, `placeholder`, and option labels and descriptions are translated server-side using `textdomain`.
 -   **`category`** (optional): Grouping category for filtering
 -   **`presentation`** (optional): Rendering intent (`framed`, `content-bleed`, `full-bleed`)
 -   **`textdomain`** (optional): Gettext text domain for translating `title`, `description`, `help`, `keywords`, and attribute labels
@@ -660,7 +660,7 @@ const widget = {
 export default widget;
 ```
 
-Entries merge by `id` with the `widget.json` schema: the JSON value wins a shared key, the module adds the rest. A widget whose attributes are plain data needs no `widget.ts`.
+Entries merge by `id` with the `widget.json` schema: the JSON value wins a shared key, the module adds the rest, and `isValid` merges rule by rule so JSON rules and a module `custom` validator coexist. A widget whose attributes are plain data needs no `widget.ts`.
 
 ### `render.tsx` — UI component
 
