@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as noticesStore } from '@wordpress/notices';
@@ -9,6 +10,8 @@ import {
 } from '@wordpress/editor';
 import { store as editPostStore } from '..';
 import { unlock } from '../../lock-unlock';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 const { interfaceStore } = unlock( editorPrivateApis );
 

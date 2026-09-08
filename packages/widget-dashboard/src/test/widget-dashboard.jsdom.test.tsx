@@ -1,7 +1,8 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import type { ComponentType } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
 import type {
 	ResolveWidgetModule,
@@ -10,6 +11,10 @@ import type {
 } from '@wordpress/widget-primitives';
 import { WidgetDashboard } from '../widget-dashboard';
 import type { DashboardWidget } from '../types';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+globalThis.wpVitest.mockResizeObserver();
 
 type Attrs = { greeting: string };
 
@@ -115,7 +120,7 @@ describe( 'WidgetDashboard', () => {
 	} );
 
 	it( 'threads setAttributes into onLayoutChange on commit with merged attributes', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		render( <Harness onLayoutChange={ onChange } /> );
 
 		const button = await screen.findByRole( 'button', {

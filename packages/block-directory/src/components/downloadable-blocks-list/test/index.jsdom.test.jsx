@@ -1,31 +1,31 @@
 import { render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSelect } from '@wordpress/data';
 import DownloadableBlocksList from '../';
 import { items } from '../../test/fixtures';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
 	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
-} );
-
-jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
-	useDispatch: () => ( { installBlockType: jest.fn() } ),
+	useSelect: vi.fn(),
+	useDispatch: () => ( { installBlockType: vi.fn() } ),
 } ) );
 
 describe( 'DownloadableBlocksList', () => {
 	describe( 'List rendering', () => {
-		useSelect.mockImplementation( () => ( {
-			isLoading: false,
-			isInstallable: true,
-		} ) );
+		beforeEach( () => {
+			useSelect.mockReturnValue( {
+				isLoading: false,
+				isInstallable: true,
+			} );
+		} );
 
 		it( 'should render an empty list', () => {
 			const { container } = render(
 				<DownloadableBlocksList
 					items={ [] }
-					onSelect={ jest.fn() }
-					onHover={ jest.fn() }
+					onSelect={ vi.fn() }
+					onHover={ vi.fn() }
 				/>
 			);
 
@@ -36,8 +36,8 @@ describe( 'DownloadableBlocksList', () => {
 			render(
 				<DownloadableBlocksList
 					items={ items }
-					onSelect={ jest.fn() }
-					onHover={ jest.fn() }
+					onSelect={ vi.fn() }
+					onHover={ vi.fn() }
 				/>
 			);
 			const downloadableBlocks = screen.getAllByRole( 'option' );

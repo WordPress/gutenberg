@@ -1,3 +1,5 @@
+import process from 'node:process';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
@@ -7,14 +9,19 @@ import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-o
 
 function collectUncaughtErrors() {
 	const errors: Error[] = [];
-	const handler = ( event: ErrorEvent ) => {
+	const windowHandler = ( event: ErrorEvent ) => {
 		event.preventDefault();
 		errors.push( event.error );
 	};
-	window.addEventListener( 'error', handler );
+	const processHandler = ( error: Error ) => errors.push( error );
+	window.addEventListener( 'error', windowHandler );
+	process.on( 'uncaughtException', processHandler );
 	return {
 		errors,
-		cleanup: () => window.removeEventListener( 'error', handler ),
+		cleanup: () => {
+			window.removeEventListener( 'error', windowHandler );
+			process.off( 'uncaughtException', processHandler );
+		},
 	};
 }
 
@@ -311,7 +318,7 @@ describe( 'Popover', () => {
 	describe( 'onOpenChange callback', () => {
 		it( 'should call onOpenChange when the popover opens and closes', async () => {
 			const user = userEvent.setup();
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 
 			render(
 				<Popover.Root onOpenChange={ onOpenChange }>
@@ -773,7 +780,7 @@ describe( 'Popover', () => {
 
 		it( 'should use a custom initialFocus callback as-is', async () => {
 			const user = userEvent.setup();
-			const customFocus = jest.fn( () => false as const );
+			const customFocus = vi.fn( () => false as const );
 
 			render(
 				<Popover.Root>
@@ -801,14 +808,14 @@ describe( 'Popover', () => {
 	describe( 'title validation', () => {
 		// Suppress console.error from React act() warnings and jsdom
 		// unhandled-error logging. Validation errors are caught via
-		// collectUncaughtErrors (window 'error' event) instead.
+		// collectUncaughtErrors (browser or process error event) instead.
 		let originalConsoleError: typeof console.error;
 
 		beforeEach( () => {
 			// eslint-disable-next-line no-console
 			originalConsoleError = console.error;
 			// eslint-disable-next-line no-console
-			console.error = jest.fn();
+			console.error = vi.fn();
 		} );
 
 		afterEach( () => {
