@@ -1,8 +1,9 @@
 import { loadView } from '@wordpress/views';
-import { resolveSelect } from '@wordpress/data';
+import { dispatch, resolveSelect, select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { decodeEntities } from '@wordpress/html-entities';
-import type { View, Filter, SupportedLayouts } from '@wordpress/dataviews';
+import { store as editorStore } from '@wordpress/editor';
+import { filterSortAndPaginate } from '@wordpress/dataviews';
+import type { View, Field, SupportedLayouts } from '@wordpress/dataviews';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import type { Template } from './types';
 
@@ -91,63 +92,23 @@ export async function ensureView(
 	} );
 }
 
-type SortableValue = string | number | undefined;
-
 /**
- * Values of the fields the stage lets the view filter, search and sort by.
- * They mirror `getValue` of the field definitions the stage renders.
+ * Resolves the post fields of the template post type, for use in the route
+ * loader that runs outside React (where `usePostFields` is unavailable).
+ *
+ * Registering the post type schema is what `usePostFields` does on mount;
+ * it is a no-op once the schema is registered.
+ *
+ * @return The field definitions the stage renders.
  */
-const FIELD_VALUES: Record< string, ( template: Template ) => SortableValue > =
-	{
-		title: ( template ) =>
-			decodeEntities(
-				template.title?.rendered ?? template.title?.raw ?? ''
-			),
-		description: ( template ) => template.description,
-		author: ( template ) => template.author_text ?? template.author,
-	};
-
-// The fields with `enableGlobalSearch`.
-const SEARCHABLE_FIELDS = [ 'title', 'description' ];
-
-// The fields DataViews can sort by (the others set `enableSorting: false`).
-const SORTABLE_FIELDS = [ 'title', 'author' ];
-
-function normalizeSearchInput( input: string ) {
-	// Strip the combining diacritical marks left by the NFD decomposition,
-	// which approximates the accent removal DataViews applies.
-	return input
-		.trim()
-		.toLowerCase()
-		.normalize( 'NFD' )
-		.replace( /[\u0300-\u036f]/g, '' );
-}
-
-function matchesFilter( template: Template, filter: Filter ) {
-	const getValue = FIELD_VALUES[ filter.field ];
-	if ( ! getValue ) {
-		return true;
-	}
-	const value = getValue( template );
-	switch ( filter.operator ) {
-		case 'is':
-			return filter.value === undefined || filter.value === value;
-		case 'isNot':
-			return filter.value !== value;
-		case 'isAny':
-			return ! filter.value?.length || filter.value.includes( value );
-		case 'isNone':
-			return ! filter.value?.length || ! filter.value.includes( value );
-		default:
-			return true;
-	}
-}
-
-function compare( a: SortableValue, b: SortableValue ) {
-	if ( typeof a === 'number' && typeof b === 'number' ) {
-		return a - b;
-	}
-	return String( a ?? '' ).localeCompare( String( b ?? '' ) );
+export async function loadTemplateFields(): Promise< Field< Template >[] > {
+	await unlock( dispatch( editorStore ) ).registerPostTypeSchema(
+		TEMPLATE_POST_TYPE
+	);
+	return unlock( select( editorStore ) ).getEntityFields(
+		'postType',
+		TEMPLATE_POST_TYPE
+	);
 }
 
 /**
@@ -156,48 +117,18 @@ function compare( a: SortableValue, b: SortableValue ) {
  *
  * The templates endpoint ignores search, ordering and pagination, so the
  * stage fetches every template and applies the view client-side through
- * `filterSortAndPaginate`; this does the same over the same records.
+ * `filterSortAndPaginate`; this does the same over the same records and
+ * field definitions.
  *
  * @param templates Every template, as the stage fetches them.
  * @param view      The resolved view.
+ * @param fields    The post fields, as `loadTemplateFields` resolves them.
  * @return The template to preview, if any.
  */
 export function getFirstTemplateInView(
 	templates: Template[],
-	view: View
+	view: View,
+	fields: Field< Template >[]
 ): Template | undefined {
-	let result = templates;
-
-	if ( view.search ) {
-		const search = normalizeSearchInput( view.search );
-		result = result.filter( ( template ) =>
-			SEARCHABLE_FIELDS.some( ( field ) =>
-				normalizeSearchInput(
-					String( FIELD_VALUES[ field ]( template ) ?? '' )
-				).includes( search )
-			)
-		);
-	}
-
-	for ( const filter of view.filters ?? [] ) {
-		result = result.filter( ( template ) =>
-			matchesFilter( template, filter )
-		);
-	}
-
-	const sortField = view.sort?.field;
-	if ( sortField && SORTABLE_FIELDS.includes( sortField ) ) {
-		const getValue = FIELD_VALUES[ sortField ];
-		const direction = view.sort?.direction === 'asc' ? 1 : -1;
-		result = [ ...result ].sort(
-			( a, b ) => direction * compare( getValue( a ), getValue( b ) )
-		);
-	}
-
-	const offset =
-		view.page !== undefined && view.perPage !== undefined
-			? ( view.page - 1 ) * view.perPage
-			: 0;
-
-	return result[ offset ];
+	return filterSortAndPaginate( templates, view, fields ).data[ 0 ];
 }

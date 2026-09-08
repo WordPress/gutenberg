@@ -2,7 +2,11 @@ import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { notFound } from '@wordpress/route';
-import { ensureView, getFirstTemplateInView } from './view-utils';
+import {
+	ensureView,
+	getFirstTemplateInView,
+	loadTemplateFields,
+} from './view-utils';
 import type { Template } from './types';
 
 /**
@@ -55,13 +59,21 @@ export const route = {
 		// Otherwise, preview the template the stage selects by default. The
 		// templates endpoint ignores search, ordering and pagination, so
 		// fetch every template (the same query the stage uses, so the
-		// records are shared) and apply the view client-side.
-		const templates = ( await resolveSelect( coreStore ).getEntityRecords(
-			'postType',
-			'wp_template',
-			{ per_page: -1 }
-		) ) as Template[] | null;
-		const template = getFirstTemplateInView( templates ?? [], view );
+		// records are shared) and apply the view client-side over the
+		// same field definitions the stage renders.
+		const [ templates, fields ] = await Promise.all( [
+			resolveSelect( coreStore ).getEntityRecords(
+				'postType',
+				'wp_template',
+				{ per_page: -1 }
+			) as Promise< Template[] | null >,
+			loadTemplateFields(),
+		] );
+		const template = getFirstTemplateInView(
+			templates ?? [],
+			view,
+			fields
+		);
 
 		if ( template ) {
 			return {
