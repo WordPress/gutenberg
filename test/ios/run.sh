@@ -74,7 +74,6 @@ xcrun simctl terminate "$UDID" com.apple.mobilesafari 2>/dev/null || true
 SAFARI_DATA=$( xcrun simctl get_app_container "$UDID" com.apple.mobilesafari data )
 rm -f "$SAFARI_DATA"/Library/Cookies/*.binarycookies
 
-xcodebuild -version
 step "Generating the Xcode project"
 ( cd test/ios && xcodegen generate --quiet )
 step "Building and running the tests"

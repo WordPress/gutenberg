@@ -58,14 +58,7 @@ final class AutoCapitalizationTests: XCTestCase {
 	/// The keyboard updates shortly after focus moves.
 	func assertCapitalized( _ message: String ) {
 		let upperCase = NSPredicate( format: "label == 'A'" )
-		if !keyboard.keys.matching( upperCase ).firstMatch.waitForExistence( timeout: 5 ) {
-			// Everything Safari shows at this point, for triage.
-			let tree = XCTAttachment( string: safari.debugDescription )
-			tree.name = "Safari accessibility tree"
-			tree.lifetime = .keepAlways
-			add( tree )
-			XCTFail( message )
-		}
+		XCTAssertTrue( keyboard.keys.matching( upperCase ).firstMatch.waitForExistence( timeout: 5 ), message )
 		XCTAssertTrue( key( "shift" ).isSelected, message )
 	}
 
