@@ -21,6 +21,8 @@ const TextContainer = ( {
 
 /**
  * A complete checkbox field with integrated label and description.
+ *
+ * Visually hidden labels also expand the checkbox pointer target.
  */
 export const CheckboxControl = forwardRef<
 	HTMLSpanElement,

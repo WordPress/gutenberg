@@ -20,11 +20,11 @@ export const Checkbox = forwardRef< HTMLSpanElement, CheckboxProps >(
 					resetStyles[ 'box-sizing' ],
 					focusStyles[ 'outset-ring--focus' ],
 					styles.root,
+					hasExpandedHitArea && styles[ 'has-expanded-hit-area' ],
 					className
 				) }
 				indeterminate={ indeterminate }
 				{ ...restProps }
-				data-expanded-hit-area={ hasExpandedHitArea ? '' : undefined }
 			>
 				<_Checkbox.Indicator
 					className={ styles[ 'indicator-icon' ] }

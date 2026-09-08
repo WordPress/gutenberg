@@ -21,6 +21,7 @@ describe( 'CheckboxControl', () => {
 		const checkbox = screen.getByRole( 'checkbox', { name: 'Subscribe' } );
 		expect( checkbox ).toBeVisible();
 		expect( screen.getByText( 'Subscribe' ) ).toBeVisible();
+		expect( checkbox ).not.toHaveAttribute( 'hasExpandedHitArea' );
 		expect( checkbox ).not.toHaveAttribute( 'data-expanded-hit-area' );
 	} );
 
@@ -29,7 +30,6 @@ describe( 'CheckboxControl', () => {
 
 		const checkbox = screen.getByRole( 'checkbox', { name: 'Subscribe' } );
 		expect( checkbox ).toBeVisible();
-		expect( checkbox ).toHaveAttribute( 'data-expanded-hit-area', '' );
 	} );
 
 	it( 'renders accessible label and description', () => {

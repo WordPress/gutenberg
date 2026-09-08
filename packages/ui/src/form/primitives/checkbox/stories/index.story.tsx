@@ -53,6 +53,13 @@ export const DisabledChecked: Story = {
 };
 
 export const ExpandedHitArea: Story = {
+	parameters: {
+		docs: {
+			description: {
+				story: 'Expands the pointer target to 24px without changing the painted size. Use this when the checkbox has no visible label.',
+			},
+		},
+	},
 	args: {
 		...Default.args,
 		hasExpandedHitArea: true,

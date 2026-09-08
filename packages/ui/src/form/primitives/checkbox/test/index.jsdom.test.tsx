@@ -29,14 +29,16 @@ describe( 'Checkbox', () => {
 
 		const checkbox = screen.getByRole( 'checkbox', { name: 'Option' } );
 		expect( checkbox ).toBeVisible();
+		expect( checkbox ).not.toHaveAttribute( 'hasExpandedHitArea' );
 		expect( checkbox ).not.toHaveAttribute( 'data-expanded-hit-area' );
 	} );
 
-	it( 'expands the hit area when hasExpandedHitArea is true', () => {
+	it( 'does not set a hit-area DOM attribute when hasExpandedHitArea is true', () => {
 		render( <Checkbox aria-label="Option" hasExpandedHitArea /> );
 
 		const checkbox = screen.getByRole( 'checkbox', { name: 'Option' } );
 		expect( checkbox ).toBeVisible();
-		expect( checkbox ).toHaveAttribute( 'data-expanded-hit-area', '' );
+		expect( checkbox ).not.toHaveAttribute( 'hasExpandedHitArea' );
+		expect( checkbox ).not.toHaveAttribute( 'data-expanded-hit-area' );
 	} );
 } );

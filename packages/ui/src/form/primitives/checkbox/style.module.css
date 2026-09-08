@@ -3,13 +3,13 @@
 
 	@layer components {
 		.root {
-			--wp-ui-checkbox-input-size: 16px;
+			--_checkbox-input-size: var(--wp-ui-checkbox-input-size, var(--wpds-dimension-size-2xs));
 
 			position: relative;
 			display: inline-block;
 			flex-shrink: 0;
-			width: var(--wp-ui-checkbox-input-size);
-			height: var(--wp-ui-checkbox-input-size);
+			width: var(--_checkbox-input-size);
+			aspect-ratio: 1;
 			border-radius: var(--wpds-border-radius-sm);
 			border:
 				var(--wpds-border-width-xs) solid
@@ -48,14 +48,10 @@
 				}
 			}
 
-			&[data-expanded-hit-area]::after {
+			&.has-expanded-hit-area::after {
 				content: "";
 				position: absolute;
-				inset-block-start: 50%;
-				inset-inline-start: 50%;
-				width: var(--wp-ui-checkbox-hit-area-size, var(--wpds-dimension-size-sm));
-				aspect-ratio: 1;
-				transform: translate(-50%, -50%);
+				inset: calc((var(--_checkbox-input-size) - max(var(--_checkbox-input-size), var(--wpds-dimension-size-sm))) / 2);
 			}
 		}
 
