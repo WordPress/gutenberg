@@ -129,7 +129,7 @@ if ( ! function_exists( 'gutenberg_resolve_pattern_blocks' ) ) {
  *
  * @param array    $query The query vars.
  * @param WP_Block $block Block instance.
- * @return array   The filtered query vars.
+ * @return array The filtered query vars.
  */
 function gutenberg_update_tax_query_of_query_loop_block( $query, $block ) {
 	if ( empty( $block->context['query']['taxQuery'] ) ) {

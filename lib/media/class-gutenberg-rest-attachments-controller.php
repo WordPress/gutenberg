@@ -1756,8 +1756,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * https://github.com/WordPress/wordpress-develop/pull/11856; until it lands
 	 * the function_exists() guard falls back to the inline implementation below.
 	 *
-	 * @param non-empty-string $mime_type The output image MIME type, e.g. 'image/jpeg'.
-	 * @param array{ width?: non-negative-int, height?: non-negative-int } $size Dimensions ('width', 'height') for the wp_editor_set_quality filter.
+	 * @param non-empty-string                                             $mime_type The output image MIME type, e.g. 'image/jpeg'.
+	 * @param array{ width?: non-negative-int, height?: non-negative-int } $size      Dimensions ('width', 'height') for the wp_editor_set_quality filter.
 	 * @return int<1, 100> Encode quality between 1 and 100.
 	 */
 	private function get_image_encode_quality( string $mime_type, array $size = array() ): int {

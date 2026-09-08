@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
@@ -23,7 +24,7 @@ const COLOR_PALETTE = [
 describe( 'DuotonePicker', () => {
 	it( 'should use matching values only for display in command button presentation', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		render(
 			<DuotonePicker
 				aria-label="Duotones"
@@ -63,7 +64,7 @@ describe( 'DuotonePicker', () => {
 				aria-label="Duotones"
 				duotonePalette={ DUPLICATE_DUOTONES }
 				colorPalette={ COLOR_PALETTE }
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				asButtons={ false }
 				presentation="command-buttons"
 				disableCustomDuotone
@@ -89,7 +90,7 @@ describe( 'DuotonePicker', () => {
 				colorPalette={ COLOR_PALETTE }
 				value={ COLORS_A }
 				selectedSlug="dark-background"
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				asButtons
 				unsetable={ false }
 				clearable={ false }
@@ -120,7 +121,7 @@ describe( 'DuotonePicker', () => {
 					duotonePalette={ DUPLICATE_DUOTONES }
 					colorPalette={ COLOR_PALETTE }
 					value={ undefined }
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					disableCustomDuotone
 					disableCustomColors
 				/>
@@ -137,7 +138,7 @@ describe( 'DuotonePicker', () => {
 					colorPalette={ COLOR_PALETTE }
 					value={ COLORS_A }
 					selectedSlug="dark-text"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					unsetable={ false }
 					disableCustomDuotone
 					disableCustomColors
@@ -157,7 +158,7 @@ describe( 'DuotonePicker', () => {
 					duotonePalette={ DUPLICATE_DUOTONES }
 					colorPalette={ COLOR_PALETTE }
 					value={ COLORS_A }
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					unsetable={ false }
 					disableCustomDuotone
 					disableCustomColors
@@ -177,7 +178,7 @@ describe( 'DuotonePicker', () => {
 					colorPalette={ COLOR_PALETTE }
 					value={ COLORS_A }
 					selectedSlug=""
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					unsetable={ false }
 					disableCustomDuotone
 					disableCustomColors
@@ -191,7 +192,7 @@ describe( 'DuotonePicker', () => {
 
 		it( 'should pass index and slug to onChange when a swatch is clicked', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<DuotonePicker
@@ -215,7 +216,7 @@ describe( 'DuotonePicker', () => {
 
 		it( 'should clear only the selected preset, identified by slug', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<DuotonePicker
@@ -331,7 +332,7 @@ describe( 'DuotonePicker', () => {
 					] }
 					colorPalette={ COLOR_PALETTE }
 					value={ COLORS_B }
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 					unsetable={ false }
 					disableCustomDuotone
 					disableCustomColors
