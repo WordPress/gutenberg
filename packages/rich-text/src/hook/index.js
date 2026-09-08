@@ -208,34 +208,17 @@ function useRichTextBase( {
 	// Apply the selection from props unless the element already holds it. A
 	// selection the element made itself is left alone: the live range keeps
 	// its direction and the side of a format boundary the caret sits on, which
-	// the record does not represent.
-	//
-	// Focus is only taken when it was lost: the element that had it was
-	// removed (a merge, a block moved into a nested list) and the document
-	// fell back to its body. Focus anywhere else was placed there on purpose
-	// and stays, including on a body that is itself an editing host, and
-	// including a stale active element while another window has focus. The
-	// selection is then not applied either, since setting a selection into
-	// an unfocused editable moves focus in some browsers, and the focus
-	// handler applies the record once focus arrives.
+	// the record does not represent. Focus is not managed here: the selection
+	// is applied only while the element, or an editing host around it, has
+	// focus, since setting a selection into an unfocused editable moves focus
+	// in some browsers. The focus handler applies the record once focus
+	// arrives.
 	useLayoutEffect( () => {
 		if ( ! isSelected ) {
 			return;
 		}
 
-		const { ownerDocument } = ref.current;
-		const { body } = ownerDocument;
-
-		if (
-			ownerDocument.hasFocus() &&
-			( ! ownerDocument.activeElement ||
-				ownerDocument.activeElement === body ) &&
-			body.contentEditable !== 'true'
-		) {
-			ref.current.focus();
-		}
-
-		const { activeElement } = ownerDocument;
+		const { activeElement } = ref.current.ownerDocument;
 
 		if (
 			activeElement !== ref.current &&

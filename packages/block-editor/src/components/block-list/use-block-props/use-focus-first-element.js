@@ -6,7 +6,7 @@ import {
 	placeCaretAtHorizontalEdge,
 } from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
-import { focusSelectedField, isInsideRootBlock } from '../../../utils/dom';
+import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -55,19 +55,6 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 			return;
 		}
 
-		// When the selection names a field and an offset in this block, the
-		// field's rich text places the caret. Only move focus to the field,
-		// which does not take focus by itself.
-		const selectionStart = getSelectionStart();
-
-		if (
-			selectionStart.clientId === clientId &&
-			selectionStart.offset !== undefined
-		) {
-			focusSelectedField( ownerDocument, selectionStart );
-			return;
-		}
-
 		// Find all tabbables within node.
 		const textInputs = focus.tabbable
 			.find( ref.current )
@@ -100,17 +87,22 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 		// Do not place a caret when the target already contains one:
 		// while a focused editing host contains the target (the block
 		// supports `editableRoot`), the caret can be inside it without the
-		// target holding focus. A leftover caret yields to an explicitly
-		// requested edge position (initialPosition -1).
+		// target holding focus. Only a caret the rich text synchronized to
+		// the store (offsets present) is deliberate; a leftover one yields
+		// to an explicitly requested edge position (initialPosition -1).
 		const { activeElement } = ownerDocument;
 		const selection = ownerDocument.defaultView.getSelection();
+		const { clientId: selectionClientId, offset } = getSelectionStart();
 		const hasCaret =
 			activeElement?.isContentEditable &&
 			activeElement.contains( target ) &&
 			!! selection.anchorNode &&
 			target.contains( selection.anchorNode );
+		const isDeliberate =
+			initialPosition === 0 ||
+			( offset !== undefined && selectionClientId === clientId );
 
-		if ( ! ( hasCaret && initialPosition === 0 ) ) {
+		if ( ! ( hasCaret && isDeliberate ) ) {
 			placeCaretAtHorizontalEdge( target, isReverse );
 		}
 	}, [ initialPosition, clientId ] );
