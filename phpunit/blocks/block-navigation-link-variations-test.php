@@ -244,7 +244,7 @@ class Block_Navigation_Link_Variations_Test extends WP_UnitTestCase {
 	 * Get a variation by its name from an array of variations.
 	 *
 	 * @param string $variation_name The name (= slug) of the variation.
-	 * @param array  $variations An array of variations.
+	 * @param array  $variations     An array of variations.
 	 * @return array|null The found variation or null.
 	 */
 	private function get_variation_by_name( $variation_name, $variations ) {

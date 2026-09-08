@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
@@ -9,6 +10,8 @@ jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 const withColorEditing = ( config: Record< string, unknown > ) => ( {
 	[ colorEditingKey ]: config,
 } );
+
+globalThis.wpVitest.mockMatchMedia();
 
 const EXAMPLE_COLORS = [
 	{ name: 'red', color: '#f00' },
@@ -43,7 +46,7 @@ const ControlledColorPalette = ( {
 describe( 'ColorPalette', () => {
 	it( 'should use matching values only for display in command button presentation', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		render(
 			<ColorPalette
 				aria-label="Colors"
@@ -73,7 +76,7 @@ describe( 'ColorPalette', () => {
 			<ColorPalette
 				aria-label="Colors"
 				colors={ EXAMPLE_COLORS }
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				asButtons={ false }
 				presentation="command-buttons"
 				disableCustomColors
@@ -96,7 +99,7 @@ describe( 'ColorPalette', () => {
 				colors={ DUPLICATE_COLOR_PALETTE }
 				value="#000"
 				selectedSlug="dark-background"
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				asButtons
 				disableCustomColors
 				clearable={ false }
@@ -118,7 +121,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should render three color button options', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<ColorPalette
@@ -133,7 +136,7 @@ describe( 'ColorPalette', () => {
 
 	it( 'should call onClick on an active button with undefined', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<ColorPalette
@@ -151,7 +154,7 @@ describe( 'ColorPalette', () => {
 
 	it( 'should call onClick on an inactive button', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<ColorPalette
@@ -180,7 +183,7 @@ describe( 'ColorPalette', () => {
 
 	it( 'should call onClick with undefined, when the clearButton onClick is triggered', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<ColorPalette
@@ -197,7 +200,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should render custom color picker', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<ColorPalette
@@ -213,7 +216,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should allow disabling custom color picker', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<ColorPalette
@@ -230,7 +233,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should render nothing when custom colors are disabled, there are no colors, and it is not clearable', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		const { container } = render(
 			<ColorPalette
 				colors={ [] }
@@ -245,7 +248,7 @@ describe( 'ColorPalette', () => {
 
 	it( 'should render dropdown and its content', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<ColorPalette
@@ -284,7 +287,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should show the clear button by default', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<ColorPalette
@@ -300,7 +303,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should show the clear button even when `colors` is an empty array', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render( <ColorPalette colors={ [] } onChange={ onChange } /> );
 
@@ -310,7 +313,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should still show the clear button when colors is empty and custom colors are disabled', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<ColorPalette
@@ -381,7 +384,7 @@ describe( 'ColorPalette', () => {
 				<ColorPalette
 					colors={ DUPLICATE_COLOR_PALETTE }
 					value={ undefined }
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 				/>
 			);
 
@@ -394,7 +397,7 @@ describe( 'ColorPalette', () => {
 					colors={ DUPLICATE_COLOR_PALETTE }
 					value="#000"
 					selectedSlug="dark-text"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 				/>
 			);
 
@@ -410,7 +413,7 @@ describe( 'ColorPalette', () => {
 				<ColorPalette
 					colors={ DUPLICATE_COLOR_PALETTE }
 					value="#000"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 				/>
 			);
 
@@ -427,7 +430,7 @@ describe( 'ColorPalette', () => {
 					colors={ DUPLICATE_COLOR_PALETTE }
 					value="#000"
 					selectedSlug=""
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 				/>
 			);
 
@@ -442,7 +445,7 @@ describe( 'ColorPalette', () => {
 					colors={ DUPLICATE_COLOR_PALETTE }
 					value="#000"
 					selectedSlug="dark-text"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 				/>
 			);
 
@@ -455,7 +458,7 @@ describe( 'ColorPalette', () => {
 
 		it( 'should pass slug as third argument to onChange when a swatch is clicked', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<ColorPalette
@@ -473,7 +476,7 @@ describe( 'ColorPalette', () => {
 
 		it( 'should clear the selection when the selected swatch is clicked', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<ColorPalette
@@ -503,7 +506,7 @@ describe( 'ColorPalette', () => {
 					colors={ MIXED_PALETTE }
 					value="#fff"
 					selectedSlug="brand-white"
-					onChange={ jest.fn() }
+					onChange={ vi.fn() }
 				/>
 			);
 

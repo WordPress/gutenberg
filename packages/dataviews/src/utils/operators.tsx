@@ -116,10 +116,10 @@ const isNoneOperatorDefinition = {
 			return ! filterValue.some( ( fv: any ) =>
 				fieldValue.includes( fv )
 			);
-		}
-
-		const fieldValueType = typeof fieldValue;
-		if ( fieldValueType === 'string' || fieldValueType === 'number' ) {
+		} else if (
+			typeof fieldValue === 'string' ||
+			typeof fieldValue === 'number'
+		) {
 			return ! filterValue.includes( fieldValue );
 		}
 
@@ -164,10 +164,10 @@ const OPERATORS: {
 				return filterValue.some( ( fv: any ) =>
 					fieldValue.includes( fv )
 				);
-			}
-
-			const fieldValueType = typeof fieldValue;
-			if ( fieldValueType === 'string' || fieldValueType === 'number' ) {
+			} else if (
+				typeof fieldValue === 'string' ||
+				typeof fieldValue === 'number'
+			) {
 				return filterValue.includes( fieldValue );
 			}
 
@@ -200,9 +200,14 @@ const OPERATORS: {
 				return true;
 			}
 
-			return filterValue.every( ( value: any ) => {
-				return field.getValue( { item } )?.includes( value );
-			} );
+			const fieldValue = field.getValue( { item } );
+			if ( ! Array.isArray( fieldValue ) ) {
+				return false;
+			}
+
+			return filterValue.every( ( value: any ) =>
+				fieldValue.includes( value )
+			);
 		},
 		selection: 'multi',
 	},

@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Compound components: Report missing state or accessible semantic structure with clear developer guidance ([#82509](https://github.com/WordPress/gutenberg/pull/82509)).
 -   `ToggleGroupControl`: Honor the root `disabled` prop so the whole control is unselectable ([#82259](https://github.com/WordPress/gutenberg/pull/82259)).
 -   Validated form controls: Use `--wpds-color-stroke-interactive-error` for the invalid-state focus ring and border ([#82410](https://github.com/WordPress/gutenberg/pull/82410)).
 -   `Popover`: Widen `offset` to also accept an object with separate main and cross axis offsets. The same applies to `BorderBoxControl`'s `popoverOffset` prop ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
@@ -13,6 +14,7 @@
 
 ### Bug Fixes
 
+-   `ProgressBar`: Remove determinate transitions and use a slower, stepped indeterminate animation when reduced motion is preferred. ([#82490](https://github.com/WordPress/gutenberg/pull/82490))
 -   `ColorPalette`: Apply the computed contrast color to the selected checkmark now that the icon is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   `CheckboxControl`: Color the checked and indeterminate icons with `color` rather than `fill`, so they stay visible now that those icons are stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   `BorderBoxControl`: Give the group of border controls an accessible name from the `label` prop, by rendering the wrapper as a `role="group"` associated with the label through `aria-labelledby`. A consumer-supplied `aria-labelledby` or `aria-label` takes precedence over `label` and names the group instead; the wrapper is only given the `group` role when one of the three provides a name. A hidden label (`hideLabelFromVision`) now renders as a `span` rather than a `label` element, matching the visible one ([#82279](https://github.com/WordPress/gutenberg/pull/82279)).
