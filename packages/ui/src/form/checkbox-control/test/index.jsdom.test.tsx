@@ -27,8 +27,9 @@ describe( 'CheckboxControl', () => {
 	it( 'renders with a visually hidden label', () => {
 		render( <CheckboxControl label="Subscribe" hideLabelFromVision /> );
 
-		const checkbox = screen.getByRole( 'checkbox', { name: 'Subscribe' } );
-		expect( checkbox ).toBeVisible();
+		expect(
+			screen.getByRole( 'checkbox', { name: 'Subscribe' } )
+		).toBeVisible();
 	} );
 
 	it( 'renders accessible label and description', () => {

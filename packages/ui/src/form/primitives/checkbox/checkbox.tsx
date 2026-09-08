@@ -20,7 +20,7 @@ export const Checkbox = forwardRef< HTMLSpanElement, CheckboxProps >(
 					resetStyles[ 'box-sizing' ],
 					focusStyles[ 'outset-ring--focus' ],
 					styles.root,
-					expandHitTarget && styles[ 'expand-hit-target' ],
+					expandHitTarget && styles[ 'is-expand-hit-target' ],
 					className
 				) }
 				indeterminate={ indeterminate }

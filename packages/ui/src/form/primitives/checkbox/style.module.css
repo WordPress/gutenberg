@@ -48,7 +48,7 @@
 				}
 			}
 
-			&.expand-hit-target::after {
+			&.is-expand-hit-target::after {
 				content: "";
 				position: absolute;
 				inset-block-start: 50%;
