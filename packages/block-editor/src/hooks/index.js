@@ -4,7 +4,6 @@ import {
 	createBlockSaveFilter,
 } from './utils';
 import './compat';
-import './cross-origin-isolation';
 import align from './align';
 import background from './background';
 import './lock';
