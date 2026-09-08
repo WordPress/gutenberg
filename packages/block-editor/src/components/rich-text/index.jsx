@@ -350,12 +350,13 @@ function RichTextWrapper(
 	// action moves the selection into it (a split, a paste), the field that
 	// had focus keeps it; when the element that had focus was removed (a
 	// merge, a toolbar button that re-rendered with the block it moved),
-	// focus fell back to the body of its document. Focus on anything else
-	// outside the canvas (a toolbar button, a sidebar input, another window)
-	// was placed on purpose and stays, and so does focus on an editing host
-	// around the field, which applies the selection inside it. Declared
-	// before the hook, whose effect applies the selection only while the
-	// field has focus.
+	// focus fell back to the body of its document. Focus outside the canvas
+	// (a toolbar button, a sidebar input, another window) was placed on
+	// purpose and stays, and so does focus on an editing host around the
+	// field, which applies the selection inside it. The canvas is the
+	// writing flow wrapper, the outermost editable ancestor of the field.
+	// Declared before the hook, whose effect applies the selection only
+	// while the field has focus.
 	useLayoutEffect( () => {
 		const element = anchorRef.current;
 
@@ -377,12 +378,20 @@ function RichTextWrapper(
 			return;
 		}
 
+		let canvas = element.parentElement?.closest( '[contenteditable]' );
+		let outer;
+
+		while (
+			canvas &&
+			( outer = canvas.parentElement?.closest( '[contenteditable]' ) )
+		) {
+			canvas = outer;
+		}
+
 		if (
 			( ownerDocument.hasFocus() &&
 				( isFocusLost( ownerDocument ) ||
-					!! activeElement.closest(
-						'.block-editor-block-list__layout'
-					) ) ) ||
+					canvas?.contains( activeElement ) ) ) ||
 			isFocusLost( ownerDocument.defaultView.frameElement?.ownerDocument )
 		) {
 			element.focus();
