@@ -425,6 +425,32 @@ describe( 'DataViews component', () => {
 			}
 		} );
 
+		it( 'should move a column past a field id without a field definition', async () => {
+			const user = userEvent.setup();
+			const onChangeView = vi.fn();
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [ 'title', 'missing', 'order' ],
+					} }
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Title' } ) );
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Move right' } )
+			);
+
+			// The move is computed against the rendered columns, so the
+			// title lands after the order column rather than swapping places
+			// with the skipped id, which is dropped from the view.
+			expect( onChangeView ).toHaveBeenCalledWith(
+				expect.objectContaining( { fields: [ 'order', 'title' ] } )
+			);
+		} );
+
 		it( 'should display title column if defined using titleField', () => {
 			render(
 				<DataViewWrapper
