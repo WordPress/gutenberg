@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Pattern: Resolve a registered pattern referenced by `slug` to its edited copy (a `wp_block` post carrying the `wp_pattern_slug` meta) when one exists, and offer "Edit original" on such blocks, creating the copy on first use ([#82549](https://github.com/WordPress/gutenberg/pull/82549)).
+-   Pattern: Resolve a registered pattern referenced by `slug` to its customization (a `wp_block` post carrying the `wp_pattern_slug` meta) when one exists, and offer "Edit original" on such blocks, creating the customization on first use. The `core/pattern` placeholder block renders the customization too ([#82549](https://github.com/WordPress/gutenberg/pull/82549)).
 -   Pattern: Add a `slug` attribute so a `core/block` can reference a registered pattern (theme, plugin or core) by name, with pattern overrides working the same way as for user patterns ([#82544](https://github.com/WordPress/gutenberg/pull/82544)).
 
 ### Enhancements
