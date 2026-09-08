@@ -280,10 +280,6 @@ export default function GalleryEdit( props ) {
 		isViewportStyleState &&
 		Object.hasOwn( viewportStyle, 'imageCrop' ) &&
 		typeof viewportStyle.imageCrop === 'boolean';
-	// `'auto'` is a value here rather than the absence of one: it cancels a
-	// base aspect ratio for this viewport. Any stored ratio counts as a value,
-	// so the control reports what the block holds; whether a ratio can be
-	// emitted as CSS is decided when the responsive styles are generated.
 	const hasViewportAspectRatio =
 		isViewportStyleState &&
 		Object.hasOwn( viewportStyle, 'aspectRatio' ) &&
@@ -683,11 +679,9 @@ export default function GalleryEdit( props ) {
 	/**
 	 * Sets the Gallery's aspect ratio.
 	 *
-	 * The base value is pushed down to the images, which carry it as an inline
-	 * style. A viewport value is instead stored on the Gallery and rendered
-	 * from its responsive CSS, which overrides that inline style for the
-	 * viewport only — and so covers dynamic galleries, where there are no inner
-	 * image blocks to push anything to.
+	 * The base value is added to the img element as an inline
+	 * style. A viewport value is instead rendered
+	 * from the Gallery's responsive CSS, which overrides that inline style.
 	 *
 	 * @param {string|undefined} value Aspect ratio to set. In a viewport state
 	 *                                 `'auto'` is an override that cancels the
@@ -709,8 +703,6 @@ export default function GalleryEdit( props ) {
 				blocks.push( block.clientId );
 				changedAttributes[ block.clientId ] = {
 					aspectRatio: cleanValue,
-					// Ensure object-fit: cover is applied when aspect-ratio is set,
-					// regardless of gallery layout and crop to fit status.
 					scale: cleanValue ? 'cover' : undefined,
 				};
 			} );
@@ -718,8 +710,6 @@ export default function GalleryEdit( props ) {
 			updateBlockAttributes( blocks, changedAttributes, true );
 		}
 
-		// Removing a viewport override restores the base value, so the notice
-		// reports the ratio the images end up with either way.
 		const noticeValue = value ?? baseAspectRatio;
 		const aspectRatioText = aspectRatioOptions.find(
 			( option ) => option.value === noticeValue

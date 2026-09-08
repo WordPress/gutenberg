@@ -137,23 +137,18 @@ function getImageCropCSS( selector, imageCrop ) {
 }
 
 function getAspectRatioCSS( selector, aspectRatio ) {
-	// Unlike the column and crop rules, this isn't scoped to the Flex layout:
-	// the aspect ratio applies to the images in every Gallery layout.
 	const imageSelector = `${ getGallerySelector(
 		selector
 	) } figure.wp-block-image:not(#individual-image) img`;
 	const ratio = aspectRatio.trim();
 
-	// The base aspect ratio is an inline style on each image, so these
-	// declarations have to be important to win for the viewport.
 	if ( ratio === 'auto' ) {
 		/*
-		 * Original cancels the base ratio, which means rolling this declaration
-		 * out of the cascade rather than giving it a value. `auto` — and
+		 * We need an explicit value here to cancel out the base aspect ratio. `auto` — and
 		 * `initial`, `unset` and `revert`, which all compute to it — would
 		 * override the `width`/`height` presentational hint that gives a
 		 * lazy-loaded image its placeholder ratio, collapsing the image to zero
-		 * height until it loads: the Featured Image bug fixed in #80386.
+		 * height until it loads.
 		 * `revert-layer` drops the declaration instead, so the image falls back
 		 * to that hint while loading, to its natural ratio once loaded, and to
 		 * any ratio a theme set in a lower cascade layer. `object-fit` is left
@@ -195,9 +190,6 @@ export function getGalleryResponsiveCSS( selector, style, mediaQueries ) {
 				css += getImageCropCSS( selector, viewportStyle.imageCrop );
 			}
 
-			// Emitted after the crop rules so an aspect ratio wins the
-			// `object-fit` they also set, matching how the base aspect ratio's
-			// inline style wins over the crop stylesheet rules.
 			if ( isValidGalleryAspectRatio( viewportStyle.aspectRatio ) ) {
 				css += getAspectRatioCSS( selector, viewportStyle.aspectRatio );
 			}
