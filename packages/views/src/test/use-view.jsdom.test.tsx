@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -448,7 +449,7 @@ describe( 'useView', () => {
 
 		it( 'should be reported through `onChangeQueryParams` instead of being persisted', () => {
 			const registry = createTestRegistry();
-			const onChangeQueryParams = jest.fn();
+			const onChangeQueryParams = vi.fn();
 			const { result } = renderUseView( registry, {
 				...BASE_PROPS,
 				defaultView: { type: 'table' },
@@ -471,7 +472,7 @@ describe( 'useView', () => {
 
 		it( 'should not report unchanged query params', () => {
 			const registry = createTestRegistry();
-			const onChangeQueryParams = jest.fn();
+			const onChangeQueryParams = vi.fn();
 			const { result } = renderUseView( registry, {
 				...BASE_PROPS,
 				defaultView: { type: 'table' },
@@ -492,7 +493,7 @@ describe( 'useView', () => {
 			let queryParams: { page?: number; search?: string } = {
 				search: 'level',
 			};
-			const onChangeQueryParams = jest.fn(
+			const onChangeQueryParams = vi.fn(
 				( newParams: { page?: number; search?: string } ) => {
 					// Mirrors real consumers, which drop an empty search from
 					// the URL instead of serializing `?search=`.

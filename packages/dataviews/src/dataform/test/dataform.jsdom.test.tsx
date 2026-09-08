@@ -1,12 +1,18 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 import { getSettings, setSettings } from '@wordpress/date';
 import Dataform from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
 
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
+globalThis.wpVitest.mockMatchMedia();
+
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	speak: vi.fn(),
+} ) );
 
 const noop = () => {};
 
@@ -98,6 +104,59 @@ const fieldsSelector = {
 
 describe( 'DataForm component', () => {
 	describe( 'in regular mode', () => {
+		it.each( [ 'top', 'side', 'none' ] as const )(
+			'renders a read-only field without an edit control with %s labels',
+			( labelPosition ) => {
+				render(
+					<Dataform
+						onChange={ noop }
+						fields={ [
+							{
+								id: 'status',
+								label: 'Account status',
+								readOnly: true,
+								render: () => <span>Account connected</span>,
+							},
+						] }
+						form={ {
+							layout: { type: 'regular', labelPosition },
+							fields: [ 'status' ],
+						} }
+						data={ {} }
+					/>
+				);
+
+				expect( screen.getByText( 'Account connected' ) ).toBeVisible();
+				expect(
+					screen.queryAllByText( 'Account status' )
+				).toHaveLength( labelPosition === 'none' ? 0 : 1 );
+			}
+		);
+
+		it( 'keeps an editable field without an edit control hidden', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'status',
+							label: 'Account status',
+							render: () => <span>Account connected</span>,
+						},
+					] }
+					form={ { fields: [ 'status' ] } }
+					data={ {} }
+				/>
+			);
+
+			expect(
+				screen.queryByText( 'Account connected' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Account status' )
+			).not.toBeInTheDocument();
+		} );
+
 		it( 'should display fields', () => {
 			render(
 				<Dataform
@@ -140,7 +199,7 @@ describe( 'DataForm component', () => {
 		} );
 
 		it( 'should call onChange with the correct value for each typed character', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			render(
 				<StatefulDataform
 					onChange={ onChange }
@@ -165,7 +224,7 @@ describe( 'DataForm component', () => {
 		} );
 
 		it( 'should allow decimal input for number fields', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const fieldsWithNumber = [
 				...fields,
 				{
@@ -201,7 +260,7 @@ describe( 'DataForm component', () => {
 		} );
 
 		it( 'should edit time fields with a time input', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const fieldsWithTime = [
 				...fields,
 				{
@@ -471,7 +530,7 @@ describe( 'DataForm component', () => {
 		} );
 
 		it( 'should apply changes and close modal when apply button is clicked', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const formWithModalPanel = {
 				...form,
 				layout: {
@@ -516,7 +575,7 @@ describe( 'DataForm component', () => {
 		} );
 
 		it( 'should call onChange with the correct value for each typed character', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			render(
 				<StatefulDataform
 					onChange={ onChange }
@@ -704,6 +763,56 @@ describe( 'DataForm component', () => {
 	} );
 
 	describe( 'in card mode', () => {
+		it( 'renders a read-only field without an edit control as its own card', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'status',
+							label: 'Account status',
+							readOnly: true,
+							render: () => <span>Account connected</span>,
+						},
+					] }
+					form={ { layout: { type: 'card' }, fields: [ 'status' ] } }
+					data={ {} }
+				/>
+			);
+
+			expect( screen.getByText( 'Account connected' ) ).toBeVisible();
+			expect( screen.getAllByText( 'Account status' ) ).toHaveLength( 1 );
+		} );
+
+		it( 'does not render an empty card for an editable field without an edit control', () => {
+			const { container } = render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'status',
+							label: 'Account status',
+							render: () => <span>Account connected</span>,
+						},
+					] }
+					form={ { layout: { type: 'card' }, fields: [ 'status' ] } }
+					data={ {} }
+				/>
+			);
+
+			expect(
+				screen.queryByText( 'Account connected' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Account status' )
+			).not.toBeInTheDocument();
+			expect(
+				// An empty card has no accessible role or text to query.
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				container.querySelector( '.dataforms-layouts-card__field' )
+			).not.toBeInTheDocument();
+		} );
+
 		const fieldsWithRequiredTitle = fields.map( ( field ) =>
 			field.id === 'title'
 				? { ...field, isValid: { required: true } }
@@ -953,7 +1062,7 @@ describe( 'DataForm component', () => {
 			await user.click(
 				screen.getByRole( 'button', { name: /main card/i } )
 			);
-			jest.mocked( speak ).mockClear();
+			vi.mocked( speak ).mockClear();
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Outside' } )
@@ -1083,7 +1192,7 @@ describe( 'DataForm component', () => {
 			await act( async () => {
 				details!.open = false;
 			} );
-			jest.mocked( speak ).mockClear();
+			vi.mocked( speak ).mockClear();
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Outside' } )
@@ -1164,7 +1273,7 @@ describe( 'DataForm component', () => {
 		}
 
 		it( 'should call onChange once when a date is selected in the calendar', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const user = userEvent.setup();
 			render(
 				<Dataform
@@ -1187,7 +1296,7 @@ describe( 'DataForm component', () => {
 		} );
 
 		it( 'should call onChange once and show the required error when the date is cleared, keeping focus on the day button', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const user = userEvent.setup();
 
 			render( <ControlledForm onChange={ onChange } /> );

@@ -1,18 +1,22 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 describe( 'cross-origin-isolation', () => {
 	let originalCrossOriginIsolated;
 	let originalBody;
 	let observeSpy;
 
 	beforeEach( () => {
+		vi.resetModules();
+
 		// Save original values
 		originalCrossOriginIsolated = window.crossOriginIsolated;
 		originalBody = document.body;
 
 		// Clear any existing filters
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 
 		// Spy on MutationObserver.observe
-		observeSpy = jest.spyOn( window.MutationObserver.prototype, 'observe' );
+		observeSpy = vi.spyOn( window.MutationObserver.prototype, 'observe' );
 	} );
 
 	afterEach( () => {
@@ -34,10 +38,9 @@ describe( 'cross-origin-isolation', () => {
 		}
 
 		observeSpy.mockRestore();
-		jest.resetModules();
 	} );
 
-	it( 'should not observe when crossOriginIsolated is false', () => {
+	it( 'should not observe when crossOriginIsolated is false', async () => {
 		Object.defineProperty( window, 'crossOriginIsolated', {
 			value: false,
 			writable: true,
@@ -45,14 +48,12 @@ describe( 'cross-origin-isolation', () => {
 		} );
 
 		// Re-import the module to trigger the side effects
-		jest.isolateModules( () => {
-			require( '../cross-origin-isolation' );
-		} );
+		await import( '../cross-origin-isolation' );
 
 		expect( observeSpy ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should observe document.body when crossOriginIsolated is true and body exists', () => {
+	it( 'should observe document.body when crossOriginIsolated is true and body exists', async () => {
 		Object.defineProperty( window, 'crossOriginIsolated', {
 			value: true,
 			writable: true,
@@ -66,9 +67,7 @@ describe( 'cross-origin-isolation', () => {
 		} );
 
 		// Re-import the module to trigger the side effects
-		jest.isolateModules( () => {
-			require( '../cross-origin-isolation' );
-		} );
+		await import( '../cross-origin-isolation' );
 
 		expect( observeSpy ).toHaveBeenCalledWith( document.body, {
 			childList: true,
@@ -77,7 +76,7 @@ describe( 'cross-origin-isolation', () => {
 		} );
 	} );
 
-	it( 'should wait for DOMContentLoaded when body is not available and document is loading', () => {
+	it( 'should wait for DOMContentLoaded when body is not available and document is loading', async () => {
 		Object.defineProperty( window, 'crossOriginIsolated', {
 			value: true,
 			writable: true,
@@ -98,12 +97,10 @@ describe( 'cross-origin-isolation', () => {
 			configurable: true,
 		} );
 
-		const addEventListenerSpy = jest.spyOn( document, 'addEventListener' );
+		const addEventListenerSpy = vi.spyOn( document, 'addEventListener' );
 
 		// Re-import the module to trigger the side effects
-		jest.isolateModules( () => {
-			require( '../cross-origin-isolation' );
-		} );
+		await import( '../cross-origin-isolation' );
 
 		// Should not observe immediately
 		expect( observeSpy ).not.toHaveBeenCalled();
@@ -117,7 +114,7 @@ describe( 'cross-origin-isolation', () => {
 		addEventListenerSpy.mockRestore();
 	} );
 
-	it( 'should not throw error when body is null and document is complete', () => {
+	it( 'should not throw error when body is null and document is complete', async () => {
 		Object.defineProperty( window, 'crossOriginIsolated', {
 			value: true,
 			writable: true,
@@ -138,11 +135,9 @@ describe( 'cross-origin-isolation', () => {
 		} );
 
 		// This should not throw an error
-		expect( () => {
-			jest.isolateModules( () => {
-				require( '../cross-origin-isolation' );
-			} );
-		} ).not.toThrow();
+		await expect(
+			import( '../cross-origin-isolation' )
+		).resolves.toBeDefined();
 
 		// Should not attempt to observe null
 		expect( observeSpy ).not.toHaveBeenCalled();
@@ -156,9 +151,7 @@ describe( 'cross-origin-isolation', () => {
 		} );
 
 		// Re-import the module to trigger the side effects
-		jest.isolateModules( () => {
-			require( '../cross-origin-isolation' );
-		} );
+		await import( '../cross-origin-isolation' );
 
 		// Create an image and add it to the DOM
 		const img = document.createElement( 'img' );
