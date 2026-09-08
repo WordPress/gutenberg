@@ -19,7 +19,7 @@
 
 ### Enhancements
 
--   `SearchableChipSelect`, `SearchableChipSelectControl`, `SearchableSelect`: Add a `statusContent` prop that announces async list status to screen readers.
+-   `SearchableChipSelect`, `SearchableChipSelectControl`, `SearchableSelect`: Add a `statusContent` prop that announces async list status to screen readers. ([#82592](https://github.com/WordPress/gutenberg/pull/82592))
 -   Compound components: Throw clear development errors when required parent context is missing ([#82510](https://github.com/WordPress/gutenberg/pull/82510)).
 -   Give input fields and checkboxes solid, state-aware themed backgrounds while keeping minimal Select triggers transparent. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
 -   `AlertDialog`, `Dialog`, `Drawer`, `Popover`, and `Tooltip`: Derive Trigger props from the corresponding Base UI components. ([#81824](https://github.com/WordPress/gutenberg/pull/81824))
