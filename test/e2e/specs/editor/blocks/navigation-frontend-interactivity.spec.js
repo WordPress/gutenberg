@@ -137,7 +137,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			<!-- /wp:navigation-submenu -->
 			`;
 
-		test( 'submenus set to open on click do not unfold with a custom overlay', async ( {
+		test( 'submenus in a custom overlay set to open on click, do not display until clicked ', async ( {
 			page,
 			requestUtils,
 		} ) => {
