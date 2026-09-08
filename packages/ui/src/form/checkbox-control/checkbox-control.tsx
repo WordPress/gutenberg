@@ -47,6 +47,7 @@ export const CheckboxControl = forwardRef<
 						ref={ ref }
 						className={ styles.checkbox }
 						{ ...checkboxProps }
+						hasExpandedHitArea={ Boolean( hideLabelFromVision ) }
 					/>
 				</div>
 				<TextContainer isStack={ hasSupportingText }>

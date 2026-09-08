@@ -47,6 +47,17 @@
 					border-color: GrayText;
 				}
 			}
+
+			/* Keep the painted box at 16px. The extra area is pointer geometry only. */
+			&[data-expanded-hit-area]::after {
+				content: "";
+				position: absolute;
+				inset-block-start: 50%;
+				inset-inline-start: 50%;
+				width: var(--wp-ui-checkbox-hit-area-size, var(--wpds-dimension-size-sm));
+				aspect-ratio: 1;
+				transform: translate(-50%, -50%);
+			}
 		}
 
 		.indicator-icon {

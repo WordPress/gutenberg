@@ -18,18 +18,18 @@ describe( 'CheckboxControl', () => {
 	it( 'renders with a visible label', () => {
 		render( <CheckboxControl label="Subscribe" /> );
 
-		expect(
-			screen.getByRole( 'checkbox', { name: 'Subscribe' } )
-		).toBeVisible();
+		const checkbox = screen.getByRole( 'checkbox', { name: 'Subscribe' } );
+		expect( checkbox ).toBeVisible();
 		expect( screen.getByText( 'Subscribe' ) ).toBeVisible();
+		expect( checkbox ).not.toHaveAttribute( 'data-expanded-hit-area' );
 	} );
 
 	it( 'renders with a visually hidden label', () => {
 		render( <CheckboxControl label="Subscribe" hideLabelFromVision /> );
 
-		expect(
-			screen.getByRole( 'checkbox', { name: 'Subscribe' } )
-		).toBeVisible();
+		const checkbox = screen.getByRole( 'checkbox', { name: 'Subscribe' } );
+		expect( checkbox ).toBeVisible();
+		expect( checkbox ).toHaveAttribute( 'data-expanded-hit-area', '' );
 	} );
 
 	it( 'renders accessible label and description', () => {

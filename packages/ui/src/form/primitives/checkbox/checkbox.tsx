@@ -9,7 +9,10 @@ import styles from './style.module.css';
 import type { CheckboxProps } from './types';
 
 export const Checkbox = forwardRef< HTMLSpanElement, CheckboxProps >(
-	function Checkbox( { className, indeterminate, ...restProps }, ref ) {
+	function Checkbox(
+		{ className, indeterminate, hasExpandedHitArea = false, ...restProps },
+		ref
+	) {
 		return (
 			<_Checkbox.Root
 				ref={ ref }
@@ -21,6 +24,7 @@ export const Checkbox = forwardRef< HTMLSpanElement, CheckboxProps >(
 				) }
 				indeterminate={ indeterminate }
 				{ ...restProps }
+				data-expanded-hit-area={ hasExpandedHitArea ? '' : undefined }
 			>
 				<_Checkbox.Indicator
 					className={ styles[ 'indicator-icon' ] }

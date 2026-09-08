@@ -51,3 +51,10 @@ export const DisabledChecked: Story = {
 		defaultChecked: true,
 	},
 };
+
+export const ExpandedHitArea: Story = {
+	args: {
+		...Default.args,
+		hasExpandedHitArea: true,
+	},
+};
