@@ -23,8 +23,8 @@ const REVISION_QUERY = {
  * @param {string}        prop               The property name.
  * @param {number|string} [_id]              An entity ID to use instead of the context-provided one.
  * @param {Object}        [options]          Options for the edits made by the setter.
- * @param {boolean}       [options.coalesce] Whether consecutive edits to this property
- *                                           should merge into a single undo level.
+ * @param {boolean}       [options.coalesce] Merge a burst of edits, such as typing, into
+ *                                           one undo level.
  *
  * @return {[*, Function, *]} An array where the first item is the
  *                            property value, the second is the

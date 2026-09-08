@@ -427,12 +427,10 @@ export const deleteEntityRecord =
  * @param {Object}                  edits                The edits.
  * @param {Object}                  options              Options for the edit.
  * @param {boolean}                 [options.undoIgnore] Whether to ignore the edit in undo history or not.
- * @param {boolean}                 [options.isCached]   Whether the edit is transient (e.g. typing). Transient
- *                                                       edits are staged and eventually merged into the
- *                                                       preceding undo level instead of creating a new one.
- * @param {boolean}                 [options.coalesce]   Whether consecutive edits to the same properties of
- *                                                       the same record should merge into a single undo
- *                                                       level. An explicit `isCached` takes precedence.
+ * @param {boolean}                 [options.isCached]   Merge this edit into the previous undo level. The
+ *                                                       caller decides where a run of edits starts and ends.
+ * @param {boolean}                 [options.coalesce]   Merge a burst of edits, such as typing, into one undo
+ *                                                       level. The store decides where the burst ends.
  *
  * @return {Object} Action object.
  */
