@@ -1,3 +1,4 @@
+import { describe, expect, it, test, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { press, click, hover, sleep } from '@ariakit/test';
 import { useState } from '@wordpress/element';
@@ -12,10 +13,20 @@ import { TOOLTIP_DELAY } from '../../tooltip';
 import type { ToggleGroupControlProps } from '../types';
 import controlStyles from '../toggle-group-control/style.module.scss';
 import optionStyles from '../toggle-group-control-option-base/style.module.scss';
+globalThis.wpVitest.mockResizeObserver();
 
 const hoverOutside = async () => {
 	await hover( document.body );
 	await hover( document.body, { clientX: 10, clientY: 10 } );
+};
+
+const expectGroupChromeDisabled = ( group: HTMLElement ) => {
+	expect( group ).toBeVisible();
+	expect( group ).toHaveAttribute( 'aria-disabled', 'true' );
+	// `toBeEnabled()` treats aria-disabled as disabled, so it cannot
+	// catch an HTML `disabled` leak onto this div.
+	// eslint-disable-next-line jest-dom/prefer-enabled-disabled
+	expect( group ).not.toHaveAttribute( 'disabled' );
 };
 
 const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
@@ -90,6 +101,32 @@ const optionsWithDisabledOption = (
 	</>
 );
 
+describe( 'required context', () => {
+	it( 'throws when ToggleGroupControlOption is outside ToggleGroupControl', () => {
+		expect( () =>
+			render( <ToggleGroupControlOption value="value" label="Label" /> )
+		).toThrow(
+			'ToggleGroupControlOption can only be rendered inside ToggleGroupControl.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
+	it( 'throws when ToggleGroupControlOptionIcon is outside ToggleGroupControl', () => {
+		expect( () =>
+			render(
+				<ToggleGroupControlOptionIcon
+					value="value"
+					label="Label"
+					icon={ formatUppercase }
+				/>
+			)
+		).toThrow(
+			'ToggleGroupControlOptionIcon can only be rendered inside ToggleGroupControl.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+} );
+
 describe.each( [
 	[ 'uncontrolled', ToggleGroupControl ],
 	[ 'controlled', ControlledToggleGroupControl ],
@@ -98,17 +135,27 @@ describe.each( [
 
 	describe( 'should render correctly', () => {
 		it( 'with text options', () => {
-			const { container } = render(
+			render(
 				<Component label="Test Toggle Group Control">
 					{ options }
 				</Component>
 			);
 
-			expect( container ).toMatchSnapshot();
+			expect(
+				screen.getByRole( 'radiogroup', {
+					name: 'Test Toggle Group Control',
+				} )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'radio', { name: 'R' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'radio', { name: 'J' } )
+			).toBeInTheDocument();
 		} );
 
 		it( 'with icons', () => {
-			const { container } = render(
+			render(
 				<Component value="uppercase" label="Test Toggle Group Control">
 					<ToggleGroupControlOptionIcon
 						value="uppercase"
@@ -123,7 +170,12 @@ describe.each( [
 				</Component>
 			);
 
-			expect( container ).toMatchSnapshot();
+			expect(
+				screen.getByRole( 'radio', { name: 'Uppercase' } )
+			).toBeChecked();
+			expect(
+				screen.getByRole( 'radio', { name: 'Lowercase' } )
+			).not.toBeChecked();
 		} );
 	} );
 	it( 'should render with the correct option initially selected when `value` is defined', () => {
@@ -143,7 +195,7 @@ describe.each( [
 		expect( screen.getByRole( 'radio', { name: 'J' } ) ).not.toBeChecked();
 	} );
 	it( 'should call onChange with proper value', async () => {
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 
 		render(
 			<Component
@@ -402,7 +454,7 @@ describe.each( [
 	describe( 'isDeselectable', () => {
 		describe( 'isDeselectable = false', () => {
 			it( 'should not be deselectable', async () => {
-				const mockOnChange = jest.fn();
+				const mockOnChange = vi.fn();
 
 				render(
 					<Component
@@ -453,7 +505,7 @@ describe.each( [
 			} );
 
 			it( 'should ignore disabled radio options', async () => {
-				const mockOnChange = jest.fn();
+				const mockOnChange = vi.fn();
 
 				render(
 					<Component
@@ -501,7 +553,7 @@ describe.each( [
 
 		describe( 'isDeselectable = true', () => {
 			it( 'should be deselectable', async () => {
-				const mockOnChange = jest.fn();
+				const mockOnChange = vi.fn();
 
 				render(
 					<Component
@@ -567,7 +619,7 @@ describe.each( [
 			} );
 
 			it( 'should ignore disabled options', async () => {
-				const mockOnChange = jest.fn();
+				const mockOnChange = vi.fn();
 
 				render(
 					<Component
@@ -624,6 +676,228 @@ describe.each( [
 				);
 				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 			} );
+		} );
+	} );
+
+	describe( 'disabled', () => {
+		it( 'should not select another option when the control is disabled', async () => {
+			const mockOnChange = vi.fn();
+
+			render(
+				<Component
+					value="rigas"
+					label="Test"
+					disabled
+					onChange={ mockOnChange }
+				>
+					{ options }
+				</Component>
+			);
+
+			expectGroupChromeDisabled(
+				screen.getByRole( 'radiogroup', { name: 'Test' } )
+			);
+
+			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
+
+			await click( screen.getByRole( 'radio', { name: 'J' } ) );
+
+			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
+			expect(
+				screen.getByRole( 'radio', { name: 'J' } )
+			).not.toBeChecked();
+			expect( mockOnChange ).not.toHaveBeenCalled();
+
+			await press.ArrowRight();
+			expect( mockOnChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should skip the disabled control when tabbing', async () => {
+			render(
+				<>
+					<button>Before ToggleGroupControl</button>
+					<Component value="rigas" label="Test" disabled>
+						{ options }
+					</Component>
+					<button>After ToggleGroupControl</button>
+				</>
+			);
+
+			await press.Tab();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Before ToggleGroupControl',
+				} )
+			).toHaveFocus();
+
+			await press.Tab();
+
+			const expectedFocusTarget =
+				mode === 'uncontrolled'
+					? screen.getByRole( 'button', {
+							name: 'After ToggleGroupControl',
+					  } )
+					: screen.getByRole( 'button', { name: 'Reset' } );
+
+			expect( expectedFocusTarget ).toHaveFocus();
+		} );
+
+		it( 'should keep the selected option when the control is disabled', () => {
+			render(
+				<Component value="jack" label="Test" disabled>
+					{ options }
+				</Component>
+			);
+
+			expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
+			expect(
+				screen.getByRole( 'radio', { name: 'R' } )
+			).not.toBeChecked();
+		} );
+
+		it( 'should not call onChange when a disabled control is clicked', async () => {
+			const mockOnChange = vi.fn();
+
+			render(
+				<Component
+					value="rigas"
+					label="Test"
+					disabled
+					onChange={ mockOnChange }
+				>
+					{ options }
+				</Component>
+			);
+
+			await click( screen.getByRole( 'radio', { name: 'J' } ) );
+			await click( screen.getByRole( 'radio', { name: 'R' } ) );
+
+			expect( mockOnChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should disable every option when the control is disabled, including options without their own disabled prop', () => {
+			render(
+				<Component value="pizza" label="Test" disabled>
+					{ optionsWithDisabledOption }
+				</Component>
+			);
+
+			expectGroupChromeDisabled(
+				screen.getByRole( 'radiogroup', { name: 'Test' } )
+			);
+
+			expect(
+				screen.getByRole( 'radio', { name: 'Pizza' } )
+			).toBeDisabled();
+			expect(
+				screen.getByRole( 'radio', { name: 'Rice' } )
+			).toBeDisabled();
+			expect(
+				screen.getByRole( 'radio', { name: 'Pasta' } )
+			).toBeDisabled();
+		} );
+
+		it( 'should not deselect the pressed option when the control is disabled', async () => {
+			const mockOnChange = vi.fn();
+
+			render(
+				<Component
+					value="rigas"
+					label="Test"
+					onChange={ mockOnChange }
+					isDeselectable
+					disabled
+				>
+					{ options }
+				</Component>
+			);
+
+			expectGroupChromeDisabled(
+				screen.getByRole( 'group', { name: 'Test' } )
+			);
+
+			const pressed = screen.getByRole( 'button', {
+				name: 'R',
+				pressed: true,
+			} );
+			expect( pressed ).toBeVisible();
+			expect( pressed ).toBeDisabled();
+
+			await click( pressed );
+
+			expect(
+				screen.getByRole( 'button', {
+					name: 'R',
+					pressed: true,
+				} )
+			).toBeVisible();
+			expect( mockOnChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should skip a deselectable disabled control when tabbing', async () => {
+			render(
+				<>
+					<button>Before ToggleGroupControl</button>
+					<Component
+						isDeselectable
+						value="rigas"
+						label="Test"
+						disabled
+					>
+						{ options }
+					</Component>
+					<button>After ToggleGroupControl</button>
+				</>
+			);
+
+			await press.Tab();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Before ToggleGroupControl',
+				} )
+			).toHaveFocus();
+
+			await press.Tab();
+
+			const expectedFocusTarget =
+				mode === 'uncontrolled'
+					? screen.getByRole( 'button', {
+							name: 'After ToggleGroupControl',
+					  } )
+					: screen.getByRole( 'button', { name: 'Reset' } );
+
+			expect( expectedFocusTarget ).toHaveFocus();
+		} );
+
+		it( 'should not call onChange when a deselectable disabled control is clicked', async () => {
+			const mockOnChange = vi.fn();
+
+			render(
+				<Component
+					value="rigas"
+					label="Test"
+					onChange={ mockOnChange }
+					isDeselectable
+					disabled
+				>
+					{ options }
+				</Component>
+			);
+
+			await click(
+				screen.getByRole( 'button', {
+					name: 'R',
+					pressed: true,
+				} )
+			);
+			await click(
+				screen.getByRole( 'button', {
+					name: 'J',
+					pressed: false,
+				} )
+			);
+
+			expect( mockOnChange ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Revisions: migrate the Active badge from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge`. ([#82560](https://github.com/WordPress/gutenberg/pull/82560))
+
 ### Bug Fixes
 
 -   Font Library: Wait for the current global styles ID before loading its entity record. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
@@ -34,6 +38,7 @@
 
 ### Internal
 
+-   Remove the experimental color randomizer from the palette editor, along with the `colord` dependency it used ([#82452](https://github.com/WordPress/gutenberg/pull/82452)).
 -   Exclude the JavaScript tests and story from the build project so their declarations are not published. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
 
 ## 1.20.0 (2026-08-12)

@@ -61,7 +61,6 @@
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0",
 		"@types/node": "^20.19.39",
 		"vitest": "^4.1.10"
 	},

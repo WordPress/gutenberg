@@ -2,6 +2,9 @@ import type { Menu as _Menu } from '@base-ui/react/menu';
 import type { ElementType, ReactElement, ReactNode } from 'react';
 import type { KeyboardShortcut } from '../utils/keyboard-shortcut';
 import type { ComponentProps } from '../utils/types';
+import type { IconProps } from '../icon/types';
+
+export type PrefixIconProps = IconProps;
 
 export type PortalProps = ComponentProps< typeof _Menu.Portal >;
 
@@ -113,6 +116,7 @@ export interface PopupProps extends ComponentProps< typeof _Menu.Popup > {
 export interface MenuItemLayoutProps {
 	/**
 	 * Presentational content displayed before the item label.
+	 * Use `Menu.PrefixIcon` for an icon aligned with the label.
 	 */
 	prefix?: ReactNode;
 

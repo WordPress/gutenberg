@@ -1,3 +1,11 @@
+import {
+	afterEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type MockedFunction,
+} from 'vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useFocusReturn } from '@wordpress/compose';
@@ -13,12 +21,16 @@ import type { ReactNode } from 'react';
 import * as Menu from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
 
-jest.mock( '@wordpress/i18n', () => ( {
-	...jest.requireActual( '@wordpress/i18n' ),
-	isRTL: jest.fn( () => false ),
+vi.mock( import( '@wordpress/i18n' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	isRTL: vi.fn( () => false ),
 } ) );
 
-const mockedIsRTL = isRTL as jest.MockedFunction< typeof isRTL >;
+const mockedIsRTL = isRTL as MockedFunction< typeof isRTL >;
+
+globalThis.wpVitest.mockPointerEvent();
+globalThis.wpVitest.mockScrollIntoView();
+globalThis.wpVitest.mockVisibleElements();
 
 afterEach( () => {
 	mockedIsRTL.mockClear();
@@ -70,6 +82,72 @@ function queryExternalLinkIndicator( item: HTMLElement ) {
 }
 
 describe( 'Menu', () => {
+	it( 'renders prefix icons at 24px by default', () => {
+		render( <Menu.PrefixIcon icon={ <svg /> } role="img" /> );
+
+		const icon = screen.getByRole( 'img', { hidden: true } );
+		expect( icon ).toHaveAttribute( 'width', '24' );
+		expect( icon ).toHaveAttribute( 'height', '24' );
+	} );
+
+	it( 'supports custom icon sizes and forwards SVG props and refs', () => {
+		const ref = createRef< SVGSVGElement >();
+		render(
+			<Menu.PrefixIcon
+				ref={ ref }
+				icon={ <svg viewBox="0 0 24 24" style={ { fill: 'none' } } /> }
+				size={ 32 }
+				role="img"
+				className="custom-icon"
+				stroke="currentColor"
+				style={ { opacity: 0.5 } }
+			/>
+		);
+
+		const icon = screen.getByRole( 'img', { hidden: true } );
+		expect( ref.current ).toBe( icon );
+		expect( icon ).toHaveAttribute( 'width', '32' );
+		expect( icon ).toHaveAttribute( 'height', '32' );
+		expect( icon ).toHaveAttribute( 'viewBox', '0 0 24 24' );
+		expect( icon ).toHaveAttribute( 'stroke', 'currentColor' );
+		expect( icon ).toHaveClass( 'custom-icon' );
+		// eslint-disable-next-line jest-dom/prefer-to-have-attribute
+		expect( icon.getAttribute( 'style' ) ).toContain( 'fill: none;' );
+		// eslint-disable-next-line jest-dom/prefer-to-have-attribute
+		expect( icon.getAttribute( 'style' ) ).toContain( 'opacity: 0.5;' );
+	} );
+
+	it( 'keeps prefix icons hidden from assistive technology', async () => {
+		const user = userEvent.setup();
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item
+						prefix={
+							<Menu.PrefixIcon
+								icon={ <svg /> }
+								role="img"
+								aria-label="Decorative icon"
+							/>
+						}
+					>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		const item = await screen.findByRole( 'menuitem', {
+			name: 'Duplicate',
+		} );
+		expect(
+			within( item ).getByRole( 'img', { hidden: true } )
+		).toBeVisible();
+		expect( within( item ).queryByRole( 'img' ) ).not.toBeInTheDocument();
+	} );
+
 	it( 'opens from the trigger and exposes menu semantics', async () => {
 		const user = userEvent.setup();
 
@@ -197,7 +275,7 @@ describe( 'Menu', () => {
 
 	it( 'closes a non-modal menu without consuming an iframe pointer interaction', async () => {
 		const user = userEvent.setup();
-		const onCanvasClick = jest.fn();
+		const onCanvasClick = vi.fn();
 
 		function ControlledMenuWithIframes() {
 			const [ open, setOpen ] = useState( false );
@@ -286,7 +364,7 @@ describe( 'Menu', () => {
 			throw new Error( 'Expected a nested same-origin iframe document.' );
 		}
 
-		const nestedAddEventListener = jest.spyOn(
+		const nestedAddEventListener = vi.spyOn(
 			nestedDocument,
 			'addEventListener'
 		);
@@ -318,10 +396,7 @@ describe( 'Menu', () => {
 		if ( ! iframeDocument ) {
 			throw new Error( 'Expected a same-origin iframe document.' );
 		}
-		const addEventListener = jest.spyOn(
-			iframeDocument,
-			'addEventListener'
-		);
+		const addEventListener = vi.spyOn( iframeDocument, 'addEventListener' );
 
 		try {
 			const outsideTarget = iframeDocument.createElement( 'button' );
@@ -449,19 +524,19 @@ describe( 'Menu', () => {
 			configurable: true,
 			get: () => iframeDocument,
 		} );
-		const firstAddEventListener = jest.spyOn(
+		const firstAddEventListener = vi.spyOn(
 			firstDocument,
 			'addEventListener'
 		);
-		const firstRemoveEventListener = jest.spyOn(
+		const firstRemoveEventListener = vi.spyOn(
 			firstDocument,
 			'removeEventListener'
 		);
-		const reloadedAddEventListener = jest.spyOn(
+		const reloadedAddEventListener = vi.spyOn(
 			reloadedDocument,
 			'addEventListener'
 		);
-		const reloadedRemoveEventListener = jest.spyOn(
+		const reloadedRemoveEventListener = vi.spyOn(
 			reloadedDocument,
 			'removeEventListener'
 		);
@@ -532,7 +607,7 @@ describe( 'Menu', () => {
 			configurable: true,
 			get: () => firstDocument,
 		} );
-		const firstRemoveEventListener = jest.spyOn(
+		const firstRemoveEventListener = vi.spyOn(
 			firstDocument,
 			'removeEventListener'
 		);
@@ -765,8 +840,8 @@ describe( 'Menu', () => {
 
 	it( 'renders checkbox and radio item roles', async () => {
 		const user = userEvent.setup();
-		const onCheckedChange = jest.fn();
-		const onValueChange = jest.fn();
+		const onCheckedChange = vi.fn();
+		const onValueChange = vi.fn();
 
 		render(
 			<Menu.Root>
@@ -845,6 +920,68 @@ describe( 'Menu', () => {
 
 		expect( item ).toHaveAccessibleDescription( 'Create a separate copy.' );
 		expect( screen.getByText( 'separate' ).tagName ).toBe( 'STRONG' );
+	} );
+
+	it( 'throws when ItemDescription is outside a menu item', () => {
+		expect( () =>
+			render( <Menu.ItemDescription>Description</Menu.ItemDescription> )
+		).toThrow(
+			'Menu.ItemDescription: Missing direct menu item parent. Render <Menu.ItemDescription> as a direct child of a menu item.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
+	it( 'throws when ItemDescription is nested inside a menu item', () => {
+		expect( () =>
+			render(
+				<Menu.Root defaultOpen>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>
+								Duplicate
+								<Menu.ItemDescription>
+									Description
+								</Menu.ItemDescription>
+							</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			)
+		).toThrow(
+			'Menu.ItemDescription: Missing direct menu item parent. Render <Menu.ItemDescription> as a direct child of a menu item.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
+	it( 'throws when a nested ItemDescription reuses a direct sibling ID', () => {
+		function MenuWithDuplicateDescriptionId() {
+			const descriptionId = useId();
+
+			return (
+				<Menu.Root defaultOpen>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>
+								Duplicate
+								<Menu.ItemDescription id={ descriptionId }>
+									Nested description
+								</Menu.ItemDescription>
+							</Menu.ItemLabel>
+							<Menu.ItemDescription id={ descriptionId }>
+								Direct description
+							</Menu.ItemDescription>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			);
+		}
+
+		expect( () => render( <MenuWithDuplicateDescriptionId /> ) ).toThrow(
+			'Menu.ItemDescription: Missing direct menu item parent. Render <Menu.ItemDescription> as a direct child of a menu item.'
+		);
+		expect( console ).toHaveErrored();
 	} );
 
 	it( 'combines multiple item descriptions in DOM order', async () => {
@@ -1363,6 +1500,52 @@ describe( 'Menu', () => {
 		).not.toHaveAttribute( 'aria-labelledby' );
 	} );
 
+	it( 'closes after activating a link item when closeOnClick is true', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem href="#destination" closeOnClick>
+						<Menu.ItemLabel>Destination</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		await user.click(
+			await screen.findByRole( 'menuitem', { name: 'Destination' } )
+		);
+
+		await waitFor( () => {
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		} );
+	} );
+
+	it( 'stays open after activating a link item by default', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem href="#destination">
+						<Menu.ItemLabel>Destination</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		await user.click(
+			await screen.findByRole( 'menuitem', { name: 'Destination' } )
+		);
+
+		expect( screen.getByRole( 'menu' ) ).toBeVisible();
+	} );
+
 	it( 'treats target="_blank" on link items as opening in a new tab', async () => {
 		const user = userEvent.setup();
 
@@ -1384,6 +1567,29 @@ describe( 'Menu', () => {
 				name: 'WordPress.org (opens in a new tab)',
 			} )
 		).toHaveAttribute( 'target', '_blank' );
+	} );
+
+	it( 'treats target="_BLANK" on link items as opening in a new tab', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem href="https://wordpress.org" target="_BLANK">
+						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		expect(
+			await screen.findByRole( 'menuitem', {
+				name: 'WordPress.org (opens in a new tab)',
+			} )
+		).toHaveAttribute( 'target', '_BLANK' );
 	} );
 
 	it( 'forwards a named target on link items without adding a new tab notice', async () => {
