@@ -361,7 +361,8 @@ export interface RangeProps {
 	excludeDisabled?: boolean;
 	/**
 	 * When `true`, selecting a date starts a new range when there is no current
-	 * start date or when the current range is complete.
+	 * start date or when the current range is complete. The hover preview shows
+	 * the range that selecting the date would create.
 	 * @default true
 	 */
 	resetOnSelect?: boolean;

@@ -17,18 +17,25 @@ export function usePreviewRange( {
 	value,
 	hoveredDate,
 	excludeDisabled,
+	resetOnSelect,
 	min,
 	max,
 	disabled,
 }: Pick<
 	RangeCalendarProps,
-	'value' | 'excludeDisabled' | 'min' | 'max' | 'disabled'
+	'value' | 'excludeDisabled' | 'resetOnSelect' | 'min' | 'max' | 'disabled'
 > & {
 	hoveredDate: Date | undefined;
 } ) {
 	return useMemo( () => {
 		if ( ! hoveredDate || ! value?.from ) {
 			return;
+		}
+		if ( resetOnSelect && value.to ) {
+			return {
+				from: hoveredDate,
+				to: hoveredDate,
+			};
 		}
 
 		let previewHighlight: DateRange | undefined;
@@ -117,7 +124,15 @@ export function usePreviewRange( {
 		}
 
 		return previewHighlight;
-	}, [ value, hoveredDate, excludeDisabled, min, max, disabled ] );
+	}, [
+		value,
+		hoveredDate,
+		excludeDisabled,
+		resetOnSelect,
+		min,
+		max,
+		disabled,
+	] );
 }
 
 /**
@@ -196,6 +211,7 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 			value: selected,
 			hoveredDate,
 			excludeDisabled,
+			resetOnSelect,
 			min,
 			max,
 			disabled,

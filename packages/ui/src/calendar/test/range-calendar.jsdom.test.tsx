@@ -1649,11 +1649,27 @@ describe( 'RangeCalendar', () => {
 			expect( result.current ).toBeUndefined();
 		} );
 
-		it( 'should show preview when hovering before selected range', () => {
+		it( 'should preview only the hovered date when resetting a complete range', () => {
 			const { result } = renderHook( () =>
 				usePreviewRange( {
 					value: { from: previewToday, to: previewTomorrow },
 					hoveredDate: previewYesterday,
+					resetOnSelect: true,
+				} )
+			);
+
+			expect( result.current ).toEqual( {
+				from: previewYesterday,
+				to: previewYesterday,
+			} );
+		} );
+
+		it( 'should show the adjustment preview before a completed range when `resetOnSelect` is `false`', () => {
+			const { result } = renderHook( () =>
+				usePreviewRange( {
+					value: { from: previewToday, to: previewTomorrow },
+					hoveredDate: previewYesterday,
+					resetOnSelect: false,
 				} )
 			);
 
@@ -1668,6 +1684,7 @@ describe( 'RangeCalendar', () => {
 				usePreviewRange( {
 					value: { from: previewYesterday, to: previewTomorrow },
 					hoveredDate: previewToday,
+					resetOnSelect: false,
 				} )
 			);
 
@@ -1682,6 +1699,7 @@ describe( 'RangeCalendar', () => {
 				usePreviewRange( {
 					value: { from: previewYesterday, to: previewToday },
 					hoveredDate: previewTomorrow,
+					resetOnSelect: false,
 				} )
 			);
 
