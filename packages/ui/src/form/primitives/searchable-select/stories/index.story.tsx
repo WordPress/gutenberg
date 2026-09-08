@@ -108,8 +108,6 @@ export const WithCustomEmptyContent: Story = {
 
 /**
  * Use `statusContent` for async list status, such as loading.
- * The status region stays mounted. Pass `null` when there is
- * nothing to announce. Use `emptyContent` for the empty list.
  */
 export const WithStatusContent: Story = {
 	args: {
