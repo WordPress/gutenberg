@@ -920,7 +920,7 @@ class WP_Navigation_Block_Renderer {
 		$wrapper_attributes = get_block_wrapper_attributes( $extra_attributes );
 
 		if ( $is_responsive_menu ) {
-			$nav_element_directives = static::get_nav_element_directives( $is_interactive );
+			$nav_element_directives = static::get_nav_element_directives( $is_interactive, ! empty( $attributes['overlay'] ) );
 			$wrapper_attributes    .= ' ' . $nav_element_directives;
 		}
 
@@ -932,24 +932,29 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param bool $is_interactive Whether the block is interactive.
+	 * @param bool $is_interactive     Whether the block is interactive.
+	 * @param bool $has_custom_overlay Whether the overlay is a custom overlay template part.
 	 * @return string the directives for the navigation element.
 	 */
-	private static function get_nav_element_directives( $is_interactive ) {
+	private static function get_nav_element_directives( $is_interactive, $has_custom_overlay = false ) {
 		if ( ! $is_interactive ) {
 			return '';
 		}
 		// When adding to this array be mindful of security concerns.
 		$nav_element_context    = wp_interactivity_data_wp_context(
 			array(
-				'overlayOpenedBy' => array(
+				'overlayOpenedBy'  => array(
 					'click' => false,
 					'hover' => false,
 					'focus' => false,
 				),
-				'type'            => 'overlay',
-				'roleAttribute'   => '',
-				'ariaLabel'       => __( 'Menu' ),
+				'type'             => 'overlay',
+				'roleAttribute'    => '',
+				'ariaLabel'        => __( 'Menu' ),
+				// The default overlay unfolds every submenu it contains, whereas a
+				// custom overlay leaves submenus to their own visibility setting.
+				// Submenus inherit this so they know which of the two they are in.
+				'hasCustomOverlay' => $has_custom_overlay,
 			)
 		);
 		$nav_element_directives = '

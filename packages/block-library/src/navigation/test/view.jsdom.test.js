@@ -50,4 +50,27 @@ describe( 'Navigation view script', () => {
 		expect( mockCurrentContext.submenuOpenedBy.hover ).toBe( false );
 		expect( state.isSubmenuOpen ).toBe( true ); // remains true because overlay is still open
 	} );
+
+	it( 'keeps a submenu inside an open custom overlay closed until it is opened', () => {
+		// A custom overlay is excluded from the styles that unfold every
+		// submenu, so opening the overlay must not report the submenu as open.
+		mockCurrentContext = {
+			type: 'submenu',
+			submenuOpenedBy: { click: false, hover: false, focus: false },
+			overlayOpenedBy: { click: true, hover: false, focus: false },
+			hasCustomOverlay: true,
+		};
+
+		const { state, actions } = mockRegisteredStore;
+
+		expect( state.isSubmenuOpen ).toBe( false );
+
+		// Opening the submenu itself is what expands it.
+		actions.openMenu( 'click' );
+		expect( state.isSubmenuOpen ).toBe( true );
+
+		// And it can be closed again while the overlay stays open.
+		actions.closeMenu( 'click' );
+		expect( state.isSubmenuOpen ).toBe( false );
+	} );
 } );
