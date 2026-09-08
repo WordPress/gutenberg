@@ -344,6 +344,10 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 							'slug'  => array(
 								'type' => 'string',
 							),
+							'count' => array(
+								'description' => __( 'Number of items the view holds.', 'gutenberg' ),
+								'type'        => 'integer',
+							),
 							'view'  => array(
 								'type'       => 'object',
 								'properties' => array_merge(

@@ -173,12 +173,41 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 }
 
 /**
+ * Counts the posts of a post type, grouped the way the page view list tabs are.
+ *
+ * The counts are what each status tab holds, so they are totals for the post
+ * type rather than for any one page of results. `wp_count_posts()` answers all
+ * of them from a single cached query, and its `readable` permission argument
+ * keeps private posts the current user cannot read out of the totals.
+ *
+ * The `all` total leaves out trashed posts, matching the statuses the "All
+ * items" view itself queries.
+ *
+ * @param string $post_type The post type to count.
+ * @return array<string, int> Counts keyed by status, plus an `all` total.
+ */
+function _gutenberg_get_entity_view_config_posttype_counts( $post_type ) {
+	$counts = wp_count_posts( $post_type, 'readable' );
+
+	$result = array( 'all' => 0 );
+	foreach ( array( 'publish', 'future', 'draft', 'pending', 'private' ) as $status ) {
+		$result[ $status ] = isset( $counts->$status ) ? (int) $counts->$status : 0;
+		$result['all']    += $result[ $status ];
+	}
+	$result['trash'] = isset( $counts->trash ) ? (int) $counts->trash : 0;
+
+	return $result;
+}
+
+/**
  * Provides the view configuration for the `page` post type.
  *
  * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
  * @return Gutenberg_View_Config_Data The updated view configuration container.
  */
 function _gutenberg_get_entity_view_config_posttype_page( $data ) {
+	$counts = _gutenberg_get_entity_view_config_posttype_counts( 'page' );
+
 	$default_layouts = array(
 		'table' => array(
 			'layout' => array(
@@ -208,9 +237,15 @@ function _gutenberg_get_entity_view_config_posttype_page( $data ) {
 	);
 
 	$view_list = array(
+		// Carries a count into the base "All items" view, which merges by slug.
+		array(
+			'slug'  => 'all',
+			'count' => $counts['all'],
+		),
 		array(
 			'title' => __( 'Published', 'gutenberg' ),
 			'slug'  => 'published',
+			'count' => $counts['publish'],
 			'view'  => array(
 				'filters' => array(
 					array(
@@ -225,6 +260,7 @@ function _gutenberg_get_entity_view_config_posttype_page( $data ) {
 		array(
 			'title' => __( 'Scheduled', 'gutenberg' ),
 			'slug'  => 'future',
+			'count' => $counts['future'],
 			'view'  => array(
 				'filters' => array(
 					array(
@@ -239,6 +275,7 @@ function _gutenberg_get_entity_view_config_posttype_page( $data ) {
 		array(
 			'title' => __( 'Drafts', 'gutenberg' ),
 			'slug'  => 'drafts',
+			'count' => $counts['draft'],
 			'view'  => array(
 				'filters' => array(
 					array(
@@ -253,6 +290,7 @@ function _gutenberg_get_entity_view_config_posttype_page( $data ) {
 		array(
 			'title' => __( 'Pending', 'gutenberg' ),
 			'slug'  => 'pending',
+			'count' => $counts['pending'],
 			'view'  => array(
 				'filters' => array(
 					array(
@@ -267,6 +305,7 @@ function _gutenberg_get_entity_view_config_posttype_page( $data ) {
 		array(
 			'title' => __( 'Private', 'gutenberg' ),
 			'slug'  => 'private',
+			'count' => $counts['private'],
 			'view'  => array(
 				'filters' => array(
 					array(
@@ -281,6 +320,7 @@ function _gutenberg_get_entity_view_config_posttype_page( $data ) {
 		array(
 			'title' => __( 'Trash', 'gutenberg' ),
 			'slug'  => 'trash',
+			'count' => $counts['trash'],
 			'view'  => array(
 				'type'    => 'table',
 				'layout'  => $default_layouts['table']['layout'],
