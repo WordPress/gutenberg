@@ -488,6 +488,110 @@ describe( 'SearchableSelect', () => {
 				screen.queryByRole( 'option', { name: 'Create new item' } )
 			).not.toBeInTheDocument();
 		} );
+
+		it( 'hides the creatable footer when the query matches other items but not the creatable item', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<SearchableSelect
+					items={ [ ...ITEMS, creatableItem ] }
+					inputValue="Apple"
+				/>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'option', { name: 'Apple' } )
+				).toBeVisible();
+			} );
+			expect(
+				screen.queryByRole( 'option', { name: 'Create new item' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'keeps the creatable footer when the query matches the creatable item', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<SearchableSelect
+					items={ [ ...ITEMS, creatableItem ] }
+					inputValue="Create"
+				/>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'option', { name: 'Create new item' } )
+				).toBeVisible();
+			} );
+			expect(
+				screen.getAllByRole( 'option', { name: 'Create new item' } )
+			).toHaveLength( 1 );
+			expect(
+				screen.queryByRole( 'option', { name: 'Apple' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'keeps the creatable footer when the query matches a grouped creatable item', async () => {
+			const user = userEvent.setup();
+			const groupedCreatableItem = {
+				value: '__create__',
+				label: 'Create new item',
+				creatable: true,
+			};
+			const items = [
+				{
+					label: 'Common',
+					items: [ { value: 'apple', label: 'Apple' } ],
+				},
+				{ label: '', items: [ groupedCreatableItem ] },
+			];
+
+			render(
+				<SearchableSelect
+					items={ items }
+					inputValue="Create"
+					children={ ( group: ItemGroup ) => (
+						<SearchableSelect.Group
+							key={ group.label }
+							items={ group.items }
+						>
+							<SearchableSelect.GroupLabel>
+								{ group.label }
+							</SearchableSelect.GroupLabel>
+							<SearchableSelect.Collection>
+								{ ( item: Item ) => (
+									<SearchableSelect.Item
+										key={ item.value }
+										value={ item }
+									>
+										{ item.label }
+									</SearchableSelect.Item>
+								) }
+							</SearchableSelect.Collection>
+						</SearchableSelect.Group>
+					) }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'option', { name: 'Create new item' } )
+				).toBeVisible();
+			} );
+			expect(
+				screen.getAllByRole( 'option', { name: 'Create new item' } )
+			).toHaveLength( 1 );
+			expect(
+				screen.queryByRole( 'option', { name: 'Apple' } )
+			).not.toBeInTheDocument();
+		} );
 	} );
 
 	it( 'warns when grouped items are used without children', () => {
