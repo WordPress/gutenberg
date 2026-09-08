@@ -50,6 +50,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Media Upload Modal', 'gutenberg' ),
 					'description' => __( 'Replaces the existing WordPress media modal with a new modal powered by Data Views, supporting browsing, selecting, and uploading media.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-optimize-existing-media',
+					'label'       => __( 'Optimize existing media', 'gutenberg' ),
+					'description' => __( 'Adds an "Optimize" panel to image-bearing blocks that re-processes a previously uploaded image in the browser to reduce its file size. Requires client-side media processing support (Chromium-based browsers).', 'gutenberg' ),
+				),
 			),
 		),
 		array(

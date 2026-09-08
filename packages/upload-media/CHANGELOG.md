@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add `optimizeExistingItem` action and a `FetchRemoteFile` operation (with a `fetchFile` utility) to re-process an already-uploaded attachment client-side: fetch the original, re-compress it, regenerate sub-sizes, and upload the result as a new attachment ([#79509](https://github.com/WordPress/gutenberg/pull/79509)).
+
 ### Internal
 
 -   Add a private `getFailureCount` selector, a running tally of top-level items cancelled because they failed. Failed items leave the queue just like successful ones, so this is the only record that an upload did not make it ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).
