@@ -21,7 +21,7 @@ permissions: {}
 
 jobs:
     check:
-        name: All${{ (matrix.node != '20' || matrix.os != 'ubuntu-24.04') && format(' (Node.js {0} on {1})', matrix.node, contains(matrix.os, 'macos-') && 'MacOS' || contains(matrix.os, 'windows-') && 'Windows' || 'Linux') || '' }}
+        name: All${{ (matrix.node != '24' || matrix.os != 'ubuntu-24.04') && format(' (Node.js {0} on {1})', matrix.node, contains(matrix.os, 'macos-') && 'MacOS' || contains(matrix.os, 'windows-') && 'Windows' || 'Linux') || '' }}
         runs-on: ${{ matrix.os }}
         env:
             NODE_OPTIONS: --max-old-space-size=4096
@@ -32,7 +32,7 @@ jobs:
         strategy:
             matrix:
                 event: ['${{ github.event_name }}']
-                node: ['20', '22', '24']
+                node: ['24', '26']
                 os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
 
                 include:
@@ -41,9 +41,9 @@ jobs:
                       os: 'ubuntu-24.04'
                       annotations: true
                 exclude:
-                    # On PRs: Only test Node 20 on Ubuntu and Windows
+                    # Only test Node 24 on Ubuntu and Windows for pull requests.
                     - event: 'pull_request'
-                      node: '22'
+                      node: '26'
                     - event: 'pull_request'
                       os: 'macos-15'
 
@@ -119,7 +119,7 @@ jobs:
               run: npm run typecheck
 
             - name: Validate JavaScript test routing
-              if: ${{ matrix.node == '20' && matrix.os == 'ubuntu-24.04' }}
+              if: ${{ matrix.node == '24' && matrix.os == 'ubuntu-24.04' }}
               run: npm run test:unit:routing -- --base="$(git rev-parse HEAD^1)"
 
             - name: Build packages
