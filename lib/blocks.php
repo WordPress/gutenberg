@@ -41,6 +41,19 @@ function gutenberg_reregister_core_block_types() {
 add_action( 'init', 'gutenberg_reregister_core_block_types' );
 
 /**
+ * Removes the core/tabs context filter that WordPress Core registers, leaving
+ * the plugin's own copy as the only one.
+ *
+ * Both callbacks generate a tabs ID, so keeping core's makes the `tabs_`
+ * counter skip a number for every tabs block rendered.
+ */
+function gutenberg_remove_core_tabs_context_filter() {
+	remove_filter( 'render_block_context', 'block_core_tabs_provide_context', 10 );
+}
+
+add_action( 'init', 'gutenberg_remove_core_tabs_context_filter' );
+
+/**
  * Adds the defer loading strategy to all registered blocks.
  *
  * This function would not be part of core merge. Instead, the register_block_script_handle() function would be patched
