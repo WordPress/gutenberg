@@ -5,7 +5,8 @@
 		// Sources and tests alike import by their real `.ts` extension, which is
 		// what Node's type stripping resolves when the action runs.
 		"allowImportingTsExtensions": true,
-		"types": [ "jest" ]
+		// The action talks to Node and the runner directly, with no dependencies.
+		"types": [ "jest", "node" ]
 	},
-	"exclude": [ "src/__tests__", "src/__fixtures__" ]
+	"include": [ "src" ]
 }
