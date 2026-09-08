@@ -111,14 +111,14 @@ export function getContrastWarning( {
 								'This color combination may be hard for people to read. Try using a darker background color and/or a brighter %s.'
 							),
 							item.description
-					  )
+						)
 					: sprintf(
 							// translators: %s is a type of text color, e.g., "text color" or "link color".
 							__(
 								'This color combination may be hard for people to read. Try using a brighter background color and/or a darker %s.'
 							),
 							item.description
-					  );
+						);
 			speakMessage = __(
 				'This color combination may be hard for people to read.'
 			);

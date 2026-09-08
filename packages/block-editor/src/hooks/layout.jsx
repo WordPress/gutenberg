@@ -439,7 +439,7 @@ function LayoutPanelPure( {
 		? cleanEmptyObject( {
 				...baseLayout,
 				...stateLayout,
-		  } ) || {}
+			} ) || {}
 		: baseLayout;
 	const resetLayoutDefaults = isViewportLayoutState
 		? baseLayout
@@ -519,7 +519,7 @@ function LayoutPanelPure( {
 	const hasInheritToggleValue = () =>
 		isViewportLayoutState
 			? ( usedLayout?.type ?? 'default' ) !==
-			  ( resetLayoutDefaults?.type ?? 'default' )
+				( resetLayoutDefaults?.type ?? 'default' )
 			: layout?.type === 'constrained';
 	const hasLayoutTypeValue = () =>
 		( usedLayout?.type ?? 'default' ) !==
@@ -554,10 +554,10 @@ function LayoutPanelPure( {
 									isUsingContentWidth()
 										? __(
 												'Nested blocks use content width with options for full and wide widths.'
-										  )
+											)
 										: __(
 												'Nested blocks will fill the width of this container.'
-										  )
+											)
 								}
 							/>
 						</ToolsPanelItem>
@@ -793,7 +793,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 						variationBlockGapValue = variationName
 							? globalStyles?.blocks?.[ name ]?.variations?.[
 									variationName
-							  ]?.spacing?.blockGap
+								]?.spacing?.blockGap
 							: undefined;
 					}
 

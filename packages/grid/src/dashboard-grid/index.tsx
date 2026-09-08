@@ -225,8 +225,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const minResizeHeightPx =
 			rowHeightPx === null
 				? undefined
-				: gridSpanToPixelSize( 1, 1, columnWidth, gapPx, rowHeightPx )
-						.heightPx ?? undefined;
+				: ( gridSpanToPixelSize( 1, 1, columnWidth, gapPx, rowHeightPx )
+						.heightPx ?? undefined );
 
 		const spanBoundsByKey = useSpanBounds(
 			itemLimits,
@@ -264,7 +264,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 								item.width,
 								bounds.minWidth,
 								bounds.maxWidth
-						  )
+							)
 						: item.width;
 				const height = clampSpan(
 					item.height ?? 1,
@@ -364,7 +364,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 						actionableArea !== undefined
 							? cloneElement( child, {
 									actionableArea: undefined,
-							  } )
+								} )
 							: child;
 
 					byKey.set( key, stripped );

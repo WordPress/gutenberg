@@ -1041,7 +1041,7 @@ describe( 'DataForm component', () => {
 										? null
 										: 'Title is not allowed for this order.',
 							},
-					  }
+						}
 					: field
 			);
 

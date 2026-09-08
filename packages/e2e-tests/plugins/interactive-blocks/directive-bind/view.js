@@ -23,9 +23,9 @@ const { state, foo } = store( 'directive-bind', {
 				'previousValue' in context
 					? context.previousValue
 					: // Any string works here; we just want to toggle the value
-					  // to ensure Preact renders the same we are hydrating in the
-					  // first place.
-					  'tacocat';
+						// to ensure Preact renders the same we are hydrating in the
+						// first place.
+						'tacocat';
 
 			context.previousValue = context.value;
 			context.value = previousValue;

@@ -649,7 +649,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 								id: 2,
 								alt_text: 'Updated alt',
 								caption: { raw: '' },
-						  },
+							},
 				resolveGetEntityRecord: ( kind, name, attachmentId ) =>
 					attachmentId === 2 ? updatedAttachment : undefined,
 			},

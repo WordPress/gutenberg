@@ -86,7 +86,7 @@ export function useSpecificEditorSettings( {
 									currentPostIsTrashed
 										? ''
 										: 'cursor: pointer;'
-							  }}`
+								}}`
 							: undefined,
 				},
 			],

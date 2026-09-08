@@ -89,14 +89,14 @@ export function FlatTermSelector( { slug } ) {
 
 			return {
 				hasCreateAction: _taxonomy
-					? post._links?.[
+					? ( post._links?.[
 							'wp:action-create-' + _taxonomy.rest_base
-					  ] ?? false
+						] ?? false )
 					: false,
 				hasAssignAction: _taxonomy
-					? post._links?.[
+					? ( post._links?.[
 							'wp:action-assign-' + _taxonomy.rest_base
-					  ] ?? false
+						] ?? false )
 					: false,
 				taxonomy: _taxonomy,
 				termIds: _termIds,
@@ -122,7 +122,7 @@ export function FlatTermSelector( { slug } ) {
 					? getEntityRecords( 'taxonomy', slug, {
 							...DEFAULT_QUERY,
 							search,
-					  } )
+						} )
 					: EMPTY_ARRAY,
 			};
 		},

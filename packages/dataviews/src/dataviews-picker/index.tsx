@@ -165,14 +165,14 @@ type DataViewsPickerProps< Item > = {
 			 * have a string `id` property, which is used by default.
 			 */
 			getItemId?: ( item: Item ) => string;
-	  }
+		}
 	: {
 			/**
 			 * Returns a unique id for an item. Required when items have no
 			 * string `id` property.
 			 */
 			getItemId: ( item: Item ) => string;
-	  } );
+		} );
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const EMPTY_ARRAY: any[] = [];

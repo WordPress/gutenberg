@@ -75,7 +75,7 @@ export default function useEntityProp( kind, name, prop, _id ) {
 				? {
 						value: editedRecord[ prop ],
 						fullValue: record[ prop ],
-				  }
+					}
 				: {};
 		},
 		[ kind, name, id, prop, revisionId ]

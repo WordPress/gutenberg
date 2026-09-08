@@ -68,7 +68,7 @@ const getToggleAriaLabel = (
 						colorObject.name,
 						ariaLabelValue,
 						style
-				  )
+					)
 				: sprintf(
 						// translators: 1: The name of the color e.g. "vivid red". 2: The color's hex code e.g.: "#f00:".
 						__(
@@ -76,7 +76,7 @@ const getToggleAriaLabel = (
 						),
 						colorObject.name,
 						ariaLabelValue
-				  );
+					);
 		}
 
 		if ( colorValue ) {
@@ -89,14 +89,14 @@ const getToggleAriaLabel = (
 						),
 						ariaLabelValue,
 						style
-				  )
+					)
 				: sprintf(
 						// translators: %s: The color's hex code e.g: "#f00".
 						__(
 							'Border color and style picker. The currently selected color has a value of "%s".'
 						),
 						ariaLabelValue
-				  );
+					);
 		}
 
 		return __( 'Border color and style picker.' );

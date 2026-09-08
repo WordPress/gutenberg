@@ -56,8 +56,7 @@ export type SelectControlProps = Omit<
 		 * ```
 		 */
 		triggerContent?:
-			| ( ( item: SelectItem ) => React.ReactNode )
-			| React.ReactNode;
+			( ( item: SelectItem ) => React.ReactNode ) | React.ReactNode;
 		/**
 		 * The size of the control.
 		 *

@@ -93,7 +93,7 @@ function StyleVariationsContainer( {
 								css: `${ variation.styles?.css || '' } ${
 									userStyles?.css || ''
 								}`,
-						  }
+							}
 						: {};
 
 				const blocks =

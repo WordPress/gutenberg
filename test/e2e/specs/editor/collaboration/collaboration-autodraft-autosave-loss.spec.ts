@@ -15,7 +15,7 @@ function rawField( field: RestPost[ 'title' ] ): string {
 
 	return typeof field === 'string'
 		? field
-		: field.raw ?? field.rendered ?? '';
+		: ( field.raw ?? field.rendered ?? '' );
 }
 
 async function getCurrentPostId( page: Page ): Promise< number > {

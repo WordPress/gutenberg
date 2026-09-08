@@ -498,7 +498,7 @@ describe.each( [
 					mode === 'uncontrolled'
 						? screen.getByRole( 'button', {
 								name: 'After ToggleGroupControl',
-						  } )
+							} )
 						: screen.getByRole( 'button', { name: 'Reset' } );
 
 				expect( expectedFocusTarget ).toHaveFocus();
@@ -736,7 +736,7 @@ describe.each( [
 				mode === 'uncontrolled'
 					? screen.getByRole( 'button', {
 							name: 'After ToggleGroupControl',
-					  } )
+						} )
 					: screen.getByRole( 'button', { name: 'Reset' } );
 
 			expect( expectedFocusTarget ).toHaveFocus();
@@ -863,7 +863,7 @@ describe.each( [
 				mode === 'uncontrolled'
 					? screen.getByRole( 'button', {
 							name: 'After ToggleGroupControl',
-					  } )
+						} )
 					: screen.getByRole( 'button', { name: 'Reset' } );
 
 			expect( expectedFocusTarget ).toHaveFocus();

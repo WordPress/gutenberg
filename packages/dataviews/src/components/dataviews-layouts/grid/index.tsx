@@ -96,7 +96,7 @@ function ViewGrid< Item >( {
 													__( '%1$s: %2$s' ),
 													groupField.label,
 													groupName
-											  ) }
+												) }
 									</h3>
 									<CompositeGrid
 										{ ...gridProps }

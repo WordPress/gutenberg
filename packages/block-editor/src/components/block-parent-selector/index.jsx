@@ -129,11 +129,11 @@ export default function BlockParentSelector() {
 													'directly add the only allowed block'
 												),
 												blockTitle.toLowerCase()
-										  )
+											)
 										: _x(
 												'Add block',
 												'Generic label for block inserter button'
-										  )
+											)
 								}
 								showTooltip
 								icon={ plus }

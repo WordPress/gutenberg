@@ -82,13 +82,11 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 		[ clientId, currentViewport ]
 	);
 
-	if (
-		! (
-			isBlockCurrentlyHidden ||
-			hasParentHiddenEverywhere ||
-			isBlockParentHiddenAtViewport
-		)
-	) {
+	if ( ! (
+		isBlockCurrentlyHidden ||
+		hasParentHiddenEverywhere ||
+		isBlockParentHiddenAtViewport
+	) ) {
 		return null;
 	}
 

@@ -62,7 +62,7 @@ export default function ResponsiveWrapper( {
 					! overlayBackgroundColor?.slug &&
 					overlayBackgroundColor?.color &&
 					overlayBackgroundColor.color,
-		  }
+			}
 		: {};
 
 	const openButtonClasses = clsx(

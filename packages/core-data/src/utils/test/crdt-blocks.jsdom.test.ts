@@ -97,7 +97,7 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => ( {
 				},
 			},
 		},
-	] ) as unknown as typeof import('@wordpress/blocks').getBlockTypes,
+	] ) as unknown as typeof import( '@wordpress/blocks' ).getBlockTypes,
 } ) );
 
 function createCursorSelection( offset: number ): WPBlockSelection {

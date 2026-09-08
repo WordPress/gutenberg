@@ -386,8 +386,8 @@ export function GalleryDynamicView( {
 	// source wording comes from the source descriptor.
 	const emptyInstructions = isResolvingDynamic
 		? __( 'Loading images…' )
-		: sourceDescriptor?.emptyMessage ??
-		  __( 'Dynamic images will appear here.' );
+		: ( sourceDescriptor?.emptyMessage ??
+			__( 'Dynamic images will appear here.' ) );
 
 	return (
 		<>

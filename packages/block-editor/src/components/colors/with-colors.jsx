@@ -123,7 +123,7 @@ function createColorHOC( colorTypes, withColorPalette ) {
 													colorContext,
 													colorObject.slug
 												),
-										  };
+											};
 
 								const setter = ( newColorValue ) => {
 									const resolvedColorObject =

@@ -26,9 +26,9 @@ export function InvalidDraftDisplay( {
 
 	const statusText = isInvalid
 		? /* translators: Indicating that the navigation link is Invalid. */
-		  __( 'Invalid' )
+			__( 'Invalid' )
 		: /* translators: Indicating that the navigation link is a Draft. */
-		  __( 'Draft' );
+			__( 'Draft' );
 
 	return (
 		<div

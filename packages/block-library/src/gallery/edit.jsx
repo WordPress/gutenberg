@@ -156,7 +156,7 @@ export default function GalleryEdit( props ) {
 	const linkOptions = ! lightboxSetting?.allowEditing
 		? LINK_OPTIONS.filter(
 				( option ) => option.value !== LINK_DESTINATION_LIGHTBOX
-		  )
+			)
 		: LINK_OPTIONS;
 
 	const {
@@ -264,7 +264,7 @@ export default function GalleryEdit( props ) {
 		? getViewportGalleryStyle(
 				attributes.style,
 				selectedStyleState.viewport
-		  )
+			)
 		: {};
 	const baseColumns = isValidGalleryColumns( columns ) ? columns : undefined;
 	const baseImageCrop = typeof imageCrop === 'boolean' ? imageCrop : true;
@@ -456,7 +456,7 @@ export default function GalleryEdit( props ) {
 					}
 
 					return file;
-			  } )
+				} )
 			: selectedImages;
 
 		if ( ! imageArray.every( isValidFileType ) ) {
@@ -485,8 +485,9 @@ export default function GalleryEdit( props ) {
 		// once the new image blocks are merged in with existing.
 		const newOrderMap = processedImages.reduce(
 			( result, image, index ) => (
-				( result[ image.id ] = index ), result
-			),
+				( result[ image.id ] = index ),
+				result
+			 ),
 			{}
 		);
 
@@ -495,7 +496,7 @@ export default function GalleryEdit( props ) {
 					processedImages.find(
 						( img ) => img.id === block.attributes.id
 					)
-			  )
+				)
 			: innerBlockImages;
 
 		const newImageList = processedImages.filter(
@@ -862,7 +863,7 @@ export default function GalleryEdit( props ) {
 								isViewportStyleState
 									? hasViewportColumns
 									: !! activeColumns &&
-									  activeColumns !== displayedImageCount
+										activeColumns !== displayedImageCount
 							}
 							onDeselect={ () => setColumnsNumber( undefined ) }
 						>
@@ -873,7 +874,7 @@ export default function GalleryEdit( props ) {
 										? activeColumns
 										: defaultColumnsNumber(
 												displayedImageCount
-										  )
+											)
 								}
 								onChange={ setColumnsNumber }
 								min={ 1 }

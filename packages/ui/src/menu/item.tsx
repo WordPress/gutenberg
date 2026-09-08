@@ -77,7 +77,9 @@ function useItemContent(
 	const generatedLabelId = useId();
 	const generatedDescriptionId = useId();
 	const { descriptionIds, hasLabel, labelId } = getItemContent( children );
-	const resolvedLabelId = hasLabel ? labelId ?? generatedLabelId : undefined;
+	const resolvedLabelId = hasLabel
+		? ( labelId ?? generatedLabelId )
+		: undefined;
 	const resolvedDescriptionIds = descriptionIds.map(
 		( descriptionId, index ) =>
 			descriptionId ?? `${ generatedDescriptionId }-${ index }`

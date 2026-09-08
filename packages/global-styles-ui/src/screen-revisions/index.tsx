@@ -90,7 +90,7 @@ function ScreenRevisions() {
 								// translators: %d: number of revisions.
 								__( 'Revisions (%d)' ),
 								revisionsCount
-						  )
+							)
 						: __( 'Revisions' )
 				}
 				description={ __(

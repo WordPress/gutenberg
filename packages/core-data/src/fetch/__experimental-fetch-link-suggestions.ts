@@ -113,7 +113,7 @@ export default async function fetchLinkSuggestions(
 			? {
 					...searchOptions,
 					...searchOptions.initialSuggestionsSearchOptions,
-			  }
+				}
 			: searchOptions;
 
 	const {

@@ -137,7 +137,7 @@ describe( 'Breadcrumb', () => {
 						element.textContent ?? ''
 					);
 					const labelWidth = Number.isNaN( intrinsicWidth )
-						? configuredLabelWidth ?? DEFAULT_LABEL_WIDTH
+						? ( configuredLabelWidth ?? DEFAULT_LABEL_WIDTH )
 						: intrinsicWidth;
 					return labelWidth + indicatorWidth;
 				}

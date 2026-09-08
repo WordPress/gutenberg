@@ -129,7 +129,7 @@ function TextShadowControl( { textShadow, onChange }: TextShadowProps ) {
 	const activeSlug = getTextShadowPresetSlug( textShadow );
 	const activeValue = activeSlug
 		? `var:preset|text-shadow|${ activeSlug }`
-		: textShadow ?? '';
+		: ( textShadow ?? '' );
 	const previewValue = activeSlug
 		? presets.find( ( preset ) => preset.slug === activeSlug )?.textShadow
 		: textShadow;

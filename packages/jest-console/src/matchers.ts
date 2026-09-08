@@ -23,10 +23,10 @@ const createErrorMessage = ( spyInfo: SpyInfo ) => {
 	const message = pass
 		? `Expected mock function not to be called but it was called with:\n${ calls.map(
 				printReceived
-		  ) }`
+			) }`
 		: `Expected mock function to be called${
 				expected ? ` with:\n${ printExpected( expected ) }\n` : '.'
-		  }\nbut it was called with:\n${ calls.map( printReceived ) }`;
+			}\nbut it was called with:\n${ calls.map( printReceived ) }`;
 
 	return () =>
 		`${ matcherHint( hint, spy.getMockName() ) }` +

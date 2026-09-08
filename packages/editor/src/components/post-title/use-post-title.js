@@ -32,7 +32,7 @@ export default function usePostTitle() {
 			// The oldest revision has nothing to compare against, so its whole
 			// title reads as added.
 			previousTitle: isDiffing
-				? getPreviousRevision()?.title?.raw ?? ''
+				? ( getPreviousRevision()?.title?.raw ?? '' )
 				: undefined,
 		};
 	}, [] );

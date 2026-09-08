@@ -322,8 +322,9 @@ describe( 'Slot', () => {
 				</Provider>
 			);
 			const iframeDocument =
-				screen.getByTitle< HTMLIFrameElement >( 'Slot document' )
-					.contentDocument!;
+				screen.getByTitle< HTMLIFrameElement >(
+					'Slot document'
+				).contentDocument!;
 
 			const styledElement = within( iframeDocument.body ).getByText(
 				'Styled content'

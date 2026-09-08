@@ -1,8 +1,5 @@
 export type ComponentStatus =
-	| 'recommended'
-	| 'use-with-caution'
-	| 'not-recommended'
-	| 'unaudited';
+	'recommended' | 'use-with-caution' | 'not-recommended' | 'unaudited';
 
 export const statuses: Record<
 	ComponentStatus,

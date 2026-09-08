@@ -518,9 +518,8 @@ describe( 'getPathAndQueryString', () => {
 				return queryString;
 			},
 		} ) );
-		const { getPathAndQueryString } = await import(
-			'../get-path-and-query-string'
-		);
+		const { getPathAndQueryString } =
+			await import( '../get-path-and-query-string' );
 		expect(
 			getPathAndQueryString( {
 				path: 'path',

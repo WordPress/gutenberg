@@ -505,15 +505,15 @@ function ViewTable< Item >( {
 										canMove={ false }
 										canInsertLeft={
 											isRtl
-												? view.layout?.enableMoving ??
-												  true
+												? ( view.layout?.enableMoving ??
+													true )
 												: false
 										}
 										canInsertRight={
 											isRtl
 												? false
-												: view.layout?.enableMoving ??
-												  true
+												: ( view.layout?.enableMoving ??
+													true )
 										}
 									/>
 								) }
@@ -569,8 +569,7 @@ function ViewTable< Item >( {
 								className={ clsx(
 									'dataviews-view-table__actions-column',
 									{
-										'dataviews-view-table__actions-column--sticky':
-											true,
+										'dataviews-view-table__actions-column--sticky': true,
 										'dataviews-view-table__actions-column--stuck':
 											! isHorizontalScrollEnd,
 									}
@@ -605,7 +604,7 @@ function ViewTable< Item >( {
 													__( '%1$s: %2$s' ),
 													groupField.label,
 													groupName
-											  ) }
+												) }
 									</td>
 								</tr>
 								{ groupItems.map( ( item, index ) => {

@@ -405,7 +405,7 @@ export function ImageEdit( {
 							/* translators: %s: Label of the bindings source. */
 							__( 'Connected to %s' ),
 							blockBindingsSource.label
-					  )
+						)
 					: __( 'Connected to dynamic data' ),
 			};
 		},

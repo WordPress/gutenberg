@@ -15,9 +15,8 @@ const html = `
 store( 'directive-key', {
 	actions: {
 		*navigate() {
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions } =
+				yield import( '@wordpress/interactivity-router' );
 			return actions.navigate( window.location, {
 				force: true,
 				html,

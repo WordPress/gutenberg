@@ -113,7 +113,7 @@ function DuotonePicker( {
 						// translators: %s: The name of the option e.g: "Dark grayscale".
 						__( 'Duotone: %s' ),
 						name
-				  )
+					)
 				: tooltipText;
 			// When a non-empty selectedSlug is provided, selection is decided
 			// strictly by slug, which keeps two presets holding the same

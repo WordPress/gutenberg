@@ -125,9 +125,9 @@ function NonDefaultControls( { format, onChange } ) {
 				value={
 					isCustom
 						? customOption
-						: suggestedOptions.find(
+						: ( suggestedOptions.find(
 								( option ) => option.format === format
-						  ) ?? customOption
+							) ?? customOption )
 				}
 				onChange={ ( { selectedItem } ) => {
 					if ( selectedItem === customOption ) {

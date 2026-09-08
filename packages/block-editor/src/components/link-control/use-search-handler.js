@@ -73,7 +73,7 @@ const handleEntitySearch = async (
 				title: val, // Must match the existing `<input>`s text value.
 				url: val, // Must match the existing `<input>`s text value.
 				type: CREATE_TYPE,
-		  } );
+			} );
 };
 
 export default function useSearchHandler(
@@ -110,7 +110,7 @@ export default function useSearchHandler(
 						withCreateSuggestion,
 						pageOnFront,
 						pageForPosts
-				  );
+					);
 		},
 		[
 			directEntryHandler,
