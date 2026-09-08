@@ -179,9 +179,7 @@ function BlockCard( {
 									{ ! parentClientId &&
 										! isChild &&
 										!! name?.length && (
-											<Badge intent="draft">
-												{ title }
-											</Badge>
+											<Badge>{ title }</Badge>
 										) }
 								</TitleElement>
 								{ children }
