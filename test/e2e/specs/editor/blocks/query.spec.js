@@ -104,4 +104,96 @@ test.describe( 'Query block', () => {
 			] );
 		} );
 	} );
+
+	test.describe( 'Taxonomy filters', () => {
+		let categoryIds = [];
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			const categories = await Promise.all(
+				[ 'Alpaca', 'Beluga', 'Capybara' ].map( ( name ) =>
+					requestUtils.rest( {
+						path: '/wp/v2/categories',
+						method: 'POST',
+						data: { name },
+					} )
+				)
+			);
+			categoryIds = categories.map( ( { id } ) => id );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await Promise.all(
+				categoryIds.map( ( id ) =>
+					requestUtils.rest( {
+						path: `/wp/v2/categories/${ id }`,
+						method: 'DELETE',
+						params: { force: true },
+					} )
+				)
+			);
+		} );
+
+		test( 'should list existing terms without typing a search', async ( {
+			page,
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/query',
+				attributes: { query: { perPage: 3, postType: 'post' } },
+				innerBlocks: [
+					{
+						name: 'core/post-template',
+						innerBlocks: [ { name: 'core/post-title' } ],
+					},
+				],
+			} );
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Query Loop',
+				} )
+			);
+			await editor.openDocumentSettingsSidebar();
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			// The taxonomies control is an optional tools panel item.
+			await settings
+				.getByRole( 'button', { name: 'Filters options' } )
+				.click();
+			await page
+				.getByRole( 'menuitemcheckbox', { name: 'Show Taxonomies' } )
+				.click();
+			await page.keyboard.press( 'Escape' );
+
+			// Opening the control lists the terms, with nothing typed.
+			await settings
+				.getByRole( 'combobox', { name: 'Categories', exact: true } )
+				.click();
+
+			await expect(
+				page.getByRole( 'option', { name: 'Alpaca' } )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'option', { name: 'Beluga' } )
+			).toBeVisible();
+
+			// Selecting from that list filters the query by the term.
+			await page.getByRole( 'option', { name: 'Beluga' } ).click();
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/query',
+					attributes: {
+						query: {
+							taxQuery: {
+								include: { category: [ categoryIds[ 1 ] ] },
+							},
+						},
+					},
+				},
+			] );
+		} );
+	} );
 } );
