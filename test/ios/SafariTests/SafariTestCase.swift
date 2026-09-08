@@ -23,27 +23,46 @@ class SafariTestCase: XCTestCase {
 		ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
 	}
 
-	func open( _ path: String ) {
-		// Opened by the system, not through the app: XCUITest cannot launch
-		// Safari itself, only attach to it.
-		XCUIDevice.shared.system.open( URL( string: baseURL + path )! )
-		safari.activate()
-		XCTAssertTrue( safari.wait( for: .runningForeground, timeout: 30 ) )
+	/// Opens the path and waits for the editor to come up, asking again if
+	/// it does not. The development server sometimes stops answering for a
+	/// while, and Safari then sits on its start page, which has a web view
+	/// of its own and so cannot be told apart by waiting for one.
+	func open(
+		_ path: String,
+		waitingFor element: XCUIElement,
+		timeout: TimeInterval = 150,
+		attempts: Int = 3
+	) {
+		for attempt in 1...attempts {
+			// Opened by the system, not through the app: XCUITest cannot
+			// launch Safari itself, only attach to it.
+			XCUIDevice.shared.system.open( URL( string: baseURL + path )! )
+			safari.activate()
+			XCTAssertTrue( safari.wait( for: .runningForeground, timeout: 30 ) )
 
-		// A post whose edits were never saved asks before it goes. These
-		// tests never keep what they type, so leave.
-		let leave = safari.buttons
-			.matching( NSPredicate( format: "label BEGINSWITH 'Leave'" ) )
-			.firstMatch
-		if leave.waitForExistence( timeout: 5 ) {
-			leave.tap()
+			// A post whose edits were never saved asks before it goes. These
+			// tests never keep what they type, so leave.
+			let leave = safari.buttons
+				.matching( NSPredicate( format: "label BEGINSWITH 'Leave'" ) )
+				.firstMatch
+			if leave.waitForExistence( timeout: 3 ) {
+				leave.tap()
+			}
+
+			if element.waitForExistence( timeout: timeout ) {
+				return
+			}
+			XCTContext.runActivity(
+				named: "\( path ) did not open on attempt \( attempt ), asking again"
+			) { _ in }
 		}
-
-		XCTAssertTrue( web.waitForExistence( timeout: 60 ), "The editor did not load" )
+		XCTFail( "The editor did not load at \( path )" )
 	}
 
 	func openNewPost() {
-		open( "/wp-admin/post-new.php" )
+		// The first load on a runner is slow: PHP runs in WebAssembly and
+		// nothing is cached yet.
+		open( "/wp-admin/post-new.php", waitingFor: web.textViews[ "Add title" ], timeout: 240 )
 	}
 
 	/// Letters are keys, labelled in the case the keyboard currently shows;

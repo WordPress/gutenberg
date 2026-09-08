@@ -32,14 +32,7 @@ final class CaretPlacementTests: SafariTestCase {
 		// The report is from a tablet held either way; landscape leaves the
 		// widest canvas beside the text to tap in.
 		XCUIDevice.shared.orientation = .landscapeLeft
-		open( "/wp-admin/post.php?post=\( post.id )&action=edit" )
-
-		// The first load on a runner is slow: PHP runs in WebAssembly and
-		// nothing is cached yet.
-		XCTAssertTrue(
-			paragraph.waitForExistence( timeout: 240 ),
-			"The seeded post has no paragraphs"
-		)
+		open( "/wp-admin/post.php?post=\( post.id )&action=edit", waitingFor: paragraph )
 
 		// The drafts differ only in their text, so this is also what catches
 		// a navigation that never happened and left the previous post up.

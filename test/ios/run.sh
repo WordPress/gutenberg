@@ -66,11 +66,22 @@ cat "$PLAYGROUND_LOG"
 step "Loading the editor once"
 # Playground logs the request in through a redirect, so cookies must be
 # kept between the hops: -b "" holds them in memory.
-EDITOR_HTML=$( curl -sL -b "" "$WP_BASE_URL/wp-admin/post-new.php" )
+EDITOR_HTML=$( curl -sL -b "" --max-time 300 "$WP_BASE_URL/wp-admin/post-new.php" )
 if ! grep -q "/build/scripts/rich-text/" <<< "$EDITOR_HTML"; then
 	echo "The editor does not load this checkout's build. Run npm run build first."
 	exit 1
 fi
+
+# The pages the tests open, warmed here as well. The server has been seen to
+# stop answering for minutes at a time, and a test that meets that just sits
+# in front of Safari's start page until it times out.
+for POST in $( grep -o "42424[0-9]" test/ios/blueprint.json | sort -u ); do
+	if ! curl -sfL -b "" --max-time 300 "$WP_BASE_URL/wp-admin/post.php?post=${POST}&action=edit" \
+		| grep -q "wp:paragraph"; then
+		echo "The editor did not serve seeded post ${POST}."
+		exit 1
+	fi
+done
 
 step "Waiting for the simulator"
 xcrun simctl bootstatus "$UDID" -b
