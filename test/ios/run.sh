@@ -90,7 +90,10 @@ step "Loading the editor once"
 # request after the one that logged in, so they share a jar.
 COOKIES=$( mktemp )
 warm() {
-	curl -sL -c "$COOKIES" -b "$COOKIES" --max-time 300 "$WP_BASE_URL/$1"
+	# --keep-session-cookies: the login cookie has no expiry, and curl drops
+	# those from the jar without it, so only the first request was logged in.
+	curl -sL -c "$COOKIES" -b "$COOKIES" --keep-session-cookies \
+		--max-time 300 "$WP_BASE_URL/$1"
 }
 EDITOR_HTML=$( warm "wp-admin/post-new.php" )
 if ! grep -q "/build/scripts/rich-text/" <<< "$EDITOR_HTML"; then

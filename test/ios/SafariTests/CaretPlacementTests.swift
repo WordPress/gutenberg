@@ -28,6 +28,17 @@ final class CaretPlacementTests: SafariTestCase {
 
 	var paragraph: XCUIElement { paragraphs.element( boundBy: 0 ) }
 
+	/// The editable fields the editor exposes right now. Read only to
+	/// describe a failure: when a block stops being an editing host it stops
+	/// being a field, and the writing flow around it becomes one instead,
+	/// under the name "Editor canvas".
+	var fieldLabels: String {
+		let labels = web.textViews.allElementsBoundByIndex
+			.map { $0.label }
+			.filter { ! $0.isEmpty }
+		return labels.isEmpty ? "none" : labels.joined( separator: ", " )
+	}
+
 	func openSeededPost( _ post: ( id: Int, firstParagraph: String ) ) {
 		// The report is from a tablet held either way; landscape leaves the
 		// widest canvas beside the text to tap in.
@@ -73,9 +84,16 @@ final class CaretPlacementTests: SafariTestCase {
 		// The gesture before this one can leave the editor redrawing, and
 		// reading an element that is not in the tree right now raises rather
 		// than failing the check that is meant to catch it.
+		//
+		// The paragraphs can also still be on screen while they stop being
+		// fields, which is what the report describes: the text is there, but
+		// nothing takes a caret. The labels say which of the two it is.
 		XCTAssertTrue(
 			paragraph.waitForExistence( timeout: 30 ),
-			"The paragraphs went missing from the editor on attempt \( attempt )"
+			"""
+			No paragraph takes the caret on attempt \( attempt ). \
+			The editor exposes these fields: \( fieldLabels ).
+			"""
 		)
 		let before = paragraph.value as? String ?? ""
 		paragraph.tap()
