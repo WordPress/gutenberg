@@ -51,7 +51,11 @@
 			&.has-expanded-hit-area::after {
 				content: "";
 				position: absolute;
-				inset: calc((var(--_checkbox-input-size) - max(var(--_checkbox-input-size), var(--wpds-dimension-size-sm))) / 2);
+				inset-block-start: 50%;
+				inset-inline-start: 50%;
+				width: max(var(--_checkbox-input-size), var(--wpds-dimension-size-sm));
+				aspect-ratio: 1;
+				transform: translate(-50%, -50%);
 			}
 		}
 
