@@ -70,6 +70,13 @@ final class CaretPlacementTests: SafariTestCase {
 	/// Taps the first paragraph and checks the two things the issue reports
 	/// losing: a caret in that paragraph, and typing that reaches it.
 	func assertTheParagraphTakesTheCaret( _ attempt: Int ) {
+		// The gesture before this one can leave the editor redrawing, and
+		// reading an element that is not in the tree right now raises rather
+		// than failing the check that is meant to catch it.
+		XCTAssertTrue(
+			paragraph.waitForExistence( timeout: 30 ),
+			"The paragraphs went missing from the editor on attempt \( attempt )"
+		)
 		let before = paragraph.value as? String ?? ""
 		paragraph.tap()
 

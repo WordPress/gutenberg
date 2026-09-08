@@ -85,9 +85,14 @@ cat "$PLAYGROUND_LOG"
 # also shows whether the plugin replaces core's bundles, which it only
 # does when its build exists.
 step "Loading the editor once"
-# Playground logs the request in through a redirect, so cookies must be
-# kept between the hops: -b "" holds them in memory.
-EDITOR_HTML=$( curl -sL -b "" --max-time 300 "$WP_BASE_URL/wp-admin/post-new.php" )
+# Playground logs a browser in once, through a redirect, and remembers it in
+# a cookie. The hops within one request need the cookie, and so does every
+# request after the one that logged in, so they share a jar.
+COOKIES=$( mktemp )
+warm() {
+	curl -sL -c "$COOKIES" -b "$COOKIES" --max-time 300 "$WP_BASE_URL/$1"
+}
+EDITOR_HTML=$( warm "wp-admin/post-new.php" )
 if ! grep -q "/build/scripts/rich-text/" <<< "$EDITOR_HTML"; then
 	echo "The editor does not load this checkout's build. Run npm run build first."
 	exit 1
@@ -98,8 +103,7 @@ fi
 # tests open these pages again and ask a second time if they do not come up,
 # and a warm-up that failed is not reason enough to give up the whole run.
 for POST in $( grep -o "42424[0-9]" test/ios/blueprint.json | sort -u ); do
-	if ! curl -sfL -b "" --max-time 300 "$WP_BASE_URL/wp-admin/post.php?post=${POST}&action=edit" \
-		| grep -q "wp:paragraph"; then
+	if ! warm "wp-admin/post.php?post=${POST}&action=edit" | grep -q "wp:paragraph"; then
 		echo "Warning: the editor did not serve seeded post ${POST}."
 	fi
 done
