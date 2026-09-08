@@ -39,6 +39,8 @@ final class AutoCapitalizationTests: XCTestCase {
 			.firstMatch
 	}
 
+	/// Taps the letters as given, without touching shift: the keyboard's own
+	/// state decides the case that lands in the field.
 	func type( _ word: String ) {
 		for letter in word {
 			key( String( letter ) ).tap()
@@ -80,8 +82,8 @@ final class AutoCapitalizationTests: XCTestCase {
 		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "No software keyboard" )
 		assertCapitalized( "An empty title should start capitalized" )
 
-		type( "Title" )
-		XCTAssertEqual( focusedField.value as? String, "Title" )
+		type( "title" )
+		XCTAssertEqual( focusedField.value as? String, "Title", "The keyboard should have capitalized the first letter" )
 		XCTAssertFalse( key( "shift" ).isSelected, "After a word the keyboard should be lowercase" )
 
 		key( "return" ).tap()
@@ -91,8 +93,8 @@ final class AutoCapitalizationTests: XCTestCase {
 		)
 		assertCapitalized( "The paragraph after the title should start capitalized" )
 
-		type( "Hello" )
-		XCTAssertEqual( focusedField.value as? String, "Hello" )
+		type( "hello" )
+		XCTAssertEqual( focusedField.value as? String, "Hello", "The keyboard should have capitalized the first letter" )
 		XCTAssertEqual( focusedField.label, "Block: Paragraph" )
 		XCTAssertFalse( key( "shift" ).isSelected, "After a word the keyboard should be lowercase" )
 
