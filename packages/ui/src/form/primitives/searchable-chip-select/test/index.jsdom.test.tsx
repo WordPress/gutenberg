@@ -346,6 +346,35 @@ describe( 'SearchableChipSelect', () => {
 			);
 		} );
 
+		it( 'selects the creatable footer by keyboard when it is not last in a flat list', async () => {
+			const user = userEvent.setup();
+			const onValueChange = vi.fn();
+
+			render(
+				<SearchableChipSelect
+					items={ [ ITEMS[ 0 ], creatableItem, ITEMS[ 2 ] ] }
+					onValueChange={ onValueChange }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'option', { name: 'Create new item' } )
+				).toBeVisible();
+			} );
+
+			await user.keyboard( '{ArrowDown}{ArrowDown}{ArrowDown}{Enter}' );
+
+			expect( onValueChange ).toHaveBeenCalledWith(
+				expect.arrayContaining( [
+					expect.objectContaining( { value: '__create__' } ),
+				] ),
+				expect.anything()
+			);
+		} );
+
 		it( 'hides the creatable footer when the query matches no items', async () => {
 			const user = userEvent.setup();
 
@@ -439,7 +468,7 @@ describe( 'SearchableChipSelect', () => {
 			);
 
 			expect( mockedWarning ).toHaveBeenCalledWith(
-				'SearchableChipSelect: do not mix `creatable: true` items with regular items in the same group. Put the creatable item in its own group or last in a flat list.'
+				'SearchableChipSelect: do not mix `creatable: true` items with regular items in the same group. Put the creatable item in its own group.'
 			);
 		} );
 	} );

@@ -51,7 +51,7 @@ function warnSearchableSelectProps(
 
 	if ( hasMixedCreatableGroup ) {
 		warning(
-			'SearchableSelect: do not mix `creatable: true` items with regular items in the same group. Put the creatable item in its own group or last in a flat list.'
+			'SearchableSelect: do not mix `creatable: true` items with regular items in the same group. Put the creatable item in its own group.'
 		);
 	}
 }

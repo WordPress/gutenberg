@@ -441,6 +441,34 @@ describe( 'SearchableSelect', () => {
 			);
 		} );
 
+		it( 'selects the creatable footer by keyboard when it is not last in a flat list', async () => {
+			const user = userEvent.setup();
+			const onValueChange = vi.fn();
+
+			render(
+				<SearchableSelect
+					items={ [ ITEMS[ 0 ], creatableItem, ITEMS[ 2 ] ] }
+					onValueChange={ onValueChange }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'option', { name: 'Create new item' } )
+				).toBeVisible();
+			} );
+
+			await user.click( screen.getByPlaceholderText( 'Search' ) );
+			await user.keyboard( '{ArrowDown}{ArrowDown}{ArrowDown}{Enter}' );
+
+			expect( onValueChange ).toHaveBeenCalledWith(
+				expect.objectContaining( { value: '__create__' } ),
+				expect.anything()
+			);
+		} );
+
 		it( 'hides the creatable footer when the query matches no items', async () => {
 			const user = userEvent.setup();
 
@@ -533,7 +561,7 @@ describe( 'SearchableSelect', () => {
 		);
 
 		expect( mockedWarning ).toHaveBeenCalledWith(
-			'SearchableSelect: do not mix `creatable: true` items with regular items in the same group. Put the creatable item in its own group or last in a flat list.'
+			'SearchableSelect: do not mix `creatable: true` items with regular items in the same group. Put the creatable item in its own group.'
 		);
 	} );
 } );
