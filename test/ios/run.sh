@@ -54,9 +54,9 @@ cat "$PLAYGROUND_LOG"
 # also shows whether the plugin replaces core's bundles, which it only
 # does when its build exists.
 step "Loading the editor once"
-COOKIES=$( mktemp )
-EDITOR_HTML=$( curl -sL -b "$COOKIES" -c "$COOKIES" "$WP_BASE_URL/wp-admin/post-new.php" )
-rm -f "$COOKIES"
+# Playground logs the request in through a redirect, so cookies must be
+# kept between the hops: -b "" holds them in memory.
+EDITOR_HTML=$( curl -sL -b "" "$WP_BASE_URL/wp-admin/post-new.php" )
 if ! grep -q "/build/scripts/rich-text/" <<< "$EDITOR_HTML"; then
 	echo "The editor does not load this checkout's build. Run npm run build first."
 	exit 1
