@@ -24,7 +24,7 @@ export const FieldsetDetails = forwardRef<
 >( function FieldsetDetails( { className, ...restProps }, ref ) {
 	const id = useId();
 	const { registerDescriptionId, unregisterDescriptionId } =
-		useFieldsetContext();
+		useFieldsetContext( 'Fieldset.Details' );
 
 	useEffect( () => {
 		registerDescriptionId( id );

@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.9.0",
+	"version": "23.9.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -185,6 +185,7 @@
 		"test:unit": "npm run --workspace @wordpress/unit-tests test:unit --",
 		"test:unit:conventions": "npm run --workspace @wordpress/unit-tests test:unit:conventions",
 		"test:unit:vitest": "npm run --workspace @wordpress/unit-tests test:unit:vitest --",
+		"test:unit:vitest:shuffled": "npm run --workspace @wordpress/unit-tests test:unit:vitest:shuffled --",
 		"test:unit:vitest:update": "npm run --workspace @wordpress/unit-tests test:unit:vitest:update --",
 		"test:unit:vitest:watch": "npm run --workspace @wordpress/unit-tests test:unit:vitest:watch --",
 		"test:unit:routing": "npm run --workspace @wordpress/unit-tests test:unit:routing --",
@@ -201,6 +202,7 @@
 		"test:unit:php:multisite:debug": "npm run test:unit:php:setup:debug && npm run test:unit:php:multisite:base",
 		"test:unit:update": "npm run --workspace @wordpress/unit-tests test:unit -- --updateSnapshot",
 		"test:unit:watch": "npm run --workspace @wordpress/unit-tests test:unit:watch --",
+		"test:agent-evals": "npm --prefix test/ai-development run eval --",
 		"pretypecheck": "npm run --workspace @wordpress/build-scripts generate-worker-placeholders --",
 		"typecheck": "npm run --workspace @wordpress/build-scripts typecheck --",
 		"wp-env": "wp-env",
@@ -212,6 +214,7 @@
 		"storybook",
 		"test/*",
 		"tools/*",
-		"widgets/*"
+		"widgets/*",
+		"!test/ai-development"
 	]
 }

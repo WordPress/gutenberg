@@ -1,11 +1,15 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { click } from '@ariakit/test';
 import { speak } from '@wordpress/a11y';
 import { SVG, Path } from '@wordpress/primitives';
 import Snackbar from '../index';
 
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
-const mockedSpeak = jest.mocked( speak );
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	speak: vi.fn(),
+} ) );
+const mockedSpeak = vi.mocked( speak );
 
 describe( 'Snackbar', () => {
 	const testId = 'snackbar';
@@ -15,7 +19,7 @@ describe( 'Snackbar', () => {
 	} );
 
 	afterEach( () => {
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
 	it( 'should render correctly', () => {
@@ -49,24 +53,24 @@ describe( 'Snackbar', () => {
 	} );
 
 	it( 'should not restart auto-dismissal after an unrelated rerender', async () => {
-		jest.useFakeTimers();
-		const removeNotice = jest.fn();
+		vi.useFakeTimers();
+		const removeNotice = vi.fn();
 		const { rerender } = render(
 			<Snackbar onRemove={ () => removeNotice() }>Message</Snackbar>
 		);
 
-		await act( async () => jest.advanceTimersByTime( 5000 ) );
+		await act( async () => vi.advanceTimersByTime( 5000 ) );
 		rerender(
 			<Snackbar onRemove={ () => removeNotice() }>Message</Snackbar>
 		);
-		await act( async () => jest.advanceTimersByTime( 1000 ) );
+		await act( async () => vi.advanceTimersByTime( 1000 ) );
 
 		expect( removeNotice ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should be dismissible by clicking the snackbar', async () => {
-		const onRemove = jest.fn();
-		const onDismiss = jest.fn();
+		const onRemove = vi.fn();
+		const onDismiss = vi.fn();
 
 		render(
 			<Snackbar onRemove={ onRemove } onDismiss={ onDismiss }>
@@ -89,9 +93,9 @@ describe( 'Snackbar', () => {
 	} );
 
 	it( 'should not be dismissible by clicking the snackbar when the `explicitDismiss` prop is set to `true`', async () => {
-		jest.useFakeTimers();
-		const onRemove = jest.fn();
-		const onDismiss = jest.fn();
+		vi.useFakeTimers();
+		const onRemove = vi.fn();
+		const onDismiss = vi.fn();
 
 		render(
 			<Snackbar
@@ -119,15 +123,15 @@ describe( 'Snackbar', () => {
 		expect( onRemove ).not.toHaveBeenCalled();
 		expect( onDismiss ).not.toHaveBeenCalled();
 
-		await act( async () => jest.advanceTimersByTime( 6000 ) );
+		await act( async () => vi.advanceTimersByTime( 6000 ) );
 
 		expect( onRemove ).not.toHaveBeenCalled();
 		expect( onDismiss ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should be dismissible by clicking the close button when the `explicitDismiss` prop is set to `true`', async () => {
-		const onRemove = jest.fn();
-		const onDismiss = jest.fn();
+		const onRemove = vi.fn();
+		const onDismiss = vi.fn();
 
 		render(
 			<Snackbar
@@ -195,7 +199,7 @@ describe( 'Snackbar', () => {
 		} );
 
 		it( 'should be rendered as a button and call `onClick` when the `onClick` prop is set', async () => {
-			const onClick = jest.fn();
+			const onClick = vi.fn();
 
 			render(
 				<Snackbar actions={ [ { label: 'View post', onClick } ] }>

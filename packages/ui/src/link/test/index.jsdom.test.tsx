@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -18,7 +19,7 @@ describe( 'Link', () => {
 
 	it( 'calls onClick when clicked (often used for analytics tracking)', async () => {
 		const user = userEvent.setup();
-		const onClick = jest.fn(
+		const onClick = vi.fn(
 			( event: React.MouseEvent< HTMLAnchorElement > ) =>
 				event.preventDefault()
 		);
@@ -106,6 +107,20 @@ describe( 'Link', () => {
 					name: 'External (opens in a new tab)',
 				} )
 			).toHaveAttribute( 'target', '_blank' );
+		} );
+
+		it( 'treats target="_BLANK" as opening in a new tab', () => {
+			render(
+				<Link href="https://example.com" target="_BLANK">
+					External
+				</Link>
+			);
+
+			expect(
+				screen.getByRole( 'link', {
+					name: 'External (opens in a new tab)',
+				} )
+			).toHaveAttribute( 'target', '_BLANK' );
 		} );
 
 		it( 'forwards a named target without adding a new tab notice', () => {
