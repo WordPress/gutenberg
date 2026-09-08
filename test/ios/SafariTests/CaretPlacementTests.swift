@@ -35,7 +35,7 @@ final class CaretPlacementTests: SafariTestCase {
 	var fieldLabels: String {
 		let labels = web.textViews.allElementsBoundByIndex
 			.map { $0.label }
-			.filter { ! $0.isEmpty }
+			.filter { !$0.isEmpty }
 		return labels.isEmpty ? "none" : labels.joined( separator: ", " )
 	}
 
