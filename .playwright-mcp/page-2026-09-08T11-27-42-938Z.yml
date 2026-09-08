@@ -1,8 +1,0 @@
-- generic [active] [ref=e1]:
-      - paragraph [ref=e2]: top
-      - generic [ref=e3]: 1foo
-      - generic [ref=e4]: foo.bar
-      - generic [ref=e5]: foo?bar
-      - generic [ref=e6]: foo%bar
-      - generic [ref=e7]: foo&bar
-      - generic [ref=e8]: föö
