@@ -21,8 +21,6 @@ const TextContainer = ( {
 
 /**
  * A complete checkbox field with integrated label and description.
- *
- * Visually hidden labels also enlarge the checkbox hit target.
  */
 export const CheckboxControl = forwardRef<
 	HTMLSpanElement,
@@ -49,7 +47,6 @@ export const CheckboxControl = forwardRef<
 						ref={ ref }
 						className={ styles.checkbox }
 						{ ...checkboxProps }
-						expandHitTarget={ Boolean( hideLabelFromVision ) }
 					/>
 				</div>
 				<TextContainer isStack={ hasSupportingText }>

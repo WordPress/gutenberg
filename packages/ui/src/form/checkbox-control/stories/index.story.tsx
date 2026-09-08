@@ -39,8 +39,7 @@ export const WithLongLabel: Story = {
 
 /**
  * Even when visually hidden, the label stays available to assistive
- * technology. The checkbox hit target is also expanded to compensate for the
- * hidden label.
+ * technology.
  */
 export const VisuallyHiddenLabel: Story = {
 	args: {

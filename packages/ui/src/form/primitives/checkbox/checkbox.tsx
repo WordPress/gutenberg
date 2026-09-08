@@ -9,10 +9,7 @@ import styles from './style.module.css';
 import type { CheckboxProps } from './types';
 
 export const Checkbox = forwardRef< HTMLSpanElement, CheckboxProps >(
-	function Checkbox(
-		{ className, indeterminate, expandHitTarget = false, ...restProps },
-		ref
-	) {
+	function Checkbox( { className, indeterminate, ...restProps }, ref ) {
 		return (
 			<_Checkbox.Root
 				ref={ ref }
@@ -20,7 +17,6 @@ export const Checkbox = forwardRef< HTMLSpanElement, CheckboxProps >(
 					resetStyles[ 'box-sizing' ],
 					focusStyles[ 'outset-ring--focus' ],
 					styles.root,
-					expandHitTarget && styles[ 'is-expand-hit-target' ],
 					className
 				) }
 				indeterminate={ indeterminate }

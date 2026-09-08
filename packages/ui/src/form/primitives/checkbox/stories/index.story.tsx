@@ -51,14 +51,3 @@ export const DisabledChecked: Story = {
 		defaultChecked: true,
 	},
 };
-
-/**
- * Enlarges the hit target without changing the painted size. Use this when the
- * checkbox has no visible label.
- */
-export const ExpandedHitTarget: Story = {
-	args: {
-		...Default.args,
-		expandHitTarget: true,
-	},
-};

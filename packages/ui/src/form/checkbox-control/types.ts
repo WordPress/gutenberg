@@ -1,8 +1,5 @@
 import type { Checkbox } from '../primitives';
 import type { ControlProps } from '../types';
 
-export type CheckboxControlProps = Omit<
-	React.ComponentProps< typeof Checkbox >,
-	'expandHitTarget'
-> &
+export type CheckboxControlProps = React.ComponentProps< typeof Checkbox > &
 	ControlProps;
