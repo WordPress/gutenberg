@@ -11,6 +11,7 @@ import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/com
 import { Card, CollapsibleCard, Stack } from '@wordpress/ui';
 import { getFormFieldLayout } from '..';
 import DataFormContext from '../../dataform-context';
+import { canRenderField } from '../can-render-field';
 import type {
 	FieldLayoutProps,
 	NormalizedCardLayout,
@@ -272,7 +273,7 @@ export default function FormCardField< Item >( {
 			( fieldDef ) => fieldDef.id === field.id
 		);
 
-		if ( ! fieldDefinition || ! fieldDefinition.Edit ) {
+		if ( ! canRenderField( fieldDefinition ) ) {
 			return null;
 		}
 

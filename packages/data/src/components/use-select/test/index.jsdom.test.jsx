@@ -1,4 +1,14 @@
 import { act, render, fireEvent, screen } from '@testing-library/react';
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import { useLayoutEffect, useState, useReducer } from '@wordpress/element';
 import {
 	createRegistry,
@@ -47,8 +57,8 @@ describe( 'useSelect', () => {
 			},
 		} );
 
-		const selectSpy = jest.fn();
-		const TestComponent = jest.fn( ( props ) => {
+		const selectSpy = vi.fn();
+		const TestComponent = vi.fn( ( props ) => {
 			selectSpy.mockImplementation( ( select ) => ( {
 				results: select( 'testStore' ).testSelector( props.keyName ),
 			} ) );
@@ -77,9 +87,9 @@ describe( 'useSelect', () => {
 			},
 		} );
 
-		const selectSpyFoo = jest.fn( () => 'foo' );
-		const selectSpyBar = jest.fn( () => 'bar' );
-		const TestComponent = jest.fn( ( props ) => {
+		const selectSpyFoo = vi.fn( () => 'foo' );
+		const selectSpyBar = vi.fn( () => 'bar' );
+		const TestComponent = vi.fn( ( props ) => {
 			const mapSelect = props.change ? selectSpyFoo : selectSpyBar;
 			const data = useSelect( mapSelect, [ props.keyName ] );
 			return <div role="status">{ data }</div>;
@@ -141,14 +151,14 @@ describe( 'useSelect', () => {
 
 		const mapSelect = ( select ) => select( 'toggler' ).get();
 
-		const mapSelectChild = jest.fn( mapSelect );
-		const Child = jest.fn( () => {
+		const mapSelectChild = vi.fn( mapSelect );
+		const Child = vi.fn( () => {
 			const show = useSelect( mapSelectChild, [] );
 			return show ? 'yes' : 'no';
 		} );
 
-		const mapSelectParent = jest.fn( mapSelect );
-		const Parent = jest.fn( () => {
+		const mapSelectParent = vi.fn( mapSelect );
+		const Parent = vi.fn( () => {
 			const show = useSelect( mapSelectParent, [] );
 			return show ? <Child /> : 'none';
 		} );
@@ -196,7 +206,7 @@ describe( 'useSelect', () => {
 		registry.registerStore( 'store-even', counterStore( 0, 2 ) );
 		registry.registerStore( 'store-odd', counterStore( 1, 2 ) );
 
-		const mapSelect = jest.fn( ( select ) => {
+		const mapSelect = vi.fn( ( select ) => {
 			const first = select( 'store-main' ).get();
 			// select from other stores depending on whether main value is even or odd
 			const secondStore = first % 2 === 1 ? 'store-odd' : 'store-even';
@@ -204,7 +214,7 @@ describe( 'useSelect', () => {
 			return first + ':' + second;
 		} );
 
-		const TestComponent = jest.fn( () => {
+		const TestComponent = vi.fn( () => {
 			const data = useSelect( mapSelect, [] );
 			return <div role="status">{ data }</div>;
 		} );
@@ -273,10 +283,10 @@ describe( 'useSelect', () => {
 		};
 
 		let TestComponent;
-		const mapSelectSpy = jest.fn( ( select ) =>
+		const mapSelectSpy = vi.fn( ( select ) =>
 			select( 'testStore' ).testSelector()
 		);
-		const selectorSpy = jest.fn();
+		const selectorSpy = vi.fn();
 
 		beforeEach( () => {
 			registry.registerStore( 'testStore', {
@@ -344,10 +354,10 @@ describe( 'useSelect', () => {
 			registry.registerStore( 'store-1', counterStore() );
 			registry.registerStore( 'store-2', counterStore() );
 
-			const selectCount1 = jest.fn();
-			const selectCount2 = jest.fn();
+			const selectCount1 = vi.fn();
+			const selectCount2 = vi.fn();
 
-			const TestComponent = jest.fn( () => {
+			const TestComponent = vi.fn( () => {
 				const count1 = useSelect(
 					( select ) => selectCount1() || select( 'store-1' ).get(),
 					[]
@@ -398,9 +408,9 @@ describe( 'useSelect', () => {
 			registry.registerStore( 'store-2', counterStore() );
 			registry.registerStore( 'store-3', counterStore() );
 
-			const selectCount1And2 = jest.fn();
+			const selectCount1And2 = vi.fn();
 
-			const TestComponent = jest.fn( () => {
+			const TestComponent = vi.fn( () => {
 				const { count1, count2 } = useSelect(
 					( select ) =>
 						selectCount1And2() || {
@@ -447,9 +457,9 @@ describe( 'useSelect', () => {
 			registry.registerStore( 'store-3', counterStore() );
 
 			let dep, setDep;
-			const selectCount1AndDep = jest.fn();
+			const selectCount1AndDep = vi.fn();
 
-			const TestComponent = jest.fn( () => {
+			const TestComponent = vi.fn( () => {
 				[ dep, setDep ] = useState( 0 );
 				const state = useSelect(
 					( select ) =>
@@ -500,11 +510,11 @@ describe( 'useSelect', () => {
 		it( 'captures state changes scheduled between render and subscription', () => {
 			registry.registerStore( 'store-1', counterStore() );
 
-			const selectCount1 = jest.fn( ( select ) => ( {
+			const selectCount1 = vi.fn( ( select ) => ( {
 				count1: select( 'store-1' ).get(),
 			} ) );
 
-			const TestComponent = jest.fn( () => {
+			const TestComponent = vi.fn( () => {
 				const { count1 } = useSelect( selectCount1, [] );
 
 				// Increment the store value from 0 to 1 after render and before subscription
@@ -611,9 +621,9 @@ describe( 'useSelect', () => {
 			registry.registerStore( 'store-1', store1Spec );
 			registry.registerStore( 'store-2', counterStore() );
 
-			const selectCount1And2 = jest.fn();
+			const selectCount1And2 = vi.fn();
 
-			const TestComponent = jest.fn( () => {
+			const TestComponent = vi.fn( () => {
 				const state = useSelect(
 					( select ) =>
 						selectCount1And2() ||
@@ -653,10 +663,10 @@ describe( 'useSelect', () => {
 			registry.registerStore( 'store-1', counterStore() );
 			registry.registerStore( 'store-2', counterStore() );
 
-			const selectCount1 = jest.fn();
-			const selectCount2 = jest.fn();
+			const selectCount1 = vi.fn();
+			const selectCount2 = vi.fn();
 
-			const TestComponent = jest.fn( () => {
+			const TestComponent = vi.fn( () => {
 				const [ shouldSelectCount1, toggle ] = useReducer(
 					( should ) => ! should,
 					false
@@ -725,7 +735,7 @@ describe( 'useSelect', () => {
 			const subRegistry = createRegistry( {}, registry );
 			subRegistry.registerStore( 'child-store', counterStore() );
 
-			const TestComponent = jest.fn( () => {
+			const TestComponent = vi.fn( () => {
 				const state = useSelect(
 					( select ) => ( {
 						parentCount: select( 'parent-store' ).get(),
@@ -765,7 +775,7 @@ describe( 'useSelect', () => {
 		it( 'handles non-existing stores', () => {
 			registry.registerStore( 'store-1', counterStore() );
 
-			const TestComponent = jest.fn( () => {
+			const TestComponent = vi.fn( () => {
 				const state = useSelect(
 					( select ) => ( {
 						count1: select( 'store-1' ).get(),
@@ -804,7 +814,7 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'handles registration of a non-existing store during rendering', () => {
-			const TestComponent = jest.fn( () => {
+			const TestComponent = vi.fn( () => {
 				const state = useSelect(
 					( select ) =>
 						select( 'not-yet-registered-store' )?.get() ?? 'blank',
@@ -845,7 +855,7 @@ describe( 'useSelect', () => {
 		it( 'handles registration of a non-existing store of sub-registry during rendering', () => {
 			const subRegistry = createRegistry( {}, registry );
 
-			const TestComponent = jest.fn( () => {
+			const TestComponent = vi.fn( () => {
 				const state = useSelect(
 					( select ) =>
 						select( 'not-yet-registered-child-store' )?.get() ??
@@ -920,7 +930,7 @@ describe( 'useSelect', () => {
 
 			registry.register( customStore );
 
-			const TestComponent = jest.fn( () => {
+			const TestComponent = vi.fn( () => {
 				const state = useSelect(
 					( select ) => select( customStore ).get(),
 					[]
@@ -953,11 +963,9 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'renders with async mode', async () => {
-			const selectSpy = jest.fn( ( select ) =>
-				select( 'counter' ).get()
-			);
+			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
 
-			const TestComponent = jest.fn( () => {
+			const TestComponent = vi.fn( () => {
 				const count = useSelect( selectSpy, [] );
 				return <div role="status">{ count }</div>;
 			} );
@@ -993,11 +1001,9 @@ describe( 'useSelect', () => {
 
 		// Tests render queue fixes done in https://github.com/WordPress/gutenberg/pull/19286
 		it( 'catches updates while switching from async to sync', () => {
-			const selectSpy = jest.fn( ( select ) =>
-				select( 'counter' ).get()
-			);
+			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
 
-			const TestComponent = jest.fn( () => {
+			const TestComponent = vi.fn( () => {
 				const count = useSelect( selectSpy, [] );
 				return <div role="status">{ count }</div>;
 			} );
@@ -1035,14 +1041,14 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'cancels scheduled updates when mapSelect function changes', async () => {
-			const selectA = jest.fn(
+			const selectA = vi.fn(
 				( select ) => 'a:' + select( 'counter' ).get()
 			);
-			const selectB = jest.fn(
+			const selectB = vi.fn(
 				( select ) => 'b:' + select( 'counter' ).get()
 			);
 
-			const TestComponent = jest.fn( ( { variant } ) => {
+			const TestComponent = vi.fn( ( { variant } ) => {
 				const count = useSelect( variant === 'a' ? selectA : selectB, [
 					variant,
 				] );
@@ -1085,11 +1091,9 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'cancels scheduled updates when unmounting', async () => {
-			const selectSpy = jest.fn( ( select ) =>
-				select( 'counter' ).get()
-			);
+			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
 
-			const TestComponent = jest.fn( () => {
+			const TestComponent = vi.fn( () => {
 				const count = useSelect( selectSpy, [] );
 				return <div role="status">{ count }</div>;
 			} );
@@ -1130,11 +1134,9 @@ describe( 'useSelect', () => {
 			const registry2 = createRegistry();
 			registry2.registerStore( 'counter', counterStore( 100 ) );
 
-			const selectSpy = jest.fn( ( select ) =>
-				select( 'counter' ).get()
-			);
+			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
 
-			const TestComponent = jest.fn( () => {
+			const TestComponent = vi.fn( () => {
 				const count = useSelect( selectSpy, [] );
 				return <div role="status">{ count }</div>;
 			} );
@@ -1237,7 +1239,7 @@ describe( 'useSelect', () => {
 		it( 'can read the current value from store', () => {
 			registry.registerStore( 'testStore', counterStore() );
 
-			const record = jest.fn();
+			const record = vi.fn();
 
 			function TestComponent() {
 				const { get } = useSelect( 'testStore' );
