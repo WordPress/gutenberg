@@ -382,8 +382,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Util: Generates a CSS var string, e.g., var(--wp--preset--color--background) from a preset string such as `var:preset|space|50`.
 		 *
-		 * @param string   $style_value  A single CSS preset value.
-		 * @param string[] $css_vars     An associate array of CSS var patterns used to generate the var string.
+		 * @param string   $style_value A single CSS preset value.
+		 * @param string[] $css_vars    An associate array of CSS var patterns used to generate the var string.
 		 *
 		 * @return string The css var, or an empty string if no match for slug found.
 		 */

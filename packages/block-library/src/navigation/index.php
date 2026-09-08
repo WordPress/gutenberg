@@ -892,8 +892,8 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param array         $attributes    The block attributes.
-	 * @param WP_Block_List $inner_blocks  A list of inner blocks.
+	 * @param array         $attributes   The block attributes.
+	 * @param WP_Block_List $inner_blocks A list of inner blocks.
 	 * @return string Returns the navigation block markup.
 	 */
 	private static function get_nav_attributes( $attributes, $inner_blocks ) {
@@ -1786,12 +1786,12 @@ add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_back
  *
  * @deprecated 6.3.0 Use WP_Navigation_Fallback::parse_blocks_from_menu_items() instead.
  *
- * @param array $menu_items               An array of menu items that represent
- *                                        an individual level of a menu.
- * @param array $menu_items_by_parent_id  An array keyed by the id of the
- *                                        parent menu where each element is an
- *                                        array of menu items that belong to
- *                                        that parent.
+ * @param array $menu_items              An array of menu items that represent
+ *                                       an individual level of a menu.
+ * @param array $menu_items_by_parent_id An array keyed by the id of the
+ *                                       parent menu where each element is an
+ *                                       array of menu items that belong to
+ *                                       that parent.
  * @return array An array of parsed block data.
  */
 function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {

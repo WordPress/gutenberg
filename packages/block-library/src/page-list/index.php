@@ -36,8 +36,8 @@ function block_core_page_list_get_submenu_visibility( $context ) {
  *
  * @since 5.8.0
  *
- * @param  array $attributes Block attributes.
- * @param  array $context    Navigation block context.
+ * @param array $attributes Block attributes.
+ * @param array $context    Navigation block context.
  * @return array Colors CSS classes and inline styles.
  */
 function block_core_page_list_build_css_colors( $attributes, $context ) {

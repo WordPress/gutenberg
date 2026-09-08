@@ -263,8 +263,8 @@ function block_core_breadcrumbs_create_page_number_item( $query_var = 'paged' ) 
  *
  * @since 7.0.0
  *
- * @param string $text       The text content.
- * @param bool   $is_paged   Whether we're on a paginated view.
+ * @param string $text     The text content.
+ * @param bool   $is_paged Whether we're on a paginated view.
  *
  * @return array The breadcrumb item data.
  */
