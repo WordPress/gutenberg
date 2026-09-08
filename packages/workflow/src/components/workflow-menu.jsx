@@ -199,8 +199,9 @@ export function WorkflowMenu() {
 					</div>
 				) : (
 					<Autocomplete.Root
-						items={ items }
-						mode="none"
+						items={ abilities }
+						filteredItems={ items }
+						mode="list"
 						value={ search }
 						onValueChange={ setSearch }
 						open
