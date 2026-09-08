@@ -157,7 +157,8 @@ export type WidgetAttributeField< Item > = WidgetAttribute< Item > & {
 /**
  * Wire form of a widget attribute, as carried by a `WidgetModuleRecord`:
  * the JSON-expressible subset of a DataViews `Field`. `Edit` is a control
- * name or config, never a component; `isValid` carries no `custom` rule.
+ * name or config, never a component; `isValid` carries no `custom` rule;
+ * `isDisabled` is a boolean, never a callback.
  */
 export type WidgetAttributeRecord< Item = unknown > = Omit<
 	WidgetAttribute< Item >,
@@ -176,6 +177,7 @@ export type WidgetAttributeRecord< Item = unknown > = Omit<
 > & {
 	header?: string;
 	description?: string;
+	isDisabled?: boolean;
 	Edit?: Exclude< NonNullable< Field< Item >[ 'Edit' ] >, Function >;
 	isValid?: Omit< NonNullable< Field< Item >[ 'isValid' ] >, 'custom' >;
 };

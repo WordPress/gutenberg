@@ -132,8 +132,9 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		/**
 		 * Attribute schema: the JSON-expressible subset of a DataViews
 		 * `Field` per entry (`id`, `type`, `label`, `elements`, ...) plus an
-		 * optional `relevance`. Labels are translated at registration time
-		 * using the widget's text domain.
+		 * optional `relevance`. Labels, headers, descriptions, placeholders
+		 * and option strings are translated at registration time using the
+		 * widget's text domain.
 		 *
 		 * Null when the widget did not declare the field.
 		 *

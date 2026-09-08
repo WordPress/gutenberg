@@ -270,6 +270,7 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 
 		$attribute_properties = $properties['attributes']['items']['properties'];
 		$this->assertArrayHasKey( 'id', $attribute_properties );
+		$this->assertArrayHasKey( 'isDisabled', $attribute_properties );
 		$this->assertArrayHasKey( 'elements', $attribute_properties );
 		$this->assertSame(
 			array( 'high', 'medium', 'low' ),

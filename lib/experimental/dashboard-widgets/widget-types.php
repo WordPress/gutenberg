@@ -261,11 +261,12 @@ function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
  * Sanitizes a widget attribute schema to the JSON-expressible subset of a
  * DataViews `Field` per entry: a string `id` (required, unique), string
  * `type` / `label` / `header` / `description` / `placeholder`, boolean
- * `readOnly` / `enableSorting` / `enableHiding` / `enableGlobalSearch`,
- * `elements` as `value` / `label` / `description` triples, `filterBy`,
- * `format`, `isValid` without `custom`, `Edit` as a control name or config,
- * and a `relevance` of `high` / `medium` / `low`. A malformed key drops, never
- * the entry; an entry without a usable `id`, or repeating one, drops.
+ * `readOnly` / `isDisabled` / `enableSorting` / `enableHiding` /
+ * `enableGlobalSearch`, `elements` as `value` / `label` / `description`
+ * triples, `filterBy`, `format`, `isValid` without `custom`, `Edit` as a
+ * control name or config, and a `relevance` of `high` / `medium` / `low`. A
+ * malformed or empty key drops, never the entry; an entry without a usable
+ * `id`, or repeating one, drops.
  *
  * This is the registration gate for manifest-sourced widget types, the same
  * boundary `gutenberg_sanitize_widget_actions()` guards.
@@ -279,7 +280,7 @@ function gutenberg_sanitize_widget_attributes( $attributes ) {
 	}
 
 	$string_keys  = array( 'type', 'label', 'header', 'description', 'placeholder' );
-	$boolean_keys = array( 'readOnly', 'enableSorting', 'enableHiding', 'enableGlobalSearch' );
+	$boolean_keys = array( 'readOnly', 'isDisabled', 'enableSorting', 'enableHiding', 'enableGlobalSearch' );
 
 	$sanitized = array();
 	$seen      = array();
@@ -304,8 +305,8 @@ function gutenberg_sanitize_widget_attributes( $attributes ) {
 		}
 
 		foreach ( $boolean_keys as $key ) {
-			if ( isset( $attribute[ $key ] ) ) {
-				$entry[ $key ] = (bool) $attribute[ $key ];
+			if ( isset( $attribute[ $key ] ) && is_bool( $attribute[ $key ] ) ) {
+				$entry[ $key ] = $attribute[ $key ];
 			}
 		}
 
@@ -337,11 +338,14 @@ function gutenberg_sanitize_widget_attributes( $attributes ) {
 			}
 		}
 
-		if ( isset( $attribute['filterBy'] ) && ( is_array( $attribute['filterBy'] ) || false === $attribute['filterBy'] ) ) {
+		if (
+			isset( $attribute['filterBy'] ) &&
+			( false === $attribute['filterBy'] || ( is_array( $attribute['filterBy'] ) && array() !== $attribute['filterBy'] ) )
+		) {
 			$entry['filterBy'] = $attribute['filterBy'];
 		}
 
-		if ( isset( $attribute['format'] ) && is_array( $attribute['format'] ) ) {
+		if ( ! empty( $attribute['format'] ) && is_array( $attribute['format'] ) ) {
 			$entry['format'] = $attribute['format'];
 		}
 
@@ -355,7 +359,7 @@ function gutenberg_sanitize_widget_attributes( $attributes ) {
 
 		if (
 			isset( $attribute['Edit'] ) &&
-			( ( is_string( $attribute['Edit'] ) && '' !== $attribute['Edit'] ) || is_array( $attribute['Edit'] ) )
+			( ( is_string( $attribute['Edit'] ) && '' !== $attribute['Edit'] ) || ( is_array( $attribute['Edit'] ) && array() !== $attribute['Edit'] ) )
 		) {
 			$entry['Edit'] = $attribute['Edit'];
 		}

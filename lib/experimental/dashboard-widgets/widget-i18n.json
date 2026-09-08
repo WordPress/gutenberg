@@ -9,9 +9,15 @@
 	"attributes": [
 		{
 			"label": "widget attribute label",
+			"header": "widget attribute header",
 			"description": "widget attribute description",
 			"placeholder": "widget attribute placeholder",
-			"elements": [ { "label": "widget attribute option label" } ]
+			"elements": [
+				{
+					"label": "widget attribute option label",
+					"description": "widget attribute option description"
+				}
+			]
 		}
 	],
 	"keywords": [ "widget keyword" ]

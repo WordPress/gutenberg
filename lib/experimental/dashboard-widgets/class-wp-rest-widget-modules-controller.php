@@ -353,7 +353,7 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 					),
 
 					'attributes'    => array(
-						'description' => __( 'Attribute schema hosts render settings from: the JSON-expressible subset of a DataViews field per entry. Labels are translatable.', 'gutenberg' ),
+						'description' => __( 'Attribute schema hosts render settings from: the JSON-expressible subset of a DataViews field per entry. User-facing strings are translatable.', 'gutenberg' ),
 						'type'        => array( 'array', 'null' ),
 						'items'       => array(
 							'type'       => 'object',
@@ -365,6 +365,7 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 								'description'        => array( 'type' => 'string' ),
 								'placeholder'        => array( 'type' => 'string' ),
 								'readOnly'           => array( 'type' => 'boolean' ),
+								'isDisabled'         => array( 'type' => 'boolean' ),
 								'enableSorting'      => array( 'type' => 'boolean' ),
 								'enableHiding'       => array( 'type' => 'boolean' ),
 								'enableGlobalSearch' => array( 'type' => 'boolean' ),
