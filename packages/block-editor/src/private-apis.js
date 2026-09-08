@@ -81,7 +81,7 @@ import {
 	isHashLink,
 	isRelativePath,
 } from './components/link-control/is-url-like';
-import { isElementVisible } from './utils/dom';
+import { focusSelectedField, isElementVisible } from './utils/dom';
 
 const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 
@@ -90,6 +90,7 @@ const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
  */
 export const privateApis = {};
 lock( privateApis, {
+	focusSelectedField,
 	...globalStyles,
 	ExperimentalBlockCanvas,
 	BlockCanvasCover,

@@ -146,29 +146,20 @@ function useRichTextBase( {
 	}
 
 	function applyFromProps() {
-		// Get previous value before updating
-		const previousValue = _valueRef.current;
-
 		setRecordFromProps();
 
-		// Check if content length changed (text was added/removed, not just formatted)
-		const contentLengthChanged =
-			previousValue &&
-			typeof previousValue === 'string' &&
-			typeof value === 'string' &&
-			previousValue.length !== value.length;
-
-		// Check if focus is on this element, or if the element owns the
-		// selection through a focused editing host.
+		// Only apply the selection when the element has focus, or owns the
+		// selection through a focused editing host. Setting a selection into
+		// an unfocused editable moves focus through it in some browsers, and
+		// the element that had focus would then dispatch its own selection
+		// over the one from props (typing in a sidebar input that changes the
+		// text, a field mounting next to the one being edited). The focus
+		// handler applies the record once focus arrives.
 		const hasFocus =
 			ref.current?.contains( ref.current.ownerDocument.activeElement ) ||
 			ownsSelection( ref.current );
 
-		// Skip re-applying the selection state when content changed from external source
-		// (e.g., typing in sidebar input changes canvas text)
-		const skipSelection = contentLengthChanged && ! hasFocus;
-
-		applyRecord( recordRef.current, { domOnly: skipSelection } );
+		applyRecord( recordRef.current, { domOnly: ! hasFocus } );
 	}
 
 	const didMountRef = useRef( false );
@@ -217,17 +208,34 @@ function useRichTextBase( {
 	// Apply the selection from props unless the element already holds it. A
 	// selection the element made itself is left alone: the live range keeps
 	// its direction and the side of a format boundary the caret sits on, which
-	// the record does not represent. Focus is not managed here; the caller
-	// decides which element should receive keys. Until the element or an
-	// editing host around it has focus, the selection is not applied either:
-	// a selection set into an unfocused editable moves focus in some browsers,
-	// and the focus handler applies the record once focus arrives.
+	// the record does not represent.
+	//
+	// Focus is only taken when it was lost: the element that had it was
+	// removed (a merge, a block moved into a nested list) and the document
+	// fell back to its body. Focus anywhere else was placed there on purpose
+	// and stays, including on a body that is itself an editing host, and
+	// including a stale active element while another window has focus. The
+	// selection is then not applied either, since setting a selection into
+	// an unfocused editable moves focus in some browsers, and the focus
+	// handler applies the record once focus arrives.
 	useLayoutEffect( () => {
 		if ( ! isSelected ) {
 			return;
 		}
 
-		const { activeElement } = ref.current.ownerDocument;
+		const { ownerDocument } = ref.current;
+		const { body } = ownerDocument;
+
+		if (
+			ownerDocument.hasFocus() &&
+			( ! ownerDocument.activeElement ||
+				ownerDocument.activeElement === body ) &&
+			body.contentEditable !== 'true'
+		) {
+			ref.current.focus();
+		}
+
+		const { activeElement } = ownerDocument;
 
 		if (
 			activeElement !== ref.current &&

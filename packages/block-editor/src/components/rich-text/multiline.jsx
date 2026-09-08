@@ -1,4 +1,9 @@
-import { forwardRef, useInsertionEffect, useRef } from '@wordpress/element';
+import {
+	flushSync,
+	forwardRef,
+	useInsertionEffect,
+	useRef,
+} from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { ENTER } from '@wordpress/keycodes';
@@ -14,6 +19,7 @@ import { store as blockEditorStore } from '../../store';
 import { useBlockEditContext } from '../block-edit';
 import { getMultilineTag } from './utils';
 import { unlock } from '../../lock-unlock';
+import { focusSelectedField } from '../../utils/dom';
 
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
@@ -49,8 +55,18 @@ function useEnterRef( props ) {
 
 			const newValues = values.slice();
 			newValues.splice( index, 1, ...array );
-			onChange( newValues );
-			selectionChange( clientId, `${ identifier }-${ index + 1 }`, 0, 0 );
+			flushSync( () => {
+				onChange( newValues );
+				selectionChange(
+					clientId,
+					`${ identifier }-${ index + 1 }`,
+					0,
+					0
+				);
+			} );
+			// The line that had focus keeps it, so move focus to the new line
+			// once it has rendered.
+			focusSelectedField( element.ownerDocument, getSelectionStart() );
 		}
 		// Capture phase so this runs before the generic rich text enter
 		// listener, which skips events that already had their default

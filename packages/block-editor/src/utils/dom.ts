@@ -98,6 +98,54 @@ export function getBlockClientId( node: Node | null ) {
  * @param rect2 Second rectangle.
  * @return Union of the two rectangles.
  */
+/**
+ * Focuses the field the store selection names, the way a format button
+ * returns focus after it acts. A field does not take focus by itself, so an
+ * action that moves the selection into a field that did not have focus (a
+ * toolbar button, a paste that splits the field, an Enter in a deprecated
+ * multiline field) calls this once the update has rendered. A field inside a
+ * focused editing host is left alone: the host keeps focus and the rich text
+ * applies the selection.
+ *
+ * @param ownerDocument          The document holding the blocks.
+ * @param selection              Store selection start.
+ * @param selection.clientId     Client ID of the selected block.
+ * @param selection.attributeKey Attribute the field edits.
+ */
+export function focusSelectedField(
+	ownerDocument: Document,
+	{ clientId, attributeKey }: { clientId?: string; attributeKey?: string }
+) {
+	if ( ! clientId || ! attributeKey ) {
+		return;
+	}
+
+	// The field is looked up by attribute key and block, not through the
+	// block element: the block element itself can be the field, and the
+	// deprecated multiline RichText gives every line the block's props, so
+	// several elements can carry the block's ID.
+	const field = Array.from(
+		ownerDocument.querySelectorAll(
+			`[data-wp-block-attribute-key="${ attributeKey }"]`
+		)
+	).find( ( element ) => getBlockClientId( element ) === clientId );
+
+	if ( ! field ) {
+		return;
+	}
+
+	const { activeElement } = ownerDocument;
+
+	if (
+		activeElement?.contentEditable === 'true' &&
+		activeElement.contains( field )
+	) {
+		return;
+	}
+
+	( field as HTMLElement ).focus();
+}
+
 export function rectUnion( rect1: DOMRect, rect2: DOMRect ) {
 	const left = Math.min( rect1.left, rect2.left );
 	const right = Math.max( rect1.right, rect2.right );

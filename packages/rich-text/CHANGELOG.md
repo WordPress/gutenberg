@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   `useRichText`: apply every selection change from props, including the second of two consecutive ones. The hook no longer focuses the element when the selection changes; the caller decides which element receives focus.
+-   `useRichText`: apply every selection change from props, including the second of two consecutive ones. The hook only focuses the element when focus was lost to the document body; focus placed elsewhere is left alone.
 
 ## 7.54.0 (2026-08-26)
 
