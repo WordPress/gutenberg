@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   The `@types/node` peer dependency now requires `^24.0.0`, matching the Node.js version the repository builds and tests against.
+-   The `@types/node` peer dependency now requires `^24.0.0`, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
 
 ### New Features
 
