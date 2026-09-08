@@ -12,6 +12,14 @@ const wpExternals = {
 				return { path: args.path, external: true };
 			}
 		);
+		build.onResolve( { filter: /^@wordpress\/ui(\/|$)/ }, ( args ) => {
+			// Don't bundle `@wordpress/ui`: it is not a WordPress script, so
+			// consumers bundle it themselves. Leaving it external keeps a
+			// single copy of the package (and of `@wordpress/theme`, which it
+			// imports) in the consumer bundle, and keeps its third-party
+			// dependencies out of this package's dependency list.
+			return { path: args.path, external: true };
+		} );
 		build.onResolve( { filter: /^@wordpress\// }, () => {
 			// Bundle WordPress packages
 			return { external: false };
