@@ -70,7 +70,7 @@
 		"npm-packlist": "^3.0.0",
 		"postcss": "^8.4.38",
 		"postcss-loader": "^6.2.1",
-		"prettier": "npm:wp-prettier@^3.0.3",
+		"prettier": "npm:wp-prettier@^3.9.6-beta.2",
 		"react-refresh": "^0.14.0",
 		"read-pkg-up": "^7.0.1",
 		"resolve-bin": "^1.0.1",
