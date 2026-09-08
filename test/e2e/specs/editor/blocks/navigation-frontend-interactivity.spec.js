@@ -184,7 +184,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 			await openMenuButton.click();
 
-			// A custom overlay does not unfold its submenus, so opening the
+			// A custom overlay does not display its submenus, so opening the
 			// overlay must leave the submenu closed.
 			await expect( submenuButton ).toHaveAttribute(
 				'aria-expanded',
