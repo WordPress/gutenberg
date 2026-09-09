@@ -10,6 +10,6 @@
 		"rootDir": ".",
 		"types": [ "node" ]
 	},
-	"include": [ "bin/**/*.ts", "terrazzo.config.ts" ],
+	"include": [ "bin", "terrazzo.config.ts" ],
 	"references": [ { "path": "./tsconfig.build.json" } ]
 }
