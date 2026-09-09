@@ -51,25 +51,34 @@
 	text-align: center;
 }
 
-// Style state badges pin below the tabs header when scrolled past.
-// Scoped to complementary-area contexts (post editor, site editor, widgets
-// editor), which provide the scroll container and the sticky tabs header.
-// The Customizer portals the inspector elsewhere.
-.interface-complementary-area .block-editor-block-inspector__sticky-badges {
-	position: sticky;
-	// Overlap the tabs header by a pixel so no seam can open up.
-	top: calc(#{$panel-header-height} - #{$border-width});
-	// Above in-panel controls (which use z-index 1–2), below the sticky
-	// tabs header.
-	z-index: 3;
+// Styles for the style state badges row. The layout applies in all contexts;
+// the sticky pinning only applies within complementary-area contexts (post
+// editor, site editor, widgets editor), which provide the scroll container
+// and a sticky tabs header to offset against. The Customizer portals the
+// inspector elsewhere.
+.block-editor-block-inspector .block-editor-block-inspector__sticky-badges {
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
 	gap: $grid-unit-10;
-	background: $white;
-	border-bottom: $border-width solid $gray-200;
-	// Merge with the following panel's own border-top into a single line.
-	margin-bottom: -$border-width;
+	// Pull the badges up against the block card, matching the description's
+	// spacing at rest. When the badges pin, the card has scrolled away and
+	// the badges' own padding provides the breathing room.
+	// Two-class specificity wins over the Spacer component's margin styles.
+	margin-top: -$grid-unit-20;
+
+	.interface-complementary-area & {
+		position: sticky;
+		// Overlap the tabs header by a pixel so no seam can open up.
+		top: calc(#{$panel-header-height} - #{$border-width});
+		// Above in-panel controls (which use z-index 1–2), below the sticky
+		// tabs header.
+		z-index: 3;
+		background: $white;
+		border-bottom: $border-width solid $gray-200;
+		// Merge with the following panel's own border-top into a single line.
+		margin-bottom: -$border-width;
+	}
 }
 
 .block-editor-block-inspector__sticky-badges-label {
