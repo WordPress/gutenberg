@@ -11,6 +11,7 @@
 
 ### Bug Fixes
 
+-   `Modal`: Keep an accessible name on the dialog when `title` is combined with `__experimentalHideHeader`. The heading that `aria-labelledby` referenced is not rendered in that case, so the title is now applied as the dialog's `aria-label` instead ([#82645](https://github.com/WordPress/gutenberg/pull/82645)).
 -   `Text`: Make single-line truncation and `isBlock` overrides consistent across the main document and iframes ([#82573](https://github.com/WordPress/gutenberg/pull/82573)).
 -   `CardDivider`: Apply the Card's width, display, and border color consistently inside iframes ([#82577](https://github.com/WordPress/gutenberg/pull/82577)).
 
