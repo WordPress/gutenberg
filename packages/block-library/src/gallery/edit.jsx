@@ -441,6 +441,7 @@ export default function GalleryEdit( props ) {
 					: image.caption?.raw,
 			alt: imageAttributes.alt || image.alt_text,
 			aspectRatio: aspectRatio === 'auto' ? undefined : aspectRatio,
+			scale: aspectRatio && aspectRatio !== 'auto' ? 'cover' : undefined,
 		};
 	}
 
