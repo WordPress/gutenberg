@@ -233,7 +233,7 @@ describe( 'SearchableChipSelect', () => {
 			).toHaveLength( 1 );
 		} );
 
-		it( 'renders only one creatable option when it is mixed with regular items in a group', async () => {
+		it( 'renders only one creatable option when it is in its own group', async () => {
 			const user = userEvent.setup();
 			const groupedCreatableItem = {
 				value: '__create__',
@@ -243,11 +243,9 @@ describe( 'SearchableChipSelect', () => {
 			const items = [
 				{
 					label: 'Common',
-					items: [
-						GROUPED_ITEMS[ 0 ].items[ 0 ],
-						groupedCreatableItem,
-					],
+					items: [ GROUPED_ITEMS[ 0 ].items[ 0 ] ],
 				},
+				{ label: '', items: [ groupedCreatableItem ] },
 			];
 
 			render(
@@ -292,18 +290,20 @@ describe( 'SearchableChipSelect', () => {
 			const onValueChange = vi.fn();
 			const groupedCreatableItem = {
 				value: '__create__',
-				label: 'Create new item: zzzzz',
+				label: 'Create new item',
 				creatable: true,
 			};
 			const items = [
-				...GROUPED_ITEMS,
+				{
+					label: 'Common',
+					items: [ { value: 'apple', label: 'Apple' } ],
+				},
 				{ label: '', items: [ groupedCreatableItem ] },
 			];
 
 			render(
 				<SearchableChipSelect
 					items={ items }
-					inputValue="zzzzz"
 					onValueChange={ onValueChange }
 					children={ ( group: ItemGroup ) => (
 						<SearchableChipSelect.Group
@@ -332,13 +332,11 @@ describe( 'SearchableChipSelect', () => {
 
 			await waitFor( () => {
 				expect(
-					screen.getByRole( 'option', {
-						name: 'Create new item: zzzzz',
-					} )
+					screen.getByRole( 'option', { name: 'Create new item' } )
 				).toBeVisible();
 			} );
 
-			await user.keyboard( '{ArrowDown}{Enter}' );
+			await user.keyboard( '{ArrowDown}{ArrowDown}{Enter}' );
 
 			expect( onValueChange ).toHaveBeenCalledWith(
 				expect.arrayContaining( [
@@ -346,6 +344,159 @@ describe( 'SearchableChipSelect', () => {
 				] ),
 				expect.anything()
 			);
+		} );
+
+		it( 'selects the creatable footer by keyboard when it is not last in a flat list', async () => {
+			const user = userEvent.setup();
+			const onValueChange = vi.fn();
+
+			render(
+				<SearchableChipSelect
+					items={ [ ITEMS[ 0 ], creatableItem, ITEMS[ 2 ] ] }
+					onValueChange={ onValueChange }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'option', { name: 'Create new item' } )
+				).toBeVisible();
+			} );
+
+			await user.keyboard( '{ArrowDown}{ArrowDown}{ArrowDown}{Enter}' );
+
+			expect( onValueChange ).toHaveBeenCalledWith(
+				expect.arrayContaining( [
+					expect.objectContaining( { value: '__create__' } ),
+				] ),
+				expect.anything()
+			);
+		} );
+
+		it( 'hides the creatable footer when the query matches no items', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<SearchableChipSelect
+					items={ [ ...ITEMS, creatableItem ] }
+					inputValue="xyzzy"
+				/>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			await waitFor( () => {
+				expect( screen.getByText( 'No results found.' ) ).toBeVisible();
+			} );
+			expect(
+				screen.queryByRole( 'option', { name: 'Create new item' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'hides the creatable footer when the query matches other items but not the creatable item', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<SearchableChipSelect
+					items={ [ ...ITEMS, creatableItem ] }
+					inputValue="Apple"
+				/>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'option', { name: 'Apple' } )
+				).toBeVisible();
+			} );
+			expect(
+				screen.queryByRole( 'option', { name: 'Create new item' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'keeps the creatable footer when the query matches the creatable item', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<SearchableChipSelect
+					items={ [ ...ITEMS, creatableItem ] }
+					inputValue="Create"
+				/>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'option', { name: 'Create new item' } )
+				).toBeVisible();
+			} );
+			expect(
+				screen.getAllByRole( 'option', { name: 'Create new item' } )
+			).toHaveLength( 1 );
+			expect(
+				screen.queryByRole( 'option', { name: 'Apple' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'keeps the creatable footer when the query matches a grouped creatable item', async () => {
+			const user = userEvent.setup();
+			const groupedCreatableItem = {
+				value: '__create__',
+				label: 'Create new item',
+				creatable: true,
+			};
+			const items = [
+				{
+					label: 'Common',
+					items: [ { value: 'apple', label: 'Apple' } ],
+				},
+				{ label: '', items: [ groupedCreatableItem ] },
+			];
+
+			render(
+				<SearchableChipSelect
+					items={ items }
+					inputValue="Create"
+					children={ ( group: ItemGroup ) => (
+						<SearchableChipSelect.Group
+							key={ group.label }
+							items={ group.items }
+						>
+							<SearchableChipSelect.GroupLabel>
+								{ group.label }
+							</SearchableChipSelect.GroupLabel>
+							<SearchableChipSelect.Collection>
+								{ ( item: Item ) => (
+									<SearchableChipSelect.Item
+										key={ item.value }
+										value={ item }
+									>
+										{ item.label }
+									</SearchableChipSelect.Item>
+								) }
+							</SearchableChipSelect.Collection>
+						</SearchableChipSelect.Group>
+					) }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'option', { name: 'Create new item' } )
+				).toBeVisible();
+			} );
+			expect(
+				screen.getAllByRole( 'option', { name: 'Create new item' } )
+			).toHaveLength( 1 );
+			expect(
+				screen.queryByRole( 'option', { name: 'Apple' } )
+			).not.toBeInTheDocument();
 		} );
 	} );
 
@@ -378,6 +529,50 @@ describe( 'SearchableChipSelect', () => {
 
 			expect( mockedWarning ).toHaveBeenCalledWith(
 				'SearchableChipSelect: expected at most one item with `creatable: true` in `items`.'
+			);
+		} );
+
+		it( 'warns when a group mixes regular items with a creatable item', () => {
+			render(
+				<SearchableChipSelect
+					items={ [
+						{
+							label: 'Common',
+							items: [
+								GROUPED_ITEMS[ 0 ].items[ 0 ],
+								{
+									value: '__create__',
+									label: 'Create new item',
+									creatable: true,
+								},
+							],
+						},
+					] }
+					children={ ( group: ItemGroup ) => (
+						<SearchableChipSelect.Group
+							key={ group.label }
+							items={ group.items }
+						>
+							<SearchableChipSelect.GroupLabel>
+								{ group.label }
+							</SearchableChipSelect.GroupLabel>
+							<SearchableChipSelect.Collection>
+								{ ( item: Item ) => (
+									<SearchableChipSelect.Item
+										key={ item.value }
+										value={ item }
+									>
+										{ item.label }
+									</SearchableChipSelect.Item>
+								) }
+							</SearchableChipSelect.Collection>
+						</SearchableChipSelect.Group>
+					) }
+				/>
+			);
+
+			expect( mockedWarning ).toHaveBeenCalledWith(
+				'SearchableChipSelect: do not mix `creatable: true` items with regular items in the same group. Put the creatable item in its own group.'
 			);
 		} );
 	} );

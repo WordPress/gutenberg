@@ -43,7 +43,7 @@
 	"sideEffects": false,
 	"devDependencies": {
 		"@testing-library/jest-dom": "^6.9.1",
-		"vitest": "^4.1.10"
+		"vitest": "^4.1.11"
 	},
 	"publishConfig": {
 		"access": "public"

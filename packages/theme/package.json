@@ -91,6 +91,7 @@
 		"memize": "^2.1.1"
 	},
 	"devDependencies": {
+		"@storybook/addon-docs": "^10.5.3",
 		"@storybook/react-vite": "^10.5.3",
 		"@terrazzo/parser": "^2.7.1",
 		"@terrazzo/plugin-css": "^2.7.1",
@@ -100,15 +101,14 @@
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1",
 		"@types/jest": "^30.0.0",
-		"@types/node": "^20.19.39",
+		"@types/node": "^24.13.3",
 		"@wordpress/validation-tools": "file:../../tools/validation",
 		"esbuild": "^0.27.2",
-		"esbuild-esm-loader": "^0.3.3",
 		"lightningcss": "^1.33.0",
 		"prettier": "npm:wp-prettier@^3.0.3",
 		"storybook": "^10.5.3",
 		"stylelint": "^17.14.1",
-		"vitest": "^4.1.10"
+		"vitest": "^4.1.11"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
@@ -144,8 +144,8 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
-		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
+		"build:default-ramps": "node bin/generate-default-ramps/index.ts",
+		"build:tokens": "node bin/generate-primitive-tokens/index.ts && node bin/build-design-tokens/index.ts",
 		"build": "npm run build:default-ramps && npm run build:tokens",
 		"lint:package-contents": "wp-validate-package-contents . --disallow-path src",
 		"postbuild": "prettier --write tokens/color.json tokens/modes prebuilt src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"

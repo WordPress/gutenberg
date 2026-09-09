@@ -2,9 +2,17 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Editor.switchEditorTool()`: Remove the helper. It clicked the Write/Design "Tools" toolbar button, which the editor no longer renders since [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
+
 ### New Features
 
 -   `Admin.visitSiteEditor()`: When the `GUTENBERG_E2E_SITE_EDITOR_V2` environment variable is set, visit the extensible site editor (`admin.php?page=site-editor-v2`) instead of `site-editor.php`, translating the classic query args to the equivalent v2 route, and wait for the lazily loaded editor to finish initializing on edit routes. `RequestUtils.setGutenbergExperiments()` keeps the `gutenberg-extensible-site-editor` experiment enabled in that mode so specs that reset experiments do not turn the v2 editor off mid-run.
+
+### Enhancements
+
+-   Widen the `@types/node` peer dependency to `>=20`, so consumers on Node 22 or 24 type definitions no longer hit a peer resolution conflict ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
 
 ### Bug Fixes
 
