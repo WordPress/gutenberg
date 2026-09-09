@@ -232,6 +232,9 @@ export default defineConfig( {
 				},
 			},
 		],
+		// mockReset already clears every mock. Keep clearMocks disabled to make
+		// that overlap explicit and avoid a redundant cleanup pass.
+		clearMocks: false,
 		globals: false,
 		includeTaskLocation: true,
 		isolate: true,

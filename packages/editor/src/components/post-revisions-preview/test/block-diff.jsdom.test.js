@@ -9,7 +9,7 @@ import {
 import { RichTextData } from '@wordpress/rich-text';
 import * as paragraphBlock from '@wordpress/block-library/build-module/paragraph/index.mjs';
 import * as groupBlock from '@wordpress/block-library/build-module/group/index.mjs';
-import { diffRevisionContent } from '../block-diff';
+import { diffRevisionContent, diffRevisionHTML } from '../block-diff';
 import {
 	registerDiffFormatTypes,
 	unregisterDiffFormatTypes,
@@ -1333,5 +1333,35 @@ describe( 'diffRevisionContent', () => {
 				},
 			] );
 		} );
+	} );
+} );
+
+describe( 'diffRevisionHTML', () => {
+	beforeAll( () => {
+		registerDiffFormatTypes();
+	} );
+
+	afterAll( () => {
+		unregisterDiffFormatTypes();
+	} );
+
+	it( 'marks the whole value as added when there is no previous value', () => {
+		expect( diffRevisionHTML( 'Hello world', '' ).toHTMLString() ).toBe(
+			'<ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">Hello world</ins>'
+		);
+	} );
+
+	it( 'leaves an unchanged value unmarked', () => {
+		expect(
+			diffRevisionHTML( 'Hello world', 'Hello world' ).toHTMLString()
+		).toBe( 'Hello world' );
+	} );
+
+	it( 'marks changed words', () => {
+		expect(
+			diffRevisionHTML( 'Hello everyone', 'Hello world' ).toHTMLString()
+		).toBe(
+			'Hello <del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">world</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">everyone</ins>'
+		);
 	} );
 } );

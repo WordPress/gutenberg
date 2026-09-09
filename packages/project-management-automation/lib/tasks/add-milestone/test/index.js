@@ -1,7 +1,5 @@
-import { createRequire } from 'node:module';
 import { describe, expect, it, vi } from 'vitest';
-const require = createRequire( import.meta.url );
-const addMilestone = require( '../' );
+import addMilestone from '../index.js';
 
 describe( 'addMilestone', () => {
 	it( 'does nothing if base is not trunk', async () => {
@@ -38,6 +36,27 @@ describe( 'addMilestone', () => {
 		).not.toHaveBeenCalled();
 		expect( octokit.rest.issues.update ).not.toHaveBeenCalled();
 		expect( octokit.rest.repos.getContent ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does nothing if the repository owner is unavailable', async () => {
+		const payload = {
+			ref: 'refs/heads/trunk',
+			commits: [ { message: '(#123)' } ],
+			repository: {
+				name: 'gutenberg',
+			},
+		};
+		const get = vi.fn();
+
+		await addMilestone( payload, {
+			rest: {
+				issues: {
+					get,
+				},
+			},
+		} );
+
+		expect( get ).not.toHaveBeenCalled();
 	} );
 
 	it( 'does nothing if PR already has a milestone', async () => {

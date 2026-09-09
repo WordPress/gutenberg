@@ -32,6 +32,7 @@ yarn.lock
 /.cache/**
 !/.cache/.gitkeep
 
+.vitest
 .eslintcache
 *.tsbuildinfo
 /test/unit/.vitest-*-typecheck.json
