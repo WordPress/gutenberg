@@ -29,7 +29,13 @@ export type WordPressComponentProps<
 				'as' | keyof P | 'children'
 		  >
 		: {} ) &
-	( IsPolymorphic extends true
+	// The tuple syntax makes this check non-distributive. `IsPolymorphic` is a
+	// naked type parameter, so a bare `IsPolymorphic extends true` is evaluated
+	// once per union member. When it is `boolean` (as inferred through
+	// `WordPressComponentFromProps`) that returns the union of both branches,
+	// `{ as?: … } | {}`, which leaks an optional `as` onto non-polymorphic
+	// components. Comparing tuples evaluates the union as a whole instead.
+	( [ IsPolymorphic ] extends [ true ]
 		? {
 				/** The HTML element or React component to render the component as. */
 				as?:
@@ -43,7 +49,7 @@ export type WordPressComponent<
 	T extends React.ElementType | null,
 	O,
 	IsPolymorphic extends boolean,
-> = ( IsPolymorphic extends true
+> = ( [ IsPolymorphic ] extends [ true ]
 	? {
 			/**
 			 * Intrinsic `as` (e.g. `as="label"`): accept a flat HTML/SVG attribute

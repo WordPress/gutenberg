@@ -32,6 +32,10 @@
 
 -   Add an Emotion-to-SCSS Modules migration guide for contributors ([#82567](https://github.com/WordPress/gutenberg/pull/82567)).
 
+### TypeScript
+
+-   Fix internal `WordPressComponent` polymorphic typings to avoid unsupported `as` props unintentionally surfacing.
+
 ### Internal
 
 -   `FormToggle`: Use the standard `inert` state instead of the `Disabled` component's class name for inherited disabled styles ([#82651](https://github.com/WordPress/gutenberg/pull/82651)).

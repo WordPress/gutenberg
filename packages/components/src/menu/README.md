@@ -17,13 +17,6 @@ component, and the `Menu.Popover` component.
 
 ## Props
 
-### `as`
-
- - Type: `any`
- - Required: No
-
-The HTML element or React component to render the component as.
-
 ### `children`
 
  - Type: `ReactNode`
