@@ -10,6 +10,7 @@ import {
 	placementToMotionAnimationProps,
 } from '../utils';
 import Popover from '..';
+import '../style.scss';
 import { Provider as SlotFillProvider } from '../../slot-fill';
 import type { PopoverProps } from '../types';
 import { PopoverInsideIframeRenderedInExternalSlot } from './utils/index.js';
@@ -841,6 +842,26 @@ describe( 'Popover', () => {
 				expect( onFocusOutside ).toHaveBeenCalledTimes( 1 );
 			} );
 		} );
+	} );
+
+	it( 'hints at transform only while it is being repositioned', async () => {
+		await render(
+			<Popover animate={ false } data-testid="popover-element">
+				Inside popover
+			</Popover>
+		);
+
+		const popover = screen.getByTestId( 'popover-element' );
+
+		// Positioning has just run, so the compositing hint is on.
+		expect( getComputedStyle( popover ).willChange ).toBe( 'transform' );
+
+		// Once the popover settles, the hint is dropped so the popover stops
+		// occupying a compositing layer of its own, which is what makes
+		// Chrome render it blurry.
+		await waitFor( () =>
+			expect( getComputedStyle( popover ).willChange ).toBe( 'auto' )
+		);
 	} );
 
 	it( 'should call a consumer-provided onKeyDown alongside close-on-Escape', async () => {
