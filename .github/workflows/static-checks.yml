@@ -157,13 +157,13 @@ jobs:
             matrix:
                 include:
                     - os: ubuntu-24.04
-                      node: '22'
-                    - os: macos-15
-                      node: '22'
-                    - os: windows-2025
-                      node: '22'
-                    - os: ubuntu-24.04
                       node: '24'
+                    - os: macos-15
+                      node: '24'
+                    - os: windows-2025
+                      node: '24'
+                    - os: ubuntu-24.04
+                      node: '26'
 
         steps:
             - name: Checkout repository
@@ -184,7 +184,7 @@ jobs:
               run: npm ci --prefix test/ai-development
 
             - name: Audit AI development test dependencies
-              if: matrix.os == 'ubuntu-24.04' && matrix.node == '22'
+              if: matrix.os == 'ubuntu-24.04' && matrix.node == '24'
               run: npm --prefix test/ai-development audit --audit-level=high
 
             - name: Test AI development utilities

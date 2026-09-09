@@ -21,7 +21,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=22.22.0"
+		"node": ">=24.18.0"
 	},
 	"type": "module",
 	"devDependencies": {
