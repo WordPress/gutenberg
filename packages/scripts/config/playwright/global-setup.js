@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const { request } = require( '@playwright/test' );
-
-/**
- * WordPress dependencies
- */
 const { RequestUtils } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**

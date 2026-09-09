@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHeading as Heading,
 	__experimentalSpacer as Spacer,
@@ -12,10 +9,6 @@ import { useMemo, useRef, useState } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type {
 	FieldLayoutProps,
 	NormalizedForm,
@@ -24,7 +17,7 @@ import type {
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
-import useReportValidity from '../../../hooks/use-report-validity';
+import useRevealValidity from '../../../hooks/use-reveal-validity';
 import useFieldFromFormField from './utils/use-field-from-form-field';
 
 function DropdownHeader( {
@@ -68,7 +61,7 @@ function DropdownContentWithValidation( {
 	children: React.ReactNode;
 } ) {
 	const ref = useRef< HTMLDivElement >( null );
-	useReportValidity( ref, touched );
+	useRevealValidity( ref, touched );
 	return <div ref={ ref }>{ children }</div>;
 }
 

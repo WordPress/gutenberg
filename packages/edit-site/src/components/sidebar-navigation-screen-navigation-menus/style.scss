@@ -27,7 +27,7 @@
 		&:hover,
 		&:focus,
 		&[aria-current] {
-			color: var(--wpds-color-foreground-interactive-neutral-active);
+			color: var(--wpds-color-foreground-interactive-neutral-weak-active);
 		}
 	}
 
@@ -35,7 +35,7 @@
 		color: var(--wpds-color-foreground-interactive-neutral-weak);
 		&:hover,
 		&:focus {
-			color: var(--wpds-color-foreground-interactive-neutral-active);
+			color: var(--wpds-color-foreground-interactive-neutral-weak-active);
 		}
 	}
 

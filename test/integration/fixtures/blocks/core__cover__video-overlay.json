@@ -13,7 +13,15 @@
 			"isUserOverlayColor": true,
 			"backgroundType": "video",
 			"isDark": true,
-			"tagName": "div"
+			"tagName": "div",
+			"allowedVideoProviders": [
+				"youtube",
+				"vimeo",
+				"videopress",
+				"animoto",
+				"tiktok",
+				"wordpress-tv"
+			]
 		},
 		"innerBlocks": [
 			{

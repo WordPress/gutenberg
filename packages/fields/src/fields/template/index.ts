@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import type { Field } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import { __ } from '@wordpress/i18n';
 import type { BasePost } from '../../types';
 import { TemplateEdit } from './template-edit';

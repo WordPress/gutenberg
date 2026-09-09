@@ -2,9 +2,6 @@
 /** @typedef {import('estree').Node} Node */
 /** @typedef {import('estree').SourceLocation} SourceLocation */
 
-const DEPENDENCY_BLOCK_PATTERN =
-	/^\*?\n \* (External|Node|WordPress|Internal) dependencies\n $/;
-
 /** @type {import('eslint').Rule.RuleModule} */
 module.exports = {
 	meta: {
@@ -112,9 +109,8 @@ module.exports = {
 		 * @return {boolean} Whether comment node is a dependency block.
 		 */
 		function isDependencyBlock( node ) {
-			return (
-				node.type === 'Block' &&
-				DEPENDENCY_BLOCK_PATTERN.test( node.value )
+			return [ 'External', 'WordPress', 'Internal' ].some( ( locality ) =>
+				isLocalityDependencyBlock( node, locality )
 			);
 		}
 

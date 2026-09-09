@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { upload, media } from '@wordpress/icons';
 import { fn } from 'storybook/test';
-
-/**
- * Internal dependencies
- */
 import DropZone from '..';
 
 const ICONS = { upload, media };

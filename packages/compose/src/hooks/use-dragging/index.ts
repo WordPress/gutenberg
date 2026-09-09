@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 import type { DraggingProps, DraggingReturn } from './types';
 

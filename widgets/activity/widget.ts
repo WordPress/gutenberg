@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import type { WidgetAttributeField } from '@wordpress/widget-primitives';
 
@@ -10,7 +7,6 @@ type ActivityWidgetAttributes = {
 
 export default {
 	name: 'core/activity',
-	title: __( 'Activity' ),
 	attributes: [
 		{
 			id: 'perPage',

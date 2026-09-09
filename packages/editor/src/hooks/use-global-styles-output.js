@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { generateGlobalStyles } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../store';
 import { useSetting, useGlobalStyles } from '../components/global-styles';
 

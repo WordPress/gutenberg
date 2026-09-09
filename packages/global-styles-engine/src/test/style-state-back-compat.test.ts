@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { normalizeStyleStateAliases } from '../style-state-back-compat';
 import type { GlobalStylesConfig } from '../types';
 

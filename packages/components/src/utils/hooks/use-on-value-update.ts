@@ -1,7 +1,4 @@
 /* eslint-disable jsdoc/require-param */
-/**
- * WordPress dependencies
- */
 import { useEvent } from '@wordpress/compose';
 import { useRef, useLayoutEffect } from '@wordpress/element';
 

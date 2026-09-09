@@ -12,6 +12,7 @@
 const vipsConvertImageFormat = jest.fn();
 const vipsCompressImage = jest.fn();
 const vipsHasTransparency = jest.fn();
+const vipsGetUltraHdrInfo = jest.fn();
 const vipsResizeImage = jest.fn();
 const vipsRotateImage = jest.fn();
 const vipsCancelOperations = jest.fn();
@@ -21,6 +22,7 @@ module.exports = {
 	vipsConvertImageFormat,
 	vipsCompressImage,
 	vipsHasTransparency,
+	vipsGetUltraHdrInfo,
 	vipsResizeImage,
 	vipsRotateImage,
 	vipsCancelOperations,

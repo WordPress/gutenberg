@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import BorderControlStylePicker from '../border-control-style-picker';
 import Button from '../../button';
 import ColorIndicator from '../../color-indicator';
@@ -21,7 +10,6 @@ import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderControlDropdown } from './hook';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
-
 import type { ColorObject } from '../../color-palette/types';
 import { isMultiplePaletteArray } from '../../color-palette/utils';
 import type { DropdownProps as DropdownComponentProps } from '../../dropdown/types';
@@ -149,13 +137,12 @@ const BorderControlDropdown = (
 		disableCustomColors,
 		enableAlpha,
 		enableStyle,
-		indicatorClassName,
 		indicatorWrapperClassName,
+		indicatorWrapperStyle,
 		isStyleSettable,
 		onReset,
 		onColorChange,
 		onStyleChange,
-		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonWrapperClassName,
 		__unstablePopoverProps,
@@ -189,11 +176,11 @@ const BorderControlDropdown = (
 			showTooltip
 			__next40pxDefaultSize
 		>
-			<span className={ indicatorWrapperClassName }>
-				<ColorIndicator
-					className={ indicatorClassName }
-					colorValue={ color }
-				/>
+			<span
+				className={ indicatorWrapperClassName }
+				style={ indicatorWrapperStyle }
+			>
+				<ColorIndicator colorValue={ color } />
 			</span>
 		</Button>
 	);
@@ -203,7 +190,6 @@ const BorderControlDropdown = (
 			<DropdownContentWrapper paddingSize="medium">
 				<VStack className={ popoverControlsClassName } spacing={ 6 }>
 					<ColorPalette
-						className={ popoverContentClassName }
 						value={ color }
 						onChange={ onColorChange }
 						{ ...{ colors, disableCustomColors } }

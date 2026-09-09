@@ -30,10 +30,10 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
 
 ### `as`
 
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | "canvas" | ... 516 more ... | ("view" & FunctionComponent<...>)`
- - Required: No
+ - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
+ - Required: Yes
 
-The HTML element or React component to render the component as.
+The HTML element to render the component as.
 
 ### `className`
 
@@ -107,7 +107,7 @@ const MyBaseControl = () => (
 
 ##### `as`
 
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
+ - Type: `keyof IntrinsicElements | JSXElementConstructor<any>`
  - Required: No
 
 The HTML element or React component to render the component as.

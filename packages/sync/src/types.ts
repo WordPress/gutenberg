@@ -1,23 +1,12 @@
-/**
- * WordPress dependencies
- */
 import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
-
-/**
- * External dependencies
- */
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
-
-/**
- * Internal dependencies
- */
 import type { ConnectionError } from './errors';
 
 /* globalThis */
 declare global {
 	interface Window {
-		_wpCollaborationEnabled?: string;
+		__experimentalEnableRealTimeCollaboration?: boolean;
 	}
 }
 
@@ -168,11 +157,20 @@ export interface SyncManager {
 	createPersistedCRDTDoc: (
 		objectType: ObjectType,
 		objectId: ObjectID
-	) => string | null;
+	) => Promise< string | null >;
 	getAwareness: < State extends Awareness >(
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID | null
 	) => State | undefined;
+	getEntitySnapshot: (
+		objectType: ObjectType,
+		objectId: ObjectID
+	) => string | undefined;
+	entityContainsSnapshot: (
+		objectType: ObjectType,
+		objectId: ObjectID,
+		encodedSnapshot: string
+	) => boolean;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,

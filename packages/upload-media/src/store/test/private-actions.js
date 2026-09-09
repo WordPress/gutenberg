@@ -1,11 +1,7 @@
-/**
- * WordPress dependencies
- */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
-
-/**
- * Internal dependencies
- */
 import {
 	generateThumbnails,
 	getTranscodeImageOperation,
@@ -14,33 +10,38 @@ import {
 	transcodeGifItem,
 	detectUltraHdr,
 	removeItem,
+	uploadItem,
 } from '../private-actions';
 import { OperationType, Type } from '../types';
+import { ErrorCode } from '../../upload-error';
 import {
 	vipsHasTransparency,
 	vipsGetUltraHdrInfo,
+	vipsRotateImage,
 	terminateVipsWorker,
 } from '../utils';
 import {
 	convertGifToVideo,
 	terminateVideoConversionWorker,
 } from '../utils/video-conversion';
+import { canvasConvertToJpeg, HeicUnsupportedError } from '../../canvas-utils';
 
 // Mock @wordpress/blob
-jest.mock( '@wordpress/blob', () => ( {
-	createBlobURL: jest.fn( () => 'blob:mock-url' ),
-	revokeBlobURL: jest.fn(),
+vi.mock( import( '@wordpress/blob' ), () => ( {
+	createBlobURL: vi.fn( () => 'blob:mock-url' ),
+	revokeBlobURL: vi.fn(),
 } ) );
 
 // Mock vips utilities. The real isAnimatedGif() is needed by prepareItem
 // so it is required from the actual module rather than stubbed out.
-jest.mock( '../utils', () => {
-	const actual = jest.requireActual( '../utils' );
+vi.mock( import( '../utils' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
 	return {
-		vipsHasTransparency: jest.fn(),
-		vipsGetUltraHdrInfo: jest.fn(),
-		terminateVipsWorker: jest.fn(),
-		maybeRecycleVipsWorker: jest.fn(),
+		vipsHasTransparency: vi.fn(),
+		vipsGetUltraHdrInfo: vi.fn(),
+		vipsRotateImage: vi.fn(),
+		terminateVipsWorker: vi.fn(),
+		maybeRecycleVipsWorker: vi.fn(),
 		isAnimatedGif: actual.isAnimatedGif,
 		cloneFile: actual.cloneFile,
 		convertBlobToFile: actual.convertBlobToFile,
@@ -48,23 +49,36 @@ jest.mock( '../utils', () => {
 	};
 } );
 
+// Mock the HEIC conversion so prepareItem's failure branch can be driven.
+// HeicUnsupportedError is kept real: prepareItem tells the two failures apart
+// with instanceof, so a stubbed class would make the test pass vacuously.
+vi.mock( import( '../../canvas-utils' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
+	return {
+		canvasConvertToJpeg: vi.fn(),
+		HeicUnsupportedError: actual.HeicUnsupportedError,
+	};
+} );
+
 // Mock the video-conversion wrapper so the dynamic worker import is never
 // executed. isUnsupportedConversionError is kept real so transcodeGifItem's
 // graceful-skip vs. hard-failure branching is genuinely exercised.
-jest.mock( '../utils/video-conversion', () => {
-	const actual = jest.requireActual( '../utils/video-conversion' );
+vi.mock( import( '../utils/video-conversion' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
 	return {
-		convertGifToVideo: jest.fn(),
-		cancelGifToVideoOperations: jest.fn(),
-		terminateVideoConversionWorker: jest.fn(),
+		convertGifToVideo: vi.fn(),
+		cancelGifToVideoOperations: vi.fn(),
+		terminateVideoConversionWorker: vi.fn(),
 		isUnsupportedConversionError: actual.isUnsupportedConversionError,
+		isSizeLimitConversionError: actual.isSizeLimitConversionError,
+		isConversionTimeoutError: actual.isConversionTimeoutError,
 	};
 } );
 
 describe( 'private actions', () => {
 	describe( 'getTranscodeImageOperation', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'should return transcode operation for valid format conversion', async () => {
@@ -83,6 +97,28 @@ describe( 'private actions', () => {
 				{
 					outputFormat: 'webp',
 					outputQuality: 0.82,
+					interlaced: false,
+				},
+			] );
+		} );
+
+		it( 'should use the provided quality instead of the default', async () => {
+			const file = new File( [ 'test' ], 'test.jpg', {
+				type: 'image/jpeg',
+			} );
+
+			const result = await getTranscodeImageOperation(
+				file,
+				'image/webp',
+				false,
+				0.6
+			);
+
+			expect( result ).toEqual( [
+				OperationType.TranscodeImage,
+				{
+					outputFormat: 'webp',
+					outputQuality: 0.6,
 					interlaced: false,
 				},
 			] );
@@ -307,8 +343,8 @@ describe( 'private actions', () => {
 		];
 
 		it( 'should call mediaFinalize with the attachment ID and sub-sizes', async () => {
-			const mediaFinalize = jest.fn().mockResolvedValue( undefined );
-			const finishOperation = jest.fn();
+			const mediaFinalize = vi.fn().mockResolvedValue( undefined );
+			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: { id: 42 },
@@ -326,8 +362,8 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'should pass empty array when no sub-sizes accumulated', async () => {
-			const mediaFinalize = jest.fn().mockResolvedValue( undefined );
-			const finishOperation = jest.fn();
+			const mediaFinalize = vi.fn().mockResolvedValue( undefined );
+			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: { id: 42 },
@@ -344,7 +380,7 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'should not call mediaFinalize when no callback is provided', async () => {
-			const finishOperation = jest.fn();
+			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: { id: 42 },
@@ -360,8 +396,8 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'should not call mediaFinalize when there is no attachment ID', async () => {
-			const mediaFinalize = jest.fn();
-			const finishOperation = jest.fn();
+			const mediaFinalize = vi.fn();
+			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: {},
@@ -390,10 +426,10 @@ describe( 'private actions', () => {
 				id: 42,
 				url: 'https://example.com/wp-content/uploads/image-scaled.jpg',
 			};
-			const mediaFinalize = jest
+			const mediaFinalize = vi
 				.fn()
 				.mockResolvedValue( updatedAttachment );
-			const finishOperation = jest.fn();
+			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: {
@@ -415,22 +451,32 @@ describe( 'private actions', () => {
 			} );
 		} );
 
-		it( 'should handle mediaFinalize errors gracefully', async () => {
-			const mediaFinalize = jest
-				.fn()
-				.mockRejectedValue( new Error( 'Network error' ) );
-			const finishOperation = jest.fn();
-			const warnSpy = jest
+		it( 'should cancel the item when mediaFinalize fails', async () => {
+			// Finalize is the server's commit point. When it fails the
+			// attachment metadata was never written, so the item must be
+			// cancelled (surfacing the error) rather than finished — which
+			// would falsely report "upload complete".
+			// apiFetch rejects a failed REST request with a plain object, not
+			// an Error instance, so reject with one here to mirror that.
+			const restError = { code: 'rest_error', message: 'Server error' };
+			const mediaFinalize = vi.fn().mockRejectedValue( restError );
+			const finishOperation = vi.fn();
+			const cancelItem = vi.fn();
+			const warnSpy = vi
 				.spyOn( console, 'warn' )
 				.mockImplementation( () => {} );
+			const file = new File( [ 'foo' ], 'foo.jpg', {
+				type: 'image/jpeg',
+			} );
 			const select = {
 				getItem: () => ( {
+					file,
 					attachment: { id: 42 },
 					subSizes: mockSubSizes,
 				} ),
 				getSettings: () => ( { mediaFinalize } ),
 			};
-			const dispatch = { finishOperation };
+			const dispatch = { finishOperation, cancelItem };
 
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
@@ -438,14 +484,21 @@ describe( 'private actions', () => {
 			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
 			expect( warnSpy ).toHaveBeenCalledWith(
 				'Media finalization failed:',
-				expect.any( Error )
+				restError
 			);
-			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+			expect( finishOperation ).not.toHaveBeenCalled();
+			expect( cancelItem ).toHaveBeenCalledWith(
+				'test-id',
+				expect.objectContaining( {
+					code: ErrorCode.MEDIA_FINALIZE_ERROR,
+					file,
+				} )
+			);
 			warnSpy.mockRestore();
 		} );
 
 		it( 'should return early when item is not found', async () => {
-			const finishOperation = jest.fn();
+			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => undefined,
 			};
@@ -493,8 +546,8 @@ describe( 'private actions', () => {
 					dispatchedOperations = action.operations;
 				}
 			};
-			dispatch.cancelItem = jest.fn();
-			dispatch.finishOperation = jest.fn();
+			dispatch.cancelItem = vi.fn();
+			dispatch.finishOperation = vi.fn();
 
 			const select = {
 				getItem: () => item,
@@ -612,8 +665,8 @@ describe( 'private actions', () => {
 					dispatchedOperations = action.operations;
 				}
 			};
-			dispatch.cancelItem = jest.fn();
-			dispatch.finishOperation = jest.fn();
+			dispatch.cancelItem = vi.fn();
+			dispatch.finishOperation = vi.fn();
 
 			const select = {
 				getItem: () => item,
@@ -651,8 +704,8 @@ describe( 'private actions', () => {
 					dispatchedOperations = action.operations;
 				}
 			};
-			dispatch.cancelItem = jest.fn();
-			dispatch.finishOperation = jest.fn();
+			dispatch.cancelItem = vi.fn();
+			dispatch.finishOperation = vi.fn();
 
 			const select = {
 				getItem: () => item,
@@ -670,19 +723,74 @@ describe( 'private actions', () => {
 		} );
 	} );
 
+	describe( 'prepareItem HEIC conversion failures', () => {
+		async function runPrepareItem() {
+			const file = new File( [ 'data' ], 'IMG_1982.heic', {
+				type: 'image/heic',
+			} );
+			const item = { id: 'heic-id', file, additionalData: {} };
+
+			const dispatch = () => {};
+			dispatch.cancelItem = vi.fn();
+			dispatch.finishOperation = vi.fn();
+
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {} ),
+			};
+
+			await prepareItem( 'heic-id' )( { select, dispatch } );
+
+			return dispatch;
+		}
+
+		it( 'reports a browser with no HEIC decoder as a decode error', async () => {
+			canvasConvertToJpeg.mockRejectedValue(
+				new HeicUnsupportedError( 'No decoder here' )
+			);
+
+			const dispatch = await runPrepareItem();
+
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'heic-id',
+				expect.objectContaining( {
+					code: ErrorCode.HEIC_DECODE_ERROR,
+				} )
+			);
+		} );
+
+		it( 'reports a failed decode as a processing error, not a missing decoder', async () => {
+			// A damaged file, an out-of-memory canvas and a null 2d context
+			// all land here. None of them says the browser cannot read HEIC,
+			// so none should send the user off to install another one.
+			const cause = new Error( 'Corrupt image data' );
+			canvasConvertToJpeg.mockRejectedValue( cause );
+
+			const dispatch = await runPrepareItem();
+
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'heic-id',
+				expect.objectContaining( {
+					code: ErrorCode.IMAGE_TRANSCODING_ERROR,
+					cause,
+				} )
+			);
+		} );
+	} );
+
 	describe( 'transcodeGifItem', () => {
 		const gifFile = new File( [ 'gif' ], 'animation.gif', {
 			type: 'image/gif',
 		} );
 
 		function buildArgs() {
-			const dispatch = Object.assign( jest.fn(), {
-				finishOperation: jest.fn(),
-				cancelItem: jest.fn(),
-				addSideloadItem: jest.fn(),
+			const dispatch = Object.assign( vi.fn(), {
+				finishOperation: vi.fn(),
+				cancelItem: vi.fn(),
+				addSideloadItem: vi.fn(),
 			} );
 			const select = {
-				getItem: jest.fn( () => ( {
+				getItem: vi.fn( () => ( {
 					id: 'gif-1',
 					file: gifFile,
 					parentId: 'parent-1',
@@ -693,17 +801,22 @@ describe( 'private actions', () => {
 		}
 
 		let consoleError;
+		let consoleDebug;
 
 		beforeEach( () => {
 			convertGifToVideo.mockReset();
 			createBlobURL.mockClear();
-			consoleError = jest
+			consoleError = vi
 				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+			consoleDebug = vi
+				.spyOn( console, 'debug' )
 				.mockImplementation( () => {} );
 		} );
 
 		afterEach( () => {
 			consoleError.mockRestore();
+			consoleDebug.mockRestore();
 		} );
 
 		it( 'hands the transcoded video to the next Upload via finishOperation', async () => {
@@ -721,7 +834,8 @@ describe( 'private actions', () => {
 			expect( convertGifToVideo ).toHaveBeenCalledWith(
 				'gif-1',
 				gifFile,
-				'video/mp4'
+				'video/mp4',
+				{ timeout: undefined, maxTotalPixels: undefined }
 			);
 			// Sideload context: no CacheBlobUrl, no attachment URL update -
 			// the parent GIF attachment already owns the block's URL.
@@ -757,7 +871,7 @@ describe( 'private actions', () => {
 			expect( poster.additionalData ).toEqual(
 				expect.objectContaining( {
 					post: 42,
-					image_size: 'animated-video-poster',
+					image_size: 'animated_video_poster',
 					convert_format: false,
 				} )
 			);
@@ -781,7 +895,30 @@ describe( 'private actions', () => {
 			expect( convertGifToVideo ).toHaveBeenCalledWith(
 				'gif-1',
 				gifFile,
-				'video/mp4'
+				'video/mp4',
+				{ timeout: undefined, maxTotalPixels: undefined }
+			);
+		} );
+
+		it( 'passes timeout and maxTotalPixels operation args through', async () => {
+			convertGifToVideo.mockResolvedValue(
+				new File( [ 'webm' ], 'animation.webm', {
+					type: 'video/webm',
+				} )
+			);
+			const { select, dispatch } = buildArgs();
+
+			await transcodeGifItem( 'gif-1', {
+				outputFormat: 'webm',
+				timeout: 5000,
+				maxTotalPixels: 1_000_000,
+			} )( { select, dispatch } );
+
+			expect( convertGifToVideo ).toHaveBeenCalledWith(
+				'gif-1',
+				gifFile,
+				'video/webm',
+				{ timeout: 5000, maxTotalPixels: 1_000_000 }
 			);
 		} );
 
@@ -805,6 +942,58 @@ describe( 'private actions', () => {
 			expect( silent ).toBe( true );
 			expect( consoleError ).not.toHaveBeenCalled();
 			// No video means no poster: the sideload is never queued.
+			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'logs a SCRIPT_DEBUG diagnostic and silently cancels when the GIF exceeds the conversion size limit', async () => {
+			// An over-budget GIF is a graceful skip like any Unsupported
+			// outcome, but the skip is logged (under SCRIPT_DEBUG, true in
+			// this test env) so developers testing large GIFs understand
+			// why no companion video was produced.
+			convertGifToVideo.mockRejectedValue(
+				new Error(
+					'Unsupported: GIF exceeds maximum conversion size (5000x5000 x 100 frames = 2500000000 pixels; limit is 300000000)'
+				)
+			);
+			const { select, dispatch } = buildArgs();
+
+			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+
+			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
+			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
+			const [ cancelledId, , silent ] =
+				dispatch.cancelItem.mock.calls[ 0 ];
+			expect( cancelledId ).toBe( 'gif-1' );
+			expect( silent ).toBe( true );
+			expect( consoleDebug ).toHaveBeenCalledWith(
+				expect.stringContaining( 'exceeds maximum conversion size' )
+			);
+			expect( consoleError ).not.toHaveBeenCalled();
+			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'logs a SCRIPT_DEBUG diagnostic and silently cancels when the conversion times out', async () => {
+			// The conversion was abandoned after the timeout; the GIF
+			// attachment stands alone. No user-facing error, but the
+			// timeout is logged (under SCRIPT_DEBUG) for debuggability.
+			convertGifToVideo.mockRejectedValue(
+				new Error( 'GIF to video conversion timed out after 30000ms' )
+			);
+			const { select, dispatch } = buildArgs();
+
+			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+
+			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
+			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
+			const [ cancelledId, error, silent ] =
+				dispatch.cancelItem.mock.calls[ 0 ];
+			expect( cancelledId ).toBe( 'gif-1' );
+			expect( error.message ).toMatch( /timed out/i );
+			expect( silent ).toBe( true );
+			expect( consoleDebug ).toHaveBeenCalledWith(
+				expect.stringContaining( 'timed out' )
+			);
+			expect( consoleError ).not.toHaveBeenCalled();
 			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
 		} );
 
@@ -833,7 +1022,7 @@ describe( 'private actions', () => {
 
 		it( 'does nothing when the item is not in the queue', async () => {
 			const { dispatch } = buildArgs();
-			const select = { getItem: jest.fn( () => undefined ) };
+			const select = { getItem: vi.fn( () => undefined ) };
 
 			await transcodeGifItem( 'missing' )( { select, dispatch } );
 
@@ -845,9 +1034,9 @@ describe( 'private actions', () => {
 
 	describe( 'generateThumbnails (animated GIF video sideload)', () => {
 		function runGenerate( { item, settings } ) {
-			const dispatchFn = jest.fn();
-			dispatchFn.finishOperation = jest.fn();
-			dispatchFn.addSideloadItem = jest.fn();
+			const dispatchFn = vi.fn();
+			dispatchFn.finishOperation = vi.fn();
+			dispatchFn.addSideloadItem = vi.fn();
 			const select = {
 				getItem: () => item,
 				getSettings: () => settings,
@@ -866,7 +1055,7 @@ describe( 'private actions', () => {
 			);
 		}
 
-		it( 'sideloads the converted video as an animated-video companion', async () => {
+		it( 'sideloads the converted video as an animated_video companion', async () => {
 			const gif = makeGif();
 			const item = {
 				id: 'g',
@@ -892,7 +1081,7 @@ describe( 'private actions', () => {
 			expect( sideload.additionalData ).toEqual(
 				expect.objectContaining( {
 					post: 42,
-					image_size: 'animated-video',
+					image_size: 'animated_video',
 					convert_format: false,
 				} )
 			);
@@ -950,7 +1139,7 @@ describe( 'private actions', () => {
 		} );
 
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'probes the file and finishes the operation when UltraHDR', async () => {
@@ -959,7 +1148,7 @@ describe( 'private actions', () => {
 				height: 768,
 				hdrCapacity: 3,
 			} );
-			const finishOperation = jest.fn();
+			const finishOperation = vi.fn();
 			const item = makeItem();
 			const select = { getItem: () => item };
 			const dispatch = { finishOperation };
@@ -976,7 +1165,7 @@ describe( 'private actions', () => {
 
 		it( 'finishes cleanly when buffer is not UltraHDR', async () => {
 			vipsGetUltraHdrInfo.mockResolvedValue( null );
-			const finishOperation = jest.fn();
+			const finishOperation = vi.fn();
 			const select = { getItem: () => makeItem() };
 			const dispatch = { finishOperation };
 
@@ -990,7 +1179,7 @@ describe( 'private actions', () => {
 			vipsGetUltraHdrInfo.mockRejectedValue(
 				new Error( 'wasm module unavailable' )
 			);
-			const finishOperation = jest.fn();
+			const finishOperation = vi.fn();
 			const select = { getItem: () => makeItem() };
 			const dispatch = { finishOperation };
 
@@ -1002,7 +1191,7 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'returns early when item is not found', async () => {
-			const finishOperation = jest.fn();
+			const finishOperation = vi.fn();
 			const select = { getItem: () => undefined };
 			const dispatch = { finishOperation };
 
@@ -1041,12 +1230,12 @@ describe( 'private actions', () => {
 		} );
 
 		const makeHarness = ( item, settings = {} ) => {
-			const addSideloadItem = jest.fn();
-			const finishOperation = jest.fn();
+			const addSideloadItem = vi.fn();
+			const finishOperation = vi.fn();
 			const dispatch = {
 				addSideloadItem,
 				finishOperation,
-				addItem: jest.fn(),
+				addItem: vi.fn(),
 			};
 			const select = {
 				getItem: () => item,
@@ -1072,7 +1261,7 @@ describe( 'private actions', () => {
 			vipsGetUltraHdrInfo.mockResolvedValue( ULTRAHDR_INFO );
 			await detectUltraHdr( item.id )( {
 				select: { getItem: () => item },
-				dispatch: { finishOperation: jest.fn() },
+				dispatch: { finishOperation: vi.fn() },
 			} );
 		};
 
@@ -1081,12 +1270,12 @@ describe( 'private actions', () => {
 		const clearTracking = async ( id ) => {
 			await removeItem( id )( {
 				select: { getItem: () => ( {} ), getAllItems: () => [] },
-				dispatch: jest.fn(),
+				dispatch: vi.fn(),
 			} );
 		};
 
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		afterEach( async () => {
@@ -1124,10 +1313,10 @@ describe( 'private actions', () => {
 
 		it( 'keeps the over-threshold -scaled full-size copy as UltraHDR (no transcode)', async () => {
 			const originalCreateImageBitmap = global.createImageBitmap;
-			global.createImageBitmap = jest.fn( async () => ( {
+			global.createImageBitmap = vi.fn( async () => ( {
 				width: 5000,
 				height: 4000,
-				close: jest.fn(),
+				close: vi.fn(),
 			} ) );
 
 			try {
@@ -1197,9 +1386,227 @@ describe( 'private actions', () => {
 		} );
 	} );
 
+	describe( 'generateThumbnails EXIF orientation', () => {
+		// `image_size: 'original'` is only sideloaded when the source is
+		// actually rotated, so its presence is a reliable proxy for
+		// "rotation happened".
+		const makeItem = ( attachmentOverrides = {}, itemOverrides = {} ) => ( {
+			id: 'orient-parent',
+			file: new File( [ 'fake' ], 'photo.jpg', { type: 'image/jpeg' } ),
+			sourceFile: new File( [ 'fake' ], 'photo.jpg', {
+				type: 'image/jpeg',
+			} ),
+			attachment: {
+				id: 7,
+				filename: 'photo.jpg',
+				missing_image_sizes: [],
+				exif_orientation: 1,
+				...attachmentOverrides,
+			},
+			...itemOverrides,
+		} );
+
+		const makeHarness = ( item ) => {
+			const addSideloadItem = vi.fn();
+			const dispatch = {
+				addSideloadItem,
+				finishOperation: vi.fn(),
+				addItem: vi.fn(),
+			};
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {
+					allImageSizes: {
+						thumbnail: { width: 150, height: 150, crop: true },
+					},
+				} ),
+			};
+			return { select, dispatch, addSideloadItem };
+		};
+
+		const sideloadedSize = ( addSideloadItem, size ) =>
+			addSideloadItem.mock.calls.find(
+				( [ args ] ) => args.additionalData.image_size === size
+			);
+
+		beforeEach( () => {
+			vi.clearAllMocks();
+			vipsRotateImage.mockResolvedValue(
+				new File( [ 'rotated' ], 'photo-rotated.jpg', {
+					type: 'image/jpeg',
+				} )
+			);
+		} );
+
+		it( 'rotates the original using the server-reported EXIF orientation', async () => {
+			const item = makeItem( { exif_orientation: 6 } );
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			await generateThumbnails( item.id )( { select, dispatch } );
+
+			expect( vipsRotateImage ).toHaveBeenCalledWith(
+				item.id,
+				item.sourceFile,
+				6,
+				undefined
+			);
+			expect(
+				sideloadedSize( addSideloadItem, 'original' )
+			).toBeDefined();
+		} );
+
+		it( 'does not rotate when the server reports an upright orientation', async () => {
+			const item = makeItem( { exif_orientation: 1 } );
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			await generateThumbnails( item.id )( { select, dispatch } );
+
+			expect( vipsRotateImage ).not.toHaveBeenCalled();
+			expect(
+				sideloadedSize( addSideloadItem, 'original' )
+			).toBeUndefined();
+		} );
+
+		it( 'skips the rotated-original sideload for already-scaled images', async () => {
+			// Images over the big-image threshold were already rotated by
+			// vips while scaling, so no separate rotated original is stored,
+			// matching WordPress core.
+			const item = makeItem(
+				{ exif_orientation: 6 },
+				{
+					file: new File( [ 'fake' ], 'photo-scaled.jpg', {
+						type: 'image/jpeg',
+					} ),
+				}
+			);
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			await generateThumbnails( item.id )( { select, dispatch } );
+
+			expect( vipsRotateImage ).not.toHaveBeenCalled();
+			expect(
+				sideloadedSize( addSideloadItem, 'original' )
+			).toBeUndefined();
+		} );
+
+		it( 'rotates AVIF sub-sizes from the client-parsed EXIF orientation', async () => {
+			// A real AVIF whose 90° CW rotation lives in an EXIF tag only (no
+			// native irot transform), so the server reports orientation 1 and
+			// the client parse is the source of truth.
+			const buffer = readFileSync(
+				join( __dirname, '../../test/fixtures/exif-rotated-90cw.avif' )
+			);
+			const rotatedFile = new File( [ 'rotated' ], 'photo-rotated.avif', {
+				type: 'image/avif',
+			} );
+			vipsRotateImage.mockResolvedValue( rotatedFile );
+
+			const item = makeItem(
+				{
+					exif_orientation: 1,
+					filename: 'photo.avif',
+					missing_image_sizes: [ 'thumbnail' ],
+				},
+				{
+					file: new File( [ buffer ], 'photo.avif', {
+						type: 'image/avif',
+					} ),
+					sourceFile: new File( [ buffer ], 'photo.avif', {
+						type: 'image/avif',
+					} ),
+				}
+			);
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			await generateThumbnails( item.id )( { select, dispatch } );
+
+			expect( vipsRotateImage ).toHaveBeenCalledWith(
+				item.id,
+				item.sourceFile,
+				6,
+				undefined
+			);
+			expect(
+				sideloadedSize( addSideloadItem, 'original' )
+			).toBeDefined();
+
+			// The thumbnail must be generated from the rotated source, not
+			// the original file, because libvips will not auto-rotate the
+			// EXIF-only orientation while resizing.
+			const thumbnailCall = sideloadedSize(
+				addSideloadItem,
+				'thumbnail'
+			);
+			expect( thumbnailCall ).toBeDefined();
+			expect( thumbnailCall[ 0 ].file.name ).toBe( 'photo.avif' );
+			expect( await thumbnailCall[ 0 ].file.text() ).toBe( 'rotated' );
+		} );
+
+		it( 'continues thumbnail generation when rotation fails', async () => {
+			const warnSpy = vi
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
+			vipsRotateImage.mockRejectedValue( new Error( 'decode failed' ) );
+
+			const item = makeItem( {
+				exif_orientation: 6,
+				missing_image_sizes: [ 'thumbnail' ],
+			} );
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			try {
+				await generateThumbnails( item.id )( { select, dispatch } );
+
+				expect( warnSpy ).toHaveBeenCalledWith(
+					'Failed to rotate image, continuing with thumbnails'
+				);
+				expect(
+					sideloadedSize( addSideloadItem, 'original' )
+				).toBeUndefined();
+				expect(
+					sideloadedSize( addSideloadItem, 'thumbnail' )
+				).toBeDefined();
+			} finally {
+				warnSpy.mockRestore();
+			}
+		} );
+	} );
+
+	describe( 'uploadItem', () => {
+		it( 'flags the transport call so consumers skip their own lifecycle handling', async () => {
+			// The queue already counts its items for progress UI; the
+			// `mediaUpload` callback it delegates the server upload to must
+			// not count the same file again (see gutenberg#80369).
+			const mediaUpload = vi.fn();
+			const file = new File( [ 'content' ], 'photo.jpg', {
+				type: 'image/jpeg',
+			} );
+			const item = { id: 'item-1', file, additionalData: {} };
+
+			const dispatch = vi.fn();
+			dispatch.finishOperation = vi.fn();
+			dispatch.cancelItem = vi.fn();
+
+			await uploadItem( 'item-1' )( {
+				select: {
+					getItem: () => item,
+					getSettings: () => ( { mediaUpload } ),
+				},
+				dispatch,
+			} );
+
+			expect( mediaUpload ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					filesList: [ file ],
+					isTransportOnly: true,
+				} )
+			);
+		} );
+	} );
+
 	describe( 'removeItem worker teardown', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		const runRemove = async ( remaining ) =>
@@ -1208,7 +1615,7 @@ describe( 'private actions', () => {
 					getItem: () => ( {} ),
 					getAllItems: () => remaining,
 				},
-				dispatch: jest.fn(),
+				dispatch: vi.fn(),
 			} );
 
 		it( 'terminates both background workers once the queue empties', async () => {

@@ -1,10 +1,9 @@
 import { FORMAT_ID } from '@terrazzo/plugin-css';
 import type { Plugin } from '@terrazzo/parser';
 import { ColorSpace, to, get, OKLCH, sRGB } from 'colorjs.io/fn';
-
-import colorTokens from '../../src/prebuilt/ts/color-tokens';
-import { DEFAULT_RAMPS } from '../../src/color-ramps/lib/default-ramps';
-import { DEFAULT_SEED_COLORS } from '../../src/color-ramps/lib/constants';
+import colorTokens from '../../src/prebuilt/ts/color-tokens.ts';
+import { DEFAULT_RAMPS } from '../../src/color-ramps/lib/default-ramps.ts';
+import { DEFAULT_SEED_COLORS } from '../../src/color-ramps/lib/constants.ts';
 
 const WP_ADMIN_THEME_COLOR_VAR = '--wp-admin-theme-color';
 const PRIMARY_SEED = DEFAULT_SEED_COLORS.primary;
@@ -227,10 +226,17 @@ export function formatDesignTokenFallbacksScss(
 	].join( '\n' );
 }
 
+type PluginDsTokenFallbacksOptions = {
+	filename?: string;
+	scssFilename?: string | false;
+	additionalScssFilenames?: string[];
+};
+
 export default function pluginDsTokenFallbacks( {
 	filename = 'js/design-token-fallbacks.mjs',
 	scssFilename = 'scss/design-token-fallbacks.scss',
-} = {} ): Plugin {
+	additionalScssFilenames = [],
+}: PluginDsTokenFallbacksOptions = {} ): Plugin {
 	return {
 		name: '@wordpress/terrazzo-plugin-ds-token-fallbacks',
 		async build( { getTransforms, outputFile } ) {
@@ -337,10 +343,15 @@ export default function pluginDsTokenFallbacks( {
 					'\n'
 			);
 
-			outputFile(
-				scssFilename,
-				formatDesignTokenFallbacksScss( sorted )
-			);
+			const scssFilenames = [
+				...( scssFilename ? [ scssFilename ] : [] ),
+				...additionalScssFilenames,
+			];
+
+			const scss = formatDesignTokenFallbacksScss( sorted );
+			for ( const currentScssFilename of scssFilenames ) {
+				outputFile( currentScssFilename, scss );
+			}
 		},
 	};
 }

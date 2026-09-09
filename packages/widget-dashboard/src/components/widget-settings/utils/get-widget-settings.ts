@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { sprintf, __ } from '@wordpress/i18n';
 import type { WidgetType } from '@wordpress/widget-primitives';
 

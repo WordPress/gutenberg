@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { FormTokenFieldProps } from '../form-token-field/types';
 import type { TreeSelectProps } from '../tree-select/types';
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useCallback, useEffect, useRef } from '@wordpress/element';
 import {
 	Button,
@@ -24,10 +17,6 @@ import {
 	cloudUpload,
 	download as downloadIcon,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { Cropper } from '../react/components/cropper';
 import { useCropperReducer } from '../react/hooks/use-cropper-reducer';
 import {
@@ -159,6 +148,11 @@ const DefaultComponent = () => {
 };
 
 export const Default: Story = {
+	parameters: {
+		// FIXME: Image credit text and its link fail color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: DefaultComponent,
 };
 
@@ -395,7 +389,6 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
 							label="Aspect ratio"
 							hideLabelFromVision
 							value={ aspectRatioValue }
@@ -417,7 +410,6 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
 							label="Grid"
 							hideLabelFromVision
 							value={ gridMode }
@@ -524,6 +516,11 @@ const WithControlsComponent = () => {
 };
 
 export const WithControls: Story = {
+	parameters: {
+		// FIXME: The state dump scrolls once its content overflows, and is not keyboard-accessible (scrollable-region-focusable). Whether it overflows depends on the numbers rendered, so this appears intermittently.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: WithControlsComponent,
 };
 
@@ -829,7 +826,6 @@ const DebugComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
 							label="Format"
 							hideLabelFromVision
 							value={ exportFormat as 'image/jpeg' }
@@ -1067,5 +1063,10 @@ aspect ratio: ${ ( sourceRegion.width / sourceRegion.height ).toFixed( 2 ) }
 };
 
 export const Debug: Story = {
+	parameters: {
+		// FIXME: Image credit text and its link fail color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: DebugComponent,
 };

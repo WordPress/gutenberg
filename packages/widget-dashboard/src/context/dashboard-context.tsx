@@ -1,12 +1,6 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
+import { debounce, useEvent } from '@wordpress/compose';
 import {
 	createContext,
 	useCallback,
@@ -19,20 +13,18 @@ import type {
 	ResolveWidgetModule,
 	WidgetType,
 } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
+import { canonicalizeLayout } from '../utils/canonicalize-layout';
 import { DEFAULT_GRID } from '../utils/default-grid';
-import { computeGridModelChange } from '../utils/grid-model-change';
+import { enforceLayoutPolicy } from '../utils/enforce-layout-policy';
 import { normalizeGridSettings } from '../utils/normalize-grid-settings';
+import { resolveDashboardColumnCap } from '../utils/resolve-dashboard-column-count/resolve-dashboard-column-count';
 import { DEFAULT_ROW_HEIGHT } from '../utils/row-height-presets';
+import { useDashboardPolicy } from '../components/dashboard-policy';
 import type {
-	WidgetGridModel,
+	CanPerformDashboardOperation,
 	WidgetGridSettings,
 	DashboardWidget,
 } from '../types';
-import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../types';
 
 type GridSettingsWithColumns = WidgetGridSettings & { columns: number };
 
@@ -42,48 +34,26 @@ function resolveGridSettings(
 	const normalized = normalizeGridSettings( settings, DEFAULT_ROW_HEIGHT );
 	return {
 		...normalized,
-		columns: WIDGET_DASHBOARD_COLUMN_COUNT,
+		columns: resolveDashboardColumnCap( normalized.columns ),
 	};
 }
 
 const DEFAULT_RESOLVE_WIDGET_MODULE: ResolveWidgetModule = ( moduleId ) =>
-	import( /* webpackIgnore: true */ moduleId );
+	import( /* webpackIgnore: true */ /* @vite-ignore */ moduleId );
 
 /**
- * Canonical form of `layout`: widgets sorted by `placement.order` (falling
- * back to array index), then `order` stripped since position now implies it.
- * Used both as the comparison form for `hasUncommittedChanges` (so a change
- * and its undo compare equal) and as the publish form, keeping persisted
- * payloads free of redundant `order` fields.
- *
- * @param {DashboardWidget[]} layout Layout to canonicalize.
- * @return {DashboardWidget[]} Canonicalized layout.
+ * Inline widget-instance edits stage live, then publish once the user pauses.
+ * A single global timer, so editing several widgets settles into one save.
  */
-function canonicalize( layout: DashboardWidget[] ): DashboardWidget[] {
-	const indexed = layout.map( ( widget, index ) => ( {
-		widget,
-		order: widget.placement?.order ?? index,
-	} ) );
-
-	indexed.sort( ( a, b ) => a.order - b.order );
-
-	return indexed.map( ( { widget } ) => {
-		if ( ! widget.placement ) {
-			return widget;
-		}
-		const { order: _stripped, ...placement } = widget.placement;
-		return { ...widget, placement };
-	} );
-}
+const AUTO_SAVE_DELAY_MS = 5000;
 
 /**
  * Rich state distributed to every compound component inside `WidgetDashboard`.
  * Internal — compounds reach the full state via `useDashboardInternalContext()`.
  *
- * `layout`/`onLayoutChange` and `gridSettings`/`onGridSettingsChange` here
- * operate on the staging layer, not the committed props. Mutations from
- * compound children stay in staging until `commit` publishes them on the
- * consumer.
+ * `layout`/`onLayoutChange` here operate on the staging layer, not the
+ * committed props. Mutations from compound children stay in staging until
+ * `commit` publishes them on the consumer.
  */
 interface InternalDashboardContextValue {
 	widgetTypes: WidgetType[];
@@ -92,53 +62,49 @@ interface InternalDashboardContextValue {
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
 	onLayoutReset?: () => void;
 	gridSettings: GridSettingsWithColumns;
-	onGridSettingsChange: ( gridSettings: WidgetGridSettings ) => void;
-	canEditGridSettings: boolean;
 
 	/**
-	 * Restores the staging copy of `gridSettings` to the package's
-	 * built-in defaults. Does not touch the committed slice; the user
-	 * must `commit` to publish the reset, or `cancel` to discard it.
-	 */
-	resetGridSettings: () => void;
-
-	/**
-	 * Publishes staged slices that differ from their committed
-	 * counterparts. By default also exits edit mode; pass
-	 * `{ exitEditMode: false }` when committing from the layout
-	 * settings drawer so customize mode stays active.
+	 * Publishes the staged layout when it differs from the committed
+	 * prop. By default also exits edit mode; pass `{ exitEditMode: false }`
+	 * for inline auto-saves that keep the current mode.
 	 */
 	commit: ( options?: CommitOptions ) => void;
 
 	/**
-	 * Switches the layout model, updates staging, and publishes
-	 * immediately — equivalent to changing the model in layout
-	 * settings and clicking Save.
+	 * Reverts the staged layout and exits edit mode.
 	 */
-	commitGridModelChange: ( targetModel: WidgetGridModel ) => void;
+	cancel: () => void;
 
 	/**
-	 * Reverts staging slices. By default reverts both layout and grid
-	 * settings and exits edit mode. Pass `{ exitEditMode: false }` when
-	 * dismissing the layout settings drawer. Pass `{ revertLayout: false }`
-	 * to revert only grid settings (preserves in-progress widget layout
-	 * edits while customize mode is active).
+	 * Debounced auto-save for inline widget-instance edits. Controls call it
+	 * after staging a change; a single global timer publishes once the edits
+	 * settle. The settings drawer does not use it (it commits on Save).
 	 */
-	cancel: ( options?: CancelOptions ) => void;
+	scheduleAutoSave: () => void;
+
+	/**
+	 * Publishes any pending auto-save immediately. Called when leaving the
+	 * inline surface (opening the drawer, entering customize) so staged inline
+	 * edits do not commingle with the drawer's explicit-save flow.
+	 */
+	flushAutoSave: () => void;
 
 	hasUncommittedChanges: boolean;
 	editMode: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	resolveWidgetModule: ResolveWidgetModule;
+
+	/**
+	 * Resolved policy. Every compound asks here, never the policy provider,
+	 * so further policy sources compose at this single point.
+	 */
+	canPerform: CanPerformDashboardOperation;
 }
+
+const ALLOW_EVERY_OPERATION: CanPerformDashboardOperation = () => true;
 
 interface CommitOptions {
 	exitEditMode?: boolean;
-}
-
-interface CancelOptions {
-	exitEditMode?: boolean;
-	revertLayout?: boolean;
 }
 
 const Context = createContext< InternalDashboardContextValue | null >( null );
@@ -184,21 +150,15 @@ interface ProviderProps {
 
 	gridSettings?: WidgetGridSettings;
 
-	/**
-	 * Fired on commit when the staged settings differ from
-	 * `gridSettings`.
-	 */
-	onGridSettingsChange?: ( gridSettings: WidgetGridSettings ) => void;
-
 	children: ReactNode;
 }
 
 /**
- * Provider for the dashboard's staging layer. Owns staging copies of
- * `layout` and `gridSettings`; `commit` publishes whichever slice
- * differs from its committed prop, `cancel` reverts both.
+ * Provider for the dashboard's staging layer. Owns the staging copy of
+ * `layout`; `commit` publishes it when it differs from the committed
+ * prop, `cancel` reverts it.
  *
- * Staging re-syncs from the committed props on prop change. In-flight
+ * Staging re-syncs from the committed prop on prop change. In-flight
  * edits are dropped silently when an external update (cross-tab commit,
  * reset, websocket push) lands. Consumers that cannot tolerate this
  * loss should mediate the prop updates before forwarding them here.
@@ -215,11 +175,44 @@ export function WidgetDashboardProvider( {
 	onEditChange,
 	resolveWidgetModule = DEFAULT_RESOLVE_WIDGET_MODULE,
 	gridSettings: committedGridSettings = DEFAULT_GRID,
-	onGridSettingsChange,
 	children,
 }: ProviderProps ): React.ReactNode {
 	const [ stagingLayout, setStagingLayout ] =
 		useState< DashboardWidget[] >( committedLayout );
+
+	const policy = useDashboardPolicy();
+
+	// Normalized once, so every surface reads a boolean: an `undefined`
+	// answer denies everywhere instead of hiding the controls while the grid
+	// still lets the tile drag and resize.
+	const canPerform = useMemo< CanPerformDashboardOperation >(
+		() =>
+			policy
+				? ( request ) => !! policy( request )
+				: ALLOW_EVERY_OPERATION,
+		[ policy ]
+	);
+
+	// Every mutation stages through here, diffed against the current
+	// staging so every change the policy denies is re-asserted before it
+	// lands: what the interface hides, the staging layer rejects. Without
+	// a policy there is nothing to enforce, and staging stays byte-equal
+	// to what the trigger wrote.
+	const stageLayout = useCallback(
+		( next: DashboardWidget[] ) => {
+			setStagingLayout( ( previous ) =>
+				canPerform === ALLOW_EVERY_OPERATION
+					? next
+					: enforceLayoutPolicy( {
+							previous,
+							next,
+							canPerform,
+							widgetTypes,
+					  } )
+			);
+		},
+		[ canPerform, widgetTypes ]
+	);
 
 	// External change in `layout` (consumer-side reset, cross-tab sync,
 	// websocket push, etc.) drops any in-flight staging edits without
@@ -228,112 +221,75 @@ export function WidgetDashboardProvider( {
 		setStagingLayout( committedLayout );
 	}, [ committedLayout ] );
 
-	const [ stagingGridSettings, setStagingGridSettings ] =
-		useState< WidgetGridSettings >( () =>
-			normalizeGridSettings( committedGridSettings, DEFAULT_ROW_HEIGHT )
-		);
-
-	// Same external-resync semantics as `stagingLayout`.
-	useEffect( () => {
-		setStagingGridSettings(
-			normalizeGridSettings( committedGridSettings, DEFAULT_ROW_HEIGHT )
-		);
-	}, [ committedGridSettings ] );
+	const gridSettings = useMemo(
+		() => resolveGridSettings( committedGridSettings ),
+		[ committedGridSettings ]
+	);
 
 	const hasLayoutChanges = useMemo(
 		() =>
 			! fastDeepEqual(
-				canonicalize( committedLayout ),
-				canonicalize( stagingLayout )
+				canonicalizeLayout( committedLayout ),
+				canonicalizeLayout( stagingLayout )
 			),
 		[ committedLayout, stagingLayout ]
 	);
 
-	const hasGridSettingsChanges = useMemo(
-		() => ! fastDeepEqual( committedGridSettings, stagingGridSettings ),
-		[ committedGridSettings, stagingGridSettings ]
-	);
-
-	const hasUncommittedChanges = hasLayoutChanges || hasGridSettingsChanges;
+	const hasUncommittedChanges = hasLayoutChanges;
 
 	const commit = useCallback(
 		( options?: CommitOptions ) => {
 			if ( hasLayoutChanges ) {
-				onLayoutChange( canonicalize( stagingLayout ) );
-			}
-
-			if ( hasGridSettingsChanges ) {
-				onGridSettingsChange?.(
-					normalizeGridSettings(
-						stagingGridSettings,
-						DEFAULT_ROW_HEIGHT
-					)
-				);
+				onLayoutChange( canonicalizeLayout( stagingLayout ) );
 			}
 
 			if ( options?.exitEditMode !== false ) {
 				onEditChange?.( false );
 			}
 		},
-		[
-			hasLayoutChanges,
-			hasGridSettingsChanges,
-			onLayoutChange,
-			onGridSettingsChange,
-			stagingLayout,
-			stagingGridSettings,
-			onEditChange,
-		]
+		[ hasLayoutChanges, onLayoutChange, stagingLayout, onEditChange ]
 	);
 
-	const cancel = useCallback(
-		( options?: CancelOptions ) => {
-			if ( options?.revertLayout !== false ) {
-				setStagingLayout( committedLayout );
-			}
-			setStagingGridSettings( committedGridSettings );
-			if ( options?.exitEditMode !== false ) {
-				onEditChange?.( false );
-			}
-		},
-		[ committedLayout, committedGridSettings, onEditChange ]
+	// Auto-save for inline edits.
+	// A single debounced timer publishes through `useEvent`, so it always
+	// reads the latest `commit` (and so the current staging) without
+	// resetting on staging re-renders.
+	const publishAutoSave = useEvent( () => commit( { exitEditMode: false } ) );
+
+	const scheduleAutoSave = useMemo(
+		() => debounce( publishAutoSave, AUTO_SAVE_DELAY_MS ),
+		[ publishAutoSave ]
 	);
 
-	const commitGridModelChange = useCallback(
-		( targetModel: WidgetGridModel ) => {
-			const next = computeGridModelChange( {
-				layout: stagingLayout,
-				gridSettings: stagingGridSettings,
-				targetModel,
-			} );
-
-			if ( ! next ) {
-				return;
-			}
-
-			setStagingLayout( next.layout );
-			setStagingGridSettings( next.gridSettings );
-			onLayoutChange( canonicalize( next.layout ) );
-			onGridSettingsChange?.(
-				normalizeGridSettings( next.gridSettings, DEFAULT_ROW_HEIGHT )
-			);
-			onEditChange?.( false );
-		},
-		[
-			stagingLayout,
-			stagingGridSettings,
-			onLayoutChange,
-			onGridSettingsChange,
-			onEditChange,
-		]
+	const flushAutoSave = useCallback(
+		() => scheduleAutoSave.flush(),
+		[ scheduleAutoSave ]
 	);
 
-	const resetGridSettings = useCallback( () => {
-		setStagingGridSettings( DEFAULT_GRID );
-	}, [] );
+	// Entering customize flushes any pending inline save first, so it does not
+	// commingle with the layout edit flow.
+	useEffect( () => {
+		if ( ! editMode ) {
+			return;
+		}
+
+		scheduleAutoSave.flush();
+	}, [ editMode, scheduleAutoSave ] );
+
+	// Flush, not cancel, on unmount: an edit still inside the debounce window
+	// must persist when the user navigates away from the dashboard.
+	useEffect( () => () => scheduleAutoSave.flush(), [ scheduleAutoSave ] );
+
+	const cancel = useCallback( () => {
+		setStagingLayout( committedLayout );
+		onEditChange?.( false );
+	}, [ committedLayout, onEditChange ] );
 
 	useEffect( () => {
-		if ( stagingLayout.length === 0 ) {
+		if (
+			stagingLayout.length === 0 &&
+			canPerform( { operation: 'customize' } )
+		) {
 			onEditChange?.( true );
 		}
 
@@ -343,42 +299,40 @@ export function WidgetDashboardProvider( {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ stagingLayout.length === 0 ] );
 
-	const canEditGridSettings = onGridSettingsChange !== undefined;
-
 	const value = useMemo< InternalDashboardContextValue >(
 		() => ( {
 			widgetTypes,
 			isResolvingWidgetTypes,
 			layout: stagingLayout,
-			onLayoutChange: setStagingLayout,
+			onLayoutChange: stageLayout,
 			onLayoutReset,
-			gridSettings: resolveGridSettings( stagingGridSettings ),
-			onGridSettingsChange: setStagingGridSettings,
-			canEditGridSettings,
-			resetGridSettings,
+			gridSettings,
 			commit,
-			commitGridModelChange,
 			cancel,
+			scheduleAutoSave,
+			flushAutoSave,
 			hasUncommittedChanges,
 			editMode,
 			onEditChange,
 			resolveWidgetModule,
+			canPerform,
 		} ),
 		[
 			widgetTypes,
 			isResolvingWidgetTypes,
 			stagingLayout,
+			stageLayout,
 			onLayoutReset,
-			stagingGridSettings,
-			canEditGridSettings,
-			resetGridSettings,
+			gridSettings,
 			commit,
-			commitGridModelChange,
 			cancel,
+			scheduleAutoSave,
+			flushAutoSave,
 			hasUncommittedChanges,
 			editMode,
 			onEditChange,
 			resolveWidgetModule,
+			canPerform,
 		]
 	);
 

@@ -61,7 +61,7 @@ class Gutenberg_Guideline_Scopes_Controller_Test extends WP_Test_REST_TestCase {
 
 		$data  = $response->get_data();
 		$slugs = wp_list_pluck( $data, 'slug' );
-		$this->assertSame( array( 'site', 'copy', 'images', 'additional' ), $slugs );
+		$this->assertSame( array( 'site', 'copy', 'images', 'blocks', 'additional' ), $slugs );
 
 		$this->assertArrayHasKey( 'title', $data[0] );
 		$this->assertArrayHasKey( 'description', $data[0] );
@@ -93,5 +93,26 @@ class Gutenberg_Guideline_Scopes_Controller_Test extends WP_Test_REST_TestCase {
 		remove_filter( 'wp_guideline_scopes', $callback );
 
 		$this->assertContains( 'custom', $slugs );
+	}
+
+	/**
+	 * The `wp_guideline_scopes` filter can remove a default scope, so a plugin
+	 * can drop the Blocks section from the Settings page entirely.
+	 */
+	public function test_filter_removes_scope() {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter(
+			'wp_guideline_scopes',
+			static function ( $scopes ) {
+				unset( $scopes['blocks'] );
+				return $scopes;
+			}
+		);
+
+		$data  = rest_get_server()->dispatch( new WP_REST_Request( 'GET', '/wp/v2/knowledge/guideline-scopes' ) )->get_data();
+		$slugs = wp_list_pluck( $data, 'slug' );
+
+		$this->assertNotContains( 'blocks', $slugs );
 	}
 }

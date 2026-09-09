@@ -1,0 +1,44 @@
+.scrollable {
+	height: 100%;
+
+	@media only screen and (min-device-width: 40em) {
+		&::-webkit-scrollbar {
+			height: 12px;
+			width: 12px;
+		}
+
+		&::-webkit-scrollbar-track {
+			background: rgba(0, 0, 0, 0.04);
+			border-radius: 8px;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background-clip: padding-box;
+			background-color: rgba(0, 0, 0, 0.2);
+			border: 2px solid rgba(0, 0, 0, 0);
+			border-radius: 7px;
+		}
+
+		&:hover::-webkit-scrollbar-thumb {
+			background-color: rgba(0, 0, 0, 0.5);
+		}
+	}
+}
+
+.smooth-scroll {
+	scroll-behavior: smooth;
+}
+
+.scroll-x {
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+.scroll-y {
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.scroll-auto {
+	overflow-y: auto;
+}

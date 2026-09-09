@@ -1,15 +1,8 @@
-/**
- * External dependencies
- */
 import { readFile } from 'fs/promises';
 import { basename } from 'path';
 import { getType } from 'mime';
-
-/**
- * Internal dependencies
- */
-import type { PageUtils } from './index';
 import type { Locator } from '@playwright/test';
+import type { PageUtils } from './index';
 
 type FileObject = {
 	name: string;

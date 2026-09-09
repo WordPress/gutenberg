@@ -120,6 +120,13 @@ drawer.
 -   Type: `Function`
 -   Required: No
 
+### additionalControls
+
+Elements rendered in a row below the URL input. They are hidden while the settings drawer is open.
+
+-   Type: `Element`
+-   Required: No
+
 ## Useful UI pieces
 
 The URLPopover exposes two components that may be used as child components to make the UI creation process easier.

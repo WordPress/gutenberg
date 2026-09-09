@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { _x } from '@wordpress/i18n';
 
 export const DEFAULT_MEDIA_SIZE_SLUG = 'full';

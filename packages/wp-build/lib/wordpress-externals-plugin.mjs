@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import { writeFile, mkdir, readFile } from 'fs/promises';
 import path from 'path';
-import { camelCase } from 'change-case';
 import { createHash } from 'crypto';
-
-/**
- * Internal dependencies
- */
+import { camelCase } from 'change-case';
 import { getPackageInfo } from './package-utils.mjs';
 
 /**

@@ -1,13 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
 import { Mark, MarkLabel } from './styles/range-control-styles';
-
 import type { RangeMarkProps } from './types';
 import type { WordPressComponentProps } from '../context';
 

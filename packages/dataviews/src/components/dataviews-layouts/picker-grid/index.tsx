@@ -1,28 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
-import {
-	Spinner,
-	Flex,
-	FlexItem,
-	privateApis as componentsPrivateApis,
-	Composite,
-} from '@wordpress/components';
+import { Spinner, Flex, FlexItem, Composite } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { useContext, useRef } from '@wordpress/element';
-import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../../lock-unlock';
+import { Badge, Stack } from '@wordpress/ui';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import DataViewsContext from '../../dataviews-context';
 import { useIsMultiselectPicker } from '../../dataviews-picker-footer';
@@ -33,8 +15,9 @@ import type {
 } from '../../../types';
 import type { SetSelection } from '../../../types/private';
 import { GridItems } from '../utils/grid-items';
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 import getDataByGroup from '../utils/get-data-by-group';
+import useSelectionProps from '../utils/use-selection-props';
+import type { SelectionProps } from '../utils/use-selection-props';
 import { useGridColumns } from '../grid/preview-size-picker';
 import {
 	useIntersectionObserver,
@@ -43,9 +26,9 @@ import {
 
 interface GridItemProps< Item > {
 	view: ViewPickerGridType;
-	multiselect?: boolean;
 	selection: string[];
 	onChangeSelection: SetSelection;
+	selectionProps: SelectionProps;
 	getItemId: ( item: Item ) => string;
 	item: Item;
 	titleField?: NormalizedField< Item >;
@@ -62,9 +45,9 @@ interface GridItemProps< Item > {
 
 function GridItem< Item >( {
 	view,
-	multiselect,
 	selection,
 	onChangeSelection,
+	selectionProps,
 	getItemId,
 	item,
 	mediaField,
@@ -115,19 +98,7 @@ function GridItem< Item >( {
 				'is-selected': isSelected,
 			} ) }
 			aria-selected={ isSelected }
-			onClick={ () => {
-				// Toggle in/out of selection array
-				if ( isSelected ) {
-					onChangeSelection(
-						selection.filter( ( itemId ) => id !== itemId )
-					);
-				} else {
-					const newSelection = multiselect
-						? [ ...selection, id ]
-						: [ id ];
-					onChangeSelection( newSelection );
-				}
-			} }
+			{ ...selectionProps }
 		>
 			{ showMedia && renderedMediaField && (
 				<div className="dataviews-view-picker-grid__media">
@@ -175,7 +146,8 @@ function GridItem< Item >( {
 					>
 						{ badgeFields.map( ( field ) => {
 							return (
-								<WCBadge
+								/* @ts-expect-error `Badge` is text-only, but a badge field renders whatever its `render` returns. */
+								<Badge
 									key={ field.id }
 									className="dataviews-view-picker-grid__field-value"
 								>
@@ -183,7 +155,7 @@ function GridItem< Item >( {
 										item={ item }
 										field={ field }
 									/>
-								</WCBadge>
+								</Badge>
 							);
 						} ) }
 					</Stack>
@@ -333,9 +305,28 @@ function ViewPickerGrid< Item >( {
 	const isInfiniteScroll =
 		( view.infiniteScrollEnabled && ! dataByGroup ) ?? false;
 
+	const orderedData = dataByGroup
+		? Array.from( dataByGroup.values() ).flat()
+		: data;
+	const { getSelectionProps } = useSelectionProps( {
+		data: orderedData,
+		getItemId,
+		isItemSelectable: () => true,
+		selection,
+		onChangeSelection,
+		selectionMode: isMultiselect ? 'multi' : 'single-clearable',
+		shouldSelectOnClick: true,
+	} );
+
 	const currentPage = view?.page ?? 1;
 	const perPage = view?.perPage ?? 0;
 	const setSize = isInfiniteScroll ? paginationInfo?.totalItems : undefined;
+
+	// Consumer-configured fill for item previews, surfaced as a class rather
+	// than a custom property because it switches the preview box's background
+	// token as well as its `object-fit`. Anything other than `contain` (an
+	// unsupported value included) leaves the previews cropped.
+	const isMediaContain = view.layout?.mediaFit === 'contain';
 
 	// Calculate placeholders needed for infinite scroll
 	const gridColumns = useGridColumns();
@@ -364,6 +355,7 @@ function ViewPickerGrid< Item >( {
 									[ 'compact', 'comfortable' ].includes(
 										view.layout.density
 									),
+								'has-media-fit-contain': isMediaContain,
 							}
 						) }
 						aria-label={ itemListLabel }
@@ -388,11 +380,6 @@ function ViewPickerGrid< Item >( {
 								>
 									<GridItems
 										previewSize={ usedPreviewSize }
-										style={ {
-											gridTemplateColumns:
-												usedPreviewSize &&
-												`repeat(auto-fill, minmax(${ usedPreviewSize }px, 1fr))`,
-										} }
 										aria-busy={ isLoading }
 										ref={
 											resizeObserverRef as React.RefObject< HTMLDivElement >
@@ -409,13 +396,13 @@ function ViewPickerGrid< Item >( {
 												<GridItem
 													key={ getItemId( item ) }
 													view={ view }
-													multiselect={
-														isMultiselect
-													}
 													selection={ selection }
 													onChangeSelection={
 														onChangeSelection
 													}
+													selectionProps={ getSelectionProps(
+														getItemId( item )
+													) }
 													getItemId={ getItemId }
 													item={ item }
 													mediaField={ mediaField }
@@ -459,6 +446,7 @@ function ViewPickerGrid< Item >( {
 												'compact',
 												'comfortable',
 											].includes( view.layout.density ),
+										'has-media-fit-contain': isMediaContain,
 									}
 								) }
 								previewSize={ usedPreviewSize }
@@ -501,9 +489,11 @@ function ViewPickerGrid< Item >( {
 								<GridItem
 									key={ getItemId( item ) }
 									view={ view }
-									multiselect={ isMultiselect }
 									selection={ selection }
 									onChangeSelection={ onChangeSelection }
+									selectionProps={ getSelectionProps(
+										getItemId( item )
+									) }
 									getItemId={ getItemId }
 									item={ item }
 									mediaField={ mediaField }

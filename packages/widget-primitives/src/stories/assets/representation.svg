@@ -1,4 +1,4 @@
-<svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The attributes are a contract both sides write. The render module reads them to produce the widget output; the widget asks for changes through setAttributes, and the host edits them through a settings form built from the schema. Only the widget gives the values meaning.">
+<svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The attributes are a contract both sides write. The render module reads them to produce the widget output; the widget asks for changes through setAttributes, and the host edits them through a settings surface built from the schema. Only the widget gives the values meaning.">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
@@ -10,9 +10,9 @@
   <!-- Caption -->
   <text x="380" y="38" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="12.5" font-weight="700" fill="#334155">Both sides write the attributes; only the widget gives them meaning.</text>
 
-  <!-- Host settings form (a write source) -->
+  <!-- Host settings surface (a write source) -->
   <rect x="44" y="112" width="156" height="76" rx="9" fill="#fafbfc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5"/>
-  <text x="122" y="130" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#64748b">host settings form</text>
+  <text x="122" y="130" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#64748b">host settings surface</text>
   <rect x="60" y="140" width="124" height="14" rx="3" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2"/>
   <rect x="60" y="162" width="124" height="14" rx="3" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2"/>
 
@@ -33,7 +33,7 @@
   <line x1="460" y1="140" x2="562" y2="140" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
   <text x="511" y="131" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#94a3b8">render module</text>
 
-  <!-- WRITE (host): the settings form edits the values -->
+  <!-- WRITE (host): the settings surface edits the values -->
   <line x1="200" y1="150" x2="296" y2="150" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
   <text x="248" y="141" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#94a3b8">host edits</text>
 

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/e2e-test-utils-playwright",
-	"version": "1.49.0",
+	"version": "1.54.0",
 	"description": "End-To-End (E2E) test utils for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,7 +21,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
+		"node": ">=22.19.0",
 		"npm": ">=8.19.2"
 	},
 	"files": [
@@ -39,17 +39,17 @@
 	"dependencies": {
 		"change-case": "^4.1.2",
 		"get-port": "^5.1.1",
-		"lighthouse": "^12.2.2",
+		"lighthouse": "^13.4.1",
 		"mime": "^3.0.0",
-		"web-vitals": "^4.2.1"
+		"web-vitals": "^4.2.4"
 	},
 	"devDependencies": {
 		"@types/mime": "^2.0.3",
-		"@types/node": "^20.19.39"
+		"@types/node": "^24.13.3"
 	},
 	"peerDependencies": {
 		"@playwright/test": ">=1",
-		"@types/node": "^20.17.10"
+		"@types/node": ">=20"
 	},
 	"publishConfig": {
 		"access": "public"

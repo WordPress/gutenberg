@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { readFileSync } from 'fs';
 import { join } from 'path';
-
-/**
- * WordPress dependencies
- */
 import { test as base, expect } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * Internal dependencies
- */
 import { setCollaboration } from './fixtures/collaboration-utils';
 
 const STEP1_CONTENT = readFileSync(

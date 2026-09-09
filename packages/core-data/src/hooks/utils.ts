@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import type { ResolutionStatus } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { Status } from './constants';
 
 /**

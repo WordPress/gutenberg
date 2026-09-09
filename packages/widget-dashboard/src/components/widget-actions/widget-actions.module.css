@@ -1,0 +1,7 @@
+.widget-actions {
+	display: inline-flex;
+}
+
+.widget-action-items .widget-action-link {
+	display: inline-flex;
+}

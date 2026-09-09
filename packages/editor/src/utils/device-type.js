@@ -1,7 +1,19 @@
-/**
- * Internal dependencies
- */
-import { DEVICE_TYPES } from '../store/constants';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import { unlock } from '../lock-unlock';
+
+const { getViewportBreakpoints, getViewportBreakpointValueInPixels } = unlock(
+	globalStylesEnginePrivateApis
+);
+
+const VIEWPORT_KEY_BY_DEVICE_TYPE = {
+	Tablet: 'tablet',
+	Mobile: 'mobile',
+};
+
+const DESKTOP_DEVICE_TYPE = 'Desktop';
+const TABLET_DEVICE_TYPE = 'Tablet';
+const MOBILE_DEVICE_TYPE = 'Mobile';
+const DEVICE_PREVIEW_WIDTH_OFFSET = 1;
 
 /**
  * Maps a device preview type to its corresponding viewport style state. Used
@@ -19,28 +31,66 @@ export const VIEWPORT_STATE_BY_DEVICE_TYPE = {
 /**
  * Gets the most appropriate device type based on the canvas width.
  *
- * @param {number} canvasWidth The canvas width in pixels.
+ * @param {number|string|undefined} canvasWidth      The canvas width.
+ * @param {Object}                  viewportSettings Optional viewport breakpoint settings.
  * @return {string} The device type.
  */
-export function getDeviceTypeByCanvasWidth( canvasWidth ) {
+export function getDeviceTypeByCanvasWidth( canvasWidth, viewportSettings ) {
+	const width = getViewportBreakpointValueInPixels( canvasWidth );
+	const breakpoints = getViewportBreakpoints( viewportSettings );
+
 	// Mobile
-	if ( canvasWidth && canvasWidth <= DEVICE_TYPES.Mobile.canvasWidth ) {
-		return DEVICE_TYPES.Mobile.value;
+	if (
+		width &&
+		width <= getViewportBreakpointValueInPixels( breakpoints.mobile )
+	) {
+		return MOBILE_DEVICE_TYPE;
 	}
 	// Tablet
-	if ( canvasWidth && canvasWidth <= DEVICE_TYPES.Tablet.canvasWidth ) {
-		return DEVICE_TYPES.Tablet.value;
+	if (
+		width &&
+		width <= getViewportBreakpointValueInPixels( breakpoints.tablet )
+	) {
+		return TABLET_DEVICE_TYPE;
 	}
 	// Desktop
-	return DEVICE_TYPES.Desktop.value;
+	return DESKTOP_DEVICE_TYPE;
 }
 
 /**
- * Get the canvas width by device type.
+ * Gets the canvas width for a device preview. The preview is inset from its
+ * breakpoint to avoid browser zoom rounding the iframe viewport outside the
+ * intended media query.
  *
- * @param {string} deviceType The device type.
- * @return {number|undefined} The canvas width in pixels.
+ * @param {string} deviceType       The device type.
+ * @param {Object} viewportSettings Optional viewport breakpoint settings.
+ * @return {number|undefined} The device preview width in pixels.
  */
-export function getCanvasWidthByDeviceType( deviceType ) {
-	return DEVICE_TYPES[ deviceType ]?.canvasWidth;
+export function getCanvasWidthByDeviceType( deviceType, viewportSettings ) {
+	const viewportKey = VIEWPORT_KEY_BY_DEVICE_TYPE[ deviceType ];
+
+	if ( ! viewportKey ) {
+		return undefined;
+	}
+
+	const breakpoints = getViewportBreakpoints( viewportSettings );
+	const width = getViewportBreakpointValueInPixels(
+		breakpoints[ viewportKey ]
+	);
+
+	if ( width === undefined ) {
+		return undefined;
+	}
+
+	let lowerBreakpoint = 0;
+	if ( deviceType === TABLET_DEVICE_TYPE ) {
+		lowerBreakpoint =
+			getViewportBreakpointValueInPixels( breakpoints.mobile ) ?? 0;
+	}
+	const offset = Math.min(
+		DEVICE_PREVIEW_WIDTH_OFFSET,
+		( width - lowerBreakpoint ) / 2
+	);
+
+	return width - offset;
 }

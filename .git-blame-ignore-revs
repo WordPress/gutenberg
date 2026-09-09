@@ -21,3 +21,6 @@ c56e8a1910ed74f405b74bbb12fe81dea974e5c3
 
 # ESLint: Enable react/jsx-curly-brace-presence
 5d4baa9ab5f57d207cc3a048003216a8574574d9
+
+# Remove dependency import separators.
+7f43eafccea3691044eabf94e94b978435d25bd3

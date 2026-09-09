@@ -1,21 +1,8 @@
-/**
- * External dependencies
- */
-// @ts-ignore -- No declaration file available.
 import { isPlainObject } from 'is-plain-object';
-// @ts-ignore -- No declaration file available.
 import { isValidElementType } from 'react-is';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { applyFilters } from '@wordpress/hooks';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import {
 	convertSvgStringToIconElement,
 	isValidIcon,
@@ -23,7 +10,12 @@ import {
 	omit,
 } from '../api/utils';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../api/constants';
-import type { BlockType, BlockCategory, BlockVariation } from '../types';
+import type {
+	BlockType,
+	BlockTypeIcon,
+	BlockCategory,
+	BlockVariation,
+} from '../types';
 
 interface ProcessBlockTypeSelect {
 	getBootstrappedBlockType: (
@@ -197,7 +189,10 @@ export const processBlockType =
 		}
 
 		// Canonicalize legacy categories to equivalent fallback.
-		if ( LEGACY_CATEGORY_MAPPING.hasOwnProperty( settings.category ) ) {
+		if (
+			typeof settings.category === 'string' &&
+			LEGACY_CATEGORY_MAPPING.hasOwnProperty( settings.category )
+		) {
 			settings.category = LEGACY_CATEGORY_MAPPING[ settings.category ];
 		}
 
@@ -228,11 +223,10 @@ export const processBlockType =
 			return;
 		}
 
-		settings.icon = normalizeIconObject( settings.icon );
-		settings.icon.src = convertSvgStringToIconElement(
-			settings.icon.src
-		) as typeof settings.icon.src;
-		if ( ! isValidIcon( settings.icon.src ) ) {
+		const icon = normalizeIconObject( settings.icon as BlockTypeIcon );
+		icon.src = convertSvgStringToIconElement( icon.src ) as typeof icon.src;
+		settings.icon = icon;
+		if ( ! isValidIcon( icon.src ) ) {
 			warning(
 				'The icon passed is invalid. ' +
 					'The icon should be a string, an element, a function, or an object following the specifications documented in https://developer.wordpress.org/block-editor/developers/block-api/block-registration/#icon-optional'

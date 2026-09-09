@@ -682,6 +682,19 @@ attributes: {
 }
 ```
 
+## editableRoot
+
+-   Type: `boolean`
+-   Default value: `false`
+
+When set to `true`, the block declares that it keeps working when an ancestor
+element (the editor canvas) is the `contenteditable` editing host, with focus
+and the native selection residing there instead of on the block's own editable
+elements. The editor uses this to keep the canvas editable while such a block
+is selected, enabling native partial selection across blocks. Blocks that rely
+on `event.target` or DOM focus pointing at their own elements should not
+declare this support.
+
 ## filter
 
 -   Type: `Object`

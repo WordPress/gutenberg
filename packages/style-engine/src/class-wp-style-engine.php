@@ -382,8 +382,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Util: Generates a CSS var string, e.g., var(--wp--preset--color--background) from a preset string such as `var:preset|space|50`.
 		 *
-		 * @param string   $style_value  A single CSS preset value.
-		 * @param string[] $css_vars     An associate array of CSS var patterns used to generate the var string.
+		 * @param string   $style_value A single CSS preset value.
+		 * @param string[] $css_vars    An associate array of CSS var patterns used to generate the var string.
 		 *
 		 * @return string The css var, or an empty string if no match for slug found.
 		 */
@@ -404,7 +404,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Util: Checks whether an incoming block style value is valid.
 		 *
-		 * @param string? $style_value  A single css preset value.
+		 * @param string? $style_value A single css preset value.
 		 *
 		 * @return bool
 		 */
@@ -415,10 +415,11 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Stores a CSS rule using the provided CSS selector and CSS declarations.
 		 *
-		 * @param string   $store_name       A valid store key.
-		 * @param string   $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
-		 * @param string[] $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
-		 * @param string $rules_group        Optional. A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
+		 * @param string                                    $store_name       A valid store key.
+		 * @param string                                    $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+		 * @param string[]|WP_Style_Engine_CSS_Declarations $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ),
+		 *                                                                    or a WP_Style_Engine_CSS_Declarations object.
+		 * @param string                                    $rules_group      Optional. A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
 		 *
 		 * @return void.
 		 */

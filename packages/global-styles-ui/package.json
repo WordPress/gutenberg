@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/global-styles-ui",
-	"version": "1.16.0",
+	"version": "1.21.0",
 	"description": "Global Styles UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -40,7 +40,7 @@
 			"default": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
-		"./build-style/": "./build-style/"
+		"./build-style/*": "./build-style/*"
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
@@ -57,21 +57,21 @@
 		"@wordpress/global-styles-engine": "file:../global-styles-engine",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/kebab-case": "file:../kebab-case",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/ui": "file:../ui",
-		"change-case": "^4.1.2",
-		"clsx": "^2.1.1",
-		"colord": "^2.9.3"
+		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",
-		"@testing-library/react": "^16.3.2"
+		"@testing-library/react": "^16.3.3",
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
-		"@types/react": "^18.3.27",
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {

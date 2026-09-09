@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import ButtonGroup from '..';
 import Button from '../../button';
 

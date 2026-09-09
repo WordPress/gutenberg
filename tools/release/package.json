@@ -24,7 +24,7 @@
 	},
 	"dependencies": {
 		"@inquirer/prompts": "^7.2.0",
-		"@octokit/rest": "^16.26.0",
+		"@octokit/rest": "^22.0.1",
 		"chalk": "^4.1.1",
 		"commander": "^9.2.0",
 		"execa": "^4.0.2",
@@ -32,8 +32,11 @@
 		"node-fetch": "^2.7.0",
 		"rimraf": "^5.0.10",
 		"semver": "^7.5.4",
-		"simple-git": "^3.24.0",
+		"simple-git": "^3.32.3",
 		"sprintf-js": "^1.1.1"
+	},
+	"devDependencies": {
+		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

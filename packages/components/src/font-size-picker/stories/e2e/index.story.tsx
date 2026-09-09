@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import FontSizePicker from '../..';
 
 export default {

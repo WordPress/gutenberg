@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { getSyncManager } from '../sync';
 
 const SYNC_SAVE_API_PATH = '/wp-sync/v1/save';

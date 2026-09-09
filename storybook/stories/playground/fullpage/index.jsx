@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import {
 	BlockCanvas,
@@ -9,10 +6,6 @@ import {
 } from '@wordpress/block-editor';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
-
-/**
- * Internal dependencies
- */
 // Reason: Styles are injected dynamically.
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import styles from './style.lazy.scss?inline';

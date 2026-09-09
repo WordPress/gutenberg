@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { UnitControlProps } from '../unit-control/types';
 import type { LABELS } from './utils';
 
@@ -28,13 +25,6 @@ type UnitControlPassthroughProps = Omit<
 
 type DeprecatedBoxControlProps = {
 	/**
-	 * Start opting into the larger default height that will become the default size in a future version.
-	 *
-	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
-	 * @ignore
-	 */
-	__next40pxDefaultSize?: boolean;
-	/**
 	 * @deprecated Pass to the `inputProps` prop instead.
 	 * @ignore
 	 */
@@ -46,7 +36,10 @@ type DeprecatedBoxControlProps = {
 	onMouseOut?: UnitControlProps[ 'onMouseOut' ];
 };
 
-export type BoxControlProps = Pick< UnitControlProps, 'units' > &
+export type BoxControlProps = Pick<
+	UnitControlProps,
+	'units' | '__next40pxDefaultSize'
+> &
 	DeprecatedBoxControlProps & {
 		/**
 		 * If this property is true, a button to reset the box control is rendered.

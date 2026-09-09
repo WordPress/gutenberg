@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const babelJest = require( 'babel-jest' );
 
@@ -26,13 +23,16 @@ module.exports = {
 	 */
 	getCacheKey( src, filename, ...args ) {
 		const isBlockIndex =
-			/block-library[\/\\]src[\/\\].+[\/\\]index\.js/.test( filename );
+			/block-library[\/\\]src[\/\\].+[\/\\]index\.jsx?$/.test( filename );
 
 		if ( ! isBlockIndex ) {
 			return babelJestTransformer.getCacheKey( src, filename, ...args );
 		}
 
-		const blockJSONFilename = filename.replace( 'index.js', 'block.json' );
+		const blockJSONFilename = filename.replace(
+			/index\.jsx?$/,
+			'block.json'
+		);
 
 		if ( ! fs.existsSync( blockJSONFilename ) ) {
 			return babelJestTransformer.getCacheKey( src, filename, ...args );

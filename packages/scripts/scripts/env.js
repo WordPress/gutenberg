@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const chalk = require( 'chalk' );
 
 process.stdout.write(

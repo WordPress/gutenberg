@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Page } from '@wordpress/admin-ui';
 import {
 	Button,
@@ -19,10 +16,6 @@ import { store as coreStore } from '@wordpress/core-data';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Notice } from '@wordpress/ui';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import './style.scss';
 import { AiPluginCallout } from './ai-plugin-callout';
 import {
@@ -72,7 +65,9 @@ function ConnectorsPage() {
 					( connector: ConnectorConfig ) =>
 						connector.plugin?.file?.split( '/' )[ 0 ]
 				)
-				.filter( ( slug ): slug is string => !! slug )
+				.filter(
+					( slug: string | undefined ): slug is string => !! slug
+				)
 		)
 	).sort();
 	const installedPluginSlugs = new Set(
@@ -130,7 +125,7 @@ function ConnectorsPage() {
 						style={ { maxWidth: 480 } }
 					>
 						<VStack alignment="center" spacing={ 2 }>
-							<Heading level={ 2 } size={ 15 } weight={ 600 }>
+							<Heading level={ 2 } size={ 15 }>
 								{ __( 'No connectors yet' ) }
 							</Heading>
 							<WCText size={ 12 }>
@@ -178,7 +173,7 @@ function ConnectorsPage() {
 					</VStack>
 				) }
 				{ canInstallPlugins && ! isFileModDisabled && (
-					<p>
+					<p className="connectors-page__help-text">
 						{ createInterpolateElement(
 							__(
 								'If the connector you need is not listed, <a>search the plugin directory</a> to see if a connector is available.'
