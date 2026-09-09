@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   Increase the minimum required Node.js version to v22.19.0. The `lighthouse` dependency is now `^13.4.1`, which requires it. Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+-   Increase the minimum required Node.js version to v22.19.0. The `lighthouse` dependency is now `^13.4.1`, which requires it. Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases) ([#81916](https://github.com/WordPress/gutenberg/pull/81916)).
 -   `Editor.switchEditorTool()`: Remove the helper. It clicked the Write/Design "Tools" toolbar button, which the editor no longer renders since [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
 
 ### New Features
@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   `Metrics.initWebVitals()`: Resolve `web-vitals` from the installed dependency so published consumers can load it outside the Gutenberg monorepo. Update to 4.2.4 to fix interaction counts after back/forward cache restores and prevent repeated input-listener registration ([#81916](https://github.com/WordPress/gutenberg/pull/81916)).
 -   `Editor.saveSiteEditorEntities()`: Wait for the save button to mount before deciding between its `Save` and `Publish` variants, instead of sampling visibility immediately — the extensible site editor only renders it once an entity is dirty.
 
 ### Internal
