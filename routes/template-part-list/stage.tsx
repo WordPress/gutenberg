@@ -24,7 +24,6 @@ import type { WpTemplatePart } from '@wordpress/core-data';
 import { CreateTemplatePartModal } from '@wordpress/fields';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import {
-	getActiveViewOverrides,
 	getAreaFromViewOverrides,
 	viewToQuery,
 	type ViewListEntry,
@@ -61,7 +60,7 @@ function TemplatePartList() {
 		name: TEMPLATE_PART_POST_TYPE,
 	} );
 	const activeViewOverrides = useMemo(
-		() => getActiveViewOverrides( viewList, area ),
+		() => viewList?.find( ( v ) => v.slug === area )?.view ?? {},
 		[ viewList, area ]
 	);
 

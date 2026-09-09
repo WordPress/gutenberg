@@ -47,21 +47,6 @@ export async function loadTemplatePartViewConfig(): Promise< EntityViewConfig > 
 }
 
 /**
- * Returns the view overrides of the entry in the view list matching the
- * given slug, or an empty object when there is none.
- *
- * @param viewList The `view_list` of an entity view configuration.
- * @param slug     Slug of the active view.
- * @return The view overrides for the active view.
- */
-export function getActiveViewOverrides(
-	viewList: ViewListEntry[] | undefined,
-	slug: string
-): ViewOverrides {
-	return viewList?.find( ( v ) => v.slug === slug )?.view ?? {};
-}
-
-/**
  * Returns the template part area the given view overrides lock the list to,
  * or `undefined` when they do not.
  *
@@ -102,7 +87,8 @@ export async function ensureView(
 		slug: 'default-new',
 		defaultView,
 		defaultLayouts,
-		activeViewOverrides: getActiveViewOverrides( viewList, area ),
+		activeViewOverrides:
+			viewList?.find( ( v ) => v.slug === area )?.view ?? {},
 		queryParams: search,
 	} );
 }
