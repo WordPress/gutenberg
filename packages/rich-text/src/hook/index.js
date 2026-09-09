@@ -155,41 +155,43 @@ function useRichTextBase( {
 		forceRender();
 	}
 
-	// Apply a value or selection set from outside. The selection goes in
-	// only while the element (or an editing host around it) has focus; the
-	// focus handler applies it once focus arrives.
+	// A selection may only be set into the element while it (or an editing
+	// host around it) has focus; the focus handler sets it once focus
+	// arrives.
+	function hasFocus() {
+		const element = ref.current;
+		const { activeElement } = element.ownerDocument;
+		return (
+			activeElement === element ||
+			( activeElement?.contentEditable === 'true' &&
+				activeElement.contains( element ) )
+		);
+	}
+
+	// Apply a value set from outside.
+	useLayoutEffect( () => {
+		if ( value === _valueRef.current ) {
+			return;
+		}
+
+		setRecordFromProps();
+		applyRecord( recordRef.current, { domOnly: ! hasFocus() } );
+		forceRender();
+	}, [ value ] );
+
+	// Apply a selection set from outside.
 	useLayoutEffect( () => {
 		const [ sentStart, sentEnd ] = sentSelectionRef.current;
 		sentSelectionRef.current = [];
 
-		const valueChanged = value !== _valueRef.current;
-		const selectionChanged =
+		if (
 			isSelected &&
-			( selectionStart !== sentStart || selectionEnd !== sentEnd );
-
-		if ( ! valueChanged && ! selectionChanged ) {
-			return;
+			( selectionStart !== sentStart || selectionEnd !== sentEnd ) &&
+			hasFocus()
+		) {
+			applyRecord( recordRef.current );
 		}
-
-		if ( valueChanged ) {
-			setRecordFromProps();
-		}
-
-		const element = ref.current;
-		const { activeElement } = element.ownerDocument;
-		const hasFocus =
-			activeElement === element ||
-			( activeElement?.contentEditable === 'true' &&
-				activeElement.contains( element ) );
-
-		if ( valueChanged || hasFocus ) {
-			applyRecord( recordRef.current, { domOnly: ! hasFocus } );
-		}
-
-		if ( valueChanged ) {
-			forceRender();
-		}
-	}, [ value, selectionStart, selectionEnd, isSelected ] );
+	}, [ selectionStart, selectionEnd, isSelected ] );
 
 	const mergedRefs = useMergeRefs( [
 		ref,
@@ -210,11 +212,11 @@ function useRichTextBase( {
 
 				// Setting a selection into an unfocused editable moves focus in
 				// some browsers.
-				const hasFocus =
+				const focused =
 					element.contains( element.ownerDocument.activeElement ) ||
 					ownsSelection( element );
 
-				applyRecord( recordRef.current, { domOnly: ! hasFocus } );
+				applyRecord( recordRef.current, { domOnly: ! focused } );
 			},
 			[ placeholder, ...__unstableDependencies ]
 		),
