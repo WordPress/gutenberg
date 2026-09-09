@@ -36,6 +36,7 @@
 
 ### Enhancements
 
+-   DataForm: Add a `showPlaceholderIfEmpty` option to the `panel` layout, which shows the field's `placeholder` in the summary when the value is empty ([#82527](https://github.com/WordPress/gutenberg/pull/82527)).
 -   Give unselected multi-selection filter indicators solid, themed backgrounds. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
 -   Validated form controls: Use `--wpds-color-stroke-interactive-error` for the invalid-state focus ring and border ([#82410](https://github.com/WordPress/gutenberg/pull/82410)).
 -   DataForm: Communicate the timezone a `datetime` value is edited in. When the site timezone differs from the visitor's, the control renders help text under the input naming the site timezone: the zone name (e.g. `(CEST) Europe/Madrid`) or the UTC offset for sites pinned to one ([#82291](https://github.com/WordPress/gutenberg/pull/82291)).
@@ -44,6 +45,7 @@
 
 ### Bug Fixes
 
+-   `DataViews` and `DataViewsPicker`: the `table` and `pickerTable` layouts no longer render an empty column for an id in `view.fields` that has no matching field definition, matching what the other layouts already did. The column header menu moves, inserts and hides columns relative to the rendered columns, so a skipped id no longer offsets those operations; such ids are dropped from `view.fields` the next time the menu changes the view ([#82601](https://github.com/WordPress/gutenberg/pull/82601)).
 -   Fix `Field.sort` TypeScript type definition to reflect that `sort` receives extracted field values rather than `Item` objects ([#82162](https://github.com/WordPress/gutenberg/pull/82162)).
 -   DataForm: Render read-only fields without requiring an edit control ([#82514](https://github.com/WordPress/gutenberg/pull/82514)).
 -   Operators: Support the `isAny` and `isNone` filter operators for numeric field values, which previously matched nothing ([#77942](https://github.com/WordPress/gutenberg/pull/77942)).

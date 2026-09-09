@@ -53,7 +53,7 @@
 	"devDependencies": {
 		"core-js-builder": "^3.39.0",
 		"terser": "^5.37.0",
-		"vitest": "^4.1.10"
+		"vitest": "^4.1.11"
 	},
 	"publishConfig": {
 		"access": "public"
