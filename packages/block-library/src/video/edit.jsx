@@ -30,7 +30,6 @@ import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
-import { isGifVariation } from './variations';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -44,7 +43,6 @@ function VideoEdit( {
 } ) {
 	const videoPlayer = useRef();
 	const { id, controls, poster, src, tracks, width, height } = attributes;
-	const isGif = isGifVariation( attributes );
 	// Give the <video> an explicit (non-`auto`) aspect ratio derived from the
 	// stored dimensions. The width/height attributes alone only yield
 	// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
@@ -72,18 +70,6 @@ function VideoEdit( {
 			videoPlayer.current.load();
 		}
 	}, [ poster ] );
-
-	// The GIF variation plays like an animated GIF in the editor (the playback
-	// attributes are applied to the preview <video> below). Regular videos do
-	// not autoplay in the editor, so only nudge GIFs into playing after a
-	// source change in case the muted autoplay did not start on its own.
-	useEffect( () => {
-		if ( isGif ) {
-			// Browsers allow muted videos to be played programmatically.
-			videoPlayer.current?.play().catch( () => {} );
-		}
-	}, [ isGif, src, poster ] );
-
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
@@ -108,6 +94,8 @@ function VideoEdit( {
 
 		// Sets the block's attribute and updates the edit component from the
 		// selected media.
+		// animated GIF detect hone par controls off by default — user settings panel se on kar sakta hai
+		const isAnimatedGif = media.media_details?.animated_video === true;
 		setAttributes( {
 			blob: undefined,
 			src: media.url,
@@ -115,6 +103,7 @@ function VideoEdit( {
 			poster:
 				media.image?.src !== media.icon ? media.image?.src : undefined,
 			caption: media.caption,
+			...( isAnimatedGif && { controls: false } ),
 		} );
 		setTemporaryURL();
 	}
@@ -214,38 +203,36 @@ function VideoEdit( {
 					</BlockControls>
 				</>
 			) }
-			{ ! isGif && (
-				<InspectorControls>
-					<ToolsPanel
-						label={ __( 'Settings' ) }
-						resetAll={ () => {
+			<InspectorControls>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							autoplay: false,
+							controls: true,
+							loop: false,
+							muted: false,
+							playsInline: false,
+							preload: 'metadata',
+							poster: undefined,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<VideoCommonSettings
+						setAttributes={ setAttributes }
+						attributes={ attributes }
+					/>
+					<PosterImage
+						poster={ poster }
+						onChange={ ( posterImage ) =>
 							setAttributes( {
-								autoplay: false,
-								controls: true,
-								loop: false,
-								muted: false,
-								playsInline: false,
-								preload: 'metadata',
-								poster: undefined,
-							} );
-						} }
-						dropdownMenuProps={ dropdownMenuProps }
-					>
-						<VideoCommonSettings
-							setAttributes={ setAttributes }
-							attributes={ attributes }
-						/>
-						<PosterImage
-							poster={ poster }
-							onChange={ ( posterImage ) =>
-								setAttributes( {
-									poster: posterImage?.url,
-								} )
-							}
-						/>
-					</ToolsPanel>
-				</InspectorControls>
-			) }
+								poster: posterImage?.url,
+							} )
+						}
+					/>
+				</ToolsPanel>
+			</InspectorControls>
 			<figure { ...blockProps }>
 				<video
 					controls={ controls }
@@ -253,10 +240,10 @@ function VideoEdit( {
 					poster={ poster }
 					src={ src || temporaryURL }
 					ref={ videoPlayer }
-					autoPlay={ isGif }
-					loop={ isGif }
-					muted={ isGif }
-					playsInline={ isGif }
+					autoPlay={ attributes.autoplay }
+					loop={ attributes.loop }
+					muted={ attributes.muted }
+					playsInline={ attributes.playsInline }
 					width={ width }
 					height={ height }
 					style={ aspectRatio ? { aspectRatio } : undefined }
