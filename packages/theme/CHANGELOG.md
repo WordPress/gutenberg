@@ -16,6 +16,7 @@
 
 ### Bug Fixes
 
+-   Calculate exact chroma capacity so weak intent backgrounds retain their color near lightness boundaries. ([#82591](https://github.com/WordPress/gutenberg/pull/82591))
 -   Make color ramp generation independent of cache population order. ([#82505](https://github.com/WordPress/gutenberg/pull/82505))
 -   Keep active fills moving in the color ramp direction and preserve text contrast for both states. ([#82542](https://github.com/WordPress/gutenberg/pull/82542))
 
