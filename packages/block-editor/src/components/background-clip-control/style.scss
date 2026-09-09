@@ -1,0 +1,40 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+// A swatch showing which box the background is painted into. The fill is the
+// background being clipped, and the dashed edge marks where it stops.
+.block-editor-background-clip-control__option::before {
+	content: "";
+	flex-shrink: 0;
+	align-self: center;
+	width: 24px;
+	height: 24px;
+	margin-right: $grid-unit-10;
+	border-radius: $radius-small;
+	box-sizing: border-box;
+	background-color: $medium-gray-placeholder;
+	border: 3px dashed $gray-300;
+	background-clip: border-box;
+}
+
+.block-editor-background-clip-control__option.is-padding-box::before {
+	background-clip: padding-box;
+}
+
+.block-editor-background-clip-control__option.is-content-box::before {
+	padding: 3px;
+	background-clip: content-box;
+}
+
+// Stripes stand in for lines of text. Letters would be folded into the
+// option's accessible name, so the swatch carries no text of its own. With no
+// border to frame them the stripes carry the contrast themselves, so they use
+// the darker grey the other swatches use for their edge.
+.block-editor-background-clip-control__option.is-text::before {
+	padding: 0;
+	border: none;
+	background-color: $medium-gray-placeholder;
+	background-clip: border-box;
+	mask-image: repeating-linear-gradient(to bottom, #000 0 5px, transparent 5px 9px);
+	-webkit-mask-image: repeating-linear-gradient(to bottom, #000 0 5px, transparent 5px 9px);
+}
