@@ -362,7 +362,8 @@ export default function createReduxStore< State, Actions, Selectors >(
 					selectorArgs: unknown[],
 					...args: unknown[]
 				) => {
-					// Normalize the arguments passed to the target selector.
+					// Normalize the arguments passed to the target selector, then
+					// map them to the cache key.
 					if ( selectorName ) {
 						const targetSelector = ( options.selectors as any )?.[
 							selectorName
@@ -373,6 +374,10 @@ export default function createReduxStore< State, Actions, Selectors >(
 								selectorArgs
 							);
 						}
+						selectorArgs = normalizeResolutionArgs(
+							resolvers[ selectorName ],
+							selectorArgs
+						);
 					}
 
 					const state = store.__unstableOriginalGetState();
@@ -643,6 +648,12 @@ function mapResolveSelector(
 		return ( ...args: unknown[] ) =>
 			new Promise( ( resolve, reject ) => {
 				const resolver = resolvers[ selectorName ];
+				// `isFulfilled` takes these; the metadata selectors derive
+				// them on their own.
+				const resolutionArgs = normalizeResolutionArgs(
+					resolver,
+					normalize( selector, args )
+				);
 				const hasFinished = () => {
 					return (
 						boundMetadataSelectors.hasFinishedResolution(
@@ -650,7 +661,10 @@ function mapResolveSelector(
 							args
 						) ||
 						( typeof resolver.isFulfilled === 'function' &&
-							resolver.isFulfilled( store.getState(), ...args ) )
+							resolver.isFulfilled(
+								store.getState(),
+								...resolutionArgs
+							) )
 					);
 				};
 				const finalize = ( result: unknown ) => {
@@ -783,10 +797,17 @@ function mapSelectorWithResolver(
 	resolversCache: ResolversCache,
 	boundMetadataSelectors: Record< string, SelectorLike >
 ): SelectorLike {
-	function fulfillSelector( args: unknown[] ): void {
+	function fulfillSelector( selectorArgs: unknown[] ): void {
+		// The resolver and both caches key off these. The bound metadata
+		// selectors derive them on their own, so they take the selector args.
+		const args = normalizeResolutionArgs( resolver, selectorArgs );
+
 		if (
 			resolversCache.isRunning( selectorName, args ) ||
-			boundMetadataSelectors.hasStartedResolution( selectorName, args ) ||
+			boundMetadataSelectors.hasStartedResolution(
+				selectorName,
+				selectorArgs
+			) ||
 			( typeof resolver.isFulfilled === 'function' &&
 				resolver.isFulfilled( store.getState(), ...args ) )
 		) {
@@ -822,6 +843,9 @@ function mapSelectorWithResolver(
 		return selector( ...args );
 	};
 	selectorResolver.hasResolver = true;
+	// Forward the normalization method so `resolveSelect` can map its own
+	// arguments the same way.
+	selectorResolver.__unstableNormalizeArgs = selector.__unstableNormalizeArgs;
 	return selectorResolver;
 }
 
@@ -840,6 +864,28 @@ function normalize( selector: SelectorLike, args: unknown[] ): unknown[] {
 		args?.length
 	) {
 		return selector.__unstableNormalizeArgs( args );
+	}
+	return args;
+}
+
+/**
+ * Maps selector arguments to the key their resolution is cached under, using
+ * the resolver's `getResolutionArgs` if it has one. Calls that map to the same
+ * key share a single resolver run.
+ *
+ * Not idempotent: the result can have fewer arguments than the input, so call
+ * this once, on args that have already been through `normalize`.
+ *
+ * @param resolver The resolver, which may define `getResolutionArgs`.
+ * @param args     Normalized selector arguments.
+ * @return The cache key arguments.
+ */
+function normalizeResolutionArgs(
+	resolver: NormalizedResolver | undefined,
+	args: unknown[]
+): unknown[] {
+	if ( typeof resolver?.getResolutionArgs === 'function' && args?.length ) {
+		return resolver.getResolutionArgs( ...args );
 	}
 	return args;
 }
