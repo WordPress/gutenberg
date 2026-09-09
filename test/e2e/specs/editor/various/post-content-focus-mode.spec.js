@@ -347,6 +347,123 @@ test.describe( 'Post Content focus mode', () => {
 			} );
 		} );
 	} );
+
+	// The same post is rendered by two Post Content blocks, which are inner
+	// block controllers sharing one entity.
+	// See https://github.com/WordPress/gutenberg/issues/79096.
+	test.describe( 'duplicate Post Content instances', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.createTemplate( 'wp_template_part', {
+				slug: 'content-area',
+				title: 'Content Area',
+				content:
+					'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
+			} );
+
+			// One Post Content at the template root, another nested inside a
+			// template part, both rendering the same post.
+			await requestUtils.createTemplate( 'wp_template', {
+				slug: 'singular',
+				title: 'Singular',
+				content: [
+					'<!-- wp:template-part {"slug":"header","tagName":"header","theme":"emptytheme"} /-->',
+					'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
+					'<!-- wp:template-part {"slug":"content-area","theme":"emptytheme"} /-->',
+				].join( '\n' ),
+			} );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllTemplates( 'wp_template' );
+			await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		} );
+
+		test( 'typing in one instance leaves the caret and selection in that instance', async ( {
+			admin,
+			editor,
+			page,
+			postContentFocusMode,
+		} ) => {
+			await admin.createNewPost();
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Shared' },
+			} );
+			await postContentFocusMode.enableShowTemplate();
+
+			// Identify the Post Content at the template root, as opposed to
+			// the one nested inside the template part.
+			const { rootParagraph, nestedPostContent } = await page.evaluate(
+				() => {
+					const {
+						getBlocksByName,
+						getBlockOrder,
+						getBlockParents,
+						getBlockName,
+					} = window.wp.data.select( 'core/block-editor' );
+					const isNested = ( clientId ) =>
+						getBlockParents( clientId ).some(
+							( parent ) =>
+								getBlockName( parent ) === 'core/template-part'
+						);
+					const all = getBlocksByName( 'core/post-content' );
+					const root = all.find(
+						( clientId ) => ! isNested( clientId )
+					);
+					return {
+						rootParagraph: getBlockOrder( root )[ 0 ],
+						nestedPostContent: all.find( isNested ),
+					};
+				}
+			);
+
+			// Clear the selection so no block toolbar overlaps the paragraph.
+			await page.evaluate( () => {
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.clearSelectedBlock();
+			} );
+			await editor.canvas
+				.locator( `[data-block="${ rootParagraph }"]` )
+				.click();
+
+			// Record every time the selection enters the nested instance.
+			// A steal is momentary — the canvas scrolls as soon as it
+			// happens, even if the selection later recovers — so asserting
+			// on the final selection alone misses it.
+			await page.evaluate( ( nestedClientId ) => {
+				const { getSelectedBlockClientId, getBlockParents } =
+					window.wp.data.select( 'core/block-editor' );
+				window.__selectionsInNestedInstance = [];
+				window.wp.data.subscribe( () => {
+					const selected = getSelectedBlockClientId();
+					if (
+						selected &&
+						getBlockParents( selected ).includes(
+							nestedClientId
+						) &&
+						window.__selectionsInNestedInstance.at( -1 ) !==
+							selected
+					) {
+						window.__selectionsInNestedInstance.push( selected );
+					}
+				} );
+			}, nestedPostContent );
+
+			await page.keyboard.press( 'End' );
+			await page.keyboard.type( ' edited' );
+
+			// The edit reaches both instances, since they render one post.
+			await expect(
+				editor.canvas.getByText( 'Shared edited' )
+			).toHaveCount( 2 );
+
+			// …and the selection never enters the nested instance.
+			expect(
+				await page.evaluate( () => window.__selectionsInNestedInstance )
+			).toEqual( [] );
+		} );
+	} );
 } );
 
 class PostContentFocusMode {
