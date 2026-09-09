@@ -8,7 +8,7 @@ import {
 import { useView } from '@wordpress/views';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
-import type { View, Action } from '@wordpress/dataviews';
+import type { View, Action, Field } from '@wordpress/dataviews';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	Button,
@@ -25,13 +25,12 @@ import { __ } from '@wordpress/i18n';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { DEFAULT_VIEW, DEFAULT_VIEWS, DEFAULT_LAYOUTS } from './view-utils';
 import { previewField } from './fields/preview';
-import { patternStatusField } from './fields/sync-status';
 import { usePatternCategoryField } from './fields/category';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import type { NormalizedPattern } from './use-patterns';
 import ImportPatternButton from './import-pattern-button';
 // Unlock WordPress private APIs
-const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
 const { PATTERN_TYPES, CreatePatternModal } = unlock( patternPrivateApis );
 /**
@@ -137,23 +136,23 @@ function PatternList() {
 	const patternsWithPermissions =
 		useAugmentPatternsWithPermissions( patterns );
 
-	// Add pattern-specific fields
+	// The canonical `wp_block` fields registered by the editor (title, sync
+	// status, description...), plus the fields specific to this screen.
+	const postTypeFields: Field< NormalizedPattern >[] = usePostFields( {
+		postType: 'wp_block',
+	} );
 	const patternCategoryField = usePatternCategoryField();
-	const fields = useMemo( () => {
-		const patternFields = [
+	const fields = useMemo( (): Field< NormalizedPattern >[] => {
+		return [
 			previewField,
-			patternTitleField,
+			...( postTypeFields || [] ).filter(
+				// Registered patterns are never synced, so the sync status
+				// is not relevant to the "Registered" tab.
+				( field ) => type !== 'registered' || field.id !== 'sync-status'
+			),
 			patternCategoryField,
 		];
-
-		// Add sync status field for user patterns
-		if ( type === 'my-patterns' || type === 'all' ) {
-			patternFields.push( patternStatusField );
-		}
-
-		// Filter and add other fields
-		return patternFields;
-	}, [ type, patternCategoryField ] );
+	}, [ type, postTypeFields, patternCategoryField ] );
 
 	// Apply client-side sorting and pagination, but NOT filtering
 	// Filtering is done server-side in usePatterns hook

@@ -13,6 +13,7 @@
 
 ### Internal
 
+-   `BlockPreview`: Stop applying the private `Disabled` component class name to block previews ([#82651](https://github.com/WordPress/gutenberg/pull/82651)).
 -   Pattern Overrides Dropdown: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` ([#77492](https://github.com/WordPress/gutenberg/pull/77492)).
 -   Allowed Blocks Modal: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` ([#78119](https://github.com/WordPress/gutenberg/pull/78119)).
 -   Block Switcher: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` for the bindings hint ([#77366](https://github.com/WordPress/gutenberg/pull/77366)).
@@ -22,6 +23,7 @@
 
 ### Bug Fixes
 
+-   `NavigableToolbar`: Preserve toolbar semantics while it is hidden, so asynchronous control changes do not remount custom block toolbars ([#82574](https://github.com/WordPress/gutenberg/pull/82574)).
 -   `ListView`: Drop the block icon's variation colors while the row is selected, so the icon keeps contrast against the selection background ([#82498](https://github.com/WordPress/gutenberg/pull/82498)).
 -   Flex layout: Output `flex-direction: row` when a viewport override switches a vertical layout to horizontal, so the base `flex-direction: column` no longer keeps applying on that viewport ([#82364](https://github.com/WordPress/gutenberg/pull/82364)).
 -   `BlockManager`: Color library block icons with `color` while retaining a `fill` fallback for custom icons that do not use `currentColor`. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))

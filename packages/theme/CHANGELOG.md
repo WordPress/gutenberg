@@ -16,6 +16,7 @@
 
 ### Bug Fixes
 
+-   Calculate exact chroma capacity so weak intent backgrounds retain their color near lightness boundaries. ([#82591](https://github.com/WordPress/gutenberg/pull/82591))
 -   Make color ramp generation independent of cache population order. ([#82505](https://github.com/WordPress/gutenberg/pull/82505))
 -   Keep active fills moving in the color ramp direction and preserve text contrast for both states. ([#82542](https://github.com/WordPress/gutenberg/pull/82542))
 
@@ -25,6 +26,7 @@
 -   Generate the default ramps before derived token artifacts so one build uses the current ramp algorithm throughout. ([#82525](https://github.com/WordPress/gutenberg/pull/82525))
 -   Cache relative luminance calculations used by color-ramp contrast checks. ([#82445](https://github.com/WordPress/gutenberg/pull/82445))
 -   Enforce NodeNext module resolution in the build project so future declaration imports are checked against the package's published ESM resolution rules. ([#82088](https://github.com/WordPress/gutenberg/pull/82088))
+-   Update the `@types/node` development dependency to v24, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
 
 ## 2.0.0 (2026-08-26)
 
