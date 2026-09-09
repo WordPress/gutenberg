@@ -31,7 +31,9 @@ function useNavigateToPreviousEntityRecord() {
 	return goBack;
 }
 
-export function useSpecificEditorSettings( { isGlobalRoute = false } = {} ) {
+export function useSpecificEditorSettings( {
+	defaultRenderingMode = 'post-only',
+} = {} ) {
 	const { query } = useLocation();
 	const { canvas = 'view' } = query;
 	const onNavigateToEntityRecord = useNavigateToEntityRecord();
@@ -94,18 +96,14 @@ export function useSpecificEditorSettings( { isGlobalRoute = false } = {} ) {
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			isPreviewMode: canvas === 'view',
-			// A route that stands for the whole site shows the template that
-			// surrounds whatever the canvas happens to be rendering.
-			defaultRenderingMode: isGlobalRoute
-				? 'template-locked'
-				: 'post-only',
+			defaultRenderingMode,
 		};
 	}, [
 		settings,
 		globalStyles,
 		globalSettings,
 		canvas,
-		isGlobalRoute,
+		defaultRenderingMode,
 		currentPostIsTrashed,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,

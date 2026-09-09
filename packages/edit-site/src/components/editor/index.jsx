@@ -76,9 +76,9 @@ function getNavigationPath( location, postType ) {
 
 export default function EditSiteEditor( {
 	isHomeRoute = false,
-	// Routes that stand for the whole site rather than one piece of content,
-	// so the canvas shows the template around whatever it is rendering.
-	isGlobalRoute = false,
+	// Routes that stand for the whole site pass 'template-locked', so the
+	// canvas shows the template around whatever it is rendering.
+	defaultRenderingMode = 'post-only',
 } ) {
 	const location = useLocation();
 	const history = useHistory();
@@ -111,7 +111,9 @@ export default function EditSiteEditor( {
 		'edit-site-editor__loading-progress'
 	);
 
-	const editorSettings = useSpecificEditorSettings( { isGlobalRoute } );
+	const editorSettings = useSpecificEditorSettings( {
+		defaultRenderingMode,
+	} );
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 	const { setCurrentRevisionId, resetStylesNavigation } = unlock(
 		useDispatch( editorStore )
