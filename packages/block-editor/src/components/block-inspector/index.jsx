@@ -423,6 +423,9 @@ const BlockInspectorSingleBlock = ( {
 		( hasViewportBlockStyleState( selectedBlockStyleState ) &&
 			isResponsiveEditing ) ||
 		hasPseudoBlockStyleState( selectedBlockStyleState );
+	// When a style state is active, the badges replace the block description.
+	const showStateBadges =
+		blockEditingMode === 'default' && isEditingStyleState;
 	const hasParentChildBlockCards =
 		editedContentOnlySection &&
 		editedContentOnlySection !== renderedBlockClientId;
@@ -457,6 +460,9 @@ const BlockInspectorSingleBlock = ( {
 			) }
 			<BlockCard
 				{ ...blockInformation }
+				description={
+					showStateBadges ? undefined : blockInformation.description
+				}
 				allowParentNavigation
 				className={ isBlockSynced && 'is-synced' }
 				isChild={ hasParentChildBlockCards }
@@ -476,7 +482,7 @@ const BlockInspectorSingleBlock = ( {
 					)
 				}
 			/>
-			{ blockEditingMode === 'default' && isEditingStyleState && (
+			{ showStateBadges && (
 				<Spacer
 					className="block-editor-block-inspector__sticky-badges"
 					paddingX={ 4 }
