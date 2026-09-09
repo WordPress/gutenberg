@@ -1,9 +1,11 @@
 import { createSelector } from '@wordpress/data';
 import {
 	displayShortcut,
+	keyboardShortcut,
 	shortcutAriaLabel,
 	rawShortcut,
 } from '@wordpress/keycodes';
+import type { WPKeyboardShortcut } from '@wordpress/keycodes';
 import type { ShortcutKeyCombination } from './actions';
 
 interface ShortcutState {
@@ -157,6 +159,54 @@ export function getShortcutRepresentation(
 	const shortcut = getShortcutKeyCombination( state, name );
 	return getKeyCombinationRepresentation( shortcut, representation );
 }
+
+/**
+ * Returns every representation of the main key combination for a given shortcut
+ * name: its display string, its `aria-keyshortcuts` value and its plain-text
+ * label.
+ *
+ * The returned object can be passed straight to the `shortcut` prop of the
+ * `@wordpress/ui` components.
+ *
+ * @param {Object} state Global state.
+ * @param {string} name  Shortcut name.
+ *
+ * @example
+ *
+ *```js
+ * import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+ * import { useSelect } from '@wordpress/data';
+ * import { Menu } from '@wordpress/ui';
+ *
+ * const ExampleComponent = () => {
+ *     const shortcut = useSelect(
+ *         ( select ) =>
+ *             select( keyboardShortcutsStore ).getKeyboardShortcut(
+ *                 'core/editor/next-region'
+ *             ),
+ *         []
+ *     );
+ *
+ *     return <Menu.Item shortcut={ shortcut }>Next region</Menu.Item>;
+ * };
+ *```
+ *
+ * @return {WPKeyboardShortcut?} Shortcut representations.
+ */
+export const getKeyboardShortcut = createSelector(
+	( state: ShortcutsState, name: string ): WPKeyboardShortcut | null => {
+		const combination = getShortcutKeyCombination( state, name );
+
+		if ( ! combination ) {
+			return null;
+		}
+
+		return keyboardShortcut[ combination.modifier ?? 'undefined' ](
+			combination.character
+		);
+	},
+	( state: ShortcutsState, name: string ) => [ state[ name ] ]
+);
 
 /**
  * Returns the shortcut description given its name.

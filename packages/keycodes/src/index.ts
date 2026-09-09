@@ -51,6 +51,30 @@ export type WPEventKeyHandler = (
 export type WPModifier = ( isApple: () => boolean ) => WPModifierPart[];
 
 /**
+ * The full set of representations of a keyboard shortcut.
+ */
+export type WPKeyboardShortcut = {
+	/**
+	 * The visual representation of the shortcut (e.g. "⌘S" on macOS or
+	 * "Ctrl+S" on Windows).
+	 */
+	displayShortcut: string;
+
+	/**
+	 * The shortcut in a format compatible with the
+	 * [`aria-keyshortcuts` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts)
+	 * (e.g. "Meta+S").
+	 */
+	ariaKeyShortcut: string;
+
+	/**
+	 * A plain-text label for the shortcut, for use in an accessible
+	 * description (e.g. "Command S").
+	 */
+	label: string;
+};
+
+/**
  * Keycode for BACKSPACE key.
  */
 export const BACKSPACE = 8;
@@ -387,6 +411,50 @@ export const shortcutAriaLabel: WPModifierHandler< WPKeyHandler< string > > =
 				.join( isApple ? ' ' : ' + ' );
 		};
 	} );
+
+/**
+ * An object that contains functions returning every representation of a
+ * keyboard shortcut at once, rather than one string at a time.
+ *
+ * Use it in place of calling `displayShortcut`, `ariaKeyShortcut` and
+ * `shortcutAriaLabel` separately, for example to build the `shortcut` prop of
+ * the `@wordpress/ui` components.
+ *
+ * @example
+ * ```js
+ * // Assuming macOS:
+ * keyboardShortcut.primaryShift( 'm' );
+ * // {
+ * //   displayShortcut: "⇧⌘M",
+ * //   ariaKeyShortcut: "Shift+Meta+M",
+ * //   label: "Shift Command M",
+ * // }
+ * ```
+ *
+ * Keyed map of functions to shortcut representations.
+ */
+export const keyboardShortcut: WPModifierHandler<
+	WPKeyHandler< WPKeyboardShortcut >
+> =
+	/* @__PURE__ */
+	Object.fromEntries(
+		( Object.keys( modifiers ) as WPKeycodeModifier[] ).map(
+			( modifier ) => [
+				modifier,
+				( character: string, _isApple = isAppleOS ) => ( {
+					displayShortcut: displayShortcut[ modifier ](
+						character,
+						_isApple
+					),
+					ariaKeyShortcut: ariaKeyShortcut[ modifier ](
+						character,
+						_isApple
+					),
+					label: shortcutAriaLabel[ modifier ]( character, _isApple ),
+				} ),
+			]
+		)
+	) as WPModifierHandler< WPKeyHandler< WPKeyboardShortcut > >;
 
 /**
  * From a given KeyboardEvent, returns an array of active modifier constants for
