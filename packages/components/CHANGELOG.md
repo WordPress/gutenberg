@@ -26,6 +26,7 @@
 -   `ItemGroup`: Drop the blanket `path { fill: currentColor }` rule that was overriding stroke-based icons' intended fill via inheritance bypass. Paths without an explicit fill still inherit `currentColor` from the surrounding SVG. Custom paths that specify a fill now retain it instead of being overridden by ItemGroup. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `Tip`: Preserve the intended yellow color after its icon became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `Button`, `Placeholder`: Remove the obsolete `fill: CanvasText` override for forced colors mode. ([#82481](https://github.com/WordPress/gutenberg/pull/82481))
+-   `InputControl`, `SelectControl`, `TextareaControl`: Match the `@wordpress/ui` disabled styles, so the disabled state is distinguishable again. The border and text now use the design system's disabled tokens, and the background no longer changes ([#82454](https://github.com/WordPress/gutenberg/pull/82454)).
 
 ### Documentation
 
