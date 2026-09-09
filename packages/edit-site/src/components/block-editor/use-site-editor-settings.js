@@ -31,8 +31,11 @@ function useNavigateToPreviousEntityRecord() {
 	return goBack;
 }
 
+// Routes that stand for the whole site rather than one piece of content.
+const GLOBAL_ROUTES = [ 'home', 'identity', 'styles' ];
+
 export function useSpecificEditorSettings() {
-	const { query } = useLocation();
+	const { name, query } = useLocation();
 	const { canvas = 'view' } = query;
 	const onNavigateToEntityRecord = useNavigateToEntityRecord();
 
@@ -94,12 +97,18 @@ export function useSpecificEditorSettings() {
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			isPreviewMode: canvas === 'view',
+			// The global routes show the site, so they show the template that
+			// surrounds whatever the canvas happens to be rendering.
+			defaultRenderingMode: GLOBAL_ROUTES.includes( name )
+				? 'template-locked'
+				: 'post-only',
 		};
 	}, [
 		settings,
 		globalStyles,
 		globalSettings,
 		canvas,
+		name,
 		currentPostIsTrashed,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,

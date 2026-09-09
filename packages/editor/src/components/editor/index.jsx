@@ -20,12 +20,6 @@ function Editor( {
 	initialEdits,
 	initialViewport,
 
-	// The site editor styles the whole site, so Global Styles belongs there
-	// whatever the canvas happens to be showing — including a page standing in
-	// as the front page. The post editor instead offers it only while the
-	// template is on screen.
-	alwaysShowGlobalStyles = false,
-
 	// This could be part of the settings.
 	onActionPerformed,
 
@@ -87,12 +81,11 @@ function Editor( {
 				showGlobalStyles:
 					_isBlockTheme &&
 					userCanEditGlobalStyles &&
-					( alwaysShowGlobalStyles ||
-						currentPostType === 'wp_template' ||
+					( currentPostType === 'wp_template' ||
 						renderingMode === 'template-locked' ),
 			};
 		},
-		[ postType, postId, templateId, alwaysShowGlobalStyles ]
+		[ postType, postId, templateId ]
 	);
 
 	return (

@@ -195,7 +195,6 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 					postId={ postWithTemplate ? context.postId : postId }
 					templateId={ postWithTemplate ? postId : undefined }
 					settings={ editorSettings }
-					alwaysShowGlobalStyles
 					className="edit-site-editor__editor-interface"
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />
