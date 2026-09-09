@@ -49,9 +49,15 @@ export function preventFocusCapture() {
 			'pointerup',
 			onPointerUp
 		);
+		const unsubscribePointerCancel = subscribeDelegatedListener(
+			defaultView,
+			'pointercancel',
+			onPointerUp
+		);
 		return () => {
 			unsubscribePointerDown();
 			unsubscribePointerUp();
+			unsubscribePointerCancel();
 		};
 	};
 }
