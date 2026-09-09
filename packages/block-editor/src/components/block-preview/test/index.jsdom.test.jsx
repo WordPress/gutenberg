@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -76,6 +76,11 @@ describe( 'useBlockPreview', () => {
 			'test-container-classname',
 			{ exact: true }
 		);
+
+		// Ensure rendered blocks cannot be interacted with.
+		await waitFor( () => {
+			expect( previewedBlock ).toHaveAttribute( 'inert', 'true' );
+		} );
 
 		// Ensure there is no nesting between the parent component and rendered blocks.
 		expect( blockPreviewComponent ).toContainElement( previewedBlock );
