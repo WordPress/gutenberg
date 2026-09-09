@@ -984,6 +984,7 @@
       - onValueChange
       - render
       - required
+      - resetOnSelect
       - role
       - showOutsideDays
       - startMonth

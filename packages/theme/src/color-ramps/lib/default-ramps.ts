@@ -9,8 +9,8 @@ export const DEFAULT_RAMPS: Record<
 		ramp: {
 			surface2: '#fcfcfc',
 			bgFill1: '#555',
-			fgFill: '#f0f0f0',
 			bgFill2: '#484848',
+			fgFill: '#f0f0f0',
 			surface6: '#d6d6d6',
 			surface5: '#e6e6e6',
 			surface4: '#ededed',
@@ -35,8 +35,8 @@ export const DEFAULT_RAMPS: Record<
 	primary: {
 		ramp: {
 			bgFill1: '#3858e9',
-			fgFill: '#eff0f2',
 			bgFill2: '#2e49d9',
+			fgFill: '#eff0f2',
 			surface2: '#f8f8f8',
 			surface6: '#c6d2f1',
 			surface5: '#dae3f8',
@@ -62,8 +62,8 @@ export const DEFAULT_RAMPS: Record<
 	info: {
 		ramp: {
 			bgFill1: '#0090ff',
-			fgFill: '#1a1f24',
 			bgFill2: '#007fed',
+			fgFill: '#12161a',
 			surface2: '#f8f8f8',
 			surface6: '#bad6f6',
 			surface5: '#d1e4fb',
@@ -89,8 +89,8 @@ export const DEFAULT_RAMPS: Record<
 	success: {
 		ramp: {
 			bgFill1: '#4ab866',
-			fgFill: '#1b1f1c',
 			bgFill2: '#37a756',
+			fgFill: '#1b1f1c',
 			surface2: '#f8f8f8',
 			surface6: '#89e79b',
 			surface5: '#a4f5b2',
@@ -116,8 +116,8 @@ export const DEFAULT_RAMPS: Record<
 	caution: {
 		ramp: {
 			bgFill1: '#f0d149',
-			fgFill: '#1f1e1b',
 			bgFill2: '#dcbe2f',
+			fgFill: '#1f1e1b',
 			surface2: '#f8f8f8',
 			surface6: '#ead270',
 			surface5: '#f8e28a',
@@ -143,8 +143,8 @@ export const DEFAULT_RAMPS: Record<
 	warning: {
 		ramp: {
 			bgFill1: '#f0b849',
-			fgFill: '#201e1b',
 			bgFill2: '#dda633',
+			fgFill: '#201e1b',
 			surface2: '#f8f8f8',
 			surface6: '#f5cd86',
 			surface5: '#fcdfab',
@@ -170,8 +170,8 @@ export const DEFAULT_RAMPS: Record<
 	error: {
 		ramp: {
 			bgFill1: '#cc1818',
-			fgFill: '#f3efef',
 			bgFill2: '#b90000',
+			fgFill: '#f3efef',
 			surface2: '#f8f8f8',
 			surface6: '#f7c8c1',
 			surface5: '#fbdbd6',
