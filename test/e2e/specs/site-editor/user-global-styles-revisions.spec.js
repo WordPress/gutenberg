@@ -211,7 +211,7 @@ test.describe( 'Style Revisions', () => {
 				await page.getByRole( 'link', { name: 'Styles' } ).click();
 				await page
 					.getByRole( 'region', { name: 'Styles' } )
-					.getByRole( 'button', { name: /\d+ Revisions?/ } )
+					.getByRole( 'button', { name: 'Revisions' } )
 					.click();
 			} else {
 				// This flow starts from the browse-mode sidebar, not the edit
@@ -246,12 +246,19 @@ test.describe( 'Style Revisions', () => {
 		}
 	} );
 
+	// The back button this exercises ("Open Navigation") and the clickable
+	// canvas belong to the v1 site editor shell; v2 has no equivalent.
 	test( 'should keep the site preview clickable after leaving the styles editor', async ( {
 		admin,
 		page,
 		requestUtils,
 		userGlobalStylesRevisions,
 	} ) => {
+		test.skip(
+			isSiteEditorV2,
+			'The v1 site editor shell is not present in v2.'
+		);
+
 		// Opening a revision used to leave the canvas showing that revision's
 		// blocks, which are rendered without change or selection handlers, so
 		// the site preview stopped responding to clicks.
