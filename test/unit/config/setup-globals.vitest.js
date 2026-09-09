@@ -226,6 +226,17 @@ globalThis.wpVitest = {
 };
 
 if ( typeof globalThis.window !== 'undefined' ) {
+	// Node 26 has its own `localStorage` and `sessionStorage` globals, which are
+	// `undefined` unless Node runs with `--localstorage-file`. The Vitest jsdom
+	// environment does not copy a window property over a global that already
+	// exists, so point these back at the jsdom window.
+	for ( const key of [ 'localStorage', 'sessionStorage' ] ) {
+		Object.defineProperty( globalThis, key, {
+			configurable: true,
+			get: () => globalThis.jsdom.window[ key ],
+		} );
+	}
+
 	globalThis.window.tinyMCEPreInit = {
 		baseURL: 'about:blank',
 	};
