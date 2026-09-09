@@ -326,7 +326,11 @@
 		}
 
 		figcaption {
-			display: none;
+			display: block;
+			max-width: var(--wp--lightbox-image-width);
+			margin-top: 1rem;
+			color: #fff;
+			text-align: center;
 		}
 	}
 
