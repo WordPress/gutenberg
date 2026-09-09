@@ -6,7 +6,6 @@ import { create, RichTextData } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { removeFormat } from '../remove-format';
-import { ownsSelection } from '../owns-selection';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useEventListeners } from './event-listeners';
@@ -216,14 +215,9 @@ function useRichTextBase( {
 		useRefEffect(
 			( element ) => {
 				setRecordFromProps();
-
-				// Setting a selection into an unfocused editable moves focus in
-				// some browsers.
-				const focused =
-					element.contains( element.ownerDocument.activeElement ) ||
-					ownsSelection( element );
-
-				applyRecord( recordRef.current, { domOnly: ! focused } );
+				applyRecord( recordRef.current, {
+					domOnly: ! hasFocus( element ),
+				} );
 			},
 			[ placeholder, ...__unstableDependencies ]
 		),
