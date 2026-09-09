@@ -96,6 +96,22 @@ describe( 'props', () => {
 		} );
 	} );
 
+	test( 'should render alignment bottomLeft', () => {
+		render(
+			<Grid alignment="bottomLeft" data-testid="grid">
+				<View />
+				<View />
+				<View />
+			</Grid>
+		);
+
+		expect( screen.getByTestId( 'grid' ) ).toHaveStyle( {
+			display: 'grid',
+			alignItems: 'flex-end',
+			justifyContent: 'flex-start',
+		} );
+	} );
+
 	test( 'should render justify', () => {
 		render(
 			<Grid justify="flex-start" data-testid="grid">
