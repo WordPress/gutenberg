@@ -151,8 +151,14 @@ export default function useBlockSync( {
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
-	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
-		registry.select( blockEditorStore );
+	const {
+		getBlockName,
+		getBlocks,
+		getSelectionStart,
+		getSelectionEnd,
+		getBlockParents,
+		areInnerBlocksControlled,
+	} = registry.select( blockEditorStore );
 
 	const pendingChangesRef = useRef( { incoming: null, outgoing: [] } );
 	const subscribedRef = useRef( false );
@@ -222,6 +228,36 @@ export default function useBlockSync( {
 			);
 			isRestoringSelectionRef.current = false;
 		}
+	};
+
+	// Whether the block-editor's current selection sits inside a *different*
+	// inner block controller.
+	//
+	// Several controllers can render one entity — two Navigation blocks using
+	// the same menu, two Post Content blocks showing the same post. Each keeps
+	// private clones of that entity's blocks, but they all map the same
+	// external IDs, so each of them recognises the entity's selection as its
+	// own. A controller that finds the selection already sitting in another
+	// controller is therefore looking at a selection that belongs to a copy
+	// other than itself.
+	//
+	// The root controller is never one of several instances, and a selection
+	// held by the root block list belongs to no controller at all.
+	const isSelectionHeldByAnotherController = () => {
+		if ( clientId === null ) {
+			return false;
+		}
+		const currentStartClientId = getSelectionStart()?.clientId;
+		if ( ! currentStartClientId ) {
+			return false;
+		}
+		const owningController = getBlockParents(
+			currentStartClientId,
+			true
+		).find( ( parentClientId ) =>
+			areInnerBlocksControlled( parentClientId )
+		);
+		return !! owningController && owningController !== clientId;
 	};
 
 	const setControlledBlocks = () => {
@@ -341,7 +377,15 @@ export default function useBlockSync( {
 			// because dispatching resetSelection between keystrokes breaks
 			// the isUpdatingSameBlockAttribute chain and creates per-
 			// character undo levels.
-			restoreSelection();
+			//
+			// An edit made in another block rendering this same entity also
+			// arrives here as an external change, and that one must not move
+			// the selection: the caret is in the block being edited, and
+			// restoring would drag it — and the canvas — into this copy.
+			// See https://github.com/WordPress/gutenberg/issues/79096.
+			if ( ! isSelectionHeldByAnotherController() ) {
+				restoreSelection();
+			}
 		}
 	}, [ controlledBlocks, clientId ] );
 
@@ -351,8 +395,6 @@ export default function useBlockSync( {
 			isLastBlockChangePersistent,
 			__unstableGetLastBlockChangeHistoryMode,
 			__unstableIsLastBlockChangeIgnored,
-			areInnerBlocksControlled,
-			getBlockParents,
 		} = registry.select( blockEditorStore );
 
 		let blocks = getBlocks( clientId );
