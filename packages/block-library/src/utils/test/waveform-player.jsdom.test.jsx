@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom/vitest';
+import '@testing-library/jest-dom';
 import { act, render } from '@testing-library/react';
 import { WaveformPlayer } from '../waveform-player';
 import {
