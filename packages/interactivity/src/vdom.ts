@@ -157,9 +157,15 @@ export function toVdom( root: Node ): ComponentChild {
 				attributeName[ 0 ] === 'o' &&
 				attributeName[ 1 ] === 'n'
 			) {
-				// Preact treats any prop starting with "on" as an event listener
-				// and would try to attach the attribute string as a handler. The
-				// browser already runs these inline handlers, so leave them alone.
+				// Preact's `setProperty` sends every prop whose name starts
+				// with "on" down its event listener branch, where it stamps
+				// its event clock onto the value. Parsed HTML gives us a
+				// string, so that stamp throws `TypeError: Cannot create
+				// property ... on string`. The browser already runs real
+				// inline handlers, so dropping them here loses nothing.
+				// Preact 10.29.1, `setProperty` in `src/diff/props.js`,
+				// lines 79 and 93:
+				// https://github.com/preactjs/preact/blob/4dc9b508dd37544b858bfa52d28e12d219effdbb/src/diff/props.js#L79-L93
 				continue;
 			}
 			// For boolean attributes with empty string values, use `true`.
