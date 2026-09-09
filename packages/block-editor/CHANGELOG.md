@@ -13,7 +13,7 @@
 
 ### Deprecations
 
--   `__unstableSetEditorMode`: Deprecate the action. It only wrote the `editorTool` preference that backed the removed Write/Design tool, and nothing has read that preference since [#72193](https://github.com/WordPress/gutenberg/pull/72193). It now dispatches nothing and logs a deprecation notice ([#{TODO}](https://github.com/WordPress/gutenberg/pull/{TODO})).
+-   `__unstableSetEditorMode`: Deprecate the action. It only wrote the `editorTool` preference that backed the removed Write/Design tool, and nothing has read that preference since [#72193](https://github.com/WordPress/gutenberg/pull/72193). It now dispatches nothing and logs a deprecation notice ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
 
 ### Internal
 

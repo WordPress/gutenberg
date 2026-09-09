@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   `Editor.switchEditorTool()`: Remove the helper. It clicked the Write/Design "Tools" toolbar button, which the editor no longer renders since [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#{TODO}](https://github.com/WordPress/gutenberg/pull/{TODO})).
+-   `Editor.switchEditorTool()`: Remove the helper. It clicked the Write/Design "Tools" toolbar button, which the editor no longer renders since [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
 
 ### New Features
 
