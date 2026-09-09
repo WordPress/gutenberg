@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+-   `Disabled`: Keep the `className` passed by the consumer on the wrapper when `isDisabled` is `false`. Only `components-disabled` and the disabled styling are conditional now, so the wrapper stays styleable and targetable in both states ([#82648](https://github.com/WordPress/gutenberg/pull/82648)).
 -   `ProgressBar`: Remove determinate transitions and use a slower, stepped indeterminate animation when reduced motion is preferred. ([#82490](https://github.com/WordPress/gutenberg/pull/82490))
 -   `ColorPalette`: Apply the computed contrast color to the selected checkmark now that the icon is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   `CheckboxControl`: Color the checked and indeterminate icons with `color` rather than `fill`, so they stay visible now that those icons are stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
