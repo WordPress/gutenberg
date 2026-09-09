@@ -79,7 +79,7 @@ describe( 'useBlockPreview', () => {
 
 		// Ensure rendered blocks cannot be interacted with.
 		await waitFor( () => {
-			expect( previewedBlock ).toHaveAttribute( 'inert', 'true' );
+			expect( previewedBlock ).toHaveAttribute( 'inert' );
 		} );
 
 		// Ensure there is no nesting between the parent component and rendered blocks.
