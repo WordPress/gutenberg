@@ -47,6 +47,7 @@
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+-   Declare the `@storybook/addon-docs` development dependency used by the package's story documentation ([#82676](https://github.com/WordPress/gutenberg/pull/82676)).
 
 ### Bug Fixes
 

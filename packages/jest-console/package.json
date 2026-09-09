@@ -46,8 +46,8 @@
 	},
 	"devDependencies": {
 		"@types/jest": "^30.0.0",
-		"@types/node": "^20.19.39",
-		"vitest": "^4.1.11"
+		"@types/node": "^24.13.3",
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
 		"jest": ">=30"

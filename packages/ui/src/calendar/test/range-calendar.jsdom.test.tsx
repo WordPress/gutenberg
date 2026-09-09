@@ -1598,8 +1598,7 @@ describe( 'RangeCalendar', () => {
 			render(
 				<RangeCalendar
 					defaultValue={ timezoneRange }
-					// Note: using "Etc/GMT+2" instead of "-02:00" because support for raw offsets was introduced in Node v22 (while currently the repository still targets Node v20).
-					timeZone="Etc/GMT+2"
+					timeZone="-02:00"
 				/>
 			);
 
