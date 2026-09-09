@@ -108,6 +108,8 @@ describe( 'focusable', () => {
 			const node = createElement( 'div' );
 			const input = createElement( 'input' );
 			node.appendChild( input );
+			// Keep the fixture connected so JSDOM invalidates computed styles.
+			document.body.appendChild( node );
 
 			input.style.visibility = 'hidden';
 			expect( find( node ) ).toEqual( [] );
@@ -126,6 +128,8 @@ describe( 'focusable', () => {
 			const node = createElement( 'div' );
 			const input = createElement( 'input' );
 			node.appendChild( input );
+			// Keep the fixture connected so JSDOM invalidates computed styles.
+			document.body.appendChild( node );
 
 			node.style.visibility = 'hidden';
 			expect( find( node ) ).toEqual( [] );
