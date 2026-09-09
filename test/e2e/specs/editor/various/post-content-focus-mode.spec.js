@@ -93,6 +93,81 @@ test.describe( 'Post Content focus mode', () => {
 		} );
 	} );
 
+	// Post Content is an inner block controller, so an undo that moves the
+	// caret between two of its blocks crosses the same controlled container.
+	// See https://github.com/WordPress/gutenberg/pull/82706.
+	test( 'undo moves the caret between blocks of the same Post Content', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+		postContentFocusMode,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+		await postContentFocusMode.enableShowTemplate();
+
+		const postContentText = () =>
+			page.evaluate( () => {
+				const { getBlocksByName, getBlockOrder, getBlockAttributes } =
+					window.wp.data.select( 'core/block-editor' );
+				const [ postContent ] = getBlocksByName( 'core/post-content' );
+				return getBlockOrder( postContent ).map( ( clientId ) =>
+					getBlockAttributes( clientId )?.content?.toString?.()
+				);
+			} );
+
+		// Edit the first block, then the second, leaving the caret in the
+		// second.
+		await editor.selectBlocks( editor.canvas.getByText( 'First' ) );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '-a' );
+		await expect.poll( postContentText ).toEqual( [ 'First-a', 'Second' ] );
+
+		await editor.selectBlocks( editor.canvas.getByText( 'Second' ) );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '-b' );
+		await expect
+			.poll( postContentText )
+			.toEqual( [ 'First-a', 'Second-b' ] );
+
+		// Typing coalesces into undo levels on a timer, so the number of
+		// levels the two edits produce is not fixed. Undo until the first
+		// block's edit is gone rather than assuming a count.
+		let reverted = false;
+		for ( let i = 0; i < 8 && ! reverted; i++ ) {
+			await pageUtils.pressKeys( 'primary+z' );
+			try {
+				await expect
+					.poll( postContentText, { timeout: 1000 } )
+					.toEqual( [ 'First', 'Second' ] );
+				reverted = true;
+			} catch {
+				// Not there yet; undo again.
+			}
+		}
+		expect( reverted ).toBe( true );
+
+		// The caret was in the second block and has to follow the undo to
+		// the first one.
+		const selected = await page.evaluate( () => {
+			const { getSelectedBlockClientId, getBlockAttributes } =
+				window.wp.data.select( 'core/block-editor' );
+			const clientId = getSelectedBlockClientId();
+			return clientId
+				? getBlockAttributes( clientId )?.content?.toString?.()
+				: null;
+		} );
+		expect( selected ).toBe( 'First' );
+	} );
+
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/76101.
 	test.describe( 'post content inside a template part', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
