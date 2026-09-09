@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   User autocompleter: Don't open the mention popup when the `@` follows other text, such as while typing an email address; mentions still trigger at the start of a line or after a space ([#47249](https://github.com/WordPress/gutenberg/pull/47249)).
+-   User autocompleter: Don't open the mention popup when the `@` follows other text, such as while typing an email address; mentions still trigger after a space, punctuation, or at the start of a line ([#47249](https://github.com/WordPress/gutenberg/pull/47249)).
 
 ### Enhancements
 

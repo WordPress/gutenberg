@@ -44,8 +44,11 @@ export default {
 	triggerPrefix: '@',
 
 	allowContext( before ) {
-		// Triggers when at the beginning of a context or when the immediately preceding character is a space.
-		return /^$/.test( before ) || /^\s$/.test( before.slice( -1 ) );
+		// Only trigger when the preceding character is not a word character,
+		// so typing an email address does not open the mention popup, while
+		// mentions still work at the start of a line or after spaces and
+		// punctuation such as an opening parenthesis.
+		return /\B$/.test( before );
 	},
 
 	useItems( filterValue ) {
