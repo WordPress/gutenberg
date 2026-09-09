@@ -176,12 +176,47 @@ export interface LayoutSettings {
 }
 
 /**
+ * Fluid spacing settings for responsive spacing sizes
+ */
+export interface FluidSpacingConfig {
+	min?: string | number | null;
+	preferred?: string | number | null;
+	max?: string | number | null;
+}
+
+/**
+ * Spacing size preset definition
+ */
+export interface SpacingSizePreset extends BasePreset {
+	size: string | number | null;
+	fluid?: boolean | FluidSpacingConfig;
+}
+
+/**
+ * Convenience type alias for spacing size data
+ */
+export type SpacingSize = SpacingSizePreset;
+
+/**
+ * Spacing sizes collection
+ */
+export interface SpacingSizes {
+	theme?: SpacingSizePreset[];
+	custom?: SpacingSizePreset[];
+	default?: SpacingSizePreset[];
+	defaultEnabled?: boolean;
+}
+/**
  * Spacing settings
  */
 export interface SpacingSettings {
 	padding?: string | Record< string, string >;
 	margin?: string | Record< string, string >;
 	blockGap?: string;
+	spacingSizes?: SpacingSizes;
+	customSpacingSize?: boolean;
+	defaultSpacingSizes?: boolean;
+	units?: string[] | null;
 }
 
 // =============================================================================
