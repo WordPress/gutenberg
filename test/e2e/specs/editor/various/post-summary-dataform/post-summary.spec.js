@@ -100,7 +100,7 @@ test.describe( 'Post Summary', () => {
 			} );
 		}
 
-		test( 'shows title and sync status while creating a new synced pattern in the post editor', async ( {
+		test( 'shows title, sync status and the description placeholder while creating a new synced pattern in the post editor', async ( {
 			admin,
 			editor,
 			page,
@@ -118,6 +118,11 @@ test.describe( 'Post Summary', () => {
 			await expect( fields.title ).toHaveText( title );
 			await expect(
 				fields.syncStatus.row.getByText( 'Synced', { exact: true } )
+			).toBeVisible();
+			await expect(
+				fields.description.row.getByText( 'Add a description', {
+					exact: true,
+				} )
 			).toBeVisible();
 		} );
 
@@ -409,9 +414,10 @@ test.describe( 'Post Summary', () => {
 			await admin.createNewPost();
 			const summary = await openPostSummary( { editor, page } );
 
-			await expect(
-				summary.getByText( 'Add an excerpt', { exact: true } )
-			).toBeVisible();
+			const placeholder = summary.getByText( 'Add an excerpt', {
+				exact: true,
+			} );
+			await expect( placeholder ).toBeVisible();
 
 			await summary
 				.getByRole( 'button', { name: 'Edit Excerpt' } )
@@ -424,6 +430,7 @@ test.describe( 'Post Summary', () => {
 			await expect(
 				summary.getByText( 'A DataForm excerpt.', { exact: true } )
 			).toBeVisible();
+			await expect( placeholder ).toBeHidden();
 			await expect
 				.poll( () =>
 					page.evaluate( () =>
@@ -630,7 +637,58 @@ test.describe( 'Post Summary', () => {
 				default_comment_status: 'open',
 			} );
 			await requestUtils.deleteAllPages();
+			await requestUtils.deleteAllTemplates( 'wp_template' );
 			await requestUtils.activateTheme( 'twentytwentyone' );
+		} );
+
+		test( 'sets the description of a custom template from the summary panel', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			// `createTemplate` marks the template as a WordPress suggestion,
+			// which makes it not custom and hides the description field.
+			const template = await requestUtils.rest( {
+				method: 'POST',
+				path: '/wp/v2/templates',
+				params: {
+					slug: 'dataform-summary',
+					title: 'DataForm summary',
+					type: 'wp_template',
+					status: 'publish',
+					// An empty template opens the start-template pattern modal
+					// over the editor, which hides the sidebar from role queries.
+					content:
+						'<!-- wp:paragraph --><p>Template content.</p><!-- /wp:paragraph -->',
+				},
+			} );
+			await admin.visitSiteEditor( {
+				postId: template.id,
+				postType: 'wp_template',
+				canvas: 'edit',
+			} );
+			const summary = await openPostSummary( { editor, page } );
+
+			const placeholder = summary.getByText( 'Add a description', {
+				exact: true,
+			} );
+			await expect( placeholder ).toBeVisible();
+
+			await summary
+				.getByRole( 'button', { name: 'Edit Description' } )
+				.click();
+			await page
+				.getByRole( 'textbox', { name: 'Description' } )
+				.fill( 'A DataForm template description.' );
+			await page.keyboard.press( 'Escape' );
+
+			await expect(
+				summary.getByText( 'A DataForm template description.', {
+					exact: true,
+				} )
+			).toBeVisible();
+			await expect( placeholder ).toBeHidden();
 		} );
 
 		test( 'edits the posts page and the site settings from the index template', async ( {
