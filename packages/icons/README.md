@@ -28,6 +28,17 @@ A growing subset of the library is stroke-based. Those icons set `fill: none` as
 
 `Icon` merges a consumer `style` with the icon's own styles. The consumer value wins for the same property.
 
+## PHP and other non-JavaScript consumers
+
+The build generates an `icons.json` file at the package root: a flat JSON object mapping each icon's slug (e.g. `plus`, `format-ltr`) to its raw SVG markup. This makes the library accessible from environments that cannot import React components:
+
+```php
+$icons = json_decode( file_get_contents( $path_to_package_root . '/icons.json' ), true );
+echo $icons['plus'];
+```
+
+The file is regenerated on every build. Its content matches the SVG sources in `src/library/` exactly, so icons inherit text color through `currentColor` and can be recolored the same way as the React components.
+
 ## Props
 
 | Name    | Type      | Default | Description                                                                 |
@@ -51,9 +62,9 @@ To add a new icon to the library, follow these steps:
    - `label`: The human-readable label for the icon. Use Title Case (for example, `My New Icon`).
    - `filePath`: The relative path to the SVG file (e.g., `library/my-new-icon.svg`)
    - `public` (optional): Set to `true` if you want to expose this icon as a core icon through the SVG Icons API. **Important**: Once an icon is made public, removing it is difficult, so carefully consider whether to make it public before setting this field to `true`.
-4. **Do not edit `manifest.php`**: The `manifest.php` file is automatically generated from `manifest.json` by the build script. Do not edit it manually, as your changes will be overwritten when the build runs.
+4. **Do not edit `manifest.php` or `icons.json`**: The `manifest.php` and `icons.json` files are automatically generated from `manifest.json` by the build script. Do not edit them manually, as your changes will be overwritten when the build runs.
 
-After adding your icon, run `npm run build` to generate the TypeScript files and update `manifest.php`.
+After adding your icon, run `npm run build` to generate the TypeScript files and update `manifest.php` and `icons.json`.
 
 ## Contributing to this package
 

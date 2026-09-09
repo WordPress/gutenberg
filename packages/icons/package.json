@@ -28,6 +28,7 @@
 		"build",
 		"build-module",
 		"build-types",
+		"icons.json",
 		"*.md"
 	],
 	"main": "build/index.cjs",
@@ -69,6 +70,6 @@
 	"scripts": {
 		"prelint:js": "npm run build",
 		"prepare": "npm run build",
-		"build": "node lib/generate-library.cjs && node lib/generate-manifest-php.cjs"
+		"build": "node lib/generate-library.cjs && node lib/generate-manifest-php.cjs && node lib/generate-icons-json.cjs"
 	}
 }
