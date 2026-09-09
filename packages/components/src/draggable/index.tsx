@@ -83,6 +83,17 @@ export function Draggable( {
 		event.preventDefault();
 		cleanupRef.current();
 
+		// Clear the :active state by temporarily removing and re-adding the element.
+		if ( event.target instanceof HTMLElement ) {
+			const element = event.target;
+			const parent = element.parentNode;
+			if ( parent ) {
+				const nextSibling = element.nextSibling;
+				parent.removeChild( element );
+				parent.insertBefore( element, nextSibling );
+			}
+		}
+
 		if ( onDragEnd ) {
 			onDragEnd( event );
 		}
@@ -197,6 +208,8 @@ export function Draggable( {
 		let cursorTop = event.clientY;
 
 		function over( e: DragEvent ) {
+			e.preventDefault();
+
 			// Skip doing any work if mouse has not moved.
 			if ( cursorLeft === e.clientX && cursorTop === e.clientY ) {
 				return;
@@ -223,6 +236,19 @@ export function Draggable( {
 		// Update cursor to 'grabbing', document wide.
 		ownerDocument.body.classList.add( bodyClass );
 
+		// Apply the cursor style to any editor iframes that might be present.
+		const editorIframes = ownerDocument.querySelectorAll(
+			'iframe[name="editor-canvas"]'
+		);
+		editorIframes.forEach( ( iframe ) => {
+			const iframeDocument =
+				( iframe as HTMLIFrameElement ).contentDocument ||
+				( iframe as HTMLIFrameElement ).contentWindow?.document;
+			if ( iframeDocument ) {
+				iframeDocument.body.classList.add( bodyClass );
+			}
+		} );
+
 		if ( onDragStart ) {
 			onDragStart( event );
 		}
@@ -239,6 +265,16 @@ export function Draggable( {
 
 			// Reset cursor.
 			ownerDocument.body.classList.remove( bodyClass );
+
+			// Remove the cursor style from any editor iframes.
+			editorIframes.forEach( ( iframe ) => {
+				const iframeDocument =
+					( iframe as HTMLIFrameElement ).contentDocument ||
+					( iframe as HTMLIFrameElement ).contentWindow?.document;
+				if ( iframeDocument ) {
+					iframeDocument.body.classList.remove( bodyClass );
+				}
+			} );
 
 			ownerDocument.removeEventListener( 'dragover', throttledDragOver );
 		};
