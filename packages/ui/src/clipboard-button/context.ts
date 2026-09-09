@@ -14,12 +14,14 @@ const fallbackContext: ClipboardButtonContextValue = {
 export const ClipboardButtonContext =
 	createContext< ClipboardButtonContextValue | null >( null );
 
-export function useClipboardButtonContext() {
+export function useClipboardButtonContext(
+	componentName: 'ClipboardButton.Icon' | 'ClipboardButton.Label'
+) {
 	const context = useContext( ClipboardButtonContext );
 
 	if ( process.env.NODE_ENV !== 'production' && ! context ) {
 		throw new Error(
-			'ClipboardButton.Icon: Missing parent <ClipboardButton>. Render <ClipboardButton.Icon> inside <ClipboardButton>.'
+			`${ componentName }: Missing parent <ClipboardButton>. Render <${ componentName }> inside <ClipboardButton>.`
 		);
 	}
 

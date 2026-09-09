@@ -35,8 +35,8 @@ function isIconOnlyChildren( children: ClipboardButtonProps[ 'children' ] ) {
 
 /**
  * A button that copies text to the clipboard. Inherits `Button` props, including
- * `tone` and `variant`. Compose `ClipboardButton.Icon`, text, or both as
- * children.
+ * `tone` and `variant`. Compose `ClipboardButton.Icon`, `ClipboardButton.Label`,
+ * or both as children.
  *
  * When rendering a group of `ClipboardButton`s, wrap them in a
  * `Tooltip.Provider` to coordinate tooltip delays across the group.
@@ -48,7 +48,7 @@ function isIconOnlyChildren( children: ClipboardButtonProps[ 'children' ] ) {
  * 	return (
  * 		<ClipboardButton text="Text to copy">
  * 			<ClipboardButton.Icon />
- * 			Copy
+ * 			<ClipboardButton.Label />
  * 		</ClipboardButton>
  * 	);
  * }

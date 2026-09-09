@@ -243,9 +243,60 @@ describe( 'ClipboardButton', () => {
 		expect( ref.current ).toBeInstanceOf( SVGSVGElement );
 	} );
 
+	it( 'updates the visible label after a successful copy', async () => {
+		const user = userEvent.setup();
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockResolvedValue();
+
+		render(
+			<ClipboardButton text="test text">
+				<ClipboardButton.Label />
+			</ClipboardButton>
+		);
+
+		expect( screen.getByRole( 'button', { name: 'Copy' } ) ).toBeVisible();
+
+		await user.click( screen.getByRole( 'button', { name: 'Copy' } ) );
+
+		expect(
+			screen.getByRole( 'button', { name: 'Copied' } )
+		).toBeVisible();
+	} );
+
+	it( 'restores the pending label after timeout', async () => {
+		const user = userEvent.setup();
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockResolvedValue();
+
+		render(
+			<ClipboardButton text="test text" timeout={ 10 }>
+				<ClipboardButton.Label />
+			</ClipboardButton>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Copy' } ) );
+
+		await waitFor( () => {
+			expect(
+				screen.getByRole( 'button', { name: 'Copied' } )
+			).toBeVisible();
+		} );
+
+		await waitFor( () => {
+			expect(
+				screen.getByRole( 'button', { name: 'Copy' } )
+			).toBeVisible();
+		} );
+	} );
+
 	it( 'throws when ClipboardButton.Icon is outside ClipboardButton', () => {
 		expect( () => render( <ClipboardButton.Icon /> ) ).toThrow(
 			'ClipboardButton.Icon: Missing parent <ClipboardButton>. Render <ClipboardButton.Icon> inside <ClipboardButton>.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
+	it( 'throws when ClipboardButton.Label is outside ClipboardButton', () => {
+		expect( () => render( <ClipboardButton.Label /> ) ).toThrow(
+			'ClipboardButton.Label: Missing parent <ClipboardButton>. Render <ClipboardButton.Label> inside <ClipboardButton>.'
 		);
 		expect( console ).toHaveErrored();
 	} );

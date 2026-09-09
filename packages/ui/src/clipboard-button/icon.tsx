@@ -14,7 +14,9 @@ export const ClipboardButtonIcon = forwardRef<
 	SVGSVGElement,
 	ClipboardButtonIconProps
 >( function ClipboardButtonIcon( { className, icon, ...props }, ref ) {
-	const { status, isIconOnly } = useClipboardButtonContext();
+	const { status, isIconOnly } = useClipboardButtonContext(
+		'ClipboardButton.Icon'
+	);
 	const resolvedIcon = status === 'success' ? check : icon ?? copy;
 
 	return (

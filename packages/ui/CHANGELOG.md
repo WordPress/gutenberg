@@ -12,7 +12,7 @@
 
 ### New Features
 
--   Add `ClipboardButton` component with a `ClipboardButton.Icon` subcomponent.
+-   Add `ClipboardButton` component with `ClipboardButton.Icon` and `ClipboardButton.Label` subcomponents.
 -   Add `CheckboxControl` component ([#82213](https://github.com/WordPress/gutenberg/pull/82213)).
 -   Add `Radio` form primitive ([#82214](https://github.com/WordPress/gutenberg/pull/82214)).
 -   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))

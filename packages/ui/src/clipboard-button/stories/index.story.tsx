@@ -9,6 +9,7 @@ const meta: Meta< typeof ClipboardButton > = {
 	component: ClipboardButton,
 	subcomponents: {
 		'ClipboardButton.Icon': ClipboardButton.Icon,
+		'ClipboardButton.Label': ClipboardButton.Label,
 	},
 	argTypes: {
 		'aria-pressed': {
@@ -143,27 +144,34 @@ export const AllTonesAndVariants: Story = {
 };
 
 /**
- * Render only a text label, without `ClipboardButton.Icon`.
+ * Render only a text label, without `ClipboardButton.Icon`. The label
+ * switches to “Copied” after a successful copy.
  */
 export const TextOnly: Story = {
 	args: {
-		children: 'Copy',
+		children: <ClipboardButton.Label />,
 	},
 };
 
 /**
- * Compose `ClipboardButton.Icon` with a visible label, the same way
+ * Compose `ClipboardButton.Icon` with `ClipboardButton.Label`, the same way
  * `Button.Icon` is used inside `Button`.
  */
 export const WithIconAndText: Story = {
 	args: {
-		children: [ <ClipboardButton.Icon key="icon" />, 'Copy' ],
+		children: [
+			<ClipboardButton.Icon key="icon" />,
+			<ClipboardButton.Label key="label" />,
+		],
 	},
 };
 
 export const IconAtEnd: Story = {
 	args: {
-		children: [ 'Copy', <ClipboardButton.Icon key="icon" /> ],
+		children: [
+			<ClipboardButton.Label key="label" />,
+			<ClipboardButton.Icon key="icon" />,
+		],
 	},
 };
 
@@ -173,7 +181,10 @@ export const IconAtEnd: Story = {
  */
 export const CustomIcon: Story = {
 	args: {
-		children: [ <ClipboardButton.Icon key="icon" icon={ cog } />, 'Copy' ],
+		children: [
+			<ClipboardButton.Icon key="icon" icon={ cog } />,
+			<ClipboardButton.Label key="label" />,
+		],
 	},
 };
 
@@ -190,7 +201,7 @@ export const CustomLabels: Story = {
 export const WithoutTooltip: Story = {
 	args: {
 		hasTooltip: false,
-		children: 'Copy',
+		children: <ClipboardButton.Label />,
 	},
 };
 

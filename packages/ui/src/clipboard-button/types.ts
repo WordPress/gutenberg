@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { ButtonIconProps, ButtonProps } from '../button/types';
 import type { PopupProps as TooltipPopupProps } from '../tooltip/types';
 
@@ -62,4 +63,20 @@ export type ClipboardButtonIconProps = Omit< ButtonIconProps, 'icon' > & {
 	 * icon is used. Success still shows a check icon.
 	 */
 	icon?: ButtonIconProps[ 'icon' ];
+};
+
+export type ClipboardButtonLabelProps = {
+	/**
+	 * Text shown before copying.
+	 *
+	 * @default __( 'Copy' )
+	 */
+	pending?: ReactNode;
+
+	/**
+	 * Text shown after a successful copy.
+	 *
+	 * @default __( 'Copied' )
+	 */
+	success?: ReactNode;
 };
