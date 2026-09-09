@@ -9,7 +9,7 @@ import {
 } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { focus, isTextField } from '@wordpress/dom';
+import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '../../store';
@@ -153,18 +153,7 @@ function useToolbarFocus( {
 				const items =
 					getAllFocusableToolbarItemsIn( navigableToolbarRef );
 				const index = initialIndex || 0;
-				const { activeElement, body } =
-					navigableToolbarRef.ownerDocument;
-				// Focus the item when the toolbar has focus, or when the
-				// toolbar remounted from under the focused item and focus
-				// was lost to the body: the block toolbar is keyed on the
-				// block and its parent, and remounts when the block moves.
-				if (
-					items[ index ] &&
-					( hasFocusWithin( navigableToolbarRef ) ||
-						( initialIndex !== undefined &&
-							activeElement === body ) )
-				) {
+				if ( items[ index ] && hasFocusWithin( navigableToolbarRef ) ) {
 					items[ index ].focus( {
 						// When focusing newly mounted toolbars,
 						// the position of the popover is often not right on the first render
@@ -187,30 +176,6 @@ function useToolbarFocus( {
 		};
 	}, [ initialIndex, initialFocusOnMount, onIndexChange, toolbarRef ] );
 
-	// Report the index of the focused item as it changes, so it is known
-	// when the toolbar remounts from under it (see above): the unmount
-	// cleanup reports it too late for a replacement rendered in the same
-	// commit.
-	useEffect( () => {
-		if ( ! onIndexChange ) {
-			return;
-		}
-
-		const toolbar = toolbarRef.current;
-
-		function onFocusIn( event ) {
-			onIndexChange(
-				getAllFocusableToolbarItemsIn( toolbar ).indexOf( event.target )
-			);
-		}
-
-		toolbar.addEventListener( 'focusin', onFocusIn );
-
-		return () => {
-			toolbar.removeEventListener( 'focusin', onFocusIn );
-		};
-	}, [ onIndexChange, toolbarRef ] );
-
 	/**
 	 * Handles returning focus to the block editor canvas when pressing escape.
 	 */
@@ -227,24 +192,10 @@ function useToolbarFocus( {
 			// The last focused element is only recorded once focus has left
 			// the canvas, so fall back to the selected block. Without it
 			// escape leaves focus stranded in the toolbar, with no way back
-			// to the canvas by keyboard. The recorded element may no longer
-			// take focus: it was removed (the block re-rendered after it
-			// moved), or it was an editing host that has since been
-			// disabled. Return to the block's first text field then, where
-			// focus left from.
-			const lastFocus = getLastFocus()?.current;
-			const blockElement = refsMap.get( getSelectedBlockClientId() );
-			let target = lastFocus ?? blockElement;
-			if (
-				lastFocus &&
-				blockElement &&
-				( ! lastFocus.isConnected ||
-					lastFocus.contentEditable === 'false' )
-			) {
-				target =
-					focus.tabbable.find( blockElement ).find( isTextField ) ??
-					blockElement;
-			}
+			// to the canvas by keyboard.
+			const target =
+				getLastFocus()?.current ??
+				refsMap.get( getSelectedBlockClientId() );
 			if ( target ) {
 				event.preventDefault();
 				target.focus();
