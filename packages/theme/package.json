@@ -104,7 +104,6 @@
 		"@types/node": "^24.13.3",
 		"@wordpress/validation-tools": "file:../../tools/validation",
 		"esbuild": "^0.27.2",
-		"esbuild-esm-loader": "^0.3.3",
 		"lightningcss": "^1.33.0",
 		"prettier": "npm:wp-prettier@^3.0.3",
 		"storybook": "^10.5.3",
@@ -145,8 +144,8 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
-		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
+		"build:default-ramps": "node bin/generate-default-ramps/index.ts",
+		"build:tokens": "node bin/generate-primitive-tokens/index.ts && node bin/build-design-tokens/index.ts",
 		"build": "npm run build:default-ramps && npm run build:tokens",
 		"lint:package-contents": "wp-validate-package-contents . --disallow-path src",
 		"postbuild": "prettier --write tokens/color.json tokens/modes prebuilt src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
