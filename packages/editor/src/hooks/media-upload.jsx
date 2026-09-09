@@ -1,15 +1,57 @@
 import { Component } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import deprecated from '@wordpress/deprecated';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	MediaUpload,
 	privateApis as mediaUtilsPrivateApis,
 } from '@wordpress/media-utils';
 import { unlock } from '../lock-unlock';
+import { store as editorStore } from '../store';
 
 const { MediaUploadModal: MediaUploadModalComponent } = unlock(
 	mediaUtilsPrivateApis
 );
+
+/**
+ * Supplies the modal with the post it was opened from, so that its "Attached to"
+ * filter can offer media uploaded to that post, labelled with the post type's
+ * own wording. `media-utils` has no editor dependency, so the post is injected
+ * here.
+ *
+ * The post is only passed on when media can actually belong to it. Templates and
+ * the like have no front end of their own, so an image can't be uploaded to one —
+ * the same reasoning, and the same `viewable` check, as attaching media on save.
+ * Their entity ID is a slug rather than a number besides, which the media query
+ * has no use for.
+ *
+ * @param {Object} props Props passed through to the modal.
+ */
+function MediaUploadModalWithPostContext( props ) {
+	const { postId, postType } = useSelect( ( select ) => {
+		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+		const currentPostId = getCurrentPostId();
+		const currentPostType = getCurrentPostType();
+		const postTypeObject = currentPostType
+			? select( coreStore ).getPostType( currentPostType )
+			: undefined;
+
+		if ( typeof currentPostId !== 'number' || ! postTypeObject?.viewable ) {
+			return {};
+		}
+
+		return { postId: currentPostId, postType: currentPostType };
+	}, [] );
+
+	return (
+		<MediaUploadModalComponent
+			{ ...props }
+			postId={ postId }
+			postType={ postType }
+		/>
+	);
+}
 
 /**
  * Class component wrapper for MediaUploadModal to maintain compatibility
@@ -49,7 +91,7 @@ class MediaUploadModalWrapper extends Component {
 		return (
 			<>
 				{ render( { open: this.openModal } ) }
-				<MediaUploadModalComponent
+				<MediaUploadModalWithPostContext
 					allowedTypes={ allowedTypes }
 					multiple={ multiple }
 					value={ value }

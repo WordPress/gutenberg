@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { press, click } from '@ariakit/test';
 import AlignmentMatrixControl from '..';
@@ -51,7 +52,7 @@ describe( 'AlignmentMatrixControl', () => {
 					'bottom center',
 					'bottom right',
 				] )( '%s', async ( alignment ) => {
-					const spy = jest.fn();
+					const spy = vi.fn();
 
 					await renderAndInitCompositeStore(
 						<AlignmentMatrixControl
@@ -69,7 +70,7 @@ describe( 'AlignmentMatrixControl', () => {
 				} );
 
 				it( 'unless already focused', async () => {
-					const spy = jest.fn();
+					const spy = vi.fn();
 
 					await renderAndInitCompositeStore(
 						<AlignmentMatrixControl
@@ -96,7 +97,7 @@ describe( 'AlignmentMatrixControl', () => {
 					[ 'ArrowDown', 'bottom center' ],
 					[ 'ArrowRight', 'center right' ],
 				] as const )( '%s', async ( keyRef, cellRef ) => {
-					const spy = jest.fn();
+					const spy = vi.fn();
 
 					await renderAndInitCompositeStore(
 						<AlignmentMatrixControl onChange={ spy } />
@@ -117,7 +118,7 @@ describe( 'AlignmentMatrixControl', () => {
 					[ 'ArrowDown', 'bottom right' ],
 					[ 'ArrowRight', 'bottom right' ],
 				] as const )( '%s', async ( keyRef, cellRef ) => {
-					const spy = jest.fn();
+					const spy = vi.fn();
 
 					await renderAndInitCompositeStore(
 						<AlignmentMatrixControl onChange={ spy } />
