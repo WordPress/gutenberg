@@ -14,6 +14,7 @@
 
 ### Internal
 
+-   Run rendered Grid tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
 -   Remove unused dependency `@dnd-kit/utilities` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 
 ## 0.6.0 (2026-08-26)
