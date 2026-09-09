@@ -3,7 +3,10 @@ const dns = require( 'dns' ).promises;
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const got = require( 'got' );
+const SimpleGit = require( 'simple-git' );
 const { getCache, setCache } = require( './cache' );
+
+const WORDPRESS_MIRROR_URL = 'https://github.com/WordPress/WordPress.git';
 
 /**
  * @typedef {import('./config').WPSource} WPSource
@@ -58,8 +61,58 @@ async function canAccessWPORG() {
 }
 
 /**
- * Returns the latest stable version of WordPress by requesting the stable-check
- * endpoint on WordPress.org.
+ * Returns every stable version tag currently on the WordPress/WordPress
+ * mirror, which is what wp-env actually fetches WordPress core from.
+ *
+ * @return {?string[]} Every available version, like [ '6.5.8', '6.5.9' ].
+ *                      Null if the mirror couldn't be queried, e.g. the
+ *                      remote or the local network connection is down.
+ */
+async function getMirrorVersions() {
+	try {
+		const output = await SimpleGit().listRemote( [
+			'--tags',
+			WORDPRESS_MIRROR_URL,
+		] );
+		return output
+			.split( '\n' )
+			.map(
+				( line ) =>
+					line.match( /refs\/tags\/(\d+\.\d+(?:\.\d+)?)$/ )?.[ 1 ]
+			)
+			.filter( Boolean );
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Compares two dotted-numeric WordPress version strings, like "6.5.9" and
+ * "6.5.10" or "6.6".
+ *
+ * @param {string} a A version string.
+ * @param {string} b Another version string.
+ * @return {number} Negative if a < b, positive if a > b, zero if equal.
+ */
+function compareWordPressVersions( a, b ) {
+	const partsA = a.split( '.' ).map( Number );
+	const partsB = b.split( '.' ).map( Number );
+
+	for ( let i = 0; i < Math.max( partsA.length, partsB.length ); i++ ) {
+		const diff = ( partsA[ i ] || 0 ) - ( partsB[ i ] || 0 );
+		if ( diff !== 0 ) {
+			return diff;
+		}
+	}
+
+	return 0;
+}
+
+/**
+ * Returns the latest stable version of WordPress, as reported by the
+ * stable-check endpoint on WordPress.org. If the WordPress/WordPress mirror
+ * hasn't synced that version's tag yet, falls back to a version the mirror
+ * actually has.
  *
  * @param {Object} options an object with cacheDirectoryPath set to the path to the cache directory in ~/.wp-env.
  * @return {string} The latest stable version of WordPress, like "6.0.1"
@@ -96,6 +149,37 @@ async function getLatestWordPressVersion( options ) {
 
 	for ( const [ version, status ] of Object.entries( versions ) ) {
 		if ( status === 'latest' ) {
+			const mirrorVersions = await getMirrorVersions();
+
+			// A null mirrorVersions means the listing itself failed, most
+			// likely a network issue -- that isn't confirmation the tag is
+			// missing, so fall through to using the reported version as
+			// before.
+			if (
+				mirrorVersions !== null &&
+				! mirrorVersions.includes( version )
+			) {
+				// The mirror hasn't synced this tag yet, so fall back to the
+				// highest version it actually has instead of returning a
+				// version that's guaranteed to fail the `git fetch` that
+				// follows.
+				const fallback = [ ...mirrorVersions ]
+					.sort( compareWordPressVersions )
+					.pop();
+
+				console.warn(
+					`wp-env: WordPress ${ version } hasn't synced to the WordPress/WordPress mirror yet. Using ${ fallback } instead.`
+				);
+
+				CACHED_WP_VERSION = fallback;
+				await setCache(
+					'latestWordPressVersion',
+					fallback,
+					cacheOptions
+				);
+				return fallback;
+			}
+
 			CACHED_WP_VERSION = version;
 			await setCache( 'latestWordPressVersion', version, cacheOptions );
 			return version;
