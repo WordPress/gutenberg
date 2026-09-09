@@ -61,9 +61,8 @@
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0",
-		"@types/node": "^20.19.39",
-		"vitest": "^4.1.10"
+		"@types/node": "^24.13.3",
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

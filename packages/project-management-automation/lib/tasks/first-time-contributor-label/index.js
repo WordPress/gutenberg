@@ -1,8 +1,8 @@
-const { setOutput } = require( '@actions/core' );
-const debug = require( '../../debug' );
+import { setOutput } from '@actions/core';
+import debug from '../../debug.js';
 
 /** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
-/** @typedef {import('@octokit/webhooks-types').EventPayloadMap['pull_request']} WebhookPayloadPullRequest */
+/** @typedef {import('@octokit/openapi-webhooks-types').components['schemas']['webhook-pull-request-opened']} WebhookPayloadPullRequest */
 
 /**
  * Assigns the first-time contributor label to PRs.
@@ -80,4 +80,4 @@ async function firstTimeContributorLabel( payload, octokit ) {
 	);
 }
 
-module.exports = firstTimeContributorLabel;
+export default firstTimeContributorLabel;

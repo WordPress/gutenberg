@@ -815,4 +815,97 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 			},
 		] );
 	} );
+
+	// Do NOT alter unless re-testing iOS auto-capitalization.
+	test( 'should split on beforeinput, moving focus after the key is handled', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'First' );
+
+		// Record the order of the events involved in handling Enter. The iOS
+		// keyboard reads the caret when the key has been handled: cancelling
+		// Enter on keydown and moving focus to the new block in that same
+		// handler leaves its auto-capitalization stale. Handled on
+		// beforeinput, the next word is capitalized.
+		await editor.canvas.locator( ':root' ).evaluate( () => {
+			const events = [];
+			window.__enterEvents = events;
+			// Capture phase on the window: before every handler.
+			window.addEventListener(
+				'keydown',
+				( event ) => {
+					if ( event.key === 'Enter' ) {
+						events.push( 'keydown' );
+					}
+				},
+				true
+			);
+			window.addEventListener(
+				'beforeinput',
+				( event ) => events.push( `beforeinput:${ event.inputType }` ),
+				true
+			);
+			// Bubble phase on the window: after every handler that may
+			// cancel the event.
+			window.addEventListener( 'beforeinput', ( event ) => {
+				window.__enterCancelled = event.defaultPrevented;
+			} );
+			document.addEventListener(
+				'focusin',
+				() => events.push( 'focusin' ),
+				true
+			);
+		} );
+
+		await page.keyboard.press( 'Enter' );
+
+		const { events, cancelled } = await editor.canvas
+			.locator( ':root' )
+			.evaluate( () => ( {
+				events: window.__enterEvents,
+				cancelled: window.__enterCancelled,
+			} ) );
+		// Nothing happens on keydown: the beforeinput fires, is cancelled,
+		// and focus only moves while it is being handled.
+		expect( events ).toEqual( [
+			'keydown',
+			'beforeinput:insertParagraph',
+			'focusin',
+		] );
+		expect( cancelled ).toBe( true );
+
+		// The caret is at the very start of the new field: not after the
+		// padding character and not in the placeholder, which the keyboard
+		// would read as a character before the caret.
+		const caret = await editor.canvas.locator( ':root' ).evaluate( () => {
+			const { anchorNode, anchorOffset } = window.getSelection();
+			const element =
+				anchorNode.nodeType === anchorNode.ELEMENT_NODE
+					? anchorNode
+					: anchorNode.parentElement;
+			const field = element.closest(
+				'.block-editor-rich-text__editable'
+			);
+			// A range only to read what precedes the caret; the selection
+			// is left as Enter placed it.
+			const beforeCaret = document.createRange();
+			beforeCaret.setStart( field, 0 );
+			beforeCaret.setEnd( anchorNode, anchorOffset );
+			return {
+				textBefore: beforeCaret.toString(),
+				inPlaceholder: !! element.closest(
+					'[data-rich-text-placeholder]'
+				),
+			};
+		} );
+		expect( caret ).toEqual( { textBefore: '', inPlaceholder: false } );
+
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: '‸' } },
+		] );
+	} );
 } );

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 /* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
 import { render, screen } from '@testing-library/react';
 import { createPortal, forwardRef, useId } from '@wordpress/element';

@@ -1,3 +1,5 @@
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+
 /**
  * Mock response value for a successful fetch.
  *
@@ -16,10 +18,10 @@ describe( 'apiFetch', () => {
 	beforeEach( async () => {
 		// Reset the `apiFetch` module before each test to clear
 		// internal variables (middlewares, fetch handler, etc.).
-		jest.resetModules();
+		vi.resetModules();
 		apiFetch = ( await import( '../' ) ).default;
 
-		globalThis.fetch = jest.fn();
+		globalThis.fetch = vi.fn();
 	} );
 
 	afterAll( () => {
@@ -216,6 +218,36 @@ describe( 'apiFetch', () => {
 		await expect( apiFetch( { path: '/random' } ) ).resolves.toBe( null );
 	} );
 
+	it( 'should return null for a 200 response with an empty body', async () => {
+		globalThis.fetch.mockResolvedValue(
+			new Response( '', { status: 200 } )
+		);
+
+		await expect( apiFetch( { path: '/random' } ) ).resolves.toBe( null );
+	} );
+
+	it( 'should return invalid JSON error for a 200 response with a non-empty invalid body', async () => {
+		globalThis.fetch.mockResolvedValue(
+			new Response( 'not json', { status: 200 } )
+		);
+
+		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
+			code: 'invalid_json',
+			message: 'The response is not a valid JSON response.',
+		} );
+	} );
+
+	it( 'should return invalid JSON error for an error response with an empty body', async () => {
+		globalThis.fetch.mockResolvedValue(
+			new Response( '', { status: 500 } )
+		);
+
+		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
+			code: 'invalid_json',
+			message: 'The response is not a valid JSON response.',
+		} );
+	} );
+
 	it( 'should not try to parse the response', async () => {
 		const mockResponse = {
 			ok: true,
@@ -329,7 +361,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should not use the default fetch handler when using a custom fetch handler', async () => {
-		const customFetchHandler = jest.fn();
+		const customFetchHandler = vi.fn();
 
 		apiFetch.setFetchHandler( customFetchHandler );
 
@@ -355,15 +387,15 @@ describe( 'apiFetch', () => {
 		} );
 
 		// Set a custom fetch handler to avoid using the default fetch handler.
-		apiFetch.setFetchHandler( jest.fn() );
+		apiFetch.setFetchHandler( vi.fn() );
 
 		await apiFetch( expectedOptions );
 	} );
 
 	describe( 'unregister', () => {
 		it( 'should stop calling a middleware once it is unregistered', async () => {
-			const middleware = jest.fn( ( options, next ) => next( options ) );
-			const fetchHandler = jest
+			const middleware = vi.fn( ( options, next ) => next( options ) );
+			const fetchHandler = vi
 				.fn()
 				.mockResolvedValue( DEFAULT_FETCH_MOCK_RETURN );
 			apiFetch.setFetchHandler( fetchHandler );

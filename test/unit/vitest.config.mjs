@@ -21,6 +21,10 @@ const gutenbergEnvSetupFile = path.join(
 	ROOT_DIR,
 	'test/unit/config/gutenberg-env.js'
 );
+const isolationSetupFile = path.join(
+	ROOT_DIR,
+	'test/unit/config/isolation.vitest.js'
+);
 const testMigration = JSON.parse(
 	readFileSync(
 		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
@@ -166,6 +170,7 @@ export default defineConfig( {
 							ROOT_DIR,
 							'test/unit/config/console.vitest.js'
 						),
+						isolationSetupFile,
 					],
 				},
 			},
@@ -202,6 +207,7 @@ export default defineConfig( {
 							ROOT_DIR,
 							'test/unit/config/testing-library.vitest.js'
 						),
+						isolationSetupFile,
 					],
 				},
 			},
@@ -215,6 +221,7 @@ export default defineConfig( {
 							ROOT_DIR,
 							'test/unit/config/console.vitest.js'
 						),
+						isolationSetupFile,
 					],
 					browser: {
 						enabled: true,
@@ -225,8 +232,13 @@ export default defineConfig( {
 				},
 			},
 		],
+		// mockReset already clears every mock. Keep clearMocks disabled to make
+		// that overlap explicit and avoid a redundant cleanup pass.
+		clearMocks: false,
 		globals: false,
 		includeTaskLocation: true,
+		isolate: true,
+		mockReset: true,
 		passWithNoTests: false,
 		reporters,
 		sequence: {
@@ -237,5 +249,8 @@ export default defineConfig( {
 			escapeString: false,
 			printBasicPrototype: false,
 		},
+		restoreMocks: true,
+		unstubEnvs: true,
+		unstubGlobals: true,
 	},
 } );
