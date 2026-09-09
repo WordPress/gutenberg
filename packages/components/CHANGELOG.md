@@ -34,7 +34,7 @@
 
 ### TypeScript
 
--   Fix internal `WordPressComponent` polymorphic typings to avoid unsupported `as` props unintentionally surfacing.
+-   Fix internal `WordPressComponent` polymorphic typings to avoid unsupported `as` props unintentionally surfacing ([#87204](https://github.com/WordPress/gutenberg/pull/82704)).
 
 ### Internal
 
