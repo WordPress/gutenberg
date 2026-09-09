@@ -1,29 +1,19 @@
-import { createRequire } from 'node:module';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-const require = createRequire( import.meta.url );
-const actionsCorePath = require.resolve( '@actions/core' );
-const originalActionsCore = require( actionsCorePath );
-const setOutput = vi.fn();
-const hasWordPressProfile = vi.fn();
-const hasWordPressProfilePath = require.resolve(
-	'../../../has-wordpress-profile'
-);
-const originalHasWordPressProfile = require( hasWordPressProfilePath );
-const taskPath = require.resolve( '../' );
-let firstTimeContributorAccountLink;
-try {
-	require.cache[ actionsCorePath ].exports = {
-		...originalActionsCore,
-		setOutput,
-	};
-	require.cache[ hasWordPressProfilePath ].exports = hasWordPressProfile;
-	firstTimeContributorAccountLink = require( taskPath );
-} finally {
-	require.cache[ actionsCorePath ].exports = originalActionsCore;
-	require.cache[ hasWordPressProfilePath ].exports =
-		originalHasWordPressProfile;
-	delete require.cache[ taskPath ];
-}
+import * as core from '@actions/core';
+import hasWordPressProfile from '../../../has-wordpress-profile.js';
+import firstTimeContributorAccountLink from '../index.js';
+
+vi.mock( import( '@actions/core' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	setOutput: vi.fn(),
+} ) );
+
+vi.mock( import( '../../../has-wordpress-profile.js' ), () => ( {
+	default: vi.fn(),
+} ) );
+
+const setOutput = vi.mocked( core.setOutput );
+const mockedHasWordPressProfile = vi.mocked( hasWordPressProfile );
 const botUser = {
 	data: {
 		name: 'Ghost',
@@ -44,7 +34,7 @@ const humanUser = {
 describe( 'firstTimeContributorAccountLink', () => {
 	beforeEach( () => {
 		setOutput.mockReset();
-		hasWordPressProfile.mockReset();
+		mockedHasWordPressProfile.mockReset();
 	} );
 
 	const payload = {
@@ -200,7 +190,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 			},
 		};
 
-		hasWordPressProfile.mockImplementation( () => {
+		mockedHasWordPressProfile.mockImplementation( () => {
 			return Promise.reject( new Error( 'Whoops!' ) );
 		} );
 
@@ -237,7 +227,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 			},
 		};
 
-		hasWordPressProfile.mockReturnValue( Promise.resolve( false ) );
+		mockedHasWordPressProfile.mockReturnValue( Promise.resolve( false ) );
 
 		await firstTimeContributorAccountLink( payload, octokit );
 

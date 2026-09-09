@@ -1,7 +1,5 @@
-import { createRequire } from 'node:module';
 import { describe, expect, it, vi } from 'vitest';
-const require = createRequire( import.meta.url );
-const addMilestone = require( '../' );
+import addMilestone from '../index.js';
 
 describe( 'addMilestone', () => {
 	it( 'does nothing if base is not trunk', async () => {

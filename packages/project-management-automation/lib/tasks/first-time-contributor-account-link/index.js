@@ -1,11 +1,11 @@
-const { setOutput } = require( '@actions/core' );
-const debug = require( '../../debug' );
-const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
-const hasWordPressProfile = require( '../../has-wordpress-profile' );
+import { setOutput } from '@actions/core';
+import debug from '../../debug.js';
+import getAssociatedPullRequest from '../../get-associated-pull-request.js';
+import hasWordPressProfile from '../../has-wordpress-profile.js';
 
 /** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
-/** @typedef {import('@octokit/webhooks-types').EventPayloadMap['push']} WebhookPayloadPush */
-/** @typedef {import('../../get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
+/** @typedef {import('@octokit/openapi-webhooks-types').components['schemas']['webhook-push']} WebhookPayloadPush */
+/** @typedef {import('../../get-associated-pull-request.js').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
 
 /**
  * Returns the message text to be used for the comment prompting contributor to
@@ -66,7 +66,12 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 	}
 
 	const repo = payload.repository.name;
-	const owner = payload.repository.owner.login;
+	const owner = payload.repository.owner?.login;
+	if ( ! owner ) {
+		throw new Error(
+			'first-time-contributor-account-link: Push payload is missing a repository owner.'
+		);
+	}
 	const author = commit.author.username;
 
 	debug(
@@ -125,4 +130,4 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 	setOutput( 'first-time-contributor-pr-number', pullRequest );
 }
 
-module.exports = firstTimeContributorAccountLink;
+export default firstTimeContributorAccountLink;
