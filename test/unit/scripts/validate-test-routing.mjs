@@ -9,6 +9,7 @@ import {
 	findAddedLegacyJestTests,
 	findOverlappingVitestProjectTests,
 	getTestEnvironmentName,
+	getVitestProjectName,
 	getVitestTests,
 	getVitestTestsByProject,
 	VITEST_PROJECT_NAMES,
@@ -95,7 +96,7 @@ function listVitestTestsByProject() {
 		const match = line.match( /^\[([^\]]+)\]\s+(.+)$/ );
 		assert.ok( match, `Unexpected Vitest list output: ${ line }` );
 		const [ , listedProjectName, testPath ] = match;
-		const projectName = listedProjectName.replace( / \(.+\)$/, '' );
+		const projectName = getVitestProjectName( listedProjectName );
 		assert.ok(
 			testsByProject[ projectName ],
 			`Unexpected Vitest project \`${ projectName }\`. Expected only: ${ VITEST_PROJECT_NAMES.join(

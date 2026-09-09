@@ -20,6 +20,7 @@ export const TEST_IGNORES = [
 ];
 
 export const VITEST_PROJECT_NAMES = [ 'node', 'jsdom', 'browser' ];
+export const VITEST_SHARED_PROJECT_NAME = 'unit';
 
 const JSDOM_TEST_PATH_PATTERN = /\.jsdom\.test\.[jt]sx?$/;
 const BROWSER_TEST_PATH_PATTERN = /\.browser\.test\.[jt]sx?$/;
@@ -70,6 +71,14 @@ export function getTestEnvironmentName( testPath ) {
 	}
 
 	return 'node';
+}
+
+export function getVitestProjectName( listedProjectName ) {
+	const nestedProjectName = listedProjectName.match(
+		new RegExp( `^${ VITEST_SHARED_PROJECT_NAME } \\(([^)]+)\\)$` )
+	)?.[ 1 ];
+
+	return nestedProjectName ?? listedProjectName.replace( / \(.+\)$/, '' );
 }
 
 export function getVitestTestsByProject( discoveredTests, manifest ) {

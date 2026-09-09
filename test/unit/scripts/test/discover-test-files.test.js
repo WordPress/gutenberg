@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	findAddedLegacyJestTests,
 	getTestEnvironmentName,
+	getVitestProjectName,
 	getVitestTestsByProject,
 } from '../discover-test-files.mjs';
 import { sourceHasTestEnvironmentOverride } from '../test-environment-overrides.mjs';
@@ -19,6 +20,16 @@ describe( 'getTestEnvironmentName', () => {
 
 	it( 'routes *.browser.test.* filenames to Browser Mode', () => {
 		expect( getTestEnvironmentName( 'example.browser.test.js' ) ).toBe(
+			'browser'
+		);
+	} );
+} );
+
+describe( 'getVitestProjectName', () => {
+	it( 'normalizes nested Node and jsdom project labels', () => {
+		expect( getVitestProjectName( 'unit (node)' ) ).toBe( 'node' );
+		expect( getVitestProjectName( 'unit (jsdom)' ) ).toBe( 'jsdom' );
+		expect( getVitestProjectName( 'browser (chromium)' ) ).toBe(
 			'browser'
 		);
 	} );

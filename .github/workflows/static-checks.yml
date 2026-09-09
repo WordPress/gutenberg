@@ -104,7 +104,7 @@ jobs:
               run: npm run lint:js -- --format compact --quiet --prune-suppressions
 
             - name: Test agent skill setup
-              run: npm run test:unit:vitest -- --project=node tools/agents/test/setup-skills.test.js
+              run: npm run test:unit:vitest -- --project='unit (node)' tools/agents/test/setup-skills.test.js
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}

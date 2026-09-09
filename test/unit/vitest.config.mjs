@@ -35,7 +35,7 @@ const vitestTests = getVitestTestsByProject(
 	discoverTestFiles( ROOT_DIR ),
 	testMigration
 );
-const styleMockAlias = {
+export const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,
 	replacement: path.join( ROOT_DIR, 'test/unit/config/style-mock.vitest.js' ),
 };
@@ -76,7 +76,7 @@ const transpiledPackageNames = globSync(
 		return relative.split( path.sep )[ 1 ];
 	} );
 
-export default defineConfig( {
+export const sharedViteConfig = {
 	root: ROOT_DIR,
 	oxc: {
 		jsx: {
@@ -152,105 +152,96 @@ export default defineConfig( {
 			},
 		],
 	},
+};
+
+export const sharedTestConfig = {
+	// mockReset already clears every mock. Keep clearMocks disabled to make
+	// that overlap explicit and avoid a redundant cleanup pass.
+	clearMocks: false,
+	globals: false,
+	includeTaskLocation: true,
+	isolate: true,
+	mockReset: true,
+	passWithNoTests: false,
+	reporters,
+	sequence: {
+		hooks: 'list',
+		setupFiles: 'list',
+	},
+	snapshotFormat: {
+		escapeString: false,
+		printBasicPrototype: false,
+	},
+	restoreMocks: true,
+	unstubEnvs: true,
+	unstubGlobals: true,
+};
+
+export const nodeProject = {
+	extends: true,
 	test: {
-		projects: [
-			{
-				extends: true,
-				resolve: {
-					alias: [ styleMockAlias ],
-				},
-				test: {
-					name: 'node',
-					environment: 'node',
-					pool: 'threads',
-					include: vitestTests.node,
-					setupFiles: [
-						gutenbergEnvSetupFile,
-						path.join(
-							ROOT_DIR,
-							'test/unit/config/console.vitest.js'
-						),
-						isolationSetupFile,
-					],
-				},
-			},
-			{
-				extends: true,
-				resolve: {
-					alias: [ styleMockAlias ],
-				},
-				test: {
-					name: 'jsdom',
-					environment: 'jsdom',
-					pool: 'threads',
-					environmentOptions: {
-						jsdom: {
-							url: 'http://localhost/',
-						},
-					},
-					include: vitestTests.jsdom,
-					setupFiles: [
-						path.join(
-							ROOT_DIR,
-							'test/unit/config/setup-globals.vitest.js'
-						),
-						path.join(
-							ROOT_DIR,
-							'test/unit/config/global-mocks.vitest.js'
-						),
-						gutenbergEnvSetupFile,
-						path.join(
-							ROOT_DIR,
-							'test/unit/config/console.vitest.js'
-						),
-						path.join(
-							ROOT_DIR,
-							'test/unit/config/testing-library.vitest.js'
-						),
-						isolationSetupFile,
-					],
-				},
-			},
-			{
-				extends: true,
-				test: {
-					name: 'browser',
-					include: vitestTests.browser,
-					setupFiles: [
-						path.join(
-							ROOT_DIR,
-							'test/unit/config/console.vitest.js'
-						),
-						isolationSetupFile,
-					],
-					browser: {
-						enabled: true,
-						headless: true,
-						instances: [ { browser: 'chromium' } ],
-						provider: playwright(),
-					},
-				},
-			},
+		name: 'node',
+		environment: 'node',
+		pool: 'threads',
+		include: vitestTests.node,
+		setupFiles: [
+			gutenbergEnvSetupFile,
+			path.join( ROOT_DIR, 'test/unit/config/console.vitest.js' ),
+			isolationSetupFile,
 		],
-		// mockReset already clears every mock. Keep clearMocks disabled to make
-		// that overlap explicit and avoid a redundant cleanup pass.
-		clearMocks: false,
-		globals: false,
-		includeTaskLocation: true,
-		isolate: true,
-		mockReset: true,
-		passWithNoTests: false,
-		reporters,
-		sequence: {
-			hooks: 'list',
-			setupFiles: 'list',
+	},
+};
+
+export const jsdomProject = {
+	extends: true,
+	test: {
+		name: 'jsdom',
+		environment: 'jsdom',
+		pool: 'threads',
+		environmentOptions: {
+			jsdom: {
+				url: 'http://localhost/',
+			},
 		},
-		snapshotFormat: {
-			escapeString: false,
-			printBasicPrototype: false,
+		include: vitestTests.jsdom,
+		setupFiles: [
+			path.join( ROOT_DIR, 'test/unit/config/setup-globals.vitest.js' ),
+			path.join( ROOT_DIR, 'test/unit/config/global-mocks.vitest.js' ),
+			gutenbergEnvSetupFile,
+			path.join( ROOT_DIR, 'test/unit/config/console.vitest.js' ),
+			path.join( ROOT_DIR, 'test/unit/config/testing-library.vitest.js' ),
+			isolationSetupFile,
+		],
+	},
+};
+
+const browserProject = {
+	extends: true,
+	test: {
+		name: 'browser',
+		include: vitestTests.browser,
+		setupFiles: [
+			path.join( ROOT_DIR, 'test/unit/config/console.vitest.js' ),
+			isolationSetupFile,
+		],
+		browser: {
+			enabled: true,
+			headless: true,
+			instances: [ { browser: 'chromium' } ],
+			provider: playwright(),
 		},
-		restoreMocks: true,
-		unstubEnvs: true,
-		unstubGlobals: true,
+	},
+};
+
+export default defineConfig( {
+	...sharedViteConfig,
+	test: {
+		...sharedTestConfig,
+		projects: [
+			// Vitest roots referenced config files at their directory. The
+			// repository-root proxy preserves the existing include paths.
+			path.join( ROOT_DIR, 'vitest.unit.config.mjs' ),
+			browserProject,
+		],
 	},
 } );

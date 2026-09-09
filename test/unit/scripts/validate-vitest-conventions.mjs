@@ -55,7 +55,9 @@ const vitestTestSet = new Set( vitestTests );
 const jsdomTests = new Set( vitestTestsByProject.jsdom );
 const browserTests = new Set( vitestTestsByProject.browser );
 const vitestInfrastructure = [
+	'vitest.unit.config.mjs',
 	'test/unit/vitest.config.mjs',
+	'test/unit/vitest.node-jsdom.config.mjs',
 	...globSync( 'test/unit/config/**/*.vitest*.{js,jsx,mjs,ts,tsx}', {
 		cwd: ROOT_DIR,
 		nodir: true,
@@ -140,15 +142,23 @@ const rootPackageJson = JSON.parse(
 const unitTestPackageJson = JSON.parse(
 	readFileSync( path.join( ROOT_DIR, 'test/unit/package.json' ), 'utf8' )
 );
-const vitestConfig = (
-	await import(
-		pathToFileURL( path.join( ROOT_DIR, 'test/unit/vitest.config.mjs' ) )
-	)
-).default;
+const vitestConfigFiles = [
+	'test/unit/vitest.config.mjs',
+	'test/unit/vitest.node-jsdom.config.mjs',
+];
+const vitestConfigs = await Promise.all(
+	vitestConfigFiles.map( async ( configFile ) => [
+		configFile,
+		( await import( pathToFileURL( path.join( ROOT_DIR, configFile ) ) ) )
+			.default,
+	] )
+);
 violations.push(
 	...findVitestIsolationOptOuts( ROOT_DIR ),
 	...validateRoutingScripts( rootPackageJson, unitTestPackageJson ),
-	...validateVitestCleanupConfig( vitestConfig ),
+	...vitestConfigs.flatMap( ( [ configFile, config ] ) =>
+		validateVitestCleanupConfig( config, configFile )
+	),
 	...validateVitestShuffleScripts( rootPackageJson, unitTestPackageJson )
 );
 

@@ -290,7 +290,7 @@ function getPropertyName( property ) {
 function findConfigIsolationOptOuts( rootDir ) {
 	const violations = [];
 	const configFiles = globSync(
-		'**/{vite,vitest}.config.{js,jsx,cjs,mjs,ts,tsx,cts,mts}',
+		'**/{vite,vitest}{,.*}.config.{js,jsx,cjs,mjs,ts,tsx,cts,mts}',
 		{
 			cwd: rootDir,
 			ignore: SOURCE_IGNORES,
@@ -342,7 +342,10 @@ export function findVitestIsolationOptOuts( rootDir ) {
 	].sort();
 }
 
-export function validateVitestCleanupConfig( vitestConfig ) {
+export function validateVitestCleanupConfig(
+	vitestConfig,
+	configFile = 'test/unit/vitest.config.mjs'
+) {
 	const violations = [];
 	const requiredOptions = [
 		'isolate',
@@ -354,39 +357,39 @@ export function validateVitestCleanupConfig( vitestConfig ) {
 
 	for ( const option of requiredOptions ) {
 		if ( vitestConfig.test?.[ option ] !== true ) {
-			violations.push(
-				`test/unit/vitest.config.mjs: test.${ option } must be true`
-			);
+			violations.push( `${ configFile }: test.${ option } must be true` );
 		}
 	}
 	if ( vitestConfig.test?.globals !== false ) {
-		violations.push(
-			'test/unit/vitest.config.mjs: test.globals must remain false'
-		);
+		violations.push( `${ configFile }: test.globals must remain false` );
 	}
 	if ( vitestConfig.test?.clearMocks !== false ) {
 		violations.push(
-			'test/unit/vitest.config.mjs: test.clearMocks must remain false while test.mockReset is true'
+			`${ configFile }: test.clearMocks must remain false while test.mockReset is true`
 		);
 	}
 
 	for ( const project of vitestConfig.test?.projects ?? [] ) {
+		if ( typeof project === 'string' ) {
+			continue;
+		}
+
 		const projectName = project.test?.name ?? 'unnamed';
 		if ( project.extends !== true ) {
 			violations.push(
-				`test/unit/vitest.config.mjs: ${ projectName } must set extends: true to inherit the shared isolation defaults`
+				`${ configFile }: ${ projectName } must set extends: true to inherit the shared isolation defaults`
 			);
 		}
 		for ( const option of requiredOptions ) {
 			if ( project.test?.[ option ] === false ) {
 				violations.push(
-					`test/unit/vitest.config.mjs: ${ projectName } overrides test.${ option } with false`
+					`${ configFile }: ${ projectName } overrides test.${ option } with false`
 				);
 			}
 		}
 		if ( project.test?.globals === true ) {
 			violations.push(
-				`test/unit/vitest.config.mjs: ${ projectName } enables global Vitest APIs`
+				`${ configFile }: ${ projectName } enables global Vitest APIs`
 			);
 		}
 	}

@@ -211,7 +211,7 @@ describe( 'runner isolation policy', () => {
 			recursive: true,
 		} );
 		writeFileSync(
-			path.join( rootDir, 'vitest.config.mjs' ),
+			path.join( rootDir, 'vitest.node-jsdom.config.mjs' ),
 			`const isolate = true;
 export default {
 	test: {
@@ -238,8 +238,8 @@ export default {
 			'.github/workflows/test.yml:1 disables Vitest module isolation: vitest --no-isolate',
 			'package.json:scripts.test disables Vitest module isolation: vitest --no-isolate',
 			'package.json:scripts.test:browser disables Vitest module isolation: vitest --browser.isolate=false',
-			'vitest.config.mjs:4 must set isolate to the literal value true',
-			'vitest.config.mjs:6 must set isolate to the literal value true',
+			'vitest.node-jsdom.config.mjs:4 must set isolate to the literal value true',
+			'vitest.node-jsdom.config.mjs:6 must set isolate to the literal value true',
 		] );
 	} );
 
@@ -258,22 +258,26 @@ export default {
 		);
 	} );
 
-	it( 'requires every Vitest project to inherit the shared defaults', () => {
+	it( 'allows referenced project containers while requiring inline projects to inherit shared cleanup defaults', () => {
 		expect(
 			validateVitestCleanupConfig( {
 				test: {
+					clearMocks: false,
 					globals: false,
 					isolate: true,
 					mockReset: true,
 					restoreMocks: true,
 					unstubEnvs: true,
 					unstubGlobals: true,
-					projects: [ { extends: false, test: { name: 'escape' } } ],
+					projects: [
+						'vitest.unit.config.mjs',
+						{ extends: false, test: { name: 'escape' } },
+					],
 				},
 			} )
-		).toContain(
-			'test/unit/vitest.config.mjs: escape must set extends: true to inherit the shared isolation defaults'
-		);
+		).toEqual( [
+			'test/unit/vitest.config.mjs: escape must set extends: true to inherit the shared isolation defaults',
+		] );
 	} );
 } );
 
