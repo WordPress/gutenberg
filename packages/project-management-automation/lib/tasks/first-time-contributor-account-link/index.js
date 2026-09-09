@@ -64,6 +64,15 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 		return;
 	}
 
+	const repo = payload.repository.name;
+	const owner = payload.repository.owner?.login;
+	if ( ! owner ) {
+		debug(
+			'first-time-contributor-account-link: Push payload is missing a repository owner. Aborting'
+		);
+		return;
+	}
+
 	const { data: user } = await octokit.rest.users.getByUsername( {
 		username: author,
 	} );
@@ -71,14 +80,6 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 	if ( user.type === 'Bot' ) {
 		debug( 'first-time-contributor-account-link: User is a bot. Aborting' );
 		return;
-	}
-
-	const repo = payload.repository.name;
-	const owner = payload.repository.owner?.login;
-	if ( ! owner ) {
-		throw new Error(
-			'first-time-contributor-account-link: Push payload is missing a repository owner.'
-		);
 	}
 
 	debug(

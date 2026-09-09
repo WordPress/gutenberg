@@ -138,6 +138,31 @@ describe( 'firstTimeContributorAccountLink', () => {
 		expect( getByUsername ).not.toHaveBeenCalled();
 	} );
 
+	it( 'does nothing if the repository owner is unavailable', async () => {
+		const payloadWithoutOwner = {
+			...payload,
+			repository: {
+				name: payload.repository.name,
+			},
+		};
+		const getByUsername = vi.fn( () => humanUser );
+		const listCommits = vi.fn();
+
+		await firstTimeContributorAccountLink( payloadWithoutOwner, {
+			rest: {
+				repos: {
+					listCommits,
+				},
+				users: {
+					getByUsername,
+				},
+			},
+		} );
+
+		expect( getByUsername ).not.toHaveBeenCalled();
+		expect( listCommits ).not.toHaveBeenCalled();
+	} );
+
 	it( 'does nothing for commits by bots', async () => {
 		const octokit = {
 			rest: {
