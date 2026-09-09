@@ -45,11 +45,11 @@
 	},
 	"devDependencies": {
 		"@types/mime": "^2.0.3",
-		"@types/node": "^20.19.39"
+		"@types/node": "^24.13.3"
 	},
 	"peerDependencies": {
 		"@playwright/test": ">=1",
-		"@types/node": "^20.17.10"
+		"@types/node": ">=20"
 	},
 	"publishConfig": {
 		"access": "public"
