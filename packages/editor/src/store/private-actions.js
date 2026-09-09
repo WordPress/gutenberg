@@ -761,3 +761,18 @@ export function selectNote( noteId, options = { focus: false } ) {
 		options,
 	};
 }
+
+/**
+ * Records whether the post title field has focus, so the sidebar can describe
+ * the title rather than reporting that nothing is selected.
+ *
+ * @param {boolean} isEditing Whether the title has focus.
+ *
+ * @return {Object} Action object.
+ */
+export function setIsEditingPostTitle( isEditing ) {
+	return {
+		type: 'SET_IS_EDITING_POST_TITLE',
+		isEditing,
+	};
+}
