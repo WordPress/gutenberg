@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   Increase the minimum required Node.js version to 22.11.0 and convert the package to ES modules. It can no longer be loaded with `require()` ([#82663](https://github.com/WordPress/gutenberg/pull/82663)).
+-   Increase the minimum required Node.js version to 24.18.0 and convert the package to ES modules. It can no longer be loaded with `require()` ([#82663](https://github.com/WordPress/gutenberg/pull/82663)).
 -   The first-time contributor welcome message is no longer posted as a comment. The action now exposes it as the `welcome-prompt` output ([#82249](https://github.com/WordPress/gutenberg/pull/82249)).
 -   The first-time contributor account link prompt is no longer posted as a comment. The action now exposes it as the `first-time-contributor-prompt` output, alongside `first-time-contributor-pr-number` for the pull request it belongs to, so the prompt can join the single automation comment maintained by `tools/pr-meta` ([#82249](https://github.com/WordPress/gutenberg/pull/82249)).
 
