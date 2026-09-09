@@ -9,6 +9,7 @@ import {
 import { WithGlobalCSS } from './decorators/with-global-css';
 import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
+import { WithButtonTextLabels } from './decorators/with-button-text-labels';
 import { WithDesignSystemTheme } from './decorators/with-design-system-theme';
 import { ComponentStatusIndicator } from './components/component-status-indicator';
 import { handlePreloadError } from './load-error-recovery';
@@ -74,6 +75,7 @@ export const globalTypes = {
 export const decorators = [
 	WithGlobalCSS,
 	WithRTL,
+	WithButtonTextLabels,
 	WithMaxWidthWrapper,
 	WithDesignSystemTheme,
 ];
