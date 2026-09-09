@@ -2193,43 +2193,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/block-fields/fields-dropdown-menu.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/block-fields/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/block-fields/link/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/block-fields/media/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/block-fields/rich-text/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/hooks/block-hooks.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1

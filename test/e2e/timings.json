@@ -8888,14 +8888,6 @@
 									]
 								},
 								{
-									"title": "should be possible to edit the value of the connected custom fields in the inspector control registered by Block Fields experiment",
-									"attempts": [
-										{
-											"duration": 3627
-										}
-									]
-								},
-								{
 									"title": "should be possible to connect movie fields through the attributes panel",
 									"attempts": [
 										{

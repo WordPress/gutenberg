@@ -373,12 +373,13 @@ test.describe( 'Post Meta source', () => {
 	} );
 
 	test.describe( 'Movie CPT post', () => {
-		test.beforeEach( async ( { admin } ) => {
+		test.beforeEach( async ( { admin, editor } ) => {
 			// CHECK HOW TO CREATE A MOVIE.
 			await admin.createNewPost( {
 				postType: 'movie',
 				title: 'Test bindings',
 			} );
+			await editor.openDocumentSettingsSidebar();
 		} );
 
 		test( 'should show the custom field value of that specific post', async ( {
@@ -534,46 +535,6 @@ test.describe( 'Post Meta source', () => {
 				'true'
 			);
 			await paragraphBlock.fill( 'new value' );
-			// Check that the paragraph content attribute didn't change.
-			const [ paragraphBlockObject ] = await editor.getBlocks();
-			expect( paragraphBlockObject.attributes.content ).toBe(
-				'fallback content'
-			);
-			// Check the value of the custom field is being updated by visiting the frontend.
-			const previewPage = await editor.openPreviewPage();
-			await expect(
-				previewPage.locator( '#connected-paragraph' )
-			).toHaveText( 'new value' );
-		} );
-
-		test( 'should be possible to edit the value of the connected custom fields in the inspector control registered by Block Fields experiment', async ( {
-			editor,
-			page,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: {
-					anchor: 'connected-paragraph',
-					content: 'fallback content',
-					metadata: {
-						bindings: {
-							content: {
-								source: 'core/post-meta',
-								args: {
-									key: 'movie_field',
-								},
-							},
-						},
-					},
-				},
-			} );
-			const contentInput = page.getByRole( 'textbox', {
-				label: 'Content',
-			} );
-			await expect( contentInput ).toHaveText(
-				'Movie field default value'
-			);
-			await contentInput.fill( 'new value' );
 			// Check that the paragraph content attribute didn't change.
 			const [ paragraphBlockObject ] = await editor.getBlocks();
 			expect( paragraphBlockObject.attributes.content ).toBe(
