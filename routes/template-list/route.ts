@@ -1,12 +1,9 @@
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { filterSortAndPaginate } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { notFound } from '@wordpress/route';
-import {
-	ensureView,
-	getFirstTemplateInView,
-	loadTemplateFields,
-} from './view-utils';
+import { ensureView, loadTemplateFields } from './view-utils';
 import type { Template } from './types';
 
 /**
@@ -56,11 +53,12 @@ export const route = {
 			};
 		}
 
-		// Otherwise, preview the template the stage selects by default. The
-		// templates endpoint ignores search, ordering and pagination, so
-		// fetch every template (the same query the stage uses, so the
-		// records are shared) and apply the view client-side over the
-		// same field definitions the stage renders.
+		// Otherwise, preview the template the stage selects by default: the
+		// first row after applying the view's search, filters, sort and
+		// pagination. The templates endpoint ignores search, ordering and
+		// pagination, so fetch every template (the same query the stage
+		// uses, so the records are shared) and apply the view client-side
+		// over the same field definitions the stage renders.
 		const [ templates, fields ] = await Promise.all( [
 			resolveSelect( coreStore ).getEntityRecords(
 				'postType',
@@ -69,11 +67,8 @@ export const route = {
 			) as Promise< Template[] | null >,
 			loadTemplateFields(),
 		] );
-		const template = getFirstTemplateInView(
-			templates ?? [],
-			view,
-			fields
-		);
+		const template = filterSortAndPaginate( templates ?? [], view, fields )
+			.data[ 0 ];
 
 		if ( template ) {
 			return {

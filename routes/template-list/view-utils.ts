@@ -2,7 +2,6 @@ import { loadView } from '@wordpress/views';
 import { dispatch, resolveSelect, select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
-import { filterSortAndPaginate } from '@wordpress/dataviews';
 import type { View, Field, SupportedLayouts } from '@wordpress/dataviews';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import type { Template } from './types';
@@ -93,26 +92,4 @@ export async function loadTemplateFields(): Promise< Field< Template >[] > {
 		'postType',
 		TEMPLATE_POST_TYPE
 	);
-}
-
-/**
- * Returns the template the stage selects by default in a list view: the
- * first row after applying the view's search, filters, sort and pagination.
- *
- * The templates endpoint ignores search, ordering and pagination, so the
- * stage fetches every template and applies the view client-side through
- * `filterSortAndPaginate`; this does the same over the same records and
- * field definitions.
- *
- * @param templates Every template, as the stage fetches them.
- * @param view      The resolved view.
- * @param fields    The post fields, as `loadTemplateFields` resolves them.
- * @return The template to preview, if any.
- */
-export function getFirstTemplateInView(
-	templates: Template[],
-	view: View,
-	fields: Field< Template >[]
-): Template | undefined {
-	return filterSortAndPaginate( templates, view, fields ).data[ 0 ];
 }
