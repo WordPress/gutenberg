@@ -19,8 +19,6 @@ interface SettingsSchema {
 						description?: string;
 						group?: string;
 						group_label?: string;
-						separate_option?: boolean;
-						option_name?: string;
 					}
 				>;
 			};

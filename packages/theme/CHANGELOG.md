@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add neutral interactive background tokens for resting, active, and disabled input and selection control states. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
+
 ### Documentation
 
 -   Explain how consumers define light and dark themes through `ThemeProvider` color seeds ([#82039](https://github.com/WordPress/gutenberg/pull/82039)).
@@ -10,9 +14,19 @@
 
 -   Add a Lightning CSS visitor plugin that injects design system token fallbacks, available as `@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks`, with an optional peer range of `>=1.33.0 <2.0.0`. ([#80401](https://github.com/WordPress/gutenberg/pull/80401))
 
+### Bug Fixes
+
+-   Calculate exact chroma capacity so weak intent backgrounds retain their color near lightness boundaries. ([#82591](https://github.com/WordPress/gutenberg/pull/82591))
+-   Make color ramp generation independent of cache population order. ([#82505](https://github.com/WordPress/gutenberg/pull/82505))
+-   Keep active fills moving in the color ramp direction and preserve text contrast for both states. ([#82542](https://github.com/WordPress/gutenberg/pull/82542))
+
 ### Internal
 
+-   Migrate design token modes to the DTCG resolver and Terrazzo CSS permutations. ([#82537](https://github.com/WordPress/gutenberg/pull/82537))
+-   Generate the default ramps before derived token artifacts so one build uses the current ramp algorithm throughout. ([#82525](https://github.com/WordPress/gutenberg/pull/82525))
+-   Cache relative luminance calculations used by color-ramp contrast checks. ([#82445](https://github.com/WordPress/gutenberg/pull/82445))
 -   Enforce NodeNext module resolution in the build project so future declaration imports are checked against the package's published ESM resolution rules. ([#82088](https://github.com/WordPress/gutenberg/pull/82088))
+-   Update the `@types/node` development dependency to v24, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
 
 ## 2.0.0 (2026-08-26)
 

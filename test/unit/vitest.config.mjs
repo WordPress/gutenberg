@@ -5,7 +5,6 @@ import { fileURLToPath } from 'node:url';
 import { playwright } from '@vitest/browser-playwright';
 import react from '@vitejs/plugin-react-swc';
 import { globSync } from 'glob';
-import commonjs from 'vite-plugin-commonjs';
 import { defineConfig } from 'vitest/config';
 import {
 	discoverTestFiles,
@@ -18,10 +17,13 @@ const ROOT_DIR = path.resolve(
 );
 const nodeRequire = createRequire( import.meta.url );
 const emotionPlugin = nodeRequire.resolve( '@swc/plugin-emotion' );
-const NORMALIZED_ROOT_DIR = ROOT_DIR.split( path.sep ).join( '/' );
 const gutenbergEnvSetupFile = path.join(
 	ROOT_DIR,
 	'test/unit/config/gutenberg-env.js'
+);
+const isolationSetupFile = path.join(
+	ROOT_DIR,
+	'test/unit/config/isolation.vitest.js'
 );
 const testMigration = JSON.parse(
 	readFileSync(
@@ -59,9 +61,10 @@ if (
 	] );
 }
 
-// Preserve Jest's repository-root configuration discovery and default timezone.
+// Preserve repository-root configuration discovery and default to UTC while
+// allowing the date-test matrix to supply another timezone.
 process.chdir( ROOT_DIR );
-process.env.TZ = 'UTC';
+process.env.TZ ||= 'UTC';
 
 const transpiledPackageNames = globSync(
 	'packages/*/src/index.{js,jsx,ts,tsx}',
@@ -91,17 +94,6 @@ export default defineConfig( {
 					},
 				],
 			],
-		} ),
-		commonjs( {
-			filter: ( id ) =>
-				[
-					`${ NORMALIZED_ROOT_DIR }/packages/block-serialization-spec-parser/parser.js`,
-					`${ NORMALIZED_ROOT_DIR }/packages/env/lib/`,
-					`${ NORMALIZED_ROOT_DIR }/packages/project-management-automation/lib/`,
-					`${ NORMALIZED_ROOT_DIR }/packages/scripts/utils/`,
-					`${ NORMALIZED_ROOT_DIR }/tools/release/commands/changelog.js`,
-				].some( ( directory ) => id.startsWith( directory ) ) &&
-				! id.endsWith( '/packages/scripts/utils/license.js' ),
 		} ),
 	],
 	resolve: {
@@ -178,6 +170,7 @@ export default defineConfig( {
 							ROOT_DIR,
 							'test/unit/config/console.vitest.js'
 						),
+						isolationSetupFile,
 					],
 				},
 			},
@@ -214,6 +207,7 @@ export default defineConfig( {
 							ROOT_DIR,
 							'test/unit/config/testing-library.vitest.js'
 						),
+						isolationSetupFile,
 					],
 				},
 			},
@@ -227,6 +221,7 @@ export default defineConfig( {
 							ROOT_DIR,
 							'test/unit/config/console.vitest.js'
 						),
+						isolationSetupFile,
 					],
 					browser: {
 						enabled: true,
@@ -239,6 +234,8 @@ export default defineConfig( {
 		],
 		globals: false,
 		includeTaskLocation: true,
+		isolate: true,
+		mockReset: true,
 		passWithNoTests: false,
 		reporters,
 		sequence: {
@@ -249,5 +246,8 @@ export default defineConfig( {
 			escapeString: false,
 			printBasicPrototype: false,
 		},
+		restoreMocks: true,
+		unstubEnvs: true,
+		unstubGlobals: true,
 	},
 } );

@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import {
 	registerBlockType,
@@ -71,12 +72,10 @@ describe( 'useBlockPreview', () => {
 
 		// Ensure the block preview class names are merged with the component's class name.
 		expect( blockPreviewComponent ).toHaveClass(
-			'block-editor-block-preview__live-content'
+			'block-editor-block-preview__live-content',
+			'test-container-classname',
+			{ exact: true }
 		);
-		expect( blockPreviewComponent ).toHaveClass(
-			'test-container-classname'
-		);
-		expect( blockPreviewComponent ).toHaveClass( 'components-disabled' );
 
 		// Ensure there is no nesting between the parent component and rendered blocks.
 		expect( blockPreviewComponent ).toContainElement( previewedBlock );

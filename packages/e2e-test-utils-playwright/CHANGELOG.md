@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Admin.visitSiteEditor()`: When the `GUTENBERG_E2E_SITE_EDITOR_V2` environment variable is set, visit the extensible site editor (`admin.php?page=site-editor-v2`) instead of `site-editor.php`, translating the classic query args to the equivalent v2 route, and wait for the lazily loaded editor to finish initializing on edit routes. `RequestUtils.setGutenbergExperiments()` keeps the `gutenberg-extensible-site-editor` experiment enabled in that mode so specs that reset experiments do not turn the v2 editor off mid-run.
+
+### Enhancements
+
+-   Widen the `@types/node` peer dependency to `>=20`, so consumers on Node 22 or 24 type definitions no longer hit a peer resolution conflict ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
+
+### Bug Fixes
+
+-   `Editor.saveSiteEditorEntities()`: Wait for the save button to mount before deciding between its `Save` and `Publish` variants, instead of sampling visibility immediately — the extensible site editor only renders it once an entity is dirty.
+
+### Internal
+
+-   `setGutenbergExperiments`: Remove the special handling for the removed `active_templates` experiment ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
+
 ## 1.54.0 (2026-08-26)
 
 ## 1.53.0 (2026-08-12)

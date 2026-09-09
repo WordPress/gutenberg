@@ -11,7 +11,6 @@ export interface TaperChromaOptions {
 	gamut?: ColorSpace; // target gamut (default `sRGB`)
 	alpha?: number; // base fraction of Cmax at target (default 0.62)
 	carry?: number; // seed vividness carry exponent β in [0..1] (default 0.5)
-	cUpperBound?: number; // hard search cap for C (default 0.45)
 	// Continuous taper around the seed (desaturate both sides slightly)
 	radiusLight?: number; // distance in L where kLight is reached (default 0.20)
 	radiusDark?: number; // distance in L where kDark is reached (default 0.20)
@@ -39,7 +38,6 @@ export function taperChroma(
 	const gamut = options.gamut ?? sRGB;
 	const alpha = options.alpha ?? 0.65; // 0.7-0.8 works well for accent surface
 	const carry = options.carry ?? 0.5;
-	const cUpperBound = options.cUpperBound ?? 0.45;
 	const radiusLight = options.radiusLight ?? 0.2;
 	const radiusDark = options.radiusDark ?? 0.2;
 	const kLight = options.kLight ?? 0.85;
@@ -67,13 +65,8 @@ export function taperChroma(
 
 	// Capacity at seed and target
 	const lSeed = clamp01( get( seed, [ OKLCH, 'l' ] ) );
-	const cmaxSeed = getCachedMaxChromaAtLH( lSeed, hSeed, gamut, cUpperBound );
-	const cmaxTarget = getCachedMaxChromaAtLH(
-		clamp01( lTarget ),
-		hSeed,
-		gamut,
-		cUpperBound
-	);
+	const cmaxSeed = getMaxChromaAtLH( lSeed, hSeed, gamut );
+	const cmaxTarget = getMaxChromaAtLH( clamp01( lTarget ), hSeed, gamut );
 
 	// Seed vividness ratio (hue-fair normalization)
 	let seedRelative = 0;
@@ -154,57 +147,19 @@ function continuousTaper(
 	return 1 - ( 1 - opts.kDark ) * w;
 }
 
-/* ---- chroma-capacity queries with small caches ---- */
+/* ---- chroma-capacity queries ---- */
 
-const maxChromaCache = new Map< string, number >();
-function keyMax( l: number, h: number, gamut: string, cap: number ): string {
-	// Quantize to keep cache compact
-	const lq = quantize( l, 0.05 );
-	const hq = quantize( normalizeHue( h ), 10 );
-	const cq = quantize( cap, 0.05 );
-	return `${ gamut }|L:${ lq }|H:${ hq }|cap:${ cq }`;
-}
-
-function quantize( x: number, step: number ): number {
-	const k = Math.round( x / step );
-	return k * step;
-}
-
-function getCachedMaxChromaAtLH(
+// Leave headroom above sRGB's maximum chroma of about 0.32.
+const MAX_CHROMA = 0.45;
+function getMaxChromaAtLH(
 	l: number,
 	h: number,
-	gamutSpace: ColorSpace,
-	cap: number
-): number {
-	const gamut = gamutSpace.id;
-	const key = keyMax( l, h, gamut, cap );
-	const hit = maxChromaCache.get( key );
-	if ( typeof hit === 'number' ) {
-		return hit;
-	}
-
-	const computed = maxInGamutChromaAtLH( l, h, gamutSpace, cap );
-	maxChromaCache.set( key, computed );
-	return computed;
-}
-
-/**
- * Find the max in-gamut chroma at fixed (L,H) in the target gamut
- * @param l
- * @param h
- * @param gamutSpace
- * @param cap
- */
-function maxInGamutChromaAtLH(
-	l: number,
-	h: number,
-	gamutSpace: ColorSpace,
-	cap: number
+	gamutSpace: ColorSpace
 ): number {
 	// Construct a color with maximum chroma.
 	const probe: PlainColorObject = {
 		space: OKLCH,
-		coords: [ l, cap, h ],
+		coords: [ clamp01( l ), MAX_CHROMA, normalizeHue( h ) ],
 		alpha: 1,
 	};
 

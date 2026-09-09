@@ -1,0 +1,55 @@
+@media aural {
+
+	.class {
+		top: 0;
+	}
+}
+
+@media braille {
+
+	.class {
+		top: 0;
+	}
+}
+
+@media embossed {
+
+	.class {
+		top: 0;
+	}
+}
+
+@media handheld {
+
+	.class {
+		top: 0;
+	}
+}
+
+@media projection {
+
+	.class {
+		top: 0;
+	}
+}
+
+@media speech {
+
+	.class {
+		top: 0;
+	}
+}
+
+@media tty {
+
+	.class {
+		top: 0;
+	}
+}
+
+@media tv {
+
+	.class {
+		top: 0;
+	}
+}

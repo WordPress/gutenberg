@@ -7,6 +7,7 @@ import { MediaEdit } from '@wordpress/fields';
 import { loadEditorAssets } from '@wordpress/lazy-editor';
 import { useEffect, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
+import styles from './style.module.scss';
 
 type SiteSettings = {
 	title?: string;
@@ -124,17 +125,15 @@ function Identity() {
 	};
 
 	return (
-		<Page
-			title={ _x( 'Identity', 'site identity' ) }
-			headingLevel={ 2 }
-			hasPadding
-		>
-			<DataForm
-				data={ data }
-				fields={ fields }
-				form={ form }
-				onChange={ onChange }
-			/>
+		<Page title={ _x( 'Identity', 'site identity' ) } headingLevel={ 2 }>
+			<div className={ styles.form }>
+				<DataForm
+					data={ data }
+					fields={ fields }
+					form={ form }
+					onChange={ onChange }
+				/>
+			</div>
 		</Page>
 	);
 }

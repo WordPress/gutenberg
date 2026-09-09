@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`formatTestErrorMessage should format test error message for @playwright/test 1`] = `
+exports[`formatTestErrorMessage > should format test error message for @playwright/test 1`] = `
 "Error: Snapshot comparison failed:
 
   <!-- wp:paragraph -->
@@ -28,7 +28,7 @@ Received: /home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-va
     at /home/runner/work/gutenberg/gutenberg/test/e2e/specs/editor/various/copy-cut-paste.spec.js:253:52"
 `;
 
-exports[`formatTestErrorMessage should format test error message for jest-circus 1`] = `
+exports[`formatTestErrorMessage > should format test error message for jest-circus 1`] = `
 "  ● Template Part › Template part block › Template part placeholder › Should insert new template part on creation
 
     expect(jest.fn()).not.toHaveErrored(expected)

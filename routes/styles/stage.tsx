@@ -168,11 +168,13 @@ function Stage() {
 					: __( 'Styles' )
 			}
 		>
-			<GlobalStylesUIWrapper
-				path={ section }
-				onPathChange={ onChangeSection }
-				settings={ editorSettings }
-			/>
+			<div className="routes-styles__content">
+				<GlobalStylesUIWrapper
+					path={ section }
+					onPathChange={ onChangeSection }
+					settings={ editorSettings }
+				/>
+			</div>
 			{ isActivatePanelOpen && (
 				<Modal
 					title={ __( 'Activate' ) }

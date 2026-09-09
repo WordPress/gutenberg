@@ -2,8 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Error boundary: Surface debugging details ([#82099](https://github.com/WordPress/gutenberg/pull/82099)).
+-   Widget areas: Use the `layout` icon instead of the default block icon ([#61028](https://github.com/WordPress/gutenberg/issues/61028)).
+
 ### Bug Fixes
 
+-   `WelcomeGuide`: Keep the modal close icon white on hover now that it is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   Prevent an error in `canInsertBlockInWidgetArea` when no widget area blocks are present.
 
 ### Internal

@@ -1,3 +1,12 @@
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { startOfDay } from 'date-fns';
@@ -32,8 +41,8 @@ function expectGregorianDate( localeCode: string ) {
 	).toBeVisible();
 }
 
-jest.mock( '@wordpress/i18n', () => {
-	const actual = jest.requireActual( '@wordpress/i18n' );
+vi.mock( import( '@wordpress/i18n' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
 	const translations: Record< string, string > = {
 		'Previous month': 'Translated previous month',
 		'Navigation bar': 'Translated navigation bar',
@@ -42,12 +51,13 @@ jest.mock( '@wordpress/i18n', () => {
 
 	return {
 		...actual,
-		__: ( text: string ) => translations[ text ] ?? text,
-		isRTL: jest.fn(),
+		__: ( ( text: string ) =>
+			translations[ text ] ?? text ) as typeof actual.__,
+		isRTL: vi.fn(),
 	};
 } );
 
-const mockIsRTL = jest.mocked( isRTL );
+const mockIsRTL = vi.mocked( isRTL );
 
 describe.each( [
 	[ 'Calendar', Calendar ],
@@ -237,9 +247,9 @@ describe( 'Calendar locale inputs', () => {
 
 	it( 'derives the week start from legacy browser week information', () => {
 		const IntlLocale = Intl.Locale;
-		const localeSpy = jest
+		const localeSpy = vi
 			.spyOn( Intl, 'Locale' )
-			.mockImplementation( ( locale ) => {
+			.mockImplementation( function Locale( locale ) {
 				const intlLocale = new IntlLocale( locale );
 				Object.defineProperties( intlLocale, {
 					getWeekInfo: { value: undefined },
@@ -263,9 +273,9 @@ describe( 'Calendar locale inputs', () => {
 
 	it( 'uses the existing default when browser week information is unavailable', () => {
 		const IntlLocale = Intl.Locale;
-		const localeSpy = jest
+		const localeSpy = vi
 			.spyOn( Intl, 'Locale' )
-			.mockImplementation( ( locale ) => {
+			.mockImplementation( function Locale( locale ) {
 				const intlLocale = new IntlLocale( locale );
 				Object.defineProperties( intlLocale, {
 					getWeekInfo: { value: undefined },
@@ -354,28 +364,50 @@ describe( 'Calendar day labels', () => {
 } );
 
 describe( 'Calendar text direction fallback', () => {
-	const getTextInfoDescriptor = Object.getOwnPropertyDescriptor(
-		Intl.Locale.prototype,
-		'getTextInfo'
-	);
+	const original = {
+		getTextInfo: Object.getOwnPropertyDescriptor(
+			Intl.Locale.prototype,
+			'getTextInfo'
+		),
+		textInfo: Object.getOwnPropertyDescriptor(
+			Intl.Locale.prototype,
+			'textInfo'
+		),
+	};
 
+	// Engines that implement `getTextInfo()` have dropped the legacy `textInfo`
+	// getter, so serve its data through `textInfo` to emulate an engine that
+	// only has the legacy property.
 	beforeAll( () => {
+		const getTextInfo = original.getTextInfo!.value;
+
 		Object.defineProperty( Intl.Locale.prototype, 'getTextInfo', {
 			configurable: true,
 			value: undefined,
 		} );
+		Object.defineProperty( Intl.Locale.prototype, 'textInfo', {
+			configurable: true,
+			get() {
+				return getTextInfo.call( this );
+			},
+		} );
 	} );
 
 	afterAll( () => {
-		if ( getTextInfoDescriptor ) {
+		Object.defineProperty(
+			Intl.Locale.prototype,
+			'getTextInfo',
+			original.getTextInfo!
+		);
+
+		if ( original.textInfo ) {
 			Object.defineProperty(
 				Intl.Locale.prototype,
-				'getTextInfo',
-				getTextInfoDescriptor
+				'textInfo',
+				original.textInfo
 			);
 		} else {
-			delete ( Intl.Locale.prototype as { getTextInfo?: unknown } )
-				.getTextInfo;
+			delete ( Intl.Locale.prototype as { textInfo?: unknown } ).textInfo;
 		}
 	} );
 

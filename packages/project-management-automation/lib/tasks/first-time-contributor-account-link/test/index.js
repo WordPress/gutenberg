@@ -1,8 +1,29 @@
-import firstTimeContributorAccountLink from '../';
-import hasWordPressProfile from '../../../has-wordpress-profile';
-
-jest.mock( '../../../has-wordpress-profile', () => jest.fn() );
-
+import { createRequire } from 'node:module';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
+const actionsCorePath = require.resolve( '@actions/core' );
+const originalActionsCore = require( actionsCorePath );
+const setOutput = vi.fn();
+const hasWordPressProfile = vi.fn();
+const hasWordPressProfilePath = require.resolve(
+	'../../../has-wordpress-profile'
+);
+const originalHasWordPressProfile = require( hasWordPressProfilePath );
+const taskPath = require.resolve( '../' );
+let firstTimeContributorAccountLink;
+try {
+	require.cache[ actionsCorePath ].exports = {
+		...originalActionsCore,
+		setOutput,
+	};
+	require.cache[ hasWordPressProfilePath ].exports = hasWordPressProfile;
+	firstTimeContributorAccountLink = require( taskPath );
+} finally {
+	require.cache[ actionsCorePath ].exports = originalActionsCore;
+	require.cache[ hasWordPressProfilePath ].exports =
+		originalHasWordPressProfile;
+	delete require.cache[ taskPath ];
+}
 const botUser = {
 	data: {
 		name: 'Ghost',
@@ -22,6 +43,7 @@ const humanUser = {
 
 describe( 'firstTimeContributorAccountLink', () => {
 	beforeEach( () => {
+		setOutput.mockReset();
 		hasWordPressProfile.mockReset();
 	} );
 
@@ -55,10 +77,10 @@ describe( 'firstTimeContributorAccountLink', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn(),
+					listCommits: vi.fn(),
 				},
 				users: {
-					getByUsername: jest.fn( () => humanUser ),
+					getByUsername: vi.fn( () => humanUser ),
 				},
 			},
 		};
@@ -87,10 +109,10 @@ describe( 'firstTimeContributorAccountLink', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn(),
+					listCommits: vi.fn(),
 				},
 				users: {
-					getByUsername: jest.fn( () => humanUser ),
+					getByUsername: vi.fn( () => humanUser ),
 				},
 			},
 		};
@@ -105,11 +127,11 @@ describe( 'firstTimeContributorAccountLink', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn(),
+					listCommits: vi.fn(),
 				},
 				users: {
 					// Return a bot when `getByUsername` is called.
-					getByUsername: jest.fn( () => botUser ),
+					getByUsername: vi.fn( () => botUser ),
 				},
 			},
 		};
@@ -126,7 +148,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
+					listCommits: vi.fn( () =>
 						Promise.resolve( {
 							data: [
 								{
@@ -140,10 +162,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 					),
 				},
 				users: {
-					getByUsername: jest.fn( () => humanUser ),
-				},
-				issues: {
-					createComment: jest.fn(),
+					getByUsername: vi.fn( () => humanUser ),
 				},
 			},
 		};
@@ -158,14 +177,14 @@ describe( 'firstTimeContributorAccountLink', () => {
 			repo: 'gutenberg',
 			author: 'ghost',
 		} );
-		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
+		expect( setOutput ).not.toHaveBeenCalled();
 	} );
 
 	it( 'aborts if the request to retrieve WordPress.org user profile fails', async () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
+					listCommits: vi.fn( () =>
 						Promise.resolve( {
 							data: [
 								{
@@ -176,10 +195,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 					),
 				},
 				users: {
-					getByUsername: jest.fn( () => humanUser ),
-				},
-				issues: {
-					createComment: jest.fn(),
+					getByUsername: vi.fn( () => humanUser ),
 				},
 			},
 		};
@@ -198,14 +214,14 @@ describe( 'firstTimeContributorAccountLink', () => {
 			repo: 'gutenberg',
 			author: 'ghost',
 		} );
-		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
+		expect( setOutput ).not.toHaveBeenCalled();
 	} );
 
 	it( 'prompts the user to link their GitHub account to their WordPress.org profile', async () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
+					listCommits: vi.fn( () =>
 						Promise.resolve( {
 							data: [
 								{
@@ -216,10 +232,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 					),
 				},
 				users: {
-					getByUsername: jest.fn( () => humanUser ),
-				},
-				issues: {
-					createComment: jest.fn(),
+					getByUsername: vi.fn( () => humanUser ),
 				},
 			},
 		};
@@ -236,11 +249,13 @@ describe( 'firstTimeContributorAccountLink', () => {
 			repo: 'gutenberg',
 			author: 'ghost',
 		} );
-		expect( octokit.rest.issues.createComment ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			issue_number: 123,
-			body: expect.stringMatching( /^Congratulations/ ),
-		} );
+		expect( setOutput ).toHaveBeenCalledWith(
+			'first-time-contributor-prompt',
+			expect.stringMatching( /^Congratulations/ )
+		);
+		expect( setOutput ).toHaveBeenCalledWith(
+			'first-time-contributor-pr-number',
+			123
+		);
 	} );
 } );

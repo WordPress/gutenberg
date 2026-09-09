@@ -10,6 +10,7 @@
 
 ### Bug Fixes
 
+-   Seed content-surface `ThemeProvider` backgrounds with `#fcfcfc` instead of `#ffffff`, matching the design system default and preserving room for stronger and weaker neutral surface tokens ([#81646](https://github.com/WordPress/gutenberg/pull/81646)).
 -   Restore bottom-centered snackbar notices after the CSS Modules migration ([#81995](https://github.com/WordPress/gutenberg/pull/81995)).
 -   Mount the plugins registered with `registerPlugin`, so the sidebars, panels and menu items they fill render ([#81754](https://github.com/WordPress/gutenberg/pull/81754)).
 -   Canvas: Show the site's front end where a route names no entity and the theme has no block templates to resolve one from, instead of an editor with nothing open. Was previously handled by the home route alone, leaving `/identity` broken on a classic theme ([#81749](https://github.com/WordPress/gutenberg/pull/81749)).

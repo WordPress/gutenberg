@@ -12,8 +12,8 @@ import {
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getUndoManager } from './private-selectors';
 import {
+	getFilteredItem,
 	getNormalizedCommaSeparable,
-	setNestedValue,
 	isNumericID,
 	getUserPermissionCacheKey,
 } from './utils';
@@ -29,14 +29,14 @@ export interface State {
 	autosaves: Record< string | number, Array< unknown > >;
 	blockPatterns: Array< unknown >;
 	blockPatternCategories: Array< unknown >;
-	currentGlobalStylesId: string;
+	currentGlobalStylesId: number | undefined;
 	currentTheme: string;
 	currentUser: ET.User< 'view' >;
 	embedPreviews: Record< string, { html: string } >;
 	entities: EntitiesState;
 	themeBaseGlobalStyles: Record< string, Object >;
 	themeGlobalStyleVariations: Record< string, string >;
-	themeGlobalStyleRevisions: Record< number, Object >;
+	themeGlobalStyleRevisions: Record< number, Array< object > >;
 	undoManager: UndoManager;
 	syncUndoManagerState: {
 		hasRedo: boolean;
@@ -309,6 +309,27 @@ export function getEntityConfig(
  * See https://github.com/WordPress/gutenberg/pull/41578 for more details.
  */
 export interface GetEntityRecord {
+	/*
+	 * Infers the record type from the `kind` and `name` arguments. Falls back
+	 * to the union of all record types for pairs absent from the map, so
+	 * runtime-registered entities keep working.
+	 */
+	<
+		Kind extends ET.EntityKind,
+		Name extends ET.EntityNameOf< Kind >,
+		const Query extends GetRecordsHttpQuery | undefined = undefined,
+	>(
+		state: State,
+		kind: Kind,
+		name: Name,
+		recordId?: EntityRecordKey,
+		query?: Query
+	): ET.EntityRecordOfQuery< Kind, Name, Query > | undefined;
+
+	/*
+	 * Retained so call sites that name the record type explicitly, and any
+	 * type not reachable through the map, continue to compile.
+	 */
 	<
 		EntityRecord extends
 			| ET.EntityRecord< any >
@@ -321,16 +342,56 @@ export interface GetEntityRecord {
 		query?: GetRecordsHttpQuery
 	): EntityRecord | undefined;
 
-	CurriedSignature: <
-		EntityRecord extends
-			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >,
-	>(
-		kind: string,
-		name: string,
-		recordId?: EntityRecordKey,
-		query?: GetRecordsHttpQuery
-	) => EntityRecord | undefined;
+	CurriedSignature: {
+		<
+			Kind extends ET.EntityKind,
+			Name extends ET.EntityNameOf< Kind >,
+			const Query extends GetRecordsHttpQuery | undefined = undefined,
+		>(
+			kind: Kind,
+			name: Name,
+			recordId?: EntityRecordKey,
+			query?: Query
+		): ET.EntityRecordOfQuery< Kind, Name, Query > | undefined;
+		<
+			EntityRecord extends
+				| ET.EntityRecord< any >
+				| Partial< ET.EntityRecord< any > >,
+		>(
+			kind: string,
+			name: string,
+			recordId?: EntityRecordKey,
+			query?: GetRecordsHttpQuery
+		): EntityRecord | undefined;
+	};
+	/*
+	 * `resolveSelect` looks for this signature specifically. Without it the
+	 * overloaded `CurriedSignature` collapses to its last overload, and every
+	 * `resolveSelect( coreStore ).getEntityRecord()` call falls back to the
+	 * union instead of resolving through the map.
+	 */
+	PromiseCurriedSignature: {
+		<
+			Kind extends ET.EntityKind,
+			Name extends ET.EntityNameOf< Kind >,
+			const Query extends GetRecordsHttpQuery | undefined = undefined,
+		>(
+			kind: Kind,
+			name: Name,
+			recordId?: EntityRecordKey,
+			query?: Query
+		): Promise< ET.EntityRecordOfQuery< Kind, Name, Query > | undefined >;
+		<
+			EntityRecord extends
+				| ET.EntityRecord< any >
+				| Partial< ET.EntityRecord< any > >,
+		>(
+			kind: string,
+			name: string,
+			recordId?: EntityRecordKey,
+			query?: GetRecordsHttpQuery
+		): Promise< EntityRecord | undefined >;
+	};
 	__unstableNormalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
 }
 
@@ -348,62 +409,41 @@ export interface GetEntityRecord {
  *
  * @return Record.
  */
-export const getEntityRecord = createSelector(
-	( <
-		EntityRecord extends
-			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >,
-	>(
-		state: State,
-		kind: string,
-		name: string,
-		recordId?: EntityRecordKey,
-		query?: GetRecordsHttpQuery
-	): EntityRecord | undefined => {
-		logEntityDeprecation( kind, name, 'getEntityRecord' );
-		const queriedState =
-			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
-		if ( ! queriedState ) {
+export const getEntityRecord = ( <
+	EntityRecord extends
+		| ET.EntityRecord< any >
+		| Partial< ET.EntityRecord< any > >,
+>(
+	state: State,
+	kind: string,
+	name: string,
+	recordId?: EntityRecordKey,
+	query?: GetRecordsHttpQuery
+): EntityRecord | undefined => {
+	logEntityDeprecation( kind, name, 'getEntityRecord' );
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.queriedData;
+	if ( ! queriedState ) {
+		return undefined;
+	}
+	const context = query?.context ?? 'default';
+
+	if ( ! query || ! query._fields ) {
+		// If expecting a complete item, validate that completeness.
+		if ( ! queriedState.itemIsComplete[ context ]?.[ recordId ] ) {
 			return undefined;
 		}
-		const context = query?.context ?? 'default';
 
-		if ( ! query || ! query._fields ) {
-			// If expecting a complete item, validate that completeness.
-			if ( ! queriedState.itemIsComplete[ context ]?.[ recordId ] ) {
-				return undefined;
-			}
-
-			return queriedState.items[ context ][ recordId ];
-		}
-
-		const item = queriedState.items[ context ]?.[ recordId ];
-		if ( ! item ) {
-			return item;
-		}
-
-		const filteredItem = {};
-		const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
-		for ( let f = 0; f < fields.length; f++ ) {
-			const field = fields[ f ].split( '.' );
-			let value = item;
-			field.forEach( ( fieldName ) => {
-				value = value?.[ fieldName ];
-			} );
-			setNestedValue( filteredItem, field, value );
-		}
-		return filteredItem as EntityRecord;
-	} ) as GetEntityRecord,
-	( state: State, kind, name, recordId, query ) => {
-		const context = query?.context ?? 'default';
-		const queriedState =
-			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
-		return [
-			queriedState?.items[ context ]?.[ recordId ],
-			queriedState?.itemIsComplete[ context ]?.[ recordId ],
-		];
+		return queriedState.items[ context ][ recordId ];
 	}
-) as GetEntityRecord;
+
+	const item = queriedState.items[ context ]?.[ recordId ];
+	if ( ! item ) {
+		return item;
+	}
+
+	return getFilteredItem< EntityRecord >( item, query._fields );
+} ) as GetEntityRecord;
 
 /**
  * Normalizes `recordKey`s that look like numeric IDs to numbers.
@@ -591,6 +631,26 @@ export function hasEntityRecords(
  * @see https://github.com/WordPress/gutenberg/pull/41578
  */
 export interface GetEntityRecords {
+	/*
+	 * Infers the record type from the `kind` and `name` arguments. Falls back
+	 * to the union of all record types for pairs absent from the map, so
+	 * runtime-registered entities keep working.
+	 */
+	<
+		Kind extends ET.EntityKind,
+		Name extends ET.EntityNameOf< Kind >,
+		const Query extends GetRecordsHttpQuery | undefined = undefined,
+	>(
+		state: State,
+		kind: Kind,
+		name: Name,
+		query?: Query
+	): ET.EntityRecordOfQuery< Kind, Name, Query >[] | null;
+
+	/*
+	 * Retained so call sites that name the record type explicitly, and any
+	 * type not reachable through the map, continue to compile.
+	 */
 	<
 		EntityRecord extends
 			| ET.EntityRecord< any >
@@ -602,25 +662,47 @@ export interface GetEntityRecords {
 		query?: GetRecordsHttpQuery
 	): EntityRecord[] | null;
 
-	CurriedSignature: <
-		EntityRecord extends
-			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >,
-	>(
-		kind: string,
-		name: string,
-		query?: GetRecordsHttpQuery
-	) => EntityRecord[] | null;
+	CurriedSignature: {
+		<
+			Kind extends ET.EntityKind,
+			Name extends ET.EntityNameOf< Kind >,
+			const Query extends GetRecordsHttpQuery | undefined = undefined,
+		>(
+			kind: Kind,
+			name: Name,
+			query?: Query
+		): ET.EntityRecordOfQuery< Kind, Name, Query >[] | null;
+		<
+			EntityRecord extends
+				| ET.EntityRecord< any >
+				| Partial< ET.EntityRecord< any > >,
+		>(
+			kind: string,
+			name: string,
+			query?: GetRecordsHttpQuery
+		): EntityRecord[] | null;
+	};
 
-	PromiseCurriedSignature: <
-		EntityRecord extends
-			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >,
-	>(
-		kind: string,
-		name: string,
-		query?: GetRecordsHttpQuery
-	) => Promise< EntityRecord[] | null >;
+	PromiseCurriedSignature: {
+		<
+			Kind extends ET.EntityKind,
+			Name extends ET.EntityNameOf< Kind >,
+			const Query extends GetRecordsHttpQuery | undefined = undefined,
+		>(
+			kind: Kind,
+			name: Name,
+			query?: Query
+		): Promise< ET.EntityRecordOfQuery< Kind, Name, Query >[] | null >;
+		<
+			EntityRecord extends
+				| ET.EntityRecord< any >
+				| Partial< ET.EntityRecord< any > >,
+		>(
+			kind: string,
+			name: string,
+			query?: GetRecordsHttpQuery
+		): Promise< EntityRecord[] | null >;
+	};
 }
 
 /**
@@ -1198,7 +1280,9 @@ export function getCurrentTheme( state: State ): any {
  *
  * @return The current global styles ID.
  */
-export function __experimentalGetCurrentGlobalStylesId( state: State ): string {
+export function __experimentalGetCurrentGlobalStylesId(
+	state: State
+): number | undefined {
 	return state.currentGlobalStylesId;
 }
 
@@ -1614,64 +1698,37 @@ export function hasRevision(
  *
  * @return Record.
  */
-export const getRevision = createSelector(
-	(
-		state: State,
-		kind: string,
-		name: string,
-		recordKey: EntityRecordKey,
-		revisionKey: EntityRecordKey,
-		query?: GetRecordsHttpQuery
-	): RevisionRecord | Record< PropertyKey, never > | undefined => {
-		logEntityDeprecation( kind, name, 'getRevision' );
-		const queriedState =
-			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[
-				recordKey
-			];
+export const getRevision = (
+	state: State,
+	kind: string,
+	name: string,
+	recordKey: EntityRecordKey,
+	revisionKey: EntityRecordKey,
+	query?: GetRecordsHttpQuery
+): RevisionRecord | Record< PropertyKey, never > | undefined => {
+	logEntityDeprecation( kind, name, 'getRevision' );
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ];
 
-		if ( ! queriedState ) {
+	if ( ! queriedState ) {
+		return undefined;
+	}
+
+	const context = query?.context ?? 'default';
+
+	if ( ! query || ! query._fields ) {
+		// If expecting a complete item, validate that completeness.
+		if ( ! queriedState.itemIsComplete[ context ]?.[ revisionKey ] ) {
 			return undefined;
 		}
 
-		const context = query?.context ?? 'default';
-
-		if ( ! query || ! query._fields ) {
-			// If expecting a complete item, validate that completeness.
-			if ( ! queriedState.itemIsComplete[ context ]?.[ revisionKey ] ) {
-				return undefined;
-			}
-
-			return queriedState.items[ context ][ revisionKey ];
-		}
-
-		const item = queriedState.items[ context ]?.[ revisionKey ];
-		if ( ! item ) {
-			return item;
-		}
-
-		const filteredItem = {};
-		const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
-
-		for ( let f = 0; f < fields.length; f++ ) {
-			const field = fields[ f ].split( '.' );
-			let value = item;
-			field.forEach( ( fieldName ) => {
-				value = value?.[ fieldName ];
-			} );
-			setNestedValue( filteredItem, field, value );
-		}
-
-		return filteredItem;
-	},
-	( state: State, kind, name, recordKey, revisionKey, query ) => {
-		const context = query?.context ?? 'default';
-		const queriedState =
-			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[
-				recordKey
-			];
-		return [
-			queriedState?.items?.[ context ]?.[ revisionKey ],
-			queriedState?.itemIsComplete?.[ context ]?.[ revisionKey ],
-		];
+		return queriedState.items[ context ][ revisionKey ];
 	}
-);
+
+	const item = queriedState.items[ context ]?.[ revisionKey ];
+	if ( ! item ) {
+		return item;
+	}
+
+	return getFilteredItem( item, query._fields );
+};

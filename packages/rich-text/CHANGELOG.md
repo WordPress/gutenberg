@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### New Features
+
+-   Export the `RichTextFormat` type, describing a single format applied to a range of characters within a `RichTextValue` ([#79486](https://github.com/WordPress/gutenberg/pull/79486)).
+
+### Bug Fixes
+
+-   Restore a rich text element's `contenteditable` attribute when a pointer interaction ends with `pointercancel`, so that swipe scrolling on touch devices no longer leaves text blocks uneditable ([#82598](https://github.com/WordPress/gutenberg/pull/82598)).
+
 ## 7.54.0 (2026-08-26)
 
 ## 7.53.0 (2026-08-12)

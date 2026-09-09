@@ -2,21 +2,37 @@
 
 ## Unreleased
 
-### Internal
+### Breaking Changes
 
--   Remove unused dependencies `@wordpress/reusable-blocks`, `client-zip` and `fast-deep-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`, `PluginPreviewMenuItem`: Items render with the `Menu` component of `@wordpress/ui` instead of `MenuItem` ([#81564](https://github.com/WordPress/gutenberg/pull/81564), [#82321](https://github.com/WordPress/gutenberg/pull/82321), [#82428](https://github.com/WordPress/gutenberg/pull/82428)).
+
+### Deprecations
+
+-   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`, `PluginPreviewMenuItem`: Deprecate the `as` prop, which reached the item only because these components forward every extra prop. The menu now renders the item itself, so the prop is ignored ([#82319](https://github.com/WordPress/gutenberg/pull/82319)).
+
+### Enhancements
+
+-   Media Library modal: Pass the current post and its post type to the modal so its "Attached to" filter can offer media uploaded to that post, under the post type's own wording. Only a viewable post type is passed on: a template has no front end of its own, so media can't be uploaded to one ([#81974](https://github.com/WordPress/gutenberg/pull/81974)).
+-   Post actions: Append an ellipsis (`…`) to the "Set as homepage" and "Set as posts page" action labels, which open a confirmation dialog, following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
+-   Show a "Privacy Policy Page" badge in the document bar and the post card panel for the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
+-   `PostCardPanel`: Migrate the page-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82500](https://github.com/WordPress/gutenberg/pull/82500)).
 
 ### Bug Fixes
 
+-   `PostURL`: Translate the copy permalink button label, which was hardcoded in English ([#82642](https://github.com/WordPress/gutenberg/pull/82642)).
+-   User autocompleter: Don't open the mention popup when the `@` follows other text, such as while typing an email address; mentions still trigger after a space, punctuation, or at the start of a line ([#47249](https://github.com/WordPress/gutenberg/pull/47249)).
+-   More menu: Align SVG prefix icons with item labels using `Menu.PrefixIcon`, preserving Dashicon and custom component support. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
+-   Attach media an Image or Gallery block displays to the post on save, when it is not already attached to another post, matching what uploading into that post has always done ([#81977](https://github.com/WordPress/gutenberg/pull/81977)).
+-   Color the welcome guide's hovered button icon with `color` rather than `fill`, so stroke-based icons follow it. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   `EditorInterface`: Apply the `showListViewByDefault` preference when the editor enters edit mode, so every editor built on the package honors it — including the extensible site editor, which previously ignored it. The logic moves here from `edit-post` and `edit-site`.
 -   `StylesCanvas`: In preview mode, render edge to edge without the close button and Escape handler. There the canvas is the whole surface rather than a frame opened over an editing session, and whatever opened it owns closing it.
-
-### Bug Fixes
-
+-   Upload progress snackbar: Stop announcing "Upload complete" for a batch in which everything failed. The snackbar treated the queue draining as success, so a failed upload showed a completion checkmark right next to its own error. A batch that fails outright now just takes the progress snackbar down, and a partly failed one reports "Uploaded 3 of 5" ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).
 -   `mediaUpload`: Refuse a batch of more than one file before registering it with the upload progress snackbar when the caller only takes one, such as a Cover block placeholder. `uploadMedia()` reported the refusal as a single error, leaving the rest of the batch counted as uploading forever - and every later upload in the session was folded into that stuck notice ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
 
 ### Internal
 
+-   Remove the template activation (`active_templates`) experiment: the post-save activation notice, the "Edit template" auto-activation, and template duplication in the actions list ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
+-   Remove unused dependencies `@wordpress/reusable-blocks`, `client-zip` and `fast-deep-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 
 ## 14.54.0 (2026-08-26)
@@ -32,12 +48,14 @@
 
 ### Bug Fixes
 
+-   `__unstableSaveForPreview`: Mark the options object and its `forceIsAutosaveable` flag as optional, matching the neighbouring `autosave` action. Both defaulted at runtime but the published types required them ([#81858](https://github.com/WordPress/gutenberg/pull/81858)).
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
 -   Header: Allow the Back button column to grow when "Show button text labels" is enabled so the label is not obscured by the following controls ([#81701](https://github.com/WordPress/gutenberg/pull/81701)).
 -   Notes: Stop forcing capitalization of the user name in a note byline, so the name is shown as the user set it ([#81788](https://github.com/WordPress/gutenberg/pull/81788)).
 -   Device Preview: Center the editor canvas with the canvas container's own flex alignment rather than the canvas's auto margins, which were conditional on the resize handles being active. Switching from the mobile or tablet preview back to desktop no longer expands the canvas from the left edge ([#81484](https://github.com/WordPress/gutenberg/pull/81484)).
 -   `PostSchedule`: Announce the new publish date to screen readers when the date is changed ([#81629](https://github.com/WordPress/gutenberg/pull/81629)).
 -   Start page/template pattern modals: Align the footer actions with the modal content's padding, so the footer no longer overflows the modal width ([#82021](https://github.com/WordPress/gutenberg/pull/82021)).
+-   Media: Store the attachment record returned by the `finalize` endpoint instead of refetching the attachment once a client-side upload completes. The finalize response is prepared after the sub-size metadata is written, so it already carries `media_details.sizes`; the refetch it replaces could be answered with the pre-finalize record - by an out-of-order response, or by a host cache keyed on the request URL - leaving the Image block without its Resolution control ([#81947](https://github.com/WordPress/gutenberg/pull/81947)).
 
 ### Internal
 

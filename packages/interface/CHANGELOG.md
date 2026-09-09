@@ -4,6 +4,7 @@
 
 ### Internal
 
+-   `ComplementaryAreaMoreMenuItem`: Stop passing a `selectedIcon`. The component the item renders as shows the selection ([#81564](https://github.com/WordPress/gutenberg/pull/81564)).
 -   Remove unused dependency `@wordpress/a11y` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 

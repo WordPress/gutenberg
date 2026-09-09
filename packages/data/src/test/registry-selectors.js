@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
 import { createSelector } from '..';

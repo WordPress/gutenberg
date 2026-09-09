@@ -31,6 +31,7 @@ import DataViewsViewConfig, {
 import normalizeFields from '../field-types';
 import useData from '../hooks/use-data';
 import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
+import usePageClamp from '../hooks/use-page-clamp';
 import type { ActionButton, Field, View, SupportedLayouts } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
 type ItemWithId = { id: string };
@@ -42,23 +43,96 @@ const dataViewsPickerLayouts = VIEW_LAYOUTS.filter(
 );
 
 type DataViewsPickerProps< Item > = {
+	/**
+	 * The current view configuration: layout type, filters, sorting,
+	 * pagination, search term, and visible fields.
+	 */
 	view: View;
+	/**
+	 * Callback invoked with the new view whenever the user changes it
+	 * (filtering, sorting, switching layout, changing page, etc.).
+	 * Consumers own the view state and must store the new value.
+	 */
 	onChangeView: ( view: View ) => void;
+	/**
+	 * The fields describing each item's data: how to get and render a value,
+	 * plus its sorting and filtering capabilities.
+	 */
 	fields: Field< Item >[];
+	/**
+	 * The button actions that can be performed on items. Unlike `DataViews`,
+	 * pickers only support button actions (no modals).
+	 */
 	actions?: ActionButton< Item >[];
+	/**
+	 * Whether the global search input is displayed.
+	 *
+	 * @default true
+	 */
 	search?: boolean;
+	/**
+	 * The accessible label and placeholder for the search input.
+	 *
+	 * @default 'Search'
+	 */
 	searchLabel?: string;
+	/**
+	 * The dataset to render, already filtered, sorted, and paginated
+	 * according to the current view.
+	 */
 	data: Item[];
+	/**
+	 * Whether the data is loading, in which case a loading state is shown.
+	 *
+	 * @default false
+	 */
 	isLoading?: boolean;
+	/**
+	 * Pagination totals for the full dataset (not just the current page).
+	 */
 	paginationInfo: {
+		/**
+		 * The total number of items in the dataset.
+		 */
 		totalItems: number;
+		/**
+		 * The total number of pages, given the current items per page.
+		 */
 		totalPages: number;
 	};
+	/**
+	 * The layouts the user can switch between, mapping each supported layout
+	 * type to view settings applied when switching to it (or `true` for
+	 * defaults). Only picker layouts (`pickerGrid`, `pickerTable`,
+	 * `pickerActivity`) are supported; other layout types are ignored.
+	 *
+	 * @default { pickerGrid: true, pickerTable: true }
+	 */
 	defaultLayouts?: SupportedLayouts;
+	/**
+	 * The currently selected items, as a list of item ids. Selection is
+	 * always controlled in pickers, so this prop is required.
+	 */
 	selection: string[];
+	/**
+	 * Callback invoked with the new list of selected item ids whenever the
+	 * selection changes.
+	 */
 	onChangeSelection: ( items: string[] ) => void;
+	/**
+	 * Custom component tree rendered instead of the default layout
+	 * composition, using the internal `DataViewsPicker.*` sub-components.
+	 */
 	children?: ReactNode;
+	/**
+	 * Static configuration of the component's UI.
+	 *
+	 * @default { perPageSizes: [ 10, 20, 50, 100 ] }
+	 */
 	config?: {
+		/**
+		 * The options offered in the "items per page" control.
+		 */
 		perPageSizes: number[];
 		/**
 		 * Whether the view config popover offers the "Original aspect ratio"
@@ -67,12 +141,38 @@ type DataViewsPickerProps< Item > = {
 		 */
 		mediaFitControl?: boolean;
 	};
+	/**
+	 * The accessible label for the list of items rendered by the layout.
+	 */
 	itemListLabel?: string;
+	/**
+	 * Content rendered when the dataset is empty (no items match the
+	 * current view).
+	 */
 	empty?: ReactNode;
+	/**
+	 * Callback to reset the view to its initial state, wired to the
+	 * "Reset view" button in the view options popover. When provided, the
+	 * view options toggle also shows a "modified" indicator. Pass `false` to
+	 * render the button disabled (the view is not modified); omit the prop
+	 * to hide the button altogether (no reset support).
+	 */
 	onReset?: ( () => void ) | false;
 } & ( Item extends ItemWithId
-	? { getItemId?: ( item: Item ) => string }
-	: { getItemId: ( item: Item ) => string } );
+	? {
+			/**
+			 * Returns a unique id for an item. Optional when items already
+			 * have a string `id` property, which is used by default.
+			 */
+			getItemId?: ( item: Item ) => string;
+	  }
+	: {
+			/**
+			 * Returns a unique id for an item. Required when items have no
+			 * string `id` property.
+			 */
+			getItemId: ( item: Item ) => string;
+	  } );
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const EMPTY_ARRAY: any[] = [];
@@ -194,6 +294,13 @@ function DataViewsPicker< Item >( {
 		paginationInfo,
 		containerRef,
 		setVisibleEntries,
+	} );
+
+	usePageClamp( {
+		view,
+		onChangeView,
+		isLoading,
+		totalPages: paginationInfo.totalPages,
 	} );
 
 	useEffect( () => {

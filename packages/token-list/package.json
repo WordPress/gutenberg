@@ -43,7 +43,7 @@
 	"wpScriptDefaultExport": true,
 	"types": "build-types",
 	"devDependencies": {
-		"@types/jest": "^30.0.0"
+		"vitest": "^4.1.11"
 	},
 	"publishConfig": {
 		"access": "public"

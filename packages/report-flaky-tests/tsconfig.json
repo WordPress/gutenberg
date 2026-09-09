@@ -2,7 +2,9 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"allowImportingTsExtensions": true
+		"allowImportingTsExtensions": true,
+		// Tests run on Vitest and import their globals, so no jest types.
+		"types": []
 	},
 	"references": [ { "path": "./tsconfig.build.json" } ]
 }

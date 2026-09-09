@@ -1,4 +1,14 @@
 import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mocked,
+} from 'vitest';
+import {
 	InteractionController,
 	type CropperInteractionActions,
 } from '../interaction-controller';
@@ -52,7 +62,7 @@ function createPointerEvent(
 		clientX: 0,
 		clientY: 0,
 		pointerId: 1,
-		preventDefault: jest.fn(),
+		preventDefault: vi.fn(),
 		...overrides,
 	} as unknown as PointerEvent;
 }
@@ -67,16 +77,16 @@ function createMockElement(): HTMLElement & {
 } {
 	const listeners: Record< string, EventListener[] > = {};
 	return {
-		focus: jest.fn(),
-		setPointerCapture: jest.fn(),
-		releasePointerCapture: jest.fn(),
-		addEventListener: jest.fn( ( type: string, fn: EventListener ) => {
+		focus: vi.fn(),
+		setPointerCapture: vi.fn(),
+		releasePointerCapture: vi.fn(),
+		addEventListener: vi.fn( ( type: string, fn: EventListener ) => {
 			if ( ! listeners[ type ] ) {
 				listeners[ type ] = [];
 			}
 			listeners[ type ].push( fn );
 		} ),
-		removeEventListener: jest.fn( ( type: string, fn: EventListener ) => {
+		removeEventListener: vi.fn( ( type: string, fn: EventListener ) => {
 			if ( listeners[ type ] ) {
 				listeners[ type ] = listeners[ type ].filter(
 					( l ) => l !== fn
@@ -106,7 +116,7 @@ function createWheelEvent(
 	overrides: Partial< WheelEvent > & { currentTarget?: unknown } = {}
 ): WheelEvent {
 	return {
-		preventDefault: jest.fn(),
+		preventDefault: vi.fn(),
 		deltaY: 0,
 		clientX: 0,
 		clientY: 0,
@@ -127,7 +137,7 @@ function createKeyboardEvent(
 ): KeyboardEvent {
 	return {
 		key,
-		preventDefault: jest.fn(),
+		preventDefault: vi.fn(),
 		...overrides,
 	} as unknown as KeyboardEvent;
 }
@@ -144,7 +154,7 @@ function createTouchEvent(
 	overrides: Partial< TouchEvent > = {}
 ): TouchEvent {
 	return {
-		preventDefault: jest.fn(),
+		preventDefault: vi.fn(),
 		touches,
 		...overrides,
 	} as unknown as TouchEvent;
@@ -166,7 +176,7 @@ function createContainerRect( overrides: Partial< DOMRect > = {} ): DOMRect {
 		bottom: 300,
 		x: 0,
 		y: 0,
-		toJSON: jest.fn(),
+		toJSON: vi.fn(),
 		...overrides,
 	} as DOMRect;
 }
@@ -182,13 +192,13 @@ function createMockDocument(): Document & {
 } {
 	const listeners: Record< string, EventListener[] > = {};
 	return {
-		addEventListener: jest.fn( ( type: string, fn: EventListener ) => {
+		addEventListener: vi.fn( ( type: string, fn: EventListener ) => {
 			if ( ! listeners[ type ] ) {
 				listeners[ type ] = [];
 			}
 			listeners[ type ].push( fn );
 		} ),
-		removeEventListener: jest.fn( ( type: string, fn: EventListener ) => {
+		removeEventListener: vi.fn( ( type: string, fn: EventListener ) => {
 			if ( listeners[ type ] ) {
 				listeners[ type ] = listeners[ type ].filter(
 					( l ) => l !== fn
@@ -208,7 +218,7 @@ function createMockDocument(): Document & {
 describe( 'InteractionController', () => {
 	const containerSize: Size = { width: 500, height: 300 };
 	const imageSize: Size = { width: 500, height: 300 };
-	let actionMocks: jest.Mocked< CropperInteractionActions >;
+	let actionMocks: Mocked< CropperInteractionActions >;
 
 	// Store original requestAnimationFrame so we can restore it.
 	const originalRAF = globalThis.requestAnimationFrame;
@@ -220,7 +230,7 @@ describe( 'InteractionController', () => {
 			cb( 0 );
 			return 0;
 		};
-		globalThis.cancelAnimationFrame = jest.fn();
+		globalThis.cancelAnimationFrame = vi.fn();
 	} );
 
 	afterAll( () => {
@@ -230,11 +240,11 @@ describe( 'InteractionController', () => {
 
 	beforeEach( () => {
 		actionMocks = {
-			setPan: jest.fn(),
-			setZoom: jest.fn(),
-			setZoomAtPoint: jest.fn(),
-			snapRotate90: jest.fn(),
-			toggleFlip: jest.fn(),
+			setPan: vi.fn(),
+			setZoom: vi.fn(),
+			setZoomAtPoint: vi.fn(),
+			snapRotate90: vi.fn(),
+			toggleFlip: vi.fn(),
 		};
 	} );
 
@@ -290,8 +300,8 @@ describe( 'InteractionController', () => {
 
 		it( 'ignores touch pointerdown so touch gestures own touch input', () => {
 			const state = makeState( { zoom: 2 } );
-			const onGestureStart = jest.fn();
-			const onStatusChange = jest.fn();
+			const onGestureStart = vi.fn();
+			const onStatusChange = vi.fn();
 			const { controller } = createController( state, {
 				onGestureStart,
 				onStatusChange,
@@ -333,7 +343,7 @@ describe( 'InteractionController', () => {
 			// Simulate pointerup.
 			el._fire( 'pointerup', createPointerEvent() );
 
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			// Another pointermove should not dispatch because the listener
 			// was removed after pointerup.
@@ -350,8 +360,8 @@ describe( 'InteractionController', () => {
 
 		it( 'calls onGestureStart on pointerdown and onGestureEnd on pointerup', () => {
 			const state = makeState( { zoom: 2 } );
-			const onGestureStart = jest.fn();
-			const onGestureEnd = jest.fn();
+			const onGestureStart = vi.fn();
+			const onGestureEnd = vi.fn();
 			const { controller } = createController( state, {
 				onGestureStart,
 				onGestureEnd,
@@ -380,7 +390,7 @@ describe( 'InteractionController', () => {
 
 		it( 'reports isDragging via onStatusChange', () => {
 			const state = makeState( { zoom: 2 } );
-			const onStatusChange = jest.fn();
+			const onStatusChange = vi.fn();
 			const { controller } = createController( state, {
 				onStatusChange,
 			} );
@@ -505,7 +515,7 @@ describe( 'InteractionController', () => {
 				el
 			);
 
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			const wheelEvent = createWheelEvent( {
 				deltaY: -100,
@@ -521,12 +531,12 @@ describe( 'InteractionController', () => {
 		} );
 
 		it( 'calls onGestureStart on first wheel, onGestureEnd after debounce', () => {
-			jest.useFakeTimers( {
-				doNotFake: [ 'requestAnimationFrame', 'cancelAnimationFrame' ],
+			vi.useFakeTimers( {
+				toFake: [ 'setTimeout', 'clearTimeout' ],
 			} );
 			const state = makeState( { zoom: 2 } );
-			const onGestureStart = jest.fn();
-			const onGestureEnd = jest.fn();
+			const onGestureStart = vi.fn();
+			const onGestureEnd = vi.fn();
 			const { controller } = createController( state, {
 				onGestureStart,
 				onGestureEnd,
@@ -546,11 +556,11 @@ describe( 'InteractionController', () => {
 			expect( onGestureStart ).toHaveBeenCalledTimes( 1 );
 
 			// Advance past the 300ms debounce.
-			jest.advanceTimersByTime( 350 );
+			vi.advanceTimersByTime( 350 );
 
 			expect( onGestureEnd ).toHaveBeenCalledTimes( 1 );
 
-			jest.useRealTimers();
+			vi.useRealTimers();
 		} );
 	} );
 
@@ -848,8 +858,8 @@ describe( 'InteractionController', () => {
 
 		it( 'calls onGestureStart/onGestureEnd for single-finger pan', () => {
 			const state = makeState( { zoom: 2 } );
-			const onGestureStart = jest.fn();
-			const onGestureEnd = jest.fn();
+			const onGestureStart = vi.fn();
+			const onGestureEnd = vi.fn();
 			const { controller } = createController( state, {
 				onGestureStart,
 				onGestureEnd,
@@ -873,7 +883,7 @@ describe( 'InteractionController', () => {
 
 		it( 'reports isDragging on first single-finger move', () => {
 			const state = makeState( { zoom: 2 } );
-			const onStatusChange = jest.fn();
+			const onStatusChange = vi.fn();
 			const { controller } = createController( state, {
 				onStatusChange,
 			} );
@@ -987,8 +997,8 @@ describe( 'InteractionController', () => {
 
 		it( 'calls onGestureStart for pinch, onGestureEnd on touchend', () => {
 			const state = makeState( { zoom: 1 } );
-			const onGestureStart = jest.fn();
-			const onGestureEnd = jest.fn();
+			const onGestureStart = vi.fn();
+			const onGestureEnd = vi.fn();
 			const { controller } = createController( state, {
 				onGestureStart,
 				onGestureEnd,
@@ -1031,7 +1041,7 @@ describe( 'InteractionController', () => {
 				createTouchEvent( [ { clientX: 210, clientY: 155 } ] )
 			);
 			expect( actionMocks.setPan ).toHaveBeenCalled();
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			// Second finger arrives via touchstart.
 			controller.handleTouchStart(
@@ -1122,7 +1132,7 @@ describe( 'InteractionController', () => {
 				] )
 			);
 
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			// One finger lifts — move with 1 touch should NOT pan
 			// because didPinch is true.
@@ -1225,7 +1235,7 @@ describe( 'InteractionController', () => {
 				createPointerEvent( { clientX: 100, clientY: 100 } ),
 				el
 			);
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			controller.destroy();
 

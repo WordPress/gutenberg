@@ -66,6 +66,27 @@ function _gutenberg_add_reading_settings_to_wp_template_view_config( $data ) {
 }
 
 /**
+ * Removes the `active`, `slug`, and `theme` fields from the `wp_template`
+ * default view.
+ *
+ * They were rendered by the template activation experiment, which has been
+ * removed. No field with those ids is registered for templates anymore.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_remove_stale_fields_from_wp_template_view_config( $data ) {
+	return $data->remove(
+		array(
+			'default_view' => array(
+				'fields' => array( 'active', 'slug', 'theme' ),
+			),
+		),
+		1
+	);
+}
+
+/**
  * Provides the view configuration for the `wp_navigation` post type.
  *
  * Core has no callback for this post type, so this is a base definition
@@ -103,6 +124,78 @@ function _gutenberg_get_entity_view_config_posttype_wp_navigation( $data ) {
 
 	return $data;
 }
+
+/**
+ * Post types whose base definition provides its own `form`, without the
+ * `status` and `discussion` groups of the default post type form.
+ *
+ * @var string[]
+ */
+const GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM = array( 'wp_block', 'wp_template', 'wp_template_part' );
+
+/**
+ * Makes the panel summary of the `status` and `discussion` groups explicit in
+ * the default post type form.
+ *
+ * Both groups used to be summarized by the field sharing their id (`status`,
+ * and the composite `discussion` field). A combined form field no longer
+ * resolves its own id against the field definitions, so the summary field is
+ * declared through `layout.summary` instead. The patch merges into the existing
+ * group members by id, leaving the rest of the form untouched.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_add_group_summaries_to_default_posttype_form( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id'     => 'status',
+						'layout' => array(
+							'type'    => 'panel',
+							'summary' => 'status',
+						),
+					),
+					array(
+						'id'     => 'discussion',
+						'layout' => array(
+							'type'    => 'panel',
+							'summary' => 'discussion',
+						),
+					),
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Layers the group summaries on top of the view configuration of every post
+ * type that uses the default form, including custom post types registered at
+ * any point.
+ *
+ * The callback merges by member id, and a member that is absent would be
+ * appended instead, so post types whose base definition provides its own form
+ * are skipped.
+ *
+ * @param string $post_type The post type being registered.
+ */
+function gutenberg_register_default_posttype_form_summaries_7_2( $post_type ) {
+	if ( in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true ) ) {
+		return;
+	}
+
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', $post_type ),
+		'_gutenberg_add_group_summaries_to_default_posttype_form',
+		6,
+		1
+	);
+}
+add_action( 'registered_post_type', 'gutenberg_register_default_posttype_form_summaries_7_2' );
 
 /**
  * Adds the item count of each view to the `page` view list.
@@ -171,6 +264,12 @@ function gutenberg_register_entity_view_config_filters_7_2() {
 	add_filter(
 		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_template' ),
 		'_gutenberg_add_reading_settings_to_wp_template_view_config',
+		6,
+		1
+	);
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_template' ),
+		'_gutenberg_remove_stale_fields_from_wp_template_view_config',
 		6,
 		1
 	);
