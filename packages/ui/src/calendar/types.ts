@@ -360,9 +360,10 @@ export interface RangeProps {
 	 */
 	excludeDisabled?: boolean;
 	/**
-	 * When `true`, selecting a date starts a new range when there is no current
-	 * start date or when the current range is complete. The hover preview shows
-	 * the range that selecting the date would create.
+	 * When `true`, clicking a day starts a new range if there is no current start
+	 * date or if a range is already complete. In those cases, the clicked day
+	 * becomes the start of the new range. When `required` is `false`, clicking
+	 * the same day of a single-day range clears the selection.
 	 * @default true
 	 */
 	resetOnSelect?: boolean;
