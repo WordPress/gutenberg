@@ -4,7 +4,8 @@
 
 ### New Features
 
--   Add `apiFetch.unregister` to remove a registered middleware, and expose `apiFetch.httpV1Middleware` so the `X-HTTP-Method-Override` behavior can be opted out of. ([#82408](https://github.com/WordPress/gutenberg/pull/82408))
+-   Add `apiFetch.unregister` to remove a registered middleware, and expose `apiFetch.httpV1Middleware` so the `X-HTTP-Method-Override` behavior can be opted out of ([#82408](https://github.com/WordPress/gutenberg/pull/82408)).
+-   Expose `apiFetch.defaultFetchHandler` so the default fetch handler can be restored after `setFetchHandler` overrides it ([#82553](https://github.com/WordPress/gutenberg/pull/82553))
 
 ## 7.54.0 (2026-08-26)
 
