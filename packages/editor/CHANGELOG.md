@@ -6,6 +6,7 @@
 
 -   Upload progress snackbar: Stop announcing "Upload complete" for a batch in which everything failed. The snackbar treated the queue draining as success, so a failed upload showed a completion checkmark right next to its own error. A batch that fails outright now just takes the progress snackbar down, and a partly failed one reports "Uploaded 3 of 5" ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).
 -   `mediaUpload`: Refuse a batch of more than one file before registering it with the upload progress snackbar when the caller only takes one, such as a Cover block placeholder. `uploadMedia()` reported the refusal as a single error, leaving the rest of the batch counted as uploading forever - and every later upload in the session was folded into that stuck notice ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
+-   Media: Store the attachment record returned by the `finalize` endpoint instead of refetching the attachment once a client-side upload completes. The finalize response is prepared after the sub-size metadata is written, so it already carries `media_details.sizes`; the refetch it replaces could be answered with the pre-finalize record - by an out-of-order response, or by a host cache keyed on the request URL - leaving the Image block without its Resolution control ([#81947](https://github.com/WordPress/gutenberg/pull/81947)).
 
 ### Enhancements
 
