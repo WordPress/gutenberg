@@ -34,7 +34,7 @@
 	},
 	"types": "build-types",
 	"dependencies": {
-		"@actions/core": "^1.9.1",
+		"@actions/core": "^3.0.1",
 		"@jest/test-result": "^30.5.0",
 		"@playwright/test": "^1.62.1",
 		"jest-message-util": "^30.5.0"

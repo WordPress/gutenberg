@@ -9,6 +9,7 @@
 
 ### Internal
 
+-   Update `@actions/core` to `^3.0.1` ([#82663](https://github.com/WordPress/gutenberg/pull/82663)).
 -   Remove the unused `@actions/github` and `@octokit/webhooks-types` dependencies ([#82249](https://github.com/WordPress/gutenberg/pull/82249)).
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81517](https://github.com/WordPress/gutenberg/pull/81517))
 
