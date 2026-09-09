@@ -22,12 +22,10 @@ import {
 	DEFAULT_LAYOUTS,
 } from './view-utils';
 import { previewField } from './fields/preview';
-import { authorField } from './fields/author';
-import { descriptionField } from './fields/description';
 import { useTemplates } from './use-templates';
 import AddNewTemplate from './add-new-template';
 // Unlock WordPress private APIs
-const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
 /**
  * Style dependencies
@@ -97,45 +95,11 @@ function TemplateList() {
 	// Fetch templates using our custom hook
 	const { records, isLoading, allRecords } = useTemplates( activeView );
 
-	// Get users for author field
-	const users = useSelect(
-		( select ) => {
-			const { getUser } = select( coreStore );
-			return records.reduce( ( acc: any, record: any ) => {
-				if ( record.author_text ) {
-					if ( ! acc[ record.author_text ] ) {
-						acc[ record.author_text ] = record.author_text;
-					}
-				} else if ( record.author ) {
-					if ( ! acc[ record.author ] ) {
-						acc[ record.author ] = getUser( record.author );
-					}
-				}
-				return acc;
-			}, {} );
-		},
-		[ records ]
+	const postFields = usePostFields( { postType: 'wp_template' } );
+	const fields = useMemo(
+		() => [ previewField, ...postFields ],
+		[ postFields ]
 	);
-
-	// Build fields array with author elements
-	const fields = useMemo( () => {
-		const elements = [];
-		for ( const author in users ) {
-			elements.push( {
-				value: users[ author ]?.id ?? author,
-				label: users[ author ]?.name ?? author,
-			} );
-		}
-		return [
-			previewField,
-			templateTitleField,
-			descriptionField,
-			{
-				...authorField,
-				elements,
-			},
-		];
-	}, [ users ] );
 
 	// Apply filtering, sorting, and pagination on the client side
 	const { data: posts, paginationInfo } = useMemo( () => {

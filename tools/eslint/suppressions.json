@@ -8175,11 +8175,6 @@
 			"count": 4
 		}
 	},
-	"routes/template-list/fields/author.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"routes/template-list/stage.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 2
