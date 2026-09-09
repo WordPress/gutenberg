@@ -1,18 +1,11 @@
-/**
- * External dependencies
- */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import DimensionControls from '../dimension-controls';
+
+globalThis.wpVitest.mockMatchMedia();
+globalThis.wpVitest.mockResizeObserver();
 
 function Example( { attributes = {}, setAttributes = () => {} } ) {
 	return (
@@ -21,6 +14,7 @@ function Example( { attributes = {}, setAttributes = () => {} } ) {
 				clientId="panel-id"
 				attributes={ attributes }
 				setAttributes={ setAttributes }
+				selectedStyleState={ undefined }
 			/>
 		</ToolsPanel>
 	);
@@ -37,7 +31,7 @@ describe( 'PostFeaturedImage dimension controls', () => {
 
 	it( 'setting a height on its own keeps the width unset and picks up the default scale', async () => {
 		const user = userEvent.setup();
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 
 		render( <Example setAttributes={ setAttributes } /> );
 
