@@ -38,13 +38,16 @@ export function getActiveViewOverridesForTab(
 	if ( activeView === 'all' ) {
 		return {};
 	}
-	// Author-based view
+	// Author-based view. Mirrors the per-author views the v1 view config
+	// endpoint provides: the filter is locked so the tab can't be removed
+	// from the filter bar.
 	return {
 		filters: [
 			{
 				field: 'author',
-				operator: 'isAny',
-				value: [ activeView ],
+				operator: 'is',
+				value: activeView,
+				isLocked: true,
 			},
 		],
 	};
