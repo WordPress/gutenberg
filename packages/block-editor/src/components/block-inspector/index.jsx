@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
@@ -9,7 +10,7 @@ import {
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { Text } from '@wordpress/ui';
 import EditContents from './edit-contents';
 import SkipToSelectedBlock from '../skip-to-selected-block';
@@ -426,6 +427,31 @@ const BlockInspectorSingleBlock = ( {
 	// When a style state is active, the badges replace the block description.
 	const showStateBadges =
 		blockEditingMode === 'default' && isEditingStyleState;
+	const [ badgesStuck, setBadgesStuck ] = useState( false );
+	const stickyBadgesRef = useRef( null );
+	useEffect( () => {
+		const badges = stickyBadgesRef.current;
+		const scrollContainer = badges?.closest(
+			'.interface-complementary-area'
+		);
+		// Outside a complementary area (e.g. the Customizer) nothing is
+		// sticky, so there is nothing to detect.
+		if ( ! badges || ! scrollContainer ) {
+			return;
+		}
+		const observer = new window.IntersectionObserver(
+			( [ entry ] ) => setBadgesStuck( entry.intersectionRatio < 1 ),
+			{
+				root: scrollContainer,
+				// 1px below the badges' sticky top: once pinned, the strip's
+				// top edge is clipped by exactly that pixel.
+				rootMargin: '-48px 0px 0px 0px',
+				threshold: [ 1 ],
+			}
+		);
+		observer.observe( badges );
+		return () => observer.disconnect();
+	}, [ showStateBadges ] );
 	const hasParentChildBlockCards =
 		editedContentOnlySection &&
 		editedContentOnlySection !== renderedBlockClientId;
@@ -484,7 +510,11 @@ const BlockInspectorSingleBlock = ( {
 			/>
 			{ showStateBadges && (
 				<Spacer
-					className="block-editor-block-inspector__sticky-badges"
+					ref={ stickyBadgesRef }
+					className={ clsx(
+						'block-editor-block-inspector__sticky-badges',
+						badgesStuck && 'is-stuck'
+					) }
 					paddingX={ 4 }
 					paddingY={ 2 }
 				>

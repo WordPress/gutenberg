@@ -66,6 +66,11 @@ $z-layers: (
 	// Below the block toolbar.
 	".block-editor-grid-visualizer": 30,
 
+	// Above in-panel controls in the block inspector (the highest being the
+	// focal-point picker's drag handle at 10000). Only competes within the
+	// panel's z-index: 0 stacking context, so it never reaches global layers.
+	".block-editor-block-inspector__sticky-badges": 10001,
+
 	// Show snackbars above everything (similar to popovers)
 	".components-snackbar-list": 100000,
 
