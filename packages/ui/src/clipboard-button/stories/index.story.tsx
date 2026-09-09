@@ -63,18 +63,6 @@ export const NeutralOutline: Story = {
 	},
 };
 
-export const Small: Story = {
-	args: {
-		size: 'small',
-	},
-};
-
-export const Compact: Story = {
-	args: {
-		size: 'compact',
-	},
-};
-
 export const Disabled: Story = {
 	args: {
 		disabled: true,
