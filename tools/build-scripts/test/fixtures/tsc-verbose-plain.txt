@@ -1,0 +1,17 @@
+06:24:00 PM - Projects in this build: 
+    * packages/dom-ready/tsconfig.build.json
+    * packages/hooks/tsconfig.json
+
+06:24:00 PM - Project 'packages/dom-ready/tsconfig.build.json' is up to date because newest input 'packages/dom-ready/src/index.ts' is older than output 'packages/dom-ready/tsconfig.build.tsbuildinfo'
+
+06:24:00 PM - Project 'packages/a11y/tsconfig.json' is out of date because buildinfo file 'packages/a11y/tsconfig.tsbuildinfo' indicates that program needs to report errors.
+
+06:24:00 PM - Building project 'packages/a11y/tsconfig.json'...
+
+error TS2688: Cannot find type definition file for 'does-not-exist'.
+  The file is in the program because:
+    Entry point of type library 'does-not-exist' specified in compilerOptions
+06:24:00 PM - Building project 'packages/blob/tsconfig.json'...
+
+packages/blob/src/test/index.jsdom.test.ts(94,7): error TS2322: Type 'string' is not assignable to type 'number'.
+06:24:00 PM - Project 'packages/components/tsconfig.json' is up to date because newest input 'packages/components/src/form-token-field/test/index.jsdom.test.tsx' is older than output 'packages/components/tsconfig.tsbuildinfo'

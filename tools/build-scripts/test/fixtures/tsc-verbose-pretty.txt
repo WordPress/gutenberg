@@ -1,0 +1,38 @@
+[[90m06:22:36 PM[0m] Projects in this build: 
+    * packages/dom-ready/tsconfig.build.json
+    * packages/hooks/tsconfig.json
+
+[[90m06:22:36 PM[0m] Project 'packages/dom-ready/tsconfig.build.json' is up to date because newest input 'packages/dom-ready/src/index.ts' is older than output 'packages/dom-ready/tsconfig.build.tsbuildinfo'
+
+[[90m06:22:37 PM[0m] Project 'packages/a11y/tsconfig.json' is out of date because output 'packages/a11y/tsconfig.tsbuildinfo' is older than input 'tsconfig.dev.base.json'
+
+[[90m06:22:37 PM[0m] Building project 'packages/a11y/tsconfig.json'...
+
+[91merror[0m[90m TS2688: [0mCannot find type definition file for 'does-not-exist'.
+  The file is in the program because:
+    Entry point of type library 'does-not-exist' specified in compilerOptions
+[[90m06:22:37 PM[0m] Project 'packages/abilities/tsconfig.json' is out of date because output 'packages/abilities/tsconfig.tsbuildinfo' is older than input 'tsconfig.dev.base.json'
+
+[[90m06:22:37 PM[0m] Building project 'packages/abilities/tsconfig.json'...
+
+[91merror[0m[90m TS2688: [0mCannot find type definition file for 'does-not-exist'.
+  The file is in the program because:
+    Entry point of type library 'does-not-exist' specified in compilerOptions
+[[90m06:22:37 PM[0m] Project 'packages/blob/tsconfig.json' is out of date because output 'packages/blob/tsconfig.tsbuildinfo' is older than input 'packages/blob/src/test/index.jsdom.test.ts'
+
+[[90m06:22:37 PM[0m] Building project 'packages/blob/tsconfig.json'...
+
+[96mpackages/blob/src/test/index.jsdom.test.ts[0m:[93m94[0m:[93m7[0m - [91merror[0m[90m TS2322: [0mType 'string' is not assignable to type 'number'.
+
+[7m94[0m const introducedError: number = "not a number";
+[7m  [0m [91m      ~~~~~~~~~~~~~~~[0m
+
+[[90m06:22:38 PM[0m] Building project 'widgets/tsconfig.json'...
+
+
+Found 24 errors in 2 files.
+
+Errors  Files
+     1  packages/blob/src/index.ts[90m:115[0m
+     1  packages/blob/src/test/index.jsdom.test.ts[90m:94[0m
+
