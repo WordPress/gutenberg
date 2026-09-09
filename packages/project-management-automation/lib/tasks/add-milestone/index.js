@@ -83,14 +83,15 @@ async function addMilestone( payload, octokit ) {
 		return;
 	}
 
-	debug( 'add-milestone: Fetching current milestone' );
 	const owner = payload.repository.owner?.login;
 	if ( ! owner ) {
-		throw new Error(
-			'add-milestone: Push payload is missing a repository owner.'
+		debug(
+			'add-milestone: Push payload is missing a repository owner. Aborting'
 		);
+		return;
 	}
 	const repo = payload.repository.name;
+	debug( 'add-milestone: Fetching current milestone' );
 
 	const {
 		data: { milestone: pullMilestone },

@@ -38,6 +38,27 @@ describe( 'addMilestone', () => {
 		expect( octokit.rest.repos.getContent ).not.toHaveBeenCalled();
 	} );
 
+	it( 'does nothing if the repository owner is unavailable', async () => {
+		const payload = {
+			ref: 'refs/heads/trunk',
+			commits: [ { message: '(#123)' } ],
+			repository: {
+				name: 'gutenberg',
+			},
+		};
+		const get = vi.fn();
+
+		await addMilestone( payload, {
+			rest: {
+				issues: {
+					get,
+				},
+			},
+		} );
+
+		expect( get ).not.toHaveBeenCalled();
+	} );
+
 	it( 'does nothing if PR already has a milestone', async () => {
 		const payload = {
 			ref: 'refs/heads/trunk',
