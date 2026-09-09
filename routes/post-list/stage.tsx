@@ -7,7 +7,7 @@ import {
 } from '@wordpress/route';
 import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
-import { Page } from '@wordpress/admin-ui';
+import { Page, ViewTabCount } from '@wordpress/admin-ui';
 import type { View, Action, SupportedLayouts } from '@wordpress/dataviews';
 import {
 	store as coreStore,
@@ -380,11 +380,7 @@ function PostListView( {
 									key={ entry.slug }
 								>
 									{ entry.title }
-									{ typeof entry.count === 'number' && (
-										<span className="routes-post-list__tab-count">
-											{ entry.count.toLocaleString() }
-										</span>
-									) }
+									<ViewTabCount count={ entry.count } />
 								</Tabs.Tab>
 							) ) }
 						</Tabs.TabList>
