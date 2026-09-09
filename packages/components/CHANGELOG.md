@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+-   `FormTokenField`: Wrap to the last suggestion when pressing the up arrow with no suggestion selected, instead of leaving the selection on an invalid index ([#82646](https://github.com/WordPress/gutenberg/pull/82646)).
 -   `Disabled`: Keep the `className` passed by the consumer on the wrapper when `isDisabled` is `false`. Only `components-disabled` and the disabled styling are conditional now, so the wrapper stays styleable and targetable in both states ([#82648](https://github.com/WordPress/gutenberg/pull/82648)).
 -   `ProgressBar`: Remove determinate transitions and use a slower, stepped indeterminate animation when reduced motion is preferred. ([#82490](https://github.com/WordPress/gutenberg/pull/82490))
 -   `ColorPalette`: Apply the computed contrast color to the selected checkmark now that the icon is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
