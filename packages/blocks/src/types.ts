@@ -528,6 +528,10 @@ export interface BlockType<
 	 * Setting `parent` lets a block require that it is only
 	 * available when nested within the specified blocks.
 	 *
+	 * Omit for no parent restriction. An empty array matches no
+	 * parent, including the root, so the block cannot be inserted
+	 * anywhere.
+	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#parent
 	 */
 	parent?: string[];
