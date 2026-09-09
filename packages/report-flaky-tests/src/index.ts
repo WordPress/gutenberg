@@ -6,7 +6,7 @@ import * as core from '@actions/core';
 /**
  * Internal dependencies
  */
-import { run } from './run';
+import { run } from './run.ts';
 
 /*
  * Fail the step rather than logging. A green step with no report is how a
