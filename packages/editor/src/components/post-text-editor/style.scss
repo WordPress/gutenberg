@@ -11,7 +11,7 @@ textarea.editor-post-text-editor {
 	box-shadow: none;
 	resize: none;
 	field-sizing: content;
-	overflow: hidden;
+	overflow: auto;
 	font-family: $editor-html-font;
 	line-height: 2.4;
 	min-height: 200px;
