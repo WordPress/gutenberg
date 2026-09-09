@@ -554,7 +554,6 @@ test.describe( 'Post Meta source', () => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 			} );
-			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
 				.getByRole( 'menuitemcheckbox', {
@@ -584,7 +583,6 @@ test.describe( 'Post Meta source', () => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 			} );
-			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
 				.getByRole( 'menuitemcheckbox', {
