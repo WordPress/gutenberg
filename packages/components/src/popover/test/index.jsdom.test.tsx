@@ -794,6 +794,26 @@ describe( 'Popover', () => {
 		} );
 	} );
 
+	it( 'hints at transform only while it is being repositioned', async () => {
+		render(
+			<Popover animate={ false } data-testid="popover-element">
+				Inside popover
+			</Popover>
+		);
+
+		const popover = screen.getByTestId( 'popover-element' );
+
+		// Positioning has just run, so the compositing hint is on.
+		expect( popover ).toHaveStyle( { willChange: 'transform' } );
+
+		// Once the popover settles, the hint is dropped so the popover stops
+		// occupying a compositing layer of its own, which is what makes
+		// Chrome render it blurry.
+		await waitFor( () =>
+			expect( popover ).toHaveStyle( { willChange: 'auto' } )
+		);
+	} );
+
 	it( 'should call a consumer-provided onKeyDown alongside close-on-Escape', async () => {
 		const user = userEvent.setup();
 		const onClose = jest.fn();
