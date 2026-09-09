@@ -2,6 +2,7 @@ import { Item } from './item';
 import { Group } from '../combobox/group';
 import { GroupLabel } from '../combobox/group-label';
 import { Collection } from '../combobox/collection';
+import { useFilteredItems } from '../combobox/use-filtered-items';
 import { SearchableSelect as _SearchableSelect } from './searchable-select';
 
 Item.displayName = 'SearchableSelect.Item';
@@ -11,10 +12,13 @@ GroupLabel.displayName = 'SearchableSelect.GroupLabel';
 /**
  * A searchable single-selection component, with support for
  * a creatable footer action.
+ *
+ * Announces a visually hidden result count as the list filters.
  */
 export const SearchableSelect = Object.assign( _SearchableSelect, {
 	Item,
 	Group,
 	GroupLabel,
 	Collection,
+	useFilteredItems,
 } );

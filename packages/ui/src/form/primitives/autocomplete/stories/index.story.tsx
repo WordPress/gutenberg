@@ -1,4 +1,3 @@
-import { Autocomplete as BaseAutocomplete } from '@base-ui/react/autocomplete';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
 import { useRef, useState } from '@wordpress/element';
@@ -177,7 +176,7 @@ function AsyncStatus( {
 	loading: boolean;
 	visibleCount: boolean;
 } ) {
-	const filteredItems = BaseAutocomplete.useFilteredItems< FixtureItem >();
+	const filteredItems = Autocomplete.useFilteredItems< FixtureItem >();
 
 	return (
 		<Autocomplete.Status>

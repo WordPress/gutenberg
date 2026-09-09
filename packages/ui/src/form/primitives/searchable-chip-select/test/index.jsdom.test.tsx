@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Combobox as BaseCombobox } from '@base-ui/react/combobox';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -11,17 +10,6 @@ import { GROUPED_ITEMS, ITEMS } from './__fixtures__';
 vi.mock( import( '@wordpress/warning' ), () => ( { default: vi.fn() } ) );
 
 const mockedWarning = vi.mocked( warning );
-
-function ResultCountStatus() {
-	const filteredItems = BaseCombobox.useFilteredItems< Item >();
-	const count = filteredItems.length;
-
-	if ( count === 0 ) {
-		return null;
-	}
-
-	return count === 1 ? '1 result found.' : `${ count } results found.`;
-}
 
 describe( 'SearchableChipSelect', () => {
 	beforeEach( () => {
@@ -235,21 +223,102 @@ describe( 'SearchableChipSelect', () => {
 		expect( status ).toBeEmptyDOMElement();
 	} );
 
-	it( 'announces a result count from statusContent', async () => {
+	it( 'announces a visually hidden result count by default', async () => {
+		const user = userEvent.setup();
+
+		render( <SearchableChipSelect items={ ITEMS.slice( 0, 3 ) } /> );
+
+		await user.click( screen.getByRole( 'combobox' ) );
+
+		const announcement = await screen.findByText( '3 results found.' );
+		expect( announcement ).toHaveAttribute( 'data-visually-hidden' );
+	} );
+
+	it( 'updates the visually hidden result count as the list filters', async () => {
+		const user = userEvent.setup();
+
+		render( <SearchableChipSelect items={ ITEMS.slice( 0, 3 ) } /> );
+
+		await user.click( screen.getByRole( 'combobox' ) );
+		await screen.findByText( '3 results found.' );
+
+		await user.type( screen.getByRole( 'combobox' ), 'Apr' );
+
+		const announcement = await screen.findByText( '1 result found.' );
+		expect( announcement ).toHaveAttribute( 'data-visually-hidden' );
+	} );
+
+	it( 'does not announce a result count when there are no matching items', async () => {
+		const user = userEvent.setup();
+
+		render( <SearchableChipSelect items={ ITEMS.slice( 0, 3 ) } /> );
+
+		await user.click( screen.getByRole( 'combobox' ) );
+		await screen.findByText( '3 results found.' );
+
+		await user.type( screen.getByRole( 'combobox' ), 'zzz' );
+
+		expect( await screen.findByText( 'No results found.' ) ).toBeVisible();
+		expect(
+			screen.queryByText( /^\d+ results? found\.$/ )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'excludes creatable items from the result count', async () => {
 		const user = userEvent.setup();
 
 		render(
 			<SearchableChipSelect
-				items={ ITEMS.slice( 0, 3 ) }
-				statusContent={ <ResultCountStatus /> }
+				items={ [
+					...ITEMS.slice( 0, 3 ),
+					{
+						value: '__create__',
+						label: 'Create new item',
+						creatable: true,
+					},
+				] }
 			/>
 		);
 
 		await user.click( screen.getByRole( 'combobox' ) );
 
-		const status = await screen.findByText( '3 results found.' );
-		expect( status ).toBeVisible();
-		expect( status ).toHaveAttribute( 'role', 'status' );
+		const announcement = await screen.findByText( '3 results found.' );
+		expect( announcement ).toHaveAttribute( 'data-visually-hidden' );
+	} );
+
+	it( 'announces the item count for grouped items', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<SearchableChipSelect
+				items={ GROUPED_ITEMS }
+				children={ ( group: ItemGroup ) => (
+					<SearchableChipSelect.Group
+						key={ group.label }
+						items={ group.items }
+					>
+						<SearchableChipSelect.GroupLabel>
+							{ group.label }
+						</SearchableChipSelect.GroupLabel>
+						<SearchableChipSelect.Collection>
+							{ ( item: Item ) => (
+								<SearchableChipSelect.Item
+									key={ item.value }
+									value={ item }
+								>
+									{ item.label }
+								</SearchableChipSelect.Item>
+							) }
+						</SearchableChipSelect.Collection>
+					</SearchableChipSelect.Group>
+				) }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'combobox' ) );
+
+		const announcement = await screen.findByText( '6 results found.' );
+		expect( announcement ).toHaveAttribute( 'data-visually-hidden' );
 	} );
 
 	describe( 'creatable item', () => {

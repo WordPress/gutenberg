@@ -6,7 +6,9 @@ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 
 /**
  * Announces a status message politely to screen readers. Use it for
- * result-count updates and for async list loading.
+ * result-count updates and for async list loading. For client-side
+ * filtering, call `Autocomplete.useFilteredItems` from a descendant of
+ * `Autocomplete.Root`.
  *
  * Keep this element mounted. Do not hide it with `display: none`, `hidden`,
  * `aria-hidden`, or by omitting the component. Change or omit the children

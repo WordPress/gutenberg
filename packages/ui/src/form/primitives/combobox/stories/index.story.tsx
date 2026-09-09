@@ -1,4 +1,3 @@
-import { Combobox as BaseCombobox } from '@base-ui/react/combobox';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState } from '@wordpress/element';
 import * as Combobox from '../index';
@@ -286,7 +285,7 @@ function AsyncStatus( {
 	loading: boolean;
 	visibleCount: boolean;
 } ) {
-	const filteredItems = BaseCombobox.useFilteredItems< FixtureItem >();
+	const filteredItems = Combobox.useFilteredItems< FixtureItem >();
 
 	return (
 		<Combobox.Status>

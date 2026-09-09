@@ -59,6 +59,8 @@ function warnSearchableSelectProps(
 /**
  * A searchable single-selection component, with support for
  * a creatable footer action.
+ *
+ * Announces a visually hidden result count as the list filters.
  */
 export const SearchableSelect = forwardRef<
 	HTMLButtonElement,
@@ -105,8 +107,10 @@ export const SearchableSelect = forwardRef<
 						aria-label={ searchPlaceholder }
 					/>
 				</div>
-				<Combobox.Status>{ statusContent }</Combobox.Status>
-				<SearchableResults emptyContent={ emptyContent }>
+				<SearchableResults
+					emptyContent={ emptyContent }
+					statusContent={ statusContent }
+				>
 					{ children }
 				</SearchableResults>
 			</Combobox.Popup>

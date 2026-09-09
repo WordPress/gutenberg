@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Combobox as BaseCombobox } from '@base-ui/react/combobox';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -42,17 +41,6 @@ vi.mock( import( '@wordpress/warning' ), async ( importOriginal ) => {
 } );
 
 const mockedWarning = vi.mocked( warning );
-
-function ResultCountStatus() {
-	const filteredItems = BaseCombobox.useFilteredItems< Item >();
-	const count = filteredItems.length;
-
-	if ( count === 0 ) {
-		return null;
-	}
-
-	return count === 1 ? '1 result found.' : `${ count } results found.`;
-}
 
 describe( 'SearchableSelect', () => {
 	beforeEach( () => {
@@ -334,22 +322,110 @@ describe( 'SearchableSelect', () => {
 		expect( status ).toBeEmptyDOMElement();
 	} );
 
-	it( 'announces a result count from statusContent', async () => {
+	it( 'announces a visually hidden result count by default', async () => {
+		const user = userEvent.setup();
+
+		render( <SearchableSelect aria-label="Fruit" items={ ITEMS } /> );
+
+		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
+
+		const announcement = await screen.findByText( '3 results found.' );
+		expect( announcement ).toHaveAttribute( 'data-visually-hidden' );
+	} );
+
+	it( 'updates the visually hidden result count as the list filters', async () => {
+		const user = userEvent.setup();
+
+		render( <SearchableSelect aria-label="Fruit" items={ ITEMS } /> );
+
+		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
+		await screen.findByText( '3 results found.' );
+
+		await user.type(
+			screen.getByRole( 'combobox', { name: 'Search' } ),
+			'Apr'
+		);
+
+		const announcement = await screen.findByText( '1 result found.' );
+		expect( announcement ).toHaveAttribute( 'data-visually-hidden' );
+	} );
+
+	it( 'does not announce a result count when there are no matching items', async () => {
+		const user = userEvent.setup();
+
+		render( <SearchableSelect aria-label="Fruit" items={ ITEMS } /> );
+
+		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
+		await screen.findByText( '3 results found.' );
+
+		await user.type(
+			screen.getByRole( 'combobox', { name: 'Search' } ),
+			'zzz'
+		);
+
+		expect( await screen.findByText( 'No results found.' ) ).toBeVisible();
+		expect(
+			screen.queryByText( /^\d+ results? found\.$/ )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'excludes creatable items from the result count', async () => {
 		const user = userEvent.setup();
 
 		render(
 			<SearchableSelect
 				aria-label="Fruit"
-				items={ ITEMS }
-				statusContent={ <ResultCountStatus /> }
+				items={ [
+					...ITEMS,
+					{
+						value: '__create__',
+						label: 'Create new item',
+						creatable: true,
+					},
+				] }
 			/>
 		);
 
 		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
 
-		const status = await screen.findByText( '3 results found.' );
-		expect( status ).toBeVisible();
-		expect( status ).toHaveAttribute( 'role', 'status' );
+		const announcement = await screen.findByText( '3 results found.' );
+		expect( announcement ).toHaveAttribute( 'data-visually-hidden' );
+	} );
+
+	it( 'announces the item count for grouped items', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<SearchableSelect
+				aria-label="Fruit"
+				items={ GROUPED_ITEMS }
+				children={ ( group: ItemGroup ) => (
+					<SearchableSelect.Group
+						key={ group.label }
+						items={ group.items }
+					>
+						<SearchableSelect.GroupLabel>
+							{ group.label }
+						</SearchableSelect.GroupLabel>
+						<SearchableSelect.Collection>
+							{ ( item: Item ) => (
+								<SearchableSelect.Item
+									key={ item.value }
+									value={ item }
+								>
+									{ item.label }
+								</SearchableSelect.Item>
+							) }
+						</SearchableSelect.Collection>
+					</SearchableSelect.Group>
+				) }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
+
+		const announcement = await screen.findByText( '6 results found.' );
+		expect( announcement ).toHaveAttribute( 'data-visually-hidden' );
 	} );
 
 	describe( 'creatable item', () => {

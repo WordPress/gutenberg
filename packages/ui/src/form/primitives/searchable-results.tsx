@@ -1,7 +1,11 @@
-import { Combobox as BaseCombobox } from '@base-ui/react/combobox';
 import type { ReactNode } from 'react';
+import { sprintf, _n } from '@wordpress/i18n';
+import { VisuallyHidden } from '../../visually-hidden';
 import * as Combobox from './combobox';
-import type { ComboboxCollectionProps } from './combobox/types';
+import type {
+	ComboboxCollectionProps,
+	ComboboxStatusProps,
+} from './combobox/types';
 
 type Item = {
 	label: string;
@@ -57,24 +61,76 @@ function shouldSkipCollectionEntry( entry: Item | ItemGroup ): boolean {
 	return isCreatableItem( entry );
 }
 
+function countVisibleResults(
+	items: ReadonlyArray< Item | ItemGroup >
+): number {
+	let count = 0;
+
+	for ( const entry of items ) {
+		if ( isItemGroup( entry ) ) {
+			count += entry.items.filter(
+				( item ) => ! isCreatableItem( item )
+			).length;
+			continue;
+		}
+
+		if ( ! isCreatableItem( entry ) ) {
+			count += 1;
+		}
+	}
+
+	return count;
+}
+
+function ResultCountStatus( {
+	filteredItems,
+}: {
+	filteredItems: ReadonlyArray< Item | ItemGroup >;
+} ) {
+	const count = countVisibleResults( filteredItems );
+
+	if ( count === 0 ) {
+		return null;
+	}
+
+	return (
+		<VisuallyHidden>
+			{ sprintf(
+				/* translators: %d: number of results. */
+				_n( '%d result found.', '%d results found.', count ),
+				count
+			) }
+		</VisuallyHidden>
+	);
+}
+
 /**
- * Empty state and filtered list for `SearchableSelect` and
+ * Empty state, status, and filtered list for `SearchableSelect` and
  * `SearchableChipSelect`. A `creatable: true` item still present in the
  * filtered collection is omitted from the list body and remounted in
  * `ListFooter`. Must render inside `Combobox.Root`.
  */
 export function SearchableResults( {
 	emptyContent,
+	statusContent,
 	children,
 }: {
 	emptyContent: ReactNode;
+	statusContent?: ComboboxStatusProps[ 'children' ];
 	children?: ComboboxCollectionProps[ 'children' ];
 } ) {
-	const filteredItems = BaseCombobox.useFilteredItems< Item | ItemGroup >();
+	const filteredItems = Combobox.useFilteredItems< Item | ItemGroup >();
 	const creatableItem = findCreatableItem( filteredItems );
 
 	return (
 		<>
+			<Combobox.Status>
+				{ statusContent !== undefined ? (
+					statusContent
+				) : (
+					<ResultCountStatus filteredItems={ filteredItems } />
+				) }
+			</Combobox.Status>
 			<Combobox.Empty>{ emptyContent }</Combobox.Empty>
 			<Combobox.List>
 				<Combobox.ListBody>

@@ -14,6 +14,17 @@ const ITEMS = [
 
 type Item = ( typeof ITEMS )[ number ];
 
+function ResultCountStatus() {
+	const filteredItems = Combobox.useFilteredItems< Item >();
+	const count = filteredItems.length;
+
+	if ( count === 0 ) {
+		return null;
+	}
+
+	return count === 1 ? '1 result found.' : `${ count } results found.`;
+}
+
 function renderDisabledMultiSelect() {
 	return render(
 		<Combobox.Root< Item, true >
@@ -141,6 +152,50 @@ describe( 'Combobox', () => {
 		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( statusRef.current ).toBeInstanceOf( HTMLDivElement );
+	} );
+
+	it( 'returns client-side filtered items from useFilteredItems', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Combobox.Root items={ ITEMS }>
+				<Combobox.Trigger aria-label="Fruit" />
+				<Combobox.Popup>
+					<Combobox.Input aria-label="Search" />
+					<Combobox.Status>
+						<ResultCountStatus />
+					</Combobox.Status>
+					<Combobox.Empty>No results found.</Combobox.Empty>
+					<Combobox.List>
+						<Combobox.ListBody>
+							<Combobox.Collection>
+								{ ( item ) => (
+									<Combobox.Item
+										key={ item.id }
+										value={ item }
+									>
+										{ item.value }
+									</Combobox.Item>
+								) }
+							</Combobox.Collection>
+						</Combobox.ListBody>
+					</Combobox.List>
+				</Combobox.Popup>
+			</Combobox.Root>
+		);
+
+		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
+
+		const status = await screen.findByText( '3 results found.' );
+		expect( status ).toBeVisible();
+		expect( status ).toHaveAttribute( 'role', 'status' );
+
+		await user.type(
+			screen.getByRole( 'combobox', { name: 'Search' } ),
+			'Item 1'
+		);
+
+		expect( await screen.findByText( '1 result found.' ) ).toBeVisible();
 	} );
 
 	it( 'uses a custom positioner', async () => {

@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Combobox as BaseCombobox } from '@base-ui/react/combobox';
 import { fn } from 'storybook/test';
 import { SearchableSelect } from '../';
 import {
@@ -33,18 +32,6 @@ const meta: Meta< typeof SearchableSelect > = {
 export default meta;
 
 type Story = StoryObj< typeof SearchableSelect >;
-
-function ResultCountStatus() {
-	const filteredItems =
-		BaseCombobox.useFilteredItems< ( typeof ITEMS )[ number ] >();
-	const count = filteredItems.length;
-
-	if ( count === 0 ) {
-		return null;
-	}
-
-	return count === 1 ? '1 result found.' : `${ count } results found.`;
-}
 
 export const Default: Story = {
 	args: {
@@ -120,13 +107,15 @@ export const WithCustomEmptyContent: Story = {
 };
 
 /**
- * Use `statusContent` for list status, such as a result count or loading.
- * Open the popup and type to see the count update.
+ * Use `statusContent` to replace the default visually hidden result count,
+ * for example while loading. Pass `emptyContent={ null }` at the same time
+ * so Empty does not claim there are no results.
  */
 export const WithStatusContent: Story = {
 	args: {
 		...Default.args,
-		statusContent: <ResultCountStatus />,
+		statusContent: 'Loading…',
+		emptyContent: null,
 	},
 };
 

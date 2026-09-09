@@ -12,6 +12,19 @@ const ITEMS = [
 	{ id: '3', value: 'Item 3' },
 ];
 
+type Item = ( typeof ITEMS )[ number ];
+
+function ResultCountStatus() {
+	const filteredItems = Autocomplete.useFilteredItems< Item >();
+	const count = filteredItems.length;
+
+	if ( count === 0 ) {
+		return null;
+	}
+
+	return count === 1 ? '1 result found.' : `${ count } results found.`;
+}
+
 function renderDisabledAutocompleteWithClear() {
 	return render(
 		<Autocomplete.Root items={ ITEMS } disabled defaultValue="Item 1">
@@ -84,6 +97,46 @@ describe( 'Autocomplete', () => {
 		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( statusRef.current ).toBeInstanceOf( HTMLDivElement );
+	} );
+
+	it( 'returns client-side filtered items from useFilteredItems', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Autocomplete.Root items={ ITEMS }>
+				<Autocomplete.Input placeholder="Search" />
+				<Autocomplete.Popup>
+					<Autocomplete.Status>
+						<ResultCountStatus />
+					</Autocomplete.Status>
+					<Autocomplete.Empty>No results found.</Autocomplete.Empty>
+					<Autocomplete.List>
+						<Autocomplete.ListBody>
+							<Autocomplete.Collection>
+								{ ( item ) => (
+									<Autocomplete.Item
+										key={ item.id }
+										value={ item }
+									>
+										{ item.value }
+									</Autocomplete.Item>
+								) }
+							</Autocomplete.Collection>
+						</Autocomplete.ListBody>
+					</Autocomplete.List>
+				</Autocomplete.Popup>
+			</Autocomplete.Root>
+		);
+
+		await user.type( screen.getByRole( 'combobox' ), 'Item' );
+
+		const status = await screen.findByText( '3 results found.' );
+		expect( status ).toBeVisible();
+		expect( status ).toHaveAttribute( 'role', 'status' );
+
+		await user.type( screen.getByRole( 'combobox' ), ' 1' );
+
+		expect( await screen.findByText( '1 result found.' ) ).toBeVisible();
 	} );
 
 	describe( 'portal', () => {

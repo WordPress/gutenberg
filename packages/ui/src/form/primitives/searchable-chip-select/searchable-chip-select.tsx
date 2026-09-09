@@ -16,6 +16,8 @@ import type { Item, SearchableChipSelectProps } from './types';
  * support for a creatable footer action.
  *
  * Prefer `SearchableChipSelectControl` when using with a standard label and description.
+ *
+ * Announces a visually hidden result count as the list filters.
  */
 export const SearchableChipSelect = forwardRef<
 	HTMLInputElement,
@@ -116,8 +118,10 @@ export const SearchableChipSelect = forwardRef<
 			</Combobox.InputGroup>
 
 			<Combobox.Popup width={ popupWidth }>
-				<Combobox.Status>{ statusContent }</Combobox.Status>
-				<SearchableResults emptyContent={ emptyContent }>
+				<SearchableResults
+					emptyContent={ emptyContent }
+					statusContent={ statusContent }
+				>
 					{ children }
 				</SearchableResults>
 			</Combobox.Popup>
