@@ -262,6 +262,32 @@ describe( 'ClipboardButton', () => {
 		).toBeVisible();
 	} );
 
+	it( 'uses custom pending and success labels', async () => {
+		const user = userEvent.setup();
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockResolvedValue();
+
+		render(
+			<ClipboardButton text="test text">
+				<ClipboardButton.Label
+					pending="Copy permalink"
+					success="Permalink copied"
+				/>
+			</ClipboardButton>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Copy permalink' } )
+		).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Copy permalink' } )
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Permalink copied' } )
+		).toBeVisible();
+	} );
+
 	it( 'restores the pending label after timeout', async () => {
 		const user = userEvent.setup();
 		vi.spyOn( navigator.clipboard, 'writeText' ).mockResolvedValue();

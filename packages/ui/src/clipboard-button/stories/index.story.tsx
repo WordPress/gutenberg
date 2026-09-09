@@ -178,6 +178,22 @@ export const CustomIcon: Story = {
 };
 
 /**
+ * Pass custom `pending` and `success` text to `ClipboardButton.Label`.
+ */
+export const WithCustomLabel: Story = {
+	args: {
+		children: [
+			<ClipboardButton.Icon key="icon" />,
+			<ClipboardButton.Label
+				key="label"
+				pending="Copy permalink"
+				success="Permalink copied"
+			/>,
+		],
+	},
+};
+
+/**
  * Customize the tooltip labels shown before and after copying.
  */
 export const CustomLabels: Story = {
