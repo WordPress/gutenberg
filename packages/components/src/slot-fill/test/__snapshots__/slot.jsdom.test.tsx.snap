@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Slot > bubblesVirtually %p > should subsume another slot by the same name 1`] = `
+exports[`Slot > bubblesVirtually false > should subsume another slot by the same name 1`] = `
 <div>
   <div
     data-position="first"
@@ -13,7 +13,7 @@ exports[`Slot > bubblesVirtually %p > should subsume another slot by the same na
 </div>
 `;
 
-exports[`Slot > bubblesVirtually %p > should subsume another slot by the same name 2`] = `
+exports[`Slot > bubblesVirtually false > should subsume another slot by the same name 2`] = `
 <div>
   <div
     data-position="first"
@@ -26,7 +26,18 @@ exports[`Slot > bubblesVirtually %p > should subsume another slot by the same na
 </div>
 `;
 
-exports[`Slot > bubblesVirtually %p > should subsume another slot by the same name 3`] = `
+exports[`Slot > bubblesVirtually false > should unmount two slots with the same name 1`] = `
+<div>
+  <div
+    data-position="first"
+  />
+  <div
+    data-position="second"
+  />
+</div>
+`;
+
+exports[`Slot > bubblesVirtually true > should subsume another slot by the same name 1`] = `
 <div>
   <div
     data-position="first"
@@ -43,7 +54,7 @@ exports[`Slot > bubblesVirtually %p > should subsume another slot by the same na
 </div>
 `;
 
-exports[`Slot > bubblesVirtually %p > should subsume another slot by the same name 4`] = `
+exports[`Slot > bubblesVirtually true > should subsume another slot by the same name 2`] = `
 <div>
   <div
     data-position="first"
@@ -58,18 +69,7 @@ exports[`Slot > bubblesVirtually %p > should subsume another slot by the same na
 </div>
 `;
 
-exports[`Slot > bubblesVirtually %p > should unmount two slots with the same name 1`] = `
-<div>
-  <div
-    data-position="first"
-  />
-  <div
-    data-position="second"
-  />
-</div>
-`;
-
-exports[`Slot > bubblesVirtually %p > should unmount two slots with the same name 2`] = `
+exports[`Slot > bubblesVirtually true > should unmount two slots with the same name 1`] = `
 <div>
   <div
     data-position="first"

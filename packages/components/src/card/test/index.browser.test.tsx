@@ -361,10 +361,14 @@ describe( 'Card', () => {
 			</Card>
 		);
 
-		for ( const testId of [ 'card-header', 'card-footer' ] ) {
-			const region = screen.getByTestId( testId );
-			expect( getComputedStyle( region ).borderTopStyle ).toBe( 'none' );
-		}
+		expect(
+			getComputedStyle( screen.getByTestId( 'card-header' ) )
+				.borderBottomStyle
+		).toBe( 'none' );
+		expect(
+			getComputedStyle( screen.getByTestId( 'card-footer' ) )
+				.borderTopStyle
+		).toBe( 'none' );
 	} );
 
 	it( 'makes CardBody scrollable when requested', async () => {

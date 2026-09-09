@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 import { waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
@@ -12,6 +12,10 @@ const TestComponent = ( { query } ) => {
 describe( 'useMediaQuery', () => {
 	beforeEach( async () => {
 		await page.viewport( 960, 768 );
+	} );
+
+	afterAll( async () => {
+		await page.viewport( 414, 896 );
 	} );
 
 	it( 'should return true when the query matches', async () => {

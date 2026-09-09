@@ -9,7 +9,7 @@ describe( 'props', () => {
 		const heading = screen.getByRole( 'heading' );
 		expect( heading.tagName ).toBe( 'H2' );
 		expect( heading ).toHaveTextContent( 'Code is Poetry' );
-		expect( getComputedStyle( heading ).fontWeight ).not.toBe( '400' );
+		expect( getComputedStyle( heading ).fontWeight ).toBe( '600' );
 	} );
 
 	test( 'should render level as a number', async () => {

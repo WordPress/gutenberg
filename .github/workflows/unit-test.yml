@@ -503,6 +503,7 @@ jobs:
                 detect-relevant-changes,
                 svn-release,
                 unit-js,
+                unit-js-browser,
                 unit-js-date,
                 test-php,
                 phpcs,

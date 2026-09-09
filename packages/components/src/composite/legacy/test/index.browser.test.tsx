@@ -289,16 +289,27 @@ describe.each( [
 	} );
 
 	test( 'Supports `currentId`', async () => {
-		const { result } = await renderHook( () =>
-			useProps( {
-				baseId: 'test-id',
-				currentId: 'test-id-2',
-			} )
+		const Test = () => (
+			<>
+				<button>Before</button>
+				<OneDimensionalTest
+					{ ...useProps( {
+						baseId: 'test-id',
+						currentId: 'test-id-2',
+					} ) }
+				/>
+			</>
 		);
-		const state =
-			'state' in result.current ? result.current.state : result.current;
 
-		expect( state.store.getState().activeId ).toBe( 'test-id-2' );
+		await renderAndValidate( <Test /> );
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Before' } )
+		);
+		await userEvent.tab();
+		await waitFor( () =>
+			expect( screen.getByText( 'Item 2' ) ).toHaveFocus()
+		);
 	} );
 } );
 

@@ -53,12 +53,14 @@ describe( 'FormFileUpload', () => {
 		const user = userEvent.setup();
 
 		const onChange = vi.fn();
+		const onClick = vi.fn(
+			( event: React.MouseEvent< HTMLInputElement > ) => {
+				event.currentTarget.value = '';
+			}
+		);
 
 		await render(
-			<FormFileUpload
-				onClick={ vi.fn( ( e ) => ( e.currentTarget.value = '' ) ) }
-				onChange={ onChange }
-			>
+			<FormFileUpload onClick={ onClick } onChange={ onChange }>
 				My Upload Button
 			</FormFileUpload>
 		);
@@ -67,13 +69,20 @@ describe( 'FormFileUpload', () => {
 			type: 'image/png',
 		} );
 
+		const button = screen.getByRole( 'button', {
+			name: 'My Upload Button',
+		} );
 		const input = screen.getByTestId( 'form-file-upload-input' );
+		await user.click( button );
 		await user.upload( input, file );
 
+		expect( onClick ).toHaveBeenCalledTimes( 1 );
 		expect( onChange ).toHaveBeenNthCalledWith( 1, fakePath );
 
+		await user.click( button );
 		await user.upload( input, file );
 
+		expect( onClick ).toHaveBeenCalledTimes( 2 );
 		expect( onChange ).toHaveBeenNthCalledWith( 2, fakePath );
 	} );
 } );

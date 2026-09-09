@@ -711,10 +711,11 @@ describe.each( [
 
 			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
 
-			// A real user cannot activate a disabled control. Dispatch the native
-			// method to verify the platform still suppresses its click handler.
-			// eslint-disable-next-line testing-library/no-node-access
-			screen.getByRole( 'radio', { name: 'J' } ).click();
+			// Force pointer input so pointer and mouse handlers still run while
+			// Chromium suppresses the disabled control's click event.
+			await userEvent.click( screen.getByRole( 'radio', { name: 'J' } ), {
+				force: true,
+			} );
 
 			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
 			expect(
@@ -783,10 +784,12 @@ describe.each( [
 				</Component>
 			);
 
-			// eslint-disable-next-line testing-library/no-node-access
-			screen.getByRole( 'radio', { name: 'J' } ).click();
-			// eslint-disable-next-line testing-library/no-node-access
-			screen.getByRole( 'radio', { name: 'R' } ).click();
+			await userEvent.click( screen.getByRole( 'radio', { name: 'J' } ), {
+				force: true,
+			} );
+			await userEvent.click( screen.getByRole( 'radio', { name: 'R' } ), {
+				force: true,
+			} );
 
 			expect( mockOnChange ).not.toHaveBeenCalled();
 		} );
@@ -839,7 +842,7 @@ describe.each( [
 			expect( pressed ).toBeVisible();
 			expect( pressed ).toBeDisabled();
 
-			pressed.click();
+			await userEvent.click( pressed, { force: true } );
 
 			expect(
 				screen.getByRole( 'button', {
@@ -900,10 +903,14 @@ describe.each( [
 				</Component>
 			);
 
-			// eslint-disable-next-line testing-library/no-node-access
-			screen.getByRole( 'button', { name: 'R', pressed: true } ).click();
-			// eslint-disable-next-line testing-library/no-node-access
-			screen.getByRole( 'button', { name: 'J', pressed: false } ).click();
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'R', pressed: true } ),
+				{ force: true }
+			);
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'J', pressed: false } ),
+				{ force: true }
+			);
 
 			expect( mockOnChange ).not.toHaveBeenCalled();
 		} );

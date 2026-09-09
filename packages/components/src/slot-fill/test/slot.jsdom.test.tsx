@@ -284,7 +284,7 @@ describe( 'Slot', () => {
 	} );
 
 	describe.each( [ false, true ] )(
-		'bubblesVirtually %p',
+		'bubblesVirtually %s',
 		( bubblesVirtually ) => {
 			it( 'should subsume another slot by the same name', () => {
 				const { container, rerender } = render(
