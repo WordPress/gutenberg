@@ -198,6 +198,8 @@ export const WithCustomLabel: Story = {
  */
 export const CustomLabels: Story = {
 	args: {
+		tone: 'neutral',
+		variant: 'minimal',
 		tooltipInitialText: 'Copy permalink',
 		tooltipSuccessText: 'Permalink copied',
 	},
@@ -216,6 +218,8 @@ export const WithoutTooltip: Story = {
  */
 export const WithCustomPositioner: Story = {
 	args: {
+		tone: 'neutral',
+		variant: 'minimal',
 		positioner: <Tooltip.Positioner side="right" />,
 	},
 };
