@@ -74,6 +74,11 @@ function styleToAttributes( style ) {
 		? fontFamilyValue.substring( 'var:preset|font-family|'.length )
 		: undefined;
 	const textColorSlug = extractPresetSlug( textColorValue, 'color' );
+	const backgroundColorValue = style?.color?.background;
+	const backgroundColorSlug = extractPresetSlug(
+		backgroundColorValue,
+		'color'
+	);
 	const textShadowSlug =
 		typeof textShadowValue === 'string' &&
 		textShadowValue?.startsWith( 'var:preset|text-shadow|' )
@@ -87,6 +92,10 @@ function styleToAttributes( style ) {
 	updatedStyle.color = {
 		...updatedStyle.color,
 		text: textColorSlug ? undefined : textColorValue,
+		// The Background panel owns this. A preset lives in the
+		// `backgroundColor` attribute, so writing it here too would store it
+		// twice; a custom color already lives here and is left alone.
+		background: backgroundColorSlug ? undefined : backgroundColorValue,
 	};
 	return {
 		style: cleanEmptyObject( updatedStyle ),
@@ -117,6 +126,11 @@ function attributesToStyle( attributes ) {
 			text: attributes.textColor
 				? 'var:preset|color|' + attributes.textColor
 				: attributes.style?.color?.text,
+			// Read only, so the panel can tell a text gradient would clip the
+			// block's background away. `styleToAttributes` folds it back out.
+			background: attributes.backgroundColor
+				? 'var:preset|color|' + attributes.backgroundColor
+				: attributes.style?.color?.background,
 		},
 	};
 }
@@ -165,6 +179,7 @@ export function TypographyPanel( {
 		textColor,
 		textShadow,
 		className,
+		backgroundColor,
 	} = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled.
@@ -179,6 +194,7 @@ export function TypographyPanel( {
 				fitText: _fitText,
 				textColor: _textColor,
 				className: _className,
+				backgroundColor: _backgroundColor,
 			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
 			return {
 				style: _style,
@@ -188,6 +204,7 @@ export function TypographyPanel( {
 				textColor: _textColor,
 				textShadow: _textShadow,
 				className: _className,
+				backgroundColor: _backgroundColor,
 			};
 		},
 		[ clientId, isEnabled ]
@@ -211,6 +228,7 @@ export function TypographyPanel( {
 			fontSize,
 			textColor,
 			textShadow,
+			backgroundColor,
 		} );
 	}, [
 		isStateSelected,
@@ -220,6 +238,7 @@ export function TypographyPanel( {
 		fontFamily,
 		textColor,
 		textShadow,
+		backgroundColor,
 	] );
 
 	const onChange = isStateSelected
@@ -284,6 +303,7 @@ export function TypographyPanel( {
 			as={ Wrapper }
 			panelId={ clientId }
 			settings={ settings }
+			blockName={ name }
 			value={ value }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
