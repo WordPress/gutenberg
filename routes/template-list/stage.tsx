@@ -8,7 +8,10 @@ import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
 import type { View, Action, SupportedLayouts } from '@wordpress/dataviews';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as corePrivateApis,
+} from '@wordpress/core-data';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
@@ -17,10 +20,10 @@ import { __ } from '@wordpress/i18n';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import type { ViewListEntry, ViewOverrides } from './view-utils';
 import { previewField } from './fields/preview';
-import { useTemplates } from './use-templates';
 import AddNewTemplate from './add-new-template';
 // Unlock WordPress private APIs
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
 /**
  * Style dependencies
@@ -30,6 +33,7 @@ import './add-new-template/style.scss';
 import type { Template } from './types';
 
 const TEMPLATE_POST_TYPE = 'wp_template';
+const EMPTY_ARRAY: Template[] = [];
 
 function getItemId( item: Template ) {
 	return item.id.toString();
@@ -128,8 +132,14 @@ function TemplateListView( {
 		}
 	};
 
-	// Fetch templates using our custom hook
-	const { records, isLoading } = useTemplates();
+	// Fetch every template. Filtering by author happens client-side through
+	// the view: the active view's locked `author` filter is applied by
+	// `filterSortAndPaginate`.
+	const { records: templates, isResolving: isLoading } =
+		useEntityRecordsWithPermissions( 'postType', TEMPLATE_POST_TYPE, {
+			per_page: -1,
+		} );
+	const records = ( templates ?? EMPTY_ARRAY ) as Template[];
 
 	const postFields = usePostFields( { postType: TEMPLATE_POST_TYPE } );
 	const fields = useMemo(
