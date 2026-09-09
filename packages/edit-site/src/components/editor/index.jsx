@@ -1,13 +1,13 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, usePrevious } from '@wordpress/compose';
 import {
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
 import { __, isRTL, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -108,7 +108,20 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 
 	const editorSettings = useSpecificEditorSettings();
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
-	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
+	const { setCurrentRevisionId, resetStylesNavigation } = unlock(
+		useDispatch( editorStore )
+	);
+
+	// The styles canvas (revisions or the style book) replaces the block
+	// editor while it is open. Leaving edit mode without closing it would
+	// leave the site preview with no block editor to click into.
+	const wasEditMode = usePrevious( isEditMode );
+	useEffect( () => {
+		if ( wasEditMode && ! isEditMode ) {
+			resetStylesNavigation();
+		}
+	}, [ isEditMode, wasEditMode, resetStylesNavigation ] );
+
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onActionPerformed = useCallback(
 		( actionId, items ) => {

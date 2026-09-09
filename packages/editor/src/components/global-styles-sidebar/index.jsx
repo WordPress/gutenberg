@@ -78,14 +78,22 @@ export default function GlobalStylesSidebar() {
 
 	const previousActiveArea = usePrevious( activeComplementaryArea );
 
-	// Reset navigation when sidebar opens
+	// Reset navigation when the sidebar opens, unless whatever opened it
+	// selected a path first — "Revisions" in the site editor sidebar sets
+	// /revisions and opens the sidebar together, and that path must survive.
+	const hasRequestedPath = stylesPath !== '/';
 	useEffect( () => {
 		if (
 			activeComplementaryArea === 'edit-site/global-styles' &&
-			previousActiveArea !== 'edit-site/global-styles'
+			previousActiveArea !== 'edit-site/global-styles' &&
+			! hasRequestedPath
 		) {
 			resetStylesNavigation();
 		}
+		// Deliberately not re-running when `hasRequestedPath` changes: it is
+		// the path as it stands when the sidebar opens that matters, and
+		// navigating within an open sidebar must not trigger a reset.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ activeComplementaryArea, previousActiveArea, resetStylesNavigation ] );
 
 	useEffect( () => {
