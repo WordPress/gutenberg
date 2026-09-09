@@ -39,7 +39,7 @@
 		"@types/js-yaml": "^3.12.10",
 		"@types/react": "^18.3.27",
 		"@vitejs/plugin-react": "^6.0.5",
-		"@vitest/browser-playwright": "^4.1.10",
+		"@vitest/browser-playwright": "^5.0.0",
 		"@wordpress/admin-ui": "file:../packages/admin-ui",
 		"@wordpress/base-styles": "file:../packages/base-styles",
 		"@wordpress/block-editor": "file:../packages/block-editor",
@@ -76,7 +76,7 @@
 		"terser": "^5.37.0",
 		"typescript": "npm:@typescript/typescript6@^6.0.2",
 		"vite": "^8.2.2",
-		"vitest": "^4.1.11"
+		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

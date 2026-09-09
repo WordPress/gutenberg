@@ -364,6 +364,11 @@ export function validateVitestCleanupConfig( vitestConfig ) {
 			'test/unit/vitest.config.mjs: test.globals must remain false'
 		);
 	}
+	if ( vitestConfig.test?.clearMocks !== false ) {
+		violations.push(
+			'test/unit/vitest.config.mjs: test.clearMocks must remain false while test.mockReset is true'
+		);
+	}
 
 	for ( const project of vitestConfig.test?.projects ?? [] ) {
 		const projectName = project.test?.name ?? 'unnamed';
