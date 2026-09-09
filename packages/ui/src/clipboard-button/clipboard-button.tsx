@@ -1,134 +1,42 @@
 import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
-import { useEvent } from '@wordpress/compose';
-import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
+import { useCopyToClipboard, useEvent, useMergeRefs } from '@wordpress/compose';
+import {
+	Children,
+	forwardRef,
+	isValidElement,
+	useEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '../button';
-import { getClipboardStatusIcon } from '../clipboard-icon/clipboard-icon';
-import { ClipboardIcon } from '../clipboard-icon';
-import {
-	CopyToClipboard,
-	DEFAULT_TIMEOUT,
-} from '../copy-to-clipboard/copy-to-clipboard';
-import { Icon } from '../icon';
 import * as Tooltip from '../tooltip';
+import { ClipboardButtonContext } from './context';
+import { ClipboardButtonIcon } from './icon';
 import styles from './style.module.css';
-import type { ClipboardButtonProps } from './types';
-import type { CopyToClipboardStatus } from '../copy-to-clipboard/types';
+import type { ClipboardButtonProps, ClipboardButtonStatus } from './types';
 
-type ClipboardButtonComponentProps = Omit<
-	ClipboardButtonProps,
-	'text' | 'timeout' | 'onCopy'
-> & {
-	status: CopyToClipboardStatus;
-};
+const DEFAULT_TIMEOUT = 1000;
+const INITIAL_STATUS: ClipboardButtonStatus = 'pending';
 
-function ClipboardButtonGraphic( {
-	status,
-	icon,
-	isIconOnly,
-}: {
-	status: CopyToClipboardStatus;
-	icon?: ClipboardButtonProps[ 'icon' ];
-	isIconOnly: boolean;
-} ) {
-	const className = isIconOnly ? styles[ 'icon-only-icon' ] : styles.icon;
-
-	if ( isIconOnly ) {
-		if ( icon ) {
-			return <Icon icon={ icon } size={ 24 } className={ className } />;
-		}
-
-		return <ClipboardIcon status={ status } className={ className } />;
+function isIconOnlyChildren( children: ClipboardButtonProps[ 'children' ] ) {
+	if ( children === undefined ) {
+		return true;
 	}
 
+	const items = Children.toArray( children );
 	return (
-		<Button.Icon
-			icon={ icon ?? getClipboardStatusIcon( status ) }
-			className={ className }
-		/>
+		items.length === 1 &&
+		isValidElement( items[ 0 ] ) &&
+		items[ 0 ].type === ClipboardButtonIcon
 	);
 }
 
-const ClipboardButtonComponent = forwardRef<
-	HTMLButtonElement,
-	ClipboardButtonComponentProps
->( function ClipboardButtonComponent(
-	{
-		status,
-		className,
-		disabled,
-		focusableWhenDisabled = true,
-		hasTooltip = true,
-		tooltipInitialText = __( 'Copy' ),
-		tooltipSuccessText = __( 'Copied!' ),
-		icon,
-		iconPosition = 'start',
-		positioner,
-		children,
-		variant = 'minimal',
-		tone = 'neutral',
-		onMouseEnter,
-		onFocus,
-		'aria-label': ariaLabel,
-		...restProps
-	},
-	ref
-) {
-	const isIconOnly =
-		children === undefined || children === null || children === false;
-	const tooltipLabel =
-		status === 'success' ? tooltipSuccessText : tooltipInitialText;
-	const classes = clsx( isIconOnly && styles[ 'icon-only' ], className );
-	const graphic = (
-		<ClipboardButtonGraphic
-			status={ status }
-			icon={ icon }
-			isIconOnly={ isIconOnly }
-		/>
-	);
-
-	return (
-		<Tooltip.Root
-			disabled={
-				! hasTooltip ||
-				( Boolean( disabled ) && ! focusableWhenDisabled )
-			}
-		>
-			<Tooltip.Trigger
-				ref={ ref }
-				disabled={ disabled && ! focusableWhenDisabled }
-				onMouseEnter={ onMouseEnter }
-				onFocus={ onFocus }
-				render={
-					<Button
-						{ ...restProps }
-						variant={ variant }
-						tone={ tone }
-						aria-label={
-							ariaLabel ??
-							( isIconOnly ? tooltipInitialText : undefined )
-						}
-						disabled={ disabled }
-						focusableWhenDisabled={ focusableWhenDisabled }
-					/>
-				}
-				className={ classes }
-			>
-				{ iconPosition === 'start' ? graphic : null }
-				{ children }
-				{ iconPosition === 'end' ? graphic : null }
-			</Tooltip.Trigger>
-			<Tooltip.Popup positioner={ positioner }>
-				{ tooltipLabel }
-			</Tooltip.Popup>
-		</Tooltip.Root>
-	);
-} );
-
 /**
- * A button that copies text to the clipboard and confirms the action with a
- * status icon and tooltip. Inherits `Button` props.
+ * A button that copies text to the clipboard. Inherits `Button` props, including
+ * `tone` and `variant`. Compose `ClipboardButton.Icon`, text, or both as
+ * children.
  *
  * When rendering a group of `ClipboardButton`s, wrap them in a
  * `Tooltip.Provider` to coordinate tooltip delays across the group.
@@ -137,7 +45,12 @@ const ClipboardButtonComponent = forwardRef<
  * import { ClipboardButton } from '@wordpress/ui';
  *
  * function MyClipboardButton() {
- * 	return <ClipboardButton text="Text to copy" />;
+ * 	return (
+ * 		<ClipboardButton text="Text to copy">
+ * 			<ClipboardButton.Icon />
+ * 			Copy
+ * 		</ClipboardButton>
+ * 	);
  * }
  * ```
  */
@@ -150,14 +63,29 @@ export const ClipboardButton = forwardRef<
 		timeout = DEFAULT_TIMEOUT,
 		onCopy,
 		hasTooltip = true,
+		tooltipInitialText = __( 'Copy' ),
+		tooltipSuccessText = __( 'Copied!' ),
+		positioner,
+		className,
+		disabled,
+		focusableWhenDisabled = true,
 		onMouseEnter,
 		onFocus,
-		...buttonProps
+		children,
+		'aria-label': ariaLabel,
+		...restProps
 	},
 	ref
 ) {
+	const [ status, setStatus ] =
+		useState< ClipboardButtonStatus >( INITIAL_STATUS );
 	const timeoutIdRef = useRef< ReturnType< typeof setTimeout > >( undefined );
 	const [ tooltipDisabled, setTooltipDisabled ] = useState( false );
+	const isIconOnly = isIconOnlyChildren( children );
+	const resolvedChildren =
+		children === undefined ? <ClipboardButtonIcon /> : children;
+	const tooltipLabel =
+		status === 'success' ? tooltipSuccessText : tooltipInitialText;
 
 	useEffect( () => {
 		return () => {
@@ -167,11 +95,11 @@ export const ClipboardButton = forwardRef<
 		};
 	}, [] );
 
-	const handleCopy = useEvent( ( copiedText: string, result: boolean ) => {
-		onCopy?.( copiedText, result );
-		if ( result ) {
-			speak( buttonProps.tooltipSuccessText ?? __( 'Copied!' ) );
-		}
+	const onSuccess = useEvent( () => {
+		const copiedText = typeof text === 'function' ? text() : text || '';
+		setStatus( 'success' );
+		onCopy?.( copiedText, true );
+		speak( tooltipSuccessText );
 		setTooltipDisabled( false );
 
 		if ( timeoutIdRef.current !== undefined ) {
@@ -179,9 +107,13 @@ export const ClipboardButton = forwardRef<
 		}
 
 		timeoutIdRef.current = setTimeout( () => {
+			setStatus( INITIAL_STATUS );
 			setTooltipDisabled( true );
 		}, timeout );
 	} );
+
+	const copyRef = useCopyToClipboard( text, onSuccess );
+	const mergedRef = useMergeRefs( [ ref, copyRef ] );
 
 	const resetTooltip = useEvent( () => {
 		if ( tooltipDisabled ) {
@@ -204,21 +136,41 @@ export const ClipboardButton = forwardRef<
 	);
 
 	return (
-		<CopyToClipboard
-			text={ text }
-			timeout={ timeout }
-			onCopy={ handleCopy }
-		>
-			{ ( status ) => (
-				<ClipboardButtonComponent
-					ref={ ref }
-					{ ...buttonProps }
-					status={ status }
-					hasTooltip={ hasTooltip && ! tooltipDisabled }
+		<ClipboardButtonContext.Provider value={ { status, isIconOnly } }>
+			<Tooltip.Root
+				disabled={
+					! hasTooltip ||
+					tooltipDisabled ||
+					( Boolean( disabled ) && ! focusableWhenDisabled )
+				}
+			>
+				<Tooltip.Trigger
+					ref={ mergedRef }
+					disabled={ disabled && ! focusableWhenDisabled }
 					onMouseEnter={ handleMouseEnter }
 					onFocus={ handleFocus }
-				/>
-			) }
-		</CopyToClipboard>
+					render={
+						<Button
+							{ ...restProps }
+							aria-label={
+								ariaLabel ??
+								( isIconOnly ? tooltipInitialText : undefined )
+							}
+							disabled={ disabled }
+							focusableWhenDisabled={ focusableWhenDisabled }
+						/>
+					}
+					className={ clsx(
+						isIconOnly && styles[ 'icon-only' ],
+						className
+					) }
+				>
+					{ resolvedChildren }
+				</Tooltip.Trigger>
+				<Tooltip.Popup positioner={ positioner }>
+					{ tooltipLabel }
+				</Tooltip.Popup>
+			</Tooltip.Root>
+		</ClipboardButtonContext.Provider>
 	);
 } );

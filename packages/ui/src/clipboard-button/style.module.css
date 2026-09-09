@@ -11,9 +11,7 @@
 		}
 
 		.icon-only-icon {
-			/* Compensate for the button's 1px border so the icon extends
-			   edge-to-edge and doesn't inflate the button's dimensions. */
-			margin: -1px;
+			composes: icon from "../icon-button/style.module.css";
 			pointer-events: none;
 		}
 	}

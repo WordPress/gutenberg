@@ -1,7 +1,9 @@
-import type { ButtonProps } from '../button/types';
-import type { CopyToClipboardOnCopy } from '../copy-to-clipboard/types';
-import type { IconProps } from '../icon/types';
+import type { ButtonIconProps, ButtonProps } from '../button/types';
 import type { PopupProps as TooltipPopupProps } from '../tooltip/types';
+
+export type ClipboardButtonStatus = 'pending' | 'success';
+
+export type ClipboardButtonOnCopy = ( text: string, result: boolean ) => void;
 
 export type ClipboardButtonProps = Omit< ButtonProps, 'onCopy' > & {
 	/**
@@ -21,7 +23,7 @@ export type ClipboardButtonProps = Omit< ButtonProps, 'onCopy' > & {
 	 * Called after a successful copy with the copied text. The second argument
 	 * is always `true`.
 	 */
-	onCopy?: CopyToClipboardOnCopy;
+	onCopy?: ClipboardButtonOnCopy;
 
 	/**
 	 * Whether to show a tooltip with the copy and copied labels.
@@ -46,22 +48,18 @@ export type ClipboardButtonProps = Omit< ButtonProps, 'onCopy' > & {
 	tooltipSuccessText?: string;
 
 	/**
-	 * Custom icon. When omitted, the icon follows copy status.
-	 */
-	icon?: IconProps[ 'icon' ];
-
-	/**
-	 * Position of the clipboard icon relative to the button's children.
-	 *
-	 * @default 'start'
-	 */
-	iconPosition?: 'start' | 'end';
-
-	/**
 	 * Customize how the tooltip is positioned relative to the button. Accepts
 	 * a `<Tooltip.Positioner />` element with custom positioning props
 	 * (`side`, `align`, `sideOffset`, collision settings, etc.). When omitted,
 	 * the tooltip uses the default placement.
 	 */
 	positioner?: TooltipPopupProps[ 'positioner' ];
+};
+
+export type ClipboardButtonIconProps = Omit< ButtonIconProps, 'icon' > & {
+	/**
+	 * Custom icon shown while copy status is pending. When omitted, a copy
+	 * icon is used. Success still shows a check icon.
+	 */
+	icon?: ButtonIconProps[ 'icon' ];
 };

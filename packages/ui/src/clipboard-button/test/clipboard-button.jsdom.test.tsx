@@ -18,6 +18,23 @@ describe( 'ClipboardButton', () => {
 		expect( ref.current ).toBeInstanceOf( HTMLButtonElement );
 	} );
 
+	it( 'respects custom render prop as handled by Button', () => {
+		render(
+			<ClipboardButton
+				text="test text"
+				variant="outline"
+				disabled
+				focusableWhenDisabled
+				render={ <button data-testid="button" /> }
+			/>
+		);
+
+		const button = screen.getByRole( 'button', { name: 'Copy' } );
+		expect( button ).toHaveAttribute( 'data-testid', 'button' );
+		expect( button ).toBeEnabled();
+		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
 	it( 'copies text when clicked', async () => {
 		const user = userEvent.setup();
 		const writeTextMock = vi
@@ -29,6 +46,45 @@ describe( 'ClipboardButton', () => {
 		await user.click( screen.getByRole( 'button', { name: 'Copy' } ) );
 
 		expect( writeTextMock ).toHaveBeenCalledWith( 'test text' );
+	} );
+
+	it( 'copies text from a function', async () => {
+		const user = userEvent.setup();
+		const writeTextMock = vi
+			.spyOn( navigator.clipboard, 'writeText' )
+			.mockResolvedValue();
+
+		render( <ClipboardButton text={ () => 'computed text' } /> );
+
+		await user.click( screen.getByRole( 'button', { name: 'Copy' } ) );
+
+		expect( writeTextMock ).toHaveBeenCalledWith( 'computed text' );
+	} );
+
+	it( 'calls onCopy after a successful copy', async () => {
+		const user = userEvent.setup();
+		const onCopy = vi.fn();
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockResolvedValue();
+
+		render( <ClipboardButton text="test text" onCopy={ onCopy } /> );
+
+		await user.click( screen.getByRole( 'button', { name: 'Copy' } ) );
+
+		expect( onCopy ).toHaveBeenCalledWith( 'test text', true );
+	} );
+
+	it( 'does not call onCopy when copying fails', async () => {
+		const user = userEvent.setup();
+		const onCopy = vi.fn();
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockRejectedValue(
+			new Error()
+		);
+
+		render( <ClipboardButton text="test text" onCopy={ onCopy } /> );
+
+		await user.click( screen.getByRole( 'button', { name: 'Copy' } ) );
+
+		expect( onCopy ).not.toHaveBeenCalled();
 	} );
 
 	it( 'shows the copy label in the tooltip on hover', async () => {
@@ -110,11 +166,87 @@ describe( 'ClipboardButton', () => {
 		expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'renders children with the clipboard icon', () => {
+	it( 'does not show a tooltip when truly disabled', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<TestProvider>
+				<ClipboardButton
+					text="test text"
+					disabled
+					focusableWhenDisabled={ false }
+				/>
+			</TestProvider>
+		);
+
+		await user.hover( screen.getByRole( 'button', { name: 'Copy' } ) );
+
+		expect( screen.queryByText( 'Copy' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'shows a tooltip when disabled by default', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<TestProvider>
+				<ClipboardButton text="test text" disabled />
+			</TestProvider>
+		);
+
+		await user.hover( screen.getByRole( 'button', { name: 'Copy' } ) );
+
+		await waitFor( () => {
+			expect( screen.getByText( 'Copy' ) ).toBeVisible();
+		} );
+	} );
+
+	it( 'renders a text label without an accessible copy name override', () => {
 		render( <ClipboardButton text="test text">Copy link</ClipboardButton> );
 
 		expect(
 			screen.getByRole( 'button', { name: 'Copy link' } )
 		).toBeVisible();
+	} );
+
+	it( 'renders icon and text together', () => {
+		render(
+			<ClipboardButton text="test text">
+				<ClipboardButton.Icon />
+				Copy link
+			</ClipboardButton>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Copy link' } )
+		).toBeVisible();
+	} );
+
+	it( 'keeps the copy accessible name when only ClipboardButton.Icon is provided', () => {
+		render(
+			<ClipboardButton text="test text">
+				<ClipboardButton.Icon />
+			</ClipboardButton>
+		);
+
+		expect( screen.getByRole( 'button', { name: 'Copy' } ) ).toBeVisible();
+	} );
+
+	it( 'forwards the icon ref', () => {
+		const ref = createRef< SVGSVGElement >();
+
+		render(
+			<ClipboardButton text="test text">
+				<ClipboardButton.Icon ref={ ref } />
+			</ClipboardButton>
+		);
+
+		expect( ref.current ).toBeInstanceOf( SVGSVGElement );
+	} );
+
+	it( 'throws when ClipboardButton.Icon is outside ClipboardButton', () => {
+		expect( () => render( <ClipboardButton.Icon /> ) ).toThrow(
+			'ClipboardButton.Icon: Missing parent <ClipboardButton>. Render <ClipboardButton.Icon> inside <ClipboardButton>.'
+		);
+		expect( console ).toHaveErrored();
 	} );
 } );
