@@ -19,6 +19,7 @@
 
 ### Bug Fixes
 
+-   User autocompleter: Don't open the mention popup when the `@` follows other text, such as while typing an email address; mentions still trigger after a space, punctuation, or at the start of a line ([#47249](https://github.com/WordPress/gutenberg/pull/47249)).
 -   More menu: Align SVG prefix icons with item labels using `Menu.PrefixIcon`, preserving Dashicon and custom component support. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
 -   Attach media an Image or Gallery block displays to the post on save, when it is not already attached to another post, matching what uploading into that post has always done ([#81977](https://github.com/WordPress/gutenberg/pull/81977)).
 -   Color the welcome guide's hovered button icon with `color` rather than `fill`, so stroke-based icons follow it. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
