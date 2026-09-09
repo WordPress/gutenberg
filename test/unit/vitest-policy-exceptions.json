@@ -12,7 +12,6 @@
 		"test/unit/config/setup-globals.vitest.jsdom.test.js": "This infrastructure regression must exercise the opt-in matchMedia mock in the jsdom project that installs it.",
 		"packages/block-editor/src/utils/test/dom.jsdom.test.jsx": "Uses explicit DOMRect fixtures to test clipping and element-selection algorithms without relying on browser layout.",
 		"packages/components/src/validated-form-controls/test/range-control.jsdom.test.tsx": "Uses requestAnimationFrame only to schedule reportValidity after React state; assertions cover accessible description semantics.",
-		"packages/compose/src/hooks/use-resize-observer/test/index.jsdom.test.ts": "Replaces ResizeObserver with a deterministic mock to verify disconnect-on-unmount lifecycle behavior without relying on browser layout.",
 		"packages/grid/src/dashboard-grid/test/item-interactions.jsdom.test.tsx": "Stubs ResizeObserver only to mount the grid; assertions cover deterministic drag and resize control semantics.",
 		"packages/grid/src/dashboard-grid/test/keyboard-activation.jsdom.test.tsx": "Stubs ResizeObserver only to mount the grid; assertions cover the deterministic keyboard activator DOM hierarchy.",
 		"packages/grid/src/dashboard-lanes/test/item-interactions.jsdom.test.tsx": "Stubs ResizeObserver only to mount the lanes; assertions cover deterministic drag and resize control semantics.",

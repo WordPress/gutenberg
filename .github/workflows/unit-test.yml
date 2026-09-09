@@ -143,7 +143,7 @@ jobs:
                     --passWithNoTests
 
     unit-js-browser:
-        name: JavaScript Browser (Chromium, Node.js 20)
+        name: JavaScript Browser (Chromium, Node.js 24)
         runs-on: 'ubuntu-24.04'
         needs: [detect-relevant-changes]
         permissions:
@@ -161,7 +161,7 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
               with:
-                  node-version: 20
+                  node-version: 24
 
             - name: Install Chromium for Browser Mode tests
               uses: ./.github/setup-playwright
@@ -177,7 +177,7 @@ jobs:
 
             - name: Run the Vitest Browser project
               env:
-                  FK_ENV_NODEJS: '20'
+                  FK_ENV_NODEJS: '24'
               run: npm run test:unit:vitest:shuffled -- --project=browser
 
     unit-js-date:

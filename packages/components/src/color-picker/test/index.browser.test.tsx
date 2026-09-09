@@ -473,8 +473,8 @@ describe( 'ColorPicker', () => {
 			// Start in hex mode and enter a mid-gray.
 			await user.selectOptions( formatSelector, 'hex' );
 			const hexInput = screen.getByRole( 'textbox' );
-			await user.clear( hexInput );
-			await user.type( hexInput, '808080' );
+			await userEvent.fill( hexInput, '808080' );
+			await waitFor( () => expect( hexInput ).toHaveValue( '808080' ) );
 
 			// Switch to HSL to inspect the values.
 			await user.selectOptions( formatSelector, 'hsl' );

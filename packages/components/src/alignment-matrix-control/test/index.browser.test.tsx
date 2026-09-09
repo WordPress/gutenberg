@@ -31,7 +31,15 @@ describe( 'AlignmentMatrixControl', () => {
 		} );
 
 		it( 'should be centered by default', async () => {
-			await renderAndInitCompositeStore( <AlignmentMatrixControl /> );
+			await renderAndInitCompositeStore(
+				<>
+					<button type="button">Before</button>
+					<AlignmentMatrixControl />
+				</>
+			);
+			const before = screen.getByRole( 'button', { name: 'Before' } );
+			await userEvent.click( before );
+			expect( before ).toHaveFocus();
 
 			await userEvent.tab();
 

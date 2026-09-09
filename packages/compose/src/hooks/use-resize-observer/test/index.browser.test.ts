@@ -1,28 +1,14 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import useResizeObserver from '..';
 
-const disconnect = vi.fn();
-
-class MockResizeObserver {
-	observe() {}
-	unobserve() {}
-	disconnect = disconnect;
-}
-
-const originalResizeObserver = globalThis.ResizeObserver;
-
-beforeAll( () => {
-	globalThis.ResizeObserver =
-		MockResizeObserver as unknown as typeof ResizeObserver;
-} );
-
-afterAll( () => {
-	globalThis.ResizeObserver = originalResizeObserver;
+afterEach( () => {
+	vi.restoreAllMocks();
 } );
 
 describe( 'useResizeObserver', () => {
 	it( 'disconnects the observer on unmount', () => {
+		const disconnect = vi.spyOn( ResizeObserver.prototype, 'disconnect' );
 		const { result, unmount } = renderHook( () =>
 			useResizeObserver( vi.fn() )
 		);

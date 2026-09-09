@@ -35,7 +35,7 @@ describe( 'focusable.find() CSS visibility', () => {
 			expect( input.offsetHeight ).toBeGreaterThan( 0 );
 			expect( input.getClientRects().length ).toBeGreaterThan( 0 );
 			input.focus();
-			expect( document.activeElement ).not.toBe( input );
+			expect( input ).not.toHaveFocus();
 			expect( find( node ) ).toEqual( [] );
 			expect( checkVisibility ).toHaveBeenCalledWith( {
 				visibilityProperty: true,
@@ -49,7 +49,7 @@ describe( 'focusable.find() CSS visibility', () => {
 		const input = node.querySelector( 'input' );
 
 		input.focus();
-		expect( document.activeElement ).toBe( input );
+		expect( input ).toHaveFocus();
 		expect( find( node ) ).toEqual( [ input ] );
 	} );
 
@@ -155,6 +155,7 @@ describe( 'focusable', () => {
 
 			const focusable = findFocusable( map );
 
+			expect( area.getClientRects() ).toHaveLength( 0 );
 			expect( focusable ).toHaveLength( 1 );
 			expect( focusable[ 0 ].nodeName ).toBe( 'AREA' );
 		} );

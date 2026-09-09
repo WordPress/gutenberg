@@ -1,10 +1,12 @@
-import { describe, expect, test } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen, act, within, waitFor } from '@testing-library/react';
+import { createBlock } from '@wordpress/blocks';
 import {
 	initializeEditor,
 	selectBlock,
 } from '@wordpress/integration-tests/helpers/integration-test-editor';
+import { registerCoreBlocks } from '@wordpress/block-library';
 const defaultSettings = {
 	__experimentalFeatures: {
 		color: {
@@ -32,23 +34,20 @@ const disabledColorSettings = {
 	disableCustomGradients: true,
 };
 
-async function setup( attributes, useCoreBlocks, customSettings ) {
-	const testBlock = { name: 'core/cover', attributes };
+async function setup( attributes, customSettings, innerBlocks = [] ) {
+	const testBlock = { name: 'core/cover', attributes, innerBlocks };
 	const settings = customSettings || defaultSettings;
-	return initializeEditor( testBlock, useCoreBlocks, settings );
+	return initializeEditor( testBlock, false, settings );
 }
 
 async function createAndSelectBlock() {
-	const colorButton = screen.getByRole( 'button', { name: 'Black' } );
-	await act( async () => {
-		colorButton.click();
-	} );
-	await waitFor( () =>
-		expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
-			'is-placeholder'
-		)
-	);
-	await selectBlock( 'Block: Cover' );
+	const view = await setup( { overlayColor: 'black' }, undefined, [
+		createBlock( 'core/paragraph' ),
+	] );
+	const cover = screen.getByLabelText( 'Block: Cover' );
+	await act( async () => cover.focus() );
+	await waitFor( () => expect( cover ).toHaveClass( 'is-selected' ) );
+	return view;
 }
 
 async function openStylesTabIfAvailable() {
@@ -62,6 +61,8 @@ async function openStylesTabIfAvailable() {
 }
 
 describe( 'Cover block', () => {
+	beforeEach( () => registerCoreBlocks() );
+
 	describe( 'Editor canvas', () => {
 		test( 'shows placeholder if background image and color not set', async () => {
 			await setup();
@@ -118,7 +119,6 @@ describe( 'Cover block', () => {
 
 	describe( 'Block toolbar', () => {
 		test( 'full height toggle sets minHeight style attribute to 100vh when clicked', async () => {
-			await setup();
 			await createAndSelectBlock();
 
 			const cover = screen.getByLabelText( 'Block: Cover' );
@@ -128,13 +128,16 @@ describe( 'Cover block', () => {
 
 			await userEvent.click( screen.getByLabelText( 'Full height' ) );
 
-			expect( window.getComputedStyle( cover ).minHeight ).toBe(
-				`${ window.innerHeight }px`
+			await waitFor( () =>
+				expect(
+					window.getComputedStyle(
+						screen.getByLabelText( 'Block: Cover' )
+					).minHeight
+				).toBe( `${ window.innerHeight }px` )
 			);
 		} );
 
 		test( 'content position button sets content position', async () => {
-			await setup();
 			await createAndSelectBlock();
 			const cover = screen.getByLabelText( 'Block: Cover' );
 
@@ -195,7 +198,6 @@ describe( 'Cover block', () => {
 				).not.toBeInTheDocument();
 			} );
 			test( 'does not display settings tab when media settings are empty', async () => {
-				await setup();
 				await createAndSelectBlock();
 
 				expect(
@@ -285,9 +287,7 @@ describe( 'Cover block', () => {
 
 		describe( 'Color panel', () => {
 			test( 'applies selected opacity to block when number control value changed', async () => {
-				const { container } = await setup();
-
-				await createAndSelectBlock();
+				const { container } = await createAndSelectBlock();
 
 				// eslint-disable-next-line testing-library/no-node-access
 				const overlay = container.getElementsByClassName(
@@ -308,9 +308,7 @@ describe( 'Cover block', () => {
 			} );
 
 			test( 'applies selected opacity to block when slider moved', async () => {
-				const { container } = await setup();
-
-				await createAndSelectBlock();
+				const { container } = await createAndSelectBlock();
 
 				// eslint-disable-next-line testing-library/no-node-access
 				const overlay = container.getElementsByClassName(
@@ -333,7 +331,7 @@ describe( 'Cover block', () => {
 
 			describe( 'when colors are disabled', () => {
 				test( 'does not render overlay control', async () => {
-					await setup( undefined, true, disabledColorSettings );
+					await setup( undefined, disabledColorSettings );
 					await selectBlock( 'Block: Cover' );
 					await openStylesTabIfAvailable();
 
@@ -344,7 +342,7 @@ describe( 'Cover block', () => {
 					expect( overlayControl ).not.toBeInTheDocument();
 				} );
 				test( 'does not render opacity control', async () => {
-					await setup( undefined, true, disabledColorSettings );
+					await setup( undefined, disabledColorSettings );
 					await selectBlock( 'Block: Cover' );
 					await openStylesTabIfAvailable();
 
@@ -359,7 +357,6 @@ describe( 'Cover block', () => {
 
 		describe( 'Dimensions panel', () => {
 			test( 'sets minHeight attribute when number control value changed', async () => {
-				await setup();
 				await createAndSelectBlock();
 				await openStylesTabIfAvailable();
 				await userEvent.clear(

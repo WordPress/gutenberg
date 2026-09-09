@@ -117,10 +117,6 @@ export function find( context, { sequential = false } = {} ) {
 	const elements = context.querySelectorAll( buildSelector( sequential ) );
 
 	return Array.from( elements ).filter( ( element ) => {
-		if ( ! isVisible( element ) ) {
-			return false;
-		}
-
 		// Elements inside an inert subtree are not focusable.
 		if ( element.closest( '[inert]' ) ) {
 			return false;
@@ -133,6 +129,6 @@ export function find( context, { sequential = false } = {} ) {
 			);
 		}
 
-		return true;
+		return isVisible( element );
 	} );
 }

@@ -6,6 +6,7 @@
 
 ### Bug Fixes
 
+-   `focusable.find`: Detect a mapped `area` through its referenced visible image because the `area` does not have its own layout box ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
 -   `focusable.find`: Exclude elements hidden by CSS `visibility` or `content-visibility` while preserving explicitly visible descendants ([#82574](https://github.com/WordPress/gutenberg/pull/82574)).
 
 ## 4.54.0 (2026-08-26)
