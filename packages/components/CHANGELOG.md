@@ -24,6 +24,7 @@
 -   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
 -   `ToolsPanel`: Use setting-first accessible action labels without changing the menu design ([#84341](https://github.com/WordPress/gutenberg/pull/84341)).
 -   `DropdownMenu`: Keep the menu closed on ArrowDown when the toggle is disabled ([#84556](https://github.com/WordPress/gutenberg/pull/84556)).
+-   `Grid`: Fix the `bottomLeft` alignment, which resolved to the top right corner instead of the bottom left one ([#82641](https://github.com/WordPress/gutenberg/pull/82641)).
 
 ### Internal
 
