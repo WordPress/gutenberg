@@ -155,18 +155,6 @@ function useRichTextBase( {
 		forceRender();
 	}
 
-	function applyFromProps() {
-		setRecordFromProps();
-
-		// Setting a selection into an unfocused editable moves focus in some
-		// browsers.
-		const hasFocus =
-			ref.current?.contains( ref.current.ownerDocument.activeElement ) ||
-			ownsSelection( ref.current );
-
-		applyRecord( recordRef.current, { domOnly: ! hasFocus } );
-	}
-
 	// Apply a value or selection set from outside. The selection goes in
 	// only while the element (or an editing host around it) has focus; the
 	// focus handler applies it once focus arrives.
@@ -216,9 +204,20 @@ function useRichTextBase( {
 			onSelectionChange: sendSelection,
 			forceRender,
 		} ),
-		useRefEffect( () => {
-			applyFromProps();
-		}, [ placeholder, ...__unstableDependencies ] ),
+		useRefEffect(
+			( element ) => {
+				setRecordFromProps();
+
+				// Setting a selection into an unfocused editable moves focus in
+				// some browsers.
+				const hasFocus =
+					element.contains( element.ownerDocument.activeElement ) ||
+					ownsSelection( element );
+
+				applyRecord( recordRef.current, { domOnly: ! hasFocus } );
+			},
+			[ placeholder, ...__unstableDependencies ]
+		),
 	] );
 
 	return {
