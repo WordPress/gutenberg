@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+-   `Disabled`: Keep the `className` passed by the consumer on the wrapper when `isDisabled` is `false`. Only `components-disabled` and the disabled styling are conditional now, so the wrapper stays styleable and targetable in both states ([#82648](https://github.com/WordPress/gutenberg/pull/82648)).
 -   `ProgressBar`: Remove determinate transitions and use a slower, stepped indeterminate animation when reduced motion is preferred. ([#82490](https://github.com/WordPress/gutenberg/pull/82490))
 -   `ColorPalette`: Apply the computed contrast color to the selected checkmark now that the icon is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   `CheckboxControl`: Color the checked and indeterminate icons with `color` rather than `fill`, so they stay visible now that those icons are stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
@@ -24,6 +25,10 @@
 -   `ItemGroup`: Drop the blanket `path { fill: currentColor }` rule that was overriding stroke-based icons' intended fill via inheritance bypass. Paths without an explicit fill still inherit `currentColor` from the surrounding SVG. Custom paths that specify a fill now retain it instead of being overridden by ItemGroup. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `Tip`: Preserve the intended yellow color after its icon became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `Button`, `Placeholder`: Remove the obsolete `fill: CanvasText` override for forced colors mode. ([#82481](https://github.com/WordPress/gutenberg/pull/82481))
+
+### Documentation
+
+-   Add an Emotion-to-SCSS Modules migration guide for contributors ([#82567](https://github.com/WordPress/gutenberg/pull/82567)).
 
 ### Internal
 
