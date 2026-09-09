@@ -38,7 +38,7 @@
 		"rimraf": "^5.0.10",
 		"terser-webpack-plugin": "^5.3.10",
 		"vitest": "^5.0.0",
-		"webpack": "^5.108.1"
+		"webpack": "5.109.2"
 	},
 	"peerDependencies": {
 		"webpack": "^4.8.3 || ^5.0.0"

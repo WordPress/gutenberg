@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Pin the bundled webpack to 5.109.2 to avoid a code-generation regression in webpack 5.110.3 that can make production bundles fail at startup ([#82698](https://github.com/WordPress/gutenberg/pull/82698)).
+
 ## 35.0.0 (2026-09-10)
 
 ### Breaking Changes

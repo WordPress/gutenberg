@@ -82,7 +82,7 @@
 		"stylelint": "^17.14.1",
 		"terser-webpack-plugin": "^5.3.10",
 		"url-loader": "^4.1.1",
-		"webpack": "^5.108.1",
+		"webpack": "5.109.2",
 		"webpack-bundle-analyzer": "^4.9.1",
 		"webpack-cli": "^5.1.4",
 		"webpack-dev-server": "^5.2.1"

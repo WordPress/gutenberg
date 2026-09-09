@@ -244,7 +244,12 @@ describe( 'Confirm', () => {
 					</ConfirmDialog>
 				);
 
-				await user.keyboard( '[Tab][Enter]' );
+				const cancelButton = screen.getByRole( 'button', {
+					name: 'Cancel',
+				} );
+				cancelButton.focus();
+				expect( cancelButton ).toHaveFocus();
+				await user.keyboard( '[Enter]' );
 
 				expect( onConfirm ).not.toHaveBeenCalled();
 				expect( onCancel ).toHaveBeenCalledTimes( 1 );
@@ -265,7 +270,12 @@ describe( 'Confirm', () => {
 					</ConfirmDialog>
 				);
 
-				await user.keyboard( '[Tab][Tab][Enter]' );
+				const confirmButton = screen.getByRole( 'button', {
+					name: 'OK',
+				} );
+				confirmButton.focus();
+				expect( confirmButton ).toHaveFocus();
+				await user.keyboard( '[Enter]' );
 
 				expect( onConfirm ).toHaveBeenCalledTimes( 1 );
 				expect( onCancel ).not.toHaveBeenCalled();
