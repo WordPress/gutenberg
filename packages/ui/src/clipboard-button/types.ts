@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import type { ButtonIconProps, ButtonProps } from '../button/types';
 import type { PopupProps as TooltipPopupProps } from '../tooltip/types';
+import type { KeyboardShortcut } from '../utils/keyboard-shortcut';
 
 export type ClipboardButtonStatus = 'pending' | 'success';
 
@@ -47,6 +48,16 @@ export type ClipboardButtonProps = Omit< ButtonProps, 'onCopy' > & {
 	 * @default __( 'Copied!' )
 	 */
 	tooltipSuccessText?: string;
+
+	/**
+	 * The keyboard shortcut associated with this button. When provided, the
+	 * shortcut is displayed in the tooltip and announced to assistive technology.
+	 *
+	 * **Note**: This prop is for display and accessibility purposes only — the
+	 * consumer is responsible for registering the keyboard shortcut and keeping
+	 * its handler synchronized with the button's disabled state.
+	 */
+	shortcut?: KeyboardShortcut;
 
 	/**
 	 * Customize how the tooltip is positioned relative to the button. Accepts

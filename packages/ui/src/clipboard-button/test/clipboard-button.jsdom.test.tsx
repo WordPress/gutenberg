@@ -326,4 +326,62 @@ describe( 'ClipboardButton', () => {
 		);
 		expect( console ).toHaveErrored();
 	} );
+
+	describe( 'shortcut', () => {
+		it( 'uses the human-readable label in the accessible description', () => {
+			const externalDescriptionId = 'external-description';
+
+			render(
+				<>
+					<span id={ externalDescriptionId }>Available offline.</span>
+					<ClipboardButton
+						text="test text"
+						aria-describedby={ externalDescriptionId }
+						shortcut={ {
+							displayShortcut: '⌘S',
+							ariaKeyShortcut: 'Meta+S',
+							label: 'Command S',
+						} }
+					/>
+				</>
+			);
+
+			const button = screen.getByRole( 'button', { name: 'Copy' } );
+			expect( button ).toHaveAttribute( 'aria-keyshortcuts', 'Meta+S' );
+			expect( button ).toHaveAccessibleDescription(
+				'Available offline. Keyboard shortcut: Command S'
+			);
+		} );
+
+		it( 'displays the shortcut in the tooltip but hides it from assistive technology', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<TestProvider>
+					<ClipboardButton
+						text="test text"
+						shortcut={ {
+							displayShortcut: '⌘S',
+							ariaKeyShortcut: 'Meta+S',
+							label: 'Command S',
+						} }
+					/>
+				</TestProvider>
+			);
+
+			const button = screen.getByRole( 'button', { name: 'Copy' } );
+			await user.hover( button );
+
+			await waitFor( () => {
+				const shortcutElement = screen.getByText( '⌘S' );
+				expect( shortcutElement ).toBeVisible();
+			} );
+
+			expect( screen.getByText( '⌘S' ) ).toHaveAttribute(
+				'aria-hidden',
+				'true'
+			);
+			expect( screen.getByText( '⌘S' ) ).toHaveAttribute( 'dir', 'ltr' );
+		} );
+	} );
 } );

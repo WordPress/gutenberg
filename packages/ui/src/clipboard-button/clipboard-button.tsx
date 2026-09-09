@@ -12,6 +12,11 @@ import {
 import { __ } from '@wordpress/i18n';
 import { Button } from '../button';
 import * as Tooltip from '../tooltip';
+import {
+	KeyboardShortcutDescription,
+	KeyboardShortcutDisplay,
+	useKeyboardShortcutProps,
+} from '../utils/keyboard-shortcut';
 import { ClipboardButtonContext } from './context';
 import { ClipboardButtonIcon } from './icon';
 import styles from './style.module.css';
@@ -72,7 +77,10 @@ export const ClipboardButton = forwardRef<
 		onMouseEnter,
 		onFocus,
 		children,
+		shortcut,
 		'aria-label': ariaLabel,
+		'aria-describedby': ariaDescribedBy,
+		'aria-keyshortcuts': ariaKeyShortcuts,
 		...restProps
 	},
 	ref
@@ -86,6 +94,11 @@ export const ClipboardButton = forwardRef<
 		children === undefined ? <ClipboardButtonIcon /> : children;
 	const tooltipLabel =
 		status === 'success' ? tooltipSuccessText : tooltipInitialText;
+	const { descriptionId, targetProps } = useKeyboardShortcutProps( {
+		'aria-describedby': ariaDescribedBy,
+		'aria-keyshortcuts': ariaKeyShortcuts,
+		shortcut,
+	} );
 
 	useEffect( () => {
 		return () => {
@@ -146,6 +159,7 @@ export const ClipboardButton = forwardRef<
 			>
 				<Tooltip.Trigger
 					ref={ mergedRef }
+					{ ...targetProps }
 					disabled={ disabled && ! focusableWhenDisabled }
 					onMouseEnter={ handleMouseEnter }
 					onFocus={ handleFocus }
@@ -166,9 +180,21 @@ export const ClipboardButton = forwardRef<
 					) }
 				>
 					{ resolvedChildren }
+					{ shortcut && descriptionId && (
+						<KeyboardShortcutDescription
+							descriptionId={ descriptionId }
+							shortcut={ shortcut }
+						/>
+					) }
 				</Tooltip.Trigger>
 				<Tooltip.Popup positioner={ positioner }>
 					{ tooltipLabel }
+					{ shortcut && (
+						<>
+							{ ' ' }
+							<KeyboardShortcutDisplay shortcut={ shortcut } />
+						</>
+					) }
 				</Tooltip.Popup>
 			</Tooltip.Root>
 		</ClipboardButtonContext.Provider>

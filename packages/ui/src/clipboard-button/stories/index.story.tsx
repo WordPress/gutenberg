@@ -1,6 +1,11 @@
 import { Fragment } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { code } from '@wordpress/icons';
+import {
+	displayShortcut,
+	ariaKeyShortcut,
+	shortcutAriaLabel,
+} from '@wordpress/keycodes';
 import { ClipboardButton } from '../index';
 import * as Tooltip from '../../tooltip';
 
@@ -133,20 +138,29 @@ export const AllTonesAndVariants: Story = {
 
 /**
  * Render only a text label, without `ClipboardButton.Icon`. The label
- * switches to “Copied” after a successful copy.
+ * switches to “Copied” after a successful copy. When the button already
+ * shows a visible label, set `hasTooltip={ false }` to hide the redundant
+ * tooltip.
  */
 export const TextOnly: Story = {
 	args: {
+		tone: 'neutral',
+		variant: 'outline',
+		hasTooltip: false,
 		children: <ClipboardButton.Label />,
 	},
 };
 
 /**
  * Compose `ClipboardButton.Icon` with `ClipboardButton.Label`, the same way
- * `Button.Icon` is used inside `Button`.
+ * `Button.Icon` is used inside `Button`. When the button already shows a
+ * visible label, set `hasTooltip={ false }` to hide the redundant tooltip.
  */
 export const WithIconAndText: Story = {
 	args: {
+		tone: 'neutral',
+		variant: 'outline',
+		hasTooltip: false,
 		children: [
 			<ClipboardButton.Icon key="icon" />,
 			<ClipboardButton.Label key="label" />,
@@ -154,8 +168,15 @@ export const WithIconAndText: Story = {
 	},
 };
 
+/**
+ * Place the icon after the label. When the button already shows a visible
+ * label, set `hasTooltip={ false }` to hide the redundant tooltip.
+ */
 export const IconAtEnd: Story = {
 	args: {
+		tone: 'neutral',
+		variant: 'outline',
+		hasTooltip: false,
 		children: [
 			<ClipboardButton.Label key="label" />,
 			<ClipboardButton.Icon key="icon" />,
@@ -165,10 +186,15 @@ export const IconAtEnd: Story = {
 
 /**
  * Pass a custom `icon` to `ClipboardButton.Icon` for the pending state.
- * A check icon still appears after a successful copy.
+ * A check icon still appears after a successful copy. When the button already
+ * shows a visible label, set `hasTooltip={ false }` to hide the redundant
+ * tooltip.
  */
 export const CustomIcon: Story = {
 	args: {
+		tone: 'neutral',
+		variant: 'outline',
+		hasTooltip: false,
 		text: "console.log( 'Code is Poetry' );",
 		children: [
 			<ClipboardButton.Icon key="icon" icon={ code } />,
@@ -178,10 +204,15 @@ export const CustomIcon: Story = {
 };
 
 /**
- * Pass custom `pending` and `success` text to `ClipboardButton.Label`.
+ * Pass custom `pending` and `success` text to `ClipboardButton.Label`. When
+ * the button already shows a visible label, set `hasTooltip={ false }` to
+ * hide the redundant tooltip.
  */
 export const WithCustomLabel: Story = {
 	args: {
+		tone: 'neutral',
+		variant: 'outline',
+		hasTooltip: false,
 		children: [
 			<ClipboardButton.Icon key="icon" />,
 			<ClipboardButton.Label
@@ -207,8 +238,29 @@ export const CustomLabels: Story = {
 
 export const WithoutTooltip: Story = {
 	args: {
+		tone: 'neutral',
+		variant: 'outline',
 		hasTooltip: false,
 		children: <ClipboardButton.Label />,
+	},
+};
+
+const EXAMPLE_SHORTCUT_OBJECT = {
+	displayShortcut: displayShortcut.primary( 'c' ),
+	ariaKeyShortcut: ariaKeyShortcut.primary( 'c' ),
+	label: shortcutAriaLabel.primary( 'c' ),
+};
+
+/**
+ * Use the `displayShortcut`, `ariaKeyShortcut`, and `shortcutAriaLabel` helpers
+ * from `@wordpress/keycodes` to create the visual, ARIA-compatible, and
+ * human-readable representations of the shortcut.
+ */
+export const WithShortcut: Story = {
+	args: {
+		tone: 'neutral',
+		variant: 'minimal',
+		shortcut: EXAMPLE_SHORTCUT_OBJECT,
 	},
 };
 
