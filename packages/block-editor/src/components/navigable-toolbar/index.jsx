@@ -153,7 +153,18 @@ function useToolbarFocus( {
 				const items =
 					getAllFocusableToolbarItemsIn( navigableToolbarRef );
 				const index = initialIndex || 0;
-				if ( items[ index ] && hasFocusWithin( navigableToolbarRef ) ) {
+				const { activeElement, body } =
+					navigableToolbarRef.ownerDocument;
+				// Focus the item when the toolbar has focus, or when the
+				// toolbar remounted from under the focused item and focus
+				// was lost to the body: the block toolbar is keyed on the
+				// block and its parent, and remounts when the block moves.
+				if (
+					items[ index ] &&
+					( hasFocusWithin( navigableToolbarRef ) ||
+						( initialIndex !== undefined &&
+							activeElement === body ) )
+				) {
 					items[ index ].focus( {
 						// When focusing newly mounted toolbars,
 						// the position of the popover is often not right on the first render
@@ -176,46 +187,29 @@ function useToolbarFocus( {
 		};
 	}, [ initialIndex, initialFocusOnMount, onIndexChange, toolbarRef ] );
 
-	// Keep focus, and a focusable item, when the focused item is removed
-	// from under the toolbar: a block that moves (a list item indented from
-	// the toolbar) re-renders its controls, replacing the item the user
-	// activated. Browsers drop focus to the body without an event when a
-	// focused element is removed, so the toolbar's DOM changes are observed.
+	// Report the index of the focused item as it changes, so it is known
+	// when the toolbar remounts from under it (see above): the unmount
+	// cleanup reports it too late for a replacement rendered in the same
+	// commit.
 	useEffect( () => {
-		const toolbar = toolbarRef.current;
-		const { ownerDocument } = toolbar;
-		let focused;
-		let index;
-
-		function onFocusIn( event ) {
-			focused = event.target;
-			index = getAllFocusableToolbarItemsIn( toolbar ).indexOf( focused );
+		if ( ! onIndexChange ) {
+			return;
 		}
 
-		const observer = new ownerDocument.defaultView.MutationObserver( () => {
-			const { activeElement, body } = ownerDocument;
+		const toolbar = toolbarRef.current;
 
-			if (
-				! focused ||
-				focused.isConnected ||
-				( activeElement && activeElement !== body )
-			) {
-				return;
-			}
-
-			const items = getAllFocusableToolbarItemsIn( toolbar );
-			focused = items[ Math.min( index, items.length - 1 ) ];
-			focused?.focus( { preventScroll: true } );
-		} );
+		function onFocusIn( event ) {
+			onIndexChange(
+				getAllFocusableToolbarItemsIn( toolbar ).indexOf( event.target )
+			);
+		}
 
 		toolbar.addEventListener( 'focusin', onFocusIn );
-		observer.observe( toolbar, { childList: true, subtree: true } );
 
 		return () => {
 			toolbar.removeEventListener( 'focusin', onFocusIn );
-			observer.disconnect();
 		};
-	}, [ toolbarRef ] );
+	}, [ onIndexChange, toolbarRef ] );
 
 	/**
 	 * Handles returning focus to the block editor canvas when pressing escape.
