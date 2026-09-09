@@ -1,6 +1,6 @@
 import { Fragment } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { cog } from '@wordpress/icons';
+import { code } from '@wordpress/icons';
 import { ClipboardButton } from '../index';
 import * as Tooltip from '../../tooltip';
 
@@ -169,9 +169,10 @@ export const IconAtEnd: Story = {
  */
 export const CustomIcon: Story = {
 	args: {
+		text: "console.log( 'Code is Poetry' );",
 		children: [
-			<ClipboardButton.Icon key="icon" icon={ cog } />,
-			<ClipboardButton.Label key="label" />,
+			<ClipboardButton.Icon key="icon" icon={ code } />,
+			<ClipboardButton.Label key="label" pending="Copy code" />,
 		],
 	},
 };
