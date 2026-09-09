@@ -5,6 +5,137 @@ test.describe( 'Accordion', () => {
 		await admin.createNewPost();
 	} );
 
+	for ( const legacy of [ false, true ] ) {
+		test( `should render panels as labelled groups in ${
+			legacy ? 'previously saved' : 'new'
+		} accordions`, async ( { admin, editor, page, requestUtils } ) => {
+			for ( const section of [ 'First section', 'Second section' ] ) {
+				await editor.insertBlock( {
+					name: 'core/heading',
+					attributes: { content: section },
+				} );
+				await editor.insertBlock( {
+					name: 'core/accordion',
+					innerBlocks: [ 'Audience', 'Contents', 'Methods' ].map(
+						( title ) => ( {
+							name: 'core/accordion-item',
+							innerBlocks: [
+								{
+									name: 'core/accordion-heading',
+									attributes: { title },
+								},
+								{
+									name: 'core/accordion-panel',
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											attributes: {
+												content: `${ section }: ${ title }`,
+											},
+										},
+									],
+								},
+							],
+						} )
+					),
+				} );
+			}
+
+			let content = await editor.getEditedPostContent();
+			if ( legacy ) {
+				// Reproduce the markup stored before panels used the group role.
+				content = content.replaceAll(
+					'role="group" class="wp-block-accordion-panel"',
+					'role="region" class="wp-block-accordion-panel"'
+				);
+			}
+			const post = await requestUtils.createPost( {
+				content,
+				status: 'publish',
+			} );
+			// Visit before opening the editor or resaving the existing content.
+			await page.goto( `/?p=${ post.id }` );
+			const panels = page.locator( '.wp-block-accordion-panel' );
+			await expect( panels ).toHaveCount( 6 );
+			await expect( page.getByRole( 'region' ) ).toHaveCount( 0 );
+			const panelIds = new Set();
+			for ( const panel of await panels.all() ) {
+				await expect( panel ).toHaveAttribute( 'role', 'group' );
+				await expect( panel ).toHaveAttribute(
+					'hidden',
+					'until-found'
+				);
+				const panelId = await panel.getAttribute( 'id' );
+				panelIds.add( panelId );
+				const toggle = page.locator(
+					`[id="${ await panel.getAttribute( 'aria-labelledby' ) }"]`
+				);
+				await expect( toggle ).toHaveAttribute(
+					'aria-controls',
+					panelId
+				);
+				await expect( toggle ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
+				await toggle.focus();
+				await page.keyboard.press( 'Enter' );
+				await expect( toggle ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+				await expect( panel ).not.toHaveAttribute( 'hidden' );
+				await expect( panel.getByRole( 'paragraph' ) ).toBeVisible();
+				await page.keyboard.press( 'Space' );
+				await expect( toggle ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
+				await expect( panel ).toHaveAttribute(
+					'hidden',
+					'until-found'
+				);
+			}
+			expect( panelIds.size ).toBe( 6 );
+
+			await admin.visitAdminPage(
+				'post.php',
+				`post=${ post.id }&action=edit`
+			);
+			await expect(
+				editor.canvas.getByText( 'Audience', { exact: true } )
+			).toHaveCount( 2 );
+			await expect(
+				editor.canvas.getByText(
+					'Block contains unexpected or invalid content.'
+				)
+			).toHaveCount( 0 );
+			// Editing the post serializes the migrated blocks; merely opening it
+			// can keep the original, unmodified post content in the editor store.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Edited after opening the accordions.' },
+			} );
+			const savedContent = await editor.getEditedPostContent();
+			expect( savedContent ).not.toContain( 'role="region"' );
+			expect(
+				savedContent.match( /class="wp-block-accordion-panel"/g )
+			).toHaveLength( 6 );
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save', exact: true } )
+				.click();
+			await page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'updated' } )
+				.waitFor();
+			await page.reload();
+			await expect
+				.poll( editor.getEditedPostContent )
+				.toBe( savedContent );
+		} );
+	}
+
 	test( 'should open by default when openByDefault is true', async ( {
 		editor,
 		page,
@@ -46,7 +177,7 @@ test.describe( 'Accordion', () => {
 			'aria-expanded',
 			'true'
 		);
-		const accordionPanel = page.getByRole( 'region', {
+		const accordionPanel = page.getByRole( 'group', {
 			name: 'Accordion Title',
 		} );
 		await expect( accordionPanel ).toBeVisible();
@@ -93,13 +224,13 @@ test.describe( 'Accordion', () => {
 		const firstAccordionToggle = page.getByRole( 'button', {
 			name: 'Accordion Title 1',
 		} );
-		const firstAccordionPanel = page.getByRole( 'region', {
+		const firstAccordionPanel = page.getByRole( 'group', {
 			name: 'Accordion Title 1',
 		} );
 		const secondAccordionToggle = page.getByRole( 'button', {
 			name: 'Accordion Title 2',
 		} );
-		const secondAccordionPanel = page.getByRole( 'region', {
+		const secondAccordionPanel = page.getByRole( 'group', {
 			name: 'Accordion Title 2',
 		} );
 
@@ -169,7 +300,7 @@ test.describe( 'Accordion', () => {
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }#target` );
 
-		const accordionPanel = page.getByRole( 'region', {
+		const accordionPanel = page.getByRole( 'group', {
 			name: 'Accordion Title',
 		} );
 		await expect( accordionPanel ).toBeVisible();
@@ -225,7 +356,7 @@ test.describe( 'Accordion', () => {
 		const link = page.getByRole( 'link', {
 			name: 'Open panel and scroll to target',
 		} );
-		const accordionPanel = page.getByRole( 'region', {
+		const accordionPanel = page.getByRole( 'group', {
 			name: 'Accordion Title',
 		} );
 		const targetParagraph = page.locator( '#target' );

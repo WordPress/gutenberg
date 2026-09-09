@@ -14,6 +14,33 @@
 class Tests_Blocks_Render_Accordion extends WP_UnitTestCase {
 
 	/**
+	 * Previously saved panels must not become landmarks, even without resaving.
+	 *
+	 * @covers ::block_core_accordion_item_render
+	 */
+	public function test_should_render_saved_region_panels_as_labelled_groups(): void {
+		$content = '<div class="wp-block-accordion-item"><h3 class="wp-block-accordion-heading"><button class="wp-block-accordion-heading__toggle">Audience</button></h3><div role="region" class="wp-block-accordion-panel"><p>Panel content</p><div role="region" aria-label="Nested landmark">Nested content</div></div></div>';
+
+		foreach ( array( false, true ) as $open_by_default ) {
+			$rendered = gutenberg_block_core_accordion_item_render( array( 'openByDefault' => $open_by_default ), $content );
+			$p        = new WP_HTML_Tag_Processor( $rendered );
+			$this->assertTrue( $p->next_tag( 'BUTTON' ) );
+			$toggle_id = $p->get_attribute( 'id' );
+			$panel_id  = $p->get_attribute( 'aria-controls' );
+			$this->assertNotEmpty( $toggle_id );
+			$this->assertNotEmpty( $panel_id );
+			$this->assertTrue( $p->next_tag( array( 'class_name' => 'wp-block-accordion-panel' ) ) );
+			$this->assertSame( 'group', $p->get_attribute( 'role' ) );
+			$this->assertSame( $panel_id, $p->get_attribute( 'id' ) );
+			$this->assertSame( $toggle_id, $p->get_attribute( 'aria-labelledby' ) );
+			$this->assertSame( 'state.isHidden', $p->get_attribute( 'data-wp-bind--hidden' ) );
+			$this->assertSame( 'actions.handleBeforeMatch', $p->get_attribute( 'data-wp-on--beforematch' ) );
+			$this->assertTrue( $p->next_tag( 'DIV' ) );
+			$this->assertSame( 'region', $p->get_attribute( 'role' ), 'Preserve landmarks inside the panel content.' );
+		}
+	}
+
+	/**
 	 * Tests Accordion with two items, both closed by default.
 	 *
 	 * @covers ::block_core_accordion_item_render
