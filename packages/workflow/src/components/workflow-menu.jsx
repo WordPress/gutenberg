@@ -206,7 +206,7 @@ export function WorkflowMenu() {
 						onValueChange={ setSearch }
 						open
 						inline
-						autoHighlight="always"
+						autoHighlight
 					>
 						<Autocomplete.Input
 							ref={ inputRef }
