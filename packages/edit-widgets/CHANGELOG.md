@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `WidgetAreasBlockEditorProvider`: Wire `selectBlockPatternsKey`, `reusableBlocksSelectKey`, `userPatternCategoriesSelectKey`, and `__experimentalBlockPatternCategories` into the block editor settings so patterns from themes, the Pattern Directory, and user categories are available in the widgets editor inserter. Patterns whose blocks are not allowed in widget areas (post, query, site, navigation, term) are still filtered out automatically ([#78884](https://github.com/WordPress/gutenberg/pull/78884)).
 -   Error boundary: Surface debugging details ([#82099](https://github.com/WordPress/gutenberg/pull/82099)).
 -   Widget areas: Use the `layout` icon instead of the default block icon ([#61028](https://github.com/WordPress/gutenberg/issues/61028)).
 
