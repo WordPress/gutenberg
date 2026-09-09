@@ -72,6 +72,9 @@ describe( 'Function date', () => {
 		[ 'c', '2019-06-18T11:00:00+00:00' ],
 		[ 'r', 'Tue, 18 Jun 2019 11:00:00 +0000' ],
 		[ 'U', '1560855600' ],
+		[ '\\Y Y', 'Y 2019' ],
+		[ String.raw`\\Y`, String.raw`\2019` ],
+		[ 'Y\\', '2019' ],
 	] )(
 		'should format date as "%s", ignoring locale settings',
 		( formatString, expected ) => {
