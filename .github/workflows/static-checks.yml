@@ -147,7 +147,7 @@ jobs:
               run: npm run other:check-licenses
 
     agent-development:
-        name: AI development tests (Node.js ${{ matrix.node }} on ${{ contains(matrix.os, 'macos-') && 'MacOS' || contains(matrix.os, 'windows-') && 'Windows' || 'Linux' }})
+        name: AI development tests (${{ contains(matrix.os, 'macos-') && 'MacOS' || contains(matrix.os, 'windows-') && 'Windows' || 'Linux' }})
         runs-on: ${{ matrix.os }}
         permissions:
             contents: read
@@ -155,15 +155,7 @@ jobs:
         timeout-minutes: 30
         strategy:
             matrix:
-                include:
-                    - os: ubuntu-24.04
-                      node: '24'
-                    - os: macos-15
-                      node: '24'
-                    - os: windows-2025
-                      node: '24'
-                    - os: ubuntu-24.04
-                      node: '26'
+                os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
 
         steps:
             - name: Checkout repository
@@ -174,8 +166,6 @@ jobs:
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
-              with:
-                  node-version: ${{ matrix.node }}
 
             - name: Install AI development test dependencies
               env:
@@ -183,7 +173,7 @@ jobs:
               run: npm ci --prefix test/ai-development
 
             - name: Audit AI development test dependencies
-              if: matrix.os == 'ubuntu-24.04' && matrix.node == '24'
+              if: matrix.os == 'ubuntu-24.04'
               run: npm --prefix test/ai-development audit --audit-level=high
 
             - name: Test AI development utilities
