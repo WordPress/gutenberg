@@ -83,9 +83,7 @@ export function usePatternCategories() {
 
 /**
  * Pattern category field configuration for DataViews.
- *
- * The category to list is picked through the tabs built from the server
- * view list, so the field is not filterable.
+ * This field shows pattern categories and provides filtering capabilities.
  */
 export function usePatternCategoryField(): Field< NormalizedPattern > {
 	const categories = usePatternCategories();
@@ -97,7 +95,10 @@ export function usePatternCategoryField(): Field< NormalizedPattern > {
 			render: CategoryField,
 			elements: categories,
 			getValue: ( { item } ) => item.categories,
-			filterBy: false,
+			filterBy: {
+				operators: [ 'is' ],
+				isPrimary: true,
+			},
 			enableSorting: false,
 		} ),
 		[ categories ]

@@ -9,8 +9,7 @@ export const route = {
 			throw: true,
 			to: '/patterns/list/$type',
 			params: {
-				// The slug of the "All patterns" entry in the server view list.
-				type: 'all-patterns',
+				type: 'all',
 			},
 		} );
 	},

@@ -28,6 +28,7 @@ import {
 } from '@wordpress/patterns';
 import { __ } from '@wordpress/i18n';
 import { unlock } from '@wordpress/routes-lock-unlock';
+import { DEFAULT_VIEWS } from './view-utils';
 import { previewField } from './fields/preview';
 import { usePatternCategoryField } from './fields/category';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
@@ -44,41 +45,15 @@ import './style.scss';
 
 const PATTERN_POST_TYPE = 'wp_block';
 
-/**
- * A layer merged on top of a view. Mirrors the `ViewOverrides` type of
- * `@wordpress/views`, which is not exported.
- */
-type ViewOverrides = Partial< Omit< View, 'type' | 'layout' > > & {
-	type?: View[ 'type' ];
-	layout?: Record< string, unknown >;
-};
-
-interface ViewListEntry {
-	title: string;
-	slug: string;
-	view?: ViewOverrides;
-}
-
 function PatternList() {
-	// The `type` param is the slug of the active view: the "all" or "my
-	// patterns" entries of the view list, or a pattern category.
-	const { type } = useParams( {
+	const { type = 'all' } = useParams( {
 		from: '/patterns/list/$type',
 	} );
-	const {
-		default_view: defaultView,
-		default_layouts: defaultLayouts,
-		view_list: viewList,
-	} = useViewConfig( {
-		kind: 'postType',
-		name: PATTERN_POST_TYPE,
-	} );
-	// The overrides of the view list entry matching the active view, if any.
-	const activeViewOverrides = useMemo(
-		(): ViewOverrides =>
-			viewList?.find( ( entry ) => entry.slug === type )?.view ?? {},
-		[ viewList, type ]
-	);
+	const { default_view: defaultView, default_layouts: defaultLayouts } =
+		useViewConfig( {
+			kind: 'postType',
+			name: PATTERN_POST_TYPE,
+		} );
 
 	if ( ! defaultView ) {
 		// The route loader resolves the view configuration before the stage
@@ -88,27 +63,21 @@ function PatternList() {
 
 	return (
 		<PatternListView
-			activeView={ type }
+			type={ type }
 			defaultView={ defaultView }
 			defaultLayouts={ defaultLayouts }
-			viewList={ viewList }
-			activeViewOverrides={ activeViewOverrides }
 		/>
 	);
 }
 
 function PatternListView( {
-	activeView,
+	type,
 	defaultView,
 	defaultLayouts,
-	viewList,
-	activeViewOverrides,
 }: {
-	activeView: string;
+	type: string;
 	defaultView: View;
 	defaultLayouts: SupportedLayouts | undefined;
-	viewList: ViewListEntry[] | undefined;
-	activeViewOverrides: ViewOverrides;
 } ) {
 	const invalidate = useInvalidate();
 	const navigate = useNavigate();
@@ -151,7 +120,6 @@ function PatternListView( {
 		slug: 'default-new',
 		defaultView,
 		defaultLayouts,
-		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );
@@ -171,18 +139,36 @@ function PatternListView( {
 	};
 
 	// Extract filter values from view
+	const categoryFilter = useMemo( () => {
+		const filter = view.filters?.find( ( f ) => f.field === 'category' );
+		// Default to PATTERN_DEFAULT_CATEGORY if no category filter is set
+		return filter?.value || 'all-patterns';
+	}, [ view.filters ] );
+
 	const syncStatusFilter = useMemo( () => {
 		const filter = view.filters?.find( ( f ) => f.field === 'sync-status' );
 		return filter?.value;
 	}, [ view.filters ] );
 
-	// Use the usePatterns hook to fetch and filter patterns. The active view
-	// slug is the category to list: the server view list is made of the
-	// "all" and "my patterns" entries plus the pattern categories.
-	const { patterns, isResolving } = usePatterns( null, activeView, {
-		search: view.search,
-		syncStatus: syncStatusFilter,
-	} );
+	// Determine which pattern type(s) to fetch based on current tab
+	const patternType = useMemo( () => {
+		if ( type === 'my-patterns' ) {
+			return PATTERN_TYPES.user;
+		} else if ( type === 'registered' ) {
+			return PATTERN_TYPES.theme;
+		}
+		return null; // null means fetch all types
+	}, [ type ] );
+
+	// Use the usePatterns hook to fetch and filter patterns
+	const { patterns, isResolving } = usePatterns(
+		patternType,
+		categoryFilter,
+		{
+			search: view.search,
+			syncStatus: syncStatusFilter,
+		}
+	);
 
 	// Augment patterns with permissions
 	const patternsWithPermissions =
@@ -197,10 +183,14 @@ function PatternListView( {
 	const fields = useMemo( (): Field< NormalizedPattern >[] => {
 		return [
 			previewField,
-			...( postTypeFields || [] ),
+			...( postTypeFields || [] ).filter(
+				// Registered patterns are never synced, so the sync status
+				// is not relevant to the "Registered" tab.
+				( field ) => type !== 'registered' || field.id !== 'sync-status'
+			),
 			patternCategoryField,
 		];
-	}, [ postTypeFields, patternCategoryField ] );
+	}, [ type, postTypeFields, patternCategoryField ] );
 
 	// Apply client-side sorting and pagination, but NOT filtering
 	// Filtering is done server-side in usePatterns hook
@@ -273,9 +263,9 @@ function PatternListView( {
 	}, [ postTypeActions ] );
 
 	const handleTabChange = useCallback(
-		( viewSlug: string ) => {
+		( typeSlug: string ) => {
 			navigate( {
-				to: `/patterns/list/${ viewSlug }`,
+				to: `/patterns/list/${ typeSlug }`,
 			} );
 		},
 		[ navigate ]
@@ -322,21 +312,23 @@ function PatternListView( {
 			}
 			hasPadding={ false }
 		>
-			{ viewList && viewList.length > 1 && (
+			{ DEFAULT_VIEWS.length > 1 && (
 				<div className="routes-pattern-list__tabs-wrapper">
 					<Tabs
 						onSelect={ handleTabChange }
-						selectedTabId={ activeView }
+						selectedTabId={ type ?? 'all' }
 					>
 						<Tabs.TabList>
-							{ viewList.map( ( entry ) => (
-								<Tabs.Tab
-									tabId={ entry.slug }
-									key={ entry.slug }
-								>
-									{ entry.title }
-								</Tabs.Tab>
-							) ) }
+							{ DEFAULT_VIEWS.map(
+								( filter: { slug: string; label: string } ) => (
+									<Tabs.Tab
+										tabId={ filter.slug }
+										key={ filter.slug }
+									>
+										{ filter.label }
+									</Tabs.Tab>
+								)
+							) }
 						</Tabs.TabList>
 					</Tabs>
 				</div>
