@@ -62,9 +62,9 @@ function pickStyles(
 describe( 'Card', () => {
 	it( 'renders its regions and media', () => {
 		render(
-			<Card>
+			<Card data-testid="card">
 				<CardHeader>Card Header</CardHeader>
-				<CardBody>Card Body</CardBody>
+				<CardBody data-testid="card-body">Card Body</CardBody>
 				<CardDivider />
 				<CardMedia>
 					<img alt="Card Media" src="about:blank" />
@@ -73,6 +73,10 @@ describe( 'Card', () => {
 			</Card>
 		);
 
+		expect( screen.getByTestId( 'card' ) ).toHaveClass( 'components-card' );
+		expect( screen.getByTestId( 'card-body' ) ).toHaveClass(
+			'components-card__body'
+		);
 		expect( screen.getByText( 'Card Header' ) ).toBeInTheDocument();
 		expect( screen.getByText( 'Card Body' ) ).toBeInTheDocument();
 		expect( screen.getByRole( 'separator' ) ).toBeInTheDocument();

@@ -14,7 +14,9 @@ describe( 'BlockIcon', () => {
 
 		// The decorative SVG is intentionally hidden from the accessibility tree.
 		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-		expect( container.querySelector( 'svg' ) ).toBeInTheDocument();
+		const icon = container.querySelector( 'svg' );
+		expect( icon ).toHaveAttribute( 'aria-hidden', 'true' );
+		expect( icon ).toHaveAttribute( 'focusable', 'false' );
 	} );
 
 	it( 'renders a span without the has-colors classname', () => {

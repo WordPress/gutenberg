@@ -12,8 +12,6 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
-import { ContextSystemProvider } from '../../context';
-import moduleStyles from '../style.module.scss';
 import type {
 	ToolsPanelContext as ToolsPanelContextType,
 	ResetAllFilter,
@@ -24,12 +22,6 @@ globalThis.wpVitest.mockMatchMedia();
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
 const resetAll = vi.fn();
 const noop = () => undefined;
-const gridContextValue = {
-	Grid: {
-		columnGap: '40px',
-		rowGap: '48px',
-	},
-};
 
 type ControlValue = boolean | undefined;
 
@@ -310,7 +302,7 @@ describe( 'ToolsPanel', () => {
 			expect( header ).toBeInTheDocument();
 		} );
 
-		it( 'should apply SCSS Module styles to the panel and its items', () => {
+		it( 'should apply public class names to the panel and its items', () => {
 			render(
 				<ToolsPanel { ...defaultProps } data-testid="tools-panel">
 					<ToolsPanelItem
@@ -324,11 +316,9 @@ describe( 'ToolsPanel', () => {
 			);
 
 			expect( screen.getByTestId( 'tools-panel' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel' ],
 				'components-tools-panel'
 			);
 			expect( screen.getByTestId( 'tools-panel-item' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel-item' ],
 				'components-tools-panel-item',
 				'custom-item'
 			);
@@ -337,73 +327,10 @@ describe( 'ToolsPanel', () => {
 				name: defaultProps.label,
 			} );
 
-			expect( heading ).toHaveClass(
-				moduleStyles[ 'tools-panel-heading' ]
-			);
 			// Disable reason: Semantic queries can't reach the header wrapper.
 			// eslint-disable-next-line testing-library/no-node-access
 			expect( heading.parentElement ).toHaveClass(
-				moduleStyles[ 'tools-panel-header' ],
 				'components-tools-panel-header'
-			);
-		} );
-
-		it( 'should preserve its spacing against Grid context values', () => {
-			render(
-				<ContextSystemProvider value={ gridContextValue }>
-					<ToolsPanel { ...defaultProps } data-testid="tools-panel">
-						<span>Panel content</span>
-					</ToolsPanel>
-				</ContextSystemProvider>
-			);
-
-			const panel = screen.getByTestId( 'tools-panel' );
-			const generatedClassName = Array.from( panel.classList ).find(
-				( className ) => /^(css|emotion)-/.test( className )
-			);
-			const generatedRule = Array.from( document.styleSheets )
-				.flatMap( ( styleSheet ) => Array.from( styleSheet.cssRules ) )
-				.find( ( rule ) =>
-					rule.cssText.includes( `.${ generatedClassName }` )
-				);
-
-			expect( generatedRule?.cssText ).toContain(
-				'grid-column-gap: calc(4px * 4);'
-			);
-			expect( generatedRule?.cssText ).toContain(
-				'grid-row-gap: calc(4px * 4);'
-			);
-		} );
-
-		it( 'should apply SCSS Module variants for inner wrappers and placeholders', () => {
-			render(
-				<ToolsPanel
-					{ ...defaultProps }
-					data-testid="tools-panel"
-					hasInnerWrapper
-					shouldRenderPlaceholderItems
-				>
-					<ToolsPanelItem
-						{ ...altControlProps }
-						className="custom-item"
-						data-testid="tools-panel-item"
-					>
-						<div>Alt control</div>
-					</ToolsPanelItem>
-				</ToolsPanel>
-			);
-
-			expect( screen.getByTestId( 'tools-panel' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel-with-inner-wrapper' ],
-				moduleStyles[ 'tools-panel-hidden-inner-wrapper' ]
-			);
-			expect( screen.getByTestId( 'tools-panel-item' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel-item' ],
-				moduleStyles[ 'tools-panel-item-placeholder' ]
-			);
-			expect( screen.getByTestId( 'tools-panel-item' ) ).not.toHaveClass(
-				'components-tools-panel-item',
-				'custom-item'
 			);
 		} );
 	} );

@@ -74,6 +74,12 @@ describe( 'ItemGroup', () => {
 		expect( screen.getByTestId( 'group' ) ).toHaveTextContent(
 			'Code is poetry'
 		);
+		expect( screen.getByTestId( 'group' ) ).toHaveClass(
+			'components-item-group'
+		);
+		expect( screen.getByText( 'Code is poetry' ) ).toHaveClass(
+			'components-item'
+		);
 	} );
 
 	it( 'shows borders when isBordered is true', () => {
