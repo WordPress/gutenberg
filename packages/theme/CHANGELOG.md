@@ -23,6 +23,7 @@
 ### Internal
 
 -   Update type-checking for script files to enforce NodeNext module resolution ([#82622](https://github.com/WordPress/gutenberg/pull/82622)).
+-   Remove `esbuild-esm-loader` dependency in favor of Node.js TypeScript native type-stripping ([#82680](https://github.com/WordPress/gutenberg/pull/82680)).
 -   Migrate design token modes to the DTCG resolver and Terrazzo CSS permutations. ([#82537](https://github.com/WordPress/gutenberg/pull/82537))
 -   Generate the default ramps before derived token artifacts so one build uses the current ramp algorithm throughout. ([#82525](https://github.com/WordPress/gutenberg/pull/82525))
 -   Cache relative luminance calculations used by color-ramp contrast checks. ([#82445](https://github.com/WordPress/gutenberg/pull/82445))
