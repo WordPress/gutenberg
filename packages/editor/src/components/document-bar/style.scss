@@ -54,13 +54,6 @@
 	margin: 0 auto;
 	max-width: 70%;
 
-	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
-	.editor-document-bar.has-shortcut & {
-		@include break-medium() {
-			padding-left: $grid-unit-30;
-		}
-	}
-
 	h1 {
 		display: flex;
 		align-items: center;
@@ -85,16 +78,6 @@
 
 	@media screen and (max-width: #{ ($break-small) }) {
 		display: none;
-	}
-}
-
-.editor-document-bar__shortcut {
-	color: $gray-800;
-	min-width: $grid-unit-30;
-	display: none;
-
-	@include break-medium() {
-		display: initial;
 	}
 }
 

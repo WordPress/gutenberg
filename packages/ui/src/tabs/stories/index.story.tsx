@@ -24,7 +24,11 @@ export default meta;
 
 const ThemedParagraph = ( { children }: { children: React.ReactNode } ) => {
 	return (
-		<p style={ { color: 'var( --wpds-color-fg-content-neutral )' } }>
+		<p
+			style={ {
+				color: 'var( --wpds-color-foreground-content-neutral )',
+			} }
+		>
 			{ children }
 		</p>
 	);
@@ -33,48 +37,44 @@ const ThemedParagraph = ( { children }: { children: React.ReactNode } ) => {
 export const Default: StoryObj< typeof Tabs.Root > = {
 	args: {
 		defaultValue: 'tab1',
-		children: (
-			<>
-				<Tabs.List>
-					<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
-					<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
-					<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
-				</Tabs.List>
-				<Tabs.Panel value="tab1">
-					<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
-				</Tabs.Panel>
-				<Tabs.Panel value="tab2">
-					<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
-				</Tabs.Panel>
-				<Tabs.Panel value="tab3">
-					<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
-				</Tabs.Panel>
-			</>
-		),
+		children: [
+			<Tabs.List key="list">
+				<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
+				<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
+				<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
+			</Tabs.List>,
+			<Tabs.Panel value="tab1" key="panel-tab1">
+				<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
+			</Tabs.Panel>,
+			<Tabs.Panel value="tab2" key="panel-tab2">
+				<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
+			</Tabs.Panel>,
+			<Tabs.Panel value="tab3" key="panel-tab3">
+				<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
+			</Tabs.Panel>,
+		],
 	},
 };
 
 export const Minimal: StoryObj< typeof Tabs.Root > = {
 	args: {
 		...Default.args,
-		children: (
-			<>
-				<Tabs.List variant="minimal">
-					<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
-					<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
-					<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
-				</Tabs.List>
-				<Tabs.Panel value="tab1">
-					<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
-				</Tabs.Panel>
-				<Tabs.Panel value="tab2">
-					<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
-				</Tabs.Panel>
-				<Tabs.Panel value="tab3">
-					<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
-				</Tabs.Panel>
-			</>
-		),
+		children: [
+			<Tabs.List variant="minimal" key="list">
+				<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
+				<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
+				<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
+			</Tabs.List>,
+			<Tabs.Panel value="tab1" key="panel-tab1">
+				<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
+			</Tabs.Panel>,
+			<Tabs.Panel value="tab2" key="panel-tab2">
+				<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
+			</Tabs.Panel>,
+			<Tabs.Panel value="tab3" key="panel-tab3">
+				<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
+			</Tabs.Panel>,
+		],
 	},
 };
 
@@ -87,7 +87,7 @@ export const SizeAndOverflowPlayground: StoryObj< typeof Tabs.Root > = {
 					style={ {
 						maxWidth: '40rem',
 						marginBottom: '1rem',
-						color: 'var( --wpds-color-fg-content-neutral )',
+						color: 'var( --wpds-color-foreground-content-neutral )',
 					} }
 				>
 					<p>
@@ -214,26 +214,24 @@ export const WithDisabledTab: StoryObj< typeof Tabs.Root > = {
 	args: {
 		...Default.args,
 		defaultValue: 'tab3',
-		children: (
-			<>
-				<Tabs.List>
-					<Tabs.Tab value="tab1" disabled>
-						Tab 1
-					</Tabs.Tab>
-					<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
-					<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
-				</Tabs.List>
-				<Tabs.Panel value="tab1">
-					<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
-				</Tabs.Panel>
-				<Tabs.Panel value="tab2">
-					<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
-				</Tabs.Panel>
-				<Tabs.Panel value="tab3">
-					<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
-				</Tabs.Panel>
-			</>
-		),
+		children: [
+			<Tabs.List key="list">
+				<Tabs.Tab value="tab1" disabled>
+					Tab 1
+				</Tabs.Tab>
+				<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
+				<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
+			</Tabs.List>,
+			<Tabs.Panel value="tab1" key="panel-tab1">
+				<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
+			</Tabs.Panel>,
+			<Tabs.Panel value="tab2" key="panel-tab2">
+				<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
+			</Tabs.Panel>,
+			<Tabs.Panel value="tab3" key="panel-tab3">
+				<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
+			</Tabs.Panel>,
+		],
 	},
 };
 
@@ -270,109 +268,96 @@ const tabWithIconsData = [
 export const WithTabIconsAndTooltips: StoryObj< typeof Tabs.Root > = {
 	args: {
 		...Default.args,
-		children: (
-			<>
-				<Tabs.List>
-					{ tabWithIconsData.map(
-						( { value, label, icon: Icon } ) => (
-							<Tooltip.Root key={ value }>
-								<Tooltip.Trigger
-									aria-label={ label }
-									render={ <Tabs.Tab value={ value } /> }
-								>
-									{ /* TODO: potentially refactor with new Icon component */ }
-									<Icon
-										style={ {
-											width: '20px',
-											height: '20px',
-										} }
-									/>
-								</Tooltip.Trigger>
-								<Tooltip.Popup
-									positioner={
-										<Tooltip.Positioner
-											align="center"
-											side="top"
-										/>
-									}
-								>
-									{ label }
-								</Tooltip.Popup>
-							</Tooltip.Root>
-						)
-					) }
-				</Tabs.List>
-				{ tabWithIconsData.map( ( { value, label } ) => (
-					<Tabs.Panel value={ value } key={ value }>
-						<ThemedParagraph>
-							Selected tab: { label }
-						</ThemedParagraph>
-					</Tabs.Panel>
+		children: [
+			<Tabs.List key="list">
+				{ tabWithIconsData.map( ( { value, label, icon: Icon } ) => (
+					<Tooltip.Root key={ value }>
+						<Tooltip.Trigger
+							aria-label={ label }
+							render={ <Tabs.Tab value={ value } /> }
+						>
+							{ /* TODO: potentially refactor with new Icon component */ }
+							<Icon
+								style={ {
+									width: '20px',
+									height: '20px',
+								} }
+							/>
+						</Tooltip.Trigger>
+						<Tooltip.Popup
+							positioner={
+								<Tooltip.Positioner align="center" side="top" />
+							}
+						>
+							{ label }
+						</Tooltip.Popup>
+					</Tooltip.Root>
 				) ) }
-			</>
-		),
+			</Tabs.List>,
+			tabWithIconsData.map( ( { value, label } ) => (
+				<Tabs.Panel value={ value } key={ value }>
+					<ThemedParagraph>Selected tab: { label }</ThemedParagraph>
+				</Tabs.Panel>
+			) ),
+		],
 	},
 };
 
 export const WithPanelsAlwaysMounted: StoryObj< typeof Tabs.Root > = {
 	args: {
 		...Default.args,
-		children: (
-			<>
-				<Tabs.List>
-					<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
-					<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
-					<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
-				</Tabs.List>
-				<Tabs.Panel value="tab1" keepMounted>
-					<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
-				</Tabs.Panel>
-				<Tabs.Panel value="tab2" keepMounted>
-					<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
-				</Tabs.Panel>
-				<Tabs.Panel value="tab3" keepMounted>
-					<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
-				</Tabs.Panel>
-			</>
-		),
+		children: [
+			<Tabs.List key="list">
+				<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
+				<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
+				<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
+			</Tabs.List>,
+			<Tabs.Panel value="tab1" keepMounted key="panel-tab1">
+				<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
+			</Tabs.Panel>,
+			<Tabs.Panel value="tab2" keepMounted key="panel-tab2">
+				<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
+			</Tabs.Panel>,
+			<Tabs.Panel value="tab3" keepMounted key="panel-tab3">
+				<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
+			</Tabs.Panel>,
+		],
 	},
 };
 
 export const WithNonFocusablePanels: StoryObj< typeof Tabs.Root > = {
 	args: {
 		...Default.args,
-		children: (
-			<>
-				<Tabs.List>
-					<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
-					<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
-					<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
-				</Tabs.List>
-				<Tabs.Panel value="tab1" tabIndex={ -1 }>
-					<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
-					<ThemedParagraph>
-						This tabpanel is not focusable, therefore tabbing into
-						it will focus its first tabbable child.
-					</ThemedParagraph>
-					<button>Focus me</button>
-				</Tabs.Panel>
-				<Tabs.Panel value="tab2" tabIndex={ -1 }>
-					<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
-					<ThemedParagraph>
-						This tabpanel is not focusable, therefore tabbing into
-						it will focus its first tabbable child.
-					</ThemedParagraph>
-					<button>Focus me</button>
-				</Tabs.Panel>
-				<Tabs.Panel value="tab3" tabIndex={ -1 }>
-					<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
-					<ThemedParagraph>
-						This tabpanel is not focusable, therefore tabbing into
-						it will focus its first tabbable child.
-					</ThemedParagraph>
-					<button>Focus me</button>
-				</Tabs.Panel>
-			</>
-		),
+		children: [
+			<Tabs.List key="list">
+				<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
+				<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
+				<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
+			</Tabs.List>,
+			<Tabs.Panel value="tab1" tabIndex={ -1 } key="panel-tab1">
+				<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
+				<ThemedParagraph>
+					This tabpanel is not focusable, therefore tabbing into it
+					will focus its first tabbable child.
+				</ThemedParagraph>
+				<button>Focus me</button>
+			</Tabs.Panel>,
+			<Tabs.Panel value="tab2" tabIndex={ -1 } key="panel-tab2">
+				<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
+				<ThemedParagraph>
+					This tabpanel is not focusable, therefore tabbing into it
+					will focus its first tabbable child.
+				</ThemedParagraph>
+				<button>Focus me</button>
+			</Tabs.Panel>,
+			<Tabs.Panel value="tab3" tabIndex={ -1 } key="panel-tab3">
+				<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
+				<ThemedParagraph>
+					This tabpanel is not focusable, therefore tabbing into it
+					will focus its first tabbable child.
+				</ThemedParagraph>
+				<button>Focus me</button>
+			</Tabs.Panel>,
+		],
 	},
 };

@@ -1,9 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId } from '@wordpress/element';
+import { Button } from '../../../../button';
+import { Stack } from '../../../../stack';
 import * as Field from '../';
 import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Field.Root > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Field',
 	component: Field.Root,
 	subcomponents: {
@@ -12,12 +15,12 @@ const meta: Meta< typeof Field.Root > = {
 		'Field.Control': Field.Control,
 		'Field.Description': Field.Description,
 		'Field.Details': Field.Details,
+		'Field.VisualLabel': Field.VisualLabel,
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -30,17 +33,17 @@ export default meta;
  */
 export const Default: StoryObj< typeof Field.Root > = {
 	args: {
-		children: (
-			<>
-				<Field.Label>Label</Field.Label>
-				<Field.Control
-					render={ <input type="text" placeholder="Placeholder" /> }
-				/>
-				<Field.Description>
-					The accessible description.
-				</Field.Description>
-			</>
-		),
+		children: [
+			<Field.Label key="label">Label</Field.Label>,
+			<Field.Control
+				render={ <input type="text" placeholder="Placeholder" /> }
+				key="control"
+			/>,
+
+			<Field.Description key="description">
+				The accessible description.
+			</Field.Description>,
+		],
 	},
 };
 
@@ -72,6 +75,7 @@ export const UsingHtmlFor: StoryObj< typeof Field.Root > = {
 					id={ controlId }
 					aria-describedby={ descriptionId }
 				/>
+
 				<Field.Description id={ descriptionId }>
 					The accessible description.
 				</Field.Description>
@@ -114,14 +118,15 @@ export const UsingAriaLabelledby: StoryObj< typeof Field.Root > = {
  */
 export const HiddenLabel: StoryObj< typeof Field.Root > = {
 	args: {
-		children: (
-			<>
-				<Field.Label hideFromVision>Label</Field.Label>
-				<Field.Control
-					render={ <input type="text" placeholder="Placeholder" /> }
-				/>
-			</>
-		),
+		children: [
+			<Field.Label hideFromVision key="label">
+				Label
+			</Field.Label>,
+			<Field.Control
+				render={ <input type="text" placeholder="Placeholder" /> }
+				key="control"
+			/>,
+		],
 	},
 };
 
@@ -137,14 +142,29 @@ export const HiddenLabel: StoryObj< typeof Field.Root > = {
  */
 export const WithDetails: StoryObj< typeof Field.Root > = {
 	args: {
-		children: (
-			<>
-				<Field.Label>Label</Field.Label>
-				<Field.Control
-					render={ <input type="text" placeholder="Placeholder" /> }
-				/>
-				<Field.Details>{ DETAILS_EXAMPLE }</Field.Details>
-			</>
-		),
+		children: [
+			<Field.Label key="label">Label</Field.Label>,
+			<Field.Control
+				render={ <input type="text" placeholder="Placeholder" /> }
+				key="control"
+			/>,
+
+			<Field.Details key="details">{ DETAILS_EXAMPLE }</Field.Details>,
+		],
 	},
+};
+
+/**
+ * `Field.VisualLabel` renders a purely visual label with the same styling as
+ * `Field.Label`. It can be used outside `Field.Root` when the control is
+ * already accessibly labeled, but a visual label is still needed for layout
+ * consistency.
+ */
+export const WithVisualLabel: StoryObj = {
+	render: () => (
+		<Stack direction="column" gap="sm" align="flex-start">
+			<Field.VisualLabel>Author</Field.VisualLabel>
+			<Button variant="outline">Select an author</Button>
+		</Stack>
+	),
 };

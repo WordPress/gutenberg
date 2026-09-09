@@ -49,7 +49,7 @@
 	 * the triangle widths. The unused sides default to
 	 * `border-style: none` and render as 0 regardless of width.
 	 */
-	border-block-end: 12px solid var(--wpds-color-fg-interactive-brand);
+	border-block-end: 12px solid var(--wpds-color-foreground-interactive-brand);
 	border-inline-start: 12px solid transparent;
 }
 
@@ -78,7 +78,7 @@
 	width: 4px;
 	height: 24px;
 	border-radius: 2px;
-	background-color: var(--wpds-color-fg-interactive-brand);
+	background-color: var(--wpds-color-foreground-interactive-brand);
 }
 
 @media (forced-colors: active) {

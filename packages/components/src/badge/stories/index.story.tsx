@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import Badge from '..';
 
 const meta: Meta< typeof Badge > = {
@@ -17,7 +10,7 @@ const meta: Meta< typeof Badge > = {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `Badge` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`Badge`](?path=/docs/design-system-components-badge--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };

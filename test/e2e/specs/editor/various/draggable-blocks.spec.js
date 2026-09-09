@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -110,9 +107,13 @@ test.describe( 'Draggable block', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
+		// Select the first paragraph by clicking it. Focusing it
+		// programmatically does not move focus while the second, editable
+		// root paragraph is selected and its wrapper holds focus (a nested
+		// editable element cannot take focus from an editing host ancestor).
 		await editor.canvas
 			.locator( 'role=document[name="Block: Paragraph"i] >> text=1' )
-			.focus();
+			.click();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(

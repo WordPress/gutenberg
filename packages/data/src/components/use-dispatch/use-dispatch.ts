@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import useRegistry from '../registry-provider/use-registry';
 import type {
 	StoreDescriptor,

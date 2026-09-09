@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import FontSizePicker from '../';
 
 const meta: Meta< typeof FontSizePicker > = {
@@ -48,7 +37,6 @@ const FontSizePickerWithState = ( {
 	const [ fontSize, setFontSize ] = useState( value );
 	return (
 		<FontSizePicker
-			__next40pxDefaultSize
 			{ ...props }
 			value={ fontSize }
 			onChange={ ( nextValue ) => {
@@ -80,7 +68,6 @@ const TwoFontSizePickersWithState = ( {
 export const Default: FontSizePickerStory = {
 	render: FontSizePickerWithState,
 	args: {
-		__next40pxDefaultSize: true,
 		disableCustomFontSizes: false,
 		fontSizes: [
 			{

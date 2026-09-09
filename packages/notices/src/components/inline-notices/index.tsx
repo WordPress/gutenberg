@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { NoticeList } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as noticesStore } from '../../store';
 
 type InlineNoticesProps = {

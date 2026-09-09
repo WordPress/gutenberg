@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const { getArgFromCLI, hasArgInCLI } = require( '../utils' );
 const {
 	checkDeps,

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import cleanNodeList from './clean-node-list';
 
 /**

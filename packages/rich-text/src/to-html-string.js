@@ -1,17 +1,8 @@
-/**
- * WordPress dependencies
- */
-
 import {
 	escapeEditableHTML,
 	escapeAttribute,
 	isValidAttributeName,
 } from '@wordpress/escape-html';
-
-/**
- * Internal dependencies
- */
-
 import { toTree } from './to-tree';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */

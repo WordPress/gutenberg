@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { ComponentPropsWithoutRef } from 'react';
 
 export interface FocusableIframeProps

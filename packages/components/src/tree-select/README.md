@@ -15,7 +15,6 @@ const MyTreeSelect = () => {
 
 	return (
 		<TreeSelect
-			__next40pxDefaultSize
 			label="Parent page"
 			noOptionLabel="No parent page"
 			onChange={ ( newPage ) => setPage( newPage ) }
@@ -52,14 +51,6 @@ const MyTreeSelect = () => {
 ```
 
 ## Props
-
-### `__next40pxDefaultSize`
-
- - Type: `boolean`
- - Required: No
- - Default: `false`
-
-Start opting into the larger default height that will become the default size in a future version.
 
 ### `children`
 
@@ -163,7 +154,7 @@ The id of the currently selected node.
 
 ### `size`
 
- - Type: `"default" | "small" | "compact" | "__unstable-large"`
+ - Type: `"default" | "small" | "compact"`
  - Required: No
  - Default: `'default'`
 

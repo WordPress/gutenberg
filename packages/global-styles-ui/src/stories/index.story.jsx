@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesUI as GlobalStylesUIComponent } from '../global-styles-ui';
 
 export default { title: 'GlobalStylesUI/GlobalStylesUI' };
@@ -272,6 +265,18 @@ const BASE_SETTINGS = {
 						shadow: '6px 6px 0px rgba(0, 0, 0, 1)',
 					},
 				],
+				theme: [
+					{
+						name: 'Soft',
+						slug: 'soft',
+						shadow: '4px 4px 8px rgba(0, 0, 0, 0.15)',
+					},
+					{
+						name: 'Hard',
+						slug: 'hard',
+						shadow: '8px 8px 0px rgba(0, 0, 0, 0.35)',
+					},
+				],
 			},
 		},
 		layout: {
@@ -352,6 +357,18 @@ const BASE_SETTINGS = {
 						size: '42px',
 					},
 				],
+				theme: [
+					{
+						name: 'Body',
+						slug: 'body',
+						size: '18px',
+					},
+					{
+						name: 'Heading',
+						slug: 'heading',
+						size: '48px',
+					},
+				],
 			},
 			fontStyle: true,
 			fontWeight: true,
@@ -366,7 +383,7 @@ const BASE_SETTINGS = {
 				theme: [
 					{
 						fontFamily:
-							'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
+							'-apple-system,system-ui,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
 						name: 'System Font',
 						slug: 'system-font',
 					},

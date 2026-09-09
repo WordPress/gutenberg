@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
 
 const ALIGNMENTS = {

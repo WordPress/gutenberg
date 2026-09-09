@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useContext, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useCropper from './use-image-cropper';
 import type { ImageCropperContextValue } from '../types';
 import { MIN_ZOOM } from '../constants';

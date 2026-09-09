@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/e2e-test-utils-playwright",
-	"version": "1.48.0",
+	"version": "1.54.0",
 	"description": "End-To-End (E2E) test utils for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -45,11 +45,11 @@
 	},
 	"devDependencies": {
 		"@types/mime": "^2.0.3",
-		"@types/node": "^20.19.39"
+		"@types/node": "^24.13.3"
 	},
 	"peerDependencies": {
 		"@playwright/test": ">=1",
-		"@types/node": "^20.17.10"
+		"@types/node": ">=20"
 	},
 	"publishConfig": {
 		"access": "public"

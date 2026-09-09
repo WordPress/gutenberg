@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, getElement, withSyncEvent } from '@wordpress/interactivity';
 
 const { state } = store( 'test/router-styles', {

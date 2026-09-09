@@ -8,21 +8,9 @@
  * on Windows Control will usually come first. So don't provide your own
  * shortcut combos directly to keyboardShortcut().
  */
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { isAppleOS } from './platform';
-
-/**
- * External dependencies
- */
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { isAppleOS } from './platform';
 
 export type WPModifierPart =
 	| typeof ALT
@@ -163,6 +151,7 @@ export const SHIFT = 'shift';
 export const ZERO = 48;
 
 export { isAppleOS };
+export { withIgnoreIMEEvents } from './with-ignore-ime-events';
 
 /**
  * Capitalise the first character of a string.

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
@@ -56,9 +49,15 @@ export function preventFocusCapture() {
 			'pointerup',
 			onPointerUp
 		);
+		const unsubscribePointerCancel = subscribeDelegatedListener(
+			defaultView,
+			'pointercancel',
+			onPointerUp
+		);
 		return () => {
 			unsubscribePointerDown();
 			unsubscribePointerUp();
+			unsubscribePointerCancel();
 		};
 	};
 }

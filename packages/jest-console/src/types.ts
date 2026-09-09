@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { Mock } from 'jest-mock';
 
 /**

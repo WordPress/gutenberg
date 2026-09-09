@@ -34,7 +34,7 @@ The fallback occurs when any of the following conditions are detected:
 
 WASM-based image optimization requires `SharedArrayBuffer` support, which in turn requires [cross-origin isolation](https://web.dev/articles/cross-origin-isolation-guide).
 
-This is achieved using the [`Document-Isolation-Policy`](https://github.com/nicolo-ribaudo/tc39-proposal-structs/blob/main/test262-filtering/isolation-explainer.md) header, which provides per-document cross-origin isolation without affecting other iframes on the page. This avoids the breakage that the older `Cross-Origin-Embedder-Policy` / `Cross-Origin-Opener-Policy` headers caused for third-party plugins and embeds.
+This is achieved using the [`Document-Isolation-Policy`](https://github.com/WICG/document-isolation-policy) header, which provides per-document cross-origin isolation without affecting other iframes on the page. This avoids the breakage that the older `Cross-Origin-Embedder-Policy` / `Cross-Origin-Opener-Policy` headers caused for third-party plugins and embeds.
 
 Once the page is served with this header, `SharedArrayBuffer` will be available in the browser, and WASM-based image optimization will work as expected. All embedded resources (e.g., images, scripts) are served with `crossorigin="anonymous"` to ensure cross-origin isolation is maintained.
 

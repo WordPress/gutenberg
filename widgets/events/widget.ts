@@ -1,31 +1,16 @@
-/**
- * WordPress dependencies
- */
-import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-import { calendar } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import {
-	LocationSettingControl,
-	type EventsWidgetAttributes,
-} from './components/location-setting-control';
+import type { WidgetAttributeField } from '@wordpress/widget-primitives';
+import type { EventsWidgetAttributes } from './types';
 
 export default {
 	name: 'core/events',
-	title: __( 'WordPress events' ),
-	icon: calendar,
 	attributes: [
 		{
 			id: 'location',
-			type: 'text',
+			type: 'location',
 			label: __( 'Event location' ),
-			description: __(
-				'City or region for nearby events. Edits apply when you save this panel.'
-			),
-			Edit: LocationSettingControl,
+			description: __( 'City or region for nearby events.' ),
+			relevance: 'high',
 		},
-	] satisfies Field< EventsWidgetAttributes >[],
+	] satisfies WidgetAttributeField< EventsWidgetAttributes >[],
 };

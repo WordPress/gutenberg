@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import type { Attachment, Updatable } from '@wordpress/core-data';
 import type { Field } from '@wordpress/dataviews';

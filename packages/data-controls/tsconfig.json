@@ -5,8 +5,8 @@
 		"types": [ "gutenberg-env" ]
 	},
 	"references": [
-		{ "path": "../api-fetch" },
+		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../deprecated" }
+		{ "path": "../deprecated/tsconfig.build.json" }
 	]
 }
