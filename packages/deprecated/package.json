@@ -46,9 +46,7 @@
 		"@wordpress/hooks": "file:../hooks"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0",
-		"@wordpress/jest-console": "file:../jest-console",
-		"vitest": "^4.1.10"
+		"vitest": "^4.1.11"
 	},
 	"publishConfig": {
 		"access": "public"

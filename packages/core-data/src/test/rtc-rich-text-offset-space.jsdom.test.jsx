@@ -1,12 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, waitFor } from '@testing-library/react';
-import {
-	afterEach,
-	beforeEach,
-	describe,
-	expect,
-	it,
-	jest,
-} from '@jest/globals';
 import {
 	getBlockTypes,
 	registerBlockType,
@@ -15,21 +8,21 @@ import {
 import { RichText } from '@wordpress/block-editor';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
-/**
- * Mock sync manager accessor.
- */
-jest.mock( '../sync', () => ( {
-	...jest.requireActual( '../sync' ),
-	getSyncManager: jest.fn(),
-	LOCAL_EDITOR_ORIGIN: 'local-editor',
-} ) );
 import { store as coreDataStore } from '../index';
 import { CRDT_RECORD_MAP_KEY, getSyncManager } from '../sync';
 import useEntityBlockEditor from '../hooks/use-entity-block-editor';
 import { applyPostChangesToCRDTDoc } from '../utils/crdt';
 import { getRootMap } from '../utils/crdt-utils';
+/**
+ * Mock sync manager accessor.
+ */
+vi.mock( import( '../sync' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	getSyncManager: vi.fn(),
+	LOCAL_EDITOR_ORIGIN: 'local-editor',
+} ) );
 
-const mockGetSyncManager = jest.mocked( getSyncManager );
+const mockGetSyncManager = vi.mocked( getSyncManager );
 
 const postTypeConfig = {
 	kind: 'postType',
@@ -115,7 +108,7 @@ describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
 		} );
 
 		mockGetSyncManager.mockReturnValue( {
-			update: jest.fn( ( _objectType, _objectId, changes ) => {
+			update: vi.fn( ( _objectType, _objectId, changes ) => {
 				applyPostChangesToCRDTDoc(
 					crdtDoc,
 					changes,

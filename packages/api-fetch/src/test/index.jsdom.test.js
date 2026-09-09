@@ -1,3 +1,5 @@
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+
 /**
  * Mock response value for a successful fetch.
  *
@@ -16,10 +18,10 @@ describe( 'apiFetch', () => {
 	beforeEach( async () => {
 		// Reset the `apiFetch` module before each test to clear
 		// internal variables (middlewares, fetch handler, etc.).
-		jest.resetModules();
+		vi.resetModules();
 		apiFetch = ( await import( '../' ) ).default;
 
-		globalThis.fetch = jest.fn();
+		globalThis.fetch = vi.fn();
 	} );
 
 	afterAll( () => {
@@ -346,7 +348,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should not use the default fetch handler when using a custom fetch handler', async () => {
-		const customFetchHandler = jest.fn();
+		const customFetchHandler = vi.fn();
 
 		apiFetch.setFetchHandler( customFetchHandler );
 
@@ -372,8 +374,68 @@ describe( 'apiFetch', () => {
 		} );
 
 		// Set a custom fetch handler to avoid using the default fetch handler.
-		apiFetch.setFetchHandler( jest.fn() );
+		apiFetch.setFetchHandler( vi.fn() );
 
 		await apiFetch( expectedOptions );
+	} );
+
+	describe( 'unregister', () => {
+		it( 'should stop calling a middleware once it is unregistered', async () => {
+			const middleware = vi.fn( ( options, next ) => next( options ) );
+			const fetchHandler = vi
+				.fn()
+				.mockResolvedValue( DEFAULT_FETCH_MOCK_RETURN );
+			apiFetch.setFetchHandler( fetchHandler );
+
+			apiFetch.use( middleware );
+
+			await apiFetch( { path: '/random' } );
+			expect( middleware ).toHaveBeenCalledTimes( 1 );
+
+			apiFetch.unregister( middleware );
+
+			await apiFetch( { path: '/random' } );
+			expect( middleware ).toHaveBeenCalledTimes( 1 );
+			expect( fetchHandler ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'should report whether the middleware was registered', () => {
+			const middleware = ( options, next ) => next( options );
+
+			expect( apiFetch.unregister( middleware ) ).toBe( false );
+
+			apiFetch.use( middleware );
+
+			expect( apiFetch.unregister( middleware ) ).toBe( true );
+			expect( apiFetch.unregister( middleware ) ).toBe( false );
+		} );
+
+		it( 'should stop overriding the method once httpV1Middleware is removed', async () => {
+			globalThis.fetch.mockResolvedValue( DEFAULT_FETCH_MOCK_RETURN );
+
+			await apiFetch( { path: '/random', method: 'DELETE' } );
+
+			expect( globalThis.fetch ).toHaveBeenCalledWith(
+				'/random?_locale=user',
+				expect.objectContaining( {
+					method: 'POST',
+					headers: expect.objectContaining( {
+						'X-HTTP-Method-Override': 'DELETE',
+					} ),
+				} )
+			);
+
+			expect( apiFetch.unregister( apiFetch.httpV1Middleware ) ).toBe(
+				true
+			);
+
+			await apiFetch( { path: '/random', method: 'DELETE' } );
+
+			const [ , options ] = globalThis.fetch.mock.lastCall;
+			expect( options.method ).toBe( 'DELETE' );
+			expect( options.headers ).not.toHaveProperty(
+				'X-HTTP-Method-Override'
+			);
+		} );
 	} );
 } );

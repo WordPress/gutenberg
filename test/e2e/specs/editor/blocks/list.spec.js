@@ -802,6 +802,104 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
+	test( 'should indent and outdent a list item when its content is fully selected', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'b' );
+
+		// Select the whole item and Tab to indent it.
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'Tab' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
+		// The item stays fully selected, so typing replaces its content.
+		await page.keyboard.type( 'c' );
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
+		// Select the whole item again and Shift+Tab to outdent it.
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'Shift+Tab' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+	} );
+
+	test( 'should indent with Space and outdent with Shift+Space at the start', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'b' );
+
+		// Move the caret to the start of the item and Space to indent it.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Space' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
+		// Shift+Space at the start outdents it back to the top level.
+		await page.keyboard.press( 'Shift+Space' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+	} );
+
 	test( 'should keep the list type when indenting an ordered list item', async ( {
 		editor,
 		page,
@@ -994,6 +1092,110 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
+	} );
+
+	test( 'should indent and outdent multi-selected items with Tab', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'three' );
+
+		// Select across the last two items.
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 3 } );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+
+		// Tab indents both items under the first, as a whole block selection.
+		await page.keyboard.press( 'Tab' );
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 2 );
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>one<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>three</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
+		// Shift+Tab outdents them back to the top level.
+		await page.keyboard.press( 'Shift+Tab' );
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 2 );
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>three</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+	} );
+
+	test( 'should keep a full selection when outdenting nested items with Shift+Tab', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// "a" with "b" and "c" nested beneath it.
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'b' );
+		await editor.clickBlockToolbarButton( 'Indent' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'c' );
+
+		// Select across "b" and "c".
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+
+		await page.keyboard.press( 'Shift+Tab' );
+
+		// The two items come back to the top level and stay selected as whole
+		// blocks, rather than leaving a hidden partial selection with nothing
+		// highlighted.
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+		await expect(
+			editor.canvas.locator(
+				'.is-multi-selected:not(.is-partially-selected)'
+			)
+		).toHaveCount( 2 );
 	} );
 
 	test( 'should insert a line break on shift+enter', async ( {

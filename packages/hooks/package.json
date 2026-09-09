@@ -43,7 +43,7 @@
 	"types": "build-types",
 	"devDependencies": {
 		"benchmark": "^2.1.4",
-		"vitest": "^4.1.10"
+		"vitest": "^4.1.11"
 	},
 	"publishConfig": {
 		"access": "public"

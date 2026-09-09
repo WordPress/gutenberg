@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the experimental Form, Input Field, Form Submit Button, and Form Submission Notification blocks, along with the "Form and input blocks" experiment that gated them.
+
 ### Enhancements
 
 -   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
@@ -18,6 +22,7 @@
 -   Query: Stop writing `excludeCurrent: null` into the `query` attribute of blocks that never had the key. The mount effect that clears a stale exclusion treated the absent key as stale, changing the serialized markup of every pre-existing Query block as soon as the editor opened it ([#82147](https://github.com/WordPress/gutenberg/pull/82147)).
 -   Icon: Preserve intrinsic SVG styles when applying block styles or rotation, and keep stroke widths scaling with the block's size for compatibility ([#78808](https://github.com/WordPress/gutenberg/pull/78808)).
 -   Image: Keep the selected image size, and re-point a media file or attachment page link, when an edit in the media editor saves to a new attachment. Cropping, rotating or flipping left the block rendering the full-size file while the size control still reported the size the user had chosen, and left the link pointing at the pre-edit image ([#82316](https://github.com/WordPress/gutenberg/pull/82316)).
+-   Query, Post Template: Treat a `query` attribute that omits `postType` as querying posts, matching `build_query_vars_from_query_block()` ([#82465](https://github.com/WordPress/gutenberg/pull/82465)).
 
 ### Internal
 
