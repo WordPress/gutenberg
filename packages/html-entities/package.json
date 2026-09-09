@@ -43,7 +43,7 @@
 	"wpScript": true,
 	"types": "build-types",
 	"devDependencies": {
-		"vitest": "^4.1.11"
+		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
