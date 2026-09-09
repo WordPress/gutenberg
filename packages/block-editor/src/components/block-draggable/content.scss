@@ -23,5 +23,5 @@
 // set. This is done so that the block can capture the drag event instead.
 .wp-block img:not([draggable]),
 .wp-block svg:not([draggable]) {
-	pointer-events: none;
+	-webkit-user-drag: none;
 }
