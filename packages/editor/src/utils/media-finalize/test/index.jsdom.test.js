@@ -1,8 +1,11 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import mediaFinalize from '..';
 import { receiveFinalizedAttachment } from '../../media-upload/finalized-attachments';
 
-jest.mock( '@wordpress/api-fetch', () => jest.fn() );
+vi.mock( import( '@wordpress/api-fetch' ), () => ( {
+	default: vi.fn(),
+} ) );
 
 jest.mock( '../../media-upload/finalized-attachments', () => ( {
 	receiveFinalizedAttachment: jest.fn(),
@@ -18,7 +21,7 @@ const mockRestAttachment = {
 
 describe( 'mediaFinalize', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'should call the finalize endpoint with the correct path, method, and sub_sizes', async () => {
