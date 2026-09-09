@@ -236,15 +236,6 @@ export const CustomLabels: Story = {
 	},
 };
 
-export const WithoutTooltip: Story = {
-	args: {
-		tone: 'neutral',
-		variant: 'outline',
-		hasTooltip: false,
-		children: <ClipboardButton.Label />,
-	},
-};
-
 const EXAMPLE_SHORTCUT_OBJECT = {
 	displayShortcut: displayShortcut.primary( 'c' ),
 	ariaKeyShortcut: ariaKeyShortcut.primary( 'c' ),
