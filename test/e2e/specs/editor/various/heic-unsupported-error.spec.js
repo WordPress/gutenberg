@@ -1,7 +1,30 @@
 /**
+ * External dependencies
+ */
+const fs = require( 'fs' );
+const path = require( 'path' );
+
+/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+/*
+ * A small, valid HEIC. Chromium cannot decode it: `createImageBitmap()`
+ * rejects it, `ImageDecoder` is not defined, and `VideoDecoder` reports no
+ * HEVC support. That is the same dead end a real photo reaches in a browser
+ * without platform HEVC codecs, such as Firefox.
+ */
+const heicFixture = fs.readFileSync(
+	path.join(
+		__dirname,
+		'..',
+		'..',
+		'..',
+		'assets',
+		'64x64_e2e_test_image.heic'
+	)
+);
 
 test.describe( 'HEIC upload error message', () => {
 	test.beforeEach( async ( { admin } ) => {
@@ -22,19 +45,12 @@ test.describe( 'HEIC upload error message', () => {
 			'role=document[name="Block: Image"i]'
 		);
 
-		/*
-		 * Bytes that are not a valid HEIC file, so every decoding strategy
-		 * fails: `createImageBitmap()` rejects it, `ImageDecoder` has no HEIC
-		 * support, and the container parser finds no HEVC bitstream to hand to
-		 * `VideoDecoder`. This is the same dead end a real HEIC file reaches in
-		 * a browser without platform HEVC codecs, such as Firefox.
-		 */
 		await imageBlock
 			.locator( 'data-testid=form-file-upload-input' )
 			.setInputFiles( {
 				name: 'IMG_1982.heic',
 				mimeType: 'image/heic',
-				buffer: Buffer.from( 'not a heic file' ),
+				buffer: heicFixture,
 			} );
 
 		/*
@@ -65,5 +81,40 @@ test.describe( 'HEIC upload error message', () => {
 
 		await dismissButton.click();
 		await expect( notice ).toBeHidden();
+	} );
+
+	test( 'blames the file, not the browser, when the HEIC is damaged', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+
+		/*
+		 * The same file cut short, the way a partial copy or download leaves
+		 * it: the container metadata is intact but the pixel data it points
+		 * at is missing. No browser can decode this, so the message must not
+		 * suggest switching to one that decodes HEIC.
+		 */
+		await imageBlock
+			.locator( 'data-testid=form-file-upload-input' )
+			.setInputFiles( {
+				name: 'IMG_1983.heic',
+				mimeType: 'image/heic',
+				buffer: heicFixture.subarray( 0, 500 ),
+			} );
+
+		const notice = page.locator( '.components-snackbar' ).filter( {
+			hasText: 'This HEIC image could not be converted',
+		} );
+		await expect( notice ).toBeVisible( { timeout: 30_000 } );
+		await expect( notice ).not.toContainText( "we couldn't convert" );
+
+		await expect(
+			imageBlock.getByRole( 'button', { name: 'Media Library' } )
+		).toBeVisible();
 	} );
 } );

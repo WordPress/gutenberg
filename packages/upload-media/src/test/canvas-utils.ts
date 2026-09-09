@@ -1,8 +1,29 @@
 /**
+ * External dependencies
+ */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+/**
  * Internal dependencies
  */
-import { canvasConvertToJpeg } from '../canvas-utils';
+import { canvasConvertToJpeg, HeicUnsupportedError } from '../canvas-utils';
 import { getHeicUnsupportedMessage } from '../heic-support';
+
+/*
+ * A small, valid HEIC. Every decoder is stubbed out below, so what the bytes
+ * decide is whether the container parses, which is how a damaged file is
+ * told apart from a browser without a codec.
+ */
+const validHeic = readFileSync(
+	join( __dirname, 'fixtures', 'exif-rotated-90cw.heic' )
+);
+
+function heicFile( bytes: Uint8Array ) {
+	return new File( [ new Uint8Array( bytes ) ], 'photo.heic', {
+		type: 'image/heic',
+	} );
+}
 
 describe( 'canvasConvertToJpeg', () => {
 	const originalCreateImageBitmap = global.createImageBitmap;
@@ -15,13 +36,13 @@ describe( 'canvasConvertToJpeg', () => {
 		if ( originalCreateImageBitmap ) {
 			global.createImageBitmap = originalCreateImageBitmap;
 		} else {
-			// @ts-ignore
+			// @ts-expect-error The operand of `delete` must be optional.
 			delete global.createImageBitmap;
 		}
 		if ( originalOffscreenCanvas ) {
 			global.OffscreenCanvas = originalOffscreenCanvas;
 		} else {
-			// @ts-ignore
+			// @ts-expect-error The operand of `delete` must be optional.
 			delete global.OffscreenCanvas;
 		}
 		if ( originalImageDecoder ) {
@@ -34,6 +55,7 @@ describe( 'canvasConvertToJpeg', () => {
 		} else {
 			delete ( global as any ).VideoDecoder;
 		}
+		delete ( global as any ).EncodedVideoChunk;
 	} );
 
 	describe( 'Strategy 1: createImageBitmap + OffscreenCanvas', () => {
@@ -55,10 +77,14 @@ describe( 'canvasConvertToJpeg', () => {
 			global.createImageBitmap = jest
 				.fn()
 				.mockResolvedValue( mockBitmap );
-			global.OffscreenCanvas = jest.fn().mockImplementation( () => ( {
-				getContext: jest.fn().mockReturnValue( mockCtx ),
-				convertToBlob: jest.fn().mockResolvedValue( jpegBlob ),
-			} ) );
+			global.OffscreenCanvas = jest
+				.fn()
+				.mockImplementation( function OffscreenCanvas() {
+					return {
+						getContext: jest.fn().mockReturnValue( mockCtx ),
+						convertToBlob: jest.fn().mockResolvedValue( jpegBlob ),
+					};
+				} );
 
 			const file = new File( [ 'heic-data' ], 'photo.heic', {
 				type: 'image/heic',
@@ -83,12 +109,16 @@ describe( 'canvasConvertToJpeg', () => {
 			global.createImageBitmap = jest
 				.fn()
 				.mockResolvedValue( mockBitmap );
-			global.OffscreenCanvas = jest.fn().mockImplementation( () => ( {
-				getContext: jest
-					.fn()
-					.mockReturnValue( { drawImage: jest.fn() } ),
-				convertToBlob: mockConvertToBlob,
-			} ) );
+			global.OffscreenCanvas = jest
+				.fn()
+				.mockImplementation( function OffscreenCanvas() {
+					return {
+						getContext: jest
+							.fn()
+							.mockReturnValue( { drawImage: jest.fn() } ),
+						convertToBlob: mockConvertToBlob,
+					};
+				} );
 
 			const file = new File( [ 'data' ], 'photo.heic', {
 				type: 'image/heic',
@@ -110,12 +140,16 @@ describe( 'canvasConvertToJpeg', () => {
 			global.createImageBitmap = jest
 				.fn()
 				.mockResolvedValue( mockBitmap );
-			global.OffscreenCanvas = jest.fn().mockImplementation( () => ( {
-				getContext: jest
-					.fn()
-					.mockReturnValue( { drawImage: jest.fn() } ),
-				convertToBlob: jest.fn().mockResolvedValue( jpegBlob ),
-			} ) );
+			global.OffscreenCanvas = jest
+				.fn()
+				.mockImplementation( function OffscreenCanvas() {
+					return {
+						getContext: jest
+							.fn()
+							.mockReturnValue( { drawImage: jest.fn() } ),
+						convertToBlob: jest.fn().mockResolvedValue( jpegBlob ),
+					};
+				} );
 
 			const file = new File( [ 'data' ], 'my-photo.HEIC', {
 				type: 'image/heic',
@@ -130,22 +164,22 @@ describe( 'canvasConvertToJpeg', () => {
 			global.createImageBitmap = jest
 				.fn()
 				.mockResolvedValue( mockBitmap );
-			global.OffscreenCanvas = jest.fn().mockImplementation( () => ( {
-				getContext: jest.fn().mockReturnValue( null ),
-				convertToBlob: jest.fn(),
-			} ) );
+			global.OffscreenCanvas = jest
+				.fn()
+				.mockImplementation( function OffscreenCanvas() {
+					return {
+						getContext: jest.fn().mockReturnValue( null ),
+						convertToBlob: jest.fn(),
+					};
+				} );
 
 			// Remove other decoders so it falls through to the final error.
 			delete ( global as any ).ImageDecoder;
 			delete ( global as any ).VideoDecoder;
 
-			const file = new File( [ 'data' ], 'photo.heic', {
-				type: 'image/heic',
-			} );
-
-			await expect( canvasConvertToJpeg( file ) ).rejects.toThrow(
-				getHeicUnsupportedMessage()
-			);
+			await expect(
+				canvasConvertToJpeg( heicFile( validHeic ) )
+			).rejects.toThrow( getHeicUnsupportedMessage() );
 			expect( mockBitmap.close ).toHaveBeenCalled();
 		} );
 	} );
@@ -160,12 +194,130 @@ describe( 'canvasConvertToJpeg', () => {
 			delete ( global as any ).ImageDecoder;
 			delete ( global as any ).VideoDecoder;
 
+			await expect(
+				canvasConvertToJpeg( heicFile( validHeic ) )
+			).rejects.toThrow( HeicUnsupportedError );
+		} );
+
+		it( 'should not blame the codec for bytes that are not a HEIC', async () => {
+			global.createImageBitmap = jest
+				.fn()
+				.mockRejectedValue( new Error( 'Unsupported format' ) );
+			delete ( global as any ).ImageDecoder;
+			delete ( global as any ).VideoDecoder;
+
+			const error = await canvasConvertToJpeg(
+				heicFile( new TextEncoder().encode( 'not a heic file' ) )
+			).catch( ( e ) => e );
+
+			expect( error ).toBeInstanceOf( Error );
+			expect( error ).not.toBeInstanceOf( HeicUnsupportedError );
+			expect( error.cause ).toBeInstanceOf( Error );
+		} );
+
+		it( 'should not blame the codec for a HEIC cut short of its pixel data', async () => {
+			global.createImageBitmap = jest
+				.fn()
+				.mockRejectedValue( new Error( 'Unsupported format' ) );
+			delete ( global as any ).ImageDecoder;
+			delete ( global as any ).VideoDecoder;
+
+			// Metadata intact, `mdat` missing: what a partial copy looks like.
+			const error = await canvasConvertToJpeg(
+				heicFile( validHeic.subarray( 0, 500 ) )
+			).catch( ( e ) => e );
+
+			expect( error ).not.toBeInstanceOf( HeicUnsupportedError );
+			expect( error.cause.message ).toContain(
+				'past the end of the file'
+			);
+		} );
+
+		it( 'should not report a failed HEVC decode as unsupported', async () => {
+			global.createImageBitmap = jest
+				.fn()
+				.mockRejectedValue( new Error( 'Unsupported format' ) );
+			delete ( global as any ).ImageDecoder;
+
+			global.OffscreenCanvas = jest
+				.fn()
+				.mockImplementation( function OffscreenCanvas() {
+					return {
+						getContext: jest
+							.fn()
+							.mockReturnValue( { drawImage: jest.fn() } ),
+					};
+				} );
+			( global as any ).EncodedVideoChunk = jest.fn();
+
+			// Strategy 3: the browser reports HEVC support, then the decode
+			// fails, which a damaged bitstream does.
+			( global as any ).VideoDecoder = jest.fn( function () {
+				return {
+					state: 'configured',
+					configure: jest.fn(),
+					decode: jest.fn(),
+					flush: jest
+						.fn()
+						.mockRejectedValue( new Error( 'Decoding error' ) ),
+					close: jest.fn(),
+				};
+			} );
+			( global as any ).VideoDecoder.isConfigSupported = jest
+				.fn()
+				.mockResolvedValue( { supported: true } );
+
+			const rejection = canvasConvertToJpeg( heicFile( validHeic ) );
+			await expect( rejection ).rejects.toThrow( 'Decoding error' );
+			await expect( rejection ).rejects.not.toBeInstanceOf(
+				HeicUnsupportedError
+			);
+		} );
+
+		it( 'should treat a codec string the browser rejects as unsupported', async () => {
+			global.createImageBitmap = jest
+				.fn()
+				.mockRejectedValue( new Error( 'Unsupported format' ) );
+			delete ( global as any ).ImageDecoder;
+			( global as any ).VideoDecoder = {
+				isConfigSupported: jest
+					.fn()
+					.mockRejectedValue( new TypeError( 'Invalid codec' ) ),
+			};
+
+			await expect(
+				canvasConvertToJpeg( heicFile( validHeic ) )
+			).rejects.toThrow( HeicUnsupportedError );
+		} );
+
+		it( 'should not report a failed decode as unsupported', async () => {
+			// Strategy 1 rejects, as it does for any HEIC in Chromium.
+			global.createImageBitmap = jest
+				.fn()
+				.mockRejectedValue( new Error( 'Unsupported format' ) );
+
+			// Strategy 2 supports the type, so the browser can decode HEIC.
+			// The decode itself fails, which a damaged file does.
+			( global as any ).ImageDecoder = jest.fn( function () {
+				return {
+					decode: jest
+						.fn()
+						.mockRejectedValue( new Error( 'Corrupt image data' ) ),
+					close: jest.fn(),
+				};
+			} );
+			( global as any ).ImageDecoder.isTypeSupported = jest
+				.fn()
+				.mockResolvedValue( true );
+
 			const file = new File( [ 'data' ], 'photo.heic', {
 				type: 'image/heic',
 			} );
 
-			await expect( canvasConvertToJpeg( file ) ).rejects.toThrow(
-				getHeicUnsupportedMessage()
+			const rejection = canvasConvertToJpeg( file );
+			await expect( rejection ).rejects.toThrow( 'Corrupt image data' );
+			await expect( rejection ).rejects.not.toBeInstanceOf(
+				HeicUnsupportedError
 			);
 		} );
 
@@ -183,13 +335,9 @@ describe( 'canvasConvertToJpeg', () => {
 			// No VideoDecoder.
 			delete ( global as any ).VideoDecoder;
 
-			const file = new File( [ 'data' ], 'photo.heic', {
-				type: 'image/heic',
-			} );
-
-			await expect( canvasConvertToJpeg( file ) ).rejects.toThrow(
-				getHeicUnsupportedMessage()
-			);
+			await expect(
+				canvasConvertToJpeg( heicFile( validHeic ) )
+			).rejects.toThrow( HeicUnsupportedError );
 
 			expect(
 				( global as any ).ImageDecoder.isTypeSupported
