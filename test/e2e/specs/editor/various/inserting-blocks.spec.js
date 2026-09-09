@@ -1053,7 +1053,10 @@ class InsertingBlocksUtils {
 	async expectIndicatorBelowParagraph( paragraphBoundingBox ) {
 		// Expect the indicator to be below the paragraph block.
 		await expect
-			.poll( () => this.indicator.boundingBox().then( ( { y } ) => y ) )
+			.poll( async () => {
+				const indicatorBoundingBox = await this.indicator.boundingBox();
+				return indicatorBoundingBox?.y ?? Number.NEGATIVE_INFINITY;
+			} )
 			.toBeGreaterThan( paragraphBoundingBox.y );
 	}
 }
