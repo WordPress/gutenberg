@@ -44,7 +44,7 @@
 	},
 	"devDependencies": {
 		"@types/babel__core": "^7.20.5",
-		"vitest": "^4.1.10"
+		"vitest": "^4.1.11"
 	},
 	"publishConfig": {
 		"access": "public"

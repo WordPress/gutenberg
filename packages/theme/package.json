@@ -108,7 +108,7 @@
 		"prettier": "npm:wp-prettier@^3.0.3",
 		"storybook": "^10.5.3",
 		"stylelint": "^17.14.1",
-		"vitest": "^4.1.10"
+		"vitest": "^4.1.11"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
