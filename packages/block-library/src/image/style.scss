@@ -5,14 +5,14 @@
 
 	> a,
 	> figure > a {
-		display: inline-block;
+		display: block;
+		justify-self: start;
 	}
 
 	img {
 		height: auto;
 		max-width: 100%;
-		vertical-align: bottom;
-		box-sizing: border-box;
+		display: block;
 
 		@media not (prefers-reduced-motion) {
 			&.hide {
