@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useRef, forwardRef } from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
 import { plus as plusIcon, reset as resetIcon } from '@wordpress/icons';
 import { useMergeRefs } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { Input, SpinButton, styles } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import type { StateReducer } from '../input-control/reducer/state';
@@ -26,8 +15,6 @@ import type { NumberControlProps } from './types';
 import { HStack } from '../h-stack';
 import { Spacer } from '../spacer';
 import { useCx } from '../utils';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const noop = () => {};
 
@@ -55,16 +42,8 @@ function UnforwardedNumberControl(
 		size = 'default',
 		suffix,
 		onChange = noop,
-		__shouldNotWarnDeprecated36pxSize,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp< NumberControlProps >( props );
-
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'NumberControl',
-		size,
-		__next40pxDefaultSize: restProps.__next40pxDefaultSize,
-		__shouldNotWarnDeprecated36pxSize,
-	} );
+	} = props;
 
 	if ( hideHTMLArrows ) {
 		deprecated( 'wp.components.NumberControl hideHTMLArrows prop ', {
@@ -239,7 +218,6 @@ function UnforwardedNumberControl(
 			value={ valueProp }
 			__unstableStateReducer={ numberControlStateReducer }
 			size={ size }
-			__shouldNotWarnDeprecated36pxSize
 			suffix={
 				spinControls === 'custom' ? (
 					<>
@@ -276,6 +254,10 @@ function UnforwardedNumberControl(
 	);
 }
 
+/**
+ * `NumberControl` is a text input control that lets users enter and adjust a
+ * numeric value.
+ */
 export const NumberControl = forwardRef( UnforwardedNumberControl );
 NumberControl.displayName = 'NumberControl';
 

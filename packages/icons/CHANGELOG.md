@@ -2,6 +2,65 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `search` icon is now stroke-based. Use CSS `color` rather than `fill` to recolor it. ([#82338](https://github.com/WordPress/gutenberg/pull/82338))
+-   Stroke-based icons now declare `fill: none` via inline `style` on the outer `<svg>` instead of the `fill` attribute, so the source's intent survives ordinary third-party CSS overrides like `.foo svg { fill: currentColor }` without using `!important`. Consumers should use CSS `color` to recolor icons. A `fill` prop or ordinary CSS `fill` declaration no longer overrides the intrinsic `fill: none`; pass `style={ { fill: value } }` to deliberately replace it. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   Stroke-based icons use `vector-effect="non-scaling-stroke"`, so their stroke width stays constant when rendered outside the Icon block at sizes other than 24px. The Icon block deliberately restores the previous proportional stroke scaling. When new bundled icon elements run with an older externalized `wp.components.Icon`, supplying an unrelated `style` prop can replace the icon's intrinsic style; update the paired packages together to retain merged styles. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+
+### Enhancements
+
+-   Redraw 35 icons as stroke-based for variable stroke-width support, and introduce the `vector-effect="non-scaling-stroke"` convention so stroke weight stays consistent across icon sizes (originally landed in [#78774](https://github.com/WordPress/gutenberg/pull/78774), reverted in [#78854](https://github.com/WordPress/gutenberg/pull/78854) due to CSS-override regressions, re-introduced here with the resilience fix): `addCard`, `addTemplate`, `cancelCircleFilled`, `caution`, `cautionFilled`, `code`, `commentAuthorAvatar`, `cover`, `currencyDollar`, `currencyEuro`, `currencyPound`, `drafts`, `help`, `helpFilled`, `image`, `info`, `lifesaver`, `link`, `linkOff`, `navigation`, `notAllowed`, `paragraph`, `pending`, `plusCircle`, `plusCircleFilled`, `published`, `scheduled`, `siteLogo`, `square`, `starEmpty`, `starFilled`, `starHalf`, `styles`, `time`, `tip`. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   Redraw a further 63 icons as stroke-based for variable stroke-width support, following the convention introduced in [#78808](https://github.com/WordPress/gutenberg/pull/78808): `alignCenter`, `alignJustify`, `alignLeft`, `alignNone`, `alignRight`, `arrowDownLeft`, `arrowDownRight`, `arrowDown`, `arrowLeft`, `arrowRight`, `arrowUpLeft`, `arrowUpRight`, `arrowUp`, `blockMeta`, `category`, `chartBar`, `check`, `chevronDownSmall`, `chevronDown`, `chevronLeftSmall`, `chevronLeft`, `chevronRightSmall`, `chevronRight`, `chevronUpDown`, `chevronUpSmall`, `chevronUp`, `closeSmall`, `close`, `create`, `download`, `handle`, `homeButton`, `justifyBottom`, `justifyCenterVertical`, `justifyCenter`, `justifyLeft`, `justifyRight`, `justifySpaceBetweenVertical`, `justifySpaceBetween`, `justifyStretchVertical`, `justifyStretch`, `justifyTop`, `lineDashed`, `lineDotted`, `lineSolid`, `listView`, `menu`, `next`, `plus`, `positionCenter`, `positionLeft`, `positionRight`, `previous`, `pullLeft`, `pullRight`, `pullquote`, `reset`, `resizeCornerNE`, `rss`, `separator`, `stretchFullWidth`, `stretchWide`, `upload`. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
+
+### Bug Fixes
+
+-   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+
+## 15.5.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
+-   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 15.4.0 (2026-08-12)
+
+### Enhancements
+
+-   Add the `inlineImage` icon. ([#81271](https://github.com/WordPress/gutenberg/pull/81271))
+-   Add the `playlistTrack` icon. ([#80959](https://github.com/WordPress/gutenberg/pull/80959))
+
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 15.3.0 (2026-07-29)
+
+### Enhancements
+
+-   Normalize `keyboard-close`, `offline`, and `wordpress` to use the standard `viewBox="0 0 24 24"`. ([#80273](https://github.com/WordPress/gutenberg/pull/80273))
+
+## 15.2.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+-   Add Playlist icon. ([#80168](https://github.com/WordPress/gutenberg/pull/80168)).
+-   Add new "sites" icon. ([#80094](https://github.com/WordPress/gutenberg/pull/80094)).
+
+## 15.1.0 (2026-07-01)
+
+## 15.0.0 (2026-06-24)
+
+### Breaking Changes
+
+-   Update all icons to render with `currentColor` by default. Consumers that style icons by setting inherited `fill` on a wrapper should set `color` instead, or pass `style={ { color: ... } }` to the icon. ([#79320](https://github.com/WordPress/gutenberg/pull/79320))
+
+## 14.0.1 (2026-06-16)
+
+## 14.0.0 (2026-06-10)
+
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
@@ -9,6 +68,7 @@
 ### Breaking Changes
 
 -   Rename `timeToRead` icon to `time`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
+-   Remove `tab` icon. ([#77439](https://github.com/WordPress/gutenberg/pull/77439))
 
 ## 13.2.0 (2026-05-27)
 
@@ -239,8 +299,6 @@
 ## 9.23.0 (2023-04-26)
 
 ## 9.22.0 (2023-04-12)
-
-### New Features
 
 ## 9.21.0 (2023-03-29)
 

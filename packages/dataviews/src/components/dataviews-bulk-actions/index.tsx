@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactElement } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { Button, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, useRef, useContext } from '@wordpress/element';
@@ -13,10 +6,6 @@ import { useRegistry } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../dataviews-context';
 import { ActionModal } from '../dataviews-item-actions';
 import type { Action, ActionModal as ActionModalType } from '../../types';
@@ -59,34 +48,35 @@ function ActionWithModal< Item >( {
 	);
 }
 
+export function hasAPossibleBulkAction< Item >(
+	actions: Action< Item >[],
+	item: Item
+) {
+	return actions.some(
+		( action ) =>
+			action.supportsBulk &&
+			( ! action.isEligible || action.isEligible( item ) )
+	);
+}
+
 export function useHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	item: Item
 ) {
-	return useMemo( () => {
-		return actions.some( ( action ) => {
-			return (
-				action.supportsBulk &&
-				( ! action.isEligible || action.isEligible( item ) )
-			);
-		} );
-	}, [ actions, item ] );
+	return useMemo(
+		() => hasAPossibleBulkAction( actions, item ),
+		[ actions, item ]
+	);
 }
 
 export function useSomeItemHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	data: Item[]
 ) {
-	return useMemo( () => {
-		return data.some( ( item ) => {
-			return actions.some( ( action ) => {
-				return (
-					action.supportsBulk &&
-					( ! action.isEligible || action.isEligible( item ) )
-				);
-			} );
-		} );
-	}, [ actions, data ] );
+	return useMemo(
+		() => data.some( ( item ) => hasAPossibleBulkAction( actions, item ) ),
+		[ actions, data ]
+	);
 }
 
 interface BulkSelectionCheckboxProps< Item > {
@@ -245,7 +235,7 @@ function ActionButton< Item >( {
 			action={ action }
 			onClick={ async () => {
 				setActionInProgress( action.id );
-				await action.callback( selectedItems, {
+				await action.callback( selectedEligibleItems, {
 					registry,
 				} );
 				setActionInProgress( null );

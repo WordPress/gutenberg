@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { useStylesPreviewColors } from './preview-hooks';
 
 export default function PresetColors() {

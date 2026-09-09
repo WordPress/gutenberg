@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'iframed block editor settings styles', () => {
@@ -24,7 +21,7 @@ test.describe( 'iframed block editor settings styles', () => {
 		editor,
 		page,
 	} ) => {
-		const defaultBlock = editor.canvas.getByRole( 'button', {
+		const defaultBlock = editor.canvas.getByRole( 'document', {
 			name: 'Add default block',
 		} );
 
@@ -58,7 +55,7 @@ test.describe( 'iframed block editor settings styles', () => {
 		editor,
 		page,
 	} ) => {
-		const defaultBlock = editor.canvas.getByRole( 'button', {
+		const defaultBlock = editor.canvas.getByRole( 'document', {
 			name: 'Add default block',
 		} );
 

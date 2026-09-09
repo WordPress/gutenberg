@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { shortestCommonSupersequence } from './scs';
 
 export type StyleElement = HTMLLinkElement | HTMLStyleElement;

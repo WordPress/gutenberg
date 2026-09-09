@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { store, privateApis, getConfig } from '@wordpress/interactivity';
-
-/**
- * Internal dependencies
- */
 import { preloadStyles, applyStyles, type StyleElement } from './assets/styles';
 import {
 	preloadScriptModules,
@@ -508,7 +501,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 					// Updates the URL in the state.
 					state.url = href;
 
-					// Updates the navigation status once the the new page rendering
+					// Updates the navigation status once the new page rendering
 					// has been completed.
 					if ( loadingAnimation ) {
 						navigation.hasStarted = false;
@@ -600,14 +593,14 @@ function a11ySpeak( messageKey: keyof typeof navigationTexts ) {
 			// Fallback to localized strings from Interactivity API state.
 			// @todo This block is for Core < 6.7.0. Remove when support is dropped.
 
-			// @ts-expect-error
+			// @ts-expect-error `texts` is not part of the typed navigation state.
 			if ( state.navigation.texts?.loading ) {
-				// @ts-expect-error
+				// @ts-expect-error `texts` is not part of the typed navigation state.
 				navigationTexts.loading = state.navigation.texts.loading;
 			}
-			// @ts-expect-error
+			// @ts-expect-error `texts` is not part of the typed navigation state.
 			if ( state.navigation.texts?.loaded ) {
-				// @ts-expect-error
+				// @ts-expect-error `texts` is not part of the typed navigation state.
 				navigationTexts.loaded = state.navigation.texts.loaded;
 			}
 		}

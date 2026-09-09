@@ -1,0 +1,10 @@
+{
+	"title": "widget title",
+	"description": "widget description",
+	"help": {
+		"content": "widget help content",
+		"links": [ { "label": "widget help link label" } ]
+	},
+	"actions": [ { "label": "widget action label" } ],
+	"keywords": [ "widget keyword" ]
+}

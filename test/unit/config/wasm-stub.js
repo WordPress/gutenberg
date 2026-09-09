@@ -1,1 +1,1 @@
-// Stub file for Jest.
+// Stub file for Jest and Vitest.

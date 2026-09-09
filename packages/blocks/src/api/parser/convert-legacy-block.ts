@@ -1,3 +1,51 @@
+/* eslint-disable @wordpress/wp-global-usage */
+declare global {
+	var IS_GUTENBERG_PLUGIN: boolean | undefined;
+}
+/* eslint-enable @wordpress/wp-global-usage */
+
+/**
+ * Normalizes legacy style state keys in serialized block attributes.
+ *
+ * Gutenberg plugin back compat for content saved before viewport style states
+ * used `@mobile` / `@tablet`. Guarded by `IS_GUTENBERG_PLUGIN` so synced
+ * Core package code does not apply it.
+ *
+ * @param style Block style attribute.
+ * @return Style attribute with canonical state keys.
+ */
+export function normalizeStyleStateAliases( style: unknown ): unknown {
+	if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
+		return style;
+	}
+
+	if ( ! style || typeof style !== 'object' || Array.isArray( style ) ) {
+		return style;
+	}
+
+	let normalizedStyle = style as Record< string, unknown >;
+	const viewportAliases: Record< string, string > = {
+		'@mobile': 'mobile',
+		'@tablet': 'tablet',
+	};
+
+	Object.entries( viewportAliases ).forEach( ( [ state, legacyState ] ) => {
+		if ( ! Object.hasOwn( normalizedStyle, legacyState ) ) {
+			return;
+		}
+
+		if ( normalizedStyle === style ) {
+			normalizedStyle = { ...normalizedStyle };
+		}
+		if ( ! Object.hasOwn( normalizedStyle, state ) ) {
+			normalizedStyle[ state ] = normalizedStyle[ legacyState ];
+		}
+		delete normalizedStyle[ legacyState ];
+	} );
+
+	return normalizedStyle;
+}
+
 /**
  * Convert legacy blocks to their canonical form. This function is used
  * both in the parser level for previous content and to convert such blocks
@@ -114,6 +162,15 @@ export function convertLegacyBlockNameAndAttributes(
 				rowSpan: isNaN( rowSpanNumber ) ? undefined : rowSpanNumber,
 			},
 		};
+	}
+
+	// `normalizeStyleStateAliases` will return the same value when there are no
+	// aliases to resolve. Use an equality check to decide whether to update the
+	// property. The `if` statement also guards against `style` being set as an
+	// undefined property.
+	const normalizedStyle = normalizeStyleStateAliases( newAttributes.style );
+	if ( normalizedStyle !== newAttributes.style ) {
+		newAttributes.style = normalizedStyle;
 	}
 
 	return [ name, newAttributes ];

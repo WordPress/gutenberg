@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { RadioGroup } from '..';
 import { Radio } from '../radio';
 
@@ -52,15 +41,9 @@ Default.args = {
 	defaultChecked: 'option2',
 	children: (
 		<>
-			<Radio __next40pxDefaultSize value="option1">
-				Option 1
-			</Radio>
-			<Radio __next40pxDefaultSize value="option2">
-				Option 2
-			</Radio>
-			<Radio __next40pxDefaultSize value="option3">
-				Option 3
-			</Radio>
+			<Radio value="option1">Option 1</Radio>
+			<Radio value="option2">Option 2</Radio>
+			<Radio value="option3">Option 3</Radio>
 		</>
 	),
 };

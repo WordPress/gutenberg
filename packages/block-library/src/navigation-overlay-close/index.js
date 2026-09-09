@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import { isWithinNavigationOverlay } from '../utils/is-within-overlay';
 import edit from './edit';

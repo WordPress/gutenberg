@@ -1,8 +1,6 @@
-'use strict';
-
-/**
- * Internal dependencies
- */
+import { createRequire } from 'node:module';
+import { describe, expect, it } from 'vitest';
+const require = createRequire( import.meta.url );
 const parseSpxMode = require( '../parse-spx-mode' );
 
 describe( 'parseSpxMode', () => {

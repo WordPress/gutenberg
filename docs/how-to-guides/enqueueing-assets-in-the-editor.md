@@ -2,7 +2,7 @@
 
 This guide is designed to be the definitive reference for enqueueing assets (scripts and styles) in the Editor. The approaches outlined here represent the recommended practices but keep in mind that this resource will evolve as WordPress does. Updates are encouraged.
 
-As of WordPress 6.3, the Post Editor is iframed if all registered blocks have a [`Block API version 3`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/) or higher and no traditional metaboxes are registered. The Site Editor has always been iframed. This guide assumes you are looking to enqueue assets for the iframed Editor, but refer to the backward compatibility section below for additional considerations.
+The Site Editor always uses an iframe. Gutenberg 23.6 and WordPress 7.1 also always use an iframe for the Post Editor, regardless of the [`Block API version`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/) of blocks in the post content. WordPress 7.0 retains a conditional fallback to a non-iframe Post Editor. This guide assumes you are targeting the iframed Editor; refer to the backward compatibility section below when supporting older WordPress versions.
 
 For more information about why the Editor is iframed, please revisit the post [Blocks in an iframed (template) editor](https://make.wordpress.org/core/2021/06/29/blocks-in-an-iframed-template-editor/).
 

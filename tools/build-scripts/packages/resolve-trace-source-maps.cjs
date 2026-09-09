@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const path = require( 'path' );
 const { SourceMapConsumer } = require( 'source-map' );

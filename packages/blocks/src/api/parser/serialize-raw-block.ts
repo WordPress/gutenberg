@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getCommentDelimitedContent } from '../serializer';
 import type { RawBlock } from '../../types';
 

@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../../types';
 
 // All WP post formats, sorted alphabetically by translated name.

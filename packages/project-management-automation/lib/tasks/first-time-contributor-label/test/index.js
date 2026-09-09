@@ -1,9 +1,27 @@
-/**
- * Internal dependencies
- */
-import firstTimeContributorLabel from '../';
+import { createRequire } from 'node:module';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
+const actionsCorePath = require.resolve( '@actions/core' );
+const originalActionsCore = require( actionsCorePath );
+const setOutput = vi.fn();
+const taskPath = require.resolve( '../' );
+let firstTimeContributorLabel;
+try {
+	require.cache[ actionsCorePath ].exports = {
+		...originalActionsCore,
+		setOutput,
+	};
+	firstTimeContributorLabel = require( taskPath );
+} finally {
+	require.cache[ actionsCorePath ].exports = originalActionsCore;
+	delete require.cache[ taskPath ];
+}
 
 describe( 'firstTimeContributorLabel', () => {
+	beforeEach( () => {
+		setOutput.mockReset();
+	} );
+
 	const payload = {
 		repository: {
 			owner: {
@@ -34,7 +52,10 @@ describe( 'firstTimeContributorLabel', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn(),
+					listCommits: vi.fn(),
+				},
+				search: {
+					commits: vi.fn(),
 				},
 			},
 		};
@@ -42,13 +63,14 @@ describe( 'firstTimeContributorLabel', () => {
 		await firstTimeContributorLabel( payloadForBot, octokit );
 
 		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
+		expect( octokit.rest.search.commits ).not.toHaveBeenCalled();
 	} );
 
-	it( 'does nothing if the user has at least one commit', async () => {
+	it( 'does nothing if the commits list finds a previous commit', async () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
+					listCommits: vi.fn( () =>
 						Promise.resolve( {
 							data: [
 								{
@@ -58,9 +80,11 @@ describe( 'firstTimeContributorLabel', () => {
 						} )
 					),
 				},
+				search: {
+					commits: vi.fn(),
+				},
 				issues: {
-					addLabels: jest.fn(),
-					createComment: jest.fn(),
+					addLabels: vi.fn(),
 				},
 			},
 		};
@@ -72,23 +96,65 @@ describe( 'firstTimeContributorLabel', () => {
 			repo: 'gutenberg',
 			author: 'ghost',
 		} );
+		expect( octokit.rest.search.commits ).not.toHaveBeenCalled();
 		expect( octokit.rest.issues.addLabels ).not.toHaveBeenCalled();
-		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
+		expect( setOutput ).not.toHaveBeenCalled();
 	} );
 
-	it( 'adds the First Time Contributor label if the user has no commits', async () => {
+	it( 'does nothing if the search fallback finds a previous commit', async () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
+					listCommits: vi.fn( () => Promise.resolve( { data: [] } ) ),
+				},
+				search: {
+					commits: vi.fn( () =>
 						Promise.resolve( {
-							data: [],
+							data: {
+								total_count: 1,
+								items: [
+									{
+										sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
+									},
+								],
+							},
 						} )
 					),
 				},
 				issues: {
-					addLabels: jest.fn(),
-					createComment: jest.fn(),
+					addLabels: vi.fn(),
+				},
+			},
+		};
+
+		await firstTimeContributorLabel( payload, octokit );
+
+		expect( octokit.rest.search.commits ).toHaveBeenCalledWith( {
+			q: 'repo:WordPress/gutenberg author:ghost',
+			per_page: 1,
+		} );
+		expect( octokit.rest.issues.addLabels ).not.toHaveBeenCalled();
+		expect( setOutput ).not.toHaveBeenCalled();
+	} );
+
+	it( 'adds the First Time Contributor label if neither finds a commit', async () => {
+		const octokit = {
+			rest: {
+				repos: {
+					listCommits: vi.fn( () => Promise.resolve( { data: [] } ) ),
+				},
+				search: {
+					commits: vi.fn( () =>
+						Promise.resolve( {
+							data: {
+								total_count: 0,
+								items: [],
+							},
+						} )
+					),
+				},
+				issues: {
+					addLabels: vi.fn(),
 				},
 			},
 		};
@@ -100,22 +166,15 @@ describe( 'firstTimeContributorLabel', () => {
 
 		await firstTimeContributorLabel( payload, octokit );
 
-		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			author: 'ghost',
-		} );
 		expect( octokit.rest.issues.addLabels ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			issue_number: 123,
 			labels: [ 'First-time Contributor' ],
 		} );
-		expect( octokit.rest.issues.createComment ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			issue_number: 123,
-			body: expectedComment,
-		} );
+		expect( setOutput ).toHaveBeenCalledWith(
+			'welcome-prompt',
+			expectedComment
+		);
 	} );
 } );

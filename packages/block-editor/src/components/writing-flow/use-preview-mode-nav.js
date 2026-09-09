@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { TAB, UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 /**

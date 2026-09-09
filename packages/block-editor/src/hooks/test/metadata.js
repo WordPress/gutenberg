@@ -1,15 +1,9 @@
-/**
- * WordPress dependencies
- */
+import { afterEach, describe, expect, it } from 'vitest';
 import {
 	getBlockTypes,
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { addTransforms } from '../metadata';
 
 describe( 'metadata', () => {

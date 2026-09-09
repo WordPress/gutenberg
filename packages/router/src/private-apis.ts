@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { useHistory, useLocation, RouterProvider } from './router';
 import { useLink, Link } from './link';
 import { lock } from './lock-unlock';

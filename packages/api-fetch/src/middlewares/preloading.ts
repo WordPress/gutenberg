@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { addQueryArgs, getQueryArgs, normalizePath } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import type { APIFetchMiddleware } from '../types';
 
 export const ENABLE_MULTI_USE = Symbol( 'preloadingEnableMultiUse' );

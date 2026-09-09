@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { useMemo, useReducer } from '@wordpress/element';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect, useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';

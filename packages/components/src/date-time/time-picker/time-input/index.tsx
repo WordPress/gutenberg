@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	TimeWrapper,
 	TimeSeparator,
@@ -113,7 +102,6 @@ export function TimeInput( {
 						className="components-datetime__time-field-hours-input" // Unused, for backwards compatibility.
 						label={ __( 'Hours' ) }
 						hideLabelFromVision
-						__next40pxDefaultSize
 						value={ String(
 							is12Hour ? hours12Format : value.hours
 						).padStart( 2, '0' ) }
@@ -143,7 +131,6 @@ export function TimeInput( {
 						) }
 						label={ __( 'Minutes' ) }
 						hideLabelFromVision
-						__next40pxDefaultSize
 						value={ String( value.minutes ).padStart( 2, '0' ) }
 						step={ 1 }
 						min={ 0 }
@@ -167,7 +154,6 @@ export function TimeInput( {
 				</TimeWrapper>
 				{ is12Hour && (
 					<ToggleGroupControl
-						__next40pxDefaultSize
 						isBlock
 						label={ __( 'Select AM or PM' ) }
 						hideLabelFromVision

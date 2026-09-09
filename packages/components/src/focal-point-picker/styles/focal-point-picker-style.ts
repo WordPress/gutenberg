@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import { Flex } from '../../flex';
 import UnitControl from '../../unit-control';
 import { View } from '../../view';
