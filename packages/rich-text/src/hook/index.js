@@ -167,41 +167,41 @@ function useRichTextBase( {
 		applyRecord( recordRef.current, { domOnly: ! hasFocus } );
 	}
 
-	const didMountRef = useRef( false );
-
-	// Value updates must happen synchronously to avoid overwriting newer values.
-	useLayoutEffect( () => {
-		if ( didMountRef.current && value !== _valueRef.current ) {
-			applyFromProps();
-			forceRender();
-		}
-	}, [ value ] );
-
-	// Apply a selection set from outside while the element (or an editing
-	// host around it) has focus. The focus handler applies it once focus
-	// arrives.
+	// Apply a value or selection set from outside. The selection goes in
+	// only while the element (or an editing host around it) has focus; the
+	// focus handler applies it once focus arrives.
 	useLayoutEffect( () => {
 		const [ sentStart, sentEnd ] = sentSelectionRef.current;
 		sentSelectionRef.current = [];
 
-		if (
-			! isSelected ||
-			( selectionStart === sentStart && selectionEnd === sentEnd )
-		) {
+		const valueChanged = value !== _valueRef.current;
+		const selectionChanged =
+			isSelected &&
+			( selectionStart !== sentStart || selectionEnd !== sentEnd );
+
+		if ( ! valueChanged && ! selectionChanged ) {
 			return;
+		}
+
+		if ( valueChanged ) {
+			setRecordFromProps();
 		}
 
 		const element = ref.current;
 		const { activeElement } = element.ownerDocument;
-
-		if (
+		const hasFocus =
 			activeElement === element ||
 			( activeElement?.contentEditable === 'true' &&
-				activeElement.contains( element ) )
-		) {
-			applyRecord( recordRef.current );
+				activeElement.contains( element ) );
+
+		if ( valueChanged || hasFocus ) {
+			applyRecord( recordRef.current, { domOnly: ! hasFocus } );
 		}
-	}, [ selectionStart, selectionEnd, isSelected ] );
+
+		if ( valueChanged ) {
+			forceRender();
+		}
+	}, [ value, selectionStart, selectionEnd, isSelected ] );
 
 	const mergedRefs = useMergeRefs( [
 		ref,
@@ -218,7 +218,6 @@ function useRichTextBase( {
 		} ),
 		useRefEffect( () => {
 			applyFromProps();
-			didMountRef.current = true;
 		}, [ placeholder, ...__unstableDependencies ] ),
 	] );
 
