@@ -10,6 +10,7 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Tooltip } from '@wordpress/ui';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { reset as resetIcon, caution as cautionIcon } from '@wordpress/icons';
@@ -204,6 +205,10 @@ export default function ColorGradientDropdownItem( {
 	isPlaceholder = false,
 	hasInheritedValue = false,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	// Renders the toggle inert with `disabledHint` as its tooltip. Used when
+	// another control has taken over the value this one writes.
+	disabled = false,
+	disabledHint,
 } ) {
 	const colorGradientDropdownButtonRef = useRef( undefined );
 	const itemClassName = clsx( 'block-editor-color-gradient-item', className );
@@ -242,15 +247,37 @@ export default function ColorGradientDropdownItem( {
 						ref: colorGradientDropdownButtonRef,
 					};
 
+					const toggle = (
+						<Button
+							{ ...toggleProps }
+							__next40pxDefaultSize
+							disabled={ disabled }
+							accessibleWhenDisabled
+						>
+							<LabeledColorIndicators
+								indicators={ indicators }
+								label={ label }
+							/>
+						</Button>
+					);
+
 					return (
 						<>
-							<Button { ...toggleProps } __next40pxDefaultSize>
-								<LabeledColorIndicators
-									indicators={ indicators }
-									label={ label }
-								/>
-							</Button>
-							{ hasValue() &&
+							{ disabled && disabledHint ? (
+								// Wrapping rather than naming the button after
+								// the hint keeps the control's own name, with
+								// the reason as a description.
+								<Tooltip.Root>
+									<Tooltip.Trigger render={ toggle } />
+									<Tooltip.Popup>
+										{ disabledHint }
+									</Tooltip.Popup>
+								</Tooltip.Root>
+							) : (
+								toggle
+							) }
+							{ ! disabled &&
+								hasValue() &&
 								( hasLocalOverride ? (
 									<InheritanceResetButton
 										className="block-editor-panel-color-gradient-settings__reset"
