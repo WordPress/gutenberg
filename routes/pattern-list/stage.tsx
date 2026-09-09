@@ -5,10 +5,15 @@ import {
 	Link,
 	useInvalidate,
 } from '@wordpress/route';
-import { useView } from '@wordpress/views';
+import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
-import type { View, Action, Field } from '@wordpress/dataviews';
+import type {
+	View,
+	Action,
+	Field,
+	SupportedLayouts,
+} from '@wordpress/dataviews';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	Button,
@@ -23,7 +28,7 @@ import {
 } from '@wordpress/patterns';
 import { __ } from '@wordpress/i18n';
 import { unlock } from '@wordpress/routes-lock-unlock';
-import { DEFAULT_VIEW, DEFAULT_VIEWS, DEFAULT_LAYOUTS } from './view-utils';
+import { DEFAULT_VIEWS } from './view-utils';
 import { previewField } from './fields/preview';
 import { usePatternCategoryField } from './fields/category';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
@@ -38,16 +43,48 @@ const { PATTERN_TYPES, CreatePatternModal } = unlock( patternPrivateApis );
  */
 import './style.scss';
 
+const PATTERN_POST_TYPE = 'wp_block';
+
 function PatternList() {
-	const invalidate = useInvalidate();
 	const { type = 'all' } = useParams( {
 		from: '/patterns/list/$type',
 	} );
+	const { default_view: defaultView, default_layouts: defaultLayouts } =
+		useViewConfig( {
+			kind: 'postType',
+			name: PATTERN_POST_TYPE,
+		} );
+
+	if ( ! defaultView ) {
+		// The route loader resolves the view configuration before the stage
+		// mounts, so this only guards against the store being reset.
+		return null;
+	}
+
+	return (
+		<PatternListView
+			type={ type }
+			defaultView={ defaultView }
+			defaultLayouts={ defaultLayouts }
+		/>
+	);
+}
+
+function PatternListView( {
+	type,
+	defaultView,
+	defaultLayouts,
+}: {
+	type: string;
+	defaultView: View;
+	defaultLayouts: SupportedLayouts | undefined;
+} ) {
+	const invalidate = useInvalidate();
 	const navigate = useNavigate();
 	const searchParams = useSearch( { from: '/patterns/list/$type' } );
 
 	const postTypeObject = useSelect(
-		( select ) => select( coreStore ).getPostType( 'wp_block' ),
+		( select ) => select( coreStore ).getPostType( PATTERN_POST_TYPE ),
 		[]
 	);
 
@@ -56,7 +93,7 @@ function PatternList() {
 		( select ) =>
 			select( coreStore ).canUser( 'create', {
 				kind: 'postType',
-				name: 'wp_block',
+				name: PATTERN_POST_TYPE,
 			} ),
 		[]
 	);
@@ -79,9 +116,10 @@ function PatternList() {
 	// Use the new view persistence hook
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
-		name: 'wp_block',
+		name: PATTERN_POST_TYPE,
 		slug: 'default-new',
-		defaultView: DEFAULT_VIEW,
+		defaultView,
+		defaultLayouts,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );
@@ -198,7 +236,7 @@ function PatternList() {
 	);
 
 	const postTypeActions: Action< any >[] = usePostActions( {
-		postType: 'wp_block',
+		postType: PATTERN_POST_TYPE,
 		context: 'list',
 		onActionPerformed: ( actionId: string, items: NormalizedPattern[] ) => {
 			// Clean up URL when delete actions are performed
@@ -306,7 +344,7 @@ function PatternList() {
 					totalItems,
 					totalPages,
 				} }
-				defaultLayouts={ DEFAULT_LAYOUTS }
+				defaultLayouts={ defaultLayouts }
 				selection={ selection }
 				onReset={ isModified ? onReset : false }
 				onChangeSelection={ ( items: string[] ) => {
