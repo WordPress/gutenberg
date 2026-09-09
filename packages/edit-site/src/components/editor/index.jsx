@@ -74,7 +74,12 @@ function getNavigationPath( location, postType ) {
 	return addQueryArgs( path, { canvas: undefined, revision: undefined } );
 }
 
-export default function EditSiteEditor( { isHomeRoute = false } ) {
+export default function EditSiteEditor( {
+	isHomeRoute = false,
+	// Routes that stand for the whole site rather than one piece of content,
+	// so the canvas shows the template around whatever it is rendering.
+	isGlobalRoute = false,
+} ) {
 	const location = useLocation();
 	const history = useHistory();
 	const { canvas = 'view' } = location.query;
@@ -106,7 +111,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 		'edit-site-editor__loading-progress'
 	);
 
-	const editorSettings = useSpecificEditorSettings();
+	const editorSettings = useSpecificEditorSettings( { isGlobalRoute } );
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 	const { setCurrentRevisionId, resetStylesNavigation } = unlock(
 		useDispatch( editorStore )

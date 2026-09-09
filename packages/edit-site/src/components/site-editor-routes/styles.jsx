@@ -42,7 +42,7 @@ function StylesPreviewArea( { siteData } ) {
 		return <StyleBookPreviewArea siteData={ siteData } />;
 	}
 
-	return <Editor />;
+	return <Editor isGlobalRoute />;
 }
 
 export const stylesRoute = {
