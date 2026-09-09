@@ -137,7 +137,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			<!-- /wp:navigation-submenu -->
 			`;
 
-		test( 'submenus in a custom overlay set to open on click, do not display until clicked ', async ( {
+		test( 'submenus in a custom overlay set to open on click, do not display until clicked', async ( {
 			page,
 			requestUtils,
 		} ) => {
