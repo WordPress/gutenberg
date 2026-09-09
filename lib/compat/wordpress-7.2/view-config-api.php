@@ -105,6 +105,57 @@ function _gutenberg_get_entity_view_config_posttype_wp_navigation( $data ) {
 }
 
 /**
+ * Adds the item count of each view to the `page` view list.
+ *
+ * The counts say how many items each status view holds, so they are totals for
+ * the post type rather than for any one page of results. `wp_count_posts()`
+ * answers all of them from a single cached query, and its `readable` permission
+ * argument keeps private posts the current user cannot read out of the totals.
+ *
+ * The counts are merged in by slug, so the views themselves stay defined in
+ * _gutenberg_get_entity_view_config_posttype_page(), and the base "All items"
+ * view keeps its post-type-specific title. Its total leaves out trashed posts,
+ * matching the statuses that view queries.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_add_counts_to_page_view_config( $data ) {
+	$counts = wp_count_posts( 'page', 'readable' );
+
+	$status_of_view = array(
+		'published' => 'publish',
+		'future'    => 'future',
+		'drafts'    => 'draft',
+		'pending'   => 'pending',
+		'private'   => 'private',
+		'trash'     => 'trash',
+	);
+
+	$all       = 0;
+	$view_list = array();
+	foreach ( $status_of_view as $slug => $status ) {
+		$count       = isset( $counts->$status ) ? (int) $counts->$status : 0;
+		$view_list[] = array(
+			'slug'  => $slug,
+			'count' => $count,
+		);
+		if ( 'trash' !== $status ) {
+			$all += $count;
+		}
+	}
+	array_unshift(
+		$view_list,
+		array(
+			'slug'  => 'all',
+			'count' => $all,
+		)
+	);
+
+	return $data->merge( array( 'view_list' => $view_list ), 1 );
+}
+
+/**
  * Registers the entity view configuration filters that layer on top of the base
  * definitions, at a priority between those (5) and third-party callbacks (10),
  * and the base definitions for entities that gained one in 7.2, at the base
@@ -120,6 +171,12 @@ function gutenberg_register_entity_view_config_filters_7_2() {
 	add_filter(
 		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_template' ),
 		'_gutenberg_add_reading_settings_to_wp_template_view_config',
+		6,
+		1
+	);
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', 'page' ),
+		'_gutenberg_add_counts_to_page_view_config',
 		6,
 		1
 	);
