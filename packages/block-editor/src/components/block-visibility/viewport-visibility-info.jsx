@@ -1,7 +1,7 @@
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { unseen } from '@wordpress/icons';
-import { Badge, Icon, Stack, Text } from '@wordpress/ui';
+import { Badge, Icon, Stack } from '@wordpress/ui';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import useBlockVisibility from './use-block-visibility';
@@ -119,11 +119,15 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 	}
 
 	return (
-		<Badge intent="draft" className="block-editor-block-visibility-info">
-			<Stack gap="sm" justify="start" align="center" direction="row">
-				<Icon icon={ unseen } />
-				<Text>{ label }</Text>
-			</Stack>
-		</Badge>
+		<Stack
+			className="block-editor-block-visibility-info"
+			gap="sm"
+			justify="start"
+			align="center"
+			direction="row"
+		>
+			<Icon icon={ unseen } />
+			<Badge intent="draft">{ label }</Badge>
+		</Stack>
 	);
 }
