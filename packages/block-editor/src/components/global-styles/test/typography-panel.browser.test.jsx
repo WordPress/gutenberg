@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { act, render, renderHook, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render, renderHook } from 'vitest-browser-react';
 import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
 
 // The inheritance treatment sits behind the
@@ -16,54 +17,14 @@ afterEach( () => {
 } );
 
 /**
- * Render helper that flushes async state effects from Ariakit-based
- * controls (CustomSelectControl, FontAppearanceControl, FontFamily) so
- * tests don't trip the strict `console.error` rule on
- * "An update to %s inside a test was not wrapped in act(...)".
- *
- * The first microtask flush handles Ariakit's `useLayoutEffect`-driven
- * state updates that cannot be wrapped by `render()`'s implicit act.
- *
- * @param {React.ReactElement} ui React element to render.
- * @return {ReturnType<typeof render>} The settled `render()` result, including `container`, `rerender`, etc.
- */
-async function renderAndSettle( ui ) {
-	let result;
-	// eslint-disable-next-line testing-library/no-unnecessary-act -- Ariakit `useLayoutEffect` chains in CustomSelect / FontAppearance / FontFamily emit state updates outside RTL's implicit act, so we must wrap render explicitly.
-	await act( async () => {
-		result = render( ui );
-	} );
-	return result;
-}
-
-/**
  * Renders `TypographyPanel` with sensible defaults so tests only pass the
  * props they actually care about (usually `value` and `inheritedValue`).
  *
  * @param {Object} props Props to override the defaults.
  * @return {ReturnType<typeof render>} The `render()` result.
  */
-function renderPanel( props ) {
-	return render(
-		<TypographyPanel
-			value={ {} }
-			settings={ baseSettings }
-			onChange={ () => {} }
-			panelId="test-panel"
-			{ ...props }
-		/>
-	);
-}
-
-/**
- * Async variant of `renderPanel` for controls (Ariakit-based) that need
- * their effects flushed. See `renderAndSettle`.
- *
- * @param {Object} props Props to override the defaults.
- * @return {Promise<ReturnType<typeof render>>} The settled `render()` result.
- */
-function renderPanelAndSettle( props ) {
-	return renderAndSettle(
+async function renderPanel( props ) {
+	return await render(
 		<TypographyPanel
 			value={ {} }
 			settings={ baseSettings }
@@ -130,7 +91,7 @@ const settingsWithFonts = {
 };
 
 describe( 'TypographyPanel — inheritedValue round-trip', () => {
-	it( 'renders a numeric leaf from `inheritedValue` as the control value when `value` is empty', () => {
+	it( 'renders a numeric leaf from `inheritedValue` as the control value when `value` is empty', async () => {
 		// LineHeightControl uses the local-then-inherited pattern: the
 		// inherited value is rendered as the control's value (so the
 		// numeric stepper increments from the inherited base) and an
@@ -140,13 +101,13 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { lineHeight: '1.7' },
 		};
 
-		renderPanel( { inheritedValue } );
+		await renderPanel( { inheritedValue } );
 
 		const lineHeightInput = screen.getByLabelText( /line height/i );
 		expect( lineHeightInput ).toHaveValue( 1.7 );
 	} );
 
-	it( 'renders an integer leaf from `inheritedValue` as placeholder when `value` is empty', () => {
+	it( 'renders an integer leaf from `inheritedValue` as placeholder when `value` is empty', async () => {
 		// Placeholder-capable controls communicate the inherited value
 		// via the native `placeholder` attribute rather than as the
 		// rendered `value`, so users can distinguish local values from
@@ -155,7 +116,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { textColumns: 3 },
 		};
 
-		renderPanel( { inheritedValue } );
+		await renderPanel( { inheritedValue } );
 
 		const columnsInput = screen.getByLabelText( /columns/i );
 		// No locally-set value; the rendered value is empty.
@@ -165,7 +126,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		expect( columnsInput ).toHaveAttribute( 'placeholder', '3' );
 	} );
 
-	it( 'renders a locally-set integer leaf as the value, with no placeholder, even when `inheritedValue` also defines it', () => {
+	it( 'renders a locally-set integer leaf as the value, with no placeholder, even when `inheritedValue` also defines it', async () => {
 		// Local override wins over the inherited value, and there is
 		// no placeholder treatment because the user has committed a
 		// value of their own.
@@ -176,18 +137,18 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { textColumns: 5 },
 		};
 
-		renderPanel( { value, inheritedValue } );
+		await renderPanel( { value, inheritedValue } );
 
 		const columnsInput = screen.getByLabelText( /columns/i );
 		expect( columnsInput ).toHaveValue( 5 );
 		expect( columnsInput ).not.toHaveAttribute( 'placeholder' );
 	} );
 
-	it( 'shows no placeholder for an integer leaf when `inheritedValue` also omits it', () => {
+	it( 'shows no placeholder for an integer leaf when `inheritedValue` also omits it', async () => {
 		// Without an inherited value, there is nothing to communicate
 		// as a placeholder; the input renders as an ordinary empty
 		// NumberControl.
-		renderPanel( { inheritedValue: {} } );
+		await renderPanel( { inheritedValue: {} } );
 
 		const columnsInput = screen.getByLabelText( /columns/i );
 		expect( columnsInput ).toHaveValue( null );
@@ -203,7 +164,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { textColumns: 3, lineHeight: '1.7' },
 		};
 
-		renderPanel( { inheritedValue, onChange } );
+		await renderPanel( { inheritedValue, onChange } );
 
 		const columnsInput = screen.getByLabelText( /columns/i );
 		await user.type( columnsInput, '2' );
@@ -225,7 +186,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		expect( lastCall.typography ).not.toHaveProperty( 'lineHeight' );
 	} );
 
-	it( 'returns to placeholder rendering after a local override is reset', () => {
+	it( 'returns to placeholder rendering after a local override is reset', async () => {
 		// Reset clears the local attribute so the inherited value
 		// re-surfaces via placeholder. We simulate the reset by
 		// re-rendering with `value` cleared (the same effect
@@ -235,7 +196,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { textColumns: 3 },
 		};
 
-		const { rerender } = renderPanel( {
+		const { rerender } = await renderPanel( {
 			value: { typography: { textColumns: 5 } },
 			inheritedValue,
 		} );
@@ -247,7 +208,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		);
 
 		// Reset: local value cleared.
-		rerender(
+		await rerender(
 			<TypographyPanel
 				value={ {} }
 				inheritedValue={ inheritedValue }
@@ -263,7 +224,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		expect( columnsInput ).toHaveAttribute( 'placeholder', '3' );
 	} );
 
-	it( 'renders a locally-set numeric leaf as the value, with no placeholder, even when `inheritedValue` also defines it', () => {
+	it( 'renders a locally-set numeric leaf as the value, with no placeholder, even when `inheritedValue` also defines it', async () => {
 		// Local values remain the source of truth when both local and
 		// inherited values are present.
 		const inheritedValue = {
@@ -273,13 +234,13 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { lineHeight: '1.4' },
 		};
 
-		renderPanel( { value, inheritedValue } );
+		await renderPanel( { value, inheritedValue } );
 
 		const lineHeightInput = screen.getByLabelText( /line height/i );
 		expect( lineHeightInput ).toHaveValue( 1.4 );
 	} );
 
-	it( 'renders a unit-string leaf from `inheritedValue` as the control value when `value` is empty', () => {
+	it( 'renders a unit-string leaf from `inheritedValue` as the control value when `value` is empty', async () => {
 		// LetterSpacingControl uses the local-then-inherited pattern: the
 		// inherited value is rendered as the control's value (so the unit
 		// parses from it rather than sitting behind a default px unit) and an
@@ -289,7 +250,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { letterSpacing: '0.5px' },
 		};
 
-		renderPanel( { inheritedValue } );
+		await renderPanel( { inheritedValue } );
 
 		const letterSpacingInput = screen.getByLabelText( /letter spacing/i );
 		expect( letterSpacingInput ).toHaveValue( 0.5 );
@@ -303,7 +264,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		);
 	} );
 
-	it( 'renders a locally-set unit-string leaf as the value, with no placeholder, even when `inheritedValue` also defines it', () => {
+	it( 'renders a locally-set unit-string leaf as the value, with no placeholder, even when `inheritedValue` also defines it', async () => {
 		const inheritedValue = {
 			typography: { letterSpacing: '0.5px' },
 		};
@@ -311,14 +272,14 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { letterSpacing: '2px' },
 		};
 
-		renderPanel( { value, inheritedValue } );
+		await renderPanel( { value, inheritedValue } );
 
 		const letterSpacingInput = screen.getByLabelText( /letter spacing/i );
 		expect( letterSpacingInput ).toHaveValue( 2 );
 		expect( letterSpacingInput ).not.toHaveAttribute( 'placeholder' );
 	} );
 
-	it( 'value for one input does not leak when other inputs are committed', () => {
+	it( 'value for one input does not leak when other inputs are committed', async () => {
 		// A locally-set lineHeight should not affect the inherited value
 		// rendering for letterSpacing, and vice versa. Each control's
 		// local/inherited resolution is computed independently from its own
@@ -330,7 +291,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { lineHeight: '1.4' },
 		};
 
-		renderPanel( { value, inheritedValue } );
+		await renderPanel( { value, inheritedValue } );
 
 		// lineHeight: locally-set, not at-rest.
 		const lineHeightInput = screen.getByLabelText( /line height/i );
@@ -341,24 +302,24 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		expect( letterSpacingInput ).toHaveValue( 0.5 );
 	} );
 
-	it( 'falls back to `value` when `inheritedValue` is omitted (pre-feature behaviour is preserved)', () => {
+	it( 'falls back to `value` when `inheritedValue` is omitted (pre-feature behaviour is preserved)', async () => {
 		// The `inheritedValue = value` default keeps call sites that
 		// have not yet opted into separate inherited data on the existing
 		// code path: no placeholder, no local-value regression.
-		renderPanel( { value: { typography: { lineHeight: '1.9' } } } );
+		await renderPanel( { value: { typography: { lineHeight: '1.9' } } } );
 
 		expect( screen.getByLabelText( /line height/i ) ).toHaveValue( 1.9 );
 	} );
 
-	it( 'renders nothing for a leaf when both `value` and `inheritedValue` omit it', () => {
-		renderPanel( { inheritedValue: {} } );
+	it( 'renders nothing for a leaf when both `value` and `inheritedValue` omit it', async () => {
+		await renderPanel( { inheritedValue: {} } );
 
 		// An empty NumberControl input has no `value` attribute applied;
 		// RTL returns `null` (not `0`, not the empty string) for that case.
 		expect( screen.getByLabelText( /line height/i ) ).toHaveValue( null );
 	} );
 
-	it( 'accepts a `var:preset|font-size|…` leaf in `inheritedValue` without throwing', () => {
+	it( 'accepts a `var:preset|font-size|…` leaf in `inheritedValue` without throwing', async () => {
 		// This verifies the panel accepts preset-shaped inherited values
 		// at its prop boundary and renders the Font size control. The
 		// decoded value flows through the panel's internal `decodeValue`
@@ -369,9 +330,9 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { fontSize: 'var:preset|font-size|large' },
 		};
 
-		expect( () => {
-			renderPanel( { inheritedValue } );
-		} ).not.toThrow();
+		await expect(
+			renderPanel( { inheritedValue } )
+		).resolves.toBeDefined();
 
 		// The Font size ToolsPanelItem label is rendered in the DOM.
 		expect( screen.getAllByText( /font size/i ).length ).toBeGreaterThan(
@@ -385,7 +346,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { textDecoration: 'underline' },
 			};
 
-			await renderPanelAndSettle( { inheritedValue } );
+			await renderPanel( { inheritedValue } );
 
 			// The inherited option is rendered as the pressed one.
 			// `TextDecorationControl` uses `isDeselectable=true` so the
@@ -418,7 +379,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				},
 			};
 
-			await renderPanelAndSettle( {
+			await renderPanel( {
 				inheritedValue,
 				settings: settingsWithFonts,
 				onChange,
@@ -440,7 +401,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { textDecoration: 'underline' },
 			};
 
-			await renderPanelAndSettle( { inheritedValue, onChange } );
+			await renderPanel( { inheritedValue, onChange } );
 
 			// Click the already-preselected "Underline" option (a
 			// button under `isDeselectable` ToggleGroupControl).
@@ -469,7 +430,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { textDecoration: 'line-through' },
 			};
 
-			await renderPanelAndSettle( {
+			await renderPanel( {
 				value,
 				inheritedValue,
 			} );
@@ -489,7 +450,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { textIndent: '2rem' },
 			};
 
-			await renderPanelAndSettle( { inheritedValue } );
+			await renderPanel( { inheritedValue } );
 
 			// `TextIndentControl` in `withSlider` mode renders both a
 			// UnitControl number input AND a RangeControl slider with
@@ -513,7 +474,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { textIndent: '4rem' },
 			};
 
-			await renderPanelAndSettle( { value, inheritedValue } );
+			await renderPanel( { value, inheritedValue } );
 
 			const indentInput = screen.getByRole( 'spinbutton', {
 				name: /line indent/i,
@@ -530,7 +491,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { fontStyle: 'italic', fontWeight: '700' },
 			};
 
-			await renderPanelAndSettle( {
+			await renderPanel( {
 				inheritedValue,
 				settings: settingsWithFonts,
 				onChange,
@@ -547,7 +508,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { fontFamily: 'Georgia, serif' },
 			};
 
-			await renderPanelAndSettle( {
+			await renderPanel( {
 				inheritedValue,
 				settings: settingsWithFonts,
 				onChange,
@@ -561,12 +522,12 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		// These tests cover preset decoding and explicit-empty values at
 		// the panel render boundary.
 
-		it( 'decodes a preset fontSize for placeholder display, never leaking the raw preset string', () => {
+		it( 'decodes a preset fontSize for placeholder display, never leaking the raw preset string', async () => {
 			const inheritedValue = {
 				typography: { fontSize: 'var:preset|font-size|large' },
 			};
 
-			const { container } = renderPanel( { inheritedValue } );
+			const { container } = await renderPanel( { inheritedValue } );
 
 			// The decoded human-readable value (`24px`, from the
 			// `large` preset in `baseSettings`) is what reaches the
@@ -582,7 +543,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 		it.each( [ '', null ] )(
 			'does not render the at-rest placeholder cue when inheritedValue.typography.lineHeight is explicit-empty (%p)',
-			( emptyValue ) => {
+			async ( emptyValue ) => {
 				// Note on `{}` empty-object: the resolver
 				// (`resolveStyle` →
 				// `pickLayerRootContribution`) drops `{}` at the
@@ -599,7 +560,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 					typography: { lineHeight: emptyValue },
 				};
 
-				renderPanel( { inheritedValue } );
+				await renderPanel( { inheritedValue } );
 
 				const lineHeightInput = screen.getByLabelText( /line height/i );
 				expect( lineHeightInput ).toHaveValue( null );
@@ -621,13 +582,13 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { fontSize: 'var:preset|font-size|large' },
 			};
 
-			await renderPanelAndSettle( { inheritedValue, onChange } );
+			await renderPanel( { inheritedValue, onChange } );
 
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
 	} );
 
-	it( 'treats local zero values as local overrides instead of inherited placeholders', () => {
+	it( 'treats local zero values as local overrides instead of inherited placeholders', async () => {
 		const inheritedValue = {
 			typography: { lineHeight: '2', textColumns: 3 },
 		};
@@ -635,7 +596,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { lineHeight: 0, textColumns: 0 },
 		};
 
-		renderPanel( { value, inheritedValue } );
+		await renderPanel( { value, inheritedValue } );
 
 		const lineHeightInput = screen.getByLabelText( /line height/i );
 		expect( lineHeightInput ).toHaveValue( 0 );
@@ -670,15 +631,15 @@ const settingsWithColors = ( overrides = {} ) => ( {
 describe( 'useHasTypographyPanel', () => {
 	// After moving top-level text color into TypographyPanel, text color
 	// alone should be enough to open the panel.
-	it( 'should be true when only text color is enabled', () => {
-		const { result } = renderHook( () =>
+	it( 'should be true when only text color is enabled', async () => {
+		const { result } = await renderHook( () =>
 			useHasTypographyPanel( settingsWithColors( { text: true } ) )
 		);
 		expect( result.current ).toBeTruthy();
 	} );
 
-	it( 'should be true when only font family is enabled', () => {
-		const { result } = renderHook( () =>
+	it( 'should be true when only font family is enabled', async () => {
+		const { result } = await renderHook( () =>
 			useHasTypographyPanel( {
 				typography: {
 					fontFamilies: {
@@ -690,27 +651,29 @@ describe( 'useHasTypographyPanel', () => {
 		expect( result.current ).toBeTruthy();
 	} );
 
-	it( 'should be true when only line height is enabled', () => {
-		const { result } = renderHook( () =>
+	it( 'should be true when only line height is enabled', async () => {
+		const { result } = await renderHook( () =>
 			useHasTypographyPanel( { typography: { lineHeight: true } } )
 		);
 		expect( result.current ).toBeTruthy();
 	} );
 
-	it( 'should be false when no typography or text color controls are enabled', () => {
-		const { result } = renderHook( () => useHasTypographyPanel( {} ) );
+	it( 'should be false when no typography or text color controls are enabled', async () => {
+		const { result } = await renderHook( () =>
+			useHasTypographyPanel( {} )
+		);
 		expect( result.current ).toBeFalsy();
 	} );
 
-	it( 'should be false when text color is enabled but no colors or custom support exist', () => {
-		const { result } = renderHook( () =>
+	it( 'should be false when text color is enabled but no colors or custom support exist', async () => {
+		const { result } = await renderHook( () =>
 			useHasTypographyPanel( { color: { text: true } } )
 		);
 		expect( result.current ).toBeFalsy();
 	} );
 
-	it( 'should be true when text color is enabled with custom colors support', () => {
-		const { result } = renderHook( () =>
+	it( 'should be true when text color is enabled with custom colors support', async () => {
+		const { result } = await renderHook( () =>
 			useHasTypographyPanel( { color: { text: true, custom: true } } )
 		);
 		expect( result.current ).toBeTruthy();
@@ -757,7 +720,7 @@ describe( 'TypographyPanel — duplicate-hex preset slug identity', () => {
 	it( 'commits the inherited preset slug when accepting the preselected inherited color', async () => {
 		const onChange = vi.fn();
 
-		await renderAndSettle(
+		await render(
 			<TypographyPanel
 				value={ {} }
 				inheritedValue={ {
@@ -781,7 +744,7 @@ describe( 'TypographyPanel — duplicate-hex preset slug identity', () => {
 	} );
 
 	it( 'marks only the local preset as selected when another preset shares its hex', async () => {
-		await renderAndSettle(
+		await render(
 			<TypographyPanel
 				value={ { color: { text: 'var:preset|color|dark-text' } } }
 				settings={ DUPLICATE_PALETTE_SETTINGS }
@@ -803,7 +766,7 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 		const onChange = vi.fn();
 		const sharedRef = 'var:preset|color|dark-background';
 
-		await renderAndSettle(
+		await render(
 			<TypographyPanel
 				value={ {} }
 				inheritedValue={ {
@@ -831,7 +794,7 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 	it( 'does NOT sync the link color when text and link have different raw refs, even if their decoded hex values match', async () => {
 		const onChange = vi.fn();
 
-		await renderAndSettle(
+		await render(
 			<TypographyPanel
 				value={ {} }
 				inheritedValue={ {
@@ -866,7 +829,7 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 		// track the text color.
 		const onChange = vi.fn();
 
-		await renderAndSettle(
+		await render(
 			<TypographyPanel
 				value={ {
 					elements: {
@@ -916,7 +879,7 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 			},
 		};
 
-		await renderAndSettle(
+		await render(
 			<TypographyPanel
 				value={ {
 					color: { text: sharedRef },
@@ -954,8 +917,8 @@ describe( 'TypographyPanel layout className preserved regardless of inheritance 
 		return control.closest( '.components-tools-panel-item' );
 	};
 
-	it( 'keeps the single-column layout class when showInheritanceLabelIndicators is false (regression)', () => {
-		renderPanel( {
+	it( 'keeps the single-column layout class when showInheritanceLabelIndicators is false (regression)', async () => {
+		await renderPanel( {
 			showInheritanceLabelIndicators: false,
 			value: {},
 			inheritedValue,
@@ -975,8 +938,8 @@ describe( 'TypographyPanel layout className preserved regardless of inheritance 
 		);
 	} );
 
-	it( 'folds the single-column layout class together with the inherited treatment when indicators are on', () => {
-		renderPanel( {
+	it( 'folds the single-column layout class together with the inherited treatment when indicators are on', async () => {
+		await renderPanel( {
 			showInheritanceLabelIndicators: true,
 			value: {},
 			inheritedValue,

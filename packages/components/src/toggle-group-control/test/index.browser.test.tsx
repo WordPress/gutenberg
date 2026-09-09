@@ -1,6 +1,7 @@
 import { describe, expect, it, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
 import Button from '../../button';
@@ -55,6 +56,7 @@ const ControlledToggleGroupControl = ( {
 				} }
 				value={ value }
 			/>
+
 			<Button
 				onClick={ () => setValue( undefined ) }
 				__next40pxDefaultSize
@@ -79,6 +81,7 @@ const options = (
 		<ToggleGroupControlOption value="jack" label="J" />
 	</>
 );
+
 const optionsWithTooltip = (
 	<>
 		<ToggleGroupControlOption
@@ -87,6 +90,7 @@ const optionsWithTooltip = (
 			aria-label="Click for Delicious Gnocchi"
 			showTooltip
 		/>
+
 		<ToggleGroupControlOption
 			value="caponata"
 			label="Sumptuous Caponata"
@@ -94,6 +98,7 @@ const optionsWithTooltip = (
 		/>
 	</>
 );
+
 const optionsWithDisabledOption = (
 	<>
 		<ToggleGroupControlOption value="pizza" label="Pizza" />
@@ -103,17 +108,17 @@ const optionsWithDisabledOption = (
 );
 
 describe( 'required context', () => {
-	it( 'throws when ToggleGroupControlOption is outside ToggleGroupControl', () => {
-		expect( () =>
+	it( 'throws when ToggleGroupControlOption is outside ToggleGroupControl', async () => {
+		await expect(
 			render( <ToggleGroupControlOption value="value" label="Label" /> )
-		).toThrow(
+		).rejects.toThrow(
 			'ToggleGroupControlOption can only be rendered inside ToggleGroupControl.'
 		);
 		expect( console ).toHaveErrored();
 	} );
 
-	it( 'throws when ToggleGroupControlOptionIcon is outside ToggleGroupControl', () => {
-		expect( () =>
+	it( 'throws when ToggleGroupControlOptionIcon is outside ToggleGroupControl', async () => {
+		await expect(
 			render(
 				<ToggleGroupControlOptionIcon
 					value="value"
@@ -121,7 +126,7 @@ describe( 'required context', () => {
 					icon={ formatUppercase }
 				/>
 			)
-		).toThrow(
+		).rejects.toThrow(
 			'ToggleGroupControlOptionIcon can only be rendered inside ToggleGroupControl.'
 		);
 		expect( console ).toHaveErrored();
@@ -135,8 +140,8 @@ describe.each( [
 	const [ mode, Component ] = modeAndComponent;
 
 	describe( 'should render correctly', () => {
-		it( 'with text options', () => {
-			render(
+		it( 'with text options', async () => {
+			await render(
 				<Component label="Test Toggle Group Control">
 					{ options }
 				</Component>
@@ -155,14 +160,15 @@ describe.each( [
 			).toBeInTheDocument();
 		} );
 
-		it( 'with icons', () => {
-			render(
+		it( 'with icons', async () => {
+			await render(
 				<Component value="uppercase" label="Test Toggle Group Control">
 					<ToggleGroupControlOptionIcon
 						value="uppercase"
 						icon={ formatUppercase }
 						label="Uppercase"
 					/>
+
 					<ToggleGroupControlOptionIcon
 						value="lowercase"
 						icon={ formatLowercase }
@@ -179,8 +185,8 @@ describe.each( [
 			).not.toBeChecked();
 		} );
 	} );
-	it( 'should render with the correct option initially selected when `value` is defined', () => {
-		render(
+	it( 'should render with the correct option initially selected when `value` is defined', async () => {
+		await render(
 			<Component value="jack" label="Test Toggle Group Control">
 				{ options }
 			</Component>
@@ -188,8 +194,8 @@ describe.each( [
 		expect( screen.getByRole( 'radio', { name: 'R' } ) ).not.toBeChecked();
 		expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
 	} );
-	it( 'should render without a selected option when `value` is `undefined`', () => {
-		render(
+	it( 'should render without a selected option when `value` is `undefined`', async () => {
+		await render(
 			<Component label="Test Toggle Group Control">{ options }</Component>
 		);
 		expect( screen.getByRole( 'radio', { name: 'R' } ) ).not.toBeChecked();
@@ -198,7 +204,7 @@ describe.each( [
 	it( 'should call onChange with proper value', async () => {
 		const mockOnChange = vi.fn();
 
-		render(
+		await render(
 			<Component
 				value="jack"
 				onChange={ mockOnChange }
@@ -214,7 +220,7 @@ describe.each( [
 	} );
 
 	it( 'should not set a value on focus', async () => {
-		render(
+		await render(
 			<Component label="Test Toggle Group Control">{ options }</Component>
 		);
 
@@ -228,7 +234,7 @@ describe.each( [
 
 	if ( mode === 'controlled' ) {
 		it( 'should not set a value on focus, after the value is reset', async () => {
-			render(
+			await render(
 				<Component label="Test Toggle Group Control" value="jack">
 					{ options }
 				</Component>
@@ -255,7 +261,7 @@ describe.each( [
 	}
 
 	it( 'should render tooltip where `showTooltip` === `true`', async () => {
-		render(
+		await render(
 			<Component label="Test Toggle Group Control">
 				{ optionsWithTooltip }
 			</Component>
@@ -285,7 +291,7 @@ describe.each( [
 	} );
 
 	it( 'should not render tooltip', async () => {
-		render(
+		await render(
 			<Component label="Test Toggle Group Control">
 				{ optionsWithTooltip }
 			</Component>
@@ -313,7 +319,7 @@ describe.each( [
 
 	if ( mode === 'controlled' ) {
 		it( 'should reset values correctly when default value is undefined', async () => {
-			render(
+			await render(
 				<Component label="Test Toggle Group Control">
 					{ options }
 				</Component>
@@ -336,7 +342,7 @@ describe.each( [
 		} );
 
 		it( 'should reset values correctly when default value is defined', async () => {
-			render(
+			await render(
 				<Component label="Test Toggle Group Control" value="rigas">
 					{ options }
 				</Component>
@@ -367,7 +373,7 @@ describe.each( [
 			'should update correctly when triggered by external updates',
 			( defaultValueType, defaultValue ) => {
 				it( `when default value is ${ defaultValueType }`, async () => {
-					render(
+					await render(
 						<Component
 							value={ defaultValue }
 							label="Test Toggle Group Control"
@@ -404,16 +410,16 @@ describe.each( [
 		);
 	}
 
-	it( 'should render the label', () => {
-		render(
+	it( 'should render the label', async () => {
+		await render(
 			<Component label="Test Toggle Group Control">{ options }</Component>
 		);
 
 		expect( screen.getByText( 'Test Toggle Group Control' ) ).toBeVisible();
 	} );
 
-	it( 'should still label the control accessibly when hideLabelFromVision is true', () => {
-		render(
+	it( 'should still label the control accessibly when hideLabelFromVision is true', async () => {
+		await render(
 			<Component label="Test Toggle Group Control" hideLabelFromVision>
 				{ options }
 			</Component>
@@ -426,8 +432,8 @@ describe.each( [
 		).toBeVisible();
 	} );
 
-	it( 'should accessibly associate the help text', () => {
-		render(
+	it( 'should accessibly associate the help text', async () => {
+		await render(
 			<Component label="Test Toggle Group Control" help="Help text">
 				{ options }
 			</Component>
@@ -440,8 +446,8 @@ describe.each( [
 		).toBeVisible();
 	} );
 
-	it( 'should accessibly associate the help text when isDeselectable', () => {
-		render(
+	it( 'should accessibly associate the help text when isDeselectable', async () => {
+		await render(
 			<Component
 				label="Test Toggle Group Control"
 				help="Help text"
@@ -463,7 +469,7 @@ describe.each( [
 			it( 'should not be deselectable', async () => {
 				const mockOnChange = vi.fn();
 
-				render(
+				await render(
 					<Component
 						value="rigas"
 						label="Test"
@@ -482,7 +488,7 @@ describe.each( [
 			} );
 
 			it( 'should not tab to next radio option', async () => {
-				render(
+				await render(
 					<>
 						<Component value="rigas" label="Test">
 							{ options }
@@ -514,7 +520,7 @@ describe.each( [
 			it( 'should ignore disabled radio options', async () => {
 				const mockOnChange = vi.fn();
 
-				render(
+				await render(
 					<Component
 						value="pizza"
 						onChange={ mockOnChange }
@@ -563,7 +569,7 @@ describe.each( [
 			it( 'should be deselectable', async () => {
 				const mockOnChange = vi.fn();
 
-				render(
+				await render(
 					<Component
 						value="rigas"
 						label="Test"
@@ -594,7 +600,7 @@ describe.each( [
 			} );
 
 			it( 'should tab to the next option button', async () => {
-				render(
+				await render(
 					<Component isDeselectable value="rigas" label="Test">
 						{ options }
 					</Component>
@@ -629,7 +635,7 @@ describe.each( [
 			it( 'should ignore disabled options', async () => {
 				const mockOnChange = vi.fn();
 
-				render(
+				await render(
 					<Component
 						value="pizza"
 						isDeselectable
@@ -688,7 +694,7 @@ describe.each( [
 		it( 'should not select another option when the control is disabled', async () => {
 			const mockOnChange = vi.fn();
 
-			render(
+			await render(
 				<Component
 					value="rigas"
 					label="Test"
@@ -721,7 +727,7 @@ describe.each( [
 		} );
 
 		it( 'should skip the disabled control when tabbing', async () => {
-			render(
+			await render(
 				<>
 					<button>Before ToggleGroupControl</button>
 					<Component value="rigas" label="Test" disabled>
@@ -750,8 +756,8 @@ describe.each( [
 			expect( expectedFocusTarget ).toHaveFocus();
 		} );
 
-		it( 'should keep the selected option when the control is disabled', () => {
-			render(
+		it( 'should keep the selected option when the control is disabled', async () => {
+			await render(
 				<Component value="jack" label="Test" disabled>
 					{ options }
 				</Component>
@@ -763,10 +769,10 @@ describe.each( [
 			).not.toBeChecked();
 		} );
 
-		it( 'should not call onChange when a disabled control is clicked', () => {
+		it( 'should not call onChange when a disabled control is clicked', async () => {
 			const mockOnChange = vi.fn();
 
-			render(
+			await render(
 				<Component
 					value="rigas"
 					label="Test"
@@ -785,8 +791,8 @@ describe.each( [
 			expect( mockOnChange ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should disable every option when the control is disabled, including options without their own disabled prop', () => {
-			render(
+		it( 'should disable every option when the control is disabled, including options without their own disabled prop', async () => {
+			await render(
 				<Component value="pizza" label="Test" disabled>
 					{ optionsWithDisabledOption }
 				</Component>
@@ -807,10 +813,10 @@ describe.each( [
 			).toBeDisabled();
 		} );
 
-		it( 'should not deselect the pressed option when the control is disabled', () => {
+		it( 'should not deselect the pressed option when the control is disabled', async () => {
 			const mockOnChange = vi.fn();
 
-			render(
+			await render(
 				<Component
 					value="rigas"
 					label="Test"
@@ -845,7 +851,7 @@ describe.each( [
 		} );
 
 		it( 'should skip a deselectable disabled control when tabbing', async () => {
-			render(
+			await render(
 				<>
 					<button>Before ToggleGroupControl</button>
 					<Component
@@ -879,10 +885,10 @@ describe.each( [
 			expect( expectedFocusTarget ).toHaveFocus();
 		} );
 
-		it( 'should not call onChange when a deselectable disabled control is clicked', () => {
+		it( 'should not call onChange when a deselectable disabled control is clicked', async () => {
 			const mockOnChange = vi.fn();
 
-			render(
+			await render(
 				<Component
 					value="rigas"
 					label="Test"
@@ -904,8 +910,8 @@ describe.each( [
 	} );
 } );
 
-test( 'should render block styles without Emotion-generated classes', () => {
-	render(
+test( 'should render block styles without Emotion-generated classes', async () => {
+	await render(
 		<ToggleGroupControl label="Test Toggle Group Control" isBlock>
 			{ options }
 		</ToggleGroupControl>
@@ -924,8 +930,8 @@ test( 'should render block styles without Emotion-generated classes', () => {
 	);
 } );
 
-test( 'should render deselectable styles without enclosing borders', () => {
-	render(
+test( 'should render deselectable styles without enclosing borders', async () => {
+	await render(
 		<ToggleGroupControl label="Test Toggle Group Control" isDeselectable>
 			{ options }
 		</ToggleGroupControl>

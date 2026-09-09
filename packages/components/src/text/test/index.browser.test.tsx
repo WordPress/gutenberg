@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { getFontSize } from '../../utils/font-size';
 import { COLORS } from '../../utils';
 import { Text } from '../';
@@ -14,13 +15,13 @@ function resolveStyle( property: 'color' | 'fontSize', value: string ) {
 }
 
 describe( 'Text', () => {
-	test( 'should render correctly', () => {
-		render( <Text>Lorem ipsum.</Text> );
+	test( 'should render correctly', async () => {
+		await render( <Text>Lorem ipsum.</Text> );
 		expect( screen.getByText( 'Lorem ipsum.' ) ).toBeInTheDocument();
 	} );
 
-	test( 'should render optimizeReadabilityFor', () => {
-		render(
+	test( 'should render optimizeReadabilityFor', async () => {
+		await render(
 			<Text role="heading" optimizeReadabilityFor="blue">
 				Lorem ipsum.
 			</Text>
@@ -30,8 +31,8 @@ describe( 'Text', () => {
 		);
 	} );
 
-	test( 'should render truncate', () => {
-		render(
+	test( 'should render truncate', async () => {
+		await render(
 			<Text role="heading" truncate limit={ 1 } ellipsizeMode="tail">
 				Lorem ipsum.
 			</Text>
@@ -39,8 +40,8 @@ describe( 'Text', () => {
 		expect( screen.getByRole( 'heading' ) ).toHaveTextContent( 'L…' );
 	} );
 
-	test( 'should render size', () => {
-		render(
+	test( 'should render size', async () => {
+		await render(
 			<Text role="heading" size="title">
 				Lorem ipsum.
 			</Text>
@@ -50,8 +51,8 @@ describe( 'Text', () => {
 		).toBe( resolveStyle( 'fontSize', getFontSize( 'title' ) ) );
 	} );
 
-	test( 'should render custom size', () => {
-		render(
+	test( 'should render custom size', async () => {
+		await render(
 			<Text role="heading" size={ 15 }>
 				Lorem ipsum.
 			</Text>
@@ -61,8 +62,8 @@ describe( 'Text', () => {
 		).toBe( resolveStyle( 'fontSize', getFontSize( 15 ) ) );
 	} );
 
-	test( 'should render variant', () => {
-		render(
+	test( 'should render variant', async () => {
+		await render(
 			<Text role="heading" variant="muted">
 				Lorem ipsum.
 			</Text>
@@ -72,8 +73,8 @@ describe( 'Text', () => {
 		);
 	} );
 
-	test( 'should render as another element', () => {
-		render(
+	test( 'should render as another element', async () => {
+		await render(
 			<Text role="heading" as="div">
 				Lorem ipsum.
 			</Text>
@@ -81,8 +82,8 @@ describe( 'Text', () => {
 		expect( screen.getByRole( 'heading' )?.nodeName ).toBe( 'DIV' );
 	} );
 
-	test( 'should render align', () => {
-		render(
+	test( 'should render align', async () => {
+		await render(
 			<>
 				<Text role="heading" align="center">
 					Lorem ipsum.
@@ -99,8 +100,8 @@ describe( 'Text', () => {
 		).not.toBe( 'center' );
 	} );
 
-	test( 'should render color', () => {
-		render(
+	test( 'should render color', async () => {
+		await render(
 			<Text role="heading" color="orange">
 				Lorem ipsum.
 			</Text>
@@ -110,8 +111,8 @@ describe( 'Text', () => {
 		);
 	} );
 
-	test( 'should render variant color regardless of Emotion insertion order', () => {
-		render(
+	test( 'should render variant color regardless of Emotion insertion order', async () => {
+		await render(
 			<>
 				<Text role="note" variant="muted">
 					Primer.
@@ -127,8 +128,8 @@ describe( 'Text', () => {
 		);
 	} );
 
-	test( 'should render display', () => {
-		render(
+	test( 'should render display', async () => {
+		await render(
 			<Text role="heading" display="inline-flex">
 				Lorem ipsum.
 			</Text>
@@ -139,7 +140,7 @@ describe( 'Text', () => {
 	} );
 
 	test( 'should render highlighted words', async () => {
-		render(
+		await render(
 			<Text role="heading" highlightWords={ [ 'm' ] }>
 				Lorem ipsum.
 			</Text>
@@ -150,8 +151,8 @@ describe( 'Text', () => {
 		words.forEach( ( word ) => expect( word.tagName ).toEqual( 'MARK' ) );
 	} );
 
-	test( 'should render highlighted words with undefined passed', () => {
-		render(
+	test( 'should render highlighted words with undefined passed', async () => {
+		await render(
 			<Text role="heading" highlightWords={ undefined }>
 				Lorem ipsum.
 			</Text>
@@ -160,8 +161,8 @@ describe( 'Text', () => {
 		expect( screen.getByRole( 'heading' )?.childNodes ).toHaveLength( 1 );
 	} );
 
-	test( 'should render highlighted words with highlightCaseSensitive', () => {
-		render(
+	test( 'should render highlighted words with highlightCaseSensitive', async () => {
+		await render(
 			<Text
 				role="heading"
 				highlightCaseSensitive
@@ -176,8 +177,8 @@ describe( 'Text', () => {
 		expect( screen.queryByText( 'IPSUM' ) ).not.toBeInTheDocument();
 	} );
 
-	test( 'should render isBlock', () => {
-		render(
+	test( 'should render isBlock', async () => {
+		await render(
 			<Text role="heading" isBlock>
 				Lorem ipsum.
 			</Text>
@@ -187,8 +188,8 @@ describe( 'Text', () => {
 		).toBe( 'block' );
 	} );
 
-	test( 'should render lineHeight', () => {
-		render(
+	test( 'should render lineHeight', async () => {
+		await render(
 			<Text role="heading" lineHeight={ 1.5 }>
 				Lorem ipsum.
 			</Text>
@@ -198,8 +199,8 @@ describe( 'Text', () => {
 		).toBe( '19.5px' );
 	} );
 
-	test( 'should render upperCase', () => {
-		render(
+	test( 'should render upperCase', async () => {
+		await render(
 			<Text role="heading" upperCase>
 				Lorem ipsum.
 			</Text>
@@ -209,8 +210,8 @@ describe( 'Text', () => {
 		).toBe( 'uppercase' );
 	} );
 
-	test( 'should render weight', () => {
-		render(
+	test( 'should render weight', async () => {
+		await render(
 			<Text role="heading" weight={ 700 }>
 				Lorem ipsum.
 			</Text>

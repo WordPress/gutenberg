@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import * as Breadcrumb from '../index';
 
 function Trail( { width }: { width: number } ) {
@@ -25,7 +26,7 @@ function Trail( { width }: { width: number } ) {
 
 describe( 'Breadcrumb responsive layout', () => {
 	it( 'collapses overflowing links at a constrained width', async () => {
-		render( <Trail width={ 180 } /> );
+		await render( <Trail width={ 180 } /> );
 
 		await waitFor( () => {
 			expect(
@@ -37,14 +38,14 @@ describe( 'Breadcrumb responsive layout', () => {
 	} );
 
 	it( 'restores links when the width grows', async () => {
-		const view = render( <Trail width={ 180 } /> );
+		const view = await render( <Trail width={ 180 } /> );
 
 		const overflowTrigger = await screen.findByRole( 'button', {
 			name: /hidden breadcrumb items?/,
 		} );
 		overflowTrigger.blur();
 
-		view.rerender( <Trail width={ 480 } /> );
+		await view.rerender( <Trail width={ 480 } /> );
 
 		await waitFor( () => {
 			expect(

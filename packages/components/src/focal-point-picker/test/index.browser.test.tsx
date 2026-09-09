@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import _Picker from '..';
 import type { FocalPointPickerProps } from '../types';
 
@@ -27,7 +28,7 @@ describe( 'FocalPointPicker', () => {
 
 			const mockOnChange = vi.fn();
 
-			render( <Picker { ...props } onChange={ mockOnChange } /> );
+			await render( <Picker { ...props } onChange={ mockOnChange } /> );
 
 			const draggableArea = screen.getByRole( 'button' );
 
@@ -36,12 +37,12 @@ describe( 'FocalPointPicker', () => {
 			expect( draggableArea ).toHaveFocus();
 		} );
 
-		it( 'should stop a drag operation when focus is lost', () => {
+		it( 'should stop a drag operation when focus is lost', async () => {
 			const mockOnDrag = vi.fn();
 			const mockOnDragEnd = vi.fn();
 			const mockOnChange = vi.fn();
 
-			render(
+			await render(
 				<Picker
 					{ ...props }
 					onChange={ mockOnChange }
@@ -78,7 +79,7 @@ describe( 'FocalPointPicker', () => {
 				handlers[ name ] = ( ...all ) => eventLogger( name, all );
 			} );
 
-			render( <Picker { ...props } { ...handlers } /> );
+			await render( <Picker { ...props } { ...handlers } /> );
 
 			const dragArea = screen.getByRole( 'button' );
 
@@ -102,7 +103,7 @@ describe( 'FocalPointPicker', () => {
 			const spyChange = vi.fn();
 			const spy = vi.fn();
 
-			render(
+			await render(
 				<Picker
 					{ ...props }
 					value={ { x: 0.25, y: 0.25 } }
@@ -129,21 +130,23 @@ describe( 'FocalPointPicker', () => {
 	} );
 
 	describe( 'controllability', () => {
-		it( 'should update value from props', () => {
-			const { rerender } = render(
+		it( 'should update value from props', async () => {
+			const { rerender } = await render(
 				<Picker { ...props } value={ { x: 0.25, y: 0.5 } } />
 			);
 			const xInput = screen.getByRole( 'spinbutton', {
 				name: 'Focal point left position',
 			} ) as HTMLButtonElement;
-			rerender( <Picker { ...props } value={ { x: 0.93, y: 0.5 } } /> );
+			await rerender(
+				<Picker { ...props } value={ { x: 0.93, y: 0.5 } } />
+			);
 			expect( xInput.value ).toBe( '93' );
 		} );
 		it( 'call onChange with the expected values', async () => {
 			const user = userEvent;
 
 			const spyChange = vi.fn();
-			render(
+			await render(
 				<Picker
 					{ ...props }
 					value={ { x: 0.14, y: 0.62 } }
@@ -164,9 +167,9 @@ describe( 'FocalPointPicker', () => {
 	} );
 
 	describe( 'value handling', () => {
-		it( 'should handle legacy string values', () => {
+		it( 'should handle legacy string values', async () => {
 			const onChangeSpy = vi.fn();
-			render(
+			await render(
 				<Picker
 					{ ...props }
 					value={ {
@@ -195,8 +198,8 @@ describe( 'FocalPointPicker', () => {
 	} );
 
 	describe( 'label', () => {
-		it( 'should render the label as a visible legend', () => {
-			render( <Picker { ...props } label="Focal point" /> );
+		it( 'should render the label as a visible legend', async () => {
+			await render( <Picker { ...props } label="Focal point" /> );
 
 			expect(
 				screen.getByRole( 'group', { name: 'Focal point' } )
@@ -209,8 +212,8 @@ describe( 'FocalPointPicker', () => {
 			expect( legend ).not.toHaveAttribute( 'data-visually-hidden' );
 		} );
 
-		it( 'should visually hide the legend when `hideLabelFromVision` is enabled', () => {
-			render(
+		it( 'should visually hide the legend when `hideLabelFromVision` is enabled', async () => {
+			await render(
 				<Picker { ...props } label="Focal point" hideLabelFromVision />
 			);
 

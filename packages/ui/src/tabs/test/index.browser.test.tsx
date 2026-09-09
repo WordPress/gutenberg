@@ -7,7 +7,8 @@ import {
 	type MockedFunction,
 } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { useEffect, useState, createRef } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { Tabs } from '../..';
@@ -217,7 +218,7 @@ async function waitForComponentToBeInitializedWithSelectedTab(
 describe( 'Tabs', () => {
 	describe( 'Adherence to spec and basic behavior', () => {
 		it( 'should apply the correct roles, semantics and attributes', async () => {
-			render(
+			await render(
 				<Tabs.Root>
 					<Tabs.List>
 						<Tabs.Tab value="one">One</Tabs.Tab>
@@ -263,7 +264,7 @@ describe( 'Tabs', () => {
 			const TABS_WITH_DELTA_REVERSED = [ ...TABS_WITH_DELTA ].reverse();
 			const user = userEvent;
 
-			render(
+			await render(
 				<Tabs.Root defaultValue="alpha">
 					<Tabs.List>
 						{ TABS_WITH_DELTA.map( ( tabObj, index ) => (
@@ -339,7 +340,7 @@ describe( 'Tabs', () => {
 		} );
 
 		it( "should apply the tab's `className` to the tab button", async () => {
-			render( <UncontrolledTabs tabs={ TABS } /> );
+			await render( <UncontrolledTabs tabs={ TABS } /> );
 
 			// Alpha is automatically selected as the selected tab.
 			await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
@@ -355,13 +356,13 @@ describe( 'Tabs', () => {
 			);
 		} );
 
-		it( 'should forward refs', () => {
+		it( 'should forward refs', async () => {
 			const rootRef = createRef< HTMLDivElement >();
 			const listRef = createRef< HTMLDivElement >();
 			const tabRef = createRef< HTMLButtonElement >();
 			const panelRef = createRef< HTMLDivElement >();
 
-			render(
+			await render(
 				<Tabs.Root ref={ rootRef } defaultValue="tab1">
 					<Tabs.List ref={ listRef }>
 						<Tabs.Tab ref={ tabRef } value="tab1">
@@ -389,7 +390,7 @@ describe( 'Tabs', () => {
 
 			const user = userEvent;
 
-			render(
+			await render(
 				<UncontrolledTabs
 					tabs={ TABS }
 					onValueChange={ mockOnValueChange }
@@ -445,7 +446,7 @@ describe( 'Tabs', () => {
 		it( 'should not select a disabled tab when clicked', async () => {
 			const mockOnValueChange = vi.fn();
 
-			render(
+			await render(
 				<UncontrolledTabs
 					tabs={ TABS_WITH_BETA_DISABLED }
 					onValueChange={ mockOnValueChange }
@@ -487,7 +488,7 @@ describe( 'Tabs', () => {
 
 					const user = userEvent;
 
-					render(
+					await render(
 						<UncontrolledTabs
 							tabs={ TABS }
 							onValueChange={ mockOnValueChange }
@@ -522,7 +523,7 @@ describe( 'Tabs', () => {
 
 					const user = userEvent;
 
-					render(
+					await render(
 						<UncontrolledTabs
 							tabs={ TABS_WITH_ALPHA_DISABLED }
 							onValueChange={ mockOnValueChange }
@@ -558,7 +559,9 @@ describe( 'Tabs', () => {
 				it( 'should not have a selected tab nor show any tabpanels, make the tablist tabbable and still allow selecting tabs', async () => {
 					const user = userEvent;
 
-					render( <ControlledTabs tabs={ TABS } value={ null } /> );
+					await render(
+						<ControlledTabs tabs={ TABS } value={ null } />
+					);
 
 					// No initially selected tabs or tabpanels.
 					await waitForComponentToBeInitializedWithSelectedTab(
@@ -589,7 +592,7 @@ describe( 'Tabs', () => {
 				it( 'should select the initial tab matching the `defaultValue` prop', async () => {
 					const user = userEvent;
 
-					render(
+					await render(
 						<UncontrolledTabs tabs={ TABS } defaultValue="beta" />
 					);
 
@@ -611,7 +614,7 @@ describe( 'Tabs', () => {
 
 				it( 'should select the initial tab matching the `defaultValue` prop even if the tab is disabled', async () => {
 					const user = userEvent;
-					render(
+					await render(
 						<UncontrolledTabs
 							tabs={ TABS_WITH_BETA_DISABLED }
 							defaultValue="beta"
@@ -638,7 +641,7 @@ describe( 'Tabs', () => {
 				it( 'should select the first tab and allow tabbing to it when `defaultValue` prop does not match any known tab', async () => {
 					const user = userEvent;
 
-					render(
+					await render(
 						<UncontrolledTabs
 							tabs={ TABS }
 							defaultValue="non-existing-tab"
@@ -673,7 +676,7 @@ describe( 'Tabs', () => {
 
 				it( 'should select the first non-disabled tab and allow tabbing to it when `defaultValue` prop does not match any known tab', async () => {
 					const user = userEvent;
-					render(
+					await render(
 						<UncontrolledTabs
 							tabs={ TABS_WITH_ALPHA_DISABLED }
 							defaultValue="non-existing-tab"
@@ -707,7 +710,7 @@ describe( 'Tabs', () => {
 						.spyOn( console, 'error' )
 						.mockImplementation( () => {} );
 
-					const { rerender } = render(
+					const { rerender } = await render(
 						<UncontrolledTabs
 							tabs={ TABS }
 							defaultValue="beta"
@@ -721,7 +724,7 @@ describe( 'Tabs', () => {
 					);
 
 					// Changing the defaultValue prop to gamma should not have any effect.
-					rerender(
+					await rerender(
 						<UncontrolledTabs
 							tabs={ TABS }
 							defaultValue="gamma"
@@ -759,7 +762,9 @@ describe( 'Tabs', () => {
 					it( 'should choose the initial tab matching the `value`', async () => {
 						const user = userEvent;
 
-						render( <ControlledTabs tabs={ TABS } value="beta" /> );
+						await render(
+							<ControlledTabs tabs={ TABS } value="beta" />
+						);
 
 						// Beta is the initially selected tab
 						await waitForComponentToBeInitializedWithSelectedTab(
@@ -780,7 +785,7 @@ describe( 'Tabs', () => {
 					it( 'should choose the initial tab matching the `value` even if a `defaultValue` is passed', async () => {
 						const user = userEvent;
 
-						render(
+						await render(
 							<ControlledTabs
 								tabs={ TABS }
 								defaultValue="beta"
@@ -806,7 +811,7 @@ describe( 'Tabs', () => {
 					it( 'should choose the initial tab matching the `value` even if the tab is disabled', async () => {
 						const user = userEvent;
 
-						render(
+						await render(
 							<ControlledTabs
 								tabs={ TABS_WITH_BETA_DISABLED }
 								value="beta"
@@ -834,7 +839,7 @@ describe( 'Tabs', () => {
 					it( 'should not have a selected tab nor show any tabpanels, but allow tabbing to the first tab', async () => {
 						const user = userEvent;
 
-						render(
+						await render(
 							<ControlledTabs
 								tabs={ TABS }
 								value="non-existing-tab"
@@ -866,7 +871,7 @@ describe( 'Tabs', () => {
 					it( 'should not have a selected tab nor show any tabpanels, but allow tabbing to the first tab even when disabled', async () => {
 						const user = userEvent;
 
-						render(
+						await render(
 							<ControlledTabs
 								tabs={ TABS_WITH_ALPHA_DISABLED }
 								value="non-existing-tab"
@@ -930,7 +935,7 @@ describe( 'Tabs', () => {
 						? { defaultValue: 'alpha' }
 						: { value: 'alpha' };
 
-				render( <Component tabs={ TABS } { ...valueProps } /> );
+				await render( <Component tabs={ TABS } { ...valueProps } /> );
 
 				// Alpha is automatically selected as the selected tab.
 				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
@@ -961,7 +966,7 @@ describe( 'Tabs', () => {
 						? { defaultValue: 'alpha' }
 						: { value: 'alpha' };
 
-				render(
+				await render(
 					<Component
 						tabs={ TABS.map( ( tabObj ) =>
 							tabObj.value === 'alpha'
@@ -973,6 +978,7 @@ describe( 'Tabs', () => {
 												<button>Alpha Button</button>
 											</>
 										),
+
 										tabpanel: { tabIndex: -1 },
 								  }
 								: tabObj
@@ -1013,7 +1019,7 @@ describe( 'Tabs', () => {
 						? { defaultValue: 'alpha' }
 						: { value: 'alpha' };
 
-				render(
+				await render(
 					<Component
 						tabs={ TABS }
 						onValueChange={ mockOnValueChange }
@@ -1114,7 +1120,7 @@ describe( 'Tabs', () => {
 						? { defaultValue: 'alpha' }
 						: { value: 'alpha' };
 
-				render(
+				await render(
 					<Component
 						tabs={ TABS }
 						onValueChange={ mockOnValueChange }
@@ -1200,7 +1206,7 @@ describe( 'Tabs', () => {
 						? { defaultValue: 'alpha' }
 						: { value: 'alpha' };
 
-				const { rerender } = render(
+				const { rerender } = await render(
 					<Component
 						tabs={ TABS }
 						onValueChange={ mockOnValueChange }
@@ -1261,7 +1267,7 @@ describe( 'Tabs', () => {
 				expect( mockOnValueChange ).toHaveBeenCalledTimes( 0 );
 
 				// Change the orientation to "vertical" and rerender the component.
-				rerender(
+				await rerender(
 					<Component
 						tabs={ TABS }
 						onValueChange={ mockOnValueChange }
@@ -1325,7 +1331,7 @@ describe( 'Tabs', () => {
 						? { defaultValue: 'alpha' }
 						: { value: 'alpha' };
 
-				render(
+				await render(
 					<Component
 						tabs={ TABS }
 						onValueChange={ mockOnValueChange }
@@ -1407,7 +1413,7 @@ describe( 'Tabs', () => {
 						? { defaultValue: 'alpha' }
 						: { value: 'alpha' };
 
-				render(
+				await render(
 					<Component
 						tabs={ TABS }
 						onValueChange={ mockOnValueChange }
@@ -1510,7 +1516,7 @@ describe( 'Tabs', () => {
 						? { defaultValue: 'alpha' }
 						: { value: 'alpha' };
 
-				render(
+				await render(
 					<Component
 						tabs={ TABS_WITH_BETA_DISABLED }
 						onValueChange={ mockOnValueChange }
@@ -1592,7 +1598,7 @@ describe( 'Tabs', () => {
 					it( 'should continue to handle arrow key navigation properly', async () => {
 						const user = userEvent;
 
-						const { rerender } = render(
+						const { rerender } = await render(
 							<ControlledTabs
 								tabs={ TABS }
 								value="beta"
@@ -1615,7 +1621,7 @@ describe( 'Tabs', () => {
 							} )
 						).toHaveFocus();
 
-						rerender(
+						await rerender(
 							<ControlledTabs
 								tabs={ TABS }
 								value="gamma"
@@ -1652,7 +1658,7 @@ describe( 'Tabs', () => {
 					it( 'should focus the correct tab when tabbing out and back into the tablist', async () => {
 						const user = userEvent;
 
-						const { rerender } = render(
+						const { rerender } = await render(
 							<>
 								<button>Focus me</button>
 								<ControlledTabs
@@ -1679,7 +1685,7 @@ describe( 'Tabs', () => {
 						).toHaveFocus();
 
 						// Change the selected tab to gamma via a controlled update.
-						rerender(
+						await rerender(
 							<>
 								<button>Focus me</button>
 								<ControlledTabs
@@ -1731,7 +1737,7 @@ describe( 'Tabs', () => {
 
 					const user = userEvent;
 
-					const { rerender } = render(
+					const { rerender } = await render(
 						<UncontrolledTabs
 							tabs={ TABS }
 							onValueChange={ mockOnValueChange }
@@ -1772,7 +1778,7 @@ describe( 'Tabs', () => {
 					);
 
 					// Remove gamma
-					rerender(
+					await rerender(
 						<UncontrolledTabs
 							tabs={ TABS.slice( 0, 2 ) }
 							onValueChange={ mockOnValueChange }
@@ -1819,7 +1825,7 @@ describe( 'Tabs', () => {
 							onValueChange: mockOnValueChange,
 						};
 
-						const { rerender } = render(
+						const { rerender } = await render(
 							<Component { ...initialComponentProps } />
 						);
 
@@ -1829,7 +1835,7 @@ describe( 'Tabs', () => {
 						);
 
 						// Remove gamma
-						rerender(
+						await rerender(
 							<Component
 								{ ...initialComponentProps }
 								tabs={ TABS.slice( 0, 2 ) }
@@ -1864,7 +1870,9 @@ describe( 'Tabs', () => {
 						}
 
 						// Re-add gamma.
-						rerender( <Component { ...initialComponentProps } /> );
+						await rerender(
+							<Component { ...initialComponentProps } />
+						);
 
 						expect( screen.getAllByRole( 'tab' ) ).toHaveLength(
 							TABS.length
@@ -1925,7 +1933,7 @@ describe( 'Tabs', () => {
 
 						const user = userEvent;
 
-						const { rerender } = render(
+						const { rerender } = await render(
 							<Component { ...initialComponentProps } />
 						);
 
@@ -1958,7 +1966,7 @@ describe( 'Tabs', () => {
 						);
 
 						// Remove alpha
-						rerender(
+						await rerender(
 							<Component
 								{ ...initialComponentProps }
 								tabs={ TABS.slice( 1 ) }
@@ -1995,7 +2003,9 @@ describe( 'Tabs', () => {
 						}
 
 						// Re-add alpha. Alpha becomes selected again.
-						rerender( <Component { ...initialComponentProps } /> );
+						await rerender(
+							<Component { ...initialComponentProps } />
+						);
 
 						expect( screen.getAllByRole( 'tab' ) ).toHaveLength(
 							TABS.length
@@ -2067,7 +2077,7 @@ describe( 'Tabs', () => {
 							onValueChange: mockOnValueChange,
 						};
 
-						const { rerender } = render(
+						const { rerender } = await render(
 							<Component { ...initialComponentProps } />
 						);
 
@@ -2100,7 +2110,7 @@ describe( 'Tabs', () => {
 						}
 
 						// Re-render with delta added.
-						rerender(
+						await rerender(
 							<Component
 								{ ...initialComponentProps }
 								tabs={ TABS_WITH_DELTA }
@@ -2165,7 +2175,7 @@ describe( 'Tabs', () => {
 							onValueChange: mockOnValueChange,
 						};
 
-						const { rerender } = render(
+						const { rerender } = await render(
 							<Component { ...initialComponentProps } />
 						);
 
@@ -2177,7 +2187,7 @@ describe( 'Tabs', () => {
 						expect( mockOnValueChange ).not.toHaveBeenCalled();
 
 						// Re-render with beta disabled.
-						rerender(
+						await rerender(
 							<Component
 								{ ...initialComponentProps }
 								tabs={ TABS_WITH_BETA_DISABLED }
@@ -2225,7 +2235,9 @@ describe( 'Tabs', () => {
 						}
 
 						// Re-enable beta.
-						rerender( <Component { ...initialComponentProps } /> );
+						await rerender(
+							<Component { ...initialComponentProps } />
+						);
 
 						if ( mode === 'Uncontrolled' ) {
 							// Alpha stays selected — re-enabling beta does
@@ -2272,7 +2284,7 @@ describe( 'Tabs', () => {
 							onValueChange: mockOnValueChange,
 						};
 
-						const { rerender } = render(
+						const { rerender } = await render(
 							<Component { ...initialComponentProps } />
 						);
 
@@ -2309,7 +2321,7 @@ describe( 'Tabs', () => {
 						);
 
 						// Re-render with beta disabled.
-						rerender(
+						await rerender(
 							<Component
 								{ ...initialComponentProps }
 								tabs={ TABS_WITH_BETA_DISABLED }
@@ -2345,7 +2357,9 @@ describe( 'Tabs', () => {
 						}
 
 						// Re-enable beta.
-						rerender( <Component { ...initialComponentProps } /> );
+						await rerender(
+							<Component { ...initialComponentProps } />
+						);
 
 						if ( mode === 'Uncontrolled' ) {
 							// Alpha stays selected.
@@ -2422,7 +2436,7 @@ describe( 'Tabs', () => {
 		it( 'should throw when there are more Tabs than Panels', async () => {
 			const { errors, cleanup } = collectUncaughtErrors();
 
-			render(
+			await render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
 						<Tabs.Tab value="one">One</Tabs.Tab>
@@ -2450,7 +2464,7 @@ describe( 'Tabs', () => {
 		it( 'should throw when there are more Panels than Tabs', async () => {
 			const { errors, cleanup } = collectUncaughtErrors();
 
-			render(
+			await render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
 						<Tabs.Tab value="one">One</Tabs.Tab>
@@ -2478,7 +2492,7 @@ describe( 'Tabs', () => {
 		it( 'should not throw when Tab and Panel counts match', async () => {
 			const { errors, cleanup } = collectUncaughtErrors();
 
-			render(
+			await render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
 						<Tabs.Tab value="one">One</Tabs.Tab>
@@ -2504,7 +2518,7 @@ describe( 'Tabs', () => {
 		it( 'should throw when tabs are used without any panels', async () => {
 			const { errors, cleanup } = collectUncaughtErrors();
 
-			render(
+			await render(
 				<Tabs.Root>
 					<Tabs.List>
 						<Tabs.Tab value="one">One</Tabs.Tab>
@@ -2527,7 +2541,7 @@ describe( 'Tabs', () => {
 		it( 'should detect count mismatch after dynamic changes', async () => {
 			const { errors, cleanup } = collectUncaughtErrors();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
 						<Tabs.Tab value="one">One</Tabs.Tab>
@@ -2549,7 +2563,7 @@ describe( 'Tabs', () => {
 			expect( errors ).toHaveLength( 0 );
 
 			// Remove a panel to create a mismatch
-			rerender(
+			await rerender(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
 						<Tabs.Tab value="one">One</Tabs.Tab>

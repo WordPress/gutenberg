@@ -1,4 +1,5 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { useState } from '@wordpress/element';
 import { GRID_ITEM_DATA_KEY } from '../../shared/grid-item-key';
@@ -29,6 +30,7 @@ function Harness( { firstHeight }: { firstHeight: number } ) {
 		{ key: 'a', span: 1 },
 		{ key: 'b', span: 1 },
 	];
+
 	const result = useLanePlacement( container, {
 		items,
 		lanes: 1,
@@ -56,14 +58,14 @@ function Harness( { firstHeight }: { firstHeight: number } ) {
 
 describe( 'useLanePlacement browser measurements', () => {
 	it( 'recomputes lane placement when an item resizes', async () => {
-		const view = render( <Harness firstHeight={ 100 } /> );
+		const view = await render( <Harness firstHeight={ 100 } /> );
 		const secondItem = screen.getByTestId( 'item-b' );
 
 		await waitFor( () => {
 			expect( secondItem ).toHaveStyle( { gridRowStart: '26' } );
 		} );
 
-		view.rerender( <Harness firstHeight={ 200 } /> );
+		await view.rerender( <Harness firstHeight={ 200 } /> );
 
 		await waitFor( () => {
 			expect( secondItem ).toHaveStyle( { gridRowStart: '51' } );

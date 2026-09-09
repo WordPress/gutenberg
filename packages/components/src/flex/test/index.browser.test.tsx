@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import type { CSSProperties } from 'react';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { View } from '../../view';
 import { Flex, FlexBlock, FlexItem } from '../';
 
@@ -17,8 +18,8 @@ function expectCustomProperty(
 }
 
 describe( 'props', () => {
-	test( 'should render correctly', () => {
-		render(
+	test( 'should render correctly', async () => {
+		await render(
 			<Flex data-testid="base-flex">
 				<FlexItem>Item</FlexItem>
 				<FlexBlock>Item</FlexBlock>
@@ -30,8 +31,8 @@ describe( 'props', () => {
 		expect( flex ).toHaveTextContent( 'ItemItem' );
 	} );
 
-	test( 'should render non Flex children', () => {
-		render(
+	test( 'should render non Flex children', async () => {
+		await render(
 			<Flex data-testid="flex">
 				<FlexItem>Item</FlexItem>
 				<View data-testid="view-child" />
@@ -44,8 +45,8 @@ describe( 'props', () => {
 		expect( screen.getByTestId( 'div-child' ) ).toBeInTheDocument();
 	} );
 
-	test( 'should render align', () => {
-		render(
+	test( 'should render align', async () => {
+		await render(
 			<Flex align="flex-start" data-testid="flex">
 				<FlexItem>Item</FlexItem>
 				<FlexBlock>Item</FlexBlock>
@@ -58,8 +59,8 @@ describe( 'props', () => {
 		);
 	} );
 
-	test( 'should render justify', () => {
-		render(
+	test( 'should render justify', async () => {
+		await render(
 			<Flex justify="flex-start" data-testid="flex">
 				<FlexItem>Item</FlexItem>
 				<FlexBlock>Item</FlexBlock>
@@ -72,8 +73,8 @@ describe( 'props', () => {
 		);
 	} );
 
-	test( 'should render spacing', () => {
-		render(
+	test( 'should render spacing', async () => {
+		await render(
 			<Flex gap={ 5 } data-testid="flex">
 				<FlexItem>Item</FlexItem>
 				<FlexBlock>Item</FlexBlock>
@@ -87,8 +88,8 @@ describe( 'props', () => {
 		);
 	} );
 
-	test( 'should prefer generated flex styles over consumer CSS custom properties', () => {
-		render(
+	test( 'should prefer generated flex styles over consumer CSS custom properties', async () => {
+		await render(
 			<Flex
 				align="flex-start"
 				data-testid="flex"
@@ -109,8 +110,8 @@ describe( 'props', () => {
 		);
 	} );
 
-	test( 'should render column direction', () => {
-		render(
+	test( 'should render column direction', async () => {
+		await render(
 			<Flex direction="column" data-testid="flex">
 				<FlexItem data-testid="flex-item">Item</FlexItem>
 			</Flex>
@@ -129,8 +130,8 @@ describe( 'props', () => {
 		);
 	} );
 
-	test( 'should render flex item display', () => {
-		render(
+	test( 'should render flex item display', async () => {
+		await render(
 			<Flex>
 				<FlexItem display="inline-flex" data-testid="item">
 					Item
@@ -145,8 +146,8 @@ describe( 'props', () => {
 		);
 	} );
 
-	test( 'should prefer generated flex item styles over consumer CSS custom properties', () => {
-		render(
+	test( 'should prefer generated flex item styles over consumer CSS custom properties', async () => {
+		await render(
 			<Flex>
 				<FlexItem
 					display="inline-flex"

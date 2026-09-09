@@ -1,18 +1,14 @@
 import { describe, expect, it, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import {
-	queryByAttribute,
-	render,
-	screen,
-	waitFor,
-} from '@testing-library/react';
+import { queryByAttribute, screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import * as Ariakit from '@ariakit/react';
 import type { ComponentProps } from 'react';
 import { useState } from '@wordpress/element';
 import { Composite } from '..';
 
 async function renderAndValidate( ...args: Parameters< typeof render > ) {
-	const view = render( ...args );
+	const view = await render( ...args );
 	await waitFor( () => {
 		const activeButton = queryByAttribute(
 			'data-active-item',
@@ -694,8 +690,8 @@ describe( 'Composite', () => {
 	} );
 
 	describe( 'required context', () => {
-		it( 'warns when Composite.Item has no composite state', () => {
-			render( <Composite.Item>Item</Composite.Item> );
+		it( 'warns when Composite.Item has no composite state', async () => {
+			await render( <Composite.Item>Item</Composite.Item> );
 
 			expect(
 				screen.getByRole( 'button', { name: 'Item' } )
@@ -705,7 +701,7 @@ describe( 'Composite', () => {
 			);
 		} );
 
-		it( 'supports an explicit store prop for Composite.Item', () => {
+		it( 'supports an explicit store prop for Composite.Item', async () => {
 			function ItemWithStore() {
 				const store = Ariakit.useCompositeStore();
 
@@ -719,21 +715,21 @@ describe( 'Composite', () => {
 				);
 			}
 
-			render( <ItemWithStore /> );
+			await render( <ItemWithStore /> );
 
 			expect(
 				screen.getByRole( 'button', { name: 'Item' } )
 			).toBeVisible();
 		} );
 
-		it( 'throws when Composite.GroupLabel is outside Composite.Group', () => {
-			expect( () =>
+		it( 'throws when Composite.GroupLabel is outside Composite.Group', async () => {
+			await expect(
 				render(
 					<Composite>
 						<Composite.GroupLabel>Label</Composite.GroupLabel>
 					</Composite>
 				)
-			).toThrow(
+			).rejects.toThrow(
 				'Composite.GroupLabel can only be rendered inside Composite.Group.'
 			);
 			expect( console ).toHaveErrored();

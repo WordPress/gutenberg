@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import Disabled from '../';
 
 describe( 'Disabled browser behavior', () => {
-	it( 'blocks pointer events for descendants', () => {
-		render(
+	it( 'blocks pointer events for descendants', async () => {
+		await render(
 			<Disabled>
 				<button type="button">Disabled action</button>
 			</Disabled>
@@ -19,7 +20,7 @@ describe( 'Disabled browser behavior', () => {
 	} );
 
 	it( 'skips descendants during tab navigation', async () => {
-		render(
+		await render(
 			<>
 				<Disabled>
 					<button type="button">Disabled action</button>

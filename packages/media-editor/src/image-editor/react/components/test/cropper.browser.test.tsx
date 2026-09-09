@@ -1,12 +1,7 @@
 import { afterEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import {
-	act,
-	fireEvent,
-	render,
-	screen,
-	waitFor,
-} from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { Cropper } from '../cropper';
 import type { CropperController } from '../../hooks/use-cropper-reducer';
 import { DEFAULT_STATE } from '../../../core/constants';
@@ -53,12 +48,14 @@ function CropperFixture( { children }: { children: React.ReactNode } ) {
 	return <div style={ { width: 648, height: 448 } }>{ children }</div>;
 }
 
-function renderCropper( cropper: React.ReactElement ) {
-	const view = render( <CropperFixture>{ cropper }</CropperFixture> );
+async function renderCropper( cropper: React.ReactElement ) {
+	const view = await render( <CropperFixture>{ cropper }</CropperFixture> );
 	return {
 		...view,
-		rerender: ( nextCropper: React.ReactElement ) =>
-			view.rerender( <CropperFixture>{ nextCropper }</CropperFixture> ),
+		rerender: async ( nextCropper: React.ReactElement ) =>
+			await view.rerender(
+				<CropperFixture>{ nextCropper }</CropperFixture>
+			),
 	};
 }
 
@@ -76,8 +73,8 @@ afterEach( () => {
 } );
 
 describe( 'Cropper', () => {
-	it( 'does not render the grid when showGrid is false', () => {
-		renderCropper(
+	it( 'does not render the grid when showGrid is false', async () => {
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ createController() }
@@ -90,7 +87,7 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'renders the grid always visible when showGrid is true', async () => {
-		renderCropper(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ createController() }
@@ -106,8 +103,8 @@ describe( 'Cropper', () => {
 		expect( canvas ).not.toHaveClass( SHOW_GRID_CLASS );
 	} );
 
-	it( 'describes and focuses the crop area when requested', () => {
-		renderCropper(
+	it( 'describes and focuses the crop area when requested', async () => {
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ createController() }
@@ -124,7 +121,7 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'does not expose crop area keyboard hints while resize handles are focused', async () => {
-		renderCropper(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ createController() }
@@ -151,7 +148,7 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'clears the keyboard-active class when a pointer drag starts on a handle', async () => {
-		renderCropper(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ createController() }
@@ -191,7 +188,7 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'returns focus to the crop area on Escape from a resize handle', async () => {
-		renderCropper(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ createController() }
@@ -215,7 +212,7 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'renders the grid hidden by default in interactive mode', async () => {
-		renderCropper(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ createController() }
@@ -232,7 +229,7 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'shows the interactive grid when a placement control is active', async () => {
-		renderCropper(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ createController() }
@@ -255,7 +252,7 @@ describe( 'Cropper', () => {
 			...controller.state,
 			cropRect: { x: 0.1, y: 0.2, width: 0.5, height: 0.4 },
 		};
-		const { rerender } = renderCropper(
+		const { rerender } = await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ controller }
@@ -270,7 +267,7 @@ describe( 'Cropper', () => {
 		( controller.setCropRect as Mock ).mockClear();
 		( controller.adjustCropRectForViewport as Mock ).mockClear();
 
-		rerender(
+		await rerender(
 			<Cropper
 				src="test.jpg"
 				controller={ controller }
@@ -294,7 +291,7 @@ describe( 'Cropper', () => {
 			...controller.state,
 			cropRect: { x: 0.1, y: 0.2, width: 0.5, height: 0.4 },
 		};
-		renderCropper(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ controller }
@@ -317,7 +314,7 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'clears settling state when a new resize starts before the settle fallback fires', async () => {
-		renderCropper(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ createController() }
@@ -368,7 +365,7 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'keeps settling active until the settle transform transition ends', async () => {
-		renderCropper(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ createController() }
@@ -413,7 +410,7 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'clears settling via the fallback timer when no transitionend fires', async () => {
-		renderCropper(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ createController() }
@@ -450,7 +447,7 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'ignores non-transform transitionend events while settling', async () => {
-		renderCropper(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ createController() }
@@ -495,7 +492,7 @@ describe( 'Cropper', () => {
 		const controller = createController();
 		controller.state = { ...controller.state, zoom: 2 };
 
-		renderCropper(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ controller }
@@ -530,7 +527,7 @@ describe( 'Cropper', () => {
 
 	it( 'ignores wheel zoom while a crop resize is active', async () => {
 		const controller = createController();
-		renderCropper(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ controller }
@@ -569,7 +566,7 @@ describe( 'Cropper', () => {
 
 	it( 'does not start canvas drag from touch pointer events', async () => {
 		const controller = createController();
-		renderCropper(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ controller }
@@ -607,7 +604,7 @@ describe( 'Cropper', () => {
 
 	it( 'ignores pointer drags on the canvas while disabled', async () => {
 		const controller = createController();
-		render(
+		await render(
 			<Cropper
 				src="test.jpg"
 				controller={ controller }
@@ -655,13 +652,13 @@ describe( 'Cropper', () => {
 			showGrid: 'interactive' as const,
 			freeformCrop: true,
 		};
-		const { rerender } = render( <Cropper { ...props } disabled /> );
+		const { rerender } = await render( <Cropper { ...props } disabled /> );
 
 		await screen.findByRole( 'button', {
 			name: 'Resize from top-left corner',
 		} );
 
-		rerender( <Cropper { ...props } /> );
+		await rerender( <Cropper { ...props } /> );
 
 		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 		fireEvent.pointerDown( canvas, {
@@ -695,7 +692,7 @@ describe( 'Cropper', () => {
 			onGestureStart,
 			onGestureEnd,
 		};
-		const { rerender } = render( <Cropper { ...props } /> );
+		const { rerender } = await render( <Cropper { ...props } /> );
 
 		await screen.findByRole( 'button', {
 			name: 'Resize from top-left corner',
@@ -718,7 +715,7 @@ describe( 'Cropper', () => {
 		} );
 		await waitFor( () => expect( onGestureStart ).toHaveBeenCalled() );
 
-		rerender( <Cropper { ...props } disabled /> );
+		await rerender( <Cropper { ...props } disabled /> );
 
 		// Without this the caller is left believing a gesture is still
 		// running, which keeps undo/redo disabled after a failed save.
@@ -737,13 +734,13 @@ describe( 'Cropper', () => {
 			freeformCrop: true,
 			onGestureEnd,
 		};
-		const { rerender } = render( <Cropper { ...props } /> );
+		const { rerender } = await render( <Cropper { ...props } /> );
 
 		await screen.findByRole( 'button', {
 			name: 'Resize from top-left corner',
 		} );
 
-		rerender( <Cropper { ...props } disabled /> );
+		await rerender( <Cropper { ...props } disabled /> );
 
 		expect( onGestureEnd ).not.toHaveBeenCalled();
 	} );
@@ -759,7 +756,7 @@ describe( 'Cropper', () => {
 			freeformCrop: true,
 			onGestureStart,
 		};
-		const { rerender } = render( <Cropper { ...props } /> );
+		const { rerender } = await render( <Cropper { ...props } /> );
 
 		await screen.findByRole( 'button', {
 			name: 'Resize from top-left corner',
@@ -771,8 +768,8 @@ describe( 'Cropper', () => {
 		await waitFor( () => expect( onGestureStart ).toHaveBeenCalled() );
 
 		// Saving cancels it, then the save fails and tools come back.
-		rerender( <Cropper { ...props } disabled /> );
-		rerender( <Cropper { ...props } /> );
+		await rerender( <Cropper { ...props } disabled /> );
+		await rerender( <Cropper { ...props } /> );
 		onGestureStart.mockClear();
 
 		// The next wheel zoom must open a gesture of its own.
@@ -782,7 +779,7 @@ describe( 'Cropper', () => {
 
 	it( 'ignores wheel zoom while disabled', async () => {
 		const controller = createController();
-		render(
+		await render(
 			<Cropper
 				src="test.jpg"
 				controller={ controller }
@@ -811,7 +808,7 @@ describe( 'Cropper', () => {
 
 	it( 'ignores keyboard pan while disabled', async () => {
 		const controller = createController();
-		render(
+		await render(
 			<Cropper
 				src="test.jpg"
 				controller={ controller }
@@ -837,7 +834,7 @@ describe( 'Cropper', () => {
 			showGrid: 'interactive' as const,
 			freeformCrop: true,
 		};
-		const { rerender } = render( <Cropper { ...props } /> );
+		const { rerender } = await render( <Cropper { ...props } /> );
 
 		await screen.findByRole( 'button', {
 			name: 'Resize from top-left corner',
@@ -852,7 +849,7 @@ describe( 'Cropper', () => {
 			isPrimary: true,
 		} );
 
-		rerender( <Cropper { ...props } disabled /> );
+		await rerender( <Cropper { ...props } disabled /> );
 		vi.mocked( controller.setPan ).mockClear();
 
 		fireEvent.pointerMove( canvas, {
@@ -873,7 +870,7 @@ describe( 'Cropper', () => {
 
 	it( 'does not resize the crop from a handle drag while disabled', async () => {
 		const controller = createController();
-		render(
+		await render(
 			<Cropper
 				src="test.jpg"
 				controller={ controller }
@@ -921,7 +918,7 @@ describe( 'Cropper', () => {
 		try {
 			const controller = createController();
 			const onGestureEnd = vi.fn();
-			renderCropper(
+			await renderCropper(
 				<Cropper
 					src="test.jpg"
 					controller={ controller }
@@ -1072,7 +1069,9 @@ describe( 'Cropper', () => {
 			// 1/3 of 400 = 133px. On-screen 133x133, well below 0.8 * 400.
 			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
 		};
-		renderCropper( <Cropper src="tall.jpg" controller={ controller } /> );
+		await renderCropper(
+			<Cropper src="tall.jpg" controller={ controller } />
+		);
 
 		// Footprint is 133.33x400. The square crop's binding axis (height) fills
 		// to 0.8 * 400, so the image magnifies by 0.8 * 400 / 133.33 = 2.4.
@@ -1087,7 +1086,9 @@ describe( 'Cropper', () => {
 			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
 			pan: { x: 0.1, y: -0.05 },
 		};
-		renderCropper( <Cropper src="tall.jpg" controller={ controller } /> );
+		await renderCropper(
+			<Cropper src="tall.jpg" controller={ controller } />
+		);
 
 		await waitFor( () => expect( imageScale() ).toBeCloseTo( 2.4, 2 ) );
 		const { viewScale, matrix } = imageTransformParts();
@@ -1108,7 +1109,7 @@ describe( 'Cropper', () => {
 			image: TALL_IMAGE,
 			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
 		};
-		renderCropper(
+		await renderCropper(
 			<Cropper src="tall.jpg" controller={ controller } showGrid />
 		);
 
@@ -1154,7 +1155,9 @@ describe( 'Cropper', () => {
 			// Full-frame crop already fills the canvas height (footprint == 400).
 			cropRect: { x: 0, y: 0, width: 1, height: 1 },
 		};
-		renderCropper( <Cropper src="tall.jpg" controller={ controller } /> );
+		await renderCropper(
+			<Cropper src="tall.jpg" controller={ controller } />
+		);
 
 		await waitFor( () =>
 			expect( controller.setVisualSize ).toHaveBeenLastCalledWith( {
@@ -1173,7 +1176,7 @@ describe( 'Cropper', () => {
 			image: TALL_IMAGE,
 			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
 		};
-		renderCropper(
+		await renderCropper(
 			<Cropper src="tall.jpg" controller={ controller } freeformCrop />
 		);
 
@@ -1209,7 +1212,7 @@ describe( 'Cropper', () => {
 			{ ...controller.state, cropRect },
 			{ width: image.naturalWidth, height: image.naturalHeight }
 		);
-		renderCropper(
+		await renderCropper(
 			<Cropper src="tiny.png" controller={ controller } freeformCrop />
 		);
 
@@ -1251,7 +1254,7 @@ describe( 'Cropper', () => {
 			{ ...controller.state, cropRect },
 			{ width: image.naturalWidth, height: image.naturalHeight }
 		);
-		renderCropper(
+		await renderCropper(
 			<Cropper src="wide.png" controller={ controller } freeformCrop />
 		);
 
@@ -1286,7 +1289,7 @@ describe( 'Cropper', () => {
 			image,
 			cropRect,
 		};
-		renderCropper(
+		await renderCropper(
 			<Cropper src="large.png" controller={ controller } freeformCrop />
 		);
 
@@ -1328,7 +1331,7 @@ describe( 'Cropper', () => {
 			cropRect,
 			zoom: 0.5,
 		};
-		const { rerender } = renderCropper(
+		const { rerender } = await renderCropper(
 			<Cropper
 				src="crossing.png"
 				controller={ controller }
@@ -1340,7 +1343,7 @@ describe( 'Cropper', () => {
 		expect( controller.setCropRect ).not.toHaveBeenCalled();
 
 		controller.state = { ...controller.state, zoom: 3 };
-		rerender(
+		await rerender(
 			<Cropper
 				src="crossing.png"
 				controller={ controller }
@@ -1384,7 +1387,7 @@ describe( 'Cropper', () => {
 			},
 			zoom: 0.5,
 		};
-		const { rerender } = renderCropper(
+		const { rerender } = await renderCropper(
 			<Cropper
 				src="locked-ratio.png"
 				controller={ controller }
@@ -1395,7 +1398,7 @@ describe( 'Cropper', () => {
 
 		await screen.findByTestId( 'cropper-image' );
 		controller.state = { ...controller.state, zoom: 3 };
-		rerender(
+		await rerender(
 			<Cropper
 				src="locked-ratio.png"
 				controller={ controller }
@@ -1421,7 +1424,9 @@ describe( 'Cropper', () => {
 			// upscale — so the display scale exceeds 1:1.
 			image: { src: 'tiny.png', naturalWidth: 50, naturalHeight: 50 },
 		};
-		renderCropper( <Cropper src="tiny.png" controller={ controller } /> );
+		await renderCropper(
+			<Cropper src="tiny.png" controller={ controller } />
+		);
 
 		await waitFor( () => expect( imageRendering() ).toBe( 'pixelated' ) );
 	} );
@@ -1435,7 +1440,9 @@ describe( 'Cropper', () => {
 			image: TALL_IMAGE,
 			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
 		};
-		renderCropper( <Cropper src="tall.jpg" controller={ controller } /> );
+		await renderCropper(
+			<Cropper src="tall.jpg" controller={ controller } />
+		);
 
 		await waitFor( () =>
 			expect( controller.setVisualSize ).toHaveBeenLastCalledWith( {

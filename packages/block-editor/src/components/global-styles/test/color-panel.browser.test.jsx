@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, renderHook, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render, renderHook } from 'vitest-browser-react';
 import ColorPanel, {
 	useHasColorPanel,
 	useHasTextPanel,
@@ -35,22 +36,22 @@ describe( 'useHasColorPanel', () => {
 	// After moving top-level text color to TypographyPanel and top-level
 	// background color to BackgroundPanel, the Color panel only aggregates
 	// link and element controls (heading, button, caption).
-	it( 'should be false when only text color is enabled', () => {
-		const { result } = renderHook( () =>
+	it( 'should be false when only text color is enabled', async () => {
+		const { result } = await renderHook( () =>
 			useHasColorPanel( settingsWithColors( { text: true } ) )
 		);
 		expect( result.current ).toBeFalsy();
 	} );
 
-	it( 'should be false when only background color is enabled', () => {
-		const { result } = renderHook( () =>
+	it( 'should be false when only background color is enabled', async () => {
+		const { result } = await renderHook( () =>
 			useHasColorPanel( settingsWithColors( { background: true } ) )
 		);
 		expect( result.current ).toBeFalsy();
 	} );
 
-	it( 'should be false when both text and background are enabled but no element controls are', () => {
-		const { result } = renderHook( () =>
+	it( 'should be false when both text and background are enabled but no element controls are', async () => {
+		const { result } = await renderHook( () =>
 			useHasColorPanel(
 				settingsWithColors( { text: true, background: true } )
 			)
@@ -58,65 +59,65 @@ describe( 'useHasColorPanel', () => {
 		expect( result.current ).toBeFalsy();
 	} );
 
-	it( 'should be true when link color is enabled', () => {
-		const { result } = renderHook( () =>
+	it( 'should be true when link color is enabled', async () => {
+		const { result } = await renderHook( () =>
 			useHasColorPanel( settingsWithColors( { link: true } ) )
 		);
 		expect( result.current ).toBeTruthy();
 	} );
 
-	it( 'should be true when heading element is enabled', () => {
-		const { result } = renderHook( () =>
+	it( 'should be true when heading element is enabled', async () => {
+		const { result } = await renderHook( () =>
 			useHasColorPanel( settingsWithColors( { heading: true } ) )
 		);
 		expect( result.current ).toBeTruthy();
 	} );
 
-	it( 'should be true when button element is enabled', () => {
-		const { result } = renderHook( () =>
+	it( 'should be true when button element is enabled', async () => {
+		const { result } = await renderHook( () =>
 			useHasColorPanel( settingsWithColors( { button: true } ) )
 		);
 		expect( result.current ).toBeTruthy();
 	} );
 
-	it( 'should be true when caption element is enabled', () => {
-		const { result } = renderHook( () =>
+	it( 'should be true when caption element is enabled', async () => {
+		const { result } = await renderHook( () =>
 			useHasColorPanel( settingsWithColors( { caption: true } ) )
 		);
 		expect( result.current ).toBeTruthy();
 	} );
 
-	it( 'should be false when no color controls are enabled', () => {
-		const { result } = renderHook( () => useHasColorPanel( {} ) );
+	it( 'should be false when no color controls are enabled', async () => {
+		const { result } = await renderHook( () => useHasColorPanel( {} ) );
 		expect( result.current ).toBeFalsy();
 	} );
 } );
 
 describe( 'useHasTextPanel', () => {
 	// Still exported for TypographyPanel to consume as its text color gate.
-	it( 'should be true when text color is enabled and colors exist', () => {
-		const { result } = renderHook( () =>
+	it( 'should be true when text color is enabled and colors exist', async () => {
+		const { result } = await renderHook( () =>
 			useHasTextPanel( settingsWithColors( { text: true } ) )
 		);
 		expect( result.current ).toBeTruthy();
 	} );
 
-	it( 'should be true when text color is enabled with custom colors support', () => {
-		const { result } = renderHook( () =>
+	it( 'should be true when text color is enabled with custom colors support', async () => {
+		const { result } = await renderHook( () =>
 			useHasTextPanel( { color: { text: true, custom: true } } )
 		);
 		expect( result.current ).toBeTruthy();
 	} );
 
-	it( 'should be false when text color is disabled', () => {
-		const { result } = renderHook( () =>
+	it( 'should be false when text color is disabled', async () => {
+		const { result } = await renderHook( () =>
 			useHasTextPanel( settingsWithColors( { text: false } ) )
 		);
 		expect( result.current ).toBeFalsy();
 	} );
 
-	it( 'should be false when no colors or custom support exist', () => {
-		const { result } = renderHook( () =>
+	it( 'should be false when no colors or custom support exist', async () => {
+		const { result } = await renderHook( () =>
 			useHasTextPanel( { color: { text: true } } )
 		);
 		expect( result.current ).toBeFalsy();
@@ -125,8 +126,8 @@ describe( 'useHasTextPanel', () => {
 
 describe( 'useHasBackgroundColorPanel', () => {
 	// Still exported for BackgroundPanel to consume as its background color gate.
-	it( 'should be true when background is enabled and colors exist', () => {
-		const { result } = renderHook( () =>
+	it( 'should be true when background is enabled and colors exist', async () => {
+		const { result } = await renderHook( () =>
 			useHasBackgroundColorPanel(
 				settingsWithColors( { background: true } )
 			)
@@ -134,8 +135,8 @@ describe( 'useHasBackgroundColorPanel', () => {
 		expect( result.current ).toBeTruthy();
 	} );
 
-	it( 'should be true when only gradients are available', () => {
-		const { result } = renderHook( () =>
+	it( 'should be true when only gradients are available', async () => {
+		const { result } = await renderHook( () =>
 			useHasBackgroundColorPanel( {
 				color: {
 					background: true,
@@ -154,8 +155,8 @@ describe( 'useHasBackgroundColorPanel', () => {
 		expect( result.current ).toBeTruthy();
 	} );
 
-	it( 'should be false when background color is disabled', () => {
-		const { result } = renderHook( () =>
+	it( 'should be false when background color is disabled', async () => {
+		const { result } = await renderHook( () =>
 			useHasBackgroundColorPanel(
 				settingsWithColors( { background: false } )
 			)
@@ -165,29 +166,29 @@ describe( 'useHasBackgroundColorPanel', () => {
 } );
 
 describe( 'element color hooks', () => {
-	it( 'useHasLinkPanel is truthy when link is enabled with colors', () => {
-		const { result } = renderHook( () =>
+	it( 'useHasLinkPanel is truthy when link is enabled with colors', async () => {
+		const { result } = await renderHook( () =>
 			useHasLinkPanel( settingsWithColors( { link: true } ) )
 		);
 		expect( result.current ).toBeTruthy();
 	} );
 
-	it( 'useHasHeadingPanel is truthy when heading is enabled with colors', () => {
-		const { result } = renderHook( () =>
+	it( 'useHasHeadingPanel is truthy when heading is enabled with colors', async () => {
+		const { result } = await renderHook( () =>
 			useHasHeadingPanel( settingsWithColors( { heading: true } ) )
 		);
 		expect( result.current ).toBeTruthy();
 	} );
 
-	it( 'useHasButtonPanel is truthy when button is enabled with colors', () => {
-		const { result } = renderHook( () =>
+	it( 'useHasButtonPanel is truthy when button is enabled with colors', async () => {
+		const { result } = await renderHook( () =>
 			useHasButtonPanel( settingsWithColors( { button: true } ) )
 		);
 		expect( result.current ).toBeTruthy();
 	} );
 
-	it( 'useHasCaptionPanel is truthy when caption is enabled with colors', () => {
-		const { result } = renderHook( () =>
+	it( 'useHasCaptionPanel is truthy when caption is enabled with colors', async () => {
+		const { result } = await renderHook( () =>
 			useHasCaptionPanel( settingsWithColors( { caption: true } ) )
 		);
 		expect( result.current ).toBeTruthy();
@@ -234,7 +235,7 @@ describe( 'ColorPanel — duplicate-hex preset slug identity', () => {
 	};
 
 	it( 'marks only the local link preset as selected when another preset shares its hex', async () => {
-		render(
+		await render(
 			<ColorPanel
 				value={ {
 					elements: {
@@ -262,8 +263,8 @@ describe( 'ColorPanel — duplicate-hex preset slug identity', () => {
 } );
 
 describe( 'ColorPanel — additional elements', () => {
-	it( 'renders additional element color controls', () => {
-		render(
+	it( 'renders additional element color controls', async () => {
+		await render(
 			<ColorPanel
 				value={ {} }
 				settings={ settingsWithColors( {
@@ -287,7 +288,7 @@ describe( 'ColorPanel — additional elements', () => {
 
 describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 	describe( 'Link color', () => {
-		it( 'exposes an accessible reset when local link.text overrides the inherited value', () => {
+		it( 'exposes an accessible reset when local link.text overrides the inherited value', async () => {
 			const inheritedValue = {
 				elements: { link: { color: { text: '#0000ff' } } },
 			};
@@ -295,7 +296,7 @@ describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 				elements: { link: { color: { text: '#aaaaaa' } } },
 			};
 
-			render(
+			await render(
 				<ColorPanel
 					value={ value }
 					inheritedValue={ inheritedValue }
@@ -336,8 +337,8 @@ describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 			},
 		};
 
-		it( 'paints an inherited link preset via its CSS custom property', () => {
-			const { container } = render(
+		it( 'paints an inherited link preset via its CSS custom property', async () => {
+			const { container } = await render(
 				<ColorPanel
 					value={ {} }
 					inheritedValue={ {
@@ -361,8 +362,8 @@ describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 			).toBe( true );
 		} );
 
-		it( 'paints an inherited element (heading) preset via its CSS custom property', () => {
-			const { container } = render(
+		it( 'paints an inherited element (heading) preset via its CSS custom property', async () => {
+			const { container } = await render(
 				<ColorPanel
 					value={ {} }
 					inheritedValue={ {

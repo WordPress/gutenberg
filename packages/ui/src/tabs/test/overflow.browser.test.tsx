@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { Tabs } from '../..';
 import styles from '../style.module.css';
 
@@ -36,14 +37,14 @@ function OverflowTabs( { tabWidth }: { tabWidth: number } ) {
 
 describe( 'Tabs.List overflow fade', () => {
 	it( 'clears the fade when a tab reflows to fit', async () => {
-		const view = render( <OverflowTabs tabWidth={ 100 } /> );
+		const view = await render( <OverflowTabs tabWidth={ 100 } /> );
 		const tablist = screen.getByRole( 'tablist' );
 
 		await waitFor( () => {
 			expect( tablist ).toHaveClass( styles[ 'is-overflowing-last' ] );
 		} );
 
-		view.rerender( <OverflowTabs tabWidth={ 10 } /> );
+		await view.rerender( <OverflowTabs tabWidth={ 10 } /> );
 
 		await waitFor( () => {
 			expect( tablist ).not.toHaveClass(

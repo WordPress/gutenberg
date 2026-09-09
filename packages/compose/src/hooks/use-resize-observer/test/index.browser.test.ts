@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { act, renderHook } from '@testing-library/react';
+import { act } from '@testing-library/react';
+import { renderHook } from 'vitest-browser-react';
 import useResizeObserver from '..';
 
 afterEach( () => {
@@ -7,16 +8,16 @@ afterEach( () => {
 } );
 
 describe( 'useResizeObserver', () => {
-	it( 'disconnects the observer on unmount', () => {
+	it( 'disconnects the observer on unmount', async () => {
 		const disconnect = vi.spyOn( ResizeObserver.prototype, 'disconnect' );
-		const { result, unmount } = renderHook( () =>
+		const { result, unmount } = await renderHook( () =>
 			useResizeObserver( vi.fn() )
 		);
 
 		act( () => result.current( document.createElement( 'div' ) ) );
 		expect( disconnect ).not.toHaveBeenCalled();
 
-		unmount();
+		await unmount();
 
 		expect( disconnect ).toHaveBeenCalledOnce();
 	} );

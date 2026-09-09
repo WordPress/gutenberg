@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { ProgressBar } from '..';
 
 describe( 'ProgressBar', () => {
-	it( 'should render an indeterminate semantic progress bar element', () => {
-		render( <ProgressBar /> );
+	it( 'should render an indeterminate semantic progress bar element', async () => {
+		await render( <ProgressBar /> );
 
 		const progressBar = screen.getByRole( 'progressbar' );
 
@@ -12,8 +13,8 @@ describe( 'ProgressBar', () => {
 		expect( progressBar ).not.toHaveValue();
 	} );
 
-	it( 'should render a determinate semantic progress bar element', () => {
-		render( <ProgressBar value={ 55 } /> );
+	it( 'should render a determinate semantic progress bar element', async () => {
+		await render( <ProgressBar value={ 55 } /> );
 
 		const progressBar = screen.getByRole( 'progressbar' );
 
@@ -21,8 +22,8 @@ describe( 'ProgressBar', () => {
 		expect( progressBar ).toHaveValue( 55 );
 	} );
 
-	it( 'should use the stylesheet-defined width for an indeterminate progress bar', () => {
-		const { container } = render( <ProgressBar /> );
+	it( 'should use the stylesheet-defined width for an indeterminate progress bar', async () => {
+		const { container } = await render( <ProgressBar /> );
 
 		/**
 		 * We're intentionally not using an accessible selector, because
@@ -42,8 +43,8 @@ describe( 'ProgressBar', () => {
 		expect( style.getPropertyValue( '--indicator-width' ) ).toBe( '50%' );
 	} );
 
-	it( 'should use `value`% as width for determinate progress bar', () => {
-		const { container } = render( <ProgressBar value={ 55 } /> );
+	it( 'should use `value`% as width for determinate progress bar', async () => {
+		const { container } = await render( <ProgressBar value={ 55 } /> );
 
 		/**
 		 * We're intentionally not using an accessible selector, because
@@ -59,12 +60,12 @@ describe( 'ProgressBar', () => {
 		).toBe( '55%' );
 	} );
 
-	it( 'should pass any additional props down to the underlying `progress` element', () => {
+	it( 'should pass any additional props down to the underlying `progress` element', async () => {
 		const id = 'foo-bar-123';
 		const ariaLabel = 'in progress...';
 		const style = { opacity: 1 };
 
-		render(
+		await render(
 			<ProgressBar id={ id } aria-label={ ariaLabel } style={ style } />
 		);
 

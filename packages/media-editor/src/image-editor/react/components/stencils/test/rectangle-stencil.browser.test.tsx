@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { screen, fireEvent, act } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { RectangleStencil } from '../rectangle-stencil';
 import type {
 	HandlePosition,
@@ -25,7 +26,7 @@ const CROP_BOUNDS = { minX: 0, minY: 0, maxX: 1, maxY: 1 };
  *
  * @param overrides Props to override on the rendered stencil.
  */
-function renderStencil(
+async function renderStencil(
 	overrides: Partial< React.ComponentProps< typeof RectangleStencil > > = {}
 ) {
 	const onCropChange = vi.fn();
@@ -45,7 +46,7 @@ function renderStencil(
 		...overrides,
 	};
 
-	const utils = render( <RectangleStencil { ...props } /> );
+	const utils = await render( <RectangleStencil { ...props } /> );
 
 	return {
 		...utils,
@@ -59,8 +60,8 @@ function renderStencil(
 
 describe( 'RectangleStencil', () => {
 	describe( 'tab order', () => {
-		it( 'renders handles clockwise from top-left in freeform mode', () => {
-			renderStencil();
+		it( 'renders handles clockwise from top-left in freeform mode', async () => {
+			await renderStencil();
 			const labels = screen
 				.getAllByRole( 'button' )
 				.map( ( b ) => b.getAttribute( 'aria-label' ) );
@@ -77,8 +78,8 @@ describe( 'RectangleStencil', () => {
 			] );
 		} );
 
-		it( 'describes keyboard resizing on resize handles', () => {
-			renderStencil();
+		it( 'describes keyboard resizing on resize handles', async () => {
+			await renderStencil();
 			expect(
 				screen.getByRole( 'button', {
 					name: 'Resize from top-left corner',
@@ -88,8 +89,8 @@ describe( 'RectangleStencil', () => {
 			);
 		} );
 
-		it( 'renders corner handles clockwise from top-left when aspect ratio is locked', () => {
-			renderStencil( { aspectRatio: 16 / 9 } );
+		it( 'renders corner handles clockwise from top-left when aspect ratio is locked', async () => {
+			await renderStencil( { aspectRatio: 16 / 9 } );
 			const labels = screen
 				.getAllByRole( 'button' )
 				.map( ( b ) => b.getAttribute( 'aria-label' ) );
@@ -107,7 +108,7 @@ describe( 'RectangleStencil', () => {
 		it( 'handles Escape on a handle without bubbling', async () => {
 			const onKeyDown = vi.fn();
 			const onEscape = vi.fn();
-			render(
+			await render(
 				// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 				<div onKeyDown={ onKeyDown }>
 					<RectangleStencil
@@ -131,7 +132,7 @@ describe( 'RectangleStencil', () => {
 		} );
 
 		it( 'does not call onCropChange when Escape is pressed', async () => {
-			const { onCropChange, onEscape } = renderStencil();
+			const { onCropChange, onEscape } = await renderStencil();
 			const [ firstHandle ] = screen.getAllByRole( 'button' );
 
 			firstHandle.focus();
@@ -143,9 +144,9 @@ describe( 'RectangleStencil', () => {
 	} );
 
 	describe( 'keyboard — arrow keys (fine step)', () => {
-		it( 'calls onResizeStart once and onResizeEnd after keyboard resize settles', () => {
+		it( 'calls onResizeStart once and onResizeEnd after keyboard resize settles', async () => {
 			vi.useFakeTimers();
-			const { onResizeStart, onResizeEnd } = renderStencil();
+			const { onResizeStart, onResizeEnd } = await renderStencil();
 			const eHandle = screen.getAllByRole( 'button' )[ 3 ];
 
 			fireEvent.keyDown( eHandle, { key: 'ArrowRight' } );
@@ -162,17 +163,19 @@ describe( 'RectangleStencil', () => {
 			vi.useRealTimers();
 		} );
 
-		it( 'closes a pending keyboard resize when resizing becomes disabled', () => {
+		it( 'closes a pending keyboard resize when resizing becomes disabled', async () => {
 			vi.useFakeTimers();
 			const { props, rerender, onResizeStart, onResizeEnd } =
-				renderStencil();
+				await renderStencil();
 			const eHandle = screen.getAllByRole( 'button' )[ 3 ];
 
 			fireEvent.keyDown( eHandle, { key: 'ArrowRight' } );
 			expect( onResizeStart ).toHaveBeenCalledTimes( 1 );
 			expect( onResizeEnd ).not.toHaveBeenCalled();
 
-			rerender( <RectangleStencil { ...props } isResizeDisabled /> );
+			await rerender(
+				<RectangleStencil { ...props } isResizeDisabled />
+			);
 
 			// Closed straight away, not left to the settle timer.
 			expect( onResizeEnd ).toHaveBeenCalledTimes( 1 );
@@ -186,7 +189,7 @@ describe( 'RectangleStencil', () => {
 		} );
 
 		it( 'moves the right edge right by KEYBOARD_STEP on ArrowRight (no Shift)', async () => {
-			const { onCropChange } = renderStencil();
+			const { onCropChange } = await renderStencil();
 			// 'e' handle is the 4th button in clockwise order (nw, n, ne, e).
 			const eHandle = screen.getAllByRole( 'button' )[ 3 ];
 
@@ -201,7 +204,7 @@ describe( 'RectangleStencil', () => {
 		} );
 
 		it( 'moves the bottom edge down by KEYBOARD_STEP on ArrowDown (no Shift)', async () => {
-			const { onCropChange } = renderStencil();
+			const { onCropChange } = await renderStencil();
 			// 's' handle is the 6th button (nw, n, ne, e, se, s).
 			const sHandle = screen.getAllByRole( 'button' )[ 5 ];
 
@@ -225,7 +228,7 @@ describe( 'RectangleStencil', () => {
 				...rect,
 				width: 0.82,
 			} ) );
-			const { onCropChange } = renderStencil( { snapCropRect } );
+			const { onCropChange } = await renderStencil( { snapCropRect } );
 			const eHandle = screen.getAllByRole( 'button' )[ 3 ];
 
 			eHandle.focus();
@@ -244,7 +247,7 @@ describe( 'RectangleStencil', () => {
 		} );
 
 		it( 'shrinks a locked-ratio crop from a corner handle', async () => {
-			const { onCropChange } = renderStencil( {
+			const { onCropChange } = await renderStencil( {
 				aspectRatio: 1,
 				containerSize: { width: 500, height: 500 },
 				imageSize: { width: 500, height: 500 },
@@ -279,7 +282,7 @@ describe( 'RectangleStencil', () => {
 
 	describe( 'keyboard — arrow keys (coarse step with Shift)', () => {
 		it( 'moves the right edge right by KEYBOARD_STEP_SHIFT on Shift+ArrowRight', async () => {
-			const { onCropChange } = renderStencil();
+			const { onCropChange } = await renderStencil();
 			const eHandle = screen.getAllByRole( 'button' )[ 3 ];
 
 			eHandle.focus();
@@ -292,7 +295,7 @@ describe( 'RectangleStencil', () => {
 		} );
 
 		it( 'step is 10x larger with Shift than without', async () => {
-			const { onCropChange } = renderStencil();
+			const { onCropChange } = await renderStencil();
 			const eHandle = screen.getAllByRole( 'button' )[ 3 ];
 
 			eHandle.focus();
@@ -312,7 +315,7 @@ describe( 'RectangleStencil', () => {
 
 		it( 'does not apply snapCropRect while resizing a locked aspect ratio', async () => {
 			const snapCropRect = vi.fn( ( rect: NormalizedRect ) => rect );
-			renderStencil( { aspectRatio: 1, snapCropRect } );
+			await renderStencil( { aspectRatio: 1, snapCropRect } );
 			const nwHandle = screen.getByRole( 'button', {
 				name: 'Resize from top-left corner',
 			} );
@@ -325,8 +328,8 @@ describe( 'RectangleStencil', () => {
 	} );
 
 	describe( 'pointer drag — focus after release', () => {
-		it( 'calls onResizeStart on pointerdown and onResizeEnd on pointerup', () => {
-			const { onResizeStart, onResizeEnd } = renderStencil();
+		it( 'calls onResizeStart on pointerdown and onResizeEnd on pointerup', async () => {
+			const { onResizeStart, onResizeEnd } = await renderStencil();
 			const [ firstHandle ] = screen.getAllByRole( 'button' );
 
 			fireEvent.pointerDown( firstHandle, {
@@ -344,8 +347,8 @@ describe( 'RectangleStencil', () => {
 			expect( onResizeEnd ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'focuses the handle button after a pointer drag ends', () => {
-			renderStencil();
+		it( 'focuses the handle button after a pointer drag ends', async () => {
+			await renderStencil();
 			const [ firstHandle ] = screen.getAllByRole( 'button' );
 
 			vi.spyOn( firstHandle, 'focus' );
@@ -363,8 +366,8 @@ describe( 'RectangleStencil', () => {
 			expect( firstHandle.focus ).toHaveBeenCalled();
 		} );
 
-		it( 'does not start a pointer resize while resizing is disabled', () => {
-			const { onResizeStart } = renderStencil( {
+		it( 'does not start a pointer resize while resizing is disabled', async () => {
+			const { onResizeStart } = await renderStencil( {
 				isResizeDisabled: true,
 			} );
 			const [ firstHandle ] = screen.getAllByRole( 'button' );
@@ -379,9 +382,9 @@ describe( 'RectangleStencil', () => {
 			expect( onResizeStart ).not.toHaveBeenCalled();
 		} );
 
-		it( 'cancels an active pointer resize when resizing becomes disabled', () => {
+		it( 'cancels an active pointer resize when resizing becomes disabled', async () => {
 			const { props, rerender, onResizeStart, onResizeEnd } =
-				renderStencil();
+				await renderStencil();
 			const [ firstHandle ] = screen.getAllByRole( 'button' );
 
 			fireEvent.pointerDown( firstHandle, {
@@ -394,7 +397,9 @@ describe( 'RectangleStencil', () => {
 			expect( onResizeStart ).toHaveBeenCalledTimes( 1 );
 			expect( onResizeEnd ).not.toHaveBeenCalled();
 
-			rerender( <RectangleStencil { ...props } isResizeDisabled /> );
+			await rerender(
+				<RectangleStencil { ...props } isResizeDisabled />
+			);
 
 			expect( onResizeEnd ).toHaveBeenCalledTimes( 1 );
 
@@ -403,9 +408,9 @@ describe( 'RectangleStencil', () => {
 			expect( onResizeEnd ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'only stops touchstart propagation for single-touch handle gestures', () => {
+		it( 'only stops touchstart propagation for single-touch handle gestures', async () => {
 			const onTouchStart = vi.fn();
-			render(
+			await render(
 				<div onTouchStart={ onTouchStart }>
 					<RectangleStencil
 						cropRect={ DEFAULT_CROP_RECT }

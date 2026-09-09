@@ -26,8 +26,11 @@ When writing or migrating a test:
     server-side logic.
 -   Use Browser Mode for real CSS, layout, geometry, viewport behavior, media
     queries, observers, animation, scrolling, native browser APIs, and
-    browser-dependent interaction. Import `userEvent` from `vitest/browser`,
-    and prefer locators for asynchronous browser state.
+    browser-dependent interaction. In React Browser Mode tests, import and
+    await `render` or `renderHook` from `vitest-browser-react`. Import
+    `userEvent` from `vitest/browser`, and prefer locators for asynchronous
+    browser state. Testing Library helpers can remain when Browser Mode has no
+    direct equivalent, but do not use its React renderer.
 -   Use JSDOM for construction, parsing, serialization, accessibility
     structure, and deterministic DOM semantics, events, and state. Browser API
     exceptions require a concrete reason and must not remain after the

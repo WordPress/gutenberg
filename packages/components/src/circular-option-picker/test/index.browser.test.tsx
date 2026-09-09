@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { logged } from '@wordpress/deprecated';
 import CircularOptionPicker from '..';
 
@@ -27,8 +28,8 @@ describe( 'CircularOptionPicker', () => {
 		Object.keys( logged ).forEach( ( key ) => delete logged[ key ] );
 	} );
 
-	it( 'should preserve toggle-button semantics when an option is rendered without a picker', () => {
-		render(
+	it( 'should preserve toggle-button semantics when an option is rendered without a picker', async () => {
+		await render(
 			<CircularOptionPicker.Option
 				isSelected
 				aria-label="Standalone option"
@@ -46,7 +47,7 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `asButtons` is not set', () => {
 		it( 'should render as a listbox', async () => {
-			render( <CircularOptionPicker { ...DEFAULT_PROPS } /> );
+			await render( <CircularOptionPicker { ...DEFAULT_PROPS } /> );
 
 			expect( screen.getByRole( 'listbox' ) ).toBeInTheDocument();
 			expect( screen.getByRole( 'option' ) ).toBeInTheDocument();
@@ -56,7 +57,7 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `asButtons` is false', () => {
 		it( 'should render as a listbox', async () => {
-			render(
+			await render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					asButtons={ false }
@@ -72,7 +73,7 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `asButtons` is true', () => {
 		it( 'should render as toggle buttons with selected and unselected states', async () => {
-			render(
+			await render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					asButtons
@@ -82,6 +83,7 @@ describe( 'CircularOptionPicker', () => {
 							isSelected
 							aria-label="Selected"
 						/>,
+
 						<CircularOptionPicker.Option
 							key="unselected"
 							aria-label="Unselected"
@@ -110,8 +112,8 @@ describe( 'CircularOptionPicker', () => {
 	} );
 
 	describe( 'when `presentation` is set', () => {
-		it( 'should render a selected listbox option', () => {
-			render(
+		it( 'should render a selected listbox option', async () => {
+			await render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					presentation="listbox"
@@ -133,8 +135,8 @@ describe( 'CircularOptionPicker', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should render toggle buttons with selected and unselected states', () => {
-			render(
+		it( 'should render toggle buttons with selected and unselected states', async () => {
+			await render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					presentation="toggle-buttons"
@@ -144,6 +146,7 @@ describe( 'CircularOptionPicker', () => {
 							isSelected
 							aria-label="Selected"
 						/>,
+
 						<CircularOptionPicker.Option
 							key="unselected"
 							aria-label="Unselected"
@@ -166,8 +169,8 @@ describe( 'CircularOptionPicker', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should render command buttons without selection state or a selected check', () => {
-			render(
+		it( 'should render command buttons without selection state or a selected check', async () => {
+			await render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					presentation="command-buttons"
@@ -189,8 +192,8 @@ describe( 'CircularOptionPicker', () => {
 			expect( button.nextElementSibling ).toBeNull();
 		} );
 
-		it( 'should prefer an explicit presentation over asButtons', () => {
-			render(
+		it( 'should prefer an explicit presentation over asButtons', async () => {
+			await render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					asButtons
@@ -207,7 +210,7 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `loop` is not set', () => {
 		it( 'should loop', async () => {
-			render(
+			await render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					options={ MULTIPLE_OPTIONS }
@@ -225,7 +228,7 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `loop` is true', () => {
 		it( 'should loop', async () => {
-			render(
+			await render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					options={ MULTIPLE_OPTIONS }
@@ -244,7 +247,7 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `loop` is false', () => {
 		it( 'should not loop', async () => {
-			render(
+			await render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					loop={ false }

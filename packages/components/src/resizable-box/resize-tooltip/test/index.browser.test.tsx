@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { createRef, createElement } from '@wordpress/element';
 import ResizeTooltip from '../index';
 import styles from '../style.module.scss';
 
 describe( 'ResizeTooltip', () => {
-	it( 'renders the legacy root class together with className and style', () => {
-		render(
+	it( 'renders the legacy root class together with className and style', async () => {
+		await render(
 			<ResizeTooltip
 				className="custom-tooltip"
 				data-testid="resize-tooltip"
@@ -22,10 +23,10 @@ describe( 'ResizeTooltip', () => {
 		expect( root ).toHaveStyle( { zIndex: '7' } );
 	} );
 
-	it( 'renders as a different element, forwards the root ref, and forwards target-specific props', () => {
+	it( 'renders as a different element, forwards the root ref, and forwards target-specific props', async () => {
 		const ref = createRef< HTMLElement >();
 
-		render(
+		await render(
 			createElement( ResizeTooltip, {
 				as: 'label',
 				'data-testid': 'resize-tooltip',

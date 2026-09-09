@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import Avatar from '..';
 
 describe( 'Avatar styles', () => {
-	it( 'applies the border and derived name colors', () => {
-		render( <Avatar data-testid="avatar" borderColor="#3858e9" /> );
+	it( 'applies the border and derived name colors', async () => {
+		await render( <Avatar data-testid="avatar" borderColor="#3858e9" /> );
 		const avatar = screen.getByTestId( 'avatar' );
 		const styles = getComputedStyle( avatar );
 
@@ -17,8 +18,8 @@ describe( 'Avatar styles', () => {
 		).not.toBe( '' );
 	} );
 
-	it( 'merges the style prop with custom properties', () => {
-		render(
+	it( 'merges the style prop with custom properties', async () => {
+		await render(
 			<Avatar
 				data-testid="avatar"
 				borderColor="#3858e9"

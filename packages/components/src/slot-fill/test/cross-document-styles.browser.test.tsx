@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { createPortal, useState } from '@wordpress/element';
 import { registerStyle } from '@wordpress/style-runtime';
 import { Slot, Fill, Provider } from '../';
@@ -27,13 +28,13 @@ describe( 'Slot cross-document styles', () => {
 		document.head.innerHTML = '';
 	} );
 
-	it( 'injects registered SCSS module styles into the Slot document', () => {
+	it( 'injects registered SCSS module styles into the Slot document', async () => {
 		const styleHash = 'slot-fill-cross-document-style';
 		const css = '.slot-fill-cross-document{padding:32px;}';
 
 		registerStyle( styleHash, css );
 
-		render(
+		await render(
 			<Provider>
 				<IframePortal>
 					<Slot name="cross-document" bubblesVirtually />

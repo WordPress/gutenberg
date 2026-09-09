@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { Path, SVG } from '@wordpress/primitives';
 import Icon from '..';
 
@@ -12,22 +13,22 @@ describe( 'Icon', () => {
 		</SVG>
 	);
 
-	it( 'renders nothing when icon omitted', () => {
-		render( <Icon data-testid={ testId } /> );
+	it( 'renders nothing when icon omitted', async () => {
+		await render( <Icon data-testid={ testId } /> );
 
 		expect( screen.queryByTestId( testId ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'renders a dashicon by slug', () => {
-		render( <Icon data-testid={ testId } icon="format-image" /> );
+	it( 'renders a dashicon by slug', async () => {
+		await render( <Icon data-testid={ testId } icon="format-image" /> );
 
 		expect( screen.getByTestId( testId ) ).toHaveClass(
 			'dashicons-format-image'
 		);
 	} );
 
-	it( 'renders a dashicon with custom size', () => {
-		render(
+	it( 'renders a dashicon with custom size', async () => {
+		await render(
 			<Icon data-testid={ testId } icon="format-image" size={ 10 } />
 		);
 
@@ -37,34 +38,34 @@ describe( 'Icon', () => {
 		expect( style.fontSize ).toBe( '10px' );
 	} );
 
-	it( 'renders a function', () => {
-		render( <Icon icon={ () => <span data-testid={ testId } /> } /> );
+	it( 'renders a function', async () => {
+		await render( <Icon icon={ () => <span data-testid={ testId } /> } /> );
 
 		expect( screen.getByTestId( testId ) ).toBeVisible();
 	} );
 
-	it( 'renders an element', () => {
-		render( <Icon icon={ <span data-testid={ testId } /> } /> );
+	it( 'renders an element', async () => {
+		await render( <Icon icon={ <span data-testid={ testId } /> } /> );
 
 		expect( screen.getByTestId( testId ) ).toBeVisible();
 	} );
 
-	it( 'renders an svg element', () => {
-		render( <Icon data-testid={ testId } icon={ svg } /> );
+	it( 'renders an svg element', async () => {
+		await render( <Icon data-testid={ testId } icon={ svg } /> );
 
 		expect( screen.getByTestId( testId ) ).toBeVisible();
 	} );
 
-	it( 'renders an svg element with a default width and height of 24', () => {
-		render( <Icon data-testid={ testId } icon={ svg } /> );
+	it( 'renders an svg element with a default width and height of 24', async () => {
+		await render( <Icon data-testid={ testId } icon={ svg } /> );
 		const icon = screen.getByTestId( testId );
 
 		expect( icon ).toHaveAttribute( 'width', '24' );
 		expect( icon ).toHaveAttribute( 'height', '24' );
 	} );
 
-	it( 'renders an svg element and override its width and height', () => {
-		render(
+	it( 'renders an svg element and override its width and height', async () => {
+		await render(
 			<Icon
 				data-testid={ testId }
 				icon={
@@ -81,30 +82,34 @@ describe( 'Icon', () => {
 		expect( icon ).toHaveAttribute( 'height', '32' );
 	} );
 
-	it( 'renders an svg element and does not override width and height if already specified', () => {
-		render( <Icon data-testid={ testId } icon={ svg } size={ 32 } /> );
+	it( 'renders an svg element and does not override width and height if already specified', async () => {
+		await render(
+			<Icon data-testid={ testId } icon={ svg } size={ 32 } />
+		);
 		const icon = screen.getByTestId( testId );
 
 		expect( icon ).toHaveAttribute( 'width', '32' );
 		expect( icon ).toHaveAttribute( 'height', '32' );
 	} );
 
-	it( 'renders a component', () => {
+	it( 'renders a component', async () => {
 		const MyComponent = () => (
 			<span data-testid={ testId } className={ className } />
 		);
-		render( <Icon icon={ MyComponent } /> );
+
+		await render( <Icon icon={ MyComponent } /> );
 
 		expect( screen.getByTestId( testId ) ).toHaveClass( className );
 	} );
 
-	it( "merges a consumer 'style' prop with the icon's intrinsic style", () => {
+	it( "merges a consumer 'style' prop with the icon's intrinsic style", async () => {
 		const strokeIcon = (
 			<SVG style={ { fill: 'none' } }>
 				<Path d="M5 4v3h5.5v12h3V7H19V4z" />
 			</SVG>
 		);
-		render(
+
+		await render(
 			<Icon
 				data-testid={ testId }
 				icon={ strokeIcon }
@@ -119,13 +124,14 @@ describe( 'Icon', () => {
 		expect( icon ).toHaveStyle( 'margin-inline-start: 4px' );
 	} );
 
-	it( "lets a consumer 'style' override the icon's intrinsic style", () => {
+	it( "lets a consumer 'style' override the icon's intrinsic style", async () => {
 		const strokeIcon = (
 			<SVG style={ { fill: 'none' } }>
 				<Path d="M5 4v3h5.5v12h3V7H19V4z" />
 			</SVG>
 		);
-		render(
+
+		await render(
 			<Icon
 				data-testid={ testId }
 				icon={ strokeIcon }
@@ -138,8 +144,8 @@ describe( 'Icon', () => {
 		} );
 	} );
 
-	it( "merges a consumer 'style' with a non-svg element's intrinsic style", () => {
-		render(
+	it( "merges a consumer 'style' with a non-svg element's intrinsic style", async () => {
+		await render(
 			<Icon
 				icon={
 					<span data-testid={ testId } style={ { fill: 'none' } } />
@@ -153,14 +159,14 @@ describe( 'Icon', () => {
 		expect( icon ).toHaveStyle( 'margin-inline-start: 4px' );
 	} );
 
-	it( "does not add a 'style' prop to a non-svg element without styles", () => {
+	it( "does not add a 'style' prop to a non-svg element without styles", async () => {
 		let hasStyleProp = true;
 		const CustomIcon = ( props: Record< string, unknown > ) => {
 			hasStyleProp = 'style' in props;
 			return <span data-testid={ testId } />;
 		};
 
-		render( <Icon icon={ <CustomIcon /> } /> );
+		await render( <Icon icon={ <CustomIcon /> } /> );
 
 		expect( screen.getByTestId( testId ) ).toBeVisible();
 		expect( hasStyleProp ).toBe( false );

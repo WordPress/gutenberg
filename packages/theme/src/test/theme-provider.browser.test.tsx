@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { ThemeProvider } from '../theme-provider';
 import type { ThemeProviderColorWarning } from '../theme-provider-color-warnings';
 import styles from '../style.module.css';
@@ -35,14 +36,14 @@ function getScopingProvider( element: Element ) {
 }
 
 describe( 'ThemeProvider', () => {
-	it( 'renders its children', () => {
-		render( <ThemeProvider>content</ThemeProvider> );
+	it( 'renders its children', async () => {
+		await render( <ThemeProvider>content</ThemeProvider> );
 
 		expect( screen.getByText( 'content' ) ).toBeInTheDocument();
 	} );
 
 	it( 'keeps its scoping wrapper styled as display contents and unfocusable', async () => {
-		render(
+		await render(
 			<>
 				<button>Before</button>
 				<ThemeProvider>
@@ -75,8 +76,8 @@ describe( 'ThemeProvider', () => {
 		expect( before ).toHaveFocus();
 	} );
 
-	it( 'defines the color tokens from the seeds within its subtree', () => {
-		render(
+	it( 'defines the color tokens from the seeds within its subtree', async () => {
+		await render(
 			<ThemeProvider
 				color={ { primary: PRIMARY, background: BACKGROUND } }
 			>
@@ -89,8 +90,8 @@ describe( 'ThemeProvider', () => {
 		expect( readProp( provider, SURFACE_BG ) ).toBe( BACKGROUND );
 	} );
 
-	it( 'does not define color tokens if neither customized nor inherited', () => {
-		render(
+	it( 'does not define color tokens if neither customized nor inherited', async () => {
+		await render(
 			<ThemeProvider>
 				<div data-testid="child">x</div>
 			</ThemeProvider>
@@ -104,20 +105,20 @@ describe( 'ThemeProvider', () => {
 		).toBe( '' );
 	} );
 
-	it( 'does not report color warnings when no colors are calculated', () => {
+	it( 'does not report color warnings when no colors are calculated', async () => {
 		const onColorWarnings = vi.fn();
 
-		render( <ThemeProvider onColorWarnings={ onColorWarnings } /> );
+		await render( <ThemeProvider onColorWarnings={ onColorWarnings } /> );
 
 		expect( onColorWarnings ).not.toHaveBeenCalled();
 	} );
 
-	it( 'does not report warnings for accessible active fill pairs', () => {
+	it( 'does not report warnings for accessible active fill pairs', async () => {
 		const onColorWarnings =
 			vi.fn<
 				( warnings: readonly ThemeProviderColorWarning[] ) => void
 			>();
-		const { rerender } = render(
+		const { rerender } = await render(
 			<ThemeProvider
 				color={ {
 					primary: FORMER_WARNING_PRIMARY,
@@ -130,7 +131,7 @@ describe( 'ThemeProvider', () => {
 		expect( onColorWarnings ).toHaveBeenCalledWith( [] );
 
 		onColorWarnings.mockClear();
-		rerender(
+		await rerender(
 			<ThemeProvider
 				color={ {
 					primary: ACCESSIBLE_PRIMARY,
@@ -143,7 +144,7 @@ describe( 'ThemeProvider', () => {
 		expect( onColorWarnings ).toHaveBeenCalledWith( [] );
 	} );
 
-	it( 'does not report warnings again when only the callback identity changes', () => {
+	it( 'does not report warnings again when only the callback identity changes', async () => {
 		const onColorWarnings =
 			vi.fn<
 				( warnings: readonly ThemeProviderColorWarning[] ) => void
@@ -157,17 +158,18 @@ describe( 'ThemeProvider', () => {
 				onColorWarnings={ ( warnings ) => onColorWarnings( warnings ) }
 			/>
 		);
-		const { rerender } = render( renderProvider() );
+
+		const { rerender } = await render( renderProvider() );
 
 		expect( onColorWarnings ).toHaveBeenCalledTimes( 1 );
 
-		rerender( renderProvider() );
+		await rerender( renderProvider() );
 
 		expect( onColorWarnings ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'does not define the custom property outside of the provider', () => {
-		render(
+	it( 'does not define the custom property outside of the provider', async () => {
+		await render(
 			<ThemeProvider color={ { primary: PRIMARY } }>
 				<div data-testid="child">x</div>
 			</ThemeProvider>
@@ -179,8 +181,8 @@ describe( 'ThemeProvider', () => {
 		expect( readProp( outside, BRAND_BG ) ).not.toBe( PRIMARY );
 	} );
 
-	it( 'applies the cursor custom property when set', () => {
-		render(
+	it( 'applies the cursor custom property when set', async () => {
+		await render(
 			<ThemeProvider cursor={ { control: 'pointer' } }>
 				<div data-testid="child">x</div>
 			</ThemeProvider>
@@ -191,8 +193,8 @@ describe( 'ThemeProvider', () => {
 	} );
 
 	describe( 'cornerRadius', () => {
-		it( 'reflects the preset as a data attribute', () => {
-			render(
+		it( 'reflects the preset as a data attribute', async () => {
+			await render(
 				<ThemeProvider cornerRadius="pronounced">
 					<div data-testid="child">x</div>
 				</ThemeProvider>
@@ -203,8 +205,8 @@ describe( 'ThemeProvider', () => {
 			).toHaveAttribute( 'data-wpds-corner-radius', 'pronounced' );
 		} );
 
-		it( 'defaults to the subtle preset', () => {
-			render(
+		it( 'defaults to the subtle preset', async () => {
+			await render(
 				<ThemeProvider>
 					<div data-testid="child">x</div>
 				</ThemeProvider>
@@ -217,8 +219,8 @@ describe( 'ThemeProvider', () => {
 	} );
 
 	describe( 'isRoot', () => {
-		it( 'defines the token on the document root', () => {
-			render(
+		it( 'defines the token on the document root', async () => {
+			await render(
 				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
 					<div>x</div>
 				</ThemeProvider>
@@ -229,8 +231,8 @@ describe( 'ThemeProvider', () => {
 			);
 		} );
 
-		it( 'does not affect the document root by default', () => {
-			render(
+		it( 'does not affect the document root by default', async () => {
+			await render(
 				<ThemeProvider color={ { primary: PRIMARY } }>
 					<div>x</div>
 				</ThemeProvider>
@@ -241,8 +243,8 @@ describe( 'ThemeProvider', () => {
 			);
 		} );
 
-		it( 'removes the forwarded properties from the document root on unmount', () => {
-			const { unmount } = render(
+		it( 'removes the forwarded properties from the document root on unmount', async () => {
+			const { unmount } = await render(
 				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
 					<div>x</div>
 				</ThemeProvider>
@@ -252,14 +254,14 @@ describe( 'ThemeProvider', () => {
 				PRIMARY
 			);
 
-			unmount();
+			await unmount();
 
 			expect( readProp( document.documentElement, BRAND_BG ) ).not.toBe(
 				PRIMARY
 			);
 		} );
 
-		it( "forwards tokens to the wrapper's own document, not the top document", () => {
+		it( "forwards tokens to the wrapper's own document, not the top document", async () => {
 			const iframe = document.createElement( 'iframe' );
 			document.body.appendChild( iframe );
 			const iframeDoc = iframe.contentDocument!;
@@ -268,7 +270,7 @@ describe( 'ThemeProvider', () => {
 			const mount = iframeDoc.createElement( 'div' );
 			iframeDoc.body.appendChild( mount );
 
-			const { unmount } = render(
+			const { unmount } = await render(
 				<ThemeProvider
 					isRoot
 					color={ { primary: PRIMARY } }
@@ -300,16 +302,16 @@ describe( 'ThemeProvider', () => {
 				PRIMARY
 			);
 
-			unmount();
+			await unmount();
 			iframe.remove();
 		} );
 
-		it( 'warns when multiple root providers share a document', () => {
+		it( 'warns when multiple root providers share a document', async () => {
 			const warn = vi
 				.spyOn( console, 'warn' )
 				.mockImplementation( () => {} );
 
-			render(
+			await render(
 				<>
 					<ThemeProvider isRoot color={ { primary: PRIMARY } }>
 						<div>a</div>
@@ -327,12 +329,12 @@ describe( 'ThemeProvider', () => {
 			warn.mockRestore();
 		} );
 
-		it( 'does not warn for a single root provider', () => {
+		it( 'does not warn for a single root provider', async () => {
 			const warn = vi
 				.spyOn( console, 'warn' )
 				.mockImplementation( () => {} );
 
-			render(
+			await render(
 				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
 					<div>x</div>
 				</ThemeProvider>
@@ -343,8 +345,8 @@ describe( 'ThemeProvider', () => {
 			warn.mockRestore();
 		} );
 		describe( 'cornerRadius forwarding', () => {
-			it( 'forwards the preset attributes and tokens to the document root when isRoot is set', () => {
-				render(
+			it( 'forwards the preset attributes and tokens to the document root when isRoot is set', async () => {
+				await render(
 					<ThemeProvider isRoot cornerRadius="moderate">
 						<div data-testid="child">x</div>
 					</ThemeProvider>
@@ -374,14 +376,14 @@ describe( 'ThemeProvider', () => {
 				);
 			} );
 
-			it( 'updates the document-root attributes when the preset changes', () => {
-				const { rerender } = render(
+			it( 'updates the document-root attributes when the preset changes', async () => {
+				const { rerender } = await render(
 					<ThemeProvider isRoot cornerRadius="moderate">
 						<div>x</div>
 					</ThemeProvider>
 				);
 
-				rerender(
+				await rerender(
 					<ThemeProvider isRoot cornerRadius="pronounced">
 						<div>x</div>
 					</ThemeProvider>
@@ -397,14 +399,14 @@ describe( 'ThemeProvider', () => {
 				);
 			} );
 
-			it( 'restores previous document-root attributes on unmount', () => {
+			it( 'restores previous document-root attributes on unmount', async () => {
 				const root = document.documentElement;
 				root.setAttribute( 'data-wpds-root-provider', 'previous' );
 				root.setAttribute( 'data-wpds-corner-radius', 'none' );
 				let unmount: undefined | ( () => void );
 
 				try {
-					( { unmount } = render(
+					( { unmount } = await render(
 						<ThemeProvider isRoot cornerRadius="moderate">
 							<div>x</div>
 						</ThemeProvider>
@@ -419,7 +421,7 @@ describe( 'ThemeProvider', () => {
 						'moderate'
 					);
 
-					unmount();
+					await unmount();
 					unmount = undefined;
 
 					expect( root ).toHaveAttribute(
@@ -437,8 +439,8 @@ describe( 'ThemeProvider', () => {
 				}
 			} );
 
-			it( 'does not forward the preset to the document root by default', () => {
-				render(
+			it( 'does not forward the preset to the document root by default', async () => {
+				await render(
 					<ThemeProvider cornerRadius="moderate">
 						<div data-testid="child">x</div>
 					</ThemeProvider>
@@ -464,8 +466,8 @@ describe( 'ThemeProvider', () => {
 	} );
 
 	describe( 'nested providers', () => {
-		it( 'overrides the settings it defines and inherits the rest', () => {
-			render(
+		it( 'overrides the settings it defines and inherits the rest', async () => {
+			await render(
 				<ThemeProvider
 					color={ { primary: PRIMARY, background: BACKGROUND } }
 					cursor={ { control: 'pointer' } }

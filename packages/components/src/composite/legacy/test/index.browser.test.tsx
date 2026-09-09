@@ -1,12 +1,7 @@
 import { describe, expect, it, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import {
-	queryByAttribute,
-	render,
-	screen,
-	renderHook,
-	waitFor,
-} from '@testing-library/react';
+import { queryByAttribute, screen, waitFor } from '@testing-library/react';
+import { render, renderHook } from 'vitest-browser-react';
 import {
 	Composite,
 	CompositeGroup,
@@ -19,7 +14,7 @@ type CompositeState = ReturnType< typeof useCompositeState >;
 type CompositeStateProps = CompositeState | { state: CompositeState };
 
 async function renderAndValidate( ...args: Parameters< typeof render > ) {
-	const view = render( ...args );
+	const view = await render( ...args );
 	await waitFor( () => {
 		const activeButton = queryByAttribute(
 			'data-active-item',
@@ -136,23 +131,23 @@ function getShiftTestItems() {
 // Checking for deprecation warnings before other tests because the `deprecated`
 // utility only fires a console.warn the first time a component is rendered.
 describe( 'Shows a deprecation warning', () => {
-	it( 'useCompositeState', () => {
-		renderHook( () => useCompositeState() );
+	it( 'useCompositeState', async () => {
+		await renderHook( () => useCompositeState() );
 		expect( console ).toHaveWarnedWith(
 			'wp.components.__unstableUseCompositeState is deprecated since version 6.7. Please use Composite instead.'
 		);
 	} );
-	it( 'Composite', () => {
+	it( 'Composite', async () => {
 		const Test = () => {
 			const props = useCompositeState();
 			return <Composite { ...props } />;
 		};
-		render( <Test /> );
+		await render( <Test /> );
 		expect( console ).toHaveWarnedWith(
 			'wp.components.__unstableComposite is deprecated since version 6.7. Please use Composite instead.'
 		);
 	} );
-	it( 'CompositeItem', () => {
+	it( 'CompositeItem', async () => {
 		const Test = () => {
 			const props = useCompositeState();
 			return (
@@ -161,12 +156,12 @@ describe( 'Shows a deprecation warning', () => {
 				</Composite>
 			);
 		};
-		render( <Test /> );
+		await render( <Test /> );
 		expect( console ).toHaveWarnedWith(
 			'wp.components.__unstableCompositeItem is deprecated since version 6.7. Please use Composite.Item instead.'
 		);
 	} );
-	it( 'CompositeGroup', () => {
+	it( 'CompositeGroup', async () => {
 		const Test = () => {
 			const props = useCompositeState();
 			return (
@@ -177,7 +172,7 @@ describe( 'Shows a deprecation warning', () => {
 				</Composite>
 			);
 		};
-		render( <Test /> );
+		await render( <Test /> );
 		expect( console ).toHaveWarnedWith(
 			'wp.components.__unstableCompositeGroup is deprecated since version 6.7. Please use Composite.Group or Composite.Row instead.'
 		);
@@ -189,6 +184,7 @@ describe.each( [
 		'With "spread" state',
 		( initialState?: InitialState ) => useCompositeState( initialState ),
 	],
+
 	[
 		'With `state` prop',
 		( initialState?: InitialState ) => ( {
@@ -204,6 +200,7 @@ describe.each( [
 				<button>After</button>
 			</>
 		);
+
 		await renderAndValidate( <Test /> );
 
 		await userEvent.tab();
@@ -282,6 +279,7 @@ describe.each( [
 				} ) }
 			/>
 		);
+
 		await renderAndValidate( <Test /> );
 		const { item1, item2, item3 } = getOneDimensionalItems();
 
@@ -290,8 +288,8 @@ describe.each( [
 		expect( item3.id ).toMatch( 'test-id-3' );
 	} );
 
-	test( 'Supports `currentId`', () => {
-		const { result } = renderHook( () =>
+	test( 'Supports `currentId`', async () => {
+		const { result } = await renderHook( () =>
 			useProps( {
 				baseId: 'test-id',
 				currentId: 'test-id-2',
@@ -316,6 +314,7 @@ describe.each( [
 				state={ useCompositeState( { rtl, ...initialState } ) }
 			/>
 		);
+
 		await renderAndValidate( <Test /> );
 		return getOneDimensionalItems();
 	}
@@ -326,6 +325,7 @@ describe.each( [
 				state={ useCompositeState( { rtl, ...initialState } ) }
 			/>
 		);
+
 		await renderAndValidate( <Test /> );
 		return getTwoDimensionalItems();
 	}
@@ -334,6 +334,7 @@ describe.each( [
 		const Test = () => (
 			<ShiftTest state={ useCompositeState( { rtl, shift } ) } />
 		);
+
 		await renderAndValidate( <Test /> );
 		return getShiftTestItems();
 	}

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { act, render, screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { useEffect, useState } from '@wordpress/element';
 import SnackbarList from '../list';
 
@@ -18,7 +19,7 @@ describe( 'SnackbarList', () => {
 	} );
 
 	it( 'should get focus after a snackbar is dismissed', async () => {
-		render(
+		await render(
 			<SnackbarList
 				notices={ [
 					{
@@ -82,7 +83,7 @@ describe( 'SnackbarList', () => {
 			);
 		}
 
-		render( <RecreatedNotice /> );
+		await render( <RecreatedNotice /> );
 
 		await act( async () => vi.advanceTimersByTime( 6000 ) );
 		expect( onRemove ).toHaveBeenCalledTimes( 1 );

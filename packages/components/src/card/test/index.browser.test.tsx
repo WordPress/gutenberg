@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import {
 	Card,
 	CardBody,
@@ -60,8 +61,8 @@ function pickStyles(
 }
 
 describe( 'Card', () => {
-	it( 'renders its regions and media', () => {
-		render(
+	it( 'renders its regions and media', async () => {
+		await render(
 			<Card data-testid="card">
 				<CardHeader>Card Header</CardHeader>
 				<CardBody data-testid="card-body">Card Body</CardBody>
@@ -86,14 +87,14 @@ describe( 'Card', () => {
 		expect( screen.getByText( 'Card Footer' ) ).toBeInTheDocument();
 	} );
 
-	it( 'removes the border when isBorderless is true', () => {
-		const { rerender } = render(
+	it( 'removes the border when isBorderless is true', async () => {
+		const { rerender } = await render(
 			<Card data-testid="card-wrapper">Code is Poetry</Card>
 		);
 		const card = screen.getByTestId( 'card-wrapper' );
 		const borderedShadow = getComputedStyle( card ).boxShadow;
 
-		rerender(
+		await rerender(
 			<Card data-testid="card-wrapper" isBorderless>
 				Code is Poetry
 			</Card>
@@ -103,9 +104,11 @@ describe( 'Card', () => {
 		expect( getComputedStyle( card ).boxShadow ).toBe( 'none' );
 	} );
 
-	it( 'keeps borderless styles regardless of Emotion insertion order', () => {
-		render( <EmotionStylePrimer styleFragment={ styles.boxShadowless } /> );
-		render(
+	it( 'keeps borderless styles regardless of Emotion insertion order', async () => {
+		await render(
+			<EmotionStylePrimer styleFragment={ styles.boxShadowless } />
+		);
+		await render(
 			<Card data-testid="card-wrapper" isBorderless>
 				Code is Poetry
 			</Card>
@@ -116,13 +119,13 @@ describe( 'Card', () => {
 		expect( getComputedStyle( card ).boxShadow ).toBe( 'none' );
 	} );
 
-	it( 'adds a rounded border when isRounded is true', () => {
-		render(
+	it( 'adds a rounded border when isRounded is true', async () => {
+		await render(
 			<Card data-testid="card-rounded" isRounded>
 				Code is Poetry
 			</Card>
 		);
-		render(
+		await render(
 			<Card data-testid="card-squared" isRounded={ false }>
 				Code is Poetry
 			</Card>
@@ -139,13 +142,13 @@ describe( 'Card', () => {
 		expect( squaredRadius ).toBe( '0px' );
 	} );
 
-	it( 'adds a box shadow when elevation is greater than zero', () => {
-		render(
+	it( 'adds a box shadow when elevation is greater than zero', async () => {
+		await render(
 			<Card data-testid="elevated" elevation={ 2 }>
 				Code is Poetry
 			</Card>
 		);
-		render( <Card data-testid="flat">Code is Poetry</Card> );
+		await render( <Card data-testid="flat">Code is Poetry</Card> );
 
 		const readElevationShadow = ( card: HTMLElement ) => {
 			// The elevation layers are intentionally hidden presentation elements.
@@ -160,14 +163,14 @@ describe( 'Card', () => {
 		).not.toBe( readElevationShadow( screen.getByTestId( 'flat' ) ) );
 	} );
 
-	it( 'changes region spacing with the size prop', () => {
-		render(
+	it( 'changes region spacing with the size prop', async () => {
+		await render(
 			<Card size="medium">
 				<CardHeader data-testid="medium-header">Header</CardHeader>
 				<CardBody data-testid="medium-body">Body</CardBody>
 			</Card>
 		);
-		render(
+		await render(
 			<Card size="large">
 				<CardHeader data-testid="large-header">Header</CardHeader>
 				<CardBody data-testid="large-body">Body</CardBody>
@@ -192,15 +195,15 @@ describe( 'Card', () => {
 		);
 	} );
 
-	it( 'warns when the legacy isElevated prop is passed', () => {
-		render( <Card isElevated>Code is Poetry</Card> );
+	it( 'warns when the legacy isElevated prop is passed', async () => {
+		await render( <Card isElevated>Code is Poetry</Card> );
 
 		expect( screen.getByText( 'Code is Poetry' ) ).toBeInTheDocument();
 		expect( console ).toHaveWarned();
 	} );
 
-	it( 'passes border and size styles from context to its regions', () => {
-		render(
+	it( 'passes border and size styles from context to its regions', async () => {
+		await render(
 			<Card isBorderless size="large">
 				<CardHeader data-testid="borderless-large-header">
 					Header
@@ -208,7 +211,7 @@ describe( 'Card', () => {
 				<CardBody data-testid="borderless-large-body">Body</CardBody>
 			</Card>
 		);
-		render(
+		await render(
 			<Card isBorderless={ false } size="small">
 				<CardHeader data-testid="bordered-small-header">
 					Header
@@ -238,8 +241,8 @@ describe( 'Card', () => {
 		);
 	} );
 
-	it( 'lets region props override inherited Card styles', () => {
-		render(
+	it( 'lets region props override inherited Card styles', async () => {
+		await render(
 			<Card isBorderless size="large">
 				<CardHeader data-testid="inherited">Header</CardHeader>
 				<CardHeader
@@ -267,14 +270,14 @@ describe( 'Card', () => {
 		);
 	} );
 
-	it( 'treats extraSmall as an alias for xSmall', () => {
-		render(
+	it( 'treats extraSmall as an alias for xSmall', async () => {
+		await render(
 			<Card size="xSmall">
 				<CardHeader data-testid="xsmall-header">Header</CardHeader>
 				<CardBody data-testid="xsmall-body">Body</CardBody>
 			</Card>
 		);
-		render(
+		await render(
 			<Card size="extraSmall">
 				<CardHeader data-testid="extra-small-header">Header</CardHeader>
 				<CardBody data-testid="extra-small-body">Body</CardBody>
@@ -302,8 +305,8 @@ describe( 'Card', () => {
 		);
 	} );
 
-	it( 'applies the shady background to all Card regions', () => {
-		render(
+	it( 'applies the shady background to all Card regions', async () => {
+		await render(
 			<>
 				<CardHeader data-testid="header">Header</CardHeader>
 				<CardHeader data-testid="shady-header" isShady>
@@ -330,8 +333,8 @@ describe( 'Card', () => {
 		}
 	} );
 
-	it( 'applies CardFooter justification', () => {
-		render(
+	it( 'applies CardFooter justification', async () => {
+		await render(
 			<CardFooter data-testid="footer" justify="flex-end">
 				Footer
 			</CardFooter>
@@ -342,9 +345,11 @@ describe( 'Card', () => {
 		).toBe( 'flex-end' );
 	} );
 
-	it( 'keeps region borderless styles regardless of Emotion insertion order', () => {
-		render( <EmotionStylePrimer styleFragment={ styles.borderless } /> );
-		render(
+	it( 'keeps region borderless styles regardless of Emotion insertion order', async () => {
+		await render(
+			<EmotionStylePrimer styleFragment={ styles.borderless } />
+		);
+		await render(
 			<Card>
 				<CardHeader data-testid="card-header" isBorderless>
 					Header
@@ -362,8 +367,8 @@ describe( 'Card', () => {
 		}
 	} );
 
-	it( 'makes CardBody scrollable when requested', () => {
-		render(
+	it( 'makes CardBody scrollable when requested', async () => {
+		await render(
 			<CardBody data-testid="scrollable" isScrollable>
 				Body
 			</CardBody>

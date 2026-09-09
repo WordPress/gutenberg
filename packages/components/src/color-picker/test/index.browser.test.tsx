@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { fireEvent, screen, render, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import { ColorPicker } from '..';
 
@@ -51,6 +52,7 @@ const ControlledColorPicker = ( {
 				onChange={ internalOnChange }
 				color={ colorState }
 			/>
+
 			<button onClick={ () => setColorState( '#4d87ba' ) }>
 				Set color to #4d87ba
 			</button>
@@ -65,7 +67,7 @@ describe( 'ColorPicker', () => {
 			const onChangeComplete = vi.fn();
 			const color = '#000';
 
-			render(
+			await render(
 				<ColorPicker
 					onChangeComplete={ onChangeComplete }
 					color={ color }
@@ -95,7 +97,7 @@ describe( 'ColorPicker', () => {
 			const onChange = vi.fn();
 			const color = '#000';
 
-			render(
+			await render(
 				<ColorPicker
 					onChange={ onChange }
 					color={ color }
@@ -122,7 +124,7 @@ describe( 'ColorPicker', () => {
 			const onChange = vi.fn();
 			const color = '#11aabb';
 
-			render(
+			await render(
 				<ColorPicker
 					onChange={ onChange }
 					color={ color }
@@ -150,7 +152,7 @@ describe( 'ColorPicker', () => {
 			const onChange = vi.fn();
 			const color = '#fff';
 
-			render(
+			await render(
 				<ColorPicker
 					onChange={ onChange }
 					color={ color }
@@ -180,7 +182,7 @@ describe( 'ColorPicker', () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 
-			render(
+			await render(
 				<ControlledColorPicker
 					onChange={ onChange }
 					enableAlpha={ false }
@@ -321,7 +323,7 @@ describe( 'ColorPicker', () => {
 		it( 'should preserve hue and saturation when lightness is set to 0 (black)', async () => {
 			const onChange = vi.fn();
 
-			render(
+			await render(
 				<ControlledColorPicker
 					onChange={ onChange }
 					enableAlpha={ false }
@@ -372,7 +374,7 @@ describe( 'ColorPicker', () => {
 			async ( _label, lightness ) => {
 				const onChange = vi.fn();
 
-				render(
+				await render(
 					<ControlledColorPicker
 						onChange={ onChange }
 						enableAlpha={ false }
@@ -419,7 +421,7 @@ describe( 'ColorPicker', () => {
 		it( 'should fire onChange once per real color change in controlled mode', async () => {
 			const onChange = vi.fn();
 
-			render(
+			await render(
 				<ControlledColorPicker
 					onChange={ onChange }
 					enableAlpha={ false }
@@ -461,7 +463,7 @@ describe( 'ColorPicker', () => {
 		it( 'should reset saturation to 0 when a mid-gray is entered via hex input', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<ControlledColorPicker
 					enableAlpha={ false }
 					initialColor="#2ad5d5" // hsl(180, 67%, 50%)
@@ -498,7 +500,7 @@ describe( 'ColorPicker', () => {
 		it( 'should preserve hue when saturation is set to 0', async () => {
 			const onChange = vi.fn();
 
-			render(
+			await render(
 				<ControlledColorPicker
 					onChange={ onChange }
 					enableAlpha={ false }
@@ -554,7 +556,7 @@ describe( 'ColorPicker', () => {
 				const onChange = vi.fn();
 				const color = '#2ad5d5';
 
-				render(
+				await render(
 					<ColorPicker
 						onChange={ onChange }
 						color={ color }
@@ -621,7 +623,7 @@ describe( 'ColorPicker', () => {
 			const onChange = vi.fn();
 
 			// Saturated red with mid brightness — HSVA s stays high at black.
-			const { container } = render(
+			const { container } = await render(
 				<ControlledColorPicker
 					onChange={ onChange }
 					enableAlpha={ false }
@@ -631,7 +633,7 @@ describe( 'ColorPicker', () => {
 
 			const colorSlider = screen.getByRole( 'slider', { name: 'Color' } );
 			// Pointer is a presentational sibling; no accessible role.
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			// eslint-disable-next-line testing-library/no-node-access
 			const pointer = container.querySelector(
 				'.react-colorful__saturation-pointer'
 			) as HTMLElement;
@@ -650,10 +652,10 @@ describe( 'ColorPicker', () => {
 			expect( onChange ).toHaveBeenLastCalledWith( '#000000' );
 		} );
 
-		it( 'preserves saturation when pointer selects black in controlled mode', () => {
+		it( 'preserves saturation when pointer selects black in controlled mode', async () => {
 			const onChange = vi.fn();
 
-			const { container } = render(
+			const { container } = await render(
 				<ControlledColorPicker
 					onChange={ onChange }
 					enableAlpha={ false }
@@ -663,7 +665,7 @@ describe( 'ColorPicker', () => {
 
 			const interactive = screen.getByRole( 'slider', { name: 'Color' } );
 			// Pointer is a presentational sibling; no accessible role.
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			// eslint-disable-next-line testing-library/no-node-access
 			const pointer = container.querySelector(
 				'.react-colorful__saturation-pointer'
 			) as HTMLElement;
@@ -685,7 +687,7 @@ describe( 'ColorPicker', () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 
-			const { container } = render(
+			const { container } = await render(
 				<ControlledColorPicker
 					onChange={ onChange }
 					enableAlpha={ false }
@@ -694,7 +696,7 @@ describe( 'ColorPicker', () => {
 			);
 
 			const interactive = screen.getByRole( 'slider', { name: 'Color' } );
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			// eslint-disable-next-line testing-library/no-node-access
 			const pointer = container.querySelector(
 				'.react-colorful__saturation-pointer'
 			) as HTMLElement;
@@ -750,7 +752,7 @@ describe( 'ColorPicker', () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 
-			const { container } = render(
+			const { container } = await render(
 				<ControlledColorPicker
 					onChange={ onChange }
 					enableAlpha={ false }
@@ -770,7 +772,7 @@ describe( 'ColorPicker', () => {
 			);
 			expect( onChange ).toHaveBeenLastCalledWith( '#ffffff' );
 
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			// eslint-disable-next-line testing-library/no-node-access
 			const pointer = container.querySelector(
 				'.react-colorful__saturation-pointer'
 			) as HTMLElement;
@@ -789,7 +791,7 @@ describe( 'ColorPicker', () => {
 		it( 'preserves visual saturation when HSL hue is edited at black', async () => {
 			const user = userEvent.setup();
 
-			const { container } = render(
+			const { container } = await render(
 				<ControlledColorPicker
 					enableAlpha={ false }
 					initialColor="#cc0000"
@@ -805,7 +807,7 @@ describe( 'ColorPicker', () => {
 			await userEvent.fill( lightnessSlider, '0' );
 			await waitFor( () => expect( lightnessSlider ).toHaveValue( '0' ) );
 
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			// eslint-disable-next-line testing-library/no-node-access
 			const pointer = container.querySelector(
 				'.react-colorful__saturation-pointer'
 			) as HTMLElement;
@@ -828,7 +830,7 @@ describe( 'ColorPicker', () => {
 		it( 'keeps the white visual coordinate at s:0 when HSL hue is edited', async () => {
 			const user = userEvent.setup();
 
-			const { container } = render(
+			const { container } = await render(
 				<ControlledColorPicker
 					enableAlpha={ false }
 					initialColor="#cc0000"
@@ -846,7 +848,7 @@ describe( 'ColorPicker', () => {
 				expect( lightnessSlider ).toHaveValue( '100' )
 			);
 
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			// eslint-disable-next-line testing-library/no-node-access
 			const pointer = container.querySelector(
 				'.react-colorful__saturation-pointer'
 			) as HTMLElement;
@@ -865,7 +867,7 @@ describe( 'ColorPicker', () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 
-			render(
+			await render(
 				<ControlledColorPicker
 					onChange={ onChange }
 					enableAlpha={ false }
@@ -899,7 +901,7 @@ describe( 'ColorPicker', () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 
-			render(
+			await render(
 				<ControlledColorPicker
 					onChange={ onChange }
 					enableAlpha={ false }
@@ -927,7 +929,7 @@ describe( 'ColorPicker', () => {
 		it( 'updates visual saturation when HSL saturation is edited at black', async () => {
 			const user = userEvent.setup();
 
-			const { container } = render(
+			const { container } = await render(
 				<ControlledColorPicker
 					enableAlpha={ false }
 					initialColor="#cc0000"
@@ -943,7 +945,7 @@ describe( 'ColorPicker', () => {
 			await userEvent.fill( lightnessSlider, '0' );
 			await waitFor( () => expect( lightnessSlider ).toHaveValue( '0' ) );
 
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			// eslint-disable-next-line testing-library/no-node-access
 			const pointer = container.querySelector(
 				'.react-colorful__saturation-pointer'
 			) as HTMLElement;
@@ -970,7 +972,7 @@ describe( 'ColorPicker', () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 
-			render(
+			await render(
 				<ControlledColorPicker
 					onChange={ onChange }
 					enableAlpha

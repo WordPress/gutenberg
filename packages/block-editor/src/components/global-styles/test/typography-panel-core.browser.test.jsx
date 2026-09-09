@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import TypographyPanel from '../typography-panel';
 
 // Coverage for `TypographyPanel` with the `gutenberg-global-styles-inheritance-ui`
@@ -41,8 +42,8 @@ const PALETTE_SETTINGS = {
 	},
 };
 
-function renderPanel( props ) {
-	return render(
+async function renderPanel( props ) {
+	return await render(
 		<TypographyPanel
 			value={ {} }
 			settings={ baseSettings }
@@ -64,8 +65,8 @@ describe( 'TypographyPanel — experiment off', () => {
 	// `showInheritanceLabelIndicators` defaults to the experiment flag, so a
 	// caller that passes no prop gets no inheritance treatment. The layout
 	// className must still come through.
-	it( 'applies no inherited treatment by default, even when an inherited value is present', () => {
-		renderPanel( {
+	it( 'applies no inherited treatment by default, even when an inherited value is present', async () => {
+		await renderPanel( {
 			value: {},
 			inheritedValue: { typography: { lineHeight: '1.5' } },
 		} );
@@ -77,8 +78,8 @@ describe( 'TypographyPanel — experiment off', () => {
 		);
 	} );
 
-	it( 'renders no reset dot by default when a local value shadows an inherited one', () => {
-		renderPanel( {
+	it( 'renders no reset dot by default when a local value shadows an inherited one', async () => {
+		await renderPanel( {
 			value: { typography: { lineHeight: '2' } },
 			inheritedValue: { typography: { lineHeight: '1.5' } },
 		} );
@@ -94,7 +95,7 @@ describe( 'TypographyPanel — experiment off', () => {
 	} );
 
 	it( 'renders the default color reset button by default when a local color shadows an inherited one', async () => {
-		render(
+		await render(
 			<TypographyPanel
 				value={ { color: { text: 'var:preset|color|blue' } } }
 				inheritedValue={ { color: { text: 'var:preset|color|red' } } }
@@ -118,7 +119,7 @@ describe( 'TypographyPanel — experiment off', () => {
 describe( 'TypographyPanel — experiment off, setTextColor link sync', () => {
 	async function pickRed( value, inheritedValue ) {
 		const onChange = vi.fn();
-		render(
+		await render(
 			<TypographyPanel
 				value={ value }
 				inheritedValue={ inheritedValue }

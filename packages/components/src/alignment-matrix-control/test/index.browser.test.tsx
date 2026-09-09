@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import AlignmentMatrixControl from '..';
 
 const getControl = () => {
@@ -15,7 +16,7 @@ const renderAndInitCompositeStore = async (
 	jsx: React.JSX.Element,
 	focusedCell = 'center center'
 ) => {
-	const view = render( jsx );
+	const view = await render( jsx );
 	await waitFor( () => {
 		expect( getCell( focusedCell ) ).toHaveAttribute( 'tabindex', '0' );
 	} );

@@ -1,4 +1,5 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { describe, expect, it, vi } from 'vitest';
 import { useOverlayScrollStateAttributes } from '../use-overlay-scroll-state-attributes';
 
@@ -26,7 +27,7 @@ function Harness( {
 describe( 'useOverlayScrollStateAttributes browser layout', () => {
 	it( 'tracks overflow, scrolling, and content resize', async () => {
 		const onScroll = vi.fn();
-		const view = render(
+		const view = await render(
 			<Harness contentHeight={ 300 } onScroll={ onScroll } />
 		);
 		const container = screen.getByTestId( 'scroll-container' );
@@ -62,7 +63,9 @@ describe( 'useOverlayScrollStateAttributes browser layout', () => {
 			'data-wp-ui-overlay-scrolled-from-bottom'
 		);
 
-		view.rerender( <Harness contentHeight={ 50 } onScroll={ onScroll } /> );
+		await view.rerender(
+			<Harness contentHeight={ 50 } onScroll={ onScroll } />
+		);
 
 		await waitFor( () => {
 			expect( container ).not.toHaveAttribute( 'tabindex' );

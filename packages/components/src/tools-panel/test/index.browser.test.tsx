@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { ContextSystemProvider } from '../../context';
 import { ToolsPanel, ToolsPanelItem } from '..';
 
@@ -23,8 +24,8 @@ const hiddenControlProps = {
 };
 
 describe( 'ToolsPanel styles', () => {
-	it( 'applies the panel padding and border', () => {
-		render(
+	it( 'applies the panel padding and border', async () => {
+		await render(
 			<ToolsPanel { ...defaultProps } data-testid="tools-panel">
 				<ToolsPanelItem { ...controlProps }>Control</ToolsPanelItem>
 			</ToolsPanel>
@@ -36,8 +37,8 @@ describe( 'ToolsPanel styles', () => {
 		expect( styles.borderTopStyle ).toBe( 'solid' );
 	} );
 
-	it( 'preserves row and column gaps against Grid context values', () => {
-		render(
+	it( 'preserves row and column gaps against Grid context values', async () => {
+		await render(
 			<ContextSystemProvider
 				value={ { Grid: { columnGap: '40px', rowGap: '48px' } } }
 			>
@@ -53,7 +54,7 @@ describe( 'ToolsPanel styles', () => {
 	} );
 
 	it( 'hides placeholder items and the inner wrapper when configured', async () => {
-		render(
+		await render(
 			<ToolsPanel
 				{ ...defaultProps }
 				hasInnerWrapper
@@ -81,7 +82,7 @@ describe( 'ToolsPanel styles', () => {
 	} );
 
 	it( 'keeps the dropdown toggle override above its base styles', async () => {
-		render(
+		await render(
 			<ToolsPanel { ...defaultProps }>
 				<ToolsPanelItem { ...controlProps }>Control</ToolsPanelItem>
 			</ToolsPanel>

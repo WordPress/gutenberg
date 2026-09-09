@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import BaseInputControl from '../';
 import InputControlPrefixWrapper from '../input-prefix-wrapper';
 
@@ -30,11 +31,11 @@ function getComparedStyles( element: HTMLElement ) {
 }
 
 describe( 'InputControl legacy size support', () => {
-	it( 'treats __unstable-large the same as default', () => {
+	it( 'treats __unstable-large the same as default', async () => {
 		const prefix = <InputControlPrefixWrapper>$</InputControlPrefixWrapper>;
 
-		render( <InputControl label="Test" prefix={ prefix } /> );
-		render(
+		await render( <InputControl label="Test" prefix={ prefix } /> );
+		await render(
 			<InputControl
 				label="Test"
 				prefix={ prefix }

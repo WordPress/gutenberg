@@ -1,6 +1,7 @@
 import { describe, expect, it, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import FontSizePicker from '../';
 import type { FontSize } from '../types';
@@ -391,6 +392,7 @@ describe( 'FontSizePicker', () => {
 						size: '16px',
 					},
 				];
+
 				await render(
 					<FontSizePicker
 						fontSizes={ fontSizesWithDuplicates }
@@ -422,6 +424,7 @@ describe( 'FontSizePicker', () => {
 						size: '16px',
 					},
 				];
+
 				await render(
 					<FontSizePicker
 						fontSizes={ fontSizesWithDuplicates }
@@ -612,7 +615,7 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'spinbutton', { name: 'Font size' } )
 			).toBeVisible();
 
-			rerender(
+			await rerender(
 				<FontSizePicker
 					disableCustomFontSizes
 					fontSizes={ fontSizes }
@@ -632,7 +635,7 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'spinbutton', { name: 'Font size' } )
 			).toBeVisible();
 
-			rerender(
+			await rerender(
 				<FontSizePicker
 					fontSizes={ fontSizes }
 					value={ fontSizes[ 0 ].size }
@@ -1081,6 +1084,7 @@ describe( 'FontSizePicker', () => {
 					size: '20px',
 				},
 			];
+
 			await render(
 				<FontSizePicker
 					fontSizes={ toggleGroupFontSizes }

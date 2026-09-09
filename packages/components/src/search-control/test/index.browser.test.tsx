@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import SearchControl from '..';
 
@@ -32,7 +33,7 @@ describe( 'SearchControl', () => {
 
 		it( 'should call onChange with input value when value is changed', async () => {
 			const onChangeSpy = vi.fn();
-			render( <Component onChange={ onChangeSpy } /> );
+			await render( <Component onChange={ onChangeSpy } /> );
 
 			const searchInput = screen.getByRole( 'searchbox' );
 			await userEvent.type( searchInput, 'test' );
@@ -42,7 +43,7 @@ describe( 'SearchControl', () => {
 
 		it( 'should render a Reset search button if no onClose function is provided', async () => {
 			const onChangeSpy = vi.fn();
-			render( <Component onChange={ onChangeSpy } /> );
+			await render( <Component onChange={ onChangeSpy } /> );
 
 			const searchInput = screen.getByRole( 'searchbox' );
 
@@ -72,7 +73,7 @@ describe( 'SearchControl', () => {
 		it( 'should render a Close button (instead of Reset) when onClose function is provided', async () => {
 			const onChangeSpy = vi.fn();
 			const onCloseSpy = vi.fn();
-			render(
+			await render(
 				<Component onChange={ onChangeSpy } onClose={ onCloseSpy } />
 			);
 

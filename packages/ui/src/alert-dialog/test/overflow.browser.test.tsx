@@ -1,4 +1,5 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
 import { describe, expect, it } from 'vitest';
 import { createRef } from '@wordpress/element';
@@ -8,7 +9,7 @@ describe( 'AlertDialog browser overflow behavior', () => {
 	it( 'focuses an action instead of its overflowing scroll container', async () => {
 		const popupRef = createRef< HTMLDivElement >();
 
-		render(
+		await render(
 			<AlertDialog.Root>
 				<AlertDialog.Trigger>Open</AlertDialog.Trigger>
 				<AlertDialog.Popup

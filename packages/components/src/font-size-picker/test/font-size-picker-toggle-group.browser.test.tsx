@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import FontSizePickerToggleGroup from '../font-size-picker-toggle-group';
 import type { FontSize } from '../types';
 describe( 'FontSizePickerToggleGroup', () => {

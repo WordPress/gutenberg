@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import ColorGradientControl from '../control';
 
 const noop = () => {};
@@ -49,7 +50,7 @@ describe( 'ColorPaletteControl', () => {
 	} );
 
 	it( 'renders the color picker and does not render tabs if it is only possible to select a color', async () => {
-		render(
+		await render(
 			<ColorGradientControl
 				label="Test Color Gradient"
 				colorValue="#f00"
@@ -78,7 +79,7 @@ describe( 'ColorPaletteControl', () => {
 	} );
 
 	it( 'renders the gradient picker and does not render tabs if it is only possible to select a gradient', async () => {
-		render(
+		await render(
 			<ColorGradientControl
 				label="Test Color Gradient"
 				colorValue="#f00"

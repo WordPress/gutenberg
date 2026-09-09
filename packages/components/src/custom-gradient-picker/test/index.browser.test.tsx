@@ -1,12 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import {
-	act,
-	fireEvent,
-	render,
-	screen,
-	waitFor,
-} from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import CustomGradientPicker from '../';
 import CustomGradientBar from '../gradient-bar';
@@ -24,9 +19,11 @@ function ControlledCustomGradientPicker( {
 describe( 'CustomGradientPicker', () => {
 	describe( 'new gradient stop color picker', () => {
 		it( 'preserves visual saturation when setting a new stop color through black', async () => {
-			const { container } = render( <ControlledCustomGradientPicker /> );
+			const { container } = await render(
+				<ControlledCustomGradientPicker />
+			);
 
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			// eslint-disable-next-line testing-library/no-node-access
 			const bar = container.querySelector(
 				'.components-custom-gradient-picker__gradient-bar'
 			) as HTMLElement;
@@ -37,7 +34,7 @@ describe( 'CustomGradientPicker', () => {
 				clientX: barBounds.left + barBounds.width / 2,
 			} );
 
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			// eslint-disable-next-line testing-library/no-node-access
 			const insertButton = container.querySelector(
 				'.components-custom-gradient-picker__insert-point-dropdown'
 			) as HTMLElement;
@@ -102,7 +99,7 @@ describe( 'CustomGradientPicker', () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 
-			render(
+			await render(
 				<CustomGradientPicker
 					value="linear-gradient(125deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
 					onChange={ onChange }
@@ -126,7 +123,7 @@ describe( 'CustomGradientPicker', () => {
 			const onChange = vi.fn();
 
 			// Start with a radial gradient so there is no previous linear angle in the ref
-			render(
+			await render(
 				<CustomGradientPicker
 					value="radial-gradient(rgb(0,0,0) 0%, rgb(255,255,255) 100%)"
 					onChange={ onChange }
@@ -147,7 +144,7 @@ describe( 'CustomGradientPicker', () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 
-			render(
+			await render(
 				<CustomGradientPicker
 					value="linear-gradient(45deg, rgb(0,0,0) 0%, rgb(255,255,255) 100%)"
 					onChange={ onChange }
@@ -179,7 +176,7 @@ describe( 'CustomGradientBar', () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<CustomGradientBar
 				background="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
 				hasGradient
@@ -210,10 +207,10 @@ describe( 'CustomGradientBar', () => {
 	// Dragging is driven by window-level listeners attached on mousedown, and
 	// the position comes from the markers container's box, so that has to be
 	// given one in jsdom.
-	it( 'moves a control point when dragged', () => {
+	it( 'moves a control point when dragged', async () => {
 		const onChange = vi.fn();
 
-		const { container } = render(
+		const { container } = await render(
 			<CustomGradientBar
 				background="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
 				hasGradient
@@ -222,7 +219,7 @@ describe( 'CustomGradientBar', () => {
 			/>
 		);
 
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+		// eslint-disable-next-line testing-library/no-node-access
 		const markers = container.querySelector(
 			'.components-custom-gradient-picker__markers-container'
 		) as HTMLElement;
@@ -244,10 +241,10 @@ describe( 'CustomGradientBar', () => {
 		] );
 	} );
 
-	it( 'does not move a control point when dragged and positioning is disabled', () => {
+	it( 'does not move a control point when dragged and positioning is disabled', async () => {
 		const onChange = vi.fn();
 
-		const { container } = render(
+		const { container } = await render(
 			<CustomGradientBar
 				background="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
 				hasGradient
@@ -257,7 +254,7 @@ describe( 'CustomGradientBar', () => {
 			/>
 		);
 
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+		// eslint-disable-next-line testing-library/no-node-access
 		const markers = container.querySelector(
 			'.components-custom-gradient-picker__markers-container'
 		) as HTMLElement;
@@ -279,7 +276,7 @@ describe( 'CustomGradientBar', () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<CustomGradientBar
 				background="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
 				hasGradient

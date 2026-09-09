@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import FormFileUpload from '..';
 const { File } = window;
 
@@ -12,8 +13,8 @@ const fakePath = expect.objectContaining( {
 } );
 
 describe( 'FormFileUpload', () => {
-	it( 'should show an Icon Button and a hidden input', () => {
-		render(
+	it( 'should show an Icon Button and a hidden input', async () => {
+		await render(
 			<FormFileUpload onChange={ () => {} }>
 				My Upload Button
 			</FormFileUpload>
@@ -30,7 +31,7 @@ describe( 'FormFileUpload', () => {
 
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<FormFileUpload onChange={ onChange }>
 				My Upload Button
 			</FormFileUpload>
@@ -53,7 +54,7 @@ describe( 'FormFileUpload', () => {
 
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<FormFileUpload
 				onClick={ vi.fn( ( e ) => ( e.currentTarget.value = '' ) ) }
 				onChange={ onChange }

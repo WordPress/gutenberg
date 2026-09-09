@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { Elevation } from '..';
 
 const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
@@ -9,8 +10,8 @@ const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
 	);
 
 describe( 'Elevation', () => {
-	it( 'renders the base elevation styles', () => {
-		render( <Elevation data-testid="elevation" /> );
+	it( 'renders the base elevation styles', async () => {
+		await render( <Elevation data-testid="elevation" /> );
 		const elevation = screen.getByTestId( 'elevation' );
 		const styles = getComputedStyle( elevation );
 
@@ -20,9 +21,9 @@ describe( 'Elevation', () => {
 		expect( styles.backgroundColor ).toBe( 'rgba(0, 0, 0, 0)' );
 	} );
 
-	it( 'changes the shadow with the value prop', () => {
-		render( <Elevation value={ 7 } data-testid="raised" /> );
-		render( <Elevation value={ 0 } data-testid="flat" /> );
+	it( 'changes the shadow with the value prop', async () => {
+		await render( <Elevation value={ 7 } data-testid="raised" /> );
+		await render( <Elevation value={ 0 } data-testid="flat" /> );
 
 		expect(
 			getComputedStyle( screen.getByTestId( 'raised' ) ).boxShadow
@@ -32,7 +33,7 @@ describe( 'Elevation', () => {
 	} );
 
 	it( 'applies the interactive hover shadow', async () => {
-		render(
+		await render(
 			<div
 				data-testid="target"
 				style={ { position: 'relative', width: 40, height: 40 } }
@@ -53,7 +54,7 @@ describe( 'Elevation', () => {
 	} );
 
 	it( 'applies the configured focus shadow', async () => {
-		render(
+		await render(
 			<button
 				type="button"
 				data-testid="target"
@@ -75,8 +76,8 @@ describe( 'Elevation', () => {
 		);
 	} );
 
-	it( 'applies the offset on every edge', () => {
-		render( <Elevation offset={ -2 } data-testid="elevation" /> );
+	it( 'applies the offset on every edge', async () => {
+		await render( <Elevation offset={ -2 } data-testid="elevation" /> );
 		const styles = getComputedStyle( screen.getByTestId( 'elevation' ) );
 
 		expect( styles.top ).toBe( '-2px' );
@@ -85,8 +86,8 @@ describe( 'Elevation', () => {
 		expect( styles.left ).toBe( '-2px' );
 	} );
 
-	it( 'composes interactive styles in a single generated class', () => {
-		render(
+	it( 'composes interactive styles in a single generated class', async () => {
+		await render(
 			<Elevation
 				active={ 5 }
 				focus={ 9 }

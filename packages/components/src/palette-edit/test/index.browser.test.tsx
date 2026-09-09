@@ -1,6 +1,7 @@
 import { describe, expect, it, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import PaletteEdit, {
 	getNameAndSlugForPosition,
 	deduplicateElementSlugs,
@@ -186,6 +187,7 @@ describe( 'PaletteEdit', () => {
 		{ color: '#1a4548', name: 'Primary', slug: 'primary' },
 		{ color: '#0000ff', name: 'Secondary', slug: 'secondary' },
 	];
+
 	const gradients = [
 		{
 			gradient:
@@ -200,6 +202,7 @@ describe( 'PaletteEdit', () => {
 			slug: 'midnight',
 		},
 	];
+
 	const duotones = [
 		{
 			colors: [ '#8c00b7', '#fcff41' ],
@@ -213,8 +216,8 @@ describe( 'PaletteEdit', () => {
 		},
 	];
 
-	it( 'shows heading label', () => {
-		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+	it( 'shows heading label', async () => {
+		await render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
 		const paletteLabel = screen.getByRole( 'heading', {
 			level: 2,
@@ -224,8 +227,8 @@ describe( 'PaletteEdit', () => {
 		expect( paletteLabel ).toBeVisible();
 	} );
 
-	it( 'shows heading label with custom heading level', () => {
-		render(
+	it( 'shows heading label with custom heading level', async () => {
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				colors={ colors }
@@ -266,7 +269,7 @@ describe( 'PaletteEdit', () => {
 	] )(
 		'shows $name swatches as named command buttons that open the editor',
 		async ( { props, buttonName, editorRole, editorName } ) => {
-			render( <PaletteEdit { ...defaultProps } { ...props } /> );
+			await render( <PaletteEdit { ...defaultProps } { ...props } /> );
 
 			const group = screen.getByRole( 'group', { name: 'Test label' } );
 			const swatch = within( group ).getByRole( 'button', {
@@ -291,7 +294,7 @@ describe( 'PaletteEdit', () => {
 	);
 
 	it( 'tabs between command swatches and opens one with Space', async () => {
-		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+		await render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
 		const primary = screen.getByRole( 'button', { name: 'Primary' } );
 		const secondary = screen.getByRole( 'button', { name: 'Secondary' } );
@@ -309,7 +312,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'opens a command swatch with Enter', async () => {
-		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+		await render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
 		screen.getByRole( 'button', { name: 'Primary' } ).focus();
 		await userEvent.keyboard( '{Enter}' );
@@ -321,8 +324,8 @@ describe( 'PaletteEdit', () => {
 		} );
 	} );
 
-	it( 'shows empty message', () => {
-		render(
+	it( 'shows empty message', async () => {
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				emptyMessage="Test empty message"
@@ -333,7 +336,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'shows an option to remove all colors', async () => {
-		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+		await render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
 		await userEvent.click(
 			screen.getByRole( 'button', {
@@ -351,7 +354,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'shows a reset option when the `canReset` prop is enabled', async () => {
-		render(
+		await render(
 			<PaletteEdit { ...defaultProps } colors={ colors } canReset />
 		);
 
@@ -370,7 +373,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'does not show a reset colors option when `canReset` is disabled', async () => {
-		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+		await render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
 		await userEvent.click(
 			screen.getByRole( 'button', {
@@ -387,7 +390,7 @@ describe( 'PaletteEdit', () => {
 	it( 'calls the `onChange` with the new color appended', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				colors={ colors }
@@ -416,7 +419,7 @@ describe( 'PaletteEdit', () => {
 	it( 'calls the `onChange` with the new gradient appended', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				gradients={ gradients }
@@ -446,7 +449,7 @@ describe( 'PaletteEdit', () => {
 	it( 'calls the `onChange` with the new duotone appended, seeded from the color palette', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				duotones={ duotones }
@@ -477,7 +480,7 @@ describe( 'PaletteEdit', () => {
 	it( 'ignores palette colors a duotone cannot be built from when adding one', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				duotones={ duotones }
@@ -521,7 +524,7 @@ describe( 'PaletteEdit', () => {
 	it( 'normalizes palette colors to hex when adding a duotone', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				duotones={ duotones }
@@ -554,7 +557,7 @@ describe( 'PaletteEdit', () => {
 	it( 'falls back to black and white when adding a duotone without a color palette', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				duotones={ duotones }
@@ -580,8 +583,8 @@ describe( 'PaletteEdit', () => {
 		} );
 	} );
 
-	it( 'can not add new colors when `canOnlyChangeValues` is enabled', () => {
-		render( <PaletteEdit { ...defaultProps } canOnlyChangeValues /> );
+	it( 'can not add new colors when `canOnlyChangeValues` is enabled', async () => {
+		await render( <PaletteEdit { ...defaultProps } canOnlyChangeValues /> );
 
 		expect(
 			screen.queryByRole( 'button', {
@@ -593,7 +596,7 @@ describe( 'PaletteEdit', () => {
 	it( 'can remove a color', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				colors={ colors }
@@ -628,7 +631,7 @@ describe( 'PaletteEdit', () => {
 	it( 'can update palette name', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				colors={ colors }
@@ -670,7 +673,7 @@ describe( 'PaletteEdit', () => {
 	it( 'can update color palette value', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				colors={ colors }
@@ -701,7 +704,7 @@ describe( 'PaletteEdit', () => {
 	it( 'can update gradient palette value', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				gradients={ gradients }
@@ -734,7 +737,7 @@ describe( 'PaletteEdit', () => {
 	it( 'can update duotone palette value', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				duotones={ duotones }
@@ -770,7 +773,7 @@ describe( 'PaletteEdit', () => {
 	it( 'hides unusable colors and saves named ones as hex when editing a duotone', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				duotones={ duotones }
@@ -832,7 +835,7 @@ describe( 'PaletteEdit', () => {
 			},
 		];
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				duotones={ twins }

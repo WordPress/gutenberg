@@ -1,11 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import {
-	act,
-	render as renderTestingLibrary,
-	screen,
-	waitFor,
-} from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
+import { render as renderTestingLibrary } from 'vitest-browser-react';
 import { useEffect, useState } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { Tabs } from '..';
@@ -31,13 +27,13 @@ async function settleRender() {
 }
 
 async function render( ...args: Parameters< typeof renderTestingLibrary > ) {
-	const view = renderTestingLibrary( ...args );
+	const view = await renderTestingLibrary( ...args );
 	await settleRender();
 
 	return {
 		...view,
 		rerender: async ( ui: React.ReactNode ) => {
-			view.rerender( ui );
+			await view.rerender( ui );
 			await settleRender();
 		},
 	};
@@ -114,9 +110,7 @@ const TABS_WITH_DELTA: Tab[] = [
 const UncontrolledTabs = ( {
 	tabs,
 	...props
-}: Omit< TabsProps, 'children' > & {
-	tabs: Tab[];
-} ) => {
+}: Omit< TabsProps, 'children' > & { tabs: Tab[] } ) => {
 	return (
 		<Tabs { ...props }>
 			<Tabs.TabList>
@@ -147,9 +141,7 @@ const UncontrolledTabs = ( {
 const ControlledTabs = ( {
 	tabs,
 	...props
-}: Omit< TabsProps, 'children' > & {
-	tabs: Tab[];
-} ) => {
+}: Omit< TabsProps, 'children' > & { tabs: Tab[] } ) => {
 	const [ selectedTabId, setSelectedTabId ] = useState<
 		string | undefined | null
 	>( props.selectedTabId );
@@ -936,6 +928,7 @@ describe( 'Tabs', () => {
 												<button>Alpha Button</button>
 											</>
 										),
+
 										tabpanel: { focusable: false },
 								  }
 								: tabObj

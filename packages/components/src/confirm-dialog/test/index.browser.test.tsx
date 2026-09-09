@@ -1,6 +1,7 @@
 /* eslint-disable testing-library/no-node-access -- The z-index contract is set on presentation-only overlay elements. */
 import { expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import Modal from '../../modal';
 import { ConfirmDialog } from '..';
 // The z-index contract spans ConfirmDialog's CSS Module and Modal's global
@@ -10,8 +11,8 @@ import '../../modal/style.scss';
 
 const noop = () => {};
 
-it( 'renders above a regular Modal overlay', () => {
-	render(
+it( 'renders above a regular Modal overlay', async () => {
+	await render(
 		<>
 			<Modal
 				title="Regular modal"

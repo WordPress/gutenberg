@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import Label from '../label';
 import { POSITIONS } from '../utils';
 
 describe( 'ResizeTooltip label', () => {
-	it( 'keeps the Text contract when an ancestor uses a bold font weight', () => {
-		render(
+	it( 'keeps the Text contract when an ancestor uses a bold font weight', async () => {
+		await render(
 			<div style={ { fontWeight: 700 } }>
 				<Label
 					label="120 x 80"

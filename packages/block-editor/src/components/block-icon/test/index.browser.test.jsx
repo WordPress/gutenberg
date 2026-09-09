@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { render } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { image } from '@wordpress/icons';
 import BlockIcon from '../';
 
@@ -9,38 +9,40 @@ function getIconWrapper( container ) {
 }
 
 describe( 'BlockIcon', () => {
-	it( 'renders an icon', () => {
-		const { container } = render( <BlockIcon icon={ image } /> );
+	it( 'renders an icon', async () => {
+		const { container } = await render( <BlockIcon icon={ image } /> );
 
 		// The decorative SVG is intentionally hidden from the accessibility tree.
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+
 		const icon = container.querySelector( 'svg' );
 		expect( icon ).toHaveAttribute( 'aria-hidden', 'true' );
 		expect( icon ).toHaveAttribute( 'focusable', 'false' );
 	} );
 
-	it( 'renders a span without the has-colors classname', () => {
-		const { container } = render( <BlockIcon icon={ image } /> );
+	it( 'renders a span without the has-colors classname', async () => {
+		const { container } = await render( <BlockIcon icon={ image } /> );
 
 		expect( getIconWrapper( container ) ).not.toHaveClass( 'has-colors' );
 	} );
 
-	it( 'renders a span with the has-colors classname', () => {
-		const { container } = render( <BlockIcon icon={ image } showColors /> );
+	it( 'renders a span with the has-colors classname', async () => {
+		const { container } = await render(
+			<BlockIcon icon={ image } showColors />
+		);
 
 		expect( getIconWrapper( container ) ).toHaveClass( 'has-colors' );
 	} );
 
-	it( 'supports adding a className to the wrapper', () => {
-		const { container } = render(
+	it( 'supports adding a className to the wrapper', async () => {
+		const { container } = await render(
 			<BlockIcon icon={ image } className="foo-bar" />
 		);
 
 		expect( getIconWrapper( container ) ).toHaveClass( 'foo-bar' );
 	} );
 
-	it( 'skips adding background and foreground styles when colors are not enabled', () => {
-		const { container } = render(
+	it( 'skips adding background and foreground styles when colors are not enabled', async () => {
+		const { container } = await render(
 			<BlockIcon
 				icon={ {
 					background: 'white',
@@ -53,8 +55,8 @@ describe( 'BlockIcon', () => {
 		expect( getIconWrapper( container ) ).not.toHaveAttribute( 'style' );
 	} );
 
-	it( 'adds background and foreground styles when colors are enabled', () => {
-		const { container } = render(
+	it( 'adds background and foreground styles when colors are enabled', async () => {
+		const { container } = await render(
 			<BlockIcon
 				icon={ {
 					background: 'white',

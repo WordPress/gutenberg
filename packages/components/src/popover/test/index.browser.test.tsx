@@ -1,12 +1,7 @@
 import { describe, expect, it, test, vi, type Mock } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import {
-	act,
-	render,
-	screen,
-	waitFor,
-	getByText,
-} from '@testing-library/react';
+import { act, screen, waitFor, getByText } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import type { CSSProperties } from 'react';
 import { useState } from '@wordpress/element';
 import {
@@ -22,11 +17,13 @@ type PositionToPlacementTuple = [
 	NonNullable< PopoverProps[ 'position' ] >,
 	NonNullable< PopoverProps[ 'placement' ] >,
 ];
+
 type PlacementToAnimationOriginTuple = [
 	NonNullable< PopoverProps[ 'placement' ] >,
 	number,
 	number,
 ];
+
 type PlacementToInitialTranslationTuple = [
 	NonNullable< PopoverProps[ 'placement' ] >,
 	'translateY' | 'translateX',
@@ -95,7 +92,7 @@ describe( 'Popover', () => {
 	describe( 'Component', () => {
 		describe( 'basic behavior', () => {
 			it( 'should render content', async () => {
-				render( <Popover>Hello</Popover> );
+				await render( <Popover>Hello</Popover> );
 
 				await waitFor( () =>
 					expect( screen.getByText( 'Hello' ) ).toBeVisible()
@@ -103,7 +100,7 @@ describe( 'Popover', () => {
 			} );
 
 			it( 'should forward additional props to portaled element', async () => {
-				render( <Popover role="tooltip">Hello</Popover> );
+				await render( <Popover role="tooltip">Hello</Popover> );
 
 				await waitFor( () =>
 					expect( screen.getByRole( 'tooltip' ) ).toBeVisible()
@@ -111,7 +108,7 @@ describe( 'Popover', () => {
 			} );
 
 			it( 'should render inline regardless of slot name', async () => {
-				const { container } = render(
+				const { container } = await render(
 					<Popover inline __unstableSlotName="Popover">
 						Hello
 					</Popover>
@@ -140,7 +137,7 @@ describe( 'Popover', () => {
 					);
 				};
 
-				render(
+				await render(
 					<PopoverWithAnchor>Popover content</PopoverWithAnchor>
 				);
 
@@ -154,7 +151,7 @@ describe( 'Popover', () => {
 
 		describe( 'offset', () => {
 			it( 'should displace the popover along its cross axis when passed an offset object', async () => {
-				render(
+				await render(
 					<>
 						<Popover
 							placement="right-start"
@@ -195,7 +192,7 @@ describe( 'Popover', () => {
 
 		describe( 'style', () => {
 			it( 'outputs inline styles added through the style prop in addition to built-in popover positioning styles', async () => {
-				render(
+				await render(
 					<Popover
 						style={ { zIndex: 0 } }
 						data-testid="popover-element"
@@ -214,7 +211,7 @@ describe( 'Popover', () => {
 			} );
 
 			it( 'is not possible to override built-in popover positioning styles via the style prop', async () => {
-				render(
+				await render(
 					<Popover
 						style={ { position: 'static' } }
 						data-testid="popover-element"
@@ -233,7 +230,7 @@ describe( 'Popover', () => {
 
 		describe( 'focus behavior', () => {
 			it( 'should focus the popover container when opened', async () => {
-				render(
+				await render(
 					<Popover focusOnMount data-testid="popover-element">
 						Popover content
 					</Popover>
@@ -247,7 +244,7 @@ describe( 'Popover', () => {
 			} );
 
 			it( 'should allow focus-on-open behavior to be disabled', async () => {
-				render(
+				await render(
 					<Popover focusOnMount={ false }>Popover content</Popover>
 				);
 
@@ -270,7 +267,7 @@ describe( 'Popover', () => {
 				props?: Partial< React.ComponentProps< typeof Popover > >
 			) => {
 				const user = await userEvent.setup();
-				const view = render(
+				const view = await render(
 					<Popover data-testid="popover-element" { ...props }>
 						<button>Button 1</button>
 						<button>Button 2</button>
@@ -486,7 +483,7 @@ describe( 'Popover', () => {
 
 	describe( 'Slot outside iframe', () => {
 		it( 'should support cross-document rendering', async () => {
-			render(
+			await render(
 				<PopoverInsideIframeRenderedInExternalSlot>
 					<span>content</span>
 				</PopoverInsideIframeRenderedInExternalSlot>
@@ -642,7 +639,7 @@ describe( 'Popover', () => {
 			const onParentFocusOutside = vi.fn();
 			const onNestedFocusOutside = vi.fn();
 
-			render(
+			await render(
 				<NestedPopoverTestComponent
 					onParentFocusOutside={ onParentFocusOutside }
 					onNestedFocusOutside={ onNestedFocusOutside }
@@ -693,7 +690,7 @@ describe( 'Popover', () => {
 			const onFocusOutside = vi.fn();
 			const { slot, slotButton } = createOverlaySlot();
 
-			render(
+			await render(
 				<Popover onFocusOutside={ onFocusOutside }>
 					<button>Inside popover</button>
 				</Popover>
@@ -713,7 +710,7 @@ describe( 'Popover', () => {
 			const onFocusOutside = vi.fn();
 			const { slot, slotButton } = createOverlaySlot();
 
-			render(
+			await render(
 				<Popover onFocusOutside={ onFocusOutside }>
 					<button>Inside popover</button>
 				</Popover>
@@ -738,7 +735,7 @@ describe( 'Popover', () => {
 			const onFocusOutside = vi.fn();
 			const { slot, slotButton } = createOverlaySlot();
 
-			render(
+			await render(
 				<Popover
 					data-testid="popover"
 					onFocusOutside={ onFocusOutside }
@@ -771,7 +768,7 @@ describe( 'Popover', () => {
 			const user = userEvent.setup();
 			const onFocusOutside = vi.fn();
 
-			render(
+			await render(
 				<>
 					<Popover onFocusOutside={ onFocusOutside }>
 						<button>Inside popover</button>
@@ -794,7 +791,7 @@ describe( 'Popover', () => {
 		const onClose = vi.fn();
 		const onKeyDown = vi.fn();
 
-		render(
+		await render(
 			<Popover onClose={ onClose } onKeyDown={ onKeyDown }>
 				<button>Inside popover</button>
 			</Popover>

@@ -1,6 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import {
 	getInheritanceProps,
@@ -9,8 +10,10 @@ import {
 } from '../';
 
 describe( 'InheritanceResetButton', () => {
-	test( 'renders an always-visible reset button labelled for the inherited value', () => {
-		render( <InheritanceResetButton onResetToInherited={ () => {} } /> );
+	test( 'renders an always-visible reset button labelled for the inherited value', async () => {
+		await render(
+			<InheritanceResetButton onResetToInherited={ () => {} } />
+		);
 		expect(
 			screen.getByRole( 'button', {
 				name: 'Reset to inherited value',
@@ -20,7 +23,7 @@ describe( 'InheritanceResetButton', () => {
 
 	test( 'invokes the reset handler when activated', async () => {
 		const onResetToInherited = vi.fn();
-		render(
+		await render(
 			<InheritanceResetButton onResetToInherited={ onResetToInherited } />
 		);
 		await userEvent.click(
@@ -29,8 +32,10 @@ describe( 'InheritanceResetButton', () => {
 		expect( onResetToInherited ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	test( 'does not expose a menu or a push-to-Global-Styles action', () => {
-		render( <InheritanceResetButton onResetToInherited={ () => {} } /> );
+	test( 'does not expose a menu or a push-to-Global-Styles action', async () => {
+		await render(
+			<InheritanceResetButton onResetToInherited={ () => {} } />
+		);
 		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 		expect(
 			screen.queryByRole( 'menuitem', { name: /Make default/ } )
@@ -133,8 +138,8 @@ describe( 'getInheritanceProps', () => {
 } );
 
 describe( 'InheritanceToolsPanelItem inherited state', () => {
-	function renderInheritedItem( label, labelClassName ) {
-		return render(
+	async function renderInheritedItem( label, labelClassName ) {
+		return await render(
 			<ToolsPanel label="Panel" panelId="panel">
 				<InheritanceToolsPanelItem
 					{ ...getInheritanceProps( true, false ) }
@@ -157,8 +162,8 @@ describe( 'InheritanceToolsPanelItem inherited state', () => {
 		[ 'input-control', 'components-input-control__label' ],
 	] )(
 		'nests the %s label inside the inherited-from-global-styles item',
-		( _name, labelClassName ) => {
-			renderInheritedItem( 'Line height', labelClassName );
+		async ( _name, labelClassName ) => {
+			await renderInheritedItem( 'Line height', labelClassName );
 			const label = screen.getByText( 'Line height' );
 			expect( label ).toHaveClass( labelClassName );
 			expect(
@@ -168,8 +173,11 @@ describe( 'InheritanceToolsPanelItem inherited state', () => {
 		}
 	);
 
-	test( 'does not render a reset dot in the inherited state', () => {
-		renderInheritedItem( 'Line height', 'components-base-control__label' );
+	test( 'does not render a reset dot in the inherited state', async () => {
+		await renderInheritedItem(
+			'Line height',
+			'components-base-control__label'
+		);
 		expect(
 			screen.queryByRole( 'button', {
 				name: 'Reset to inherited value',
@@ -179,8 +187,8 @@ describe( 'InheritanceToolsPanelItem inherited state', () => {
 } );
 
 describe( 'InheritanceToolsPanelItem local-override reset dot', () => {
-	function renderItem( props ) {
-		return render(
+	async function renderItem( props ) {
+		return await render(
 			<ToolsPanel label="Panel" panelId="panel">
 				<InheritanceToolsPanelItem
 					label="Line height"
@@ -197,8 +205,8 @@ describe( 'InheritanceToolsPanelItem local-override reset dot', () => {
 		);
 	}
 
-	test( 'renders the reset dot as a sibling of the control, not inside the label', () => {
-		renderItem( {
+	test( 'renders the reset dot as a sibling of the control, not inside the label', async () => {
+		await renderItem( {
 			hasLocalOverride: true,
 			onDeselect: () => {},
 		} );
@@ -215,10 +223,10 @@ describe( 'InheritanceToolsPanelItem local-override reset dot', () => {
 		).toBeNull();
 	} );
 
-	test( 'does not render the item reset dot when showLocalOverrideActionsInLabel is false', () => {
+	test( 'does not render the item reset dot when showLocalOverrideActionsInLabel is false', async () => {
 		// Color/background render their own reset control next to a custom
 		// toggle, so the item must not render a second one.
-		renderItem( {
+		await renderItem( {
 			hasLocalOverride: true,
 			showLocalOverrideActionsInLabel: false,
 			onDeselect: () => {},
@@ -232,15 +240,15 @@ describe( 'InheritanceToolsPanelItem local-override reset dot', () => {
 
 	test( 'the reset dot invokes the deselect handler', async () => {
 		const onDeselect = vi.fn();
-		renderItem( { hasLocalOverride: true, onDeselect } );
+		await renderItem( { hasLocalOverride: true, onDeselect } );
 		await userEvent.click(
 			screen.getByRole( 'button', { name: 'Reset to inherited value' } )
 		);
 		expect( onDeselect ).toHaveBeenCalled();
 	} );
 
-	test( 'does not offset the reset dot by default', () => {
-		renderItem( { hasLocalOverride: true, onDeselect: () => {} } );
+	test( 'does not offset the reset dot by default', async () => {
+		await renderItem( { hasLocalOverride: true, onDeselect: () => {} } );
 		const resetButton = screen.getByRole( 'button', {
 			name: 'Reset to inherited value',
 		} );
@@ -252,8 +260,8 @@ describe( 'InheritanceToolsPanelItem local-override reset dot', () => {
 		);
 	} );
 
-	test( 'offsets the reset dot when the control has an inline-end toggle', () => {
-		renderItem( {
+	test( 'offsets the reset dot when the control has an inline-end toggle', async () => {
+		await renderItem( {
 			hasLocalOverride: true,
 			hasInlineEndToggle: true,
 			onDeselect: () => {},

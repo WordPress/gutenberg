@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
-import { render, waitFor } from '@testing-library/react';
+import { waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import useMediaQuery from '../';
 
 const TestComponent = ( { query } ) => {
@@ -14,7 +15,7 @@ describe( 'useMediaQuery', () => {
 	} );
 
 	it( 'should return true when the query matches', async () => {
-		const { container } = render(
+		const { container } = await render(
 			<TestComponent query="(min-width: 782px)" />
 		);
 
@@ -22,7 +23,7 @@ describe( 'useMediaQuery', () => {
 	} );
 
 	it( 'should correctly update the value when the query evaluation matches', async () => {
-		const { container } = render(
+		const { container } = await render(
 			<TestComponent query="(min-width: 782px)" />
 		);
 
@@ -36,7 +37,7 @@ describe( 'useMediaQuery', () => {
 	} );
 
 	it( 'should return false when the query does not match', async () => {
-		const { container } = render(
+		const { container } = await render(
 			<TestComponent query="(max-width: 782px)" />
 		);
 
@@ -44,12 +45,12 @@ describe( 'useMediaQuery', () => {
 	} );
 
 	it( 'should return false when a query is not passed', async () => {
-		const { container, rerender } = render( <TestComponent /> );
+		const { container, rerender } = await render( <TestComponent /> );
 
 		// Query will be case to a boolean to simplify the return type.
 		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
 
-		rerender( <TestComponent query={ false } /> );
+		await rerender( <TestComponent query={ false } /> );
 
 		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
 	} );

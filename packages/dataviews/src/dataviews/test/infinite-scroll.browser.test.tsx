@@ -1,4 +1,5 @@
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { fireEvent, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { describe, expect, it, vi } from 'vitest';
 import DataViews from '../index';
 import { LAYOUT_GRID } from '../../constants';
@@ -24,7 +25,7 @@ const view: View = {
 describe( 'DataViews browser scrolling', () => {
 	it( 'loads the next page when the layout scrolls near the bottom', async () => {
 		const onChangeView = vi.fn();
-		const { container } = render(
+		const { container } = await render(
 			<DataViews< Data >
 				view={ view }
 				onChangeView={ onChangeView }
@@ -47,7 +48,7 @@ describe( 'DataViews browser scrolling', () => {
 
 		// Direct DOM access is intentional: the production scroll listener is
 		// attached to this internal layout container.
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+		// eslint-disable-next-line testing-library/no-node-access
 		const layoutContainer = container.querySelector< HTMLDivElement >(
 			'.dataviews-layout__container'
 		);

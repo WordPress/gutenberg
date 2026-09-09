@@ -1,11 +1,12 @@
 import { expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { LinkButton } from '../index';
 
 it( 'shows the Link focus ring when focused', async () => {
 	/* eslint-disable @wordpress/no-setting-ds-tokens -- This fixture supplies the focus tokens consumed by Link. */
-	render(
+	await render(
 		<LinkButton
 			href="/example"
 			style={

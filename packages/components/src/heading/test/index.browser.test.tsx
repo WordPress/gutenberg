@@ -1,19 +1,20 @@
 import { describe, expect, test } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { Heading } from '../';
 
 describe( 'props', () => {
-	test( 'should render correctly', () => {
-		render( <Heading>Code is Poetry</Heading> );
+	test( 'should render correctly', async () => {
+		await render( <Heading>Code is Poetry</Heading> );
 		const heading = screen.getByRole( 'heading' );
 		expect( heading.tagName ).toBe( 'H2' );
 		expect( heading ).toHaveTextContent( 'Code is Poetry' );
 		expect( getComputedStyle( heading ).fontWeight ).not.toBe( '400' );
 	} );
 
-	test( 'should render level as a number', () => {
-		render( <Heading>Code is Poetry</Heading> );
-		render( <Heading level={ 4 }>Code is Poetry</Heading> );
+	test( 'should render level as a number', async () => {
+		await render( <Heading>Code is Poetry</Heading> );
+		await render( <Heading level={ 4 }>Code is Poetry</Heading> );
 		expect(
 			getComputedStyle( screen.getByRole( 'heading', { level: 4 } ) )
 				.fontSize
@@ -23,9 +24,9 @@ describe( 'props', () => {
 		);
 	} );
 
-	test( 'should render level as a string', () => {
-		render( <Heading>Code is Poetry</Heading> );
-		render( <Heading level="4">Code is Poetry</Heading> );
+	test( 'should render level as a string', async () => {
+		await render( <Heading>Code is Poetry</Heading> );
+		await render( <Heading level="4">Code is Poetry</Heading> );
 		expect(
 			getComputedStyle( screen.getByRole( 'heading', { level: 4 } ) )
 				.fontSize
@@ -35,8 +36,8 @@ describe( 'props', () => {
 		);
 	} );
 
-	test( 'should allow as prop', () => {
-		render(
+	test( 'should allow as prop', async () => {
+		await render(
 			<Heading level="1" as="span">
 				Code is Poetry
 			</Heading>
@@ -44,8 +45,8 @@ describe( 'props', () => {
 		expect( screen.getByRole( 'heading' ).tagName ).toBe( 'SPAN' );
 	} );
 
-	test( 'should render a11y props when not using a semantic element', () => {
-		render(
+	test( 'should render a11y props when not using a semantic element', async () => {
+		await render(
 			<Heading level="3" as="div">
 				Code is Poetry
 			</Heading>
@@ -55,8 +56,8 @@ describe( 'props', () => {
 		).toBeInTheDocument();
 	} );
 
-	test( 'should not render a11y props when using a semantic element', () => {
-		render(
+	test( 'should not render a11y props when using a semantic element', async () => {
+		await render(
 			<Heading level="1" as="h4">
 				Code is Poetry
 			</Heading>

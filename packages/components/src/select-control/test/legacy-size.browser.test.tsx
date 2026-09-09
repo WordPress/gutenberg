@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import SelectControl from '..';
 import { InputControlPrefixWrapper } from '../../input-control/input-prefix-wrapper';
 
@@ -26,14 +27,14 @@ function getComparedStyles( element: Element ) {
 }
 
 describe( 'SelectControl legacy size support', () => {
-	it( 'treats __unstable-large the same as default', () => {
+	it( 'treats __unstable-large the same as default', async () => {
 		const prefix = <InputControlPrefixWrapper>$</InputControlPrefixWrapper>;
 		const options = [ { value: 'one', label: 'One' } ];
 
-		render(
+		await render(
 			<SelectControl label="Test" options={ options } prefix={ prefix } />
 		);
-		render(
+		await render(
 			<SelectControl
 				label="Test"
 				options={ options }

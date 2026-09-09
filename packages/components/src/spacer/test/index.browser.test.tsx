@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { Spacer } from '../index';
 import styles from '../style.module.scss';
 
@@ -14,16 +15,16 @@ function expectCustomProperties(
 }
 
 describe( 'props', () => {
-	test( 'should render correctly', () => {
-		render( <Spacer data-testid="spacer" /> );
+	test( 'should render correctly', async () => {
+		await render( <Spacer data-testid="spacer" /> );
 
 		const spacer = screen.getByTestId( 'spacer' );
 		expect( spacer ).toHaveClass( styles.spacer );
 		expect( getComputedStyle( spacer ).marginBottom ).toBe( '8px' );
 	} );
 
-	test( 'should render margin', () => {
-		render( <Spacer margin={ 5 } data-testid="spacer" /> );
+	test( 'should render margin', async () => {
+		await render( <Spacer margin={ 5 } data-testid="spacer" /> );
 
 		expectCustomProperties( 'spacer', {
 			'--wp-components-spacer-margin': 'calc(4px * 5)',
@@ -31,8 +32,8 @@ describe( 'props', () => {
 		} );
 	} );
 
-	test( 'should render marginX', () => {
-		render( <Spacer marginX={ 5 } data-testid="spacer" /> );
+	test( 'should render marginX', async () => {
+		await render( <Spacer marginX={ 5 } data-testid="spacer" /> );
 
 		expectCustomProperties( 'spacer', {
 			'--wp-components-spacer-margin-inline-start': 'calc(4px * 5)',
@@ -41,8 +42,8 @@ describe( 'props', () => {
 		} );
 	} );
 
-	test( 'should render marginY', () => {
-		render( <Spacer marginY={ 5 } data-testid="spacer" /> );
+	test( 'should render marginY', async () => {
+		await render( <Spacer marginY={ 5 } data-testid="spacer" /> );
 
 		expectCustomProperties( 'spacer', {
 			'--wp-components-spacer-margin-block-start': 'calc(4px * 5)',
@@ -50,8 +51,8 @@ describe( 'props', () => {
 		} );
 	} );
 
-	test( 'should render marginTop', () => {
-		render( <Spacer marginTop={ 5 } data-testid="spacer" /> );
+	test( 'should render marginTop', async () => {
+		await render( <Spacer marginTop={ 5 } data-testid="spacer" /> );
 
 		expectCustomProperties( 'spacer', {
 			'--wp-components-spacer-margin-block-start': 'calc(4px * 5)',
@@ -59,16 +60,16 @@ describe( 'props', () => {
 		} );
 	} );
 
-	test( 'should render marginBottom', () => {
-		render( <Spacer marginBottom={ 5 } data-testid="spacer" /> );
+	test( 'should render marginBottom', async () => {
+		await render( <Spacer marginBottom={ 5 } data-testid="spacer" /> );
 
 		expectCustomProperties( 'spacer', {
 			'--wp-components-spacer-margin-block-end': 'calc(4px * 5)',
 		} );
 	} );
 
-	test( 'should render marginLeft', () => {
-		render( <Spacer marginLeft={ 5 } data-testid="spacer" /> );
+	test( 'should render marginLeft', async () => {
+		await render( <Spacer marginLeft={ 5 } data-testid="spacer" /> );
 
 		expectCustomProperties( 'spacer', {
 			'--wp-components-spacer-margin-inline-start': 'calc(4px * 5)',
@@ -76,8 +77,8 @@ describe( 'props', () => {
 		} );
 	} );
 
-	test( 'should render marginRight', () => {
-		render( <Spacer marginRight={ 5 } data-testid="spacer" /> );
+	test( 'should render marginRight', async () => {
+		await render( <Spacer marginRight={ 5 } data-testid="spacer" /> );
 
 		expectCustomProperties( 'spacer', {
 			'--wp-components-spacer-margin-inline-end': 'calc(4px * 5)',
@@ -85,8 +86,8 @@ describe( 'props', () => {
 		} );
 	} );
 
-	test( 'should override margin props from less to more specific', () => {
-		render(
+	test( 'should override margin props from less to more specific', async () => {
+		await render(
 			<Spacer
 				margin={ 10 }
 				marginX={ 3 }
@@ -104,8 +105,8 @@ describe( 'props', () => {
 		} );
 	} );
 
-	test( 'should render padding', () => {
-		render( <Spacer padding={ 5 } data-testid="spacer" /> );
+	test( 'should render padding', async () => {
+		await render( <Spacer padding={ 5 } data-testid="spacer" /> );
 
 		expectCustomProperties( 'spacer', {
 			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
@@ -113,8 +114,8 @@ describe( 'props', () => {
 		} );
 	} );
 
-	test( 'should render paddingX', () => {
-		render( <Spacer paddingX={ 5 } data-testid="spacer" /> );
+	test( 'should render paddingX', async () => {
+		await render( <Spacer paddingX={ 5 } data-testid="spacer" /> );
 
 		expectCustomProperties( 'spacer', {
 			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
@@ -123,8 +124,8 @@ describe( 'props', () => {
 		} );
 	} );
 
-	test( 'should render paddingY', () => {
-		render( <Spacer paddingY={ 5 } data-testid="spacer" /> );
+	test( 'should render paddingY', async () => {
+		await render( <Spacer paddingY={ 5 } data-testid="spacer" /> );
 
 		expectCustomProperties( 'spacer', {
 			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
@@ -133,8 +134,8 @@ describe( 'props', () => {
 		} );
 	} );
 
-	test( 'should render paddingTop', () => {
-		render( <Spacer paddingTop={ 5 } data-testid="spacer" /> );
+	test( 'should render paddingTop', async () => {
+		await render( <Spacer paddingTop={ 5 } data-testid="spacer" /> );
 
 		expectCustomProperties( 'spacer', {
 			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
@@ -142,8 +143,8 @@ describe( 'props', () => {
 		} );
 	} );
 
-	test( 'should render paddingBottom', () => {
-		render( <Spacer paddingBottom={ 5 } data-testid="spacer" /> );
+	test( 'should render paddingBottom', async () => {
+		await render( <Spacer paddingBottom={ 5 } data-testid="spacer" /> );
 
 		expectCustomProperties( 'spacer', {
 			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
@@ -151,8 +152,8 @@ describe( 'props', () => {
 		} );
 	} );
 
-	test( 'should render paddingLeft', () => {
-		render( <Spacer paddingLeft={ 5 } data-testid="spacer" /> );
+	test( 'should render paddingLeft', async () => {
+		await render( <Spacer paddingLeft={ 5 } data-testid="spacer" /> );
 
 		expectCustomProperties( 'spacer', {
 			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
@@ -160,8 +161,8 @@ describe( 'props', () => {
 		} );
 	} );
 
-	test( 'should render paddingRight', () => {
-		render( <Spacer paddingRight={ 5 } data-testid="spacer" /> );
+	test( 'should render paddingRight', async () => {
+		await render( <Spacer paddingRight={ 5 } data-testid="spacer" /> );
 
 		expectCustomProperties( 'spacer', {
 			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
@@ -169,8 +170,8 @@ describe( 'props', () => {
 		} );
 	} );
 
-	test( 'should override padding props from less to more specific', () => {
-		render(
+	test( 'should override padding props from less to more specific', async () => {
+		await render(
 			<Spacer
 				padding={ 10 }
 				paddingY={ 2 }
@@ -189,8 +190,8 @@ describe( 'props', () => {
 		} );
 	} );
 
-	test( 'should render nested instances without passing spacing variables to children', () => {
-		render(
+	test( 'should render nested instances without passing spacing variables to children', async () => {
+		await render(
 			<Spacer padding={ 4 } data-testid="outer-spacer">
 				<Spacer data-testid="inner-spacer" />
 			</Spacer>

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 
 const paddingProperties = [
@@ -14,8 +15,8 @@ function getPadding( element: Element ) {
 	return paddingProperties.map( ( property ) => styles[ property ] );
 }
 
-function renderWrapper( paddingSize?: 'small' | 'medium' | 'none' ) {
-	render(
+async function renderWrapper( paddingSize?: 'small' | 'medium' | 'none' ) {
+	await render(
 		<DropdownContentWrapper paddingSize={ paddingSize }>
 			<span>content</span>
 		</DropdownContentWrapper>
@@ -25,8 +26,8 @@ function renderWrapper( paddingSize?: 'small' | 'medium' | 'none' ) {
 }
 
 describe( 'DropdownContentWrapper', () => {
-	it( 'applies the default small padding', () => {
-		expect( getPadding( renderWrapper() ) ).toEqual( [
+	it( 'applies the default small padding', async () => {
+		expect( getPadding( await renderWrapper() ) ).toEqual( [
 			'8px',
 			'8px',
 			'8px',
@@ -34,8 +35,8 @@ describe( 'DropdownContentWrapper', () => {
 		] );
 	} );
 
-	it( 'applies medium padding when paddingSize is "medium"', () => {
-		expect( getPadding( renderWrapper( 'medium' ) ) ).toEqual( [
+	it( 'applies medium padding when paddingSize is "medium"', async () => {
+		expect( getPadding( await renderWrapper( 'medium' ) ) ).toEqual( [
 			'16px',
 			'16px',
 			'16px',
@@ -43,8 +44,8 @@ describe( 'DropdownContentWrapper', () => {
 		] );
 	} );
 
-	it( 'removes padding when paddingSize is "none"', () => {
-		expect( getPadding( renderWrapper( 'none' ) ) ).toEqual( [
+	it( 'removes padding when paddingSize is "none"', async () => {
+		expect( getPadding( await renderWrapper( 'none' ) ) ).toEqual( [
 			'0px',
 			'0px',
 			'0px',

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, test } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { createPortal, useState } from '@wordpress/element';
 import { registerStyle } from '@wordpress/style-runtime';
 import { CardBody } from '../../card';
@@ -33,8 +34,8 @@ function IframeWithStyleProvider( {
 }
 
 describe( 'props', () => {
-	test( 'should render correctly', () => {
-		render(
+	test( 'should render correctly', async () => {
+		await render(
 			<div data-testid="scrollable-parent" style={ { height: 120 } }>
 				<Scrollable data-testid="scrollable">
 					WordPress.org - Code is Poetry
@@ -55,13 +56,13 @@ describe( 'props', () => {
 		expect( computedStyles.overflowY ).toBe( 'auto' );
 	} );
 
-	test( 'should render smoothScroll', () => {
-		render(
+	test( 'should render smoothScroll', async () => {
+		await render(
 			<Scrollable data-testid="scrollable">
 				WordPress.org - Code is Poetry
 			</Scrollable>
 		);
-		render(
+		await render(
 			<Scrollable smoothScroll data-testid="smooth-scrollable">
 				WordPress.org - Code is Poetry
 			</Scrollable>
@@ -80,8 +81,8 @@ describe( 'props', () => {
 		).toBe( 'auto' );
 	} );
 
-	test( 'supports native scrolling', () => {
-		render(
+	test( 'supports native scrolling', async () => {
+		await render(
 			<div style={ { height: 100, width: 100 } }>
 				<Scrollable data-testid="scrollable">
 					<div style={ { height: 300 } }>Content</div>
@@ -95,8 +96,8 @@ describe( 'props', () => {
 		expect( scrollable.scrollTop ).toBe( 100 );
 	} );
 
-	test( 'should render scrollDirection x', () => {
-		render(
+	test( 'should render scrollDirection x', async () => {
+		await render(
 			<Scrollable scrollDirection="x" data-testid="scrollable-x">
 				WordPress.org - Code is Poetry
 			</Scrollable>
@@ -108,8 +109,8 @@ describe( 'props', () => {
 		expect( scrollable ).not.toHaveClass( styles[ 'scroll-y' ] );
 	} );
 
-	test( 'should render scrollDirection auto', () => {
-		render(
+	test( 'should render scrollDirection auto', async () => {
+		await render(
 			<Scrollable scrollDirection="auto" data-testid="scrollable-auto">
 				WordPress.org - Code is Poetry
 			</Scrollable>
@@ -136,7 +137,7 @@ describe( 'CardBody isScrollable height', () => {
 		delete globalScope.__wpStyleRuntime;
 	} );
 
-	test( 'should keep height 100% in the main document and in an iframe', () => {
+	test( 'should keep height 100% in the main document and in an iframe', async () => {
 		// Register explicitly so this test isolates StyleProvider's
 		// cross-document injection from the package build transform.
 		registerStyle(
@@ -144,7 +145,7 @@ describe( 'CardBody isScrollable height', () => {
 			`.${ styles.scrollable }{height:100%;}`
 		);
 
-		render(
+		await render(
 			<div style={ { height: 200 } }>
 				<CardBody data-testid="card-body">Body</CardBody>
 				<CardBody isScrollable data-testid="scrollable-body">
@@ -160,7 +161,7 @@ describe( 'CardBody isScrollable height', () => {
 			getComputedStyle( screen.getByTestId( 'scrollable-body' ) ).height
 		).toBe( '200px' );
 
-		render(
+		await render(
 			<IframeWithStyleProvider>
 				<div style={ { height: 200 } }>
 					<CardBody isScrollable data-testid="scrollable-body-iframe">

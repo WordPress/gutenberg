@@ -1,4 +1,5 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
 import { describe, expect, it } from 'vitest';
 import { createRef } from '@wordpress/element';
@@ -8,7 +9,7 @@ describe( 'Drawer.Content browser rendering', () => {
 	it( 'renders the swipe marker as a layout box inside the scroll container', async () => {
 		const contentRef = createRef< HTMLDivElement >();
 
-		render(
+		await render(
 			<Drawer.Root>
 				<Drawer.Trigger>Open</Drawer.Trigger>
 				<Drawer.Popup>
