@@ -693,6 +693,82 @@ test.describe( 'undo', () => {
 		await pageUtils.pressKeys( 'primaryShift+z', { times: 4 } );
 		await expect( field ).toHaveValue( '<p>markup</p>EDIT' );
 	} );
+
+	// A navigation block syncs its inner blocks back to the menu entity
+	// whenever the block tree is replaced, which every undo does. That
+	// derived edit must not count as new history, or the next undo throws
+	// away every redo step recorded after it.
+	test( 'should redo every step after undoing past a navigation block', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Menu',
+			content:
+				'<!-- wp:navigation-submenu {"label":"Sub","url":"#"} --><!-- wp:navigation-link {"label":"Child","url":"#"} /--><!-- /wp:navigation-submenu -->',
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: { ref: menu.id },
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( '3' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '4' );
+		const blocks = [
+			{ name: 'core/paragraph', attributes: { content: '1' } },
+			{ name: 'core/paragraph', attributes: { content: '2' } },
+			{ name: 'core/navigation', attributes: { ref: menu.id } },
+			{ name: 'core/paragraph', attributes: { content: '3' } },
+			{ name: 'core/paragraph', attributes: { content: '4' } },
+		];
+		await expect.poll( editor.getBlocks ).toMatchObject( blocks );
+
+		// Wait for each click to take effect before the next one: either the
+		// content changes, or the step only moved the history so the buttons
+		// change instead.
+		const undo = page.getByRole( 'button', { name: 'Undo' } );
+		const redo = page.getByRole( 'button', { name: 'Redo' } );
+		const getState = async () => ( {
+			content: await editor.getEditedPostContent(),
+			undo: await undo.isEnabled(),
+			redo: await redo.isEnabled(),
+		} );
+		let state = await getState();
+		const submenu = editor.canvas.locator(
+			'[data-type="core/navigation-submenu"]'
+		);
+		const click = async ( button ) => {
+			const before = state;
+			await button.click();
+			await expect
+				.poll( async () => ( state = await getState() ) )
+				.not.toEqual( before );
+			// The navigation block renders its menu after the step, and
+			// syncs it back to the menu entity at the same time.
+			await expect( submenu ).toBeVisible( {
+				visible: state.content.includes( 'wp:navigation' ),
+			} );
+		};
+		let steps = 0;
+		while ( state.undo ) {
+			await click( undo );
+			steps++;
+		}
+		await expect.poll( editor.getBlocks ).toEqual( [] );
+		for ( let step = 0; step < steps; step++ ) {
+			await expect( redo ).toBeEnabled();
+			await click( redo );
+		}
+		await expect.poll( editor.getBlocks ).toMatchObject( blocks );
+
+		await requestUtils.deleteAllMenus();
+	} );
 } );
 
 class UndoUtils {
