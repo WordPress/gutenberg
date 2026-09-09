@@ -273,7 +273,7 @@ Titles are required for accessibility reasons, see `aria.labelledby` and `conten
 
 #### `__experimentalHideHeader`: `boolean`
 
-When set to `true`, the Modal's header (including the icon, title and close button) will not be rendered.
+When set to `true`, the Modal's header (including the icon, title and close button) will not be rendered. A `title` is then applied to the dialog as its `aria-label`, so the dialog keeps an accessible name.
 
 _Warning_: This property is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 
