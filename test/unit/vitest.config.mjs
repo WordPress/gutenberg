@@ -11,10 +11,8 @@ import {
 	getVitestTestsByProject,
 } from './scripts/discover-test-files.mjs';
 
-const ROOT_DIR = path.resolve(
-	path.dirname( fileURLToPath( import.meta.url ) ),
-	'../..'
-);
+const CONFIG_DIR = path.dirname( fileURLToPath( import.meta.url ) );
+const ROOT_DIR = path.resolve( CONFIG_DIR, '../..' );
 const nodeRequire = createRequire( import.meta.url );
 const emotionPlugin = nodeRequire.resolve( '@swc/plugin-emotion' );
 const gutenbergEnvSetupFile = path.join(
@@ -213,8 +211,15 @@ export default defineConfig( {
 			},
 			{
 				extends: true,
+				/*
+				 * Browser mode pre-bundles the Vitest runtime, which Vite resolves
+				 * from the project root. Root the project where the test
+				 * dependencies are declared so resolution stays layout agnostic.
+				 */
+				root: CONFIG_DIR,
 				test: {
 					name: 'browser',
+					dir: ROOT_DIR,
 					include: vitestTests.browser,
 					setupFiles: [
 						path.join(
