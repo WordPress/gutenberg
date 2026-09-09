@@ -2,8 +2,9 @@
 
 ## Unreleased
 
-### New Features
+### Enhancements
 
+-   Revisions: migrate the Active badge from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge`. ([#82560](https://github.com/WordPress/gutenberg/pull/82560))
 -   Add a text shadow presets screen under Typography ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
 
 ### Bug Fixes
