@@ -12,6 +12,24 @@ import { useBoundaryStyle } from './use-boundary-style';
 import { useEventListeners } from './event-listeners';
 import { useFormatTypes } from './use-format-types';
 
+/**
+ * Whether a selection may be set into the element: it (or an editing host
+ * around it) has focus. Otherwise the focus handler sets the selection once
+ * focus arrives.
+ *
+ * @param {HTMLElement} element The editable element.
+ *
+ * @return {boolean} Whether the element has focus.
+ */
+function hasFocus( element ) {
+	const { activeElement } = element.ownerDocument;
+	return (
+		activeElement === element ||
+		( activeElement?.contentEditable === 'true' &&
+			activeElement.contains( element ) )
+	);
+}
+
 function useRichTextBase( {
 	value = '',
 	selectionStart,
@@ -155,19 +173,6 @@ function useRichTextBase( {
 		forceRender();
 	}
 
-	// A selection may only be set into the element while it (or an editing
-	// host around it) has focus; the focus handler sets it once focus
-	// arrives.
-	function hasFocus() {
-		const element = ref.current;
-		const { activeElement } = element.ownerDocument;
-		return (
-			activeElement === element ||
-			( activeElement?.contentEditable === 'true' &&
-				activeElement.contains( element ) )
-		);
-	}
-
 	// Apply a value set from outside.
 	useLayoutEffect( () => {
 		if ( value === _valueRef.current ) {
@@ -175,7 +180,9 @@ function useRichTextBase( {
 		}
 
 		setRecordFromProps();
-		applyRecord( recordRef.current, { domOnly: ! hasFocus() } );
+		applyRecord( recordRef.current, {
+			domOnly: ! hasFocus( ref.current ),
+		} );
 		forceRender();
 	}, [ value ] );
 
@@ -187,7 +194,7 @@ function useRichTextBase( {
 		if (
 			isSelected &&
 			( selectionStart !== sentStart || selectionEnd !== sentEnd ) &&
-			hasFocus()
+			hasFocus( ref.current )
 		) {
 			applyRecord( recordRef.current );
 		}
