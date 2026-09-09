@@ -65,12 +65,8 @@ export function taperChroma(
 
 	// Capacity at seed and target
 	const lSeed = clamp01( get( seed, [ OKLCH, 'l' ] ) );
-	const cmaxSeed = getCachedMaxChromaAtLH( lSeed, hSeed, gamut );
-	const cmaxTarget = getCachedMaxChromaAtLH(
-		clamp01( lTarget ),
-		hSeed,
-		gamut
-	);
+	const cmaxSeed = getMaxChromaAtLH( lSeed, hSeed, gamut );
+	const cmaxTarget = getMaxChromaAtLH( clamp01( lTarget ), hSeed, gamut );
 
 	// Seed vividness ratio (hue-fair normalization)
 	let seedRelative = 0;
@@ -151,57 +147,19 @@ function continuousTaper(
 	return 1 - ( 1 - opts.kDark ) * w;
 }
 
-/* ---- chroma-capacity queries with small caches ---- */
+/* ---- chroma-capacity queries ---- */
 
 // Leave headroom above sRGB's maximum chroma of about 0.32.
 const MAX_CHROMA = 0.45;
-const maxChromaCache = new Map< string, number >();
-
-function quantize( x: number, step: number ): number {
-	const k = Math.round( x / step );
-	return k * step;
-}
-
-function getCachedMaxChromaAtLH(
+function getMaxChromaAtLH(
 	l: number,
 	h: number,
 	gamutSpace: ColorSpace
 ): number {
-	const lQuantized = quantize( l, 0.05 );
-	const hQuantized = quantize( normalizeHue( h ), 10 );
-	const key = `${ gamutSpace.id }|L:${ lQuantized }|H:${ hQuantized }`;
-	const hit = maxChromaCache.get( key );
-	if ( typeof hit === 'number' ) {
-		return hit;
-	}
-
-	const computed = maxInGamutChromaAtLH(
-		lQuantized,
-		hQuantized,
-		gamutSpace,
-		MAX_CHROMA
-	);
-	maxChromaCache.set( key, computed );
-	return computed;
-}
-
-/**
- * Find the max in-gamut chroma at fixed (L,H) in the target gamut
- * @param l
- * @param h
- * @param gamutSpace
- * @param cap
- */
-function maxInGamutChromaAtLH(
-	l: number,
-	h: number,
-	gamutSpace: ColorSpace,
-	cap: number
-): number {
 	// Construct a color with maximum chroma.
 	const probe: PlainColorObject = {
 		space: OKLCH,
-		coords: [ l, cap, h ],
+		coords: [ clamp01( l ), MAX_CHROMA, normalizeHue( h ) ],
 		alpha: 1,
 	};
 

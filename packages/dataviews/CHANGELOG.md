@@ -65,6 +65,7 @@
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
 -   Note in the `/wp` bundle build script that its singleton externals list must stay in sync with the transitive private API usage check ([#82027](https://github.com/WordPress/gutenberg/pull/82027)).
+-   Update the `@types/node` development dependency to v24, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
 
 ### Bug Fix
 

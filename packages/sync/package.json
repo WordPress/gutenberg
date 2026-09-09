@@ -54,7 +54,7 @@
 		"yjs": "^13.6.29"
 	},
 	"devDependencies": {
-		"@types/node": "^20.19.39",
+		"@types/node": "^24.13.3",
 		"vitest": "^4.1.11"
 	},
 	"publishConfig": {
