@@ -146,10 +146,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		insertingBlocksUtils,
 	}, testInfo ) => {
 		testInfo.skip(
-			testInfo.project.name === 'firefox',
-			'Firefox does not dispatch drag events to the iframe content when dragging from outside the iframe.'
-		);
-		testInfo.skip(
 			testInfo.project.name === 'webkit',
 			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
 		);
@@ -378,10 +374,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		editor,
 		insertingBlocksUtils,
 	}, testInfo ) => {
-		testInfo.skip(
-			testInfo.project.name === 'firefox',
-			'Firefox does not dispatch drag events to the iframe content when dragging from outside the iframe.'
-		);
 		testInfo.skip(
 			testInfo.project.name === 'webkit',
 			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
