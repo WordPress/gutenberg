@@ -9,11 +9,7 @@ import {
 	upload,
 	wordpress,
 } from '@wordpress/icons';
-import {
-	displayShortcut,
-	ariaKeyShortcut,
-	shortcutAriaLabel,
-} from '@wordpress/keycodes';
+import { keyboardShortcut } from '@wordpress/keycodes';
 import { IconButton } from '../index';
 import * as Tooltip from '../../tooltip';
 
@@ -126,16 +122,11 @@ export const Pressed: Story = {
 	},
 };
 
-const EXAMPLE_SHORTCUT_OBJECT = {
-	displayShortcut: displayShortcut.primary( 'c' ),
-	ariaKeyShortcut: ariaKeyShortcut.primary( 'c' ),
-	label: shortcutAriaLabel.primary( 'c' ),
-};
+const EXAMPLE_SHORTCUT_OBJECT = keyboardShortcut.primary( 'c' );
 
 /**
- * Use the `displayShortcut`, `ariaKeyShortcut`, and `shortcutAriaLabel` helpers
- * from `@wordpress/keycodes` to create the visual, ARIA-compatible, and
- * human-readable representations of the shortcut.
+ * Use the `keyboardShortcut` helper from `@wordpress/keycodes` to create the
+ * visual, ARIA-compatible, and human-readable representations of the shortcut.
  */
 export const WithShortcut: Story = {
 	...Default,

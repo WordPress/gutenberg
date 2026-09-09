@@ -1,11 +1,7 @@
 import { Fragment } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { wordpress } from '@wordpress/icons';
-import {
-	displayShortcut,
-	shortcutAriaLabel,
-	ariaKeyShortcut,
-} from '@wordpress/keycodes';
+import { keyboardShortcut } from '@wordpress/keycodes';
 import {
 	KeyboardShortcutDescription,
 	KeyboardShortcutDisplay,
@@ -211,11 +207,7 @@ export const WithKeyboardShortcut: Story = {
 		'aria-keyshortcuts': consumerKeyShortcuts,
 		...args
 	} ) => {
-		const shortcut = {
-			displayShortcut: displayShortcut.primary( 's' ),
-			ariaKeyShortcut: ariaKeyShortcut.primary( 's' ),
-			label: shortcutAriaLabel.primary( 's' ),
-		};
+		const shortcut = keyboardShortcut.primary( 's' );
 		const { descriptionId, targetProps } = useKeyboardShortcutProps( {
 			'aria-describedby': consumerDescribedBy,
 			'aria-keyshortcuts': consumerKeyShortcuts,

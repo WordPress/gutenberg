@@ -2,11 +2,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { _n, __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	ariaKeyShortcut,
-	displayShortcut,
-	shortcutAriaLabel,
-} from '@wordpress/keycodes';
+import { keyboardShortcut } from '@wordpress/keycodes';
 import { check } from '@wordpress/icons';
 import { EntitiesSavedStates } from '@wordpress/editor';
 import { Button, Modal } from '@wordpress/components';
@@ -62,11 +58,7 @@ export default function SaveButton() {
 	const shouldShowButton = hasChanges || showSavedState;
 
 	useSaveShortcut( { openSavePanel: () => setIsSaveViewOpened( true ) } );
-	const shortcut = {
-		displayShortcut: displayShortcut.primary( 's' ),
-		ariaKeyShortcut: ariaKeyShortcut.primary( 's' ),
-		label: shortcutAriaLabel.primary( 's' ),
-	};
+	const shortcut = keyboardShortcut.primary( 's' );
 	const { descriptionId, targetProps } = useKeyboardShortcutProps( {
 		shortcut,
 	} );
