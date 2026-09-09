@@ -78,7 +78,7 @@ This is a [**hybrid block**](https://developer.wordpress.org/block-editor/gettin
 		</h3>
 		<!-- /wp:accordion-heading -->
 		<!-- wp:accordion-panel -->
-		<div role="region" class="wp-block-accordion-panel">
+		<div role="group" class="wp-block-accordion-panel">
 			<!-- wp:paragraph -->
 			<p>Accordion  Panel Content</p>
 			<!-- /wp:paragraph -->
