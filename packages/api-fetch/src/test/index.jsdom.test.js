@@ -219,20 +219,33 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should return null for a 200 response with an empty body', async () => {
-		globalThis.fetch.mockResolvedValue( {
-			ok: true,
-			status: 200,
-			// An empty body is not valid JSON, so `json()` rejects.
-			json: () =>
-				Promise.reject(
-					new SyntaxError( 'Unexpected end of JSON input' )
-				),
-			clone() {
-				return { text: () => Promise.resolve( '' ) };
-			},
-		} );
+		globalThis.fetch.mockResolvedValue(
+			new Response( '', { status: 200 } )
+		);
 
 		await expect( apiFetch( { path: '/random' } ) ).resolves.toBe( null );
+	} );
+
+	it( 'should return invalid JSON error for a 200 response with a non-empty invalid body', async () => {
+		globalThis.fetch.mockResolvedValue(
+			new Response( 'not json', { status: 200 } )
+		);
+
+		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
+			code: 'invalid_json',
+			message: 'The response is not a valid JSON response.',
+		} );
+	} );
+
+	it( 'should return invalid JSON error for an error response with an empty body', async () => {
+		globalThis.fetch.mockResolvedValue(
+			new Response( '', { status: 500 } )
+		);
+
+		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
+			code: 'invalid_json',
+			message: 'The response is not a valid JSON response.',
+		} );
 	} );
 
 	it( 'should not try to parse the response', async () => {

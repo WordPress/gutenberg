@@ -1,25 +1,34 @@
 import { __ } from '@wordpress/i18n';
 
 /**
- * Calls the `json` function on the Response, throwing an error if the response
- * doesn't have a json function or if parsing the json itself fails.
+ * Reads the response body as JSON, normalizing a parse failure into an
+ * `invalid_json` error.
+ *
+ * Only the success path passes `allowEmptyBody`: `parseAndThrowError` throws
+ * whatever this returns, and callers read `code` off it.
  *
  * @param response
+ * @param allowEmptyBody Resolve an empty body to `null` instead of throwing.
  * @return Parsed response.
  */
-async function parseJsonAndNormalizeError( response: Response ) {
-	// Clone the response up front so that, should `json()` fail, the body can
-	// still be read to distinguish an empty body from genuinely invalid JSON.
-	const clone = response.clone?.();
+async function parseJsonAndNormalizeError(
+	response: Response,
+	allowEmptyBody = false
+) {
 	try {
-		return await response.json();
-	} catch {
-		// A successful response can legitimately have an empty body (for
-		// example, a `200` with no content), which is not valid JSON. Treat it
-		// the same as a `204` rather than reporting an error.
-		if ( clone && ( await clone.text() ) === '' ) {
+		// Response-likes without `text()` were always accepted here.
+		if ( typeof response.text !== 'function' ) {
+			return await response.json();
+		}
+
+		// Parsing the text here, rather than calling `json()`, keeps an empty
+		// body distinguishable from invalid JSON without a `clone()`.
+		const text = await response.text();
+		if ( allowEmptyBody && text === '' ) {
 			return null;
 		}
+		return JSON.parse( text );
+	} catch {
 		throw {
 			code: 'invalid_json',
 			message: __( 'The response is not a valid JSON response.' ),
@@ -47,7 +56,7 @@ export async function parseResponseAndNormalizeError(
 		return null;
 	}
 
-	return await parseJsonAndNormalizeError( response );
+	return await parseJsonAndNormalizeError( response, true );
 }
 
 /**
