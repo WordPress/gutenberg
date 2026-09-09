@@ -28,11 +28,6 @@ import {
 } from '@wordpress/patterns';
 import { __ } from '@wordpress/i18n';
 import { unlock } from '@wordpress/routes-lock-unlock';
-import {
-	getActiveViewOverrides,
-	type ViewListEntry,
-	type ViewOverrides,
-} from './view-utils';
 import { previewField } from './fields/preview';
 import { usePatternCategoryField } from './fields/category';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
@@ -49,6 +44,21 @@ import './style.scss';
 
 const PATTERN_POST_TYPE = 'wp_block';
 
+/**
+ * A layer merged on top of a view. Mirrors the `ViewOverrides` type of
+ * `@wordpress/views`, which is not exported.
+ */
+type ViewOverrides = Partial< Omit< View, 'type' | 'layout' > > & {
+	type?: View[ 'type' ];
+	layout?: Record< string, unknown >;
+};
+
+interface ViewListEntry {
+	title: string;
+	slug: string;
+	view?: ViewOverrides;
+}
+
 function PatternList() {
 	// The `type` param is the slug of the active view: the "all" or "my
 	// patterns" entries of the view list, or a pattern category.
@@ -63,8 +73,10 @@ function PatternList() {
 		kind: 'postType',
 		name: PATTERN_POST_TYPE,
 	} );
+	// The overrides of the view list entry matching the active view, if any.
 	const activeViewOverrides = useMemo(
-		() => getActiveViewOverrides( viewList, type ),
+		(): ViewOverrides =>
+			viewList?.find( ( entry ) => entry.slug === type )?.view ?? {},
 		[ viewList, type ]
 	);
 
