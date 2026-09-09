@@ -390,19 +390,20 @@ export default function useBlockSync( {
 			pendingChangesRef.current.outgoing = [];
 			setControlledBlocks();
 
-			// Restore selection from context if it targets our scope.
-			// Only done when blocks were reset from an external source
-			// (undo/redo, entity navigation) — NOT for outgoing changes,
-			// because dispatching resetSelection between keystrokes breaks
-			// the isUpdatingSameBlockAttribute chain and creates per-
-			// character undo levels.
-			//
-			// An edit made in another block rendering this same entity also
-			// arrives here as an external change, and that one must not move
-			// the selection: the caret is in the block being edited, and
-			// restoring would drag it — and the canvas — into this copy.
+			// An edit made in another block rendering this same entity
+			// arrives here as an external change too, but that one must not
+			// move the selection: the caret is in the block being edited,
+			// and restoring would drag it — and the canvas — into this copy.
+			// Checked after the blocks are set, so that a selection this
+			// controller just destroyed by re-cloning still gets repaired.
 			// See https://github.com/WordPress/gutenberg/issues/79096.
 			if ( ! isSelectionHeldByAnotherController() ) {
+				// Restore selection from context if it targets our scope.
+				// Only done when blocks were reset from an external source
+				// (undo/redo, entity navigation) — NOT for outgoing changes,
+				// because dispatching resetSelection between keystrokes
+				// breaks the isUpdatingSameBlockAttribute chain and creates
+				// per-character undo levels.
 				restoreSelection();
 			}
 		}
