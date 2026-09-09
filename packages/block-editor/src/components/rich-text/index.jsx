@@ -329,9 +329,37 @@ function RichTextWrapper(
 		]
 	);
 
+	const {
+		value,
+		getValue,
+		onChange,
+		ref: richTextRef,
+		formatTypes,
+	} = useRichText( {
+		value: adjustedValue,
+		onChange: adjustedOnChange,
+		selectionStart,
+		selectionEnd,
+		onSelectionChange,
+		placeholder: bindingsPlaceholder || placeholder,
+		__unstableIsSelected: isSelected,
+		__unstableDisableFormats: disableFormats,
+		preserveWhiteSpace,
+		__unstableDependencies: [ tagName ],
+		allowedFormats: adjustedAllowedFormats,
+		withoutInteractiveFormatting,
+		__unstableFormatTypeHandlerContext: useMemo(
+			() => ( {
+				richTextIdentifier: identifier,
+				blockClientId: clientId,
+			} ),
+			[ identifier, clientId ]
+		),
+	} );
 	// Focus follows the selection while focus is inside the canvas or was
-	// lost to the body. Focus placed elsewhere stays. Runs before
-	// `useRichText`, which applies the selection only to a focused field.
+	// lost to the body. Focus placed elsewhere stays. Runs after
+	// `useRichText` applied the content, so the field is current when its
+	// focus handler applies the selection.
 	useLayoutEffect( () => {
 		const element = anchorRef.current;
 
@@ -361,33 +389,6 @@ function RichTextWrapper(
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
 
-	const {
-		value,
-		getValue,
-		onChange,
-		ref: richTextRef,
-		formatTypes,
-	} = useRichText( {
-		value: adjustedValue,
-		onChange: adjustedOnChange,
-		selectionStart,
-		selectionEnd,
-		onSelectionChange,
-		placeholder: bindingsPlaceholder || placeholder,
-		__unstableIsSelected: isSelected,
-		__unstableDisableFormats: disableFormats,
-		preserveWhiteSpace,
-		__unstableDependencies: [ tagName ],
-		allowedFormats: adjustedAllowedFormats,
-		withoutInteractiveFormatting,
-		__unstableFormatTypeHandlerContext: useMemo(
-			() => ( {
-				richTextIdentifier: identifier,
-				blockClientId: clientId,
-			} ),
-			[ identifier, clientId ]
-		),
-	} );
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
 		onReplace,
 		completers: autocompleters,
