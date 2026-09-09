@@ -38,12 +38,7 @@
 }
 
 .workflows-workflow-menu__input {
-	border: none;
-	margin: $grid-unit-10 0;
-
-	&:focus-within {
-		outline: none;
-	}
+	margin: $grid-unit-10;
 }
 
 .workflows-workflow-menu__list {
