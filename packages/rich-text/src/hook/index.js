@@ -159,13 +159,10 @@ function useRichTextBase( {
 		setRecordFromProps();
 
 		// Setting a selection into an unfocused editable moves focus in some
-		// browsers. While the document itself has no focus, the selection
-		// stays with the element and only needs to follow the new content.
-		const { ownerDocument } = ref.current;
+		// browsers.
 		const hasFocus =
-			ref.current.contains( ownerDocument.activeElement ) ||
-			ownsSelection( ref.current ) ||
-			! ownerDocument.hasFocus();
+			ref.current?.contains( ref.current.ownerDocument.activeElement ) ||
+			ownsSelection( ref.current );
 
 		applyRecord( recordRef.current, { domOnly: ! hasFocus } );
 	}
