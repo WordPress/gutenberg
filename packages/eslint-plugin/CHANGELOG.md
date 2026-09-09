@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Update `use-recommended-components` rule to mark `Notice` from `@wordpress/ui` as recommended, and to prefer it over legacy `@wordpress/components` `Notice`.
+-   Update `use-recommended-components` rule to mark `Notice` from `@wordpress/ui` as recommended, and to prefer it over `@wordpress/components` `Notice`.
 -   Update `use-recommended-components` rule to prefer `@wordpress/ui` `Field` and `Fieldset` over legacy `@wordpress/components` `BaseControl` ([#82095](https://github.com/WordPress/gutenberg/pull/82095)).
 
 ### Bug Fixes
