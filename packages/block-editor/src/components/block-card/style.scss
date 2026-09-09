@@ -27,7 +27,6 @@
 	align-items: center;
 	flex-wrap: wrap;
 	gap: calc($grid-unit-10 / 2) $grid-unit-10;
-	min-width: 0;
 	overflow-wrap: anywhere;
 
 	&.block-editor-block-card__title {
@@ -39,8 +38,6 @@
 
 .block-editor-block-card__name {
 	padding: 3px 0; // This makes the title as high as the icon.
-	min-width: 0;
-	overflow-wrap: anywhere;
 }
 
 .block-editor-block-card .block-editor-block-icon,
