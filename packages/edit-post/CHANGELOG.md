@@ -9,6 +9,7 @@
 
 ### Internal
 
+-   Stop registering the `editorTool` preference default; the Write/Design tool that read it was removed in [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#{TODO}](https://github.com/WordPress/gutenberg/pull/{TODO})).
 -   Remove the `showListViewByDefault` handling from `initializeEditor`; the `editor` package now applies the preference itself.
 -   Remove unused dependencies `@wordpress/a11y`, `@wordpress/dom`, `@wordpress/viewport`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).

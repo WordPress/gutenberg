@@ -11,6 +11,10 @@
 -   Borders: rename the "Border & Shadow" panel to "Borders", whichever of its controls are available, and always show the Border and Shadow controls' visible labels. A stable panel title is what lets the Border label render unconditionally, so its "Unlink sides" toggle lines up with the border radius one ([#82163](https://github.com/WordPress/gutenberg/pull/82163)).
 -   `ListView`: Updated to use `outset-ring__focus()` mixin for focus outline wherever applicable instead of the previous box-shadow implementation. ([#82129](https://github.com/WordPress/gutenberg/pull/82129))
 
+### Deprecations
+
+-   `__unstableSetEditorMode`: Deprecate the action. It only wrote the `editorTool` preference that backed the removed Write/Design tool, and nothing has read that preference since [#72193](https://github.com/WordPress/gutenberg/pull/72193). It now dispatches nothing and logs a deprecation notice ([#{TODO}](https://github.com/WordPress/gutenberg/pull/{TODO})).
+
 ### Internal
 
 -   `BlockPreview`: Stop applying the private `Disabled` component class name to block previews ([#82651](https://github.com/WordPress/gutenberg/pull/82651)).
