@@ -7,8 +7,8 @@ vi.mock( import( '@wordpress/api-fetch' ), () => ( {
 	default: vi.fn(),
 } ) );
 
-jest.mock( '../../media-upload/finalized-attachments', () => ( {
-	receiveFinalizedAttachment: jest.fn(),
+vi.mock( import( '../../media-upload/finalized-attachments' ), () => ( {
+	receiveFinalizedAttachment: vi.fn(),
 } ) );
 
 const mockRestAttachment = {
