@@ -23,6 +23,10 @@
 	cursor: pointer;
 	text-decoration: none;
 
+	&:hover .wp-block-navigation-overlay-close__text {
+		text-decoration: underline;
+	}
+
 	&:focus {
 		outline-offset: 2px;
 	}
@@ -40,4 +44,3 @@
 		align-items: center;
 	}
 }
-
