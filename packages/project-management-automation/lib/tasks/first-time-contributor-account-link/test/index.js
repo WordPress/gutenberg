@@ -113,6 +113,31 @@ describe( 'firstTimeContributorAccountLink', () => {
 		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
 	} );
 
+	it( 'does nothing if the commit author has no GitHub username', async () => {
+		const payloadWithoutUsername = {
+			...payload,
+			commits: [
+				{
+					...payload.commits[ 0 ],
+					author: {
+						name: 'Ghost',
+						email: 'ghost@example.invalid',
+					},
+				},
+			],
+		};
+		const getByUsername = vi.fn();
+		await firstTimeContributorAccountLink( payloadWithoutUsername, {
+			rest: {
+				users: {
+					getByUsername,
+				},
+			},
+		} );
+
+		expect( getByUsername ).not.toHaveBeenCalled();
+	} );
+
 	it( 'does nothing for commits by bots', async () => {
 		const octokit = {
 			rest: {

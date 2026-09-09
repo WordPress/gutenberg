@@ -56,8 +56,16 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 		return;
 	}
 
+	const author = commit.author.username;
+	if ( ! author ) {
+		debug(
+			'first-time-contributor-account-link: Commit author has no GitHub username. Aborting'
+		);
+		return;
+	}
+
 	const { data: user } = await octokit.rest.users.getByUsername( {
-		username: commit.author.username,
+		username: author,
 	} );
 
 	if ( user.type === 'Bot' ) {
@@ -72,7 +80,6 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 			'first-time-contributor-account-link: Push payload is missing a repository owner.'
 		);
 	}
-	const author = commit.author.username;
 
 	debug(
 		`first-time-contributor-account-link: Searching for commits in ${ owner }/${ repo } by @${ author }`
