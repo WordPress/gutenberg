@@ -1,5 +1,5 @@
 const { join } = require( 'path' );
-const { pascalCase, snakeCase } = require( 'change-case' );
+const { pascalCase, snakeCase } = require( 'scule' );
 const initBlock = require( './init-block' );
 const initPackageJSON = require( './init-package-json' );
 const initWPScripts = require( './init-wp-scripts' );
