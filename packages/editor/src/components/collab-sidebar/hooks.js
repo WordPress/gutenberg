@@ -536,6 +536,47 @@ export function useEnableFloatingSidebar( enabled = false ) {
 	}, [ enabled, registry ] );
 }
 
+// Return true if a vertical scroll container inside `panel` should
+// consume the wheel before we forward it to the canvas. The edge check
+// lets the canvas resume scrolling once the inner scroller reaches its
+// top/bottom.
+function isWheelAbsorbedInside( panel, event ) {
+	const { deltaY, target } = event;
+	const inner = getScrollContainer( target, 'vertical' );
+	if ( ! inner || ! panel.contains( inner ) ) {
+		return false;
+	}
+	const maxScrollTop = inner.scrollHeight - inner.clientHeight;
+	const isScrollingDown = deltaY > 0;
+	const canScrollDown = inner.scrollTop < maxScrollTop;
+	const canScrollUp = inner.scrollTop > 0;
+	return isScrollingDown ? canScrollDown : canScrollUp;
+}
+
+// Normalize `WheelEvent.deltaY` to CSS pixels by branching on `deltaMode`.
+// Firefox on Windows/Linux can report lines/pages instead of pixels,
+// which would otherwise crawl when forwarded to `scrollBy`.
+function getWheelDeltaYInPixels( event, canvas, view ) {
+	const { deltaY, deltaMode } = event;
+	if ( deltaMode === 1 ) {
+		// DOM_DELTA_LINE: scale by the canvas's line height,
+		// falling back to `font-size × 1.2` when it resolves to `normal`.
+		const canvasStyle = view.getComputedStyle( canvas );
+		const parsedLineHeight = parseFloat( canvasStyle.lineHeight );
+		const parsedFontSize = parseFloat( canvasStyle.fontSize );
+		const lineHeight = Number.isFinite( parsedLineHeight )
+			? parsedLineHeight
+			: parsedFontSize * 1.2;
+		return deltaY * lineHeight;
+	}
+	if ( deltaMode === 2 ) {
+		// DOM_DELTA_PAGE: scale by the canvas height.
+		return deltaY * canvas.clientHeight;
+	}
+	// DOM_DELTA_PIXEL: already in pixels, so use as-is.
+	return deltaY;
+}
+
 export function useFloatingBoard( {
 	threads,
 	selectedNoteId,
@@ -601,10 +642,25 @@ export function useFloatingBoard( {
 		const listenerOptions = { passive: true, capture: true };
 		view?.addEventListener( 'scroll', applyScroll, listenerOptions );
 
+		// Wheel events over the floating sidebar should scroll the canvas.
+		const onWheel = ( event ) => {
+			if ( ! canvas || isWheelAbsorbedInside( panel, event ) ) {
+				return;
+			}
+			const deltaYInPixels = getWheelDeltaYInPixels(
+				event,
+				canvas,
+				panel.ownerDocument.defaultView
+			);
+			canvas.scrollBy( 0, deltaYInPixels );
+		};
+		panel.addEventListener( 'wheel', onWheel, { passive: true } );
+
 		return () => {
 			window.cancelAnimationFrame( rafId );
 			contentObserver.disconnect();
 			view?.removeEventListener( 'scroll', applyScroll, listenerOptions );
+			panel.removeEventListener( 'wheel', onWheel );
 		};
 	}, [ sidebarRef, heights, isFloating, selectedNoteId, store, threads ] );
 
