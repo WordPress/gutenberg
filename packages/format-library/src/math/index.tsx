@@ -10,7 +10,7 @@ import {
 // @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
-import { ValidatedInputControl } from '@wordpress/ui';
+import { ValidatedInputControl, Link } from '@wordpress/ui';
 import { math as icon } from '@wordpress/icons';
 import type { InlineMathUIProps, EditMathProps } from '../types';
 
@@ -84,21 +84,28 @@ function InlineUI( {
 		>
 			<form
 				ref={ formRef }
-				style={ { minWidth: '300px', padding: '4px' } }
+				style={ { minWidth: '300px', padding: '16px' } }
 				onSubmit={ ( event ) => event.preventDefault() }
 			>
 				<ValidatedInputControl
-					hideLabelFromVision
 					label={ __( 'LaTeX math syntax' ) }
 					value={ latex }
 					customValidity={
 						error ? { type: 'invalid', message: error } : undefined
 					}
 					onValueChange={ handleLatexChange }
-					placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
+					placeholder={ __( 'e.g., x^2, \\frac{a}{b}, \\sqrt{x}' ) }
 					autoComplete="off"
 					className="block-editor-format-toolbar__math-input"
 				/>
+				<Link
+					className="block-editor-format-toolbar__math-learn-more"
+					href={ __(
+						'https://wordpress.org/documentation/article/math-block/'
+					) }
+				>
+					{ __( 'Learn more about LaTeX syntax' ) }
+				</Link>
 			</form>
 		</Popover>
 	);

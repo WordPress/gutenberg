@@ -4,7 +4,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
-import { ValidatedTextareaControl } from '@wordpress/ui';
+import { ValidatedTextareaControl, Link } from '@wordpress/ui';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 
@@ -67,12 +67,11 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 				>
 					<form
 						ref={ formRef }
-						style={ { padding: '4px', minWidth: '300px' } }
+						style={ { padding: '16px', minWidth: '300px' } }
 						onSubmit={ ( event ) => event.preventDefault() }
 					>
 						<ValidatedTextareaControl
 							label={ __( 'LaTeX math syntax' ) }
-							hideLabelFromVision
 							value={ latex ?? '' }
 							className="wp-block-math__textarea-control"
 							customValidity={
@@ -99,8 +98,18 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 									latex: newLatex,
 								} );
 							} }
-							placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
+							placeholder={ __(
+								'e.g., x^2, \\frac{a}{b}, \\sqrt{x}'
+							) }
 						/>
+						<Link
+							className="wp-block-math__learn-more"
+							href={ __(
+								'https://wordpress.org/documentation/article/math-block/'
+							) }
+						>
+							{ __( 'Learn more about LaTeX syntax' ) }
+						</Link>
 					</form>
 				</Popover>
 			) }
