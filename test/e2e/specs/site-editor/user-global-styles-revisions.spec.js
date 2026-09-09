@@ -271,11 +271,11 @@ test.describe( 'Style Revisions', () => {
 			page_on_front: frontPage.id,
 		} );
 
-		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
-			color: { background: 'blue' },
-		} );
-
 		try {
+			await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+				color: { background: 'blue' },
+			} );
+
 			// The styles route (site-editor.php?p=%2Fstyles) is where the
 			// Revisions entry lives.
 			await admin.visitSiteEditor();

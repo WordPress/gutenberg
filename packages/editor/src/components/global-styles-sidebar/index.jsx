@@ -81,7 +81,9 @@ export default function GlobalStylesSidebar() {
 	// Reset navigation when the sidebar opens, unless whatever opened it
 	// selected a path first — "Revisions" in the site editor sidebar sets
 	// /revisions and opens the sidebar together, and that path must survive.
-	const hasRequestedPath = stylesPath !== '/';
+	// Only in the visual editor: the code editor has no styles canvas to show,
+	// and `shouldResetNavigation` clears the path there anyway.
+	const hasRequestedPath = stylesPath !== '/' && ! shouldResetNavigation;
 	useEffect( () => {
 		if (
 			activeComplementaryArea === 'edit-site/global-styles' &&
