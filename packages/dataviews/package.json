@@ -52,9 +52,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@ariakit/react": "^0.4.37",
-		"@base-ui/react": "^1.7.0",
 		"@date-fns/tz": "^1.5.0",
-		"@daypicker/react": "^10.0.1",
 		"@emotion/cache": "^11.14.0",
 		"@emotion/css": "^11.13.5",
 		"@emotion/react": "^11.14.0",
@@ -80,7 +78,6 @@
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.1",
 		"colord": "^2.9.3",
-		"colorjs.io": "^0.7.1",
 		"date-fns": "^4.4.0",
 		"deepmerge": "^4.3.1",
 		"fast-deep-equal": "^3.1.3",

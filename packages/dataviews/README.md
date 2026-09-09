@@ -48,7 +48,7 @@ The `DataViews` component receives data and some other configuration to render t
 
 ![DataViews flow](https://developer.wordpress.org/files/2024/09/368600071-20aa078f-7c3d-406d-8dd0-8b764addd22a.png 'DataViews flow')
 
-<div class="callout callout-info">If you're trying to use the DataViews component in a WordPress plugin or theme and you are building your scripts using the `@wordpress/scripts` package, you need to import the components from `@wordpress/dataviews/wp` instead of `@wordpress/dataviews`.</div>
+<div class="callout callout-info">If you're trying to use the DataViews component in a WordPress plugin or theme and you are building your scripts using the `@wordpress/scripts` package, you need to import the components from `@wordpress/dataviews/wp` instead of `@wordpress/dataviews`. The `@wordpress/dataviews/wp` bundle requires WordPress 7.0 or later.</div>
 
 Example:
 
