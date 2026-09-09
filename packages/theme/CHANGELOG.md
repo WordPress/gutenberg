@@ -17,9 +17,12 @@
 ### Bug Fixes
 
 -   Make color ramp generation independent of cache population order. ([#82505](https://github.com/WordPress/gutenberg/pull/82505))
+-   Keep active fills moving in the color ramp direction and preserve text contrast for both states. ([#82542](https://github.com/WordPress/gutenberg/pull/82542))
 
 ### Internal
 
+-   Migrate design token modes to the DTCG resolver and Terrazzo CSS permutations. ([#82537](https://github.com/WordPress/gutenberg/pull/82537))
+-   Generate the default ramps before derived token artifacts so one build uses the current ramp algorithm throughout. ([#82525](https://github.com/WordPress/gutenberg/pull/82525))
 -   Cache relative luminance calculations used by color-ramp contrast checks. ([#82445](https://github.com/WordPress/gutenberg/pull/82445))
 -   Enforce NodeNext module resolution in the build project so future declaration imports are checked against the package's published ESM resolution rules. ([#82088](https://github.com/WordPress/gutenberg/pull/82088))
 

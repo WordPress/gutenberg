@@ -1,9 +1,12 @@
+import { describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import { click, press, type } from '@ariakit/test';
 import { render } from '@ariakit/test/react';
 import { useState } from '@wordpress/element';
 import UncontrolledCustomSelectControlV2 from '..';
 import type { CustomSelectProps } from '../types';
+
+globalThis.wpVitest.mockMatchMedia();
 
 const items = [
 	{
@@ -222,7 +225,7 @@ describe.each( [
 
 	describe( 'Multiple selection', () => {
 		it( 'Should be able to select multiple items when provided an array', async () => {
-			const onChangeMock = jest.fn();
+			const onChangeMock = vi.fn();
 
 			// initial selection as defaultValue
 			const defaultValues = [

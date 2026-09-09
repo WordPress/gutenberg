@@ -4,11 +4,7 @@ import { createRef } from '@wordpress/element';
 import { describe, expect, it, vi } from 'vitest';
 import { CheckboxControl } from '../index';
 
-declare const wpVitest: {
-	mockPointerEvent: () => void;
-};
-
-wpVitest.mockPointerEvent();
+globalThis.wpVitest.mockPointerEvent();
 
 describe( 'CheckboxControl', () => {
 	it( 'forwards ref', () => {
