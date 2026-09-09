@@ -1,5 +1,7 @@
 import clsx from 'clsx';
 import { addFilter } from '@wordpress/hooks';
+import { __, sprintf } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	getBlockSupport,
 	getBlockType,
@@ -10,6 +12,8 @@ import useAvailableAlignments, {
 	useAlignmentMenu,
 } from '../components/block-alignment-control/use-available-alignments';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { store as blockEditorStore } from '../store';
+import useBlockDisplayInformation from '../components/use-block-display-information';
 
 /**
  * An array which includes all possible valid alignments,
@@ -98,9 +102,76 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
+/**
+ * Describes the block whose layout is withholding alignments, so the menu can
+ * name it and offer to select it.
+ *
+ * Only a block the user can reach from here is described. When the constraint
+ * comes from outside the post — the template wrapped around the content — there
+ * is no block on the page to send anyone to.
+ *
+ * @param {string} clientId The block whose alignments are withheld.
+ *
+ * @return {?{description: string, action: Object}} The constraint.
+ */
+function useAlignmentConstraint( clientId ) {
+	const parentClientId = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, getBlockEditingMode } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+
+			if (
+				! rootClientId ||
+				getBlockEditingMode( rootClientId ) !== 'default'
+			) {
+				return null;
+			}
+
+			return rootClientId;
+		},
+		[ clientId ]
+	);
+
+	const parentInfo = useBlockDisplayInformation( parentClientId );
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	if ( ! parentInfo ) {
+		return null;
+	}
+
+	/*
+	 * The block type rather than any name it has been given, matching how
+	 * `BlockParentSelector` labels the same action. The icon comes from the
+	 * type too, so the two can never describe different blocks — a custom name
+	 * can sit beside an icon that does not look like it.
+	 */
+	const parentTitle = parentInfo.title;
+
+	return {
+		// Short enough not to wrap: the label above it already names the block.
+		description: __( 'It limits this block’s width.' ),
+		action: {
+			label: sprintf(
+				// translators: %s: title of the containing block, e.g. "Group".
+				__( 'Select %s' ),
+				parentTitle
+			),
+			/*
+			 * The block's own icon, matching how `BlockParentSelector` renders
+			 * the same "go up a level" action in the toolbar. It also keeps the
+			 * item in the menu's icon column.
+			 */
+			icon: parentInfo.icon,
+			onClick: () => selectBlock( parentClientId ),
+		},
+	};
+}
+
 function BlockEditAlignmentToolbarControlsPure( {
 	name: blockName,
 	align,
+	clientId,
 	setAttributes,
 } ) {
 	// Compute the block valid alignments by taking into account,
@@ -113,6 +184,7 @@ function BlockEditAlignmentToolbarControlsPure( {
 	);
 
 	const { enabled, unavailable } = useAlignmentMenu( blockAllowedAlignments );
+	const constraint = useAlignmentConstraint( clientId );
 	const blockEditingMode = useBlockEditingMode();
 	/*
 	 * Render whenever there is something to say, which includes having only
@@ -151,6 +223,7 @@ function BlockEditAlignmentToolbarControlsPure( {
 				 * parent layout has taken away.
 				 */
 				controls={ blockAllowedAlignments }
+				constraint={ unavailable.length ? constraint : undefined }
 			/>
 		</BlockControls>
 	);

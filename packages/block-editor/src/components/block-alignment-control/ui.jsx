@@ -6,6 +6,7 @@ import {
 	MenuGroup,
 	MenuItem,
 } from '@wordpress/components';
+import BlockIcon from '../block-icon';
 import { useAlignmentMenu } from './use-available-alignments';
 import { BLOCK_ALIGNMENTS_CONTROLS, DEFAULT_CONTROL } from './constants';
 
@@ -17,6 +18,7 @@ function BlockAlignmentUI( {
 	isCollapsed = true,
 	label = __( 'Align block' ),
 	description,
+	constraint,
 } ) {
 	/*
 	 * Wide and Full are the alignments users look for and fail to find. When a
@@ -136,6 +138,33 @@ function BlockAlignmentUI( {
 									}
 								) }
 							</MenuGroup>
+							{ /*
+							 * The explanation is the action's description rather
+							 * than a group heading: headings here are one or two
+							 * words, and hanging it off the item keeps it tied to
+							 * the thing that resolves it. The separate group is
+							 * what stops the action being announced as another
+							 * alignment choice.
+							 */ }
+							{ !! constraint && (
+								<MenuGroup>
+									<MenuItem
+										icon={
+											<BlockIcon
+												icon={ constraint.action.icon }
+											/>
+										}
+										iconPosition="left"
+										info={ constraint.description }
+										onClick={ () => {
+											constraint.action.onClick();
+											onClose();
+										} }
+									>
+										{ constraint.action.label }
+									</MenuItem>
+								</MenuGroup>
+							) }
 						</>
 					);
 				},

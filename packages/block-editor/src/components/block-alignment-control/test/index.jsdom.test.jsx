@@ -382,3 +382,69 @@ describe( 'BlockAlignmentUI on a theme without layout support', () => {
 		] );
 	} );
 } );
+
+describe( 'BlockAlignmentUI constraint', () => {
+	const controls = [ 'left', 'center', 'right', 'wide', 'full' ];
+	const onChange = vi.fn();
+	const onSelect = vi.fn();
+	const constraint = {
+		description: 'It limits this block\u2019s width.',
+		action: { label: 'Select Group', onClick: onSelect },
+	};
+
+	afterEach( () => {
+		onChange.mockClear();
+		onSelect.mockClear();
+	} );
+
+	async function openMenu() {
+		const user = userEvent.setup();
+		renderWithTheme(
+			<BlockAlignmentUI
+				onChange={ onChange }
+				controls={ controls }
+				constraint={ constraint }
+			/>
+		);
+		await user.click(
+			screen.getByRole( 'button', { name: 'Align block' } )
+		);
+		return user;
+	}
+
+	test( 'explains the constraint as the action description', async () => {
+		await openMenu();
+
+		// Hung off the item rather than a group heading, so it reads as one
+		// thing with the action that resolves it.
+		expect(
+			screen.getByRole( 'menuitem', {
+				name: `Select Group ${ constraint.description }`,
+			} )
+		).toBeInTheDocument();
+	} );
+
+	test( 'offers the action as a command, not an alignment choice', async () => {
+		await openMenu();
+
+		// `menuitem`, not `menuitemradio`, so it is not announced as an
+		// alignment option alongside the real ones.
+		expect(
+			screen.getByRole( 'menuitem', { name: /Select Group/ } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'menuitemradio', { name: /Select Group/ } )
+		).not.toBeInTheDocument();
+	} );
+
+	test( 'runs the action without changing the alignment', async () => {
+		const user = await openMenu();
+
+		await user.click(
+			screen.getByRole( 'menuitem', { name: /Select Group/ } )
+		);
+
+		expect( onSelect ).toHaveBeenCalledTimes( 1 );
+		expect( onChange ).not.toHaveBeenCalled();
+	} );
+} );
