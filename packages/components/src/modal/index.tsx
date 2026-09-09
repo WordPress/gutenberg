@@ -73,7 +73,8 @@ function UnforwardedModal(
 	// The heading that `aria-labelledby` points at lives in the header, so when
 	// the header is hidden the title has to label the dialog directly instead.
 	const dialogLabel =
-		contentLabel ?? ( __experimentalHideHeader ? title : undefined );
+		contentLabel ??
+		( __experimentalHideHeader && title ? title : undefined );
 
 	const shouldFocusContent = focusOnMount === 'firstContentElement';
 	const focusOnMountRef = useFocusOnMount(
