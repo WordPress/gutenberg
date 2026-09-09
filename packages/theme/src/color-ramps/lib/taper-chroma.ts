@@ -86,11 +86,7 @@ export function createChromaTaper(
 	const seedCarry = Math.pow( seedRelative, clamp01( carry ) );
 
 	return ( lTarget ) => {
-		const cmaxTarget = getMaxChromaAtLH(
-			clamp01( lTarget ),
-			hSeed,
-			gamut
-		);
+		const cmaxTarget = getMaxChromaAtLH( clamp01( lTarget ), hSeed, gamut );
 
 		// Intended chroma from local capacity, tempered by seed vividness
 		const cIntendedBase = alpha * cmaxTarget;
