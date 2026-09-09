@@ -276,4 +276,44 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 			'Submenu should not have "open-on-hover-click" class when legacy openSubmenusOnClick was true'
 		);
 	}
+
+	/**
+	 * Test that the submenu arrow follows the showSubmenuIcon attribute when
+	 * submenus open on click.
+	 *
+	 * @group submenu-icon
+	 * @covers ::gutenberg_render_block_core_navigation_submenu
+	 */
+	public function test_should_respect_show_submenu_icon_when_submenus_open_on_click() {
+		$page_id = self::$page->ID;
+
+		$markup = '<!-- wp:navigation {"submenuVisibility":"click","showSubmenuIcon":%s,"overlayMenu":"never"} -->
+<!-- wp:navigation-submenu {"label":"Submenu Label","type":"page","id":' . $page_id . ',"url":"http://localhost:8888/?page_id=' . $page_id . '","kind":"post-type"} -->
+<!-- wp:navigation-link {"label":"Submenu Item","type":"page","id":' . $page_id . ',"url":"http://localhost:8888/?page_id=' . $page_id . '","kind":"post-type"} /-->
+<!-- /wp:navigation-submenu -->
+<!-- /wp:navigation -->';
+
+		$with_icon = do_blocks( sprintf( $markup, 'true' ) );
+
+		$this->assertStringContainsString(
+			'wp-block-navigation__submenu-icon',
+			$with_icon,
+			'Submenu should render the arrow when opening on click with "showSubmenuIcon" enabled'
+		);
+
+		$without_icon = do_blocks( sprintf( $markup, 'false' ) );
+
+		$this->assertStringNotContainsString(
+			'wp-block-navigation__submenu-icon',
+			$without_icon,
+			'Submenu should not render the arrow when opening on click with "showSubmenuIcon" disabled'
+		);
+
+		// The submenu must remain openable on click without the arrow.
+		$this->assertStringContainsString(
+			'wp-block-navigation-submenu__toggle',
+			$without_icon,
+			'Submenu should still render the click toggle when the arrow is hidden'
+		);
+	}
 }

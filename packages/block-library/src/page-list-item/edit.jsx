@@ -71,9 +71,11 @@ export default function PageListItemEdit( { context, attributes } ) {
 							__html: safeHTML( label ),
 						} }
 					/>
-					<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
-						<ItemSubmenuIcon />
-					</span>
+					{ context.showSubmenuIcon && (
+						<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
+							<ItemSubmenuIcon />
+						</span>
+					) }
 				</>
 			) : (
 				<a
