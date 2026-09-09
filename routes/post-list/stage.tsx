@@ -17,8 +17,8 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback, useEffect, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { useMemo, useCallback } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
@@ -262,25 +262,6 @@ function PostListView( {
 		} ),
 		[ navigate, searchParams ]
 	);
-
-	const { invalidateViewConfig } = unlock( useDispatch( coreStore ) );
-
-	/*
-	 * The tab counts are part of the view configuration, which is cached per
-	 * entity and so is not refetched when a post is trashed, duplicated,
-	 * restored, or moved between statuses. The records are refetched on each of
-	 * those, so a change in them is the signal that the counts may no longer be
-	 * accurate.
-	 *
-	 * The first resolution counts as such a change, so that returning to the
-	 * list after creating a post elsewhere also recomputes the counts.
-	 */
-	useEffect( () => {
-		if ( posts === undefined ) {
-			return;
-		}
-		invalidateViewConfig();
-	}, [ posts, invalidateViewConfig ] );
 
 	const actions = useMemo( () => {
 		const _actions = [

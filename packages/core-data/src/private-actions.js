@@ -181,29 +181,6 @@ export const setCollaborationSupported =
 	};
 
 /**
- * Invalidates the resolution of the view configuration, so that it is fetched
- * again the next time it is selected.
- *
- * The configuration carries data that is derived from other records — the item
- * counts of each view in `view_list` — which the store cannot know has changed
- * when those records are edited. Callers that mutate such records invalidate
- * the configuration so the derived data is recomputed.
- *
- * Every cached argument shape is invalidated, because the configuration is
- * resolved both with and without a `fields` argument and the derived data in
- * each of them goes stale alike.
- *
- * @return {Function} Action thunk.
- */
-export const invalidateViewConfig =
-	() =>
-	( { registry } ) => {
-		registry
-			.dispatch( STORE_NAME )
-			.invalidateResolutionForStoreSelector( 'getViewConfig' );
-	};
-
-/**
  * Returns an action object used to receive view config.
  *
  * @param {string} kind   Entity kind.
