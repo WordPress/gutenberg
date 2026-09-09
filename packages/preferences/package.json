@@ -62,7 +62,7 @@
 		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"devDependencies": {
-		"vitest": "^4.1.10"
+		"vitest": "^4.1.11"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
