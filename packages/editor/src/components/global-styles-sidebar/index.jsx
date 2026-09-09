@@ -90,11 +90,12 @@ export default function GlobalStylesSidebar() {
 		) {
 			resetStylesNavigation();
 		}
-		// Deliberately not re-running when `hasRequestedPath` changes: it is
-		// the path as it stands when the sidebar opens that matters, and
-		// navigating within an open sidebar must not trigger a reset.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ activeComplementaryArea, previousActiveArea, resetStylesNavigation ] );
+	}, [
+		activeComplementaryArea,
+		previousActiveArea,
+		hasRequestedPath,
+		resetStylesNavigation,
+	] );
 
 	useEffect( () => {
 		if ( shouldResetNavigation ) {
