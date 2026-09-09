@@ -241,7 +241,7 @@ export function GallerySourcePanel( {
 					 * carrying the per-source explanation these strings do today.
 					 */ }
 					<p className="wp-block-gallery__source-description">
-						{ __( 'Use images already attached to this post.' ) }
+						{ __( 'Images added to the gallery.' ) }
 					</p>
 					<Button
 						__next40pxDefaultSize
@@ -255,7 +255,7 @@ export function GallerySourcePanel( {
 			{ isConfirming && (
 				<ConfirmDialog
 					isOpen
-					title={ __( 'Use attached images?' ) }
+					title={ __( 'Use images attached to the post?' ) }
 					__experimentalHideHeader={ false }
 					confirmButtonText={ __( 'Use attached images' ) }
 					onConfirm={ () => {
