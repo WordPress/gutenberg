@@ -108,10 +108,6 @@
 		"lerna": {
 			"js-yaml": "4.3.2",
 			"pacote": "21.5.1"
-		},
-		"markdownlint-cli": {
-			"js-yaml": "~4.3.2",
-			"markdown-it": "~14.3.0"
 		}
 	},
 	"scripts": {
