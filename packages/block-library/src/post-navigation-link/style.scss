@@ -24,4 +24,8 @@
 	&.has-text-align-left[style*="writing-mode: vertical-lr"] {
 		rotate: 180deg;
 	}
+
+	.post-navigation-link__no-post {
+		color: #b5b5b5;
+	}
 }
