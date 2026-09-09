@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BlockAlignmentUI from '../ui';
 import { LayoutProvider } from '../../block-list/layout';
+import { BlockEditorProvider } from '../../provider';
 
 describe( 'BlockAlignmentUI', () => {
 	const alignment = 'left';
@@ -117,6 +118,23 @@ describe( 'BlockAlignmentUI', () => {
 	} );
 } );
 
+/**
+ * A theme offering both wide and full. Without one, those alignments were never
+ * on the table and are not reported as withheld.
+ */
+const THEME_LAYOUT = { contentSize: '600px', wideSize: '1200px' };
+
+function renderWithTheme( ui, layout = THEME_LAYOUT ) {
+	return render(
+		<BlockEditorProvider
+			value={ [] }
+			settings={ { __experimentalFeatures: { layout } } }
+		>
+			{ ui }
+		</BlockEditorProvider>
+	);
+}
+
 describe( 'BlockAlignmentUI unavailable alignments', () => {
 	// The block supports every alignment; the default flow layout offers only
 	// none/left/center/right, so wide and full are taken away by the parent.
@@ -129,7 +147,7 @@ describe( 'BlockAlignmentUI unavailable alignments', () => {
 
 	async function openMenu() {
 		const user = userEvent.setup();
-		render(
+		renderWithTheme(
 			<BlockAlignmentUI onChange={ onChange } controls={ controls } />
 		);
 		await user.click(
@@ -180,7 +198,7 @@ describe( 'BlockAlignmentUI unavailable alignments', () => {
 
 	test( 'leaves the menu alone when the layout offers every alignment', async () => {
 		const user = userEvent.setup();
-		render(
+		renderWithTheme(
 			<LayoutProvider
 				value={ {
 					type: 'constrained',
@@ -222,7 +240,7 @@ describe( 'BlockAlignmentUI with no available alignments', () => {
 
 	test( 'still offers None alongside what the layout withholds', async () => {
 		const user = userEvent.setup();
-		render(
+		renderWithTheme(
 			<BlockAlignmentUI onChange={ onChange } controls={ controls } />
 		);
 
@@ -242,12 +260,70 @@ describe( 'BlockAlignmentUI with no available alignments', () => {
 	} );
 
 	test( 'renders nothing when the layout places children itself', () => {
-		const { container } = render(
+		const { container } = renderWithTheme(
 			<LayoutProvider value={ { type: 'flex' } }>
 				<BlockAlignmentUI onChange={ onChange } controls={ controls } />
 			</LayoutProvider>
 		);
 
 		expect( container ).toBeEmptyDOMElement();
+	} );
+} );
+
+describe( 'BlockAlignmentUI when the theme withholds alignments', () => {
+	// A theme offering neither is curating its own options globally, so those
+	// alignments stay hidden rather than being reported as unavailable.
+	const controls = [ 'left', 'center', 'right', 'wide', 'full' ];
+	const onChange = vi.fn();
+
+	afterEach( () => {
+		onChange.mockClear();
+	} );
+
+	async function openMenuForTheme( layout ) {
+		const user = userEvent.setup();
+		renderWithTheme(
+			<BlockAlignmentUI onChange={ onChange } controls={ controls } />,
+			layout
+		);
+		await user.click(
+			screen.getByRole( 'button', { name: 'Align block' } )
+		);
+	}
+
+	function menuItems() {
+		return screen
+			.getAllByRole( 'menuitemradio' )
+			.map( ( item ) => item.textContent );
+	}
+
+	test( 'hides both when the theme sets no layout at all', async () => {
+		// No provider at all, so the store holds no global layout.
+		const user = userEvent.setup();
+		render(
+			<BlockAlignmentUI onChange={ onChange } controls={ controls } />
+		);
+		await user.click(
+			screen.getByRole( 'button', { name: 'Align block' } )
+		);
+
+		expect( menuItems() ).toEqual( [
+			'None',
+			'Align left',
+			'Align center',
+			'Align right',
+		] );
+	} );
+
+	test( 'hides Wide when the theme sets no wide size', async () => {
+		await openMenuForTheme( { contentSize: '600px' } );
+
+		expect( menuItems() ).toEqual( [
+			'None',
+			'Full widthNot available',
+			'Align left',
+			'Align center',
+			'Align right',
+		] );
 	} );
 } );

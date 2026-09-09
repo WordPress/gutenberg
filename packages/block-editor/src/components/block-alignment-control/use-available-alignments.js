@@ -1,5 +1,7 @@
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import { useLayout } from '../block-list/layout';
+import { useSettings } from '../use-settings';
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
 
@@ -7,7 +9,10 @@ const EMPTY_ARRAY = [];
 const DEFAULT_CONTROLS = [ 'none', 'left', 'center', 'right', 'wide', 'full' ];
 const WIDE_CONTROLS = [ 'wide', 'full' ];
 
-export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
+export default function useAvailableAlignments(
+	controls = DEFAULT_CONTROLS,
+	layoutOverride
+) {
 	// Always add the `none` option if not exists.
 	if ( ! controls.includes( 'none' ) ) {
 		controls = [ 'none', ...controls ];
@@ -34,7 +39,8 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
 			},
 			[ isNoneOnly ]
 		);
-	const layout = useLayout();
+	const parentLayout = useLayout();
+	const layout = layoutOverride ?? parentLayout;
 
 	if ( isNoneOnly ) {
 		return EMPTY_ARRAY;
@@ -104,15 +110,33 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
  * @return {{enabled: Object[], unavailable: string[]}} The split alignments.
  */
 export function useAlignmentMenu( controls = DEFAULT_CONTROLS ) {
+	const [ globalLayout ] = useSettings( 'layout' );
+
 	const enabled = useAvailableAlignments( controls );
 	const layoutOffersAlignments =
 		!! useAvailableAlignments( DEFAULT_CONTROLS ).length;
+
+	/*
+	 * What the theme itself offers, measured against its global layout rather
+	 * than the parent's. A theme that offers no wide size, or no layout at all,
+	 * is curating its own options; those alignments were never on the table and
+	 * reporting them as withheld would be wrong.
+	 */
+	const themeLayout = useMemo(
+		() => ( { ...globalLayout, type: 'constrained' } ),
+		[ globalLayout ]
+	);
+	const themeNames = useAvailableAlignments(
+		DEFAULT_CONTROLS,
+		themeLayout
+	).map( ( { name } ) => name );
 
 	const enabledNames = enabled.map( ( { name } ) => name );
 	const unavailable = layoutOffersAlignments
 		? controls.filter(
 				( name ) =>
 					WIDE_CONTROLS.includes( name ) &&
+					themeNames.includes( name ) &&
 					! enabledNames.includes( name )
 		  )
 		: EMPTY_ARRAY;
