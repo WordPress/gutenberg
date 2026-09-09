@@ -16,13 +16,6 @@ import { store as blockEditorStore } from '../../store';
 import { BlockRefs } from '../provider/block-refs-provider';
 import { unlock } from '../../lock-unlock';
 
-// A toolbar that unmounts while one of its items has focus hands the item's
-// position to a toolbar with the same label mounting in the same task. The
-// block toolbar is keyed on the selected block and its parent, so it
-// remounts when its block moves (a list item indented from it), and the
-// focused item is removed with it, which drops focus without an event.
-let handoff = null;
-
 function hasOnlyToolbarItem( elements ) {
 	const dataProp = 'toolbarItem';
 	return ! elements.some( ( element ) => ! ( dataProp in element.dataset ) );
@@ -156,25 +149,11 @@ function useToolbarFocus( {
 			! initialFocusOnMount &&
 			! hasFocusWithin( navigableToolbarRef )
 		) {
-			const received =
-				handoff?.label ===
-				navigableToolbarRef.getAttribute( 'aria-label' )
-					? handoff
-					: null;
 			raf = window.requestAnimationFrame( () => {
 				const items =
 					getAllFocusableToolbarItemsIn( navigableToolbarRef );
-				const index = received
-					? Math.min( received.index, items.length - 1 )
-					: initialIndex || 0;
-				const { activeElement, body } =
-					navigableToolbarRef.ownerDocument;
-				if (
-					items[ index ] &&
-					( hasFocusWithin( navigableToolbarRef ) ||
-						( received &&
-							( ! activeElement || activeElement === body ) ) )
-				) {
+				const index = initialIndex || 0;
+				if ( items[ index ] && hasFocusWithin( navigableToolbarRef ) ) {
 					items[ index ].focus( {
 						// When focusing newly mounted toolbars,
 						// the position of the popover is often not right on the first render
@@ -197,50 +176,44 @@ function useToolbarFocus( {
 		};
 	}, [ initialIndex, initialFocusOnMount, onIndexChange, toolbarRef ] );
 
-	// Track which item has focus, and hand its position over on unmount.
+	// Keep focus, and a focusable item, when the focused item is removed
+	// from under the toolbar: a block that moves (a list item indented from
+	// the toolbar) re-renders its controls, replacing the item the user
+	// activated. Browsers drop focus to the body without an event when a
+	// focused element is removed, so the toolbar's DOM changes are observed.
 	useEffect( () => {
 		const toolbar = toolbarRef.current;
-		let index = -1;
+		const { ownerDocument } = toolbar;
+		let focused;
+		let index;
 
 		function onFocusIn( event ) {
-			index = getAllFocusableToolbarItemsIn( toolbar ).indexOf(
-				event.target
-			);
+			focused = event.target;
+			index = getAllFocusableToolbarItemsIn( toolbar ).indexOf( focused );
 		}
 
-		function onFocusOut( event ) {
-			// Focus moved somewhere on purpose.
-			if ( event.relatedTarget ) {
-				index = -1;
+		const observer = new ownerDocument.defaultView.MutationObserver( () => {
+			const { activeElement, body } = ownerDocument;
+
+			if (
+				! focused ||
+				focused.isConnected ||
+				( activeElement && activeElement !== body )
+			) {
 				return;
 			}
-			// No related target: focus went to another document (the
-			// canvas), to something not focusable, or the item was
-			// removed. Chrome fires no event at all for a removal; the
-			// others report it before the item is detached.
-			const { target } = event;
-			window.queueMicrotask( () => {
-				if ( target.isConnected ) {
-					index = -1;
-				}
-			} );
-		}
+
+			const items = getAllFocusableToolbarItemsIn( toolbar );
+			focused = items[ Math.min( index, items.length - 1 ) ];
+			focused?.focus( { preventScroll: true } );
+		} );
 
 		toolbar.addEventListener( 'focusin', onFocusIn );
-		toolbar.addEventListener( 'focusout', onFocusOut );
+		observer.observe( toolbar, { childList: true, subtree: true } );
 
 		return () => {
 			toolbar.removeEventListener( 'focusin', onFocusIn );
-			toolbar.removeEventListener( 'focusout', onFocusOut );
-
-			if ( index < 0 ) {
-				return;
-			}
-
-			handoff = { label: toolbar.getAttribute( 'aria-label' ), index };
-			window.queueMicrotask( () => {
-				handoff = null;
-			} );
+			observer.disconnect();
 		};
 	}, [ toolbarRef ] );
 

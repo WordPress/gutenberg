@@ -140,7 +140,7 @@ export function PrivateBlockToolbar( {
 			isDefaultEditingMode: _isDefaultEditingMode,
 			blockType: selectedBlockClientId && getBlockType( _blockName ),
 			shouldShowVisualToolbar: isValid && isVisual,
-			toolbarKey: `${ selectedBlockClientId }${ parentClientId }`,
+			toolbarKey: selectedBlockClientId,
 			showParentSelector:
 				! _isZoomOut &&
 				parentBlockType &&
@@ -211,6 +211,8 @@ export function PrivateBlockToolbar( {
 			__experimentalOnIndexChange={ __experimentalOnIndexChange }
 			// Resets the index whenever the active block changes so
 			// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+			// The toolbar keeps its focused item when the block's controls
+			// re-render, so it need not remount when the block moves.
 			key={ toolbarKey }
 		>
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
