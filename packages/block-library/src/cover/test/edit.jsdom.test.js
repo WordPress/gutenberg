@@ -1,5 +1,5 @@
 /* eslint-disable jest-dom/prefer-to-have-style -- This suite moves to Browser Mode in the next stacked PR. */
-import { describe, expect, test } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { screen, fireEvent, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -10,6 +10,25 @@ globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockCSSSupports();
 globalThis.wpVitest.mockResizeObserver();
 globalThis.wpVitest.mockVisibleElements();
+
+// JSDOM never fetches image sources, so an image element's load never resolves.
+// The block awaits `getMediaColor` before it commits a new background, which
+// would otherwise leave every media selection pending forever.
+beforeEach( () => {
+	vi.stubGlobal(
+		'Image',
+		class StubImage {
+			set src( value ) {
+				this._src = value;
+				Promise.resolve().then( () => this.onerror?.() );
+			}
+
+			get src() {
+				return this._src;
+			}
+		}
+	);
+} );
 
 const defaultSettings = {
 	__experimentalFeatures: {
@@ -97,6 +116,19 @@ async function createAndSelectBlock() {
 	await selectBlock( 'Block: Cover' );
 }
 
+/**
+ * Adds media to the Cover placeholder through its "Insert from URL" popover.
+ *
+ * @param {string} url The media URL to insert.
+ */
+async function insertFromURL( url ) {
+	await userEvent.click(
+		screen.getByRole( 'button', { name: 'Insert from URL' } )
+	);
+	await userEvent.type( screen.getByRole( 'textbox', { name: 'URL' } ), url );
+	await userEvent.click( screen.getByRole( 'button', { name: 'Apply' } ) );
+}
+
 async function openStylesTabIfAvailable() {
 	const stylesTab = screen.queryByRole( 'tab', {
 		name: 'Styles',
@@ -113,10 +145,46 @@ describe( 'Cover block', () => {
 			await setup();
 
 			expect(
-				within( screen.getByLabelText( 'Block: Cover' ) ).getByText(
-					'To edit this block, you need permission to upload media.'
+				within( screen.getByLabelText( 'Block: Cover' ) ).getByRole(
+					'button',
+					{ name: 'Insert from URL' }
 				)
 			).toBeInTheDocument();
+		} );
+
+		test( 'sets an image background from a URL inserted in the placeholder', async () => {
+			await setup();
+
+			await insertFromURL( 'https://example.com/photo.jpg' );
+
+			const cover = screen.getByLabelText( 'Block: Cover' );
+			expect( cover ).toHaveAttribute(
+				'data-url',
+				'https://example.com/photo.jpg'
+			);
+			expect( within( cover ).getByRole( 'img' ) ).toHaveAttribute(
+				'src',
+				'https://example.com/photo.jpg'
+			);
+		} );
+
+		test( 'sets a video background from a URL inserted in the placeholder', async () => {
+			const { container } = await setup();
+
+			await insertFromURL( 'https://example.com/clip.mp4' );
+
+			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveAttribute(
+				'data-url',
+				'https://example.com/clip.mp4'
+			);
+			// eslint-disable-next-line testing-library/no-node-access
+			const video = container.getElementsByClassName(
+				'wp-block-cover__video-background'
+			);
+			expect( video[ 0 ] ).toHaveAttribute(
+				'src',
+				'https://example.com/clip.mp4'
+			);
 		} );
 
 		test( 'can set overlay color using color picker on block placeholder', async () => {
@@ -127,8 +195,8 @@ describe( 'Cover block', () => {
 			await userEvent.click( colorPicker );
 			const color = colorPicker.style.backgroundColor;
 			expect(
-				screen.queryByRole( 'group', {
-					name: 'To edit this block, you need permission to upload media.',
+				screen.queryByRole( 'button', {
+					name: 'Insert from URL',
 				} )
 			).not.toBeInTheDocument();
 
@@ -200,6 +268,36 @@ describe( 'Cover block', () => {
 			);
 			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
 				'is-position-top-left'
+			);
+		} );
+
+		test( 'replaces the background media with a URL from the replace flow', async () => {
+			await setup( {
+				url: 'http://localhost/my-image.jpg',
+				backgroundType: 'image',
+			} );
+
+			await selectBlock( 'Block: Cover' );
+
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'Replace' } )
+			);
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'Edit link' } )
+			);
+
+			const urlInput = screen.getByRole( 'combobox', {
+				name: 'Paste or type URL',
+			} );
+			await userEvent.clear( urlInput );
+			await userEvent.type( urlInput, 'https://example.com/photo.png' );
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'Apply' } )
+			);
+
+			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveAttribute(
+				'data-url',
+				'https://example.com/photo.png'
 			);
 		} );
 
