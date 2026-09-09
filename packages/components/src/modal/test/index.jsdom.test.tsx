@@ -59,6 +59,21 @@ describe( 'Modal', () => {
 		);
 	} );
 
+	it( 'keeps the title as the accessible name when the header is hidden', () => {
+		render(
+			<Modal
+				title="Test Title"
+				__experimentalHideHeader
+				onRequestClose={ noop }
+			>
+				<p>Modal content</p>
+			</Modal>
+		);
+		expect( screen.getByRole( 'dialog' ) ).toHaveAccessibleName(
+			'Test Title'
+		);
+	} );
+
 	it( 'hides the header when the `__experimentalHideHeader` prop is used', () => {
 		render(
 			<Modal

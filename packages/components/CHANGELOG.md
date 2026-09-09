@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+-   `Modal`: Keep an accessible name on the dialog when `title` is combined with `__experimentalHideHeader`. The heading that `aria-labelledby` referenced is not rendered in that case, so the title is now applied as the dialog's `aria-label` instead ([#82645](https://github.com/WordPress/gutenberg/pull/82645)).
 -   `ProgressBar`: Remove determinate transitions and use a slower, stepped indeterminate animation when reduced motion is preferred. ([#82490](https://github.com/WordPress/gutenberg/pull/82490))
 -   `ColorPalette`: Apply the computed contrast color to the selected checkmark now that the icon is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   `CheckboxControl`: Color the checked and indeterminate icons with `color` rather than `fill`, so they stay visible now that those icons are stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
