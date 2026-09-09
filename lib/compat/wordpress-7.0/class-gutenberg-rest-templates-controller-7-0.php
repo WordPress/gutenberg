@@ -303,7 +303,7 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 	 * @since 6.5.0
 	 *
 	 * @param WP_Block_Template $template_object Template instance.
-	 * @return string                            Original source of the template one of theme, plugin, site, or user.
+	 * @return string Original source of the template one of theme, plugin, site, or user.
 	 */
 	private static function get_wp_templates_original_source_field( $template_object ) {
 		if ( 'wp_template' === $template_object->type || 'wp_template_part' === $template_object->type ) {
@@ -355,7 +355,7 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 	 * @since 6.5.0
 	 *
 	 * @param WP_Block_Template $template_object Template instance.
-	 * @return string                            Human readable text for the author.
+	 * @return string Human readable text for the author.
 	 */
 	private static function get_wp_templates_author_text_field( $template_object ) {
 		$original_source = self::get_wp_templates_original_source_field( $template_object );

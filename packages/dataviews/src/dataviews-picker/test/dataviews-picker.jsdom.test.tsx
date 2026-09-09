@@ -677,6 +677,57 @@ describe( 'DataViews Picker', () => {
 		} );
 	} );
 
+	describe( 'Table layout', () => {
+		it( 'does not render a column for a field id without a field definition', () => {
+			const { container } = render(
+				<Picker
+					layout={ LAYOUT_PICKER_TABLE }
+					fields={ [
+						{ id: 'title', label: 'Title' },
+						{ id: 'order', label: 'Order' },
+					] }
+					view={ { fields: [ 'order', 'missing' ] } }
+				/>
+			);
+
+			// The picker table marks its rows and cells as presentational, so
+			// they have no queryable role.
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const headers = container.querySelectorAll( 'thead th' );
+			// The checkbox column, the primary (title) column and the order
+			// column.
+			expect( headers ).toHaveLength( 3 );
+			expect( headers[ 2 ] ).toHaveTextContent( 'Order' );
+
+			for ( const option of screen.getAllByRole( 'option' ) ) {
+				// eslint-disable-next-line testing-library/no-node-access
+				expect( option.querySelectorAll( 'td' ) ).toHaveLength( 3 );
+			}
+		} );
+
+		it( 'disables moving right for the last column when a field id without a field definition follows it', async () => {
+			const user = userEvent.setup();
+			render(
+				<Picker
+					layout={ LAYOUT_PICKER_TABLE }
+					fields={ [
+						{ id: 'title', label: 'Title' },
+						{ id: 'order', label: 'Order' },
+					] }
+					view={ { fields: [ 'order', 'missing' ] } }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Order' } ) );
+
+			// `order` is the last rendered column, so it can't move right even
+			// though a skipped id follows it in `view.fields`.
+			expect(
+				await screen.findByRole( 'menuitem', { name: 'Move right' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
+		} );
+	} );
+
 	describe( 'Default layouts', () => {
 		/**
 		 * A minimal Picker that intentionally omits the `defaultLayouts` prop so
