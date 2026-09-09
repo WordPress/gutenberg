@@ -168,3 +168,88 @@ export function isAnimatedGif( buffer: ArrayBuffer ): boolean {
 
 	return false;
 }
+
+/**
+ * Brands that identify a HEIC/HEIF image, as registered with the MP4RA.
+ *
+ * `mif1` and `msf1` are the generic HEIF brands, which AVIF files carry too,
+ * so the AVIF brands are ruled out before these are consulted.
+ */
+const HEIC_BRANDS = [
+	'heic',
+	'heix',
+	'heim',
+	'heis',
+	'hevc',
+	'hevx',
+	'hevm',
+	'hevs',
+	'mif1',
+	'msf1',
+];
+const AVIF_BRANDS = [ 'avif', 'avis' ];
+
+/**
+ * Detects whether a file buffer contains a HEIC/HEIF image.
+ *
+ * Performs binary analysis of the ISOBMFF file structure:
+ * 1. Checks for the File Type Box marker ("ftyp" at offset 4)
+ * 2. Collects the brands it declares (major brand at offset 8, compatible
+ *    brands from offset 16 on, each four ASCII characters)
+ * 3. Returns true if a HEIC/HEIF brand is present and no AVIF brand is
+ *
+ * Used when the browser can't report a MIME type at all (`file.type === ''`),
+ * which happens on platforms lacking the OS-level HEVC codec. More reliable
+ * than the file name, which is only a naming convention.
+ *
+ * Only the File Type Box is read, so a file can declare a HEIF brand and still
+ * be undecodable. That is non-destructive: it reaches the HEIC conversion path,
+ * where `parseHeic()` does the full parse and a failure surfaces as a regular
+ * decode error.
+ *
+ * Based on ISO/IEC 14496-12 (ISOBMFF) and ISO/IEC 23008-12 (HEIF):
+ *
+ * @see https://mp4ra.org/registered-types/brands
+ * @see https://nokiatech.github.io/heif/technical.html
+ *
+ * @param buffer File ArrayBuffer. The first 64 bytes cover the File Type Box.
+ * @return Whether the buffer contains a HEIC/HEIF image.
+ */
+export function isHeicBuffer( buffer: ArrayBuffer ): boolean {
+	const view = new Uint8Array( buffer );
+
+	// A File Type Box is at least: size (4) + "ftyp" (4) + major brand (4).
+	if ( view.length < 12 ) {
+		return false;
+	}
+
+	// Check the File Type Box marker: "ftyp" (0x66 0x74 0x79 0x70) at offset 4.
+	if (
+		view[ 4 ] !== 0x66 ||
+		view[ 5 ] !== 0x74 ||
+		view[ 6 ] !== 0x79 ||
+		view[ 7 ] !== 0x70
+	) {
+		return false;
+	}
+
+	// Collect the brands: the major one at offset 8, then the compatible ones
+	// every 4 bytes from 16 on, skipping the minor version at 12. The box size
+	// bounds the scan, as anything past it belongs to the next box.
+	const boxSize = new DataView(
+		buffer,
+		view.byteOffset,
+		view.byteLength
+	).getUint32( 0 );
+	const end = Math.min( boxSize || view.length, view.length );
+	const brands = [ String.fromCharCode( ...view.subarray( 8, 12 ) ) ];
+	for ( let i = 16; i + 4 <= end; i += 4 ) {
+		brands.push( String.fromCharCode( ...view.subarray( i, i + 4 ) ) );
+	}
+
+	if ( brands.some( ( brand ) => AVIF_BRANDS.includes( brand ) ) ) {
+		return false;
+	}
+
+	return brands.some( ( brand ) => HEIC_BRANDS.includes( brand ) );
+}

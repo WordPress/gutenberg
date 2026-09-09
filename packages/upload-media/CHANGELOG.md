@@ -22,6 +22,7 @@
 
 ### Bug Fixes
 
+-   HEIC uploads no longer hang indefinitely on platforms lacking the OS-level HEVC codec, where `ImageDecoder.decode()` never settles. The decode is now bounded by a timeout, and HEIC files the OS can't identify (empty `file.type`) are detected from the file header ([#81043](https://github.com/WordPress/gutenberg/issues/81043)).
 -   A failed `/finalize` request is no longer reported as a successful upload. Finalize is the server's commit point for the attachment metadata (responsive sub-sizes and the final `-scaled` file reference); when it fails, the item is now cancelled and the error surfaced instead of showing "upload complete" and keeping an attachment that is missing its registered sizes ([#80673](https://github.com/WordPress/gutenberg/issues/80673)).
 ## 0.37.0 (2026-07-29)
 

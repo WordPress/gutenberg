@@ -7,6 +7,7 @@ import {
 	cloneFile,
 	convertBlobToFile,
 	isAnimatedGif,
+	isHeicBuffer,
 	renameFile,
 } from '../utils';
 import { canvasConvertToJpeg } from '../canvas-utils';
@@ -823,11 +824,20 @@ export function prepareItem( id: QueueItemId ) {
 
 		let heicJpeg: File | null = null;
 
-		const isImage = file.type.startsWith( 'image/' );
+		// Browsers report an empty file.type for HEIC files on platforms that
+		// lack the OS-level HEVC codec needed to identify the format (e.g.
+		// Windows without the HEVC Video Extension). Fall back to sniffing the
+		// file header so these files still reach the HEIC handling below
+		// instead of silently uploading as an undecodable, unconverted file.
+		const isHeicByContent =
+			! file.type &&
+			isHeicBuffer( await file.slice( 0, 64 ).arrayBuffer() );
+
+		const isImage = file.type.startsWith( 'image/' ) || isHeicByContent;
 		const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
 			file.type
 		);
-		const isHeic = HEIC_MIME_TYPES.includes( file.type );
+		const isHeic = HEIC_MIME_TYPES.includes( file.type ) || isHeicByContent;
 
 		// Gate very large images out of client-side processing. wasm-vips is
 		// capped at 1 GiB of memory, so high-megapixel images, especially
