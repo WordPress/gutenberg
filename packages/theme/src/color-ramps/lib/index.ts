@@ -1,9 +1,9 @@
 import { clone, get, OKLCH, set, type PlainColorObject } from 'colorjs.io/fn';
 import {
-	assertValidSeedColor,
 	clampToGamut,
 	getContrast,
 	getColorString,
+	parseSeedColor,
 } from './color-utils.ts';
 import { findColorMeetingRequirements } from './find-color-with-constraints.ts';
 import {
@@ -222,13 +222,12 @@ export function buildRamp(
 		rescaleToFitContrastTargets?: boolean;
 	} = {}
 ): RampResult {
-	// Validate here: the single point where user-supplied color strings enter.
-	// Internal recursive callers pass color objects to `clampToGamut` instead.
-	assertValidSeedColor( seedArg );
+	// Parse and validate here: the single point where user-supplied color strings enter.
+	const parsedSeed = parseSeedColor( seedArg );
 
 	let seed: PlainColorObject;
 	try {
-		seed = clampToGamut( seedArg );
+		seed = clampToGamut( parsedSeed );
 	} catch ( error ) {
 		throw new Error(
 			`Invalid seed color "${ seedArg }": ${
