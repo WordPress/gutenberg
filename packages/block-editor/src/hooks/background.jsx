@@ -112,6 +112,14 @@ function useBlockProps( { name, style } ) {
  * @return {string} CSS class name.
  */
 export function getBackgroundImageClasses( style ) {
+	// A gradient clipped to text paints the text, not the block background,
+	// so the block has no background to announce.
+	if (
+		'text' === style?.background?.backgroundClip &&
+		hasBackgroundGradientValue( style )
+	) {
+		return '';
+	}
 	return hasBackgroundImageValue( style ) ||
 		hasBackgroundGradientValue( style )
 		? 'has-background'
@@ -323,7 +331,8 @@ export function BackgroundImagePanel( {
 		// Conversely, if the gradient is cleared and has-background was added
 		// during a previous migration, remove it so it does not linger.
 		const hasNewGradient = !! newGradientSlug || !! newGradientValue;
-		if ( isMigrating && hasNewGradient ) {
+		const isTextGradient = 'text' === newStyle?.background?.backgroundClip;
+		if ( isMigrating && hasNewGradient && ! isTextGradient ) {
 			newAttributes.className = clsx( className, 'has-background' );
 		} else if (
 			! hasNewGradient &&

@@ -29,6 +29,8 @@
 
 -   Add a text shadow block support and its control in the typography panel ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
 -   Stabilize `getStyleForState` and `setStyleForState`, for reading and writing block style values for a given viewport or pseudo state, and stabilize the `getSelectedBlockStyleState` and `hasSelectedBlockStyleState`(renamed from `hasSelectedStyleState`) store selectors. ([#82741](https://github.com/WordPress/gutenberg/pull/82741)).
+-   Typography: Add a Gradient control that fills the text with a gradient, shown when the block supports `background.gradient` and `background.backgroundClip` ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
+-   `BackgroundClipControl`: New component for choosing the box a background is painted into. Rendered in the Background panel when a theme sets `settings.background.backgroundClip` ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
 
 ### Enhancements
 
