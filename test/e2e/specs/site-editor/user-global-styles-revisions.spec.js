@@ -267,13 +267,6 @@ test.describe( 'Style Revisions', () => {
 			page.getByLabel( 'Global styles revisions list' )
 		).toBeVisible();
 
-		// Leave while the revisions panel is still open, which used to strand
-		// the canvas on the revision's blocks.
-		await page
-			.getByRole( 'option', { name: /^Changes saved by / } )
-			.last()
-			.click();
-
 		// Back on the styles route in view mode the canvas is a button again,
 		// and clicking it enters the editor.
 		await admin.visitSiteEditor( { path: '/styles' } );

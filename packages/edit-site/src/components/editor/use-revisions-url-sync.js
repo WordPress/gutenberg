@@ -30,32 +30,6 @@ export default function useRevisionsURLSync( enabled, postType, postId ) {
 		useDispatch( editorStore )
 	);
 	const entityKey = postType && postId ? `${ postType }:${ postId }` : null;
-
-	// Leaving the editor with a revision open would otherwise keep the canvas
-	// showing that revision's blocks, which are rendered without change or
-	// selection handlers, so the site preview stops responding to clicks.
-	const wasEnabledRef = useRef( enabled );
-	useEffect( () => {
-		const wasEnabled = wasEnabledRef.current;
-		wasEnabledRef.current = enabled;
-		if ( enabled || ! wasEnabled || ! currentRevisionId ) {
-			return;
-		}
-		setCurrentRevisionId( null );
-		if ( location.query.revision !== undefined ) {
-			history.navigate(
-				addQueryArgs( location.path, { revision: undefined } ),
-				{ replace: true }
-			);
-		}
-	}, [
-		enabled,
-		currentRevisionId,
-		setCurrentRevisionId,
-		history,
-		location.path,
-		location.query.revision,
-	] );
 	const isCurrentEntity =
 		!! entityKey &&
 		currentPostType === postType &&
