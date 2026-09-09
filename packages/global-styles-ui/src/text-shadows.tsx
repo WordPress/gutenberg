@@ -8,7 +8,7 @@ import { NavigationButtonAsItem } from './navigation-button';
 function TextShadows() {
 	return (
 		<Stack direction="column" gap="sm">
-			<Subtitle level={ 3 }>{ __( 'Text Shadows' ) }</Subtitle>
+			<Subtitle level={ 3 }>{ __( 'Text shadows' ) }</Subtitle>
 			<ItemGroup isBordered isSeparated>
 				<NavigationButtonAsItem path="/typography/text-shadows">
 					<Stack

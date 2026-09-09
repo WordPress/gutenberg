@@ -209,7 +209,7 @@ function TextShadowEditor( { textShadow, onChange }: TextShadowEditorProps ) {
 				align="center"
 				className="global-styles-ui__text-shadow-editor__header"
 			>
-				<Subtitle level={ 3 }>{ __( 'Text Shadows' ) }</Subtitle>
+				<Subtitle level={ 3 }>{ __( 'Text shadows' ) }</Subtitle>
 				<div className="global-styles-ui__shadows-panel__options-container">
 					<Button
 						size="small"

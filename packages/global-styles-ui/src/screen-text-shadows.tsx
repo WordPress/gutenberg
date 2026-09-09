@@ -43,7 +43,7 @@ export default function ScreenTextShadows() {
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'Text Shadows' ) }
+				title={ __( 'Text shadows' ) }
 				description={ __(
 					'Manage and create text shadow styles for use across the site.'
 				) }
