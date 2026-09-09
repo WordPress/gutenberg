@@ -62,7 +62,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^24.13.3",
-		"vitest": "^4.1.11"
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
