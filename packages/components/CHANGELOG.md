@@ -31,6 +31,7 @@
 
 ### Internal
 
+-   `FormToggle`: Use the standard `inert` state instead of the `Disabled` component's class name for inherited disabled styles ([#82651](https://github.com/WordPress/gutenberg/pull/82651)).
 -   Migrate JSX files to TypeScript and remove their ESLint filename suppressions ([#82132](https://github.com/WordPress/gutenberg/pull/82132)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
