@@ -1,6 +1,6 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
-import { useInstanceId, usePrevious } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import {
 	privateApis as editorPrivateApis,
 	store as editorStore,
@@ -119,15 +119,20 @@ export default function EditSiteEditor( {
 		useDispatch( editorStore )
 	);
 
-	// The styles canvas (revisions or the style book) replaces the block
-	// editor while it is open. Leaving edit mode without closing it would
-	// leave the site preview with no block editor to click into.
-	const wasEditMode = usePrevious( isEditMode );
+	// Revisions and the style book render in place of the block editor, and
+	// belong to the styles route in edit mode. Anywhere else they would show
+	// the styles canvas where the block editor is expected: a site preview
+	// that cannot be clicked into, or the next route's content missing.
+	//
+	// Routes render their own element for this area, so navigating between
+	// them remounts this component. The check therefore runs on every render
+	// rather than on a transition, which a remount would never observe.
+	const isStylesEditing = isEditMode && location.name === 'styles';
 	useEffect( () => {
-		if ( wasEditMode && ! isEditMode ) {
+		if ( ! isStylesEditing ) {
 			resetStylesNavigation();
 		}
-	}, [ isEditMode, wasEditMode, resetStylesNavigation ] );
+	}, [ isStylesEditing, resetStylesNavigation ] );
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onActionPerformed = useCallback(
