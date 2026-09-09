@@ -67,8 +67,34 @@ runs:
               # `--update=none` needs coreutils 9.3+, so ubuntu-24.04 or newer.
               sudo cp -r --update=none "$HOME/apt-cache/." /var/cache/apt/archives/
 
+              # Playwright downloads its own browser binaries and needs only
+              # Ubuntu packages here. Temporarily hide the runner's Google
+              # Chrome source so an unrelated repository update cannot make
+              # apt reject the dependency installation.
+              google_chrome_sources=(
+                  /etc/apt/sources.list.d/google-chrome.list
+                  /etc/apt/sources.list.d/google-chrome.sources
+              )
+              restore_google_chrome_sources() {
+                  for source in "${google_chrome_sources[@]}"; do
+                      disabled_source="$RUNNER_TEMP/$(basename "$source").disabled"
+                      if [ -f "$disabled_source" ]; then
+                          sudo mv "$disabled_source" "$source"
+                      fi
+                  done
+              }
+              trap restore_google_chrome_sources EXIT
+              for source in "${google_chrome_sources[@]}"; do
+                  if [ -f "$source" ]; then
+                      sudo mv "$source" "$RUNNER_TEMP/$(basename "$source").disabled"
+                  fi
+              done
+
               # shellcheck disable=SC2086 # The browser list is intentionally split into separate arguments.
               npm exec --no --workspace "$WORKSPACE" -- playwright install $BROWSERS --with-deps
+
+              restore_google_chrome_sources
+              trap - EXIT
 
               sudo find /var/cache/apt/archives -maxdepth 1 -name '*.deb' -exec cp --update=none -t "$HOME/apt-cache" {} +
               sudo chown -R "$(id -u):$(id -g)" "$HOME/apt-cache"
