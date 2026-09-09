@@ -8,7 +8,7 @@ import { usePresets } from './presets/use-presets';
 import { useSetting } from './hooks';
 import { getNewIndexFromPresets } from './utils';
 
-export const DEFAULT_TEXT_SHADOW = '1px 1px 2px rgba(0, 0, 0, 0.3)';
+export const DEFAULT_TEXT_SHADOW = '0.05em 0.05em 0.1em rgba(0, 0, 0, 0.3)';
 
 export default function ScreenTextShadows() {
 	const [ defaultEnabled ] = useSetting< boolean >(

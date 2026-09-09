@@ -385,17 +385,17 @@ const BASE_SETTINGS = {
 					{
 						name: 'Light',
 						slug: 'light',
-						textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)',
+						textShadow: '0.05em 0.05em 0.1em rgba(0, 0, 0, 0.3)',
 					},
 					{
 						name: 'Strong',
 						slug: 'strong',
-						textShadow: '2px 2px 5px rgba(0, 0, 0, 0.5)',
+						textShadow: '0.1em 0.1em 0.25em rgba(0, 0, 0, 0.5)',
 					},
 					{
 						name: 'Outlined',
 						slug: 'outlined',
-						textShadow: '0px 0px 3px rgba(0, 0, 0, 0.8)',
+						textShadow: '0.05em 0.05em 0 rgba(0, 0, 0, 0.3)',
 					},
 				],
 			},
