@@ -332,7 +332,6 @@ describe( 'private actions', () => {
 
 		it( 'should call mediaFinalize with the attachment ID and sub-sizes', async () => {
 			const mediaFinalize = vi.fn().mockResolvedValue( undefined );
-			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: { id: 42 },
@@ -340,68 +339,65 @@ describe( 'private actions', () => {
 				} ),
 				getSettings: () => ( { mediaFinalize } ),
 			};
-			const dispatch = { finishOperation };
+			const dispatch = {};
 
 			const thunk = finalizeItem( 'test-id' );
-			await thunk( { select, dispatch } );
+			const result = await thunk( { select, dispatch } );
 
 			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
-			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+			expect( result ).toEqual( {} );
 		} );
 
 		it( 'should pass empty array when no sub-sizes accumulated', async () => {
 			const mediaFinalize = vi.fn().mockResolvedValue( undefined );
-			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: { id: 42 },
 				} ),
 				getSettings: () => ( { mediaFinalize } ),
 			};
-			const dispatch = { finishOperation };
+			const dispatch = {};
 
 			const thunk = finalizeItem( 'test-id' );
-			await thunk( { select, dispatch } );
+			const result = await thunk( { select, dispatch } );
 
 			expect( mediaFinalize ).toHaveBeenCalledWith( 42, [] );
-			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+			expect( result ).toEqual( {} );
 		} );
 
 		it( 'should not call mediaFinalize when no callback is provided', async () => {
-			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: { id: 42 },
 				} ),
 				getSettings: () => ( {} ),
 			};
-			const dispatch = { finishOperation };
+			const dispatch = {};
 
 			const thunk = finalizeItem( 'test-id' );
-			await thunk( { select, dispatch } );
+			const result = await thunk( { select, dispatch } );
 
-			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+			expect( result ).toEqual( {} );
 		} );
 
 		it( 'should not call mediaFinalize when there is no attachment ID', async () => {
 			const mediaFinalize = vi.fn();
-			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: {},
 				} ),
 				getSettings: () => ( { mediaFinalize } ),
 			};
-			const dispatch = { finishOperation };
+			const dispatch = {};
 
 			const thunk = finalizeItem( 'test-id' );
-			await thunk( { select, dispatch } );
+			const result = await thunk( { select, dispatch } );
 
 			expect( mediaFinalize ).not.toHaveBeenCalled();
-			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+			expect( result ).toEqual( {} );
 		} );
 
-		it( 'should forward the finalized attachment to finishOperation', async () => {
+		it( 'should resolve with the finalized attachment', async () => {
 			// Regression: after PR #78038, CSM uploads the original file rather
 			// than a pre-scaled copy, so the upload response carries the URL of
 			// the un-scaled original. The scaled-sideload step later updates
@@ -417,7 +413,6 @@ describe( 'private actions', () => {
 			const mediaFinalize = vi
 				.fn()
 				.mockResolvedValue( updatedAttachment );
-			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: {
@@ -428,28 +423,25 @@ describe( 'private actions', () => {
 				} ),
 				getSettings: () => ( { mediaFinalize } ),
 			};
-			const dispatch = { finishOperation };
+			const dispatch = {};
 
 			const thunk = finalizeItem( 'test-id' );
-			await thunk( { select, dispatch } );
+			const result = await thunk( { select, dispatch } );
 
 			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
-			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {
-				attachment: updatedAttachment,
-			} );
+			expect( result ).toEqual( { attachment: updatedAttachment } );
 		} );
 
-		it( 'should cancel the item when mediaFinalize fails', async () => {
+		it( 'should fail the item when mediaFinalize fails', async () => {
 			// Finalize is the server's commit point. When it fails the
 			// attachment metadata was never written, so the item must be
 			// cancelled (surfacing the error) rather than finished — which
-			// would falsely report "upload complete".
+			// would falsely report "upload complete". Throwing is how a
+			// handler cancels its item.
 			// apiFetch rejects a failed REST request with a plain object, not
 			// an Error instance, so reject with one here to mirror that.
 			const restError = { code: 'rest_error', message: 'Server error' };
 			const mediaFinalize = vi.fn().mockRejectedValue( restError );
-			const finishOperation = vi.fn();
-			const cancelItem = vi.fn();
 			const warnSpy = vi
 				.spyOn( console, 'warn' )
 				.mockImplementation( () => {} );
@@ -464,38 +456,34 @@ describe( 'private actions', () => {
 				} ),
 				getSettings: () => ( { mediaFinalize } ),
 			};
-			const dispatch = { finishOperation, cancelItem };
+			const dispatch = {};
 
 			const thunk = finalizeItem( 'test-id' );
-			await thunk( { select, dispatch } );
+			await expect( thunk( { select, dispatch } ) ).rejects.toMatchObject(
+				{
+					code: ErrorCode.MEDIA_FINALIZE_ERROR,
+					file,
+				}
+			);
 
 			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
 			expect( warnSpy ).toHaveBeenCalledWith(
 				'Media finalization failed:',
 				restError
 			);
-			expect( finishOperation ).not.toHaveBeenCalled();
-			expect( cancelItem ).toHaveBeenCalledWith(
-				'test-id',
-				expect.objectContaining( {
-					code: ErrorCode.MEDIA_FINALIZE_ERROR,
-					file,
-				} )
-			);
 			warnSpy.mockRestore();
 		} );
 
 		it( 'should return early when item is not found', async () => {
-			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => undefined,
 			};
-			const dispatch = { finishOperation };
+			const dispatch = {};
 
 			const thunk = finalizeItem( 'test-id' );
-			await thunk( { select, dispatch } );
+			const result = await thunk( { select, dispatch } );
 
-			expect( finishOperation ).not.toHaveBeenCalled();
+			expect( result ).toBeUndefined();
 		} );
 	} );
 
@@ -534,18 +522,17 @@ describe( 'private actions', () => {
 					dispatchedOperations = action.operations;
 				}
 			};
-			dispatch.cancelItem = vi.fn();
-			dispatch.finishOperation = vi.fn();
-
 			const select = {
 				getItem: () => item,
 				getSettings: () => ( {} ),
+				getOperations: () => [],
+				getOperation: () => ( {} ),
 			};
 
 			const thunk = prepareItem( 'gif-id' );
-			await thunk( { select, dispatch } );
+			const updates = await thunk( { select, dispatch } );
 
-			return { operations: dispatchedOperations, dispatch, item };
+			return { operations: dispatchedOperations, item, updates };
 		}
 
 		beforeEach( () => {
@@ -568,7 +555,7 @@ describe( 'private actions', () => {
 			// prepareItem itself never enqueues TranscodeGif as the
 			// first op — that happens inside the sideload's own
 			// operations list.
-			const { operations, dispatch, item } = await runPrepareItem();
+			const { operations, item, updates } = await runPrepareItem();
 
 			expect( flattenOperations( operations ) ).toEqual( [
 				OperationType.Upload,
@@ -578,7 +565,7 @@ describe( 'private actions', () => {
 			expect( flattenOperations( operations ) ).not.toContain(
 				OperationType.TranscodeGif
 			);
-			expect( dispatch.finishOperation ).toHaveBeenCalledWith( 'gif-id', {
+			expect( updates ).toEqual( {
 				animatedGifFile: item.file,
 			} );
 		} );
@@ -586,13 +573,12 @@ describe( 'private actions', () => {
 		it( 'does not stash animatedGifFile when WebCodecs is unavailable', async () => {
 			delete global.ImageDecoder;
 
-			const { operations, dispatch } = await runPrepareItem();
+			const { operations, updates } = await runPrepareItem();
 
 			expect( flattenOperations( operations || [] ) ).not.toContain(
 				OperationType.TranscodeGif
 			);
-			expect( dispatch.finishOperation ).not.toHaveBeenCalledWith(
-				'gif-id',
+			expect( updates ).not.toEqual(
 				expect.objectContaining( {
 					animatedGifFile: expect.anything(),
 				} )
@@ -604,11 +590,10 @@ describe( 'private actions', () => {
 			// GIF must stay a GIF.
 			vipsHasTransparency.mockResolvedValue( true );
 
-			const { dispatch } = await runPrepareItem();
+			const { updates } = await runPrepareItem();
 
 			expect( vipsHasTransparency ).toHaveBeenCalled();
-			expect( dispatch.finishOperation ).not.toHaveBeenCalledWith(
-				'gif-id',
+			expect( updates ).not.toEqual(
 				expect.objectContaining( {
 					animatedGifFile: expect.anything(),
 				} )
@@ -620,11 +605,10 @@ describe( 'private actions', () => {
 				new Error( 'vips unavailable' )
 			);
 
-			const { dispatch } = await runPrepareItem();
+			const { updates } = await runPrepareItem();
 
 			// Errs on the side of caution: no lossy conversion is attempted.
-			expect( dispatch.finishOperation ).not.toHaveBeenCalledWith(
-				'gif-id',
+			expect( updates ).not.toEqual(
 				expect.objectContaining( {
 					animatedGifFile: expect.anything(),
 				} )
@@ -653,12 +637,11 @@ describe( 'private actions', () => {
 					dispatchedOperations = action.operations;
 				}
 			};
-			dispatch.cancelItem = vi.fn();
-			dispatch.finishOperation = vi.fn();
-
 			const select = {
 				getItem: () => item,
 				getSettings: () => ( {} ),
+				getOperations: () => [],
+				getOperation: () => ( {} ),
 			};
 
 			const thunk = prepareItem( 'gif-static-id' );
@@ -692,13 +675,12 @@ describe( 'private actions', () => {
 					dispatchedOperations = action.operations;
 				}
 			};
-			dispatch.cancelItem = vi.fn();
-			dispatch.finishOperation = vi.fn();
-
 			const select = {
 				getItem: () => item,
 				// gifConvert:false opts out of the animated-GIF conversion path.
 				getSettings: () => ( { gifConvert: false } ),
+				getOperations: () => [],
+				getOperation: () => ( {} ),
 			};
 
 			const thunk = prepareItem( 'gif-optout-id' );
@@ -718,8 +700,6 @@ describe( 'private actions', () => {
 
 		function buildArgs() {
 			const dispatch = Object.assign( vi.fn(), {
-				finishOperation: vi.fn(),
-				cancelItem: vi.fn(),
 				addSideloadItem: vi.fn(),
 			} );
 			const select = {
@@ -752,14 +732,16 @@ describe( 'private actions', () => {
 			consoleDebug.mockRestore();
 		} );
 
-		it( 'hands the transcoded video to the next Upload via finishOperation', async () => {
+		it( 'hands the transcoded video to the next Upload as the item file', async () => {
 			const videoFile = new File( [ 'mp4' ], 'animation.mp4', {
 				type: 'video/mp4',
 			} );
 			convertGifToVideo.mockResolvedValue( videoFile );
 			const { select, dispatch } = buildArgs();
 
-			await transcodeGifItem( 'gif-1', { outputFormat: 'mp4' } )( {
+			const result = await transcodeGifItem( 'gif-1', {
+				outputFormat: 'mp4',
+			} )( {
 				select,
 				dispatch,
 			} );
@@ -776,10 +758,7 @@ describe( 'private actions', () => {
 			expect( dispatch ).not.toHaveBeenCalledWith(
 				expect.objectContaining( { type: Type.CacheBlobUrl } )
 			);
-			expect( dispatch.finishOperation ).toHaveBeenCalledWith( 'gif-1', {
-				file: videoFile,
-			} );
-			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+			expect( result ).toEqual( { file: videoFile } );
 		} );
 
 		it( 'sideloads the first-frame poster as a sibling once the video succeeds', async () => {
@@ -796,8 +775,8 @@ describe( 'private actions', () => {
 			expect( dispatch.addSideloadItem ).toHaveBeenCalledTimes( 1 );
 			const poster = dispatch.addSideloadItem.mock.calls[ 0 ][ 0 ];
 			/*
-			 * Built from the original GIF (captured before finishOperation
-			 * swaps in the video) and parented to the GIF attachment.
+			 * Built from the original GIF (captured before the video is
+			 * swapped in) and parented to the GIF attachment.
 			 */
 			expect( poster.file ).toBe( gifFile );
 			expect( poster.parentId ).toBe( 'parent-1' );
@@ -865,14 +844,10 @@ describe( 'private actions', () => {
 			);
 			const { select, dispatch } = buildArgs();
 
-			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+			await expect(
+				transcodeGifItem( 'gif-1' )( { select, dispatch } )
+			).rejects.toMatchObject( { silent: true } );
 
-			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
-			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
-			const [ cancelledId, , silent ] =
-				dispatch.cancelItem.mock.calls[ 0 ];
-			expect( cancelledId ).toBe( 'gif-1' );
-			expect( silent ).toBe( true );
 			expect( consoleError ).not.toHaveBeenCalled();
 			// No video means no poster: the sideload is never queued.
 			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
@@ -890,14 +865,10 @@ describe( 'private actions', () => {
 			);
 			const { select, dispatch } = buildArgs();
 
-			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+			await expect(
+				transcodeGifItem( 'gif-1' )( { select, dispatch } )
+			).rejects.toMatchObject( { silent: true } );
 
-			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
-			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
-			const [ cancelledId, , silent ] =
-				dispatch.cancelItem.mock.calls[ 0 ];
-			expect( cancelledId ).toBe( 'gif-1' );
-			expect( silent ).toBe( true );
 			expect( consoleDebug ).toHaveBeenCalledWith(
 				expect.stringContaining( 'exceeds maximum conversion size' )
 			);
@@ -914,15 +885,13 @@ describe( 'private actions', () => {
 			);
 			const { select, dispatch } = buildArgs();
 
-			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+			await expect(
+				transcodeGifItem( 'gif-1' )( { select, dispatch } )
+			).rejects.toMatchObject( {
+				message: expect.stringMatching( /timed out/i ),
+				silent: true,
+			} );
 
-			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
-			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
-			const [ cancelledId, error, silent ] =
-				dispatch.cancelItem.mock.calls[ 0 ];
-			expect( cancelledId ).toBe( 'gif-1' );
-			expect( error.message ).toMatch( /timed out/i );
-			expect( silent ).toBe( true );
 			expect( consoleDebug ).toHaveBeenCalledWith(
 				expect.stringContaining( 'timed out' )
 			);
@@ -938,16 +907,14 @@ describe( 'private actions', () => {
 			convertGifToVideo.mockRejectedValue( cause );
 			const { select, dispatch } = buildArgs();
 
-			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+			await expect(
+				transcodeGifItem( 'gif-1' )( { select, dispatch } )
+			).rejects.toMatchObject( {
+				code: 'GIF_TRANSCODING_ERROR',
+				cause,
+				silent: true,
+			} );
 
-			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
-			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
-			const [ cancelledId, error, silent ] =
-				dispatch.cancelItem.mock.calls[ 0 ];
-			expect( cancelledId ).toBe( 'gif-1' );
-			expect( error.code ).toBe( 'GIF_TRANSCODING_ERROR' );
-			expect( error.cause ).toBe( cause );
-			expect( silent ).toBe( true );
 			expect( consoleError ).toHaveBeenCalled();
 			// No video means no poster: the sideload is never queued.
 			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
@@ -957,18 +924,19 @@ describe( 'private actions', () => {
 			const { dispatch } = buildArgs();
 			const select = { getItem: vi.fn( () => undefined ) };
 
-			await transcodeGifItem( 'missing' )( { select, dispatch } );
+			const result = await transcodeGifItem( 'missing' )( {
+				select,
+				dispatch,
+			} );
 
 			expect( convertGifToVideo ).not.toHaveBeenCalled();
-			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
-			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+			expect( result ).toBeUndefined();
 		} );
 	} );
 
 	describe( 'generateThumbnails (animated GIF video sideload)', () => {
 		function runGenerate( { item, settings } ) {
 			const dispatchFn = vi.fn();
-			dispatchFn.finishOperation = vi.fn();
 			dispatchFn.addSideloadItem = vi.fn();
 			const select = {
 				getItem: () => item,
@@ -1075,64 +1043,60 @@ describe( 'private actions', () => {
 			vi.clearAllMocks();
 		} );
 
-		it( 'probes the file and finishes the operation when UltraHDR', async () => {
+		it( 'probes the file and resolves when UltraHDR', async () => {
 			vipsGetUltraHdrInfo.mockResolvedValue( {
 				width: 1024,
 				height: 768,
 				hdrCapacity: 3,
 			} );
-			const finishOperation = vi.fn();
 			const item = makeItem();
 			const select = { getItem: () => item };
-			const dispatch = { finishOperation };
+			const dispatch = {};
 
 			const thunk = detectUltraHdr( 'test-id' );
-			await thunk( { select, dispatch } );
+			const result = await thunk( { select, dispatch } );
 
 			// The thunk only probes and tracks the item (tracking is verified
 			// via the generateThumbnails routing tests); the upload itself is
-			// untouched, so it finishes with no attachment updates.
+			// untouched, so it resolves with no attachment updates.
 			expect( vipsGetUltraHdrInfo ).toHaveBeenCalledTimes( 1 );
-			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+			expect( result ).toEqual( {} );
 		} );
 
-		it( 'finishes cleanly when buffer is not UltraHDR', async () => {
+		it( 'resolves cleanly when buffer is not UltraHDR', async () => {
 			vipsGetUltraHdrInfo.mockResolvedValue( null );
-			const finishOperation = vi.fn();
 			const select = { getItem: () => makeItem() };
-			const dispatch = { finishOperation };
+			const dispatch = {};
 
 			const thunk = detectUltraHdr( 'test-id' );
-			await thunk( { select, dispatch } );
+			const result = await thunk( { select, dispatch } );
 
-			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+			expect( result ).toEqual( {} );
 		} );
 
 		it( 'falls through gracefully when probe throws', async () => {
 			vipsGetUltraHdrInfo.mockRejectedValue(
 				new Error( 'wasm module unavailable' )
 			);
-			const finishOperation = vi.fn();
 			const select = { getItem: () => makeItem() };
-			const dispatch = { finishOperation };
+			const dispatch = {};
 
 			const thunk = detectUltraHdr( 'test-id' );
-			await thunk( { select, dispatch } );
+			const result = await thunk( { select, dispatch } );
 
 			// Probe failure must not cancel the upload — pass-through finish.
-			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+			expect( result ).toEqual( {} );
 		} );
 
 		it( 'returns early when item is not found', async () => {
-			const finishOperation = vi.fn();
 			const select = { getItem: () => undefined };
-			const dispatch = { finishOperation };
+			const dispatch = {};
 
 			const thunk = detectUltraHdr( 'missing' );
-			await thunk( { select, dispatch } );
+			const result = await thunk( { select, dispatch } );
 
 			expect( vipsGetUltraHdrInfo ).not.toHaveBeenCalled();
-			expect( finishOperation ).not.toHaveBeenCalled();
+			expect( result ).toBeUndefined();
 		} );
 	} );
 
@@ -1164,10 +1128,8 @@ describe( 'private actions', () => {
 
 		const makeHarness = ( item, settings = {} ) => {
 			const addSideloadItem = vi.fn();
-			const finishOperation = vi.fn();
 			const dispatch = {
 				addSideloadItem,
-				finishOperation,
 				addItem: vi.fn(),
 			};
 			const select = {
@@ -1194,7 +1156,7 @@ describe( 'private actions', () => {
 			vipsGetUltraHdrInfo.mockResolvedValue( ULTRAHDR_INFO );
 			await detectUltraHdr( item.id )( {
 				select: { getItem: () => item },
-				dispatch: { finishOperation: vi.fn() },
+				dispatch: {},
 			} );
 		};
 
@@ -1343,7 +1305,6 @@ describe( 'private actions', () => {
 			const addSideloadItem = vi.fn();
 			const dispatch = {
 				addSideloadItem,
-				finishOperation: vi.fn(),
 				addItem: vi.fn(),
 			};
 			const select = {
@@ -1516,16 +1477,14 @@ describe( 'private actions', () => {
 			} );
 			const item = { id: 'item-1', file, additionalData: {} };
 
-			const dispatch = vi.fn();
-			dispatch.finishOperation = vi.fn();
-			dispatch.cancelItem = vi.fn();
-
-			await uploadItem( 'item-1' )( {
+			// The thunk settles only once the transport calls back, which this
+			// stub never does; the transport call itself happens synchronously.
+			void uploadItem( 'item-1' )( {
 				select: {
 					getItem: () => item,
 					getSettings: () => ( { mediaUpload } ),
 				},
-				dispatch,
+				dispatch: vi.fn(),
 			} );
 
 			expect( mediaUpload ).toHaveBeenCalledWith(

@@ -22,6 +22,9 @@ export enum ErrorCode {
 	// server failed to finalize the attachment (write its metadata).
 	MEDIA_FINALIZE_ERROR = 'MEDIA_FINALIZE_ERROR',
 
+	// An item's pipeline names an operation that is not registered.
+	UNKNOWN_OPERATION = 'UNKNOWN_OPERATION',
+
 	// Generic fallback
 	GENERAL = 'GENERAL',
 }
@@ -31,6 +34,13 @@ interface UploadErrorArgs {
 	message: string;
 	file: File;
 	cause?: Error;
+	/**
+	 * Whether cancelling the item because of this error should skip its
+	 * `onError` callback. For outcomes that are not failures from the
+	 * user's point of view, like an optional companion file that could
+	 * not be produced.
+	 */
+	silent?: boolean;
 }
 
 /**
@@ -42,13 +52,15 @@ interface UploadErrorArgs {
 export class UploadError extends Error {
 	code: ErrorCode | string;
 	file: File;
+	silent: boolean;
 
-	constructor( { code, message, file, cause }: UploadErrorArgs ) {
+	constructor( { code, message, file, cause, silent }: UploadErrorArgs ) {
 		super( message, { cause } );
 
 		Object.setPrototypeOf( this, new.target.prototype );
 
 		this.code = code;
 		this.file = file;
+		this.silent = silent ?? false;
 	}
 }

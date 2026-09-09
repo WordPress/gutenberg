@@ -7,23 +7,59 @@ import {
 	isUploadingByUrl,
 } from '../selectors';
 import {
-	getActiveUploadCount,
+	getActiveCountByPool,
+	getConcurrencyPoolLimit,
 	getFailureCount,
-	getActiveImageProcessingCount,
-	getActiveVideoProcessingCount,
 	getFailedItems,
 	getItemProgress,
-	getPendingUploads,
-	getPendingImageProcessing,
-	getPendingVideoProcessing,
+	getOperation,
+	getOperations,
+	getPendingItemsByPool,
 	hasPendingItemsByParentId,
 } from '../private-selectors';
 import {
 	ItemStatus,
 	OperationType,
+	type OperationDefinition,
 	type QueueItem,
 	type State,
 } from '../types';
+import {
+	CORE_OPERATIONS,
+	IMAGE_PROCESSING_POOL,
+	UPLOAD_POOL,
+	VIDEO_PROCESSING_POOL,
+} from '../operations';
+
+/**
+ * Builds a state with the core operations registered.
+ *
+ * @param queue      Queue items.
+ * @param operations Extra operations to register.
+ * @return State.
+ */
+function createState(
+	queue: Partial< QueueItem >[],
+	operations: OperationDefinition[] = []
+): State {
+	return {
+		queue: queue as QueueItem[],
+		queueStatus: 'active',
+		failureCount: 0,
+		blobUrls: {},
+		operations: Object.fromEntries(
+			[ ...CORE_OPERATIONS, ...operations ].map( ( operation ) => [
+				operation.name,
+				operation,
+			] )
+		),
+		settings: {
+			mediaUpload: vi.fn(),
+			maxConcurrentUploads: 5,
+			maxConcurrentImageProcessing: 2,
+		},
+	};
+}
 
 describe( 'selectors', () => {
 	describe( 'getFailureCount', () => {
@@ -33,6 +69,7 @@ describe( 'selectors', () => {
 				queueStatus: 'active',
 				failureCount: 3,
 				blobUrls: {},
+				operations: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -51,6 +88,7 @@ describe( 'selectors', () => {
 				queueStatus: 'paused',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -79,6 +117,7 @@ describe( 'selectors', () => {
 				queueStatus: 'paused',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -107,6 +146,7 @@ describe( 'selectors', () => {
 				queueStatus: 'paused',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -137,6 +177,7 @@ describe( 'selectors', () => {
 				queueStatus: 'paused',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -149,217 +190,276 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getActiveUploadCount', () => {
-		it( 'should return the count of items currently uploading', () => {
-			const state: State = {
-				queue: [
-					{
-						id: '1',
-						status: ItemStatus.Processing,
-						currentOperation: OperationType.Upload,
-					},
-					{
-						id: '2',
-						status: ItemStatus.Processing,
-						currentOperation: OperationType.Prepare,
-					},
-					{
-						id: '3',
-						status: ItemStatus.Processing,
-						currentOperation: OperationType.Upload,
-					},
-				] as QueueItem[],
-				queueStatus: 'active',
-				failureCount: 0,
-				blobUrls: {},
-				settings: {
-					mediaUpload: vi.fn(),
-					maxConcurrentUploads: 5,
-					maxConcurrentImageProcessing: 2,
-				},
+	describe( 'getOperations', () => {
+		it( 'returns the registered operations in registration order', () => {
+			const custom: OperationDefinition = {
+				name: 'my-plugin/ocr',
+				label: 'Reading text',
+				handler: () => {},
 			};
+			const state = createState( [], [ custom ] );
 
-			expect( getActiveUploadCount( state ) ).toBe( 2 );
+			const names = getOperations( state ).map( ( op ) => op.name );
+			expect( names ).toEqual( [
+				...CORE_OPERATIONS.map( ( op ) => op.name ),
+				'my-plugin/ocr',
+			] );
 		} );
 	} );
 
-	describe( 'getActiveImageProcessingCount', () => {
-		it( 'should return the count of items currently doing image processing', () => {
-			const state: State = {
-				queue: [
-					{
-						id: '1',
-						status: ItemStatus.Processing,
-						currentOperation: OperationType.ResizeCrop,
-					},
-					{
-						id: '2',
-						status: ItemStatus.Processing,
-						currentOperation: OperationType.Upload,
-					},
-					{
-						id: '3',
-						status: ItemStatus.Processing,
-						currentOperation: OperationType.Rotate,
-					},
-					{
-						id: '4',
-						status: ItemStatus.Processing,
-						currentOperation: OperationType.Prepare,
-					},
-				] as QueueItem[],
-				queueStatus: 'active',
-				failureCount: 0,
-				blobUrls: {},
-				settings: {
-					mediaUpload: vi.fn(),
-					maxConcurrentUploads: 5,
-					maxConcurrentImageProcessing: 2,
-				},
-			};
+	describe( 'getOperation', () => {
+		it( 'returns a registered operation by name', () => {
+			const state = createState( [] );
 
-			expect( getActiveImageProcessingCount( state ) ).toBe( 2 );
-		} );
-
-		it( 'should return 0 when no image processing is active', () => {
-			const state: State = {
-				queue: [
-					{
-						id: '1',
-						status: ItemStatus.Processing,
-						currentOperation: OperationType.Upload,
-					},
-				] as QueueItem[],
-				queueStatus: 'active',
-				failureCount: 0,
-				blobUrls: {},
-				settings: {
-					mediaUpload: vi.fn(),
-					maxConcurrentUploads: 5,
-					maxConcurrentImageProcessing: 2,
-				},
-			};
-
-			expect( getActiveImageProcessingCount( state ) ).toBe( 0 );
+			expect( getOperation( state, OperationType.Upload )?.name ).toBe(
+				OperationType.Upload
+			);
+			expect(
+				getOperation( state, 'my-plugin/missing' )
+			).toBeUndefined();
 		} );
 	} );
 
-	describe( 'getPendingUploads', () => {
-		it( 'should return items waiting for upload', () => {
-			const state: State = {
-				queue: [
-					{
-						id: '1',
-						status: ItemStatus.Processing,
-						operations: [ OperationType.Upload ],
-						currentOperation: undefined,
-					},
-					{
-						id: '2',
-						status: ItemStatus.Processing,
-						operations: [ OperationType.Upload ],
-						currentOperation: OperationType.Upload,
-					},
-				] as QueueItem[],
-				queueStatus: 'active',
-				failureCount: 0,
-				blobUrls: {},
-				settings: {
-					mediaUpload: vi.fn(),
-					maxConcurrentUploads: 5,
-					maxConcurrentImageProcessing: 2,
-				},
-			};
+	describe( 'getConcurrencyPoolLimit', () => {
+		it( 'derives the upload and image pools from settings', () => {
+			const state = createState( [] );
 
-			const pending = getPendingUploads( state );
-			expect( pending ).toHaveLength( 1 );
-			expect( pending[ 0 ].id ).toBe( '1' );
+			expect( getConcurrencyPoolLimit( state, UPLOAD_POOL ) ).toBe( 5 );
+			expect(
+				getConcurrencyPoolLimit( state, IMAGE_PROCESSING_POOL )
+			).toBe( 2 );
+		} );
+
+		it( 'limits video processing to one item at a time', () => {
+			const state = createState( [] );
+
+			expect(
+				getConcurrencyPoolLimit( state, VIDEO_PROCESSING_POOL )
+			).toBe( 1 );
+		} );
+
+		it( 'uses the limit declared by an operation for its own pool', () => {
+			const state = createState(
+				[],
+				[
+					{
+						name: 'my-plugin/ocr',
+						label: 'Reading text',
+						handler: () => {},
+						concurrency: { pool: 'ocr', limit: 3 },
+					},
+				]
+			);
+
+			expect( getConcurrencyPoolLimit( state, 'ocr' ) ).toBe( 3 );
+		} );
+
+		it( 'does not limit a pool nothing declares a limit for', () => {
+			const state = createState( [] );
+
+			expect( getConcurrencyPoolLimit( state, 'unknown' ) ).toBe(
+				Infinity
+			);
 		} );
 	} );
 
-	describe( 'getPendingImageProcessing', () => {
-		it( 'should return items waiting for image processing', () => {
-			const state: State = {
-				queue: [
-					{
-						id: '1',
-						status: ItemStatus.Processing,
-						operations: [
-							[
-								OperationType.ResizeCrop,
-								{
-									resize: {
-										width: 150,
-										height: 150,
-									},
-								},
-							],
-						],
-						currentOperation: undefined,
-					},
-					{
-						id: '2',
-						status: ItemStatus.Processing,
-						operations: [
-							[
-								OperationType.ResizeCrop,
-								{
-									resize: {
-										width: 300,
-										height: 300,
-									},
-								},
-							],
-						],
-						currentOperation: OperationType.ResizeCrop,
-					},
-					{
-						id: '3',
-						status: ItemStatus.Processing,
-						operations: [ OperationType.Upload ],
-						currentOperation: undefined,
-					},
-				] as QueueItem[],
-				queueStatus: 'active',
-				failureCount: 0,
-				blobUrls: {},
-				settings: {
-					mediaUpload: vi.fn(),
-					maxConcurrentUploads: 5,
-					maxConcurrentImageProcessing: 2,
+	describe( 'getActiveCountByPool', () => {
+		it( 'counts items whose current operation belongs to the pool', () => {
+			const state = createState( [
+				{
+					id: '1',
+					status: ItemStatus.Processing,
+					currentOperation: OperationType.Upload,
 				},
-			};
+				{
+					id: '2',
+					status: ItemStatus.Processing,
+					currentOperation: OperationType.Prepare,
+				},
+				{
+					id: '3',
+					status: ItemStatus.Processing,
+					currentOperation: OperationType.Upload,
+				},
+			] );
 
-			const pending = getPendingImageProcessing( state );
+			expect( getActiveCountByPool( state, UPLOAD_POOL ) ).toBe( 2 );
+		} );
+
+		it( 'counts every operation sharing the pool', () => {
+			const state = createState( [
+				{
+					id: '1',
+					status: ItemStatus.Processing,
+					currentOperation: OperationType.ResizeCrop,
+				},
+				{
+					id: '2',
+					status: ItemStatus.Processing,
+					currentOperation: OperationType.Upload,
+				},
+				{
+					id: '3',
+					status: ItemStatus.Processing,
+					currentOperation: OperationType.Rotate,
+				},
+				{
+					id: '4',
+					status: ItemStatus.Processing,
+					currentOperation: OperationType.Prepare,
+				},
+			] );
+
+			expect( getActiveCountByPool( state, IMAGE_PROCESSING_POOL ) ).toBe(
+				2
+			);
+		} );
+
+		it( 'returns 0 when nothing in the pool is active', () => {
+			const state = createState( [
+				{
+					id: '1',
+					status: ItemStatus.Processing,
+					currentOperation: OperationType.Upload,
+				},
+			] );
+
+			expect( getActiveCountByPool( state, IMAGE_PROCESSING_POOL ) ).toBe(
+				0
+			);
+		} );
+
+		it( 'counts items transcoding a GIF towards the video pool', () => {
+			const state = createState( [
+				{ currentOperation: OperationType.TranscodeGif },
+				{ currentOperation: OperationType.Upload },
+				{ currentOperation: OperationType.TranscodeGif },
+			] );
+
+			expect( getActiveCountByPool( state, VIDEO_PROCESSING_POOL ) ).toBe(
+				2
+			);
+		} );
+	} );
+
+	describe( 'getPendingItemsByPool', () => {
+		it( 'returns items whose next operation is in the pool but not started', () => {
+			const state = createState( [
+				{
+					id: '1',
+					status: ItemStatus.Processing,
+					operations: [ OperationType.Upload ],
+					currentOperation: undefined,
+				},
+				{
+					id: '2',
+					status: ItemStatus.Processing,
+					operations: [ OperationType.Upload ],
+					currentOperation: OperationType.Upload,
+				},
+			] );
+
+			const pending = getPendingItemsByPool( state, UPLOAD_POOL );
 			expect( pending ).toHaveLength( 1 );
 			expect( pending[ 0 ].id ).toBe( '1' );
 		} );
 
-		it( 'should include items pending Rotate operations', () => {
-			const state: State = {
-				queue: [
-					{
-						id: '1',
-						status: ItemStatus.Processing,
-						operations: [
-							[ OperationType.Rotate, { orientation: 6 } ],
+		it( 'matches operations carrying arguments', () => {
+			const state = createState( [
+				{
+					id: '1',
+					status: ItemStatus.Processing,
+					operations: [
+						[
+							OperationType.ResizeCrop,
+							{ resize: { width: 150, height: 150 } },
 						],
-						currentOperation: undefined,
-					},
-				] as QueueItem[],
-				queueStatus: 'active',
-				failureCount: 0,
-				blobUrls: {},
-				settings: {
-					mediaUpload: vi.fn(),
-					maxConcurrentUploads: 5,
-					maxConcurrentImageProcessing: 2,
+					],
+					currentOperation: undefined,
 				},
-			};
+				{
+					id: '2',
+					status: ItemStatus.Processing,
+					operations: [
+						[
+							OperationType.ResizeCrop,
+							{ resize: { width: 300, height: 300 } },
+						],
+					],
+					currentOperation: OperationType.ResizeCrop,
+				},
+				{
+					id: '3',
+					status: ItemStatus.Processing,
+					operations: [ OperationType.Upload ],
+					currentOperation: undefined,
+				},
+			] );
 
-			const pending = getPendingImageProcessing( state );
+			const pending = getPendingItemsByPool(
+				state,
+				IMAGE_PROCESSING_POOL
+			);
 			expect( pending ).toHaveLength( 1 );
 			expect( pending[ 0 ].id ).toBe( '1' );
+		} );
+
+		it( 'includes every operation sharing the pool', () => {
+			const state = createState( [
+				{
+					id: '1',
+					status: ItemStatus.Processing,
+					operations: [
+						[ OperationType.Rotate, { orientation: 6 } ],
+					],
+					currentOperation: undefined,
+				},
+				{
+					id: '2',
+					status: ItemStatus.Processing,
+					operations: [
+						[
+							OperationType.ResizeCrop,
+							{ resize: { width: 150, height: 150 } },
+						],
+					],
+					currentOperation: undefined,
+				},
+			] );
+
+			const pending = getPendingItemsByPool(
+				state,
+				IMAGE_PROCESSING_POOL
+			);
+			expect( pending.map( ( item ) => item.id ) ).toEqual( [
+				'1',
+				'2',
+			] );
+		} );
+
+		it( 'returns items whose next operation is a GIF transcode', () => {
+			const state = createState( [
+				{
+					operations: [ OperationType.TranscodeGif ],
+					currentOperation: undefined,
+				},
+				{
+					operations: [ OperationType.Upload ],
+					currentOperation: undefined,
+				},
+			] );
+
+			expect(
+				getPendingItemsByPool( state, VIDEO_PROCESSING_POOL )
+			).toHaveLength( 1 );
+		} );
+
+		it( 'ignores items with nothing left to do', () => {
+			const state = createState( [
+				{ id: '1', operations: [], currentOperation: undefined },
+			] );
+
+			expect( getPendingItemsByPool( state, UPLOAD_POOL ) ).toEqual( [] );
 		} );
 	} );
 
@@ -385,6 +485,7 @@ describe( 'selectors', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -417,6 +518,7 @@ describe( 'selectors', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -444,35 +546,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'video processing selectors', () => {
-		it( 'getActiveVideoProcessingCount counts items transcoding a GIF', () => {
-			const state = {
-				queue: [
-					{ currentOperation: OperationType.TranscodeGif },
-					{ currentOperation: OperationType.Upload },
-					{ currentOperation: OperationType.TranscodeGif },
-				],
-			} as never;
-			expect( getActiveVideoProcessingCount( state ) ).toBe( 2 );
-		} );
-
-		it( 'getPendingVideoProcessing returns items whose next op is TranscodeGif', () => {
-			const state = {
-				queue: [
-					{
-						operations: [ OperationType.TranscodeGif ],
-						currentOperation: undefined,
-					},
-					{
-						operations: [ OperationType.Upload ],
-						currentOperation: undefined,
-					},
-				],
-			} as never;
-			expect( getPendingVideoProcessing( state ) ).toHaveLength( 1 );
-		} );
-	} );
-
 	describe( 'hasPendingItemsByParentId', () => {
 		it( 'should return true if there are items with matching parent ID', () => {
 			const state: State = {
@@ -490,6 +563,7 @@ describe( 'selectors', () => {
 				queueStatus: 'paused',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -516,6 +590,7 @@ describe( 'selectors', () => {
 				queueStatus: 'paused',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
