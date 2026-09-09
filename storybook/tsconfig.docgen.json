@@ -7,5 +7,14 @@
 		"rootDir": ".."
 	},
 	"references": [],
-	"include": [ "**/*.ts", "**/*.tsx", "../packages/*/src/**/*" ]
+	"include": [ "**/*.ts", "**/*.tsx", "../packages/*/src/**/*" ],
+	// Override the base exclusions to admit stories without also admitting tests.
+	"exclude": [
+		"../**/benchmark",
+		"../packages/*/build-*/**",
+		"../packages/*/build/**",
+		"../**/test/**",
+		"../**/tests/**",
+		"../**/__tests__/**"
+	]
 }
