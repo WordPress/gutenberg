@@ -481,3 +481,148 @@ describe( 'normalizing args', () => {
 		] );
 	} );
 } );
+
+describe( 'resolution args', () => {
+	// A store whose selector takes an extra leading argument the resolver does
+	// not need, so calls differing only in it share one resolver run.
+	function registerStore( registry, { fulfill } ) {
+		registry.registerStore( 'store', {
+			reducer: ( state = {}, action ) =>
+				action.type === 'RECEIVE' ? action.items : state,
+			selectors: {
+				getItem: ( state, field, id ) => state[ id ]?.[ field ],
+			},
+			actions: {
+				receive: ( items ) => ( { type: 'RECEIVE', items } ),
+			},
+			resolvers: {
+				getItem: {
+					getResolutionArgs: ( field, id ) => [ id ],
+					fulfill,
+				},
+			},
+		} );
+	}
+
+	it( 'should run the resolver once for selector calls that share resolution args', async () => {
+		const registry = createRegistry();
+		const fulfill = vi.fn(
+			( id ) =>
+				( { dispatch } ) =>
+					dispatch.receive( { [ id ]: { a: 1, b: 2 } } )
+		);
+		registerStore( registry, { fulfill } );
+
+		registry.select( 'store' ).getItem( 'a', 7 );
+		registry.select( 'store' ).getItem( 'b', 7 );
+
+		await new Promise( ( done ) => setTimeout( done, 0 ) );
+
+		expect( fulfill ).toHaveBeenCalledTimes( 1 );
+		expect( fulfill ).toHaveBeenCalledWith( 7 );
+	} );
+
+	it( 'should run the resolver again for different resolution args', async () => {
+		const registry = createRegistry();
+		const fulfill = vi.fn( () => () => {} );
+		registerStore( registry, { fulfill } );
+
+		registry.select( 'store' ).getItem( 'a', 7 );
+		registry.select( 'store' ).getItem( 'a', 8 );
+
+		await new Promise( ( done ) => setTimeout( done, 0 ) );
+
+		expect( fulfill ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'should resolve each selector call with its own value', async () => {
+		const registry = createRegistry();
+		registerStore( registry, {
+			fulfill:
+				( id ) =>
+				( { dispatch } ) =>
+					dispatch.receive( { [ id ]: { a: 'A', b: 'B' } } ),
+		} );
+
+		const resolve = registry.resolveSelect( 'store' );
+		const [ a, b ] = await Promise.all( [
+			resolve.getItem( 'a', 7 ),
+			resolve.getItem( 'b', 7 ),
+		] );
+
+		expect( a ).toBe( 'A' );
+		expect( b ).toBe( 'B' );
+	} );
+
+	it( 'should share the resolution state across selector calls', async () => {
+		const registry = createRegistry();
+		registerStore( registry, { fulfill: () => () => {} } );
+
+		await registry.resolveSelect( 'store' ).getItem( 'a', 7 );
+
+		const { hasFinishedResolution } = registry.select( 'store' );
+		expect( hasFinishedResolution( 'getItem', [ 'a', 7 ] ) ).toBe( true );
+		expect( hasFinishedResolution( 'getItem', [ 'b', 7 ] ) ).toBe( true );
+		expect( hasFinishedResolution( 'getItem', [ 'a', 8 ] ) ).toBe( false );
+	} );
+
+	it( 'should suspend both selector calls on one resolution', async () => {
+		const registry = createRegistry();
+		const fulfill = vi.fn( () => () => {} );
+		registerStore( registry, { fulfill } );
+
+		const suspend = registry.suspendSelect( 'store' );
+		expect( () => suspend.getItem( 'a', 7 ) ).toThrow( Promise );
+		expect( () => suspend.getItem( 'b', 7 ) ).toThrow( Promise );
+
+		await new Promise( ( done ) => setTimeout( done, 0 ) );
+
+		expect( fulfill ).toHaveBeenCalledTimes( 1 );
+		expect( suspend.getItem( 'a', 7 ) ).toBeUndefined();
+	} );
+
+	it( 'should apply getResolutionArgs after __unstableNormalizeArgs', async () => {
+		const registry = createRegistry();
+		const selector = ( state, field, id ) => state[ id ]?.[ field ];
+		// Coerce the numeric id, then drop the field.
+		selector.__unstableNormalizeArgs = ( [ field, id ] ) => [
+			field,
+			Number( id ),
+		];
+		const fulfill = vi.fn( () => () => {} );
+
+		registry.registerStore( 'store', {
+			reducer: ( state = {} ) => state,
+			selectors: { getItem: selector },
+			resolvers: {
+				getItem: {
+					getResolutionArgs: ( field, id ) => [ id ],
+					fulfill,
+				},
+			},
+		} );
+
+		registry.select( 'store' ).getItem( 'a', '7' );
+
+		await new Promise( ( done ) => setTimeout( done, 0 ) );
+
+		expect( fulfill ).toHaveBeenCalledWith( 7 );
+	} );
+
+	it( 'should not call getResolutionArgs when the selector takes no arguments', async () => {
+		const registry = createRegistry();
+		const getResolutionArgs = vi.fn( ( ...args ) => args );
+
+		registry.registerStore( 'store', {
+			reducer: ( state = {} ) => state,
+			selectors: { getItems: () => {} },
+			resolvers: {
+				getItems: { getResolutionArgs, fulfill: () => () => {} },
+			},
+		} );
+
+		registry.select( 'store' ).getItems();
+
+		expect( getResolutionArgs ).not.toHaveBeenCalled();
+	} );
+} );
