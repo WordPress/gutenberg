@@ -1045,9 +1045,6 @@ class InsertingBlocksUtils {
 
 		// Move gradually into the editor iframe so Firefox dispatches drag events there.
 		await this.page.mouse.move( x, y, { steps: 10 } );
-		// Move again to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		await this.page.mouse.move( x, y );
 	}
 
 	async expectIndicatorBelowParagraph( paragraphBoundingBox ) {
