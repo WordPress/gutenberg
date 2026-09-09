@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `Notice`: Mark as not recommended for use in a WordPress environment, in favour of `Notice` from `@wordpress/ui`.
 -   Compound components: Report missing state or accessible semantic structure with clear developer guidance ([#82509](https://github.com/WordPress/gutenberg/pull/82509)).
 -   `ToggleGroupControl`: Honor the root `disabled` prop so the whole control is unselectable ([#82259](https://github.com/WordPress/gutenberg/pull/82259)).
 -   Validated form controls: Use `--wpds-color-stroke-interactive-error` for the invalid-state focus ring and border ([#82410](https://github.com/WordPress/gutenberg/pull/82410)).

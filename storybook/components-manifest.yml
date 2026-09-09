@@ -899,24 +899,69 @@
         props:
             - children
             - path
-- name: Notice
+- name: Notice.Root
   props:
-      - __unstableHTML
-      - actions
       - children
       - className
-      - isDismissible
-      - onDismiss
-      - onRemove
+      - icon
+      - intent
       - politeness
+      - render
       - spokenMessage
-      - status
+      - style
   subcomponents:
-      - name: NoticeList
+      - name: Notice.ActionButton
+        props:
+            - aria-pressed
+            - children
+            - className
+            - disabled
+            - focusableWhenDisabled
+            - loading
+            - loadingAnnouncement
+            - nativeButton
+            - render
+            - style
+            - variant
+      - name: Notice.ActionLink
         props:
             - children
-            - notices
-            - onRemove
+            - className
+            - openInNewTab
+            - render
+            - style
+            - target
+      - name: Notice.Actions
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Notice.CloseIcon
+        props:
+            - aria-pressed
+            - className
+            - disabled
+            - focusableWhenDisabled
+            - icon
+            - label
+            - nativeButton
+            - positioner
+            - render
+            - shortcut
+            - style
+      - name: Notice.Description
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Notice.Title
+        props:
+            - children
+            - className
+            - render
+            - style
 - name: Popover
   props:
       - __unstableForcePosition

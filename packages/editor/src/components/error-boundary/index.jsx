@@ -1,6 +1,5 @@
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-// eslint-disable-next-line @wordpress/use-recommended-components -- The fallback UI renders outside the editor's notice system.
 import { Card, CollapsibleCard, Notice, Stack, Text } from '@wordpress/ui';
 import { select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
