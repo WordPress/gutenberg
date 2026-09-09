@@ -7,6 +7,10 @@ import {
 	shortcutAriaLabel,
 } from '@wordpress/keycodes';
 import { ClipboardButton } from '../index';
+import { InputControl } from '../../form';
+import { InputLayout } from '../../form/primitives/input-layout';
+import { Stack } from '../../stack';
+import { Text } from '../../text';
 import * as Tooltip from '../../tooltip';
 
 const meta: Meta< typeof ClipboardButton > = {
@@ -265,4 +269,50 @@ export const WithCustomPositioner: Story = {
 		variant: 'minimal',
 		positioner: <Tooltip.Positioner side="right" />,
 	},
+};
+
+/**
+ * Place `ClipboardButton` in an input suffix to copy the field value.
+ */
+export const InTextField: Story = {
+	args: {
+		text: 'email@example.com',
+		tone: 'neutral',
+		variant: 'minimal',
+		size: 'small',
+	},
+	render: ( args ) => (
+		<div style={ { maxWidth: 320 } }>
+			<InputControl
+				label="Email"
+				defaultValue={ args.text as string }
+				readOnly
+				suffix={
+					<InputLayout.Slot padding="minimal">
+						<ClipboardButton { ...args } />
+					</InputLayout.Slot>
+				}
+			/>
+		</div>
+	),
+};
+
+/**
+ * Pair plain text with a small icon-only copy button.
+ */
+export const NextToText: Story = {
+	args: {
+		text: 'email@example.com',
+		tone: 'neutral',
+		variant: 'minimal',
+		size: 'small',
+	},
+	render: ( args ) => (
+		<Stack align="center" gap="xs">
+			<Text>{ args.text as string }</Text>
+			<ClipboardButton { ...args }>
+				<ClipboardButton.Icon size={ 16 } />
+			</ClipboardButton>
+		</Stack>
+	),
 };
