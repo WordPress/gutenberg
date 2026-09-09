@@ -181,7 +181,8 @@
 	{
 		"slug": "brush",
 		"label": "Brush",
-		"filePath": "library/brush.svg"
+		"filePath": "library/brush.svg",
+		"public": false
 	},
 	{
 		"slug": "bug",
@@ -491,7 +492,8 @@
 	{
 		"slug": "dashboard",
 		"label": "Dashboard",
-		"filePath": "library/dashboard.svg"
+		"filePath": "library/dashboard.svg",
+		"public": false
 	},
 	{
 		"slug": "desktop",
@@ -923,7 +925,8 @@
 	{
 		"slug": "link",
 		"label": "Link",
-		"filePath": "library/link.svg"
+		"filePath": "library/link.svg",
+		"public": false
 	},
 	{
 		"slug": "link-off",
@@ -984,7 +987,8 @@
 	{
 		"slug": "media",
 		"label": "Media",
-		"filePath": "library/media.svg"
+		"filePath": "library/media.svg",
+		"public": false
 	},
 	{
 		"slug": "media-and-text",
@@ -1069,7 +1073,8 @@
 	{
 		"slug": "page",
 		"label": "Page",
-		"filePath": "library/page.svg"
+		"filePath": "library/page.svg",
+		"public": false
 	},
 	{
 		"slug": "page-break",
@@ -1123,7 +1128,8 @@
 	{
 		"slug": "pin",
 		"label": "Pin",
-		"filePath": "library/pin.svg"
+		"filePath": "library/pin.svg",
+		"public": false
 	},
 	{
 		"slug": "pin-small",
@@ -1133,7 +1139,8 @@
 	{
 		"slug": "plugins",
 		"label": "Plugins",
-		"filePath": "library/plugins.svg"
+		"filePath": "library/plugins.svg",
+		"public": false
 	},
 	{
 		"slug": "play",
@@ -1507,7 +1514,8 @@
 	{
 		"slug": "sites",
 		"label": "Sites",
-		"filePath": "library/sites.svg"
+		"filePath": "library/sites.svg",
+		"public": false
 	},
 	{
 		"slug": "square",
@@ -1713,7 +1721,8 @@
 	{
 		"slug": "tool",
 		"label": "Tool",
-		"filePath": "library/tool.svg"
+		"filePath": "library/tool.svg",
+		"public": false
 	},
 	{
 		"slug": "trash",
@@ -1758,7 +1767,8 @@
 	{
 		"slug": "update",
 		"label": "Update",
-		"filePath": "library/update.svg"
+		"filePath": "library/update.svg",
+		"public": false
 	},
 	{
 		"slug": "upload",
