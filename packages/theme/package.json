@@ -91,6 +91,7 @@
 		"memize": "^2.1.1"
 	},
 	"devDependencies": {
+		"@storybook/addon-docs": "^10.5.3",
 		"@storybook/react-vite": "^10.5.3",
 		"@terrazzo/parser": "^2.7.1",
 		"@terrazzo/plugin-css": "^2.7.1",
