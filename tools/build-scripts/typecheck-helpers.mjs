@@ -2,14 +2,18 @@ const ANSI = /\u001B\[[0-9;]*m/g;
 const CYAN = '\u001B[96m';
 const RESET = '\u001B[0m';
 
-/*
- * Bookkeeping `--verbose` adds: a timestamped status line, bracketed by
- * `--pretty` or plain, and the project entries listed under the first one.
- */
+/* A timestamped status line, bracketed by `--pretty` or plain. */
 const STATUS =
-	/^(?:\[\d{1,2}:\d{2}:\d{2}(?: [AP]M)?\] |\d{1,2}:\d{2}:\d{2}(?: [AP]M)? - )/;
+	/^(?:\[\d{1,2}:\d{2}:\d{2}(?: [AP]M)?\] |\d{1,2}:\d{2}:\d{2}(?: [AP]M)? - )(.*)$/;
+
+/*
+ * The statuses `--verbose` adds, and the project entries listed under the
+ * first. Anything else on a status line, `--dry` for one, is the caller's.
+ */
+const BOOKKEEPING =
+	/^(?:Projects in this build:|Building project '|Updating (?:unchanged )?output timestamps of project '|Project '.+' is (?:up to date|out of date) [a-z])/;
 const LISTED_PROJECT = /^\s+\* .+\.json$/;
-const BUILDING = /Building project '(.+)'/;
+const BUILDING = /^Building project '(.+)'/;
 
 /*
  * A diagnostic tsc placed on no file, which is what a `types` entry inherited
@@ -30,14 +34,18 @@ export function createLineTransform( verbatim = false ) {
 
 	return ( line ) => {
 		const text = line.replace( ANSI, '' );
+		const status = STATUS.exec( text )?.[ 1 ];
 
-		if ( STATUS.test( text ) ) {
-			project = BUILDING.exec( text )?.[ 1 ] ?? project;
+		if ( status ) {
+			project = BUILDING.exec( status )?.[ 1 ] ?? project;
 		}
 
 		if ( ! verbatim ) {
 			// Every dropped entry is followed by a blank line of its own.
-			if ( STATUS.test( text ) || LISTED_PROJECT.test( text ) ) {
+			if (
+				( status && BOOKKEEPING.test( status ) ) ||
+				LISTED_PROJECT.test( text )
+			) {
 				dropped = true;
 				return null;
 			}

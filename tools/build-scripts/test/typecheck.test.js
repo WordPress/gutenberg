@@ -108,3 +108,22 @@ test( 'attributes each diagnostic to the project being built', () => {
 		"packages/abilities/tsconfig.json - error TS2688: Cannot find type definition file for 'does-not-exist'."
 	);
 } );
+
+test( 'keeps what a forwarded flag reports, such as `--dry`', () => {
+	const text = transformFixture( 'tsc-verbose-dry.txt' )
+		.map( ( line ) => line.replace( ANSI, '' ) )
+		.join( '\n' );
+
+	expect( text ).toContain(
+		"A non-dry build would build project '/repo/packages/dom-ready/tsconfig.build.json'"
+	);
+	expect( text ).toContain(
+		"A non-dry build would update timestamps for output of project '/repo/packages/a11y/tsconfig.build.json'"
+	);
+	// The bare status `--dry` reports, as opposed to the `--verbose` one.
+	expect( text ).toContain(
+		"Project '/repo/packages/hooks/tsconfig.json' is up to date"
+	);
+	expect( text ).not.toContain( 'is up to date because' );
+	expect( text ).not.toContain( 'Projects in this build' );
+} );

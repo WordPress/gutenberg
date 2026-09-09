@@ -1,0 +1,20 @@
+[[90m07:51:39 PM[0m] Projects in this build: 
+    * packages/dom-ready/tsconfig.build.json
+    * packages/hooks/tsconfig.json
+
+[[90m07:51:39 PM[0m] Project 'packages/dom-ready/tsconfig.build.json' is out of date because buildinfo file 'packages/dom-ready/tsconfig.build.tsbuildinfo' indicates that program needs to report errors.
+
+[[90m07:51:39 PM[0m] A non-dry build would build project '/repo/packages/dom-ready/tsconfig.build.json'
+
+[[90m07:51:39 PM[0m] Project 'packages/hooks/tsconfig.json' is up to date because newest input 'packages/hooks/src/types.ts' is older than output 'packages/hooks/tsconfig.tsbuildinfo'
+
+[[90m07:51:39 PM[0m] Project '/repo/packages/hooks/tsconfig.json' is up to date
+
+[[90m07:51:39 PM[0m] Project 'packages/i18n/tsconfig.build.json' is up to date because newest input 'packages/i18n/src/types.ts' is older than output 'packages/i18n/tsconfig.build.tsbuildinfo'
+
+[[90m07:51:39 PM[0m] Project '/repo/packages/i18n/tsconfig.build.json' is up to date
+
+[[90m07:51:39 PM[0m] Project 'packages/a11y/tsconfig.build.json' is up to date with .d.ts files from its dependencies
+
+[[90m07:51:39 PM[0m] A non-dry build would update timestamps for output of project '/repo/packages/a11y/tsconfig.build.json'
+
