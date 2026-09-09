@@ -5,6 +5,15 @@
 		{
 			"step": "runPHP",
 			"code": "<?php require '/wordpress/wp-load.php'; update_user_meta( 1, 'wp_persisted_preferences', array( 'core/edit-post' => array( 'welcomeGuide' => false, 'fullscreenMode' => false ), '_modified' => gmdate( 'c' ) ) );"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require '/wordpress/wp-load.php'; $posts = array( 424242 => array( 'First', 'Second', 'Third' ), 424243 => array( 'Alpha', 'Beta', 'Gamma' ) ); foreach ( $posts as $id => $words ) { $content = ''; foreach ( $words as $word ) { $content .= \"<!-- wp:paragraph -->\\n<p>$word paragraph.</p>\\n<!-- /wp:paragraph -->\\n\\n\"; } wp_insert_post( array( 'import_id' => $id, 'post_title' => 'Caret test ' . $id, 'post_status' => 'draft', 'post_content' => trim( $content ) ) ); }"
+		},
+		{
+			"step": "writeFile",
+			"path": "/wordpress/wp-content/mu-plugins/no-autosave.php",
+			"data": "<?php add_filter( 'block_editor_settings_all', function ( $settings ) { $settings['autosaveInterval'] = DAY_IN_SECONDS; return $settings; } );"
 		}
 	]
 }

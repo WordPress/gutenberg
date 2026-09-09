@@ -5,60 +5,7 @@ import XCTest
 /// was focused once the key that got it there has been handled. Desktop
 /// browsers have no such keyboard, so these tests read the shift key of
 /// the software keyboard in Safari on a simulator.
-final class AutoCapitalizationTests: XCTestCase {
-	let safari = XCUIApplication( bundleIdentifier: "com.apple.mobilesafari" )
-
-	var web: XCUIElement { safari.webViews.firstMatch }
-	var keyboard: XCUIElement { safari.keyboards.firstMatch }
-
-	/// Whichever editable field has the keyboard right now. Elements are
-	/// live queries, so this follows the focus.
-	var focusedField: XCUIElement {
-		web.textViews.matching( NSPredicate( format: "hasKeyboardFocus == true" ) ).firstMatch
-	}
-
-	override func setUpWithError() throws {
-		continueAfterFailure = false
-	}
-
-	func openNewPost() {
-		let base = ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
-		// Opened by the system, not through the app: XCUITest cannot launch
-		// Safari itself, only attach to it.
-		XCUIDevice.shared.system.open( URL( string: base + "/wp-admin/post-new.php" )! )
-		safari.activate()
-		XCTAssertTrue( safari.wait( for: .runningForeground, timeout: 30 ) )
-		XCTAssertTrue( web.waitForExistence( timeout: 60 ), "The editor did not load" )
-	}
-
-	/// Letters are keys, labelled in the case the keyboard currently shows;
-	/// shift and return are buttons.
-	func key( _ label: String ) -> XCUIElement {
-		keyboard.descendants( matching: .any )
-			.matching( NSPredicate( format: "label ==[c] %@", label ) )
-			.firstMatch
-	}
-
-	/// Taps the letters as given, without touching shift: the keyboard's own
-	/// state decides the case that lands in the field.
-	func type( _ word: String ) {
-		if key( "letters" ).exists {
-			key( "letters" ).tap()
-		}
-		for letter in word {
-			key( String( letter ) ).tap()
-		}
-	}
-
-	/// Waits until the field with the keyboard is an empty one with this
-	/// aria-label.
-	func waitForFocus( on label: String, _ message: String ) {
-		// An empty field holds nothing or the padding character.
-		let matches = NSPredicate( format: "label == %@ AND value.length < 2", label )
-		let done = XCTNSPredicateExpectation( predicate: matches, object: focusedField )
-		XCTAssertEqual( XCTWaiter.wait( for: [ done ], timeout: 10 ), .completed, message )
-	}
-
+final class AutoCapitalizationTests: SafariTestCase {
 	/// The keyboard updates shortly after focus moves.
 	func assertCapitalized( _ message: String ) {
 		let upperCase = NSPredicate( format: "label == 'A'" )

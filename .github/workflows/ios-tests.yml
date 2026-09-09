@@ -50,7 +50,7 @@ jobs:
                   overwrite: true
 
     safari:
-        name: Safari on an iOS simulator
+        name: ${{ matrix.suite }} on an ${{ matrix.device }} simulator
         # Safari and the iOS keyboard only run on Apple hardware.
         runs-on: macos-15
         needs: build
@@ -58,6 +58,17 @@ jobs:
         if: ${{ !cancelled() && needs.build.result != 'skipped' }}
         permissions:
             contents: read
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    # The editor lays out by viewport width: a phone gets the
+                    # mobile editor, a tablet the desktop one. Each suite runs
+                    # on the device its behavior belongs to.
+                    - device: iPhone
+                      suite: AutoCapitalizationTests
+                    - device: iPad
+                      suite: CaretPlacementTests
 
         steps:
             - name: Fail if the build job failed
@@ -88,12 +99,22 @@ jobs:
                   xcodebuild -version
 
             - name: Run the tests
-              run: ./test/ios/run.sh
+              run: ./test/ios/run.sh -only-testing:SafariTests/${{ matrix.suite }}
+              env:
+                  SIMULATOR_DEVICE: ${{ matrix.device }}
 
+            # Not `failure()`: a run over the job's timeout is cancelled, and
+            # the results of that run are the ones worth looking at. The
+            # bundle is tarred because uploading it as a directory fails.
             - name: Archive the test results
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-              if: ${{ failure() }}
+              if: ${{ !success() }}
+              run: |
+                  test -d test/ios/build/results.xcresult || exit 0
+                  tar -czf test/ios/build/results.tar.gz -C test/ios/build results.xcresult
+
+            - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              if: ${{ !success() }}
               with:
-                  name: ios-test-results
-                  path: test/ios/build/results.xcresult
+                  name: ios-test-results-${{ matrix.device }}-${{ matrix.suite }}
+                  path: test/ios/build/results.tar.gz
                   if-no-files-found: ignore
