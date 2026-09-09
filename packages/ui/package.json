@@ -73,7 +73,7 @@
 		"@wordpress/jest-console": "file:../jest-console",
 		"fast-glob": "^3.2.7",
 		"storybook": "^10.5.3",
-		"vitest": "^4.1.10"
+		"vitest": "^4.1.11"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

@@ -364,28 +364,50 @@ describe( 'Calendar day labels', () => {
 } );
 
 describe( 'Calendar text direction fallback', () => {
-	const getTextInfoDescriptor = Object.getOwnPropertyDescriptor(
-		Intl.Locale.prototype,
-		'getTextInfo'
-	);
+	const original = {
+		getTextInfo: Object.getOwnPropertyDescriptor(
+			Intl.Locale.prototype,
+			'getTextInfo'
+		),
+		textInfo: Object.getOwnPropertyDescriptor(
+			Intl.Locale.prototype,
+			'textInfo'
+		),
+	};
 
+	// Engines that implement `getTextInfo()` have dropped the legacy `textInfo`
+	// getter, so serve its data through `textInfo` to emulate an engine that
+	// only has the legacy property.
 	beforeAll( () => {
+		const getTextInfo = original.getTextInfo!.value;
+
 		Object.defineProperty( Intl.Locale.prototype, 'getTextInfo', {
 			configurable: true,
 			value: undefined,
 		} );
+		Object.defineProperty( Intl.Locale.prototype, 'textInfo', {
+			configurable: true,
+			get() {
+				return getTextInfo.call( this );
+			},
+		} );
 	} );
 
 	afterAll( () => {
-		if ( getTextInfoDescriptor ) {
+		Object.defineProperty(
+			Intl.Locale.prototype,
+			'getTextInfo',
+			original.getTextInfo!
+		);
+
+		if ( original.textInfo ) {
 			Object.defineProperty(
 				Intl.Locale.prototype,
-				'getTextInfo',
-				getTextInfoDescriptor
+				'textInfo',
+				original.textInfo
 			);
 		} else {
-			delete ( Intl.Locale.prototype as { getTextInfo?: unknown } )
-				.getTextInfo;
+			delete ( Intl.Locale.prototype as { textInfo?: unknown } ).textInfo;
 		}
 	} );
 

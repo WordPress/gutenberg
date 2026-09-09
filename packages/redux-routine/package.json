@@ -52,7 +52,7 @@
 	},
 	"devDependencies": {
 		"redux": "^5.0.1",
-		"vitest": "^4.1.10"
+		"vitest": "^4.1.11"
 	},
 	"peerDependencies": {
 		"redux": ">=4"
