@@ -40,6 +40,13 @@ export default {
 	],
 	semverGroups: [
 		{
+			label: '`@wordpress/scripts` pins run-con 1.3.2 because 1.3.3 does not support Node.js 20.',
+			dependencies: [ 'run-con' ],
+			packages: [ '@wordpress/scripts' ],
+			dependencyTypes: [ 'prod' ],
+			range: '',
+		},
+		{
 			label: 'Prerelease dependencies (e.g. alpha or beta) should be pinned to exact versions to avoid auto-upgrades that can include breaking changes. Remove entries once the dependency reaches a stable release.',
 			dependencies: [ '@modelcontextprotocol/server' ],
 			packages: [ '**' ],

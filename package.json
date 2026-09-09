@@ -111,8 +111,7 @@
 		},
 		"markdownlint-cli": {
 			"js-yaml": "~4.3.2",
-			"markdown-it": "~14.3.0",
-			"run-con": "1.3.2"
+			"markdown-it": "~14.3.0"
 		}
 	},
 	"scripts": {
