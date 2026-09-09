@@ -15,11 +15,7 @@ import { useMemo, useCallback } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { unlock } from '@wordpress/routes-lock-unlock';
-import {
-	getActiveViewOverrides,
-	type ViewListEntry,
-	type ViewOverrides,
-} from './view-utils';
+import type { ViewListEntry, ViewOverrides } from './view-utils';
 import { previewField } from './fields/preview';
 import { useTemplates } from './use-templates';
 import AddNewTemplate from './add-new-template';
@@ -52,7 +48,7 @@ function TemplateList() {
 		name: TEMPLATE_POST_TYPE,
 	} );
 	const activeViewOverrides = useMemo(
-		() => getActiveViewOverrides( viewList, activeView ),
+		() => viewList?.find( ( v ) => v.slug === activeView )?.view ?? {},
 		[ viewList, activeView ]
 	);
 
