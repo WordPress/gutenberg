@@ -100,9 +100,7 @@ const getGlobalStylesResetCommands = () =>
 const getGlobalStylesOpenRevisionsCommands = () =>
 	function useGlobalStylesOpenRevisionsCommands() {
 		const { openGeneralSidebar } = unlock( useDispatch( editSiteStore ) );
-		const editorDispatch = useDispatch( editorStore );
-		const { setRenderingMode } = editorDispatch;
-		const { setStylesPath } = unlock( editorDispatch );
+		const { setStylesPath } = unlock( useDispatch( editorStore ) );
 		const { params } = useLocation();
 		const { canvas = 'view' } = params;
 		const history = useHistory();
@@ -134,12 +132,6 @@ const getGlobalStylesOpenRevisionsCommands = () =>
 								transition: 'canvas-mode-edit-transition',
 							} );
 						}
-						// When the site uses a static front page, the canvas
-						// edits that page rather than a template, and the
-						// Styles sidebar is hidden. Render the template around
-						// the page so the sidebar is available, the same state
-						// the "Show template" option produces.
-						setRenderingMode( 'template-locked' );
 						openGeneralSidebar( 'edit-site/global-styles' );
 						setStylesPath( '/revisions' );
 					},
@@ -148,7 +140,6 @@ const getGlobalStylesOpenRevisionsCommands = () =>
 		}, [
 			history,
 			openGeneralSidebar,
-			setRenderingMode,
 			setStylesPath,
 			hasRevisions,
 			canvas,

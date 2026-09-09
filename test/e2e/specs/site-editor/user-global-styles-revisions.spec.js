@@ -246,6 +246,38 @@ test.describe( 'Style Revisions', () => {
 		}
 	} );
 
+	test( 'should keep the site preview clickable after leaving the styles editor', async ( {
+		admin,
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		// Opening Styles used to switch the canvas into template mode and
+		// leave it there, which broke click-to-edit on the way back.
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'blue' },
+		} );
+
+		await admin.visitSiteEditor();
+		await page.getByRole( 'link', { name: 'Styles' } ).click();
+		await page
+			.getByRole( 'region', { name: 'Styles' } )
+			.getByRole( 'button', { name: 'Revisions' } )
+			.click();
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeVisible();
+
+		// Back on the styles route in view mode the canvas is a button again,
+		// and clicking it enters the editor.
+		await admin.visitSiteEditor( { path: '/styles' } );
+		const canvasButton = page.locator(
+			'iframe.edit-site-visual-editor__editor-canvas[role="button"]'
+		);
+		await expect( canvasButton ).toBeVisible();
+		await canvasButton.click();
+		await expect( page ).toHaveURL( /canvas=edit/ );
+	} );
+
 	test( 'should allow switching to style book view', async ( {
 		page,
 		userGlobalStylesRevisions,
