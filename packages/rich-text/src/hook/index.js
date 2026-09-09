@@ -103,6 +103,16 @@ function useRichTextBase( {
 		};
 	}
 
+	// The selection the element last sent out, so it can be told apart from
+	// one set from outside. Forgotten once compared: the same positions can
+	// come back from outside later, after the selection moved elsewhere.
+	const sentSelectionRef = useRef( [] );
+
+	function sendSelection( start, end ) {
+		sentSelectionRef.current = [ start, end ];
+		onSelectionChange( start, end );
+	}
+
 	/**
 	 * Sync the value to global state. The node tree and selection will also be
 	 * updated if differences are found.
@@ -136,7 +146,7 @@ function useRichTextBase( {
 		// the content change happens.
 		// We batch both calls to only attempt to rerender once.
 		registry.batch( () => {
-			onSelectionChange( start, end );
+			sendSelection( start, end );
 			onChange( _valueRef.current, {
 				__unstableFormats: formats,
 				__unstableText: text,
@@ -148,13 +158,8 @@ function useRichTextBase( {
 	function applyFromProps() {
 		setRecordFromProps();
 
-		// Only apply the selection when the element has focus, or owns the
-		// selection through a focused editing host. Setting a selection into
-		// an unfocused editable moves focus through it in some browsers, and
-		// the element that had focus would then dispatch its own selection
-		// over the one from props (typing in a sidebar input that changes the
-		// text, a field mounting next to the one being edited). The focus
-		// handler applies the record once focus arrives.
+		// Setting a selection into an unfocused editable moves focus in some
+		// browsers.
 		const hasFocus =
 			ref.current?.contains( ref.current.ownerDocument.activeElement ) ||
 			ownsSelection( ref.current );
@@ -172,53 +177,30 @@ function useRichTextBase( {
 		}
 	}, [ value ] );
 
-	// Apply the selection from props unless the element already holds it. A
-	// selection the element made itself is left alone: the live range keeps
-	// its direction and the side of a format boundary the caret sits on, which
-	// the record does not represent. Focus is not managed here: the selection
-	// is applied only while the element, or an editing host around it, has
-	// focus, since setting a selection into an unfocused editable moves focus
-	// in some browsers. The focus handler applies the record once focus
+	// Apply a selection set from outside while the element (or an editing
+	// host around it) has focus. The focus handler applies it once focus
 	// arrives.
 	useLayoutEffect( () => {
-		if ( ! isSelected ) {
-			return;
-		}
-
-		const element = ref.current;
-		const { ownerDocument } = element;
-		const { activeElement } = ownerDocument;
+		const [ sentStart, sentEnd ] = sentSelectionRef.current;
+		sentSelectionRef.current = [];
 
 		if (
-			activeElement !== element &&
-			! (
-				activeElement?.contentEditable === 'true' &&
-				activeElement.contains( element )
-			)
+			! isSelected ||
+			( selectionStart === sentStart && selectionEnd === sentEnd )
 		) {
 			return;
 		}
 
-		const selection = ownerDocument.defaultView.getSelection();
-		const range =
-			selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
+		const element = ref.current;
+		const { activeElement } = element.ownerDocument;
 
-		// Positions are compared rather than DOM ranges: at a format boundary
-		// the browser and the record place the same offset in different text
-		// nodes.
-		if ( range && element.contains( range.commonAncestorContainer ) ) {
-			const { start, end } = create( {
-				element,
-				range,
-				__unstableIsEditableTree: true,
-			} );
-
-			if ( start === selectionStart && end === selectionEnd ) {
-				return;
-			}
+		if (
+			activeElement === element ||
+			( activeElement?.contentEditable === 'true' &&
+				activeElement.contains( element ) )
+		) {
+			applyRecord( recordRef.current );
 		}
-
-		applyRecord( recordRef.current );
 	}, [ selectionStart, selectionEnd, isSelected ] );
 
 	const mergedRefs = useMergeRefs( [
@@ -231,7 +213,7 @@ function useRichTextBase( {
 			applyRecord,
 			createRecord,
 			isSelected,
-			onSelectionChange,
+			onSelectionChange: sendSelection,
 			forceRender,
 		} ),
 		useRefEffect( () => {

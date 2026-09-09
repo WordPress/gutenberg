@@ -329,17 +329,9 @@ function RichTextWrapper(
 		]
 	);
 
-	// Focus follows the selection while focus is inside the canvas. A field
-	// does not take focus by itself, so when an action moves the selection
-	// into it (a split, a paste), the field that had focus keeps it, and
-	// when the element that had focus was removed (a merge, a list item
-	// moved by Tab), focus fell back to the body. Focus placed outside the
-	// canvas (a toolbar button, a sidebar input, another window) stays,
-	// and so does focus on an editing host around the field, which applies
-	// the selection inside it. The canvas is the writing flow wrapper, the
-	// nearest editable ancestor of the field.
-	// Declared before the hook, whose effect applies the selection only
-	// while the field has focus.
+	// Focus follows the selection while focus is inside the canvas or was
+	// lost to the body. Focus placed elsewhere stays. Runs before
+	// `useRichText`, which applies the selection only to a focused field.
 	useLayoutEffect( () => {
 		const element = anchorRef.current;
 
@@ -348,38 +340,24 @@ function RichTextWrapper(
 		}
 
 		const { ownerDocument } = element;
-		const { activeElement, body } = ownerDocument;
+		// Focus lost to the body of the parent document (a removed toolbar
+		// button) leaves the frame document without focus.
+		const focusedDocument = [
+			ownerDocument,
+			ownerDocument.defaultView.frameElement?.ownerDocument,
+		].find( ( doc ) => doc?.hasFocus() );
+
+		if ( ! focusedDocument ) {
+			return;
+		}
+
+		const { activeElement, body } = focusedDocument;
 		const canvas = element.parentElement?.closest( '[contenteditable]' );
-		const parentDocument =
-			ownerDocument.defaultView.frameElement?.ownerDocument;
+		// A field inside an editing host cannot hold focus.
+		const target = canvas?.isContentEditable ? canvas : element;
 
-		// Focus lost to the body of the document around the canvas (a toolbar
-		// button removed together with the block it acted on).
-		if (
-			parentDocument?.hasFocus() &&
-			parentDocument.activeElement === parentDocument.body
-		) {
-			element.focus();
-			return;
-		}
-
-		if (
-			! ownerDocument.hasFocus() ||
-			activeElement === element ||
-			element.contains( activeElement ) ||
-			// A focused editing host around the field.
-			( activeElement?.isContentEditable &&
-				activeElement.contains( element ) )
-		) {
-			return;
-		}
-
-		if (
-			! activeElement ||
-			activeElement === body ||
-			canvas?.contains( activeElement )
-		) {
-			element.focus();
+		if ( activeElement === body || canvas?.contains( activeElement ) ) {
+			target.focus();
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
 
