@@ -1,7 +1,4 @@
 'use strict';
-/**
- * Internal dependencies
- */
 const { downloadSource } = require( '../../download-sources' );
 
 /**

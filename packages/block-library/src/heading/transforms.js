@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
+import { __, sprintf } from '@wordpress/i18n';
 import { getLevelFromHeadingNodeName } from './shared';
 import { getTransformedAttributes } from '../utils/get-transformed-attributes';
 
@@ -15,6 +9,23 @@ const transforms = {
 			type: 'block',
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
+			// The level shortcuts are declared here as well as on the
+			// variations, so that they reach a paragraph and not only a
+			// heading. Both declarations describe the same shortcut, and only
+			// one of them can apply to any given selection.
+			shortcuts: [ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
+				name: `core/block-editor/transform-to-heading-${ level }`,
+				description: sprintf(
+					/* translators: %d: heading level e.g: "1", "2", "3" */
+					__( 'Transform the selected block into a heading %d.' ),
+					level
+				),
+				keyCombination: {
+					modifier: 'access',
+					character: `${ level }`,
+				},
+				variationName: `h${ level }`,
+			} ) ),
 			transform: ( attributes ) =>
 				attributes.map( ( _attributes ) => {
 					const { content, anchor, style } = _attributes;
@@ -103,6 +114,24 @@ const transforms = {
 			type: 'block',
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
+			shortcuts: [
+				{
+					name: 'core/block-editor/transform-heading-to-paragraph',
+					description: __(
+						'Transform the selected heading into a paragraph.'
+					),
+					keyCombination: {
+						modifier: 'access',
+						character: '0',
+					},
+					aliases: [
+						{
+							modifier: 'access',
+							character: '7',
+						},
+					],
+				},
+			],
 			transform: ( attributes ) =>
 				attributes.map( ( _attributes ) => {
 					const { content, style } = _attributes;

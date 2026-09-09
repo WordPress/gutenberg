@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from '../fixtures';
 import { SECOND_USER } from '../fixtures/collaboration-utils';
 import type { UserCredentials } from '../fixtures/collaboration-utils';

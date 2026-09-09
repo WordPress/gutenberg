@@ -1,7 +1,14 @@
 export * as Autocomplete from './autocomplete';
+export { Checkbox } from './checkbox';
+export { ControlWithError } from './control-with-error';
+export * as Combobox from './combobox';
 export * as Field from './field';
 export * as Fieldset from './fieldset';
 export { Input } from './input';
 export { InputLayout } from './input-layout';
+export { Radio } from './radio';
 export * as Select from './select';
+export { SearchableChipSelect } from './searchable-chip-select';
+export { SearchableSelect } from './searchable-select';
 export { Textarea } from './textarea';
+export { ValidityIndicator } from './validity-indicator';

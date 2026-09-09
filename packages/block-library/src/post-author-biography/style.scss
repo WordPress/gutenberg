@@ -2,4 +2,5 @@
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 	white-space: pre-wrap;
+	overflow-wrap: break-word; // Break long strings of text without spaces so they don't overflow the block.
 }

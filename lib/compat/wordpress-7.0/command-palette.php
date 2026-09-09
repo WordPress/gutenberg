@@ -67,20 +67,15 @@ function gutenberg_add_admin_bar_styles() {
 			return;
 	}
 	$css = <<<CSS
-		#wpadminbar #wp-admin-bar-command-palette .ab-icon {
-			display: none; /* Icon displayed only on mobile */
-		}
 		#wpadminbar #wp-admin-bar-command-palette .ab-icon:before {
 			content: "\\f179";
 			content: "\\f179" / '';
+			top: 3px;
 		}
 		#wpadminbar #wp-admin-bar-command-palette kbd {
 			background: transparent;
 		}
 		@media screen and (max-width: 782px) {
-			#wpadminbar #wp-admin-bar-command-palette .ab-icon {
-				display: block; /* Icon is only shown on mobile, while the keyboard shortcut is hidden */
-			}
 			#wpadminbar #wp-admin-bar-command-palette .ab-icon:before {
 				text-indent: 0;
 				font: normal 32px/1 dashicons;

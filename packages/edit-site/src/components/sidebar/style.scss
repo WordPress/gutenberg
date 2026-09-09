@@ -4,6 +4,8 @@
 
 .edit-site-sidebar__content {
 	flex-grow: 1;
+	flex-basis: 0;
+	min-height: 0;
 	overflow-y: auto;
 	// Prevents horizontal overflow while animating screen transitions
 	overflow-x: hidden;

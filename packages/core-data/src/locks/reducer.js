@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getNode, deepCopyLocksTreePath } from './utils';
 
 const DEFAULT_STATE = {

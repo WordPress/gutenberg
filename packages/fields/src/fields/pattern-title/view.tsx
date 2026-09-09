@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Icon, lockSmall } from '@wordpress/icons';
-import { Tooltip as WCTooltip } from '@wordpress/components';
-// @ts-ignore
+// @ts-expect-error `@wordpress/patterns` is not typed yet.
 import { privateApis as patternPrivateApis } from '@wordpress/patterns';
-
-/**
- * Internal dependencies
- */
+import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 import type { CommonPost } from '../../types';
 import { BaseTitleView } from '../title/view';
 import { unlock } from '../../lock-unlock';
@@ -17,15 +10,19 @@ import { unlock } from '../../lock-unlock';
 export const { PATTERN_TYPES } = unlock( patternPrivateApis );
 
 export default function PatternTitleView( { item }: { item: CommonPost } ) {
+	const lockMessage = __( 'This pattern cannot be edited.' );
 	return (
 		<BaseTitleView item={ item } className="fields-field__pattern-title">
 			{ item.type === PATTERN_TYPES.theme && (
-				<WCTooltip
-					placement="top"
-					text={ __( 'This pattern cannot be edited.' ) }
-				>
-					<Icon icon={ lockSmall } size={ 24 } />
-				</WCTooltip>
+				<>
+					<VisuallyHidden>{ lockMessage }</VisuallyHidden>
+					<Tooltip.Root>
+						<Tooltip.Trigger
+							render={ <Icon icon={ lockSmall } size={ 24 } /> }
+						/>
+						<Tooltip.Popup>{ lockMessage }</Tooltip.Popup>
+					</Tooltip.Root>
+				</>
 			) }
 		</BaseTitleView>
 	);

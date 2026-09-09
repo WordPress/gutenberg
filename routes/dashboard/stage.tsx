@@ -1,31 +1,49 @@
-/**
- * WordPress dependencies
- */
-import { Page } from '@wordpress/admin-ui';
-import { useDispatch } from '@wordpress/data';
+import { Breadcrumbs, Page } from '@wordpress/admin-ui';
+import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
+import { store as viewportStore } from '@wordpress/viewport';
+import {
+	WidgetDashboard,
+	type DashboardWidget,
+} from '@wordpress/widget-dashboard';
+import {
+	useWidgetTypes,
+	type WidgetModuleRecord,
+} from '@wordpress/widget-primitives';
+import { registerDashboardFieldTypes } from './field-types';
 import { useDashboardGridSettings, useDashboardLayout } from './hooks';
-import { WidgetDashboard } from './widget-dashboard';
-import type { DashboardWidget } from './widget-dashboard';
-import { useWidgetTypes } from './widget-types';
-import styles from './stage.module.css';
+import { DashboardWidgetHostProvider } from './widget-host';
+
+registerDashboardFieldTypes();
 
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
 		'gutenberg_dashboard'
 	);
 
-	const [ gridSettings, setGridSettings ] = useDashboardGridSettings();
+	const gridSettings = useDashboardGridSettings();
 
-	const widgetTypes = useWidgetTypes();
+	const widgetsModules = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecords( 'root', 'widgetModule' ) as
+				| WidgetModuleRecord[]
+				| null,
+		[]
+	);
+
+	const [ widgetTypes, isResolving ] = useWidgetTypes( widgetsModules );
 
 	const [ editMode, setEditMode ] = useState( false );
+
+	// @TODO: switch to using Admin UI declaratively for mobile viewport support once available.
+	// https://github.com/WordPress/gutenberg/issues/77628
+	const isMobileViewport = useSelect(
+		( select ) => select( viewportStore ).isViewportMatch( '< small' ),
+		[]
+	);
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -36,27 +54,39 @@ function Dashboard() {
 		} );
 	};
 
+	const pageTitle = editMode
+		? __( 'Customize Dashboard' )
+		: __( 'Dashboard' );
+
 	return (
-		<WidgetDashboard
-			widgetTypes={ widgetTypes }
-			layout={ layout }
-			onLayoutChange={ handleLayoutChange }
-			onLayoutReset={ resetLayout }
-			gridSettings={ gridSettings }
-			onGridSettingsChange={ setGridSettings }
-			editMode={ editMode }
-			onEditChange={ setEditMode }
-		>
-			<Page
-				title={ __( 'Dashboard' ) }
-				actions={ <WidgetDashboard.Actions /> }
+		<DashboardWidgetHostProvider>
+			<WidgetDashboard
+				widgetTypes={ widgetTypes }
+				isResolvingWidgetTypes={ isResolving }
+				layout={ layout }
+				onLayoutChange={ handleLayoutChange }
+				onLayoutReset={ resetLayout }
+				gridSettings={ gridSettings }
+				editMode={ editMode }
+				onEditChange={ setEditMode }
 			>
-				<div className={ styles[ 'dashboard-widgets-container' ] }>
+				<Page
+					breadcrumbs={
+						editMode && isMobileViewport ? undefined : (
+							<Breadcrumbs items={ [ { label: pageTitle } ] } />
+						)
+					}
+					ariaLabel={ pageTitle }
+					actions={ <WidgetDashboard.Actions /> }
+					hasPadding
+				>
 					<WidgetDashboard.NoWidgetsState />
 					<WidgetDashboard.Widgets />
-				</div>
-			</Page>
-		</WidgetDashboard>
+				</Page>
+
+				<WidgetDashboard.Commands />
+			</WidgetDashboard>
+		</DashboardWidgetHostProvider>
 	);
 }
 

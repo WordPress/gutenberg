@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import { COLORS, font, rtl, CONFIG, DROPDOWN_MOTION_CSS } from '../utils';
 import { space } from '../utils/space';
 import Icon from '../icon';
@@ -22,7 +15,9 @@ const ITEM_PADDING_INLINE = space( 3 );
 // - border color and divider color are different from COLORS.theme variables
 // - lighter text color is not defined in COLORS.theme, should it be?
 // - lighter background color is not defined in COLORS.theme, should it be?
+// TODO: should use the `stroke-surface-neutral` WPDS token when refactored to SCSS modules
 const DEFAULT_BORDER_COLOR = COLORS.theme.gray[ 300 ];
+// TODO: should use the `stroke-surface-neutral-weak` WPDS token when refactored to SCSS modules
 const DIVIDER_COLOR = COLORS.theme.gray[ 200 ];
 const LIGHTER_TEXT_COLOR = COLORS.theme.gray[ 700 ];
 const LIGHT_BACKGROUND_COLOR = COLORS.theme.gray[ 100 ];

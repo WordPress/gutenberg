@@ -1,4 +1,6 @@
+export { default as clearUnchangedEdits } from './clear-unchanged-edits';
 export { default as conservativeMapItem } from './conservative-map-item';
+export { default as getFilteredItem } from './get-filtered-item';
 export { default as getNormalizedCommaSeparable } from './get-normalized-comma-separable';
 export { default as ifMatchingAction } from './if-matching-action';
 export { default as forwardResolver } from './forward-resolver';
@@ -14,3 +16,5 @@ export {
 } from './user-permissions';
 export { RECEIVE_INTERMEDIATE_RESULTS } from './receive-intermediate-results';
 export { default as normalizeQueryForResolution } from './normalize-query-for-resolution';
+export { saveCRDTDoc } from './save-crdt-doc';
+export { default as getPaginationMeta } from './get-pagination-meta';

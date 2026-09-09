@@ -17,7 +17,7 @@ const meta: Meta< typeof VisuallyHidden > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use `VisuallyHidden` from `@wordpress/ui` instead.',
+			notes: 'Use [`VisuallyHidden`](?path=/docs/design-system-components-visuallyhidden--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };

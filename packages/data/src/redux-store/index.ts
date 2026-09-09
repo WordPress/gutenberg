@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { createStore, applyMiddleware } from 'redux';
 import type { Store as ReduxStore, StoreEnhancer } from 'redux';
 import EquivalentKeyMap from 'equivalent-key-map';
-
-/**
- * WordPress dependencies
- */
 import createReduxRoutineMiddleware from '@wordpress/redux-routine';
 import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { combineReducers } from './combine-reducers';
 import { builtinControls } from '../controls';
 import { lock } from '../lock-unlock';

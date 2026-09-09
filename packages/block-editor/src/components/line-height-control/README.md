@@ -18,7 +18,6 @@ const MyLineHeightControl = () => (
 	<LineHeightControl
 		value={ lineHeight }
 		onChange={ onChange }
-		__next40pxDefaultSize
 	/>
 );
 ```
@@ -36,13 +35,6 @@ The value of the line height.
 -   **Type:** `Function`
 
 A callback function that handles the application of the line height value.
-
-#### `__next40pxDefaultSize`
-
-- **Type:** `boolean`
-- **Default:** `false`
-
-Start opting into the larger default height that will become the default size in a future version.
 
 ## Related components
 

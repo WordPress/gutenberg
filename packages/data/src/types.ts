@@ -1,16 +1,8 @@
-/**
- * External dependencies
- */
-
 import type {
 	// eslint-disable-next-line no-restricted-imports
 	combineReducers as reduxCombineReducers,
 	Store as ReduxStore,
 } from 'redux';
-
-/**
- * Internal dependencies
- */
 import type { DataEmitter } from './utils/emitter';
 import type {
 	MetadataSelectors,

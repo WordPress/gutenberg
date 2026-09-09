@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const snapshotDiff = require( 'snapshot-diff' );
 
 const getStyleSheets = () =>

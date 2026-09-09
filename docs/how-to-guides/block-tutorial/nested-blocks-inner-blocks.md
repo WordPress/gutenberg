@@ -277,7 +277,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 		return (
 			<div {...innerBlocksProps}>
     			{ children }
-				<!-- Insert any arbitrary html here at the same level as the children -->
+				{/* Insert any arbitrary html here at the same level as the children */}
 			</div>
 		);
 	},

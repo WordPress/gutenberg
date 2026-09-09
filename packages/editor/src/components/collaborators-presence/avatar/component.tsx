@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { colord, extend } from 'colord';
 import a11yPlugin from 'colord/plugins/a11y';
-
 extend( [ a11yPlugin ] );
-
-/**
- * WordPress dependencies
- */
-import { Icon as WCIcon, Tooltip as WCTooltip } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { Tooltip } from '@wordpress/ui';
 import type { AvatarProps } from './types';
 import { useImageLoadingStatus } from './use-image-loading-status';
 
@@ -114,7 +103,12 @@ function Avatar( {
 	);
 
 	if ( name && ( ! showBadge || label ) ) {
-		return <WCTooltip text={ name }>{ avatar }</WCTooltip>;
+		return (
+			<Tooltip.Root>
+				<Tooltip.Trigger render={ avatar } />
+				<Tooltip.Popup>{ name }</Tooltip.Popup>
+			</Tooltip.Root>
+		);
 	}
 
 	return avatar;

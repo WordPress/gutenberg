@@ -1,13 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import { ControlWithError } from '../control-with-error';
+import deprecated from '@wordpress/deprecated';
+import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 import InputControl from '../../input-control';
 
@@ -17,28 +11,27 @@ const UnforwardedValidatedInputControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof InputControl >,
-		'__next40pxDefaultSize'
-	> &
-		ValidatedControlProps,
+	}: React.ComponentProps< typeof InputControl > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
+	deprecated( 'wp.components.privateApis.ValidatedInputControl', {
+		since: '7.2',
+		alternative: 'ValidatedInputControl from @wordpress/ui',
+		hint: 'This private API will be completely removed within a few Gutenberg plugin releases.',
+	} );
+
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
 
 	return (
 		<ControlWithError
+			className="components-validated-control"
 			required={ required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<InputControl
-				__next40pxDefaultSize
-				ref={ mergedRefs }
-				{ ...restProps }
-			/>
+			<InputControl ref={ mergedRefs } { ...restProps } />
 		</ControlWithError>
 	);
 };

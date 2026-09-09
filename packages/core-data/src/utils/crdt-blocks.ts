@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { v4 as uuidv4 } from 'uuid';
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { getBlockTypes } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 import { Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import {
 	asRichTextOffset,
 	createYMap,
@@ -46,6 +35,7 @@ export interface Block {
 	attributes: BlockAttributes;
 	clientId?: string;
 	innerBlocks: Block[];
+	innerContent?: Array< string | null >;
 	isValid?: boolean;
 	name: string;
 	originalContent?: string;
@@ -68,6 +58,10 @@ export type YBlocks = Y.Array< YBlock >;
 // Block attribute schema cannot be known at compile time, so we use Y.Map.
 // Attribute values will be typed as the union of `Y.Text` and `unknown`.
 export type YBlockAttributes = Y.Map< Y.Text | unknown >;
+
+interface MergeCrdtBlocksOptions {
+	preserveClientIds?: boolean;
+}
 
 /**
  * Optional description of where a cursor falls.
@@ -420,11 +414,13 @@ function createNewYBlock( block: Block ): YBlock {
  * @param attributeCursor When provided, describes a selection cursor falling within a
  *                        RichText field associated with a specific block and attribute.
  *                        Derived from the changes that produced the blocks.
+ * @param options         Optional settings for the merge operation.
  */
 export function mergeCrdtBlocks(
 	yblocks: YBlocks,
 	incomingBlocks: Block[],
-	attributeCursor: MergeCursorPosition
+	attributeCursor: MergeCursorPosition,
+	options: MergeCrdtBlocksOptions = {}
 ): void {
 	// Ensure we are working with serializable block data.
 	if ( ! serializableBlocksCache.has( incomingBlocks ) ) {
@@ -594,8 +590,31 @@ export function mergeCrdtBlocks(
 						mergeCrdtBlocks(
 							yInnerBlocks,
 							incomingBlockPropertyValue ?? [],
-							attributeCursor
+							attributeCursor,
+							options
 						);
+						break;
+					}
+
+					case 'clientId': {
+						// Code Editor changes reparse raw HTML on every
+						// keystroke and regenerate fresh clientIds. Keep Y.Doc
+						// clientIds stable for the code editor so peers do not
+						// remount unchanged blocks on every edit.
+						if ( options.preserveClientIds ) {
+							break;
+						}
+
+						// Otherwise, accept new clientIds from updates
+						if (
+							incomingBlockPropertyValue !==
+							localYBlock.get( incomingBlockProperty )
+						) {
+							localYBlock.set(
+								incomingBlockProperty,
+								incomingBlockPropertyValue
+							);
+						}
 						break;
 					}
 

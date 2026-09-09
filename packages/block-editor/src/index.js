@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import './hooks';
 export {
 	getBorderClassesAndStyles as __experimentalGetBorderClassesAndStyles,

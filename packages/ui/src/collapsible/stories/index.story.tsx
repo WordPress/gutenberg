@@ -23,14 +23,12 @@ type Story = StoryObj< typeof Collapsible.Root >;
 
 export const Default: Story = {
 	args: {
-		children: (
-			<>
-				<Collapsible.Trigger>Toggle</Collapsible.Trigger>
-				<Collapsible.Panel>
-					<p>Collapsible content here.</p>
-				</Collapsible.Panel>
-			</>
-		),
+		children: [
+			<Collapsible.Trigger key="trigger">Toggle</Collapsible.Trigger>,
+			<Collapsible.Panel key="panel">
+				<p>Collapsible content here.</p>
+			</Collapsible.Panel>,
+		],
 	},
 };
 
@@ -38,28 +36,26 @@ export const DefaultOpen: Story = {
 	argTypes: { open: { control: false } },
 	args: {
 		defaultOpen: true,
-		children: (
-			<>
-				<Collapsible.Trigger>Toggle</Collapsible.Trigger>
-				<Collapsible.Panel>
-					<p>This panel is open by default.</p>
-				</Collapsible.Panel>
-			</>
-		),
+		children: [
+			<Collapsible.Trigger key="trigger">Toggle</Collapsible.Trigger>,
+			<Collapsible.Panel key="panel">
+				<p>This panel is open by default.</p>
+			</Collapsible.Panel>,
+		],
 	},
 };
 
 export const Disabled: Story = {
 	args: {
 		disabled: true,
-		children: (
-			<>
-				<Collapsible.Trigger>Toggle (disabled)</Collapsible.Trigger>
-				<Collapsible.Panel>
-					<p>This content cannot be toggled.</p>
-				</Collapsible.Panel>
-			</>
-		),
+		children: [
+			<Collapsible.Trigger key="trigger">
+				Toggle (disabled)
+			</Collapsible.Trigger>,
+			<Collapsible.Panel key="panel">
+				<p>This content cannot be toggled.</p>
+			</Collapsible.Panel>,
+		],
 	},
 };
 

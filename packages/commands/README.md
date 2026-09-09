@@ -49,6 +49,8 @@ Each command can be assigned a `category` that describes what kind of action it 
 
 If no `category` is specified, the command will have `action` set. If an invalid value is provided, a warning is emitted in development mode and the category defaults to `action`.
 
+A category can also supply a fallback icon, used when the command passes no `icon` of its own: `view` falls back to an arrow, so that navigating somewhere reads the same way throughout the palette. Commands in that category are expected to rely on the fallback rather than pass an icon, unless their own icon says something the arrow cannot, such as opening a new tab.
+
 ## WordPress Data API
 
 The Command Palette also offers a number of [selectors and actions](https://developer.wordpress.org/block-editor/reference-guides/data/data-core-commands/) to manipulate its state, which include:

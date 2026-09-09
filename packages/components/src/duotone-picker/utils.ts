@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
-
-/**
- * Internal dependencies
- */
 import type { DuotonePickerProps } from './types';
 
 extend( [ namesPlugin ] );

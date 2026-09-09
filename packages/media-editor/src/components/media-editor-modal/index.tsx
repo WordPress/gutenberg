@@ -1,16 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { Modal } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import { store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
-
-/**
- * Internal dependencies
- */
 import MediaEditor from '../media-editor';
 import type { Media } from '../media-editor-provider';
 import { store as mediaEditorStore } from '../../store';
@@ -32,20 +26,42 @@ interface MediaEditorModalProps {
 	aspectRatioPresets?: AspectRatioPreset[];
 }
 
+/**
+ * The modal's footer chrome. The fine-rotation ruler and the image controls
+ * both live under the canvas (in `media-editor__content`), never here, so the
+ * footer has one layout at every width: History on the left, Cancel/Save on
+ * the right.
+ */
+function ModalFooter() {
+	return (
+		<div
+			className="media-editor-modal__footer"
+			role="region"
+			aria-label={ __( 'Editor actions' ) }
+		>
+			<MediaEditor.HistoryActions />
+			<MediaEditor.SaveActions />
+		</div>
+	);
+}
+
 export function MediaEditorModal( {
 	fields = [],
 	aspectRatioPresets,
 }: MediaEditorModalProps ) {
-	const { isModalOpen, id, onUpdate } = useSelect( ( select ) => {
-		const { isOpen, getId, getOnUpdate } = select( mediaEditorStore );
+	const { isModalOpen, id, onUpdate, onClose } = useSelect( ( select ) => {
+		const { isOpen, getId, getOnUpdate, getOnClose } =
+			select( mediaEditorStore );
 		return {
 			isModalOpen: isOpen(),
 			id: getId(),
 			onUpdate: getOnUpdate(),
+			onClose: getOnClose(),
 		};
 	}, [] );
 
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	if ( ! isModalOpen || ! id ) {
 		return null;
@@ -64,17 +80,21 @@ export function MediaEditorModal( {
 		event.stopPropagation();
 	};
 
+	const handleClose = () => {
+		closeMediaEditorModal();
+		onClose?.();
+	};
+
 	return (
 		<MediaEditor
 			id={ id }
 			fields={ fields }
 			aspectRatioPresets={ aspectRatioPresets }
-			showCloseButton
 			shouldCloseOnEsc
 			noticesClassName="media-editor-modal__snackbar"
 			noticesPortalElement={ portalElement }
-			onClose={ closeMediaEditorModal }
-			onSaved={ ( { id: savedId, url } ) => {
+			onClose={ handleClose }
+			onSaved={ ( { id: savedId, url, previous } ) => {
 				if ( savedId && onUpdate ) {
 					const update: MediaEditorModalUpdate = {
 						id: savedId,
@@ -82,11 +102,29 @@ export function MediaEditorModal( {
 					};
 					onUpdate( update );
 				}
-				closeMediaEditorModal();
+				handleClose();
+				if ( previous && savedId !== previous.id && onUpdate ) {
+					// Intentionally unscoped: the modal is closing, so the
+					// snackbar surfaces in the host editor (not the media
+					// editor's `MEDIA_EDITOR_NOTICES_CONTEXT` region).
+					createSuccessNotice( __( 'Image edited.' ), {
+						type: 'snackbar',
+						actions: [
+							{
+								label: __( 'Undo' ),
+								onClick: () => {
+									onUpdate( {
+										id: previous.id,
+										url: previous.url,
+									} );
+								},
+							},
+						],
+					} );
+				}
 			} }
 			renderFrame={ ( {
 				children,
-				headerActions,
 				onRequestClose,
 				onKeyDown,
 				shouldCloseOnClickOutside,
@@ -103,9 +141,12 @@ export function MediaEditorModal( {
 						shouldCloseOnClickOutside={ shouldCloseOnClickOutside }
 						onKeyDown={ onKeyDown }
 						onRequestClose={ onRequestClose }
-						headerActions={ headerActions }
+						headerActions={
+							<MediaEditor.HeaderActions showCloseButton />
+						}
 					>
 						{ children }
+						<ModalFooter />
 					</Modal>
 				</ShortcutProvider>
 			) }

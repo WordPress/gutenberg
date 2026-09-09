@@ -33,7 +33,6 @@
 								label: 'Dropdown field',
 								value,
 								onChange: setValue,
-								__next40pxDefaultSize: true,
 							} ),
 					} )
 				),

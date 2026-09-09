@@ -2,17 +2,26 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/global-styles-ui/build-style/style.css" as *;
 
+.font-library-page__content {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	min-height: 0;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+
+	.font-library-page:has(.font-library__footer) & {
+		padding-bottom: 90px;
+	}
+}
+
 .font-library-page__tablist {
+	flex-shrink: 0;
 	border-bottom: 1px solid $gray-100;
 	padding: 0 $grid-unit-30;
 }
 
 .font-library-page__tab-panel {
 	flex-grow: 1;
-	max-height: calc(100% - 110px); // Subtracting header + tabs
+	min-height: 0;
 	overflow: auto;
-
-	.font-library-page:has(.font-library__footer) & {
-		max-height: calc(100% - 198px); // Subtracting header + tabs + footer
-	}
 }

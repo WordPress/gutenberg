@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -13,10 +6,6 @@ import {
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
 import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
@@ -419,18 +408,20 @@ const withBlockTree =
  */
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
-	let markNextChangeAsNotPersistent = false;
+	let nextHistoryMode;
 
 	return ( state, action ) => {
 		const nextState = reducer( state, action );
 
-		const wasMarkedAsNotPersistent = markNextChangeAsNotPersistent;
-		markNextChangeAsNotPersistent =
-			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
+		const pendingHistoryMode = nextHistoryMode;
+		nextHistoryMode =
+			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT'
+				? action.history ?? 'merge'
+				: undefined;
 
 		const isExplicitPersistentChange =
 			action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' ||
-			wasMarkedAsNotPersistent;
+			pendingHistoryMode;
 
 		// Defer to previous state value (or default) unless changing or
 		// explicitly marking as persistent.
@@ -442,7 +433,7 @@ function withPersistentBlockChange( reducer ) {
 		}
 
 		const isPersistentChange = isExplicitPersistentChange
-			? ! wasMarkedAsNotPersistent
+			? ! pendingHistoryMode
 			: ! isUpdatingSameBlockAttribute( action, lastAction );
 
 		// In comparing against the previous action, consider only those which
@@ -450,7 +441,17 @@ function withPersistentBlockChange( reducer ) {
 		// have resulted in a changed state.
 		lastAction = action;
 
-		return { ...nextState, isPersistentChange };
+		if ( pendingHistoryMode === 'ignore' ) {
+			return {
+				...nextState,
+				isPersistentChange,
+				lastBlockChangeHistoryMode: 'ignore',
+			};
+		}
+
+		const { lastBlockChangeHistoryMode, ...blockChange } = nextState;
+
+		return { ...blockChange, isPersistentChange };
 	};
 }
 
@@ -1430,19 +1431,19 @@ export function selection( state = {}, action ) {
 				selectionEnd,
 			};
 		case 'MULTI_SELECT':
-			const { start, end } = action;
+			const nextSelection = {
+				selectionStart: { clientId: action.start },
+				selectionEnd: { clientId: action.end },
+			};
 
-			if (
-				start === state.selectionStart?.clientId &&
-				end === state.selectionEnd?.clientId
-			) {
+			// A text selection between the same blocks is not the same
+			// selection: it carries attribute keys and offsets, making it
+			// partial rather than a block multi-selection.
+			if ( fastDeepEqual( state, nextSelection ) ) {
 				return state;
 			}
 
-			return {
-				selectionStart: { clientId: start },
-				selectionEnd: { clientId: end },
-			};
+			return nextSelection;
 		case 'RESET_BLOCKS':
 			const startClientId = state?.selectionStart?.clientId;
 			const endClientId = state?.selectionEnd?.clientId;
@@ -2276,7 +2277,7 @@ export function requestedInspectorTab( state = null, action ) {
 }
 
 /**
- * Reducer tracking the selected pseudo-state for block style controls.
+ * Reducer tracking the selected style state for block style controls.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -2286,23 +2287,55 @@ export function requestedInspectorTab( state = null, action ) {
 export function selectedBlockStyleState( state = undefined, action ) {
 	switch ( action.type ) {
 		case 'SET_SELECTED_BLOCK_STYLE_STATE': {
-			if (
-				! action.clientId ||
-				! action.value ||
-				action.value === 'default'
-			) {
+			if ( ! action.clientId || ! action.value ) {
 				return undefined;
 			}
+			const showStateOnCanvas =
+				state?.clientId === action.clientId
+					? state.showStateOnCanvas ?? true
+					: true;
+			const previousValue =
+				state?.clientId === action.clientId ? state.value : {};
 
 			return {
 				clientId: action.clientId,
-				value: action.value,
+				showStateOnCanvas,
+				value: {
+					pseudo: 'default',
+					...previousValue,
+					...action.value,
+				},
+			};
+		}
+
+		case 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW': {
+			if ( ! action.clientId || typeof action.value !== 'boolean' ) {
+				return state;
+			}
+
+			const previousValue =
+				state?.clientId === action.clientId ? state.value : {};
+
+			return {
+				clientId: action.clientId,
+				showStateOnCanvas: action.value,
+				value: {
+					pseudo: 'default',
+					...previousValue,
+				},
 			};
 		}
 
 		case 'SELECT_BLOCK':
 		case 'SELECTION_CHANGE': {
-			if ( state?.clientId && state.clientId !== action.clientId ) {
+			const startClientId = action.clientId ?? action.start?.clientId;
+			const endClientId = action.clientId ?? action.end?.clientId;
+
+			if (
+				state?.clientId &&
+				( startClientId !== endClientId ||
+					state.clientId !== startClientId )
+			) {
 				return undefined;
 			}
 
@@ -2351,6 +2384,41 @@ export function selectedBlockStyleState( state = undefined, action ) {
 	return state;
 }
 
+/**
+ * Reducer holding the globally selected viewport style state. When set to a
+ * value other than 'default', block style edits in the inspector are applied to
+ * that viewport. Driven by the editor's device preview (Responsive editing).
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function styleStateViewport( state = 'default', action ) {
+	if ( action.type === 'SET_STYLE_STATE_VIEWPORT' ) {
+		return action.viewport ?? 'default';
+	}
+
+	return state;
+}
+
+/**
+ * Reducer for whether Responsive editing is enabled. When enabled, the device
+ * preview also drives which viewport block style edits are applied to.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isResponsiveEditing( state = false, action ) {
+	if ( action.type === 'SET_RESPONSIVE_EDITING' ) {
+		return action.enabled;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2387,6 +2455,8 @@ const combinedReducers = combineReducers( {
 	listViewContentPanelOpen,
 	requestedInspectorTab,
 	selectedBlockStyleState,
+	styleStateViewport,
+	isResponsiveEditing,
 } );
 
 /**

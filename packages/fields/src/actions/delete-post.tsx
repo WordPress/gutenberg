@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { trash } from '@wordpress/icons';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -10,14 +7,10 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-// @ts-ignore
+// @ts-expect-error `@wordpress/patterns` is not typed yet.
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import type { Action } from '@wordpress/dataviews';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import {
 	getItemTitle,
 	isTemplateOrTemplatePart,
@@ -35,7 +28,7 @@ const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 // moves the post to trash.
 const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 	id: 'delete-post',
-	label: __( 'Delete' ),
+	label: __( 'Delete…' ),
 	isPrimary: true,
 	icon: trash,
 	isEligible( post ) {

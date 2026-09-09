@@ -1,0 +1,80 @@
+<svg viewBox="0 0 920 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The application registers the field type vocabulary once at init; the widget references a type by name; resolveFields, inside useWidgetTypes, is the only point that recognizes the name and translates it into plain DataViews field props; DataForm then renders the control in the chrome header and the settings surface. Unregistered names pass through and degrade silently as unknown types.">
+  <defs>
+    <marker id="arrow-ftp" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
+    </marker>
+    <marker id="arrow-ftp-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#1d6b5a"/>
+    </marker>
+  </defs>
+
+  <rect x="6" y="6" width="908" height="388" rx="12" fill="#ffffff"/>
+
+  <text x="460" y="38" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#334155">Widgets reference a name; the application defines what it means.</text>
+
+  <!-- Application registry -->
+  <rect x="336" y="64" width="268" height="88" rx="9" fill="#d7f0ea" stroke="#1d6b5a" stroke-width="1.5"/>
+  <text x="470" y="90" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#1d6b5a">application registry</text>
+  <text x="470" y="105" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#3c5a52">registered once, before render</text>
+  <rect x="354" y="114" width="232" height="28" rx="5" fill="#ffffff" stroke="#1d6b5a" stroke-width="1.2"/>
+  <text x="470" y="132" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#1d6b5a">location → { baseType, Edit }</text>
+
+  <!-- Lookup arrow -->
+  <line x1="470" y1="156" x2="470" y2="190" stroke="#1d6b5a" stroke-width="1.5" marker-end="url(#arrow-ftp-green)"/>
+  <rect x="480" y="163" width="50" height="14" rx="3" fill="#ffffff"/>
+  <text x="505" y="174" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9" font-weight="700" fill="#1d6b5a">lookup</text>
+
+  <!-- Widget authoring -->
+  <rect x="40" y="196" width="216" height="112" rx="9" fill="#fff3d0" stroke="#b07020" stroke-width="1.5"/>
+  <text x="58" y="224" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#855317">widget.ts</text>
+  <text x="58" y="241" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#855317" opacity="0.8">references by name</text>
+  <rect x="58" y="252" width="180" height="40" rx="5" fill="#ffffff" stroke="#b07020" stroke-width="1.2"/>
+  <text x="70" y="268" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" fill="#855317">location</text>
+  <text x="70" y="283" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" font-weight="700" fill="#b07020">type: 'location'</text>
+  <text x="58" y="304" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#94a3b8">pure data · widget.json-ready</text>
+
+  <!-- Attributes arrow -->
+  <line x1="260" y1="252" x2="332" y2="252" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-ftp)"/>
+  <rect x="266" y="233" width="60" height="14" rx="3" fill="#ffffff"/>
+  <text x="296" y="244" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9" fill="#855317">attributes</text>
+
+  <!-- Resolver -->
+  <rect x="336" y="196" width="268" height="112" rx="9" fill="#ffffff" stroke="#1d6b5a" stroke-width="1.5"/>
+  <text x="470" y="224" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">resolveFields()</text>
+  <text x="470" y="240" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#64748b">inside useWidgetTypes:</text>
+  <text x="470" y="253" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#64748b">the only point that recognizes the name</text>
+  <text x="372" y="278" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#855317">in   type: 'location'</text>
+  <text x="372" y="296" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" font-weight="700" fill="#1d6b5a">out  type: 'text' + Edit control</text>
+
+  <!-- DataForm arrow -->
+  <line x1="608" y1="252" x2="680" y2="252" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-ftp)"/>
+  <rect x="612" y="233" width="64" height="14" rx="3" fill="#ffffff"/>
+  <text x="644" y="244" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9" fill="#64748b">DataForm</text>
+
+  <!-- Widget tile: chrome header surface -->
+  <rect x="684" y="140" width="188" height="104" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <path d="M 693 142 H 863 Q 870 142 870 149 V 172 H 686 V 149 Q 686 142 693 142 Z" fill="#f1f5f9"/>
+  <line x1="684" y1="172" x2="872" y2="172" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="698" y="148" width="16" height="16" rx="4" fill="#2f54a5"/>
+  <text x="722" y="161" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="700" fill="#334155">Events</text>
+  <rect x="790" y="149" width="72" height="15" rx="4" fill="#ffffff" stroke="#1d6b5a" stroke-width="1.1"/>
+  <text x="826" y="160" text-anchor="middle" font-family="ui-monospace, monospace" font-size="8.5" fill="#1d6b5a">city…</text>
+  <rect x="698" y="184" width="12" height="12" rx="3" fill="#e2e8f0"/>
+  <line x1="718" y1="190" x2="830" y2="190" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="698" y="206" width="12" height="12" rx="3" fill="#e2e8f0"/>
+  <line x1="718" y1="212" x2="800" y2="212" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="778" y="234" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#94a3b8">widget render</text>
+
+  <!-- Settings surface -->
+  <rect x="684" y="258" width="188" height="76" rx="9" fill="#fafbfc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="778" y="276" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" font-weight="700" fill="#64748b">settings surface</text>
+  <text x="700" y="293" font-family="ui-monospace, monospace" font-size="8.5" fill="#64748b">Event location</text>
+  <rect x="700" y="299" width="156" height="18" rx="3" fill="#ffffff" stroke="#1d6b5a" stroke-width="1.2"/>
+  <text x="708" y="312" font-family="ui-monospace, monospace" font-size="8.5" fill="#1d6b5a">Madrid</text>
+
+  <!-- Degradation bypass -->
+  <path d="M 480 312 C 540 344, 610 344, 682 318" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4 5" marker-end="url(#arrow-ftp)"/>
+  <text x="460" y="356" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" fill="#94a3b8">unregistered names pass through and degrade as unknown types, silently</text>
+
+  <text x="460" y="380" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12" font-weight="700" fill="#855317">referenced by name · registered by the app · resolved once · rendered natively</text>
+</svg>

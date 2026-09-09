@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Font Library', () => {
@@ -144,7 +141,10 @@ test.describe( 'Font Library', () => {
 			await page.getByRole( 'button', { name: 'Ember' } ).click();
 
 			// Click "Back" button
-			await page.getByRole( 'button', { name: 'Back' } ).click();
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Back', exact: true } )
+				.click();
 
 			await page.getByRole( 'button', { name: 'Typography' } ).click();
 
@@ -167,7 +167,10 @@ test.describe( 'Font Library', () => {
 			await page.getByRole( 'button', { name: 'Close' } ).click();
 
 			// Click "Back"
-			await page.getByRole( 'button', { name: 'Back' } ).click();
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Back', exact: true } )
+				.click();
 
 			// Click "Browse styles"
 			await page.getByRole( 'button', { name: 'Browse styles' } ).click();
@@ -176,7 +179,10 @@ test.describe( 'Font Library', () => {
 			await page.getByRole( 'button', { name: 'Maelstrom' } ).click();
 
 			// Click "Back" button
-			await page.getByRole( 'button', { name: 'Back' } ).click();
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Back', exact: true } )
+				.click();
 
 			await page.getByRole( 'button', { name: 'Typography' } ).click();
 
