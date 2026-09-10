@@ -474,7 +474,11 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	$processed_content = new WP_HTML_Tag_Processor( $content );
 	$processed_content->next_tag();
 
-	if ( $is_flex_layout ) {
+	/*
+	 * Only generate the gap styles — and the unique classname that exists solely
+	 * to scope them — if the theme has not opted out of layout styles.
+	 */
+	if ( $is_flex_layout && ! current_theme_supports( 'disable-layout-styles' ) ) {
 		// Add a style tag for the --wp--style--unstable-gallery-gap var. The
 		// Gallery's custom Flex layout recalculates Image block widths based on
 		// the current gap so it can maintain the selected number of columns.
