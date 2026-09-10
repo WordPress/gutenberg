@@ -1,0 +1,285 @@
+{
+	"title": "JSON schema for WordPress widgets",
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"definitions": {
+		"//": {
+			"reference": "https://developer.wordpress.org/block-editor/reference-guides/widgets/"
+		}
+	},
+	"type": "object",
+	"properties": {
+		"$schema": {
+			"type": "string"
+		},
+		"apiVersion": {
+			"description": "The version of the Widget API used by the widget.",
+			"type": "integer"
+		},
+		"name": {
+			"description": "A unique string that identifies the widget type. Names must be structured as `namespace/widget-name`, where namespace is the name of your plugin or theme.",
+			"type": "string",
+			"pattern": "^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$"
+		},
+		"__experimental": {
+			"description": "The name of the experiment this widget is a part of, or boolean true if there is no specific experiment name.",
+			"anyOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "boolean"
+				}
+			]
+		},
+		"title": {
+			"description": "The display title for your widget, which can be translated with our translation functions. The widget inserter will show this name.",
+			"type": "string"
+		},
+		"category": {
+			"description": "Widgets are grouped into categories to help users browse and discover them.\nCore provided categories are: dashboard\n\nPlugins and Themes can also register custom widget categories.",
+			"anyOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "string",
+					"enum": [ "dashboard" ]
+				}
+			]
+		},
+		"icon": {
+			"description": "An icon property should be specified to make it easier to identify a widget. These can be any of WordPress' Dashicons (slug serving also as a fallback in non-js contexts).",
+			"type": "string"
+		},
+		"description": {
+			"description": "A short description for your widget, which can be translated with our translation functions. This will be shown in the widget inspector.",
+			"type": "string"
+		},
+		"keywords": {
+			"description": "Optional aliases that help users discover the widget while searching. For example, a widget could also want to be discovered by an alternative term. You can do so by providing an array of terms (which are translated).",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"version": {
+			"description": "The current version number of the widget, such as 1.0 or 1.0.3. It's similar to how plugins are versioned. This field might be used with widget assets to control cache invalidation.",
+			"type": "string"
+		},
+		"textdomain": {
+			"description": "The gettext text domain of the plugin/widget. More information can be found in the Text Domain section of the How to Internationalize your Plugin page.\n\nhttps://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/",
+			"type": "string"
+		},
+		"attributes": {
+			"description": "A declarative list of fields used by the widget. Each entry follows the @wordpress/dataviews Field shape so the dashboard can pipe attributes through DataForm directly, with no per-widget form code required.\n\nSee packages/dataviews/src/types/field-api.ts for the full TypeScript definition.",
+			"type": "array",
+			"items": {
+				"description": "A declarative field descriptor. Follows the @wordpress/dataviews Field type.",
+				"type": "object",
+				"properties": {
+					"id": {
+						"description": "The unique identifier of the field. Used as the key when reading and writing the widget's saved data.",
+						"type": "string"
+					},
+					"type": {
+						"description": "The type of the field, which determines how the value is handled and what default control is rendered.",
+						"type": "string",
+						"enum": [
+							"text",
+							"integer",
+							"number",
+							"datetime",
+							"date",
+							"media",
+							"boolean",
+							"email",
+							"password",
+							"telephone",
+							"color",
+							"url",
+							"array"
+						]
+					},
+					"label": {
+						"description": "A human-readable label shown above the control. Defaults to the id.",
+						"type": "string"
+					},
+					"header": {
+						"description": "The header of the field. Defaults to the label.",
+						"type": "string"
+					},
+					"description": {
+						"description": "Optional help text shown below the control.",
+						"type": "string"
+					},
+					"placeholder": {
+						"description": "Placeholder text for the control.",
+						"type": "string"
+					},
+					"Edit": {
+						"description": "Override the default control rendered for this field. Pass a control name string (e.g. `\"textarea\"`) or a configuration object with a `control` key.",
+						"oneOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "object",
+								"properties": {
+									"control": {
+										"description": "The control type to render.",
+										"type": "string"
+									}
+								},
+								"required": [ "control" ],
+								"additionalProperties": true
+							}
+						]
+					},
+					"isValid": {
+						"description": "Validation rules for the field value.",
+						"type": "object",
+						"properties": {
+							"required": {
+								"description": "Whether a value is required.",
+								"type": "boolean"
+							},
+							"pattern": {
+								"description": "A regex pattern the value must match.",
+								"type": "string"
+							},
+							"minLength": {
+								"description": "The minimum string length.",
+								"type": "number"
+							},
+							"maxLength": {
+								"description": "The maximum string length.",
+								"type": "number"
+							},
+							"min": {
+								"description": "The minimum allowed numeric value.",
+								"type": "number"
+							},
+							"max": {
+								"description": "The maximum allowed numeric value.",
+								"type": "number"
+							}
+						},
+						"additionalProperties": false
+					},
+					"elements": {
+						"description": "The list of choices for the field. A field with `elements` and a non-`array` type renders an adaptive select control automatically via DataForm.",
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"value": {
+									"description": "The value stored when this option is selected.",
+									"oneOf": [
+										{ "type": "string" },
+										{ "type": "number" },
+										{ "type": "boolean" }
+									]
+								},
+								"label": {
+									"description": "The human-readable text shown for this option.",
+									"type": "string"
+								},
+								"description": {
+									"description": "An optional longer description for the option.",
+									"type": "string"
+								}
+							},
+							"required": [ "value", "label" ],
+							"additionalProperties": false
+						}
+					},
+					"enableSorting": {
+						"description": "Whether the field is sortable.",
+						"type": "boolean"
+					},
+					"enableGlobalSearch": {
+						"description": "Whether the field is searchable.",
+						"type": "boolean"
+					},
+					"enableHiding": {
+						"description": "Whether the field can be hidden in the UI.",
+						"type": "boolean"
+					},
+					"readOnly": {
+						"description": "Whether the field is read-only. When true, the value is rendered using the render callback and no edit control is shown.",
+						"type": "boolean"
+					},
+					"format": {
+						"description": "Display format configuration for the field value. The shape depends on the field type: datetime/date fields accept `datetime` or `date` format strings; number/integer fields accept `separatorThousand`, `separatorDecimal`, and `decimals`.",
+						"type": "object",
+						"properties": {
+							"datetime": {
+								"description": "A datetime format string for `datetime` fields.",
+								"type": "string"
+							},
+							"date": {
+								"description": "A date format string for `date` fields.",
+								"type": "string"
+							},
+							"weekStartsOn": {
+								"description": "The day the week starts on (0 = Sunday, 6 = Saturday). Applicable to `datetime` and `date` fields.",
+								"type": "integer",
+								"minimum": 0,
+								"maximum": 6
+							},
+							"separatorThousand": {
+								"description": "Thousands separator character for `number` and `integer` fields.",
+								"type": "string"
+							},
+							"separatorDecimal": {
+								"description": "Decimal separator character for `number` fields.",
+								"type": "string"
+							},
+							"decimals": {
+								"description": "Number of decimal places to display for `number` fields.",
+								"type": "integer"
+							}
+						},
+						"additionalProperties": false
+					}
+				},
+				"required": [ "id" ],
+				"additionalProperties": true
+			}
+		},
+		"styles": {
+			"description": "Widget styles can be used to provide alternative visual styles to a widget. It works by adding a class name to the widget's wrapper. Using CSS, a theme developer can target the class name for the widget style if it is selected.",
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"label": {
+						"type": "string"
+					},
+					"isDefault": {
+						"type": "boolean",
+						"default": false
+					}
+				},
+				"required": [ "name", "label" ],
+				"additionalProperties": false
+			}
+		},
+		"example": {
+			"description": "Provides structured example data for the widget. This data is used to construct a preview for the widget to be shown in the Inspector Help Panel.",
+			"type": "object",
+			"properties": {
+				"attributes": {
+					"description": "Set the attribute values for the widget example.",
+					"type": "object"
+				}
+			},
+			"additionalProperties": false
+		}
+	},
+	"required": [ "apiVersion", "name", "title" ],
+	"additionalProperties": false
+}
