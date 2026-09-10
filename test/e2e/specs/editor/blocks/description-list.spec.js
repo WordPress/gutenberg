@@ -37,6 +37,14 @@ async function clickBlockSwitcherMenuItem( { editor, page, from, to } ) {
 		.click();
 }
 
+async function selectTextSuffix( { editor, page, pageUtils, text, length } ) {
+	await editor.canvas.getByText( text, { exact: true } ).click();
+	await page.keyboard.press( 'End' );
+	await page.keyboard.down( 'Shift' );
+	await pageUtils.pressKeys( 'ArrowLeft', { times: length } );
+	await page.keyboard.up( 'Shift' );
+}
+
 test.describe( 'Description List', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -78,6 +86,45 @@ test.describe( 'Description List', () => {
 	} );
 
 	// eslint-disable-next-line playwright/expect-expect
+	test( 'keeps a text range selected when transforming a term with Tab', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/description-list',
+			innerBlocks: [
+				{
+					name: 'core/description-term',
+					attributes: { content: 'Cy' },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: { content: 'Rotating weather system' },
+				},
+			],
+		} );
+
+		await editor.canvas.getByText( 'Cy', { exact: true } ).click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( 'clone' );
+		await selectTextSuffix( {
+			editor,
+			page,
+			pageUtils,
+			text: 'Cyclone',
+			length: 5,
+		} );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.type( 'spin' );
+
+		await expectDescriptionListChildren( editor, [
+			detail( 'Cyspin' ),
+			detail( 'Rotating weather system' ),
+		] );
+	} );
+
+	// eslint-disable-next-line playwright/expect-expect
 	test( 'transforms a detail to a term with Shift+Tab', async ( {
 		editor,
 		page,
@@ -102,6 +149,45 @@ test.describe( 'Description List', () => {
 		await expectDescriptionListChildren( editor, [
 			term( 'Cyclone' ),
 			term( 'Rotating weather system' ),
+		] );
+	} );
+
+	// eslint-disable-next-line playwright/expect-expect
+	test( 'keeps a text range selected when transforming a detail with Shift+Tab', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/description-list',
+			innerBlocks: [
+				{
+					name: 'core/description-term',
+					attributes: { content: 'Storm' },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: { content: 'Weather' },
+				},
+			],
+		} );
+
+		await editor.canvas.getByText( 'Weather', { exact: true } ).click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' system' );
+		await selectTextSuffix( {
+			editor,
+			page,
+			pageUtils,
+			text: 'Weather system',
+			length: 6,
+		} );
+		await page.keyboard.press( 'Shift+Tab' );
+		await page.keyboard.type( 'event' );
+
+		await expectDescriptionListChildren( editor, [
+			term( 'Storm' ),
+			term( 'Weather event' ),
 		] );
 	} );
 
