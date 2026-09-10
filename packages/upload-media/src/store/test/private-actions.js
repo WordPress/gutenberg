@@ -1639,6 +1639,40 @@ describe( 'private actions', () => {
 			} );
 		} );
 
+		it( 'cancels the item with an edit error when the image is too large for the browser', async () => {
+			// A 20000x20000 progressive JPEG header: well past the wasm-vips
+			// memory budget, so the edit must never reach the worker.
+			const hugeFile = new File(
+				[
+					new Uint8Array( [
+						0xff, 0xd8, 0xff, 0xc2, 0x00, 0x11, 0x08, 0x4e, 0x20,
+						0x4e, 0x20, 0x03,
+					] ),
+				],
+				'huge.jpg',
+				{ type: 'image/jpeg' }
+			);
+			const dispatch = createDispatch();
+
+			await editImageItem( 'item-1', { modifiers } )( {
+				select: {
+					getItem: () => ( { id: 'item-1', file: hugeFile } ),
+					getSettings: () => ( {} ),
+				},
+				dispatch,
+			} );
+
+			expect( vipsEditImage ).not.toHaveBeenCalled();
+			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'item-1',
+				expect.objectContaining( {
+					code: ErrorCode.IMAGE_EDIT_ERROR,
+					file: hugeFile,
+				} )
+			);
+		} );
+
 		it( 'cancels the item with an edit error when vips fails', async () => {
 			// Nothing has reached the server at this point, so the error
 			// code lets a caller fall back to the REST `/edit` endpoint.

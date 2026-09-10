@@ -1323,6 +1323,25 @@ export function editImageItem( id: QueueItemId, args?: EditImageItemArgs ) {
 			return;
 		}
 
+		// Gate images past the wasm-vips memory cap out of the browser before
+		// any decode is attempted, as `prepareItem` does for uploads. Nothing
+		// has reached the server yet, so the edit error lets the caller hand
+		// the edit to the REST `/edit` endpoint instead.
+		const dimensions = await getImageDimensions( item.file );
+		if ( dimensions && exceedsClientProcessingMemory( dimensions ) ) {
+			dispatch.cancelItem(
+				id,
+				new UploadError( {
+					code: ErrorCode.IMAGE_EDIT_ERROR,
+					message: __(
+						'The image is too large to edit in the browser.'
+					),
+					file: item.file,
+				} )
+			);
+			return;
+		}
+
 		const startTime = performance.now();
 
 		try {

@@ -1,6 +1,7 @@
 import type { createRegistry } from '@wordpress/data';
 import {
 	ErrorCode,
+	exceedsClientProcessingMemory,
 	isClientSideMediaSupported,
 	store as uploadStore,
 	UploadError,
@@ -86,6 +87,37 @@ export function getOriginalImageUrl( media: Media ): string | undefined {
 		return sourceUrl.replace( /[^/]+$/, originalImage );
 	}
 	return sourceUrl;
+}
+
+/**
+ * Whether the attachment record shows an original too large for the browser
+ * to process, so the edit can go straight to the server without downloading
+ * the file first.
+ *
+ * The record's width and height describe the full-size image WordPress
+ * serves. When the upload exceeded the big image size threshold that is the
+ * scaled copy, and the original the edit applies to is larger by an unknown
+ * amount, so only a record without `original_image` can answer. Interlacing
+ * is not recorded either, so the baseline budget applies; the upload queue
+ * checks the file itself before decoding it.
+ *
+ * @param media Attachment record.
+ * @return Whether the original is known to exceed the client memory budget.
+ */
+export function isOriginalTooLargeForClient( media: Media ): boolean {
+	const details = media.media_details;
+	if ( ! details || details.original_image ) {
+		return false;
+	}
+	const { width, height } = details;
+	if ( typeof width !== 'number' || typeof height !== 'number' ) {
+		return false;
+	}
+	return exceedsClientProcessingMemory( {
+		width,
+		height,
+		interlaced: false,
+	} );
 }
 
 /**
@@ -184,7 +216,11 @@ export async function editImageClientSide( {
 	modifiers,
 	additionalData,
 }: EditImageClientSideArgs ): Promise< number | null > {
-	if ( ! media.id || ! canEditImageClientSide( registry ) ) {
+	if (
+		! media.id ||
+		! canEditImageClientSide( registry ) ||
+		isOriginalTooLargeForClient( media )
+	) {
 		return null;
 	}
 

@@ -5,6 +5,7 @@ import {
 	editImageClientSide,
 	getEditedAttachmentData,
 	getOriginalImageUrl,
+	isOriginalTooLargeForClient,
 } from '../edit-image-client-side';
 
 const { mockAddEditedImage, mockGetSettings, mockIsSupported } = vi.hoisted(
@@ -66,6 +67,45 @@ describe( 'getOriginalImageUrl', () => {
 
 	it( 'returns undefined without a source_url', () => {
 		expect( getOriginalImageUrl( { id: 10 } ) ).toBeUndefined();
+	} );
+} );
+
+describe( 'isOriginalTooLargeForClient', () => {
+	it( 'is true when the record shows an original past the client memory budget', () => {
+		expect(
+			isOriginalTooLargeForClient( {
+				...media,
+				media_details: { width: 20000, height: 20000 },
+			} )
+		).toBe( true );
+	} );
+
+	it( 'is false for an ordinary image', () => {
+		expect(
+			isOriginalTooLargeForClient( {
+				...media,
+				media_details: { width: 4000, height: 3000 },
+			} )
+		).toBe( false );
+	} );
+
+	it( 'is false when the record only describes the scaled copy', () => {
+		// The original the edit applies to is larger by an unknown amount,
+		// so the record cannot answer; the queue checks the file itself.
+		expect(
+			isOriginalTooLargeForClient( {
+				...media,
+				media_details: {
+					width: 2560,
+					height: 2560,
+					original_image: 'photo.jpg',
+				},
+			} )
+		).toBe( false );
+	} );
+
+	it( 'is false without dimensions', () => {
+		expect( isOriginalTooLargeForClient( media ) ).toBe( false );
 	} );
 } );
 
@@ -191,6 +231,22 @@ describe( 'editImageClientSide', () => {
 			} )
 		).toBeNull();
 		expect( fetchMock ).not.toHaveBeenCalled();
+	} );
+
+	it( 'falls back without downloading an original too large for the browser', async () => {
+		expect(
+			await editImageClientSide( {
+				registry,
+				media: {
+					...media,
+					media_details: { width: 20000, height: 20000 },
+				},
+				modifiers,
+				additionalData: {},
+			} )
+		).toBeNull();
+		expect( fetchMock ).not.toHaveBeenCalled();
+		expect( mockAddEditedImage ).not.toHaveBeenCalled();
 	} );
 
 	it( 'falls back when the original cannot be fetched', async () => {

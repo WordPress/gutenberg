@@ -4,7 +4,8 @@
 
 ### New Features
 
--   Add an `addEditedImage` action that applies flip, rotate and crop edits to an image with vips and uploads the result as a new attachment through the regular pipeline, the client-side counterpart of the REST `media/<id>/edit` endpoint ([#82362](https://github.com/WordPress/gutenberg/pull/82362)).
+-   Add an `addEditedImage` action that applies flip, rotate and crop edits to an image with vips and uploads the result as a new attachment through the regular pipeline, the client-side counterpart of the REST `media/<id>/edit` endpoint. An image past the client memory budget fails with `IMAGE_EDIT_ERROR` before any decode is attempted, so the caller can hand the edit to the server ([#82362](https://github.com/WordPress/gutenberg/pull/82362)).
+-   Export `exceedsClientProcessingMemory` and the `ImageDimensions` type, so a caller that already knows an image's dimensions can route it to the server without downloading it ([#82362](https://github.com/WordPress/gutenberg/pull/82362)).
 
 ## 0.40.0 (2026-09-10)
 
