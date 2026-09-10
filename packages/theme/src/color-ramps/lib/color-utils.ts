@@ -9,6 +9,7 @@ import {
 	getLuminance,
 	sRGB,
 	OKLCH,
+	type ColorObject,
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 
@@ -87,16 +88,17 @@ function getContrastFromLuminances( first: number, second: number ): number {
 }
 
 /**
- * Assert that a seed-color string is sRGB-parseable and fully opaque (hex,
+ * Parse a seed-color string and assert that it is sRGB-parseable and fully opaque (hex,
  * `rgb()`/`rgba()`, or a CSS named color), throwing otherwise.
  *
  * Rejection is deterministic regardless of which `ColorSpace`s are globally
  * registered.
  *
  * @param seed The seed-color string to validate.
+ * @return The parsed seed color.
  * @throws If `seed` is not an sRGB-parseable, fully opaque string.
  */
-export function assertValidSeedColor( seed: string ): void {
+export function parseSeedColor( seed: string ): ReturnType< typeof parse > {
 	ALLOWED_SEED_COLOR_SPACES.forEach( ( space ) =>
 		ColorSpace.register( space )
 	);
@@ -125,13 +127,14 @@ export function assertValidSeedColor( seed: string ): void {
 			`Unsupported seed color "${ seed }": expected a fully opaque color.`
 		);
 	}
+
+	return parsedColor;
 }
 
 /**
  * Make sure that a color is valid in the sRGB gamut and convert it to OKLCH.
- * @param c A `PlainColorObject`, or an sRGB-parseable string.
+ * @param c A color object.
  */
-export function clampToGamut( c: string | PlainColorObject ) {
-	ColorSpace.register( sRGB );
+export function clampToGamut( c: ColorObject ) {
 	return to( toGamut( c, { space: sRGB, method: 'css' } ), OKLCH );
 }

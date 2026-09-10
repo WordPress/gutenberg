@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import nodePath, { dirname } from 'path';
-import Octokit from '@octokit/rest';
+import { Octokit } from '@octokit/rest';
 
 function getArg( argName ) {
 	const arg = process.argv.find( ( _arg ) =>

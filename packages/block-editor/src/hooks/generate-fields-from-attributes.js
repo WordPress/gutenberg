@@ -10,7 +10,7 @@
  * See https://github.com/WordPress/wordpress-develop/blob/8f6d31266deecd7eea258bd3d45597355cce13d0/src/wp-includes/block-supports/auto-register.php#L30
  *
  * @param {Object} attributes - Block type attributes from block registration
- * @return {{ fields: Array, form: Object }} fieldsKey and formKey values
+ * @return {{ fields: Array, form: Object }} DataForm fields and form definitions
  */
 export function generateFieldsFromAttributes( attributes ) {
 	const fields = [];

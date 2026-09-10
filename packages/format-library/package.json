@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/format-library",
-	"version": "5.54.0",
+	"version": "5.55.0",
 	"description": "Format library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -61,9 +61,9 @@
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",
-		"@testing-library/react": "^16.3.2",
+		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.1",
-		"vitest": "^4.1.11"
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",
