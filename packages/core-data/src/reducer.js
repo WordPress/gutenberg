@@ -577,6 +577,18 @@ export function navigationFallbackId( state = null, action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_NAVIGATION_FALLBACK_ID':
 			return action.fallbackId;
+		case 'REMOVE_ITEMS':
+			// if the kind is postType
+			// and the type if `wp_navigation`
+			// and the item is the fallback id
+			// then remove the fallback id
+			if (
+				action.kind === 'postType' &&
+				action.name === 'wp_navigation' &&
+				state === action.itemIds[ 0 ]
+			) {
+				return null;
+			}
 	}
 
 	return state;
