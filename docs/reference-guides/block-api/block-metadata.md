@@ -166,12 +166,15 @@ An implementation should expect and tolerate unknown categories, providing some 
 -   Optional
 -   Localized: No
 -   Property: `parent`
+-   Default: `undefined`
 
 ```json
 { "parent": [ "my-block/product" ] }
 ```
 
-Setting `parent` lets a block require that it is only available when nested within the specified blocks. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+Setting `parent` lets a block require that it is only available when nested within the specified blocks. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block. When `parent` is omitted or `undefined`, the block can be inserted anywhere in the editor without restriction.
+
+Note: Providing an empty array (`"parent": []`) will prevent the block from being inserted anywhere in the editor, effectively making it unavailable. To allow a block everywhere, omit the `parent` property entirely.
 
 ### Ancestor
 
