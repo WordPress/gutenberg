@@ -1,28 +1,35 @@
 import { defineConfig, type Config } from '@terrazzo/parser';
 import pluginCSS from '@terrazzo/plugin-css';
 import { makeCSSVar } from '@terrazzo/token-tools/css';
-import pluginModeOverrides from './bin/terrazzo-plugin-mode-overrides/index';
-import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index';
-import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
-import pluginDsTokenFallbacks from './bin/terrazzo-plugin-ds-token-fallbacks/index';
-import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index';
-import typescriptTypes from './bin/terrazzo-plugin-typescript-types/index';
-import { SEMANTIC_COLOR_CONTRAST_PAIRS } from './src/semantic-color-contrast-pairs';
+import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index.ts';
+import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index.ts';
+import pluginDsTokenFallbacks from './bin/terrazzo-plugin-ds-token-fallbacks/index.ts';
+import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index.ts';
+import typescriptTypes from './bin/terrazzo-plugin-typescript-types/index.ts';
+import { SEMANTIC_COLOR_CONTRAST_PAIRS } from './src/semantic-color-contrast-pairs.ts';
+
+const cornerRadiusPermutations = [
+	'none',
+	'subtle',
+	'moderate',
+	'pronounced',
+].map( ( cornerRadius ) => ( {
+	input: { 'corner-radius': cornerRadius },
+	only: {
+		sets: [ 'base' ],
+		modifiers: [ 'corner-radius' ],
+	},
+	include: [ 'wpds-border.radius.*' ],
+	prepare: ( contents: string ) =>
+		`[data-wpds-corner-radius="${ cornerRadius }"],\n:root[data-wpds-root-provider="true"][data-wpds-corner-radius="${ cornerRadius }"] {\n\t${ contents }\n}`,
+} ) );
 
 const config: Config = {
-	tokens: [
-		'./tokens/border.json',
-		'./tokens/color.json',
-		'./tokens/cursor.json',
-		'./tokens/dimension.json',
-		'./tokens/motion.json',
-		'./tokens/typography.json',
-	],
+	tokens: [ './tokens/wpds.resolver.json' ],
 	outDir: '.',
 
-	// Preserve source ordering of tokens in output. This is important because
-	// many of our tokens operate on a size scale (2xs → 2xl) and it's more easy
-	// to understand that size progression in the original order.
+	// Preserve source ordering in generated documentation and JavaScript/TypeScript
+	// artifacts. The CSS plugin alphabetizes custom properties independently.
 	alphabetize: false,
 
 	plugins: [
@@ -39,13 +46,20 @@ const config: Config = {
 		pluginCSS( {
 			filename: 'prebuilt/css/design-tokens.css',
 			variableName: ( token ) => makeCSSVar( token.id ),
-			baseSelector: ':root',
-			modeSelectors: [
+			permutations: [
 				{
-					mode: 'high-dpi',
-					selectors: [
-						'@media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi )',
-					],
+					input: {},
+					prepare: ( contents ) => `:root {\n\t${ contents }\n}`,
+				},
+				{
+					input: { 'pixel-density': 'high-dpi' },
+					only: {
+						sets: [ 'base' ],
+						modifiers: [ 'pixel-density' ],
+					},
+					include: [ 'wpds-border.width.focus' ],
+					prepare: ( contents ) =>
+						`@media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {\n\t:root {\n\t\t${ contents }\n\t}\n}`,
 				},
 				// Each corner-radius preset is applied via the
 				// `data-wpds-corner-radius` attribute that `ThemeProvider`
@@ -53,34 +67,7 @@ const config: Config = {
 				// its preset attributes directly to the document element so
 				// the whole token surface stays consistent on `<html>` (e.g.
 				// for PHP-rendered admin UI outside the React app).
-				{
-					mode: 'corner-radius-none',
-					selectors: [
-						'[data-wpds-corner-radius="none"]',
-						':root[data-wpds-root-provider="true"][data-wpds-corner-radius="none"]',
-					],
-				},
-				{
-					mode: 'corner-radius-subtle',
-					selectors: [
-						'[data-wpds-corner-radius="subtle"]',
-						':root[data-wpds-root-provider="true"][data-wpds-corner-radius="subtle"]',
-					],
-				},
-				{
-					mode: 'corner-radius-moderate',
-					selectors: [
-						'[data-wpds-corner-radius="moderate"]',
-						':root[data-wpds-root-provider="true"][data-wpds-corner-radius="moderate"]',
-					],
-				},
-				{
-					mode: 'corner-radius-pronounced',
-					selectors: [
-						'[data-wpds-corner-radius="pronounced"]',
-						':root[data-wpds-root-provider="true"][data-wpds-corner-radius="pronounced"]',
-					],
-				},
+				...cornerRadiusPermutations,
 			],
 			legacyHex: true,
 		} ),
@@ -265,7 +252,6 @@ const config: Config = {
 				},
 			],
 		} ),
-		pluginModeOverrides(),
 	],
 	lint: {
 		rules: {

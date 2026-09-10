@@ -4,14 +4,13 @@ import { forwardRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { ENTER } from '@wordpress/keycodes';
 import { pasteHandler } from '@wordpress/blocks';
 import {
 	privateApis as richTextPrivateApis,
 	create,
 	insert,
 } from '@wordpress/rich-text';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
@@ -97,12 +96,25 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		insertDefaultBlock( undefined, undefined, 0 );
 	}
 
-	function onKeyDown( event ) {
-		if ( event.keyCode === ENTER ) {
-			event.preventDefault();
-			onEnterPress();
+	// A native listener: React's onBeforeInput is synthesized from other
+	// events and does not carry the input type. Handled on beforeinput rather
+	// than keydown: moving focus to the new block while the keydown is still
+	// being handled leaves the iOS keyboard's auto-capitalization stale.
+	const enterRef = useRefEffect( ( element ) => {
+		function onBeforeInput( event ) {
+			if (
+				event.inputType === 'insertParagraph' ||
+				event.inputType === 'insertLineBreak'
+			) {
+				event.preventDefault();
+				onEnterPress();
+			}
 		}
-	}
+		element.addEventListener( 'beforeinput', onBeforeInput );
+		return () => {
+			element.removeEventListener( 'beforeinput', onBeforeInput );
+		};
+	}, [] );
 
 	function onPaste( event ) {
 		const clipboardData = event.clipboardData;
@@ -172,7 +184,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	return (
 		/* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
 		<h1
-			ref={ useMergeRefs( [ richTextRef, focusRef ] ) }
+			ref={ useMergeRefs( [ richTextRef, focusRef, enterRef ] ) }
 			contentEditable={ ! isEditingContentOnlySection && ! isPreview }
 			className={ className }
 			aria-label={ decodedPlaceholder }
@@ -180,7 +192,6 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 			aria-multiline="true"
 			onFocus={ onSelect }
 			onBlur={ onUnselect }
-			onKeyDown={ onKeyDown }
 			onPaste={ onPaste }
 			style={ style }
 		/>

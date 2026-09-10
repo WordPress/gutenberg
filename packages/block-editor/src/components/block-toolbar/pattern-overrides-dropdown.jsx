@@ -1,8 +1,5 @@
-import {
-	Popover,
-	ToolbarButton,
-	__experimentalText as WCText,
-} from '@wordpress/components';
+import { Popover, ToolbarButton } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -41,7 +38,7 @@ function PatternOverridesPopoverContent( { clientIds, blockTitle } ) {
 		description = __( 'These blocks are editable using overrides.' );
 	}
 
-	return <WCText>{ description }</WCText>;
+	return <Text>{ description }</Text>;
 }
 
 /**
