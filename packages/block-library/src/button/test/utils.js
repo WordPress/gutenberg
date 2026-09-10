@@ -32,9 +32,7 @@ describe( 'getSafeButtonUrl', () => {
 	} );
 
 	it( 'should reject a javascript: url disguised with a leading or embedded control character', () => {
-		// Browsers strip ASCII tab/newline and leading C0 control chars or
-		// spaces before resolving a URL's scheme, so these still execute as
-		// `javascript:` even though the raw string doesn't start with it.
+		// Browsers strip these before resolving the scheme, so it still executes.
 		expect( getSafeButtonUrl( '\tjavascript:alert(1)' ) ).toBeNull();
 		expect( getSafeButtonUrl( ' javascript:alert(1)' ) ).toBeNull();
 		expect( getSafeButtonUrl( 'java\tscript:alert(1)' ) ).toBeNull();
