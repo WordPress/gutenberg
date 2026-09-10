@@ -307,6 +307,19 @@ export function isCollaborationSupported( state: State ): boolean {
 }
 
 /**
+ * Returns the names of the plugins that make collaboration unsupported.
+ *
+ * Only meaningful while collaboration is unsupported. A meta box title stands
+ * in where the plugin behind it cannot be resolved.
+ *
+ * @param state Data state.
+ * @return Plugin names, empty when collaboration is supported.
+ */
+export function getCollaborationIncompatiblePlugins( state: State ): string[] {
+	return state.collaborationIncompatiblePlugins;
+}
+
+/**
  * Returns the view configuration for the given entity type.
  *
  * An optional fourth argument (e.g. `{ fields }`) may be passed when selecting;
