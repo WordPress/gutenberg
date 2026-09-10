@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Breadcrumbs, auto-registered PHP-only blocks: Don't pass `post_id` to the block-renderer endpoint when the current user can't edit the post referenced by the `postId` block context, which made the request fail with a 403 error; render without post context instead ([#80604](https://github.com/WordPress/gutenberg/pull/80604)).
+
 ## 11.0.0 (2026-09-10)
 
 ### Breaking Changes
