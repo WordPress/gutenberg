@@ -5,7 +5,7 @@ import { createRef } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 import * as Notice from '../index';
 
-vi.mock( '@wordpress/a11y', () => ( {
+vi.mock( import( '@wordpress/a11y' ), () => ( {
 	speak: vi.fn(),
 } ) );
 
@@ -184,13 +184,21 @@ describe( 'Notice', () => {
 
 	describe( 'screen reader announcements', () => {
 		it( 'renders without announcing its content', () => {
-			render(
+			const { container } = render(
 				<Notice.Root intent="error">
 					<Notice.Description>Something failed.</Notice.Description>
 				</Notice.Root>
 			);
 
 			expect( speak ).not.toHaveBeenCalled();
+			// Disable reason: no accessible query can find an element by an
+			// `aria-live` attribute when that element has no live-region role.
+			expect(
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				container.querySelector(
+					'[aria-live], [role="alert"], [role="status"]'
+				)
+			).not.toBeInTheDocument();
 		} );
 	} );
 } );
