@@ -26,9 +26,9 @@
 						]
 					}
 				],
-				"innerHTML": "\n\t<div role=\"region\" class=\"wp-block-accordion-panel\">\n\t\t\n\t</div>\n\t",
+				"innerHTML": "\n\t<div role=\"group\" class=\"wp-block-accordion-panel\">\n\t\t\n\t</div>\n\t",
 				"innerContent": [
-					"\n\t<div role=\"region\" class=\"wp-block-accordion-panel\">\n\t\t",
+					"\n\t<div role=\"group\" class=\"wp-block-accordion-panel\">\n\t\t",
 					null,
 					"\n\t</div>\n\t"
 				]

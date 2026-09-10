@@ -1,0 +1,36 @@
+[
+	{
+		"blockName": "core/accordion-panel",
+		"attrs": {
+			"templateLock": "insert",
+			"className": "custom-panel",
+			"style": {
+				"border": {
+					"radius": "8px"
+				},
+				"spacing": {
+					"padding": {
+						"top": "12px"
+					}
+				}
+			},
+			"backgroundColor": "cyan-bluish-gray",
+			"fontSize": "large"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<p>Accordion  Panel Content</p>\n\t",
+				"innerContent": [ "\n\t<p>Accordion  Panel Content</p>\n\t" ]
+			}
+		],
+		"innerHTML": "\n<div role=\"region\" class=\"wp-block-accordion-panel custom-panel has-cyan-bluish-gray-background-color has-background has-large-font-size\" style=\"border-radius:8px;padding-top:12px\">\n\t\n</div>\n",
+		"innerContent": [
+			"\n<div role=\"region\" class=\"wp-block-accordion-panel custom-panel has-cyan-bluish-gray-background-color has-background has-large-font-size\" style=\"border-radius:8px;padding-top:12px\">\n\t",
+			null,
+			"\n</div>\n"
+		]
+	}
+]
