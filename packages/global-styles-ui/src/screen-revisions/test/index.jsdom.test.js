@@ -1,47 +1,55 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useNavigator } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { createElement } from '@wordpress/element';
 import { getGlobalStylesChanges } from '@wordpress/global-styles-engine';
 import ScreenRevisions from '../';
 import { GlobalStylesContext } from '../../context';
 import useGlobalStylesRevisions from '../use-global-styles-revisions';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+globalThis.wpVitest.mockMatchMedia();
 
-jest.mock( '@wordpress/components', () => ( {
-	...jest.requireActual( '@wordpress/components' ),
-	useNavigator: jest.fn(),
+vi.mock( '@wordpress/data/src/components/use-select', () => ( {
+	default: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/global-styles-engine', () => ( {
-	...jest.requireActual( '@wordpress/global-styles-engine' ),
-	areGlobalStylesEqual: ( a, b ) =>
-		JSON.stringify( { styles: a?.styles, settings: a?.settings } ) ===
-		JSON.stringify( { styles: b?.styles, settings: b?.settings } ),
-	getGlobalStylesChanges: jest.fn( () => [ 'Colors styles.' ] ),
+vi.mock( import( '@wordpress/components' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useNavigator: vi.fn(),
 } ) );
 
-jest.mock( '../use-global-styles-revisions', () => jest.fn() );
+vi.mock(
+	import( '@wordpress/global-styles-engine' ),
+	async ( importOriginal ) => ( {
+		...( await importOriginal() ),
+		areGlobalStylesEqual: ( a, b ) =>
+			JSON.stringify( { styles: a?.styles, settings: a?.settings } ) ===
+			JSON.stringify( { styles: b?.styles, settings: b?.settings } ),
+		getGlobalStylesChanges: vi.fn( () => [ 'Colors styles.' ] ),
+	} )
+);
 
-jest.mock( '../../screen-header', () => ( {
-	ScreenHeader: ( { title, description } ) => (
-		<div>
-			<h2>{ title }</h2>
-			<p>{ description }</p>
-		</div>
-	),
+vi.mock( import( '../use-global-styles-revisions' ), () => ( {
+	default: vi.fn(),
 } ) );
 
-jest.mock( '../../lock-unlock', () => ( {
-	unlock: () => ( {
-		Badge: ( { children, className } ) => (
-			<span className={ className }>{ children }</span>
-		),
-	} ),
-} ) );
+vi.mock( import( '../../screen-header' ), async () => {
+	const { createElement: h } = await import( '@wordpress/element' );
+	return {
+		ScreenHeader: ( { title, description } ) =>
+			h(
+				'div',
+				null,
+				h( 'h2', null, title ),
+				h( 'p', null, description )
+			),
+	};
+} );
 
-jest.mock( '@wordpress/dataviews', () => {
+vi.mock( import( '@wordpress/dataviews' ), async () => {
+	const { createElement: h } = await import( '@wordpress/element' );
 	const DataViewsPicker = ( {
 		data,
 		fields,
@@ -61,64 +69,66 @@ jest.mock( '@wordpress/dataviews', () => {
 			selection.includes( getItemId( item ) )
 		);
 
-		return (
-			<div role="listbox" aria-label={ itemListLabel }>
-				{ data.map( ( item ) => (
-					<div
-						key={ getItemId( item ) }
-						role="option"
-						aria-label={ titleField.getValue( { item } ) }
-						aria-selected={ selection.includes(
+		return h(
+			'div',
+			{ role: 'listbox', 'aria-label': itemListLabel },
+			data.map( ( item ) =>
+				h(
+					'div',
+					{
+						key: getItemId( item ),
+						role: 'option',
+						'aria-label': titleField.getValue( { item } ),
+						'aria-selected': selection.includes(
 							getItemId( item )
-						) }
-						onClick={ () =>
-							onChangeSelection( [ getItemId( item ) ] )
-						}
-						onKeyDown={ () => {} }
-						tabIndex={ -1 }
-					>
-						<titleField.render item={ item } field={ titleField } />
-						<descriptionField.render
-							item={ item }
-							field={ descriptionField }
-						/>
-					</div>
-				) ) }
-				<button onClick={ () => onChangeSelection( [] ) }>
-					Clear selection
-				</button>
-				<button
-					onClick={ () =>
+						),
+						onClick: () =>
+							onChangeSelection( [ getItemId( item ) ] ),
+						onKeyDown: () => {},
+						tabIndex: -1,
+					},
+					h( titleField.render, { item, field: titleField } ),
+					h( descriptionField.render, {
+						item,
+						field: descriptionField,
+					} )
+				)
+			),
+			h(
+				'button',
+				{ onClick: () => onChangeSelection( [] ) },
+				'Clear selection'
+			),
+			h(
+				'button',
+				{
+					onClick: () =>
 						onChangeView( {
 							...view,
 							page: ( view.page ?? 1 ) + 1,
-						} )
-					}
-				>
-					Next page
-				</button>
-				{ /* Mirrors the picker footer's action buttons: eligibility
-				     disables the button, the label sees the selection, the
-				     callback only receives eligible items. */ }
-				{ actions.map( ( action ) => {
-					const eligibleItems = action.isEligible
-						? selectedItems.filter( action.isEligible )
-						: selectedItems;
-					return (
-						<button
-							key={ action.id }
-							disabled={
-								! selection.length || ! eligibleItems.length
-							}
-							onClick={ () => action.callback( eligibleItems ) }
-						>
-							{ typeof action.label === 'string'
-								? action.label
-								: action.label( selectedItems ) }
-						</button>
-					);
-				} ) }
-			</div>
+						} ),
+				},
+				'Next page'
+			),
+			// Mirrors the picker footer's action buttons: eligibility
+			// disables the button, the label sees the selection, the
+			// callback only receives eligible items.
+			actions.map( ( action ) => {
+				const eligibleItems = action.isEligible
+					? selectedItems.filter( action.isEligible )
+					: selectedItems;
+				return h(
+					'button',
+					{
+						key: action.id,
+						disabled: ! selection.length || ! eligibleItems.length,
+						onClick: () => action.callback( eligibleItems ),
+					},
+					typeof action.label === 'string'
+						? action.label
+						: action.label( selectedItems )
+				);
+			} )
 		);
 	};
 	DataViewsPicker.Layout = () => null;
@@ -158,13 +168,13 @@ const REVISIONS = [
 function renderScreen( {
 	userConfig = { styles: STYLES_A, settings: {} },
 } = {} ) {
-	const onChange = jest.fn();
+	const onChange = vi.fn();
 	render(
-		<GlobalStylesContext.Provider
-			value={ { user: userConfig, base: {}, merged: {}, onChange } }
-		>
-			<ScreenRevisions />
-		</GlobalStylesContext.Provider>
+		createElement(
+			GlobalStylesContext.Provider,
+			{ value: { user: userConfig, base: {}, merged: {}, onChange } },
+			createElement( ScreenRevisions )
+		)
 	);
 	return { onChange };
 }
@@ -173,8 +183,8 @@ describe( 'ScreenRevisions', () => {
 	let goTo;
 
 	beforeEach( () => {
-		jest.clearAllMocks();
-		goTo = jest.fn();
+		vi.clearAllMocks();
+		goTo = vi.fn();
 		useNavigator.mockReturnValue( { params: {}, goTo } );
 		useGlobalStylesRevisions.mockReturnValue( {
 			revisions: REVISIONS,
