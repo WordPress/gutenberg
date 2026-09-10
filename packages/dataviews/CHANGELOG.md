@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Grid layout: when the title is hidden (`showTitle: false`) and items are clickable, label each item's clickable media area with its title instead of the generic "Navigate to item" ([#82639](https://github.com/WordPress/gutenberg/pull/82639)).
+
+## 19.0.0 (2026-09-10)
+
 ### Breaking Changes
 
 -   Removed the rich text options (`className`, `clientId`, `allowedFormats`, `disableFormats`, `withoutInteractiveFormatting`, `preserveWhiteSpace`, `disableLineBreaks`) from the `config` prop of `DataFormControlProps`. They were added for the built-in `richtext` control ([#78471](https://github.com/WordPress/gutenberg/pull/78471)), which has since moved to `@wordpress/editor` ([#81430](https://github.com/WordPress/gutenberg/pull/81430)), so nothing in this package sets or reads them ([#82330](https://github.com/WordPress/gutenberg/pull/82330)).
@@ -45,6 +51,7 @@
 
 ### Bug Fixes
 
+-   `DataViews` and `DataViewsPicker`: the `table` and `pickerTable` layouts no longer render an empty column for an id in `view.fields` that has no matching field definition, matching what the other layouts already did. The column header menu moves, inserts and hides columns relative to the rendered columns, so a skipped id no longer offsets those operations; such ids are dropped from `view.fields` the next time the menu changes the view ([#82601](https://github.com/WordPress/gutenberg/pull/82601)).
 -   Fix `Field.sort` TypeScript type definition to reflect that `sort` receives extracted field values rather than `Item` objects ([#82162](https://github.com/WordPress/gutenberg/pull/82162)).
 -   DataForm: Render read-only fields without requiring an edit control ([#82514](https://github.com/WordPress/gutenberg/pull/82514)).
 -   Operators: Support the `isAny` and `isNone` filter operators for numeric field values, which previously matched nothing ([#77942](https://github.com/WordPress/gutenberg/pull/77942)).
@@ -64,6 +71,7 @@
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
 -   Note in the `/wp` bundle build script that its singleton externals list must stay in sync with the transitive private API usage check ([#82027](https://github.com/WordPress/gutenberg/pull/82027)).
+-   Update the `@types/node` development dependency to v24, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
 
 ### Bug Fix
 

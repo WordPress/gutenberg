@@ -1,18 +1,18 @@
 import 'vitest';
 import type { TestingLibraryMatchers } from '@testing-library/jest-dom/matchers';
 
-interface GutenbergVitestMatchers {
-	toBePositionedPopover: () => void;
-	toHaveErrored: () => void;
-	toHaveErroredWith: ( ...args: unknown[] ) => void;
-	toHaveInformed: () => void;
-	toHaveInformedWith: ( ...args: unknown[] ) => void;
-	toHaveLogged: () => void;
-	toHaveLoggedWith: ( ...args: unknown[] ) => void;
-	toHaveWarned: () => void;
-	toHaveWarnedWith: ( ...args: unknown[] ) => void;
-	toMatchDiffSnapshot: ( expected: unknown ) => void;
-	toMatchStyleDiffSnapshot: ( expected: Element | null ) => void;
+interface GutenbergVitestMatchers< R > {
+	toBePositionedPopover: () => R;
+	toHaveErrored: () => R;
+	toHaveErroredWith: ( ...args: unknown[] ) => R;
+	toHaveInformed: () => R;
+	toHaveInformedWith: ( ...args: unknown[] ) => R;
+	toHaveLogged: () => R;
+	toHaveLoggedWith: ( ...args: unknown[] ) => R;
+	toHaveWarned: () => R;
+	toHaveWarnedWith: ( ...args: unknown[] ) => R;
+	toMatchDiffSnapshot: ( expected: unknown ) => R;
+	toMatchStyleDiffSnapshot: ( expected: Element | null ) => R;
 }
 
 interface GutenbergVitestEnvironment {
@@ -30,8 +30,10 @@ declare global {
 }
 
 declare module 'vitest' {
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Keep Vitest's canonical generic matcher interface.
-	interface Matchers< T = any >
-		extends GutenbergVitestMatchers,
-			TestingLibraryMatchers< any, void > {}
+	interface Matchers<
+		R extends void | Promise< void > = void | Promise< void >,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Keep Vitest's canonical generic matcher interface.
+		T = unknown,
+	> extends GutenbergVitestMatchers< R >,
+			TestingLibraryMatchers< any, R > {}
 }

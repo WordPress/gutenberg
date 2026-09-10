@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+	within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMemo, useState } from '@wordpress/element';
@@ -388,6 +394,61 @@ describe( 'DataViews component', () => {
 					screen.getAllByText( item.title )[ 0 ]
 				).toBeInTheDocument();
 			}
+		} );
+
+		it( 'should not render a column for a field id without a field definition', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [ 'title', 'missing', 'order' ],
+					} }
+				/>
+			);
+
+			const headers = screen.getAllByRole( 'columnheader' );
+			expect( headers ).toHaveLength( 2 );
+			expect(
+				within( headers[ 0 ] ).getByRole( 'button', { name: 'Title' } )
+			).toBeInTheDocument();
+			expect(
+				within( headers[ 1 ] ).getByRole( 'button', { name: 'Order' } )
+			).toBeInTheDocument();
+
+			// The header row plus one row per item.
+			const rows = screen.getAllByRole( 'row' );
+			expect( rows ).toHaveLength( data.length + 1 );
+			for ( const row of rows.slice( 1 ) ) {
+				expect( within( row ).getAllByRole( 'cell' ) ).toHaveLength(
+					2
+				);
+			}
+		} );
+
+		it( 'should move a column past a field id without a field definition', async () => {
+			const user = userEvent.setup();
+			const onChangeView = vi.fn();
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [ 'title', 'missing', 'order' ],
+					} }
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Title' } ) );
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Move right' } )
+			);
+
+			// The move is computed against the rendered columns, so the
+			// title lands after the order column rather than swapping places
+			// with the skipped id, which is dropped from the view.
+			expect( onChangeView ).toHaveBeenCalledWith(
+				expect.objectContaining( { fields: [ 'order', 'title' ] } )
+			);
 		} );
 
 		it( 'should display title column if defined using titleField', () => {
@@ -829,6 +890,53 @@ describe( 'DataViews component', () => {
 			const user = userEvent.setup();
 			await user.click( imageField );
 			expect( mediaClickItemCallback ).toHaveBeenCalledWith( data[ 0 ] );
+		} );
+
+		it( 'labels the clickable media area with the title when the title is hidden', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: 'grid',
+						titleField: 'title',
+						mediaField: 'image',
+						showTitle: false,
+					} }
+					isItemClickable={ () => true }
+					onClickItem={ () => {} }
+				/>
+			);
+			for ( const item of data ) {
+				expect(
+					screen.getByRole( 'button', { name: item.title } )
+				).toBeInTheDocument();
+			}
+			expect(
+				screen.queryByRole( 'button', { name: 'Navigate to item' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'labels the clickable media area by the visible title when the title is shown', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: 'grid',
+						titleField: 'title',
+						mediaField: 'image',
+					} }
+					isItemClickable={ () => true }
+					onClickItem={ () => {} }
+				/>
+			);
+			// Both the media area and the title are clickable and share the
+			// name; the media area points at the rendered title
+			// (`aria-labelledby`) rather than carrying a label of its own.
+			const mediaButton = screen
+				.getAllByRole( 'button', { name: data[ 0 ].title } )
+				.find( ( button ) =>
+					button.classList.contains( 'dataviews-view-grid__media' )
+				);
+			expect( mediaButton ).toHaveAttribute( 'aria-labelledby' );
+			expect( mediaButton ).not.toHaveAttribute( 'aria-label' );
 		} );
 
 		it( 'accepts checkbox click for selection', async () => {

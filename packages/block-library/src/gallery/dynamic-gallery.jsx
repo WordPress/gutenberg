@@ -238,14 +238,17 @@ export function GallerySourcePanel( {
 					 * its confirm dialog below) is temporary. Once more sources
 					 * exist it becomes a "Choose source" select whose options read
 					 * from each source descriptor's `title`, with help text
-					 * carrying the per-source explanation this string does today.
+					 * carrying the per-source explanation these strings do today.
 					 */ }
+					<p className="wp-block-gallery__source-description">
+						{ __( 'Images added to the gallery.' ) }
+					</p>
 					<Button
 						__next40pxDefaultSize
 						variant="secondary"
 						onClick={ requestEnableDynamicMode }
 					>
-						{ __( 'Use images attached to the post' ) }
+						{ __( 'Use attached images' ) }
 					</Button>
 				</div>
 			</PanelBody>

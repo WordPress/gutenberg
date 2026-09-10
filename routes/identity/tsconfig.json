@@ -19,7 +19,8 @@
 		{ "path": "../../packages/fields/tsconfig.build.json" },
 		{ "path": "../../packages/html-entities/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
-		{ "path": "../../packages/lazy-editor" }
+		{ "path": "../../packages/lazy-editor" },
+		{ "path": "../../packages/views/tsconfig.build.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],
 	"exclude": [ "build", "node_modules" ]

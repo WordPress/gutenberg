@@ -3,7 +3,8 @@
 	"extends": "@wordpress/config-tools/tsconfig/dev.base.json",
 	// Tests live beside src, not under it.
 	"compilerOptions": {
-		"rootDir": "."
+		"rootDir": ".",
+		"types": [ "gutenberg-vitest-test-env" ]
 	},
 	"include": [ "test/**/*.ts" ],
 	"references": [ { "path": "./tsconfig.build.json" } ]

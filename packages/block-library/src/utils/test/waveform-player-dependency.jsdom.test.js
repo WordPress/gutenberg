@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import '@testing-library/jest-dom/vitest';
 
 const FIXTURE_ATTRIBUTE = 'data-player-fixture';
 
