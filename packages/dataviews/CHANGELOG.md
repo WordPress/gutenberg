@@ -54,6 +54,8 @@
 
 ### Enhancements
 
+-   DataViews: show bulk actions in the default table and grid headers, with a plain selected-item count. Custom compositions retain their existing placement.
+
 -   DataForm: Add a `showPlaceholderIfEmpty` option to the `panel` layout, which shows the field's `placeholder` in the summary when the value is empty ([#82527](https://github.com/WordPress/gutenberg/pull/82527)).
 -   Give unselected multi-selection filter indicators solid, themed backgrounds. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
 -   Validated form controls: Use `--wpds-color-stroke-interactive-error` for the invalid-state focus ring and border ([#82410](https://github.com/WordPress/gutenberg/pull/82410)).
@@ -62,6 +64,10 @@
 -   Export the `DataViewsProps` and `ItemWithId` types and document every type property ([#82326](https://github.com/WordPress/gutenberg/pull/82326)).
 
 ### Bug Fixes
+
+-   DataViews: keep default bulk-action headers visible when scrolling auto-height layouts.
+
+-   DataViews: preserve accessible table column headers while bulk actions are shown.
 
 -   `DataViews` and `DataViewsPicker`: the `table` and `pickerTable` layouts no longer render an empty column for an id in `view.fields` that has no matching field definition, matching what the other layouts already did. The column header menu moves, inserts and hides columns relative to the rendered columns, so a skipped id no longer offsets those operations; such ids are dropped from `view.fields` the next time the menu changes the view ([#82601](https://github.com/WordPress/gutenberg/pull/82601)).
 -   Fix `Field.sort` TypeScript type definition to reflect that `sort` receives extracted field values rather than `Item` objects ([#82162](https://github.com/WordPress/gutenberg/pull/82162)).

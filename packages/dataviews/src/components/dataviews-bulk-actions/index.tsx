@@ -1,9 +1,9 @@
 import type { ReactElement } from 'react';
-import { Button, CheckboxControl, DropdownMenu } from '@wordpress/components';
+import { Button, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, useRef, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
-import { closeSmall, chevronDown } from '@wordpress/icons';
+import { closeSmall } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
 import DataViewsContext from '../dataviews-context';
@@ -288,7 +288,7 @@ function renderBulkActionsContent< Item >(
 				getItemId={ getItemId }
 				disableSelectAll={ isInfiniteScroll }
 			/>
-			{ ! bulkActionsInLayout && (
+			{ ( ! bulkActionsInLayout || !! selection.length ) && (
 				<span className="dataviews-bulk-actions-footer__item-count">
 					{ getFooterMessage(
 						selection.length,
@@ -298,12 +298,9 @@ function renderBulkActionsContent< Item >(
 					) }
 				</span>
 			) }
-			{ bulkActionsInLayout &&
-				( selection.length ? (
-					<BulkSelectionDropdown />
-				) : (
-					<BulkActionsLabel />
-				) ) }
+			{ bulkActionsInLayout && ! selection.length && (
+				<BulkActionsLabel />
+			) }
 			<Stack
 				direction="row"
 				className={
@@ -447,61 +444,5 @@ function BulkActionsLabel() {
 			{ fields.find( ( field ) => field.id === view.titleField )?.label ??
 				__( 'Items' ) }
 		</span>
-	);
-}
-
-function BulkSelectionDropdown() {
-	const {
-		data,
-		actions = EMPTY_ARRAY,
-		selection,
-		onChangeSelection,
-		getItemId,
-		view,
-	} = useContext( DataViewsContext );
-	const remainingIds = data
-		.filter(
-			( item ) =>
-				hasAPossibleBulkAction( actions, item ) &&
-				! selection.includes( getItemId( item ) )
-		)
-		.map( getItemId );
-	return (
-		<DropdownMenu
-			icon={ chevronDown }
-			label={ __( 'Selection options' ) }
-			text={ getFooterMessage(
-				selection.length,
-				data.length,
-				data.length
-			) }
-			toggleProps={ {
-				size: 'compact',
-				iconPosition: 'right',
-				iconSize: 16,
-				showTooltip: false,
-				className: 'dataviews-bulk-actions__selection-toggle',
-			} }
-			controls={ [
-				{
-					title: __( 'Deselect all' ),
-					isDisabled: ! selection.length,
-					onClick: () => onChangeSelection( [] ),
-				},
-				...( view.infiniteScrollEnabled
-					? []
-					: [
-							{
-								title: __( 'Select remaining on this page' ),
-								isDisabled: ! remainingIds.length,
-								onClick: () =>
-									onChangeSelection( [
-										...selection,
-										...remainingIds,
-									] ),
-							},
-					  ] ),
-			] }
-		/>
 	);
 }

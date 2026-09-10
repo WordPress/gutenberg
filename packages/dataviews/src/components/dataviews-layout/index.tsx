@@ -1,9 +1,14 @@
 import type { ComponentType } from 'react';
-import { useContext } from '@wordpress/element';
+import { useContext, useEffect, useRef } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import DataViewsContext from '../dataviews-context';
 import { VIEW_LAYOUTS } from '../dataviews-layouts';
+import {
+	BulkActions,
+	useSomeItemHasAPossibleBulkAction,
+} from '../dataviews-bulk-actions';
+import { LAYOUT_TABLE, LAYOUT_GRID } from '../../constants';
 import { useDelayedLoading } from '../../hooks/use-delayed-loading';
 import type { ViewBaseProps } from '../../types';
 
@@ -30,8 +35,40 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		renderItemLink,
 		defaultLayouts,
 		containerRef,
+		bulkActionsInLayout,
 		empty = <p>{ __( 'No results' ) }</p>,
 	} = useContext( DataViewsContext );
+
+	const hasBulkActions =
+		useSomeItemHasAPossibleBulkAction( actions, data ) &&
+		[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type );
+	const bulkActionsRef = useRef< HTMLDivElement >( null );
+	const hadSelectionRef = useRef( false );
+	useEffect( () => {
+		if ( ! bulkActionsInLayout || view.type !== LAYOUT_TABLE ) {
+			return;
+		}
+		const tableHead = containerRef.current?.querySelector( 'thead' );
+		const ownerDocument = tableHead?.ownerDocument;
+		if (
+			selection.length &&
+			tableHead?.contains( ownerDocument?.activeElement ?? null )
+		) {
+			bulkActionsRef.current
+				?.querySelector< HTMLInputElement >( 'input' )
+				?.focus();
+		} else if (
+			hadSelectionRef.current &&
+			! selection.length &&
+			( ownerDocument?.activeElement === ownerDocument?.body ||
+				bulkActionsRef.current?.contains(
+					ownerDocument?.activeElement ?? null
+				) )
+		) {
+			tableHead?.querySelector< HTMLInputElement >( 'input' )?.focus();
+		}
+		hadSelectionRef.current = selection.length > 0;
+	}, [ selection.length, bulkActionsInLayout, view.type, containerRef ] );
 
 	const isDelayedInitialLoading = useDelayedLoading( ! hasInitiallyLoaded, {
 		delay: 200,
@@ -59,25 +96,43 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 	)?.component as ComponentType< ViewBaseProps< any > >;
 
 	return (
-		<div className="dataviews-layout__container" ref={ containerRef }>
-			<ViewComponent
-				className={ className }
-				actions={ actions }
-				data={ data }
-				fields={ fields }
-				getItemId={ getItemId }
-				getItemLevel={ getItemLevel }
-				isLoading={ isLoading }
-				onChangeView={ onChangeView }
-				onChangeSelection={ onChangeSelection }
-				selection={ selection }
-				setOpenedFilter={ setOpenedFilter }
-				onClickItem={ onClickItem }
-				renderItemLink={ renderItemLink }
-				isItemClickable={ isItemClickable }
-				view={ view }
-				empty={ empty }
-			/>
-		</div>
+		<>
+			{ /* Stay outside the scroll container so auto-height layouts stick to the page. */ }
+			{ bulkActionsInLayout && hasBulkActions && (
+				<div
+					className={
+						view.type === LAYOUT_TABLE
+							? 'dataviews-view-table__bulk-actions-overlay'
+							: 'dataviews-view-grid__bulk-actions-header'
+					}
+					hidden={ view.type === LAYOUT_TABLE && ! selection.length }
+					ref={ bulkActionsRef }
+					// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+					inert={ isLoading ? 'true' : undefined }
+				>
+					<BulkActions />
+				</div>
+			) }
+			<div className="dataviews-layout__container" ref={ containerRef }>
+				<ViewComponent
+					className={ className }
+					actions={ actions }
+					data={ data }
+					fields={ fields }
+					getItemId={ getItemId }
+					getItemLevel={ getItemLevel }
+					isLoading={ isLoading }
+					onChangeView={ onChangeView }
+					onChangeSelection={ onChangeSelection }
+					selection={ selection }
+					setOpenedFilter={ setOpenedFilter }
+					onClickItem={ onClickItem }
+					renderItemLink={ renderItemLink }
+					isItemClickable={ isItemClickable }
+					view={ view }
+					empty={ empty }
+				/>
+			</div>
+		</>
 	);
 }
