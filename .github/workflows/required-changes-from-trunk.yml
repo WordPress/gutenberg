@@ -1,6 +1,11 @@
 name: Required changes from trunk
 
 on:
+    workflow_call:
+        inputs:
+            mode:
+                required: true
+                type: string
     pull_request_target:
         types: [opened, synchronize, reopened, ready_for_review, edited, closed]
         branches: [trunk]
@@ -20,7 +25,7 @@ permissions: {}
 
 env:
     # One source of truth for both jobs. No markers: the baseline moves only
-    # through a labeled merge or a dispatch, never because a path changed.
+    # after a latest package release, a labeled merge, or a dispatch.
     PR_BASELINES: '[{"name":"required-trunk-changes","label":"Require PR update"}]'
     STATUS_CONTEXT: Required changes from trunk
     DESCRIPTION_PASS: Includes required {base} changes.
@@ -54,15 +59,15 @@ jobs:
 
     refresh-pr-statuses:
         name: Move the required trunk baseline and refresh statuses
-        # The baseline moves only through explicit intent: a merged pull request
-        # carrying the label, or a dispatch with mode move-baseline. Every trunk
-        # push recovers a move whose own run was lost, and continues a refresh
-        # that stopped on its write budget.
+        # The baseline moves only through explicit intent: a latest package
+        # release, a merged pull request carrying the label, or a dispatch with
+        # mode move-baseline. Every trunk push recovers a move whose own run was
+        # lost, and continues a refresh that stopped on its write budget.
         if: >
             github.repository == 'WordPress/gutenberg' && (
                 (github.event_name == 'pull_request_target' && github.event.action == 'closed' && github.event.pull_request.merged) ||
                 (github.event_name == 'push' && github.ref_name == 'trunk') ||
-                github.event_name == 'workflow_dispatch'
+                inputs.mode != ''
             )
         runs-on: ubuntu-latest
         timeout-minutes: 60

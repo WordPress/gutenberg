@@ -589,3 +589,14 @@ jobs:
                   npm exec --no release-cli -- npm-latest --semver minor --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    move-required-trunk-baseline:
+        name: Move required trunk baseline
+        needs: npm-publish
+        permissions:
+            contents: write
+            statuses: write
+            pull-requests: read
+        uses: ./.github/workflows/required-changes-from-trunk.yml
+        with:
+            mode: move-baseline

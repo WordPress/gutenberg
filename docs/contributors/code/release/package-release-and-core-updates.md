@@ -22,6 +22,8 @@ We deliberately update the `wp/latest` branch within the Gutenberg repo with the
 
 Behind the scenes, all steps are automated via `npm exec --no release-cli -- npm-latest`. For the record, the manual process would look very close to the following steps:
 
+After a successful `latest` release updates `trunk`, the workflow also moves the required-trunk baseline to the current `trunk` commit. Open pull requests must then merge or rebase `trunk` before they can be merged. This automation initially excludes standalone bugfix package releases to limit disruption. Maintainers can still dispatch the Required changes from trunk workflow with `mode: move-baseline` when a bugfix release needs it.
+
 1. Ensure the WordPress `trunk` branch is open for enhancements.
 2. Get the last published Gutenberg release branch with `git fetch`.
 3. Check out the `wp/latest` branch.

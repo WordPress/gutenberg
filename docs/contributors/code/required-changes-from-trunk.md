@@ -1,13 +1,14 @@
 # Required changes from trunk
 
-The `Required changes from trunk` status check ensures open pull requests contain the latest required repo-wide infrastructure changes from `trunk` (toolchain bumps like a Node.js upgrade, or repo-wide formatting and linting changes) before they can be merged. This prevents a pull request based on an older commit from passing CI against an outdated toolchain or reintroducing old-style code.
+The `Required changes from trunk` status check ensures open pull requests contain changes that must not be overwritten, such as published package metadata, toolchain updates, or repo-wide formatting changes, before they can be merged. This prevents a pull request based on an older commit from restoring stale release data or passing CI against outdated repository conventions.
 
 ## How it works
 
 A movable git ref, `refs/baselines/required-trunk-changes`, points at the last `trunk` commit that every open pull request must contain. The check passes when that commit is an ancestor of the pull request head, and fails otherwise. While the ref does not exist, nothing is required and every pull request passes.
 
-The baseline moves only through explicit maintainer intent, in one of two ways:
+The baseline moves only through explicit release or maintainer intent, in one of three ways:
 
+-   Completing a `latest` npm package release,
 -   Merging a pull request that carries the `Require PR update` label, or
 -   Dispatching the `Required changes from trunk` workflow with `mode: move-baseline`.
 
