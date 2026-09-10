@@ -35,7 +35,7 @@ class WidgetErrorBoundary extends Component<
 		if ( this.state.hasError ) {
 			return (
 				<Notice.Root intent="error">
-					<Notice.Description>
+					<Notice.Description role="alert">
 						{ __( 'This widget encountered an error.' ) }
 					</Notice.Description>
 				</Notice.Root>
