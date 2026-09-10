@@ -6,12 +6,16 @@ import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 // @ts-expect-error No exported types
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
 const { BlockCard } = unlock( blockEditorPrivateApis );
+const { getTemplateInfo } = unlock( coreDataPrivateApis );
 
 const POST_TITLE_BLOCK = 'core/post-title';
 
@@ -26,41 +30,60 @@ const POST_TITLE_BLOCK = 'core/post-title';
  * @return The rendered panel.
  */
 export default function PostTitleInspector() {
-	const { templateId, onNavigateToEntityRecord, canEditTemplate } = useSelect(
-		( select ) => {
-			const { getCurrentTemplateId, getEditorSettings } = select(
-				editorStore
-			) as {
-				getCurrentTemplateId: () => string | undefined;
-				getEditorSettings: () => {
-					onNavigateToEntityRecord?: ( args: {
-						postId: string;
-						postType: string;
-					} ) => void;
-				};
+	const {
+		templateId,
+		templateTitle,
+		onNavigateToEntityRecord,
+		canEditTemplate,
+	} = useSelect( ( select ) => {
+		const { getCurrentTemplateId, getEditorSettings } = select(
+			editorStore
+		) as {
+			getCurrentTemplateId: () => string | undefined;
+			getEditorSettings: () => {
+				onNavigateToEntityRecord?: ( args: {
+					postId: string;
+					postType: string;
+				} ) => void;
 			};
-			const { canUser } = select( coreStore );
+		};
+		const { canUser, getEntityRecord, getCurrentTheme } =
+			select( coreStore );
+		const currentTemplateId = getCurrentTemplateId();
 
-			return {
-				templateId: getCurrentTemplateId(),
-				onNavigateToEntityRecord:
-					getEditorSettings().onNavigateToEntityRecord,
-				canEditTemplate: !! canUser( 'create', {
-					kind: 'postType',
-					name: TEMPLATE_POST_TYPE,
-				} ),
-			};
-		},
-		[]
-	);
+		/*
+		 * A template's own title is empty, or just its slug, until someone
+		 * renames it. `getTemplateInfo` falls back to the name the theme
+		 * gives it — "Pages", "Single Posts" — which is what the rest of
+		 * the editor shows.
+		 */
+		const templateInfo = currentTemplateId
+			? getTemplateInfo( {
+					templateTypes:
+						(
+							getCurrentTheme() as
+								| { default_template_types?: unknown[] }
+								| undefined
+						 )?.default_template_types ?? [],
+					template: getEntityRecord(
+						'postType',
+						TEMPLATE_POST_TYPE,
+						currentTemplateId
+					),
+			  } )
+			: undefined;
 
-	// Nothing to fetch until the post resolves which template it uses.
-	const { editedRecord: template } = useEntityRecord< { title?: string } >(
-		'postType',
-		TEMPLATE_POST_TYPE,
-		templateId ?? '',
-		{ enabled: !! templateId }
-	);
+		return {
+			templateId: currentTemplateId,
+			templateTitle: templateInfo?.title as string | undefined,
+			onNavigateToEntityRecord:
+				getEditorSettings().onNavigateToEntityRecord,
+			canEditTemplate: !! canUser( 'create', {
+				kind: 'postType',
+				name: TEMPLATE_POST_TYPE,
+			} ),
+		};
+	}, [] );
 
 	const blockType = getBlockType( POST_TITLE_BLOCK );
 
@@ -68,15 +91,13 @@ export default function PostTitleInspector() {
 		return null;
 	}
 
-	const templateTitle = template?.title
-		? decodeEntities( template.title )
-		: undefined;
+	const title = templateTitle ? decodeEntities( templateTitle ) : undefined;
 
 	/*
-	 * Without a template to name there is nothing useful to say about where the
-	 * title's appearance comes from, so only the card is shown.
+	 * A template that cannot be named is no reason to withhold the
+	 * explanation; the button just says "Edit template" instead.
 	 */
-	const canExplain = !! templateTitle && canEditTemplate;
+	const canExplain = !! templateId && canEditTemplate;
 
 	return (
 		<Stack direction="column" gap="md">
@@ -94,11 +115,13 @@ export default function PostTitleInspector() {
 						onNavigateToEntityRecord
 							? [
 									{
-										label: sprintf(
-											// translators: %s: name of the template, e.g. "Pages".
-											__( 'Edit %s template' ),
-											templateTitle
-										),
+										label: title
+											? sprintf(
+													// translators: %s: name of the template, e.g. "Pages".
+													__( 'Edit %s template' ),
+													title
+											  )
+											: __( 'Edit template' ),
 										onClick: () =>
 											onNavigateToEntityRecord( {
 												postId: templateId as string,
