@@ -35,6 +35,19 @@ export function taperChroma(
 	lTarget: number, // [0..1]
 	options: TaperChromaOptions = {}
 ): { l: number; c: number } | PlainColorObject {
+	return createChromaTaper( seed, options )( lTarget );
+}
+
+/**
+ * Prepare a chroma taper for repeated target-lightness calculations.
+ *
+ * @param seed    Seed color in OKLCH.
+ * @param options Chroma taper options.
+ */
+export function createChromaTaper(
+	seed: PlainColorObject,
+	options: TaperChromaOptions = {}
+): ( lTarget: number ) => { l: number; c: number } | PlainColorObject {
 	const gamut = options.gamut ?? sRGB;
 	const alpha = options.alpha ?? 0.65; // 0.7-0.8 works well for accent surface
 	const carry = options.carry ?? 0.5;
@@ -55,42 +68,44 @@ export function taperChroma(
 			hSeed = normalizeHue( options.hueFallback );
 		} else {
 			// Respect achromatic intent: grayscale at target L
-			return {
+			return ( lTarget ) => ( {
 				space: OKLCH,
 				coords: [ clamp01( lTarget ), 0, 0 ],
 				alpha: 1,
-			};
+			} );
 		}
 	}
 
-	// Capacity at seed and target
+	// Capacity at seed
 	const lSeed = clamp01( get( seed, [ OKLCH, 'l' ] ) );
 	const cmaxSeed = getMaxChromaAtLH( lSeed, hSeed, gamut );
-	const cmaxTarget = getMaxChromaAtLH( clamp01( lTarget ), hSeed, gamut );
 
 	// Seed vividness ratio (hue-fair normalization)
-	let seedRelative = 0;
 	const denom = cmaxSeed > 0 ? cmaxSeed : 1e-6;
-	seedRelative = clamp01( cSeed / denom );
+	const seedRelative = clamp01( cSeed / denom );
+	const seedCarry = Math.pow( seedRelative, clamp01( carry ) );
 
-	// Intended chroma from local capacity, tempered by seed vividness
-	const cIntendedBase = alpha * cmaxTarget;
-	const cWithCarry =
-		cIntendedBase * Math.pow( seedRelative, clamp01( carry ) );
+	return ( lTarget ) => {
+		const cmaxTarget = getMaxChromaAtLH( clamp01( lTarget ), hSeed, gamut );
 
-	// Gentle, symmetric desaturation vs distance in L
-	const t = continuousTaper( lSeed, lTarget, {
-		radiusLight,
-		radiusDark,
-		kLight,
-		kDark,
-	} );
-	const cPlanned = cWithCarry * t;
+		// Intended chroma from local capacity, tempered by seed vividness
+		const cIntendedBase = alpha * cmaxTarget;
+		const cWithCarry = cIntendedBase * seedCarry;
 
-	// Downward-only clamp (preserve L & H)
-	const lOut = clamp01( lTarget );
+		// Gentle, symmetric desaturation vs distance in L
+		const t = continuousTaper( lSeed, lTarget, {
+			radiusLight,
+			radiusDark,
+			kLight,
+			kDark,
+		} );
+		const cPlanned = cWithCarry * t;
 
-	return { l: lOut, c: cPlanned };
+		// Downward-only clamp (preserve L & H)
+		const lOut = clamp01( lTarget );
+
+		return { l: lOut, c: cPlanned };
+	};
 }
 
 /* ---------------- helpers & caches ---------------- */
