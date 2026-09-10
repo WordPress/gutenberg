@@ -1,19 +1,25 @@
-const mockSyncManager = {};
-const mockCreateSyncManager = jest.fn( () => mockSyncManager );
+import { afterEach, describe, expect, it, vi } from 'vitest';
+const { mockSyncManager, mockCreateSyncManager } = vi.hoisted( () => {
+	const manager = {};
+	return {
+		mockSyncManager: manager,
+		mockCreateSyncManager: vi.fn( () => manager ),
+	};
+} );
 
-jest.mock( '@wordpress/sync', () => ( {
+vi.mock( '@wordpress/sync', () => ( {
 	privateApis: {
 		createSyncManager: mockCreateSyncManager,
 	},
 } ) );
 
-jest.mock( '../lock-unlock', () => ( {
+vi.mock( '../lock-unlock', () => ( {
 	unlock: ( privateApis ) => privateApis,
 } ) );
 
-function loadSync() {
-	jest.resetModules();
-	return require( '../sync' );
+async function loadSync() {
+	vi.resetModules();
+	return import( '../sync' );
 }
 
 describe( 'getSyncManager', () => {
@@ -24,28 +30,28 @@ describe( 'getSyncManager', () => {
 
 	it.each( [ undefined, false ] )(
 		'does not create a sync manager when the real-time collaboration flag is %s',
-		( collaborationEnabled ) => {
+		async ( collaborationEnabled ) => {
 			window.__experimentalEnableRealTimeCollaboration =
 				collaborationEnabled;
-			const { getSyncManager } = loadSync();
+			const { getSyncManager } = await loadSync();
 
 			expect( getSyncManager() ).toBeUndefined();
 			expect( mockCreateSyncManager ).not.toHaveBeenCalled();
 		}
 	);
 
-	it( 'creates and reuses a sync manager when real-time collaboration is enabled', () => {
+	it( 'creates and reuses a sync manager when real-time collaboration is enabled', async () => {
 		window.__experimentalEnableRealTimeCollaboration = true;
-		const { getSyncManager } = loadSync();
+		const { getSyncManager } = await loadSync();
 
 		expect( getSyncManager() ).toBe( mockSyncManager );
 		expect( getSyncManager() ).toBe( mockSyncManager );
 		expect( mockCreateSyncManager ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'returns an existing sync manager after real-time collaboration is disabled', () => {
+	it( 'returns an existing sync manager after real-time collaboration is disabled', async () => {
 		window.__experimentalEnableRealTimeCollaboration = true;
-		const { getSyncManager } = loadSync();
+		const { getSyncManager } = await loadSync();
 		const existingSyncManager = getSyncManager();
 
 		window.__experimentalEnableRealTimeCollaboration = false;
