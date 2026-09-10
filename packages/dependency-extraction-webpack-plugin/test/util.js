@@ -39,6 +39,12 @@ describe( 'defaultRequestToExternal', () => {
 		] );
 	} );
 
+	test( 'Handles @wordpress/dataviews/wp subpath request', () => {
+		expect( defaultRequestToExternal( '@wordpress/dataviews/wp' ) ).toEqual(
+			[ 'wp', 'dataviews' ]
+		);
+	} );
+
 	test( 'Handles future @wordpress namespace packages', () => {
 		expect(
 			defaultRequestToExternal( '@wordpress/some-future-package' )
@@ -67,6 +73,12 @@ describe( 'defaultRequestToHandle', () => {
 
 	test( 'Handles known @wordpress request', () => {
 		expect( defaultRequestToHandle( '@wordpress/i18n' ) ).toBe( 'wp-i18n' );
+	} );
+
+	test( 'Handles @wordpress/dataviews/wp subpath request', () => {
+		expect( defaultRequestToHandle( '@wordpress/dataviews/wp' ) ).toBe(
+			'wp-dataviews'
+		);
 	} );
 
 	test( 'Handles  @wordpress request', () => {
