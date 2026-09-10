@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Run rendered Theme tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
+## 2.1.0 (2026-09-10)
+
 ### New Features
 
 -   Add neutral interactive background tokens for resting, active, and disabled input and selection control states. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
@@ -25,6 +31,7 @@
 -   Update type-checking for script files to enforce NodeNext module resolution ([#82622](https://github.com/WordPress/gutenberg/pull/82622)).
 -   Remove `esbuild-esm-loader` dependency in favor of Node.js TypeScript native type-stripping ([#82680](https://github.com/WordPress/gutenberg/pull/82680)).
 -   Migrate design token modes to the DTCG resolver and Terrazzo CSS permutations. ([#82537](https://github.com/WordPress/gutenberg/pull/82537))
+-   Reuse seed-dependent calculations during color-ramp constraint searches. ([#82545](https://github.com/WordPress/gutenberg/pull/82545))
 -   Generate the default ramps before derived token artifacts so one build uses the current ramp algorithm throughout. ([#82525](https://github.com/WordPress/gutenberg/pull/82525))
 -   Cache relative luminance calculations used by color-ramp contrast checks. ([#82445](https://github.com/WordPress/gutenberg/pull/82445))
 -   Enforce NodeNext module resolution in the build project so future declaration imports are checked against the package's published ESM resolution rules. ([#82088](https://github.com/WordPress/gutenberg/pull/82088))

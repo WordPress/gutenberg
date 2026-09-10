@@ -43,6 +43,25 @@ describe( 'Vitest policy rules', () => {
 		expectValid( "import { userEvent } from 'vitest/browser';" );
 	} );
 
+	it( 'rejects Testing Library React renderers in Browser Mode', () => {
+		for ( const source of [
+			"import { render } from '@testing-library/react';",
+			"import { renderHook as mountHook } from '@testing-library/react';",
+			"import * as testingLibrary from '@testing-library/react';\ntestingLibrary.render( <Example /> );",
+		] ) {
+			expectViolation(
+				source,
+				"React renderers from 'vitest-browser-react'"
+			);
+		}
+	} );
+
+	it( 'allows vitest-browser-react renderers in Browser Mode', () => {
+		expectValid(
+			"import { render, renderHook } from 'vitest-browser-react';"
+		);
+	} );
+
 	it( 'rejects unjustified Browser fireEvent', () => {
 		const source =
 			"import { fireEvent } from '@testing-library/react';\nfireEvent.click( document.body );";
