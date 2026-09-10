@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { buildHighlightCss } from '../note-highlight-styles';
 import { getAvatarBorderColor } from '../utils';
 

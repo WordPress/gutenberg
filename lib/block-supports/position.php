@@ -28,9 +28,9 @@ function gutenberg_register_position_support( $block_type ) {
 /**
  * Renders position styles to the block wrapper.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function gutenberg_render_position_support( $block_content, $block ) {
 	$block_type           = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
