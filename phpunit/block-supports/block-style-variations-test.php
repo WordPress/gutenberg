@@ -458,6 +458,109 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that `blocks` nested within a responsive breakpoint state is not
+	 * retained for a block style variation partial, since that shape generates
+	 * no CSS. The supported shape nests the breakpoint state within `blocks`.
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::sanitize
+	 */
+	public function test_block_style_variation_partial_does_not_allow_blocks_within_breakpoint_state() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'    => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'blockTypes' => array( 'core/group' ),
+				'styles'     => array(
+					'blocks'  => array(
+						'core/heading' => array(
+							'@mobile' => array(
+								'typography' => array( 'fontSize' => '18px' ),
+							),
+						),
+					),
+					'@mobile' => array(
+						'blocks' => array(
+							'core/heading' => array(
+								'typography' => array( 'fontSize' => '18px' ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual = $theme_json->get_raw_data()['styles'];
+
+		$this->assertSame(
+			array( 'fontSize' => '18px' ),
+			$actual['blocks']['core/heading']['@mobile']['typography'] ?? null,
+			'A breakpoint state nested within `blocks` should be retained.'
+		);
+		$this->assertArrayNotHasKey(
+			'blocks',
+			$actual['@mobile'] ?? array(),
+			'`blocks` nested within a breakpoint state should not be retained.'
+		);
+	}
+
+	/**
+	 * Tests that `blocks` nested within a responsive breakpoint state is not
+	 * retained for a block style variation declared inline in theme.json,
+	 * matching the behaviour for variation partials.
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::sanitize
+	 */
+	public function test_block_style_variation_does_not_allow_blocks_within_breakpoint_state() {
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => 'blocks-in-breakpoint',
+				'label' => 'Blocks In Breakpoint',
+			)
+		);
+
+		try {
+			$theme_json = new WP_Theme_JSON_Gutenberg(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array(
+							'core/group' => array(
+								'variations' => array(
+									'blocks-in-breakpoint' => array(
+										'@mobile' => array(
+											'color'  => array( 'text' => 'red' ),
+											'blocks' => array(
+												'core/heading' => array(
+													'typography' => array( 'fontSize' => '18px' ),
+												),
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+				)
+			);
+
+			$variation = $theme_json->get_raw_data()['styles']['blocks']['core/group']['variations']['blocks-in-breakpoint'] ?? array();
+
+			$this->assertSame(
+				array( 'text' => 'red' ),
+				$variation['@mobile']['color'] ?? null,
+				'Style properties within a breakpoint state should be retained.'
+			);
+			$this->assertArrayNotHasKey(
+				'blocks',
+				$variation['@mobile'] ?? array(),
+				'`blocks` nested within a breakpoint state should not be retained.'
+			);
+		} finally {
+			unregister_block_style( 'core/group', 'blocks-in-breakpoint' );
+		}
+	}
+
+	/**
 	 * Tests that block style variations resolve any `ref` values when generating styles.
 	 */
 	public function test_block_style_variation_ref_values() {
