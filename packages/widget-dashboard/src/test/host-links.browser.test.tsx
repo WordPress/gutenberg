@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor } from '@testing-library/react';
+import { render as renderInBrowser } from 'vitest-browser-react';
+import { userEvent } from 'vitest/browser';
 import { forwardRef } from '@wordpress/element';
 import { WidgetHostProvider } from '@wordpress/widget-primitives';
 import type {
@@ -10,11 +11,6 @@ import type {
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import { WidgetActions } from '../components/widget-actions/widget-actions';
 import { WidgetFooter } from '../components/widget-footer/widget-footer';
-
-globalThis.wpVitest.mockCSSSupports();
-globalThis.wpVitest.mockResizeObserver();
-globalThis.wpVitest.mockScrollIntoView();
-globalThis.wpVitest.mockVisibleElements();
 
 const MATCHED_HREF = 'admin.php?page=dashboard&p=/reports';
 const MATCHED_PATH = '/reports';
@@ -48,7 +44,7 @@ function createHost() {
 }
 
 function renderWithHost( ui: ReactNode, links: WidgetHostLinks ) {
-	return render(
+	return renderInBrowser(
 		<WidgetHostProvider value={ { links } }>{ ui }</WidgetHostProvider>
 	);
 }
@@ -100,18 +96,24 @@ describe( 'host links across the chrome compositions', () => {
 			},
 		];
 
-		it( 'mounts the host link for a matched high action', () => {
+		it( 'mounts the host link for a matched high action', async () => {
 			const { links } = createHost();
-			renderWithHost( <WidgetFooter actions={ footerActions } />, links );
+			await renderWithHost(
+				<WidgetFooter actions={ footerActions } />,
+				links
+			);
 
 			const link = screen.getByRole( 'link', { name: 'See report' } );
 			expect( link ).toHaveAttribute( 'data-host-link' );
 			expect( link ).toHaveAttribute( 'href', MATCHED_PATH );
 		} );
 
-		it( 'keeps the plain anchor for an unmatched high action', () => {
+		it( 'keeps the plain anchor for an unmatched high action', async () => {
 			const { links } = createHost();
-			renderWithHost( <WidgetFooter actions={ footerActions } />, links );
+			await renderWithHost(
+				<WidgetFooter actions={ footerActions } />,
+				links
+			);
 
 			const link = screen.getByRole( 'link', {
 				name: 'External guide',
@@ -123,9 +125,12 @@ describe( 'host links across the chrome compositions', () => {
 			);
 		} );
 
-		it( 'hands the tooltip ref to the host link of a matched medium action', () => {
+		it( 'hands the tooltip ref to the host link of a matched medium action', async () => {
 			const { links, receivedRef } = createHost();
-			renderWithHost( <WidgetFooter actions={ footerActions } />, links );
+			await renderWithHost(
+				<WidgetFooter actions={ footerActions } />,
+				links
+			);
 
 			const link = screen.getByRole( 'link', { name: 'Status' } );
 			expect( link ).toHaveAttribute( 'data-host-link' );
@@ -136,9 +141,12 @@ describe( 'host links across the chrome compositions', () => {
 		/*
 		 * These targets match; only the modifiers keep the plain anchor.
 		 */
-		it( 'keeps the plain anchor and the download for a download action', () => {
+		it( 'keeps the plain anchor and the download for a download action', async () => {
 			const { links } = createHost();
-			renderWithHost( <WidgetFooter actions={ footerActions } />, links );
+			await renderWithHost(
+				<WidgetFooter actions={ footerActions } />,
+				links
+			);
 
 			const link = screen.getByRole( 'link', { name: 'Export data' } );
 			expect( link ).not.toHaveAttribute( 'data-host-link' );
@@ -146,9 +154,12 @@ describe( 'host links across the chrome compositions', () => {
 			expect( link ).toHaveAttribute( 'download', 'export.csv' );
 		} );
 
-		it( 'keeps the plain anchor for an empty-string download', () => {
+		it( 'keeps the plain anchor for an empty-string download', async () => {
 			const { links } = createHost();
-			renderWithHost( <WidgetFooter actions={ footerActions } />, links );
+			await renderWithHost(
+				<WidgetFooter actions={ footerActions } />,
+				links
+			);
 
 			const link = screen.getByRole( 'link', {
 				name: 'Download snapshot',
@@ -158,9 +169,12 @@ describe( 'host links across the chrome compositions', () => {
 			expect( link ).toHaveAttribute( 'download', '' );
 		} );
 
-		it( 'keeps the plain anchor for a new-tab action', () => {
+		it( 'keeps the plain anchor for a new-tab action', async () => {
 			const { links } = createHost();
-			renderWithHost( <WidgetFooter actions={ footerActions } />, links );
+			await renderWithHost(
+				<WidgetFooter actions={ footerActions } />,
+				links
+			);
 
 			const link = screen.getByRole( 'link', {
 				name: 'Documentation (opens in a new tab)',
@@ -177,7 +191,10 @@ describe( 'host links across the chrome compositions', () => {
 		it( 'shows the tooltip of a matched medium action on hover', async () => {
 			const user = userEvent.setup();
 			const { links } = createHost();
-			renderWithHost( <WidgetFooter actions={ footerActions } />, links );
+			await renderWithHost(
+				<WidgetFooter actions={ footerActions } />,
+				links
+			);
 
 			await user.hover( screen.getByRole( 'link', { name: 'Status' } ) );
 
@@ -219,7 +236,10 @@ describe( 'host links across the chrome compositions', () => {
 		it( 'routes only the matched item through the host link', async () => {
 			const user = userEvent.setup();
 			const { links, receivedRef } = createHost();
-			renderWithHost( <WidgetActions actions={ menuActions } />, links );
+			await renderWithHost(
+				<WidgetActions actions={ menuActions } />,
+				links
+			);
 
 			await user.click( screen.getByRole( 'button', { name: 'More' } ) );
 
@@ -260,7 +280,10 @@ describe( 'host links across the chrome compositions', () => {
 		it( 'keeps the matched item reachable by keyboard', async () => {
 			const user = userEvent.setup();
 			const { links } = createHost();
-			renderWithHost( <WidgetActions actions={ menuActions } />, links );
+			await renderWithHost(
+				<WidgetActions actions={ menuActions } />,
+				links
+			);
 
 			await user.tab();
 			expect(

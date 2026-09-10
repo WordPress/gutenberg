@@ -1,5 +1,6 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor, within } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
+import { userEvent } from 'vitest/browser';
 import type { ComponentType } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
@@ -10,12 +11,6 @@ import type {
 } from '@wordpress/widget-primitives';
 import { WidgetDashboard } from '../widget-dashboard';
 import type { CanPerformDashboardOperation, DashboardWidget } from '../types';
-
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
-
-globalThis.wpVitest.mockCSSSupports();
-globalThis.wpVitest.mockResizeObserver();
-globalThis.wpVitest.mockVisibleElements();
 
 function PreviewWidget( {
 	attributes,
@@ -83,8 +78,8 @@ function Harness( {
 }
 
 describe( 'WidgetDashboard.WidgetInserter', () => {
-	it( 'is hidden until the "Add widget" trigger is clicked', () => {
-		render( <Harness /> );
+	it( 'is hidden until the "Add widget" trigger is clicked', async () => {
+		await render( <Harness /> );
 		expect(
 			screen.queryByRole( 'dialog', { name: 'Add widget' } )
 		).not.toBeInTheDocument();
@@ -92,7 +87,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 
 	it( 'opens after clicking the "Add widget" trigger', async () => {
 		const user = userEvent.setup();
-		render( <Harness /> );
+		await render( <Harness /> );
 
 		await user.click(
 			screen.getByRole( 'button', { name: 'Add widget' } )
@@ -106,7 +101,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 	it( 'inserts the selected widget type into the layout on Done', async () => {
 		const user = userEvent.setup();
 		const onLayoutChange = vi.fn();
-		render( <Harness onLayoutChange={ onLayoutChange } /> );
+		await render( <Harness onLayoutChange={ onLayoutChange } /> );
 
 		await user.click(
 			screen.getByRole( 'button', { name: 'Add widget' } )
@@ -147,7 +142,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 	it( 'inserts multiple widgets via multi-select in a single layout change', async () => {
 		const user = userEvent.setup();
 		const onLayoutChange = vi.fn();
-		render( <Harness onLayoutChange={ onLayoutChange } /> );
+		await render( <Harness onLayoutChange={ onLayoutChange } /> );
 
 		await user.click(
 			screen.getByRole( 'button', { name: 'Add widget' } )
@@ -186,7 +181,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 			placement: { width: 1, height: 1 },
 		};
 
-		render(
+		await render(
 			<Harness
 				initialLayout={ [ existing ] }
 				onLayoutChange={ onLayoutChange }
@@ -225,7 +220,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 
 		it( 'offers only the types the policy allows to insert', async () => {
 			const user = userEvent.setup();
-			render( <Harness canPerform={ notesOnly } /> );
+			await render( <Harness canPerform={ notesOnly } /> );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add widget' } )
@@ -251,7 +246,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 			const canPerform = vi.fn< CanPerformDashboardOperation >(
 				() => true
 			);
-			render( <Harness canPerform={ canPerform } /> );
+			await render( <Harness canPerform={ canPerform } /> );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add widget' } )
@@ -270,7 +265,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 
 		it( 'updates the open picker when the policy changes', async () => {
 			const user = userEvent.setup();
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Harness canPerform={ welcomeOnly } />
 			);
 
@@ -284,7 +279,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 				within( dialog ).queryAllByText( 'Welcome' ).length
 			).toBeGreaterThan( 0 );
 
-			rerender( <Harness canPerform={ notesOnly } /> );
+			await rerender( <Harness canPerform={ notesOnly } /> );
 
 			await waitFor( () =>
 				expect(
@@ -298,7 +293,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 
 		it( 'governs each dashboard through its own provider', async () => {
 			const user = userEvent.setup();
-			render(
+			await render(
 				<>
 					<Harness canPerform={ notesOnly } />
 					<Harness canPerform={ welcomeOnly } />
@@ -349,7 +344,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 				placement: { width: 1, height: 1 },
 			};
 
-			render(
+			await render(
 				<Harness
 					canPerform={ notesOnly }
 					initialLayout={ [ existing ] }
@@ -372,8 +367,8 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'composes nested policies restrictively', () => {
-			render(
+		it( 'composes nested policies restrictively', async () => {
+			await render(
 				<WidgetDashboard.Policy canPerform={ welcomeOnly }>
 					<Harness canPerform={ notesOnly } />
 				</WidgetDashboard.Policy>
@@ -388,7 +383,7 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 
 		it( 'lets an enclosing policy narrow an inner permissive one', async () => {
 			const user = userEvent.setup();
-			render(
+			await render(
 				<WidgetDashboard.Policy canPerform={ notesOnly }>
 					<Harness canPerform={ () => true } />
 				</WidgetDashboard.Policy>
@@ -409,8 +404,8 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'hides the Add widget trigger when the policy denies every insert', () => {
-			render(
+		it( 'hides the Add widget trigger when the policy denies every insert', async () => {
+			await render(
 				<Harness
 					canPerform={ ( request ) => request.operation !== 'insert' }
 				/>

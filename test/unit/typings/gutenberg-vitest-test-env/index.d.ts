@@ -20,7 +20,6 @@ interface GutenbergVitestEnvironment {
 	mockPointerEvent: () => void;
 	mockResizeObserver: () => void;
 	mockScrollIntoView: () => void;
-	mockVisibleElements: () => void;
 	timers: typeof import('vitest').vi;
 }
 

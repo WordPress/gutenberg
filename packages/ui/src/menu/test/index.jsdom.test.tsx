@@ -30,8 +30,6 @@ const mockedIsRTL = isRTL as MockedFunction< typeof isRTL >;
 
 globalThis.wpVitest.mockPointerEvent();
 globalThis.wpVitest.mockScrollIntoView();
-globalThis.wpVitest.mockVisibleElements();
-
 afterEach( () => {
 	mockedIsRTL.mockClear();
 	mockedIsRTL.mockReturnValue( false );

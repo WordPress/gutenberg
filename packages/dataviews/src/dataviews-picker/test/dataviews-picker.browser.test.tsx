@@ -1,5 +1,6 @@
-import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, within } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
+import { page, userEvent } from 'vitest/browser';
 import { describe, expect, it, vi } from 'vitest';
 import { useMemo, useState } from '@wordpress/element';
 import DataViewsPicker from '../index';
@@ -16,13 +17,6 @@ import type {
 	ViewPickerGrid,
 } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
-
-globalThis.wpVitest.mockMatchMedia();
-
-globalThis.wpVitest.mockCSSSupports();
-globalThis.wpVitest.mockResizeObserver();
-globalThis.wpVitest.mockScrollIntoView();
-globalThis.wpVitest.mockVisibleElements();
 
 type Data = {
 	id: number;
@@ -54,6 +48,14 @@ const data: Data[] = [
 	},
 ];
 
+const defaultFields: Field< Data >[] = [
+	{
+		id: 'title',
+		label: 'Title',
+		type: 'text',
+	},
+];
+
 const singleSelectCallback = vi.fn();
 const singleSelectActions: ActionButton< Data >[] = [
 	{
@@ -82,6 +84,7 @@ const multiSelectActions: ActionButton< Data >[] = [
 // makes that possible: it stops `filterSortAndPaginate` from sorting the data
 // into group order first, which would leave the two orders identical.
 const groupingFields: Field< Data >[] = [
+	...defaultFields,
 	{
 		id: 'parity',
 		label: 'Parity',
@@ -102,7 +105,7 @@ function Picker( {
 	label,
 	multiselect,
 	layout = LAYOUT_PICKER_GRID,
-	fields = [],
+	fields = defaultFields,
 	...props
 }: {
 	actions?: ActionButton< Data >[];
@@ -154,8 +157,8 @@ function Picker( {
 }
 describe( 'DataViews Picker', () => {
 	describe( 'Grid layout', () => {
-		it( 'renders the grid as a `listbox` role, with items as `option` roles', () => {
-			render( <Picker /> );
+		it( 'renders the grid as a `listbox` role, with items as `option` roles', async () => {
+			await render( <Picker /> );
 
 			// Grid should have listbox role
 			expect( screen.getByRole( 'listbox' ) ).toBeInTheDocument();
@@ -165,9 +168,9 @@ describe( 'DataViews Picker', () => {
 			expect( options ).toHaveLength( data.length );
 		} );
 
-		it( 'supports specifying a `label` which is rendered as an aria-label', () => {
+		it( 'supports specifying a `label` which is rendered as an aria-label', async () => {
 			const testLabel = 'Select an item from the grid';
-			render( <Picker label={ testLabel } /> );
+			await render( <Picker label={ testLabel } /> );
 
 			// Grid should have the specified aria-label
 			expect(
@@ -176,7 +179,7 @@ describe( 'DataViews Picker', () => {
 		} );
 
 		it( 'implements single tab-stop composite pattern with aria-activedescendant', async () => {
-			render( <Picker /> );
+			await render( <Picker /> );
 
 			// Grid should be tabbable as the main composite widget
 			const grid = screen.getByRole( 'listbox' );
@@ -263,14 +266,13 @@ describe( 'DataViews Picker', () => {
 
 		describe( 'Single selection', () => {
 			it( 'maintains only a single selected item and calls the `onChangeSelection` callback when the selection changes', async () => {
-				render( <Picker actions={ singleSelectActions } /> );
+				await render( <Picker actions={ singleSelectActions } /> );
 
-				const user = userEvent.setup();
 				const listbox = screen.getByRole( 'listbox' );
 				const options = within( listbox ).getAllByRole( 'option' );
 
 				// Click first item
-				await user.click( options[ 0 ] );
+				await page.getByRole( 'option' ).nth( 0 ).click();
 				expect( options[ 0 ] ).toHaveAttribute(
 					'aria-selected',
 					'true'
@@ -288,7 +290,7 @@ describe( 'DataViews Picker', () => {
 				] );
 
 				// Click second item - should deselect first
-				await user.click( options[ 1 ] );
+				await page.getByRole( 'option' ).nth( 1 ).click();
 				expect( options[ 0 ] ).toHaveAttribute(
 					'aria-selected',
 					'false'
@@ -307,7 +309,7 @@ describe( 'DataViews Picker', () => {
 			} );
 
 			it( 'calls the action callback when the action button is clicked', async () => {
-				render( <Picker actions={ singleSelectActions } /> );
+				await render( <Picker actions={ singleSelectActions } /> );
 
 				const user = userEvent.setup();
 				const options = screen.getAllByRole( 'option' );
@@ -335,8 +337,8 @@ describe( 'DataViews Picker', () => {
 		} );
 
 		describe( 'Multi selection', () => {
-			it( 'adds the `aria-multiselectable` attribute to the listbox', () => {
-				render( <Picker actions={ multiSelectActions } /> );
+			it( 'adds the `aria-multiselectable` attribute to the listbox', async () => {
+				await render( <Picker actions={ multiSelectActions } /> );
 
 				const listbox = screen.getByRole( 'listbox' );
 				expect( listbox ).toHaveAttribute(
@@ -347,7 +349,7 @@ describe( 'DataViews Picker', () => {
 
 			it( 'supports multiple selected items and calls the `onChangeSelection` callback when the selection changes', async () => {
 				// Test multi-selection by clicking multiple items
-				render( <Picker actions={ multiSelectActions } /> );
+				await render( <Picker actions={ multiSelectActions } /> );
 
 				const user = userEvent.setup();
 				const listbox = screen.getByRole( 'listbox' );
@@ -398,7 +400,7 @@ describe( 'DataViews Picker', () => {
 			} );
 
 			it( 'calls the action callback when the action button is clicked', async () => {
-				render( <Picker actions={ multiSelectActions } /> );
+				await render( <Picker actions={ multiSelectActions } /> );
 
 				const user = userEvent.setup();
 				const options = screen.getAllByRole( 'option' );
@@ -438,7 +440,7 @@ describe( 'DataViews Picker', () => {
 
 			it( 'maintains the selected items when navigating between pages for a paginated view', async () => {
 				// Create a component with pagination (2 items per page)
-				render(
+				await render(
 					<Picker
 						actions={ multiSelectActions }
 						view={ {
@@ -509,15 +511,15 @@ describe( 'DataViews Picker', () => {
 			// Both the flat and grouped branches put the class on the listbox:
 			// the flat branch renders `GridItems` as the listbox itself, and
 			// the grouped one nests its per-group grids inside it.
-			it( 'crops previews by default', () => {
-				render( <Picker /> );
+			it( 'crops previews by default', async () => {
+				await render( <Picker /> );
 				expect( screen.getByRole( 'listbox' ) ).not.toHaveClass(
 					'has-media-fit-contain'
 				);
 			} );
 
-			it( 'fits previews when configured to contain', () => {
-				render(
+			it( 'fits previews when configured to contain', async () => {
+				await render(
 					<Picker
 						view={
 							{
@@ -531,8 +533,8 @@ describe( 'DataViews Picker', () => {
 				);
 			} );
 
-			it( 'ignores an unsupported value and falls back to cropping', () => {
-				render(
+			it( 'ignores an unsupported value and falls back to cropping', async () => {
+				await render(
 					<Picker
 						view={
 							{
@@ -547,8 +549,8 @@ describe( 'DataViews Picker', () => {
 				);
 			} );
 
-			it( 'applies the fit when the data is grouped', () => {
-				render(
+			it( 'applies the fit when the data is grouped', async () => {
+				await render(
 					<Picker
 						fields={ groupingFields }
 						view={
@@ -573,7 +575,7 @@ describe( 'DataViews Picker', () => {
 		[ 'picker activity', LAYOUT_PICKER_ACTIVITY ],
 	] as const )( 'Range selection (%s)', ( _layoutName, layout ) => {
 		it( 'selects the range between the clicked item and the Shift-clicked item', async () => {
-			render(
+			await render(
 				<Picker actions={ multiSelectActions } layout={ layout } />
 			);
 
@@ -597,7 +599,7 @@ describe( 'DataViews Picker', () => {
 		} );
 
 		it( 'redefines the range from the anchor when consecutive Shift+Clicks reverse direction', async () => {
-			render(
+			await render(
 				<Picker actions={ multiSelectActions } layout={ layout } />
 			);
 
@@ -624,7 +626,7 @@ describe( 'DataViews Picker', () => {
 		} );
 
 		it( 'selects only the Shift-clicked item when the picker is single-select', async () => {
-			render(
+			await render(
 				<Picker actions={ singleSelectActions } layout={ layout } />
 			);
 
@@ -646,7 +648,7 @@ describe( 'DataViews Picker', () => {
 		} );
 
 		it( 'extends the range in rendered order when grouping reorders the data', async () => {
-			render(
+			await render(
 				<Picker
 					actions={ multiSelectActions }
 					layout={ layout }
@@ -678,8 +680,8 @@ describe( 'DataViews Picker', () => {
 	} );
 
 	describe( 'Table layout', () => {
-		it( 'does not render a column for a field id without a field definition', () => {
-			const { container } = render(
+		it( 'does not render a column for a field id without a field definition', async () => {
+			const { container } = await render(
 				<Picker
 					layout={ LAYOUT_PICKER_TABLE }
 					fields={ [
@@ -692,7 +694,7 @@ describe( 'DataViews Picker', () => {
 
 			// The picker table marks its rows and cells as presentational, so
 			// they have no queryable role.
-			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			// eslint-disable-next-line testing-library/no-node-access
 			const headers = container.querySelectorAll( 'thead th' );
 			// The checkbox column, the primary (title) column and the order
 			// column.
@@ -707,7 +709,7 @@ describe( 'DataViews Picker', () => {
 
 		it( 'disables moving right for the last column when a field id without a field definition follows it', async () => {
 			const user = userEvent.setup();
-			render(
+			await render(
 				<Picker
 					layout={ LAYOUT_PICKER_TABLE }
 					fields={ [
@@ -768,7 +770,7 @@ describe( 'DataViews Picker', () => {
 		}
 
 		it( 'renders both picker layout options when defaultLayouts is not provided', async () => {
-			render( <PickerWithoutDefaultLayouts /> );
+			await render( <PickerWithoutDefaultLayouts /> );
 
 			const user = userEvent.setup();
 

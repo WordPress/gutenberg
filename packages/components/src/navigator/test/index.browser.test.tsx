@@ -1,14 +1,18 @@
 import { describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import type { ComponentPropsWithoutRef } from 'react';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import Button from '../../button';
 import { Navigator, useNavigator } from '..';
 import { NavigatorToParentButton } from '../legacy';
 import type { NavigateOptions } from '../types';
-globalThis.wpVitest.mockMatchMedia();
-globalThis.wpVitest.mockVisibleElements();
+
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useReducedMotion: () => true,
+} ) );
 
 const INVALID_HTML_ATTRIBUTE = {
 	raw: '/ "\'><=invalid_path',
@@ -460,39 +464,61 @@ const queryScreen = ( screenKey: keyof typeof SCREEN_TEXT ) =>
 const getNavigationButton = ( buttonKey: keyof typeof BUTTON_TEXT ) =>
 	screen.getByRole( 'button', { name: BUTTON_TEXT[ buttonKey ] } );
 
+const waitForScreen = ( screenKey: keyof typeof SCREEN_TEXT ) =>
+	waitFor( () => {
+		for ( const key of Object.keys( SCREEN_TEXT ) as Array<
+			keyof typeof SCREEN_TEXT
+		> ) {
+			if ( key === screenKey ) {
+				expect( getScreen( key ) ).toBeInTheDocument();
+			} else {
+				expect( queryScreen( key ) ).not.toBeInTheDocument();
+			}
+		}
+	} );
+
+const waitForNoScreen = () =>
+	waitFor( () => {
+		for ( const key of Object.keys( SCREEN_TEXT ) as Array<
+			keyof typeof SCREEN_TEXT
+		> ) {
+			expect( queryScreen( key ) ).not.toBeInTheDocument();
+		}
+	} );
+
 describe( 'Navigator', () => {
-	it( 'should render', () => {
-		render( <MyNavigation /> );
+	it( 'should render', async () => {
+		await render( <MyNavigation /> );
 
 		expect( getScreen( 'home' ) ).toBeInTheDocument();
 		expect( queryScreen( 'child' ) ).not.toBeInTheDocument();
 		expect( queryScreen( 'nested' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should show a different screen on the first render depending on the value of `initialPath`', () => {
-		render( <MyNavigation initialPath={ PATHS.CHILD } /> );
+	it( 'should show a different screen on the first render depending on the value of `initialPath`', async () => {
+		await render( <MyNavigation initialPath={ PATHS.CHILD } /> );
 
 		expect( queryScreen( 'home' ) ).not.toBeInTheDocument();
 		expect( getScreen( 'child' ) ).toBeInTheDocument();
 		expect( queryScreen( 'nested' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should ignore changes to `initialPath` after the first render', () => {
-		const { rerender } = render( <MyNavigation /> );
+	it( 'should ignore changes to `initialPath` after the first render', async () => {
+		const { rerender } = await render( <MyNavigation /> );
 
 		expect( getScreen( 'home' ) ).toBeInTheDocument();
 		expect( queryScreen( 'child' ) ).not.toBeInTheDocument();
 		expect( queryScreen( 'nested' ) ).not.toBeInTheDocument();
 
-		rerender( <MyNavigation initialPath={ PATHS.CHILD } /> );
+		await rerender( <MyNavigation initialPath={ PATHS.CHILD } /> );
 
 		expect( getScreen( 'home' ) ).toBeInTheDocument();
 		expect( queryScreen( 'child' ) ).not.toBeInTheDocument();
 		expect( queryScreen( 'nested' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should not rended anything if the `initialPath` does not match any available screen', () => {
-		render( <MyNavigation initialPath={ PATHS.NOT_FOUND } /> );
+	it( 'should not rended anything if the `initialPath` does not match any available screen', async () => {
+		await render( <MyNavigation initialPath={ PATHS.NOT_FOUND } /> );
 
 		expect( queryScreen( 'home' ) ).not.toBeInTheDocument();
 		expect( queryScreen( 'child' ) ).not.toBeInTheDocument();
@@ -504,44 +530,39 @@ describe( 'Navigator', () => {
 
 		const user = userEvent.setup();
 
-		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
+		await render( <MyNavigation onNavigatorButtonClick={ spy } /> );
 
 		expect( getScreen( 'home' ) ).toBeInTheDocument();
 		expect( getNavigationButton( 'toChildScreen' ) ).toBeInTheDocument();
 
 		// Navigate to child screen.
 		await user.click( getNavigationButton( 'toChildScreen' ) );
-
-		expect( getScreen( 'child' ) ).toBeInTheDocument();
+		await waitForScreen( 'child' );
 		expect( getNavigationButton( 'back' ) ).toBeInTheDocument();
 
 		// Navigate back to home screen.
 		await user.click( getNavigationButton( 'back' ) );
-		expect( getScreen( 'home' ) ).toBeInTheDocument();
+		await waitForScreen( 'home' );
 		expect( getNavigationButton( 'toChildScreen' ) ).toBeInTheDocument();
 
 		// Navigate again to child screen.
 		await user.click( getNavigationButton( 'toChildScreen' ) );
-
-		expect( getScreen( 'child' ) ).toBeInTheDocument();
+		await waitForScreen( 'child' );
 		expect( getNavigationButton( 'toNestedScreen' ) ).toBeInTheDocument();
 
 		// Navigate to nested screen.
 		await user.click( getNavigationButton( 'toNestedScreen' ) );
-
-		expect( getScreen( 'nested' ) ).toBeInTheDocument();
+		await waitForScreen( 'nested' );
 		expect( getNavigationButton( 'back' ) ).toBeInTheDocument();
 
 		// Navigate back to child screen.
 		await user.click( getNavigationButton( 'back' ) );
-
-		expect( getScreen( 'child' ) ).toBeInTheDocument();
+		await waitForScreen( 'child' );
 		expect( getNavigationButton( 'toNestedScreen' ) ).toBeInTheDocument();
 
 		// Navigate back to home screen.
 		await user.click( getNavigationButton( 'back' ) );
-
-		expect( getScreen( 'home' ) ).toBeInTheDocument();
+		await waitForScreen( 'home' );
 		expect( getNavigationButton( 'toChildScreen' ) ).toBeInTheDocument();
 
 		// Check the values passed to `navigator.goTo()`.
@@ -574,7 +595,7 @@ describe( 'Navigator', () => {
 
 		const user = userEvent.setup();
 
-		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
+		await render( <MyNavigation onNavigatorButtonClick={ spy } /> );
 
 		expect(
 			getNavigationButton( 'toNonExistingScreen' )
@@ -582,10 +603,7 @@ describe( 'Navigator', () => {
 
 		// Attempt to navigate to non-existing screen. No screens get rendered.
 		await user.click( getNavigationButton( 'toNonExistingScreen' ) );
-
-		expect( queryScreen( 'home' ) ).not.toBeInTheDocument();
-		expect( queryScreen( 'child' ) ).not.toBeInTheDocument();
-		expect( queryScreen( 'nested' ) ).not.toBeInTheDocument();
+		await waitForNoScreen();
 
 		// Check the values passed to `navigator.goTo()`.
 		expect( spy ).toHaveBeenCalledTimes( 1 );
@@ -596,7 +614,7 @@ describe( 'Navigator', () => {
 	} );
 
 	it( 'should escape the value of the `path` prop', async () => {
-		render( <MyNavigation /> );
+		await render( <MyNavigation /> );
 
 		expect( getScreen( 'home' ) ).toBeInTheDocument();
 		expect(
@@ -614,8 +632,10 @@ describe( 'Navigator', () => {
 		).toHaveAttribute( 'id', INVALID_HTML_ATTRIBUTE.escaped );
 	} );
 
-	it( 'should warn if the `path` prop does not follow the required format', () => {
-		render( <Navigator.Screen path="not-valid">Test</Navigator.Screen> );
+	it( 'should warn if the `path` prop does not follow the required format', async () => {
+		await render(
+			<Navigator.Screen path="not-valid">Test</Navigator.Screen>
+		);
 
 		expect( console ).toHaveWarnedWith(
 			'wp.components.Navigator.Screen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
@@ -625,27 +645,24 @@ describe( 'Navigator', () => {
 	it( 'should match correctly paths with named arguments', async () => {
 		const user = userEvent.setup();
 
-		render( <MyNavigation /> );
+		await render( <MyNavigation /> );
 
 		expect( getScreen( 'home' ) ).toBeInTheDocument();
 
 		// Navigate to Product 1 screen
 		await user.click( getNavigationButton( 'toProductScreen1' ) );
-
-		expect( getScreen( 'product' ) ).toBeInTheDocument();
+		await waitForScreen( 'product' );
 
 		// Check that named parameter is extracted correctly
 		expect( screen.getByText( 'Product ID is 1' ) ).toBeInTheDocument();
 
 		// Navigate back to home screen
 		await user.click( getNavigationButton( 'back' ) );
-
-		expect( getScreen( 'home' ) ).toBeInTheDocument();
+		await waitForScreen( 'home' );
 
 		// Navigate to Product 2 screen
 		await user.click( getNavigationButton( 'toProductScreen2' ) );
-
-		expect( getScreen( 'product' ) ).toBeInTheDocument();
+		await waitForScreen( 'product' );
 
 		// Check that named parameter is extracted correctly
 		expect( screen.getByText( 'Product ID is 2' ) ).toBeInTheDocument();
@@ -655,10 +672,11 @@ describe( 'Navigator', () => {
 		it( 'should restore focus correctly', async () => {
 			const user = userEvent.setup();
 
-			render( <MyNavigation /> );
+			await render( <MyNavigation /> );
 
 			// Navigate to child screen.
 			await user.click( getNavigationButton( 'toChildScreen' ) );
+			await waitForScreen( 'child' );
 
 			// The first tabbable element receives focus.
 			expect(
@@ -669,12 +687,14 @@ describe( 'Navigator', () => {
 
 			// Navigate to nested screen.
 			await user.click( getNavigationButton( 'toNestedScreen' ) );
+			await waitForScreen( 'nested' );
 
 			// The first tabbable element receives focus.
 			expect( getNavigationButton( 'back' ) ).toHaveFocus();
 
 			// Navigate back to child screen.
 			await user.click( getNavigationButton( 'back' ) );
+			await waitForScreen( 'child' );
 
 			// Focus is restored on the last element that had focus when the
 			// navigation away from the screen occurred.
@@ -682,6 +702,7 @@ describe( 'Navigator', () => {
 
 			// Navigate back to home screen.
 			await user.click( getNavigationButton( 'back' ) );
+			await waitForScreen( 'home' );
 
 			// Focus is restored on the last element that had focus when the
 			// navigation away from the screen occurred.
@@ -689,12 +710,14 @@ describe( 'Navigator', () => {
 
 			// Navigate to product screen for product 2
 			await user.click( getNavigationButton( 'toProductScreen2' ) );
+			await waitForScreen( 'product' );
 
 			// The first tabbable element receives focus.
 			expect( getNavigationButton( 'back' ) ).toHaveFocus();
 
 			// Navigate back to home screen.
 			await user.click( getNavigationButton( 'back' ) );
+			await waitForScreen( 'home' );
 
 			// Focus is restored on the last element that had focus when the
 			// navigation away from the screen occurred.
@@ -704,10 +727,11 @@ describe( 'Navigator', () => {
 		it( 'should keep focus on an active element inside navigator, while re-rendering', async () => {
 			const user = userEvent.setup();
 
-			render( <MyNavigation /> );
+			await render( <MyNavigation /> );
 
 			// Navigate to child screen.
 			await user.click( getNavigationButton( 'toChildScreen' ) );
+			await waitForScreen( 'child' );
 
 			// The first tabbable element receives focus.
 			expect(
@@ -726,10 +750,11 @@ describe( 'Navigator', () => {
 		it( 'should keep focus on an active element outside navigator, while re-rendering', async () => {
 			const user = userEvent.setup();
 
-			render( <MyNavigation /> );
+			await render( <MyNavigation /> );
 
 			// Navigate to child screen.
 			await user.click( getNavigationButton( 'toChildScreen' ) );
+			await waitForScreen( 'child' );
 
 			// The first tabbable element receives focus.
 			expect(
@@ -748,7 +773,7 @@ describe( 'Navigator', () => {
 		it( 'should restore focus correctly even when the `path` needs to be escaped', async () => {
 			const user = userEvent.setup();
 
-			render( <MyNavigation /> );
+			await render( <MyNavigation /> );
 
 			expect( getScreen( 'home' ) ).toBeInTheDocument();
 
@@ -756,14 +781,14 @@ describe( 'Navigator', () => {
 			await user.click(
 				getNavigationButton( 'toInvalidHtmlPathScreen' )
 			);
+			await waitForScreen( 'invalidHtmlPath' );
 
 			expect( getScreen( 'invalidHtmlPath' ) ).toBeInTheDocument();
 
 			// Navigate back to home screen, check that the focus restoration selector
 			// worked correctly despite the escaping.
 			await user.click( getNavigationButton( 'back' ) );
-
-			expect( getScreen( 'home' ) ).toBeInTheDocument();
+			await waitForScreen( 'home' );
 			expect(
 				getNavigationButton( 'toInvalidHtmlPathScreen' )
 			).toHaveFocus();
@@ -772,56 +797,56 @@ describe( 'Navigator', () => {
 		it( 'should restore focus while using goTo and goToParent', async () => {
 			const user = userEvent.setup();
 
-			render( <MyHierarchicalNavigation /> );
+			await render( <MyHierarchicalNavigation /> );
 
 			expect( getScreen( 'home' ) ).toBeInTheDocument();
 
 			// Navigate to child screen.
 			await user.click( getNavigationButton( 'toChildScreen' ) );
-			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			await waitForScreen( 'child' );
 
 			// Navigate to nested screen.
 			await user.click( getNavigationButton( 'toNestedScreen' ) );
-			expect( getScreen( 'nested' ) ).toBeInTheDocument();
+			await waitForScreen( 'nested' );
 			expect( getNavigationButton( 'back' ) ).toBeInTheDocument();
 
 			// Navigate back to child screen using the back button.
 			await user.click( getNavigationButton( 'back' ) );
-			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			await waitForScreen( 'child' );
 			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
 
 			// Re navigate to nested screen.
 			await user.click( getNavigationButton( 'toNestedScreen' ) );
-			expect( getScreen( 'nested' ) ).toBeInTheDocument();
+			await waitForScreen( 'nested' );
 			expect(
 				getNavigationButton( 'backUsingGoTo' )
 			).toBeInTheDocument();
 
 			// Navigate back to child screen using the go to button.
 			await user.click( getNavigationButton( 'backUsingGoTo' ) );
-			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			await waitForScreen( 'child' );
 			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
 
 			// Navigate back to home screen.
 			await user.click( getNavigationButton( 'back' ) );
+			await waitForScreen( 'home' );
 			expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
 		} );
 
 		it( 'should skip focus based on location `skipFocus` option', async () => {
 			const user = userEvent.setup();
-			render( <MyHierarchicalNavigation /> );
+			await render( <MyHierarchicalNavigation /> );
 
 			// Navigate to child screen with skipFocus.
 			await user.click( getNavigationButton( 'goToWithSkipFocus' ) );
-			expect( queryScreen( 'home' ) ).not.toBeInTheDocument();
-			expect( getScreen( 'nested' ) ).toBeInTheDocument();
+			await waitForScreen( 'nested' );
 
 			// The clicked button should remain focused.
 			expect( getNavigationButton( 'goToWithSkipFocus' ) ).toHaveFocus();
 
 			// Navigate back to parent screen.
 			await user.click( getNavigationButton( 'back' ) );
-			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			await waitForScreen( 'child' );
 			// The first tabbable element receives focus.
 			expect(
 				screen.getByRole( 'button', {
@@ -835,7 +860,9 @@ describe( 'Navigator', () => {
 		it( 'should log a deprecation notice when using the NavigatorToParentButton component', async () => {
 			const user = userEvent.setup();
 
-			render( <MyDeprecatedNavigation initialPath={ PATHS.CHILD } /> );
+			await render(
+				<MyDeprecatedNavigation initialPath={ PATHS.CHILD } />
+			);
 
 			expect( getScreen( 'child' ) ).toBeInTheDocument();
 
@@ -843,7 +870,7 @@ describe( 'Navigator', () => {
 			// The first tabbable element receives focus, since focus restoration
 			// it not possible (there was no forward navigation).
 			await user.click( getNavigationButton( 'back' ) );
-			expect( getScreen( 'home' ) ).toBeInTheDocument();
+			await waitForScreen( 'home' );
 			expect(
 				screen.getByRole( 'button', {
 					name: 'First tabbable home screen button',
@@ -859,7 +886,9 @@ describe( 'Navigator', () => {
 		it( 'should log a deprecation notice when using the useNavigator().goToParent() function', async () => {
 			const user = userEvent.setup();
 
-			render( <MyDeprecatedNavigation initialPath={ PATHS.NESTED } /> );
+			await render(
+				<MyDeprecatedNavigation initialPath={ PATHS.NESTED } />
+			);
 
 			expect( getScreen( 'nested' ) ).toBeInTheDocument();
 
@@ -867,7 +896,7 @@ describe( 'Navigator', () => {
 			// The first tabbable element receives focus, since focus restoration
 			// it not possible (there was no forward navigation).
 			await user.click( getNavigationButton( 'back' ) );
-			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			await waitForScreen( 'child' );
 			expect(
 				screen.getByRole( 'button', {
 					name: 'First tabbable child screen button',
