@@ -1,5 +1,4 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -12,10 +11,8 @@ import type {
 	SupportedLayouts,
 	View,
 } from '@wordpress/dataviews';
+import { Badge } from '@wordpress/ui';
 import type { Revision } from './types';
-import { unlock } from '../lock-unlock';
-
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 const DEFAULT_LAYOUTS: SupportedLayouts = { pickerActivity: true };
@@ -271,12 +268,12 @@ function RevisionsList( {
 								/>
 							) }
 							{ ! canApplyRevision && (
-								<WCBadge
+								<Badge
 									className="global-styles-ui-screen-revisions__active-badge"
-									intent="info"
+									intent="informational"
 								>
 									{ __( 'Active' ) }
-								</WCBadge>
+								</Badge>
 							) }
 						</span>
 					);
