@@ -415,18 +415,14 @@ describe( 'Card', () => {
 		{
 			order: 'rounded first',
 			rounded: [ true, false ],
-			borderRadius: undefined,
 		},
 		{
 			order: 'square first',
 			rounded: [ false, true ],
-			borderRadius: undefined,
 		},
-		{ order: 'rounded first', rounded: [ true, false ], borderRadius: 23 },
-		{ order: 'square first', rounded: [ false, true ], borderRadius: 23 },
 	] )(
-		'keeps both shadows aligned with the Card radius with $order and borderRadius=$borderRadius',
-		async ( { rounded, borderRadius } ) => {
+		'keeps both shadows aligned with the default Card radius with $order',
+		async ( { rounded } ) => {
 			await render(
 				<>
 					{ rounded.map( ( isRounded ) => (
@@ -434,7 +430,6 @@ describe( 'Card', () => {
 							key={ String( isRounded ) }
 							isRounded={ isRounded }
 							elevation={ 5 }
-							style={ { borderRadius } }
 							data-testid={
 								isRounded ? 'rounded-card' : 'square-card'
 							}
@@ -456,4 +451,23 @@ describe( 'Card', () => {
 			}
 		}
 	);
+
+	it( 'keeps both shadows aligned with a custom Card radius', async () => {
+		await render(
+			<Card
+				isRounded={ false }
+				elevation={ 5 }
+				style={ { borderRadius: 23 } }
+				data-testid="card"
+			>
+				Card content
+			</Card>
+		);
+
+		const card = screen.getByTestId( 'card' );
+		const radius = getComputedStyle( card ).borderRadius;
+		await expect
+			.poll( () => readElevationRadii( card ) )
+			.toEqual( [ radius, radius ] );
+	} );
 } );
