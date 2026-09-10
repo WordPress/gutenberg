@@ -335,6 +335,8 @@ The key is the name of the block (`string`) to hook into, and the value is the p
 }
 ```
 
+For a broader overview, examples, and related filters, see the [Block Hooks documentation](/docs/reference-guides/block-api/block-hooks.md).
+
 ## Block collections
 
 ## `registerBlockCollection`
