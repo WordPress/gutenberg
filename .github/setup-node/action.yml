@@ -14,11 +14,7 @@ runs:
               node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
               check-latest: true
-              # Caching for npm dependencies is automatically enabled when package.json contains devEngines.packageManager field set to npm
-              # cache: npm
-              cache-dependency-path: |
-                  package-lock.json
-                  patches/**
+              package-manager-cache: false
 
         - name: Set up npm
           uses: ./.github/setup-npm
