@@ -6,11 +6,12 @@ import DataViewsPagination, {
 	hasPaginationControls,
 } from '../dataviews-pagination';
 import {
-	BulkActionsFooter,
+	BulkActions,
 	useSomeItemHasAPossibleBulkAction,
 } from '../dataviews-bulk-actions';
 import { LAYOUT_GRID, LAYOUT_TABLE } from '../../constants';
 import { useDelayedLoading } from '../../hooks/use-delayed-loading';
+import DataViewsItemCount from './item-count';
 
 const EMPTY_ARRAY: [] = [];
 
@@ -22,6 +23,7 @@ export default function DataViewsFooter() {
 		actions = EMPTY_ARRAY,
 		isLoading,
 		hasInitiallyLoaded,
+		bulkActionsInLayout,
 	} = useContext( DataViewsContext );
 
 	const isRefreshing = !! isLoading && hasInitiallyLoaded && !! data?.length;
@@ -56,7 +58,12 @@ export default function DataViewsFooter() {
 				} ) }
 				gap="sm"
 			>
-				{ hasBulkActions && <BulkActionsFooter /> }
+				{ hasBulkActions &&
+					( bulkActionsInLayout ? (
+						<DataViewsItemCount />
+					) : (
+						<BulkActions />
+					) ) }
 				<DataViewsPagination />
 			</Stack>
 		</div>
