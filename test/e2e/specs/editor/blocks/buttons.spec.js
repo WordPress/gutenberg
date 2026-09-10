@@ -214,7 +214,7 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Edit link.
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await page.getByRole( 'button', { name: 'Edit link' } ).click();
 
 		// Open Advanced settings panel.
 		await page
@@ -261,7 +261,7 @@ test.describe( 'Buttons', () => {
 		] );
 
 		// Edit link again.
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await page.getByRole( 'button', { name: 'Edit link' } ).click();
 
 		// Navigate to and toggle the "nofollow" checkbox.
 		await noFollowCheckbox.click();

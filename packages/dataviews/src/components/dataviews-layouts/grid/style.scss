@@ -135,6 +135,18 @@
 		}
 	}
 
+	// Fitting the whole media inside the box letterboxes it, so the box needs
+	// a background of its own for the item to still read as a unit. Only
+	// applied to `contain`: under `cover` the media covers the box, and a grey
+	// would only show through transparent images and while previews load.
+	&.has-media-fit-contain .dataviews-view-grid__media {
+		background-color: var(--wpds-color-background-surface-neutral);
+
+		img {
+			object-fit: contain;
+		}
+	}
+
 	.dataviews-view-grid__fields {
 		position: relative;
 		font-size: 12px;

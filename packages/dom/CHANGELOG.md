@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 4.55.0 (2026-09-10)
+
+### Bug Fixes
+
+-   `focusable.find`: Exclude elements hidden by CSS `visibility` or `content-visibility` while preserving explicitly visible descendants ([#82574](https://github.com/WordPress/gutenberg/pull/82574)).
+
+## 4.54.0 (2026-08-26)
+
+### Bug Fixes
+
+-   `cleanNodeList`: Unwrap whitespace-only phrasing content elements instead of removing them, so pasting content like `a<em> </em>b` no longer loses the space between words ([#76696](https://github.com/WordPress/gutenberg/pull/76696)).
+
 ## 4.53.0 (2026-08-12)
 
 

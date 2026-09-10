@@ -1,5 +1,5 @@
 import type { McpServer } from '@modelcontextprotocol/server';
-import { getDesignTokens } from '../data';
+import { getDesignTokens } from '../data.ts';
 
 /**
  * Register the get_design_tokens tool.

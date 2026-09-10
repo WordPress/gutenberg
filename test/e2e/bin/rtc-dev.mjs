@@ -162,18 +162,29 @@ function runCommand( command, args, options = {} ) {
 	} );
 }
 
+/*
+ * The root `wp-env` script resolves the installed binary through PATH. A bare
+ * `npx` would instead fetch whatever the registry serves under that name.
+ */
+function runWpEnv( args ) {
+	return runCommand( 'npm', [ 'run', 'wp-env', '--', ...args ] );
+}
+
 function runWpCli( wpArgs, { allowFailure = false } = {} ) {
-	const promise = runCommand( 'npx', [
-		'wp-env',
-		'run',
-		'cli',
-		'wp',
-		...wpArgs,
-	] );
+	const promise = runWpEnv( [ 'run', 'cli', 'wp', ...wpArgs ] );
 	if ( ! allowFailure ) {
 		return promise;
 	}
 	return promise.catch( () => undefined );
+}
+
+async function enableCollaborationExperiment() {
+	process.stdout.write( 'Enabling collaboration experiment... ' );
+	await runWpCli( [
+		'eval',
+		"$experiments = get_option( 'gutenberg-experiments', array() ); $experiments['gutenberg-real-time-collaboration'] = true; update_option( 'gutenberg-experiments', $experiments );",
+	] );
+	process.stdout.write( 'done\n' );
 }
 
 async function buildProviderBundle() {
@@ -205,7 +216,7 @@ async function runWebSocketsMode() {
 	} else {
 		process.stdout.write( 'Ensuring wp-env is running... ' );
 	}
-	await runCommand( 'npx', [ 'wp-env', 'start' ] );
+	await runWpEnv( [ 'start' ] );
 	process.stdout.write( 'done\n' );
 
 	await buildProviderBundle();
@@ -215,9 +226,7 @@ async function runWebSocketsMode() {
 	await runWpCli( [ 'plugin', 'activate', PLUGIN_SLUG ] );
 	process.stdout.write( 'done\n' );
 
-	process.stdout.write( 'Enabling collaboration option... ' );
-	await runWpCli( [ 'option', 'update', 'wp_collaboration_enabled', '1' ] );
-	process.stdout.write( 'done\n' );
+	await enableCollaborationExperiment();
 
 	const server = spawn(
 		process.execPath,
@@ -257,11 +266,13 @@ async function runHttpMode() {
 		process.stdout.write(
 			'Removed mount from .wp-env.override.json. Restarting wp-env... '
 		);
-		await runCommand( 'npx', [ 'wp-env', 'start' ] );
+		await runWpEnv( [ 'start' ] );
 		process.stdout.write( 'done\n' );
 	} else {
 		process.stdout.write( 'No mount to remove.\n' );
 	}
+
+	await enableCollaborationExperiment();
 
 	process.stdout.write(
 		'\nRTC switched to HTTP polling (default). http://localhost:8888/wp-admin\n'

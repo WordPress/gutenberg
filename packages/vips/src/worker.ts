@@ -14,7 +14,7 @@ import {
 	rotateImage,
 	hasTransparency,
 	getUltraHdrInfo,
-} from './index';
+} from './index.ts';
 
 /**
  * The API object that exposes all vips functions to the main thread.

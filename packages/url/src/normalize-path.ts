@@ -10,9 +10,15 @@ import { safeDecodeURIComponent } from './safe-decode-uri-component';
  * @return Normalized path.
  */
 export function normalizePath( path: string ): string {
-	const split = path.split( '?' );
-	const query = split[ 1 ];
-	const base = split[ 0 ];
+	const separatorIndex = path.indexOf( '?' );
+
+	if ( separatorIndex === -1 ) {
+		return path;
+	}
+
+	const base = path.slice( 0, separatorIndex );
+	const query = path.slice( separatorIndex + 1 );
+
 	if ( ! query ) {
 		return base;
 	}

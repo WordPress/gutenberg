@@ -1,10 +1,14 @@
 import { useRender } from '@base-ui/react';
-import type { CalendarDay, RootProps, ChevronProps } from '@daypicker/react';
+import {
+	useDayPicker,
+	type CalendarDay,
+	type RootProps,
+} from '@daypicker/react';
 import { useContext } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
-import { Button } from '../../button';
-import { Icon } from '../../icon';
+import { __, sprintf } from '@wordpress/i18n';
+import { IconButton } from '../../icon-button';
 import { RootContext } from './root-context';
 import type { Modifiers } from '../types';
 
@@ -141,7 +145,24 @@ export function Day(
  * @see https://daypicker.dev/guides/custom-components
  */
 export function Root( { rootRef, ...props }: RootProps ) {
-	const { render, ref } = useContext( RootContext );
+	const { render, ref, role, defaultAriaLabel } = useContext( RootContext );
+	const { months, labels } = useDayPicker();
+	const hasExplicitLabel =
+		props[ 'aria-label' ] !== undefined ||
+		props[ 'aria-labelledby' ] !== undefined;
+	let ariaLabel = props[ 'aria-label' ];
+
+	if ( ! hasExplicitLabel && defaultAriaLabel && role === 'application' ) {
+		const currentMonth = months[ 0 ];
+		ariaLabel = currentMonth
+			? sprintf(
+					// translators: 1: Calendar type. 2: Current month and year.
+					__( '%1$s, %2$s' ),
+					defaultAriaLabel,
+					labels.labelGrid( currentMonth.date )
+			  )
+			: defaultAriaLabel;
+	}
 
 	// `rootRef` is only set by `@daypicker/react` when `animate` is enabled.
 	const mergedRef = useMergeRefs( [ rootRef ?? null, ref ?? null ] );
@@ -150,21 +171,8 @@ export function Root( { rootRef, ...props }: RootProps ) {
 		render,
 		defaultTagName: 'div',
 		ref: mergedRef,
-		props,
+		props: { ...props, role, 'aria-label': ariaLabel },
 	} );
-}
-
-/**
- * Render the chevron icon used in the navigation buttons.
- * @see https://daypicker.dev/guides/custom-components
- */
-export function Chevron( { orientation, className }: ChevronProps ) {
-	return (
-		<Icon
-			className={ className }
-			icon={ orientation === 'right' ? chevronRight : chevronLeft }
-		/>
-	);
 }
 
 /**
@@ -172,18 +180,27 @@ export function Chevron( { orientation, className }: ChevronProps ) {
  *
  * `@daypicker/react` marks the button as `aria-disabled` (rather than
  * `disabled`) when there is no month to navigate to, so that it stays
- * discoverable. `Button`'s `focusableWhenDisabled` produces the same DOM.
+ * discoverable. `IconButton`'s `focusableWhenDisabled` produces the same DOM.
+ * It also always provides the string returned by its navigation label formatter
+ * as `aria-label`; the native button prop type cannot express that requirement.
  * @see https://daypicker.dev/guides/custom-components
  */
-export function NavButton( {
+function NavButton( {
+	icon,
 	className,
+	children: _children,
+	'aria-label': label,
 	'aria-disabled': ariaDisabled,
 	...props
-}: React.ButtonHTMLAttributes< HTMLButtonElement > ) {
+}: React.ButtonHTMLAttributes< HTMLButtonElement > & {
+	icon: React.ComponentProps< typeof IconButton >[ 'icon' ];
+} ) {
 	return (
-		<Button
+		<IconButton
 			{ ...props }
 			className={ className }
+			label={ label as string }
+			icon={ icon }
 			variant="minimal"
 			tone="neutral"
 			size="compact"
@@ -191,4 +208,16 @@ export function NavButton( {
 			focusableWhenDisabled
 		/>
 	);
+}
+
+export function PreviousMonthButton(
+	props: React.ButtonHTMLAttributes< HTMLButtonElement >
+) {
+	return <NavButton { ...props } icon={ chevronLeft } />;
+}
+
+export function NextMonthButton(
+	props: React.ButtonHTMLAttributes< HTMLButtonElement >
+) {
+	return <NavButton { ...props } icon={ chevronRight } />;
 }

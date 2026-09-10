@@ -6,25 +6,29 @@ import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import focusStyles from '../../../utils/css/focus.module.scss';
 import * as Combobox from '../combobox';
 import { InputLayout } from '../input-layout';
+import { SearchableResults } from '../searchable-results';
 import styles from './style.module.css';
+import { warnSearchableChipSelectProps } from './dev-warnings';
 import type { Item, SearchableChipSelectProps } from './types';
 
 /**
- * A searchable multi-selection component with chips, with support for
- * a footer item to create new items.
+ * A low-level primitive for a searchable multi-selection field with chips, with
+ * support for a creatable footer action.
+ *
+ * Prefer `SearchableChipSelectControl` when using with a standard label and description.
  */
 export const SearchableChipSelect = forwardRef<
-	HTMLDivElement,
+	HTMLInputElement,
 	SearchableChipSelectProps
 >( function SearchableChipSelect(
 	{
 		children,
-		creatableItem,
 		disabled,
 		emptyContent = __( 'No results found.' ),
 		items,
 		chipsContent,
 		searchPlaceholder = __( 'Search' ),
+		popupWidth,
 		showClearButton = true,
 		clearButtonLabel = __( 'Clear all' ),
 		'aria-label': ariaLabel,
@@ -34,11 +38,11 @@ export const SearchableChipSelect = forwardRef<
 	},
 	ref
 ) {
+	warnSearchableChipSelectProps( items, children );
+
 	return (
 		<Combobox.Root
-			items={
-				! creatableItem ? items : [ ...( items ?? [] ), creatableItem ]
-			}
+			items={ items }
 			multiple
 			disabled={ disabled }
 			{ ...restProps }
@@ -54,7 +58,6 @@ export const SearchableChipSelect = forwardRef<
 							visuallyDisabled={ disabled }
 						/>
 					}
-					ref={ ref }
 				>
 					<Combobox.Value>
 						{ ( value: Item[] ) => (
@@ -93,8 +96,10 @@ export const SearchableChipSelect = forwardRef<
 					</Combobox.Value>
 
 					<Combobox.Input
+						ref={ ref }
 						render={
 							<input
+								type="text"
 								className={ clsx(
 									defenseStyles.input,
 									styles.input
@@ -109,42 +114,10 @@ export const SearchableChipSelect = forwardRef<
 				</Combobox.Chips>
 			</Combobox.InputGroup>
 
-			<Combobox.Popup>
-				<Combobox.Empty>{ emptyContent }</Combobox.Empty>
-				<Combobox.List>
-					<Combobox.ListBody>
-						<Combobox.Collection>
-							{ ( item: Item, ...args ) => {
-								if ( item.value === creatableItem?.value ) {
-									return null;
-								}
-								if ( children ) {
-									return children( item, ...args );
-								}
-								return (
-									<Combobox.Item
-										key={ item.value }
-										value={ item }
-										disabled={ item.disabled }
-									>
-										{ item.label }
-									</Combobox.Item>
-								);
-							} }
-						</Combobox.Collection>
-					</Combobox.ListBody>
-					{ creatableItem && (
-						<Combobox.ListFooter>
-							<Combobox.Item
-								variant="creatable"
-								value={ creatableItem }
-								disabled={ creatableItem.disabled }
-							>
-								{ creatableItem.label }
-							</Combobox.Item>
-						</Combobox.ListFooter>
-					) }
-				</Combobox.List>
+			<Combobox.Popup width={ popupWidth }>
+				<SearchableResults emptyContent={ emptyContent }>
+					{ children }
+				</SearchableResults>
 			</Combobox.Popup>
 		</Combobox.Root>
 	);

@@ -1,8 +1,7 @@
-import { useMemo } from '@wordpress/element';
-import * as styles from '../styles';
+import clsx from 'clsx';
+import styles from '../style.module.scss';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import { useCx } from '../../utils/hooks/use-cx';
 import type { LinkedButtonProps } from '../types';
 
 export function useBorderBoxControlLinkedButton(
@@ -13,11 +12,8 @@ export function useBorderBoxControlLinkedButton(
 		'BorderBoxControlLinkedButton'
 	);
 
-	// Generate class names.
-	const cx = useCx();
-	const classes = useMemo( () => {
-		return cx( styles.borderBoxControlLinkedButton, className );
-	}, [ className, cx ] );
-
-	return { ...otherProps, className: classes };
+	return {
+		...otherProps,
+		className: clsx( styles[ 'linked-button' ], className ),
+	};
 }

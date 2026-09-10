@@ -27,38 +27,20 @@ const EMPTY_ACTIVE_FORMATS = [];
 
 const PLACEHOLDER_ATTR_NAME = 'data-rich-text-placeholder';
 
-/**
- * If the selection is set on the placeholder element, collapse the selection to
- * the start (before the placeholder).
- *
- * @param {Window} defaultView
- */
-function fixPlaceholderSelection( defaultView ) {
-	const selection = defaultView.getSelection();
-	const { anchorNode, anchorOffset } = selection;
-
-	if ( anchorNode.nodeType !== anchorNode.ELEMENT_NODE ) {
-		return;
-	}
-
-	const targetNode = anchorNode.childNodes[ anchorOffset ];
-
-	if (
-		! targetNode ||
-		targetNode.nodeType !== targetNode.ELEMENT_NODE ||
-		! targetNode.hasAttribute( PLACEHOLDER_ATTR_NAME )
-	) {
-		return;
-	}
-
-	selection.collapseToStart();
-}
-
 export default ( props ) => ( element ) => {
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
 
 	let isComposing = false;
+	let isPointerDown = false;
+
+	function onPointerDown() {
+		isPointerDown = true;
+	}
+
+	function onPointerUp() {
+		isPointerDown = false;
+	}
 
 	function onInput( event ) {
 		// Do not trigger a change if characters are being composed. Browsers
@@ -168,6 +150,20 @@ export default ( props ) => ( element ) => {
 		const { start, end, text } = createRecord();
 		const oldRecord = record.current;
 
+		// An empty field has a single caret position, but browsers may
+		// resolve a caret after the padding character or on the placeholder
+		// element. The caret is then invisible, or the iOS keyboard sees a
+		// character before it and does not capitalize. Apply the record's
+		// position right away: this runs in the task that placed the caret
+		// (see the focus handler), which is what the keyboard requires. It
+		// must happen before the snapshot below, so that the selection
+		// change event it causes is recognized as processed. Applying again
+		// from that later task moves the caret on iOS and the keyboard
+		// loses the capital.
+		if ( text.length === 0 ) {
+			applyRecord( { ...oldRecord, start, end } );
+		}
+
 		selectionSnapshot = {
 			anchorNode: selection.anchorNode,
 			anchorOffset: selection.anchorOffset,
@@ -185,13 +181,6 @@ export default ( props ) => ( element ) => {
 		}
 
 		if ( start === oldRecord.start && end === oldRecord.end ) {
-			// Sometimes the browser may set the selection on the placeholder
-			// element, in which case the caret is not visible. We need to set
-			// the caret before the placeholder if that's the case.
-			if ( oldRecord.text.length === 0 && start === 0 ) {
-				fixPlaceholderSelection( defaultView );
-			}
-
 			return;
 		}
 
@@ -279,6 +268,9 @@ export default ( props ) => ( element ) => {
 					selection.collapse( element, 0 );
 				}
 			}
+			// The caret placed after this focus must still be synchronized
+			// in this task (see below).
+			window.queueMicrotask( handleSelectionChange );
 			return;
 		}
 
@@ -297,9 +289,11 @@ export default ( props ) => ( element ) => {
 			// The record no longer reflects the selection, so a matching
 			// snapshot must not skip synchronization.
 			selectionSnapshot = undefined;
-		} else {
+		} else if ( ! isPointerDown ) {
 			// The document's selection may have moved elsewhere while the
-			// element was blurred, so restore it from the record.
+			// element was blurred, so restore it from the record. A pointer
+			// press places the caret itself; a selection set during the
+			// press would replace it.
 			applyRecord( record.current );
 		}
 
@@ -337,12 +331,27 @@ export default ( props ) => ( element ) => {
 		'focusin',
 		onFocus
 	);
+	const unsubscribePointerDown = subscribeDelegatedListener(
+		element,
+		'pointerdown',
+		onPointerDown
+	);
+	const unsubscribePointerUp = subscribeDelegatedListener(
+		defaultView,
+		'pointerup',
+		onPointerUp
+	);
+	const unsubscribePointerCancel = subscribeDelegatedListener(
+		defaultView,
+		'pointercancel',
+		onPointerUp
+	);
 	// Permanently subscribed rather than added on focus and removed on blur:
 	// `handleSelectionChange` checks whether the element is focused itself,
 	// and the shared underlying delegated listener keeps the number of native
 	// listeners constant.
-	const unsubscribeSelectionChange = subscribeDelegatedListener(
-		ownerDocument,
+	const unsubscribeSelectionChange = subscribeOwnedListener(
+		element,
 		'selectionchange',
 		handleSelectionChange
 	);
@@ -363,8 +372,8 @@ export default ( props ) => ( element ) => {
 		'cut',
 		'paste',
 	].map( ( eventType ) =>
-		subscribeDelegatedListener(
-			ownerDocument,
+		subscribeOwnedListener(
+			element,
 			eventType,
 			handleSelectionChange,
 			true
@@ -376,6 +385,9 @@ export default ( props ) => ( element ) => {
 		unsubscribeCompositionStart();
 		unsubscribeCompositionEnd();
 		unsubscribeFocus();
+		unsubscribePointerDown();
+		unsubscribePointerUp();
+		unsubscribePointerCancel();
 		unsubscribeSelectionChange();
 		unsubscribeEnsureSelectionSync.forEach( ( unsubscribe ) =>
 			unsubscribe()

@@ -354,8 +354,10 @@ export function buildRevisionsPageQuery( revisionKey, page ) {
 				'author',
 				'slug',
 				'meta',
-				'title.raw',
-				'excerpt.raw',
+				'title',
+				'excerpt',
+				// Not the whole field: `content.rendered` would blow up the
+				// payload of a page of revisions.
 				'content.raw',
 				revisionKey,
 			] ),
@@ -594,7 +596,7 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		return Boolean(
 			syncConfig &&
 				syncConfig.supportsPersistence &&
-				window._wpCollaborationEnabled &&
+				window.__experimentalEnableRealTimeCollaboration &&
 				false !==
 					syncConfig.shouldSync?.(
 						`postType/${ currentPostType }`,

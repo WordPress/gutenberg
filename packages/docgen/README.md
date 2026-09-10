@@ -21,7 +21,7 @@ npm install @wordpress/docgen --save-dev
 ## Usage
 
 ```bash
-npx docgen <entry-point.js>
+npm exec --no -- docgen <entry-point.js>
 ```
 
 This command will generate a file named `entry-point-api.md` containing all the exports and their JSDoc comments.
@@ -66,7 +66,7 @@ export default function addition( term1, term2 ) {
 }
 ```
 
-Output of `npx docgen index.js` would be `index-api.js`:
+Output of `npm exec --no -- docgen index.js` would be `index-api.js`:
 
 ```markdown
 # API
@@ -119,7 +119,7 @@ function count( term1, term2 ) {
 export { count, addition };
 ```
 
-Output of `npx docgen index.js` would be `index-api.js`:
+Output of `npm exec --no -- docgen index.js` would be `index-api.js`:
 
 ```markdown
 # API
@@ -206,7 +206,7 @@ export function addition( term1, term2 ) {
 }
 ````
 
-Output of `npx docgen index.js` would be `index-api.js`:
+Output of `npm exec --no -- docgen index.js` would be `index-api.js`:
 
 ````markdown
 # API
@@ -273,7 +273,7 @@ export default function addition( term1: number, term2: number ): number {
 }
 ```
 
-Output of `npx docgen index.ts` would be `index-api.js`:
+Output of `npm exec --no -- docgen index.ts` would be `index-api.js`:
 
 ```markdown
 # API

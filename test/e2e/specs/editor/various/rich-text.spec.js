@@ -187,6 +187,35 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should retain focus after backspace-undo of heading prefix transform', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '## ' );
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/heading' } ] );
+
+		await page.keyboard.press( 'Backspace' );
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/paragraph' } ] );
+
+		await page.keyboard.type( 'hello' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '## hello' },
+			},
+		] );
+	} );
+
 	test( 'should not undo backtick transform with backspace after typing', async ( {
 		page,
 		editor,

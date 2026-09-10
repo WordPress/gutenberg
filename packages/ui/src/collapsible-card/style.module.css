@@ -27,9 +27,14 @@
 			min-width: 0;
 		}
 
+		.header-description {
+			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
 		.header-trigger-positioner {
 			flex-shrink: 0;
-			align-self: center;
+			align-self: flex-start;
+			margin-block-start: calc(var(--wpds-typography-line-height-sm) / 2);
 			/* Prevent the trigger from making the header taller than its content,
 			   preserving the same metrics between `Card` and `CollapsibleCard`. */
 			max-height: 0;
@@ -40,8 +45,7 @@
 			display: flex;
 
 			/* Offset by half the button's own height so it visually centers
-			   at the wrapper's midpoint (which `align-self: center` places at
-			   the vertical center of the header). */
+			   against the title's line box. */
 			translate: 0 -50%;
 
 			/* For an outline that looks like `IconButton`'s */
@@ -49,7 +53,7 @@
 		}
 
 		.header-trigger {
-			@media not ( prefers-reduced-motion ) {
+			@media not (prefers-reduced-motion) {
 				transition: rotate 0.15s ease-out;
 			}
 		}
@@ -86,7 +90,7 @@
 				height: 0;
 			}
 
-			@media not ( prefers-reduced-motion ) {
+			@media not (prefers-reduced-motion) {
 				transition: all 150ms ease-out;
 			}
 		}

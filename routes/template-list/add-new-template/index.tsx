@@ -174,12 +174,14 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 
 	const homeUrl = useSelect( ( select ) => {
 		// Site index.
-		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
-			?.home;
+		return select( coreStore ).getEntityRecord< { home?: string } >(
+			'root',
+			'__unstableBase'
+		)?.home;
 	}, [] );
 
 	const TEMPLATE_SHORT_DESCRIPTIONS: Record< string, string > = {
-		'front-page': homeUrl,
+		'front-page': homeUrl ?? '',
 		date: sprintf(
 			// translators: %s: The homepage url.
 			__( 'E.g. %s' ),
@@ -220,12 +222,8 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 					slug: slug.toString(),
 					status: 'publish',
 					title,
-					// This adds post meta fields in template
-					meta: {
-						is_wp_suggestion: isWPSuggestion,
-						// Mark as inactive by default when template activation is enabled
-						is_inactive_by_default: true,
-					},
+					// This adds a post meta field in template that is part of `is_custom` value calculation.
+					is_wp_suggestion: isWPSuggestion,
 				},
 				{ throwOnError: true }
 			);

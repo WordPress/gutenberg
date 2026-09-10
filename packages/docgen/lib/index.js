@@ -8,7 +8,7 @@ const isSymbolIgnore = require( './is-symbol-ignore' );
 /**
  * Helpers functions.
  */
-const extensions = [ '.js', '.ts', '.tsx' ];
+const extensions = [ '.js', '.jsx', '.ts', '.tsx' ];
 const relativeToAbsolute = ( basePath, relativePath ) => {
 	const target = path.join( path.dirname( basePath ), relativePath );
 	const extension = path.extname( target );

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 10.55.0 (2026-09-10)
+
+### Internal
+
+-   Remove unused dependency `use-memo-one` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 10.54.0 (2026-08-26)
+
 ## 10.53.0 (2026-08-12)
 
 

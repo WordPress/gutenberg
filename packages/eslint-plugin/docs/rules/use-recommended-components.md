@@ -4,6 +4,15 @@ Encourages the use of recommended UI components in a WordPress environment by fl
 
 The rule checks named imports and direct destructuring from `unlock( privateApis )` when the `privateApis` identifier can be traced back to a package with a denylist entry.
 
+## Migration guides
+
+- `__experimentalInputControl` — [`InputControl` migration guide][inputcontrol-migration-guide]
+- `TextControl` — [`InputControl` migration guide][inputcontrol-migration-guide]
+- `TextareaControl` — [`TextareaControl` migration guide][textareacontrol-migration-guide]
+
+[inputcontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide
+[textareacontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-textareacontrol--migration-guide
+
 ## Rule details
 
 Examples of **incorrect** code for this rule:

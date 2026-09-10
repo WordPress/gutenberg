@@ -2,8 +2,26 @@
 
 ## Unreleased
 
+## 0.20.0 (2026-09-10)
+
+### Bug Fixes
+
+-   `author`: Drop the custom `sort` callback, which read `_embedded.author` from the arguments although `Field.sort` receives the field values (the author ids), so every comparison returned `0` and in-memory sorting by author was a no-op. The field now sorts by author id through the `integer` type, matching the order the REST API returns for `orderby=author` ([#82559](https://github.com/WordPress/gutenberg/pull/82559)).
+-   `alt_text`, `caption`, `description`: Pass the field's disabled state to the textarea control, so disabling one of these fields stops it accepting input. ([#82516](https://github.com/WordPress/gutenberg/pull/82516))
+
 ### Internal
 
+-   `caption`: Replace the custom `Edit` component with the built-in `textarea` control ([#82539](https://github.com/WordPress/gutenberg/pull/82539)).
+-   `alt_text`: Replace the custom `Edit` component with the built-in `textarea` control, passing the help text as the field's `description` ([#82539](https://github.com/WordPress/gutenberg/pull/82539)).
+-   `description`: Replace the custom `Edit` component with the built-in `textarea` control ([#82539](https://github.com/WordPress/gutenberg/pull/82539)).
+-   Remove unused dependencies `@wordpress/date` and `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 0.19.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 -   `attached_to`: Narrow the combobox `onChange` handler parameter to `string | null`, following the upstream `ComboboxControl` type fix that removed the accidental `undefined` from the callback type. ([#81568](https://github.com/WordPress/gutenberg/pull/81568))
 
 ## 0.18.0 (2026-08-12)

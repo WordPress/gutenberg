@@ -1,8 +1,8 @@
-import { useMemo, useRef } from '@wordpress/element';
-import { useIsomorphicLayoutEffect } from '@wordpress/compose';
-import { ThemeContext } from './context';
-import { useThemeProviderStyles } from './use-theme-provider-styles';
-import { type ThemeProviderProps } from './types';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEvent, useIsomorphicLayoutEffect } from '@wordpress/compose';
+import { ThemeContext } from './context.ts';
+import { useThemeProviderStyles } from './use-theme-provider-styles.ts';
+import { type ThemeProviderProps } from './types.ts';
 import styles from './style.module.css';
 
 // Dev-only: count active root providers per document so we can warn when more
@@ -21,14 +21,17 @@ export const ThemeProvider = ( {
 	cursor,
 	cornerRadius,
 	isRoot = false,
+	onColorWarnings,
 }: ThemeProviderProps ) => {
-	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
-		color,
-		cursor,
-		cornerRadius,
-	} );
+	const { themeProviderStyles, resolvedSettings, colorWarnings } =
+		useThemeProviderStyles( {
+			color,
+			cursor,
+			cornerRadius,
+		} );
 
 	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'subtle';
+	const onColorWarningsEvent = useEvent( onColorWarnings );
 
 	const contextValue = useMemo(
 		() => ( {
@@ -38,6 +41,12 @@ export const ThemeProvider = ( {
 	);
 
 	const wrapperRef = useRef< HTMLDivElement >( null );
+
+	useEffect( () => {
+		if ( colorWarnings !== undefined ) {
+			onColorWarningsEvent( colorWarnings );
+		}
+	}, [ colorWarnings, onColorWarningsEvent ] );
 
 	// For root providers, mirror the wrapper's custom properties and preset
 	// attributes onto the document element of the wrapper's own document
@@ -136,7 +145,7 @@ export const ThemeProvider = ( {
 			ref={ wrapperRef }
 			data-wpds-root-provider={ isRoot || undefined }
 			data-wpds-corner-radius={ cornerRadiusPreset }
-			className={ styles.root }
+			className={ styles.wrapper }
 			style={ themeProviderStyles }
 		>
 			<ThemeContext.Provider value={ contextValue }>

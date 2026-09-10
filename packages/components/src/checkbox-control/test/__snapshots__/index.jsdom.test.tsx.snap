@@ -1,0 +1,42 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`CheckboxControl > Basic rendering > should render the indeterminate icon when in the indeterminate state 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -14,14 +14,32 @@
+          <span
+            class="components-checkbox-control__input-container"
+          >
+            <input
+              class="components-checkbox-control__input"
+-             id="inspector-checkbox-control-6"
++             id="inspector-checkbox-control-7"
+              type="checkbox"
+              value="1"
++           />
++           <svg
++             aria-hidden="true"
++             class="components-checkbox-control__indeterminate"
++             focusable="false"
++             height="16"
++             role="presentation"
++             stroke="currentColor"
++             stroke-width="1.5"
++             style="fill: none;"
++             viewBox="4 4 16 16"
++             width="16"
++             xmlns="http://www.w3.org/2000/svg"
++           >
++             <path
++               d="M7 12H17"
++               vector-effect="non-scaling-stroke"
+              />
++           </svg>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+`;

@@ -1,13 +1,14 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"composite": true
+		"types": [ "gutenberg-vitest-test-env" ]
 	},
-	"files": [],
+	"files": [ "global.d.ts" ],
 	"references": [
-		{ "path": "../a11y" },
-		{ "path": "../interactivity/tsconfig.build.json" },
-		{ "path": "tsconfig.main.json" },
-		{ "path": "tsconfig.full-page.json" }
+		{ "path": "./tsconfig.main.json" },
+		{ "path": "./tsconfig.full-page.json" },
+		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../interactivity/tsconfig.build.json" }
 	]
 }

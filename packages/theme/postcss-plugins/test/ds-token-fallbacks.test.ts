@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { addFallbackToVar } from '../ds-token-fallbacks.mjs';
 
 describe( 'addFallbackToVar', () => {
@@ -19,6 +20,12 @@ describe( 'addFallbackToVar', () => {
 		expect(
 			addFallbackToVar( 'var(--wpds-border-radius-sm, 999px)' )
 		).toBe( 'var(--wpds-border-radius-sm, 999px)' );
+	} );
+
+	it( 'leaves a var() with an empty fallback untouched', () => {
+		expect( addFallbackToVar( 'var(--wpds-dimension-gap-sm,)' ) ).toBe(
+			'var(--wpds-dimension-gap-sm,)'
+		);
 	} );
 
 	it( 'leaves var() calls that are not design token properties', () => {

@@ -2,13 +2,13 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "jest", "style-imports" ]
+		"types": [ "style-imports" ]
 	},
 	"files": [ "global.d.ts" ],
 	"references": [
 		{ "path": "./tsconfig.build.json" },
-		{ "path": "../compose" },
-		{ "path": "../element" },
-		{ "path": "../style-runtime" }
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../style-runtime/tsconfig.build.json" }
 	]
 }

@@ -10,18 +10,21 @@ test.describe( 'Dropdown Menu', () => {
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
-		const menuItems = page
-			.getByRole( 'menu', { name: 'Options' } )
-			.locator(
-				'[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]'
-			);
+		const menu = page.getByRole( 'menu', { name: 'Options' } );
+		const menuItems = menu.locator(
+			'[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]'
+		);
+		await expect( menu ).toBeVisible();
 		const totalItems = await menuItems.count();
 
 		// Catch any issues with the selector, which could cause a false positive test result.
 		expect( totalItems ).toBeGreaterThan( 0 );
 
 		await test.step( 'allows navigation through each item using arrow keys', async () => {
-			// Expect the first menu item to be focused.
+			// Opening with a click focuses the menu itself. The first arrow
+			// key moves focus into the menu.
+			await expect( menu ).toBeFocused();
+			await page.keyboard.press( 'ArrowDown' );
 			await expect( menuItems.first() ).toBeFocused();
 
 			// Arrow down to the last item.
