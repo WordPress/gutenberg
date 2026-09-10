@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Cover: Allow video backgrounds to use the "Fixed background" (parallax) option, matching image backgrounds. Videos cannot use `background-attachment: fixed`, so the video is pinned to the viewport and clipped to the block's bounds, with fallbacks/preferences ([#74289](https://github.com/WordPress/gutenberg/pull/74289)).
+
 ## 11.0.0 (2026-09-10)
 
 ### Breaking Changes

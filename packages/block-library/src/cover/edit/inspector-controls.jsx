@@ -308,7 +308,6 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Fixed background' ) }
 									checked={ !! hasParallax }
 									onChange={ toggleParallax }
@@ -327,7 +326,6 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Repeated background' ) }
 									checked={ isRepeated }
 									onChange={ toggleIsRepeated }
