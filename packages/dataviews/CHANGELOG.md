@@ -54,6 +54,8 @@
 
 ### Enhancements
 
+-   DataViews: collapse default bulk actions into a labeled menu on mobile, including eligible actions without icons.
+
 -   DataViews: show bulk actions in the default table and grid headers, with a plain selected-item count. Custom compositions retain their existing placement.
 
 -   DataForm: Add a `showPlaceholderIfEmpty` option to the `panel` layout, which shows the field's `placeholder` in the summary when the value is empty ([#82527](https://github.com/WordPress/gutenberg/pull/82527)).

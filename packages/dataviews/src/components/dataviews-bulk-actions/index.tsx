@@ -1,9 +1,13 @@
-import type { ReactElement } from 'react';
-import { Button, CheckboxControl } from '@wordpress/components';
+import {
+	Button,
+	CheckboxControl,
+	DropdownMenu,
+	MenuItem,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState, useRef, useContext } from '@wordpress/element';
+import { useMemo, useState, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
-import { closeSmall } from '@wordpress/icons';
+import { closeSmall, chevronDown } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
 import DataViewsContext from '../dataviews-context';
@@ -12,41 +16,6 @@ import type { Action, ActionModal as ActionModalType } from '../../types';
 import type { SetSelection } from '../../types/private';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 import getFooterMessage from '../../utils/get-footer-message';
-
-interface ActionWithModalProps< Item > {
-	action: ActionModalType< Item >;
-	items: Item[];
-	ActionTriggerComponent: (
-		props: ActionTriggerProps< Item >
-	) => ReactElement;
-}
-
-function ActionWithModal< Item >( {
-	action,
-	items,
-	ActionTriggerComponent,
-}: ActionWithModalProps< Item > ) {
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const actionTriggerProps = {
-		action,
-		onClick: () => {
-			setIsModalOpen( true );
-		},
-		items,
-	};
-	return (
-		<>
-			<ActionTriggerComponent { ...actionTriggerProps } />
-			{ isModalOpen && (
-				<ActionModal
-					action={ action }
-					items={ items }
-					closeModal={ () => setIsModalOpen( false ) }
-				/>
-			) }
-		</>
-	);
-}
 
 export function hasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
@@ -152,7 +121,8 @@ interface ActionButtonProps< Item > {
 	action: Action< Item >;
 	selectedItems: Item[];
 	actionInProgress: string | null;
-	setActionInProgress: ( actionId: string | null ) => void;
+	onAction: ( action: Action< Item >, items: Item[] ) => void;
+	onClose?: () => void;
 }
 
 interface ToolbarContentProps< Item > {
@@ -202,37 +172,36 @@ function ActionButton< Item >( {
 	action,
 	selectedItems,
 	actionInProgress,
-	setActionInProgress,
+	onAction,
+	onClose,
 }: ActionButtonProps< Item > ) {
-	const registry = useRegistry();
-	const selectedEligibleItems = useMemo( () => {
-		return selectedItems.filter( ( item ) => {
-			return ! action.isEligible || action.isEligible( item );
-		} );
-	}, [ action, selectedItems ] );
-	if ( 'RenderModal' in action ) {
+	const selectedEligibleItems = useMemo(
+		() =>
+			selectedItems.filter(
+				( item ) => ! action.isEligible || action.isEligible( item )
+			),
+		[ action, selectedItems ]
+	);
+	const onClick = () => {
+		onClose?.();
+		onAction( action, selectedEligibleItems );
+	};
+	const isBusy = actionInProgress === action.id;
+	if ( onClose ) {
 		return (
-			<ActionWithModal
-				key={ action.id }
-				action={ action }
-				items={ selectedEligibleItems }
-				ActionTriggerComponent={ ActionTrigger }
-			/>
+			<MenuItem onClick={ onClick } disabled={ isBusy }>
+				{ typeof action.label === 'string'
+					? action.label
+					: action.label( selectedEligibleItems ) }
+			</MenuItem>
 		);
 	}
 	return (
 		<ActionTrigger
-			key={ action.id }
 			action={ action }
-			onClick={ async () => {
-				setActionInProgress( action.id );
-				await action.callback( selectedEligibleItems, {
-					registry,
-				} );
-				setActionInProgress( null );
-			} }
+			onClick={ onClick }
 			items={ selectedEligibleItems }
-			isBusy={ actionInProgress === action.id }
+			isBusy={ isBusy }
 		/>
 	);
 }
@@ -246,10 +215,11 @@ function renderBulkActionsContent< Item >(
 	actionsToShow: Action< Item >[],
 	selectedItems: Item[],
 	actionInProgress: string | null,
-	setActionInProgress: ( actionId: string | null ) => void,
+	onAction: ( action: Action< Item >, items: Item[] ) => void,
 	onChangeSelection: SetSelection,
 	bulkActionsInLayout: boolean,
-	totalItems: number
+	totalItems: number,
+	isMobile: boolean
 ) {
 	const clearSelection = selectedItems.length > 0 && (
 		<Button
@@ -268,6 +238,17 @@ function renderBulkActionsContent< Item >(
 			onClick={ () => onChangeSelection( EMPTY_ARRAY ) }
 		/>
 	);
+	const renderActions = ( onClose?: () => void ) =>
+		actionsToShow.map( ( action ) => (
+			<ActionButton
+				key={ action.id }
+				action={ action }
+				selectedItems={ selectedItems }
+				actionInProgress={ actionInProgress }
+				onAction={ onAction }
+				onClose={ onClose }
+			/>
+		) );
 	return (
 		<Stack
 			direction="row"
@@ -311,17 +292,26 @@ function renderBulkActionsContent< Item >(
 				gap={ bulkActionsInLayout ? 'md' : 'xs' }
 				justify="start"
 			>
-				{ actionsToShow.map( ( action ) => {
-					return (
-						<ActionButton
-							key={ action.id }
-							action={ action }
-							selectedItems={ selectedItems }
-							actionInProgress={ actionInProgress }
-							setActionInProgress={ setActionInProgress }
-						/>
-					);
-				} ) }
+				{ bulkActionsInLayout && isMobile
+					? actionsToShow.length > 0 && (
+							<DropdownMenu
+								label={ __( 'Actions' ) }
+								text={ __( 'Actions' ) }
+								icon={ chevronDown }
+								toggleProps={ {
+									variant: 'secondary',
+									size: 'compact',
+									iconPosition: 'right',
+									className: 'dataviews-bulk-actions__action',
+									disabled: !! actionInProgress,
+									isBusy: !! actionInProgress,
+									accessibleWhenDisabled: true,
+								} }
+							>
+								{ ( { onClose } ) => renderActions( onClose ) }
+							</DropdownMenu>
+					  )
+					: renderActions() }
 				{ ! bulkActionsInLayout && clearSelection }
 			</Stack>
 			{ bulkActionsInLayout && clearSelection }
@@ -339,10 +329,25 @@ function BulkActionsContent< Item >( {
 }: ToolbarContentProps< Item > ) {
 	const { bulkActionsInLayout = false, paginationInfo } =
 		useContext( DataViewsContext );
-	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
-		null
-	);
-	const bulkActionsContentRef = useRef< React.JSX.Element >( undefined );
+	const [ pendingContent, setPendingContent ] =
+		useState< React.JSX.Element >();
+	const registry = useRegistry();
+	const [ activeModal, setActiveModal ] = useState< {
+		action: ActionModalType< Item >;
+		items: Item[];
+	} | null >( null );
+	const onAction = async ( action: Action< Item >, items: Item[] ) => {
+		if ( 'RenderModal' in action ) {
+			setActiveModal( { action, items } );
+			return;
+		}
+		setPendingContent( renderContent( action.id ) );
+		try {
+			await action.callback( items, { registry } );
+		} finally {
+			setPendingContent( undefined );
+		}
+	};
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	const bulkActions = useMemo(
@@ -370,20 +375,17 @@ function BulkActionsContent< Item >( {
 			actions.filter( ( action ) => {
 				return (
 					action.supportsBulk &&
-					( ! isMobile || action.icon ) &&
+					( ! isMobile || bulkActionsInLayout || action.icon ) &&
 					selectedItems.some(
 						( item ) =>
 							! action.isEligible || action.isEligible( item )
 					)
 				);
 			} ),
-		[ actions, selectedItems, isMobile ]
+		[ actions, selectedItems, isMobile, bulkActionsInLayout ]
 	);
-	if ( ! actionInProgress ) {
-		if ( bulkActionsContentRef.current ) {
-			bulkActionsContentRef.current = undefined;
-		}
-		return renderBulkActionsContent(
+	const renderContent = ( actionInProgress: string | null ) =>
+		renderBulkActionsContent(
 			data,
 			actions,
 			getItemId,
@@ -392,28 +394,24 @@ function BulkActionsContent< Item >( {
 			actionsToShow,
 			selectedItems,
 			actionInProgress,
-			setActionInProgress,
+			onAction,
 			onChangeSelection,
 			bulkActionsInLayout,
-			paginationInfo.totalItems
+			paginationInfo.totalItems,
+			isMobile
 		);
-	} else if ( ! bulkActionsContentRef.current ) {
-		bulkActionsContentRef.current = renderBulkActionsContent(
-			data,
-			actions,
-			getItemId,
-			isInfiniteScroll,
-			selection,
-			actionsToShow,
-			selectedItems,
-			actionInProgress,
-			setActionInProgress,
-			onChangeSelection,
-			bulkActionsInLayout,
-			paginationInfo.totalItems
-		);
-	}
-	return bulkActionsContentRef.current;
+	return (
+		<>
+			{ pendingContent ?? renderContent( null ) }
+			{ activeModal && (
+				<ActionModal
+					action={ activeModal.action }
+					items={ activeModal.items }
+					closeModal={ () => setActiveModal( null ) }
+				/>
+			) }
+		</>
+	);
 }
 
 export function BulkActions() {
