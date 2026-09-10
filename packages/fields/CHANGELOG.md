@@ -19,6 +19,7 @@
 -   `author`: Drop the custom `sort` callback, which read `_embedded.author` from the arguments although `Field.sort` receives the field values (the author ids), so every comparison returned `0` and in-memory sorting by author was a no-op. The field now sorts by author id through the `integer` type, matching the order the REST API returns for `orderby=author` ([#82559](https://github.com/WordPress/gutenberg/pull/82559)).
 -   Hide the slug field for posts without a permalink, such as posts of non-public post types, matching the classic post URL panel ([#82341](https://github.com/WordPress/gutenberg/pull/82341)).
 -   Normalize special characters in exported pattern filenames to prevent broken or unreadable files. ([#77033](https://github.com/WordPress/gutenberg/pull/77033))
+-   `trashPost`: Remove the confirmation dialog when moving items to the trash in DataViews. ([#82297](https://github.com/WordPress/gutenberg/pull/82297))
 
 ### Internal
 
