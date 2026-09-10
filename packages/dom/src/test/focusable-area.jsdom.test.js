@@ -1,16 +1,15 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { find } from '../focusable';
 
-function createElementWithLayout( type ) {
-	const element = document.createElement( type );
-	const sizeIfVisible = () => ( element.style.display === 'none' ? 0 : 10 );
+function createImageWithLayout() {
+	const image = document.createElement( 'img' );
 
-	Object.defineProperties( element, {
-		offsetHeight: { get: sizeIfVisible },
-		offsetWidth: { get: sizeIfVisible },
+	Object.defineProperties( image, {
+		offsetHeight: { value: 10 },
+		offsetWidth: { value: 10 },
 	} );
 
-	return element;
+	return image;
 }
 
 describe( 'focusable.find() image map areas', () => {
@@ -18,29 +17,26 @@ describe( 'focusable.find() image map areas', () => {
 		document.body.innerHTML = '';
 	} );
 
-	it( 'finds a mapped area with a visible image', () => {
-		const map = createElementWithLayout( 'map' );
+	it( 'finds an area in a named map referenced by an image', () => {
+		const map = document.createElement( 'map' );
 		map.name = 'testfocus';
-		const area = createElementWithLayout( 'area' );
+		const area = document.createElement( 'area' );
 		area.href = '';
 		map.appendChild( area );
-		const image = createElementWithLayout( 'img' );
+		const image = createImageWithLayout();
 		image.setAttribute( 'usemap', '#testfocus' );
 		document.body.append( map, image );
 
 		expect( find( map ) ).toEqual( [ area ] );
 	} );
 
-	it( 'ignores a mapped area with a hidden image', () => {
-		const map = createElementWithLayout( 'map' );
+	it( 'ignores an area when no image references its map', () => {
+		const map = document.createElement( 'map' );
 		map.name = 'testfocus';
-		const area = createElementWithLayout( 'area' );
+		const area = document.createElement( 'area' );
 		area.href = '';
 		map.appendChild( area );
-		const image = createElementWithLayout( 'img' );
-		image.setAttribute( 'usemap', '#testfocus' );
-		image.style.display = 'none';
-		document.body.append( map, image );
+		document.body.append( map );
 
 		expect( find( map ) ).toEqual( [] );
 	} );

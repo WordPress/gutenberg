@@ -140,6 +140,54 @@ describe( 'focusable', () => {
 			expect( findFocusable( node ) ).toEqual( [ link ] );
 		} );
 
+		it( 'finds a mapped area whose referenced image is visible', () => {
+			const node = createElement( 'div' );
+			node.innerHTML = `
+				<map name="testfocus">
+					<area href="#target" shape="rect" coords="0,0,30,30" alt="Target">
+				</map>
+				<img usemap="#testfocus" width="40" height="40" alt="">
+			`;
+			const area = node.querySelector( 'area' );
+			const image = node.querySelector( 'img' );
+
+			document.body.appendChild( node );
+
+			expect( area.getClientRects() ).toHaveLength( 0 );
+			expect( image.getClientRects().length ).toBeGreaterThan( 0 );
+			expect( find( node ) ).toEqual( [ area ] );
+		} );
+
+		it( 'ignores a mapped area whose referenced image is hidden', () => {
+			const node = createElement( 'div' );
+			node.innerHTML = `
+				<map name="testfocus">
+					<area href="#target" shape="rect" coords="0,0,30,30" alt="Target">
+				</map>
+				<img usemap="#testfocus" width="40" height="40" alt="" style="visibility: hidden">
+			`;
+			const image = node.querySelector( 'img' );
+
+			document.body.appendChild( node );
+
+			expect( image.getClientRects().length ).toBeGreaterThan( 0 );
+			expect( find( node ) ).toEqual( [] );
+		} );
+
+		it( 'ignores a mapped area whose referenced image is inside an inert subtree', () => {
+			const node = createElement( 'div' );
+			node.innerHTML = `
+				<map name="testfocus">
+					<area href="#target" shape="rect" coords="0,0,30,30" alt="Target">
+				</map>
+				<div inert>
+					<img usemap="#testfocus" width="40" height="40" alt="">
+				</div>
+			`;
+
+			expect( findFocusable( node ) ).toEqual( [] );
+		} );
+
 		it( 'finds contenteditable', () => {
 			const node = createElement( 'div' );
 			const div = createElement( 'div' );
