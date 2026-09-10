@@ -654,7 +654,7 @@ describe( 'URLInput', () => {
 			// `useFocusOutside` treats a document without focus as the window
 			// losing focus and bails, and jsdom's `document.hasFocus()`
 			// returns false.
-			hasFocusSpy = jest
+			hasFocusSpy = vi
 				.spyOn( document, 'hasFocus' )
 				.mockReturnValue( true );
 		} );
@@ -700,7 +700,7 @@ describe( 'URLInput', () => {
 		} );
 
 		it( 'should close the suggestions when pressing Escape, without the event propagating', async () => {
-			const onParentKeyDown = jest.fn();
+			const onParentKeyDown = vi.fn();
 			const user = userEvent.setup();
 
 			render(
@@ -737,7 +737,7 @@ describe( 'URLInput', () => {
 		} );
 
 		it( 'should leave Escape to the parent without the prop', async () => {
-			const onParentKeyDown = jest.fn();
+			const onParentKeyDown = vi.fn();
 
 			render(
 				// A stand-in for an ancestor listening for keydown, the way
