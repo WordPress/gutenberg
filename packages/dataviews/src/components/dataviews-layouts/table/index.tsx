@@ -19,6 +19,7 @@ import {
 	useHasAPossibleBulkAction,
 	hasAPossibleBulkAction,
 	BulkSelectionCheckbox,
+	BulkActions,
 } from '../../dataviews-bulk-actions';
 import type {
 	Action,
@@ -271,7 +272,8 @@ function ViewTable< Item >( {
 	className,
 	empty,
 }: ViewTableProps< Item > ) {
-	const { containerRef } = useContext( DataViewsContext );
+	const { containerRef, bulkActionsInLayout } =
+		useContext( DataViewsContext );
 	const isDelayedLoading = useDelayedLoading( isLoading );
 	const groupField = view.groupBy?.field
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
@@ -309,6 +311,37 @@ function ViewTable< Item >( {
 	} );
 
 	const tableNoticeId = useId();
+	const tableHeadRef = useRef< HTMLTableSectionElement >( null );
+	const bulkActionsRef = useRef< HTMLDivElement >( null );
+	const hadSelectionRef = useRef( false );
+	useEffect( () => {
+		if ( ! bulkActionsInLayout ) {
+			return;
+		}
+		const ownerDocument = tableHeadRef.current?.ownerDocument;
+		if (
+			selection.length &&
+			tableHeadRef.current?.contains(
+				ownerDocument?.activeElement ?? null
+			)
+		) {
+			bulkActionsRef.current
+				?.querySelector< HTMLInputElement >( 'input' )
+				?.focus();
+		} else if (
+			hadSelectionRef.current &&
+			! selection.length &&
+			( ownerDocument?.activeElement === ownerDocument?.body ||
+				bulkActionsRef.current?.contains(
+					ownerDocument?.activeElement ?? null
+				) )
+		) {
+			tableHeadRef.current
+				?.querySelector< HTMLInputElement >( 'input' )
+				?.focus();
+		}
+		hadSelectionRef.current = selection.length > 0;
+	}, [ selection.length, bulkActionsInLayout ] );
 
 	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
 		scrollContainerRef: containerRef,
@@ -413,6 +446,17 @@ function ViewTable< Item >( {
 
 	return (
 		<>
+			{ hasBulkActions && bulkActionsInLayout && (
+				<div
+					className="dataviews-view-table__bulk-actions-overlay"
+					hidden={ ! selection.length }
+					ref={ bulkActionsRef }
+					// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+					inert={ isLoading ? 'true' : undefined }
+				>
+					<BulkActions />
+				</div>
+			) }
 			<table
 				className={ clsx( 'dataviews-view-table', className, {
 					[ `has-${ view.layout?.density }-density` ]:
@@ -465,6 +509,15 @@ function ViewTable< Item >( {
 					</Popover>
 				) }
 				<thead
+					ref={ tableHeadRef }
+					// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+					inert={
+						bulkActionsInLayout &&
+						hasBulkActions &&
+						selection.length
+							? 'true'
+							: undefined
+					}
 					className={ clsx( {
 						'dataviews-view-table__thead--stuck':
 							isVerticallyScrolled,

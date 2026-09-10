@@ -1,9 +1,9 @@
 import type { ReactElement } from 'react';
-import { Button, CheckboxControl } from '@wordpress/components';
+import { Button, CheckboxControl, DropdownMenu } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, useRef, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
-import { closeSmall } from '@wordpress/icons';
+import { closeSmall, chevronDown } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
 import DataViewsContext from '../dataviews-context';
@@ -162,10 +162,6 @@ interface ToolbarContentProps< Item > {
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
 	isInfiniteScroll: boolean;
-	paginationInfo: {
-		totalItems: number;
-		totalPages: number;
-	};
 }
 
 function ActionTrigger< Item >( {
@@ -174,33 +170,28 @@ function ActionTrigger< Item >( {
 	isBusy,
 	items,
 }: ActionTriggerProps< Item > ) {
+	const { bulkActionsInLayout } = useContext( DataViewsContext );
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	const isMobile = useViewportMatch( 'medium', '<' );
 
-	if ( isMobile ) {
-		return (
-			<Button
-				disabled={ isBusy }
-				accessibleWhenDisabled
-				label={ label }
-				icon={ action.icon }
-				size="compact"
-				onClick={ onClick }
-				isBusy={ isBusy }
-			/>
-		);
-	}
-
 	return (
 		<Button
+			variant={ bulkActionsInLayout ? 'secondary' : undefined }
+			className={
+				bulkActionsInLayout
+					? 'dataviews-bulk-actions__action'
+					: undefined
+			}
 			disabled={ isBusy }
 			accessibleWhenDisabled
+			label={ isMobile ? label : undefined }
+			icon={ isMobile ? action.icon : undefined }
 			size="compact"
 			onClick={ onClick }
 			isBusy={ isBusy }
 		>
-			{ label }
+			{ ! isMobile && label }
 		</Button>
 	);
 }
@@ -246,7 +237,7 @@ function ActionButton< Item >( {
 	);
 }
 
-function renderFooterContent< Item >(
+function renderBulkActionsContent< Item >(
 	data: Item[],
 	actions: Action< Item >[],
 	getItemId: ( item: Item ) => string,
@@ -257,23 +248,37 @@ function renderFooterContent< Item >(
 	actionInProgress: string | null,
 	setActionInProgress: ( actionId: string | null ) => void,
 	onChangeSelection: SetSelection,
-	paginationInfo: {
-		totalItems: number;
-		totalPages: number;
-	}
+	bulkActionsInLayout: boolean,
+	totalItems: number
 ) {
-	const message = getFooterMessage(
-		selection.length,
-		data.length,
-		paginationInfo.totalItems,
-		isInfiniteScroll
+	const clearSelection = selectedItems.length > 0 && (
+		<Button
+			className={
+				bulkActionsInLayout
+					? 'dataviews-bulk-actions__clear'
+					: undefined
+			}
+			icon={ closeSmall }
+			showTooltip
+			tooltipPosition="top"
+			size="compact"
+			label={ __( 'Cancel' ) }
+			disabled={ !! actionInProgress }
+			accessibleWhenDisabled={ false }
+			onClick={ () => onChangeSelection( EMPTY_ARRAY ) }
+		/>
 	);
 	return (
 		<Stack
 			direction="row"
-			className="dataviews-bulk-actions-footer__container"
+			className={
+				bulkActionsInLayout
+					? 'dataviews-bulk-actions'
+					: 'dataviews-bulk-actions-footer__container'
+			}
 			gap="md"
 			align="center"
+			justify="start"
 		>
 			<BulkSelectionCheckbox
 				selection={ selection }
@@ -283,13 +288,31 @@ function renderFooterContent< Item >(
 				getItemId={ getItemId }
 				disableSelectAll={ isInfiniteScroll }
 			/>
-			<span className="dataviews-bulk-actions-footer__item-count">
-				{ message }
-			</span>
+			{ ! bulkActionsInLayout && (
+				<span className="dataviews-bulk-actions-footer__item-count">
+					{ getFooterMessage(
+						selection.length,
+						data.length,
+						totalItems,
+						isInfiniteScroll
+					) }
+				</span>
+			) }
+			{ bulkActionsInLayout &&
+				( selection.length ? (
+					<BulkSelectionDropdown />
+				) : (
+					<BulkActionsLabel />
+				) ) }
 			<Stack
 				direction="row"
-				className="dataviews-bulk-actions-footer__action-buttons"
-				gap="xs"
+				className={
+					bulkActionsInLayout
+						? 'dataviews-bulk-actions__buttons'
+						: 'dataviews-bulk-actions-footer__action-buttons'
+				}
+				gap={ bulkActionsInLayout ? 'md' : 'xs' }
+				justify="start"
 			>
 				{ actionsToShow.map( ( action ) => {
 					return (
@@ -302,38 +325,27 @@ function renderFooterContent< Item >(
 						/>
 					);
 				} ) }
-				{ selectedItems.length > 0 && (
-					<Button
-						icon={ closeSmall }
-						showTooltip
-						tooltipPosition="top"
-						size="compact"
-						label={ __( 'Cancel' ) }
-						disabled={ !! actionInProgress }
-						accessibleWhenDisabled={ false }
-						onClick={ () => {
-							onChangeSelection( EMPTY_ARRAY );
-						} }
-					/>
-				) }
+				{ ! bulkActionsInLayout && clearSelection }
 			</Stack>
+			{ bulkActionsInLayout && clearSelection }
 		</Stack>
 	);
 }
 
-function FooterContent< Item >( {
+function BulkActionsContent< Item >( {
 	selection,
 	actions,
 	onChangeSelection,
 	data,
 	getItemId,
 	isInfiniteScroll,
-	paginationInfo,
 }: ToolbarContentProps< Item > ) {
+	const { bulkActionsInLayout = false, paginationInfo } =
+		useContext( DataViewsContext );
 	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
 		null
 	);
-	const footerContentRef = useRef< React.JSX.Element >( undefined );
+	const bulkActionsContentRef = useRef< React.JSX.Element >( undefined );
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	const bulkActions = useMemo(
@@ -371,10 +383,10 @@ function FooterContent< Item >( {
 		[ actions, selectedItems, isMobile ]
 	);
 	if ( ! actionInProgress ) {
-		if ( footerContentRef.current ) {
-			footerContentRef.current = undefined;
+		if ( bulkActionsContentRef.current ) {
+			bulkActionsContentRef.current = undefined;
 		}
-		return renderFooterContent(
+		return renderBulkActionsContent(
 			data,
 			actions,
 			getItemId,
@@ -385,10 +397,11 @@ function FooterContent< Item >( {
 			actionInProgress,
 			setActionInProgress,
 			onChangeSelection,
-			paginationInfo
+			bulkActionsInLayout,
+			paginationInfo.totalItems
 		);
-	} else if ( ! footerContentRef.current ) {
-		footerContentRef.current = renderFooterContent(
+	} else if ( ! bulkActionsContentRef.current ) {
+		bulkActionsContentRef.current = renderBulkActionsContent(
 			data,
 			actions,
 			getItemId,
@@ -399,31 +412,96 @@ function FooterContent< Item >( {
 			actionInProgress,
 			setActionInProgress,
 			onChangeSelection,
-			paginationInfo
+			bulkActionsInLayout,
+			paginationInfo.totalItems
 		);
 	}
-	return footerContentRef.current;
+	return bulkActionsContentRef.current;
 }
 
-export function BulkActionsFooter() {
+export function BulkActions() {
 	const {
 		data,
 		selection,
 		actions = EMPTY_ARRAY,
 		onChangeSelection,
 		getItemId,
-		paginationInfo,
 		view,
 	} = useContext( DataViewsContext );
 	return (
-		<FooterContent
+		<BulkActionsContent
 			selection={ selection }
 			onChangeSelection={ onChangeSelection }
 			data={ data }
 			actions={ actions }
 			getItemId={ getItemId }
 			isInfiniteScroll={ !! view.infiniteScrollEnabled }
-			paginationInfo={ paginationInfo }
+		/>
+	);
+}
+
+function BulkActionsLabel() {
+	const { fields, view } = useContext( DataViewsContext );
+	return (
+		<span>
+			{ fields.find( ( field ) => field.id === view.titleField )?.label ??
+				__( 'Items' ) }
+		</span>
+	);
+}
+
+function BulkSelectionDropdown() {
+	const {
+		data,
+		actions = EMPTY_ARRAY,
+		selection,
+		onChangeSelection,
+		getItemId,
+		view,
+	} = useContext( DataViewsContext );
+	const remainingIds = data
+		.filter(
+			( item ) =>
+				hasAPossibleBulkAction( actions, item ) &&
+				! selection.includes( getItemId( item ) )
+		)
+		.map( getItemId );
+	return (
+		<DropdownMenu
+			icon={ chevronDown }
+			label={ __( 'Selection options' ) }
+			text={ getFooterMessage(
+				selection.length,
+				data.length,
+				data.length
+			) }
+			toggleProps={ {
+				size: 'compact',
+				iconPosition: 'right',
+				iconSize: 16,
+				showTooltip: false,
+				className: 'dataviews-bulk-actions__selection-toggle',
+			} }
+			controls={ [
+				{
+					title: __( 'Deselect all' ),
+					isDisabled: ! selection.length,
+					onClick: () => onChangeSelection( [] ),
+				},
+				...( view.infiniteScrollEnabled
+					? []
+					: [
+							{
+								title: __( 'Select remaining on this page' ),
+								isDisabled: ! remainingIds.length,
+								onClick: () =>
+									onChangeSelection( [
+										...selection,
+										...remainingIds,
+									] ),
+							},
+					  ] ),
+			] }
 		/>
 	);
 }

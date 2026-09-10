@@ -171,6 +171,140 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => {
 } );
 
 describe( 'DataViews component', () => {
+	it.each( [ LAYOUT_TABLE, LAYOUT_GRID ] as const )(
+		'preserves the standalone toolbar in a custom %s composition',
+		async ( type ) => {
+			render(
+				<DataViewWrapper
+					view={ { type } }
+					actions={ actions }
+					selection={ [ '1' ] }
+					onChangeSelection={ vi.fn() }
+				>
+					<DataViews.Layout />
+					<DataViews.BulkActionToolbar />
+					<DataViews.Pagination />
+				</DataViewWrapper>
+			);
+			expect(
+				screen.queryByRole( 'button', { name: 'Selection options' } )
+			).not.toBeInTheDocument();
+			expect( screen.getByText( '1 Item selected' ) ).toBeInTheDocument();
+			const action = screen.getByRole( 'button', {
+				name: 'Delete',
+			} );
+			expect( action ).not.toHaveClass( 'is-secondary' );
+			const user = userEvent.setup();
+			await user.click( action );
+			expect( screen.getByText( 'Modal Content' ) ).toBeInTheDocument();
+		}
+	);
+
+	it.each( [ LAYOUT_TABLE, LAYOUT_GRID ] as const )(
+		'preserves bulk actions in the footer of a custom %s composition',
+		async ( type ) => {
+			render(
+				<DataViewWrapper view={ { type } } actions={ actions }>
+					<DataViews.Layout />
+					<DataViews.Footer />
+				</DataViewWrapper>
+			);
+			expect( screen.getByText( '3 Items' ) ).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Selection options' } )
+			).not.toBeInTheDocument();
+			const user = userEvent.setup();
+			await user.click(
+				screen
+					.getAllByRole( 'checkbox', { name: 'Select all' } )
+					.at( -1 )!
+			);
+			expect(
+				screen.getByText( '3 Items selected' )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Delete' } )
+			).not.toHaveClass( 'is-secondary' );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Cancel' } )
+			);
+			expect( screen.getByText( '3 Items' ) ).toBeInTheDocument();
+		}
+	);
+
+	it( 'adds only remaining eligible page items without duplicating existing selection', async () => {
+		const onChangeSelection = vi.fn();
+		render(
+			<DataViewWrapper
+				selection={ [ '1' ] }
+				onChangeSelection={ onChangeSelection }
+				actions={ [
+					{
+						...actions[ 0 ],
+						isEligible: ( item: Data ) => item.id !== 2,
+					},
+				] }
+			/>
+		);
+		const user = userEvent.setup();
+		await user.click(
+			screen.getByRole( 'button', { name: 'Selection options' } )
+		);
+		await user.click(
+			screen.getByRole( 'menuitem', {
+				name: 'Select remaining on this page',
+			} )
+		);
+		expect( onChangeSelection ).toHaveBeenLastCalledWith( [ '1', '3' ] );
+		await user.click(
+			screen.getByRole( 'button', { name: 'Selection options' } )
+		);
+		await user.click(
+			screen.getByRole( 'menuitem', {
+				name: 'Deselect all',
+			} )
+		);
+		expect( onChangeSelection ).toHaveBeenLastCalledWith( [] );
+	} );
+
+	it( 'keeps the footer count-only and omits page selection for infinite scrolling', async () => {
+		vi.stubGlobal(
+			'IntersectionObserver',
+			class {
+				observe() {}
+				unobserve() {}
+				disconnect() {}
+			}
+		);
+		render(
+			<DataViewWrapper
+				view={ { ...DEFAULT_VIEW, infiniteScrollEnabled: true } }
+				selection={ [ '1' ] }
+				onChangeSelection={ vi.fn() }
+				actions={ actions }
+			/>
+		);
+		expect( screen.getByText( '3 Items' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Selection options' } )
+		).toHaveTextContent( '1 Item selected' );
+		const user = userEvent.setup();
+		await user.click(
+			screen.getByRole( 'button', { name: 'Selection options' } )
+		);
+		expect(
+			screen.queryByRole( 'menuitem', {
+				name: 'Select remaining on this page',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'menuitem', {
+				name: 'Deselect all',
+			} )
+		).toBeInTheDocument();
+		vi.unstubAllGlobals();
+	} );
+
 	it( 'should show "No results" if data is empty', () => {
 		render( <DataViewWrapper data={ [] } /> );
 		expect( screen.getByText( 'No results' ) ).toBeInTheDocument();
@@ -964,6 +1098,10 @@ describe( 'DataViews component', () => {
 			await user.click( viewOptionsButton );
 
 			await user.tab();
+			expect(
+				screen.getByRole( 'checkbox', { name: 'Select all' } )
+			).toHaveFocus();
+			await user.tab();
 			await user.tab();
 
 			expect(
@@ -1008,6 +1146,10 @@ describe( 'DataViews component', () => {
 			// instead of a direct .focus() so that effects have time to complete.
 			await user.click( viewOptionsButton );
 			await user.click( viewOptionsButton );
+			await user.tab();
+			expect(
+				screen.getByRole( 'checkbox', { name: 'Select all' } )
+			).toHaveFocus();
 			await user.tab();
 			await user.tab();
 
