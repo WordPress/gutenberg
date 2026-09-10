@@ -322,7 +322,8 @@ HTML;
 	public function test_rendering_query_enqueues_style_handle( $block_attributes ) {
 		/*
 		 * The block ships no front end stylesheet, so its handle is registered
-		 * without a source when the block type is registered.
+		 * without a source. `set_up()` replaced `$wp_styles`, and enqueueing an
+		 * unregistered handle does not add it to the queue, so register it again.
 		 */
 		wp_register_style( 'wp-block-query', false );
 
