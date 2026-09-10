@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Query: Keep the block's style handle enqueued when "Reload full page" is enabled, so the `theme.json` styles for the block are printed on the front end ([#82745](https://github.com/WordPress/gutenberg/pull/82745)).
+
 ## 11.0.0 (2026-09-10)
 
 ### Breaking Changes
