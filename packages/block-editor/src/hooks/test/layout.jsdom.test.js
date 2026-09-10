@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import {
 	getLayoutStateOverrides,
@@ -10,10 +10,13 @@ import {
 import { getLayoutType } from '../../layouts';
 import { useSettings } from '../../components/use-settings';
 
-jest.mock( '../../components/use-settings', () => ( {
-	...jest.requireActual( '../../components/use-settings' ),
-	useSettings: jest.fn(),
-} ) );
+vi.mock(
+	import( '../../components/use-settings' ),
+	async ( importOriginal ) => ( {
+		...( await importOriginal() ),
+		useSettings: vi.fn(),
+	} )
+);
 
 describe( 'layout', () => {
 	describe( 'useLayoutStyles()', () => {
