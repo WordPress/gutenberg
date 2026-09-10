@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useCallback, useState } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components -- admin-ui is a bundled package that depends on @wordpress/ui
-import { Badge, Button, Text } from '@wordpress/ui';
+import { Button, Text } from '@wordpress/ui';
 import { Icon, wordpress } from '@wordpress/icons';
 import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';
@@ -141,7 +141,7 @@ export const WithoutHeader: Story = {
 export const WithTitleAndBadges: Story = {
 	args: {
 		title: 'Page title',
-		badges: <Badge intent="informational">Status</Badge>,
+		badges: [ { label: 'Status', intent: 'informational' } ],
 		showSidebarToggle: false,
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
@@ -160,7 +160,7 @@ export const WithBreadcrumbsAndBadges: Story = {
 				] }
 			/>
 		),
-		badges: <Badge intent="none">Published</Badge>,
+		badges: [ { label: 'Published', intent: 'none' } ],
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
 	},
@@ -271,7 +271,7 @@ export const FullHeader: Story = {
 				] }
 			/>
 		),
-		badges: <Badge intent="informational">Status</Badge>,
+		badges: [ { label: 'Status', intent: 'informational' } ],
 		navigation: {
 			items: [
 				{ label: 'Overview', href: '/overview' },
