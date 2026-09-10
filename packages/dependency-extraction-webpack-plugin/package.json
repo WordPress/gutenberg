@@ -49,7 +49,7 @@
 		"mkdirp": "^3.0.1",
 		"rimraf": "^5.0.10",
 		"vitest": "^5.0.0",
-		"webpack": "^5.108.1"
+		"webpack": "5.109.2"
 	},
 	"peerDependencies": {
 		"webpack": "^5.0.0"

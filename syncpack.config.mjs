@@ -32,6 +32,13 @@ export default {
 			pinVersion: '^18.3.1',
 		},
 		{
+			label: 'Webpack 5.110.3 has a production code-generation regression (https://github.com/webpack/webpack/issues/21955); pin to the last safe repository version until an upstream fix is released.',
+			dependencies: [ 'webpack' ],
+			packages: [ '**' ],
+			dependencyTypes: [ 'prod', 'dev' ],
+			pinVersion: '5.109.2',
+		},
+		{
 			label: 'All dependencies must use the same version across the repo.',
 			dependencies: [ '**' ],
 			packages: [ '**' ],
@@ -42,6 +49,13 @@ export default {
 		{
 			label: 'Prerelease dependencies (e.g. alpha or beta) should be pinned to exact versions to avoid auto-upgrades that can include breaking changes. Remove entries once the dependency reaches a stable release.',
 			dependencies: [ '@modelcontextprotocol/server' ],
+			packages: [ '**' ],
+			dependencyTypes: [ 'prod', 'dev' ],
+			range: '',
+		},
+		{
+			label: 'Webpack is temporarily pinned to avoid the 5.110.3 production code-generation regression.',
+			dependencies: [ 'webpack' ],
 			packages: [ '**' ],
 			dependencyTypes: [ 'prod', 'dev' ],
 			range: '',
