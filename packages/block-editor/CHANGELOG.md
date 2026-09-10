@@ -23,6 +23,7 @@
 -   Block Patterns, Block Visibility, and Block Lock: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
 -   Layout: Treat a missing `spacing.blockGap` setting as no block gap support, as the server does. A theme that does not opt into block gap has the setting stored as `null`, which the block settings resolve to `undefined`, so per-block layout styles applied block gap values the front end never renders. An editor that never provides the setting must set it to `true` to keep rendering block gap values ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
 -   Block Toolbar: Show the parent block selector for blocks inside patterns and `contentOnly` locked blocks. It selects the nearest parent shown in List View and the breadcrumb ([#82912](https://github.com/WordPress/gutenberg/pull/82912)).
+-   `BlockCompare`: Show whitespace differences in the Resolve Block dialog. The markup's spaces and blank lines are kept instead of collapsed by the browser, and each added or removed line break gets a visible marker, so a diff made only of whitespace no longer looks identical on both sides. The dialog also shows the markup of a converted Custom HTML block, which is kept in its `innerContent` rather than produced by `save`, instead of an empty diff ([#82397](https://github.com/WordPress/gutenberg/pull/82397)).
 
 ### Internal
 
@@ -60,7 +61,6 @@
 
 -   `NavigableToolbar`: Preserve toolbar semantics while it is hidden, so asynchronous control changes do not remount custom block toolbars ([#82574](https://github.com/WordPress/gutenberg/pull/82574)).
 -   `ListView`: Drop the block icon's variation colors while the row is selected, so the icon keeps contrast against the selection background ([#82498](https://github.com/WordPress/gutenberg/pull/82498)).
--   `BlockCompare`: Show whitespace differences in the Resolve Block dialog. The markup's spaces and blank lines are kept instead of collapsed by the browser, and each added or removed line break gets a visible marker, so a diff made only of whitespace no longer looks identical on both sides. The dialog also shows the markup of a converted Custom HTML block, which is kept in its `innerContent` rather than produced by `save`, instead of an empty diff ([#82397](https://github.com/WordPress/gutenberg/pull/82397)).
 -   Flex layout: Output `flex-direction: row` when a viewport override switches a vertical layout to horizontal, so the base `flex-direction: column` no longer keeps applying on that viewport ([#82364](https://github.com/WordPress/gutenberg/pull/82364)).
 -   `BlockManager`: Color library block icons with `color` while retaining a `fill` fallback for custom icons that do not use `currentColor`. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   Block List Appender: Show the appender button as a drop target when dragging a block over an empty container such as a Column, restoring the reveal that the `visibility`-to-`opacity` migration left behind ([#77852](https://github.com/WordPress/gutenberg/pull/77852)).
