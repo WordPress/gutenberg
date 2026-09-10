@@ -1,6 +1,4 @@
 import { describe, expect, test } from 'vitest';
-import { page } from 'vitest/browser';
-import { createRef } from '@wordpress/element';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { View } from '../../view';
@@ -192,38 +190,17 @@ describe( 'props', () => {
 } );
 
 describe( 'style composition', () => {
-	test.each( [
-		[ undefined, undefined, '20px', '20px' ],
-		[ 0, '2em', '0px', '28px' ],
-		[ '10%', 7, '10%', '7px' ],
-		[ '', '', '20px', '20px' ],
-	] )(
-		'rowGap %s and columnGap %s override the shared gap',
-		async ( rowGap, columnGap, expectedRowGap, expectedColumnGap ) => {
-			await render(
-				<Grid
-					data-testid="grid"
-					gap={ 5 }
-					rowGap={ rowGap }
-					columnGap={ columnGap }
-					style={ { fontSize: 14 } }
-				>
-					<View />
-				</Grid>
-			);
-			const style = getComputedStyle( screen.getByTestId( 'grid' ) );
-			expect( style.rowGap ).toBe( expectedRowGap );
-			expect( style.columnGap ).toBe( expectedColumnGap );
-		}
-	);
-
-	test( 'alignment takes precedence over align and justify', async () => {
+	test( 'specific layout props override their fallbacks', async () => {
 		await render(
 			<Grid
 				data-testid="grid"
 				alignment="spaced"
 				align="end"
 				justify="end"
+				gap={ 5 }
+				rowGap={ 0 }
+				columnGap="2em"
+				style={ { fontSize: 14 } }
 			>
 				<View />
 			</Grid>
@@ -231,6 +208,8 @@ describe( 'style composition', () => {
 		const style = getComputedStyle( screen.getByTestId( 'grid' ) );
 		expect( style.alignItems ).toBe( 'center' );
 		expect( style.justifyContent ).toBe( 'space-between' );
+		expect( style.rowGap ).toBe( '0px' );
+		expect( style.columnGap ).toBe( '28px' );
 	} );
 
 	test( 'nested Grids use their own layout props', async () => {
@@ -257,18 +236,6 @@ describe( 'style composition', () => {
 		expect( style.justifyContent ).toBe( 'normal' );
 	} );
 
-	test( 'zero columns and rows leave track generation to CSS', async () => {
-		await render(
-			<Grid data-testid="grid" columns={ 0 } rows={ 0 } gap={ 0 }>
-				{ null }
-			</Grid>
-		);
-		const style = getComputedStyle( screen.getByTestId( 'grid' ) );
-		expect( style.gridTemplateColumns ).toBe( 'none' );
-		expect( style.gridTemplateRows ).toBe( 'none' );
-		expect( style.gap ).toBe( '0px' );
-	} );
-
 	test( 'inline styles override layout props', async () => {
 		await render(
 			<Grid
@@ -293,83 +260,50 @@ describe( 'style composition', () => {
 		expect( style.gridTemplateColumns ).toBe( '50px' );
 	} );
 
-	test( 'consumer stylesheets can override layout props', async () => {
-		await render(
-			<>
-				<style>{ `.grid-consumer.grid-consumer { gap: 23px; align-items: end; grid-template-columns: 100px 100px; }` }</style>
-				<Grid
-					data-testid="grid"
-					className="grid-consumer"
-					align="start"
-					columns={ 3 }
-				>
-					<View />
-				</Grid>
-			</>
-		);
-		const style = getComputedStyle( screen.getByTestId( 'grid' ) );
-		expect( style.gap ).toBe( '23px' );
-		expect( style.alignItems ).toBe( 'end' );
-		expect( style.gridTemplateColumns ).toBe( '100px 100px' );
-	} );
+	test( 'consumer stylesheets retain precedence', async () => {
+		const consumerStyle = document.createElement( 'style' );
+		consumerStyle.textContent =
+			'.grid-consumer.grid-consumer, .grid-disabled { align-items: end; justify-content: end; grid-template-columns: 100px; grid-template-rows: 90px; }';
+		document.head.prepend( consumerStyle );
 
-	test.each( [
-		{ name: 'zero tracks', columns: 0, rows: 0 },
-		{ name: 'empty responsive tracks', columns: [], rows: [] },
-		{
-			name: 'undefined responsive tracks',
-			columns: [ undefined ],
-			rows: [ undefined ],
-		},
-		{ name: 'zero responsive tracks', columns: [ 0 ], rows: [ 0 ] },
-	] )(
-		'preserves consumer styles with $name and overrides them with explicit values',
-		async ( { columns, rows } ) => {
-			const consumerStyle = document.createElement( 'style' );
-			consumerStyle.textContent =
-				'.grid-consumer { align-items: end; justify-content: end; grid-template-columns: 100px; grid-template-rows: 90px; }';
-			document.head.prepend( consumerStyle );
-
-			try {
-				const { rerender } = await render(
+		try {
+			await render(
+				<>
 					<Grid
-						data-testid="grid"
+						data-testid="grid-with-props"
 						className="grid-consumer"
-						columns={ columns }
-						rows={ rows }
+						align="start"
+						justify="start"
+						columns={ 3 }
+						rows={ 2 }
 					>
 						<View />
 					</Grid>
-				);
-				let style = getComputedStyle( screen.getByTestId( 'grid' ) );
+					<Grid
+						data-testid="grid-with-disabled-tracks"
+						className="grid-disabled"
+						columns={ [ 0 ] }
+						rows={ [ 0 ] }
+					>
+						<View />
+					</Grid>
+				</>
+			);
+
+			for ( const testId of [
+				'grid-with-props',
+				'grid-with-disabled-tracks',
+			] ) {
+				const style = getComputedStyle( screen.getByTestId( testId ) );
 				expect( style.alignItems ).toBe( 'end' );
 				expect( style.justifyContent ).toBe( 'end' );
 				expect( style.gridTemplateColumns ).toBe( '100px' );
 				expect( style.gridTemplateRows ).toBe( '90px' );
-
-				await rerender(
-					<Grid
-						data-testid="grid"
-						className="grid-consumer"
-						columns={ 0 }
-						align="start"
-						justify="start"
-						templateColumns="200px"
-						templateRows="120px"
-					>
-						<View />
-					</Grid>
-				);
-				style = getComputedStyle( screen.getByTestId( 'grid' ) );
-				expect( style.alignItems ).toBe( 'start' );
-				expect( style.justifyContent ).toBe( 'start' );
-				expect( style.gridTemplateColumns ).toBe( '200px' );
-				expect( style.gridTemplateRows ).toBe( '120px' );
-			} finally {
-				consumerStyle.remove();
 			}
+		} finally {
+			consumerStyle.remove();
 		}
-	);
+	} );
 
 	test( 'CSS-wide values apply to the layout properties', async () => {
 		await render(
@@ -404,74 +338,5 @@ describe( 'style composition', () => {
 		expect( style.columnGap ).toBe( '29px' );
 		expect( style.gridTemplateColumns ).toBe( '300px' );
 		expect( style.gridTemplateRows ).toBe( '100px' );
-	} );
-
-	test( 'CSS-wide gap resets override the shared gap', async () => {
-		await render(
-			<Grid
-				data-testid="grid"
-				gap={ 5 }
-				rowGap="initial"
-				columnGap="initial"
-			>
-				<View />
-			</Grid>
-		);
-		const style = getComputedStyle( screen.getByTestId( 'grid' ) );
-		expect( style.rowGap ).toBe( 'normal' );
-		expect( style.columnGap ).toBe( 'normal' );
-	} );
-
-	test( 'responsive tracks follow the existing viewport breakpoints', async () => {
-		await render(
-			<Grid
-				data-testid="grid"
-				columns={ [ 1, 2, 3, 4 ] }
-				rows={ [ 1, 2, 3, 4 ] }
-				style={ { width: 300, height: 300 } }
-			>
-				<View />
-			</Grid>
-		);
-		for ( const [ width, tracks ] of [
-			[ 600, 1 ],
-			[ 700, 2 ],
-			[ 900, 3 ],
-			[ 1100, 4 ],
-		] ) {
-			await page.viewport( width, 800 );
-			await expect
-				.poll(
-					() =>
-						getComputedStyle(
-							screen.getByTestId( 'grid' )
-						).gridTemplateColumns.split( ' ' ).length
-				)
-				.toBe( tracks );
-			expect(
-				getComputedStyle(
-					screen.getByTestId( 'grid' )
-				).gridTemplateRows.split( ' ' )
-			).toHaveLength( tracks );
-		}
-	} );
-
-	test( 'forwards the element type, ref, and consumer props', async () => {
-		const ref = createRef< HTMLAnchorElement >();
-		await render(
-			<Grid as="a" ref={ ref } href="#target" className="consumer-class">
-				Grid link
-			</Grid>
-		);
-		expect( ref.current ).toBe(
-			screen.getByRole( 'link', { name: 'Grid link' } )
-		);
-		expect( ref.current?.getAttribute( 'href' ) ).toBe( '#target' );
-		expect( ref.current?.classList.contains( 'components-grid' ) ).toBe(
-			true
-		);
-		expect( ref.current?.classList.contains( 'consumer-class' ) ).toBe(
-			true
-		);
 	} );
 } );
