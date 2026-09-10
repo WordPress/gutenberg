@@ -9,6 +9,8 @@
 ### Enhancements
 
 -   `lint-md-docs`: Detect `.markdownlint.jsonc` so the bundled default config is not used when one is present ([#81917](https://github.com/WordPress/gutenberg/pull/81917)).
+-   `format`: Format `.cjs` and `.mjs` files when expanding a directory ([#82731](https://github.com/WordPress/gutenberg/pull/82731)).
+-   The bundled `wp-prettier` dependency has been upgraded from `3.0.3` to `3.9.6` ([#82731](https://github.com/WordPress/gutenberg/pull/82731)).
 
 ## 35.0.0 (2026-09-10)
 
