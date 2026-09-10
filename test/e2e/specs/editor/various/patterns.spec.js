@@ -786,6 +786,12 @@ test.describe( 'Synced pattern', () => {
 		editor,
 		page,
 	} ) => {
+		// Wait for the empty post to finish hydrating before dispatching the
+		// insertion. Otherwise the initial block-editor state can overwrite it.
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.waitFor();
+
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: {
