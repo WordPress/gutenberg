@@ -131,7 +131,7 @@
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.1",
-		"colord": "^2.9.3",
+		"colord": "^2.9.4",
 		"fast-average-color": "^9.1.1",
 		"fast-deep-equal": "^3.1.3",
 		"html-react-parser": "^5.2.11",

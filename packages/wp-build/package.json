@@ -39,7 +39,7 @@
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"autoprefixer": "^10.4.21",
-		"browserslist": "^4.28.4",
+		"browserslist": "^4.28.7",
 		"browserslist-to-esbuild": "^2.1.1",
 		"change-case": "^4.1.2",
 		"chokidar": "^4.0.0",
