@@ -1309,12 +1309,14 @@ async function transpilePackage( packageName ) {
 		cwd: packageDir,
 		ignore: IGNORE_PATTERNS,
 		absolute: true,
+		dot: true,
 	} );
 
 	const assetFiles = await glob( `src/**/*.${ ASSET_EXTENSIONS }`, {
 		cwd: packageDir,
 		ignore: IGNORE_PATTERNS,
 		absolute: true,
+		dot: true,
 	} );
 
 	const buildDir = path.join( packageDir, 'build' );
