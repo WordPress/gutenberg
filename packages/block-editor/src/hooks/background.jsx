@@ -219,7 +219,7 @@ export function BackgroundImagePanel( {
 				...style?.background,
 				gradient: gradient
 					? 'var:preset|gradient|' + gradient
-					: style?.background?.gradient ?? style?.color?.gradient,
+					: ( style?.background?.gradient ?? style?.color?.gradient ),
 			},
 		} ),
 	};

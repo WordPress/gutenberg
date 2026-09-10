@@ -16,10 +16,7 @@ import type {
 export default function DensityPicker() {
 	const context = useContext( DataViewsContext );
 	const view = context.view as
-		| ViewTable
-		| ViewList
-		| ViewGrid
-		| ViewPickerGrid;
+		ViewTable | ViewList | ViewGrid | ViewPickerGrid;
 	return (
 		<ToggleGroupControl
 			label={ __( 'Density' ) }

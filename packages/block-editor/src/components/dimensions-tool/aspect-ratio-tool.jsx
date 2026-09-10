@@ -84,8 +84,8 @@ export default function AspectRatioTool( {
 	const displayValue =
 		value === undefined || value === null || value === 'auto'
 			? 'auto'
-			: findAspectRatioOption( value, resolvedOptions )?.value ??
-			  'custom';
+			: ( findAspectRatioOption( value, resolvedOptions )?.value ??
+				'custom' );
 
 	return (
 		<InheritanceToolsPanelItem

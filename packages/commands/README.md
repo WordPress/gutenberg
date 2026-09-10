@@ -6,13 +6,13 @@ Commands is a generic package that allows registering and modifying commands to 
 
 There are two ways to register commands: static or dynamic. Both methods receive a command object as an argument, which provides:
 
--   `name`: A unique machine-readable name for the command
--   `label`: A human-readable label
--   `icon`: An SVG icon
--   `callback`: A callback function that is called when the command is selected
--   `category`: (Optional) The category of the command. See [Command categories](#command-categories) below
--   `context`: (Optional) The context of the command
--   `keywords`: (Optional) An array of keywords for search matching
+- `name`: A unique machine-readable name for the command
+- `label`: A human-readable label
+- `icon`: An SVG icon
+- `callback`: A callback function that is called when the command is selected
+- `category`: (Optional) The category of the command. See [Command categories](#command-categories) below
+- `context`: (Optional) The context of the command
+- `keywords`: (Optional) An array of keywords for search matching
 
 ### Static commands
 
@@ -30,9 +30,9 @@ Static and dynamic commands can be contextual. This means that in a given contex
 
 At the moment, three contexts have been implemented:
 
--   `site-editor`: This is the context that is set when you are navigating in the site editor (sidebar visible).
--   `entity-edit`: This is the context that is set when you are editing a document (template, template part or page).
--   `block-selection-edit`: This is the context that is set when a block is selected.
+- `site-editor`: This is the context that is set when you are navigating in the site editor (sidebar visible).
+- `entity-edit`: This is the context that is set when you are editing a document (template, template part or page).
+- `block-selection-edit`: This is the context that is set when a block is selected.
 
 As the usage of the Command Palette expands, more contexts will be added.
 
@@ -42,10 +42,10 @@ Attaching a command or command loader to a given context is as simple as adding 
 
 Each command can be assigned a `category` that describes what kind of action it performs. Categories are used by the Command Palette to visually differentiate commands. The following categories are available:
 
--   `command`: Executes code or toggles a command (e.g., Add block, duplicating a block).
--   `view`: Navigates to an area in the admin or opens a panel (e.g., "Go to: Templates").
--   `edit`: Navigates to edit a document (e.g., editing a template, editing a page).
--   `action`: A generic fallback for commands that don't fit the other categories. This is also the default when an invalid category is provided.
+- `command`: Executes code or toggles a command (e.g., Add block, duplicating a block).
+- `view`: Navigates to an area in the admin or opens a panel (e.g., "Go to: Templates").
+- `edit`: Navigates to edit a document (e.g., editing a template, editing a page).
+- `action`: A generic fallback for commands that don't fit the other categories. This is also the default when an invalid category is provided.
 
 If no `category` is specified, the command will have `action` set. If an invalid value is provided, a warning is emitted in development mode and the category defaults to `action`.
 
@@ -55,9 +55,9 @@ A category can also supply a fallback icon, used when the command passes no `ico
 
 The Command Palette also offers a number of [selectors and actions](https://developer.wordpress.org/block-editor/reference-guides/data/data-core-commands/) to manipulate its state, which include:
 
--   Retrieving the registered commands and command loaders using the following selectors `getCommands` and `getCommandLoader`
--   Checking if the Command Palette is open using the `isOpen` selector.
--   Programmatically open or close the Command Palette using the `open` and `close` actions.
+- Retrieving the registered commands and command loaders using the following selectors `getCommands` and `getCommandLoader`
+- Checking if the Command Palette is open using the `isOpen` selector.
+- Programmatically open or close the Command Palette using the `open` and `close` actions.
 
 See the [Commands Data](https://developer.wordpress.org/block-editor/reference-guides/data/data-core-commands/) documentation for more information.
 
@@ -89,7 +89,7 @@ Store definition for the commands namespace.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
 
 _Usage_
 
@@ -102,7 +102,7 @@ const { open: openCommandCenter } = useDispatch( commandsStore );
 
 _Type_
 
--   `Object`
+- `Object`
 
 ### useCommand
 
@@ -128,7 +128,7 @@ useCommand( {
 
 _Parameters_
 
--   _command_ `import('../store/actions').WPCommandConfig`: command config.
+- _command_ `import('../store/actions').WPCommandConfig`: command config.
 
 ### useCommandLoader
 
@@ -202,7 +202,7 @@ useCommandLoader( {
 
 _Parameters_
 
--   _loader_ `import('../store/actions').WPCommandLoaderConfig`: command loader config.
+- _loader_ `import('../store/actions').WPCommandLoaderConfig`: command loader config.
 
 ### useCommands
 
@@ -240,7 +240,7 @@ useCommands( [
 
 _Parameters_
 
--   _commands_ `import('../store/actions').WPCommandConfig[]`: Array of command configs.
+- _commands_ `import('../store/actions').WPCommandConfig[]`: Array of command configs.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 

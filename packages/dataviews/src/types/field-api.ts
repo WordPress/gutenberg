@@ -434,11 +434,7 @@ export type Field< Item > = {
 	 * Display format configuration for fields.
 	 */
 	format?:
-		| FormatDatetime
-		| FormatDate
-		| FormatTime
-		| FormatNumber
-		| FormatInteger;
+		FormatDatetime | FormatDate | FormatTime | FormatNumber | FormatInteger;
 
 	/**
 	 * Callback used to format the value of the field for display.

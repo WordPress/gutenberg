@@ -1588,7 +1588,7 @@ class ListViewUtils {
 			focusedRows.length > 0
 				? await focusedRows[ focusedRows.length - 1 ].getAttribute(
 						'data-block'
-				  )
+					)
 				: null;
 		// Don't use the util to get the unmodified default block when it's empty.
 		const blocks = await this.#page.evaluate( () =>

@@ -16,7 +16,7 @@ vi.mock(
 	() =>
 		( {
 			store: 'core',
-		} ) as unknown as typeof import('@wordpress/core-data')
+		} ) as unknown as typeof import( '@wordpress/core-data' )
 );
 
 const receiveEntityRecords = vi.fn();

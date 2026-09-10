@@ -80,7 +80,7 @@ const cssLoaders = [
 										],
 									} ),
 								} ),
-						  ]
+							]
 						: postcssPlugins,
 				},
 			} ),
@@ -171,15 +171,11 @@ const baseConfig = {
 								babelrc: false,
 								configFile: false,
 								presets: [
-									require.resolve(
-										'@wordpress/babel-preset-default'
-									),
+									require.resolve( '@wordpress/babel-preset-default' ),
 								],
 								plugins: [
 									hasReactFastRefresh &&
-										require.resolve(
-											'react-refresh/babel'
-										),
+										require.resolve( 'react-refresh/babel' ),
 								].filter( Boolean ),
 							} ),
 						},
@@ -309,7 +305,7 @@ const scriptConfig = {
 						},
 					},
 				],
-		  },
+			},
 
 	plugins: [
 		new webpack.DefinePlugin( {

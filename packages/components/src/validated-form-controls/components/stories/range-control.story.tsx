@@ -36,7 +36,7 @@ export const Default: StoryObj< typeof ValidatedRangeControl > = {
 						? {
 								type: 'invalid',
 								message: 'Choose an even number.',
-						  }
+							}
 						: undefined
 				}
 			/>

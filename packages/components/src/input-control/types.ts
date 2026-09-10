@@ -157,10 +157,8 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 }
 
 export interface InputControlProps
-	extends Omit<
-			InputBaseProps,
-			'children' | 'isBorderless' | keyof FlexProps
-		>,
+	extends
+		Omit< InputBaseProps, 'children' | 'isBorderless' | keyof FlexProps >,
 		Pick< BaseControlProps, 'help' >,
 		/**
 		 * The `prefix` prop in `WordPressComponentProps< InputFieldProps, 'input', false >` comes from the

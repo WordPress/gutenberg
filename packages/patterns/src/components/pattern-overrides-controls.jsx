@@ -60,10 +60,10 @@ function PatternOverridesControls( {
 		! hasOverrides && hasUnsupportedImageAttributes
 			? __(
 					`Overrides currently don't support image links. Remove the link first before enabling overrides.`
-			  )
+				)
 			: __(
 					'Allow changes to this block throughout instances of this pattern.'
-			  );
+				);
 
 	return (
 		<>

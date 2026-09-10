@@ -400,7 +400,7 @@ export const getListViewClientIdsTree = createSelector(
 					state.blocks.attributes,
 					state.blockListSettings,
 					state.settings,
-			  ]
+				]
 			: [] ),
 	]
 );
@@ -633,11 +633,11 @@ export const getPatternBySlug = createRegistrySelector( ( select ) =>
 				? [
 						unlock( select( STORE_NAME ) ).getReusableBlocks(),
 						state.settings.__experimentalReusableBlocks,
-				  ]
+					]
 				: [
 						state.settings.__experimentalBlockPatterns,
 						state.settings[ selectBlockPatternsKey ]?.( select ),
-				  ]
+					]
 	)
 );
 
@@ -1427,8 +1427,8 @@ export const getSelectedBlockStyleState = createSelector(
 	( state, clientId ) => {
 		const perBlockState =
 			state.selectedBlockStyleState?.clientId === clientId
-				? state.selectedBlockStyleState.value ??
-				  DEFAULT_BLOCK_STYLE_STATE
+				? ( state.selectedBlockStyleState.value ??
+					DEFAULT_BLOCK_STYLE_STATE )
 				: DEFAULT_BLOCK_STYLE_STATE;
 
 		return {

@@ -97,7 +97,7 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
 	// as it would cause double announcements
 	useSpokenMessage( spokenMessage, politeness );
 
-	const iconElement = icon === null ? null : icon ?? icons[ intent ];
+	const iconElement = icon === null ? null : ( icon ?? icons[ intent ] );
 
 	const mergedClassName = clsx(
 		styles.notice,

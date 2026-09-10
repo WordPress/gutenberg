@@ -8,8 +8,8 @@ import { SECOND_USER } from './fixtures/collaboration-utils';
  * @param text
  */
 async function clearAndType(
-	page: import('@playwright/test').Page,
-	locator: import('@playwright/test').Locator,
+	page: import( '@playwright/test' ).Page,
+	locator: import( '@playwright/test' ).Locator,
 	text: string
 ) {
 	await locator.click();

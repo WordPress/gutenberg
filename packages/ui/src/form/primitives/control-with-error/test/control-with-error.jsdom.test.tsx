@@ -311,7 +311,7 @@ describe( 'ControlWithError', () => {
 							? setCustomValidity( {
 									type: 'invalid',
 									message: 'The word "error" is not allowed.',
-							  } )
+								} )
 							: setCustomValidity( undefined )
 					}
 					customValidity={ customValidity }
@@ -445,8 +445,8 @@ describe( 'ControlWithError', () => {
 									type: 'invalid',
 									message: 'Please enter a valid URL.',
 								} );
-								requestAnimationFrame(
-									() => inputRef.current?.reportValidity()
+								requestAnimationFrame( () =>
+									inputRef.current?.reportValidity()
 								);
 							} }
 						>
@@ -498,8 +498,8 @@ describe( 'ControlWithError', () => {
 									type: 'invalid',
 									message: 'Please enter a valid URL.',
 								} );
-								requestAnimationFrame(
-									() => inputRef.current?.reportValidity()
+								requestAnimationFrame( () =>
+									inputRef.current?.reportValidity()
 								);
 							} }
 						>

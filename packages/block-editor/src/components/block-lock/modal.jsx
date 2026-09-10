@@ -52,9 +52,8 @@ export default function BlockLockModal( { clientId, onClose } ) {
 		},
 		[ clientId ]
 	);
-	const [ applyTemplateLock, setApplyTemplateLock ] = useState(
-		!! templateLock
-	);
+	const [ applyTemplateLock, setApplyTemplateLock ] =
+		useState( !! templateLock );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( clientId );
 

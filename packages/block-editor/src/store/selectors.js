@@ -2448,7 +2448,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 					? {
 							src: symbol,
 							foreground: 'var(--wp-block-synced-color)',
-					  }
+						}
 					: symbol;
 				const userPattern = mapUserPattern( reusableBlock );
 				const { time, count = 0 } =
@@ -2864,12 +2864,12 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 										state,
 										name,
 										rootClientId
-								  )
+									)
 								: isBlockVisibleInTheInserter(
 										state,
 										name,
 										rootClientId
-								  )
+									)
 						)
 				);
 

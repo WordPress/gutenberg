@@ -159,7 +159,7 @@ export function useServerSideRender(
 						headers: isPostRequest
 							? {
 									'Content-Type': 'application/json',
-							  }
+								}
 							: {},
 						signal: controller.signal,
 					} )

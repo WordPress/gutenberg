@@ -268,7 +268,7 @@ export const getDefaultRenderingMode = createRegistrySelector(
 		)
 			? postTypeEntity.supports.editor.find(
 					( features ) => 'default-mode' in features
-			  )?.[ 'default-mode' ]
+				)?.[ 'default-mode' ]
 			: undefined;
 
 		if ( RENDERING_MODES.includes( postTypeDefaultMode ) ) {
@@ -595,13 +595,13 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 
 		return Boolean(
 			syncConfig &&
-				syncConfig.supportsPersistence &&
-				window.__experimentalEnableRealTimeCollaboration &&
-				false !==
-					syncConfig.shouldSync?.(
-						`postType/${ currentPostType }`,
-						currentPostId
-					)
+			syncConfig.supportsPersistence &&
+			window.__experimentalEnableRealTimeCollaboration &&
+			false !==
+				syncConfig.shouldSync?.(
+					`postType/${ currentPostType }`,
+					currentPostId
+				)
 		);
 	}
 );

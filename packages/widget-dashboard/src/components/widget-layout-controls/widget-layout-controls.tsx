@@ -58,7 +58,7 @@ export function WidgetLayoutControls( {
 							...currentWidget.placement,
 							width: nextWidth,
 						},
-				  }
+					}
 				: currentWidget
 		);
 		onLayoutChange( nextLayout );

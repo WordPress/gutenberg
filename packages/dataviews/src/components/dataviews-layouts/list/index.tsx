@@ -588,7 +588,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 												__( '%1$s: %2$s' ),
 												groupField.label,
 												groupName
-										  ) }
+											) }
 								</h3>
 								{ groupItems.map( ( item ) => {
 									const id =

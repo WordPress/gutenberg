@@ -34,7 +34,7 @@ export default function TypographyPreview( {
 		element === 'link'
 			? {
 					textDecoration: 'underline',
-			  }
+				}
 			: {};
 
 	return (

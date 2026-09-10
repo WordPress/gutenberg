@@ -92,7 +92,7 @@ function getColumnsCSS( selector, columns ) {
 			? '100%'
 			: `calc((100% - (var(--wp--style--unstable-gallery-gap, 16px) * ${
 					columns - 1
-			  })) / ${ columns })`;
+				})) / ${ columns })`;
 
 	return `${ getImageSelector( selector ) }{width:${ width } !important;}`;
 }

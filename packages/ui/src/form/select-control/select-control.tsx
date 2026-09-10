@@ -51,7 +51,7 @@ export const SelectControl = forwardRef<
 								>
 									{ item.label }
 								</Item>
-						  ) ) }
+							) ) }
 				</Select.Popup>
 			</Select.Root>
 			{ description && (

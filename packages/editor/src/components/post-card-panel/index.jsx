@@ -89,7 +89,7 @@ export default function PostCardPanel( {
 					? getTemplateInfo( {
 							template: _record,
 							templateTypes,
-					  } )
+						} )
 					: {};
 				_title = _templateInfo?.title || _record?.title;
 			}

@@ -22,7 +22,7 @@ interface GutenbergVitestEnvironment {
 	mockResizeObserver: () => void;
 	mockScrollIntoView: () => void;
 	mockVisibleElements: () => void;
-	timers: typeof import('vitest').vi;
+	timers: typeof import( 'vitest' ).vi;
 }
 
 declare global {
@@ -34,6 +34,8 @@ declare module 'vitest' {
 		R extends void | Promise< void > = void | Promise< void >,
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Keep Vitest's canonical generic matcher interface.
 		T = unknown,
-	> extends GutenbergVitestMatchers< R >,
+	>
+		extends
+			GutenbergVitestMatchers< R >,
 			TestingLibraryMatchers< any, R > {}
 }

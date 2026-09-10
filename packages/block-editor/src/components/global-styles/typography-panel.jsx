@@ -178,7 +178,7 @@ function getMergedFontSizes( settings ) {
 	return [
 		...( fontSizes?.custom ?? [] ),
 		...( fontSizes?.theme ?? [] ),
-		...( defaultFontSizesEnabled ? fontSizes?.default ?? [] : [] ),
+		...( defaultFontSizesEnabled ? ( fontSizes?.default ?? [] ) : [] ),
 	];
 }
 
@@ -289,7 +289,7 @@ export default function TypographyPanel( {
 		const syncLinkColor = isGlobalStylesInheritanceEnabled()
 			? shouldSyncLinkColor( value, inheritedValue )
 			: inheritedValue?.color?.text ===
-			  inheritedValue?.elements?.link?.color?.text;
+				inheritedValue?.elements?.link?.color?.text;
 		if ( syncLinkColor ) {
 			changedObject = setImmutably(
 				changedObject,
@@ -970,7 +970,7 @@ export default function TypographyPanel( {
 										getNumericPlaceholder(
 											inheritedLineHeight
 										),
-							  }
+								}
 							: {} ) }
 					/>
 				</InheritanceToolsPanelItem>
@@ -1004,7 +1004,7 @@ export default function TypographyPanel( {
 							isLetterSpacingPlaceholder
 								? getNumericPlaceholder(
 										inheritedLetterSpacing
-								  )
+									)
 								: undefined
 						}
 					/>

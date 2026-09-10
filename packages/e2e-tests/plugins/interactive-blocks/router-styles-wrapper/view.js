@@ -10,27 +10,24 @@ const { state } = store( 'test/router-styles', {
 		navigate: withSyncEvent( function* ( e ) {
 			e.preventDefault();
 			state.clientSideNavigation = false;
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions } =
+				yield import( '@wordpress/interactivity-router' );
 			yield actions.navigate( e.target.href );
 			state.clientSideNavigation = true;
 		} ),
 		navigateForce: withSyncEvent( function* ( e ) {
 			e.preventDefault();
 			state.clientSideNavigation = false;
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions } =
+				yield import( '@wordpress/interactivity-router' );
 			yield actions.navigate( e.target.href, { force: true } );
 			state.clientSideNavigation = true;
 		} ),
 		*prefetch() {
 			state.prefetching = true;
 			const { ref } = getElement();
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions } =
+				yield import( '@wordpress/interactivity-router' );
 			yield actions.prefetch( ref.href );
 			state.prefetching = false;
 		},

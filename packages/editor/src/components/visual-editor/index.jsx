@@ -170,7 +170,7 @@ function VisualEditor( {
 					'postType',
 					TEMPLATE_POST_TYPE,
 					currentTemplateId
-			  )
+				)
 			: undefined;
 
 		return {

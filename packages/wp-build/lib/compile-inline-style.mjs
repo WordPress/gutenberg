@@ -6,9 +6,8 @@ import postcssModules from 'postcss-modules';
 /** @type {import('postcss').AcceptedPlugin | undefined} */
 let dsTokenFallbacks;
 try {
-	const { default: postcssPlugin } = await import(
-		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
-	);
+	const { default: postcssPlugin } =
+		await import( '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks' );
 	dsTokenFallbacks = postcssPlugin;
 } catch {
 	// @wordpress/theme is optional; skip token fallbacks if not available.

@@ -82,7 +82,7 @@ const wpBuildStyleFixturePlugin = {
 	},
 	load( id ) {
 		return id.startsWith( '\0' )
-			? wpBuildStyleFixtureSources.get( id.slice( 1 ) ) ?? null
+			? ( wpBuildStyleFixtureSources.get( id.slice( 1 ) ) ?? null )
 			: null;
 	},
 };

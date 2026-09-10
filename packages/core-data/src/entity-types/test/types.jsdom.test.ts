@@ -430,8 +430,7 @@ describe( 'Entity record types', () => {
 			attachment?.filesize satisfies number | null | undefined;
 			attachment?.class_list satisfies string[] | undefined;
 			attachment?.media_details.sizes?.full?.source_url satisfies
-				| string
-				| undefined;
+				string | undefined;
 			// @ts-expect-error -- only edit responses contain the raw caption.
 			attachment?.caption.raw;
 			// @ts-expect-error -- Gutenberg's image-processing fields are edit-only.
@@ -447,8 +446,7 @@ describe( 'Entity record types', () => {
 			editable?.image_save_progressive satisfies boolean | undefined;
 			editable?.image_quality?.default satisfies number | undefined;
 			editable?.image_quality?.sizes.thumbnail satisfies
-				| number
-				| undefined;
+				number | undefined;
 
 			const embedded = select( coreStore ).getEntityRecord(
 				'postType',

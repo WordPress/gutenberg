@@ -71,7 +71,7 @@ function SidebarContentWrapper( { children, shouldAnimate } ) {
 			? {
 					'slide-from-left': navAnimation === 'back',
 					'slide-from-right': navAnimation === 'forward',
-			  }
+				}
 			: {}
 	);
 

@@ -351,8 +351,7 @@ export interface ImageSizeCrop {
 	 * - `false` or undefined for soft proportional resize.
 	 */
 	crop?:
-		| boolean
-		| [ 'left' | 'center' | 'right', 'top' | 'center' | 'bottom' ];
+		boolean | [ 'left' | 'center' | 'right', 'top' | 'center' | 'bottom' ];
 	/** Size name identifier (e.g., 'thumbnail', 'medium'). */
 	name?: string;
 }

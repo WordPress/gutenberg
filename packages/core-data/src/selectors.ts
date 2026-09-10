@@ -332,8 +332,7 @@ export interface GetEntityRecord {
 	 */
 	<
 		EntityRecord extends
-			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >,
+			ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -355,8 +354,7 @@ export interface GetEntityRecord {
 		): ET.EntityRecordOfQuery< Kind, Name, Query > | undefined;
 		<
 			EntityRecord extends
-				| ET.EntityRecord< any >
-				| Partial< ET.EntityRecord< any > >,
+				ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 		>(
 			kind: string,
 			name: string,
@@ -383,8 +381,7 @@ export interface GetEntityRecord {
 		): Promise< ET.EntityRecordOfQuery< Kind, Name, Query > | undefined >;
 		<
 			EntityRecord extends
-				| ET.EntityRecord< any >
-				| Partial< ET.EntityRecord< any > >,
+				ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 		>(
 			kind: string,
 			name: string,
@@ -411,8 +408,7 @@ export interface GetEntityRecord {
  */
 export const getEntityRecord = ( <
 	EntityRecord extends
-		| ET.EntityRecord< any >
-		| Partial< ET.EntityRecord< any > >,
+		ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 >(
 	state: State,
 	kind: string,
@@ -653,8 +649,7 @@ export interface GetEntityRecords {
 	 */
 	<
 		EntityRecord extends
-			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >,
+			ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -674,8 +669,7 @@ export interface GetEntityRecords {
 		): ET.EntityRecordOfQuery< Kind, Name, Query >[] | null;
 		<
 			EntityRecord extends
-				| ET.EntityRecord< any >
-				| Partial< ET.EntityRecord< any > >,
+				ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 		>(
 			kind: string,
 			name: string,
@@ -695,8 +689,7 @@ export interface GetEntityRecords {
 		): Promise< ET.EntityRecordOfQuery< Kind, Name, Query >[] | null >;
 		<
 			EntityRecord extends
-				| ET.EntityRecord< any >
-				| Partial< ET.EntityRecord< any > >,
+				ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 		>(
 			kind: string,
 			name: string,
@@ -718,8 +711,7 @@ export interface GetEntityRecords {
  */
 export const getEntityRecords = ( <
 	EntityRecord extends
-		| ET.EntityRecord< any >
-		| Partial< ET.EntityRecord< any > >,
+		ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 >(
 	state: State,
 	kind: string,
@@ -860,7 +852,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 							key: entityRecord
 								? entityRecord[
 										entityConfig.key || DEFAULT_ENTITY_KEY
-								  ]
+									]
 								: undefined,
 							title:
 								entityConfig?.getTitle?.( entityRecord ) || '',
@@ -913,7 +905,7 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 							key: entityRecord
 								? entityRecord[
 										entityConfig.key || DEFAULT_ENTITY_KEY
-								  ]
+									]
 								: undefined,
 							title:
 								entityConfig?.getTitle?.( entityRecord ) || '',

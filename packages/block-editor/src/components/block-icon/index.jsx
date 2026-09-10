@@ -20,7 +20,7 @@ function BlockIcon( { icon, showColors = false, className, context } ) {
 		? {
 				backgroundColor: icon && icon.background,
 				color: icon && icon.foreground,
-		  }
+			}
 		: {};
 
 	return (

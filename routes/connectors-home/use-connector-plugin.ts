@@ -392,8 +392,7 @@ export function useConnectorPlugin( {
 			// 2. Returns an empty value
 			// In both cases, the key we sent was not accepted.
 			const record = updatedRecord as
-				| Record< string, string >
-				| undefined;
+				Record< string, string > | undefined;
 			const returnedKey = record?.[ settingName ];
 			if (
 				apiKey &&

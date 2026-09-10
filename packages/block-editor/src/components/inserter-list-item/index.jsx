@@ -26,7 +26,7 @@ function InserterListItem( {
 		? {
 				backgroundColor: item.icon.background,
 				color: item.icon.foreground,
-		  }
+			}
 		: {};
 	const blocks = useMemo(
 		() => [

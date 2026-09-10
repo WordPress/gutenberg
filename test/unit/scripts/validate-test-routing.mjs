@@ -287,7 +287,7 @@ const vitestTestsByProject = existsSync( path.join( ROOT_DIR, VITEST_CONFIG ) )
 				projectName,
 				new Set(),
 			] )
-	  );
+		);
 const overlappingVitestProjectTests =
 	findOverlappingVitestProjectTests( vitestTestsByProject );
 assert.deepEqual(

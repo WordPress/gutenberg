@@ -47,14 +47,14 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 									items.length
 								),
 								items.length
-						  )
+							)
 						: sprintf(
 								// translators: %s: The post's title
 								__(
 									'Are you sure you want to permanently delete "%s"?'
 								),
 								decodeEntities( getItemTitle( items[ 0 ] ) )
-						  ) }
+							) }
 				</WCText>
 				<HStack justify="right">
 					<Button

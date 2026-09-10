@@ -43,7 +43,7 @@ export function generateMarkdownDocs( {
 						headingLevel: 4,
 					} ),
 				] ),
-		  ]
+			]
 		: [];
 
 	return json2md(

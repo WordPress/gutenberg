@@ -35,8 +35,7 @@ export function useDashboardLayout(
 	const layout = useSelect(
 		( select ) =>
 			( select( preferencesStore ).get( SCOPE, KEY ) as
-				| DashboardWidget[]
-				| undefined ) ?? [],
+				DashboardWidget[] | undefined ) ?? [],
 		[]
 	);
 

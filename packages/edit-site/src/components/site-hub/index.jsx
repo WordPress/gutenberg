@@ -63,7 +63,7 @@ export const SiteHubMobile = memo(
 				? () => {
 						history.navigate( backPath );
 						navigate( 'back' );
-				  }
+					}
 				: undefined,
 		};
 

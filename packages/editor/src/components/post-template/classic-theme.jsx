@@ -82,7 +82,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 							post_type:
 								select( editorStore ).getCurrentPostType(),
 							per_page: -1,
-					  } )
+						} )
 					: undefined,
 				selectedTemplateSlug:
 					select( editorStore ).getEditedPostAttribute( 'template' ),
@@ -141,7 +141,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 									label: __( 'Add template' ),
 									onClick: () => setIsCreateModalOpen( true ),
 								},
-						  ]
+							]
 						: []
 				}
 				onClose={ onClose }

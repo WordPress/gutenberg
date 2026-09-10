@@ -115,7 +115,7 @@ export function Note( {
 		note.parent === 0
 			? __(
 					"Are you sure you want to delete this note? This will also delete all of this note's replies."
-			  )
+				)
 			: __( 'Are you sure you want to delete this reply?' );
 
 	const handleCancel = () => {
@@ -166,7 +166,7 @@ export function Note( {
 							__( '%1$s: %2$s' ),
 							actionText,
 							raw
-					  )
+						)
 					: actionText;
 		} else {
 			content = note?.content?.rendered;

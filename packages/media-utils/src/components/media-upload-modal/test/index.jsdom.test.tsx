@@ -32,9 +32,8 @@ const POST_TYPES: Record< string, unknown > = {
 };
 
 vi.mock( import( '@wordpress/core-data' ), async () => {
-	const { __dangerousOptInToUnstableAPIsOnlyForCoreModules } = await import(
-		'@wordpress/private-apis'
-	);
+	const { __dangerousOptInToUnstableAPIsOnlyForCoreModules } =
+		await import( '@wordpress/private-apis' );
 	const { lock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
 		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
 		'@wordpress/core-data'
@@ -50,7 +49,7 @@ vi.mock( import( '@wordpress/core-data' ), async () => {
 		store: {
 			name: 'core',
 		},
-	} as unknown as typeof import('@wordpress/core-data');
+	} as unknown as typeof import( '@wordpress/core-data' );
 } );
 
 const mockUseEntityRecordsWithPermissions = unlock( coreDataPrivateApis )

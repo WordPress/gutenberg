@@ -576,7 +576,7 @@ export const EditMode: Story = {
 								...tile,
 								width:
 									tile.width === 'fill' ? undefined : 'fill',
-						  }
+							}
 						: tile
 				)
 			);
@@ -590,7 +590,7 @@ export const EditMode: Story = {
 								...tile,
 								width:
 									tile.width === 'full' ? undefined : 'full',
-						  }
+							}
 						: tile
 				)
 			);
@@ -731,7 +731,7 @@ export const SizeLimits: Story = {
 								...tile,
 								width:
 									tile.width === 'fill' ? undefined : 'fill',
-						  }
+							}
 						: tile
 				)
 			);
@@ -745,7 +745,7 @@ export const SizeLimits: Story = {
 								...tile,
 								width:
 									tile.width === 'full' ? undefined : 'full',
-						  }
+							}
 						: tile
 				)
 			);

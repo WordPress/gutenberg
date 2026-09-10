@@ -38,7 +38,7 @@ export function useTemplateFieldMode(
 				? !! select( coreStore ).canUser( 'read', {
 						kind: 'postType',
 						name: 'wp_template',
-				  } )
+					} )
 				: false;
 			if ( ( ! isBlockTheme || ! canViewTemplates ) && isVisible ) {
 				return 'classic';

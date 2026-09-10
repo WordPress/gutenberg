@@ -134,7 +134,7 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 							? __( 'Play inline enabled because of Autoplay.' )
 							: __(
 									'When enabled, videos will play directly within the webpage on mobile browsers, instead of opening in a fullscreen player.'
-							  )
+								)
 					}
 				/>
 			</ToolsPanelItem>

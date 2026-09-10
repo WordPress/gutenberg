@@ -156,7 +156,7 @@ export default function useBlockColorContrastWarning( {
 				linkColor: checkLinkColor ? colors.linkColor : undefined,
 				messageOverride,
 				enableAlphaChecker: true,
-		  } )
+			} )
 		: null;
 
 	// The popover Notice that displays this warning is muted

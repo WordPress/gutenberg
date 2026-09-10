@@ -69,7 +69,7 @@ function ControlPointButton( {
 					? __( 'Press the button to change the color.' )
 					: __(
 							'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.'
-					  ) }
+						) }
 			</VisuallyHidden>
 		</>
 	);
@@ -408,7 +408,7 @@ function InsertPoint( {
 					? {
 							left: `${ insertPosition }%`,
 							transform: 'translateX( -50% )',
-					  }
+						}
 					: undefined
 			}
 		/>

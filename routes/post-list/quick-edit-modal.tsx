@@ -198,7 +198,7 @@ export function QuickEditModal( {
 						fieldsWithBulkEditSupport.includes(
 							typeof field === 'string' ? field : field.id
 						)
-				  )
+					)
 				: allFields,
 		};
 	}, [ isBulk ] );

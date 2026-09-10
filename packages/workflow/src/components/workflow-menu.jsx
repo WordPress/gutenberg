@@ -225,7 +225,7 @@ export function WorkflowMenu() {
 														: {
 																transform:
 																	'scaleX(-1)',
-														  }
+															}
 												}
 											/>
 										</InputLayout.Slot>

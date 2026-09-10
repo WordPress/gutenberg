@@ -37,7 +37,7 @@ function defaultRenderSelectedValue(
 					// translators: %d: number of items selected (it will always be 2 or more items)
 					_n( '%d item selected', '%d items selected', value.length ),
 					value.length
-			  );
+				);
 	}
 
 	return value;

@@ -300,12 +300,12 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 								...commonTypes,
 								...( needsNodeTypes ? [ 'node' ] : [] ),
 								'gutenberg-vitest-test-env',
-						  ]
+							]
 						: [
 								...commonTypes,
 								'node',
 								'gutenberg-vitest-test-env',
-						  ],
+							],
 			},
 			// Package configs often include every source, story, and test file.
 			// This validator owns an exact routed-test set, so do not inherit
@@ -327,7 +327,7 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 								ROOT_DIR,
 								'test/unit/config/testing-library.vitest.js'
 							),
-					  ]
+						]
 					: [] ),
 				...typescriptTests.map( ( file ) =>
 					path.join( ROOT_DIR, file )

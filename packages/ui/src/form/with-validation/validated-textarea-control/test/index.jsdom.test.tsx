@@ -101,7 +101,7 @@ describe( 'ValidatedTextareaControl', () => {
 							? {
 									type: 'invalid',
 									message: 'The word "error" is not allowed.',
-							  }
+								}
 							: undefined
 					}
 				/>
