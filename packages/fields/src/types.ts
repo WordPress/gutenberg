@@ -188,4 +188,10 @@ export interface MediaEditProps< Item >
 	 * @default false
 	 */
 	isExpanded?: boolean;
+	/**
+	 * Extra props forwarded to the media upload component (e.g. `gallery`,
+	 * `modalClass`). The props the control sets itself, such as `onSelect`,
+	 * `value` and `render`, take precedence.
+	 */
+	mediaUploadProps?: Record< string, unknown >;
 }

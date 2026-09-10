@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `MediaEdit`: Add a `mediaUploadProps` prop forwarded to the media upload component; the featured image field uses it to open the featured-image media frame, as the classic panel does. ([#82678](https://github.com/WordPress/gutenberg/pull/82678))
+
 ### Bug Fixes
 
+-   `MediaEdit`: Resolve the media picker through the `editor.MediaUpload` filter, so the editor's media library and the plugin extensions registered on it apply to media fields. ([#82678](https://github.com/WordPress/gutenberg/pull/82678))
 -   `MediaEdit`: Show a message instead of the picker when the user lacks permission to upload media. ([#82720](https://github.com/WordPress/gutenberg/pull/82720))
 
 ## 0.47.0 (2026-09-10)

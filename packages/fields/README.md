@@ -149,6 +149,7 @@ _Parameters_
 -   _props.multiple_ `[boolean]`: - Whether to allow multiple media selections. Default `false`.
 -   _props.hideLabelFromVision_ `[boolean]`: - Whether the label should be hidden from vision.
 -   _props.isExpanded_ `[boolean]`: - Whether to render in an expanded form. Default `false`.
+-   _props.mediaUploadProps_ `[Object]`: - Extra props forwarded to the media upload component (e.g. `gallery`, `modalClass`). The props the control sets itself, such as `onSelect`, `value` and `render`, take precedence.
 
 _Returns_
 
