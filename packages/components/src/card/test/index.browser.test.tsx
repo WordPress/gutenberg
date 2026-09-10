@@ -69,6 +69,18 @@ function readElevationShadow( card: HTMLElement ) {
 	return getComputedStyle( layers[ layers.length - 1 ] ).boxShadow;
 }
 
+function readElevationRadii( card: HTMLElement ) {
+	// The elevation layers are intentionally hidden presentation elements.
+	// eslint-disable-next-line testing-library/no-node-access
+	const layers = card.querySelectorAll< HTMLElement >(
+		'.components-elevation'
+	);
+	return Array.from(
+		layers,
+		( shadow ) => getComputedStyle( shadow ).borderRadius
+	);
+}
+
 describe( 'Card', () => {
 	it( 'renders its regions and media', async () => {
 		await render(
@@ -416,37 +428,32 @@ describe( 'Card', () => {
 		'keeps both shadows aligned with the Card radius with $order and borderRadius=$borderRadius',
 		async ( { rounded, borderRadius } ) => {
 			await render(
-			<>
-				{ rounded.map( ( isRounded ) => (
-					<Card
-						key={ String( isRounded ) }
-						isRounded={ isRounded }
-						elevation={ 5 }
-						style={ { borderRadius } }
-						data-testid={
-							isRounded ? 'rounded-card' : 'square-card'
-						}
-					>
-						Card content
-					</Card>
-				) ) }
-			</>
-		);
-
-		for ( const isRounded of rounded ) {
-			const card = screen.getByTestId(
-				isRounded ? 'rounded-card' : 'square-card'
+				<>
+					{ rounded.map( ( isRounded ) => (
+						<Card
+							key={ String( isRounded ) }
+							isRounded={ isRounded }
+							elevation={ 5 }
+							style={ { borderRadius } }
+							data-testid={
+								isRounded ? 'rounded-card' : 'square-card'
+							}
+						>
+							Card content
+						</Card>
+					) ) }
+				</>
 			);
-			const radius = borderRadius ?? ( isRounded ? 7 : 0 );
-			await expect
-				.poll( () =>
-					Array.from(
-						card.querySelectorAll( '.components-elevation' ),
-						( shadow ) => getComputedStyle( shadow ).borderRadius
-					)
-				)
-				.toEqual( [ `${ radius }px`, `${ radius }px` ] );
-		}
+
+			for ( const isRounded of rounded ) {
+				const card = screen.getByTestId(
+					isRounded ? 'rounded-card' : 'square-card'
+				);
+				const radius = getComputedStyle( card ).borderRadius;
+				await expect
+					.poll( () => readElevationRadii( card ) )
+					.toEqual( [ radius, radius ] );
+			}
 		}
 	);
 } );
