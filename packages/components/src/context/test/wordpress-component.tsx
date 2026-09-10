@@ -2,7 +2,7 @@ import { describe, it } from 'vitest';
 import type { ForwardedRef } from 'react';
 import { forwardRef } from '@wordpress/element';
 import type { WordPressComponentProps } from '../wordpress-component';
-import { contextConnectWithoutRef } from '../context-connect';
+import { contextConnect, contextConnectWithoutRef } from '../context-connect';
 
 // Static TypeScript checks
 describe( 'WordPressComponentProps', () => {
@@ -27,6 +27,16 @@ describe( 'WordPressComponentProps', () => {
 } );
 
 describe( 'WordPressComponentFromProps', () => {
+	it( 'should preserve as for polymorphic connected components', () => {
+		const Unconnected = (
+			props: WordPressComponentProps< {}, 'div' >,
+			ref: ForwardedRef< any >
+		) => <div { ...props } ref={ ref } />;
+		const Connected = contextConnect( Unconnected, 'Polymorphic' );
+
+		<Connected as="label" htmlFor="field" />;
+	} );
+
 	it( 'should reject as on a non-polymorphic connected component', () => {
 		const Unconnected = (
 			props: WordPressComponentProps< {}, null, false >
