@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/stylelint-config",
-	"version": "24.3.0",
+	"version": "25.0.0",
 	"description": "stylelint config for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "MIT",
@@ -51,7 +51,7 @@
 		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
 		"stylelint": "^17.14.1",
 		"stylelint-scss": "^7.2.0",
-		"vitest": "^4.1.11"
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
 		"stylelint": "^17.14.1",
