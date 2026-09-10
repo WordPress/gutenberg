@@ -22,7 +22,7 @@ export const homeRoute = {
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
 			return isBlockTheme ||
 				isClassicThemeWithStyleBookSupport( siteData ) ? (
-				<Editor isHomeRoute defaultRenderingMode="template-locked" />
+				<Editor isHomeRoute fixedRenderingMode="template-locked" />
 			) : undefined;
 		},
 		mobileSidebar( { siteData } ) {

@@ -77,8 +77,9 @@ function getNavigationPath( location, postType ) {
 export default function EditSiteEditor( {
 	isHomeRoute = false,
 	// Routes that stand for the whole site pass 'template-locked', so the
-	// canvas shows the template around whatever it is rendering.
-	defaultRenderingMode = 'post-only',
+	// canvas shows the template around whatever it is rendering, and the
+	// controls for switching it are not offered.
+	fixedRenderingMode,
 } ) {
 	const location = useLocation();
 	const history = useHistory();
@@ -111,9 +112,7 @@ export default function EditSiteEditor( {
 		'edit-site-editor__loading-progress'
 	);
 
-	const editorSettings = useSpecificEditorSettings( {
-		defaultRenderingMode,
-	} );
+	const editorSettings = useSpecificEditorSettings();
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 	const { setCurrentRevisionId, resetStylesNavigation } = unlock(
 		useDispatch( editorStore )
@@ -207,6 +206,7 @@ export default function EditSiteEditor( {
 					postId={ postWithTemplate ? context.postId : postId }
 					templateId={ postWithTemplate ? postId : undefined }
 					settings={ editorSettings }
+					fixedRenderingMode={ fixedRenderingMode }
 					className="edit-site-editor__editor-interface"
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />

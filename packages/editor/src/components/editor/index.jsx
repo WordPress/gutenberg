@@ -19,6 +19,7 @@ function Editor( {
 	children,
 	initialEdits,
 	initialViewport,
+	fixedRenderingMode,
 
 	// This could be part of the settings.
 	onActionPerformed,
@@ -109,6 +110,7 @@ function Editor( {
 					settings={ settings }
 					initialEdits={ initialEdits }
 					initialViewport={ initialViewport }
+					fixedRenderingMode={ fixedRenderingMode }
 					useSubRegistry={ false }
 				>
 					<EditorInterface { ...props }>

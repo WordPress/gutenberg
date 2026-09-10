@@ -246,6 +246,89 @@ test.describe( 'Style Revisions', () => {
 		}
 	} );
 
+	// The controls this checks belong to the v1 site editor shell.
+	test( 'should show the template on the styles route whatever the user prefers', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		test.skip(
+			isSiteEditorV2,
+			'The v1 site editor shell is not present in v2.'
+		);
+
+		// Styling the site means styling the template around it, so the
+		// styles route shows the template even when the canvas is a page and
+		// the user has turned "Show template" off while editing pages.
+		const frontPage = await requestUtils.createPage( {
+			title: 'Home',
+			status: 'publish',
+		} );
+		await requestUtils.updateSiteSettings( {
+			show_on_front: 'page',
+			page_on_front: frontPage.id,
+		} );
+
+		try {
+			await admin.visitSiteEditor();
+			await page.evaluate( async () => {
+				const theme = window.wp.data
+					.select( 'core' )
+					.getCurrentTheme()?.stylesheet;
+				await window.wp.data
+					.dispatch( 'core/preferences' )
+					.set( 'core', 'renderingModes', {
+						[ theme ]: { page: 'post-only' },
+					} );
+			} );
+
+			await admin.visitSiteEditor();
+			await page
+				.getByRole( 'region', { name: 'Navigation' } )
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
+			await editor.canvas.locator( '.wp-block' ).first().waitFor();
+
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.getRenderingMode()
+					)
+				)
+				.toBe( 'template-locked' );
+
+			// With one mode to be in, the editor does not offer to leave it.
+			await page
+				.locator(
+					'iframe.edit-site-visual-editor__editor-canvas[role="button"]'
+				)
+				.click();
+			await expect( page ).toHaveURL( /canvas=edit/ );
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'View', exact: true } )
+				.click();
+			await expect(
+				page.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
+			).toBeHidden();
+			await page.keyboard.press( 'Escape' );
+		} finally {
+			await page.evaluate( () =>
+				window.wp.data
+					.dispatch( 'core/preferences' )
+					.set( 'core', 'renderingModes', {} )
+			);
+			await requestUtils.updateSiteSettings( {
+				show_on_front: 'posts',
+				page_on_front: 0,
+			} );
+			await requestUtils.deleteAllPages();
+		}
+	} );
+
 	// The back button this exercises ("Open Navigation") and the clickable
 	// canvas belong to the v1 site editor shell; v2 has no equivalent.
 	test( 'should keep the site preview clickable after leaving the styles editor', async ( {

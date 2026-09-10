@@ -20,6 +20,7 @@ export default function BlockThemeControl() {
 		onNavigateToEntityRecord,
 		getEditorSettings,
 		hasGoBack,
+		hasFixedRenderingMode,
 		id,
 	} = useSelect( ( select ) => {
 		const {
@@ -35,6 +36,7 @@ export default function BlockThemeControl() {
 			hasGoBack: editorSettings.hasOwnProperty(
 				'onNavigateToPreviousEntityRecord'
 			),
+			hasFixedRenderingMode: !! editorSettings.fixedRenderingMode,
 			id: getCurrentTemplateId(),
 		};
 	}, [] );
@@ -137,22 +139,29 @@ export default function BlockThemeControl() {
 							<ResetDefaultTemplate onClick={ onClose } />
 							{ canCreateTemplate && <CreateNewTemplate /> }
 						</MenuGroup>
-						<MenuGroup>
-							<MenuItem
-								icon={ ! isTemplateHidden ? check : undefined }
-								isSelected={ ! isTemplateHidden }
-								role="menuitemcheckbox"
-								onClick={ () => {
-									const newRenderingMode = isTemplateHidden
-										? 'template-locked'
-										: 'post-only';
-									setRenderingMode( newRenderingMode );
-									setDefaultRenderingMode( newRenderingMode );
-								} }
-							>
-								{ __( 'Show template' ) }
-							</MenuItem>
-						</MenuGroup>
+						{ ! hasFixedRenderingMode && (
+							<MenuGroup>
+								<MenuItem
+									icon={
+										! isTemplateHidden ? check : undefined
+									}
+									isSelected={ ! isTemplateHidden }
+									role="menuitemcheckbox"
+									onClick={ () => {
+										const newRenderingMode =
+											isTemplateHidden
+												? 'template-locked'
+												: 'post-only';
+										setRenderingMode( newRenderingMode );
+										setDefaultRenderingMode(
+											newRenderingMode
+										);
+									} }
+								>
+									{ __( 'Show template' ) }
+								</MenuItem>
+							</MenuGroup>
+						) }
 					</>
 				) }
 			</DropdownMenu>

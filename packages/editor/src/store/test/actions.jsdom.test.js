@@ -1219,4 +1219,75 @@ describe( 'Editor actions', () => {
 			);
 		} );
 	} );
+
+	describe( 'setRenderingMode', () => {
+		it( 'changes the mode when none is fixed', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).setRenderingMode( 'post-only' );
+			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
+				'post-only'
+			);
+
+			registry
+				.dispatch( editorStore )
+				.setRenderingMode( 'template-locked' );
+			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
+				'template-locked'
+			);
+		} );
+
+		it( 'applies the fixed mode, so an editor can enter it', () => {
+			const registry = createRegistryWithStores();
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				fixedRenderingMode: 'template-locked',
+			} );
+
+			registry
+				.dispatch( editorStore )
+				.setRenderingMode( 'template-locked' );
+
+			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
+				'template-locked'
+			);
+		} );
+
+		it( 'ignores a move away from the fixed mode', () => {
+			const registry = createRegistryWithStores();
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				fixedRenderingMode: 'template-locked',
+			} );
+			registry
+				.dispatch( editorStore )
+				.setRenderingMode( 'template-locked' );
+
+			registry.dispatch( editorStore ).setRenderingMode( 'post-only' );
+
+			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
+				'template-locked'
+			);
+		} );
+
+		it( 'changes the mode again once the fixed mode is cleared', () => {
+			const registry = createRegistryWithStores();
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				fixedRenderingMode: 'template-locked',
+			} );
+			registry
+				.dispatch( editorStore )
+				.setRenderingMode( 'template-locked' );
+
+			// Leaving a route that fixes the mode sends `undefined`, which
+			// has to clear it: editor settings merge, and the site editor
+			// shares one store across its routes.
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				fixedRenderingMode: undefined,
+			} );
+			registry.dispatch( editorStore ).setRenderingMode( 'post-only' );
+
+			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
+				'post-only'
+			);
+		} );
+	} );
 } );
