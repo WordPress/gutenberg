@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.0 (2026-09-10)
+
 ### Breaking Changes
 
 -   Increase the minimum required Node.js version to v22.19.0. The `lighthouse` dependency is now `^13.4.1`, which requires it. Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases) ([#81916](https://github.com/WordPress/gutenberg/pull/81916)).

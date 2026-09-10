@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.7.0 (2026-09-10)
+
 ### New Features
 
 -   Layout items accept `draggable` and `resizable` flags. A non-draggable
