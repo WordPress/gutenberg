@@ -44,7 +44,7 @@ jobs:
             # The head SHA comes from the event. PR code is never checked out,
             # built, or executed.
             - name: Report the status for this pull request
-              uses: mawesomedev/pr-baseline-action@34f5c5ac73ac338fae2ab0b441a7d6c2f800bfd1 # v0.1.0
+              uses: mawesomedev/pr-baseline-action@8c21a09691ccfdf5ea118cb60cee8ec8b99231a1 # v0.1.1
               with:
                   base: trunk
                   baselines: ${{ env.PR_BASELINES }}
@@ -89,7 +89,7 @@ jobs:
 
             - name: Move the baseline and refresh open pull requests
               id: pr-baseline
-              uses: mawesomedev/pr-baseline-action@34f5c5ac73ac338fae2ab0b441a7d6c2f800bfd1 # v0.1.0
+              uses: mawesomedev/pr-baseline-action@8c21a09691ccfdf5ea118cb60cee8ec8b99231a1 # v0.1.1
               with:
                   base: trunk
                   baselines: ${{ env.PR_BASELINES }}

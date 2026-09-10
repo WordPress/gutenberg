@@ -44,7 +44,7 @@ The workflow blocks nothing until these one-time steps are completed, in order:
 
 1. Create the `Require PR update` label.
 2. Let a refresh run with no baseline ref. Every open pull request receives a pass, which proves the token and permissions before anything can block.
-3. Seed the baseline: dispatch the workflow with `mode: move-baseline`.
+3. Seed the baseline: dispatch the workflow with `mode: move-baseline`, which seeds it at the current `trunk` HEAD. To seed at an earlier commit, push that commit to the ref directly: `git push origin <sha>:refs/baselines/required-trunk-changes`.
 4. Re-dispatch with `mode: refresh-pr-statuses` until a run reports no writes, so that no pull request is left unstamped.
 5. Ask a repository admin to add the `Required changes from trunk` commit status (source: GitHub Actions) to the trunk ruleset's required status checks.
 
