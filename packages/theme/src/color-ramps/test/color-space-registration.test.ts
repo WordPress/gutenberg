@@ -18,37 +18,32 @@ describe( 'color-space registration', () => {
 		expect( Object.keys( ColorSpace.registry ) ).toEqual( [] );
 	} );
 
-	it.each( [
-		'assertValidSeedColor',
-		'clampToGamut',
-		'getColorString',
-		'getContrast',
-	] as const )( '%s works without prior registration', async ( name ) => {
-		const utils = await import( '../lib/color-utils' );
-		// Do not let an import-time registration satisfy the utility's needs.
-		ColorSpace.registry = {};
+	it.each( [ 'parseSeedColor', 'getColorString', 'getContrast' ] as const )(
+		'%s works without prior registration',
+		async ( name ) => {
+			const utils = await import( '../lib/color-utils' );
+			// Do not let an import-time registration satisfy the utility's needs.
+			ColorSpace.registry = {};
 
-		switch ( name ) {
-			case 'assertValidSeedColor':
-				expect( () =>
-					utils.assertValidSeedColor( '#3858e9' )
-				).not.toThrow();
-				break;
-			case 'clampToGamut':
-				expect( utils.clampToGamut( '#3858e9' ).space.id ).toBe(
-					'oklch'
-				);
-				break;
-			case 'getColorString':
-				expect( utils.getColorString( '#3858e9' ) ).toBe( '#3858e9' );
-				break;
-			case 'getContrast':
-				expect( utils.getContrast( '#000000', '#ffffff' ) ).toBeCloseTo(
-					21
-				);
-				break;
+			switch ( name ) {
+				case 'parseSeedColor':
+					expect( () =>
+						utils.parseSeedColor( '#3858e9' )
+					).not.toThrow();
+					break;
+				case 'getColorString':
+					expect( utils.getColorString( '#3858e9' ) ).toBe(
+						'#3858e9'
+					);
+					break;
+				case 'getContrast':
+					expect(
+						utils.getContrast( '#000000', '#ffffff' )
+					).toBeCloseTo( 21 );
+					break;
+			}
 		}
-	} );
+	);
 
 	it( 'builds a background ramp without prior registration', async () => {
 		const { buildBgRamp } = await import( '..' );

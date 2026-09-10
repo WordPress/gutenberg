@@ -239,15 +239,7 @@ export function buildRamp(
 		pinLightness,
 		backgroundRamp,
 		rescaleToFitContrastTargets = true,
-	}: {
-		mainDirection?: RampDirection;
-		pinLightness?: {
-			stepName: keyof Ramp;
-			value: number;
-		};
-		backgroundRamp?: RampResult;
-		rescaleToFitContrastTargets?: boolean;
-	} = {}
+	}: BuildRampOptions = {}
 ): RampResult {
 	// Parse and validate here: the single point where user-supplied color strings enter.
 	const parsedSeed = parseSeedColor( seedArg );

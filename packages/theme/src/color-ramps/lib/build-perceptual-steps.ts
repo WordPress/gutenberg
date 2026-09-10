@@ -6,6 +6,7 @@ import {
 	OKLab,
 	OKLCH,
 	OKLrab,
+	parse,
 	sRGB,
 	to,
 	type PlainColorObject,
@@ -30,6 +31,10 @@ function getPerceptualLightness( color: string | PlainColorObject ) {
 	return get( color, [ OKLrab, 'l' ] );
 }
 
+function clampColorToGamut( color: string | PlainColorObject ) {
+	return clampToGamut( typeof color === 'string' ? parse( color ) : color );
+}
+
 /**
  * Create a path indexed by OKLr lightness, not OKLCH lightness. Preserve the
  * seed's authored chroma and hue before gamut mapping, which may reduce chroma.
@@ -39,7 +44,7 @@ function getPerceptualLightness( color: string | PlainColorObject ) {
 function createColorAtPerceptualLightness(
 	seed: string | PlainColorObject
 ): GetColorAtLightness {
-	const parsedSeed = clampToGamut( seed );
+	const parsedSeed = clampColorToGamut( seed );
 	const chroma = get( parsedSeed, [ OKLCH, 'c' ] );
 	const hue = get( parsedSeed, [ OKLCH, 'h' ] );
 
@@ -97,9 +102,9 @@ function createAnchoredColorForStepAtPerceptualLightness( {
 	startLightness: number;
 	endLightness: number;
 } ) {
-	const stepColor = to( clampToGamut( ramp[ step ] ), OKLCH );
+	const stepColor = to( clampColorToGamut( ramp[ step ] ), OKLCH );
 	const getTargetColor = createColorAtPerceptualLightness( stepColor );
-	const anchorColor = to( clampToGamut( anchor ), OKLCH );
+	const anchorColor = to( clampColorToGamut( anchor ), OKLCH );
 	const anchorChroma = get( anchorColor, [ OKLCH, 'c' ] );
 	const stepChroma = get( stepColor, [ OKLCH, 'c' ] );
 	const distance = endLightness - startLightness;
@@ -377,7 +382,7 @@ function rebuildStrokes(
 	} );
 
 	const stroke3Lightness = getPerceptualLightness( nextRamp.stroke3 );
-	const stroke1Reference = to( clampToGamut( nextRamp.stroke1 ), OKLab );
+	const stroke1Reference = to( clampColorToGamut( nextRamp.stroke1 ), OKLab );
 	const stroke1To3Difference = deltaEOK2(
 		stroke1Reference,
 		nextRamp.stroke3
@@ -425,7 +430,7 @@ function rebuildStrokes(
 		return nextRamp;
 	}
 
-	const stroke3Reference = to( clampToGamut( nextRamp.stroke3 ), OKLab );
+	const stroke3Reference = to( clampColorToGamut( nextRamp.stroke3 ), OKLab );
 	const minimumActiveDifference = deltaEOK2(
 		stroke3Reference,
 		ramp.ramp.stroke4
