@@ -83,6 +83,8 @@ describe( 'focusable.find() CSS visibility', () => {
 } );
 
 const createElement = ( type ) => document.createElement( type );
+const IMAGE_SOURCE =
+	'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
 function findFocusable( context ) {
 	if ( ! context.isConnected ) {
@@ -140,21 +142,24 @@ describe( 'focusable', () => {
 			expect( findFocusable( node ) ).toEqual( [ link ] );
 		} );
 
-		it( 'finds a mapped area whose referenced image is visible', () => {
+		it( 'finds a mapped area whose referenced image is visible', async () => {
 			const node = createElement( 'div' );
 			node.innerHTML = `
 				<map name="testfocus">
 					<area href="#target" shape="rect" coords="0,0,30,30" alt="Target">
 				</map>
-				<img usemap="#testfocus" width="40" height="40" alt="">
+				<img src="${ IMAGE_SOURCE }" usemap="#testfocus" width="40" height="40" alt="">
 			`;
 			const area = node.querySelector( 'area' );
 			const image = node.querySelector( 'img' );
 
 			document.body.appendChild( node );
+			await image.decode();
 
 			expect( area.getClientRects() ).toHaveLength( 0 );
 			expect( image.getClientRects().length ).toBeGreaterThan( 0 );
+			area.focus();
+			expect( area ).toHaveFocus();
 			expect( find( node ) ).toEqual( [ area ] );
 		} );
 
@@ -164,7 +169,7 @@ describe( 'focusable', () => {
 				<map name="testfocus">
 					<area href="#target" shape="rect" coords="0,0,30,30" alt="Target">
 				</map>
-				<img usemap="#testfocus" width="40" height="40" alt="" style="visibility: hidden">
+				<img src="${ IMAGE_SOURCE }" usemap="#testfocus" width="40" height="40" alt="" style="visibility: hidden">
 			`;
 			const image = node.querySelector( 'img' );
 
@@ -181,11 +186,32 @@ describe( 'focusable', () => {
 					<area href="#target" shape="rect" coords="0,0,30,30" alt="Target">
 				</map>
 				<div inert>
-					<img usemap="#testfocus" width="40" height="40" alt="">
+					<img src="${ IMAGE_SOURCE }" usemap="#testfocus" width="40" height="40" alt="">
 				</div>
 			`;
 
 			expect( findFocusable( node ) ).toEqual( [] );
+		} );
+
+		it( "finds a mapped area whose referenced image is outside the map's inert subtree", async () => {
+			const node = createElement( 'div' );
+			node.innerHTML = `
+				<div inert>
+					<map name="testfocus">
+						<area href="#target" shape="rect" coords="0,0,30,30" alt="Target">
+					</map>
+				</div>
+				<img src="${ IMAGE_SOURCE }" usemap="#testfocus" width="40" height="40" alt="">
+			`;
+			const area = node.querySelector( 'area' );
+			const image = node.querySelector( 'img' );
+
+			document.body.appendChild( node );
+			await image.decode();
+
+			area.focus();
+			expect( area ).toHaveFocus();
+			expect( find( node ) ).toEqual( [ area ] );
 		} );
 
 		it( 'finds contenteditable', () => {

@@ -117,16 +117,17 @@ export function find( context, { sequential = false } = {} ) {
 	const elements = context.querySelectorAll( buildSelector( sequential ) );
 
 	return Array.from( elements ).filter( ( element ) => {
-		// Elements inside an inert subtree are not focusable.
-		if ( element.closest( '[inert]' ) ) {
-			return false;
-		}
-
 		const { nodeName } = element;
 		if ( 'AREA' === nodeName ) {
+			// The mapped image determines whether this region is visible or inert.
 			return isValidFocusableArea(
 				/** @type {HTMLAreaElement} */ ( element )
 			);
+		}
+
+		// Elements inside an inert subtree are not focusable.
+		if ( element.closest( '[inert]' ) ) {
+			return false;
 		}
 
 		return isVisible( element );
