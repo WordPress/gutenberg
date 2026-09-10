@@ -2,6 +2,12 @@ on:
     pull_request_target:
         types: [opened]
     push:
+        branches:
+            - trunk
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
 name: Pull request automation
 
 # Disable permissions for all available scopes by default.
