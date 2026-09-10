@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 13.1.0 (2026-09-10)
+
 ### Internal
 
 -   Regenerate the WPDS fallback map with the solid neutral interactive background state tokens. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
