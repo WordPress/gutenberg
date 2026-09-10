@@ -191,40 +191,48 @@ export const getPostsPageId = createRegistrySelector( ( select ) => () => {
 
 export const getTemplateId = createRegistrySelector(
 	( select ) => ( state, postType, postId ) => {
-		const homepage = unlock( select( STORE_NAME ) ).getHomePage();
+		// `getHomePage()` and `getPostsPageId()` fire a
+		// `/wp/v2/templates/lookup?slug=front-page` REST request via the
+		// `getDefaultTemplateId` resolver. The homepage / posts-page
+		// branches below are guarded by `postType === 'page'`, so resolve
+		// them only when the post is actually a page — otherwise the
+		// lookup is wasted work for every non-page post type.
+		if ( postType === 'page' ) {
+			const homepage = unlock( select( STORE_NAME ) ).getHomePage();
 
-		if ( ! homepage ) {
-			return;
-		}
-
-		// For the front page, we always use the front page template if existing.
-		if (
-			postType === 'page' &&
-			postType === homepage?.postType &&
-			postId.toString() === homepage?.postId
-		) {
-			// The /lookup endpoint cannot currently handle a lookup
-			// when a page is set as the front page, so specifically in
-			// that case, we want to check if there is a front page
-			// template, and instead of falling back to the home
-			// template, we want to fall back to the page template.
-			const templates = select( STORE_NAME ).getEntityRecords(
-				'postType',
-				'wp_template',
-				{
-					per_page: -1,
-				}
-			);
-			if ( ! templates ) {
+			if ( ! homepage ) {
 				return;
 			}
-			const id = templates.find( ( { slug } ) => slug === 'front-page' )
-				?.id;
-			if ( id ) {
-				return id;
+
+			// For the front page, we always use the front page template if existing.
+			if (
+				postType === homepage?.postType &&
+				postId.toString() === homepage?.postId
+			) {
+				// The /lookup endpoint cannot currently handle a lookup
+				// when a page is set as the front page, so specifically in
+				// that case, we want to check if there is a front page
+				// template, and instead of falling back to the home
+				// template, we want to fall back to the page template.
+				const templates = select( STORE_NAME ).getEntityRecords(
+					'postType',
+					'wp_template',
+					{
+						per_page: -1,
+					}
+				);
+				if ( ! templates ) {
+					return;
+				}
+				const id = templates.find(
+					( { slug } ) => slug === 'front-page'
+				)?.id;
+				if ( id ) {
+					return id;
+				}
+				// If no front page template is found, continue with the
+				// logic below (fetching the page template).
 			}
-			// If no front page template is found, continue with the
-			// logic below (fetching the page template).
 		}
 
 		const editedEntity = select( STORE_NAME ).getEditedEntityRecord(
@@ -235,12 +243,14 @@ export const getTemplateId = createRegistrySelector(
 		if ( ! editedEntity ) {
 			return;
 		}
-		const postsPageId = unlock( select( STORE_NAME ) ).getPostsPageId();
 		// Check if the current page is the posts page.
-		if ( postType === 'page' && postsPageId === postId.toString() ) {
-			return select( STORE_NAME ).getDefaultTemplateId( {
-				slug: 'home',
-			} );
+		if ( postType === 'page' ) {
+			const postsPageId = unlock( select( STORE_NAME ) ).getPostsPageId();
+			if ( postsPageId === postId.toString() ) {
+				return select( STORE_NAME ).getDefaultTemplateId( {
+					slug: 'home',
+				} );
+			}
 		}
 		// First see if the post/page has an assigned template and fetch it.
 		const currentTemplateSlug = editedEntity.template;

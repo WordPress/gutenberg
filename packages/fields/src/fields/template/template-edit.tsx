@@ -72,7 +72,6 @@ function BlockThemeTemplateEdit( {
 	const postType = data.type;
 	const postId =
 		typeof data.id === 'number' ? data.id : parseInt( data.id, 10 );
-	const slug = data.slug;
 	const { templates, canSwitchTemplate } = useSelect(
 		( select ) => {
 			const allTemplates =
@@ -100,11 +99,7 @@ function BlockThemeTemplateEdit( {
 		},
 		[ postId, postType ]
 	);
-	const defaultTemplateLabel = useDefaultTemplateLabel(
-		postType,
-		postId,
-		slug
-	);
+	const defaultTemplateLabel = useDefaultTemplateLabel( postType, postId );
 	const value = field.getValue( { item: data } );
 	const options = useMemo( () => {
 		const templateOptions = templates.map( ( template ) => ( {
