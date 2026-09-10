@@ -6,10 +6,6 @@
 
 -   Stop publishing the `src` directory to npm. The package's `exports` field only exposes the built artifacts, so the source files were unreachable by consumers and only inflated the package size ([#77285](https://github.com/WordPress/gutenberg/pull/77285)).
 
-### New Features
-
--   `ViewTabCount`: Add a component that renders the number of items a view holds, to trail the label of the tab that selects it ([#82247](https://github.com/WordPress/gutenberg/pull/82247)).
-
 ## 2.9.0 (2026-08-26)
 
 ### Bug Fixes

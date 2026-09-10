@@ -1,5 +1,15 @@
-import styles from './style.module.css';
-import type { ViewTabCountProps } from './types';
+/**
+ * Style dependencies
+ */
+import styles from './view-tab-count.module.css';
+
+interface ViewTabCountProps {
+	/**
+	 * The number of items the view holds. Nothing is rendered when it is
+	 * `undefined`.
+	 */
+	count?: number;
+}
 
 /**
  * Renders the number of items a view holds, to trail the label of the tab that
@@ -12,16 +22,8 @@ import type { ViewTabCountProps } from './types';
  *
  * @param props
  * @param props.count The number of items the view holds.
- *
- * @example
- * ```jsx
- * <Tabs.Tab tabId={ entry.slug }>
- *   { entry.title }
- *   <ViewTabCount count={ entry.count } />
- * </Tabs.Tab>
- * ```
  */
-export default function ViewTabCount( { count }: ViewTabCountProps ) {
+export function ViewTabCount( { count }: ViewTabCountProps ) {
 	if ( typeof count !== 'number' ) {
 		return null;
 	}

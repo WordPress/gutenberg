@@ -7,7 +7,7 @@ import {
 } from '@wordpress/route';
 import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
-import { Page, ViewTabCount } from '@wordpress/admin-ui';
+import { Page } from '@wordpress/admin-ui';
 import type { View, Action, SupportedLayouts } from '@wordpress/dataviews';
 import {
 	store as coreStore,
@@ -30,6 +30,7 @@ import {
 	type ViewListEntry,
 	type ViewOverrides,
 } from './view-utils';
+import { ViewTabCount } from './view-tab-count';
 import { QuickEditModal } from './quick-edit-modal';
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
