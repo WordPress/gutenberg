@@ -1,6 +1,6 @@
 import { act, fireEvent, render } from '@testing-library/react';
 import { DashboardGrid } from '..';
-import type { DashboardGridLayoutItem } from '../types';
+import type { DashboardGridLayoutItem, DashboardGridProps } from '../types';
 
 class MockResizeObserver {
 	observe() {}
@@ -142,6 +142,137 @@ describe( 'DashboardGrid item limits', () => {
 		expect( committed.find( ( item ) => item.key === 'a' )?.width ).toBe(
 			1
 		);
+	} );
+} );
+
+describe( 'DashboardGrid resized width semantics', () => {
+	function renderResizableItem(
+		width: DashboardGridLayoutItem[ 'width' ],
+		props: Partial< DashboardGridProps > = {}
+	) {
+		const onChangeLayout = jest.fn();
+		const onPreviewLayout = jest.fn();
+		const { container } = render(
+			<DashboardGrid
+				layout={ [ { key: 'tile', width, height: 1 } ] }
+				columns={ 1 }
+				rowHeight={ 20 }
+				editMode
+				onChangeLayout={ onChangeLayout }
+				onPreviewLayout={ onPreviewLayout }
+				{ ...props }
+			>
+				<div key="tile">Tile</div>
+			</DashboardGrid>
+		);
+		const handle = container.querySelector(
+			'[data-wp-grid-item-key="tile"] [aria-roledescription="draggable"]'
+		)!;
+		return { handle, onChangeLayout, onPreviewLayout };
+	}
+
+	async function resizeWithKeyboard( handle: Element, keys: string[] ) {
+		fireEvent.keyDown( handle, { code: 'Space' } );
+		act( () => {
+			jest.runOnlyPendingTimers();
+		} );
+		for ( const code of keys ) {
+			fireEvent.keyDown( handle, { code } );
+			// Deliver each throttled resize before the next key or drop.
+			act( () => {
+				jest.advanceTimersByTime( 20 );
+			} );
+		}
+		fireEvent.keyDown( handle, { code: 'Space' } );
+		await act( async () => {
+			jest.runOnlyPendingTimers();
+		} );
+	}
+
+	it.each( [ 'full', 'fill' ] as const )(
+		'preserves %s when only the height changes in one column',
+		async ( width ) => {
+			const { handle, onChangeLayout } = renderResizableItem( width );
+
+			await resizeWithKeyboard( handle, [ 'ArrowDown' ] );
+
+			expect( onChangeLayout ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeLayout ).toHaveBeenLastCalledWith( [
+				{ key: 'tile', width, height: 2 },
+			] );
+		}
+	);
+
+	it.each( [ 'full', 'fill' ] as const )(
+		'does not commit %s when movement stays within the starting span',
+		async ( width ) => {
+			const { handle, onChangeLayout, onPreviewLayout } =
+				renderResizableItem( width, { rowHeight: 300 } );
+
+			await resizeWithKeyboard( handle, [ 'ArrowDown', 'ArrowRight' ] );
+
+			expect( onChangeLayout ).not.toHaveBeenCalled();
+			expect( onPreviewLayout ).not.toHaveBeenCalled();
+		}
+	);
+
+	it.each( [ 'full', 'fill' ] as const )(
+		'converts %s to a numeric width after a horizontal span change',
+		async ( width ) => {
+			const { handle, onChangeLayout } = renderResizableItem( width, {
+				columns: 3,
+			} );
+
+			// Three columns in 240px have an 88px track including the gap.
+			await resizeWithKeyboard( handle, Array( 4 ).fill( 'ArrowLeft' ) );
+
+			expect( onChangeLayout ).toHaveBeenLastCalledWith( [
+				{ key: 'tile', width: 2, height: 1 },
+			] );
+		}
+	);
+
+	it.each( [ 'full', 'fill' ] as const )(
+		'restores %s when the horizontal resize returns to its starting span',
+		async ( width ) => {
+			const { handle, onChangeLayout, onPreviewLayout } =
+				renderResizableItem( width, { columns: 3 } );
+
+			await resizeWithKeyboard( handle, [
+				...Array( 4 ).fill( 'ArrowLeft' ),
+				...Array( 4 ).fill( 'ArrowRight' ),
+			] );
+
+			expect( onPreviewLayout ).toHaveBeenCalledWith( [
+				{ key: 'tile', width: 2, height: 1 },
+			] );
+			expect( onChangeLayout ).toHaveBeenLastCalledWith( [
+				{ key: 'tile', width, height: 1 },
+			] );
+		}
+	);
+
+	it( 'commits the rendered numeric width when height changes', async () => {
+		const { handle, onChangeLayout } = renderResizableItem( 4 );
+
+		await resizeWithKeyboard( handle, [ 'ArrowDown' ] );
+
+		expect( onChangeLayout ).toHaveBeenLastCalledWith( [
+			{ key: 'tile', width: 1, height: 2 },
+		] );
+	} );
+
+	it( 'preserves full when height changes at a maximum width limit', async () => {
+		const { handle, onChangeLayout } = renderResizableItem( 'full', {
+			columns: 3,
+			itemLimits: { tile: { maxWidth: 80 } },
+		} );
+
+		await resizeWithKeyboard( handle, [ 'ArrowDown' ] );
+
+		expect( onChangeLayout ).toHaveBeenLastCalledWith( [
+			{ key: 'tile', width: 'full', height: 2 },
+		] );
 	} );
 } );
 /* eslint-enable testing-library/no-container, testing-library/no-node-access */

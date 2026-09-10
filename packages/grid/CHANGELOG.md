@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Preserve `DashboardGrid` layout items' `full` and `fill` widths when a resize ends at its starting horizontal span, including height-only resize gestures. ([#82522](https://github.com/WordPress/gutenberg/pull/82522))
+
 ### New Features
 
 -   Layout items accept `draggable` and `resizable` flags. A non-draggable
