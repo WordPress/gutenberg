@@ -156,8 +156,10 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 				// area with the item's title so it isn't announced generically.
 				mediaA11yProps = {
 					'aria-label':
-						( titleField && titleField.getValue( { item } ) ) ||
-						__( 'Navigate to item' ),
+						titleField?.getValueFormatted( {
+							item,
+							field: titleField,
+						} ) || __( 'Navigate to item' ),
 				};
 			}
 		}
