@@ -2,6 +2,8 @@ name: Storybook build and Smoke Tests
 
 on:
     pull_request:
+        branches:
+            - trunk
     push:
         branches:
             - trunk
