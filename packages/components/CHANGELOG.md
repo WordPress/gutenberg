@@ -41,6 +41,10 @@
 -   `Draggable`: Render `__experimentalDragComponent` only while a drag is in progress, so long lists of draggables such as the block inserter no longer render a hidden drag preview per item ([#83423](https://github.com/WordPress/gutenberg/pull/83423)).
 -   `Flex`, `Grid`: Stop watching the viewport for props that are given a single value rather than an array of breakpoint values. Each instance previously called `window.matchMedia()` and subscribed a `resize` listener that could never change its result ([#83423](https://github.com/WordPress/gutenberg/pull/83423)).
 
+### Bug Fixes
+
+-   `Notice`, `Snackbar`: Fix a crash when a child using hooks is conditionally rendered ([#81640](https://github.com/WordPress/gutenberg/pull/81640)).
+
 ### Internal
 
 -   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
@@ -80,7 +84,6 @@
 ### Documentation
 
 -   Add an Emotion-to-SCSS Modules migration guide for contributors ([#82567](https://github.com/WordPress/gutenberg/pull/82567)).
--   `Notice`, `Snackbar`: Fix a crash when a child using hooks is conditionally rendered ([#81640](https://github.com/WordPress/gutenberg/pull/81640)).
 
 ### Internal
 
