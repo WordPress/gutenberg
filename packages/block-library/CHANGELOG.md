@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.0.0 (2026-09-10)
+
 ### Breaking Changes
 
 -   Remove the experimental Form, Input Field, Form Submit Button, and Form Submission Notification blocks, along with the "Form and input blocks" experiment that gated them.

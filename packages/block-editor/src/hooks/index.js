@@ -21,6 +21,7 @@ import duotone from './duotone';
 import fontFamily from './font-family';
 import fontSize from './font-size';
 import textAlign from './text-align';
+import textShadow from './text-shadow';
 import fitText from './fit-text';
 import border from './border';
 import customCSS from './custom-css';
@@ -66,6 +67,7 @@ createBlockListBlockFilter( [
 	duotone,
 	fontFamily,
 	fontSize,
+	textShadow,
 	fitText,
 	border,
 	customCSS,
@@ -86,6 +88,7 @@ createBlockSaveFilter( [
 	style,
 	fontFamily,
 	fontSize,
+	textShadow,
 ] );
 
 export { useCustomSides } from './dimensions';

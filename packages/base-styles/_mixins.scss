@@ -370,8 +370,8 @@
 
 	&[aria-disabled="true"],
 	&:disabled {
-		background: colors.$gray-100;
-		border-color: colors.$gray-300;
+		background: wpds.var("--wpds-color-background-interactive-neutral-disabled");
+		border-color: wpds.var("--wpds-color-stroke-interactive-neutral-disabled");
 		cursor: default;
 
 		// Override style inherited from wp-admin. Required to avoid degraded appearance on different backgrounds.

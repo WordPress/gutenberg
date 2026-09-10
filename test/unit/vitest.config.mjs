@@ -10,11 +10,10 @@ import {
 	discoverTestFiles,
 	getVitestTestsByProject,
 } from './scripts/discover-test-files.mjs';
+import { compileInlineStyle } from '../../packages/wp-build/lib/compile-inline-style.mjs';
 
-const ROOT_DIR = path.resolve(
-	path.dirname( fileURLToPath( import.meta.url ) ),
-	'../..'
-);
+const CONFIG_DIR = path.dirname( fileURLToPath( import.meta.url ) );
+const ROOT_DIR = path.resolve( CONFIG_DIR, '../..' );
 const nodeRequire = createRequire( import.meta.url );
 const emotionPlugin = nodeRequire.resolve( '@swc/plugin-emotion' );
 const gutenbergEnvSetupFile = path.join(
@@ -38,6 +37,54 @@ const vitestTests = getVitestTestsByProject(
 const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,
 	replacement: path.join( ROOT_DIR, 'test/unit/config/style-mock.vitest.js' ),
+};
+const WP_BUILD_CSS_MODULE_STYLE_FIXTURE_ID = 'virtual:wp-build-style-injection';
+const WP_BUILD_ORDINARY_STYLE_FIXTURE_ID =
+	'virtual:wp-build-ordinary-style-injection';
+const wpBuildStyleFixtureSources = new Map( [
+	[
+		WP_BUILD_CSS_MODULE_STYLE_FIXTURE_ID,
+		await compileInlineStyle( {
+			cssModules: true,
+			minify: false,
+		} )(
+			`@layer wp-build-test {
+				.fixture {
+					--wp-build-style-injection-test: true;
+					color: rgb(1, 2, 3);
+				}
+			}`,
+			ROOT_DIR,
+			path.join(
+				ROOT_DIR,
+				'test/unit/config/wp-build-style-fixture.module.css'
+			)
+		),
+	],
+	[
+		WP_BUILD_ORDINARY_STYLE_FIXTURE_ID,
+		await compileInlineStyle( { minify: false } )(
+			`.ordinary-fixture {
+				background-color: rgb(4, 5, 6);
+			}`,
+			ROOT_DIR,
+			path.join(
+				ROOT_DIR,
+				'test/unit/config/wp-build-ordinary-style-fixture.css'
+			)
+		),
+	],
+] );
+const wpBuildStyleFixturePlugin = {
+	name: 'wp-build-style-injection-fixture',
+	resolveId( id ) {
+		return wpBuildStyleFixtureSources.has( id ) ? `\0${ id }` : null;
+	},
+	load( id ) {
+		return id.startsWith( '\0' )
+			? wpBuildStyleFixtureSources.get( id.slice( 1 ) ) ?? null
+			: null;
+	},
 };
 const reporters = [ 'default' ];
 
@@ -84,6 +131,7 @@ export default defineConfig( {
 		},
 	},
 	plugins: [
+		wpBuildStyleFixturePlugin,
 		react( {
 			plugins: [
 				[
@@ -213,8 +261,15 @@ export default defineConfig( {
 			},
 			{
 				extends: true,
+				/*
+				 * Browser mode pre-bundles the Vitest runtime, which Vite resolves
+				 * from the project root. Root the project where the test
+				 * dependencies are declared so resolution stays layout agnostic.
+				 */
+				root: CONFIG_DIR,
 				test: {
 					name: 'browser',
+					dir: ROOT_DIR,
 					include: vitestTests.browser,
 					setupFiles: [
 						path.join(
