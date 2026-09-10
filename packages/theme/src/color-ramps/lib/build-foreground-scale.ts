@@ -4,6 +4,7 @@ import {
 	get,
 	OKLCH,
 	OKLCH_sRGB as OklchSrgb,
+	parse,
 	sRGB,
 	to,
 	type PlainColorObject,
@@ -23,6 +24,10 @@ import { solveWithBisect } from './utils.ts';
 type GetColorForLightness = ( lightness: number ) => PlainColorObject;
 
 const PERCEPTUAL_INTERVAL_SERIALIZATION_TOPUP = 0.25;
+
+function clampSerializedColorToGamut( color: string ) {
+	return clampToGamut( parse( color ) );
+}
 
 function getChromaPreservingColorForLightness(
 	seed: PlainColorObject,
@@ -366,7 +371,10 @@ function serializeColorMeetingPerceptualInterval( {
 		return strongColor;
 	}
 
-	const strongLightness = get( clampToGamut( strongColor ), [ OKLCH, 'l' ] );
+	const strongLightness = get( clampSerializedColorToGamut( strongColor ), [
+		OKLCH,
+		'l',
+	] );
 	const endpointLightness = get( strongEndpoint, [ OKLCH, 'l' ] );
 	const direction = Math.sign( endpointLightness - strongLightness );
 	if ( direction === 0 ) {
@@ -406,12 +414,14 @@ export function buildForegroundScale(
 ): RampResult {
 	// APCA resolves sRGB by name, even for color objects.
 	ColorSpace.register( sRGB );
-	const seed = clampToGamut( ramp.ramp[ config.seed ] );
+	const seed = clampSerializedColorToGamut( ramp.ramp[ config.seed ] );
 	const getColorAtLightness = createColorForLightness( seed, config );
 	// Parse and convert this once. APCA evaluates it for every intermediate
 	// foreground candidate.
 	const displayBackground = to(
-		clampToGamut( backgroundRamp.ramp[ config.perceptualReference ] ),
+		clampSerializedColorToGamut(
+			backgroundRamp.ramp[ config.perceptualReference ]
+		),
 		sRGB
 	);
 	const steps = Object.fromEntries(
@@ -435,7 +445,9 @@ export function buildForegroundScale(
 	for ( const step of config.steps.filter(
 		( stepConfig ) => stepConfig.preserveAnchor === true
 	) ) {
-		const currentColor = clampToGamut( ramp.ramp[ step.name ] );
+		const currentColor = clampSerializedColorToGamut(
+			ramp.ramp[ step.name ]
+		);
 		colors.set(
 			step.name,
 			meetsContrastTarget(
