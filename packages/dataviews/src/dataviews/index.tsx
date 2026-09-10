@@ -18,7 +18,7 @@ import {
 import DataViewsLayout from '../components/dataviews-layout';
 import DataViewsFooter from '../components/dataviews-footer';
 import DataViewsSearch from '../components/dataviews-search';
-import { BulkActionsFooter } from '../components/dataviews-bulk-actions';
+import { BulkActions } from '../components/dataviews-bulk-actions';
 import { DataViewsPagination } from '../components/dataviews-pagination';
 import DataViewsViewConfig, {
 	DataviewsViewConfigDropdown,
@@ -247,6 +247,8 @@ function DataViews< Item >( {
 				hasInitiallyLoaded,
 				onReset,
 				intersectionObserver,
+				bulkActionsInLayout:
+					children === undefined || children === null,
 			} }
 		>
 			<div className="dataviews-wrapper">
@@ -269,7 +271,7 @@ function DataViews< Item >( {
  */
 // Populate the DataViews sub components
 const DataViewsSubComponents = DataViews as typeof DataViews & {
-	BulkActionToolbar: typeof BulkActionsFooter;
+	BulkActionToolbar: typeof BulkActions;
 	Filters: typeof Filters;
 	FiltersToggle: typeof FiltersToggle;
 	FiltersToggled: typeof FiltersToggled;
@@ -281,7 +283,7 @@ const DataViewsSubComponents = DataViews as typeof DataViews & {
 	Footer: typeof DataViewsFooter;
 };
 
-DataViewsSubComponents.BulkActionToolbar = BulkActionsFooter;
+DataViewsSubComponents.BulkActionToolbar = BulkActions;
 DataViewsSubComponents.Filters = Filters;
 DataViewsSubComponents.FiltersToggled = FiltersToggled;
 DataViewsSubComponents.FiltersToggle = FiltersToggle;
