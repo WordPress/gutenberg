@@ -190,50 +190,22 @@ export async function convertImageFormat(
 			}
 		};
 
-		const saveOptions: SaveOptions< typeof outputType > = {
-			// Strip metadata except ICC color profiles,
-			// matching WordPress core's behavior. The `image_strip_meta`
-			// filter can disable stripping entirely.
-			keep: stripMeta ? 'icc' : 'all',
-		};
+		// Only AVIF carries a source bit depth worth preserving, and the
+		// `image_max_bit_depth` filter can cap it.
+		const sourceBitdepth =
+			'image/avif' === outputType ? getSourceBitdepth( image ) : 8;
 
-		if ( supportsQuality( outputType ) ) {
-			saveOptions.Q = quality * 100;
-		}
-
-		if ( interlaced && supportsInterlace( outputType ) ) {
-			saveOptions.interlace = interlaced;
-		}
-
-		// Keep indexed sources indexed. libvips decodes a palette image into
-		// RGB(A) pixels, so without this a compressed or converted PNG is
-		// written as truecolour and can grow several times larger than the
-		// indexed original.
-		// See https://core.trac.wordpress.org/ticket/65922.
-		if ( 'image/png' === outputType && isPaletteImage( image ) ) {
-			saveOptions.palette = true;
-		}
-
-		// See https://github.com/swissspidy/media-experiments/issues/324.
-		if ( 'image/avif' === outputType ) {
-			saveOptions.effort = 2;
-
-			// Preserve the source bit depth so high-bit-depth (10/12-bit) HDR
-			// images stay high-bit-depth when compressed or converted to AVIF
-			// instead of being flattened to 8-bit. Unlike resizing, this path
-			// keeps the decoded 16-bit image, so no extra handling is needed.
-			// The `image_max_bit_depth` filter can cap the output depth; the
-			// depth is set explicitly whenever the source is high-bit-depth,
-			// since heifsave would otherwise default to 12-bit for 16-bit
-			// pixel data.
-			const sourceBitdepth = getSourceBitdepth( image );
-			if ( sourceBitdepth > 8 ) {
-				saveOptions.bitdepth = resolveSaveBitdepth(
-					sourceBitdepth,
-					maxBitdepth
-				);
-			}
-		}
+		const saveOptions = buildSaveOptions( {
+			type: outputType,
+			quality,
+			bitdepth:
+				sourceBitdepth > 8
+					? resolveSaveBitdepth( sourceBitdepth, maxBitdepth )
+					: undefined,
+			stripMeta,
+			isPalette: isPaletteImage( image ),
+			interlaced,
+		} );
 
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 		const result = outBuffer.buffer;
@@ -474,29 +446,32 @@ function resolveSaveBitdepth(
 /**
  * Builds save options for writing an image to a buffer.
  *
- * @param options           Save option inputs.
- * @param options.type      Output mime type.
- * @param options.quality   Desired quality (0-1).
- * @param options.bitdepth  Save bit depth; values above 8 are preserved for
- *                          AVIF.
- * @param options.stripMeta Whether to strip metadata (except color
- *                          profiles), from the `image_strip_meta` filter.
- * @param options.isPalette Whether the source image was indexed (palette)
- *                          encoded.
+ * @param options            Save option inputs.
+ * @param options.type       Output mime type.
+ * @param options.quality    Desired quality (0-1).
+ * @param options.bitdepth   Save bit depth; values above 8 are preserved for
+ *                           AVIF.
+ * @param options.stripMeta  Whether to strip metadata (except color
+ *                           profiles), from the `image_strip_meta` filter.
+ * @param options.isPalette  Whether the source image was indexed (palette)
+ *                           encoded.
+ * @param options.interlaced
  * @return Save options object.
  */
 function buildSaveOptions( {
 	type,
 	quality,
-	bitdepth = 8,
+	bitdepth,
 	stripMeta = true,
 	isPalette = false,
+	interlaced = false,
 }: {
 	type: string;
 	quality: number;
 	bitdepth?: number;
 	stripMeta?: boolean;
 	isPalette?: boolean;
+	interlaced?: boolean;
 } ): SaveOptions< string > {
 	const saveOptions: SaveOptions< typeof type > = {
 		// Strip metadata except ICC color profiles or gainmaps,
@@ -507,6 +482,13 @@ function buildSaveOptions( {
 
 	if ( supportsQuality( type ) ) {
 		saveOptions.Q = quality * 100;
+	}
+
+	// Core applies the `image_save_progressive` filter in the image editor's
+	// `_save()`, which every write goes through, so it does not depend on the
+	// operation that produced the image.
+	if ( interlaced && supportsInterlace( type ) ) {
+		saveOptions.interlace = interlaced;
 	}
 
 	// Keep indexed sources indexed. libvips decodes a palette PNG into RGB(A)
@@ -521,9 +503,10 @@ function buildSaveOptions( {
 	if ( 'image/avif' === type ) {
 		saveOptions.effort = 2;
 
-		// Preserve the source bit depth so high-bit-depth (10/12-bit) HDR
-		// images are not flattened to 8-bit on output.
-		if ( bitdepth > 8 ) {
+		// Set for high-bit-depth sources so the output depth is the resolved
+		// one, since heifsave would otherwise default to 12-bit for 16-bit
+		// pixel data and ignore the `image_max_bit_depth` cap.
+		if ( undefined !== bitdepth ) {
 			saveOptions.bitdepth = bitdepth;
 		}
 	}
@@ -634,6 +617,7 @@ export async function resizeImage(
 		quality = 0.82,
 		stripMeta = true,
 		maxBitdepth = 16,
+		interlaced = false,
 	} = options;
 	const ext = type.split( '/' )[ 1 ];
 
@@ -698,9 +682,10 @@ export async function resizeImage(
 		const saveOptions = buildSaveOptions( {
 			type,
 			quality,
-			bitdepth: saveBitdepth,
+			bitdepth: isHighBitDepth ? saveBitdepth : undefined,
 			stripMeta,
 			isPalette: isPaletteImage( sourceImage ),
+			interlaced,
 		} );
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
@@ -798,18 +783,26 @@ export async function getUltraHdrInfo(
  * @param buffer      Original file buffer.
  * @param type        Mime type.
  * @param orientation EXIF orientation value (1-8).
+ * @param options     Save options for the rotated file.
  * @return Rotated file data plus the new dimensions.
  */
 export async function rotateImage(
 	id: ItemId,
 	buffer: ArrayBuffer,
 	type: string,
-	orientation: number
+	orientation: number,
+	options: ConvertImageOptions = {}
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
 	height: number;
 } > {
+	const {
+		quality = 0.82,
+		interlaced = false,
+		stripMeta = true,
+		maxBitdepth = 16,
+	} = options;
 	const ext = type.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
@@ -883,15 +876,20 @@ export async function rotateImage(
 		// second time.
 		image.remove( 'orientation' );
 
-		const saveOptions: SaveOptions< typeof type > = {};
+		const sourceBitdepth =
+			'image/avif' === type ? getSourceBitdepth( image ) : 8;
 
-		// Keep indexed sources indexed, as the resize and convert paths do.
-		// Rotating writes the full-size file, so losing the palette here
-		// inflates the image the user actually uploaded.
-		// See https://github.com/WordPress/gutenberg/issues/81895.
-		if ( 'image/png' === type && isPalette ) {
-			saveOptions.palette = true;
-		}
+		const saveOptions = buildSaveOptions( {
+			type,
+			quality,
+			bitdepth:
+				sourceBitdepth > 8
+					? resolveSaveBitdepth( sourceBitdepth, maxBitdepth )
+					: undefined,
+			stripMeta,
+			isPalette,
+			interlaced,
+		} );
 
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 

@@ -436,6 +436,48 @@ describe( 'resizeImage', () => {
 		} );
 	} );
 
+	describe( 'image_save_progressive', () => {
+		it( 'writes a progressive JPEG when interlacing is requested', async () => {
+			const file = new File( [ '<BLOB>' ], 'example.jpeg', {
+				type: 'image/jpeg',
+			} );
+
+			await resizeImage(
+				'itemId',
+				await file.arrayBuffer(),
+				'image/jpeg',
+				{ width: 50, height: 50 },
+				{ interlaced: true }
+			);
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.objectContaining( { interlace: true } )
+			);
+		} );
+
+		it( 'writes a baseline JPEG otherwise', async () => {
+			const file = new File( [ '<BLOB>' ], 'example.jpeg', {
+				type: 'image/jpeg',
+			} );
+
+			await resizeImage(
+				'itemId',
+				await file.arrayBuffer(),
+				'image/jpeg',
+				{
+					width: 50,
+					height: 50,
+				}
+			);
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.not.objectContaining( { interlace: expect.anything() } )
+			);
+		} );
+	} );
+
 	describe( 'image_max_bit_depth', () => {
 		it( 'caps a 12-bit AVIF at 10-bit', async () => {
 			mockState.bitdepth = 12;

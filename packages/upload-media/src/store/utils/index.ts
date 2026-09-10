@@ -57,6 +57,10 @@ interface VipsResizeOptions {
 	 * Maximum output bit depth.
 	 */
 	maxBitdepth?: number;
+	/**
+	 * Whether to use interlaced/progressive mode.
+	 */
+	interlaced?: boolean;
 }
 
 /**
@@ -211,6 +215,7 @@ export async function vipsResizeImage(
 		quality,
 		stripMeta,
 		maxBitdepth,
+		interlaced,
 	} = options;
 
 	if ( signal?.aborted ) {
@@ -224,6 +229,7 @@ export async function vipsResizeImage(
 			quality,
 			stripMeta,
 			maxBitdepth,
+			interlaced,
 		} );
 
 	let fileName = file.name;
@@ -272,13 +278,15 @@ export async function vipsResizeImage(
  * @param file        File object.
  * @param orientation EXIF orientation value (1-8).
  * @param signal      Optional abort signal to cancel the operation.
+ * @param options     Save options for the rotated file.
  * @return Rotated ImageFile with updated dimensions.
  */
 export async function vipsRotateImage(
 	id: QueueItemId,
 	file: File,
 	orientation: number,
-	signal?: AbortSignal
+	signal?: AbortSignal,
+	options: VipsConvertOptions = {}
 ) {
 	if ( signal?.aborted ) {
 		throw new Error( 'Operation aborted' );
@@ -294,7 +302,8 @@ export async function vipsRotateImage(
 		id,
 		await file.arrayBuffer(),
 		file.type,
-		orientation
+		orientation,
+		options
 	);
 
 	// Add '-rotated' suffix to filename, matching WordPress core behavior.
