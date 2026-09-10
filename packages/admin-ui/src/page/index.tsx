@@ -4,6 +4,8 @@ import Header from './header';
 import type { PageComponents } from './types';
 import NavigableRegion from '../navigable-region';
 import { SidebarToggleFill } from './sidebar-toggle-slot';
+import { FullBleed } from './full-bleed';
+import { Narrow } from './narrow';
 import styles from './style.module.css';
 
 function Page( {
@@ -97,5 +99,7 @@ function Page( {
 }
 
 Page.SidebarToggleFill = SidebarToggleFill;
+Page.FullBleed = FullBleed;
+Page.Narrow = Narrow;
 
 export default Page;
