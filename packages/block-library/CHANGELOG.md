@@ -10,6 +10,7 @@
 -   Query Pagination: Remove the editor-only `margin: 0` override on the block wrapper so the parent layout's block gap applies in the canvas as it does on the front end ([#82399](https://github.com/WordPress/gutenberg/pull/82399)).
 -   Navigation: Reset the submenu detection for each rendered block. Once a Navigation with a submenu rendered, every Navigation rendered afterwards in the same request was treated as having one and loaded the navigation view module it does not need ([#82366](https://github.com/WordPress/gutenberg/pull/82366)).
 -   Gallery: Skip the generated gap styles, and the unique classname that scopes them, for themes opting out of layout styles via `add_theme_support( 'disable-layout-styles' )` ([#81633](https://github.com/WordPress/gutenberg/pull/81633)).
+-   Term Name: Apply the term name display filters when rendering, so adjustments plugins make to term names take effect and the name is escaped in the heading and link markup ([#82365](https://github.com/WordPress/gutenberg/pull/82365)).
 
 ### Internal
 
@@ -37,7 +38,6 @@
 -   Tabs: Activate the tab that a URL hash points into, so an anchor set on a block inside a tab panel can be reached. Anchor links followed after the page has loaded are handled too, matching the Accordion block ([#81744](https://github.com/WordPress/gutenberg/pull/81744)).
 -   Accordion Panel: Reset padding-block when panel is hidden ([#81782](https://github.com/WordPress/gutenberg/pull/81782)).
 -   Query: Stop writing `excludeCurrent: null` into the `query` attribute of blocks that never had the key. The mount effect that clears a stale exclusion treated the absent key as stale, changing the serialized markup of every pre-existing Query block as soon as the editor opened it ([#82147](https://github.com/WordPress/gutenberg/pull/82147)).
--   Term Name: Apply the term name display filters when rendering, so adjustments plugins make to term names take effect and the name is escaped in the heading and link markup ([#82365](https://github.com/WordPress/gutenberg/pull/82365)).
 -   Icon: Preserve intrinsic SVG styles when applying block styles or rotation, and keep stroke widths scaling with the block's size for compatibility ([#78808](https://github.com/WordPress/gutenberg/pull/78808)).
 -   Image: Keep the selected image size, and re-point a media file or attachment page link, when an edit in the media editor saves to a new attachment. Cropping, rotating or flipping left the block rendering the full-size file while the size control still reported the size the user had chosen, and left the link pointing at the pre-edit image ([#82316](https://github.com/WordPress/gutenberg/pull/82316)).
 -   Query, Post Template: Treat a `query` attribute that omits `postType` as querying posts, matching `build_query_vars_from_query_block()` ([#82465](https://github.com/WordPress/gutenberg/pull/82465)).
