@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Run rendered Theme tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
 ## 2.1.0 (2026-09-10)
 
 ### New Features
@@ -24,7 +28,6 @@
 
 ### Internal
 
--   Run rendered Theme tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
 -   Update type-checking for script files to enforce NodeNext module resolution ([#82622](https://github.com/WordPress/gutenberg/pull/82622)).
 -   Remove `esbuild-esm-loader` dependency in favor of Node.js TypeScript native type-stripping ([#82680](https://github.com/WordPress/gutenberg/pull/82680)).
 -   Migrate design token modes to the DTCG resolver and Terrazzo CSS permutations. ([#82537](https://github.com/WordPress/gutenberg/pull/82537))

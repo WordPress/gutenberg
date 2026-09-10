@@ -14,6 +14,10 @@
 
 -   `formatIndent`, `formatIndentRTL`, `formatOutdent` and `formatOutdentRTL`: correct the arrow geometry, which was malformed in the previous drawings. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
 
+### Internal
+
+-   Run rendered icon tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
 ## 16.0.0 (2026-09-10)
 
 ### Breaking Changes
@@ -30,10 +34,6 @@
 ### Bug Fixes
 
 -   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
-
-### Internal
-
--   Run rendered icon tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
 
 ## 15.5.0 (2026-08-26)
 

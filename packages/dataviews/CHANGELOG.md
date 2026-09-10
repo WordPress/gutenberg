@@ -6,6 +6,10 @@
 
 -   Grid layout: when the title is hidden (`showTitle: false`) and items are clickable, label each item's clickable media area with its title instead of the generic "Navigate to item" ([#82639](https://github.com/WordPress/gutenberg/pull/82639)).
 
+### Internal
+
+-   Run rendered DataViews tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
 ## 19.0.0 (2026-09-10)
 
 ### Breaking Changes
@@ -64,7 +68,6 @@
 
 ### Internal
 
--   Run rendered DataViews tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
 -   Declare the dependencies imported by the `./wp` bundle (`build-wp/index.js`) so they resolve without relying on hoisting. ([#81843](https://github.com/WordPress/gutenberg/pull/81843))
 -   DataViews: Use `Menu.PrefixIcon` for table column menu icons. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
 -   DataForm date control: Space `ValidityIndicator` with `Stack` now that the indicator has no outer margin. ([#82267](https://github.com/WordPress/gutenberg/pull/82267))
