@@ -1,5 +1,45 @@
 import { describe, expect, it } from 'vitest';
-import { getWidthClasses, isPercentageWidth } from '../utils';
+import { getSafeButtonUrl, getWidthClasses, isPercentageWidth } from '../utils';
+
+describe( 'getSafeButtonUrl', () => {
+	it( 'should return null for an empty or non-string url', () => {
+		expect( getSafeButtonUrl( undefined ) ).toBeNull();
+		expect( getSafeButtonUrl( null ) ).toBeNull();
+		expect( getSafeButtonUrl( '' ) ).toBeNull();
+		expect( getSafeButtonUrl( 123 ) ).toBeNull();
+	} );
+
+	it( 'should return the url unchanged for an allowed protocol', () => {
+		expect( getSafeButtonUrl( 'https://wordpress.org' ) ).toBe(
+			'https://wordpress.org'
+		);
+		expect( getSafeButtonUrl( 'http://wordpress.org' ) ).toBe(
+			'http://wordpress.org'
+		);
+		expect( getSafeButtonUrl( 'mailto:test@example.com' ) ).toBe(
+			'mailto:test@example.com'
+		);
+		expect( getSafeButtonUrl( 'tel:012345678' ) ).toBe( 'tel:012345678' );
+	} );
+
+	it( 'should return a relative url unchanged', () => {
+		expect( getSafeButtonUrl( '/handbook' ) ).toBe( '/handbook' );
+		expect( getSafeButtonUrl( '#section' ) ).toBe( '#section' );
+	} );
+
+	it( 'should reject a javascript: url', () => {
+		expect( getSafeButtonUrl( 'javascript:alert(1)' ) ).toBeNull();
+	} );
+
+	it( 'should reject a javascript: url disguised with a leading or embedded control character', () => {
+		// Browsers strip ASCII tab/newline and leading C0 control chars or
+		// spaces before resolving a URL's scheme, so these still execute as
+		// `javascript:` even though the raw string doesn't start with it.
+		expect( getSafeButtonUrl( '\tjavascript:alert(1)' ) ).toBeNull();
+		expect( getSafeButtonUrl( ' javascript:alert(1)' ) ).toBeNull();
+		expect( getSafeButtonUrl( 'java\tscript:alert(1)' ) ).toBeNull();
+	} );
+} );
 
 describe( 'isPercentageWidth', () => {
 	it( 'should return true for percentage values', () => {
