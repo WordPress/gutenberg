@@ -64,6 +64,10 @@ const MyCheckboxControl = () => {
 };
 ```
 
+### Refs
+
+The component forwards its `ref` to the underlying `HTMLInputElement`, allowing consumers to focus the checkbox programmatically.
+
 ### Props
 
 The set of props accepted by the component will be specified below.

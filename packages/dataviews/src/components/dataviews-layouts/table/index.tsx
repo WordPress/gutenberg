@@ -271,7 +271,7 @@ function ViewTable< Item >( {
 	className,
 	empty,
 }: ViewTableProps< Item > ) {
-	const { containerRef, bulkActionsInLayout } =
+	const { containerRef, isDefaultUI, tableHeaderRef, tableSelectionRef } =
 		useContext( DataViewsContext );
 	const isDelayedLoading = useDelayedLoading( isLoading );
 	const groupField = view.groupBy?.field
@@ -318,7 +318,7 @@ function ViewTable< Item >( {
 
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const disableHeaderControls =
-		!! bulkActionsInLayout && hasBulkActions && selection.length > 0;
+		!! isDefaultUI && hasBulkActions && selection.length > 0;
 
 	if ( nextHeaderMenuToFocus ) {
 		// If we need to force focus, we short-circuit rendering here
@@ -468,6 +468,7 @@ function ViewTable< Item >( {
 					</Popover>
 				) }
 				<thead
+					ref={ isDefaultUI ? tableHeaderRef : undefined }
 					className={ clsx( {
 						'dataviews-view-table__thead--stuck':
 							isVerticallyScrolled,
@@ -490,6 +491,11 @@ function ViewTable< Item >( {
 									}
 								>
 									<BulkSelectionCheckbox
+										inputRef={
+											isDefaultUI
+												? tableSelectionRef
+												: undefined
+										}
 										selection={ selection }
 										onChangeSelection={ onChangeSelection }
 										data={ data }
