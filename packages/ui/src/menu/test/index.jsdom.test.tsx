@@ -1,3 +1,11 @@
+import {
+	afterEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type MockedFunction,
+} from 'vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useFocusReturn } from '@wordpress/compose';
@@ -13,13 +21,15 @@ import type { ReactNode } from 'react';
 import * as Menu from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
 
-jest.mock( '@wordpress/i18n', () => ( {
-	...jest.requireActual( '@wordpress/i18n' ),
-	isRTL: jest.fn( () => false ),
+vi.mock( import( '@wordpress/i18n' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	isRTL: vi.fn( () => false ),
 } ) );
 
-const mockedIsRTL = isRTL as jest.MockedFunction< typeof isRTL >;
+const mockedIsRTL = isRTL as MockedFunction< typeof isRTL >;
 
+globalThis.wpVitest.mockPointerEvent();
+globalThis.wpVitest.mockScrollIntoView();
 afterEach( () => {
 	mockedIsRTL.mockClear();
 	mockedIsRTL.mockReturnValue( false );
@@ -99,7 +109,10 @@ describe( 'Menu', () => {
 		expect( icon ).toHaveAttribute( 'viewBox', '0 0 24 24' );
 		expect( icon ).toHaveAttribute( 'stroke', 'currentColor' );
 		expect( icon ).toHaveClass( 'custom-icon' );
-		expect( icon ).toHaveStyle( { fill: 'none', opacity: '0.5' } );
+		// eslint-disable-next-line jest-dom/prefer-to-have-attribute
+		expect( icon.getAttribute( 'style' ) ).toContain( 'fill: none;' );
+		// eslint-disable-next-line jest-dom/prefer-to-have-attribute
+		expect( icon.getAttribute( 'style' ) ).toContain( 'opacity: 0.5;' );
 	} );
 
 	it( 'keeps prefix icons hidden from assistive technology', async () => {
@@ -260,7 +273,7 @@ describe( 'Menu', () => {
 
 	it( 'closes a non-modal menu without consuming an iframe pointer interaction', async () => {
 		const user = userEvent.setup();
-		const onCanvasClick = jest.fn();
+		const onCanvasClick = vi.fn();
 
 		function ControlledMenuWithIframes() {
 			const [ open, setOpen ] = useState( false );
@@ -349,7 +362,7 @@ describe( 'Menu', () => {
 			throw new Error( 'Expected a nested same-origin iframe document.' );
 		}
 
-		const nestedAddEventListener = jest.spyOn(
+		const nestedAddEventListener = vi.spyOn(
 			nestedDocument,
 			'addEventListener'
 		);
@@ -381,10 +394,7 @@ describe( 'Menu', () => {
 		if ( ! iframeDocument ) {
 			throw new Error( 'Expected a same-origin iframe document.' );
 		}
-		const addEventListener = jest.spyOn(
-			iframeDocument,
-			'addEventListener'
-		);
+		const addEventListener = vi.spyOn( iframeDocument, 'addEventListener' );
 
 		try {
 			const outsideTarget = iframeDocument.createElement( 'button' );
@@ -512,19 +522,19 @@ describe( 'Menu', () => {
 			configurable: true,
 			get: () => iframeDocument,
 		} );
-		const firstAddEventListener = jest.spyOn(
+		const firstAddEventListener = vi.spyOn(
 			firstDocument,
 			'addEventListener'
 		);
-		const firstRemoveEventListener = jest.spyOn(
+		const firstRemoveEventListener = vi.spyOn(
 			firstDocument,
 			'removeEventListener'
 		);
-		const reloadedAddEventListener = jest.spyOn(
+		const reloadedAddEventListener = vi.spyOn(
 			reloadedDocument,
 			'addEventListener'
 		);
-		const reloadedRemoveEventListener = jest.spyOn(
+		const reloadedRemoveEventListener = vi.spyOn(
 			reloadedDocument,
 			'removeEventListener'
 		);
@@ -562,11 +572,24 @@ describe( 'Menu', () => {
 			expect.any( Function ),
 			true
 		);
+		reloadedAddEventListener.mockClear();
+		reloadedRemoveEventListener.mockClear();
 
 		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
 		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+		await waitFor( () => {
+			expect( reloadedAddEventListener ).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any( Function ),
+				true
+			);
+		} );
 		unmount();
-		expect( reloadedRemoveEventListener ).toHaveBeenCalledTimes( 2 );
+		expect( reloadedRemoveEventListener ).toHaveBeenCalledWith(
+			'pointerdown',
+			expect.any( Function ),
+			true
+		);
 	} );
 
 	it( 'moves the listener when an iframe remounts while the menu is open', async () => {
@@ -595,13 +618,24 @@ describe( 'Menu', () => {
 			configurable: true,
 			get: () => firstDocument,
 		} );
-		const firstRemoveEventListener = jest.spyOn(
+		const firstAddEventListener = vi.spyOn(
+			firstDocument,
+			'addEventListener'
+		);
+		const firstRemoveEventListener = vi.spyOn(
 			firstDocument,
 			'removeEventListener'
 		);
 
 		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
 		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+		await waitFor( () => {
+			expect( firstAddEventListener ).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any( Function ),
+				true
+			);
+		} );
 
 		rerender( <MenuWithIframe iframeKey="second" /> );
 		await waitFor( () => {
@@ -828,8 +862,8 @@ describe( 'Menu', () => {
 
 	it( 'renders checkbox and radio item roles', async () => {
 		const user = userEvent.setup();
-		const onCheckedChange = jest.fn();
-		const onValueChange = jest.fn();
+		const onCheckedChange = vi.fn();
+		const onValueChange = vi.fn();
 
 		render(
 			<Menu.Root>
@@ -908,6 +942,68 @@ describe( 'Menu', () => {
 
 		expect( item ).toHaveAccessibleDescription( 'Create a separate copy.' );
 		expect( screen.getByText( 'separate' ).tagName ).toBe( 'STRONG' );
+	} );
+
+	it( 'throws when ItemDescription is outside a menu item', () => {
+		expect( () =>
+			render( <Menu.ItemDescription>Description</Menu.ItemDescription> )
+		).toThrow(
+			'Menu.ItemDescription: Missing direct menu item parent. Render <Menu.ItemDescription> as a direct child of a menu item.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
+	it( 'throws when ItemDescription is nested inside a menu item', () => {
+		expect( () =>
+			render(
+				<Menu.Root defaultOpen>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>
+								Duplicate
+								<Menu.ItemDescription>
+									Description
+								</Menu.ItemDescription>
+							</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			)
+		).toThrow(
+			'Menu.ItemDescription: Missing direct menu item parent. Render <Menu.ItemDescription> as a direct child of a menu item.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
+	it( 'throws when a nested ItemDescription reuses a direct sibling ID', () => {
+		function MenuWithDuplicateDescriptionId() {
+			const descriptionId = useId();
+
+			return (
+				<Menu.Root defaultOpen>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>
+								Duplicate
+								<Menu.ItemDescription id={ descriptionId }>
+									Nested description
+								</Menu.ItemDescription>
+							</Menu.ItemLabel>
+							<Menu.ItemDescription id={ descriptionId }>
+								Direct description
+							</Menu.ItemDescription>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			);
+		}
+
+		expect( () => render( <MenuWithDuplicateDescriptionId /> ) ).toThrow(
+			'Menu.ItemDescription: Missing direct menu item parent. Render <Menu.ItemDescription> as a direct child of a menu item.'
+		);
+		expect( console ).toHaveErrored();
 	} );
 
 	it( 'combines multiple item descriptions in DOM order', async () => {

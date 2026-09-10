@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, jest } from '@jest/globals';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ProviderCreator } from '../../types';
 
 type ProvidersModule = typeof import('../index');
@@ -6,36 +6,31 @@ type ApplyFilters = ( hookName: string, defaultValue: unknown ) => unknown;
 
 function createMockProviderCreator(): ProviderCreator {
 	return async () => ( {
-		destroy: jest.fn(),
-		on: jest.fn(),
+		destroy: vi.fn(),
+		on: vi.fn(),
 	} );
 }
 
-function loadProviders(
+async function loadProviders(
 	filter: ( providers: ProviderCreator[] ) => unknown = ( providers ) =>
 		providers
-): {
-	module: ProvidersModule;
-	applyFilters: jest.MockedFunction< ApplyFilters >;
-	createHttpPollingProvider: jest.MockedFunction< () => ProviderCreator >;
-	pollingProvider: ProviderCreator;
-} {
-	jest.resetModules();
+) {
+	vi.resetModules();
 
-	const applyFilters = jest.fn(
+	const applyFilters = vi.fn< ApplyFilters >(
 		( _hookName: string, defaultValue: unknown ) =>
 			filter( defaultValue as ProviderCreator[] )
 	);
 	const pollingProvider = createMockProviderCreator();
-	const createHttpPollingProvider = jest.fn( () => pollingProvider );
+	const createHttpPollingProvider = vi.fn( () => pollingProvider );
 
-	jest.doMock( '@wordpress/hooks', () => ( { applyFilters } ) );
-	jest.doMock( '../http-polling/http-polling-provider', () => ( {
+	vi.doMock( '@wordpress/hooks', () => ( { applyFilters } ) );
+	vi.doMock( '../http-polling/http-polling-provider', () => ( {
 		createHttpPollingProvider,
 	} ) );
 
 	return {
-		module: require( '../index' ) as ProvidersModule,
+		module: ( await import( '../index' ) ) as ProvidersModule,
 		applyFilters,
 		createHttpPollingProvider,
 		pollingProvider,
@@ -45,26 +40,26 @@ function loadProviders(
 describe( 'sync providers', () => {
 	afterEach( () => {
 		delete window.__experimentalEnableRealTimeCollaboration;
-		jest.dontMock( '@wordpress/hooks' );
-		jest.dontMock( '../http-polling/http-polling-provider' );
-		jest.resetModules();
+		vi.doUnmock( '@wordpress/hooks' );
+		vi.doUnmock( '../http-polling/http-polling-provider' );
+		vi.resetModules();
 	} );
 
-	it( 'does not provide HTTP polling by default', () => {
-		const { module, createHttpPollingProvider } = loadProviders();
+	it( 'does not provide HTTP polling by default', async () => {
+		const { module, createHttpPollingProvider } = await loadProviders();
 
 		expect( module.getDefaultProviderCreators() ).toEqual( [] );
 		expect( createHttpPollingProvider ).not.toHaveBeenCalled();
 	} );
 
-	it( 'provides HTTP polling when collaboration is enabled', () => {
+	it( 'provides HTTP polling when collaboration is enabled', async () => {
 		window.__experimentalEnableRealTimeCollaboration = true;
 		const {
 			module,
 			applyFilters,
 			createHttpPollingProvider,
 			pollingProvider,
-		} = loadProviders();
+		} = await loadProviders();
 
 		expect( module.getProviderCreators() ).toEqual( [ pollingProvider ] );
 		expect( createHttpPollingProvider ).toHaveBeenCalledTimes( 1 );
@@ -73,12 +68,12 @@ describe( 'sync providers', () => {
 		] );
 	} );
 
-	it( 'allows filters to replace the polling provider', () => {
+	it( 'allows filters to replace the polling provider', async () => {
 		window.__experimentalEnableRealTimeCollaboration = true;
 		const customProvider = createMockProviderCreator();
-		const { module, applyFilters, pollingProvider } = loadProviders( () => [
-			customProvider,
-		] );
+		const { module, applyFilters, pollingProvider } = await loadProviders(
+			() => [ customProvider ]
+		);
 
 		expect( module.getProviderCreators() ).toEqual( [ customProvider ] );
 		expect( applyFilters ).toHaveBeenCalledWith( 'sync.providers', [

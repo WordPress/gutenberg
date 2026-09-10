@@ -31,6 +31,7 @@ function gutenberg_register_typography_support( $block_type ) {
 	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
 	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
 	$has_text_indent_support     = $typography_supports['textIndent'] ?? false;
+	$has_text_shadow_support     = $typography_supports['textShadow'] ?? false;
 	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
 
 	$has_typography_support = $has_font_family_support
@@ -44,6 +45,7 @@ function gutenberg_register_typography_support( $block_type ) {
 		|| $has_text_decoration_support
 		|| $has_text_transform_support
 		|| $has_text_indent_support
+		|| $has_text_shadow_support
 		|| $has_writing_mode_support;
 
 	if ( ! $block_type->attributes ) {
@@ -67,6 +69,12 @@ function gutenberg_register_typography_support( $block_type ) {
 			'type' => 'string',
 		);
 	}
+
+	if ( $has_text_shadow_support && ! array_key_exists( 'textShadow', $block_type->attributes ) ) {
+		$block_type->attributes['textShadow'] = array(
+			'type' => 'string',
+		);
+	}
 }
 
 /**
@@ -74,8 +82,8 @@ function gutenberg_register_typography_support( $block_type ) {
  * to the incoming attributes array. This will be applied to the block markup in
  * the front-end.
  *
- * @param  WP_Block_Type $block_type       Block type.
- * @param  array         $block_attributes Block attributes.
+ * @param WP_Block_Type $block_type       Block type.
+ * @param array         $block_attributes Block attributes.
  *
  * @return array Typography CSS classes and inline styles.
  */
@@ -104,6 +112,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
 	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
 	$has_text_indent_support     = $typography_supports['textIndent'] ?? false;
+	$has_text_shadow_support     = $typography_supports['textShadow'] ?? false;
 	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
 
 	// Whether to skip individual block support features.
@@ -118,6 +127,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$should_skip_text_transform  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textTransform' );
 	$should_skip_letter_spacing  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'letterSpacing' );
 	$should_skip_text_indent     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textIndent' );
+	$should_skip_text_shadow     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textShadow' );
 	$should_skip_writing_mode    = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'writingMode' );
 
 	$typography_block_styles = array();
@@ -180,6 +190,12 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 
 	if ( $has_text_indent_support && ! $should_skip_text_indent && isset( $block_attributes['style']['typography']['textIndent'] ) ) {
 		$typography_block_styles['textIndent'] = $block_attributes['style']['typography']['textIndent'] ?? null;
+	}
+
+	if ( $has_text_shadow_support && ! $should_skip_text_shadow ) {
+		$preset_text_shadow                    = array_key_exists( 'textShadow', $block_attributes ) ? "var:preset|text-shadow|{$block_attributes['textShadow']}" : null;
+		$custom_text_shadow                    = $block_attributes['style']['typography']['textShadow'] ?? null;
+		$typography_block_styles['textShadow'] = $preset_text_shadow ? $preset_text_shadow : $custom_text_shadow;
 	}
 
 	$attributes = array();
@@ -247,9 +263,9 @@ function gutenberg_typography_get_preset_inline_style_value( $style_value, $css_
 /**
  * Renders typography styles/content to the block wrapper.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function gutenberg_render_typography_support( $block_content, $block ) {
 	if ( ! empty( $block['attrs']['fitText'] ) && $block['attrs']['fitText'] && ! is_admin() ) {
@@ -480,7 +496,7 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
  * @since 6.6.0 Deprecated bool argument $should_use_fluid_typography.
  * @since 6.7.0 Font size presets can enable fluid typography individually, even if it’s disabled globally.
  *
- * @param array $preset       {
+ * @param array      $preset   {
  *     Required. fontSizes preset value as seen in theme.json.
  *
  *     @type string           $name Name of the font size preset.

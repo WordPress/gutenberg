@@ -32,14 +32,6 @@ const authorField: Partial< Field< MediaItem > > = {
 		} ) );
 	},
 	render: AuthorView,
-	sort: ( a, b, direction ) => {
-		const nameA = a._embedded?.author?.[ 0 ]?.name || '';
-		const nameB = b._embedded?.author?.[ 0 ]?.name || '';
-
-		return direction === 'asc'
-			? nameA.localeCompare( nameB )
-			: nameB.localeCompare( nameA );
-	},
 	filterBy: {
 		operators: [ 'isAny', 'isNone' ],
 	},
