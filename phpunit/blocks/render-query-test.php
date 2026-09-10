@@ -329,7 +329,7 @@ HTML;
 
 		do_blocks( "<!-- wp:query $block_attributes --><div class=\"wp-block-query\"></div><!-- /wp:query -->" );
 
-		$this->assertTrue( wp_style_is( 'wp-block-query' ) );
+		$this->assertContains( 'wp-block-query', wp_styles()->queue );
 	}
 
 	/**
@@ -342,5 +342,59 @@ HTML;
 			'enhanced pagination disabled' => array( '{"queryId":0,"query":{"inherit":true}}' ),
 			'enhanced pagination enabled'  => array( '{"queryId":0,"query":{"inherit":true},"enhancedPagination":true}' ),
 		);
+	}
+
+	/**
+	 * Tests that the `theme.json` styles for the block are added to the global
+	 * styles once the block is rendered without enhanced pagination.
+	 */
+	public function test_rendering_query_without_enhanced_pagination_adds_theme_json_styles() {
+		add_filter( 'should_load_separate_core_block_assets', '__return_true' );
+
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array(
+							'core/query' => array(
+								'css' => 'background-color: hotpink',
+							),
+						),
+					),
+				)
+			);
+		};
+		add_filter( 'wp_theme_json_data_theme', $filter );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		try {
+			wp_register_style( 'wp-block-query', false );
+			wp_register_style( 'global-styles', false );
+
+			gutenberg_add_global_styles_for_blocks();
+			$this->assertNotContains(
+				':root :where(.wp-block-query){background-color: hotpink}',
+				$this->get_global_styles(),
+				'The block styles should not be added before the block is rendered.'
+			);
+
+			do_blocks( '<!-- wp:query {"queryId":0,"query":{"inherit":true}} --><div class="wp-block-query"></div><!-- /wp:query -->' );
+			gutenberg_add_global_styles_for_blocks();
+
+			$this->assertContains(
+				':root :where(.wp-block-query){background-color: hotpink}',
+				$this->get_global_styles(),
+				'The block styles should be added once the block is rendered.'
+			);
+		} finally {
+			remove_filter( 'wp_theme_json_data_theme', $filter );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
+	}
+
+	private function get_global_styles() {
+		$styles = wp_styles()->get_data( 'global-styles', 'after' );
+		return is_array( $styles ) ? $styles : array();
 	}
 }
