@@ -296,3 +296,33 @@ export const FullHeader: Story = {
 		children: <Text>Page content here</Text>,
 	},
 };
+
+/**
+ * `Page.Footer` anchors itself to the bottom of the page, spanning
+ * edge-to-edge and staying stuck to the bottom of the viewport while the
+ * page content scrolls.
+ */
+export const WithFooter: Story = {
+	decorators: [
+		( Story ) => (
+			<div style={ { height: '400px' } }>
+				<Story />
+			</div>
+		),
+	],
+	args: {
+		title: 'Page title',
+		showSidebarToggle: false,
+		hasPadding: true,
+		children: (
+			<>
+				{ Array.from( { length: 20 }, ( _, index ) => (
+					<Text key={ index }>Page content here</Text>
+				) ) }
+				<Page.Footer>
+					<Text>Footer content</Text>
+				</Page.Footer>
+			</>
+		),
+	},
+};
