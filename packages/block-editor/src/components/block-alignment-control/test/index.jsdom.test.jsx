@@ -124,11 +124,11 @@ describe( 'BlockAlignmentUI', () => {
  */
 const THEME_LAYOUT = { contentSize: '600px', wideSize: '1200px' };
 
-function renderWithTheme( ui, layout = THEME_LAYOUT ) {
+function renderWithTheme( ui, layout = THEME_LAYOUT, settings = {} ) {
 	return render(
 		<BlockEditorProvider
 			value={ [] }
-			settings={ { __experimentalFeatures: { layout } } }
+			settings={ { __experimentalFeatures: { layout }, ...settings } }
 		>
 			{ ui }
 		</BlockEditorProvider>
@@ -321,6 +321,61 @@ describe( 'BlockAlignmentUI when the theme withholds alignments', () => {
 		expect( menuItems() ).toEqual( [
 			'None',
 			'Full widthNot available',
+			'Align left',
+			'Align center',
+			'Align right',
+		] );
+	} );
+} );
+
+describe( 'BlockAlignmentUI on a theme without layout support', () => {
+	// Classic themes opt into wide alignments with `add_theme_support`, which
+	// arrives as the `alignWide` setting. There is no layout to withhold
+	// anything, so the menu either offers wide and full or leaves them out.
+	const controls = [ 'left', 'center', 'right', 'wide', 'full' ];
+	const onChange = vi.fn();
+
+	afterEach( () => {
+		onChange.mockClear();
+	} );
+
+	async function openMenuWithAlignWide( alignWide ) {
+		const user = userEvent.setup();
+		renderWithTheme(
+			<BlockAlignmentUI onChange={ onChange } controls={ controls } />,
+			undefined,
+			{ supportsLayout: false, alignWide }
+		);
+		await user.click(
+			screen.getByRole( 'button', { name: 'Align block' } )
+		);
+	}
+
+	function menuItems() {
+		return screen
+			.getAllByRole( 'menuitemradio' )
+			.map( ( item ) => item.textContent );
+	}
+
+	test( 'offers both when the theme supports wide alignments', async () => {
+		await openMenuWithAlignWide( true );
+
+		expect( screen.queryAllByText( 'Not available' ) ).toHaveLength( 0 );
+		expect( menuItems() ).toEqual( [
+			'None',
+			'Align left',
+			'Align center',
+			'Align right',
+			'Wide width',
+			'Full width',
+		] );
+	} );
+
+	test( 'hides both when the theme does not support wide alignments', async () => {
+		await openMenuWithAlignWide( false );
+
+		expect( menuItems() ).toEqual( [
+			'None',
 			'Align left',
 			'Align center',
 			'Align right',
