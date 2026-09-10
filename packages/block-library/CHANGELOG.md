@@ -22,6 +22,7 @@
 -   Navigation: Reset the submenu detection for each rendered block. Once a Navigation with a submenu rendered, every Navigation rendered afterwards in the same request was treated as having one and loaded the navigation view module it does not need ([#82366](https://github.com/WordPress/gutenberg/pull/82366)).
 -   Gallery: Skip the generated gap styles, and the unique classname that scopes them, for themes opting out of layout styles via `add_theme_support( 'disable-layout-styles' )` ([#81633](https://github.com/WordPress/gutenberg/pull/81633)).
 -   Term Name: Apply the term name display filters when rendering, so adjustments plugins make to term names take effect and the name is escaped in the heading and link markup ([#82365](https://github.com/WordPress/gutenberg/pull/82365)).
+-   Breadcrumbs, auto-registered PHP-only blocks: Don't pass `post_id` to the block-renderer endpoint when the current user can't edit the post referenced by the `postId` block context, which made the request fail with a 403 error; render without post context instead ([#80604](https://github.com/WordPress/gutenberg/pull/80604)).
 
 ### Internal
 
@@ -140,7 +141,6 @@
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
 -   Post Content: Restrict the wrapper tag to the supported values offered in the editor.
 -   Post Date: Escape date values and link URLs before rendering the block.
--   Breadcrumbs, auto-registered PHP-only blocks: Don't pass `post_id` to the block-renderer endpoint when the current user can't edit the post referenced by the `postId` block context, which made the request fail with a 403 error; render without post context instead ([#80604](https://github.com/WordPress/gutenberg/pull/80604)).
 
 ### Internal
 
