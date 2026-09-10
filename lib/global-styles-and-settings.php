@@ -131,6 +131,20 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 }
 
 /**
+ * Returns CSS media queries for responsive viewport style states.
+ *
+ * @param mixed $viewport_settings Viewport settings from theme.json.
+ * @param array $options           Options for generating media queries.
+ * @return array Responsive media queries.
+ */
+function gutenberg_get_viewport_media_queries( $viewport_settings = null, $options = array() ) {
+	return WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
+		$viewport_settings,
+		$options
+	);
+}
+
+/**
  * Gets the global styles custom css from theme.json.
  *
  * @deprecated Gutenberg 18.6.0 Use {@see 'gutenberg_get_global_stylesheet'} instead for top-level custom CSS, or {@see 'WP_Theme_JSON_Gutenberg::get_styles_for_block'} for block-level custom CSS.
