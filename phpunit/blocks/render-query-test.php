@@ -70,6 +70,7 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 		$wp_interactivity                = new WP_Interactivity_API();
 		$this->original_wp_styles        = $wp_styles;
 		$wp_styles                       = null;
+		wp_styles();
 	}
 
 	public function tear_down() {
