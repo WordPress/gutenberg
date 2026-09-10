@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import { ColorPicker } from '..';
@@ -695,8 +695,15 @@ describe( 'ColorPicker', () => {
 			) as HTMLElement;
 			expect( parseFloat( pointer.style.left ) ).toBeGreaterThan( 50 );
 
-			// Drag to the bottom of the saturation surface at 80% saturation.
-			await dragToBlack( interactive );
+			// Exact black is on the lower boundary, outside the native hit area.
+			// Supply that coordinate without movement to retain click-only coverage.
+			const bounds = interactive.getBoundingClientRect();
+			fireEvent.mouseDown( interactive, {
+				clientX: bounds.left + bounds.width * 0.8,
+				clientY: bounds.bottom,
+				buttons: 1,
+			} );
+			fireEvent.mouseUp( interactive );
 
 			expectPointerPosition( pointer, { top: 100 } );
 			// Lossy HSVA→HSLA→HSVA sync would snap left to 0%.

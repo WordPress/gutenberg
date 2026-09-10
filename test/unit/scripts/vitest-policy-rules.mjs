@@ -2305,22 +2305,43 @@ export function validateVitestPolicy( {
 			);
 		}
 
-		if (
-			project === 'jsdom' &&
-			! typeOnlyNodes.has( node ) &&
-			( ( node.type === 'Identifier' &&
-				browserApiIdentifiers.has( node.name ) &&
-				unboundIdentifiers.has( node ) ) ||
-				( node.type === 'MemberExpression' &&
-					browserApiProperties.has( getMemberPropertyName( node ) ) &&
+		if ( project === 'jsdom' && ! typeOnlyNodes.has( node ) ) {
+			const isVitestMock =
+				node.type === 'CallExpression' &&
+				node.callee?.type === 'MemberExpression' &&
+				isImportedApiReference(
+					node.callee.object,
+					'vi',
+					vitestViVariables,
+					vitestNamespaceVariables,
+					identifierVariables
+				);
+			const mockMethod =
+				isVitestMock && getMemberPropertyName( node.callee );
+			const apiName =
+				mockMethod === 'spyOn'
+					? getStaticStringValue( node.arguments[ 1 ] )
+					: getMemberPropertyName( node );
+			const apiTarget =
+				mockMethod === 'spyOn' ? node.arguments[ 0 ] : node.object;
+
+			if (
+				( node.type === 'Identifier' &&
+					browserApiIdentifiers.has( node.name ) &&
+					unboundIdentifiers.has( node ) ) ||
+				( mockMethod === 'stubGlobal' &&
+					browserApiProperties.has(
+						getStaticStringValue( node.arguments[ 0 ] )
+					) ) ||
+				( browserApiProperties.has( apiName ) &&
 					( isWindowReference(
-						node.object,
+						apiTarget,
 						unboundIdentifiers,
 						windowVariables,
 						identifierVariables
 					) ||
 						isBrowserGlobalExpression(
-							node.object,
+							apiTarget,
 							unboundIdentifiers,
 							domVariables,
 							domCollectionVariables,
@@ -2332,9 +2353,10 @@ export function validateVitestPolicy( {
 							testingLibraryCollectionFunctionVariables,
 							testingLibraryAsyncCollectionFunctionVariables,
 							testingLibraryNamespaceVariables
-						) ) ) )
-		) {
-			reportJsdomBrowserApi( node );
+						) ) )
+			) {
+				reportJsdomBrowserApi( node );
+			}
 		}
 
 		if (

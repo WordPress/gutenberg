@@ -37,11 +37,13 @@ When writing or migrating a test:
     structure, and deterministic DOM semantics, events, and state. Browser API
     exceptions require a concrete reason and must not remain after the
     exception is no longer needed.
+
     Prefer real browser behavior over an exception for component interaction
     and layout tests. Supplied rectangles, observer notifications, and timers
     can remain in JSDOM when they are deliberate inputs to algorithm or
     lifecycle tests. A browser API in test setup alone does not establish that
     the assertions need Browser Mode.
+
 -   Before running Browser Mode tests locally for the first time, install
     Chromium with
     `npm exec --no --workspace @wordpress/unit-tests -- playwright install chromium`.

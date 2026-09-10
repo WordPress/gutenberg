@@ -3,9 +3,14 @@ import { userEvent } from 'vitest/browser';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
-// Load the picker, buttons and portaled popover as a consumer does.
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '../../style.scss';
+import '../style.scss';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '../../button/style.scss';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '../../dropdown/style.scss';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '../../popover/style.scss';
 import CustomGradientPicker from '../';
 import CustomGradientBar from '../gradient-bar';
 import { KEYBOARD_CONTROL_POINT_VARIATION } from '../gradient-bar/constants';
