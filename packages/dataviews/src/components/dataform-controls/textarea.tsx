@@ -1,31 +1,23 @@
-/**
- * WordPress dependencies
- */
-import { privateApis } from '@wordpress/components';
+import { ValidatedTextareaControl } from '@wordpress/ui';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
-import { unlock } from '../../lock-unlock';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { ValidatedTextareaControl } = unlock( privateApis );
 
 export default function Textarea< Item >( {
 	data,
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	config,
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { rows = 4 } = config || {};
+	const disabled = field.isDisabled( { item: data, field } );
 	const { label, placeholder, description, setValue, isValid } = field;
 	const value = field.getValue( { item: data } );
 
-	const onChangeControl = useCallback(
+	const onValueChangeControl = useCallback(
 		( newValue: string ) =>
 			onChange( setValue( { item: data, value: newValue } ) ),
 		[ data, onChange, setValue ]
@@ -34,20 +26,26 @@ export default function Textarea< Item >( {
 	return (
 		<ValidatedTextareaControl
 			required={ !! isValid.required }
+			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
 			value={ value ?? '' }
-			help={ description }
-			onChange={ onChangeControl }
+			description={
+				typeof description === 'string' ? description : undefined
+			}
+			details={
+				typeof description === 'string' ? undefined : description
+			}
+			onValueChange={ onValueChangeControl }
 			rows={ rows }
+			disabled={ disabled }
 			minLength={
 				isValid.minLength ? isValid.minLength.constraint : undefined
 			}
 			maxLength={
 				isValid.maxLength ? isValid.maxLength.constraint : undefined
 			}
-			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
 		/>
 	);

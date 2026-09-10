@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import {
 	store as blocksStore,
@@ -10,11 +7,8 @@ import {
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { symbol } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /** @typedef {import('@wordpress/blocks').WPIcon} WPIcon */
 
@@ -37,7 +31,7 @@ import { store as blockEditorStore } from '../../store';
  * @param {Object} attributes Block attributes.
  * @return {string} The position type label.
  */
-function getPositionTypeLabel( attributes ) {
+export function getPositionTypeLabel( attributes ) {
 	const positionType = attributes?.style?.position?.type;
 
 	if ( positionType === 'sticky' ) {
@@ -72,11 +66,13 @@ export default function useBlockDisplayInformation( clientId ) {
 			if ( ! clientId ) {
 				return null;
 			}
+			const blockEditorSelect = select( blockEditorStore );
 			const {
 				getBlockName,
 				getBlockAttributes,
+				getBlock,
 				__experimentalGetParsedPattern,
-			} = select( blockEditorStore );
+			} = blockEditorSelect;
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const blockName = getBlockName( clientId );
@@ -85,16 +81,13 @@ export default function useBlockDisplayInformation( clientId ) {
 				return null;
 			}
 			const attributes = getBlockAttributes( clientId );
+			const { isSectionBlock } = unlock( blockEditorSelect );
 
 			// Check if this block is a pattern
 			const patternName = attributes?.metadata?.patternName;
 
-			if (
-				patternName &&
-				window?.__experimentalContentOnlyPatternInsertion
-			) {
+			if ( patternName && isSectionBlock( clientId ) ) {
 				const pattern = __experimentalGetParsedPattern( patternName );
-
 				const positionLabel = getPositionTypeLabel( attributes );
 				return {
 					isSynced: false,
@@ -109,7 +102,12 @@ export default function useBlockDisplayInformation( clientId ) {
 				};
 			}
 
-			const match = getActiveBlockVariation( blockName, attributes );
+			const match = getActiveBlockVariation(
+				blockName,
+				attributes,
+				undefined,
+				getBlock?.( clientId )?.innerContent
+			);
 			const isSynced =
 				isReusableBlock( blockType ) || isTemplatePart( blockType );
 			const syncedTitle = isSynced

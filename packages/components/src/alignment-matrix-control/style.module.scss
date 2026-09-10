@@ -15,7 +15,7 @@
 	border-radius: $radius-medium;
 	outline: none;
 
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 }
 
 .grid-row {

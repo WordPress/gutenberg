@@ -1,7 +1,6 @@
 @use "sass:math";
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/z-index" as *;
 @use "../utils/theme-variables" as *;
 
 $resize-handler-size: 15px;
@@ -15,7 +14,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 	height: $resize-handler-container-size;
 
 	// Elevate the resize handle above the focus style.
-	z-index: z-index(".components-resizable-box__handle");
+	z-index: 2;
 
 	// Show the resize handle if set in props
 	.components-resizable-box__container.has-show-handle & {
@@ -26,7 +25,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 		position: relative;
 		width: 100%;
 		height: 100%;
-		z-index: z-index(".components-resizable-box__handle");
+		z-index: 2;
 		outline: none;
 	}
 }
@@ -77,11 +76,11 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 
 // Show corner handles on top of side handles so they can be used
 .components-resizable-box__side-handle {
-	z-index: z-index(".components-resizable-box__side-handle");
+	z-index: 2;
 }
 
 .components-resizable-box__corner-handle {
-	z-index: z-index(".components-resizable-box__corner-handle");
+	z-index: 2;
 }
 
 // Make horizontal side-handles full width

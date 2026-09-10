@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode, ReactElement, ReactPortal } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { Children, isValidElement } from '@wordpress/element';
 
 /**

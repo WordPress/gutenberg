@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { type ComponentProps } from '../utils/types';
 
 export interface BadgeProps extends ComponentProps< 'span' > {

@@ -33,6 +33,10 @@ Private @wordpress/media-utils APIs.
 
 Undocumented declaration.
 
+### SubSizeData
+
+Undocumented declaration.
+
 ### transformAttachment
 
 Transforms an attachment object from the REST API shape into the shape expected by the block editor and other consumers.

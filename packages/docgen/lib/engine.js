@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const babel = require( '@babel/core' );
-
-/**
- * Internal dependencies
- */
 const getIntermediateRepresentation = require( './get-intermediate-representation' );
 
 const getAST = ( source, filename ) => {

@@ -21,7 +21,7 @@ export function getCompatibilityStyles() {
 				// May fail for external styles.
 				// eslint-disable-next-line no-unused-expressions
 				styleSheet.cssRules;
-			} catch ( e ) {
+			} catch {
 				return accumulator;
 			}
 

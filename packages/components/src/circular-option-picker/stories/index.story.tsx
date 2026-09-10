@@ -1,14 +1,5 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { createContext, useContext, useState } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import CircularOptionPicker from '..';
 
 const CircularOptionPickerStoryContext = createContext< {
@@ -21,13 +12,9 @@ const meta: Meta< typeof CircularOptionPicker > = {
 	id: 'components-circularoptionpicker',
 	component: CircularOptionPicker,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.Option': CircularOptionPicker.Option,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.OptionGroup': CircularOptionPicker.OptionGroup,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.ButtonAction': CircularOptionPicker.ButtonAction,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.DropdownLinkAction':
 			CircularOptionPicker.DropdownLinkAction,
 	},
@@ -41,6 +28,11 @@ const meta: Meta< typeof CircularOptionPicker > = {
 		docs: {
 			canvas: { sourceState: 'shown' },
 			source: { excludeDecorators: true },
+		},
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Mostly intended for internal use.',
 		},
 	},
 	decorators: [
@@ -115,10 +107,10 @@ Default.args = {
 	options: <DefaultOptions />,
 };
 
-export const AsButtons = Template.bind( {} );
-AsButtons.args = {
+export const AsToggleButtons = Template.bind( {} );
+AsToggleButtons.args = {
 	...Default.args,
-	asButtons: true,
+	presentation: 'toggle-buttons',
 };
 
 export const WithLoopingDisabled = Template.bind( {} );

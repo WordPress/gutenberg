@@ -1,0 +1,15 @@
+{
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
+	"styles": {
+		"blocks": {
+			"my-plugin/custom-block": {
+				":hover": {
+					"color": {
+						"text": "red"
+					}
+				}
+			}
+		}
+	}
+}

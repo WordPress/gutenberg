@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { cloneElement, forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Shortcut from '../shortcut';
 import Button from '../button';
 import Icon from '../icon';
@@ -109,5 +98,6 @@ function UnforwardedMenuItem(
  * ```
  */
 export const MenuItem = forwardRef( UnforwardedMenuItem );
+MenuItem.displayName = 'MenuItem';
 
 export default MenuItem;

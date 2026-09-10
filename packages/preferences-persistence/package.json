@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/preferences-persistence",
-	"version": "2.36.0",
+	"version": "2.55.0",
 	"description": "Persistence utilities for `wordpress/preferences`.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -30,22 +30,23 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch"
+	},
+	"devDependencies": {
+		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

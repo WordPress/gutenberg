@@ -1,13 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataForm from '../index';
-import type { Field, Form, Layout, PanelLayout } from '../../types';
+import type {
+	Field,
+	Form,
+	Layout,
+	PanelLayout,
+	EditVisibility,
+} from '../../types';
 
 type SamplePost = {
 	title: string;
@@ -20,6 +19,7 @@ type SamplePost = {
 	password?: string;
 	filesize?: number;
 	dimensions?: string;
+	file_type?: string;
 	tags?: string[];
 	address1?: string;
 	address2?: string;
@@ -39,6 +39,7 @@ const fields: Field< SamplePost >[] = [
 		id: 'title',
 		label: 'Title',
 		type: 'text',
+		placeholder: 'Add a title',
 	},
 	{
 		id: 'order',
@@ -69,6 +70,10 @@ const fields: Field< SamplePost >[] = [
 			{ value: 2, label: 'John' },
 			{ value: 3, label: 'Alice' },
 			{ value: 4, label: 'Bob' },
+			{
+				value: 5,
+				label: 'Superadministratoraccountwithalongunhyphenatedusername',
+			},
 		],
 		setValue: ( { value } ) => ( {
 			author: Number( value ),
@@ -123,7 +128,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'filesize',
-		label: 'File Size',
+		label: 'File size',
 		type: 'integer',
 		readOnly: true,
 	},
@@ -131,6 +136,12 @@ const fields: Field< SamplePost >[] = [
 		id: 'dimensions',
 		label: 'Dimensions',
 		type: 'text',
+		readOnly: true,
+	},
+	{
+		// No type and no Edit: a read-only field without an edit control.
+		id: 'file_type',
+		label: 'File type',
 		readOnly: true,
 	},
 	{
@@ -170,7 +181,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'longDescription',
-		label: 'Long Description',
+		label: 'Long description',
 		type: 'text',
 		Edit: {
 			control: 'textarea',
@@ -179,7 +190,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'comment_status',
-		label: 'Comment Status',
+		label: 'Comment status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
@@ -189,7 +200,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'ping_status',
-		label: 'Allow Pings/Trackbacks',
+		label: 'Allow pings/trackbacks',
 		type: 'boolean',
 	},
 	{
@@ -223,7 +234,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'flight_status',
-		label: 'Flight Status',
+		label: 'Flight status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
@@ -261,10 +272,14 @@ const getPanelLayoutFromStoryArgs = ( {
 	summary,
 	labelPosition,
 	openAs,
+	editVisibility,
+	showPlaceholderIfEmpty,
 }: {
 	summary?: string[];
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
-	openAs?: 'default' | 'dropdown' | 'modal';
+	openAs?: PanelLayout[ 'openAs' ];
+	editVisibility?: 'default' | EditVisibility;
+	showPlaceholderIfEmpty?: boolean;
 } ): Layout | undefined => {
 	const panelLayout: PanelLayout = {
 		type: 'panel',
@@ -274,7 +289,7 @@ const getPanelLayoutFromStoryArgs = ( {
 		panelLayout.labelPosition = labelPosition;
 	}
 
-	if ( openAs !== 'default' ) {
+	if ( openAs ) {
 		panelLayout.openAs = openAs;
 	}
 
@@ -282,27 +297,44 @@ const getPanelLayoutFromStoryArgs = ( {
 		panelLayout.summary = summary;
 	}
 
+	if ( editVisibility !== 'default' ) {
+		panelLayout.editVisibility = editVisibility;
+	}
+
+	if ( showPlaceholderIfEmpty ) {
+		panelLayout.showPlaceholderIfEmpty = true;
+	}
+
 	return panelLayout;
 };
 
 const LayoutPanelComponent = ( {
 	labelPosition,
-	openAs,
+	openAs: openAsArg,
+	editVisibility,
+	showPlaceholderIfEmpty,
+	applyLabel,
+	cancelLabel,
 }: {
 	type: 'default' | 'regular' | 'panel' | 'card';
 	labelPosition: 'default' | 'top' | 'side' | 'none';
 	openAs: 'default' | 'dropdown' | 'modal';
+	editVisibility: 'default' | EditVisibility;
+	showPlaceholderIfEmpty: boolean;
+	applyLabel?: string;
+	cancelLabel?: string;
 } ) => {
 	const [ post, setPost ] = useState< SamplePost >( {
 		title: 'Hello, World!',
 		order: 2,
-		author: 1,
+		author: 5,
 		status: 'draft',
 		reviewer: 'fulano',
 		date: '2021-01-01T12:00:00',
 		birthdate: '1950-02-23T12:00:00',
 		filesize: 1024,
 		dimensions: '1920x1080',
+		file_type: 'JPEG',
 		tags: [ 'photography' ],
 		address1: '123 Main St',
 		address2: 'Apt 4B',
@@ -317,36 +349,71 @@ const LayoutPanelComponent = ( {
 	} );
 
 	const form: Form = useMemo( () => {
+		let openAs: PanelLayout[ 'openAs' ];
+		if ( openAsArg === 'modal' && ( applyLabel || cancelLabel ) ) {
+			openAs = {
+				type: 'modal',
+				applyLabel: applyLabel || undefined,
+				cancelLabel: cancelLabel || undefined,
+			};
+		} else if ( openAsArg !== 'default' ) {
+			openAs = openAsArg;
+		}
+
 		return {
 			layout: getPanelLayoutFromStoryArgs( {
 				labelPosition,
 				openAs,
+				editVisibility,
+				showPlaceholderIfEmpty,
 			} ),
 			fields: [
 				'title',
 				{
 					id: 'status',
-					label: 'Status & Visibility',
+					label: 'Status & visibility',
 					children: [ 'status', 'password' ],
+					layout: getPanelLayoutFromStoryArgs( {
+						summary: [ 'status' ],
+						labelPosition,
+						openAs,
+						editVisibility,
+						showPlaceholderIfEmpty,
+					} ),
 				},
 				'order',
 				'author',
 				'filesize',
 				'dimensions',
+				'file_type',
 				'tags',
 				{
 					id: 'discussion',
 					label: 'Discussion',
 					children: [ 'comment_status', 'ping_status' ],
+					layout: getPanelLayoutFromStoryArgs( {
+						summary: [ 'discussion' ],
+						labelPosition,
+						openAs,
+						editVisibility,
+						showPlaceholderIfEmpty,
+					} ),
 				},
 				{
 					id: 'address1',
-					label: 'Combined Address',
+					label: 'Combined address',
 					children: [ 'address1', 'address2', 'city' ],
+					layout: getPanelLayoutFromStoryArgs( {
+						summary: [ 'address1' ],
+						labelPosition,
+						openAs,
+						editVisibility,
+						showPlaceholderIfEmpty,
+					} ),
 				},
 				{
 					id: 'flight_info',
-					label: 'Flight Information',
+					label: 'Flight information',
 					children: [
 						'origin',
 						'destination',
@@ -357,21 +424,32 @@ const LayoutPanelComponent = ( {
 						summary: [ 'origin', 'destination', 'flight_status' ],
 						labelPosition,
 						openAs,
+						editVisibility,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 				{
 					id: 'passenger_details',
-					label: 'Passenger Details',
+					label: 'Passenger details',
 					children: [ 'author', 'seat' ],
 					layout: getPanelLayoutFromStoryArgs( {
 						summary: [ 'author', 'seat' ],
 						labelPosition,
 						openAs,
+						editVisibility,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 			],
 		};
-	}, [ labelPosition, openAs ] );
+	}, [
+		labelPosition,
+		openAsArg,
+		applyLabel,
+		cancelLabel,
+		editVisibility,
+		showPlaceholderIfEmpty,
+	] );
 
 	return (
 		<DataForm< SamplePost >

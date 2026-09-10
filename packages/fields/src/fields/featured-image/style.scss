@@ -1,34 +1,15 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-.dataviews-view-grid__media,
-.dataviews-view-table__cell-content-wrapper.dataviews-column-primary__media,
-.dataviews-view-list__media-wrapper {
-	.fields-controls__featured-image-image,
-	.fields-controls__featured-image-placeholder {
-		width: 100%;
-		height: 100%;
-		display: block;
-		border-radius: $radius-medium;
-	}
-
-	.fields-controls__featured-image-placeholder {
-		box-shadow: none;
-		background: $gray-100;
-	}
+.fields-controls__featured-image-image,
+.fields-controls__featured-image-placeholder {
+	width: 100%;
+	height: 100%;
+	display: block;
+	border-radius: $radius-medium;
 }
 
-.dataviews-view-table__cell-content-wrapper.dataviews-column-primary__media {
-	.fields-controls__featured-image-image,
-	.fields-controls__featured-image-placeholder {
-		width: 32px;
-		height: 32px;
-	}
-}
-
-.dataforms-layouts-panel__field-control {
-	.fields-controls__featured-image-image {
-		width: 16px;
-		height: 16px;
-	}
+.fields-controls__featured-image-placeholder {
+	box-shadow: none;
+	background: $gray-100;
 }

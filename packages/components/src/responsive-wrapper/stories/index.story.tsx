@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import ResponsiveWrapper from '..';
 
 const meta: Meta< typeof ResponsiveWrapper > = {
@@ -18,6 +11,11 @@ const meta: Meta< typeof ResponsiveWrapper > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation.',
+		},
 	},
 };
 export default meta;

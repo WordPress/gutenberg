@@ -1,11 +1,8 @@
-/**
- * External dependencies
- */
 import { FORMAT_ID } from '@terrazzo/plugin-css';
 import type { Plugin } from '@terrazzo/parser';
 
 export default function pluginKnownWpdsCssVariables( {
-	filename = 'design-tokens.js',
+	filename = 'design-tokens.mjs',
 } = {} ): Plugin {
 	return {
 		name: '@wordpress/terrazzo-plugin-known-wpds-css-variables',

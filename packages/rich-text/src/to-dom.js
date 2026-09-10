@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { toTree } from './to-tree';
 import { createElement } from './create-element';
 import { isRangeEqual } from './is-range-equal';

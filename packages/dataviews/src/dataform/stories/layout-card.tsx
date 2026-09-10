@@ -1,17 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
-import { privateApis } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
+import { Badge } from '@wordpress/ui';
 import DataForm from '../index';
 import type { Field, Form } from '../../types';
-import { unlock } from '../../lock-unlock';
-
-const { Badge } = unlock( privateApis );
 
 const LayoutCardComponent = ( {
 	withHeader,
@@ -38,13 +28,16 @@ const LayoutCardComponent = ( {
 		hasVat: boolean;
 		vat: number;
 		commission: number;
+		fileSize: number;
+		dimensions: string;
+		fileType: string;
 		dueDate: string;
 	};
 
 	const customerFields: Field< Customer >[] = [
 		{
 			id: 'name',
-			label: 'Customer Name',
+			label: 'Customer name',
 			type: 'text',
 		},
 		{
@@ -70,23 +63,41 @@ const LayoutCardComponent = ( {
 		},
 		{
 			id: 'shippingAddress',
-			label: 'Shipping Address',
+			label: 'Shipping address',
 			type: 'text',
 		},
 		{
 			id: 'billingAddress',
-			label: 'Billing Address',
+			label: 'Billing address',
 			type: 'text',
 		},
 		{
 			id: 'displayPayments',
-			label: 'Display Payments?',
+			label: 'Display payments?',
 			type: 'boolean',
 		},
 		{
+			id: 'fileSize',
+			label: 'File size',
+			type: 'integer',
+			readOnly: true,
+		},
+		{
+			id: 'dimensions',
+			label: 'Dimensions',
+			type: 'text',
+			readOnly: true,
+		},
+		{
+			// No type and no Edit: a read-only field without an edit control.
+			id: 'fileType',
+			label: 'File type',
+			readOnly: true,
+		},
+		{
+			// No type and no Edit: a read-only field rendered as its own card.
 			id: 'payments',
 			label: 'Payments',
-			type: 'text',
 			readOnly: true, // Triggers using the render method instead of Edit.
 			isVisible: ( item ) => item.displayPayments,
 			render: ( { item } ) => {
@@ -112,10 +123,10 @@ const LayoutCardComponent = ( {
 		},
 		{
 			id: 'dueDate',
-			label: 'Due Date',
+			label: 'Due date',
 			type: 'text',
 			render: ( { item } ) => {
-				return <Badge>Due on: { item.dueDate }</Badge>;
+				return <Badge>{ `Due on: ${ item.dueDate }` }</Badge>;
 			},
 		},
 		{
@@ -138,6 +149,9 @@ const LayoutCardComponent = ( {
 		displayPayments: true,
 		totalOrders: 2,
 		totalRevenue: 1430,
+		fileSize: 1024,
+		dimensions: '1920x1080',
+		fileType: 'JPEG',
 		averageOrderValue: 715,
 		hasVat: true,
 		vat: 10,
@@ -152,7 +166,7 @@ const LayoutCardComponent = ( {
 		isCollapsible: collapsible,
 		isOpened: opened,
 	}: {
-		summary?: string | { id: string; visibility: 'always' }[];
+		summary?: string | string[] | { id: string; visibility: 'always' }[];
 		withSummary?: boolean;
 		withHeader?: boolean;
 		isCollapsible?: boolean;
@@ -178,7 +192,7 @@ const LayoutCardComponent = ( {
 				{
 					id: 'customerCard',
 					layout: getCardLayoutFromStoryArgs( {
-						summary: 'plan-summary',
+						summary: [ 'name', 'plan-summary' ],
 						withHeader: withHeader ?? true,
 						withSummary,
 						isCollapsible,
@@ -239,6 +253,17 @@ const LayoutCardComponent = ( {
 					layout: getCardLayoutFromStoryArgs( {
 						withHeader: false,
 					} ),
+				},
+				{
+					id: 'fileDetails',
+					label: 'File details',
+					layout: getCardLayoutFromStoryArgs( {
+						withHeader,
+						withSummary,
+						isCollapsible,
+						isOpened,
+					} ),
+					children: [ 'fileSize', 'dimensions', 'fileType' ],
 				},
 				{
 					id: 'taxConfiguration',

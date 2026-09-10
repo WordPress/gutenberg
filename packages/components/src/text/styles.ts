@@ -1,18 +1,10 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
-
-/**
- * Internal dependencies
- */
 import { COLORS, CONFIG } from '../utils';
 
 export const Text = css`
 	color: ${ COLORS.theme.foreground };
 	line-height: ${ CONFIG.fontLineHeightBase };
 	margin: 0;
-	text-wrap: balance; /* Fallback for Safari. */
 	text-wrap: pretty;
 `;
 
@@ -29,7 +21,7 @@ export const destructive = css`
 `;
 
 export const muted = css`
-	color: ${ COLORS.gray[ 700 ] };
+	color: ${ COLORS.theme.gray[ 700 ] };
 `;
 
 export const highlighterText = css`

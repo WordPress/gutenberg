@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block - Frontend interactivity', () => {
@@ -11,14 +8,14 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		await requestUtils.deleteAllMenus();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.deleteAllPages();
 		await requestUtils.deleteAllMenus();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test.describe( 'Overlay menu', () => {
@@ -133,6 +130,124 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 	} );
 
+	test.describe( 'Submenus inside an overlay', () => {
+		const submenuMenuContent = `
+			<!-- wp:navigation-submenu {"label":"Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+				<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+			<!-- /wp:navigation-submenu -->
+			`;
+
+		test( 'submenus in a custom overlay set to open on click, do not display until clicked', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			// The menu shown in the overlay. The header navigation uses a
+			// separate menu so that the overlay's submenu is the only one in
+			// the page.
+			const overlayMenu = await requestUtils.createNavigationMenu( {
+				title: 'Overlay menu',
+				content: submenuMenuContent,
+			} );
+			const headerMenu = await requestUtils.createNavigationMenu( {
+				title: 'Header menu',
+				content: `
+					<!-- wp:navigation-link {"label":"Header Item","type":"custom","url":"http://www.wordpress.org/"} /-->
+					`,
+			} );
+
+			await requestUtils.createTemplate( 'wp_template_part', {
+				slug: 'navigation-overlay',
+				title: 'Navigation Overlay',
+				area: 'navigation-overlay',
+				content: `
+					<!-- wp:navigation-overlay-close /-->
+					<!-- wp:navigation {"ref":${ overlayMenu.id },"submenuVisibility":"click","showSubmenuIcon":false,"layout":{"type":"flex","orientation":"vertical"}} /-->
+					`,
+			} );
+			await requestUtils.createTemplate( 'wp_template_part', {
+				slug: 'header',
+				title: 'Header',
+				content: `<!-- wp:navigation {"ref":${ headerMenu.id },"overlayMenu":"always","overlay":"navigation-overlay"} /-->`,
+			} );
+
+			await page.goto( '/' );
+
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Submenu submenu',
+			} );
+			const submenuLink = page.getByRole( 'link', {
+				name: 'Submenu Link',
+			} );
+
+			await openMenuButton.click();
+
+			// A custom overlay does not display its submenus, so opening the
+			// overlay must leave the submenu closed.
+			await expect( submenuButton ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+			await expect( submenuLink ).toBeHidden();
+
+			// The submenu opens and closes on click, as configured.
+			await submenuButton.click();
+			await expect( submenuButton ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect( submenuLink ).toBeVisible();
+
+			await submenuButton.click();
+			await expect( submenuButton ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+			await expect( submenuLink ).toBeHidden();
+		} );
+
+		test( 'submenus report themselves as expanded with the default overlay', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Overlay menu',
+				content: submenuMenuContent,
+			} );
+
+			// The same submenu setting as the test above, so that the overlay
+			// is the only difference between the two. The arrow toggle is not
+			// used here because the default overlay hides it with
+			// `display: none`, which takes it out of the accessibility tree.
+			await requestUtils.createTemplate( 'wp_template_part', {
+				slug: 'header',
+				title: 'Header',
+				content: `<!-- wp:navigation {"ref":${ menu.id },"overlayMenu":"always","submenuVisibility":"click"} /-->`,
+			} );
+
+			await page.goto( '/' );
+
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Submenu submenu',
+			} );
+			const submenuLink = page.getByRole( 'link', {
+				name: 'Submenu Link',
+			} );
+
+			await page.getByRole( 'button', { name: 'Open menu' } ).click();
+
+			// The default overlay expands every submenu it contains, so the
+			// toggle has to report that without waiting for an interaction.
+			await expect( submenuLink ).toBeVisible();
+			await expect( submenuButton ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+		} );
+	} );
+
 	test.describe( 'Submenu mouse and keyboard interactions', () => {
 		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
 			await admin.visitSiteEditor( {
@@ -159,7 +274,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			} );
 			await editor.insertBlock( {
 				name: 'core/navigation',
-				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
+				attributes: { overlayMenu: 'off', submenuVisibility: 'click' },
 			} );
 			await editor.saveSiteEditorEntities( {
 				isOnlyCurrentEntityDirty: true,
@@ -197,7 +312,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( innerElement ).toBeVisible();
 
 			// Test: submenu closes on click outside submenu
-			await page.click( 'body' );
+			await page.locator( 'body' ).click();
 			await expect( innerElement ).toBeHidden();
 
 			// Test: nested submenu opens on click
@@ -212,7 +327,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( secondLevelElement ).toBeVisible();
 
 			// Test: nested submenus close on click outside submenu
-			await page.click( 'body' );
+			await page.locator( 'body' ).click();
 			await expect( firstLevelElement ).toBeHidden();
 			await expect( secondLevelElement ).toBeHidden();
 
@@ -350,7 +465,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( secondLevelElement ).toBeHidden();
 
 			// Close the menu via click on the body
-			await page.click( 'body' );
+			await page.locator( 'body' ).click();
 			await expect( firstLevelElement ).toBeHidden();
 
 			// Test: nested submenu closes on ESC key and focuses parent menu item:
@@ -445,7 +560,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( secondLevelElement ).toBeHidden();
 
 			// Close menu via click on the body
-			await page.click( 'body' );
+			await page.locator( 'body' ).click();
 			await expect( firstLevelElement ).toBeHidden();
 			await expect( secondLevelElement ).toBeHidden();
 		} );
@@ -478,7 +593,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			} );
 			await editor.insertBlock( {
 				name: 'core/navigation',
-				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
+				attributes: { overlayMenu: 'off', submenuVisibility: 'click' },
 			} );
 			await editor.saveSiteEditorEntities( {
 				isOnlyCurrentEntityDirty: true,
@@ -503,7 +618,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( innerElement ).toBeVisible();
 
 			// page-list submenu closes on click outside
-			await page.click( 'body' );
+			await page.locator( 'body' ).click();
 			await expect( innerElement ).toBeHidden();
 
 			// page-list submenu opens on enter keypress
@@ -521,6 +636,253 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			// Tab to first element, then tab outside the submenu.
 			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
 			await expect( innerElement ).toBeHidden();
+		} );
+	} );
+
+	test.describe( 'Legacy openSubmenusOnClick backward compatibility', () => {
+		test( 'Should render and migrate legacy openSubmenusOnClick blocks', async ( {
+			page,
+			admin,
+			editor,
+			requestUtils,
+		} ) => {
+			let postId;
+
+			await test.step( 'Insert post directly to database with legacy markup', async () => {
+				// Insert directly to database to avoid editor migration
+				const response = await requestUtils.rest( {
+					method: 'POST',
+					path: '/wp/v2/posts',
+					data: {
+						title: 'Legacy Navigation Test',
+						content: `<!-- wp:navigation {"openSubmenusOnClick":true,"overlayMenu":"never"} -->
+<!-- wp:navigation-submenu {"label":"Products"} -->
+<!-- wp:navigation-link {"label":"Product 1","url":"#"} /-->
+<!-- wp:navigation-link {"label":"Product 2","url":"#"} /-->
+<!-- /wp:navigation-submenu -->
+<!-- wp:navigation-link {"label":"About","url":"#"} /-->
+<!-- /wp:navigation -->`,
+						status: 'publish',
+					},
+				} );
+
+				postId = response.id;
+			} );
+
+			await test.step( 'Verify frontend renders correctly before editor load', async () => {
+				await page.goto( `/?p=${ postId }` );
+
+				// Find the submenu list item
+				const submenuItem = page
+					.locator( 'li.wp-block-navigation-item' )
+					.filter( { has: page.locator( 'text="Products"' ) } )
+					.first();
+
+				// Should have open-on-click class for backward compatibility
+				await expect( submenuItem ).toHaveClass( /open-on-click/ );
+			} );
+
+			await test.step( 'Load in editor - migration runs in memory only', async () => {
+				await admin.editPost( postId );
+
+				// Wait for blocks to load
+				const navigationBlock = editor.canvas.locator(
+					'[data-type="core/navigation"]'
+				);
+				await expect( navigationBlock ).toBeVisible();
+
+				// The deprecation runs in the editor in memory, transforming the block
+				// But the database is NOT updated automatically - requires an edit + save
+				const contentInEditor = await editor.getEditedPostContent();
+				// Raw content still shows legacy attribute since no save happened yet
+				expect( contentInEditor ).toContain( 'openSubmenusOnClick' );
+
+				// Make an edit to trigger save capability
+				// This causes the migrated block attributes to be persisted on save
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content: 'Test paragraph' },
+				} );
+			} );
+
+			await test.step( 'Save post and verify migration was written to database', async () => {
+				// For published posts, we need to use the save button (Update)
+				const saveButton = page
+					.getByRole( 'region', {
+						name: 'Editor top bar',
+					} )
+					.getByRole( 'button', { name: 'Save', exact: true } );
+
+				await saveButton.click();
+				await page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'updated' } )
+					.waitFor();
+
+				// Fetch the post from the database to see what was actually saved
+				const savedPost = await requestUtils.rest( {
+					path: `/wp/v2/posts/${ postId }`,
+					params: {
+						context: 'edit',
+					},
+				} );
+
+				// After saving, the migration should have been applied
+				// The content should now have submenuVisibility instead of openSubmenusOnClick
+				const content = savedPost.content.raw;
+
+				expect( content ).toContain( '"submenuVisibility":"click"' );
+				expect( content ).not.toContain( 'openSubmenusOnClick' );
+			} );
+
+			await test.step( 'Verify frontend still works after migration', async () => {
+				// Navigate to frontend
+				await page.goto( `/?p=${ postId }` );
+
+				const submenuItem = page
+					.locator( 'li.wp-block-navigation-item' )
+					.filter( { has: page.locator( 'text="Products"' ) } )
+					.first();
+
+				// Should still have open-on-click class after migration
+				await expect( submenuItem ).toHaveClass( /open-on-click/ );
+			} );
+		} );
+
+		test.describe( 'Submenu touch device interactions', () => {
+			test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+				await admin.visitSiteEditor( {
+					postId: 'emptytheme//header',
+					postType: 'wp_template_part',
+					canvas: 'edit',
+				} );
+				await requestUtils.createNavigationMenu( {
+					title: 'Touch test menu',
+					content: `
+					<!-- wp:navigation-submenu {"label":"Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- /wp:navigation-submenu -->
+					`,
+				} );
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: { overlayMenu: 'off' },
+				} );
+				await editor.saveSiteEditorEntities( {
+					isOnlyCurrentEntityDirty: true,
+				} );
+			} );
+
+			test( 'submenu does not open via hover on touch devices', async ( {
+				page,
+				browser,
+			} ) => {
+				// Create a touch device context where (hover: none) matches.
+				const touchContext = await browser.newContext( {
+					hasTouch: true,
+				} );
+				const touchPage = await touchContext.newPage();
+
+				// Copy auth cookies from the original context.
+				const cookies = await page.context().cookies();
+				await touchContext.addCookies( cookies );
+
+				await touchPage.goto( new URL( '/', page.url() ).href );
+
+				const innerElement = touchPage.getByRole( 'link', {
+					name: 'Submenu Link',
+				} );
+
+				// Submenu should be hidden initially.
+				await expect( innerElement ).toBeHidden();
+
+				// Simulate a touch pointerenter event. On real touch devices,
+				// tapping an element fires pointerenter with pointerType "touch"
+				// before the click event, which would previously set hover=true
+				// and leave the submenu stuck open. Our guard should return early
+				// and leave the submenu hidden.
+				const submenuLi = touchPage.locator( 'li.has-child' ).first();
+				await submenuLi.dispatchEvent( 'pointerenter', {
+					pointerType: 'touch',
+				} );
+				await expect( innerElement ).toBeHidden();
+
+				await touchContext.close();
+			} );
+
+			test( 'chevron opens and closes submenu on touch devices', async ( {
+				page,
+				browser,
+			} ) => {
+				// Create a touch device context where (hover: none) matches.
+				const touchContext = await browser.newContext( {
+					hasTouch: true,
+				} );
+				const touchPage = await touchContext.newPage();
+
+				// Copy auth cookies from the original context.
+				const cookies = await page.context().cookies();
+				await touchContext.addCookies( cookies );
+
+				await touchPage.goto( new URL( '/', page.url() ).href );
+
+				const arrowButton = touchPage.getByRole( 'button', {
+					name: 'Submenu submenu',
+				} );
+				const innerElement = touchPage.getByRole( 'link', {
+					name: 'Submenu Link',
+				} );
+
+				// Submenu should be hidden initially.
+				await expect( innerElement ).toBeHidden();
+
+				// Click the chevron to open the submenu.
+				await arrowButton.click();
+				await expect( arrowButton ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+				await expect( innerElement ).toBeVisible();
+
+				// Click the chevron again to close the submenu.
+				await arrowButton.click();
+				await expect( arrowButton ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
+
+				// The submenu may still be visible due to CSS :focus-within
+				// while the button retains focus. Clicking elsewhere removes
+				// focus and the submenu should then be hidden.
+				await touchPage
+					.locator( 'body' )
+					.click( { position: { x: 0, y: 0 } } );
+				await expect( innerElement ).toBeHidden();
+
+				await touchContext.close();
+			} );
+
+			test( 'submenu still opens via hover on non-touch devices', async ( {
+				page,
+			} ) => {
+				await page.goto( '/' );
+
+				const innerElement = page.getByRole( 'link', {
+					name: 'Submenu Link',
+				} );
+
+				// Submenu should be hidden initially.
+				await expect( innerElement ).toBeHidden();
+
+				// On a non-touch device (default Playwright context),
+				// pointerenter with pointerType "mouse" should still open the
+				// submenu via hover — verifying we haven't broken desktop hover.
+				const submenuLi = page.locator( 'li.has-child' ).first();
+				await submenuLi.dispatchEvent( 'pointerenter', {
+					pointerType: 'mouse',
+				} );
+				await expect( innerElement ).toBeVisible();
+			} );
 		} );
 	} );
 } );

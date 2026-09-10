@@ -1,8 +1,6 @@
 # Divider
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 `Divider` is a layout component that separates groups of related content.
 
@@ -11,17 +9,16 @@ This feature is still experimental. “Experimental” means this is an early im
 ```jsx
 import {
 	__experimentalDivider as Divider,
-	__experimentalText as Text,
-	__experimentalVStack as VStack,
 } from `@wordpress/components`;
+import { Stack } from '@wordpress/ui';
 
 function Example() {
 	return (
-		<VStack spacing={4}>
-			<Text>Some text here</Text>
+		<Stack direction="column" gap="lg">
+			<span>Some text here</span>
 			<Divider />
-			<Text>Some more text here</Text>
-		</VStack>
+			<span>Some more text here</span>
+		</Stack>
 	);
 }
 ```

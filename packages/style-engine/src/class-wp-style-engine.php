@@ -73,6 +73,18 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 					'path'          => array( 'background', 'backgroundAttachment' ),
 				),
+				'gradient'             => array(
+					'property_keys' => array(
+						'default' => 'background-image',
+					),
+					'css_vars'      => array(
+						'gradient' => '--wp--preset--gradient--$slug',
+					),
+					'path'          => array( 'background', 'gradient' ),
+					'classnames'    => array(
+						'has-background' => true,
+					),
+				),
 			),
 			'color'      => array(
 				'text'       => array(
@@ -216,6 +228,21 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'dimension' => '--wp--preset--dimension--$slug',
 					),
 				),
+				'minWidth'    => array(
+					'property_keys' => array(
+						'default' => 'min-width',
+					),
+					'path'          => array( 'dimensions', 'minWidth' ),
+					'css_vars'      => array(
+						'dimension' => '--wp--preset--dimension--$slug',
+					),
+				),
+				'objectFit'   => array(
+					'property_keys' => array(
+						'default' => 'object-fit',
+					),
+					'path'          => array( 'dimensions', 'objectFit' ),
+				),
 				'width'       => array(
 					'property_keys' => array(
 						'default' => 'width',
@@ -303,6 +330,24 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 					'path'          => array( 'typography', 'textDecoration' ),
 				),
+				'textIndent'     => array(
+					'property_keys' => array(
+						'default' => 'text-indent',
+					),
+					'path'          => array( 'typography', 'textIndent' ),
+				),
+				'textShadow'     => array(
+					'property_keys' => array(
+						'default' => 'text-shadow',
+					),
+					'css_vars'      => array(
+						'text-shadow' => '--wp--preset--text-shadow--$slug',
+					),
+					'path'          => array( 'typography', 'textShadow' ),
+					'classnames'    => array(
+						'has-$slug-text-shadow' => 'text-shadow',
+					),
+				),
 				'textTransform'  => array(
 					'property_keys' => array(
 						'default' => 'text-transform',
@@ -343,8 +388,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Util: Generates a CSS var string, e.g., var(--wp--preset--color--background) from a preset string such as `var:preset|space|50`.
 		 *
-		 * @param string   $style_value  A single CSS preset value.
-		 * @param string[] $css_vars     An associate array of CSS var patterns used to generate the var string.
+		 * @param string   $style_value A single CSS preset value.
+		 * @param string[] $css_vars    An associate array of CSS var patterns used to generate the var string.
 		 *
 		 * @return string The css var, or an empty string if no match for slug found.
 		 */
@@ -365,7 +410,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Util: Checks whether an incoming block style value is valid.
 		 *
-		 * @param string? $style_value  A single css preset value.
+		 * @param string? $style_value A single css preset value.
 		 *
 		 * @return bool
 		 */
@@ -376,10 +421,11 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Stores a CSS rule using the provided CSS selector and CSS declarations.
 		 *
-		 * @param string   $store_name       A valid store key.
-		 * @param string   $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
-		 * @param string[] $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
-		 * @param string $rules_group        Optional. A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
+		 * @param string                                    $store_name       A valid store key.
+		 * @param string                                    $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+		 * @param string[]|WP_Style_Engine_CSS_Declarations $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ),
+		 *                                                                    or a WP_Style_Engine_CSS_Declarations object.
+		 * @param string                                    $rules_group      Optional. A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
 		 *
 		 * @return void.
 		 */
@@ -449,6 +495,13 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 
 					$css_declarations = static::get_css_declarations( $style_value, $style_definition, $options );
 					if ( ! empty( $css_declarations ) ) {
+						/*
+						 * Combine background gradient and background image into a single
+						 * comma-separated background-image value, matching the JS style engine.
+						 */
+						if ( isset( $css_declarations['background-image'] ) && isset( $parsed_styles['declarations']['background-image'] ) ) {
+							$css_declarations['background-image'] = $css_declarations['background-image'] . ', ' . $parsed_styles['declarations']['background-image'];
+						}
 						$parsed_styles['declarations'] = array_merge( $parsed_styles['declarations'], $css_declarations );
 					}
 				}

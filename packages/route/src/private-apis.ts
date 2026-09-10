@@ -1,27 +1,23 @@
-/**
- * External dependencies
- */
 import { parseHref } from '@tanstack/history';
 import {
 	createBrowserHistory,
 	createLazyRoute,
 	createLink,
+	createMemoryHistory,
 	createRootRoute,
 	createRoute,
 	createRouter,
 	Outlet,
 	redirect,
 	RouterProvider,
+	useBlocker,
 	useCanGoBack,
 	useLoaderData,
 	useLocation,
 	useMatches,
 	useRouter,
+	useRouterState,
 } from '@tanstack/react-router';
-
-/**
- * Internal dependencies
- */
 import { lock } from './lock-unlock';
 
 /**
@@ -36,6 +32,7 @@ lock( privateApis, {
 	// Router creation and setup
 	createBrowserHistory,
 	createLazyRoute,
+	createMemoryHistory,
 	createRouter,
 	createRootRoute,
 	createRoute,
@@ -50,6 +47,8 @@ lock( privateApis, {
 	useLocation,
 	useMatches,
 	useRouter,
+	useRouterState,
+	useBlocker,
 
 	// History utilities
 	parseHref,

@@ -1,16 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * External dependencies
- */
-import type { StoryObj, Meta } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { StoryObj, Meta } from '@storybook/react-vite';
 import { formDecorator } from './story-utils';
 import { ValidatedRangeControl } from '../range-control';
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem, contextConnect } from '../context';
 import { visuallyHidden } from './styles';
@@ -24,6 +17,7 @@ function UnconnectedVisuallyHidden(
 		<View
 			ref={ forwardedRef }
 			{ ...contextProps }
+			data-visually-hidden=""
 			style={ { ...visuallyHidden, ...( styleProp || {} ) } }
 		/>
 	);

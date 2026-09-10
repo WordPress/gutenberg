@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { StyleBookCategory, StyleBookColorGroup } from './types';
 
 export const STYLE_BOOK_COLOR_GROUPS: StyleBookColorGroup[] = [
@@ -227,7 +220,7 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 	.editor-style-book__example {
 	    max-width: 900px;
 		border-radius: 2px;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		display: flex;
 		flex-direction: column;
 		gap: 40px;
@@ -274,7 +267,7 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 
 	.editor-style-book__subcategory-title,
 	.editor-style-book__example-title {
-		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+		font-family: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 		font-size: 13px;
 		font-weight: normal;
 		line-height: normal;

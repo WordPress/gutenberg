@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useReducer } from '@wordpress/element';
 import {
 	Panel,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import ResolutionTool from '..';
 
 export default {

@@ -1,0 +1,253 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// Handle touch target size — used for the handle ::before hit area. The
+// inner canvas inset must stay at least half this (22px) so the handles'
+// reach isn't clipped by the root.
+$handle-touch-target-size: 44px;
+
+.wp-media-editor-image-editor {
+	position: relative;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	touch-action: none;
+	user-select: none;
+	cursor: grab;
+
+	// Inner gutter for resize handles. Handles use negative offsets and a
+	// touch target that extends past the crop edge; the root clips overflow
+	// (required for the dimming overlay's box-shadow trick), so a flush
+	// handle would be clipped. The inner `__canvas` wrapper is inset to
+	// reserve reach room on all sides while keeping the root as the clipping
+	// boundary. `$grid-unit-30` (24px) ≥ half the 44px touch target, so the
+	// handles still clear the edge.
+	&__canvas {
+		position: absolute;
+		inset: $grid-unit-30;
+		min-height: 100px;
+		min-width: 100px;
+
+		// Suppress the browser's default focus ring — the crop rectangle
+		// border provides the custom keyboard-focus indicator instead.
+		&:focus {
+			outline: none;
+		}
+	}
+
+	// Inner stage — receives the viewport pan transform so the canvas div
+	// itself stays fixed, preventing the root background from showing through.
+	&__stage {
+		position: absolute;
+		inset: 0;
+	}
+
+	&--dragging {
+		cursor: grabbing;
+	}
+
+	&__image {
+		position: absolute;
+		top: 0;
+		left: 0;
+		will-change: transform;
+		transform-origin: center center;
+	}
+
+	&__stencil {
+		position: absolute;
+		pointer-events: none;
+	}
+
+	&__dimming {
+		position: absolute;
+		pointer-events: none;
+		/* Large shadow spread washes everything outside the crop area
+		   toward the canvas grey ($gray-200). Slightly stronger at rest
+		   for clear crop framing, lighter during drag so the user can see
+		   where they're panning. */
+		box-shadow: 0 0 0 9999px rgba($gray-200, 0.6);
+		transition: box-shadow 0.15s ease;
+	}
+
+	&--dragging &__dimming {
+		box-shadow: 0 0 0 9999px rgba($gray-200, 0.4);
+	}
+
+	&__grid {
+		position: absolute;
+		pointer-events: none;
+		overflow: hidden;
+		transition: opacity 0.15s ease;
+	}
+
+	&__canvas--grid-interactive &__grid {
+		opacity: 0;
+		transition-delay: 0.1s;
+	}
+
+	&__canvas--show-grid &__grid {
+		opacity: 1;
+		transition-delay: 0s;
+	}
+
+	&__canvas--settling &__grid {
+		opacity: 0;
+		transition: none;
+	}
+
+	&__grid-line {
+		position: absolute;
+		background: rgba(255, 255, 255, 0.4);
+
+		&--horizontal {
+			left: 0;
+			width: 100%;
+			height: 1px;
+		}
+
+		&--vertical {
+			top: 0;
+			height: 100%;
+			width: 1px;
+		}
+	}
+
+	&__dimensions-tooltip {
+		position: absolute;
+		padding: 2px 6px;
+		background: #fff;
+		color: #1e1e1e;
+		font-size: 11px;
+		line-height: 1.4;
+		font-variant-numeric: tabular-nums;
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.08);
+		pointer-events: none;
+		white-space: nowrap;
+		z-index: 2;
+	}
+
+	&__stencil-rect {
+		position: absolute;
+		// Dark crop outline, matching the sidebar control/heading text so
+		// the crop boundary stays legible against the light grey wash.
+		border: 1px solid $gray-900;
+		box-sizing: border-box;
+		pointer-events: none;
+		transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	// Blue border on the crop rectangle when the canvas has keyboard focus.
+	// Uses a JS-controlled class rather than :focus-visible — browsers can
+	// restore :focus-visible across programmatic focus calls, making pure
+	// CSS unreliable for pointer-to-keyboard transitions. The :focus check
+	// on the canvas ensures the outline appears only when the canvas
+	// itself is focused, not when focus is on a child handle.
+	&__canvas--focus-visible:focus &__stencil-rect {
+		border-color: var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
+		box-shadow: 0 0 0 1px var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
+	}
+
+	&__handle {
+		// Reset native <button> UA styles — the handle is a button for
+		// accessibility (native keyboard focus, button semantics), but
+		// it's styled as a small draggable circle.
+		appearance: none;
+		margin: 0;
+		padding: 0;
+		font: inherit;
+		cursor: default;
+
+		position: absolute;
+		width: 12px;
+		height: 12px;
+		// Solid white fill with an accent-blue border so the handles read
+		// clearly against the light grey wash.
+		background: $white;
+		border: 1px solid var(--wp-admin-theme-color, #007cba);
+		border-radius: 50%;
+		box-sizing: border-box;
+		pointer-events: auto;
+		transition: background-color 0.15s ease, box-shadow 0.15s ease;
+
+		&:focus {
+			outline: none;
+		}
+
+		// Double ring (white inner + theme-color outer) for a clear
+		// keyboard-focus state on the handle. Gated on the JS-controlled
+		// keyboard-active class so that mouse interactions after a
+		// keyboard session — e.g., clicking a handle to start a drag —
+		// don't leave the active ring stuck on the handle.
+		.wp-media-editor-image-editor__canvas--focus-visible &:focus {
+			background: var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
+			border-color: transparent;
+			box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
+		}
+
+		// Extend touch target to the minimum accessible hit area.
+		&::before {
+			content: "";
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: $handle-touch-target-size;
+			height: $handle-touch-target-size;
+			transform: translate(-50%, -50%);
+		}
+
+		/* Offset by half the handle width (12px / 2 = 6px) to center on crop edge */
+		&--n {
+			top: -6px;
+			left: 50%;
+			margin-left: -6px;
+			cursor: ns-resize;
+		}
+
+		&--s {
+			bottom: -6px;
+			left: 50%;
+			margin-left: -6px;
+			cursor: ns-resize;
+		}
+
+		&--e {
+			top: 50%;
+			right: -6px;
+			margin-top: -6px;
+			cursor: ew-resize;
+		}
+
+		&--w {
+			top: 50%;
+			left: -6px;
+			margin-top: -6px;
+			cursor: ew-resize;
+		}
+
+		&--nw {
+			top: -6px;
+			left: -6px;
+			cursor: nwse-resize;
+		}
+
+		&--ne {
+			top: -6px;
+			right: -6px;
+			cursor: nesw-resize;
+		}
+
+		&--sw {
+			bottom: -6px;
+			left: -6px;
+			cursor: nesw-resize;
+		}
+
+		&--se {
+			bottom: -6px;
+			right: -6px;
+			cursor: nwse-resize;
+		}
+	}
+
+}

@@ -1,0 +1,9 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.experiments-page__container {
+	box-sizing: border-box;
+	width: 100%;
+	padding: $grid-unit-30;
+	max-width: 680px;
+	margin-inline: auto;
+}

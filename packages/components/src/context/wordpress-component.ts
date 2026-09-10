@@ -1,7 +1,15 @@
-/**
- * External dependencies
- */
 import type * as React from 'react';
+
+/**
+ * Loose intrinsic attribute bag used when a polymorphic component is rendered
+ * with an `as` prop. Previous implementations enabled precise typings for the
+ * given `as` element (e.g. `as="label"` unlocks `htmlFor`), but doing so
+ * contributed to high memory usage and slow compilation times.
+ */
+type PolymorphicIntrinsicProps = Omit<
+	React.AllHTMLAttributes< Element > & React.SVGAttributes< Element >,
+	'as' | 'children'
+>;
 
 // Based on https://github.com/ariakit/ariakit/blob/reakit/packages/reakit-utils/src/types.ts
 export type WordPressComponentProps<
@@ -24,7 +32,10 @@ export type WordPressComponentProps<
 	( IsPolymorphic extends true
 		? {
 				/** The HTML element or React component to render the component as. */
-				as?: T | keyof JSX.IntrinsicElements;
+				as?:
+					| T
+					| keyof React.JSX.IntrinsicElements
+					| React.JSXElementConstructor< any >;
 		  }
 		: {} );
 
@@ -32,14 +43,33 @@ export type WordPressComponent<
 	T extends React.ElementType | null,
 	O,
 	IsPolymorphic extends boolean,
-> = {
-	< TT extends React.ElementType >(
-		props: WordPressComponentProps< O, TT, IsPolymorphic > &
-			( IsPolymorphic extends true ? { as: TT } : {} )
-	): JSX.Element | null;
-	(
-		props: WordPressComponentProps< O, T, IsPolymorphic >
-	): JSX.Element | null;
+> = ( IsPolymorphic extends true
+	? {
+			/**
+			 * Intrinsic `as` (e.g. `as="label"`): accept a flat HTML/SVG attribute
+			 * bag instead of remapping to that tag's props.
+			 */
+			(
+				props: WordPressComponentProps< O, T, false > & {
+					/** The HTML element to render the component as. */
+					as: keyof React.JSX.IntrinsicElements;
+				} & Omit< PolymorphicIntrinsicProps, keyof O >
+			): React.ReactNode;
+			/**
+			 * Component `as` (e.g. `as={ Item }`): remap to that component's props.
+			 */
+			< C extends React.JSXElementConstructor< any > >(
+				props: WordPressComponentProps< O, T, false > & {
+					/** The React component to render the component as. */
+					as: C;
+				} & Omit<
+						React.ComponentPropsWithoutRef< C >,
+						'as' | keyof O | 'children'
+					>
+			): React.ReactNode;
+	  }
+	: unknown ) & {
+	( props: WordPressComponentProps< O, T, IsPolymorphic > ): React.ReactNode;
 	displayName?: string;
 	/**
 	 * A CSS selector used to fake component interpolation in styled components

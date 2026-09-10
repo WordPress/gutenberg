@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState, useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { isValueDefined, getDefinedValue } from '../values';
 
 /**

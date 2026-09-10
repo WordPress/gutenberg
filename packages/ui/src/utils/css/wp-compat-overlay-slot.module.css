@@ -1,0 +1,37 @@
+/*
+ * Compat overlay slot — body-level positioned container that hosts
+ * `@wordpress/ui` overlays so they reliably stack in mixed-library
+ * compositions. See `getWpCompatOverlaySlot()` for the runtime side.
+ *
+ * The `.slot` rule is authored unlayered (outside `@layer wp-ui`) so the
+ * slot's z-index and positioning win against any `@layer`-scoped rule.
+ */
+
+.slot {
+	/* Viewport-sized so `position: absolute` overlay positioners inside
+	 * the slot have a non-zero containing block — otherwise `width: auto`
+	 * popups collapse to their min-content width. */
+	position: fixed;
+	inset: 0;
+	/* Reserved band above the legacy z-index map in
+	 * `packages/base-styles/_z-index.scss`. */
+	z-index: 1000000003;
+	isolation: isolate;
+	/* The slot itself doesn't capture clicks; portaled overlays opt back in
+	 * via the `.slot > *` rule below. */
+	pointer-events: none;
+}
+
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	/*
+	 * Re-enable interaction for portaled overlays. Placed in the lowest layer
+	 * so any consumer can override with a higher-layer (or unlayered) rule.
+	 */
+	@layer utilities {
+		.slot > * {
+			pointer-events: auto;
+		}
+	}
+}

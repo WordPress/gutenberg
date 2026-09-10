@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { menu } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { contextConnectWithoutRef, useContextSystem } from '../context';
 import Button from '../button';
 import Dropdown from '../dropdown';

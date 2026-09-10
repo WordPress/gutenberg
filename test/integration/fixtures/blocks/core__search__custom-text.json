@@ -10,7 +10,7 @@
 			"buttonPosition": "button-outside",
 			"buttonUseIcon": false,
 			"query": {},
-			"isSearchFieldHidden": false
+			"tagName": ""
 		},
 		"innerBlocks": []
 	}

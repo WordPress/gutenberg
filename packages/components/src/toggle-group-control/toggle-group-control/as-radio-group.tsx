@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef, useEffect, useMemo } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import type { WordPressComponentProps } from '../../context';
 import ToggleGroupControlContext from '../context';
@@ -29,10 +18,10 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		isAdaptiveWidth,
 		label,
 		onChange: onChangeProp,
-		size,
 		value: valueProp,
 		id: idProp,
 		setSelectedElement,
+		disabled,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
@@ -85,12 +74,12 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 				radio.getState().activeId !== radio.first(),
 			baseId,
 			isBlock: ! isAdaptiveWidth,
-			size,
 			// @ts-expect-error - This is wrong and we should fix it.
 			value: selectedValue,
 			// @ts-expect-error - This is wrong and we should fix it.
 			setValue,
 			setSelectedElement,
+			disabled: Boolean( disabled ),
 		} ),
 		[
 			baseId,
@@ -99,7 +88,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 			selectedValue,
 			setSelectedElement,
 			setValue,
-			size,
+			disabled,
 		]
 	);
 
@@ -112,6 +101,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 				{ ...otherProps }
 				id={ baseId }
 				ref={ forwardedRef }
+				disabled={ disabled || undefined }
 			>
 				{ children }
 			</Ariakit.RadioGroup>
@@ -122,3 +112,4 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 export const ToggleGroupControlAsRadioGroup = forwardRef(
 	UnforwardedToggleGroupControlAsRadioGroup
 );
+ToggleGroupControlAsRadioGroup.displayName = 'ToggleGroupControlAsRadioGroup';

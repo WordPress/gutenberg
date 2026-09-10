@@ -1,0 +1,38 @@
+[
+	{
+		"name": "core/term-description",
+		"isValid": true,
+		"attributes": {
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/term-description",
+		"isValid": true,
+		"attributes": {
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/term-description",
+		"isValid": true,
+		"attributes": {
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

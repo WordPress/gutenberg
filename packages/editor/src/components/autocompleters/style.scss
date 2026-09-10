@@ -1,4 +1,10 @@
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-autocompleters__link {
+	white-space: nowrap;
+	gap: $grid-unit-10;
+}
 
 .editor-autocompleters__user {
 	.editor-autocompleters__no-avatar::before {
@@ -28,7 +34,7 @@
 		margin-left: 8px;
 		white-space: nowrap;
 		text-overflow: ellipsis;
-		overflow: none;
+		overflow: hidden;
 		max-width: 100px;
 		flex-grow: 0;
 		flex-shrink: 0;

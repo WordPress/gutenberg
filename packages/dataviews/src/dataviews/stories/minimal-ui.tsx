@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { Field, View } from '../../types';
@@ -23,11 +16,6 @@ const MinimalUIComponent = ( {
 		page: 1,
 		perPage: 10,
 		layout: {
-			styles: {
-				satellites: {
-					align: 'end' as const,
-				},
-			},
 			enableMoving: false,
 		},
 		filters: [],
@@ -59,7 +47,7 @@ const MinimalUIComponent = ( {
 			view={ view }
 			fields={ _fields }
 			onChangeView={ setView }
-			defaultLayouts={ { [ layout ]: {} } }
+			defaultLayouts={ { [ layout ]: true } }
 		>
 			<DataViews.Layout />
 			<DataViews.Footer />

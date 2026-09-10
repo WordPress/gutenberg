@@ -1,0 +1,159 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as ContentStories from './content.story';
+
+<Meta of={ ContentStories } />
+
+# Content Elements
+
+Guidance on understanding the semantics and proper usage of content elements in `DataForm` instances, including when and how to use high-level help text, labels, placeholders, field-level help text, and validation messages.
+
+## Accessibility
+
+Proper use of content elements is essential for accessibility. Each element serves a specific semantic purpose that assistive technologies rely on:
+
+- **Labels** are announced by screen readers to identify form fields. Every field must have a label.
+- **Placeholders** provide example input to hint at expected format. They are not a substitute for labels—they disappear on input and are not reliably announced.
+- **Help text** provides additional context that is programmatically associated with fields and read by assistive technologies.
+- **Validation messages** are announced when they appear so users know how to correct errors.
+
+Following these semantics benefits all users, including those navigating with keyboards, using screen readers, or experiencing cognitive challenges.
+
+## High-level help text
+
+High-level help text provides context and guidance for an entire form. It should be used to explain the purpose of the form, the information that will be collected, and how the information will be used. To add high-level help text, use the `description` property on a field group object (a `FormField` type) in the form configuration's `fields` array that wraps all the form fields as children.
+
+<Canvas of={ ContentStories.HighLevelHelpText } />
+
+## Labels
+
+A label tells users what information they need to enter in a field. Labels must be short, clear, and descriptive to avoid confusion.
+
+<Canvas of={ ContentStories.Labels } />
+
+### Guidelines
+
+<table style={ { width: '100%' } }>
+	<thead>
+		<tr>
+			<th style={ { width: '50%' } }>✅ Do</th>
+			<th style={ { width: '50%' } }>🚫 Don't</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td style={ { width: '50%' } }>Use clear and straightforward language.</td>
+			<td style={ { width: '50%' } }>Use vague or ambiguous terms like "Information" or "Details".</td>
+		</tr>
+		<tr>
+			<td style={ { width: '50%' } }>Limit labels to 1 to 3 concise words.</td>
+			<td style={ { width: '50%' } }>Exceed 3 words—longer labels create visual clutter.</td>
+		</tr>
+		<tr>
+			<td style={ { width: '50%' } }>Remove filler words and redundant phrasing.</td>
+			<td style={ { width: '50%' } }>Include filler words like "Please enter your" or "Kindly provide".</td>
+		</tr>
+		<tr>
+			<td style={ { width: '50%' } }>Use plain language that users understand.</td>
+			<td style={ { width: '50%' } }>Use technical jargon that users might not understand.</td>
+		</tr>
+		<tr>
+			<td style={ { width: '50%' } }>Be specific and descriptive.</td>
+			<td style={ { width: '50%' } }>Use generic labels like "Input" or "Field 1".</td>
+		</tr>
+	</tbody>
+</table>
+
+## Placeholders
+
+A placeholder provides example input to help users understand the expected format. Use placeholders sparingly, keep them short (1 to 3 words), and use real-world examples where possible. They should only be used for formatting hints or common examples, never as a replacement for labels or instructions.
+
+<Canvas of={ ContentStories.Placeholders } />
+
+<table style={ { width: '100%' } }>
+	<thead>
+		<tr>
+			<th style={ { width: '50%' } }>✅ Good</th>
+			<th style={ { width: '50%' } }>🚫 Bad</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td style={ { width: '50%' } }>For a name field: "Jane Doe".</td>
+			<td style={ { width: '50%' } }>For a name field: "Enter your full name here" (Should be a label or help text, not a placeholder).</td>
+		</tr>
+		<tr>
+			<td style={ { width: '50%' } }>For an email field: "you@example.com".</td>
+			<td style={ { width: '50%' } }>For a password field: "At least 8 characters" (Belongs in help text, not a placeholder).</td>
+		</tr>
+	</tbody>
+</table>
+
+## Help text
+
+For complicated inputs, use help text to explain how the user should proceed. Help text is always visible, appears immediately after the input, and provides essential guidance for completing the input correctly. Help text can also inform users about how their information might be used, providing transparency and context that helps build trust and sets appropriate expectations.
+
+Use help text when the user needs contextual guidance upfront to avoid errors, when the instruction explains why or how to complete the field correctly, when the form field has complex requirements or constraints (e.g., password rules, business logic), or when the information should be accessible without additional interaction.
+
+<Canvas of={ ContentStories.HelpText } />
+
+### Guidelines
+
+<table style={ { width: '100%' } }>
+	<thead>
+		<tr>
+			<th style={ { width: '50%' } }>✅ Do</th>
+			<th style={ { width: '50%' } }>🚫 Don't</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td style={ { width: '50%' } }>Keep help text concise—one to two sentences maximum.</td>
+			<td style={ { width: '50%' } }>Write lengthy paragraphs that overwhelm the user.</td>
+		</tr>
+		<tr>
+			<td style={ { width: '50%' } }>Provide actionable, contextual guidance about why or how to complete the field.</td>
+			<td style={ { width: '50%' } }>State the obvious or repeat what the label already conveys.</td>
+		</tr>
+		<tr>
+			<td style={ { width: '50%' } }>Explain requirements or constraints that aren't obvious from the label.</td>
+			<td style={ { width: '50%' } }>Duplicate format examples that belong in placeholders (e.g., "Use YYYY-MM-DD format").</td>
+		</tr>
+		<tr>
+			<td style={ { width: '50%' } }>Focus on what the user needs to know to succeed.</td>
+			<td style={ { width: '50%' } }>Include unnecessary background information or explanations.</td>
+		</tr>
+		<tr>
+			<td style={ { width: '50%' } }>Write in plain, user-friendly language.</td>
+			<td style={ { width: '50%' } }>Use technical terms or system-specific jargon.</td>
+		</tr>
+		<tr>
+			<td style={ { width: '50%' } }>For radios or selects, explain how to choose between options.</td>
+			<td style={ { width: '50%' } }>Use help text to describe what a selected value means after selection.</td>
+		</tr>
+	</tbody>
+</table>
+
+## Validation messages
+
+Validation messages help users understand and fix errors in a form. They should be clear, concise, and actionable to guide users toward correcting their input.
+
+Where possible, messages should infer what is wrong and how the user can fix it.
+
+<Canvas of={ ContentStories.ValidationMessages } />
+
+### Guidelines
+
+<table style={ { width: '100%' } }>
+	<thead>
+		<tr>
+			<th style={ { width: '50%' } }>✅ Good</th>
+			<th style={ { width: '50%' } }>🚫 Bad</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td style={ { width: '50%' } }>Name must be at least 2 characters long.</td>
+			<td style={ { width: '50%' } }>Invalid name.</td>
+		</tr>
+	</tbody>
+</table>

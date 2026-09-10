@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalItemGroup as ItemGroup,
@@ -8,10 +5,6 @@ import {
 	__experimentalHStack as HStack,
 	FlexItem,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { NavigationButtonAsItem } from './navigation-button';
 import { Subtitle } from './subtitle';
 import { useStyle } from './hooks';
@@ -102,8 +95,23 @@ function TypographyElements() {
 				/>
 				<ElementItem
 					parentMenu={ parentMenu }
+					element="cite"
+					label={ __( 'Citations' ) }
+				/>
+				<ElementItem
+					parentMenu={ parentMenu }
 					element="button"
 					label={ __( 'Buttons' ) }
+				/>
+				<ElementItem
+					parentMenu={ parentMenu }
+					element="textInput"
+					label={ __( 'Inputs' ) }
+				/>
+				<ElementItem
+					parentMenu={ parentMenu }
+					element="select"
+					label={ __( 'Selects' ) }
 				/>
 			</ItemGroup>
 		</VStack>

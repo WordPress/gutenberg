@@ -1,12 +1,7 @@
-/**
- * External dependencies
- */
-import blockLibraryStyles from '!!raw-loader!../../../../../block-library/build-style/style.css';
-import { fn } from '@storybook/test';
-
-/**
- * Internal dependencies
- */
+import { fn } from 'storybook/test';
+// Reason: Styles are contained in ExperimentalBlockEditorProvider iframe.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import blockLibraryStyles from '@wordpress/block-library/build-style/style.css?raw';
 import BlockPatternsList from '../';
 import { ExperimentalBlockEditorProvider } from '../../provider';
 import patterns from './fixtures';

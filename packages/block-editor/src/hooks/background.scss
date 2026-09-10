@@ -1,0 +1,10 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.background-block-support-panel {
+	/* Increased specificity required to remove the slot wrapper's row gap */
+	&#{&} {
+		.background-block-support-panel__inner-wrapper {
+			row-gap: 0;
+		}
+	}
+}

@@ -57,23 +57,38 @@ Array of duotone presets of the form `{ colors: [ '#000000', '#ffffff' ], name: 
 
 An array of colors for the duotone effect.
 
+### `selectedSlug`
+
+-   Type: `string`
+-   Required: No
+
+The slug of the selected duotone preset. When a non-empty `selectedSlug` is given, selection is decided strictly by slug, which keeps two presets holding the same pair of colors apart. Presets whose slug does not match will not appear selected in this mode, even if their colors match `value`.
+
+An empty string is treated the same as `undefined`: selection falls back to matching by color value.
+
 ### `onChange`
 
--   Type: `Function`
+-   Type: `(value: string[] | 'unset' | undefined, index?: number | undefined, slug?: string | undefined) => void`
 -   Required: Yes
 
-Callback which is called when the duotone colors change.
+The function called when the duotone colors change. It is passed the new `value` as an argument. When a preset from `duotonePalette` is picked, the second argument is its index and the third is its slug.
 
-### `asButtons`: `boolean`
+Both are omitted whenever no preset is being picked: the custom, unset and clear controls, and deselecting the currently selected preset, which reports `undefined` alone.
 
-Whether the control should present as a set of buttons, each with its own tab stop.
+### `presentation`: `'listbox' | 'toggle-buttons' | 'command-buttons'`
+
+Controls the predefined swatches' interaction and accessibility semantics.
+
+-   `listbox` uses one tab stop for the picker. Arrow keys move between options. Options expose selection with `aria-selected`.
+-   `toggle-buttons` uses a tab stop for each swatch. Swatches expose selection with `aria-pressed`.
+-   `command-buttons` uses a tab stop for each swatch. Swatches do not expose selection. The `value` and `selectedSlug` props do not mark predefined swatches as selected, and activating a swatch always calls `onChange` with that swatch.
 
 - Required: No
-- Default: `false`
+- Default: `listbox`
 
 ### `loop`: `boolean`
 
-Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
+Prevents arrow-key navigation from wrapping around. Only used with the `listbox` presentation.
 
 - Required: No
 - Default: `true`

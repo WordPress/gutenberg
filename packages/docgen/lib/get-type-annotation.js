@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 // See https://babeljs.io/docs/en/babel-types.
 const { types: babelTypes } = require( '@babel/core' );
 
@@ -598,7 +595,7 @@ function getVariableTypeAnnotation( declarationToken ) {
 
 	try {
 		return getTypeAnnotation( resolvedToken.typeAnnotation.typeAnnotation );
-	} catch ( e ) {
+	} catch {
 		// Assume it's a fully undocumented variable, there's nothing we can do about that but fail silently.
 	}
 }

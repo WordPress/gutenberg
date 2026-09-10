@@ -3,11 +3,6 @@
 	text-wrap: pretty;
 }
 
-.free-composition {
-	height: 600px;
-	overflow: auto;
-}
-
 .free-composition-heading,
 .free-composition-header {
 	padding: 16px 48px;
@@ -24,7 +19,7 @@
 	inset-block-start: 67px;
 }
 
-.free-composition-dataviews-empty  {
+.free-composition-dataviews-empty {
 	border: 1px solid #000;
 	border-radius: 8px;
 	padding: 24px;

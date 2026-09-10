@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const {
 	TRANSLATION_FUNCTIONS,
 	REGEXP_SPRINTF_PLACEHOLDER,
@@ -61,6 +58,7 @@ function extractTranslatorKeys( commentText ) {
 module.exports = {
 	meta: {
 		type: 'problem',
+		schema: [],
 		messages: {
 			missing:
 				'Translation function with placeholders is missing preceding translator comment',
@@ -71,6 +69,7 @@ module.exports = {
 		},
 	},
 	create( context ) {
+		const sourceCode = context.sourceCode;
 		return {
 			CallExpression( node ) {
 				const {
@@ -107,7 +106,7 @@ module.exports = {
 					return;
 				}
 
-				const comments = context.getCommentsBefore( node ).slice();
+				const comments = sourceCode.getCommentsBefore( node ).slice();
 
 				let parentNode = parent;
 
@@ -123,7 +122,9 @@ module.exports = {
 					parentNode.type !== 'Program' &&
 					Math.abs( parentNode.loc.start.line - currentLine ) <= 1
 				) {
-					comments.push( ...context.getCommentsBefore( parentNode ) );
+					comments.push(
+						...sourceCode.getCommentsBefore( parentNode )
+					);
 					parentNode = parentNode.parent;
 				}
 

@@ -1,8 +1,9 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
-	"files": [ "src/declarations.d.ts" ],
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "jest", "@testing-library/jest-dom" ]
-	}
+		"types": [ "jest", "node", "gutenberg-vitest-test-env" ]
+	},
+	"include": [ "src" ],
+	"files": [ "declarations.d.ts" ]
 }

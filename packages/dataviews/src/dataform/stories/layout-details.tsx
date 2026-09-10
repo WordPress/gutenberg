@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataForm from '../index';
 import type { Field, Form } from '../../types';
 
@@ -20,6 +13,7 @@ type SamplePost = {
 	password?: string;
 	filesize?: number;
 	dimensions?: string;
+	file_type?: string;
 	tags?: string[];
 	address1?: string;
 	address2?: string;
@@ -123,7 +117,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'filesize',
-		label: 'File Size',
+		label: 'File size',
 		type: 'integer',
 		readOnly: true,
 	},
@@ -131,6 +125,12 @@ const fields: Field< SamplePost >[] = [
 		id: 'dimensions',
 		label: 'Dimensions',
 		type: 'text',
+		readOnly: true,
+	},
+	{
+		// No type and no Edit: a read-only field without an edit control.
+		id: 'file_type',
+		label: 'File type',
 		readOnly: true,
 	},
 	{
@@ -170,7 +170,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'longDescription',
-		label: 'Long Description',
+		label: 'Long description',
 		type: 'text',
 		Edit: {
 			control: 'textarea',
@@ -179,7 +179,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'comment_status',
-		label: 'Comment Status',
+		label: 'Comment status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
@@ -189,7 +189,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'ping_status',
-		label: 'Allow Pings/Trackbacks',
+		label: 'Allow pings/trackbacks',
 		type: 'boolean',
 	},
 	{
@@ -223,7 +223,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'flight_status',
-		label: 'Flight Status',
+		label: 'Flight status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
@@ -268,6 +268,7 @@ const LayoutDetailsComponent = () => {
 		birthdate: '1950-02-23T12:00:00',
 		filesize: 1024,
 		dimensions: '1920x1080',
+		file_type: 'JPEG',
 		comment_status: 'open',
 		ping_status: true,
 		tags: [ 'photography' ],
@@ -287,7 +288,7 @@ const LayoutDetailsComponent = () => {
 			{
 				id: 'metadata',
 				label: 'Metadata',
-				children: [ 'filesize', 'dimensions' ],
+				children: [ 'filesize', 'dimensions', 'file_type' ],
 				layout: {
 					type: 'details',
 					summary: 'metadata_summary',

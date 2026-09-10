@@ -1,0 +1,43 @@
+[
+	{
+		"blockName": "core/post-time-to-read",
+		"attrs": {
+			"textAlign": "left"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/post-time-to-read",
+		"attrs": {
+			"textAlign": "center"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/post-time-to-read",
+		"attrs": {
+			"textAlign": "right"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

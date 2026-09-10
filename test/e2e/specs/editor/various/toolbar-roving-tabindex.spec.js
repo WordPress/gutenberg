@@ -1,11 +1,10 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	ToolbarRovingTabindexUtils: async ( { page, pageUtils }, use ) => {
-		await use( new ToolbarRovingTabindexUtils( { page, pageUtils } ) );
+	ToolbarRovingTabindexUtils: async ( { editor, page, pageUtils }, use ) => {
+		await use(
+			new ToolbarRovingTabindexUtils( { editor, page, pageUtils } )
+		);
 	},
 } );
 
@@ -60,11 +59,14 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'List' );
 		await ToolbarRovingTabindexUtils.focusBlockToolbar();
-		await page.click( `role=button[name="Select parent block: List"i]` );
+		await page
+			.getByRole( 'button', { name: 'Select parent block: List' } )
+			.click();
 		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'List' );
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
 			'Block: List',
-			'List'
+			'List',
+			{ hasInnerBlocks: true }
 		);
 
 		// ensures table block toolbar uses roving tabindex
@@ -135,7 +137,8 @@ test.describe( 'Toolbar roving tabindex', () => {
 } );
 
 class ToolbarRovingTabindexUtils {
-	constructor( { page, pageUtils } ) {
+	constructor( { editor, page, pageUtils } ) {
+		this.editor = editor;
 		this.page = page;
 		this.pageUtils = pageUtils;
 	}
@@ -159,34 +162,43 @@ class ToolbarRovingTabindexUtils {
 	}
 
 	async expectLabelToHaveFocus( label ) {
-		let ariaLabel = await this.page.evaluate( () => {
-			const { activeElement } =
-				document.activeElement.contentDocument ?? document;
-			return activeElement.getAttribute( 'aria-label' );
-		} );
+		let ariaLabel = await this.editor.getFocusOwnerLabel();
 		// If the labels don't match, try pressing Up Arrow to focus the block wrapper in non-content editable block.
 		if ( ariaLabel !== label ) {
 			await this.page.keyboard.press( 'ArrowUp' );
-			ariaLabel = await this.page.evaluate( () => {
-				const { activeElement } =
-					document.activeElement.contentDocument ?? document;
-				return activeElement.getAttribute( 'aria-label' );
-			} );
+			ariaLabel = await this.editor.getFocusOwnerLabel();
 		}
 		expect( ariaLabel ).toBe( label );
 	}
 
 	async wrapCurrentBlockWithGroup( currentBlockTitle ) {
-		await this.page.click( `role=button[name="${ currentBlockTitle }"i]` );
-		await this.page.click( `role=menuitem[name="Group"]` );
+		await this.page
+			.getByRole( 'button', { name: currentBlockTitle, exact: true } )
+			.click();
+		await this.page
+			.getByRole( 'menuitem', { name: 'Group', exact: true } )
+			.click();
 	}
 
-	async testGroupKeyboardNavigation( currentBlockLabel, currentBlockTitle ) {
+	async testGroupKeyboardNavigation(
+		currentBlockLabel,
+		currentBlockTitle,
+		{ hasInnerBlocks = false } = {}
+	) {
 		await this.expectLabelToHaveFocus( 'Block: Group' );
 		await this.page.keyboard.press( 'ArrowRight' );
+		if ( hasInnerBlocks ) {
+			// ArrowRight enters a nested inner block (e.g. list-item
+			// inside list). Use primary+a to escalate selection back
+			// to the expected parent block.
+			await this.pageUtils.pressKeys( 'primary+a', { times: 2 } );
+		}
 		await this.expectLabelToHaveFocus( currentBlockLabel );
 		await this.pageUtils.pressKeys( 'shift+Tab' );
 		await this.expectLabelToHaveFocus( 'Select parent block: Group' );
+		await this.page.keyboard.press( 'ArrowRight' );
+		// The parent selector segment also hosts the inserter.
+		await this.expectLabelToHaveFocus( 'Add block' );
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( currentBlockTitle );
 	}

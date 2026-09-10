@@ -19,7 +19,6 @@
 	},
 	"supports": {
 		"__experimentalOnEnter": true,
-		"__experimentalOnMerge": true,
 		"__experimentalSettings": true,
 		"align": [ "wide", "full" ],
 		"anchor": true,
@@ -28,8 +27,10 @@
 		"background": {
 			"backgroundImage": true,
 			"backgroundSize": true,
+			"gradient": true,
 			"__experimentalDefaultControls": {
-				"backgroundImage": true
+				"backgroundImage": true,
+				"gradient": true
 			}
 		},
 		"color": {
@@ -46,14 +47,15 @@
 		"spacing": {
 			"margin": [ "top", "bottom" ],
 			"padding": true,
-			"blockGap": true,
+			"blockGap": [ "horizontal", "vertical" ],
 			"__experimentalDefaultControls": {
 				"padding": true,
 				"blockGap": true
 			}
 		},
 		"dimensions": {
-			"minHeight": true
+			"minHeight": true,
+			"minWidth": true
 		},
 		"__experimentalBorder": {
 			"color": true,

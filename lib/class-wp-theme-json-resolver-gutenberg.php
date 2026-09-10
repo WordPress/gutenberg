@@ -144,7 +144,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	protected static function translate( $theme_json, $domain = 'default' ) {
 		if ( null === static::$i18n_schema ) {
 			$i18n_schema         = wp_json_file_decode( __DIR__ . '/theme-i18n.json' );
-			static::$i18n_schema = null === $i18n_schema ? array() : $i18n_schema;
+			static::$i18n_schema = $i18n_schema ?? array();
 		}
 
 		return translate_settings_using_i18n_schema( static::$i18n_schema, $theme_json, $domain );
@@ -224,7 +224,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *              Added registration and merging of block style variations from partial theme.json files and the block styles registry.
 	 *
 	 * @param array $deprecated Deprecated. Not used.
-	 * @param array $options {
+	 * @param array $options    {
 	 *     Options arguments.
 	 *
 	 *     @type bool $with_supports Whether to include theme supports in the data. Default true.
@@ -927,7 +927,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 *
-	 * @param array $data   Array following the theme.json specification.
+	 * @param array $data       Array following the theme.json specification.
 	 * @param array $variations Shared block style variations.
 	 * @return array Theme json data including shared block style variation definitions.
 	 */
@@ -969,7 +969,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 *
-	 * @param array $data   Array following the theme.json specification.
+	 * @param array $data Array following the theme.json specification.
 	 * @return array Theme json data including variations from the block styles registry.
 	 */
 	private static function inject_variations_from_block_styles_registry( $data ) {

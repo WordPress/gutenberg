@@ -150,15 +150,7 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 	 */
 	public function prepare_item_for_response( $item, $request ) {
 		// Don't prepare the response body for HEAD requests.
-		/*
-		 * Gutenberg only. Do not backport this change to core.
-		 * Using the get_method() method to check the request method
-		 * to satisfy the minimum `GUTENBERG_MINIMUM_WP_VERSION` version requirement for WordPress 6.7 and above.
-		 * Once 6.9 is released, we can make Gutenberg's minimum version
-		 * requirement 6.8 and then use the is_method() method instead.
-		 * See: https://core.trac.wordpress.org/changeset/59899
-		 */
-		if ( 'HEAD' === $request->get_method() ) {
+		if ( $request->is_method( 'HEAD' ) ) {
 			return new WP_REST_Response( array() );
 		}
 
@@ -311,7 +303,7 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 	 * @since 6.5.0
 	 *
 	 * @param WP_Block_Template $template_object Template instance.
-	 * @return string                            Original source of the template one of theme, plugin, site, or user.
+	 * @return string Original source of the template one of theme, plugin, site, or user.
 	 */
 	private static function get_wp_templates_original_source_field( $template_object ) {
 		if ( 'wp_template' === $template_object->type || 'wp_template_part' === $template_object->type ) {
@@ -363,7 +355,7 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 	 * @since 6.5.0
 	 *
 	 * @param WP_Block_Template $template_object Template instance.
-	 * @return string                            Human readable text for the author.
+	 * @return string Human readable text for the author.
 	 */
 	private static function get_wp_templates_author_text_field( $template_object ) {
 		$original_source = self::get_wp_templates_original_source_field( $template_object );
@@ -404,9 +396,7 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 				if ( isset( $plugins[ $plugin_basename ] ) && isset( $plugins[ $plugin_basename ]['Name'] ) ) {
 					return $plugins[ $plugin_basename ]['Name'];
 				}
-				return isset( $template_object->plugin ) ?
-					$template_object->plugin :
-					$template_object->theme;
+				return $template_object->plugin ?? $template_object->theme;
 			case 'site':
 				return get_bloginfo( 'name' );
 			case 'user':

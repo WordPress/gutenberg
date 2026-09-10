@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { proxifyState, proxifyStore, deepMerge, peek } from './proxies';
 import { PENDING_GETTER } from './proxies/state';
 import { getNamespace } from './namespaces';
@@ -329,7 +326,3 @@ export const populateServerData = ( data?: {
 		);
 	}
 };
-
-// Parse and populate the initial state and config.
-const data = parseServerData();
-populateServerData( data );

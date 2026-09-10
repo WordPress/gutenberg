@@ -61,7 +61,7 @@ $input-size: 300px;
 	color: $gray-700;
 	display: block;
 	font-size: $default-font-size;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	background: $white;
 	width: 100%;
 	border: none;

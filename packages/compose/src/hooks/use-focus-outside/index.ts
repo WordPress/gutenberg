@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 
 /**
@@ -78,7 +75,7 @@ export default function useFocusOutside(
 
 	const preventBlurCheckRef = useRef( false );
 
-	const blurCheckTimeoutIdRef = useRef< number | undefined >();
+	const blurCheckTimeoutIdRef = useRef< number >( undefined );
 
 	/**
 	 * Cancel a blur check timeout.

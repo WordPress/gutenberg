@@ -31,7 +31,7 @@ function arrayLast( array ) {
 function getReferences( context, specifiers ) {
 	const variables = specifiers.reduce(
 		( acc, specifier ) =>
-			acc.concat( context.getDeclaredVariables( specifier ) ),
+			acc.concat( context.sourceCode.getDeclaredVariables( specifier ) ),
 		[]
 	);
 	const references = variables.reduce(
@@ -58,7 +58,9 @@ function collectAllNodesFromCallbackFunctions( context, node ) {
 		( acc, { identifier: { parent } } ) =>
 			parent && parent.arguments && parent.arguments.length > 0
 				? acc.concat(
-						context.getDeclaredVariables( parent.arguments[ 0 ] )
+						context.sourceCode.getDeclaredVariables(
+							parent.arguments[ 0 ]
+						)
 				  )
 				: acc,
 		[]
@@ -153,9 +155,10 @@ function getFixes( fixer, context, callNode ) {
 		fixer.replaceText( callNode.arguments[ 0 ], variableName ),
 	];
 
-	const imports = context
-		.getAncestors()[ 0 ]
-		.body.filter( ( node ) => node.type === 'ImportDeclaration' );
+	const ancestors = context.sourceCode.getAncestors( callNode );
+	const imports = ancestors[ 0 ].body.filter(
+		( node ) => node.type === 'ImportDeclaration'
+	);
 	const packageImports = imports.filter(
 		( node ) => node.source.value === importName
 	);

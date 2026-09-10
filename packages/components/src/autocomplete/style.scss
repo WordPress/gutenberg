@@ -12,6 +12,7 @@
 	min-height: $button-size;
 	text-align: left;
 	width: 100%;
+	font-weight: var(--wpds-typography-font-weight-default);
 
 	&:focus:not(:disabled) {
 		@include block-toolbar-button-style__focus();

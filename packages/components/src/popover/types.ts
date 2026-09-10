@@ -1,8 +1,6 @@
-/**
- * External dependencies
- */
-import type { ReactNode, MutableRefObject, SyntheticEvent } from 'react';
 import type { Placement } from '@floating-ui/react-dom';
+import type { useFocusOnMount } from '@wordpress/compose';
+import type { MutableRefObject, ReactNode, SyntheticEvent } from 'react';
 
 type PositionYAxis = 'top' | 'middle' | 'bottom';
 type PositionXAxis = 'left' | 'center' | 'right';
@@ -68,22 +66,24 @@ export type PopoverProps = {
 	/**
 	 * Determines whether tabbing is constrained to within the popover,
 	 * preventing keyboard focus from leaving the popover content without
-	 * explicit focus elswhere, or whether the popover remains part of the wider
+	 * explicit focus elsewhere, or whether the popover remains part of the wider
 	 * tab order. If no value is passed, it will be derived from `focusOnMount`.
 	 *
 	 * @default `focusOnMount` !== false
 	 */
 	constrainTabbing?: boolean;
 	/**
-	 * By default, the _first tabbable element_ in the popover will receive focus
-	 * when it mounts. This is the same as setting this prop to `"firstElement"`.
-	 * Specifying a `false` value disables the focus handling entirely (this
-	 * should only be done when an appropriately accessible substitute behavior
-	 * exists).
+	 * Determines focus behavior when the popover mounts.
+	 *
+	 * - `"firstElement"` focuses the first tabbable element within.
+	 * - `"firstInputElement"` focuses the first value control within.
+	 * - `true` focuses the element itself.
+	 * - `false` does nothing and _should not be used unless an accessible
+	 *    substitute behavior is implemented_.
 	 *
 	 * @default 'firstElement'
 	 */
-	focusOnMount?: 'firstElement' | boolean;
+	focusOnMount?: useFocusOnMount.Mode;
 	/**
 	 * A callback invoked when the focus leaves the opened popover. This should
 	 * only be provided in advanced use-cases when a popover should close under
@@ -105,9 +105,15 @@ export type PopoverProps = {
 	 */
 	noArrow?: boolean;
 	/**
-	 * The distance (in px) between the anchor and the popover.
+	 * The distance (in px) between the anchor and the popover. Pass an object to
+	 * also displace the popover along its cross axis.
 	 */
-	offset?: number;
+	offset?:
+		| number
+		| {
+				mainAxis?: number;
+				crossAxis?: number;
+		  };
 	/**
 	 * A callback invoked when the popover should be closed.
 	 */

@@ -6,12 +6,14 @@ import type { FieldRootProps } from './types';
 import { Stack } from '../../../stack';
 
 const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
-	<Stack { ...props } direction="column" gap="xs" />
+	<Stack { ...props } direction="column" gap="sm" />
 );
 
 /**
  * A low-level component that associates an accessible label and description
  * with a single form control element.
+ *
+ * To label a group of multiple form control elements, use the `Fieldset` component instead.
  *
  * Simply wrapping a control with this component does not guarantee
  * accessible labeling. See examples for how to associate the label in different cases.

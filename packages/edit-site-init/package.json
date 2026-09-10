@@ -28,14 +28,14 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
-	"wpScriptModuleExports": "./build-module/index.js",
+	"module": "build-module/index.mjs",
+	"wpScriptModuleExports": "./build-module/index.mjs",
 	"dependencies": {
 		"@wordpress/boot": "file:../boot",
 		"@wordpress/data": "file:../data",
-		"@wordpress/icons": "file:../icons"
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/preferences": "file:../preferences"
 	},
 	"publishConfig": {
 		"access": "public"

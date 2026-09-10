@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { logged } from './utils';
 
 function isDev(): boolean {
@@ -43,7 +40,7 @@ export default function warning( message: string ): void {
 	// https://github.com/facebook/react/issues/4216
 	try {
 		throw Error( message );
-	} catch ( x ) {
+	} catch {
 		// Do nothing.
 	}
 	logged.add( message );

@@ -39,13 +39,23 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	add_filter( 'excerpt_more', $filter_excerpt_more );
 
 	/*
-	* The purpose of the excerpt length setting is to limit the length of both
-	* automatically generated and user-created excerpts.
-	* Because the excerpt_length filter only applies to auto generated excerpts,
-	* wp_trim_words is used instead.
-	*/
+	 * The purpose of the excerpt length setting is to limit the length of both
+	 * automatically generated and user-created excerpts.
+	 * Because the excerpt_length filter only applies to auto generated excerpts,
+	 * wp_trim_words is used instead.
+	 *
+	 * To ensure the block's excerptLength setting works correctly for auto-generated
+	 * excerpts, we temporarily override excerpt_length to 101 (the max block setting)
+	 * so that wp_trim_excerpt doesn't pre-trim the content before wp_trim_words can
+	 * apply the user's desired length.
+	 */
 	$excerpt_length = $attributes['excerptLength'];
-	$excerpt        = get_the_excerpt( $block->context['postId'] );
+	add_filter( 'excerpt_length', 'block_core_post_excerpt_excerpt_length', PHP_INT_MAX );
+
+	$excerpt = get_the_excerpt( $block->context['postId'] );
+
+	remove_filter( 'excerpt_length', 'block_core_post_excerpt_excerpt_length', PHP_INT_MAX );
+
 	if ( isset( $excerpt_length ) ) {
 		$excerpt = wp_trim_words( $excerpt, $excerpt_length );
 	}
@@ -63,8 +73,11 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	$show_more_on_new_line = ! isset( $attributes['showMoreOnNewLine'] ) || $attributes['showMoreOnNewLine'];
 	if ( $show_more_on_new_line && ! empty( $more_text ) ) {
 		$content .= '</p><p class="wp-block-post-excerpt__more-text">' . $more_text . '</p>';
+	} elseif ( empty( $more_text ) ) {
+		$content .= '</p>';
 	} else {
-		$content .= " $more_text</p>";
+		$separator = '' === $excerpt ? '' : ' ';
+		$content  .= $separator . $more_text . '</p>';
 	}
 	remove_filter( 'excerpt_more', $filter_excerpt_more );
 	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $content );
@@ -86,18 +99,22 @@ function register_block_core_post_excerpt() {
 add_action( 'init', 'register_block_core_post_excerpt' );
 
 /**
+ * Callback for the excerpt_length filter to override the excerpt length.
+ *
  * If themes or plugins filter the excerpt_length, we need to
  * override the filter in the editor, otherwise
  * the excerpt length block setting has no effect.
- * Returns 100 because 100 is the max length in the setting.
+ * Returns 101 (one more than the max block setting of 100) to ensure
+ * wp_trim_words can detect when trimming is needed and add the ellipsis.
+ *
+ * @since 7.0.0
+ *
+ * @return int The excerpt length.
  */
-if ( is_admin() ||
-	defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-	add_filter(
-		'excerpt_length',
-		static function () {
-			return 100;
-		},
-		PHP_INT_MAX
-	);
+function block_core_post_excerpt_excerpt_length() {
+	return 101;
+}
+
+if ( is_admin() ) {
+	add_filter( 'excerpt_length', 'block_core_post_excerpt_excerpt_length', PHP_INT_MAX );
 }

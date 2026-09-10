@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`props should render correctly 1`] = `
+<div
+  class="style-spacer components-spacer"
+  data-testid="spacer"
+  data-wp-c16t="true"
+  data-wp-component="Spacer"
+  style="--wp-components-spacer-margin-block-end: calc(4px * 2);"
+/>
+`;

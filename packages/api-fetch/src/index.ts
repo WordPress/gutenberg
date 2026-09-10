@@ -1,14 +1,11 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import { lock } from './lock-unlock';
 import createNonceMiddleware from './middlewares/nonce';
 import createRootURLMiddleware from './middlewares/root-url';
-import createPreloadingMiddleware from './middlewares/preloading';
+import createPreloadingMiddleware, {
+	CLEAR as PRELOADING_CLEAR,
+	ENABLE_MULTI_USE as PRELOADING_ENABLE_MULTI_USE,
+} from './middlewares/preloading';
 import fetchAllMiddleware from './middlewares/fetch-all-middleware';
 import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
@@ -61,9 +58,42 @@ function registerMiddleware( middleware: APIFetchMiddleware ) {
 	middlewares.unshift( middleware );
 }
 
-const defaultFetchHandler: FetchHandler = ( nextOptions ) => {
-	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
-	let { body, headers } = nextOptions;
+/**
+ * Unregister a middleware
+ *
+ * @param middleware
+ * @return Whether the middleware was registered.
+ */
+function unregisterMiddleware( middleware: APIFetchMiddleware ) {
+	const index = middlewares.indexOf( middleware );
+	if ( index === -1 ) {
+		return false;
+	}
+	middlewares.splice( index, 1 );
+	return true;
+}
+
+function enablePreloadMultiUse() {
+	for ( const middleware of middlewares ) {
+		( middleware as any )[ PRELOADING_ENABLE_MULTI_USE ]?.();
+	}
+}
+
+function clearPreloadedData() {
+	for ( const middleware of middlewares ) {
+		( middleware as any )[ PRELOADING_CLEAR ]?.();
+	}
+}
+
+/**
+ * The default fetch handler, using `window.fetch`. Exposed so it can be
+ * restored after `setFetchHandler` overrides it.
+ *
+ * @param options The options for the fetch.
+ */
+const defaultFetchHandler: FetchHandler = ( options ) => {
+	const { url, path, data, parse = true, ...remainingOptions } = options;
+	let { body, headers } = options;
 
 	// Merge explicitly-provided headers with default values.
 	headers = { ...DEFAULT_HEADERS, ...headers };
@@ -135,20 +165,24 @@ function setFetchHandler( newFetchHandler: FetchHandler ) {
 	fetchHandler = newFetchHandler;
 }
 
-interface apiFetch {
+export interface ApiFetch {
 	< T, Parse extends boolean = true >(
 		options: APIFetchOptions< Parse >
 	): Promise< Parse extends true ? T : Response >;
 	nonceEndpoint?: string;
 	nonceMiddleware?: ReturnType< typeof createNonceMiddleware >;
 	use: ( middleware: APIFetchMiddleware ) => void;
+	unregister: ( middleware: APIFetchMiddleware ) => boolean;
 	setFetchHandler: ( newFetchHandler: FetchHandler ) => void;
+	defaultFetchHandler: FetchHandler;
 	createNonceMiddleware: typeof createNonceMiddleware;
 	createPreloadingMiddleware: typeof createPreloadingMiddleware;
 	createRootURLMiddleware: typeof createRootURLMiddleware;
 	fetchAllMiddleware: typeof fetchAllMiddleware;
+	httpV1Middleware: typeof httpV1Middleware;
 	mediaUploadMiddleware: typeof mediaUploadMiddleware;
 	createThemePreviewMiddleware: typeof createThemePreviewMiddleware;
+	privateApis: object;
 }
 
 /**
@@ -157,7 +191,7 @@ interface apiFetch {
  * @param options The options for the fetch.
  * @return A promise representing the request processed via the registered middlewares.
  */
-const apiFetch: apiFetch = ( options ) => {
+const apiFetch: ApiFetch = ( options ) => {
 	// creates a nested function chain that calls all middlewares and finally the `fetchHandler`,
 	// converting `middlewares = [ m1, m2, m3 ]` into:
 	// ```
@@ -195,12 +229,26 @@ const apiFetch: apiFetch = ( options ) => {
 };
 
 apiFetch.use = registerMiddleware;
+apiFetch.unregister = unregisterMiddleware;
 apiFetch.setFetchHandler = setFetchHandler;
+apiFetch.defaultFetchHandler = defaultFetchHandler;
+
+// Attached to the function (rather than a named export) because
+// `wpScriptDefaultExport: true` flattens this module to its default
+// export — `wp.apiFetch` is the function itself, so anything that
+// needs to be reachable from a consumer's `wp.apiFetch.X` lookup has
+// to live on the function.
+apiFetch.privateApis = {};
+lock( apiFetch.privateApis, {
+	enablePreloadMultiUse,
+	clearPreloadedData,
+} );
 
 apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
 apiFetch.fetchAllMiddleware = fetchAllMiddleware;
+apiFetch.httpV1Middleware = httpV1Middleware;
 apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
 apiFetch.createThemePreviewMiddleware = createThemePreviewMiddleware;
 

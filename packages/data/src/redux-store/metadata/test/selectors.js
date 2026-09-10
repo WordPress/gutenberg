@@ -1,6 +1,4 @@
-/**
- * WordPress dependencies
- */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry } from '@wordpress/data';
 
 const getFooSelector = ( state ) => state;
@@ -21,7 +19,7 @@ const testStore = {
 async function resolve( registry, selector ) {
 	try {
 		await registry.resolveSelect( 'store' )[ selector ]();
-	} catch ( e ) {}
+	} catch {}
 }
 
 describe( 'getIsResolving', () => {
@@ -458,7 +456,7 @@ describe( 'Selector arguments normalization', () => {
 	} );
 
 	it( 'should call normalization method on target selector if exists', () => {
-		const normalizationFunction = jest.fn( ( args ) => {
+		const normalizationFunction = vi.fn( ( args ) => {
 			return args.map( Number );
 		} );
 		getFooSelector.__unstableNormalizeArgs = normalizationFunction;

@@ -1,12 +1,10 @@
-/**
- * Internal dependencies
- */
 import {
 	createBlockEditFilter,
 	createBlockListBlockFilter,
 	createBlockSaveFilter,
 } from './utils';
 import './compat';
+import './cross-origin-isolation';
 import align from './align';
 import background from './background';
 import './lock';
@@ -23,19 +21,21 @@ import duotone from './duotone';
 import fontFamily from './font-family';
 import fontSize from './font-size';
 import textAlign from './text-align';
+import textShadow from './text-shadow';
 import fitText from './fit-text';
 import border from './border';
+import customCSS from './custom-css';
 import position from './position';
 import blockStyleVariation from './block-style-variation';
 import layout from './layout';
 import childLayout from './layout-child';
-import contentLockUI from './content-lock-ui';
 import './metadata';
 import blockHooks from './block-hooks';
 import blockBindingsPanel from './block-bindings';
 import listView from './list-view';
 import './block-renaming';
 import './grid-visualizer';
+import AutoRegisterControls from './auto-inspector-controls';
 
 createBlockEditFilter(
 	[
@@ -44,16 +44,17 @@ createBlockEditFilter(
 		anchor,
 		customClassName,
 		style,
+		customCSS,
 		duotone,
 		fitText,
 		position,
 		layout,
-		contentLockUI,
 		blockHooks,
 		blockBindingsPanel,
 		childLayout,
 		allowedBlocks,
 		listView,
+		AutoRegisterControls,
 	].filter( Boolean )
 );
 createBlockListBlockFilter( [
@@ -66,8 +67,10 @@ createBlockListBlockFilter( [
 	duotone,
 	fontFamily,
 	fontSize,
+	textShadow,
 	fitText,
 	border,
+	customCSS,
 	position,
 	blockStyleVariation,
 	childLayout,
@@ -79,14 +82,17 @@ createBlockSaveFilter( [
 	ariaLabel,
 	customClassName,
 	border,
+	customCSS,
 	fitText,
 	color,
 	style,
 	fontFamily,
 	fontSize,
+	textShadow,
 ] );
 
 export { useCustomSides } from './dimensions';
+export { getDimensionsClassesAndStyles } from './use-dimensions-props';
 export { useLayoutClasses, useLayoutStyles } from './layout';
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
 export { getShadowClassesAndStyles } from './use-shadow-props';
@@ -97,5 +103,5 @@ export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
 export { setBackgroundStyleDefaults } from './background';
 export { useZoomOut } from './use-zoom-out';
-export { __unstableBlockStyleVariationOverridesWithConfig } from './block-style-variation';
+export { BlockStyleVariationOverridesWithConfig } from './block-style-variation';
 export { useStyleOverride } from './utils';
