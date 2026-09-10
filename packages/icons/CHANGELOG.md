@@ -2,22 +2,33 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   A further 141 icons are now stroke-based. Use CSS `color` rather than `fill` to recolor them. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+
+### Enhancements
+
+-   Redraw a further 141 icons as stroke-based for variable stroke-width support, following the convention introduced in [#78808](https://github.com/WordPress/gutenberg/pull/78808), and refine the already stroke-based `image` drawing. Most retain their original footprint; the table icons, `capturePhoto` and `image` are slightly smaller by design. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+
+### Bug Fixes
+
+-   `formatIndent`, `formatIndentRTL`, `formatOutdent` and `formatOutdentRTL`: correct the arrow geometry, which was malformed in the previous drawings. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+
 ## 16.0.0 (2026-09-10)
 
 ### Breaking Changes
 
--   A further 205 icons are now stroke-based. Use CSS `color` rather than `fill` to recolor them. ([#78812](https://github.com/WordPress/gutenberg/pull/78812), [#82338](https://github.com/WordPress/gutenberg/pull/82338), [#82540](https://github.com/WordPress/gutenberg/pull/82540))
+-   The `search` icon is now stroke-based. Use CSS `color` rather than `fill` to recolor it. ([#82338](https://github.com/WordPress/gutenberg/pull/82338))
 -   Stroke-based icons now declare `fill: none` via inline `style` on the outer `<svg>` instead of the `fill` attribute, so the source's intent survives ordinary third-party CSS overrides like `.foo svg { fill: currentColor }` without using `!important`. Consumers should use CSS `color` to recolor icons. A `fill` prop or ordinary CSS `fill` declaration no longer overrides the intrinsic `fill: none`; pass `style={ { fill: value } }` to deliberately replace it. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   Stroke-based icons use `vector-effect="non-scaling-stroke"`, so their stroke width stays constant when rendered outside the Icon block at sizes other than 24px. The Icon block deliberately restores the previous proportional stroke scaling. When new bundled icon elements run with an older externalized `wp.components.Icon`, supplying an unrelated `style` prop can replace the icon's intrinsic style; update the paired packages together to retain merged styles. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 
 ### Enhancements
 
--   Redraw a further 205 icons as stroke-based for variable stroke-width support, following the convention introduced in [#78808](https://github.com/WordPress/gutenberg/pull/78808): 63 icons in [#78812](https://github.com/WordPress/gutenberg/pull/78812), `search` in [#82338](https://github.com/WordPress/gutenberg/pull/82338), and 141 icons in [#82540](https://github.com/WordPress/gutenberg/pull/82540). [#82540](https://github.com/WordPress/gutenberg/pull/82540) also refines the already stroke-based `image` drawing. Most retain their original footprint; the table icons, `capturePhoto`, and `image` are slightly smaller by design.
 -   Redraw 35 icons as stroke-based for variable stroke-width support, and introduce the `vector-effect="non-scaling-stroke"` convention so stroke weight stays consistent across icon sizes (originally landed in [#78774](https://github.com/WordPress/gutenberg/pull/78774), reverted in [#78854](https://github.com/WordPress/gutenberg/pull/78854) due to CSS-override regressions, re-introduced here with the resilience fix): `addCard`, `addTemplate`, `cancelCircleFilled`, `caution`, `cautionFilled`, `code`, `commentAuthorAvatar`, `cover`, `currencyDollar`, `currencyEuro`, `currencyPound`, `drafts`, `help`, `helpFilled`, `image`, `info`, `lifesaver`, `link`, `linkOff`, `navigation`, `notAllowed`, `paragraph`, `pending`, `plusCircle`, `plusCircleFilled`, `published`, `scheduled`, `siteLogo`, `square`, `starEmpty`, `starFilled`, `starHalf`, `styles`, `time`, `tip`. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   Redraw a further 63 icons as stroke-based for variable stroke-width support, following the convention introduced in [#78808](https://github.com/WordPress/gutenberg/pull/78808): `alignCenter`, `alignJustify`, `alignLeft`, `alignNone`, `alignRight`, `arrowDownLeft`, `arrowDownRight`, `arrowDown`, `arrowLeft`, `arrowRight`, `arrowUpLeft`, `arrowUpRight`, `arrowUp`, `blockMeta`, `category`, `chartBar`, `check`, `chevronDownSmall`, `chevronDown`, `chevronLeftSmall`, `chevronLeft`, `chevronRightSmall`, `chevronRight`, `chevronUpDown`, `chevronUpSmall`, `chevronUp`, `closeSmall`, `close`, `create`, `download`, `handle`, `homeButton`, `justifyBottom`, `justifyCenterVertical`, `justifyCenter`, `justifyLeft`, `justifyRight`, `justifySpaceBetweenVertical`, `justifySpaceBetween`, `justifyStretchVertical`, `justifyStretch`, `justifyTop`, `lineDashed`, `lineDotted`, `lineSolid`, `listView`, `menu`, `next`, `plus`, `positionCenter`, `positionLeft`, `positionRight`, `previous`, `pullLeft`, `pullRight`, `pullquote`, `reset`, `resizeCornerNE`, `rss`, `separator`, `stretchFullWidth`, `stretchWide`, `upload`. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 
 ### Bug Fixes
 
--   `formatIndent`, `formatIndentRTL`, `formatOutdent` and `formatOutdentRTL`: correct the arrow geometry, which was malformed in the previous drawings. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
 -   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 
 ## 15.5.0 (2026-08-26)

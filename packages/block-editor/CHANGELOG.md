@@ -14,6 +14,7 @@
 ### Bug Fixes
 
 -   `InnerBlocks`: Resolve a container's legacy layout markup (`inherit: true`, or a bare `contentSize` / `wideSize` with no `type`) to a constrained layout for its inner blocks, so they are offered the wide and full alignments. Previously only the container's styles honoured the legacy form, and the inner blocks resolved to the flow layout ([#82637](https://github.com/WordPress/gutenberg/pull/82637)).
+-   Block Patterns and Block Visibility: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
 
 ### Internal
 
@@ -47,7 +48,6 @@
 ### Bug Fixes
 
 -   `NavigableToolbar`: Preserve toolbar semantics while it is hidden, so asynchronous control changes do not remount custom block toolbars ([#82574](https://github.com/WordPress/gutenberg/pull/82574)).
--   Block Patterns and Block Visibility: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
 -   `ListView`: Drop the block icon's variation colors while the row is selected, so the icon keeps contrast against the selection background ([#82498](https://github.com/WordPress/gutenberg/pull/82498)).
 -   Flex layout: Output `flex-direction: row` when a viewport override switches a vertical layout to horizontal, so the base `flex-direction: column` no longer keeps applying on that viewport ([#82364](https://github.com/WordPress/gutenberg/pull/82364)).
 -   `BlockManager`: Color library block icons with `color` while retaining a `fill` fallback for custom icons that do not use `currentColor`. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
