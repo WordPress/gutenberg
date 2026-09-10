@@ -35,7 +35,7 @@ describe( 'focusable.find() CSS visibility', () => {
 			expect( input.offsetHeight ).toBeGreaterThan( 0 );
 			expect( input.getClientRects().length ).toBeGreaterThan( 0 );
 			input.focus();
-			expect( document.activeElement ).not.toBe( input );
+			expect( input ).not.toHaveFocus();
 			expect( find( node ) ).toEqual( [] );
 			expect( checkVisibility ).toHaveBeenCalledWith( {
 				visibilityProperty: true,
@@ -49,7 +49,7 @@ describe( 'focusable.find() CSS visibility', () => {
 		const input = node.querySelector( 'input' );
 
 		input.focus();
-		expect( document.activeElement ).toBe( input );
+		expect( input ).toHaveFocus();
 		expect( find( node ) ).toEqual( [ input ] );
 	} );
 
@@ -79,5 +79,246 @@ describe( 'focusable.find() CSS visibility', () => {
 		expect( find( iframeDocument.body ) ).toEqual( [ visibleInput ] );
 		expect( getComputedStyle ).toHaveBeenCalledWith( hiddenInput );
 		expect( getComputedStyle ).toHaveBeenCalledWith( visibleInput );
+	} );
+} );
+
+const createElement = ( type ) => document.createElement( type );
+const IMAGE_SOURCE =
+	'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
+function findFocusable( context ) {
+	if ( ! context.isConnected ) {
+		document.body.appendChild( context );
+	}
+	return find( context );
+}
+
+describe( 'focusable', () => {
+	beforeEach( () => {
+		document.body.innerHTML = '';
+	} );
+
+	describe( 'find()', () => {
+		it( 'returns empty array if no children', () => {
+			const node = createElement( 'div' );
+
+			expect( findFocusable( node ) ).toEqual( [] );
+		} );
+
+		it( 'returns empty array if no focusable children', () => {
+			const node = createElement( 'div' );
+			node.appendChild( createElement( 'div' ) );
+
+			expect( findFocusable( node ) ).toEqual( [] );
+		} );
+
+		it( 'returns array of focusable children', () => {
+			const node = createElement( 'div' );
+			node.appendChild( createElement( 'input' ) );
+
+			const focusable = findFocusable( node );
+
+			expect( focusable ).toHaveLength( 1 );
+			expect( focusable[ 0 ].nodeName ).toBe( 'INPUT' );
+		} );
+
+		it( 'finds nested focusable child', () => {
+			const node = createElement( 'div' );
+			node.appendChild( createElement( 'div' ) );
+			node.firstChild.appendChild( createElement( 'input' ) );
+
+			const focusable = findFocusable( node );
+
+			expect( focusable ).toHaveLength( 1 );
+			expect( focusable[ 0 ].nodeName ).toBe( 'INPUT' );
+		} );
+
+		it( 'finds link with no href but tabindex', () => {
+			const node = createElement( 'div' );
+			const link = createElement( 'a' );
+			link.tabIndex = 0;
+			node.appendChild( link );
+
+			expect( findFocusable( node ) ).toEqual( [ link ] );
+		} );
+
+		it( 'finds a mapped area whose referenced image is visible', async () => {
+			const node = createElement( 'div' );
+			node.innerHTML = `
+				<map name="testfocus">
+					<area href="#target" shape="rect" coords="0,0,30,30" alt="Target">
+				</map>
+				<img src="${ IMAGE_SOURCE }" usemap="#testfocus" width="40" height="40" alt="">
+			`;
+			const area = node.querySelector( 'area' );
+			const image = node.querySelector( 'img' );
+
+			document.body.appendChild( node );
+			await image.decode();
+
+			expect( area.getClientRects() ).toHaveLength( 0 );
+			expect( image.getClientRects().length ).toBeGreaterThan( 0 );
+			area.focus();
+			expect( area ).toHaveFocus();
+			expect( find( node ) ).toEqual( [ area ] );
+		} );
+
+		it( 'ignores a mapped area whose referenced image is hidden', () => {
+			const node = createElement( 'div' );
+			node.innerHTML = `
+				<map name="testfocus">
+					<area href="#target" shape="rect" coords="0,0,30,30" alt="Target">
+				</map>
+				<img src="${ IMAGE_SOURCE }" usemap="#testfocus" width="40" height="40" alt="" style="visibility: hidden">
+			`;
+			const image = node.querySelector( 'img' );
+
+			document.body.appendChild( node );
+
+			expect( image.getClientRects().length ).toBeGreaterThan( 0 );
+			expect( find( node ) ).toEqual( [] );
+		} );
+
+		it( 'ignores a mapped area whose referenced image is inside an inert subtree', () => {
+			const node = createElement( 'div' );
+			node.innerHTML = `
+				<map name="testfocus">
+					<area href="#target" shape="rect" coords="0,0,30,30" alt="Target">
+				</map>
+				<div inert>
+					<img src="${ IMAGE_SOURCE }" usemap="#testfocus" width="40" height="40" alt="">
+				</div>
+			`;
+
+			expect( findFocusable( node ) ).toEqual( [] );
+		} );
+
+		it( "finds a mapped area whose referenced image is outside the map's inert subtree", async () => {
+			const node = createElement( 'div' );
+			node.innerHTML = `
+				<div inert>
+					<map name="testfocus">
+						<area href="#target" shape="rect" coords="0,0,30,30" alt="Target">
+					</map>
+				</div>
+				<img src="${ IMAGE_SOURCE }" usemap="#testfocus" width="40" height="40" alt="">
+			`;
+			const area = node.querySelector( 'area' );
+			const image = node.querySelector( 'img' );
+
+			document.body.appendChild( node );
+			await image.decode();
+
+			area.focus();
+			expect( area ).toHaveFocus();
+			expect( find( node ) ).toEqual( [ area ] );
+		} );
+
+		it( 'finds contenteditable', () => {
+			const node = createElement( 'div' );
+			const div = createElement( 'div' );
+			node.appendChild( div );
+
+			div.setAttribute( 'contenteditable', '' );
+			expect( findFocusable( node ) ).toEqual( [ div ] );
+
+			div.setAttribute( 'contenteditable', 'true' );
+			expect( findFocusable( node ) ).toEqual( [ div ] );
+		} );
+
+		it( 'ignores contenteditable=false', () => {
+			const node = createElement( 'div' );
+			const div = createElement( 'div' );
+			node.appendChild( div );
+
+			div.setAttribute( 'contenteditable', 'false' );
+			expect( findFocusable( node ) ).toEqual( [] );
+		} );
+
+		it( 'ignores invisible inputs', () => {
+			const node = createElement( 'div' );
+			const input = createElement( 'input' );
+			node.appendChild( input );
+			// Keep the fixture connected so JSDOM invalidates computed styles.
+			document.body.appendChild( node );
+
+			input.style.visibility = 'hidden';
+			expect( findFocusable( node ) ).toEqual( [] );
+
+			input.style.visibility = 'visible';
+			input.style.display = 'none';
+			expect( findFocusable( node ) ).toEqual( [] );
+
+			input.style.display = 'inline-block';
+			const focusable = findFocusable( node );
+			expect( focusable ).toHaveLength( 1 );
+			expect( focusable[ 0 ].nodeName ).toBe( 'INPUT' );
+		} );
+
+		it( 'ignores inputs in invisible ancestors', () => {
+			const node = createElement( 'div' );
+			const input = createElement( 'input' );
+			node.appendChild( input );
+			// Keep the fixture connected so JSDOM invalidates computed styles.
+			document.body.appendChild( node );
+
+			node.style.visibility = 'hidden';
+			expect( findFocusable( node ) ).toEqual( [] );
+
+			node.style.visibility = 'visible';
+			node.style.display = 'none';
+			expect( findFocusable( node ) ).toEqual( [] );
+
+			node.style.display = 'block';
+			const focusable = findFocusable( node );
+			expect( focusable ).toHaveLength( 1 );
+			expect( focusable[ 0 ].nodeName ).toBe( 'INPUT' );
+		} );
+
+		it( 'does not return context even if focusable', () => {
+			const node = createElement( 'div' );
+			node.tabIndex = 0;
+
+			expect( findFocusable( node ) ).toEqual( [] );
+		} );
+
+		it( 'limits found focusables to specific context', () => {
+			const node = createElement( 'div' );
+			node.appendChild( createElement( 'div' ) );
+			document.body.appendChild( node );
+			document.body.appendChild( createElement( 'input' ) );
+
+			expect( findFocusable( node ) ).toEqual( [] );
+		} );
+
+		it( 'ignores elements inside inert containers', () => {
+			const node = createElement( 'div' );
+			const inertDiv = createElement( 'div' );
+			inertDiv.setAttribute( 'inert', '' );
+			const input = createElement( 'input' );
+			inertDiv.appendChild( input );
+			node.appendChild( inertDiv );
+
+			expect( findFocusable( node ) ).toEqual( [] );
+		} );
+
+		it( 'returns focusable elements outside inert containers', () => {
+			const node = createElement( 'div' );
+
+			// Inert container with input
+			const inertDiv = createElement( 'div' );
+			inertDiv.setAttribute( 'inert', '' );
+			const inertInput = createElement( 'input' );
+			inertDiv.appendChild( inertInput );
+			node.appendChild( inertDiv );
+
+			// Non-inert input
+			const visibleInput = createElement( 'input' );
+			node.appendChild( visibleInput );
+
+			const focusable = findFocusable( node );
+			expect( focusable ).toHaveLength( 1 );
+			expect( focusable[ 0 ] ).toBe( visibleInput );
+		} );
 	} );
 } );

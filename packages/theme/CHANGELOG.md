@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Run rendered Theme tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
 ## 2.1.0 (2026-09-10)
 
 ### New Features
