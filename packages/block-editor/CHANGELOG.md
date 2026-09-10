@@ -14,6 +14,10 @@
 
 -   `InnerBlocks`: Resolve a container's legacy layout markup (`inherit: true`, or a bare `contentSize` / `wideSize` with no `type`) to a constrained layout for its inner blocks, so they are offered the wide and full alignments. Previously only the container's styles honoured the legacy form, and the inner blocks resolved to the flow layout ([#82637](https://github.com/WordPress/gutenberg/pull/82637)).
 
+### Internal
+
+-   Layout hooks: Use `normalizeLegacyLayout` in `useLayoutClasses`, `useLayoutStyles`, the block layout styles wrapper and `isAxialBlockGapAllowed`, replacing four inline copies of the legacy `inherit` / size check ([#82710](https://github.com/WordPress/gutenberg/pull/82710)).
+
 ## 17.1.0 (2026-09-10)
 
 ### New Features
@@ -32,7 +36,6 @@
 ### Internal
 
 -   `BlockPreview`: Stop applying the private `Disabled` component class name to block previews ([#82651](https://github.com/WordPress/gutenberg/pull/82651)).
--   Layout hooks: Use `normalizeLegacyLayout` in `useLayoutClasses`, `useLayoutStyles`, the block layout styles wrapper and `isAxialBlockGapAllowed`, replacing four inline copies of the legacy `inherit` / size check ([#82710](https://github.com/WordPress/gutenberg/pull/82710)).
 -   Pattern Overrides Dropdown: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` ([#77492](https://github.com/WordPress/gutenberg/pull/77492)).
 -   Allowed Blocks Modal: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` ([#78119](https://github.com/WordPress/gutenberg/pull/78119)).
 -   Block Switcher: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` for the bindings hint ([#77366](https://github.com/WordPress/gutenberg/pull/77366)).

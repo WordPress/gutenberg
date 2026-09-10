@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `MediaUpload`: Coerce `multiple` to a boolean before passing it to the experimental media modal; callers such as the playlist block and the inserter media tab pass the legacy media frame's `'add'` mode. ([#82715](https://github.com/WordPress/gutenberg/pull/82715))
+
 ## 15.0.0 (2026-09-10)
 
 ### Breaking Changes
@@ -21,7 +25,6 @@
 
 ### Bug Fixes
 
--   `MediaUpload`: Coerce `multiple` to a boolean before passing it to the experimental media modal; callers such as the playlist block and the inserter media tab pass the legacy media frame's `'add'` mode. ([#82715](https://github.com/WordPress/gutenberg/pull/82715))
 -   `PostURL`: Translate the copy permalink button label, which was hardcoded in English ([#82642](https://github.com/WordPress/gutenberg/pull/82642)).
 -   User autocompleter: Don't open the mention popup when the `@` follows other text, such as while typing an email address; mentions still trigger after a space, punctuation, or at the start of a line ([#47249](https://github.com/WordPress/gutenberg/pull/47249)).
 -   More menu: Align SVG prefix icons with item labels using `Menu.PrefixIcon`, preserving Dashicon and custom component support. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
