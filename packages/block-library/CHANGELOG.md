@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Navigation: Reset the submenu detection for each rendered block. Once a Navigation with a submenu rendered, every Navigation rendered afterwards in the same request was treated as having one and loaded the navigation view module it does not need ([#82366](https://github.com/WordPress/gutenberg/pull/82366)).
+
 ## 11.0.0 (2026-09-10)
 
 ### Breaking Changes
