@@ -1,5 +1,4 @@
-import { speak } from '@wordpress/a11y';
-import { forwardRef, renderToString, useEffect } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { info, published, error, caution } from '@wordpress/icons';
 import { useRender, mergeProps } from '@base-ui/react';
 import clsx from 'clsx';
@@ -18,51 +17,10 @@ const icons: { [ key in NoticeIntent ]: IconProps[ 'icon' ] | null } = {
 };
 
 /**
- * Returns the default politeness level based on the notice intent.
- * Error uses 'assertive' for urgent announcements, others use 'polite'.
- */
-function getDefaultPoliteness( intent: NoticeIntent ): 'polite' | 'assertive' {
-	return intent === 'error' ? 'assertive' : 'polite';
-}
-
-/**
- * Safely converts a message to a string for screen reader announcement.
- * Returns undefined if the message can't be safely serialized.
- */
-function safeRenderToString( message: RootProps[ 'spokenMessage' ] ) {
-	if ( ! message ) {
-		return undefined;
-	}
-	if ( typeof message === 'string' ) {
-		return message;
-	}
-	try {
-		return renderToString( message );
-	} catch {
-		// If renderToString fails (e.g., due to complex components like Tooltip),
-		// return undefined and skip the announcement
-		return undefined;
-	}
-}
-
-/**
- * Custom hook which announces the message with the given politeness.
- */
-function useSpokenMessage(
-	message: RootProps[ 'spokenMessage' ],
-	politeness: 'polite' | 'assertive'
-) {
-	const spokenMessage = safeRenderToString( message );
-
-	useEffect( () => {
-		if ( spokenMessage ) {
-			speak( spokenMessage, politeness );
-		}
-	}, [ spokenMessage, politeness ] );
-}
-
-/**
  * A notice component that communicates system status and provides actions.
+ * It does not announce its content to assistive technology. Consumers are
+ * responsible for adding suitable live-region semantics when a dynamic notice
+ * needs to be announced.
  *
  * ```jsx
  * import { Notice } from '@wordpress/ui';
@@ -82,21 +40,9 @@ function useSpokenMessage(
  * ```
  */
 export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
-	{
-		intent = 'neutral',
-		children,
-		icon,
-		spokenMessage = children,
-		politeness = getDefaultPoliteness( intent ),
-		render,
-		...restProps
-	},
+	{ intent = 'neutral', children, icon, render, ...restProps },
 	ref
 ) {
-	// Announce to screen readers via speak() API - no role attribute needed
-	// as it would cause double announcements
-	useSpokenMessage( spokenMessage, politeness );
-
 	const iconElement = icon === null ? null : icon ?? icons[ intent ];
 
 	const mergedClassName = clsx(

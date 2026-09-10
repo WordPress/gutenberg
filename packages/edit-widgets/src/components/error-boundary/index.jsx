@@ -149,7 +149,7 @@ export default class ErrorBoundary extends Component {
 					<Notice.Title>
 						{ __( 'The editor has crashed' ) }
 					</Notice.Title>
-					<Notice.Description>
+					<Notice.Description role="alert">
 						{ __(
 							'An unknown error occurred. Reload your browser to try again, or copy the error to report the problem or search.'
 						) }

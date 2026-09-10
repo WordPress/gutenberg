@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Widget error boundary: Announce only the error message instead of the entire notice. ([#82737](https://github.com/WordPress/gutenberg/pull/82737))
+
 ## 0.7.0 (2026-09-10)
 
 ### New Features

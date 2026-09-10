@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Notice`: Remove built-in screen reader announcements and the `spokenMessage` and `politeness` props. Consumers now provide live-region semantics when needed. ([#82737](https://github.com/WordPress/gutenberg/pull/82737))
+
 ### Enhancements
 
 -   `Checkbox`: Enlarge the hit target to 24px without changing the visual size. ([#82597](https://github.com/WordPress/gutenberg/pull/82597))
