@@ -388,7 +388,7 @@ describe( 'BlockAlignmentUI constraint', () => {
 	const onChange = vi.fn();
 	const onSelect = vi.fn();
 	const constraint = {
-		description: 'It limits this block\u2019s width.',
+		description: 'Its layout limits widths',
 		action: { label: 'Select Group', onClick: onSelect },
 	};
 

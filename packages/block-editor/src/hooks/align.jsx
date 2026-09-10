@@ -149,8 +149,12 @@ function useAlignmentConstraint( clientId ) {
 	const parentTitle = parentInfo.title;
 
 	return {
-		// Short enough not to wrap: the label above it already names the block.
-		description: __( 'It limits this block’s width.' ),
+		/*
+		 * The label above already names the block, so this only has to say what
+		 * about it is doing the limiting. "Layout" is also where the setting
+		 * lives once they get there.
+		 */
+		description: __( 'Its layout limits widths' ),
 		action: {
 			label: sprintf(
 				// translators: %s: title of the containing block, e.g. "Group".
