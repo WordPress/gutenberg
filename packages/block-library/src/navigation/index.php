@@ -1002,6 +1002,14 @@ class WP_Navigation_Block_Renderer {
 	private static function get_unique_navigation_name( $attributes ) {
 		$nav_menu_name = static::get_navigation_name( $attributes );
 
+		/*
+		 * Empty names should not receive a uniqueness suffix. Appending only
+		 * the count would produce aria-label values like " 2".
+		 */
+		if ( '' === $nav_menu_name ) {
+			return '';
+		}
+
 		// This is used to count the number of times a navigation name has been seen,
 		// so that we can ensure every navigation has a unique id.
 		if ( isset( static::$seen_menu_names[ $nav_menu_name ] ) ) {

@@ -431,4 +431,37 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'Hello, World!', $output, 'Shortcode inside the navigation overlay should be expanded.' );
 		$this->assertStringNotContainsString( '[gb_test_overlay_shortcode]', $output, 'Raw shortcode token should not appear in the overlay output.' );
 	}
+
+	/**
+	 * Unnamed navigations must not receive a space-prefixed uniqueness suffix.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_unique_navigation_name
+	 */
+	public function test_unnamed_navigation_does_not_get_space_prefixed_aria_label() {
+		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
+		$property   = $reflection->getProperty( 'seen_menu_names' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$property->setAccessible( true );
+		}
+		$property->setValue( null, array() );
+
+		$method = $reflection->getMethod( 'get_unique_navigation_name' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		$first  = $method->invoke( null, array() );
+		$second = $method->invoke( null, array() );
+
+		$this->assertSame( '', $first );
+		$this->assertSame( '', $second );
+
+		$named_first  = $method->invoke( null, array( 'ariaLabel' => 'Primary' ) );
+		$named_second = $method->invoke( null, array( 'ariaLabel' => 'Primary' ) );
+
+		$this->assertSame( 'Primary', $named_first );
+		$this->assertSame( 'Primary 2', $named_second );
+	}
 }
