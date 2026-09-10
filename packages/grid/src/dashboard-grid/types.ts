@@ -250,10 +250,11 @@ export interface DashboardGridProps
 	onChangeLayout?: ( newLayout: DashboardGridLayoutItem[] ) => void;
 
 	/**
-	 * Callback fired continuously during a drag or resize interaction
+	 * Callback fired continuously during a pointer drag or resize interaction
 	 * with the in-progress layout. Useful for live feedback in the
 	 * surface (e.g., displaying the current width/position). The final
-	 * committed layout is still emitted via `onChangeLayout`.
+	 * committed layout is still emitted via `onChangeLayout`. Keyboard
+	 * reordering commits on drop without intermediate preview updates.
 	 */
 	onPreviewLayout?: ( previewLayout: DashboardGridLayoutItem[] ) => void;
 

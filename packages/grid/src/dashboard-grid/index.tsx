@@ -10,7 +10,11 @@ import {
 	SortableContext,
 	sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import type { DragMoveEvent, DragStartEvent } from '@dnd-kit/core';
+import type {
+	DragEndEvent,
+	DragMoveEvent,
+	DragStartEvent,
+} from '@dnd-kit/core';
 import clsx from 'clsx';
 import { useResizeObserver, useEvent, useMergeRefs } from '@wordpress/compose';
 import {
@@ -417,6 +421,12 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		// just when `over.id` changes — otherwise a "swap back" with
 		// the cursor still on the same tile would never fire.
 		const handleDragMove = useEvent( ( event: DragMoveEvent ) => {
+			// Keyboard coordinates identify a target, not a pointer insertion
+			// edge. Commit the final target on drop after collision updates.
+			if ( event.activatorEvent.type === 'keydown' ) {
+				return;
+			}
+
 			const { active, over } = event;
 			if ( ! over || active.id === over.id ) {
 				return;
@@ -505,6 +515,43 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 
 			onChangeLayout( latest );
 			setTemporaryLayout( undefined );
+		} );
+
+		const handleDragEnd = useEvent( ( event: DragEndEvent ) => {
+			if ( event.activatorEvent.type === 'keydown' && editMode ) {
+				const { active, over } = event;
+				const currentIndex = items.indexOf( String( active.id ) );
+				const overIndex = over
+					? items.indexOf( String( over.id ) )
+					: -1;
+				if (
+					currentIndex !== -1 &&
+					overIndex !== -1 &&
+					currentIndex !== overIndex &&
+					layoutMap.get( String( active.id ) )?.draggable !== false
+				) {
+					const updatedItems = arrayMoveWithPinned(
+						items,
+						currentIndex,
+						overIndex,
+						( key ) => layoutMap.get( key )?.draggable === false
+					);
+					if (
+						updatedItems.some(
+							( key, index ) => key !== items[ index ]
+						)
+					) {
+						latestLayoutRef.current = layout.map( ( item ) => ( {
+							...item,
+							order: updatedItems.indexOf( item.key ),
+						} ) );
+						captureLayoutSnapshotRef.current();
+					}
+				}
+			}
+			persistTemporaryLayout();
+			lastReorderCursorRef.current = null;
+			setActiveId( null );
 		} );
 
 		const handleResize = useEvent( ( id: string, delta: ResizeDelta ) => {
@@ -697,11 +744,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				onDragStart={ handleDragStart }
 				onDragCancel={ handleDragCancel }
 				onDragMove={ handleDragMove }
-				onDragEnd={ () => {
-					persistTemporaryLayout();
-					lastReorderCursorRef.current = null;
-					setActiveId( null );
-				} }
+				onDragEnd={ handleDragEnd }
 			>
 				{ /* No-op strategy: reorder comes from `temporaryLayout`
 				 + CSS Grid, not dnd-kit transforms. */ }
