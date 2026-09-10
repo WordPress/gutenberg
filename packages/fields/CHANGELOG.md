@@ -4,7 +4,8 @@
 
 ### Enhancements
 
--	Replace deprecated `word-break: break-word` with `overflow-wrap: anywhere` on the slug permalink help link to clear the Stylelint suppression. ([#82693](https://github.com/WordPress/gutenberg/pull/82693))
+-   `MediaEdit`: Show a message instead of the picker when the user lacks permission to upload media. ([#82720](https://github.com/WordPress/gutenberg/pull/82720))
+- 	Replace deprecated `word-break: break-word` with `overflow-wrap: anywhere` on the slug permalink help link to clear the Stylelint suppression. ([#82693](https://github.com/WordPress/gutenberg/pull/82693))
 
 ## 0.47.0 (2026-09-10)
 

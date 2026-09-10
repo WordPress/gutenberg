@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   A further 141 icons are now stroke-based. Use CSS `color` rather than `fill` to recolor them. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+
+### Enhancements
+
+-   Redraw a further 141 icons as stroke-based for variable stroke-width support, following the convention introduced in [#78808](https://github.com/WordPress/gutenberg/pull/78808), and refine the already stroke-based `image` drawing. Most retain their original footprint; the table icons, `capturePhoto` and `image` are slightly smaller by design. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+
+### Bug Fixes
+
+-   `formatIndent`, `formatIndentRTL`, `formatOutdent` and `formatOutdentRTL`: correct the arrow geometry, which was malformed in the previous drawings. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+
 ## 16.0.0 (2026-09-10)
 
 ### Breaking Changes
