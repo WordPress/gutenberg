@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.4.0 (2026-09-10)
+
 ### Enhancements
 
 -   Add New Template: Use the Button component's focus ring instead of the legacy `box-shadow` ones ([#80138](https://github.com/WordPress/gutenberg/issues/80138)).
@@ -15,6 +17,8 @@
 
 ### Internal
 
+-   `PostList`: Stop re-sorting the fetched page in memory when the view sorts by author. The author field now sorts by author id, the same order the REST API already returns for `orderby=author`, so the re-sort no longer changes anything ([#82559](https://github.com/WordPress/gutenberg/pull/82559)).
+-   Stop registering the `editorTool` preference default; the Write/Design tool that read it was removed in [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
 -   Remove the template activation (`active_templates`) experiment: the Templates page and its sidebar always use the previous (non-activation) implementations ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
 -   Remove the `showListViewByDefault` handling from `useAdaptEditorToCanvas`; the `editor` package now applies the preference on the preview ↔ edit transition itself.
 -   Remove unused dependencies `@wordpress/blob`, `@wordpress/date`, `@wordpress/escape-html`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

@@ -9,8 +9,8 @@
 	}
 
 	.fields-controls__slug-help-link {
-		// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
-		word-break: break-word;
+		word-break: normal;
+		overflow-wrap: anywhere;
 	}
 
 	.fields-controls__slug-help {

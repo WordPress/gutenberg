@@ -369,7 +369,8 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	box-sizing: border-box;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	resize: none;
-	overflow: hidden;
+	field-sizing: content;
+	overflow: auto;
 	font-family: $editor-html-font;
 	font-size: $text-editor-font-size;
 	line-height: 1.5;

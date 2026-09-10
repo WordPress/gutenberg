@@ -14,6 +14,8 @@ npm start     # Development with watch
 npm run build # Production build; emits types with --noCheck, does NOT type check
 ```
 
+Before verification or a commit in a fresh Git worktree, follow the [worktree setup instructions](docs/contributors/code/getting-started-with-code-contribution.md#set-up-each-worktree).
+
 `npm run build` never fails on type errors. After changing TypeScript or checked JS, run `npm run typecheck`.
 
 ### Key Directories
