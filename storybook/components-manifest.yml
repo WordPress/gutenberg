@@ -984,6 +984,7 @@
       - onValueChange
       - render
       - required
+      - resetOnSelect
       - role
       - showOutsideDays
       - startMonth
@@ -1441,11 +1442,13 @@
   subcomponents:
       - name: ToggleGroupControlOption
         props:
+            - disabled
             - label
             - showTooltip
             - value
       - name: ToggleGroupControlOptionIcon
         props:
+            - disabled
             - icon
             - label
             - value

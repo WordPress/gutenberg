@@ -4,10 +4,11 @@
 
 ### Enhancements
 
--   Error boundary: Surface debugging details ([#{TODO}](https://github.com/WordPress/gutenberg/pull/{TODO})).
+-   Error boundary: Surface debugging details ([#82099](https://github.com/WordPress/gutenberg/pull/82099)).
 
 ### Internal
 
+-   Stop passing the unused `editorTool` block editor setting; the selector that read it was removed with the Write/Design tool in [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
 -   Remove unused dependency `@wordpress/interface` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 

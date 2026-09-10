@@ -42,9 +42,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"devDependencies": {
-		"@testing-library/jest-dom": "^6.9.1",
-		"@types/jest": "^30.0.0",
-		"vitest": "^4.1.10"
+		"@testing-library/jest-dom": "^7.0.1",
+		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

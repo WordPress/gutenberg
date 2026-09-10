@@ -54,10 +54,11 @@ or via npm script:
 
 ### Testing Generated Styles
 
-Generated CSS module output skips automatic style injection when `NODE_ENV` is
-`test`. Node-based DOM implementations such as jsdom do not reliably support
-modern CSS features, so tests that need actual styles in the DOM should
-run in a browser environment.
+Generated CSS output skips automatic style injection in Node-based environments
+when `NODE_ENV` is `test` and `process` is defined. Browsers have no `process`,
+so they always receive styles. Node-based DOM implementations such as jsdom do
+not reliably support modern CSS features, so tests that need actual styles in
+the DOM should run in a browser environment.
 
 ## Browser support
 

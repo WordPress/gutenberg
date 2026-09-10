@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v22.19.0. The `lighthouse` dependency is now `^13.4.1`, which requires it. Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases) ([#81916](https://github.com/WordPress/gutenberg/pull/81916)).
+-   `Editor.switchEditorTool()`: Remove the helper. It clicked the Write/Design "Tools" toolbar button, which the editor no longer renders since [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
+
+### New Features
+
+-   `Admin.visitSiteEditor()`: When the `GUTENBERG_E2E_SITE_EDITOR_V2` environment variable is set, visit the extensible site editor (`admin.php?page=site-editor-v2`) instead of `site-editor.php`, translating the classic query args to the equivalent v2 route, and wait for the lazily loaded editor to finish initializing on edit routes. `RequestUtils.setGutenbergExperiments()` keeps the `gutenberg-extensible-site-editor` experiment enabled in that mode so specs that reset experiments do not turn the v2 editor off mid-run.
+
+### Enhancements
+
+-   Widen the `@types/node` peer dependency to `>=20`, so consumers on Node 22 or 24 type definitions no longer hit a peer resolution conflict ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
+
+### Bug Fixes
+
+-   `Metrics.initWebVitals()`: Resolve `web-vitals` from the installed dependency so published consumers can load it outside the Gutenberg monorepo. Update to 4.2.4 to fix interaction counts after back/forward cache restores and prevent repeated input-listener registration ([#81916](https://github.com/WordPress/gutenberg/pull/81916)).
+-   `Editor.saveSiteEditorEntities()`: Wait for the save button to mount before deciding between its `Save` and `Publish` variants, instead of sampling visibility immediately — the extensible site editor only renders it once an entity is dirty.
+
 ### Internal
 
 -   `setGutenbergExperiments`: Remove the special handling for the removed `active_templates` experiment ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).

@@ -66,3 +66,9 @@
 /lib/block-supports/layout.php                  @tellthemachines
 /lib/class-wp-theme-json-gutenberg.php          @tellthemachines
 /lib/compat/*/html-api                          @dmsnell
+
+# Exclusions
+# An entry without an owner cancels the rules above it, and last match wins,
+# so these stay at the end. Removing them brings back the review requests.
+/tools/eslint/suppressions.json
+/tools/stylelint/stylelint-suppressions.json

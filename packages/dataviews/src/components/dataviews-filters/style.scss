@@ -220,8 +220,9 @@
 		}
 
 		.dataviews-filters__search-widget-listitem-multi-selection {
+			/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
+			background-color: var(--wpds-color-background-interactive-neutral, var(--wpds-color-background-surface-neutral-strong));
 			border-color: var(--wpds-color-stroke-interactive-brand-active);
-			background: var(--wpds-color-background-surface-neutral-strong);
 
 			&.is-selected {
 				border-color: var(--wpds-color-stroke-interactive-brand-active);
@@ -289,7 +290,8 @@
 
 		@include checkbox-control;
 		position: relative;
-		background: var(--wpds-color-background-interactive-neutral-weak);
+		/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
+		background: var(--wpds-color-background-interactive-neutral, var(--wpds-color-background-surface-neutral-strong));
 		color: var(--wpds-color-foreground-content-neutral);
 		margin: 0;
 		padding: 0;

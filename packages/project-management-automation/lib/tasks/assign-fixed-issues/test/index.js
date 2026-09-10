@@ -1,7 +1,5 @@
-import { createRequire } from 'node:module';
 import { describe, expect, it, vi } from 'vitest';
-const require = createRequire( import.meta.url );
-const assignFixedIssues = require( '../' );
+import assignFixedIssues from '../index.js';
 
 describe( 'assignFixedIssues', () => {
 	it( 'does nothing if there are no fixed issues', async () => {
