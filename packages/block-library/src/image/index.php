@@ -344,6 +344,25 @@ function block_core_image_print_lightbox_overlay() {
 		}
 	}
 
+	// Check for a lightbox specific overlay background color.
+	// Themes can set this in theme.json under:
+	// settings.blocks.core/image.lightbox.overlayBackgroundColor (block-level)
+	// settings.lightbox.overlayBackgroundColor (global fallback).
+	$lightbox_overlay_background_color = null;
+	$lightbox_block_settings           = wp_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
+	if ( isset( $lightbox_block_settings['overlayBackgroundColor'] ) ) {
+		$lightbox_overlay_background_color = esc_attr( $lightbox_block_settings['overlayBackgroundColor'] );
+	} else {
+		$lightbox_global_settings = wp_get_global_settings( array( 'lightbox' ) );
+		if ( isset( $lightbox_global_settings['overlayBackgroundColor'] ) ) {
+			$lightbox_overlay_background_color = esc_attr( $lightbox_global_settings['overlayBackgroundColor'] );
+		}
+	}
+
+	// Prefer the lightbox specific color when set, otherwise fall back to
+	// the global background color.
+	$overlay_background_color = $lightbox_overlay_background_color ?? $background_color;
+
 	echo <<<HTML
 		<div
 			class="wp-lightbox-overlay zoom"
@@ -399,7 +418,7 @@ function block_core_image_print_lightbox_overlay() {
 					<span class="wp-lightbox-navigation-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$next_button_icon}</span>
 				</button>
 				<div data-wp-text="state.ariaLabel" aria-live="polite" aria-atomic="true" class="screen-reader-text"></div>
-				<div class="scrim" style="background-color: {$background_color}" aria-hidden="true"></div>
+				<div class="scrim" style="--wp--lightbox--overlay-background-color: {$overlay_background_color}" aria-hidden="true"></div>
 		</div>
 HTML;
 }
