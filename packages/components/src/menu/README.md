@@ -57,7 +57,7 @@ A callback that gets called when the `open` state changes.
 
 ### `placement`
 
- - Type: `"left" | "right" | "top" | "bottom" | "left-start" | "right-start" | "top-start" | "bottom-start" | "left-end" | "right-end" | ...`
+ - Type: `"top" | "bottom" | "left" | "right" | "top-start" | "bottom-start" | "left-start" | "right-start" | "top-end" | "bottom-end" | ...`
  - Required: No
  - Default: `'bottom-start' for root-level menus, 'right-start' for submenus`
 

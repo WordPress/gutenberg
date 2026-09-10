@@ -2,6 +2,7 @@ import { describe, it } from 'vitest';
 import type { ForwardedRef } from 'react';
 import { forwardRef } from '@wordpress/element';
 import type { WordPressComponentProps } from '../wordpress-component';
+import { contextConnectWithoutRef } from '../context-connect';
 
 // Static TypeScript checks
 describe( 'WordPressComponentProps', () => {
@@ -22,5 +23,17 @@ describe( 'WordPressComponentProps', () => {
 		const ForwardedFoo = forwardRef( Foo );
 
 		<ForwardedFoo ref={ null } />;
+	} );
+} );
+
+describe( 'WordPressComponentFromProps', () => {
+	it( 'should reject as on a non-polymorphic connected component', () => {
+		const Unconnected = (
+			props: WordPressComponentProps< {}, null, false >
+		) => <div { ...props } />;
+		const Foo = contextConnectWithoutRef( Unconnected, 'Foo' );
+
+		// @ts-expect-error Non-polymorphic components must not accept `as`.
+		<Foo as="div" />;
 	} );
 } );

@@ -88,13 +88,20 @@ export type WordPressComponent<
 	selector?: `.${ string }`;
 };
 
+type RefProps< ForwardsRef extends boolean > = ForwardsRef extends true
+	? React.RefAttributes< any >
+	: {};
+
 export type WordPressComponentFromProps<
 	Props,
 	ForwardsRef extends boolean = true,
-> = Props extends WordPressComponentProps< infer P, infer T, infer I >
-	? WordPressComponent<
-			T,
-			P & ( ForwardsRef extends true ? React.RefAttributes< any > : {} ),
-			I
-	  >
-	: never;
+> = 'as' extends keyof Props
+	? // When `Props` includes `as`, treat the component as polymorphic and
+	  // reverse-infer `P` / `T` from the component props.
+	  Props extends WordPressComponentProps< infer P, infer T, true >
+		? WordPressComponent< T, P & RefProps< ForwardsRef >, true >
+		: never
+	: // Otherwise, keep `Props` intact and force types non-polymorphic, since
+	  // reverse-inferring `T`/`IsPolymorphic` widens them (`ElementType | null`
+	  // and `boolean`), leaving the connected type open to arbitrary props.
+	  WordPressComponent< null, Props & RefProps< ForwardsRef >, false >;
