@@ -243,6 +243,7 @@ const BG_RAMP_STEPS: RampConfig[ 'steps' ] = {
 			followDirection: 'best',
 			target: 4.5,
 		},
+		lightness: lightnessConstraintForegroundHighContrast,
 		taperChromaOptions: FG_TAPER_CHROMA,
 	},
 	fgFillInverted: {
