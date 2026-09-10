@@ -18,6 +18,7 @@
 		"packages/grid/src/dashboard-lanes/test/keyboard-activation.jsdom.test.tsx": "Stubs ResizeObserver only to mount the lanes; assertions cover the deterministic keyboard activator DOM hierarchy.",
 		"packages/grid/src/dashboard-lanes/test/use-lane-placement.jsdom.test.tsx": "Injects ResizeObserver entries and requestAnimationFrame scheduling to test deterministic lane-placement state without browser layout.",
 		"packages/ui/src/form/primitives/control-with-error/test/control-with-error.jsdom.test.tsx": "Uses requestAnimationFrame only to schedule reportValidity after React state; assertions cover aria-describedby semantics.",
-		"packages/editor/src/components/collab-sidebar/test/board-store.jsdom.test.js": "Uses supplied DOMRect fixtures to test deterministic range-to-anchor calculations without relying on rendered layout."
+		"packages/editor/src/components/collab-sidebar/test/board-store.jsdom.test.js": "Uses supplied DOMRect fixtures to test deterministic range-to-anchor calculations without relying on rendered layout.",
+		"packages/ui/src/breadcrumb/test/index.jsdom.test.tsx": "Injects sizes, ResizeObserver notifications, font readiness, and animation frames to verify deterministic overflow state and measurement lifecycle. Real responsive layout is covered in index.browser.test.tsx."
 	}
 }

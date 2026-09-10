@@ -114,6 +114,7 @@ const commonProjectConfig = {
 
 module.exports = {
 	rootDir: ROOT_DIR,
+	passWithNoTests: testMigration.jest.files.length === 0,
 	projects: [
 		{
 			...commonProjectConfig,
@@ -122,9 +123,12 @@ module.exports = {
 			testEnvironmentOptions: {
 				url: 'http://localhost/',
 			},
-			testMatch: testMigration.jest.files.map(
-				( testPath ) => `<rootDir>/${ testPath }`
-			),
+			// An empty testMatch array makes Jest discover every file.
+			testMatch: testMigration.jest.files.length
+				? testMigration.jest.files.map(
+						( testPath ) => `<rootDir>/${ testPath }`
+				  )
+				: [ '!**/*' ],
 		},
 	],
 	watchPlugins: [

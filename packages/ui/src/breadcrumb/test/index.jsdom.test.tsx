@@ -1,4 +1,5 @@
 /* eslint-disable testing-library/no-container, testing-library/no-node-access -- Measurement behavior requires access to the hidden intrinsic tree and element geometry. */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -25,9 +26,6 @@ describe( 'Breadcrumb', () => {
 	let originalClientWidth: PropertyDescriptor | undefined;
 	let originalScrollWidth: PropertyDescriptor | undefined;
 	let originalGetBoundingClientRect: typeof HTMLElement.prototype.getBoundingClientRect;
-	let originalResizeObserver: typeof ResizeObserver;
-	let originalRequestAnimationFrame: typeof requestAnimationFrame;
-	let originalCancelAnimationFrame: typeof cancelAnimationFrame;
 	let originalFonts: PropertyDescriptor | undefined;
 
 	beforeEach( () => {
@@ -46,43 +44,46 @@ describe( 'Breadcrumb', () => {
 		);
 		originalGetBoundingClientRect =
 			HTMLElement.prototype.getBoundingClientRect;
-		originalResizeObserver = global.ResizeObserver;
-		originalRequestAnimationFrame = global.requestAnimationFrame;
-		originalCancelAnimationFrame = global.cancelAnimationFrame;
 		originalFonts = Object.getOwnPropertyDescriptor( document, 'fonts' );
 
-		global.ResizeObserver = class {
-			elements = new Set< Element >();
-			private record: ResizeObserverRecord;
+		vi.stubGlobal(
+			'ResizeObserver',
+			class {
+				elements = new Set< Element >();
+				private record: ResizeObserverRecord;
 
-			constructor( callback: ResizeObserverCallback ) {
-				this.record = {
-					callback,
-					disconnected: false,
-					elements: this.elements,
-				};
-				resizeObservers.push( this.record );
+				constructor( callback: ResizeObserverCallback ) {
+					this.record = {
+						callback,
+						disconnected: false,
+						elements: this.elements,
+					};
+					resizeObservers.push( this.record );
+				}
+
+				observe( element: Element ) {
+					this.elements.add( element );
+				}
+
+				unobserve( element: Element ) {
+					this.elements.delete( element );
+				}
+
+				disconnect() {
+					this.record.disconnected = true;
+					this.elements.clear();
+				}
 			}
+		);
 
-			observe( element: Element ) {
-				this.elements.add( element );
-			}
-
-			unobserve( element: Element ) {
-				this.elements.delete( element );
-			}
-
-			disconnect() {
-				this.record.disconnected = true;
-				this.elements.clear();
-			}
-		} as unknown as typeof ResizeObserver;
-
-		global.requestAnimationFrame = jest.fn( ( callback ) => {
-			animationFrames.push( callback );
-			return animationFrames.length;
-		} );
-		global.cancelAnimationFrame = jest.fn();
+		vi.stubGlobal(
+			'requestAnimationFrame',
+			vi.fn( ( callback: FrameRequestCallback ) => {
+				animationFrames.push( callback );
+				return animationFrames.length;
+			} )
+		);
+		vi.stubGlobal( 'cancelAnimationFrame', vi.fn() );
 
 		Object.defineProperty( HTMLElement.prototype, 'scrollWidth', {
 			configurable: true,
@@ -201,6 +202,8 @@ describe( 'Breadcrumb', () => {
 				'clientWidth',
 				originalClientWidth
 			);
+		} else {
+			Reflect.deleteProperty( HTMLElement.prototype, 'clientWidth' );
 		}
 		if ( originalScrollWidth ) {
 			Object.defineProperty(
@@ -208,12 +211,12 @@ describe( 'Breadcrumb', () => {
 				'scrollWidth',
 				originalScrollWidth
 			);
+		} else {
+			Reflect.deleteProperty( HTMLElement.prototype, 'scrollWidth' );
 		}
 		HTMLElement.prototype.getBoundingClientRect =
 			originalGetBoundingClientRect;
-		global.ResizeObserver = originalResizeObserver;
-		global.requestAnimationFrame = originalRequestAnimationFrame;
-		global.cancelAnimationFrame = originalCancelAnimationFrame;
+		vi.unstubAllGlobals();
 		if ( originalFonts ) {
 			Object.defineProperty( document, 'fonts', originalFonts );
 		} else {
@@ -349,7 +352,7 @@ describe( 'Breadcrumb', () => {
 
 		it( 'passes complete link props through a custom renderer', () => {
 			const href = '/settings/general?section=writing#defaults';
-			const renderLink = jest.fn(
+			const renderLink = vi.fn(
 				( {
 					children: linkChildren,
 					...linkProps
@@ -454,14 +457,12 @@ describe( 'Breadcrumb', () => {
 				</Breadcrumb.Root>
 			);
 
-			const measurement = container.querySelector(
+			const measurement = container.querySelector< HTMLElement >(
 				'.style-measurement-label'
 			);
 			expect( measurement ).toHaveClass( 'item-class', 'render-class' );
-			expect( measurement ).toHaveStyle( {
-				fontSize: '20px',
-				letterSpacing: '3px',
-			} );
+			expect( measurement?.style.fontSize ).toBe( '20px' );
+			expect( measurement?.style.letterSpacing ).toBe( '3px' );
 		} );
 
 		it( 'collapses items based on custom-rendered link widths', () => {
@@ -736,7 +737,7 @@ describe( 'Breadcrumb', () => {
 
 		it( 'activates an overflow link from the keyboard', async () => {
 			const user = userEvent.setup();
-			const handleClick = jest.fn( ( event ) => event.preventDefault() );
+			const handleClick = vi.fn( ( event ) => event.preventDefault() );
 			availableWidth = 164;
 			labelWidths.set( 'Section', 80 );
 			render(
@@ -776,7 +777,7 @@ describe( 'Breadcrumb', () => {
 			const user = userEvent.setup();
 			availableWidth = 84;
 			labelWidths.set( 'Settings', 100 );
-			const renderLink = jest.fn(
+			const renderLink = vi.fn(
 				( {
 					children: linkChildren,
 					...linkProps
@@ -1417,7 +1418,7 @@ describe( 'Breadcrumb', () => {
 			const itemObserver = resizeObservers.find( ( observer ) =>
 				observer.elements.has( item! )
 			);
-			const requestFrame = global.requestAnimationFrame as jest.Mock;
+			const requestFrame = vi.mocked( requestAnimationFrame );
 			requestFrame.mockClear();
 
 			act( () => {
@@ -1441,8 +1442,7 @@ describe( 'Breadcrumb', () => {
 		} );
 
 		it( 'falls back to the complete semantic trail without ResizeObserver', () => {
-			global.ResizeObserver =
-				undefined as unknown as typeof ResizeObserver;
+			vi.stubGlobal( 'ResizeObserver', undefined );
 			availableWidth = 40;
 			renderDefaultTrail();
 
