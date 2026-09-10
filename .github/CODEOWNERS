@@ -25,6 +25,8 @@
 /packages/interactivity                         @luisherranz @darerodz
 
 # Tooling
+/.npmrc                                         @manzoorwanijk
+/package.json                                   @manzoorwanijk
 /bin                                            @manzoorwanijk
 /tools                                          @manzoorwanijk
 /test/php/gutenberg-coding-standards            @anton-vlasenko
