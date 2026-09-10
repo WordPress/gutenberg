@@ -34,6 +34,8 @@ const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
 const EMPTY_OBJECT = {};
 
+const { getTemplateInfo } = unlock( coreDataPrivateApis );
+
 function __experimentalReusableBlocksSelect( select ) {
 	const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreDataPrivateApis );
 	const { getEntityRecords } = select( coreStore );
@@ -168,6 +170,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				getEntityRecord,
 				getBlockPatternCategories,
 				getPostType,
+				getCurrentTheme,
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
@@ -258,12 +261,22 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					: undefined,
 				currentPostId: getCurrentPostId(),
 				templateId: getCurrentTemplateId(),
+				/*
+				 * A template's own `title` is empty, or just its slug, until
+				 * someone renames it. `getTemplateInfo` falls back to the name
+				 * the theme gives it — "Pages", "Single Posts" — which is what
+				 * the rest of the editor shows.
+				 */
 				templateTitle: getCurrentTemplateId()
-					? getEntityRecord(
-							'postType',
-							TEMPLATE_POST_TYPE,
-							getCurrentTemplateId()
-					  )?.title?.rendered
+					? getTemplateInfo( {
+							templateTypes:
+								getCurrentTheme()?.default_template_types ?? [],
+							template: getEntityRecord(
+								'postType',
+								TEMPLATE_POST_TYPE,
+								getCurrentTemplateId()
+							),
+					  } )?.title
 					: undefined,
 				canEditTemplate: !! canUser( 'create', {
 					kind: 'postType',
@@ -325,6 +338,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { get: getPreference } = useSelect( preferencesStore );
+	const { getEditorSettings } = useSelect( editorStore );
 
 	/*
 	 * Explains a width constraint that comes from the template rather than from
@@ -335,25 +349,28 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const outerWidthConstraint = useMemo( () => {
 		const onNavigateToEntityRecord = settings.onNavigateToEntityRecord;
 
-		if (
-			! templateId ||
-			! templateTitle ||
-			! canEditTemplate ||
-			! onNavigateToEntityRecord
-		) {
+		if ( ! templateId || ! canEditTemplate || ! onNavigateToEntityRecord ) {
 			return undefined;
 		}
 
-		const title = decodeEntities( templateTitle );
+		const title = templateTitle
+			? decodeEntities( templateTitle )
+			: undefined;
 
 		return {
 			description: __( 'The template limits this block’s width.' ),
 			action: {
-				label: sprintf(
-					// translators: %s: name of the template, e.g. "Pages".
-					__( 'Edit %s template' ),
-					title
-				),
+				/*
+				 * Naming the template is better, but a template that cannot be
+				 * named is no reason to withhold the explanation entirely.
+				 */
+				label: title
+					? sprintf(
+							// translators: %s: name of the template, e.g. "Pages".
+							__( 'Edit %s template' ),
+							title
+					  )
+					: __( 'Edit template' ),
 				icon: layout,
 				onClick: () => {
 					onNavigateToEntityRecord( {
@@ -372,11 +389,30 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 							'welcomeGuideTemplate'
 						)
 					) {
+						/*
+						 * Read after navigating, so the way back belongs to the
+						 * template being edited rather than to the post left
+						 * behind.
+						 */
+						const goBack =
+							getEditorSettings()
+								.onNavigateToPreviousEntityRecord;
+
 						createSuccessNotice(
 							__(
 								'Editing template. Changes made here affect all posts and pages that use the template.'
 							),
-							{ type: 'snackbar' }
+							{
+								type: 'snackbar',
+								actions: goBack
+									? [
+											{
+												label: __( 'Back' ),
+												onClick: goBack,
+											},
+									  ]
+									: undefined,
+							}
 						);
 					}
 				},
@@ -389,6 +425,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		settings.onNavigateToEntityRecord,
 		createSuccessNotice,
 		getPreference,
+		getEditorSettings,
 	] );
 
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
