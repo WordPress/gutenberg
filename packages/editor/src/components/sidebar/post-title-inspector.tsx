@@ -1,7 +1,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 import { Notice } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 // @ts-expect-error No exported types
@@ -110,16 +110,18 @@ export default function PostTitleInspector() {
 							: []
 					}
 				>
-					<p>
-						<strong>
-							{ __( 'This block comes from the template' ) }
-						</strong>
-					</p>
-					<p>
-						{ __(
-							'Changes to its settings affect all posts and pages that use the template.'
-						) }
-					</p>
+					<Stack direction="column" gap="sm">
+						<Text render={ <p /> }>
+							<strong>
+								{ __( 'This block comes from the template' ) }
+							</strong>
+						</Text>
+						<Text render={ <p /> }>
+							{ __(
+								'Changes to its settings affect all posts and pages that use the template.'
+							) }
+						</Text>
+					</Stack>
 				</Notice>
 			) }
 		</Stack>
