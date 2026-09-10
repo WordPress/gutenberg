@@ -95,7 +95,8 @@
 	min-width: 0;
 
 	// Prevent long unbroken words from overflowing.
-	overflow-wrap: break-word; // New standard.
+	word-break: normal;
+	overflow-wrap: break-word;
 
 	/**
 	* Individual Column Alignment
