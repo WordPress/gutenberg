@@ -136,6 +136,9 @@ function DataViews< Item >( {
 		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 	};
 	const containerRef = useRef< HTMLDivElement >( null );
+	const tableHeaderRef = useRef< HTMLTableSectionElement >( null );
+	const tableSelectionRef = useRef< HTMLInputElement >( null );
+	const bulkSelectionRef = useRef< HTMLInputElement >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
 		( resizeObserverEntries: any ) => {
@@ -245,6 +248,9 @@ function DataViews< Item >( {
 				renderItemLink,
 				containerWidth,
 				containerRef,
+				tableHeaderRef,
+				tableSelectionRef,
+				bulkSelectionRef,
 				resizeObserverRef,
 				defaultLayouts,
 				filters,
@@ -255,8 +261,7 @@ function DataViews< Item >( {
 				hasInitiallyLoaded,
 				onReset,
 				intersectionObserver,
-				bulkActionsInLayout:
-					children === undefined || children === null,
+				isDefaultUI: children === undefined || children === null,
 			} }
 		>
 			<div className="dataviews-wrapper">

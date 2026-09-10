@@ -23,7 +23,7 @@ export default function DataViewsFooter() {
 		actions = EMPTY_ARRAY,
 		isLoading,
 		hasInitiallyLoaded,
-		bulkActionsInLayout,
+		isDefaultUI,
 	} = useContext( DataViewsContext );
 
 	const isRefreshing = !! isLoading && hasInitiallyLoaded && !! data?.length;
@@ -59,11 +59,7 @@ export default function DataViewsFooter() {
 				gap="sm"
 			>
 				{ hasBulkActions &&
-					( bulkActionsInLayout ? (
-						<DataViewsItemCount />
-					) : (
-						<BulkActions />
-					) ) }
+					( isDefaultUI ? <DataViewsItemCount /> : <BulkActions /> ) }
 				<DataViewsPagination />
 			</Stack>
 		</div>
