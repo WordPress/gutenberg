@@ -1,3 +1,4 @@
+import { beforeAll, describe, expect, it } from 'vitest';
 import plugin from '../no-setting-wpds-custom-properties.mjs';
 import { getStylelintResult } from './utils';
 

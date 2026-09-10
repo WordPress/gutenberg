@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`flags warnings with invalid values css snapshot matches warnings 1`] = `
+exports[`flags warnings with invalid values css > snapshot matches warnings 1`] = `
 [
   {
     "column": 16,
@@ -27,7 +27,7 @@ exports[`flags warnings with invalid values css snapshot matches warnings 1`] = 
     "line": 12,
     "rule": "declaration-property-unit-allowed-list",
     "severity": "error",
-    "text": "Unexpected unit "em" for property "line-height" (declaration-property-unit-allowed-list)",
+    "text": "Disallowed unit "em" for property "line-height" (declaration-property-unit-allowed-list)",
   },
   {
     "column": 15,
@@ -54,7 +54,7 @@ exports[`flags warnings with invalid values css snapshot matches warnings 1`] = 
     "line": 6,
     "rule": "length-zero-no-unit",
     "severity": "error",
-    "text": "Unexpected unit (length-zero-no-unit)",
+    "text": "Disallowed unit (length-zero-no-unit)",
   },
   {
     "column": 15,
@@ -63,7 +63,7 @@ exports[`flags warnings with invalid values css snapshot matches warnings 1`] = 
     "line": 6,
     "rule": "length-zero-no-unit",
     "severity": "error",
-    "text": "Unexpected unit (length-zero-no-unit)",
+    "text": "Disallowed unit (length-zero-no-unit)",
   },
   {
     "column": 24,
@@ -72,7 +72,7 @@ exports[`flags warnings with invalid values css snapshot matches warnings 1`] = 
     "line": 6,
     "rule": "length-zero-no-unit",
     "severity": "error",
-    "text": "Unexpected unit (length-zero-no-unit)",
+    "text": "Disallowed unit (length-zero-no-unit)",
   },
   {
     "column": 1,
@@ -81,7 +81,7 @@ exports[`flags warnings with invalid values css snapshot matches warnings 1`] = 
     "line": 15,
     "rule": "no-duplicate-selectors",
     "severity": "error",
-    "text": "Unexpected duplicate selector ".selector", first used at line 1 (no-duplicate-selectors)",
+    "text": "Duplicate selector ".selector", first used at line 1 (no-duplicate-selectors)",
   },
 ]
 `;

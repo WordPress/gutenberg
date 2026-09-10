@@ -1,23 +1,27 @@
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
+import { useState } from '@wordpress/element';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
-import { ContextSystemProvider } from '../../context';
-import moduleStyles from '../style.module.scss';
 import type {
 	ToolsPanelContext as ToolsPanelContextType,
 	ResetAllFilter,
 } from '../types';
 
+globalThis.wpVitest.mockMatchMedia();
+
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
-const resetAll = jest.fn();
+const resetAll = vi.fn();
 const noop = () => undefined;
-const gridContextValue = {
-	Grid: {
-		columnGap: '40px',
-		rowGap: '48px',
-	},
-};
 
 type ControlValue = boolean | undefined;
 
@@ -30,51 +34,53 @@ const defaultProps = {
 // Default props for an enabled control to be rendered within panel.
 let controlValue: ControlValue = true;
 const controlProps = {
-	hasValue: jest.fn().mockImplementation( () => {
+	hasValue: vi.fn().mockImplementation( () => {
 		return !! controlValue;
 	} ),
 	label: 'Example',
-	onDeselect: jest.fn().mockImplementation( () => {
+	onDeselect: vi.fn().mockImplementation( () => {
 		controlValue = undefined;
 	} ),
-	onSelect: jest.fn(),
+	onSelect: vi.fn(),
+	onShownChange: vi.fn(),
 };
 
 // Default props without a value for an alternate control to be rendered within
 // the panel.
 let altControlValue: ControlValue = false;
 const altControlProps = {
-	hasValue: jest.fn().mockImplementation( () => {
+	hasValue: vi.fn().mockImplementation( () => {
 		return !! altControlValue;
 	} ),
 	label: 'Alt',
-	onDeselect: jest.fn(),
-	onSelect: jest.fn(),
+	onDeselect: vi.fn(),
+	onSelect: vi.fn(),
+	onShownChange: vi.fn(),
 };
 
 // Default props for wrapped or grouped panel items.
 let nestedControlValue: ControlValue = true;
 const nestedControlProps = {
-	hasValue: jest.fn().mockImplementation( () => {
+	hasValue: vi.fn().mockImplementation( () => {
 		return !! nestedControlValue;
 	} ),
 	label: 'Nested Control 1',
-	onDeselect: jest.fn().mockImplementation( () => {
+	onDeselect: vi.fn().mockImplementation( () => {
 		nestedControlValue = undefined;
 	} ),
-	onSelect: jest.fn(),
+	onSelect: vi.fn(),
 	isShownByDefault: true,
 };
 
 // Alternative props for wrapped or grouped panel items.
 const altNestedControlValue: ControlValue = false;
 const altNestedControlProps = {
-	hasValue: jest.fn().mockImplementation( () => {
+	hasValue: vi.fn().mockImplementation( () => {
 		return !! altNestedControlValue;
 	} ),
 	label: 'Nested Control 2',
-	onDeselect: jest.fn(),
-	onSelect: jest.fn(),
+	onDeselect: vi.fn(),
+	onSelect: vi.fn(),
 };
 
 // Simple custom component grouping panel items. Used to test panel item
@@ -106,10 +112,10 @@ const panelContext: ToolsPanelContextType = {
 	hasMenuItems: false,
 	isResetting: false,
 	shouldRenderPlaceholderItems: false,
-	registerPanelItem: jest.fn(),
-	deregisterPanelItem: jest.fn(),
-	registerResetAllFilter: jest.fn(),
-	deregisterResetAllFilter: jest.fn(),
+	registerPanelItem: vi.fn(),
+	deregisterPanelItem: vi.fn(),
+	registerResetAllFilter: vi.fn(),
+	deregisterResetAllFilter: vi.fn(),
 	flagItemCustomization: noop,
 	areAllOptionalControlsHidden: true,
 };
@@ -196,9 +202,27 @@ const selectMenuItem = async ( label: string ) => {
 };
 
 describe( 'ToolsPanel', () => {
+	beforeEach( () => {
+		controlProps.hasValue.mockImplementation( () => !! controlValue );
+		controlProps.onDeselect.mockImplementation( () => {
+			controlValue = undefined;
+		} );
+		altControlProps.hasValue.mockImplementation( () => !! altControlValue );
+		nestedControlProps.hasValue.mockImplementation(
+			() => !! nestedControlValue
+		);
+		nestedControlProps.onDeselect.mockImplementation( () => {
+			nestedControlValue = undefined;
+		} );
+		altNestedControlProps.hasValue.mockImplementation(
+			() => !! altNestedControlValue
+		);
+	} );
+
 	afterEach( () => {
 		controlValue = true;
 		altControlValue = false;
+		nestedControlValue = true;
 	} );
 
 	describe( 'basic rendering', () => {
@@ -278,7 +302,7 @@ describe( 'ToolsPanel', () => {
 			expect( header ).toBeInTheDocument();
 		} );
 
-		it( 'should apply SCSS Module styles to the panel and its items', () => {
+		it( 'should apply public class names to the panel and its items', () => {
 			render(
 				<ToolsPanel { ...defaultProps } data-testid="tools-panel">
 					<ToolsPanelItem
@@ -292,11 +316,9 @@ describe( 'ToolsPanel', () => {
 			);
 
 			expect( screen.getByTestId( 'tools-panel' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel' ],
 				'components-tools-panel'
 			);
 			expect( screen.getByTestId( 'tools-panel-item' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel-item' ],
 				'components-tools-panel-item',
 				'custom-item'
 			);
@@ -305,73 +327,10 @@ describe( 'ToolsPanel', () => {
 				name: defaultProps.label,
 			} );
 
-			expect( heading ).toHaveClass(
-				moduleStyles[ 'tools-panel-heading' ]
-			);
 			// Disable reason: Semantic queries can't reach the header wrapper.
 			// eslint-disable-next-line testing-library/no-node-access
 			expect( heading.parentElement ).toHaveClass(
-				moduleStyles[ 'tools-panel-header' ],
 				'components-tools-panel-header'
-			);
-		} );
-
-		it( 'should preserve its spacing against Grid context values', () => {
-			render(
-				<ContextSystemProvider value={ gridContextValue }>
-					<ToolsPanel { ...defaultProps } data-testid="tools-panel">
-						<span>Panel content</span>
-					</ToolsPanel>
-				</ContextSystemProvider>
-			);
-
-			const panel = screen.getByTestId( 'tools-panel' );
-			const generatedClassName = Array.from( panel.classList ).find(
-				( className ) => /^(css|emotion)-/.test( className )
-			);
-			const generatedRule = Array.from( document.styleSheets )
-				.flatMap( ( styleSheet ) => Array.from( styleSheet.cssRules ) )
-				.find( ( rule ) =>
-					rule.cssText.includes( `.${ generatedClassName }` )
-				);
-
-			expect( generatedRule?.cssText ).toContain(
-				'grid-column-gap: calc(4px * 4);'
-			);
-			expect( generatedRule?.cssText ).toContain(
-				'grid-row-gap: calc(4px * 4);'
-			);
-		} );
-
-		it( 'should apply SCSS Module variants for inner wrappers and placeholders', () => {
-			render(
-				<ToolsPanel
-					{ ...defaultProps }
-					data-testid="tools-panel"
-					hasInnerWrapper
-					shouldRenderPlaceholderItems
-				>
-					<ToolsPanelItem
-						{ ...altControlProps }
-						className="custom-item"
-						data-testid="tools-panel-item"
-					>
-						<div>Alt control</div>
-					</ToolsPanelItem>
-				</ToolsPanel>
-			);
-
-			expect( screen.getByTestId( 'tools-panel' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel-with-inner-wrapper' ],
-				moduleStyles[ 'tools-panel-hidden-inner-wrapper' ]
-			);
-			expect( screen.getByTestId( 'tools-panel-item' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel-item' ],
-				moduleStyles[ 'tools-panel-item-placeholder' ]
-			);
-			expect( screen.getByTestId( 'tools-panel-item' ) ).not.toHaveClass(
-				'components-tools-panel-item',
-				'custom-item'
 			);
 		} );
 	} );
@@ -425,8 +384,8 @@ describe( 'ToolsPanel', () => {
 					attributes: { value: toolsPanelItemValue },
 					hasValue: () => !! toolsPanelItemValue,
 					label: 'Alt',
-					onDeselect: jest.fn(),
-					onSelect: jest.fn(),
+					onDeselect: vi.fn(),
+					onSelect: vi.fn(),
 				};
 
 				return (
@@ -461,8 +420,8 @@ describe( 'ToolsPanel', () => {
 					attributes: { value: toolsPanelItemValue },
 					hasValue: () => !! toolsPanelItemValue,
 					label: 'Alt',
-					onDeselect: jest.fn(),
-					onSelect: jest.fn(),
+					onDeselect: vi.fn(),
+					onSelect: vi.fn(),
 				};
 
 				// The null panelId below simulates the panel prop when there
@@ -486,6 +445,156 @@ describe( 'ToolsPanel', () => {
 			const controlRerendered = screen.getByText( 'Optional control' );
 
 			expect( controlRerendered ).toBeInTheDocument();
+		} );
+
+		it( 'should not render optional item without a value by default', () => {
+			render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...altControlProps }>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			expect(
+				screen.queryByText( 'Optional control' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should render optional item on first render when defaultShown is true', () => {
+			render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...altControlProps } defaultShown>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			expect(
+				screen.getByText( 'Optional control' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should render optional item with a value even when defaultShown is false', () => {
+			altControlValue = true;
+
+			render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem
+						{ ...altControlProps }
+						defaultShown={ false }
+					>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			expect(
+				screen.getByText( 'Optional control' )
+			).toBeInTheDocument();
+		} );
+
+		// `defaultShown` only seeds the item's initial visibility. A change
+		// after mount must leave the item as it is, and must not be reported
+		// as though the user had used the menu.
+		describe( 'changing defaultShown after mount', () => {
+			const onDeselect = vi.fn();
+			const onSelect = vi.fn();
+			const onShownChange = vi.fn();
+
+			const ToolsPanelOptional = ( {
+				defaultShown,
+			}: {
+				defaultShown: boolean;
+			} ) => (
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem
+						defaultShown={ defaultShown }
+						hasValue={ () => false }
+						label="Alt"
+						onDeselect={ onDeselect }
+						onSelect={ onSelect }
+						onShownChange={ onShownChange }
+					>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			beforeEach( () => {
+				vi.clearAllMocks();
+			} );
+
+			it( 'should keep a hidden item hidden when it changes to true', () => {
+				const { rerender } = render(
+					<ToolsPanelOptional defaultShown={ false } />
+				);
+
+				rerender( <ToolsPanelOptional defaultShown /> );
+
+				expect(
+					screen.queryByText( 'Optional control' )
+				).not.toBeInTheDocument();
+				expect( onShownChange ).not.toHaveBeenCalled();
+				expect( onSelect ).not.toHaveBeenCalled();
+				expect( onDeselect ).not.toHaveBeenCalled();
+			} );
+
+			it( 'should keep a shown item visible when it changes to false', () => {
+				const { rerender } = render(
+					<ToolsPanelOptional defaultShown />
+				);
+
+				rerender( <ToolsPanelOptional defaultShown={ false } /> );
+
+				expect(
+					screen.getByText( 'Optional control' )
+				).toBeInTheDocument();
+				expect( onShownChange ).not.toHaveBeenCalled();
+				expect( onSelect ).not.toHaveBeenCalled();
+				expect( onDeselect ).not.toHaveBeenCalled();
+			} );
+		} );
+
+		it( 'should keep an item the user hid hidden when another item registers', async () => {
+			// Registering an item regenerates the panel's menu state. An item
+			// the user hid is stored as `false`, which must be preserved
+			// rather than treated as unregistered and reseeded from
+			// `defaultShown`.
+			const TestPanel = ( { showExtra }: { showExtra: boolean } ) => (
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...altControlProps } defaultShown>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+					{ showExtra && (
+						<ToolsPanelItem
+							hasValue={ () => false }
+							label="Extra"
+							onDeselect={ noop }
+							onSelect={ noop }
+						>
+							<div>Extra control</div>
+						</ToolsPanelItem>
+					) }
+				</ToolsPanel>
+			);
+
+			const { rerender } = render( <TestPanel showExtra={ false } /> );
+			expect(
+				screen.getByText( 'Optional control' )
+			).toBeInTheDocument();
+
+			await openDropdownMenu();
+			await selectMenuItem( altControlProps.label );
+			expect(
+				screen.queryByText( 'Optional control' )
+			).not.toBeInTheDocument();
+
+			rerender( <TestPanel showExtra /> );
+
+			expect(
+				screen.queryByText( 'Optional control' )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
@@ -534,30 +643,39 @@ describe( 'ToolsPanel', () => {
 		it( 'should not render contents of items when in placeholder state', () => {
 			render(
 				<ToolsPanel { ...defaultProps } shouldRenderPlaceholderItems>
-					<ToolsPanelItem { ...altControlProps }>
+					<ToolsPanelItem
+						{ ...altControlProps }
+						className="custom-item"
+						data-testid="placeholder-item"
+					>
 						<div>Optional control</div>
 					</ToolsPanelItem>
 				</ToolsPanel>
 			);
 
 			const optionalItem = screen.queryByText( 'Optional control' );
+			const placeholderItem = screen.getByTestId( 'placeholder-item' );
 
 			// When rendered as a placeholder a ToolsPanelItem will just omit
 			// all the item's children. So the container element will still be
 			// there holding its position but the inner text etc should not be
 			// there.
 			expect( optionalItem ).not.toBeInTheDocument();
+			expect( placeholderItem ).not.toHaveClass(
+				'components-tools-panel-item',
+				'custom-item'
+			);
 		} );
 
 		it( 'should render default controls with conditional isShownByDefault', async () => {
 			const linkedControlValue = false;
 			const linkedControlProps = {
-				hasValue: jest.fn().mockImplementation( () => {
+				hasValue: vi.fn().mockImplementation( () => {
 					return !! linkedControlValue;
 				} ),
 				label: 'Linked',
-				onDeselect: jest.fn(),
-				onSelect: jest.fn(),
+				onDeselect: vi.fn(),
+				onSelect: vi.fn(),
 			};
 
 			const TestPanel = () => (
@@ -624,12 +742,12 @@ describe( 'ToolsPanel', () => {
 		it( 'should handle conditionally rendered default control', async () => {
 			const conditionalControlValue = false;
 			const conditionalControlProps = {
-				hasValue: jest.fn().mockImplementation( () => {
+				hasValue: vi.fn().mockImplementation( () => {
 					return !! conditionalControlValue;
 				} ),
 				label: 'Conditional',
-				onDeselect: jest.fn(),
-				onSelect: jest.fn(),
+				onDeselect: vi.fn(),
+				onSelect: vi.fn(),
 			};
 
 			const TestPanel = () => (
@@ -687,7 +805,7 @@ describe( 'ToolsPanel', () => {
 
 	describe( 'registration of panel items', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'should register and deregister items when panelId changes', () => {
@@ -734,7 +852,8 @@ describe( 'ToolsPanel', () => {
 			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
 			// deregisterPanelItem is called, given that we have switched panels.
 			expect( context.deregisterPanelItem ).toHaveBeenCalledWith(
-				altControlProps.label
+				altControlProps.label,
+				expect.objectContaining( { label: altControlProps.label } )
 			);
 
 			// Simulate switching back to the original panelId, e.g. by selecting
@@ -755,6 +874,72 @@ describe( 'ToolsPanel', () => {
 			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 2 );
 			// deregisterPanelItem has still only been called once.
 			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should register with the latest defaultShown when panelId changes', () => {
+			// A consumer that persists the user's choice feeds it back in
+			// through `defaultShown`. A change to that prop must not
+			// re-register the item on its own, but a re-registration caused by
+			// something else has to seed from the saved preference rather than
+			// the value the item mounted with.
+			const context: ToolsPanelContextType = {
+				...panelContext,
+				registerPanelItem: vi.fn(),
+				deregisterPanelItem: vi.fn(),
+			};
+			const TestPanel = ( {
+				defaultShown,
+			}: {
+				defaultShown: boolean;
+			} ) => (
+				<ToolsPanelContext.Provider value={ context }>
+					<ToolsPanelItem
+						{ ...altControlProps }
+						defaultShown={ defaultShown }
+						panelId="1234"
+					>
+						<div>Item</div>
+					</ToolsPanelItem>
+				</ToolsPanelContext.Provider>
+			);
+
+			const { rerender } = render( <TestPanel defaultShown={ false } /> );
+
+			expect( context.registerPanelItem ).toHaveBeenCalledWith(
+				expect.objectContaining( { defaultShown: false } )
+			);
+
+			// Let registration settle, so that any further calls can only
+			// have been caused by the changes made below.
+			rerender( <TestPanel defaultShown={ false } /> );
+			const settledCalls = ( context.registerPanelItem as Mock ).mock
+				.calls.length;
+
+			// The user shows the item and the consumer saves that preference.
+			// The updated prop alone must not re-register the item, which
+			// would discard the visibility the user chose.
+			rerender( <TestPanel defaultShown /> );
+
+			expect( context.registerPanelItem ).toHaveBeenCalledTimes(
+				settledCalls
+			);
+
+			// Simulate switching block selection away and back again, which
+			// deregisters and re-registers the item.
+			context.panelId = '4321';
+			rerender( <TestPanel defaultShown /> );
+			context.panelId = '1234';
+			rerender( <TestPanel defaultShown /> );
+
+			expect( context.deregisterPanelItem ).toHaveBeenCalledWith(
+				altControlProps.label,
+				expect.objectContaining( { label: altControlProps.label } )
+			);
+			// The item registers again with the saved preference rather than
+			// the value it mounted with.
+			expect( context.registerPanelItem ).toHaveBeenLastCalledWith(
+				expect.objectContaining( { defaultShown: true } )
+			);
 		} );
 
 		it( 'should register items when ToolsPanel panelId is null', () => {
@@ -802,29 +987,30 @@ describe( 'ToolsPanel', () => {
 			expect( context.deregisterPanelItem ).not.toHaveBeenCalled();
 
 			// Simulate another multi-selection where the panelId is `null`.
-			// Item should re-register itself after it deregistered as the
-			// multi-selection occurred.
+			// Still matches the panel, so the registration stands rather than
+			// churning through a deregister/register pair.
 			context.panelId = null;
 			rerender( <TestPanel /> );
-			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 2 );
-			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 1 );
+			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
+			expect( context.deregisterPanelItem ).not.toHaveBeenCalled();
 
 			// Simulate a change in panel e.g. back to a single block selection
 			// Where the item's panelId is not a match.
 			context.panelId = '4321';
 			rerender( <TestPanel /> );
 
-			// As the item no longer matches the panelId it should not have
-			// registered again but instead deregistered.
+			// No longer matches, so it has already deregistered. Unmounting
+			// must not deregister again.
+			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 1 );
 			unmount();
-			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 2 );
-			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 2 );
+			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
+			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
 	describe( 'callbacks on menu item selection', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'should call onDeselect callback when menu item is toggled off', async () => {
@@ -875,6 +1061,126 @@ describe( 'ToolsPanel', () => {
 			await selectMenuItem( controlProps.label ); // Reset control.
 
 			expect( controlProps.onDeselect ).toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'shown change callback', () => {
+		beforeEach( () => {
+			vi.clearAllMocks();
+		} );
+
+		it( 'should call onShownChange with true when an optional item is shown via the menu', async () => {
+			renderPanel();
+
+			await openDropdownMenu();
+			await selectMenuItem( altControlProps.label );
+
+			expect( altControlProps.onShownChange ).toHaveBeenCalledTimes( 1 );
+			expect( altControlProps.onShownChange ).toHaveBeenCalledWith(
+				true
+			);
+		} );
+
+		it( 'should call onShownChange with false when an optional item without a value is hidden via the menu', async () => {
+			renderPanel();
+
+			await openDropdownMenu();
+			await selectMenuItem( altControlProps.label );
+			await selectMenuItem( altControlProps.label );
+
+			expect( altControlProps.onShownChange ).toHaveBeenCalledTimes( 2 );
+			expect( altControlProps.onShownChange ).toHaveBeenLastCalledWith(
+				false
+			);
+			// The item never had a value, so there was nothing to reset.
+			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should call both onShownChange and onDeselect when an optional item with a value is hidden via the menu', async () => {
+			renderPanel();
+
+			await openDropdownMenu();
+			await selectMenuItem( controlProps.label );
+
+			expect( controlProps.onShownChange ).toHaveBeenCalledTimes( 1 );
+			expect( controlProps.onShownChange ).toHaveBeenCalledWith( false );
+			expect( controlProps.onDeselect ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should not call onShownChange for default items', async () => {
+			render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...controlProps } isShownByDefault>
+						<div>Example control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			await openDropdownMenu();
+			await selectMenuItem( controlProps.label );
+
+			// Default items stay visible when toggled off; the action resets
+			// them rather than hiding them.
+			expect( controlProps.onDeselect ).toHaveBeenCalledTimes( 1 );
+			expect( controlProps.onShownChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should not call onShownChange when items are hidden by Reset all', async () => {
+			renderPanel();
+
+			await openDropdownMenu();
+			await selectMenuItem( 'Reset all' );
+
+			expect( controlProps.onShownChange ).not.toHaveBeenCalled();
+			expect( altControlProps.onShownChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should not call onShownChange when the value changes programmatically', () => {
+			const onShownChange = vi.fn();
+			const ToolsPanelOptional = ( { value }: { value?: number } ) => (
+				<ToolsPanel { ...defaultProps } panelId="1234">
+					<ToolsPanelItem
+						hasValue={ () => !! value }
+						label="Alt"
+						onShownChange={ onShownChange }
+						panelId="1234"
+					>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			const { rerender } = render( <ToolsPanelOptional /> );
+			expect(
+				screen.queryByText( 'Optional control' )
+			).not.toBeInTheDocument();
+
+			// Gaining a value shows the item, but that is not a menu action.
+			rerender( <ToolsPanelOptional value={ 100 } /> );
+			expect(
+				screen.getByText( 'Optional control' )
+			).toBeInTheDocument();
+
+			// Losing it again is not a menu action either.
+			rerender( <ToolsPanelOptional /> );
+
+			expect( onShownChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should not call any callback when an item is mounted with defaultShown', () => {
+			render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...altControlProps } defaultShown>
+						<div>Alt control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			// Registering an item as shown is not a menu action, so none of
+			// the item's callbacks should fire.
+			expect( screen.getByText( 'Alt control' ) ).toBeInTheDocument();
+			expect( altControlProps.onShownChange ).not.toHaveBeenCalled();
+			expect( altControlProps.onSelect ).not.toHaveBeenCalled();
 		} );
 	} );
 
@@ -952,7 +1258,7 @@ describe( 'ToolsPanel', () => {
 
 	describe( 'rendering via SlotFills', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'should maintain visual order of controls when toggled on and off', async () => {
@@ -1192,6 +1498,64 @@ describe( 'ToolsPanel', () => {
 			).not.toBeInTheDocument();
 		} );
 
+		it( "should not let a replacement item inherit the outgoing one's state", async () => {
+			// Two blocks can each contribute a control of the same name. When
+			// selection moves between them, the incoming item starts from its
+			// own value rather than the visibility the user chose for the one
+			// it replaced.
+			const SameLabelInTwoPanels = ( {
+				panelId,
+			}: Pick<
+				React.ComponentProps< typeof ToolsPanelItem >,
+				'panelId'
+			> ) => (
+				<SlotFillProvider>
+					<ToolsPanelItems>
+						<ToolsPanelItem
+							label="Shared"
+							panelId="1234"
+							hasValue={ () => false }
+						>
+							<div>Item 1</div>
+						</ToolsPanelItem>
+					</ToolsPanelItems>
+					<ToolsPanelItems>
+						<ToolsPanelItem
+							label="Shared"
+							panelId="9999"
+							hasValue={ () => false }
+						>
+							<div>Item 2</div>
+						</ToolsPanelItem>
+					</ToolsPanelItems>
+					<ToolsPanel { ...defaultProps } panelId={ panelId }>
+						<Slot />
+					</ToolsPanel>
+				</SlotFillProvider>
+			);
+
+			const { rerender } = render(
+				<SameLabelInTwoPanels panelId="1234" />
+			);
+
+			// Show the first block's control.
+			await openDropdownMenu();
+			await selectMenuItem( 'Shared' );
+			expect( screen.getByText( 'Item 1' ) ).toBeInTheDocument();
+
+			// Move to the other block. Its control has no value and was never
+			// shown, so it stays hidden.
+			// The menu stays open across the rerender.
+			rerender( <SameLabelInTwoPanels panelId="9999" /> );
+
+			expect(
+				await screen.findByRole( 'menuitemcheckbox', {
+					name: 'Show Shared',
+				} )
+			).toBeInTheDocument();
+			expect( screen.queryByText( 'Item 2' ) ).not.toBeInTheDocument();
+		} );
+
 		it( 'should not contain orphaned menu items when panelId changes', async () => {
 			// As fills and the panel can update independently this aims to
 			// test that no orphaned items appear registered in the panel menu.
@@ -1255,23 +1619,23 @@ describe( 'ToolsPanel', () => {
 	describe( 'panel header icon toggle', () => {
 		const defaultControlsValue = false;
 		const defaultControls = {
-			hasValue: jest.fn().mockImplementation( () => {
+			hasValue: vi.fn().mockImplementation( () => {
 				return !! defaultControlsValue;
 			} ),
 			label: 'Default',
-			onDeselect: jest.fn(),
-			onSelect: jest.fn(),
+			onDeselect: vi.fn(),
+			onSelect: vi.fn(),
 			isShownByDefault: true,
 		};
 
 		const optionalControlsValue = false;
 		const optionalControls = {
-			hasValue: jest.fn().mockImplementation( () => {
+			hasValue: vi.fn().mockImplementation( () => {
 				return !! optionalControlsValue;
 			} ),
 			label: 'Optional',
-			onDeselect: jest.fn(),
-			onSelect: jest.fn(),
+			onDeselect: vi.fn(),
+			onSelect: vi.fn(),
 			isShownByDefault: false,
 		};
 
@@ -1330,9 +1694,48 @@ describe( 'ToolsPanel', () => {
 			expect( optionsDisplayedIcon ).not.toHaveAccessibleDescription();
 		} );
 
+		it( 'should pass reset all filters that see the latest props', async () => {
+			let received: unknown[] = [];
+			const ChangingFilter = () => {
+				const [ count, setCount ] = useState( 1 );
+				return (
+					<ToolsPanel
+						label="Panel header"
+						resetAll={ ( filters ) => {
+							received = ( filters ?? [] ).map( ( filter ) =>
+								filter()
+							);
+						} }
+					>
+						<ToolsPanelItem
+							label="Filtered"
+							isShownByDefault
+							hasValue={ () => true }
+							resetAllFilter={ () => count }
+						>
+							<button onClick={ () => setCount( 2 ) }>
+								bump
+							</button>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				);
+			};
+
+			const user = userEvent.setup();
+			render( <ChangingFilter /> );
+
+			// The panelId never changes, which is where a filter frozen at
+			// registration goes stale.
+			await user.click( screen.getByText( 'bump' ) );
+			await openDropdownMenu();
+			await selectMenuItem( 'Reset all' );
+
+			expect( received ).toEqual( [ 2 ] );
+		} );
+
 		it( 'should not call reset all for different panelIds', async () => {
-			const resetItem = jest.fn();
-			const resetItemB = jest.fn();
+			const resetItem = vi.fn();
+			const resetItemB = vi.fn();
 
 			const children = (
 				<>
@@ -1419,6 +1822,48 @@ describe( 'ToolsPanel', () => {
 				'aria-disabled',
 				'true'
 			);
+		} );
+	} );
+
+	describe( 'reset all with values the reset leaves in place', () => {
+		it( 'should keep a default control resettable when its value survives', async () => {
+			// The value arrives after mount, like block library controls whose
+			// `hasValue` closes over an attribute: false at mount, true once
+			// edited. A value read back from registration time misses it.
+			const GainsAValue = () => {
+				const [ hasVal, setHasVal ] = useState( false );
+				return (
+					<ToolsPanel label="Panel header" resetAll={ () => {} }>
+						<ToolsPanelItem
+							label="Survivor"
+							isShownByDefault
+							hasValue={ () => hasVal }
+						>
+							<button onClick={ () => setHasVal( true ) }>
+								set a value
+							</button>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				);
+			};
+
+			const user = userEvent.setup();
+			render( <GainsAValue /> );
+
+			await user.click( screen.getByText( 'set a value' ) );
+			await openDropdownMenu();
+			await selectMenuItem( 'Reset all' );
+
+			// `resetAll` clears nothing here, so the value is still set and
+			// must stay resettable from both menu entries.
+			expect(
+				await screen.findByRole( 'menuitem', { name: 'Reset all' } )
+			).toHaveAttribute( 'aria-disabled', 'false' );
+			expect(
+				await screen.findByRole( 'menuitem', {
+					name: 'Reset Survivor',
+				} )
+			).toBeInTheDocument();
 		} );
 	} );
 

@@ -107,19 +107,7 @@ export const getEntityRecord =
 				}
 			}
 
-			let { baseURL } = entityConfig;
-
-			// For "string" IDs, use the old templates endpoint.
-			if (
-				kind === 'postType' &&
-				name === 'wp_template' &&
-				( ( key && typeof key === 'string' && ! /^\d+$/.test( key ) ) ||
-					! window?.__experimentalTemplateActivate )
-			) {
-				baseURL =
-					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
-					'/templates';
-			}
+			const { baseURL } = entityConfig;
 
 			const path = addQueryArgs( baseURL + ( key ? '/' + key : '' ), {
 				...entityConfig.baseURLParams,
@@ -418,24 +406,7 @@ export const getEntityRecords =
 				};
 			}
 
-			let { baseURL } = entityConfig;
-			// `combinedTemplates` means that we fetch templates from the "old"
-			// /templates endpoint, which combines active user templates with
-			// the registered templates and rewrites IDs in the form of
-			// `theme-slug/template-slug`. When turned off, we only fetch
-			// database templates (posts). To fetch registered templates without
-			// edits applied, use the `registeredTemplate` entity.
-			const { combinedTemplates = true } = query;
-
-			if (
-				kind === 'postType' &&
-				name === 'wp_template' &&
-				combinedTemplates
-			) {
-				baseURL =
-					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
-					'/templates';
-			}
+			const { baseURL } = entityConfig;
 
 			const path = addQueryArgs( baseURL, {
 				...entityConfig.baseURLParams,
@@ -1008,12 +979,7 @@ export const getDefaultTemplateId =
 		// Wait for the entities config to be loaded, otherwise receiving
 		// the template as an entity will not work.
 		await resolveSelect.getEntitiesConfig( 'postType' );
-		// When active_templates experiment is enabled, use numeric wp_id if it
-		// exists, otherwise fall back to string ID format (theme//slug) as the
-		// frontend expects string IDs for templates.
-		const id = window?.__experimentalTemplateActivate
-			? template?.wp_id || template?.id
-			: template?.id;
+		const id = template?.id;
 
 		registry.batch( () => {
 			dispatch.receiveDefaultTemplateId( query, id || '' );
@@ -1034,18 +1000,6 @@ export const getDefaultTemplateId =
 			}
 		} );
 	};
-
-getDefaultTemplateId.shouldInvalidate = ( action ) => {
-	// Only invalidate on real saves; `persistedEdits` is absent on
-	// initial fetches so the kickoff's own site read doesn't wipe
-	// the just-resolved template id.
-	return (
-		action.type === 'RECEIVE_ITEMS' &&
-		action.kind === 'root' &&
-		action.name === 'site' &&
-		!! action.persistedEdits
-	);
-};
 
 /**
  * Requests an entity's revisions from the REST API.

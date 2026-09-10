@@ -21,8 +21,9 @@ on:
 concurrency:
     # Scope package release dispatches by target npm release branch.
     # `latest` and `bugfix` both target wp/latest and must serialize.
-    group: ${{ github.workflow }}-wp-${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version || github.event.inputs.release_type == 'development' && 'next' || 'latest' }}
+    group: npm-publish-wp-${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version || github.event.inputs.release_type == 'development' && 'next' || 'latest' }}
     cancel-in-progress: false
+    queue: max
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -83,10 +84,10 @@ jobs:
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
 
-            - name: Pin npm version for consistency
-              run: |
-                  npm install --global npm@10
-                  npm --version
+            - name: Set up npm
+              uses: ./cli/.github/setup-npm
+              with:
+                  working-directory: cli
 
             - name: Publish development packages to npm ("next" dist-tag)
               if: ${{ github.event.inputs.release_type == 'development' }}

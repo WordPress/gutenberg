@@ -1,10 +1,11 @@
+import { describe, expect, it, vi } from 'vitest';
 import { updateAttributes } from '../update-attributes';
 
 describe( 'updateAttributes', () => {
 	// Data shapes are linked to fetchLinkSuggestions from
 	// core-data/src/fetch/__experimental-fetch-link-suggestions.js.
 	it( 'can update a post link', () => {
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		const linkSuggestion = {
 			opensInNewTab: false,
 			id: 1337,
@@ -26,7 +27,7 @@ describe( 'updateAttributes', () => {
 	} );
 
 	it( 'can update a page link', () => {
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		const linkSuggestion = {
 			id: 2,
 			kind: 'post-type',
@@ -47,7 +48,7 @@ describe( 'updateAttributes', () => {
 	} );
 
 	it( 'can update a tag link', () => {
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		const linkSuggestion = {
 			id: 15,
 			kind: 'taxonomy',
@@ -68,7 +69,7 @@ describe( 'updateAttributes', () => {
 	} );
 
 	it( 'can update a category link', () => {
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		const linkSuggestion = {
 			id: 9,
 			kind: 'taxonomy',
@@ -89,7 +90,7 @@ describe( 'updateAttributes', () => {
 	} );
 
 	it( 'can update a custom post type link', () => {
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		const linkSuggestion = {
 			id: 131,
 			kind: 'post-type',
@@ -110,7 +111,7 @@ describe( 'updateAttributes', () => {
 	} );
 
 	it( 'can update a custom tag link', () => {
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		const linkSuggestion = {
 			id: 4,
 			kind: 'taxonomy',
@@ -131,7 +132,7 @@ describe( 'updateAttributes', () => {
 	} );
 
 	it( 'can update a custom category link', () => {
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		const linkSuggestion = {
 			id: 2,
 			kind: 'taxonomy',
@@ -152,7 +153,7 @@ describe( 'updateAttributes', () => {
 	} );
 
 	it( 'can update a post format and ignores id slug', () => {
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		const linkSuggestion = {
 			id: 'video',
 			kind: 'taxonomy',
@@ -175,7 +176,7 @@ describe( 'updateAttributes', () => {
 
 	describe( 'various link protocols save as custom links', () => {
 		it( 'when typing a url, but not selecting a search suggestion', () => {
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const linkSuggestion = {
 				opensInNewTab: false,
 				url: 'www.wordpress.org',
@@ -190,7 +191,7 @@ describe( 'updateAttributes', () => {
 		} );
 
 		it( 'url', () => {
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const linkSuggestion = {
 				id: 'www.wordpress.org',
 				opensInNewTab: false,
@@ -208,7 +209,7 @@ describe( 'updateAttributes', () => {
 		} );
 
 		it( 'email', () => {
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const linkSuggestion = {
 				id: 'mailto:foo@example.com',
 				opensInNewTab: false,
@@ -227,7 +228,7 @@ describe( 'updateAttributes', () => {
 		} );
 
 		it( 'anchor links (internal links)', () => {
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const linkSuggestion = {
 				id: '#foo',
 				opensInNewTab: false,
@@ -246,7 +247,7 @@ describe( 'updateAttributes', () => {
 		} );
 
 		it( 'telephone', () => {
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const linkSuggestion = {
 				id: 'tel:5555555',
 				opensInNewTab: false,
@@ -268,7 +269,7 @@ describe( 'updateAttributes', () => {
 	describe( 'link label', () => {
 		// https://github.com/WordPress/gutenberg/pull/19461
 		it( 'sets the url as a label if title is not provided', () => {
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const linkSuggestion = {
 				id: 'www.wordpress.org/foo bar',
 				opensInNewTab: false,
@@ -285,7 +286,7 @@ describe( 'updateAttributes', () => {
 			} );
 		} );
 		it( 'does not replace label when editing url without protocol', () => {
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const linkSuggestion = {
 				id: 'www.wordpress.org',
 				opensInNewTab: false,
@@ -302,7 +303,7 @@ describe( 'updateAttributes', () => {
 			} );
 		} );
 		it( 'does not replace label when editing url with protocol', () => {
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const linkSuggestion = {
 				id: 'www.wordpress.org',
 				opensInNewTab: false,
@@ -320,7 +321,7 @@ describe( 'updateAttributes', () => {
 		} );
 		// https://github.com/WordPress/gutenberg/pull/19679
 		it( 'url when escaped is still an actual link', () => {
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const linkSuggestion = {
 				id: 'http://wordpress.org/?s=',
 				opensInNewTab: false,
@@ -341,7 +342,7 @@ describe( 'updateAttributes', () => {
 	describe( 'does not overwrite props when only some props are passed', () => {
 		it( 'id is retained after toggling opensInNewTab', () => {
 			const mockState = {};
-			const setAttributes = jest.fn( ( attr ) =>
+			const setAttributes = vi.fn( ( attr ) =>
 				Object.assign( mockState, attr )
 			);
 			const linkSuggestion = {
@@ -382,7 +383,7 @@ describe( 'updateAttributes', () => {
 		} );
 		it( 'id is removed after editing url', () => {
 			const mockState = {};
-			const setAttributes = jest.fn( ( attr ) =>
+			const setAttributes = vi.fn( ( attr ) =>
 				Object.assign( mockState, attr )
 			);
 			const linkSuggestion = {
@@ -427,7 +428,7 @@ describe( 'updateAttributes', () => {
 	describe( 'ID handling when URL is manually changed', () => {
 		describe( 'URL modifications that should sever the entity link', () => {
 			it( 'should remove ID when URL path is changed', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -456,7 +457,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should remove ID when changing to relative URL that does not match the path', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -485,7 +486,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should remove ID when URL domain is changed', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -514,7 +515,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should remove ID when plain permalink post ID is changed', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -543,7 +544,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should remove ID when changing from plain permalink to different plain permalink', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -574,7 +575,7 @@ describe( 'updateAttributes', () => {
 
 		describe( 'URL modifications that should preserve the entity link', () => {
 			it( 'should preserve ID when changing to relative URL that matches the path', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -606,7 +607,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should preserve ID when only query string is added', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -637,7 +638,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should preserve ID when only hash fragment is added', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -668,7 +669,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should preserve ID when both query string and hash are added', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -699,7 +700,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should preserve ID when query string is modified', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -730,7 +731,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should preserve ID when hash fragment is modified', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -761,7 +762,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should preserve ID when protocol changes from http to https', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -792,7 +793,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should preserve ID when protocol changes from https to http', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -823,7 +824,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should preserve ID when query string is removed', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -854,7 +855,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should preserve ID when hash fragment is removed', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -885,7 +886,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should preserve ID when both query string and hash are removed', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -916,7 +917,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should preserve ID when adding query string to URL with hash fragment', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -947,7 +948,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should preserve ID when query string is partially removed', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -979,7 +980,7 @@ describe( 'updateAttributes', () => {
 		} );
 
 		it( 'should remove ID when URL is changed without new ID', () => {
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const blockAttributes = {
 				id: 123,
 				type: 'page',
@@ -1004,7 +1005,7 @@ describe( 'updateAttributes', () => {
 		} );
 
 		it( 'should preserve ID when new ID is provided with URL', () => {
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const blockAttributes = {
 				id: 123,
 				type: 'page',
@@ -1028,7 +1029,7 @@ describe( 'updateAttributes', () => {
 		} );
 
 		it( 'should not remove ID when only label is changed', () => {
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const blockAttributes = {
 				id: 123,
 				type: 'page',
@@ -1052,7 +1053,7 @@ describe( 'updateAttributes', () => {
 		} );
 
 		it( 'should not remove ID when only opensInNewTab is changed', () => {
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const blockAttributes = {
 				id: 123,
 				type: 'page',
@@ -1076,7 +1077,7 @@ describe( 'updateAttributes', () => {
 		} );
 
 		it( 'should handle case where block has no existing ID', () => {
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const blockAttributes = {
 				type: 'page',
 				kind: 'post-type',
@@ -1103,7 +1104,7 @@ describe( 'updateAttributes', () => {
 		} );
 
 		it( 'should handle non-integer ID values', () => {
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const blockAttributes = {
 				id: 'not-an-integer',
 				type: 'page',
@@ -1134,7 +1135,7 @@ describe( 'updateAttributes', () => {
 	describe( 'Return value metadata', () => {
 		describe( 'isEntityLink', () => {
 			it( 'should return true for entity links with id and non-custom kind', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const linkSuggestion = {
 					id: 123,
 					kind: 'post-type',
@@ -1155,7 +1156,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should return false for custom links even with id', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const linkSuggestion = {
 					id: 123,
 					kind: 'custom',
@@ -1176,7 +1177,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should return false for links without id', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const linkSuggestion = {
 					url: 'https://example.com',
 					title: 'Example',
@@ -1194,7 +1195,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should return false when entity link is severed', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -1220,7 +1221,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should return true when entity link is preserved through query string change', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const blockAttributes = {
 					id: 123,
 					type: 'page',
@@ -1246,7 +1247,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should return false for mailto links', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const linkSuggestion = {
 					id: 'mailto:test@example.com',
 					type: 'mailto',
@@ -1267,7 +1268,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should return false for tel links', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const linkSuggestion = {
 					id: 'tel:5555555',
 					type: 'tel',
@@ -1288,7 +1289,7 @@ describe( 'updateAttributes', () => {
 			} );
 
 			it( 'should return true for taxonomy links', () => {
-				const setAttributes = jest.fn();
+				const setAttributes = vi.fn();
 				const linkSuggestion = {
 					id: 5,
 					kind: 'taxonomy',

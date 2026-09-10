@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and isActive functions 1`] = `
+exports[`hooks > enhanceNavigationLinkVariations > enhances variations with icon and isActive functions 1`] = `
 {
   "extraProp": "extraProp",
   "name": "core/navigation-link",
@@ -27,12 +27,19 @@ exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and
       },
       "description": "A link to a post.",
       "icon": <SVG
-        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        style={
+          {
+            "fill": "none",
+          }
+        }
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >
         <Path
-          d="M18 5.5H6a.5.5 0 0 0-.5.5v12a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5V6a.5.5 0 0 0-.5-.5ZM6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm1 5h1.5v1.5H7V9Zm1.5 4.5H7V15h1.5v-1.5ZM10 9h7v1.5h-7V9Zm7 4.5h-7V15h7v-1.5Z"
+          d="M7 10H8.5M10 10H17M7 14H8.5M10 14H17M6 19.25H18C18.6904 19.25 19.25 18.6904 19.25 18V6C19.25 5.30964 18.6904 4.75 18 4.75H6C5.30964 4.75 4.75 5.30964 4.75 6V18C4.75 18.6904 5.30964 19.25 6 19.25Z"
+          vectorEffect="non-scaling-stroke"
         />
       </SVG>,
       "isActive": [Function],
@@ -45,15 +52,19 @@ exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and
       },
       "description": "A link to a page.",
       "icon": <SVG
-        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        style={
+          {
+            "fill": "none",
+          }
+        }
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >
         <Path
-          d="M15.5 7.5h-7V9h7V7.5Zm-7 3.5h7v1.5h-7V11Zm7 3.5h-7V16h7v-1.5Z"
-        />
-        <Path
-          d="M17 4H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2ZM7 5.5h10a.5.5 0 0 1 .5.5v12a.5.5 0 0 1-.5.5H7a.5.5 0 0 1-.5-.5V6a.5.5 0 0 1 .5-.5Z"
+          d="M8.5 8.25H15.5M8.5 11.75H15.5M8.5 15.25H15.5M18.25 18V6C18.25 5.30964 17.6904 4.75 17 4.75H7C6.30964 4.75 5.75 5.30964 5.75 6L5.75 18C5.75 18.6904 6.30964 19.25 7 19.25H17C17.6904 19.25 18.25 18.6904 18.25 18Z"
+          vectorEffect="non-scaling-stroke"
         />
       </SVG>,
       "isActive": [Function],
@@ -66,14 +77,31 @@ exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and
       },
       "description": "A link to a category.",
       "icon": <SVG
-        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        style={
+          {
+            "fill": "none",
+          }
+        }
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >
         <Path
-          clipRule="evenodd"
-          d="M6 5.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM4 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm11-.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5h-3a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM13 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2h-3a2 2 0 01-2-2V6zm5 8.5h-3a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-3a.5.5 0 00-.5-.5zM15 13a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2v-3a2 2 0 00-2-2h-3zm-9 1.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5v-3a.5.5 0 01.5-.5zM4 15a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H6a2 2 0 01-2-2v-3z"
-          fillRule="evenodd"
+          d="M4.75 6C4.75 5.30964 5.30964 4.75 6 4.75H9C9.69036 4.75 10.25 5.30964 10.25 6V9C10.25 9.69036 9.69036 10.25 9 10.25H6C5.30964 10.25 4.75 9.69036 4.75 9V6Z"
+          vectorEffect="non-scaling-stroke"
+        />
+        <Path
+          d="M4.75 15C4.75 14.3096 5.30964 13.75 6 13.75H9C9.69036 13.75 10.25 14.3096 10.25 15V18C10.25 18.6904 9.69036 19.25 9 19.25H6C5.30964 19.25 4.75 18.6904 4.75 18V15Z"
+          vectorEffect="non-scaling-stroke"
+        />
+        <Path
+          d="M13.75 6C13.75 5.30964 14.3096 4.75 15 4.75H18C18.6904 4.75 19.25 5.30964 19.25 6V9C19.25 9.69036 18.6904 10.25 18 10.25H15C14.3096 10.25 13.75 9.69036 13.75 9V6Z"
+          vectorEffect="non-scaling-stroke"
+        />
+        <Path
+          d="M13.75 15C13.75 14.3096 14.3096 13.75 15 13.75H18C18.6904 13.75 19.25 14.3096 19.25 15V18C19.25 18.6904 18.6904 19.25 18 19.25H15C14.3096 19.25 13.75 18.6904 13.75 18V15Z"
+          vectorEffect="non-scaling-stroke"
         />
       </SVG>,
       "isActive": [Function],
