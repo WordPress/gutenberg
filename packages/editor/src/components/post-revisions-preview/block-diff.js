@@ -670,6 +670,21 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 }
 
 /**
+ * Apply inline diff formatting to two HTML strings, for fields that are
+ * stored as HTML rather than as blocks, such as the post title.
+ *
+ * @param {string} currentHTML  Current revision's HTML.
+ * @param {string} previousHTML Previous revision's HTML.
+ * @return {RichTextData} Rich text with the diff marks applied.
+ */
+export function diffRevisionHTML( currentHTML, previousHTML ) {
+	return applyRichTextDiff(
+		RichTextData.fromHTMLString( currentHTML || '' ),
+		RichTextData.fromHTMLString( previousHTML || '' )
+	);
+}
+
+/**
  * Apply diffs to a modified block's attributes.
  * - Rich-text attributes: applies inline diff formatting (ins/del marks).
  * - Other attributes: computes word-level diffs for the sidebar panel.

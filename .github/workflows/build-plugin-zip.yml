@@ -535,6 +535,11 @@ jobs:
     npm-publish:
         name: Publish WordPress packages to npm
         runs-on: 'ubuntu-24.04'
+        # Serialize this RC1 package publication with manual latest and bugfix releases.
+        concurrency:
+            group: npm-publish-wp-latest
+            cancel-in-progress: false
+            queue: max
         permissions:
             contents: read
         environment: WordPress packages

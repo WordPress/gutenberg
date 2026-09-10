@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getSettings, setSettings } from '@wordpress/date';
@@ -8,7 +9,12 @@ import { OPERATOR_BETWEEN } from '../../../constants';
 import DateControl from '../date';
 import type { DataFormControlProps } from '../../../types';
 
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
+vi.mock(
+	import( '@wordpress/a11y' ),
+	() => ( { speak: vi.fn() } ) as unknown as typeof import('@wordpress/a11y')
+);
+
+globalThis.wpVitest.mockMatchMedia();
 
 const noop = () => {};
 
@@ -352,9 +358,6 @@ describe( 'DateControl', () => {
 		const august25 = screen.getByRole( 'button', {
 			name: /august 25, 2026/i,
 		} );
-		await user.click( august25 );
-		// The first click extends the existing range. Clicking its new end again
-		// starts the replacement range from that day.
 		await user.click( august25 );
 		await user.click(
 			screen.getByRole( 'button', { name: /august 27, 2026/i } )

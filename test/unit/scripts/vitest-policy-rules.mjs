@@ -1713,6 +1713,22 @@ export function validateVitestPolicy( {
 
 		if (
 			project === 'browser' &&
+			importSource === '@testing-library/react' &&
+			node.specifiers.some( ( specifier ) =>
+				[ 'render', 'renderHook' ].includes(
+					getImportedName( specifier )
+				)
+			)
+		) {
+			report(
+				'browser-react-renderer',
+				"Browser tests must import React renderers from 'vitest-browser-react'",
+				node
+			);
+		}
+
+		if (
+			project === 'browser' &&
 			[ '@testing-library/dom', '@testing-library/react' ].includes(
 				importSource
 			) &&
@@ -2104,6 +2120,25 @@ export function validateVitestPolicy( {
 	}
 
 	traverseAst( ast, visitorKeys, ( node ) => {
+		if (
+			project === 'browser' &&
+			node.type === 'MemberExpression' &&
+			[ 'render', 'renderHook' ].includes(
+				getMemberPropertyName( node )
+			) &&
+			isVariableReference(
+				node.object,
+				testingLibraryNamespaceVariables,
+				identifierVariables
+			)
+		) {
+			report(
+				'browser-react-renderer',
+				"Browser tests must import React renderers from 'vitest-browser-react'",
+				node
+			);
+		}
+
 		if (
 			project === 'browser' &&
 			node.type === 'Identifier' &&
