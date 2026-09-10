@@ -10,5 +10,12 @@
 			margin: 0;
 			padding: 0;
 		}
+
+		.legend:not(.is-hidden) + .description {
+			/* prettier-ignore */
+			--_gcd-p-margin: calc(var(--wpds-dimension-gap-xs) - var(--wpds-dimension-gap-sm)) 0 0;
+			/* prettier-ignore */
+			margin-block-start: calc(var(--wpds-dimension-gap-xs) - var(--wpds-dimension-gap-sm));
+		}
 	}
 }
