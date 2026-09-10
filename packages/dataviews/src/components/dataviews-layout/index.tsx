@@ -3,6 +3,7 @@ import { useContext, useEffect, useRef } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import DataViewsContext from '../dataviews-context';
+import TableSelectionContext from './table-selection-context';
 import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import {
 	BulkActions,
@@ -36,28 +37,29 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		defaultLayouts,
 		containerRef,
 		isDefaultUI,
-		tableHeaderRef,
-		tableSelectionRef,
-		bulkSelectionRef,
 		empty = <p>{ __( 'No results' ) }</p>,
 	} = useContext( DataViewsContext );
 
-	const hasBulkActions =
+	// Default bulk-action headers are supported by table and grid only.
+	const hasBulkActionsHeader =
 		useSomeItemHasAPossibleBulkAction( actions, data ) &&
 		[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type );
+	const tableHeaderRef = useRef< HTMLTableSectionElement >( null );
+	const tableSelectionRef = useRef< HTMLInputElement >( null );
+	const bulkSelectionRef = useRef< HTMLInputElement >( null );
 	const bulkActionsRef = useRef< HTMLDivElement >( null );
 	const hadSelectionRef = useRef( false );
 	useEffect( () => {
 		if ( ! isDefaultUI || view.type !== LAYOUT_TABLE ) {
 			return;
 		}
-		const tableHead = tableHeaderRef?.current;
+		const tableHead = tableHeaderRef.current;
 		const ownerDocument = tableHead?.ownerDocument;
 		if (
 			selection.length &&
 			tableHead?.contains( ownerDocument?.activeElement ?? null )
 		) {
-			bulkSelectionRef?.current?.focus();
+			bulkSelectionRef.current?.focus();
 		} else if (
 			hadSelectionRef.current &&
 			! selection.length &&
@@ -66,17 +68,10 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 					ownerDocument?.activeElement ?? null
 				) )
 		) {
-			tableSelectionRef?.current?.focus();
+			tableSelectionRef.current?.focus();
 		}
 		hadSelectionRef.current = selection.length > 0;
-	}, [
-		selection.length,
-		isDefaultUI,
-		view.type,
-		tableHeaderRef,
-		tableSelectionRef,
-		bulkSelectionRef,
-	] );
+	}, [ selection.length, isDefaultUI, view.type ] );
 
 	const isDelayedInitialLoading = useDelayedLoading( ! hasInitiallyLoaded, {
 		delay: 200,
@@ -104,9 +99,18 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 	)?.component as ComponentType< ViewBaseProps< any > >;
 
 	return (
-		<>
+		<TableSelectionContext.Provider
+			value={
+				isDefaultUI && view.type === LAYOUT_TABLE
+					? {
+							headerRef: tableHeaderRef,
+							selectionRef: tableSelectionRef,
+					  }
+					: null
+			}
+		>
 			{ /* Stay outside the scroll container so auto-height layouts stick to the page. */ }
-			{ isDefaultUI && hasBulkActions && (
+			{ isDefaultUI && hasBulkActionsHeader && (
 				<div
 					className={
 						view.type === LAYOUT_TABLE
@@ -118,7 +122,13 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 					// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 					inert={ isLoading ? 'true' : undefined }
 				>
-					<BulkActions />
+					<BulkActions
+						selectionCheckboxRef={
+							view.type === LAYOUT_TABLE
+								? bulkSelectionRef
+								: undefined
+						}
+					/>
 				</div>
 			) }
 			<div className="dataviews-layout__container" ref={ containerRef }>
@@ -141,6 +151,6 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 					empty={ empty }
 				/>
 			</div>
-		</>
+		</TableSelectionContext.Provider>
 	);
 }

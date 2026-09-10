@@ -136,9 +136,6 @@ function DataViews< Item >( {
 		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 	};
 	const containerRef = useRef< HTMLDivElement >( null );
-	const tableHeaderRef = useRef< HTMLTableSectionElement >( null );
-	const tableSelectionRef = useRef< HTMLInputElement >( null );
-	const bulkSelectionRef = useRef< HTMLInputElement >( null );
 	const [ containerWidth, resizeObserverRef ] = useContainerWidth();
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
@@ -240,9 +237,6 @@ function DataViews< Item >( {
 				renderItemLink,
 				containerWidth,
 				containerRef,
-				tableHeaderRef,
-				tableSelectionRef,
-				bulkSelectionRef,
 				resizeObserverRef,
 				defaultLayouts,
 				filters,
@@ -276,7 +270,7 @@ function DataViews< Item >( {
  */
 // Populate the DataViews sub components
 const DataViewsSubComponents = DataViews as typeof DataViews & {
-	BulkActionToolbar: typeof BulkActions;
+	BulkActionToolbar: () => React.JSX.Element;
 	Filters: typeof Filters;
 	FiltersToggle: typeof FiltersToggle;
 	FiltersToggled: typeof FiltersToggled;
