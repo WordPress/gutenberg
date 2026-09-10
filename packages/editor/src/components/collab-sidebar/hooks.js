@@ -29,6 +29,7 @@ import {
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
+	readInlineSelection,
 	removeNoteFormat,
 	removeNoteIdFromMetadata,
 } from './utils';
@@ -170,41 +171,6 @@ export function useNoteThreads( postId ) {
 }
 
 /**
- * Read an inline selection from block-editor selection state, returning
- * normalized anchor data when a non-collapsed selection sits inside a single
- * rich-text attribute. Returns null for block-level or collapsed selections.
- *
- * @param {Function} getSelectionStart Block-editor selector.
- * @param {Function} getSelectionEnd   Block-editor selector.
- * @return {?Object} { clientId, attributeKey, start, end } or null.
- */
-function readInlineSelection( getSelectionStart, getSelectionEnd ) {
-	const start = getSelectionStart();
-	const end = getSelectionEnd();
-	if (
-		! start?.clientId ||
-		start.clientId !== end.clientId ||
-		! start.attributeKey ||
-		start.offset === undefined ||
-		end.offset === undefined ||
-		start.offset === end.offset
-	) {
-		return null;
-	}
-	// Normalize direction so callers don't have to think about reversed ranges.
-	const [ startOffset, endOffset ] =
-		start.offset < end.offset
-			? [ start.offset, end.offset ]
-			: [ end.offset, start.offset ];
-	return {
-		clientId: start.clientId,
-		attributeKey: start.attributeKey,
-		start: startOffset,
-		end: endOffset,
-	};
-}
-
-/**
  * Wrap a rich-text range with a core/note marker. Returns a new
  * RichTextData ready to write back into block attributes, or null when the
  * incoming value isn't a rich-text instance (legacy/string attributes).
@@ -297,7 +263,7 @@ export function useNoteActions() {
 			// save: selection may shift during the round-trip, attaching the
 			// note to the wrong block or collapsing its inline anchor.
 			const inlineSelection = ! parent
-				? readInlineSelection( getSelectionStart, getSelectionEnd )
+				? readInlineSelection( getSelectionStart(), getSelectionEnd() )
 				: null;
 			const clientId = ! parent
 				? inlineSelection?.clientId || getSelectedBlockClientId()
