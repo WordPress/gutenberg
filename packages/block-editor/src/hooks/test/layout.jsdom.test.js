@@ -1,13 +1,56 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { renderHook } from '@testing-library/react';
 import {
 	getLayoutStateOverrides,
 	getResetLayout,
 	getResponsiveLayoutStyles,
 	hasLayoutPanelControls,
+	useLayoutStyles,
 } from '../layout';
 import { getLayoutType } from '../../layouts';
+import { useSettings } from '../../components/use-settings';
+
+vi.mock(
+	import( '../../components/use-settings' ),
+	async ( importOriginal ) => ( {
+		...( await importOriginal() ),
+		useSettings: vi.fn(),
+	} )
+);
 
 describe( 'layout', () => {
+	describe( 'useLayoutStyles()', () => {
+		const attributes = {
+			layout: { type: 'flex' },
+			style: { spacing: { blockGap: '10px' } },
+		};
+
+		it.each( [ null, undefined ] )(
+			'outputs no layout styles when the block gap setting is %s',
+			( blockGapSetting ) => {
+				useSettings.mockReturnValue( [ blockGapSetting ] );
+
+				const { result } = renderHook( () =>
+					useLayoutStyles( attributes, 'test/block', '.my-container' )
+				);
+
+				expect( result.current ).toBe( '' );
+			}
+		);
+
+		it( 'outputs block gap styles when the theme opts into block gap', () => {
+			useSettings.mockReturnValue( [ true ] );
+
+			const { result } = renderHook( () =>
+				useLayoutStyles( attributes, 'test/block', '.my-container' )
+			);
+
+			expect( result.current ).toContain(
+				'.my-container { gap: 10px; }'
+			);
+		} );
+	} );
+
 	describe( 'hasLayoutPanelControls()', () => {
 		it( 'does not show the layout panel when every flex layout control is disabled', () => {
 			expect(

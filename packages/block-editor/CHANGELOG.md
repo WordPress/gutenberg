@@ -15,6 +15,7 @@
 
 -   `InnerBlocks`: Resolve a container's legacy layout markup (`inherit: true`, or a bare `contentSize` / `wideSize` with no `type`) to a constrained layout for its inner blocks, so they are offered the wide and full alignments. Previously only the container's styles honoured the legacy form, and the inner blocks resolved to the flow layout ([#82637](https://github.com/WordPress/gutenberg/pull/82637)).
 -   Block Patterns and Block Visibility: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+-   Layout: Treat a missing `spacing.blockGap` setting as no block gap support, as the server does. A theme that does not opt into block gap has the setting stored as `null`, which the block settings resolve to `undefined`, so per-block layout styles applied block gap values the front end never renders. An editor that never provides the setting must set it to `true` to keep rendering block gap values ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
 
 ### Internal
 

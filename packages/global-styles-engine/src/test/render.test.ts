@@ -1821,6 +1821,87 @@ describe( 'global styles renderer', () => {
 			expect( assets ).toContain( 'wp-duotone-grayscale' );
 			expect( assets ).toContain( 'wp-duotone-custom-duotone-1' );
 		} );
+
+		describe( 'block gap support', () => {
+			const blockTypes = [
+				{
+					name: 'core/columns',
+					selectors: { root: '.wp-block-columns' },
+					supports: {
+						layout: true,
+						spacing: {
+							blockGap: { __experimentalDefault: '2em' },
+						},
+					},
+				},
+			];
+
+			const getGlobalStylesCSS = ( settings: Record< string, any > ) => {
+				const config: any = {
+					version: 3,
+					settings,
+					styles: {
+						spacing: { blockGap: '24px' },
+						blocks: {
+							// WordPress adds an empty block gap placeholder for
+							// blocks that declare a default block gap value.
+							'core/columns': { spacing: { blockGap: null } },
+						},
+					},
+				};
+				const [ styles ] = generateGlobalStyles( config, blockTypes );
+				return styles
+					.map( ( style: any ) => style.css ?? '' )
+					.join( '' );
+			};
+
+			it( 'outputs block gap styles when the theme opts into block gap', () => {
+				const css = getGlobalStylesCSS( {
+					spacing: { blockGap: true },
+				} );
+
+				expect( css ).toContain(
+					':root :where(.is-layout-flex) { gap: 24px; }'
+				);
+				expect( css ).toContain( '--wp--style--block-gap: 24px;' );
+				expect( css ).not.toContain(
+					':where(.wp-block-columns.is-layout-flex) { gap: 2em; }'
+				);
+			} );
+
+			it( 'outputs fallback gap styles when the theme sets the block gap setting to null', () => {
+				// WordPress' default theme.json sets `spacing.blockGap` to
+				// `null` for themes that do not opt into block gap.
+				const css = getGlobalStylesCSS( {
+					spacing: { blockGap: null },
+				} );
+
+				expect( css ).toContain(
+					':where(.is-layout-flex) { gap: 0.5em; }'
+				);
+				expect( css ).toContain(
+					':where(.wp-block-columns.is-layout-flex) { gap: 2em; }'
+				);
+				expect( css ).not.toContain(
+					':root :where(.is-layout-flex) { gap: 24px; }'
+				);
+				expect( css ).not.toContain( '--wp--style--block-gap' );
+			} );
+
+			it( 'outputs fallback gap styles when the block gap setting is missing', () => {
+				const css = getGlobalStylesCSS( {} );
+
+				expect( css ).toContain(
+					':where(.is-layout-flex) { gap: 0.5em; }'
+				);
+				expect( css ).toContain(
+					':where(.wp-block-columns.is-layout-flex) { gap: 2em; }'
+				);
+				expect( css ).not.toContain(
+					':root :where(.is-layout-flex) { gap: 24px; }'
+				);
+			} );
+		} );
 	} );
 
 	describe( 'getBlockSelectors', () => {
