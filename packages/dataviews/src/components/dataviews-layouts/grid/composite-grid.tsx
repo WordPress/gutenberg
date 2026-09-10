@@ -152,8 +152,14 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 					id: `dataviews-view-grid__title-field-${ instanceId }`,
 				};
 			} else {
+				// With no visible title to point at, label the clickable media
+				// area with the item's title so it isn't announced generically.
 				mediaA11yProps = {
-					'aria-label': __( 'Navigate to item' ),
+					'aria-label':
+						titleField?.getValueFormatted( {
+							item,
+							field: titleField,
+						} ) || __( 'Navigate to item' ),
 				};
 			}
 		}

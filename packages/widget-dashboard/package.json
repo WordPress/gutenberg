@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/widget-dashboard",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"description": "Stateless rendering engine for widget dashboards: the WidgetDashboard compound component and its grid-settings kit.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -74,7 +74,8 @@
 		"@testing-library/user-event": "^14.6.1",
 		"@wordpress/admin-ui": "file:../admin-ui",
 		"storybook": "^10.5.3",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.0",
+		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

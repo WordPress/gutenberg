@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Run rendered Grid tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
+## 0.7.0 (2026-09-10)
+
 ### New Features
 
 -   Layout items accept `draggable` and `resizable` flags. A non-draggable
