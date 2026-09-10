@@ -6,12 +6,7 @@
 	direction: ltr;
 }
 
-.wp-block-math__popover-content {
-	padding: var(--wpds-dimension-padding-lg);
-	min-width: 300px;
-}
-
 .wp-block-math__learn-more {
-	display: block;
-	margin-top: var(--wpds-dimension-padding-lg);
+	display: inline-block;
+	margin-top: var(--wpds-dimension-gap-sm);
 }

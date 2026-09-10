@@ -103,6 +103,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 							) }
 						/>
 						<Link
+							openInNewTab
 							className="wp-block-math__learn-more"
 							href={ __(
 								'https://wordpress.org/documentation/article/math-block/'

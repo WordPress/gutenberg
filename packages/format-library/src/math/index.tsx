@@ -99,6 +99,7 @@ function InlineUI( {
 					className="block-editor-format-toolbar__math-input"
 				/>
 				<Link
+					openInNewTab
 					className="block-editor-format-toolbar__math-learn-more"
 					href={ __(
 						'https://wordpress.org/documentation/article/math-block/'
