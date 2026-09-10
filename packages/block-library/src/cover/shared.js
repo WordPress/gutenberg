@@ -70,6 +70,10 @@ export function attributesFromMedia( media ) {
 		id: media.id,
 		alt: media?.alt,
 		backgroundType: mediaType,
+		// Media that isn't in the library, such as a background added from a
+		// URL, has no registered image sizes, so a size selected for an earlier
+		// background no longer applies.
+		...( media.id ? {} : { sizeSlug: undefined } ),
 		...( mediaType === VIDEO_BACKGROUND_TYPE
 			? { hasParallax: undefined }
 			: {} ),

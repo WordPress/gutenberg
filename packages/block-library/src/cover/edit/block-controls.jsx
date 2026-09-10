@@ -20,6 +20,7 @@ export default function CoverBlockControls( {
 	attributes,
 	setAttributes,
 	onSelectMedia,
+	onSelectURL,
 	currentSettings,
 	toggleUseFeaturedImage,
 	onClearMedia,
@@ -130,6 +131,7 @@ export default function CoverBlockControls( {
 					mediaURL={ url }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onSelect={ onSelectMedia }
+					onSelectURL={ onSelectURL }
 					onToggleFeaturedImage={ toggleUseFeaturedImage }
 					useFeaturedImage={ useFeaturedImage }
 					name={ ! url ? __( 'Add media' ) : __( 'Replace' ) }

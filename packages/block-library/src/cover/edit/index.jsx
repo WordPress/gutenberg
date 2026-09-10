@@ -35,6 +35,7 @@ import {
 	getPositionClassName,
 	mediaPosition,
 } from '../shared';
+import getMediaTypeFromUrl from './get-media-type-from-url';
 import CoverInspectorControls from './inspector-controls';
 import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
@@ -320,6 +321,17 @@ function CoverEdit( {
 			} );
 
 			scaffoldInnerBlocks();
+		} );
+	};
+
+	const onSelectURL = async ( newURL ) => {
+		if ( ! newURL || newURL === url ) {
+			return;
+		}
+
+		await onSelectMedia( {
+			url: newURL,
+			type: await getMediaTypeFromUrl( newURL ),
 		} );
 	};
 
@@ -683,6 +695,7 @@ function CoverEdit( {
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			onSelectMedia={ onSelectMedia }
+			onSelectURL={ onSelectURL }
 			onSelectEmbedUrl={ onSelectEmbedUrl }
 			currentSettings={ currentSettings }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
@@ -751,6 +764,7 @@ function CoverEdit( {
 					{ resizeListener }
 					<CoverPlaceholder
 						onSelectMedia={ onSelectMedia }
+						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 						toggleUseFeaturedImage={ toggleUseFeaturedImage }
 					>

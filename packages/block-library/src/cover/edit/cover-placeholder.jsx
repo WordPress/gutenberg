@@ -8,6 +8,7 @@ export default function CoverPlaceholder( {
 	disableMediaButtons = false,
 	children,
 	onSelectMedia,
+	onSelectURL,
 	onError,
 	style,
 	toggleUseFeaturedImage,
@@ -25,6 +26,7 @@ export default function CoverPlaceholder( {
 				title: __( 'Cover' ),
 			} }
 			onSelect={ onSelectMedia }
+			onSelectURL={ onSelectURL }
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			disableMediaButtons={ disableMediaButtons }
 			onToggleFeaturedImage={ toggleUseFeaturedImage }
