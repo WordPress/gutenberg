@@ -12,6 +12,7 @@
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },
+		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../date" },
 		{ "path": "../data" },
 		{ "path": "../element/tsconfig.build.json" },

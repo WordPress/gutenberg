@@ -109,8 +109,14 @@ function ActionButtons< Item >( {
 					return null;
 				}
 
-				const { id, label, icon, isPrimary, callback } = action;
+				const { id, label, icon, isPrimary, isEligible, callback } =
+					action;
 
+				// The label reflects the selection; eligibility only
+				// controls whether the action can run on it.
+				const eligibleItems = isEligible
+					? items.filter( ( item ) => isEligible( item ) )
+					: items;
 				const _label =
 					typeof label === 'string' ? label : label( items );
 				const variant = isPrimary ? 'primary' : 'tertiary';
@@ -121,11 +127,15 @@ function ActionButtons< Item >( {
 						key={ id }
 						accessibleWhenDisabled
 						icon={ icon }
-						disabled={ isInProgress || ! selection?.length }
+						disabled={
+							isInProgress ||
+							! selection?.length ||
+							! eligibleItems.length
+						}
 						isBusy={ isInProgress }
 						onClick={ async () => {
 							setActionInProgress( id );
-							await callback( items, {
+							await callback( eligibleItems, {
 								registry,
 							} );
 							setActionInProgress( null );
@@ -160,8 +170,11 @@ function PickerBulkSelectionInfo() {
 		[ selection, getItemId, data ]
 	);
 
-	// The count and the selection checkbox belong with the actions, mirroring `DataViews`.
-	if ( ! actions.length ) {
+	// The count and the selection checkbox belong with the actions, mirroring
+	// `DataViews`. Single-select pickers always hold exactly one selection, so
+	// the count carries no information and only the multiselect variant
+	// renders it.
+	if ( ! actions.length || ! isMultiselect ) {
 		return null;
 	}
 
