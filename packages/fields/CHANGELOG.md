@@ -16,6 +16,9 @@
 -   Template field: Show it on block themes to users who can't create templates, like the post editor's template panel. ([#82857](https://github.com/WordPress/gutenberg/pull/82857))
 -   `MediaEdit`: Show a message instead of the picker when the user lacks permission to upload media. ([#82720](https://github.com/WordPress/gutenberg/pull/82720))
 -   Featured image field: label the button that sets the image with the post type's `set_featured_image` label and title the DataViews media modal with its `featured_image` label, as the classic panel does. ([#83445](https://github.com/WordPress/gutenberg/pull/83445))
+-   `date`: Render nothing instead of the current date when the post has no date ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
+-   `discussion`: Only describe the comment and ping settings that are known, instead of reporting "Closed" for settings that have not been loaded ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
+-   `author`: Drop the avatar's alt text so it no longer repeats the author name that follows it ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
 
 ### Internal
 
@@ -35,9 +38,6 @@
 -   `author`: Drop the custom `sort` callback, which read `_embedded.author` from the arguments although `Field.sort` receives the field values (the author ids), so every comparison returned `0` and in-memory sorting by author was a no-op. The field now sorts by author id through the `integer` type, matching the order the REST API returns for `orderby=author` ([#82559](https://github.com/WordPress/gutenberg/pull/82559)).
 -   Hide the slug field for posts without a permalink, such as posts of non-public post types, matching the classic post URL panel ([#82341](https://github.com/WordPress/gutenberg/pull/82341)).
 -   Normalize special characters in exported pattern filenames to prevent broken or unreadable files. ([#77033](https://github.com/WordPress/gutenberg/pull/77033))
--   `date`: Render nothing instead of the current date when the post has no date ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
--   `discussion`: Only describe the comment and ping settings that are known, instead of reporting "Closed" for settings that have not been loaded ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
--   `author`: Drop the avatar's alt text so it no longer repeats the author name that follows it ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
 
 ### Internal
 
