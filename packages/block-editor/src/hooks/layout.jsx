@@ -23,6 +23,7 @@ import { useSettings } from '../components/use-settings';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
+import { normalizeLegacyLayout } from '../layouts/utils';
 import { cleanEmptyObject, useBlockSettings, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 import { globalStylesDataKey } from '../store/private-keys';
@@ -162,9 +163,7 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 	const { default: defaultBlockLayout } =
 		getBlockSupport( blockName, layoutBlockSupportKey ) || {};
 	const usedLayout =
-		layout?.inherit || layout?.contentSize || layout?.wideSize
-			? { ...layout, type: 'constrained' }
-			: layout || defaultBlockLayout || {};
+		normalizeLegacyLayout( layout ) || defaultBlockLayout || {};
 
 	const layoutClassnames = [];
 
@@ -231,11 +230,7 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
  */
 export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 	const { layout = {}, style = {} } = blockAttributes;
-	// Update type for blocks using legacy layouts.
-	const usedLayout =
-		layout?.inherit || layout?.contentSize || layout?.wideSize
-			? { ...layout, type: 'constrained' }
-			: layout || {};
+	const usedLayout = normalizeLegacyLayout( layout ) || {};
 	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
 	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGapSupport !== null;
@@ -696,9 +691,7 @@ function BlockWithLayoutStyles( {
 	const { default: defaultBlockLayout } =
 		getBlockSupport( name, layoutBlockSupportKey ) || {};
 	const usedLayout =
-		layout?.inherit || layout?.contentSize || layout?.wideSize
-			? { ...layout, type: 'constrained' }
-			: layout || defaultBlockLayout || {};
+		normalizeLegacyLayout( layout ) || defaultBlockLayout || {};
 
 	const selectorPrefix = `wp-container-${ kebabCase( name ) }-is-layout-`;
 	// Higher specificity to override defaults from theme.json.

@@ -18,7 +18,6 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	retrieveSelectedAttribute,
 	findRichTextAttributeKey,
@@ -1948,21 +1947,24 @@ export const __unstableMarkAutomaticChange =
 	};
 
 /**
- * Action that sets the editor mode
+ * Action that used to set the editor mode (Write/Design tool).
  *
- * @param {string} mode Editor mode
+ * @deprecated
+ *
+ * @return {Object} Action object.
  */
-export const __unstableSetEditorMode =
-	( mode ) =>
-	( { registry } ) => {
-		registry.dispatch( preferencesStore ).set( 'core', 'editorTool', mode );
-
-		if ( mode === 'navigation' ) {
-			speak( __( 'You are currently in Write mode.' ) );
-		} else if ( mode === 'edit' ) {
-			speak( __( 'You are currently in Design mode.' ) );
+export function __unstableSetEditorMode() {
+	deprecated(
+		'wp.data.dispatch( "core/block-editor" ).__unstableSetEditorMode',
+		{
+			since: '7.2',
+			hint: 'The Write/Design editor tool has been removed.',
 		}
+	);
+	return {
+		type: 'DO_NOTHING',
 	};
+}
 
 /**
  * Set the block moving client ID.

@@ -2224,6 +2224,7 @@ class Navigation {
 	getNavBlock() {
 		return this.editor.canvas.getByRole( 'document', {
 			name: 'Block: Navigation',
+			exact: true,
 		} );
 	}
 

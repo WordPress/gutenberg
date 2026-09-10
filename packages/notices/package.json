@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/notices",
-	"version": "5.54.0",
+	"version": "5.55.0",
 	"description": "State management for notices.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -55,11 +55,10 @@
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",
-		"@testing-library/jest-dom": "^6.9.1",
-		"@testing-library/react": "^16.3.2",
-		"@types/jest": "^30.0.0",
+		"@testing-library/jest-dom": "^7.0.1",
+		"@testing-library/react": "^16.3.3",
 		"deep-freeze": "^0.0.1",
-		"vitest": "^4.1.10"
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

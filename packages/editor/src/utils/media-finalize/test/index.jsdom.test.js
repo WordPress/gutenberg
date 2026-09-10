@@ -1,7 +1,15 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import mediaFinalize from '..';
+import { receiveFinalizedAttachment } from '../../media-upload/finalized-attachments';
 
-jest.mock( '@wordpress/api-fetch', () => jest.fn() );
+vi.mock( import( '@wordpress/api-fetch' ), () => ( {
+	default: vi.fn(),
+} ) );
+
+vi.mock( import( '../../media-upload/finalized-attachments' ), () => ( {
+	receiveFinalizedAttachment: vi.fn(),
+} ) );
 
 const mockRestAttachment = {
 	id: 123,
@@ -13,7 +21,7 @@ const mockRestAttachment = {
 
 describe( 'mediaFinalize', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'should call the finalize endpoint with the correct path, method, and sub_sizes', async () => {
@@ -77,5 +85,31 @@ describe( 'mediaFinalize', () => {
 		apiFetch.mockRejectedValue( new Error( 'Network error' ) );
 
 		await expect( mediaFinalize( 456 ) ).rejects.toThrow( 'Network error' );
+	} );
+
+	it( 'should store the finalize response as the attachment record', async () => {
+		// The finalize response is the attachment as prepared after its
+		// sub-size metadata was written, so it is what the editor should hold.
+		// Receiving it here is what removes the need to fetch the attachment
+		// again just to pick the generated sizes up.
+		const finalized = {
+			...mockRestAttachment,
+			media_details: { sizes: { thumbnail: {} } },
+		};
+		apiFetch.mockResolvedValue( finalized );
+
+		await mediaFinalize( 123 );
+
+		// The untransformed record: core-data holds REST records, and
+		// transformAttachment renames fields for block consumers.
+		expect( receiveFinalizedAttachment ).toHaveBeenCalledWith( finalized );
+	} );
+
+	it( 'should store nothing when the response is empty', async () => {
+		apiFetch.mockResolvedValue( undefined );
+
+		await mediaFinalize( 123 );
+
+		expect( receiveFinalizedAttachment ).not.toHaveBeenCalled();
 	} );
 } );

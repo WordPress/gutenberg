@@ -1,8 +1,10 @@
+import { describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from '@ariakit/test/react';
 import FontSizePickerToggleGroup from '../font-size-picker-toggle-group';
 import type { FontSize } from '../types';
+globalThis.wpVitest.mockResizeObserver();
 
 describe( 'FontSizePickerToggleGroup', () => {
 	const fontSizes: FontSize[] = [
@@ -25,7 +27,7 @@ describe( 'FontSizePickerToggleGroup', () => {
 
 	describe( 'valueMode prop', () => {
 		it( 'should find font size by size value when valueMode is literal', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerToggleGroup
 					fontSizes={ fontSizes }
@@ -41,7 +43,7 @@ describe( 'FontSizePickerToggleGroup', () => {
 		} );
 
 		it( 'should find font size by slug when valueMode is slug', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerToggleGroup
 					fontSizes={ fontSizes }
@@ -57,7 +59,7 @@ describe( 'FontSizePickerToggleGroup', () => {
 		} );
 
 		it( 'should handle undefined value', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerToggleGroup
 					fontSizes={ fontSizes }
@@ -73,7 +75,7 @@ describe( 'FontSizePickerToggleGroup', () => {
 		} );
 
 		it( 'should handle empty string value', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerToggleGroup
 					fontSizes={ fontSizes }
@@ -92,7 +94,7 @@ describe( 'FontSizePickerToggleGroup', () => {
 	describe( 'onChange callback', () => {
 		it( 'should call onChange with FontSize object as second parameter', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerToggleGroup
 					fontSizes={ fontSizes }
@@ -105,7 +107,7 @@ describe( 'FontSizePickerToggleGroup', () => {
 
 		it( 'should call onChange with FontSize object when selecting a different option', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerToggleGroup
 					fontSizes={ fontSizes }
@@ -139,7 +141,7 @@ describe( 'FontSizePickerToggleGroup', () => {
 		];
 
 		it( 'should handle multiple font sizes with same value in literal mode', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerToggleGroup
 					fontSizes={ fontSizesWithDuplicates }
@@ -155,7 +157,7 @@ describe( 'FontSizePickerToggleGroup', () => {
 		} );
 
 		it( 'should handle multiple font sizes with same value in slug mode', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerToggleGroup
 					fontSizes={ fontSizesWithDuplicates }
@@ -196,7 +198,7 @@ describe( 'FontSizePickerToggleGroup', () => {
 		];
 
 		it( 'should handle different units in literal mode', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerToggleGroup
 					fontSizes={ heterogeneousFontSizes }
@@ -212,7 +214,7 @@ describe( 'FontSizePickerToggleGroup', () => {
 		} );
 
 		it( 'should handle complex font size values in literal mode', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerToggleGroup
 					fontSizes={ heterogeneousFontSizes }
@@ -228,7 +230,7 @@ describe( 'FontSizePickerToggleGroup', () => {
 		} );
 
 		it( 'should handle different units in slug mode', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			await render(
 				<FontSizePickerToggleGroup
 					fontSizes={ heterogeneousFontSizes }
