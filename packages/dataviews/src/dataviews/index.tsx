@@ -136,9 +136,6 @@ function DataViews< Item >( {
 		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 	};
 	const containerRef = useRef< HTMLDivElement >( null );
-	const tableHeaderRef = useRef< HTMLTableSectionElement >( null );
-	const tableSelectionRef = useRef< HTMLInputElement >( null );
-	const bulkSelectionRef = useRef< HTMLInputElement >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
 		( resizeObserverEntries: any ) => {
@@ -248,9 +245,6 @@ function DataViews< Item >( {
 				renderItemLink,
 				containerWidth,
 				containerRef,
-				tableHeaderRef,
-				tableSelectionRef,
-				bulkSelectionRef,
 				resizeObserverRef,
 				defaultLayouts,
 				filters,
@@ -284,7 +278,7 @@ function DataViews< Item >( {
  */
 // Populate the DataViews sub components
 const DataViewsSubComponents = DataViews as typeof DataViews & {
-	BulkActionToolbar: typeof BulkActions;
+	BulkActionToolbar: () => React.JSX.Element;
 	Filters: typeof Filters;
 	FiltersToggle: typeof FiltersToggle;
 	FiltersToggled: typeof FiltersToggled;
