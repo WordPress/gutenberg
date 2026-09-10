@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.55.0 (2026-09-10)
+
 ### Bug Fixes
 
 -   `focusable.find`: Exclude elements hidden by CSS `visibility` or `content-visibility` while preserving explicitly visible descendants ([#82574](https://github.com/WordPress/gutenberg/pull/82574)).
