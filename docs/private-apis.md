@@ -29,6 +29,7 @@ Private actions:
 Private selectors:
 - `getAllBlockBindingsSources`
 - `getBlockBindingsSource`
+- `getBlockKeyboardShortcuts`
 - `getBootstrappedBlockType`
 - `getSupportedStyles`
 - `getUnprocessedBlockTypes`
@@ -246,7 +247,8 @@ Private selectors:
 ## block-library
 
 Private exports:
-- `BlockKeyboardShortcuts`
+- `NAVIGATION_OVERLAY_TEMPLATE_PART_AREA`
+- `NavigationLinkUI`
 
 ## router (private exports only)
 

@@ -1,6 +1,7 @@
 import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
+import { getBlockType, isUnmodifiedBlock } from '@wordpress/blocks';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -163,14 +164,44 @@ export const privateRemoveBlocks =
 			}
 		}
 
+		// When the removal covers all the inner blocks of an otherwise
+		// unmodified container, remove the container as well: an empty
+		// husk requiring a second removal is never the intention.
+		let removeRoot = false;
+		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
+		// A wrapper that only exists as a slot of a larger block (a column
+		// in columns) keeps its place: emptying it must not reshape the
+		// parent layout.
+		if (
+			rootClientId &&
+			! getBlockType( select.getBlockName( rootClientId ) )?.parent
+				?.length
+		) {
+			const blockOrder = select.getBlockOrder( rootClientId );
+			removeRoot =
+				blockOrder.length === clientIds.length &&
+				blockOrder.every( ( clientId ) =>
+					clientIds.includes( clientId )
+				) &&
+				isUnmodifiedBlock(
+					select.__unstableGetBlockWithoutInnerBlocks( rootClientId )
+				);
+		}
+
 		if ( selectPrevious ) {
-			dispatch.selectPreviousBlock( clientIds[ 0 ], selectPrevious );
+			dispatch.selectPreviousBlock(
+				removeRoot ? rootClientId : clientIds[ 0 ],
+				selectPrevious
+			);
 		}
 
 		// We're batching these two actions because an extra `undo/redo` step can
 		// be created, based on whether we insert a default block or not.
 		registry.batch( () => {
-			dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
+			dispatch( {
+				type: 'REMOVE_BLOCKS',
+				clientIds: removeRoot ? [ rootClientId ] : clientIds,
+			} );
 			// To avoid a focus loss when removing the last block, assure there is
 			// always a default block if the last of the blocks have been removed.
 			dispatch( ensureDefaultBlock() );

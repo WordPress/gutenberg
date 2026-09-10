@@ -10,7 +10,7 @@ test.describe( 'Quote', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( 'test' );

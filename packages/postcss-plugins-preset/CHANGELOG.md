@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 5.55.0 (2026-09-10)
+
+### Internal
+
+-   Remove unused dependency `@wordpress/base-styles` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 5.54.0 (2026-08-26)
+
+## 5.53.0 (2026-08-12)
+
 
 ## 5.52.0 (2026-07-29)
 

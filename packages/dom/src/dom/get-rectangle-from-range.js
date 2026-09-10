@@ -88,6 +88,36 @@ export default function getRectangleFromRange( range ) {
 		return null;
 	}
 
+	// A collapsed range at a soft line wrap is equally ambiguous: the same
+	// position ends one line and starts the next. Some browsers (Gecko)
+	// return a single rectangle for it, on the upper line, regardless of
+	// where the caret is. Detect the boundary by measuring the characters
+	// around the position: when they sit on different lines, there is no
+	// way to know which line the caret is on, so don't return anything.
+	if (
+		rects.length === 1 &&
+		startContainer.nodeType === startContainer.TEXT_NODE &&
+		range.startOffset > 0 &&
+		range.startOffset < /** @type {Text} */ ( startContainer ).length
+	) {
+		assertIsDefined( ownerDocument, 'ownerDocument' );
+		const measure = (
+			/** @type {number} */ start,
+			/** @type {number} */ end
+		) => {
+			const charRange = ownerDocument.createRange();
+			charRange.setStart( startContainer, start );
+			charRange.setEnd( startContainer, end );
+			return charRange.getBoundingClientRect();
+		};
+		const before = measure( range.startOffset - 1, range.startOffset );
+		const after = measure( range.startOffset, range.startOffset + 1 );
+
+		if ( before.bottom <= after.top ) {
+			return null;
+		}
+	}
+
 	let rect = rects[ 0 ];
 
 	// If the collapsed range starts (and therefore ends) at an element node,

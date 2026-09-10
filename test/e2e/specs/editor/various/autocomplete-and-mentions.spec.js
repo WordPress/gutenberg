@@ -81,6 +81,34 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 	].forEach( ( completerAndOptionType ) => {
 		const [ completer, type ] = completerAndOptionType;
 
+		if ( type === 'mention' ) {
+			test( `${ completer }: should not trigger ${ type } when the immediately preceding character is not a space`, async ( {
+				page,
+				editor,
+			} ) => {
+				await editor.canvas
+					.getByRole( 'document', { name: 'Add default block' } )
+					.click();
+				await page.keyboard.type( 'email@da' );
+
+				// Allow time for the autocomplete trigger effects to settle.
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+				await page.waitForTimeout( 100 );
+				await expect( page.getByRole( 'listbox' ) ).toBeHidden();
+
+				// Enter must break the line rather than accept a completion.
+				await page.keyboard.press( 'Enter' );
+				await expect.poll( editor.getEditedPostContent )
+					.toBe( `<!-- wp:paragraph -->
+<p>email@da</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->` );
+			} );
+		}
+
 		test( `${ completer }: should insert ${ type }`, async ( {
 			page,
 			editor,
@@ -102,7 +130,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.triggerString );
 			await expect(
@@ -167,7 +195,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( 'Stuck in the middle with you.' );
 			await pageUtils.pressKeys( 'ArrowLeft', { times: 'you.'.length } );
@@ -210,7 +238,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.firstTriggerString );
 			await expect(
@@ -254,7 +282,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.triggerString );
 			await page
@@ -292,7 +320,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.triggerString );
 			await expect(
@@ -329,7 +357,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.triggerString );
 			await expect(
@@ -350,7 +378,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				editor,
 			} ) => {
 				await editor.canvas
-					.locator( 'role=button[name="Add default block"i]' )
+					.locator( 'role=document[name="Add default block"i]' )
 					.click();
 				// The 'Grapes' option is disabled in our test plugin, so it should not insert the grapes emoji
 				await page.keyboard.type( 'Sorry, we are all out of ~g' );
@@ -418,7 +446,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 
 			for ( let i = 0; i < 4; i++ ) {
@@ -483,7 +511,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( '@fr' );
@@ -524,7 +552,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '@fr' );
 		await expect(
@@ -542,7 +570,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '@' );
 		await pageUtils.pressKeys( 'primary+b' );
@@ -566,7 +594,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/' );
 		await expect(
@@ -595,7 +623,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		const mentionOption = page.getByRole( 'option', {
 			name: 'Bilbo Baggins thebetterhobbit',
@@ -625,7 +653,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		'should not re-trigger autocomplete after accepting a mention and changing text near it',
 		async ( { editor, page, pageUtils } ) => {
 			await editor.canvas
-				.getByRole( 'button', { name: 'Add default block' } )
+				.getByRole( 'document', { name: 'Add default block' } )
 				.click();
 
 			await page.keyboard.type( '@bi' );
@@ -670,7 +698,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( '@bi' );
@@ -708,7 +736,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( 'hello @fr' );
@@ -738,7 +766,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( '@fr' );
@@ -771,7 +799,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( '@შოთა' );

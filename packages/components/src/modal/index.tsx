@@ -195,6 +195,7 @@ function UnforwardedModal(
 			! event.defaultPrevented
 		) {
 			event.preventDefault();
+			event.stopPropagation();
 			closeModal().then( () => onRequestClose( event ) );
 		}
 	}

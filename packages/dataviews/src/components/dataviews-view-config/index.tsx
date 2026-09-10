@@ -1,4 +1,3 @@
-import type { ChangeEvent } from 'react';
 import {
 	Button,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
@@ -8,22 +7,19 @@ import {
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	SelectControl,
 	__experimentalHeading as Heading,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { memo, useContext, useMemo } from '@wordpress/element';
 import { cog } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 import { useInstanceId } from '@wordpress/compose';
-import { Stack } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu, Stack } from '@wordpress/ui';
 import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
 import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import type { View } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import { PropertiesSection } from './properties-section';
-import { unlock } from '../../lock-unlock';
-
-const { Menu } = unlock( componentsPrivateApis );
 
 const DATAVIEWS_CONFIG_POPOVER_PROPS = {
 	className: 'dataviews-config__popover',
@@ -40,8 +36,8 @@ export function ViewTypeMenu() {
 	}
 	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
 	return (
-		<Menu>
-			<Menu.TriggerButton
+		<Menu.Root>
+			<Menu.Trigger
 				render={
 					<Button
 						size="compact"
@@ -50,51 +46,53 @@ export function ViewTypeMenu() {
 					/>
 				}
 			/>
-			<Menu.Popover>
-				{ availableLayouts.map( ( layout ) => {
-					const config = VIEW_LAYOUTS.find(
-						( v ) => v.type === layout
-					);
-					if ( ! config ) {
-						return null;
-					}
-					return (
-						<Menu.RadioItem
-							key={ layout }
-							value={ layout }
-							name="view-actions-available-view"
-							checked={ layout === view.type }
-							hideOnClick
-							onChange={ (
-								e: ChangeEvent< HTMLInputElement >
-							) => {
-								switch ( e.target.value ) {
-									case 'list':
-									case 'grid':
-									case 'table':
-									case 'pickerGrid':
-									case 'pickerTable':
-									case 'pickerActivity':
-									case 'activity':
-										const viewWithoutLayout = { ...view };
-										if ( 'layout' in viewWithoutLayout ) {
-											delete viewWithoutLayout.layout;
-										}
-										return onChangeView( {
-											...viewWithoutLayout,
-											type: e.target.value,
-											...defaultLayouts[ e.target.value ],
-										} as View );
+			<Menu.Popup>
+				<Menu.RadioGroup
+					value={ view.type }
+					onValueChange={ ( value: string ) => {
+						switch ( value ) {
+							case 'list':
+							case 'grid':
+							case 'table':
+							case 'pickerGrid':
+							case 'pickerTable':
+							case 'pickerActivity':
+							case 'activity':
+								const viewWithoutLayout = { ...view };
+								if ( 'layout' in viewWithoutLayout ) {
+									delete viewWithoutLayout.layout;
 								}
-								warning( 'Invalid dataview' );
-							} }
-						>
-							<Menu.ItemLabel>{ config.label }</Menu.ItemLabel>
-						</Menu.RadioItem>
-					);
-				} ) }
-			</Menu.Popover>
-		</Menu>
+								return onChangeView( {
+									...viewWithoutLayout,
+									type: value,
+									...defaultLayouts[ value ],
+								} as View );
+						}
+						warning( 'Invalid dataview' );
+					} }
+				>
+					{ availableLayouts.map( ( layout ) => {
+						const config = VIEW_LAYOUTS.find(
+							( v ) => v.type === layout
+						);
+						if ( ! config ) {
+							return null;
+						}
+						return (
+							<Menu.RadioItem
+								key={ layout }
+								value={ layout }
+								closeOnClick
+							>
+								<Menu.ItemLabel>
+									{ config.label }
+								</Menu.ItemLabel>
+							</Menu.RadioItem>
+						);
+					} ) }
+				</Menu.RadioGroup>
+			</Menu.Popup>
+		</Menu.Root>
 	);
 }
 

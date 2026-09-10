@@ -74,16 +74,20 @@
 			padding: $grid-unit-10;
 		}
 
-		.editor-collab-sidebar-panel__user-meta {
+		.editor-collab-sidebar-panel__user-info {
 			white-space: nowrap;
 		}
 
 		&:not(:hover):not(:focus-within) {
-			.editor-collab-sidebar-panel__user-meta {
+			.editor-collab-sidebar-panel__user-info {
 				display: none;
 			}
 		}
 	}
+}
+
+.editor-collab-sidebar-panel__user-info {
+	flex: 1;
 }
 
 .editor-collab-sidebar-panel__user-name {
@@ -92,7 +96,7 @@
 	line-height: 16px;
 	text-align: left;
 	color: $gray-700;
-	text-transform: capitalize;
+	overflow-wrap: anywhere;
 }
 
 .editor-collab-sidebar-panel__user-time {

@@ -1,5 +1,5 @@
 import type { AriaAttributes } from 'react';
-import { useId } from '@wordpress/element';
+import { forwardRef, useId } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '../visually-hidden';
 
@@ -31,6 +31,12 @@ type ShortcutAriaProps = Pick<
 	'aria-describedby' | 'aria-keyshortcuts'
 >;
 
+/**
+ * Returns shortcut accessibility metadata for an interactive element.
+ *
+ * Render `KeyboardShortcutDescription` with the returned `descriptionId` when
+ * a shortcut is provided.
+ */
 function useKeyboardShortcutProps( {
 	'aria-describedby': ariaDescribedBy,
 	'aria-keyshortcuts': ariaKeyShortcuts,
@@ -51,18 +57,21 @@ function useKeyboardShortcutProps( {
 	};
 }
 
-function KeyboardShortcutDescription( {
-	descriptionId,
-	shortcut,
-}: {
-	descriptionId: string;
-	shortcut: KeyboardShortcut;
-} ) {
+/**
+ * Renders a localized, visually hidden description for a keyboard shortcut.
+ */
+const KeyboardShortcutDescription = forwardRef<
+	HTMLSpanElement,
+	{
+		descriptionId: string;
+		shortcut: KeyboardShortcut;
+	}
+>( function KeyboardShortcutDescription( { descriptionId, shortcut }, ref ) {
 	return (
 		<VisuallyHidden
 			id={ descriptionId }
 			aria-hidden="true"
-			render={ <span /> }
+			render={ <span ref={ ref } /> }
 		>
 			{ sprintf(
 				/* translators: %s: keyboard shortcut. */
@@ -71,21 +80,25 @@ function KeyboardShortcutDescription( {
 			) }
 		</VisuallyHidden>
 	);
-}
+} );
 
-function KeyboardShortcutDisplay( {
-	className,
-	shortcut,
-}: {
-	className?: string;
-	shortcut: KeyboardShortcut;
-} ) {
+/**
+ * Renders a visual keyboard shortcut while hiding it from assistive
+ * technology.
+ */
+const KeyboardShortcutDisplay = forwardRef<
+	HTMLSpanElement,
+	{
+		className?: string;
+		shortcut: KeyboardShortcut;
+	}
+>( function KeyboardShortcutDisplay( { className, shortcut }, ref ) {
 	return (
-		<span aria-hidden="true" className={ className } dir="ltr">
+		<span ref={ ref } aria-hidden="true" className={ className } dir="ltr">
 			{ shortcut.displayShortcut }
 		</span>
 	);
-}
+} );
 
 export {
 	KeyboardShortcutDescription,

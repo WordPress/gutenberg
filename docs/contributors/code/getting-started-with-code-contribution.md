@@ -5,7 +5,7 @@ The following guide is for setting up your local environment to contribute to th
 ## Prerequisites
 
 -   Node.js
-    Gutenberg is a JavaScript project that requires [Node.js](https://nodejs.org/). The project is currently built using Node.js v20 and npm v10. Though best efforts are made to always use the Active LTS version of Node.js, this will not always be the case. For more details, please refer to the [Node.js release schedule](https://github.com/nodejs/Release#release-schedule).
+    Gutenberg is a JavaScript project that requires [Node.js](https://nodejs.org/). The project is currently built using Node.js v24 and npm v11. Though best efforts are made to always use the Active LTS version of Node.js, this will not always be the case. For more details, please refer to the [Node.js release schedule](https://github.com/nodejs/Release#release-schedule).
 
 We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) since it is the easiest way to install and manage node for macOS, Linux, and Windows 10 using WSL2. See [our Development Tools guide](/docs/getting-started/devenv/README.md#development-tools) or the Nodejs site for additional installation instructions.
 
@@ -41,6 +41,12 @@ npm run dev
 ```
 
 > Note: The install scripts require [Python](https://www.python.org/) to be installed and in the path of the local system. This might be installed by default for your operating system, or require downloading and installing.
+
+### Set up each worktree
+
+Install dependencies in each fresh Git worktree before you build, test, lint, or commit. Do not reuse `node_modules` or generated package files from a worktree whose `package-lock.json` is at a different revision. Results from that setup might not match the current checkout.
+
+If you install dependencies with `--ignore-scripts`, run `npm run prepare` before committing so Husky installs the repository Git hooks. If a focused command needs generated package files, build the affected package in the current worktree before you interpret its result.
 
 There are two ways to build your code. While developing, you probably will want to use `npm run dev` to run continuous builds automatically as source files change. The dev build also includes additional warnings and errors to help troubleshoot while developing. Once you are happy with your changes, you can run `npm run build` to create optimized production build.
 
@@ -239,6 +245,9 @@ You can start with this workspace settings file:
 		"editor.formatOnSave": true,
 		"editor.defaultFormatter": "obliviousharmony.vscode-php-codesniffer"
 	},
+	"eslint.bulkSuppression.enable": true,
+	"eslint.bulkSuppression.location": "tools/eslint/suppressions.json",
+	"eslint.bulkSuppression.severity": "hint",
 	"intelephense.environment.phpVersion": "7.4.0",
 	"intelephense.files.exclude": [
 		"**/.cache/**",
@@ -285,7 +294,7 @@ You can start with this workspace settings file:
 
 ### ESLint
 
-[ESLint](https://eslint.org/) statically analyzes the code to find problems. The lint rules are integrated in the continuous integration process and must pass to be able to commit. With an editor integration enabled, ESLint will use the [eslint.config.cjs](https://github.com/WordPress/gutenberg/blob/HEAD/eslint.config.cjs) file in the root of the Gutenberg repository to highlight issues as you develop.
+[ESLint](https://eslint.org/) statically analyzes the code to find problems. The lint rules are integrated in the continuous integration process and must pass to be able to commit. With an editor integration enabled, ESLint will use the [eslint.config.mjs](https://github.com/WordPress/gutenberg/blob/HEAD/eslint.config.mjs) file in the root of the Gutenberg repository to highlight issues as you develop.
 
 If you use Visual Studio Code, use the extension and settings listed in the [Visual Studio Code](#visual-studio-code) section above. For other editors, see the [ESLint editor integration docs](https://eslint.org/docs/user-guide/integrations).
 
@@ -299,4 +308,4 @@ For other editors, see [Prettier's Editor Integration docs](https://prettier.io/
 
 ### TypeScript
 
-**TypeScript** is a typed superset of JavaScript language. The Gutenberg project uses TypeScript via JSDoc to [type check JavaScript files](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html). If you use Visual Studio Code, TypeScript support is built-in, otherwise see [TypeScript Editor Support](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support) for editor integrations.
+[**TypeScript**](https://www.typescriptlang.org/) is a typed superset of JavaScript language. The Gutenberg project uses TypeScript to detect type-based errors and improve developer experience through editor integrations. If you use Visual Studio Code, TypeScript support is built-in, otherwise see [TypeScript Editor Support](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support) for editor integrations.

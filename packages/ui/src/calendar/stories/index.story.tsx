@@ -1,5 +1,5 @@
 import { fn } from 'storybook/test';
-import { TZDate } from 'react-day-picker';
+import { TZDate } from '@daypicker/react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useEffect } from '@wordpress/element';
 import { Calendar } from '../index';

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { addFallbackToVar } from '../add-fallback-to-var.mjs';
 
 const mockFallbacks: Record< string, string > = {
@@ -40,6 +41,12 @@ describe( 'addFallbackToVar', () => {
 				mockFallbacks
 			)
 		).toBe( 'var(--wpds-border-radius-sm, 999px)' );
+	} );
+
+	it( 'leaves a var() with an empty fallback untouched', () => {
+		expect(
+			addFallbackToVar( 'var(--wpds-dimension-gap-sm,)', mockFallbacks )
+		).toBe( 'var(--wpds-dimension-gap-sm,)' );
 	} );
 
 	it( 'handles multiple var() calls in one value', () => {

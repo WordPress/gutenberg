@@ -239,7 +239,7 @@ export function PageAttributesParent( {
 	 *
 	 * @param {Object} selectedPostId The selected Author.
 	 */
-	const handleChange = ( selectedPostId: string | null | undefined ) => {
+	const handleChange = ( selectedPostId: string | null ) => {
 		if ( selectedPostId ) {
 			return onChangeControl( parseInt( selectedPostId, 10 ) ?? 0 );
 		}

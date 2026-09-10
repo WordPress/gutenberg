@@ -24,7 +24,6 @@
 	background: $components-color-background;
 	color: $components-color-foreground;
 	@include input-control;
-	border-color: $components-color-border;
 
 	// Subtract 1px to account for the border, which isn't included on the element
 	// on newer components like InputControl, SelectControl, etc.

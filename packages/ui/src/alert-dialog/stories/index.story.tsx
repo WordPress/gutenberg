@@ -1,9 +1,9 @@
-import { Menu } from '@base-ui/react/menu';
 import { useId, useState } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { action } from 'storybook/actions';
 import { fn } from 'storybook/test';
 import * as AlertDialog from '../';
+import * as Menu from '../../menu';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
 
@@ -162,81 +162,39 @@ export const WithCustomZIndex: Story = {
 	},
 };
 
-const menuPopupStyles: React.CSSProperties = {
-	background: 'var(--wpds-color-background-surface-neutral-strong)',
-	border: '1px solid var(--wpds-color-stroke-surface-neutral)',
-	borderRadius: '8px',
-	padding: '4px',
-	minWidth: '160px',
-	boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-};
-
-const menuItemStyles: React.CSSProperties = {
-	display: 'block',
-	width: '100%',
-	padding: '8px 12px',
-	borderRadius: '4px',
-	border: 'none',
-	background: 'none',
-	textAlign: 'start',
-	fontSize: 'inherit',
-	userSelect: 'none',
-};
-
 /**
- * Example showing composition with a menu. The `AlertDialog.Trigger` is
- * composed with Base UI's `Menu.Item` using the `render` prop, allowing the
- * menu item to directly trigger the alert dialog.
- *
- * Note: the example currently uses the `Menu` component from BaseUI, although
- * consumers should not use BaseUI directly and instead use the DS `Menu`
- * component (not ready yet).
+ * Control the alert dialog when opening it from a menu item. This lets the
+ * menu close before the dialog opens and keeps the dialog mounted while the
+ * menu popup unmounts.
  */
 export const MenuTrigger: Story = {
 	render: () => {
-		const [ menuOpen, setMenuOpen ] = useState( false );
+		const [ dialogOpen, setDialogOpen ] = useState( false );
+
 		return (
-			<>
-				<Menu.Root onOpenChange={ setMenuOpen } open={ menuOpen }>
+			<AlertDialog.Root
+				open={ dialogOpen }
+				onOpenChange={ setDialogOpen }
+				onConfirm={ () => action( 'onConfirm' )() }
+			>
+				<Menu.Root>
 					<Menu.Trigger>Actions ▾</Menu.Trigger>
-					<Menu.Portal>
-						<Menu.Positioner>
-							<Menu.Popup style={ menuPopupStyles }>
-								<Menu.Item style={ menuItemStyles }>
-									Edit
-								</Menu.Item>
-								<AlertDialog.Root
-									onConfirm={ () => {
-										setMenuOpen( false );
-										action( 'onConfirm' )();
-									} }
-								>
-									<Menu.Item
-										render={
-											<AlertDialog.Trigger
-												// Quick fix to remove `button`-specific styles.
-												// This shouldn't be an issue once we use the DS `Menu`
-												// component, which will come with item styles.
-												render={ <div /> }
-											/>
-										}
-										style={ menuItemStyles }
-										closeOnClick={ false }
-									>
-										Delete...
-										<AlertDialog.Popup
-											intent="irreversible"
-											title="Delete permanently?"
-											description="This action cannot be undone. All data will be lost."
-											confirmButtonText="Delete permanently"
-										/>
-									</Menu.Item>
-								</AlertDialog.Root>
-							</Menu.Popup>
-						</Menu.Positioner>
-					</Menu.Portal>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>Edit</Menu.ItemLabel>
+						</Menu.Item>
+						<Menu.Item onClick={ () => setDialogOpen( true ) }>
+							<Menu.ItemLabel>Delete…</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
 				</Menu.Root>
-			</>
+				<AlertDialog.Popup
+					intent="irreversible"
+					title="Delete permanently?"
+					description="This action cannot be undone. All data will be lost."
+					confirmButtonText="Delete permanently"
+				/>
+			</AlertDialog.Root>
 		);
 	},
 };

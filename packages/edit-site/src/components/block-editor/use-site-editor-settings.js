@@ -31,7 +31,9 @@ function useNavigateToPreviousEntityRecord() {
 	return goBack;
 }
 
-export function useSpecificEditorSettings() {
+export function useSpecificEditorSettings( {
+	defaultRenderingMode = 'post-only',
+} = {} ) {
 	const { query } = useLocation();
 	const { canvas = 'view' } = query;
 	const onNavigateToEntityRecord = useNavigateToEntityRecord();
@@ -91,16 +93,17 @@ export function useSpecificEditorSettings() {
 			__experimentalFeatures: globalSettings,
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
-			focusMode: canvas !== 'view',
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			isPreviewMode: canvas === 'view',
+			defaultRenderingMode,
 		};
 	}, [
 		settings,
 		globalStyles,
 		globalSettings,
 		canvas,
+		defaultRenderingMode,
 		currentPostIsTrashed,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,

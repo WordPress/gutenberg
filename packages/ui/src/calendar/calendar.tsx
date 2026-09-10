@@ -1,10 +1,10 @@
-import { DayPicker } from 'react-day-picker';
-import { enUS } from 'react-day-picker/locale';
+import { DayPicker } from '@daypicker/react';
 import { forwardRef, useCallback, useMemo } from '@wordpress/element';
 import { COMMON_PROPS } from './utils/constants';
 import { clampNumberOfMonths } from './utils/misc';
 import { useControlledValue } from './utils/use-controlled-value';
 import { useLocalizationProps } from './utils/use-localization-props';
+import { usePreserveDayFocus } from './utils/use-preserve-day-focus';
 import { RootContext } from './utils/root-context';
 import type { CalendarProps, OnValueChangeHandler } from './types';
 
@@ -23,19 +23,23 @@ export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 			value: valueProp,
 			onValueChange,
 			numberOfMonths = 1,
-			locale = enUS,
+			locale,
 			timeZone,
+			month,
 			render,
+			role = 'application',
+			'aria-label': ariaLabel,
 			labels: customLabels,
 			...props
 		},
 		ref
 	) {
-		const localizationProps = useLocalizationProps( {
-			locale,
-			timeZone,
-			mode: 'single',
-		} );
+		const { 'aria-label': defaultAriaLabel, ...localizationProps } =
+			useLocalizationProps( {
+				locale,
+				timeZone,
+				mode: 'single',
+			} );
 
 		const labels = useMemo(
 			() =>
@@ -44,7 +48,6 @@ export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 					: localizationProps.labels,
 			[ localizationProps.labels, customLabels ]
 		);
-
 		const onChange: OnValueChangeHandler< Date | null | undefined > =
 			useCallback(
 				( selected, triggerDate, modifiers, e ) => {
@@ -65,10 +68,16 @@ export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 			value: valueProp,
 			onChange,
 		} );
+		const dayFocusProps = usePreserveDayFocus( ref, month );
 
 		const rootContextValue = useMemo(
-			() => ( { render, ref } ),
-			[ render, ref ]
+			() => ( {
+				render,
+				ref: dayFocusProps.ref,
+				role,
+				defaultAriaLabel,
+			} ),
+			[ render, dayFocusProps.ref, role, defaultAriaLabel ]
 		);
 
 		return (
@@ -77,12 +86,15 @@ export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 					{ ...COMMON_PROPS }
 					{ ...localizationProps }
 					{ ...props }
-					role="application"
+					aria-label={ ariaLabel }
 					mode="single"
+					month={ month }
 					numberOfMonths={ clampNumberOfMonths( numberOfMonths ) }
 					labels={ labels }
 					selected={ selected ?? undefined }
 					onSelect={ setSelected }
+					onDayFocus={ dayFocusProps.onDayFocus }
+					onDayBlur={ dayFocusProps.onDayBlur }
 				/>
 			</RootContext.Provider>
 		);

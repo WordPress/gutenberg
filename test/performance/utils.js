@@ -60,6 +60,11 @@ export function quartiles( array ) {
 
 	const q50 = med( 0, numbers.length );
 
+	// A single value has no halves, and `med()` would read past the array.
+	if ( numbers.length === 1 ) {
+		return { q25: q50, q50, q75: q50 };
+	}
+
 	let q25, q75;
 	if ( numbers.length % 2 === 0 ) {
 		// medians of two exact halves

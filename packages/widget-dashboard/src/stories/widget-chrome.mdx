@@ -1,11 +1,15 @@
 import { Meta, Markdown } from '@storybook/addon-docs/blocks';
 import WidgetChromeDoc from './widget-chrome.md?raw';
+import tileAnatomy from './assets/tile-anatomy.svg';
 import headerAnatomy from './assets/header-anatomy.svg';
 import headerFit from './assets/header-fit.svg';
+import footerAnatomy from './assets/footer-anatomy.svg';
 
 <Meta title="Widget Dashboard/Widget Chrome" />
 
 <Markdown>
-	{ WidgetChromeDoc.replace( './assets/header-anatomy.svg', headerAnatomy )
-		.replace( './assets/header-fit.svg', headerFit ) }
+	{ WidgetChromeDoc.replace( './assets/tile-anatomy.svg', tileAnatomy )
+		.replace( './assets/header-anatomy.svg', headerAnatomy )
+		.replace( './assets/header-fit.svg', headerFit )
+		.replace( './assets/footer-anatomy.svg', footerAnatomy ) }
 </Markdown>

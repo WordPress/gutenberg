@@ -22,7 +22,7 @@ export function FeatureHighlight( {
 	return (
 		<Stack direction="row" gap="lg" align="start">
 			<Stack
-				className={ styles.iconBox }
+				className={ styles[ 'icon-box' ] }
 				direction="column"
 				align="center"
 				justify="center"

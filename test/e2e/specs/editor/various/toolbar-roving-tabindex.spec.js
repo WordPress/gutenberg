@@ -90,9 +90,7 @@ test.describe( 'Toolbar roving tabindex', () => {
 		);
 		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'Table' );
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
-			// ArrowRight from Group enters the table cell directly,
-			// not the Table block wrapper.
-			'Body cell text',
+			'Block: Table',
 			'Table'
 		);
 
@@ -198,6 +196,9 @@ class ToolbarRovingTabindexUtils {
 		await this.expectLabelToHaveFocus( currentBlockLabel );
 		await this.pageUtils.pressKeys( 'shift+Tab' );
 		await this.expectLabelToHaveFocus( 'Select parent block: Group' );
+		await this.page.keyboard.press( 'ArrowRight' );
+		// The parent selector segment also hosts the inserter.
+		await this.expectLabelToHaveFocus( 'Add block' );
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( currentBlockTitle );
 	}

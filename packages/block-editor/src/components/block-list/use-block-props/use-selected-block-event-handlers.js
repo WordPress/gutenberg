@@ -28,7 +28,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 		getBlock,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
-		insertAfterBlock,
 		removeBlock,
 		resetZoomLevel,
 		startDraggingBlocks,
@@ -66,13 +65,13 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					return;
 				}
 
-				event.preventDefault();
-
-				if ( keyCode === ENTER && isZoomOut() ) {
-					resetZoomLevel();
-				} else if ( keyCode === ENTER ) {
-					insertAfterBlock( clientId );
+				if ( keyCode === ENTER ) {
+					if ( isZoomOut() ) {
+						event.preventDefault();
+						resetZoomLevel();
+					}
 				} else {
+					event.preventDefault();
 					removeBlock( clientId );
 				}
 			}
@@ -327,7 +326,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			getBlock,
 			isReusableBlock,
 			isTemplatePart,
-			insertAfterBlock,
 			removeBlock,
 			isZoomOut,
 			resetZoomLevel,

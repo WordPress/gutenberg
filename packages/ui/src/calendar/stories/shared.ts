@@ -18,7 +18,7 @@ import {
 	sv,
 } from 'date-fns/locale';
 
-// Storybook date controls pass a number, but react-day-picker expects a Date
+// Storybook date controls pass a number, but DayPicker expects a Date.
 // for props such as `endMonth`.
 export function toDate( value: Date | number | undefined ): Date | undefined {
 	return value === undefined ? undefined : new Date( value );
@@ -32,6 +32,7 @@ export const SHARED_ARG_TYPES = {
 	locale: {
 		options: [
 			'English (US)',
+			'Persian (locale code)',
 			'French',
 			'Spanish',
 			'German',
@@ -51,6 +52,7 @@ export const SHARED_ARG_TYPES = {
 		],
 		mapping: {
 			'English (US)': enUS,
+			'Persian (locale code)': 'fa-IR',
 			French: fr,
 			Spanish: es,
 			German: de,
@@ -92,6 +94,9 @@ export const SHARED_ARG_TYPES = {
 	month: { control: 'date' },
 	onMonthChange: {
 		control: false,
+	},
+	role: {
+		control: 'text',
 	},
 	endMonth: { control: 'date' },
 	startMonth: { control: 'date' },

@@ -167,7 +167,7 @@ test.describe( 'Change detection', () => {
 		changeDetectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Paragraph' );
 
@@ -193,7 +193,7 @@ test.describe( 'Change detection', () => {
 		changeDetectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Hello World' );
 
@@ -379,7 +379,7 @@ test.describe( 'Change detection', () => {
 	} ) => {
 		// Enter content.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Paragraph' );
 
@@ -435,7 +435,7 @@ test.describe( 'Change detection', () => {
 
 		// Insert a paragraph.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Hello, World!' );
 
@@ -505,7 +505,7 @@ test.describe( 'Change detection', () => {
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'Hello World' );
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Paragraph' );
 

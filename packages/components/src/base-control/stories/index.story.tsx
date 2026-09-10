@@ -19,9 +19,9 @@ const meta: Meta< typeof BaseControl > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'recommended',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) in `@wordpress/ui`, but continue using for now.',
+			notes: 'Use [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) from `@wordpress/ui` instead. For a purely visual label outside `Field.Root`, use `Field.VisualLabel`. For a group legend, use [`Fieldset`](?path=/docs/design-system-components-form-primitives-fieldset--docs) and `Fieldset.Legend`.',
 		},
 	},
 };

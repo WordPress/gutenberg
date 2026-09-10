@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ReactElement } from 'react';
-import { useArgs } from 'storybook/preview-api';
+import { useState, type Element as ReactElement } from '@wordpress/element';
 import {
 	SearchControl,
 	__experimentalHStack as HStack,
@@ -79,16 +78,16 @@ type LibraryArgs = {
 	highlightPublicIcons: boolean;
 };
 
-type LibraryExampleProps = LibraryArgs & {
-	updateArgs: ( newArgs: Partial< LibraryArgs > ) => void;
-};
-
 const LibraryExample = ( {
-	filter,
-	size,
-	highlightPublicIcons,
-	updateArgs,
-}: LibraryExampleProps ): ReactElement => {
+	filter: initialFilter,
+	size: initialSize,
+	highlightPublicIcons: initialHighlightPublicIcons,
+}: LibraryArgs ): ReactElement => {
+	const [ filter, setFilter ] = useState( initialFilter );
+	const [ size, setSize ] = useState( initialSize );
+	const [ highlightPublicIcons, setHighlightPublicIcons ] = useState(
+		initialHighlightPublicIcons
+	);
 	const filteredIcons = filter.length
 		? Object.fromEntries(
 				Object.entries( availableIcons ).filter( ( [ name ] ) => {
@@ -116,7 +115,7 @@ const LibraryExample = ( {
 						hideLabelFromVision={ false }
 						value={ filter }
 						onChange={ ( value: string | undefined ) =>
-							updateArgs( { filter: value } )
+							setFilter( value ?? '' )
 						}
 					/>
 					<ToggleGroupControl
@@ -124,7 +123,7 @@ const LibraryExample = ( {
 						isBlock
 						value={ size }
 						onChange={ ( value: string | number | undefined ) =>
-							updateArgs( { size: value } )
+							setSize( value ?? '24' )
 						}
 					>
 						{ [ '16', '24', '32' ].map( ( option ) => (
@@ -138,9 +137,7 @@ const LibraryExample = ( {
 					<ToggleControl
 						label="Highlight public icons"
 						checked={ highlightPublicIcons }
-						onChange={ ( value: boolean ) =>
-							updateArgs( { highlightPublicIcons: value } )
-						}
+						onChange={ setHighlightPublicIcons }
 						help="Emphasize icons available in the SVG icon registry."
 					/>
 				</HStack>
@@ -196,14 +193,11 @@ const LibraryExample = ( {
 	);
 };
 
-export const Library: StoryObj< typeof meta > = {
+export const Library: StoryObj< LibraryArgs > = {
 	args: {
 		filter: '',
 		size: '24',
 		highlightPublicIcons: false,
 	},
-	render: function Library() {
-		const [ args, updateArgs ] = useArgs< LibraryArgs >();
-		return <LibraryExample { ...args } updateArgs={ updateArgs } />;
-	},
+	render: ( args ) => <LibraryExample { ...args } />,
 };

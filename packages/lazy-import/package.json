@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/lazy-import",
-	"version": "2.52.0",
+	"version": "2.55.0",
 	"description": "Lazily import a module, installing it automatically if missing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -34,7 +34,7 @@
 		"semver": "^7.5.4"
 	},
 	"devDependencies": {
-		"@types/node": "^20.19.39",
+		"@types/node": "^24.13.3",
 		"@types/npm-package-arg": "^6.1.1",
 		"@types/semver": "^7.3.8"
 	},

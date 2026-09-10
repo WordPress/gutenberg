@@ -19,13 +19,14 @@ import {
 	doActionAsync,
 } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { localAutosaveSet } from './local-autosave';
 import {
 	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
+import attachMediaInPost from './utils/attach-media-in-post';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
@@ -199,6 +200,10 @@ export const savePost =
 		dispatch.editPost( { content }, { undoIgnore: true } );
 
 		const previousRecord = select.getCurrentPost();
+		// Snapshotted alongside the content above, so that attaching media once
+		// the save finishes works from what was saved for the post itself.
+		const savedBlocks = select.getEditorBlocks();
+
 		let edits = {
 			id: previousRecord.id,
 			...registry
@@ -277,15 +282,26 @@ export const savePost =
 		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
+		// Attach any images in the post that aren't attached to a post yet. Not
+		// awaited: it shouldn't hold up the editor showing "Saved", and it
+		// handles its own errors.
+		//
+		// `isDeletingPost` is what catches trashing. `trashPost` deletes the post
+		// and then calls this, and the record still says what it did before the
+		// delete, so checking the status alone would miss it.
 		if (
-			typeof window !== 'undefined' &&
-			window.__experimentalTemplateActivate &&
+			! error &&
 			! options.isAutosave &&
-			previousRecord.type === 'wp_template' &&
-			( typeof previousRecord.id === 'number' ||
-				/^\d+$/.test( previousRecord.id ) )
+			! options.isPreview &&
+			! select.isDeletingPost() &&
+			previousRecord.status !== 'trash' &&
+			select.getEditorSettings().autoAttachMediaEnabled
 		) {
-			templateActivationNotice( { select, dispatch, registry } );
+			attachMediaInPost( registry, {
+				id: previousRecord.id,
+				type: previousRecord.type,
+				blocks: savedBlocks,
+			} );
 		}
 
 		if ( error ) {
@@ -346,91 +362,6 @@ export const savePost =
 			}
 		}
 	};
-
-async function templateActivationNotice( { select, registry } ) {
-	const editorSettings = select.getEditorSettings();
-
-	// Don't open for focused entity.
-	if ( editorSettings.onNavigateToPreviousEntityRecord ) {
-		return;
-	}
-
-	const { id, slug } = select.getCurrentPost();
-	const site = await registry
-		.select( coreStore )
-		.getEntityRecord( 'root', 'site' );
-
-	// Already active.
-	if ( site.active_templates[ slug ] === id ) {
-		return;
-	}
-
-	const currentTheme = await registry
-		.resolveSelect( coreStore )
-		.getCurrentTheme();
-	const templateType = currentTheme?.default_template_types.find(
-		( type ) => type.slug === slug
-	);
-
-	await registry.dispatch( noticesStore ).createNotice(
-		'info',
-		sprintf(
-			// translators: %s: The name (or slug) of the type of template.
-			__( 'Do you want to activate this "%s" template?' ),
-			templateType?.title ?? slug
-		),
-		{
-			id: 'template-activate-notice',
-			actions: [
-				{
-					label: __( 'Activate' ),
-					onClick: async () => {
-						await registry
-							.dispatch( noticesStore )
-							.createNotice(
-								'info',
-								__( 'Activating template…' ),
-								{ id: 'template-activate-notice' }
-							);
-						try {
-							const currentSite = await registry
-								.select( coreStore )
-								.getEntityRecord( 'root', 'site' );
-							await registry
-								.dispatch( coreStore )
-								.saveEntityRecord(
-									'root',
-									'site',
-									{
-										active_templates: {
-											...currentSite.active_templates,
-											[ slug ]: id,
-										},
-									},
-									{ throwOnError: true }
-								);
-							await registry
-								.dispatch( noticesStore )
-								.createSuccessNotice(
-									__( 'Template activated.' ),
-									{ id: 'template-activate-notice' }
-								);
-						} catch ( error ) {
-							await registry
-								.dispatch( noticesStore )
-								.createErrorNotice(
-									__( 'Template activation failed.' ),
-									{ id: 'template-activate-notice' }
-								);
-							// Rethrow for debugging.
-							throw error;
-						}
-					},
-				},
-			],
-		}
-	);
-}
 
 /**
  * Action for refreshing the current post.
@@ -522,8 +453,8 @@ export const autosave =
 /**
  * Save for preview.
  *
- * @param {Object}  options                     Options object.
- * @param {boolean} options.forceIsAutosaveable Whether to force the post to be autosaveable.
+ * @param {Object}  [options]                     Options object.
+ * @param {boolean} [options.forceIsAutosaveable] Whether to force the post to be autosaveable.
  *
  * @return {Function} Thunk that saves for preview and returns the preview link.
  */
