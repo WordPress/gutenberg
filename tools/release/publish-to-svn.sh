@@ -3,6 +3,11 @@
 # commit response. Requires Subversion and GNU diff/timeout, as on Ubuntu runners.
 set -euo pipefail
 
+if (( $# != 2 )); then
+	echo "Usage: $0 <source-dir> <trunk|tag>" >&2
+	exit 1
+fi
+
 source_dir="$(cd "$1" && pwd)"
 mode="$2"
 : "${PLUGIN_REPO_URL:?}" "${VERSION:?}" "${SVN_USERNAME:?}" "${SVN_PASSWORD:?}"

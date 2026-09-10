@@ -121,6 +121,18 @@ expect_failure() {
 	fi
 }
 
+usage_output="$TEST_ROOT/usage-output"
+if bash "$SCRIPT" > "$usage_output" 2>&1; then
+	echo 'Unexpected success without required arguments'
+	exit 1
+fi
+grep -q '^Usage: ' "$usage_output"
+if grep -q 'unbound variable' "$usage_output"; then
+	echo 'Missing arguments reported an unbound variable'
+	exit 1
+fi
+echo 'PASS: reject missing arguments with usage guidance'
+
 setup successful-trunk
 "$REAL_SVN" checkout "$PLUGIN_REPO_URL/trunk" "$CASE_ROOT/old-trunk" -q
 echo obsolete > "$CASE_ROOT/old-trunk/removed file.js"
