@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `get_patterns` and `get_pattern_details` tools, serving the design system pattern guidance (destructive actions, error messages, save and submit) that was previously only readable in the Storybook. ([#82548](https://github.com/WordPress/gutenberg/pull/82548))
+
 ### Internal
 
 -   Enforce NodeNext module resolution in the build project so future declaration imports are checked against the package's published ESM resolution rules. ([#82088](https://github.com/WordPress/gutenberg/pull/82088))

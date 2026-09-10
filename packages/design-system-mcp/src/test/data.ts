@@ -3,14 +3,19 @@ import {
 	getComponents,
 	getComponentDetail,
 	getDesignTokens,
+	getPatternDetail,
+	getPatterns,
 	resetCache,
 } from '../data';
 import manifestFixture from './fixtures/manifest.json';
+import patternsFixture from './fixtures/patterns-manifest.json';
 
 const MANIFEST_URL =
 	'https://wordpress.github.io/gutenberg/manifests/components.json';
 const TOKENS_URL =
 	'https://raw.githubusercontent.com/WordPress/gutenberg/refs/heads/trunk/packages/theme/docs/tokens.md';
+const PATTERNS_MANIFEST_URL =
+	'https://wordpress.github.io/gutenberg/manifests/patterns.json';
 
 const originalFetch = globalThis.fetch;
 
@@ -171,6 +176,79 @@ describe( 'data', () => {
 			await expect( getDesignTokens() ).rejects.toThrow(
 				'Failed to fetch design tokens'
 			);
+		} );
+	} );
+
+	describe( 'getPatterns', () => {
+		it( 'should return every pattern in the manifest', async () => {
+			mockFetchResponses( {
+				[ PATTERNS_MANIFEST_URL ]: { ok: true, body: patternsFixture },
+			} );
+
+			expect( await getPatterns() ).toEqual( [
+				{
+					slug: 'destructive-actions',
+					title: 'Destructive Actions',
+					description:
+						'How to present actions that remove or delete content.',
+				},
+				{
+					slug: 'error-messages',
+					title: 'Error Messages',
+					description: 'How to write an error message.',
+				},
+			] );
+		} );
+
+		it( 'should cache the manifest across calls', async () => {
+			mockFetchResponses( {
+				[ PATTERNS_MANIFEST_URL ]: { ok: true, body: patternsFixture },
+			} );
+
+			await getPatterns();
+			await getPatternDetail( 'error-messages' );
+
+			expect( globalThis.fetch ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should throw on fetch failure', async () => {
+			mockFetchResponses( {
+				[ PATTERNS_MANIFEST_URL ]: { ok: false, body: null },
+			} );
+
+			await expect( getPatterns() ).rejects.toThrow(
+				'Failed to fetch patterns manifest'
+			);
+		} );
+	} );
+
+	describe( 'getPatternDetail', () => {
+		it( 'should return the document for a slug', async () => {
+			mockFetchResponses( {
+				[ PATTERNS_MANIFEST_URL ]: { ok: true, body: patternsFixture },
+			} );
+
+			expect( await getPatternDetail( 'destructive-actions' ) ).toEqual(
+				patternsFixture.patterns[ 'destructive-actions' ]
+			);
+		} );
+
+		it( 'should ignore casing and surrounding space in the slug', async () => {
+			mockFetchResponses( {
+				[ PATTERNS_MANIFEST_URL ]: { ok: true, body: patternsFixture },
+			} );
+
+			expect(
+				await getPatternDetail( '  Destructive-Actions ' )
+			).toEqual( patternsFixture.patterns[ 'destructive-actions' ] );
+		} );
+
+		it( 'should return null for an unknown pattern', async () => {
+			mockFetchResponses( {
+				[ PATTERNS_MANIFEST_URL ]: { ok: true, body: patternsFixture },
+			} );
+
+			expect( await getPatternDetail( 'nope' ) ).toBeNull();
 		} );
 	} );
 } );

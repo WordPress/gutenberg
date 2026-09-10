@@ -1,0 +1,17 @@
+{
+	"v": 0,
+	"patterns": {
+		"destructive-actions": {
+			"slug": "destructive-actions",
+			"title": "Destructive Actions",
+			"description": "How to present actions that remove or delete content.",
+			"content": "# Destructive Actions\n\nGuidance."
+		},
+		"error-messages": {
+			"slug": "error-messages",
+			"title": "Error Messages",
+			"description": "How to write an error message.",
+			"content": "# Error Messages\n\nGuidance."
+		}
+	}
+}
