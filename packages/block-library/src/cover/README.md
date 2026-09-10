@@ -61,7 +61,7 @@ add_filter( 'register_block_type_args', 'example_disable_cover_video_embeds', 10
 
 ## Overlay color and opacity
 
-The Cover block's overlay controls are part of its color settings. The opacity slider sets how transparent the overlay color is, so it appears next to that color rather than on its own.
+The Cover block's overlay color and opacity controls live in the block toolbar (the Overlay button), next to Add media / Replace. The opacity slider sets how transparent the overlay color is, so it appears next to that color rather than on its own.
 
 Both controls only appear if the block has at least one color or gradient to pick from. A `theme.json` that leaves the block with none, like the one below, hides them:
 

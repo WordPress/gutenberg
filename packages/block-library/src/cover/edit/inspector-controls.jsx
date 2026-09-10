@@ -1,7 +1,6 @@
 import { useMemo } from '@wordpress/element';
 import {
 	FocalPointPicker,
-	RangeControl,
 	TextareaControl as WCTextareaControl,
 	ToggleControl,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -15,9 +14,6 @@ import {
 	InspectorControls,
 	useSettings,
 	store as blockEditorStore,
-	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
-	__experimentalUseGradient,
-	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -95,16 +91,13 @@ export default function CoverInspectorControls( {
 	attributes,
 	setAttributes,
 	clientId,
-	setOverlayColor,
 	coverRef,
 	currentSettings,
-	updateDimRatio,
 	featuredImage,
 } ) {
 	const {
 		useFeaturedImage,
 		id,
-		dimRatio,
 		focalPoint,
 		hasParallax,
 		isRepeated,
@@ -114,17 +107,11 @@ export default function CoverInspectorControls( {
 		tagName,
 		poster,
 	} = attributes;
-	const {
-		isVideoBackground,
-		isImageBackground,
-		mediaElement,
-		url,
-		overlayColor,
-	} = currentSettings;
+	const { isVideoBackground, isImageBackground, mediaElement, url } =
+		currentSettings;
 
 	const sizeSlug = attributes.sizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
-	const { gradientValue, setGradient } = __experimentalUseGradient();
 	const { imageSizes, selectedStyleState } = useSelect(
 		( select ) => {
 			const { getSettings, getSelectedBlockStyleState } = unlock(
@@ -223,11 +210,6 @@ export default function CoverInspectorControls( {
 			: [ coverRef.current.style, 'backgroundPosition' ];
 		styleOfRef[ property ] = mediaPosition( value );
 	};
-
-	const colorGradientSettings = useMultipleOriginColorsAndGradients();
-
-	const showOverlayControls =
-		colorGradientSettings.hasColorsOrGradients && ! hasSelectedStyleState;
 
 	const setMinHeightAttributes = ( nextMinHeight, nextUnit ) => {
 		if ( hasSelectedStyleState ) {
@@ -416,60 +398,6 @@ export default function CoverInspectorControls( {
 							/>
 						) }
 					</ToolsPanel>
-				</InspectorControls>
-			) }
-			{ showOverlayControls && (
-				<InspectorControls group="color">
-					<ColorGradientSettingsDropdown
-						__experimentalIsRenderedInSidebar
-						settings={ [
-							{
-								colorValue: overlayColor.color,
-								gradientValue,
-								label: __( 'Overlay' ),
-								onColorChange: setOverlayColor,
-								onGradientChange: setGradient,
-								isShownByDefault: true,
-								resetAllFilter: () => ( {
-									overlayColor: undefined,
-									customOverlayColor: undefined,
-									gradient: undefined,
-									customGradient: undefined,
-								} ),
-								clearable: true,
-							},
-						] }
-						panelId={ clientId }
-						{ ...colorGradientSettings }
-					/>
-					<ToolsPanelItem
-						hasValue={ () => {
-							// If there's a media background the dimRatio will be
-							// defaulted to 50 whereas it will be 100 for colors.
-							return dimRatio === undefined
-								? false
-								: dimRatio !== ( url ? 50 : 100 );
-						} }
-						label={ __( 'Overlay opacity' ) }
-						onDeselect={ () => updateDimRatio( url ? 50 : 100 ) }
-						resetAllFilter={ () => ( {
-							dimRatio: url ? 50 : 100,
-						} ) }
-						isShownByDefault
-						panelId={ clientId }
-					>
-						<RangeControl
-							label={ __( 'Overlay opacity' ) }
-							value={ dimRatio }
-							onChange={ ( newDimRatio ) =>
-								updateDimRatio( newDimRatio )
-							}
-							min={ 0 }
-							max={ 100 }
-							step={ 10 }
-							required
-						/>
-					</ToolsPanelItem>
 				</InspectorControls>
 			) }
 			<InspectorControls group="dimensions">

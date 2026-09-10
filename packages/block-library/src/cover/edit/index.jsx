@@ -682,6 +682,7 @@ function CoverEdit( {
 		<CoverBlockControls
 			attributes={ attributes }
 			setAttributes={ setAttributes }
+			clientId={ clientId }
 			onSelectMedia={ onSelectMedia }
 			onSelectEmbedUrl={ onSelectEmbedUrl }
 			currentSettings={ currentSettings }
@@ -692,6 +693,8 @@ function CoverEdit( {
 			editMediaButtonRef={ editMediaButtonRef }
 			showEditMediaButton={ showEditMediaButton }
 			isEditMediaDisabled={ isSwappingMedia }
+			setOverlayColor={ onSetOverlayColor }
+			updateDimRatio={ onUpdateDimRatio }
 		/>
 	);
 
@@ -700,11 +703,9 @@ function CoverEdit( {
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			clientId={ clientId }
-			setOverlayColor={ onSetOverlayColor }
 			coverRef={ ref }
 			currentSettings={ currentSettings }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
-			updateDimRatio={ onUpdateDimRatio }
 			onClearMedia={ onClearMedia }
 			featuredImage={ media }
 		/>
