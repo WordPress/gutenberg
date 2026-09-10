@@ -10,7 +10,7 @@ GroupLabel.displayName = 'SearchableSelect.GroupLabel';
 
 /**
  * A searchable single-selection component, with support for
- * a footer item to create new items.
+ * a creatable footer action.
  */
 export const SearchableSelect = Object.assign( _SearchableSelect, {
 	Item,

@@ -126,6 +126,40 @@ function _gutenberg_get_entity_view_config_posttype_wp_navigation( $data ) {
 }
 
 /**
+ * Provides the view configuration for the `root`/`site` entity.
+ *
+ * The site settings are a singleton record edited through a form (the site
+ * editor's Identity screen) rather than listed in a view, so only the `form`
+ * is defined here. The generic `default_view`, `default_layouts`, and
+ * `view_list` built by gutenberg_get_entity_view_config() are left untouched.
+ *
+ * Core has no callback for this entity, so this is a base definition rather
+ * than a layer on top of one.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_get_entity_view_config_root_site( $data ) {
+	return $data->set(
+		array(
+			'form' => array(
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'top',
+				),
+				'fields' => array(
+					'title',
+					'description',
+					'site_logo',
+					'site_icon',
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
  * Post types whose base definition provides its own `form`, without the
  * `status` and `discussion` groups of the default post type form.
  *
@@ -207,6 +241,12 @@ function gutenberg_register_entity_view_config_filters_7_2() {
 	add_filter(
 		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_navigation' ),
 		'_gutenberg_get_entity_view_config_posttype_wp_navigation',
+		5,
+		1
+	);
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'root', 'site' ),
+		'_gutenberg_get_entity_view_config_root_site',
 		5,
 		1
 	);
