@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 40.1.0 (2026-09-10)
+
 ### Enhancements
 
 -   Compound components: Report missing state or accessible semantic structure with clear developer guidance ([#82509](https://github.com/WordPress/gutenberg/pull/82509)).

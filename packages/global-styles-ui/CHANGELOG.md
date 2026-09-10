@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.22.0 (2026-09-10)
+
 ### Enhancements
 
 -   Revisions: migrate the Active badge from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge`. ([#82560](https://github.com/WordPress/gutenberg/pull/82560))
