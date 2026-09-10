@@ -4,6 +4,11 @@ const { readdir, stat, readFile } = require( 'fs/promises' );
 const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
 const ICON_VIEW_BOX = '0 0 24 24';
 
+function isStrokeBasedSvg( svgContent ) {
+	const svgTag = svgContent.match( /<svg\b[^>]*>/ )?.[ 0 ];
+	return /\sstyle=(["'])fill\s*:\s*none\s*;?\s*\1/.test( svgTag ?? '' );
+}
+
 /*
  * Validating the icons collection checks that:
  *
@@ -108,8 +113,7 @@ async function validateCollection() {
 			);
 		}
 
-		const svgTag = svgContent.match( /<svg\b[^>]*>/ )?.[ 0 ];
-		if ( svgTag?.includes( 'style="fill: none"' ) ) {
+		if ( isStrokeBasedSvg( svgContent ) ) {
 			const graphicalElements = svgContent.match(
 				/<(?:circle|ellipse|line|path|polygon|polyline|rect)\b[^>]*>/g
 			);
@@ -152,5 +156,6 @@ if ( module === require.main ) {
 }
 
 module.exports = {
+	isStrokeBasedSvg,
 	validateCollection,
 };
