@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `BoxControl`: Complete the migration to SCSS modules. Consumers that compose source-order-dependent Emotion fragments with `cx()` should pass those fragments in a single `css()` call ([#82570](https://github.com/WordPress/gutenberg/pull/82570)).
+
 ### Enhancements
 
 -   `CheckboxControl`: Match the `@wordpress/ui` checkmark size and disabled fill ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
