@@ -296,8 +296,8 @@ describe( 'Snackbar', () => {
 			expect( speak ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'should speak a spokenMessage element that is distinct from children', () => {
-			render(
+		it( 'should speak a spokenMessage element that is distinct from children', async () => {
+			await render(
 				<Snackbar spokenMessage={ <em>Custom message</em> }>
 					Visible content
 				</Snackbar>
@@ -309,26 +309,28 @@ describe( 'Snackbar', () => {
 			);
 		} );
 
-		it( 'should not speak when spokenMessage is null', () => {
-			render( <Snackbar spokenMessage={ null }>FYI</Snackbar> );
+		it( 'should not speak when spokenMessage is null', async () => {
+			await render( <Snackbar spokenMessage={ null }>FYI</Snackbar> );
 
 			expect( speak ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should speak the same message again after an empty message', () => {
-			const { rerender } = render(
+		it( 'should speak the same message again after an empty message', async () => {
+			const { rerender } = await render(
 				<Snackbar spokenMessage="Saved">Content</Snackbar>
 			);
-			rerender( <Snackbar spokenMessage="">Content</Snackbar> );
-			rerender( <Snackbar spokenMessage="Saved">Content</Snackbar> );
+			await rerender( <Snackbar spokenMessage="">Content</Snackbar> );
+			await rerender(
+				<Snackbar spokenMessage="Saved">Content</Snackbar>
+			);
 
 			expect( speak ).toHaveBeenCalledTimes( 2 );
 			expect( speak ).toHaveBeenNthCalledWith( 1, 'Saved', 'polite' );
 			expect( speak ).toHaveBeenNthCalledWith( 2, 'Saved', 'polite' );
 		} );
 
-		it( 'should speak a message containing components that use hooks', () => {
-			render(
+		it( 'should speak a message containing components that use hooks', async () => {
+			await render(
 				<Snackbar>
 					Saving
 					<ChildWithHooks />
@@ -342,17 +344,15 @@ describe( 'Snackbar', () => {
 		} );
 
 		// Regression test for https://github.com/WordPress/gutenberg/issues/61199.
-		it( 'should not crash when a child using hooks is conditionally rendered', () => {
-			const { rerender } = render(
+		it( 'should not crash when a child using hooks is conditionally rendered', async () => {
+			const { rerender } = await render(
 				<Snackbar>
 					Saving
 					<ChildWithHooks />
 				</Snackbar>
 			);
 
-			expect( () =>
-				rerender( <Snackbar>Saved</Snackbar> )
-			).not.toThrow();
+			await rerender( <Snackbar>Saved</Snackbar> );
 			expect( speak ).toHaveBeenLastCalledWith( 'Saved', 'polite' );
 		} );
 	} );
