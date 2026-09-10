@@ -7,7 +7,7 @@
 -   Image: Inject the lightbox trigger with a literal string replacement instead of `preg_replace`, so `$` and `\` sequences in author-controlled image attributes (such as a price in the alt text) are no longer interpreted as regex backreferences and silently removed ([#79369](https://github.com/WordPress/gutenberg/pull/79369)).
 -   Cover: Grow the block with its content in Safari when an aspect ratio is set, instead of clipping the overflow. WebKit locks the box to the ratio where other engines let content expand it ([#70152](https://github.com/WordPress/gutenberg/pull/70152)).
 -   Query Pagination: Remove the editor-only `margin: 0` override on the block wrapper so the parent layout's block gap applies in the canvas as it does on the front end ([#82399](https://github.com/WordPress/gutenberg/pull/82399)).
--   Query: Keep the block's style handle enqueued when "Reload full page" is enabled, so the `theme.json` styles for the block are printed on the front end ([#82745](https://github.com/WordPress/gutenberg/pull/82745)).
+-   Query: Enqueue the block's style handle when "Reload full page" is enabled (the default), so the `theme.json` styles for the block are printed on the front end ([#82745](https://github.com/WordPress/gutenberg/pull/82745)).
 
 ### Internal
 
