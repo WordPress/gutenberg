@@ -47,7 +47,10 @@ type DataViewsContextType< Item > = {
 	empty?: ReactNode;
 	hasInitiallyLoaded?: boolean;
 	itemListLabel?: string;
-	bulkActionsInLayout?: boolean;
+	isDefaultUI?: boolean;
+	tableHeaderRef?: React.RefObject< HTMLTableSectionElement >;
+	tableSelectionRef?: React.RefObject< HTMLInputElement >;
+	bulkSelectionRef?: React.RefObject< HTMLInputElement >;
 	onReset?: ( () => void ) | false;
 	intersectionObserver?: IntersectionObserver | null;
 };
