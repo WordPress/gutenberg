@@ -1,6 +1,7 @@
 import { getProtocol } from '@wordpress/url';
 
-// Matches WordPress core's own wp_allowed_protocols() allowlist (wp-includes/functions.php) so this doesn't reject links core already treats as safe.
+// Matches wp_allowed_protocols() in wp-includes/functions.php, so this
+// doesn't reject a link the rest of WordPress already treats as safe.
 const ALLOWED_LINK_PROTOCOLS = [
 	'http:',
 	'https:',
@@ -46,7 +47,8 @@ export function getSafeButtonUrl( url ) {
 		.replace( /[\t\n\r]/g, '' )
 		.replace( /^[\x00-\x20]+|[\x00-\x20]+$/g, '' );
 
-	// A leading "/", "?", or "#" is unambiguously relative, so a later colon (e.g. "/2024/03/10:special-post") isn't mistaken for a scheme.
+	// A leading "/", "?", or "#" is unambiguously relative, so a later
+	// colon (e.g. "/2024/03/10:special-post") isn't mistaken for a scheme.
 	if ( /^[/?#]/.test( normalized ) ) {
 		return url;
 	}
