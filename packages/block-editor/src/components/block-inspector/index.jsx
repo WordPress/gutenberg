@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
@@ -11,8 +10,7 @@ import {
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { getScrollContainer } from '@wordpress/dom';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import { Text } from '@wordpress/ui';
 import EditContents from './edit-contents';
@@ -430,39 +428,6 @@ const BlockInspectorSingleBlock = ( {
 	// When a style state is active, the badges replace the block description.
 	const showStateBadges =
 		blockEditingMode === 'default' && isEditingStyleState;
-	const [ badgesStuck, setBadgesStuck ] = useState( false );
-	const stickyBadgesRef = useRef( null );
-	useEffect( () => {
-		const badges = stickyBadgesRef.current;
-		if ( ! badges ) {
-			return;
-		}
-		// Find the scroll container by behavior rather than class name.
-		const scrollContainer = getScrollContainer( badges );
-		// Derive the sticky offset from the element's own computed style
-		// rather than hardcoding the tabs header height. When the badges
-		// aren't sticky (e.g. the Customizer), `top` computes to `auto`
-		// and we skip observing entirely.
-		const stickyTop = parseFloat( window.getComputedStyle( badges ).top );
-		if ( ! scrollContainer || ! Number.isFinite( stickyTop ) ) {
-			return;
-		}
-		const observer = new window.IntersectionObserver(
-			( [ entry ] ) => setBadgesStuck( entry.intersectionRatio < 1 ),
-			{
-				root: scrollContainer,
-				// 1px below the badges' sticky top: once pinned, the
-				// strip's top edge is clipped by exactly that pixel.
-				rootMargin: `-${ stickyTop + 1 }px 0px 0px 0px`,
-				threshold: [ 1 ],
-			}
-		);
-		observer.observe( badges );
-		return () => {
-			observer.disconnect();
-			setBadgesStuck( false );
-		};
-	}, [ showStateBadges ] );
 	const hasParentChildBlockCards =
 		editedContentOnlySection &&
 		editedContentOnlySection !== renderedBlockClientId;
@@ -538,16 +503,10 @@ const BlockInspectorSingleBlock = ( {
 				}
 			/>
 			{ showStateBadges && (
-				<div
-					ref={ stickyBadgesRef }
-					className={ clsx(
-						'block-editor-block-inspector__sticky-badges',
-						badgesStuck && 'is-stuck'
-					) }
-				>
+				<div className="block-editor-block-inspector__state-badges">
 					<Text
 						variant="body-sm"
-						className="block-editor-block-inspector__sticky-badges-label"
+						className="block-editor-block-inspector__state-badges-label"
 					>
 						{ __( 'Editing:' ) }
 					</Text>
