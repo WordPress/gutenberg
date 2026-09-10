@@ -4,6 +4,18 @@
 
 ### Enhancements
 
+-   `CheckboxControl`: Match the `@wordpress/ui` checkmark size and disabled fill ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
+-   `Snackbar`: Show the action's focus ring with the design system's outline instead of a legacy dotted outline, and let `Button`/`ExternalLink` own the ring ([#82640](https://github.com/WordPress/gutenberg/pull/82640)).
+
+### Internal
+
+-   `Notice`: Remove dismiss button style overrides that now duplicate `Button` defaults, and drop an unused Sass import ([#82640](https://github.com/WordPress/gutenberg/pull/82640)).
+-   Run Components interaction tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
+## 40.1.0 (2026-09-10)
+
+### Enhancements
+
 -   Compound components: Report missing state or accessible semantic structure with clear developer guidance ([#82509](https://github.com/WordPress/gutenberg/pull/82509)).
 -   `ToggleGroupControl`: Honor the root `disabled` prop so the whole control is unselectable ([#82259](https://github.com/WordPress/gutenberg/pull/82259)).
 -   Validated form controls: Use `--wpds-color-stroke-interactive-error` for the invalid-state focus ring and border ([#82410](https://github.com/WordPress/gutenberg/pull/82410)).
@@ -14,6 +26,8 @@
 
 ### Bug Fixes
 
+-   `FormTokenField`: Wrap to the last suggestion when pressing the up arrow with no suggestion selected, instead of leaving the selection on an invalid index ([#82646](https://github.com/WordPress/gutenberg/pull/82646)).
+-   `Disabled`: Keep the `className` passed by the consumer on the wrapper when `isDisabled` is `false`. Only `components-disabled` and the disabled styling are conditional now, so the wrapper stays styleable and targetable in both states ([#82648](https://github.com/WordPress/gutenberg/pull/82648)).
 -   `ProgressBar`: Remove determinate transitions and use a slower, stepped indeterminate animation when reduced motion is preferred. ([#82490](https://github.com/WordPress/gutenberg/pull/82490))
 -   `ColorPalette`: Apply the computed contrast color to the selected checkmark now that the icon is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   `CheckboxControl`: Color the checked and indeterminate icons with `color` rather than `fill`, so they stay visible now that those icons are stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
@@ -24,6 +38,7 @@
 -   `ItemGroup`: Drop the blanket `path { fill: currentColor }` rule that was overriding stroke-based icons' intended fill via inheritance bypass. Paths without an explicit fill still inherit `currentColor` from the surrounding SVG. Custom paths that specify a fill now retain it instead of being overridden by ItemGroup. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `Tip`: Preserve the intended yellow color after its icon became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `Button`, `Placeholder`: Remove the obsolete `fill: CanvasText` override for forced colors mode. ([#82481](https://github.com/WordPress/gutenberg/pull/82481))
+-   `InputControl`, `SelectControl`, `TextareaControl`: Match the `@wordpress/ui` disabled styles, so the disabled state is distinguishable again. The border and text now use the design system's disabled tokens, and the background no longer changes ([#82454](https://github.com/WordPress/gutenberg/pull/82454)).
 
 ### Documentation
 
@@ -31,6 +46,7 @@
 
 ### Internal
 
+-   `FormToggle`: Use the standard `inert` state instead of the `Disabled` component's class name for inherited disabled styles ([#82651](https://github.com/WordPress/gutenberg/pull/82651)).
 -   Migrate JSX files to TypeScript and remove their ESLint filename suppressions ([#82132](https://github.com/WordPress/gutenberg/pull/82132)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
