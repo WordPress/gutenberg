@@ -347,3 +347,17 @@
 .dataviews-view-table.is-refreshing {
 	@include dataviews-refreshing();
 }
+.dataviews-view-table__bulk-actions-overlay {
+	position: sticky;
+	top: 0;
+	left: 0;
+	z-index: 2;
+	height: 0;
+	flex-shrink: 0;
+
+	> .dataviews-bulk-actions {
+		position: absolute;
+		inset-inline: 0;
+		top: 0;
+	}
+}
