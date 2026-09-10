@@ -2,13 +2,18 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `checkbox-control`: Use the design system disabled fill and border tokens ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
+
+## 13.1.0 (2026-09-10)
+
 ### Internal
 
 -   Regenerate the WPDS fallback map with the solid neutral interactive background state tokens. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
 
 ### Enhancements
 
--   `checkbox-control`: Use the design system disabled fill and border tokens ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
 -   Add a `$block-bg-padding` variable that resolves the default background padding through the `--wp--style--block-background-padding` custom property, keeping the existing values as its fallback ([#82024](https://github.com/WordPress/gutenberg/pull/82024)).
 
 ## 13.0.0 (2026-08-26)

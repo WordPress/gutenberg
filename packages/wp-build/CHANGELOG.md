@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Carry a widget's `attributes` from `widget.json` into `build/widgets/registry.php` ([#82485](https://github.com/WordPress/gutenberg/pull/82485)).
+
+## 0.23.0 (2026-09-10)
+
 ### Breaking Changes
 
 -   `@wordpress/build` no longer parses JSX syntax in `.js` source files. Rename these files to `.jsx` or `.tsx` before building ([#82189](https://github.com/WordPress/gutenberg/pull/82189)).
