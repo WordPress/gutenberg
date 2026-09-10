@@ -27,6 +27,28 @@ describe( 'getSafeButtonUrl', () => {
 		expect( getSafeButtonUrl( '#section' ) ).toBe( '#section' );
 	} );
 
+	it( 'should return a relative url unchanged even with a colon later in the path, query, or fragment', () => {
+		expect( getSafeButtonUrl( '/2024/03/10:special-post' ) ).toBe(
+			'/2024/03/10:special-post'
+		);
+		expect( getSafeButtonUrl( '?redirect=https://example.com' ) ).toBe(
+			'?redirect=https://example.com'
+		);
+		expect( getSafeButtonUrl( '#section:1' ) ).toBe( '#section:1' );
+	} );
+
+	it( 'should return the url unchanged for other core-allowed protocols', () => {
+		expect( getSafeButtonUrl( 'ftp://example.com/file' ) ).toBe(
+			'ftp://example.com/file'
+		);
+		expect( getSafeButtonUrl( 'webcal://example.com/cal.ics' ) ).toBe(
+			'webcal://example.com/cal.ics'
+		);
+		expect( getSafeButtonUrl( 'xmpp:user@example.com' ) ).toBe(
+			'xmpp:user@example.com'
+		);
+	} );
+
 	it( 'should reject a javascript: url', () => {
 		expect( getSafeButtonUrl( 'javascript:alert(1)' ) ).toBeNull();
 	} );

@@ -1,6 +1,30 @@
 import { getProtocol } from '@wordpress/url';
 
-const ALLOWED_LINK_PROTOCOLS = [ 'http:', 'https:', 'mailto:', 'tel:', 'sms:' ];
+// Matches WordPress core's own wp_allowed_protocols() allowlist (wp-includes/functions.php) so this doesn't reject links core already treats as safe.
+const ALLOWED_LINK_PROTOCOLS = [
+	'http:',
+	'https:',
+	'ftp:',
+	'ftps:',
+	'mailto:',
+	'news:',
+	'irc:',
+	'irc6:',
+	'ircs:',
+	'gopher:',
+	'nntp:',
+	'feed:',
+	'telnet:',
+	'mms:',
+	'rtsp:',
+	'sms:',
+	'svn:',
+	'tel:',
+	'fax:',
+	'xmpp:',
+	'webcal:',
+	'urn:',
+];
 
 /**
  * Returns the given link URL only if its protocol is on the safe allowlist
@@ -21,6 +45,11 @@ export function getSafeButtonUrl( url ) {
 	const normalized = url
 		.replace( /[\t\n\r]/g, '' )
 		.replace( /^[\x00-\x20]+|[\x00-\x20]+$/g, '' );
+
+	// A leading "/", "?", or "#" is unambiguously relative, so a later colon (e.g. "/2024/03/10:special-post") isn't mistaken for a scheme.
+	if ( /^[/?#]/.test( normalized ) ) {
+		return url;
+	}
 
 	const protocol = getProtocol( normalized )?.toLowerCase();
 	if ( protocol && ! ALLOWED_LINK_PROTOCOLS.includes( protocol ) ) {
