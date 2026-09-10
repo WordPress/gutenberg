@@ -8,17 +8,18 @@ const transforms = {
 			type: 'block',
 			isMultiBlock: true,
 			blocks: [ 'core/button' ],
-			transform: ( buttons ) =>
-				// Creates the buttons block.
-				createBlock(
+			transform: ( buttons ) => {
+				// Move align from the first button to the outer wrapper.
+				// core/button does not support align; it belongs on core/buttons.
+				const { align } = buttons[ 0 ];
+				return createBlock(
 					'core/buttons',
-					{},
-					// Loop the selected buttons.
-					buttons.map( ( attributes ) =>
-						// Create singular button in the buttons block.
-						createBlock( 'core/button', attributes )
+					align ? { align } : {},
+					buttons.map( ( { align: _align, ...buttonAttributes } ) =>
+						createBlock( 'core/button', buttonAttributes )
 					)
-				),
+				);
+			},
 		},
 		{
 			type: 'block',
