@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Query Pagination: Remove the editor-only `margin: 0` override on the block wrapper so the parent layout's block gap applies in the canvas as it does on the front end ([#82399](https://github.com/WordPress/gutenberg/pull/82399)).
+
 ## 11.0.0 (2026-09-10)
 
 ### Breaking Changes
