@@ -892,6 +892,53 @@ describe( 'DataViews component', () => {
 			expect( mediaClickItemCallback ).toHaveBeenCalledWith( data[ 0 ] );
 		} );
 
+		it( 'labels the clickable media area with the title when the title is hidden', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: 'grid',
+						titleField: 'title',
+						mediaField: 'image',
+						showTitle: false,
+					} }
+					isItemClickable={ () => true }
+					onClickItem={ () => {} }
+				/>
+			);
+			for ( const item of data ) {
+				expect(
+					screen.getByRole( 'button', { name: item.title } )
+				).toBeInTheDocument();
+			}
+			expect(
+				screen.queryByRole( 'button', { name: 'Navigate to item' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'labels the clickable media area by the visible title when the title is shown', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: 'grid',
+						titleField: 'title',
+						mediaField: 'image',
+					} }
+					isItemClickable={ () => true }
+					onClickItem={ () => {} }
+				/>
+			);
+			// Both the media area and the title are clickable and share the
+			// name; the media area points at the rendered title
+			// (`aria-labelledby`) rather than carrying a label of its own.
+			const mediaButton = screen
+				.getAllByRole( 'button', { name: data[ 0 ].title } )
+				.find( ( button ) =>
+					button.classList.contains( 'dataviews-view-grid__media' )
+				);
+			expect( mediaButton ).toHaveAttribute( 'aria-labelledby' );
+			expect( mediaButton ).not.toHaveAttribute( 'aria-label' );
+		} );
+
 		it( 'accepts checkbox click for selection', async () => {
 			render(
 				<DataViewWrapper
