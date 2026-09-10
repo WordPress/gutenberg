@@ -600,6 +600,15 @@ export default function MediaEdit< Item >( {
 	validity,
 }: MediaEditProps< Item > ) {
 	const value = field.getValue( { item: data } );
+	// While the permission is unresolved, show the picker, as the editor does.
+	const canUpload = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'attachment',
+			} ) ?? true,
+		[]
+	);
 	const [ isTouched, setIsTouched ] = useState( false );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 	const [ customValidity, setCustomValidity ] = useState<
@@ -856,6 +865,31 @@ export default function MediaEdit< Item >( {
 		},
 		[ isTouched ]
 	);
+	const legend =
+		field.label &&
+		( hideLabelFromVision ? (
+			<VisuallyHidden render={ <legend /> }>
+				{ field.label }
+			</VisuallyHidden>
+		) : (
+			<BaseControl.VisualLabel as="legend" style={ { marginBottom: 0 } }>
+				{ field.label }
+			</BaseControl.VisualLabel>
+		) );
+	if ( ! canUpload ) {
+		return (
+			<fieldset className="fields__media-edit" data-field-id={ field.id }>
+				<VStack spacing={ 2 }>
+					{ legend }
+					<WCText variant="muted">
+						{ __(
+							'To edit this field, you need permission to upload media.'
+						) }
+					</WCText>
+				</VStack>
+			</fieldset>
+		);
+	}
 	return (
 		<Stack direction="column" gap="sm" onBlur={ onBlur }>
 			<fieldset className="fields__media-edit" data-field-id={ field.id }>
@@ -916,19 +950,7 @@ export default function MediaEdit< Item >( {
 							: CompactMediaEditAttachments;
 						return (
 							<VStack spacing={ 2 }>
-								{ field.label &&
-									( hideLabelFromVision ? (
-										<VisuallyHidden render={ <legend /> }>
-											{ field.label }
-										</VisuallyHidden>
-									) : (
-										<BaseControl.VisualLabel
-											as="legend"
-											style={ { marginBottom: 0 } }
-										>
-											{ field.label }
-										</BaseControl.VisualLabel>
-									) ) }
+								{ legend }
 								<AttachmentsComponent
 									allItems={ allItems }
 									addButtonLabel={ addButtonLabel }
