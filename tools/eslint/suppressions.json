@@ -7475,16 +7475,10 @@
 	"packages/global-styles-ui/src/presets/preset-edit-header.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/presets/preset-group.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"no-restricted-imports": {
 			"count": 1
 		}
 	},
