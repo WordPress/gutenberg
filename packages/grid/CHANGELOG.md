@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Preserve tile content semantics when dragging is disabled in `DashboardGrid` and `DashboardLanes` ([#82511](https://github.com/WordPress/gutenberg/pull/82511)).
+
 ### New Features
 
 -   Layout items accept `draggable` and `resizable` flags. A non-draggable
