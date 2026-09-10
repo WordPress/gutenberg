@@ -15,6 +15,7 @@ import PostSummary from './post-summary';
 import DataFormPostSummary from './dataform-post-summary';
 import PostRevisionSummary from './post-revision-summary';
 import PostTitleInspector from './post-title-inspector';
+import TemplateBlockScope from './template-block-scope';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
@@ -130,7 +131,10 @@ function Sidebar( { extraPanels, onActionPerformed } ) {
 				{ isDescribingPostTitle ? (
 					<PostTitleInspector />
 				) : (
-					<BlockInspector />
+					<>
+						<BlockInspector />
+						<TemplateBlockScope />
+					</>
 				) }
 				{ isRevisionsMode && <RevisionBlockDiffPanel /> }
 			</Tabs.Panel>
