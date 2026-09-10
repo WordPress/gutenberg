@@ -1,5 +1,6 @@
 import { useRefEffect } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useLayoutEffect, useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { TAB } from '@wordpress/keycodes';
@@ -51,6 +52,7 @@ export function transformDescriptionListItem( {
 	event,
 	replaceBlock,
 	selectionChange,
+	selectionEnd,
 	selectionStart,
 } ) {
 	const targetName = getKeyboardTransformTarget( blockName, event );
@@ -68,7 +70,7 @@ export function transformDescriptionListItem( {
 		targetBlock.clientId,
 		'content',
 		selectionStart?.offset ?? 0,
-		selectionStart?.offset ?? 0
+		selectionEnd?.offset ?? selectionStart?.offset ?? 0
 	);
 
 	return true;
@@ -80,18 +82,25 @@ export default function useKeyboardTransform( {
 	clientId,
 } ) {
 	const { replaceBlock, selectionChange } = useDispatch( blockEditorStore );
-	const { getSelectionStart } = useSelect( blockEditorStore );
+	const { getSelectionEnd, getSelectionStart } =
+		useSelect( blockEditorStore );
+	const attributesRef = useRef( attributes );
+
+	useLayoutEffect( () => {
+		attributesRef.current = attributes;
+	}, [ attributes ] );
 
 	return useRefEffect(
 		( element ) => {
 			function onKeyDown( event ) {
 				transformDescriptionListItem( {
-					attributes,
+					attributes: attributesRef.current,
 					blockName,
 					clientId,
 					event,
 					replaceBlock,
 					selectionChange,
+					selectionEnd: getSelectionEnd(),
 					selectionStart: getSelectionStart(),
 				} );
 			}
@@ -103,6 +112,6 @@ export default function useKeyboardTransform( {
 				true
 			);
 		},
-		[ attributes, blockName, clientId, replaceBlock, selectionChange ]
+		[ blockName, clientId, replaceBlock, selectionChange ]
 	);
 }
