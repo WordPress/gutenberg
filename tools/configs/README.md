@@ -25,8 +25,16 @@ when editing them:
 
 -   `${configDir}` resolves against the project doing the extending, so it is
     what per-project paths such as `rootDir` and `include` use.
--   A plain relative path resolves against this directory, so anything pointing
-    at the repo root has to walk back up (`../../../typings`).
+-   A plain relative path resolves against this directory, so `../typings`
+    reaches the ambient declarations below.
+
+## Typings
+
+`typings/` holds the ambient type declarations the whole repo relies on: the
+`gutenberg-env` and `gutenberg-test-env` globals, the CSS and style-import
+module shims, and the stubs that stand in for packages that ship no types yet.
+They live here so `tsconfig/base.json` can point at them without walking out of
+the workspace.
 
 See the TypeScript section of [`packages/README.md`](../../packages/README.md)
 for how a package lays its projects out.

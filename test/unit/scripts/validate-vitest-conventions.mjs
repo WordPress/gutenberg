@@ -287,7 +287,7 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 				noEmit: true,
 				rootDir: ROOT_DIR,
 				typeRoots: [
-					path.join( ROOT_DIR, 'typings' ),
+					path.join( ROOT_DIR, 'tools/configs/typings' ),
 					path.join( ROOT_DIR, 'test/unit/typings' ),
 					...resolveTypeRoots(
 						[ ...commonTypes, 'node' ],
