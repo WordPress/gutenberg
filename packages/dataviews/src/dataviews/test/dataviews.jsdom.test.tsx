@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+	within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMemo, useState } from '@wordpress/element';
@@ -232,7 +238,7 @@ describe( 'DataViews component', () => {
 		}
 	);
 
-	it( 'adds only remaining eligible page items without duplicating existing selection', async () => {
+	it( 'selects remaining eligible page items with the header checkbox', async () => {
 		const onChangeSelection = vi.fn();
 		render(
 			<DataViewWrapper
@@ -246,28 +252,19 @@ describe( 'DataViews component', () => {
 				] }
 			/>
 		);
+		expect(
+			screen.queryByRole( 'button', { name: 'Selection options' } )
+		).not.toBeInTheDocument();
 		const user = userEvent.setup();
 		await user.click(
-			screen.getByRole( 'button', { name: 'Selection options' } )
-		);
-		await user.click(
-			screen.getByRole( 'menuitem', {
-				name: 'Select remaining on this page',
-			} )
+			screen.getAllByRole( 'checkbox', { name: 'Select all' } )[ 0 ]
 		);
 		expect( onChangeSelection ).toHaveBeenLastCalledWith( [ '1', '3' ] );
-		await user.click(
-			screen.getByRole( 'button', { name: 'Selection options' } )
-		);
-		await user.click(
-			screen.getByRole( 'menuitem', {
-				name: 'Deselect all',
-			} )
-		);
+		await user.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
 		expect( onChangeSelection ).toHaveBeenLastCalledWith( [] );
 	} );
 
-	it( 'keeps the footer count-only and omits page selection for infinite scrolling', async () => {
+	it( 'keeps the footer count-only and clears selection for infinite scrolling', async () => {
 		vi.stubGlobal(
 			'IntersectionObserver',
 			class {
@@ -276,33 +273,50 @@ describe( 'DataViews component', () => {
 				disconnect() {}
 			}
 		);
+		const onChangeSelection = vi.fn();
 		render(
 			<DataViewWrapper
 				view={ { ...DEFAULT_VIEW, infiniteScrollEnabled: true } }
 				selection={ [ '1' ] }
-				onChangeSelection={ vi.fn() }
+				onChangeSelection={ onChangeSelection }
 				actions={ actions }
 			/>
 		);
 		expect( screen.getByText( '3 Items' ) ).toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Selection options' } )
-		).toHaveTextContent( '1 Item selected' );
+			screen.queryByRole( 'button', { name: 'Selection options' } )
+		).not.toBeInTheDocument();
 		const user = userEvent.setup();
 		await user.click(
-			screen.getByRole( 'button', { name: 'Selection options' } )
+			screen.getAllByRole( 'checkbox', { name: 'Deselect all' } )[ 0 ]
 		);
-		expect(
-			screen.queryByRole( 'menuitem', {
-				name: 'Select remaining on this page',
-			} )
-		).not.toBeInTheDocument();
-		expect(
-			screen.getByRole( 'menuitem', {
-				name: 'Deselect all',
-			} )
-		).toBeInTheDocument();
+		expect( onChangeSelection ).toHaveBeenLastCalledWith( [] );
 		vi.unstubAllGlobals();
+	} );
+
+	it( 'keeps column headers accessible while rows are selected', async () => {
+		render( <DataViewWrapper actions={ actions } /> );
+		const user = userEvent.setup();
+		await user.click(
+			screen.getByRole( 'checkbox', { name: 'Select all' } )
+		);
+		const titleHeader = screen.getByRole( 'columnheader', {
+			name: 'Title',
+		} );
+		expect(
+			within( screen.getByRole( 'table' ) ).getAllByRole(
+				'rowgroup'
+			)[ 0 ]
+		).not.toHaveAttribute( 'inert' );
+		expect( within( titleHeader ).getByRole( 'button' ) ).toBeDisabled();
+		expect(
+			screen.getAllByRole( 'checkbox', { name: 'Deselect all' } )[ 0 ]
+		).toHaveFocus();
+		await user.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
+		expect( within( titleHeader ).getByRole( 'button' ) ).toBeEnabled();
+		expect(
+			screen.getByRole( 'checkbox', { name: 'Select all' } )
+		).toHaveFocus();
 	} );
 
 	it( 'should show "No results" if data is empty', () => {

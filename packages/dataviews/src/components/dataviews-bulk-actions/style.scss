@@ -23,12 +23,6 @@
 	margin-inline-start: auto;
 }
 
-.dataviews-bulk-actions__selection-toggle {
-	padding-inline: var(--wpds-dimension-padding-md);
-	gap: var(--wpds-dimension-gap-sm);
-	white-space: nowrap;
-}
-
 .dataviews-bulk-actions__action {
 	--wp-components-color-accent: var(--wpds-color-foreground-interactive-neutral);
 	--wp-components-color-accent-darker-20: var(--wpds-color-foreground-interactive-neutral-active);
