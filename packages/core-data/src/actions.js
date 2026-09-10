@@ -196,7 +196,7 @@ export function receiveCurrentTheme( currentTheme ) {
  *
  * @ignore
  *
- * @param {string} currentGlobalStylesId The current global styles id.
+ * @param {number} currentGlobalStylesId The current global styles id.
  *
  * @return {Object} Action object.
  */

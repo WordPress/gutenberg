@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
-import { createHash } from 'node:crypto';
 import { createRequire as createNodeRequire } from 'node:module';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
@@ -10,7 +9,6 @@ import chokidar from 'chokidar';
 import browserslistToEsbuild from 'browserslist-to-esbuild';
 import { sassPlugin } from 'esbuild-sass-plugin';
 import postcss from 'postcss';
-import postcssModules from 'postcss-modules';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
@@ -47,6 +45,10 @@ import {
 	buildWorkers,
 	generateWorkerCode,
 } from './worker-build.mjs';
+import {
+	compileInlineStyle,
+	dsTokenFallbacks,
+} from './compile-inline-style.mjs';
 
 /**
  * Resolve the ESBuild target from the project's Browserslist config.
@@ -56,19 +58,14 @@ import {
 function getEsbuildTarget() {
 	return browserslistToEsbuild( getBrowserslistQueries() );
 }
-// Optional dependency: @wordpress/theme provides plugins that inject fallback
-// values for design system tokens. Fails gracefully when the package is not
-// installed (it is an optional peerDependency).
-let dsTokenFallbacks;
+// Optional dependency: @wordpress/theme provides a plugin that injects fallback
+// values for design system tokens in JavaScript. Fails gracefully when the
+// package is not installed (it is an optional peerDependency).
 let dsTokenFallbacksJs;
 try {
-	const { default: postcssPlugin } = await import(
-		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
-	);
 	const { default: esbuildPlugin } = await import(
 		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
 	);
-	dsTokenFallbacks = postcssPlugin;
 	dsTokenFallbacksJs = esbuildPlugin;
 } catch {
 	// @wordpress/theme is optional; skip token fallbacks if not available.
@@ -109,6 +106,11 @@ const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
 const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
+
+// Capability required to view a generated page when the page config does not
+// declare one. Pages rendering outside the menu page callback flow must
+// enforce this themselves.
+const DEFAULT_PAGE_CAPABILITY = 'manage_options';
 
 /**
  * Interprets a configuration value as a boolean, where `"true"` and `"1"`
@@ -201,66 +203,6 @@ function getSassOptions( workingDir ) {
 			// For local imports like @use "mixins"
 			path.join( PACKAGES_DIR, 'base-styles' ),
 		],
-	};
-}
-
-function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
-	return async function styleType( cssText, _dirname, filePath ) {
-		let moduleExports = null;
-
-		// Transform the code: token fallbacks, CSS modules and minification.
-		const plugins = [
-			dsTokenFallbacks,
-			cssModules &&
-				postcssModules( {
-					generateScopedName: '[contenthash]__[local]',
-					getJSON: ( _, json ) => {
-						moduleExports = json;
-					},
-				} ),
-			minify &&
-				cssnano( {
-					preset: [
-						'default',
-						{ discardComments: { removeAll: true } },
-					],
-				} ),
-		].filter( Boolean );
-
-		const { css } = await postcss( plugins ).process( cssText, {
-			from: filePath,
-			map: false,
-		} );
-
-		// Hash the transformed CSS so that the dedup key reflects the actual
-		// injected content, including mangled CSS module class names.
-		const hash = createHash( 'sha1' )
-			.update( css )
-			.digest( 'hex' )
-			.slice( 0, 10 );
-
-		// Skip automatic style injection in Node-based test environments, where DOM
-		// implementations do not reliably support modern CSS features like @layer.
-		let cssModule = cssModules
-			? `import { registerStyle } from '@wordpress/style-runtime';
-if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
-	registerStyle("${ hash }", ${ JSON.stringify( css ) });
-}
-`
-			: `if (typeof document !== 'undefined' && process.env.NODE_ENV !== 'test' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
-	const style = document.createElement("style");
-	style.setAttribute("data-wp-hash", "${ hash }");
-	style.appendChild(document.createTextNode(${ JSON.stringify( css ) }));
-	document.head.appendChild(style);
-}
-`;
-
-		// The CSS modules transform produces an `exports` object with class name mappings.
-		if ( moduleExports ) {
-			const exportsString = JSON.stringify( moduleExports );
-			cssModule += `export default ${ exportsString };\n`;
-		}
-		return cssModule;
 	};
 }
 
@@ -1296,6 +1238,7 @@ async function generatePagesPhp( pageData, replacements ) {
 			'{{PREFIX}}': prefixUnderscore,
 			'{{INIT_MODULES_PHP_ARRAY}}': initModulesPhp,
 			'{{INIT_MODULES_JSON}}': JSON.stringify( page.initModules ),
+			'{{CAPABILITY}}': page.capability || DEFAULT_PAGE_CAPABILITY,
 		};
 
 		// Generate both page.php and page-wp-admin.php
@@ -2352,13 +2295,19 @@ async function buildAll( baseUrlExpression ) {
 	// Normalize PAGES config to support both string and object formats
 	const normalizedPages = PAGES.map( ( page ) => {
 		if ( typeof page === 'string' ) {
-			return { id: page, init: [], title: undefined };
+			return {
+				id: page,
+				init: [],
+				title: undefined,
+				capability: DEFAULT_PAGE_CAPABILITY,
+			};
 		}
 		return {
 			id: page.id,
 			init: page.init || [],
 			title: page.title || undefined,
 			experimental: page.experimental || false,
+			capability: page.capability || DEFAULT_PAGE_CAPABILITY,
 		};
 	} );
 
@@ -2426,6 +2375,7 @@ async function buildAll( baseUrlExpression ) {
 			routes: pageRoutes,
 			initModules: page.init,
 			title: page.title,
+			capability: page.capability,
 		};
 	} );
 

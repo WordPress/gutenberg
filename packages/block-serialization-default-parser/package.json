@@ -24,7 +24,6 @@
 		"npm": ">=8.19.2"
 	},
 	"files": [
-		"src",
 		"build",
 		"build-module",
 		"build-types",
@@ -45,7 +44,7 @@
 	"sideEffects": false,
 	"devDependencies": {
 		"@wordpress/block-serialization-spec-parser": "file:../block-serialization-spec-parser",
-		"vitest": "^4.1.10"
+		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

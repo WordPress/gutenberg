@@ -1,18 +1,22 @@
 import { renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { createElement } from '@wordpress/element';
-// Only mock the internal hooks - let the real blocks store work
-jest.mock( '../../hooks', () => ( {
-	useStyle: jest.fn(),
-} ) );
-jest.mock( '@wordpress/components', () => ( {
-	__experimentalItemGroup: jest.fn( ( { children } ) => children ),
-} ) );
 import { store as blocksStore } from '@wordpress/blocks';
+import { useStyle } from '../../hooks';
 import { useBlockVariations } from '../variations-panel';
 
+// Only mock the internal hooks - let the real blocks store work.
+vi.mock( import( '../../hooks' ), () => ( {
+	useStyle: vi.fn(),
+} ) );
+
+vi.mock( import( '@wordpress/components' ), () => ( {
+	__experimentalItemGroup: vi.fn( ( { children } ) => children ),
+} ) );
+
 describe( 'useBlockVariations', () => {
-	const mockUseStyle = require( '../../hooks' ).useStyle;
+	const mockUseStyle = vi.mocked( useStyle );
 	let registry;
 
 	beforeEach( () => {
@@ -20,7 +24,7 @@ describe( 'useBlockVariations', () => {
 		registry = createRegistry();
 		// Register the blocks store so we can dispatch actions
 		registry.register( blocksStore );
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	function renderHookWithRegistry( hook, options = {} ) {
@@ -40,7 +44,7 @@ describe( 'useBlockVariations', () => {
 		];
 
 		registerBlockStyles( 'core/button', blockStyles );
-		mockUseStyle.mockReturnValue( [ {}, jest.fn() ] );
+		mockUseStyle.mockReturnValue( [ {}, vi.fn() ] );
 
 		const { result } = renderHookWithRegistry( () =>
 			useBlockVariations( 'core/button' )
@@ -57,7 +61,7 @@ describe( 'useBlockVariations', () => {
 		const variations = { outline: {}, fill: {} };
 
 		registerBlockStyles( 'core/button', blockStyles );
-		mockUseStyle.mockReturnValue( [ variations, jest.fn() ] );
+		mockUseStyle.mockReturnValue( [ variations, vi.fn() ] );
 
 		const { result } = renderHookWithRegistry( () =>
 			useBlockVariations( 'core/button' )
@@ -75,7 +79,7 @@ describe( 'useBlockVariations', () => {
 		const variations = { fill: {} };
 
 		registerBlockStyles( 'core/button', blockStyles );
-		mockUseStyle.mockReturnValue( [ variations, jest.fn() ] );
+		mockUseStyle.mockReturnValue( [ variations, vi.fn() ] );
 
 		const { result } = renderHookWithRegistry( () =>
 			useBlockVariations( 'core/button' )
@@ -88,7 +92,7 @@ describe( 'useBlockVariations', () => {
 	} );
 
 	it( 'should return empty array when block has no styles', () => {
-		mockUseStyle.mockReturnValue( [ {}, jest.fn() ] );
+		mockUseStyle.mockReturnValue( [ {}, vi.fn() ] );
 
 		const { result } = renderHookWithRegistry( () =>
 			useBlockVariations( 'core/button' )
@@ -103,7 +107,7 @@ describe( 'useBlockVariations', () => {
 		];
 
 		registerBlockStyles( 'core/button', blockStyles );
-		mockUseStyle.mockReturnValue( [ null, jest.fn() ] );
+		mockUseStyle.mockReturnValue( [ null, vi.fn() ] );
 
 		const { result } = renderHookWithRegistry( () =>
 			useBlockVariations( 'core/button' )
@@ -118,7 +122,7 @@ describe( 'useBlockVariations', () => {
 		];
 
 		registerBlockStyles( 'core/button', blockStyles );
-		mockUseStyle.mockReturnValue( [ undefined, jest.fn() ] );
+		mockUseStyle.mockReturnValue( [ undefined, vi.fn() ] );
 
 		const { result } = renderHookWithRegistry( () =>
 			useBlockVariations( 'core/button' )
@@ -134,7 +138,7 @@ describe( 'useBlockVariations', () => {
 		];
 
 		registerBlockStyles( 'core/button', blockStyles );
-		mockUseStyle.mockReturnValue( [ {}, jest.fn() ] );
+		mockUseStyle.mockReturnValue( [ {}, vi.fn() ] );
 
 		const { result } = renderHookWithRegistry( () =>
 			useBlockVariations( 'core/button' )
@@ -153,7 +157,7 @@ describe( 'useBlockVariations', () => {
 		const variations = { outline: {} };
 
 		registerBlockStyles( 'core/button', blockStyles );
-		mockUseStyle.mockReturnValue( [ variations, jest.fn() ] );
+		mockUseStyle.mockReturnValue( [ variations, vi.fn() ] );
 
 		const { result } = renderHookWithRegistry( () =>
 			useBlockVariations( 'core/button' )
@@ -175,7 +179,7 @@ describe( 'useBlockVariations', () => {
 
 		registerBlockStyles( 'core/paragraph', paragraphStyles );
 		registerBlockStyles( 'core/button', buttonStyles );
-		mockUseStyle.mockReturnValue( [ {}, jest.fn() ] );
+		mockUseStyle.mockReturnValue( [ {}, vi.fn() ] );
 
 		const { result: paragraphResult } = renderHookWithRegistry( () =>
 			useBlockVariations( 'core/paragraph' )
