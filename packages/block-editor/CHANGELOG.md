@@ -5,13 +5,31 @@
 ### New Features
 
 -   Add a text shadow block support and its control in the typography panel ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+
+### Enhancements
+
+-   Remove the `react-autosize-textarea` dependency. `PlainText` and the block "Edit as HTML" field now auto-grow with CSS `field-sizing: content`. Browsers without support use scrollable fields. `PlainText` consumers should use CSS height constraints instead of `rows` ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).
+-   `BlockCard`: Migrate the block-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82503](https://github.com/WordPress/gutenberg/pull/82503)).
+
+### Bug Fixes
+
+-   `InnerBlocks`: Resolve a container's legacy layout markup (`inherit: true`, or a bare `contentSize` / `wideSize` with no `type`) to a constrained layout for its inner blocks, so they are offered the wide and full alignments. Previously only the container's styles honoured the legacy form, and the inner blocks resolved to the flow layout ([#82637](https://github.com/WordPress/gutenberg/pull/82637)).
+-   Block Patterns and Block Visibility: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+
+### Internal
+
+-   Layout hooks: Use `normalizeLegacyLayout` in `useLayoutClasses`, `useLayoutStyles`, the block layout styles wrapper and `isAxialBlockGapAllowed`, replacing four inline copies of the legacy `inherit` / size check ([#82710](https://github.com/WordPress/gutenberg/pull/82710)).
+
+## 17.1.0 (2026-09-10)
+
+### New Features
+
 -   `BackgroundImageControl`: Support setting the background image from a URL, through the URL field in the media replace popover ([#82230](https://github.com/WordPress/gutenberg/pull/82230)).
 
 ### Enhancements
 
 -   Borders: rename the "Border & Shadow" panel to "Borders", whichever of its controls are available, and always show the Border and Shadow controls' visible labels. A stable panel title is what lets the Border label render unconditionally, so its "Unlink sides" toggle lines up with the border radius one ([#82163](https://github.com/WordPress/gutenberg/pull/82163)).
 -   `ListView`: Updated to use `outset-ring__focus()` mixin for focus outline wherever applicable instead of the previous box-shadow implementation. ([#82129](https://github.com/WordPress/gutenberg/pull/82129))
--   `BlockCard`: Migrate the block-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82503](https://github.com/WordPress/gutenberg/pull/82503)).
 
 ### Deprecations
 
@@ -20,7 +38,6 @@
 ### Internal
 
 -   `BlockPreview`: Stop applying the private `Disabled` component class name to block previews ([#82651](https://github.com/WordPress/gutenberg/pull/82651)).
--   Layout hooks: Use `normalizeLegacyLayout` in `useLayoutClasses`, `useLayoutStyles`, the block layout styles wrapper and `isAxialBlockGapAllowed`, replacing four inline copies of the legacy `inherit` / size check ([#82710](https://github.com/WordPress/gutenberg/pull/82710)).
 -   Pattern Overrides Dropdown: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` ([#77492](https://github.com/WordPress/gutenberg/pull/77492)).
 -   Allowed Blocks Modal: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` ([#78119](https://github.com/WordPress/gutenberg/pull/78119)).
 -   Block Switcher: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` for the bindings hint ([#77366](https://github.com/WordPress/gutenberg/pull/77366)).
@@ -40,17 +57,10 @@
 -   Client-side media processing: Refuse a batch of more than one file when the caller only takes one, such as a Cover block placeholder, matching what the server-side upload path already did. Every dropped file was uploaded instead, and the block kept whichever one finished last ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
 -   `BlockVariationPicker`: Set icon colors with `color` so stroke-based variation icons retain their intended unfilled appearance, while keeping a non-important `fill` fallback for third-party icons that do not use `currentColor`. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `BlockIcon`, List View: Remove the obsolete `fill: CanvasText` override for forced colors mode. ([#82481](https://github.com/WordPress/gutenberg/pull/82481))
--   `InnerBlocks`: Resolve a container's legacy layout markup (`inherit: true`, or a bare `contentSize` / `wideSize` with no `type`) to a constrained layout for its inner blocks, so they are offered the wide and full alignments. Previously only the container's styles honoured the legacy form, and the inner blocks resolved to the flow layout ([#82637](https://github.com/WordPress/gutenberg/pull/82637)).
 
 ### Internal
 
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
--   Pattern Overrides Dropdown: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` ([#77492](https://github.com/WordPress/gutenberg/pull/77492)).
--   Allowed Blocks Modal: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` ([#78119](https://github.com/WordPress/gutenberg/pull/78119)).
--   Block Switcher: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` for the bindings hint ([#77366](https://github.com/WordPress/gutenberg/pull/77366)).
--   Inspector Popover Header: Use `Text` from `@wordpress/ui` instead of `__experimentalHeading` and `__experimentalText` from `@wordpress/components` ([#77449](https://github.com/WordPress/gutenberg/pull/77449)).
--   Remove unused dependencies `@wordpress/escape-html`, `@wordpress/wordcount` and `deepmerge` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
--   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
 
 ## 17.0.0 (2026-08-26)
 
