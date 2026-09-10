@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Remove the `react-autosize-textarea` dependency. The post editor's "Code editor" view now auto-grows with CSS `field-sizing: content`. Browsers without support use a scrollable field ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).
+-   Add category filtering and search to the "Choose a pattern" modal shown when creating a new page. Only the categories containing start patterns for the current post type are listed, with labels pulled from the registered pattern categories ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
 
 ### Bug Fixes
 
@@ -88,7 +89,6 @@
 
 ### Enhancements
 
--   Add category filtering and search to the "Choose a pattern" modal shown when creating a new page. Only the categories containing start patterns for the current post type are listed, with labels pulled from the registered pattern categories ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
 -   Add a read-only code diff to the revisions screen ([#80314](https://github.com/WordPress/gutenberg/pull/80314)).
 
 ### New Features

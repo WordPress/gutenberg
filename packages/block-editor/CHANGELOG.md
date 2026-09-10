@@ -19,6 +19,7 @@
 ### Internal
 
 -   Layout hooks: Use `normalizeLegacyLayout` in `useLayoutClasses`, `useLayoutStyles`, the block layout styles wrapper and `isAxialBlockGapAllowed`, replacing four inline copies of the legacy `inherit` / size check ([#82710](https://github.com/WordPress/gutenberg/pull/82710)).
+-   Extract the populated pattern category computation from `usePatternCategories` into a `getPopulatedCategories` util, and expose it and `searchItems` through private APIs for reuse by the start page options modal ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
 
 ## 17.1.0 (2026-09-10)
 
@@ -44,7 +45,6 @@
 -   Inspector Popover Header: Use `Text` from `@wordpress/ui` instead of `__experimentalHeading` and `__experimentalText` from `@wordpress/components` ([#77449](https://github.com/WordPress/gutenberg/pull/77449)).
 -   Remove unused dependencies `@wordpress/escape-html`, `@wordpress/wordcount` and `deepmerge` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
--   Extract the populated pattern category computation from `usePatternCategories` into a `getPopulatedCategories` util, and expose it and `searchItems` through private APIs for reuse by the start page options modal ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
 
 ### Bug Fixes
 
