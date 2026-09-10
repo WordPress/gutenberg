@@ -2,21 +2,11 @@ name: Performance Tests
 
 on:
     pull_request:
-        branches:
-            - trunk
-            - 'release/[0-9]+.[0-9]'
-            - 'wp/[0-9]+.[0-9]'
-            - wp/latest
-            - wp/next
+        branches: [trunk]
     release:
         types: [published]
     push:
-        branches:
-            - trunk
-            - 'release/[0-9]+.[0-9]'
-            - 'wp/[0-9]+.[0-9]'
-            - wp/latest
-            - wp/next
+        branches: [trunk]
     workflow_dispatch:
         inputs:
             branches:
@@ -430,13 +420,10 @@ jobs:
               env:
                   CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
                   BRANCHES: ${{ needs.prepare.outputs.branches }}
-                  # The series the results are recorded under. Now that pushes to the
-                  # release and `wp/*` branches run too, this can no longer be `trunk`.
-                  BRANCH_NAME: ${{ github.ref_name }}
               run: |
                   COMMITTED_AT="$(git show -s "$GITHUB_SHA" --format="%cI")"
                   REFERENCE_COMMIT="$(echo "$BRANCHES" | jq -r '.[1].name')"
-                  node tools/release/log-performance-results.js "$CODEHEALTH_PROJECT_TOKEN" "$BRANCH_NAME" "$GITHUB_SHA" "$REFERENCE_COMMIT" "$COMMITTED_AT"
+                  node tools/release/log-performance-results.js "$CODEHEALTH_PROJECT_TOKEN" trunk "$GITHUB_SHA" "$REFERENCE_COMMIT" "$COMMITTED_AT"
 
     pr-meta:
         name: Update PR meta comment
