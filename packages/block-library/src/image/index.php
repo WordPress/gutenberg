@@ -378,8 +378,8 @@ function block_core_image_print_lightbox_overlay() {
 					<span class="wp-lightbox-navigation-text" data-wp-bind--hidden="!state.hasNavigationText">{$prev_button_text}</span>
 				</button>
 				<div class="lightbox-image-container">
-					<figure data-wp-bind--class="state.selectedImage.figureClassNames" data-wp-bind--style="state.figureStyles">
-						<img data-wp-bind--alt="state.selectedImage.alt" data-wp-bind--class="state.selectedImage.imgClassNames" data-wp-bind--style="state.imgStyles" data-wp-bind--src="state.selectedImage.currentSrc">
+					<figure aria-hidden="true" data-wp-bind--class="state.selectedImage.figureClassNames" data-wp-bind--style="state.figureStyles">
+						<img alt="" data-wp-bind--class="state.selectedImage.imgClassNames" data-wp-bind--style="state.imgStyles" data-wp-bind--src="state.selectedImage.currentSrc">
 					</figure>
 				</div>
 				<div class="lightbox-image-container">
@@ -392,6 +392,7 @@ function block_core_image_print_lightbox_overlay() {
 							data-wp-bind--srcset="state.enlargedSrcset"
 							sizes="100vw"
 						>
+						<figcaption data-wp-bind--hidden="!state.selectedImage.caption" data-wp-text="state.selectedImage.caption"></figcaption>
 					</figure>
 				</div>
 				<button type="button" style="fill:{$close_button_color}" class="wp-lightbox-navigation-button wp-lightbox-navigation-button-next" data-wp-bind--hidden="!state.hasNavigation" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-label="state.nextButtonAriaLabel">
