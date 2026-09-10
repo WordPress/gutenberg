@@ -14,6 +14,8 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 
 	private $original_wp_interactivity;
 
+	private $original_wp_styles;
+
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		register_block_type(
 			'test/plugin-block',
@@ -63,14 +65,17 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
-		global $wp_interactivity;
+		global $wp_interactivity, $wp_styles;
 		$this->original_wp_interactivity = $wp_interactivity;
 		$wp_interactivity                = new WP_Interactivity_API();
+		$this->original_wp_styles        = $wp_styles;
+		$wp_styles                       = null;
 	}
 
 	public function tear_down() {
-		global $wp_interactivity;
+		global $wp_interactivity, $wp_styles;
 		$wp_interactivity = $this->original_wp_interactivity;
+		$wp_styles        = $this->original_wp_styles;
 		parent::tear_down();
 	}
 
@@ -302,5 +307,38 @@ HTML;
 		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-router-region' ) );
 		$router_config = wp_interactivity_config( 'core/router' );
 		$this->assertArrayNotHasKey( 'clientNavigationDisabled', $router_config );
+	}
+
+	/**
+	 * Tests that rendering the block enqueues its style handle regardless of
+	 * the enhanced pagination setting, so that the `theme.json` styles for the
+	 * block are added by `wp_add_global_styles_for_blocks()`.
+	 *
+	 * @dataProvider data_rendering_query_enqueues_style_handle
+	 *
+	 * @param string $block_attributes JSON encoded block attributes.
+	 */
+	public function test_rendering_query_enqueues_style_handle( $block_attributes ) {
+		/*
+		 * The block ships no front end stylesheet, so its handle is registered
+		 * without a source when the block type is registered.
+		 */
+		wp_register_style( 'wp-block-query', false );
+
+		do_blocks( "<!-- wp:query $block_attributes --><div class=\"wp-block-query\"></div><!-- /wp:query -->" );
+
+		$this->assertTrue( wp_style_is( 'wp-block-query' ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_rendering_query_enqueues_style_handle() {
+		return array(
+			'enhanced pagination disabled' => array( '{"queryId":0,"query":{"inherit":true}}' ),
+			'enhanced pagination enabled'  => array( '{"queryId":0,"query":{"inherit":true},"enhancedPagination":true}' ),
+		);
 	}
 }
