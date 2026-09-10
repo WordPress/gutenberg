@@ -129,7 +129,11 @@ interface ActionButtonProps< Item > {
 	onClose?: () => void;
 }
 
-interface ToolbarContentProps< Item > {
+interface BulkActionsProps {
+	selectionCheckboxRef?: React.Ref< HTMLInputElement >;
+}
+
+interface ToolbarContentProps< Item > extends BulkActionsProps {
 	selection: string[];
 	onChangeSelection: SetSelection;
 	data: Item[];
@@ -222,7 +226,7 @@ function renderBulkActionsContent< Item >(
 	isDefaultUI: boolean,
 	totalItems: number,
 	isMobile: boolean,
-	bulkSelectionRef?: React.Ref< HTMLInputElement >
+	selectionCheckboxRef?: React.Ref< HTMLInputElement >
 ) {
 	const clearSelection = selectedItems.length > 0 && (
 		<Button
@@ -263,7 +267,7 @@ function renderBulkActionsContent< Item >(
 			justify="start"
 		>
 			<BulkSelectionCheckbox
-				inputRef={ isDefaultUI ? bulkSelectionRef : undefined }
+				inputRef={ selectionCheckboxRef }
 				selection={ selection }
 				onChangeSelection={ onChangeSelection }
 				data={ data }
@@ -326,12 +330,10 @@ function BulkActionsContent< Item >( {
 	data,
 	getItemId,
 	isInfiniteScroll,
+	selectionCheckboxRef,
 }: ToolbarContentProps< Item > ) {
-	const {
-		isDefaultUI = false,
-		paginationInfo,
-		bulkSelectionRef,
-	} = useContext( DataViewsContext );
+	const { isDefaultUI = false, paginationInfo } =
+		useContext( DataViewsContext );
 	const [ pendingContent, setPendingContent ] =
 		useState< React.JSX.Element >();
 	const registry = useRegistry();
@@ -402,7 +404,7 @@ function BulkActionsContent< Item >( {
 			isDefaultUI,
 			paginationInfo.totalItems,
 			isMobile,
-			bulkSelectionRef
+			selectionCheckboxRef
 		);
 	return (
 		<>
@@ -418,7 +420,7 @@ function BulkActionsContent< Item >( {
 	);
 }
 
-export function BulkActions() {
+export function BulkActions( { selectionCheckboxRef }: BulkActionsProps = {} ) {
 	const {
 		data,
 		selection,
@@ -429,6 +431,7 @@ export function BulkActions() {
 	} = useContext( DataViewsContext );
 	return (
 		<BulkActionsContent
+			selectionCheckboxRef={ selectionCheckboxRef }
 			selection={ selection }
 			onChangeSelection={ onChangeSelection }
 			data={ data }

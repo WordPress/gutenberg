@@ -36,10 +36,8 @@
 
 ### Enhancements
 
--   DataViews: collapse default bulk actions into a labeled menu on mobile, including eligible actions without icons.
-
--   DataViews: show bulk actions in the default table and grid headers, with a plain selected-item count. Custom compositions retain their existing placement.
-
+-   DataViews: collapse default bulk actions into a labeled menu on mobile, including eligible actions without icons. ([#82730](https://github.com/WordPress/gutenberg/pull/82730))
+-   DataViews: show bulk actions in the default table and grid headers, with a plain selected-item count. Custom compositions retain their existing placement. ([#82730](https://github.com/WordPress/gutenberg/pull/82730))
 -   Give unselected multi-selection filter indicators solid, themed backgrounds. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
 -   Validated form controls: Use `--wpds-color-stroke-interactive-error` for the invalid-state focus ring and border ([#82410](https://github.com/WordPress/gutenberg/pull/82410)).
 -   DataForm: Communicate the timezone a `datetime` value is edited in. When the site timezone differs from the visitor's, the control renders help text under the input naming the site timezone: the zone name (e.g. `(CEST) Europe/Madrid`) or the UTC offset for sites pinned to one ([#82291](https://github.com/WordPress/gutenberg/pull/82291)).
@@ -48,10 +46,8 @@
 
 ### Bug Fixes
 
--   DataViews: keep default bulk-action headers visible when scrolling auto-height layouts.
-
--   DataViews: preserve accessible table column headers while bulk actions are shown.
-
+-   DataViews: keep default bulk-action headers visible when scrolling auto-height layouts. ([#82730](https://github.com/WordPress/gutenberg/pull/82730))
+-   DataViews: preserve accessible table column headers while bulk actions are shown. ([#82730](https://github.com/WordPress/gutenberg/pull/82730))
 -   Fix `Field.sort` TypeScript type definition to reflect that `sort` receives extracted field values rather than `Item` objects ([#82162](https://github.com/WordPress/gutenberg/pull/82162)).
 -   DataForm: Render read-only fields without requiring an edit control ([#82514](https://github.com/WordPress/gutenberg/pull/82514)).
 -   Operators: Support the `isAny` and `isNone` filter operators for numeric field values, which previously matched nothing ([#77942](https://github.com/WordPress/gutenberg/pull/77942)).

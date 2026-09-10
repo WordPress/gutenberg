@@ -11,6 +11,7 @@ import {
 } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
 import DataViewsContext from '../../dataviews-context';
+import TableSelectionContext from '../../dataviews-layout/table-selection-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import ItemActions from '../../dataviews-item-actions';
 import { MEDIA_ASPECT_RATIOS, sortValues } from '../../../constants';
@@ -271,8 +272,8 @@ function ViewTable< Item >( {
 	className,
 	empty,
 }: ViewTableProps< Item > ) {
-	const { containerRef, isDefaultUI, tableHeaderRef, tableSelectionRef } =
-		useContext( DataViewsContext );
+	const { containerRef, isDefaultUI } = useContext( DataViewsContext );
+	const tableSelection = useContext( TableSelectionContext );
 	const isDelayedLoading = useDelayedLoading( isLoading );
 	const groupField = view.groupBy?.field
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
@@ -468,7 +469,7 @@ function ViewTable< Item >( {
 					</Popover>
 				) }
 				<thead
-					ref={ isDefaultUI ? tableHeaderRef : undefined }
+					ref={ tableSelection?.headerRef }
 					className={ clsx( {
 						'dataviews-view-table__thead--stuck':
 							isVerticallyScrolled,
@@ -492,9 +493,7 @@ function ViewTable< Item >( {
 								>
 									<BulkSelectionCheckbox
 										inputRef={
-											isDefaultUI
-												? tableSelectionRef
-												: undefined
+											tableSelection?.selectionRef
 										}
 										selection={ selection }
 										onChangeSelection={ onChangeSelection }
