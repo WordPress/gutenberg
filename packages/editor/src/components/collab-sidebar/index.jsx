@@ -1,21 +1,17 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef, useState } from '@wordpress/element';
-import { MenuGroup, MenuItemsChoice } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	useShortcut,
-	store as keyboardShortcutsStore,
-} from '@wordpress/keyboard-shortcuts';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import PluginSidebar from '../plugin-sidebar';
-import NotesMoreMenuGroup from '../more-menu/notes-more-menu-group';
 import { ALL_NOTES_SIDEBAR } from './constants';
 import { Notes } from './notes';
 import { FloatingNotes, FloatingNotesFill } from './floating-notes';
+import { NotesDisplayModeMenu } from './notes-display-mode-menu';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
@@ -87,8 +83,9 @@ function NotesSidebar( { postId } ) {
 		notesDisplayMode !== 'hidden' &&
 		( unresolvedNotes.length > 0 || selectedNoteId !== undefined ) &&
 		! isAllNotesSidebarOpen;
-	// The display-mode choices live in the editor's Options (ellipsis) menu;
-	// they only apply where the floating notes can render.
+	// The display-mode choices live in a "Notes" submenu of the editor's
+	// Options (ellipsis) menu; they only apply where the floating notes can
+	// render.
 	const showNotesDisplayOptions =
 		showFloatingNotes && unresolvedNotes.length > 0;
 
@@ -197,18 +194,6 @@ function NotesSidebar( { postId } ) {
 		{ isDisabled: notesDisplayShortcutsDisabled }
 	);
 
-	// Human-readable combinations, surfaced on the menu items themselves.
-	const notesDisplayShortcuts = useSelect( ( select ) => {
-		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-		return {
-			full: getShortcutRepresentation( 'core/editor/expand-notes' ),
-			minimized: getShortcutRepresentation(
-				'core/editor/minimize-notes'
-			),
-			hidden: getShortcutRepresentation( 'core/editor/hide-notes' ),
-		};
-	}, [] );
-
 	// Surface one thread for the avatar indicator.
 	const currentThreads =
 		blockNoteIds.length > 0
@@ -238,37 +223,10 @@ function NotesSidebar( { postId } ) {
 				}
 			/>
 			{ showNotesDisplayOptions && (
-				<NotesMoreMenuGroup>
-					{ ( { onClose } ) => (
-						<MenuGroup label={ __( 'Notes' ) }>
-							<MenuItemsChoice
-								choices={ [
-									{
-										value: 'full',
-										label: __( 'Expand notes' ),
-										shortcut: notesDisplayShortcuts.full,
-									},
-									{
-										value: 'minimized',
-										label: __( 'Minimize notes' ),
-										shortcut:
-											notesDisplayShortcuts.minimized,
-									},
-									{
-										value: 'hidden',
-										label: __( 'Hide notes' ),
-										shortcut: notesDisplayShortcuts.hidden,
-									},
-								] }
-								value={ notesDisplayMode }
-								onSelect={ ( value ) => {
-									applyNotesDisplayMode( value );
-									onClose();
-								} }
-							/>
-						</MenuGroup>
-					) }
-				</NotesMoreMenuGroup>
+				<NotesDisplayModeMenu
+					value={ notesDisplayMode }
+					onChange={ applyNotesDisplayMode }
+				/>
 			) }
 			{ showAllNotesSidebar && (
 				<PluginSidebar

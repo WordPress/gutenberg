@@ -131,10 +131,10 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 						</MoreMenuGroup>
 					) }
 				</ActionItem.Slot>
-				<NotesMoreMenuGroup.Slot />
 				<Menu.Separator />
 				<Menu.Group>
 					<Menu.GroupLabel>{ __( 'Tools' ) }</Menu.GroupLabel>
+					<NotesMoreMenuGroup.Slot />
 					<Menu.Item
 						onClick={ () =>
 							openModal( 'editor/keyboard-shortcut-help' )

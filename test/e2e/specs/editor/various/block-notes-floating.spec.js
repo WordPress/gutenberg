@@ -30,6 +30,22 @@ test.describe( 'Block Notes: floating panel', () => {
 		).toBeVisible();
 	}
 
+	// Opens the Options menu and then the "Notes" submenu holding the
+	// display-mode choices.
+	async function openNotesDisplayModeMenu( page ) {
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await page
+			.getByRole( 'menu', { name: 'Options' } )
+			.getByRole( 'menuitem', { name: 'Notes', exact: true } )
+			.click();
+		await expect(
+			page.getByRole( 'menuitemradio', { name: 'Hide notes' } )
+		).toBeVisible();
+	}
+
 	test( 'notices span the full width of the editor when notes are visible', async ( {
 		editor,
 		page,
@@ -488,35 +504,80 @@ test.describe( 'Block Notes: floating panel', () => {
 
 		const notes = page.getByRole( 'region', { name: 'Notes' } );
 		const overlay = page.locator( '.editor-collab-sidebar-overlay' );
-		const openOptionsMenu = () =>
-			page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Options' } )
-				.click();
 
 		await expect( notes ).toBeVisible();
 		await expect( overlay ).not.toHaveClass( /is-compact/ );
 
-		// Minimized: threads collapse to avatar pills.
-		await openOptionsMenu();
+		// The current mode is marked in the submenu.
+		await openNotesDisplayModeMenu( page );
+		await expect(
+			page.getByRole( 'menuitemradio', { name: 'Expand notes' } )
+		).toHaveAttribute( 'aria-checked', 'true' );
+
+		// Minimized: threads collapse to avatar pills. Choosing a mode
+		// closes the menu.
 		await page
 			.getByRole( 'menuitemradio', { name: 'Minimize notes' } )
 			.click();
+		await expect(
+			page.getByRole( 'menu', { name: 'Options' } )
+		).toBeHidden();
 		await expect( overlay ).toHaveClass( /is-compact/ );
 		await expect( notes ).toBeVisible();
 
 		// Hidden: the floating panel disappears from the canvas.
-		await openOptionsMenu();
+		await openNotesDisplayModeMenu( page );
+		await expect(
+			page.getByRole( 'menuitemradio', { name: 'Minimize notes' } )
+		).toHaveAttribute( 'aria-checked', 'true' );
 		await page.getByRole( 'menuitemradio', { name: 'Hide notes' } ).click();
 		await expect( notes ).toBeHidden();
 
 		// Full: the complete threads return.
-		await openOptionsMenu();
+		await openNotesDisplayModeMenu( page );
 		await page
 			.getByRole( 'menuitemradio', { name: 'Expand notes' } )
 			.click();
 		await expect( notes ).toBeVisible();
 		await expect( overlay ).not.toHaveClass( /is-compact/ );
+	} );
+
+	test( 'notes display modes are reachable with the keyboard', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph with a note' },
+		} );
+		await addNote( page, editor, 'Keyboard mode note' );
+		await page.setViewportSize( { width: 1450, height: 800 } );
+
+		const notes = page.getByRole( 'region', { name: 'Notes' } );
+		await expect( notes ).toBeVisible();
+
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		const trigger = page
+			.getByRole( 'menu', { name: 'Options' } )
+			.getByRole( 'menuitem', { name: 'Notes', exact: true } );
+		await trigger.focus();
+		await expect( trigger ).toBeFocused();
+
+		// Right arrow opens the submenu on its first choice; Left closes it.
+		await pageUtils.pressKeys( 'ArrowRight' );
+		await expect(
+			page.getByRole( 'menuitemradio', { name: 'Hide notes' } )
+		).toBeFocused();
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		await expect( trigger ).toBeFocused();
+
+		await pageUtils.pressKeys( 'ArrowRight' );
+		await pageUtils.pressKeys( 'Enter' );
+		await expect( notes ).toBeHidden();
 	} );
 
 	test( 'notes display modes have keyboard shortcuts', async ( {
@@ -550,10 +611,7 @@ test.describe( 'Block Notes: floating panel', () => {
 		await expect( overlay ).not.toHaveClass( /is-compact/ );
 
 		// The combinations are advertised on the menu choices themselves.
-		await page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Options' } )
-			.click();
+		await openNotesDisplayModeMenu( page );
 		await expect(
 			page.getByRole( 'menuitemradio', { name: 'Expand notes' } )
 		).toContainText( /E$/ );
