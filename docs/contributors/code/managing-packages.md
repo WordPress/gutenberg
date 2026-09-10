@@ -12,7 +12,7 @@ The repository also contains internal workspaces under `tools/` and `test/` for 
 
 ## Supply chain policy
 
-npm v12 refuses git references (`EALLOWGIT`) and tarball URLs (`EALLOWREMOTE`) by default. `.npmrc` extends that to local tarball files (`EALLOWFILE`), and limits local directories to those the root or a workspace `package.json` declares, which covers the `file:` workspace links.
+npm v12 refuses git references (`EALLOWGIT`) and tarball URLs (`EALLOWREMOTE`) by default. `.npmrc` extends that to local tarball files (`EALLOWFILE`). Local directories stay at the npm default, because narrowing them also blocks `npm pack` on the repository's own workspaces.
 
 Install scripts are opt-in: every dependency that ships one is recorded in `allowScripts` in the root `package.json`, and `strict-allow-scripts` fails the install with `ESTRICTALLOWSCRIPTS` on anything missing from that list. Most entries are `false` because the package works without its script; `leveldown` and `fs-ext` are approved because they are `node-gyp` builds with no usable prebuilt binary on every supported platform.
 
