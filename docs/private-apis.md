@@ -4,7 +4,82 @@ This is an overview of private APIs exposed by Gutenberg packages. These APIs ar
 
 The purpose of this document is to present a picture of how many private APIs we have and how they are used to build the Gutenberg editor apps with the libraries and frameworks provided by the family of `@wordpress/*` packages.
 
-## data
+## Bundled packages and externalized dependencies
+
+Some `@wordpress/*` packages are **bundled** into the consumer's build output, while others are **externalized** and provided at runtime by WordPress or the Gutenberg plugin. See the [@wordpress/dependency-extraction-webpack-plugin README](/packages/dependency-extraction-webpack-plugin/README.md) for details.
+
+Bundled packages may rely on private APIs from externalized packages, but the two package types version independently at runtime. Any use of a private API must be backward compatible when the API is introduced, promoted to public, or deprecated.
+
+This section is about coordination between `@wordpress/*` packages, not third-party plugin or theme authors. Most consumers are not calling `unlock()` on externalized private APIs themselves; they pick up the dependency indirectly when their build bundles an `@wordpress/*` package that unlocks a private API from an externalized one.
+
+Third-party code that imports and unlocks private APIs directly is knowingly using unsupported APIs and accepts that risk.
+
+### Promoting a private API to public
+
+When making a private API public in an externalized package, follow this sequence to avoid breaking bundled dependents:
+
+1. **Add the public export** without removing the private one.
+2. **Deprecate the private export** using `@wordpress/deprecated`, targeting a specific WordPress version for removal.
+3. **Migrate in-repo consumers first**, including any bundled packages.
+4. **Publish the updated bundled packages** and announce the change so npm consumers can update.
+5. **Keep both exports during a grace period** (typically one or two WordPress releases) so plugins that have not yet updated their bundled dependencies continue to work.
+6. **Remove the private export** only after the grace period ends.
+
+### Removing private API usage from a bundled package
+
+When a bundled package currently uses `unlock( privateApis )` against an externalized dependency, migrate it to the public export using the steps below.
+
+#### 1. Add a runtime fallback for supporting multiple WordPress versions
+
+Bundled packages must work on WordPress versions that only expose the API privately. Resolve it at runtime instead of picking one approach at build time. Use a namespace import so a missing export does not break the module at load time:
+
+```ts
+import * as theme from '@wordpress/theme';
+import { unlock } from '../lock-unlock';
+
+function getThemeProvider() {
+	if ( theme.ThemeProvider ) {
+		return theme.ThemeProvider;
+	}
+
+	if ( ! theme.privateApis ) {
+		throw new Error(
+			'ThemeProvider is not available. Update WordPress or the Gutenberg plugin.'
+		);
+	}
+
+	return unlock( theme.privateApis ).ThemeProvider;
+}
+
+export const ThemeProvider = getThemeProvider();
+```
+
+Use this pattern to help consumers support both a WordPress release that only has the private export and a newer release with the public export.
+
+#### 2. Bump the bundled package version and document the change
+
+Switching from a private to a public API is a breaking change for consumers running older WordPress versions. Treat it as a semver-major release of the bundled package.
+
+#### 3. Replace `unlock()` with a public import
+
+After the grace period ends and the externalized package removes the private export, drop the runtime fallback and use the public API directly.
+
+```js
+// Before
+import { privateApis as themePrivateApis } from '@wordpress/theme';
+import { unlock } from '../lock-unlock';
+
+const ThemeProvider = unlock( themePrivateApis ).ThemeProvider;
+
+// After
+import { ThemeProvider } from '@wordpress/theme';
+```
+
+Remove the `lock-unlock` import if it is no longer needed.
+
+## Private APIs by package
+
+### data
 
 The registry has two private methods:
 - `privateActionsOf`
@@ -16,9 +91,9 @@ Every store has a private API for registering private selectors/actions:
 - `privateSelectors`
 - `registerPrivateSelectors`
 
-## blocks
+### blocks
 
-### `core/blocks` store
+#### `core/blocks` store
 
 Private actions:
 - `addBlockBindingsSource`
@@ -35,7 +110,7 @@ Private selectors:
 - `getUnprocessedBlockTypes`
 - `hasContentRoleAttribute`
 
-## components
+### components
 
 Private exports:
 - `__experimentalPopoverLegacyPositionToPlacement`
@@ -44,17 +119,17 @@ Private exports:
 - `Menu`
 - `kebabCase`
 
-## commands
+### commands
 
 Private exports:
 - `useCommandContext` (added May 2023 in #50543)
 
-### `core/commands` store
+#### `core/commands` store
 
 Private actions:
 - `setContext` (added together with `useCommandContext`)
 
-## preferences
+### preferences
 
 Private exports: (added in Jan 2024 in #57639)
 - `PreferenceBaseOption`
@@ -66,7 +141,7 @@ Private exports: (added in Jan 2024 in #57639)
 There is only one publicly exported component!
 - `PreferenceToggleMenuItem`
 
-## block-editor
+### block-editor
 
 Private exports:
 - `AdvancedPanel`
@@ -127,7 +202,7 @@ Private exports:
 - `NoteIconSlotFill`
 - `NoteIconToolbarSlotFill`
 
-### `core/block-editor` store
+#### `core/block-editor` store
 
 Private actions:
 - `__experimentalUpdateSettings`: version of public `updateSettings` action that filters out some private/experimental settings.
@@ -188,7 +263,7 @@ Private selectors:
 - `isSectionBlock`
 - `isZoomOut`
 
-## core-data
+### core-data
 
 Private exports:
 - `EntitiesSavedStates`
@@ -197,7 +272,7 @@ Private exports:
 - `getTemplatePartIcon`
 - `useEntityRecordsWithPermissions`
 
-### `core` store
+#### `core` store
 
 Private actions:
 - `receiveRegisteredPostMeta`
@@ -211,7 +286,7 @@ Private selectors:
 - `getRegisteredPostMeta`
 - `getUndoManager`
 
-## patterns (package created in Aug 2023 and has no public exports, everything is private)
+### patterns (package created in Aug 2023 and has no public exports, everything is private)
 
 Private exports:
 - `OverridesPanel`
@@ -233,7 +308,7 @@ Private exports:
 - `EXCLUDED_PATTERN_SOURCES`
 - `PATTERN_SYNC_TYPES`
 
-### `core/patterns` store
+#### `core/patterns` store
 
 Private actions:
 - `convertSyncedPatternToStatic`
@@ -244,25 +319,25 @@ Private actions:
 Private selectors:
 - `isEditingPattern`
 
-## block-library
+### block-library
 
 Private exports:
 - `NAVIGATION_OVERLAY_TEMPLATE_PART_AREA`
 - `NavigationLinkUI`
 
-## router (private exports only)
+### router (private exports only)
 
 Private exports:
 - `useHistory`
 - `useLocation`
 - `RouterProvider`
 
-## core-commands (private exports only)
+### core-commands (private exports only)
 
 Private exports:
 - `useCommands`
 
-## editor
+### editor
 
 Private exports:
 - `CreateTemplatePartModal`
@@ -284,7 +359,7 @@ Private exports:
 - `InterfaceSkeleton`
 - `PinnedItems`
 
-### `core/editor` store
+#### `core/editor` store
 
 Private actions:
 - `createTemplate`
@@ -308,16 +383,16 @@ Private selectors:
 - `getPostIcon`
 - `isEntityReady`
 
-## edit-post
+### edit-post
 
-### `core/edit-post` store
+#### `core/edit-post` store
 
 Private selectors:
 - `getEditedPostTemplateId`
 
-## edit-site
+### edit-site
 
-### `core/edit-site` store
+#### `core/edit-site` store
 
 Private actions:
 - `registerRoute`
