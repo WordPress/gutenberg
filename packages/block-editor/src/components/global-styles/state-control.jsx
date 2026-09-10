@@ -113,16 +113,22 @@ export default function StateControl( {
 				text={ showText ? triggerLabel : undefined }
 				toggleProps={ toggleProps }
 			>
-				{ () => (
+				{ ( { onClose } ) => (
 					<>
 						{ hasViewportOptions && (
 							<MenuGroup label={ __( 'Viewport' ) }>
 								{ viewportOptions.map( ( option ) => (
 									<MenuItem
 										key={ `viewport-${ option.value }` }
-										onClick={ () =>
-											onChangeViewport?.( option.value )
-										}
+										onClick={ () => {
+											onChangeViewport?.( option.value );
+											if (
+												! hasPseudoStateOptions &&
+												! children
+											) {
+												onClose();
+											}
+										} }
 										icon={
 											viewportValue === option.value
 												? check
@@ -139,11 +145,17 @@ export default function StateControl( {
 								{ pseudoStateOptions.map( ( option ) => (
 									<MenuItem
 										key={ `pseudo-${ option.value }` }
-										onClick={ () =>
+										onClick={ () => {
 											onChangePseudoState?.(
 												option.value
-											)
-										}
+											);
+											if (
+												! hasViewportOptions &&
+												! children
+											) {
+												onClose();
+											}
+										} }
 										icon={
 											pseudoStateValue === option.value
 												? check

@@ -6,11 +6,14 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import {
-	__experimentalSpacer as Spacer,
+	MenuGroup,
+	MenuItem,
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { getScrollContainer } from '@wordpress/dom';
 import { useEffect, useRef, useState } from '@wordpress/element';
+import { check } from '@wordpress/icons';
 import { Text } from '@wordpress/ui';
 import EditContents from './edit-contents';
 import SkipToSelectedBlock from '../skip-to-selected-block';
@@ -431,26 +434,34 @@ const BlockInspectorSingleBlock = ( {
 	const stickyBadgesRef = useRef( null );
 	useEffect( () => {
 		const badges = stickyBadgesRef.current;
-		const scrollContainer = badges?.closest(
-			'.interface-complementary-area'
-		);
-		// Outside a complementary area (e.g. the Customizer) nothing is
-		// sticky, so there is nothing to detect.
-		if ( ! badges || ! scrollContainer ) {
+		if ( ! badges ) {
+			return;
+		}
+		// Find the scroll container by behavior rather than class name.
+		const scrollContainer = getScrollContainer( badges );
+		// Derive the sticky offset from the element's own computed style
+		// rather than hardcoding the tabs header height. When the badges
+		// aren't sticky (e.g. the Customizer), `top` computes to `auto`
+		// and we skip observing entirely.
+		const stickyTop = parseFloat( window.getComputedStyle( badges ).top );
+		if ( ! scrollContainer || ! Number.isFinite( stickyTop ) ) {
 			return;
 		}
 		const observer = new window.IntersectionObserver(
 			( [ entry ] ) => setBadgesStuck( entry.intersectionRatio < 1 ),
 			{
 				root: scrollContainer,
-				// 1px below the badges' sticky top: once pinned, the strip's
-				// top edge is clipped by exactly that pixel.
-				rootMargin: '-48px 0px 0px 0px',
+				// 1px below the badges' sticky top: once pinned, the
+				// strip's top edge is clipped by exactly that pixel.
+				rootMargin: `-${ stickyTop + 1 }px 0px 0px 0px`,
 				threshold: [ 1 ],
 			}
 		);
 		observer.observe( badges );
-		return () => observer.disconnect();
+		return () => {
+			observer.disconnect();
+			setBadgesStuck( false );
+		};
 	}, [ showStateBadges ] );
 	const hasParentChildBlockCards =
 		editedContentOnlySection &&
@@ -500,23 +511,39 @@ const BlockInspectorSingleBlock = ( {
 							name={ blockName }
 							value={ selectedBlockStyleState }
 							onChange={ onBlockStyleStateChange }
-							canvasPreview={ {
-								checked: showStateOnCanvas,
-								onChange: onShowStateOnCanvasChange,
-							} }
-						/>
+						>
+							<MenuGroup>
+								<MenuItem
+									role="menuitemcheckbox"
+									isSelected={ showStateOnCanvas }
+									icon={ showStateOnCanvas ? check : null }
+									// Previewing is only meaningful while a
+									// non-default pseudo state is selected.
+									disabled={
+										! hasPseudoBlockStyleState(
+											selectedBlockStyleState
+										)
+									}
+									onClick={ () =>
+										onShowStateOnCanvasChange(
+											! showStateOnCanvas
+										)
+									}
+								>
+									{ __( 'Preview on canvas' ) }
+								</MenuItem>
+							</MenuGroup>
+						</BlockStatesControl>
 					)
 				}
 			/>
 			{ showStateBadges && (
-				<Spacer
+				<div
 					ref={ stickyBadgesRef }
 					className={ clsx(
 						'block-editor-block-inspector__sticky-badges',
 						badgesStuck && 'is-stuck'
 					) }
-					paddingX={ 4 }
-					paddingY={ 2 }
 				>
 					<Text
 						variant="body-sm"
@@ -529,7 +556,7 @@ const BlockInspectorSingleBlock = ( {
 						value={ selectedBlockStyleState }
 						isResponsiveEditing={ isResponsiveEditing }
 					/>
-				</Spacer>
+				</div>
 			) }
 			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
 			<EditContents clientId={ renderedBlockClientId } />
