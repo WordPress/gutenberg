@@ -194,8 +194,25 @@ setup rejected-write
 export SCENARIO=reject-write SVN_VERIFY_TIMEOUT=4
 expect_failure "$CASE_ROOT/release" tag
 grep -q 'Authorization failed' "$CASE_ROOT/output"
-grep -q 'Retrying in 1 seconds' "$CASE_ROOT/output"
-grep -q 'Retrying in 2 seconds' "$CASE_ROOT/output"
+retry_count=0
+expected_delay="$SVN_VERIFY_RETRY_INTERVAL"
+while read -r actual_delay remaining; do
+	(( retry_count += 1 ))
+	expected_attempt_delay="$expected_delay"
+	if (( expected_attempt_delay > remaining )); then
+		expected_attempt_delay="$remaining"
+	fi
+	if (( actual_delay != expected_attempt_delay )); then
+		echo "Expected a $expected_attempt_delay-second retry delay, got $actual_delay seconds"
+		exit 1
+	fi
+	if (( expected_delay <= SVN_VERIFY_TIMEOUT / 2 )); then
+		expected_delay=$((expected_delay * 2))
+	else
+		expected_delay="$SVN_VERIFY_TIMEOUT"
+	fi
+done < <(sed -n 's/^Release not yet verified\. Retrying in \([0-9][0-9]*\) seconds; \([0-9][0-9]*\) seconds remain\.$/\1 \2/p' "$CASE_ROOT/output")
+(( retry_count > 0 ))
 echo 'PASS: a rejected write with no deployment remains a failure'
 
 setup unreadable-deployment
