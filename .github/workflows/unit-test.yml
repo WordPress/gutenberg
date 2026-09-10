@@ -464,7 +464,15 @@ jobs:
         permissions:
             contents: read
             actions: read
-        needs: [detect-relevant-changes, unit-js, unit-js-date, test-php, phpcs]
+        needs:
+            [
+                detect-relevant-changes,
+                svn-release,
+                unit-js,
+                unit-js-date,
+                test-php,
+                phpcs,
+            ]
         if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
         steps:
             - name: Checkout repository
