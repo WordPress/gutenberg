@@ -15,6 +15,7 @@ import type {
 } from '../../../types';
 import DataViewsContext from '../../dataviews-context';
 import getHideableFields from '../../../utils/get-hideable-fields';
+import getTableColumns from '../utils/get-table-columns';
 
 interface HeaderMenuProps< Item > {
 	fieldId: string;
@@ -53,8 +54,6 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	}: HeaderMenuProps< Item >,
 	ref: Ref< HTMLButtonElement >
 ) {
-	const visibleFieldIds = view.fields ?? [];
-	const index = visibleFieldIds?.indexOf( fieldId ) as number;
 	const isSorted = view.sort?.field === fieldId;
 	let isHidable = false;
 	let isSortable = false;
@@ -91,6 +90,11 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		return header;
 	}
 
+	// Operate on the rendered columns rather than the raw `view.fields`, so an
+	// id without a field definition (which the table skips) can't offset the
+	// indexes that move and insert rely on.
+	const visibleFieldIds = getTableColumns( view, fields );
+	const index = visibleFieldIds.indexOf( fieldId );
 	const hiddenFields = getHideableFields( view, fields ).filter(
 		( f ) => ! visibleFieldIds.includes( f.id )
 	);
