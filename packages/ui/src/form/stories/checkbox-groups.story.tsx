@@ -14,40 +14,36 @@ export default meta;
 /**
  * Compose checkbox groups from `CheckboxGroup` and `CheckboxControl`.
  *
- * This example wraps the group in a `Fieldset` with a legend and description.
- * The `Fieldset` labels the outer set. Each `CheckboxGroup` still needs its own
- * accessible name, such as an `aria-label` or `aria-labelledby`.
+ * This example composes `Fieldset.Root` and `CheckboxGroup` on one element.
+ * The fieldset legend gives the group its accessible name.
  *
  * Control checked state through `value` or `defaultValue` and `onValueChange`.
  */
 export const GroupingCheckboxes: StoryObj = {
 	render: function Template() {
 		return (
-			<Fieldset.Root>
+			<Fieldset.Root
+				render={ <CheckboxGroup defaultValue={ [ '1' ] } /> }
+			>
 				<Fieldset.Legend>Notifications</Fieldset.Legend>
 				<Fieldset.Description>
 					Choose which updates you want to receive.
 				</Fieldset.Description>
-				<CheckboxGroup
-					defaultValue={ [ '1' ] }
-					aria-label="Notifications"
-				>
-					<CheckboxControl
-						value="1"
-						label="Comments"
-						description="Notify me when someone comments."
-					/>
-					<CheckboxControl
-						value="2"
-						label="Mentions"
-						description="Notify me when someone mentions me."
-					/>
-					<CheckboxControl
-						value="3"
-						label="Follows"
-						description="Notify me when someone follows me."
-					/>
-				</CheckboxGroup>
+				<CheckboxControl
+					value="1"
+					label="Comments"
+					description="Notify me when someone comments."
+				/>
+				<CheckboxControl
+					value="2"
+					label="Mentions"
+					description="Notify me when someone mentions me."
+				/>
+				<CheckboxControl
+					value="3"
+					label="Follows"
+					description="Notify me when someone follows me."
+				/>
 			</Fieldset.Root>
 		);
 	},

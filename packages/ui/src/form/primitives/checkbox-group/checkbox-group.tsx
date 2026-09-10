@@ -11,8 +11,10 @@ const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
  * A low-level primitive that groups checkboxes so they share one selected-values
  * state.
  *
- * Prefer composing `CheckboxControl` inside the group for labeled items. Wrap
- * related groups in `Fieldset` for a legend and description.
+ * Prefer composing `CheckboxControl` inside the group for labeled items. For
+ * one labeled group, pass `CheckboxGroup` to `Fieldset.Root`'s `render` prop.
+ * When a `Fieldset` contains multiple groups, give each `CheckboxGroup` its own
+ * accessible name.
  */
 export const CheckboxGroup = forwardRef< HTMLDivElement, CheckboxGroupProps >(
 	function CheckboxGroup( { render = DEFAULT_RENDER, ...restProps }, ref ) {
