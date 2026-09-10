@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 -   Restore a rich text element's `contenteditable` attribute when a pointer interaction ends with `pointercancel`, so that swipe scrolling on touch devices no longer leaves text blocks uneditable ([#82598](https://github.com/WordPress/gutenberg/pull/82598)).
+-   `useRichText`: apply every selection change from props, including the second of two consecutive ones, and only while the element or an editing host around it has focus. The hook no longer moves focus to the element; the consumer decides where focus goes.
 
 ## 7.54.0 (2026-08-26)
 

@@ -1031,6 +1031,44 @@ describe( 'FormTokenField', () => {
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 		} );
 
+		it( 'should select the last suggestion when pressing the up arrow with no suggestion selected', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [ 'Pink', 'Salmon', 'Carnation', 'Neon' ];
+
+			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Typing "on" will show the "Salmon", "Carnation" and "Neon" suggestions
+			await user.type( input, 'on' );
+
+			const suggestionList = screen.getByRole( 'listbox' );
+
+			expectVisibleSuggestionsToBe( suggestionList, [
+				'Salmon',
+				'Carnation',
+				'Neon',
+			] );
+
+			// Currently, none of the suggestions are selected
+			expect(
+				within( suggestionList ).queryByRole( 'option', {
+					selected: true,
+				} )
+			).not.toBeInTheDocument();
+
+			// Pressing the up arrow from an empty selection wraps to the end of
+			// the list and selects "Neon"
+			await user.keyboard( '[ArrowUp]' );
+
+			expect(
+				within( suggestionList ).getByRole( 'option', {
+					selected: true,
+				} )
+			).toHaveAccessibleName( 'Neon' );
+		} );
+
 		it( 'should allow the user to use the mouse to navigate and select suggestions (which are marked with the `aria-selected` attribute)', async () => {
 			const user = userEvent.setup();
 
