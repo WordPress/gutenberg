@@ -114,11 +114,13 @@ Options:
 
 -   `--input`: Specify the input directory (default: 'build')
 -   `--output`: Specify the output file path (default: 'build/blocks-manifest.php')
+-   `--exclude-experimental`: Exclude blocks marked as experimental (with `"__experimental": true` in block.json) from the manifest. This is useful when building for WordPress Core to prevent experimental block code from being bundled.
 
 Example:
 
 ```bash
 wp-scripts build-blocks-manifest --input=src --output=dist/blocks-manifest.php
+wp-scripts build-blocks-manifest --input=src --output=dist/blocks-manifest.php --exclude-experimental
 ```
 
 This command will scan the specified input directory for `block.json` files,
