@@ -1,7 +1,5 @@
 import { useMemo } from '@wordpress/element';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-import { MenuGroup, MenuItem } from '@wordpress/components';
-import { check } from '@wordpress/icons';
 import { __, _x } from '@wordpress/i18n';
 import StateControl from '../components/global-styles/state-control';
 import StateControlBadges from '../components/global-styles/state-control-badges';
@@ -69,17 +67,15 @@ const EMPTY_STATE_OPTIONS = [];
  * Viewport states are selected globally via the editor's device preview
  * (Responsive editing), so only pseudo-states are exposed here.
  *
- * @param {Object}   props                 Component props.
- * @param {string}   props.name            Block name.
- * @param {Object}   props.value           Currently selected style-state value.
- * @param {Function} props.onChange        Callback when style-state selection changes.
- * @param {Object}   [props.canvasPreview] Optional canvas preview toggle, with
- *                                         `checked` and `onChange` properties. Only
- *                                         contexts with a canvas preview (i.e. the
- *                                         block editor) should pass this.
+ * @param {Object}   props          Component props.
+ * @param {string}   props.name     Block name.
+ * @param {Object}   props.value    Currently selected style-state value.
+ * @param {Function} props.onChange Callback when style-state selection changes.
+ * @param {Element}  props.children Optional menu content rendered after the
+ *                                  state groups.
  * @return {Element|null} State control component, or null if not applicable.
  */
-export function BlockStatesControl( { name, value, onChange, canvasPreview } ) {
+export function BlockStatesControl( { name, value, onChange, children } ) {
 	const pseudoStateOptions = useMemo(
 		() => getPseudoStateOptions( name ),
 		[ name ]
@@ -98,26 +94,7 @@ export function BlockStatesControl( { name, value, onChange, canvasPreview } ) {
 			popoverProps={ dropdownMenuProps.popoverProps }
 			showText={ false }
 		>
-			{ canvasPreview && (
-				<MenuGroup>
-					<MenuItem
-						role="menuitemcheckbox"
-						isSelected={ canvasPreview.checked }
-						icon={ canvasPreview.checked ? check : null }
-						// Previewing is only meaningful while a
-						// non-default state is selected.
-						disabled={
-							( value?.pseudo ?? DEFAULT_STATE_VALUE ) ===
-							DEFAULT_STATE_VALUE
-						}
-						onClick={ () =>
-							canvasPreview.onChange( ! canvasPreview.checked )
-						}
-					>
-						{ __( 'Preview on canvas' ) }
-					</MenuItem>
-				</MenuGroup>
-			) }
+			{ children }
 		</StateControl>
 	);
 }
