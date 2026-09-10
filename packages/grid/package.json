@@ -62,7 +62,8 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/ui": "file:../ui",
 		"storybook": "^10.5.3",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.0",
+		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
