@@ -9,6 +9,7 @@
  * Modifies the static `core/query` block on the server.
  *
  * @since 6.4.0
+ * @since 7.2.0 Removed the `$block` parameter.
  *
  * @param array  $attributes Block attributes.
  * @param string $content    Block default content.
