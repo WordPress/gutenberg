@@ -172,7 +172,9 @@ export default function PostPublishPanel( {
 						{ PostPublishExtension && <PostPublishExtension /> }
 					</PostPublishPanelPostpublish>
 				) }
-				{ isSaving && <Spinner /> }
+				{ isSaving && (
+					<Spinner data-testid="post-publish-panel-spinner" />
+				) }
 			</div>
 			<div className="editor-post-publish-panel__footer">
 				<CheckboxControl

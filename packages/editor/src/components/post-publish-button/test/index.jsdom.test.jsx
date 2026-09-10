@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { dispatch, select } from '@wordpress/data';
@@ -13,29 +14,31 @@ function setEditorIntent( intent ) {
 	unlock( dispatch( editorStore ) ).setEditorIntent( intent );
 }
 
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
 describe( 'PostPublishButton', () => {
 	beforeEach( () => {
 		// The intent is registry state, not a mock, so restoring the spies
 		// doesn't reset what a previous test left behind. Reset it before
 		// rendering, while nothing is mounted to react to the change.
 		setEditorIntent( EDITOR_INTENT_EDIT );
-		jest.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
+		vi.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
 			_links: {},
 		} );
-		jest.spyOn( dispatch( editorStore ), 'editPost' ).mockReturnValue();
-		jest.spyOn( dispatch( editorStore ), 'savePost' ).mockReturnValue();
+		vi.spyOn( dispatch( editorStore ), 'editPost' ).mockReturnValue();
+		vi.spyOn( dispatch( editorStore ), 'savePost' ).mockReturnValue();
 	} );
 
 	afterEach( () => {
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 	} );
 
 	function mockSelector( name, value ) {
-		jest.spyOn( select( editorStore ), name ).mockReturnValue( value );
+		vi.spyOn( select( editorStore ), name ).mockReturnValue( value );
 	}
 
 	function mockHasPublishAction( hasPublishAction ) {
-		jest.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
+		vi.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
 			_links: hasPublishAction ? { 'wp:action-publish': true } : {},
 		} );
 	}
@@ -177,7 +180,7 @@ describe( 'PostPublishButton', () => {
 
 		it( 'should not open the entities save panel when clicked', async () => {
 			const user = userEvent.setup();
-			const setEntitiesSavedStatesCallback = jest.fn();
+			const setEntitiesSavedStatesCallback = vi.fn();
 			mockHasPublishAction( true );
 			mockSelector( 'isEditedPostPublishable', true );
 			mockSelector( 'isEditedPostSaveable', true );

@@ -1,6 +1,5 @@
 import { __ } from '@wordpress/i18n';
 import { video as icon } from '@wordpress/icons';
-import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -8,9 +7,6 @@ import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
 import variations from './variations';
-import { unlock } from '../lock-unlock';
-
-const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -31,41 +27,5 @@ export const settings = {
 	edit,
 	save,
 };
-
-if ( window.__experimentalContentOnlyInspectorFields ) {
-	settings[ fieldsKey ] = [
-		{
-			id: 'video',
-			label: __( 'Video' ),
-			type: 'media',
-			Edit: {
-				control: 'media', // TODO: replace with custom component
-				allowedTypes: [ 'video' ],
-				multiple: false,
-			},
-			getValue: ( { item } ) => ( {
-				id: item.id,
-				url: item.src,
-				caption: item.caption,
-				poster: item.poster,
-			} ),
-			setValue: ( { value } ) => ( {
-				id: value.id,
-				src: value.url,
-				caption: value.caption,
-				poster: value.poster,
-			} ),
-		},
-		{
-			id: 'caption',
-			label: __( 'Caption' ),
-			type: 'text',
-			Edit: 'rich-text', // TODO: replace with custom component
-		},
-	];
-	settings[ formKey ] = {
-		fields: [ 'video', 'caption' ],
-	};
-}
 
 export const init = () => initBlock( { name, metadata, settings } );
