@@ -93,7 +93,8 @@ class MediaUploadModalWrapper extends Component {
 				{ render( { open: this.openModal } ) }
 				<MediaUploadModalWithPostContext
 					allowedTypes={ allowedTypes }
-					multiple={ multiple }
+					// Callers may pass the legacy frame's `'add'` mode; the modal takes a boolean.
+					multiple={ !! multiple }
 					value={ value }
 					onSelect={ ( media ) => {
 						onSelect( media );

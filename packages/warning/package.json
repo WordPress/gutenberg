@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/warning",
-	"version": "3.54.0",
+	"version": "3.55.0",
 	"description": "Warning utility for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -47,7 +47,7 @@
 	"sideEffects": false,
 	"devDependencies": {
 		"@babel/core": "^7.25.7",
-		"vitest": "^4.1.10"
+		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
