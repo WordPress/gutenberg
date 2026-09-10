@@ -42,7 +42,19 @@ function VideoEdit( {
 	onReplace,
 } ) {
 	const videoPlayer = useRef();
-	const { id, controls, poster, src, tracks, width, height } = attributes;
+	const {
+		id,
+		controls,
+		poster,
+		src,
+		tracks,
+		width,
+		height,
+		autoplay,
+		loop,
+		muted,
+		playsInline,
+	} = attributes;
 	// Give the <video> an explicit (non-`auto`) aspect ratio derived from the
 	// stored dimensions. The width/height attributes alone only yield
 	// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
@@ -94,8 +106,6 @@ function VideoEdit( {
 
 		// Sets the block's attribute and updates the edit component from the
 		// selected media.
-		// animated GIF detect hone par controls off by default — user settings panel se on kar sakta hai
-		const isAnimatedGif = media.media_details?.animated_video === true;
 		setAttributes( {
 			blob: undefined,
 			src: media.url,
@@ -103,7 +113,6 @@ function VideoEdit( {
 			poster:
 				media.image?.src !== media.icon ? media.image?.src : undefined,
 			caption: media.caption,
-			...( isAnimatedGif && { controls: false } ),
 		} );
 		setTemporaryURL();
 	}
@@ -240,10 +249,10 @@ function VideoEdit( {
 					poster={ poster }
 					src={ src || temporaryURL }
 					ref={ videoPlayer }
-					autoPlay={ attributes.autoplay }
-					loop={ attributes.loop }
-					muted={ attributes.muted }
-					playsInline={ attributes.playsInline }
+					autoPlay={ autoplay }
+					loop={ loop }
+					muted={ muted }
+					playsInline={ playsInline }
 					width={ width }
 					height={ height }
 					style={ aspectRatio ? { aspectRatio } : undefined }
