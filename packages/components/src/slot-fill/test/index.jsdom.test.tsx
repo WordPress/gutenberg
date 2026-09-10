@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import { createRef } from '@wordpress/element';
 import { createSlotFill, Provider as SlotFillProvider } from '../';

@@ -1,6 +1,9 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FiltersPanel from '../filters-panel';
+
+globalThis.wpVitest.mockMatchMedia();
 
 // The inheritance treatment sits behind the
 // `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
@@ -101,7 +104,7 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 	} );
 
 	it( 'does not invoke onChange on mount when only inherited duotone is present (display-without-commit)', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		const inheritedValue = {
 			filter: { duotone: [ '#000000', '#ffffff' ] },
 		};
@@ -121,7 +124,7 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 
 	it( 'commits the inherited value when the user clicks the preselected duotone preset', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		const inheritedValue = {
 			filter: { duotone: [ '#000000', '#ffffff' ] },
 		};
@@ -167,7 +170,7 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 	} );
 
 	it( 'does not invoke onChange on mount when a local duotone is set (no spurious commit)', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		const value = {
 			filter: { duotone: [ '#8c00b7', '#fcff41' ] },
 		};
@@ -247,7 +250,7 @@ describe( 'FiltersPanel — duplicate duotone presets', () => {
 
 	it( 'saves the slug of the preset that was picked', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<FiltersPanel

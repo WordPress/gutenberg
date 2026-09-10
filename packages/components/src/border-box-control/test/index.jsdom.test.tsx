@@ -1,8 +1,11 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ComponentProps } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useId } from '@wordpress/element';
 import { BorderBoxControl } from '..';
+
+globalThis.wpVitest.mockMatchMedia();
 
 const colors = [
 	{ name: 'Gray', color: '#f6f7f7' },
@@ -35,7 +38,7 @@ const mixedBorders = {
 const props = {
 	colors,
 	label: 'Border Box',
-	onChange: jest.fn().mockImplementation( ( newValue ) => {
+	onChange: vi.fn().mockImplementation( ( newValue ) => {
 		props.value = newValue;
 	} ),
 	value: undefined,
@@ -451,7 +454,7 @@ describe( 'BorderBoxControl', () => {
 
 	describe( 'onChange handling', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 			props.value = undefined;
 		} );
 

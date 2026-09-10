@@ -1,8 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
 import { preloadScriptModules } from '../script-modules';
 
-jest.mock( '../dynamic-importmap', () => ( {
-	...jest.requireActual( '../dynamic-importmap' ),
-	preloadWithMap: jest.fn( () => Promise.resolve( {} ) ),
+vi.mock( import( '../dynamic-importmap' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	preloadWithMap: vi.fn( async () => ( {} ) ),
 } ) );
 
 describe( 'preloadScriptModules', () => {
