@@ -524,7 +524,7 @@ function gutenberg_resolve_block_icon_path( $metadata ) {
 		);
 		if ( ! $full_path || ! file_exists( $full_path ) ) {
 			_doing_it_wrong(
-				__FUNCTION__,
+				'gutenberg_resolve_block_icon_path',
 				sprintf(
 					/* translators: %s: path to the icon file */
 					__( 'Icon file not found: %s', 'gutenberg' ),
