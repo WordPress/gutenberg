@@ -124,7 +124,8 @@
 		"@types/jest": "^30.0.0",
 		"@wordpress/block-library": "file:../block-library",
 		"deep-freeze": "^0.0.1",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.0",
+		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

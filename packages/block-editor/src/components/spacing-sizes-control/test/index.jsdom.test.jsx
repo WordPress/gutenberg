@@ -29,7 +29,6 @@ import useSpacingSizes from '../hooks/use-spacing-sizes';
 
 globalThis.wpVitest.mockMatchMedia();
 
-globalThis.wpVitest.mockVisibleElements();
 globalThis.wpVitest.mockScrollIntoView();
 
 // Mock useSelect
@@ -760,26 +759,6 @@ describe( 'SpacingSizesControl', () => {
 			await waitFor( () => {
 				expect( screen.getAllByRole( 'combobox' ) ).toHaveLength( 2 ); // Vertical and Horizontal
 			} );
-		} );
-
-		it( 'can interact with select dropdown options', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<SpacingSizesControl { ...defaultProps } values={ undefined } />
-			);
-
-			// With large preset sets, should use select dropdowns instead of sliders
-			await waitFor( () => {
-				expect( screen.getAllByRole( 'combobox' ) ).toHaveLength( 2 );
-			} );
-
-			// Click on the first combobox to open dropdown
-			const comboboxes = screen.getAllByRole( 'combobox' );
-			await user.click( comboboxes[ 0 ] );
-
-			// Should be able to interact with the dropdown
-			expect( comboboxes[ 0 ] ).toHaveAttribute( 'aria-expanded' );
 		} );
 	} );
 

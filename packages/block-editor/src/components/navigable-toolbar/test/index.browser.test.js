@@ -1,5 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { act, screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { createElement } from '@wordpress/element';
 import NavigableToolbar from '..';
 
@@ -19,13 +20,11 @@ function createToolbar( { hidden = false, extraChildren = 0 } = {} ) {
 }
 
 describe( 'NavigableToolbar', () => {
-	afterEach( cleanup );
-
 	it( 'does not reclassify a visibility-hidden toolbar when its subtree changes', async () => {
-		const { rerender } = render( createToolbar() );
+		const { rerender } = await render( createToolbar() );
 		const initialToolbar = screen.getByRole( 'toolbar' );
 
-		rerender( createToolbar( { extraChildren: 1 } ) );
+		await rerender( createToolbar( { extraChildren: 1 } ) );
 
 		await waitFor( () => {
 			expect( screen.getByRole( 'toolbar' ) ).not.toBe( initialToolbar );
@@ -33,7 +32,7 @@ describe( 'NavigableToolbar', () => {
 		expect( console ).toHaveWarned();
 		const toolbar = screen.getByRole( 'toolbar' );
 
-		rerender( createToolbar( { hidden: true, extraChildren: 2 } ) );
+		await rerender( createToolbar( { hidden: true, extraChildren: 2 } ) );
 
 		await act(
 			() =>
