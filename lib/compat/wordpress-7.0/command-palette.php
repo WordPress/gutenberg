@@ -57,10 +57,6 @@ function gutenberg_admin_bar_command_palette_menu( WP_Admin_Bar $wp_admin_bar ):
 		)
 	);
 }
-if ( has_action( 'admin_bar_menu', 'wp_admin_bar_command_palette_menu' ) ) {
-	remove_action( 'admin_bar_menu', 'wp_admin_bar_command_palette_menu', 55 );
-}
-add_action( 'admin_bar_menu', 'gutenberg_admin_bar_command_palette_menu', 55 );
 
 function gutenberg_add_admin_bar_styles() {
 	if ( ! is_admin_bar_showing() ) {
@@ -99,4 +95,8 @@ function gutenberg_add_admin_bar_styles() {
 CSS;
 	wp_add_inline_style( 'admin-bar', $css );
 }
-add_action( 'admin_bar_init', 'gutenberg_add_admin_bar_styles' );
+
+if ( ! function_exists( 'wp_admin_bar_command_palette_menu' ) ) {
+	add_action( 'admin_bar_menu', 'gutenberg_admin_bar_command_palette_menu', 55 );
+	add_action( 'admin_bar_init', 'gutenberg_add_admin_bar_styles' );
+}

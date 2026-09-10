@@ -95,7 +95,7 @@ function isValidFocusableArea( element ) {
 	const img = element.ownerDocument.querySelector(
 		'img[usemap="#' + map.name + '"]'
 	);
-	return !! img && isVisible( img );
+	return !! img && ! img.closest( '[inert]' ) && isVisible( img );
 }
 
 /**
@@ -117,8 +117,12 @@ export function find( context, { sequential = false } = {} ) {
 	const elements = context.querySelectorAll( buildSelector( sequential ) );
 
 	return Array.from( elements ).filter( ( element ) => {
-		if ( ! isVisible( element ) ) {
-			return false;
+		const { nodeName } = element;
+		if ( 'AREA' === nodeName ) {
+			// The mapped image determines whether this region is visible or inert.
+			return isValidFocusableArea(
+				/** @type {HTMLAreaElement} */ ( element )
+			);
 		}
 
 		// Elements inside an inert subtree are not focusable.
@@ -126,13 +130,6 @@ export function find( context, { sequential = false } = {} ) {
 			return false;
 		}
 
-		const { nodeName } = element;
-		if ( 'AREA' === nodeName ) {
-			return isValidFocusableArea(
-				/** @type {HTMLAreaElement} */ ( element )
-			);
-		}
-
-		return true;
+		return isVisible( element );
 	} );
 }
