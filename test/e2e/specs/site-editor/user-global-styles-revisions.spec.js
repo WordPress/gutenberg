@@ -405,11 +405,9 @@ test.describe( 'Style Revisions', () => {
 			.last()
 			.click();
 
-		await page
-			.getByRole( 'button', {
-				name: 'Apply the selected revision to your site.',
-			} )
-			.click();
+		// The last entry is the theme defaults, for which the picker footer
+		// action reads "Reset".
+		await page.getByRole( 'button', { name: 'Reset' } ).click();
 
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )
