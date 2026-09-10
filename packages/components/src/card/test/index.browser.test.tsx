@@ -60,6 +60,15 @@ function pickStyles(
 	);
 }
 
+function readElevationShadow( card: HTMLElement ) {
+	// The elevation layers are intentionally hidden presentation elements.
+	// eslint-disable-next-line testing-library/no-node-access
+	const layers = card.querySelectorAll< HTMLElement >(
+		'[aria-hidden="true"]'
+	);
+	return getComputedStyle( layers[ layers.length - 1 ] ).boxShadow;
+}
+
 describe( 'Card', () => {
 	it( 'renders its regions and media', async () => {
 		await render(
@@ -150,14 +159,6 @@ describe( 'Card', () => {
 		);
 		await render( <Card data-testid="flat">Code is Poetry</Card> );
 
-		const readElevationShadow = ( card: HTMLElement ) => {
-			// The elevation layers are intentionally hidden presentation elements.
-			// eslint-disable-next-line testing-library/no-node-access
-			const layers = card.querySelectorAll< HTMLElement >(
-				'[aria-hidden="true"]'
-			);
-			return getComputedStyle( layers[ layers.length - 1 ] ).boxShadow;
-		};
 		expect(
 			readElevationShadow( screen.getByTestId( 'elevated' ) )
 		).not.toBe( readElevationShadow( screen.getByTestId( 'flat' ) ) );
@@ -195,11 +196,26 @@ describe( 'Card', () => {
 		);
 	} );
 
-	it( 'warns when the legacy isElevated prop is passed', async () => {
-		await render( <Card isElevated>Code is Poetry</Card> );
+	it( 'supports the legacy isElevated prop with a warning', async () => {
+		await render(
+			<Card isElevated data-testid="legacy-elevated">
+				Code is Poetry
+			</Card>
+		);
+		await render(
+			<Card elevation={ 2 } data-testid="elevated">
+				Code is Poetry
+			</Card>
+		);
+		await render( <Card data-testid="flat">Code is Poetry</Card> );
 
-		expect( screen.getByText( 'Code is Poetry' ) ).toBeInTheDocument();
 		expect( console ).toHaveWarned();
+		expect(
+			readElevationShadow( screen.getByTestId( 'legacy-elevated' ) )
+		).toBe( readElevationShadow( screen.getByTestId( 'elevated' ) ) );
+		expect(
+			readElevationShadow( screen.getByTestId( 'legacy-elevated' ) )
+		).not.toBe( readElevationShadow( screen.getByTestId( 'flat' ) ) );
 	} );
 
 	it( 'passes border and size styles from context to its regions', async () => {

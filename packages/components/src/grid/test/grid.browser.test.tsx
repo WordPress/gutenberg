@@ -129,29 +129,38 @@ describe( 'props', () => {
 
 	test( 'should render custom templateColumns', async () => {
 		await render(
-			<Grid templateColumns="1fr auto 1fr" data-testid="grid">
+			<Grid
+				templateColumns="1fr auto 1fr"
+				data-testid="grid"
+				style={ { width: 300 } }
+			>
 				<View />
-				<View />
+				<View style={ { width: 24 } } />
 				<View />
 			</Grid>
 		);
 
 		const style = readStyle();
 		expect( style.display ).toBe( 'grid' );
-		expect( countTracks( style.gridTemplateColumns ) ).toBe( 3 );
+		expect( style.gridTemplateColumns ).toBe( '126px 24px 126px' );
 	} );
 
 	test( 'should render custom templateRows', async () => {
 		await render(
-			<Grid templateRows="1fr auto 1fr" data-testid="grid">
+			<Grid
+				columns={ 1 }
+				templateRows="1fr auto 1fr"
+				data-testid="grid"
+				style={ { height: 300 } }
+			>
 				<View />
-				<View />
+				<View style={ { height: 24 } } />
 				<View />
 			</Grid>
 		);
 
 		const style = readStyle();
 		expect( style.display ).toBe( 'grid' );
-		expect( countTracks( style.gridTemplateRows ) ).toBe( 3 );
+		expect( style.gridTemplateRows ).toBe( '126px 24px 126px' );
 	} );
 } );

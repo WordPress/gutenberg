@@ -76,6 +76,47 @@ describe( 'Elevation', () => {
 		);
 	} );
 
+	it( 'applies the configured hover and active shadows', async () => {
+		await render(
+			<>
+				<div
+					data-testid="target"
+					style={ { position: 'relative', width: 40, height: 40 } }
+				>
+					<Elevation
+						active={ 5 }
+						hover={ 14 }
+						value={ 7 }
+						data-testid="elevation"
+						style={ { transition: 'none' } }
+					/>
+				</div>
+				<Elevation value={ 14 } data-testid="hover-reference" />
+				<Elevation value={ 5 } data-testid="active-reference" />
+			</>
+		);
+		const target = screen.getByTestId( 'target' );
+		const elevation = screen.getByTestId( 'elevation' );
+		const expectedHoverShadow = getComputedStyle(
+			screen.getByTestId( 'hover-reference' )
+		).boxShadow;
+		const expectedActiveShadow = getComputedStyle(
+			screen.getByTestId( 'active-reference' )
+		).boxShadow;
+		let pressedShadow: string | undefined;
+		target.addEventListener( 'mousedown', () => {
+			pressedShadow = getComputedStyle( elevation ).boxShadow;
+		} );
+
+		await userEvent.hover( page.getByTestId( 'target' ) );
+		expect( getComputedStyle( elevation ).boxShadow ).toBe(
+			expectedHoverShadow
+		);
+
+		await userEvent.click( page.getByTestId( 'target' ) );
+		expect( pressedShadow ).toBe( expectedActiveShadow );
+	} );
+
 	it( 'applies the offset on every edge', async () => {
 		await render( <Elevation offset={ -2 } data-testid="elevation" /> );
 		const styles = getComputedStyle( screen.getByTestId( 'elevation' ) );

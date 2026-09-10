@@ -95,7 +95,7 @@ function isValidFocusableArea( element ) {
 	const img = element.ownerDocument.querySelector(
 		'img[usemap="#' + map.name + '"]'
 	);
-	return !! img && isVisible( img );
+	return !! img && ! img.closest( '[inert]' ) && isVisible( img );
 }
 
 /**

@@ -177,6 +177,26 @@ describe( 'focusable', () => {
 			expect( findFocusable( map ) ).toEqual( [] );
 		} );
 
+		it( 'ignores an area whose referenced image is inside an inert container', () => {
+			const node = createElement( 'div' );
+			node.innerHTML = `
+				<map name="testfocus">
+					<area href="#target" shape="rect" coords="0,0,30,30" alt="Target">
+				</map>
+				<div inert>
+					<img usemap="#testfocus" width="40" height="40" alt="">
+				</div>
+				<button id="target">Continue</button>
+			`;
+			const button = node.querySelector( 'button' );
+
+			const focusable = findFocusable( node );
+			focusable[ 0 ].focus();
+
+			expect( focusable ).toEqual( [ button ] );
+			expect( button ).toHaveFocus();
+		} );
+
 		it( 'finds contenteditable', () => {
 			const node = createElement( 'div' );
 			const div = createElement( 'div' );

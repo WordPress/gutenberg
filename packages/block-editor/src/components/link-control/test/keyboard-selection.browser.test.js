@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
-import { screen, within } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { SlotFillProvider } from '@wordpress/components';
 import { createElement, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -65,27 +65,32 @@ describe( 'LinkControl keyboard selection', () => {
 			} );
 			await user.type( searchInput, searchTerm );
 
-			const searchResults = await screen.findByRole( 'listbox', {
+			await screen.findByRole( 'listbox', {
 				name: /Search results for.*/,
 			} );
-			const searchResultElements =
-				within( searchResults ).getAllByRole( 'option' );
+			const selectedOption = page.getByRole( 'option', {
+				selected: true,
+			} );
 
 			await user.keyboard( '{ArrowDown}' );
-			expect( screen.getByRole( 'option', { selected: true } ) ).toBe(
-				searchResultElements[ 0 ]
-			);
+			await expect
+				.element( selectedOption )
+				.toHaveTextContent(
+					type === 'entity'
+						? fauxEntitySuggestions[ 0 ].title
+						: searchTerm
+				);
 
 			if ( type === 'entity' ) {
 				await user.keyboard( '{ArrowDown}' );
-				expect( screen.getByRole( 'option', { selected: true } ) ).toBe(
-					searchResultElements[ 1 ]
-				);
+				await expect
+					.element( selectedOption )
+					.toHaveTextContent( fauxEntitySuggestions[ 1 ].title );
 
 				await user.keyboard( '{ArrowUp}' );
-				expect( screen.getByRole( 'option', { selected: true } ) ).toBe(
-					searchResultElements[ 0 ]
-				);
+				await expect
+					.element( selectedOption )
+					.toHaveTextContent( fauxEntitySuggestions[ 0 ].title );
 			}
 
 			await user.keyboard( '{Enter}' );

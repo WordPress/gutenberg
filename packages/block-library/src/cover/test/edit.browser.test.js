@@ -146,6 +146,8 @@ describe( 'Cover block', () => {
 			await userEvent.click(
 				screen.getByLabelText( 'Change content position' )
 			);
+			expect( cover ).not.toHaveClass( 'has-custom-content-position' );
+
 			await userEvent.click(
 				within( screen.getByRole( 'grid' ) ).getByRole( 'gridcell', {
 					name: 'top left',
