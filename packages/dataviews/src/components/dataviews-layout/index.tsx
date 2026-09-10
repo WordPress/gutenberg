@@ -35,7 +35,10 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		renderItemLink,
 		defaultLayouts,
 		containerRef,
-		bulkActionsInLayout,
+		isDefaultUI,
+		tableHeaderRef,
+		tableSelectionRef,
+		bulkSelectionRef,
 		empty = <p>{ __( 'No results' ) }</p>,
 	} = useContext( DataViewsContext );
 
@@ -45,18 +48,16 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 	const bulkActionsRef = useRef< HTMLDivElement >( null );
 	const hadSelectionRef = useRef( false );
 	useEffect( () => {
-		if ( ! bulkActionsInLayout || view.type !== LAYOUT_TABLE ) {
+		if ( ! isDefaultUI || view.type !== LAYOUT_TABLE ) {
 			return;
 		}
-		const tableHead = containerRef.current?.querySelector( 'thead' );
+		const tableHead = tableHeaderRef?.current;
 		const ownerDocument = tableHead?.ownerDocument;
 		if (
 			selection.length &&
 			tableHead?.contains( ownerDocument?.activeElement ?? null )
 		) {
-			bulkActionsRef.current
-				?.querySelector< HTMLInputElement >( 'input' )
-				?.focus();
+			bulkSelectionRef?.current?.focus();
 		} else if (
 			hadSelectionRef.current &&
 			! selection.length &&
@@ -65,10 +66,17 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 					ownerDocument?.activeElement ?? null
 				) )
 		) {
-			tableHead?.querySelector< HTMLInputElement >( 'input' )?.focus();
+			tableSelectionRef?.current?.focus();
 		}
 		hadSelectionRef.current = selection.length > 0;
-	}, [ selection.length, bulkActionsInLayout, view.type, containerRef ] );
+	}, [
+		selection.length,
+		isDefaultUI,
+		view.type,
+		tableHeaderRef,
+		tableSelectionRef,
+		bulkSelectionRef,
+	] );
 
 	const isDelayedInitialLoading = useDelayedLoading( ! hasInitiallyLoaded, {
 		delay: 200,
@@ -98,7 +106,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 	return (
 		<>
 			{ /* Stay outside the scroll container so auto-height layouts stick to the page. */ }
-			{ bulkActionsInLayout && hasBulkActions && (
+			{ isDefaultUI && hasBulkActions && (
 				<div
 					className={
 						view.type === LAYOUT_TABLE
