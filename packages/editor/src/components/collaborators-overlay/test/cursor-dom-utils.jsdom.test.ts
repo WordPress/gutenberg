@@ -81,6 +81,7 @@ describe( 'cursor-dom-utils', () => {
 			);
 
 			expect( result ).toBeNull();
+			expect( document.createRange ).not.toHaveBeenCalled();
 		} );
 	} );
 
