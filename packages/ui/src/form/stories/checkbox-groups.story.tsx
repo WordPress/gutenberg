@@ -15,8 +15,8 @@ export default meta;
  * Compose checkbox groups from `CheckboxGroup` and `CheckboxControl`.
  *
  * This example wraps the group in a `Fieldset` with a legend and description.
- * When not using `Fieldset`, label the `CheckboxGroup` accessibly, for example
- * with `aria-labelledby`.
+ * The `Fieldset` labels the outer set. Each `CheckboxGroup` still needs its own
+ * accessible name, such as an `aria-label` or `aria-labelledby`.
  *
  * Control checked state through `value` or `defaultValue` and `onValueChange`.
  */
@@ -28,7 +28,10 @@ export const GroupingCheckboxes: StoryObj = {
 				<Fieldset.Description>
 					Choose which updates you want to receive.
 				</Fieldset.Description>
-				<CheckboxGroup defaultValue={ [ '1' ] }>
+				<CheckboxGroup
+					defaultValue={ [ '1' ] }
+					aria-label="Notifications"
+				>
 					<CheckboxControl
 						value="1"
 						label="Comments"
@@ -79,6 +82,7 @@ export const Nesting: StoryObj = {
 					value={ fruitValue }
 					onValueChange={ setFruitValue }
 					allValues={ [ 'apple', 'orange', 'banana' ] }
+					aria-label="Fruit"
 				>
 					<CheckboxControl parent value="fruit" label="Fruit" />
 					<CheckboxGroup.NestedItems>
@@ -91,6 +95,7 @@ export const Nesting: StoryObj = {
 					value={ vegetableValue }
 					onValueChange={ setVegetableValue }
 					allValues={ [ 'carrot', 'lettuce', 'pepper' ] }
+					aria-label="Vegetable"
 				>
 					<CheckboxControl
 						parent
