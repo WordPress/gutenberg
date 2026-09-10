@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Mark the Welcome Guide item of the Options menu with `aria-haspopup="dialog"`, since it opens a modal dialog ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
+
 ## 7.4.0 (2026-09-10)
 
 ### Enhancements

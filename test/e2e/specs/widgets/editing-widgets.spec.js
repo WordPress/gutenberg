@@ -656,6 +656,34 @@ test.describe( 'Widgets screen', () => {
 			],
 		} );
 	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/52328.
+	test( 'should open the welcome guide from the Options menu', async ( {
+		page,
+	} ) => {
+		const welcomeGuide = page.getByRole( 'dialog', {
+			name: 'Welcome to block Widgets',
+		} );
+		await expect( welcomeGuide ).toBeHidden();
+
+		await page
+			.getByRole( 'region', { name: 'Widgets top bar' } )
+			.getByRole( 'button', { name: 'Options', exact: true } )
+			.click();
+
+		// The item opens a dialog, so it is a plain menu item rather than a
+		// preference toggle (`menuitemcheckbox`).
+		const welcomeGuideMenuItem = page.getByRole( 'menuitem', {
+			name: 'Welcome Guide',
+		} );
+		await expect( welcomeGuideMenuItem ).toHaveAttribute(
+			'aria-haspopup',
+			'dialog'
+		);
+		await welcomeGuideMenuItem.click();
+
+		await expect( welcomeGuide ).toBeVisible();
+	} );
 } );
 
 class WidgetsScreen {
