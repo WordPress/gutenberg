@@ -7601,11 +7601,6 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/screen-typography.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/shadows-edit-panel.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -7987,9 +7982,6 @@
 	},
 	"packages/workflow/src/components/workflow-menu.jsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
-		"@wordpress/use-recommended-components": {
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
