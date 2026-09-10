@@ -721,10 +721,7 @@ export const setRenderingMode =
 		// An editor opened with a rendering mode of its own is showing what
 		// that context is for, so it stays in that mode. Applying that mode is
 		// what puts the editor in it, so only a move away is ignored.
-		if (
-			settings.fixedRenderingMode &&
-			mode !== settings.fixedRenderingMode
-		) {
+		if ( settings.renderingMode && mode !== settings.renderingMode ) {
 			return;
 		}
 

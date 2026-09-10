@@ -52,7 +52,7 @@ export const createTemplate =
 					template: savedTemplate.slug,
 				}
 			);
-		const { defaultRenderingMode, fixedRenderingMode } =
+		const { defaultRenderingMode, renderingMode } =
 			select.getEditorSettings();
 		registry
 			.dispatch( noticesStore )
@@ -62,7 +62,7 @@ export const createTemplate =
 					type: 'snackbar',
 					// An editor with a fixed rendering mode has no other mode
 					// to go back to, so the action is not offered.
-					actions: fixedRenderingMode
+					actions: renderingMode
 						? []
 						: [
 								{

@@ -79,7 +79,7 @@ export default function EditSiteEditor( {
 	// Routes that stand for the whole site pass 'template-locked', so the
 	// canvas shows the template around whatever it is rendering, and the
 	// controls for switching it are not offered.
-	fixedRenderingMode,
+	renderingMode,
 } ) {
 	const location = useLocation();
 	const history = useHistory();
@@ -206,7 +206,7 @@ export default function EditSiteEditor( {
 					postId={ postWithTemplate ? context.postId : postId }
 					templateId={ postWithTemplate ? postId : undefined }
 					settings={ editorSettings }
-					fixedRenderingMode={ fixedRenderingMode }
+					renderingMode={ renderingMode }
 					className="edit-site-editor__editor-interface"
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />

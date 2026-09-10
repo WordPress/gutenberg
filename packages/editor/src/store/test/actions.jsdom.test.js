@@ -1240,7 +1240,7 @@ describe( 'Editor actions', () => {
 		it( 'applies the fixed mode, so an editor can enter it', () => {
 			const registry = createRegistryWithStores();
 			registry.dispatch( editorStore ).updateEditorSettings( {
-				fixedRenderingMode: 'template-locked',
+				renderingMode: 'template-locked',
 			} );
 
 			registry
@@ -1255,7 +1255,7 @@ describe( 'Editor actions', () => {
 		it( 'ignores a move away from the fixed mode', () => {
 			const registry = createRegistryWithStores();
 			registry.dispatch( editorStore ).updateEditorSettings( {
-				fixedRenderingMode: 'template-locked',
+				renderingMode: 'template-locked',
 			} );
 			registry
 				.dispatch( editorStore )
@@ -1271,7 +1271,7 @@ describe( 'Editor actions', () => {
 		it( 'changes the mode again once the fixed mode is cleared', () => {
 			const registry = createRegistryWithStores();
 			registry.dispatch( editorStore ).updateEditorSettings( {
-				fixedRenderingMode: 'template-locked',
+				renderingMode: 'template-locked',
 			} );
 			registry
 				.dispatch( editorStore )
@@ -1281,7 +1281,7 @@ describe( 'Editor actions', () => {
 			// has to clear it: editor settings merge, and the site editor
 			// shares one store across its routes.
 			registry.dispatch( editorStore ).updateEditorSettings( {
-				fixedRenderingMode: undefined,
+				renderingMode: undefined,
 			} );
 			registry.dispatch( editorStore ).setRenderingMode( 'post-only' );
 

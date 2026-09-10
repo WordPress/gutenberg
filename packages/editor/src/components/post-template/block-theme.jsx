@@ -20,7 +20,7 @@ export default function BlockThemeControl() {
 		onNavigateToEntityRecord,
 		getEditorSettings,
 		hasGoBack,
-		hasFixedRenderingMode,
+		hasRenderingMode,
 		id,
 	} = useSelect( ( select ) => {
 		const {
@@ -36,7 +36,7 @@ export default function BlockThemeControl() {
 			hasGoBack: editorSettings.hasOwnProperty(
 				'onNavigateToPreviousEntityRecord'
 			),
-			hasFixedRenderingMode: !! editorSettings.fixedRenderingMode,
+			hasRenderingMode: !! editorSettings.renderingMode,
 			id: getCurrentTemplateId(),
 		};
 	}, [] );
@@ -139,7 +139,7 @@ export default function BlockThemeControl() {
 							<ResetDefaultTemplate onClick={ onClose } />
 							{ canCreateTemplate && <CreateNewTemplate /> }
 						</MenuGroup>
-						{ ! hasFixedRenderingMode && (
+						{ ! hasRenderingMode && (
 							<MenuGroup>
 								<MenuItem
 									icon={

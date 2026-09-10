@@ -42,7 +42,7 @@ function StylesPreviewArea( { siteData } ) {
 		return <StyleBookPreviewArea siteData={ siteData } />;
 	}
 
-	return <Editor fixedRenderingMode="template-locked" />;
+	return <Editor renderingMode="template-locked" />;
 }
 
 export const stylesRoute = {
