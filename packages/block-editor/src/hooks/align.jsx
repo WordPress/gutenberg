@@ -13,6 +13,7 @@ import useAvailableAlignments, {
 } from '../components/block-alignment-control/use-available-alignments';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { store as blockEditorStore } from '../store';
+import { outerWidthConstraintKey } from '../store/private-keys';
 import useBlockDisplayInformation from '../components/use-block-display-information';
 
 /**
@@ -103,32 +104,34 @@ export function addAttribute( settings ) {
 }
 
 /**
- * Describes the block whose layout is withholding alignments, so the menu can
- * name it and offer to select it.
+ * Describes what is withholding a block's alignments, so the menu can name it
+ * and offer a way to change it.
  *
- * Only a block the user can reach from here is described. When the constraint
- * comes from outside the post — the template wrapped around the content — there
- * is no block on the page to send anyone to.
+ * A block on the page is described here, because everything needed to name it
+ * and select it is known. When the constraint comes from outside the post —
+ * the template wrapped around the content — there is no block to select and
+ * this cannot say what the template is, so the host supplies that instead.
  *
  * @param {string} clientId The block whose alignments are withheld.
  *
  * @return {?{description: string, action: Object}} The constraint.
  */
 function useAlignmentConstraint( clientId ) {
-	const parentClientId = useSelect(
+	const { parentClientId, outerConstraint } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getBlockEditingMode } =
+			const { getBlockRootClientId, getBlockEditingMode, getSettings } =
 				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
+			const isOnPage =
+				!! rootClientId &&
+				getBlockEditingMode( rootClientId ) === 'default';
 
-			if (
-				! rootClientId ||
-				getBlockEditingMode( rootClientId ) !== 'default'
-			) {
-				return null;
-			}
-
-			return rootClientId;
+			return {
+				parentClientId: isOnPage ? rootClientId : null,
+				outerConstraint: isOnPage
+					? undefined
+					: getSettings()[ outerWidthConstraintKey ],
+			};
 		},
 		[ clientId ]
 	);
@@ -137,7 +140,7 @@ function useAlignmentConstraint( clientId ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	if ( ! parentInfo ) {
-		return null;
+		return outerConstraint ?? null;
 	}
 
 	/*
