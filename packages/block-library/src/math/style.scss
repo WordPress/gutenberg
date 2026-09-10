@@ -1,4 +1,32 @@
 .wp-block-math {
 	overflow-x: auto;
 	overflow-y: hidden;
+
+	// Temml uses these classes to justify cells in matrices and other
+	// arrays. LaTeX alignment is always left-to-right, regardless of the
+	// page's text direction, so these are excluded from RTL flipping.
+	.tml-right {
+		/*rtl:ignore*/
+		text-align: right;
+	}
+
+	.tml-left {
+		/*rtl:ignore*/
+		text-align: left;
+	}
+
+	// Chromium alone needs `-webkit-` prefixed values here too. This feature
+	// query matches Temml's own upstream CSS and only matches Chromium,
+	// since Safari also recognizes (but mishandles) these prefixed values.
+	@supports (not (-webkit-backdrop-filter: blur(1px))) and (not (-moz-appearance: none)) {
+		.tml-right {
+			/*rtl:ignore*/
+			text-align: -webkit-right;
+		}
+
+		.tml-left {
+			/*rtl:ignore*/
+			text-align: -webkit-left;
+		}
+	}
 }
