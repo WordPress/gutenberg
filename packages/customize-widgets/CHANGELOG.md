@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Use `aria-disabled` for the Undo and Redo buttons of the document tools so they stay focusable when there is nothing to undo or redo, and make the focus style of all the document tools buttons visible ([#82412](https://github.com/WordPress/gutenberg/pull/82412)).
+
 ## 5.55.0 (2026-09-10)
 
 ### Enhancements
