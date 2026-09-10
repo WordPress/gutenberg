@@ -3,7 +3,7 @@ import { speak } from '@wordpress/a11y';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as Notice from '../index';
 
-vi.mock( '@wordpress/a11y', () => ( { speak: vi.fn() } ) );
+vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
 const mockedSpeak = vi.mocked( speak );
 
 describe( 'Notice spoken messages', () => {
