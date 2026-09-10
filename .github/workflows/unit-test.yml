@@ -59,6 +59,7 @@ jobs:
     svn-release:
         name: SVN release recovery
         runs-on: 'ubuntu-24.04'
+        timeout-minutes: 5
         permissions:
             contents: read
         steps:
