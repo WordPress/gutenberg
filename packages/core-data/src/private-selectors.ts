@@ -255,16 +255,25 @@ export const getTemplateId = createRegistrySelector(
 			}
 		}
 		// If no template is assigned, use the default template.
+		// Derive the slug from the saved record rather than the edited one. A
+		// slug only selects a template once it has been saved, and reading the
+		// edited value would send a lookup request for every keystroke while
+		// someone types in the slug field.
+		const savedEntity = select( STORE_NAME ).getRawEntityRecord(
+			'postType',
+			postType,
+			postId
+		);
 		let slugToCheck;
 		// In `draft` status we might not have a slug available, so we use the `single`
 		// post type templates slug(ex page, single-post, single-product etc..).
 		// Pages do not need the `single` prefix in the slug to be prioritized
 		// through template hierarchy.
-		if ( editedEntity.slug ) {
+		if ( savedEntity?.slug ) {
 			slugToCheck =
 				postType === 'page'
-					? `${ postType }-${ editedEntity.slug }`
-					: `single-${ postType }-${ editedEntity.slug }`;
+					? `${ postType }-${ savedEntity.slug }`
+					: `single-${ postType }-${ savedEntity.slug }`;
 		} else {
 			slugToCheck = postType === 'page' ? 'page' : `single-${ postType }`;
 		}
