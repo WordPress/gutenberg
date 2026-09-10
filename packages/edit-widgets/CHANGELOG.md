@@ -2,12 +2,21 @@
 
 ## Unreleased
 
+## 6.55.0 (2026-09-10)
+
+### Enhancements
+
+-   Error boundary: Surface debugging details ([#82099](https://github.com/WordPress/gutenberg/pull/82099)).
+-   Widget areas: Use the `layout` icon instead of the default block icon ([#61028](https://github.com/WordPress/gutenberg/issues/61028)).
+
 ### Bug Fixes
 
+-   `WelcomeGuide`: Keep the modal close icon white on hover now that it is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   Prevent an error in `canInsertBlockInWidgetArea` when no widget area blocks are present.
 
 ### Internal
 
+-   Stop passing the unused `editorTool` block editor setting; the selector that read it was removed with the Write/Design tool in [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
 -   Remove unused dependency `@wordpress/reusable-blocks` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 

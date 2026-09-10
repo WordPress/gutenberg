@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `focusable.find`: Return linked image-map areas when their mapped image is visible and outside an inert subtree ([#82736](https://github.com/WordPress/gutenberg/pull/82736)).
+
+## 4.55.0 (2026-09-10)
+
+### Bug Fixes
+
+-   `focusable.find`: Exclude elements hidden by CSS `visibility` or `content-visibility` while preserving explicitly visible descendants ([#82574](https://github.com/WordPress/gutenberg/pull/82574)).
+
 ## 4.54.0 (2026-08-26)
 
 ### Bug Fixes

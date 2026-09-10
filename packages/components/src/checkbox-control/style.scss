@@ -75,28 +75,22 @@
 
 svg.components-checkbox-control__checked,
 svg.components-checkbox-control__indeterminate {
-	--checkmark-size: var(--checkbox-input-size);
-
-	fill: $white;
+	color: $white;
 	cursor: var(--wpds-cursor-control);
 	position: absolute;
 	left: 50%;
 	top: 50%;
 	transform: translate(-50%, -50%);
-	width: var(--checkmark-size);
-	height: var(--checkmark-size);
+	width: var(--checkbox-input-size);
+	height: var(--checkbox-input-size);
 	user-select: none;
 	pointer-events: none;
-
-	@include break-small() {
-		--checkmark-size: calc(var(--checkbox-input-size) + 4px);
-	}
 }
 
 .components-checkbox-control:has(:disabled) {
 	svg.components-checkbox-control__checked,
 	svg.components-checkbox-control__indeterminate {
-		fill: $components-color-gray-400;
+		color: $components-color-gray-400;
 	}
 }
 

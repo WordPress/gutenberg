@@ -9,6 +9,7 @@
  * @covers ::gutenberg_sanitize_widget_help
  * @covers ::gutenberg_sanitize_widget_icon
  * @covers ::gutenberg_sanitize_widget_actions
+ * @covers ::gutenberg_sanitize_widget_attributes
  * @covers ::gutenberg_resolve_widget_action_href
  */
 class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
@@ -32,6 +33,16 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 			$schema->help->links[0]->label
 		);
 		$this->assertSame( array( 'widget keyword' ), $schema->keywords );
+		$this->assertSame( 'widget attribute label', $schema->attributes[0]->label );
+		$this->assertSame( 'widget attribute header', $schema->attributes[0]->header );
+		$this->assertSame(
+			'widget attribute option label',
+			$schema->attributes[0]->elements[0]->label
+		);
+		$this->assertSame(
+			'widget attribute option description',
+			$schema->attributes[0]->elements[0]->description
+		);
 	}
 
 	/**
@@ -56,6 +67,21 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 					),
 				),
 				'keywords'    => array( 'start' ),
+				'attributes'  => array(
+					array(
+						'id'       => 'variant',
+						'type'     => 'text',
+						'label'    => 'Variant',
+						'header'   => 'Kind',
+						'elements' => array(
+							array(
+								'value'       => 'compact',
+								'label'       => 'Compact',
+								'description' => 'Fewer details.',
+							),
+						),
+					),
+				),
 				'category'    => 'dashboard',
 				'textdomain'  => 'default',
 			)
@@ -67,6 +93,11 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 		$this->assertSame( 'Más información', $widget['help']['links'][0]['label'] );
 		$this->assertSame( 'about.php', $widget['help']['links'][0]['href'] );
 		$this->assertSame( array( 'inicio' ), $widget['keywords'] );
+		$this->assertSame( 'Variante', $widget['attributes'][0]['label'] );
+		$this->assertSame( 'Tipo', $widget['attributes'][0]['header'] );
+		$this->assertSame( 'text', $widget['attributes'][0]['type'] );
+		$this->assertSame( 'Compacto', $widget['attributes'][0]['elements'][0]['label'] );
+		$this->assertSame( 'Menos detalles.', $widget['attributes'][0]['elements'][0]['description'] );
 		$this->assertSame( 'dashboard', $widget['category'] );
 	}
 
@@ -396,11 +427,161 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Every download value but `false` keeps the download: a usable filename
+	 * survives sanitization, anything else falls back to the original name.
+	 */
+	public function test_sanitize_widget_actions_keeps_download_intent() {
+		$href = 'https://wordpress.org/export.csv';
+
+		$actions = gutenberg_sanitize_widget_actions(
+			array(
+				array(
+					'id'       => 'empty',
+					'label'    => 'Empty string',
+					'href'     => $href,
+					'download' => '',
+				),
+				array(
+					'id'       => 'zero',
+					'label'    => 'Zero',
+					'href'     => $href,
+					'download' => '0',
+				),
+				array(
+					'id'       => 'unusable',
+					'label'    => 'Unusable name',
+					'href'     => $href,
+					'download' => '???',
+				),
+				array(
+					'id'       => 'flag',
+					'label'    => 'Boolean true',
+					'href'     => $href,
+					'download' => true,
+				),
+				array(
+					'id'       => 'off',
+					'label'    => 'Boolean false',
+					'href'     => $href,
+					'download' => false,
+				),
+			)
+		);
+
+		$this->assertSame(
+			array( true, '0', true, true, false ),
+			array_column( $actions, 'download' )
+		);
+	}
+
+	/**
 	 * An empty or non-array actions list normalizes to null.
 	 */
 	public function test_sanitize_widget_actions_requires_entries() {
 		$this->assertNull( gutenberg_sanitize_widget_actions( null ) );
 		$this->assertNull( gutenberg_sanitize_widget_actions( array() ) );
+	}
+
+	/**
+	 * Keeps the JSON-expressible field keys, drops malformed and empty
+	 * ones, and strips the `custom` validation rule.
+	 */
+	public function test_sanitize_widget_attributes_constrains_entries() {
+		$attributes = gutenberg_sanitize_widget_attributes(
+			array(
+				array(
+					'id'          => 'location',
+					'type'        => 'location',
+					'label'       => 'Event location',
+					'description' => 'City or region.',
+					'placeholder' => '',
+					'readOnly'    => 'yes',
+					'isDisabled'  => true,
+					'relevance'   => 'high',
+					'isValid'     => array(
+						'required' => true,
+						'custom'   => 'not-a-rule',
+					),
+					'filterBy'    => array(),
+					'Edit'        => array( 'control' => 'text' ),
+					'render'      => 'ignored',
+				),
+				array(
+					'id'        => 'variant',
+					'elements'  => array(
+						array(
+							'value' => 'compact',
+							'label' => 'Compact',
+						),
+						array( 'value' => 'no-label' ),
+						'not-an-option',
+					),
+					'relevance' => 'urgent',
+					'filterBy'  => false,
+					'format'    => array(),
+					'Edit'      => array(),
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'id'          => 'location',
+					'type'        => 'location',
+					'label'       => 'Event location',
+					'description' => 'City or region.',
+					'isDisabled'  => true,
+					'isValid'     => array( 'required' => true ),
+					'Edit'        => array( 'control' => 'text' ),
+					'relevance'   => 'high',
+				),
+				array(
+					'id'       => 'variant',
+					'elements' => array(
+						array(
+							'value' => 'compact',
+							'label' => 'Compact',
+						),
+					),
+					'filterBy' => false,
+				),
+			),
+			$attributes
+		);
+	}
+
+	/**
+	 * Entries need a unique string `id`; an empty list normalizes to null.
+	 */
+	public function test_sanitize_widget_attributes_requires_unique_ids() {
+		$attributes = gutenberg_sanitize_widget_attributes(
+			array(
+				array(
+					'id'   => 'perPage',
+					'type' => 'integer',
+				),
+				array(
+					'id'   => 'perPage',
+					'type' => 'text',
+				),
+				array( 'type' => 'text' ),
+				array( 'id' => '' ),
+				'perPage',
+			)
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'id'   => 'perPage',
+					'type' => 'integer',
+				),
+			),
+			$attributes
+		);
+		$this->assertNull( gutenberg_sanitize_widget_attributes( null ) );
+		$this->assertNull( gutenberg_sanitize_widget_attributes( array() ) );
 	}
 
 	/**
@@ -430,11 +611,15 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	 */
 	public function translate_to_spanish( $translation, $text, $context, $domain ) {
 		$messages = array(
-			'widget title'           => array( 'Welcome' => 'Bienvenido' ),
-			'widget description'     => array( 'Displays a welcome panel.' => 'Muestra un panel de bienvenida.' ),
-			'widget help content'    => array( 'Welcome at a glance.' => 'Bienvenida de un vistazo.' ),
-			'widget help link label' => array( 'Learn more' => 'Más información' ),
-			'widget keyword'         => array( 'start' => 'inicio' ),
+			'widget title'                        => array( 'Welcome' => 'Bienvenido' ),
+			'widget description'                  => array( 'Displays a welcome panel.' => 'Muestra un panel de bienvenida.' ),
+			'widget help content'                 => array( 'Welcome at a glance.' => 'Bienvenida de un vistazo.' ),
+			'widget help link label'              => array( 'Learn more' => 'Más información' ),
+			'widget attribute label'              => array( 'Variant' => 'Variante' ),
+			'widget attribute header'             => array( 'Kind' => 'Tipo' ),
+			'widget attribute option label'       => array( 'Compact' => 'Compacto' ),
+			'widget attribute option description' => array( 'Fewer details.' => 'Menos detalles.' ),
+			'widget keyword'                      => array( 'start' => 'inicio' ),
 		);
 
 		if ( 'default' === $domain && isset( $messages[ $context ][ $text ] ) ) {

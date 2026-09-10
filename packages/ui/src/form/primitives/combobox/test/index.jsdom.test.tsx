@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -68,6 +69,7 @@ describe( 'Combobox', () => {
 		const chipWithRemoveRef = createRef< HTMLDivElement >();
 		const clearRef = createRef< HTMLButtonElement >();
 		const emptyRef = createRef< HTMLDivElement >();
+		const statusRef = createRef< HTMLDivElement >();
 
 		render(
 			<Combobox.Root items={ ITEMS } defaultValue={ ITEMS[ 0 ] }>
@@ -87,6 +89,9 @@ describe( 'Combobox', () => {
 							<Combobox.Clear ref={ clearRef } />
 						</Combobox.Chips>
 					</Combobox.Value>
+					<Combobox.Status ref={ statusRef }>
+						Loading...
+					</Combobox.Status>
 					<Combobox.Empty ref={ emptyRef }>
 						No results found.
 					</Combobox.Empty>
@@ -135,6 +140,7 @@ describe( 'Combobox', () => {
 		expect( chipWithRemoveRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( statusRef.current ).toBeInstanceOf( HTMLDivElement );
 	} );
 
 	it( 'uses a custom positioner', async () => {
@@ -237,7 +243,7 @@ describe( 'Combobox', () => {
 	// verifies the behavioral contract, not the CSS fix itself.
 	it( 'allows selecting items when Empty is rendered after List', async () => {
 		const user = userEvent.setup();
-		const onValueChange = jest.fn();
+		const onValueChange = vi.fn();
 
 		render(
 			<Combobox.Root

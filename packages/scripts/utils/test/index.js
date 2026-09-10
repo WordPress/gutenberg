@@ -1,56 +1,45 @@
-import crossSpawn from 'cross-spawn';
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
+	afterAll,
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	test,
+	vi,
+} from 'vitest';
+const require = createRequire( import.meta.url );
+const currentDirectory = path.dirname( fileURLToPath( import.meta.url ) );
+const crossSpawn = require( 'cross-spawn' );
+const processUtils = require( '../process' );
+const getArgsFromCLIMock = vi.spyOn( processUtils, 'getArgsFromCLI' );
+const exitMock = vi.spyOn( processUtils, 'exit' );
+const packageUtils = require( '../package' );
+const getPackagePathMock = vi.spyOn( packageUtils, 'getPackagePath' );
+const hasPackagePropMock = vi.spyOn( packageUtils, 'hasPackageProp' );
+const fileUtils = require( '../file' );
+const hasProjectFileMock = vi.spyOn( fileUtils, 'hasProjectFile' );
+const fromProjectRootMock = vi.spyOn( fileUtils, 'fromProjectRoot' );
+const fromConfigRootMock = vi.spyOn( fileUtils, 'fromConfigRoot' );
+let crossSpawnMock = vi.spyOn( crossSpawn, 'sync' );
+const {
 	hasArgInCLI,
 	hasProjectFile,
 	getJestOverrideConfigFile,
 	getWebpackArgs,
 	spawnScript,
-} from '../';
-import {
-	getPackagePath as getPackagePathMock,
-	hasPackageProp as hasPackagePropMock,
-} from '../package';
-import {
-	exit as exitMock,
-	getArgsFromCLI as getArgsFromCLIMock,
-} from '../process';
-import {
-	hasProjectFile as hasProjectFileMock,
-	fromProjectRoot as fromProjectRootMock,
-	fromConfigRoot as fromConfigRootMock,
-} from '../file';
+} = require( '../' );
 
-jest.mock( '../package', () => {
-	const module = jest.requireActual( '../package' );
-
-	jest.spyOn( module, 'getPackagePath' );
-	jest.spyOn( module, 'hasPackageProp' );
-
-	return module;
-} );
-jest.mock( '../process', () => {
-	const module = jest.requireActual( '../process' );
-
-	jest.spyOn( module, 'exit' );
-	jest.spyOn( module, 'getArgsFromCLI' );
-
-	return module;
-} );
-jest.mock( '../file', () => {
-	const module = jest.requireActual( '../file' );
-
-	jest.spyOn( module, 'hasProjectFile' );
-	jest.spyOn( module, 'fromProjectRoot' );
-	jest.spyOn( module, 'fromConfigRoot' );
-
-	return module;
+beforeEach( () => {
+	crossSpawnMock = vi.spyOn( crossSpawn, 'sync' );
 } );
 
 describe( 'utils', () => {
-	const crossSpawnMock = jest.spyOn( crossSpawn, 'sync' );
-
 	describe( 'hasArgInCLI', () => {
-		beforeAll( () => {
+		beforeEach( () => {
 			getArgsFromCLIMock.mockReturnValue( [
 				'-a',
 				'--b',
@@ -81,13 +70,13 @@ describe( 'utils', () => {
 
 	describe( 'hasProjectFile', () => {
 		test( 'should return false for the current directory and unknown file', () => {
-			getPackagePathMock.mockReturnValueOnce( __dirname );
+			getPackagePathMock.mockReturnValueOnce( currentDirectory );
 
 			expect( hasProjectFile( 'unknown-file.name' ) ).toBe( false );
 		} );
 
 		test( 'should return true for the current directory and this file', () => {
-			getPackagePathMock.mockReturnValueOnce( __dirname );
+			getPackagePathMock.mockReturnValueOnce( currentDirectory );
 
 			expect( hasProjectFile( 'index.js' ) ).toBe( true );
 		} );
@@ -98,8 +87,12 @@ describe( 'utils', () => {
 			getArgsFromCLIMock.mockReturnValue( [] );
 			hasPackagePropMock.mockReturnValue( false );
 			hasProjectFileMock.mockReturnValue( false );
-			fromProjectRootMock.mockImplementation( ( path ) => '/p/' + path );
-			fromConfigRootMock.mockImplementation( ( path ) => '/c/' + path );
+			fromProjectRootMock.mockImplementation(
+				( filePath ) => '/p/' + filePath
+			);
+			fromConfigRootMock.mockImplementation(
+				( filePath ) => '/c/' + filePath
+			);
 		} );
 
 		afterEach( () => {
@@ -170,8 +163,12 @@ describe( 'utils', () => {
 	describe( 'getWebpackArgs', () => {
 		beforeEach( () => {
 			hasProjectFileMock.mockReturnValue( false );
-			fromProjectRootMock.mockImplementation( ( path ) => '/p/' + path );
-			fromConfigRootMock.mockImplementation( ( path ) => '/c/' + path );
+			fromProjectRootMock.mockImplementation(
+				( filePath ) => '/p/' + filePath
+			);
+			fromConfigRootMock.mockImplementation(
+				( filePath ) => '/c/' + filePath
+			);
 		} );
 
 		afterEach( () => {
@@ -201,7 +198,7 @@ describe( 'utils', () => {
 	describe( 'spawnScript', () => {
 		const scriptName = 'test-unit-js';
 
-		beforeAll( () => {
+		beforeEach( () => {
 			exitMock.mockImplementation( ( code ) => {
 				throw new Error( `Exit code: ${ code }.` );
 			} );

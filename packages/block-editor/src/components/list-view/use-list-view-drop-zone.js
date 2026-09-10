@@ -557,7 +557,7 @@ export default function useListViewDropZone( {
 		},
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being
-			// handled, so get it now and pass it to the thottled function.
+			// handled, so get it now and pass it to the throttled function.
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
 			throttled( event, event.currentTarget );
 		},

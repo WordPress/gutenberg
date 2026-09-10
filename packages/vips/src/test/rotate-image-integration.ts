@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import type VipsFactory from 'wasm-vips';
 import { rotateImage } from '../';
 
 /**
@@ -28,17 +29,31 @@ import { rotateImage } from '../';
  * See https://github.com/WordPress/gutenberg/issues/79383.
  */
 
-jest.mock( 'wasm-vips', () => {
-	const RealVips = jest.requireActual( 'wasm-vips' );
-	return jest.fn( ( options: Record< string, unknown > = {} ) =>
-		RealVips( { dynamicLibraries: options.dynamicLibraries } )
-	);
+vi.mock( import( 'wasm-vips' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		default: vi.fn( ( options: { dynamicLibraries?: string[] } = {} ) =>
+			original.default( {
+				dynamicLibraries: options.dynamicLibraries,
+			} )
+		) as unknown as typeof original.default,
+	};
 } );
 
-const FIXTURES = join( __dirname, 'fixtures' );
+/**
+ * Returns a fixture URL relative to this ESM test module.
+ *
+ * @param file Fixture filename.
+ *
+ * @return Fixture URL.
+ */
+const getFixtureUrl = ( file: string ) =>
+	new URL( `./fixtures/${ file }`, import.meta.url );
 
 const loadFixture = ( file: string ): ArrayBuffer => {
-	const contents = readFileSync( join( FIXTURES, file ) );
+	const contents = readFileSync( getFixtureUrl( file ) );
 	return contents.buffer.slice(
 		contents.byteOffset,
 		contents.byteOffset + contents.byteLength
@@ -49,11 +64,25 @@ const loadFixture = ( file: string ): ArrayBuffer => {
 const isRed = ( [ r, , b ]: number[] ) => r > 128 && r > b;
 const isBlue = ( [ r, , b ]: number[] ) => b > 128 && b > r;
 
+/**
+ * Colour type 3 in a PNG header means the image is palette (indexed) encoded.
+ */
+const PNG_COLOR_TYPE_INDEXED = 3;
+
+/*
+ * A PNG's IHDR chunk always comes first: an 8-byte signature, a 4-byte length,
+ * the 4-byte chunk type, then width (4), height (4), bit depth (1) and colour
+ * type (1). That puts the colour type at a fixed offset of 25.
+ */
+const pngColorType = ( bytes: Uint8Array ): number => bytes[ 25 ];
+
 describe( 'rotateImage EXIF orientation fixtures', () => {
-	let vips: any;
+	let vips: Awaited< ReturnType< typeof VipsFactory > >;
 
 	beforeAll( async () => {
-		const Vips = jest.requireActual( 'wasm-vips' );
+		const { default: Vips } = await vi.importActual< {
+			default: typeof VipsFactory;
+		} >( 'wasm-vips' );
 		vips = await Vips( { dynamicLibraries: [ 'vips-heif.wasm' ] } );
 	} );
 
@@ -116,7 +145,9 @@ describe( 'rotateImage EXIF orientation fixtures', () => {
 			expect( result.width ).toBe( width );
 			expect( result.height ).toBe( height );
 
-			const rotated = vips.Image.newFromBuffer( result.buffer );
+			const rotated = vips.Image.newFromBuffer(
+				result.buffer as ArrayBuffer
+			);
 			expect( rotated.width ).toBe( width );
 			expect( rotated.height ).toBe( height );
 
@@ -176,9 +207,42 @@ describe( 'rotateImage EXIF orientation fixtures', () => {
 				6
 			);
 
-			const rotated = vips.Image.newFromBuffer( result.buffer );
+			const rotated = vips.Image.newFromBuffer(
+				result.buffer as ArrayBuffer
+			);
 			expect( reportedOrientation( rotated ) ).toBe( 1 );
 			rotated.delete();
 		}
 	);
+
+	it( 'keeps a rotated indexed PNG indexed', async () => {
+		/*
+		 * Rotating is the third path that writes a PNG, alongside resizing and
+		 * converting. It writes the full-size file, so dropping the palette
+		 * here inflates the image the user actually uploaded.
+		 * See https://github.com/WordPress/gutenberg/issues/81895.
+		 */
+		const source = vips.Image.newFromBuffer(
+			loadFixture( 'exif-rotated-90cw.jpg' )
+		);
+		const indexedPng: Uint8Array = source.writeToBuffer( '.png', {
+			palette: true,
+		} );
+		source.delete();
+
+		// Premise check: the generated source really is indexed, so a
+		// truecolour result below can only come from the rotation.
+		expect( pngColorType( indexedPng ) ).toBe( PNG_COLOR_TYPE_INDEXED );
+
+		const result = await rotateImage(
+			'test-item',
+			indexedPng.buffer as ArrayBuffer,
+			'image/png',
+			6
+		);
+
+		expect( pngColorType( new Uint8Array( result.buffer ) ) ).toBe(
+			PNG_COLOR_TYPE_INDEXED
+		);
+	} );
 } );

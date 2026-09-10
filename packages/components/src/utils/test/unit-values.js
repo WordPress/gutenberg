@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { createCSSUnitValue, parseCSSUnitValue } from '../unit-values';
 
 describe( 'unit-values', () => {

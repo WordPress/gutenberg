@@ -2,7 +2,7 @@
 
 .content-wrapper {
 	// Negative margin to reset (offset) the default padding on .components-popover__content.
-	/* stylelint-disable plugin/use-logical-properties-and-values -- Preserve the previous physical offsets against Popover padding. */
+	/* stylelint-disable logical-css/require-logical-properties -- Preserve the previous physical offsets against Popover padding. */
 	margin-left: -$grid-unit-10;
 	margin-right: -$grid-unit-10;
 
@@ -13,7 +13,7 @@
 	&:last-of-type {
 		margin-bottom: -$grid-unit-10;
 	}
-	/* stylelint-enable plugin/use-logical-properties-and-values */
+	/* stylelint-enable logical-css/require-logical-properties */
 }
 
 .padding-small {

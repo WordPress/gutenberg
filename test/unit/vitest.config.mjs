@@ -5,23 +5,24 @@ import { fileURLToPath } from 'node:url';
 import { playwright } from '@vitest/browser-playwright';
 import react from '@vitejs/plugin-react-swc';
 import { globSync } from 'glob';
-import commonjs from 'vite-plugin-commonjs';
 import { defineConfig } from 'vitest/config';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
 } from './scripts/discover-test-files.mjs';
+import { compileInlineStyle } from '../../packages/wp-build/lib/compile-inline-style.mjs';
 
-const ROOT_DIR = path.resolve(
-	path.dirname( fileURLToPath( import.meta.url ) ),
-	'../..'
-);
+const CONFIG_DIR = path.dirname( fileURLToPath( import.meta.url ) );
+const ROOT_DIR = path.resolve( CONFIG_DIR, '../..' );
 const nodeRequire = createRequire( import.meta.url );
 const emotionPlugin = nodeRequire.resolve( '@swc/plugin-emotion' );
-const NORMALIZED_ROOT_DIR = ROOT_DIR.split( path.sep ).join( '/' );
 const gutenbergEnvSetupFile = path.join(
 	ROOT_DIR,
 	'test/unit/config/gutenberg-env.js'
+);
+const isolationSetupFile = path.join(
+	ROOT_DIR,
+	'test/unit/config/isolation.vitest.js'
 );
 const testMigration = JSON.parse(
 	readFileSync(
@@ -36,6 +37,54 @@ const vitestTests = getVitestTestsByProject(
 const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,
 	replacement: path.join( ROOT_DIR, 'test/unit/config/style-mock.vitest.js' ),
+};
+const WP_BUILD_CSS_MODULE_STYLE_FIXTURE_ID = 'virtual:wp-build-style-injection';
+const WP_BUILD_ORDINARY_STYLE_FIXTURE_ID =
+	'virtual:wp-build-ordinary-style-injection';
+const wpBuildStyleFixtureSources = new Map( [
+	[
+		WP_BUILD_CSS_MODULE_STYLE_FIXTURE_ID,
+		await compileInlineStyle( {
+			cssModules: true,
+			minify: false,
+		} )(
+			`@layer wp-build-test {
+				.fixture {
+					--wp-build-style-injection-test: true;
+					color: rgb(1, 2, 3);
+				}
+			}`,
+			ROOT_DIR,
+			path.join(
+				ROOT_DIR,
+				'test/unit/config/wp-build-style-fixture.module.css'
+			)
+		),
+	],
+	[
+		WP_BUILD_ORDINARY_STYLE_FIXTURE_ID,
+		await compileInlineStyle( { minify: false } )(
+			`.ordinary-fixture {
+				background-color: rgb(4, 5, 6);
+			}`,
+			ROOT_DIR,
+			path.join(
+				ROOT_DIR,
+				'test/unit/config/wp-build-ordinary-style-fixture.css'
+			)
+		),
+	],
+] );
+const wpBuildStyleFixturePlugin = {
+	name: 'wp-build-style-injection-fixture',
+	resolveId( id ) {
+		return wpBuildStyleFixtureSources.has( id ) ? `\0${ id }` : null;
+	},
+	load( id ) {
+		return id.startsWith( '\0' )
+			? wpBuildStyleFixtureSources.get( id.slice( 1 ) ) ?? null
+			: null;
+	},
 };
 const reporters = [ 'default' ];
 
@@ -59,9 +108,10 @@ if (
 	] );
 }
 
-// Preserve Jest's repository-root configuration discovery and default timezone.
+// Preserve repository-root configuration discovery and default to UTC while
+// allowing the date-test matrix to supply another timezone.
 process.chdir( ROOT_DIR );
-process.env.TZ = 'UTC';
+process.env.TZ ||= 'UTC';
 
 const transpiledPackageNames = globSync(
 	'packages/*/src/index.{js,jsx,ts,tsx}',
@@ -81,6 +131,7 @@ export default defineConfig( {
 		},
 	},
 	plugins: [
+		wpBuildStyleFixturePlugin,
 		react( {
 			plugins: [
 				[
@@ -91,17 +142,6 @@ export default defineConfig( {
 					},
 				],
 			],
-		} ),
-		commonjs( {
-			filter: ( id ) =>
-				[
-					`${ NORMALIZED_ROOT_DIR }/packages/block-serialization-spec-parser/parser.js`,
-					`${ NORMALIZED_ROOT_DIR }/packages/env/lib/`,
-					`${ NORMALIZED_ROOT_DIR }/packages/project-management-automation/lib/`,
-					`${ NORMALIZED_ROOT_DIR }/packages/scripts/utils/`,
-					`${ NORMALIZED_ROOT_DIR }/tools/release/commands/changelog.js`,
-				].some( ( directory ) => id.startsWith( directory ) ) &&
-				! id.endsWith( '/packages/scripts/utils/license.js' ),
 		} ),
 	],
 	resolve: {
@@ -178,6 +218,7 @@ export default defineConfig( {
 							ROOT_DIR,
 							'test/unit/config/console.vitest.js'
 						),
+						isolationSetupFile,
 					],
 				},
 			},
@@ -214,31 +255,67 @@ export default defineConfig( {
 							ROOT_DIR,
 							'test/unit/config/testing-library.vitest.js'
 						),
+						isolationSetupFile,
 					],
 				},
 			},
 			{
 				extends: true,
+				/*
+				 * Browser mode pre-bundles the Vitest runtime, which Vite resolves
+				 * from the project root. Root the project where the test
+				 * dependencies are declared so resolution stays layout agnostic.
+				 */
+				root: CONFIG_DIR,
+				optimizeDeps: {
+					entries: vitestTests.browser.map( ( testPath ) =>
+						path.join( ROOT_DIR, testPath )
+					),
+				},
 				test: {
 					name: 'browser',
+					dir: ROOT_DIR,
+					attachmentsDir: path.join(
+						ROOT_DIR,
+						'test-results/vitest-browser-attachments'
+					),
 					include: vitestTests.browser,
 					setupFiles: [
 						path.join(
 							ROOT_DIR,
+							'test/unit/config/browser.vitest.js'
+						),
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/gutenberg-env.js'
+						),
+						path.join(
+							ROOT_DIR,
 							'test/unit/config/console.vitest.js'
 						),
+						isolationSetupFile,
 					],
 					browser: {
 						enabled: true,
 						headless: true,
 						instances: [ { browser: 'chromium' } ],
 						provider: playwright(),
+						screenshotDirectory: path.join(
+							ROOT_DIR,
+							'test-results/vitest-browser-screenshots'
+						),
+						screenshotFailures: true,
 					},
 				},
 			},
 		],
+		// mockReset already clears every mock. Keep clearMocks disabled to make
+		// that overlap explicit and avoid a redundant cleanup pass.
+		clearMocks: false,
 		globals: false,
 		includeTaskLocation: true,
+		isolate: true,
+		mockReset: true,
 		passWithNoTests: false,
 		reporters,
 		sequence: {
@@ -249,5 +326,8 @@ export default defineConfig( {
 			escapeString: false,
 			printBasicPrototype: false,
 		},
+		restoreMocks: true,
+		unstubEnvs: true,
+		unstubGlobals: true,
 	},
 } );
