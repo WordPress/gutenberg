@@ -16,6 +16,7 @@
 
 ### Bug Fixes
 
+-   Image: Size the lightbox container from the original image's aspect ratio instead of the displayed thumbnail's, so a cropped size such as a square thumbnail no longer opens a lightbox with the wrong proportions ([#79058](https://github.com/WordPress/gutenberg/pull/79058)).
 -   Footnotes: Prefix newly created footnote IDs with `fn-` so they always start with a letter. A bare UUID often starts with a digit, and an ID that does is not a valid CSS identifier, so `querySelector( '#' + id )` threw and `#id` style rules never matched. Existing footnotes keep their IDs ([#82398](https://github.com/WordPress/gutenberg/pull/82398)).
 -   Navigation: Restore `flex-grow` on the menu container in the editor, where the visually hidden menu description breaks the `:only-child` selector the front end relies on, so the "Space between" and other justification settings apply in the canvas as they do on the front end ([#78447](https://github.com/WordPress/gutenberg/pull/78447)).
 -   Image: Fix cropped galleries rendering images at their natural height in the editor canvas. The baseline inline `height: auto` is no longer emitted for images inside a cropped gallery, so the gallery's own cropping CSS applies ([#82318](https://github.com/WordPress/gutenberg/pull/82318)).
