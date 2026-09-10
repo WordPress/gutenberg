@@ -3,38 +3,20 @@ import { render, screen } from '@testing-library/react';
 import BoxControlIcon from '../icon';
 
 describe( 'BoxControlIcon', () => {
-	it( 'renders a span when the element is undefined', () => {
-		render( <BoxControlIcon as={ undefined } title="Selected sides" /> );
+	/* eslint-disable jest-dom/prefer-to-have-style -- These tests assert inline props, not computed styles. */
+	it( 'renders the default element with the generated scale', () => {
+		render( <BoxControlIcon size={ 36 } title="Selected sides" /> );
 
-		expect( screen.getByTitle( 'Selected sides' ).tagName ).toBe( 'SPAN' );
+		const icon = screen.getByTitle( 'Selected sides' );
+		expect( icon.tagName ).toBe( 'SPAN' );
+		expect( icon.style.transform ).toBe( 'scale(1.5)' );
 	} );
 
-	it( 'renders the requested element with consumer props', () => {
+	it( 'forwards consumer props to the requested element', () => {
 		render(
 			<BoxControlIcon
 				as="i"
 				className="custom-icon"
-				title="Selected sides"
-			/>
-		);
-
-		const icon = screen.getByTitle( 'Selected sides' );
-		expect( icon.tagName ).toBe( 'I' );
-		expect( icon ).toHaveClass( 'custom-icon' );
-	} );
-
-	/* eslint-disable jest-dom/prefer-to-have-style -- These tests assert inline props, not computed styles. */
-	it( 'scales the icon to the requested size', () => {
-		render( <BoxControlIcon size={ 36 } title="Selected sides" /> );
-
-		expect( screen.getByTitle( 'Selected sides' ).style.transform ).toBe(
-			'scale(1.5)'
-		);
-	} );
-
-	it( 'lets consumer styles replace the generated scale', () => {
-		render(
-			<BoxControlIcon
 				size={ 36 }
 				style={ { color: 'red' } }
 				title="Selected sides"
@@ -42,6 +24,8 @@ describe( 'BoxControlIcon', () => {
 		);
 
 		const icon = screen.getByTitle( 'Selected sides' );
+		expect( icon.tagName ).toBe( 'I' );
+		expect( icon ).toHaveClass( 'custom-icon' );
 		expect( icon.style.color ).toBe( 'red' );
 		expect( icon.style.transform ).toBe( '' );
 	} );
