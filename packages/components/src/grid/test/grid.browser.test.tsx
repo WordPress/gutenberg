@@ -109,6 +109,22 @@ describe( 'props', () => {
 		expect( style.justifyContent ).toBe( 'space-between' );
 	} );
 
+	test( 'should ignore unsupported runtime alignment values', async () => {
+		await render(
+			<Grid
+				// @ts-expect-error Runtime JavaScript consumers can pass unsupported values.
+				alignment="unsupported"
+				data-testid="grid"
+			>
+				<View />
+			</Grid>
+		);
+
+		const style = readStyle();
+		expect( style.alignItems ).toBe( 'normal' );
+		expect( style.justifyContent ).toBe( 'normal' );
+	} );
+
 	test( 'should render justify', async () => {
 		await render(
 			<Grid justify="flex-start" data-testid="grid">
@@ -451,7 +467,11 @@ describe( 'style composition', () => {
 			screen.getByRole( 'link', { name: 'Grid link' } )
 		);
 		expect( ref.current?.getAttribute( 'href' ) ).toBe( '#target' );
-		expect( ref.current?.classList.contains( 'components-grid' ) ).toBe( true );
-		expect( ref.current?.classList.contains( 'consumer-class' ) ).toBe( true );
+		expect( ref.current?.classList.contains( 'components-grid' ) ).toBe(
+			true
+		);
+		expect( ref.current?.classList.contains( 'consumer-class' ) ).toBe(
+			true
+		);
 	} );
 } );
