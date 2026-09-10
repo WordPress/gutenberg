@@ -19,9 +19,14 @@
 -   Preserve Lightning CSS `from global` references and keep nested fallback variables global when injecting design token fallbacks ([#83359](https://github.com/WordPress/gutenberg/pull/83359)).
 -   Mark the `react` and `react-dom` peer dependencies as optional, since the design tokens and build tool plugins do not need them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
 
+### Enhancements
+
+-   Generate perception-aware color ramps with ordered surface and stroke progressions, preserve available surface spacing near black and white, align normal content with resting interactive colors, reserve the fifth foreground step for interaction states, and keep WCAG contrast floors unchanged. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+
 ### Internal
 
 -   Generate and commit complete border radius and width tokens for Figma mode imports during the theme build. ([#84035](https://github.com/WordPress/gutenberg/pull/84035))
+-   Register color spaces only when calculating colors, avoiding module-import side effects. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Update the Vite development dependency to 8.3.2 ([#83992](https://github.com/WordPress/gutenberg/pull/83992)).
 -   Update the Vite development dependency to 8.3.1. ([#83569](https://github.com/WordPress/gutenberg/pull/83569))
 -   Restore color-scale Storybook accessibility checks with labeled color samples, readable seed labels, and keyboard scrolling ([#83358](https://github.com/WordPress/gutenberg/pull/83358)).
@@ -49,7 +54,6 @@
 
 ### Enhancements
 
--   Generate perception-aware color ramps with ordered surface and stroke progressions, preserve available surface spacing near black and white, align normal content with resting interactive colors, reserve the fifth foreground step for interaction states, and keep WCAG contrast floors unchanged. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Add a Lightning CSS visitor plugin that injects design system token fallbacks, available as `@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks`, with an optional peer range of `>=1.33.0 <2.0.0`. ([#80401](https://github.com/WordPress/gutenberg/pull/80401))
 
 ### Bug Fixes
@@ -66,7 +70,6 @@
 -   Reuse seed-dependent calculations during color-ramp constraint searches. ([#82545](https://github.com/WordPress/gutenberg/pull/82545))
 -   Generate the default ramps before derived token artifacts so one build uses the current ramp algorithm throughout. ([#82525](https://github.com/WordPress/gutenberg/pull/82525))
 -   Cache relative luminance calculations used by color-ramp contrast checks. ([#82445](https://github.com/WordPress/gutenberg/pull/82445))
--   Register color spaces only when calculating colors, avoiding module-import side effects. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Enforce NodeNext module resolution in the build project so future declaration imports are checked against the package's published ESM resolution rules. ([#82088](https://github.com/WordPress/gutenberg/pull/82088))
 -   Update the `@types/node` development dependency to v24, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
 -   Declare the `@storybook/addon-docs` development dependency used by the package's story documentation ([#82676](https://github.com/WordPress/gutenberg/pull/82676)).
