@@ -1,14 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
+import { userEvent } from 'vitest/browser';
 import { useState, useRef } from '@wordpress/element';
 import { ValidatedRangeControl } from '../components';
 
-globalThis.wpVitest.mockMatchMedia();
-
 describe( 'ValidatedRangeControl', () => {
-	it( 'should preserve the help description', () => {
-		render(
+	it( 'should preserve the help description', async () => {
+		await render(
 			<ValidatedRangeControl label="Opacity" help="Set the opacity." />
 		);
 
@@ -57,7 +56,7 @@ describe( 'ValidatedRangeControl', () => {
 			);
 		}
 
-		render( <TestComponent /> );
+		await render( <TestComponent /> );
 
 		const slider = screen.getByRole( 'slider', { name: 'Opacity' } );
 		expect( slider ).toHaveAccessibleDescription( 'Set the opacity.' );

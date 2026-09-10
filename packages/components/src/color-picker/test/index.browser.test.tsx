@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import { ColorPicker } from '..';
@@ -603,14 +603,23 @@ describe( 'ColorPicker', () => {
 			const bounds = element.getBoundingClientRect();
 			expect( bounds.width ).toBeGreaterThan( 0 );
 			expect( bounds.height ).toBeGreaterThan( 0 );
-			const clientX = bounds.left + bounds.width * x;
-			const clientY = bounds.top + bounds.height * y;
-			return {
-				clientX,
-				clientY,
-				pageX: clientX + window.scrollX,
-				pageY: clientY + window.scrollY,
-			};
+			return { x: bounds.width * x, y: bounds.height * y };
+		};
+
+		const dragToBlack = async ( element: HTMLElement ) => {
+			// Black is at the bottom boundary, just outside the slider's hit area.
+			// Release over the picker below it so native mouse movement reaches v = 0.
+			// eslint-disable-next-line testing-library/no-node-access -- The picker background has no accessible role.
+			const picker = element.closest< HTMLElement >( '.react-colorful' )!;
+			const bounds = element.getBoundingClientRect();
+			const pickerBounds = picker.getBoundingClientRect();
+			await userEvent.dragAndDrop( element, picker, {
+				sourcePosition: pointAt( element, 0.8, 0.5 ),
+				targetPosition: {
+					x: bounds.left - pickerBounds.left + bounds.width * 0.8,
+					y: bounds.bottom - pickerBounds.top + 1,
+				},
+			} );
 		};
 
 		const getPointerPosition = ( pointer: HTMLElement ) => {
@@ -686,11 +695,8 @@ describe( 'ColorPicker', () => {
 			) as HTMLElement;
 			expect( parseFloat( pointer.style.left ) ).toBeGreaterThan( 50 );
 
-			// Click the bottom of the saturation surface (v = 0) at ~80% saturation.
-			fireEvent.mouseDown( interactive, {
-				buttons: 1,
-				...pointAt( interactive, 0.8, 1 ),
-			} );
+			// Drag to the bottom of the saturation surface at 80% saturation.
+			await dragToBlack( interactive );
 
 			expectPointerPosition( pointer, { top: 100 } );
 			// Lossy HSVA→HSLA→HSVA sync would snap left to 0%.
@@ -716,30 +722,7 @@ describe( 'ColorPicker', () => {
 				'.react-colorful__saturation-pointer'
 			) as HTMLElement;
 
-			// Full pointer lifecycle so isPointerInteractingRef is exercised
-			// and prevHslaRef stays in sync across mid-gesture parent updates.
-			fireEvent.pointerDown( interactive, {
-				pointerId: 1,
-				buttons: 1,
-				...pointAt( interactive, 0.8, 0.5 ),
-			} );
-			fireEvent.mouseDown( interactive, {
-				buttons: 1,
-				...pointAt( interactive, 0.8, 0.5 ),
-			} );
-			fireEvent.mouseMove( interactive, {
-				buttons: 1,
-				...pointAt( interactive, 0.8, 1 ),
-			} );
-			fireEvent.pointerUp( interactive, {
-				pointerId: 1,
-				buttons: 0,
-				...pointAt( interactive, 0.8, 1 ),
-			} );
-			fireEvent.mouseUp( interactive, {
-				buttons: 0,
-				...pointAt( interactive, 0.8, 1 ),
-			} );
+			await dragToBlack( interactive );
 
 			expectPointerPosition( pointer, { top: 100 } );
 			expect( getPointerPosition( pointer ).left ).toBeGreaterThan( 50 );
@@ -904,9 +887,8 @@ describe( 'ColorPicker', () => {
 
 			const colorSlider = screen.getByRole( 'slider', { name: 'Color' } );
 			onChange.mockClear();
-			fireEvent.mouseDown( colorSlider, {
-				buttons: 1,
-				...pointAt( colorSlider, 0.5, 0 ),
+			await userEvent.click( colorSlider, {
+				position: pointAt( colorSlider, 0.5, 0 ),
 			} );
 
 			expect( onChange ).toHaveBeenLastCalledWith( '#80d4ff' );
@@ -933,9 +915,8 @@ describe( 'ColorPicker', () => {
 
 			const colorSlider = screen.getByRole( 'slider', { name: 'Color' } );
 			onChange.mockClear();
-			fireEvent.mouseDown( colorSlider, {
-				buttons: 1,
-				...pointAt( colorSlider, 0.5, 0.5 ),
+			await userEvent.click( colorSlider, {
+				position: pointAt( colorSlider, 0.5, 0.5 ),
 			} );
 
 			expect( onChange ).toHaveBeenLastCalledWith( '#416c81' );
