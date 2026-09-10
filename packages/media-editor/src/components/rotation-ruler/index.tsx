@@ -194,6 +194,7 @@ export default function RotationRuler( props: RotationRulerProps ) {
 		<div
 			className={ clsx( 'rotation-ruler', className ) }
 			role="presentation"
+			data-testid="rotation-ruler"
 			data-disabled={ disabled || undefined }
 			{ ...dragHandlers }
 		>

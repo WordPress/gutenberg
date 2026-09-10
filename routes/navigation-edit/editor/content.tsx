@@ -19,7 +19,7 @@ type Block = {
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
-// Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
+// Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.jsx.
 const MAX_PAGE_COUNT = 100;
 const PAGES_QUERY = [
 	'postType',
@@ -40,6 +40,17 @@ export default function NavigationMenuContent( {
 }: {
 	rootClientId: string;
 } ) {
+	// Read from the global rather than imported: `@wordpress/block-library`
+	// is not a script module and only loads with the lazily loaded editor
+	// assets, so a static import here would compile to a read of a global
+	// that does not exist yet when this bundle initializes, capturing
+	// `undefined` (and crashing the screen). This component only renders once
+	// `useEditorAssets` reports the assets ready, which is exactly when the
+	// global is defined — do not "clean this up" into an import.
+	const { NavigationLinkUI } = unlock(
+		( window as any ).wp.blockLibrary.privateApis
+	);
+
 	const { listViewRootClientId, isLoading } = useSelect(
 		( select ) => {
 			const {
@@ -105,7 +116,8 @@ export default function NavigationMenuContent( {
 					rootClientId={ listViewRootClientId }
 					onSelect={ offCanvasOnselect }
 					blockSettingsMenu={ LeafMoreMenu }
-					showAppender={ false }
+					showAppender
+					additionalBlockContent={ NavigationLinkUI }
 					isExpanded
 				/>
 			) }

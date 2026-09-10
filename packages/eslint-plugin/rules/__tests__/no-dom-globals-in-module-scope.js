@@ -1,5 +1,9 @@
-import { RuleTester } from 'eslint';
+import typescriptParser from '@typescript-eslint/parser';
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule from '../no-dom-globals-in-module-scope';
+
+const RuleTester = configureRuleTester( { describe, it } );
 
 const ruleTester = new RuleTester( {
 	languageOptions: {
@@ -87,7 +91,7 @@ ruleTester.run( 'no-dom-globals-in-module-scope', rule, {
 // TypeScript-specific tests for shouldSkipReference.
 const tsRuleTester = new RuleTester( {
 	languageOptions: {
-		parser: require( '@typescript-eslint/parser' ),
+		parser: typescriptParser,
 		ecmaVersion: 2020,
 		sourceType: 'module',
 		parserOptions: {

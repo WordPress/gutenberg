@@ -20,8 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.10.0",
-		"npm": ">=10.2.3"
+		"node": ">=20.10.0"
 	},
 	"files": [
 		"lib"
@@ -38,7 +37,6 @@
 	},
 	"dependencies": {
 		"@inquirer/prompts": "^7.2.0",
-		"@wordpress/lazy-import": "file:../lazy-import",
 		"chalk": "^4.1.1",
 		"change-case": "^4.1.2",
 		"check-node-version": "^4.1.0",

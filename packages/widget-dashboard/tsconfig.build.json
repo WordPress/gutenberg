@@ -14,7 +14,6 @@
 		{ "path": "../grid/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../style-runtime/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },

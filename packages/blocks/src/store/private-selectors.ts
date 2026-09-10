@@ -342,10 +342,13 @@ export const getBlockKeyboardShortcuts = createSelector(
 			const transforms = state.blockTypes[ blockName ]?.transforms;
 
 			for ( const transform of transforms?.to ?? [] ) {
+				if ( transform.type !== 'block' ) {
+					continue;
+				}
 				// A `to` transform can list several target blocks, but a shortcut
 				// can only produce one of them. The first is used.
 				const targetBlockName = transform.blocks?.[ 0 ];
-				if ( transform.type !== 'block' || ! targetBlockName ) {
+				if ( ! targetBlockName ) {
 					continue;
 				}
 				for ( const shortcut of transform.shortcuts ?? [] ) {

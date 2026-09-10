@@ -40,6 +40,7 @@ const DEFAULT_STATE: State = {
 		maxConcurrentImageProcessing: DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
 		retry: { ...DEFAULT_RETRY_SETTINGS },
 	},
+	failureCount: 0,
 };
 
 type Action =
@@ -115,9 +116,22 @@ function reducer(
 				queue: [ ...state.queue, action.item ],
 			};
 
-		case Type.Cancel:
+		case Type.Cancel: {
+			/*
+			 * Only top-level items count as failures. A sub-size that fails on
+			 * its own does not stop the attachment from being uploaded, and a
+			 * sub-size failure bad enough to sink the whole attachment cancels
+			 * the parent too - which is the cancellation counted here.
+			 */
+			const cancelled = state.queue.find(
+				( item ) => item.id === action.id
+			);
 			return {
 				...state,
+				failureCount:
+					cancelled && ! cancelled.parentId
+						? state.failureCount + 1
+						: state.failureCount,
 				queue: state.queue.map(
 					( item ): QueueItem =>
 						item.id === action.id
@@ -128,6 +142,7 @@ function reducer(
 							: item
 				),
 			};
+		}
 
 		case Type.RetryItem:
 			return {

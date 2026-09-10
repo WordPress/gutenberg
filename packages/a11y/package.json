@@ -25,7 +25,6 @@
 		"npm": ">=8.19.2"
 	},
 	"files": [
-		"src",
 		"build",
 		"build-module",
 		"build-types",
@@ -49,8 +48,8 @@
 		"@wordpress/i18n": "file:../i18n"
 	},
 	"devDependencies": {
-		"@testing-library/jest-dom": "^6.9.1",
-		"@types/jest": "^30.0.0"
+		"@testing-library/jest-dom": "^7.0.1",
+		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

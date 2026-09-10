@@ -52,3 +52,22 @@ export const DETAILS_EXAMPLE = (
 		and other semantic elements.
 	</>
 );
+
+export const POPUP_WIDTH_STORY_CONTAINER_WIDTH = 248;
+
+export const narrowContainerDecorator: Decorator = ( Story ) => (
+	<div style={ { width: POPUP_WIDTH_STORY_CONTAINER_WIDTH } }>
+		<Story />
+	</div>
+);
+
+export const longLabelPopupItems = [
+	{
+		value: 'short',
+		label: 'Short label',
+	},
+	{
+		value: 'long',
+		label: 'Hippopotomonstrosesquipedaliophobia',
+	},
+];

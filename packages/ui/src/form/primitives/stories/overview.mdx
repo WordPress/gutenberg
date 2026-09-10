@@ -19,3 +19,5 @@ Feel free to reach out to the `#design-system` channel on the [Make WordPress Sl
 Form primitives do not provide labels or descriptions on their own. When you compose them directly, you are responsible for associating each control with an accessible name and, when needed, an accessible description.
 
 For standard labels and descriptions, use [Field](?path=/docs/design-system-components-form-primitives-field--docs) for individual controls and [Fieldset](?path=/docs/design-system-components-form-primitives-fieldset--docs) for groups of related controls.
+
+When a control is already accessibly labeled but still needs a visual label for layout consistency, use `Field.VisualLabel` outside `Field.Root`. It does not carry semantics and is not associated with a control. When a visual label was used as a legend for a group of controls, use `Fieldset` and `Fieldset.Legend`. Description text under a field or fieldset should use `Field.Description` or `Fieldset.Description` so it is associated.

@@ -59,8 +59,8 @@
 		"wasm-vips": "^0.0.18"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0",
-		"@types/node": "^20.19.39"
+		"@types/node": "^24.13.3",
+		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

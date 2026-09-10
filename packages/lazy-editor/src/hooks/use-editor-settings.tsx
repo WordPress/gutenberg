@@ -9,11 +9,15 @@ import { unlock } from '../lock-unlock';
 /**
  * This is a React hook that provides the editor settings from the REST API.
  *
- * @param {Object} props            - The props object.
- * @param {string} [props.stylesId] - The ID of the user's global styles to use.
+ * @param {Object}        props            - The props object.
+ * @param {string|number} [props.stylesId] - The ID of the user's global styles to use.
  * @return Editor settings.
  */
-export function useEditorSettings( { stylesId }: { stylesId: string } ) {
+export function useEditorSettings( {
+	stylesId,
+}: {
+	stylesId?: string | number;
+} ) {
 	const { editorSettings, blockTypes } = useSelect(
 		( select ) => ( {
 			editorSettings: unlock(

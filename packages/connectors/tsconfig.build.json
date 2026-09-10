@@ -9,7 +9,6 @@
 		{ "path": "../data" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../private-apis" }
 	]
 }

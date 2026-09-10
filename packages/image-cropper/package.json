@@ -46,12 +46,8 @@
 		"@wordpress/components": "file:../components",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
-		"clsx": "^2.1.1",
 		"dequal": "^2.0.3",
 		"react-easy-crop": "^5.4.2"
-	},
-	"devDependencies": {
-		"@types/jest": "^30.0.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

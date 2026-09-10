@@ -12,6 +12,8 @@ import * as SearchableChipSelectStories from '../../primitives/searchable-chip-s
 import {
 	WITH_DETAILS_DESCRIPTION,
 	DETAILS_EXAMPLE,
+	longLabelPopupItems,
+	narrowContainerDecorator,
 } from '../../stories/shared';
 
 const meta: Meta< typeof SearchableChipSelectControl > = {
@@ -35,6 +37,7 @@ const meta: Meta< typeof SearchableChipSelectControl > = {
 	},
 	argTypes: {
 		items: { control: false },
+		value: { control: false },
 		onValueChange: { action: fn() },
 	},
 	parameters: {
@@ -113,19 +116,23 @@ export const WithDisabledOption: Story = {
 
 /**
  * Mark a creatable action with `creatable: true` on an item in `items`.
- * It renders in the list footer and is excluded from the main list
- * automatically. Handle creation in `onValueChange`.
+ * It renders in the list footer, not the main list, when it is in the
+ * filtered items. Handle the creation of the item in `onValueChange`.
  */
 export const Creatable: Story = {
 	args: {
 		...Default.args,
+		items: ITEMS,
+		value: [ ITEMS[ 0 ], ITEMS[ 1 ] ],
 	},
 	render: function Template( args ) {
+		const {
+			items = ITEMS,
+			value: initialValue = [ ITEMS[ 0 ], ITEMS[ 1 ] ],
+			...restArgs
+		} = args;
 		const [ inputValue, setInputValue ] = useState( '' );
-		const [ value, setValue ] = useState< typeof ITEMS >( [
-			ITEMS[ 0 ],
-			ITEMS[ 1 ],
-		] );
+		const [ value, setValue ] = useState( initialValue );
 		const creatableItem = {
 			value: '__create__',
 			label:
@@ -135,12 +142,12 @@ export const Creatable: Story = {
 
 		return (
 			<SearchableChipSelectControl
-				{ ...args }
-				items={ [ ...ITEMS, creatableItem ] }
+				{ ...restArgs }
+				items={ [ ...( items as FixtureItem[] ), creatableItem ] }
 				inputValue={ inputValue }
 				onInputValueChange={ setInputValue }
 				value={ value }
-				onValueChange={ ( values: typeof ITEMS, event ) => {
+				onValueChange={ ( values, event ) => {
 					if (
 						values.some(
 							( item ) => item.value === creatableItem.value
@@ -209,7 +216,8 @@ export const Grouped: Story = {
 
 /**
  * Grouped items with a creatable footer item. Include the creatable item in
- * `items` as a creatable-only group and handle creation in `onValueChange`.
+ * `items` as a creatable-only group. Handle the creation of the item in
+ * `onValueChange`.
  */
 export const GroupedCreatable: Story = {
 	args: {
@@ -281,5 +289,23 @@ export const GroupedCreatable: Story = {
 				) }
 			/>
 		);
+	},
+};
+
+/**
+ * Use `popupWidth` to control how the popup width is constrained relative to
+ * its anchor.
+ *
+ * This example uses `sm`, allowing the popup to extend beyond the narrow anchor width.
+ */
+export const PopupWidth: Story = {
+	...Creatable,
+	decorators: [ narrowContainerDecorator ],
+	args: {
+		...Creatable.args,
+		label: 'Tags',
+		popupWidth: 'sm',
+		items: longLabelPopupItems,
+		value: [ longLabelPopupItems[ 0 ] ],
 	},
 };

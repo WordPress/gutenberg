@@ -2,6 +2,7 @@ const path = require( 'node:path' );
 const { existsSync, readFileSync } = require( 'node:fs' );
 const resolverNode = require( 'eslint-import-resolver-typescript' );
 const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
+const BUILD_DIRECTORY_PATTERN = /(^|\/)build(-module)?\//;
 
 exports.interfaceVersion = 2;
 
@@ -111,14 +112,19 @@ exports.resolve = function ( source, file, config ) {
 
 			const exportPath = getResolvedExport( subpath, manifest.exports );
 
-			const sourcePath = exportPath
+			const mapsBuiltJavaScriptToSource =
+				BUILD_DIRECTORY_PATTERN.test( exportPath );
+			let sourcePath = exportPath
 				// Remap build-style CSS files to src SCSS files. By default,
 				// wp-build emits a CSS file for each SCSS file in src. This is
 				// controlled by wpStyleEntryPoints which we don't fully
 				// recreate here (yet), but generally we don't override this.
-				.replace( /build-style\/(.+?)\.css/, 'src/$1.scss' )
-				.replace( /build(-module)?/, 'src' )
-				.replace( /\.[cm]?js$/, '.js' );
+				.replace( /(^|\/)build-style\/(.+?)\.css/, '$1src/$2.scss' )
+				.replace( BUILD_DIRECTORY_PATTERN, '$1src/' );
+
+			if ( mapsBuiltJavaScriptToSource ) {
+				sourcePath = sourcePath.replace( /\.[cm]?js$/, '' );
+			}
 
 			return resolve( path.join( packagePath, sourcePath ) );
 		} catch {

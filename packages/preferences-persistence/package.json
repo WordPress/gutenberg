@@ -45,6 +45,9 @@
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch"
 	},
+	"devDependencies": {
+		"vitest": "^5.0.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

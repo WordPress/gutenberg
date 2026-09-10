@@ -5,7 +5,6 @@
 	"dependencies": {
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
-		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/ui": "file:../../packages/ui"
 	},
 	"devDependencies": {

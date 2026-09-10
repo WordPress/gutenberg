@@ -19,7 +19,6 @@ const { MediaEditor } = unlock( mediaEditorPrivateApis );
 const MEDIA_LIST_PATH = '/types/attachment/list/all';
 const MEDIA_LIBRARY_ADMIN_PATH = 'upload.php';
 const MEDIA_EDITOR_ADMIN_PAGE = 'media-editor-wp-admin';
-const MEDIA_EDITOR_SCOPE = 'media-editor-route';
 
 /*
  * The `MediaEditor` callback arguments this route reads. The private API
@@ -88,9 +87,6 @@ function MediaEditorRoute() {
 		<MediaEditor
 			id={ attachmentId }
 			fields={ fields }
-			// A scope of its own, so that the details sidebar opens by default
-			// here regardless of whether it was last collapsed in the modal.
-			scope={ MEDIA_EDITOR_SCOPE }
 			onClose={ navigateBack }
 			onSaved={ ( { id: savedId }: SaveResult ) => {
 				if ( savedId !== attachmentId ) {
@@ -103,12 +99,10 @@ function MediaEditorRoute() {
 				layout,
 				onKeyDown,
 			}: FrameProps ) => {
-				// Below the sidebar-collapse breakpoint the header has no room
-				// for the history cluster: it already carries the breadcrumbs,
-				// Cancel/Save, and (under `medium`) the framework's navigation
-				// toggle, in a single row that does not wrap. History joins the
-				// transform controls in a bar under the canvas instead, which
-				// is what the modal's narrow footer does.
+				// Below `small` the page header already carries the
+				// breadcrumbs, Cancel/Save and (under `medium`) the
+				// framework's navigation toggle, in a row that does not wrap,
+				// so History moves to a bar under the canvas instead.
 				const isNarrow = layout === 'narrow';
 				return (
 					// The keydown handler covers the whole frame, not just the
@@ -157,7 +151,6 @@ function MediaEditorRoute() {
 							</div>
 							{ isNarrow && isImage && (
 								<div className="media-editor-route__toolbar">
-									<MediaEditor.ImageControls />
 									<MediaEditor.HistoryActions />
 								</div>
 							) }
