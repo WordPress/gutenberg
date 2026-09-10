@@ -363,6 +363,18 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 								targetRootClientId,
 								getBlockIndex( _clientId )
 							);
+
+							// Remove the wrapper if it is left empty. The
+							// other branches remove it themselves.
+							if (
+								! getBlockOrder( _clientId ).length &&
+								isUnmodifiedBlock(
+									getBlock( _clientId ),
+									'content'
+								)
+							) {
+								removeBlock( _clientId, false );
+							}
 						} else {
 							const replacement = switchToBlockType(
 								getBlock( firstClientId ),
@@ -389,16 +401,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 							} else {
 								switchToDefaultOrRemove();
 							}
-						}
-
-						if (
-							! getBlockOrder( _clientId ).length &&
-							isUnmodifiedBlock(
-								getBlock( _clientId ),
-								'content'
-							)
-						) {
-							removeBlock( _clientId, false );
 						}
 					} );
 				} else {
