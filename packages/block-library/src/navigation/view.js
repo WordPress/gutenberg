@@ -3,6 +3,7 @@ import {
 	getContext,
 	getElement,
 	withSyncEvent,
+	withScope,
 } from '@wordpress/interactivity';
 
 const focusableSelectors = [
@@ -235,6 +236,27 @@ const { state, actions } = store(
 					ctx.firstFocusableElement = focusableElements[ 0 ];
 					ctx.lastFocusableElement =
 						focusableElements[ focusableElements.length - 1 ];
+
+					const handleResize = withScope( () => {
+						const toggle = ref.parentElement?.querySelector(
+							'.wp-block-navigation__responsive-container-open'
+						);
+
+						if (
+							toggle &&
+							window.getComputedStyle( toggle ).display === 'none'
+						) {
+							actions.closeMenu( 'click' );
+							actions.closeMenu( 'focus' );
+							actions.closeMenu( 'hover' );
+						}
+					} );
+
+					window.addEventListener( 'resize', handleResize );
+
+					return () => {
+						window.removeEventListener( 'resize', handleResize );
+					};
 				}
 			},
 			focusFirstElement() {
