@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.21.0 (2026-09-10)
+
 ### Bug Fixes
 
 -   Allow `useEditorSettings` callers to omit `stylesId` or pass an unresolved global styles ID, and defer loading user styles until the ID resolves. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))

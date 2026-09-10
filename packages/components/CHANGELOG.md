@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 40.1.0 (2026-09-10)
+
 ### Enhancements
 
 -   `CheckboxControl`: Match the `@wordpress/ui` checkmark size and disabled fill ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
