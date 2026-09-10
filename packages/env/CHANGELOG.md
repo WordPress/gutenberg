@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use the versioned WordPress.org zip file for the default core source to speed up fresh environment creation while preserving version-based cache invalidation. ([#78942](https://github.com/WordPress/gutenberg/pull/78942))
+
 ### Bug Fixes
 
 -   Point the apt sources of the bullseye-based WordPress images (PHP 7.4 and 8.0) at `archive.debian.org`, so building them no longer fails now that Debian 11 has reached end-of-life and left the regular mirrors ([#82478](https://github.com/WordPress/gutenberg/pull/82478)).
