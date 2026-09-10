@@ -35,10 +35,40 @@ mkdir "$verification_dir/expected"
 # Preserve the exact prepared payload before SVN can change the working copy.
 tar -C "$source_dir" --exclude=.svn -cf - . | tar -C "$verification_dir/expected" -xf -
 
+# Bound and retry all remote reads. A transient tag lookup failure must not
+# force a manual rerun, while a persistent failure must not trigger a write.
+read_svn() {
+	local deadline="$1"
+	shift
+	local remaining=$((deadline - SECONDS))
+	if (( remaining <= 0 )); then
+		return 1
+	fi
+	timeout "$remaining" svn "$@" "${svn_args[@]}" --config-option=servers:global:http-timeout=60
+}
+
 # Listing the parent must succeed. An authentication or network error must not
 # be mistaken for an absent tag and trigger a new write.
-svn list "$PLUGIN_REPO_URL/tags" "${svn_args[@]}" \
-	--config-option=servers:global:http-timeout=60 > "$verification_dir/tags"
+lookup_deadline=$((SECONDS + verify_timeout))
+retry_delay="$retry_interval"
+while ! read_svn "$lookup_deadline" list "$PLUGIN_REPO_URL/tags" > "$verification_dir/tags"; do
+	remaining=$((lookup_deadline - SECONDS))
+	if (( remaining <= 0 )); then
+		echo "::error::Could not read SVN tags within $verify_timeout seconds. No publication was attempted. Check SVN access, then rerun the workflow."
+		exit 1
+	fi
+	delay="$retry_delay"
+	if (( delay > remaining )); then
+		delay="$remaining"
+	fi
+	echo "Could not read SVN tags. Retrying in $delay seconds; $remaining seconds remain."
+	sleep "$delay"
+	if (( retry_delay <= verify_timeout / 2 )); then
+		retry_delay=$((retry_delay * 2))
+	else
+		retry_delay="$verify_timeout"
+	fi
+done
 if grep -Fxq "$VERSION/" "$verification_dir/tags"; then
 	echo "SVN tag tags/$VERSION already exists. Verifying its contents before accepting the release."
 else
@@ -62,17 +92,10 @@ fi
 # never repeat a write whose outcome is uncertain. Each attempt pins all exports
 # to one revision, so trunk and tag cannot be verified at different revisions.
 deadline=$((SECONDS + verify_timeout))
-read_svn() {
-	local remaining=$((deadline - SECONDS))
-	if (( remaining <= 0 )); then
-		return 1
-	fi
-	timeout "$remaining" svn "$@" "${svn_args[@]}" --config-option=servers:global:http-timeout=60
-}
 
 verify_release() {
 	local revision remote_path
-	if ! revision=$(read_svn info --show-item revision "$PLUGIN_REPO_URL"); then
+	if ! revision=$(read_svn "$deadline" info --show-item revision "$PLUGIN_REPO_URL"); then
 		return 1
 	fi
 	if [[ ! "$revision" =~ ^[0-9]+$ ]]; then
@@ -85,11 +108,11 @@ verify_release() {
 	fi
 	for remote_path in "${paths[@]}"; do
 		rm -rf "$verification_dir/actual"
-		if ! read_svn export --quiet --ignore-externals --ignore-keywords \
+		if ! read_svn "$deadline" export --quiet --ignore-externals --ignore-keywords \
 			-r "$revision" "$PLUGIN_REPO_URL/$remote_path@$revision" "$verification_dir/actual"; then
 			return 1
 		fi
-		if ! diff --recursive --brief --no-dereference "$verification_dir/expected" "$verification_dir/actual"; then
+		if ! ( cd "$verification_dir" && diff --recursive --brief --no-dereference expected actual ); then
 			echo "SVN $remote_path at revision $revision does not match the prepared release." >&2
 			return 1
 		fi
@@ -100,6 +123,7 @@ verify_release() {
 	fi
 }
 
+retry_delay="$retry_interval"
 while (( SECONDS < deadline )); do
 	if verify_release; then
 		exit 0
@@ -108,12 +132,17 @@ while (( SECONDS < deadline )); do
 	if (( remaining <= 0 )); then
 		break
 	fi
-	delay="$retry_interval"
+	delay="$retry_delay"
 	if (( delay > remaining )); then
 		delay="$remaining"
 	fi
 	echo "Release not yet verified. Retrying in $delay seconds; $remaining seconds remain."
 	sleep "$delay"
+	if (( retry_delay <= verify_timeout / 2 )); then
+		retry_delay=$((retry_delay * 2))
+	else
+		retry_delay="$verify_timeout"
+	fi
 done
 
 echo "::error::Could not verify SVN release $VERSION within $verify_timeout seconds. Inspect the SVN tag and trunk against the prepared release before retrying publication."

@@ -60,17 +60,23 @@ jobs:
         name: SVN release recovery
         runs-on: 'ubuntu-24.04'
         timeout-minutes: 5
+        needs: [detect-relevant-changes]
         permissions:
             contents: read
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         steps:
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
                   sparse-checkout: tools/release
 
             - name: Install Subversion
               run: sudo apt-get update -y && sudo apt-get install -y subversion
+
+            - name: Lint release scripts
+              run: shellcheck tools/release/*.sh tools/release/test/*.sh
 
             - name: Test SVN publication and recovery
               run: bash tools/release/test/publish-to-svn.sh

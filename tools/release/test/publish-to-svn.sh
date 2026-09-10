@@ -18,6 +18,14 @@ case "$1" in
 			echo 'svn: E170001: Authorization failed' >&2
 			exit 1
 		fi
+		if [[ "${SCENARIO:-}" == delayed-list ]]; then
+			count=$(cat "$READ_COUNT")
+			echo "$((count + 1))" > "$READ_COUNT"
+			if (( count < 2 )); then
+				echo 'svn: E175012: Connection timed out' >&2
+				exit 1
+			fi
+		fi
 		;;
 	commit|import)
 		if [[ "${SCENARIO:-}" == reject-write ]]; then
@@ -172,6 +180,7 @@ for difference in missing changed extra; do
 		extra) rm "$CASE_ROOT/release/build/file with spaces.js" ;;
 	esac
 	expect_failure "$CASE_ROOT/release" tag
+	grep -Eq 'Only in (expected|actual)|Files expected/.+ and actual/.+ differ' "$CASE_ROOT/output"
 	echo "PASS: reject $difference files despite matching version headers"
 done
 
@@ -182,9 +191,11 @@ expect_failure "$CASE_ROOT/trunk" trunk
 echo 'PASS: a matching tag cannot hide an incomplete trunk release'
 
 setup rejected-write
-export SCENARIO=reject-write
+export SCENARIO=reject-write SVN_VERIFY_TIMEOUT=4
 expect_failure "$CASE_ROOT/release" tag
 grep -q 'Authorization failed' "$CASE_ROOT/output"
+grep -q 'Retrying in 1 seconds' "$CASE_ROOT/output"
+grep -q 'Retrying in 2 seconds' "$CASE_ROOT/output"
 echo 'PASS: a rejected write with no deployment remains a failure'
 
 setup unreadable-deployment
@@ -213,6 +224,12 @@ before=$("$REAL_SVN" info --show-item revision "$PLUGIN_REPO_URL")
 expect_failure "$CASE_ROOT/release" tag
 [[ $("$REAL_SVN" info --show-item revision "$PLUGIN_REPO_URL") == "$before" ]]
 echo 'PASS: failed tag lookup cannot trigger publication'
+
+setup delayed-tag-lookup
+export SCENARIO=delayed-list SVN_VERIFY_TIMEOUT=10
+expect_success "$CASE_ROOT/release" tag
+[[ $(cat "$READ_COUNT") -ge 3 ]]
+echo 'PASS: retry a transient tag lookup before publication'
 
 setup mixed-revisions
 prepare_trunk
