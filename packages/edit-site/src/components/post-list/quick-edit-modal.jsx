@@ -15,6 +15,35 @@ const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
+// The record keys each bulk-editable field's summary reads. Bulk edit starts
+// from an empty record, so until the user edits a field there is no value to
+// summarize and rendering one would invent it: `date` would show the current
+// time and `discussion` would report "Closed".
+const bulkSummaryKeys = {
+	status: [ 'status' ],
+	date: [ 'date' ],
+	author: [ 'author' ],
+	discussion: [ 'comment_status', 'ping_status' ],
+};
+
+function withBulkSummary( field ) {
+	const keys = bulkSummaryKeys[ field.id ];
+	// A field with no `render` of its own falls back to the one its type
+	// provides, which already renders nothing for an absent value.
+	if ( ! keys || ! field.render ) {
+		return field;
+	}
+	const Summary = field.render;
+	const BulkSummary = ( props ) =>
+		keys.some( ( key ) => key in props.item ) ? (
+			<Summary { ...props } />
+		) : (
+			__( 'No change' )
+		);
+	BulkSummary.displayName = `BulkSummary(${ field.id })`;
+	return { ...field, render: BulkSummary };
+}
+
 export function QuickEditModal( {
 	postType,
 	postId,
@@ -69,25 +98,25 @@ export function QuickEditModal( {
 	const fields = useMemo(
 		() =>
 			_fields?.map( ( field ) => {
+				let nextField = field;
+
 				if ( field.id === 'status' ) {
-					return {
+					nextField = {
 						...field,
 						elements: field.elements.filter(
 							( element ) => element.value !== 'trash'
 						),
 					};
-				}
-
-				if ( field.id === 'template' ) {
-					return {
+				} else if ( field.id === 'template' ) {
+					nextField = {
 						...field,
 						readOnly: ! canSwitchTemplate,
 					};
 				}
 
-				return field;
+				return isBulk ? withBulkSummary( nextField ) : nextField;
 			} ),
-		[ _fields, canSwitchTemplate ]
+		[ _fields, canSwitchTemplate, isBulk ]
 	);
 
 	const form = useMemo( () => {
