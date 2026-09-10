@@ -87,6 +87,11 @@
 			"clientNavigation": true
 		}
 	},
+	"selectors": {
+		"states": {
+			"-current": ".wp-block-navigation .wp-block-navigation-submenu .current-menu-item"
+		}
+	},
 	"editorStyle": "wp-block-navigation-submenu-editor",
 	"style": "wp-block-navigation-submenu"
 }
