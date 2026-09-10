@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Error boundary: Announce only the error message instead of the entire notice and its action labels. ([#82737](https://github.com/WordPress/gutenberg/pull/82737))
 -   `MediaUpload`: Coerce `multiple` to a boolean before passing it to the experimental media modal; callers such as the playlist block and the inserter media tab pass the legacy media frame's `'add'` mode. ([#82715](https://github.com/WordPress/gutenberg/pull/82715))
 
 ## 15.0.0 (2026-09-10)

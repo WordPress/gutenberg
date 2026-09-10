@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Error boundary: Announce only the error message instead of the entire notice and its action labels. ([#82737](https://github.com/WordPress/gutenberg/pull/82737))
+
 ## 6.55.0 (2026-09-10)
 
 ### Enhancements
