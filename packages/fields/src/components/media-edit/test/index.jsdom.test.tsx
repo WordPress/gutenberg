@@ -58,10 +58,9 @@ describe( 'MediaEdit', () => {
 				/>
 			</RegistryProvider>
 		);
-		expect( screen.getByText( 'Featured Image' ) ).toBeInTheDocument();
 		expect(
 			screen.getByText(
-				'To edit this field, you need permission to upload media.'
+				'Featured Image: To edit this field, you need permission to upload media.'
 			)
 		).toBeInTheDocument();
 		expect(

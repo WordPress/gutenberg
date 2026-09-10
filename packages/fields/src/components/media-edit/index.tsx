@@ -865,28 +865,18 @@ export default function MediaEdit< Item >( {
 		},
 		[ isTouched ]
 	);
-	const legend =
-		field.label &&
-		( hideLabelFromVision ? (
-			<VisuallyHidden render={ <legend /> }>
-				{ field.label }
-			</VisuallyHidden>
-		) : (
-			<BaseControl.VisualLabel as="legend" style={ { marginBottom: 0 } }>
-				{ field.label }
-			</BaseControl.VisualLabel>
-		) );
 	if ( ! canUpload ) {
 		return (
 			<fieldset className="fields__media-edit" data-field-id={ field.id }>
-				<VStack spacing={ 2 }>
-					{ legend }
-					<WCText variant="muted">
-						{ __(
-							'To edit this field, you need permission to upload media.'
-						) }
-					</WCText>
-				</VStack>
+				<WCText>
+					{ sprintf(
+						/* translators: %s: The field label. */
+						__(
+							'%s: To edit this field, you need permission to upload media.'
+						),
+						field.label
+					) }
+				</WCText>
 			</fieldset>
 		);
 	}
@@ -950,7 +940,19 @@ export default function MediaEdit< Item >( {
 							: CompactMediaEditAttachments;
 						return (
 							<VStack spacing={ 2 }>
-								{ legend }
+								{ field.label &&
+									( hideLabelFromVision ? (
+										<VisuallyHidden render={ <legend /> }>
+											{ field.label }
+										</VisuallyHidden>
+									) : (
+										<BaseControl.VisualLabel
+											as="legend"
+											style={ { marginBottom: 0 } }
+										>
+											{ field.label }
+										</BaseControl.VisualLabel>
+									) ) }
 								<AttachmentsComponent
 									allItems={ allItems }
 									addButtonLabel={ addButtonLabel }
