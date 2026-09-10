@@ -642,8 +642,7 @@ test.describe( 'Page List', () => {
 
 	test.describe( 'Bulk Quick Edit', () => {
 		test.beforeEach( async ( { admin, page } ) => {
-			await admin.visitSiteEditor();
-			await page.getByRole( 'button', { name: 'Pages' } ).click();
+			await admin.visitSiteEditor( { postType: 'page' } );
 			await page.getByRole( 'button', { name: 'Layout' } ).click();
 			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 
