@@ -38,7 +38,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`default`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex","flexWrap":"wrap"}`
   - [`allowVerticalAlignment`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowverticalalignment): `false`
   - [`allowOrientation`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-alloworientation): `false`
-  - [`allowWrap`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowwrap): `false`
+  - [`allowWrap`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowwrap): `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `padding`: `true`
   - `blockGap`: `true`
