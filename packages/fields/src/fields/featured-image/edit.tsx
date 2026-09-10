@@ -12,9 +12,19 @@ import type { BasePostWithEmbeddedFeaturedMedia } from '../../types';
 
 type Item = BasePostWithEmbeddedFeaturedMedia;
 
+// Opens the featured-image media frame, as the classic panel does; plugins
+// extending `editor.MediaUpload` recognize the featured image by it.
+const mediaUploadProps = { unstableFeaturedImageFlow: true };
+
 const FilteredMediaEdit = withFilters( 'editor.PostFeaturedImage' )(
 	function PostFeaturedImage( props: DataFormControlProps< Item > ) {
-		return <MediaEdit { ...props } isExpanded />;
+		return (
+			<MediaEdit
+				{ ...props }
+				isExpanded
+				mediaUploadProps={ mediaUploadProps }
+			/>
+		);
 	}
 ) as unknown as React.ComponentType<
 	DataFormControlProps< Item > & {
@@ -97,7 +107,13 @@ export default function FeaturedImageEdit(
 		contextId === undefined ||
 		String( contextId ) !== String( data.id )
 	) {
-		return <MediaEdit { ...props } isExpanded />;
+		return (
+			<MediaEdit
+				{ ...props }
+				isExpanded
+				mediaUploadProps={ mediaUploadProps }
+			/>
+		);
 	}
 	return <FilteredFeaturedImageEdit { ...props } />;
 }

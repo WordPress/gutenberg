@@ -89,7 +89,10 @@ test.describe( 'Page List', () => {
 						} );
 
 					await mediaLibrary
-						.getByRole( 'button', { name: 'Select', exact: true } )
+						.getByRole( 'button', {
+							name: 'Set featured image',
+							exact: true,
+						} )
 						.click();
 				},
 				assertInitialState: async ( page ) => {
