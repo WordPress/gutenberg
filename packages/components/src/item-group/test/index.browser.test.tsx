@@ -115,20 +115,25 @@ describe( 'ItemGroup', () => {
 				<Item>Rounded</Item>
 			</ItemGroup>
 		);
-		/* eslint-enable @wordpress/no-setting-ds-tokens */
 		await render(
-			<ItemGroup data-testid="squared" isRounded={ false }>
+			<ItemGroup
+				data-testid="squared"
+				isRounded={ false }
+				style={ { '--wpds-border-radius-sm': '4px' } }
+			>
 				<Item>Squared</Item>
 			</ItemGroup>
 		);
+		/* eslint-enable @wordpress/no-setting-ds-tokens */
 
 		expect(
 			window.getComputedStyle( screen.getByTestId( 'rounded' ) )
 				.borderTopLeftRadius
-		).not.toBe(
+		).toBe( '4px' );
+		expect(
 			window.getComputedStyle( screen.getByTestId( 'squared' ) )
 				.borderTopLeftRadius
-		);
+		).toBe( '0px' );
 	} );
 
 	it( 'separates items when isSeparated is true', async () => {

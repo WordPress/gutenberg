@@ -40,6 +40,12 @@ async function setup( attributes, customSettings, innerBlocks = [] ) {
 	return initializeEditor( testBlock, false, settings );
 }
 
+async function activateWithKeyboard( element ) {
+	act( () => element.focus() );
+	expect( element ).toHaveFocus();
+	await userEvent.keyboard( '{Enter}' );
+}
+
 async function createAndSelectBlock() {
 	const view = await setup( { overlayColor: 'black' }, undefined, [
 		createBlock( 'core/paragraph' ),
@@ -79,7 +85,7 @@ describe( 'Cover block', () => {
 			const colorPicker = screen.getByRole( 'button', {
 				name: 'Black',
 			} );
-			await act( async () => colorPicker.click() );
+			await activateWithKeyboard( colorPicker );
 			const color = colorPicker.style.backgroundColor;
 			await waitFor( () =>
 				expect(
@@ -92,8 +98,10 @@ describe( 'Cover block', () => {
 			const overlay = coverBlock.querySelector(
 				'.wp-block-cover__background'
 			);
-			expect( window.getComputedStyle( overlay ).backgroundColor ).toBe(
-				color
+			await waitFor( () =>
+				expect(
+					window.getComputedStyle( overlay ).backgroundColor
+				).toBe( color )
 			);
 		} );
 
@@ -101,7 +109,7 @@ describe( 'Cover block', () => {
 			await setup();
 
 			const colorButton = screen.getByRole( 'button', { name: 'Black' } );
-			await act( async () => colorButton.click() );
+			await activateWithKeyboard( colorButton );
 			await waitFor( () =>
 				expect(
 					screen.getByLabelText( 'Block: Cover' )
@@ -111,7 +119,8 @@ describe( 'Cover block', () => {
 			const title = screen.getByLabelText( 'Empty block;', {
 				exact: false,
 			} );
-			await userEvent.click( title );
+			act( () => title.focus() );
+			expect( title ).toHaveFocus();
 			await userEvent.keyboard( 'abc' );
 			expect( title ).toHaveTextContent( 'abc' );
 		} );
@@ -176,9 +185,8 @@ describe( 'Cover block', () => {
 			await userEvent.click(
 				screen.getByRole( 'button', { name: 'Replace' } )
 			);
-			await act( async () =>
-				// eslint-disable-next-line testing-library/no-node-access
-				screen.getByRole( 'menuitem', { name: 'Reset' } ).click()
+			await activateWithKeyboard(
+				screen.getByRole( 'menuitem', { name: 'Reset' } )
 			);
 
 			expect(
@@ -384,7 +392,7 @@ describe( 'Cover block', () => {
 			const colorPicker = screen.getByRole( 'button', {
 				name: 'White',
 			} );
-			await act( async () => colorPicker.click() );
+			await activateWithKeyboard( colorPicker );
 
 			await waitFor( () =>
 				expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
@@ -407,7 +415,7 @@ describe( 'Cover block', () => {
 			const colorPicker = screen.getByRole( 'button', {
 				name: 'White',
 			} );
-			await act( async () => colorPicker.click() );
+			await activateWithKeyboard( colorPicker );
 			await waitFor( () =>
 				expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
 					'is-light'

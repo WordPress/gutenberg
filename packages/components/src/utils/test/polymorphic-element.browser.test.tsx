@@ -6,7 +6,7 @@ import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { PolymorphicElement } from '../polymorphic-element';
 
-const StyledDiv = styled.div( {
+const StyledPolymorphicElement = styled( PolymorphicElement )( {
 	color: 'rgb(255, 0, 0)',
 } );
 
@@ -25,11 +25,18 @@ describe( 'PolymorphicElement styles', () => {
 		).toBe( 'rgb(255, 0, 0)' );
 	} );
 
-	it( 'applies generated Emotion styles in the browser', async () => {
-		await render( <StyledDiv data-testid="styled-div" /> );
+	it( 'applies generated and inline styles to styled elements', async () => {
+		await render(
+			<StyledPolymorphicElement
+				data-testid="styled-element"
+				style={ { backgroundColor: 'rgb(0, 0, 255)' } }
+			/>
+		);
 
-		expect(
-			getComputedStyle( screen.getByTestId( 'styled-div' ) ).color
-		).toBe( 'rgb(255, 0, 0)' );
+		const style = getComputedStyle(
+			screen.getByTestId( 'styled-element' )
+		);
+		expect( style.color ).toBe( 'rgb(255, 0, 0)' );
+		expect( style.backgroundColor ).toBe( 'rgb(0, 0, 255)' );
 	} );
 } );

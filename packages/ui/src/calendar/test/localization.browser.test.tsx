@@ -1,10 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import { ckb, ug } from 'date-fns/locale';
 import { Calendar } from '..';
 import { weekdayFormatter } from './__utils__';
 
 const TEST_DATE = new Date( 2026, 0, 15 );
+
+type IntlLocaleWithTextInfo = Intl.Locale & {
+	getTextInfo?: () => { direction: string };
+	textInfo?: { direction: string };
+};
 
 function mockIntlLocaleProperties(
 	getDescriptors: ( locale: Intl.Locale ) => PropertyDescriptorMap
@@ -68,14 +74,16 @@ describe( 'Calendar Intl.Locale compatibility', () => {
 	] as const )(
 		'uses legacy textInfo for %s',
 		async ( _, locale, direction ) => {
-			const restore = mockIntlLocaleProperties( ( intlLocale ) => ( {
-				getTextInfo: { value: undefined },
-				textInfo: {
-					value: {
-						direction: intlLocale.language === 'sd' ? 'rtl' : 'ltr',
-					},
-				},
-			} ) );
+			const restore = mockIntlLocaleProperties( ( intlLocale ) => {
+				const localeWithTextInfo = intlLocale as IntlLocaleWithTextInfo;
+				const textInfo =
+					localeWithTextInfo.getTextInfo?.() ??
+					localeWithTextInfo.textInfo;
+				return {
+					getTextInfo: { value: undefined },
+					textInfo: { value: textInfo },
+				};
+			} );
 
 			try {
 				await render( <Calendar locale={ locale } /> );
@@ -84,6 +92,33 @@ describe( 'Calendar Intl.Locale compatibility', () => {
 					direction
 				);
 			} finally {
+				restore();
+			}
+		}
+	);
+
+	it.each( [
+		[ 'Central Kurdish', ckb ],
+		[ 'Uyghur', ug ],
+	] as const )(
+		'uses the language fallback for the %s date-fns locale',
+		async ( _, locale ) => {
+			const restore = mockIntlLocaleProperties( () => ( {
+				getTextInfo: { value: undefined },
+				textInfo: { value: undefined },
+			} ) );
+			const supportedLocalesSpy = vi
+				.spyOn( Intl.DateTimeFormat, 'supportedLocalesOf' )
+				.mockReturnValue( [ locale.code ] );
+
+			try {
+				await render( <Calendar locale={ locale } /> );
+				expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+					'dir',
+					'rtl'
+				);
+			} finally {
+				supportedLocalesSpy.mockRestore();
 				restore();
 			}
 		}

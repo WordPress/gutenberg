@@ -16,24 +16,26 @@ describe( 'props', () => {
 		await render( <Heading>Code is Poetry</Heading> );
 		await render( <Heading level={ 4 }>Code is Poetry</Heading> );
 		expect(
-			getComputedStyle( screen.getByRole( 'heading', { level: 4 } ) )
-				.fontSize
-		).not.toBe(
 			getComputedStyle( screen.getByRole( 'heading', { level: 2 } ) )
 				.fontSize
-		);
+		).toBe( '25.35px' );
+		expect(
+			getComputedStyle( screen.getByRole( 'heading', { level: 4 } ) )
+				.fontSize
+		).toBe( '16.25px' );
 	} );
 
 	test( 'should render level as a string', async () => {
 		await render( <Heading>Code is Poetry</Heading> );
 		await render( <Heading level="4">Code is Poetry</Heading> );
 		expect(
-			getComputedStyle( screen.getByRole( 'heading', { level: 4 } ) )
-				.fontSize
-		).not.toBe(
 			getComputedStyle( screen.getByRole( 'heading', { level: 2 } ) )
 				.fontSize
-		);
+		).toBe( '25.35px' );
+		expect(
+			getComputedStyle( screen.getByRole( 'heading', { level: 4 } ) )
+				.fontSize
+		).toBe( '16.25px' );
 	} );
 
 	test( 'should allow as prop', async () => {

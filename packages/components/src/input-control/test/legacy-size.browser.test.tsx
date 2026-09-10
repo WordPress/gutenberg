@@ -8,24 +8,12 @@ const InputControl = (
 	props: React.ComponentProps< typeof BaseInputControl >
 ) => <BaseInputControl { ...props } data-testid="input" />;
 
-const comparedProperties = [
-	'height',
-	'minHeight',
-	'paddingTop',
-	'paddingRight',
-	'paddingBottom',
-	'paddingLeft',
-	'fontSize',
-	'lineHeight',
-	'borderRadius',
-] as const;
-
-function getComparedStyles( element: HTMLElement ) {
-	const styles = window.getComputedStyle( element );
+function getComputedStyles( element: Element ) {
+	const styles = getComputedStyle( element );
 	return Object.fromEntries(
-		comparedProperties.map( ( property ) => [
+		Array.from( styles ).map( ( property ) => [
 			property,
-			styles[ property ],
+			styles.getPropertyValue( property ),
 		] )
 	);
 }
@@ -49,11 +37,11 @@ describe( 'InputControl legacy size support', () => {
 			screen.getAllByText( '$' );
 		const [ defaultInput, legacyInput ] = screen.getAllByTestId( 'input' );
 
-		expect( getComparedStyles( legacyPrefixWrapper ) ).toEqual(
-			getComparedStyles( defaultPrefixWrapper )
+		expect( getComputedStyles( legacyPrefixWrapper ) ).toEqual(
+			getComputedStyles( defaultPrefixWrapper )
 		);
-		expect( getComparedStyles( legacyInput ) ).toEqual(
-			getComparedStyles( defaultInput )
+		expect( getComputedStyles( legacyInput ) ).toEqual(
+			getComputedStyles( defaultInput )
 		);
 	} );
 } );

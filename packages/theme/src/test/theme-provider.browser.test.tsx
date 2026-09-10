@@ -25,6 +25,7 @@ const FORMER_WARNING_PRIMARY = '#608010';
 const FORMER_WARNING_BACKGROUND = '#4f386e';
 const ACCESSIBLE_PRIMARY = '#3858e9';
 const ACCESSIBLE_BACKGROUND = '#fcfcfc';
+const DEFAULT_PRIMARY = '#3858e9';
 
 function readProp( element: Element, property: string ) {
 	return getComputedStyle( element ).getPropertyValue( property ).trim();
@@ -178,7 +179,7 @@ describe( 'ThemeProvider', () => {
 		const outside = document.createElement( 'div' );
 		document.body.appendChild( outside );
 
-		expect( readProp( outside, BRAND_BG ) ).not.toBe( PRIMARY );
+		expect( readProp( outside, BRAND_BG ) ).toBe( DEFAULT_PRIMARY );
 	} );
 
 	it( 'applies the cursor custom property when set', async () => {
@@ -238,8 +239,8 @@ describe( 'ThemeProvider', () => {
 				</ThemeProvider>
 			);
 
-			expect( readProp( document.documentElement, BRAND_BG ) ).not.toBe(
-				PRIMARY
+			expect( readProp( document.documentElement, BRAND_BG ) ).toBe(
+				DEFAULT_PRIMARY
 			);
 		} );
 
@@ -256,8 +257,8 @@ describe( 'ThemeProvider', () => {
 
 			await unmount();
 
-			expect( readProp( document.documentElement, BRAND_BG ) ).not.toBe(
-				PRIMARY
+			expect( readProp( document.documentElement, BRAND_BG ) ).toBe(
+				DEFAULT_PRIMARY
 			);
 		} );
 
@@ -298,8 +299,8 @@ describe( 'ThemeProvider', () => {
 			expect( document.documentElement ).not.toHaveAttribute(
 				'data-wpds-corner-radius'
 			);
-			expect( readProp( document.documentElement, BRAND_BG ) ).not.toBe(
-				PRIMARY
+			expect( readProp( document.documentElement, BRAND_BG ) ).toBe(
+				DEFAULT_PRIMARY
 			);
 
 			await unmount();

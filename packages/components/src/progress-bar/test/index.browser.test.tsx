@@ -63,7 +63,7 @@ describe( 'ProgressBar', () => {
 	it( 'should pass any additional props down to the underlying `progress` element', async () => {
 		const id = 'foo-bar-123';
 		const ariaLabel = 'in progress...';
-		const style = { opacity: 1 };
+		const style = { opacity: 0.5 };
 
 		await render(
 			<ProgressBar id={ id } aria-label={ ariaLabel } style={ style } />
@@ -76,6 +76,6 @@ describe( 'ProgressBar', () => {
 		);
 		expect(
 			getComputedStyle( screen.getByRole( 'progressbar' ) ).opacity
-		).toBe( '1' );
+		).toBe( '0.5' );
 	} );
 } );

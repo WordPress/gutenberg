@@ -643,19 +643,28 @@ describe( 'ToolsPanel', () => {
 		it( 'should not render contents of items when in placeholder state', () => {
 			render(
 				<ToolsPanel { ...defaultProps } shouldRenderPlaceholderItems>
-					<ToolsPanelItem { ...altControlProps }>
+					<ToolsPanelItem
+						{ ...altControlProps }
+						className="custom-item"
+						data-testid="placeholder-item"
+					>
 						<div>Optional control</div>
 					</ToolsPanelItem>
 				</ToolsPanel>
 			);
 
 			const optionalItem = screen.queryByText( 'Optional control' );
+			const placeholderItem = screen.getByTestId( 'placeholder-item' );
 
 			// When rendered as a placeholder a ToolsPanelItem will just omit
 			// all the item's children. So the container element will still be
 			// there holding its position but the inner text etc should not be
 			// there.
 			expect( optionalItem ).not.toBeInTheDocument();
+			expect( placeholderItem ).not.toHaveClass(
+				'components-tools-panel-item',
+				'custom-item'
+			);
 		} );
 
 		it( 'should render default controls with conditional isShownByDefault', async () => {

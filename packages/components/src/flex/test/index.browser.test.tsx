@@ -21,13 +21,22 @@ describe( 'props', () => {
 	test( 'should render correctly', async () => {
 		await render(
 			<Flex data-testid="base-flex">
-				<FlexItem>Item</FlexItem>
+				<FlexItem data-testid="base-flex-item">Item</FlexItem>
 				<FlexBlock>Item</FlexBlock>
 			</Flex>
 		);
 
 		const flex = screen.getByTestId( 'base-flex' );
-		expect( getComputedStyle( flex ).display ).toBe( 'flex' );
+		const style = getComputedStyle( flex );
+		expect( style.display ).toBe( 'flex' );
+		expect( style.alignItems ).toBe( 'center' );
+		expect( style.flexDirection ).toBe( 'row' );
+		expect( style.flexWrap ).toBe( 'nowrap' );
+		expect( style.gap ).toBe( '8px' );
+		expect( style.justifyContent ).toBe( 'space-between' );
+		expect(
+			getComputedStyle( screen.getByTestId( 'base-flex-item' ) ).display
+		).toBe( 'block' );
 		expect( flex ).toHaveTextContent( 'ItemItem' );
 	} );
 

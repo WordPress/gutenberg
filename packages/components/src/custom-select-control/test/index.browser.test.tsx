@@ -54,6 +54,16 @@ const props = {
 	],
 };
 
+function getComputedStyles( element: Element ) {
+	const styles = getComputedStyle( element );
+	return Object.fromEntries(
+		Array.from( styles ).map( ( property ) => [
+			property,
+			styles.getPropertyValue( property ),
+		] )
+	);
+}
+
 const ControlledCustomSelectControl = ( {
 	options,
 	onChange: onChangeProp,
@@ -737,25 +747,10 @@ describe( 'Legacy size support', () => {
 
 		const comboboxes = screen.getAllByRole( 'combobox' );
 		const [ defaultCombobox, legacyCombobox ] = comboboxes;
-		const properties = [
-			'height',
-			'minHeight',
-			'paddingTop',
-			'paddingRight',
-			'paddingBottom',
-			'paddingLeft',
-			'fontSize',
-			'lineHeight',
-			'borderRadius',
-		] as const;
-		const defaultStyles = getComputedStyle( defaultCombobox );
-		const legacyStyles = getComputedStyle( legacyCombobox );
 
-		for ( const property of properties ) {
-			expect( legacyStyles[ property ] ).toBe(
-				defaultStyles[ property ]
-			);
-		}
+		expect( getComputedStyles( legacyCombobox ) ).toEqual(
+			getComputedStyles( defaultCombobox )
+		);
 	} );
 } );
 

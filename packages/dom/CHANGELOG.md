@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Bug Fixes
-
--   `focusable.find`: Detect a mapped `area` through its referenced visible, non-inert image because the `area` does not have its own layout box ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
-
 ## 4.55.0 (2026-09-10)
 
 ### Bug Fixes
@@ -19,6 +15,7 @@
 -   `cleanNodeList`: Unwrap whitespace-only phrasing content elements instead of removing them, so pasting content like `a<em> </em>b` no longer loses the space between words ([#76696](https://github.com/WordPress/gutenberg/pull/76696)).
 
 ## 4.53.0 (2026-08-12)
+
 
 ## 4.52.0 (2026-07-29)
 

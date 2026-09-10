@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
+import { screen as testingLibraryScreen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import UncontrolledCustomSelectControlV2 from '..';
@@ -59,7 +60,9 @@ describe.each( [
 		const user = userEvent.setup();
 		const screen = await render( <Component { ...defaultProps } /> );
 
-		const currentSelectedItem = screen.getByRole( 'combobox' );
+		const currentSelectedItem = screen.getByRole( 'combobox', {
+			expanded: false,
+		} );
 
 		await user.click( currentSelectedItem );
 
@@ -90,7 +93,9 @@ describe.each( [
 		const user = userEvent.setup();
 		const screen = await render( <Component { ...defaultProps } /> );
 
-		const currentSelectedItem = screen.getByRole( 'combobox' );
+		const currentSelectedItem = screen.getByRole( 'combobox', {
+			expanded: false,
+		} );
 
 		await user.tab();
 		await user.keyboard( '{Enter}' );
@@ -121,7 +126,12 @@ describe.each( [
 			const user = userEvent.setup();
 			const screen = await render( <Component { ...defaultProps } /> );
 
-			const currentSelectedItem = screen.getByRole( 'combobox' );
+			const currentSelectedItem = testingLibraryScreen.getByRole(
+				'combobox',
+				{
+					expanded: false,
+				}
+			);
 
 			await user.tab();
 			await expect.element( currentSelectedItem ).toHaveFocus();
@@ -147,7 +157,12 @@ describe.each( [
 			const user = userEvent.setup();
 			const screen = await render( <Component { ...defaultProps } /> );
 
-			const currentSelectedItem = screen.getByRole( 'combobox' );
+			const currentSelectedItem = testingLibraryScreen.getByRole(
+				'combobox',
+				{
+					expanded: false,
+				}
+			);
 
 			await user.tab();
 			await user.keyboard( '{Enter}' );
@@ -170,7 +185,9 @@ describe.each( [
 			const user = userEvent.setup();
 			const screen = await render( <Component { ...defaultProps } /> );
 
-			const currentSelectedItem = screen.getByRole( 'combobox' );
+			const currentSelectedItem = screen.getByRole( 'combobox', {
+				expanded: false,
+			} );
 
 			await user.tab();
 			await expect.element( currentSelectedItem ).toHaveFocus();
@@ -181,17 +198,15 @@ describe.each( [
 			// Ideally we would test a multi-character typeahead, but anything more than a single character is flaky
 			await user.keyboard( 'a' );
 
-			await expect
-				.element(
-					screen.getByRole( 'listbox', {
-						name: defaultProps.label,
-						includeHidden: true,
-					} )
-				)
-				.not.toBeVisible();
+			expect(
+				testingLibraryScreen.queryByRole( 'listbox', {
+					name: defaultProps.label,
+					hidden: true,
+				} )
+			).not.toBeInTheDocument();
 
 			await expect
-				.element( screen.getByRole( 'combobox' ) )
+				.element( screen.getByRole( 'combobox', { expanded: false } ) )
 				.toHaveTextContent( 'amber' );
 		} );
 
@@ -199,7 +214,9 @@ describe.each( [
 			const user = userEvent.setup();
 			const screen = await render( <Component { ...defaultProps } /> );
 
-			const currentSelectedItem = screen.getByRole( 'combobox' );
+			const currentSelectedItem = screen.getByRole( 'combobox', {
+				expanded: false,
+			} );
 
 			await user.click( currentSelectedItem );
 
@@ -275,7 +292,12 @@ describe.each( [
 				</Component>
 			);
 
-			const currentSelectedItem = screen.getByRole( 'combobox' );
+			const currentSelectedItem = testingLibraryScreen.getByRole(
+				'combobox',
+				{
+					expanded: false,
+				}
+			);
 
 			// ensure more than one item is selected due to defaultValues
 			await expect
@@ -359,7 +381,12 @@ describe.each( [
 				</Component>
 			);
 
-			const currentSelectedItem = screen.getByRole( 'combobox' );
+			const currentSelectedItem = testingLibraryScreen.getByRole(
+				'combobox',
+				{
+					expanded: false,
+				}
+			);
 
 			await user.click( currentSelectedItem );
 
@@ -414,7 +441,9 @@ describe.each( [
 			</Component>
 		);
 
-		const currentSelectedItem = screen.getByRole( 'combobox' );
+		const currentSelectedItem = screen.getByRole( 'combobox', {
+			expanded: false,
+		} );
 
 		await expect.element( currentSelectedItem ).toBeVisible();
 
@@ -444,7 +473,9 @@ describe.each( [
 		const user = userEvent.setup();
 		const screen = await render( <Component { ...defaultProps } /> );
 
-		const currentSelectedItem = screen.getByRole( 'combobox' );
+		const currentSelectedItem = screen.getByRole( 'combobox', {
+			expanded: false,
+		} );
 
 		await user.tab();
 		await expect.element( currentSelectedItem ).toHaveFocus();

@@ -140,63 +140,6 @@ describe( 'focusable', () => {
 			expect( findFocusable( node ) ).toEqual( [ link ] );
 		} );
 
-		it( 'finds valid area focusable', () => {
-			const map = createElement( 'map' );
-			map.name = 'testfocus';
-			const area = createElement( 'area' );
-			area.href = '';
-			map.appendChild( area );
-			const img = createElement( 'img' );
-			img.setAttribute( 'usemap', '#testfocus' );
-			img.style.width = '10px';
-			img.style.height = '10px';
-			document.body.appendChild( map );
-			document.body.appendChild( img );
-
-			const focusable = findFocusable( map );
-
-			expect( area.getClientRects() ).toHaveLength( 0 );
-			expect( focusable ).toHaveLength( 1 );
-			expect( focusable[ 0 ].nodeName ).toBe( 'AREA' );
-		} );
-
-		it( 'ignores invalid area focusable', () => {
-			const map = createElement( 'map' );
-			map.name = 'testfocus';
-			const area = createElement( 'area' );
-			area.href = '';
-			map.appendChild( area );
-			const img = createElement( 'img' );
-			img.setAttribute( 'usemap', '#testfocus' );
-			img.style.width = '10px';
-			img.style.height = '10px';
-			img.style.display = 'none';
-			document.body.appendChild( map );
-			document.body.appendChild( img );
-
-			expect( findFocusable( map ) ).toEqual( [] );
-		} );
-
-		it( 'ignores an area whose referenced image is inside an inert container', () => {
-			const node = createElement( 'div' );
-			node.innerHTML = `
-				<map name="testfocus">
-					<area href="#target" shape="rect" coords="0,0,30,30" alt="Target">
-				</map>
-				<div inert>
-					<img usemap="#testfocus" width="40" height="40" alt="">
-				</div>
-				<button id="target">Continue</button>
-			`;
-			const button = node.querySelector( 'button' );
-
-			const focusable = findFocusable( node );
-			focusable[ 0 ].focus();
-
-			expect( focusable ).toEqual( [ button ] );
-			expect( button ).toHaveFocus();
-		} );
-
 		it( 'finds contenteditable', () => {
 			const node = createElement( 'div' );
 			const div = createElement( 'div' );

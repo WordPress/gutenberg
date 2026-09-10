@@ -1473,6 +1473,7 @@ describe( 'Tabs', () => {
 						expect(
 							screen.getByRole( 'tab', {
 								name: updatedActiveTab,
+								selected: true,
 							} )
 						).toHaveFocus();
 

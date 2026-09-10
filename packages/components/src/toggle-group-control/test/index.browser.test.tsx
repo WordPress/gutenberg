@@ -556,8 +556,10 @@ describe.each( [
 				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pizza' );
 
 				// Clicks don't cause the option to be selected
-				// eslint-disable-next-line testing-library/no-node-access
-				screen.getByRole( 'radio', { name: 'Rice' } ).click();
+				await userEvent.click(
+					screen.getByRole( 'radio', { name: 'Rice' } ),
+					{ force: true }
+				);
 				expect(
 					screen.getByRole( 'radio', { name: 'Pizza' } )
 				).toBeChecked();
@@ -683,8 +685,10 @@ describe.each( [
 				).toHaveFocus();
 
 				// Clicks don't cause the option to be selected.
-				// eslint-disable-next-line testing-library/no-node-access
-				screen.getByRole( 'button', { name: 'Rice' } ).click();
+				await userEvent.click(
+					screen.getByRole( 'button', { name: 'Rice' } ),
+					{ force: true }
+				);
 				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 			} );
 		} );

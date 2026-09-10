@@ -17,7 +17,17 @@ function resolveStyle( property: 'color' | 'fontSize', value: string ) {
 describe( 'Text', () => {
 	test( 'should render correctly', async () => {
 		await render( <Text>Lorem ipsum.</Text> );
-		expect( screen.getByText( 'Lorem ipsum.' ) ).toBeInTheDocument();
+		const text = screen.getByText( 'Lorem ipsum.' );
+		const style = getComputedStyle( text );
+		expect( text.tagName ).toBe( 'SPAN' );
+		expect( text ).toHaveClass( 'components-text', 'components-truncate' );
+		expect( text ).toHaveAttribute( 'data-wp-component', 'Text' );
+		expect( text ).toHaveAttribute( 'data-wp-c16t', 'true' );
+		expect( style.fontSize ).toBe( '13px' );
+		expect( style.fontWeight ).toBe( '400' );
+		expect( style.lineHeight ).toBe( '18.2px' );
+		expect( style.margin ).toBe( '0px' );
+		expect( style.textWrap ).toBe( 'pretty' );
 	} );
 
 	test( 'should render optimizeReadabilityFor', async () => {
@@ -174,7 +184,9 @@ describe( 'Text', () => {
 
 		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered.
 		expect( screen.getByRole( 'heading' )?.childNodes ).toHaveLength( 1 );
-		expect( screen.queryByText( 'IPSUM' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( 'ipsum', { selector: 'mark' } )
+		).not.toBeInTheDocument();
 	} );
 
 	test( 'should render isBlock', async () => {

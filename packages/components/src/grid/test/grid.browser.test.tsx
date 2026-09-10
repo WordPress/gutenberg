@@ -7,7 +7,15 @@ import CONFIG from '../../utils/config-values';
 
 describe( 'props', () => {
 	const readStyle = () => getComputedStyle( screen.getByTestId( 'grid' ) );
-	const countTracks = ( value: string ) => value.trim().split( /\s+/ ).length;
+	const readTracks = ( value: string ) => value.trim().split( /\s+/ );
+	const expectEqualTracks = ( value: string, count: number ) => {
+		const tracks = readTracks( value );
+		expect( tracks ).toHaveLength( count );
+		const widths = tracks.map( Number.parseFloat );
+		expect(
+			Math.max( ...widths ) - Math.min( ...widths )
+		).toBeLessThanOrEqual( 0.02 );
+	};
 
 	test( 'should render correctly', async () => {
 		await render(
@@ -19,7 +27,7 @@ describe( 'props', () => {
 
 		const style = readStyle();
 		expect( style.display ).toBe( 'grid' );
-		expect( countTracks( style.gridTemplateColumns ) ).toBe( 2 );
+		expectEqualTracks( style.gridTemplateColumns, 2 );
 		expect( style.gap ).toBe(
 			`${ Number.parseFloat( CONFIG.gridBase ) * 3 }px`
 		);
@@ -36,7 +44,7 @@ describe( 'props', () => {
 
 		const style = readStyle();
 		expect( style.display ).toBe( 'grid' );
-		expect( countTracks( style.gridTemplateColumns ) ).toBe( 3 );
+		expectEqualTracks( style.gridTemplateColumns, 3 );
 		expect( style.gap ).toBe(
 			`${ Number.parseFloat( CONFIG.gridBase ) * 4 }px`
 		);
@@ -53,7 +61,7 @@ describe( 'props', () => {
 
 		const style = readStyle();
 		expect( style.display ).toBe( 'grid' );
-		expect( countTracks( style.gridTemplateColumns ) ).toBe( 7 );
+		expectEqualTracks( style.gridTemplateColumns, 7 );
 	} );
 
 	test( 'should render custom rows', async () => {
@@ -67,7 +75,7 @@ describe( 'props', () => {
 
 		const style = readStyle();
 		expect( style.display ).toBe( 'grid' );
-		expect( countTracks( style.gridTemplateRows ) ).toBe( 7 );
+		expectEqualTracks( style.gridTemplateRows, 7 );
 	} );
 
 	test( 'should render align', async () => {
@@ -124,7 +132,7 @@ describe( 'props', () => {
 
 		const style = readStyle();
 		expect( style.display ).toBe( 'inline-grid' );
-		expect( countTracks( style.gridTemplateColumns ) ).toBe( 3 );
+		expectEqualTracks( style.gridTemplateColumns, 3 );
 	} );
 
 	test( 'should render custom templateColumns', async () => {

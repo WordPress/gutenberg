@@ -84,8 +84,13 @@ describe( 'ColorPicker', () => {
 			expect( hexInput ).toBeVisible();
 
 			await user.clear( hexInput );
-			await user.type( hexInput, '1ab' );
-
+			expect( onChangeComplete ).toHaveBeenCalledTimes( 1 );
+			await user.keyboard( '1' );
+			expect( onChangeComplete ).toHaveBeenCalledTimes( 2 );
+			await user.keyboard( 'a' );
+			expect( onChangeComplete ).toHaveBeenCalledTimes( 3 );
+			await user.keyboard( 'b' );
+			expect( onChangeComplete ).toHaveBeenCalledTimes( 4 );
 			expect( onChangeComplete ).toHaveBeenLastCalledWith(
 				legacyColorMatcher
 			);
@@ -114,8 +119,13 @@ describe( 'ColorPicker', () => {
 			expect( hexInput ).toBeVisible();
 
 			await user.clear( hexInput );
-			await user.type( hexInput, '1ab' );
-
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			await user.keyboard( '1' );
+			expect( onChange ).toHaveBeenCalledTimes( 2 );
+			await user.keyboard( 'a' );
+			expect( onChange ).toHaveBeenCalledTimes( 3 );
+			await user.keyboard( 'b' );
+			expect( onChange ).toHaveBeenCalledTimes( 4 );
 			expect( onChange ).toHaveBeenLastCalledWith( '#11aabb' );
 		} );
 
@@ -171,8 +181,13 @@ describe( 'ColorPicker', () => {
 			expect( inputElement ).toBeVisible();
 
 			await user.clear( inputElement );
-			await user.type( inputElement, '125' );
-
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			await user.keyboard( '1' );
+			expect( onChange ).toHaveBeenCalledTimes( 2 );
+			await user.keyboard( '2' );
+			expect( onChange ).toHaveBeenCalledTimes( 3 );
+			await user.keyboard( '5' );
+			expect( onChange ).toHaveBeenCalledTimes( 4 );
 			expect( onChange ).toHaveBeenLastCalledWith( expected );
 		} );
 	} );
@@ -1016,12 +1031,21 @@ describe( 'ColorPicker', () => {
 
 			onChange.mockClear();
 
-			// Test pattern 2: Update the alphaInput
-			await user.fill( alphaInput, '25' );
+			// Test pattern 2: Update the alphaInput one digit at a time.
+			await user.clear( alphaInput );
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+
+			await user.keyboard( '7' );
+			expect( onChange ).toHaveBeenCalledTimes( 2 );
+			expect( onChange ).toHaveBeenNthCalledWith( 2, '#ffffff12' );
+
+			await user.keyboard( '5' );
+
+			expect( onChange ).toHaveBeenCalledTimes( 3 );
+			expect( onChange ).toHaveBeenNthCalledWith( 3, '#ffffffbf' );
 			await waitFor( () => {
-				expect( onChange ).toHaveBeenLastCalledWith( '#ffffff40' );
-				expect( alphaSlider ).toHaveValue( '25' );
-				expect( alphaInput ).toHaveValue( 25 );
+				expect( alphaSlider ).toHaveValue( '75' );
+				expect( alphaInput ).toHaveValue( 75 );
 			} );
 		} );
 	} );

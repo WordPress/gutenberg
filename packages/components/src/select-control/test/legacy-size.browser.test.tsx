@@ -4,24 +4,12 @@ import { render } from 'vitest-browser-react';
 import SelectControl from '..';
 import { InputControlPrefixWrapper } from '../../input-control/input-prefix-wrapper';
 
-const comparedProperties = [
-	'height',
-	'minHeight',
-	'paddingTop',
-	'paddingRight',
-	'paddingBottom',
-	'paddingLeft',
-	'fontSize',
-	'lineHeight',
-	'borderRadius',
-] as const;
-
-function getComparedStyles( element: Element ) {
+function getComputedStyles( element: Element ) {
 	const styles = getComputedStyle( element );
 	return Object.fromEntries(
-		comparedProperties.map( ( property ) => [
+		Array.from( styles ).map( ( property ) => [
 			property,
-			styles[ property ],
+			styles.getPropertyValue( property ),
 		] )
 	);
 }
@@ -49,11 +37,11 @@ describe( 'SelectControl legacy size support', () => {
 		const [ defaultSelect, legacySelect ] =
 			screen.getAllByRole( 'combobox' );
 
-		expect( getComparedStyles( legacyPrefixWrapper ) ).toEqual(
-			getComparedStyles( defaultPrefixWrapper )
+		expect( getComputedStyles( legacyPrefixWrapper ) ).toEqual(
+			getComputedStyles( defaultPrefixWrapper )
 		);
-		expect( getComparedStyles( legacySelect ) ).toEqual(
-			getComparedStyles( defaultSelect )
+		expect( getComputedStyles( legacySelect ) ).toEqual(
+			getComputedStyles( defaultSelect )
 		);
 	} );
 } );
