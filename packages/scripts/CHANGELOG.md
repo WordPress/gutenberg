@@ -14,6 +14,7 @@
 ### Enhancements
 
 -   Include `.jsx` unit tests in the default lint configuration ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   `lint-style`: Use stylelint's `resolveConfig` for config detection instead of a static extension list, supporting all current and future config file formats without manual maintenance overhead ([#79280](https://github.com/WordPress/gutenberg/pull/79280)).
 
 ### Internal
 
@@ -36,8 +37,6 @@
 
 ### Enhancements
 
--   `lint-style`: Use stylelint's `resolveConfig` for config detection instead of a static extension list, supporting all current and future config file formats without manual maintenance overhead ([#79280](https://github.com/WordPress/gutenberg/pull/79280)).
-- 	`format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
 -   `format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
 
 ## 33.0.0 (2026-07-14)
