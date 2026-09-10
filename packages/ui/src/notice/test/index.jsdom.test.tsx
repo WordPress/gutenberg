@@ -2,7 +2,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 import * as Notice from '../index';
+
+vi.mock( '@wordpress/a11y', () => ( {
+	speak: vi.fn(),
+} ) );
 
 describe( 'Notice', () => {
 	describe( 'basic behaviour', () => {
@@ -177,31 +182,15 @@ describe( 'Notice', () => {
 		} );
 	} );
 
-	describe( 'announcing to screen readers', () => {
-		it( 'creates a polite live region for non-error intents', () => {
-			render(
-				<Notice.Root intent="info">
-					<Notice.Description>Update available.</Notice.Description>
-				</Notice.Root>
-			);
-			expect(
-				screen.getByText( 'Update available.', {
-					selector: '[aria-live="polite"]',
-				} )
-			).toBeInTheDocument();
-		} );
-
-		it( 'creates an assertive live region for error intent', () => {
+	describe( 'screen reader announcements', () => {
+		it( 'renders without announcing its content', () => {
 			render(
 				<Notice.Root intent="error">
 					<Notice.Description>Something failed.</Notice.Description>
 				</Notice.Root>
 			);
-			expect(
-				screen.getByText( 'Something failed.', {
-					selector: '[aria-live="assertive"]',
-				} )
-			).toBeInTheDocument();
+
+			expect( speak ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

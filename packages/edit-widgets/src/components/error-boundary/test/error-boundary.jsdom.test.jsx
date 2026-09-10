@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import * as wpHooks from '@wordpress/hooks';
 import ErrorBoundary from '../index';
 
@@ -11,6 +11,19 @@ const ChildComponent = () => {
 
 describe( 'Error Boundary', () => {
 	describe( 'when error is thrown from a Child component', () => {
+		it( 'announces the error message', () => {
+			render(
+				<ErrorBoundary>
+					<ChildComponent />
+				</ErrorBoundary>
+			);
+
+			expect( console ).toHaveErrored();
+			expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+				'An unknown error occurred.'
+			);
+		} );
+
 		it( 'calls the `editor.ErrorBoundary.errorLogged` hook action with the error object and error info', () => {
 			const doAction = vi.spyOn( wpHooks, 'doAction' );
 
