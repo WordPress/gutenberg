@@ -327,7 +327,7 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-icon/test/index.jsdom.test.jsx": {
+	"packages/block-editor/src/components/block-icon/test/index.browser.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -898,7 +898,7 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/colors-gradients/test/control.jsdom.test.jsx": {
+	"packages/block-editor/src/components/colors-gradients/test/control.browser.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1126,7 +1126,7 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/global-styles/inheritance/test/index.jsdom.test.jsx": {
+	"packages/block-editor/src/components/global-styles/inheritance/test/index.browser.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1159,7 +1159,7 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/global-styles/test/color-panel.jsdom.test.jsx": {
+	"packages/block-editor/src/components/global-styles/test/color-panel.browser.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1184,12 +1184,12 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/global-styles/test/typography-panel-core.jsdom.test.jsx": {
+	"packages/block-editor/src/components/global-styles/test/typography-panel-core.browser.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/global-styles/test/typography-panel.jsdom.test.jsx": {
+	"packages/block-editor/src/components/global-styles/test/typography-panel.browser.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4876,7 +4876,7 @@
 			"count": 1
 		}
 	},
-	"packages/compose/src/hooks/use-media-query/test/index.jsdom.test.jsx": {
+	"packages/compose/src/hooks/use-media-query/test/index.browser.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

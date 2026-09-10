@@ -828,14 +828,9 @@ describe( 'Drawer', () => {
 		//   swipe-dismiss (Base UI excludes mouse-drag swipe over
 		//   [data-drawer-content] to preserve text selection).
 		//
-		// Not asserted here: the marker rendering as a real block-level
-		// element rather than `display: contents` (which would neuter
-		// `useOverlayScrollStateAttributes`'s `ResizeObserver`). CSS
-		// modules resolve to empty stubs in this jsdom test environment,
-		// so a `display: contents` regression introduced via CSS would
-		// not be observable from `getComputedStyle`. Catching it
-		// requires reviewing the marker's stylesheet rules at code
-		// review time.
+		// The Browser Mode coverage in `content.browser.test.tsx` separately
+		// verifies that the marker renders as a real layout box rather than
+		// `display: contents`, which jsdom cannot observe from computed styles.
 		it( 'wraps a [data-drawer-content] marker as the only direct child', async () => {
 			const user = userEvent.setup();
 			const contentRef = createRef< HTMLDivElement >();
