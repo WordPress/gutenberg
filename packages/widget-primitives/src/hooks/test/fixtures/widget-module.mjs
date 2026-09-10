@@ -13,6 +13,7 @@ export default {
 			id: 'location',
 			label: 'Location',
 			type: 'test/location',
+			isValid: { custom: () => null },
 		},
 		{ id: 'label', label: 'Label', type: 'text' },
 	],

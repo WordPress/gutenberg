@@ -1,14 +1,20 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import ChildLayoutControl from '../';
 
-jest.mock( '../../use-settings', () => ( {
+globalThis.wpVitest.mockMatchMedia();
+
+globalThis.wpVitest.mockResizeObserver();
+
+vi.mock( import( '../../use-settings' ), () => ( {
 	useSettings: () => [ undefined ],
 } ) );
 
-jest.mock( '@wordpress/data/src/components/use-select', () =>
-	jest.fn( ( mapSelect ) => {
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn( ( mapSelect ) => {
 		if ( typeof mapSelect === 'function' ) {
 			return mapSelect( () => ( {
 				getBlockRootClientId: () => 'root-client-id',
@@ -19,19 +25,16 @@ jest.mock( '@wordpress/data/src/components/use-select', () =>
 			getBlockAttributes: () => ( {} ),
 			getBlockOrder: () => [],
 		};
-	} )
-);
-
-jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
+	} ),
 	useDispatch: () => ( {
-		__unstableMarkNextChangeAsNotPersistent: jest.fn(),
-		moveBlocksToPosition: jest.fn(),
+		__unstableMarkNextChangeAsNotPersistent: vi.fn(),
+		moveBlocksToPosition: vi.fn(),
 	} ),
 } ) );
 
 describe( 'ChildLayoutControl', () => {
 	const baseProps = {
-		onChange: jest.fn(),
+		onChange: vi.fn(),
 		parentLayout: {
 			type: 'grid',
 		},
@@ -40,14 +43,14 @@ describe( 'ChildLayoutControl', () => {
 	};
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	function renderControl( props ) {
 		return render(
 			<ToolsPanel
 				label="Dimensions"
-				resetAll={ jest.fn() }
+				resetAll={ vi.fn() }
 				panelId="client-id"
 			>
 				<ChildLayoutControl { ...baseProps } { ...props } />
@@ -96,7 +99,7 @@ describe( 'ChildLayoutControl', () => {
 
 	it( 'sets a numeric span when entering 1 into an empty span control', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		renderControl( {
 			value: {},
@@ -134,7 +137,7 @@ describe( 'ChildLayoutControl', () => {
 
 	it( 'sets fixedNoShrink when selecting fixed flex sizing', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		renderControl( {
 			parentLayout: {
@@ -155,7 +158,7 @@ describe( 'ChildLayoutControl', () => {
 
 	it( 'sets legacy fixed when selecting max sizing', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		renderControl( {
 			parentLayout: {

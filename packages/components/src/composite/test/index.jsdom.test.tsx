@@ -1,5 +1,7 @@
+import { beforeEach, describe, expect, it, test, vi } from 'vitest';
 import { queryByAttribute, render, screen } from '@testing-library/react';
 import { click, press, waitFor } from '@ariakit/test';
+import * as Ariakit from '@ariakit/react';
 import type { ComponentProps } from 'react';
 import { useState } from '@wordpress/element';
 import { Composite } from '..';
@@ -18,26 +20,20 @@ async function renderAndValidate( ...args: Parameters< typeof render > ) {
 }
 
 describe( 'Composite', () => {
-	let clientHeightSpy: jest.SpiedGetter<
-		typeof HTMLElement.prototype.clientHeight
-	>;
-
-	beforeAll( () => {
+	beforeEach( () => {
 		// This is necessary because of how Ariakit calculates page up and
 		// page down. Without this, nothing has a height, and so paging up
 		// and down doesn't behave as expected in tests.
-		clientHeightSpy = jest
-			.spyOn( HTMLElement.prototype, 'clientHeight', 'get' )
-			.mockImplementation( function getClientHeight( this: HTMLElement ) {
-				if ( this.tagName === 'BODY' ) {
-					return window.outerHeight;
-				}
-				return 50;
-			} );
-	} );
-
-	afterAll( () => {
-		clientHeightSpy?.mockRestore();
+		vi.spyOn(
+			HTMLElement.prototype,
+			'clientHeight',
+			'get'
+		).mockImplementation( function getClientHeight( this: HTMLElement ) {
+			if ( this.tagName === 'BODY' ) {
+				return window.outerHeight;
+			}
+			return 50;
+		} );
 	} );
 
 	test( 'Renders as a single tab stop', async () => {
@@ -698,6 +694,53 @@ describe( 'Composite', () => {
 				// C2 is disabled
 				expect( itemB2 ).toHaveFocus();
 			} );
+		} );
+	} );
+
+	describe( 'required context', () => {
+		it( 'warns when Composite.Item has no composite state', () => {
+			render( <Composite.Item>Item</Composite.Item> );
+
+			expect(
+				screen.getByRole( 'button', { name: 'Item' } )
+			).toBeVisible();
+			expect( console ).toHaveWarnedWith(
+				'Composite.Item: Missing composite state. Render inside Composite to enable composite keyboard behavior.'
+			);
+		} );
+
+		it( 'supports an explicit store prop for Composite.Item', () => {
+			function ItemWithStore() {
+				const store = Ariakit.useCompositeStore();
+
+				return (
+					<Composite.Item
+						// @ts-expect-error The store prop is intentionally omitted from the public types.
+						store={ store }
+					>
+						Item
+					</Composite.Item>
+				);
+			}
+
+			render( <ItemWithStore /> );
+
+			expect(
+				screen.getByRole( 'button', { name: 'Item' } )
+			).toBeVisible();
+		} );
+
+		it( 'throws when Composite.GroupLabel is outside Composite.Group', () => {
+			expect( () =>
+				render(
+					<Composite>
+						<Composite.GroupLabel>Label</Composite.GroupLabel>
+					</Composite>
+				)
+			).toThrow(
+				'Composite.GroupLabel can only be rendered inside Composite.Group.'
+			);
+			expect( console ).toHaveErrored();
 		} );
 	} );
 } );

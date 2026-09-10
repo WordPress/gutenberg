@@ -1,6 +1,6 @@
 import { forwardRef, useInsertionEffect, useRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { ENTER } from '@wordpress/keycodes';
 import {
 	create,
@@ -18,6 +18,7 @@ import { unlock } from '../../lock-unlock';
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 function useEnterRef( props ) {
+	const registry = useRegistry();
 	const { getSelectionStart, getSelectionEnd } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
@@ -49,8 +50,15 @@ function useEnterRef( props ) {
 
 			const newValues = values.slice();
 			newValues.splice( index, 1, ...array );
-			onChange( newValues );
-			selectionChange( clientId, `${ identifier }-${ index + 1 }`, 0, 0 );
+			registry.batch( () => {
+				onChange( newValues );
+				selectionChange(
+					clientId,
+					`${ identifier }-${ index + 1 }`,
+					0,
+					0
+				);
+			} );
 		}
 		// Capture phase so this runs before the generic rich text enter
 		// listener, which skips events that already had their default
