@@ -1406,7 +1406,6 @@ class WP_Theme_JSON_Gutenberg {
 					foreach ( array_keys( $responsive_media_queries ) as $breakpoint_state ) {
 						$variation_schema[ $breakpoint_state ]             = $styles_non_top_level;
 						$variation_schema[ $breakpoint_state ]['elements'] = $schema_styles_elements;
-						$variation_schema[ $breakpoint_state ]['blocks']   = $schema_styles_blocks;
 
 						if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
 							foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
