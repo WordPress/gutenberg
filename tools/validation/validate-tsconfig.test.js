@@ -1,13 +1,38 @@
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import {
+	mkdtempSync,
+	mkdirSync,
+	readFileSync,
+	rmSync,
+	writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parse } from 'jsonc-parser';
 import { afterEach, expect, test } from 'vitest';
 
 const validatorPath = fileURLToPath(
 	new URL( 'validate-tsconfig.mjs', import.meta.url )
 );
+
+/*
+ * The validator resolves the base config by package name, so it always reads
+ * the real one rather than anything a fixture writes. Derive the patterns a
+ * build project has to keep the same way it does, so adding a pattern to the
+ * base config does not strand these fixtures.
+ */
+const REQUIRED_BUILD_EXCLUDES = parse(
+	readFileSync(
+		fileURLToPath(
+			import.meta.resolve( '@wordpress/config-tools/tsconfig/base.json' )
+		),
+		'utf8'
+	)
+)
+	.exclude.map( ( pattern ) => pattern.replace( /^\$\{configDir\}\//, '' ) )
+	.filter( ( pattern ) => /test|stories|story/.test( pattern ) );
+
 const temporaryRoots = [];
 
 afterEach( () => {
@@ -36,17 +61,6 @@ function createRepo( { packages, routes, build, root } ) {
 	const repoRoot = mkdtempSync( join( tmpdir(), 'validate-tsconfig-' ) );
 	temporaryRoots.push( repoRoot );
 
-	/*
-	 * Patterns carry the prefix that walks back to the repo root, as they do
-	 * in the real config: the validator has to compare them without it.
-	 */
-	writeJson( join( repoRoot, 'tools', 'configs', 'tsconfig', 'base.json' ), {
-		exclude: [
-			'../../../**/benchmark',
-			'../../../**/test/**',
-			'../../../**/stories/**',
-		],
-	} );
 	writeJson( join( repoRoot, 'tsconfig.build.json' ), {
 		references: build.map( ( path ) => ( { path } ) ),
 	} );
@@ -545,7 +559,7 @@ test( 'fails when a build project exclude omits a dev-file pattern of the base',
 						'tsconfig.build.json': {
 							exclude: [
 								'**/benchmark',
-								'**/test/**',
+								...REQUIRED_BUILD_EXCLUDES.slice( 0, -1 ),
 								'src/legacy.js',
 							],
 							references: [],
@@ -560,7 +574,9 @@ test( 'fails when a build project exclude omits a dev-file pattern of the base',
 
 	expect( result.status ).not.toBe( 0 );
 	expect( result.stderr ).toContain(
-		'Missing exclude "**/stories/**" in packages/blob/tsconfig.build.json'
+		`Missing exclude "${ REQUIRED_BUILD_EXCLUDES.at(
+			-1
+		) }" in packages/blob/tsconfig.build.json`
 	);
 } );
 
@@ -578,8 +594,7 @@ test( 'passes when a build project keeps every dev-file pattern of the base', ()
 						'tsconfig.build.json': {
 							exclude: [
 								'**/benchmark',
-								'**/test/**',
-								'**/stories/**',
+								...REQUIRED_BUILD_EXCLUDES,
 								'src/legacy.js',
 							],
 							references: [],
