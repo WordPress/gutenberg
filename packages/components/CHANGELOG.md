@@ -5,6 +5,11 @@
 ### Enhancements
 
 -   `CheckboxControl`: Match the `@wordpress/ui` checkmark size and disabled fill ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
+-   `Snackbar`: Show the action's focus ring with the design system's outline instead of a legacy dotted outline, and let `Button`/`ExternalLink` own the ring ([#82640](https://github.com/WordPress/gutenberg/pull/82640)).
+
+### Internal
+
+-   `Notice`: Remove dismiss button style overrides that now duplicate `Button` defaults, and drop an unused Sass import ([#82640](https://github.com/WordPress/gutenberg/pull/82640)).
 
 ## 40.1.0 (2026-09-10)
 
