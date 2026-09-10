@@ -36,6 +36,8 @@
 
 ### Enhancements
 
+-   DataViews: collapse default bulk actions into a labeled menu on mobile, including eligible actions without icons.
+
 -   DataViews: show bulk actions in the default table and grid headers, with a plain selected-item count. Custom compositions retain their existing placement.
 
 -   Give unselected multi-selection filter indicators solid, themed backgrounds. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))

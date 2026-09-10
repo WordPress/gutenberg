@@ -1378,6 +1378,96 @@ describe( 'DataViews component', () => {
 			mockUseViewportMatch.mockImplementation( () => false );
 		} );
 
+		it.each( [ LAYOUT_TABLE, LAYOUT_GRID ] as const )(
+			'opens labeled iconless bulk actions and passes eligible items in %s',
+			async ( type ) => {
+				let finishAction: () => void = () => {};
+				const pendingAction = new Promise< void >( ( resolve ) => {
+					finishAction = resolve;
+				} );
+				const callback = vi.fn( () => pendingAction );
+				render(
+					<DataViewWrapper
+						view={ { ...DEFAULT_VIEW, type } }
+						selection={ [ '1', '2', '3' ] }
+						onChangeSelection={ vi.fn() }
+						actions={ [
+							{
+								id: 'duplicate',
+								label: ( items ) =>
+									`Duplicate ${ items.length } items`,
+								supportsBulk: true,
+								isEligible: ( item ) => item.id !== 2,
+								callback,
+							},
+						] }
+					/>
+				);
+				const user = userEvent.setup();
+				const bulkActions = screen.getAllByRole( 'button', {
+					name: 'Actions',
+				} )[ 0 ];
+				expect( bulkActions ).toHaveTextContent( 'Actions' );
+				await user.click( bulkActions );
+				await user.click(
+					screen.getByRole( 'menuitem', {
+						name: 'Duplicate 2 items',
+					} )
+				);
+				expect( callback ).toHaveBeenCalledWith(
+					[ data[ 0 ], data[ 2 ] ],
+					expect.objectContaining( {
+						registry: expect.any( Object ),
+					} )
+				);
+				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+				expect( bulkActions ).toHaveAttribute(
+					'aria-disabled',
+					'true'
+				);
+				finishAction();
+				await waitFor( () =>
+					expect( bulkActions ).not.toHaveAttribute(
+						'aria-disabled',
+						'true'
+					)
+				);
+			}
+		);
+
+		it.each( [ LAYOUT_TABLE, LAYOUT_GRID ] as const )(
+			'keeps the bulk action dialog open after closing the mobile menu in %s',
+			async ( type ) => {
+				render(
+					<DataViewWrapper
+						view={ { ...DEFAULT_VIEW, type } }
+						selection={ [ '1' ] }
+						onChangeSelection={ vi.fn() }
+						actions={ actions }
+					/>
+				);
+				const user = userEvent.setup();
+				const bulkActions = screen.getAllByRole( 'button', {
+					name: 'Actions',
+				} )[ 0 ];
+				await user.click( bulkActions );
+				await user.click(
+					screen.getByRole( 'menuitem', { name: 'Delete' } )
+				);
+				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+				expect(
+					screen.getByRole( 'dialog', { name: 'Delete' } )
+				).toHaveTextContent( 'Modal Content' );
+				await user.click(
+					screen.getByRole( 'button', { name: 'Close' } )
+				);
+				expect(
+					screen.queryByRole( 'dialog' )
+				).not.toBeInTheDocument();
+				expect( bulkActions ).toHaveFocus();
+			}
+		);
+
 		it( 'should show actions dropdown on mobile even when there is only one action in table layout', () => {
 			render(
 				<DataViewWrapper

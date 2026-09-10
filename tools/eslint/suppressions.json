@@ -5179,11 +5179,6 @@
 			"count": 1
 		}
 	},
-	"packages/dataviews/src/components/dataviews-bulk-actions/index.tsx": {
-		"react-hooks/refs": {
-			"count": 4
-		}
-	},
 	"packages/dataviews/src/components/dataviews-filters/filter.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1

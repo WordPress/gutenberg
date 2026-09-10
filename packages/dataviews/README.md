@@ -565,6 +565,7 @@ The following components are available directly under `DataViews`:
 -   `DataViews.ViewConfig`
 
 The default UI includes bulk-action controls in the table and grid headers.
+On mobile, these controls group the available actions in a labeled menu.
 Custom compositions retain control of their placement: `DataViews.Layout`
 does not add a toolbar, and `DataViews.BulkActionToolbar` and `DataViews.Footer`
 retain their count and bulk-action controls.
