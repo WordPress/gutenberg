@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ContentEditableControl from '..';
 
@@ -142,15 +143,15 @@ describe( 'ContentEditableControl', () => {
 	it( 'forwards its ref to the contenteditable element', () => {
 		// The rich-text wiring (the `useRichText` ref, event-listener refs,
 		// an anchor ref, …) is injected through this forwarded ref.
-		const ref = jest.fn();
+		const ref = vi.fn();
 		render( <ContentEditableControl label="Note" ref={ ref } /> );
 
 		expect( ref ).toHaveBeenCalledWith( screen.getByRole( 'textbox' ) );
 	} );
 
 	it( 'calls consumer-supplied focus and blur handlers', () => {
-		const onFocus = jest.fn();
-		const onBlur = jest.fn();
+		const onFocus = vi.fn();
+		const onBlur = vi.fn();
 		render(
 			<ContentEditableControl
 				label="Field"

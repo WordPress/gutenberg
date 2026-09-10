@@ -2,9 +2,8 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
+import type { Field } from '@wordpress/dataviews';
 import type { NormalizedPattern } from '../use-patterns';
-
-const OPERATOR_IS = 'is';
 
 function CategoryField( { item }: { item: NormalizedPattern } ) {
 	const blockPatternCategories = useSelect(
@@ -86,21 +85,22 @@ export function usePatternCategories() {
  * Pattern category field configuration for DataViews.
  * This field shows pattern categories and provides filtering capabilities.
  */
-export function usePatternCategoryField() {
+export function usePatternCategoryField(): Field< NormalizedPattern > {
 	const categories = usePatternCategories();
 
-	return {
-		label: __( 'Category' ),
-		id: 'category',
-		render: CategoryField,
-		elements: categories,
-		getValue: ( { item }: { item: NormalizedPattern } ) => {
-			return item.categories;
-		},
-		filterBy: {
-			operators: [ OPERATOR_IS ],
-			isPrimary: true,
-		},
-		enableSorting: false,
-	};
+	return useMemo(
+		() => ( {
+			label: __( 'Category' ),
+			id: 'category',
+			render: CategoryField,
+			elements: categories,
+			getValue: ( { item } ) => item.categories,
+			filterBy: {
+				operators: [ 'is' ],
+				isPrimary: true,
+			},
+			enableSorting: false,
+		} ),
+		[ categories ]
+	);
 }

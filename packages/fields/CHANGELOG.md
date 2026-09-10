@@ -2,17 +2,27 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `MediaEdit`: Show a message instead of the picker when the user lacks permission to upload media. ([#82720](https://github.com/WordPress/gutenberg/pull/82720))
+
+## 0.47.0 (2026-09-10)
+
 ### Enhancements
 
+-   Show a "Privacy Policy Page" badge next to the title of the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
 -   Append an ellipsis (`…`) to the labels of the actions that open a dialog requiring further input or confirmation (`Delete…`, `Trash…`, `Permanently delete…`, `Rename…`, `Duplicate…`, `Reset…`, `Order…`), following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
+-   `PageTitleView`: Migrate the page-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82499](https://github.com/WordPress/gutenberg/pull/82499))
 
 ### Bug Fixes
 
+-   `author`: Drop the custom `sort` callback, which read `_embedded.author` from the arguments although `Field.sort` receives the field values (the author ids), so every comparison returned `0` and in-memory sorting by author was a no-op. The field now sorts by author id through the `integer` type, matching the order the REST API returns for `orderby=author` ([#82559](https://github.com/WordPress/gutenberg/pull/82559)).
 -   Hide the slug field for posts without a permalink, such as posts of non-public post types, matching the classic post URL panel ([#82341](https://github.com/WordPress/gutenberg/pull/82341)).
 -   Normalize special characters in exported pattern filenames to prevent broken or unreadable files. ([#77033](https://github.com/WordPress/gutenberg/pull/77033))
 
 ### Internal
 
+-   `pingStatusField`: Replace the custom `Edit` component with the built-in checkbox control of the `boolean` field type. The field now exposes the REST API's `open` / `closed` value as a boolean through `getValue` and `setValue`, and passes the help link as the field's `description` ([#82539](https://github.com/WordPress/gutenberg/pull/82539)).
 -   `MediaEdit`: Space `ValidityIndicator` with `Stack` now that the indicator has no outer margin. ([#82267](https://github.com/WordPress/gutenberg/pull/82267))
 -   Remove the template activation (`active_templates`) experiment checks from the rename, reset, and duplicate actions ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
 -   Remove unused dependencies `@wordpress/hooks`, `@wordpress/primitives`, `@wordpress/router`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

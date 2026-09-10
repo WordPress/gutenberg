@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 import { useMemo, useState } from '@wordpress/element';
 import DataViewsPicker from '../index';
 import {
@@ -16,6 +17,13 @@ import type {
 } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 
+globalThis.wpVitest.mockMatchMedia();
+
+globalThis.wpVitest.mockCSSSupports();
+globalThis.wpVitest.mockResizeObserver();
+globalThis.wpVitest.mockScrollIntoView();
+globalThis.wpVitest.mockVisibleElements();
+
 type Data = {
 	id: number;
 	title: string;
@@ -23,7 +31,7 @@ type Data = {
 	order?: number;
 };
 
-const onChangeSelection = jest.fn();
+const onChangeSelection = vi.fn();
 
 const data: Data[] = [
 	{
@@ -46,7 +54,7 @@ const data: Data[] = [
 	},
 ];
 
-const singleSelectCallback = jest.fn();
+const singleSelectCallback = vi.fn();
 const singleSelectActions: ActionButton< Data >[] = [
 	{
 		id: 'confirm',
@@ -57,7 +65,7 @@ const singleSelectActions: ActionButton< Data >[] = [
 	},
 ];
 
-const multiSelectCallback = jest.fn();
+const multiSelectCallback = vi.fn();
 const multiSelectActions: ActionButton< Data >[] = [
 	{
 		id: 'confirm',
@@ -666,6 +674,57 @@ describe( 'DataViews Picker', () => {
 				data[ 0 ].id.toString(),
 				data[ 2 ].id.toString(),
 			] );
+		} );
+	} );
+
+	describe( 'Table layout', () => {
+		it( 'does not render a column for a field id without a field definition', () => {
+			const { container } = render(
+				<Picker
+					layout={ LAYOUT_PICKER_TABLE }
+					fields={ [
+						{ id: 'title', label: 'Title' },
+						{ id: 'order', label: 'Order' },
+					] }
+					view={ { fields: [ 'order', 'missing' ] } }
+				/>
+			);
+
+			// The picker table marks its rows and cells as presentational, so
+			// they have no queryable role.
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const headers = container.querySelectorAll( 'thead th' );
+			// The checkbox column, the primary (title) column and the order
+			// column.
+			expect( headers ).toHaveLength( 3 );
+			expect( headers[ 2 ] ).toHaveTextContent( 'Order' );
+
+			for ( const option of screen.getAllByRole( 'option' ) ) {
+				// eslint-disable-next-line testing-library/no-node-access
+				expect( option.querySelectorAll( 'td' ) ).toHaveLength( 3 );
+			}
+		} );
+
+		it( 'disables moving right for the last column when a field id without a field definition follows it', async () => {
+			const user = userEvent.setup();
+			render(
+				<Picker
+					layout={ LAYOUT_PICKER_TABLE }
+					fields={ [
+						{ id: 'title', label: 'Title' },
+						{ id: 'order', label: 'Order' },
+					] }
+					view={ { fields: [ 'order', 'missing' ] } }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Order' } ) );
+
+			// `order` is the last rendered column, so it can't move right even
+			// though a skipped id follows it in `view.fields`.
+			expect(
+				await screen.findByRole( 'menuitem', { name: 'Move right' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 	} );
 

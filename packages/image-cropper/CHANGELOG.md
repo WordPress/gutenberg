@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.19.0 (2026-09-10)
+
 ### Internal
 
 -   Remove unused dependency `clsx` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
