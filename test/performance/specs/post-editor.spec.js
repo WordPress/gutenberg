@@ -72,7 +72,6 @@ test.describe( 'Post Editor Performance', () => {
 		for ( let i = 1; i <= iterations; i++ ) {
 			test( `Run the test (${ i } of ${ iterations })`, async ( {
 				admin,
-				perfUtils,
 				metrics,
 			} ) => {
 				// Start tracing before navigating so the page load is captured.
@@ -83,13 +82,16 @@ test.describe( 'Post Editor Performance', () => {
 					'wp-admin/post.php?post=' + draftId + '&action=edit'
 				);
 
-				// Wait for the first block.
-				const canvas = await perfUtils.getCanvas();
-				await canvas.locator( '.wp-block' ).first().waitFor();
+				// Wait for the editor canvas iframe's first-contentful-paint
+				// entry. This is the moment the browser actually painted the
+				// block tree, without the DOM-probe-vs-paint race or polling
+				// jitter of a `.wp-block` locator wait. Throws if FCP fires
+				// before any `.wp-block` is in the iframe DOM.
+				const firstBlockTime = await metrics.getFirstBlockTime();
 
 				// Capture timing metrics before `stopTracing()`, which
 				// blocks for the trace download/parse and would otherwise
-				// inflate `timeSinceResponseEnd` by seconds.
+				// inflate timings by seconds.
 				const loadingDurations = await metrics.getLoadingDurations();
 
 				// Stop tracing. Save just one representative sample.
@@ -103,12 +105,14 @@ test.describe( 'Post Editor Performance', () => {
 					Object.entries( loadingDurations ).forEach(
 						( [ metric, duration ] ) => {
 							if ( metric === 'timeSinceResponseEnd' ) {
-								results.firstBlock.push( duration );
-							} else {
-								results[ metric ].push( duration );
+								return;
 							}
+							results[ metric ].push( duration );
 						}
 					);
+					if ( firstBlockTime !== null ) {
+						results.firstBlock.push( firstBlockTime );
+					}
 
 					const serverTiming = await metrics.getServerTiming();
 
