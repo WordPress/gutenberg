@@ -213,7 +213,10 @@ export default function useClipboardHandler() {
 					blocks = pasteHandler( {
 						HTML: html,
 						plainText,
-						mode: isFullySelected ? 'BLOCKS' : 'AUTO',
+						mode:
+							isFullySelected || hasMultiSelection()
+								? 'BLOCKS'
+								: 'AUTO',
 						canUserUseUnfilteredHTML,
 					} );
 				}
