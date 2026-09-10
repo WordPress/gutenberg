@@ -1,8 +1,36 @@
 import clsx from 'clsx';
 import { diffChars } from 'diff';
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { getSaveContent } from '@wordpress/blocks';
+import { getBlockContent } from '@wordpress/blocks';
 import BlockView from './block-view';
+
+/**
+ * Renders the text of an added or removed diff part, marking each of its
+ * newlines with a visible symbol. The highlight of a changed part has no width
+ * at a bare line break, so without the symbol a difference made of blank lines
+ * cannot be seen.
+ *
+ * @param {string} value Text of the diff part.
+ * @return {Array} Text pieces, with a marker before each newline.
+ */
+function getChangedValue( value ) {
+	return value.split( /(\n)/ ).map( ( piece, index ) =>
+		piece === '\n' ? (
+			<Fragment key={ index }>
+				<span
+					className="block-editor-block-compare__newline"
+					aria-hidden="true"
+				>
+					↵
+				</span>
+				{ piece }
+			</Fragment>
+		) : (
+			piece
+		)
+	);
+}
 
 function BlockCompare( {
 	block,
@@ -15,6 +43,7 @@ function BlockCompare( {
 		const difference = diffChars( originalContent, newContent );
 
 		return difference.map( ( item, pos ) => {
+			const isChanged = item.added || item.removed;
 			const classes = clsx( {
 				'block-editor-block-compare__added': item.added,
 				'block-editor-block-compare__removed': item.removed,
@@ -22,7 +51,7 @@ function BlockCompare( {
 
 			return (
 				<span key={ pos } className={ classes }>
-					{ item.value }
+					{ isChanged ? getChangedValue( item.value ) : item.value }
 				</span>
 			);
 		} );
@@ -34,10 +63,10 @@ function BlockCompare( {
 			? convertedBlock
 			: [ convertedBlock ];
 
-		// Get converted block details.
-		const newContent = newBlocks.map( ( item ) =>
-			getSaveContent( item.name, item.attributes, item.innerBlocks )
-		);
+		// Get converted block details. `getBlockContent` also covers the
+		// Custom HTML block, which keeps its markup in `innerContent` rather
+		// than producing it from `save`.
+		const newContent = newBlocks.map( ( item ) => getBlockContent( item ) );
 
 		return newContent.join( '' );
 	}
