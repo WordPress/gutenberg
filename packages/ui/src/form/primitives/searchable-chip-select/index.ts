@@ -16,8 +16,6 @@ GroupLabel.displayName = 'SearchableChipSelect.GroupLabel';
  * support for a creatable footer action.
  *
  * Prefer `SearchableChipSelectControl` when using with a standard label and description.
- *
- * Announces a visually hidden result count as the list filters.
  */
 export const SearchableChipSelect = Object.assign( _SearchableChipSelect, {
 	Item,

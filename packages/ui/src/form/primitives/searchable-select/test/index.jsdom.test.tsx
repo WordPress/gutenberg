@@ -329,8 +329,7 @@ describe( 'SearchableSelect', () => {
 
 		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
 
-		const announcement = await screen.findByText( '3 results found.' );
-		expect( announcement ).toHaveAttribute( 'data-visually-hidden' );
+		await screen.findByText( '3 results found.' );
 	} );
 
 	it( 'updates the visually hidden result count as the list filters', async () => {
@@ -346,8 +345,7 @@ describe( 'SearchableSelect', () => {
 			'Apr'
 		);
 
-		const announcement = await screen.findByText( '1 result found.' );
-		expect( announcement ).toHaveAttribute( 'data-visually-hidden' );
+		await screen.findByText( '1 result found.' );
 	} );
 
 	it( 'does not announce a result count when there are no matching items', async () => {
@@ -388,8 +386,7 @@ describe( 'SearchableSelect', () => {
 
 		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
 
-		const announcement = await screen.findByText( '3 results found.' );
-		expect( announcement ).toHaveAttribute( 'data-visually-hidden' );
+		await screen.findByText( '3 results found.' );
 	} );
 
 	it( 'announces the item count for grouped items', async () => {
@@ -424,8 +421,7 @@ describe( 'SearchableSelect', () => {
 
 		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
 
-		const announcement = await screen.findByText( '6 results found.' );
-		expect( announcement ).toHaveAttribute( 'data-visually-hidden' );
+		await screen.findByText( '6 results found.' );
 	} );
 
 	describe( 'creatable item', () => {

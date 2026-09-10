@@ -5,8 +5,6 @@ import type { SearchableChipSelectControlProps } from './types';
 /**
  * A complete searchable multi-select field with chips, integrated label,
  * and description.
- *
- * Announces a visually hidden result count as the list filters.
  */
 export const SearchableChipSelectControl = forwardRef<
 	HTMLInputElement,

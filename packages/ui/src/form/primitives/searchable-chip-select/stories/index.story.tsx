@@ -93,19 +93,6 @@ export const WithCustomEmptyContent: Story = {
 };
 
 /**
- * Use `statusContent` to replace the default visually hidden result count,
- * for example while loading. Pass `emptyContent={ null }` at the same time
- * so Empty does not claim there are no results.
- */
-export const WithStatusContent: Story = {
-	args: {
-		...Default.args,
-		statusContent: 'Loading…',
-		emptyContent: null,
-	},
-};
-
-/**
  * To render grouped items, pass an array of groups to `items` (each with
  * `label` and `items` properties) and provide `children` that renders each
  * group using `SearchableChipSelect.Group`, `SearchableChipSelect.GroupLabel`,

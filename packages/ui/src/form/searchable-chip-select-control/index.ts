@@ -9,8 +9,6 @@ import { useFilteredItems } from '../primitives/combobox/use-filtered-items';
 /**
  * A complete searchable multi-select field with chips, integrated label,
  * and description.
- *
- * Announces a visually hidden result count as the list filters.
  */
 export const SearchableChipSelectControl = Object.assign(
 	_SearchableChipSelectControl,

@@ -12,8 +12,6 @@ GroupLabel.displayName = 'SearchableSelect.GroupLabel';
 /**
  * A searchable single-selection component, with support for
  * a creatable footer action.
- *
- * Announces a visually hidden result count as the list filters.
  */
 export const SearchableSelect = Object.assign( _SearchableSelect, {
 	Item,

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
+import { Spinner } from '../../../spinner';
+import { Stack } from '../../../stack';
 import { SearchableChipSelectControl } from '../';
 import {
 	GROUPED_ITEMS,
@@ -186,11 +188,50 @@ export const WithCustomEmptyContent: Story = {
 	},
 };
 
-export const WithStatusContent: Story = {
-	...SearchableChipSelectStories.WithStatusContent,
+/**
+ * Loads the item list asynchronously. While loading, pass `statusContent`
+ * and `emptyContent={ null }` so Empty does not claim there are no results.
+ * When loading finishes, omit `statusContent` to restore the default
+ * visually hidden result count.
+ */
+export const AsyncItems: Story = {
 	args: {
-		...Default.args,
-		...SearchableChipSelectStories.WithStatusContent.args,
+		label: 'Label',
+		description: 'This is a description.',
+	},
+	render: function Template( args ) {
+		const [ loading, setLoading ] = useState( false );
+		const [ items, setItems ] = useState< typeof ITEMS >( [] );
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+
+		return (
+			<SearchableChipSelectControl
+				{ ...args }
+				items={ items }
+				statusContent={
+					loading ? (
+						<Stack direction="row" gap="sm" align="center">
+							<Spinner />
+							Loading…
+						</Stack>
+					) : undefined
+				}
+				emptyContent={ loading ? null : undefined }
+				onOpenChange={ ( open ) => {
+					if ( ! open ) {
+						clearTimeout( timeoutRef.current );
+						return;
+					}
+					setLoading( true );
+					setItems( [] );
+					clearTimeout( timeoutRef.current );
+					timeoutRef.current = setTimeout( () => {
+						setItems( ITEMS );
+						setLoading( false );
+					}, 500 );
+				} }
+			/>
+		);
 	},
 };
 
