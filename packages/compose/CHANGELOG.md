@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.8.0 (2026-09-10)
+
 ### Bug Fixes
 
 -   `useResizeObserver`: Disconnect the observer when the hook unmounts so queued callbacks cannot run after teardown ([#82687](https://github.com/WordPress/gutenberg/pull/82687)).
