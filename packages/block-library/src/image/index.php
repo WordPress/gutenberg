@@ -293,12 +293,17 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 	$img = null;
 	preg_match( '/<img[^>]+>/', $body_content, $img );
 
+	// The static aria-label on the button below is the pre-hydration / no-JS
+	// fallback. It must stay in sync with the 'triggerButtonAriaLabel' default set
+	// in wp_interactivity_state() above (both __( 'Enlarge' )); the
+	// data-wp-bind--aria-label directive overrides it at runtime once hydrated.
 	$button =
 		$img[0]
 		. '<button
 			class="lightbox-trigger"
 			type="button"
 			aria-haspopup="dialog"
+			aria-label="' . esc_attr__( 'Enlarge' ) . '"
 			data-wp-bind--aria-label="state.thisImage.triggerButtonAriaLabel"
 			data-wp-init="callbacks.initTriggerButton"
 			data-wp-on--click="actions.showLightbox"
