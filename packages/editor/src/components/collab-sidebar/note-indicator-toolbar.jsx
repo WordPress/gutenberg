@@ -8,7 +8,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { unlock } from '../../lock-unlock';
-import { getAvatarBorderColor } from './utils';
+import { getAvatarBorderColor, getThreadParticipants } from './utils';
 
 const { NoteIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
@@ -63,35 +63,13 @@ function ThreadParticipants( { participants } ) {
 	);
 }
 
-export function NoteAvatarIndicator( { onClick, note } ) {
-	const threadParticipants = useMemo( () => {
-		if ( ! note ) {
-			return [];
-		}
-
-		// Track thread participants (original author + repliers), sorted by
-		// date so they appear in chronological order.
-		const participantsMap = new Map();
-		const allNotes = [ note, ...note.reply ].sort(
-			( a, b ) => new Date( a.date ) - new Date( b.date )
-		);
-
-		for ( const entry of allNotes ) {
-			if ( ! entry.author_name || participantsMap.has( entry.author ) ) {
-				continue;
-			}
-
-			participantsMap.set( entry.author, {
-				id: entry.author,
-				name: entry.author_name,
-				avatar:
-					entry.author_avatar_urls?.[ '48' ] ||
-					entry.author_avatar_urls?.[ '96' ],
-			} );
-		}
-
-		return Array.from( participantsMap.values() );
-	}, [ note ] );
+export function NoteAvatarIndicator( { onClick, notes } ) {
+	// A block can carry several threads; the indicator stands for all of them,
+	// so aggregate the participants rather than showing a single thread's.
+	const threadParticipants = useMemo(
+		() => getThreadParticipants( notes ?? [] ),
+		[ notes ]
+	);
 
 	if ( ! threadParticipants.length ) {
 		return null;

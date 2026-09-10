@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -20,7 +20,11 @@ import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
 import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
-import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
+import {
+	getNoteIdsFromMetadata,
+	pickIndicatorNotes,
+	pickPrimaryNote,
+} from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
@@ -49,7 +53,6 @@ function NotesSidebar( { postId } ) {
 		};
 	}, [] );
 
-	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 	const { isDistractionFree } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
@@ -140,12 +143,17 @@ function NotesSidebar( { postId } ) {
 	const { merged: GlobalStyles } = useGlobalStyles();
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
 
-	// Surface one thread for the avatar indicator.
-	const currentThreads =
-		blockNoteIds.length > 0
-			? notes.filter( ( thread ) => blockNoteIds.includes( thread.id ) )
-			: [];
-	const currentThread = pickPrimaryNote( currentThreads );
+	// The avatar indicator stands for every thread on the block, so it gets
+	// the whole set and aggregates their participants.
+	const indicatorThreads = useMemo( () => {
+		const noteIds = getNoteIdsFromMetadata( { noteId } );
+		if ( noteIds.length === 0 ) {
+			return [];
+		}
+		return pickIndicatorNotes(
+			notes.filter( ( thread ) => noteIds.includes( thread.id ) )
+		);
+	}, [ notes, noteId ] );
 
 	if ( isDistractionFree ) {
 		return <AddNoteMenuItem isDistractionFree />;
@@ -157,9 +165,9 @@ function NotesSidebar( { postId } ) {
 				threads={ unresolvedNotes }
 				selectedId={ selectedNoteId }
 			/>
-			{ !! currentThread && (
+			{ indicatorThreads.length > 0 && (
 				<NoteAvatarIndicator
-					note={ currentThread }
+					notes={ indicatorThreads }
 					onClick={ () => openNoteForBlock( clientId ) }
 				/>
 			) }
