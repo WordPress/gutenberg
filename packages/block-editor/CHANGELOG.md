@@ -37,6 +37,7 @@
 -   In-between inserter: Show the inserter between blocks on a wrapped line of a horizontal container, such as the Buttons, Row, Gallery and Navigation blocks ([#83276](https://github.com/WordPress/gutenberg/pull/83276)).
 -   In-between inserter: Resolve the hovered block through the block refs rather than the container's DOM children, so the inserter also appears in lists whose blocks apply their block props to an inner element, such as Social Icons ([#83327](https://github.com/WordPress/gutenberg/pull/83327)).
 -   In HEIC-only upload mode, route files to the HEIC conversion by what they contain rather than by the MIME type the browser infers from their name, so a HEIC photo saved as `.jpg` or `.png` is no longer handed to a server-side path that cannot convert it either ([#81737](https://github.com/WordPress/gutenberg/pull/81737)).
+-   `BlockCompare`: Show whitespace differences in the Resolve Block dialog. The markup's spaces and blank lines are kept instead of collapsed by the browser, and each added or removed line break gets a visible marker, so a diff made only of whitespace no longer looks identical on both sides. The dialog also shows the markup of a converted Custom HTML block, which is kept in its `innerContent` rather than produced by `save`, instead of an empty diff ([#82397](https://github.com/WordPress/gutenberg/pull/82397)).
 
 ### Internal
 
@@ -78,7 +79,6 @@
 
 -   `NavigableToolbar`: Preserve toolbar semantics while it is hidden, so asynchronous control changes do not remount custom block toolbars ([#82574](https://github.com/WordPress/gutenberg/pull/82574)).
 -   `ListView`: Drop the block icon's variation colors while the row is selected, so the icon keeps contrast against the selection background ([#82498](https://github.com/WordPress/gutenberg/pull/82498)).
--   `BlockCompare`: Show whitespace differences in the Resolve Block dialog. The markup's spaces and blank lines are kept instead of collapsed by the browser, and each added or removed line break gets a visible marker, so a diff made only of whitespace no longer looks identical on both sides. The dialog also shows the markup of a converted Custom HTML block, which is kept in its `innerContent` rather than produced by `save`, instead of an empty diff ([#82397](https://github.com/WordPress/gutenberg/pull/82397)).
 -   Flex layout: Output `flex-direction: row` when a viewport override switches a vertical layout to horizontal, so the base `flex-direction: column` no longer keeps applying on that viewport ([#82364](https://github.com/WordPress/gutenberg/pull/82364)).
 -   `BlockManager`: Color library block icons with `color` while retaining a `fill` fallback for custom icons that do not use `currentColor`. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   Block List Appender: Show the appender button as a drop target when dragging a block over an empty container such as a Column, restoring the reveal that the `visibility`-to-`opacity` migration left behind ([#77852](https://github.com/WordPress/gutenberg/pull/77852)).
