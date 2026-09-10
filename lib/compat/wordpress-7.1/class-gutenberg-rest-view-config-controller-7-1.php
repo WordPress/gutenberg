@@ -487,21 +487,17 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array(
 				'width'    => array(
-					'description' => __( 'The width of the column.', 'gutenberg' ),
-					'type'        => array( 'string', 'number' ),
+					'type' => array( 'string', 'number' ),
 				),
 				'maxWidth' => array(
-					'description' => __( 'The maximum width of the column.', 'gutenberg' ),
-					'type'        => array( 'string', 'number' ),
+					'type' => array( 'string', 'number' ),
 				),
 				'minWidth' => array(
-					'description' => __( 'The minimum width of the column.', 'gutenberg' ),
-					'type'        => array( 'string', 'number' ),
+					'type' => array( 'string', 'number' ),
 				),
 				'align'    => array(
-					'description' => __( 'The horizontal alignment of the column content.', 'gutenberg' ),
-					'type'        => 'string',
-					'enum'        => array( 'start', 'center', 'end' ),
+					'type' => 'string',
+					'enum' => array( 'start', 'center', 'end' ),
 				),
 			),
 		);
@@ -517,7 +513,6 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array(
 				'styles'       => array(
-					'description'          => __( 'Column styles keyed by field id, for the columns listed in the view fields. The primary column (title, media, and description fields) ignores these styles; in the table layout it takes the width left over by the other columns, or the last column does when there is no primary column.', 'gutenberg' ),
 					'type'                 => 'object',
 					'additionalProperties' => $this->get_column_style_schema(),
 				),

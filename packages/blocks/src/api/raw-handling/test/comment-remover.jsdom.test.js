@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import commentRemover from '../comment-remover';
 import { deepFilterHTML } from '../utils';
 
