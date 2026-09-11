@@ -27,6 +27,7 @@
 -   Post actions: Append an ellipsis (`…`) to the "Set as homepage" and "Set as posts page" action labels, which open a confirmation dialog, following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
 -   Show a "Privacy Policy Page" badge in the document bar and the post card panel for the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
 -   `PostCardPanel`: Migrate the page-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82500](https://github.com/WordPress/gutenberg/pull/82500)).
+-   `EditorProvider`: Add a `renderingMode` prop for editors that exist to show one rendering mode. It replaces the usual resolution, so the user's saved "Show template" preference cannot override it, and the controls that switch modes are not offered ([#82711](https://github.com/WordPress/gutenberg/pull/82711)).
 
 ### Bug Fixes
 
