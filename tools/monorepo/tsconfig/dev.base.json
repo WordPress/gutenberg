@@ -23,5 +23,5 @@
 		"${configDir}/src/**/*.story.ts",
 		"${configDir}/src/**/*.story.tsx"
 	],
-	"exclude": [ "**/benchmark" ]
+	"exclude": [ "${configDir}/**/benchmark" ]
 }
