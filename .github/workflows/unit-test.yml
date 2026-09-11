@@ -229,7 +229,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # master
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -238,7 +238,7 @@ jobs:
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # v4.0.0
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
               with:
                   custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
@@ -324,7 +324,7 @@ jobs:
                   persist-credentials: false
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # master
               with:
                   php-version: '7.4'
                   coverage: none
@@ -345,7 +345,7 @@ jobs:
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # v4.0.0
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
               with:
                   custom-cache-suffix: ${{ steps.get-date.outputs.date }}
 
