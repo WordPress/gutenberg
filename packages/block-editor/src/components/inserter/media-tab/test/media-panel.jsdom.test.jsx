@@ -268,4 +268,29 @@ describe( 'MediaCategoryPanel media folders', () => {
 			'false'
 		);
 	} );
+
+	it( 'offers "Add to folder…" everywhere and "Remove from folder" inside a folder', async () => {
+		const user = userEvent.setup();
+		renderPanel( folderCategory, { mediaFolders } );
+
+		expect( getGridActions() ).toBe( 'detach,add-to-folder' );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'choose Holiday' } )
+		);
+		expect( getGridActions() ).toBe(
+			'detach,add-to-folder,remove-from-folder'
+		);
+	} );
+
+	it( 'offers no folder actions when there are no folders yet', () => {
+		renderPanel( folderCategory, {
+			mediaFolders: { ...mediaFolders, folders: [] },
+		} );
+
+		// The filter still renders (with its "New folder" button), but there
+		// is nothing to file into.
+		expect( screen.getByTestId( 'folder-select' ) ).toBeInTheDocument();
+		expect( getGridActions() ).toBe( 'detach' );
+	} );
 } );

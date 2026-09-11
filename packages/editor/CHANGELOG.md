@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Experimental
+
+-   Media categories: Behind the `gutenberg-media-folders` experiment, supply the inserter with the `wp_media_folder` terms through a private `inserterMediaFolders` setting, and give every core media source a `folder` request filter plus `assignToFolder`/`removeFromFolder` capabilities ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ### Enhancements
 
 -   Remove the `react-autosize-textarea` dependency. The post editor's "Code editor" view now auto-grows with CSS `field-sizing: content`. Browsers without support use a scrollable field ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).

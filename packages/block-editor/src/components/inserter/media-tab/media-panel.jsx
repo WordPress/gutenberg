@@ -11,7 +11,8 @@ import { useDebouncedInput, usePrevious } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as noticesStore } from '@wordpress/notices';
-import { external, linkOff } from '@wordpress/icons';
+// There is no folder icon in the library; the category one is the closest.
+import { external, linkOff, category as folderIcon } from '@wordpress/icons';
 import MediaGrid from './media-grid';
 import FolderSelect from './folder-select';
 import NewFolderModal from './new-folder-modal';
@@ -105,6 +106,47 @@ function DetachConfirmation( { postTypeLabel, onCancel, onConfirm } ) {
 					onClick={ onConfirm }
 				>
 					{ __( 'Detach' ) }
+				</Button>
+			</div>
+		</>
+	);
+}
+
+/**
+ * The body of the "Add to folder…" action's modal: pick the destination.
+ *
+ * @param {Object}   props
+ * @param {Object[]} props.folders
+ * @param {Function} props.onCancel
+ * @param {Function} props.onConfirm Called with the chosen folder's id.
+ */
+function AddToFolderPicker( { folders, onCancel, onConfirm } ) {
+	const [ folderId, setFolderId ] = useState();
+	return (
+		<>
+			<FolderSelect
+				folders={ folders }
+				value={ folderId }
+				onChange={ setFolderId }
+				includeAll={ false }
+				showLabel
+			/>
+			<div className="block-editor-inserter__media-panel-detach-actions">
+				<Button
+					__next40pxDefaultSize
+					variant="tertiary"
+					onClick={ onCancel }
+				>
+					{ __( 'Cancel' ) }
+				</Button>
+				<Button
+					__next40pxDefaultSize
+					variant="primary"
+					disabled={ folderId === undefined }
+					accessibleWhenDisabled
+					onClick={ () => onConfirm( folderId ) }
+				>
+					{ __( 'Add' ) }
 				</Button>
 			</div>
 		</>
@@ -312,14 +354,20 @@ export function MediaCategoryPanel( { onInsert, category, mediaFolders } ) {
 		[ detach, category, refresh, createErrorNotice, createSuccessNotice ]
 	);
 
-	// Files the picked items into the selected folder.
-	const handleAddToFolder = useCallback(
-		async ( selectedMedia ) => {
+	const getFolderName = useCallback(
+		( folderId ) => {
+			const match = folders?.find( ( { id } ) => id === folderId );
+			return match ? decodeEntities( match.name ) : '';
+		},
+		[ folders ]
+	);
+
+	// Files items into a folder: the picker's selection into the selected
+	// folder, or one card into the folder chosen in the action's modal.
+	const addToFolder = useCallback(
+		async ( mediaItems, folderId ) => {
 			try {
-				const addedCount = await assignToFolder(
-					selectedMedia,
-					folder
-				);
+				const addedCount = await assignToFolder( mediaItems, folderId );
 
 				if ( ! addedCount ) {
 					// The picker's "Upload files" tab accepts any file type, so
@@ -341,7 +389,7 @@ export function MediaCategoryPanel( { onInsert, category, mediaFolders } ) {
 							addedCount
 						),
 						addedCount,
-						selectedFolderName
+						getFolderName( folderId )
 					),
 					{ type: 'snackbar', id: 'inserter-notice' }
 				);
@@ -354,12 +402,47 @@ export function MediaCategoryPanel( { onInsert, category, mediaFolders } ) {
 		},
 		[
 			assignToFolder,
+			getFolderName,
+			refresh,
+			createErrorNotice,
+			createSuccessNotice,
+			createWarningNotice,
+		]
+	);
+	const handleAddToFolder = useCallback(
+		( selectedMedia ) => addToFolder( selectedMedia, folder ),
+		[ addToFolder, folder ]
+	);
+
+	const removeFromFolder =
+		supportsAttachments && folders ? category.removeFromFolder : undefined;
+	const handleRemoveFromFolder = useCallback(
+		async ( media ) => {
+			try {
+				await removeFromFolder( media, folder );
+				refresh();
+				createSuccessNotice(
+					sprintf(
+						/* translators: %s: Name of the folder. */
+						__( 'Item removed from %s.' ),
+						selectedFolderName
+					),
+					{ type: 'snackbar', id: 'inserter-notice' }
+				);
+			} catch {
+				createErrorNotice(
+					__( 'Could not remove the item from the folder.' ),
+					{ type: 'snackbar', id: 'inserter-notice' }
+				);
+			}
+		},
+		[
+			removeFromFolder,
 			folder,
 			selectedFolderName,
 			refresh,
 			createErrorNotice,
 			createSuccessNotice,
-			createWarningNotice,
 		]
 	);
 
@@ -417,8 +500,45 @@ export function MediaCategoryPanel( { onInsert, category, mediaFolders } ) {
 				),
 			} );
 		}
+		if ( assignToFolder && folders.length ) {
+			list.push( {
+				id: 'add-to-folder',
+				label: __( 'Add to folder…' ),
+				icon: folderIcon,
+				modalHeader: __( 'Add to folder' ),
+				RenderModal: ( { items, closeModal } ) => (
+					<AddToFolderPicker
+						folders={ folders }
+						onCancel={ closeModal }
+						onConfirm={ ( folderId ) => {
+							closeModal?.();
+							addToFolder( items, folderId );
+						} }
+					/>
+				),
+			} );
+		}
+		if ( removeFromFolder && selectedFolder ) {
+			list.push( {
+				id: 'remove-from-folder',
+				label: __( 'Remove from folder' ),
+				icon: folderIcon,
+				// Reversible by adding the item again, so no confirmation.
+				callback: ( [ media ] ) => handleRemoveFromFolder( media ),
+			} );
+		}
 		return list;
-	}, [ category, detach, handleDetach ] );
+	}, [
+		category,
+		detach,
+		handleDetach,
+		assignToFolder,
+		folders,
+		addToFolder,
+		removeFromFolder,
+		selectedFolder,
+		handleRemoveFromFolder,
+	] );
 
 	const searchLabel = category.labels.search_items || __( 'Search' );
 	let emptyMessage = __( 'No results found.' );

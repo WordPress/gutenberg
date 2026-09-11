@@ -17,10 +17,24 @@ export type MediaFolder = {
 type FolderSelectProps = {
 	folders: MediaFolder[];
 	/**
-	 * The selected folder's id, or `undefined` for all folders.
+	 * The selected folder's id, or `undefined` for none (all folders when
+	 * `includeAll` is set).
 	 */
 	value?: number;
 	onChange: ( folderId?: number ) => void;
+	/**
+	 * Whether to offer an "All folders" choice, for filtering. Off when a
+	 * single folder must be chosen, e.g. when filing an item.
+	 *
+	 * @default true
+	 */
+	includeAll?: boolean;
+	/**
+	 * Whether the "Folder" label is visible.
+	 *
+	 * @default false
+	 */
+	showLabel?: boolean;
 	/**
 	 * Called to start creating a folder. The "New folder" button is only
 	 * rendered when set.
@@ -36,27 +50,31 @@ type FolderItem = {
 const ALL_FOLDERS: FolderItem = { value: null, label: __( 'All folders' ) };
 
 /**
- * The folder filter beneath a media source's search: a dropdown listing every
- * folder (plus "All folders"), and a button to create one.
+ * A dropdown of media folders: beneath a source's search it filters the grid
+ * (with "All folders" and a button to create one); in the "Add to folder"
+ * modal it picks the destination.
  */
 export default function FolderSelect( {
 	folders,
 	value,
 	onChange,
+	includeAll = true,
+	showLabel = false,
 	onCreate,
 }: FolderSelectProps ) {
 	const items = useMemo< FolderItem[] >(
 		() => [
-			ALL_FOLDERS,
+			...( includeAll ? [ ALL_FOLDERS ] : [] ),
 			...folders.map( ( folder ) => ( {
 				value: String( folder.id ),
 				label: decodeEntities( folder.name ),
 			} ) ),
 		],
-		[ folders ]
+		[ folders, includeAll ]
 	);
 	const selected =
-		items.find( ( item ) => item.value === String( value ) ) ?? ALL_FOLDERS;
+		items.find( ( item ) => item.value === String( value ) ) ??
+		( includeAll ? ALL_FOLDERS : null );
 
 	return (
 		<Stack
@@ -68,7 +86,8 @@ export default function FolderSelect( {
 			<SelectControl
 				className="block-editor-inserter__media-folder-select"
 				label={ __( 'Folder' ) }
-				hideLabelFromVision
+				hideLabelFromVision={ ! showLabel }
+				placeholder={ __( 'Select a folder' ) }
 				popupWidth="anchor"
 				items={ items }
 				value={ selected }

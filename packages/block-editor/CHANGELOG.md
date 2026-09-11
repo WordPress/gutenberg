@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Experimental
+
+-   Inserter: Behind the `gutenberg-media-folders` experiment, add a folder filter beneath each media source's search, with a "New folder" button, an "Add to folder" picker and per-item "Add to folder…" and "Remove from folder" actions ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ### Internal
 
 -   Remove the `crossorigin` MutationObserver. Under `Document-Isolation-Policy: isolate-and-credentialless` cross-origin resources load without the attribute, and adding it broke any resource served without CORS headers ([#82614](https://github.com/WordPress/gutenberg/pull/82614)).
