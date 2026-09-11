@@ -1,7 +1,9 @@
-import '@testing-library/jest-dom';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom/vitest';
+import { screen, waitFor } from '@testing-library/react';
+import { userEvent } from 'vitest/browser';
+import { render as renderInBrowser } from 'vitest-browser-react';
 import type { WidgetAction } from '@wordpress/widget-primitives';
+import { describe, expect, it, vi } from 'vitest';
 import { ActionsMenu } from '../components/actions-menu/actions-menu';
 import { WidgetActions } from '../components/widget-actions/widget-actions';
 import { WidgetLayoutControls } from '../components/widget-layout-controls/widget-layout-controls';
@@ -17,8 +19,10 @@ function LayoutWidth() {
 describe( 'Widget Dashboard menus', () => {
 	it( 'opens the dashboard actions menu from the keyboard and runs the selected action', async () => {
 		const user = userEvent.setup();
-		const onClick = jest.fn();
-		render( <ActionsMenu items={ [ { label: 'Reset', onClick } ] } /> );
+		const onClick = vi.fn();
+		await renderInBrowser(
+			<ActionsMenu items={ [ { label: 'Reset', onClick } ] } />
+		);
 
 		const trigger = screen.getByRole( 'button', { name: 'More options' } );
 		await user.tab();
@@ -39,8 +43,8 @@ describe( 'Widget Dashboard menus', () => {
 
 	it( 'keeps a disabled dashboard action available to explain why it cannot run', async () => {
 		const user = userEvent.setup();
-		const onClick = jest.fn();
-		render(
+		const onClick = vi.fn();
+		await renderInBrowser(
 			<ActionsMenu
 				items={ [
 					{
@@ -75,7 +79,7 @@ describe( 'Widget Dashboard menus', () => {
 				openInNewTab: true,
 			},
 		];
-		render( <WidgetActions actions={ actions } /> );
+		await renderInBrowser( <WidgetActions actions={ actions } /> );
 
 		await user.click( screen.getByRole( 'button', { name: 'More' } ) );
 		const action = await screen.findByRole( 'menuitem', {
@@ -90,7 +94,7 @@ describe( 'Widget Dashboard menus', () => {
 
 	it( 'closes the widget action menu when a link is activated', async () => {
 		const user = userEvent.setup();
-		render(
+		await renderInBrowser(
 			<WidgetActions
 				actions={ [
 					{
@@ -124,7 +128,7 @@ describe( 'Widget Dashboard menus', () => {
 			type: 'core/test',
 			placement: { width: 1, height: 1 },
 		};
-		render(
+		await renderInBrowser(
 			<WidgetDashboard
 				layout={ [ widget ] }
 				onLayoutChange={ () => {} }
