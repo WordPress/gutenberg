@@ -988,6 +988,53 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should place the caret at the click inside a multi block selection', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'One two three' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+
+		const box = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.boundingBox();
+		// Click past the text so the caret lands at the end.
+		await page.mouse.click( box.x + box.width - 4, box.y + box.height / 2 );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Shift+ArrowDown' );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectionStart, getSelectionEnd } =
+						window.wp.data.select( 'core/block-editor' );
+					return [ getSelectionStart(), getSelectionEnd() ].map(
+						( { offset } ) => offset
+					);
+				} )
+			)
+			.toEqual( [ 11, 6 ] );
+
+		// Selecting the first block must not keep the start offset without
+		// an end, which would set the caret at the start of the block.
+		await page.mouse.click( box.x + box.width - 4, box.y + box.height / 2 );
+		await page.keyboard.type( 'a' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'One two threea' },
+			},
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
+	} );
+
 	test( 'should select the whole paragraph on triple click from the block edge', async ( {
 		page,
 		editor,
