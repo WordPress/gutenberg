@@ -51,8 +51,8 @@
 
 ### Enhancements
 
--   Widget header: the title carries a `title` attribute, so a title the
-    row clips can still be read on hover
+-   Widget header: a title the row clips shows the full text in a tooltip
+    on hover, and becomes focusable so keyboard users can open it too
     ([#82226](https://github.com/WordPress/gutenberg/pull/82226)).
 
 ### Internal
