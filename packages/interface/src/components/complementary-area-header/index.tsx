@@ -1,12 +1,13 @@
 import clsx from 'clsx';
 import { closeSmall } from '@wordpress/icons';
 import ComplementaryAreaToggle from '../complementary-area-toggle';
+import type { ComplementaryAreaHeaderProps } from './types';
 
 const ComplementaryAreaHeader = ( {
 	children,
 	className,
 	toggleButtonProps,
-} ) => {
+}: ComplementaryAreaHeaderProps ) => {
 	const toggleButton = (
 		<ComplementaryAreaToggle icon={ closeSmall } { ...toggleButtonProps } />
 	);

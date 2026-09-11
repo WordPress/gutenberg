@@ -38,13 +38,21 @@ const dependenciesToTransform = [
 process.env.TZ = 'UTC';
 
 /*
- * Resolved rather than hardcoded to `<rootDir>/node_modules`,
- * which is empty under non-hoisting installs.
+ * Resolved hop by hop through its dependents rather than hardcoded to
+ * `<rootDir>/node_modules`, which is empty under non-hoisting installs.
  */
-const ariakitUtilsDir = path.dirname(
-	require.resolve( '@ariakit/utils/package.json', {
-		paths: [ path.join( ROOT_DIR, 'packages/components' ) ],
-	} )
+const ariakitUtilsDir = [
+	'@ariakit/react',
+	'@ariakit/react-components',
+	'@ariakit/utils',
+].reduce(
+	( fromDir, packageName ) =>
+		path.dirname(
+			require.resolve( `${ packageName }/package.json`, {
+				paths: [ fromDir ],
+			} )
+		),
+	path.join( ROOT_DIR, 'packages/components' )
 );
 
 const commonProjectConfig = {

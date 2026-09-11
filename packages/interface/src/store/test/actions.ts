@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createRegistry } from '@wordpress/data';
+import type { DataRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '../';
 
@@ -11,7 +12,7 @@ function createRegistryWithStores() {
 }
 
 describe( 'actions', () => {
-	let registry;
+	let registry: DataRegistry;
 	beforeEach( () => {
 		registry = createRegistryWithStores();
 	} );
@@ -200,9 +201,11 @@ describe( 'actions', () => {
 		it( 'coerces non-boolean values into booleans', () => {
 			registry
 				.dispatch( interfaceStore )
+				// @ts-expect-error Non-boolean values are coerced.
 				.setFeatureValue( 'test', 'feature1', 'avocado' );
 			registry
 				.dispatch( interfaceStore )
+				// @ts-expect-error Non-boolean values are coerced.
 				.setFeatureValue( 'test', 'feature2', 0 );
 
 			expect(

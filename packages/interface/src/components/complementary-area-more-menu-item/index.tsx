@@ -2,12 +2,19 @@ import { observableMap, useObservableValue } from '@wordpress/compose';
 import { useLayoutEffect } from '@wordpress/element';
 import ComplementaryAreaToggle from '../complementary-area-toggle';
 import ActionItem from '../action-item';
+import type {
+	ComplementaryAreaMoreMenuItemProps,
+	DefaultComplementaryAreaMoreMenuItemProps,
+} from './types';
 
 // How many more menu items are rendered for a complementary area, by
 // `scope/target`.
-const menuItems = observableMap();
+const menuItems = observableMap< string, number >();
 
-export function useHasComplementaryAreaMenuItem( scope, target ) {
+export function useHasComplementaryAreaMenuItem(
+	scope: string,
+	target?: string
+): boolean {
 	return !! useObservableValue( menuItems, `${ scope }/${ target }` );
 }
 
@@ -18,7 +25,7 @@ export function DefaultComplementaryAreaMoreMenuItem( {
 	scope,
 	target,
 	...props
-} ) {
+}: DefaultComplementaryAreaMoreMenuItemProps ) {
 	return (
 		<ComplementaryAreaToggle
 			as={ ( toggleProps ) => (
@@ -43,13 +50,13 @@ export default function ComplementaryAreaMoreMenuItem( {
 	__unstableExplicitMenuItem,
 	__unstableTarget,
 	...props
-} ) {
+}: ComplementaryAreaMoreMenuItemProps ) {
 	useLayoutEffect( () => {
 		const key = `${ scope }/${ target }`;
 		menuItems.set( key, ( menuItems.get( key ) ?? 0 ) + 1 );
 
 		return () => {
-			const count = menuItems.get( key ) - 1;
+			const count = menuItems.get( key )! - 1;
 			if ( count ) {
 				menuItems.set( key, count );
 			} else {

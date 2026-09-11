@@ -1,3 +1,4 @@
+import type { ForwardedRef } from 'react';
 import clsx from 'clsx';
 import { NavigableRegion } from '@wordpress/admin-ui';
 import { forwardRef, useEffect } from '@wordpress/element';
@@ -7,6 +8,7 @@ import {
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useReducedMotion, useViewportMatch } from '@wordpress/compose';
+import type { InterfaceSkeletonProps } from './types';
 
 const ANIMATION_DURATION = 0.25;
 const commonTransition = {
@@ -15,7 +17,7 @@ const commonTransition = {
 	ease: [ 0.6, 0, 0.4, 1 ],
 };
 
-function useHTMLClass( className ) {
+function useHTMLClass( className: string ) {
 	useEffect( () => {
 		const element =
 			document && document.querySelector( `html:not(.${ className })` );
@@ -68,8 +70,8 @@ function InterfaceSkeleton(
 		actions,
 		labels,
 		className,
-	},
-	ref
+	}: InterfaceSkeletonProps,
+	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const disableMotion = useReducedMotion();

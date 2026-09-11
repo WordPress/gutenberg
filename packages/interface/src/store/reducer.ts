@@ -1,6 +1,10 @@
 import { combineReducers } from '@wordpress/data';
+import type { Action, StoreState } from './types';
 
-export function complementaryAreas( state = {}, action ) {
+export function complementaryAreas(
+	state: StoreState[ 'complementaryAreas' ] = {},
+	action: Action
+): StoreState[ 'complementaryAreas' ] {
 	switch ( action.type ) {
 		case 'SET_DEFAULT_COMPLEMENTARY_AREA': {
 			const { scope, area } = action;
@@ -30,12 +34,15 @@ export function complementaryAreas( state = {}, action ) {
 /**
  * Reducer for storing the name of the open modal, or null if no modal is open.
  *
- * @param {Object} state  Previous state.
- * @param {Object} action Action object containing the `name` of the modal
+ * @param state  Previous state.
+ * @param action Action object containing the `name` of the modal
  *
- * @return {Object} Updated state
+ * @return Updated state
  */
-export function activeModal( state = null, action ) {
+export function activeModal(
+	state: StoreState[ 'activeModal' ] = null,
+	action: Action
+): StoreState[ 'activeModal' ] {
 	switch ( action.type ) {
 		case 'OPEN_MODAL':
 			return action.name;

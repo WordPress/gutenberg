@@ -1,3 +1,4 @@
+import type { HTMLAttributes } from 'react';
 import clsx from 'clsx';
 import {
 	Button,
@@ -33,10 +34,19 @@ import {
 import ComplementaryAreaToggle from '../complementary-area-toggle';
 import PinnedItems from '../pinned-items';
 import { store as interfaceStore } from '../../store';
+import type {
+	ComplementaryAreaFillProps,
+	ComplementaryAreaProps,
+	ComplementaryAreaSlotProps,
+	ComplementaryAreaTransition,
+} from './types';
 
 const ANIMATION_DURATION = 0.3;
 
-function ComplementaryAreaSlot( { scope, ...props } ) {
+function ComplementaryAreaSlot( {
+	scope,
+	...props
+}: ComplementaryAreaSlotProps ) {
 	return <Slot name={ `ComplementaryArea/${ scope }` } { ...props } />;
 }
 
@@ -47,7 +57,10 @@ const variants = {
 	open: { width: 'auto' },
 	// Resolved with the `custom` value passed to `AnimatePresence`, which is
 	// the only way an already removed element can be given a fresh transition.
-	closed: ( transition ) => ( { width: 0, transition } ),
+	closed: ( transition: ComplementaryAreaTransition ) => ( {
+		width: 0,
+		transition,
+	} ),
 };
 
 /**
@@ -57,10 +70,13 @@ const variants = {
  * `className` and `style` are composed rather than overwritten, since the
  * container is also the scroll container for the sidebar.
  *
- * @param {Object} [render] Replacement element.
- * @param {Object} props    Props for the container.
+ * @param [render] Replacement element.
+ * @param props    Props for the container.
  */
-function renderContainer( render, props ) {
+function renderContainer(
+	render: ComplementaryAreaFillProps[ 'render' ],
+	props: HTMLAttributes< HTMLDivElement >
+) {
 	if ( isValidElement( render ) ) {
 		return cloneElement( render, {
 			...props,
@@ -80,7 +96,7 @@ function ComplementaryAreaFill( {
 	className,
 	id,
 	render,
-} ) {
+}: ComplementaryAreaFillProps ) {
 	const disableMotion = useReducedMotion();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	// Swapping one open area straight for another should not animate.
@@ -89,7 +105,7 @@ function ComplementaryAreaFill( {
 		!! previousActiveArea &&
 		!! activeArea &&
 		activeArea !== previousActiveArea;
-	const transition = {
+	const transition: ComplementaryAreaTransition = {
 		type: 'tween',
 		duration:
 			disableMotion || isMobileViewport || isSwitchingAreas
@@ -123,11 +139,11 @@ function ComplementaryAreaFill( {
 }
 
 function useAdjustComplementaryListener(
-	scope,
-	identifier,
-	activeArea,
-	isActive,
-	isSmall
+	scope: string,
+	identifier: string,
+	activeArea: string | null | undefined,
+	isActive: boolean,
+	isSmall: boolean
 ) {
 	const previousIsSmallRef = useRef( false );
 	const shouldOpenWhenNotSmallRef = useRef( false );
@@ -193,7 +209,7 @@ function ComplementaryArea( {
 	title,
 	toggleShortcut,
 	isActiveByDefault,
-} ) {
+}: ComplementaryAreaProps ) {
 	const context = usePluginContext();
 	const icon = iconProp || context.icon;
 	const identifier = identifierProp || `${ context.name }/${ name }`;
@@ -258,7 +274,7 @@ function ComplementaryArea( {
 		if ( isActiveByDefault && activeArea === undefined && ! isSmall ) {
 			enableComplementaryArea( scope, identifier );
 		} else if ( activeArea === undefined && isSmall ) {
-			disableComplementaryArea( scope, identifier );
+			disableComplementaryArea( scope );
 		}
 		setIsReady( true );
 	}, [
@@ -318,8 +334,6 @@ function ComplementaryArea( {
 			>
 				<ComplementaryAreaHeader
 					className={ headerClassName }
-					closeLabel={ closeLabel }
-					onClose={ () => disableComplementaryArea( scope ) }
 					toggleButtonProps={ {
 						label: closeLabel,
 						size: 'compact',
