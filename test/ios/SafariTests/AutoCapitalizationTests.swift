@@ -21,6 +21,14 @@ final class AutoCapitalizationTests: XCTestCase {
 		continueAfterFailure = false
 	}
 
+	/// Each test leaves its post open and unsaved. Ending Safari keeps the
+	/// next test from inheriting that page, its keyboard and its focus, and
+	/// skips the unsaved changes prompt a navigation would raise. The login
+	/// cookie is on disk and survives.
+	override func tearDownWithError() throws {
+		safari.terminate()
+	}
+
 	func openNewPost() {
 		let base = ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
 		// Opened by the system, not through the app: XCUITest cannot launch
@@ -76,7 +84,10 @@ final class AutoCapitalizationTests: XCTestCase {
 			"The new post has no title field"
 		)
 		waitForFocus( on: "Add title", "The title is not focused" )
-		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "No software keyboard" )
+		// The keyboard element exists even when a hardware keyboard keeps
+		// it off screen; a key that can be tapped shows it is on screen.
+		let shown = XCTNSPredicateExpectation( predicate: NSPredicate( format: "hittable == true" ), object: key( "return" ) )
+		XCTAssertEqual( XCTWaiter.wait( for: [ shown ], timeout: 10 ), .completed, "No software keyboard" )
 		assertCapitalized( "An empty title should start capitalized" )
 
 		type( "title" )
@@ -109,7 +120,7 @@ final class AutoCapitalizationTests: XCTestCase {
 		key( " " ).tap()
 		waitForFocus( on: "List text", "The prefix did not turn the paragraph into a list" )
 		type( "one" )
-		XCTAssertEqual( ( focusedField.value as? String )?.lowercased(), "one" )
+		XCTAssertEqual( focusedField.value as? String, "One", "The keyboard should have capitalized the first letter" )
 
 		key( "return" ).tap()
 		waitForFocus( on: "List text", "Return did not focus a new list item" )
