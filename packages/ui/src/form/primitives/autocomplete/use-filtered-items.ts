@@ -4,14 +4,7 @@ import { Autocomplete as BaseAutocomplete } from '@base-ui/react/autocomplete';
  * Returns the items currently visible after the autocomplete's client-side
  * filter.
  *
- * Call this from a descendant of `Autocomplete.Root`. Use it to announce a
- * result count through `Autocomplete.Status`.
- *
- * When you already supply the filtered list (for example from a server
- * request), you have the count and do not need this hook.
- *
- * The returned array is read-only and may share identity with the root's
- * `items`.
+ * Call this from a descendant of `Autocomplete.Root`.
  */
 export function useFilteredItems< T >(): ReadonlyArray< T > {
 	return BaseAutocomplete.useFilteredItems< T >();

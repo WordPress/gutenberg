@@ -60,7 +60,7 @@ function shouldSkipCollectionEntry( entry: Item | ItemGroup ): boolean {
 }
 
 /**
- * Empty state, status, and filtered list for `SearchableSelect` and
+ * Empty state and filtered list for `SearchableSelect` and
  * `SearchableChipSelect`. A `creatable: true` item still present in the
  * filtered collection is omitted from the list body and remounted in
  * `ListFooter`. Must render inside `Combobox.Root`.

@@ -5,10 +5,8 @@ import type { ComboboxStatusProps } from './types';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 
 /**
- * Announces a status message politely to screen readers. Use it for
- * result-count updates and for async list loading. For client-side
- * filtering, call `Combobox.useFilteredItems` from a descendant of
- * `Combobox.Root`.
+ * Announces a status message politely to screen readers. Use it for the
+ * status of an asynchronously loaded list.
  *
  * Keep this element mounted. Do not hide it with `display: none`, `hidden`,
  * `aria-hidden`, or by omitting the component. Change or omit the children

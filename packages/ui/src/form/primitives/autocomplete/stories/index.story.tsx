@@ -166,66 +166,65 @@ function AsyncStatus( { loading }: { loading: boolean } ) {
 	);
 }
 
-function AsyncItemsTemplate( { args }: { args: Story[ 'args' ] } ) {
-	const [ query, setQuery ] = useState( '' );
-	const [ loading, setLoading ] = useState( false );
-	const [ results, setResults ] = useState< typeof URLS >( [] );
-	const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
-
-	return (
-		<Autocomplete.Root
-			{ ...args }
-			items={ results }
-			value={ query }
-			onValueChange={ ( newValue ) => {
-				setQuery( newValue );
-				setLoading( true );
-				setResults( [] );
-				clearTimeout( timeoutRef.current );
-				timeoutRef.current = setTimeout( () => {
-					setResults(
-						URLS.filter( ( item ) =>
-							item.value
-								.toLowerCase()
-								.includes( newValue.toLowerCase() )
-						)
-					);
-					setLoading( false );
-				}, 500 );
-			} }
-		>
-			<Autocomplete.Input aria-label="URL" placeholder="Enter a URL" />
-			<Autocomplete.Popup>
-				<AsyncStatus loading={ loading } />
-				<Autocomplete.Empty>
-					{ loading ? null : 'No matching items.' }
-				</Autocomplete.Empty>
-				<Autocomplete.List>
-					<Autocomplete.ListBody>
-						<Autocomplete.Collection>
-							{ ( item: FixtureItem ) => (
-								<Autocomplete.Item
-									key={ item.id }
-									value={ item }
-								>
-									{ item.value }
-								</Autocomplete.Item>
-							) }
-						</Autocomplete.Collection>
-					</Autocomplete.ListBody>
-				</Autocomplete.List>
-			</Autocomplete.Popup>
-		</Autocomplete.Root>
-	);
-}
-
 /**
  * Fetches matching items asynchronously. Keep `Status` mounted. It shows
  * loading, then a visually hidden result count. Use `Empty` for no results.
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
-		return <AsyncItemsTemplate args={ args } />;
+		const [ query, setQuery ] = useState( '' );
+		const [ loading, setLoading ] = useState( false );
+		const [ results, setResults ] = useState< typeof URLS >( [] );
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+
+		return (
+			<Autocomplete.Root
+				{ ...args }
+				items={ results }
+				value={ query }
+				onValueChange={ ( newValue ) => {
+					setQuery( newValue );
+					setLoading( true );
+					setResults( [] );
+					clearTimeout( timeoutRef.current );
+					timeoutRef.current = setTimeout( () => {
+						setResults(
+							URLS.filter( ( item ) =>
+								item.value
+									.toLowerCase()
+									.includes( newValue.toLowerCase() )
+							)
+						);
+						setLoading( false );
+					}, 500 );
+				} }
+			>
+				<Autocomplete.Input
+					aria-label="URL"
+					placeholder="Enter a URL"
+				/>
+				<Autocomplete.Popup>
+					<AsyncStatus loading={ loading } />
+					<Autocomplete.Empty>
+						{ loading ? null : 'No matching items.' }
+					</Autocomplete.Empty>
+					<Autocomplete.List>
+						<Autocomplete.ListBody>
+							<Autocomplete.Collection>
+								{ ( item: FixtureItem ) => (
+									<Autocomplete.Item
+										key={ item.id }
+										value={ item }
+									>
+										{ item.value }
+									</Autocomplete.Item>
+								) }
+							</Autocomplete.Collection>
+						</Autocomplete.ListBody>
+					</Autocomplete.List>
+				</Autocomplete.Popup>
+			</Autocomplete.Root>
+		);
 	},
 };
 

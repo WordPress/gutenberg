@@ -275,75 +275,74 @@ function AsyncStatus( { loading }: { loading: boolean } ) {
 	);
 }
 
-function AsyncItemsTemplate( { args }: { args: Story[ 'args' ] } ) {
-	const [ loading, setLoading ] = useState( false );
-	const [ items, setItems ] = useState< FixtureItem[] >( [] );
-	const [ value, setValue ] = useState< FixtureItem | undefined >();
-	const [ open, setOpen ] = useState( false );
-	const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
-
-	return (
-		<Combobox.Root
-			{ ...args }
-			items={ items }
-			value={ value }
-			open={ open }
-			onValueChange={ ( newValue ) => {
-				setValue(
-					( newValue ?? undefined ) as FixtureItem | undefined
-				);
-			} }
-			onOpenChange={ ( nextOpen ) => {
-				setOpen( nextOpen );
-				if ( ! nextOpen ) {
-					clearTimeout( timeoutRef.current );
-					return;
-				}
-				setLoading( true );
-				setItems( [] );
-				clearTimeout( timeoutRef.current );
-				timeoutRef.current = setTimeout( () => {
-					setItems( ITEMS );
-					setValue( ( current ) => current ?? ITEMS[ 0 ] );
-					setLoading( false );
-				}, 500 );
-			} }
-		>
-			<Combobox.Trigger aria-label="Fruit" />
-			<Combobox.Popup>
-				<div style={ inputWrapperStyle }>
-					<Combobox.Input aria-label="Search" placeholder="Search" />
-				</div>
-				<AsyncStatus loading={ loading } />
-				<Combobox.Empty>
-					{ loading ? null : 'No results found.' }
-				</Combobox.Empty>
-				<Combobox.List>
-					<Combobox.ListBody>
-						<Combobox.Collection>
-							{ ( item: FixtureItem ) => (
-								<Combobox.Item
-									key={ item.value }
-									value={ item }
-								>
-									{ item.label }
-								</Combobox.Item>
-							) }
-						</Combobox.Collection>
-					</Combobox.ListBody>
-				</Combobox.List>
-			</Combobox.Popup>
-		</Combobox.Root>
-	);
-}
-
 /**
  * Loads the item list asynchronously. Keep `Status` mounted. It shows
  * loading, then a visually hidden result count. Use `Empty` for no results.
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
-		return <AsyncItemsTemplate args={ args } />;
+		const [ loading, setLoading ] = useState( false );
+		const [ items, setItems ] = useState< FixtureItem[] >( [] );
+		const [ value, setValue ] = useState< FixtureItem | undefined >();
+		const [ open, setOpen ] = useState( false );
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+
+		return (
+			<Combobox.Root
+				{ ...args }
+				items={ items }
+				value={ value }
+				open={ open }
+				onValueChange={ ( newValue ) => {
+					setValue(
+						( newValue ?? undefined ) as FixtureItem | undefined
+					);
+				} }
+				onOpenChange={ ( nextOpen ) => {
+					setOpen( nextOpen );
+					if ( ! nextOpen ) {
+						clearTimeout( timeoutRef.current );
+						return;
+					}
+					setLoading( true );
+					setItems( [] );
+					clearTimeout( timeoutRef.current );
+					timeoutRef.current = setTimeout( () => {
+						setItems( ITEMS );
+						setValue( ( current ) => current ?? ITEMS[ 0 ] );
+						setLoading( false );
+					}, 500 );
+				} }
+			>
+				<Combobox.Trigger aria-label="Fruit" />
+				<Combobox.Popup>
+					<div style={ inputWrapperStyle }>
+						<Combobox.Input
+							aria-label="Search"
+							placeholder="Search"
+						/>
+					</div>
+					<AsyncStatus loading={ loading } />
+					<Combobox.Empty>
+						{ loading ? null : 'No results found.' }
+					</Combobox.Empty>
+					<Combobox.List>
+						<Combobox.ListBody>
+							<Combobox.Collection>
+								{ ( item: FixtureItem ) => (
+									<Combobox.Item
+										key={ item.value }
+										value={ item }
+									>
+										{ item.label }
+									</Combobox.Item>
+								) }
+							</Combobox.Collection>
+						</Combobox.ListBody>
+					</Combobox.List>
+				</Combobox.Popup>
+			</Combobox.Root>
+		);
 	},
 };
 
