@@ -121,6 +121,36 @@ describe( 'Widget Dashboard menus', () => {
 		expect( trigger ).toHaveFocus();
 	} );
 
+	it.each( [ 'Meta', 'Control', 'Alt' ] as const )(
+		'keeps the widget action menu open for %s-click',
+		async ( modifier ) => {
+			const user = userEvent.setup();
+			await renderInBrowser(
+				<WidgetActions
+					actions={ [
+						{
+							id: 'view-report',
+							label: 'View report',
+							href: '#report',
+						},
+					] }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'More' } ) );
+			const action = await screen.findByRole( 'menuitem', {
+				name: 'View report',
+			} );
+			action.addEventListener( 'click', ( event ) =>
+				event.preventDefault()
+			);
+
+			await user.click( action, { modifiers: [ modifier ] } );
+
+			expect( screen.getByRole( 'menu' ) ).toBeVisible();
+		}
+	);
+
 	it( 'updates a widget width from its options menu and returns focus', async () => {
 		const user = userEvent.setup();
 		const widget: DashboardWidget = {

@@ -76,6 +76,15 @@ export function WidgetActions( {
 									key={ action.id }
 									closeOnClick
 									{ ...linkProps }
+									onClick={ ( event ) => {
+										if (
+											event.metaKey ||
+											event.ctrlKey ||
+											event.altKey
+										) {
+											event.preventBaseUIHandler();
+										}
+									} }
 									prefix={
 										action.icon ? (
 											<Icon icon={ action.icon } />
