@@ -16,7 +16,42 @@ function renderInNavigator( children ) {
 }
 
 describe( 'Global Styles menus', () => {
-	it( 'opens the reset dialog and returns focus to the menu trigger', async () => {
+	it( 'separates adjacent preset action buttons', async () => {
+		await renderInNavigator(
+			<>
+				{ /* eslint-disable-next-line @wordpress/no-setting-ds-tokens -- Supply the Stack gap token without adding a production theme dependency. */ }
+				<div style={ { '--wpds-dimension-gap-xs': '4px' } }>
+					<PresetGroup
+						label="Shadows"
+						items={ [ { name: 'Natural', slug: 'natural' } ] }
+						getEditPath={ ( slug ) => `/shadows/${ slug }` }
+						addLabel="Add shadow"
+						onAdd={ vi.fn() }
+						menuAction={ {
+							label: 'Reset shadows',
+							optionsLabel: 'Shadow options',
+							confirmText: 'Reset all shadows?',
+							confirmButtonText: 'Reset',
+							onConfirm: vi.fn(),
+						} }
+					/>
+				</div>
+			</>
+		);
+
+		const addButtonRect = screen
+			.getByRole( 'button', { name: 'Add shadow' } )
+			.getBoundingClientRect();
+		const menuButtonRect = screen
+			.getByRole( 'button', { name: 'Shadow options' } )
+			.getBoundingClientRect();
+
+		expect(
+			menuButtonRect.left - addButtonRect.right
+		).toBeGreaterThanOrEqual( 4 );
+	} );
+
+	it( 'centers the reset label and returns focus to the menu trigger', async () => {
 		const user = userEvent.setup();
 		await renderInNavigator(
 			<PresetGroup
@@ -37,9 +72,20 @@ describe( 'Global Styles menus', () => {
 			name: 'Shadow options',
 		} );
 		await user.click( trigger );
-		await user.click(
-			await screen.findByRole( 'menuitem', { name: 'Reset shadows' } )
+		const resetItem = await screen.findByRole( 'menuitem', {
+			name: 'Reset shadows',
+		} );
+		const itemRect = resetItem.getBoundingClientRect();
+		const labelRect = screen
+			.getByText( 'Reset shadows' )
+			.getBoundingClientRect();
+
+		expect( labelRect.top + labelRect.height / 2 ).toBeCloseTo(
+			itemRect.top + itemRect.height / 2,
+			0
 		);
+
+		await user.click( resetItem );
 
 		const dialog = await screen.findByRole( 'dialog' );
 		expect( dialog ).toHaveFocus();

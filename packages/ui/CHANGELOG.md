@@ -6,6 +6,10 @@
 
 -   `Checkbox`: Enlarge the hit target to 24px without changing the visual size. ([#82597](https://github.com/WordPress/gutenberg/pull/82597))
 
+### Bug Fixes
+
+-   `Menu`: vertically center single-line item labels while preserving first-line alignment for wrapped content. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
+
 ### Internal
 
 -   Run UI interaction tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
