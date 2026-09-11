@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Runs the Safari tests against the plugin in this checkout on an iOS
-# simulator. Needs macOS with Xcode, xcodegen and a built plugin
-# (npm run build). Set WP_PORT to serve WordPress on another port and
-# SIMULATOR_UDID to pick a device.
+# simulator. Needs macOS with Xcode, xcodegen, the Node version in
+# .nvmrc and a built plugin (npm run build). Set WP_PORT to serve
+# WordPress on another port and SIMULATOR_UDID to pick a device.
 set -euo pipefail
 
 # Steps print like the performance tests: elapsed time, then the step.
