@@ -2,9 +2,21 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `Grid` ([#82571](https://github.com/WordPress/gutenberg/pull/82571))
+
 ### Enhancements
 
 -   `CheckboxControl`: Match the `@wordpress/ui` checkmark size and disabled fill ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
+-   `Snackbar`: Show the action's focus ring with the design system's outline instead of a legacy dotted outline, and let `Button`/`ExternalLink` own the ring ([#82640](https://github.com/WordPress/gutenberg/pull/82640)).
+-   `CircularOptionPicker`: Updated to show outline via design system's mixin for focus ring instead of previous border implementation ([#82521](https://github.com/WordPress/gutenberg/pull/82521)).
+
+### Internal
+
+-   `Notice`: Remove dismiss button style overrides that now duplicate `Button` defaults, and drop an unused Sass import ([#82640](https://github.com/WordPress/gutenberg/pull/82640)).
+-   Run Components interaction tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
 
 ## 40.1.0 (2026-09-10)
 

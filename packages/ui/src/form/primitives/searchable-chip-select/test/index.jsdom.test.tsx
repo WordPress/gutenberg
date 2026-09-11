@@ -181,6 +181,23 @@ describe( 'SearchableChipSelect', () => {
 		).toBeVisible();
 	} );
 
+	it( 'announces statusContent in a status live region', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<SearchableChipSelect
+				items={ ITEMS.slice( 0, 3 ) }
+				statusContent="Loading…"
+			/>
+		);
+
+		await user.click( screen.getByRole( 'combobox' ) );
+
+		const status = await screen.findByText( 'Loading…' );
+		expect( status ).toBeVisible();
+		expect( status ).toHaveAttribute( 'role', 'status' );
+	} );
+
 	describe( 'creatable item', () => {
 		const creatableItem = {
 			value: '__create__',
