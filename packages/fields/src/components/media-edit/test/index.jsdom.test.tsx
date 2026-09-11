@@ -1,10 +1,15 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import {
+	render,
+	screen,
+	waitForElementToBeRemoved,
+} from '@testing-library/react';
+import { afterEach, describe, expect, it } from 'vitest';
 import {
 	createReduxStore,
 	createRegistry,
 	RegistryProvider,
 } from '@wordpress/data';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
 import MediaEdit from '../index';
 
@@ -46,6 +51,64 @@ function createTestRegistry( { canUpload = true } = {} ) {
 }
 
 describe( 'MediaEdit', () => {
+	afterEach( () => {
+		removeFilter( 'editor.MediaUpload', 'test/media-upload-marker' );
+	} );
+
+	it( 'resolves the media picker through the editor.MediaUpload filter', async () => {
+		const received: Record< string, unknown >[] = [];
+		render(
+			<RegistryProvider value={ createTestRegistry() }>
+				<MediaEdit
+					data={ { featured_media: 0 } }
+					field={ field }
+					onChange={ () => {} }
+					mediaUploadProps={ {
+						unstableFeaturedImageFlow: true,
+						mode: 'browse',
+					} }
+				/>
+			</RegistryProvider>
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Set featured image' } )
+		).toBeInTheDocument();
+		expect( screen.queryByText( 'Filter marker' ) ).not.toBeInTheDocument();
+
+		addFilter(
+			'editor.MediaUpload',
+			'test/media-upload-marker',
+			( MediaUpload: React.ComponentType< any > ) =>
+				( props: Record< string, unknown > ) => {
+					received.push( props );
+					return (
+						<>
+							<MediaUpload { ...props } />
+							<div>Filter marker</div>
+						</>
+					);
+				}
+		);
+		expect(
+			await screen.findByText( 'Filter marker' )
+		).toBeInTheDocument();
+		expect( received.at( -1 ) ).toMatchObject( {
+			unstableFeaturedImageFlow: true,
+			mode: 'browse',
+			allowedTypes: [ 'image' ],
+			multiple: false,
+			title: 'Featured Image',
+		} );
+		expect(
+			screen.getByRole( 'button', { name: 'Set featured image' } )
+		).toBeInTheDocument();
+
+		removeFilter( 'editor.MediaUpload', 'test/media-upload-marker' );
+		await waitForElementToBeRemoved( () =>
+			screen.queryByText( 'Filter marker' )
+		);
+	} );
+
 	it( 'shows a message instead of the picker without upload permission', () => {
 		render(
 			<RegistryProvider
