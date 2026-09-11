@@ -1,7 +1,9 @@
-import { Combobox as BaseCombobox } from '@base-ui/react/combobox';
 import type { ReactNode } from 'react';
 import * as Combobox from './combobox';
-import type { ComboboxCollectionProps } from './combobox/types';
+import type {
+	ComboboxCollectionProps,
+	ComboboxStatusProps,
+} from './combobox/types';
 
 type Item = {
 	label: string;
@@ -65,16 +67,19 @@ function shouldSkipCollectionEntry( entry: Item | ItemGroup ): boolean {
  */
 export function SearchableResults( {
 	emptyContent,
+	statusContent,
 	children,
 }: {
 	emptyContent: ReactNode;
+	statusContent?: ComboboxStatusProps[ 'children' ];
 	children?: ComboboxCollectionProps[ 'children' ];
 } ) {
-	const filteredItems = BaseCombobox.useFilteredItems< Item | ItemGroup >();
+	const filteredItems = Combobox.useFilteredItems< Item | ItemGroup >();
 	const creatableItem = findCreatableItem( filteredItems );
 
 	return (
 		<>
+			<Combobox.Status>{ statusContent }</Combobox.Status>
 			<Combobox.Empty>{ emptyContent }</Combobox.Empty>
 			<Combobox.List>
 				<Combobox.ListBody>
