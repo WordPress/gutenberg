@@ -97,7 +97,7 @@ describe( 'ThemeProvider', () => {
 		expect( readProp( provider, SURFACE_BG ) ).toBe( BACKGROUND );
 	} );
 
-	it( 'maps normal content and resting neutral foregrounds to the same scale step', async () => {
+	it( 'maps active neutral foregrounds to a stronger scale step', async () => {
 		await render(
 			<ThemeProvider color={ { background: BACKGROUND } }>
 				<div data-testid="child">x</div>
@@ -117,6 +117,7 @@ describe( 'ThemeProvider', () => {
 		expect( activeForeground ).toBe(
 			readProp( provider, FOREGROUND_NEUTRAL_WEAK_ACTIVE )
 		);
+		expect( activeForeground ).not.toBe( restingForeground );
 	} );
 
 	it( 'does not define color tokens if neither customized nor inherited', async () => {

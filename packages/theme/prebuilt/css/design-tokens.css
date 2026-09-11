@@ -140,9 +140,9 @@
 	/* Foreground color for content like text with warning tone and weak emphasis. */
 	--wpds-color-foreground-content-warning-weak: #886726;
 	/* Foreground color for interactive elements with brand tone and normal emphasis. */
-	--wpds-color-foreground-interactive-brand: #3f61ea;
+	--wpds-color-foreground-interactive-brand: #222eda;
 	/* Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active. */
-	--wpds-color-foreground-interactive-brand-active: #222eda;
+	--wpds-color-foreground-interactive-brand-active: #03063b;
 	/* Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-brand-disabled: #8d8d8d;
 	/* Foreground color for interactive elements with brand tone and strong emphasis. */
@@ -152,9 +152,9 @@
 	/* Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-brand-strong-disabled: #8d8d8d;
 	/* Foreground color for interactive elements with error tone and normal emphasis. */
-	--wpds-color-foreground-interactive-error: #d81a1a;
+	--wpds-color-foreground-interactive-error: #980f0f;
 	/* Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active. */
-	--wpds-color-foreground-interactive-error-active: #980f0f;
+	--wpds-color-foreground-interactive-error-active: #260101;
 	/* Foreground color for interactive elements with error tone and normal emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-error-disabled: #8d8d8d;
 	/* Foreground color for interactive elements with error tone and strong emphasis. */
@@ -166,7 +166,7 @@
 	/* Foreground color for interactive elements with neutral tone and normal emphasis. */
 	--wpds-color-foreground-interactive-neutral: #505050;
 	/* Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active. */
-	--wpds-color-foreground-interactive-neutral-active: #505050;
+	--wpds-color-foreground-interactive-neutral-active: #141414;
 	/* Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-neutral-disabled: #8d8d8d;
 	/* Foreground color for interactive elements with neutral tone and strong emphasis. */
@@ -178,7 +178,7 @@
 	/* Foreground color for interactive elements with neutral tone and weak emphasis. */
 	--wpds-color-foreground-interactive-neutral-weak: #717171;
 	/* Foreground color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active. */
-	--wpds-color-foreground-interactive-neutral-weak-active: #505050;
+	--wpds-color-foreground-interactive-neutral-weak-active: #141414;
 	/* Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-neutral-weak-disabled: #8d8d8d;
 	/* Accessible stroke color applied to focus rings. */
