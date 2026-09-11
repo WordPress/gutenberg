@@ -429,12 +429,15 @@ $block-inserter-tabs-height: 44px;
 
 // The Media tab is a single column: every source is a collapsible panel, and
 // the open one takes the height left beneath the other panels' headers so its
-// results scroll internally.
+// results scroll internally. The column is at least as tall as its content
+// (the headers plus the open panel's minimum height), so with many sources or
+// a short viewport it outgrows the tab panel, which scrolls.
+$media-panel-min-height: 320px;
+
 .block-editor-inserter__media-sources {
 	display: flex;
 	flex-direction: column;
-	flex: 1;
-	min-height: 0;
+	flex: 1 0 auto;
 
 	.block-editor-inserter__media-sources__source {
 		display: flex;
@@ -442,9 +445,12 @@ $block-inserter-tabs-height: 44px;
 		flex-shrink: 0;
 		border-bottom: $border-width solid $gray-200;
 
+		// The open panel grows to fill the column but never below a usable
+		// height (roughly the search field, two rows of cards and the pager).
+		// Below that the column outgrows the tab panel, which scrolls.
 		&.is-open {
 			flex: 1;
-			min-height: 0;
+			min-height: $media-panel-min-height;
 		}
 	}
 
@@ -480,12 +486,14 @@ $block-inserter-tabs-height: 44px;
 
 	.block-editor-inserter__media-sources__footer {
 		flex-shrink: 0;
+		// Pinned to the bottom of the sidebar even when every panel is
+		// collapsed and nothing above it grows.
+		margin-top: auto;
 		padding: 0 $grid-unit-20 $grid-unit-20;
 	}
 }
 
 .block-editor-inserter__media-panel {
-	padding: 0 $grid-unit-20;
 	display: flex;
 	flex-direction: column;
 	// Fill the height of the open source panel so the results scroll
@@ -493,17 +501,18 @@ $block-inserter-tabs-height: 44px;
 	flex: 1;
 	min-height: 0;
 
-	// The panel body is a DataViews grid composed from its sub-components:
-	// strip the padding and surface colour DataViews brings for full-page use
-	// so the grid sits flush in the narrow column, and let its layout container
-	// be the scroll host.
+	// The panel body is a DataViews grid composed from its sub-components.
+	// Strip the surface colour DataViews brings for full-page use, and let its
+	// layout container be the scroll host across the panel's full width, so
+	// the scrollbar sits at the sidebar edge: the search, grid, empty state
+	// and footer each carry the horizontal gutter instead of the panel.
 	.dataviews-wrapper {
 		background-color: transparent;
 	}
 
 	.block-editor-inserter__media-grid__search {
 		flex-shrink: 0;
-		padding-bottom: $grid-unit-20;
+		padding: 0 $grid-unit-20 $grid-unit-20;
 
 		.dataviews-search {
 			width: 100%;
@@ -511,20 +520,19 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	.dataviews-view-grid {
-		padding: 0 0 $grid-unit-20;
+		padding: 0 $grid-unit-20 $grid-unit-20;
 	}
 
 	.dataviews-no-results,
 	.dataviews-loading {
-		padding: 0;
+		padding: 0 $grid-unit-20;
 	}
 
 	.block-editor-inserter__media-grid__footer {
 		// Keeps the footer at its natural height rather than collapsing to make
 		// room for the scrolling grid above.
 		flex-shrink: 0;
-		padding-top: $grid-unit-20;
-		padding-bottom: $grid-unit-20;
+		padding: $grid-unit-20;
 	}
 
 	.block-editor-inserter__media-grid__date-span {

@@ -27,9 +27,10 @@ type MediaSourcesProps = {
 
 /**
  * The Media tab: every media source is a collapsible panel stacked in a single
- * column. Exactly one is open at a time and fills the height left
- * beneath the other panels' headers, so the tab opens straight onto a browsable
- * library rather than a list of sources to drill into.
+ * column. At most one is open at a time and fills the height left beneath
+ * the other panels' headers; the first opens on mount, so the tab opens
+ * straight onto a browsable library rather than a list of sources to drill
+ * into.
  */
 export default function MediaSources( {
 	categories,
@@ -39,28 +40,20 @@ export default function MediaSources( {
 	const [ openName, setOpenName ] = useState< string | undefined >(
 		categories[ 0 ]?.name
 	);
-	// If the categories change underneath us (e.g. the attached images source
-	// appears once the post is saved) keep a panel open rather than none.
-	const openCategory =
-		categories.find( ( category ) => category.name === openName ) ??
-		categories[ 0 ];
 	const baseCssClass = 'block-editor-inserter__media-sources';
 
 	return (
 		<div className={ baseCssClass }>
 			{ categories.map( ( category ) => {
-				const isOpen = category === openCategory;
+				const isOpen = category.name === openName;
 				return (
 					<Collapsible.Root
 						key={ category.name }
 						open={ isOpen }
 						onOpenChange={ ( open ) => {
-							// One panel is always open: opening another closes
-							// the current one, and the open one can't be
-							// collapsed on its own.
-							if ( open ) {
-								setOpenName( category.name );
-							}
+							// Opening a panel closes the current one; closing
+							// the open one leaves every panel collapsed.
+							setOpenName( open ? category.name : undefined );
 						} }
 						className={ clsx( `${ baseCssClass }__source`, {
 							'is-open': isOpen,
