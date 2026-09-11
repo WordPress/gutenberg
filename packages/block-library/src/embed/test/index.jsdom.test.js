@@ -44,6 +44,10 @@ describe( 'utils', () => {
 		test( 'findMoreSuitableBlock matches a URL to a block name', () => {
 			const twitterURL = 'https://twitter.com/notnownikki';
 			const youtubeURL = 'https://www.youtube.com/watch?v=bNnfuvC1LlU';
+			const reverbnationURL =
+				'https://www.reverbnation.com/theweakerthans';
+			const reverbnationLegacyURL =
+				'https://legacy.reverbnation.com/theweakerthans';
 			const unknownURL = 'https://example.com/';
 
 			expect( findMoreSuitableBlock( twitterURL ) ).toEqual(
@@ -51,6 +55,12 @@ describe( 'utils', () => {
 			);
 			expect( findMoreSuitableBlock( youtubeURL ) ).toEqual(
 				expect.objectContaining( { name: 'youtube' } )
+			);
+			expect( findMoreSuitableBlock( reverbnationURL ) ).toEqual(
+				expect.objectContaining( { name: 'reverbnation' } )
+			);
+			expect( findMoreSuitableBlock( reverbnationLegacyURL ) ).toEqual(
+				expect.objectContaining( { name: 'reverbnation' } )
 			);
 			expect( findMoreSuitableBlock( unknownURL ) ).toBeUndefined();
 		} );

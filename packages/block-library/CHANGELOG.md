@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Embed: Match `legacy.reverbnation.com` in the ReverbNation variation, so URLs copied after ReverbNation's redirect resolve as ReverbNation embeds instead of generic ones ([#82757](https://github.com/WordPress/gutenberg/pull/82757)).
+
 ## 11.0.0 (2026-09-10)
 
 ### Breaking Changes
