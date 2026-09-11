@@ -21,7 +21,7 @@ jobs:
   admin-1:
     name: Admin - 1
 
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-24.04'
     timeout-minutes: 45
 
     steps:
@@ -64,7 +64,7 @@ jobs:
   admin-2:
     name: Admin - 2
 
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-24.04'
     timeout-minutes: 45
 
     steps:
@@ -107,7 +107,7 @@ jobs:
   admin-3:
     name: Admin - 3
 
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-24.04'
     timeout-minutes: 45
 
     steps:
@@ -150,7 +150,7 @@ jobs:
   admin-4:
     name: Admin - 4
 
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-24.04'
     timeout-minutes: 45
 
     steps:
