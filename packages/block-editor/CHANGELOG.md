@@ -15,6 +15,7 @@
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
 -   `LinkControl`: Add a `transformSuggestions` prop, so a consumer can filter, order or add to the search suggestions before they are shown ([#83652](https://github.com/WordPress/gutenberg/pull/83652)).
 -   Block Switcher: Show the pattern previews' focus and hover rings with the design system's outline instead of a legacy box-shadow ([#83933](https://github.com/WordPress/gutenberg/pull/83933)).
+-   Inserter: Redesign the Media tab as a single column of collapsible panels, one per media source, with the first open, in place of the category list and flyout panel. Each source renders as a DataViews grid with search, per-item actions and a pager labelled with the page's date span ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
 
 ### Bug Fixes
 
@@ -86,7 +87,6 @@
 ### Enhancements
 
 -   `BlockAlignmentControl`: List Wide and Full width as unavailable when a parent layout withholds them but the theme itself offers them, instead of removing them from the menu without explanation. A theme that offers neither keeps them hidden, since it is curating its own options. Blocks whose only alignments are wide and full, such as Group and Columns, now keep an alignment control in layouts that offer neither ([#82600](https://github.com/WordPress/gutenberg/pull/82600)).
--   Inserter: Redesign the Media tab as a single column of collapsible panels, one per media source, with the first open, in place of the category list and flyout panel ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
 -   Borders: rename the "Border & Shadow" panel to "Borders", whichever of its controls are available, and always show the Border and Shadow controls' visible labels. A stable panel title is what lets the Border label render unconditionally, so its "Unlink sides" toggle lines up with the border radius one ([#82163](https://github.com/WordPress/gutenberg/pull/82163)).
 -   `ListView`: Updated to use `outset-ring__focus()` mixin for focus outline wherever applicable instead of the previous box-shadow implementation. ([#82129](https://github.com/WordPress/gutenberg/pull/82129))
 
