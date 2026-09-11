@@ -77,6 +77,14 @@ jobs:
                   name: ios-build-output
                   path: build
 
+            # The runner's Node is older than the repository requires, and
+            # npx enforces that requirement when it starts Playground.
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: .nvmrc
+                  package-manager-cache: false
+
             - name: Install xcodegen
               run: brew install xcodegen
 
