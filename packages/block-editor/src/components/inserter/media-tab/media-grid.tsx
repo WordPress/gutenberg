@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { useCallback, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -256,6 +257,9 @@ export default function MediaGrid( {
 		[ totalItems, totalPages ]
 	);
 	const showPagination = paginationInfo.totalPages > 1;
+	// The footer, when present, supplies the breathing room beneath the grid,
+	// so the grid drops its own bottom gutter (see styles).
+	const hasFooter = showPagination || !! footer;
 	// Search results are ordered by relevance, so the span is only shown for
 	// the date-ordered browse.
 	const dateSpan = search ? undefined : getDateSpan( mediaList );
@@ -281,8 +285,12 @@ export default function MediaGrid( {
 				<div className="block-editor-inserter__media-grid__search">
 					<DataViews.Search label={ searchLabel } />
 				</div>
-				<DataViews.Layout className="block-editor-inserter__media-grid" />
-				{ ( showPagination || footer ) && (
+				<DataViews.Layout
+					className={ clsx( 'block-editor-inserter__media-grid', {
+						'has-footer': hasFooter,
+					} ) }
+				/>
+				{ hasFooter && (
 					<Stack
 						direction="column"
 						gap="sm"

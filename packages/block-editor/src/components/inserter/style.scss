@@ -521,6 +521,12 @@ $media-panel-min-height: 320px;
 
 	.dataviews-view-grid {
 		padding: 0 $grid-unit-20 $grid-unit-20;
+
+		// The footer supplies the breathing room beneath the grid when present,
+		// so drop the grid's own bottom gutter rather than doubling up.
+		&.has-footer {
+			padding-bottom: 0;
+		}
 	}
 
 	.dataviews-no-results,
