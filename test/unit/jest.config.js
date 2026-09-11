@@ -23,7 +23,6 @@ const transpiledPackageNames = globSync(
 	} );
 
 const dependenciesToTransform = [
-	'@ariakit/test',
 	'@ariakit/utils',
 	'@preact',
 	'comctx',
@@ -42,14 +41,9 @@ process.env.TZ = 'UTC';
  * Resolved rather than hardcoded to `<rootDir>/node_modules`,
  * which is empty under non-hoisting installs.
  */
-const ariakitTestDir = path.dirname(
-	require.resolve( '@ariakit/test/package.json', {
-		paths: [ path.join( ROOT_DIR, 'packages/components' ) ],
-	} )
-);
 const ariakitUtilsDir = path.dirname(
 	require.resolve( '@ariakit/utils/package.json', {
-		paths: [ ariakitTestDir ],
+		paths: [ path.join( ROOT_DIR, 'packages/components' ) ],
 	} )
 );
 
@@ -59,10 +53,6 @@ const commonProjectConfig = {
 		/**
 		 * Specific mappings first (before generic patterns)
 		 */
-		// Jest resolves dependencies from CommonJS and cannot select import-only
-		// package exports. Map Ariakit's ESM test helpers explicitly.
-		'^@ariakit/test$': path.join( ariakitTestDir, 'dist/index.js' ),
-		'^@ariakit/test/react$': path.join( ariakitTestDir, 'dist/react.js' ),
 		'^@ariakit/utils$': path.join( ariakitUtilsDir, 'dist/index.js' ),
 		// Mock @wordpress/vips/worker before the general pattern so it doesn't try to load the real file.
 		// The worker-code.ts file is auto-generated during full builds and is gitignored.
