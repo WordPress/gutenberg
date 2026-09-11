@@ -392,11 +392,16 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			// Settings merge, so pass the prop even when `undefined` to clear a
 			// mode left behind by a previous mount.
 			updateEditorSettings( { ...settings, renderingMode } );
-
-			// And clear it on the way out, for whatever mounts next without a
-			// mode of its own: the style book on `/styles`, for one.
-			return () => updateEditorSettings( { renderingMode: undefined } );
 		}, [ settings, renderingMode, updateEditorSettings ] );
+
+		// Clear the mode when this editor goes away, so whatever mounts in its
+		// place without a mode of its own, such as the style book on `/styles`,
+		// does not inherit it. Kept out of the sync above, which re-runs on
+		// every settings change: on the styles route, with every edit.
+		useLayoutEffect(
+			() => () => updateEditorSettings( { renderingMode: undefined } ),
+			[ updateEditorSettings ]
+		);
 
 		// Synchronizes the active template with the state.
 		useEffect( () => {
