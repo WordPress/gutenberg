@@ -22,6 +22,10 @@ module.exports = {
 	],
 	setupFilesAfterEnv: [ '<rootDir>/test/unit/config/testing-library.js' ],
 	testURL: 'http://localhost',
+	transformIgnorePatterns: [
+		'/node_modules/(?!(docker-compose|yaml)/)',
+		'\\.pnp\\.[^\\/]+$',
+	],
 	testPathIgnorePatterns: [
 		'/.git/',
 		'/node_modules/',
