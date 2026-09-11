@@ -413,7 +413,7 @@ export const WithItemDescription: Story = {
 	args: {
 		items: stockItems,
 		children: [
-			<Select.Trigger key="trigger" />,
+			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ stockItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
