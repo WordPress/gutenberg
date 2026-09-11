@@ -70,14 +70,14 @@ function addAttributes( settings ) {
 	}
 
 	// Allow blocks to specify their own attribute definition with default values if needed.
-	if ( ! settings.attributes.backgroundColor ) {
+	if ( ! settings.attributes?.backgroundColor ) {
 		Object.assign( settings.attributes, {
 			backgroundColor: {
 				type: 'string',
 			},
 		} );
 	}
-	if ( ! settings.attributes.textColor ) {
+	if ( ! settings.attributes?.textColor ) {
 		Object.assign( settings.attributes, {
 			textColor: {
 				type: 'string',
@@ -85,7 +85,7 @@ function addAttributes( settings ) {
 		} );
 	}
 
-	if ( hasGradientSupport( settings ) && ! settings.attributes.gradient ) {
+	if ( hasGradientSupport( settings ) && ! settings.attributes?.gradient ) {
 		Object.assign( settings.attributes, {
 			gradient: {
 				type: 'string',

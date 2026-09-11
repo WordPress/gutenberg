@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Block supports: Guard the attribute-registration hooks (border, color, duotone, font family, font size, style) against block types registered without an `attributes` object, which crashed the editor with "Cannot read properties of undefined" ([#78853](https://github.com/WordPress/gutenberg/pull/78853)).
+
 ### Internal
 
 -   Remove the `crossorigin` MutationObserver. Under `Document-Isolation-Policy: isolate-and-credentialless` cross-origin resources load without the attribute, and adding it broke any resource served without CORS headers ([#82614](https://github.com/WordPress/gutenberg/pull/82614)).

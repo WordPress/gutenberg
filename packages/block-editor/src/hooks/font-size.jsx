@@ -32,7 +32,7 @@ function addAttributes( settings ) {
 	}
 
 	// Allow blocks to specify a default value if needed.
-	if ( ! settings.attributes.fontSize ) {
+	if ( ! settings.attributes?.fontSize ) {
 		Object.assign( settings.attributes, {
 			fontSize: {
 				type: 'string',

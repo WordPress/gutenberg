@@ -20,7 +20,7 @@ function addAttributes( settings ) {
 	}
 
 	// Allow blocks to specify a default value if needed.
-	if ( ! settings.attributes.fontFamily ) {
+	if ( ! settings.attributes?.fontFamily ) {
 		Object.assign( settings.attributes, {
 			fontFamily: {
 				type: 'string',
