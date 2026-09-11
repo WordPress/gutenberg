@@ -287,13 +287,6 @@ When `parent` is omitted, the block is not restricted by parent block type. Sett
 parent: [ 'core/columns' ],
 ```
 
-Setting `parent` to an empty array restricts the block to the root level only, so it is not available inside another block.
-
-```js
-// Only allow this block at the root level
-parent: [],
-```
-
 #### ancestor (optional)
 
 -   **Type:** `Array`
