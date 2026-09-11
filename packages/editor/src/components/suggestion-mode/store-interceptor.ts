@@ -24,6 +24,10 @@
  *     provider after creating a note comment) is folded into the snapshot
  *     before diffing so it's invisible to the diff and never leaks into the
  *     user-pending overlay.
+ *   - A `resetBlocks` — content handed down by the controlling entity rather
+ *     than typed by this user — re-seeds the baseline instead of being
+ *     diffed, so another session's document isn't captured as a page of
+ *     insertions.
  *
  * Why subscribe rather than React state:
  *   - The interceptor must run after the dispatch lands but before any
@@ -43,6 +47,11 @@
  *     whose index just shifted as a side-effect by preferring the current
  *     selection (the block a user moves stays selected), with an LCS-based
  *     heuristic as the fallback.
+ *   - A block-switcher transform (or any other `replaceBlocks`) reaches the
+ *     loop as a removal AND an insertion in the same fire. Both halves are
+ *     stamped with a shared `groupId` so the review layer can resolve them
+ *     together — accepting the insertion without the removal would leave a
+ *     duplicate block, and rejecting it without the removal a hole.
  *
  * In every case the live block carries the marker and a corresponding
  * structural op is written to the overlay so auto-save persists it.
@@ -55,6 +64,7 @@ import { useSuggestionOverlay } from './overlay-context';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { parseSuggestionPayload } from './provider';
 import { createRevertGuard } from '../attribute-suggestions/revert-guard';
+import { planStoreContentEdit } from './plan-store-content-edit';
 import { unlock } from '../../lock-unlock';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
@@ -370,16 +380,25 @@ function isAcceptedSuggestionChange(
  * reject. See `docs/explanations/architecture/suggestions.md` for the
  * "apply-and-tag" rationale.
  *
- * The marker's `type` is the op type it represents; `commentId` is filled
- * in by auto-save once a note comment exists for the marker; `authorId` is
- * the ID of the user who proposed the suggestion, captured at marker-write
- * time so the rendering layer can tint the preview with the author's avatar
- * color (`null` when the current user can't be resolved, e.g. unit tests).
+ * The marker's `type` is the op type it represents; `groupId` is a shared id
+ * linking the halves of a single replacement (a block-switcher transform is a
+ * removal plus an insertion — present on every member, and the review layer
+ * resolves the whole group with one decision); `commentId` is filled in by
+ * auto-save once a note comment exists for the marker; `authorId` is the ID
+ * of the user who proposed the suggestion, captured at marker-write time so
+ * the rendering layer can tint the preview with the author's avatar color
+ * (`null` when the current user can't be resolved, e.g. unit tests);
+ * `crossedParents` (`pending-move` only) is true when the move changed
+ * parents, which makes `fromIndex` meaningless to any consumer that only
+ * sees the block's current sibling list (absent on markers written before
+ * this field existed).
  */
 export interface SuggestionMarker {
 	type: 'pending-remove' | 'pending-insert' | 'pending-move';
+	groupId?: string;
 	commentId?: number;
 	authorId?: number | null;
+	crossedParents?: boolean;
 	[ key: string ]: any;
 }
 
@@ -468,6 +487,88 @@ function isPartOfPendingInsertion(
 	return parents.some(
 		( id: string ) => markerType( id ) === 'pending-insert'
 	);
+}
+
+/**
+ * Monotonic counter behind `nextSuggestionGroupId`. Module scope so two
+ * interceptor sessions in the same page never mint the same id.
+ */
+let suggestionGroupCounter = 0;
+
+/**
+ * Mint an id shared by the halves of one replacement. It only has to be
+ * unique among the suggestions pending on a post, and it is written into
+ * post content (`metadata.suggestion.groupId`) and into the note payload,
+ * so it is kept short and free of characters that need escaping.
+ *
+ * @return Group id.
+ */
+function nextSuggestionGroupId(): string {
+	suggestionGroupCounter += 1;
+	return `sg-${ Date.now().toString( 36 ) }-${ suggestionGroupCounter }`;
+}
+
+/**
+ * Pair the insertions and removals captured in a single subscribe fire.
+ *
+ * `replaceBlocks` — what the block switcher, "Group", and paste-over-selection
+ * all dispatch — lands as one store update in which a block disappears and
+ * another appears in its place. Diffed independently those are two unrelated
+ * suggestions, and resolving one without the other leaves either a duplicate
+ * block or a hole. Insertions and removals that landed in the SAME parent
+ * during the same fire are the two halves of one replacement, so they get a
+ * shared group id.
+ *
+ * Pairing is deliberately per-parent: a transform of three paragraphs into one
+ * quote (3 removals, 1 insertion) is one group, while an unrelated removal in
+ * a different container stays its own suggestion.
+ *
+ * @param insertions       New top-level blocks captured this fire.
+ * @param removedTopIds    Top-level removed clientIds.
+ * @param parentByClientId Previous-tick parents.
+ * @return Group id per participating clientId. Empty when the fire held only
+ * insertions or only removals.
+ */
+function pairReplacedBlocks(
+	insertions: Array< { clientId: string; parentClientId: string | null } >,
+	removedTopIds: string[],
+	parentByClientId: Map< string, string | null >
+): Map< string, string > {
+	const groupIds = new Map< string, string >();
+	if ( insertions.length === 0 || removedTopIds.length === 0 ) {
+		return groupIds;
+	}
+
+	const insertedByParent = new Map< string | null, string[] >();
+	for ( const insertion of insertions ) {
+		const parent = insertion.parentClientId ?? null;
+		if ( ! insertedByParent.has( parent ) ) {
+			insertedByParent.set( parent, [] );
+		}
+		insertedByParent.get( parent )!.push( insertion.clientId );
+	}
+
+	const removedByParent = new Map< string | null, string[] >();
+	for ( const clientId of removedTopIds ) {
+		const parent = parentByClientId.get( clientId ) ?? null;
+		if ( ! removedByParent.has( parent ) ) {
+			removedByParent.set( parent, [] );
+		}
+		removedByParent.get( parent )!.push( clientId );
+	}
+
+	for ( const [ parent, insertedIds ] of insertedByParent ) {
+		const removedIds = removedByParent.get( parent );
+		if ( ! removedIds ) {
+			continue;
+		}
+		const groupId = nextSuggestionGroupId();
+		for ( const clientId of [ ...insertedIds, ...removedIds ] ) {
+			groupIds.set( clientId, groupId );
+		}
+	}
+
+	return groupIds;
 }
 
 /**
@@ -715,6 +816,17 @@ function detectMovedBlocks(
 			fromParentClientId: oldParent,
 			fromAnchorClientId,
 			fromIndex: oldIndex,
+			/*
+			 * Whether the block changed parents. Recorded as a plain boolean
+			 * because client IDs are session-local and never reach the
+			 * server: `fromParentClientId` alone only tells the front end
+			 * whether the origin was the root, so a move between two
+			 * different nested parents is indistinguishable from a reorder
+			 * inside one. Applying `fromIndex` in that case drops the block
+			 * at an offset of a parent it never belonged to, so the renderer
+			 * needs to be told to leave it alone.
+			 */
+			crossedParents: oldParent !== newParent,
 			toParentClientId: newParent,
 			toAnchorClientId,
 		};
@@ -754,6 +866,7 @@ export default function SuggestionStoreInterceptor() {
 		isDeferredInsertion,
 		clearDeferredInsertions,
 		consumeUndoRedoAdoption,
+		requestContentSuggestion,
 	} = useSuggestionOverlay();
 	const registry = useRegistry();
 
@@ -784,6 +897,9 @@ export default function SuggestionStoreInterceptor() {
 
 	const consumeUndoRedoAdoptionRef = useRef( consumeUndoRedoAdoption );
 	consumeUndoRedoAdoptionRef.current = consumeUndoRedoAdoption;
+
+	const requestContentSuggestionRef = useRef( requestContentSuggestion );
+	requestContentSuggestionRef.current = requestContentSuggestion;
 
 	// The deferred-insertion callbacks are identity-stable (`useCallback`
 	// with no dependencies in the overlay provider), so unlike the values
@@ -930,8 +1046,61 @@ export default function SuggestionStoreInterceptor() {
 			tree = captureTreeSnapshot( blockEditor );
 		};
 
+		/*
+		 * Content that did not come from this user replaces the whole block
+		 * tree through `resetBlocks`: the sync manager applying another
+		 * session's changes, a revision restore, a refetch. Every block in the
+		 * replacement carries a fresh clientId, so the diff below would read
+		 * the arriving document as "the local user inserted all of this" and
+		 * the previous document as "the local user removed all of that" —
+		 * duplicating the post in the canvas and opening a note per block.
+		 *
+		 * `resetBlocks` is the reliable signal because no editing action
+		 * dispatches it: in the post editor it is reached only from
+		 * `useBlockSync`, which calls it when the controlling entity hands
+		 * down a new value (and with `[]` on unmount), plus `synchronizeTemplate`,
+		 * which is a template resync rather than a content edit. Wrapping the
+		 * store's action object is the same interception `SuggestionUndoGuard`
+		 * uses for undo/redo; the original is restored on cleanup.
+		 *
+		 * Subscribers fire synchronously from within the dispatch, so the flag
+		 * is read by the very fire the reset triggers and needs no token
+		 * bookkeeping.
+		 */
+		let isExternalReset = false;
+		const originalResetBlocks = blockEditorDispatch.resetBlocks;
+		if ( originalResetBlocks ) {
+			blockEditorDispatch.resetBlocks = ( ...args ) => {
+				isExternalReset = true;
+				try {
+					return originalResetBlocks( ...args );
+				} finally {
+					isExternalReset = false;
+				}
+			};
+		}
+
 		const unsubscribe = registry.subscribe( () => {
 			if ( isDispatchingOwnWrite ) {
+				return;
+			}
+
+			// Externally-supplied content (see above): adopt it as the new
+			// capture baseline rather than diffing it as user intent.
+			if ( isExternalReset ) {
+				/*
+				 * An undo/redo lands here too: in the post editor it is
+				 * applied as a `resetBlocks`, so this branch — not the
+				 * drift branch below — is where the guard's armed adoption
+				 * token comes due. Consume it, because a token left armed
+				 * stays live for UNDO_ADOPTION_TTL_MS and the user's next
+				 * keystroke would spend it, adopting that edit as baseline
+				 * instead of capturing it as a suggestion. Resets that are
+				 * not an undo have no token armed, so this is a no-op for
+				 * them.
+				 */
+				consumeUndoRedoAdoptionRef.current?.();
+				adoptLiveTreeAsBaseline();
 				return;
 			}
 
@@ -953,6 +1122,15 @@ export default function SuggestionStoreInterceptor() {
 			const liveClientIds =
 				blockEditor.getClientIdsWithDescendants?.() ?? [];
 			const live = new Set( liveClientIds );
+
+			/*
+			 * Insertions captured during this fire. A `replaceBlocks` shows up
+			 * as an insertion here and as a removal further down, and the
+			 * removal is only known once this loop has finished — so the
+			 * insertions are recorded as they are captured and re-stamped with
+			 * a group id below if a removal turns up to pair them with.
+			 */
+			const insertionsThisFire = [];
 
 			for ( const clientId of liveClientIds ) {
 				let previous = snapshot.get( clientId );
@@ -1055,13 +1233,35 @@ export default function SuggestionStoreInterceptor() {
 						isDispatchingOwnWrite = false;
 					}
 
-					setStructuralOpRef.current?.( clientId, block.name, {
+					const insertOp = {
 						type: 'block-insert-after',
 						clientId,
 						blockName: block.name,
 						anchorClientId,
 						parentClientId,
+						/*
+						 * The sidebar summary is the only surface some
+						 * reviewers use, and "Insert block: paragraph" reads
+						 * identically whether the paragraph landed at the top
+						 * level or inside a Group. Record the container's name
+						 * so the summary can say where.
+						 */
+						parentBlockName: parentClientId
+							? blockEditor.getBlockName?.( parentClientId ) ??
+							  null
+							: null,
 						block,
+					};
+					setStructuralOpRef.current?.(
+						clientId,
+						block.name,
+						insertOp
+					);
+					insertionsThisFire.push( {
+						clientId,
+						blockName: block.name,
+						parentClientId,
+						op: insertOp,
 					} );
 					continue;
 				}
@@ -1117,27 +1317,56 @@ export default function SuggestionStoreInterceptor() {
 					continue;
 				}
 
-				// Capture a baseline if one isn't already set. The HOC's
-				// own captureBaseline only fires for `setAttributes` calls;
-				// for store-level mutations we have to seed one here.
-				const overlayEntries = entriesRef.current;
-				if ( ! overlayEntries[ clientId ] ) {
-					const block = blockEditor.getBlock?.( clientId );
-					captureBaselineRef.current(
-						clientId,
-						block?.name ?? '',
-						previous
-					);
-				}
-
-				// Route the changes into the overlay so the user still sees
-				// their edit, then revert the underlying store back to the
-				// snapshot so the post itself isn't actually modified. System
-				// metadata is filtered out of the overlay payload — it isn't
-				// a user edit, and `delta.restore` already preserves it.
+				// System metadata is filtered out before the change is
+				// classified — it isn't a user edit, and `delta.restore`
+				// already preserves it.
 				const overlayChanged = stripSystemMetadata( delta.changed );
-				if ( Object.keys( overlayChanged ).length > 0 ) {
-					setOverlayAttributesRef.current( clientId, overlayChanged );
+
+				/*
+				 * A `content` change that is a plain removal goes to the
+				 * content reconciler as an inline deletion marker rather than
+				 * to the overlay. The splitting Enter is why (#73411, F-07):
+				 * it dispatches `replaceBlocks` with a truncated head, so the
+				 * removed tail reached the overlay, which draws its clean
+				 * snapshot in place of the block's value — the removal rendered
+				 * as already done instead of struck through where it still is.
+				 * The reconciler runs asynchronously and re-reads the block, so
+				 * the revert below has to land first; the overlay fallback is
+				 * unaffected by the reordering because it works off `delta`.
+				 */
+				const markerPlan = planStoreContentEdit(
+					previous,
+					current,
+					overlayChanged,
+					currentUserId
+				);
+				const block = blockEditor.getBlock?.( clientId );
+
+				// Capture a baseline if one isn't already set (the HOC's own
+				// captureBaseline only fires for `setAttributes` calls; for
+				// store-level mutations we have to seed one here), then route
+				// the changes into the overlay so the user still sees their
+				// edit. The revert below restores the store so the post itself
+				// isn't actually modified.
+				const routeToOverlay = () => {
+					const overlayEntries = entriesRef.current;
+					if ( ! overlayEntries[ clientId ] ) {
+						captureBaselineRef.current(
+							clientId,
+							block?.name ?? '',
+							previous
+						);
+					}
+					if ( Object.keys( overlayChanged ).length > 0 ) {
+						setOverlayAttributesRef.current(
+							clientId,
+							overlayChanged
+						);
+					}
+				};
+
+				if ( ! markerPlan ) {
+					routeToOverlay();
 				}
 
 				// Record what this revert will make true, so its echo can be
@@ -1172,6 +1401,26 @@ export default function SuggestionStoreInterceptor() {
 					clientId,
 					blockEditor.getBlockAttributes( clientId )
 				);
+
+				/*
+				 * Hand the marker plan over now that the block is back at the
+				 * value the plan was diffed from. The reconciler opens the
+				 * note(s) and writes the marked content through an interceptor
+				 * bypass. It returns a synchronous verdict, so a refusal (no
+				 * handler mounted, as in isolated unit tests) still lands in
+				 * the overlay exactly as it did before this branch existed.
+				 */
+				if ( markerPlan ) {
+					const handed = requestContentSuggestionRef.current?.( {
+						clientId,
+						blockName: block?.name ?? '',
+						prevContent: previous?.content,
+						plan: markerPlan,
+					} );
+					if ( ! handed ) {
+						routeToOverlay();
+					}
+				}
 
 				// The snapshot reflects the (now-restored) baseline for this
 				// block; do NOT update it to `current` here.
@@ -1231,11 +1480,21 @@ export default function SuggestionStoreInterceptor() {
 								fromParentClientId:
 									existingMarker.fromParentClientId ?? null,
 								fromIndex: existingMarker.fromIndex ?? 0,
+								/*
+								 * Sticky: a block that crossed parents and is
+								 * then nudged within its new parent has still
+								 * left its origin, so the origin index stays
+								 * unusable.
+								 */
+								crossedParents:
+									existingMarker.crossedParents === true ||
+									move.crossedParents,
 						  }
 						: {
 								fromAnchorClientId: move.fromAnchorClientId,
 								fromParentClientId: move.fromParentClientId,
 								fromIndex: move.fromIndex,
+								crossedParents: move.crossedParents,
 						  };
 				isDispatchingOwnWrite = true;
 				try {
@@ -1318,6 +1577,19 @@ export default function SuggestionStoreInterceptor() {
 					tree.parentByClientId
 				);
 
+				/*
+				 * A removal and an insertion that landed in the same parent
+				 * during the same fire are the two halves of one
+				 * `replaceBlocks` — a block-switcher transform, "Group", or a
+				 * paste over a selection. Stamp both with a shared id so the
+				 * review layer can resolve them with one decision.
+				 */
+				const groupIds = pairReplacedBlocks(
+					insertionsThisFire,
+					tops,
+					tree.parentByClientId
+				);
+
 				// Phase 1: re-insert each top-level removed subtree at its
 				// previous position. Done synchronously inside `isReverting`
 				// so the resulting subscribe fires don't loop. The inserted
@@ -1362,6 +1634,7 @@ export default function SuggestionStoreInterceptor() {
 						continue;
 					}
 					const block = tree.blocksByClientId.get( clientId );
+					const groupId = groupIds.get( clientId );
 					isDispatchingOwnWrite = true;
 					try {
 						// Programmatic marker write — keep it off the undo
@@ -1373,18 +1646,73 @@ export default function SuggestionStoreInterceptor() {
 								{
 									type: 'pending-remove',
 									authorId: currentUserId,
+									...( groupId ? { groupId } : {} ),
 								}
 							),
 						} );
 					} finally {
 						isDispatchingOwnWrite = false;
 					}
+					// Same reason as the insertion branch: name the container
+					// so "Remove block: paragraph" says which paragraph.
+					const removedParentClientId =
+						tree.parentByClientId.get( clientId ) ?? null;
 					setStructuralOpRef.current?.( clientId, block?.name ?? '', {
 						type: 'block-remove',
 						clientId,
 						blockName: block?.name ?? '',
+						parentBlockName: removedParentClientId
+							? tree.blocksByClientId.get( removedParentClientId )
+									?.name ?? null
+							: null,
+						...( groupId ? { groupId } : {} ),
 						block,
 					} );
+				}
+
+				/*
+				 * Re-stamp the insertion halves. Their markers and ops were
+				 * written earlier in this fire, before the removal that pairs
+				 * with them was known, so the group id has to be added after
+				 * the fact. `setStructuralOp` replaces the entry's op, and the
+				 * marker rewrite is system metadata the next diff folds in.
+				 */
+				for ( const insertion of insertionsThisFire ) {
+					const groupId = groupIds.get( insertion.clientId );
+					if ( ! groupId ) {
+						continue;
+					}
+					const insertAttrs = blockEditor.getBlockAttributes?.(
+						insertion.clientId
+					);
+					if ( ! insertAttrs ) {
+						continue;
+					}
+					isDispatchingOwnWrite = true;
+					try {
+						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
+						blockEditorDispatch.updateBlockAttributes(
+							insertion.clientId,
+							{
+								metadata: withSuggestionMarker(
+									insertAttrs.metadata,
+									{
+										...insertAttrs.metadata?.suggestion,
+										type: 'pending-insert',
+										authorId: currentUserId,
+										groupId,
+									}
+								),
+							}
+						);
+					} finally {
+						isDispatchingOwnWrite = false;
+					}
+					setStructuralOpRef.current?.(
+						insertion.clientId,
+						insertion.blockName,
+						{ ...insertion.op, groupId }
+					);
 				}
 
 				// Re-seed the snapshot for every block that came back via
@@ -1418,7 +1746,12 @@ export default function SuggestionStoreInterceptor() {
 			tree = captureTreeSnapshot( blockEditor );
 		}, BLOCK_EDITOR_STORE_NAME );
 
-		return unsubscribe;
+		return () => {
+			unsubscribe();
+			if ( originalResetBlocks ) {
+				blockEditorDispatch.resetBlocks = originalResetBlocks;
+			}
+		};
 	}, [
 		isSuggestMode,
 		registry,
@@ -1440,6 +1773,7 @@ export {
 	isPartOfPendingInsertion,
 	captureTreeSnapshot,
 	topLevelRemoved,
+	pairReplacedBlocks,
 	withSuggestionMarker,
 	lcsClientIds,
 	stableSiblingSet,

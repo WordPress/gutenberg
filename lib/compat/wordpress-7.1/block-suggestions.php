@@ -1,17 +1,19 @@
 <?php
 /**
- * Suggestion support for suggest mode.
+ * Inline suggestion support for suggest mode.
  *
- * Registers the comment meta that backs a suggested edit. A note-type comment
- * becomes a suggestion when it carries a `_wp_suggestion` payload;
- * `_wp_suggestion_status` tracks its apply/reject lifecycle. The base note
- * infrastructure graduated to WordPress 6.9 core, so only the
+ * Inline suggestions are anchored in raw block content as
+ * `<mark class="wp-suggestion" data-suggestion-id="N" data-suggestion-type="del|add" data-author="A">…</mark>`
+ * so a suggestion survives edits elsewhere in the block (offsets are derived
+ * from the marker on read, never stored). This mirrors inline notes
+ * (`lib/compat/wordpress-7.1/block-comments.php`) but the render-time strip is
+ * type-aware.
+ *
+ * This file also registers the comment meta that backs a suggested edit. A
+ * note-type comment becomes a suggestion when it carries a `_wp_suggestion`
+ * payload; `_wp_suggestion_status` tracks its apply/reject lifecycle. The base
+ * note infrastructure graduated to WordPress 6.9 core, so only the
  * suggestion-specific additions live here in the 7.1 compat layer.
- *
- * This file also hides un-accepted structural suggestions at render time: a
- * pending block insertion saves into `post_content` so it survives a reload,
- * and `gutenberg_strip_pending_structural_suggestions` drops it from the
- * front end until the suggestion is accepted.
  *
  * @package gutenberg
  */
@@ -207,6 +209,166 @@ function gutenberg_register_suggestion_meta() {
 add_action( 'init', 'gutenberg_register_suggestion_meta' );
 
 /**
+ * Strip inline suggestion markers from rendered block output.
+ *
+ * The public HTML must never expose suggestion metadata, and an un-accepted
+ * addition must never reach the front end. `render_block` therefore strips the
+ * markers, type-aware:
+ *
+ * - `del` (suggested deletion): the marked text already exists, so the wrapper
+ *   is unwrapped but the text is kept. It is only removed when the suggestion
+ *   is accepted in the editor.
+ * - `add` (suggested addition): the marked text is proposed new content, so the
+ *   wrapper *and* the text are removed. It only becomes permanent when accepted.
+ *
+ * The raw `post_content` (and the REST `raw` view, revisions, exports) keeps the
+ * markers so the editor can re-attach on reload. Only `wp-suggestion` markers
+ * are touched: `WP_HTML_Tag_Processor::has_class()` matches the class by exact
+ * token, so an unrelated `<mark>` (a `core/text-color` highlight, a `wp-note`,
+ * or a `wp-suggestion-foo` class) survives byte-for-byte.
+ *
+ * The HTML API cannot yet remove a tag together with its closer, so a second
+ * offset-based pass pairs each flagged `<mark>` with its matching `</mark>` -
+ * tracking nesting so overlapping markers still pair correctly - and removes
+ * the wrappers (and, for additions, the text between them). Overlapping byte
+ * ranges are merged before removal so a deletion nested inside an addition (the
+ * whole of which is already removed) cannot corrupt offsets. Tag
+ * removal/unwrapping is on the HTML API roadmap
+ * (https://github.com/WordPress/gutenberg/discussions/54583); once it lands this
+ * offset pass can be replaced with a single `WP_HTML_Tag_Processor` call.
+ *
+ * @param string $block_content Rendered block HTML.
+ * @return string Block HTML with wp-suggestion markers stripped (type-aware).
+ */
+function gutenberg_strip_inline_suggestion_markers( $block_content ) {
+	if ( false === strpos( $block_content, 'wp-suggestion' ) ) {
+		return $block_content;
+	}
+
+	/*
+	 * Flag the suggestion markers with a sentinel attribute carrying the strip
+	 * mode so the offset pass below can classify them without re-parsing. Every
+	 * tag that is NOT a genuine suggestion marker has any pre-existing
+	 * `data-wp-suggestion-strip` attribute removed first: a user-planted
+	 * sentinel (data-* attributes pass KSES, so no special capability is
+	 * needed to store one) must be able neither to influence the offset pass
+	 * nor to leak into public output.
+	 */
+	$processor = new WP_HTML_Tag_Processor( $block_content );
+	$found     = false;
+	while ( $processor->next_tag() ) {
+		if ( 'MARK' !== $processor->get_tag() || ! $processor->has_class( 'wp-suggestion' ) ) {
+			$processor->remove_attribute( 'data-wp-suggestion-strip' );
+			continue;
+		}
+		// An unknown or missing type defaults to deletion (unwrap, keep text)
+		// so a malformed marker never silently drops content. A planted
+		// sentinel on a genuine marker is overwritten with the derived mode.
+		$mode = ( 'add' === $processor->get_attribute( 'data-suggestion-type' ) )
+			? 'add'
+			: 'del';
+		$processor->set_attribute( 'data-wp-suggestion-strip', $mode );
+		$found = true;
+	}
+
+	// Return the updated HTML even when no marker was found — planted
+	// sentinels may have been removed above.
+	$block_content = $processor->get_updated_html();
+
+	if ( ! $found ) {
+		return $block_content;
+	}
+
+	/*
+	 * Known limitation: this pass tokenizes `<mark …>` / `</mark>` with a
+	 * regex, so a literal `</mark>` (or a sentinel look-alike) inside an
+	 * attribute VALUE would be miscounted. Storing such a value requires
+	 * `unfiltered_html` — KSES rejects it for everyone else. Replacing the
+	 * regex pass with tag-processor bookmarks once the HTML API can remove a
+	 * tag together with its closer is the planned fix (see the docblock).
+	 */
+	if ( preg_match_all( '~</?mark\b[^>]*>~i', $block_content, $tags, PREG_OFFSET_CAPTURE ) ) {
+		// Pair each flagged opener with its matching closer via a nesting
+		// stack. Collect half-open byte ranges to remove: for a deletion the
+		// opener and closer tags only (text kept); for an addition the whole
+		// span.
+		$open_stack = array();
+		$removals   = array();
+		foreach ( $tags[0] as $tag ) {
+			$html   = $tag[0];
+			$offset = $tag[1];
+			$length = strlen( $html );
+
+			if ( '/' === $html[1] ) {
+				$open = array_pop( $open_stack );
+				if ( null === $open || 'none' === $open['mode'] ) {
+					continue;
+				}
+				if ( 'add' === $open['mode'] ) {
+					$removals[] = array( $open['start'], $offset + $length );
+				} else {
+					$removals[] = array( $open['start'], $open['end'] );
+					$removals[] = array( $offset, $offset + $length );
+				}
+				continue;
+			}
+
+			$mode = 'none';
+			if ( false !== strpos( $html, 'data-wp-suggestion-strip="add"' ) ) {
+				$mode = 'add';
+			} elseif ( false !== strpos( $html, 'data-wp-suggestion-strip="del"' ) ) {
+				$mode = 'del';
+			}
+			$open_stack[] = array(
+				'start' => $offset,
+				'end'   => $offset + $length,
+				'mode'  => $mode,
+			);
+		}
+
+		if ( ! empty( $removals ) ) {
+			// Merge overlapping/adjacent ranges so a deletion nested inside an
+			// addition (already wholly removed) doesn't double-remove and
+			// corrupt offsets.
+			sort( $removals );
+			$merged = array();
+			foreach ( $removals as $range ) {
+				$last = count( $merged ) - 1;
+				if ( $last >= 0 && $range[0] <= $merged[ $last ][1] ) {
+					if ( $range[1] > $merged[ $last ][1] ) {
+						$merged[ $last ][1] = $range[1];
+					}
+				} else {
+					$merged[] = $range;
+				}
+			}
+
+			// Remove from the end so earlier offsets remain valid.
+			for ( $i = count( $merged ) - 1; $i >= 0; $i-- ) {
+				$block_content = substr_replace( $block_content, '', $merged[ $i ][0], $merged[ $i ][1] - $merged[ $i ][0] );
+			}
+		}
+	}
+
+	/*
+	 * The sentinel is an internal implementation detail and must never reach
+	 * public output. A flagged opener whose closer was never found (malformed
+	 * or truncated markup) survives the offset pass with the sentinel still
+	 * attached — strip any remainder.
+	 */
+	if ( false !== strpos( $block_content, 'data-wp-suggestion-strip' ) ) {
+		$cleanup = new WP_HTML_Tag_Processor( $block_content );
+		while ( $cleanup->next_tag() ) {
+			$cleanup->remove_attribute( 'data-wp-suggestion-strip' );
+		}
+		$block_content = $cleanup->get_updated_html();
+	}
+
+	return $block_content;
+}
+add_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' );
+
+/**
  * Hide un-accepted structural suggestions on the front end.
  *
  * Pending structural suggestion state (the `metadata.suggestion` marker, and
@@ -220,9 +382,10 @@ add_action( 'init', 'gutenberg_register_suggestion_meta' );
  *   markup).
  * - `pending-insert`: the block is proposed new content, so it must not
  *   render until accepted — the whole subtree is dropped.
- * - `pending-move`: the block renders (its content is real); it appears at
- *   the proposed position because block order is fixed before render. See
- *   Known Limitations in the suggestions architecture doc.
+ * - `pending-move`: the block renders (its content is real). Restoring its
+ *   pre-move position is a sibling-order concern that a per-block filter
+ *   cannot express, so it is handled before render by
+ *   `gutenberg_restore_pending_move_order()`.
  *
  * @param string $block_content Rendered block HTML.
  * @param array  $block         Parsed block, including attributes.
@@ -238,3 +401,249 @@ function gutenberg_strip_pending_structural_suggestions( $block_content, $block 
 	return $block_content;
 }
 add_filter( 'render_block', 'gutenberg_strip_pending_structural_suggestions', 10, 2 );
+
+/**
+ * Puts moved blocks back into their original slots and closes the gaps.
+ *
+ * Split out from `gutenberg_restore_pending_move_block_order()` so the
+ * placement rules can be exercised directly: the caller currently declines to
+ * restore a list holding more than one pending move (see the gate there), so
+ * the multi-move behaviour this function defines is otherwise unreachable.
+ *
+ * Moved blocks claim their slots lowest `fromIndex` first, which makes two
+ * moves resolve deterministically. Every block that did not move keeps its
+ * current relative order and flows into whatever slots are left, which is also
+ * its original relative order, since only the moved blocks left their place.
+ *
+ * A `fromIndex` already claimed by another move is unrestorable. That block is
+ * put back into the queue of un-moved blocks AT ITS OWN OFFSET rather than
+ * appended after them, so failing to restore a block leaves it where it is
+ * instead of pushing it to the end of the list.
+ *
+ * @param array $siblings Blocks at one level, in their current (proposed) order.
+ * @param array $moved    Map of current offset => `fromIndex`, for moved blocks only.
+ * @return array `$siblings` reordered, same length.
+ */
+function gutenberg_reorder_pending_move_siblings( $siblings, $moved ) {
+	$count = count( $siblings );
+	asort( $moved );
+
+	$slots    = array_fill( 0, $count, null );
+	$unplaced = array();
+	foreach ( $moved as $offset => $from_index ) {
+		if ( null === $slots[ $from_index ] ) {
+			$slots[ $from_index ] = $siblings[ $offset ];
+		} else {
+			$unplaced[ $offset ] = true;
+		}
+	}
+
+	/*
+	 * Keyed by offset and then sorted, so an unrestorable move rejoins the
+	 * un-moved blocks in its own position among them rather than at the end.
+	 */
+	$rest = array();
+	foreach ( $siblings as $offset => $block ) {
+		if ( ! isset( $moved[ $offset ] ) || isset( $unplaced[ $offset ] ) ) {
+			$rest[ $offset ] = $block;
+		}
+	}
+	ksort( $rest );
+	$rest = array_values( $rest );
+
+	$next = 0;
+	foreach ( $slots as $slot => $block ) {
+		if ( null === $block ) {
+			$slots[ $slot ] = $rest[ $next ];
+			++$next;
+		}
+	}
+
+	return $slots;
+}
+
+/**
+ * Restores the pre-move sibling order of a list of parsed blocks.
+ *
+ * A pending move is stored as the block sitting at its PROPOSED position with
+ * `metadata.suggestion.fromIndex` recording where it came from, so undoing it
+ * for the front end means putting each moved block back at that index and
+ * letting its siblings close up behind it.
+ *
+ * Placement itself lives in `gutenberg_reorder_pending_move_siblings()`; this
+ * function decides which markers are safe to act on and hands it the survivors.
+ * A `fromIndex` that is out of range is treated as unrestorable, and the block
+ * stays where it is.
+ *
+ * Only a sibling list holding exactly ONE pending move is restored. `fromIndex`
+ * is recorded against the order the list was in at the time of the move, so a
+ * second move in the same list carries an index the first one already shifted
+ * and replaying both would invent an order that never existed. See the gate
+ * below for why that case cannot be detected and has to be skipped wholesale.
+ * The placement helper stays general so lifting the gate is a one-line change
+ * once the marker writer records a baseline-relative index.
+ *
+ * A move that crossed parents cannot be undone from a single sibling list,
+ * because `fromIndex` counts positions in a list the block has left. The
+ * marker writer records `crossedParents` for exactly this reason and such
+ * markers are skipped. Markers saved before that field existed fall back to
+ * the root-boundary check, which catches a root origin now sitting nested (or
+ * the reverse) but cannot see a move between two different nested parents.
+ *
+ * @param array $blocks  Parsed blocks for a single level of the tree.
+ * @param bool  $is_root Whether this level is the top level of the document.
+ * @param bool  $changed Set to true when any level was reordered.
+ * @return array Blocks in their pre-move order.
+ */
+function gutenberg_restore_pending_move_block_order( $blocks, $is_root, &$changed ) {
+	foreach ( $blocks as $index => $block ) {
+		if ( ! empty( $block['innerBlocks'] ) ) {
+			$blocks[ $index ]['innerBlocks'] = gutenberg_restore_pending_move_block_order( $block['innerBlocks'], false, $changed );
+		}
+	}
+
+	/*
+	 * The whitespace between top-level blocks parses as block-name-less
+	 * chunks. They hold no position in the editor's block list — which is what
+	 * `fromIndex` counts — so they stay pinned where they are and only the
+	 * real blocks around them are reordered.
+	 */
+	$positions = array();
+	foreach ( $blocks as $index => $block ) {
+		$is_separator = ( ! isset( $block['blockName'] ) || null === $block['blockName'] )
+			&& '' === trim( isset( $block['innerHTML'] ) ? $block['innerHTML'] : '' );
+		if ( ! $is_separator ) {
+			$positions[] = $index;
+		}
+	}
+
+	$siblings = array();
+	foreach ( $positions as $index ) {
+		$siblings[] = $blocks[ $index ];
+	}
+	$count = count( $siblings );
+
+	// Map each moved block's current offset to the offset it came from.
+	$moved         = array();
+	$pending_moves = 0;
+	foreach ( $siblings as $offset => $block ) {
+		$suggestion = isset( $block['attrs']['metadata']['suggestion'] )
+			? $block['attrs']['metadata']['suggestion']
+			: null;
+		if ( ! is_array( $suggestion ) ) {
+			continue;
+		}
+		if ( ! isset( $suggestion['type'] ) || 'pending-move' !== $suggestion['type'] ) {
+			continue;
+		}
+		/*
+		 * Counted ahead of the guards below: a marker this function declines
+		 * to act on still sits in the list, so it still shifts the indices
+		 * every other marker in the list was measured against.
+		 */
+		++$pending_moves;
+		if ( ! isset( $suggestion['fromIndex'] ) || ! is_numeric( $suggestion['fromIndex'] ) ) {
+			continue;
+		}
+		/*
+		 * A move that changed parents cannot be undone from a single sibling
+		 * list: `fromIndex` counts positions in a list this block is no
+		 * longer in. The writer records that outright, since client IDs are
+		 * session-local and never reach the server.
+		 */
+		if ( isset( $suggestion['crossedParents'] ) && $suggestion['crossedParents'] ) {
+			continue;
+		}
+		/*
+		 * Fallback for markers saved before `crossedParents` existed. It only
+		 * catches a move across the root boundary — a root origin recorded as
+		 * a null/empty parent against a block that now sits nested, or the
+		 * reverse. Nested-to-nested is invisible to it, which is why the
+		 * writer now states the answer instead of leaving it to be inferred.
+		 */
+		$from_parent = isset( $suggestion['fromParentClientId'] ) ? $suggestion['fromParentClientId'] : null;
+		$was_at_root = null === $from_parent || '' === $from_parent;
+		if ( $was_at_root !== (bool) $is_root ) {
+			continue;
+		}
+		$from_index = (int) $suggestion['fromIndex'];
+		if ( $from_index < 0 || $from_index >= $count ) {
+			continue;
+		}
+		$moved[ $offset ] = $from_index;
+	}
+
+	/*
+	 * `fromIndex` is measured against the sibling order the list was in when
+	 * the move was made, not against the pristine baseline: the marker writer
+	 * diffs each tick against the previous one. For a lone pending move those
+	 * are the same order and the restore below is exact. For two or more they
+	 * are not — the first move already shifted the indices the second marker
+	 * was measured against, and replaying both invents a third order that
+	 * neither the author nor the suggester ever saw.
+	 *
+	 * Nothing in the serialized markers separates a skewed pair from an
+	 * honest one: the skewed values describe a perfectly self-consistent
+	 * baseline, and re-applying the moves to it reproduces the current order.
+	 * With no way to tell them apart, a level holding more than one pending
+	 * move keeps its proposed order — what readers saw before this restore
+	 * existed — rather than risk publishing an order nobody wrote.
+	 *
+	 * Recording a baseline-relative index is the real fix and belongs with
+	 * the marker writer, where it has to be reconciled with Reject: undoing
+	 * one move while the rest stay pending wants the tick-relative meaning,
+	 * so the two consumers need separate fields.
+	 */
+	if ( $pending_moves > 1 ) {
+		return $blocks;
+	}
+
+	if ( empty( $moved ) ) {
+		return $blocks;
+	}
+
+	$slots = gutenberg_reorder_pending_move_siblings( $siblings, $moved );
+
+	foreach ( $positions as $offset => $index ) {
+		if ( $blocks[ $index ] !== $slots[ $offset ] ) {
+			$changed = true;
+		}
+		$blocks[ $index ] = $slots[ $offset ];
+	}
+
+	return $blocks;
+}
+
+/**
+ * Render a pending block move in its original order on the front end.
+ *
+ * A move is the one structural suggestion with nothing to strip: the block is
+ * real content, and the proposal is expressed as the block's POSITION in
+ * `post_content` plus a `metadata.suggestion` marker recording where it came
+ * from. Order is therefore fixed by the time `render_block` runs on each
+ * block, and an un-accepted move would otherwise change what readers see.
+ *
+ * Restoring it needs the sibling list, so this runs on `the_content` ahead of
+ * `do_blocks()` (priority 9): the content is parsed, each level is put back
+ * into its pre-move order, and it is re-serialized for the normal render.
+ * `post_content` itself is untouched — the editor still loads the proposed
+ * order, which is what a reviewer needs to see.
+ *
+ * The `pending-move` substring check keeps the parse/serialize round trip off
+ * every other post, and the content is returned unchanged when no move turns
+ * out to be restorable.
+ *
+ * @param string $content Post content.
+ * @return string Post content with pending moves restored to their original order.
+ */
+function gutenberg_restore_pending_move_order( $content ) {
+	if ( ! is_string( $content ) || false === strpos( $content, 'pending-move' ) ) {
+		return $content;
+	}
+
+	$changed = false;
+	$blocks  = gutenberg_restore_pending_move_block_order( parse_blocks( $content ), true, $changed );
+
+	return $changed ? serialize_blocks( $blocks ) : $content;
+}
+add_filter( 'the_content', 'gutenberg_restore_pending_move_order', 8 );

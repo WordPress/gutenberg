@@ -4,6 +4,7 @@ import {
 	createRegistry,
 	createReduxStore,
 	RegistryProvider,
+	select,
 } from '@wordpress/data';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -15,6 +16,16 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 import {
+	RichTextData,
+	registerFormatType,
+	unregisterFormatType,
+	store as richTextStore,
+} from '@wordpress/rich-text';
+import {
+	SUGGESTION_FORMAT_NAME,
+	suggestionFormat,
+} from '../../inline-suggestions';
+import {
 	operationsFromOverlay,
 	applyOperations,
 	hasAttributeConflict,
@@ -22,8 +33,11 @@ import {
 	payloadByteLength,
 	PAYLOAD_MAX_BYTES,
 	findStructuralOp,
+	findInlineOp,
 	clearSuggestionMarkerAttributes,
 	useSuggestionsProvider,
+	getSuggestionsResolvedThisSession,
+	forgetResolvedSuggestion,
 } from '../provider';
 
 // The editor store pulls in `@wordpress/viewport`, which reads
@@ -472,6 +486,33 @@ describe( 'findStructuralOp', () => {
 	} );
 } );
 
+describe( 'findInlineOp', () => {
+	it( 'returns the inline-suggestion op when present', () => {
+		const op = findInlineOp( [
+			{ type: 'attribute-set', attribute: 'level', before: 2, after: 3 },
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'del',
+			},
+		] );
+		expect( op?.type ).toBe( 'inline-suggestion' );
+		expect( op?.attribute ).toBe( 'content' );
+	} );
+
+	it( 'returns null when there is no inline op', () => {
+		expect(
+			findInlineOp( [ { type: 'attribute-set', attribute: 'content' } ] )
+		).toBeNull();
+		expect( findInlineOp( [ { type: 'block-remove' } ] ) ).toBeNull();
+	} );
+
+	it( 'returns null for non-array input', () => {
+		expect( findInlineOp( null ) ).toBeNull();
+		expect( findInlineOp( undefined ) ).toBeNull();
+	} );
+} );
+
 describe( 'clearSuggestionMarkerAttributes', () => {
 	it( 'returns null when there is no marker to clear', () => {
 		expect( clearSuggestionMarkerAttributes( {} ) ).toBeNull();
@@ -673,6 +714,167 @@ describe( 'rejectSuggestion (block-move)', () => {
 		expect( blockEditor.getBlockIndex( moved.clientId ) ).toBe( 0 );
 		expect( blockEditor.getBlockRootClientId( moved.clientId ) || '' ).toBe(
 			''
+		);
+	} );
+} );
+
+describe( 'rejectSuggestion (inline marker)', () => {
+	const PARAGRAPH = 'core/test-inline-paragraph';
+
+	beforeAll( () => {
+		if (
+			! ( select( richTextStore as any ) as any ).getFormatType(
+				SUGGESTION_FORMAT_NAME
+			)
+		) {
+			registerFormatType(
+				SUGGESTION_FORMAT_NAME,
+				suggestionFormat as any
+			);
+		}
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Inline Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		if (
+			( select( richTextStore as any ) as any ).getFormatType(
+				SUGGESTION_FORMAT_NAME
+			)
+		) {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	/*
+	 * Stub core store whose `saveEntityRecord` is a thunk that resolves or
+	 * rejects on demand, so the comment-status round-trip can be failed
+	 * deterministically.
+	 */
+	function createStubCoreStore( { failSave }: { failSave?: boolean } ) {
+		return createReduxStore( 'core', {
+			reducer: ( state = {} ) => state,
+			actions: {
+				saveEntityRecord: () => async () => {
+					if ( failSave ) {
+						throw new Error( 'save failed' );
+					}
+					return { id: 9 };
+				},
+			},
+			selectors: {
+				getEditedEntityRecord: () => null,
+				getEntityRecord: () => null,
+				getCurrentUser: () => null,
+			},
+		} );
+	}
+
+	function setup( { failSave = false } = {} ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register( createStubCoreStore( { failSave } ) );
+		registry.register( createStubInterfaceStore() );
+
+		const block = createBlock( PARAGRAPH );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+		// Write the marked value directly so the attribute is a real
+		// RichTextData (as in the editor), bypassing string sanitization.
+		const markedValue = RichTextData.fromHTMLString(
+			'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+		);
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( block.clientId, {
+				content: markedValue,
+			} );
+
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return { registry, block, getProvider: () => providerHandle };
+	}
+
+	const inlinePayload = {
+		schemaVersion: 2,
+		blockName: PARAGRAPH,
+		baseRevision: null,
+		operations: [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+			},
+		],
+	};
+
+	it( 'strips the marker and its text when the status save succeeds', async () => {
+		const { registry, block, getProvider } = setup();
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		const content = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( block.clientId )?.content;
+		expect( content.toHTMLString() ).toBe( 'Hello ' );
+	} );
+
+	it( 'rolls the attribute back when the status save fails', async () => {
+		// Before the fix, reject rewrote the attribute BEFORE the comment
+		// save; a server failure then left the marker stripped from content
+		// while the comment stayed unresolved ('hold') — the suggestion
+		// silently vanished for every viewer but still counted as pending.
+		const { registry, block, getProvider } = setup( { failSave: true } );
+		const before = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( block.clientId )
+			?.content.toHTMLString();
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		const content = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( block.clientId )?.content;
+		// The marker (and its proposed text) is restored.
+		expect( content.toHTMLString() ).toBe( before );
+		expect( content.toHTMLString() ).toContain( 'data-suggestion-id="9"' );
+		// And the failure is surfaced.
+		const notices = registry.select( noticesStore ).getNotices();
+		expect( notices.some( ( notice ) => notice.status === 'error' ) ).toBe(
+			true
 		);
 	} );
 } );
@@ -973,5 +1175,464 @@ describe( 'createSuggestion (notes sidebar switch)', () => {
 				.select( 'core/interface' )
 				.getActiveComplementaryArea( 'core' )
 		).toBe( FLOATING_NOTES_SIDEBAR );
+	} );
+} );
+
+describe( 'grouped structural decisions (block replacement)', () => {
+	const PARAGRAPH = 'core/test-group-paragraph';
+	const QUOTE = 'core/test-group-quote';
+	const GROUP_ID = 'sg-test-1';
+
+	beforeAll( () => {
+		for ( const [ name, title ] of [
+			[ PARAGRAPH, 'Test Group Paragraph' ],
+			[ QUOTE, 'Test Group Quote' ],
+		] ) {
+			registerBlockType( name, {
+				apiVersion: 3,
+				attributes: {
+					content: { type: 'string', default: '' },
+					metadata: { type: 'object' },
+				},
+				save: () => null,
+				category: 'text',
+				title,
+			} );
+		}
+	} );
+
+	afterAll( () => {
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	function payloadFor( op: any ) {
+		return {
+			schemaVersion: 2,
+			blockName: op.blockName,
+			baseRevision: null,
+			operations: [ op ],
+		};
+	}
+
+	/**
+	 * Stub core store whose `getEntityRecord` serves the two suggestion
+	 * comments the group is made of, and which records every
+	 * `saveEntityRecord` so the test can assert that BOTH notes were
+	 * resolved by one decision.
+	 *
+	 * @param comments Comment records keyed by id.
+	 * @param saves    Collector for saved records.
+	 * @return Store descriptor.
+	 */
+	function createStubCoreStore(
+		comments: Record< string, any >,
+		saves: any[],
+		control: { failNextSave: boolean }
+	) {
+		return createReduxStore( 'core', {
+			reducer: ( state = {} ) => state,
+			actions: {
+				saveEntityRecord:
+					( kind: any, name: any, record: any ) =>
+					( { dispatch }: { dispatch: any } ) => {
+						if ( control.failNextSave ) {
+							control.failNextSave = false;
+							throw new Error( 'Server rejected the update.' );
+						}
+						saves.push( record );
+						dispatch( { type: 'SAVE_ENTITY_RECORD' } );
+						return record;
+					},
+			},
+			selectors: {
+				getEditedEntityRecord: () => null,
+				getEntityRecord: (
+					state: any,
+					kind: any,
+					name: any,
+					id: any
+				) => comments[ id ] ?? null,
+				getCurrentUser: () => null,
+			},
+		} );
+	}
+
+	function setup() {
+		const removed = createBlock( PARAGRAPH, {
+			content: 'Original',
+			metadata: {
+				suggestion: { type: 'pending-remove', groupId: GROUP_ID },
+				noteId: [ 11 ],
+			},
+		} );
+		const inserted = createBlock( QUOTE, {
+			content: 'Original',
+			metadata: {
+				suggestion: { type: 'pending-insert', groupId: GROUP_ID },
+				noteId: [ 12 ],
+			},
+		} );
+
+		const removeOp = {
+			type: 'block-remove',
+			clientId: removed.clientId,
+			blockName: PARAGRAPH,
+			groupId: GROUP_ID,
+		};
+		const insertOp = {
+			type: 'block-insert-after',
+			clientId: inserted.clientId,
+			blockName: QUOTE,
+			anchorClientId: removed.clientId,
+			parentClientId: null,
+			groupId: GROUP_ID,
+		};
+
+		const comments = {
+			11: {
+				id: 11,
+				meta: {
+					_wp_suggestion: JSON.stringify( payloadFor( removeOp ) ),
+				},
+			},
+			12: {
+				id: 12,
+				meta: {
+					_wp_suggestion: JSON.stringify( payloadFor( insertOp ) ),
+				},
+			},
+		};
+		const saves: any[] = [];
+		const control = { failNextSave: false };
+
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register( createStubCoreStore( comments, saves, control ) );
+		registry.register( createStubInterfaceStore() );
+		registry
+			.dispatch( blockEditorStore )
+			.resetBlocks( [ removed, inserted ] );
+
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return {
+			registry,
+			saves,
+			control,
+			removed,
+			inserted,
+			removeOp,
+			insertOp,
+			payloadFor,
+			getProvider: () => providerHandle,
+		};
+	}
+
+	it( 'accepting the insertion half also accepts the removal half', async () => {
+		const { registry, saves, removed, inserted, insertOp, getProvider } =
+			setup();
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 12,
+				clientId: inserted.clientId,
+				payload: payloadFor( insertOp ),
+			} );
+		} );
+
+		const blockEditor = registry.select( blockEditorStore );
+		// The replacement stays and loses its pending treatment...
+		expect( blockEditor.getBlock( inserted.clientId ) ).toBeTruthy();
+		expect(
+			blockEditor.getBlockAttributes( inserted.clientId )?.metadata
+				?.suggestion
+		).toBeUndefined();
+		// ...and the block it replaced is gone, rather than left behind as a
+		// duplicate with a still-pending removal note.
+		expect( blockEditor.getBlock( removed.clientId ) ).toBeFalsy();
+
+		expect( saves.map( ( record ) => record.id ).sort() ).toEqual( [
+			11, 12,
+		] );
+		expect(
+			saves.every(
+				( record ) => record.meta?._wp_suggestion_status === 'applied'
+			)
+		).toBe( true );
+	} );
+
+	it( 'rejecting the removal half also rejects the insertion half', async () => {
+		const { registry, saves, removed, inserted, removeOp, getProvider } =
+			setup();
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 11,
+				clientId: removed.clientId,
+				payload: payloadFor( removeOp ),
+			} );
+		} );
+
+		const blockEditor = registry.select( blockEditorStore );
+		// The original block stays and loses its pending treatment...
+		expect( blockEditor.getBlock( removed.clientId ) ).toBeTruthy();
+		expect(
+			blockEditor.getBlockAttributes( removed.clientId )?.metadata
+				?.suggestion
+		).toBeUndefined();
+		// ...and the replacement is withdrawn, rather than left in place as a
+		// duplicate.
+		expect( blockEditor.getBlock( inserted.clientId ) ).toBeFalsy();
+
+		expect( saves.map( ( record ) => record.id ).sort() ).toEqual( [
+			11, 12,
+		] );
+		expect(
+			saves.every(
+				( record ) => record.meta?._wp_suggestion_status === 'rejected'
+			)
+		).toBe( true );
+	} );
+
+	it( 'stops the group when the first half fails to save', async () => {
+		const {
+			registry,
+			saves,
+			control,
+			removed,
+			inserted,
+			insertOp,
+			getProvider,
+		} = setup();
+		control.failNextSave = true;
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 12,
+				clientId: inserted.clientId,
+				payload: payloadFor( insertOp ),
+			} );
+		} );
+
+		const blockEditor = registry.select( blockEditorStore );
+		// Neither half moved: the insertion keeps its pending treatment...
+		expect(
+			blockEditor.getBlockAttributes( inserted.clientId )?.metadata
+				?.suggestion?.type
+		).toBe( 'pending-insert' );
+		// ...and the removal was never attempted, so the block is still
+		// there for the user to decide on again.
+		expect( blockEditor.getBlock( removed.clientId ) ).toBeTruthy();
+		expect( saves ).toEqual( [] );
+	} );
+
+	it( 'leaves an ungrouped structural suggestion alone', async () => {
+		const { registry, saves, removed, inserted, getProvider } = setup();
+
+		// Same tree, but the decision is made against a payload with no
+		// group id — the partner must not be dragged in.
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 11,
+				clientId: removed.clientId,
+				payload: payloadFor( {
+					type: 'block-remove',
+					clientId: removed.clientId,
+					blockName: PARAGRAPH,
+				} ),
+			} );
+		} );
+
+		expect(
+			registry.select( blockEditorStore ).getBlock( inserted.clientId )
+		).toBeTruthy();
+		expect( saves.map( ( record ) => record.id ) ).toEqual( [ 11 ] );
+	} );
+} );
+
+describe( 'review decisions and undo history', () => {
+	const PARAGRAPH = 'core/test-decision-paragraph';
+
+	beforeAll( () => {
+		if (
+			! ( select( richTextStore as any ) as any ).getFormatType(
+				SUGGESTION_FORMAT_NAME
+			)
+		) {
+			registerFormatType(
+				SUGGESTION_FORMAT_NAME,
+				suggestionFormat as any
+			);
+		}
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Decision Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		if (
+			( select( richTextStore as any ) as any ).getFormatType(
+				SUGGESTION_FORMAT_NAME
+			)
+		) {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	function setup() {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register(
+			createReduxStore( 'core', {
+				reducer: ( state = {} ) => state,
+				actions: {
+					saveEntityRecord: () => async () => ( { id: 9 } ),
+				},
+				selectors: {
+					getEditedEntityRecord: () => null,
+					getEntityRecord: () => null,
+					getCurrentUser: () => null,
+				},
+			} )
+		);
+		registry.register( createStubInterfaceStore() );
+
+		const block = createBlock( PARAGRAPH );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( block.clientId, {
+				content: RichTextData.fromHTMLString(
+					'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+				),
+			} );
+		// Close the setup writes as a normal undo level so the assertions
+		// below observe the decision's own history mode, not a leftover.
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkLastChangeAsPersistent();
+
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return { registry, block, getProvider: () => providerHandle };
+	}
+
+	const inlinePayload = {
+		schemaVersion: 2,
+		blockName: PARAGRAPH,
+		baseRevision: null,
+		operations: [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+			},
+		],
+	};
+
+	it( 'commits an applied suggestion as a persistent change', async () => {
+		const { registry, block, getProvider } = setup();
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		// The proposed text is committed...
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( block.clientId )
+				?.content.toHTMLString()
+		).toBe( 'Hello world' );
+		/*
+		 * ...as a PERSISTENT change. Hiding the decision from undo also hides
+		 * it from the entity: a non-persistent block change reaches the parent
+		 * through `onInput`, which never writes `content`, so the post would
+		 * never go dirty and the applied text would be gone on reload. The
+		 * undo half of F-18 is handled by reopening the note instead, in
+		 * `SuggestionNoteGC`.
+		 */
+		expect(
+			registry
+				.select( blockEditorStore )
+				.__unstableGetLastBlockChangeHistoryMode()
+		).toBe( 'persistent' );
+	} );
+
+	it( 'commits a rejected suggestion as a persistent change', async () => {
+		const { registry, block, getProvider } = setup();
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( block.clientId )
+				?.content.toHTMLString()
+		).toBe( 'Hello ' );
+		expect(
+			registry
+				.select( blockEditorStore )
+				.__unstableGetLastBlockChangeHistoryMode()
+		).toBe( 'persistent' );
+	} );
+
+	it( 'records a decided suggestion so its note can be reopened', async () => {
+		const { block, getProvider } = setup();
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		// The note collector reads this to spot a marker an undo put back.
+		expect( getSuggestionsResolvedThisSession().has( '9' ) ).toBe( true );
+		forgetResolvedSuggestion( 9 );
 	} );
 } );

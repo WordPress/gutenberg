@@ -14,6 +14,14 @@ import {
 	getNoteIdsFromMetadata,
 } from '../collab-sidebar/utils';
 import { ALL_NOTES_SIDEBAR, SIDEBARS } from '../collab-sidebar/constants';
+import {
+	acceptInlineDeletion,
+	rejectInlineDeletion,
+	acceptInlineAddition,
+	rejectInlineAddition,
+	acceptInlineFormat,
+	rejectInlineFormat,
+} from '../inline-suggestions';
 
 /**
  * A single suggestion operation.
@@ -231,6 +239,33 @@ export function findStructuralOp(
 }
 
 /**
+ * Operation type for an inline suggestion: a `core/suggestion` marker anchored
+ * in a single rich-text attribute. The marked range is never stored — it is
+ * re-derived from the in-content marker by id (the comment id) on read — so the
+ * op only records which attribute carries the marker and the marker kind.
+ */
+export const INLINE_OP_TYPE = 'inline-suggestion';
+
+/**
+ * Locate the inline-suggestion operation in a payload. A payload describes at
+ * most one inline suggestion (each is its own note/comment), so the first match
+ * is returned.
+ *
+ * @param operations Payload operations.
+ * @return Inline op, or null when none.
+ */
+export function findInlineOp(
+	operations: SuggestionOperation[] | null | undefined
+): SuggestionOperation | null {
+	if ( ! Array.isArray( operations ) ) {
+		return null;
+	}
+	return (
+		operations.find( ( op ) => op && op.type === INLINE_OP_TYPE ) ?? null
+	);
+}
+
+/**
  * Build attributes that clear the `metadata.suggestion` marker on a block
  * while preserving every other metadata field. Used by Apply (after the
  * mutation lands) and by Reject (to drop the pending state).
@@ -421,8 +456,54 @@ function withDecisionInFlight< Args extends { commentId?: number | string } >(
 			return await decide( args );
 		} finally {
 			decisionsInFlight.delete( key );
+			resolvedThisSession.add( key );
 		}
 	};
+}
+
+/*
+ * Suggestions this session has applied or rejected.
+ *
+ * A decision has two halves: the block change, which the undo stack holds, and
+ * the comment's lifecycle status, which lives on the server and no keystroke
+ * here can walk back. Undo therefore puts a marker back while its note stays
+ * resolved, leaving a marked-up run with no Accept/Reject on it and no way to
+ * clear it through the UI (issue #73411, F-18). The note collector watches this
+ * set and reopens a note whose marker reappears, so the two halves travel
+ * together again.
+ *
+ * Deliberately scoped to decisions made HERE rather than to every resolved note
+ * that has a live marker: a peer's decision arriving through sync before this
+ * session's content catches up looks identical from the outside, and reopening
+ * that would undo their review.
+ */
+const resolvedThisSession = new Set< string >();
+
+/**
+ * Comment ids this session applied or rejected and has not yet reopened.
+ *
+ * @return Comment id keys.
+ */
+export function getSuggestionsResolvedThisSession() {
+	return resolvedThisSession;
+}
+
+/**
+ * Forget a decision, once its note has been reopened or is past reopening.
+ *
+ * @param commentId Comment id.
+ */
+export function forgetResolvedSuggestion( commentId: number | string ) {
+	resolvedThisSession.delete( String( commentId ) );
+}
+
+/**
+ * Record a decision again, so a failed reopen is retried on a later pass.
+ *
+ * @param commentId Comment id.
+ */
+export function rememberResolvedSuggestion( commentId: number | string ) {
+	resolvedThisSession.add( String( commentId ) );
 }
 
 /**
@@ -469,7 +550,8 @@ export function useSuggestionsProvider() {
 		getBlockRootClientId: selectBlockRootClientId,
 		getClientIdsWithDescendants: selectClientIdsWithDescendants,
 	} = useSelect( blockEditorStore );
-	const { requestInterceptorBypass, clearOverlay } = useSuggestionOverlay();
+	const { requestInterceptorBypass, clearOverlay, clearOverlayForComment } =
+		useSuggestionOverlay();
 	const registry = useRegistry();
 
 	const createSuggestion = useCallback(
@@ -694,23 +776,28 @@ export function useSuggestionsProvider() {
 	 *                       persisted — the apply path then scans the live
 	 *                       tree by `metadata.noteId`.
 	 * @param args.payload   Parsed payload (from `parseSuggestionPayload`).
+	 * @param args.silent    Suppress the success snackbar. Set when
+	 *                       resolving the other half of a grouped suggestion
+	 *                       so one gesture reports once.
 	 */
-	const applySuggestion = useCallback(
+	const applyOneSuggestion = useCallback(
 		async ( {
 			commentId,
 			clientId,
 			payload,
+			silent,
 		}: {
 			commentId: number | string;
 			clientId?: string;
 			payload: SuggestionPayload | null;
+			silent?: boolean;
 		} ) => {
 			if ( ! payload || ! Array.isArray( payload.operations ) ) {
 				createNotice( 'error', __( 'Invalid suggestion payload.' ), {
 					type: 'snackbar',
 					isDismissible: true,
 				} );
-				return;
+				return false;
 			}
 
 			// `thread.blockClientId` is derived by matching `metadata.noteId`
@@ -750,7 +837,90 @@ export function useSuggestionsProvider() {
 					),
 					{ type: 'snackbar', isDismissible: true }
 				);
-				return;
+				return false;
+			}
+
+			// Inline suggestions live as a `core/suggestion` marker in a
+			// single rich-text attribute. Apply resolves the marker by comment
+			// id and rewrites that one attribute: a deletion drops the marked
+			// text with its marker; an addition unwraps the marker so the
+			// proposed text becomes permanent. The write bypasses the
+			// suggest-mode interceptor so it lands on the live block instead of
+			// being reverted into the overlay.
+			const inlineOp = findInlineOp( payload.operations );
+			if ( inlineOp ) {
+				const attributeKey = inlineOp.attribute;
+				const originalValue =
+					selectBlockAttributes( targetClientId )?.[ attributeKey ];
+				let nextValue;
+				if ( inlineOp.suggestionType === 'add' ) {
+					nextValue = acceptInlineAddition(
+						originalValue,
+						commentId
+					);
+				} else if ( inlineOp.suggestionType === 'format' ) {
+					// Accepting a format suggestion unwraps the marker, leaving
+					// the proposed formatting (already carried on the run) in
+					// place — the same shape as accepting an addition.
+					nextValue = acceptInlineFormat( originalValue, commentId );
+				} else {
+					nextValue = acceptInlineDeletion(
+						originalValue,
+						commentId
+					);
+				}
+				try {
+					requestInterceptorBypass( targetClientId );
+					/*
+					 * An inline suggestion never lives in the overlay, but the
+					 * same block can hold a pending attribute suggestion that
+					 * does. Clear only an entry this comment owns: the entry is
+					 * the attribute note's sole anchor, so an unconditional
+					 * clear here hands that note to the orphan collector and
+					 * wipes the proposed value off the canvas (F-14).
+					 */
+					clearOverlayForComment( targetClientId, commentId );
+					updateBlockAttributes( targetClientId, {
+						[ attributeKey ]: nextValue,
+					} );
+
+					await saveEntityRecord(
+						'root',
+						'comment',
+						{
+							id: commentId,
+							status: 'approved',
+							meta: { _wp_suggestion_status: 'applied' },
+						},
+						{ throwOnError: true }
+					);
+
+					if ( ! silent ) {
+						createNotice(
+							'snackbar' as any,
+							__( 'Suggestion applied.' ),
+							{
+								type: 'snackbar',
+								isDismissible: true,
+							}
+						);
+					}
+				} catch ( error: any ) {
+					// Roll the attribute back so the block isn't left
+					// half-applied if the server rejected the status update.
+					requestInterceptorBypass( targetClientId );
+					updateBlockAttributes( targetClientId, {
+						[ attributeKey ]: originalValue,
+					} );
+					createNotice(
+						'error',
+						error?.message ||
+							__( 'Failed to save suggestion status.' ),
+						{ type: 'snackbar', isDismissible: true }
+					);
+					return false;
+				}
+				return true;
 			}
 
 			// Structural ops (block-remove, block-insert-after; block-move
@@ -839,14 +1009,16 @@ export function useSuggestionsProvider() {
 						clearOverlay( targetClientId );
 					}
 
-					createNotice(
-						'snackbar' as any,
-						__( 'Suggestion applied.' ),
-						{
-							type: 'snackbar',
-							isDismissible: true,
-						}
-					);
+					if ( ! silent ) {
+						createNotice(
+							'snackbar' as any,
+							__( 'Suggestion applied.' ),
+							{
+								type: 'snackbar',
+								isDismissible: true,
+							}
+						);
+					}
 				} catch ( error: any ) {
 					createNotice(
 						'error',
@@ -854,8 +1026,9 @@ export function useSuggestionsProvider() {
 							__( 'Failed to save suggestion status.' ),
 						{ type: 'snackbar', isDismissible: true }
 					);
+					return false;
 				}
-				return;
+				return true;
 			}
 
 			const currentAttributes = selectBlockAttributes( targetClientId );
@@ -909,10 +1082,16 @@ export function useSuggestionsProvider() {
 					{ throwOnError: true }
 				);
 
-				createNotice( 'snackbar' as any, __( 'Suggestion applied.' ), {
-					type: 'snackbar',
-					isDismissible: true,
-				} );
+				if ( ! silent ) {
+					createNotice(
+						'snackbar' as any,
+						__( 'Suggestion applied.' ),
+						{
+							type: 'snackbar',
+							isDismissible: true,
+						}
+					);
+				}
 			} catch ( error: any ) {
 				// Roll back the block change so the UI isn't left in a
 				// half-applied state if the server rejected the update.
@@ -923,7 +1102,9 @@ export function useSuggestionsProvider() {
 					error?.message || __( 'Failed to save suggestion status.' ),
 					{ type: 'snackbar', isDismissible: true }
 				);
+				return false;
 			}
+			return true;
 		},
 		[
 			saveEntityRecord,
@@ -934,6 +1115,7 @@ export function useSuggestionsProvider() {
 			createNotice,
 			requestInterceptorBypass,
 			clearOverlay,
+			clearOverlayForComment,
 		]
 	);
 
@@ -951,17 +1133,128 @@ export function useSuggestionsProvider() {
 	 * @param args.payload   Parsed suggestion payload — inspected to detect
 	 *                       a structural op so the marker can be cleared on
 	 *                       the live block.
+	 * @param args.silent    Suppress the success snackbar. Set when
+	 *                       resolving the other half of a grouped
+	 *                       suggestion.
 	 */
-	const rejectSuggestion = useCallback(
+	const rejectOneSuggestion = useCallback(
 		async ( {
 			commentId,
 			clientId,
 			payload,
+			silent,
 		}: {
 			commentId: number | string;
 			clientId?: string;
 			payload?: SuggestionPayload | null;
+			silent?: boolean;
 		} ) => {
+			// Inline suggestions: reject restores the block's pre-suggestion
+			// content for the marked attribute — a deletion keeps the text and
+			// drops the marker, an addition removes the proposed text with its
+			// marker. Resolve the target the way apply does (the metadata link
+			// may be absent on a fresh load) and bypass the interceptor so the
+			// change lands on the live block.
+			const inlineOp = findInlineOp( payload?.operations );
+			if ( inlineOp ) {
+				let targetClientId = clientId;
+				if ( ! targetClientId ) {
+					const liveIds = selectClientIdsWithDescendants?.() ?? [];
+					const commentIdKey = String( commentId );
+					for ( const id of liveIds ) {
+						const ids = getNoteIdsFromMetadata(
+							selectBlockAttributes( id )?.metadata
+						);
+						if (
+							ids.some(
+								( n: number | string ) =>
+									String( n ) === commentIdKey
+							)
+						) {
+							targetClientId = id;
+							break;
+						}
+					}
+				}
+				if ( targetClientId ) {
+					const attributeKey = inlineOp.attribute;
+					const originalValue =
+						selectBlockAttributes( targetClientId )?.[
+							attributeKey
+						];
+					let nextValue;
+					if ( inlineOp.suggestionType === 'add' ) {
+						nextValue = rejectInlineAddition(
+							originalValue,
+							commentId
+						);
+					} else if ( inlineOp.suggestionType === 'format' ) {
+						/*
+						 * Rejecting a format suggestion restores the original
+						 * run captured at suggest-time (`beforeHTML`),
+						 * discarding both the proposed formatting and the
+						 * marker.
+						 */
+						nextValue = rejectInlineFormat(
+							originalValue,
+							commentId,
+							inlineOp.beforeHTML
+						);
+					} else {
+						nextValue = rejectInlineDeletion(
+							originalValue,
+							commentId
+						);
+					}
+					try {
+						requestInterceptorBypass( targetClientId );
+						// Guarded for the same reason as the apply path above:
+						// a co-resident attribute suggestion owns this block's
+						// overlay entry and must survive an inline decision.
+						clearOverlayForComment( targetClientId, commentId );
+						updateBlockAttributes( targetClientId, {
+							[ attributeKey ]: nextValue,
+						} );
+
+						await saveEntityRecord(
+							'root',
+							'comment',
+							{
+								id: commentId,
+								status: 'approved',
+								meta: { _wp_suggestion_status: 'rejected' },
+							},
+							{ throwOnError: true }
+						);
+
+						if ( ! silent ) {
+							createNotice(
+								'snackbar' as any,
+								__( 'Suggestion rejected.' ),
+								{ type: 'snackbar', isDismissible: true }
+							);
+						}
+					} catch ( error: any ) {
+						// Roll the attribute back so the content isn't left
+						// inconsistent with a still-pending comment if the
+						// server rejected the status update. Mirrors the
+						// apply-path rollback.
+						requestInterceptorBypass( targetClientId );
+						updateBlockAttributes( targetClientId, {
+							[ attributeKey ]: originalValue,
+						} );
+						createNotice(
+							'error',
+							error?.message ||
+								__( 'Failed to reject suggestion.' ),
+							{ type: 'snackbar', isDismissible: true }
+						);
+						return false;
+					}
+					return true;
+				}
+			}
+
 			// Reject behavior depends on the structural op type:
 			//   - block-remove: drop the marker (block stays).
 			//   - block-insert-after: dispatch removeBlock to undo the
@@ -1047,30 +1340,169 @@ export function useSuggestionsProvider() {
 					}
 				}
 
-				createNotice( 'snackbar' as any, __( 'Suggestion rejected.' ), {
-					type: 'snackbar',
-					isDismissible: true,
-				} );
+				if ( ! silent ) {
+					createNotice(
+						'snackbar' as any,
+						__( 'Suggestion rejected.' ),
+						{
+							type: 'snackbar',
+							isDismissible: true,
+						}
+					);
+				}
 			} catch ( error: any ) {
 				createNotice(
 					'error',
 					error?.message || __( 'Failed to reject suggestion.' ),
 					{ type: 'snackbar', isDismissible: true }
 				);
+				return false;
 			}
+			return true;
 		},
 		[
 			saveEntityRecord,
 			createNotice,
 			selectBlockAttributes,
+			selectClientIdsWithDescendants,
 			selectBlockRootClientId,
 			updateBlockAttributes,
 			removeBlock,
 			moveBlockToPosition,
 			requestInterceptorBypass,
 			clearOverlay,
+			clearOverlayForComment,
 			registry,
 		]
+	);
+
+	/**
+	 * Collect the OTHER pending suggestions that belong to the same
+	 * replacement group as the one being resolved.
+	 *
+	 * A `replaceBlocks` — the block switcher's transform, "Group", a paste
+	 * over a selection — is captured as a removal plus an insertion, and the
+	 * interceptor stamps both halves with a shared `metadata.suggestion
+	 * .groupId`. They are one logical change: accepting the insertion alone
+	 * leaves the original block behind as a duplicate, and rejecting it alone
+	 * leaves a hole where the original used to be. The group is resolved from
+	 * the live tree rather than from the payload so it survives a reload,
+	 * where every clientId in a stored payload is stale but the marker on each
+	 * block still carries the group id and its own `metadata.noteId`.
+	 *
+	 * @param args           Arguments.
+	 * @param args.commentId Comment being resolved.
+	 * @param args.payload   Its parsed payload.
+	 * @return Partner suggestions, or an empty array when this one is not
+	 * grouped.
+	 */
+	const findGroupPartners = useCallback(
+		( {
+			commentId,
+			payload,
+		}: {
+			commentId: number | string;
+			payload?: SuggestionPayload | null;
+		} ) => {
+			const groupId = findStructuralOp( payload?.operations )?.groupId;
+			if ( ! groupId ) {
+				return [];
+			}
+			const partners: Array< {
+				commentId: number | string;
+				clientId: string;
+				payload: SuggestionPayload | null;
+			} > = [];
+			const seen = new Set( [ String( commentId ) ] );
+			const liveIds = selectClientIdsWithDescendants?.() ?? [];
+			for ( const id of liveIds ) {
+				const metadata = selectBlockAttributes( id )?.metadata;
+				if ( metadata?.suggestion?.groupId !== groupId ) {
+					continue;
+				}
+				for ( const noteId of getNoteIdsFromMetadata( metadata ) ) {
+					if ( seen.has( String( noteId ) ) ) {
+						continue;
+					}
+					seen.add( String( noteId ) );
+					const comment: any = registry
+						.select( coreStore )
+						.getEntityRecord( 'root', 'comment', noteId );
+					const status = comment?.meta?._wp_suggestion_status;
+					if ( status === 'applied' || status === 'rejected' ) {
+						continue;
+					}
+					const partnerPayload = parseSuggestionPayload(
+						comment?.meta?._wp_suggestion
+					);
+					if (
+						findStructuralOp( partnerPayload?.operations )
+							?.groupId !== groupId
+					) {
+						continue;
+					}
+					partners.push( {
+						commentId: noteId,
+						clientId: id,
+						payload: partnerPayload,
+					} );
+				}
+			}
+			return partners;
+		},
+		[ selectClientIdsWithDescendants, selectBlockAttributes, registry ]
+	);
+
+	/*
+	 * Public apply / reject. Partners are resolved BEFORE the decision runs:
+	 * applying a removal takes its block out of the tree, and the scan reads
+	 * the group off the live blocks. Only the first decision reports through a
+	 * snackbar — the group is one change and one gesture, so a half that
+	 * fails to save stops the group: the remaining halves stay pending, with
+	 * their blocks intact, for the user to decide again.
+	 */
+	const applySuggestion = useCallback(
+		async ( args: {
+			commentId: number | string;
+			clientId?: string;
+			payload: SuggestionPayload | null;
+			silent?: boolean;
+		} ) => {
+			const partners = findGroupPartners( args );
+			let resolved = await applyOneSuggestion( args );
+			for ( const partner of partners ) {
+				if ( ! resolved ) {
+					break;
+				}
+				resolved = await applyOneSuggestion( {
+					...partner,
+					silent: true,
+				} );
+			}
+		},
+		[ applyOneSuggestion, findGroupPartners ]
+	);
+
+	const rejectSuggestion = useCallback(
+		async ( args: {
+			commentId: number | string;
+			clientId?: string;
+			payload?: SuggestionPayload | null;
+			silent?: boolean;
+		} ) => {
+			const partners = findGroupPartners( args );
+			let resolved = await rejectOneSuggestion( args );
+			for ( const partner of partners ) {
+				if ( ! resolved ) {
+					break;
+				}
+				resolved = await rejectOneSuggestion( {
+					...partner,
+					silent: true,
+				} );
+			}
+		},
+		[ rejectOneSuggestion, findGroupPartners ]
 	);
 
 	// Decisions are wrapped so the note garbage collector can distinguish a
