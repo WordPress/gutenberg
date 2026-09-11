@@ -9,3 +9,17 @@ Publishing WordPress packages to npm is automated by synchronizing it with the b
 ## Internal workspaces (tools and tests)
 
 The repository also contains internal workspaces under `tools/` and `test/` for development tooling and test infrastructure. When you need to add a new tool, script, or dependency for repo-level work, create a workspace under `tools/` (or add to an existing one) instead of adding dependencies to the root `package.json`. See the [Workspace Development guide](/docs/contributors/code/workspace-development.md) for the conversion pattern, CI conventions, and reference examples.
+
+## Supply chain policy
+
+npm v12 refuses git references (`EALLOWGIT`) and tarball URLs (`EALLOWREMOTE`) by default. `.npmrc` extends that to local tarball files (`EALLOWFILE`). Local directories stay at the npm default, because narrowing them also blocks `npm pack` on the repository's own workspaces.
+
+Install scripts are opt-in: every dependency that ships one is recorded in `allowScripts` in the root `package.json`, and `strict-allow-scripts` fails the install with `ESTRICTALLOWSCRIPTS` on anything missing from that list. Most entries are `false` because the package works without its script; `leveldown` and `fs-ext` are approved because they are `node-gyp` builds with no usable prebuilt binary on every supported platform.
+
+When an install fails that way, read the script, then record the decision and commit the `package.json` change:
+
+```bash
+npm install-scripts ls              # list what is not covered yet
+npm install-scripts deny <pkg>      # the package works without its install script
+npm install-scripts approve <pkg>   # the script is required; approval is pinned to the reviewed version
+```

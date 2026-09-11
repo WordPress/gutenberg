@@ -16,7 +16,7 @@
 	},
 	"engines": {
 		"node": ">=24.18.0",
-		"npm": ">=11.16.0"
+		"npm": ">=12.0.2"
 	},
 	"devEngines": {
 		"runtime": {
@@ -25,7 +25,7 @@
 		},
 		"packageManager": {
 			"name": "npm",
-			"version": ">=11.16.0",
+			"version": ">=12.0.2",
 			"onFail": "error"
 		}
 	},
@@ -220,5 +220,17 @@
 		"tools/*",
 		"widgets/*",
 		"!test/ai-development"
-	]
+	],
+	"allowScripts": {
+		"@parcel/watcher": false,
+		"@swc/core": false,
+		"core-js": false,
+		"core-js-pure": false,
+		"esbuild": false,
+		"fs-ext@2.1.1": true,
+		"fsevents": false,
+		"leveldown@5.6.0": true,
+		"nx": false,
+		"unrs-resolver": false
+	}
 }
