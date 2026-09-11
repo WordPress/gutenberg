@@ -1612,6 +1612,10 @@ _Related_
 
 -   toggleBlockMode in core/block-editor store.
 
+### toggleBoundaryMode
+
+Action that toggles the Boundary Mode view option.
+
 ### toggleDistractionFree
 
 Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.

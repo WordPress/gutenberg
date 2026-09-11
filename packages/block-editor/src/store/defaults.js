@@ -17,6 +17,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean}       hasFixedToolbar                        Whether or not the editor toolbar is fixed
  * @property {boolean}       distractionFree                        Whether or not the editor UI is distraction free
  * @property {boolean}       focusMode                              Whether the focus mode is enabled or not
+ * @property {boolean}       boundaryMode                           Whether the boundary mode is enabled or not
  * @property {Array}         styles                                 Editor Styles
  * @property {boolean}       keepCaretInsideBlock                   Whether caret should move between blocks in edit mode
  * @property {string}        bodyPlaceholder                        Empty post placeholder

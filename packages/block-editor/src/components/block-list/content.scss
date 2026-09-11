@@ -307,6 +307,37 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	}
 }
 
+// Boundary mode. Display visible borders around all blocks to visualize their boundaries.
+.is-boundary-mode .block-editor-block-list__block {
+	outline: 1px dashed var(--wp-admin-theme-color, #007cba);
+	position: relative;
+
+	&::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		pointer-events: none;
+		z-index: 1;
+	}
+
+	// When a block is selected in boundary mode, use a more visible border.
+	&.is-selected,
+	&.is-selected:focus {
+		outline: 2px solid var(--wp-admin-theme-color, #007cba);
+	}
+
+	.block-editor-block-list__block {
+		outline: 1px dashed rgba(0, 124, 186, 0.6);
+
+		.block-editor-block-list__block {
+			outline: 1px dashed rgba(0, 124, 186, 0.4);
+		}
+	}
+}
+
 .wp-block[data-align="left"] > *,
 .wp-block[data-align="right"] > *,
 .wp-block.alignleft,
