@@ -363,18 +363,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 								targetRootClientId,
 								getBlockIndex( _clientId )
 							);
-
-							// Remove the wrapper if it is left empty. The
-							// other branches remove it themselves.
-							if (
-								! getBlockOrder( _clientId ).length &&
-								isUnmodifiedBlock(
-									getBlock( _clientId ),
-									'content'
-								)
-							) {
-								removeBlock( _clientId, false );
-							}
 						} else {
 							const replacement = switchToBlockType(
 								getBlock( firstClientId ),
@@ -401,6 +389,18 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 							} else {
 								switchToDefaultOrRemove();
 							}
+						}
+
+						// The store might have already removed the wrapper if
+						// it was unmodified. However, we still want to remove
+						// the wrapper unless there is content like a cite.
+						const wrapper = getBlock( _clientId );
+						if (
+							wrapper &&
+							! getBlockOrder( _clientId ).length &&
+							isUnmodifiedBlock( wrapper, 'content' )
+						) {
+							removeBlock( _clientId, false );
 						}
 					} );
 				} else {
