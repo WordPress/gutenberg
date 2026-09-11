@@ -241,7 +241,7 @@ const variations = [
 		title: getTitle( 'ReverbNation' ),
 		icon: embedAudioIcon,
 		description: __( 'Embed ReverbNation content.' ),
-		patterns: [ /^https?:\/\/(www\.)?reverbnation\.com\/.+/i ],
+		patterns: [ /^https?:\/\/((legacy|www)\.)?reverbnation\.com\/.+/i ],
 		attributes: { providerNameSlug: 'reverbnation', responsive: true },
 	},
 	{
