@@ -5,6 +5,7 @@ describe( 'selectors', () => {
 	describe( 'isModalActive', () => {
 		it( 'returns true if the provided name matches the value in the preferences activeModal property', () => {
 			const state = {
+				complementaryAreas: {},
 				activeModal: 'test-modal',
 			};
 
@@ -13,6 +14,7 @@ describe( 'selectors', () => {
 
 		it( 'returns false if the provided name does not match the preferences activeModal property', () => {
 			const state = {
+				complementaryAreas: {},
 				activeModal: 'something-else',
 			};
 
@@ -21,6 +23,7 @@ describe( 'selectors', () => {
 
 		it( 'returns false if the preferences activeModal property is null', () => {
 			const state = {
+				complementaryAreas: {},
 				activeModal: null,
 			};
 

@@ -5,17 +5,18 @@ import {
 	normalizeComplementaryAreaScope,
 	normalizeComplementaryAreaName,
 } from './deprecated';
+import type { StoreState } from './types';
 
 /**
  * Returns the complementary area that is active in a given scope.
  *
- * @param {Object} state Global application state.
- * @param {string} scope Item scope.
+ * @param state Global application state.
+ * @param scope Item scope.
  *
- * @return {string | null | undefined} The complementary area that is active in the given scope.
+ * @return The complementary area that is active in the given scope.
  */
 export const getActiveComplementaryArea = createRegistrySelector(
-	( select ) => ( state, scope ) => {
+	( select ) => ( state: StoreState, scope: string ) => {
 		scope = normalizeComplementaryAreaScope( scope );
 		const isComplementaryAreaVisible = select( preferencesStore ).get(
 			scope,
@@ -39,7 +40,7 @@ export const getActiveComplementaryArea = createRegistrySelector(
 );
 
 export const isComplementaryAreaLoading = createRegistrySelector(
-	( select ) => ( state, scope ) => {
+	( select ) => ( state: StoreState, scope: string ) => {
 		scope = normalizeComplementaryAreaScope( scope );
 		const isVisible = select( preferencesStore ).get(
 			scope,
@@ -54,14 +55,14 @@ export const isComplementaryAreaLoading = createRegistrySelector(
 /**
  * Returns a boolean indicating if an item is pinned or not.
  *
- * @param {Object} state Global application state.
- * @param {string} scope Scope.
- * @param {string} item  Item to check.
+ * @param state Global application state.
+ * @param scope Scope.
+ * @param item  Item to check.
  *
- * @return {boolean} True if the item is pinned and false otherwise.
+ * @return True if the item is pinned and false otherwise.
  */
 export const isItemPinned = createRegistrySelector(
-	( select ) => ( state, scope, item ) => {
+	( select ) => ( state: StoreState, scope: string, item: string ) => {
 		scope = normalizeComplementaryAreaScope( scope );
 		item = normalizeComplementaryAreaName( scope, item );
 		const pinnedItems = select( preferencesStore ).get(
@@ -76,14 +77,14 @@ export const isItemPinned = createRegistrySelector(
  * Returns a boolean indicating whether a feature is active for a particular
  * scope.
  *
- * @param {Object} state       The store state.
- * @param {string} scope       The scope of the feature (e.g. core/edit-post).
- * @param {string} featureName The name of the feature.
+ * @param state       The store state.
+ * @param scope       The scope of the feature (e.g. core/edit-post).
+ * @param featureName The name of the feature.
  *
- * @return {boolean} Is the feature enabled?
+ * @return Is the feature enabled?
  */
 export const isFeatureActive = createRegistrySelector(
-	( select ) => ( state, scope, featureName ) => {
+	( select ) => ( state: StoreState, scope: string, featureName: string ) => {
 		deprecated(
 			`select( 'core/interface' ).isFeatureActive( scope, featureName )`,
 			{
@@ -99,11 +100,11 @@ export const isFeatureActive = createRegistrySelector(
 /**
  * Returns true if a modal is active, or false otherwise.
  *
- * @param {Object} state     Global application state.
- * @param {string} modalName A string that uniquely identifies the modal.
+ * @param state     Global application state.
+ * @param modalName A string that uniquely identifies the modal.
  *
- * @return {boolean} Whether the modal is active.
+ * @return Whether the modal is active.
  */
-export function isModalActive( state, modalName ) {
+export function isModalActive( state: StoreState, modalName: string ): boolean {
 	return state.activeModal === modalName;
 }
