@@ -1,40 +1,14 @@
-import { render } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { userEvent } from 'vitest/browser';
+import { render } from 'vitest-browser-react';
+import { describe, expect, it } from 'vitest';
 import { DashboardLanes } from '..';
 
-class MockResizeObserver {
-	observed: Set< Element > = new Set();
-	observe( element: Element ) {
-		this.observed.add( element );
-	}
-	unobserve( element: Element ) {
-		this.observed.delete( element );
-	}
-	disconnect() {
-		this.observed.clear();
-	}
-}
-
-let originalResizeObserver: typeof ResizeObserver;
-
-beforeEach( () => {
-	originalResizeObserver = globalThis.ResizeObserver;
-	( globalThis as unknown as { ResizeObserver: unknown } ).ResizeObserver =
-		MockResizeObserver;
-} );
-
-afterEach( () => {
-	( globalThis as unknown as { ResizeObserver: unknown } ).ResizeObserver =
-		originalResizeObserver;
-} );
-
 describe( 'DashboardLanes keyboard activation', () => {
-	it( 'places the dnd-kit keyboard activator on the inner wrapper, not the outer item', () => {
+	it( 'places the dnd-kit keyboard activator on the inner wrapper, not the outer item', async () => {
 		// Verifies the DOM hierarchy: keyboard activation needs the
 		// focused node and the keydown listener to share a node, so
 		// the activator must live nested inside the outer item.
-		/* eslint-disable testing-library/no-container, testing-library/no-node-access */
-		const { container } = render(
+		const { container } = await render(
 			<DashboardLanes layout={ [ { key: 'a' } ] } columns={ 2 } editMode>
 				<div key="a">A</div>
 			</DashboardLanes>
@@ -56,6 +30,12 @@ describe( 'DashboardLanes keyboard activation', () => {
 		expect( lanesItem ).not.toBeNull();
 		expect( activator ).not.toBe( lanesItem );
 		expect( lanesItem!.contains( activator! ) ).toBe( true );
-		/* eslint-enable testing-library/no-container, testing-library/no-node-access */
+
+		await userEvent.tab();
+		expect( activator ).toHaveFocus();
+		await userEvent.keyboard( '[Space]' );
+		expect( activator ).toHaveAttribute( 'aria-pressed', 'true' );
+		await userEvent.keyboard( '[Escape]' );
+		expect( activator ).not.toHaveAttribute( 'aria-pressed' );
 	} );
 } );

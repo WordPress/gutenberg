@@ -1,5 +1,6 @@
 import { MenuGroup, MenuItem, Slot, Fill } from '@wordpress/components';
 import { Children } from '@wordpress/element';
+import type { ActionItemProps, ActionItemSlotProps } from './types';
 
 function ActionItemSlot( {
 	name,
@@ -7,7 +8,7 @@ function ActionItemSlot( {
 	fillProps = {},
 	children,
 	...props
-} ) {
+}: ActionItemSlotProps ) {
 	return (
 		<Slot name={ name } fillProps={ fillProps }>
 			{ ( fills ) => {
@@ -29,7 +30,7 @@ function ActionItemSlot( {
 	);
 }
 
-function ActionItem( { name, as, onClick, ...props } ) {
+function ActionItem( { name, as, onClick, ...props }: ActionItemProps ) {
 	return (
 		<Fill name={ name }>
 			{ ( { as: slotAs = MenuItem, onClick: slotOnClick } ) => {
@@ -45,7 +46,7 @@ function ActionItem( { name, as, onClick, ...props } ) {
 					<Component
 						onClick={
 							handlers.length
-								? ( ...args ) =>
+								? ( ...args: unknown[] ) =>
 										handlers.forEach( ( handler ) =>
 											handler( ...args )
 										)
