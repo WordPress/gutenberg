@@ -584,10 +584,15 @@ describe( 'Menu', () => {
 				true
 			);
 		} );
+		const reloadedPointerDownListener =
+			reloadedAddEventListener.mock.calls.find(
+				( [ type, , capture ] ) =>
+					type === 'pointerdown' && capture === true
+			)?.[ 1 ];
 		unmount();
-		expect( reloadedRemoveEventListener ).toHaveBeenCalledWith(
+		expect( reloadedRemoveEventListener ).toHaveBeenCalledExactlyOnceWith(
 			'pointerdown',
-			expect.any( Function ),
+			reloadedPointerDownListener,
 			true
 		);
 	} );
@@ -637,11 +642,15 @@ describe( 'Menu', () => {
 			);
 		} );
 
+		const firstPointerDownListener = firstAddEventListener.mock.calls.find(
+			( [ type, , capture ] ) =>
+				type === 'pointerdown' && capture === true
+		)?.[ 1 ];
 		rerender( <MenuWithIframe iframeKey="second" /> );
 		await waitFor( () => {
 			expect( firstRemoveEventListener ).toHaveBeenCalledWith(
 				'pointerdown',
-				expect.any( Function ),
+				firstPointerDownListener,
 				true
 			);
 		} );

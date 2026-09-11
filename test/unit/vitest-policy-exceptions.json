@@ -1,23 +1,19 @@
 {
 	"browserFireEvent": {
-		"packages/components/src/color-picker/test/index.browser.test.tsx": "Uses exact pointer and mouse coordinates to verify visual picker geometry and a complete pointer lifecycle that native userEvent cannot express deterministically.",
-		"packages/components/src/custom-gradient-picker/test/index.browser.test.tsx": "Uses exact mouse coordinates to verify gradient marker positioning while observable clicks and keyboard input use native userEvent.",
-		"packages/components/src/focal-point-picker/test/index.browser.test.tsx": "Uses exact mouse coordinates and an explicit blur sequence to verify drag lifecycle state that native userEvent cannot express deterministically.",
-		"packages/dataviews/src/dataviews/test/infinite-scroll.browser.test.tsx": "Sets controlled scroll metrics before dispatching scroll to verify the infinite-loading threshold deterministically.",
+		"packages/components/src/focal-point-picker/test/index.browser.test.tsx": "Starts an unreleased mouse gesture to verify cancellation when native Tab moves focus away; subsequent movement uses native hover.",
 		"packages/media-editor/src/image-editor/react/components/stencils/test/rectangle-stencil.browser.test.tsx": "Uses exact pointer and touch payloads for capture lifecycle coverage, plus direct key events only where fake timers verify resize debounce timing.",
 		"packages/media-editor/src/image-editor/react/components/test/cropper.browser.test.tsx": "Uses exact pointer, wheel, and transition payloads for crop geometry and lifecycle coverage, plus a direct key event only where fake timers isolate resize timing.",
-		"packages/ui/src/utils/test/use-overlay-scroll-state-attributes.browser.test.tsx": "Sets controlled scroll dimensions before dispatching scroll to verify overlay state transitions deterministically."
+		"packages/components/src/color-picker/test/index.browser.test.tsx": "Supplies exact bottom-edge mouse coordinates for click-to-black saturation coverage, where native hit testing excludes the lower boundary. Drag and keyboard paths use native input."
 	},
 	"jsdomBrowserApis": {
 		"test/unit/config/setup-globals.vitest.jsdom.test.js": "This infrastructure regression must exercise the opt-in matchMedia mock in the jsdom project that installs it.",
 		"packages/block-editor/src/utils/test/dom.jsdom.test.jsx": "Uses explicit DOMRect fixtures to test clipping and element-selection algorithms without relying on browser layout.",
-		"packages/components/src/validated-form-controls/test/range-control.jsdom.test.tsx": "Uses requestAnimationFrame only to schedule reportValidity after React state; assertions cover accessible description semantics.",
-		"packages/grid/src/dashboard-grid/test/item-interactions.jsdom.test.tsx": "Stubs ResizeObserver only to mount the grid; assertions cover deterministic drag and resize control semantics.",
-		"packages/grid/src/dashboard-grid/test/keyboard-activation.jsdom.test.tsx": "Stubs ResizeObserver only to mount the grid; assertions cover the deterministic keyboard activator DOM hierarchy.",
-		"packages/grid/src/dashboard-lanes/test/item-interactions.jsdom.test.tsx": "Stubs ResizeObserver only to mount the lanes; assertions cover deterministic drag and resize control semantics.",
-		"packages/grid/src/dashboard-lanes/test/keyboard-activation.jsdom.test.tsx": "Stubs ResizeObserver only to mount the lanes; assertions cover the deterministic keyboard activator DOM hierarchy.",
 		"packages/grid/src/dashboard-lanes/test/use-lane-placement.jsdom.test.tsx": "Injects ResizeObserver entries and requestAnimationFrame scheduling to test deterministic lane-placement state without browser layout.",
-		"packages/ui/src/form/primitives/control-with-error/test/control-with-error.jsdom.test.tsx": "Uses requestAnimationFrame only to schedule reportValidity after React state; assertions cover aria-describedby semantics.",
-		"packages/editor/src/components/collab-sidebar/test/board-store.jsdom.test.js": "Uses supplied DOMRect fixtures to test deterministic range-to-anchor calculations without relying on rendered layout."
+		"packages/editor/src/components/collab-sidebar/test/board-store.jsdom.test.js": "Uses supplied DOMRect fixtures to test deterministic range-to-anchor calculations without relying on rendered layout.",
+		"packages/editor/src/components/collaborators-overlay/test/cursor-dom-utils.jsdom.test.ts": "Supplies fixed element and range rectangles to verify cursor fallback and ancestor-selection algorithms without relying on browser layout.",
+		"packages/ui/src/breadcrumb/test/index.jsdom.test.tsx": "Injects sizes, ResizeObserver notifications, font readiness, and animation frames to verify deterministic overflow state and measurement lifecycle. Real responsive layout is covered in index.browser.test.tsx.",
+		"packages/grid/src/dashboard-grid/test/item-limits.jsdom.test.tsx": "Supplies fixed tile rectangles and timers to verify minimum-size quantization and stored layout updates independently of browser layout.",
+		"packages/grid/src/dashboard-lanes/test/item-limits.jsdom.test.tsx": "Supplies two container geometries and timers to verify lane-width quantization and minimum-size clamping independently of browser layout.",
+		"packages/components/src/custom-gradient-picker/gradient-bar/test/utils.jsdom.test.ts": "Supplies fixed rectangles to verify coordinate-to-percentage conversion, rounding, and clamping without relying on browser layout."
 	}
 }

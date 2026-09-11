@@ -3,6 +3,11 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
+import {
+	ariaKeyShortcut,
+	displayShortcut,
+	shortcutAriaLabel,
+} from '@wordpress/keycodes';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import {
@@ -10,7 +15,6 @@ import {
 	EDITOR_INTENT_SUGGEST,
 	EDITOR_INTENT_VIEW,
 } from '../../store/constants';
-import { getKeyboardShortcut } from '../../utils/keyboard-shortcut';
 import PostTypeSupportCheck from '../post-type-support-check';
 
 /**
@@ -32,13 +36,18 @@ type KeyboardShortcut = NonNullable<
 	ComponentProps< typeof Menu.RadioItem >[ 'shortcut' ]
 >;
 
-// `getKeyboardShortcut` is untyped JavaScript; its result is the `Menu`
-// component's shortcut shape.
+/*
+ * Builds the `Menu` shortcut shape for a `secondary` modifier combination.
+ * The editor-local helper this replaced now lives in
+ * `@wordpress/keyboard-shortcuts` as a selector keyed by shortcut name, which
+ * these module-level constants cannot reach.
+ */
 function intentShortcut( character: string ): KeyboardShortcut {
-	return getKeyboardShortcut( {
-		character,
-		modifier: 'secondary',
-	} ) as KeyboardShortcut;
+	return {
+		ariaKeyShortcut: ariaKeyShortcut.secondary( character ),
+		displayShortcut: displayShortcut.secondary( character ),
+		label: shortcutAriaLabel.secondary( character ),
+	};
 }
 
 const INTENTS: Array< {

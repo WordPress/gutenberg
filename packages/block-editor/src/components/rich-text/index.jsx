@@ -363,7 +363,10 @@ function RichTextWrapper(
 	useLayoutEffect( () => {
 		const element = anchorRef.current;
 
-		if ( ! isSelected || ! element ) {
+		// A pointer press outside the field makes it non editable until the
+		// release (see rich text's preventFocusCapture). Focusing it then
+		// makes the block focus handler drop the text selection.
+		if ( ! isSelected || element?.contentEditable !== 'true' ) {
 			return;
 		}
 
