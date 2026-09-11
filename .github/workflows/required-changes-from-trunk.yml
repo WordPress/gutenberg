@@ -6,6 +6,9 @@ on:
         branches: [trunk]
     push:
         branches: [trunk]
+    schedule:
+        # Daily at 04:23 UTC, to stamp the pull requests nothing else reaches.
+        - cron: '23 4 * * *'
     workflow_dispatch:
         inputs:
             mode:
@@ -128,3 +131,44 @@ jobs:
               with:
                   name: required-trunk-changes-refresh-${{ github.run_id }}
                   path: ${{ steps.refresh.outputs.results-file }}
+
+    backfill:
+        name: Stamp the pull requests that have no status yet
+        # Every run Dependabot triggers gets a read-only token, so its pull requests
+        # are never stamped by their own events. This is what reaches them.
+        if: >
+            github.repository == 'WordPress/gutenberg' &&
+            github.event.schedule == '23 4 * * *'
+        runs-on: ubuntu-latest
+        timeout-minutes: 60
+        permissions:
+            contents: read
+            statuses: write
+            pull-requests: read
+        # Shares the refresh's group: a backfill that read the baseline before a
+        # move would otherwise write a pass the move had already invalidated.
+        concurrency:
+            group: required-trunk-changes-refresh
+            cancel-in-progress: false
+            queue: max
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: trunk
+                  fetch-depth: 0
+                  filter: tree:0
+                  persist-credentials: false
+
+            - name: Stamp the unstamped pull requests
+              uses: mawesomedev/pr-baseline-action@cc4d934b8c7c8cd2fd965d8334849d8108321ab3 # v0.2.0
+              with:
+                  base: trunk
+                  baselines: ${{ env.PR_BASELINES }}
+                  status-context: ${{ env.STATUS_CONTEXT }}
+                  description-pass: ${{ env.DESCRIPTION_PASS }}
+                  description-fail: ${{ env.DESCRIPTION_FAIL }}
+                  mode: refresh-pr-statuses
+                  scope: unstamped
+                  # Well below the ceiling: a backfill must not starve the refresh.
+                  max-writes-per-run: 150

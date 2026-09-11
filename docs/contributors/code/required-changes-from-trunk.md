@@ -18,7 +18,7 @@ The ref lives outside `refs/heads/` and `refs/tags/` on purpose: nothing fetches
 ## Limits
 
 -   Each refresh writes at most 300 statuses. A move rewrites the pull requests showing green, so a large one takes a few `trunk` pushes to land: a run that stops on that budget says so, and the next `trunk` push, or a dispatch, continues where it left off.
--   A pull request that never received a status shows as "Expected", which also blocks merging. Its own next update gives it a real one, except on a Dependabot pull request: every run Dependabot triggers gets a read-only token, so those wait for a dispatch with `mode: refresh-pr-statuses` and `scope: unstamped`.
+-   A pull request that never received a status shows as "Expected", which also blocks merging. Its own next update gives it a real one, except on a Dependabot pull request: every run Dependabot triggers gets a read-only token, so those wait for the daily backfill, which stamps whatever still carries no status.
 -   A pull request whose head moves while a refresh is running is deferred rather than stamped at a stale head. The push that moved it reports its own status.
 
 ## My pull request has a red "Required changes from trunk" status. What do I do?
@@ -38,7 +38,7 @@ Committers apply the `Require PR update` label to a pull request whose change in
 
 The `Required changes from trunk` workflow exposes a `mode` dispatch input: `auto` behaves like a `trunk` push, moving the baseline only if a labeled merge earned it and then refreshing, `move-baseline` forces a move to the current `trunk` HEAD and then refreshes, and `refresh-pr-statuses` only refreshes open pull request statuses, which is the retry path after an interrupted run.
 
-A `scope` input picks which open pull requests `mode: refresh-pr-statuses` covers: `corrections` visits the ones showing green, the only ones a forward move can turn red; `unstamped` visits the ones carrying no status yet; and `all` visits every open pull request. The other two modes pick their own scope, `corrections` for `auto` and `all` for `move-baseline`.
+A `scope` input picks which open pull requests `mode: refresh-pr-statuses` covers: `corrections` visits the ones showing green, the only ones a forward move can turn red; `unstamped` visits the ones carrying no status yet, which is what the daily backfill runs; and `all` visits every open pull request. The other two modes pick their own scope, `corrections` for `auto` and `all` for `move-baseline`.
 
 Moving the baseline backwards is the exception. It can turn a failing pull request green, so it refreshes at scope `all`, which a `trunk` push does not continue. Re-dispatch with `mode: refresh-pr-statuses` and `scope: all` until a run ends green with nothing remaining. A run that deferred or failed a pull request still reports it as accounted for, so it can say nothing remains while being red.
 
