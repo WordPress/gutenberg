@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Term Name: Apply the term name display filters when rendering, so adjustments plugins make to term names take effect and the name is escaped in the heading and link markup ([#82365](https://github.com/WordPress/gutenberg/pull/82365)).
+
 ## 11.0.0 (2026-09-10)
 
 ### Breaking Changes
