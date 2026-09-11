@@ -170,9 +170,9 @@ export function WidgetHeader( {
 							{ widgetType.title }
 						</Tooltip.Trigger>
 
-						{ isTitleTruncated && (
-							<Tooltip.Popup>{ widgetType.title }</Tooltip.Popup>
-						) }
+						{ /* Always mounted: Base UI closes through the popup's
+						   ref, so unmounting it mid-close leaves it stuck open. */ }
+						<Tooltip.Popup>{ widgetType.title }</Tooltip.Popup>
 					</Tooltip.Root>
 
 					{ widgetType.help && (
