@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { useGlobalStyles } from './hooks';
+import { useGlobalStylesReset } from './hooks';
 
 /**
  * Action menu with Reset, Welcome Guide, and Additional CSS.
@@ -18,18 +18,7 @@ export function GlobalStylesActionMenu( {
 	hideWelcomeGuide = false,
 	onChangePath,
 } ) {
-	const { user, setUser } = useGlobalStyles();
-
-	// Check if there are user customizations that can be reset
-	const canReset =
-		!! user &&
-		( Object.keys( user?.styles ?? {} ).length > 0 ||
-			Object.keys( user?.settings ?? {} ).length > 0 );
-
-	// Reset function to clear all user customizations
-	const onReset = () => {
-		setUser( { styles: {}, settings: {} } );
-	};
+	const { canReset, resetGlobalStyles } = useGlobalStylesReset();
 	const { toggle } = useDispatch( preferencesStore );
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
@@ -79,7 +68,7 @@ export function GlobalStylesActionMenu( {
 					<MenuGroup>
 						<MenuItem
 							onClick={ () => {
-								onReset();
+								resetGlobalStyles();
 								onClose();
 							} }
 							disabled={ ! canReset }
