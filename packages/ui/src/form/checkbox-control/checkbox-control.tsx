@@ -22,7 +22,7 @@ const TextContainer = ( {
 /**
  * A complete checkbox field with integrated label and description.
  *
- * For grouping and nested parent checkboxes, see the [Checkbox Groups](?path=/docs/design-system-components-form-checkbox-groups--docs)
+ * For grouping and nested parent checkboxes, see the [Checkbox Groups](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-form-checkbox-groups--docs)
  * documentation.
  */
 export const CheckboxControl = forwardRef<

@@ -4,8 +4,8 @@
 	@layer components {
 		.nested-items {
 			padding-inline-start:
-				calc(var(--wp-ui-checkbox-input-size, var(--wpds-dimension-size-2xs)) +
-				var(--wpds-dimension-gap-sm));
+				calc(var(--wp-ui-checkbox-input-size, var(--wpds-dimension-size-2xs)) -
+				var(--wpds-dimension-size-5xs));
 		}
 	}
 }

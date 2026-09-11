@@ -12,7 +12,7 @@ import type { CheckboxProps } from './types';
  * A low-level checkbox primitive.
  *
  * Prefer `CheckboxControl` for labeled items. For grouping and nested parent
- * checkboxes, see the [Checkbox Groups](?path=/docs/design-system-components-form-checkbox-groups--docs)
+ * checkboxes, see the [Checkbox Groups](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-form-checkbox-groups--docs)
  * documentation.
  */
 export const Checkbox = forwardRef< HTMLSpanElement, CheckboxProps >(

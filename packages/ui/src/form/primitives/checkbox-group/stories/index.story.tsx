@@ -42,8 +42,8 @@ export const Default: Story = {
  *
  * For screen reader accessibility, do not nest more than one level.
  *
- * See the <a href="?path=/docs/design-system-components-form-checkbox-groups--docs#nesting" target="_top">`Checkbox Groups` documentation</a>
- * for a full example.
+ * See the [Checkbox Groups](?path=/docs/design-system-components-form-checkbox-groups--docs#nesting)
+ * documentation for a full example.
  */
 export const WithParentCheckbox: Story = {
 	render: function Template() {
