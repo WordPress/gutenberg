@@ -16,10 +16,6 @@ type MediaSourcesProps = {
 	 */
 	categories: MediaSourceCategory[];
 	/**
-	 * Client ID of the block the media is inserted into.
-	 */
-	rootClientId?: string;
-	/**
 	 * Called with the block to insert.
 	 */
 	onInsert: ( block: unknown ) => void;
@@ -37,7 +33,6 @@ type MediaSourcesProps = {
  */
 export default function MediaSources( {
 	categories,
-	rootClientId,
 	onInsert,
 	footer,
 }: MediaSourcesProps ) {
@@ -83,7 +78,6 @@ export default function MediaSources( {
 							className={ `${ baseCssClass }__panel` }
 						>
 							<MediaCategoryPanel
-								rootClientId={ rootClientId }
 								onInsert={ onInsert }
 								category={ category }
 							/>
