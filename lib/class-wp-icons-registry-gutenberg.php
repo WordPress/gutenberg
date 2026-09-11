@@ -123,7 +123,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				return false;
 			}
 
-			$sanitized_icon_content = $this->sanitize_icon_content( $icon_properties['content'] );
+			$sanitized_icon_content = $this->sanitize_inline_svg( $icon_properties['content'] );
 			if ( empty( $sanitized_icon_content ) ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -158,6 +158,739 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		$this->registered_icons[ $qualified_name ] = $icon;
 
 		return true;
+	}
+
+	/**
+	 * Builds the allowed attribute list for wp_kses() from attribute names.
+	 *
+	 * @param non-empty-string ...$attribute_names Attribute names to allow.
+	 * @return array<non-empty-string, true> Attribute names mapped to true.
+	 */
+	private function get_allowed_attribute_list( ...$attribute_names ): array {
+		return array_fill_keys( $attribute_names, true );
+	}
+
+	/**
+	 * Sanitizes an SVG embedded in an HTML fragment.
+	 *
+	 * The input SVG must have been extracted as HTML from a broader HTML
+	 * document, NOT as an entire XML document from an external file or JSON
+	 * value. Parsed as HTML, XML-only constructs (CDATA, `<foreignObject>`
+	 * integration points) are mis-parsed. WP_HTML_Processor extracts the whole
+	 * SVG element before wp_kses runs, so inner HTML tags like <p> don't
+	 * terminate the SVG and self-closing tags are handled correctly.
+	 *
+	 * @param string $html_containing_svg HTML fragment containing the SVG to sanitize.
+	 * @return string The sanitized SVG, or an empty string when no valid SVG is found.
+	 */
+	private function sanitize_inline_svg( $html_containing_svg ) {
+		// Core attributes applicable to most elements. `data-*` is a wildcard
+		// supported by wp_kses() and matches any data attribute.
+		$core_attributes = $this->get_allowed_attribute_list( 'class', 'data-*', 'id', 'style' );
+
+		/**
+		 * ARIA and accessibility attributes. wp_kses() does not support an
+		 * `aria-*` wildcard, so every ARIA state and property is listed
+		 * explicitly. The list mirrors the WAI-ARIA states and properties.
+		 *
+		 * @link https://www.w3.org/TR/wai-aria-1.2/#state_prop_def
+		 */
+		$aria_attributes = $this->get_allowed_attribute_list(
+			'aria-activedescendant',
+			'aria-atomic',
+			'aria-autocomplete',
+			'aria-busy',
+			'aria-checked',
+			'aria-colcount',
+			'aria-colindex',
+			'aria-colspan',
+			'aria-controls',
+			'aria-current',
+			'aria-describedby',
+			'aria-description',
+			'aria-details',
+			'aria-disabled',
+			'aria-dropeffect',
+			'aria-errormessage',
+			'aria-expanded',
+			'aria-flowto',
+			'aria-grabbed',
+			'aria-haspopup',
+			'aria-hidden',
+			'aria-invalid',
+			'aria-keyshortcuts',
+			'aria-label',
+			'aria-labelledby',
+			'aria-level',
+			'aria-live',
+			'aria-modal',
+			'aria-multiline',
+			'aria-multiselectable',
+			'aria-orientation',
+			'aria-owns',
+			'aria-placeholder',
+			'aria-posinset',
+			'aria-pressed',
+			'aria-readonly',
+			'aria-relevant',
+			'aria-required',
+			'aria-roledescription',
+			'aria-rowcount',
+			'aria-rowindex',
+			'aria-rowspan',
+			'aria-selected',
+			'aria-setsize',
+			'aria-sort',
+			'aria-valuemax',
+			'aria-valuemin',
+			'aria-valuenow',
+			'aria-valuetext',
+			'focusable',
+			'role',
+			'tabindex',
+		);
+
+		// Presentation attributes for graphics elements (shapes, text, use, image).
+		$presentation_attributes = $this->get_allowed_attribute_list(
+			'clip-path',
+			'clip-rule',
+			'color',
+			'color-interpolation',
+			'color-rendering',
+			'display',
+			'fill',
+			'fill-opacity',
+			'fill-rule',
+			'filter',
+			'mask',
+			'opacity',
+			'paint-order',
+			'stroke',
+			'stroke-dasharray',
+			'stroke-dashoffset',
+			'stroke-linecap',
+			'stroke-linejoin',
+			'stroke-miterlimit',
+			'stroke-opacity',
+			'stroke-width',
+			'transform',
+			'vector-effect',
+			'visibility',
+		);
+
+		// Marker attributes (only for shape elements).
+		$marker_attributes = $this->get_allowed_attribute_list( 'marker-end', 'marker-mid', 'marker-start' );
+
+		// Container attributes for grouping elements.
+		$container_attributes = $this->get_allowed_attribute_list(
+			'clip-path',
+			'display',
+			'filter',
+			'mask',
+			'opacity',
+			'transform',
+			'visibility',
+		);
+
+		/**
+		 * Allowed tags for wp_kses(). WP_HTML_Processor::normalize() with
+		 * constraints (similar structure to this array) is proposed to improve
+		 * HTML/SVG sanitization in the future.
+		 *
+		 * @link https://github.com/dmsnell/wordpress-develop/pull/20
+		 */
+		$allowed_tags = array(
+			// Root SVG element.
+			'svg'                 => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$presentation_attributes,
+				$this->get_allowed_attribute_list(
+					'height',
+					'preserveaspectratio',
+					'viewbox',
+					'width',
+					'x',
+					'xmlns',
+					'xmlns:xlink',
+					'y',
+				)
+			),
+			// Basic shape elements (with markers).
+			'path'                => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$presentation_attributes,
+				$marker_attributes,
+				$this->get_allowed_attribute_list(
+					'd',
+					'pathlength',
+				)
+			),
+			'circle'              => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$presentation_attributes,
+				$marker_attributes,
+				$this->get_allowed_attribute_list(
+					'cx',
+					'cy',
+					'r',
+				)
+			),
+			'ellipse'             => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$presentation_attributes,
+				$marker_attributes,
+				$this->get_allowed_attribute_list(
+					'cx',
+					'cy',
+					'rx',
+					'ry',
+				)
+			),
+			'line'                => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$presentation_attributes,
+				$marker_attributes,
+				$this->get_allowed_attribute_list(
+					'x1',
+					'x2',
+					'y1',
+					'y2',
+				)
+			),
+			'polygon'             => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$presentation_attributes,
+				$marker_attributes,
+				$this->get_allowed_attribute_list(
+					'points',
+				)
+			),
+			'polyline'            => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$presentation_attributes,
+				$marker_attributes,
+				$this->get_allowed_attribute_list(
+					'points',
+				)
+			),
+			'rect'                => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$presentation_attributes,
+				$marker_attributes,
+				$this->get_allowed_attribute_list(
+					'height',
+					'rx',
+					'ry',
+					'width',
+					'x',
+					'y',
+				)
+			),
+			// Grouping and structural elements.
+			'g'                   => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$container_attributes
+			),
+			'defs'                => $core_attributes,
+			'view'                => array_merge(
+				$core_attributes,
+				$this->get_allowed_attribute_list(
+					'preserveaspectratio',
+					'viewbox',
+					'viewtarget',
+					'zoomandpan',
+				)
+			),
+			'symbol'              => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$container_attributes,
+				$this->get_allowed_attribute_list(
+					'height',
+					'preserveaspectratio',
+					'viewbox',
+					'width',
+					'x',
+					'y',
+				)
+			),
+			'use'                 => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$presentation_attributes,
+				$this->get_allowed_attribute_list(
+					'height',
+					'href',
+					'width',
+					'x',
+					'xlink:href',
+					'y',
+				)
+			),
+			'switch'              => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$container_attributes
+			),
+			// Linking element.
+			'a'                   => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$presentation_attributes,
+				$container_attributes,
+				$this->get_allowed_attribute_list(
+					'href',
+					'rel',
+					'target',
+					'type',
+					'xlink:href',
+				)
+			),
+			'clippath'            => array_merge(
+				$core_attributes,
+				$this->get_allowed_attribute_list(
+					'clippathunits',
+					'transform',
+				)
+			),
+			'mask'                => array_merge(
+				$core_attributes,
+				$this->get_allowed_attribute_list(
+					'height',
+					'maskcontentunits',
+					'maskunits',
+					'width',
+					'x',
+					'y',
+				)
+			),
+			// Gradient elements.
+			'lineargradient'      => array_merge(
+				$core_attributes,
+				$this->get_allowed_attribute_list(
+					'gradienttransform',
+					'gradientunits',
+					'href',
+					'spreadmethod',
+					'x1',
+					'x2',
+					'xlink:href',
+					'y1',
+					'y2',
+				)
+			),
+			'radialgradient'      => array_merge(
+				$core_attributes,
+				$this->get_allowed_attribute_list(
+					'cx',
+					'cy',
+					'fr',
+					'fx',
+					'fy',
+					'gradienttransform',
+					'gradientunits',
+					'href',
+					'r',
+					'spreadmethod',
+					'xlink:href',
+				)
+			),
+			'stop'                => array_merge(
+				$core_attributes,
+				$this->get_allowed_attribute_list(
+					'offset',
+					'stop-color',
+					'stop-opacity',
+				)
+			),
+			// Pattern element.
+			'pattern'             => array_merge(
+				$core_attributes,
+				$this->get_allowed_attribute_list(
+					'height',
+					'href',
+					'patterncontentunits',
+					'patterntransform',
+					'patternunits',
+					'preserveaspectratio',
+					'viewbox',
+					'width',
+					'x',
+					'xlink:href',
+					'y',
+				)
+			),
+			// Filter elements.
+			'filter'              => array_merge(
+				$core_attributes,
+				$this->get_allowed_attribute_list(
+					'filterunits',
+					'height',
+					'primitiveunits',
+					'width',
+					'x',
+					'y',
+				)
+			),
+			'feblend'             => $this->get_allowed_attribute_list(
+				'in',
+				'in2',
+				'mode',
+				'result',
+			),
+			'fecolormatrix'       => $this->get_allowed_attribute_list(
+				'in',
+				'result',
+				'type',
+				'values',
+			),
+			'fecomponenttransfer' => $this->get_allowed_attribute_list(
+				'in',
+				'result',
+			),
+			'fecomposite'         => $this->get_allowed_attribute_list(
+				'in',
+				'in2',
+				'k1',
+				'k2',
+				'k3',
+				'k4',
+				'operator',
+				'result',
+			),
+			'feconvolvematrix'    => $this->get_allowed_attribute_list(
+				'bias',
+				'divisor',
+				'edgemode',
+				'in',
+				'kernelmatrix',
+				'order',
+				'preservealpha',
+				'result',
+				'targetx',
+				'targety',
+			),
+			'fediffuselighting'   => $this->get_allowed_attribute_list(
+				'diffuseconstant',
+				'in',
+				'result',
+				'surfacescale',
+			),
+			'fedisplacementmap'   => $this->get_allowed_attribute_list(
+				'in',
+				'in2',
+				'result',
+				'scale',
+				'xchannelselector',
+				'ychannelselector',
+			),
+			'fedistantlight'      => $this->get_allowed_attribute_list(
+				'azimuth',
+				'elevation',
+			),
+			'feflood'             => $this->get_allowed_attribute_list(
+				'flood-color',
+				'flood-opacity',
+				'result',
+			),
+			'fegaussianblur'      => $this->get_allowed_attribute_list(
+				'edgemode',
+				'in',
+				'result',
+				'stddeviation',
+			),
+			'feimage'             => $this->get_allowed_attribute_list(
+				'href',
+				'preserveaspectratio',
+				'result',
+				'xlink:href',
+			),
+			'femerge'             => $this->get_allowed_attribute_list(
+				'result',
+			),
+			'femergenode'         => $this->get_allowed_attribute_list(
+				'in',
+			),
+			'femorphology'        => $this->get_allowed_attribute_list(
+				'in',
+				'operator',
+				'radius',
+				'result',
+			),
+			'feoffset'            => $this->get_allowed_attribute_list(
+				'dx',
+				'dy',
+				'in',
+				'result',
+			),
+			'fepointlight'        => $this->get_allowed_attribute_list(
+				'x',
+				'y',
+				'z',
+			),
+			'fespecularlighting'  => $this->get_allowed_attribute_list(
+				'in',
+				'result',
+				'specularconstant',
+				'specularexponent',
+				'surfacescale',
+			),
+			'fespotlight'         => $this->get_allowed_attribute_list(
+				'limitingconeangle',
+				'pointsatx',
+				'pointsaty',
+				'pointsatz',
+				'specularexponent',
+				'x',
+				'y',
+				'z',
+			),
+			'fetile'              => $this->get_allowed_attribute_list(
+				'in',
+				'result',
+			),
+			'feturbulence'        => $this->get_allowed_attribute_list(
+				'basefrequency',
+				'numoctaves',
+				'result',
+				'seed',
+				'stitchtiles',
+				'type',
+			),
+			'fefunca'             => $this->get_allowed_attribute_list(
+				'amplitude',
+				'exponent',
+				'intercept',
+				'offset',
+				'slope',
+				'tablevalues',
+				'type',
+			),
+			'fefuncb'             => $this->get_allowed_attribute_list(
+				'amplitude',
+				'exponent',
+				'intercept',
+				'offset',
+				'slope',
+				'tablevalues',
+				'type',
+			),
+			'fefuncg'             => $this->get_allowed_attribute_list(
+				'amplitude',
+				'exponent',
+				'intercept',
+				'offset',
+				'slope',
+				'tablevalues',
+				'type',
+			),
+			'fefuncr'             => $this->get_allowed_attribute_list(
+				'amplitude',
+				'exponent',
+				'intercept',
+				'offset',
+				'slope',
+				'tablevalues',
+				'type',
+			),
+			// Text elements.
+			'text'                => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$presentation_attributes,
+				$this->get_allowed_attribute_list(
+					'alignment-baseline',
+					'baseline-shift',
+					'dominant-baseline',
+					'dx',
+					'dy',
+					'font-family',
+					'font-size',
+					'font-style',
+					'font-variant',
+					'font-weight',
+					'lengthadjust',
+					'letter-spacing',
+					'rotate',
+					'text-anchor',
+					'text-decoration',
+					'textlength',
+					'word-spacing',
+					'writing-mode',
+					'x',
+					'y',
+				)
+			),
+			'tspan'               => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$presentation_attributes,
+				$this->get_allowed_attribute_list(
+					'dx',
+					'dy',
+					'font-family',
+					'font-size',
+					'font-style',
+					'font-weight',
+					'lengthadjust',
+					'rotate',
+					'text-anchor',
+					'text-decoration',
+					'textlength',
+					'x',
+					'y',
+				)
+			),
+			'textpath'            => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$presentation_attributes,
+				$this->get_allowed_attribute_list(
+					'href',
+					'method',
+					'spacing',
+					'startoffset',
+					'text-anchor',
+					'xlink:href',
+				)
+			),
+			// Descriptive elements.
+			'title'               => array(),
+			'desc'                => array(),
+			'metadata'            => array(),
+			// Image element.
+			'image'               => array_merge(
+				$core_attributes,
+				$aria_attributes,
+				$presentation_attributes,
+				$this->get_allowed_attribute_list(
+					'height',
+					'href',
+					'preserveaspectratio',
+					'width',
+					'x',
+					'xlink:href',
+					'y',
+				)
+			),
+			// Marker element.
+			'marker'              => array_merge(
+				$core_attributes,
+				$this->get_allowed_attribute_list(
+					'markerheight',
+					'markerunits',
+					'markerwidth',
+					'orient',
+					'preserveaspectratio',
+					'refx',
+					'refy',
+					'viewbox',
+				)
+			),
+			// Animation elements. `<animate>` and `<set>` are excluded: their
+			// `attributeName` targets any attribute at runtime, letting them
+			// replace a value wp_kses() already validated, such as `href`.
+			'animatemotion'       => array_merge(
+				$core_attributes,
+				$this->get_allowed_attribute_list(
+					'accumulate',
+					'additive',
+					'begin',
+					'calcmode',
+					'dur',
+					'end',
+					'from',
+					'keypoints',
+					'keysplines',
+					'keytimes',
+					'path',
+					'repeatcount',
+					'rotate',
+					'to',
+					'values',
+				)
+			),
+			'animatetransform'    => array_merge(
+				$core_attributes,
+				$this->get_allowed_attribute_list(
+					'accumulate',
+					'additive',
+					'attributename',
+					'begin',
+					'calcmode',
+					'dur',
+					'end',
+					'from',
+					'keysplines',
+					'keytimes',
+					'repeatcount',
+					'to',
+					'type',
+					'values',
+				)
+			),
+		);
+
+		/*
+		 * `xlink:href` holds a URI but is missing from Core's
+		 * wp_kses_uri_attributes(), so wp_kses() would not run it through
+		 * wp_kses_bad_protocol(). Add it for this call only.
+		 */
+		$allow_xlink_href = static function ( $uri_attributes ) {
+			$uri_attributes[] = 'xlink:href';
+			return $uri_attributes;
+		};
+
+		$processor = WP_HTML_Processor::create_fragment( $html_containing_svg );
+		if ( ! $processor ) {
+			return '';
+		}
+
+		// Find the first SVG root, ignoring surrounding content. The namespace
+		// check rejects a foreign-namespaced `<svg>`, such as in `<math><svg>`.
+		if ( ! $processor->next_tag( 'SVG' ) || 'svg' !== $processor->get_namespace() ) {
+			return '';
+		}
+
+		// A self-closing `<svg />` has no descendants and no closing tag. Scanning
+		// past it would swallow the next sibling and hide it from the check below.
+		$svg = $processor->serialize_token();
+		if ( $processor->expects_closer() ) {
+			$depth = $processor->get_current_depth();
+			while ( $processor->next_token() && $processor->get_current_depth() >= $depth ) {
+				$svg .= $processor->serialize_token();
+			}
+			// An early stop inside an SVG means truncated input, not unsupported
+			// markup. Reject it: the parser can synthesize closing tags that were
+			// never written, so no valid document remains to trust.
+			if ( null !== $processor->get_last_error() || $processor->paused_at_incomplete_token() ) {
+				return '';
+			}
+			$svg .= '</svg>';
+		}
+
+		// Reject more than one top-level SVG. Nested SVGs were extracted above,
+		// so only sibling roots remain to be found.
+		while ( $processor->next_tag( 'SVG' ) ) {
+			if ( 'svg' === $processor->get_namespace() ) {
+				return '';
+			}
+		}
+
+		add_filter( 'wp_kses_uri_attributes', $allow_xlink_href );
+		$sanitized_svg = wp_kses( $svg, $allowed_tags );
+		remove_filter( 'wp_kses_uri_attributes', $allow_xlink_href );
+
+		return $sanitized_svg;
 	}
 
 	/**
@@ -231,7 +964,10 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				return null;
 			}
 
-			$content = $this->sanitize_icon_content( file_get_contents( $icon_path ) );
+			// An external `.svg` file is XML, but sanitize_inline_svg() expects an
+			// inline HTML fragment. A dedicated XML sanitizer should handle this
+			// in the future.
+			$content = $this->sanitize_inline_svg( file_get_contents( $icon_path ) );
 
 			if ( empty( $content ) ) {
 				wp_trigger_error(
