@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Export the `BUNDLED_PACKAGES` list from `lib/util`, so downstream tooling can consult which `@wordpress/*` packages are bundled rather than externalized, instead of maintaining its own copy ([#76818](https://github.com/WordPress/gutenberg/pull/76818)).
+
 ## 6.55.0 (2026-09-10)
 
 ## 6.54.0 (2026-08-26)
