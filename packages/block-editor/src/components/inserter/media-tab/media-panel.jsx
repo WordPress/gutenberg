@@ -1,5 +1,4 @@
-import clsx from 'clsx';
-import { Button, Modal, Spinner, SearchControl } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	useCallback,
@@ -10,17 +9,17 @@ import {
 } from '@wordpress/element';
 import { useDebouncedInput, usePrevious } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
-import { getScrollContainer } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
-import { Stack } from '@wordpress/ui';
-import MediaList from './media-list';
+import { external, linkOff } from '@wordpress/icons';
+import MediaGrid from './media-grid';
 import MediaUpload from '../../media-upload';
 import MediaUploadCheck from '../../media-upload/check';
-import { useMediaResults, useDelayedLoading } from './hooks';
+import { useMediaResults } from './hooks';
 import InserterNoResults from '../no-results';
-import BlockPatternsPaging from '../../block-patterns-paging';
 
-const MEDIA_ITEMS_PER_PAGE = 20;
+// Four rows at the grid's two columns: roughly one screen of the open panel,
+// so a page is browsed with little scrolling and the pager does the rest.
+const MEDIA_ITEMS_PER_PAGE = 8;
 
 // The attach flow is image-only, so the picker is constrained to images.
 const ATTACH_ALLOWED_TYPES = [ 'image' ];
@@ -64,19 +63,63 @@ function AttachImagesButton( { onSelect } ) {
 	);
 }
 
-export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
-	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();
+/**
+ * The body of the "Detach" action's confirmation modal.
+ *
+ * @param {Object}   props
+ * @param {string}   [props.postTypeLabel] Name of the post type, e.g. "Page".
+ * @param {Function} props.onCancel
+ * @param {Function} props.onConfirm
+ */
+function DetachConfirmation( { postTypeLabel, onCancel, onConfirm } ) {
+	return (
+		<>
+			<p>
+				{ postTypeLabel
+					? sprintf(
+							/* translators: %s: Name of the post type e.g: "Page". */
+							__(
+								'Detach this image from the current %s? The image will remain in the Media Library.'
+							),
+							postTypeLabel
+					  )
+					: __(
+							'Detach this image from the current post? The image will remain in the Media Library.'
+					  ) }
+			</p>
+			<div className="block-editor-inserter__media-panel-detach-actions">
+				<Button
+					__next40pxDefaultSize
+					variant="tertiary"
+					onClick={ onCancel }
+				>
+					{ __( 'Cancel' ) }
+				</Button>
+				<Button
+					__next40pxDefaultSize
+					variant="primary"
+					onClick={ onConfirm }
+				>
+					{ __( 'Detach' ) }
+				</Button>
+			</div>
+		</>
+	);
+}
+
+export function MediaCategoryPanel( { onInsert, category } ) {
+	// The grid's search input debounces on its own, so the panel queries with
+	// the value it hands over as-is.
+	const [ search, setSearch ] = useDebouncedInput();
 	const [ page, setPage ] = useState( 1 );
-	// The desktop panel persists across category switches (it's driven by the
-	// selected category, not remounted), so reset paging whenever the source
-	// category or the search term changes. Adjusting state during render (rather
-	// than in an effect) keeps the query on page 1 for the very next fetch,
-	// avoiding a wasted request for the previous page. Mirrors `usePatternsPaging`.
+	// Reset paging whenever the source category or the search term changes.
+	// Adjusting state during render (rather than in an effect) keeps the query
+	// on page 1 for the very next fetch, avoiding a wasted request for the
+	// previous page. Mirrors `usePatternsPaging`.
 	const previousCategory = usePrevious( category.name );
-	const previousSearch = usePrevious( debouncedSearch );
+	const previousSearch = usePrevious( search );
 	if (
-		( previousCategory !== category.name ||
-			previousSearch !== debouncedSearch ) &&
+		( previousCategory !== category.name || previousSearch !== search ) &&
 		page !== 1
 	) {
 		setPage( 1 );
@@ -85,9 +128,9 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 		() => ( {
 			per_page: MEDIA_ITEMS_PER_PAGE,
 			page,
-			search: debouncedSearch,
+			search,
 		} ),
-		[ page, debouncedSearch ]
+		[ page, search ]
 	);
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
 	const { mediaList, isLoading, totalItems, totalPages } = useMediaResults(
@@ -115,29 +158,17 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const detach = supportsAttachments ? category.detach : undefined;
 	const subscribe = supportsAttachments ? category.subscribe : undefined;
 
-	// Only show the pager for multi-page sources. Gating on the page count (not
-	// `mediaList.length`) keeps the footer mounted while paging, since the count
-	// persists across the fetch. It also skips the shared component's stray
-	// single-page item count, which reads oddly here.
-	const showPagination = numPages > 1;
-	// The footer holds the pager and/or the attach button; it exists when either
-	// is present so it can own their shared top/horizontal breathing room.
-	const hasFooter = showPagination || !! attach;
-	const scrollContainerRef = useRef();
+	const panelRef = useRef();
 	const changePage = useCallback( ( nextPage ) => {
-		const scrollContainer = getScrollContainer(
-			scrollContainerRef.current
-		);
-		scrollContainer?.scrollTo( 0, 0 );
+		// The grid's layout container is the scroll host; start the new page
+		// from the top rather than wherever the previous one was scrolled to.
+		panelRef.current
+			?.querySelector( '.dataviews-layout__container' )
+			?.scrollTo?.( 0, 0 );
 		setPage( nextPage );
 	}, [] );
 	const { createErrorNotice, createSuccessNotice, createWarningNotice } =
 		useDispatch( noticesStore );
-
-	// Dim (rather than blank) the populated grid while a refetch is in flight,
-	// but only once it has run long enough to be worth signalling — quick
-	// attach/detach refetches resolve before this and show nothing.
-	const showRefreshing = useDelayedLoading( isLoading );
 
 	// Invalidate the cached results and force `useMediaResults` to refetch so
 	// the grid reflects images that were just attached or detached.
@@ -241,134 +272,87 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 		[ detach, category, refresh, createErrorNotice, createSuccessNotice ]
 	);
 
-	// Detaching is confirmed first: the dropdown sets the pending item, which
-	// opens a modal, and only `confirmDetach` performs the detach.
-	const [ mediaPendingDetach, setMediaPendingDetach ] = useState();
-	const confirmDetach = useCallback( () => {
-		const media = mediaPendingDetach;
-		setMediaPendingDetach( undefined );
-		handleDetach( media );
-	}, [ handleDetach, mediaPendingDetach ] );
-
-	const baseCssClass = 'block-editor-inserter__media-panel';
-	const searchLabel = category.labels.search_items || __( 'Search' );
-	return (
-		<div
-			ref={ scrollContainerRef }
-			className={ clsx( baseCssClass, {
-				// The footer supplies the breathing room beneath the grid, so the
-				// list drops its own bottom padding (see styles).
-				'has-footer': hasFooter,
-			} ) }
-		>
-			<SearchControl
-				className={ `${ baseCssClass }-search` }
-				onChange={ setSearch }
-				value={ search }
-				label={ searchLabel }
-				placeholder={ searchLabel }
-			/>
-			{ isLoading && ! mediaList?.length && (
-				<div className={ `${ baseCssClass }-spinner` }>
-					<Spinner />
-				</div>
-			) }
-			{ ! isLoading && ! mediaList?.length && (
-				<InserterNoResults>
-					{ category.emptyMessage && ! debouncedSearch
-						? // For a source with a custom empty message (e.g.
-						  // Attachments) and no active search, an empty result
-						  // means nothing is attached yet — clearer than the
-						  // generic "no results found".
-						  category.emptyMessage
-						: __( 'No results found.' ) }
-				</InserterNoResults>
-			) }
-			{ !! mediaList?.length && (
-				// Keep the existing items visible while a refetch is in flight,
-				// dimming (and gently pulsing) them rather than clearing the grid,
-				// so it doesn't flicker or pop.
-				<div
-					className={ clsx( `${ baseCssClass }-results`, {
-						'is-loading': showRefreshing,
-					} ) }
-					aria-busy={ showRefreshing }
-				>
-					<MediaList
-						rootClientId={ rootClientId }
-						onClick={ onInsert }
-						onDetach={ detach ? setMediaPendingDetach : undefined }
-						mediaList={ mediaList }
-						category={ category }
+	// Per-item actions for the grid's card menu. None supports bulk, so the
+	// grid renders no selection checkboxes.
+	const actions = useMemo( () => {
+		const list = [];
+		if ( category.getReportUrl ) {
+			list.push( {
+				id: 'report',
+				label: sprintf(
+					/* translators: %s: The media type to report e.g: "image", "video", "audio" */
+					__( 'Report %s' ),
+					category.mediaType
+				),
+				icon: external,
+				callback: ( [ media ] ) => {
+					window
+						.open( category.getReportUrl( media ), '_blank' )
+						.focus();
+				},
+			} );
+		}
+		if ( detach ) {
+			list.push( {
+				id: 'detach',
+				label: category.postTypeLabel
+					? sprintf(
+							/* translators: %s: Name of the post type e.g: "Page". */
+							__( 'Detach from %s' ),
+							category.postTypeLabel
+					  )
+					: __( 'Detach from post' ),
+				icon: linkOff,
+				modalHeader: __( 'Detach image' ),
+				// Detaching is confirmed in the action's modal before it takes
+				// effect.
+				RenderModal: ( { items, closeModal } ) => (
+					<DetachConfirmation
+						postTypeLabel={ category.postTypeLabel }
+						onCancel={ closeModal }
+						onConfirm={ () => {
+							closeModal?.();
+							handleDetach( items[ 0 ] );
+						} }
 					/>
-				</div>
-			) }
-			{ hasFooter && (
-				// A single footer wrapper owns the top and horizontal breathing
-				// room, so the pager and attach button don't span the full width
-				// and sit clear of the grid above (see styles).
-				<Stack
-					direction="column"
-					gap="sm"
-					className={ `${ baseCssClass }-footer` }
-				>
-					{ showPagination && (
-						// Reuse the Patterns tab pager (presentational only); only
-						// rendered for multi-page sources (see `showPagination`).
-						<BlockPatternsPaging
-							currentPage={ page }
-							numPages={ numPages }
-							changePage={ changePage }
-							totalItems={ totalItems }
-						/>
-					) }
-					{ attach && (
-						// Lines up with the "Open Media Library" button in the
-						// adjacent column.
-						<AttachImagesButton onSelect={ handleAttach } />
-					) }
-				</Stack>
-			) }
-			{ mediaPendingDetach && (
-				// A plain `Modal` (not `ConfirmDialog`) so we can pass
-				// `overlayClassName` and stack it above the options dropdown that
-				// opened it (see the z-index entry in `_z-index.scss`).
-				<Modal
-					title={ __( 'Detach image' ) }
-					onRequestClose={ () => setMediaPendingDetach( undefined ) }
-					overlayClassName={ `${ baseCssClass }-detach-modal` }
-				>
-					<p>
-						{ category.postTypeLabel
-							? sprintf(
-									/* translators: %s: Name of the post type e.g: "Page". */
-									__(
-										'Detach this image from the current %s? The image will remain in the Media Library.'
-									),
-									category.postTypeLabel
-							  )
-							: __(
-									'Detach this image from the current post? The image will remain in the Media Library.'
-							  ) }
-					</p>
-					<div className={ `${ baseCssClass }-detach-actions` }>
-						<Button
-							__next40pxDefaultSize
-							variant="tertiary"
-							onClick={ () => setMediaPendingDetach( undefined ) }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							__next40pxDefaultSize
-							variant="primary"
-							onClick={ confirmDetach }
-						>
-							{ __( 'Detach' ) }
-						</Button>
-					</div>
-				</Modal>
-			) }
+				),
+			} );
+		}
+		return list;
+	}, [ category, detach, handleDetach ] );
+
+	const searchLabel = category.labels.search_items || __( 'Search' );
+	const emptyMessage =
+		category.emptyMessage && ! search
+			? // For a source with a custom empty message (e.g. Attachments)
+			  // and no active search, an empty result means nothing is
+			  // attached yet — clearer than the generic "no results found".
+			  category.emptyMessage
+			: __( 'No results found.' );
+
+	return (
+		<div ref={ panelRef } className="block-editor-inserter__media-panel">
+			<MediaGrid
+				mediaList={ mediaList }
+				isLoading={ isLoading }
+				totalItems={ totalItems }
+				totalPages={ totalPages }
+				page={ page }
+				perPage={ MEDIA_ITEMS_PER_PAGE }
+				onChangePage={ changePage }
+				search={ search }
+				onChangeSearch={ setSearch }
+				category={ category }
+				onInsert={ onInsert }
+				actions={ actions }
+				searchLabel={ searchLabel }
+				empty={
+					<InserterNoResults>{ emptyMessage }</InserterNoResults>
+				}
+				footer={
+					attach && <AttachImagesButton onSelect={ handleAttach } />
+				}
+			/>
 		</div>
 	);
 }

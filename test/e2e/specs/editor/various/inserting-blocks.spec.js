@@ -932,10 +932,20 @@ test.describe( 'insert media from inserter', () => {
 
 		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
-		// `exact` so this matches only the "Images" source and not the new
-		// "Attached images" source, which also contains "Images".
-		await page.getByRole( 'tab', { name: 'Images', exact: true } ).click();
-		await page.getByLabel( uploadedMedia.title.raw ).click();
+		// Each media source is a collapsible panel. `exact` so this matches only
+		// the "Images" source and not the "Attached images" source, which also
+		// contains "Images". It is the first source, so it is already open;
+		// clicking it keeps it open.
+		const imagesSource = page.getByRole( 'button', {
+			name: 'Images',
+			exact: true,
+		} );
+		await expect( imagesSource ).toHaveAttribute( 'aria-expanded', 'true' );
+		// The card's preview is the click-to-insert target, named by the
+		// item's title.
+		await page
+			.getByRole( 'button', { name: uploadedMedia.title.raw } )
+			.click();
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:image {"id":${ uploadedMedia.id }} -->
 <figure class="wp-block-image"><img src="${ uploadedMedia.source_url }" alt="${ uploadedMedia.alt_text }" class="wp-image-${ uploadedMedia.id }"/></figure>
@@ -983,25 +993,28 @@ test.describe( 'Attached images media category', () => {
 
 		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
-		await page.getByRole( 'tab', { name: 'Attached images' } ).click();
+		// Each media source is a collapsible panel; open the attached images one.
+		await page.getByRole( 'button', { name: 'Attached images' } ).click();
 
 		const mediaPanel = page.locator(
 			'.block-editor-inserter__media-panel'
 		);
-		const attachedImage = mediaPanel.getByRole( 'option', {
+		// The card's preview is the click-to-insert target, named by the
+		// item's title.
+		const attachedImage = mediaPanel.getByRole( 'button', {
 			name: media.title.raw,
 		} );
 		await expect( attachedImage ).toBeVisible();
 
-		// The per-item options button is only revealed once the item is
-		// hovered, matching how a user reaches the detach action.
+		// The per-item actions menu is only revealed once the card is hovered,
+		// matching how a user reaches the detach action.
 		await attachedImage.hover();
-		await mediaPanel.getByRole( 'button', { name: 'Options' } ).click();
+		await mediaPanel.getByRole( 'button', { name: 'Actions' } ).click();
 		await page
 			.getByRole( 'menuitem', { name: 'Detach from post' } )
 			.click();
 
-		// Detaching is confirmed in a modal before it takes effect.
+		// Detaching is confirmed in the action's modal before it takes effect.
 		await page
 			.getByRole( 'dialog', { name: 'Detach image' } )
 			.getByRole( 'button', { name: 'Detach' } )

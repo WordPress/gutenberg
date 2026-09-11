@@ -1420,20 +1420,7 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/inserter/media-tab/media-list.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/inserter/media-tab/media-panel.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inserter/media-tab/media-preview.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
