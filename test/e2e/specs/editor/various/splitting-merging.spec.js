@@ -868,17 +868,15 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 				cancelled: window.__enterCancelled,
 			} ) );
 		// Nothing happens on keydown: the beforeinput fires, is cancelled,
-		// and focus only moves while it is being handled. Focus can move
-		// twice: into the new field, then to the editing host that engages
-		// once the block has a sibling.
-		expect( events.slice( 0, 2 ) ).toEqual( [
+		// and focus only moves while it is being handled. Focus moves into
+		// the new field, then to the editing host that engages once the
+		// block has a sibling.
+		expect( events ).toEqual( [
 			'keydown',
 			'beforeinput:insertParagraph',
+			'focusin',
+			'focusin',
 		] );
-		expect( events.length ).toBeGreaterThan( 2 );
-		expect( events.slice( 2 ).every( ( e ) => e === 'focusin' ) ).toBe(
-			true
-		);
 		expect( cancelled ).toBe( true );
 
 		// The caret is at the very start of the new field: not after the
