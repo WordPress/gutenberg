@@ -137,65 +137,36 @@ export const OpenOnlyOnMatch: Story = {
 	},
 };
 
-function getStatusChildren( {
-	loading,
-	count,
-	visibleCount,
-}: {
-	loading: boolean;
-	count: number;
-	visibleCount: boolean;
-} ) {
+function AsyncStatus( { loading }: { loading: boolean } ) {
+	const filteredItems = Autocomplete.useFilteredItems< FixtureItem >();
+
 	if ( loading ) {
 		return (
-			<Stack direction="row" gap="sm" align="center">
-				<Spinner />
-				Loading…
-			</Stack>
+			<Autocomplete.Status>
+				<Stack direction="row" gap="sm" align="center">
+					<Spinner />
+					Loading…
+				</Stack>
+			</Autocomplete.Status>
 		);
 	}
 
-	if ( count === 0 ) {
-		return null;
-	}
-
-	const message =
-		count === 1 ? '1 result found.' : `${ count } results found.`;
-
-	if ( visibleCount ) {
-		return message;
-	}
-
-	return <VisuallyHidden>{ message }</VisuallyHidden>;
-}
-
-function AsyncStatus( {
-	loading,
-	visibleCount,
-}: {
-	loading: boolean;
-	visibleCount: boolean;
-} ) {
-	const filteredItems = Autocomplete.useFilteredItems< FixtureItem >();
+	const count = filteredItems.length;
 
 	return (
 		<Autocomplete.Status>
-			{ getStatusChildren( {
-				loading,
-				count: filteredItems.length,
-				visibleCount,
-			} ) }
+			{ count === 0 ? null : (
+				<VisuallyHidden>
+					{ count === 1
+						? '1 result found.'
+						: `${ count } results found.` }
+				</VisuallyHidden>
+			) }
 		</Autocomplete.Status>
 	);
 }
 
-function AsyncItemsTemplate( {
-	args,
-	visibleCount,
-}: {
-	args: Story[ 'args' ];
-	visibleCount: boolean;
-} ) {
+function AsyncItemsTemplate( { args }: { args: Story[ 'args' ] } ) {
 	const [ query, setQuery ] = useState( '' );
 	const [ loading, setLoading ] = useState( false );
 	const [ results, setResults ] = useState< typeof URLS >( [] );
@@ -225,10 +196,7 @@ function AsyncItemsTemplate( {
 		>
 			<Autocomplete.Input aria-label="URL" placeholder="Enter a URL" />
 			<Autocomplete.Popup>
-				<AsyncStatus
-					loading={ loading }
-					visibleCount={ visibleCount }
-				/>
+				<AsyncStatus loading={ loading } />
 				<Autocomplete.Empty>
 					{ loading ? null : 'No matching items.' }
 				</Autocomplete.Empty>
@@ -257,17 +225,7 @@ function AsyncItemsTemplate( {
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
-		return <AsyncItemsTemplate args={ args } visibleCount={ false } />;
-	},
-};
-
-/**
- * Same async pattern as `AsyncItems`, with the result count visible in the
- * popup.
- */
-export const AsyncItemsVisibleCount: Story = {
-	render: function Template( args ) {
-		return <AsyncItemsTemplate args={ args } visibleCount />;
+		return <AsyncItemsTemplate args={ args } />;
 	},
 };
 

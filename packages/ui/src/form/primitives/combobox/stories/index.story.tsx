@@ -246,65 +246,36 @@ export const Creatable: Story = {
 	},
 };
 
-function getStatusChildren( {
-	loading,
-	count,
-	visibleCount,
-}: {
-	loading: boolean;
-	count: number;
-	visibleCount: boolean;
-} ) {
+function AsyncStatus( { loading }: { loading: boolean } ) {
+	const filteredItems = Combobox.useFilteredItems< FixtureItem >();
+
 	if ( loading ) {
 		return (
-			<Stack direction="row" gap="sm" align="center">
-				<Spinner />
-				Loading…
-			</Stack>
+			<Combobox.Status>
+				<Stack direction="row" gap="sm" align="center">
+					<Spinner />
+					Loading…
+				</Stack>
+			</Combobox.Status>
 		);
 	}
 
-	if ( count === 0 ) {
-		return null;
-	}
-
-	const message =
-		count === 1 ? '1 result found.' : `${ count } results found.`;
-
-	if ( visibleCount ) {
-		return message;
-	}
-
-	return <VisuallyHidden>{ message }</VisuallyHidden>;
-}
-
-function AsyncStatus( {
-	loading,
-	visibleCount,
-}: {
-	loading: boolean;
-	visibleCount: boolean;
-} ) {
-	const filteredItems = Combobox.useFilteredItems< FixtureItem >();
+	const count = filteredItems.length;
 
 	return (
 		<Combobox.Status>
-			{ getStatusChildren( {
-				loading,
-				count: filteredItems.length,
-				visibleCount,
-			} ) }
+			{ count === 0 ? null : (
+				<VisuallyHidden>
+					{ count === 1
+						? '1 result found.'
+						: `${ count } results found.` }
+				</VisuallyHidden>
+			) }
 		</Combobox.Status>
 	);
 }
 
-function AsyncItemsTemplate( {
-	args,
-	visibleCount,
-}: {
-	args: Story[ 'args' ];
-	visibleCount: boolean;
-} ) {
+function AsyncItemsTemplate( { args }: { args: Story[ 'args' ] } ) {
 	const [ loading, setLoading ] = useState( false );
 	const [ items, setItems ] = useState< FixtureItem[] >( [] );
 	const [ value, setValue ] = useState< FixtureItem | undefined >();
@@ -343,10 +314,7 @@ function AsyncItemsTemplate( {
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
-				<AsyncStatus
-					loading={ loading }
-					visibleCount={ visibleCount }
-				/>
+				<AsyncStatus loading={ loading } />
 				<Combobox.Empty>
 					{ loading ? null : 'No results found.' }
 				</Combobox.Empty>
@@ -375,17 +343,7 @@ function AsyncItemsTemplate( {
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
-		return <AsyncItemsTemplate args={ args } visibleCount={ false } />;
-	},
-};
-
-/**
- * Same async pattern as `AsyncItems`, with the result count visible in the
- * popup.
- */
-export const AsyncItemsVisibleCount: Story = {
-	render: function Template( args ) {
-		return <AsyncItemsTemplate args={ args } visibleCount />;
+		return <AsyncItemsTemplate args={ args } />;
 	},
 };
 
