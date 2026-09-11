@@ -9,6 +9,7 @@ export type ParsedSection = {
 	body: string;
 	sha?: string;
 	runUrl?: string;
+	generation?: number;
 };
 
 export type SectionUpdate = {
@@ -16,6 +17,8 @@ export type SectionUpdate = {
 	body: string;
 	sha?: string;
 	runUrl?: string;
+	/** Run that produced this, to order writes a commit cannot order. */
+	generation?: number;
 };
 
 const SECTION_PATTERN =
@@ -40,8 +43,116 @@ export function sanitizeBody( body: string ): string {
 	return body.replace( /<!--(\s*\/?\s*)pr-meta:/g, '&lt;!--$1pr-meta:' );
 }
 
-function parseAttributes( raw: string ): { sha?: string; runUrl?: string } {
-	const attributes: { sha?: string; runUrl?: string } = {};
+/** Section headings are `####`, so a body's own headings start below them. */
+const BODY_HEADING_LEVEL = 5;
+const MAX_HEADING_LEVEL = 6;
+
+/*
+ * The hashes and the rest of the line, so neither is reconstructed by hand.
+ * `s` matters: without it a `.` stops at the carriage return of a CRLF body,
+ * so no line would match and the body would be left half demoted.
+ */
+const HEADING = /^( {0,3})(#{1,6})(\s.*|)$/s;
+/* A fence opens on three or more backticks or tildes, indented at most three. */
+const FENCE = /^ {0,3}(`{3,}|~{3,})(.*)$/s;
+
+/**
+ * Tracks whether a line falls inside a fenced code block.
+ *
+ * Toggling on every fence-looking line is not enough: a fence closes only on
+ * the character it opened with, repeated at least as many times, and a
+ * backtick fence's info string may not itself contain a backtick.
+ *
+ * @return A function reporting whether each line handed to it is fenced.
+ */
+function fenceTracker() {
+	let open: string | undefined;
+
+	return ( line: string ): boolean => {
+		const match = line.match( FENCE );
+
+		if ( ! match ) {
+			return open !== undefined;
+		}
+
+		const [ , marker, info ] = match;
+
+		if ( open === undefined ) {
+			if ( marker.startsWith( '`' ) && info.includes( '`' ) ) {
+				return false;
+			}
+			open = marker;
+			return true;
+		}
+
+		if (
+			marker[ 0 ] === open[ 0 ] &&
+			marker.length >= open.length &&
+			info.trim() === ''
+		) {
+			open = undefined;
+		}
+
+		return true;
+	};
+}
+
+/**
+ * Pushes a body's own headings below the heading of its section.
+ *
+ * A producer renders its markdown without knowing where it will sit, so props
+ * opens with `## Unlinked Accounts` and would outrank the `#### Props` above
+ * it. Shifting them all by the same amount keeps their hierarchy intact.
+ *
+ * @param body Markdown that may carry its own headings.
+ * @return The same markdown, its headings demoted.
+ */
+export function demoteHeadings( body: string ): string {
+	const lines = body.split( '\n' );
+
+	let isFenced = fenceTracker();
+	let shallowest = MAX_HEADING_LEVEL;
+
+	for ( const line of lines ) {
+		const level = isFenced( line )
+			? undefined
+			: line.match( HEADING )?.[ 2 ].length;
+
+		if ( level !== undefined ) {
+			shallowest = Math.min( shallowest, level );
+		}
+	}
+
+	const shift = Math.max( 0, BODY_HEADING_LEVEL - shallowest );
+
+	if ( shift === 0 ) {
+		return body;
+	}
+
+	isFenced = fenceTracker();
+
+	return lines
+		.map( ( line ) => {
+			if ( isFenced( line ) ) {
+				return line;
+			}
+
+			return line.replace(
+				HEADING,
+				( _, indent, hashes, rest ) =>
+					`${ indent }${ '#'.repeat(
+						Math.min( hashes.length + shift, MAX_HEADING_LEVEL )
+					) }${ rest }`
+			);
+		} )
+		.join( '\n' );
+}
+
+function parseAttributes(
+	raw: string
+): Pick< ParsedSection, 'sha' | 'runUrl' | 'generation' > {
+	const attributes: Pick< ParsedSection, 'sha' | 'runUrl' | 'generation' > =
+		{};
 
 	for ( const pair of raw.trim().split( /\s+/ ).filter( Boolean ) ) {
 		const [ key, value ] = pair.split( '=' );
@@ -49,6 +160,11 @@ function parseAttributes( raw: string ): { sha?: string; runUrl?: string } {
 			attributes.sha = value;
 		} else if ( key === 'run' ) {
 			attributes.runUrl = value;
+		} else if ( key === 'gen' ) {
+			const generation = Number.parseInt( value, 10 );
+			attributes.generation = Number.isNaN( generation )
+				? undefined
+				: generation;
 		}
 	}
 
@@ -159,6 +275,7 @@ function renderSection(
 	const attributes = [
 		section.sha && `sha=${ section.sha }`,
 		section.runUrl && `run=${ section.runUrl }`,
+		section.generation !== undefined && `gen=${ section.generation }`,
 	]
 		.filter( Boolean )
 		.join( ' ' );
@@ -172,6 +289,15 @@ function renderSection(
 		definition ?? UNKNOWN_SECTION,
 		section.runUrl
 	);
+
+	/*
+	 * A cleared section stays as a bare pair of markers, invisible in the
+	 * rendered comment but still carrying its generation, so a run that was
+	 * gathered earlier cannot bring the old content back.
+	 */
+	if ( body === '' ) {
+		return `${ open }\n\n${ close }`;
+	}
 
 	const delimited = `${ open }\n${ body }\n${ close }`;
 
@@ -287,6 +413,23 @@ export function mergeSection(
 	 * optional, since without either one the two cases are indistinguishable
 	 * and guessing lets the stale run through.
 	 */
+	/*
+	 * A section describing the pull request rather than a commit has no SHA to
+	 * order writes by. Two runs can gather their view, queue behind each other
+	 * on the shared lock, and land out of order, so the later-numbered run
+	 * wins regardless of which reaches the lock first.
+	 */
+	if (
+		definition.scope === 'pr-state' &&
+		update.generation !== undefined &&
+		current?.generation !== undefined &&
+		update.generation < current.generation
+	) {
+		return {
+			rejected: `Result is from run ${ update.generation }, older than the run ${ current.generation } already reported.`,
+		};
+	}
+
 	if ( definition.scope === 'commit' && ( update.body || current ) ) {
 		if ( ! update.sha || ! headSha ) {
 			return {
@@ -302,26 +445,41 @@ export function mergeSection(
 		}
 	}
 
-	const body = sanitizeBody( update.body ).trim();
+	const body = demoteHeadings( sanitizeBody( update.body ) ).trim();
 	const remaining = sections.filter(
 		( section ) => section.id !== update.id
 	);
-	const next = body
-		? [
-				...remaining,
-				{
-					id: update.id,
-					body,
-					sha: definition.scope === 'commit' ? update.sha : undefined,
-					runUrl:
-						definition.scope === 'commit'
-							? update.runUrl
-							: undefined,
-				},
-		  ]
-		: remaining;
+	/*
+	 * Clearing keeps the entry when it has a generation to remember, so a
+	 * later, older write is still ordered against it.
+	 */
+	const cleared =
+		definition.scope === 'pr-state' && update.generation !== undefined;
+	const next =
+		body || cleared
+			? [
+					...remaining,
+					{
+						id: update.id,
+						body,
+						sha:
+							definition.scope === 'commit'
+								? update.sha
+								: undefined,
+						runUrl:
+							definition.scope === 'commit'
+								? update.runUrl
+								: undefined,
+						generation:
+							definition.scope === 'pr-state'
+								? update.generation
+								: undefined,
+					},
+			  ]
+			: remaining;
 
-	if ( next.length === 0 ) {
+	/* Markers alone render as nothing, so a comment of them is worth no comment. */
+	if ( next.every( ( section ) => section.body === '' ) ) {
 		return { remove: Boolean( existing ) };
 	}
 
