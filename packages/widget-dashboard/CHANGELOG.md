@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Run rendered Widget Dashboard tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
+## 0.7.0 (2026-09-10)
+
 ### New Features
 
 -   `WidgetDashboard.Policy`: a provider that governs the dashboards below
@@ -47,6 +53,7 @@
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+-   Declare the `@storybook/addon-docs` development dependency used by the package's story documentation ([#82676](https://github.com/WordPress/gutenberg/pull/82676)).
 
 ### Bug Fixes
 
