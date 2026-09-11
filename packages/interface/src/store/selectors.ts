@@ -42,7 +42,7 @@ export const getActiveComplementaryArea = createRegistrySelector(
 export const isComplementaryAreaLoading = createRegistrySelector(
 	( select ) => ( state: StoreState, scope: string ) => {
 		scope = normalizeComplementaryAreaScope( scope );
-		const isVisible = select( preferencesStore ).get(
+		const isVisible: boolean | undefined = select( preferencesStore ).get(
 			scope,
 			'isComplementaryAreaVisible'
 		);
@@ -65,10 +65,9 @@ export const isItemPinned = createRegistrySelector(
 	( select ) => ( state: StoreState, scope: string, item: string ) => {
 		scope = normalizeComplementaryAreaScope( scope );
 		item = normalizeComplementaryAreaName( scope, item );
-		const pinnedItems = select( preferencesStore ).get(
-			scope,
-			'pinnedItems'
-		);
+		const pinnedItems: Record< string, boolean > | undefined = select(
+			preferencesStore
+		).get( scope, 'pinnedItems' );
 		return pinnedItems?.[ item ] ?? true;
 	}
 );
