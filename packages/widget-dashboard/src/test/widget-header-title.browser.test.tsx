@@ -28,8 +28,16 @@ function Header( { title, width }: { title: string; width: number } ) {
 					showIdentity
 				/>
 			</div>
+			<div data-testid="outside" style={ { height: 40 } } />
 		</Tooltip.Provider>
 	);
+}
+
+// The tooltip opens on `mouseenter`, so the pointer has to arrive from
+// outside the heading; where the previous test left it is not guaranteed.
+async function hoverFromOutside( element: HTMLElement ) {
+	await userEvent.hover( screen.getByTestId( 'outside' ) );
+	await userEvent.hover( element );
 }
 
 describe( 'WidgetHeader title', () => {
@@ -38,13 +46,11 @@ describe( 'WidgetHeader title', () => {
 
 		const heading = screen.getByRole( 'heading', { name: LONG_TITLE } );
 		expect( heading.scrollWidth ).toBeGreaterThan( heading.clientWidth );
-		// The trigger arms on the ResizeObserver tick, after layout; hovering
-		// before that fires mouseenter on a disabled trigger.
 		await waitFor( () =>
 			expect( heading ).toHaveAttribute( 'tabindex', '0' )
 		);
 
-		await userEvent.hover( heading );
+		await hoverFromOutside( heading );
 
 		await waitFor( () =>
 			expect( screen.getAllByText( LONG_TITLE ) ).toHaveLength( 2 )
@@ -105,7 +111,7 @@ describe( 'WidgetHeader title', () => {
 		);
 		expect( heading ).not.toHaveAttribute( 'tabindex' );
 
-		await userEvent.hover( heading );
+		await hoverFromOutside( heading );
 
 		// The popup mounts asynchronously, so give a wrongly enabled tooltip a
 		// chance to appear before asserting it never did.
