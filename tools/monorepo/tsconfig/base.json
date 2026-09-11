@@ -47,12 +47,20 @@
 
 		/*
 		 * `../typings` is this workspace's own. `@types` packages are not:
-		 * the install hoists them to the repo root, which is the one place
-		 * this config still has to reach outside itself. A linked install
-		 * moves them into each workspace (see #75814), and that PR changes
-		 * this entry to `${configDir}/node_modules/@types`.
+		 * a hoisted install puts them at the repo root, a linked one puts
+		 * them in the workspace that declared them. Both are listed because
+		 * TypeScript skips a type root that does not exist, so the preset
+		 * serves either layout.
+		 *
+		 * TODO: Remove `../../../node_modules/@types` once
+		 * https://github.com/WordPress/gutenberg/pull/75814 is merged. It is
+		 * the last path here that reaches outside the workspace.
 		 */
-		"typeRoots": [ "../typings", "../../../node_modules/@types" ],
+		"typeRoots": [
+			"../typings",
+			"${configDir}/node_modules/@types",
+			"../../../node_modules/@types"
+		],
 		"types": [],
 
 		"rootDir": "${configDir}/src",
