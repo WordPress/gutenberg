@@ -23,8 +23,13 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { getFilename } from '@wordpress/url';
 import { Link } from '@wordpress/ui';
-import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
+import {
+	ALLOWED_MEDIA_TYPES,
+	COVER_MIN_HEIGHT,
+	mediaPosition,
+} from '../shared';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import {
@@ -35,6 +40,7 @@ import {
 } from '../../utils/style-state';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 import PosterImage from '../../utils/poster-image';
+import { MediaControl } from '../../utils/media-control';
 
 const {
 	cleanEmptyObject,
@@ -98,7 +104,11 @@ export default function CoverInspectorControls( {
 	setOverlayColor,
 	coverRef,
 	currentSettings,
+	onSelectMedia,
+	onUploadError,
+	toggleUseFeaturedImage,
 	updateDimRatio,
+	onClearMedia,
 	featuredImage,
 } ) {
 	const {
@@ -138,6 +148,24 @@ export default function CoverInspectorControls( {
 		},
 		[ clientId ]
 	);
+	/*
+	 * The block only resolves the featured image record, so the record of a
+	 * media selection of its own is resolved here to name it in the panel.
+	 */
+	const selectedMedia = useSelect(
+		( select ) =>
+			id && ! useFeaturedImage
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id,
+						{ context: 'view' }
+				  )
+				: undefined,
+		[ id, useFeaturedImage ]
+	);
+	const mediaRecord = useFeaturedImage ? featuredImage : selectedMedia;
+
 	const hasSelectedStyleState =
 		! isDefaultBlockStyleState( selectedStyleState );
 	const selectedStyleStateKey = getStyleStateKey( selectedStyleState );
@@ -277,8 +305,49 @@ export default function CoverInspectorControls( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	/*
+	 * Rendered whether or not media has been set, so that a cover in its setup
+	 * state can be given media from the inspector as well as from the toolbar.
+	 * The settings below stay behind their own condition, having nothing to
+	 * configure until there is media to configure.
+	 */
+	const mediaInspectorPanel = (
+		<InspectorControls group="content">
+			<ToolsPanel
+				label={ __( 'Media' ) }
+				resetAll={ onClearMedia }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
+					label={ __( 'Media' ) }
+					hasValue={ () => !! url || !! useFeaturedImage }
+					onDeselect={ onClearMedia }
+					isShownByDefault
+				>
+					<MediaControl
+						mediaId={ id }
+						mediaUrl={ url }
+						filename={
+							mediaRecord?.media_details?.sizes?.full?.file ||
+							mediaRecord?.slug ||
+							getFilename( url )
+						}
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						onSelect={ onSelectMedia }
+						onError={ onUploadError }
+						onReset={ onClearMedia }
+						useFeaturedImage={ useFeaturedImage }
+						onToggleFeaturedImage={ toggleUseFeaturedImage }
+						emptyLabel={ __( 'Add media' ) }
+					/>
+				</ToolsPanelItem>
+			</ToolsPanel>
+		</InspectorControls>
+	);
+
 	return (
 		<>
+			{ mediaInspectorPanel }
 			{ ( !! url || useFeaturedImage ) && (
 				<InspectorControls>
 					<ToolsPanel
