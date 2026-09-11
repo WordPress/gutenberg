@@ -4,6 +4,7 @@ import { forwardRef, useEffect, useId } from '@wordpress/element';
 import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import fieldStyles from '../../../utils/css/field.module.css';
 import { useFieldsetContext } from './context';
+import styles from './style.module.css';
 import type { FieldsetDescriptionProps } from './types';
 
 export const FieldsetDescription = forwardRef<
@@ -31,6 +32,7 @@ export const FieldsetDescription = forwardRef<
 			{
 				className: clsx(
 					defenseStyles.p,
+					styles.description,
 					fieldStyles.description,
 					className
 				),
