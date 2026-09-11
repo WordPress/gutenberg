@@ -151,3 +151,15 @@ export function getResponsiveMediaQueries(
 
 	return mediaQueries;
 }
+
+/**
+ * Returns responsive media query aliases for viewport settings.
+ *
+ * @param viewportSettings Viewport settings.
+ * @return Responsive media queries keyed by alias.
+ */
+export function getViewportMediaQueries(
+	viewportSettings?: ViewportSettings
+): Record< string, string > {
+	return getResponsiveMediaQueries( viewportSettings );
+}

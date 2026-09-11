@@ -618,6 +618,19 @@ _Returns_
 
 -   `string | undefined`: CSS var string for given spacing preset value.
 
+### getStyleForState
+
+Returns the style object for the selected block style state.
+
+_Parameters_
+
+-   _style_ `Object`: The block style object.
+-   _selectedState_ `Object`: Selected block style state.
+
+_Returns_
+
+-   `Object`: The style object for the selected state, if found.
+
 ### getTypographyClassesAndStyles
 
 Provides the CSS class names and inline styles for a block's typography support attributes.
@@ -630,6 +643,30 @@ _Parameters_
 _Returns_
 
 -   `Object`: Typography block support derived CSS classes & styles.
+
+### hasPseudoBlockStyleState
+
+Returns true when a pseudo style state is selected.
+
+_Parameters_
+
+-   _selectedState_ `Object`: Selected block style state.
+
+_Returns_
+
+-   `boolean`: Whether a pseudo state is selected.
+
+### hasViewportBlockStyleState
+
+Returns true when a viewport style state is selected.
+
+_Parameters_
+
+-   _selectedState_ `Object`: Selected block style state.
+
+_Returns_
+
+-   `boolean`: Whether a viewport state is selected.
 
 ### HeadingLevelDropdown
 
@@ -683,6 +720,18 @@ Undocumented declaration.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md>
+
+### isDefaultBlockStyleState
+
+Returns true when the default style state is selected.
+
+_Parameters_
+
+-   _selectedState_ `Object`: Selected block style state.
+
+_Returns_
+
+-   `boolean`: Whether the default style state is selected.
 
 ### isValueSpacingPreset
 
@@ -883,6 +932,20 @@ Undocumented declaration.
 ### RichTextToolbarButton
 
 Undocumented declaration.
+
+### setStyleForState
+
+Returns a style object with the selected block style state updated.
+
+_Parameters_
+
+-   _style_ `Object`: The block style object.
+-   _selectedState_ `Object`: Selected block style state.
+-   _newStyle_ `Object`: New style for the selected state.
+
+_Returns_
+
+-   `Object`: The updated style object.
 
 ### SETTINGS_DEFAULTS
 
@@ -1129,6 +1192,14 @@ _Parameters_
 _Returns_
 
 -   `Object`: Props to pass to the element to mark as a block.
+
+### useBlockStyleState
+
+Returns the current block style state.
+
+_Returns_
+
+-   `Object`: The current block style state.
 
 ### useCachedTruthy
 
