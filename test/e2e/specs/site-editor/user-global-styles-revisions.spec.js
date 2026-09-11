@@ -270,19 +270,13 @@ test.describe( 'Style Revisions', () => {
 			page_on_front: frontPage.id,
 		} );
 
-		try {
-			await admin.visitSiteEditor();
-			await page.evaluate( async () => {
-				const theme = window.wp.data
-					.select( 'core' )
-					.getCurrentTheme()?.stylesheet;
-				await window.wp.data
-					.dispatch( 'core/preferences' )
-					.set( 'core', 'renderingModes', {
-						[ theme ]: { page: 'post-only' },
-					} );
-			} );
+		// Set over REST rather than dispatched, so it is persisted before the
+		// editor reads it.
+		await requestUtils.setPreferences( 'core', {
+			renderingModes: { emptytheme: { page: 'post-only' } },
+		} );
 
+		try {
 			await admin.visitSiteEditor();
 			await page
 				.getByRole( 'region', { name: 'Navigation' } )
@@ -316,11 +310,9 @@ test.describe( 'Style Revisions', () => {
 			).toBeHidden();
 			await page.keyboard.press( 'Escape' );
 		} finally {
-			await page.evaluate( () =>
-				window.wp.data
-					.dispatch( 'core/preferences' )
-					.set( 'core', 'renderingModes', {} )
-			);
+			await requestUtils.setPreferences( 'core', {
+				renderingModes: {},
+			} );
 			await requestUtils.updateSiteSettings( {
 				show_on_front: 'posts',
 				page_on_front: 0,
