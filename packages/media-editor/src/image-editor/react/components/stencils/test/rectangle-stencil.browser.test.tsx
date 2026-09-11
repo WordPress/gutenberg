@@ -353,17 +353,10 @@ describe( 'RectangleStencil', () => {
 
 			vi.spyOn( firstHandle, 'focus' );
 
-			fireEvent.pointerDown( firstHandle, {
-				button: 0,
-				clientX: 100,
-				clientY: 100,
-				pointerId: 1,
-			} );
-			fireEvent.pointerUp( firstHandle, {
-				pointerId: 1,
-			} );
+			await userEvent.dragAndDrop( firstHandle, firstHandle );
 
 			expect( firstHandle.focus ).toHaveBeenCalled();
+			expect( firstHandle ).toHaveFocus();
 		} );
 
 		it( 'does not start a pointer resize while resizing is disabled', async () => {
