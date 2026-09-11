@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { info, caution, error, published } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import type { BadgeProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import Icon from '../icon';

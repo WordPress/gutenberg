@@ -1,13 +1,6 @@
 /* eslint-disable jsdoc/require-param */
-
-/**
- * WordPress dependencies
- */
 import { useEvent } from '@wordpress/compose';
 import { useLayoutEffect } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import type { ElementOffsetRect } from '../element-rect';
 import { useOnValueUpdate } from './use-on-value-update';
 

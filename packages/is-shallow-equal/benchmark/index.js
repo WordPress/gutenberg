@@ -1,13 +1,5 @@
 'use strict';
-
-/**
- * External dependencies
- */
 const Benchmark = require( 'benchmark' );
-
-/**
- * WordPress dependencies
- */
 const lazyImport = require( '@wordpress/lazy-import' );
 
 const suite = new Benchmark.Suite();

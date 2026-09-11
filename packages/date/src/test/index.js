@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
 import momentLib from 'moment';
-
-/**
- * Internal dependencies
- */
+import { describe, expect, it, test } from 'vitest';
 import {
 	getSettings,
 	date as dateNoI18n,

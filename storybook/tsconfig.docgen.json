@@ -1,0 +1,18 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../tsconfig.base.json",
+	"compilerOptions": {
+		"composite": false,
+		"noEmit": true,
+		"rootDir": ".."
+	},
+	"references": [],
+	"include": [ "**/*.ts", "**/*.tsx", "../packages/*/src/**/*" ],
+	// Override the base exclusions to admit stories without also admitting tests.
+	"exclude": [
+		"../**/benchmark",
+		"../**/test/**",
+		"../**/tests/**",
+		"../**/__tests__/**"
+	]
+}

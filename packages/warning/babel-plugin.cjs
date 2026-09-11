@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const pkg = require( './package.json' );
 
 /**

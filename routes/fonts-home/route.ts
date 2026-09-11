@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { redirect } from '@wordpress/route';
 
 /**

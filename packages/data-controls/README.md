@@ -52,11 +52,8 @@ The default export is what you use to register the controls with your custom sto
 _Usage_
 
 ```js
-// WordPress dependencies
 import { controls } from '@wordpress/data-controls';
 import { registerStore } from '@wordpress/data';
-
-// Internal dependencies
 import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';

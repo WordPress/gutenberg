@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { focus } from '@wordpress/dom';
 import { forwardRef, useCallback } from '@wordpress/element';
 import { UP, DOWN, LEFT, RIGHT, HOME, END } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import RovingTabIndexContainer from './roving-tab-index';
 import type { TreeGridProps } from './types';
 import type { WordPressComponentProps } from '../context';

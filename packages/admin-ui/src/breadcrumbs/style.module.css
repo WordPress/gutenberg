@@ -7,9 +7,11 @@
 /*
  * Preceding items keep their intrinsic width; only the last (current) item
  * is allowed to shrink so that the truncation styles on `.current` engage.
+ * The margin reset keeps wp-admin's bottom margin on `li` out of the trail.
  */
 .list > li {
 	flex-shrink: 0;
+	margin: 0;
 }
 
 .list > li:last-child {

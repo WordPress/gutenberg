@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
@@ -242,6 +239,148 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		);
 	} );
 
+	test( 'should forward delete an empty heading without transforming the next block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/heading' } );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'My paragraph' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/heading', attributes: { content: '' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'My paragraph' },
+			},
+		] );
+
+		await page.keyboard.press( 'Delete' );
+		// The caret lands at the start of the surviving paragraph.
+		await page.keyboard.type( '‸' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '‸My paragraph' },
+			},
+		] );
+	} );
+
+	test( 'should forward delete an empty heading before an empty paragraph', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/heading' } );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.click();
+
+		await page.keyboard.press( 'Delete' );
+		// Typing proves the surviving block: the empty heading is removed
+		// and the caret sits in the empty default paragraph.
+		await page.keyboard.type( '2' );
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: '2' } },
+			] );
+	} );
+
+	test( 'should place the caret in the next block on forward delete from an empty paragraph', async ( {
+		editor,
+		page,
+	} ) => {
+		for ( const content of [ 'first', '', '', 'last' ] ) {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content },
+			} );
+		}
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.first()
+			.click();
+
+		// Forward delete removes the empty block; the caret must move to
+		// the start of the next block, not the end of the previous one,
+		// so repeated presses keep deleting forward.
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.type( '|' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'first' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '|last' },
+			},
+		] );
+	} );
+
+	test( 'should forward delete an empty paragraph without breaking apart the next block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{ name: 'core/list-item', attributes: { content: 'one' } },
+				{ name: 'core/list-item', attributes: { content: 'two' } },
+			],
+		} );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.focus();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: '' } },
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'one' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'two' },
+					},
+				],
+			},
+		] );
+
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.type( '|' );
+
+		// The empty paragraph is removed and the list is left intact, with
+		// the caret at the start of its first item.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: '|one' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'two' },
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'should remove empty paragraph block on backspace', async ( {
 		editor,
 		page,
@@ -319,10 +458,16 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		// But the effective saved content is still empty:
 		expect( await editor.getEditedPostContent() ).toBe( '' );
 
-		// And focus is retained:
-		await expect(
-			editor.canvas.locator( 'role=document[name=/Empty block/i]' )
-		).toBeFocused();
+		// And the selection is retained:
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.locator(
+						'role=document[name=/Empty block/i]'
+					)
+				)
+			)
+			.toBe( true );
 	} );
 
 	test( 'should undo split in one go', async ( {
@@ -668,6 +813,99 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 					},
 				],
 			},
+		] );
+	} );
+
+	// Do NOT alter unless re-testing iOS auto-capitalization.
+	test( 'should split on beforeinput, moving focus after the key is handled', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'First' );
+
+		// Record the order of the events involved in handling Enter. The iOS
+		// keyboard reads the caret when the key has been handled: cancelling
+		// Enter on keydown and moving focus to the new block in that same
+		// handler leaves its auto-capitalization stale. Handled on
+		// beforeinput, the next word is capitalized.
+		await editor.canvas.locator( ':root' ).evaluate( () => {
+			const events = [];
+			window.__enterEvents = events;
+			// Capture phase on the window: before every handler.
+			window.addEventListener(
+				'keydown',
+				( event ) => {
+					if ( event.key === 'Enter' ) {
+						events.push( 'keydown' );
+					}
+				},
+				true
+			);
+			window.addEventListener(
+				'beforeinput',
+				( event ) => events.push( `beforeinput:${ event.inputType }` ),
+				true
+			);
+			// Bubble phase on the window: after every handler that may
+			// cancel the event.
+			window.addEventListener( 'beforeinput', ( event ) => {
+				window.__enterCancelled = event.defaultPrevented;
+			} );
+			document.addEventListener(
+				'focusin',
+				() => events.push( 'focusin' ),
+				true
+			);
+		} );
+
+		await page.keyboard.press( 'Enter' );
+
+		const { events, cancelled } = await editor.canvas
+			.locator( ':root' )
+			.evaluate( () => ( {
+				events: window.__enterEvents,
+				cancelled: window.__enterCancelled,
+			} ) );
+		// Nothing happens on keydown: the beforeinput fires, is cancelled,
+		// and focus only moves while it is being handled.
+		expect( events ).toEqual( [
+			'keydown',
+			'beforeinput:insertParagraph',
+			'focusin',
+		] );
+		expect( cancelled ).toBe( true );
+
+		// The caret is at the very start of the new field: not after the
+		// padding character and not in the placeholder, which the keyboard
+		// would read as a character before the caret.
+		const caret = await editor.canvas.locator( ':root' ).evaluate( () => {
+			const { anchorNode, anchorOffset } = window.getSelection();
+			const element =
+				anchorNode.nodeType === anchorNode.ELEMENT_NODE
+					? anchorNode
+					: anchorNode.parentElement;
+			const field = element.closest(
+				'.block-editor-rich-text__editable'
+			);
+			// A range only to read what precedes the caret; the selection
+			// is left as Enter placed it.
+			const beforeCaret = document.createRange();
+			beforeCaret.setStart( field, 0 );
+			beforeCaret.setEnd( anchorNode, anchorOffset );
+			return {
+				textBefore: beforeCaret.toString(),
+				inPlaceholder: !! element.closest(
+					'[data-rich-text-placeholder]'
+				),
+			};
+		} );
+		expect( caret ).toEqual( { textBefore: '', inPlaceholder: false } );
+
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: '‸' } },
 		] );
 	} );
 } );

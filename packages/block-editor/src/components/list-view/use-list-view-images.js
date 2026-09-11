@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 // Maximum number of images to display in a list view row.
@@ -63,8 +56,7 @@ const IMAGE_GETTERS = {
 };
 
 function getImagesFromBlock( block, isExpanded ) {
-	const getImages = IMAGE_GETTERS[ block.name ];
-	const images = !! getImages ? getImages( block ) : undefined;
+	const images = block ? IMAGE_GETTERS[ block.name ]( block ) : undefined;
 
 	if ( ! images ) {
 		return [];
@@ -92,7 +84,11 @@ function getImagesFromBlock( block, isExpanded ) {
 export default function useListViewImages( { clientId, isExpanded } ) {
 	const { block } = useSelect(
 		( select ) => {
-			return { block: select( blockEditorStore ).getBlock( clientId ) };
+			const { getBlockName, getBlock } = select( blockEditorStore );
+			// Reading the block subscribes to its whole subtree, so only
+			// do it for blocks that can show an image.
+			const hasImages = !! IMAGE_GETTERS[ getBlockName( clientId ) ];
+			return { block: hasImages ? getBlock( clientId ) : undefined };
 		},
 		[ clientId ]
 	);

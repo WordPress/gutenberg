@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { default as DatePicker } from '../date-picker';
 import { default as TimePicker } from '../time-picker';
 import type { DateTimePickerProps } from '../types';

@@ -2,9 +2,7 @@
  * Tests for store selectors.
  */
 
-/**
- * Internal dependencies
- */
+import { describe, expect, it, vi } from 'vitest';
 import {
 	getAbilities,
 	getAbility,
@@ -33,7 +31,7 @@ describe( 'Store Selectors', () => {
 						category: 'test-category',
 						input_schema: { type: 'object' },
 						output_schema: { type: 'object' },
-						callback: jest.fn(),
+						callback: vi.fn(),
 					},
 				},
 				categoriesBySlug: {},
@@ -210,7 +208,7 @@ describe( 'Store Selectors', () => {
 					category: 'test-category',
 					input_schema: { type: 'object' },
 					output_schema: { type: 'object' },
-					callback: jest.fn(),
+					callback: vi.fn(),
 				},
 			},
 			categoriesBySlug: {},

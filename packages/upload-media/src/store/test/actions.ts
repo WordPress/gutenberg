@@ -1,46 +1,71 @@
-/**
- * WordPress dependencies
- */
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
 import { createRegistry } from '@wordpress/data';
+import { store as uploadStore } from '..';
+import { ItemStatus, OperationType, type QueueItem } from '../types';
+import { unlock } from '../../lock-unlock';
+import { UploadError } from '../../upload-error';
+import { vipsCancelOperations, vipsResizeImage } from '../utils';
+import { cancelGifToVideoOperations } from '../utils/video-conversion';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
-/**
- * Internal dependencies
+vi.mock(
+	import( '@wordpress/blob' ),
+	() =>
+		( {
+			createBlobURL: vi.fn( () => 'blob:foo' ),
+			isBlobURL: vi.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
+			revokeBlobURL: vi.fn(),
+		} ) as unknown as typeof import('@wordpress/blob')
+);
+
+vi.mock(
+	import( '../utils' ),
+	() =>
+		( {
+			vipsCancelOperations: vi.fn( () => Promise.resolve( true ) ),
+			vipsResizeImage: vi.fn( () =>
+				Promise.resolve(
+					new File( [ 'resized' ], 'example-100x100.jpg', {
+						type: 'image/jpeg',
+					} )
+				)
+			),
+			vipsRotateImage: vi.fn(),
+			vipsHasTransparency: vi.fn( () => Promise.resolve( false ) ),
+			vipsConvertImageFormat: vi.fn(),
+			terminateVipsWorker: vi.fn(),
+		} ) as unknown as typeof import('../utils')
+);
+
+/*
+ * actions.ts transitively imports private-actions, which also pulls in
+ * convertGifToVideo / isUnsupportedConversionError, so the mock must cover the
+ * whole module surface. isUnsupportedConversionError is kept real.
  */
-import { store as uploadStore } from '..';
-import { ItemStatus, OperationType } from '../types';
-import { unlock } from '../../lock-unlock';
+vi.mock( import( '../utils/video-conversion' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
+	return {
+		convertGifToVideo: vi.fn(),
+		cancelGifToVideoOperations: vi.fn( () => Promise.resolve( true ) ),
+		terminateVideoConversionWorker: vi.fn(),
+		isUnsupportedConversionError: actual.isUnsupportedConversionError,
+	};
+} );
 
-jest.mock( '@wordpress/blob', () => ( {
-	__esModule: true,
-	createBlobURL: jest.fn( () => 'blob:foo' ),
-	isBlobURL: jest.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
-	revokeBlobURL: jest.fn(),
-} ) );
-
-jest.mock( '../utils', () => ( {
-	vipsCancelOperations: jest.fn( () => Promise.resolve( true ) ),
-	vipsResizeImage: jest.fn( () =>
-		Promise.resolve(
-			new File( [ 'resized' ], 'example-100x100.jpg', {
-				type: 'image/jpeg',
-			} )
-		)
-	),
-	vipsRotateImage: jest.fn(),
-	vipsHasTransparency: jest.fn( () => Promise.resolve( false ) ),
-	vipsConvertImageFormat: jest.fn(),
-	terminateVipsWorker: jest.fn(),
-} ) );
-
-// Import the mocked module to access the mock function.
-import { vipsCancelOperations } from '../utils';
+// Import the mocked modules to access the mock functions.
 
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
 	const registry = createRegistry();
-	// @ts-ignore
-	[ uploadStore ].forEach( registry.register );
+	registry.register( uploadStore );
 	return registry;
 }
 
@@ -88,7 +113,7 @@ describe( 'actions', () => {
 
 	describe( 'addItems', () => {
 		it( 'adds multiple items to the queue', () => {
-			const onError = jest.fn();
+			const onError = vi.fn();
 			registry.dispatch( uploadStore ).addItems( {
 				files: [ jpegFile, mp4File ],
 				onError,
@@ -334,13 +359,68 @@ describe( 'actions', () => {
 			);
 			expect( updatedItem.additionalData.convert_format ).toBe( true );
 		} );
+
+		it( 'routes very large interlaced images to the server', async () => {
+			// A progressive JPEG (SOF2) header reporting 20000x11857, which
+			// exceeds the client-side memory budget for interlaced images.
+			const dimensions = new Uint8Array( 4 );
+			const dimView = new DataView( dimensions.buffer );
+			dimView.setUint16( 0, 11857 ); // height
+			dimView.setUint16( 2, 20000 ); // width
+			const bytes = new Uint8Array( [
+				0xff,
+				0xd8, // SOI
+				0xff,
+				0xc2, // SOF2 (progressive)
+				0x00,
+				0x11, // segment length
+				0x08, // precision
+				...dimensions, // height (2) + width (2)
+				0x03, // components
+				0x00,
+				0x00,
+				0x00,
+			] );
+			const largeJpeg = new File( [ bytes ], 'huge.jpg', {
+				type: 'image/jpeg',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: largeJpeg,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Should fall back to server-side processing: only Upload, no
+			// client-side thumbnail generation.
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [ OperationType.Upload ] )
+			);
+			expect( updatedItem.operations ).not.toEqual(
+				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
+			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
+			);
+			expect( updatedItem.additionalData.convert_format ).toBe( true );
+		} );
 	} );
 
 	describe( 'concurrent sideloads', () => {
 		it( 'does not pause sideload items targeting the same post', async () => {
 			// Configure mediaSideload so sideload uploads can proceed.
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
-				mediaSideload: jest.fn(),
+				mediaSideload: vi.fn(),
 			} );
 
 			// Use a fake parentId so we only test sideload scheduling.
@@ -367,7 +447,7 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems();
 			const sideloadItems = items.filter(
-				( item ) => item.parentId === fakeParentId
+				( item: QueueItem ) => item.parentId === fakeParentId
 			);
 
 			// Neither sideload item should be paused.
@@ -377,7 +457,7 @@ describe( 'actions', () => {
 		} );
 
 		it( 'allows multiple sideloads to the same attachment to upload concurrently', async () => {
-			const mediaSideload = jest.fn();
+			const mediaSideload = vi.fn();
 
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 				mediaSideload,
@@ -410,7 +490,7 @@ describe( 'actions', () => {
 		} );
 
 		it( 'respects maxConcurrentUploads for sideloads', async () => {
-			const mediaSideload = jest.fn();
+			const mediaSideload = vi.fn();
 
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 				mediaSideload,
@@ -447,7 +527,7 @@ describe( 'actions', () => {
 			let onSuccessCallback:
 				| ( ( subSize: Record< string, unknown > ) => void )
 				| undefined;
-			const mediaSideload = jest.fn( ( { onSuccess } ) => {
+			const mediaSideload = vi.fn( ( { onSuccess } ) => {
 				// Capture the first callback to simulate completion later.
 				if ( ! onSuccessCallback ) {
 					onSuccessCallback = onSuccess;
@@ -511,12 +591,13 @@ describe( 'actions', () => {
 
 	describe( 'cancelItem', () => {
 		beforeEach( () => {
-			( vipsCancelOperations as jest.Mock ).mockClear();
+			( vipsCancelOperations as Mock ).mockClear();
+			( cancelGifToVideoOperations as Mock ).mockClear();
 		} );
 
 		it( 'calls vipsCancelOperations when cancelling', async () => {
 			// Suppress console.error that fires when there's no onError callback.
-			const consoleErrorSpy = jest
+			const consoleErrorSpy = vi
 				.spyOn( console, 'error' )
 				.mockImplementation( () => {} );
 
@@ -537,9 +618,33 @@ describe( 'actions', () => {
 			consoleErrorSpy.mockRestore();
 		} );
 
+		it( 'cancels any in-flight GIF-to-video conversion when cancelling', async () => {
+			// Suppress console.error that fires when there's no onError callback.
+			const consoleErrorSpy = vi
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'User cancelled' ) );
+
+			expect( cancelGifToVideoOperations ).toHaveBeenCalledWith(
+				item.id
+			);
+
+			consoleErrorSpy.mockRestore();
+		} );
+
 		it( 'removes item from queue after cancelling', async () => {
 			// Suppress console.error that fires when there's no onError callback.
-			const consoleErrorSpy = jest
+			const consoleErrorSpy = vi
 				.spyOn( console, 'error' )
 				.mockImplementation( () => {} );
 
@@ -562,7 +667,7 @@ describe( 'actions', () => {
 		} );
 
 		it( 'calls onError callback when not silent', async () => {
-			const onError = jest.fn();
+			const onError = vi.fn();
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 				onError,
@@ -581,7 +686,7 @@ describe( 'actions', () => {
 		} );
 
 		it( 'does not call onError when silent', async () => {
-			const onError = jest.fn();
+			const onError = vi.fn();
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 				onError,
@@ -597,6 +702,103 @@ describe( 'actions', () => {
 			expect( onError ).not.toHaveBeenCalled();
 		} );
 
+		it( 'still calls onError and removes the item when vips cancellation rejects', async () => {
+			/*
+			 * When the vips worker has crashed, any call on its remote —
+			 * including the cancellation itself — rejects. That rejection
+			 * must not abort cancelItem, or the item would be stuck in the
+			 * queue forever with no error surfaced.
+			 */
+			( vipsCancelOperations as Mock ).mockImplementationOnce( () =>
+				Promise.reject( new Error( 'Worker error: crashed' ) )
+			);
+
+			const onError = vi.fn();
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				onError,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Test error' ) );
+
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( { message: 'Test error' } )
+			);
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+		} );
+
+		it( 'still calls onError and removes the item when GIF-to-video cancellation rejects', async () => {
+			( cancelGifToVideoOperations as Mock ).mockImplementationOnce( () =>
+				Promise.reject( new Error( 'Worker error: crashed' ) )
+			);
+
+			const onError = vi.fn();
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				onError,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Test error' ) );
+
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( { message: 'Test error' } )
+			);
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+		} );
+
+		it( 'removes the item even when the workers never answer the cancel calls', async () => {
+			/*
+			 * A busy vips worker is synchronously blocked inside a wasm call
+			 * and cannot answer the cancellation RPC until the current
+			 * operation - and every operation already queued behind it -
+			 * finishes, which for a large animated GIF takes minutes. The
+			 * worker cancels are best-effort cleanup; cancelItem must not
+			 * block on them, or the cancelled item lingers in the queue and
+			 * gates the parent's finalization the whole time.
+			 */
+			( vipsCancelOperations as Mock ).mockImplementationOnce(
+				() => new Promise( () => {} )
+			);
+			( cancelGifToVideoOperations as Mock ).mockImplementationOnce(
+				() => new Promise( () => {} )
+			);
+
+			const onError = vi.fn();
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				onError,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Test error' ) );
+
+			expect( vipsCancelOperations ).toHaveBeenCalledWith( item.id );
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( { message: 'Test error' } )
+			);
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+		} );
+
 		describe( 'parent cancellation when child sideload fails', () => {
 			// Helpers used by every scenario below. Set up a parent that
 			// has finished its primary upload (so it has an attachment.id),
@@ -605,9 +807,11 @@ describe( 'actions', () => {
 			const setUpParentAndChild = ( {
 				parentSubSizes,
 				parentOnError,
+				imageSize = 'medium',
 			}: {
 				parentSubSizes?: { name: string; id: number }[];
-				parentOnError?: jest.Mock;
+				parentOnError?: Mock;
+				imageSize?: string;
 			} = {} ) => {
 				unlock( registry.dispatch( uploadStore ) ).addItem( {
 					file: jpegFile,
@@ -634,22 +838,22 @@ describe( 'actions', () => {
 				unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
 					file: jpegFile,
 					parentId: parent.id,
-					additionalData: { post: 42, image_size: 'medium' },
+					additionalData: { post: 42, image_size: imageSize },
 				} );
 
 				const child = unlock( registry.select( uploadStore ) )
 					.getAllItems()
-					.find( ( i ) => i.parentId === parent.id );
+					.find( ( i: QueueItem ) => i.parentId === parent.id );
 
 				return { parent, child };
 			};
 
 			it( 'deletes parent attachment and cancels parent for vips processing failures with no successful siblings', async () => {
-				const consoleErrorSpy = jest
+				const consoleErrorSpy = vi
 					.spyOn( console, 'error' )
 					.mockImplementation( () => {} );
-				const mediaDelete = jest.fn().mockResolvedValue( undefined );
-				const parentOnError = jest.fn();
+				const mediaDelete = vi.fn().mockResolvedValue( undefined );
+				const parentOnError = vi.fn();
 				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 					mediaDelete,
 				} );
@@ -661,9 +865,7 @@ describe( 'actions', () => {
 				// resizeCropItem and rotateItem already wrap vips
 				// failures in an UploadError that carries the
 				// actionable user-facing message at the source.
-				const vipsError = new ( jest.requireActual(
-					'../../upload-error'
-				).UploadError )( {
+				const vipsError = new UploadError( {
 					code: 'IMAGE_TRANSCODING_ERROR',
 					message:
 						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.',
@@ -693,17 +895,15 @@ describe( 'actions', () => {
 			} );
 
 			it( 'propagates the underlying error message for non-vips sideload failures', async () => {
-				const mediaDelete = jest.fn().mockResolvedValue( undefined );
-				const parentOnError = jest.fn();
+				const mediaDelete = vi.fn().mockResolvedValue( undefined );
+				const parentOnError = vi.fn();
 				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 					mediaDelete,
 				} );
 
 				const { child } = setUpParentAndChild( { parentOnError } );
 
-				const networkError = new ( jest.requireActual(
-					'../../upload-error'
-				).UploadError )( {
+				const networkError = new UploadError( {
 					code: 'GENERAL',
 					message: 'Network request failed: 503',
 					file: jpegFile,
@@ -723,8 +923,8 @@ describe( 'actions', () => {
 			} );
 
 			it( 'preserves the parent attachment when at least one sibling sub-size succeeded', async () => {
-				const mediaDelete = jest.fn().mockResolvedValue( undefined );
-				const parentOnError = jest.fn();
+				const mediaDelete = vi.fn().mockResolvedValue( undefined );
+				const parentOnError = vi.fn();
 				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 					mediaDelete,
 				} );
@@ -734,9 +934,7 @@ describe( 'actions', () => {
 					parentSubSizes: [ { name: 'medium', id: 99 } ],
 				} );
 
-				const networkError = new ( jest.requireActual(
-					'../../upload-error'
-				).UploadError )( {
+				const networkError = new UploadError( {
 					code: 'GENERAL',
 					message: 'sideload of large size failed',
 					file: jpegFile,
@@ -759,8 +957,8 @@ describe( 'actions', () => {
 			} );
 
 			it( 'falls back to a generic message when the underlying error has no message', async () => {
-				const mediaDelete = jest.fn().mockResolvedValue( undefined );
-				const parentOnError = jest.fn();
+				const mediaDelete = vi.fn().mockResolvedValue( undefined );
+				const parentOnError = vi.fn();
 				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 					mediaDelete,
 				} );
@@ -776,6 +974,39 @@ describe( 'actions', () => {
 						message: 'The image could not be uploaded.',
 					} )
 				);
+			} );
+
+			it( 'keeps the parent GIF when its only child is a failed animated_video companion', async () => {
+				const mediaDelete = vi.fn().mockResolvedValue( undefined );
+				const parentOnError = vi.fn();
+				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+					mediaDelete,
+				} );
+
+				// The converted video is the sole child of the GIF and has no
+				// accumulated sub-sizes — the pre-fix "total failure" case.
+				const { parent, child } = setUpParentAndChild( {
+					parentOnError,
+					imageSize: 'animated_video',
+				} );
+
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem(
+						child!.id,
+						new Error( 'conversion failed' ),
+						true
+					);
+
+				// The optional companion failing must not delete or cancel the
+				// already-uploaded GIF attachment.
+				expect( mediaDelete ).not.toHaveBeenCalled();
+				expect( parentOnError ).not.toHaveBeenCalled();
+				expect(
+					unlock( registry.select( uploadStore ) ).getItem(
+						parent.id
+					)
+				).toBeDefined();
 			} );
 		} );
 	} );
@@ -869,8 +1100,8 @@ describe( 'actions', () => {
 
 	describe( 'cancelItem retry integration', () => {
 		beforeEach( () => {
-			jest.useFakeTimers();
-			( vipsCancelOperations as jest.Mock ).mockClear();
+			vi.useFakeTimers();
+			( vipsCancelOperations as Mock ).mockClear();
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 				retry: {
 					maxRetryAttempts: 3,
@@ -883,7 +1114,7 @@ describe( 'actions', () => {
 		} );
 
 		afterEach( () => {
-			jest.useRealTimers();
+			vi.useRealTimers();
 		} );
 
 		it( 'schedules retry for retryable errors', async () => {
@@ -927,7 +1158,7 @@ describe( 'actions', () => {
 		} );
 
 		it( 'does NOT schedule retry for non-retryable errors', async () => {
-			const consoleErrorSpy = jest
+			const consoleErrorSpy = vi
 				.spyOn( console, 'error' )
 				.mockImplementation( () => {} );
 
@@ -952,7 +1183,7 @@ describe( 'actions', () => {
 		} );
 
 		it( 'does NOT schedule retry when retry settings are undefined', async () => {
-			const consoleErrorSpy = jest
+			const consoleErrorSpy = vi
 				.spyOn( console, 'error' )
 				.mockImplementation( () => {} );
 
@@ -982,7 +1213,7 @@ describe( 'actions', () => {
 		} );
 
 		it( 'clears pending retry timer on manual cancel', async () => {
-			const onError = jest.fn();
+			const onError = vi.fn();
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 				onError,
@@ -1012,7 +1243,7 @@ describe( 'actions', () => {
 			).toHaveLength( 0 );
 
 			// Advance timers — the old retry timer should NOT fire.
-			await jest.runAllTimersAsync();
+			await vi.runAllTimersAsync();
 
 			// Queue should still be empty (timer was cleared).
 			expect(
@@ -1023,7 +1254,7 @@ describe( 'actions', () => {
 
 	describe( 'scheduleRetry', () => {
 		beforeEach( () => {
-			jest.useFakeTimers();
+			vi.useFakeTimers();
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 				retry: {
 					maxRetryAttempts: 3,
@@ -1036,7 +1267,7 @@ describe( 'actions', () => {
 		} );
 
 		afterEach( () => {
-			jest.useRealTimers();
+			vi.useRealTimers();
 		} );
 
 		it( 'sets item status to PendingRetry', async () => {
@@ -1134,7 +1365,7 @@ describe( 'actions', () => {
 			expect( updatedItem.status ).toBe( ItemStatus.PendingRetry );
 
 			// Fire all timers to trigger executeRetry.
-			await jest.runAllTimersAsync();
+			await vi.runAllTimersAsync();
 
 			// Item should now be back in Processing status with incremented retryCount.
 			updatedItem = unlock(
@@ -1147,7 +1378,7 @@ describe( 'actions', () => {
 
 	describe( 'executeRetry', () => {
 		beforeEach( async () => {
-			jest.useFakeTimers();
+			vi.useFakeTimers();
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 				retry: {
 					maxRetryAttempts: 3,
@@ -1163,7 +1394,7 @@ describe( 'actions', () => {
 		} );
 
 		afterEach( () => {
-			jest.useRealTimers();
+			vi.useRealTimers();
 		} );
 
 		it( 'resets item to Processing status', async () => {
@@ -1311,7 +1542,7 @@ describe( 'actions', () => {
 
 			// Advance timers — the old retry timer must NOT re-add or
 			// touch the item.
-			await jest.runAllTimersAsync();
+			await vi.runAllTimersAsync();
 
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
@@ -1319,7 +1550,7 @@ describe( 'actions', () => {
 		} );
 
 		it( 'falls through to cancellation after exhausting max retries', async () => {
-			const onError = jest.fn();
+			const onError = vi.fn();
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 				onError,
@@ -1342,7 +1573,7 @@ describe( 'actions', () => {
 			// executes the retry (incrementing retryCount), then we simulate
 			// another failure.
 			for ( let attempt = 1; attempt <= 3; attempt++ ) {
-				await jest.runAllTimersAsync();
+				await vi.runAllTimersAsync();
 
 				const inProgress = unlock(
 					registry.select( uploadStore )
@@ -1405,7 +1636,7 @@ describe( 'actions', () => {
 
 			// Fire the retry timer while paused — executeRetry should bail
 			// without mutating state.
-			await jest.runAllTimersAsync();
+			await vi.runAllTimersAsync();
 
 			const pausedItem = unlock(
 				registry.select( uploadStore )
@@ -1439,8 +1670,7 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 
-			const { vipsResizeImage } = require( '../utils' );
-			( vipsResizeImage as jest.Mock ).mockClear();
+			( vipsResizeImage as Mock ).mockClear();
 
 			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
 				item.id,
@@ -1460,8 +1690,7 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 
-			const { vipsResizeImage } = require( '../utils' );
-			( vipsResizeImage as jest.Mock ).mockClear();
+			( vipsResizeImage as Mock ).mockClear();
 
 			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
 				item.id,
@@ -1493,10 +1722,10 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'generateThumbnails', () => {
-		const mockBitmapClose = jest.fn();
+		const mockBitmapClose = vi.fn();
 
 		function mockCreateImageBitmap( width: number, height: number ) {
-			global.createImageBitmap = jest.fn( () =>
+			global.createImageBitmap = vi.fn( () =>
 				Promise.resolve( {
 					width,
 					height,
@@ -1550,7 +1779,7 @@ describe( 'actions', () => {
 
 		afterEach( () => {
 			// Clean up global mock.
-			// @ts-ignore
+			// @ts-expect-error The test removes the browser API to verify the fallback.
 			delete global.createImageBitmap;
 		} );
 
@@ -1577,7 +1806,7 @@ describe( 'actions', () => {
 
 			// Should have sideload items for thumbnails, but NOT for 'scaled'.
 			const scaledItems = allItems.filter(
-				( i ) => i.additionalData?.image_size === 'scaled'
+				( i: QueueItem ) => i.additionalData?.image_size === 'scaled'
 			);
 			expect( scaledItems ).toHaveLength( 0 );
 			expect( mockBitmapClose ).toHaveBeenCalled();
@@ -1605,7 +1834,7 @@ describe( 'actions', () => {
 			).getAllItems();
 
 			const scaledItems = allItems.filter(
-				( i ) => i.additionalData?.image_size === 'scaled'
+				( i: QueueItem ) => i.additionalData?.image_size === 'scaled'
 			);
 			expect( scaledItems ).toHaveLength( 1 );
 			expect( scaledItems[ 0 ].additionalData.post ).toBe( 123 );
@@ -1634,7 +1863,7 @@ describe( 'actions', () => {
 			).getAllItems();
 
 			const scaledItems = allItems.filter(
-				( i ) => i.additionalData?.image_size === 'scaled'
+				( i: QueueItem ) => i.additionalData?.image_size === 'scaled'
 			);
 			expect( scaledItems ).toHaveLength( 1 );
 		} );
@@ -1658,7 +1887,7 @@ describe( 'actions', () => {
 			).getAllItems();
 
 			const scaledItems = allItems.filter(
-				( i ) => i.additionalData?.image_size === 'scaled'
+				( i: QueueItem ) => i.additionalData?.image_size === 'scaled'
 			);
 			expect( scaledItems ).toHaveLength( 0 );
 			// createImageBitmap should not have been called since threshold is not set.
@@ -1689,7 +1918,7 @@ describe( 'actions', () => {
 			).getAllItems();
 
 			const scaledItems = allItems.filter(
-				( i ) => i.additionalData?.image_size === 'scaled'
+				( i: QueueItem ) => i.additionalData?.image_size === 'scaled'
 			);
 			expect( scaledItems ).toHaveLength( 0 );
 		} );
@@ -1716,10 +1945,10 @@ describe( 'actions', () => {
 
 			// Should have the original item plus 2 sideload items for thumbnail and medium.
 			const thumbnailItems = allItems.filter(
-				( i ) => i.additionalData?.image_size === 'thumbnail'
+				( i: QueueItem ) => i.additionalData?.image_size === 'thumbnail'
 			);
 			const mediumItems = allItems.filter(
-				( i ) => i.additionalData?.image_size === 'medium'
+				( i: QueueItem ) => i.additionalData?.image_size === 'medium'
 			);
 			expect( thumbnailItems ).toHaveLength( 1 );
 			expect( mediumItems ).toHaveLength( 1 );
@@ -1754,12 +1983,12 @@ describe( 'actions', () => {
 			// Should have the original item plus 2 sideload items (not 3),
 			// because medium and custom share the same dimensions.
 			const sideloadItems = allItems.filter(
-				( i ) => i.parentId === item.id
+				( i: QueueItem ) => i.parentId === item.id
 			);
 			expect( sideloadItems ).toHaveLength( 2 );
 
 			// The deduplicated group should pass both size names.
-			const mediumCustomItem = sideloadItems.find( ( i ) =>
+			const mediumCustomItem = sideloadItems.find( ( i: QueueItem ) =>
 				Array.isArray( i.additionalData?.image_size )
 			);
 			expect( mediumCustomItem ).toBeDefined();
@@ -1795,7 +2024,7 @@ describe( 'actions', () => {
 			).getAllItems();
 
 			const sideloadItems = allItems.filter(
-				( i ) => i.parentId === item.id
+				( i: QueueItem ) => i.parentId === item.id
 			);
 			// Two separate sideloads because crop differs.
 			expect( sideloadItems ).toHaveLength( 2 );
@@ -1807,7 +2036,7 @@ describe( 'actions', () => {
 				).toBe( true );
 			}
 			const imageSizes = sideloadItems.map(
-				( i ) => i.additionalData?.image_size
+				( i: QueueItem ) => i.additionalData?.image_size
 			);
 			expect( imageSizes ).toEqual(
 				expect.arrayContaining( [ 'soft', 'hard' ] )
@@ -1840,7 +2069,7 @@ describe( 'actions', () => {
 			).getAllItems();
 
 			const sideloadItems = allItems.filter(
-				( i ) => i.parentId === item.id
+				( i: QueueItem ) => i.parentId === item.id
 			);
 			// One sideload, all three names grouped together.
 			expect( sideloadItems ).toHaveLength( 1 );
@@ -1907,7 +2136,7 @@ describe( 'actions', () => {
 			).getAllItems();
 
 			const scaledItems = allItems.filter(
-				( i ) => i.additionalData?.image_size === 'scaled'
+				( i: QueueItem ) => i.additionalData?.image_size === 'scaled'
 			);
 			// Exactly at threshold means no scaling (condition is > not >=).
 			expect( scaledItems ).toHaveLength( 0 );
@@ -1952,7 +2181,7 @@ describe( 'actions', () => {
 			const thumbnailItems = unlock( registry.select( uploadStore ) )
 				.getAllItems()
 				.filter(
-					( i ) =>
+					( i: QueueItem ) =>
 						i.additionalData?.image_size === 'thumbnail' ||
 						i.additionalData?.image_size === 'medium'
 				);
@@ -1994,7 +2223,8 @@ describe( 'actions', () => {
 				const scaledItems = unlock( registry.select( uploadStore ) )
 					.getAllItems()
 					.filter(
-						( i ) => i.additionalData?.image_size === 'scaled'
+						( i: QueueItem ) =>
+							i.additionalData?.image_size === 'scaled'
 					);
 				expect( scaledItems ).toHaveLength( 1 );
 				// vipsResizeImage adds the `-scaled` suffix during the

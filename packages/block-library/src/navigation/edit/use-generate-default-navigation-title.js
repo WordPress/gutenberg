@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { Disabled } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useRegistry } from '@wordpress/data';
 import { useContext, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import useTemplatePartAreaLabel from '../use-template-part-area-label';
 
 const DRAFT_MENU_PARAMS = [

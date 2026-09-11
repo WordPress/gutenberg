@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useImperativeHandle, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 /**

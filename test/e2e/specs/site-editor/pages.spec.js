@@ -1,21 +1,45 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-async function draftNewPage( page ) {
-	await page.getByRole( 'button', { name: 'Pages' } ).click();
-	await page.getByRole( 'button', { name: 'Add page' } ).click();
-	await page
-		.locator( 'role=dialog[name="Draft new: page"i]' )
-		.locator( 'role=textbox[name="title"i]' )
-		.fill( 'Test Page' );
-	await page.keyboard.press( 'Enter' );
-	await expect(
-		page.locator(
-			`role=button[name="Dismiss this notice"i] >> text='"Test Page" successfully created.'`
-		)
-	).toBeVisible();
+/**
+ * Activates a theme, retrying on the transient "socket hang up"
+ * (ECONNRESET) connection error that intermittently occurs in CI.
+ *
+ * See https://github.com/WordPress/gutenberg/issues/74483.
+ *
+ * @param {Object} requestUtils Playwright request utils.
+ * @param {string} themeSlug    Theme slug to activate.
+ */
+async function activateThemeWithRetry( requestUtils, themeSlug ) {
+	const maxAttempts = 3;
+	for ( let attempt = 1; attempt <= maxAttempts; attempt++ ) {
+		try {
+			await requestUtils.activateTheme( themeSlug );
+			return;
+		} catch ( error ) {
+			const isTransient = /socket hang up|ECONNRESET/i.test(
+				error?.message ?? ''
+			);
+			if ( ! isTransient || attempt === maxAttempts ) {
+				throw error;
+			}
+		}
+	}
+}
+
+// Creating the page through the UI differs between the classic and the
+// extensible site editor (a naming dialog vs. a full "Add Page" editor
+// screen), and is not what these tests cover, so create it via REST and open
+// it in the editor directly.
+async function draftNewPage( admin, requestUtils ) {
+	const testPage = await requestUtils.createPage( {
+		title: 'Test Page',
+		status: 'draft',
+	} );
+	await admin.visitSiteEditor( {
+		postId: testPage.id,
+		postType: 'page',
+		canvas: 'edit',
+	} );
 }
 
 async function addPageContent( editor, page ) {
@@ -24,7 +48,7 @@ async function addPageContent( editor, page ) {
 			name: 'Block: Content',
 		} )
 		.getByRole( 'document', {
-			name: 'Empty block; start writing or type forward slash to choose a block',
+			name: 'Add default block',
 		} )
 		.click();
 
@@ -69,7 +93,7 @@ async function addPageContent( editor, page ) {
 
 test.describe( 'Pages', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'emptytheme' );
+		await activateThemeWithRetry( requestUtils, 'emptytheme' );
 		await Promise.all( [
 			requestUtils.deleteAllTemplates( 'wp_template' ),
 			requestUtils.deleteAllPages(),
@@ -85,7 +109,7 @@ test.describe( 'Pages', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
+		await activateThemeWithRetry( requestUtils, 'twentytwentyone' );
 		await Promise.all( [
 			requestUtils.deleteAllTemplates( 'wp_template' ),
 			requestUtils.deleteAllPages(),
@@ -93,11 +117,13 @@ test.describe( 'Pages', () => {
 	} );
 
 	test.skip( 'create a new page, edit template and toggle page template preview', async ( {
+		admin,
 		page,
 		editor,
+		requestUtils,
 	} ) => {
 		// Set up
-		await draftNewPage( page );
+		await draftNewPage( admin, requestUtils );
 		await addPageContent( editor, page );
 		await editor.openDocumentSettingsSidebar();
 
@@ -239,14 +265,53 @@ test.describe( 'Pages', () => {
 		).toBeVisible();
 	} );
 
+	test( 'the writing prompt in an empty content block responds to the first click', async ( {
+		admin,
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		await draftNewPage( admin, requestUtils );
+
+		// Show the template so the Content block wraps the writing prompt.
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Template options' } )
+			.click();
+		await page
+			.getByRole( 'menu', { name: 'Template options' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
+			.click();
+		await page.keyboard.press( 'Escape' );
+
+		const contentBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Content',
+		} );
+
+		// A single click on the prompt inserts a paragraph and moves the
+		// caret into it; no click to select the Content block is needed.
+		await contentBlock
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'Typed after one click' );
+
+		await expect(
+			contentBlock.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+		).toHaveText( 'Typed after one click' );
+	} );
+
 	test( 'swap template and reset to default', async ( {
 		admin,
 		page,
 		editor,
+		requestUtils,
 	} ) => {
 		// Create a custom template first.
 		const templateName = 'demo';
-		await page.getByRole( 'button', { name: 'Templates' } ).click();
+		await admin.visitSiteEditor( { postType: 'wp_template' } );
 		await page.getByRole( 'button', { name: 'Add template' } ).click();
 		await page
 			.getByRole( 'button', {
@@ -271,7 +336,7 @@ test.describe( 'Pages', () => {
 		await admin.visitSiteEditor();
 
 		// Create new page that has the default template so as to swap it.
-		await draftNewPage( page );
+		await draftNewPage( admin, requestUtils );
 		await editor.openDocumentSettingsSidebar();
 		const templateOptionsButton = page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -304,10 +369,12 @@ test.describe( 'Pages', () => {
 	} );
 
 	test( 'change template options should respect the declared `postTypes`', async ( {
+		admin,
 		page,
 		editor,
+		requestUtils,
 	} ) => {
-		await draftNewPage( page );
+		await draftNewPage( admin, requestUtils );
 		await editor.openDocumentSettingsSidebar();
 		const templateOptionsButton = page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -334,8 +401,7 @@ test.describe( 'Pages', () => {
 			status: 'publish',
 		} );
 
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
+		await admin.visitSiteEditor( { postType: 'page' } );
 
 		// Switch to table layout to access actions
 		await page.getByRole( 'button', { name: 'Layout' } ).click();
@@ -379,8 +445,7 @@ test.describe( 'Pages', () => {
 		).toBeVisible();
 
 		// Reload the page to verify the value persisted
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
+		await admin.visitSiteEditor( { postType: 'page' } );
 		await page.getByRole( 'button', { name: 'Layout' } ).click();
 		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 

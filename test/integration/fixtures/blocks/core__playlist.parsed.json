@@ -1,0 +1,32 @@
+[
+	{
+		"blockName": "core/playlist",
+		"attrs": {
+			"caption": "Sample playlist"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/playlist-track",
+				"attrs": {
+					"id": 123,
+					"src": "https://example.com/audio.mp3",
+					"album": "Example album",
+					"artist": "Example creator",
+					"image": "https://example.com/track-image.jpg",
+					"imageAlt": "Track image",
+					"length": "3:21",
+					"title": "Sample track"
+				},
+				"innerBlocks": [],
+				"innerHTML": "",
+				"innerContent": []
+			}
+		],
+		"innerHTML": "\n<figure class=\"wp-block-playlist\">\n\t<ol class=\"wp-block-playlist__tracklist wp-block-playlist__tracklist-show-numbers\">\n\t\t\n\t</ol>\n\t<figcaption class=\"wp-element-caption\">Sample playlist</figcaption>\n</figure>\n",
+		"innerContent": [
+			"\n<figure class=\"wp-block-playlist\">\n\t<ol class=\"wp-block-playlist__tracklist wp-block-playlist__tracklist-show-numbers\">\n\t\t",
+			null,
+			"\n\t</ol>\n\t<figcaption class=\"wp-element-caption\">Sample playlist</figcaption>\n</figure>\n"
+		]
+	}
+]

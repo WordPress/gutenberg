@@ -54,11 +54,6 @@
 	margin: 0 auto;
 	max-width: 70%;
 
-	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
-	@include break-medium() {
-		padding-left: $grid-unit-30;
-	}
-
 	h1 {
 		display: flex;
 		align-items: center;
@@ -86,16 +81,6 @@
 	}
 }
 
-.editor-document-bar__shortcut {
-	color: $gray-800;
-	min-width: $grid-unit-30;
-	display: none;
-
-	@include break-medium() {
-		display: initial;
-	}
-}
-
 .editor-document-bar__back.components-button.has-icon.has-text {
 	min-width: $button-size;
 	flex-shrink: 0;
@@ -116,7 +101,7 @@
 	display: none;
 	pointer-events: none;
 	svg {
-		fill: $gray-600;
+		color: $gray-600;
 	}
 	@include break-small {
 		display: flex;

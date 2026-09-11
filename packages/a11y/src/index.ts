@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import domReady from '@wordpress/dom-ready';
-
-/**
- * Internal dependencies
- */
 import addContainer from './script/add-container';
 import addIntroText from './script/add-intro-text';
 

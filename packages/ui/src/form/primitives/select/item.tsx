@@ -17,7 +17,7 @@ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
 					itemPopupStyles.item,
-					itemPopupStyles[ `is-size-${ size }` ],
+					size === 'small' && itemPopupStyles[ 'is-size-small' ],
 					className
 				) }
 				value={ value }
