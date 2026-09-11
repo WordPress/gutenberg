@@ -4,9 +4,10 @@ XCUITest suites that drive Safari on an iOS simulator, for behavior only the
 iOS keyboard shows, such as auto-capitalization after Enter.
 
 Run them on macOS with Xcode and [xcodegen](https://github.com/yonaskolb/XcodeGen)
-installed, after building the plugin:
+installed, on the Node version in `.nvmrc`, after building the plugin:
 
 ```bash
+nvm use
 npm run build
 ./test/ios/run.sh
 ```
