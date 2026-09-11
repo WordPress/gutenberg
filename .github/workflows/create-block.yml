@@ -3,7 +3,12 @@ name: Create Block
 on:
     pull_request:
     push:
-        branches: [trunk, wp/latest]
+        branches:
+            - trunk
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
