@@ -11,24 +11,66 @@
 	--wp-components-grid-column-gap: initial;
 
 	display: grid;
+}
+
+.grid:not(:where(
+	.row-gap-inherit,
+	.row-gap-initial,
+	.row-gap-unset,
+	.row-gap-revert,
+	.row-gap-revert-layer
+)) {
 	row-gap: var(--wp-components-grid-row-gap, calc(#{$grid-unit-05} * var(--wp-components-grid-gap)));
+}
+
+.grid:not(:where(
+	.column-gap-inherit,
+	.column-gap-initial,
+	.column-gap-unset,
+	.column-gap-revert,
+	.column-gap-revert-layer
+)) {
 	column-gap: var(--wp-components-grid-column-gap, calc(#{$grid-unit-05} * var(--wp-components-grid-gap)));
 }
 
 // Omitted props leave consumer stylesheet declarations intact.
-.has-align {
+.has-align:not(:where(
+	.align-inherit,
+	.align-initial,
+	.align-unset,
+	.align-revert,
+	.align-revert-layer
+)) {
 	align-items: var(--wp-components-grid-align);
 }
 
-.has-justify {
+.has-justify:not(:where(
+	.justify-inherit,
+	.justify-initial,
+	.justify-unset,
+	.justify-revert,
+	.justify-revert-layer
+)) {
 	justify-content: var(--wp-components-grid-justify);
 }
 
-.has-template-columns {
+.has-template-columns:not(:where(
+	.template-columns-inherit,
+	.template-columns-initial,
+	.template-columns-unset,
+	.template-columns-revert,
+	.template-columns-revert-layer
+)) {
 	grid-template-columns: var(--wp-components-grid-template-columns);
 }
 
-.has-template-rows {
+.has-template-rows:not(:where(
+	.template-rows-inherit,
+	.template-rows-initial,
+	.template-rows-unset,
+	.template-rows-revert,
+	.template-rows-revert-layer
+)) {
 	grid-template-rows: var(--wp-components-grid-template-rows);
 }
 
