@@ -1,7 +1,8 @@
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { unseen } from '@wordpress/icons';
-import { Badge, Icon, Stack } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Notice } from '@wordpress/ui';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import useBlockVisibility from './use-block-visibility';
@@ -119,15 +120,12 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 	}
 
 	return (
-		<Stack
+		<Notice.Root
 			className="block-editor-block-visibility-info"
-			gap="sm"
-			justify="start"
-			align="center"
-			direction="row"
+			icon={ unseen }
+			intent="info"
 		>
-			<Icon icon={ unseen } />
-			<Badge intent="draft">{ label }</Badge>
-		</Stack>
+			<Notice.Description>{ label }</Notice.Description>
+		</Notice.Root>
 	);
 }
