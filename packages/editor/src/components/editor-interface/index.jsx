@@ -237,12 +237,9 @@ export default function EditorInterface( {
 			}
 			secondarySidebar={
 				! isPreviewMode &&
-				mode === 'visual' && (
-					<AsyncModeProvider value>
-						{ ( isInserterOpened && <InserterSidebar /> ) ||
-							( isListViewOpened && <ListViewSidebar /> ) }
-					</AsyncModeProvider>
-				)
+				mode === 'visual' &&
+				( ( isInserterOpened && <InserterSidebar /> ) ||
+					( isListViewOpened && <ListViewSidebar /> ) )
 			}
 			sidebar={
 				! isPreviewMode &&
