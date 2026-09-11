@@ -544,6 +544,12 @@ $media-panel-min-height: 320px;
 	.block-editor-inserter__media-grid__date-span {
 		color: $gray-700;
 		font-size: $helptext-font-size;
+		// Beside the pager there is only room for one line: truncate rather
+		// than wrap (the full span is in the `title`).
+		min-width: 0;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.block-editor-inserter__media-grid__preview {

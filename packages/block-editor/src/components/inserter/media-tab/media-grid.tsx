@@ -137,14 +137,28 @@ function getDateSpan( mediaList?: MediaItem[] ) {
 	}
 	const newest = dateI18n( 'M Y', first, undefined );
 	const oldest = dateI18n( 'M Y', last, undefined );
-	return newest === oldest
-		? newest
-		: sprintf(
-				/* translators: 1: The newest month on the page, e.g. "Jul 2024". 2: The oldest month on the page, e.g. "May 2024". */
-				__( '%1$s – %2$s' ),
-				newest,
-				oldest
-		  );
+	if ( newest === oldest ) {
+		return newest;
+	}
+	// Within one year the year is only said once ("Jul – May 2024"), which
+	// keeps the span on one line beside the pager in the common case.
+	if (
+		dateI18n( 'Y', first, undefined ) === dateI18n( 'Y', last, undefined )
+	) {
+		return sprintf(
+			/* translators: 1: The newest month on the page, e.g. "Jul". 2: The oldest month on the page, e.g. "May". 3: The year, e.g. "2024". */
+			__( '%1$s – %2$s %3$s' ),
+			dateI18n( 'M', first, undefined ),
+			dateI18n( 'M', last, undefined ),
+			dateI18n( 'Y', first, undefined )
+		);
+	}
+	return sprintf(
+		/* translators: 1: The newest month on the page, e.g. "Jul 2024". 2: The oldest month on the page, e.g. "May 2024". */
+		__( '%1$s – %2$s' ),
+		newest,
+		oldest
+	);
 }
 
 /**
@@ -303,11 +317,16 @@ export default function MediaGrid( {
 								align="center"
 								gap="sm"
 							>
-								{ dateSpan && (
-									<span className="block-editor-inserter__media-grid__date-span">
-										{ dateSpan }
-									</span>
-								) }
+								{ /* Always rendered, so the pager doesn't shift when the span resolves (or is absent). */ }
+								<span
+									className="block-editor-inserter__media-grid__date-span"
+									aria-hidden={ ! dateSpan }
+									// The full span, in case the row is too narrow
+									// and it is truncated (see styles).
+									title={ dateSpan }
+								>
+									{ dateSpan ?? ' ' }
+								</span>
 								<DataViews.Pagination />
 							</Stack>
 						) }
