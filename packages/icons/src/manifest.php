@@ -357,4 +357,9 @@ return array(
 		'label'    => _x( 'Verse', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/verse.svg',
 	),
+	'wordpress'           => array(
+		'label'    => _x( 'WordPress', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/wordpress.svg',
+		'public'   => false,
+	),
 );

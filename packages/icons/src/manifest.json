@@ -1790,6 +1790,7 @@
 	{
 		"slug": "wordpress",
 		"label": "WordPress",
-		"filePath": "library/wordpress.svg"
+		"filePath": "library/wordpress.svg",
+		"public": false
 	}
 ]
