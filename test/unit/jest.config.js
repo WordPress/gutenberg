@@ -16,6 +16,10 @@ module.exports = {
 		) })$` ]: 'packages/$1/src',
 	},
 	preset: '@wordpress/jest-preset-default',
+	transformIgnorePatterns: [
+		'/node_modules/(?!(docker-compose|yaml)/)',
+		'\\.pnp\\.[^\\/]+$',
+	],
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-phase.js',
