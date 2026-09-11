@@ -125,16 +125,12 @@ jobs:
             fail-fast: true
             matrix:
                 event: ['${{ github.event_name }}']
-                php: ['7.4', '8.0', '8.1', '8.2', '8.3']
+                php: ['7.4', '8.0', '8.5']
                 multisite: [false, true]
                 exclude:
-                    # On PRs: Only test PHP 7.4 and 8.3, single-site
+                    # On PRs: Only test PHP 7.4 and 8.5, single-site
                     - event: 'pull_request'
                       php: '8.0'
-                    - event: 'pull_request'
-                      php: '8.1'
-                    - event: 'pull_request'
-                      php: '8.2'
                     - event: 'pull_request'
                       multisite: true
 
