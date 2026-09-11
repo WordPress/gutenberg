@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Featured image field: Only register it for the post types a theme lists in its `post-thumbnails` support, matching the classic panel. ([#82773](https://github.com/WordPress/gutenberg/pull/82773))
 -   `MediaUpload`: Coerce `multiple` to a boolean before passing it to the experimental media modal; callers such as the playlist block and the inserter media tab pass the legacy media frame's `'add'` mode. ([#82715](https://github.com/WordPress/gutenberg/pull/82715))
 -   Document bar: Preserve the subdued template-preview icon color after the icon became stroke-based. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
 
@@ -43,6 +44,7 @@
 
 ### Internal
 
+-   Global Styles: replace the sidebar action `DropdownMenu` from `@wordpress/components` with the public `Menu` from `@wordpress/ui`. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
 -   Stop passing the unused `editorTool` block editor setting; the selector that read it was removed with the Write/Design tool in [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
 -   Remove the template activation (`active_templates`) experiment: the post-save activation notice, the "Edit template" auto-activation, and template duplication in the actions list ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
 -   Remove unused dependencies `@wordpress/reusable-blocks`, `client-zip` and `fast-deep-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

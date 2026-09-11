@@ -1,9 +1,11 @@
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Menu } from '@wordpress/ui';
 import { useGlobalStyles } from './hooks';
 
 /**
@@ -47,48 +49,54 @@ export function GlobalStylesActionMenu( {
 	const loadCustomCSS = () => {
 		onChangePath( '/css' );
 	};
+	const hasPrimaryActions = canEditCSS || ! hideWelcomeGuide;
 
 	return (
-		<DropdownMenu
-			icon={ moreVertical }
-			label={ __( 'More' ) }
-			toggleProps={ { size: 'compact' } }
-		>
-			{ ( { onClose } ) => (
-				<>
-					<MenuGroup>
+		<Menu.Root modal={ false }>
+			<Menu.Trigger
+				render={
+					<Button
+						icon={ moreVertical }
+						label={ __( 'More' ) }
+						size="compact"
+					/>
+				}
+			/>
+			<Menu.Popup positioner={ <Menu.Positioner align="end" /> }>
+				{ hasPrimaryActions && (
+					<Menu.Group>
 						{ canEditCSS && (
-							<MenuItem onClick={ loadCustomCSS }>
-								{ __( 'Additional CSS' ) }
-							</MenuItem>
+							<Menu.Item onClick={ loadCustomCSS }>
+								<Menu.ItemLabel>
+									{ __( 'Additional CSS' ) }
+								</Menu.ItemLabel>
+							</Menu.Item>
 						) }
 						{ ! hideWelcomeGuide && (
-							<MenuItem
+							<Menu.Item
 								onClick={ () => {
 									toggle(
 										'core/edit-site',
 										'welcomeGuideStyles'
 									);
-									onClose();
 								} }
 							>
-								{ __( 'Welcome Guide' ) }
-							</MenuItem>
+								<Menu.ItemLabel>
+									{ __( 'Welcome Guide' ) }
+								</Menu.ItemLabel>
+							</Menu.Item>
 						) }
-					</MenuGroup>
-					<MenuGroup>
-						<MenuItem
-							onClick={ () => {
-								onReset();
-								onClose();
-							} }
-							disabled={ ! canReset }
-						>
+					</Menu.Group>
+				) }
+				{ hasPrimaryActions && <Menu.Separator /> }
+				<Menu.Group>
+					<Menu.Item onClick={ onReset } disabled={ ! canReset }>
+						<Menu.ItemLabel>
 							{ __( 'Reset styles' ) }
-						</MenuItem>
-					</MenuGroup>
-				</>
-			) }
-		</DropdownMenu>
+						</Menu.ItemLabel>
+					</Menu.Item>
+				</Menu.Group>
+			</Menu.Popup>
+		</Menu.Root>
 	);
 }
