@@ -37,12 +37,13 @@ export const Default: Story = {
 };
 
 /**
- * A parent checkbox can control which values in the group are selected.
+ * `CheckboxGroup` can be used to control a group of checkboxes from a single
+ * parent checkbox.
  *
- * Do not nest more than one level. Deeper nesting is hard for screen readers.
+ * For screen reader accessibility, do not nest more than one level.
  *
- * See the [Checkbox Groups](?path=/docs/design-system-components-form-checkbox-groups--docs)
- * page for labeled `CheckboxControl` examples.
+ * See the <a href="?path=/docs/design-system-components-form-checkbox-groups--docs#nesting" target="_top">`Checkbox Groups` documentation</a>
+ * for a full example.
  */
 export const WithParentCheckbox: Story = {
 	render: function Template() {

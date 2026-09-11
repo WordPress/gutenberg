@@ -50,16 +50,20 @@ export const GroupingCheckboxes: StoryObj = {
 };
 
 /**
- * To control a group from a parent checkbox:
+ * To control a group of checkboxes from a single parent checkbox:
  *
  * 1. Use `CheckboxGroup` in controlled mode.
- * 2. Pass the child checkbox values to `allValues`.
- * 3. Mark the parent checkbox with the `parent` prop.
+ * 2. Pass an array of the child checkbox values to the `allValues` prop.
+ * 3. Mark the parent checkbox with the `parent` boolean prop.
  *
- * `CheckboxGroup.NestedItems` adds standard indentation to nested items.
+ * A `CheckboxGroup.NestedItems` component is also available for adding standard
+ * indentation to the nested checkbox items.
  *
- * This example uses two `CheckboxGroup`s in one `Fieldset`. Do not nest more
- * than one level for screen readers.
+ * In this example, there are two `CheckboxGroup`s, one for fruits and one for
+ * vegetables. The two are grouped together in a single `Fieldset`, labeled by
+ * a legend.
+ *
+ * For screen reader accessibility, do not nest more than one level.
  */
 export const Nesting: StoryObj = {
 	render: function Template() {
