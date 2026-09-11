@@ -1,8 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '../style.scss';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '../../button/style.scss';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '../../dropdown/style.scss';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '../../popover/style.scss';
 import CustomGradientPicker from '../';
 import CustomGradientBar from '../gradient-bar';
 import { KEYBOARD_CONTROL_POINT_VARIATION } from '../gradient-bar/constants';
@@ -30,8 +38,8 @@ describe( 'CustomGradientPicker', () => {
 			const barBounds = bar.getBoundingClientRect();
 			expect( barBounds.width ).toBeGreaterThan( 0 );
 			// Hover mid-bar so the insert-point control appears (away from 0%/100%).
-			fireEvent.mouseMove( bar, {
-				clientX: barBounds.left + barBounds.width / 2,
+			await userEvent.hover( bar, {
+				position: { x: barBounds.width / 2, y: barBounds.height / 2 },
 			} );
 
 			// eslint-disable-next-line testing-library/no-node-access
@@ -39,7 +47,7 @@ describe( 'CustomGradientPicker', () => {
 				'.components-custom-gradient-picker__insert-point-dropdown'
 			) as HTMLElement;
 			expect( insertButton ).toBeTruthy();
-			await act( async () => insertButton.click() );
+			await userEvent.click( insertButton );
 
 			const colorSlider = screen.getByRole( 'slider', { name: 'Color' } );
 			const sliderBounds = colorSlider.getBoundingClientRect();
@@ -48,14 +56,11 @@ describe( 'CustomGradientPicker', () => {
 
 			// Choose a saturated mid-brightness color — creates the new stop and
 			// exercises parent gradient updates while picking.
-			const clientX = sliderBounds.left + sliderBounds.width * 0.8;
-			const clientY = sliderBounds.top + sliderBounds.height * 0.2;
-			fireEvent.mouseDown( colorSlider, {
-				buttons: 1,
-				clientX,
-				clientY,
-				pageX: clientX + window.scrollX,
-				pageY: clientY + window.scrollY,
+			await userEvent.click( colorSlider, {
+				position: {
+					x: sliderBounds.width * 0.8,
+					y: sliderBounds.height * 0.2,
+				},
 			} );
 
 			// ColorPicker content is portaled; pointer has no accessible role.
@@ -85,7 +90,7 @@ describe( 'CustomGradientPicker', () => {
 
 			// Close the portaled popover so later tests are not affected by
 			// asynchronous Popover position updates.
-			await act( async () => insertButton.click() );
+			await userEvent.click( insertButton );
 			await waitFor( () => {
 				expect(
 					screen.queryByRole( 'slider', { name: 'Color' } )
@@ -204,9 +209,6 @@ describe( 'CustomGradientBar', () => {
 		] );
 	} );
 
-	// Dragging is driven by window-level listeners attached on mousedown, and
-	// the position comes from the markers container's box, so that has to be
-	// given one in jsdom.
 	it( 'moves a control point when dragged', async () => {
 		const onChange = vi.fn();
 
@@ -223,18 +225,22 @@ describe( 'CustomGradientBar', () => {
 		const markers = container.querySelector(
 			'.components-custom-gradient-picker__markers-container'
 		) as HTMLElement;
-		markers.getBoundingClientRect = () =>
-			( { x: 0, width: 200 } ) as DOMRect;
+		expect( markers.getBoundingClientRect().width ).toBeGreaterThan( 0 );
+		// eslint-disable-next-line testing-library/no-node-access -- The gradient background has no accessible role.
+		const bar = markers.closest< HTMLElement >(
+			'.components-custom-gradient-picker__gradient-bar'
+		)!;
+		const bounds = bar.getBoundingClientRect();
 
 		const [ firstPoint ] = screen.getAllByRole( 'button', {
 			name: /Gradient control point/,
 		} );
 
-		fireEvent.mouseDown( firstPoint );
-		fireEvent.mouseMove( window, { clientX: 100 } );
-		fireEvent.mouseUp( window );
+		await userEvent.dragAndDrop( firstPoint, bar, {
+			targetPosition: { x: bounds.width / 2, y: bounds.height / 2 },
+		} );
 
-		// 100px into a 200px container is 50%.
+		// The midpoint of the rendered container is 50%.
 		expect( onChange ).toHaveBeenCalledWith( [
 			{ position: 50, color: 'rgb(0,0,0)' },
 			POINTS[ 1 ],
@@ -258,16 +264,20 @@ describe( 'CustomGradientBar', () => {
 		const markers = container.querySelector(
 			'.components-custom-gradient-picker__markers-container'
 		) as HTMLElement;
-		markers.getBoundingClientRect = () =>
-			( { x: 0, width: 200 } ) as DOMRect;
+		expect( markers.getBoundingClientRect().width ).toBeGreaterThan( 0 );
+		// eslint-disable-next-line testing-library/no-node-access -- The gradient background has no accessible role.
+		const bar = markers.closest< HTMLElement >(
+			'.components-custom-gradient-picker__gradient-bar'
+		)!;
+		const bounds = bar.getBoundingClientRect();
 
 		const [ firstPoint ] = screen.getAllByRole( 'button', {
 			name: /Gradient control point/,
 		} );
 
-		fireEvent.mouseDown( firstPoint );
-		fireEvent.mouseMove( window, { clientX: 100 } );
-		fireEvent.mouseUp( window );
+		await userEvent.dragAndDrop( firstPoint, bar, {
+			targetPosition: { x: bounds.width / 2, y: bounds.height / 2 },
+		} );
 
 		expect( onChange ).not.toHaveBeenCalled();
 	} );
