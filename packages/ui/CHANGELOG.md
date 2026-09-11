@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `CheckboxGroup` form primitive ([#82556](https://github.com/WordPress/gutenberg/pull/82556)).
+
 ### Enhancements
 
 -   `Checkbox`: Enlarge the hit target to 24px without changing the visual size. ([#82597](https://github.com/WordPress/gutenberg/pull/82597))
