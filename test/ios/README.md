@@ -14,3 +14,9 @@ npm run build
 The script serves the checkout with WordPress Playground, boots a simulator
 and runs `xcodebuild test`. Screenshots of failures are in
 `test/ios/build/results.xcresult`.
+
+The tests read the software keyboard, so the simulator must show one. A
+simulator that has ever had a hardware keyboard connected keeps hiding the
+software keyboard, and the tests then stop with "No software keyboard".
+Erase that simulator (`xcrun simctl erase <udid>`) or pass a fresh one in
+`SIMULATOR_UDID`.
