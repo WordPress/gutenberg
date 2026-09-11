@@ -203,7 +203,7 @@ describe( 'NavigationMenuSelector', () => {
 
 			it( 'should show a disabled create option when the user cannot create menus', async () => {
 				const user = userEvent.setup();
-				const handler = jest.fn();
+				const handler = vi.fn();
 
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],

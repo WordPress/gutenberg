@@ -1,28 +1,22 @@
-/**
- * WordPress dependencies
- */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import getNavigationMenuLabel from '../get-navigation-menu-label';
 
-jest.mock( '@wordpress/data', () => ( {
-	select: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	select: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/core-data', () => ( {
+vi.mock( import( '@wordpress/core-data' ), () => ( {
 	store: { name: 'core' },
 } ) );
 
 describe( 'getNavigationMenuLabel', () => {
-	const getEntityRecord = jest.fn();
-	const getEditedEntityRecord = jest.fn();
-	const canUser = jest.fn();
+	const getEntityRecord = vi.fn();
+	const getEditedEntityRecord = vi.fn();
+	const canUser = vi.fn();
 
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		select.mockReturnValue( {
 			canUser,
 			getEntityRecord,

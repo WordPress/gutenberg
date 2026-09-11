@@ -3366,7 +3366,17 @@
 			"count": 1
 		}
 	},
+	"packages/block-library/src/navigation/edit/read-only-inner-blocks.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-library/src/navigation/edit/responsive-wrapper.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/test/deleted-navigation-warning.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -3377,6 +3387,11 @@
 		}
 	},
 	"packages/block-library/src/navigation/edit/test/overlay-template-part-selector.jsdom.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/test/read-only-inner-blocks.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

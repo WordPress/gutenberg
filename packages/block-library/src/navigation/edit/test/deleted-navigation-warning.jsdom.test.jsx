@@ -1,17 +1,11 @@
-/**
- * External dependencies
- */
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import DeletedNavigationWarning from '../deleted-navigation-warning';
 
 describe( 'DeletedNavigationWarning', () => {
 	it( 'does not offer menu creation without permission', () => {
-		render( <DeletedNavigationWarning onCreateNew={ jest.fn() } /> );
+		render( <DeletedNavigationWarning onCreateNew={ vi.fn() } /> );
 
 		expect(
 			screen.getByText(
@@ -25,7 +19,7 @@ describe( 'DeletedNavigationWarning', () => {
 
 	it( 'offers menu creation when the user has permission', async () => {
 		const user = userEvent.setup();
-		const onCreateNew = jest.fn();
+		const onCreateNew = vi.fn();
 		render(
 			<DeletedNavigationWarning onCreateNew={ onCreateNew } canCreate />
 		);

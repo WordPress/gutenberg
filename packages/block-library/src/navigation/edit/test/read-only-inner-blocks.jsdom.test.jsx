@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import ReadOnlyNavigationInnerBlocks from '../read-only-inner-blocks';
 
 describe( 'ReadOnlyNavigationInnerBlocks', () => {
