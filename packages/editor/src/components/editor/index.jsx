@@ -19,6 +19,7 @@ function Editor( {
 	children,
 	initialEdits,
 	initialViewport,
+	renderingMode,
 
 	// This could be part of the settings.
 	onActionPerformed,
@@ -50,7 +51,9 @@ function Editor( {
 				select( editorStore );
 
 			const postArgs = [ 'postType', postType, postId ];
-			const renderingMode = getRenderingMode();
+			// Named apart from the `renderingMode` prop, which is what this
+			// editor was told to be in rather than what it is in now.
+			const currentRenderingMode = getRenderingMode();
 			const currentPostType = getCurrentPostType();
 			const _isBlockTheme = getCurrentTheme()?.is_block_theme;
 			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
@@ -82,7 +85,7 @@ function Editor( {
 					_isBlockTheme &&
 					userCanEditGlobalStyles &&
 					( currentPostType === 'wp_template' ||
-						renderingMode === 'template-locked' ),
+						currentRenderingMode === 'template-locked' ),
 			};
 		},
 		[ postType, postId, templateId ]
@@ -109,6 +112,7 @@ function Editor( {
 					settings={ settings }
 					initialEdits={ initialEdits }
 					initialViewport={ initialViewport }
+					renderingMode={ renderingMode }
 					useSubRegistry={ false }
 				>
 					<EditorInterface { ...props }>

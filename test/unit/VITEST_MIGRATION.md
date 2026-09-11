@@ -26,8 +26,13 @@ When writing or migrating a test:
     server-side logic.
 -   Use Browser Mode for real CSS, layout, geometry, viewport behavior, media
     queries, observers, animation, scrolling, native browser APIs, and
-    browser-dependent interaction. Import `userEvent` from `vitest/browser`,
-    and prefer locators for asynchronous browser state.
+    browser-dependent interaction. In direct React Browser Mode tests, import
+    and await `render` or `renderHook` from `vitest-browser-react`. Import
+    `userEvent` from `vitest/browser`, and prefer locators for asynchronous
+    browser state. Testing Library helpers can remain when Browser Mode has no
+    direct equivalent, but do not use its React renderer. The shared
+    `initializeEditor` integration helper is the remaining renderer exception;
+    do not add another.
 -   Use JSDOM for construction, parsing, serialization, accessibility
     structure, and deterministic DOM semantics, events, and state. Browser API
     exceptions require a concrete reason and must not remain after the
@@ -50,3 +55,10 @@ also rejects Vitest isolation opt-outs and global Vitest APIs.
 
 `wpVitest` remains an explicit opt-in for jsdom suites that need hoist-safe
 helpers inside `vi.hoisted()`.
+
+Vitest clears mock call history, resets mock implementations, restores spies,
+resets stubbed globals and environment variables, and restores real timers
+between tests. Tests must configure required mock implementations in their own
+setup hooks. Mutable state held by an imported module is not reset
+automatically; reset it explicitly or use `vi.resetModules()` when a fresh
+module instance is required.

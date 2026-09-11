@@ -1,32 +1,32 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { createRef } from '@wordpress/element';
 import { useWidgetHost } from '@wordpress/widget-primitives';
-import type { Ref } from 'react';
+import type { AnchorHTMLAttributes, Ref } from 'react';
 import { DashboardWidgetHostProvider } from '../dashboard-widget-host-provider';
 
-jest.mock( '@wordpress/route', () => {
+vi.mock( import( '@wordpress/route' ), async () => {
 	const { createElement, forwardRef } =
-		jest.requireActual( '@wordpress/element' );
+		await vi.importActual< typeof import('@wordpress/element') >(
+			'@wordpress/element'
+		);
+	type MockLinkProps = AnchorHTMLAttributes< HTMLAnchorElement > & {
+		to: string;
+		search?: Record< string, string >;
+	};
+	const Link = forwardRef< HTMLAnchorElement, MockLinkProps >(
+		( props, ref ) => {
+			const { to, search, ...rest } = props;
+			const query = search ? `?${ new URLSearchParams( search ) }` : '';
+			return createElement( 'a', {
+				...rest,
+				href: `${ to }${ query }`,
+				ref,
+			} );
+		}
+	);
 	return {
-		Link: forwardRef(
-			(
-				props: {
-					to: string;
-					search?: Record< string, string >;
-				} & Record< string, unknown >,
-				ref: unknown
-			) => {
-				const { to, search, ...rest } = props;
-				const query = search
-					? `?${ new URLSearchParams( search ) }`
-					: '';
-				return createElement( 'a', {
-					...rest,
-					href: `${ to }${ query }`,
-					ref,
-				} );
-			}
-		),
+		Link: Link as unknown as typeof import('@wordpress/route').Link,
 	};
 } );
 
