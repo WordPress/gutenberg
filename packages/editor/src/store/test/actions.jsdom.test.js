@@ -7,6 +7,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
+import warning from '@wordpress/warning';
 import { store as editorStore } from '..';
 import * as actions from '../actions';
 import { unlock } from '../../lock-unlock';
@@ -16,6 +17,8 @@ vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 vi.mock( '@wordpress/a11y', () => ( {
 	speak: vi.fn(),
 } ) );
+
+vi.mock( '@wordpress/warning' );
 
 const postId = 44;
 
@@ -1221,6 +1224,10 @@ describe( 'Editor actions', () => {
 	} );
 
 	describe( 'setRenderingMode', () => {
+		beforeEach( () => {
+			warning.mockClear();
+		} );
+
 		it( 'changes the mode when none is fixed', () => {
 			const registry = createRegistryWithStores();
 
@@ -1235,6 +1242,7 @@ describe( 'Editor actions', () => {
 			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
 				'template-locked'
 			);
+			expect( warning ).not.toHaveBeenCalled();
 		} );
 
 		it( 'applies the fixed mode, so an editor can enter it', () => {
@@ -1250,9 +1258,12 @@ describe( 'Editor actions', () => {
 			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
 				'template-locked'
 			);
+			// Applying the mode is how the editor enters it, so it is not a
+			// request to refuse.
+			expect( warning ).not.toHaveBeenCalled();
 		} );
 
-		it( 'ignores a move away from the fixed mode', () => {
+		it( 'ignores a move away from the fixed mode, and warns', () => {
 			const registry = createRegistryWithStores();
 			registry.dispatch( editorStore ).updateEditorSettings( {
 				renderingMode: 'template-locked',
@@ -1265,6 +1276,10 @@ describe( 'Editor actions', () => {
 
 			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
 				'template-locked'
+			);
+			expect( warning ).toHaveBeenCalledTimes( 1 );
+			expect( warning ).toHaveBeenCalledWith(
+				expect.stringContaining( "setRenderingMode( 'post-only' )" )
 			);
 		} );
 
@@ -1288,6 +1303,7 @@ describe( 'Editor actions', () => {
 			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
 				'post-only'
 			);
+			expect( warning ).not.toHaveBeenCalled();
 		} );
 	} );
 } );
