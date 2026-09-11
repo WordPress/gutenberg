@@ -389,8 +389,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Synchronize the editor settings as they change.
 		// Do it as a layout effect so that rendered UI with outdated settings is not painted.
 		useLayoutEffect( () => {
-			// Settings merge, so pass the prop even when `undefined` to clear a
-			// mode left behind by a previous mount.
+			// Settings merge, so pass the prop even when `undefined`. That clears the
+			// mode when this editor stays mounted but loses the prop, as when going
+			// from Home to Navigation: both show the front page in the same editor.
 			updateEditorSettings( { ...settings, renderingMode } );
 		}, [ settings, renderingMode, updateEditorSettings ] );
 
