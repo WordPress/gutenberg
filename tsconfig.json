@@ -51,6 +51,7 @@
 		{ "path": "packages/style-runtime" },
 		{ "path": "packages/sync" },
 		{ "path": "packages/theme" },
+		{ "path": "packages/theme/tsconfig.bin.json" },
 		{ "path": "packages/token-list" },
 		{ "path": "packages/ui" },
 		{ "path": "packages/ui/tsconfig.stories.json" },

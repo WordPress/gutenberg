@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Grid layout: when the title is hidden (`showTitle: false`) and items are clickable, label each item's clickable media area with its title instead of the generic "Navigate to item" ([#82639](https://github.com/WordPress/gutenberg/pull/82639)).
+
+### Internal
+
+-   Run rendered DataViews tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
+## 19.0.0 (2026-09-10)
+
 ### Breaking Changes
 
 -   Removed the rich text options (`className`, `clientId`, `allowedFormats`, `disableFormats`, `withoutInteractiveFormatting`, `preserveWhiteSpace`, `disableLineBreaks`) from the `config` prop of `DataFormControlProps`. They were added for the built-in `richtext` control ([#78471](https://github.com/WordPress/gutenberg/pull/78471)), which has since moved to `@wordpress/editor` ([#81430](https://github.com/WordPress/gutenberg/pull/81430)), so nothing in this package sets or reads them ([#82330](https://github.com/WordPress/gutenberg/pull/82330)).
@@ -65,6 +75,7 @@
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
 -   Note in the `/wp` bundle build script that its singleton externals list must stay in sync with the transitive private API usage check ([#82027](https://github.com/WordPress/gutenberg/pull/82027)).
+-   Update the `@types/node` development dependency to v24, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
 
 ### Bug Fix
 

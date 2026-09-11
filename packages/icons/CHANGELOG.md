@@ -4,6 +4,24 @@
 
 ### Breaking Changes
 
+-   A further 141 icons are now stroke-based. Use CSS `color` rather than `fill` to recolor them. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+
+### Enhancements
+
+-   Redraw a further 141 icons as stroke-based for variable stroke-width support, following the convention introduced in [#78808](https://github.com/WordPress/gutenberg/pull/78808), and refine the already stroke-based `image` drawing. Most retain their original footprint; the table icons, `capturePhoto` and `image` are slightly smaller by design. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+
+### Bug Fixes
+
+-   `formatIndent`, `formatIndentRTL`, `formatOutdent` and `formatOutdentRTL`: correct the arrow geometry, which was malformed in the previous drawings. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+
+### Internal
+
+-   Run rendered icon tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
+## 16.0.0 (2026-09-10)
+
+### Breaking Changes
+
 -   The `search` icon is now stroke-based. Use CSS `color` rather than `fill` to recolor it. ([#82338](https://github.com/WordPress/gutenberg/pull/82338))
 -   Stroke-based icons now declare `fill: none` via inline `style` on the outer `<svg>` instead of the `fill` attribute, so the source's intent survives ordinary third-party CSS overrides like `.foo svg { fill: currentColor }` without using `!important`. Consumers should use CSS `color` to recolor icons. A `fill` prop or ordinary CSS `fill` declaration no longer overrides the intrinsic `fill: none`; pass `style={ { fill: value } }` to deliberately replace it. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   Stroke-based icons use `vector-effect="non-scaling-stroke"`, so their stroke width stays constant when rendered outside the Icon block at sizes other than 24px. The Icon block deliberately restores the previous proportional stroke scaling. When new bundled icon elements run with an older externalized `wp.components.Icon`, supplying an unrelated `style` prop can replace the icon's intrinsic style; update the paired packages together to retain merged styles. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
