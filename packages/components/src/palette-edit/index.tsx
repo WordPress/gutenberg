@@ -12,7 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
 import { useDebounce, useInstanceId } from '@wordpress/compose';
 import { kebabCase } from '@wordpress/kebab-case';
-import { Menu } from '@wordpress/ui';
+import { Menu, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import Button from '../button';
 import { ColorPicker } from '../color-picker';
 import { FlexBlock, FlexItem } from '../flex';
@@ -612,6 +612,10 @@ export function PaletteEdit( {
 	slugPrefix = '',
 	popoverProps,
 }: PaletteEditProps ) {
+	// PaletteEdit combines Components overlays with UI Menu. Direct package
+	// consumers do not expose window.wp.components for automatic opt-in.
+	useEnableWpCompatOverlaySlot();
+
 	let variant: PaletteVariant = 'color';
 	if ( gradients ) {
 		variant = 'gradient';
