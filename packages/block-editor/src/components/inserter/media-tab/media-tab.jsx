@@ -44,7 +44,6 @@ function MediaTab( { rootClientId, onInsert } ) {
 	return (
 		<MediaSources
 			categories={ categories }
-			rootClientId={ rootClientId }
 			onInsert={ onInsert }
 			footer={
 				<MediaUploadCheck>
