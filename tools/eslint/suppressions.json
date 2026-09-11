@@ -3817,9 +3817,6 @@
 		}
 	},
 	"packages/block-library/src/search/edit.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

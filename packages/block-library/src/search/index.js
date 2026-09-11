@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { search as icon } from '@wordpress/icons';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
+import deprecated from './deprecated';
 import edit from './edit';
 import variations from './variations';
 
@@ -17,6 +18,7 @@ export const settings = {
 	},
 	variations,
 	edit,
+	deprecated,
 };
 
 export const init = () => initBlock( { name, metadata, settings } );
