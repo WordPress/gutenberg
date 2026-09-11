@@ -1611,6 +1611,21 @@ export function validateVitestPolicy( {
 			}
 		}
 	};
+	const isTrackedDomValue = ( value ) =>
+		isBrowserGlobalExpression(
+			value,
+			unboundIdentifiers,
+			domVariables,
+			domCollectionVariables,
+			identifierVariables,
+			windowVariables,
+			testingLibraryScreenVariables,
+			testingLibraryDomFunctionVariables,
+			testingLibraryAsyncDomFunctionVariables,
+			testingLibraryCollectionFunctionVariables,
+			testingLibraryAsyncCollectionFunctionVariables,
+			testingLibraryNamespaceVariables
+		);
 
 	for ( const node of ast.body ) {
 		if ( node.type !== 'ImportDeclaration' ) {
@@ -1831,6 +1846,33 @@ export function validateVitestPolicy( {
 							elementParameterIndex + callback.boundArgumentCount
 						]
 					);
+				}
+			}
+
+			if ( node.type === 'CallExpression' ) {
+				let localFunctions;
+				for ( const [
+					argumentIndex,
+					argument,
+				] of node.arguments.entries() ) {
+					if (
+						argument.type !== 'SpreadElement' &&
+						isTrackedDomValue( argument )
+					) {
+						localFunctions ??= getReachableLocalFunctions(
+							node.callee,
+							identifierVariables,
+							parentNodes
+						);
+						for ( const localFunction of localFunctions ) {
+							trackDomValuePattern(
+								localFunction.functionNode.params[
+									argumentIndex +
+										localFunction.boundArgumentCount
+								]
+							);
+						}
+					}
 				}
 			}
 
@@ -2096,22 +2138,7 @@ export function validateVitestPolicy( {
 				}
 			}
 
-			if (
-				! isBrowserGlobalExpression(
-					value,
-					unboundIdentifiers,
-					domVariables,
-					domCollectionVariables,
-					identifierVariables,
-					windowVariables,
-					testingLibraryScreenVariables,
-					testingLibraryDomFunctionVariables,
-					testingLibraryAsyncDomFunctionVariables,
-					testingLibraryCollectionFunctionVariables,
-					testingLibraryAsyncCollectionFunctionVariables,
-					testingLibraryNamespaceVariables
-				)
-			) {
+			if ( ! isTrackedDomValue( value ) ) {
 				return;
 			}
 
@@ -2305,22 +2332,43 @@ export function validateVitestPolicy( {
 			);
 		}
 
-		if (
-			project === 'jsdom' &&
-			! typeOnlyNodes.has( node ) &&
-			( ( node.type === 'Identifier' &&
-				browserApiIdentifiers.has( node.name ) &&
-				unboundIdentifiers.has( node ) ) ||
-				( node.type === 'MemberExpression' &&
-					browserApiProperties.has( getMemberPropertyName( node ) ) &&
+		if ( project === 'jsdom' && ! typeOnlyNodes.has( node ) ) {
+			const isVitestMock =
+				node.type === 'CallExpression' &&
+				node.callee?.type === 'MemberExpression' &&
+				isImportedApiReference(
+					node.callee.object,
+					'vi',
+					vitestViVariables,
+					vitestNamespaceVariables,
+					identifierVariables
+				);
+			const mockMethod =
+				isVitestMock && getMemberPropertyName( node.callee );
+			const apiName =
+				mockMethod === 'spyOn'
+					? getStaticStringValue( node.arguments[ 1 ] )
+					: getMemberPropertyName( node );
+			const apiTarget =
+				mockMethod === 'spyOn' ? node.arguments[ 0 ] : node.object;
+
+			if (
+				( node.type === 'Identifier' &&
+					browserApiIdentifiers.has( node.name ) &&
+					unboundIdentifiers.has( node ) ) ||
+				( mockMethod === 'stubGlobal' &&
+					browserApiProperties.has(
+						getStaticStringValue( node.arguments[ 0 ] )
+					) ) ||
+				( browserApiProperties.has( apiName ) &&
 					( isWindowReference(
-						node.object,
+						apiTarget,
 						unboundIdentifiers,
 						windowVariables,
 						identifierVariables
 					) ||
 						isBrowserGlobalExpression(
-							node.object,
+							apiTarget,
 							unboundIdentifiers,
 							domVariables,
 							domCollectionVariables,
@@ -2332,9 +2380,10 @@ export function validateVitestPolicy( {
 							testingLibraryCollectionFunctionVariables,
 							testingLibraryAsyncCollectionFunctionVariables,
 							testingLibraryNamespaceVariables
-						) ) ) )
-		) {
-			reportJsdomBrowserApi( node );
+						) ) )
+			) {
+				reportJsdomBrowserApi( node );
+			}
 		}
 
 		if (
