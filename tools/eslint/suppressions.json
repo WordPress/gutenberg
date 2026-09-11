@@ -5835,11 +5835,6 @@
 			"count": 1
 		}
 	},
-	"packages/edit-widgets/src/components/more-menu/tools-more-menu-group.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/edit-widgets/src/components/notices/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -6188,16 +6183,6 @@
 		}
 	},
 	"packages/editor/src/components/more-menu/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/more-menu/tools-more-menu-group.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/more-menu/view-more-menu-group.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
