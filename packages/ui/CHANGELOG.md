@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   `Autocomplete`, `Combobox`, `Menu`, and `Select`: Restore the highlighted item indicator in forced-colors mode, which wp-admin's global CSS was suppressing. ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX))
+-   `Autocomplete`, `Combobox`, `Menu`, and `Select`: Restore the highlighted item indicator in forced-colors mode, which wp-admin's global CSS was suppressing. ([#82772](https://github.com/WordPress/gutenberg/pull/82772))
 
 ### Internal
 
