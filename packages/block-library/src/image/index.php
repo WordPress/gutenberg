@@ -377,7 +377,7 @@ function block_core_image_print_lightbox_overlay() {
 					<span class="wp-lightbox-navigation-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$prev_button_icon}</span>
 					<span class="wp-lightbox-navigation-text" data-wp-bind--hidden="!state.hasNavigationText">{$prev_button_text}</span>
 				</button>
-				<div class="lightbox-image-container">
+				<div class="lightbox-image-container" aria-hidden="true">
 					<figure data-wp-bind--class="state.selectedImage.figureClassNames" data-wp-bind--style="state.figureStyles">
 						<img data-wp-bind--alt="state.selectedImage.alt" data-wp-bind--class="state.selectedImage.imgClassNames" data-wp-bind--style="state.imgStyles" data-wp-bind--src="state.selectedImage.currentSrc">
 					</figure>
@@ -398,7 +398,7 @@ function block_core_image_print_lightbox_overlay() {
 					<span class="wp-lightbox-navigation-text" data-wp-bind--hidden="!state.hasNavigationText">{$next_button_text}</span>
 					<span class="wp-lightbox-navigation-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$next_button_icon}</span>
 				</button>
-				<div data-wp-text="state.ariaLabel" aria-live="polite" aria-atomic="true" class="screen-reader-text"></div>
+				<div data-wp-text="state.currentLiveText" data-wp-bind--hidden="!state.currentLiveText" aria-live="polite" aria-atomic="true" class="screen-reader-text"></div>
 				<div class="scrim" style="background-color: {$background_color}" aria-hidden="true"></div>
 		</div>
 HTML;

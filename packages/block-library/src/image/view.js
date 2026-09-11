@@ -66,6 +66,7 @@ const { state, actions, callbacks } = store(
 			selectedGalleryId: null,
 			preloadTimers: new Map(),
 			preloadedImageIds: new Set(),
+			currentLiveText: '',
 			get galleryImages() {
 				if ( ! state.selectedGalleryId ) {
 					return [ state.selectedImageId ];
@@ -210,12 +211,17 @@ const { state, actions, callbacks } = store(
 				state.selectedGalleryId = galleryId || null;
 				state.overlayEnabled = true;
 
+				// Clears the live text so the aria-live region is empty
+				// on initial open and not counted as a dialog item.
+				state.currentLiveText = '';
+
 				// Computes the styles of the overlay for the animation.
 				callbacks.setOverlayStyles();
 			},
 			hideLightbox() {
 				if ( state.overlayEnabled ) {
 					state.overlayEnabled = false;
+					state.currentLiveText = '';
 
 					// Waits until the close animation has completed before allowing a
 					// user to scroll again. The duration of this animation is defined in
@@ -242,6 +248,7 @@ const { state, actions, callbacks } = store(
 					? state.selectedImageIndex - 1
 					: state.galleryImages.length - 1;
 				state.selectedImageId = state.galleryImages[ nextIndex ];
+				state.currentLiveText = state.ariaLabel;
 				callbacks.setOverlayStyles();
 			} ),
 			showNextImage: withSyncEvent( ( event ) => {
@@ -250,6 +257,7 @@ const { state, actions, callbacks } = store(
 					? state.selectedImageIndex + 1
 					: 0;
 				state.selectedImageId = state.galleryImages[ nextIndex ];
+				state.currentLiveText = state.ariaLabel;
 				callbacks.setOverlayStyles();
 			} ),
 			handleKeydown: withSyncEvent( ( event ) => {
