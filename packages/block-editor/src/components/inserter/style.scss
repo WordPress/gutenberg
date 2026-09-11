@@ -229,17 +229,12 @@ $block-inserter-tabs-height: 44px;
 	border-bottom: $border-width solid $gray-200;
 }
 
-.block-editor-inserter__media-tabs-container,
 .block-editor-inserter__block-patterns-tabs-container {
 	flex-grow: 1;
 	padding: 0 $grid-unit-20 $grid-unit-20;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-}
-
-.block-editor-inserter__media-tabs-container {
-	padding-top: $grid-unit-20;
 }
 
 .block-editor-inserter__category-tablist {
@@ -263,7 +258,6 @@ $block-inserter-tabs-height: 44px;
 		background: $gray-100;
 		border-top: $border-width solid $gray-200;
 
-		.block-editor-inserter__media-list,
 		.block-editor-block-patterns-list {
 			padding: 0 $grid-unit-30 $grid-unit-20;
 		}
@@ -447,32 +441,71 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-// On mobile the media category renders inside a `Navigator.Screen`. The screen
-// is a grid item the navigator aligns to the start (so it's content-height by
-// default); stretch it to full height and make it a flex column so the panel
-// below the back-button header fills the remaining space rather than overflowing.
-.block-editor-inserter__media-mobile-screen {
+// The Media tab is a single column: every source is a collapsible panel, and
+// the open one takes the height left beneath the other panels' headers so its
+// results scroll internally.
+.block-editor-inserter__media-sources {
 	display: flex;
 	flex-direction: column;
-	align-self: stretch;
+	flex: 1;
+	min-height: 0;
+
+	.block-editor-inserter__media-sources__source {
+		display: flex;
+		flex-direction: column;
+		flex-shrink: 0;
+		border-bottom: $border-width solid $gray-200;
+
+		&.is-open {
+			flex: 1;
+			min-height: 0;
+		}
+	}
+
+	.block-editor-inserter__media-sources__trigger {
+		// Reset the native button so the header reads as a row in the column.
+		appearance: none;
+		border: 0;
+		background: none;
+		color: inherit;
+		font: inherit;
+		cursor: var(--wpds-cursor-control);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: $grid-unit-10;
+		width: 100%;
+		padding: $grid-unit-15 $grid-unit-20;
+		font-weight: 500;
+		text-align: start;
+		flex-shrink: 0;
+
+		&:focus-visible {
+			@include outset-ring__focus();
+		}
+	}
+
+	.block-editor-inserter__media-sources__panel {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+	}
+
+	.block-editor-inserter__media-sources__footer {
+		flex-shrink: 0;
+		padding: 0 $grid-unit-20 $grid-unit-20;
+	}
 }
 
 .block-editor-inserter__media-panel {
 	padding: 0 $grid-unit-20;
 	display: flex;
 	flex-direction: column;
-	// Mobile: fill the height left below the screen's back-button header so the
-	// results scroll internally and the attach footer stays on-screen.
+	// Fill the height of the open source panel so the results scroll
+	// internally and the footer stays on-screen.
 	flex: 1;
 	min-height: 0;
-
-	@include break-medium {
-		padding: 0;
-		// Desktop: the panel lives in the absolutely-positioned category panel,
-		// so fill its height directly instead.
-		flex: 0 1 auto;
-		min-height: 100%;
-	}
 
 	.block-editor-inserter__media-panel-spinner {
 		height: 100%;
@@ -484,10 +517,6 @@ $block-inserter-tabs-height: 44px;
 
 	.block-editor-inserter__media-panel-search {
 		margin-bottom: $grid-unit-30;
-		@include break-medium() {
-			margin-bottom: 0;
-			padding: $grid-unit-20 $grid-unit-30 $grid-unit-20;
-		}
 	}
 
 	// The empty state grows to fill, alongside `-results`/`-spinner`, so the
@@ -502,16 +531,11 @@ $block-inserter-tabs-height: 44px;
 		flex-shrink: 0;
 		padding-top: $grid-unit-20;
 		padding-bottom: $grid-unit-20;
-		@include break-medium() {
-			// Align with the search field and grid gutters.
-			padding-left: $grid-unit-30;
-			padding-right: $grid-unit-30;
-		}
 	}
 
 	.block-editor-inserter__media-panel-attach {
 		// Match the padding (and so the height) of the "Open Media Library"
-		// footer button in the adjacent column, so the two line up.
+		// button beneath the panels, so the two line up.
 		&.components-button {
 			justify-content: center;
 			padding: $grid-unit-20;
