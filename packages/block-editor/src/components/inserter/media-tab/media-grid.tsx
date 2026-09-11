@@ -43,6 +43,10 @@ type MediaGridProps = {
 	totalItems?: number;
 	totalPages?: number;
 	page: number;
+	/**
+	 * Items per page, as requested from the source by the panel.
+	 */
+	perPage: number;
 	onChangePage: ( page: number ) => void;
 	search: string;
 	onChangeSearch: ( search: string ) => void;
@@ -66,7 +70,6 @@ type MediaGridProps = {
 	footer?: ReactNode;
 };
 
-const PER_PAGE = 20;
 const EMPTY_ARRAY: MediaItem[] = [];
 // A 120px minimum gives two columns at the inserter's width (the grid derives
 // its column count from the container width and this size).
@@ -154,6 +157,7 @@ export default function MediaGrid( {
 	totalItems,
 	totalPages,
 	page,
+	perPage,
 	onChangePage,
 	search,
 	onChangeSearch,
@@ -207,7 +211,7 @@ export default function MediaGrid( {
 		() => ( {
 			type: 'grid',
 			page,
-			perPage: PER_PAGE,
+			perPage,
 			search,
 			fields: [],
 			titleField: 'title',
@@ -216,7 +220,7 @@ export default function MediaGrid( {
 			showMedia: true,
 			layout: GRID_LAYOUT,
 		} ),
-		[ page, search ]
+		[ page, perPage, search ]
 	);
 
 	// The panel owns page and search; the view is derived from them, so a
