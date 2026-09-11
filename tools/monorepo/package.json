@@ -26,6 +26,8 @@
 	},
 	"devDependencies": {
 		"@testing-library/jest-dom": "^7.0.1",
+		"@types/react": "^18.3.27",
+		"@wordpress/data": "file:../../packages/data",
 		"vitest": "^5.0.0"
 	},
 	"publishConfig": {

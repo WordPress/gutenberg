@@ -25,7 +25,9 @@ const validatorPath = fileURLToPath(
 const REQUIRED_BUILD_EXCLUDES = parse(
 	readFileSync(
 		fileURLToPath(
-			import.meta.resolve( '@wordpress/monorepo-tools/tsconfig/base.json' )
+			import.meta.resolve(
+				'@wordpress/monorepo-tools/tsconfig/base.json'
+			)
 		),
 		'utf8'
 	)
