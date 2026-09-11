@@ -9,9 +9,12 @@ import {
 } from '@wordpress/element';
 import { useDebouncedInput, usePrevious } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
+import { decodeEntities } from '@wordpress/html-entities';
 import { store as noticesStore } from '@wordpress/notices';
 import { external, linkOff } from '@wordpress/icons';
 import MediaGrid from './media-grid';
+import FolderSelect from './folder-select';
+import NewFolderModal from './new-folder-modal';
 import MediaUpload from '../../media-upload';
 import MediaUploadCheck from '../../media-upload/check';
 import { useMediaResults } from './hooks';
@@ -25,25 +28,26 @@ const MEDIA_ITEMS_PER_PAGE = 8;
 const ATTACH_ALLOWED_TYPES = [ 'image' ];
 
 /**
- * Opens the Media Library to attach images to the current post. Only rendered
- * for media categories that expose an `attach` capability (i.e. the "Attached
- * images" source); other sources render the panel exactly as before.
+ * Opens the Media Library to pick items for the panel's footer action: attaching
+ * images to the current post, or filing items into the selected folder.
  *
  * The picker opens fresh each time with no pre-selected value, so it is purely
- * additive: selecting images attaches them, and it does not imply that
- * deselecting would detach. Detaching is a separate, explicit per-item action.
+ * additive: selecting items adds them, and it does not imply that deselecting
+ * would remove them. Removing is a separate, explicit per-item action.
  *
  * @param {Object}   props
- * @param {Function} props.onSelect Called with the selected media items.
+ * @param {string}   props.label        The button label, also the picker's title.
+ * @param {string[]} props.allowedTypes The media types the picker offers.
+ * @param {Function} props.onSelect     Called with the selected media items.
  */
-function AttachImagesButton( { onSelect } ) {
+function MediaPickerButton( { label, allowedTypes, onSelect } ) {
 	return (
 		<MediaUploadCheck>
 			<MediaUpload
 				multiple="add"
 				onSelect={ onSelect }
-				allowedTypes={ ATTACH_ALLOWED_TYPES }
-				title={ __( 'Attach images' ) }
+				allowedTypes={ allowedTypes }
+				title={ label }
 				render={ ( { open } ) => (
 					<Button
 						__next40pxDefaultSize
@@ -55,7 +59,7 @@ function AttachImagesButton( { onSelect } ) {
 						} }
 						variant="secondary"
 					>
-						{ __( 'Attach images' ) }
+						{ label }
 					</Button>
 				) }
 			/>
@@ -107,30 +111,59 @@ function DetachConfirmation( { postTypeLabel, onCancel, onConfirm } ) {
 	);
 }
 
-export function MediaCategoryPanel( { onInsert, category } ) {
+/**
+ * @param {Object}   props
+ * @param {Function} props.onInsert       Called with the block to insert.
+ * @param {Object}   props.category       The media source.
+ * @param {Object}   [props.mediaFolders] The host editor's media folders capability, when available.
+ */
+export function MediaCategoryPanel( { onInsert, category, mediaFolders } ) {
 	// The grid's search input debounces on its own, so the panel queries with
 	// the value it hands over as-is.
 	const [ search, setSearch ] = useDebouncedInput();
 	const [ page, setPage ] = useState( 1 );
-	// Reset paging whenever the source category or the search term changes.
-	// Adjusting state during render (rather than in an effect) keeps the query
-	// on page 1 for the very next fetch, avoiding a wasted request for the
-	// previous page. Mirrors `usePatternsPaging`.
+	// The selected folder's id, or `undefined` for all. Only meaningful for a
+	// source that supports folders while the host editor supplies them.
+	const [ folder, setFolder ] = useState();
+	const folders =
+		mediaFolders && category.supportsFolders
+			? mediaFolders.folders
+			: undefined;
+	// Reset paging (and the folder) whenever the source category changes, and
+	// paging whenever the search term or folder changes. Adjusting state during
+	// render (rather than in an effect) keeps the query on page 1 for the very
+	// next fetch, avoiding a wasted request for the previous page. Mirrors
+	// `usePatternsPaging`.
 	const previousCategory = usePrevious( category.name );
 	const previousSearch = usePrevious( search );
+	const previousFolder = usePrevious( folder );
+	if ( previousCategory !== category.name && folder !== undefined ) {
+		setFolder( undefined );
+	}
 	if (
-		( previousCategory !== category.name || previousSearch !== search ) &&
+		( previousCategory !== category.name ||
+			previousSearch !== search ||
+			previousFolder !== folder ) &&
 		page !== 1
 	) {
 		setPage( 1 );
+	}
+	// A folder deleted elsewhere (or folders going away) leaves nothing to
+	// filter by.
+	if (
+		folder !== undefined &&
+		! folders?.some( ( { id } ) => id === folder )
+	) {
+		setFolder( undefined );
 	}
 	const query = useMemo(
 		() => ( {
 			per_page: MEDIA_ITEMS_PER_PAGE,
 			page,
 			search,
+			folder,
 		} ),
-		[ page, search ]
+		[ page, search, folder ]
 	);
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
 	const { mediaList, isLoading, totalItems, totalPages } = useMediaResults(
@@ -148,6 +181,7 @@ export function MediaCategoryPanel( { onInsert, category } ) {
 	// Private to core's media categories, these capabilities act on WordPress
 	// attachments:
 	// - `attach`/`detach`/`invalidate` manage the images attached to this post.
+	// - `assignToFolder`/`removeFromFolder` file them into media folders.
 	// - `subscribe` watches the attachment cache backing them.
 	// An external resource can never own a post's attachments, and every category
 	// registered by an extender through the public `registerInserterMediaCategory`
@@ -157,6 +191,12 @@ export function MediaCategoryPanel( { onInsert, category } ) {
 	const attach = supportsAttachments ? category.attach : undefined;
 	const detach = supportsAttachments ? category.detach : undefined;
 	const subscribe = supportsAttachments ? category.subscribe : undefined;
+	const assignToFolder =
+		supportsAttachments && folders ? category.assignToFolder : undefined;
+	const selectedFolder = folders?.find( ( { id } ) => id === folder );
+	const selectedFolderName = selectedFolder
+		? decodeEntities( selectedFolder.name )
+		: undefined;
 
 	const panelRef = useRef();
 	const changePage = useCallback( ( nextPage ) => {
@@ -171,7 +211,7 @@ export function MediaCategoryPanel( { onInsert, category } ) {
 		useDispatch( noticesStore );
 
 	// Invalidate the cached results and force `useMediaResults` to refetch so
-	// the grid reflects images that were just attached or detached.
+	// the grid reflects images that were just attached, detached or filed.
 	const refresh = useCallback( () => {
 		if ( supportsAttachments ) {
 			category.invalidate?.( query );
@@ -272,6 +312,65 @@ export function MediaCategoryPanel( { onInsert, category } ) {
 		[ detach, category, refresh, createErrorNotice, createSuccessNotice ]
 	);
 
+	// Files the picked items into the selected folder.
+	const handleAddToFolder = useCallback(
+		async ( selectedMedia ) => {
+			try {
+				const addedCount = await assignToFolder(
+					selectedMedia,
+					folder
+				);
+
+				if ( ! addedCount ) {
+					// The picker's "Upload files" tab accepts any file type, so
+					// a selection can hold nothing of this source's type.
+					createWarningNotice( __( 'No items were added.' ), {
+						type: 'snackbar',
+						id: 'inserter-notice',
+					} );
+					return;
+				}
+
+				refresh();
+				createSuccessNotice(
+					sprintf(
+						/* translators: %1$d: Number of items added. %2$s: Name of the folder. */
+						_n(
+							'%1$d item added to %2$s.',
+							'%1$d items added to %2$s.',
+							addedCount
+						),
+						addedCount,
+						selectedFolderName
+					),
+					{ type: 'snackbar', id: 'inserter-notice' }
+				);
+			} catch {
+				createErrorNotice( __( 'Could not add items to the folder.' ), {
+					type: 'snackbar',
+					id: 'inserter-notice',
+				} );
+			}
+		},
+		[
+			assignToFolder,
+			folder,
+			selectedFolderName,
+			refresh,
+			createErrorNotice,
+			createSuccessNotice,
+			createWarningNotice,
+		]
+	);
+
+	const [ isCreatingFolder, setIsCreatingFolder ] = useState( false );
+	const onFolderCreated = useCallback( ( newFolder ) => {
+		setIsCreatingFolder( false );
+		// Land in the new, empty folder so items can be added to it straight
+		// away. The host's folder list updates on its own.
+		setFolder( newFolder?.id );
+	}, [] );
+
 	// Per-item actions for the grid's card menu. None supports bulk, so the
 	// grid renders no selection checkboxes.
 	const actions = useMemo( () => {
@@ -322,13 +421,34 @@ export function MediaCategoryPanel( { onInsert, category } ) {
 	}, [ category, detach, handleDetach ] );
 
 	const searchLabel = category.labels.search_items || __( 'Search' );
-	const emptyMessage =
-		category.emptyMessage && ! search
-			? // For a source with a custom empty message (e.g. Attachments)
-			  // and no active search, an empty result means nothing is
-			  // attached yet — clearer than the generic "no results found".
-			  category.emptyMessage
-			: __( 'No results found.' );
+	let emptyMessage = __( 'No results found.' );
+	if ( ! search && selectedFolder ) {
+		emptyMessage = __( 'This folder is empty.' );
+	} else if ( ! search && category.emptyMessage ) {
+		// For a source with a custom empty message (e.g. Attachments) and no
+		// active search, an empty result means nothing is attached yet —
+		// clearer than the generic "no results found".
+		emptyMessage = category.emptyMessage;
+	}
+
+	let footer;
+	if ( selectedFolder && assignToFolder ) {
+		footer = (
+			<MediaPickerButton
+				label={ __( 'Add to folder' ) }
+				allowedTypes={ [ category.mediaType ] }
+				onSelect={ handleAddToFolder }
+			/>
+		);
+	} else if ( attach ) {
+		footer = (
+			<MediaPickerButton
+				label={ __( 'Attach images' ) }
+				allowedTypes={ ATTACH_ALLOWED_TYPES }
+				onSelect={ handleAttach }
+			/>
+		);
+	}
 
 	return (
 		<div ref={ panelRef } className="block-editor-inserter__media-panel">
@@ -346,13 +466,32 @@ export function MediaCategoryPanel( { onInsert, category } ) {
 				onInsert={ onInsert }
 				actions={ actions }
 				searchLabel={ searchLabel }
+				filters={
+					folders && (
+						<FolderSelect
+							folders={ folders }
+							value={ folder }
+							onChange={ setFolder }
+							onCreate={
+								mediaFolders.canCreate
+									? () => setIsCreatingFolder( true )
+									: undefined
+							}
+						/>
+					)
+				}
 				empty={
 					<InserterNoResults>{ emptyMessage }</InserterNoResults>
 				}
-				footer={
-					attach && <AttachImagesButton onSelect={ handleAttach } />
-				}
+				footer={ footer }
 			/>
+			{ isCreatingFolder && (
+				<NewFolderModal
+					create={ mediaFolders.create }
+					onCreated={ onFolderCreated }
+					onClose={ () => setIsCreatingFolder( false ) }
+				/>
+			) }
 		</div>
 	);
 }

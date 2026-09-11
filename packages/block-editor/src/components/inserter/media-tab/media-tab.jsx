@@ -1,17 +1,27 @@
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import MediaUploadCheck from '../../media-upload/check';
 import MediaUpload from '../../media-upload';
 import { useMediaCategories } from './hooks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import MediaSources from './media-sources';
 import InserterNoResults from '../no-results';
+import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
 function MediaTab( { rootClientId, onInsert } ) {
 	const mediaCategories = useMediaCategories( rootClientId );
+	// Supplied by the host editor while media folders are available (see the
+	// `inserterMediaFolders` private setting); `undefined` otherwise.
+	const mediaFolders = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).getInserterMediaFolders(),
+		[]
+	);
 	const onSelectMedia = useCallback(
 		( media ) => {
 			if ( ! media?.url ) {
@@ -44,6 +54,7 @@ function MediaTab( { rootClientId, onInsert } ) {
 	return (
 		<MediaSources
 			categories={ categories }
+			mediaFolders={ mediaFolders }
 			onInsert={ onInsert }
 			footer={
 				<MediaUploadCheck>

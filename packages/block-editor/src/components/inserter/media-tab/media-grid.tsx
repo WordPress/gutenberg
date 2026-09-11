@@ -62,6 +62,10 @@ type MediaGridProps = {
 	actions: Action< MediaItem >[];
 	searchLabel: string;
 	/**
+	 * Rendered between the search and the grid (e.g. the folder filter).
+	 */
+	filters?: ReactNode;
+	/**
 	 * Rendered when there are no items to show.
 	 */
 	empty: ReactNode;
@@ -180,6 +184,7 @@ export default function MediaGrid( {
 	onInsert,
 	actions,
 	searchLabel,
+	filters,
 	empty,
 	footer,
 }: MediaGridProps ) {
@@ -299,6 +304,7 @@ export default function MediaGrid( {
 				<div className="block-editor-inserter__media-grid__search">
 					<DataViews.Search label={ searchLabel } />
 				</div>
+				{ filters }
 				<DataViews.Layout
 					className={ clsx( 'block-editor-inserter__media-grid', {
 						'has-footer': hasFooter,

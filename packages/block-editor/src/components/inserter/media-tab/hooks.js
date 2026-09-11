@@ -85,10 +85,18 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 			lastQueryKeyRef.current = key;
 			lastFetchRef.current = category.fetch;
 			lastSourceRef.current = category.name;
-			// Omit the default first page so sources that forward the query to a
-			// strict external API don't receive an unexpected `page` arg.
-			const { page, ...queryWithoutPage } = query;
-			const fetchQuery = page > 1 ? query : queryWithoutPage;
+			// Omit the default first page, and any unset optional arg (e.g. no
+			// folder selected), so sources that forward the query to a strict
+			// external API don't receive an unexpected or empty arg. The panel
+			// keeps every key on its query object so this hook's dependencies
+			// stay a fixed length.
+			const fetchQuery = Object.fromEntries(
+				Object.entries( query ).filter(
+					( [ arg, value ] ) =>
+						value !== undefined &&
+						! ( arg === 'page' && ! ( value > 1 ) )
+				)
+			);
 			const { mediaItems, totalItems, totalPages } = normalizeFetchResult(
 				await category.fetch?.( fetchQuery )
 			);

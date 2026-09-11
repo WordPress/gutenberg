@@ -21,10 +21,18 @@ vi.mock( import( '../hooks' ), () => ( {
 } ) );
 
 // Replace the grid with a marker that reports the actions it was given and
-// lets tests drive its search and paging callbacks.
+// lets tests drive its search and paging callbacks; the filters and footer it
+// receives render through so their controls can be exercised.
 vi.mock( import( '../media-grid' ), () => ( {
 	__esModule: true,
-	default: ( { actions, onChangeSearch, onChangePage, page, footer } ) => (
+	default: ( {
+		actions,
+		onChangeSearch,
+		onChangePage,
+		page,
+		filters,
+		footer,
+	} ) => (
 		<div
 			data-testid="media-grid"
 			data-actions={ actions.map( ( action ) => action.id ).join( ',' ) }
@@ -32,12 +40,31 @@ vi.mock( import( '../media-grid' ), () => ( {
 		>
 			<button onClick={ () => onChangeSearch( 'sunset' ) }>search</button>
 			<button onClick={ () => onChangePage( 2 ) }>next page</button>
+			{ filters }
 			{ footer }
 		</div>
 	),
 } ) );
 
-// The attach button renders through MediaUpload's render prop behind a
+// Replace the folder select with a marker that lists the folders and lets
+// tests pick one, so the design-system popup isn't part of the test.
+vi.mock( import( '../folder-select' ), () => ( {
+	__esModule: true,
+	default: ( { folders, value, onChange, onCreate } ) => (
+		<div
+			data-testid="folder-select"
+			data-folders={ folders
+				.map( ( folder ) => folder.name )
+				.join( ',' ) }
+			data-value={ String( value ) }
+			data-can-create={ String( !! onCreate ) }
+		>
+			<button onClick={ () => onChange( 7 ) }>choose Holiday</button>
+		</div>
+	),
+} ) );
+
+// The picker button renders through MediaUpload's render prop behind a
 // capability check; stub both so the real Button (and its label) render.
 vi.mock( import( '../../../media-upload' ), () => ( {
 	__esModule: true,
@@ -58,14 +85,28 @@ const baseCategory = {
 	invalidate: vi.fn(),
 };
 
-function renderPanel( category ) {
+const mediaFolders = {
+	folders: [
+		{ id: 7, name: 'Holiday' },
+		{ id: 8, name: 'Product shots' },
+	],
+	canCreate: true,
+	create: vi.fn(),
+};
+
+function renderPanel( category, props ) {
 	return render(
-		<MediaCategoryPanel onInsert={ vi.fn() } category={ category } />
+		<MediaCategoryPanel
+			onInsert={ vi.fn() }
+			category={ category }
+			{ ...props }
+		/>
 	);
 }
 
 const getGridActions = () =>
 	screen.getByTestId( 'media-grid' ).getAttribute( 'data-actions' );
+const lastQuery = () => useMediaResults.mock.lastCall[ 1 ];
 
 beforeEach( () => {
 	useMediaResults.mockClear();
@@ -139,8 +180,6 @@ describe( 'MediaCategoryPanel subscription gating', () => {
 } );
 
 describe( 'MediaCategoryPanel querying', () => {
-	const lastQuery = () => useMediaResults.mock.lastCall[ 1 ];
-
 	it( 'queries with the search term and page the grid reports', async () => {
 		const user = userEvent.setup();
 		renderPanel( baseCategory );
@@ -160,6 +199,73 @@ describe( 'MediaCategoryPanel querying', () => {
 		await user.click( screen.getByRole( 'button', { name: 'search' } ) );
 		expect( lastQuery() ).toEqual(
 			expect.objectContaining( { page: 1, search: 'sunset' } )
+		);
+	} );
+} );
+
+describe( 'MediaCategoryPanel media folders', () => {
+	const folderCategory = {
+		...baseCategory,
+		supportsFolders: true,
+		assignToFolder: vi.fn(),
+		removeFromFolder: vi.fn(),
+	};
+
+	it( 'offers no folder UI without the host capability or source support', () => {
+		const { unmount } = renderPanel( folderCategory );
+		expect(
+			screen.queryByTestId( 'folder-select' )
+		).not.toBeInTheDocument();
+		unmount();
+
+		renderPanel( baseCategory, { mediaFolders } );
+		expect(
+			screen.queryByTestId( 'folder-select' )
+		).not.toBeInTheDocument();
+		expect( lastQuery().folder ).toBeUndefined();
+	} );
+
+	it( 'filters by the chosen folder from the first page and swaps the footer action', async () => {
+		const user = userEvent.setup();
+		renderPanel( folderCategory, { mediaFolders } );
+
+		const folderSelect = screen.getByTestId( 'folder-select' );
+		expect( folderSelect ).toHaveAttribute(
+			'data-folders',
+			'Holiday,Product shots'
+		);
+		expect( folderSelect ).toHaveAttribute( 'data-can-create', 'true' );
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { folder: undefined } )
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Attach images' } )
+		).toBeInTheDocument();
+
+		await user.click( screen.getByRole( 'button', { name: 'next page' } ) );
+		await user.click(
+			screen.getByRole( 'button', { name: 'choose Holiday' } )
+		);
+
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { page: 1, folder: 7 } )
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Add to folder' } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Attach images' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'hides folder creation when the user may not create folders', () => {
+		renderPanel( folderCategory, {
+			mediaFolders: { ...mediaFolders, canCreate: false },
+		} );
+
+		expect( screen.getByTestId( 'folder-select' ) ).toHaveAttribute(
+			'data-can-create',
+			'false'
 		);
 	} );
 } );

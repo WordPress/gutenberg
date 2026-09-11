@@ -16,6 +16,11 @@ type MediaSourcesProps = {
 	 */
 	categories: MediaSourceCategory[];
 	/**
+	 * The host editor's media folders capability, when media folders are
+	 * available; handed to every panel.
+	 */
+	mediaFolders?: unknown;
+	/**
 	 * Called with the block to insert.
 	 */
 	onInsert: ( block: unknown ) => void;
@@ -39,6 +44,7 @@ const DEFAULT_OPEN_SOURCE = 'images';
  */
 export default function MediaSources( {
 	categories,
+	mediaFolders,
 	onInsert,
 	footer,
 }: MediaSourcesProps ) {
@@ -83,6 +89,7 @@ export default function MediaSources( {
 							<MediaCategoryPanel
 								onInsert={ onInsert }
 								category={ category }
+								mediaFolders={ mediaFolders }
 							/>
 						</Collapsible.Panel>
 					</Collapsible.Root>

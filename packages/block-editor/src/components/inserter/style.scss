@@ -519,6 +519,18 @@ $media-panel-min-height: 320px;
 		}
 	}
 
+	// The folder filter beneath the search: the dropdown takes the width,
+	// with the "New folder" button beside it.
+	.block-editor-inserter__media-grid__filters {
+		flex-shrink: 0;
+		padding: 0 $grid-unit-20 $grid-unit-20;
+
+		.block-editor-inserter__media-folder-select {
+			flex: 1;
+			min-width: 0;
+		}
+	}
+
 	.dataviews-view-grid {
 		padding: 0 $grid-unit-20 $grid-unit-20;
 
