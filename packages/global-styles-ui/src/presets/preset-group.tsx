@@ -64,40 +64,38 @@ export default function PresetGroup( {
 			) }
 			<Stack justify="space-between" align="flex-start">
 				<Subtitle level={ 3 }>{ label }</Subtitle>
-				<FlexItem>
-					<Stack direction="row" gap="xs">
-						{ addLabel && onAdd && (
-							<Button
-								size="small"
-								icon={ plus }
-								label={ addLabel }
-								onClick={ onAdd }
+				<Stack direction="row" gap="xs">
+					{ addLabel && onAdd && (
+						<Button
+							size="small"
+							icon={ plus }
+							label={ addLabel }
+							onClick={ onAdd }
+						/>
+					) }
+					{ showMenu && (
+						<Menu.Root>
+							<Menu.Trigger
+								render={
+									<Button
+										size="small"
+										icon={ moreVertical }
+										label={ menuAction.optionsLabel }
+									/>
+								}
 							/>
-						) }
-						{ showMenu && (
-							<Menu.Root>
-								<Menu.Trigger
-									render={
-										<Button
-											size="small"
-											icon={ moreVertical }
-											label={ menuAction.optionsLabel }
-										/>
-									}
-								/>
-								<Menu.Popup>
-									<Menu.Item
-										onClick={ () => setIsResetOpen( true ) }
-									>
-										<Menu.ItemLabel>
-											{ menuAction.label }
-										</Menu.ItemLabel>
-									</Menu.Item>
-								</Menu.Popup>
-							</Menu.Root>
-						) }
-					</Stack>
-				</FlexItem>
+							<Menu.Popup>
+								<Menu.Item
+									onClick={ () => setIsResetOpen( true ) }
+								>
+									<Menu.ItemLabel>
+										{ menuAction.label }
+									</Menu.ItemLabel>
+								</Menu.Item>
+							</Menu.Popup>
+						</Menu.Root>
+					) }
+				</Stack>
 			</Stack>
 			{ items.length > 0 && (
 				<ItemGroup isBordered isSeparated>
