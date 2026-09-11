@@ -9,6 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createServer } from 'vite';
+import { createVitePlugins } from '../../config/vite-plugins.mjs';
 
 const temporaryRoots = [];
 
@@ -40,6 +41,7 @@ describe( 'Vite block metadata invalidation', () => {
 		const server = await createServer( {
 			configFile: false,
 			logLevel: 'silent',
+			plugins: await createVitePlugins( process.cwd() ),
 			root,
 			server: {
 				middlewareMode: true,
