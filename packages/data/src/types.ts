@@ -4,10 +4,13 @@ import type {
 	Store as ReduxStore,
 } from 'redux';
 import type { DataEmitter } from './utils/emitter';
+import type { SubscriptionDeps } from './utils/track-state';
 import type {
 	MetadataSelectors,
 	MetadataActions,
 } from './redux-store/metadata/types';
+
+export type { SubscriptionDeps };
 
 type MapOf< T > = { [ name: string ]: T };
 
@@ -20,7 +23,7 @@ export type AnyConfig = ReduxStoreConfig< any, any, any >;
 export interface StoreInstance< Config extends AnyConfig > {
 	getSelectors: () => SelectorsOf< Config >;
 	getActions: () => ActionCreatorsOf< Config >;
-	subscribe: ( listener: () => void ) => () => void;
+	subscribe: ( listener: () => void, deps?: SubscriptionDeps ) => () => void;
 }
 
 export interface StoreDescriptor< Config extends AnyConfig = AnyConfig > {
@@ -213,7 +216,8 @@ export interface DataRegistry {
 	namespaces: Record< string, InternalStoreInstance >;
 	subscribe: (
 		listener: ListenerFunction,
-		storeNameOrDescriptor?: StoreNameOrDescriptor
+		storeNameOrDescriptor?: StoreNameOrDescriptor,
+		deps?: SubscriptionDeps
 	) => () => void;
 	select: {
 		< S extends StoreDescriptor< any > >(

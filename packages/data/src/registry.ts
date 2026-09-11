@@ -11,6 +11,7 @@ import type {
 	InternalStoreInstance,
 	AnyConfig,
 	ReduxStoreConfig,
+	SubscriptionDeps,
 } from './types';
 
 function getStoreName( storeNameOrDescriptor: StoreNameOrDescriptor ): string {
@@ -49,12 +50,14 @@ export function createRegistry(
 	 *
 	 * @param listener              Listener function.
 	 * @param storeNameOrDescriptor Optional store name.
+	 * @param deps                  Optional state paths the listener depends on.
 	 *
 	 * @return Unsubscribe function.
 	 */
 	const subscribe = (
 		listener: () => void,
-		storeNameOrDescriptor?: StoreNameOrDescriptor
+		storeNameOrDescriptor?: StoreNameOrDescriptor,
+		deps?: SubscriptionDeps
 	): ( () => void ) => {
 		// subscribe to all stores
 		if ( ! storeNameOrDescriptor ) {
@@ -65,7 +68,7 @@ export function createRegistry(
 		const storeName = getStoreName( storeNameOrDescriptor );
 		const store = stores[ storeName ];
 		if ( store ) {
-			return store.subscribe( listener );
+			return store.subscribe( listener, deps );
 		}
 
 		// Trying to access a store that hasn't been registered,
@@ -76,7 +79,7 @@ export function createRegistry(
 			return emitter.subscribe( listener );
 		}
 
-		return parent.subscribe( listener, storeNameOrDescriptor );
+		return parent.subscribe( listener, storeNameOrDescriptor, deps );
 	};
 
 	/**
@@ -226,20 +229,30 @@ export function createRegistry(
 		// get paused, that way, when resumed we should be able to call all these
 		// pending listeners.
 		store.emitter = createEmitter();
+		// Listeners notified while the registry is batching are held back
+		// one by one and run when the batch ends, so a listener that
+		// nothing in the batch touched stays quiet.
+		const pending = new Set< () => void >();
+		const resume = store.emitter.resume;
+		store.emitter.resume = () => {
+			resume();
+			const held = Array.from( pending );
+			pending.clear();
+			held.forEach( ( listener ) => listener() );
+		};
 		const currentSubscribe = store.subscribe;
-		store.subscribe = ( listener: () => void ) => {
-			const unsubscribeFromEmitter = store.emitter.subscribe( listener );
+		store.subscribe = ( listener: () => void, deps?: SubscriptionDeps ) => {
 			const unsubscribeFromStore = currentSubscribe( () => {
 				if ( store.emitter.isPaused ) {
-					store.emitter.emit();
+					pending.add( listener );
 					return;
 				}
 				listener();
-			} );
+			}, deps );
 
 			return () => {
+				pending.delete( listener );
 				unsubscribeFromStore?.();
-				unsubscribeFromEmitter?.();
 			};
 		};
 		stores[ name ] = store;

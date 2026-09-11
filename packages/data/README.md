@@ -502,9 +502,14 @@ Creates a memoized selector that caches the computed values according to the arr
 
 See The documentation for the `rememo` package from which the `createSelector` function is reexported.
 
-_Type_
+_Parameters_
 
--   `( selector: S, getDependants: GetDependants ) => S & EnhancedSelector`
+-   _selector_ `S`: Selector function.
+-   _getDependants_ `GetDependants`: Returns the state values the selector depends on.
+
+_Returns_
+
+-   `S & EnhancedSelector`: Memoized selector.
 
 ### dispatch
 
@@ -726,6 +731,10 @@ _Parameters_
 
 -   _listener_ `Function`: Callback function.
 -   _storeNameOrDescriptor_ `string|StoreDescriptor?`: Optional store name.
+
+### SubscriptionDeps
+
+Undocumented declaration.
 
 ### suspendSelect
 

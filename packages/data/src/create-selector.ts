@@ -1,4 +1,5 @@
 import memoize from 'rememo';
+import { toRaw } from './utils/track-state';
 
 /**
  * Returns the array of immutable references on which a memoized selector
@@ -31,8 +32,19 @@ export interface EnhancedSelector {
  * and the selector parameters, and recomputes the values only when any of them changes.
  *
  * See The documentation for the `rememo` package from which the `createSelector` function is reexported.
+ *
+ * @param selector      Selector function.
+ * @param getDependants Returns the state values the selector depends on.
+ * @return Memoized selector.
  */
-export const createSelector: < S extends ( ...args: any[] ) => any >(
+export const createSelector = < S extends ( ...args: any[] ) => any >(
 	selector: S,
 	getDependants?: GetDependants
-) => S & EnhancedSelector = memoize;
+): S & EnhancedSelector =>
+	// Dependants are compared by reference. Strip the tracking proxies so
+	// tracked and untracked calls share one cache.
+	memoize(
+		selector,
+		getDependants &&
+			( ( ...args: any[] ) => getDependants( ...args ).map( toRaw ) )
+	);

@@ -12,7 +12,13 @@ import createThunkMiddleware from './thunk-middleware';
 import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
+import {
+	createPathIndex,
+	trackMetadata,
+	trackRoot,
+} from '../utils/track-state';
 import type {
+	SubscriptionDeps,
 	DataRegistry,
 	ListenerFunction,
 	StoreDescriptor,
@@ -218,7 +224,7 @@ export default function createReduxStore< State, Actions, Selectors >(
 			 * optimize checking if the state has changed before calling
 			 * each listener.
 			 */
-			const listeners = new Set< ListenerFunction >();
+			const listeners = createPathIndex();
 			const reducer = options.reducer;
 
 			// Object that every thunk function receives as the first argument. It contains the
@@ -326,7 +332,7 @@ export default function createReduxStore< State, Actions, Selectors >(
 					if ( selector.isRegistrySelector ) {
 						selector.registry = registry;
 					}
-					return selector( state.root, ...args );
+					return selector( trackRoot( key, state.root ), ...args );
 				};
 
 				// Expose normalization method on the bound selector
@@ -376,6 +382,7 @@ export default function createReduxStore< State, Actions, Selectors >(
 					}
 
 					const state = store.__unstableOriginalGetState();
+					trackMetadata( key );
 
 					return metaDataSelector(
 						state.metadata,
@@ -511,8 +518,11 @@ export default function createReduxStore< State, Actions, Selectors >(
 
 			// Customize subscribe behavior to call listeners only on effective change,
 			// not on every dispatch.
-			const subscribe = ( listener: ListenerFunction ) => {
-				listeners.add( listener );
+			const subscribe = (
+				listener: ListenerFunction,
+				deps?: SubscriptionDeps
+			) => {
+				listeners.add( listener, deps );
 
 				return () => listeners.delete( listener );
 			};
@@ -520,13 +530,19 @@ export default function createReduxStore< State, Actions, Selectors >(
 			let lastState = store.__unstableOriginalGetState();
 			store.subscribe( () => {
 				const state = store.__unstableOriginalGetState();
-				const hasChanged = state !== lastState;
+				const previousState = lastState;
 				lastState = state;
 
-				if ( hasChanged ) {
-					for ( const listener of listeners ) {
-						listener();
-					}
+				if ( state === previousState ) {
+					return;
+				}
+				// A listener that recorded the paths it reads is only
+				// called when one of those paths changed.
+				for ( const listener of listeners.collect(
+					previousState,
+					state
+				) ) {
+					listener();
 				}
 			} );
 
