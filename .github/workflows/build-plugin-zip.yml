@@ -116,6 +116,11 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: true
 
+            # `semver` comes from the release-tools workspace, so the job needs
+            # the dependency tree before it can compute the next version.
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
             - name: Compute old and new version
               id: get_version
               env:
@@ -124,17 +129,17 @@ jobs:
                   OLD_VERSION="$(jq --raw-output '.version' package.json)"
                   echo "old_version=${OLD_VERSION}" >> "$GITHUB_OUTPUT"
                   if [[ "$VERSION" == 'stable' ]]; then
-                    NEW_VERSION="$(npx semver "$OLD_VERSION" -i patch)"
+                    NEW_VERSION="$(npm exec --no --workspace @wordpress/release-tools -- semver "$OLD_VERSION" -i patch)"
                   else
                     if [[ "$OLD_VERSION" == *"rc"* ]]; then
-                      NEW_VERSION="$(npx semver "$OLD_VERSION" -i prerelease)"
+                      NEW_VERSION="$(npm exec --no --workspace @wordpress/release-tools -- semver "$OLD_VERSION" -i prerelease)"
                     else
                       # WordPress version guidelines: If minor is 9, bump major instead.
                       IFS='.' read -r -a OLD_VERSION_ARRAY <<< "$OLD_VERSION"
                       if [[ ${OLD_VERSION_ARRAY[1]} == "9" ]]; then
-                        NEW_VERSION="$(npx semver "$OLD_VERSION" -i major)-rc.1"
+                        NEW_VERSION="$(npm exec --no --workspace @wordpress/release-tools -- semver "$OLD_VERSION" -i major)-rc.1"
                       else
-                        NEW_VERSION="$(npx semver "$OLD_VERSION" -i minor)-rc.1"
+                        NEW_VERSION="$(npm exec --no --workspace @wordpress/release-tools -- semver "$OLD_VERSION" -i minor)-rc.1"
                       fi
                     fi
                   fi
@@ -260,11 +265,17 @@ jobs:
                   IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}
                   IS_WORDPRESS_CORE: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
 
+            # When using archive: false to upload an artifact, the file name is used and the name input is ignored.
+            # This ensures unique artifiact names for `IS_GUTENBERG_PLUGIN` and `IS_WORDPRESS_CORE`.
+            - name: Rename Zip file for wordpress-develop
+              if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
+              run: mv gutenberg.zip gutenberg-wordpress-develop.zip
+
             - name: Upload artifact
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
-                  name: gutenberg-${{ ! matrix.IS_GUTENBERG_PLUGIN && 'wordpress-develop' || 'plugin' }}
-                  path: ./gutenberg.zip
+                  path: ./gutenberg${{ ! matrix.IS_GUTENBERG_PLUGIN && '-wordpress-develop' || '' }}.zip
+                  archive: false
 
             - name: Build release notes draft
               if: ${{ matrix.IS_GUTENBERG_PLUGIN && needs.bump-version.outputs.new_version }}
@@ -320,10 +331,7 @@ jobs:
             - name: Download build artifact
               uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
-                  name: gutenberg-wordpress-develop
-
-            - name: Unzip zip artifact
-              run: unzip gutenberg.zip && rm gutenberg.zip
+                  name: gutenberg-wordpress-develop.zip
 
             # Noting the hash helps keep track of the commit the zip was built from.
             # For pull_request events, github.sha is the ephemeral merge commit; use the PR head SHA instead
@@ -480,7 +488,11 @@ jobs:
             - name: Download Plugin Zip Artifact
               uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
-                  name: gutenberg-plugin
+                  name: gutenberg.zip
+                  # The artifact is the plugin zip itself (uploaded with `archive: false`).
+                  # Without this, the action detects a zip and extracts it, leaving no
+                  # gutenberg.zip file to attach to the release.
+                  skip-decompress: true
 
             - name: Download Release Notes Artifact
               uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -530,6 +542,11 @@ jobs:
     npm-publish:
         name: Publish WordPress packages to npm
         runs-on: 'ubuntu-24.04'
+        # Serialize this RC1 package publication with manual latest and bugfix releases.
+        concurrency:
+            group: npm-publish-wp-latest
+            cancel-in-progress: false
+            queue: max
         permissions:
             contents: read
         environment: WordPress packages

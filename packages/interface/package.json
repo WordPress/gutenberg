@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/interface",
-	"version": "10.0.0",
+	"version": "10.1.0",
 	"description": "Interface module for WordPress. The package contains shared functionality across the modern JavaScript-based WordPress screens.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -35,17 +35,19 @@
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
+			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
 		"./build-style/*": "./build-style/*"
 	},
+	"types": "build-types",
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
-		"src/index.js",
-		"src/store/index.js",
+		"src/index.ts",
+		"src/store/index.ts",
 		"build/index.cjs",
 		"build/store/index.cjs",
 		"build-module/index.mjs",
@@ -68,12 +70,18 @@
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",
-		"@testing-library/react": "^16.3.2",
-		"vitest": "^4.1.10"
+		"@testing-library/react": "^16.3.3",
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
+		"@types/react": "^18 || ^19",
 		"react": "^18 || ^19",
 		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

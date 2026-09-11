@@ -14,9 +14,6 @@
 			],
 			"@wordpress/patterns": [
 				"./typings/untyped-packages/any-module.d.ts"
-			],
-			"@wordpress/interface": [
-				"./typings/untyped-packages/any-module.d.ts"
 			]
 		},
 		"checkJs": true,
@@ -45,7 +42,11 @@
 
 		"resolveJsonModule": true,
 
-		"typeRoots": [ "./typings", "./node_modules/@types" ],
+		"typeRoots": [
+			"./typings",
+			"./test/unit/typings",
+			"./node_modules/@types"
+		],
 		"types": [],
 
 		"rootDir": "${configDir}/src",

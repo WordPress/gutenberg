@@ -245,10 +245,17 @@ export const registerPostTypeSchema =
 			const postTypeSlug = postTypeConfig.slug;
 			const isDesignPostType = DESIGN_POST_TYPES.includes( postTypeSlug );
 			const isPattern = postTypeSlug === 'wp_block';
+			// `post-thumbnails` is `true` or the list of post types the theme
+			// opted in.
+			const postThumbnails =
+				currentTheme?.theme_supports?.[ 'post-thumbnails' ];
+			const themeSupportsThumbnails = Array.isArray( postThumbnails )
+				? postThumbnails.includes( postTypeSlug )
+				: !! postThumbnails;
 
 			fields = [
 				postTypeConfig.supports?.thumbnail &&
-					currentTheme?.theme_supports?.[ 'post-thumbnails' ] &&
+					themeSupportsThumbnails &&
 					featuredImageField,
 				! isDesignPostType &&
 					postTypeConfig.supports?.author &&
@@ -259,7 +266,10 @@ export const registerPostTypeSchema =
 				! isDesignPostType && dateField,
 				! isDesignPostType && scheduledDateField,
 				lastEditedDateField,
-				! isDesignPostType && slugField,
+				// There is no post type support flag for permalinks, and
+				// `viewable` alone is not the full condition (the type must
+				// also be public), so the field also checks each post.
+				! isDesignPostType && postTypeConfig.viewable && slugField,
 				! isDesignPostType &&
 					postTypeConfig.supports?.excerpt &&
 					excerptField,

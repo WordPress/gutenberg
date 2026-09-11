@@ -11,7 +11,7 @@ const { CreatePatternModalContents, useDuplicatePatternProps } =
 
 const duplicatePattern: Action< Pattern > = {
 	id: 'duplicate-pattern',
-	label: _x( 'Duplicate', 'action label' ),
+	label: _x( 'Duplicate…', 'action label' ),
 	isEligible: ( item ) => item.type !== 'wp_template_part',
 	modalHeader: _x( 'Duplicate pattern', 'action label' ),
 	modalFocusOnMount: 'firstContentElement',

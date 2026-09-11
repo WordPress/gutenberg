@@ -20,6 +20,7 @@ export default function BlockThemeControl() {
 		onNavigateToEntityRecord,
 		getEditorSettings,
 		hasGoBack,
+		hasRenderingMode,
 		id,
 	} = useSelect( ( select ) => {
 		const {
@@ -35,6 +36,7 @@ export default function BlockThemeControl() {
 			hasGoBack: editorSettings.hasOwnProperty(
 				'onNavigateToPreviousEntityRecord'
 			),
+			hasRenderingMode: !! editorSettings.renderingMode,
 			id: getCurrentTemplateId(),
 		};
 	}, [] );
@@ -84,7 +86,7 @@ export default function BlockThemeControl() {
 	const notificationAction = hasGoBack
 		? [
 				{
-					label: __( 'Go back' ),
+					label: __( 'Back' ),
 					onClick: () =>
 						getEditorSettings().onNavigateToPreviousEntityRecord(),
 				},
@@ -137,22 +139,29 @@ export default function BlockThemeControl() {
 							<ResetDefaultTemplate onClick={ onClose } />
 							{ canCreateTemplate && <CreateNewTemplate /> }
 						</MenuGroup>
-						<MenuGroup>
-							<MenuItem
-								icon={ ! isTemplateHidden ? check : undefined }
-								isSelected={ ! isTemplateHidden }
-								role="menuitemcheckbox"
-								onClick={ () => {
-									const newRenderingMode = isTemplateHidden
-										? 'template-locked'
-										: 'post-only';
-									setRenderingMode( newRenderingMode );
-									setDefaultRenderingMode( newRenderingMode );
-								} }
-							>
-								{ __( 'Show template' ) }
-							</MenuItem>
-						</MenuGroup>
+						{ ! hasRenderingMode && (
+							<MenuGroup>
+								<MenuItem
+									icon={
+										! isTemplateHidden ? check : undefined
+									}
+									isSelected={ ! isTemplateHidden }
+									role="menuitemcheckbox"
+									onClick={ () => {
+										const newRenderingMode =
+											isTemplateHidden
+												? 'template-locked'
+												: 'post-only';
+										setRenderingMode( newRenderingMode );
+										setDefaultRenderingMode(
+											newRenderingMode
+										);
+									} }
+								>
+									{ __( 'Show template' ) }
+								</MenuItem>
+							</MenuGroup>
+						) }
 					</>
 				) }
 			</DropdownMenu>

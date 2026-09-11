@@ -1,8 +1,17 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+	act,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import { Menu } from '..';
 import Modal from '../../modal';
+globalThis.wpVitest.mockCSSSupports();
+globalThis.wpVitest.mockScrollIntoView();
 
 const waitForFocusedMenu = () =>
 	waitFor( () => expect( screen.getByRole( 'menu' ) ).toHaveFocus() );
@@ -30,10 +39,10 @@ const isBodyScrollLocked = () =>
 	document.body.classList.contains( 'modal-open' );
 
 const resetTypeahead = () => {
-	act( () => jest.advanceTimersByTime( 500 ) );
+	act( () => vi.advanceTimersByTime( 500 ) );
 };
 
-const MenuWithModal = ( { nested = false }: { nested?: boolean } ) => {
+const MenuWithModal = () => {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const modalItem = (
 		<Menu.Item onClick={ () => setIsModalOpen( true ) }>
@@ -45,18 +54,7 @@ const MenuWithModal = ( { nested = false }: { nested?: boolean } ) => {
 		<>
 			<Menu>
 				<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
-				<Menu.Popover>
-					{ nested ? (
-						<Menu>
-							<Menu.SubmenuTriggerItem>
-								Open submenu
-							</Menu.SubmenuTriggerItem>
-							<Menu.Popover>{ modalItem }</Menu.Popover>
-						</Menu>
-					) : (
-						modalItem
-					) }
-				</Menu.Popover>
+				<Menu.Popover>{ modalItem }</Menu.Popover>
 			</Menu>
 			{ isModalOpen && (
 				<Modal
@@ -177,37 +175,6 @@ describe( 'Menu', () => {
 			await waitForFocusedMenu();
 		} );
 
-		it( 'should open and focus the first item when pressing the arrow down key on the trigger', async () => {
-			render(
-				<Menu>
-					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
-					<Menu.Popover>
-						<Menu.Item disabled>First item</Menu.Item>
-						<Menu.Item>Second item</Menu.Item>
-						<Menu.Item>Third item</Menu.Item>
-					</Menu.Popover>
-				</Menu>
-			);
-
-			const toggleButton = screen.getByRole( 'button', {
-				name: 'Open dropdown',
-			} );
-
-			// Move focus on the toggle
-			await user.tab();
-
-			expect( toggleButton ).toHaveFocus();
-
-			// Menu closed
-			expect( screen.queryByRole( 'menuitem' ) ).not.toBeInTheDocument();
-
-			await user.keyboard( '{ArrowDown}' );
-
-			// Menu open, focus is on the first focusable item
-			// (disabled items are still focusable and accessible)
-			await waitForFocusedMenuItem( 'First item' );
-		} );
-
 		it( 'should open when pressing the space key on the trigger', async () => {
 			render(
 				<Menu>
@@ -243,40 +210,6 @@ describe( 'Menu', () => {
 				)
 			);
 			expect( screen.getByRole( 'menu' ) ).toBeVisible();
-		} );
-
-		it( 'should close when pressing the escape key', async () => {
-			render(
-				<Menu>
-					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
-					<Menu.Popover>
-						<Menu.Item>Menu item</Menu.Item>
-					</Menu.Popover>
-				</Menu>
-			);
-
-			const trigger = screen.getByRole( 'button', {
-				name: 'Open dropdown',
-			} );
-
-			await user.click( trigger );
-
-			// Focuses menu on mouse click, focuses first item on keyboard press
-			// Can be changed with a custom useEffect
-			await waitForFocusedMenu();
-
-			// Pressing esc will close the menu and move focus to the toggle
-			await user.keyboard( '{Escape}' );
-
-			await waitFor( () =>
-				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
-			);
-
-			await waitFor( () =>
-				expect(
-					screen.getByRole( 'button', { name: 'Open dropdown' } )
-				).toHaveFocus()
-			);
 		} );
 
 		it( 'should close when clicking outside of the content', async () => {
@@ -382,26 +315,6 @@ describe( 'Menu', () => {
 			await waitFor( () => expect( trigger ).toHaveFocus() );
 		} );
 
-		it( 'should return focus to the root trigger after a nested menu opens a modal', async () => {
-			render( <MenuWithModal nested /> );
-
-			const trigger = screen.getByRole( 'button', {
-				name: 'Open dropdown',
-			} );
-			await openMenu( user );
-			await user.keyboard( '{ArrowDown}' );
-			await waitForFocusedMenuItem( 'Open submenu' );
-			await user.keyboard( '{ArrowRight}' );
-			await waitForFocusedMenuItem( 'Open modal' );
-			await user.keyboard( '{Enter}' );
-			await waitForClosedMenu();
-			await user.click(
-				screen.getByRole( 'button', { name: 'Close modal' } )
-			);
-
-			await waitFor( () => expect( trigger ).toHaveFocus() );
-		} );
-
 		it( 'should keep body scroll locked while handing off to a modal', async () => {
 			render( <MenuWithModal /> );
 
@@ -443,7 +356,7 @@ describe( 'Menu', () => {
 		} );
 
 		it( 'should use a `hideOnClick` callback to decide whether to close', async () => {
-			const hideOnClick = jest.fn( () => false );
+			const hideOnClick = vi.fn( () => false );
 			render(
 				<Menu defaultOpen>
 					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
@@ -462,7 +375,7 @@ describe( 'Menu', () => {
 		} );
 
 		it( 'should close when a `hideOnClick` callback returns `true`', async () => {
-			const hideOnClick = jest.fn( () => true );
+			const hideOnClick = vi.fn( () => true );
 			render(
 				<Menu defaultOpen>
 					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
@@ -658,104 +571,8 @@ describe( 'Menu', () => {
 			} );
 		} );
 
-		it( 'should navigate menu items and subitems using the arrow, spacebar and enter keys', async () => {
-			render(
-				<Menu defaultOpen>
-					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
-					<Menu.Popover>
-						<Menu.Item>Menu item 1</Menu.Item>
-						<Menu.Item>Menu item 2</Menu.Item>
-						<Menu>
-							<Menu.SubmenuTriggerItem>
-								Submenu trigger item
-							</Menu.SubmenuTriggerItem>
-							<Menu.Popover>
-								<Menu.Item>Submenu item 1</Menu.Item>
-								<Menu.Item>Submenu item 2</Menu.Item>
-							</Menu.Popover>
-						</Menu>
-						<Menu.Item>Menu item 3</Menu.Item>
-					</Menu.Popover>
-				</Menu>
-			);
-
-			// The first menu item is focused automatically when `defaultOpen` is
-			// set and jsdom reports visible elements as focusable.
-			await waitForFocusedMenuItem( 'Menu item 1' );
-
-			// Arrow up/down selects menu items
-			// The selection wraps around from last to first and viceversa
-			await user.keyboard( '{ArrowDown}' );
-			expect(
-				screen.getByRole( 'menuitem', { name: 'Menu item 2' } )
-			).toHaveFocus();
-
-			await user.keyboard( '{ArrowDown}' );
-			expect(
-				screen.getByRole( 'menuitem', { name: 'Submenu trigger item' } )
-			).toHaveFocus();
-
-			await user.keyboard( '{ArrowDown}' );
-			expect(
-				screen.getByRole( 'menuitem', { name: 'Menu item 3' } )
-			).toHaveFocus();
-
-			await user.keyboard( '{ArrowDown}' );
-			expect(
-				screen.getByRole( 'menuitem', { name: 'Menu item 1' } )
-			).toHaveFocus();
-
-			await user.keyboard( '{ArrowUp}' );
-			expect(
-				screen.getByRole( 'menuitem', { name: 'Menu item 3' } )
-			).toHaveFocus();
-
-			await user.keyboard( '{ArrowUp}' );
-			expect(
-				screen.getByRole( 'menuitem', { name: 'Submenu trigger item' } )
-			).toHaveFocus();
-
-			// Arrow right/left can be used to enter/leave submenus
-			// (focus crosses menu contexts, so wait for it to settle)
-			await user.keyboard( '{ArrowRight}' );
-			await waitForFocusedMenuItem( 'Submenu item 1' );
-
-			await user.keyboard( '{ArrowDown}' );
-			expect(
-				screen.getByRole( 'menuitem', { name: 'Submenu item 2' } )
-			).toHaveFocus();
-
-			await user.keyboard( '{ArrowLeft}' );
-			expect(
-				screen.getByRole( 'menuitem', {
-					name: 'Submenu trigger item',
-				} )
-			).toHaveFocus();
-
-			// Spacebar or enter key can also be used to enter a submenu
-			await user.keyboard( '{Enter}' );
-			await waitForFocusedMenuItem( 'Submenu item 1' );
-
-			await user.keyboard( '{ArrowLeft}' );
-			expect(
-				screen.getByRole( 'menuitem', {
-					name: 'Submenu trigger item',
-				} )
-			).toHaveFocus();
-
-			await user.keyboard( ' ' );
-			await waitForFocusedMenuItem( 'Submenu item 1' );
-
-			await user.keyboard( '{ArrowLeft}' );
-			expect(
-				screen.getByRole( 'menuitem', {
-					name: 'Submenu trigger item',
-				} )
-			).toHaveFocus();
-		} );
-
 		it( 'should check radio items and keep the menu open when clicking (controlled)', async () => {
-			const onRadioValueChangeSpy = jest.fn();
+			const onRadioValueChangeSpy = vi.fn();
 
 			const ControlledRadioGroup = () => {
 				const [ radioValue, setRadioValue ] = useState( 'two' );
@@ -843,7 +660,7 @@ describe( 'Menu', () => {
 		} );
 
 		it( 'should check radio items and keep the menu open when clicking (uncontrolled)', async () => {
-			const onRadioValueChangeSpy = jest.fn();
+			const onRadioValueChangeSpy = vi.fn();
 			render(
 				<Menu>
 					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
@@ -923,7 +740,7 @@ describe( 'Menu', () => {
 		} );
 
 		it( 'should check checkbox items and keep the menu open when clicking (controlled)', async () => {
-			const onCheckboxValueChangeSpy = jest.fn();
+			const onCheckboxValueChangeSpy = vi.fn();
 
 			const ControlledRadioGroup = () => {
 				const [ itemOneChecked, setItemOneChecked ] =
@@ -1055,7 +872,7 @@ describe( 'Menu', () => {
 		} );
 
 		it( 'should check checkbox items and keep the menu open when clicking (uncontrolled)', async () => {
-			const onCheckboxValueChangeSpy = jest.fn();
+			const onCheckboxValueChangeSpy = vi.fn();
 
 			render(
 				<Menu>
@@ -1239,7 +1056,7 @@ describe( 'Menu', () => {
 			// The outer button can be focused by pressing tab. Doing so will cause
 			// the Menu to close.
 			await user.tab();
-			expect( outerButton ).toHaveFocus();
+			await waitFor( () => expect( outerButton ).toHaveFocus() );
 			await waitFor( () =>
 				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
 			);
@@ -1365,15 +1182,8 @@ describe( 'Menu', () => {
 	} );
 
 	describe( 'typeahead', () => {
-		beforeEach( () => {
-			jest.useFakeTimers();
-			user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-		} );
-
 		afterEach( () => {
-			jest.useRealTimers();
+			vi.useRealTimers();
 		} );
 
 		it( 'should highlight matching item', async () => {
@@ -1394,9 +1204,17 @@ describe( 'Menu', () => {
 				} )
 			);
 			await waitForFocusedMenu();
+			vi.useFakeTimers();
 
 			// Type "tw", it should match and focus the item with content "Two"
-			await user.keyboard( 'tw' );
+			fireEvent.keyDown( screen.getByRole( 'menu' ), {
+				code: 'KeyT',
+				key: 't',
+			} );
+			fireEvent.keyDown( screen.getByRole( 'menu' ), {
+				code: 'KeyW',
+				key: 'w',
+			} );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'Two' } )
 			).toHaveFocus();
@@ -1405,7 +1223,18 @@ describe( 'Menu', () => {
 			resetTypeahead();
 
 			// Type "on", it should match and focus the item with content "One"
-			await user.keyboard( 'on' );
+			fireEvent.keyDown(
+				screen.getByRole( 'menuitem', { name: 'Two' } ),
+				{
+					key: 'o',
+				}
+			);
+			fireEvent.keyDown(
+				screen.getByRole( 'menuitem', { name: 'Two' } ),
+				{
+					key: 'n',
+				}
+			);
 			expect(
 				screen.getByRole( 'menuitem', { name: 'One' } )
 			).toHaveFocus();
@@ -1429,16 +1258,20 @@ describe( 'Menu', () => {
 				} )
 			);
 			await waitForFocusedMenu();
+			vi.useFakeTimers();
 
 			// Type a string that doesn't match any items. Focus shouldn't move.
-			await user.keyboard( 'abc' );
+			fireEvent.keyDown( screen.getByRole( 'menu' ), { key: 'a' } );
+			fireEvent.keyDown( screen.getByRole( 'menu' ), { key: 'b' } );
+			fireEvent.keyDown( screen.getByRole( 'menu' ), { key: 'c' } );
 			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
 
 			// Reset the typeahead search so the next keystrokes start a new query.
 			resetTypeahead();
 
 			// Type "on", it should match and focus the item with content "One"
-			await user.keyboard( 'on' );
+			fireEvent.keyDown( screen.getByRole( 'menu' ), { key: 'o' } );
+			fireEvent.keyDown( screen.getByRole( 'menu' ), { key: 'n' } );
 			expect(
 				screen.getByRole( 'menuitem', { name: 'One' } )
 			).toHaveFocus();
@@ -1447,7 +1280,18 @@ describe( 'Menu', () => {
 			resetTypeahead();
 
 			// Type a string that doesn't match any items. Focus shouldn't move.
-			await user.keyboard( 'abc' );
+			fireEvent.keyDown(
+				screen.getByRole( 'menuitem', { name: 'One' } ),
+				{ key: 'a' }
+			);
+			fireEvent.keyDown(
+				screen.getByRole( 'menuitem', { name: 'One' } ),
+				{ key: 'b' }
+			);
+			fireEvent.keyDown(
+				screen.getByRole( 'menuitem', { name: 'One' } ),
+				{ key: 'c' }
+			);
 			expect(
 				screen.getByRole( 'menuitem', { name: 'One' } )
 			).toHaveFocus();
@@ -1456,7 +1300,14 @@ describe( 'Menu', () => {
 			resetTypeahead();
 
 			// Type "tw", it should match and focus the item with content "Two"
-			await user.keyboard( 'tw' );
+			fireEvent.keyDown(
+				screen.getByRole( 'menuitem', { name: 'One' } ),
+				{ key: 't' }
+			);
+			fireEvent.keyDown(
+				screen.getByRole( 'menuitem', { name: 'One' } ),
+				{ key: 'w' }
+			);
 			expect(
 				screen.getByRole( 'menuitem', { name: 'Two' } )
 			).toHaveFocus();

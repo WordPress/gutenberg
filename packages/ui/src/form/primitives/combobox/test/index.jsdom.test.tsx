@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -242,7 +243,7 @@ describe( 'Combobox', () => {
 	// verifies the behavioral contract, not the CSS fix itself.
 	it( 'allows selecting items when Empty is rendered after List', async () => {
 		const user = userEvent.setup();
-		const onValueChange = jest.fn();
+		const onValueChange = vi.fn();
 
 		render(
 			<Combobox.Root

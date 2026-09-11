@@ -7,7 +7,7 @@ import {
 } from '@wordpress/editor';
 import { __, isRTL, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -74,7 +74,13 @@ function getNavigationPath( location, postType ) {
 	return addQueryArgs( path, { canvas: undefined, revision: undefined } );
 }
 
-export default function EditSiteEditor( { isHomeRoute = false } ) {
+export default function EditSiteEditor( {
+	isHomeRoute = false,
+	// Routes that stand for the whole site pass 'template-locked', so the
+	// canvas shows the template around whatever it is rendering, and the
+	// controls for switching it are not offered.
+	renderingMode,
+} ) {
 	const location = useLocation();
 	const history = useHistory();
 	const { canvas = 'view' } = location.query;
@@ -108,7 +114,25 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 
 	const editorSettings = useSpecificEditorSettings();
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
-	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
+	const { setCurrentRevisionId, resetStylesNavigation } = unlock(
+		useDispatch( editorStore )
+	);
+
+	// Revisions and the style book render in place of the block editor, and
+	// belong to the styles route in edit mode. Anywhere else they would show
+	// the styles canvas where the block editor is expected: a site preview
+	// that cannot be clicked into, or the next route's content missing.
+	//
+	// Routes render their own element for this area, so navigating between
+	// them remounts this component. The check therefore runs on every render
+	// rather than on a transition, which a remount would never observe.
+	const isStylesEditing = isEditMode && location.name === 'styles';
+	useEffect( () => {
+		if ( ! isStylesEditing ) {
+			resetStylesNavigation();
+		}
+	}, [ isStylesEditing, resetStylesNavigation ] );
+
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onActionPerformed = useCallback(
 		( actionId, items ) => {
@@ -182,6 +206,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 					postId={ postWithTemplate ? context.postId : postId }
 					templateId={ postWithTemplate ? postId : undefined }
 					settings={ editorSettings }
+					renderingMode={ renderingMode }
 					className="edit-site-editor__editor-interface"
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />

@@ -6,19 +6,14 @@ import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import focusStyles from '../../../utils/css/focus.module.scss';
 import * as Combobox from '../combobox';
 import { InputLayout } from '../input-layout';
+import { SearchableResults } from '../searchable-results';
 import styles from './style.module.css';
 import { warnSearchableChipSelectProps } from './dev-warnings';
-import type { Item, ItemGroup, SearchableChipSelectProps } from './types';
-import {
-	findCreatableItem,
-	isItem,
-	normalizeRootItems,
-	shouldSkipCollectionEntry,
-} from './types';
+import type { Item, SearchableChipSelectProps } from './types';
 
 /**
  * A low-level primitive for a searchable multi-selection field with chips, with
- * support for a footer item to create new items.
+ * support for a creatable footer action.
  *
  * Prefer `SearchableChipSelectControl` when using with a standard label and description.
  */
@@ -30,6 +25,7 @@ export const SearchableChipSelect = forwardRef<
 		children,
 		disabled,
 		emptyContent = __( 'No results found.' ),
+		statusContent,
 		items,
 		chipsContent,
 		searchPlaceholder = __( 'Search' ),
@@ -45,12 +41,9 @@ export const SearchableChipSelect = forwardRef<
 ) {
 	warnSearchableChipSelectProps( items, children );
 
-	const creatableItem = findCreatableItem( items );
-	const comboboxItems = normalizeRootItems( items );
-
 	return (
 		<Combobox.Root
-			items={ comboboxItems }
+			items={ items }
 			multiple
 			disabled={ disabled }
 			{ ...restProps }
@@ -107,6 +100,7 @@ export const SearchableChipSelect = forwardRef<
 						ref={ ref }
 						render={
 							<input
+								type="text"
 								className={ clsx(
 									defenseStyles.input,
 									styles.input
@@ -122,52 +116,12 @@ export const SearchableChipSelect = forwardRef<
 			</Combobox.InputGroup>
 
 			<Combobox.Popup width={ popupWidth }>
-				<Combobox.Empty>{ emptyContent }</Combobox.Empty>
-				<Combobox.List>
-					<Combobox.ListBody>
-						<Combobox.Collection>
-							{ ( entry: Item | ItemGroup, ...args ) => {
-								if (
-									shouldSkipCollectionEntry(
-										entry,
-										creatableItem
-									)
-								) {
-									return null;
-								}
-
-								if ( children ) {
-									return children( entry, ...args );
-								}
-
-								if ( ! isItem( entry ) ) {
-									return null;
-								}
-
-								return (
-									<Combobox.Item
-										key={ entry.value }
-										value={ entry }
-										disabled={ entry.disabled }
-									>
-										{ entry.label }
-									</Combobox.Item>
-								);
-							} }
-						</Combobox.Collection>
-					</Combobox.ListBody>
-					{ creatableItem && (
-						<Combobox.ListFooter>
-							<Combobox.Item
-								variant="creatable"
-								value={ creatableItem }
-								disabled={ creatableItem.disabled }
-							>
-								{ creatableItem.label }
-							</Combobox.Item>
-						</Combobox.ListFooter>
-					) }
-				</Combobox.List>
+				<SearchableResults
+					emptyContent={ emptyContent }
+					statusContent={ statusContent }
+				>
+					{ children }
+				</SearchableResults>
 			</Combobox.Popup>
 		</Combobox.Root>
 	);
