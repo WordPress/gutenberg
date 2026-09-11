@@ -1,28 +1,17 @@
 import { __ } from '@wordpress/i18n';
-import { useViewportMatch } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
-import { useCallback, useEffect, useMemo } from '@wordpress/element';
-import { MediaCategoryPanel } from './media-panel';
+import { useCallback, useMemo } from '@wordpress/element';
 import MediaUploadCheck from '../../media-upload/check';
 import MediaUpload from '../../media-upload';
 import { useMediaCategories } from './hooks';
 import { getBlockAndPreviewFromMedia } from './utils';
-import MobileTabNavigation from '../mobile-tab-navigation';
-import CategoryTabs from '../category-tabs';
+import MediaSources from './media-sources';
 import InserterNoResults from '../no-results';
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
-function MediaTab( {
-	rootClientId,
-	selectedCategory,
-	onSelectCategory,
-	onInsert,
-	children,
-} ) {
+function MediaTab( { rootClientId, onInsert } ) {
 	const mediaCategories = useMediaCategories( rootClientId );
-	const isMobile = useViewportMatch( 'medium', '<' );
-	const baseCssClass = 'block-editor-inserter__media-tabs';
 	const onSelectMedia = useCallback(
 		( media ) => {
 			if ( ! media?.url ) {
@@ -47,81 +36,46 @@ function MediaTab( {
 			} ) ),
 		[ mediaCategories ]
 	);
-	useEffect( () => {
-		if ( ! selectedCategory ) {
-			return;
-		}
-
-		const latestCategory = categories.find(
-			( category ) => category.name === selectedCategory.name
-		);
-
-		if ( latestCategory && latestCategory !== selectedCategory ) {
-			onSelectCategory( latestCategory );
-		} else if ( ! latestCategory ) {
-			onSelectCategory( null );
-		}
-	}, [ categories, onSelectCategory, selectedCategory ] );
 
 	if ( ! categories.length ) {
 		return <InserterNoResults />;
 	}
 
 	return (
-		<>
-			{ ! isMobile && (
-				<div className={ `${ baseCssClass }-container` }>
-					<CategoryTabs
-						categories={ categories }
-						selectedCategory={ selectedCategory }
-						onSelectCategory={ onSelectCategory }
-					>
-						{ children }
-					</CategoryTabs>
-					<MediaUploadCheck>
-						<MediaUpload
-							multiple={ false }
-							onSelect={ onSelectMedia }
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							render={ ( { open } ) => (
-								<Button
-									__next40pxDefaultSize
-									onClick={ ( event ) => {
-										// Safari doesn't emit a focus event on button elements when
-										// clicked and we need to manually focus the button here.
-										// The reason is that core's Media Library modal explicitly triggers a
-										// focus event and therefore a `blur` event is triggered on a different
-										// element, which doesn't contain the `data-unstable-ignore-focus-outside-for-relatedtarget`
-										// attribute making the Inserter dialog to close.
-										event.target.focus();
-										open();
-									} }
-									className="block-editor-inserter__media-library-button"
-									variant="secondary"
-									data-unstable-ignore-focus-outside-for-relatedtarget=".media-modal"
-								>
-									{ __( 'Open Media Library' ) }
-								</Button>
-							) }
-						/>
-					</MediaUploadCheck>
-				</div>
-			) }
-			{ isMobile && (
-				<MobileTabNavigation
-					categories={ categories }
-					screenClassName="block-editor-inserter__media-mobile-screen"
-				>
-					{ ( category ) => (
-						<MediaCategoryPanel
-							onInsert={ onInsert }
-							rootClientId={ rootClientId }
-							category={ category }
-						/>
-					) }
-				</MobileTabNavigation>
-			) }
-		</>
+		<MediaSources
+			categories={ categories }
+			rootClientId={ rootClientId }
+			onInsert={ onInsert }
+			footer={
+				<MediaUploadCheck>
+					<MediaUpload
+						multiple={ false }
+						onSelect={ onSelectMedia }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						render={ ( { open } ) => (
+							<Button
+								__next40pxDefaultSize
+								onClick={ ( event ) => {
+									// Safari doesn't emit a focus event on button elements when
+									// clicked and we need to manually focus the button here.
+									// The reason is that core's Media Library modal explicitly triggers a
+									// focus event and therefore a `blur` event is triggered on a different
+									// element, which doesn't contain the `data-unstable-ignore-focus-outside-for-relatedtarget`
+									// attribute making the Inserter dialog to close.
+									event.target.focus();
+									open();
+								} }
+								className="block-editor-inserter__media-library-button"
+								variant="secondary"
+								data-unstable-ignore-focus-outside-for-relatedtarget=".media-modal"
+							>
+								{ __( 'Open Media Library' ) }
+							</Button>
+						) }
+					/>
+				</MediaUploadCheck>
+			}
+		/>
 	);
 }
 
