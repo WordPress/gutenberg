@@ -17,6 +17,20 @@ import {
 } from '../../store/constants';
 import { store as editorStore } from '../../store';
 
+export function isEntityRecordLoaded( {
+	getEntityRecord,
+	hasFinishedResolution,
+}, postType, postId ) {
+	return (
+		getEntityRecord( 'postType', postType, postId ) !== undefined ||
+		hasFinishedResolution( 'getEntityRecord', [
+			'postType',
+			postType,
+			postId,
+		] )
+	);
+}
+
 export function useStartPatterns() {
 	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
 	// and it has no postTypes declared and the current post type is page or if
@@ -138,7 +152,11 @@ function StartPageOptionsModal( { onClose } ) {
 export default function StartPageOptions() {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const { isEditedPostEmpty } = useSelect( editorStore );
-	const { getEntityRecordNonTransientEdits } = useSelect( coreStore );
+	const {
+		getEntityRecord,
+		getEntityRecordNonTransientEdits,
+		hasFinishedResolution,
+	} = useSelect( coreStore );
 	const { isModalActive } = useSelect( interfaceStore );
 	const { enabled, postType, postId } = useSelect( ( select ) => {
 		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
@@ -173,10 +191,20 @@ export default function StartPageOptions() {
 					postId
 				) ?? {}
 			).length > 0;
+		const isPostLoaded = isEntityRecordLoaded(
+			{ getEntityRecord, hasFinishedResolution },
+			postType,
+			postId
+		);
 		const isFreshPage = ! hasEdits && isEditedPostEmpty();
 		// Prevents immediately opening when features is enabled via preferences modal.
 		const isPreferencesModalActive = isModalActive( 'editor/preferences' );
-		if ( ! enabled || ! isFreshPage || isPreferencesModalActive ) {
+		if (
+			! enabled ||
+			! isPostLoaded ||
+			! isFreshPage ||
+			isPreferencesModalActive
+		) {
 			return;
 		}
 
@@ -187,6 +215,8 @@ export default function StartPageOptions() {
 		postType,
 		postId,
 		getEntityRecordNonTransientEdits,
+		getEntityRecord,
+		hasFinishedResolution,
 		isEditedPostEmpty,
 		isModalActive,
 	] );
