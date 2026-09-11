@@ -9,6 +9,7 @@
 ### Internal
 
 -   Run rendered DataViews tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+-   DataForm panel layout: Replace deprecated `word-break: break-word` with `word-break: normal` and `overflow-wrap: anywhere` on field summary controls.
 
 ## 19.0.0 (2026-09-10)
 
