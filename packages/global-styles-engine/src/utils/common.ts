@@ -101,6 +101,14 @@ export const PRESET_METADATA = [
 		],
 	},
 	{
+		path: [ 'typography', 'textShadowPresets' ],
+		valueKey: 'textShadow',
+		cssVarInfix: 'text-shadow',
+		classes: [
+			{ classSuffix: 'text-shadow', propertyName: 'text-shadow' },
+		],
+	},
+	{
 		path: [ 'spacing', 'spacingSizes' ],
 		valueKey: 'size',
 		cssVarInfix: 'spacing',
@@ -167,6 +175,7 @@ export const STYLE_PATH_TO_CSS_VAR_INFIX: Record< string, string > = {
 	shadow: 'shadow',
 	'typography.fontSize': 'font-size',
 	'typography.fontFamily': 'font-family',
+	'typography.textShadow': 'text-shadow',
 };
 
 /**

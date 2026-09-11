@@ -431,4 +431,80 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'Hello, World!', $output, 'Shortcode inside the navigation overlay should be expanded.' );
 		$this->assertStringNotContainsString( '[gb_test_overlay_shortcode]', $output, 'Raw shortcode token should not appear in the overlay output.' );
 	}
+
+	/**
+	 * Creates a Navigation Overlay template part for the active theme.
+	 *
+	 * @param string $slug    The template part slug.
+	 * @param string $content The template part content.
+	 * @return int The template part post ID.
+	 */
+	private function create_navigation_overlay_template_part( $slug, $content ) {
+		$template_part_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_title'   => 'Test Overlay',
+				'post_name'    => $slug,
+				'post_content' => $content,
+			),
+			true
+		);
+		$this->assertNotWPError( $template_part_id );
+
+		wp_set_post_terms( $template_part_id, array( get_stylesheet() ), 'wp_theme' );
+		wp_set_post_terms( $template_part_id, array( 'navigation-overlay' ), 'wp_template_part_area' );
+
+		return $template_part_id;
+	}
+
+	/**
+	 * The default overlay expands every submenu it contains through the styles
+	 * scoped to `:not(.disable-default-overlay)`, so the context must not claim
+	 * a custom overlay when none is rendered.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_responsive_container_markup
+	 */
+	public function test_default_overlay_does_not_flag_the_context_as_a_custom_overlay() {
+		$output = do_blocks( '<!-- wp:navigation {"overlayMenu":"always"} /-->' );
+
+		$this->assertStringNotContainsString( 'disable-default-overlay', $output, 'The default overlay should not disable the default overlay styles.' );
+		$this->assertStringNotContainsString( '"hasCustomOverlay":true', $output, 'The default overlay should not flag the context as a custom overlay.' );
+	}
+
+	/**
+	 * A custom overlay opts out of the styles that expand every submenu, so the
+	 * context must tell submenus they are not inside the default overlay.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_responsive_container_markup
+	 */
+	public function test_custom_overlay_flags_the_context_as_a_custom_overlay() {
+		$slug = 'test-overlay-with-content';
+		$this->create_navigation_overlay_template_part( $slug, '<!-- wp:paragraph --><p>Overlay content</p><!-- /wp:paragraph -->' );
+
+		$output = do_blocks( '<!-- wp:navigation {"overlay":"' . $slug . '","overlayMenu":"always"} /-->' );
+
+		$this->assertStringContainsString( 'disable-default-overlay', $output, 'A custom overlay should disable the default overlay styles.' );
+		$this->assertStringContainsString( '"hasCustomOverlay":true', $output, 'A custom overlay should flag the context as a custom overlay.' );
+	}
+
+	/**
+	 * An overlay template part that renders nothing - it was deleted, or it
+	 * belongs to a theme that is no longer active - falls back to the default
+	 * overlay, so the context has to fall back with it.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_responsive_container_markup
+	 */
+	public function test_overlay_template_part_that_renders_nothing_falls_back_to_the_default_overlay() {
+		$output = do_blocks( '<!-- wp:navigation {"overlay":"test-overlay-that-does-not-exist","overlayMenu":"always"} /-->' );
+
+		$this->assertStringNotContainsString( 'disable-default-overlay', $output, 'An overlay that renders nothing should keep the default overlay styles.' );
+		$this->assertStringNotContainsString( '"hasCustomOverlay":true', $output, 'An overlay that renders nothing should not flag the context as a custom overlay.' );
+	}
 }
