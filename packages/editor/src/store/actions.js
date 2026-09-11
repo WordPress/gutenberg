@@ -2,6 +2,7 @@ import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
 import { escapeHTML } from '@wordpress/escape-html';
 import deprecated from '@wordpress/deprecated';
+import warning from '@wordpress/warning';
 import {
 	parse,
 	synchronizeBlocksWithTemplate,
@@ -798,10 +799,20 @@ export function updateEditorSettings( settings ) {
 export const setRenderingMode =
 	( mode ) =>
 	( { dispatch, registry, select } ) => {
-		if (
-			select.__unstableIsEditorReady() &&
-			! select.getEditorSettings().isPreviewMode
-		) {
+		const settings = select.getEditorSettings();
+
+		// An editor opened with a rendering mode of its own is showing what
+		// that context is for, so it stays in that mode. Applying that mode is
+		// what puts the editor in it, so only a move away is ignored. It warns,
+		// or the caller could not tell why nothing changed.
+		if ( settings.renderingMode && mode !== settings.renderingMode ) {
+			warning(
+				`setRenderingMode( '${ mode }' ) was ignored: this editor is using overriding rendering mode from '${ settings.renderingMode }'.`
+			);
+			return;
+		}
+
+		if ( select.__unstableIsEditorReady() && ! settings.isPreviewMode ) {
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
 		}
 

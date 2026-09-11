@@ -347,7 +347,7 @@ function gutenberg_set_up_cross_origin_isolation() {
 		return;
 	}
 
-	gutenberg_start_cross_origin_isolation_output_buffer();
+	gutenberg_send_document_isolation_policy_header();
 }
 
 add_action( 'load-post.php', 'gutenberg_set_up_cross_origin_isolation' );
@@ -365,9 +365,16 @@ remove_action( 'load-widgets.php', 'wp_set_up_cross_origin_isolation' );
 /**
  * Sends the Document-Isolation-Policy header for cross-origin isolation.
  *
- * Uses an output buffer to add crossorigin="anonymous" where needed.
+ * `isolate-and-credentialless` loads cross-origin subresources without
+ * credentials instead of blocking them, so no `crossorigin` attribute is
+ * needed on scripts, styles, images, audio, or video for the page to work.
+ * Forcing `crossorigin="anonymous"` would turn those into CORS requests
+ * and break any resource served without `Access-Control-Allow-Origin`,
+ * such as media offloaded to a CDN.
+ *
+ * @return bool Whether the header was sent.
  */
-function gutenberg_start_cross_origin_isolation_output_buffer(): void {
+function gutenberg_send_document_isolation_policy_header(): bool {
 	$chromium_version = gutenberg_get_chromium_major_version();
 
 	/**
@@ -387,102 +394,30 @@ function gutenberg_start_cross_origin_isolation_output_buffer(): void {
 	);
 
 	if ( ! $use_dip ) {
-		return;
+		return false;
 	}
 
-	ob_start(
-		function ( string $output ): string {
-			header( 'Document-Isolation-Policy: isolate-and-credentialless' );
+	header( 'Document-Isolation-Policy: isolate-and-credentialless' );
 
-			return gutenberg_add_crossorigin_attributes( $output );
-		}
-	);
+	return true;
 }
 
 /**
- * Adds crossorigin="anonymous" to relevant tags in the given HTML string.
+ * Removes `crossorigin` attributes from the printed media templates.
  *
- * @param string $html HTML input.
- *
- * @return string Modified HTML.
- */
-function gutenberg_add_crossorigin_attributes( string $html ): string {
-	$site_url = site_url();
-
-	$processor = new WP_HTML_Tag_Processor( $html );
-
-	// See https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin.
-	$tags = array(
-		'AUDIO'  => 'src',
-		'LINK'   => 'href',
-		'SCRIPT' => 'src',
-		'VIDEO'  => 'src',
-		'SOURCE' => 'src',
-	);
-
-	$tag_names = array_keys( $tags );
-
-	while ( $processor->next_tag() ) {
-		$tag = $processor->get_tag();
-
-		if ( ! in_array( $tag, $tag_names, true ) ) {
-			continue;
-		}
-
-		if ( 'AUDIO' === $tag || 'VIDEO' === $tag ) {
-			$processor->set_bookmark( 'audio-video-parent' );
-		}
-
-		$processor->set_bookmark( 'resume' );
-
-		$sought = false;
-
-		$crossorigin = $processor->get_attribute( 'crossorigin' );
-
-		$url = $processor->get_attribute( $tags[ $tag ] );
-
-		if ( is_string( $url ) && ! str_starts_with( $url, $site_url ) && ! str_starts_with( $url, '/' ) && ! is_string( $crossorigin ) ) {
-			if ( 'SOURCE' === $tag ) {
-				$sought = $processor->seek( 'audio-video-parent' );
-
-				if ( $sought ) {
-					$processor->set_attribute( 'crossorigin', 'anonymous' );
-				}
-			} else {
-				$processor->set_attribute( 'crossorigin', 'anonymous' );
-			}
-
-			if ( $sought ) {
-				$processor->seek( 'resume' );
-				$processor->release_bookmark( 'audio-video-parent' );
-			}
-		}
-	}
-
-	return $processor->get_updated_html();
-}
-
-/**
- * Updates `crossorigin` attributes in the printed media templates.
- *
- * Adds `crossorigin="anonymous"` to AUDIO and VIDEO tags inside the
- * Backbone `<script type="text/html">` templates so the media modal can
- * play cross-origin audio and video under cross-origin isolation. Tags
- * that already have the attribute are left untouched so the output does
- * not gain duplicates on WordPress versions where Core adds it itself.
- *
- * IMG is intentionally excluded: under
- * `Document-Isolation-Policy: isolate-and-credentialless` the browser
- * already loads cross-origin images in credentialless mode, so forcing
- * `crossorigin="anonymous"` triggers a CORS request that breaks previews
- * of images served without CORS headers, such as media offloaded to a
- * CDN. See https://core.trac.wordpress.org/ticket/65673.
+ * WordPress 7.1 forces `crossorigin="anonymous"` onto the AUDIO and VIDEO
+ * tags inside the Backbone `<script type="text/html">` templates whenever
+ * client-side media processing is enabled. Under
+ * `Document-Isolation-Policy: isolate-and-credentialless` the attribute is
+ * not needed to play cross-origin media, and it turns the load into a CORS
+ * request that fails for media served without CORS headers, such as media
+ * offloaded to a CDN. See https://core.trac.wordpress.org/ticket/65930.
  *
  * @param string $html The printed media templates.
  *
  * @return string Modified media templates.
  */
-function gutenberg_update_media_template_crossorigin_attributes( string $html ): string {
+function gutenberg_remove_media_template_crossorigin_attributes( string $html ): string {
 	/*
 	 * The media templates are inside <script type="text/html"> tags,
 	 * whose content is treated as raw text by the HTML Tag Processor.
@@ -497,10 +432,10 @@ function gutenberg_update_media_template_crossorigin_attributes( string $html ):
 		$template_processor = new WP_HTML_Tag_Processor( $script_processor->get_modifiable_text() );
 		while ( $template_processor->next_tag() ) {
 			if (
-				in_array( $template_processor->get_tag(), array( 'AUDIO', 'VIDEO' ), true )
-				&& ! is_string( $template_processor->get_attribute( 'crossorigin' ) )
+				in_array( $template_processor->get_tag(), array( 'AUDIO', 'IMG', 'VIDEO' ), true )
+				&& 'anonymous' === $template_processor->get_attribute( 'crossorigin' )
 			) {
-				$template_processor->set_attribute( 'crossorigin', 'anonymous' );
+				$template_processor->remove_attribute( 'crossorigin' );
 			}
 		}
 		$script_processor->set_modifiable_text( $template_processor->get_updated_html() );
@@ -512,11 +447,14 @@ function gutenberg_update_media_template_crossorigin_attributes( string $html ):
 /**
  * Overrides templates from wp_print_media_templates with custom ones.
  *
- * Updates the `crossorigin` attributes on media tags so cross-origin
- * audio and video can be processed under cross-origin isolation without
- * breaking previews of images served without CORS headers.
+ * Only needed on WordPress 7.1, the one release whose
+ * `wp_print_media_templates()` injects `crossorigin="anonymous"` itself.
  */
 function gutenberg_override_media_templates(): void {
+	if ( ! function_exists( 'wp_add_crossorigin_attributes' ) || function_exists( 'wp_send_document_isolation_policy_header' ) ) {
+		return;
+	}
+
 	remove_action( 'admin_footer', 'wp_print_media_templates' );
 	add_action(
 		'admin_footer',
@@ -525,7 +463,7 @@ function gutenberg_override_media_templates(): void {
 			wp_print_media_templates();
 			$html = (string) ob_get_clean();
 
-			echo gutenberg_update_media_template_crossorigin_attributes( $html ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo gutenberg_remove_media_template_crossorigin_attributes( $html ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	);
 }
