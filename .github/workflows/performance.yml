@@ -61,7 +61,7 @@ jobs:
                           - '!packages/{create-block,docgen,eslint-plugin,jest-*,npm-package-json-lint-config,prettier-config,project-management-automation,stylelint-config}/**'
                           # The mu-plugins and plugins below it load at run time, so they still count.
                           - '!packages/e2e-tests/{*,!(mu-plugins|plugins)/**}'
-                          - '!tools/{configs,docs,eslint,stylelint,validation}/**'
+                          - '!tools/{docs,eslint,monorepo,stylelint,validation}/**'
                           - '!{eslint,lint-staged,prettier,syncpack}.config*'
                           - '!{phpcs,phpunit}*'
                           # Repository metadata.
