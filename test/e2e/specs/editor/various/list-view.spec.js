@@ -341,25 +341,13 @@ test.describe( 'List View', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Paragraph text' },
 		} );
-		// The block owns the caret: it is focused itself, or the engaged
-		// editing host holds focus with the selection inside the block.
 		await expect
 			.poll( () =>
-				editor.canvas
-					.getByRole( 'document', {
+				editor.ownsSelection(
+					editor.canvas.getByRole( 'document', {
 						name: 'Block: Paragraph',
 					} )
-					.evaluate( ( el ) => {
-						const { activeElement } = el.ownerDocument;
-						const { anchorNode } =
-							el.ownerDocument.defaultView.getSelection();
-						return (
-							el === activeElement ||
-							( activeElement?.contentEditable === 'true' &&
-								activeElement.contains( el ) &&
-								el.contains( anchorNode ) )
-						);
-					} )
+				)
 			)
 			.toBe( true );
 
