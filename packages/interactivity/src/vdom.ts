@@ -98,7 +98,7 @@ export function toVdom( root: Node ): ComponentChild {
 		// CDATA_SECTION_NODE (4)
 		if ( nodeType === 4 ) {
 			nodesToReplace.add( node );
-			return node.nodeValue;
+			return ( node as CDATASection ).data;
 		}
 
 		// COMMENT_NODE (8) || PROCESSING_INSTRUCTION_NODE (7)
@@ -108,7 +108,6 @@ export function toVdom( root: Node ): ComponentChild {
 		}
 
 		const elementNode = node as HTMLElement;
-		const { attributes } = elementNode;
 		const localName = elementNode.localName as keyof JSX.IntrinsicElements;
 
 		const props: Record< string, any > = {};
@@ -119,9 +118,16 @@ export function toVdom( root: Node ): ComponentChild {
 		let ignore = false;
 		let island = false;
 
-		for ( let i = 0; i < attributes.length; i++ ) {
-			const attributeName = attributes[ i ].name;
-			const attributeValue = attributes[ i ].value;
+		// `getAttributeNames()` copies the attribute names into a plain JS
+		// array, which is much faster than per-attribute access to the live
+		// NamedNodeMap (`attributes[ i ].name` / `.value`): each index access
+		// and property read crosses the JS/DOM boundary and may allocate an
+		// `Attr` wrapper object.
+		const attributeNames = elementNode.getAttributeNames();
+		for ( let i = 0; i < attributeNames.length; i++ ) {
+			const attributeName = attributeNames[ i ];
+			const attributeValue =
+				elementNode.getAttribute( attributeName ) ?? '';
 			if (
 				attributeName[ directivePrefix.length ] &&
 				attributeName.slice( 0, directivePrefix.length ) ===
@@ -133,10 +139,22 @@ export function toVdom( root: Node ): ComponentChild {
 					const regexResult = nsPathRegExp.exec( attributeValue );
 					const namespace = regexResult?.[ 1 ] ?? null;
 					let value: any = regexResult?.[ 2 ] ?? attributeValue;
-					try {
-						const parsedValue = JSON.parse( value );
-						value = isObject( parsedValue ) ? parsedValue : value;
-					} catch {}
+					// The parsed value is only ever used if it is a plain
+					// object, so a value can only be worth parsing if it
+					// starts with `{` (allowing leading whitespace, which
+					// JSON.parse tolerates for values set via setAttribute).
+					// This gates the common case of plain string values
+					// (e.g. `data-wp-interactive="myplugin"`), avoiding the
+					// relatively expensive SyntaxError that JSON.parse throws
+					// for every non-JSON value.
+					if ( /^\s*\{/.test( value ) ) {
+						try {
+							const parsedValue = JSON.parse( value );
+							value = isObject( parsedValue )
+								? parsedValue
+								: value;
+						} catch {}
+					}
 					if ( attributeName === 'data-wp-interactive' ) {
 						island = true;
 						const islandNamespace =
@@ -151,6 +169,10 @@ export function toVdom( root: Node ): ComponentChild {
 						directives.push( [ attributeName, namespace, value ] );
 					}
 				}
+				// Directive attributes are never boolean properties, so skip
+				// the boolean check below and assign the value directly.
+				props[ attributeName ] = attributeValue;
+				continue;
 			} else if ( attributeName === 'ref' ) {
 				continue;
 			}
@@ -260,7 +282,7 @@ export function toVdom( root: Node ): ComponentChild {
 	);
 	nodesToReplace.forEach( ( node: Node ) =>
 		( node as CDATASection ).replaceWith(
-			new window.Text( ( node as CDATASection ).nodeValue ?? '' )
+			new window.Text( ( node as CDATASection ).data )
 		)
 	);
 
