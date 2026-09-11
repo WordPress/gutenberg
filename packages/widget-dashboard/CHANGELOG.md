@@ -10,6 +10,9 @@
     ([#82961](https://github.com/WordPress/gutenberg/pull/82961)).
 -   Show the selected widget width in its options menu and add an ellipsis to
     the reset action that opens a confirmation dialog ([#81929](https://github.com/WordPress/gutenberg/pull/81929)).
+-   Widget header: a title the row clips shows the full text in a tooltip
+    on hover, and becomes focusable so keyboard users can open it too
+    ([#82226](https://github.com/WordPress/gutenberg/pull/82226)).
 
 ### Internal
 
@@ -63,12 +66,6 @@
     the type is registered; a gone plugin or a failed load leaves it
     absent, so locks keyed on the type do not fire
     ([#82256](https://github.com/WordPress/gutenberg/pull/82256)).
-
-### Enhancements
-
--   Widget header: a title the row clips shows the full text in a tooltip
-    on hover, and becomes focusable so keyboard users can open it too
-    ([#82226](https://github.com/WordPress/gutenberg/pull/82226)).
 
 ### Internal
 
