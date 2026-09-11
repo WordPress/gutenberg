@@ -3571,7 +3571,7 @@ describe( 'Link preview with entity data from navigation blocks', () => {
 				title: 'My Test Page',
 				badges: [
 					{ label: 'Draft', intent: 'low' },
-					{ label: 'Page', intent: 'draft' },
+					{ label: 'Page', intent: 'none' },
 				],
 			};
 

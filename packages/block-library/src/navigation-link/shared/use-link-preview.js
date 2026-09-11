@@ -143,17 +143,17 @@ export function computeBadges( {
 		} else if ( isHomepage( url, homeUrl ) ) {
 			badges.push( {
 				label: __( 'Homepage' ),
-				intent: 'draft',
+				intent: 'none',
 			} );
 		} else if ( type && type !== 'custom' ) {
 			// Show entity type badge (page, post, category, etc.)
 			// but not 'custom' since that's just a manual link
-			badges.push( { label: capitalize( type ), intent: 'draft' } );
+			badges.push( { label: capitalize( type ), intent: 'none' } );
 		} else {
 			// Internal link (not external, not hash, not entity)
 			badges.push( {
 				label: __( 'Page' ),
-				intent: 'draft',
+				intent: 'none',
 			} );
 		}
 	}
@@ -176,8 +176,8 @@ export function computeBadges( {
 			future: { label: __( 'Scheduled' ), intent: 'informational' },
 			draft: { label: __( 'Draft' ), intent: 'low' },
 			pending: { label: __( 'Pending' ), intent: 'low' },
-			private: { label: __( 'Private' ), intent: 'draft' },
-			trash: { label: __( 'Trash' ), intent: 'high' },
+			private: { label: __( 'Private' ), intent: 'informational' },
+			trash: { label: __( 'Trashed' ), intent: 'high' },
 		};
 		const badge = statusMap[ entityStatus ];
 		if ( badge ) {

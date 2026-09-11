@@ -221,7 +221,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Page',
-				intent: 'draft',
+				intent: 'none',
 			} );
 		} );
 
@@ -245,7 +245,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Homepage',
-				intent: 'draft',
+				intent: 'none',
 			} );
 		} );
 
@@ -262,7 +262,7 @@ describe( 'computeBadges', () => {
 			} );
 			expect( badges ).toContainEqual( {
 				label: 'Homepage',
-				intent: 'draft',
+				intent: 'none',
 			} );
 		} );
 
@@ -276,7 +276,7 @@ describe( 'computeBadges', () => {
 				} );
 				expect( badges ).not.toContainEqual( {
 					label: 'Homepage',
-					intent: 'draft',
+					intent: 'none',
 				} );
 			}
 		);
@@ -293,7 +293,7 @@ describe( 'computeBadges', () => {
 				} );
 				expect( badges ).toContainEqual( {
 					label: 'Homepage',
-					intent: 'draft',
+					intent: 'none',
 				} );
 			}
 		);
@@ -306,7 +306,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Page',
-				intent: 'draft',
+				intent: 'none',
 			} );
 		} );
 	} );
@@ -380,7 +380,7 @@ it( 'should show "Internal link" badge for hash links even when type is present'
 	// Should NOT show Page badge
 	expect( badges ).not.toContainEqual( {
 		label: 'Page',
-		intent: 'draft',
+		intent: 'none',
 	} );
 } );
 
@@ -394,12 +394,12 @@ it( 'should show "Homepage" badge for root path even when type is present', () =
 	// Should prioritize homepage detection over type
 	expect( badges ).toContainEqual( {
 		label: 'Homepage',
-		intent: 'draft',
+		intent: 'none',
 	} );
 	// Should NOT show Page badge
 	expect( badges ).not.toContainEqual( {
 		label: 'Page',
-		intent: 'draft',
+		intent: 'none',
 	} );
 } );
 
@@ -425,7 +425,7 @@ test.each( [
 		// Should NOT show Page badge
 		expect( badges ).not.toContainEqual( {
 			label: 'Page',
-			intent: 'draft',
+			intent: 'none',
 		} );
 	}
 );
@@ -440,7 +440,7 @@ it( 'should show "Page" badge for internal custom links', () => {
 	// Should show Page badge for internal custom links
 	expect( badges ).toContainEqual( {
 		label: 'Page',
-		intent: 'draft',
+		intent: 'none',
 	} );
 	// Should NOT show Custom badge
 	expect( badges ).not.toContainEqual( {

@@ -103,7 +103,7 @@ describe( 'LinkPicker', () => {
 					preview={ {
 						title: 'My Page',
 						url: 'example.com',
-						badges: [ { label: 'Page', intent: 'draft' } ],
+						badges: [ { label: 'Page', intent: 'none' } ],
 					} }
 					onSelect={ vi.fn() }
 					label="Link"
@@ -123,7 +123,7 @@ describe( 'LinkPicker', () => {
 						title: 'My Page',
 						url: 'example.com',
 						image: 'https://example.com/image.jpg',
-						badges: [ { label: 'Page', intent: 'draft' } ],
+						badges: [ { label: 'Page', intent: 'none' } ],
 					} }
 					onSelect={ vi.fn() }
 					label="Link"
