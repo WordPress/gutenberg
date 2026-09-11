@@ -44,6 +44,7 @@ const DEFAULT_QUERY = {
 
 const CREATE_TERM_VALUE = '__create__';
 const PENDING_TERM_PREFIX = '__pending__:';
+let pendingTermId = 0;
 
 /**
  * Maps a term record to the `{ value, label }` shape the select works with.
@@ -245,7 +246,9 @@ export function FlatTermSelector( { slug } ) {
 
 	async function createTerm( name ) {
 		const pendingTerm = {
-			value: PENDING_TERM_PREFIX + name,
+			// A term removed and created again shouldn't share a key with the
+			// earlier request, which may still resolve.
+			value: PENDING_TERM_PREFIX + ++pendingTermId,
 			label: name,
 		};
 		// Show the term right away, it is assigned once it exists.
