@@ -16,5 +16,6 @@
 
 	&:focus:not(:disabled):not(:active) {
 		box-shadow: 0 0 0 calc(2 * var(--wpds-border-width-focus) + 2px) var(--wpds-color-background-surface-neutral-strong);
+		z-index: 1
 	}
 }
