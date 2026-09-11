@@ -469,6 +469,34 @@ export function syncUndoManagerState(
 	return state;
 }
 
+/**
+ * Tracks the last undoable edit so that `editEntityRecord` can decide whether
+ * a new edit continues the same undo level or starts a new one. `target`
+ * identifies the record and the set of edited keys; `time` is when the edit
+ * was dispatched.
+ *
+ * @param {Object|null} state  Current state.
+ * @param {Object}      action Dispatched action.
+ *
+ * @return {Object|null} Updated state.
+ */
+export function undoCoalesceSession( state = null, action ) {
+	switch ( action.type ) {
+		case 'EDIT_ENTITY_RECORD':
+			// An absent field leaves the session untouched, which is what
+			// edits that do not touch the undo history want, `undoIgnore`
+			// among them. `null` ends the run, an object starts or extends it.
+			return action.coalesceSession !== undefined
+				? action.coalesceSession
+				: state;
+		case 'UNDO':
+		case 'REDO':
+		case 'END_UNDO_COALESCE_SESSION':
+			return null;
+	}
+	return state;
+}
+
 export function editsReference( state = {}, action ) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
@@ -768,6 +796,7 @@ export default combineReducers( {
 	editsReference,
 	syncUndoManagerState,
 	undoManager,
+	undoCoalesceSession,
 	embedPreviews,
 	userPermissions,
 	autosaves,

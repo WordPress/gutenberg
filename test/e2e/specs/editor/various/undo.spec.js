@@ -493,6 +493,9 @@ test.describe( 'undo', () => {
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.type( 'a' ); // First step.
+		// Title edits made less than a second apart share an undo level, so
+		// pause to give the backspace its own.
+		await editor.page.waitForTimeout( 1000 );
 		await page.keyboard.press( 'Backspace' ); // Second step.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Add default block' } )
