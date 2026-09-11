@@ -9,7 +9,10 @@ import { Autocomplete as BaseAutocomplete } from '@base-ui/react/autocomplete';
  *
  * When you already supply the filtered list (for example from a server
  * request), you have the count and do not need this hook.
+ *
+ * The returned array is read-only and may share identity with the root's
+ * `items`.
  */
-export function useFilteredItems< T >(): T[] {
+export function useFilteredItems< T >(): ReadonlyArray< T > {
 	return BaseAutocomplete.useFilteredItems< T >();
 }

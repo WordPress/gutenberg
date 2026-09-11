@@ -322,30 +322,30 @@ describe( 'SearchableSelect', () => {
 		expect( status ).toBeEmptyDOMElement();
 	} );
 
-	it( 'announces a visually hidden result count by default', async () => {
+	it( 'announces a result count by default', async () => {
 		const user = userEvent.setup();
 
 		render( <SearchableSelect aria-label="Fruit" items={ ITEMS } /> );
 
 		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
 
-		await screen.findByText( '3 results found.' );
+		expect( await screen.findByText( '3 results found.' ) ).toBeVisible();
 	} );
 
-	it( 'updates the visually hidden result count as the list filters', async () => {
+	it( 'updates the result count as the list filters', async () => {
 		const user = userEvent.setup();
 
 		render( <SearchableSelect aria-label="Fruit" items={ ITEMS } /> );
 
 		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
-		await screen.findByText( '3 results found.' );
+		expect( await screen.findByText( '3 results found.' ) ).toBeVisible();
 
 		await user.type(
 			screen.getByRole( 'combobox', { name: 'Search' } ),
 			'Apr'
 		);
 
-		await screen.findByText( '1 result found.' );
+		expect( await screen.findByText( '1 result found.' ) ).toBeVisible();
 	} );
 
 	it( 'does not announce a result count when there are no matching items', async () => {
@@ -354,7 +354,7 @@ describe( 'SearchableSelect', () => {
 		render( <SearchableSelect aria-label="Fruit" items={ ITEMS } /> );
 
 		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
-		await screen.findByText( '3 results found.' );
+		expect( await screen.findByText( '3 results found.' ) ).toBeVisible();
 
 		await user.type(
 			screen.getByRole( 'combobox', { name: 'Search' } ),
@@ -386,7 +386,7 @@ describe( 'SearchableSelect', () => {
 
 		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
 
-		await screen.findByText( '3 results found.' );
+		expect( await screen.findByText( '3 results found.' ) ).toBeVisible();
 	} );
 
 	it( 'announces the item count for grouped items', async () => {
@@ -421,7 +421,7 @@ describe( 'SearchableSelect', () => {
 
 		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
 
-		await screen.findByText( '6 results found.' );
+		expect( await screen.findByText( '6 results found.' ) ).toBeVisible();
 	} );
 
 	describe( 'creatable item', () => {
