@@ -125,6 +125,7 @@ describe( 'Vitest policy rules', () => {
 		);
 		for ( const source of [
 			"import { vi } from 'vitest'; const fake = { getBoundingClientRect() {} }; vi.spyOn( fake, 'getBoundingClientRect' );",
+			"import { vi } from 'vitest'; function mockRect( value ) { vi.spyOn( value, 'getBoundingClientRect' ); } const fake = { getBoundingClientRect() {} }; mockRect( fake );",
 			"import { vi } from 'vitest'; vi.stubGlobal( 'fetch', () => {} );",
 			"const vi = { stubGlobal() {}, spyOn() {} }; vi.stubGlobal( 'ResizeObserver', class {} ); vi.spyOn( HTMLElement.prototype, 'getBoundingClientRect' );",
 		] ) {
@@ -152,6 +153,14 @@ describe( 'Vitest policy rules', () => {
 				project: 'jsdom',
 			} );
 		}
+	} );
+
+	it( 'tracks DOM values through local helper parameters', () => {
+		expectViolation(
+			"import { vi } from 'vitest';\nfunction mockRect( element ) { vi.spyOn( element, 'getBoundingClientRect' ); }\nconst element = document.createElement( 'div' );\nmockRect( element );",
+			'require Browser Mode',
+			{ project: 'jsdom' }
+		);
 	} );
 
 	it( 'tracks Testing Library DOM results and later assignments', () => {

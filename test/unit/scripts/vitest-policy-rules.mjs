@@ -1611,6 +1611,21 @@ export function validateVitestPolicy( {
 			}
 		}
 	};
+	const isTrackedDomValue = ( value ) =>
+		isBrowserGlobalExpression(
+			value,
+			unboundIdentifiers,
+			domVariables,
+			domCollectionVariables,
+			identifierVariables,
+			windowVariables,
+			testingLibraryScreenVariables,
+			testingLibraryDomFunctionVariables,
+			testingLibraryAsyncDomFunctionVariables,
+			testingLibraryCollectionFunctionVariables,
+			testingLibraryAsyncCollectionFunctionVariables,
+			testingLibraryNamespaceVariables
+		);
 
 	for ( const node of ast.body ) {
 		if ( node.type !== 'ImportDeclaration' ) {
@@ -1831,6 +1846,33 @@ export function validateVitestPolicy( {
 							elementParameterIndex + callback.boundArgumentCount
 						]
 					);
+				}
+			}
+
+			if ( node.type === 'CallExpression' ) {
+				let localFunctions;
+				for ( const [
+					argumentIndex,
+					argument,
+				] of node.arguments.entries() ) {
+					if (
+						argument.type !== 'SpreadElement' &&
+						isTrackedDomValue( argument )
+					) {
+						localFunctions ??= getReachableLocalFunctions(
+							node.callee,
+							identifierVariables,
+							parentNodes
+						);
+						for ( const localFunction of localFunctions ) {
+							trackDomValuePattern(
+								localFunction.functionNode.params[
+									argumentIndex +
+										localFunction.boundArgumentCount
+								]
+							);
+						}
+					}
 				}
 			}
 
@@ -2096,22 +2138,7 @@ export function validateVitestPolicy( {
 				}
 			}
 
-			if (
-				! isBrowserGlobalExpression(
-					value,
-					unboundIdentifiers,
-					domVariables,
-					domCollectionVariables,
-					identifierVariables,
-					windowVariables,
-					testingLibraryScreenVariables,
-					testingLibraryDomFunctionVariables,
-					testingLibraryAsyncDomFunctionVariables,
-					testingLibraryCollectionFunctionVariables,
-					testingLibraryAsyncCollectionFunctionVariables,
-					testingLibraryNamespaceVariables
-				)
-			) {
+			if ( ! isTrackedDomValue( value ) ) {
 				return;
 			}
 
