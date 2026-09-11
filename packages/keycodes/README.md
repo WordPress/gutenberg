@@ -169,6 +169,28 @@ isKeyboardEvent.primary( event, 'm' );
 
 Keyed map of functions to match events.
 
+### keyboardShortcut
+
+An object that contains functions returning the three values used to display and describe a keyboard shortcut: its display string, its `aria-keyshortcuts` value and its plain-text label.
+
+The raw representation is not included; use `rawShortcut` for that.
+
+Use it in place of calling `displayShortcut`, `ariaKeyShortcut` and `shortcutAriaLabel` separately, for example to build the `shortcut` prop of the `@wordpress/ui` components.
+
+_Usage_
+
+```js
+// Assuming macOS:
+keyboardShortcut.primaryShift( 'm' );
+// {
+//   displayShortcut: "⇧⌘M",
+//   ariaKeyShortcut: "Shift+Meta+M",
+//   label: "Shift Command M",
+// }
+```
+
+Keyed map of functions to shortcut display values.
+
 ### LEFT
 
 Keycode for LEFT key.
