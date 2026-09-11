@@ -7,7 +7,11 @@ import {
 	alignCenter,
 	alignRight,
 } from '@wordpress/icons';
-import { keyboardShortcut } from '@wordpress/keycodes';
+import {
+	ariaKeyShortcut,
+	displayShortcut,
+	shortcutAriaLabel,
+} from '@wordpress/keycodes';
 import * as Menu from '../';
 
 const meta: Meta< typeof Menu.Root > = {
@@ -49,12 +53,36 @@ export default meta;
 type Story = StoryObj< typeof Menu.Root >;
 
 const SHORTCUTS = {
-	comfortableDensity: keyboardShortcut.primary( '2' ),
-	developerResources: keyboardShortcut.primary( 'd' ),
-	downloads: keyboardShortcut.primary( 'd' ),
-	move: keyboardShortcut.primary( 'm' ),
-	save: keyboardShortcut.primary( 's' ),
-	shared: keyboardShortcut.primaryShift( 's' ),
+	comfortableDensity: {
+		displayShortcut: displayShortcut.primary( '2' ),
+		ariaKeyShortcut: ariaKeyShortcut.primary( '2' ),
+		label: shortcutAriaLabel.primary( '2' ),
+	},
+	developerResources: {
+		displayShortcut: displayShortcut.primary( 'd' ),
+		ariaKeyShortcut: ariaKeyShortcut.primary( 'd' ),
+		label: shortcutAriaLabel.primary( 'd' ),
+	},
+	downloads: {
+		displayShortcut: displayShortcut.primary( 'd' ),
+		ariaKeyShortcut: ariaKeyShortcut.primary( 'd' ),
+		label: shortcutAriaLabel.primary( 'd' ),
+	},
+	move: {
+		displayShortcut: displayShortcut.primary( 'm' ),
+		ariaKeyShortcut: ariaKeyShortcut.primary( 'm' ),
+		label: shortcutAriaLabel.primary( 'm' ),
+	},
+	save: {
+		displayShortcut: displayShortcut.primary( 's' ),
+		ariaKeyShortcut: ariaKeyShortcut.primary( 's' ),
+		label: shortcutAriaLabel.primary( 's' ),
+	},
+	shared: {
+		displayShortcut: displayShortcut.primaryShift( 's' ),
+		ariaKeyShortcut: ariaKeyShortcut.primaryShift( 's' ),
+		label: shortcutAriaLabel.primaryShift( 's' ),
+	},
 };
 
 export const Default: Story = {
