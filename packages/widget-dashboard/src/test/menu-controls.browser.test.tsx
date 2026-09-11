@@ -121,7 +121,7 @@ describe( 'Widget Dashboard menus', () => {
 		expect( trigger ).toHaveFocus();
 	} );
 
-	it.each( [ 'Meta', 'Control', 'Alt' ] as const )(
+	it.each( [ 'Meta', 'Control', 'Alt', 'Shift' ] as const )(
 		'keeps the widget action menu open for %s-click',
 		async ( modifier ) => {
 			const user = userEvent.setup();
