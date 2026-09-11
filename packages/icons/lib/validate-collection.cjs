@@ -8,6 +8,7 @@ const ICON_VIEW_BOX = '0 0 24 24';
  * Validating the icons collection checks that:
  *
  * - Each manifest entry has a matching SVG in library/, and vice versa.
+ * - Each manifest entry's `public` property, if present, is a boolean.
  * - Each SVG uses currentColor so icons inherit text color.
  * - Each SVG uses viewBox="0 0 24 24".
  */
@@ -52,6 +53,19 @@ async function validateCollection() {
 		}
 
 		manifestPaths.push( icon.filePath );
+
+		/*
+		 * Verify that `public`, if present, is a boolean.
+		 */
+		if ( 'public' in icon && typeof icon.public !== 'boolean' ) {
+			problems.push(
+				`- Invalid icon definition for icon '${
+					icon.slug
+				}': expected 'public' to be true or false, saw ${ JSON.stringify(
+					icon.public
+				) }`
+			);
+		}
 
 		/*
 		 * Verify that the corresponding SVG file is found.
