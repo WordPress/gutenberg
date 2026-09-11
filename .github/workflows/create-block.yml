@@ -18,7 +18,7 @@ permissions: {}
 
 jobs:
     checks:
-        name: Checks w/Node.js ${{ matrix.node }} on ${{ contains( matrix.os, 'macos-' ) && 'MacOS' || contains( matrix.os, 'windows-' ) && 'Windows' || 'Linux' }}
+        name: Checks on ${{ contains( matrix.os, 'macos-' ) && 'MacOS' || contains( matrix.os, 'windows-' ) && 'Windows' || 'Linux' }}
         runs-on: ${{ matrix.os }}
         permissions:
             contents: read
@@ -27,14 +27,9 @@ jobs:
             fail-fast: false
             matrix:
                 event: ['${{ github.event_name }}']
-                node: ['20', '22', '24']
                 os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
                 exclude:
-                    # On PRs: Only test Node 20 on Ubuntu
-                    - event: 'pull_request'
-                      node: '22'
-                    - event: 'pull_request'
-                      node: '24'
+                    # On PRs: Only test on Ubuntu
                     - event: 'pull_request'
                       os: 'macos-15'
                     - event: 'pull_request'
@@ -48,8 +43,6 @@ jobs:
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
-              with:
-                  node-version: ${{ matrix.node }}
 
             - name: Create block
               shell: bash
