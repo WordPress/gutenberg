@@ -25,8 +25,8 @@
 	},
 	"devDependencies": {
 		"@mawesome/dependency-audit": "^0.4.6",
-		"@wordpress/monorepo-tools": "file:../monorepo",
 		"@wordpress/create-block": "file:../../packages/create-block",
+		"@wordpress/monorepo-tools": "file:../monorepo",
 		"@wordpress/scripts": "file:../../packages/scripts",
 		"chalk": "^4.1.1",
 		"esbuild": "^0.27.2",
