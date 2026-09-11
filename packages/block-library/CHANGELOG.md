@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Social Links: Rename the color controls to "Icon & text" and "Background", since the colors also apply to the text labels when "Show text" is enabled ([#68858](https://github.com/WordPress/gutenberg/pull/68858)).
+
 ## 11.0.0 (2026-09-10)
 
 ### Breaking Changes
