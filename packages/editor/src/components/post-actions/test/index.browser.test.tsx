@@ -1,37 +1,48 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { screen, waitFor } from '@testing-library/react';
+import { userEvent } from 'vitest/browser';
+import { render } from 'vitest-browser-react';
 import { useSelect } from '@wordpress/data';
 import PostActions from '../';
 import { usePostActions } from '../actions';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-jest.mock( '../actions', () => ( { usePostActions: jest.fn() } ) );
+vi.mock( import( '@wordpress/data' ), { spy: true } );
+vi.mock( import( '../actions' ), () => ( { usePostActions: vi.fn() } ) );
+
+const mockedUseSelect = vi.mocked( useSelect );
+const mockedUsePostActions = vi.mocked( usePostActions );
 
 const item = { id: 123, title: { raw: 'Test post' } };
 
-function renderPostActions() {
-	useSelect.mockReturnValue( {
+async function renderPostActions() {
+	mockedUseSelect.mockReturnValue( {
 		item,
 		permissions: { canUpdate: true },
 	} );
 
-	return render( <PostActions postType="post" postId={ item.id } /> );
+	await render(
+		<PostActions
+			postType="post"
+			postId={ item.id }
+			onActionPerformed={ undefined }
+		/>
+	);
 }
 
 describe( 'PostActions', () => {
 	beforeEach( () => {
-		usePostActions.mockReset();
+		mockedUsePostActions.mockReset();
 	} );
 
 	it( 'keeps the unavailable actions trigger focusable and closed', async () => {
 		const user = userEvent.setup();
-		usePostActions.mockReturnValue( [] );
-		renderPostActions();
+		mockedUsePostActions.mockReturnValue( [] );
+		await renderPostActions();
 
 		const trigger = screen.getByRole( 'button', { name: 'Actions' } );
 		expect( trigger ).toHaveAttribute( 'aria-disabled', 'true' );
 
-		trigger.focus();
+		await user.tab();
 		expect( trigger ).toHaveFocus();
 
 		await user.keyboard( '{Enter}' );
@@ -40,11 +51,11 @@ describe( 'PostActions', () => {
 
 	it( 'performs an action, closes the menu, and restores trigger focus', async () => {
 		const user = userEvent.setup();
-		const callback = jest.fn();
-		usePostActions.mockReturnValue( [
+		const callback = vi.fn();
+		mockedUsePostActions.mockReturnValue( [
 			{ id: 'duplicate', label: 'Duplicate', callback },
 		] );
-		renderPostActions();
+		await renderPostActions();
 
 		const trigger = screen.getByRole( 'button', { name: 'Actions' } );
 		await user.click( trigger );
@@ -64,16 +75,16 @@ describe( 'PostActions', () => {
 
 	it( 'moves focus to a modal action and returns it after cancellation', async () => {
 		const user = userEvent.setup();
-		usePostActions.mockReturnValue( [
+		mockedUsePostActions.mockReturnValue( [
 			{
 				id: 'delete',
 				label: 'Delete',
-				RenderModal: ( { closeModal } ) => (
+				RenderModal: ( { closeModal }: { closeModal: () => void } ) => (
 					<button onClick={ closeModal }>Cancel</button>
 				),
 			},
 		] );
-		renderPostActions();
+		await renderPostActions();
 
 		const trigger = screen.getByRole( 'button', { name: 'Actions' } );
 		await user.click( trigger );
