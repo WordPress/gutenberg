@@ -4,15 +4,13 @@
 	"compilerOptions": {
 		"types": [
 			"jest",
+			"gutenberg-vitest-test-env",
 			"style-imports",
 			"react-css-custom-properties",
 			"gutenberg-env"
 		]
 	},
-	"files": [
-		"global.d.ts",
-		"../../test/unit/typings/gutenberg-vitest-test-env/index.d.ts"
-	],
+	"files": [ "global.d.ts" ],
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
