@@ -4,6 +4,7 @@ import { activeModal } from '../reducer';
 describe( 'state', () => {
 	describe( 'activeModal', () => {
 		it( 'should default to null', () => {
+			// @ts-expect-error Unknown actions leave the state untouched.
 			const state = activeModal( undefined, {} );
 			expect( state ).toBeNull();
 		} );

@@ -1,6 +1,6 @@
 import deprecated from '@wordpress/deprecated';
 
-export function normalizeComplementaryAreaScope( scope ) {
+export function normalizeComplementaryAreaScope( scope: string ): string {
 	if ( [ 'core/edit-post', 'core/edit-site' ].includes( scope ) ) {
 		deprecated( `${ scope } interface scope`, {
 			alternative: 'core interface scope',
@@ -13,7 +13,10 @@ export function normalizeComplementaryAreaScope( scope ) {
 	return scope;
 }
 
-export function normalizeComplementaryAreaName( scope, name ) {
+export function normalizeComplementaryAreaName(
+	scope: string,
+	name: string
+): string {
 	if ( scope === 'core' && name === 'edit-site/template' ) {
 		deprecated( `edit-site/template sidebar`, {
 			alternative: 'edit-post/document',
