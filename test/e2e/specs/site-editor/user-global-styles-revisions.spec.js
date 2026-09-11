@@ -2,6 +2,10 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
+// The rendering mode preference is keyed by theme, so the tests that set it
+// have to name the same theme the fixture activates.
+const THEME = 'emptytheme';
+
 test.use( {
 	userGlobalStylesRevisions: async (
 		{ editor, page, requestUtils },
@@ -18,7 +22,7 @@ test.describe( 'Style Revisions', () => {
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
-			requestUtils.activateTheme( 'emptytheme' ),
+			requestUtils.activateTheme( THEME ),
 			requestUtils.deleteAllTemplates( 'wp_template' ),
 			requestUtils.deleteAllTemplates( 'wp_template_part' ),
 		] );
@@ -27,7 +31,7 @@ test.describe( 'Style Revisions', () => {
 
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
-			postId: 'emptytheme//index',
+			postId: `${ THEME }//index`,
 			postType: 'wp_template',
 			canvas: 'edit',
 		} );
@@ -238,6 +242,81 @@ test.describe( 'Style Revisions', () => {
 				page.getByLabel( 'Global styles revisions list' )
 			).toBeVisible();
 		} finally {
+			await requestUtils.updateSiteSettings( {
+				show_on_front: 'posts',
+				page_on_front: 0,
+			} );
+			await requestUtils.deleteAllPages();
+		}
+	} );
+
+	// The controls this checks belong to the v1 site editor shell.
+	test( 'should show the template on the styles route whatever the user prefers', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		test.skip(
+			isSiteEditorV2,
+			'The v1 site editor shell is not present in v2.'
+		);
+
+		try {
+			// Styling the site means styling the template around it, so the
+			// styles route shows the template even when the canvas is a page
+			// and the user has turned "Show template" off while editing pages.
+			const frontPage = await requestUtils.createPage( {
+				title: 'Home',
+				status: 'publish',
+			} );
+			await requestUtils.updateSiteSettings( {
+				show_on_front: 'page',
+				page_on_front: frontPage.id,
+			} );
+
+			// Set over REST rather than dispatched, so it is persisted before
+			// the editor reads it.
+			await requestUtils.setPreferences( 'core', {
+				renderingModes: { [ THEME ]: { page: 'post-only' } },
+			} );
+
+			await admin.visitSiteEditor();
+			await page
+				.getByRole( 'region', { name: 'Navigation' } )
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
+			await editor.canvas.locator( '.wp-block' ).first().waitFor();
+
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.getRenderingMode()
+					)
+				)
+				.toBe( 'template-locked' );
+
+			// With one mode to be in, the editor does not offer to leave it.
+			await page
+				.locator(
+					'iframe.edit-site-visual-editor__editor-canvas[role="button"]'
+				)
+				.click();
+			await expect( page ).toHaveURL( /canvas=edit/ );
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'View', exact: true } )
+				.click();
+			await expect(
+				page.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
+			).toBeHidden();
+			await page.keyboard.press( 'Escape' );
+		} finally {
+			await requestUtils.setPreferences( 'core', {
+				renderingModes: {},
+			} );
 			await requestUtils.updateSiteSettings( {
 				show_on_front: 'posts',
 				page_on_front: 0,
