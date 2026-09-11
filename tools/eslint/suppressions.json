@@ -7831,22 +7831,7 @@
 			"count": 1
 		}
 	},
-	"packages/widget-dashboard/src/components/actions-menu/actions-menu.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/widget-dashboard/src/components/commands/commands.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/widget-dashboard/src/components/widget-actions/widget-actions.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/widget-dashboard/src/components/widget-layout-controls/widget-layout-controls.tsx": {
 		"no-restricted-imports": {
 			"count": 1
 		}
