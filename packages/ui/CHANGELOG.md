@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   `Select.Item`, `SelectControl.Item`: Children must start with `ItemLabel`, followed by zero or more `ItemDescription` components. `Select.Item` no longer auto-wraps children. `SelectControl` still wraps the `items` array path in `ItemLabel`, and in `ItemDescription` when `description` is set. ([#82369](https://github.com/WordPress/gutenberg/pull/82369))
+-   `Select.Item`, `SelectControl.Item`: Children must start with `ItemLabel`, followed by zero or more `ItemDescription` components. Pass `ItemLabel` instead of a string. For `SelectControl` `items`, set `label` and optional `description` on each item. ([#82369](https://github.com/WordPress/gutenberg/pull/82369))
 
 ### Enhancements
 
