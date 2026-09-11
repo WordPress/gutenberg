@@ -12,12 +12,12 @@ import type { SelectItemLabelProps } from './types';
  * value) or from `Select.Trigger` children.
  */
 export const ItemLabel = forwardRef< HTMLDivElement, SelectItemLabelProps >(
-	function ItemLabel( { children, className, ...restProps }, ref ) {
+	function ItemLabel( { children, className, render, ...restProps }, ref ) {
 		return (
 			<Text
 				ref={ ref }
 				variant="body-md"
-				render={ <_Select.ItemText /> }
+				render={ <_Select.ItemText render={ render } /> }
 				className={ clsx( itemPopupStyles[ 'item-label' ], className ) }
 				{ ...restProps }
 			>

@@ -350,8 +350,8 @@ const customOptions = [
 ];
 
 /**
- * For custom needs, a `Select.Trigger` can take a custom render function as its children,
- * while `Select.Item` can take arbitrary content as children.
+ * For custom needs, a `Select.Trigger` can take a custom render function as its
+ * children. Put custom item content inside `Select.ItemLabel`.
  */
 export const WithCustomTriggerAndItem: Story = {
 	args: {

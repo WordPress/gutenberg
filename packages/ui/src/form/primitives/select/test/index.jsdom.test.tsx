@@ -412,6 +412,41 @@ describe( 'Select', () => {
 		} );
 	} );
 
+	it( 'supports custom rendering for item labels and descriptions', async () => {
+		const user = userEvent.setup();
+		const items = [ { value: 'apple', label: 'Apple' } ];
+
+		render(
+			<Select.Root items={ items }>
+				<Select.Trigger />
+				<Select.Popup>
+					<Select.Item value={ items[ 0 ] }>
+						<Select.ItemLabel render={ <h2 /> }>
+							Apple
+						</Select.ItemLabel>
+						<Select.ItemDescription render={ <h3 /> }>
+							99 in stock
+						</Select.ItemDescription>
+					</Select.Item>
+				</Select.Popup>
+			</Select.Root>
+		);
+
+		await user.click( screen.getByRole( 'combobox' ) );
+
+		const item = await screen.findByRole( 'option', { name: 'Apple' } );
+
+		expect( screen.getByText( 'Apple' ).tagName ).toBe( 'H2' );
+		expect( screen.getByText( '99 in stock' ).tagName ).toBe( 'H3' );
+
+		await user.click( item );
+
+		expect( screen.getByRole( 'combobox' ) ).toHaveTextContent( 'Apple' );
+		expect( screen.getByRole( 'combobox' ) ).not.toHaveTextContent(
+			'99 in stock'
+		);
+	} );
+
 	it( 'keeps ItemDescription out of the trigger', async () => {
 		const user = userEvent.setup();
 		const items = [ { value: 'apple', label: 'Apple' } ];
