@@ -38,9 +38,13 @@
 .input {
 	box-sizing: var(--_gcd-input-box-sizing, border-box);
 	font-family: var(--_gcd-input-font-family, inherit);
-	font-size: var(--_gcd-input-font-size, inherit);
+	font-size: var(--_gcd-input-font-size, max(var(--wpds-typography-font-size-md), 16px)); /* avoid mobile zoom */
 	font-weight: var(--_gcd-input-font-weight, inherit);
 	margin: var(--_gcd-input-margin, 0);
+
+	@media (min-width: 600px) {
+		font-size: var(--_gcd-input-font-size, inherit);
+	}
 
 	&::placeholder {
 		color: var(--_gcd-input-placeholder-color, var(--wpds-color-foreground-interactive-neutral-weak));
