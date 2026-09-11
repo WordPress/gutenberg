@@ -20,7 +20,7 @@ concurrency:
 jobs:
     e2e-puppeteer:
         name: Puppeteer - ${{ matrix.part }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
@@ -64,7 +64,7 @@ jobs:
 
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
