@@ -17,7 +17,9 @@ import MediaUploadCheck from '../../media-upload/check';
 import { useMediaResults } from './hooks';
 import InserterNoResults from '../no-results';
 
-const MEDIA_ITEMS_PER_PAGE = 20;
+// Four rows at the grid's two columns: roughly one screen of the open panel,
+// so a page is browsed with little scrolling and the pager does the rest.
+const MEDIA_ITEMS_PER_PAGE = 8;
 
 // The attach flow is image-only, so the picker is constrained to images.
 const ATTACH_ALLOWED_TYPES = [ 'image' ];
@@ -336,6 +338,7 @@ export function MediaCategoryPanel( { onInsert, category } ) {
 				totalItems={ totalItems }
 				totalPages={ totalPages }
 				page={ page }
+				perPage={ MEDIA_ITEMS_PER_PAGE }
 				onChangePage={ changePage }
 				search={ search }
 				onChangeSearch={ setSearch }
