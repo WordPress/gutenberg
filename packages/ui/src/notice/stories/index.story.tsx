@@ -160,9 +160,9 @@ export const CustomIcon: Story = {
 		intent: 'info',
 		icon: unseen,
 		children: [
-			<Notice.Title key="title">
+			<Notice.Description key="description">
 				Parent block is hidden on Desktop
-			</Notice.Title>,
+			</Notice.Description>,
 		],
 	},
 };
