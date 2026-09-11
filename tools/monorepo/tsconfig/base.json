@@ -48,10 +48,6 @@
 		 * them in the workspace that declared them. Both are listed because
 		 * TypeScript skips a type root that does not exist, so the preset
 		 * serves either layout.
-		 *
-		 * TODO: Remove `../../../node_modules/@types` once
-		 * https://github.com/WordPress/gutenberg/pull/75814 is merged. It is
-		 * the last path here that reaches outside the workspace.
 		 */
 		"typeRoots": [
 			"../typings",
