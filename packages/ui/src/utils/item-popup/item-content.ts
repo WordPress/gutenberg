@@ -10,6 +10,7 @@ export type ItemContentComponents = {
 	Label: ElementType;
 	Description: ElementType;
 	validationMessage: string;
+	descriptionValidationToken?: symbol;
 };
 
 export type ItemAriaProps = {
@@ -77,7 +78,7 @@ export function useItemContent(
 		] )
 	).join( ' ' );
 	let descriptionIndex = 0;
-	const { Label, Description } = components;
+	const { Label, Description, descriptionValidationToken } = components;
 	const contentChildren = Children.map( children, ( child ) => {
 		if ( ! isValidElement< { id?: string } >( child ) ) {
 			return child;
@@ -94,9 +95,21 @@ export function useItemContent(
 		}
 
 		const descriptionId = resolvedDescriptionIds[ descriptionIndex++ ];
-		return child.props.id === descriptionId
-			? child
-			: cloneElement( child, { id: descriptionId } );
+		// Always clone when a validation token is required so a matching `id`
+		// cannot skip the direct-child token (see Menu.ItemDescription).
+		if (
+			! descriptionValidationToken &&
+			child.props.id === descriptionId
+		) {
+			return child;
+		}
+
+		return cloneElement( child, {
+			id: descriptionId,
+			...( descriptionValidationToken && {
+				validationToken: descriptionValidationToken,
+			} ),
+		} );
 	} );
 	/*
 	 * `aria-labelledby` takes precedence over `aria-label` in the accessible

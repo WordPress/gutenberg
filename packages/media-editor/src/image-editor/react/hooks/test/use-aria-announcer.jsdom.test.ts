@@ -1,12 +1,25 @@
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { speak } from '@wordpress/a11y';
 import { useAriaAnnouncer } from '../use-aria-announcer';
 import { DEFAULT_STATE } from '../../../core/constants';
 import type { CropperState } from '../../../core/types';
 
-jest.mock( '@wordpress/a11y', () => ( {
-	speak: jest.fn(),
-} ) );
+vi.mock(
+	import( '@wordpress/a11y' ),
+	() =>
+		( {
+			speak: vi.fn(),
+		} ) as unknown as typeof import('@wordpress/a11y')
+);
 
 function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 	return {
@@ -25,12 +38,12 @@ function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 
 describe( 'useAriaAnnouncer', () => {
 	beforeEach( () => {
-		jest.useFakeTimers();
-		( speak as jest.Mock ).mockClear();
+		vi.useFakeTimers();
+		( speak as Mock ).mockClear();
 	} );
 
 	afterEach( () => {
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
 	it( 'announces horizontal flip changes', () => {
@@ -39,14 +52,14 @@ describe( 'useAriaAnnouncer', () => {
 			{ initialProps: { state: makeState() } }
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		rerender( {
 			state: makeState( {
 				flip: { horizontal: true, vertical: false },
 			} ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith( 'Flipped horizontally' );
 
@@ -55,7 +68,7 @@ describe( 'useAriaAnnouncer', () => {
 				flip: { horizontal: false, vertical: false },
 			} ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith( 'Flip removed' );
 	} );
@@ -66,14 +79,14 @@ describe( 'useAriaAnnouncer', () => {
 			{ initialProps: { state: makeState() } }
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		rerender( {
 			state: makeState( {
 				flip: { horizontal: true, vertical: true },
 			} ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith(
 			'Flipped horizontally and vertically'
@@ -91,7 +104,7 @@ describe( 'useAriaAnnouncer', () => {
 			{ initialProps: { state: makeState( { image } ) } }
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		rerender( {
 			state: makeState( {
@@ -99,7 +112,7 @@ describe( 'useAriaAnnouncer', () => {
 				cropRect: { x: 0, y: 0, width: 0.8, height: 0.5 },
 			} ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith( 'Crop 800 by 400 pixels' );
 	} );
@@ -122,7 +135,7 @@ describe( 'useAriaAnnouncer', () => {
 			}
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		// 0.5 → 0.5005 of a 2000px-wide image is a one-pixel change (1000 →
 		// 1001), well under the old ~0.5% percentage threshold.
@@ -132,7 +145,7 @@ describe( 'useAriaAnnouncer', () => {
 				cropRect: { x: 0, y: 0, width: 0.5005, height: 0.5 },
 			} ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith( 'Crop 1001 by 500 pixels' );
 	} );
@@ -155,7 +168,7 @@ describe( 'useAriaAnnouncer', () => {
 			}
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		rerender( {
 			state: makeState( {
@@ -164,7 +177,7 @@ describe( 'useAriaAnnouncer', () => {
 				zoom: 1.5,
 			} ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith( 'Zoom 150%' );
 	} );
@@ -191,7 +204,7 @@ describe( 'useAriaAnnouncer', () => {
 			}
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		rerender( {
 			state: makeState( {
@@ -200,7 +213,7 @@ describe( 'useAriaAnnouncer', () => {
 				cropRect: { x: 0, y: 0, width: 0.5005, height: 0.5 },
 			} ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith( 'Crop 1001 by 400 pixels' );
 	} );
@@ -211,12 +224,12 @@ describe( 'useAriaAnnouncer', () => {
 			{ initialProps: { state: makeState() } }
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		rerender( {
 			state: makeState( { rotation: 15 } ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith( 'Rotated 15 degrees clockwise' );
 	} );
@@ -233,7 +246,7 @@ describe( 'useAriaAnnouncer', () => {
 			}
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		// With a single-axis flip, rotation 10 appears as -10 visually.
 		rerender( {
@@ -242,7 +255,7 @@ describe( 'useAriaAnnouncer', () => {
 				flip: { horizontal: true, vertical: false },
 			} ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith(
 			'Rotated 10 degrees counterclockwise'
@@ -261,7 +274,7 @@ describe( 'useAriaAnnouncer', () => {
 			}
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		// Flip horizontal, then rotate 90° clockwise: the reducer negates the
 		// visual direction for the field, so it stores 270 (normalized -90).
@@ -272,7 +285,7 @@ describe( 'useAriaAnnouncer', () => {
 				flip: { horizontal: true, vertical: false },
 			} ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith( 'Rotated 90 degrees clockwise' );
 	} );
@@ -289,7 +302,7 @@ describe( 'useAriaAnnouncer', () => {
 			}
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		rerender( {
 			state: makeState( {
@@ -297,7 +310,7 @@ describe( 'useAriaAnnouncer', () => {
 				flip: { horizontal: false, vertical: true },
 			} ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith( 'Rotated 90 degrees clockwise' );
 	} );
@@ -316,7 +329,7 @@ describe( 'useAriaAnnouncer', () => {
 			}
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		rerender( {
 			state: makeState( {
@@ -324,7 +337,7 @@ describe( 'useAriaAnnouncer', () => {
 				flip: { horizontal: true, vertical: true },
 			} ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith(
 			'Rotated 90 degrees counterclockwise'
@@ -337,12 +350,12 @@ describe( 'useAriaAnnouncer', () => {
 			{ initialProps: { state: makeState() } }
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		rerender( {
 			state: makeState( { rotation: 90, zoom: 1.5 } ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith(
 			'Rotated 90 degrees clockwise, Zoom 150%'
@@ -355,12 +368,12 @@ describe( 'useAriaAnnouncer', () => {
 			{ initialProps: { state: makeState( { rotation: 15 } ) } }
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		rerender( {
 			state: makeState( { rotation: 0 } ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith( 'Rotation 0 degrees' );
 	} );
@@ -371,13 +384,13 @@ describe( 'useAriaAnnouncer', () => {
 			{ initialProps: { state: makeState() } }
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		// 90° CW snap + 15° fine = 105° stored.
 		rerender( {
 			state: makeState( { rotation: 105 } ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith( 'Rotated 105 degrees clockwise' );
 	} );
@@ -388,14 +401,14 @@ describe( 'useAriaAnnouncer', () => {
 			{ initialProps: { state: makeState() } }
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		// 90° CCW snap (270°) + 15° CCW fine (255° stored).
 		// visualRotation = 255 → normalized to -105.
 		rerender( {
 			state: makeState( { rotation: 255 } ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith(
 			'Rotated 105 degrees counterclockwise'
@@ -408,14 +421,14 @@ describe( 'useAriaAnnouncer', () => {
 			{ initialProps: { state: makeState() } }
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		// -10° from 0° is stored as 350° after normalization.
 		// visualRotation = -10 → counterclockwise.
 		rerender( {
 			state: makeState( { rotation: 350 } ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith(
 			'Rotated 10 degrees counterclockwise'
@@ -437,9 +450,9 @@ describe( 'useAriaAnnouncer', () => {
 			}
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
-		( speak as jest.Mock ).mockClear();
+		( speak as Mock ).mockClear();
 
 		// Only change crop — zoom and rotation should be suppressed.
 		rerender( {
@@ -449,7 +462,7 @@ describe( 'useAriaAnnouncer', () => {
 				cropRect: { x: 0, y: 0, width: 0.5, height: 0.5 },
 			} ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith( 'Crop 500 by 400 pixels' );
 		expect( speak ).not.toHaveBeenCalledWith(
@@ -466,12 +479,12 @@ describe( 'useAriaAnnouncer', () => {
 			{ initialProps: { state: makeState() } }
 		);
 
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		rerender( {
 			state: makeState( { zoom: 1.5 } ),
 		} );
-		act( () => jest.advanceTimersByTime( 300 ) );
+		act( () => vi.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith( 'Zoom 150%' );
 	} );

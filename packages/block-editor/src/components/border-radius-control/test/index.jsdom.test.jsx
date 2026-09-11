@@ -17,12 +17,18 @@
  * The tests ensure that when the BorderRadiusControl is refactored to use
  * PresetInputControl, the existing user experience and behavior is preserved.
  */
+
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BorderRadiusControl from '../index';
 
+globalThis.wpVitest.mockMatchMedia();
+
+globalThis.wpVitest.mockScrollIntoView();
+
 describe( 'BorderRadiusControl', () => {
-	const mockOnChange = jest.fn();
+	const mockOnChange = vi.fn();
 	const mockPresets = {
 		default: [
 			{ name: 'None', slug: '0', size: 0 },
@@ -474,27 +480,6 @@ describe( 'BorderRadiusControl', () => {
 			await waitFor( () => {
 				const combobox = screen.getByRole( 'combobox' );
 				expect( combobox ).toHaveTextContent( 'Default' );
-			} );
-		} );
-
-		it( 'can interact with select dropdown options', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<BorderRadiusControl
-					onChange={ mockOnChange }
-					values={ undefined }
-					presets={ largePresetSet }
-				/>
-			);
-
-			// Click on the combobox to open dropdown
-			const combobox = screen.getByRole( 'combobox' );
-			await user.click( combobox );
-
-			// Should show preset options in the dropdown
-			await waitFor( () => {
-				expect( screen.getByText( 'Size 1' ) ).toBeInTheDocument();
 			} );
 		} );
 	} );

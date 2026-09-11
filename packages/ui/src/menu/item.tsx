@@ -10,7 +10,10 @@ import {
 import { useItemContent as usePopupItemContent } from '../utils/item-popup';
 import styles from './style.module.css';
 import { MenuItemContentContext } from './context';
-import { ItemDescription } from './item-description';
+import {
+	ITEM_DESCRIPTION_DIRECT_CHILD,
+	ItemDescription,
+} from './item-description';
 import { ItemLabel } from './item-label';
 import type { ItemProps } from './types';
 
@@ -28,6 +31,7 @@ const ITEM_CONTENT_COMPONENTS = {
 	Description: ItemDescription,
 	validationMessage:
 		'Menu.ItemLabel must be the first direct child of every menu item, followed only by Menu.ItemDescription components.',
+	descriptionValidationToken: ITEM_DESCRIPTION_DIRECT_CHILD,
 };
 
 function useItemContent(
