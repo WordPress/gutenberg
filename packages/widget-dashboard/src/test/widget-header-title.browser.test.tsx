@@ -37,8 +37,11 @@ describe( 'WidgetHeader title', () => {
 		await render( <Header title={ LONG_TITLE } width={ 240 } /> );
 
 		const heading = screen.getByRole( 'heading', { name: LONG_TITLE } );
+		expect( heading.scrollWidth ).toBeGreaterThan( heading.clientWidth );
+		// The trigger arms on the ResizeObserver tick, after layout; hovering
+		// before that fires mouseenter on a disabled trigger.
 		await waitFor( () =>
-			expect( heading.scrollWidth ).toBeGreaterThan( heading.clientWidth )
+			expect( heading ).toHaveAttribute( 'tabindex', '0' )
 		);
 
 		await userEvent.hover( heading );

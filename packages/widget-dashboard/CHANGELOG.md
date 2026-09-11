@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widget header: a title the row clips shows the full text in a tooltip
+    on hover, and becomes focusable so keyboard users can open it too
+    ([#82226](https://github.com/WordPress/gutenberg/pull/82226)).
+
 ### Internal
 
 -   Run rendered Widget Dashboard tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
@@ -48,12 +54,6 @@
     the type is registered; a gone plugin or a failed load leaves it
     absent, so locks keyed on the type do not fire
     ([#82256](https://github.com/WordPress/gutenberg/pull/82256)).
-
-### Enhancements
-
--   Widget header: a title the row clips shows the full text in a tooltip
-    on hover, and becomes focusable so keyboard users can open it too
-    ([#82226](https://github.com/WordPress/gutenberg/pull/82226)).
 
 ### Internal
 
