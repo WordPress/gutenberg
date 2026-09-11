@@ -246,32 +246,17 @@ export const Creatable: Story = {
 	},
 };
 
-function AsyncStatus( { loading }: { loading: boolean } ) {
-	const filteredItems = Combobox.useFilteredItems< FixtureItem >();
+function HiddenResultCount() {
+	const count = Combobox.useFilteredItems< FixtureItem >().length;
 
-	if ( loading ) {
-		return (
-			<Combobox.Status>
-				<Stack direction="row" gap="sm" align="center">
-					<Spinner />
-					Loading…
-				</Stack>
-			</Combobox.Status>
-		);
+	if ( count === 0 ) {
+		return null;
 	}
 
-	const count = filteredItems.length;
-
 	return (
-		<Combobox.Status>
-			{ count === 0 ? null : (
-				<VisuallyHidden>
-					{ count === 1
-						? '1 result found.'
-						: `${ count } results found.` }
-				</VisuallyHidden>
-			) }
-		</Combobox.Status>
+		<VisuallyHidden>
+			{ count === 1 ? '1 result found.' : `${ count } results found.` }
+		</VisuallyHidden>
 	);
 }
 
@@ -322,7 +307,16 @@ export const AsyncItems: Story = {
 							placeholder="Search"
 						/>
 					</div>
-					<AsyncStatus loading={ loading } />
+					<Combobox.Status>
+						{ loading ? (
+							<Stack direction="row" gap="sm" align="center">
+								<Spinner />
+								Loading…
+							</Stack>
+						) : (
+							<HiddenResultCount />
+						) }
+					</Combobox.Status>
 					<Combobox.Empty>
 						{ loading ? null : 'No results found.' }
 					</Combobox.Empty>

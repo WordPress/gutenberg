@@ -137,32 +137,17 @@ export const OpenOnlyOnMatch: Story = {
 	},
 };
 
-function AsyncStatus( { loading }: { loading: boolean } ) {
-	const filteredItems = Autocomplete.useFilteredItems< FixtureItem >();
+function HiddenResultCount() {
+	const count = Autocomplete.useFilteredItems< FixtureItem >().length;
 
-	if ( loading ) {
-		return (
-			<Autocomplete.Status>
-				<Stack direction="row" gap="sm" align="center">
-					<Spinner />
-					Loading…
-				</Stack>
-			</Autocomplete.Status>
-		);
+	if ( count === 0 ) {
+		return null;
 	}
 
-	const count = filteredItems.length;
-
 	return (
-		<Autocomplete.Status>
-			{ count === 0 ? null : (
-				<VisuallyHidden>
-					{ count === 1
-						? '1 result found.'
-						: `${ count } results found.` }
-				</VisuallyHidden>
-			) }
-		</Autocomplete.Status>
+		<VisuallyHidden>
+			{ count === 1 ? '1 result found.' : `${ count } results found.` }
+		</VisuallyHidden>
 	);
 }
 
@@ -204,7 +189,16 @@ export const AsyncItems: Story = {
 					placeholder="Enter a URL"
 				/>
 				<Autocomplete.Popup>
-					<AsyncStatus loading={ loading } />
+					<Autocomplete.Status>
+						{ loading ? (
+							<Stack direction="row" gap="sm" align="center">
+								<Spinner />
+								Loading…
+							</Stack>
+						) : (
+							<HiddenResultCount />
+						) }
+					</Autocomplete.Status>
 					<Autocomplete.Empty>
 						{ loading ? null : 'No matching items.' }
 					</Autocomplete.Empty>

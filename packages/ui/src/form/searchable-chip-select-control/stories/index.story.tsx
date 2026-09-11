@@ -189,24 +189,17 @@ export const WithCustomEmptyContent: Story = {
 	},
 };
 
-function AsyncStatus( { loading }: { loading: boolean } ) {
-	const filteredItems =
+function HiddenResultCount() {
+	const count =
 		SearchableChipSelectControl.useFilteredItems<
 			( typeof ITEMS )[ number ]
-		>();
+		>().length;
 
-	if ( loading ) {
-		return (
-			<Stack direction="row" gap="sm" align="center">
-				<Spinner />
-				Loading…
-			</Stack>
-		);
+	if ( count === 0 ) {
+		return null;
 	}
 
-	const count = filteredItems.length;
-
-	return count === 0 ? null : (
+	return (
 		<VisuallyHidden>
 			{ count === 1 ? '1 result found.' : `${ count } results found.` }
 		</VisuallyHidden>
@@ -233,7 +226,16 @@ export const AsyncItems: Story = {
 			<SearchableChipSelectControl
 				{ ...args }
 				items={ items }
-				statusContent={ <AsyncStatus loading={ loading } /> }
+				statusContent={
+					loading ? (
+						<Stack direction="row" gap="sm" align="center">
+							<Spinner />
+							Loading…
+						</Stack>
+					) : (
+						<HiddenResultCount />
+					)
+				}
 				emptyContent={ loading ? null : undefined }
 				onOpenChange={ ( open ) => {
 					if ( ! open ) {
