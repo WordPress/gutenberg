@@ -15,22 +15,27 @@ cd "$( dirname "$0" )/../.."
 PORT="${WP_PORT:-9400}"
 export WP_BASE_URL="http://127.0.0.1:${PORT}"
 
-# A booted iPhone if there is one, otherwise any available iPhone.
+# A booted iPhone if there is one, otherwise an iPhone on the newest iOS.
 UDID="${SIMULATOR_UDID:-$( xcrun simctl list devices available -j | python3 -c '
-import json, sys
+import json, re, sys
 runtimes = json.load( sys.stdin )[ "devices" ]
+# Runtime identifiers end in the version, like SimRuntime.iOS-26-2.
+def version( runtime ):
+	return [ int( part ) for part in re.findall( r"\d+", runtime.split( ".iOS-" )[ -1 ] ) ]
 phones = [
 	device
-	for runtime, devices in runtimes.items() if ".iOS-" in runtime
-	for device in devices if device[ "name" ].startswith( "iPhone" )
+	for runtime in sorted( ( r for r in runtimes if ".iOS-" in r ), key=version )
+	for device in runtimes[ runtime ] if device[ "name" ].startswith( "iPhone" )
 ]
 booted = [ device for device in phones if device[ "state" ] == "Booted" ]
-print( ( booted or phones )[ -1 ][ "udid" ] )
+devices = booted or phones
+if not devices:
+	sys.exit( "No available iPhone simulator" )
+print( devices[ -1 ][ "udid" ] )
 ' )}"
+[ -n "$UDID" ] || exit 1
 step "Booting simulator $UDID"
 # The boot goes on in the background while WordPress starts.
-# The software keyboard only shows without a hardware keyboard.
-defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool false
 xcrun simctl boot "$UDID" 2>/dev/null || true
 # WordPress runs in Playground: PHP compiled to WebAssembly, no Docker.
 step "Starting WordPress"
@@ -56,9 +61,12 @@ cat "$PLAYGROUND_LOG"
 step "Loading the editor once"
 # Playground logs the request in through a redirect, so cookies must be
 # kept between the hops: -b "" holds them in memory.
-EDITOR_HTML=$( curl -sL -b "" "$WP_BASE_URL/wp-admin/post-new.php" )
+if ! EDITOR_HTML=$( curl -sSL --fail -b "" "$WP_BASE_URL/wp-admin/post-new.php" ); then
+	echo "The editor did not load from $WP_BASE_URL"
+	exit 1
+fi
 if ! grep -q "/build/scripts/rich-text/" <<< "$EDITOR_HTML"; then
-	echo "The editor does not load this checkout's build. Run npm run build first."
+	echo "The editor loaded without this checkout's build. Run npm run build first."
 	exit 1
 fi
 
@@ -68,7 +76,9 @@ xcrun simctl bootstatus "$UDID" -b
 # outlives the server: start Safari without cookies from an earlier run.
 xcrun simctl terminate "$UDID" com.apple.mobilesafari 2>/dev/null || true
 SAFARI_DATA=$( xcrun simctl get_app_container "$UDID" com.apple.mobilesafari data )
-rm -f "$SAFARI_DATA"/Library/Cookies/*.binarycookies
+if [[ -n "$SAFARI_DATA" && -d "$SAFARI_DATA" ]]; then
+	rm -f "$SAFARI_DATA"/Library/Cookies/*.binarycookies
+fi
 
 step "Generating the Xcode project"
 ( cd test/ios && xcodegen generate --quiet )
