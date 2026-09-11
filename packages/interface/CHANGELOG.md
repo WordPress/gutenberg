@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Convert the package to TypeScript and publish its type declarations ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   The package now bundles TypeScript types ([#82753](https://github.com/WordPress/gutenberg/pull/82753)).
 
 ## 10.1.0 (2026-09-10)
 
