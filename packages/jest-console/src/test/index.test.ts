@@ -47,12 +47,6 @@ describe( 'jest-console', () => {
 			setupFilesAfterEnv: [ sourceEntryPath ],
 			testEnvironment: 'node',
 			testRegex: 'jest-restore-all-mocks\\.cjs$',
-			transform: {
-				'^.+\\.m?[jt]sx?$': join(
-					process.cwd(),
-					'test/unit/scripts/babel-transformer.js'
-				),
-			},
 		} );
 		const result = spawnSync(
 			process.execPath,
