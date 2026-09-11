@@ -9,12 +9,19 @@ exports[`hooks > enhanceNavigationLinkVariations > enhances variations with icon
       "attributes": {},
       "description": "A link to a custom URL.",
       "icon": <SVG
-        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        style={
+          {
+            "fill": "none",
+          }
+        }
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >
         <Path
-          d="M4 20h9v-1.5H4V20zm0-5.5V16h16v-1.5H4zm.8-4l.7.7 2-2V12h1V9.2l2 2 .7-.7-2-2H12v-1H9.2l2-2-.7-.7-2 2V4h-1v2.8l-2-2-.7.7 2 2H4v1h2.8l-2 2z"
+          d="M8 12V8M8 4V8M8 8H12M8 8H4M8 8L10.8284 10.8284M8 8L5.17157 5.17157M8 8L10.8284 5.17157M8 8L5.17157 10.8284M4 15H20M4 19H13"
+          vectorEffect="non-scaling-stroke"
         />
       </SVG>,
       "isActive": [Function],
@@ -114,12 +121,26 @@ exports[`hooks > enhanceNavigationLinkVariations > enhances variations with icon
       },
       "description": "A link to a tag.",
       "icon": <SVG
-        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        style={
+          {
+            "fill": "none",
+          }
+        }
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >
         <Path
-          d="M4.75 4a.75.75 0 0 0-.75.75v7.826c0 .2.08.39.22.53l6.72 6.716a2.313 2.313 0 0 0 3.276-.001l5.61-5.611-.531-.53.532.528a2.315 2.315 0 0 0 0-3.264L13.104 4.22a.75.75 0 0 0-.53-.22H4.75ZM19 12.576a.815.815 0 0 1-.236.574l-5.61 5.611a.814.814 0 0 1-1.153 0L5.5 12.264V5.5h6.763l6.5 6.502a.816.816 0 0 1 .237.574ZM8.75 9.75a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
+          d="M4.75 12.5429V4.85C4.75 4.79477 4.79477 4.75 4.85 4.75H12.5429C12.6755 4.75 12.8027 4.80268 12.8964 4.89645L20.1464 12.1464C20.3417 12.3417 20.3417 12.6583 20.1464 12.8536L12.8536 20.1464C12.6583 20.3417 12.3417 20.3417 12.1464 20.1464L4.89645 12.8964C4.80268 12.8027 4.75 12.6755 4.75 12.5429Z"
+          vectorEffect="non-scaling-stroke"
+        />
+        <Circle
+          cx="8.75"
+          cy="8.75"
+          fill="currentColor"
+          r="1"
+          stroke="none"
         />
       </SVG>,
       "isActive": [Function],
