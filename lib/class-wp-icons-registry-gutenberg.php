@@ -1,5 +1,64 @@
 <?php
 
+/**
+ * Returns the SVG elements and attributes allowed for registered icons.
+ *
+ * @return array[] Allowed SVG elements and attributes.
+ * @phpstan-return array<non-falsy-string, array<non-falsy-string, true>>
+ */
+function gutenberg_get_allowed_icon_svg_tags(): array {
+	$stroke_attributes = array(
+		'style'             => true,
+		'stroke'            => true,
+		'stroke-width'      => true,
+		'stroke-linecap'    => true,
+		'stroke-linejoin'   => true,
+		'stroke-miterlimit' => true,
+		'vector-effect'     => true,
+	);
+
+	return array(
+		'svg'     => array_merge(
+			array(
+				'class'       => true,
+				'xmlns'       => true,
+				'width'       => true,
+				'height'      => true,
+				'viewbox'     => true,
+				'aria-hidden' => true,
+				'role'        => true,
+				'focusable'   => true,
+				'fill'        => true,
+				'fill-rule'   => true,
+				'clip-rule'   => true,
+			),
+			$stroke_attributes
+		),
+		'path'    => array_merge(
+			array(
+				'fill'      => true,
+				'fill-rule' => true,
+				'clip-rule' => true,
+				'd'         => true,
+				'transform' => true,
+			),
+			$stroke_attributes
+		),
+		'polygon' => array_merge(
+			array(
+				'fill'      => true,
+				'fill-rule' => true,
+				'clip-rule' => true,
+				'points'    => true,
+				'transform' => true,
+				'focusable' => true,
+			),
+			$stroke_attributes
+		),
+	);
+}
+
+
 class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Overridden to skip the parent's core icon registration, which uses the
@@ -21,6 +80,10 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 *                             If not provided, the content will be retrieved from the `file_path` if set.
 	 *                             If both `content` and `file_path` are not set, the icon will not be registered.
 	 *     @type string $file_path Optional. The full path to the file containing the icon content.
+	 *     @type bool   $public    Optional. Whether the icon is exposed through the REST API, and
+	 *                             therefore selectable in the editor's Icon block. Non-public icons
+	 *                             stay available to server-side code via {@see wp_get_icon()}.
+	 *                             Default true.
 	 * }
 	 * @return bool True if the icon was registered with success and false otherwise.
 	 */
@@ -63,7 +126,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		$allowed_keys = array_fill_keys( array( 'label', 'content', 'file_path' ), 1 );
+		$allowed_keys = array_fill_keys( array( 'label', 'content', 'file_path', 'public' ), 1 );
 		foreach ( array_keys( $icon_properties ) as $key ) {
 			if ( ! array_key_exists( $key, $allowed_keys ) ) {
 				_doing_it_wrong(
@@ -97,6 +160,15 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				__METHOD__,
 				__( 'Icon label must be a string.', 'gutenberg' ),
 				'7.0.0'
+			);
+			return false;
+		}
+
+		if ( isset( $icon_properties['public'] ) && ! is_bool( $icon_properties['public'] ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'Icon public property must be a boolean.', 'gutenberg' ),
+				'7.2.0'
 			);
 			return false;
 		}
@@ -292,6 +364,9 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 						$icon_properties['file_path'] = $icon['file_path'];
 					} else {
 						continue;
+					}
+					if ( isset( $icon['public'] ) ) {
+						$icon_properties['public'] = $icon['public'];
 					}
 					$gutenberg_registry->register( $icon['name'], $icon_properties );
 				}

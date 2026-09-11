@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { describe, expect, it, vi } from 'vitest';
 import { useOverlayScrollStateAttributes } from '../use-overlay-scroll-state-attributes';
@@ -43,19 +43,16 @@ describe( 'useOverlayScrollStateAttributes browser layout', () => {
 		);
 
 		container.scrollTop = 100;
-		fireEvent.scroll( container );
-
+		await waitFor( () => expect( onScroll ).toHaveBeenCalledTimes( 1 ) );
 		expect( container ).toHaveAttribute(
 			'data-wp-ui-overlay-scrolled-from-top'
 		);
 		expect( container ).toHaveAttribute(
 			'data-wp-ui-overlay-scrolled-from-bottom'
 		);
-		expect( onScroll ).toHaveBeenCalledTimes( 1 );
 
 		container.scrollTop = container.scrollHeight;
-		fireEvent.scroll( container );
-
+		await waitFor( () => expect( onScroll ).toHaveBeenCalledTimes( 2 ) );
 		expect( container ).toHaveAttribute(
 			'data-wp-ui-overlay-scrolled-from-top'
 		);

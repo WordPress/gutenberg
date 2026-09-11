@@ -8,6 +8,13 @@ import focusStyles from '../../../utils/css/focus.module.scss';
 import styles from './style.module.css';
 import type { CheckboxProps } from './types';
 
+/**
+ * A low-level checkbox primitive.
+ *
+ * Prefer `CheckboxControl` for labeled items. For grouping and nested parent
+ * checkboxes, see the [Checkbox Groups](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-form-checkbox-groups--docs)
+ * documentation.
+ */
 export const Checkbox = forwardRef< HTMLSpanElement, CheckboxProps >(
 	function Checkbox( { className, indeterminate, ...restProps }, ref ) {
 		return (
