@@ -42,6 +42,11 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 		parent::tear_down();
 	}
 
+	public function test_does_not_render_non_public_icon() {
+		$this->assertNotEmpty( wp_get_icon( 'core/wordpress' ) );
+		$this->assertEmpty( gutenberg_render_block_core_icon( array( 'icon' => 'core/wordpress' ) ) );
+	}
+
 	public function test_preserves_intrinsic_svg_style_when_applying_block_styles() {
 		$output = gutenberg_render_block_core_icon(
 			array(
