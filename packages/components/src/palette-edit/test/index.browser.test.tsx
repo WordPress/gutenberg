@@ -346,7 +346,7 @@ describe( 'PaletteEdit', () => {
 
 		await waitFor( () => {
 			expect(
-				screen.getByRole( 'button', {
+				screen.getByRole( 'menuitem', {
 					name: 'Remove all colors',
 				} )
 			).toBeVisible();
@@ -365,7 +365,7 @@ describe( 'PaletteEdit', () => {
 		);
 		await waitFor( () => {
 			expect(
-				screen.getByRole( 'button', {
+				screen.getByRole( 'menuitem', {
 					name: 'Reset colors',
 				} )
 			).toBeVisible();
@@ -381,10 +381,43 @@ describe( 'PaletteEdit', () => {
 			} )
 		);
 		expect(
-			screen.queryByRole( 'button', {
+			screen.queryByRole( 'menuitem', {
 				name: 'Reset colors',
 			} )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'moves through palette options with arrow keys and activates a menu item with Enter', async () => {
+		const onChange = vi.fn();
+
+		await render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				onChange={ onChange }
+			/>
+		);
+
+		const trigger = screen.getByRole( 'button', {
+			name: 'Color options',
+		} );
+		trigger.focus();
+		await userEvent.keyboard( '{ArrowDown}' );
+
+		const showDetails = await screen.findByRole( 'menuitem', {
+			name: 'Show details',
+		} );
+		const removeAll = screen.getByRole( 'menuitem', {
+			name: 'Remove all colors',
+		} );
+
+		expect( showDetails ).toHaveFocus();
+		await userEvent.keyboard( '{ArrowDown}' );
+		expect( removeAll ).toHaveFocus();
+
+		await userEvent.keyboard( '{Enter}' );
+		expect( onChange ).toHaveBeenCalledWith();
+		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'calls the `onChange` with the new color appended', async () => {
@@ -610,7 +643,7 @@ describe( 'PaletteEdit', () => {
 			} )
 		);
 		await userEvent.click(
-			screen.getByRole( 'button', {
+			screen.getByRole( 'menuitem', {
 				name: 'Show details',
 			} )
 		);
@@ -645,7 +678,7 @@ describe( 'PaletteEdit', () => {
 			} )
 		);
 		await userEvent.click(
-			screen.getByRole( 'button', {
+			screen.getByRole( 'menuitem', {
 				name: 'Show details',
 			} )
 		);
