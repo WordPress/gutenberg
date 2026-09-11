@@ -16,15 +16,19 @@ function useAlignmentSettings( isNoneOnly ) {
 			// the `useSelect` but we must call it anyway because Rules of Hooks.
 			// So the callback returns early to avoid block editor subscription.
 			if ( isNoneOnly ) {
-				return [ false, false, false ];
+				return {
+					wideControlsEnabled: false,
+					themeSupportsLayout: false,
+					isBlockBasedTheme: false,
+				};
 			}
 
 			const settings = select( blockEditorStore ).getSettings();
-			return [
-				settings.alignWide ?? false,
-				settings.supportsLayout,
-				settings.__unstableIsBlockBasedTheme,
-			];
+			return {
+				wideControlsEnabled: settings.alignWide ?? false,
+				themeSupportsLayout: settings.supportsLayout,
+				isBlockBasedTheme: settings.__unstableIsBlockBasedTheme,
+			};
 		},
 		[ isNoneOnly ]
 	);
@@ -51,15 +55,20 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
  * The store-free part of `useAvailableAlignments`, so the same rules can be
  * evaluated against more than one layout without a subscription for each.
  *
- * @param {string[]} controls Alignments the block supports, including `none`.
- * @param {Object}   layout   Layout to evaluate against.
- * @param {Array}    settings The `[ wideControlsEnabled, themeSupportsLayout, isBlockBasedTheme ]` tuple from `useAlignmentSettings`.
+ * @param {string[]} controls                     Alignments the block supports, including `none`.
+ * @param {Object}   layout                       Layout to evaluate against.
+ * @param {Object}   settings                     Editor settings from `useAlignmentSettings`.
+ * @param {boolean}  settings.wideControlsEnabled Whether the theme enables wide alignments.
+ * @param {boolean}  settings.themeSupportsLayout Whether the theme supports the layout config.
+ * @param {boolean}  settings.isBlockBasedTheme   Whether the theme is block based.
  *
  * @return {Object[]} The alignments the layout offers.
  */
-function getAvailableAlignments( controls, layout, settings ) {
-	const [ wideControlsEnabled, themeSupportsLayout, isBlockBasedTheme ] =
-		settings;
+function getAvailableAlignments(
+	controls,
+	layout,
+	{ wideControlsEnabled, themeSupportsLayout, isBlockBasedTheme }
+) {
 	const layoutType = getLayoutType( layout?.type );
 
 	if ( themeSupportsLayout ) {
