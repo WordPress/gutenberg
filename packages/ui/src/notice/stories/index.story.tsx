@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { unseen } from '@wordpress/icons';
 import * as Notice from '../index';
 
 const meta: Meta< typeof Notice.Root > = {
@@ -146,6 +147,22 @@ export const DescriptionOnly: Story = {
 			<Notice.Description key="description">
 				Just a description without title or actions.
 			</Notice.Description>,
+			<Notice.CloseIcon key="closeIcon" />,
+		],
+	},
+};
+
+/**
+ * Pass a custom icon via the `icon` prop to override the default intent icon.
+ */
+export const CustomIcon: Story = {
+	args: {
+		intent: 'info',
+		icon: unseen,
+		children: [
+			<Notice.Title key="title">
+				Parent block is hidden on Desktop
+			</Notice.Title>,
 			<Notice.CloseIcon key="closeIcon" />,
 		],
 	},
