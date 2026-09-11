@@ -10,6 +10,7 @@
 ### Internal
 
 -   `Notice`: Remove dismiss button style overrides that now duplicate `Button` defaults, and drop an unused Sass import ([#82640](https://github.com/WordPress/gutenberg/pull/82640)).
+-   Run Components interaction tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
 
 ## 40.1.0 (2026-09-10)
 
