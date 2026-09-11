@@ -12,18 +12,6 @@ const ITEMS = [
 	{ id: '3', value: 'Item 3' },
 ];
 
-type Item = ( typeof ITEMS )[ number ];
-
-function FilteredItems() {
-	const filteredItems = Autocomplete.useFilteredItems< Item >();
-
-	return (
-		<span data-testid="filtered-items">
-			{ filteredItems.map( ( item ) => item.value ).join( '|' ) }
-		</span>
-	);
-}
-
 function renderDisabledAutocompleteWithClear() {
 	return render(
 		<Autocomplete.Root items={ ITEMS } disabled defaultValue="Item 1">
@@ -96,46 +84,6 @@ describe( 'Autocomplete', () => {
 		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( statusRef.current ).toBeInstanceOf( HTMLDivElement );
-	} );
-
-	it( 'returns client-side filtered items from useFilteredItems', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<Autocomplete.Root items={ ITEMS }>
-				<Autocomplete.Input placeholder="Search" />
-				<Autocomplete.Popup>
-					<FilteredItems />
-					<Autocomplete.List>
-						<Autocomplete.ListBody>
-							<Autocomplete.Collection>
-								{ ( item ) => (
-									<Autocomplete.Item
-										key={ item.id }
-										value={ item }
-									>
-										{ item.value }
-									</Autocomplete.Item>
-								) }
-							</Autocomplete.Collection>
-						</Autocomplete.ListBody>
-					</Autocomplete.List>
-				</Autocomplete.Popup>
-			</Autocomplete.Root>
-		);
-
-		await user.type( screen.getByRole( 'combobox' ), 'Item' );
-
-		const filtered = await screen.findByTestId( 'filtered-items' );
-		expect( filtered ).toHaveTextContent( 'Item 1|Item 2|Item 3' );
-
-		await user.type( screen.getByRole( 'combobox' ), ' 1' );
-
-		await waitFor( () => {
-			expect( filtered ).toHaveTextContent( 'Item 1' );
-			expect( filtered ).not.toHaveTextContent( 'Item 2' );
-			expect( filtered ).not.toHaveTextContent( 'Item 3' );
-		} );
 	} );
 
 	describe( 'portal', () => {

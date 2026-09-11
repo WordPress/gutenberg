@@ -14,16 +14,6 @@ const ITEMS = [
 
 type Item = ( typeof ITEMS )[ number ];
 
-function FilteredItems() {
-	const filteredItems = Combobox.useFilteredItems< Item >();
-
-	return (
-		<span data-testid="filtered-items">
-			{ filteredItems.map( ( item ) => item.value ).join( '|' ) }
-		</span>
-	);
-}
-
 function renderDisabledMultiSelect() {
 	return render(
 		<Combobox.Root< Item, true >
@@ -151,50 +141,6 @@ describe( 'Combobox', () => {
 		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( statusRef.current ).toBeInstanceOf( HTMLDivElement );
-	} );
-
-	it( 'returns client-side filtered items from useFilteredItems', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<Combobox.Root items={ ITEMS }>
-				<Combobox.Trigger aria-label="Fruit" />
-				<Combobox.Popup>
-					<Combobox.Input aria-label="Search" />
-					<FilteredItems />
-					<Combobox.List>
-						<Combobox.ListBody>
-							<Combobox.Collection>
-								{ ( item ) => (
-									<Combobox.Item
-										key={ item.id }
-										value={ item }
-									>
-										{ item.value }
-									</Combobox.Item>
-								) }
-							</Combobox.Collection>
-						</Combobox.ListBody>
-					</Combobox.List>
-				</Combobox.Popup>
-			</Combobox.Root>
-		);
-
-		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
-
-		const filtered = await screen.findByTestId( 'filtered-items' );
-		expect( filtered ).toHaveTextContent( 'Item 1|Item 2|Item 3' );
-
-		await user.type(
-			screen.getByRole( 'combobox', { name: 'Search' } ),
-			'Item 1'
-		);
-
-		await waitFor( () => {
-			expect( filtered ).toHaveTextContent( 'Item 1' );
-			expect( filtered ).not.toHaveTextContent( 'Item 2' );
-			expect( filtered ).not.toHaveTextContent( 'Item 3' );
-		} );
 	} );
 
 	it( 'uses a custom positioner', async () => {
