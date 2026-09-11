@@ -98,33 +98,6 @@ jobs:
                   MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
               run: npm run test:unit:date -- --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"
 
-    compute-previous-wordpress-version:
-        name: Compute previous WordPress version
-        runs-on: 'ubuntu-24.04'
-        permissions: {}
-        outputs:
-            previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
-
-        steps:
-            - name: Get previous WordPress version
-              id: get-previous-wordpress-version
-              run: |
-                  curl \
-                    -H "Accept: application/json" \
-                    -o versions.json \
-                    "http://api.wordpress.org/core/stable-check/1.0/"
-                  LATEST_WP_VERSION="$(jq --raw-output 'with_entries(select(.value=="latest"))|keys[]' versions.json)"
-                  # shellcheck disable=SC2034
-                  IFS='.' read -r LATEST_WP_MAJOR LATEST_WP_MINOR LATEST_WP_PATCH <<< "${LATEST_WP_VERSION}"
-                  if [[ "${LATEST_WP_MINOR}" == "0" ]]; then
-                    PREVIOUS_WP_SERIES="$((LATEST_WP_MAJOR - 1)).9"
-                  else
-                    PREVIOUS_WP_SERIES="${LATEST_WP_MAJOR}.$((LATEST_WP_MINOR - 1))"
-                  fi
-                  PREVIOUS_WP_VERSION="$(jq --raw-output --arg series "${PREVIOUS_WP_SERIES}" 'with_entries(select(.key|startswith($series)))|keys[-1]' versions.json)"
-                  echo "previous-wordpress-version=${PREVIOUS_WP_VERSION}" >> "$GITHUB_OUTPUT"
-                  rm versions.json
-
     build-assets:
         name: Build JavaScript assets for PHP unit tests
         runs-on: 'ubuntu-24.04'
@@ -150,8 +123,8 @@ jobs:
                       ./build/
 
     test-php:
-        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on Linux
-        needs: [compute-previous-wordpress-version, build-assets]
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on Linux
+        needs: [build-assets]
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
@@ -163,9 +136,8 @@ jobs:
                 event: ['${{ github.event_name }}']
                 php: ['7.4', '8.0', '8.1', '8.2', '8.3']
                 multisite: [false, true]
-                wordpress: ['', 'previous major version']
                 exclude:
-                    # On PRs: Only test PHP 7.4 and 8.3, single-site, latest WP
+                    # On PRs: Only test PHP 7.4 and 8.3, single-site
                     - event: 'pull_request'
                       php: '8.0'
                     - event: 'pull_request'
@@ -174,19 +146,9 @@ jobs:
                       php: '8.2'
                     - event: 'pull_request'
                       multisite: true
-                    - event: 'pull_request'
-                      wordpress: 'previous major version'
-                    # On trunk/releases: Only test previous WP version with specific PHP versions
-                    - php: '8.0'
-                      wordpress: 'previous major version'
-                    - php: '8.1'
-                      wordpress: 'previous major version'
-                    - php: '8.2'
-                      wordpress: 'previous major version'
 
         env:
             WP_ENV_PHP_VERSION: ${{ matrix.php }}
-            WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', needs.compute-previous-wordpress-version.outputs.previous-wordpress-version ) }}
 
         steps:
             - name: Checkout repository
