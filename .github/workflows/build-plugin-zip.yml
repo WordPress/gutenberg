@@ -333,11 +333,6 @@ jobs:
               with:
                   name: gutenberg-wordpress-develop.zip
 
-            # The .zip artifact is the plugin zip itself (uploaded with `archive: false`),
-            # so it still needs extracting before the directory is repackaged below.
-            - name: Unzip zip artifact
-              run: unzip gutenberg-wordpress-develop.zip && rm gutenberg-wordpress-develop.zip
-
             # Noting the hash helps keep track of the commit the zip was built from.
             # For pull_request events, github.sha is the ephemeral merge commit; use the PR head SHA instead
             # so the recorded value points to a real, branch-reachable commit.
@@ -494,6 +489,10 @@ jobs:
               uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
                   name: gutenberg.zip
+                  # The artifact is the plugin zip itself (uploaded with `archive: false`).
+                  # Without this, the action detects a zip and extracts it, leaving no
+                  # gutenberg.zip file to attach to the release.
+                  skip-decompress: true
 
             - name: Download Release Notes Artifact
               uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
