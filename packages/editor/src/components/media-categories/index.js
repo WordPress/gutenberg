@@ -156,11 +156,42 @@ const coreMediaFetch = async ( query = {} ) => {
 	};
 };
 
-const getAttachedImagesQuery = ( postId, query = {} ) => ( {
-	...query,
-	media_type: 'image',
-	parent: postId,
-} );
+/**
+ * The media folders taxonomy's REST base. It names both the `/wp/v2/media`
+ * collection parameter used to filter attachments by folder and the field on an
+ * attachment record holding its folder ids — `WP_REST_Posts_Controller` derives
+ * both from `rest_base`, so the hyphenated form is correct in a REST context
+ * even though the taxonomy itself is `wp_media_folder`.
+ */
+const MEDIA_FOLDER_REST_BASE = 'media-folders';
+
+// Behind the `gutenberg-media-folders` experiment, which is what registers the
+// taxonomy. Read at call time (not module load) so the categories can be built
+// either way in the same session, e.g. in tests.
+const isMediaFoldersEnabled = () =>
+	typeof window !== 'undefined' && !! window.__experimentalMediaFolders;
+
+/**
+ * Maps the inserter request's `folder` (a `wp_media_folder` term id, set by the
+ * panel's folder filter) onto the REST collection parameter, and strips it
+ * otherwise so it never reaches the endpoint as an unknown arg.
+ *
+ * @param {Object} query The inserter media request.
+ * @return {Object} The query with the folder expressed as a taxonomy filter.
+ */
+const withFolderQuery = ( query ) => {
+	const { folder, ...restQuery } = query;
+	return folder
+		? { ...restQuery, [ MEDIA_FOLDER_REST_BASE ]: [ folder ] }
+		: restQuery;
+};
+
+const getAttachedImagesQuery = ( postId, query = {} ) =>
+	withFolderQuery( {
+		...query,
+		media_type: 'image',
+		parent: postId,
+	} );
 
 const normalizePostId = ( postId ) => {
 	const parsedPostId = typeof postId === 'number' ? postId : Number( postId );
@@ -197,32 +228,105 @@ const getMediaItemType = ( mediaItem ) =>
 	mediaItem?.type;
 
 // The picker's "Upload files" tab accepts any file type, so the selection can
-// include non-images. Gate to images only: a non-image would be reparented to
-// the post but never appear in the image-filtered grid, and would wrongly count
-// toward the "images attached" notice.
-const getImageAttachmentIds = ( mediaItems ) => [
+// include other types. Gate to the source's own media type: an item of another
+// type would be filed or reparented but never appear in the type-filtered grid,
+// and would wrongly count toward the notice.
+const getMediaAttachmentIds = ( mediaItems, mediaType ) => [
 	...new Set(
 		( Array.isArray( mediaItems ) ? mediaItems : [ mediaItems ] )
 			.filter(
-				( mediaItem ) => getMediaItemType( mediaItem ) === 'image'
+				( mediaItem ) => getMediaItemType( mediaItem ) === mediaType
 			)
 			.map( ( mediaItem ) => mediaItem?.id )
 			.filter( Boolean )
 	),
 ];
 
-const invalidateAttachedImagesQueries = ( postId, query = {} ) => {
-	const { invalidateResolution } = dispatch( coreStore );
-	// Invalidate the resolution backing the visible grid so it refetches after
-	// an attach/detach and reflects the updated set of attached images. The tab
-	// is always shown (via `emptyMessage`), so there's no separate visibility
-	// probe to invalidate.
-	invalidateResolution( 'getEntityRecords', [
+const getImageAttachmentIds = ( mediaItems ) =>
+	getMediaAttachmentIds( mediaItems, 'image' );
+
+/**
+ * Reads an attachment's current folder ids straight from the REST record.
+ *
+ * Folder assignment is many-to-many, and saving the taxonomy field *replaces*
+ * the whole set — so adding or removing one folder means reading the current set
+ * first and writing the union/difference. The record is read here rather than
+ * taken from the caller's media item because selections coming from the media
+ * picker are not guaranteed to carry the taxonomy field.
+ *
+ * @param {number} attachmentId The attachment id.
+ * @return {Promise<number[]>} The attachment's current folder ids.
+ */
+const getAttachmentFolderIds = async ( attachmentId ) => {
+	const record = await resolveSelect( coreStore ).getEntityRecord(
 		'postType',
 		'attachment',
-		getCoreMediaQuery( getAttachedImagesQuery( postId, query ) ),
-	] );
+		attachmentId
+	);
+	const folderIds = record?.[ MEDIA_FOLDER_REST_BASE ];
+	return Array.isArray( folderIds ) ? folderIds : [];
 };
+
+const saveAttachmentFolderIds = ( attachmentId, folderIds ) =>
+	// `throwOnError` so a failed REST write rejects rather than being silently
+	// swallowed, letting the panel surface an error notice (see
+	// `saveAttachmentParent`).
+	dispatch( coreStore ).saveEntityRecord(
+		'postType',
+		'attachment',
+		{
+			id: attachmentId,
+			[ MEDIA_FOLDER_REST_BASE ]: folderIds,
+		},
+		{ throwOnError: true }
+	);
+
+/**
+ * The folder capabilities a core (attachment-backed) source exposes to the
+ * inserter panel while the media folders experiment is on:
+ *
+ * - `supportsFolders` tells the panel to offer the folder filter.
+ * - `assignToFolder` files the given media items (of the source's type) into a
+ *   folder, keeping whatever other folders they are already in, and returns how
+ *   many were filed.
+ * - `removeFromFolder` takes one item out of a folder, leaving its other
+ *   folders alone.
+ *
+ * @param {string} mediaType The source's media type, used to gate selections.
+ * @return {Object} The capabilities to spread onto the category.
+ */
+const getFolderCapabilities = ( mediaType ) => ( {
+	supportsFolders: true,
+	async assignToFolder( mediaItems, folderId ) {
+		const attachmentIds = getMediaAttachmentIds( mediaItems, mediaType );
+
+		await Promise.all(
+			attachmentIds.map( async ( attachmentId ) => {
+				const folderIds = await getAttachmentFolderIds( attachmentId );
+				// Already in this folder: skip the write rather than re-saving
+				// an unchanged set. The item still counts toward the notice,
+				// which reports what the selection put in the folder, not how
+				// many rows changed.
+				if ( folderIds.includes( folderId ) ) {
+					return;
+				}
+				await saveAttachmentFolderIds( attachmentId, [
+					...folderIds,
+					folderId,
+				] );
+			} )
+		);
+
+		return attachmentIds.length;
+	},
+	async removeFromFolder( mediaItem, folderId ) {
+		const folderIds = await getAttachmentFolderIds( mediaItem.id );
+		await saveAttachmentFolderIds(
+			mediaItem.id,
+			folderIds.filter( ( id ) => id !== folderId )
+		);
+	},
+} );
 
 // The inserter panel fetches imperatively into local state, so it can't react to
 // attachment cache invalidation on its own. Calls `onChange` on the resolved ->
@@ -243,12 +347,17 @@ const subscribeToMediaInvalidation = ( args, onChange ) => {
 	}, coreStore );
 };
 
-// Builds a core-data-backed category from a single `getQuery` mapper, so `fetch`
-// and `subscribe` can't drift apart on the resolution args. `coreMediaFetch`
-// applies `getCoreMediaQuery` internally, so `subscribe` mirrors it. External
-// sources (e.g. Openverse) don't use this and simply omit `subscribe`.
+// Builds a core-data-backed category from a single `getQuery` mapper, so
+// `fetch`, `subscribe` and `invalidate` can't drift apart on the resolution
+// args. `coreMediaFetch` applies `getCoreMediaQuery` internally, so the other
+// two mirror it. External sources (e.g. Openverse) don't use this and simply
+// omit them. With the media folders experiment on, every core source also gets
+// the folder capabilities.
 const createCoreMediaCategory = ( { getQuery, ...category } ) => ( {
 	...category,
+	...( isMediaFoldersEnabled()
+		? getFolderCapabilities( category.mediaType )
+		: {} ),
 	async fetch( query = {} ) {
 		return coreMediaFetch( getQuery( query ) );
 	},
@@ -261,6 +370,15 @@ const createCoreMediaCategory = ( { getQuery, ...category } ) => ( {
 			],
 			onChange
 		);
+	},
+	// Invalidate the resolution backing the visible grid so it refetches after
+	// an attach/detach or a folder change and reflects the updated set.
+	invalidate( query = {} ) {
+		dispatch( coreStore ).invalidateResolution( 'getEntityRecords', [
+			'postType',
+			'attachment',
+			getCoreMediaQuery( getQuery( query ) ),
+		] );
 	},
 } );
 
@@ -315,13 +433,14 @@ const getAttachedImagesCategory = ( postId, typeLabel ) =>
 		async detach( mediaItem ) {
 			await saveAttachmentParent( mediaItem.id, 0 );
 		},
-		invalidate( query = {} ) {
-			invalidateAttachedImagesQueries( postId, query );
-		},
 	} );
 
-/** @type {InserterMediaCategory[]} */
-const inserterMediaCategories = [
+const getMediaTypeQuery = ( mediaType, query = {} ) =>
+	withFolderQuery( { ...query, media_type: mediaType } );
+
+// Built per call (rather than once at module load) so the folder capabilities
+// reflect the experiment flag at the time the categories are requested.
+const getInserterMediaCategoriesList = () => [
 	createCoreMediaCategory( {
 		name: 'images',
 		labels: {
@@ -329,7 +448,7 @@ const inserterMediaCategories = [
 			search_items: __( 'Search images' ),
 		},
 		mediaType: 'image',
-		getQuery: ( query ) => ( { ...query, media_type: 'image' } ),
+		getQuery: ( query ) => getMediaTypeQuery( 'image', query ),
 	} ),
 	createCoreMediaCategory( {
 		name: 'videos',
@@ -338,7 +457,7 @@ const inserterMediaCategories = [
 			search_items: __( 'Search videos' ),
 		},
 		mediaType: 'video',
-		getQuery: ( query ) => ( { ...query, media_type: 'video' } ),
+		getQuery: ( query ) => getMediaTypeQuery( 'video', query ),
 	} ),
 	createCoreMediaCategory( {
 		name: 'audio',
@@ -347,7 +466,7 @@ const inserterMediaCategories = [
 			search_items: __( 'Search audio' ),
 		},
 		mediaType: 'audio',
-		getQuery: ( query ) => ( { ...query, media_type: 'audio' } ),
+		getQuery: ( query ) => getMediaTypeQuery( 'audio', query ),
 	} ),
 	{
 		name: 'openverse',
@@ -421,6 +540,7 @@ export default function getInserterMediaCategories(
 	viewablePostTypeLabel
 ) {
 	const currentPostId = normalizePostId( postId );
+	const inserterMediaCategories = getInserterMediaCategoriesList();
 
 	// A falsy label means either a non-viewable post type (synced pattern,
 	// navigation, template) or that the record hasn't resolved yet — in both

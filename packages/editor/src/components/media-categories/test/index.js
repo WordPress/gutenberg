@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { dispatch, resolveSelect, select, subscribe } from '@wordpress/data';
 import getInserterMediaCategories from '..';
 
@@ -325,5 +325,179 @@ describe( 'getInserterMediaCategories', () => {
 				( category ) => category.name === 'attached-images'
 			)
 		).toBe( false );
+	} );
+
+	describe( 'media folders', () => {
+		const findCategory = ( name ) =>
+			getInserterMediaCategories( 42, 'Page' ).find(
+				( category ) => category.name === name
+			);
+
+		// The tests run without a DOM; the flag is what the experiment's inline
+		// script sets on the editor page.
+		beforeEach( () => {
+			globalThis.window = { __experimentalMediaFolders: true };
+		} );
+		afterEach( () => {
+			delete globalThis.window;
+		} );
+
+		it( 'adds folder capabilities to core sources only while the experiment is on', () => {
+			expect( findCategory( 'images' ).supportsFolders ).toBe( true );
+			expect( findCategory( 'videos' ).supportsFolders ).toBe( true );
+			expect( findCategory( 'attached-images' ).supportsFolders ).toBe(
+				true
+			);
+			// Openverse isn't attachment-backed, so it can't file anything.
+			expect(
+				findCategory( 'openverse' ).supportsFolders
+			).toBeUndefined();
+
+			delete globalThis.window;
+			expect( findCategory( 'images' ).supportsFolders ).toBeUndefined();
+			expect( findCategory( 'images' ).assignToFolder ).toBeUndefined();
+		} );
+
+		it( 'filters a source by the requested folder and strips the request param', async () => {
+			const getEntityRecords = vi.fn().mockResolvedValue( [] );
+			resolveSelect.mockReturnValue( { getEntityRecords } );
+			select.mockReturnValue( {
+				getEntityRecordsTotalItems: vi.fn().mockReturnValue( 0 ),
+				getEntityRecordsTotalPages: vi.fn().mockReturnValue( 0 ),
+			} );
+
+			await findCategory( 'images' ).fetch( {
+				per_page: 8,
+				search: '',
+				folder: 7,
+			} );
+			expect( getEntityRecords ).toHaveBeenCalledWith(
+				'postType',
+				'attachment',
+				{
+					per_page: 8,
+					search: '',
+					media_type: 'image',
+					'media-folders': [ 7 ],
+					orderBy: 'date',
+				}
+			);
+
+			// Without a folder nothing is added, so the query is the same as
+			// with the experiment off.
+			await findCategory( 'images' ).fetch( { per_page: 8, search: '' } );
+			expect( getEntityRecords ).toHaveBeenLastCalledWith(
+				'postType',
+				'attachment',
+				{
+					per_page: 8,
+					search: '',
+					media_type: 'image',
+					orderBy: 'date',
+				}
+			);
+		} );
+
+		it( 'invalidates the folder-filtered query it fetched', () => {
+			const invalidateResolution = vi.fn();
+			dispatch.mockReturnValue( { invalidateResolution } );
+
+			findCategory( 'attached-images' ).invalidate( {
+				per_page: 8,
+				search: '',
+				folder: 7,
+			} );
+
+			expect( invalidateResolution ).toHaveBeenCalledWith(
+				'getEntityRecords',
+				[
+					'postType',
+					'attachment',
+					{
+						per_page: 8,
+						search: '',
+						media_type: 'image',
+						parent: 42,
+						'media-folders': [ 7 ],
+						orderBy: 'date',
+					},
+				]
+			);
+		} );
+
+		it( 'adds a folder without dropping the ones an item is already in', async () => {
+			const saveEntityRecord = vi.fn().mockResolvedValue( {} );
+			dispatch.mockReturnValue( { saveEntityRecord } );
+			// Image 10 is already filed under folder 3; image 11 is in none.
+			const getEntityRecord = vi.fn( ( kind, name, id ) =>
+				Promise.resolve(
+					id === 10 ? { id, 'media-folders': [ 3 ] } : { id }
+				)
+			);
+			resolveSelect.mockReturnValue( { getEntityRecord } );
+
+			const count = await findCategory( 'images' ).assignToFolder(
+				[
+					{ id: 10, type: 'image' },
+					{ id: 11, type: 'image' },
+					// Other types are gated out, as for attaching.
+					{ id: 12, type: 'video' },
+				],
+				7
+			);
+
+			expect( count ).toBe( 2 );
+			expect( saveEntityRecord ).toHaveBeenCalledWith(
+				'postType',
+				'attachment',
+				{ id: 10, 'media-folders': [ 3, 7 ] },
+				{ throwOnError: true }
+			);
+			expect( saveEntityRecord ).toHaveBeenCalledWith(
+				'postType',
+				'attachment',
+				{ id: 11, 'media-folders': [ 7 ] },
+				{ throwOnError: true }
+			);
+			expect( saveEntityRecord ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'skips the write for an item already in the folder', async () => {
+			const saveEntityRecord = vi.fn().mockResolvedValue( {} );
+			dispatch.mockReturnValue( { saveEntityRecord } );
+			resolveSelect.mockReturnValue( {
+				getEntityRecord: vi
+					.fn()
+					.mockResolvedValue( { id: 10, 'media-folders': [ 7 ] } ),
+			} );
+
+			const count = await findCategory( 'videos' ).assignToFolder(
+				[ { id: 10, type: 'video' } ],
+				7
+			);
+
+			// Still reported as in the folder, but nothing was re-saved.
+			expect( count ).toBe( 1 );
+			expect( saveEntityRecord ).not.toHaveBeenCalled();
+		} );
+
+		it( 'removes only the given folder', async () => {
+			const saveEntityRecord = vi.fn().mockResolvedValue( {} );
+			dispatch.mockReturnValue( { saveEntityRecord } );
+			resolveSelect.mockReturnValue( {
+				getEntityRecord: vi
+					.fn()
+					.mockResolvedValue( { id: 10, 'media-folders': [ 3, 7 ] } ),
+			} );
+
+			await findCategory( 'images' ).removeFromFolder( { id: 10 }, 7 );
+
+			expect( saveEntityRecord ).toHaveBeenCalledWith(
+				'postType',
+				'attachment',
+				{ id: 10, 'media-folders': [ 3 ] },
+				{ throwOnError: true }
+			);
+		} );
 	} );
 } );

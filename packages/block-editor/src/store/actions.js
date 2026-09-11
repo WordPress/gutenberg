@@ -2110,6 +2110,7 @@ export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
  * - _per_page_ `number`: How many items to fetch per page.
  * - _page_ `[number]`: Which page of results to fetch. Defaults to the first page.
  * - _search_ `string`: The search term to use for filtering the results.
+ * - _folder_ `[number]`: A media folder id to filter the results by, when the source supports folders.
  *
  * _Type Definition_
  *

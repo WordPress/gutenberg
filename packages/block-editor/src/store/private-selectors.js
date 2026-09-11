@@ -500,6 +500,18 @@ export function getRegisteredInserterMediaCategories( state ) {
 }
 
 /**
+ * Returns the media folders capability supplied by the host editor for the
+ * inserter's Media tab, or `undefined` when media folders are unavailable.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?{folders: Object[], canCreate: boolean, create: Function}} The media folders capability.
+ */
+export function getInserterMediaFolders( state ) {
+	return state.settings.inserterMediaFolders;
+}
+
+/**
  * Returns an array containing the allowed inserter media categories.
  * It merges the registered media categories from extenders with the
  * core ones. It also takes into account the allowed `mime_types`, which

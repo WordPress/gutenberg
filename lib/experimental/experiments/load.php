@@ -50,6 +50,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Media Upload Modal', 'gutenberg' ),
 					'description' => __( 'Replaces the existing WordPress media modal with a new modal powered by Data Views, supporting browsing, selecting, and uploading media.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-media-folders',
+					'label'       => __( 'Media folders', 'gutenberg' ),
+					'description' => __( 'Adds folders for organizing media, and lets you filter, file and create them from the block inserter’s Media tab.', 'gutenberg' ),
+				),
 			),
 		),
 		array(

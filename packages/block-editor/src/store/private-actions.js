@@ -16,6 +16,7 @@ const castArray = ( maybeArray ) =>
  */
 const privateSettings = [
 	'inserterMediaCategories',
+	'inserterMediaFolders',
 	'blockInspectorAnimation',
 	'mediaSideload',
 ];
