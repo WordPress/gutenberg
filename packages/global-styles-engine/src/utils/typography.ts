@@ -84,7 +84,26 @@ export function getTypographyFontSizeValue(
 	preset: TypographyPreset,
 	settings: GlobalStylesSettings
 ) {
-	const { size: defaultSize } = preset;
+	let { size: defaultSize } = preset;
+
+	/*
+	 * The theme.json schema requires `size` to be a string including a unit,
+	 * e.g., "12px". A bare number would otherwise be emitted verbatim as a
+	 * preset custom property (`--wp--preset--font-size--large: 22`), which is
+	 * invalid for `font-size`, so the browser drops the declaration and the
+	 * preset has no effect.
+	 *
+	 * Coerce numeric values to pixels, matching the PHP equivalent. This runs
+	 * before the early returns below so that every code path returns a value
+	 * with a unit. `0` is left alone: it is handled below and valid unitless.
+	 */
+	if (
+		defaultSize &&
+		'0' !== defaultSize &&
+		! isNaN( Number( defaultSize ) )
+	) {
+		defaultSize = `${ defaultSize }px`;
+	}
 
 	/*
 	 * Catch falsy values and 0/'0'. Fluid calculations cannot be performed on `0`.
