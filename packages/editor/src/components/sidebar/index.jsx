@@ -14,6 +14,8 @@ import PluginSidebar from '../plugin-sidebar';
 import PostSummary from './post-summary';
 import DataFormPostSummary from './dataform-post-summary';
 import PostRevisionSummary from './post-revision-summary';
+import PostTitleInspector from './post-title-inspector';
+import TemplateBlockScope from './template-block-scope';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
@@ -31,35 +33,43 @@ const SIDEBAR_ACTIVE_BY_DEFAULT = true;
 function Sidebar( { extraPanels, onActionPerformed } ) {
 	useAutoSwitchEditorSidebars();
 
-	const { tabName, keyboardShortcut, isRevisionsMode } = useSelect(
-		( select ) => {
-			const shortcut = select(
-				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/editor/toggle-sidebar' );
+	const {
+		tabName,
+		keyboardShortcut,
+		isRevisionsMode,
+		isDescribingPostTitle,
+	} = useSelect( ( select ) => {
+		const shortcut = select(
+			keyboardShortcutsStore
+		).getShortcutRepresentation( 'core/editor/toggle-sidebar' );
 
-			const sidebar =
-				select( interfaceStore ).getActiveComplementaryArea( 'core' );
-			const _isEditorSidebarOpened = [
-				sidebars.block,
-				sidebars.document,
-			].includes( sidebar );
-			let _tabName = sidebar;
-			if ( ! _isEditorSidebarOpened ) {
-				_tabName = select( blockEditorStore ).getBlockSelectionStart()
-					? sidebars.block
-					: sidebars.document;
-			}
+		const sidebar =
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
+		const _isEditorSidebarOpened = [
+			sidebars.block,
+			sidebars.document,
+		].includes( sidebar );
+		let _tabName = sidebar;
+		if ( ! _isEditorSidebarOpened ) {
+			_tabName = select( blockEditorStore ).getBlockSelectionStart()
+				? sidebars.block
+				: sidebars.document;
+		}
 
-			return {
-				tabName: _tabName,
-				keyboardShortcut: shortcut,
-				isRevisionsMode: unlock(
-					select( editorStore )
-				).isRevisionsMode(),
-			};
-		},
-		[]
-	);
+		return {
+			tabName: _tabName,
+			keyboardShortcut: shortcut,
+			isRevisionsMode: unlock( select( editorStore ) ).isRevisionsMode(),
+			/*
+			 * The title is not a block, so it never reaches the block
+			 * inspector. While it has focus the block tab describes it
+			 * instead of reporting that nothing is selected.
+			 */
+			isDescribingPostTitle:
+				unlock( select( editorStore ) ).isEditingPostTitle() &&
+				! select( blockEditorStore ).getBlockSelectionStart(),
+		};
+	}, [] );
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
@@ -118,7 +128,14 @@ function Sidebar( { extraPanels, onActionPerformed } ) {
 				{ tabContent }
 			</Tabs.Panel>
 			<Tabs.Panel value={ sidebars.block } tabIndex={ -1 }>
-				<BlockInspector />
+				{ isDescribingPostTitle ? (
+					<PostTitleInspector />
+				) : (
+					<>
+						<BlockInspector />
+						<TemplateBlockScope />
+					</>
+				) }
 				{ isRevisionsMode && <RevisionBlockDiffPanel /> }
 			</Tabs.Panel>
 		</PluginSidebar>

@@ -605,3 +605,14 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		);
 	}
 );
+
+/**
+ * Returns whether the post title field has focus.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the title is being edited.
+ */
+export function isEditingPostTitle( state ) {
+	return state.isEditingPostTitle;
+}
