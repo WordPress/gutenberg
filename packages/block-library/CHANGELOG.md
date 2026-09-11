@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Cover: Grow the block with its content in Safari when an aspect ratio is set, instead of clipping the overflow. WebKit locks the box to the ratio where other engines let content expand it ([#70152](https://github.com/WordPress/gutenberg/pull/70152)).
+
 ## 11.0.0 (2026-09-10)
 
 ### Breaking Changes

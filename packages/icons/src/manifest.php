@@ -61,6 +61,11 @@ return array(
 		'label'    => _x( 'Block Table', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/block-table.svg',
 	),
+	'brush'               => array(
+		'label'    => _x( 'Brush', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/brush.svg',
+		'public'   => false,
+	),
 	'calendar'            => array(
 		'label'    => _x( 'Calendar', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/calendar.svg',
@@ -141,6 +146,11 @@ return array(
 		'label'    => _x( 'Create', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/create.svg',
 	),
+	'dashboard'           => array(
+		'label'    => _x( 'Dashboard', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/dashboard.svg',
+		'public'   => false,
+	),
 	'desktop'             => array(
 		'label'    => _x( 'Desktop', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/desktop.svg',
@@ -209,9 +219,19 @@ return array(
 		'label'    => _x( 'Language', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/language.svg',
 	),
+	'link'                => array(
+		'label'    => _x( 'Link', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/link.svg',
+		'public'   => false,
+	),
 	'map-marker'          => array(
 		'label'    => _x( 'Map Marker', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/map-marker.svg',
+	),
+	'media'               => array(
+		'label'    => _x( 'Media', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/media.svg',
+		'public'   => false,
 	),
 	'menu'                => array(
 		'label'    => _x( 'Menu', 'icon label', 'gutenberg' ),
@@ -233,6 +253,11 @@ return array(
 		'label'    => _x( 'Next', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/next.svg',
 	),
+	'page'                => array(
+		'label'    => _x( 'Page', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/page.svg',
+		'public'   => false,
+	),
 	'paragraph'           => array(
 		'label'    => _x( 'Paragraph', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/paragraph.svg',
@@ -248,6 +273,16 @@ return array(
 	'people'              => array(
 		'label'    => _x( 'People', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/people.svg',
+	),
+	'pin'                 => array(
+		'label'    => _x( 'Pin', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/pin.svg',
+		'public'   => false,
+	),
+	'plugins'             => array(
+		'label'    => _x( 'Plugins', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/plugins.svg',
+		'public'   => false,
 	),
 	'plus'                => array(
 		'label'    => _x( 'Plus', 'icon label', 'gutenberg' ),
@@ -305,6 +340,11 @@ return array(
 		'label'    => _x( 'Shuffle', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/shuffle.svg',
 	),
+	'sites'               => array(
+		'label'    => _x( 'Sites', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/sites.svg',
+		'public'   => false,
+	),
 	'star-empty'          => array(
 		'label'    => _x( 'Star Empty', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/star-empty.svg',
@@ -348,6 +388,16 @@ return array(
 	'tip'                 => array(
 		'label'    => _x( 'Tip', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/tip.svg',
+	),
+	'tool'                => array(
+		'label'    => _x( 'Tool', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/tool.svg',
+		'public'   => false,
+	),
+	'update'              => array(
+		'label'    => _x( 'Update', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/update.svg',
+		'public'   => false,
 	),
 	'upload'              => array(
 		'label'    => _x( 'Upload', 'icon label', 'gutenberg' ),
