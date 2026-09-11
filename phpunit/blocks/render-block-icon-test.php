@@ -31,7 +31,7 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 		if ( ! WP_Icon_Collections_Registry::get_instance()->is_registered( 'core' ) ) {
 			gutenberg_register_default_icon_collections();
 		}
-		if ( empty( WP_Icons_Registry::get_instance()->get_registered_icons() ) ) {
+		if ( empty( WP_Icons_Registry_Gutenberg::get_instance()->get_registered_icons() ) ) {
 			gutenberg_register_default_icons();
 		}
 	}
@@ -40,6 +40,11 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 		WP_Block_Supports::$block_to_render = $this->original_block_to_render;
 
 		parent::tear_down();
+	}
+
+	public function test_does_not_render_non_public_icon() {
+		$this->assertNotEmpty( wp_get_icon( 'core/wordpress' ) );
+		$this->assertEmpty( gutenberg_render_block_core_icon( array( 'icon' => 'core/wordpress' ) ) );
 	}
 
 	public function test_preserves_intrinsic_svg_style_when_applying_block_styles() {
