@@ -31,6 +31,74 @@ const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 const EMPTY_OBJECT = {};
 
 /**
+ * Every folder, alphabetically. Folders are a small, hand-curated set, so they
+ * are fetched in one page rather than paginated, and empty ones are kept: a new
+ * folder has to be listed before anything can be put in it.
+ */
+const MEDIA_FOLDERS_QUERY = {
+	per_page: -1,
+	hide_empty: false,
+	orderby: 'name',
+	order: 'asc',
+};
+
+/**
+ * The media folders capability handed to the inserter's Media tab, behind the
+ * `gutenberg-media-folders` experiment: the `wp_media_folder` terms to filter
+ * by, whether the user may create one, and a `create` that does so.
+ *
+ * `block-editor` is WordPress-agnostic and can't read or write a taxonomy
+ * itself, so all of it is injected as a setting from here. `undefined` when the
+ * experiment is off (the taxonomy isn't registered then, so nothing is
+ * requested), which is what hides every folder affordance.
+ *
+ * @return {?{folders: Object[], canCreate: boolean, create: (name: string) => Promise<Object>}} The media folders capability.
+ */
+function useInserterMediaFolders() {
+	const isEnabled = !! window.__experimentalMediaFolders;
+	const { folders, canCreate } = useSelect(
+		( select ) => {
+			if ( ! isEnabled ) {
+				return EMPTY_OBJECT;
+			}
+			const { getEntityRecords, canUser } = select( coreStore );
+			return {
+				folders: getEntityRecords(
+					'taxonomy',
+					'wp_media_folder',
+					MEDIA_FOLDERS_QUERY
+				),
+				canCreate: canUser( 'create', {
+					kind: 'taxonomy',
+					name: 'wp_media_folder',
+				} ),
+			};
+		},
+		[ isEnabled ]
+	);
+	const { saveEntityRecord } = useDispatch( coreStore );
+
+	return useMemo( () => {
+		if ( ! isEnabled ) {
+			return undefined;
+		}
+		return {
+			folders: folders ?? [],
+			canCreate: !! canCreate,
+			// `throwOnError` so a rejected write (e.g. a duplicate name) reaches
+			// the caller and can be reported, rather than failing silently.
+			create: ( name ) =>
+				saveEntityRecord(
+					'taxonomy',
+					'wp_media_folder',
+					{ name },
+					{ throwOnError: true }
+				),
+		};
+	}, [ isEnabled, folders, canCreate, saveEntityRecord ] );
+}
+
+/**
  * The synced patterns the inserter offers: every pattern the user can read.
  *
  * They load in the `view` context. The `edit` context only includes the
@@ -372,6 +440,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			getInserterMediaCategories( currentPostId, viewablePostTypeLabel ),
 		[ currentPostId, viewablePostTypeLabel ]
 	);
+	const inserterMediaFolders = useInserterMediaFolders();
 
 	return useMemo( () => {
 		const blockEditorSettings = {
@@ -436,6 +505,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			inserterMediaCategories,
+			inserterMediaFolders,
 			__experimentalFetchRichUrlData: fetchUrlData,
 			// Todo: This only checks the top level post, not the post within a template or any other entity that can be edited.
 			// This might be better as a generic "canUser" selector.
@@ -494,6 +564,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		blockPatterns,
 		blockPatternCategories,
 		inserterMediaCategories,
+		inserterMediaFolders,
 		canUseUnfilteredHTML,
 		undo,
 		createPageEntity,

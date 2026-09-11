@@ -182,6 +182,9 @@ if (
 if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor' ) ) {
 	require __DIR__ . '/experimental/media-editor/load.php';
 }
+if ( gutenberg_is_experiment_enabled( 'gutenberg-media-folders' ) ) {
+	require __DIR__ . '/experimental/media-folders.php';
+}
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
 	require __DIR__ . '/experimental/workflow-palette.php';
