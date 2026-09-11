@@ -69,3 +69,36 @@ between tests. Tests must configure required mock implementations in their own
 setup hooks. Mutable state held by an imported module is not reset
 automatically; reset it explicitly or use `vi.resetModules()` when a fresh
 module instance is required.
+
+## Additive public package release
+
+`@wordpress/vitest-console` and `@wordpress/vitest-preset-default` provide the
+public Vitest 5 setup. See the [preset migration guide](../../packages/vitest-preset-default/README.md).
+They start at `1.0.0-prerelease` under the new-package policy. The release workflow
+assigns the published versions. Existing Jest packages, public lint defaults,
+and `wp-scripts test-unit-js` remain available.
+
+The packed-consumer validator runs against Node 22.12.0, 24 and 26 with Vite 7
+and 8 in `.github/workflows/vitest-packages.yml`. It verifies JSX and Emotion,
+console matcher types and failure output, setup inheritance, native browser
+values, CSS-module proxies, and rebuilt CSS-module and ordinary-CSS output.
+The Node 24/Vite 8 combination also checks packed Jest tooling.
+
+Before adopting these packages in released public tooling:
+
+1. Publish `@wordpress/vitest-console`, then `@wordpress/vitest-preset-default`
+   through the protected package-release workflow. Verify that their published
+   exports, declarations and dependency versions match the reviewed artifacts.
+2. Repeat isolated consumer verification using the actual published versions.
+3. Use a published `@wordpress/build` containing #82154 and rebuild affected
+   generated CSS. Published version `0.23.0` contains both browser-safe guards.
+   No additional build-fix PR is planned.
+4. Switch public commands and lint defaults only at the separately documented
+   tooling release boundary. Retire active Jest support after that replacement
+   has shipped and its supported consumers have migrated.
+
+The September 11, 2026 audit found no advisories in the isolated install of the
+two new packages with Vitest 5.0.0 and Vite 8.2.2. The repository audit found 47
+advisories, unchanged from base `351883676c6`: 5 low, 27 moderate and 15 high.
+The published-dependency audit found no undeclared imports in either package.
+Refresh these checks before publication.

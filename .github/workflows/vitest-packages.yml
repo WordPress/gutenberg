@@ -1,0 +1,67 @@
+name: Vitest packages
+
+on:
+    pull_request:
+        paths:
+            - 'packages/vitest-*/**'
+            - 'packages/jest-*/**'
+            - 'packages/scripts/**'
+            - 'packages/eslint-plugin/**'
+            - 'packages/wp-build/**'
+            - 'packages/style-runtime/**'
+            - 'test/unit/scripts/validate-vitest-package-consumer.mjs'
+            - 'test/unit/package.json'
+            - 'package-lock.json'
+            - '.github/workflows/vitest-packages.yml'
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    consumers:
+        name: Packed consumers (Node ${{ matrix.node }}, Vite ${{ matrix.vite }})
+        runs-on: ubuntu-24.04
+        timeout-minutes: 20
+        strategy:
+            fail-fast: false
+            matrix:
+                node: ['22.12.0', '24', '26']
+                vite: ['7.3.6', '8.2.2']
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+
+            - name: Install and build repository packages on the repository Node version
+              uses: ./.github/setup-node
+              with:
+                  node-version: '24'
+
+            - run: npm run build
+
+            - name: Record the npm CLI for isolated installs
+              run: echo "VITEST_CONSUMER_NPM=$(command -v npm)" >> "$GITHUB_ENV"
+
+            - uses: ./.github/setup-playwright
+              with:
+                  workspace: '@wordpress/unit-tests'
+                  browsers: chromium
+
+            - name: Select the public consumer Node version
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: ${{ matrix.node }}
+                  package-manager-cache: false
+
+            - name: Verify packed packages in isolated consumers
+              env:
+                  npm_execpath: ${{ env.VITEST_CONSUMER_NPM }}
+                  VITEST_CONSUMER_VITE: ${{ matrix.vite }}
+                  # The unchanged wp-scripts engine range is narrower than the new preset's.
+                  VITEST_CONSUMER_JEST: ${{ matrix.node == '24' && matrix.vite == '8.2.2' && '1' || '' }}
+              run: node test/unit/scripts/validate-vitest-package-consumer.mjs
