@@ -4,22 +4,18 @@
 
 ### Breaking Changes
 
--   A further 141 icons are now stroke-based. Use CSS `color` rather than `fill` to recolor them. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
--   A further 95 icons are now stroke-based. Use CSS `color` rather than `fill` to recolor them. ([#82754](https://github.com/WordPress/gutenberg/pull/82754))
+-   A further 236 icons are now stroke-based. Use CSS `color` rather than `fill` to recolor them. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
 
 ### Enhancements
 
--   Redraw a further 141 icons as stroke-based for variable stroke-width support, following the convention introduced in [#78808](https://github.com/WordPress/gutenberg/pull/78808), and refine the already stroke-based `image` drawing. Most retain their original footprint; the table icons, `capturePhoto` and `image` are slightly smaller by design. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+-   Redraw a further 236 icons as stroke-based for variable stroke-width support, following the convention introduced in [#78808](https://github.com/WordPress/gutenberg/pull/78808), and refine the already stroke-based `image` and `commentAuthorAvatar` drawings. Most retain their original footprint; the table icons, `capturePhoto`, and `image` are slightly smaller, and several drawings in the final batch change by design. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
 -   `manifest.json`: The `public` property is now a tri-state. Omitting it keeps an icon in the JS library only; `true` ships it to WordPress Core and exposes it through the icons REST API, making it selectable in the Icon block; `false` ships it and registers it in the `core` collection for server-side use via `wp_get_icon()`, while hiding it from the REST API and the Icon block. ([#82634](https://github.com/WordPress/gutenberg/pull/82634))
 -   The `brush`, `dashboard`, `link`, `media`, `page`, `pin`, `plugins`, `sites`, `tool`, `update` and `wordpress` icons now ship to WordPress Core as non-public icons: they are registered in the `core` collection and stay available to server-side code via `wp_get_icon()`, but are not exposed through the icons REST API and are not selectable in the Icon block. ([#82634](https://github.com/WordPress/gutenberg/pull/82634), [#79451](https://github.com/WordPress/gutenberg/pull/79451))
--   Redraw the remaining fill-based icons as stroke-based, following the convention introduced in [#78808](https://github.com/WordPress/gutenberg/pull/78808), and refine the already stroke-based `commentAuthorAvatar`. This batch changes several drawings deliberately. ([#82754](https://github.com/WordPress/gutenberg/pull/82754))
 
 ### Bug Fixes
 
 -   `cornerBottomLeft`, `cornerBottomRight`, `cornerTopLeft`, `cornerTopRight`, `sidesBottom`, `sidesHorizontal`, `sidesLeft`, `sidesRight`, `sidesTop` and `sidesVertical`: dim the rest of the box again, so each variant reads as one highlighted side or corner rather than a plain box. The dimming was dropped when these were redrawn as stroke icons. ([#82940](https://github.com/WordPress/gutenberg/pull/82940))
--   `formatIndent`, `formatIndentRTL`, `formatOutdent` and `formatOutdentRTL`: correct the arrow geometry, which was malformed in the previous drawings. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
--   `lock` and `post`: correct drawings that were malformed in the previous stroke conversion. ([#82754](https://github.com/WordPress/gutenberg/pull/82754))
--   `pause`: restore the second bar, which was missing from the drawing. ([#82754](https://github.com/WordPress/gutenberg/pull/82754))
+-   Correct malformed drawings for `formatIndent`, `formatIndentRTL`, `formatOutdent`, `formatOutdentRTL`, `lock`, and `post`, and restore the missing second bar in `pause`. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
 
 ### Internal
 
