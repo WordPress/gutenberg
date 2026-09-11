@@ -28,7 +28,11 @@ function Header( { title, width }: { title: string; width: number } ) {
 					showIdentity
 				/>
 			</div>
-			<div data-testid="outside" style={ { height: 40 } } />
+			{ /* Far enough down that an open popup cannot cover it. */ }
+			<div
+				data-testid="outside"
+				style={ { height: 40, marginBlockStart: 160 } }
+			/>
 		</Tooltip.Provider>
 	);
 }
@@ -100,6 +104,35 @@ describe( 'WidgetHeader title', () => {
 		await waitFor( () =>
 			expect( heading ).not.toHaveAttribute( 'tabindex' )
 		);
+	} );
+
+	it( 'does not reopen the tooltip on its own after the title is clipped again', async () => {
+		const view = await render(
+			<Header title={ LONG_TITLE } width={ 240 } />
+		);
+
+		const heading = screen.getByRole( 'heading', { name: LONG_TITLE } );
+		await waitFor( () =>
+			expect( heading ).toHaveAttribute( 'tabindex', '0' )
+		);
+		await hoverFromOutside( heading );
+		await waitFor( () =>
+			expect( screen.getAllByText( LONG_TITLE ) ).toHaveLength( 2 )
+		);
+
+		// Un-clip while the tooltip is open, then leave and clip again.
+		await view.rerender( <Header title={ LONG_TITLE } width={ 640 } /> );
+		await waitFor( () =>
+			expect( screen.getAllByText( LONG_TITLE ) ).toHaveLength( 1 )
+		);
+		await userEvent.hover( screen.getByTestId( 'outside' ) );
+		await view.rerender( <Header title={ LONG_TITLE } width={ 240 } /> );
+		await waitFor( () =>
+			expect( heading ).toHaveAttribute( 'tabindex', '0' )
+		);
+
+		await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
+		expect( screen.getAllByText( LONG_TITLE ) ).toHaveLength( 1 );
 	} );
 
 	it( 'leaves a title that fits alone: no tooltip, not focusable', async () => {
