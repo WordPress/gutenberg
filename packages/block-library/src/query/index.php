@@ -9,14 +9,14 @@
  * Modifies the static `core/query` block on the server.
  *
  * @since 6.4.0
+ * @since 7.2.0 Removed the `$block` parameter.
  *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
- * @param WP_Block $block      The block instance.
+ * @param array  $attributes Block attributes.
+ * @param string $content    Block default content.
  *
  * @return string Returns the modified output of the query block.
  */
-function render_block_core_query( $attributes, $content, $block ) {
+function render_block_core_query( $attributes, $content ) {
 	$is_interactive = isset( $attributes['enhancedPagination'] )
 		&& true === $attributes['enhancedPagination']
 		&& isset( $attributes['queryId'] )
@@ -35,21 +35,6 @@ function render_block_core_query( $attributes, $content, $block ) {
 			$p->set_attribute( 'data-wp-context', '{}' );
 			$p->set_attribute( 'data-wp-key', $attributes['queryId'] );
 			$content = $p->get_updated_html();
-		}
-	}
-
-	// Add the styles to the block type if the block is interactive and remove
-	// them if it's not.
-	$style_asset = 'wp-block-query';
-	if ( ! wp_style_is( $style_asset ) ) {
-		$style_handles = $block->block_type->style_handles;
-		// If the styles are not needed, and they are still in the `style_handles`, remove them.
-		if ( ! $is_interactive && in_array( $style_asset, $style_handles, true ) ) {
-			$block->block_type->style_handles = array_diff( $style_handles, array( $style_asset ) );
-		}
-		// If the styles are needed, but they were previously removed, add them again.
-		if ( $is_interactive && ! in_array( $style_asset, $style_handles, true ) ) {
-			$block->block_type->style_handles = array_merge( $style_handles, array( $style_asset ) );
 		}
 	}
 
