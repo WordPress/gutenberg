@@ -1,5 +1,14 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -7,11 +16,25 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { MediaUploadModal } from '../index';
 import { unlock } from '../../../lock-unlock';
 
+globalThis.wpVitest.mockMatchMedia();
+
+globalThis.wpVitest.mockResizeObserver();
+
 const preferenceKey = 'dataviews-postType-attachment-media-modal';
 
-jest.mock( '@wordpress/core-data', () => {
-	const { __dangerousOptInToUnstableAPIsOnlyForCoreModules } =
-		jest.requireActual( '@wordpress/private-apis' );
+// Only the labels the modal reads. `getPostType` is resolved through core-data
+// in the real editor; here a minimal store named `core` stands in for it.
+const POST_TYPES: Record< string, unknown > = {
+	post: { labels: { uploaded_to_this_item: 'Uploaded to this post' } },
+	page: { labels: { uploaded_to_this_item: 'Uploaded to this page' } },
+	// A post type that never set the label.
+	cpt: { labels: {} },
+};
+
+vi.mock( import( '@wordpress/core-data' ), async () => {
+	const { __dangerousOptInToUnstableAPIsOnlyForCoreModules } = await import(
+		'@wordpress/private-apis'
+	);
 	const { lock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
 		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
 		'@wordpress/core-data'
@@ -19,7 +42,7 @@ jest.mock( '@wordpress/core-data', () => {
 	// Keep the private API contract real while replacing only the data hook.
 	const privateApis = {};
 	lock( privateApis, {
-		useEntityRecordsWithPermissions: jest.fn(),
+		useEntityRecordsWithPermissions: vi.fn(),
 	} );
 
 	return {
@@ -27,11 +50,11 @@ jest.mock( '@wordpress/core-data', () => {
 		store: {
 			name: 'core',
 		},
-	};
+	} as unknown as typeof import('@wordpress/core-data');
 } );
 
 const mockUseEntityRecordsWithPermissions = unlock( coreDataPrivateApis )
-	.useEntityRecordsWithPermissions as jest.Mock;
+	.useEntityRecordsWithPermissions as Mock;
 
 const IMAGE_RECORDS = [
 	{
@@ -61,21 +84,43 @@ function mockRecords( records: unknown[] ) {
 	} );
 }
 
-type ModalProps = { isOpen?: boolean; value?: number | number[] };
+type ModalProps = {
+	isOpen: boolean;
+	value?: number | number[];
+	postId?: number;
+	postType?: string;
+};
 
-function renderModal( { isOpen = true, value }: ModalProps = {} ) {
+function renderModal(
+	{ isOpen = true, value, postId, postType }: Partial< ModalProps > = {},
+	persistedView?: Record< string, unknown >
+) {
 	const registry = createRegistry();
 	registry.register( noticesStore );
 	registry.register( preferencesStore );
+	registry.registerStore( 'core', {
+		reducer: ( state = {} ) => state,
+		selectors: {
+			getPostType: ( state: unknown, slug: string ) => POST_TYPES[ slug ],
+		},
+	} );
 
-	const onSelect = jest.fn();
-	const onClose = jest.fn();
+	if ( persistedView ) {
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/views', preferenceKey, persistedView );
+	}
+
+	const onSelect = vi.fn();
+	const onClose = vi.fn();
 
 	const view = render(
 		<RegistryProvider value={ registry }>
 			<MediaUploadModal
 				isOpen={ isOpen }
 				value={ value }
+				postId={ postId }
+				postType={ postType }
 				onSelect={ onSelect }
 				onClose={ onClose }
 			/>
@@ -108,7 +153,18 @@ describe( 'MediaUploadModal', () => {
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
+		// The popover fallback container is appended to `document.body`, outside
+		// the tree Testing Library cleans up. Left in place, the next modal to
+		// open marks it `aria-hidden` — hiding the popovers that later tests
+		// render into it — so it is removed and recreated per test. This is DOM
+		// teardown outside the rendered tree, not a query for an element under
+		// test, so Testing Library has nothing to offer here.
+		/* eslint-disable testing-library/no-node-access */
+		document
+			.querySelectorAll( '.components-popover__fallback-container' )
+			.forEach( ( node ) => node.remove() );
+		/* eslint-enable testing-library/no-node-access */
 	} );
 
 	it( 'resets page and search when the modal is closed and reopened', async () => {
@@ -233,6 +289,307 @@ describe( 'MediaUploadModal', () => {
 				.select( preferencesStore )
 				.get( 'core/views', preferenceKey )
 		).toBeUndefined();
+	} );
+
+	describe( 'the "Attached to" filter', () => {
+		it( 'offers the current post only when the modal knows one', async () => {
+			const user = userEvent.setup();
+			const { rerender } = renderModal( {
+				postId: 42,
+				postType: 'post',
+			} );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+
+			expect(
+				await screen.findByRole( 'option', {
+					name: 'Uploaded to this post',
+				} )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'option', { name: 'Unattached' } )
+			).toBeVisible();
+
+			// Outside a post context, only "Unattached" is meaningful.
+			rerender( { isOpen: true } );
+
+			await waitFor( () => {
+				expect(
+					screen.queryByRole( 'option', {
+						name: 'Uploaded to this post',
+					} )
+				).not.toBeInTheDocument();
+			} );
+			expect(
+				screen.getByRole( 'option', { name: 'Unattached' } )
+			).toBeVisible();
+		} );
+
+		it( "labels the option with the post type's own wording", async () => {
+			const user = userEvent.setup();
+			renderModal( { postId: 42, postType: 'page' } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+
+			expect(
+				await screen.findByRole( 'option', {
+					name: 'Uploaded to this page',
+				} )
+			).toBeVisible();
+		} );
+
+		it( 'falls back to a generic label when the post type has none', async () => {
+			const user = userEvent.setup();
+			renderModal( { postId: 42, postType: 'cpt' } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+
+			expect(
+				await screen.findByRole( 'option', {
+					name: 'Uploaded to this item',
+				} )
+			).toBeVisible();
+		} );
+
+		it( 'ignores a post ID that is not a number', async () => {
+			const user = userEvent.setup();
+			// A template's entity ID is a slug rather than a post ID, and media
+			// can't be uploaded to one.
+			renderModal( {
+				postId: 'twentytwentyfive//index' as unknown as number,
+				postType: 'wp_template',
+			} );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+
+			expect(
+				await screen.findByRole( 'option', { name: 'Unattached' } )
+			).toBeVisible();
+			expect(
+				screen.queryByRole( 'option', {
+					name: 'Uploaded to this post',
+				} )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'stops constraining the query when the chosen option is clicked again', async () => {
+			const user = userEvent.setup();
+			renderModal( { postId: 42, postType: 'post' } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+
+			const unattached = await screen.findByRole( 'option', {
+				name: 'Unattached',
+			} );
+			await user.click( unattached );
+
+			await waitFor( () => {
+				expect(
+					mockUseEntityRecordsWithPermissions
+				).toHaveBeenLastCalledWith(
+					'postType',
+					'attachment',
+					expect.objectContaining( { parent: [ 0 ] } )
+				);
+			} );
+
+			// Clicking the selected option again deselects it. The filter stays
+			// in the view with an empty value, which must read as "no constraint"
+			// rather than as "attached to nothing".
+			await user.click( unattached );
+
+			await waitFor( () => {
+				expect(
+					mockUseEntityRecordsWithPermissions
+				).toHaveBeenLastCalledWith(
+					'postType',
+					'attachment',
+					expect.not.objectContaining( { parent: expect.anything() } )
+				);
+			} );
+		} );
+
+		it( 'queries both options together as a single `parent` list', async () => {
+			const user = userEvent.setup();
+			renderModal( { postId: 42, postType: 'post' } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Uploaded to this post',
+				} )
+			);
+			await user.click(
+				screen.getByRole( 'option', { name: 'Unattached' } )
+			);
+
+			await waitFor( () => {
+				expect(
+					mockUseEntityRecordsWithPermissions
+				).toHaveBeenLastCalledWith(
+					'postType',
+					'attachment',
+					expect.objectContaining( { parent: [ 42, 0 ] } )
+				);
+			} );
+		} );
+
+		it( 'queries media uploaded to the post as its `parent`', async () => {
+			const user = userEvent.setup();
+			renderModal( { postId: 42, postType: 'post' } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Uploaded to this post',
+				} )
+			);
+
+			await waitFor( () => {
+				expect(
+					mockUseEntityRecordsWithPermissions
+				).toHaveBeenLastCalledWith(
+					'postType',
+					'attachment',
+					expect.objectContaining( { parent: [ 42 ] } )
+				);
+			} );
+		} );
+
+		it( 'does not persist the filter', async () => {
+			// Unlike author or mime type, scoping the library to a post — or to
+			// unattached media — is about the task at hand, not a standing
+			// preference. Carrying it into the next post would quietly hide most
+			// of the library.
+			const user = userEvent.setup();
+			const { registry } = renderModal( {
+				postId: 42,
+				postType: 'post',
+			} );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+			await user.click(
+				await screen.findByRole( 'option', { name: 'Unattached' } )
+			);
+
+			await waitFor( () => {
+				expect(
+					mockUseEntityRecordsWithPermissions
+				).toHaveBeenLastCalledWith(
+					'postType',
+					'attachment',
+					expect.objectContaining( { parent: [ 0 ] } )
+				);
+			} );
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core/views', preferenceKey )
+			).toBeUndefined();
+		} );
+
+		it( 'keeps the filter while the picker stays on screen', async () => {
+			const user = userEvent.setup();
+			const { rerender } = renderModal( {
+				postId: 42,
+				postType: 'post',
+			} );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+			await user.click(
+				await screen.findByRole( 'option', { name: 'Unattached' } )
+			);
+
+			// Closing and reopening is the same instance: the choice stands.
+			rerender( { isOpen: false, postId: 42, postType: 'post' } );
+			rerender( { isOpen: true, postId: 42, postType: 'post' } );
+
+			await waitFor( () => {
+				expect(
+					mockUseEntityRecordsWithPermissions
+				).toHaveBeenLastCalledWith(
+					'postType',
+					'attachment',
+					expect.objectContaining( { parent: [ 0 ] } )
+				);
+			} );
+		} );
+
+		it( 'ignores an `attached_to` filter left in the persisted view', async () => {
+			renderModal(
+				{ postId: 42, postType: 'post' },
+				{
+					filters: [
+						{
+							field: 'attached_to',
+							operator: 'isAny',
+							value: [ 'current' ],
+						},
+					],
+				}
+			);
+
+			await waitFor( () => {
+				expect(
+					mockUseEntityRecordsWithPermissions
+				).toHaveBeenCalled();
+			} );
+			expect(
+				mockUseEntityRecordsWithPermissions
+			).toHaveBeenLastCalledWith(
+				'postType',
+				'attachment',
+				expect.not.objectContaining( { parent: expect.anything() } )
+			);
+			expect(
+				screen.queryByRole( 'button', { name: /Attached to/ } )
+			).not.toBeInTheDocument();
+		} );
 	} );
 
 	it( 'updates the media query when the picker changes search', async () => {

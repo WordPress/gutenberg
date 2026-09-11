@@ -50,8 +50,11 @@ To add a new icon to the library, follow these steps:
    - `slug`: The icon identifier (should match the SVG filename without the `.svg` extension)
    - `label`: The human-readable label for the icon. Use Title Case (for example, `My New Icon`).
    - `filePath`: The relative path to the SVG file (e.g., `library/my-new-icon.svg`)
+   - `public` (optional): Controls whether the icon is shipped to WordPress core, and if so how far it is exposed. **Important**: Once an icon ships, removing it is difficult, so carefully consider this field before setting it.
+     - Omit the field to keep the icon in the JS library only. It is not shipped to core.
+     - `true` ships the icon to core and exposes it through the SVG Icons API, which makes it selectable in the Icon block.
+     - `false` ships the icon to core and registers it for server-side use through `wp_get_icon()`, but hides it from the REST API and the Icon block. Use this for icons that belong to the admin UI rather than to post content, such as admin menu icons.
    - `keywords` (optional): An array of lowercase search terms for the icon, such as `[ "hamburger", "navigation" ]` for Menu. Public and non-public icons alike may have them: the icons registry and the icon library match them alongside the name and label, and so does the Storybook icon library, which reads this manifest rather than keeping its own list. Terms for public icons are localized in the generated `manifest.php`.
-   - `public` (optional): Set to `true` if you want to expose this icon as a core icon through the SVG Icons API. **Important**: Once an icon is made public, removing it is difficult, so carefully consider whether to make it public before setting this field to `true`.
 4. **Do not edit `manifest.php`**: The `manifest.php` file is automatically generated from `manifest.json` by the build script. Do not edit it manually, as your changes will be overwritten when the build runs.
 
 After adding your icon, run `npm run build` to generate the TypeScript files and update `manifest.php`.

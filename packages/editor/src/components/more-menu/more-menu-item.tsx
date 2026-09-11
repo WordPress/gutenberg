@@ -1,5 +1,6 @@
 import { Icon as WCIcon } from '@wordpress/components';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, isValidElement } from '@wordpress/element';
+import { SVG } from '@wordpress/primitives';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
 import type {
@@ -134,9 +135,20 @@ function UnforwardedMoreMenuItem(
 	const description = info ? (
 		<Menu.ItemDescription>{ info }</Menu.ItemDescription>
 	) : null;
-	// Not the UI package's icon: only this one renders the Dashicon slugs
-	// `PluginMoreMenuItem` accepts.
-	const prefix = icon ? <WCIcon icon={ icon } /> : undefined;
+	let prefix: ReactNode;
+	if ( icon ) {
+		// Preserve support for Dashicon slugs and custom icon components.
+		prefix =
+			isValidElement< ComponentProps< 'svg' > >( icon ) &&
+			( icon.type === 'svg' || icon.type === SVG ) ? (
+				<Menu.PrefixIcon
+					icon={ icon }
+					className={ icon.props.className }
+				/>
+			) : (
+				<WCIcon icon={ icon } />
+			);
+	}
 	const itemShortcut = adaptShortcut( shortcut );
 	// `MenuItem` documented `isSelected`; `ComplementaryAreaToggle` sets
 	// `aria-checked`.

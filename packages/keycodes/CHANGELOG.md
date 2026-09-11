@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `keyboardShortcut`, a helper returning the values used to display and describe a keyboard shortcut (`displayShortcut`, `ariaKeyShortcut` and `label`) ([#82632](https://github.com/WordPress/gutenberg/pull/82632)).
+
+## 4.55.0 (2026-09-10)
+
 ## 4.54.0 (2026-08-26)
 
 ### Internal

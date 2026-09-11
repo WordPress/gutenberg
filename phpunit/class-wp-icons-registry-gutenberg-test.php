@@ -503,6 +503,25 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should fail to register an icon whose `public` property is not a boolean.
+	 *
+	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
+	 */
+	public function test_register_icon_rejects_non_boolean_public_property() {
+		$result = $this->registry->register(
+			'test-collection/invalid-visibility',
+			array(
+				'label'   => 'Icon',
+				'content' => '<svg></svg>',
+				'public'  => 'yes',
+			)
+		);
+
+		$this->assertFalse( $result );
+		$this->assertFalse( $this->registry->is_registered( 'test-collection/invalid-visibility' ) );
+	}
+
+	/**
 	 * Should register an icon that provides a valid `keywords` array.
 	 */
 	public function test_register_icon_with_keywords() {

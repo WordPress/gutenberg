@@ -3,3 +3,4 @@
  * like the jest-dom matchers, must be referenced explicitly.
  */
 import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';

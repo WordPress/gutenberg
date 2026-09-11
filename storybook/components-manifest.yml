@@ -984,6 +984,7 @@
       - onValueChange
       - render
       - required
+      - resetOnSelect
       - role
       - showOutsideDays
       - startMonth
@@ -1123,6 +1124,7 @@
       - required
       - searchPlaceholder
       - showClearButton
+      - statusContent
       - value
       - virtualized
   subcomponents:
@@ -1215,6 +1217,7 @@
       - required
       - searchPlaceholder
       - showClearButton
+      - statusContent
       - value
       - virtualized
   subcomponents:
@@ -1441,11 +1444,13 @@
   subcomponents:
       - name: ToggleGroupControlOption
         props:
+            - disabled
             - label
             - showTooltip
             - value
       - name: ToggleGroupControlOptionIcon
         props:
+            - disabled
             - icon
             - label
             - value

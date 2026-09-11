@@ -94,7 +94,8 @@ function listVitestTestsByProject() {
 	for ( const line of lines ) {
 		const match = line.match( /^\[([^\]]+)\]\s+(.+)$/ );
 		assert.ok( match, `Unexpected Vitest list output: ${ line }` );
-		const [ , projectName, testPath ] = match;
+		const [ , listedProjectName, testPath ] = match;
+		const projectName = listedProjectName.replace( / \(.+\)$/, '' );
 		assert.ok(
 			testsByProject[ projectName ],
 			`Unexpected Vitest project \`${ projectName }\`. Expected only: ${ VITEST_PROJECT_NAMES.join(
