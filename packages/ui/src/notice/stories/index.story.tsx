@@ -163,7 +163,6 @@ export const CustomIcon: Story = {
 			<Notice.Title key="title">
 				Parent block is hidden on Desktop
 			</Notice.Title>,
-			<Notice.CloseIcon key="closeIcon" />,
 		],
 	},
 };
