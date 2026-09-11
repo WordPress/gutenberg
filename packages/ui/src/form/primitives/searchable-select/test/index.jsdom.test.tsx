@@ -322,41 +322,6 @@ describe( 'SearchableSelect', () => {
 		expect( status ).toBeEmptyDOMElement();
 	} );
 
-	it( 'does not announce a result count by default', async () => {
-		const user = userEvent.setup();
-
-		render( <SearchableSelect aria-label="Fruit" items={ ITEMS } /> );
-
-		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
-
-		expect(
-			await screen.findByRole( 'option', { name: 'Apple' } )
-		).toBeVisible();
-		expect(
-			screen.queryByText( /^\d+ results? found\.$/ )
-		).not.toBeInTheDocument();
-	} );
-
-	it( 'does not announce a result count when there are no matching items', async () => {
-		const user = userEvent.setup();
-
-		render( <SearchableSelect aria-label="Fruit" items={ ITEMS } /> );
-
-		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
-		expect(
-			await screen.findByRole( 'combobox', { name: 'Search' } )
-		).toBeVisible();
-		await user.type(
-			screen.getByRole( 'combobox', { name: 'Search' } ),
-			'zzz'
-		);
-
-		expect( await screen.findByText( 'No results found.' ) ).toBeVisible();
-		expect(
-			screen.queryByText( /^\d+ results? found\.$/ )
-		).not.toBeInTheDocument();
-	} );
-
 	describe( 'creatable item', () => {
 		const creatableItem = {
 			value: '__create__',

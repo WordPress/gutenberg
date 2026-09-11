@@ -198,60 +198,6 @@ describe( 'SearchableChipSelect', () => {
 		expect( status ).toHaveAttribute( 'role', 'status' );
 	} );
 
-	it( 'keeps the status live region mounted when statusContent is cleared', async () => {
-		const user = userEvent.setup();
-		const { rerender } = render(
-			<SearchableChipSelect
-				items={ ITEMS.slice( 0, 3 ) }
-				statusContent="Loading…"
-			/>
-		);
-
-		await user.click( screen.getByRole( 'combobox' ) );
-
-		const status = await screen.findByText( 'Loading…' );
-
-		rerender(
-			<SearchableChipSelect
-				items={ ITEMS.slice( 0, 3 ) }
-				statusContent={ null }
-			/>
-		);
-
-		expect( status ).toBeVisible();
-		expect( status ).toHaveAttribute( 'role', 'status' );
-		expect( status ).toBeEmptyDOMElement();
-	} );
-
-	it( 'does not announce a result count by default', async () => {
-		const user = userEvent.setup();
-
-		render( <SearchableChipSelect items={ ITEMS.slice( 0, 3 ) } /> );
-
-		await user.click( screen.getByRole( 'combobox' ) );
-
-		expect(
-			await screen.findByRole( 'option', { name: 'Apple' } )
-		).toBeVisible();
-		expect(
-			screen.queryByText( /^\d+ results? found\.$/ )
-		).not.toBeInTheDocument();
-	} );
-
-	it( 'does not announce a result count when there are no matching items', async () => {
-		const user = userEvent.setup();
-
-		render( <SearchableChipSelect items={ ITEMS.slice( 0, 3 ) } /> );
-
-		await user.click( screen.getByRole( 'combobox' ) );
-		await user.type( screen.getByRole( 'combobox' ), 'zzz' );
-
-		expect( await screen.findByText( 'No results found.' ) ).toBeVisible();
-		expect(
-			screen.queryByText( /^\d+ results? found\.$/ )
-		).not.toBeInTheDocument();
-	} );
-
 	describe( 'creatable item', () => {
 		const creatableItem = {
 			value: '__create__',

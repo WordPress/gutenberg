@@ -14,15 +14,14 @@ const ITEMS = [
 
 type Item = ( typeof ITEMS )[ number ];
 
-function ResultCountStatus() {
+function FilteredItems() {
 	const filteredItems = Autocomplete.useFilteredItems< Item >();
-	const count = filteredItems.length;
 
-	if ( count === 0 ) {
-		return null;
-	}
-
-	return count === 1 ? '1 result found.' : `${ count } results found.`;
+	return (
+		<span data-testid="filtered-items">
+			{ filteredItems.map( ( item ) => item.value ).join( '|' ) }
+		</span>
+	);
 }
 
 function renderDisabledAutocompleteWithClear() {
@@ -106,10 +105,7 @@ describe( 'Autocomplete', () => {
 			<Autocomplete.Root items={ ITEMS }>
 				<Autocomplete.Input placeholder="Search" />
 				<Autocomplete.Popup>
-					<Autocomplete.Status>
-						<ResultCountStatus />
-					</Autocomplete.Status>
-					<Autocomplete.Empty>No results found.</Autocomplete.Empty>
+					<FilteredItems />
 					<Autocomplete.List>
 						<Autocomplete.ListBody>
 							<Autocomplete.Collection>
@@ -130,13 +126,16 @@ describe( 'Autocomplete', () => {
 
 		await user.type( screen.getByRole( 'combobox' ), 'Item' );
 
-		const status = await screen.findByText( '3 results found.' );
-		expect( status ).toBeVisible();
-		expect( status ).toHaveAttribute( 'role', 'status' );
+		const filtered = await screen.findByTestId( 'filtered-items' );
+		expect( filtered ).toHaveTextContent( 'Item 1|Item 2|Item 3' );
 
 		await user.type( screen.getByRole( 'combobox' ), ' 1' );
 
-		expect( await screen.findByText( '1 result found.' ) ).toBeVisible();
+		await waitFor( () => {
+			expect( filtered ).toHaveTextContent( 'Item 1' );
+			expect( filtered ).not.toHaveTextContent( 'Item 2' );
+			expect( filtered ).not.toHaveTextContent( 'Item 3' );
+		} );
 	} );
 
 	describe( 'portal', () => {

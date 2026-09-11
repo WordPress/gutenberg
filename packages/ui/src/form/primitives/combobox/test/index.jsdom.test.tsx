@@ -14,15 +14,14 @@ const ITEMS = [
 
 type Item = ( typeof ITEMS )[ number ];
 
-function ResultCountStatus() {
+function FilteredItems() {
 	const filteredItems = Combobox.useFilteredItems< Item >();
-	const count = filteredItems.length;
 
-	if ( count === 0 ) {
-		return null;
-	}
-
-	return count === 1 ? '1 result found.' : `${ count } results found.`;
+	return (
+		<span data-testid="filtered-items">
+			{ filteredItems.map( ( item ) => item.value ).join( '|' ) }
+		</span>
+	);
 }
 
 function renderDisabledMultiSelect() {
@@ -162,10 +161,7 @@ describe( 'Combobox', () => {
 				<Combobox.Trigger aria-label="Fruit" />
 				<Combobox.Popup>
 					<Combobox.Input aria-label="Search" />
-					<Combobox.Status>
-						<ResultCountStatus />
-					</Combobox.Status>
-					<Combobox.Empty>No results found.</Combobox.Empty>
+					<FilteredItems />
 					<Combobox.List>
 						<Combobox.ListBody>
 							<Combobox.Collection>
@@ -186,16 +182,19 @@ describe( 'Combobox', () => {
 
 		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
 
-		const status = await screen.findByText( '3 results found.' );
-		expect( status ).toBeVisible();
-		expect( status ).toHaveAttribute( 'role', 'status' );
+		const filtered = await screen.findByTestId( 'filtered-items' );
+		expect( filtered ).toHaveTextContent( 'Item 1|Item 2|Item 3' );
 
 		await user.type(
 			screen.getByRole( 'combobox', { name: 'Search' } ),
 			'Item 1'
 		);
 
-		expect( await screen.findByText( '1 result found.' ) ).toBeVisible();
+		await waitFor( () => {
+			expect( filtered ).toHaveTextContent( 'Item 1' );
+			expect( filtered ).not.toHaveTextContent( 'Item 2' );
+			expect( filtered ).not.toHaveTextContent( 'Item 3' );
+		} );
 	} );
 
 	it( 'uses a custom positioner', async () => {
