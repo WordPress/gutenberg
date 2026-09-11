@@ -25,12 +25,17 @@ type MediaSourcesProps = {
 	footer?: ReactNode;
 };
 
+// The source opened on mount: the whole image library, so the tab opens
+// straight onto something browsable. Sources listed ahead of it (e.g. the
+// post's attached images) keep their place but start collapsed.
+const DEFAULT_OPEN_SOURCE = 'images';
+
 /**
  * The Media tab: every media source is a collapsible panel stacked in a single
  * column. At most one is open at a time and fills the height left beneath
- * the other panels' headers; the first opens on mount, so the tab opens
- * straight onto a browsable library rather than a list of sources to drill
- * into.
+ * the other panels' headers; the image library (or, failing that, the first
+ * source) opens on mount, so the tab opens straight onto a browsable library
+ * rather than a list of sources to drill into.
  */
 export default function MediaSources( {
 	categories,
@@ -38,7 +43,12 @@ export default function MediaSources( {
 	footer,
 }: MediaSourcesProps ) {
 	const [ openName, setOpenName ] = useState< string | undefined >(
-		categories[ 0 ]?.name
+		() =>
+			(
+				categories.find(
+					( category ) => category.name === DEFAULT_OPEN_SOURCE
+				) ?? categories[ 0 ]
+			)?.name
 	);
 	const baseCssClass = 'block-editor-inserter__media-sources';
 
