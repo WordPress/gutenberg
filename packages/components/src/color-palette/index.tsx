@@ -1,39 +1,47 @@
 import type { ForwardedRef } from 'react';
-import { colord, extend } from 'colord';
-import namesPlugin from 'colord/plugins/names';
-import a11yPlugin from 'colord/plugins/a11y';
-import clsx from 'clsx';
+import { colord } from 'colord';
 import { useInstanceId } from '@wordpress/compose';
-import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
+import { __, _x, sprintf } from '@wordpress/i18n';
+import {
+	Fragment,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	forwardRef,
+} from '@wordpress/element';
+import { Stack } from '@wordpress/ui';
 import Dropdown from '../dropdown';
-import { ColorPicker } from '../color-picker';
 import CircularOptionPicker, {
 	getComputeCircularOptionPickerCommonProps,
 	warnIfCircularOptionPickerAsButtonsIsSet,
 } from '../circular-option-picker';
-import { VStack } from '../v-stack';
-import { Truncate } from '../truncate';
 import { Heading } from '../heading';
-import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
 import styles from './style.module.scss';
 import type {
-	ColorObject,
+	ColorPaletteInternalProps,
 	ColorPaletteProps,
 	CustomColorPickerDropdownProps,
 	MultiplePalettesProps,
 	PaletteObject,
 	SinglePaletteProps,
 } from './types';
+import { colorEditingKey } from './private-keys';
 import type { WordPressComponentProps } from '../context';
 import type { DropdownProps } from '../dropdown/types';
 import {
+	CUSTOM_PALETTE_SLUG,
 	extractColorNameFromCurrentValue,
 	isMultiplePaletteArray,
+	isSimpleCSSColor,
 	normalizeColorValue,
+	toColorObjects,
+	toPaletteObjects,
 } from './utils';
-
-extend( [ namesPlugin, a11yPlugin ] );
+import { AddCustomColorButton } from './color-editing-controls';
+import { CustomColorPickerContent, InfoArea } from './color-editing-ui';
+import { useColorEditing } from './use-color-editing';
 
 function SinglePalette( {
 	className,
@@ -43,10 +51,11 @@ function SinglePalette( {
 	value,
 	selectedSlug,
 	presentation,
+	addAction,
 	...additionalProps
 }: SinglePaletteProps ) {
 	const colorOptions = useMemo( () => {
-		return colors.map( ( { color, name, slug }, index ) => {
+		const options = colors.map( ( { color, name, slug }, index ) => {
 			const colordColor = colord( color );
 			// When a non-empty selectedSlug is provided, selection is decided
 			// strictly by slug — entries without a slug or with a different slug
@@ -87,7 +96,22 @@ function SinglePalette( {
 				/>
 			);
 		} );
-	}, [ colors, value, selectedSlug, onChange, clearColor, presentation ] );
+		if ( addAction ) {
+			// Wrap the add action in a Fragment so it doesn't break the listbox structure and reachable by the keyboard.
+			options.push(
+				<Fragment key="__add-custom-color">{ addAction }</Fragment>
+			);
+		}
+		return options;
+	}, [
+		colors,
+		value,
+		selectedSlug,
+		onChange,
+		clearColor,
+		presentation,
+		addAction,
+	] );
 
 	return (
 		<CircularOptionPicker.OptionGroup
@@ -107,6 +131,8 @@ function MultiplePalettes( {
 	selectedSlug,
 	headingLevel,
 	presentation,
+	canAddCustomColor,
+	onAddCustom,
 }: MultiplePalettesProps ) {
 	const instanceId = useInstanceId( MultiplePalettes, 'color-palette' );
 
@@ -115,33 +141,52 @@ function MultiplePalettes( {
 	}
 
 	return (
-		<VStack spacing={ 3 } className={ className }>
-			{ colors.map( ( { name, colors: colorPalette }, index ) => {
-				const id = `${ instanceId }-${ index }`;
-				return (
-					<VStack spacing={ 2 } key={ index }>
-						<Heading
-							className={ styles[ 'color-heading' ] }
-							id={ id }
-							level={ headingLevel }
+		<Stack direction="column" gap="md" className={ className }>
+			{ colors.map(
+				(
+					{ name, slug: paletteSlug, colors: colorPalette },
+					index
+				) => {
+					const id = `${ instanceId }-${ index }`;
+					const isCustomPalette = paletteSlug === CUSTOM_PALETTE_SLUG;
+					return (
+						<Stack
+							direction="column"
+							gap="sm"
+							key={ paletteSlug ?? name ?? index }
 						>
-							{ name }
-						</Heading>
-						<SinglePalette
-							clearColor={ clearColor }
-							colors={ colorPalette }
-							onChange={ ( newColor, _colorIndex, slug ) =>
-								onChange( newColor, index, slug )
-							}
-							value={ value }
-							selectedSlug={ selectedSlug }
-							presentation={ presentation }
-							aria-labelledby={ id }
-						/>
-					</VStack>
-				);
-			} ) }
-		</VStack>
+							<Heading
+								className={ styles[ 'color-heading' ] }
+								id={ id }
+								level={ headingLevel }
+							>
+								{ name }
+							</Heading>
+							<SinglePalette
+								clearColor={ clearColor }
+								colors={ colorPalette }
+								onChange={ ( newColor, _colorIndex, slug ) =>
+									onChange( newColor, index, slug )
+								}
+								value={ value }
+								selectedSlug={ selectedSlug }
+								presentation={ presentation }
+								aria-labelledby={ id }
+								addAction={
+									isCustomPalette &&
+									canAddCustomColor &&
+									onAddCustom ? (
+										<AddCustomColorButton
+											onClick={ onAddCustom }
+										/>
+									) : undefined
+								}
+							/>
+						</Stack>
+					);
+				}
+			) }
+		</Stack>
 	);
 }
 
@@ -157,6 +202,7 @@ export function CustomColorPickerDropdown( {
 			// scrollbars while dragging the color picker's handle close to the
 			// popover edge.
 			resize: false,
+			focusOnMount: 'firstElement',
 			...( isRenderedInSidebar
 				? {
 						// When in the sidebar: open to the left (stacking),
@@ -185,7 +231,7 @@ export function CustomColorPickerDropdown( {
 
 function UnforwardedColorPalette(
 	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
-	forwardedRef: ForwardedRef< any >
+	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
 	const {
 		asButtons,
@@ -200,17 +246,21 @@ function UnforwardedColorPalette(
 		selectedSlug,
 		__experimentalIsRenderedInSidebar = false,
 		headingLevel = 2,
+		[ colorEditingKey ]: colorEditing,
+		hasColorsToChoose,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledby,
 		...additionalProps
-	} = props;
+	} = props as ColorPaletteInternalProps;
 	warnIfCircularOptionPickerAsButtonsIsSet( 'ColorPalette', asButtons );
 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
 
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 
+	const colorToggleRef = useRef< HTMLElement | null >( null );
 	const customColorPaletteCallbackRef = useCallback(
 		( node: HTMLElement | null ) => {
+			colorToggleRef.current = node;
 			setNormalizedColorValue( normalizeColorValue( value, node ) );
 		},
 		[ value ]
@@ -228,19 +278,34 @@ function UnforwardedColorPalette(
 		[ value, colors, hasMultipleColorOrigins, selectedSlug ]
 	);
 
-	const renderCustomColorPicker = () => (
-		<DropdownContentWrapper paddingSize="none">
-			<ColorPicker
-				color={ normalizedColorValue }
-				onChange={ ( color ) => onChange( color ) }
-				enableAlpha={ enableAlpha }
-			/>
-		</DropdownContentWrapper>
-	);
-	const isHex = value?.startsWith( '#' );
+	const isHex = !! value?.startsWith( '#' );
 
 	// Leave hex values as-is. Remove the `var()` wrapper from CSS vars.
 	const displayValue = value?.replace( /^var\((.+)\)$/, '$1' );
+
+	const resolvedColorValue =
+		value && isSimpleCSSColor( value ) ? value : normalizedColorValue;
+
+	const editing = useColorEditing( {
+		colorEditing,
+		value,
+		selectedSlug,
+		colors,
+		disableCustomColors,
+		onChange,
+		displayValue,
+		isHex,
+		buttonLabelName,
+		resolvedColorValue,
+	} );
+
+	// Recolor-first flows (value-only edits) move focus to the existing
+	// swatch toggle rather than introducing a separate in-form color control.
+	const { registerFocusColorToggle } = editing;
+	useEffect( () => {
+		registerFocusColorToggle( () => colorToggleRef.current?.focus() );
+	}, [ registerFocusColorToggle ] );
+
 	const customColorAccessibleLabel = !! displayValue
 		? sprintf(
 				// translators: 1: The name of the color e.g: "vivid red". 2: The color's hex code e.g: "#f00".
@@ -279,88 +344,161 @@ function UnforwardedColorPalette(
 		</CircularOptionPicker.ButtonAction>
 	);
 
-	// If disableCustomColors is true and colors.length is 0, return null to avoid rendering an empty palette wrapper.
-	if ( disableCustomColors && colors.length === 0 && ! actions ) {
+	const shouldDisplayMultiplePalettes =
+		hasMultipleColorOrigins ||
+		( editing.isEditingEnabled && colors.length === 0 );
+
+	const displayedColors = useMemo( () => {
+		if ( ! editing.isEditingEnabled || ! shouldDisplayMultiplePalettes ) {
+			return colors;
+		}
+
+		const palettes = hasMultipleColorOrigins
+			? toPaletteObjects( colors )
+			: [];
+		if (
+			! editing.canEditFullCustom ||
+			palettes.some( ( palette ) => palette.slug === CUSTOM_PALETTE_SLUG )
+		) {
+			return palettes;
+		}
+
+		return [
+			...palettes,
+			{
+				name: _x(
+					'Custom',
+					'Indicates this palette is created by the user.'
+				),
+				slug: CUSTOM_PALETTE_SLUG,
+				colors: [],
+			},
+		];
+	}, [
+		colors,
+		hasMultipleColorOrigins,
+		editing.isEditingEnabled,
+		editing.canEditFullCustom,
+		shouldDisplayMultiplePalettes,
+	] );
+
+	const shouldRenderCustomColorPicker = ! disableCustomColors;
+	const shouldRenderPalette = displayedColors.length > 0 || !! actions;
+
+	// Avoid rendering an empty palette wrapper when there is neither a custom
+	// color picker nor anything to show in the palette.
+	if ( ! shouldRenderCustomColorPicker && ! shouldRenderPalette ) {
 		return null;
 	}
 
+	// Toggle swatch uses raw `value` so CSS variables (`var(--*)`) paint
+	// correctly; the picker uses `resolvedColorValue` (computed hex when needed).
+	const toggleSwatchBackground =
+		editing.editingState.mode === 'edit'
+			? editing.editingState.previewColor ?? value
+			: value;
+
 	return (
-		<VStack spacing={ 3 } ref={ forwardedRef } { ...additionalProps }>
-			{ ! disableCustomColors && (
+		<Stack
+			direction="column"
+			gap="md"
+			ref={ forwardedRef }
+			{ ...additionalProps }
+		>
+			{ shouldRenderCustomColorPicker && (
 				<CustomColorPickerDropdown
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
-					renderContent={ renderCustomColorPicker }
+					open={ editing.isPickerOpen }
+					onToggle={ editing.setIsPickerOpen }
+					renderContent={ () => (
+						<CustomColorPickerContent
+							color={ editing.editPickerColor }
+							enableAlpha={ enableAlpha }
+							onPickerChange={ editing.handlePickerChange }
+						/>
+					) }
 					renderToggle={ ( { isOpen, onToggle } ) => (
-						<VStack
+						<Stack
 							className="components-color-palette__custom-color-wrapper"
-							spacing={ 0 }
+							direction="column"
 						>
 							<button
 								ref={ customColorPaletteCallbackRef }
 								className="components-color-palette__custom-color-button"
 								aria-expanded={ isOpen }
-								aria-haspopup="true"
+								aria-haspopup="dialog"
 								onClick={ onToggle }
 								aria-label={ customColorAccessibleLabel }
 								style={ {
-									background: value,
+									background: toggleSwatchBackground,
 								} }
 								type="button"
 							/>
-							<VStack
+							<Stack
 								className="components-color-palette__custom-color-text-wrapper"
-								spacing={ 0.5 }
+								direction="column"
+								gap="xs"
 							>
-								<Truncate className="components-color-palette__custom-color-name">
-									{ value
-										? buttonLabelName
-										: __( 'No color selected' ) }
-								</Truncate>
-								{ /*
-								This `Truncate` is always rendered, even if
-								there is no `displayValue`, to ensure the layout
-								does not shift
-								*/ }
-								<Truncate
-									className={ clsx(
-										'components-color-palette__custom-color-value',
-										{
-											'components-color-palette__custom-color-value--is-hex':
-												isHex,
-										}
-									) }
-								>
-									{ displayValue }
-								</Truncate>
-							</VStack>
-						</VStack>
+								<InfoArea
+									editingState={ editing.editingState }
+									displayValue={ displayValue }
+									editDisplayHex={ editing.editDisplayHex }
+									editingCapability={
+										editing.editingCapability
+									}
+									displayedName={ editing.displayedName }
+									isHex={ isHex }
+									canEditSelected={ editing.canEditSelected }
+									canDeleteSelected={
+										editing.canDeleteSelected
+									}
+									isDirtyCustomValue={
+										editing.isDirtyCustomValue
+									}
+									onEnterAdd={ editing.handleEnterAdd }
+									onEnterEdit={ editing.handleEnterEdit }
+									onEnterDelete={ editing.handleEnterDelete }
+									onCancel={ editing.handleCancel }
+									onSubmitAdd={ editing.handleSubmitAdd }
+									onSubmitEdit={ editing.handleSubmitEdit }
+									onConfirmDelete={
+										editing.handleConfirmDelete
+									}
+								/>
+							</Stack>
+						</Stack>
 					) }
 				/>
 			) }
-			{ ( colors.length > 0 || actions ) && (
+			{ shouldRenderPalette && (
 				<CircularOptionPicker
 					{ ...metaProps }
 					{ ...labelProps }
 					actions={ actions }
 					options={
-						hasMultipleColorOrigins ? (
+						shouldDisplayMultiplePalettes ? (
 							<MultiplePalettes
 								{ ...paletteCommonProps }
 								headingLevel={ headingLevel }
-								colors={ colors as PaletteObject[] }
-								value={ value }
+								colors={ displayedColors as PaletteObject[] }
+								canAddCustomColor={ editing.canEditFullCustom }
+								onAddCustom={ ( trigger ) =>
+									editing.handleEnterAdd( {
+										initialFocus: 'color',
+										trigger,
+									} )
+								}
 							/>
 						) : (
 							<SinglePalette
 								{ ...paletteCommonProps }
-								colors={ colors as ColorObject[] }
-								value={ value }
+								colors={ toColorObjects( colors ) }
 							/>
 						)
 					}
 				/>
 			) }
-		</VStack>
+		</Stack>
 	);
 }
 

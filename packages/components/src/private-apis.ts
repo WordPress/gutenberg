@@ -10,6 +10,8 @@ import {
 	ValidatedContentEditableControl,
 	ValidatedTextareaControl,
 } from './validated-form-controls';
+import { colorEditingKey } from './color-palette/private-keys';
+import { isColorEditingEnabled } from './color-palette/utils';
 import ContentEditableControl from './content-editable-control';
 
 export const privateApis = {};
@@ -24,4 +26,6 @@ lock( privateApis, {
 	ValidatedInputControl,
 	ValidatedContentEditableControl,
 	ValidatedTextareaControl,
+	colorEditingKey,
+	isColorEditingEnabled,
 } );

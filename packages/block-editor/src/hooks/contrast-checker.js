@@ -1,10 +1,17 @@
-import { useEffect, useLayoutEffect, useReducer } from '@wordpress/element';
+import {
+	useEffect,
+	useLayoutEffect,
+	useReducer,
+	useRef,
+} from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { getBlockSelector } from '@wordpress/global-styles-engine';
 import { speak } from '@wordpress/a11y';
 import { getContrastWarning } from '../components/contrast-checker';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
+import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
 
 function getComputedValue( node, property ) {
 	return node.ownerDocument.defaultView
@@ -111,6 +118,15 @@ export default function useBlockColorContrastWarning( {
 		[ name, enabled ]
 	);
 
+	// Injected style overrides (palette previews, etc.) change colors without DOM mutations,
+	// so also watch `getStyleOverrides` to re-render contrast checks.
+	useSelect(
+		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
+		[]
+	);
+
+	const rafHandlesRef = useRef( [] );
+
 	// There are so many things that can change the color of a block
 	// So we perform this check on every render.
 	useLayoutEffect( () => {
@@ -118,13 +134,22 @@ export default function useBlockColorContrastWarning( {
 			return;
 		}
 
-		// Combine `useLayoutEffect` and two rAF calls to ensure that values are read
-		// after the current paint but before the next paint.
-		window.requestAnimationFrame( () =>
-			window.requestAnimationFrame( () =>
+		// Combine `useLayoutEffect` and two rAF calls to ensure that values
+		// are read after the current paint but before the next paint.
+		const outer = window.requestAnimationFrame( () => {
+			const inner = window.requestAnimationFrame( () =>
 				setColors( getBlockElementColors( blockEl, blockType ) )
-			)
-		);
+			);
+			rafHandlesRef.current.push( inner );
+		} );
+		rafHandlesRef.current.push( outer );
+
+		return () => {
+			rafHandlesRef.current.forEach( ( handle ) =>
+				window.cancelAnimationFrame( handle )
+			);
+			rafHandlesRef.current = [];
+		};
 	} );
 
 	// Runs in its own effect with dependencies so the observer is only

@@ -8,6 +8,7 @@ import {
 	useGradientsPerOrigin,
 	useColorGradientSettings,
 } from './hooks';
+import useColorEditing from './use-color-editing';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import {
@@ -156,6 +157,8 @@ export default function ColorPanel( {
 		decodeValue,
 		encodeGradientValue,
 	} = useColorGradientSettings( settings );
+
+	const colorEditing = useColorEditing();
 
 	// When an inherited preset isn't in the panel's palette, `decodeValue`
 	// returns the raw `var:preset|…` token rather than a paintable colour.
@@ -560,6 +563,7 @@ export default function ColorPanel( {
 							disableCustomColors: ! areCustomSolidsEnabled,
 							gradients,
 							disableCustomGradients: ! areCustomGradientsEnabled,
+							colorEditing,
 						} }
 						panelId={ panelId }
 					/>
