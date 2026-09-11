@@ -344,6 +344,69 @@
 		opacity: 0.9;
 	}
 
+	// The caption lives in a scroll layer laid over the (fixed) enlarged image,
+	// rather than inside `.lightbox-image-container`, which clips and transforms
+	// its contents during the zoom animation. The image never moves: a short
+	// caption sits in the empty space below it, and a long caption scrolls up
+	// and covers the image (scroll back up to reveal it again).
+	.wp-lightbox-caption-scroll {
+		position: absolute;
+		inset: 0;
+		// Above the image (2000001), below the navigation/close chrome (>=2000002).
+		z-index: 2000001;
+		overflow-y: auto;
+		// Keeps the scroll from chaining to the page once the caption ends.
+		overscroll-behavior: contain;
+
+		&[hidden] {
+			display: none;
+		}
+	}
+
+	// Transparent spacer that pushes the caption panel down to the image's
+	// bottom edge. The image is centered, so its bottom is `50vh + height/2`;
+	// the enlarged image now reserves extra safe area on every side (see
+	// `setOverlayStyles()`), so a short caption sits in the space below the
+	// image without covering it. `--wp--lightbox-container-height` is published
+	// by `setOverlayStyles()` and recomputed on resize, so the caption stays
+	// anchored responsively.
+	.wp-lightbox-caption-spacer {
+		height: calc(50vh + var(--wp--lightbox-container-height, 0px) / 2);
+		cursor: zoom-out;
+	}
+
+	// Opaque panel painted with the overlay background, so a caption long enough
+	// to scroll fully covers the image as it moves up over it.
+	.wp-lightbox-caption-panel {
+		padding-block: 24px;
+		// Aligns the caption's left and right edges with the enlarged image
+		// above it. The image is centered and its width is published as
+		// `--wp--lightbox-container-width`, so its inset from each edge is half
+		// of the leftover space. Because that width is recomputed on resize,
+		// the caption follows the image at every breakpoint — the two are
+		// separate elements, so a fixed padding could only match at one size.
+		// The `max()` floor keeps a sane gutter in the brief moment before
+		// `setOverlayStyles()` publishes the variable.
+		padding-inline: max(16px, calc((100% - var(--wp--lightbox-container-width, 100%)) / 2));
+		cursor: default;
+	}
+
+	.wp-lightbox-caption {
+		margin: 0 auto;
+		// Inherit the theme's content width (theme.json
+		// `settings.layout.contentSize`), so theme developers control the
+		// caption measure with the same knob as post content. Capped at 90vw
+		// so it never overflows a narrow viewport. The fallback (used by
+		// classic themes and block themes that set no content size, where the
+		// variable is not emitted) keeps the measure readable.
+		max-width: min(90vw, var(--wp--style--global--content-size, 480px));
+
+		// Do not set `text-align` here. The element carries the
+		// `wp-element-caption` class, so caption alignment defined in
+		// `theme.json` (`styles.elements.caption`) — which targets
+		// `.wp-element-caption` — is inherited automatically.
+	}
+
 	// When fading, make the image come in slightly slower
 	// or faster than the scrim to give a sense of depth.
 	&.active {
