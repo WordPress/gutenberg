@@ -261,8 +261,8 @@ function HiddenResultCount() {
 }
 
 /**
- * Loads the item list asynchronously. Keep `Status` mounted. It shows
- * loading, then a visually hidden result count. Use `Empty` for no results.
+ * Loads the item list asynchronously. `Status` shows loading, then a
+ * visually hidden result count. Use `Empty` for no results.
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {

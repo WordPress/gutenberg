@@ -207,10 +207,9 @@ function HiddenResultCount() {
 }
 
 /**
- * Loads the item list asynchronously. Keep `statusContent` on the live
- * region. It shows loading, then a visually hidden result count. Pass
- * `emptyContent={ null }` while loading so Empty does not claim there are
- * no results.
+ * Loads the item list asynchronously. `statusContent` shows loading, then
+ * a visually hidden result count. Pass `emptyContent={ null }` while
+ * loading so Empty does not claim there are no results.
  */
 export const AsyncItems: Story = {
 	args: {
