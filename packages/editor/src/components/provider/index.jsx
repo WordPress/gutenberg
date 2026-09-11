@@ -393,16 +393,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			// mode when this editor stays mounted but loses the prop, as when going
 			// from Home to Navigation: both show the front page in the same editor.
 			updateEditorSettings( { ...settings, renderingMode } );
-		}, [ settings, renderingMode, updateEditorSettings ] );
 
-		// Clear the mode when this editor goes away, so whatever mounts in its
-		// place without a mode of its own, such as the style book on `/styles`,
-		// does not inherit it. Kept out of the sync above, which re-runs on
-		// every settings change: on the styles route, with every edit.
-		useLayoutEffect(
-			() => () => updateEditorSettings( { renderingMode: undefined } ),
-			[ updateEditorSettings ]
-		);
+			return () => updateEditorSettings( { renderingMode: undefined } );
+		}, [ settings, renderingMode, updateEditorSettings ] );
 
 		// Synchronizes the active template with the state.
 		useEffect( () => {
