@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### New Features
+
+-   `WidgetModuleRecord.attributes`: a record carries the attribute schema
+    `widget.json` declares, as `WidgetAttributeRecord[]`; `useWidgetTypes`
+    merges it by `id` over the module's entries, the record winning a shared
+    key and `isValid` merging rule by rule
+    ([#82485](https://github.com/WordPress/gutenberg/pull/82485)).
+
+## 0.7.0 (2026-09-10)
+
 ### Documentation
 
 -   `WidgetHostLinks.match`: the in-app route it returns carries the

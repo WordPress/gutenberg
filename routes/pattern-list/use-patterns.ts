@@ -51,6 +51,8 @@ interface UserPattern {
 	content: { raw: string; rendered?: string };
 	excerpt?: { raw: string; rendered?: string };
 	description?: string;
+	modified?: string;
+	meta?: Record< string, any >;
 	wp_pattern_sync_status?: string;
 	wp_pattern_category?: number[];
 	blocks?: any[];
@@ -59,6 +61,10 @@ interface UserPattern {
 /**
  * Unified pattern type after normalization.
  * All patterns have these properties after going through normalizers.
+ *
+ * User patterns also keep the properties of the underlying `wp_block` record
+ * (`excerpt`, `modified`, `meta`, `wp_pattern_sync_status`, and so on), so
+ * the canonical `wp_block` fields registered by the editor can read them.
  */
 export interface NormalizedPattern {
 	// Required properties (normalized for both user and theme patterns)
@@ -71,6 +77,12 @@ export interface NormalizedPattern {
 	categories: string[];
 	syncStatus: string;
 	blocks?: any[];
+	// Raw `wp_block` record properties (user patterns only)
+	excerpt?: { raw: string; rendered?: string };
+	modified?: string;
+	meta?: Record< string, any >;
+	wp_pattern_sync_status?: string;
+	wp_pattern_category?: number[];
 	// Internal property for permissions lookup (user patterns only)
 	_recordId?: number;
 }
@@ -134,6 +146,9 @@ function normalizeUserPattern(
 
 	const numericId = pattern.id;
 	return {
+		// Keep the raw record properties so the canonical `wp_block` fields
+		// (sync status, description, last edited...) work on the normalized item.
+		...pattern,
 		id: pattern.name || pattern.id.toString(),
 		_recordId: numericId, // Keep numeric ID for permissions lookup
 		keywords: [],
