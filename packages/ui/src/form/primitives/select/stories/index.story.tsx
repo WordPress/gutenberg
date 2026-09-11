@@ -277,7 +277,7 @@ export const WithLongList: Story = {
 			<Select.Popup key="popup">
 				{ longListItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
 					</Select.Item>
 				) ) }
 			</Select.Popup>,
