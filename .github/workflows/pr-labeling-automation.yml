@@ -3,6 +3,13 @@ on:
     pull_request_target:
         types: [opened, synchronize]
 
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ contains( fromJSON( '["pull_request_target"]' ), github.event_name ) && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
 permissions: {}
