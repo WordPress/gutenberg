@@ -46,13 +46,16 @@
 		"resolveJsonModule": true,
 
 		/*
-		 * `../typings` is this workspace's own, so every ambient declaration
-		 * the repo relies on lives beside this config. `@types` packages
-		 * still anchor at the repo root, where the install hoists them; that
-		 * entry becomes `${configDir}/node_modules/@types` once the repo
-		 * switches to a linked install layout (see #75814).
+		 * `../typings` is this workspace's own. `@types` packages sit wherever
+		 * the install puts them, so both spellings are listed and TypeScript
+		 * skips whichever is absent: the workspace itself when linked (see
+		 * #75814), the repo root when hoisted.
 		 */
-		"typeRoots": [ "../typings", "../../../node_modules/@types" ],
+		"typeRoots": [
+			"../typings",
+			"${configDir}/node_modules/@types",
+			"../../../node_modules/@types"
+		],
 		"types": [],
 
 		"rootDir": "${configDir}/src",
