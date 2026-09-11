@@ -65,7 +65,7 @@ jobs:
                   check-latest: true
                   cache: npm
 
-            - uses: preactjs/compressed-size-action@f322c295dde06a1cb7ccaef105732dd8a726d1d9 # v2.10.0
+            - uses: preactjs/compressed-size-action@f322c295dde06a1cb7ccaef105732dd8a726d1d9 # 2.10.0
               id: size
               with:
                   omit-unchanged: true
