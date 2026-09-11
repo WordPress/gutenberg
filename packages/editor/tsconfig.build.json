@@ -2,11 +2,12 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"types": [ "style-imports", "react-css-custom-properties" ],
+		"types": [ "style-imports", "react-css-custom-properties", "gutenberg-env" ],
 		"checkJs": false
 	},
 	"references": [
 		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../annotations/tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../block-editor/tsconfig.build.json" },

@@ -3096,6 +3096,12 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "Suggestions Architecture",
+		"slug": "suggestions",
+		"markdown_source": "../docs/explanations/architecture/suggestions.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "User Interface",
 		"slug": "user-interface",
 		"markdown_source": "../docs/explanations/user-interface/README.md",

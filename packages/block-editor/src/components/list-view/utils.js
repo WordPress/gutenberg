@@ -29,6 +29,50 @@ export const getBlockPropertiesDescription = ( positionLabel, isLocked ) =>
 		.join( ' ' );
 
 /**
+ * Describe a block's pending structural suggestion for List View.
+ *
+ * A structural suggestion lives on the block as `metadata.suggestion` and, on
+ * the canvas, is conveyed entirely by colour and text-decoration: an outline
+ * for an insertion, a strikethrough for a removal, a tab for a move. None of
+ * that reaches List View, which is both the primary way to perceive
+ * *structural* change and a key non-visual navigation surface — so a row whose
+ * block is slated for removal has to carry the same information, in a form
+ * that survives having no sight of the canvas.
+ *
+ * The class names match the canvas treatment on purpose (see
+ * `block-list/content-suggestion.scss`), so the two surfaces stay in step.
+ * Unrecognized marker types return nothing rather than an invented class.
+ *
+ * @param {?Object} suggestion Value of the block's `metadata.suggestion`.
+ * @return {?{className: string, label: string}} Row class and the sentence
+ * appended to the row's accessible description, or undefined when the block
+ * carries no structural suggestion.
+ */
+export const getBlockSuggestionTreatment = ( suggestion ) => {
+	switch ( suggestion?.type ) {
+		case 'pending-insert':
+			return {
+				className: 'is-suggestion-pending-insert',
+				label: __( 'Suggested insertion.' ),
+			};
+		case 'pending-remove':
+			return {
+				className: 'is-suggestion-pending-remove',
+				label: __( 'Suggested removal.' ),
+			};
+		case 'pending-move':
+			return {
+				className: 'is-suggestion-pending-move',
+				// Matches the canvas wording: the block sits at the position it
+				// is proposed to move to, not the one it came from.
+				label: __( 'Suggested move destination.' ),
+			};
+		default:
+			return undefined;
+	}
+};
+
+/**
  * Returns true if the client ID occurs within the block selection or multi-selection,
  * or false otherwise.
  *
