@@ -1,6 +1,7 @@
 import { useEffect } from '@wordpress/element';
+import type { FullscreenModeProps } from './types';
 
-const FullscreenMode = ( { isActive } ) => {
+const FullscreenMode = ( { isActive }: FullscreenModeProps ) => {
 	useEffect( () => {
 		let isSticky = false;
 		// `is-fullscreen-mode` is set in PHP as a body class by Gutenberg, and this causes

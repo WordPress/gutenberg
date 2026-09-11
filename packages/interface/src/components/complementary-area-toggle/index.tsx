@@ -1,16 +1,18 @@
+import type { AriaRole } from 'react';
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { usePluginContext } from '@wordpress/plugins';
 import { store as interfaceStore } from '../../store';
+import type { ComplementaryAreaToggleProps } from './types';
 
 /**
  * Whether the role supports checked state.
  *
  * @see https://www.w3.org/TR/wai-aria-1.1/#aria-checked
- * @param {React.AriaRole} role Role.
- * @return {boolean} Whether the role supports checked state.
+ * @param role Role.
+ * @return Whether the role supports checked state.
  */
-function roleSupportsCheckedState( role ) {
+function roleSupportsCheckedState( role?: AriaRole ): boolean {
 	return [
 		'checkbox',
 		'option',
@@ -19,7 +21,7 @@ function roleSupportsCheckedState( role ) {
 		'menuitemcheckbox',
 		'menuitemradio',
 		'treeitem',
-	].includes( role );
+	].includes( role as string );
 }
 
 export default function ComplementaryAreaToggle( {
@@ -31,7 +33,7 @@ export default function ComplementaryAreaToggle( {
 	name,
 	shortcut,
 	...props
-} ) {
+}: ComplementaryAreaToggleProps ) {
 	const ComponentToUse = as;
 	const context = usePluginContext();
 	const icon = iconProp || context.icon;
