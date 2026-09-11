@@ -25,7 +25,7 @@ permissions: {}
 
 jobs:
     unit-js:
-        name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
+        name: JavaScript (Node.js 24) ${{ matrix.shard }}
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
@@ -35,12 +35,7 @@ jobs:
             fail-fast: false
             matrix:
                 event: ['${{ github.event_name }}']
-                node: ['24', '26']
                 shard: ['1/4', '2/4', '3/4', '4/4']
-                exclude:
-                    # Only test Node 24 for pull requests.
-                    - event: 'pull_request'
-                      node: '26'
 
         steps:
             - name: Checkout repository
@@ -51,8 +46,6 @@ jobs:
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
-              with:
-                  node-version: ${{ matrix.node }}
 
             - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
@@ -63,10 +56,6 @@ jobs:
             - name: Running the tests
               env:
                   SHARD: ${{ matrix.shard }}
-                  # Record the Node.js major as a custom flakiness environment
-                  # dimension so flakiness.io keeps a separate history per Node
-                  # version in the matrix.
-                  FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
                   npm run test:unit -- \
                     --ci \
@@ -75,7 +64,7 @@ jobs:
                     --cacheDirectory="$HOME/.jest-cache"
 
     unit-js-date:
-        name: JavaScript Date Tests (Node.js ${{ matrix.node }})
+        name: JavaScript Date Tests (Node.js 24)
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
@@ -85,11 +74,6 @@ jobs:
             fail-fast: false
             matrix:
                 event: ['${{ github.event_name }}']
-                node: ['24', '26']
-                exclude:
-                    # On PRs: Only test Node 24
-                    - event: 'pull_request'
-                      node: '26'
 
         steps:
             - name: Checkout repository
@@ -100,8 +84,6 @@ jobs:
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
-              with:
-                  node-version: ${{ matrix.node }}
 
             - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
@@ -110,11 +92,6 @@ jobs:
               run: npx lerna run build
 
             - name: Run the date tests
-              env:
-                  # Record the Node.js major as a custom flakiness environment
-                  # dimension so flakiness.io keeps a separate history per Node
-                  # version in the matrix.
-                  FK_ENV_NODEJS: ${{ matrix.node }}
               run: npm run test:unit:date -- --ci --maxWorkers="$(nproc)" --cacheDirectory="$HOME/.jest-cache"
 
     compute-previous-wordpress-version:

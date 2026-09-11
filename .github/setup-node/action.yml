@@ -13,7 +13,6 @@ runs:
           with:
               node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
-              check-latest: true
               cache: npm
 
         - name: Get Node.js and npm version

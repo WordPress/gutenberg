@@ -80,7 +80,6 @@ jobs:
               with:
                   node-version-file: 'cli/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
-                  check-latest: true
 
             # Keep the release CLI and publish checkout on one runtime;
             # active wp release branches must stay compatible with the trunk release CLI.
@@ -90,7 +89,6 @@ jobs:
               with:
                   node-version-file: 'publish/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
-                  check-latest: true
 
             - name: Publish development packages to npm ("next" dist-tag)
               if: ${{ github.event.inputs.release_type == 'development' }}
