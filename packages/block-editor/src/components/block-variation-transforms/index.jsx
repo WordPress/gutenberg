@@ -75,7 +75,7 @@ function VariationsDropdown( {
 					}
 				>
 					<Menu.RadioGroup
-						value={ selectedValue }
+						value={ selectedValue ?? null }
 						onValueChange={ onSelectVariation }
 					>
 						{ variations.map( ( variation ) => (

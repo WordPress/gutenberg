@@ -1,14 +1,19 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useDispatch, useSelect } from '@wordpress/data';
 import BlockVariationTransforms from '../';
 
-jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
-	useDispatch: jest.fn(),
-} ) );
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+globalThis.wpVitest.mockPointerEvent();
+globalThis.wpVitest.mockScrollIntoView();
 
-const updateBlockAttributes = jest.fn();
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useDispatch: vi.fn(),
+	useSelect: vi.fn(),
+} ) );
+
+const updateBlockAttributes = vi.fn();
 const variations = [
 	{
 		name: 'plain',
@@ -41,11 +46,11 @@ describe( 'BlockVariationTransforms', () => {
 		const user = userEvent.setup();
 		render( <BlockVariationTransforms blockClientId="client-id" /> );
 
-		fireEvent.click(
+		await user.click(
 			screen.getByRole( 'button', { name: 'Transform to variation' } )
 		);
 
-		const plainVariation = screen.getByRole( 'menuitemradio', {
+		const plainVariation = await screen.findByRole( 'menuitemradio', {
 			name: 'Plain',
 		} );
 		expect( plainVariation ).toBeChecked();
@@ -65,5 +70,38 @@ describe( 'BlockVariationTransforms', () => {
 			className: 'is-style-decorated',
 		} );
 		expect( decoratedVariation ).toBeVisible();
+	} );
+
+	it( 'reflects a variation that becomes active after the first render', async () => {
+		const user = userEvent.setup();
+		useSelect.mockReturnValue( {
+			activeBlockVariation: undefined,
+			variations,
+			canEdit: true,
+			isContentOnly: false,
+			isSection: false,
+		} );
+		const { rerender } = render(
+			<BlockVariationTransforms blockClientId="client-id" />
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Transform to variation' } )
+		);
+		const plainVariation = await screen.findByRole( 'menuitemradio', {
+			name: 'Plain',
+		} );
+		expect( plainVariation ).not.toBeChecked();
+
+		useSelect.mockReturnValue( {
+			activeBlockVariation: variations[ 0 ],
+			variations,
+			canEdit: true,
+			isContentOnly: false,
+			isSection: false,
+		} );
+		rerender( <BlockVariationTransforms blockClientId="client-id" /> );
+
+		await waitFor( () => expect( plainVariation ).toBeChecked() );
 	} );
 } );

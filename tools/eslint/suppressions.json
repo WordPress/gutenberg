@@ -199,6 +199,11 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/block-bindings/test/attribute-control.jsdom.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/components/block-breadcrumb/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -760,6 +765,11 @@
 		}
 	},
 	"packages/block-editor/src/components/block-variation-transforms/index.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-variation-transforms/test/index.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

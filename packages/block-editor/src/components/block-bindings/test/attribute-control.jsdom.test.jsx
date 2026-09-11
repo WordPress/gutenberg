@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import { useViewportMatch } from '@wordpress/compose';
@@ -6,19 +7,31 @@ import { useSelect } from '@wordpress/data';
 import BlockBindingsAttributeControl from '../attribute-control';
 import useBlockBindingsUtils from '../use-block-bindings-utils';
 
-jest.mock( '@wordpress/blocks', () => ( {
-	...jest.requireActual( '@wordpress/blocks' ),
-	getBlockBindingsSource: jest.fn(),
+globalThis.wpVitest.mockMatchMedia();
+globalThis.wpVitest.mockPointerEvent();
+globalThis.wpVitest.mockScrollIntoView();
+
+vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	getBlockBindingsSource: vi.fn(),
 } ) );
-jest.mock( '@wordpress/components', () => ( {
-	...jest.requireActual( '@wordpress/components' ),
+vi.mock( import( '@wordpress/components' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
 	__experimentalToolsPanelItem: ( { children } ) => children,
 } ) );
-jest.mock( '@wordpress/compose/src/hooks/use-viewport-match', () => jest.fn() );
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-jest.mock( '../use-block-bindings-utils', () => jest.fn() );
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useViewportMatch: vi.fn(),
+} ) );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
+vi.mock( import( '../use-block-bindings-utils' ), () => ( {
+	default: vi.fn(),
+} ) );
 
-const updateBlockBindings = jest.fn();
+const updateBlockBindings = vi.fn();
 const field = {
 	args: { key: 'seo_title' },
 	key: 'seo_title',
@@ -26,7 +39,7 @@ const field = {
 	type: 'string',
 };
 const source = {
-	getValues: jest.fn(),
+	getValues: vi.fn(),
 	label: 'Post meta',
 };
 
@@ -53,15 +66,18 @@ function renderControl( binding ) {
 	);
 }
 
-async function openFieldMenu() {
-	fireEvent.click( screen.getByRole( 'button', { name: /content/i } ) );
+async function openFieldMenu( user ) {
+	await user.click( screen.getByRole( 'button', { name: /content/i } ) );
 	const sourceItem = await screen.findByRole( 'menuitem', {
 		name: 'Post meta',
 	} );
-	fireEvent.click( sourceItem );
-	return screen.findByRole( 'menuitemcheckbox', {
+	await user.click( sourceItem );
+	const fieldItem = await screen.findByRole( 'menuitemcheckbox', {
 		name: 'A deliberately long SEO title field',
 	} );
+	await user.keyboard( '{ArrowRight}' );
+	await waitFor( () => expect( fieldItem ).toHaveFocus() );
+	return fieldItem;
 }
 
 describe( 'BlockBindingsAttributeControl', () => {
@@ -73,13 +89,14 @@ describe( 'BlockBindingsAttributeControl', () => {
 		const user = userEvent.setup();
 		renderControl();
 
-		const fieldItem = await openFieldMenu();
+		const fieldItem = await openFieldMenu( user );
 		expect( fieldItem ).not.toBeChecked();
 		expect( fieldItem ).toHaveAccessibleDescription(
 			'A value supplied by post meta'
 		);
 
-		await user.click( fieldItem );
+		expect( fieldItem ).toHaveFocus();
+		await user.keyboard( '{Enter}' );
 
 		expect( updateBlockBindings ).toHaveBeenCalledWith( {
 			content: {
@@ -97,10 +114,11 @@ describe( 'BlockBindingsAttributeControl', () => {
 			args: field.args,
 		} );
 
-		const fieldItem = await openFieldMenu();
+		const fieldItem = await openFieldMenu( user );
 		expect( fieldItem ).toBeChecked();
 
-		await user.click( fieldItem );
+		expect( fieldItem ).toHaveFocus();
+		await user.keyboard( '{Enter}' );
 
 		expect( updateBlockBindings ).toHaveBeenCalledWith( {
 			content: undefined,
