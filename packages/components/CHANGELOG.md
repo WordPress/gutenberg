@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   Deprecate `Badge` in the private APIs; use `Badge` from `@wordpress/ui` instead. ([#82379](https://github.com/WordPress/gutenberg/pull/82379)).
+
 ### Enhancements
 
 -   `CheckboxControl`: Match the `@wordpress/ui` checkmark size and disabled fill ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).

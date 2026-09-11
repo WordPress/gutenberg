@@ -4,6 +4,8 @@
 
 🔒 This component is locked as a [private API](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-private-apis/). We do not yet recommend using this outside of the Gutenberg project.
 
+<p class="callout callout-alert">This component is deprecated. Please use `Badge` from the `@wordpress/ui` package instead.</p>
+
 <p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-badge--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
 
 ## Props

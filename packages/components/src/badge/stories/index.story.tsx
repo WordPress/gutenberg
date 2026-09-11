@@ -1,16 +1,20 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import Badge from '..';
 
+/**
+ * This component is deprecated. Please use `Badge` from the `@wordpress/ui`
+ * package instead.
+ */
 const meta: Meta< typeof Badge > = {
 	component: Badge,
-	title: 'Components/Containers/Badge',
+	title: 'Components/Deprecated/Badge',
 	id: 'components-badge',
 	tags: [ 'status-private' ],
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by [`Badge`](?path=/docs/design-system-components-badge--docs) in `@wordpress/ui`, but continue using for now.',
+			notes: 'Deprecated. Use [`Badge`](?path=/docs/design-system-components-badge--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };
