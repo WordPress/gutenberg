@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Select.Item`, `SelectControl.Item`: Children must start with `ItemLabel`, followed by zero or more `ItemDescription` components. Pass `ItemLabel` instead of a string. For `SelectControl` `items`, set `label` and optional `description` on each item. ([#82369](https://github.com/WordPress/gutenberg/pull/82369))
+
 ### Enhancements
 
+-   `Select`, `SelectControl`: Add `ItemLabel` and `ItemDescription` subcomponents. Multiple descriptions contribute to `aria-describedby` in DOM order. `SelectControl` `items` may include an optional `description` string. ([#82369](https://github.com/WordPress/gutenberg/pull/82369))
 -   `Checkbox`: Enlarge the hit target to 24px without changing the visual size. ([#82597](https://github.com/WordPress/gutenberg/pull/82597))
 
 ### Internal

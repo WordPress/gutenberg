@@ -49,7 +49,14 @@ export const SelectControl = forwardRef<
 									label={ item.label }
 									disabled={ item.disabled }
 								>
-									{ item.label }
+									<Select.ItemLabel>
+										{ item.label }
+									</Select.ItemLabel>
+									{ item.description ? (
+										<Select.ItemDescription>
+											{ item.description }
+										</Select.ItemDescription>
+									) : null }
 								</Item>
 						  ) ) }
 				</Select.Popup>

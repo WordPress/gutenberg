@@ -3,7 +3,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useId, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Use the portal-based popup to avoid inspector clipping.
 import { SelectControl } from '@wordpress/ui';
 import { useSettings } from '../components/use-settings';
@@ -15,25 +15,22 @@ import { store as blockEditorStore } from '../store';
 const POSITION_SUPPORT_KEY = 'position';
 
 const DEFAULT_OPTION = {
-	key: 'default',
 	value: '',
 	label: __( 'Default' ),
 };
 
 const STICKY_OPTION = {
-	key: 'sticky',
 	value: 'sticky',
 	label: _x( 'Sticky', 'Name for the value of the CSS position property' ),
-	hint: __(
+	description: __(
 		'The block will stick to the top of the window instead of scrolling.'
 	),
 };
 
 const FIXED_OPTION = {
-	key: 'fixed',
 	value: 'fixed',
 	label: _x( 'Fixed', 'Name for the value of the CSS position property' ),
-	hint: __( 'The block will not move when the page is scrolled.' ),
+	description: __( 'The block will not move when the page is scrolled.' ),
 };
 
 const POSITION_SIDES = [ 'top', 'right', 'bottom', 'left' ];
@@ -252,7 +249,6 @@ export function PositionPanelPure( {
 	const selectedOption = value
 		? options.find( ( option ) => option.value === value ) || DEFAULT_OPTION
 		: DEFAULT_OPTION;
-	const hintIdPrefix = useId();
 
 	// Only display position controls if there is at least one option to choose from.
 	return options.length > 1 ? (
@@ -267,33 +263,7 @@ export function PositionPanelPure( {
 				onValueChange={ ( selectedItem ) => {
 					onChangeType( selectedItem.value );
 				} }
-			>
-				{ options.map( ( option ) => {
-					const hintId = option.hint
-						? `${ hintIdPrefix }-${ option.key }`
-						: undefined;
-
-					return (
-						<SelectControl.Item
-							key={ option.key }
-							value={ option }
-							label={ option.label }
-							aria-describedby={ hintId }
-						>
-							<div>{ option.label }</div>
-							{ option.hint && (
-								<div
-									id={ hintId }
-									className="block-editor-hooks__position-control-item-hint"
-									aria-hidden="true"
-								>
-									{ option.hint }
-								</div>
-							) }
-						</SelectControl.Item>
-					);
-				} ) }
-			</SelectControl>
+			/>
 		</InspectorControls>
 	) : null;
 }

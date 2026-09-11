@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef } from '@wordpress/element';
-import type { ReactNode } from 'react';
+import { createRef, useId } from '@wordpress/element';
+import type { ComponentType, ReactNode } from 'react';
 import * as Select from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../../../utils/use-enable-wp-compat-overlay-slot';
 
@@ -25,7 +25,9 @@ describe( 'Select', () => {
 				<Select.Popup>
 					{ users.map( ( option ) => (
 						<Select.Item key={ option.value } value={ option }>
-							{ option.label }
+							<Select.ItemLabel>
+								{ option.label }
+							</Select.ItemLabel>
 						</Select.Item>
 					) ) }
 				</Select.Popup>
@@ -61,7 +63,9 @@ describe( 'Select', () => {
 				<Select.Popup>
 					{ users.map( ( option ) => (
 						<Select.Item key={ option.value } value={ option }>
-							{ option.label }
+							<Select.ItemLabel>
+								{ option.label }
+							</Select.ItemLabel>
 						</Select.Item>
 					) ) }
 				</Select.Popup>
@@ -76,7 +80,9 @@ describe( 'Select', () => {
 			<Select.Root>
 				<Select.Trigger />
 				<Select.Popup>
-					<Select.Item value="Item 1" />
+					<Select.Item value="Item 1">
+						<Select.ItemLabel>Item 1</Select.ItemLabel>
+					</Select.Item>
 				</Select.Popup>
 			</Select.Root>
 		);
@@ -89,7 +95,9 @@ describe( 'Select', () => {
 			<Select.Root>
 				<Select.Trigger placeholder="Choose an item" />
 				<Select.Popup>
-					<Select.Item value="Item 1" />
+					<Select.Item value="Item 1">
+						<Select.ItemLabel>Item 1</Select.ItemLabel>
+					</Select.Item>
 				</Select.Popup>
 			</Select.Root>
 		);
@@ -110,9 +118,11 @@ describe( 'Select', () => {
 				<Select.Trigger ref={ triggerRef } />
 				<Select.Popup ref={ popupRef }>
 					<Select.Item ref={ itemRef } value="Item 1">
-						Item 1
+						<Select.ItemLabel>Item 1</Select.ItemLabel>
 					</Select.Item>
-					<Select.Item value="Item 2">Item 2</Select.Item>
+					<Select.Item value="Item 2">
+						<Select.ItemLabel>Item 2</Select.ItemLabel>
+					</Select.Item>
 				</Select.Popup>
 			</Select.Root>
 		);
@@ -146,7 +156,9 @@ describe( 'Select', () => {
 								<Select.Portal container={ containerRef } />
 							}
 						>
-							<Select.Item value="Item 1">Item 1</Select.Item>
+							<Select.Item value="Item 1">
+								<Select.ItemLabel>Item 1</Select.ItemLabel>
+							</Select.Item>
 						</Select.Popup>
 					</Select.Root>
 				</div>
@@ -172,7 +184,9 @@ describe( 'Select', () => {
 					<Select.Root>
 						<Select.Trigger />
 						<Select.Popup>
-							<Select.Item value="Item 1">Item 1</Select.Item>
+							<Select.Item value="Item 1">
+								<Select.ItemLabel>Item 1</Select.ItemLabel>
+							</Select.Item>
 						</Select.Popup>
 					</Select.Root>
 				</div>
@@ -203,7 +217,9 @@ describe( 'Select', () => {
 							<Select.Positioner data-testid="custom-positioner" />
 						}
 					>
-						<Select.Item value="Item 1">Item 1</Select.Item>
+						<Select.Item value="Item 1">
+							<Select.ItemLabel>Item 1</Select.ItemLabel>
+						</Select.Item>
 					</Select.Popup>
 				</Select.Root>
 			);
@@ -247,7 +263,9 @@ describe( 'Select', () => {
 					<Select.Root>
 						<Select.Trigger />
 						<Select.Popup>
-							<Select.Item value="Item 1">Item 1</Select.Item>
+							<Select.Item value="Item 1">
+								<Select.ItemLabel>Item 1</Select.ItemLabel>
+							</Select.Item>
 						</Select.Popup>
 					</Select.Root>
 				</WithSlotEnabled>
@@ -272,7 +290,9 @@ describe( 'Select', () => {
 				<Select.Root>
 					<Select.Trigger />
 					<Select.Popup>
-						<Select.Item value="Item 1">Item 1</Select.Item>
+						<Select.Item value="Item 1">
+							<Select.ItemLabel>Item 1</Select.ItemLabel>
+						</Select.Item>
 					</Select.Popup>
 				</Select.Root>
 			);
@@ -304,7 +324,9 @@ describe( 'Select', () => {
 								<Select.Portal container={ containerRef } />
 							}
 						>
-							<Select.Item value="Item 1">Item 1</Select.Item>
+							<Select.Item value="Item 1">
+								<Select.ItemLabel>Item 1</Select.ItemLabel>
+							</Select.Item>
 						</Select.Popup>
 					</Select.Root>
 				</WithSlotEnabled>
@@ -372,7 +394,9 @@ describe( 'Select', () => {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<Select.ItemLabel>
+											{ item.label }
+										</Select.ItemLabel>
 									</Select.Item>
 								) ) }
 							</Select.Group>
@@ -386,5 +410,168 @@ describe( 'Select', () => {
 			expect( groupRef.current ).toBeInstanceOf( HTMLDivElement );
 			expect( groupLabelRef.current ).toBeInstanceOf( HTMLDivElement );
 		} );
+	} );
+
+	it( 'supports custom rendering for item labels and descriptions', async () => {
+		const user = userEvent.setup();
+		const items = [ { value: 'apple', label: 'Apple' } ];
+
+		render(
+			<Select.Root items={ items }>
+				<Select.Trigger />
+				<Select.Popup>
+					<Select.Item value={ items[ 0 ] }>
+						<Select.ItemLabel render={ <h2 /> }>
+							Apple
+						</Select.ItemLabel>
+						<Select.ItemDescription render={ <h3 /> }>
+							99 in stock
+						</Select.ItemDescription>
+					</Select.Item>
+				</Select.Popup>
+			</Select.Root>
+		);
+
+		await user.click( screen.getByRole( 'combobox' ) );
+
+		const item = await screen.findByRole( 'option', { name: 'Apple' } );
+
+		expect( screen.getByText( 'Apple' ).tagName ).toBe( 'H2' );
+		expect( screen.getByText( '99 in stock' ).tagName ).toBe( 'H3' );
+
+		await user.click( item );
+
+		expect( screen.getByRole( 'combobox' ) ).toHaveTextContent( 'Apple' );
+		expect( screen.getByRole( 'combobox' ) ).not.toHaveTextContent(
+			'99 in stock'
+		);
+	} );
+
+	it( 'keeps ItemDescription out of the trigger', async () => {
+		const user = userEvent.setup();
+		const items = [ { value: 'apple', label: 'Apple' } ];
+
+		render(
+			<Select.Root items={ items } defaultValue={ items[ 0 ] }>
+				<Select.Trigger />
+				<Select.Popup>
+					<Select.Item value={ items[ 0 ] }>
+						<Select.ItemLabel>Apple</Select.ItemLabel>
+						<Select.ItemDescription>
+							99 in stock
+						</Select.ItemDescription>
+					</Select.Item>
+				</Select.Popup>
+			</Select.Root>
+		);
+
+		const trigger = screen.getByRole( 'combobox' );
+
+		expect( trigger ).toHaveTextContent( 'Apple' );
+		expect( trigger ).not.toHaveTextContent( '99 in stock' );
+
+		await user.click( trigger );
+		await user.click(
+			await screen.findByRole( 'option', { name: 'Apple' } )
+		);
+
+		expect( trigger ).toHaveTextContent( 'Apple' );
+		expect( trigger ).not.toHaveTextContent( '99 in stock' );
+	} );
+
+	it( 'uses item descriptions as accessible descriptions', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Select.Root>
+				<Select.Trigger />
+				<Select.Popup>
+					<Select.Item value="apple">
+						<Select.ItemLabel>Apple</Select.ItemLabel>
+						<Select.ItemDescription>
+							Create a <strong>separate</strong> copy.
+						</Select.ItemDescription>
+					</Select.Item>
+				</Select.Popup>
+			</Select.Root>
+		);
+
+		await user.click( screen.getByRole( 'combobox' ) );
+
+		const item = await screen.findByRole( 'option', { name: 'Apple' } );
+
+		expect( item ).toHaveAccessibleDescription( 'Create a separate copy.' );
+		expect( screen.getByText( 'separate' ).tagName ).toBe( 'STRONG' );
+	} );
+
+	it( 'combines multiple item descriptions in DOM order', async () => {
+		const user = userEvent.setup();
+
+		function SelectWithMultipleDescriptions() {
+			const externalDescriptionId = useId();
+			const firstDescriptionId = useId();
+
+			return (
+				<Select.Root>
+					<Select.Trigger />
+					<span id={ externalDescriptionId }>Available offline.</span>
+					<Select.Popup>
+						<Select.Item
+							value="save"
+							aria-describedby={ externalDescriptionId }
+						>
+							<Select.ItemLabel>Save</Select.ItemLabel>
+							<Select.ItemDescription id={ firstDescriptionId }>
+								Save to this device.
+							</Select.ItemDescription>
+							<Select.ItemDescription>
+								Keeps the current version.
+							</Select.ItemDescription>
+						</Select.Item>
+					</Select.Popup>
+				</Select.Root>
+			);
+		}
+
+		render( <SelectWithMultipleDescriptions /> );
+
+		await user.click( screen.getByRole( 'combobox' ) );
+
+		const item = await screen.findByRole( 'option', { name: 'Save' } );
+		const externalDescription = screen.getByText( 'Available offline.' );
+		const firstDescription = screen.getByText( 'Save to this device.' );
+		const secondDescription = screen.getByText(
+			'Keeps the current version.'
+		);
+
+		expect( item ).toHaveAccessibleDescription(
+			'Available offline. Save to this device. Keeps the current version.'
+		);
+		expect( firstDescription.id ).not.toBe( '' );
+		expect( secondDescription.id ).not.toBe( '' );
+		expect( secondDescription.id ).not.toBe( firstDescription.id );
+		expect( item ).toHaveAttribute(
+			'aria-describedby',
+			`${ externalDescription.id } ${ firstDescription.id } ${ secondDescription.id }`
+		);
+	} );
+
+	it( 'requires an ItemLabel as a direct child of every item', () => {
+		const InvalidItem = Select.Item as ComponentType< {
+			value: string;
+			children?: ReactNode;
+		} >;
+
+		expect( () =>
+			render(
+				<Select.Root defaultOpen>
+					<Select.Trigger />
+					<Select.Popup>
+						<InvalidItem value="duplicate">Duplicate</InvalidItem>
+					</Select.Popup>
+				</Select.Root>
+			)
+		).toThrow( 'Select.ItemLabel must be the first direct child' );
+		expect( console ).toHaveErrored();
 	} );
 } );

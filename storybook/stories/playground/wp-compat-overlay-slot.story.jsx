@@ -124,7 +124,9 @@ export const InsideComponentsModal = {
 											key={ item.value }
 											value={ item }
 										>
-											{ item.label }
+											<Select.ItemLabel>
+												{ item.label }
+											</Select.ItemLabel>
 										</Select.Item>
 									) ) }
 								</Select.Popup>
@@ -249,7 +251,9 @@ export const InsideComponentsPopover = {
 												key={ item.value }
 												value={ item }
 											>
-												{ item.label }
+												<Select.ItemLabel>
+													{ item.label }
+												</Select.ItemLabel>
 											</Select.Item>
 										) ) }
 									</Select.Popup>
