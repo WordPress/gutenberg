@@ -1,8 +1,9 @@
 # Dependency patches
 
-Sometimes there are problems with dependencies that can be solved by patching them. Gutenberg uses
-[`patch-package`](https://www.npmjs.com/package/patch-package) to patch npm dependencies when
-they're installed.
+Sometimes there are problems with dependencies that can be solved by patching them. Patches live in
+this directory and are applied on `postinstall` by
+[`tools/monorepo/patch`](../tools/monorepo/patch), which knows how to find packages
+in the `node_modules/.store/` layout the `linked` install strategy uses.
 
 Existing patches should be described and justified here.
 

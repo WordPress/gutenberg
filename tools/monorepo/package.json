@@ -1,0 +1,33 @@
+{
+	"name": "@wordpress/monorepo-tools",
+	"version": "0.0.0",
+	"description": "Tools for maintaining the Gutenberg monorepo.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"dependencies",
+		"patches"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/monorepo",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/monorepo"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"devDependencies": {
+		"vitest": "^5.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"apply-patches": "node ./patch/index.mjs apply",
+		"patch": "node ./patch/index.mjs"
+	}
+}
