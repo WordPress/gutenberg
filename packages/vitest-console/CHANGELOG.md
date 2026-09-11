@@ -2,4 +2,4 @@
 
 ## Unreleased
 
-Initial release.
+Initial release. ([#82765](https://github.com/WordPress/gutenberg/pull/82765))
