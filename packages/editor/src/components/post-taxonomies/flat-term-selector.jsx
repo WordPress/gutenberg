@@ -1,4 +1,4 @@
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import {
 	useCallback,
 	useEffect,
@@ -7,7 +7,12 @@ import {
 	useState,
 } from '@wordpress/element';
 import { withFilters } from '@wordpress/components';
-import { SearchableChipSelectControl, Stack } from '@wordpress/ui';
+import {
+	SearchableChipSelectControl,
+	Spinner,
+	Stack,
+	VisuallyHidden,
+} from '@wordpress/ui';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
@@ -386,9 +391,29 @@ export function FlatTermSelector( { slug } ) {
 				isItemEqualToValue={ isSameTerm }
 				inputValue={ inputValue }
 				onInputValueChange={ onInputValueChange }
-				emptyContent={
-					isSearching ? __( 'Searching…' ) : notFoundLabel
+				statusContent={
+					isSearching ? (
+						<Stack direction="row" gap="sm" align="center">
+							<Spinner />
+							{ __( 'Searching…' ) }
+						</Stack>
+					) : (
+						suggestions.length > 0 && (
+							<VisuallyHidden>
+								{ sprintf(
+									/* translators: %d: number of results. */
+									_n(
+										'%d result found.',
+										'%d results found.',
+										suggestions.length
+									),
+									suggestions.length
+								) }
+							</VisuallyHidden>
+						)
+					)
 				}
+				emptyContent={ isSearching ? null : notFoundLabel }
 				showClearButton={ false }
 				chipsContent={ ( selectedTerms ) =>
 					selectedTerms.map( ( term ) => (
