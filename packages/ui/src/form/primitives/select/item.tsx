@@ -2,6 +2,7 @@ import { Select as _Select } from '@base-ui/react/select';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { check } from '@wordpress/icons';
+import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
 import { Icon } from '../../../icon';
@@ -15,6 +16,7 @@ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
 		return (
 			<_Select.Item
 				className={ clsx(
+					defenseStyles.div,
 					resetStyles[ 'box-sizing' ],
 					itemPopupStyles.item,
 					size === 'small' && itemPopupStyles[ 'is-size-small' ],

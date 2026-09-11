@@ -16,6 +16,10 @@
 
 -   `Menu`: vertically center single-line item labels while preserving first-line alignment for wrapped content. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
 
+### Bug Fixes
+
+-   `Autocomplete`, `Combobox`, `Menu`, and `Select`: Restore the highlighted item indicator in forced-colors mode, which wp-admin's global CSS was suppressing. ([#82772](https://github.com/WordPress/gutenberg/pull/82772))
+
 ### Internal
 
 -   Run UI interaction tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).

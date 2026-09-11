@@ -147,8 +147,12 @@
 				color: var(--wpds-color-foreground-interactive-neutral);
 				outline: none; /* Disable user agent focus ring */
 
+				/*
+				 * Set the outline through the global CSS defense bridge, since
+				 * wp-admin's unlayered `div { outline: 0 }` beats layered styles.
+				 */
 				@media ( forced-colors: active ) {
-					outline: 1px solid Highlight;
+					--_gcd-div-outline: var(--wpds-border-width-xs) solid Highlight;
 				}
 			}
 
