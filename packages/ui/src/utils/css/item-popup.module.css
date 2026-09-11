@@ -48,6 +48,10 @@
 			}
 		}
 
+		.is-align-item-with-trigger .popup {
+			max-height: none;
+		}
+
 		/*
 		 * Slot and typography styles for a list in `.popup`'s `main` grid area.
 		 * Combobox and Autocomplete get this via `.list`. Select applies
