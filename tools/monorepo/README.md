@@ -1,8 +1,9 @@
-# Config Tools
+# Monorepo Tools
 
-Shared tooling configuration for the repo, published internally as
-`@wordpress/config-tools`. The workspace is private: it exists so the configs
-have one home and a stable name, not for use outside the monorepo.
+Tooling that exists only to maintain this monorepo, published internally as
+`@wordpress/monorepo-tools`. The workspace is private: it gives the shared
+configuration one home and a stable name, and nothing here is meant for use
+outside the repo.
 
 ## TypeScript
 
@@ -12,7 +13,7 @@ files that never emit declarations.
 
 ```json
 {
-	"extends": "@wordpress/config-tools/tsconfig/base.json"
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json"
 }
 ```
 
@@ -31,10 +32,11 @@ when editing them:
 ## Typings
 
 `typings/` holds the ambient type declarations the whole repo relies on: the
-`gutenberg-env` and `gutenberg-test-env` globals, the CSS and style-import
-module shims, and the stubs that stand in for packages that ship no types yet.
-They live here so `tsconfig/base.json` can point at them without walking out of
-the workspace.
+`gutenberg-env`, `gutenberg-test-env` and `gutenberg-vitest-test-env` globals,
+the CSS and style-import module shims, and the stubs that stand in for packages
+that ship no types yet. They live here so `tsconfig/base.json` can point at
+them without walking out of the workspace, which is why it needs a single type
+root rather than one per consumer.
 
 See the TypeScript section of [`packages/README.md`](../../packages/README.md)
 for how a package lays its projects out.

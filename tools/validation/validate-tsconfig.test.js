@@ -25,7 +25,7 @@ const validatorPath = fileURLToPath(
 const REQUIRED_BUILD_EXCLUDES = parse(
 	readFileSync(
 		fileURLToPath(
-			import.meta.resolve( '@wordpress/config-tools/tsconfig/base.json' )
+			import.meta.resolve( '@wordpress/monorepo-tools/tsconfig/base.json' )
 		),
 		'utf8'
 	)
@@ -343,7 +343,7 @@ test( 'fails when the root solution does not reference the build solution', () =
 const devOnlyPackage = {
 	tsconfigs: {
 		'tsconfig.json': {
-			extends: '@wordpress/config-tools/tsconfig/dev.base.json',
+			extends: '@wordpress/monorepo-tools/tsconfig/dev.base.json',
 			references: [],
 		},
 	},
@@ -463,7 +463,7 @@ function typedSplitPackage( buildTypes, devTypes ) {
 	return {
 		tsconfigs: {
 			'tsconfig.json': {
-				extends: '@wordpress/config-tools/tsconfig/dev.base.json',
+				extends: '@wordpress/monorepo-tools/tsconfig/dev.base.json',
 				compilerOptions: { types: devTypes },
 				references: [ './tsconfig.build.json' ],
 			},
@@ -527,7 +527,7 @@ test( 'checks the stories project of a package without a build project', () => {
 					tsconfigs: {
 						'tsconfig.json': {
 							extends:
-								'@wordpress/config-tools/tsconfig/dev.base.json',
+								'@wordpress/monorepo-tools/tsconfig/dev.base.json',
 							references: [],
 						},
 						'tsconfig.stories.json': [],
@@ -553,7 +553,7 @@ test( 'fails when a build project exclude omits a dev-file pattern of the base',
 					tsconfigs: {
 						'tsconfig.json': {
 							extends:
-								'@wordpress/config-tools/tsconfig/dev.base.json',
+								'@wordpress/monorepo-tools/tsconfig/dev.base.json',
 							references: [ './tsconfig.build.json' ],
 						},
 						'tsconfig.build.json': {
@@ -588,7 +588,7 @@ test( 'passes when a build project keeps every dev-file pattern of the base', ()
 					tsconfigs: {
 						'tsconfig.json': {
 							extends:
-								'@wordpress/config-tools/tsconfig/dev.base.json',
+								'@wordpress/monorepo-tools/tsconfig/dev.base.json',
 							references: [ './tsconfig.build.json' ],
 						},
 						'tsconfig.build.json': {

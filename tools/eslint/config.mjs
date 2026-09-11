@@ -1088,7 +1088,7 @@ export default dedupePlugins( [
 	// Override: typings — global type declarations require `var` and define
 	// the globals that wp-global-usage warns about.
 	{
-		files: [ 'tools/configs/typings/**/*.d.ts' ],
+		files: [ 'tools/monorepo/typings/**/*.d.ts' ],
 		rules: {
 			'no-var': 'off',
 			'@wordpress/wp-global-usage': 'off',

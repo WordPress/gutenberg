@@ -465,7 +465,7 @@ export const beforeAll = () => {};
 		copyFileSync(
 			path.resolve(
 				import.meta.dirname,
-				'../../typings/gutenberg-vitest-test-env/index.d.ts'
+				'../../../../tools/monorepo/typings/gutenberg-vitest-test-env/index.d.ts'
 			),
 			path.join( typingsDir, 'index.d.ts' )
 		);

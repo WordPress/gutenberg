@@ -70,7 +70,7 @@ const TEST_TYPES = new Set( [ 'jest', 'gutenberg-test-env' ] );
  * its own must keep every dev-file pattern the base config excludes.
  */
 const baseConfigPath = fileURLToPath(
-	import.meta.resolve( '@wordpress/config-tools/tsconfig/base.json' )
+	import.meta.resolve( '@wordpress/monorepo-tools/tsconfig/base.json' )
 );
 /*
  * The base config anchors its patterns with `${configDir}` so each project

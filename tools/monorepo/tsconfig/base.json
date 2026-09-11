@@ -46,17 +46,13 @@
 		"resolveJsonModule": true,
 
 		/*
-		 * `../typings` is this workspace's own. The other two still anchor at
-		 * the repo root: the vitest globals belong to `test/unit`, and
-		 * `@types` packages hoist to the root install. The `@types` entry
-		 * becomes `${configDir}/node_modules/@types` once the repo switches to
-		 * a linked install layout (see #75814).
+		 * `../typings` is this workspace's own, so every ambient declaration
+		 * the repo relies on lives beside this config. `@types` packages
+		 * still anchor at the repo root, where the install hoists them; that
+		 * entry becomes `${configDir}/node_modules/@types` once the repo
+		 * switches to a linked install layout (see #75814).
 		 */
-		"typeRoots": [
-			"../typings",
-			"../../../test/unit/typings",
-			"../../../node_modules/@types"
-		],
+		"typeRoots": [ "../typings", "../../../node_modules/@types" ],
 		"types": [],
 
 		"rootDir": "${configDir}/src",
