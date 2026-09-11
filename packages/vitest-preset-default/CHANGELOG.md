@@ -2,4 +2,4 @@
 
 ## Unreleased
 
-Initial release. ([#82765](https://github.com/WordPress/gutenberg/pull/82765))
+Initial release, with consumer-configured Emotion transforms. ([#82765](https://github.com/WordPress/gutenberg/pull/82765))

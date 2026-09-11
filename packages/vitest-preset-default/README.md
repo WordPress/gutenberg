@@ -1,6 +1,6 @@
 # Default Vitest Preset
 
-[Vitest 5](https://vitest.dev/) configuration for WordPress projects, with explicit imports, isolated tests, React and Emotion compilation, and console matchers.
+[Vitest 5](https://vitest.dev/) configuration for WordPress projects, with explicit imports, isolated tests, React compilation, and console matchers.
 
 ## Installation
 
@@ -42,7 +42,7 @@ Tests import APIs explicitly:
 import { expect, test, vi } from 'vitest';
 ```
 
-Vite compiles JavaScript and TypeScript. SWC compiles JSX and applies the Emotion plugin with local labels. Browser dependencies compile with `NODE_ENV=test` without adding a `process` global. Babel configuration is not used. Use `.jsx` or `.tsx` for JSX.
+Vite compiles JavaScript and TypeScript. SWC compiles JSX. Emotion transforms are consumer-configured; the preset does not install Emotion or its compiler plugin. Browser dependencies compile with `NODE_ENV=test` without adding a `process` global. Babel configuration is not used. Use `.jsx` or `.tsx` for JSX.
 
 The preset enables `SCRIPT_DEBUG` and supplies `tinyMCEPreInit` and `userSettings` in DOM environments. It installs [`@wordpress/vitest-console`](../vitest-console/README.md), resets mocks, restores spies and stubbed globals/environment variables, and restores real timers before each test. Test files remain isolated. Console assertions share per-test state, so tests that use them must not run concurrently within a file.
 
@@ -73,6 +73,39 @@ afterEach( cleanup );
 ```
 
 For Browser React tests, use `vitest-browser-react` and Browser Mode's `userEvent`. The browser renderer handles cleanup. Tests can use Vitest's native DOM assertions.
+
+### Emotion
+
+Projects using Emotion can install `@vitejs/plugin-react-swc@^4` and
+`@swc/plugin-emotion@^16` as development dependencies alongside their existing
+Emotion runtime. Configure the transform in `vitest.config.mjs`:
+
+```js
+import { createRequire } from 'node:module';
+import react from '@vitejs/plugin-react-swc';
+import wordpressConfig from '@wordpress/vitest-preset-default';
+
+const require = createRequire( import.meta.url );
+
+export default {
+	...wordpressConfig,
+	plugins: [
+		react( {
+			plugins: [
+				[
+					require.resolve( '@swc/plugin-emotion' ),
+					{ autoLabel: 'always', labelFormat: '[local]' },
+				],
+			],
+		} ),
+	],
+};
+```
+
+This replaces the preset's React plugin with the consumer's configured instance.
+Use `/** @jsxImportSource @emotion/react */` in files using Emotion's `css` prop.
+Projects can remove this configuration and its dependencies when they stop using
+Emotion. Plain React JSX needs no additional configuration.
 
 ## Migrating from Jest
 

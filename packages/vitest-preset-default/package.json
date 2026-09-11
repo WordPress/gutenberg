@@ -45,7 +45,6 @@
 	},
 	"types": "index.d.ts",
 	"dependencies": {
-		"@swc/plugin-emotion": "^16.0.0",
 		"@vitejs/plugin-react-swc": "^4.3.3",
 		"@vitest/browser-playwright": "^5.0.0",
 		"@wordpress/vitest-console": "file:../vitest-console",

@@ -1,11 +1,8 @@
-import { createRequire } from 'node:module';
 import react from '@vitejs/plugin-react-swc';
 import { playwright } from '@vitest/browser-playwright';
 import { configDefaults, defineConfig } from 'vitest/config';
 import { version as viteVersion } from 'vite';
 
-const require = createRequire( import.meta.url );
-const emotionPlugin = require.resolve( '@swc/plugin-emotion' );
 const usesRolldown = Number( viteVersion.split( '.' )[ 0 ] ) >= 8;
 // Compile browser dependencies against React's test runtime before tree shaking.
 // A top-level define would make Vitest install a process global in the browser.
@@ -33,19 +30,7 @@ export default defineConfig( {
 	...( usesRolldown
 		? { oxc: { jsx: { runtime: 'automatic' } } }
 		: { esbuild: { jsx: 'automatic' } } ),
-	plugins: [
-		react( {
-			plugins: [
-				[
-					emotionPlugin,
-					{
-						autoLabel: 'always',
-						labelFormat: '[local]',
-					},
-				],
-			],
-		} ),
-	],
+	plugins: [ react() ],
 	test: {
 		setupFiles: [ setupGlobals, setupTestFramework ],
 		projects: [

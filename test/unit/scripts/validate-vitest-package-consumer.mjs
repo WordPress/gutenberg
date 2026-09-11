@@ -37,7 +37,6 @@ const stagedPackages = path.join( tempDirectory, 'staged-packages' );
 const installedPackages = path.join( tempDirectory, 'node_modules' );
 const CONSUMER_DEPENDENCIES = [
 	'@babel/core',
-	'@emotion/react',
 	'@testing-library/dom',
 	'@testing-library/jest-dom',
 	'@testing-library/react',
@@ -182,6 +181,15 @@ function packPackage( packageName, workspaceVersions ) {
 }
 
 function getInstalledVersion( packageName ) {
+	// The React plugin exports its root entry, but not package.json.
+	if ( packageName === '@vitejs/plugin-react-swc' ) {
+		return readJson(
+			path.join(
+				path.dirname( require.resolve( packageName ) ),
+				'package.json'
+			)
+		).version;
+	}
 	return readJson( require.resolve( `${ packageName }/package.json` ) )
 		.version;
 }
@@ -267,6 +275,12 @@ function installPackedPackages( packedPackages ) {
 		assertIsolatedResolution( isolatedRequire, packageName );
 	}
 
+	for ( const packageName of [ '@emotion/react', '@swc/plugin-emotion' ] ) {
+		assert.throws( () => isolatedRequire.resolve( packageName ), {
+			code: 'MODULE_NOT_FOUND',
+		} );
+	}
+
 	// The staged source includes package self-tests which are intentionally not
 	// part of the published tarballs. Remove it before consumer test discovery.
 	rmSync( stagedPackages, { force: true, recursive: true } );
@@ -350,21 +364,18 @@ function createDefaultConsumer() {
 	);
 	writeFileSync(
 		path.join( fixture, 'default.test.tsx' ),
-		`import { css } from '@emotion/react';
-import { expect, test } from 'vitest';
+		`import { expect, test } from 'vitest';
 import builtStyles from '@wordpress/test-style-fixture';
 import styles from './styles.module.css';
 
 test( 'uses Node and native transforms by default', () => {
 \tconst count: number = 2;
-\tconst nodeStyle = css( { color: 'red' } );
-\tconst element = <button css={ nodeStyle }>Save { count }</button>;
+\tconst element = <button>Save { count }</button>;
 
 \texpect( typeof document ).toBe( 'undefined' );
 \texpect( styles.primaryAction ).toBe( 'style-primary-action' );
 \texpect( builtStyles.fixture ).toBeTruthy();
 \texpect( element.props.children ).toEqual( [ 'Save ', 2 ] );
-\texpect( nodeStyle.name ).toMatch( /nodeStyle/ );
 \texpect( globalThis.SCRIPT_DEBUG ).toBe( true );
 \tconsole.warn( 'expected warning' );
 \texpect( console ).toHaveWarnedWith( 'expected warning' );
@@ -425,20 +436,17 @@ test( 'uses real CSS and native browser values', async () => {
 	);
 
 	writeFileSync(
-		path.join( fixture, 'emotion.browser.test.jsx' ),
-		`/** @jsxImportSource @emotion/react */
-import { css } from '@emotion/react';
+		path.join( fixture, 'react.browser.test.jsx' ),
+		`
 import { render } from 'vitest-browser-react';
 import { expect, test } from 'vitest';
 import styles from './styles.module.css';
 
-test( 'renders JSX, Emotion and CSS modules in Chromium', async () => {
-	const buttonStyle = css( { color: 'rgb(11, 22, 33)' } );
-	const screen = await render( <button className={ styles.primaryAction } css={ buttonStyle }>Save</button> );
+test( 'renders JSX and CSS modules in Chromium', async () => {
+	const screen = await render( <button className={ styles.primaryAction }>Save</button> );
 	const button = screen.getByRole( 'button', { name: 'Save' } );
 	await expect.element( button ).toBeVisible();
 	expect( styles.primaryAction ).not.toBe( 'style-primary-action' );
-	expect( getComputedStyle( button.element() ).color ).toBe( 'rgb(11, 22, 33)' );
 	expect( button.element().getBoundingClientRect().width ).toBe( 127 );
 } );`
 	);
@@ -483,6 +491,96 @@ test( 'reports unasserted teardown output', () => {} );`
 		/console\.error\(\) should not be used unless explicitly expected/
 	);
 	return fixture;
+}
+
+function createEmotionConsumer() {
+	const fixture = tempDirectory;
+	run(
+		process.execPath,
+		[
+			process.env.npm_execpath,
+			'install',
+			'--ignore-scripts',
+			'--no-audit',
+			'--no-fund',
+			'--package-lock=false',
+			...[
+				'@emotion/react',
+				'@swc/plugin-emotion',
+				'@vitejs/plugin-react-swc',
+			].map( ( name ) => `${ name }@${ getConsumerSpecifier( name ) }` ),
+		],
+		{ cwd: fixture }
+	);
+	// npm prunes the generated fixture when the consumer installs Emotion.
+	createBuiltStylePackage();
+	// Start with a fresh dependency graph after adding the optional transform.
+	rmSync( path.join( installedPackages, '.vite' ), {
+		recursive: true,
+		force: true,
+	} );
+	writeFileSync(
+		path.join( fixture, 'vitest-emotion.config.mjs' ),
+		`import { createRequire } from 'node:module';
+import react from '@vitejs/plugin-react-swc';
+import wordpressConfig from '@wordpress/vitest-preset-default';
+
+const require = createRequire( import.meta.url );
+
+export default {
+	...wordpressConfig,
+	plugins: [
+		react( {
+			plugins: [ [ require.resolve( '@swc/plugin-emotion' ), {
+				autoLabel: 'always',
+				labelFormat: '[local]',
+			} ] ],
+		} ),
+	],
+};`
+	);
+	writeFileSync(
+		path.join( fixture, 'emotion.test.tsx' ),
+		`import { css } from '@emotion/react';
+import { expect, test } from 'vitest';
+
+test( 'applies the consumer Emotion transform in Node', () => {
+	const nodeStyle = css( { color: 'red' } );
+	const element = <button css={ nodeStyle }>Save</button>;
+	expect( typeof document ).toBe( 'undefined' );
+	expect( element.props.children ).toBe( 'Save' );
+	expect( nodeStyle.name ).toContain( 'nodeStyle' );
+} );`
+	);
+	writeFileSync(
+		path.join( fixture, 'emotion.browser.test.jsx' ),
+		`/** @jsxImportSource @emotion/react */
+import { css } from '@emotion/react';
+import { render } from 'vitest-browser-react';
+import { expect, test } from 'vitest';
+import styles from './styles.module.css';
+
+test( 'renders JSX, Emotion and CSS modules in Chromium', async () => {
+	const buttonStyle = css( { color: 'rgb(11, 22, 33)' } );
+	const screen = await render( <button className={ styles.primaryAction } css={ buttonStyle }>Save</button> );
+	const button = screen.getByRole( 'button', { name: 'Save' } );
+	await expect.element( button ).toBeVisible();
+	expect( buttonStyle.name ).toContain( 'buttonStyle' );
+	expect( styles.primaryAction ).not.toBe( 'style-primary-action' );
+	expect( getComputedStyle( button.element() ).color ).toBe( 'rgb(11, 22, 33)' );
+	expect( button.element().getBoundingClientRect().width ).toBe( 127 );
+} );`
+	);
+
+	const output = runVitest( fixture, [
+		'--config=vitest-emotion.config.mjs',
+		'--run',
+		'emotion.test.tsx',
+		'emotion.browser.test.jsx',
+		'--reporter=verbose',
+	] );
+	assert.match( output, /applies the consumer Emotion transform in Node/ );
+	assert.match( output, /renders JSX, Emotion and CSS modules in Chromium/ );
 }
 
 function createConfiguredConsumer() {
@@ -708,6 +806,7 @@ try {
 	createDefaultConsumer();
 	createConfiguredConsumer();
 	createCustomJsdomConsumer();
+	createEmotionConsumer();
 	if ( process.env.VITEST_CONSUMER_JEST ) {
 		verifyJestTooling();
 	}

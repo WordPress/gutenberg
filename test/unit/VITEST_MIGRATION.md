@@ -79,7 +79,7 @@ assigns the published versions. Existing Jest packages, public lint defaults,
 and `wp-scripts test-unit-js` remain available.
 
 The packed-consumer validator runs against Node 22.12.0, 24 and 26 with Vite 7
-and 8 in `.github/workflows/vitest-packages.yml`. It verifies JSX and Emotion,
+and 8 in `.github/workflows/vitest-packages.yml`. It verifies plain JSX without Emotion installed, consumer-configured Emotion,
 console matcher types and failure output, setup inheritance, native browser
 values, CSS-module proxies, and rebuilt CSS-module and ordinary-CSS output.
 The Node 24/Vite 8 combination also checks packed Jest tooling.
