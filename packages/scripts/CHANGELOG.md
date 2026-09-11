@@ -16,6 +16,10 @@
 
 -   Require Node.js `^20.19.0 || >=22.13.0` and upgrade the bundled Stylelint to `^17.14.1` ([#80738](https://github.com/WordPress/gutenberg/pull/80738)).
 
+### New Features
+
+-   `build`: A `block.json` `icon` may point at an SVG file with the `file:` prefix, as `style`, `editorScript`, `render` and `variations` already do. The SVG is inlined into the copied `block.json` at build time, so the built file stays self-contained. Both the string form and the object form's `src` are resolved ([#79658](https://github.com/WordPress/gutenberg/pull/79658)).
+
 ### Bug Fixes
 
 -   `test-playwright`: Install browsers with the bundled `@playwright/test` CLI, so they match the Playwright that runs the tests. A bare `npx playwright` could resolve another version, or download one ([#82331](https://github.com/WordPress/gutenberg/pull/82331)).

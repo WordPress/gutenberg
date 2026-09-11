@@ -3,7 +3,12 @@ import { isValidElementType } from 'react-is';
 import deprecated from '@wordpress/deprecated';
 import { applyFilters } from '@wordpress/hooks';
 import warning from '@wordpress/warning';
-import { isValidIcon, normalizeIconObject, omit } from '../api/utils';
+import {
+	convertSvgStringToIconElement,
+	isValidIcon,
+	normalizeIconObject,
+	omit,
+} from '../api/utils';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../api/constants';
 import type {
 	BlockType,
@@ -219,6 +224,7 @@ export const processBlockType =
 		}
 
 		const icon = normalizeIconObject( settings.icon as BlockTypeIcon );
+		icon.src = convertSvgStringToIconElement( icon.src ) as typeof icon.src;
 		settings.icon = icon;
 		if ( ! isValidIcon( icon.src ) ) {
 			warning(
