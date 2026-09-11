@@ -176,7 +176,7 @@ export function computeBadges( {
 			future: { label: __( 'Scheduled' ), intent: 'informational' },
 			draft: { label: __( 'Draft' ), intent: 'low' },
 			pending: { label: __( 'Pending' ), intent: 'low' },
-			private: { label: __( 'Private' ), intent: 'informational' },
+			private: { label: __( 'Private' ), intent: 'draft' },
 			trash: { label: __( 'Trashed' ), intent: 'high' },
 		};
 		const badge = statusMap[ entityStatus ];
