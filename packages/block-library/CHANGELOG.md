@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   Navigation: Give the block appender an explicit width so it renders square, matching the appender in other container blocks ([#82718](https://github.com/WordPress/gutenberg/pull/82718)).
 -   Footnotes: Prefix newly created footnote IDs with `fn-` so they always start with a letter. A bare UUID often starts with a digit, and an ID that does is not a valid CSS identifier, so `querySelector( '#' + id )` threw and `#id` style rules never matched. Existing footnotes keep their IDs ([#82398](https://github.com/WordPress/gutenberg/pull/82398)).
 -   Navigation: Restore `flex-grow` on the menu container in the editor, where the visually hidden menu description breaks the `:only-child` selector the front end relies on, so the "Space between" and other justification settings apply in the canvas as they do on the front end ([#78447](https://github.com/WordPress/gutenberg/pull/78447)).
 -   Image: Fix cropped galleries rendering images at their natural height in the editor canvas. The baseline inline `height: auto` is no longer emitted for images inside a cropped gallery, so the gallery's own cropping CSS applies ([#82318](https://github.com/WordPress/gutenberg/pull/82318)).
@@ -59,6 +60,7 @@
 -   Columns: Preserve individual Column attributes supported by Group, including styles and layouts, when transforming to Row or Grid.
 -   Gallery: Don't offer the Image and Grid transforms while the block is in dynamic mode, where it has no inner blocks to convert ([#82009](https://github.com/WordPress/gutenberg/pull/82009)).
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
+-   Playlist: Prevent track selector fallback values from triggering `useSelect` stability warnings.
 -   Playlist: Attach the inner block drop zone to the track list, so Playlist Track blocks show insertion markers while being reordered.
 -   Playlist Track: Hide the Title and Replace audio controls when multiple tracks are selected.
 -   Playlist Track: Mark track media fields as content so toolbar inserters add an empty track instead of duplicating the selected track.
