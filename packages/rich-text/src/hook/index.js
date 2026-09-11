@@ -6,11 +6,28 @@ import { create, RichTextData } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { removeFormat } from '../remove-format';
-import { ownsSelection } from '../owns-selection';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useEventListeners } from './event-listeners';
 import { useFormatTypes } from './use-format-types';
+
+/**
+ * Whether a selection may be set into the element: it (or an editing host
+ * around it) has focus. Otherwise the focus handler sets the selection once
+ * focus arrives.
+ *
+ * @param {HTMLElement} element The editable element.
+ *
+ * @return {boolean} Whether the element has focus.
+ */
+function hasFocus( element ) {
+	const { activeElement } = element.ownerDocument;
+	return (
+		activeElement === element ||
+		( activeElement?.contentEditable === 'true' &&
+			activeElement.contains( element ) )
+	);
+}
 
 function useRichTextBase( {
 	value = '',
@@ -89,22 +106,28 @@ function useRichTextBase( {
 		recordRef.current.end = selectionEnd;
 	}
 
-	const hadSelectionUpdateRef = useRef( false );
-
 	if ( ! recordRef.current ) {
-		hadSelectionUpdateRef.current = isSelected;
 		setRecordFromProps();
 	} else if (
 		selectionStart !== recordRef.current.start ||
 		selectionEnd !== recordRef.current.end
 	) {
-		hadSelectionUpdateRef.current = isSelected;
 		recordRef.current = {
 			...recordRef.current,
 			start: selectionStart,
 			end: selectionEnd,
 			activeFormats: undefined,
 		};
+	}
+
+	// The selection the element last sent out, so it can be told apart from
+	// one set from outside. Forgotten once compared: the same positions can
+	// come back from outside later, after the selection moved elsewhere.
+	const sentSelectionRef = useRef( [] );
+
+	function sendSelection( start, end ) {
+		sentSelectionRef.current = [ start, end ];
+		onSelectionChange( start, end );
 	}
 
 	/**
@@ -140,7 +163,7 @@ function useRichTextBase( {
 		// the content change happens.
 		// We batch both calls to only attempt to rerender once.
 		registry.batch( () => {
-			onSelectionChange( start, end );
+			sendSelection( start, end );
 			onChange( _valueRef.current, {
 				__unstableFormats: formats,
 				__unstableText: text,
@@ -149,61 +172,32 @@ function useRichTextBase( {
 		forceRender();
 	}
 
-	function applyFromProps() {
-		// Get previous value before updating
-		const previousValue = _valueRef.current;
-
-		setRecordFromProps();
-
-		// Check if content length changed (text was added/removed, not just formatted)
-		const contentLengthChanged =
-			previousValue &&
-			typeof previousValue === 'string' &&
-			typeof value === 'string' &&
-			previousValue.length !== value.length;
-
-		// Check if focus is on this element, or if the element owns the
-		// selection through a focused editing host.
-		const hasFocus =
-			ref.current?.contains( ref.current.ownerDocument.activeElement ) ||
-			ownsSelection( ref.current );
-
-		// Skip re-applying the selection state when content changed from external source
-		// (e.g., typing in sidebar input changes canvas text)
-		const skipSelection = contentLengthChanged && ! hasFocus;
-
-		applyRecord( recordRef.current, { domOnly: skipSelection } );
-	}
-
-	const didMountRef = useRef( false );
-
-	// Value updates must happen synchronously to avoid overwriting newer values.
+	// Apply a value set from outside.
 	useLayoutEffect( () => {
-		if ( didMountRef.current && value !== _valueRef.current ) {
-			applyFromProps();
-			forceRender();
-		}
-	}, [ value ] );
-
-	// Value updates must happen synchronously to avoid overwriting newer values.
-	useLayoutEffect( () => {
-		if ( ! hadSelectionUpdateRef.current ) {
+		if ( value === _valueRef.current ) {
 			return;
 		}
 
-		// Do not steal focus from a focused editing host that contains the
-		// selection (the editable block editor canvas wrapper); the record
-		// can be applied while the host keeps focus.
-		if (
-			ref.current.ownerDocument.activeElement !== ref.current &&
-			! ownsSelection( ref.current )
-		) {
-			ref.current.focus();
-		}
+		setRecordFromProps();
+		applyRecord( recordRef.current, {
+			domOnly: ! hasFocus( ref.current ),
+		} );
+		forceRender();
+	}, [ value ] );
 
-		applyRecord( recordRef.current );
-		hadSelectionUpdateRef.current = false;
-	}, [ hadSelectionUpdateRef.current ] );
+	// Apply a selection set from outside.
+	useLayoutEffect( () => {
+		const [ sentStart, sentEnd ] = sentSelectionRef.current;
+		sentSelectionRef.current = [];
+
+		if (
+			isSelected &&
+			( selectionStart !== sentStart || selectionEnd !== sentEnd ) &&
+			hasFocus( ref.current )
+		) {
+			applyRecord( recordRef.current );
+		}
+	}, [ selectionStart, selectionEnd, isSelected ] );
 
 	const mergedRefs = useMergeRefs( [
 		ref,
@@ -215,13 +209,18 @@ function useRichTextBase( {
 			applyRecord,
 			createRecord,
 			isSelected,
-			onSelectionChange,
+			onSelectionChange: sendSelection,
 			forceRender,
 		} ),
-		useRefEffect( () => {
-			applyFromProps();
-			didMountRef.current = true;
-		}, [ placeholder, ...__unstableDependencies ] ),
+		useRefEffect(
+			( element ) => {
+				setRecordFromProps();
+				applyRecord( recordRef.current, {
+					domOnly: ! hasFocus( element ),
+				} );
+			},
+			[ placeholder, ...__unstableDependencies ]
+		),
 	] );
 
 	return {

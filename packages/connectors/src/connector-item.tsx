@@ -32,7 +32,7 @@ export function ConnectorItem( {
 }: ConnectorItemProps ) {
 	const headingId = useId();
 	return (
-		<Item className={ className }>
+		<Item className={ className } role="listitem">
 			<VStack spacing={ 4 } role="group" aria-labelledby={ headingId }>
 				<HStack alignment="center" spacing={ 4 } wrap>
 					{ logo }
