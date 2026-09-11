@@ -12,6 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
 import { useDebounce, useInstanceId } from '@wordpress/compose';
 import { kebabCase } from '@wordpress/kebab-case';
+import { Menu } from '@wordpress/ui';
 import Button from '../button';
 import { ColorPicker } from '../color-picker';
 import { FlexBlock, FlexItem } from '../flex';
@@ -27,7 +28,6 @@ import {
 	getDefaultColors,
 	getGradientFromCSSColors,
 } from '../duotone-picker/utils';
-import DropdownMenu from '../dropdown-menu';
 import Popover from '../popover';
 import {
 	PaletteActionsContainer,
@@ -40,7 +40,6 @@ import {
 	RemoveButton,
 	PaletteEditContents,
 } from './styles';
-import { NavigableMenu } from '../navigable-container';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
 import type {
@@ -761,68 +760,60 @@ export function PaletteEdit( {
 						( ! isEditing ||
 							! canOnlyChangeValues ||
 							canReset ) && (
-							<DropdownMenu
-								icon={ moreVertical }
-								label={ getOptionsLabel( variant ) }
-								toggleProps={ {
-									size: 'small',
-								} }
-							>
-								{ ( { onClose }: { onClose: () => void } ) => (
-									<>
-										<NavigableMenu role="menu">
-											{ ! isEditing && (
-												<Button
-													__next40pxDefaultSize
-													variant="tertiary"
-													onClick={ () => {
-														setIsEditing( true );
-														onClose();
-													} }
-													className="components-palette-edit__menu-button"
-												>
-													{ __( 'Show details' ) }
-												</Button>
-											) }
-											{ ! canOnlyChangeValues && (
-												<Button
-													__next40pxDefaultSize
-													variant="tertiary"
-													onClick={ () => {
-														setEditingElement(
-															null
-														);
-														setIsEditing( false );
-														onChange();
-														onClose();
-													} }
-													className="components-palette-edit__menu-button"
-												>
-													{ getRemoveAllLabel(
-														variant
-													) }
-												</Button>
-											) }
-											{ canReset && (
-												<Button
-													__next40pxDefaultSize
-													className="components-palette-edit__menu-button"
-													variant="tertiary"
-													onClick={ () => {
-														setEditingElement(
-															null
-														);
-														onChange();
-														onClose();
-													} }
-												>
-													{ getResetLabel( variant ) }
-												</Button>
-											) }
-										</NavigableMenu>
-									</>
-								) }
-							</DropdownMenu>
+							<Menu.Root modal={ false }>
+								<Menu.Trigger
+									render={
+										<Button
+											size="small"
+											icon={ moreVertical }
+											label={ getOptionsLabel( variant ) }
+											showTooltip
+										/>
+									}
+								/>
+								<Menu.Popup
+									positioner={
+										<Menu.Positioner align="end" />
+									}
+								>
+									{ ! isEditing && (
+										<Menu.Item
+											onClick={ () =>
+												setIsEditing( true )
+											}
+										>
+											<Menu.ItemLabel>
+												{ __( 'Show details' ) }
+											</Menu.ItemLabel>
+										</Menu.Item>
+									) }
+									{ ! canOnlyChangeValues && (
+										<Menu.Item
+											onClick={ () => {
+												setEditingElement( null );
+												setIsEditing( false );
+												onChange();
+											} }
+										>
+											<Menu.ItemLabel>
+												{ getRemoveAllLabel( variant ) }
+											</Menu.ItemLabel>
+										</Menu.Item>
+									) }
+									{ canReset && (
+										<Menu.Item
+											onClick={ () => {
+												setEditingElement( null );
+												onChange();
+											} }
+										>
+											<Menu.ItemLabel>
+												{ getResetLabel( variant ) }
+											</Menu.ItemLabel>
+										</Menu.Item>
+									) }
+								</Menu.Popup>
+							</Menu.Root>
 						) }
 				</PaletteActionsContainer>
 			</HStack>
