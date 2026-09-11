@@ -14,9 +14,6 @@
 			],
 			"@wordpress/patterns": [
 				"../typings/untyped-packages/any-module.d.ts"
-			],
-			"@wordpress/interface": [
-				"../typings/untyped-packages/any-module.d.ts"
 			]
 		},
 		"checkJs": true,
