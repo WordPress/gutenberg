@@ -30,6 +30,22 @@ test.describe( 'Block Notes: floating panel', () => {
 		).toBeVisible();
 	}
 
+	// Opens the Options menu and then the "Notes" submenu holding the
+	// display-mode choices.
+	async function openNotesDisplayModeMenu( page ) {
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await page
+			.getByRole( 'menu', { name: 'Options' } )
+			.getByRole( 'menuitem', { name: 'Notes', exact: true } )
+			.click();
+		await expect(
+			page.getByRole( 'menuitemradio', { name: 'Hide notes' } )
+		).toBeVisible();
+	}
+
 	test( 'notices span the full width of the editor when notes are visible', async ( {
 		editor,
 		page,
@@ -110,6 +126,9 @@ test.describe( 'Block Notes: floating panel', () => {
 		editor,
 		page,
 	} ) => {
+		// Keep the canvas wide enough for the full-notes tier; narrower
+		// canvases collapse the panel to minimized pills.
+		await page.setViewportSize( { width: 1450, height: 800 } );
 		await editor.insertBlock( {
 			name: 'core/cover',
 			attributes: {
@@ -222,6 +241,9 @@ test.describe( 'Block Notes: floating panel', () => {
 		editor,
 		page,
 	} ) => {
+		// Keep the canvas wide enough for the full-notes tier; narrower
+		// canvases collapse the panel to minimized pills.
+		await page.setViewportSize( { width: 1450, height: 800 } );
 		await editor.insertBlock( {
 			name: 'core/cover',
 			attributes: {
@@ -348,7 +370,7 @@ test.describe( 'Block Notes: floating panel', () => {
 		).toBeHidden();
 	} );
 
-	test( 'floating notes yield when the canvas is too narrow', async ( {
+	test( 'floating notes collapse and yield as the canvas narrows', async ( {
 		editor,
 		page,
 	} ) => {
@@ -359,8 +381,9 @@ test.describe( 'Block Notes: floating panel', () => {
 		await addNote( page, editor, 'Narrow canvas note' );
 
 		const notes = page.getByRole( 'region', { name: 'Notes' } );
+		const overlay = page.locator( '.editor-collab-sidebar-overlay' );
 
-		// Reading the reserved padding applied to the canvas root.
+		// Reads the reserved padding applied to the canvas root.
 		const getReservedWidth = () =>
 			editor.canvas.locator( 'body' ).evaluate( ( body ) => {
 				const root = body.ownerDocument.documentElement;
@@ -372,33 +395,43 @@ test.describe( 'Block Notes: floating panel', () => {
 				);
 			} );
 
-		// The Settings sidebar narrows the canvas without touching the admin
-		// viewport, which stays above the large-viewport breakpoint - so only
-		// the canvas-width guard (not the viewport gate) governs the panel.
+		// The Settings sidebar and List View narrow the canvas without
+		// touching the admin viewport, which stays above the large-viewport
+		// breakpoint - so only the canvas-width guard (not the viewport gate)
+		// governs the panel.
 		await editor.openDocumentSettingsSidebar();
-		await page.setViewportSize( { width: 1200, height: 800 } );
+		await page.setViewportSize( { width: 1450, height: 800 } );
+
+		// Wide canvas: full threads with the full reserved space.
 		await expect( notes ).toBeVisible();
-		expect( await getReservedWidth() ).toBeGreaterThan( 0 );
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
+		await expect.poll( getReservedWidth ).toBe( 280 );
 
-		// Shrink the window so the canvas (minus the sidebar) is narrower than
-		// the panel needs, while the viewport itself stays "large".
-		await page.setViewportSize( { width: 800, height: 800 } );
+		// Mid-width canvas: threads collapse to minimized avatar pills and
+		// release most of the reserved space.
+		await page.setViewportSize( { width: 1060, height: 800 } );
+		await expect( overlay ).toHaveClass( /is-compact/ );
+		await expect( notes ).toBeVisible();
+		await expect.poll( getReservedWidth ).toBe( 82 );
 
-		// The floating panel yields and releases the reserved canvas padding so
-		// it doesn't crowd the narrow content column.
+		// Narrow canvas (List View narrows it further): even the pills yield
+		// and release the reserved space so they don't crowd the content.
+		await page.getByRole( 'button', { name: 'Document Overview' } ).click();
 		await expect( notes ).toBeHidden();
-		expect( await getReservedWidth() ).toBe( 0 );
+		await expect.poll( getReservedWidth ).toBe( 0 );
 
-		// Widening the canvas again brings the panel (and reserved space) back.
-		await page.setViewportSize( { width: 1200, height: 800 } );
+		// Widening the canvas again brings the panel (and reserved space)
+		// back.
+		await page.getByRole( 'button', { name: 'Document Overview' } ).click();
 		await expect( notes ).toBeVisible();
-		expect( await getReservedWidth() ).toBeGreaterThan( 0 );
+		await expect.poll( getReservedWidth ).toBe( 82 );
 	} );
 
 	test( 'floating notes do not react to the device preview', async ( {
 		editor,
 		page,
 	} ) => {
+		// Keep the canvas wide enough for the full-notes tier.
 		await page.setViewportSize( { width: 1450, height: 800 } );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -407,6 +440,7 @@ test.describe( 'Block Notes: floating panel', () => {
 		await addNote( page, editor, 'Device preview note' );
 
 		const notes = page.getByRole( 'region', { name: 'Notes' } );
+		const overlay = page.locator( '.editor-collab-sidebar-overlay' );
 		const setDevice = async ( device ) => {
 			await page
 				.getByRole( 'region', { name: 'Editor top bar' } )
@@ -431,23 +465,161 @@ test.describe( 'Block Notes: floating panel', () => {
 			} );
 
 		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
 		await expect.poll( getReservedWidth ).toBe( 280 );
 
 		// The device preview simulates a device width; the notes are editor
-		// chrome, so they must neither hide at the simulated width nor
+		// chrome, so they must neither collapse to the simulated width nor
 		// reserve space inside the previewed canvas (which would distort the
 		// simulation).
 		await setDevice( 'Tablet' );
 		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
 		await expect.poll( getReservedWidth ).toBe( 0 );
 
 		await setDevice( 'Mobile' );
 		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
 		await expect.poll( getReservedWidth ).toBe( 0 );
 
 		// Back to Desktop, the canvas reservation returns.
 		await setDevice( 'Desktop' );
 		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
 		await expect.poll( getReservedWidth ).toBe( 280 );
+	} );
+
+	test( 'notes display modes are switched from the Options menu', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph with a note' },
+		} );
+		await addNote( page, editor, 'Display mode note' );
+		// Keep the canvas wide enough for the full-notes tier so the menu
+		// choice (not the canvas width) drives the presentation.
+		await page.setViewportSize( { width: 1450, height: 800 } );
+
+		const notes = page.getByRole( 'region', { name: 'Notes' } );
+		const overlay = page.locator( '.editor-collab-sidebar-overlay' );
+
+		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
+
+		// The current mode is marked in the submenu.
+		await openNotesDisplayModeMenu( page );
+		await expect(
+			page.getByRole( 'menuitemradio', { name: 'Expand notes' } )
+		).toHaveAttribute( 'aria-checked', 'true' );
+
+		// Minimized: threads collapse to avatar pills. Choosing a mode
+		// closes the menu.
+		await page
+			.getByRole( 'menuitemradio', { name: 'Minimize notes' } )
+			.click();
+		await expect(
+			page.getByRole( 'menu', { name: 'Options' } )
+		).toBeHidden();
+		await expect( overlay ).toHaveClass( /is-compact/ );
+		await expect( notes ).toBeVisible();
+
+		// Hidden: the floating panel disappears from the canvas.
+		await openNotesDisplayModeMenu( page );
+		await expect(
+			page.getByRole( 'menuitemradio', { name: 'Minimize notes' } )
+		).toHaveAttribute( 'aria-checked', 'true' );
+		await page.getByRole( 'menuitemradio', { name: 'Hide notes' } ).click();
+		await expect( notes ).toBeHidden();
+
+		// Full: the complete threads return.
+		await openNotesDisplayModeMenu( page );
+		await page
+			.getByRole( 'menuitemradio', { name: 'Expand notes' } )
+			.click();
+		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
+	} );
+
+	test( 'notes display modes are reachable with the keyboard', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph with a note' },
+		} );
+		await addNote( page, editor, 'Keyboard mode note' );
+		await page.setViewportSize( { width: 1450, height: 800 } );
+
+		const notes = page.getByRole( 'region', { name: 'Notes' } );
+		await expect( notes ).toBeVisible();
+
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		const trigger = page
+			.getByRole( 'menu', { name: 'Options' } )
+			.getByRole( 'menuitem', { name: 'Notes', exact: true } );
+		await trigger.focus();
+		await expect( trigger ).toBeFocused();
+
+		// Right arrow opens the submenu on its first choice; Left closes it.
+		await pageUtils.pressKeys( 'ArrowRight' );
+		await expect(
+			page.getByRole( 'menuitemradio', { name: 'Hide notes' } )
+		).toBeFocused();
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		await expect( trigger ).toBeFocused();
+
+		await pageUtils.pressKeys( 'ArrowRight' );
+		await pageUtils.pressKeys( 'Enter' );
+		await expect( notes ).toBeHidden();
+	} );
+
+	test( 'notes display modes have keyboard shortcuts', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph with a note' },
+		} );
+		await addNote( page, editor, 'Shortcut mode note' );
+		// Keep the canvas wide enough for the full-notes tier so the chosen
+		// mode (not the canvas width) drives the presentation.
+		await page.setViewportSize( { width: 1450, height: 800 } );
+
+		const notes = page.getByRole( 'region', { name: 'Notes' } );
+		const overlay = page.locator( '.editor-collab-sidebar-overlay' );
+
+		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
+
+		await pageUtils.pressKeys( 'access+i' );
+		await expect( overlay ).toHaveClass( /is-compact/ );
+
+		await pageUtils.pressKeys( 'access+j' );
+		await expect( notes ).toBeHidden();
+
+		await pageUtils.pressKeys( 'access+e' );
+		await expect( notes ).toBeVisible();
+		await expect( overlay ).not.toHaveClass( /is-compact/ );
+
+		// The combinations are advertised on the menu choices themselves.
+		await openNotesDisplayModeMenu( page );
+		await expect(
+			page.getByRole( 'menuitemradio', { name: 'Expand notes' } )
+		).toContainText( /E$/ );
+		await expect(
+			page.getByRole( 'menuitemradio', { name: 'Minimize notes' } )
+		).toContainText( /I$/ );
+		await expect(
+			page.getByRole( 'menuitemradio', { name: 'Hide notes' } )
+		).toContainText( /J$/ );
 	} );
 } );

@@ -11,6 +11,7 @@ import MoreMenuItem from './more-menu-item';
 import ModeSwitcher from '../mode-switcher';
 import MoreMenuGroup from './more-menu-group';
 import MoreMenuPreferenceItem from './more-menu-preference-item';
+import NotesMoreMenuGroup from './notes-more-menu-group';
 import ToolsMoreMenuGroup from './tools-more-menu-group';
 import ViewMoreMenuGroup from './view-more-menu-group';
 import { store as editorStore } from '../../store';
@@ -133,6 +134,7 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 				<Menu.Separator />
 				<Menu.Group>
 					<Menu.GroupLabel>{ __( 'Tools' ) }</Menu.GroupLabel>
+					<NotesMoreMenuGroup.Slot />
 					<Menu.Item
 						onClick={ () =>
 							openModal( 'editor/keyboard-shortcut-help' )
