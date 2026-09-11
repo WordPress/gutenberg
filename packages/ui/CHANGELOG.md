@@ -21,7 +21,7 @@
 
 ### Enhancements
 
--   `SearchableChipSelect`, `SearchableChipSelectControl`, `SearchableSelect`: Announce a visually hidden result count by default. `statusContent` overrides it, for example while loading. ([#82592](https://github.com/WordPress/gutenberg/pull/82592))
+-   `SearchableChipSelect`, `SearchableChipSelectControl`, `SearchableSelect`: Add `statusContent` for the list status live region. The region stays mounted. Use it for async loading. Use `emptyContent` for the empty list. ([#82592](https://github.com/WordPress/gutenberg/pull/82592))
 -   `Autocomplete`, `Combobox`, `SearchableChipSelect`, `SearchableChipSelectControl`, `SearchableSelect`: Export a `useFilteredItems` hook that returns the client-side filtered item list, for result-count status. ([#82592](https://github.com/WordPress/gutenberg/pull/82592))
 -   `Select.Popup`: Put overflow on `Select.List` instead of a nested wrapper, so the listbox is the scroll container. ([#82470](https://github.com/WordPress/gutenberg/pull/82470))
 -   Compound components: Throw clear development errors when required parent context is missing ([#82510](https://github.com/WordPress/gutenberg/pull/82510)).

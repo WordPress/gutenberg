@@ -127,9 +127,9 @@ export type SearchableChipSelectProps = Omit<
 		emptyContent?: ComboboxEmptyProps[ 'children' ];
 		/**
 		 * Content for the list status live region. The region stays mounted.
-		 * When omitted, a visually hidden result count is announced. Pass
-		 * `null` to suppress it, or custom content such as a loading message.
-		 * Use `emptyContent` for the empty list.
+		 * Pass custom content such as a loading message. Use `emptyContent`
+		 * for the empty list. For a result count after an async load, pass
+		 * visually hidden text here using `useFilteredItems`.
 		 */
 		statusContent?: ComboboxStatusProps[ 'children' ];
 		/**

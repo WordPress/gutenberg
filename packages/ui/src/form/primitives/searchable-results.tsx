@@ -1,6 +1,4 @@
 import type { ReactNode } from 'react';
-import { sprintf, _n } from '@wordpress/i18n';
-import { VisuallyHidden } from '../../visually-hidden';
 import * as Combobox from './combobox';
 import type {
 	ComboboxCollectionProps,
@@ -61,49 +59,6 @@ function shouldSkipCollectionEntry( entry: Item | ItemGroup ): boolean {
 	return isCreatableItem( entry );
 }
 
-function countVisibleResults(
-	items: ReadonlyArray< Item | ItemGroup >
-): number {
-	let count = 0;
-
-	for ( const entry of items ) {
-		if ( isItemGroup( entry ) ) {
-			count += entry.items.filter(
-				( item ) => ! isCreatableItem( item )
-			).length;
-			continue;
-		}
-
-		if ( ! isCreatableItem( entry ) ) {
-			count += 1;
-		}
-	}
-
-	return count;
-}
-
-function ResultCountStatus( {
-	filteredItems,
-}: {
-	filteredItems: ReadonlyArray< Item | ItemGroup >;
-} ) {
-	const count = countVisibleResults( filteredItems );
-
-	if ( count === 0 ) {
-		return null;
-	}
-
-	return (
-		<VisuallyHidden>
-			{ sprintf(
-				/* translators: %d: number of results. */
-				_n( '%d result found.', '%d results found.', count ),
-				count
-			) }
-		</VisuallyHidden>
-	);
-}
-
 /**
  * Empty state, status, and filtered list for `SearchableSelect` and
  * `SearchableChipSelect`. A `creatable: true` item still present in the
@@ -124,13 +79,7 @@ export function SearchableResults( {
 
 	return (
 		<>
-			<Combobox.Status>
-				{ statusContent !== undefined ? (
-					statusContent
-				) : (
-					<ResultCountStatus filteredItems={ filteredItems } />
-				) }
-			</Combobox.Status>
+			<Combobox.Status>{ statusContent }</Combobox.Status>
 			<Combobox.Empty>{ emptyContent }</Combobox.Empty>
 			<Combobox.List>
 				<Combobox.ListBody>

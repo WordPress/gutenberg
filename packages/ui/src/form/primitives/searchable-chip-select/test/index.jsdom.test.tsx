@@ -223,27 +223,19 @@ describe( 'SearchableChipSelect', () => {
 		expect( status ).toBeEmptyDOMElement();
 	} );
 
-	it( 'announces a result count by default', async () => {
+	it( 'does not announce a result count by default', async () => {
 		const user = userEvent.setup();
 
 		render( <SearchableChipSelect items={ ITEMS.slice( 0, 3 ) } /> );
 
 		await user.click( screen.getByRole( 'combobox' ) );
 
-		expect( await screen.findByText( '3 results found.' ) ).toBeVisible();
-	} );
-
-	it( 'updates the result count as the list filters', async () => {
-		const user = userEvent.setup();
-
-		render( <SearchableChipSelect items={ ITEMS.slice( 0, 3 ) } /> );
-
-		await user.click( screen.getByRole( 'combobox' ) );
-		expect( await screen.findByText( '3 results found.' ) ).toBeVisible();
-
-		await user.type( screen.getByRole( 'combobox' ), 'Apr' );
-
-		expect( await screen.findByText( '1 result found.' ) ).toBeVisible();
+		expect(
+			await screen.findByRole( 'option', { name: 'Apple' } )
+		).toBeVisible();
+		expect(
+			screen.queryByText( /^\d+ results? found\.$/ )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'does not announce a result count when there are no matching items', async () => {
@@ -252,69 +244,12 @@ describe( 'SearchableChipSelect', () => {
 		render( <SearchableChipSelect items={ ITEMS.slice( 0, 3 ) } /> );
 
 		await user.click( screen.getByRole( 'combobox' ) );
-		expect( await screen.findByText( '3 results found.' ) ).toBeVisible();
-
 		await user.type( screen.getByRole( 'combobox' ), 'zzz' );
 
 		expect( await screen.findByText( 'No results found.' ) ).toBeVisible();
 		expect(
 			screen.queryByText( /^\d+ results? found\.$/ )
 		).not.toBeInTheDocument();
-	} );
-
-	it( 'excludes creatable items from the result count', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<SearchableChipSelect
-				items={ [
-					...ITEMS.slice( 0, 3 ),
-					{
-						value: '__create__',
-						label: 'Create new item',
-						creatable: true,
-					},
-				] }
-			/>
-		);
-
-		await user.click( screen.getByRole( 'combobox' ) );
-
-		expect( await screen.findByText( '3 results found.' ) ).toBeVisible();
-	} );
-
-	it( 'announces the item count for grouped items', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<SearchableChipSelect
-				items={ GROUPED_ITEMS }
-				children={ ( group: ItemGroup ) => (
-					<SearchableChipSelect.Group
-						key={ group.label }
-						items={ group.items }
-					>
-						<SearchableChipSelect.GroupLabel>
-							{ group.label }
-						</SearchableChipSelect.GroupLabel>
-						<SearchableChipSelect.Collection>
-							{ ( item: Item ) => (
-								<SearchableChipSelect.Item
-									key={ item.value }
-									value={ item }
-								>
-									{ item.label }
-								</SearchableChipSelect.Item>
-							) }
-						</SearchableChipSelect.Collection>
-					</SearchableChipSelect.Group>
-				) }
-			/>
-		);
-
-		await user.click( screen.getByRole( 'combobox' ) );
-
-		expect( await screen.findByText( '6 results found.' ) ).toBeVisible();
 	} );
 
 	describe( 'creatable item', () => {

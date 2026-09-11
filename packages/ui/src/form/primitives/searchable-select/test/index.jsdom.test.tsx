@@ -322,30 +322,19 @@ describe( 'SearchableSelect', () => {
 		expect( status ).toBeEmptyDOMElement();
 	} );
 
-	it( 'announces a result count by default', async () => {
+	it( 'does not announce a result count by default', async () => {
 		const user = userEvent.setup();
 
 		render( <SearchableSelect aria-label="Fruit" items={ ITEMS } /> );
 
 		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
 
-		expect( await screen.findByText( '3 results found.' ) ).toBeVisible();
-	} );
-
-	it( 'updates the result count as the list filters', async () => {
-		const user = userEvent.setup();
-
-		render( <SearchableSelect aria-label="Fruit" items={ ITEMS } /> );
-
-		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
-		expect( await screen.findByText( '3 results found.' ) ).toBeVisible();
-
-		await user.type(
-			screen.getByRole( 'combobox', { name: 'Search' } ),
-			'Apr'
-		);
-
-		expect( await screen.findByText( '1 result found.' ) ).toBeVisible();
+		expect(
+			await screen.findByRole( 'option', { name: 'Apple' } )
+		).toBeVisible();
+		expect(
+			screen.queryByText( /^\d+ results? found\.$/ )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'does not announce a result count when there are no matching items', async () => {
@@ -354,8 +343,9 @@ describe( 'SearchableSelect', () => {
 		render( <SearchableSelect aria-label="Fruit" items={ ITEMS } /> );
 
 		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
-		expect( await screen.findByText( '3 results found.' ) ).toBeVisible();
-
+		expect(
+			await screen.findByRole( 'combobox', { name: 'Search' } )
+		).toBeVisible();
 		await user.type(
 			screen.getByRole( 'combobox', { name: 'Search' } ),
 			'zzz'
@@ -365,63 +355,6 @@ describe( 'SearchableSelect', () => {
 		expect(
 			screen.queryByText( /^\d+ results? found\.$/ )
 		).not.toBeInTheDocument();
-	} );
-
-	it( 'excludes creatable items from the result count', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<SearchableSelect
-				aria-label="Fruit"
-				items={ [
-					...ITEMS,
-					{
-						value: '__create__',
-						label: 'Create new item',
-						creatable: true,
-					},
-				] }
-			/>
-		);
-
-		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
-
-		expect( await screen.findByText( '3 results found.' ) ).toBeVisible();
-	} );
-
-	it( 'announces the item count for grouped items', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<SearchableSelect
-				aria-label="Fruit"
-				items={ GROUPED_ITEMS }
-				children={ ( group: ItemGroup ) => (
-					<SearchableSelect.Group
-						key={ group.label }
-						items={ group.items }
-					>
-						<SearchableSelect.GroupLabel>
-							{ group.label }
-						</SearchableSelect.GroupLabel>
-						<SearchableSelect.Collection>
-							{ ( item: Item ) => (
-								<SearchableSelect.Item
-									key={ item.value }
-									value={ item }
-								>
-									{ item.label }
-								</SearchableSelect.Item>
-							) }
-						</SearchableSelect.Collection>
-					</SearchableSelect.Group>
-				) }
-			/>
-		);
-
-		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
-
-		expect( await screen.findByText( '6 results found.' ) ).toBeVisible();
 	} );
 
 	describe( 'creatable item', () => {
