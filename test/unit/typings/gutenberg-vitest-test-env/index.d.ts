@@ -12,7 +12,6 @@ interface GutenbergVitestMatchers< R > {
 	toHaveWarned: () => R;
 	toHaveWarnedWith: ( ...args: unknown[] ) => R;
 	toMatchDiffSnapshot: ( expected: unknown ) => R;
-	toMatchStyleDiffSnapshot: ( expected: Element | null ) => R;
 }
 
 interface GutenbergVitestEnvironment {
@@ -21,7 +20,6 @@ interface GutenbergVitestEnvironment {
 	mockPointerEvent: () => void;
 	mockResizeObserver: () => void;
 	mockScrollIntoView: () => void;
-	mockVisibleElements: () => void;
 	timers: typeof import('vitest').vi;
 }
 

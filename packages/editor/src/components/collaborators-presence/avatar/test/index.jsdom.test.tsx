@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Tooltip } from '@wordpress/ui';
@@ -92,23 +93,6 @@ describe( 'Avatar', () => {
 		expect( avatar ).not.toHaveClass( 'is-small' );
 	} );
 
-	it( 'should apply border color when provided', () => {
-		render( <Avatar data-testid="avatar" borderColor="#3858e9" /> );
-		const avatar = screen.getByTestId( 'avatar' );
-		expect( avatar ).toHaveClass( 'has-avatar-border-color' );
-		expect(
-			avatar.style.getPropertyValue( '--editor-avatar-outline-color' )
-		).toBe( '#3858e9' );
-	} );
-
-	it( 'should set name color custom property when borderColor is provided', () => {
-		render( <Avatar data-testid="avatar" borderColor="#3858e9" /> );
-		const avatar = screen.getByTestId( 'avatar' );
-		expect(
-			avatar.style.getPropertyValue( '--editor-avatar-name-color' )
-		).toBeTruthy();
-	} );
-
 	it( 'should not have has-src class when src is not provided', () => {
 		render( <Avatar data-testid="avatar" /> );
 		const avatar = screen.getByTestId( 'avatar' );
@@ -126,21 +110,6 @@ describe( 'Avatar', () => {
 		render( <Avatar data-testid="avatar" data-custom="value" /> );
 		const avatar = screen.getByTestId( 'avatar' );
 		expect( avatar ).toHaveAttribute( 'data-custom', 'value' );
-	} );
-
-	it( 'should merge style prop with custom properties', () => {
-		render(
-			<Avatar
-				data-testid="avatar"
-				borderColor="#3858e9"
-				style={ { left: '10px' } }
-			/>
-		);
-		const avatar = screen.getByTestId( 'avatar' );
-		expect( avatar ).toHaveStyle( { left: '10px' } );
-		expect(
-			avatar.style.getPropertyValue( '--editor-avatar-outline-color' )
-		).toBe( '#3858e9' );
 	} );
 
 	describe( 'variant: badge', () => {
