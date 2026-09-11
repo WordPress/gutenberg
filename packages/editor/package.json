@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "14.54.0",
+	"version": "15.0.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -111,7 +111,6 @@
 		"colord": "^2.9.4",
 		"date-fns": "^4.4.0",
 		"diff": "^8.0.3",
-		"react-autosize-textarea": "^7.1.0",
 		"redux": "^5.0.1",
 		"remove-accents": "^0.5.0",
 		"uuid": "^14.0.0"
@@ -125,7 +124,8 @@
 		"@types/jest": "^30.0.0",
 		"@wordpress/block-library": "file:../block-library",
 		"deep-freeze": "^0.0.1",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.0",
+		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

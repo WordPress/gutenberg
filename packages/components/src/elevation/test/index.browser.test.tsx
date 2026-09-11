@@ -1,0 +1,145 @@
+import { describe, expect, it } from 'vitest';
+import { page, userEvent } from 'vitest/browser';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
+import { Elevation } from '..';
+
+const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
+	Array.from( element.classList ).filter( ( className ) =>
+		/^(css|emotion)-/.test( className )
+	);
+
+describe( 'Elevation', () => {
+	it( 'renders the base elevation styles', async () => {
+		await render( <Elevation data-testid="elevation" /> );
+		const elevation = screen.getByTestId( 'elevation' );
+		const styles = getComputedStyle( elevation );
+
+		expect( elevation ).toHaveAttribute( 'aria-hidden', 'true' );
+		expect( styles.position ).toBe( 'absolute' );
+		expect( styles.pointerEvents ).toBe( 'none' );
+		expect( styles.backgroundColor ).toBe( 'rgba(0, 0, 0, 0)' );
+	} );
+
+	it( 'changes the shadow with the value prop', async () => {
+		await render( <Elevation value={ 7 } data-testid="raised" /> );
+		await render( <Elevation value={ 0 } data-testid="flat" /> );
+
+		expect(
+			getComputedStyle( screen.getByTestId( 'raised' ) ).boxShadow
+		).not.toBe(
+			getComputedStyle( screen.getByTestId( 'flat' ) ).boxShadow
+		);
+	} );
+
+	it( 'applies the interactive hover shadow', async () => {
+		await render(
+			<div
+				data-testid="target"
+				style={ { position: 'relative', width: 40, height: 40 } }
+			>
+				<Elevation isInteractive value={ 7 } data-testid="elevation" />
+			</div>
+		);
+		const elevation = screen.getByTestId( 'elevation' );
+		const restingShadow = getComputedStyle( elevation ).boxShadow;
+
+		await userEvent.hover( page.getByTestId( 'target' ) );
+
+		await waitFor( () =>
+			expect( getComputedStyle( elevation ).boxShadow ).not.toBe(
+				restingShadow
+			)
+		);
+	} );
+
+	it( 'applies the configured focus shadow', async () => {
+		await render(
+			<button
+				type="button"
+				data-testid="target"
+				style={ { position: 'relative', width: 40, height: 40 } }
+			>
+				<Elevation focus={ 9 } value={ 7 } data-testid="elevation" />
+			</button>
+		);
+		const elevation = screen.getByTestId( 'elevation' );
+		const restingShadow = getComputedStyle( elevation ).boxShadow;
+
+		await userEvent.tab();
+		expect( screen.getByTestId( 'target' ) ).toHaveFocus();
+
+		await waitFor( () =>
+			expect( getComputedStyle( elevation ).boxShadow ).not.toBe(
+				restingShadow
+			)
+		);
+	} );
+
+	it( 'applies the configured hover and active shadows', async () => {
+		await render(
+			<>
+				<div
+					data-testid="target"
+					style={ { position: 'relative', width: 40, height: 40 } }
+				>
+					<Elevation
+						active={ 5 }
+						hover={ 14 }
+						value={ 7 }
+						data-testid="elevation"
+						style={ { transition: 'none' } }
+					/>
+				</div>
+				<Elevation value={ 14 } data-testid="hover-reference" />
+				<Elevation value={ 5 } data-testid="active-reference" />
+			</>
+		);
+		const target = screen.getByTestId( 'target' );
+		const elevation = screen.getByTestId( 'elevation' );
+		const expectedHoverShadow = getComputedStyle(
+			screen.getByTestId( 'hover-reference' )
+		).boxShadow;
+		const expectedActiveShadow = getComputedStyle(
+			screen.getByTestId( 'active-reference' )
+		).boxShadow;
+		let pressedShadow: string | undefined;
+		target.addEventListener( 'mousedown', () => {
+			pressedShadow = getComputedStyle( elevation ).boxShadow;
+		} );
+
+		await userEvent.hover( page.getByTestId( 'target' ) );
+		expect( getComputedStyle( elevation ).boxShadow ).toBe(
+			expectedHoverShadow
+		);
+
+		await userEvent.click( page.getByTestId( 'target' ) );
+		expect( pressedShadow ).toBe( expectedActiveShadow );
+	} );
+
+	it( 'applies the offset on every edge', async () => {
+		await render( <Elevation offset={ -2 } data-testid="elevation" /> );
+		const styles = getComputedStyle( screen.getByTestId( 'elevation' ) );
+
+		expect( styles.top ).toBe( '-2px' );
+		expect( styles.right ).toBe( '-2px' );
+		expect( styles.bottom ).toBe( '-2px' );
+		expect( styles.left ).toBe( '-2px' );
+	} );
+
+	it( 'composes interactive styles in a single generated class', async () => {
+		await render(
+			<Elevation
+				active={ 5 }
+				focus={ 9 }
+				hover={ 14 }
+				value={ 7 }
+				data-testid="elevation"
+			/>
+		);
+
+		expect(
+			getGeneratedEmotionClassNames( screen.getByTestId( 'elevation' ) )
+		).toHaveLength( 1 );
+	} );
+} );
