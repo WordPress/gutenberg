@@ -162,8 +162,13 @@
 				color: var(--wpds-color-foreground-interactive-neutral);
 				outline: none;
 
+				/*
+				 * Set the outline through the global CSS defense bridge, since
+				 * wp-admin's unlayered `div { outline: 0 }` beats layered styles.
+				 */
 				@media ( forced-colors: active ) {
-					outline: var(--wpds-border-width-xs) solid Highlight;
+					--_gcd-div-outline: var(--wpds-border-width-xs) solid Highlight;
+					--_gcd-a-outline: var(--wpds-border-width-xs) solid Highlight;
 				}
 			}
 

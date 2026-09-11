@@ -6,6 +6,10 @@
 
 -   `Checkbox`: Enlarge the hit target to 24px without changing the visual size. ([#82597](https://github.com/WordPress/gutenberg/pull/82597))
 
+### Bug Fixes
+
+-   `Autocomplete`, `Combobox`, `Menu`, and `Select`: Restore the highlighted item indicator in forced-colors mode, which wp-admin's global CSS was suppressing. ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX))
+
 ### Internal
 
 -   Run UI interaction tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
