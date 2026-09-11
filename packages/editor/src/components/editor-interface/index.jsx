@@ -1,6 +1,11 @@
 import clsx from 'clsx';
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import {
+	AsyncModeProvider,
+	useSelect,
+	useDispatch,
+	useRegistry,
+} from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -213,22 +218,31 @@ export default function EditorInterface( {
 			} }
 			header={
 				! isPreviewMode && (
-					<Header
-						forceIsDirty={ forceIsDirty }
-						setEntitiesSavedStatesCallback={
-							setEntitiesSavedStatesCallback
-						}
-						customSaveButton={ customSaveButton }
-						forceDisableBlockTools={ forceDisableBlockTools }
-					/>
+					<AsyncModeProvider value>
+						<Header
+							forceIsDirty={ forceIsDirty }
+							setEntitiesSavedStatesCallback={
+								setEntitiesSavedStatesCallback
+							}
+							customSaveButton={ customSaveButton }
+							forceDisableBlockTools={ forceDisableBlockTools }
+						/>
+					</AsyncModeProvider>
 				)
 			}
-			editorNotices={ <Notices /> }
+			editorNotices={
+				<AsyncModeProvider value>
+					<Notices />
+				</AsyncModeProvider>
+			}
 			secondarySidebar={
 				! isPreviewMode &&
-				mode === 'visual' &&
-				( ( isInserterOpened && <InserterSidebar /> ) ||
-					( isListViewOpened && <ListViewSidebar /> ) )
+				mode === 'visual' && (
+					<AsyncModeProvider value>
+						{ ( isInserterOpened && <InserterSidebar /> ) ||
+							( isListViewOpened && <ListViewSidebar /> ) }
+					</AsyncModeProvider>
+				)
 			}
 			sidebar={
 				! isPreviewMode &&
@@ -236,7 +250,11 @@ export default function EditorInterface( {
 			}
 			content={
 				<>
-					{ ! isDistractionFree && ! isPreviewMode && <Notices /> }
+					{ ! isDistractionFree && ! isPreviewMode && (
+						<AsyncModeProvider value>
+							<Notices />
+						</AsyncModeProvider>
+					) }
 					{ shouldShowStylesCanvas && <StylesCanvas /> }
 					{ shouldShowBlockEditor && (
 						<>
@@ -276,13 +294,15 @@ export default function EditorInterface( {
 				isLargeViewport &&
 				showBlockBreadcrumbs &&
 				mode === 'visual' && (
-					<BlockBreadcrumb
-						rootLabelText={
-							postTypeLabel
-								? decodeEntities( postTypeLabel )
-								: undefined
-						}
-					/>
+					<AsyncModeProvider value>
+						<BlockBreadcrumb
+							rootLabelText={
+								postTypeLabel
+									? decodeEntities( postTypeLabel )
+									: undefined
+							}
+						/>
+					</AsyncModeProvider>
 				)
 			}
 			actions={
