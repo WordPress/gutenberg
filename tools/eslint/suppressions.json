@@ -4668,11 +4668,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/grid/hook.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/input-control/input-field.tsx": {
 		"react-hooks/immutability": {
 			"count": 2
