@@ -171,7 +171,9 @@ Keyed map of functions to match events.
 
 ### keyboardShortcut
 
-An object that contains functions returning every representation of a keyboard shortcut at once, rather than one string at a time.
+An object that contains functions returning the three values used to display and describe a keyboard shortcut: its display string, its `aria-keyshortcuts` value and its plain-text label.
+
+The raw representation is not included; use `rawShortcut` for that.
 
 Use it in place of calling `displayShortcut`, `ariaKeyShortcut` and `shortcutAriaLabel` separately, for example to build the `shortcut` prop of the `@wordpress/ui` components.
 
@@ -187,7 +189,7 @@ keyboardShortcut.primaryShift( 'm' );
 // }
 ```
 
-Keyed map of functions to shortcut representations.
+Keyed map of functions to shortcut display values.
 
 ### LEFT
 

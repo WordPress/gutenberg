@@ -51,7 +51,7 @@ export type WPEventKeyHandler = (
 export type WPModifier = ( isApple: () => boolean ) => WPModifierPart[];
 
 /**
- * The full set of representations of a keyboard shortcut.
+ * The values used to display and describe a keyboard shortcut.
  */
 export type WPKeyboardShortcut = {
 	/**
@@ -413,8 +413,11 @@ export const shortcutAriaLabel: WPModifierHandler< WPKeyHandler< string > > =
 	} );
 
 /**
- * An object that contains functions returning every representation of a
- * keyboard shortcut at once, rather than one string at a time.
+ * An object that contains functions returning the three values used to
+ * display and describe a keyboard shortcut: its display string, its
+ * `aria-keyshortcuts` value and its plain-text label.
+ *
+ * The raw representation is not included; use `rawShortcut` for that.
  *
  * Use it in place of calling `displayShortcut`, `ariaKeyShortcut` and
  * `shortcutAriaLabel` separately, for example to build the `shortcut` prop of
@@ -431,7 +434,7 @@ export const shortcutAriaLabel: WPModifierHandler< WPKeyHandler< string > > =
  * // }
  * ```
  *
- * Keyed map of functions to shortcut representations.
+ * Keyed map of functions to shortcut display values.
  */
 export const keyboardShortcut: WPModifierHandler<
 	WPKeyHandler< WPKeyboardShortcut >

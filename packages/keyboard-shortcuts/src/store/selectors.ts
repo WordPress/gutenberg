@@ -161,11 +161,15 @@ export function getShortcutRepresentation(
 }
 
 /**
- * Returns every representation of the main key combination for a given shortcut
- * name: its display string, its `aria-keyshortcuts` value and its plain-text
- * label.
+ * Returns the three values used to display and describe the main key
+ * combination of a registered shortcut: its display string, its
+ * `aria-keyshortcuts` value and its plain-text label. Returns `null` when no
+ * shortcut is registered under the name.
  *
- * The returned object can be passed straight to the `shortcut` prop of the
+ * The raw representation and aliases are not included; use
+ * `getShortcutRepresentation` and `getShortcutAliases` for those.
+ *
+ * The returned object can be passed to the `shortcut` prop of the
  * `@wordpress/ui` components.
  *
  * @param {Object} state Global state.
@@ -187,11 +191,15 @@ export function getShortcutRepresentation(
  *         []
  *     );
  *
- *     return <Menu.Item shortcut={ shortcut }>Next region</Menu.Item>;
+ *     return (
+ *         <Menu.Item shortcut={ shortcut ?? undefined }>
+ *             <Menu.ItemLabel>Next region</Menu.ItemLabel>
+ *         </Menu.Item>
+ *     );
  * };
  *```
  *
- * @return {WPKeyboardShortcut?} Shortcut representations.
+ * @return {WPKeyboardShortcut?} Shortcut display values.
  */
 export const getKeyboardShortcut = createSelector(
 	( state: ShortcutsState, name: string ): WPKeyboardShortcut | null => {

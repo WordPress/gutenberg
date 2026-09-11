@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `keyboardShortcut`, a helper returning every representation of a keyboard shortcut at once (`displayShortcut`, `ariaKeyShortcut` and `label`) ([#82632](https://github.com/WordPress/gutenberg/pull/82632)).
+-   Add `keyboardShortcut`, a helper returning the values used to display and describe a keyboard shortcut (`displayShortcut`, `ariaKeyShortcut` and `label`) ([#82632](https://github.com/WordPress/gutenberg/pull/82632)).
 
 ## 4.55.0 (2026-09-10)
 
