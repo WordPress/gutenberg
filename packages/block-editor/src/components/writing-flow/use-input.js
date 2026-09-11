@@ -28,6 +28,7 @@ export default function useInput() {
 		getSelectionStart,
 		getSelectionEnd,
 		getBlockAttributes,
+		getSettings,
 		getNextBlockClientId,
 		getBlockOrder,
 		getBlockEditingMode,
@@ -46,7 +47,23 @@ export default function useInput() {
 	} = useDispatch( blockEditorStore );
 
 	return useRefEffect( ( node ) => {
+		/*
+		 * A preview canvas is read-only, so none of the cross-block input
+		 * handling below applies: every branch of it writes to the store.
+		 * Preview mode is checked per event rather than once, because the
+		 * editor intent can turn it on and off while this effect stays
+		 * mounted.
+		 */
+		function isReadOnly() {
+			return !! getSettings().isPreviewMode;
+		}
+
 		function onBeforeInput( event ) {
+			if ( isReadOnly() ) {
+				event.preventDefault();
+				return;
+			}
+
 			// Enter in an editable is handled here instead of on keydown:
 			// moving focus while the keydown is still being handled leaves
 			// the iOS keyboard's auto-capitalization stale.
@@ -85,7 +102,7 @@ export default function useInput() {
 		}
 
 		function onKeyDown( event ) {
-			if ( event.defaultPrevented ) {
+			if ( event.defaultPrevented || isReadOnly() ) {
 				return;
 			}
 
@@ -299,6 +316,11 @@ export default function useInput() {
 		}
 
 		function onCompositionStart( event ) {
+			if ( isReadOnly() ) {
+				event.preventDefault();
+				return;
+			}
+
 			if ( ! hasMultiSelection() ) {
 				return;
 			}

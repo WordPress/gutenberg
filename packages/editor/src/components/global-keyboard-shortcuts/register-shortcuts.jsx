@@ -4,6 +4,19 @@ import { __ } from '@wordpress/i18n';
 import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { isAppleOS } from '@wordpress/keycodes';
+import { useCanSuggest } from '../suggestion-mode/gate';
+
+/**
+ * The intent shortcuts, kept together so they are registered and removed as
+ * one set. Names only: the descriptions are translated at registration time.
+ *
+ * @type {string[]}
+ */
+const INTENT_SHORTCUT_NAMES = [
+	'core/editor/intent-edit',
+	'core/editor/intent-suggest',
+	'core/editor/intent-view',
+];
 
 /**
  * Component for registering editor keyboard shortcuts.
@@ -12,7 +25,9 @@ import { isAppleOS } from '@wordpress/keycodes';
  */
 function EditorKeyboardShortcutsRegister() {
 	// Registering the shortcuts.
-	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
+	const { registerShortcut, unregisterShortcut } = useDispatch(
+		keyboardShortcutsStore
+	);
 	useEffect( () => {
 		registerShortcut( {
 			name: 'core/editor/toggle-mode',
@@ -152,6 +167,66 @@ function EditorKeyboardShortcutsRegister() {
 			],
 		} );
 	}, [ registerShortcut ] );
+
+	/*
+	 * The intent shortcuts follow the same runtime gate as the Mode menu and
+	 * the shortcut handlers: the Suggestion Mode experiment AND `editor.notes`
+	 * support on the current post type. Registration is what lists a shortcut
+	 * in the Keyboard Shortcuts help modal, so gating registration on the
+	 * experiment flag alone advertised "Switch to Suggest mode." on screens
+	 * that can never act on it. The Site Editor listed it for `wp_template`,
+	 * which has no notes support, renders no Mode menu, and does nothing when
+	 * the combination is pressed.
+	 *
+	 * `editor.notes` support arrives with the post type record, so the
+	 * predicate starts false and flips once it resolves, which is why the
+	 * effect is keyed on it. The cleanup removes the set again when it flips
+	 * back or the editor unmounts: the shortcuts store outlives this
+	 * component, so a registration left behind would keep advertising the
+	 * set to whatever mounts next.
+	 */
+	const canSuggest = useCanSuggest();
+	useEffect( () => {
+		if ( ! canSuggest ) {
+			return;
+		}
+
+		registerShortcut( {
+			name: 'core/editor/intent-edit',
+			category: 'global',
+			description: __( 'Switch to Edit mode.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'z',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/editor/intent-suggest',
+			category: 'global',
+			description: __( 'Switch to Suggest mode.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'x',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/editor/intent-view',
+			category: 'global',
+			description: __( 'Switch to View mode.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'c',
+			},
+		} );
+
+		return () => {
+			INTENT_SHORTCUT_NAMES.forEach( ( name ) =>
+				unregisterShortcut( name )
+			);
+		};
+	}, [ canSuggest, registerShortcut, unregisterShortcut ] );
 
 	return <BlockEditorKeyboardShortcuts.Register />;
 }
