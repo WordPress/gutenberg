@@ -3,12 +3,12 @@ import {
 	CheckboxControl,
 	Dropdown,
 	__experimentalVStack as VStack,
-	TextControl,
 	RadioControl,
 } from '@wordpress/components';
+import { ValidatedInputControl } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useRef, useEffect } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { useInstanceId } from '@wordpress/compose';
@@ -89,6 +89,36 @@ export default function PostStatus() {
 		'editor-change-status__password-input'
 	);
 	const { editEntityRecord } = useDispatch( coreStore );
+	const { lockPostSaving, unlockPostSaving } = useDispatch( editorStore );
+	const [ isStatusPopoverOpen, setIsStatusPopoverOpen ] = useState( false );
+	const passwordInputRef = useRef( null );
+	const isPasswordInvalid = password && password.length > 255;
+
+	useEffect( () => {
+		if ( isPasswordInvalid ) {
+			lockPostSaving( 'post-status-password-length' );
+		} else {
+			unlockPostSaving( 'post-status-password-length' );
+		}
+		return () => {
+			if ( ! isPasswordInvalid ) {
+				unlockPostSaving( 'post-status-password-length' );
+			}
+		};
+	}, [ isPasswordInvalid, lockPostSaving, unlockPostSaving ] );
+
+	// Reveal the inline error immediately when the limit is breached,
+	// following the Storybook "Showing Errors Without Moving Focus" pattern.
+	// This ensures the user sees the error before potentially clicking a block
+	// and unmounting the popover.
+	useEffect( () => {
+		if ( isPasswordInvalid && passwordInputRef.current ) {
+			passwordInputRef.current.dispatchEvent(
+				new window.Event( 'invalid', { cancelable: true } )
+			);
+		}
+	}, [ isPasswordInvalid ] );
+
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	// Memoize popoverProps to avoid returning a new object every time.
 	const popoverProps = useMemo(
@@ -144,6 +174,32 @@ export default function PostStatus() {
 		} );
 	};
 
+	const attemptClosePanel = () => {
+		if (
+			showPassword &&
+			passwordInputRef.current &&
+			! passwordInputRef.current.reportValidity()
+		) {
+			passwordInputRef.current.focus?.();
+			return false;
+		}
+
+		if ( ! password || password.trim() === '' ) {
+			setShowPassword( false );
+		}
+
+		setIsStatusPopoverOpen( false );
+		return true;
+	};
+
+	const handleToggle = ( willOpen ) => {
+		if ( willOpen ) {
+			setIsStatusPopoverOpen( true );
+		} else {
+			attemptClosePanel();
+		}
+	};
+
 	return (
 		<PostPanelRow label={ __( 'Status' ) } ref={ setPopoverAnchor }>
 			{ canEdit ? (
@@ -152,6 +208,9 @@ export default function PostStatus() {
 					contentClassName="editor-change-status__content"
 					popoverProps={ popoverProps }
 					focusOnMount
+					open={ isStatusPopoverOpen }
+					onToggle={ handleToggle }
+					onClose={ attemptClosePanel }
 					renderToggle={ ( { onToggle, isOpen } ) => (
 						<Button
 							className="editor-post-status__toggle"
@@ -169,16 +228,16 @@ export default function PostStatus() {
 							{ postStatusesInfo[ status ]?.label }
 						</Button>
 					) }
-					renderContent={ ( { onClose } ) => (
+					renderContent={ () => (
 						<>
 							<InspectorPopoverHeader
 								title={ __( 'Status & visibility' ) }
-								onClose={ onClose }
+								onClose={ attemptClosePanel }
 							/>
 							<form
 								onSubmit={ ( event ) => {
 									event.preventDefault();
-									onClose();
+									attemptClosePanel();
 								} }
 							>
 								<VStack spacing={ 4 }>
@@ -224,13 +283,17 @@ export default function PostStatus() {
 											/>
 											{ showPassword && (
 												<div className="editor-change-status__password-input">
-													<TextControl
+													<ValidatedInputControl
+														ref={ passwordInputRef }
 														label={ __(
 															'Password'
 														) }
-														onChange={ ( value ) =>
+														onValueChange={ (
+															value
+														) =>
 															updatePost( {
-																password: value,
+																password:
+																	value ?? '',
 															} )
 														}
 														value={ password }
@@ -239,7 +302,17 @@ export default function PostStatus() {
 														) }
 														type="text"
 														id={ passwordInputId }
-														maxLength={ 255 }
+														customValidity={
+															isPasswordInvalid
+																? {
+																		type: 'invalid',
+																		message:
+																			__(
+																				'Password cannot exceed 255 characters.'
+																			),
+																  }
+																: undefined
+														}
 													/>
 												</div>
 											) }
