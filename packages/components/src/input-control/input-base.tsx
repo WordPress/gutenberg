@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Backdrop from './backdrop';
 import Label from './label';
 import { Container, Root, Prefix, Suffix } from './styles/input-control-styles';

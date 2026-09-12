@@ -23,25 +23,24 @@ jobs:
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 10
         strategy:
             fail-fast: false
             matrix:
                 event: ['${{ github.event_name }}']
-                node: ['20', '22', '24']
+                node: ['24', '26']
                 os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
                 exclude:
-                    # On PRs: Only test Node 20 on Ubuntu
+                    # Only test Node 24 on Ubuntu for pull requests.
                     - event: 'pull_request'
-                      node: '22'
-                    - event: 'pull_request'
-                      node: '24'
+                      node: '26'
                     - event: 'pull_request'
                       os: 'macos-15'
                     - event: 'pull_request'
                       os: 'windows-2025'
 
         steps:
-            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -53,3 +52,49 @@ jobs:
 
             - name: Create block
               run: npm run test:create-block
+
+    packed-package:
+        name: Packed package w/Node.js ${{ matrix.node }}
+        runs-on: ubuntu-24.04
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 10
+        strategy:
+            fail-fast: false
+            matrix:
+                node: ['minimum', '22.0.0']
+
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Resolve the Node.js version
+              id: node
+              env:
+                  NODE_VERSION: ${{ matrix.node }}
+              run: |
+                  if [ "$NODE_VERSION" = 'minimum' ]; then
+                      NODE_VERSION="$(node --print 'require("./packages/create-block/package.json").engines.node.replace(/^>=/, "")')"
+                  fi
+                  echo "version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
+
+            - name: Use Node.js ${{ steps.node.outputs.version }}
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: ${{ steps.node.outputs.version }}
+
+            - name: Test the packed package
+              working-directory: ${{ runner.temp }}
+              run: |
+                  echo "Node version: $(node --version)"
+                  echo "npm version: $(npm --version)"
+                  npm pack "$GITHUB_WORKSPACE/packages/create-block" --pack-destination "$RUNNER_TEMP"
+                  mkdir create-block-consumer
+                  cd create-block-consumer
+                  npm init --yes
+                  npm install "$RUNNER_TEMP"/wordpress-create-block-*.tgz
+                  npm exec --no -- wp-create-block runtime-floor --no-wp-scripts
+                  test -f runtime-floor/src/runtime-floor/block.json

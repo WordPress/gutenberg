@@ -1,6 +1,4 @@
-/**
- * WordPress dependencies
- */
+import type { KeyboardEvent, ReactNode } from 'react';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -13,10 +11,6 @@ import {
 } from '@wordpress/media-editor';
 import { useNavigate, useParams } from '@wordpress/route';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import './style.scss';
 
 const { usePostFields } = unlock( editorPrivateApis );
@@ -25,6 +19,21 @@ const { MediaEditor } = unlock( mediaEditorPrivateApis );
 const MEDIA_LIST_PATH = '/types/attachment/list/all';
 const MEDIA_LIBRARY_ADMIN_PATH = 'upload.php';
 const MEDIA_EDITOR_ADMIN_PAGE = 'media-editor-wp-admin';
+
+/*
+ * The `MediaEditor` callback arguments this route reads. The private API
+ * does not publish its types, so these stay local until it stabilizes.
+ */
+interface SaveResult {
+	id: number;
+}
+
+interface FrameProps {
+	children: ReactNode;
+	isImage: boolean;
+	layout: 'wide' | 'narrow';
+	onKeyDown: ( event: KeyboardEvent< HTMLElement > ) => void;
+}
 
 function isMediaEditorAdminPage() {
 	return (
@@ -52,15 +61,16 @@ function MediaEditorRoute() {
 
 	const media = useSelect(
 		( select ) =>
+			/* The record of an attachment is always assignable to `Media`. */
 			select( coreStore ).getEditedEntityRecord(
 				'postType',
 				'attachment',
 				attachmentId
-			),
+			) as Media | false,
 		[ attachmentId ]
 	);
 
-	const title = getMediaTitle( media ?? null );
+	const title = getMediaTitle( media || null );
 	const navigateBack = () => {
 		if ( typeof window !== 'undefined' && window.history.length > 1 ) {
 			window.history.back();
@@ -78,41 +88,76 @@ function MediaEditorRoute() {
 			id={ attachmentId }
 			fields={ fields }
 			onClose={ navigateBack }
-			onSaved={ ( { id: savedId } ) => {
+			onSaved={ ( { id: savedId }: SaveResult ) => {
 				if ( savedId !== attachmentId ) {
 					navigate( { to: `/media-editor/${ savedId }` } );
 				}
 			} }
-			renderFrame={ ( { children, headerActions, onKeyDown } ) => (
-				<Page
-					className="media-editor-route"
-					ariaLabel={ title }
-					breadcrumbs={
-						<Breadcrumbs
-							items={
-								isStandaloneAdminPage
-									? [ { label: title } ]
-									: [
-											{
-												label: __( 'Media' ),
-												to: MEDIA_LIST_PATH,
-											},
-											{ label: title },
-									  ]
-							}
-						/>
-					}
-					actions={ headerActions }
-				>
-					{ /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */ }
+			renderFrame={ ( {
+				children,
+				isImage,
+				layout,
+				onKeyDown,
+			}: FrameProps ) => {
+				// Below `small` the page header already carries the
+				// breadcrumbs, Cancel/Save and (under `medium`) the
+				// framework's navigation toggle, in a row that does not wrap,
+				// so History moves to a bar under the canvas instead.
+				const isNarrow = layout === 'narrow';
+				return (
+					// The keydown handler covers the whole frame, not just the
+					// canvas: undo/redo live in the header, so after clicking
+					// one, focus sits outside the content region and the
+					// keyboard shortcuts would no longer reach the handler.
+					// `Page` takes no `onKeyDown`, hence the wrapper; it is
+					// `display: contents`, so it adds no box to the layout.
+					// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 					<div
-						className="media-editor-route__content"
+						className="media-editor-route__shortcut-scope"
 						onKeyDown={ onKeyDown }
 					>
-						{ children }
+						<Page
+							className="media-editor-route"
+							ariaLabel={ title }
+							breadcrumbs={
+								<Breadcrumbs
+									items={
+										isStandaloneAdminPage
+											? [ { label: title } ]
+											: [
+													{
+														label: __( 'Media' ),
+														to: MEDIA_LIST_PATH,
+													},
+													{ label: title },
+											  ]
+									}
+								/>
+							}
+							actions={
+								<>
+									{ ! isNarrow && (
+										<MediaEditor.HistoryActions />
+									) }
+									<MediaEditor.HeaderActions />
+									{ /* Compact to match the header's other
+									     controls, as elsewhere in wp-admin. */ }
+									<MediaEditor.SaveActions size="compact" />
+								</>
+							}
+						>
+							<div className="media-editor-route__content">
+								{ children }
+							</div>
+							{ isNarrow && isImage && (
+								<div className="media-editor-route__toolbar">
+									<MediaEditor.HistoryActions />
+								</div>
+							) }
+						</Page>
 					</div>
-				</Page>
-			) }
+				);
+			} }
 		/>
 	);
 }

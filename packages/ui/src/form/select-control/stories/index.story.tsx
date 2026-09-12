@@ -3,12 +3,16 @@ import { SelectControl } from '../';
 import {
 	WITH_DETAILS_DESCRIPTION,
 	DETAILS_EXAMPLE,
+	longLabelPopupItems,
+	narrowContainerDecorator,
 } from '../../stories/shared';
 
 const meta: Meta< typeof SelectControl > = {
 	title: 'Design System/Components/Form/SelectControl',
 	component: SelectControl,
 	subcomponents: {
+		'SelectControl.Group': SelectControl.Group,
+		'SelectControl.GroupLabel': SelectControl.GroupLabel,
 		'SelectControl.Item': SelectControl.Item,
 	},
 	argTypes: {
@@ -123,6 +127,64 @@ export const WithDisabledOption: Story = {
 	},
 };
 
+const groupedItems = [
+	{
+		label: 'Common',
+		items: [
+			{ value: 'apple', label: 'Apple' },
+			{ value: 'banana', label: 'Banana' },
+			{ value: 'orange', label: 'Orange' },
+		],
+	},
+	{
+		label: 'Berries',
+		items: [
+			{ value: 'strawberry', label: 'Strawberry' },
+			{ value: 'blueberry', label: 'Blueberry' },
+			{ value: 'raspberry', label: 'Raspberry' },
+		],
+	},
+	{
+		label: 'Tropical',
+		items: [
+			{ value: 'mango', label: 'Mango' },
+			{ value: 'pineapple', label: 'Pineapple' },
+			{ value: 'papaya', label: 'Papaya' },
+		],
+	},
+];
+
+/**
+ * Options can be organized into labeled groups with `SelectControl.Group`
+ * and `SelectControl.GroupLabel`. Pass a flat `items` array for trigger label
+ * resolution, and use `children` to render the grouped popup content.
+ */
+export const Grouped: Story = {
+	args: {
+		label: 'Fruit',
+		description: 'Choose a fruit.',
+		items: groupedItems.flatMap( ( group ) => group.items ),
+		children: [
+			groupedItems.map( ( group ) => (
+				<SelectControl.Group key={ group.label }>
+					<SelectControl.GroupLabel>
+						{ group.label }
+					</SelectControl.GroupLabel>
+					{ group.items.map( ( item ) => (
+						<SelectControl.Item
+							key={ item.value }
+							value={ item }
+							label={ item.label }
+						>
+							{ item.label }
+						</SelectControl.Item>
+					) ) }
+				</SelectControl.Group>
+			) ),
+		],
+	},
+};
+
 const userOptions: React.ComponentProps< typeof SelectControl >[ 'items' ] = [
 	{
 		value: '1',
@@ -214,5 +276,19 @@ export const WithItemsArrayAndPartialCustomization: Story = {
 				</SelectControl.Item>
 			) ),
 		],
+	},
+};
+
+/**
+ * Use `popupWidth` to control how the popup width is constrained relative to
+ * its anchor. Defaults to `content` so static option lists can grow with their
+ * labels.
+ */
+export const PopupWidth: Story = {
+	decorators: [ narrowContainerDecorator ],
+	args: {
+		label: 'Label',
+		items: longLabelPopupItems,
+		popupWidth: 'content',
 	},
 };

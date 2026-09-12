@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type {
 	Browser,
 	Page,
 	BrowserContext,
 	FrameLocator,
 } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { clickBlockOptionsMenuItem } from './click-block-options-menu-item';
 import { clickBlockToolbarButton } from './click-block-toolbar-button';
 import { getBlocks } from './get-blocks';
@@ -29,7 +22,6 @@ import { saveSiteEditorEntities } from './site-editor';
 import { setIsFixedToolbar } from './set-is-fixed-toolbar';
 import { switchToLegacyCanvas } from './switch-to-legacy-canvas';
 import { transformBlockTo } from './transform-block-to';
-import { switchEditorTool } from './switch-editor-tool';
 
 type EditorConstructorProps = {
 	page: Page;
@@ -91,8 +83,6 @@ export class Editor {
 	/** @borrows setIsFixedToolbar as this.setIsFixedToolbar */
 	setIsFixedToolbar: typeof setIsFixedToolbar =
 		setIsFixedToolbar.bind( this );
-	/** @borrows switchEditorTool as this.switchEditorTool */
-	switchEditorTool: typeof switchEditorTool = switchEditorTool.bind( this );
 	/** @borrows switchToLegacyCanvas as this.switchToLegacyCanvas */
 	switchToLegacyCanvas: typeof switchToLegacyCanvas =
 		switchToLegacyCanvas.bind( this );

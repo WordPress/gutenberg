@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { DataRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 

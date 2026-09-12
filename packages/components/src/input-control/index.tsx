@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import InputBase from './input-base';
 import InputField from './input-field';
 import type { InputControlProps } from './types';
@@ -37,7 +26,6 @@ export function UnforwardedInputControl(
 		// Prevent passing legacy props to internal components.
 		__next40pxDefaultSize: _next40pxDefaultSize,
 		__next36pxDefaultSize: _next36pxDefaultSize,
-		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		__unstableStateReducer: stateReducer = ( state ) => state,
 		__unstableInputWidth,
 		className,

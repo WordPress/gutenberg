@@ -226,6 +226,11 @@
 					"type": "boolean",
 					"default": false
 				},
+				"autoRegister": {
+					"description": "Allows PHP-only blocks with a `render_callback` to appear in the block editor without JavaScript registration. The editor renders them with `ServerSideRender`. If a block uses an API version older than 3, or does not specify one, the editor uses version 3.",
+					"type": "boolean",
+					"default": false
+				},
 				"align": {
 					"description": "This property adds block controls which allow to change block’s alignment.",
 					"oneOf": [
@@ -670,6 +675,11 @@
 							"description": "This value signals that a block supports the text-indent CSS style property. When it does, the block editor will show a UI control for the user to set its value if the theme declares support.\n\nWhen the block declares support for textIndent, its attributes definition is extended to include the style attribute.",
 							"type": "boolean",
 							"default": false
+						},
+						"textShadow": {
+							"description": "This value signals that a block supports the text-shadow CSS style property. When it does, the block editor will show a UI control for the user to set its value if the theme declares support.\n\nWhen the block declares support for textShadow, its attributes definition is extended to include the style attribute.",
+							"type": "boolean",
+							"default": false
 						}
 					}
 				},
@@ -710,11 +720,6 @@
 				},
 				"splitting": {
 					"description": "This property indicates whether the block can split when the Enter key is pressed or when blocks are pasted.",
-					"type": "boolean",
-					"default": false
-				},
-				"editableRoot": {
-					"description": "This property indicates that the block works when an ancestor element (the editor canvas) is the contenteditable editing host, with focus and native selection residing there instead of on the block's own elements. It enables native partial selection across blocks.",
 					"type": "boolean",
 					"default": false
 				}

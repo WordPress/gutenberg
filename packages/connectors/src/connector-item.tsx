@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -13,10 +10,6 @@ import {
 } from '@wordpress/components';
 import { createInterpolateElement, useId, useState } from '@wordpress/element';
 import { __, sprintf, type TransformedText } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { ReactNode } from 'react';
 import type { ApiKeySource } from './types';
 
@@ -39,7 +32,7 @@ export function ConnectorItem( {
 }: ConnectorItemProps ) {
 	const headingId = useId();
 	return (
-		<Item className={ className }>
+		<Item className={ className } role="listitem">
 			<VStack spacing={ 4 } role="group" aria-labelledby={ headingId }>
 				<HStack alignment="center" spacing={ 4 } wrap>
 					{ logo }

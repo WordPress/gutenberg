@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block - Frontend interactivity', () => {
@@ -133,6 +130,124 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 	} );
 
+	test.describe( 'Submenus inside an overlay', () => {
+		const submenuMenuContent = `
+			<!-- wp:navigation-submenu {"label":"Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+				<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+			<!-- /wp:navigation-submenu -->
+			`;
+
+		test( 'submenus in a custom overlay set to open on click, do not display until clicked', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			// The menu shown in the overlay. The header navigation uses a
+			// separate menu so that the overlay's submenu is the only one in
+			// the page.
+			const overlayMenu = await requestUtils.createNavigationMenu( {
+				title: 'Overlay menu',
+				content: submenuMenuContent,
+			} );
+			const headerMenu = await requestUtils.createNavigationMenu( {
+				title: 'Header menu',
+				content: `
+					<!-- wp:navigation-link {"label":"Header Item","type":"custom","url":"http://www.wordpress.org/"} /-->
+					`,
+			} );
+
+			await requestUtils.createTemplate( 'wp_template_part', {
+				slug: 'navigation-overlay',
+				title: 'Navigation Overlay',
+				area: 'navigation-overlay',
+				content: `
+					<!-- wp:navigation-overlay-close /-->
+					<!-- wp:navigation {"ref":${ overlayMenu.id },"submenuVisibility":"click","showSubmenuIcon":false,"layout":{"type":"flex","orientation":"vertical"}} /-->
+					`,
+			} );
+			await requestUtils.createTemplate( 'wp_template_part', {
+				slug: 'header',
+				title: 'Header',
+				content: `<!-- wp:navigation {"ref":${ headerMenu.id },"overlayMenu":"always","overlay":"navigation-overlay"} /-->`,
+			} );
+
+			await page.goto( '/' );
+
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Submenu submenu',
+			} );
+			const submenuLink = page.getByRole( 'link', {
+				name: 'Submenu Link',
+			} );
+
+			await openMenuButton.click();
+
+			// A custom overlay does not display its submenus, so opening the
+			// overlay must leave the submenu closed.
+			await expect( submenuButton ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+			await expect( submenuLink ).toBeHidden();
+
+			// The submenu opens and closes on click, as configured.
+			await submenuButton.click();
+			await expect( submenuButton ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect( submenuLink ).toBeVisible();
+
+			await submenuButton.click();
+			await expect( submenuButton ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+			await expect( submenuLink ).toBeHidden();
+		} );
+
+		test( 'submenus report themselves as expanded with the default overlay', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Overlay menu',
+				content: submenuMenuContent,
+			} );
+
+			// The same submenu setting as the test above, so that the overlay
+			// is the only difference between the two. The arrow toggle is not
+			// used here because the default overlay hides it with
+			// `display: none`, which takes it out of the accessibility tree.
+			await requestUtils.createTemplate( 'wp_template_part', {
+				slug: 'header',
+				title: 'Header',
+				content: `<!-- wp:navigation {"ref":${ menu.id },"overlayMenu":"always","submenuVisibility":"click"} /-->`,
+			} );
+
+			await page.goto( '/' );
+
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Submenu submenu',
+			} );
+			const submenuLink = page.getByRole( 'link', {
+				name: 'Submenu Link',
+			} );
+
+			await page.getByRole( 'button', { name: 'Open menu' } ).click();
+
+			// The default overlay expands every submenu it contains, so the
+			// toggle has to report that without waiting for an interaction.
+			await expect( submenuLink ).toBeVisible();
+			await expect( submenuButton ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+		} );
+	} );
+
 	test.describe( 'Submenu mouse and keyboard interactions', () => {
 		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
 			await admin.visitSiteEditor( {
@@ -197,7 +312,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( innerElement ).toBeVisible();
 
 			// Test: submenu closes on click outside submenu
-			await page.click( 'body' );
+			await page.locator( 'body' ).click();
 			await expect( innerElement ).toBeHidden();
 
 			// Test: nested submenu opens on click
@@ -212,7 +327,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( secondLevelElement ).toBeVisible();
 
 			// Test: nested submenus close on click outside submenu
-			await page.click( 'body' );
+			await page.locator( 'body' ).click();
 			await expect( firstLevelElement ).toBeHidden();
 			await expect( secondLevelElement ).toBeHidden();
 
@@ -350,7 +465,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( secondLevelElement ).toBeHidden();
 
 			// Close the menu via click on the body
-			await page.click( 'body' );
+			await page.locator( 'body' ).click();
 			await expect( firstLevelElement ).toBeHidden();
 
 			// Test: nested submenu closes on ESC key and focuses parent menu item:
@@ -445,7 +560,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( secondLevelElement ).toBeHidden();
 
 			// Close menu via click on the body
-			await page.click( 'body' );
+			await page.locator( 'body' ).click();
 			await expect( firstLevelElement ).toBeHidden();
 			await expect( secondLevelElement ).toBeHidden();
 		} );
@@ -503,7 +618,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( innerElement ).toBeVisible();
 
 			// page-list submenu closes on click outside
-			await page.click( 'body' );
+			await page.locator( 'body' ).click();
 			await expect( innerElement ).toBeHidden();
 
 			// page-list submenu opens on enter keypress

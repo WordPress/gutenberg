@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const userList = [
@@ -46,6 +43,12 @@ const userList = [
 		lastName: 'Elf',
 		password: 'sm1lingsmyfavorite',
 	},
+	{
+		username: 'thescribe',
+		firstName: 'შოთა',
+		lastName: 'რუსთაველი',
+		password: 'n0nl@t1nName',
+	},
 ];
 
 test.describe( 'Autocomplete (@firefox, @webkit)', () => {
@@ -78,6 +81,34 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 	].forEach( ( completerAndOptionType ) => {
 		const [ completer, type ] = completerAndOptionType;
 
+		if ( type === 'mention' ) {
+			test( `${ completer }: should not trigger ${ type } when the immediately preceding character is not a space`, async ( {
+				page,
+				editor,
+			} ) => {
+				await editor.canvas
+					.getByRole( 'document', { name: 'Add default block' } )
+					.click();
+				await page.keyboard.type( 'email@da' );
+
+				// Allow time for the autocomplete trigger effects to settle.
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+				await page.waitForTimeout( 100 );
+				await expect( page.getByRole( 'listbox' ) ).toBeHidden();
+
+				// Enter must break the line rather than accept a completion.
+				await page.keyboard.press( 'Enter' );
+				await expect.poll( editor.getEditedPostContent )
+					.toBe( `<!-- wp:paragraph -->
+<p>email@da</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->` );
+			} );
+		}
+
 		test( `${ completer }: should insert ${ type }`, async ( {
 			page,
 			editor,
@@ -99,7 +130,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.triggerString );
 			await expect(
@@ -110,6 +141,13 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				.evaluate( () => {
 					return document.activeElement.getAttribute( 'aria-owns' );
 				} );
+			const ariaControls = await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => {
+					return document.activeElement.getAttribute(
+						'aria-controls'
+					);
+				} );
 			const ariaActiveDescendant = await editor.canvas
 				.locator( ':root' )
 				.evaluate( () => {
@@ -117,10 +155,16 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 						'aria-activedescendant'
 					);
 				} );
-			// Ensure `aria-owns` is part of the same document and ensure the
-			// selected option is equal to the active descendant.
+			// Ensure `aria-owns` and `aria-controls` are part of the same
+			// document and ensure the selected option is equal to the active
+			// descendant.
 			await expect(
 				editor.canvas.locator( `#${ ariaOwns } [aria-selected="true"]` )
+			).toHaveAttribute( 'id', ariaActiveDescendant );
+			await expect(
+				editor.canvas.locator(
+					`#${ ariaControls } [aria-selected="true"]`
+				)
 			).toHaveAttribute( 'id', ariaActiveDescendant );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
@@ -151,7 +195,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( 'Stuck in the middle with you.' );
 			await pageUtils.pressKeys( 'ArrowLeft', { times: 'you.'.length } );
@@ -194,7 +238,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.firstTriggerString );
 			await expect(
@@ -238,7 +282,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.triggerString );
 			await page
@@ -276,7 +320,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.triggerString );
 			await expect(
@@ -313,7 +357,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.triggerString );
 			await expect(
@@ -334,7 +378,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				editor,
 			} ) => {
 				await editor.canvas
-					.locator( 'role=button[name="Add default block"i]' )
+					.locator( 'role=document[name="Add default block"i]' )
 					.click();
 				// The 'Grapes' option is disabled in our test plugin, so it should not insert the grapes emoji
 				await page.keyboard.type( 'Sorry, we are all out of ~g' );
@@ -402,7 +446,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 
 			for ( let i = 0; i < 4; i++ ) {
@@ -467,7 +511,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( '@fr' );
@@ -508,7 +552,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '@fr' );
 		await expect(
@@ -526,7 +570,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '@' );
 		await pageUtils.pressKeys( 'primary+b' );
@@ -550,7 +594,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/' );
 		await expect(
@@ -579,7 +623,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		const mentionOption = page.getByRole( 'option', {
 			name: 'Bilbo Baggins thebetterhobbit',
@@ -609,7 +653,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		'should not re-trigger autocomplete after accepting a mention and changing text near it',
 		async ( { editor, page, pageUtils } ) => {
 			await editor.canvas
-				.getByRole( 'button', { name: 'Add default block' } )
+				.getByRole( 'document', { name: 'Add default block' } )
 				.click();
 
 			await page.keyboard.type( '@bi' );
@@ -654,7 +698,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( '@bi' );
@@ -692,7 +736,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( 'hello @fr' );
@@ -717,12 +761,75 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		await expect( page.getByRole( 'listbox' ) ).toBeHidden();
 	} );
 
+	test( 'should mirror the suggestions list reference onto the editing host', async ( {
+		editor,
+		page,
+	} ) => {
+		// The editing host, which `RichText` mirrors these attributes onto by
+		// hand, only takes over once the block has a sibling.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'A first paragraph.' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'hello @fr' );
+
+		await expect(
+			page.getByRole( 'option', {
+				name: 'Frodo Baggins',
+				selected: true,
+			} )
+		).toBeVisible();
+
+		const editingHost = editor.canvas.getByRole( 'textbox', {
+			name: 'Editor canvas',
+		} );
+
+		// The popover renders outside the canvas, so the list is mirrored back
+		// into it — these IDs have to resolve in the host's own document.
+		const listBoxId = await editor.canvas
+			.getByRole( 'listbox' )
+			.getAttribute( 'id' );
+		const optionId = await editor.canvas
+			.getByRole( 'option', { name: 'Frodo Baggins' } )
+			.getAttribute( 'id' );
+
+		await expect( editingHost ).toHaveAttribute(
+			'aria-autocomplete',
+			'list'
+		);
+		await expect( editingHost ).toHaveAttribute(
+			'aria-haspopup',
+			'listbox'
+		);
+		await expect( editingHost ).toHaveAttribute(
+			'aria-controls',
+			listBoxId
+		);
+		await expect( editingHost ).toHaveAttribute( 'aria-owns', listBoxId );
+		await expect( editingHost ).toHaveAttribute(
+			'aria-activedescendant',
+			optionId
+		);
+
+		await page.keyboard.press( 'Escape' );
+		await expect( page.getByRole( 'listbox' ) ).toBeHidden();
+
+		// Only an omitted value clears an attribute here: a `null` would land
+		// on the host as the string "null".
+		await expect( editingHost ).not.toHaveAttribute( 'aria-controls' );
+		await expect( editingHost ).not.toHaveAttribute( 'aria-owns' );
+		await expect( editingHost ).not.toHaveAttribute(
+			'aria-activedescendant'
+		);
+	} );
+
 	test( 'should re-trigger autocomplete when backspacing into a completed mention', async ( {
 		editor,
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( '@fr' );
@@ -745,5 +852,24 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				name: 'Frodo Baggins',
 			} )
 		).toBeVisible();
+	} );
+
+	// The search term must reach the REST API unencoded. Pre-encoding it means
+	// WordPress's `sanitize_text_field` strips every percent-encoded sequence,
+	// so a non-latin term is erased entirely and matches every user.
+	test( 'should filter mentions by non-latin search terms', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+
+		await page.keyboard.type( '@შოთა' );
+
+		await expect(
+			page.getByRole( 'option', { name: 'შოთა რუსთაველი' } )
+		).toBeVisible();
+		await expect( page.getByRole( 'option' ) ).toHaveCount( 1 );
 	} );
 } );

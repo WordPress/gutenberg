@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getBlockSupport } from '@wordpress/blocks';
 
 export default function useBlockRename( name ) {

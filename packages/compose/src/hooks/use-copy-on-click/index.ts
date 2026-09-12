@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import type { RefObject } from 'react';
-
-/**
- * Internal dependencies
- */
 import { restoreFocus, copyToClipboard } from '../use-copy-to-clipboard';
 
 /**

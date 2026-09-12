@@ -14,7 +14,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-
 // `wasm-vips` is a dependency of `@wordpress/vips` and is installed under that
 // package's `node_modules` (it no longer hoists to the repo root as of 0.0.18),
 // so resolve it from there, mirroring test/performance/specs/media-processing.

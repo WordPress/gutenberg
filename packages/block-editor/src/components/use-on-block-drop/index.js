@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import {
 	cloneBlock,
@@ -13,10 +10,6 @@ import {
 } from '@wordpress/blocks';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 /** @typedef {React.SyntheticEvent} SyntheticEvent */

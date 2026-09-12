@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef, useEffect, useMemo } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import type { WordPressComponentProps } from '../../context';
 import ToggleGroupControlContext from '../context';
@@ -32,6 +21,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		value: valueProp,
 		id: idProp,
 		setSelectedElement,
+		disabled,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
@@ -89,6 +79,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 			// @ts-expect-error - This is wrong and we should fix it.
 			setValue,
 			setSelectedElement,
+			disabled: Boolean( disabled ),
 		} ),
 		[
 			baseId,
@@ -97,6 +88,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 			selectedValue,
 			setSelectedElement,
 			setValue,
+			disabled,
 		]
 	);
 
@@ -109,6 +101,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 				{ ...otherProps }
 				id={ baseId }
 				ref={ forwardedRef }
+				disabled={ disabled || undefined }
 			>
 				{ children }
 			</Ariakit.RadioGroup>

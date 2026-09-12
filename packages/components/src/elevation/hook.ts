@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { SerializedStyles } from '@emotion/react';
 import { css } from '@emotion/react';
-
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import * as styles from './styles';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'HTML block', () => {
@@ -11,7 +8,7 @@ test.describe( 'HTML block', () => {
 	test( 'can be created by typing "/html"', async ( { editor, page } ) => {
 		// Create a Custom HTML block with the slash shortcut.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '/html' );
 		await expect(
@@ -44,7 +41,7 @@ test.describe( 'HTML block', () => {
 	test( 'should not encode <', async ( { editor, page } ) => {
 		// Create a Custom HTML block with the slash shortcut.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '/html' );
 		await expect(

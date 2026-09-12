@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post title', () => {
@@ -184,7 +181,7 @@ test.describe( 'Post title', () => {
 				} )
 			).toBeVisible();
 
-			const pageTitleField = page.getByRole( 'textbox', {
+			const titleField = page.getByRole( 'textbox', {
 				name: 'Add title',
 			} );
 
@@ -195,11 +192,11 @@ test.describe( 'Post title', () => {
 			} );
 
 			// focus on the title field
-			await pageTitleField.focus();
+			await titleField.focus();
 
 			await pageUtils.pressKeys( 'primary+v' );
 
-			await expect( pageTitleField ).toHaveText(
+			await expect( titleField ).toHaveText(
 				'I am <em>emphasis</em> I am <strong>bold</strong> I am <a href="#">anchor</a>'
 			);
 		} );

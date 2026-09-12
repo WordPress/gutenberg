@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesUI as GlobalStylesUIComponent } from '../global-styles-ui';
 
 export default { title: 'GlobalStylesUI/GlobalStylesUI' };
@@ -272,6 +265,18 @@ const BASE_SETTINGS = {
 						shadow: '6px 6px 0px rgba(0, 0, 0, 1)',
 					},
 				],
+				theme: [
+					{
+						name: 'Soft',
+						slug: 'soft',
+						shadow: '4px 4px 8px rgba(0, 0, 0, 0.15)',
+					},
+					{
+						name: 'Hard',
+						slug: 'hard',
+						shadow: '8px 8px 0px rgba(0, 0, 0, 0.35)',
+					},
+				],
 			},
 		},
 		layout: {
@@ -352,6 +357,18 @@ const BASE_SETTINGS = {
 						size: '42px',
 					},
 				],
+				theme: [
+					{
+						name: 'Body',
+						slug: 'body',
+						size: '18px',
+					},
+					{
+						name: 'Heading',
+						slug: 'heading',
+						size: '48px',
+					},
+				],
 			},
 			fontStyle: true,
 			fontWeight: true,
@@ -361,6 +378,27 @@ const BASE_SETTINGS = {
 			textDecoration: true,
 			textTransform: true,
 			writingMode: false,
+			textShadow: true,
+			defaultTextShadowPresets: true,
+			textShadowPresets: {
+				default: [
+					{
+						name: 'Light',
+						slug: 'light',
+						textShadow: '0.05em 0.05em 0.1em rgba(0, 0, 0, 0.3)',
+					},
+					{
+						name: 'Strong',
+						slug: 'strong',
+						textShadow: '0.1em 0.1em 0.25em rgba(0, 0, 0, 0.5)',
+					},
+					{
+						name: 'Outlined',
+						slug: 'outlined',
+						textShadow: '0.05em 0.05em 0 rgba(0, 0, 0, 0.3)',
+					},
+				],
+			},
 			fluid: true,
 			fontFamilies: {
 				theme: [

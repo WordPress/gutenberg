@@ -1,8 +1,6 @@
 # `ToggleGroupControl`
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 `ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use [`ToggleGroupControlOption`](/packages/components/src/toggle-group-control/toggle-group-control-option/README.md) component.
 
@@ -20,11 +18,7 @@ import {
 
 function Example() {
 	return (
-		<ToggleGroupControl
-			label="my label"
-			value="vertical"
-			isBlock
-		>
+		<ToggleGroupControl label="my label" value="vertical" isBlock>
 			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
 			<ToggleGroupControlOption value="vertical" label="Vertical" />
 		</ToggleGroupControl>
@@ -86,3 +80,10 @@ Callback when a segment is selected.
 The value of the `ToggleGroupControl`.
 
 -   Required: No
+
+### `disabled`: `boolean`
+
+If true, every option is unselectable. The selected value is left as-is.
+
+-   Required: No
+-   Default: `false`

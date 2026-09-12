@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ComponentProps, InputHTMLAttributes, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type Icon from '../icon';
 
 // TODO: Replace `children` and `icon` types with props from Button once Button is typed.

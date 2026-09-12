@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { StoryFn, Meta } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { Button } from '../..';
 import type { ButtonAsButtonProps, ButtonAsAnchorProps } from '../../types';
 
@@ -51,7 +40,13 @@ export const VariantStates: StoryFn< typeof Button > = (
 					{ name }
 				</th>
 				{ variants.map( ( variant ) => (
-					<td key={ variant ?? 'undefined' } style={ { padding: 4 } }>
+					<td
+						key={ variant ?? 'undefined' }
+						style={ {
+							padding: 4,
+							textAlign: 'center',
+						} }
+					>
 						<Button
 							__next40pxDefaultSize
 							{ ...props }
@@ -86,6 +81,11 @@ export const VariantStates: StoryFn< typeof Button > = (
 			</thead>
 			<tbody>
 				<VariantsRow name="(default)" />
+				<VariantsRow
+					name="compact"
+					buttonProps={ { size: 'compact' } }
+				/>
+				<VariantsRow name="small" buttonProps={ { size: 'small' } } />
 				<VariantsRow
 					name="disabled"
 					buttonProps={ { disabled: true } }
@@ -138,6 +138,10 @@ export const VariantStates: StoryFn< typeof Button > = (
 						accessibleWhenDisabled: true,
 						disabled: true,
 					} }
+				/>
+				<VariantsRow
+					name="with icon"
+					buttonProps={ { icon: wordpress } }
 				/>
 			</tbody>
 		</table>

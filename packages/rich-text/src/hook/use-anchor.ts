@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { usePrevious } from '@wordpress/compose';
 import { useState, useLayoutEffect } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import type { WPFormat } from '../register-format-type';
 import { ownsSelection } from '../owns-selection';
 

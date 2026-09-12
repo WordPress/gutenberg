@@ -19,8 +19,8 @@ component, and the `Menu.Popover` component.
 
 ### `as`
 
- - Type: `ElementType<any, keyof IntrinsicElements>`
- - Required: Yes
+ - Type: `any`
+ - Required: No
 
 The HTML element or React component to render the component as.
 
@@ -64,7 +64,7 @@ A callback that gets called when the `open` state changes.
 
 ### `placement`
 
- - Type: `"top" | "bottom" | "left" | "right" | "top-start" | "bottom-start" | "left-start" | "right-start" | "top-end" | "bottom-end" | ...`
+ - Type: `"left" | "right" | "top" | "bottom" | "left-start" | "right-start" | "top-start" | "bottom-start" | "left-end" | "right-end" | ...`
  - Required: No
  - Default: `'bottom-start' for root-level menus, 'right-start' for submenus`
 
@@ -466,7 +466,7 @@ Renders a menu item's label text. It should be wrapped with `Menu.Item`,
 
 ##### `as`
 
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
+ - Type: `keyof IntrinsicElements | JSXElementConstructor<any>`
  - Required: No
 
 The HTML element or React component to render the component as.
@@ -480,7 +480,7 @@ Renders a menu item's help text. It should be wrapped with `Menu.Item`,
 
 ##### `as`
 
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
+ - Type: `keyof IntrinsicElements | JSXElementConstructor<any>`
  - Required: No
 
 The HTML element or React component to render the component as.

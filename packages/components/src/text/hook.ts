@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { SerializedStyles } from '@emotion/react';
 import { css } from '@emotion/react';
 import type React from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, Children, cloneElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { hasConnectNamespace, useContextSystem } from '../context';
 import { useTruncate } from '../truncate';

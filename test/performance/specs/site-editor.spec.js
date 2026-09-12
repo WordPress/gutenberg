@@ -1,13 +1,5 @@
 /* eslint-disable playwright/expect-expect */
-
-/**
- * WordPress dependencies
- */
 import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * Internal dependencies
- */
 import { PerfUtils } from '../fixtures';
 
 // See https://github.com/WordPress/gutenberg/issues/51383#issuecomment-1613460429

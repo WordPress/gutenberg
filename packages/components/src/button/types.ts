@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { Props as IconProps } from '../icon';
 import type { PopoverProps } from '../popover/types';
 import type { WordPressComponentProps } from '../context/wordpress-component';

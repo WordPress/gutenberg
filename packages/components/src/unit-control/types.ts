@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { FocusEventHandler } from 'react';
-
-/**
- * Internal dependencies
- */
 import type {
 	InputChangeCallback,
 	InputControlProps,

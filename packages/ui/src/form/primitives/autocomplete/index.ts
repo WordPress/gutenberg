@@ -12,4 +12,7 @@ export { Popup } from './popup';
 export { Portal } from './portal';
 export { Positioner } from './positioner';
 export { Root } from './root';
+export { Row } from './row';
+export { Status } from './status';
+export { useFilteredItems } from './use-filtered-items';
 export { Value } from './value';

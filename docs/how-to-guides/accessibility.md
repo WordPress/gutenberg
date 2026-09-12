@@ -13,5 +13,5 @@ For setting up navigation between different regions, see the [navigateRegions pa
 Read more regarding landmark design from W3C:
 
 -   [General Principles of Landmark Design](https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/#x4-2-general-principles-of-landmark-design)
--   [ARIA Landmarks Examples](https://www.w3.org/WAI/ARIA/apg/example-index/landmarks/)
+-   [ARIA Landmarks Examples](https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/)
 -   [HTML5 elements that by default define ARIA landmarks](https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/#x4-1-html-sectioning-elements)

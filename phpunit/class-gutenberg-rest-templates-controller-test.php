@@ -93,31 +93,34 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		unset( $data['content'] );
 		unset( $data['_links'] );
 
-		$this->assertSame(
-			array(
-				'id'              => 'default//my_template',
-				'theme'           => 'default',
-				'slug'            => 'my_template',
-				'source'          => 'custom',
-				'origin'          => null,
-				'type'            => 'wp_template',
-				'description'     => 'Description of my template.',
-				'title'           => array(
-					'raw'      => 'My Template',
-					'rendered' => 'My Template',
-				),
-				'status'          => 'publish',
-				'wp_id'           => self::$template_post->ID,
-				'has_theme_file'  => false,
-				'is_custom'       => true,
-				'author'          => 0,
-				'modified'        => mysql_to_rfc3339( self::$template_post->post_modified ),
-				'author_text'     => 'Test Blog',
-				'original_source' => 'site',
-				'date'            => mysql_to_rfc3339( self::$template_post->post_date ),
+		$expected = array(
+			'id'              => 'default//my_template',
+			'theme'           => 'default',
+			'slug'            => 'my_template',
+			'source'          => 'custom',
+			'origin'          => null,
+			'type'            => 'wp_template',
+			'description'     => 'Description of my template.',
+			'title'           => array(
+				'raw'      => 'My Template',
+				'rendered' => 'My Template',
 			),
-			$data
+			'status'          => 'publish',
+			'wp_id'           => self::$template_post->ID,
+			'has_theme_file'  => false,
+			'is_custom'       => true,
+			'author'          => 0,
+			'modified'        => mysql_to_rfc3339( self::$template_post->post_modified ),
+			'author_text'     => 'Test Blog',
+			'original_source' => 'site',
+			'date'            => mysql_to_rfc3339( self::$template_post->post_date ),
 		);
+		$actual   = $data;
+
+		// The REST response is a JSON object, so key order is not part of the contract.
+		ksort( $expected );
+		ksort( $actual );
+		$this->assertSame( $expected, $actual );
 	}
 
 	/**
@@ -129,31 +132,53 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame(
-			array(
-				'id'              => 'default//my_template',
-				'theme'           => 'default',
-				'slug'            => 'my_template',
-				'source'          => 'custom',
-				'origin'          => null,
-				'type'            => 'wp_template',
-				'description'     => 'Description of my template.',
-				'title'           => array(
-					'raw'      => 'My Template',
-					'rendered' => 'My Template',
-				),
-				'status'          => 'publish',
-				'wp_id'           => self::$template_post->ID,
-				'has_theme_file'  => false,
-				'is_custom'       => true,
-				'author'          => 0,
-				'modified'        => mysql_to_rfc3339( self::$template_post->post_modified ),
-				'author_text'     => 'Test Blog',
-				'original_source' => 'site',
-				'date'            => mysql_to_rfc3339( self::$template_post->post_date ),
+		$expected = array(
+			'id'              => 'default//my_template',
+			'theme'           => 'default',
+			'slug'            => 'my_template',
+			'source'          => 'custom',
+			'origin'          => null,
+			'type'            => 'wp_template',
+			'description'     => 'Description of my template.',
+			'title'           => array(
+				'raw'      => 'My Template',
+				'rendered' => 'My Template',
 			),
-			$this->find_and_normalize_template_by_id( $data, 'default//my_template' )
+			'status'          => 'publish',
+			'wp_id'           => self::$template_post->ID,
+			'has_theme_file'  => false,
+			'is_custom'       => true,
+			'author'          => 0,
+			'modified'        => mysql_to_rfc3339( self::$template_post->post_modified ),
+			'author_text'     => 'Test Blog',
+			'original_source' => 'site',
+			'date'            => mysql_to_rfc3339( self::$template_post->post_date ),
 		);
+		$actual   = $this->find_and_normalize_template_by_id( $data, 'default//my_template' );
+
+		// The REST response is a JSON object, so key order is not part of the contract.
+		ksort( $expected );
+		ksort( $actual );
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * A file-backed template has no modification date, which should be exposed as
+	 * `null` rather than the `false` returned by `mysql_to_rfc3339()`.
+	 *
+	 * @ticket 65728
+	 * @covers WP_REST_Templates_Controller::prepare_item_for_response
+	 */
+	public function test_get_item_modified_is_null_for_file_backed_template() {
+		wp_set_current_user( self::$admin_id );
+		switch_theme( 'block-theme' );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/block-theme//page-home' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status(), 'Fetching a file-backed template should return 200.' );
+		$this->assertNull( $data['modified'], 'The modified date should be null for a file-backed template.' );
 	}
 
 	/**
@@ -182,6 +207,22 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	 */
 	public function test_prepare_item() {
 		// Not testing item preparation.
+	}
+
+	/**
+	 * A `null` template must produce an error response, not a fatal error from
+	 * reading properties on `null`.
+	 *
+	 * @covers Gutenberg_REST_Templates_Controller_7_2::prepare_item_for_response
+	 */
+	public function test_prepare_item_for_response_with_null_template() {
+		$controller = new Gutenberg_REST_Templates_Controller_7_2( 'wp_template' );
+		$request    = new WP_REST_Request( 'PUT', '/wp/v2/templates/default//does-not-exist' );
+
+		$response = $controller->prepare_item_for_response( null, $request );
+
+		$this->assertWPError( $response, 'A null template should produce a WP_Error, not a fatal error.' );
+		$this->assertSame( 'rest_template_not_found', $response->get_error_code() );
 	}
 
 	/**

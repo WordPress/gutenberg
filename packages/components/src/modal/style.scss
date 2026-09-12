@@ -5,6 +5,10 @@
 @use "@wordpress/base-styles/z-index" as *;
 @use "../utils/theme-variables" as *;
 
+body.modal-open {
+	overflow: hidden;
+}
+
 // The scrim behind the modal window.
 .components-modal__screen-overlay {
 	position: fixed;

@@ -1,22 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { colord, extend } from 'colord';
 import a11yPlugin from 'colord/plugins/a11y';
-
 extend( [ a11yPlugin ] );
-
-/**
- * WordPress dependencies
- */
 import { Icon as WCIcon } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { AvatarProps } from './types';
 import { useImageLoadingStatus } from './use-image-loading-status';
 

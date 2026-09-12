@@ -41,7 +41,6 @@
 
 			padding-block: var(--text-vertical-padding);
 
-			text-wrap: pretty;
 			color: var(--wp-ui-notice-text-color);
 		}
 

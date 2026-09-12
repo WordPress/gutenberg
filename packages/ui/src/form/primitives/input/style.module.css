@@ -19,12 +19,17 @@
 			line-height: inherit;
 
 			&::placeholder {
-				color: var(--wpds-color-foreground-interactive-neutral-disabled);
+				color: var(--wpds-color-foreground-interactive-neutral-weak);
 			}
 
 			&:disabled,
 			&[aria-disabled="true"] {
+				--_gcd-input-placeholder-color: var(--wpds-color-foreground-interactive-neutral-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+				&::placeholder {
+					color: var(--wpds-color-foreground-interactive-neutral-disabled);
+				}
 
 				@media ( forced-colors: active ) {
 					color: GrayText;
@@ -34,6 +39,16 @@
 			&[type="email"],
 			&[type="url"] {
 				direction: ltr; /* maintain LTR in RTL languages */
+			}
+
+			&[type="number"] {
+				appearance: textfield;
+
+				&::-webkit-outer-spin-button,
+				&::-webkit-inner-spin-button {
+					appearance: none;
+					margin: 0;
+				}
 			}
 		}
 	}

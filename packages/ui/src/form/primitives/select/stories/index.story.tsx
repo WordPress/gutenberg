@@ -9,6 +9,8 @@ const meta: Meta< typeof Select.Root > = {
 		'Select.Portal': Select.Portal,
 		'Select.Positioner': Select.Positioner,
 		'Select.Popup': Select.Popup,
+		'Select.Group': Select.Group,
+		'Select.GroupLabel': Select.GroupLabel,
 		'Select.Item': Select.Item,
 	},
 	parameters: {
@@ -32,7 +34,7 @@ export const Default: Story = {
 	args: {
 		items: defaultItems,
 		children: [
-			<Select.Trigger key="trigger" />,
+			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ defaultItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
@@ -48,14 +50,10 @@ export const Compact: Story = {
 	args: {
 		...Default.args,
 		children: [
-			<Select.Trigger size="compact" key="trigger" />,
+			<Select.Trigger size="compact" aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ defaultItems.map( ( item ) => (
-					<Select.Item
-						key={ item.value }
-						value={ item }
-						size="compact"
-					>
+					<Select.Item key={ item.value } value={ item }>
 						{ item.label }
 					</Select.Item>
 				) ) }
@@ -75,8 +73,13 @@ export const Compact: Story = {
 export const Minimal: Story = {
 	args: {
 		children: [
-			<Select.Trigger size="small" variant="minimal" key="trigger" />,
-			<Select.Popup key="popup">
+			<Select.Trigger
+				size="small"
+				variant="minimal"
+				aria-label="Item"
+				key="trigger"
+			/>,
+			<Select.Popup width="content" key="popup">
 				{ Array.from( { length: 6 }, ( _, index ) => (
 					<Select.Item
 						key={ index }
@@ -93,6 +96,58 @@ export const Minimal: Story = {
 	},
 };
 
+const groupedItems = [
+	{
+		label: 'Common',
+		items: [
+			{ value: 'apple', label: 'Apple' },
+			{ value: 'banana', label: 'Banana' },
+			{ value: 'orange', label: 'Orange' },
+		],
+	},
+	{
+		label: 'Berries',
+		items: [
+			{ value: 'strawberry', label: 'Strawberry' },
+			{ value: 'blueberry', label: 'Blueberry' },
+			{ value: 'raspberry', label: 'Raspberry' },
+		],
+	},
+	{
+		label: 'Tropical',
+		items: [
+			{ value: 'mango', label: 'Mango' },
+			{ value: 'pineapple', label: 'Pineapple' },
+			{ value: 'papaya', label: 'Papaya' },
+		],
+	},
+];
+
+/**
+ * Options can be organized into labeled groups with `Select.Group`
+ * and `Select.GroupLabel`.
+ */
+export const Grouped: Story = {
+	args: {
+		items: groupedItems.flatMap( ( group ) => group.items ),
+		children: [
+			<Select.Trigger aria-label="Item" key="trigger" />,
+			<Select.Popup key="popup">
+				{ groupedItems.map( ( group ) => (
+					<Select.Group key={ group.label }>
+						<Select.GroupLabel>{ group.label }</Select.GroupLabel>
+						{ group.items.map( ( item ) => (
+							<Select.Item key={ item.value } value={ item }>
+								{ item.label }
+							</Select.Item>
+						) ) }
+					</Select.Group>
+				) ) }
+			</Select.Popup>,
+		],
+	},
+};
+
 /**
  * Use the `placeholder` prop on `Select.Trigger` to show text when no
  * value is selected. The default placeholder is `"Select"`.
@@ -101,7 +156,11 @@ export const WithCustomPlaceholder: Story = {
 	args: {
 		items: defaultItems,
 		children: [
-			<Select.Trigger placeholder="Choose an item" key="trigger" />,
+			<Select.Trigger
+				placeholder="Choose an item"
+				aria-label="Item"
+				key="trigger"
+			/>,
 			<Select.Popup key="popup">
 				{ defaultItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
@@ -129,7 +188,7 @@ export const WithNullValueOption: Story = {
 	args: {
 		items: nullValueOptionItems,
 		children: [
-			<Select.Trigger key="trigger" />,
+			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ nullValueOptionItems.map( ( item ) => (
 					<Select.Item
@@ -184,7 +243,7 @@ export const WithOverflow: Story = {
 	args: {
 		items: overflowItems,
 		children: [
-			<Select.Trigger key="trigger" />,
+			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ overflowItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
@@ -198,11 +257,33 @@ export const WithOverflow: Story = {
 	},
 };
 
+const longListItems = Array.from( { length: 30 }, ( _, index ) => ( {
+	value: `item-${ index + 1 }`,
+	label: `Item ${ index + 1 }`,
+} ) );
+
+export const WithLongList: Story = {
+	args: {
+		items: longListItems,
+		defaultValue: longListItems[ 17 ],
+		children: [
+			<Select.Trigger aria-label="Item" key="trigger" />,
+			<Select.Popup key="popup">
+				{ longListItems.map( ( item ) => (
+					<Select.Item key={ item.value } value={ item }>
+						{ item.label }
+					</Select.Item>
+				) ) }
+			</Select.Popup>,
+		],
+	},
+};
+
 export const Disabled: Story = {
 	args: {
 		...Default.args,
 		children: [
-			<Select.Trigger key="trigger" />,
+			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ defaultItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
@@ -233,7 +314,7 @@ export const WithDisabledItem: Story = {
 	args: {
 		items: disabledItemItems,
 		children: [
-			<Select.Trigger key="trigger" />,
+			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ disabledItemItems.map( ( item ) => (
 					<Select.Item
@@ -270,7 +351,7 @@ export const WithCustomTriggerAndItem: Story = {
 	args: {
 		items: customOptions,
 		children: [
-			<Select.Trigger key="trigger">
+			<Select.Trigger aria-label="Item" key="trigger">
 				{ ( item ) => (
 					<span
 						style={ {
@@ -326,7 +407,7 @@ export const WithCustomZIndex: Story = {
 	args: {
 		...Default.args,
 		children: [
-			<Select.Trigger key="trigger" />,
+			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup
 				portal={
 					<Select.Portal

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Unsynced pattern', () => {
@@ -1076,7 +1073,7 @@ test.describe( 'Synced pattern', () => {
 
 		await admin.createNewPost();
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '/Awesome block' );
 		await page.getByRole( 'option', { name: 'Awesome block' } ).click();

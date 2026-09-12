@@ -288,11 +288,11 @@ WordPress calls this endpoint automatically as part of the client-side upload pi
 
 ## Cross-origin isolation considerations
 
-Client-side media processing requires `SharedArrayBuffer` for WASM threading. WordPress enables this automatically on block editor screens using [`Document-Isolation-Policy`](https://github.com/nicolo-ribaudo/tc39-proposal-structs/blob/main/test262-filtering/isolation-explainer.md) (DIP), which provides per-document cross-origin isolation without affecting other iframes on the page.
+Client-side media processing requires `SharedArrayBuffer` for WASM threading. WordPress enables this automatically on block editor screens using [`Document-Isolation-Policy`](https://github.com/WICG/document-isolation-policy) (DIP), which provides per-document cross-origin isolation without affecting other iframes on the page.
 
 ### Impact on plugins
 
--   **External scripts**: Scripts loaded from other origins will automatically get a `crossorigin="anonymous"` attribute added, handled by WordPress server-side (via HTML processing) and client-side (via a MutationObserver).
+-   **External resources**: Scripts, styles, images, audio, and video loaded from other origins keep working without a `crossorigin` attribute. `isolate-and-credentialless` loads them without credentials rather than blocking them, so resources behind a signed cookie or a logged-in session are the one case that breaks. WordPress does not add `crossorigin="anonymous"` to them, since that would force a CORS request that fails for hosts without `Access-Control-Allow-Origin` headers.
 -   **Third-party page builders**: DIP is skipped on admin pages with an `action` parameter other than `edit`, to avoid conflicts with page builders that rely on same-origin iframe access.
 -   **External images**: Importing an external image into the media library is handled server-side — the editor sends the image URL to `POST /wp/v2/media` (the `url` parameter) and the server downloads and sideloads the file. A browser cross-origin fetch would be subject to CORS and fails in a `credentialless` isolated document, so plugins importing remote media should use the same server-side path (exposed to the editor as the `mediaSideloadFromUrl` setting) rather than `fetch()`ing image bytes in the browser.
 

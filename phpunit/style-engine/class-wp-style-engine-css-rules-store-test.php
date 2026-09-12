@@ -2,7 +2,7 @@
 /**
  * Tests the Style Engine CSS Rules Store class.
  *
- * @package    Gutenberg
+ * @package    gutenberg
  * @subpackage style-engine
  */
 

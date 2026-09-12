@@ -3,6 +3,11 @@ import { forwardRef } from '@wordpress/element';
 import { Button } from '../button';
 import { Icon } from '../icon';
 import * as Tooltip from '../tooltip';
+import {
+	KeyboardShortcutDescription,
+	KeyboardShortcutDisplay,
+	useKeyboardShortcutProps,
+} from '../utils/keyboard-shortcut';
 import styles from './style.module.css';
 import { type IconButtonProps } from './types';
 
@@ -29,23 +34,30 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 			size,
 			shortcut,
 			positioner,
+			'aria-describedby': ariaDescribedBy,
+			'aria-keyshortcuts': ariaKeyShortcuts,
 			...restProps
 		}: IconButtonProps & { children?: unknown },
 		ref
 	) {
 		const classes = clsx( styles[ 'icon-button' ], className );
+		const { descriptionId, targetProps } = useKeyboardShortcutProps( {
+			'aria-describedby': ariaDescribedBy,
+			'aria-keyshortcuts': ariaKeyShortcuts,
+			shortcut,
+		} );
 
 		return (
 			<Tooltip.Root>
 				<Tooltip.Trigger
 					ref={ ref }
+					{ ...targetProps }
 					disabled={ disabled && ! focusableWhenDisabled }
 					render={
 						<Button
 							{ ...restProps }
 							size={ size }
 							aria-label={ label }
-							aria-keyshortcuts={ shortcut?.ariaKeyShortcut }
 							disabled={ disabled }
 							focusableWhenDisabled={ focusableWhenDisabled }
 						/>
@@ -53,15 +65,19 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 					className={ classes }
 				>
 					<Icon icon={ icon } size={ 24 } className={ styles.icon } />
+					{ shortcut && descriptionId && (
+						<KeyboardShortcutDescription
+							descriptionId={ descriptionId }
+							shortcut={ shortcut }
+						/>
+					) }
 				</Tooltip.Trigger>
 				<Tooltip.Popup positioner={ positioner }>
 					{ label }
 					{ shortcut && (
 						<>
 							{ ' ' }
-							<span aria-hidden="true">
-								{ shortcut.displayShortcut }
-							</span>
+							<KeyboardShortcutDisplay shortcut={ shortcut } />
 						</>
 					) }
 				</Tooltip.Popup>

@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ComponentType } from 'react';
-
-/**
- * WordPress dependencies
- */
 // Form controls read these stylesheets, normally enqueued by WordPress.
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/components/build-style/style.css';
@@ -14,20 +7,25 @@ import '@wordpress/components/build-style/style.css';
 import '@wordpress/dataviews/build-style/style.css';
 import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { DataFormControlProps, Field, Form } from '@wordpress/dataviews';
-import { Suspense, useId, useMemo, useState } from '@wordpress/element';
+import {
+	Suspense,
+	useEffect,
+	useId,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { globe, starFilled } from '@wordpress/icons';
 // `IconButton` is not on the recommended list yet.
 /* eslint-disable @wordpress/use-recommended-components */
-import { Card, Icon, IconButton, Stack } from '@wordpress/ui';
+import { Card, Icon, IconButton, Link, Stack } from '@wordpress/ui';
 /* eslint-enable @wordpress/use-recommended-components */
-
-/**
- * Internal dependencies
- */
 import { WidgetRender } from '..';
 import { registerFieldType, resolveFields } from '../../../field-types';
+import { registerIconResolver, resolveIcon } from '../../../icon-resolver';
 import type {
+	WidgetAction,
 	WidgetAttributeField,
+	WidgetIcon,
 	WidgetRenderProps,
 	WidgetType,
 } from '../../../types';
@@ -529,7 +527,7 @@ export const WithRelevance: StoryObj = {
 		docs: {
 			description: {
 				story: `
-Each attribute may carry a \`relevance\` hint (\`'high' | 'low'\`). The widget declares importance; the host chooses the surface. When absent, treat the hint as \`'low'\`.
+Each attribute may carry a \`relevance\` hint (\`'high' | 'medium' | 'low'\`). The widget declares importance; the host chooses the surface. When absent, treat the hint as \`'low'\`.
 
 **In this demo**
 
@@ -742,6 +740,188 @@ The attribute references a **field type** by name instead of carrying a control:
 3. The host resolves the schema (hosts get this through \`useWidgetTypes\`; the story calls the resolver itself) and promotes the field to the prominent surface, where the registered control renders.
 
 An unregistered name would degrade silently, exactly like an unknown type in DataViews. See the **Field Types** doc for the full pipeline.
+`,
+			},
+		},
+	},
+};
+
+const actionsWidgetType: WidgetType< DemoAttributes > = {
+	...demoWidgetType,
+	actions: [
+		{
+			id: 'open-docs',
+			label: 'Open docs',
+			href: 'https://developer.wordpress.org/',
+			openInNewTab: true,
+		},
+		{
+			id: 'export-greeting',
+			label: 'Export greeting',
+			href: new URL( './greeting.txt', import.meta.url ).href,
+			download: 'greeting.txt',
+		},
+	] satisfies WidgetAction[],
+};
+
+function WidgetWithActions() {
+	const titleId = useId();
+	const actions = actionsWidgetType.actions ?? [];
+	const [ attributes ] = useState< DemoAttributes >( {
+		...actionsWidgetType.example?.attributes,
+	} );
+
+	return (
+		<div style={ { maxWidth: 560 } }>
+			<Card.Root render={ <section /> } aria-labelledby={ titleId }>
+				<Card.Header>
+					<Stack direction="row" align="center" gap="sm">
+						{ actionsWidgetType.icon && (
+							<span aria-hidden="true">
+								<Icon icon={ actionsWidgetType.icon } />
+							</span>
+						) }
+						<Card.Title
+							id={ titleId }
+							render={ <h3 /> }
+							style={ { flexGrow: 1 } }
+						>
+							{ actionsWidgetType.title }
+						</Card.Title>
+
+						{ /* The host materializes the declared actions; here, as links. */ }
+						<Stack direction="row" align="center" gap="md">
+							{ actions.map( ( action ) => (
+								<Link
+									key={ action.id }
+									href={ action.href }
+									download={ action.download }
+									openInNewTab={ action.openInNewTab }
+								>
+									{ action.label }
+								</Link>
+							) ) }
+						</Stack>
+					</Stack>
+				</Card.Header>
+				<Card.Content>
+					<Suspense fallback={ null }>
+						<WidgetRender< DemoAttributes >
+							widgetType={ actionsWidgetType }
+							attributes={ attributes }
+							resolveWidgetModule={ resolveDemoModule }
+						/>
+					</Suspense>
+				</Card.Content>
+			</Card.Root>
+		</div>
+	);
+}
+
+export const WithActions: StoryObj = {
+	render: () => <WidgetWithActions />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+Beyond its data, a widget can declare \`actions\`: verbs a user can trigger, like opening docs or downloading a file. The widget names each action (\`id\`, \`label\`) and how it is fulfilled, through the key it writes (today a link \`href\`); the host mounts the primitive and decides where to put it.
+
+**In this demo**
+
+- The widget declares two actions: an external link (\`Open docs\`) and a download (\`Export greeting\`).
+- The host renders them as links beside the title. Another host could surface them in a menu, a footer, or a command palette.
+
+**Takeaway**
+
+The widget names the intent and how it is fulfilled; the host mounts the primitive and places it, so the widget never knows its surface.
+`,
+			},
+		},
+	},
+};
+
+/*
+ * The application's icon vocabulary: one resolver, registered once.
+ * Records reference icons by name; the resolver returns elements.
+ */
+const STORY_ICONS: Record< string, WidgetIcon > = {
+	'demo/planet': globe,
+};
+
+registerIconResolver( async ( reference ) => STORY_ICONS[ reference ] ?? null );
+
+const referencedIconWidgetType: WidgetType< DemoAttributes > = {
+	...demoWidgetType,
+	icon: undefined,
+};
+
+function WidgetWithIconReference() {
+	const titleId = useId();
+	const [ attributes ] = useState< DemoAttributes >( {
+		...referencedIconWidgetType.example?.attributes,
+	} );
+	const [ icon, setIcon ] = useState< WidgetIcon | null >( null );
+
+	// Hosts get the resolved icon through `useWidgetTypes`; the story
+	// resolves the reference itself.
+	useEffect( () => {
+		let cancelled = false;
+		void resolveIcon( 'demo/planet' ).then( ( resolved ) => {
+			if ( ! cancelled ) {
+				setIcon( resolved );
+			}
+		} );
+		return () => {
+			cancelled = true;
+		};
+	}, [] );
+
+	return (
+		<div style={ { maxWidth: 560 } }>
+			<Card.Root render={ <section /> } aria-labelledby={ titleId }>
+				<Card.Header>
+					<Stack direction="row" align="center" gap="sm">
+						{ icon && (
+							<span aria-hidden="true">
+								<Icon icon={ icon } />
+							</span>
+						) }
+						<Card.Title
+							id={ titleId }
+							render={ <h3 /> }
+							style={ { flexGrow: 1 } }
+						>
+							{ referencedIconWidgetType.title }
+						</Card.Title>
+					</Stack>
+				</Card.Header>
+				<Card.Content>
+					<Suspense fallback={ null }>
+						<WidgetRender< DemoAttributes >
+							widgetType={ referencedIconWidgetType }
+							attributes={ attributes }
+							resolveWidgetModule={ resolveDemoModule }
+						/>
+					</Suspense>
+				</Card.Content>
+			</Card.Root>
+		</div>
+	);
+}
+
+export const WithIconReference: StoryObj = {
+	render: () => <WidgetWithIconReference />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+The widget declares its icon as a **registered icon name** instead of a rendered element:
+
+1. The application registers one **icon resolver** (\`registerIconResolver\`), closing over its icon source. On WordPress that source is the \`icon\` REST entity; here, a local catalog.
+2. The widget declares \`"icon": "demo/planet"\` in \`widget.json\`. Pure data: no imports, no elements.
+3. \`useWidgetTypes\` resolves the reference while assembling each \`WidgetType\` (the story calls the resolver itself), so the host receives a renderable element and never sees the name.
+
+An unresolvable reference degrades to no icon. See the **Icons** doc for the full pipeline.
 `,
 			},
 		},

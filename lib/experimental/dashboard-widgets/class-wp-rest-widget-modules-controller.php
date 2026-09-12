@@ -211,6 +211,18 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 				$data['help'] = $widget_type->help;
 			}
 
+			if ( rest_is_field_included( 'icon', $fields ) ) {
+				$data['icon'] = $widget_type->icon;
+			}
+
+			if ( rest_is_field_included( 'actions', $fields ) ) {
+				$data['actions'] = $widget_type->actions;
+			}
+
+			if ( rest_is_field_included( 'attributes', $fields ) ) {
+				$data['attributes'] = $widget_type->attributes;
+			}
+
 			if ( rest_is_field_included( 'keywords', $fields ) ) {
 				$data['keywords'] = $widget_type->keywords;
 			}
@@ -304,6 +316,77 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 										'label' => array( 'type' => 'string' ),
 										'href'  => array( 'type' => 'string' ),
 									),
+								),
+							),
+						),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'icon'          => array(
+						'description' => __( 'Registered icon name identifying the widget type visually.', 'gutenberg' ),
+						'type'        => array( 'string', 'null' ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'actions'       => array(
+						'description' => __( 'Declarative actions the widget type exposes. Labels are translatable.', 'gutenberg' ),
+						'type'        => array( 'array', 'null' ),
+						'items'       => array(
+							'type'       => 'object',
+							'properties' => array(
+								'id'           => array( 'type' => 'string' ),
+								'label'        => array( 'type' => 'string' ),
+								'icon'         => array( 'type' => 'string' ),
+								'relevance'    => array(
+									'type' => 'string',
+									'enum' => array( 'high', 'medium', 'low' ),
+								),
+								'href'         => array( 'type' => 'string' ),
+								'download'     => array( 'type' => array( 'string', 'boolean' ) ),
+								'openInNewTab' => array( 'type' => 'boolean' ),
+							),
+						),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'attributes'    => array(
+						'description' => __( 'Attribute schema hosts render settings from: the JSON-expressible subset of a DataViews field per entry. User-facing strings are translatable.', 'gutenberg' ),
+						'type'        => array( 'array', 'null' ),
+						'items'       => array(
+							'type'       => 'object',
+							'properties' => array(
+								'id'                 => array( 'type' => 'string' ),
+								'type'               => array( 'type' => 'string' ),
+								'label'              => array( 'type' => 'string' ),
+								'header'             => array( 'type' => 'string' ),
+								'description'        => array( 'type' => 'string' ),
+								'placeholder'        => array( 'type' => 'string' ),
+								'readOnly'           => array( 'type' => 'boolean' ),
+								'isDisabled'         => array( 'type' => 'boolean' ),
+								'enableSorting'      => array( 'type' => 'boolean' ),
+								'enableHiding'       => array( 'type' => 'boolean' ),
+								'enableGlobalSearch' => array( 'type' => 'boolean' ),
+								'elements'           => array(
+									'type'  => 'array',
+									'items' => array(
+										'type'       => 'object',
+										'properties' => array(
+											'value'       => array( 'type' => array( 'string', 'integer', 'number', 'boolean', 'null' ) ),
+											'label'       => array( 'type' => 'string' ),
+											'description' => array( 'type' => 'string' ),
+										),
+									),
+								),
+								'filterBy'           => array( 'type' => array( 'object', 'boolean' ) ),
+								'format'             => array( 'type' => 'object' ),
+								'isValid'            => array( 'type' => 'object' ),
+								'Edit'               => array( 'type' => array( 'string', 'object' ) ),
+								'relevance'          => array(
+									'type' => 'string',
+									'enum' => array( 'high', 'medium', 'low' ),
 								),
 							),
 						),

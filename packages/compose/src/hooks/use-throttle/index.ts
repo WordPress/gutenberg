@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { useMemoOne } from 'use-memo-one';
-
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { throttle } from '../../utils/throttle';
 import type { ThrottleOptions } from '../../utils/throttle';
 import type { DebouncedFunc } from '../../utils/debounce';

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { forwardRef, memo } from '@wordpress/element';
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
 import useSelect from '../use-select';
 import type { SelectFunction, DataRegistry } from '../../types';
 

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { colord } from 'colord';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { InputControl } from '../input-control';
 import { Text } from '../text';
 import { COLORS } from '../utils/colors-values';

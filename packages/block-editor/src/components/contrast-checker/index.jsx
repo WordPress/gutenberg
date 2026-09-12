@@ -1,0 +1,176 @@
+import a11yPlugin from 'colord/plugins/a11y';
+import namesPlugin from 'colord/plugins/names';
+import { colord, extend } from 'colord';
+import { __, sprintf } from '@wordpress/i18n';
+import { Notice } from '@wordpress/components';
+import { speak } from '@wordpress/a11y';
+
+extend( [ namesPlugin, a11yPlugin ] );
+
+/**
+ * Computes a contrast warning for the given color combination, if any.
+ *
+ * Shared between the `ContrastChecker` component and the block inspector
+ * contrast warning indicators, which surface the result without rendering
+ * a notice.
+ *
+ * @param {Object}  props
+ * @param {string}  [props.backgroundColor]         Background color.
+ * @param {string}  [props.fallbackBackgroundColor] Fallback background color.
+ * @param {string}  [props.fallbackTextColor]       Fallback text color.
+ * @param {string}  [props.fallbackLinkColor]       Fallback link color.
+ * @param {number}  [props.fontSize]                Font size value in pixels.
+ * @param {boolean} [props.isLargeText]             Whether the text is large.
+ * @param {string}  [props.textColor]               Text color.
+ * @param {string}  [props.linkColor]               Link color.
+ * @param {string}  [props.messageOverride]         Caller-provided copy used in place of the generic guidance.
+ * @param {boolean} [props.enableAlphaChecker]      Whether to warn about transparent text.
+ *
+ * @return {?Object} `{ message, speakMessage }` when contrast is insufficient, otherwise `null`.
+ */
+export function getContrastWarning( {
+	backgroundColor,
+	fallbackBackgroundColor,
+	fallbackTextColor,
+	fallbackLinkColor,
+	fontSize, // Font size value in pixels.
+	isLargeText,
+	textColor,
+	linkColor,
+	messageOverride,
+	enableAlphaChecker = false,
+} ) {
+	const currentBackgroundColor = backgroundColor || fallbackBackgroundColor;
+
+	// Must have a background color.
+	if ( ! currentBackgroundColor ) {
+		return null;
+	}
+
+	const currentTextColor = textColor || fallbackTextColor;
+	const currentLinkColor = linkColor || fallbackLinkColor;
+
+	// Must have at least one text color.
+	if ( ! currentTextColor && ! currentLinkColor ) {
+		return null;
+	}
+
+	const textColors = [
+		{
+			color: currentTextColor,
+			description: __( 'text color' ),
+		},
+		{
+			color: currentLinkColor,
+			description: __( 'link color' ),
+		},
+	];
+	const colordBackgroundColor = colord( currentBackgroundColor );
+	const backgroundColorHasTransparency = colordBackgroundColor.alpha() < 1;
+	const backgroundColorBrightness = colordBackgroundColor.brightness();
+	const isReadableOptions = {
+		level: 'AA',
+		size:
+			isLargeText || ( isLargeText !== false && fontSize >= 24 )
+				? 'large'
+				: 'small',
+	};
+
+	let message = '';
+	let speakMessage = '';
+	for ( const item of textColors ) {
+		// If there is no color, go no further.
+		if ( ! item.color ) {
+			continue;
+		}
+		const colordTextColor = colord( item.color );
+		const isColordTextReadable = colordTextColor.isReadable(
+			colordBackgroundColor,
+			isReadableOptions
+		);
+		const textHasTransparency = colordTextColor.alpha() < 1;
+
+		// If the contrast is not readable.
+		if ( ! isColordTextReadable ) {
+			// Don't show the message if the background or text is transparent.
+			if ( backgroundColorHasTransparency || textHasTransparency ) {
+				continue;
+			}
+			// A caller can provide panel-specific copy that is clearer and
+			// more concise than the generic brighter/darker guidance.
+			if ( messageOverride ) {
+				message = messageOverride;
+				speakMessage = messageOverride;
+				break;
+			}
+			message =
+				backgroundColorBrightness < colordTextColor.brightness()
+					? sprintf(
+							// translators: %s is a type of text color, e.g., "text color" or "link color".
+							__(
+								'This color combination may be hard for people to read. Try using a darker background color and/or a brighter %s.'
+							),
+							item.description
+					  )
+					: sprintf(
+							// translators: %s is a type of text color, e.g., "text color" or "link color".
+							__(
+								'This color combination may be hard for people to read. Try using a brighter background color and/or a darker %s.'
+							),
+							item.description
+					  );
+			speakMessage = __(
+				'This color combination may be hard for people to read.'
+			);
+			// Break from the loop when we have a contrast warning.
+			// These messages take priority over the transparency warning.
+			break;
+		}
+
+		// If there is no contrast warning and the text is transparent,
+		// show the transparent warning if alpha check is enabled.
+		if ( textHasTransparency && enableAlphaChecker ) {
+			message = __( 'Transparent text may be hard for people to read.' );
+			speakMessage = __(
+				'Transparent text may be hard for people to read.'
+			);
+		}
+	}
+
+	if ( ! message ) {
+		return null;
+	}
+
+	return { message, speakMessage };
+}
+
+function ContrastChecker( props ) {
+	const warning = getContrastWarning( props );
+
+	if ( ! warning ) {
+		return null;
+	}
+
+	// Note: The `Notice` component can speak messages via its `spokenMessage`
+	// prop, but the contrast checker requires granular control over when the
+	// announcements are made. Notably, the message will be re-announced if a
+	// new color combination is selected and the contrast is still insufficient.
+	speak( warning.speakMessage );
+
+	return (
+		<div className="block-editor-contrast-checker">
+			<Notice
+				spokenMessage={ null }
+				status="warning"
+				isDismissible={ false }
+			>
+				{ warning.message }
+			</Notice>
+		</div>
+	);
+}
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/contrast-checker/README.md
+ */
+export default ContrastChecker;

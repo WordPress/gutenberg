@@ -1,11 +1,4 @@
-/**
- * Internal dependencies
- */
-import {
-	convertGifToVideo,
-	cancelOperations,
-	UNSUPPORTED_ERROR_PREFIX,
-} from '../index';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Configurable decoded-frame dimensions; the default (10x10) is even so the
 // canvas/resize path is skipped. Tests set odd values to exercise it.
@@ -88,10 +81,12 @@ class FakeReplacementVideoFrame {
 const mockAddedSamples: Array< {
 	init: { timestamp: number; duration: number };
 } > = [];
-const mockCanEncodeVideo = jest.fn().mockResolvedValue( true );
+const mockCanEncodeVideo = vi
+	.fn< ( ...args: unknown[] ) => Promise< boolean > >()
+	.mockResolvedValue( true );
 // Default VideoSampleSource.add implementation; tests can override it,
 // e.g. to make it reject and exercise frame-cleanup error paths.
-const mockSourceAdd = jest.fn(
+const mockSourceAdd = vi.fn(
 	async ( sample: { init: { timestamp: number; duration: number } } ) => {
 		mockAddedSamples.push( sample );
 	}
@@ -105,47 +100,69 @@ let encodeGateResolve: ( ( v: boolean ) => void ) | undefined;
 // is close()d (mediabunny warns about GC'd, unclosed samples).
 let mockVideoSamples: Array< { closed: boolean } > = [];
 
-jest.mock( 'mediabunny', () => ( {
-	Output: class {
-		opts: { target: { buffer: ArrayBuffer | null } };
-		constructor( opts: { target: { buffer: ArrayBuffer | null } } ) {
-			this.opts = opts;
-		}
-		addVideoTrack() {}
-		async start() {}
-		async finalize() {
-			this.opts.target.buffer = new Uint8Array( [ 1, 2, 3 ] ).buffer;
-		}
-	},
-	BufferTarget: class {
-		buffer: ArrayBuffer | null = null;
-	},
-	Mp4OutputFormat: class {},
-	WebMOutputFormat: class {},
-	VideoSampleSource: class {
-		add( sample: { init: { timestamp: number; duration: number } } ) {
-			return mockSourceAdd( sample );
-		}
-	},
-	VideoSample: class {
-		frame: unknown;
-		init: { timestamp: number; duration: number };
-		closed = false;
-		constructor(
-			frame: unknown,
-			init: { timestamp: number; duration: number }
-		) {
-			this.frame = frame;
-			this.init = init;
-			mockVideoSamples.push( this );
-		}
-		close() {
-			this.closed = true;
-		}
-	},
-	QUALITY_HIGH: 'quality-high',
-	canEncodeVideo: ( ...args: unknown[] ) => mockCanEncodeVideo( ...args ),
-} ) );
+// Options each VideoSampleSource was constructed with, so tests can pin the
+// encoding configuration.
+let mockVideoSampleSourceOpts: Array< Record< string, unknown > > = [];
+
+vi.doMock( import( 'mediabunny' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		Output: class {
+			opts: { target: { buffer: ArrayBuffer | null } };
+			constructor( opts: { target: { buffer: ArrayBuffer | null } } ) {
+				this.opts = opts;
+			}
+			addVideoTrack() {}
+			async start() {}
+			async finalize() {
+				this.opts.target.buffer = new Uint8Array( [ 1, 2, 3 ] ).buffer;
+			}
+		} as unknown as typeof original.Output,
+		BufferTarget: class {
+			buffer: ArrayBuffer | null = null;
+		} as unknown as typeof original.BufferTarget,
+		Mp4OutputFormat: class {} as unknown as typeof original.Mp4OutputFormat,
+		WebMOutputFormat:
+			class {} as unknown as typeof original.WebMOutputFormat,
+		VideoSampleSource: class {
+			constructor( opts: Record< string, unknown > ) {
+				mockVideoSampleSourceOpts.push( opts );
+			}
+			add( sample: { init: { timestamp: number; duration: number } } ) {
+				return mockSourceAdd( sample );
+			}
+		} as unknown as typeof original.VideoSampleSource,
+		VideoSample: class {
+			frame: unknown;
+			init: { timestamp: number; duration: number };
+			closed = false;
+			constructor(
+				frame: unknown,
+				init: { timestamp: number; duration: number }
+			) {
+				this.frame = frame;
+				this.init = init;
+				mockVideoSamples.push( this );
+			}
+			close() {
+				this.closed = true;
+			}
+		} as unknown as typeof original.VideoSample,
+		QUALITY_HIGH: 'quality-high' as unknown as typeof original.QUALITY_HIGH,
+		canEncodeVideo:
+			mockCanEncodeVideo as unknown as typeof original.canEncodeVideo,
+	};
+} );
+
+const {
+	convertGifToVideo,
+	cancelOperations,
+	UNSUPPORTED_ERROR_PREFIX,
+	SIZE_LIMIT_ERROR_PREFIX,
+	DEFAULT_MAX_TOTAL_PIXELS,
+} = await import( '../index' );
 
 beforeEach( () => {
 	mockAddedSamples.length = 0;
@@ -157,6 +174,7 @@ beforeEach( () => {
 	mockCanvases = [];
 	mockReplacementFrames = [];
 	mockVideoSamples = [];
+	mockVideoSampleSourceOpts = [];
 	encodeGateResolve = undefined;
 	mockCanEncodeVideo.mockResolvedValue( true );
 	mockSourceAdd.mockReset();
@@ -182,6 +200,18 @@ describe( 'convertGifToVideo', () => {
 		);
 		expect( result ).toBeInstanceOf( ArrayBuffer );
 		expect( mockAddedSamples ).toHaveLength( 3 );
+	} );
+
+	it( 'configures the encoder with high quality and a sparse key frame cadence', async () => {
+		await convertGifToVideo( 'item-config', GIF_BUFFER, 'video/mp4' );
+		expect( mockVideoSampleSourceOpts ).toHaveLength( 1 );
+		expect( mockVideoSampleSourceOpts[ 0 ] ).toEqual( {
+			codec: 'avc',
+			bitrate: 'quality-high',
+			// Sparser than mediabunny's 2s default: roughly halves output
+			// size for long GIFs at no encode-time or quality cost.
+			keyFrameInterval: 10,
+		} );
 	} );
 
 	it( 'converts ImageDecoder microsecond durations to mediabunny seconds', async () => {
@@ -248,10 +278,13 @@ describe( 'convertGifToVideo', () => {
 			convertGifToVideo( 'item-add-throw', GIF_BUFFER, 'video/mp4' )
 		).rejects.toThrow( 'add failed' );
 
-		// The first frame was decoded; it must have been closed despite the
-		// add() rejection (Issue 1: frame leak on source.add() throw).
-		expect( mockDecodedFrames ).toHaveLength( 1 );
-		expect( mockDecodedFrames[ 0 ].closed ).toBe( true );
+		// Two decodes: the budget probe, then the first loop frame. Both
+		// must have been closed despite the add() rejection (Issue 1:
+		// frame leak on source.add() throw).
+		expect( mockDecodedFrames ).toHaveLength( 2 );
+		for ( const frame of mockDecodedFrames ) {
+			expect( frame.closed ).toBe( true );
+		}
 	} );
 
 	it( 'reads track metadata after tracks.ready, not decoder.completed', async () => {
@@ -293,8 +326,9 @@ describe( 'convertGifToVideo', () => {
 			expect( canvas.width ).toBe( 600 );
 			expect( canvas.height ).toBe( 442 );
 		}
-		// The original odd-sized frames are closed once redrawn.
-		expect( mockDecodedFrames ).toHaveLength( 3 );
+		// The budget probe plus the three loop frames, all closed (the
+		// odd-sized originals are closed once redrawn).
+		expect( mockDecodedFrames ).toHaveLength( 4 );
 		for ( const frame of mockDecodedFrames ) {
 			expect( frame.closed ).toBe( true );
 		}
@@ -334,5 +368,92 @@ describe( 'convertGifToVideo', () => {
 
 		expect( mockVideoSamples ).toHaveLength( 1 );
 		expect( mockVideoSamples[ 0 ].closed ).toBe( true );
+	} );
+
+	describe( 'total pixel budget', () => {
+		it( 'rejects an over-budget GIF before any encoding work', async () => {
+			// 10x10 x 3 frames = 300 total pixels; a budget of 200 must
+			// reject before a single sample is encoded.
+			const promise = convertGifToVideo(
+				'item-over-budget',
+				GIF_BUFFER,
+				'video/mp4',
+				undefined,
+				200
+			);
+
+			await expect( promise ).rejects.toThrow( SIZE_LIMIT_ERROR_PREFIX );
+			expect( mockAddedSamples ).toHaveLength( 0 );
+			// Only the first frame was decoded (to learn the dimensions),
+			// and it was closed.
+			expect( mockDecodedFrames ).toHaveLength( 1 );
+			expect( mockDecodedFrames[ 0 ].closed ).toBe( true );
+		} );
+
+		it( 'prefixes the size-limit error with UNSUPPORTED_ERROR_PREFIX (consumer contract)', async () => {
+			// Consumers must treat an over-budget GIF as a graceful skip
+			// (keep the uploaded GIF, no companion video), which they detect
+			// by the Unsupported message prefix.
+			await expect(
+				convertGifToVideo(
+					'item-budget-prefix',
+					GIF_BUFFER,
+					'video/mp4',
+					undefined,
+					200
+				)
+			).rejects.toThrow(
+				new RegExp( `^${ UNSUPPORTED_ERROR_PREFIX }:` )
+			);
+		} );
+
+		it( 'applies the default budget when none is given', async () => {
+			// 5000x5000 x 100 frames = 2.5e9 pixels, far above any sane
+			// default.
+			mockFrameDims = { width: 5000, height: 5000 };
+			mockFrameCount = 100;
+			expect( 5000 * 5000 * 100 ).toBeGreaterThan(
+				DEFAULT_MAX_TOTAL_PIXELS
+			);
+
+			await expect(
+				convertGifToVideo(
+					'item-default-budget',
+					GIF_BUFFER,
+					'video/mp4'
+				)
+			).rejects.toThrow( SIZE_LIMIT_ERROR_PREFIX );
+			expect( mockAddedSamples ).toHaveLength( 0 );
+		} );
+
+		it( 'converts a GIF exactly at the budget', async () => {
+			// 10x10 x 3 frames = 300 = the budget: not over, so convert.
+			const result = await convertGifToVideo(
+				'item-at-budget',
+				GIF_BUFFER,
+				'video/mp4',
+				undefined,
+				300
+			);
+
+			expect( result ).toBeInstanceOf( ArrayBuffer );
+			expect( mockAddedSamples ).toHaveLength( 3 );
+		} );
+
+		it( 'treats a budget of 0 as disabled', async () => {
+			mockFrameDims = { width: 5000, height: 5000 };
+			mockFrameCount = 10;
+
+			const result = await convertGifToVideo(
+				'item-budget-disabled',
+				GIF_BUFFER,
+				'video/mp4',
+				undefined,
+				0
+			);
+
+			expect( result ).toBeInstanceOf( ArrayBuffer );
+			expect( mockAddedSamples ).toHaveLength( 10 );
+		} );
 	} );
 } );

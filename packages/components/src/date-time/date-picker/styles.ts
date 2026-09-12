@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { boxSizingReset, COLORS, CONFIG } from '../../utils';
 import { HStack } from '../../h-stack';

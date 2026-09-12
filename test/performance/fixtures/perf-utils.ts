@@ -1,18 +1,7 @@
-/**
- * WordPress dependencies
- */
-import { expect } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * External dependencies
- */
 import fs from 'fs';
 import path from 'path';
+import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Locator, Page } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { readFile } from '../utils.js';
 
 type PerfUtilsConstructorProps = {

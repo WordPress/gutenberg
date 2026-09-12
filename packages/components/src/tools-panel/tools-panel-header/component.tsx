@@ -1,27 +1,16 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { check, moreVertical, plus } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import DropdownMenu from '../../dropdown-menu';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { useToolsPanelHeader } from './hook';
+import styles from '../style.module.scss';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
-import { ResetLabel } from '../styles';
 import type {
 	ToolsPanelControlsGroupProps,
 	ToolsPanelHeaderProps,
@@ -36,7 +25,11 @@ const DefaultControlsGroup = ( {
 		return null;
 	}
 
-	const resetSuffix = <ResetLabel aria-hidden>{ __( 'Reset' ) }</ResetLabel>;
+	const resetSuffix = (
+		<span aria-hidden className={ styles[ 'reset-label' ] }>
+			{ __( 'Reset' ) }
+		</span>
+	);
 
 	return (
 		<>

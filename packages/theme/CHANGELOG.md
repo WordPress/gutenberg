@@ -2,6 +2,81 @@
 
 ## Unreleased
 
+### Internal
+
+-   Run rendered Theme tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
+## 2.1.0 (2026-09-10)
+
+### New Features
+
+-   Add neutral interactive background tokens for resting, active, and disabled input and selection control states. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
+
+### Documentation
+
+-   Explain how consumers define light and dark themes through `ThemeProvider` color seeds ([#82039](https://github.com/WordPress/gutenberg/pull/82039)).
+
+### Enhancements
+
+-   Add a Lightning CSS visitor plugin that injects design system token fallbacks, available as `@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks`, with an optional peer range of `>=1.33.0 <2.0.0`. ([#80401](https://github.com/WordPress/gutenberg/pull/80401))
+
+### Bug Fixes
+
+-   Calculate exact chroma capacity so weak intent backgrounds retain their color near lightness boundaries. ([#82591](https://github.com/WordPress/gutenberg/pull/82591))
+-   Make color ramp generation independent of cache population order. ([#82505](https://github.com/WordPress/gutenberg/pull/82505))
+-   Keep active fills moving in the color ramp direction and preserve text contrast for both states. ([#82542](https://github.com/WordPress/gutenberg/pull/82542))
+
+### Internal
+
+-   Update type-checking for script files to enforce NodeNext module resolution ([#82622](https://github.com/WordPress/gutenberg/pull/82622)).
+-   Remove `esbuild-esm-loader` dependency in favor of Node.js TypeScript native type-stripping ([#82680](https://github.com/WordPress/gutenberg/pull/82680)).
+-   Migrate design token modes to the DTCG resolver and Terrazzo CSS permutations. ([#82537](https://github.com/WordPress/gutenberg/pull/82537))
+-   Reuse seed-dependent calculations during color-ramp constraint searches. ([#82545](https://github.com/WordPress/gutenberg/pull/82545))
+-   Generate the default ramps before derived token artifacts so one build uses the current ramp algorithm throughout. ([#82525](https://github.com/WordPress/gutenberg/pull/82525))
+-   Cache relative luminance calculations used by color-ramp contrast checks. ([#82445](https://github.com/WordPress/gutenberg/pull/82445))
+-   Enforce NodeNext module resolution in the build project so future declaration imports are checked against the package's published ESM resolution rules. ([#82088](https://github.com/WordPress/gutenberg/pull/82088))
+-   Update the `@types/node` development dependency to v24, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
+-   Declare the `@storybook/addon-docs` development dependency used by the package's story documentation ([#82676](https://github.com/WordPress/gutenberg/pull/82676)).
+
+## 2.0.0 (2026-08-26)
+
+### Breaking Changes
+
+-   Fix published ESM declaration imports for Node-style resolution. TypeScript consumers now require TypeScript 5 or newer. ([#82022](https://github.com/WordPress/gutenberg/pull/82022))
+
+### Enhancements
+
+-   Add an `onColorWarnings` callback for `ThemeProvider` consumers to receive structured color ramp and semantic contrast warnings ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).
+
+### Bug Fixes
+
+-   Check normal and active fill color contrast, and return warnings for the final generated ramp ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).
+-   `ThemeProvider`: Avoid root-level relational selectors when forwarding `cornerRadius` presets to reduce style recalculation work. ([#81457](https://github.com/WordPress/gutenberg/pull/81457))
+
+### Documentation
+
+-   Route contributors and coding agents to the canonical Design System package guidance ([#80597](https://github.com/WordPress/gutenberg/pull/80597)).
+
+### Internal
+
+-   Rename `ThemeProvider` wrapper CSS module class from `root` to `wrapper` for clearer DevTools inspection ([#81996](https://github.com/WordPress/gutenberg/pull/81996)).
+-   Update Terrazzo packages to 2.7.1 ([#81978](https://github.com/WordPress/gutenberg/pull/81978)).
+-   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
+-   Collapse the `tsconfig.src.json`/`tsconfig.bin.json`/`tsconfig.test.json` projects into the repository-standard split of `tsconfig.build.json` and a default dev `tsconfig.json`. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
+-   Update Terrazzo packages to 2.5.0, use its resolver for mode overrides, and restore token linting with semantic WCAG AA contrast checks ([#81082](https://github.com/WordPress/gutenberg/pull/81082)).
+
+## 1.2.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Avoid `ThemeProvider` assigning CSS color properties when a seed value is not provided and there is no ancestor to inherit from. This is consistent with how `cursor` and `cornerRadius` behave, and resolves an issue where `ThemeProvider` may forcibly override colors to the default color scheme in situations where the admin color scheme properties may be provided elsewhere ([#80600](https://github.com/WordPress/gutenberg/pull/80600)).
+
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 1.1.0 (2026-07-29)
+
 ### Enhancements
 
 -   Widen optional peer dependency ranges so projects on newer tooling can install without peer resolution conflicts: Vite `^7 || ^8`, Stylelint `^16 || ^17`, and esbuild `>=0.27.2 <1.0.0` ([#80267](https://github.com/WordPress/gutenberg/pull/80267)).
@@ -10,10 +85,17 @@
 
 -   Add a Storybook typography showcase that renders the published CSS design tokens directly ([#80212](https://github.com/WordPress/gutenberg/pull/80212)).
 
+### Internal
+
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
+
 ### Code Quality
 
+-   Update `colorjs.io` to 0.7.1 ([#80762](https://github.com/WordPress/gutenberg/pull/80762)).
+-   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   Stop publishing `@wordpress/theme` source paths by moving publish-ready assets outside `src` and enforcing the package boundary ([#80213](https://github.com/WordPress/gutenberg/pull/80213)).
 -   Update `colorjs.io` dependency to remove need for colorspace registration workaround ([#80272](https://github.com/WordPress/gutenberg/pull/80272)).
+-   Regenerate design token styles using the shared CSS/SCSS Prettier configuration ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
 
 ## 1.0.0 (2026-07-14)
 

@@ -24,6 +24,7 @@ on:
             - 'packages/wp-build/**'
             - '!packages/*/src/**/stories/**'
             - '!packages/*/src/**/test/**'
+            - '!packages/*/CHANGELOG.md'
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -64,15 +65,15 @@ jobs:
                   PR_COUNT: ${{ github.event.pull_request.commits }}
               run: echo "PR_COMMIT_COUNT=$(( PR_COUNT + 1 ))" >> "${GITHUB_ENV}"
             - name: Checkout code
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   ref: ${{ github.event.pull_request.head.ref }}
                   repository: ${{ github.event.pull_request.head.repo.full_name }}
                   fetch-depth: ${{ env.PR_COMMIT_COUNT }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
-            - name: 'Fetch relevant history from origin'
-              run: git fetch origin "$GITHUB_BASE_REF"
+            - name: 'Fetch relevant history from base repository'
+              run: git fetch "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$GITHUB_BASE_REF"
             - name: Determine if package has relevant changes
               id: filter
               env:
@@ -83,7 +84,7 @@ jobs:
                   # tracked packages, so this matrix entry may run on a PR that
                   # doesn't touch its package. Short-circuit if that's the case.
                   relevant_changes=$(git diff --name-only "$BASE_SHA"...HEAD -- "${PACKAGE_PATH}/" \
-                      | grep -Ev "^${PACKAGE_PATH}/src/(.+/)?(stories|test)/" || true)
+                      | grep -Ev "^${PACKAGE_PATH}/(src/(.+/)?(stories|test)/|CHANGELOG\.md$)" || true)
 
                   if [ -z "$relevant_changes" ]; then
                       echo "No relevant changes under ${PACKAGE_PATH}; skipping CHANGELOG check."

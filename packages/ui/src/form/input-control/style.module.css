@@ -1,0 +1,27 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer compositions {
+		/* Hide Safari's value-like placeholder (e.g. `12:30`) in empty
+		   date/time inputs, using the `data-filled` attribute Base UI
+		   maintains on field controls. Base UI only maintains `data-filled`
+		   inside a `Field.Root`, so on a standalone `Input` its absence
+		   doesn't imply emptiness. While the input is focused, the browser's
+		   segment editor must stay visible for typing. */
+		@supports ( -webkit-hyphens: none ) and ( not ( -moz-appearance: none ) ) { /* Safari only */
+			.root input[type="date"]:not([data-filled]):not(:focus),
+			.root input[type="time"]:not([data-filled]):not(:focus),
+			.root input[type="datetime-local"]:not([data-filled]):not(:focus) {
+				--_gcd-input-color: transparent;
+				--_gcd-input-color-disabled: transparent;
+
+				color: transparent;
+
+				/* Hide slashes in date when input is disabled. */
+				&:disabled::-webkit-datetime-edit-text {
+					color: transparent;
+				}
+			}
+		}
+	}
+}

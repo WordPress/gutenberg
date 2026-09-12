@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { StyleBookCategory, StyleBookColorGroup } from './types';
 
 export const STYLE_BOOK_COLOR_GROUPS: StyleBookColorGroup[] = [

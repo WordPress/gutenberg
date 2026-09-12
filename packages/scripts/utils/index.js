@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const { getAsBooleanFromENV } = require( './process' );
 const {
 	getArgFromCLI,

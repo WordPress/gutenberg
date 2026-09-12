@@ -78,9 +78,10 @@ status "Installing dependencies... 📦"
 npm cache verify
 npm ci
 status "Generating build... 👷‍♀️"
-npm run build -- --skip-types
+npm run build
 
-# Only including public icons when building for WordPress Core.
+# Only including icons shipped to WordPress Core when building for it. An icon is shipped when its
+# manifest entry carries a `public` property, whether that property is `true` or `false`.
 #
 # This runs before creating the archive but after the build so icon collection validation passes as expected. Plugin
 # builds keep the full library.
@@ -89,7 +90,7 @@ if [ "$IS_WORDPRESS_CORE" = "true" ]; then
 	(
   	cd packages/icons/src
   	non_public_icons=$(comm -13 \
-  		<(jq -r "map(select(.public) | .filePath)[]" manifest.json | sort) \
+  		<(jq -r "map(select(.public != null) | .filePath)[]" manifest.json | sort) \
   		<(ls library/*.svg))
   	echo "$non_public_icons" | sed 's|^|  Deleting packages/icons/src/|'
   	echo "$non_public_icons" | xargs rm
@@ -98,18 +99,10 @@ fi
 
 # Generate the plugin zip file.
 status "Creating archive... 🎁"
+# shellcheck disable=SC2046 # The list holds globs that must expand.
 zip --recurse-paths --no-dir-entries \
 	gutenberg.zip \
-	gutenberg.php \
-	lib \
-	packages/block-serialization-default-parser/*.php \
-	packages/icons/src/manifest.php \
-	packages/icons/src/library/*.svg \
-	build \
-	build-module \
-	readme.txt \
-	changelog.txt \
-	README.md
+	$(grep -v '^#' bin/plugin-files.txt)
 
 status "Restoring non-public icons... 🔁"
 git diff --name-only --diff-filter=D -- packages/icons/src | sed 's|^|  Restoring |'

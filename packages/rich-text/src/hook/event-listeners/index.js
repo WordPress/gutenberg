@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useRef, useInsertionEffect } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import copyHandler from './copy-handler';
 import selectObject from './select-object';
 import formatBoundaries from './format-boundaries';
