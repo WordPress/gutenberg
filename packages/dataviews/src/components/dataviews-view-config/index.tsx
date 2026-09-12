@@ -25,7 +25,7 @@ const DATAVIEWS_CONFIG_POPOVER_PROPS = {
 	className: 'dataviews-config__popover',
 	placement: 'bottom-end',
 	offset: 9,
-};
+} as const;
 
 export function ViewTypeMenu() {
 	const { view, onChangeView, defaultLayouts } =
