@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Cover: Allow video backgrounds to use the "Fixed background" (parallax) option, matching image backgrounds. Videos cannot use `background-attachment: fixed`, so the video is pinned to the viewport and clipped to the block's bounds, with fallbacks/preferences ([#74289](https://github.com/WordPress/gutenberg/pull/74289)).
+
 ### Bug Fixes
 
 -   Cover: Grow the block with its content in Safari when an aspect ratio is set, instead of clipping the overflow. WebKit locks the box to the ratio where other engines let content expand it ([#70152](https://github.com/WordPress/gutenberg/pull/70152)).
