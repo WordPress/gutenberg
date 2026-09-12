@@ -276,6 +276,291 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that responsive breakpoint styles defined in a standalone block style
+	 * variation partial within a theme's `styles` directory are preserved when
+	 * the partial is sanitized.
+	 *
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_style_variations
+	 */
+	public function test_block_style_variation_partial_retains_responsive_styles() {
+		switch_theme( 'block-theme' );
+
+		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( 'block' );
+		$actual     = null;
+
+		foreach ( $variations as $variation ) {
+			if ( isset( $variation['slug'] ) && 'responsive-variation' === $variation['slug'] ) {
+				$actual = $variation;
+				break;
+			}
+		}
+
+		$this->assertNotNull( $actual, 'The responsive block style variation partial was not found.' );
+		$this->assertSame(
+			array( 'fontSize' => '28px' ),
+			$actual['styles']['@tablet']['typography'] ?? null,
+			'Tablet styles should be preserved when reading a block style variation partial.'
+		);
+		$this->assertSame(
+			array( 'fontSize' => '16px' ),
+			$actual['styles']['@mobile']['typography'] ?? null,
+			'Mobile styles should be preserved when reading a block style variation partial.'
+		);
+	}
+
+	/**
+	 * Tests that responsive breakpoint styles defined in a standalone block style
+	 * variation partial generate the expected media query CSS.
+	 *
+	 * @covers ::gutenberg_render_block_style_variation_support_styles
+	 */
+	public function test_block_style_variation_partial_responsive_styles_generate_css() {
+		switch_theme( 'block-theme' );
+
+		try {
+			$parsed_block = array(
+				'blockName' => 'core/preformatted',
+				'attrs'     => array(
+					'className' => 'wp-block-preformatted is-style-responsive-variation',
+				),
+			);
+
+			gutenberg_render_block_style_variation_support_styles( $parsed_block );
+			$inline_styles     = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
+			$actual_stylesheet = is_array( $inline_styles ) ? implode( '', $inline_styles ) : '';
+
+			$this->assertStringContainsString(
+				'@media (480px < width <= 782px)',
+				$actual_stylesheet,
+				'CSS should contain the tablet viewport media query.'
+			);
+			$this->assertStringContainsString(
+				'@media (width <= 480px)',
+				$actual_stylesheet,
+				'CSS should contain the mobile viewport media query.'
+			);
+		} finally {
+			wp_deregister_style( 'block-style-variation-styles' );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
+	}
+
+	/**
+	 * Tests that pseudo-selector styles defined in a standalone block style
+	 * variation partial are preserved when the partial is sanitized, both at
+	 * the root of `styles` and within a responsive breakpoint state.
+	 *
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_style_variations
+	 */
+	public function test_block_style_variation_partial_retains_pseudo_selector_styles() {
+		switch_theme( 'block-theme' );
+
+		$actual = null;
+		foreach ( WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( 'block' ) as $variation ) {
+			if ( isset( $variation['slug'] ) && 'pseudo-variation' === $variation['slug'] ) {
+				$actual = $variation;
+				break;
+			}
+		}
+
+		$this->assertNotNull( $actual, 'The pseudo-selector block style variation partial was not found.' );
+		$this->assertSame(
+			array( 'text' => 'blue' ),
+			$actual['styles'][':hover']['color'] ?? null,
+			'Pseudo-selector styles should be preserved when reading a block style variation partial.'
+		);
+		$this->assertSame(
+			array( 'text' => 'purple' ),
+			$actual['styles']['@tablet'][':hover']['color'] ?? null,
+			'Pseudo-selector styles within a breakpoint state should be preserved.'
+		);
+	}
+
+	/**
+	 * Tests that pseudo-selector styles defined in a standalone block style
+	 * variation partial generate the expected CSS, including within a
+	 * responsive breakpoint state.
+	 *
+	 * @covers ::gutenberg_render_block_style_variation_support_styles
+	 */
+	public function test_block_style_variation_partial_pseudo_selector_styles_generate_css() {
+		switch_theme( 'block-theme' );
+
+		try {
+			$parsed_block = array(
+				'blockName' => 'core/navigation-link',
+				'attrs'     => array(
+					'className' => 'wp-block-navigation-link is-style-pseudo-variation',
+				),
+			);
+
+			gutenberg_render_block_style_variation_support_styles( $parsed_block );
+			$inline_styles     = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
+			$actual_stylesheet = is_array( $inline_styles ) ? implode( '', $inline_styles ) : '';
+
+			$this->assertStringContainsString(
+				':hover',
+				$actual_stylesheet,
+				'CSS should contain the pseudo-selector rule.'
+			);
+			$this->assertStringContainsString(
+				'blue',
+				$actual_stylesheet,
+				'CSS should contain the pseudo-selector declaration value.'
+			);
+			$this->assertStringContainsString(
+				'purple',
+				$actual_stylesheet,
+				'CSS should contain the pseudo-selector declaration value from the breakpoint state.'
+			);
+		} finally {
+			wp_deregister_style( 'block-style-variation-styles' );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
+	}
+
+	/**
+	 * Tests that the block style variation states allowed at the root of a
+	 * partial are not allowed at the root of a regular theme.json file, which
+	 * has no `blockTypes` property.
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::sanitize
+	 */
+	public function test_theme_json_root_styles_do_not_allow_variation_states() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'color'   => array( 'text' => 'red' ),
+					'@tablet' => array( 'color' => array( 'text' => 'green' ) ),
+					':hover'  => array( 'color' => array( 'text' => 'blue' ) ),
+				),
+			)
+		);
+
+		$actual = $theme_json->get_raw_data()['styles'];
+
+		$this->assertSame(
+			array( 'text' => 'red' ),
+			$actual['color'] ?? null,
+			'Base root styles should be retained.'
+		);
+		$this->assertArrayNotHasKey(
+			'@tablet',
+			$actual,
+			'Responsive breakpoint states should not be allowed at the root of a regular theme.json.'
+		);
+		$this->assertArrayNotHasKey(
+			':hover',
+			$actual,
+			'Pseudo-selectors should not be allowed at the root of a regular theme.json.'
+		);
+	}
+
+	/**
+	 * Tests that `blocks` nested within a responsive breakpoint state is not
+	 * retained for a block style variation partial, since that shape generates
+	 * no CSS. The supported shape nests the breakpoint state within `blocks`.
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::sanitize
+	 */
+	public function test_block_style_variation_partial_does_not_allow_blocks_within_breakpoint_state() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'    => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'blockTypes' => array( 'core/group' ),
+				'styles'     => array(
+					'blocks'  => array(
+						'core/heading' => array(
+							'@mobile' => array(
+								'typography' => array( 'fontSize' => '18px' ),
+							),
+						),
+					),
+					'@mobile' => array(
+						'blocks' => array(
+							'core/heading' => array(
+								'typography' => array( 'fontSize' => '18px' ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual = $theme_json->get_raw_data()['styles'];
+
+		$this->assertSame(
+			array( 'fontSize' => '18px' ),
+			$actual['blocks']['core/heading']['@mobile']['typography'] ?? null,
+			'A breakpoint state nested within `blocks` should be retained.'
+		);
+		$this->assertArrayNotHasKey(
+			'blocks',
+			$actual['@mobile'] ?? array(),
+			'`blocks` nested within a breakpoint state should not be retained.'
+		);
+	}
+
+	/**
+	 * Tests that `blocks` nested within a responsive breakpoint state is not
+	 * retained for a block style variation declared inline in theme.json,
+	 * matching the behaviour for variation partials.
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::sanitize
+	 */
+	public function test_block_style_variation_does_not_allow_blocks_within_breakpoint_state() {
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => 'blocks-in-breakpoint',
+				'label' => 'Blocks In Breakpoint',
+			)
+		);
+
+		try {
+			$theme_json = new WP_Theme_JSON_Gutenberg(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array(
+							'core/group' => array(
+								'variations' => array(
+									'blocks-in-breakpoint' => array(
+										'@mobile' => array(
+											'color'  => array( 'text' => 'red' ),
+											'blocks' => array(
+												'core/heading' => array(
+													'typography' => array( 'fontSize' => '18px' ),
+												),
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+				)
+			);
+
+			$variation = $theme_json->get_raw_data()['styles']['blocks']['core/group']['variations']['blocks-in-breakpoint'] ?? array();
+
+			$this->assertSame(
+				array( 'text' => 'red' ),
+				$variation['@mobile']['color'] ?? null,
+				'Style properties within a breakpoint state should be retained.'
+			);
+			$this->assertArrayNotHasKey(
+				'blocks',
+				$variation['@mobile'] ?? array(),
+				'`blocks` nested within a breakpoint state should not be retained.'
+			);
+		} finally {
+			unregister_block_style( 'core/group', 'blocks-in-breakpoint' );
+		}
+	}
+
+	/**
 	 * Tests that block style variations resolve any `ref` values when generating styles.
 	 */
 	public function test_block_style_variation_ref_values() {
