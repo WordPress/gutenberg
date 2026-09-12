@@ -241,6 +241,8 @@ Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-
 
 Organized way to set CSS properties. Styles in the top-level will be added in the `body` selector.
 
+In a block style variation partial (a theme.json file with a `blockTypes` property), the styles are scoped to the listed block types instead, and the responsive (`@mobile`, `@tablet`) and pseudo-selector (`:hover`, `:focus`, `:focus-visible`, `:active`) states available to block style variations are also allowed at this level.
+
 ### background
 
 Background styles.

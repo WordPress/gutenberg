@@ -391,12 +391,14 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 							}
 						}
 
+						// The store might have already removed the wrapper if
+						// it was unmodified. However, we still want to remove
+						// the wrapper unless there is content like a cite.
+						const wrapper = getBlock( _clientId );
 						if (
+							wrapper &&
 							! getBlockOrder( _clientId ).length &&
-							isUnmodifiedBlock(
-								getBlock( _clientId ),
-								'content'
-							)
+							isUnmodifiedBlock( wrapper, 'content' )
 						) {
 							removeBlock( _clientId, false );
 						}

@@ -134,6 +134,8 @@ _Parameters_
 
 Attach a command loader to the command palette. Used for dynamic commands.
 
+The palette always calls the most recent `hook`. Changing the `hook` instance doesn't re-render the palette.
+
 _Usage_
 
 ```js

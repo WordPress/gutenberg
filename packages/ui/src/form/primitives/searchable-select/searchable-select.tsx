@@ -67,6 +67,7 @@ export const SearchableSelect = forwardRef<
 	{
 		children,
 		emptyContent = __( 'No results found.' ),
+		statusContent,
 		items,
 		placeholder,
 		triggerContent,
@@ -104,7 +105,10 @@ export const SearchableSelect = forwardRef<
 						aria-label={ searchPlaceholder }
 					/>
 				</div>
-				<SearchableResults emptyContent={ emptyContent }>
+				<SearchableResults
+					emptyContent={ emptyContent }
+					statusContent={ statusContent }
+				>
 					{ children }
 				</SearchableResults>
 			</Combobox.Popup>

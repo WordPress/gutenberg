@@ -1124,6 +1124,7 @@
       - required
       - searchPlaceholder
       - showClearButton
+      - statusContent
       - value
       - virtualized
   subcomponents:
@@ -1216,6 +1217,7 @@
       - required
       - searchPlaceholder
       - showClearButton
+      - statusContent
       - value
       - virtualized
   subcomponents:
