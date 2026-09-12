@@ -36,8 +36,8 @@
 
 		td,
 		th {
-			// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
-			word-break: break-word;
+			word-break: normal;
+			overflow-wrap: anywhere;
 		}
 	}
 
@@ -54,8 +54,8 @@
 
 		td,
 		th {
-			// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
-			word-break: break-word;
+			word-break: normal;
+			overflow-wrap: anywhere;
 		}
 	}
 
