@@ -146,7 +146,9 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 	let subscribed = false;
 	// `notifyTick` value when `lastMapResult` was last computed.
 	let computedAt = 0;
-	const storeStatesOnMount = new Map< string, unknown >();
+	// Store states at the last compute or unsubscribe while no subscription
+	// is active, compared on subscribe to catch updates made in between.
+	const storeStatesBeforeSubscribe = new Map< string, unknown >();
 
 	function getStoreState( name: string ): unknown {
 		// If there's no store property (custom generic store), return an empty
@@ -175,12 +177,13 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 			// during render and creating the subscription, which is slightly
 			// delayed. We need to ensure that this second `getValue` call will
 			// compute a fresh value only if any of the store states have
-			// changed in the meantime. Later subscriptions (mode switches)
-			// are covered by the notification tick check on unsubscribe.
+			// changed in the meantime. The same applies to the gap between the
+			// previous unsubscribe and this subscribe on a mode switch.
 			if ( ! subscribed && lastMapResultValid ) {
 				for ( const name of activeStores ) {
 					if (
-						storeStatesOnMount.get( name ) !== getStoreState( name )
+						storeStatesBeforeSubscribe.get( name ) !==
+						getStoreState( name )
 					) {
 						lastMapResultValid = false;
 					}
@@ -188,7 +191,7 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 			}
 
 			subscribed = true;
-			storeStatesOnMount.clear();
+			storeStatesBeforeSubscribe.clear();
 
 			const onStoreChange = () => {
 				// Invalidate the value on store update, so that a fresh value is computed.
@@ -254,6 +257,16 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 				if ( pending ) {
 					lastMapResultValid = false;
 				}
+
+				if ( activeSubscriptions.size === 0 ) {
+					subscribed = false;
+					for ( const name of activeStores ) {
+						storeStatesBeforeSubscribe.set(
+							name,
+							getStoreState( name )
+						);
+					}
+				}
 			};
 		}
 
@@ -304,7 +317,10 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 
 			if ( ! subscribed ) {
 				for ( const name of listeningStores.current! ) {
-					storeStatesOnMount.set( name, getStoreState( name ) );
+					storeStatesBeforeSubscribe.set(
+						name,
+						getStoreState( name )
+					);
 				}
 			}
 			if ( ! subscriber ) {

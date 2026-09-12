@@ -9,7 +9,12 @@ import {
 	it,
 	vi,
 } from 'vitest';
-import { useLayoutEffect, useState, useReducer } from '@wordpress/element';
+import {
+	useEffect,
+	useLayoutEffect,
+	useState,
+	useReducer,
+} from '@wordpress/element';
 import {
 	createRegistry,
 	createRegistrySelector,
@@ -1298,6 +1303,42 @@ describe( 'useSelect', () => {
 				<AsyncModeProvider value={ async }>
 					<RegistryProvider value={ registry }>
 						<TestComponent async={ async } />
+					</RegistryProvider>
+				</AsyncModeProvider>
+			);
+
+			const { rerender } = render( <App async /> );
+
+			rerender( <App async={ false } /> );
+
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
+		} );
+
+		it( 'catches an update dispatched between unsubscribe and re-subscription', () => {
+			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
+
+			// Rendered before the hook, so its passive effect runs after the
+			// hook's old subscription is torn down and before the new one
+			// is created.
+			const Sibling = ( { async } ) => {
+				useEffect( () => {
+					if ( ! async ) {
+						registry.dispatch( 'counter' ).inc();
+					}
+				}, [ async ] );
+				return null;
+			};
+
+			const TestComponent = () => {
+				const count = useSelect( selectSpy, [] );
+				return <div role="status">{ count }</div>;
+			};
+
+			const App = ( { async } ) => (
+				<AsyncModeProvider value={ async }>
+					<RegistryProvider value={ registry }>
+						<Sibling async={ async } />
+						<TestComponent />
 					</RegistryProvider>
 				</AsyncModeProvider>
 			);
