@@ -5,6 +5,7 @@ import {
 	getDefaultRenderingMode,
 	getPostBlocksByName,
 	isCollaborationEnabledForCurrentPost,
+	isPostLockCollaborative,
 } from '../private-selectors';
 import { lock } from '../../lock-unlock';
 
@@ -245,5 +246,29 @@ describe( 'getDefaultRenderingMode', () => {
 				'post-only'
 			);
 		} );
+	} );
+} );
+
+describe( 'isPostLockCollaborative', () => {
+	it( 'returns true when the lock belongs to a collaborative session', () => {
+		expect(
+			isPostLockCollaborative( {
+				postLock: { isLocked: true, isCollaborative: true },
+			} )
+		).toBe( true );
+	} );
+
+	it( 'returns false when the lock belongs to an editor without collaboration support', () => {
+		expect(
+			isPostLockCollaborative( {
+				postLock: { isLocked: true, isCollaborative: false },
+			} )
+		).toBe( false );
+	} );
+
+	it( 'returns false when the server did not report the lock state', () => {
+		expect(
+			isPostLockCollaborative( { postLock: { isLocked: true } } )
+		).toBe( false );
 	} );
 } );

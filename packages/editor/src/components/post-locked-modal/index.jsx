@@ -16,7 +16,7 @@ import { unlock } from '../../lock-unlock';
 import { DOCUMENT_SIZE_LIMIT_EXCEEDED } from '../../utils/sync-error-messages';
 import { store as editorStore } from '../../store';
 
-function CollaborationContext() {
+function CollaborationContext( { isLockCollaborative } ) {
 	const { isCollaborationSupported, syncConnectionStatus } = useSelect(
 		( select ) => {
 			const {
@@ -30,6 +30,17 @@ function CollaborationContext() {
 		},
 		[]
 	);
+
+	// The lock holder is editing somewhere that can't merge changes.
+	if ( isCollaborationSupported && ! isLockCollaborative ) {
+		return (
+			<p>
+				{ __(
+					'Because this post is open in an editor that doesn’t support real-time collaboration, only one person can edit at a time.'
+				) }
+			</p>
+		);
+	}
 
 	if ( isCollaborationSupported ) {
 		return null;
@@ -60,6 +71,8 @@ function PostLockedModal() {
 	const { autosave, updatePostLock } = useDispatch( editorStore );
 	const {
 		isCollaborationEnabled,
+		isCollaborationRunning,
+		isLockCollaborative,
 		isLocked,
 		isTakeover,
 		user,
@@ -79,10 +92,16 @@ function PostLockedModal() {
 			getEditedPostPreviewLink,
 			getEditorSettings,
 			isCollaborationEnabledForCurrentPost,
+			isPostLockCollaborative,
 		} = unlock( select( editorStore ) );
 		const { getPostType } = select( coreStore );
+		const { isCollaborationSupported } = unlock( select( coreStore ) );
+		const collaborationEnabled = isCollaborationEnabledForCurrentPost();
 		return {
-			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
+			isCollaborationEnabled: collaborationEnabled,
+			isCollaborationRunning:
+				collaborationEnabled && isCollaborationSupported(),
+			isLockCollaborative: isPostLockCollaborative(),
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
 			user: getPostLockUser(),
@@ -111,6 +130,12 @@ function PostLockedModal() {
 			data[ 'wp-refresh-post-lock' ] = {
 				lock: activePostLock,
 				post_id: postId,
+				// Tells the server this lock belongs to a session that merges
+				// changes, so a post open in the classic editor or a page
+				// builder is still treated as exclusively locked. Reported
+				// here rather than derived from sync traffic, which differs
+				// per transport.
+				collaborative: isCollaborationRunning ? 1 : 0,
 			};
 		}
 
@@ -131,6 +156,10 @@ function PostLockedModal() {
 				updatePostLock( {
 					isLocked: true,
 					isTakeover: true,
+					// The heartbeat doesn't say which editor took over, so carry
+					// the last known value rather than reading a missing flag as
+					// an exclusive lock and interrupting everyone.
+					isCollaborative: isLockCollaborative,
 					user: {
 						name: received.lock_error.name,
 						avatar: received.lock_error.avatar_src_2x,
@@ -139,6 +168,7 @@ function PostLockedModal() {
 			} else if ( received.new_lock ) {
 				updatePostLock( {
 					isLocked: false,
+					isCollaborative: isLockCollaborative,
 					activePostLock: received.new_lock,
 				} );
 			}
@@ -184,6 +214,8 @@ function PostLockedModal() {
 	}, [
 		hookName,
 		isLocked,
+		isCollaborationRunning,
+		isLockCollaborative,
 		activePostLock,
 		postId,
 		postLockUtils,
@@ -195,8 +227,13 @@ function PostLockedModal() {
 		return null;
 	}
 
-	// Avoid sending the modal if sync is supported, but retain functionality around locks etc.
-	if ( isCollaborationEnabled ) {
+	/*
+	 * Avoid showing the modal if sync is supported, but retain functionality
+	 * around locks etc. The lock must be collaborative too: one held by the
+	 * classic editor or a page builder can't merge, so the modal has to appear
+	 * and the conflict be resolved by taking over rather than by saving last.
+	 */
+	if ( isCollaborationEnabled && isLockCollaborative ) {
 		return null;
 	}
 
@@ -265,7 +302,9 @@ function PostLockedModal() {
 									}
 								) }
 							</p>
-							<CollaborationContext />
+							<CollaborationContext
+								isLockCollaborative={ isLockCollaborative }
+							/>
 						</>
 					) }
 					{ ! isTakeover && (
@@ -293,7 +332,9 @@ function PostLockedModal() {
 									}
 								) }
 							</p>
-							<CollaborationContext />
+							<CollaborationContext
+								isLockCollaborative={ isLockCollaborative }
+							/>
 							<p>
 								{ __(
 									'If you take over, the other user will lose editing control to the post, but their changes will be saved.'

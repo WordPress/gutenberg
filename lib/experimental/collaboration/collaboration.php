@@ -13,6 +13,20 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 }
 require_once __DIR__ . '/class-wp-sync-save-server.php';
 
+/**
+ * Post meta key recording collaborative editor sessions.
+ *
+ * Stored as a map of user ID to the time the session was last reported. A post
+ * can be open in several collaborative editors at once, so this cannot be a
+ * single most-recent value.
+ */
+const GUTENBERG_COLLABORATIVE_SESSION_META_KEY = '_collaborative_edit_session';
+
+/**
+ * Non-persistent cache group holding per-request edit lock collaboration state.
+ */
+const GUTENBERG_COLLABORATIVE_LOCK_CACHE_GROUP = 'gutenberg_collaborative_locks';
+
 if ( ! function_exists( 'gutenberg_register_sync_storage_post_type' ) ) {
 	/**
 	 * Registers the custom post type for sync storage.
@@ -57,15 +71,15 @@ if ( ! function_exists( 'gutenberg_register_sync_storage_post_type' ) ) {
 	add_action( 'init', 'gutenberg_register_sync_storage_post_type' );
 }
 
-if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
+if ( ! function_exists( 'gutenberg_get_sync_storage' ) ) {
 	/**
-	 * Registers REST API routes for collaborative editing.
+	 * Returns the sync storage implementation for collaborative editing.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @return WP_Sync_Storage Storage implementation.
 	 */
-	function gutenberg_register_collaboration_rest_routes(): void {
-		if ( ! wp_is_collaboration_enabled() ) {
-			return;
-		}
-
+	function gutenberg_get_sync_storage() {
 		/**
 		 * Filters the sync storage implementation for collaborative editing.
 		 *
@@ -89,7 +103,20 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 			$sync_storage = new WP_Sync_Post_Meta_Storage();
 		}
 
-		$sync_server = new WP_HTTP_Polling_Sync_Server( $sync_storage );
+		return $sync_storage;
+	}
+}
+
+if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
+	/**
+	 * Registers REST API routes for collaborative editing.
+	 */
+	function gutenberg_register_collaboration_rest_routes(): void {
+		if ( ! wp_is_collaboration_enabled() ) {
+			return;
+		}
+
+		$sync_server = new WP_HTTP_Polling_Sync_Server( gutenberg_get_sync_storage() );
 		$sync_server->register_routes();
 
 		$sync_save_server = new WP_Sync_Save_Server();
@@ -247,6 +274,193 @@ if ( ! function_exists( 'gutenberg_get_active_edit_lock_user' ) ) {
 	}
 }
 
+if ( ! function_exists( 'gutenberg_mark_collaborative_edit_session' ) ) {
+	/**
+	 * Records that the current user opened this post in a collaborative editor.
+	 *
+	 * Written when the editor page renders and refreshed by the editor's
+	 * heartbeat, so the signal does not depend on which sync transport is in
+	 * use. Expires with the edit lock it describes.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param int      $post_id Post ID.
+	 * @param int|null $user_id User ID. Defaults to the current user.
+	 */
+	function gutenberg_mark_collaborative_edit_session( $post_id, $user_id = null ) {
+		$user_id = $user_id ? (int) $user_id : get_current_user_id();
+		if ( ! $user_id ) {
+			return;
+		}
+
+		$sessions             = gutenberg_get_collaborative_edit_sessions( $post_id );
+		$sessions[ $user_id ] = time();
+
+		update_post_meta( $post_id, GUTENBERG_COLLABORATIVE_SESSION_META_KEY, $sessions );
+	}
+}
+
+if ( ! function_exists( 'gutenberg_get_collaborative_edit_sessions' ) ) {
+	/**
+	 * Returns the unexpired collaborative editor sessions recorded for a post.
+	 *
+	 * A post can be open in several collaborative editors at once, so sessions
+	 * are kept per user rather than as a single most-recent value.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param int $post_id Post ID.
+	 * @return array<int, int> Map of user ID to the time the session was last reported.
+	 */
+	function gutenberg_get_collaborative_edit_sessions( $post_id ) {
+		$sessions = get_post_meta( $post_id, GUTENBERG_COLLABORATIVE_SESSION_META_KEY, true );
+		if ( ! is_array( $sessions ) ) {
+			return array();
+		}
+
+		$oldest = time() - gutenberg_get_collaborative_session_window();
+		$fresh  = array();
+
+		foreach ( $sessions as $user_id => $reported_at ) {
+			if ( (int) $reported_at > $oldest ) {
+				$fresh[ (int) $user_id ] = (int) $reported_at;
+			}
+		}
+
+		return $fresh;
+	}
+}
+
+if ( ! function_exists( 'gutenberg_clear_collaborative_edit_session' ) ) {
+	/**
+	 * Removes a user's recorded collaborative editor session for a post.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param int $post_id Post ID.
+	 * @param int $user_id User ID.
+	 */
+	function gutenberg_clear_collaborative_edit_session( $post_id, $user_id ) {
+		$sessions = gutenberg_get_collaborative_edit_sessions( $post_id );
+
+		unset( $sessions[ (int) $user_id ] );
+
+		update_post_meta( $post_id, GUTENBERG_COLLABORATIVE_SESSION_META_KEY, $sessions );
+	}
+}
+
+if ( ! function_exists( 'gutenberg_get_collaborative_session_window' ) ) {
+	/**
+	 * Returns how long a recorded collaborative session stays valid.
+	 *
+	 * Matches the edit lock window, so the marker and the lock it describes
+	 * expire together. Both are refreshed by the same heartbeat.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @return int Window in seconds.
+	 */
+	function gutenberg_get_collaborative_session_window() {
+		/** This filter is documented in wp-admin/includes/ajax-actions.php */
+		return (int) apply_filters( 'wp_check_post_lock_window', 150 );
+	}
+}
+
+if ( ! function_exists( 'gutenberg_is_user_in_collaborative_session' ) ) {
+	/**
+	 * Determines whether a user is editing a post in a collaborative session.
+	 *
+	 * True when they have recently reported a collaborative editor session, or
+	 * when the HTTP polling sync server has recent awareness for them. The
+	 * awareness check is a fallback: other transports do not record it.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param int $post_id Post ID.
+	 * @param int $user_id User ID.
+	 * @return bool Whether the user is in a collaborative session for the post.
+	 */
+	function gutenberg_is_user_in_collaborative_session( $post_id, $user_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post || ! $user_id ) {
+			return false;
+		}
+
+		$now = time();
+
+		$sessions = gutenberg_get_collaborative_edit_sessions( $post->ID );
+		if ( isset( $sessions[ (int) $user_id ] ) ) {
+			return true;
+		}
+
+		$room      = 'postType/' . $post->post_type . ':' . $post->ID;
+		$awareness = gutenberg_get_sync_storage()->get_awareness_state( $room );
+
+		foreach ( $awareness as $entry ) {
+			if ( ! isset( $entry['wp_user_id'], $entry['updated_at'] ) ) {
+				continue;
+			}
+
+			if ( (int) $entry['wp_user_id'] !== (int) $user_id ) {
+				continue;
+			}
+
+			if ( $now - (int) $entry['updated_at'] < WP_HTTP_Polling_Sync_Server::AWARENESS_TIMEOUT ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+}
+
+if ( ! function_exists( 'gutenberg_is_post_lock_collaborative' ) ) {
+	/**
+	 * Determines whether a post's edit lock belongs to a collaborative session.
+	 *
+	 * The classic editor and page builders take the same lock but do not merge
+	 * changes, so treating their lock as collaborative lets two people edit at
+	 * once and the second save wins. A post with no active lock counts as
+	 * collaborative: there is nothing to conflict with.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_Post|int $post Post object or post ID.
+	 * @return bool Whether the post's edit lock belongs to a collaborative session.
+	 */
+	function gutenberg_is_post_lock_collaborative( $post ) {
+		$post = get_post( $post );
+		if ( ! $post || wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+			return false;
+		}
+
+		/*
+		 * Asked three times per post list row, and reading awareness runs an
+		 * uncached query. Non-persistent: awareness expires within seconds, so
+		 * this must not outlive the request.
+		 */
+		wp_cache_add_non_persistent_groups( GUTENBERG_COLLABORATIVE_LOCK_CACHE_GROUP );
+
+		$found  = false;
+		$cached = wp_cache_get( $post->ID, GUTENBERG_COLLABORATIVE_LOCK_CACHE_GROUP, false, $found );
+		if ( $found ) {
+			return (bool) $cached;
+		}
+
+		$lock_user = gutenberg_get_active_edit_lock_user( $post->ID );
+
+		if ( ! $lock_user || get_current_user_id() === $lock_user ) {
+			$collaborative = true;
+		} else {
+			$collaborative = gutenberg_is_user_in_collaborative_session( $post->ID, $lock_user );
+		}
+
+		wp_cache_set( $post->ID, $collaborative, GUTENBERG_COLLABORATIVE_LOCK_CACHE_GROUP );
+
+		return $collaborative;
+	}
+}
+
 /**
  * Injects the post types for which real-time collaboration is disabled.
  */
@@ -291,6 +505,7 @@ function gutenberg_post_list_collaboration_ui() {
 	// Heartbeat filter applies globally (not just edit.php) since the
 	// heartbeat API can fire from any admin page.
 	add_filter( 'heartbeat_received', 'gutenberg_filter_locked_posts_heartbeat_for_rtc', 20, 2 );
+	add_filter( 'heartbeat_received', 'gutenberg_track_collaborative_session_heartbeat', 20, 2 );
 
 	// Register globally because Quick Edit submits `action=inline-save` through admin-ajax.php.
 	add_action( 'wp_ajax_inline-save', 'gutenberg_block_quick_edit_for_active_lock', 0 );
@@ -302,10 +517,52 @@ function gutenberg_post_list_collaboration_ui() {
 
 	add_action( 'admin_head', 'gutenberg_post_list_collaboration_styles' );
 	add_filter( 'gettext', 'gutenberg_filter_locked_post_text_for_rtc', 10, 3 );
+	add_filter( 'post_class', 'gutenberg_post_list_collaboration_row_class', 10, 3 );
 	add_filter( 'post_row_actions', 'gutenberg_post_list_collaboration_row_actions', 10, 2 );
 	add_filter( 'page_row_actions', 'gutenberg_post_list_collaboration_row_actions', 10, 2 );
 }
 add_action( 'admin_init', 'gutenberg_post_list_collaboration_ui' );
+
+/**
+ * Records whether the editor refreshing an edit lock can merge changes.
+ *
+ * The block editor reports this alongside its lock refresh, so the signal does
+ * not depend on which sync transport is in use. The classic editor refreshes
+ * the same lock without reporting anything, which clears the marker.
+ *
+ * @param array $response The heartbeat response.
+ * @param array $data     The data sent by the client.
+ * @return array Unmodified heartbeat response.
+ */
+function gutenberg_track_collaborative_session_heartbeat( $response, $data = array() ) {
+	if ( empty( $data['wp-refresh-post-lock']['post_id'] ) ) {
+		return $response;
+	}
+
+	$post_id = (int) $data['wp-refresh-post-lock']['post_id'];
+	if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
+		return $response;
+	}
+
+	$post = get_post( $post_id );
+	if ( ! $post || wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+		return $response;
+	}
+
+	// Only the lock holder describes the session the lock belongs to.
+	if ( get_current_user_id() !== gutenberg_get_active_edit_lock_user( $post_id ) ) {
+		return $response;
+	}
+
+	if ( empty( $data['wp-refresh-post-lock']['collaborative'] ) ) {
+		gutenberg_clear_collaborative_edit_session( $post_id, get_current_user_id() );
+		return $response;
+	}
+
+	gutenberg_mark_collaborative_edit_session( $post_id );
+
+	return $response;
+}
 
 /**
  * Removes user-specific details from post lock heartbeat responses and adds
@@ -322,6 +579,13 @@ add_action( 'admin_init', 'gutenberg_post_list_collaboration_ui' );
 function gutenberg_filter_locked_posts_heartbeat_for_rtc( $response, $data = array() ) {
 	if ( ! empty( $response['wp-check-locked-posts'] ) ) {
 		foreach ( $response['wp-check-locked-posts'] as $key => $lock_data ) {
+			$post_id = absint( substr( $key, 5 ) );
+
+			// An exclusive lock keeps core's "%s is currently editing" details.
+			if ( ! $post_id || ! gutenberg_is_post_lock_collaborative( $post_id ) ) {
+				continue;
+			}
+
 			$response['wp-check-locked-posts'][ $key ]['text'] = __( 'Currently being edited', 'gutenberg' );
 			unset( $response['wp-check-locked-posts'][ $key ]['avatar_src'] );
 			unset( $response['wp-check-locked-posts'][ $key ]['avatar_src_2x'] );
@@ -411,6 +675,25 @@ if ( ! function_exists( 'gutenberg_block_quick_edit_for_active_lock' ) ) {
 }
 
 /**
+ * Marks post list rows whose edit lock belongs to a collaborative session.
+ *
+ * The collaborative treatment (generic lock text, no avatar, a "Join" action)
+ * applies only to these rows; the rest keep core's exclusive lock UI.
+ *
+ * @param string[] $classes An array of post class names.
+ * @param string[] $css_class An array of additional class names added to the post.
+ * @param int      $post_id  The post ID.
+ * @return string[] Filtered post class names.
+ */
+function gutenberg_post_list_collaboration_row_class( $classes, $css_class, $post_id ) {
+	if ( gutenberg_is_post_lock_collaborative( $post_id ) ) {
+		$classes[] = 'is-collaborative-lock';
+	}
+
+	return $classes;
+}
+
+/**
  * Outputs CSS to hide the post lock icon and user avatar in the post list
  * when real-time collaboration is enabled.
  *
@@ -423,15 +706,21 @@ function gutenberg_post_list_collaboration_styles() {
 	?>
 	<style type="text/css">
 		/*
+		 * Every rule is scoped to `.is-collaborative-lock`, added by
+		 * gutenberg_post_list_collaboration_row_class(). Rows without it keep
+		 * core's exclusive lock UI.
+		 */
+
+		/*
 		 * Hide the lock indicator icon in the checkbox column.
 		 * WordPress core shows it via .wp-locked .locked-indicator { display: block },
 		 * so we match that specificity to override it.
 		 */
-		.wp-locked .locked-indicator {
+		.is-collaborative-lock.wp-locked .locked-indicator {
 			display: none;
 		}
 		/* Hide the user avatar in the locked info area. */
-		.wp-locked .locked-info .locked-avatar {
+		.is-collaborative-lock.wp-locked .locked-info .locked-avatar {
 			display: none;
 		}
 		/*
@@ -442,23 +731,23 @@ function gutenberg_post_list_collaboration_styles() {
 		 * Quick Edit intentionally stays hidden: it is not collaboration-aware,
 		 * so edits made through it diverge from the content in an active editor session.
 		 */
-		tr.wp-locked .check-column label,
-		tr.wp-locked .check-column input[type="checkbox"] {
+		tr.is-collaborative-lock.wp-locked .check-column label,
+		tr.is-collaborative-lock.wp-locked .check-column input[type="checkbox"] {
 			display: revert;
 		}
 		/*
 		 * Toggle "Edit" / "Join" action link text based on lock state.
-		 * The heartbeat adds/removes .wp-locked on locked rows. This
-		 * CSS only runs when RTC is enabled, so .wp-locked here always
-		 * means collaborative editing, not exclusive locking.
+		 * The heartbeat adds/removes .wp-locked on locked rows. Both labels are
+		 * only rendered for rows with a collaborative lock, so the unlocked
+		 * state of any other row is unaffected.
 		 */
 		.join-action-text {
 			display: none;
 		}
-		.wp-locked .edit-action-text {
+		.is-collaborative-lock.wp-locked .edit-action-text {
 			display: none;
 		}
-		.wp-locked .join-action-text {
+		.is-collaborative-lock.wp-locked .join-action-text {
 			display: inline;
 		}
 	</style>
@@ -480,11 +769,17 @@ function gutenberg_post_list_collaboration_styles() {
  * @return string Modified translation.
  */
 function gutenberg_filter_locked_post_text_for_rtc( $translation, $text, $domain ) {
-	if ( 'default' === $domain && '%s is currently editing' === $text ) {
-		return __( 'Currently being edited', 'gutenberg' );
+	if ( 'default' !== $domain || '%s is currently editing' !== $text ) {
+		return $translation;
 	}
 
-	return $translation;
+	// single_row() sets the global post, so this resolves against the right row.
+	$post = get_post();
+	if ( ! $post || ! gutenberg_is_post_lock_collaborative( $post ) ) {
+		return $translation;
+	}
+
+	return __( 'Currently being edited', 'gutenberg' );
 }
 
 /**
@@ -505,6 +800,11 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 	}
 
 	if ( wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+		return $actions;
+	}
+
+	// Locked by an editor that cannot merge changes, so there is nothing to join.
+	if ( ! gutenberg_is_post_lock_collaborative( $post ) ) {
 		return $actions;
 	}
 
@@ -541,6 +841,41 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 
 	return $actions;
 }
+
+/**
+ * Tells the block editor whether the post's edit lock is collaborative, and
+ * records this session so other collaborators can see it.
+ *
+ * The editor suppresses the "already being edited" modal while collaboration is
+ * enabled, which is only correct when the existing lock can merge changes.
+ *
+ * @param array                   $settings             Editor settings.
+ * @param WP_Block_Editor_Context $block_editor_context The current block editor context.
+ * @return array Filtered editor settings.
+ */
+function gutenberg_add_lock_collaboration_state_to_editor_settings( $settings, $block_editor_context ) {
+	if ( ! isset( $settings['postLock'] ) || empty( $block_editor_context->post ) ) {
+		return $settings;
+	}
+
+	if ( ! wp_is_collaboration_enabled() ) {
+		return $settings;
+	}
+
+	$post = $block_editor_context->post;
+
+	if ( wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+		return $settings;
+	}
+
+	$settings['postLock']['isCollaborative'] = gutenberg_is_post_lock_collaborative( $post );
+
+	// Recorded after reading the lock, so this session isn't mistaken for it.
+	gutenberg_mark_collaborative_edit_session( $post->ID );
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'gutenberg_add_lock_collaboration_state_to_editor_settings', 10, 2 );
 
 /**
  * Adds the autosave's CRDT snapshot to the block editor settings when
