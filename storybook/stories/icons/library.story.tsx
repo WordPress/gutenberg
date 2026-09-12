@@ -14,33 +14,17 @@ import manifest from '../../../packages/icons/src/manifest.json';
 
 const { Icon, ...availableIcons } = iconsPackage;
 
-const keywords: Partial< Record< string, string[] > > = {
-	archive: [ 'folder' ],
-	atSymbol: [ 'email' ],
-	audio: [ 'music' ],
-	cancelCircleFilled: [ 'close' ],
-	caution: [ 'alert', 'warning' ],
-	cautionFilled: [ 'alert', 'warning' ],
-	create: [ 'add', 'new', 'plus' ],
-	envelope: [ 'email' ],
-	error: [ 'alert', 'caution', 'warning' ],
-	file: [ 'folder' ],
-	lifesaver: [ 'buoy' ],
-	seen: [ 'show', 'visible', 'eye' ],
-	starFilled: [ 'favorite' ],
-	pencil: [ 'edit' ],
-	thumbsDown: [ 'dislike' ],
-	thumbsUp: [ 'like' ],
-	time: [ 'clock', 'duration', 'hour', 'minute', 'second' ],
-	trash: [ 'delete' ],
-	unseen: [ 'hide' ],
-};
-
 const ALL_ICONS_MANIFEST = new Map(
-	manifest.map( ( entry: { slug: string; public?: boolean } ) => [
-		entry.slug,
-		{ slug: entry.slug, public: !! entry.public },
-	] )
+	manifest.map(
+		( entry: { slug: string; keywords?: string[]; public?: boolean } ) => [
+			entry.slug,
+			{
+				slug: entry.slug,
+				keywords: entry.keywords ?? [],
+				public: !! entry.public,
+			},
+		]
+	)
 );
 
 function nameToSlug( name: string ): string {
@@ -91,14 +75,20 @@ const LibraryExample = ( {
 	const filteredIcons = filter.length
 		? Object.fromEntries(
 				Object.entries( availableIcons ).filter( ( [ name ] ) => {
-					const normalizedName = name.toLowerCase();
 					const normalizedFilter = filter.toLowerCase();
 
-					return (
-						normalizedName.includes( normalizedFilter ) ||
-						keywords[ name ]?.some( ( keyword: string ) =>
-							keyword.toLowerCase().includes( normalizedFilter )
-						)
+					if ( name.toLowerCase().includes( normalizedFilter ) ) {
+						return true;
+					}
+
+					// Keywords live in the manifest, so Storybook and the icon
+					// registry search the same terms.
+					const iconInfo = ALL_ICONS_MANIFEST.get(
+						nameToSlug( name )
+					);
+
+					return !! iconInfo?.keywords.some( ( keyword ) =>
+						keyword.toLowerCase().includes( normalizedFilter )
 					);
 				} )
 		  )

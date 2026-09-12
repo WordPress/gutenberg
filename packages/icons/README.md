@@ -54,6 +54,7 @@ To add a new icon to the library, follow these steps:
      - Omit the field to keep the icon in the JS library only. It is not shipped to core.
      - `true` ships the icon to core and exposes it through the SVG Icons API, which makes it selectable in the Icon block.
      - `false` ships the icon to core and registers it for server-side use through `wp_get_icon()`, but hides it from the REST API and the Icon block. Use this for icons that belong to the admin UI rather than to post content, such as admin menu icons.
+   - `keywords` (optional): An array of lowercase search terms for the icon, such as `[ "hamburger", "navigation" ]` for Menu. Public and non-public icons alike may have them: the icons registry and the icon library match them alongside the name and label, and so does the Storybook icon library, which reads this manifest rather than keeping its own list. Terms for public icons are localized in the generated `manifest.php`.
 4. **Do not edit `manifest.php`**: The `manifest.php` file is automatically generated from `manifest.json` by the build script. Do not edit it manually, as your changes will be overwritten when the build runs.
 
 After adding your icon, run `npm run build` to generate the TypeScript files and update `manifest.php`.
