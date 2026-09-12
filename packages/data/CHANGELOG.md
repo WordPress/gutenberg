@@ -2,9 +2,10 @@
 
 ## Unreleased
 
-## Enhancements
+### Enhancements
 
-- Optimized store listener registration and execution.
+-   Optimized store listener registration and execution.
+-   `useSelect`: async-mode subscribers share a single store subscription per store and are notified at idle time instead of inside the dispatch.
 
 ## 10.55.0 (2026-09-10)
 

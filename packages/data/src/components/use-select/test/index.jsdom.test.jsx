@@ -1170,6 +1170,204 @@ describe( 'useSelect', () => {
 			expect( selectSpy ).toHaveBeenCalledTimes( 2 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		} );
+
+		it( 'shares one store subscription between async subscribers', () => {
+			const subscribeSpy = vi.spyOn( registry, 'subscribe' );
+
+			const AsyncCounter = () => {
+				const count = useSelect(
+					( select ) => select( 'counter' ).get(),
+					[]
+				);
+				return <div role="status">{ count }</div>;
+			};
+
+			render(
+				<AsyncModeProvider value>
+					<RegistryProvider value={ registry }>
+						<AsyncCounter />
+						<AsyncCounter />
+						<AsyncCounter />
+					</RegistryProvider>
+				</AsyncModeProvider>
+			);
+
+			// Three async hooks, one real subscription to the store.
+			expect( subscribeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( subscribeSpy ).toHaveBeenCalledWith(
+				expect.any( Function ),
+				'counter'
+			);
+		} );
+
+		it( 'notifies an instance reading several stores once per flush', async () => {
+			registry.registerStore( 'counter2', counterStore( 10 ) );
+
+			const selectSpy = vi.fn(
+				( select ) =>
+					select( 'counter' ).get() + ':' + select( 'counter2' ).get()
+			);
+
+			const TestComponent = vi.fn( () => {
+				const value = useSelect( selectSpy, [] );
+				return <div role="status">{ value }</div>;
+			} );
+
+			render(
+				<AsyncModeProvider value>
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				</AsyncModeProvider>
+			);
+
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0:10' );
+
+			act( () => {
+				registry.dispatch( 'counter' ).inc();
+				registry.dispatch( 'counter2' ).inc();
+			} );
+
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0:10' );
+
+			expect( await screen.findByText( '1:11' ) ).toBeInTheDocument();
+
+			// Initial render plus a single recomputation for both store updates.
+			expect( selectSpy ).toHaveBeenCalledTimes( 2 );
+			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'defers updates after switching from sync to async', async () => {
+			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
+
+			const TestComponent = vi.fn( () => {
+				const count = useSelect( selectSpy, [] );
+				return <div role="status">{ count }</div>;
+			} );
+
+			const App = ( { async } ) => (
+				<AsyncModeProvider value={ async }>
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				</AsyncModeProvider>
+			);
+
+			const { rerender } = render( <App async={ false } /> );
+
+			act( () => {
+				registry.dispatch( 'counter' ).inc();
+			} );
+
+			// Sync mode: updated inside the dispatch.
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
+
+			rerender( <App async /> );
+
+			act( () => {
+				registry.dispatch( 'counter' ).inc();
+			} );
+
+			// Async mode: not updated yet.
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
+
+			expect( await screen.findByText( '2' ) ).toBeInTheDocument();
+
+			// Initial render, sync update, async update. The mode switch itself
+			// re-subscribes but must not recompute the value.
+			expect( selectSpy ).toHaveBeenCalledTimes( 3 );
+		} );
+
+		it( 'catches an update dispatched between render and re-subscription', () => {
+			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
+
+			const TestComponent = ( { async } ) => {
+				const count = useSelect( selectSpy, [] );
+				// Layout effects run before the passive effect in which
+				// `useSyncExternalStore` swaps the subscription, so this update
+				// lands while the old (async) subscription is still active.
+				useLayoutEffect( () => {
+					if ( ! async ) {
+						registry.dispatch( 'counter' ).inc();
+					}
+				}, [ async ] );
+				return <div role="status">{ count }</div>;
+			};
+
+			const App = ( { async } ) => (
+				<AsyncModeProvider value={ async }>
+					<RegistryProvider value={ registry }>
+						<TestComponent async={ async } />
+					</RegistryProvider>
+				</AsyncModeProvider>
+			);
+
+			const { rerender } = render( <App async /> );
+
+			rerender( <App async={ false } /> );
+
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
+		} );
+
+		it( 'schedules another flush for updates dispatched during a flush', async () => {
+			const TestComponent = () => {
+				const count = useSelect(
+					( select ) => select( 'counter' ).get(),
+					[]
+				);
+				useLayoutEffect( () => {
+					if ( count === 1 ) {
+						registry.dispatch( 'counter' ).inc();
+					}
+				}, [ count ] );
+				return <div role="status">{ count }</div>;
+			};
+
+			render(
+				<AsyncModeProvider value>
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				</AsyncModeProvider>
+			);
+
+			act( () => {
+				registry.dispatch( 'counter' ).inc();
+			} );
+
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
+
+			expect( await screen.findByText( '2' ) ).toBeInTheDocument();
+		} );
+
+		it( 'recreates the shared subscription after the last async subscriber leaves', async () => {
+			const TestComponent = () => {
+				const count = useSelect(
+					( select ) => select( 'counter' ).get(),
+					[]
+				);
+				return <div role="status">{ count }</div>;
+			};
+
+			const App = () => (
+				<AsyncModeProvider value>
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				</AsyncModeProvider>
+			);
+
+			const { unmount } = render( <App /> );
+			unmount();
+
+			render( <App /> );
+
+			act( () => {
+				registry.dispatch( 'counter' ).inc();
+			} );
+
+			expect( await screen.findByText( '1' ) ).toBeInTheDocument();
+		} );
 	} );
 
 	describe( 'usage without dependencies array', () => {
