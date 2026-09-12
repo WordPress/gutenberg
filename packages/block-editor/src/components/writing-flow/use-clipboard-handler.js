@@ -16,10 +16,7 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { getEventTarget } from './get-event-target';
-import {
-	setClipboardBlocks,
-	setContentEditableWrapper,
-} from './utils';
+import { setClipboardBlocks, setContentEditableWrapper } from './utils';
 import { getPasteEventData } from '../../utils/pasting';
 import { getBlockClientId } from '../../utils/dom';
 
@@ -105,11 +102,13 @@ export default function useClipboardHandler() {
 			if ( ! hasMultiSelection() ) {
 				const eventTarget = getEventTarget( event );
 				// Open shadow roots retarget `event.target` to the host; use
-				// the composed path so text fields inside shadow DOM keep
-				// native clipboard behaviour.
+				// the composed path so inputs/textareas inside shadow DOM keep
+				// native clipboard behaviour. Skip contentEditable nodes so
+				// RichText still uses writing-flow block copy/cut/paste.
 				if (
 					eventTarget?.nodeName &&
-					isTextField( eventTarget )
+					isTextField( eventTarget ) &&
+					eventTarget.contentEditable !== 'true'
 				) {
 					return;
 				}
