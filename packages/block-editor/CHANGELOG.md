@@ -14,6 +14,7 @@
 
 -   Remove the `react-autosize-textarea` dependency. `PlainText` and the block "Edit as HTML" field now auto-grow with CSS `field-sizing: content`. Browsers without support use scrollable fields. `PlainText` consumers should use CSS height constraints instead of `rows` ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).
 -   `BlockCard`: Migrate the block-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82503](https://github.com/WordPress/gutenberg/pull/82503)).
+-   State control badges: migrate from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge`, and replace the badge tooltip with an info-icon Popover infotip ([#82608](https://github.com/WordPress/gutenberg/pull/82608)).
 
 ### Bug Fixes
 
@@ -35,7 +36,6 @@
 -   `BlockAlignmentControl`: List Wide and Full width as unavailable when a parent layout withholds them but the theme itself offers them, instead of removing them from the menu without explanation. A theme that offers neither keeps them hidden, since it is curating its own options. Blocks whose only alignments are wide and full, such as Group and Columns, now keep an alignment control in layouts that offer neither ([#82600](https://github.com/WordPress/gutenberg/pull/82600)).
 -   Borders: rename the "Border & Shadow" panel to "Borders", whichever of its controls are available, and always show the Border and Shadow controls' visible labels. A stable panel title is what lets the Border label render unconditionally, so its "Unlink sides" toggle lines up with the border radius one ([#82163](https://github.com/WordPress/gutenberg/pull/82163)).
 -   `ListView`: Updated to use `outset-ring__focus()` mixin for focus outline wherever applicable instead of the previous box-shadow implementation. ([#82129](https://github.com/WordPress/gutenberg/pull/82129))
--   State control badges: migrate from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82608](https://github.com/WordPress/gutenberg/pull/82608)).
 
 ### Deprecations
 
