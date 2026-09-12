@@ -16,6 +16,7 @@ import {
 	createPathIndex,
 	trackMetadata,
 	trackRoot,
+	untrack,
 } from '../utils/track-state';
 import type {
 	SubscriptionDeps,
@@ -332,7 +333,10 @@ export default function createReduxStore< State, Actions, Selectors >(
 					if ( selector.isRegistrySelector ) {
 						selector.registry = registry;
 					}
-					return selector( trackRoot( key, state.root ), ...args );
+					// The result never carries a tracking proxy out.
+					return untrack(
+						selector( trackRoot( key, state.root ), ...args )
+					);
 				};
 
 				// Expose normalization method on the bound selector

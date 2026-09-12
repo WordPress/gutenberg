@@ -10,6 +10,7 @@
 
 const SEP = '\u0000';
 const MAX_DEPTH = 3;
+const ROOT = 'k:root';
 
 export type PathsByStore = Map< string, string[] >;
 
@@ -21,6 +22,7 @@ interface Tracker {
 let current: Tracker | null = null;
 
 const proxyToTarget = new WeakMap< object, object >();
+const proxyInfo = new WeakMap< object, { storeName: string; path: string } >();
 const proxyCache = new WeakMap< object, Map< string, object > >();
 
 function addTo(
@@ -75,25 +77,45 @@ function getCached(
 	return proxy;
 }
 
+function getCachedFor(
+	target: object,
+	storeName: string,
+	path: string,
+	create: () => object
+): object {
+	const proxy = getCached( target, path, create );
+	if ( ! proxyInfo.has( proxy ) ) {
+		proxyInfo.set( proxy, { storeName, path } );
+	}
+	return proxy;
+}
+
 function wrap(
 	value: unknown,
 	storeName: string,
 	path: string,
 	depth: number
 ): unknown {
+	// A method on a state object answers from mutable internals, like the
+	// undo manager. Its reference never changes, so depend on the whole
+	// store instead.
+	if ( typeof value === 'function' ) {
+		recordLeaf( storeName, ROOT );
+		return value;
+	}
 	if ( depth >= MAX_DEPTH ) {
 		recordLeaf( storeName, path );
 		return value;
 	}
 	if ( value instanceof Map ) {
 		recordContainer( storeName, path );
-		return getCached( value, path, () =>
+		return getCachedFor( value, storeName, path, () =>
 			createMapProxy( value, storeName, path, depth )
 		);
 	}
 	if ( isPlainObject( value ) ) {
 		recordContainer( storeName, path );
-		return getCached( value, path, () =>
+		return getCachedFor( value, storeName, path, () =>
 			createObjectProxy( value, storeName, path, depth )
 		);
 	}
@@ -192,7 +214,7 @@ export function trackRoot< T >( storeName: string, root: T ): T {
 	if ( ! current ) {
 		return root;
 	}
-	return wrap( root, storeName, 'k:root', 0 ) as T;
+	return wrap( root, storeName, ROOT, 0 ) as T;
 }
 
 /**
@@ -214,6 +236,25 @@ export function toRaw< T >( value: T ): T {
 		return ( proxyToTarget.get( value ) as T ) ?? value;
 	}
 	return value;
+}
+
+/**
+ * Replaces a tracking proxy returned by a selector with the plain
+ * object. The whole branch behind it becomes a dependency, since the
+ * caller may read anything inside it later.
+ *
+ * @param value Selector result.
+ */
+export function untrack< T >( value: T ): T {
+	if ( typeof value !== 'object' || value === null ) {
+		return value;
+	}
+	const info = proxyInfo.get( value );
+	if ( ! info ) {
+		return value;
+	}
+	recordLeaf( info.storeName, info.path );
+	return proxyToTarget.get( value ) as T;
 }
 
 /**
