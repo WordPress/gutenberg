@@ -4,6 +4,7 @@ import type { GlobalStylesConfig } from '../types';
 const VALID_SETTINGS = [
 	'appearanceTools',
 	'useRootPaddingAwareAlignments',
+	'background.backgroundClip',
 	'background.backgroundImage',
 	'background.backgroundRepeat',
 	'background.backgroundSize',

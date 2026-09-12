@@ -265,6 +265,7 @@ class WP_Theme_JSON_Gutenberg {
 		'background-repeat'                 => array( 'background', 'backgroundRepeat' ),
 		'background-size'                   => array( 'background', 'backgroundSize' ),
 		'background-attachment'             => array( 'background', 'backgroundAttachment' ),
+		'background-clip'                   => array( 'background', 'backgroundClip' ),
 		'border-radius'                     => array( 'border', 'radius' ),
 		'border-top-left-radius'            => array( 'border', 'radius', 'topLeft' ),
 		'border-top-right-radius'           => array( 'border', 'radius', 'topRight' ),
@@ -411,6 +412,7 @@ class WP_Theme_JSON_Gutenberg {
 		'appearanceTools'               => null,
 		'useRootPaddingAwareAlignments' => null,
 		'background'                    => array(
+			'backgroundClip'  => null,
 			'backgroundImage' => null,
 			'backgroundSize'  => null,
 			'gradient'        => null,
@@ -552,6 +554,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const VALID_STYLES = array(
 		'background' => array(
+			'backgroundClip'       => null,
 			'backgroundImage'      => null,
 			'backgroundAttachment' => null,
 			'backgroundPosition'   => null,
@@ -3183,6 +3186,31 @@ class WP_Theme_JSON_Gutenberg {
 				'name'  => $css_property,
 				'value' => $value,
 			);
+
+			// When background-clip is set, add vendor-prefixed properties for
+			// cross-browser support. For 'text', this clips the background to
+			// the text and makes it visible via transparent fill. For box-model
+			// values, only the fill color is reset, to cancel any inherited
+			// text gradient. `-webkit-background-clip` is an alias of
+			// `background-clip` in Chromium, so resetting it there would
+			// discard the value set above.
+			if ( 'background-clip' === $css_property ) {
+				if ( 'text' === $value ) {
+					$declarations[] = array(
+						'name'  => '-webkit-background-clip',
+						'value' => 'text',
+					);
+					$declarations[] = array(
+						'name'  => '-webkit-text-fill-color',
+						'value' => 'transparent',
+					);
+				} else {
+					$declarations[] = array(
+						'name'  => '-webkit-text-fill-color',
+						'value' => 'currentColor',
+					);
+				}
+			}
 		}
 
 		// If a variable value is added to the root, the corresponding property should be removed.
