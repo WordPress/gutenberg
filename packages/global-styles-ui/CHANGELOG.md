@@ -4,6 +4,20 @@
 
 ### Enhancements
 
+-   Add a text shadow presets screen under Typography ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+
+### Bug Fixes
+
+-   Preset groups: separate adjacent header action buttons so their focus rings and hit areas do not overlap. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
+
+### Internal
+
+-   Global Styles UI: replace the private `Menu` from `@wordpress/components` with the public `Menu` from `@wordpress/ui` for preset actions and the block filter. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
+
+## 1.22.0 (2026-09-10)
+
+### Enhancements
+
 -   Revisions: migrate the Active badge from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge`. ([#82560](https://github.com/WordPress/gutenberg/pull/82560))
 
 ### Bug Fixes

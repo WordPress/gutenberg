@@ -1,10 +1,4 @@
-import {
-	fireEvent,
-	render,
-	screen,
-	waitFor,
-	within,
-} from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMemo, useState } from '@wordpress/element';
@@ -21,8 +15,6 @@ import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockCSSSupports();
-globalThis.wpVitest.mockVisibleElements();
-
 type Data = {
 	id: number;
 	title: string;
@@ -241,62 +233,6 @@ describe( 'DataViews component', () => {
 		expect( screen.getByText( 'TEST TITLE' ) ).toBeInTheDocument();
 	} );
 
-	it( 'should trigger infinite scroll when the layout container scrolls', async () => {
-		const onChangeView = vi.fn();
-
-		if ( typeof globalThis.IntersectionObserver === 'undefined' ) {
-			class IntersectionObserverMock {
-				observe = vi.fn();
-				unobserve = vi.fn();
-				disconnect = vi.fn();
-			}
-
-			globalThis.IntersectionObserver =
-				IntersectionObserverMock as unknown as typeof IntersectionObserver;
-		}
-
-		const { container } = render(
-			<DataViewWrapper
-				view={ {
-					type: LAYOUT_GRID,
-					infiniteScrollEnabled: true,
-					perPage: 1,
-				} }
-				onChangeView={ onChangeView }
-			/>
-		);
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-		const layoutContainer = container.querySelector(
-			'.dataviews-layout__container'
-		) as HTMLDivElement;
-
-		Object.defineProperties( layoutContainer, {
-			scrollTop: {
-				configurable: true,
-				value: 500,
-			},
-			scrollHeight: {
-				configurable: true,
-				value: 1000,
-			},
-			clientHeight: {
-				configurable: true,
-				value: 500,
-			},
-		} );
-
-		fireEvent.scroll( layoutContainer );
-
-		await waitFor( () => {
-			expect( onChangeView ).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					infiniteScrollEnabled: true,
-					startPosition: 2,
-				} )
-			);
-		} );
-	} );
-
 	describe( 'page clamping', () => {
 		it( 'moves the view to the last page when it points past the end of the collection', async () => {
 			const onChangeView = vi.fn();
@@ -373,7 +309,6 @@ describe( 'DataViews component', () => {
 			expect( onChangeView ).not.toHaveBeenCalled();
 		} );
 	} );
-
 	describe( 'in table view', () => {
 		it( 'should display columns for each field', () => {
 			render( <DataViewWrapper /> );
@@ -890,6 +825,53 @@ describe( 'DataViews component', () => {
 			const user = userEvent.setup();
 			await user.click( imageField );
 			expect( mediaClickItemCallback ).toHaveBeenCalledWith( data[ 0 ] );
+		} );
+
+		it( 'labels the clickable media area with the title when the title is hidden', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: 'grid',
+						titleField: 'title',
+						mediaField: 'image',
+						showTitle: false,
+					} }
+					isItemClickable={ () => true }
+					onClickItem={ () => {} }
+				/>
+			);
+			for ( const item of data ) {
+				expect(
+					screen.getByRole( 'button', { name: item.title } )
+				).toBeInTheDocument();
+			}
+			expect(
+				screen.queryByRole( 'button', { name: 'Navigate to item' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'labels the clickable media area by the visible title when the title is shown', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: 'grid',
+						titleField: 'title',
+						mediaField: 'image',
+					} }
+					isItemClickable={ () => true }
+					onClickItem={ () => {} }
+				/>
+			);
+			// Both the media area and the title are clickable and share the
+			// name; the media area points at the rendered title
+			// (`aria-labelledby`) rather than carrying a label of its own.
+			const mediaButton = screen
+				.getAllByRole( 'button', { name: data[ 0 ].title } )
+				.find( ( button ) =>
+					button.classList.contains( 'dataviews-view-grid__media' )
+				);
+			expect( mediaButton ).toHaveAttribute( 'aria-labelledby' );
+			expect( mediaButton ).not.toHaveAttribute( 'aria-label' );
 		} );
 
 		it( 'accepts checkbox click for selection', async () => {

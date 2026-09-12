@@ -4,6 +4,6 @@ const { Fill: ViewMoreMenuGroup, Slot } = createSlotFill(
 	Symbol( 'ViewMoreMenuGroup' )
 );
 
-ViewMoreMenuGroup.Slot = ( { fillProps } ) => <Slot fillProps={ fillProps } />;
+ViewMoreMenuGroup.Slot = Slot;
 
 export default ViewMoreMenuGroup;
