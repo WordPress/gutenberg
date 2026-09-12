@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   A further 141 icons are now stroke-based. Use CSS `color` rather than `fill` to recolor them. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+
+### Enhancements
+
+-   Redraw a further 141 icons as stroke-based for variable stroke-width support, following the convention introduced in [#78808](https://github.com/WordPress/gutenberg/pull/78808), and refine the already stroke-based `image` drawing. Most retain their original footprint; the table icons, `capturePhoto` and `image` are slightly smaller by design. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+-   `manifest.json`: The `public` property is now a tri-state. Omitting it keeps an icon in the JS library only; `true` ships it to WordPress Core and exposes it through the icons REST API, making it selectable in the Icon block; `false` ships it and registers it in the `core` collection for server-side use via `wp_get_icon()`, while hiding it from the REST API and the Icon block. ([#82634](https://github.com/WordPress/gutenberg/pull/82634))
+-   The `brush`, `dashboard`, `link`, `media`, `page`, `pin`, `plugins`, `sites`, `tool`, `update` and `wordpress` icons now ship to WordPress Core as non-public icons: they are registered in the `core` collection and stay available to server-side code via `wp_get_icon()`, but are not exposed through the icons REST API and are not selectable in the Icon block. ([#82634](https://github.com/WordPress/gutenberg/pull/82634), [#79451](https://github.com/WordPress/gutenberg/pull/79451))
+
+### Bug Fixes
+
+-   `formatIndent`, `formatIndentRTL`, `formatOutdent` and `formatOutdentRTL`: correct the arrow geometry, which was malformed in the previous drawings. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+
+### Internal
+
+-   Run rendered icon tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
 ## 16.0.0 (2026-09-10)
 
 ### Breaking Changes

@@ -72,3 +72,4 @@
 # so these stay at the end. Removing them brings back the review requests.
 /tools/eslint/suppressions.json
 /tools/stylelint/stylelint-suppressions.json
+/tools/validation/check-private-apis.config.json
