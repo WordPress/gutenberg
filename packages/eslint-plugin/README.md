@@ -45,6 +45,23 @@ export default [
 
 Refer to the [ESLint flat config documentation](https://eslint.org/docs/latest/use/configure/configuration-files) for more information.
 
+### TypeScript config (`eslint.config.ts`)
+
+The package ships type declarations, so it can be used from a type-checked config without an ambient module shim:
+
+```ts
+import { defineConfig } from 'eslint/config';
+import wordpress from '@wordpress/eslint-plugin';
+
+export default defineConfig( {
+	extends: [ wordpress.configs.recommended ],
+} );
+```
+
+Config and rule names are typed, so `wordpress.configs` and `wordpress.rules` only accept names the plugin actually exports.
+
+The declarations are written against the types ESLint itself ships, which were added in ESLint 9.10. On an earlier ESLint 9 release, install [`@types/eslint`](https://www.npmjs.com/package/@types/eslint) alongside it.
+
 ### Legacy eslintrc (ESLint v9 only, deprecated)
 
 If you are still using ESLint v9 with the legacy `.eslintrc.*` format, a compatibility wrapper is available:

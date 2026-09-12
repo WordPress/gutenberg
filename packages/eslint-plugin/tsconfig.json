@@ -2,15 +2,23 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "rules"
+		"rootDir": "."
 	},
 	"references": [
 		{ "path": "../prettier-config" },
 		{ "path": "../theme/tsconfig.build.json" }
 	],
+	// The hand-maintained declarations for the package's public API, plus the
+	// rules which can be type-checked.
 	// NOTE: This package is being progressively typed. You are encouraged to
 	// expand this array with files which can be type-checked. At some point in
 	// the future, this can be simplified to an `includes` of `src/**/*`.
-	"files": [ "rules/dependency-group.js", "rules/no-unsafe-wp-apis.js" ],
+	"files": [
+		"types/index.d.ts",
+		"types/eslintrc.d.ts",
+		"types/shared.d.ts",
+		"rules/dependency-group.js",
+		"rules/no-unsafe-wp-apis.js"
+	],
 	"include": []
 }
