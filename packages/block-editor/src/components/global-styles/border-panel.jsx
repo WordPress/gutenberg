@@ -57,7 +57,7 @@ function useHasShadowControl( settings ) {
 	return !! settings?.shadow && shadows.length > 0;
 }
 
-function BorderToolsPanel( {
+export function BorderToolsPanel( {
 	resetAllFilter,
 	onChange,
 	value,

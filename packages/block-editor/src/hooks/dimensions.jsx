@@ -65,7 +65,13 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
+export function DimensionsPanel( {
+	clientId,
+	name,
+	setAttributes,
+	settings,
+	asWrapper,
+} ) {
 	const selectedState = useBlockStyleState();
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 	const isEnabled = useHasDimensionsPanel( settings, selectedState );
@@ -133,7 +139,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	return (
 		<>
 			<StylesDimensionsPanel
-				as={ DimensionsInspectorControl }
+				as={ asWrapper || DimensionsInspectorControl }
 				panelId={ clientId }
 				settings={ settings }
 				allowAxialBlockGap={ isAxialBlockGapAllowed(
