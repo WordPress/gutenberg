@@ -222,7 +222,7 @@ function getTypecheckConfigPath( testFile ) {
 		directory = path.dirname( directory );
 	}
 
-	return path.join( ROOT_DIR, 'tsconfig.base.json' );
+	return path.join( ROOT_DIR, 'tools/monorepo/tsconfig/base.json' );
 }
 
 let typescriptTestCount = 0;
@@ -300,8 +300,7 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 				noEmit: true,
 				rootDir: ROOT_DIR,
 				typeRoots: [
-					path.join( ROOT_DIR, 'typings' ),
-					path.join( ROOT_DIR, 'test/unit/typings' ),
+					path.join( ROOT_DIR, 'tools/monorepo/typings' ),
 					...resolveTypeRoots(
 						[ ...commonTypes, 'node' ],
 						( specifier ) => require.resolve( specifier )

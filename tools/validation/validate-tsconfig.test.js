@@ -1,13 +1,40 @@
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import {
+	mkdtempSync,
+	mkdirSync,
+	readFileSync,
+	rmSync,
+	writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parse } from 'jsonc-parser';
 import { afterEach, expect, test } from 'vitest';
 
 const validatorPath = fileURLToPath(
 	new URL( 'validate-tsconfig.mjs', import.meta.url )
 );
+
+/*
+ * The validator resolves the base config by package name, so it always reads
+ * the real one rather than anything a fixture writes. Derive the patterns a
+ * build project has to keep the same way it does, so adding a pattern to the
+ * base config does not strand these fixtures.
+ */
+const REQUIRED_BUILD_EXCLUDES = parse(
+	readFileSync(
+		fileURLToPath(
+			import.meta.resolve(
+				'@wordpress/monorepo-tools/tsconfig/base.json'
+			)
+		),
+		'utf8'
+	)
+)
+	.exclude.map( ( pattern ) => pattern.replace( /^\$\{configDir\}\//, '' ) )
+	.filter( ( pattern ) => /test|stories|story/.test( pattern ) );
+
 const temporaryRoots = [];
 
 afterEach( () => {
@@ -17,6 +44,7 @@ afterEach( () => {
 } );
 
 function writeJson( path, contents ) {
+	mkdirSync( dirname( path ), { recursive: true } );
 	writeFileSync( path, JSON.stringify( contents, null, '\t' ) + '\n' );
 }
 
@@ -35,9 +63,6 @@ function createRepo( { packages, routes, build, root } ) {
 	const repoRoot = mkdtempSync( join( tmpdir(), 'validate-tsconfig-' ) );
 	temporaryRoots.push( repoRoot );
 
-	writeJson( join( repoRoot, 'tsconfig.base.json' ), {
-		exclude: [ '**/benchmark', '**/test/**', '**/stories/**' ],
-	} );
 	writeJson( join( repoRoot, 'tsconfig.build.json' ), {
 		references: build.map( ( path ) => ( { path } ) ),
 	} );
@@ -320,7 +345,7 @@ test( 'fails when the root solution does not reference the build solution', () =
 const devOnlyPackage = {
 	tsconfigs: {
 		'tsconfig.json': {
-			extends: '../../tsconfig.dev.base.json',
+			extends: '@wordpress/monorepo-tools/tsconfig/dev.base.json',
 			references: [],
 		},
 	},
@@ -440,7 +465,7 @@ function typedSplitPackage( buildTypes, devTypes ) {
 	return {
 		tsconfigs: {
 			'tsconfig.json': {
-				extends: '../../tsconfig.dev.base.json',
+				extends: '@wordpress/monorepo-tools/tsconfig/dev.base.json',
 				compilerOptions: { types: devTypes },
 				references: [ './tsconfig.build.json' ],
 			},
@@ -503,7 +528,8 @@ test( 'checks the stories project of a package without a build project', () => {
 				icons: {
 					tsconfigs: {
 						'tsconfig.json': {
-							extends: '../../tsconfig.dev.base.json',
+							extends:
+								'@wordpress/monorepo-tools/tsconfig/dev.base.json',
 							references: [],
 						},
 						'tsconfig.stories.json': [],
@@ -528,13 +554,14 @@ test( 'fails when a build project exclude omits a dev-file pattern of the base',
 				blob: {
 					tsconfigs: {
 						'tsconfig.json': {
-							extends: '../../tsconfig.dev.base.json',
+							extends:
+								'@wordpress/monorepo-tools/tsconfig/dev.base.json',
 							references: [ './tsconfig.build.json' ],
 						},
 						'tsconfig.build.json': {
 							exclude: [
 								'**/benchmark',
-								'**/test/**',
+								...REQUIRED_BUILD_EXCLUDES.slice( 0, -1 ),
 								'src/legacy.js',
 							],
 							references: [],
@@ -549,7 +576,9 @@ test( 'fails when a build project exclude omits a dev-file pattern of the base',
 
 	expect( result.status ).not.toBe( 0 );
 	expect( result.stderr ).toContain(
-		'Missing exclude "**/stories/**" in packages/blob/tsconfig.build.json'
+		`Missing exclude "${ REQUIRED_BUILD_EXCLUDES.at(
+			-1
+		) }" in packages/blob/tsconfig.build.json`
 	);
 } );
 
@@ -560,14 +589,14 @@ test( 'passes when a build project keeps every dev-file pattern of the base', ()
 				blob: {
 					tsconfigs: {
 						'tsconfig.json': {
-							extends: '../../tsconfig.dev.base.json',
+							extends:
+								'@wordpress/monorepo-tools/tsconfig/dev.base.json',
 							references: [ './tsconfig.build.json' ],
 						},
 						'tsconfig.build.json': {
 							exclude: [
 								'**/benchmark',
-								'**/test/**',
-								'**/stories/**',
+								...REQUIRED_BUILD_EXCLUDES,
 								'src/legacy.js',
 							],
 							references: [],
