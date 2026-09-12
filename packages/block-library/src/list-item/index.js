@@ -1,5 +1,6 @@
 import { listItem as icon } from '@wordpress/icons';
 import { privateApis } from '@wordpress/block-editor';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
@@ -7,12 +8,16 @@ import save from './save';
 import transforms from './transforms';
 import { unlock } from '../lock-unlock';
 
+const { editableRootKey } = unlock( blocksPrivateApis );
+
 const { name } = metadata;
 
 export { metadata, name };
 
 export const settings = {
 	icon,
+	// Opt into the editing host behaviour privately, like the paragraph.
+	[ editableRootKey ]: true,
 	edit,
 	save,
 	merge( attributes, attributesToMerge ) {
