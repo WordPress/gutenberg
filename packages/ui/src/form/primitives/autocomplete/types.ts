@@ -91,4 +91,10 @@ export type AutocompleteRowProps = ComponentProps<
 	children?: React.ReactNode;
 };
 
+export type AutocompleteStatusProps = ComponentProps<
+	typeof _Autocomplete.Status
+> & {
+	children?: React.ReactNode;
+};
+
 export type AutocompleteValueProps = _Autocomplete.Value.Props;

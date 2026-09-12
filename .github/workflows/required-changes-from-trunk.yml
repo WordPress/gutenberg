@@ -1,0 +1,174 @@
+name: Required changes from trunk
+
+on:
+    pull_request_target:
+        types: [opened, synchronize, reopened, ready_for_review, edited]
+        branches: [trunk]
+    push:
+        branches: [trunk]
+    schedule:
+        # Daily at 04:23 UTC, to stamp the pull requests nothing else reaches.
+        - cron: '23 4 * * *'
+    workflow_dispatch:
+        inputs:
+            mode:
+                description: 'auto moves the baseline only if a labeled merge earned it, then refreshes; move-baseline forces a move and then refreshes; refresh-pr-statuses only refreshes open PR statuses'
+                type: choice
+                default: auto
+                options: [auto, move-baseline, refresh-pr-statuses]
+            scope:
+                description: 'Which open pull requests refresh-pr-statuses covers: corrections is the ones showing green, unstamped is the ones with no status yet, all is every one of them. The other modes pick their own.'
+                type: choice
+                default: corrections
+                options: [corrections, unstamped, all]
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+env:
+    # One source of truth for both jobs. No markers: the baseline moves only
+    # through a labeled merge or a dispatch, never because a path changed.
+    PR_BASELINES: '[{"name":"required-trunk-changes","label":"Require PR update"}]'
+    STATUS_CONTEXT: Required changes from trunk
+    DESCRIPTION_PASS: Includes required {base} changes.
+    DESCRIPTION_FAIL: Merge or rebase {base} to include required changes.
+
+jobs:
+    check-pr:
+        name: Report required trunk changes status
+        if: >
+            github.repository == 'WordPress/gutenberg' &&
+            github.event_name == 'pull_request_target'
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        permissions:
+            contents: read
+            statuses: write
+        concurrency:
+            group: required-trunk-changes-status-${{ github.event.pull_request.number }}
+            cancel-in-progress: false
+        steps:
+            # The head SHA comes from the event. PR code is never checked out,
+            # built, or executed.
+            - name: Report the status for this pull request
+              uses: mawesomedev/pr-baseline-action@cc4d934b8c7c8cd2fd965d8334849d8108321ab3 # v0.2.0
+              with:
+                  base: trunk
+                  baselines: ${{ env.PR_BASELINES }}
+                  status-context: ${{ env.STATUS_CONTEXT }}
+                  description-pass: ${{ env.DESCRIPTION_PASS }}
+                  description-fail: ${{ env.DESCRIPTION_FAIL }}
+
+    refresh-pr-statuses:
+        name: Move the required trunk baseline and refresh statuses
+        # Every trunk push is the recovery path: it moves a baseline whose own
+        # run was lost, and continues a refresh that stopped on its write cap.
+        if: >
+            github.repository == 'WordPress/gutenberg' && (
+                (github.event_name == 'push' && github.ref_name == 'trunk') ||
+                github.event_name == 'workflow_dispatch'
+            )
+        runs-on: ubuntu-latest
+        timeout-minutes: 60
+        permissions:
+            contents: write
+            statuses: write
+            pull-requests: read
+        concurrency:
+            group: required-trunk-changes-refresh
+            cancel-in-progress: false
+            # The default queue keeps a single pending run, so a trunk push could
+            # replace (cancel) a pending forced dispatch; queue: max keeps them all.
+            queue: max
+        steps:
+            # Treeless but complete history: ancestry needs commits, not trees,
+            # and reading it from the clone costs no API quota.
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: trunk
+                  fetch-depth: 0
+                  filter: tree:0
+                  persist-credentials: false
+
+            # Moves only. The refresh below runs whether or not this moved
+            # anything, since a move that hits its write cap spills into later runs.
+            - name: Move the baseline
+              # An unforced move still moves when a labeled merge earned it, which
+              # is not what a maintainer asking for a refresh asked for.
+              if: ${{ inputs.mode != 'refresh-pr-statuses' }}
+              uses: mawesomedev/pr-baseline-action@cc4d934b8c7c8cd2fd965d8334849d8108321ab3 # v0.2.0
+              with:
+                  base: trunk
+                  baselines: ${{ env.PR_BASELINES }}
+                  status-context: ${{ env.STATUS_CONTEXT }}
+                  mode: move-baseline
+                  force: ${{ inputs.mode == 'move-baseline' }}
+                  refresh-pr-statuses-after-move: false
+
+            - name: Refresh the pull requests a move can invalidate
+              id: refresh
+              uses: mawesomedev/pr-baseline-action@cc4d934b8c7c8cd2fd965d8334849d8108321ab3 # v0.2.0
+              with:
+                  base: trunk
+                  baselines: ${{ env.PR_BASELINES }}
+                  status-context: ${{ env.STATUS_CONTEXT }}
+                  description-pass: ${{ env.DESCRIPTION_PASS }}
+                  description-fail: ${{ env.DESCRIPTION_FAIL }}
+                  mode: refresh-pr-statuses
+                  # A forced move can put the baseline anywhere, so it can turn a
+                  # failing pull request green, which only a full sweep sees. A scope
+                  # that skips the green ones is safe only when nothing moved.
+                  scope: ${{ inputs.mode == 'move-baseline' && 'all' || inputs.mode == 'refresh-pr-statuses' && inputs.scope || 'corrections' }}
+                  # Leaves headroom in the hourly write budget the whole repository
+                  # shares; later pushes continue a run that stops here.
+                  max-writes-per-run: 300
+
+            - name: Upload the per-pull-request results
+              if: ${{ !cancelled() && steps.refresh.outputs.results-file != '' && (failure() || steps.refresh.outputs.written != '0') }}
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: required-trunk-changes-refresh-${{ github.run_id }}
+                  path: ${{ steps.refresh.outputs.results-file }}
+
+    backfill:
+        name: Stamp the pull requests that have no status yet
+        # Every run Dependabot triggers gets a read-only token, so its pull requests
+        # are never stamped by their own events. This is what reaches them.
+        if: >
+            github.repository == 'WordPress/gutenberg' &&
+            github.event.schedule == '23 4 * * *'
+        runs-on: ubuntu-latest
+        timeout-minutes: 60
+        permissions:
+            contents: read
+            statuses: write
+            pull-requests: read
+        # Shares the refresh's group: a backfill that read the baseline before a
+        # move would otherwise write a pass the move had already invalidated.
+        concurrency:
+            group: required-trunk-changes-refresh
+            cancel-in-progress: false
+            queue: max
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: trunk
+                  fetch-depth: 0
+                  filter: tree:0
+                  persist-credentials: false
+
+            - name: Stamp the unstamped pull requests
+              uses: mawesomedev/pr-baseline-action@cc4d934b8c7c8cd2fd965d8334849d8108321ab3 # v0.2.0
+              with:
+                  base: trunk
+                  baselines: ${{ env.PR_BASELINES }}
+                  status-context: ${{ env.STATUS_CONTEXT }}
+                  description-pass: ${{ env.DESCRIPTION_PASS }}
+                  description-fail: ${{ env.DESCRIPTION_FAIL }}
+                  mode: refresh-pr-statuses
+                  scope: unstamped
+                  # Well below the ceiling: a backfill must not starve the refresh.
+                  max-writes-per-run: 150

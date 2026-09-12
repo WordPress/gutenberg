@@ -7,17 +7,6 @@ const testMigration = require( './test-migration.json' );
  */
 const ROOT_DIR = path.resolve( __dirname, '../..' );
 
-const escapeRegExp = ( value ) =>
-	value.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
-const vitestTestPathIgnorePatterns = [
-	...testMigration.vitest.files.map(
-		( testPath ) => `<rootDir>/${ escapeRegExp( testPath ) }$`
-	),
-	...testMigration.vitest.directories.map(
-		( directoryPath ) => `<rootDir>/${ escapeRegExp( directoryPath ) }/`
-	),
-];
-
 // Ensure Babel config resolution works from the repo root,
 // even when Jest runs from the workspace directory.
 process.chdir( ROOT_DIR );
@@ -34,7 +23,6 @@ const transpiledPackageNames = globSync(
 	} );
 
 const dependenciesToTransform = [
-	'@ariakit/test',
 	'@ariakit/utils',
 	'@preact',
 	'comctx',
@@ -50,18 +38,21 @@ const dependenciesToTransform = [
 process.env.TZ = 'UTC';
 
 /*
- * Resolved rather than hardcoded to `<rootDir>/node_modules`,
- * which is empty under non-hoisting installs.
+ * Resolved hop by hop through its dependents rather than hardcoded to
+ * `<rootDir>/node_modules`, which is empty under non-hoisting installs.
  */
-const ariakitTestDir = path.dirname(
-	require.resolve( '@ariakit/test/package.json', {
-		paths: [ path.join( ROOT_DIR, 'packages/components' ) ],
-	} )
-);
-const ariakitUtilsDir = path.dirname(
-	require.resolve( '@ariakit/utils/package.json', {
-		paths: [ ariakitTestDir ],
-	} )
+const ariakitUtilsDir = [
+	'@ariakit/react',
+	'@ariakit/react-components',
+	'@ariakit/utils',
+].reduce(
+	( fromDir, packageName ) =>
+		path.dirname(
+			require.resolve( `${ packageName }/package.json`, {
+				paths: [ fromDir ],
+			} )
+		),
+	path.join( ROOT_DIR, 'packages/components' )
 );
 
 const commonProjectConfig = {
@@ -70,10 +61,6 @@ const commonProjectConfig = {
 		/**
 		 * Specific mappings first (before generic patterns)
 		 */
-		// Jest resolves dependencies from CommonJS and cannot select import-only
-		// package exports. Map Ariakit's ESM test helpers explicitly.
-		'^@ariakit/test$': path.join( ariakitTestDir, 'dist/index.js' ),
-		'^@ariakit/test/react$': path.join( ariakitTestDir, 'dist/react.js' ),
 		'^@ariakit/utils$': path.join( ariakitUtilsDir, 'dist/index.js' ),
 		// Mock @wordpress/vips/worker before the general pattern so it doesn't try to load the real file.
 		// The worker-code.ts file is auto-generated during full builds and is gitignored.
@@ -96,14 +83,6 @@ const commonProjectConfig = {
 			'packages/$1/src',
 	},
 	preset: require.resolve( '@wordpress/jest-preset-default' ),
-	setupFiles: [
-		'<rootDir>/test/unit/config/global-mocks.js',
-		'<rootDir>/test/unit/config/gutenberg-env.js',
-	],
-	setupFilesAfterEnv: [
-		'<rootDir>/test/unit/config/testing-library.js',
-		'<rootDir>/test/unit/mocks/match-media.js',
-	],
 	testLocationInResults: true,
 	testPathIgnorePatterns: [
 		'/\\.git($|/)',
@@ -114,19 +93,11 @@ const commonProjectConfig = {
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.*/build-types/',
 		'<rootDir>/.+\\.d\\.ts$',
-		...vitestTestPathIgnorePatterns,
 	],
 	resolver: '<rootDir>/test/unit/scripts/resolver.js',
-	transform: {
-		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
-	},
 	transformIgnorePatterns: [
 		`/node_modules/(?!(${ dependenciesToTransform.join( '|' ) })/)`,
 		'\\.pnp\\.[^\\/]+$',
-	],
-	snapshotSerializers: [
-		require.resolve( '@emotion/jest/serializer' ),
-		require.resolve( 'snapshot-diff/serializer' ),
 	],
 	snapshotFormat: {
 		escapeString: false,
@@ -136,16 +107,8 @@ const commonProjectConfig = {
 
 module.exports = {
 	rootDir: ROOT_DIR,
+	passWithNoTests: testMigration.jest.files.length === 0,
 	projects: [
-		{
-			...commonProjectConfig,
-			displayName: 'node',
-			testEnvironment: 'node',
-			testPathIgnorePatterns: [
-				...commonProjectConfig.testPathIgnorePatterns,
-				'\\.(?:browser|jsdom)\\.test\\.[jt]sx?$',
-			],
-		},
 		{
 			...commonProjectConfig,
 			displayName: 'jsdom',
@@ -153,7 +116,12 @@ module.exports = {
 			testEnvironmentOptions: {
 				url: 'http://localhost/',
 			},
-			testMatch: [ '**/*.jsdom.test.[jt]s?(x)' ],
+			// An empty testMatch array makes Jest discover every file.
+			testMatch: testMigration.jest.files.length
+				? testMigration.jest.files.map(
+						( testPath ) => `<rootDir>/${ testPath }`
+				  )
+				: [ '!**/*' ],
 		},
 	],
 	watchPlugins: [

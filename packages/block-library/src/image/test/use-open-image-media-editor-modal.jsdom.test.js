@@ -1,29 +1,31 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useRegistry, useSelect } from '@wordpress/data';
 import {
 	getImageBlockMetadataFromAttachment,
+	getNewAttachmentImageBlockAttributes,
 	getSyncedImageBlockAttributes,
 	useOpenImageMediaEditorModal,
 } from '../use-open-image-media-editor-modal';
 
 const mockOpenMediaEditorModalKey = 'openMediaEditorModal';
 
-jest.mock( '@wordpress/core-data', () => ( {
+vi.mock( import( '@wordpress/core-data' ), () => ( {
 	store: {},
 } ) );
 
-jest.mock( '@wordpress/data', () => ( {
-	useRegistry: jest.fn(),
-	useSelect: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useRegistry: vi.fn(),
+	useSelect: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/block-editor', () => ( {
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	privateApis: {},
 	store: {},
 } ) );
 
-jest.mock( '../../lock-unlock', () => ( {
-	unlock: jest.fn( () => ( {
+vi.mock( import( '../../lock-unlock' ), () => ( {
+	unlock: vi.fn( () => ( {
 		openMediaEditorModalKey: 'openMediaEditorModal',
 	} ) ),
 } ) );
@@ -33,14 +35,14 @@ function createRegistry( {
 	resolveGetEntityRecord = () => undefined,
 } = {} ) {
 	const actions = {
-		invalidateResolution: jest.fn(),
+		invalidateResolution: vi.fn(),
 	};
 	return {
-		select: jest.fn( () => ( {
+		select: vi.fn( () => ( {
 			getEditedEntityRecord,
 		} ) ),
-		dispatch: jest.fn( () => actions ),
-		resolveSelect: jest.fn( () => ( {
+		dispatch: vi.fn( () => actions ),
+		resolveSelect: vi.fn( () => ( {
 			getEntityRecord: resolveGetEntityRecord,
 		} ) ),
 		actions,
@@ -73,8 +75,8 @@ async function runModalUpdate( {
 } ) {
 	const registry = createRegistry( registryOptions );
 	useRegistry.mockReturnValue( registry );
-	const setAttributes = jest.fn();
-	const openMediaEditorModal = jest.fn();
+	const setAttributes = vi.fn();
+	const openMediaEditorModal = vi.fn();
 	mockMediaEditorModalSetting( openMediaEditorModal );
 	const { result } = renderHook( () =>
 		useOpenImageMediaEditorModal( {
@@ -94,13 +96,67 @@ async function runModalUpdate( {
 	return { setAttributes, registry, openMediaEditorModal };
 }
 
+// The attachment as it was before the edit. Its metadata matches the blocks
+// used below, so the metadata sync never contributes attributes and the
+// assertions stay about the ones derived from the edited attachment.
+const ORIGINAL_ATTACHMENT = {
+	id: 1,
+	alt_text: '',
+	caption: { raw: '' },
+};
+
+// Editing media saves to a new attachment, with its own sub-sizes, file and
+// attachment page.
+const CROPPED_ATTACHMENT = {
+	id: 2,
+	alt_text: '',
+	caption: { raw: '' },
+	source_url: 'cropped.jpg',
+	link: 'https://example.com/cropped/',
+	media_details: {
+		sizes: {
+			medium: { source_url: 'cropped-300x200.jpg' },
+			full: { source_url: 'cropped.jpg' },
+		},
+	},
+};
+
+// What the media editor reports after a crop, rotate or flip: it saved to a
+// new attachment, and reports that attachment's full-size file.
+const CROP_UPDATE = {
+	id: CROPPED_ATTACHMENT.id,
+	url: CROPPED_ATTACHMENT.source_url,
+};
+
+/**
+ * Registry options for an edit that saved to a new attachment: the pre-edit
+ * record is cached, and the edited one is only reachable by resolving it.
+ *
+ * @param {Object}  options             Options.
+ * @param {boolean} options.hasOriginal Whether the pre-edit attachment is
+ *                                      known at all; without it there is no
+ *                                      metadata baseline.
+ */
+function croppedAttachmentRecords( { hasOriginal = true } = {} ) {
+	return {
+		getEditedEntityRecord: ( kind, name, attachmentId ) =>
+			hasOriginal && attachmentId === ORIGINAL_ATTACHMENT.id
+				? ORIGINAL_ATTACHMENT
+				: undefined,
+		resolveGetEntityRecord: ( kind, name, attachmentId ) =>
+			attachmentId === CROPPED_ATTACHMENT.id
+				? CROPPED_ATTACHMENT
+				: undefined,
+	};
+}
+
 describe( 'useOpenImageMediaEditorModal', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'notifies onUrlChange when the update switches to a new attachment URL', async () => {
-		const onUrlChange = jest.fn();
+		const onUrlChange = vi.fn();
 		await runModalUpdate( {
 			attributes: { id: 1, url: 'original.jpg', alt: '', caption: '' },
 			updatePayload: { id: 2, url: 'updated.jpg' },
@@ -111,7 +167,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 	} );
 
 	it( 'does not notify onUrlChange for a same-attachment update', async () => {
-		const onUrlChange = jest.fn();
+		const onUrlChange = vi.fn();
 		await runModalUpdate( {
 			attributes: { id: 1, url: 'original.jpg', alt: '', caption: '' },
 			updatePayload: { id: 1, url: 'original.jpg' },
@@ -121,7 +177,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 	} );
 
 	it( 'does not notify onUrlChange when the update carries no URL', async () => {
-		const onUrlChange = jest.fn();
+		const onUrlChange = vi.fn();
 		await runModalUpdate( {
 			attributes: { id: 1, url: 'original.jpg', alt: '', caption: '' },
 			updatePayload: { id: 2 },
@@ -142,7 +198,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 					alt: '',
 					caption: '',
 				},
-				setAttributes: jest.fn(),
+				setAttributes: vi.fn(),
 			} )
 		);
 
@@ -155,8 +211,8 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		document.body.append( cropButton, otherButton );
 		const registry = createRegistry();
 		useRegistry.mockReturnValue( registry );
-		const setAttributes = jest.fn();
-		const openMediaEditorModal = jest.fn();
+		const setAttributes = vi.fn();
+		const openMediaEditorModal = vi.fn();
 		mockMediaEditorModalSetting( openMediaEditorModal );
 		const onClose = () => cropButton.focus();
 		const { result } = renderHook( () =>
@@ -239,7 +295,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			alt_text: 'Updated alt',
 			caption: { raw: 'Updated caption' },
 		};
-		const resolveGetEntityRecord = jest
+		const resolveGetEntityRecord = vi
 			.fn()
 			.mockResolvedValueOnce( originalAttachment )
 			.mockResolvedValueOnce( updatedAttachment );
@@ -281,7 +337,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			alt_text: '',
 			caption: { raw: 'Updated attachment caption' },
 		};
-		const resolveGetEntityRecord = jest
+		const resolveGetEntityRecord = vi
 			.fn()
 			.mockResolvedValueOnce( originalAttachment )
 			.mockResolvedValueOnce( updatedAttachment );
@@ -322,7 +378,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			alt_text: '',
 			caption: { raw: 'Updated attachment caption' },
 		};
-		const resolveGetEntityRecord = jest
+		const resolveGetEntityRecord = vi
 			.fn()
 			.mockResolvedValueOnce( originalAttachment )
 			.mockResolvedValueOnce( updatedAttachment );
@@ -392,6 +448,121 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		} );
 	} );
 
+	it( 'keeps the selected image size when the edit created a new attachment', async () => {
+		const onUrlChange = vi.fn();
+		const { setAttributes } = await runModalUpdate( {
+			attributes: {
+				id: 1,
+				url: 'original-300x200.jpg',
+				alt: '',
+				caption: '',
+				sizeSlug: 'medium',
+			},
+			registryOptions: croppedAttachmentRecords(),
+			updatePayload: CROP_UPDATE,
+			hookOptions: { onUrlChange },
+		} );
+
+		// Everything lands in one update, so the block never renders against
+		// half-updated settings.
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			id: 2,
+			url: 'cropped-300x200.jpg',
+		} );
+		// The loading state settles against the file the block will render,
+		// not the full-size file the media editor reported.
+		expect( onUrlChange ).toHaveBeenLastCalledWith( 'cropped-300x200.jpg' );
+	} );
+
+	it( 'falls back to the saved record when the refetch fails', async () => {
+		const { setAttributes } = await runModalUpdate( {
+			attributes: {
+				id: 1,
+				url: 'original-300x200.jpg',
+				alt: '',
+				caption: '',
+				sizeSlug: 'medium',
+				href: 'original.jpg',
+				linkDestination: 'media',
+			},
+			registryOptions: {
+				// The media editor put the saved record in the store, so it
+				// is cached even though refetching it fails.
+				getEditedEntityRecord: ( kind, name, attachmentId ) =>
+					attachmentId === ORIGINAL_ATTACHMENT.id
+						? ORIGINAL_ATTACHMENT
+						: CROPPED_ATTACHMENT,
+				resolveGetEntityRecord: ( kind, name, attachmentId ) => {
+					if ( attachmentId === CROPPED_ATTACHMENT.id ) {
+						throw new Error( 'Network error' );
+					}
+					return undefined;
+				},
+			},
+			updatePayload: CROP_UPDATE,
+		} );
+
+		// The size and link still follow the edited image, rather than the
+		// block half-updating to the new file at its old settings.
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			id: 2,
+			url: 'cropped-300x200.jpg',
+			href: 'cropped.jpg',
+		} );
+	} );
+
+	it( 'derives the size of the edited image without a metadata baseline', async () => {
+		const { setAttributes, registry } = await runModalUpdate( {
+			// Custom metadata leaves the block with no fallback baseline, and
+			// the original attachment is unknown, so no metadata is synced.
+			attributes: {
+				id: 1,
+				url: 'original-300x200.jpg',
+				alt: 'Custom alt',
+				caption: 'Custom caption',
+				sizeSlug: 'medium',
+			},
+			registryOptions: croppedAttachmentRecords( { hasOriginal: false } ),
+			updatePayload: CROP_UPDATE,
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			id: 2,
+			url: 'cropped-300x200.jpg',
+		} );
+		// The size is derived from a freshly resolved record for the edited
+		// attachment, not a stale cached one.
+		expect( registry.actions.invalidateResolution ).toHaveBeenCalledWith(
+			'getEntityRecord',
+			[ 'postType', 'attachment', 2 ]
+		);
+	} );
+
+	it( 'points a media file link at the edited image', async () => {
+		const { setAttributes } = await runModalUpdate( {
+			attributes: {
+				id: 1,
+				url: 'original.jpg',
+				alt: '',
+				caption: '',
+				href: 'original.jpg',
+				linkDestination: 'media',
+			},
+			registryOptions: croppedAttachmentRecords(),
+			updatePayload: CROP_UPDATE,
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			id: 2,
+			url: 'cropped.jpg',
+			href: 'cropped.jpg',
+		} );
+	} );
+
 	it( 'updates back to the previous attachment from the original modal callback', async () => {
 		const originalAttachment = {
 			id: 1,
@@ -411,8 +582,8 @@ describe( 'useOpenImageMediaEditorModal', () => {
 				attachmentId === 2 ? deferredAttachment.promise : undefined,
 		} );
 		useRegistry.mockReturnValue( registry );
-		const setAttributes = jest.fn();
-		const openMediaEditorModal = jest.fn();
+		const setAttributes = vi.fn();
+		const openMediaEditorModal = vi.fn();
 		mockMediaEditorModalSetting( openMediaEditorModal );
 		const { result } = renderHook(
 			( { attributes } ) =>
@@ -523,7 +694,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 	} );
 
 	it( 'syncs metadata from an empty block when the original attachment is not cached', async () => {
-		const resolveGetEntityRecord = jest
+		const resolveGetEntityRecord = vi
 			.fn()
 			.mockResolvedValueOnce( {
 				id: 1,
@@ -645,8 +816,8 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			resolveGetEntityRecord: () => deferredAttachment.promise,
 		} );
 		useRegistry.mockReturnValue( registry );
-		const setAttributes = jest.fn();
-		const openMediaEditorModal = jest.fn();
+		const setAttributes = vi.fn();
+		const openMediaEditorModal = vi.fn();
 		mockMediaEditorModalSetting( openMediaEditorModal );
 		const { result, rerender } = renderHook(
 			( { attributes } ) =>
@@ -920,6 +1091,150 @@ describe( 'getSyncedImageBlockAttributes', () => {
 					alt_text: 'Updated alt',
 					caption: { raw: 'Updated caption' },
 				}
+			)
+		).toEqual( {} );
+	} );
+} );
+
+describe( 'getNewAttachmentImageBlockAttributes', () => {
+	const croppedAttachment = {
+		id: 2,
+		source_url: 'cropped.jpg',
+		link: 'https://example.com/cropped/',
+		media_details: {
+			sizes: {
+				medium: { source_url: 'cropped-300x200.jpg' },
+				full: { source_url: 'cropped.jpg' },
+			},
+		},
+	};
+
+	it( 'points the URL at the selected size on the new attachment', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'medium' },
+				croppedAttachment
+			)
+		).toEqual( { url: 'cropped-300x200.jpg' } );
+	} );
+
+	it( 'falls back to full when the new attachment lacks the selected size', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'large' },
+				croppedAttachment
+			)
+		).toEqual( { url: 'cropped.jpg', sizeSlug: 'full' } );
+	} );
+
+	it( 'falls back to full when the edited image is too small for any sub-size', () => {
+		// Cropping below the smallest registered size leaves
+		// `media_details.sizes` empty, so the block has to fall back to the
+		// file itself and stop reporting a size it no longer has.
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'medium' },
+				{
+					id: 2,
+					source_url: 'cropped-103x45.jpg',
+					media_details: { width: 103, height: 45, sizes: {} },
+				}
+			)
+		).toEqual( {
+			url: 'cropped-103x45.jpg',
+			sizeSlug: 'full',
+		} );
+	} );
+
+	it( 'makes no change when no full-size URL is available', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'large' },
+				{ id: 2, media_details: { sizes: { medium: {} } } }
+			)
+		).toEqual( {} );
+	} );
+
+	it( 'makes no change for the full size or an unset size', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'full' },
+				croppedAttachment
+			)
+		).toEqual( {} );
+		expect(
+			getNewAttachmentImageBlockAttributes( {}, croppedAttachment )
+		).toEqual( {} );
+	} );
+
+	it( 'makes no change when the attachment sizes are unknown', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'medium' },
+				{ id: 2 }
+			)
+		).toEqual( {} );
+	} );
+
+	it( 'makes no change when the attachment record is unknown', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'medium' },
+				undefined
+			)
+		).toBeUndefined();
+	} );
+
+	it( 'points a media file link at the new attachment file', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'medium', linkDestination: 'media' },
+				croppedAttachment
+			)
+		).toEqual( {
+			url: 'cropped-300x200.jpg',
+			href: 'cropped.jpg',
+		} );
+	} );
+
+	it( 'points an attachment page link at the new attachment page', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ linkDestination: 'attachment' },
+				croppedAttachment
+			)
+		).toEqual( { href: 'https://example.com/cropped/' } );
+	} );
+
+	it( 'leaves custom and absent links alone', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ linkDestination: 'custom' },
+				croppedAttachment
+			)
+		).toEqual( {} );
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ linkDestination: 'none' },
+				croppedAttachment
+			)
+		).toEqual( {} );
+		expect(
+			getNewAttachmentImageBlockAttributes( {}, croppedAttachment )
+		).toEqual( {} );
+	} );
+
+	it( 'keeps the existing link when the new attachment record lacks it', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ linkDestination: 'media' },
+				{ id: 2 }
+			)
+		).toEqual( {} );
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ linkDestination: 'attachment' },
+				{ id: 2 }
 			)
 		).toEqual( {} );
 	} );

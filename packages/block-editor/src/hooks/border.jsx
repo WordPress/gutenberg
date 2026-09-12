@@ -4,14 +4,12 @@ import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/com
 import { useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 import { getColorClassName } from '../components/colors';
 import InspectorControls from '../components/inspector-controls';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
 import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 import {
 	useHasBorderPanel,
-	useHasBorderPanelControls,
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
@@ -22,12 +20,9 @@ import {
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
-import { unlock } from '../lock-unlock';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 export const SHADOW_SUPPORT_KEY = 'shadow';
-
-const EMPTY_ARRAY = [];
 
 const getColorByProperty = ( colors, property, value ) => {
 	let matchedColor;
@@ -247,54 +242,6 @@ export function hasBorderSupport( blockName, feature = 'any' ) {
  */
 export function hasShadowSupport( blockName ) {
 	return hasBlockSupport( blockName, SHADOW_SUPPORT_KEY );
-}
-
-export function useBorderPanelLabel( {
-	clientId,
-	hasBorderControl,
-	hasShadowControl,
-} = {} ) {
-	const [ color, radius, style, width, shadow ] = useSelect(
-		( select ) => {
-			if ( ! clientId ) {
-				return EMPTY_ARRAY;
-			}
-			const { getBlockSettings } = unlock( select( blockEditorStore ) );
-			return getBlockSettings(
-				clientId,
-				'border.color',
-				'border.radius',
-				'border.style',
-				'border.width',
-				'shadow'
-			);
-		},
-		[ clientId ]
-	);
-	const settings = useMemo(
-		() => ( { border: { color, radius, style, width }, shadow } ),
-		[ color, radius, style, width, shadow ]
-	);
-	const controls = useHasBorderPanelControls( settings );
-
-	if ( ! hasBorderControl && ! hasShadowControl && clientId ) {
-		hasBorderControl =
-			controls?.hasBorderColor ||
-			controls?.hasBorderStyle ||
-			controls?.hasBorderWidth ||
-			controls?.hasBorderRadius;
-		hasShadowControl = controls?.hasShadow;
-	}
-
-	if ( hasBorderControl && hasShadowControl ) {
-		return __( 'Border & Shadow' );
-	}
-
-	if ( hasShadowControl ) {
-		return __( 'Shadow' );
-	}
-
-	return __( 'Border' );
 }
 
 /**

@@ -77,7 +77,7 @@ export default function TemplateActionsPanelContent() {
 	const notificationAction = hasGoBack
 		? [
 				{
-					label: __( 'Go back' ),
+					label: __( 'Back' ),
 					onClick: () =>
 						getEditorSettings().onNavigateToPreviousEntityRecord(),
 				},

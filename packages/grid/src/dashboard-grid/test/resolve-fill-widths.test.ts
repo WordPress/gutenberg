@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { resolveFillWidths } from '../resolve-fill-widths';
 import type { DashboardGridLayoutItem } from '../types';
 

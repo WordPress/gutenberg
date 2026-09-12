@@ -1,8 +1,5 @@
-import {
-	formatTestErrorMessage,
-	renderReportComment,
-	isReportComment,
-} from '../markdown';
+import { describe, expect, it } from 'vitest';
+import { formatTestErrorMessage, renderReport } from '../markdown';
 import type { ReportedFlakyTest } from '../types';
 
 describe( 'formatTestErrorMessage', () => {
@@ -27,9 +24,8 @@ describe( 'formatTestErrorMessage', () => {
 	} );
 } );
 
-describe( 'renderReportComment', () => {
-	it( 'render the report comment', () => {
-		const runURL = 'runURL';
+describe( 'renderReport', () => {
+	it( 'render the report', () => {
 		const reportedTests: ReportedFlakyTest[] = [
 			{
 				testTitle: 'title1',
@@ -43,21 +39,12 @@ describe( 'renderReportComment', () => {
 				failedTimes: 2,
 			},
 		];
-		const commitSHA = 'commitSHA';
 
-		const view = renderReportComment( {
-			reportedTests,
-			runURL,
-			commitSHA,
-		} );
+		const view = renderReport( { reportedTests } );
 
 		expect( view ).toMatchInlineSnapshot( `
-		"<!-- flaky-tests-report-comment -->
-		**Flaky tests detected in commitSHA.**
-		Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.
+		"Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.
 
-		🔍  Workflow run URL: runURL
-		📝  Reported tests:
 		<details>
 		<summary>title1 in <code>path1</code>, passed after 1 failed attempt.</summary>
 
@@ -70,19 +57,5 @@ describe( 'renderReportComment', () => {
 		</details>
 		<p>title2 in <code>path2</code>, passed after 2 failed attempts.</p>"
 	` );
-	} );
-} );
-
-describe( 'isReportComment', () => {
-	it( 'matches the report comment', () => {
-		const view = renderReportComment( {
-			reportedTests: [],
-			runURL: '',
-			commitSHA: 'commitSHA',
-		} );
-
-		expect( isReportComment( view ) ).toBe( true );
-
-		expect( isReportComment( 'random string' ) ).toBe( false );
 	} );
 } );

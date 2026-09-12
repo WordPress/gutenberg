@@ -34,14 +34,18 @@ const RadioItem = forwardRef< HTMLDivElement, RadioItemProps >(
 		},
 		ref
 	) {
-		const { contentContextValue, itemAriaProps, shortcutDescriptionId } =
-			useItemContent( children, {
-				'aria-describedby': ariaDescribedBy,
-				'aria-keyshortcuts': ariaKeyShortcuts,
-				'aria-label': ariaLabel,
-				'aria-labelledby': ariaLabelledBy,
-				shortcut,
-			} );
+		const {
+			contentChildren,
+			contentContextValue,
+			itemAriaProps,
+			shortcutDescriptionId,
+		} = useItemContent( children, {
+			'aria-describedby': ariaDescribedBy,
+			'aria-keyshortcuts': ariaKeyShortcuts,
+			'aria-label': ariaLabel,
+			'aria-labelledby': ariaLabelledBy,
+			shortcut,
+		} );
 
 		return (
 			<_Menu.RadioItem
@@ -71,7 +75,7 @@ const RadioItem = forwardRef< HTMLDivElement, RadioItemProps >(
 						shortcutDescriptionId={ shortcutDescriptionId }
 						suffix={ suffix }
 					>
-						{ children }
+						{ contentChildren }
 					</ItemContent>
 				</MenuItemContentContext.Provider>
 			</_Menu.RadioItem>

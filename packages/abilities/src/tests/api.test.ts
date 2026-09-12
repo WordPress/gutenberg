@@ -1,6 +1,8 @@
 /**
  * Tests for API functions.
  */
+
+import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { dispatch, select } from '@wordpress/data';
 import {
 	getAbilities,
@@ -14,18 +16,37 @@ import {
 import { store } from '../store';
 import type { Ability, AbilityCategory } from '../types';
 
-jest.mock( '@wordpress/data', () => ( {
-	select: jest.fn(),
-	dispatch: jest.fn(),
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	select: vi.fn(),
+	dispatch: vi.fn(),
 } ) );
 
-jest.mock( '../store', () => ( {
-	store: 'abilities-api/store',
+vi.mock( import( '../store' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	store: 'abilities-api/store' as unknown as typeof store,
 } ) );
+
+type AbilitySelectors = ReturnType< typeof select< typeof store > >;
+type AbilityDispatch = ReturnType< typeof dispatch< typeof store > >;
+const mockedSelect = vi.mocked( select ) as Mock<
+	( storeDescriptor: typeof store ) => AbilitySelectors
+>;
+const mockedDispatch = vi.mocked( dispatch ) as Mock<
+	( storeDescriptor: typeof store ) => AbilityDispatch
+>;
+
+const mockSelect = ( selectors: Partial< AbilitySelectors > ) => {
+	mockedSelect.mockReturnValue( selectors as AbilitySelectors );
+};
+
+const mockDispatch = ( actions: Partial< AbilityDispatch > ) => {
+	mockedDispatch.mockReturnValue( actions as AbilityDispatch );
+};
 
 describe( 'API functions', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	describe( 'getAbilities', () => {
@@ -49,8 +70,8 @@ describe( 'API functions', () => {
 				},
 			];
 
-			const mockGetAbilities = jest.fn().mockReturnValue( mockAbilities );
-			( select as jest.Mock ).mockReturnValue( {
+			const mockGetAbilities = vi.fn().mockReturnValue( mockAbilities );
+			mockSelect( {
 				getAbilities: mockGetAbilities,
 			} );
 
@@ -81,8 +102,8 @@ describe( 'API functions', () => {
 				},
 			];
 
-			const mockGetAbilities = jest.fn().mockReturnValue( mockAbilities );
-			( select as jest.Mock ).mockReturnValue( {
+			const mockGetAbilities = vi.fn().mockReturnValue( mockAbilities );
+			mockSelect( {
 				getAbilities: mockGetAbilities,
 			} );
 
@@ -107,8 +128,8 @@ describe( 'API functions', () => {
 				output_schema: { type: 'object' },
 			};
 
-			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
-			( select as jest.Mock ).mockReturnValue( {
+			const mockGetAbility = vi.fn().mockReturnValue( mockAbility );
+			mockSelect( {
 				getAbility: mockGetAbility,
 			} );
 
@@ -122,14 +143,14 @@ describe( 'API functions', () => {
 
 	describe( 'registerAbility', () => {
 		it( 'should register a client-side ability with a callback', () => {
-			const mockRegisterAbility = jest.fn();
-			( dispatch as jest.Mock ).mockReturnValue( {
+			const mockRegisterAbility = vi.fn();
+			mockDispatch( {
 				registerAbility: mockRegisterAbility,
 			} );
 
 			// Mock select to return no existing ability
-			( select as jest.Mock ).mockReturnValue( {
-				getAbility: jest.fn().mockReturnValue( null ),
+			mockSelect( {
+				getAbility: vi.fn().mockReturnValue( null ),
 			} );
 
 			const ability = {
@@ -139,7 +160,7 @@ describe( 'API functions', () => {
 				category: 'test-category',
 				input_schema: { type: 'object' },
 				output_schema: { type: 'object' },
-				callback: jest.fn(),
+				callback: vi.fn(),
 			};
 
 			registerAbility( ability );
@@ -151,8 +172,8 @@ describe( 'API functions', () => {
 
 	describe( 'unregisterAbility', () => {
 		it( 'should unregister an ability', () => {
-			const mockUnregisterAbility = jest.fn();
-			( dispatch as jest.Mock ).mockReturnValue( {
+			const mockUnregisterAbility = vi.fn();
+			mockDispatch( {
 				unregisterAbility: mockUnregisterAbility,
 			} );
 
@@ -167,7 +188,7 @@ describe( 'API functions', () => {
 
 	describe( 'executeAbility', () => {
 		it( 'should execute a server-side ability via callback', async () => {
-			const mockServerCallback = jest
+			const mockServerCallback = vi
 				.fn()
 				.mockResolvedValue( { success: true, result: 'test' } );
 			const mockAbility: Ability = {
@@ -187,8 +208,8 @@ describe( 'API functions', () => {
 				meta: { annotations: { serverRegistered: true } },
 			};
 
-			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
-			( select as jest.Mock ).mockReturnValue( {
+			const mockGetAbility = vi.fn().mockReturnValue( mockAbility );
+			mockSelect( {
 				getAbility: mockGetAbility,
 			} );
 
@@ -203,9 +224,7 @@ describe( 'API functions', () => {
 		} );
 
 		it( 'should execute a client-side ability locally', async () => {
-			const mockCallback = jest
-				.fn()
-				.mockResolvedValue( { success: true } );
+			const mockCallback = vi.fn().mockResolvedValue( { success: true } );
 			const mockAbility: Ability = {
 				name: 'test/client-ability',
 				label: 'Client Ability',
@@ -217,8 +236,8 @@ describe( 'API functions', () => {
 				meta: { annotations: { clientRegistered: true } },
 			};
 
-			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
-			( select as jest.Mock ).mockReturnValue( {
+			const mockGetAbility = vi.fn().mockReturnValue( mockAbility );
+			mockSelect( {
 				getAbility: mockGetAbility,
 			} );
 
@@ -233,8 +252,8 @@ describe( 'API functions', () => {
 		} );
 
 		it( 'should throw error if ability not found', async () => {
-			const mockGetAbility = jest.fn().mockReturnValue( null );
-			( select as jest.Mock ).mockReturnValue( {
+			const mockGetAbility = vi.fn().mockReturnValue( null );
+			mockSelect( {
 				getAbility: mockGetAbility,
 			} );
 
@@ -244,7 +263,7 @@ describe( 'API functions', () => {
 		} );
 
 		it( 'should validate input for client abilities', async () => {
-			const mockCallback = jest.fn();
+			const mockCallback = vi.fn();
 			const mockAbility: Ability = {
 				name: 'test/client-ability',
 				label: 'Client Ability',
@@ -262,8 +281,8 @@ describe( 'API functions', () => {
 				meta: { annotations: { clientRegistered: true } },
 			};
 
-			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
-			( select as jest.Mock ).mockReturnValue( {
+			const mockGetAbility = vi.fn().mockReturnValue( mockAbility );
+			mockSelect( {
 				getAbility: mockGetAbility,
 			} );
 
@@ -273,7 +292,7 @@ describe( 'API functions', () => {
 		} );
 
 		it( 'should execute a read-only server ability', async () => {
-			const mockServerCallback = jest
+			const mockServerCallback = vi
 				.fn()
 				.mockResolvedValue( { data: 'read-only data' } );
 			const mockAbility: Ability = {
@@ -295,8 +314,8 @@ describe( 'API functions', () => {
 				callback: mockServerCallback,
 			};
 
-			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
-			( select as jest.Mock ).mockReturnValue( {
+			const mockGetAbility = vi.fn().mockReturnValue( mockAbility );
+			mockSelect( {
 				getAbility: mockGetAbility,
 			} );
 
@@ -308,7 +327,7 @@ describe( 'API functions', () => {
 		} );
 
 		it( 'should execute a read-only ability with empty input', async () => {
-			const mockServerCallback = jest
+			const mockServerCallback = vi
 				.fn()
 				.mockResolvedValue( { data: 'read-only data' } );
 			const mockAbility: Ability = {
@@ -324,8 +343,8 @@ describe( 'API functions', () => {
 				callback: mockServerCallback,
 			};
 
-			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
-			( select as jest.Mock ).mockReturnValue( {
+			const mockGetAbility = vi.fn().mockReturnValue( mockAbility );
+			mockSelect( {
 				getAbility: mockGetAbility,
 			} );
 
@@ -336,7 +355,7 @@ describe( 'API functions', () => {
 		} );
 
 		it( 'should execute a destructive idempotent server ability', async () => {
-			const mockServerCallback = jest
+			const mockServerCallback = vi
 				.fn()
 				.mockResolvedValue( 'Item deleted successfully.' );
 			const mockAbility: Ability = {
@@ -362,8 +381,8 @@ describe( 'API functions', () => {
 				callback: mockServerCallback,
 			};
 
-			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
-			( select as jest.Mock ).mockReturnValue( {
+			const mockGetAbility = vi.fn().mockReturnValue( mockAbility );
+			mockSelect( {
 				getAbility: mockGetAbility,
 			} );
 
@@ -375,11 +394,11 @@ describe( 'API functions', () => {
 		} );
 
 		it( 'should handle errors in client ability execution', async () => {
-			const consoleErrorSpy = jest
+			const consoleErrorSpy = vi
 				.spyOn( console, 'error' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 			const executionError = new Error( 'Execution failed' );
-			const mockCallback = jest.fn().mockRejectedValue( executionError );
+			const mockCallback = vi.fn().mockRejectedValue( executionError );
 
 			const mockAbility: Ability = {
 				name: 'test/client-ability',
@@ -392,8 +411,8 @@ describe( 'API functions', () => {
 				meta: { annotations: { clientRegistered: true } },
 			};
 
-			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
-			( select as jest.Mock ).mockReturnValue( {
+			const mockGetAbility = vi.fn().mockReturnValue( mockAbility );
+			mockSelect( {
 				getAbility: mockGetAbility,
 			} );
 
@@ -410,13 +429,11 @@ describe( 'API functions', () => {
 		} );
 
 		it( 'should handle errors in server ability execution', async () => {
-			const consoleErrorSpy = jest
+			const consoleErrorSpy = vi
 				.spyOn( console, 'error' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 			const serverError = new Error( 'Server execution failed' );
-			const mockServerCallback = jest
-				.fn()
-				.mockRejectedValue( serverError );
+			const mockServerCallback = vi.fn().mockRejectedValue( serverError );
 
 			const mockAbility: Ability = {
 				name: 'test/server-ability',
@@ -429,8 +446,8 @@ describe( 'API functions', () => {
 				meta: { annotations: { serverRegistered: true } },
 			};
 
-			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
-			( select as jest.Mock ).mockReturnValue( {
+			const mockGetAbility = vi.fn().mockReturnValue( mockAbility );
+			mockSelect( {
 				getAbility: mockGetAbility,
 			} );
 
@@ -447,7 +464,7 @@ describe( 'API functions', () => {
 		} );
 
 		it( 'should execute ability without callback as server ability', async () => {
-			const mockServerCallback = jest
+			const mockServerCallback = vi
 				.fn()
 				.mockResolvedValue( { success: true } );
 			const mockAbility: Ability = {
@@ -462,8 +479,8 @@ describe( 'API functions', () => {
 				meta: { annotations: { serverRegistered: true } },
 			};
 
-			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
-			( select as jest.Mock ).mockReturnValue( {
+			const mockGetAbility = vi.fn().mockReturnValue( mockAbility );
+			mockSelect( {
 				getAbility: mockGetAbility,
 			} );
 
@@ -478,7 +495,7 @@ describe( 'API functions', () => {
 		} );
 
 		it( 'should validate output for client abilities', async () => {
-			const mockCallback = jest
+			const mockCallback = vi
 				.fn()
 				.mockResolvedValue( { invalid: 'response' } );
 			const mockAbility: Ability = {
@@ -498,8 +515,8 @@ describe( 'API functions', () => {
 				meta: { annotations: { clientRegistered: true } },
 			};
 
-			const mockGetAbility = jest.fn().mockReturnValue( mockAbility );
-			( select as jest.Mock ).mockReturnValue( {
+			const mockGetAbility = vi.fn().mockReturnValue( mockAbility );
+			mockSelect( {
 				getAbility: mockGetAbility,
 			} );
 
@@ -524,10 +541,10 @@ describe( 'API functions', () => {
 				},
 			];
 
-			const mockGetAbilityCategories = jest
+			const mockGetAbilityCategories = vi
 				.fn()
 				.mockReturnValue( mockCategories );
-			( select as jest.Mock ).mockReturnValue( {
+			mockSelect( {
 				getAbilityCategories: mockGetAbilityCategories,
 			} );
 
@@ -539,8 +556,8 @@ describe( 'API functions', () => {
 		} );
 
 		it( 'should return empty array when no categories exist', () => {
-			const mockGetAbilityCategories = jest.fn().mockReturnValue( [] );
-			( select as jest.Mock ).mockReturnValue( {
+			const mockGetAbilityCategories = vi.fn().mockReturnValue( [] );
+			mockSelect( {
 				getAbilityCategories: mockGetAbilityCategories,
 			} );
 
@@ -558,10 +575,10 @@ describe( 'API functions', () => {
 				description: 'Abilities that retrieve data',
 			};
 
-			const mockGetAbilityCategory = jest
+			const mockGetAbilityCategory = vi
 				.fn()
 				.mockReturnValue( mockCategory );
-			( select as jest.Mock ).mockReturnValue( {
+			mockSelect( {
 				getAbilityCategory: mockGetAbilityCategory,
 			} );
 
@@ -584,10 +601,10 @@ describe( 'API functions', () => {
 				},
 			};
 
-			const mockGetAbilityCategory = jest
+			const mockGetAbilityCategory = vi
 				.fn()
 				.mockReturnValue( mockCategory );
-			( select as jest.Mock ).mockReturnValue( {
+			mockSelect( {
 				getAbilityCategory: mockGetAbilityCategory,
 			} );
 

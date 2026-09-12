@@ -10,7 +10,7 @@ import type { ComboboxPopupProps } from './types';
 
 export const Popup = forwardRef< HTMLDivElement, ComboboxPopupProps >(
 	function Popup(
-		{ className, portal, positioner, popupWidth, ...restProps },
+		{ className, portal, positioner, width, ...restProps },
 		ref
 	) {
 		const popupContent = (
@@ -18,7 +18,7 @@ export const Popup = forwardRef< HTMLDivElement, ComboboxPopupProps >(
 				ref={ ref }
 				className={ clsx(
 					itemPopupStyles.popup,
-					getItemPopupWidthClassName( popupWidth ),
+					getItemPopupWidthClassName( width ),
 					className
 				) }
 				{ ...restProps }

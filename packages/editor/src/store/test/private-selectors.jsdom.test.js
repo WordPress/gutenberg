@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -116,7 +117,7 @@ describe( 'isCollaborationEnabledForCurrentPost', () => {
 	}
 
 	it( 'returns true when the current post type sync config should sync', () => {
-		const shouldSync = jest.fn( () => true );
+		const shouldSync = vi.fn( () => true );
 		setupRegistry( {
 			syncConfig: { shouldSync, supportsPersistence: true },
 		} );
@@ -128,7 +129,7 @@ describe( 'isCollaborationEnabledForCurrentPost', () => {
 	} );
 
 	it( 'returns false when the current post type sync config does not support persistence', () => {
-		const shouldSync = jest.fn( () => true );
+		const shouldSync = vi.fn( () => true );
 		setupRegistry( { syncConfig: { shouldSync } } );
 
 		const state = { postType: 'book', postId: 123 };
