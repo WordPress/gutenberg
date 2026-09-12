@@ -1260,6 +1260,42 @@ registry.select( 'store' ).getItems( 'foo', 'bar', '54' );
 
 Ensuring consistency of arguments for a given selector call is [an important optimization to help improve performance in the data layer](https://github.com/WordPress/gutenberg/pull/52120). However, this type of problem can be usually be avoided by ensuring selectors don't use variable types for their arguments.
 
+### Sharing a Resolution Between Selector Calls
+
+`__unstableNormalizeArgs` changes the arguments for the selector and the resolver together, so it can only coerce values the selector still needs. Sometimes a selector takes an argument the resolver has no use for, and every call that differs only in that argument should share one resolution.
+
+Define `getResolutionArgs` on the _resolver_ to say which arguments the resolution is keyed by. It runs after `__unstableNormalizeArgs`. Its result is the resolution cache key, and it is what `fulfill`, `isFulfilled` and `shouldInvalidate` are called with. The selector keeps its own arguments.
+
+For example, `canUser( action, resource )` answers one action at a time, but a single request returns the permissions for every action on the resource. Leaving `action` out of the resolution arguments makes all the calls for a resource share one request:
+
+```js
+const canUserResolver =
+	( resource ) =>
+	async ( { dispatch } ) => {
+		// Fetches the permissions for every action at once.
+		dispatch.receivePermissions( await fetchPermissions( resource ) );
+	};
+
+canUserResolver.getResolutionArgs = ( action, resource ) => [ resource ];
+
+registry.registerStore( 'store', {
+	// ...
+	selectors: {
+		canUser: ( state, action, resource ) =>
+			state.permissions[ resource ]?.[ action ],
+	},
+	resolvers: {
+		canUser: canUserResolver,
+	},
+} );
+
+// One request, and both calls wait for it.
+await registry.resolveSelect( 'store' ).canUser( 'create', 'media' );
+await registry.resolveSelect( 'store' ).canUser( 'read', 'media' );
+```
+
+Resolution metadata is keyed by these arguments too, so code calling `startResolution`, `finishResolution(s)` or `invalidateResolution` for such a selector has to pass them. Above that means `dispatch.finishResolution( 'canUser', [ 'media' ] )`, not `[ 'create', 'media' ]`.
+
 ## Going further
 
 -   [What is WordPress Data?](https://unfoldingneurons.com/2020/what-is-wordpress-data/)
