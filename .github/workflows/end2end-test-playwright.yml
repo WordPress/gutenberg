@@ -38,9 +38,9 @@ jobs:
                   npm ci
                   npm run build
 
-            - name: Install Playwright dependencies
+            - name: Install Playwright browser binaries
               run: |
-                  npx playwright install chromium --with-deps
+                  npx playwright install chromium
 
             - name: Install WordPress and start the server
               run: |
