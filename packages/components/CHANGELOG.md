@@ -9,6 +9,7 @@
 
 ### Enhancements
 
+-   `PaletteEdit`: Use standard menu semantics and keyboard navigation for palette option actions through `Menu` from `@wordpress/ui` ([#82768](https://github.com/WordPress/gutenberg/pull/82768)).
 -   `CheckboxControl`: Match the `@wordpress/ui` checkmark size and disabled fill ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
 -   `Snackbar`: Show the action's focus ring with the design system's outline instead of a legacy dotted outline, and let `Button`/`ExternalLink` own the ring ([#82640](https://github.com/WordPress/gutenberg/pull/82640)).
 -   `CircularOptionPicker`: Updated to show outline via design system's mixin for focus ring instead of previous border implementation ([#82521](https://github.com/WordPress/gutenberg/pull/82521)).
