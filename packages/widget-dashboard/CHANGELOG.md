@@ -127,6 +127,13 @@
     controls, the promoted fields collapse into a dropdown; the settings
     trigger stays in the toolbar ([#80208](https://github.com/WordPress/gutenberg/pull/80208)) ([#80423](https://github.com/WordPress/gutenberg/pull/80423])).
 
+### Bug Fixes
+
+-   Widget toolbar: measure the header's identity cluster instead of reserving
+    a fixed width, so the inline attribute controls collapse correctly when the
+    identity carries an info tooltip (a widget's `help` note) or otherwise
+    differs from the assumed layout ([#80398](https://github.com/WordPress/gutenberg/issues/80398)).
+
 ### Documentation
 
 -   Prefer a static CSV asset over a `data:` URL in the goal-progress story ([#80510](https://github.com/WordPress/gutenberg/pull/80510)).
