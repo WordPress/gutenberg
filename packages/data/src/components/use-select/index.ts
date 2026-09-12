@@ -47,8 +47,88 @@ function warnOnUnstableReference(
 }
 
 interface StoreSubscriber {
-	subscribe: ( listener: () => void ) => () => void;
+	subscribe: ( listener: () => void, isAsync: boolean ) => () => void;
 	updateStores: ( newStores: string[] ) => void;
+}
+
+interface DeferredListener {
+	context: object;
+	callback: VoidFunction;
+}
+
+interface DeferredBucket {
+	listeners: Set< DeferredListener >;
+	// `notifyTick` value of the last store update this bucket saw.
+	lastNotified: number;
+	unsubscribe: VoidFunction;
+}
+
+// Counts store updates seen by deferred buckets. A hook compares the tick of
+// its last recompute against a bucket's `lastNotified` to know whether an
+// update was still waiting for idle time when the subscription went away.
+let notifyTick = 0;
+
+const deferredBuckets = new WeakMap<
+	DataRegistry,
+	Map< string, DeferredBucket >
+>();
+
+/**
+ * Subscribe an async-mode listener to a store without adding it to the
+ * store's own listener list. All async listeners of one store in one registry
+ * share a single real subscription whose only synchronous work is scheduling a
+ * flush. The flush runs at idle time and queues each listener under its own
+ * context, so the render queue keeps coalescing per hook instance and
+ * time-slicing between instances.
+ *
+ * @param registry  Registry.
+ * @param storeName Store name.
+ * @param listener  Listener record.
+ *
+ * @return Unsubscribe function. Returns the tick of the last store update the
+ *         bucket saw.
+ */
+function subscribeDeferred(
+	registry: DataRegistry,
+	storeName: string,
+	listener: DeferredListener
+): () => number {
+	let buckets = deferredBuckets.get( registry );
+	if ( ! buckets ) {
+		buckets = new Map();
+		deferredBuckets.set( registry, buckets );
+	}
+
+	let bucket = buckets.get( storeName );
+	if ( ! bucket ) {
+		const listeners = new Set< DeferredListener >();
+		const flush = () => {
+			for ( const { context, callback } of listeners ) {
+				renderQueue.add( context, callback );
+			}
+		};
+		bucket = {
+			listeners,
+			lastNotified: 0,
+			unsubscribe: registry.subscribe( () => {
+				bucket!.lastNotified = ++notifyTick;
+				renderQueue.add( listeners, flush );
+			}, storeName ),
+		};
+		buckets.set( storeName, bucket );
+	}
+
+	const { listeners } = bucket;
+	listeners.add( listener );
+
+	return () => {
+		if ( listeners.delete( listener ) && listeners.size === 0 ) {
+			buckets.delete( storeName );
+			renderQueue.cancel( listeners );
+			bucket.unsubscribe();
+		}
+		return bucket.lastNotified;
+	};
 }
 
 function Store( registry: DataRegistry, suspense: boolean ) {
@@ -61,8 +141,14 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 	let lastMapResultValid = false;
 	let lastIsAsync: boolean | undefined;
 	let subscriber: StoreSubscriber | undefined;
+	let subscribeFn: ( ( listener: () => void ) => () => void ) | undefined;
 	let didWarnUnstableReference: boolean | undefined;
-	const storeStatesOnMount = new Map< string, unknown >();
+	let subscribed = false;
+	// `notifyTick` value when `lastMapResult` was last computed.
+	let computedAt = 0;
+	// Store states at the last compute or unsubscribe while no subscription
+	// is active, compared on subscribe to catch updates made in between.
+	const storeStatesBeforeSubscribe = new Map< string, unknown >();
 
 	function getStoreState( name: string ): unknown {
 		// If there's no store property (custom generic store), return an empty
@@ -81,25 +167,31 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 		// keep a set of active subscriptions;
 		const activeSubscriptions = new Set< ( storeName: string ) => void >();
 
-		function subscribe( listener: () => void ): () => void {
+		function subscribe(
+			listener: () => void,
+			isAsync: boolean
+		): () => void {
 			// Maybe invalidate the value right after subscription was created.
 			// React will call `getValue` after subscribing, to detect store
 			// updates that happened in the interval between the `getValue` call
 			// during render and creating the subscription, which is slightly
 			// delayed. We need to ensure that this second `getValue` call will
 			// compute a fresh value only if any of the store states have
-			// changed in the meantime.
-			if ( lastMapResultValid ) {
+			// changed in the meantime. The same applies to the gap between the
+			// previous unsubscribe and this subscribe on a mode switch.
+			if ( ! subscribed && lastMapResultValid ) {
 				for ( const name of activeStores ) {
 					if (
-						storeStatesOnMount.get( name ) !== getStoreState( name )
+						storeStatesBeforeSubscribe.get( name ) !==
+						getStoreState( name )
 					) {
 						lastMapResultValid = false;
 					}
 				}
 			}
 
-			storeStatesOnMount.clear();
+			subscribed = true;
+			storeStatesBeforeSubscribe.clear();
 
 			const onStoreChange = () => {
 				// Invalidate the value on store update, so that a fresh value is computed.
@@ -107,16 +199,30 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 				listener();
 			};
 
-			const onChange = () => {
-				if ( lastIsAsync ) {
-					renderQueue.add( queueContext, onStoreChange );
-				} else {
-					onStoreChange();
-				}
+			const deferredListener: DeferredListener = {
+				context: queueContext,
+				callback: onStoreChange,
 			};
 
-			const unsubs: Array< VoidFunction > = [];
+			const unsubs: Array< () => number | void > = [];
 			function subscribeStore( storeName: string ) {
+				// A store that isn't registered anywhere yet gets a plain
+				// per-hook subscription: `registry.subscribe` would fall back
+				// to the registry-wide emitter, and a shared bucket must not
+				// pin that fallback for later subscribers.
+				if ( isAsync && registry.select( storeName ) !== undefined ) {
+					unsubs.push(
+						subscribeDeferred(
+							registry,
+							storeName,
+							deferredListener
+						)
+					);
+					return;
+				}
+				const onChange = isAsync
+					? () => renderQueue.add( queueContext, onStoreChange )
+					: onStoreChange;
 				unsubs.push( registry.subscribe( onChange, storeName ) );
 			}
 
@@ -129,12 +235,38 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 			return () => {
 				activeSubscriptions.delete( subscribeStore );
 
+				let pending = false;
 				for ( const unsub of unsubs.values() ) {
 					// The return value of the subscribe function could be undefined if the store is a custom generic store.
-					unsub?.();
+					const lastNotified = unsub?.();
+					if (
+						lastNotified !== undefined &&
+						lastNotified > computedAt
+					) {
+						pending = true;
+					}
 				}
 				// Cancel existing store updates that were already scheduled.
-				renderQueue.cancel( queueContext );
+				if ( renderQueue.cancel( queueContext ) ) {
+					pending = true;
+				}
+
+				// When the subscription is re-created after a mode switch, React
+				// re-reads the value right after re-subscribing. An update that
+				// was still waiting for idle time must not be lost with it.
+				if ( pending ) {
+					lastMapResultValid = false;
+				}
+
+				if ( activeSubscriptions.size === 0 ) {
+					subscribed = false;
+					for ( const name of activeStores ) {
+						storeStatesBeforeSubscribe.set(
+							name,
+							getStoreState( name )
+						);
+					}
+				}
 			};
 		}
 
@@ -183,14 +315,20 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 				}
 			}
 
-			if ( ! subscriber ) {
+			if ( ! subscribed ) {
 				for ( const name of listeningStores.current! ) {
-					storeStatesOnMount.set( name, getStoreState( name ) );
+					storeStatesBeforeSubscribe.set(
+						name,
+						getStoreState( name )
+					);
 				}
+			}
+			if ( ! subscriber ) {
 				subscriber = createSubscriber( listeningStores.current! );
 			} else {
 				subscriber.updateStores( listeningStores.current! );
 			}
+			computedAt = notifyTick;
 
 			// If the new value is shallow-equal to the old one, keep the old one so
 			// that we don't trigger unwanted updates that do a `===` check.
@@ -217,10 +355,19 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 
 		updateValue();
 
+		// The mode is fixed per subscription. A mode switch needs a new
+		// `subscribe` identity so that `useSyncExternalStore` drops the old
+		// subscription and creates one on the other tier.
+		if ( ! subscribeFn || lastIsAsync !== isAsync ) {
+			const { subscribe: subscribeToStores } = subscriber!;
+			subscribeFn = ( listener ) =>
+				subscribeToStores( listener, isAsync );
+		}
+
 		lastIsAsync = isAsync;
 
 		// Return a pair of functions that can be passed to `useSyncExternalStore`.
-		return { subscribe: subscriber!.subscribe, getValue };
+		return { subscribe: subscribeFn, getValue };
 	};
 }
 
