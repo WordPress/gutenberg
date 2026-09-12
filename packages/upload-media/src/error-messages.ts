@@ -95,6 +95,15 @@ export function getErrorMessage(
 			),
 			action: __( 'The image may be corrupted. Try a different file.' ),
 		},
+		[ ErrorCode.IMAGE_EDIT_ERROR ]: {
+			title: __( 'Image editing failed' ),
+			description: sprintf(
+				/* translators: %s: file name */
+				__( 'Failed to edit "%s".' ),
+				fileName
+			),
+			action: __( 'The image may be corrupted. Try a different file.' ),
+		},
 		[ ErrorCode.MEDIA_TRANSCODING_ERROR ]: {
 			title: __( 'Media processing failed' ),
 			description: sprintf(

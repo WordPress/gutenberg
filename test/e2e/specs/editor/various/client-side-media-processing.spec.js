@@ -23,28 +23,168 @@ const {
 } = require( './client-side-media-utils' );
 
 /**
+ * Lazily instantiated wasm-vips runtime (~10MB), shared by every probe in
+ * this file so a test that probes several images only pays for it once.
+ *
+ * @type {Promise<Object>|undefined}
+ */
+let vipsRuntime;
+
+/**
  * Probes a remote JPEG for an embedded UltraHDR gain map.
  *
- * Loaded lazily so the wasm-vips runtime (~10MB) only instantiates when an
- * UltraHDR test actually runs.
+ * The returned `pixelAt( fx, fy )` samples the decoded base image at a
+ * point given as fractions of its width and height, so images of
+ * different dimensions can be compared at corresponding positions.
  *
  * @param {string} url Image URL to fetch.
- * @return {Promise<{ width: number, height: number, hasGainmap: boolean }>} Probe result.
+ * @return {Promise<{ width: number, height: number, hasGainmap: boolean, pixelAt: (fx: number, fy: number) => number[] }>} Probe result.
  */
 async function probeUltraHdrUrl( url ) {
-	const { default: Vips } = await import( wasmVipsEntry );
-	const vips = await Vips( {} );
+	if ( ! vipsRuntime ) {
+		vipsRuntime = import( wasmVipsEntry ).then( ( { default: Vips } ) =>
+			Vips( {} )
+		);
+	}
+	const vips = await vipsRuntime;
 	const response = await fetch( url );
 	if ( ! response.ok ) {
 		throw new Error( `Failed to fetch ${ url }: ${ response.status }` );
 	}
 	const bytes = new Uint8Array( await response.arrayBuffer() );
 	const image = vips.Image.uhdrloadBuffer( bytes );
+	const width = image.width;
+	const height = image.pageHeight;
 	return {
-		width: image.width,
-		height: image.pageHeight,
+		width,
+		height,
 		hasGainmap: !! image.gainmap,
+		pixelAt: ( fx, fy ) =>
+			image.getpoint(
+				Math.round( fx * ( width - 1 ) ),
+				Math.round( fy * ( height - 1 ) )
+			),
 	};
+}
+
+/**
+ * Sample points as fractions of an image's width and height: the four
+ * corners, inset to stay clear of edge resampling, and the centre. The
+ * UltraHDR fixture has a different colour in each corner, so a sample
+ * that lands in the wrong corner is unmistakable.
+ *
+ * @type {Array<[number, number]>}
+ */
+const SAMPLE_POINTS = [
+	[ 0.1, 0.1 ],
+	[ 0.9, 0.1 ],
+	[ 0.1, 0.9 ],
+	[ 0.9, 0.9 ],
+	[ 0.5, 0.5 ],
+];
+
+/**
+ * Per-channel tolerance (on a 0-255 scale) for comparing pixels across
+ * JPEG re-encoding and resampling. The fixture's corner colours differ by
+ * well over a hundred levels per channel.
+ *
+ * @type {number}
+ */
+const PIXEL_TOLERANCE = 24;
+
+/**
+ * Expects two pixel samples to match within `PIXEL_TOLERANCE`.
+ *
+ * @param {number[]} actual   Sampled channel values.
+ * @param {number[]} expected Expected channel values.
+ * @param {string}   label    Description used in the failure message.
+ */
+function expectSimilarPixels( actual, expected, label ) {
+	const message = `${ label }: got [${ actual }], expected [${ expected }]`;
+	expect( actual, message ).toHaveLength( expected.length );
+	actual.forEach( ( value, index ) => {
+		expect(
+			Math.abs( value - expected[ index ] ),
+			message
+		).toBeLessThanOrEqual( PIXEL_TOLERANCE );
+	} );
+}
+
+/**
+ * Expects every sample point of `source` to land, after `mapPoint`
+ * transforms its coordinates, on a matching pixel in `target`. Used to
+ * check the direction of an edit: a horizontal flip maps `( fx, fy )` to
+ * `( 1 - fx, fy )`, and so on.
+ *
+ * @param {Object}   source   Probe of the image before the edit.
+ * @param {Object}   target   Probe of the image after the edit.
+ * @param {Function} mapPoint Maps a source point to its target point.
+ * @param {string}   label    Description used in the failure message.
+ */
+function expectMappedPixels( source, target, mapPoint, label ) {
+	for ( const [ fx, fy ] of SAMPLE_POINTS ) {
+		const [ tx, ty ] = mapPoint( fx, fy );
+		expectSimilarPixels(
+			target.pixelAt( tx, ty ),
+			source.pixelAt( fx, fy ),
+			`${ label } at (${ fx }, ${ fy })`
+		);
+	}
+}
+
+/**
+ * Asserts each registered sub-size of an edited attachment was generated
+ * from the edited full-size image rather than from the source attachment:
+ * it keeps the gain map, has the dimensions the server registered, and its
+ * pixels match the region of the edited full-size image WordPress makes it
+ * from (the whole image for a soft resize, a centred window of the size's
+ * aspect ratio for a hard crop, as `image_resize_dimensions()` does).
+ *
+ * @param {Object} edited Edited attachment REST record.
+ * @return {Promise<Object>} Probe of the edited full-size image.
+ */
+async function expectSubSizesDerivedFromFullSize( edited ) {
+	const full = await probeUltraHdrUrl( edited.source_url );
+	expect( full.hasGainmap ).toBe( true );
+	expect( full.width ).toBe( edited.media_details.width );
+	expect( full.height ).toBe( edited.media_details.height );
+
+	const sizes = Object.entries( edited.media_details.sizes ).filter(
+		( [ name ] ) => name !== 'full'
+	);
+	expect( sizes.map( ( [ name ] ) => name ) ).toEqual(
+		expect.arrayContaining( [ 'thumbnail', 'medium' ] )
+	);
+
+	for ( const [ name, size ] of sizes ) {
+		const probed = await probeUltraHdrUrl( size.source_url );
+		expect( probed.hasGainmap, `${ name } keeps the gain map` ).toBe(
+			true
+		);
+		expect( probed.width, `${ name } width` ).toBe( size.width );
+		expect( probed.height, `${ name } height` ).toBe( size.height );
+
+		const scale = Math.max(
+			probed.width / full.width,
+			probed.height / full.height
+		);
+		const regionWidth = probed.width / scale / full.width;
+		const regionHeight = probed.height / scale / full.height;
+		const regionX = ( 1 - regionWidth ) / 2;
+		const regionY = ( 1 - regionHeight ) / 2;
+
+		expectMappedPixels(
+			probed,
+			full,
+			( fx, fy ) => [
+				regionX + fx * regionWidth,
+				regionY + fy * regionHeight,
+			],
+			`${ name } sub-size`
+		);
+	}
+
+	return full;
 }
 
 /**
@@ -347,6 +487,294 @@ test.describe( 'Client-side media processing', () => {
 			expect( probed.width ).toBe( size.width );
 			expect( probed.height ).toBe( size.height );
 		}
+	} );
+
+	test.describe( 'image edits', () => {
+		/**
+		 * Opens the media editor modal for the selected image block, applies
+		 * the given edits and saves, returning the edited attachment's REST
+		 * record along with any requests sent to the server-side `/edit`
+		 * endpoint. Client-side editing must never call that endpoint.
+		 *
+		 * @param {Object}   editor       The editor fixture.
+		 * @param {Object}   page         The page fixture.
+		 * @param {Object}   requestUtils The requestUtils fixture.
+		 * @param {Object}   utils        The mediaProcessingUtils fixture.
+		 * @param {number}   originalId   ID of the attachment being edited.
+		 * @param {Function} applyEdits   Applies edits within the modal.
+		 * @return {Promise<{ edited: Object, editRequests: string[] }>} Result.
+		 */
+		async function editSelectedImage(
+			editor,
+			page,
+			requestUtils,
+			utils,
+			originalId,
+			applyEdits
+		) {
+			const editRequests = [];
+			page.on( 'request', ( request ) => {
+				if ( /\/wp\/v2\/media\/\d+\/edit/.test( request.url() ) ) {
+					editRequests.push( request.url() );
+				}
+			} );
+
+			await editor.clickBlockToolbarButton( 'Edit image' );
+			const modal = page.locator( 'role=dialog[name="Edit media"i]' );
+			await expect( modal ).toBeVisible();
+			// The cropper is inert until its image has loaded; an edit
+			// applied before that is lost when it initializes.
+			await expect(
+				modal.locator( '.media-editor-canvas__cropper.is-loaded' )
+			).toBeVisible();
+			await expect(
+				modal.locator( '.wp-media-editor-image-editor__image' )
+			).toHaveJSProperty( 'complete', true );
+
+			await applyEdits( modal );
+			// Every edit here makes the editor dirty, which enables Reset.
+			await expect(
+				modal.locator( 'role=button[name="Reset"i]' )
+			).toBeEnabled();
+			await modal.locator( 'role=button[name="Save"i]' ).click();
+			await expect( modal ).toBeHidden( { timeout: 60_000 } );
+
+			// The edit produces a new attachment which the block switches to.
+			await expect
+				.poll( () => utils.getSelectedBlockImageId(), {
+					timeout: 60_000,
+				} )
+				.not.toBe( originalId );
+			await utils.waitForUploadQueueEmpty();
+
+			const editedId = await utils.getSelectedBlockImageId();
+			const edited = await utils.getMediaDetails(
+				requestUtils,
+				editedId
+			);
+			return { edited, editRequests };
+		}
+
+		test( 'rotates an UltraHDR image client-side and keeps its gain map', async ( {
+			editor,
+			page,
+			mediaProcessingUtils,
+			requestUtils,
+		} ) => {
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				'1024x768_e2e_test_image_ultrahdr.jpeg'
+			);
+
+			const { edited, editRequests } = await editSelectedImage(
+				editor,
+				page,
+				requestUtils,
+				mediaProcessingUtils,
+				media.id,
+				async ( modal ) => {
+					await modal
+						.locator( 'role=button[name="Rotate 90° clockwise"i]' )
+						.click();
+				}
+			);
+
+			// The whole edit happened in the browser.
+			expect( editRequests ).toEqual( [] );
+
+			// A new attachment, named like the server's `/edit` endpoint
+			// names its output, attached to the same post and carrying the
+			// source attachment's details.
+			expect( edited.id ).not.toBe( media.id );
+			expect( edited.source_url ).toMatch( /-edited(-\d+)?\.jpe?g$/ );
+			expect( edited.post ).toBe( media.post );
+			expect( edited.title.raw ).toBe( media.title.raw );
+			expect( edited.media_details.parent_image.attachment_id ).toBe(
+				media.id
+			);
+			expect( edited.mime_type ).toBe( 'image/jpeg' );
+			expect( edited.media_details.width ).toBe( 768 );
+			expect( edited.media_details.height ).toBe( 1024 );
+
+			// Sub-sizes must be made from the rotated image, so the soft
+			// resized `medium` is portrait too rather than the source's
+			// landscape 300x225.
+			expect( edited.media_details.sizes.medium.width ).toBe( 225 );
+			expect( edited.media_details.sizes.medium.height ).toBe( 300 );
+
+			// The server-side editors strip the gain map when they rotate
+			// (see gutenberg#82295). The client-side edit must keep it, on
+			// the full-size file and on every sub-size generated from it.
+			const full = await expectSubSizesDerivedFromFullSize( edited );
+
+			// Rotated clockwise: a point at ( fx, fy ) moves to ( 1 - fy, fx ).
+			const original = await probeUltraHdrUrl( media.source_url );
+			expectMappedPixels(
+				original,
+				full,
+				( fx, fy ) => [ 1 - fy, fx ],
+				'rotated full size'
+			);
+		} );
+
+		test( 'flips an image client-side', async ( {
+			editor,
+			page,
+			mediaProcessingUtils,
+			requestUtils,
+		} ) => {
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				'1024x768_e2e_test_image_ultrahdr.jpeg'
+			);
+
+			const { edited, editRequests } = await editSelectedImage(
+				editor,
+				page,
+				requestUtils,
+				mediaProcessingUtils,
+				media.id,
+				async ( modal ) => {
+					await modal
+						.locator( 'role=button[name="Flip horizontal"i]' )
+						.click();
+				}
+			);
+
+			expect( editRequests ).toEqual( [] );
+			expect( edited.id ).not.toBe( media.id );
+			// A flip keeps the dimensions, so only the pixels can tell an
+			// edited sub-size from one made from the source image.
+			expect( edited.media_details.width ).toBe( 1024 );
+			expect( edited.media_details.height ).toBe( 768 );
+
+			const full = await expectSubSizesDerivedFromFullSize( edited );
+
+			// Flipped horizontally: ( fx, fy ) moves to ( 1 - fx, fy ).
+			const original = await probeUltraHdrUrl( media.source_url );
+			expectMappedPixels(
+				original,
+				full,
+				( fx, fy ) => [ 1 - fx, fy ],
+				'flipped full size'
+			);
+		} );
+
+		test( 'crops an image client-side', async ( {
+			editor,
+			page,
+			mediaProcessingUtils,
+			requestUtils,
+		} ) => {
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				'1024x768_e2e_test_image_ultrahdr.jpeg'
+			);
+
+			const { edited, editRequests } = await editSelectedImage(
+				editor,
+				page,
+				requestUtils,
+				mediaProcessingUtils,
+				media.id,
+				async ( modal ) => {
+					// Square (1:1) preset, keyed by its ratio.
+					await modal
+						.getByRole( 'combobox', { name: 'Aspect ratio' } )
+						.selectOption( '1' );
+				}
+			);
+
+			expect( editRequests ).toEqual( [] );
+			expect( edited.id ).not.toBe( media.id );
+			expect( edited.media_details.width ).toBe( 768 );
+			expect( edited.media_details.height ).toBe( 768 );
+
+			// `medium` is a soft resize, so it must be square as well.
+			expect( edited.media_details.sizes.medium.width ).toBe( 300 );
+			expect( edited.media_details.sizes.medium.height ).toBe( 300 );
+
+			const full = await expectSubSizesDerivedFromFullSize( edited );
+
+			// The square preset keeps the middle 768 of the 1024 columns:
+			// ( fx, fy ) of the crop is ( 0.125 + 0.75 * fx, fy ) of the
+			// source.
+			const original = await probeUltraHdrUrl( media.source_url );
+			expectMappedPixels(
+				full,
+				original,
+				( fx, fy ) => [ 0.125 + 0.75 * fx, fy ],
+				'cropped full size'
+			);
+		} );
+
+		test( 'edits an already edited image client-side', async ( {
+			editor,
+			page,
+			mediaProcessingUtils,
+			requestUtils,
+		} ) => {
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				'1024x768_e2e_test_image_ultrahdr.jpeg'
+			);
+
+			const { edited: cropped } = await editSelectedImage(
+				editor,
+				page,
+				requestUtils,
+				mediaProcessingUtils,
+				media.id,
+				async ( modal ) => {
+					await modal
+						.getByRole( 'combobox', { name: 'Aspect ratio' } )
+						.selectOption( '1' );
+				}
+			);
+			expect( cropped.media_details.width ).toBe( 768 );
+			expect( cropped.media_details.height ).toBe( 768 );
+
+			// Editing the cropped attachment starts from its own full-size
+			// file, so the second edit builds on the first for the full size
+			// and for every sub-size.
+			const { edited: flipped, editRequests } = await editSelectedImage(
+				editor,
+				page,
+				requestUtils,
+				mediaProcessingUtils,
+				cropped.id,
+				async ( modal ) => {
+					await modal
+						.locator( 'role=button[name="Flip horizontal"i]' )
+						.click();
+				}
+			);
+
+			expect( editRequests ).toEqual( [] );
+			expect( flipped.id ).not.toBe( cropped.id );
+			expect( flipped.media_details.parent_image.attachment_id ).toBe(
+				cropped.id
+			);
+			// The `-edited` suffix is not stacked on a re-edit.
+			expect( flipped.source_url ).toMatch( /-edited(-\d+)?\.jpe?g$/ );
+			expect( flipped.source_url ).not.toMatch( /-edited-edited/ );
+			expect( flipped.media_details.width ).toBe( 768 );
+			expect( flipped.media_details.height ).toBe( 768 );
+
+			const full = await expectSubSizesDerivedFromFullSize( flipped );
+
+			const croppedFull = await probeUltraHdrUrl( cropped.source_url );
+			expectMappedPixels(
+				croppedFull,
+				full,
+				( fx, fy ) => [ 1 - fx, fy ],
+				'flipped full size'
+			);
+		} );
 	} );
 
 	test( 'keeps sub-sizes of an indexed PNG indexed', async ( {

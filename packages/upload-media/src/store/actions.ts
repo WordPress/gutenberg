@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import type { createRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import type { ImageEditModifier } from '@wordpress/vips/worker';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 import type {
 	AdditionalData,
@@ -136,6 +137,77 @@ export function addItems( {
 	};
 }
 
+interface AddEditedImageArgs {
+	file: File;
+	modifiers: ImageEditModifier[];
+	sourceAttachmentId?: number;
+	onChange?: OnChangeHandler;
+	onSuccess?: OnSuccessHandler;
+	onError?: OnErrorHandler;
+	additionalData?: AdditionalData;
+}
+
+/**
+ * Applies edits (flip, rotate, crop) to an image and uploads the result as
+ * a new attachment.
+ *
+ * This is the client-side counterpart of the REST `media/<id>/edit`
+ * endpoint. The edits are applied with vips, then the edited file goes
+ * through the regular upload pipeline, so sub-sizes are generated
+ * client-side and anything the server-side image editors would drop
+ * (such as an UltraHDR gain map) survives.
+ *
+ * When the edit step itself fails, `onError` receives an `UploadError`
+ * with the `IMAGE_EDIT_ERROR` code before anything reaches the server, so
+ * a caller can fall back to the `/edit` endpoint.
+ *
+ * @param $0
+ * @param $0.file                 The attachment's original (full-size) file.
+ * @param $0.modifiers            Edits to apply, in order.
+ * @param [$0.sourceAttachmentId] ID of the attachment being edited.
+ * @param [$0.onChange]           Function called each time a file or a temporary representation of the file is available.
+ * @param [$0.onSuccess]          Function called after the file is uploaded.
+ * @param [$0.onError]            Function called when an error happens.
+ * @param [$0.additionalData]     Additional data to include in the request.
+ */
+export function addEditedImage( {
+	file,
+	modifiers,
+	sourceAttachmentId,
+	onChange,
+	onSuccess,
+	onError,
+	additionalData,
+}: AddEditedImageArgs ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		try {
+			validateMimeType( file, [ 'image' ] );
+			validateMimeTypeForUser(
+				file,
+				select.getSettings().allowedMimeTypes
+			);
+			validateFileSize( file, select.getSettings().maxUploadFileSize );
+		} catch ( error: unknown ) {
+			onError?.( error as Error );
+			return;
+		}
+
+		dispatch.addItem( {
+			file,
+			onChange,
+			onSuccess,
+			onError,
+			additionalData,
+			sourceAttachmentId,
+			// Edit first, so the pipeline is prepared for the edited file.
+			operations: [
+				[ OperationType.EditImage, { modifiers } ],
+				OperationType.Prepare,
+			],
+		} );
+	};
+}
+
 /**
  * Cancels an item in the queue based on an error.
  *
@@ -244,7 +316,8 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		// waiting in the queue, mirroring finishOperation's behavior.
 		if (
 			currentOperation === OperationType.ResizeCrop ||
-			currentOperation === OperationType.Rotate
+			currentOperation === OperationType.Rotate ||
+			currentOperation === OperationType.EditImage
 		) {
 			for ( const pending of select.getPendingImageProcessing() ) {
 				dispatch.processItem( pending.id );
@@ -267,6 +340,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		if (
 			currentOperation === OperationType.ResizeCrop ||
 			currentOperation === OperationType.Rotate ||
+			currentOperation === OperationType.EditImage ||
 			currentOperation === OperationType.TranscodeImage
 		) {
 			maybeRecycleVipsWorker( select.getActiveImageProcessingCount() );

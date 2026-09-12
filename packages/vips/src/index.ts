@@ -11,6 +11,8 @@ import type {
 	ThumbnailOptions,
 	ConvertImageOptions,
 	ResizeImageOptions,
+	EditImageOptions,
+	ImageEditModifier,
 } from './types.ts';
 import {
 	supportsAnimation,
@@ -782,6 +784,83 @@ export async function getUltraHdrInfo(
 }
 
 /**
+ * Applies the physical transform described by an EXIF orientation value.
+ *
+ * EXIF orientation values:
+ * 1 = Normal (no rotation needed)
+ * 2 = Flipped horizontally
+ * 3 = Rotated 180°
+ * 4 = Flipped vertically
+ * 5 = Rotated 90° CCW and flipped horizontally
+ * 6 = Rotated 90° CW
+ * 7 = Rotated 90° CW and flipped horizontally
+ * 8 = Rotated 90° CCW
+ *
+ * @param image       Decoded vips image.
+ * @param orientation EXIF orientation value (1-8).
+ * @return The upright image.
+ */
+function applyExifOrientation(
+	image: Vips.Image,
+	orientation: number
+): Vips.Image {
+	// See: https://exiftool.org/TagNames/EXIF.html#:~:text=0x0112,Orientation
+	switch ( orientation ) {
+		case 2:
+			// Flipped horizontally
+			image = image.flipHor();
+			break;
+		case 3:
+			// Rotated 180°
+			image = image.rot180();
+			break;
+		case 4:
+			// Flipped vertically
+			image = image.flipVer();
+			break;
+		case 5:
+			// Mirrored horizontally and rotated 270° CW (transpose).
+			// The mirror is applied before the rotation, matching the
+			// EXIF spec; the operand order matters for orientations 5/7.
+			image = image.flipHor().rot270();
+			break;
+		case 6:
+			// Rotated 90° CW
+			image = image.rot90();
+			break;
+		case 7:
+			// Mirrored horizontally and rotated 90° CW (transverse).
+			// The mirror is applied before the rotation, matching the
+			// EXIF spec; the operand order matters for orientations 5/7.
+			image = image.flipHor().rot90();
+			break;
+		case 8:
+			// Rotated 90° CCW
+			image = image.rot270();
+			break;
+		// case 1 and default: no transformation needed
+	}
+	return image;
+}
+
+/**
+ * Reads the EXIF orientation tag libvips copies through from the source.
+ *
+ * @param image Decoded vips image.
+ * @return EXIF orientation value (1-8), or 1 when the tag is absent.
+ */
+function getExifOrientation( image: Vips.Image ): number {
+	if ( image.getTypeof( 'orientation' ) === 0 ) {
+		return 1;
+	}
+	try {
+		return image.getInt( 'orientation' );
+	} catch {
+		return 1;
+	}
+}
+
+/**
  * Rotates an image based on EXIF orientation value.
  *
  * EXIF orientation values:
@@ -838,43 +917,7 @@ export async function rotateImage(
 		// `image` with their result.
 		const isPalette = isPaletteImage( image );
 
-		// Apply transformation based on EXIF orientation.
-		// See: https://exiftool.org/TagNames/EXIF.html#:~:text=0x0112,Orientation
-		switch ( orientation ) {
-			case 2:
-				// Flipped horizontally
-				image = image.flipHor();
-				break;
-			case 3:
-				// Rotated 180°
-				image = image.rot180();
-				break;
-			case 4:
-				// Flipped vertically
-				image = image.flipVer();
-				break;
-			case 5:
-				// Mirrored horizontally and rotated 270° CW (transpose).
-				// The mirror is applied before the rotation, matching the
-				// EXIF spec; the operand order matters for orientations 5/7.
-				image = image.flipHor().rot270();
-				break;
-			case 6:
-				// Rotated 90° CW
-				image = image.rot90();
-				break;
-			case 7:
-				// Mirrored horizontally and rotated 90° CW (transverse).
-				// The mirror is applied before the rotation, matching the
-				// EXIF spec; the operand order matters for orientations 5/7.
-				image = image.flipHor().rot90();
-				break;
-			case 8:
-				// Rotated 90° CCW
-				image = image.rot270();
-				break;
-			// case 1 and default: no transformation needed
-		}
+		image = applyExifOrientation( image, orientation );
 
 		// The pixels have now been physically rotated, so strip the EXIF
 		// orientation tag (which `newFromBuffer` copies through from the
@@ -893,6 +936,244 @@ export async function rotateImage(
 			saveOptions.palette = true;
 		}
 
+		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
+
+		const result = {
+			buffer: outBuffer.buffer,
+			width: image.width,
+			height: image.pageHeight,
+		};
+
+		// Only call after `image` is no longer being used.
+		cleanup?.();
+
+		return result;
+	} finally {
+		inProgressOperations.delete( id );
+	}
+}
+
+/**
+ * Applies a geometric operation to an image and, for UltraHDR sources, to
+ * its attached gain map as well.
+ *
+ * libvips carries the gain map as image-valued metadata that geometric
+ * operations copy through untouched, so it has to be transformed alongside
+ * the base image or the two drift apart. The gain map can be smaller than
+ * the base image, so `op` receives whichever image it runs on and must
+ * derive any pixel coordinates from that image's own dimensions. See:
+ * https://www.libvips.org/API/current/uhdr.html#a-la-carte-processing
+ *
+ * @param image Decoded vips image.
+ * @param op    Operation to apply.
+ * @return The transformed image.
+ */
+function transformWithGainmap(
+	image: Vips.Image,
+	op: ( input: Vips.Image ) => Vips.Image
+): Vips.Image {
+	const result = op( image );
+
+	const gainmap = image.gainmap;
+	const copy = result.copy;
+	const setImage = result.setImage;
+	if ( ! gainmap || ! copy || ! setImage ) {
+		return result;
+	}
+
+	// setImage mutates, so produce a unique copy first.
+	const output = copy.call( result );
+	setImage.call( output, 'gainmap', op( gainmap ) );
+	return output;
+}
+
+/**
+ * Background colour for the canvas an arbitrary-angle rotation exposes.
+ *
+ * Transparent where the image has an alpha channel, white otherwise, which
+ * is what WordPress core's GD editor produces for the same rotation.
+ *
+ * @param image Decoded vips image.
+ * @return Background pixel value, one entry per band.
+ */
+function getRotationBackground( image: Vips.Image ): number[] {
+	if ( image.hasAlpha() ) {
+		return new Array( image.bands ).fill( 0 );
+	}
+	const max = image.format === 'ushort' ? 65535 : 255;
+	return new Array( image.bands ).fill( max );
+}
+
+/**
+ * Builds the vips operation for a single edit modifier.
+ *
+ * Rotation is clockwise-positive, matching the REST `/edit` endpoint. Right
+ * angles use the exact `rot*` operations; anything else goes through the
+ * interpolating `rotate`, whose output is the rotated image's bounding box,
+ * the frame a following `crop` modifier is expressed in. Crop percentages
+ * are rounded to whole pixels the way `edit_media_item()` does and clamped
+ * so the rectangle never leaves the image.
+ *
+ * @param modifier Edit modifier.
+ * @return Operation to apply, or null for an identity modifier.
+ */
+function getModifierOperation(
+	modifier: ImageEditModifier
+): ( ( input: Vips.Image ) => Vips.Image ) | null {
+	switch ( modifier.type ) {
+		case 'flip': {
+			const { horizontal, vertical } = modifier.args.flip;
+			if ( ! horizontal && ! vertical ) {
+				return null;
+			}
+			return ( input ) => {
+				let output = input;
+				if ( horizontal ) {
+					output = output.flipHor();
+				}
+				if ( vertical ) {
+					output = output.flipVer();
+				}
+				return output;
+			};
+		}
+		case 'rotate': {
+			const angle = ( ( modifier.args.angle % 360 ) + 360 ) % 360;
+			if ( angle === 0 ) {
+				return null;
+			}
+			if ( angle === 90 ) {
+				return ( input ) => input.rot90();
+			}
+			if ( angle === 180 ) {
+				return ( input ) => input.rot180();
+			}
+			if ( angle === 270 ) {
+				return ( input ) => input.rot270();
+			}
+			return ( input ) =>
+				input.rotate( angle, {
+					background: getRotationBackground( input ),
+				} );
+		}
+		case 'crop': {
+			const { left, top, width, height } = modifier.args;
+			return ( input ) => {
+				const inputWidth = input.width;
+				const inputHeight = input.pageHeight;
+				const cropLeft = Math.min(
+					Math.max( 0, Math.round( ( inputWidth * left ) / 100 ) ),
+					inputWidth - 1
+				);
+				const cropTop = Math.min(
+					Math.max( 0, Math.round( ( inputHeight * top ) / 100 ) ),
+					inputHeight - 1
+				);
+				const cropWidth = Math.min(
+					Math.max( 1, Math.round( ( inputWidth * width ) / 100 ) ),
+					inputWidth - cropLeft
+				);
+				const cropHeight = Math.min(
+					Math.max( 1, Math.round( ( inputHeight * height ) / 100 ) ),
+					inputHeight - cropTop
+				);
+				if (
+					cropLeft === 0 &&
+					cropTop === 0 &&
+					cropWidth === inputWidth &&
+					cropHeight === inputHeight
+				) {
+					return input;
+				}
+				return input.crop( cropLeft, cropTop, cropWidth, cropHeight );
+			};
+		}
+		default:
+			return null;
+	}
+}
+
+/**
+ * Applies a list of edits (flip, rotate, crop) to an image.
+ *
+ * Mirrors what `WP_REST_Attachments_Controller::edit_media_item()` does on
+ * the server: any pending EXIF orientation is applied first, so the edits
+ * run in the upright frame the user previewed, then the modifiers are
+ * applied in order. The full-size result keeps its metadata (EXIF, ICC
+ * profile) and, for UltraHDR JPEGs, its gain map, which is transformed in
+ * step with the base image.
+ *
+ * Only the first frame of an animated image is edited, as core's GD
+ * editor does.
+ *
+ * @param id        Item ID.
+ * @param buffer    Original file buffer.
+ * @param type      Mime type.
+ * @param modifiers Edits to apply, in order.
+ * @param options   Edit options.
+ * @return Edited file data plus the new dimensions.
+ */
+export async function editImage(
+	id: ItemId,
+	buffer: ArrayBuffer,
+	type: string,
+	modifiers: ImageEditModifier[],
+	options: EditImageOptions = {}
+): Promise< {
+	buffer: ArrayBuffer | ArrayBufferLike;
+	width: number;
+	height: number;
+} > {
+	const { quality = 0.82 } = options;
+	const ext = type.split( '/' )[ 1 ];
+
+	inProgressOperations.add( id );
+
+	try {
+		const vips = await getVips();
+
+		let image = vips.Image.newFromBuffer( buffer );
+
+		image.onProgress = () => {
+			if ( ! inProgressOperations.has( id ) ) {
+				image.kill = true;
+			}
+		};
+
+		// Read these off the source, before the transforms below replace
+		// `image` with their result.
+		const isPalette = isPaletteImage( image );
+		const sourceBitdepth =
+			'image/avif' === type ? getSourceBitdepth( image ) : 8;
+
+		const orientation = getExifOrientation( image );
+		if ( orientation !== 1 ) {
+			image = transformWithGainmap( image, ( input ) =>
+				applyExifOrientation( input, orientation )
+			);
+		}
+
+		for ( const modifier of modifiers ) {
+			const op = getModifierOperation( modifier );
+			if ( op ) {
+				image = transformWithGainmap( image, op );
+			}
+		}
+
+		// The pixels are now upright, so drop the orientation tag copied
+		// through from the source. Otherwise a later consumer that
+		// auto-rotates from EXIF would apply the rotation a second time.
+		image.remove( 'orientation' );
+
+		const saveOptions = buildSaveOptions( {
+			type,
+			quality,
+			bitdepth: sourceBitdepth,
+			// This is the new full-size file, which core keeps intact;
+			// only sub-sizes have their metadata stripped.
+			stripMeta: false,
+			isPalette,
+		} );
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {
@@ -955,6 +1236,7 @@ export {
 	compressImage as vipsCompressImage,
 	resizeImage as vipsResizeImage,
 	rotateImage as vipsRotateImage,
+	editImage as vipsEditImage,
 	hasTransparency as vipsHasTransparency,
 	getUltraHdrInfo as vipsGetUltraHdrInfo,
 	cancelOperations as vipsCancelOperations,

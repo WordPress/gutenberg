@@ -58,6 +58,39 @@ export interface ResizeImageOptions {
 }
 
 /**
+ * A single image edit, in the shape of the WordPress REST API
+ * `media/<id>/edit` endpoint's `modifiers` parameter. Edits are applied in
+ * array order, matching `WP_REST_Attachments_Controller::edit_media_item()`.
+ *
+ * - `flip`:   mirror the image along either axis.
+ * - `rotate`: `angle` in degrees, clockwise-positive, as the endpoint
+ *             expects it (Core negates it for `WP_Image_Editor::rotate()`).
+ * - `crop`:   percentages (0-100) of the image's dimensions at the moment
+ *             the crop is applied, so after a preceding `rotate` they refer
+ *             to the rotated image's bounding box. Origin is top-left.
+ */
+export type ImageEditModifier =
+	| {
+			type: 'flip';
+			args: { flip: { horizontal: boolean; vertical: boolean } };
+	  }
+	| { type: 'rotate'; args: { angle: number } }
+	| {
+			type: 'crop';
+			args: { left: number; top: number; width: number; height: number };
+	  };
+
+/**
+ * Options for applying edits to an image.
+ */
+export interface EditImageOptions {
+	/**
+	 * Desired quality (0-1) for lossy output formats. Defaults to 0.82.
+	 */
+	quality?: number;
+}
+
+/**
  * none: Do nothing. Same as low.
  * centre: Just take the centre.
  * entropy: Use an entropy measure

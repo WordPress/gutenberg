@@ -242,6 +242,33 @@ describe( 'selectors', () => {
 
 			expect( getActiveImageProcessingCount( state ) ).toBe( 0 );
 		} );
+
+		it( 'should count items applying image edits', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.EditImage,
+					},
+					{
+						id: '2',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.Upload,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				failureCount: 0,
+				blobUrls: {},
+				settings: {
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
+				},
+			};
+
+			expect( getActiveImageProcessingCount( state ) ).toBe( 1 );
+		} );
 	} );
 
 	describe( 'getPendingUploads', () => {
@@ -345,6 +372,63 @@ describe( 'selectors', () => {
 							[ OperationType.Rotate, { orientation: 6 } ],
 						],
 						currentOperation: undefined,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				failureCount: 0,
+				blobUrls: {},
+				settings: {
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
+				},
+			};
+
+			const pending = getPendingImageProcessing( state );
+			expect( pending ).toHaveLength( 1 );
+			expect( pending[ 0 ].id ).toBe( '1' );
+		} );
+
+		it( 'should include items pending EditImage operations', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						operations: [
+							[
+								OperationType.EditImage,
+								{
+									modifiers: [
+										{ type: 'rotate', args: { angle: 90 } },
+									],
+								},
+							],
+						],
+						currentOperation: undefined,
+					},
+					{
+						id: '2',
+						status: ItemStatus.Processing,
+						operations: [
+							[
+								OperationType.EditImage,
+								{
+									modifiers: [
+										{
+											type: 'flip',
+											args: {
+												flip: {
+													horizontal: true,
+													vertical: false,
+												},
+											},
+										},
+									],
+								},
+							],
+						],
+						currentOperation: OperationType.EditImage,
 					},
 				] as QueueItem[],
 				queueStatus: 'active',

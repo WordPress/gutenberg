@@ -12,6 +12,7 @@ import {
 	compressImage,
 	resizeImage,
 	rotateImage,
+	editImage,
 	hasTransparency,
 	getUltraHdrInfo,
 } from './index.ts';
@@ -25,6 +26,7 @@ const api = {
 	compressImage,
 	resizeImage,
 	rotateImage,
+	editImage,
 	hasTransparency,
 	getUltraHdrInfo,
 };

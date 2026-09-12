@@ -10,6 +10,10 @@ import {
 	buildModifiers,
 	type Modifier,
 } from '../media-editor-modal/build-modifiers';
+import {
+	editImageClientSide,
+	getEditedAttachmentData,
+} from './edit-image-client-side';
 
 // Details-tab edits are bundled into transformed `/edit` requests. Core's
 // endpoint only accepts this whitelist.
@@ -117,26 +121,59 @@ export function useSaveMediaEditor( {
 						'attachment',
 						id
 					) as PendingMetadataEdits;
-				const metadataEdits = getMetadataEdits( pendingEdits, media );
 
-				saved = ( await apiFetch( {
-					path: `/wp/v2/media/${ id }/edit`,
-					method: 'POST',
-					data: {
-						src: media?.source_url,
-						modifiers,
-						...metadataEdits,
-					},
-				} ) ) as Media;
+				// Prefer applying the edits in the browser, which keeps what
+				// the server-side image editors drop (an UltraHDR gain map,
+				// for one) and generates sub-sizes client-side. The server
+				// path remains the fallback whenever that is unavailable.
+				const editedId = media
+					? await editImageClientSide( {
+							registry,
+							media,
+							modifiers,
+							additionalData: getEditedAttachmentData(
+								pendingEdits,
+								media
+							),
+					  } )
+					: null;
 
-				if ( saved ) {
-					receiveEntityRecords(
-						'postType',
-						'attachment',
-						saved,
-						undefined,
-						true
+				if ( editedId ) {
+					// The upload transport has already cleared any stale
+					// record for this ID, so this fetches the finalized
+					// attachment, with its sub-sizes, into the store.
+					saved = ( await registry
+						.resolveSelect( coreStore )
+						.getEntityRecord(
+							'postType',
+							'attachment',
+							editedId
+						) ) as Media | undefined;
+				} else {
+					const metadataEdits = getMetadataEdits(
+						pendingEdits,
+						media
 					);
+
+					saved = ( await apiFetch( {
+						path: `/wp/v2/media/${ id }/edit`,
+						method: 'POST',
+						data: {
+							src: media?.source_url,
+							modifiers,
+							...metadataEdits,
+						},
+					} ) ) as Media;
+
+					if ( saved ) {
+						receiveEntityRecords(
+							'postType',
+							'attachment',
+							saved,
+							undefined,
+							true
+						);
+					}
 				}
 			} else {
 				saved = ( await saveEditedEntityRecord(

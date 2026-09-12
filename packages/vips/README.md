@@ -59,6 +59,26 @@ _Parameters_
 -   _outputType_ `string`: Output mime type.
 -   _options_ `ConvertImageOptions`: Conversion options.
 
+### editImage
+
+Applies a list of edits (flip, rotate, crop) to an image.
+
+Mirrors what `WP_REST_Attachments_Controller::edit_media_item()` does on the server: any pending EXIF orientation is applied first, so the edits run in the upright frame the user previewed, then the modifiers are applied in order. The full-size result keeps its metadata (EXIF, ICC profile) and, for UltraHDR JPEGs, its gain map, which is transformed in step with the base image.
+
+Only the first frame of an animated image is edited, as core's GD editor does.
+
+_Parameters_
+
+-   _id_ `ItemId`: Item ID.
+-   _buffer_ `ArrayBuffer`: Original file buffer.
+-   _type_ `string`: Mime type.
+-   _modifiers_ `ImageEditModifier[]`: Edits to apply, in order.
+-   _options_ `EditImageOptions`: Edit options.
+
+_Returns_
+
+-   `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; } >`: Edited file data plus the new dimensions.
+
 ### getUltraHdrInfo
 
 Probes a JPEG to determine whether it is an UltraHDR image with an embedded gain map.
@@ -164,6 +184,26 @@ _Parameters_
 -   _inputType_ `string`: Input mime type.
 -   _outputType_ `string`: Output mime type.
 -   _options_ `ConvertImageOptions`: Conversion options.
+
+### vipsEditImage
+
+Applies a list of edits (flip, rotate, crop) to an image.
+
+Mirrors what `WP_REST_Attachments_Controller::edit_media_item()` does on the server: any pending EXIF orientation is applied first, so the edits run in the upright frame the user previewed, then the modifiers are applied in order. The full-size result keeps its metadata (EXIF, ICC profile) and, for UltraHDR JPEGs, its gain map, which is transformed in step with the base image.
+
+Only the first frame of an animated image is edited, as core's GD editor does.
+
+_Parameters_
+
+-   _id_ `ItemId`: Item ID.
+-   _buffer_ `ArrayBuffer`: Original file buffer.
+-   _type_ `string`: Mime type.
+-   _modifiers_ `ImageEditModifier[]`: Edits to apply, in order.
+-   _options_ `EditImageOptions`: Edit options.
+
+_Returns_
+
+-   `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; } >`: Edited file data plus the new dimensions.
 
 ### vipsGetUltraHdrInfo
 

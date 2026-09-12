@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `editImage`, which applies the REST `media/<id>/edit` endpoint's flip, rotate and crop modifiers to an image. Any pending EXIF orientation is applied first, and an UltraHDR gain map is transformed in step with the base image instead of being dropped ([#82362](https://github.com/WordPress/gutenberg/pull/82362)).
+
 ## 4.1.0 (2026-09-10)
 
 ### Bug Fixes
