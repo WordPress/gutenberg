@@ -68,7 +68,8 @@ const clientIdLabels = Object.fromEntries(
 );
 
 const meta = {
-	title: 'BlockEditor/BlockPopover',
+	id: 'blockeditor-blockpopover',
+	title: 'Editor/Block Editor/BlockPopover',
 	component: BlockPopover,
 	parameters: {
 		docs: {

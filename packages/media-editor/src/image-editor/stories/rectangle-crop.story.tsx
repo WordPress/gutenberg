@@ -118,7 +118,8 @@ function resolveAspectRatio(
 }
 
 const meta: Meta< typeof Cropper > = {
-	title: 'MediaEditor/ImageEditor',
+	id: 'mediaeditor-imageeditor',
+	title: 'Editor/Media Editor/ImageEditor',
 	component: Cropper,
 	tags: [ 'status-experimental' ],
 };

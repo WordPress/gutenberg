@@ -9,7 +9,8 @@ import { AlignmentControl } from '../';
  * If you want to use the alignment control in a toolbar, you should use the `AlignmentToolbar` component instead.
  */
 const meta = {
-	title: 'BlockEditor/AlignmentControl',
+	id: 'blockeditor-alignmentcontrol',
+	title: 'Editor/Block Editor/AlignmentControl',
 	component: AlignmentControl,
 	argTypes: {
 		value: {
