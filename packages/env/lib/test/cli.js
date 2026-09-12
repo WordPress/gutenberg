@@ -138,7 +138,7 @@ describe( 'env cli', () => {
 		await env.start.mock.results[ 0 ].value.catch( () => {} );
 
 		expect( spinner.fail ).toHaveBeenCalledWith(
-			'Error while running docker-compose command.'
+			'Error while running docker compose command.'
 		);
 		expect( process.stderr.write ).toHaveBeenCalledWith( 'failure error' );
 		expect( process.exit ).toHaveBeenCalledWith( 1 );
