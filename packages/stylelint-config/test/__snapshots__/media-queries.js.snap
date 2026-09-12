@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`flags warnings with invalid media queries css snapshot matches warnings 1`] = `
+exports[`flags warnings with invalid media queries css > snapshot matches warnings 1`] = `
 [
   {
     "column": 26,
@@ -77,8 +77,8 @@ exports[`flags warnings with invalid media queries css snapshot matches warnings
   {
     "column": 27,
     "endColumn": 28,
-    "endLine": 40,
-    "line": 40,
+    "endLine": 41,
+    "line": 41,
     "rule": "@stylistic/media-query-list-comma-space-before",
     "severity": "error",
     "text": "Unexpected whitespace before "," (@stylistic/media-query-list-comma-space-before)",
@@ -90,7 +90,7 @@ exports[`flags warnings with invalid media queries css snapshot matches warnings
     "line": 31,
     "rule": "at-rule-no-unknown",
     "severity": "error",
-    "text": "Unexpected unknown at-rule "@mdia" (at-rule-no-unknown)",
+    "text": "Unknown at-rule "@mdia" (at-rule-no-unknown)",
   },
   {
     "column": 17,
@@ -99,7 +99,7 @@ exports[`flags warnings with invalid media queries css snapshot matches warnings
     "line": 11,
     "rule": "media-feature-name-no-unknown",
     "severity": "error",
-    "text": "Unexpected unknown media feature name "unknown" (media-feature-name-no-unknown)",
+    "text": "Unknown media feature name "unknown" (media-feature-name-no-unknown)",
   },
 ]
 `;

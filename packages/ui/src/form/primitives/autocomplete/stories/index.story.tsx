@@ -4,6 +4,9 @@ import { useRef, useState } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import * as Autocomplete from '../index';
 import { Icon } from '../../../../icon';
+import { Spinner } from '../../../../spinner';
+import { Stack } from '../../../../stack';
+import { VisuallyHidden } from '../../../../visually-hidden';
 import { Input } from '../../input';
 import { InputLayout } from '../../input-layout';
 import {
@@ -35,6 +38,7 @@ const meta: Meta< typeof Autocomplete.Root > = {
 		'Autocomplete.Row': Autocomplete.Row,
 		'Autocomplete.Value': Autocomplete.Value,
 		'Autocomplete.Empty': Autocomplete.Empty,
+		'Autocomplete.Status': Autocomplete.Status,
 		'Autocomplete.Clear': Autocomplete.Clear,
 	},
 	parameters: {
@@ -55,7 +59,11 @@ export const Default: Story = {
 	args: {
 		items: URLS,
 		children: [
-			<Autocomplete.Input placeholder="Enter a URL" key="input" />,
+			<Autocomplete.Input
+				aria-label="URL"
+				placeholder="Enter a URL"
+				key="input"
+			/>,
 			<Autocomplete.Popup key="popup">
 				<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
 				<Autocomplete.List>
@@ -104,7 +112,10 @@ export const OpenOnlyOnMatch: Story = {
 				} }
 				filteredItems={ filteredItems }
 			>
-				<Autocomplete.Input placeholder="Enter a URL" />
+				<Autocomplete.Input
+					aria-label="URL"
+					placeholder="Enter a URL"
+				/>
 				<Autocomplete.Popup>
 					<Autocomplete.List>
 						<Autocomplete.ListBody>
@@ -126,11 +137,30 @@ export const OpenOnlyOnMatch: Story = {
 	},
 };
 
+function HiddenResultCount() {
+	const count = Autocomplete.useFilteredItems< FixtureItem >().length;
+
+	if ( count === 0 ) {
+		return null;
+	}
+
+	return (
+		<VisuallyHidden>
+			{ count === 1 ? '1 result found.' : `${ count } results found.` }
+		</VisuallyHidden>
+	);
+}
+
+/**
+ * Fetches matching items asynchronously. `Status` shows loading, then a
+ * visually hidden result count. Use `Empty` for no results.
+ */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
 		const [ query, setQuery ] = useState( '' );
 		const [ loading, setLoading ] = useState( false );
 		const [ results, setResults ] = useState< typeof URLS >( [] );
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
 
 		return (
 			<Autocomplete.Root
@@ -140,7 +170,9 @@ export const AsyncItems: Story = {
 				onValueChange={ ( newValue ) => {
 					setQuery( newValue );
 					setLoading( true );
-					setTimeout( () => {
+					setResults( [] );
+					clearTimeout( timeoutRef.current );
+					timeoutRef.current = setTimeout( () => {
 						setResults(
 							URLS.filter( ( item ) =>
 								item.value
@@ -152,10 +184,23 @@ export const AsyncItems: Story = {
 					}, 500 );
 				} }
 			>
-				<Autocomplete.Input placeholder="Enter a URL" />
+				<Autocomplete.Input
+					aria-label="URL"
+					placeholder="Enter a URL"
+				/>
 				<Autocomplete.Popup>
+					<Autocomplete.Status>
+						{ loading ? (
+							<Stack direction="row" gap="sm" align="center">
+								<Spinner />
+								Loading…
+							</Stack>
+						) : (
+							<HiddenResultCount />
+						) }
+					</Autocomplete.Status>
 					<Autocomplete.Empty>
-						{ loading ? 'Loading...' : 'No matching items.' }
+						{ loading ? null : 'No matching items.' }
 					</Autocomplete.Empty>
 					<Autocomplete.List>
 						<Autocomplete.ListBody>
@@ -206,7 +251,10 @@ export const Inline: Story = {
 				value={ value }
 				onValueChange={ setValue }
 			>
-				<Autocomplete.Input placeholder="Type a command" />
+				<Autocomplete.Input
+					aria-label="Command"
+					placeholder="Type a command"
+				/>
 				<div
 					style={ {
 						minHeight: '200px',
@@ -240,6 +288,7 @@ export const WithSearchIconAndClearButton: Story = {
 		children: [
 			<Autocomplete.InputGroup key="inputGroup">
 				<Autocomplete.Input
+					aria-label="Search URLs"
 					placeholder="Search URLs"
 					render={
 						<Input
@@ -382,6 +431,7 @@ export const InlineMentionAutocomplete: Story = {
 			>
 				<Autocomplete.Input
 					ref={ inputRef }
+					aria-label="Comment"
 					placeholder="Type @ to mention someone"
 				/>
 
@@ -427,7 +477,11 @@ export const WithCustomZIndex: Story = {
 	args: {
 		items: URLS,
 		children: [
-			<Autocomplete.Input placeholder="Enter a URL" key="input" />,
+			<Autocomplete.Input
+				aria-label="URL"
+				placeholder="Enter a URL"
+				key="input"
+			/>,
 			<Autocomplete.Popup
 				portal={
 					<Autocomplete.Portal
@@ -463,7 +517,11 @@ export const Grouped: Story = {
 	args: {
 		items: GROUPED_COMMANDS,
 		children: [
-			<Autocomplete.Input placeholder="Type a command" key="input" />,
+			<Autocomplete.Input
+				aria-label="Command"
+				placeholder="Type a command"
+				key="input"
+			/>,
 			<Autocomplete.Popup key="popup">
 				<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
 				<Autocomplete.List>
@@ -548,7 +606,10 @@ export const Grid: Story = {
 	render: function Template( args ) {
 		return (
 			<Autocomplete.Root { ...args }>
-				<Autocomplete.Input placeholder="Search emojis" />
+				<Autocomplete.Input
+					aria-label="Search emojis"
+					placeholder="Search emojis"
+				/>
 				<div
 					style={ {
 						marginTop: 'var(--wpds-dimension-gap-sm)',

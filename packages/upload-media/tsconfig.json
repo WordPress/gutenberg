@@ -2,7 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "jest", "gutenberg-env", "node" ]
+		"types": [ "gutenberg-env", "gutenberg-vitest-test-env", "node" ]
 	},
 	"references": [
 		{ "path": "./tsconfig.build.json" },
@@ -23,6 +23,6 @@
 		"src/store/test/actions.ts",
 		"src/store/test/selectors.ts",
 		"src/test/heic-parser.ts",
-		"src/store/test/vips.ts"
+		"src/store/test/vips.jsdom.test.ts"
 	]
 }

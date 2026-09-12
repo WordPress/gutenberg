@@ -164,7 +164,7 @@ function Controls( { attributes, setAttributes } ) {
 			return;
 		}
 		// Categories that are already will be objects, while new additions will be strings (the name).
-		// allCategories nomalizes the array so that they are all objects.
+		// allCategories normalizes the array so that they are all objects.
 		const allCategories = tokens.map( ( token ) => {
 			return typeof token === 'string'
 				? categorySuggestions[ token ]

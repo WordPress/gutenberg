@@ -1,5 +1,6 @@
 import { isBuiltin } from 'node:module';
 import typescriptEslintParser from '@typescript-eslint/parser';
+import { hasTestEnvironmentOverride } from './test-environment-overrides.mjs';
 
 const browserApiIdentifiers = new Set( [
 	'IntersectionObserver',
@@ -1610,6 +1611,21 @@ export function validateVitestPolicy( {
 			}
 		}
 	};
+	const isTrackedDomValue = ( value ) =>
+		isBrowserGlobalExpression(
+			value,
+			unboundIdentifiers,
+			domVariables,
+			domCollectionVariables,
+			identifierVariables,
+			windowVariables,
+			testingLibraryScreenVariables,
+			testingLibraryDomFunctionVariables,
+			testingLibraryAsyncDomFunctionVariables,
+			testingLibraryCollectionFunctionVariables,
+			testingLibraryAsyncCollectionFunctionVariables,
+			testingLibraryNamespaceVariables
+		);
 
 	for ( const node of ast.body ) {
 		if ( node.type !== 'ImportDeclaration' ) {
@@ -1706,6 +1722,22 @@ export function validateVitestPolicy( {
 			report(
 				'browser-user-event',
 				"Browser tests must import { userEvent } from 'vitest/browser'",
+				node
+			);
+		}
+
+		if (
+			project === 'browser' &&
+			importSource === '@testing-library/react' &&
+			node.specifiers.some( ( specifier ) =>
+				[ 'render', 'renderHook' ].includes(
+					getImportedName( specifier )
+				)
+			)
+		) {
+			report(
+				'browser-react-renderer',
+				"Browser tests must import React renderers from 'vitest-browser-react'",
 				node
 			);
 		}
@@ -1814,6 +1846,33 @@ export function validateVitestPolicy( {
 							elementParameterIndex + callback.boundArgumentCount
 						]
 					);
+				}
+			}
+
+			if ( node.type === 'CallExpression' ) {
+				let localFunctions;
+				for ( const [
+					argumentIndex,
+					argument,
+				] of node.arguments.entries() ) {
+					if (
+						argument.type !== 'SpreadElement' &&
+						isTrackedDomValue( argument )
+					) {
+						localFunctions ??= getReachableLocalFunctions(
+							node.callee,
+							identifierVariables,
+							parentNodes
+						);
+						for ( const localFunction of localFunctions ) {
+							trackDomValuePattern(
+								localFunction.functionNode.params[
+									argumentIndex +
+										localFunction.boundArgumentCount
+								]
+							);
+						}
+					}
 				}
 			}
 
@@ -2079,22 +2138,7 @@ export function validateVitestPolicy( {
 				}
 			}
 
-			if (
-				! isBrowserGlobalExpression(
-					value,
-					unboundIdentifiers,
-					domVariables,
-					domCollectionVariables,
-					identifierVariables,
-					windowVariables,
-					testingLibraryScreenVariables,
-					testingLibraryDomFunctionVariables,
-					testingLibraryAsyncDomFunctionVariables,
-					testingLibraryCollectionFunctionVariables,
-					testingLibraryAsyncCollectionFunctionVariables,
-					testingLibraryNamespaceVariables
-				)
-			) {
+			if ( ! isTrackedDomValue( value ) ) {
 				return;
 			}
 
@@ -2103,6 +2147,25 @@ export function validateVitestPolicy( {
 	}
 
 	traverseAst( ast, visitorKeys, ( node ) => {
+		if (
+			project === 'browser' &&
+			node.type === 'MemberExpression' &&
+			[ 'render', 'renderHook' ].includes(
+				getMemberPropertyName( node )
+			) &&
+			isVariableReference(
+				node.object,
+				testingLibraryNamespaceVariables,
+				identifierVariables
+			)
+		) {
+			report(
+				'browser-react-renderer',
+				"Browser tests must import React renderers from 'vitest-browser-react'",
+				node
+			);
+		}
+
 		if (
 			project === 'browser' &&
 			node.type === 'Identifier' &&
@@ -2269,22 +2332,43 @@ export function validateVitestPolicy( {
 			);
 		}
 
-		if (
-			project === 'jsdom' &&
-			! typeOnlyNodes.has( node ) &&
-			( ( node.type === 'Identifier' &&
-				browserApiIdentifiers.has( node.name ) &&
-				unboundIdentifiers.has( node ) ) ||
-				( node.type === 'MemberExpression' &&
-					browserApiProperties.has( getMemberPropertyName( node ) ) &&
+		if ( project === 'jsdom' && ! typeOnlyNodes.has( node ) ) {
+			const isVitestMock =
+				node.type === 'CallExpression' &&
+				node.callee?.type === 'MemberExpression' &&
+				isImportedApiReference(
+					node.callee.object,
+					'vi',
+					vitestViVariables,
+					vitestNamespaceVariables,
+					identifierVariables
+				);
+			const mockMethod =
+				isVitestMock && getMemberPropertyName( node.callee );
+			const apiName =
+				mockMethod === 'spyOn'
+					? getStaticStringValue( node.arguments[ 1 ] )
+					: getMemberPropertyName( node );
+			const apiTarget =
+				mockMethod === 'spyOn' ? node.arguments[ 0 ] : node.object;
+
+			if (
+				( node.type === 'Identifier' &&
+					browserApiIdentifiers.has( node.name ) &&
+					unboundIdentifiers.has( node ) ) ||
+				( mockMethod === 'stubGlobal' &&
+					browserApiProperties.has(
+						getStaticStringValue( node.arguments[ 0 ] )
+					) ) ||
+				( browserApiProperties.has( apiName ) &&
 					( isWindowReference(
-						node.object,
+						apiTarget,
 						unboundIdentifiers,
 						windowVariables,
 						identifierVariables
 					) ||
 						isBrowserGlobalExpression(
-							node.object,
+							apiTarget,
 							unboundIdentifiers,
 							domVariables,
 							domCollectionVariables,
@@ -2296,9 +2380,10 @@ export function validateVitestPolicy( {
 							testingLibraryCollectionFunctionVariables,
 							testingLibraryAsyncCollectionFunctionVariables,
 							testingLibraryNamespaceVariables
-						) ) ) )
-		) {
-			reportJsdomBrowserApi( node );
+						) ) )
+			) {
+				reportJsdomBrowserApi( node );
+			}
 		}
 
 		if (
@@ -2331,12 +2416,7 @@ export function validateVitestPolicy( {
 		report( 'vitest-import', 'no explicit Vitest collector import' );
 	}
 
-	if (
-		isVitestTest &&
-		ast.comments?.some( ( comment ) =>
-			/^\s*\*?\s*@(jest|vitest)-environment\b/m.test( comment.value )
-		)
-	) {
+	if ( isVitestTest && hasTestEnvironmentOverride( ast.comments ) ) {
 		report(
 			'test-environment-override',
 			'per-file test environment overrides are not allowed; use the filename suffix'

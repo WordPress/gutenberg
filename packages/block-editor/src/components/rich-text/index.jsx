@@ -5,6 +5,7 @@ import {
 	useState,
 	useCallback,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 	forwardRef,
 	useContext,
@@ -355,6 +356,42 @@ function RichTextWrapper(
 			[ identifier, clientId ]
 		),
 	} );
+	// Focus follows the selection while focus is inside the canvas or was
+	// lost to the body. Focus placed elsewhere stays. Runs after
+	// `useRichText` applied the content, so the field is current when its
+	// focus handler applies the selection.
+	useLayoutEffect( () => {
+		const element = anchorRef.current;
+
+		// A pointer press outside the field makes it non editable until the
+		// release (see rich text's preventFocusCapture). Focusing it then
+		// makes the block focus handler drop the text selection.
+		if ( ! isSelected || element?.contentEditable !== 'true' ) {
+			return;
+		}
+
+		const { ownerDocument } = element;
+		// Focus lost to the body of the parent document (a removed toolbar
+		// button) leaves the frame document without focus.
+		const focusedDocument = [
+			ownerDocument,
+			ownerDocument.defaultView.frameElement?.ownerDocument,
+		].find( ( doc ) => doc?.hasFocus() );
+
+		if ( ! focusedDocument ) {
+			return;
+		}
+
+		const { activeElement, body } = focusedDocument;
+		const canvas = element.parentElement?.closest( '[contenteditable]' );
+		// A field inside an editing host cannot hold focus.
+		const target = canvas?.isContentEditable ? canvas : element;
+
+		if ( activeElement === body || canvas?.contains( activeElement ) ) {
+			target.focus();
+		}
+	}, [ selectionStart, selectionEnd, isSelected ] );
+
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
 		onReplace,
 		completers: autocompleters,
