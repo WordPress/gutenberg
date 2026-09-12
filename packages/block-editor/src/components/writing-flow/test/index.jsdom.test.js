@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { isNavigationCandidate } from '../use-arrow-nav';
+import { getEventTarget } from '../get-event-target';
 
 describe( 'isNavigationCandidate', () => {
 	let elements;
@@ -90,5 +91,25 @@ describe( 'isNavigationCandidate', () => {
 
 			expect( result ).toBe( true );
 		} );
+	} );
+} );
+
+describe( 'getEventTarget', () => {
+	it( 'returns the first composed path entry when available', () => {
+		const host = document.createElement( 'div' );
+		const textarea = document.createElement( 'textarea' );
+		const event = {
+			target: host,
+			composedPath: () => [ textarea, host ],
+		};
+
+		expect( getEventTarget( event ) ).toBe( textarea );
+	} );
+
+	it( 'falls back to event.target when composedPath is unavailable', () => {
+		const host = document.createElement( 'div' );
+		const event = { target: host };
+
+		expect( getEventTarget( event ) ).toBe( host );
 	} );
 } );
