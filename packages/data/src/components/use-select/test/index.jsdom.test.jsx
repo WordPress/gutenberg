@@ -1368,6 +1368,53 @@ describe( 'useSelect', () => {
 
 			expect( await screen.findByText( '1' ) ).toBeInTheDocument();
 		} );
+
+		it( 'does not share the registry-wide fallback of a store registered late', async () => {
+			const selectLate = ( select ) => select( 'late' )?.get() ?? 'none';
+			const selectSpy = vi.fn( selectLate );
+
+			const Early = () => {
+				const value = useSelect( selectLate, [] );
+				return <div role="status">{ value }</div>;
+			};
+			const Late = () => {
+				const value = useSelect( selectSpy, [] );
+				return <div role="note">{ value }</div>;
+			};
+
+			const App = ( { withLate } ) => (
+				<AsyncModeProvider value>
+					<RegistryProvider value={ registry }>
+						<Early />
+						{ withLate && <Late /> }
+					</RegistryProvider>
+				</AsyncModeProvider>
+			);
+
+			// `Early` subscribes before the store exists, which falls back to
+			// a registry-wide subscription.
+			const { rerender } = render( <App withLate={ false } /> );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'none' );
+
+			registry.registerStore( 'late', counterStore( 5 ) );
+			rerender( <App withLate /> );
+			expect( screen.getByRole( 'note' ) ).toHaveTextContent( '5' );
+			expect( selectSpy ).toHaveBeenCalledTimes( 1 );
+
+			// An unrelated store update must not reach `Late`.
+			act( () => {
+				registry.dispatch( 'counter' ).inc();
+			} );
+			await act( () => new Promise( setImmediate ) );
+			expect( selectSpy ).toHaveBeenCalledTimes( 1 );
+
+			act( () => {
+				registry.dispatch( 'late' ).inc();
+			} );
+			expect(
+				await screen.findByText( '6', { selector: '[role="note"]' } )
+			).toBeInTheDocument();
+		} );
 	} );
 
 	describe( 'usage without dependencies array', () => {
