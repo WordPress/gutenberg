@@ -362,6 +362,14 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/stylelint-config/**'
 
+'[Tool] Vitest console':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/vitest-console/**'
+
+'[Tool] Vitest preset':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/vitest-preset-default/**'
+
 '[Tool] WP Scripts':
     - changed-files:
           - any-glob-to-any-file: 'packages/scripts/**'

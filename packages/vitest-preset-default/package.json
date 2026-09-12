@@ -1,0 +1,70 @@
+{
+	"name": "@wordpress/vitest-preset-default",
+	"version": "1.0.0-prerelease",
+	"description": "Default Vitest configuration for WordPress development.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"vitest",
+		"preset",
+		"react"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/vitest-preset-default/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/vitest-preset-default"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": "^22.12.0 || ^24.0.0 || >=26.0.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"CHANGELOG.md",
+		"README.md",
+		"index.js",
+		"scripts",
+		"index.d.ts"
+	],
+	"type": "module",
+	"main": "index.js",
+	"exports": {
+		".": {
+			"types": "./index.d.ts",
+			"default": "./index.js"
+		},
+		"./package.json": "./package.json",
+		"./setup-globals": "./scripts/setup-globals.js",
+		"./setup-test-framework": "./scripts/setup-test-framework.js",
+		"./style-mock": "./scripts/style-mock.js"
+	},
+	"types": "index.d.ts",
+	"dependencies": {
+		"@vitejs/plugin-react-swc": "^4.3.3",
+		"@vitest/browser-playwright": "^5.0.0",
+		"@wordpress/vitest-console": "file:../vitest-console",
+		"change-case": "^4.1.2",
+		"jsdom": "^26.1.0",
+		"playwright": "^1.63.0"
+	},
+	"devDependencies": {
+		"clsx": "^2.1.1",
+		"vite": "^8.2.2",
+		"vitest": "^5.0.0"
+	},
+	"peerDependencies": {
+		"vite": "^7.0.0 || ^8.0.0",
+		"vitest": "^5.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"lint:package-contents": "wp-validate-package-contents ."
+	}
+}
