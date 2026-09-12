@@ -383,7 +383,6 @@ export function FlatTermSelector( { slug } ) {
 	return (
 		<Stack direction="column" gap="lg">
 			<SearchableChipSelectControl
-				autoHighlight
 				openOnInputClick={ false }
 				// Terms are searched through the REST API.
 				filter={ null }
