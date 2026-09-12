@@ -152,7 +152,8 @@ const resolveDemoModule = async () => ( {
 } );
 
 const meta: Meta< typeof WidgetRender > = {
-	title: 'Widget Primitives/WidgetRender',
+	id: 'widget-primitives-widgetrender',
+	title: 'Widgets/Primitives/WidgetRender',
 	component: WidgetRender,
 	tags: [ 'status-experimental' ],
 	parameters: {
