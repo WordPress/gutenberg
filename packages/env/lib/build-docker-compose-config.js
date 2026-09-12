@@ -136,6 +136,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 				ports: [ developmentPorts ],
 				environment: {
 					WORDPRESS_DB_NAME: 'wordpress',
+					WORDPRESS_DB_USER: 'root',
+					WORDPRESS_DB_PASSWORD: '',
 				},
 				volumes: developmentMounts,
 			},
@@ -145,6 +147,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 				ports: [ testsPorts ],
 				environment: {
 					WORDPRESS_DB_NAME: 'tests-wordpress',
+					WORDPRESS_DB_USER: 'root',
+					WORDPRESS_DB_PASSWORD: '',
 				},
 				volumes: testsMounts,
 			},
@@ -153,12 +157,20 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: 'wordpress:cli',
 				volumes: developmentMounts,
 				user: cliUser,
+				environment: {
+					WORDPRESS_DB_USER: 'root',
+					WORDPRESS_DB_PASSWORD: '',
+				},
 			},
 			'tests-cli': {
 				depends_on: [ 'tests-wordpress' ],
 				image: 'wordpress:cli',
 				volumes: testsMounts,
 				user: cliUser,
+				environment: {
+					WORDPRESS_DB_USER: 'root',
+					WORDPRESS_DB_PASSWORD: '',
+				},
 			},
 			composer: {
 				image: 'composer',
@@ -175,6 +187,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 					LOCAL_DIR: 'html',
 					WP_PHPUNIT__TESTS_CONFIG:
 						'/var/www/html/phpunit-wp-config.php',
+					WORDPRESS_DB_USER: 'root',
+					WORDPRESS_DB_PASSWORD: '',
 				},
 			},
 		},
