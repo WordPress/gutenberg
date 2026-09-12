@@ -1,0 +1,18 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"version": 3,
+	"settings": {
+		"spacing": {
+			"padding": [ "top", "bottom" ],
+			"margin": { "sides": [ "horizontal", "vertical" ] }
+		},
+		"blocks": {
+			"core/group": {
+				"spacing": {
+					"padding": true,
+					"margin": [ "top", "right", "bottom", "left" ]
+				}
+			}
+		}
+	}
+}
