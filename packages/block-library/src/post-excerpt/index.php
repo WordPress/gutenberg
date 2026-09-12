@@ -102,7 +102,7 @@ add_action( 'init', 'register_block_core_post_excerpt' );
  * Callback for the excerpt_length filter to override the excerpt length.
  *
  * If themes or plugins filter the excerpt_length, we need to
- * override the filter in the editor, otherwise
+ * override the filter while rendering the block, otherwise
  * the excerpt length block setting has no effect.
  * Returns 101 (one more than the max block setting of 100) to ensure
  * wp_trim_words can detect when trimming is needed and add the ellipsis.
@@ -113,8 +113,4 @@ add_action( 'init', 'register_block_core_post_excerpt' );
  */
 function block_core_post_excerpt_excerpt_length() {
 	return 101;
-}
-
-if ( is_admin() ) {
-	add_filter( 'excerpt_length', 'block_core_post_excerpt_excerpt_length', PHP_INT_MAX );
 }
