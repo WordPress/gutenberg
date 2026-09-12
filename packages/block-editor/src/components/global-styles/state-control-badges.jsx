@@ -1,12 +1,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
-import {
-	Badge,
-	Icon,
-	Popover,
-	Stack,
-	VisuallyHidden,
-} from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Infotip pattern; Popover is not allowlisted yet (same as widget-header-infotip).
+import { Badge, Icon, Popover, Stack, VisuallyHidden } from '@wordpress/ui';
 
 export default function StateControlBadges( {
 	viewportStates = [],
@@ -84,7 +79,7 @@ export default function StateControlBadges( {
 								aria-label={ moreInfoLabel }
 								className="block-editor-global-styles-state-control__badge-infotip"
 							>
-								<Icon icon={ info } size={ 16 } />
+								<Icon icon={ info } size={ 20 } />
 							</Popover.Trigger>
 							<Popover.Popup className="block-editor-global-styles-state-control__badge-infotip-popup">
 								<Popover.Arrow />

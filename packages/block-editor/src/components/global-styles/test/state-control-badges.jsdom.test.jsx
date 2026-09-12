@@ -51,9 +51,7 @@ describe( 'StateControlBadges', () => {
 		);
 
 		expect(
-			await screen.findByText(
-				'Style changes apply to the Hover state.'
-			)
+			await screen.findByText( 'Style changes apply to the Hover state.' )
 		).toBeVisible();
 	} );
 } );
