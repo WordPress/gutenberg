@@ -20,6 +20,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `tagName` | `string` | `"div"` | — |
 | `namespace` | `string` | — | — |
 | `enhancedPagination` | `boolean` | `false` | — |
+| `useAlphabeticalPagination` | `boolean` | `false` | — |
 
 ## Supports
 
@@ -48,6 +49,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `query` → attribute `query`
 - `displayLayout` → attribute `displayLayout`
 - `enhancedPagination` → attribute `enhancedPagination`
+- `useAlphabeticalPagination` → attribute `useAlphabeticalPagination`
 
 ## Block Markup
 

@@ -7,7 +7,7 @@
 	"description": "Contains the block elements used to render content when no query results are found.",
 	"ancestor": [ "core/query" ],
 	"textdomain": "default",
-	"usesContext": [ "queryId", "query" ],
+	"usesContext": [ "queryId", "query", "useAlphabeticalPagination" ],
 	"supports": {
 		"anchor": true,
 		"align": true,
