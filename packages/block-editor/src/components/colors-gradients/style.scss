@@ -123,6 +123,19 @@ $swatch-gap: 12px;
 	}
 }
 
+/**
+* The Color and Background panels group these items inside a zero row-gap
+* wrapper, so consecutive items already sit flush. The Typography panel cannot
+* do the same, because its other controls rely on the panel's row gap, so close
+* the gap between adjacent items here instead. Grid rows are sized from the
+* item's margin box, so this pulls the item up without adding space below it.
+*/
+.typography-block-support-panel {
+	.block-editor-color-gradient-item + .block-editor-color-gradient-item {
+		margin-top: -$grid-unit-20;
+	}
+}
+
 .block-editor-tools-panel-color-gradient-settings__dropdown {
 	display: block;
 	padding: 0;
