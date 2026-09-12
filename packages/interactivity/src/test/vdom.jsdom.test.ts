@@ -5,9 +5,12 @@ import { toVdom, hydratedIslands } from '../vdom';
 
 declare module 'vitest' {
 	// Must match Vitest's generic declaration for module augmentation.
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	interface Assertion< T = any > {
-		toMatchVNode: ( expected: ComponentChild ) => void;
+	interface Matchers<
+		R extends void | Promise< void > = void | Promise< void >,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		T = unknown,
+	> {
+		toMatchVNode: ( expected: ComponentChild ) => R;
 	}
 }
 

@@ -307,7 +307,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.toEqual( [ 1, 2, 3 ] );
 	} );
 
-	test( 'should present the editing host semantics during a cross-block selection', async ( {
+	test( 'should keep the editing host semantics across a cross-block selection', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -319,13 +319,16 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 
-		// Without a cross-block selection, the block is edited on its own
-		// element and the canvas wrapper is not an editing host.
+		// The wrapper hosts editing for the selected block: it must present
+		// as a named multiline textbox for as long as it is the editing
+		// host, including while a selection crosses blocks.
 		const host = editor.canvas.locator( 'body' );
-		await expect( host ).not.toHaveAttribute( 'contenteditable', 'true' );
+		await expect( host ).toHaveAttribute( 'contenteditable', 'true' );
+		await expect( host ).toHaveAttribute( 'role', 'textbox' );
+		await expect( host ).toHaveAttribute( 'aria-multiline', 'true' );
+		await expect( host ).toHaveAttribute( 'aria-label', 'Editor canvas' );
 
-		// Extend the selection across blocks: the wrapper becomes the
-		// editing host and must present as a named multiline textbox.
+		// Extend the selection across blocks: the host semantics remain.
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await expect
 			.poll( () =>
@@ -344,9 +347,18 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			'Multiple selected blocks'
 		);
 
-		// Collapse into a block: the editability and the textbox semantics
-		// are removed together.
+		// Collapse into a block: the block still hosts, so the semantics
+		// remain and the generic host name returns.
 		await page.keyboard.press( 'ArrowLeft' );
+		await expect( host ).toHaveAttribute( 'contenteditable', 'true' );
+		await expect( host ).toHaveAttribute( 'role', 'textbox' );
+		await expect( host ).toHaveAttribute( 'aria-label', 'Editor canvas' );
+
+		// Move to the post title: the editability and the textbox semantics
+		// are removed together.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
 		await expect( host ).toHaveAttribute( 'contenteditable', 'false' );
 		await expect( host ).not.toHaveAttribute( 'role' );
 		await expect( host ).not.toHaveAttribute( 'aria-multiline' );
@@ -1173,6 +1185,53 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'a' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{ name: 'core/paragraph', attributes: { content: 'a' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
+	} );
+
+	test( 'should place the caret at the click inside a multi block selection', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'One two three' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+
+		const box = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.boundingBox();
+		// Click past the text so the caret lands at the end.
+		await page.mouse.click( box.x + box.width - 4, box.y + box.height / 2 );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Shift+ArrowDown' );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectionStart, getSelectionEnd } =
+						window.wp.data.select( 'core/block-editor' );
+					return [ getSelectionStart(), getSelectionEnd() ].map(
+						( { offset } ) => offset
+					);
+				} )
+			)
+			.toEqual( [ 11, 6 ] );
+
+		// Selecting the first block must not keep the start offset without
+		// an end, which would set the caret at the start of the block.
+		await page.mouse.click( box.x + box.width - 4, box.y + box.height / 2 );
+		await page.keyboard.type( 'a' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'One two threea' },
+			},
 			{ name: 'core/paragraph', attributes: { content: 'Second' } },
 		] );
 	} );
