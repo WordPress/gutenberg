@@ -1,0 +1,1 @@
+import{n as t}from"./rolldown-runtime-DiifJuVD.js";import{n,t as i}from"./react-jbyP5ryc.js";var o;function init_icon(){return(init_icon=t(()=>{n(),o=(0,i.forwardRef)(({icon:t,size:n=24,style:o,...r},e)=>{const s=t.props.style,a=s||o?{...s,...o}:void 0;return(0,i.cloneElement)(t,{width:n,height:n,...r,...a?{style:a}:{},ref:e})})}))()}export{init_icon as n,o as t};

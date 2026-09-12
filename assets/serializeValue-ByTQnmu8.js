@@ -1,0 +1,1 @@
+import{n as i}from"./rolldown-runtime-DiifJuVD.js";function serializeValue(i){if(null==i)return"";if("string"==typeof i)return i;try{return JSON.stringify(i)}catch{return String(i)}}function init_serializeValue(){return(init_serializeValue=i(()=>{}))()}export{serializeValue as n,init_serializeValue as t};

@@ -1,0 +1,1 @@
+import{n as i}from"./rolldown-runtime-DiifJuVD.js";var s;function init_resets_module(){return(init_resets_module=i(()=>{s={"box-sizing":"_box-sizing_12s1j_5"}}))()}export{s as n,init_resets_module as t};

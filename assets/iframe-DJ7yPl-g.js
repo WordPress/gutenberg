@@ -1,0 +1,1 @@
+import{t as a}from"./iframe-wrYupPA6.js";a();

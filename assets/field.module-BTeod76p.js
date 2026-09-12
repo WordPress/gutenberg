@@ -1,0 +1,1 @@
+import{n as i}from"./rolldown-runtime-DiifJuVD.js";var e;function init_field_module(){return(init_field_module=i(()=>{e={label:"_label_eehm8_5","is-plain":"_is-plain_eehm8_15",description:"_description_eehm8_22"}}))()}export{init_field_module as n,e as t};

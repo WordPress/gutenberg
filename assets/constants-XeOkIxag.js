@@ -1,0 +1,1 @@
+import{n}from"./rolldown-runtime-DiifJuVD.js";var t;function init_constants(){return(init_constants=n(()=>{t={align:"start",sideOffset:8,collisionPadding:12}}))()}export{init_constants as n,t};

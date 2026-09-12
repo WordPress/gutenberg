@@ -1,0 +1,1 @@
+import{n as r}from"./rolldown-runtime-DiifJuVD.js";function areArraysEqual(r,a,n=(r,a)=>r===a){return r.length===a.length&&r.every((r,e)=>n(r,a[e]))}function init_areArraysEqual(){return(init_areArraysEqual=r(()=>{}))()}export{init_areArraysEqual as n,areArraysEqual as t};

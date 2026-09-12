@@ -1,0 +1,1 @@
+import{n}from"./rolldown-runtime-DiifJuVD.js";import{u as o}from"./floating-ui.utils.dom-BcDFwO9X.js";function ownerDocument(n){return n?.ownerDocument||document}function init_owner(){return(init_owner=n(()=>{o()}))()}export{ownerDocument as n,init_owner as t};

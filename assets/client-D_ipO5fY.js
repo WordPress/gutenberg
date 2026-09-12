@@ -1,0 +1,1 @@
+import{t as o}from"./rolldown-runtime-DiifJuVD.js";import{t}from"./react-dom-CMHV4mz7.js";var r=o(o=>{var r=t();o.createRoot=r.createRoot,o.hydrateRoot=r.hydrateRoot});export{r as t};
