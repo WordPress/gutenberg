@@ -116,6 +116,16 @@ p.p {
 	transition: var(--_gcd-a-transition, none);
 }
 
+/* Scoped to `:any-link` to outrank the wrapper-scoped `.some-page a` rules hosts
+   use to strip underlines, which a lone class does not. All three longhands,
+   because a host `text-decoration` shorthand resets each of them. */
+.a:any-link,
+.a:any-link:is(:hover, :focus, :active) {
+	text-decoration-line: var(--_gcd-a-text-decoration-line, none);
+	text-decoration-color: var(--_gcd-a-text-decoration-color, currentColor);
+	text-decoration-thickness: var(--_gcd-a-text-decoration-thickness, auto);
+}
+
 .ol {
 	margin: var(--_gcd-ol-margin, 0);
 	padding-block: var(--_gcd-ol-padding-block, 0);
