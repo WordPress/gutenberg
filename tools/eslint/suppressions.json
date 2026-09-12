@@ -801,9 +801,6 @@
 		}
 	},
 	"packages/block-editor/src/components/block-visibility/viewport-visibility-info.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
