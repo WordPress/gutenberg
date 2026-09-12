@@ -30,6 +30,7 @@ import {
 	type ViewListEntry,
 	type ViewOverrides,
 } from './view-utils';
+import { ViewTabCount } from './view-tab-count';
 import { QuickEditModal } from './quick-edit-modal';
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
@@ -380,6 +381,7 @@ function PostListView( {
 									key={ entry.slug }
 								>
 									{ entry.title }
+									<ViewTabCount count={ entry.count } />
 								</Tabs.Tab>
 							) ) }
 						</Tabs.TabList>
