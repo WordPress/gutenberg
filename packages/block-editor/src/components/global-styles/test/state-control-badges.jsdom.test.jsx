@@ -1,25 +1,15 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import StateControlBadges from '../state-control-badges';
-
-vi.mock( import( '@wordpress/ui' ), async ( importOriginal ) => {
-	const actual = await importOriginal();
-
-	return {
-		...actual,
-		Tooltip: {
-			Root: ( { children } ) => <>{ children }</>,
-			Trigger: ( { render: trigger } ) => trigger,
-			Popup: ( { children } ) => <span role="tooltip">{ children }</span>,
-		},
-	};
-} );
 
 describe( 'StateControlBadges', () => {
 	const viewportStates = [ { value: '@tablet', label: 'Tablet' } ];
 	const pseudoStates = [ { value: ':hover', label: 'Hover' } ];
 
-	it( 'explains viewport badges with a tooltip', () => {
+	it( 'explains viewport badges with an infotip', async () => {
+		const user = userEvent.setup();
+
 		render(
 			<StateControlBadges
 				viewportStates={ viewportStates }
@@ -27,19 +17,24 @@ describe( 'StateControlBadges', () => {
 			/>
 		);
 
-		const badge = screen.getByText( 'Tablet' );
-		expect( badge ).toBeVisible();
-		// The explanation is also embedded in the badge, visually hidden, so
-		// screen reader users perceive it without relying on the tooltip.
-		expect( badge ).toHaveTextContent(
-			'Style changes apply to the Tablet viewport.'
+		expect( screen.getByText( 'Tablet' ) ).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'More information about Tablet',
+			} )
 		);
-		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent(
-			'Style changes apply to the Tablet viewport.'
-		);
+
+		expect(
+			await screen.findByText(
+				'Style changes apply to the Tablet viewport.'
+			)
+		).toBeVisible();
 	} );
 
-	it( 'explains pseudo state badges with a tooltip', () => {
+	it( 'explains pseudo state badges with an infotip', async () => {
+		const user = userEvent.setup();
+
 		render(
 			<StateControlBadges
 				pseudoStates={ pseudoStates }
@@ -47,13 +42,16 @@ describe( 'StateControlBadges', () => {
 			/>
 		);
 
-		const badge = screen.getByText( 'Hover' );
-		expect( badge ).toBeVisible();
-		expect( badge ).toHaveTextContent(
-			'Style changes apply to the Hover state.'
+		expect( screen.getByText( 'Hover' ) ).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'More information about Hover',
+			} )
 		);
-		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent(
-			'Style changes apply to the Hover state.'
-		);
+
+		expect(
+			await screen.findByText( 'Style changes apply to the Hover state.' )
+		).toBeVisible();
 	} );
 } );
