@@ -6,7 +6,8 @@ import useFormValidity from '../../hooks/use-form-validity';
 import type { Field, Form } from '../../types';
 
 const meta: Meta< typeof DataForm > = {
-	title: 'DataViews/DataForm/Content',
+	id: 'dataviews-dataform-content',
+	title: 'Design System/DataViews/DataForm/Content',
 	component: DataForm,
 	parameters: {
 		controls: { disable: true },

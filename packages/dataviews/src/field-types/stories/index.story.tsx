@@ -18,7 +18,8 @@ const meta = {
 		a11y: { test: 'todo' },
 	},
 
-	title: 'DataViews/FieldTypes',
+	id: 'dataviews-fieldtypes',
+	title: 'Design System/DataViews/FieldTypes',
 	component: DataForm,
 	argTypes: {
 		type: {
