@@ -7,7 +7,8 @@ type ItemProps = React.ComponentPropsWithoutRef< typeof Item >;
 const meta: Meta< typeof ItemGroup > = {
 	component: ItemGroup,
 	subcomponents: { Item },
-	title: 'Components/ItemGroup',
+	id: 'components-itemgroup',
+	title: 'Classic Components/ItemGroup',
 	argTypes: {
 		as: { control: false },
 		children: { control: false },

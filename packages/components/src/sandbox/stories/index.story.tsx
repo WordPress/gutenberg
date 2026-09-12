@@ -5,7 +5,7 @@ import SandBox from '..';
 const meta: Meta< typeof SandBox > = {
 	tags: [ 'manifest' ],
 	component: SandBox,
-	title: 'Components/Utilities/SandBox',
+	title: 'Classic Components/Utilities/SandBox',
 	id: 'components-sandbox',
 	argTypes: {
 		onFocus: { control: false },

@@ -10,7 +10,7 @@ const meta: Meta< typeof ValidatedContentEditableControl > = {
 		a11y: { test: 'todo' },
 	},
 
-	title: 'Components/Selection & Input/Validated Form Controls/ValidatedContentEditableControl',
+	title: 'Classic Components/Selection & Input/Validated Form Controls/ValidatedContentEditableControl',
 	id: 'components-validatedcontenteditablecontrol',
 	component: ValidatedContentEditableControl,
 	tags: [ 'status-private' ],

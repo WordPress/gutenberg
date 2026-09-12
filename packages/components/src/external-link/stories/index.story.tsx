@@ -3,7 +3,7 @@ import ExternalLink from '..';
 
 const meta: Meta< typeof ExternalLink > = {
 	component: ExternalLink,
-	title: 'Components/Navigation/ExternalLink',
+	title: 'Classic Components/Navigation/ExternalLink',
 	id: 'components-externallink',
 	argTypes: {
 		children: { control: { type: 'text' } },

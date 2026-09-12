@@ -5,7 +5,7 @@ import { RadioGroup } from '..';
 import { Radio } from '../radio';
 
 const meta: Meta< typeof RadioGroup > = {
-	title: 'Components/Deprecated/RadioGroup',
+	title: 'Classic Components/Deprecated/RadioGroup',
 	id: 'components-radiogroup',
 	component: RadioGroup,
 	subcomponents: { Radio },

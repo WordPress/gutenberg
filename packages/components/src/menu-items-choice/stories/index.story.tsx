@@ -7,7 +7,7 @@ import { NavigableMenu } from '../../navigable-container';
 const meta: Meta< typeof MenuItemsChoice > = {
 	tags: [ 'manifest' ],
 	component: MenuItemsChoice,
-	title: 'Components/Actions/MenuItemsChoice',
+	title: 'Classic Components/Actions/MenuItemsChoice',
 	id: 'components-menuitemschoice',
 	argTypes: {
 		onHover: { action: 'onHover' },

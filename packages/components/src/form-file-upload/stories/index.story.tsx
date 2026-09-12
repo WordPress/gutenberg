@@ -4,7 +4,7 @@ import FormFileUpload from '..';
 
 const meta: Meta< typeof FormFileUpload > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/File Upload/FormFileUpload',
+	title: 'Classic Components/Selection & Input/File Upload/FormFileUpload',
 	id: 'components-formfileupload',
 	component: FormFileUpload,
 	argTypes: {

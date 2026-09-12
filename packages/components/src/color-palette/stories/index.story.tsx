@@ -4,7 +4,7 @@ import ColorPalette from '..';
 
 const meta: Meta< typeof ColorPalette > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Color/ColorPalette',
+	title: 'Classic Components/Selection & Input/Color/ColorPalette',
 	id: 'components-colorpalette',
 	component: ColorPalette,
 	argTypes: {

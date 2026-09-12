@@ -12,7 +12,7 @@ const meta: Meta< typeof Navigator > = {
 		Button: Navigator.Button,
 		BackButton: Navigator.BackButton,
 	},
-	title: 'Components/Navigation/Navigator',
+	title: 'Classic Components/Navigation/Navigator',
 	id: 'components-navigator',
 	argTypes: {
 		as: { control: false },

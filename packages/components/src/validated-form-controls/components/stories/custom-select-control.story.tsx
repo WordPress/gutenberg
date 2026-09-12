@@ -10,7 +10,7 @@ const meta: Meta< typeof ValidatedCustomSelectControl > = {
 		a11y: { test: 'todo' },
 	},
 
-	title: 'Components/Selection & Input/Validated Form Controls/ValidatedCustomSelectControl',
+	title: 'Classic Components/Selection & Input/Validated Form Controls/ValidatedCustomSelectControl',
 	id: 'components-validatedcustomselectcontrol',
 	component: ValidatedCustomSelectControl,
 	tags: [ 'status-private' ],
