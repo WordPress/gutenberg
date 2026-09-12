@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Playlist: Make the tracklist keyboard navigable on the frontend. The list is now a single tab stop, the arrow keys and Home/End move focus between tracks, and Enter or Space plays the focused track ([#81513](https://github.com/WordPress/gutenberg/pull/81513)).
+
 ### Bug Fixes
 
 -   Cover: Grow the block with its content in Safari when an aspect ratio is set, instead of clipping the overflow. WebKit locks the box to the ratio where other engines let content expand it ([#70152](https://github.com/WordPress/gutenberg/pull/70152)).
