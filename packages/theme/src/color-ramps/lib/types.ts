@@ -18,29 +18,30 @@ export type Ramp = {
 	bgFill2: string;
 	bgFillInverted1: string;
 	bgFillInverted2: string;
-	bgFillDark: string;
 	// Foreground (text, icon) colors
-	fgSurface1: string;
 	fgSurface2: string;
 	fgSurface3: string;
 	fgSurface4: string;
+	fgSurface5: string;
 	// Foreground (text, icon) colors on top of bgFill
 	fgFill: string;
 	fgFillInverted: string;
-	fgFillDark: string;
 };
 
 export type RampDirection = 'lighter' | 'darker';
+// FGS4/FGS5 are produced by the foreground pass, not the base constraint solve.
+export type BaseRamp = Omit< Ramp, 'fgSurface4' | 'fgSurface5' >;
+export type BaseRampStep = keyof BaseRamp;
 export type FollowDirection = 'main' | 'opposite' | 'best' | RampDirection;
 export type ContrastRequirement = {
 	/** The reference color against which to calculate the contrast */
-	reference: keyof Ramp | 'seed';
+	reference: BaseRampStep | 'seed';
 	/**
 	 * Other colors against which the generated color must meet the same target.
 	 * The solver uses the reference with the least contrast headroom for the
 	 * selected direction.
 	 */
-	additionalReferences?: readonly ( keyof Ramp | 'seed' )[];
+	additionalReferences?: readonly ( BaseRampStep | 'seed' )[];
 	/**
 	 * Which direction should the algorithm search a matching color in:
 	 * - main: follow the same direction as the ramp's main direction
@@ -76,13 +77,64 @@ export type RampStepConfig = {
 	 * the contrast requirements. This reduces the number of unique colors
 	 * in the ramp and improves consistency.
 	 */
-	sameAsIfPossible?: keyof Ramp;
+	sameAsIfPossible?: BaseRampStep;
 };
 
-export type RampConfig = Record< keyof Ramp, RampStepConfig >;
+export type RampStepsConfig = Record< BaseRampStep, RampStepConfig >;
 
-export type RampResult = {
-	ramp: Record< keyof Ramp, string >;
+export type ForegroundRampStep =
+	| 'fgSurface2'
+	| 'fgSurface3'
+	| 'fgSurface4'
+	| 'fgSurface5';
+
+export type ForegroundScaleConfig = {
+	/** Ramp step whose hue and chroma define the foreground scale. */
+	seed: BaseRampStep;
+	/** Background step used to measure the APCA contrast range. */
+	perceptualReference: BaseRampStep;
+	perceptualTargets: {
+		/** Preferred APCA contrast for normal content and resting controls. */
+		normalContrast: number;
+		/** APCA contrast left unused unless the foreground intervals need it. */
+		endpointReserve: number;
+		/** Minimum APCA interval from weak to normal emphasis. */
+		weakToNormal: number;
+		/** Minimum APCA interval from a resting control to its active state. */
+		normalToActive: number;
+	};
+	chroma:
+		| {
+				mode: 'tapered';
+				options: TaperChromaOptions;
+		  }
+		| {
+				mode: 'gamut-relative';
+		  };
+	steps: readonly ( {
+		contrast: {
+			references: readonly BaseRampStep[];
+			target: number;
+		};
+	} & (
+		| {
+				name: Extract< ForegroundRampStep, BaseRampStep >;
+				/** Preserve a base color when it meets every WCAG floor. */
+				preserveAnchor: true;
+		  }
+		| { name: ForegroundRampStep; preserveAnchor?: false }
+	) )[];
+};
+
+export type RampConfig = {
+	steps: RampStepsConfig;
+	foregroundScale: ForegroundScaleConfig;
+};
+
+export type RampResult< Colors = Ramp > = {
+	ramp: Colors;
 	warnings?: ( keyof Ramp )[];
 	direction: RampDirection;
 };
+
+export type BaseRampResult = RampResult< BaseRamp >;
