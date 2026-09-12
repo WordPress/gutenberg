@@ -14,7 +14,7 @@
 
 -   Remove the `react-autosize-textarea` dependency. `PlainText` and the block "Edit as HTML" field now auto-grow with CSS `field-sizing: content`. Browsers without support use scrollable fields. `PlainText` consumers should use CSS height constraints instead of `rows` ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).
 -   `BlockCard`: Migrate the block-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82503](https://github.com/WordPress/gutenberg/pull/82503)).
--   State control badges: migrate from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge`, and replace the badge tooltip with an info-icon Popover infotip ([#82608](https://github.com/WordPress/gutenberg/pull/82608)).
+-   State control badges: migrate from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82608](https://github.com/WordPress/gutenberg/pull/82608)).
 
 ### Bug Fixes
 
