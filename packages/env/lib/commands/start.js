@@ -32,18 +32,11 @@ module.exports = async function start( {
 	spx,
 	scripts,
 	debug,
-	runtime: runtimeName = 'docker',
+	runtime: cliRuntime,
 	autoPort,
 	config: customConfigPath,
 } ) {
 	spinner.text = 'Reading configuration.';
-
-	const runtime = getRuntime( runtimeName );
-
-	// Check for legacy Docker installs (Docker-specific UI concern)
-	if ( runtimeName === 'docker' ) {
-		await checkForLegacyInstall( spinner );
-	}
 
 	const config = await loadConfig( path.resolve( '.' ), customConfigPath, {
 		resolvePorts: true,
@@ -53,6 +46,15 @@ module.exports = async function start( {
 	config.debug = debug;
 	config.xdebug = xdebug;
 	config.spx = spx;
+
+	// Resolve runtime: CLI arg takes precedence over JSON config, defaulting to 'docker'.
+	const runtimeName = cliRuntime ?? config.runtime ?? 'docker';
+	const runtime = getRuntime( runtimeName );
+
+	// Check for legacy Docker installs (Docker-specific UI concern)
+	if ( runtimeName === 'docker' ) {
+		await checkForLegacyInstall( spinner );
+	}
 
 	// Check if switching runtimes and prompt user to destroy old environment first.
 	const savedRuntime = await getSavedRuntime( config.workDirectoryPath );
