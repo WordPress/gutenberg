@@ -142,11 +142,6 @@
 			"via": "packages/ui/src/utils/theme-provider.ts"
 		},
 		{
-			"comment": "Unlocks private APIs of @wordpress/components (see its actions-menu component). Remove when the unlocked components go public.",
-			"package": "widget-dashboard",
-			"via": "packages/components/src/private-apis.ts"
-		},
-		{
 			"comment": "Depends on @wordpress/commands, whose store and private surface use private APIs. Remove when commands no longer does or the dependency is dropped.",
 			"package": "widget-dashboard",
 			"via": "packages/commands/src/index.js"
