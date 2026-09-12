@@ -383,8 +383,15 @@ function block_core_table_of_contents_render( $attributes, $content, $block = nu
 		return block_core_table_of_contents_add_aria_label( $attributes, $legacy_content );
 	}
 
+	// The REST block renderer provides the edited post as the global post, so
+	// use the same dynamic output for its editor preview as on the front end.
+	$is_rest_request = defined( 'REST_REQUEST' ) && REST_REQUEST;
+
 	// Outside post content rendering, there is no reliable current post to scan.
-	if ( ! is_array( $wp_current_filter ) || ! in_array( 'the_content', $wp_current_filter, true ) ) {
+	if (
+		( ! is_array( $wp_current_filter ) || ! in_array( 'the_content', $wp_current_filter, true ) ) &&
+		! $is_rest_request
+	) {
 		return block_core_table_of_contents_add_aria_label( $attributes, $content );
 	}
 
