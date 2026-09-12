@@ -482,7 +482,9 @@ export default function useSelectionObserver() {
 			defaultView.addEventListener( 'mouseup', onMouseUp );
 			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'keydown', onKeyDown );
-			ownerDocument.addEventListener(
+			// On the window, so it runs before any document listener that
+			// reads the store on keydown, whatever order they were added in.
+			defaultView.addEventListener(
 				'keydown',
 				ensureMultiBlockSelectionSync,
 				true
@@ -510,7 +512,7 @@ export default function useSelectionObserver() {
 				defaultView.removeEventListener( 'mouseup', onMouseUp );
 				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'keydown', onKeyDown );
-				ownerDocument.removeEventListener(
+				defaultView.removeEventListener(
 					'keydown',
 					ensureMultiBlockSelectionSync,
 					true
