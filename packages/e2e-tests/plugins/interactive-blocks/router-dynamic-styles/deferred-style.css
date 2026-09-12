@@ -1,0 +1,14 @@
+/**
+ * Deferred stylesheet for the test/router-dynamic-styles block.
+ *
+ * Enqueued by render.php with media="not all" — the browser fetches the file
+ * but does not apply it until an iAPI store activates it by mutating
+ * link.media to "all" (see activateDeferredStyle action in view.js).
+ *
+ * The custom property lets the view script detect activation without relying
+ * on visual-style inspection: getComputedStyle(body) returns "--test-deferred-active: 1"
+ * only when this sheet is active (media matches AND sheet.disabled === false).
+ */
+body {
+	--test-deferred-active: 1;
+}
