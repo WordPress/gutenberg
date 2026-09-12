@@ -51,6 +51,22 @@
 	text-align: center;
 }
 
+// Styles for the style state badges row, shown when a style state is
+// active. The badges replace the block description, so the row is pulled up
+// against the block card to match the description's spacing.
+.block-editor-block-inspector__state-badges {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: $grid-unit-10;
+	padding: $grid-unit-10 $grid-unit-20;
+	margin-top: -$grid-unit-20;
+}
+
+.block-editor-block-inspector__state-badges-label {
+	white-space: nowrap;
+}
+
 .block-editor-block-inspector__no-block-tools {
 	border-top: $border-width solid $gray-300;
 }
