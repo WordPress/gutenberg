@@ -157,8 +157,8 @@ A single column within a columns block.
 -	**Name:** [core/column](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-column/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/columns
--	**Supports:** allowedBlocks, anchor, color (background, button, gradients, heading, link, text), interactivity (clientNavigation), layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** templateLock, verticalAlignment, width
+-	**Supports:** allowedBlocks, anchor, color (background, button, gradients, heading, link, text), dimensions (width), interactivity (clientNavigation), layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** templateLock, verticalAlignment
 
 ## Columns
 

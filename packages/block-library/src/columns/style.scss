@@ -32,13 +32,11 @@
 		align-items: flex-end;
 	}
 
-	&:not(.is-not-stacked-on-mobile) > .wp-block-column {
-		@media (max-width: #{ ($break-medium - 1) }) {
-			// Responsiveness: Show at most one columns on mobile. This must be
-			// important since the Column assigns its own width as an inline style.
-			flex-basis: 100% !important;
-		}
-
+	// The default flex sizing uses the same `:root :where()` format as the
+	// global styles output, so a column width set in theme.json or Global
+	// Styles wins on source order. A width set on the block itself is an
+	// inline style and still takes precedence over both.
+	@at-root :root :where(#{&}:not(.is-not-stacked-on-mobile) > .wp-block-column) {
 		// At large viewports, show all columns horizontally.
 		@include break-medium() {
 			// Available space should be divided equally amongst columns without an
@@ -50,7 +48,17 @@
 			// explicit widths (if any exist).
 			flex-basis: 0;
 			flex-grow: 1;
+		}
+	}
 
+	&:not(.is-not-stacked-on-mobile) > .wp-block-column {
+		@media (max-width: #{ ($break-medium - 1) }) {
+			// Responsiveness: Show at most one columns on mobile. This must be
+			// important since the Column assigns its own width as an inline style.
+			flex-basis: 100% !important;
+		}
+
+		@include break-medium() {
 			// Columns with an explicitly-assigned width should maintain their
 			// `flex-basis` width and not grow.
 			&[style*="flex-basis"] {
@@ -59,14 +67,17 @@
 		}
 	}
 
+	// See the note on specificity above.
+	@at-root :root :where(#{&}.is-not-stacked-on-mobile > .wp-block-column) {
+		// Available space should be divided equally amongst columns.
+		flex-basis: 0;
+		flex-grow: 1;
+	}
+
 	&.is-not-stacked-on-mobile {
 		flex-wrap: nowrap !important;
 
 		> .wp-block-column {
-			// Available space should be divided equally amongst columns.
-			flex-basis: 0;
-
-			flex-grow: 1;
 			// Columns with an explicitly-assigned width should maintain their
 			// `flex-basis` width and not grow.
 			&[style*="flex-basis"] {

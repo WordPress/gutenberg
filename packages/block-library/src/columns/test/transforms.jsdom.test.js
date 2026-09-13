@@ -216,10 +216,10 @@ describe( 'transforms', () => {
 			createBlock(
 				'core/column',
 				{
-					width: '320px',
 					style: {
 						color: { background: '#123456' },
 						layout: { columnSpan: 2 },
+						dimensions: { width: '320px' },
 					},
 				},
 				[ createBlock( 'core/paragraph', { content: 'One' } ) ]
@@ -227,8 +227,10 @@ describe( 'transforms', () => {
 			createBlock(
 				'core/column',
 				{
-					width: '50%',
-					style: { spacing: { padding: { top: '10px' } } },
+					style: {
+						spacing: { padding: { top: '10px' } },
+						dimensions: { width: '50%' },
+					},
 				},
 				[
 					createBlock( 'core/paragraph', { content: 'Two' } ),
@@ -395,7 +397,7 @@ describe( 'transforms', () => {
 						lock: { move: true, remove: true },
 						templateLock: 'insert',
 						verticalAlignment: 'center',
-						width: '320px',
+						style: { dimensions: { width: '320px' } },
 					},
 					[ createBlock( 'core/paragraph' ) ]
 				),
@@ -419,26 +421,32 @@ describe( 'transforms', () => {
 			expect( transformedColumn.attributes ).not.toHaveProperty(
 				'verticalAlignment'
 			);
-			expect( transformedColumn.attributes ).not.toHaveProperty(
-				'width'
-			);
+			expect(
+				transformedColumn.attributes.style?.dimensions
+			).toBeUndefined();
 		}
 	);
 
 	it( 'migrates Column widths to Row child sizing controls', () => {
 		const block = createBlock( 'core/columns', {}, [
-			createBlock( 'core/column', { width: '320px' }, [
-				createBlock( 'core/paragraph', {
-					content: 'One',
-					style: {
-						color: { text: '#123456' },
-						layout: { columnSpan: 2 },
-					},
-				} ),
-			] ),
-			createBlock( 'core/column', { width: '50%' }, [
-				createBlock( 'core/paragraph', { content: 'Two' } ),
-			] ),
+			createBlock(
+				'core/column',
+				{ style: { dimensions: { width: '320px' } } },
+				[
+					createBlock( 'core/paragraph', {
+						content: 'One',
+						style: {
+							color: { text: '#123456' },
+							layout: { columnSpan: 2 },
+						},
+					} ),
+				]
+			),
+			createBlock(
+				'core/column',
+				{ style: { dimensions: { width: '50%' } } },
+				[ createBlock( 'core/paragraph', { content: 'Two' } ) ]
+			),
 			createBlock( 'core/column', {}, [
 				createBlock( 'core/paragraph', { content: 'Three' } ),
 			] ),
@@ -600,7 +608,7 @@ describe( 'transforms', () => {
 
 		expect(
 			transformedBlocks[ 0 ].innerBlocks.map(
-				( column ) => column.attributes.width
+				( column ) => column.attributes.style?.dimensions?.width
 			)
 		).toEqual( [ '320px', '50%', undefined ] );
 		expect(
@@ -646,7 +654,9 @@ describe( 'transforms', () => {
 		expect( transformedBlocks[ 0 ].innerBlocks ).toEqual( [
 			expect.objectContaining( {
 				name: 'core/column',
-				attributes: { width: '33.33%' },
+				attributes: {
+					style: { dimensions: { width: '33.33%' } },
+				},
 				innerBlocks: [
 					expect.objectContaining( {
 						name: 'core/paragraph',
@@ -656,7 +666,9 @@ describe( 'transforms', () => {
 			} ),
 			expect.objectContaining( {
 				name: 'core/column',
-				attributes: { width: '33.33%' },
+				attributes: {
+					style: { dimensions: { width: '33.33%' } },
+				},
 				innerBlocks: [
 					expect.objectContaining( {
 						name: 'core/paragraph',
@@ -666,7 +678,9 @@ describe( 'transforms', () => {
 			} ),
 			expect.objectContaining( {
 				name: 'core/column',
-				attributes: { width: '33.33%' },
+				attributes: {
+					style: { dimensions: { width: '33.33%' } },
+				},
 				innerBlocks: [],
 			} ),
 		] );
