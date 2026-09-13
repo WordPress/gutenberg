@@ -479,7 +479,7 @@ const WithControlsComponent = () => {
 					<FlexItem
 						style={ {
 							fontSize: 11,
-							color: '#757575',
+							color: '#707070',
 							fontFamily: 'monospace',
 						} }
 					>

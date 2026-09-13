@@ -16,7 +16,7 @@ const Indicator = styled.div`
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: var( --wpds-typography-font-weight-emphasis );
-	color: #757575;
+	color: #707070;
 	margin-top: 24px;
 `;
 
