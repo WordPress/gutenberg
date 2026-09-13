@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Cover: Grow the block with its content in Safari when an aspect ratio is set, instead of clipping the overflow. WebKit locks the box to the ratio where other engines let content expand it ([#70152](https://github.com/WordPress/gutenberg/pull/70152)).
+-   Image: Reserve less vertical space for the lightbox close and navigation buttons on viewports 500px tall or shorter. The reservation was picked by viewport width alone, so a phone rotated to landscape kept the amount meant for a tall portrait screen and rendered the enlarged image smaller than it had been before the rotation ([#82825](https://github.com/WordPress/gutenberg/pull/82825)).
 
 ## 11.0.0 (2026-09-10)
 
