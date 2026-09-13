@@ -274,6 +274,19 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 			temporaryDirectory,
 			'compatibility.d.ts'
 		);
+		const setupTypeFiles = [];
+		if ( projectName === 'browser' ) {
+			setupTypeFiles.push(
+				path.join( ROOT_DIR, 'test/unit/config/browser.vitest.js' )
+			);
+		} else if ( projectName === 'jsdom' ) {
+			setupTypeFiles.push(
+				path.join(
+					ROOT_DIR,
+					'test/unit/config/testing-library.vitest.js'
+				)
+			);
+		}
 		const typecheckConfig = {
 			extends: baseConfigPath,
 			compilerOptions: {
@@ -294,18 +307,11 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 						( specifier ) => require.resolve( specifier )
 					),
 				],
-				types:
-					projectName === 'jsdom'
-						? [
-								...commonTypes,
-								...( needsNodeTypes ? [ 'node' ] : [] ),
-								'gutenberg-vitest-test-env',
-						  ]
-						: [
-								...commonTypes,
-								'node',
-								'gutenberg-vitest-test-env',
-						  ],
+				types: [
+					...commonTypes,
+					...( needsNodeTypes ? [ 'node' ] : [] ),
+					'gutenberg-vitest-test-env',
+				],
 			},
 			// Package configs often include every source, story, and test file.
 			// This validator owns an exact routed-test set, so do not inherit
@@ -321,14 +327,7 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 			} ) ),
 			files: [
 				compatibilityTypesPath,
-				...( projectName === 'jsdom'
-					? [
-							path.join(
-								ROOT_DIR,
-								'test/unit/config/testing-library.vitest.js'
-							),
-					  ]
-					: [] ),
+				...setupTypeFiles,
 				...typescriptTests.map( ( file ) =>
 					path.join( ROOT_DIR, file )
 				),

@@ -57,11 +57,6 @@ function gutenberg_initialize_experiments_settings() {
 			'label' => _x( 'Data Views', 'experiments group name', 'gutenberg' ),
 			'items' => array(
 				array(
-					'id'          => 'gutenberg-content-only-inspector-fields',
-					'label'       => __( 'Block fields: Show dataform driven inspector fields on blocks that support them', 'gutenberg' ),
-					'description' => __( 'Enables editable block inspector fields that are generated using a dataform.', 'gutenberg' ),
-				),
-				array(
 					'id'          => 'gutenberg-dataform-inspector',
 					'label'       => __( 'Editor Inspector: Use DataForm', 'gutenberg' ),
 					'description' => __( 'Replaces the bespoke editor inspector panels with a unified DataForm-based implementation for Pages and Posts, matching the QuickEdit experience.', 'gutenberg' ),

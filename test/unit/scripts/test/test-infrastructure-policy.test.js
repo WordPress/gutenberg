@@ -252,6 +252,7 @@ export default {
 			expect.arrayContaining( [
 				'test/unit/vitest.config.mjs: test.isolate must be true',
 				'test/unit/vitest.config.mjs: test.mockReset must be true',
+				'test/unit/vitest.config.mjs: test.clearMocks must remain false while test.mockReset is true',
 				'test/unit/vitest.config.mjs: test.globals must remain false',
 			] )
 		);
@@ -441,12 +442,12 @@ export const beforeAll = () => {};
 		} );
 		writeJson( path.join( vitestDir, 'package.json' ), {
 			name: 'vitest',
-			version: '4.0.0',
+			version: '5.0.0',
 			types: 'index.d.ts',
 		} );
 		writeFileSync(
 			path.join( vitestDir, 'index.d.ts' ),
-			'export interface AsymmetricMatcher { asymmetricMatch(value: unknown): boolean; }\nexport interface Matchers<T = any> { toBe(value: unknown): void; }\nexport declare const vi: unknown;\nexport declare function expect<T>(value: T): Matchers<T>;\nexport declare namespace expect { function stringContaining(value: string): AsymmetricMatcher; }\n'
+			'export interface AsymmetricMatcher { asymmetricMatch(value: unknown): boolean; }\nexport interface Matchers<R extends void | Promise<void> = void | Promise<void>, T = unknown> {}\nexport interface Assertion<R extends void | Promise<void> = void, T = unknown> extends Matchers<R, T> { toBe(value: unknown): R; }\nexport declare const vi: unknown;\nexport declare function expect<T>(value: T): Assertion<void, T>;\nexport declare namespace expect { function stringContaining(value: string): AsymmetricMatcher; }\n'
 		);
 		writeJson( path.join( jestDomDir, 'package.json' ), {
 			name: '@testing-library/jest-dom',

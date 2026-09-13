@@ -31,7 +31,7 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 		if ( ! WP_Icon_Collections_Registry::get_instance()->is_registered( 'core' ) ) {
 			gutenberg_register_default_icon_collections();
 		}
-		if ( empty( WP_Icons_Registry::get_instance()->get_registered_icons() ) ) {
+		if ( empty( WP_Icons_Registry_Gutenberg::get_instance()->get_registered_icons() ) ) {
 			gutenberg_register_default_icons();
 		}
 	}

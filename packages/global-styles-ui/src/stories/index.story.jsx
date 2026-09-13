@@ -378,6 +378,27 @@ const BASE_SETTINGS = {
 			textDecoration: true,
 			textTransform: true,
 			writingMode: false,
+			textShadow: true,
+			defaultTextShadowPresets: true,
+			textShadowPresets: {
+				default: [
+					{
+						name: 'Light',
+						slug: 'light',
+						textShadow: '0.05em 0.05em 0.1em rgba(0, 0, 0, 0.3)',
+					},
+					{
+						name: 'Strong',
+						slug: 'strong',
+						textShadow: '0.1em 0.1em 0.25em rgba(0, 0, 0, 0.5)',
+					},
+					{
+						name: 'Outlined',
+						slug: 'outlined',
+						textShadow: '0.05em 0.05em 0 rgba(0, 0, 0, 0.3)',
+					},
+				],
+			},
 			fluid: true,
 			fontFamilies: {
 				theme: [

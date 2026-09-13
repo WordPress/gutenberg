@@ -4,6 +4,7 @@ import { GroupLabel } from '../primitives/combobox/group-label';
 import { Item } from '../primitives/combobox/item';
 import { ChipWithRemove } from '../primitives/combobox/chip-with-remove';
 import { Collection } from '../primitives/combobox/collection';
+import { useFilteredItems } from '../primitives/combobox/use-filtered-items';
 
 /**
  * A complete searchable multi-select field with chips, integrated label,
@@ -17,5 +18,6 @@ export const SearchableChipSelectControl = Object.assign(
 		Item,
 		ChipWithRemove,
 		Collection,
+		useFilteredItems,
 	}
 );
