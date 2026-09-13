@@ -1,5 +1,5 @@
 name: 'Set up npm'
-description: 'Installs the npm version required by the devEngines field of package.json, so every job resolves dependencies identically.'
+description: 'Installs the npm version required by the devEngines field of package.json, so every job resolves dependencies identically. Keeps the bundled npm when the field is absent.'
 
 inputs:
     working-directory:
@@ -12,10 +12,14 @@ runs:
     steps:
         - name: Install npm
           run: |
-              NPM_VERSION="$(jq -r '.devEngines.packageManager.version' package.json)"
-              # Contributors need the floor; CI stays on that major's newest release.
-              npm install --global "npm@${NPM_VERSION/>=/^}"
-              echo "Required npm version: $NPM_VERSION"
+              NPM_VERSION="$(jq -r '.devEngines.packageManager.version // empty' package.json)"
+              if [ -n "$NPM_VERSION" ]; then
+                  # Contributors need the floor; CI stays on that major's newest release.
+                  npm install --global "npm@${NPM_VERSION/>=/^}"
+                  echo "Required npm version: $NPM_VERSION"
+              else
+                  echo "No devEngines.packageManager.version, keeping the bundled npm."
+              fi
               echo "Installed npm version: $(npm --version)"
           working-directory: ${{ inputs.working-directory }}
           shell: bash
