@@ -80,7 +80,7 @@ export const Default: StoryObj< typeof Verifier > = {
 			<p
 				style={ {
 					margin: '0 0 16px',
-					color: '#757575',
+					color: '#707070',
 					fontSize: 12,
 				} }
 			>
@@ -121,7 +121,7 @@ export const Default: StoryObj< typeof Verifier > = {
 const headerStyle: React.CSSProperties = {
 	fontSize: 11,
 	fontWeight: 'var(--wpds-typography-font-weight-emphasis)',
-	color: '#757575',
+	color: '#707070',
 	paddingBottom: 4,
 	borderBottom: '1px solid #e0e0e0',
 };
