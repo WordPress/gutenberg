@@ -341,11 +341,15 @@ test.describe( 'List View', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Paragraph text' },
 		} );
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} )
-		).toBeFocused();
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.getByRole( 'document', {
+						name: 'Block: Paragraph',
+					} )
+				)
+			)
+			.toBe( true );
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
