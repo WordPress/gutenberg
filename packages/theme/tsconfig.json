@@ -13,8 +13,6 @@
 	},
 	"files": [ "global.d.ts" ],
 	"include": [
-		"bin",
-		"terrazzo.config.ts",
 		"*-plugins/test/**/*",
 		"src/**/stories/**/*",
 		"src/**/test/**/*",

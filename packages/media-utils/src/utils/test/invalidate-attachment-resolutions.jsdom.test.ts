@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { invalidateAttachmentResolutions } from '../invalidate-attachment-resolutions';
 
 type Registry = Parameters< typeof invalidateAttachmentResolutions >[ 0 ];
@@ -11,7 +12,7 @@ type Registry = Parameters< typeof invalidateAttachmentResolutions >[ 0 ];
 function createRegistryStub(
 	entityRecords: Map< unknown[], { status: string } > | undefined
 ) {
-	const invalidateResolution = jest.fn();
+	const invalidateResolution = vi.fn();
 	const registry = {
 		select: () => ( {
 			getCachedResolvers: () => ( { getEntityRecords: entityRecords } ),

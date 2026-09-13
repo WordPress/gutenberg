@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render } from '@testing-library/react';
 import {
 	createBlock,
@@ -11,6 +12,8 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 import { unregisterFormatType } from '@wordpress/rich-text';
 import { store as coreDataStore } from '../index';
 import useEntityBlockEditor from '../hooks/use-entity-block-editor';
+
+vi.mock( '@wordpress/api-fetch' );
 
 const postTypeConfig = {
 	kind: 'postType',

@@ -600,6 +600,15 @@ export default function MediaEdit< Item >( {
 	validity,
 }: MediaEditProps< Item > ) {
 	const value = field.getValue( { item: data } );
+	// While the permission is unresolved, show the picker, as the editor does.
+	const canUpload = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'attachment',
+			} ) ?? true,
+		[]
+	);
 	const [ isTouched, setIsTouched ] = useState( false );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 	const [ customValidity, setCustomValidity ] = useState<
@@ -856,6 +865,21 @@ export default function MediaEdit< Item >( {
 		},
 		[ isTouched ]
 	);
+	if ( ! canUpload ) {
+		return (
+			<fieldset className="fields__media-edit" data-field-id={ field.id }>
+				<WCText>
+					{ sprintf(
+						/* translators: %s: The field label. */
+						__(
+							'%s: To edit this field, you need permission to upload media.'
+						),
+						field.label
+					) }
+				</WCText>
+			</fieldset>
+		);
+	}
 	return (
 		<Stack direction="column" gap="sm" onBlur={ onBlur }>
 			<fieldset className="fields__media-edit" data-field-id={ field.id }>

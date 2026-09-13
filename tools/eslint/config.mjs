@@ -27,6 +27,7 @@ const vitestTestsByProject = getVitestTestsByProject(
 );
 const vitestTestPatterns = Object.values( vitestTestsByProject ).flat();
 const vitestJsdomTestPatterns = vitestTestsByProject.jsdom;
+const vitestBrowserTestPatterns = vitestTestsByProject.browser;
 // Prefer the installed React version for linting, but fall back to the detected version.
 let reactVersion = 'detect';
 try {
@@ -527,6 +528,25 @@ export default dedupePlugins( [
 	{
 		...testingLibraryPlugin.configs[ 'flat/react' ],
 		files: vitestJsdomTestPatterns,
+	},
+	{
+		...jestDomPlugin.configs[ 'flat/recommended' ],
+		files: vitestBrowserTestPatterns,
+	},
+	{
+		...testingLibraryPlugin.configs[ 'flat/react' ],
+		files: vitestBrowserTestPatterns,
+		settings: {
+			'testing-library/utils-module': 'off',
+			'testing-library/custom-renders': 'off',
+			'testing-library/custom-queries': 'off',
+		},
+		rules: {
+			...testingLibraryPlugin.configs[ 'flat/react' ].rules,
+			// Browser Mode locators are the browser-native alternative to
+			// Testing Library's screen queries.
+			'testing-library/prefer-screen-queries': 'off',
+		},
 	},
 	{
 		plugins: jestPlugin.configs[ 'flat/recommended' ].plugins,

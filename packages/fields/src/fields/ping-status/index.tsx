@@ -1,63 +1,33 @@
-import type { DataFormControlProps, Field } from '@wordpress/dataviews';
+import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-import { CheckboxControl, ExternalLink } from '@wordpress/components';
+import { ExternalLink } from '@wordpress/components';
 import type { BasePost } from '../../types';
-
-function PingStatusEdit( {
-	data,
-	onChange,
-}: DataFormControlProps< BasePost > ) {
-	const pingStatus = data?.ping_status ?? 'open';
-
-	const onTogglePingback = ( checked: boolean ) => {
-		onChange( {
-			...data,
-			ping_status: checked ? 'open' : 'closed',
-		} );
-	};
-
-	return (
-		<CheckboxControl
-			label={ __( 'Enable pingbacks & trackbacks' ) }
-			checked={ pingStatus === 'open' }
-			onChange={ onTogglePingback }
-			help={
-				<ExternalLink
-					href={ __(
-						'https://wordpress.org/documentation/article/trackbacks-and-pingbacks/'
-					) }
-				>
-					{ __( 'Learn more about pingbacks & trackbacks' ) }
-				</ExternalLink>
-			}
-		/>
-	);
-}
 
 const pingStatusField: Field< BasePost > = {
 	id: 'ping_status',
-	label: __( 'Trackbacks & Pingbacks' ),
-	type: 'text',
-	Edit: PingStatusEdit,
+	label: __( 'Enable pingbacks & trackbacks' ),
+	header: __( 'Trackbacks & Pingbacks' ),
+	type: 'boolean',
+	description: (
+		<ExternalLink
+			href={ __(
+				'https://wordpress.org/documentation/article/trackbacks-and-pingbacks/'
+			) }
+		>
+			{ __( 'Learn more about pingbacks & trackbacks' ) }
+		</ExternalLink>
+	),
+	// The REST API stores the setting as `open` / `closed`; the field
+	// exposes it as a boolean so the built-in checkbox control can edit it.
+	getValue: ( { item } ) => ( item.ping_status ?? 'open' ) === 'open',
+	setValue: ( { value } ) => ( {
+		ping_status: value ? 'open' : 'closed',
+	} ),
+	render: ( { item, field } ) =>
+		field.getValue( { item } ) ? __( 'Allow' ) : __( "Don't allow" ),
 	enableSorting: false,
 	enableHiding: false,
 	filterBy: false,
-	elements: [
-		{
-			value: 'open',
-			label: __( 'Allow' ),
-			description: __(
-				'Allow link notifications from other blogs (pingbacks and trackbacks) on new articles.'
-			),
-		},
-		{
-			value: 'closed',
-			label: __( "Don't allow" ),
-			description: __(
-				"Don't allow link notifications from other blogs (pingbacks and trackbacks) on new articles."
-			),
-		},
-	],
 };
 
 /**

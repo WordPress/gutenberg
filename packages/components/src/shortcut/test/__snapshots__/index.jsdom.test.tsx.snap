@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Shortcut renders passed className 1`] = `
+exports[`Shortcut > renders passed className 1`] = `
 <span
   class="my-class"
 >
@@ -8,7 +8,7 @@ exports[`Shortcut renders passed className 1`] = `
 </span>
 `;
 
-exports[`Shortcut renders the shortcut display text when a string is passed as the shortcut 1`] = `
+exports[`Shortcut > renders the shortcut display text when a string is passed as the shortcut 1`] = `
 <span>
   shortcut text
 </span>

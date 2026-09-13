@@ -1,3 +1,5 @@
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import '../../store';
 import { createBlock } from '../factory';
 import {
 	getBlockTypes,
@@ -20,11 +22,6 @@ import {
 const noop = () => {};
 
 describe( 'block helpers', () => {
-	beforeAll( () => {
-		// Initialize the block store.
-		require( '../../store' );
-	} );
-
 	afterEach( () => {
 		setDefaultBlockName( undefined );
 		getBlockTypes().forEach( ( block ) => {
@@ -265,8 +262,8 @@ describe( 'sanitizeBlockAttributes', () => {
 	it( 'throws error if the block is not registered', () => {
 		expect( () => {
 			sanitizeBlockAttributes( 'core/not-registered-test-block', {} );
-		} ).toThrowErrorMatchingInlineSnapshot(
-			`"Block type 'core/not-registered-test-block' is not registered."`
+		} ).toThrow(
+			"Block type 'core/not-registered-test-block' is not registered."
 		);
 	} );
 

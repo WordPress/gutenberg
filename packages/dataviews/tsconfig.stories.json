@@ -29,6 +29,7 @@
 		{ "path": "../date" },
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../hooks" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../kebab-case" },

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "34.2.0",
+	"version": "35.0.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,7 +19,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": "^20.19.0 || >=22.13.0",
+		"node": "^22.22.2 || ^24.15.0 || >=26.0.0",
 		"npm": ">=8.19.2"
 	},
 	"files": [
@@ -50,7 +50,7 @@
 		"adm-zip": "^0.6.0",
 		"babel-jest": "^30.5.0",
 		"babel-loader": "^9.2.1",
-		"browserslist": "^4.28.4",
+		"browserslist": "^4.28.7",
 		"chalk": "^4.1.1",
 		"check-node-version": "^4.1.0",
 		"copy-webpack-plugin": "^10.2.0",
@@ -63,7 +63,7 @@
 		"jest": "^30.5.0",
 		"jest-environment-jsdom": "^30.5.0",
 		"json2php": "^0.0.9",
-		"markdownlint-cli": "^0.31.1",
+		"markdownlint-cli": "^0.49.1",
 		"mini-css-extract-plugin": "^2.9.2",
 		"minimist": "^1.2.0",
 		"npm-package-json-lint": "^6.4.0",
@@ -89,7 +89,7 @@
 	},
 	"devDependencies": {
 		"rimraf": "^5.0.10",
-		"vitest": "^4.1.10"
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
 		"@playwright/test": ">=1",

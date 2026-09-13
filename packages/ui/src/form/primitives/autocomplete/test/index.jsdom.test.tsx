@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -469,6 +470,26 @@ describe( 'Autocomplete', () => {
 				],
 			},
 		];
+
+		it( 'throws outside Autocomplete.Root', () => {
+			expect( () => render( <Autocomplete.Row /> ) ).toThrow(
+				'Autocomplete.Row: Missing parent <Autocomplete.Root grid>. Render <Autocomplete.Row> inside <Autocomplete.Root grid>.'
+			);
+			expect( console ).toHaveErrored();
+		} );
+
+		it( 'throws when Autocomplete.Root does not enable grid mode', () => {
+			expect( () =>
+				render(
+					<Autocomplete.Root items={ GRID_ITEMS }>
+						<Autocomplete.Row />
+					</Autocomplete.Root>
+				)
+			).toThrow(
+				'Autocomplete.Row: Missing parent <Autocomplete.Root grid>. Render <Autocomplete.Row> inside <Autocomplete.Root grid>.'
+			);
+			expect( console ).toHaveErrored();
+		} );
 
 		it( 'forwards ref', async () => {
 			const rowRef = createRef< HTMLDivElement >();

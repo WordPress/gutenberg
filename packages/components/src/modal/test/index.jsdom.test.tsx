@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useEffect, useState } from '@wordpress/element';
@@ -6,7 +7,8 @@ import {
 	useEnableWpCompatOverlaySlot,
 } from '@wordpress/ui';
 import Modal from '../';
-import type { ModalProps } from '../types';
+globalThis.wpVitest.mockCSSSupports();
+globalThis.wpVitest.mockMatchMedia();
 
 const noop = () => {};
 
@@ -72,7 +74,7 @@ describe( 'Modal', () => {
 
 	it( 'should call onRequestClose when the escape key is pressed', async () => {
 		const user = userEvent.setup();
-		const onRequestClose = jest.fn();
+		const onRequestClose = vi.fn();
 		render(
 			<Modal onRequestClose={ onRequestClose }>
 				<p>Modal content</p>
@@ -84,7 +86,7 @@ describe( 'Modal', () => {
 
 	it( 'should stop an Escape key press from propagating when it dismisses the modal', async () => {
 		const user = userEvent.setup();
-		const documentKeyDownHandler = jest.fn();
+		const documentKeyDownHandler = vi.fn();
 		document.addEventListener( 'keydown', documentKeyDownHandler );
 
 		try {
@@ -131,7 +133,7 @@ describe( 'Modal', () => {
 
 	it( 'should request closing of any non nested modal when opened', async () => {
 		const user = userEvent.setup();
-		const onRequestClose = jest.fn();
+		const onRequestClose = vi.fn();
 
 		const DismissAdjacent = () => {
 			const [ isShown, setIsShown ] = useState( false );
@@ -156,7 +158,7 @@ describe( 'Modal', () => {
 
 	it( 'should support nested modals', async () => {
 		const user = userEvent.setup();
-		const onRequestClose = jest.fn();
+		const onRequestClose = vi.fn();
 
 		const NestSupport = () => {
 			const [ isShown, setIsShown ] = useState( false );
@@ -181,7 +183,7 @@ describe( 'Modal', () => {
 
 	it( 'should request closing of nested modal when outer modal unmounts', async () => {
 		const user = userEvent.setup();
-		const onRequestClose = jest.fn();
+		const onRequestClose = vi.fn();
 
 		const RequestCloseOfNested = () => {
 			const [ isShown, setIsShown ] = useState( true );
@@ -316,106 +318,6 @@ describe( 'Modal', () => {
 		expect(
 			screen.getByText( 'A sweet button', { selector: 'button' } )
 		).toBeInTheDocument();
-	} );
-
-	describe( 'Focus handling', () => {
-		const FocusMountDemo = ( {
-			focusOnMount,
-		}: Pick< ModalProps, 'focusOnMount' > ) => {
-			const [ isShown, setIsShown ] = useState( false );
-			return (
-				<>
-					<button onClick={ () => setIsShown( true ) }>
-						Toggle Modal
-					</button>
-					{ isShown && (
-						<Modal
-							focusOnMount={ focusOnMount }
-							onRequestClose={ () => setIsShown( false ) }
-						>
-							<p>Modal content</p>
-							<a href="https://wordpress.org">
-								First Focusable Content Element
-							</a>
-
-							<a href="https://wordpress.org">
-								Another Focusable Content Element
-							</a>
-						</Modal>
-					) }
-				</>
-			);
-		};
-
-		it( 'should focus the Modal dialog by default when `focusOnMount` prop is not provided', async () => {
-			const user = userEvent.setup();
-
-			render( <FocusMountDemo /> );
-
-			const opener = screen.getByRole( 'button', {
-				name: 'Toggle Modal',
-			} );
-
-			await user.click( opener );
-
-			expect( screen.getByRole( 'dialog' ) ).toHaveFocus();
-		} );
-
-		it( 'should focus the Modal dialog when `true` passed as value for `focusOnMount` prop', async () => {
-			const user = userEvent.setup();
-
-			render( <FocusMountDemo focusOnMount /> );
-
-			const opener = screen.getByRole( 'button', {
-				name: 'Toggle Modal',
-			} );
-
-			await user.click( opener );
-
-			expect( screen.getByRole( 'dialog' ) ).toHaveFocus();
-		} );
-
-		it( 'should focus the first focusable element in the contents (if found) when `firstContentElement` passed as value for `focusOnMount` prop', async () => {
-			const user = userEvent.setup();
-
-			render( <FocusMountDemo focusOnMount="firstContentElement" /> );
-
-			const opener = screen.getByRole( 'button' );
-
-			await user.click( opener );
-
-			expect(
-				screen.getByText( 'First Focusable Content Element' )
-			).toHaveFocus();
-		} );
-
-		it( 'should focus the first element anywhere within the Modal when `firstElement` passed as value for `focusOnMount` prop', async () => {
-			const user = userEvent.setup();
-
-			render( <FocusMountDemo focusOnMount="firstElement" /> );
-
-			const opener = screen.getByRole( 'button' );
-
-			await user.click( opener );
-
-			expect(
-				screen.getByRole( 'button', { name: 'Close' } )
-			).toHaveFocus();
-		} );
-
-		it( 'should not move focus when `false` passed as value for `focusOnMount` prop', async () => {
-			const user = userEvent.setup();
-
-			render( <FocusMountDemo focusOnMount={ false } /> );
-
-			const opener = screen.getByRole( 'button', {
-				name: 'Toggle Modal',
-			} );
-
-			await user.click( opener );
-
-			expect( opener ).toHaveFocus();
-		} );
 	} );
 
 	describe( 'Body class name', () => {

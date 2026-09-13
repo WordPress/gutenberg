@@ -7,7 +7,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
 async function navigateToRegion( page, pageUtils, region ) {
-	const regionCount = await page
+	let regionCount = await page
 		.locator( '[role="region"][tabindex="-1"]' )
 		.count();
 
@@ -20,6 +20,13 @@ async function navigateToRegion( page, pageUtils, region ) {
 		) {
 			return;
 		}
+
+		// The site editor can finish rendering additional regions after the
+		// first keyboard interaction. Include any that appeared while cycling.
+		regionCount = Math.max(
+			regionCount,
+			await page.locator( '[role="region"][tabindex="-1"]' ).count()
+		);
 	}
 }
 

@@ -16,7 +16,10 @@ import {
 } from '../utils/keyboard-shortcut';
 import styles from './style.module.css';
 import { MenuItemContentContext } from './context';
-import { ItemDescription } from './item-description';
+import {
+	ITEM_DESCRIPTION_DIRECT_CHILD,
+	ItemDescription,
+} from './item-description';
 import { ItemLabel } from './item-label';
 import type { ItemDescriptionProps, ItemProps } from './types';
 
@@ -87,7 +90,7 @@ function useItemContent(
 	).join( ' ' );
 	let descriptionIndex = 0;
 	// React widens the tuple while mapping; validation preserves the item-child
-	// contract and cloning changes only generated description IDs.
+	// contract and cloning adds only private validation data and generated IDs.
 	const contentChildren = Children.map( children, ( child ) => {
 		if (
 			! isValidElement< ItemDescriptionProps >( child ) ||
@@ -97,9 +100,11 @@ function useItemContent(
 		}
 
 		const descriptionId = resolvedDescriptionIds[ descriptionIndex++ ];
-		return child.props.id === descriptionId
-			? child
-			: cloneElement( child, { id: descriptionId } );
+		const descriptionProps = {
+			id: descriptionId,
+			validationToken: ITEM_DESCRIPTION_DIRECT_CHILD,
+		};
+		return cloneElement( child, descriptionProps );
 	} ) as ItemProps[ 'children' ];
 	const {
 		descriptionId: shortcutDescriptionId,

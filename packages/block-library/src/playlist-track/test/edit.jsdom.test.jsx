@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { useDispatch } from '@wordpress/data';
 import PlaylistTrackEdit from '../edit';
@@ -6,10 +7,10 @@ import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 let mockMediaReplaceFlowProps;
 
-jest.mock( '@wordpress/block-editor', () => {
-	const PlainText = jest.requireActual(
+vi.mock( '@wordpress/block-editor', async () => {
+	const { default: PlainText } = await import(
 		'../../../../block-editor/src/components/plain-text'
-	).default;
+	);
 
 	return {
 		BlockControls: ( { children } ) => <div>{ children }</div>,
@@ -22,16 +23,16 @@ jest.mock( '@wordpress/block-editor', () => {
 			return <button onClick={ () => onSelect( {} ) }>{ name }</button>;
 		},
 		MediaUpload: ( { render: renderMediaUpload } ) =>
-			renderMediaUpload( { open: jest.fn() } ),
+			renderMediaUpload( { open: vi.fn() } ),
 		MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
 		PlainText,
-		useBlockProps: jest.fn( () => ( {} ) ),
+		useBlockProps: vi.fn( () => ( {} ) ),
 	};
 } );
 
-jest.mock( '@wordpress/data', () => {
-	const data = jest.requireActual( '@wordpress/data' );
-	const mockUseDispatch = jest.fn();
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
+	const data = await importOriginal();
+	const mockUseDispatch = vi.fn();
 
 	return new Proxy( data, {
 		get( target, property ) {
@@ -44,12 +45,12 @@ jest.mock( '@wordpress/data', () => {
 	} );
 } );
 
-jest.mock( '@wordpress/notices', () => ( {
+vi.mock( '@wordpress/notices', () => ( {
 	store: 'core/notices',
 } ) );
 
-jest.mock( '../../utils/hooks', () => ( {
-	useUploadMediaFromBlobURL: jest.fn(),
+vi.mock( '../../utils/hooks', () => ( {
+	useUploadMediaFromBlobURL: vi.fn(),
 } ) );
 
 // The handler only forwards the message to a notice, so its text is
@@ -68,9 +69,9 @@ const defaultAttributes = {
 };
 
 function renderEdit( props = {} ) {
-	const setAttributes = jest.fn();
-	const setCurrentTrackClientId = props.setCurrentTrackClientId || jest.fn();
-	const removeTrack = props.removeTrack || jest.fn();
+	const setAttributes = vi.fn();
+	const setCurrentTrackClientId = props.setCurrentTrackClientId || vi.fn();
+	const removeTrack = props.removeTrack || vi.fn();
 
 	render(
 		<PlaylistContext.Provider
@@ -104,7 +105,7 @@ describe( 'PlaylistTrackEdit', () => {
 	beforeEach( () => {
 		mockMediaReplaceFlowProps = undefined;
 		useDispatch.mockReturnValue( {
-			createErrorNotice: jest.fn(),
+			createErrorNotice: vi.fn(),
 		} );
 		useUploadMediaFromBlobURL.mockClear();
 	} );
@@ -231,8 +232,8 @@ describe( 'PlaylistTrackEdit', () => {
 	} );
 
 	it( 'removes the track when its initial upload fails', () => {
-		const createErrorNotice = jest.fn();
-		const removeBlock = jest.fn();
+		const createErrorNotice = vi.fn();
+		const removeBlock = vi.fn();
 		useDispatch.mockReturnValue( { createErrorNotice, removeBlock } );
 
 		const { removeTrack } = renderEdit( {
@@ -260,8 +261,8 @@ describe( 'PlaylistTrackEdit', () => {
 	// `onUploadError` also fires when replacing an existing track's media, so
 	// removing the block unconditionally would discard the original track.
 	it( 'keeps a track that already has a source when an upload fails', () => {
-		const createErrorNotice = jest.fn();
-		const removeBlock = jest.fn();
+		const createErrorNotice = vi.fn();
+		const removeBlock = vi.fn();
 		useDispatch.mockReturnValue( { createErrorNotice, removeBlock } );
 
 		const { setAttributes } = renderEdit( {

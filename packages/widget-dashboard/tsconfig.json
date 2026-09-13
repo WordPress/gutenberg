@@ -2,7 +2,8 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "jest", "style-imports" ]
+		"types": [ "gutenberg-vitest-test-env", "style-imports" ],
+		"checkJs": false
 	},
 	"files": [ "global.d.ts" ],
 	"references": [

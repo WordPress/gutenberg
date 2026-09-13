@@ -257,6 +257,28 @@ export const WithOverflow: Story = {
 	},
 };
 
+const longListItems = Array.from( { length: 30 }, ( _, index ) => ( {
+	value: `item-${ index + 1 }`,
+	label: `Item ${ index + 1 }`,
+} ) );
+
+export const WithLongList: Story = {
+	args: {
+		items: longListItems,
+		defaultValue: longListItems[ 17 ],
+		children: [
+			<Select.Trigger aria-label="Item" key="trigger" />,
+			<Select.Popup key="popup">
+				{ longListItems.map( ( item ) => (
+					<Select.Item key={ item.value } value={ item }>
+						{ item.label }
+					</Select.Item>
+				) ) }
+			</Select.Popup>,
+		],
+	},
+};
+
 export const Disabled: Story = {
 	args: {
 		...Default.args,

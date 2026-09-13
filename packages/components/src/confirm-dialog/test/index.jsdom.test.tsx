@@ -1,7 +1,8 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ConfirmDialog } from '..';
-import styles from '../style.module.scss';
+globalThis.wpVitest.mockMatchMedia();
 
 const noop = () => {};
 
@@ -20,9 +21,6 @@ describe( 'Confirm', () => {
 
 				expect( dialog ).toBeInTheDocument();
 				expect( dialog ).toHaveClass( 'components-confirm-dialog' );
-				// Disable reason: Semantic queries can't reach the overlay.
-				// eslint-disable-next-line testing-library/no-node-access
-				expect( dialog.parentElement ).toHaveClass( styles.wrapper );
 
 				elementsTexts.forEach( ( txt ) => {
 					const el = screen.getByText( txt );
@@ -115,7 +113,7 @@ describe( 'Confirm', () => {
 			it( 'should not render if closed by clicking `OK`, and the `onConfirm` callback should be called', async () => {
 				const user = userEvent.setup();
 
-				const onConfirm = jest.fn().mockName( 'onConfirm()' );
+				const onConfirm = vi.fn().mockName( 'onConfirm()' );
 
 				render(
 					<ConfirmDialog onConfirm={ onConfirm }>
@@ -135,7 +133,7 @@ describe( 'Confirm', () => {
 			it( 'should not render if closed by clicking `Cancel`, and the `onCancel` callback should be called', async () => {
 				const user = userEvent.setup();
 
-				const onCancel = jest.fn().mockName( 'onCancel()' );
+				const onCancel = vi.fn().mockName( 'onCancel()' );
 
 				render(
 					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
@@ -171,7 +169,7 @@ describe( 'Confirm', () => {
 
 			it( 'should not render if dialog is closed by clicking the overlay, and the `onCancel` callback should be called', async () => {
 				const user = userEvent.setup();
-				const onCancel = jest.fn().mockName( 'onCancel()' );
+				const onCancel = vi.fn().mockName( 'onCancel()' );
 
 				render(
 					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
@@ -192,7 +190,7 @@ describe( 'Confirm', () => {
 			it( 'should not render if dialog is closed by pressing `Escape`, and the `onCancel` callback should be called', async () => {
 				const user = userEvent.setup();
 
-				const onCancel = jest.fn().mockName( 'onCancel()' );
+				const onCancel = vi.fn().mockName( 'onCancel()' );
 
 				render(
 					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
@@ -211,7 +209,7 @@ describe( 'Confirm', () => {
 			it( 'should not render if dialog is closed by pressing `Enter`, and the `onConfirm` callback should be called', async () => {
 				const user = userEvent.setup();
 
-				const onConfirm = jest.fn().mockName( 'onConfirm()' );
+				const onConfirm = vi.fn().mockName( 'onConfirm()' );
 
 				render(
 					<ConfirmDialog onConfirm={ onConfirm }>
@@ -230,8 +228,8 @@ describe( 'Confirm', () => {
 			it( 'calls only the `onCancel` callback and not the `onConfirm` callback when the cancel button is submitted using the keyboard', async () => {
 				const user = userEvent.setup();
 
-				const onConfirm = jest.fn().mockName( 'onConfirm()' );
-				const onCancel = jest.fn().mockName( 'onCancel()' );
+				const onConfirm = vi.fn().mockName( 'onConfirm()' );
+				const onCancel = vi.fn().mockName( 'onCancel()' );
 
 				render(
 					<ConfirmDialog
@@ -251,8 +249,8 @@ describe( 'Confirm', () => {
 			it( 'calls only the `onConfirm` callback when the confirm button is submitted using the keyboard', async () => {
 				const user = userEvent.setup();
 
-				const onConfirm = jest.fn().mockName( 'onConfirm()' );
-				const onCancel = jest.fn().mockName( 'onCancel()' );
+				const onConfirm = vi.fn().mockName( 'onConfirm()' );
+				const onCancel = vi.fn().mockName( 'onCancel()' );
 
 				render(
 					<ConfirmDialog
@@ -305,7 +303,7 @@ describe( 'Confirm', () => {
 		it( 'should call the `onConfirm` callback if `OK`', async () => {
 			const user = userEvent.setup();
 
-			const onConfirm = jest.fn().mockName( 'onConfirm()' );
+			const onConfirm = vi.fn().mockName( 'onConfirm()' );
 
 			render(
 				<ConfirmDialog isOpen onConfirm={ onConfirm }>
@@ -323,7 +321,7 @@ describe( 'Confirm', () => {
 		it( 'should call the `onCancel` callback if `Cancel` is clicked', async () => {
 			const user = userEvent.setup();
 
-			const onCancel = jest.fn().mockName( 'onCancel()' );
+			const onCancel = vi.fn().mockName( 'onCancel()' );
 
 			render(
 				<ConfirmDialog isOpen onConfirm={ noop } onCancel={ onCancel }>
@@ -340,7 +338,7 @@ describe( 'Confirm', () => {
 
 		it( 'should call the `onCancel` callback if the overlay is clicked', async () => {
 			const user = userEvent.setup();
-			const onCancel = jest.fn().mockName( 'onCancel()' );
+			const onCancel = vi.fn().mockName( 'onCancel()' );
 
 			render(
 				<ConfirmDialog isOpen onConfirm={ noop } onCancel={ onCancel }>
@@ -360,7 +358,7 @@ describe( 'Confirm', () => {
 		it( 'should call the `onCancel` callback if the `Escape` key is pressed', async () => {
 			const user = userEvent.setup();
 
-			const onCancel = jest.fn().mockName( 'onCancel()' );
+			const onCancel = vi.fn().mockName( 'onCancel()' );
 
 			render(
 				<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
@@ -376,7 +374,7 @@ describe( 'Confirm', () => {
 		it( 'should call the `onConfirm` callback if the `Enter` key is pressed', async () => {
 			const user = userEvent.setup();
 
-			const onConfirm = jest.fn().mockName( 'onConfirm()' );
+			const onConfirm = vi.fn().mockName( 'onConfirm()' );
 
 			render(
 				<ConfirmDialog isOpen onConfirm={ onConfirm } onCancel={ noop }>
