@@ -46,9 +46,15 @@
 		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
+		"@types/react": "^18 || ^19",
 		"react": "^18 || ^19"
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	}
 }
