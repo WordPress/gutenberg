@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
+import { userEvent } from 'vitest/browser';
+import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import { DuotonePicker } from '..';
 import type { DuotonePickerProps } from '../types';
@@ -25,7 +26,7 @@ describe( 'DuotonePicker', () => {
 	it( 'should use matching values only for display in command button presentation', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
-		render(
+		await render(
 			<DuotonePicker
 				aria-label="Duotones"
 				duotonePalette={ DUPLICATE_DUOTONES }
@@ -58,8 +59,8 @@ describe( 'DuotonePicker', () => {
 		);
 	} );
 
-	it( 'should warn for asButtons and prefer an explicit presentation', () => {
-		render(
+	it( 'should warn for asButtons and prefer an explicit presentation', async () => {
+		await render(
 			<DuotonePicker
 				aria-label="Duotones"
 				duotonePalette={ DUPLICATE_DUOTONES }
@@ -82,8 +83,8 @@ describe( 'DuotonePicker', () => {
 		);
 	} );
 
-	it( 'should preserve asButtons as a toggle-button alias', () => {
-		render(
+	it( 'should preserve asButtons as a toggle-button alias', async () => {
+		await render(
 			<DuotonePicker
 				aria-label="Duotones"
 				duotonePalette={ DUPLICATE_DUOTONES }
@@ -114,8 +115,8 @@ describe( 'DuotonePicker', () => {
 	} );
 
 	describe( 'duplicate duotones in palette', () => {
-		it( 'should render all swatches even when two entries share the same colors', () => {
-			render(
+		it( 'should render all swatches even when two entries share the same colors', async () => {
+			await render(
 				<DuotonePicker
 					aria-label="Duotone"
 					duotonePalette={ DUPLICATE_DUOTONES }
@@ -130,8 +131,8 @@ describe( 'DuotonePicker', () => {
 			expect( screen.getAllByRole( 'option' ) ).toHaveLength( 3 );
 		} );
 
-		it( 'should select by slug when selectedSlug is provided, marking only the matching entry', () => {
-			render(
+		it( 'should select by slug when selectedSlug is provided, marking only the matching entry', async () => {
+			await render(
 				<DuotonePicker
 					aria-label="Duotone"
 					duotonePalette={ DUPLICATE_DUOTONES }
@@ -151,8 +152,8 @@ describe( 'DuotonePicker', () => {
 			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 
-		it( 'should fall back to value selection and mark all matching duplicates when no selectedSlug is provided', () => {
-			render(
+		it( 'should fall back to value selection and mark all matching duplicates when no selectedSlug is provided', async () => {
+			await render(
 				<DuotonePicker
 					aria-label="Duotone"
 					duotonePalette={ DUPLICATE_DUOTONES }
@@ -170,8 +171,8 @@ describe( 'DuotonePicker', () => {
 			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 
-		it( 'should treat an empty-string selectedSlug as no slug and fall back to value selection', () => {
-			render(
+		it( 'should treat an empty-string selectedSlug as no slug and fall back to value selection', async () => {
+			await render(
 				<DuotonePicker
 					aria-label="Duotone"
 					duotonePalette={ DUPLICATE_DUOTONES }
@@ -194,7 +195,7 @@ describe( 'DuotonePicker', () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 
-			render(
+			await render(
 				<DuotonePicker
 					aria-label="Duotone"
 					duotonePalette={ DUPLICATE_DUOTONES }
@@ -218,7 +219,7 @@ describe( 'DuotonePicker', () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 
-			render(
+			await render(
 				<DuotonePicker
 					aria-label="Duotone"
 					duotonePalette={ DUPLICATE_DUOTONES }
@@ -278,7 +279,9 @@ describe( 'DuotonePicker', () => {
 
 		it( 'should clear both the value and the selected state when the selected preset is clicked again', async () => {
 			const user = userEvent.setup();
-			render( <Controlled duotonePalette={ DUPLICATE_DUOTONES } /> );
+			await render(
+				<Controlled duotonePalette={ DUPLICATE_DUOTONES } />
+			);
 
 			const option = () =>
 				screen.getByRole( 'option', { name: 'Duotone: Dark Text' } );
@@ -299,7 +302,9 @@ describe( 'DuotonePicker', () => {
 
 		it( 'should move the selection when a different preset is clicked', async () => {
 			const user = userEvent.setup();
-			render( <Controlled duotonePalette={ DUPLICATE_DUOTONES } /> );
+			await render(
+				<Controlled duotonePalette={ DUPLICATE_DUOTONES } />
+			);
 
 			await user.click(
 				screen.getByRole( 'option', { name: 'Duotone: Dark Text' } )
@@ -322,8 +327,8 @@ describe( 'DuotonePicker', () => {
 	} );
 
 	describe( 'distinct duotones', () => {
-		it( 'should mark the preset matching value as selected', () => {
-			render(
+		it( 'should mark the preset matching value as selected', async () => {
+			await render(
 				<DuotonePicker
 					aria-label="Duotone"
 					duotonePalette={ [
