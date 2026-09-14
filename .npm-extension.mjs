@@ -10,7 +10,7 @@
  * `major` limits each repair to the release line that needs it.
  */
 const PEER_RANGES = {
-	// https://github.com/storybookjs/storybook/issues/36082
+	// https://github.com/storybookjs/storybook/pull/36221
 	'@storybook/addon-vitest': {
 		major: 10,
 		peerDependencies: {
