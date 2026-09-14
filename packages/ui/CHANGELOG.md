@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `Combobox.Root`: `filteredItems` now uses the selected value type instead of `any`. Consumers that pass object items with primitive selected values must use matching item and value types. ([#82835](https://github.com/WordPress/gutenberg/pull/82835))
 -   `Select.Item`, `SelectControl.Item`: Children must start with `ItemLabel`, followed by zero or more `ItemDescription` components. Pass `ItemLabel` instead of a string. For `SelectControl` `items`, set `label` and optional `description` on each item. ([#82369](https://github.com/WordPress/gutenberg/pull/82369))
 
 ### New Features
