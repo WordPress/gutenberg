@@ -116,6 +116,8 @@ const GridVisualizerGrid = forwardRef(
 						/>
 					) : (
 						<AutoGridVisualizer
+							gridClientId={ gridClientId }
+							gridElement={ gridElement }
 							gridInfo={ gridInfo }
 							childGridRect={ childGridRect }
 						/>
@@ -126,23 +128,115 @@ const GridVisualizerGrid = forwardRef(
 	}
 );
 
-function AutoGridVisualizer( { gridInfo, childGridRect } ) {
+function AutoGridVisualizer( {
+	gridClientId,
+	gridElement,
+	gridInfo,
+	childGridRect,
+} ) {
+	const blockOrder = useSelect(
+		( select ) => {
+			const { getBlockOrder } = unlock( select( blockEditorStore ) );
+			return getBlockOrder( gridClientId );
+		},
+		[ gridClientId ]
+	);
+
+	const occupiedRects = useMemo( () => {
+		if ( ! gridElement ) {
+			return [];
+		}
+		const rects = [];
+		for ( const child of gridElement.children ) {
+			if (
+				child.classList?.contains( 'wp-block' ) &&
+				! child.classList?.contains( 'block-list-appender' )
+			) {
+				const rect = getGridItemRect( child );
+				if ( rect ) {
+					rects.push( rect );
+				}
+			}
+		}
+		return rects;
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ gridElement, gridInfo, blockOrder ] );
+
 	return range( 1, gridInfo.numRows ).map( ( row ) =>
 		range( 1, gridInfo.numColumns ).map( ( column ) => {
 			// Don't render visualizer cells for a selected child block
 			// that is itself a grid, so that only the child's grid
 			// visualizer is visible.
+			const isChildGridCell = childGridRect?.contains( column, row );
 			let color = gridInfo.currentColor;
-			if ( childGridRect?.contains( column, row ) ) {
+			if ( isChildGridCell ) {
 				color = 'transparent';
 			}
+			const isCellOccupied = occupiedRects.some( ( rect ) =>
+				rect.contains( column, row )
+			);
+
 			return (
 				<GridVisualizerCell
 					key={ `${ row }-${ column }` }
 					color={ color }
-				/>
+				>
+					{ ! isCellOccupied && ! isChildGridCell && (
+						<AutoGridVisualizerAppender
+							column={ column }
+							row={ row }
+							gridClientId={ gridClientId }
+							gridInfo={ gridInfo }
+						/>
+					) }
+				</GridVisualizerCell>
 			);
 		} )
+	);
+}
+
+function AutoGridVisualizerAppender( { column, row, gridClientId, gridInfo } ) {
+	const {
+		updateBlockAttributes,
+		moveBlocksToPosition,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
+
+	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
+		gridClientId,
+		gridInfo.numColumns
+	);
+
+	return (
+		<ButtonBlockAppender
+			rootClientId={ gridClientId }
+			className="block-editor-grid-visualizer__appender"
+			style={ {
+				color: gridInfo.currentColor,
+			} }
+			onSelect={ ( block ) => {
+				if ( ! block ) {
+					return;
+				}
+				updateBlockAttributes( block.clientId, {
+					style: {
+						...block.attributes?.style,
+						layout: {
+							...block.attributes?.style?.layout,
+							columnStart: column,
+							rowStart: row,
+						},
+					},
+				} );
+				__unstableMarkNextChangeAsNotPersistent();
+				moveBlocksToPosition(
+					[ block.clientId ],
+					gridClientId,
+					gridClientId,
+					getNumberOfBlocksBeforeCell( column, row )
+				);
+			} }
+		/>
 	);
 }
 

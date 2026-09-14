@@ -156,8 +156,10 @@ export function getChildLayoutStyleRules( {
 		 * container query is needed for the span to resize.
 		 */
 		if (
-			( columnSpan || columnStart ) &&
-			( minimumColumnWidth || ! columnCount )
+			( columnSpan && columnSpan > 1 ) ||
+			( ( columnSpan || columnStart ) &&
+				! columnCount &&
+				minimumColumnWidth )
 		) {
 			let parentColumnValue = parseFloat( minimumColumnWidth );
 			/**
