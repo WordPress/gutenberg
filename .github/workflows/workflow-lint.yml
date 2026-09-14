@@ -15,12 +15,6 @@ on:
             - 'packages/**/action.yml'
             - 'tools/**/action.yml'
     pull_request:
-        branches:
-            - trunk
-            - 'release/[0-9]+.[0-9]'
-            - 'wp/[0-9]+.[0-9]'
-            - wp/latest
-            - wp/next
         paths:
             # Only run when changes are made to workflow files.
             - '.github/workflows/**'
