@@ -15,6 +15,10 @@
 -   `CircularOptionPicker`: Updated to show outline via design system's mixin for focus ring instead of previous border implementation ([#82521](https://github.com/WordPress/gutenberg/pull/82521)).
 -   `Autocomplete`: Show focus ring with the design system's outline instead of previous box-shadow implementation ([#82766](https://github.com/WordPress/gutenberg/pull/82766)).
 
+### Bug Fixes
+
+-   `PaletteEdit`: Separate adjacent header action buttons so their focus rings do not overlap ([#82768](https://github.com/WordPress/gutenberg/pull/82768)).
+
 ### Internal
 
 -   `Notice`: Remove dismiss button style overrides that now duplicate `Button` defaults, and drop an unused Sass import ([#82640](https://github.com/WordPress/gutenberg/pull/82640)).

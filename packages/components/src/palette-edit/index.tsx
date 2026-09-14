@@ -12,7 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
 import { useDebounce, useInstanceId } from '@wordpress/compose';
 import { kebabCase } from '@wordpress/kebab-case';
-import { Menu, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
+import { Menu, Stack, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import Button from '../button';
 import { ColorPicker } from '../color-picker';
 import { FlexBlock, FlexItem } from '../flex';
@@ -30,7 +30,6 @@ import {
 } from '../duotone-picker/utils';
 import Popover from '../popover';
 import {
-	PaletteActionsContainer,
 	PaletteEditStyles,
 	PaletteHeading,
 	IndicatorStyled,
@@ -697,7 +696,7 @@ export function PaletteEdit( {
 				>
 					{ paletteLabel }
 				</PaletteHeading>
-				<PaletteActionsContainer>
+				<Stack direction="row" gap="xs">
 					{ hasElements && isEditing && (
 						<DoneButton
 							size="small"
@@ -819,7 +818,7 @@ export function PaletteEdit( {
 								</Menu.Popup>
 							</Menu.Root>
 						) }
-				</PaletteActionsContainer>
+				</Stack>
 			</HStack>
 			{ hasElements && (
 				<PaletteEditContents>
