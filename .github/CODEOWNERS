@@ -25,6 +25,7 @@
 /packages/interactivity                         @luisherranz @darerodz
 
 # Tooling
+/.npm-extension.mjs                             @manzoorwanijk
 /.npmrc                                         @manzoorwanijk
 /package.json                                   @manzoorwanijk
 /bin                                            @manzoorwanijk
