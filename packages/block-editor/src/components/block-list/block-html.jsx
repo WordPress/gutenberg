@@ -5,10 +5,14 @@ import {
 	getBlockContent,
 	getBlockType,
 	getSaveContent,
+	privateApis as blocksPrivateApis,
 	validateBlock,
 } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { useNativeUndo } from '../../utils/native-undo';
+
+const { applyBuiltInValidationFixes } = unlock( blocksPrivateApis );
 
 function BlockHTML( { clientId } ) {
 	const [ html, setHtml ] = useState( '' );
@@ -43,16 +47,28 @@ function BlockHTML( { clientId } ) {
 
 		// If html is empty  we reset the block to the default HTML and mark it as valid to avoid triggering an error
 		const content = html ? html : getSaveContent( blockType, attributes );
-		const [ isValid ] = html
-			? validateBlock( {
-					...block,
-					attributes,
-					originalContent: content,
-			  } )
-			: [ true ];
+
+		let updatedAttributes = attributes;
+		let isValid = true;
+
+		if ( html ) {
+			/*
+			 * `getBlockAttributes` only sources what the block's save output
+			 * declares, so global attributes typed by hand here — `id`,
+			 * `class`, `aria-label` — never reach the block. The parser
+			 * recovers them with these same fixes; without them a hand-added
+			 * anchor fails validation and the block drops into recovery.
+			 */
+			const fixedBlock = applyBuiltInValidationFixes(
+				{ ...block, attributes, originalContent: content },
+				blockType
+			);
+			updatedAttributes = fixedBlock.attributes;
+			[ isValid ] = validateBlock( fixedBlock );
+		}
 
 		updateBlock( clientId, {
-			attributes,
+			attributes: updatedAttributes,
 			originalContent: content,
 			isValid,
 		} );
