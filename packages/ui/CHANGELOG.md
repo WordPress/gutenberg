@@ -12,7 +12,7 @@
 
 ### Enhancements
 
--   `SearchableChipSelect`, `SearchableChipSelectControl`, `Combobox.ChipWithRemove`: When items are selected, the chips toolbar is labelled, each chip describes Backspace or Delete removal, and the search input includes the selected count and how to move to those chips. A Field or consumer description stays in place.
+-   `SearchableChipSelect`, `SearchableChipSelectControl`, `Combobox.ChipWithRemove`: When items are selected, the chips toolbar is labelled, each chip describes Backspace or Delete removal, and the search input includes the selected count and how to move to those chips. A Field or consumer description stays in place. ([#82863](https://github.com/WordPress/gutenberg/pull/82863))
 -   `Select`, `SelectControl`: Add `ItemLabel` and `ItemDescription` subcomponents. Multiple descriptions contribute to `aria-describedby` in DOM order. `SelectControl` `items` may include an optional `description` string. ([#82369](https://github.com/WordPress/gutenberg/pull/82369))
 -   `Select`, `SelectControl`: Align the selected item with the trigger by default, and drop the popup max-height cap when that alignment is enabled ([#82043](https://github.com/WordPress/gutenberg/pull/82043)).
 -   `Checkbox`: Enlarge the hit target to 24px without changing the visual size. ([#82597](https://github.com/WordPress/gutenberg/pull/82597))
