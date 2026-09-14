@@ -160,7 +160,7 @@
 		"other:cherry-pick": "npm run --workspace @wordpress/release-tools cherry-pick --",
 		"other:generate-php-sync-issue": "npm run --workspace @wordpress/release-tools generate-php-sync-issue --",
 		"other:update-packages:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer update --no-interaction",
-		"postinstall": "npm run --workspace @wordpress/monorepo-tools apply-patches && npm run agents:setup -- --if-safe",
+		"postinstall": "npm run agents:setup -- --if-safe",
 		"prepare": "husky install",
 		"prepublishOnly": "npm run build",
 		"rtc:http": "node ./test/e2e/bin/rtc-dev.mjs --mode=http",
@@ -234,5 +234,8 @@
 		"leveldown@5.6.0": true,
 		"nx": false,
 		"unrs-resolver": false
+	},
+	"patchedDependencies": {
+		"@arraypress/waveform-player@1.26.0": "patches/@arraypress/waveform-player@1.26.0.patch"
 	}
 }
