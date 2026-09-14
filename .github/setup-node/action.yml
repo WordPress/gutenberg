@@ -16,12 +16,8 @@ runs:
           with:
               node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
-              package-manager-cache: ${{ inputs.enable-caching == 'true' && 'true' || 'false' }}
-              # Caching for npm dependencies is automatically enabled when package.json contains devEngines.packageManager field set to npm.
-              cache-dependency-path: |
-                  package-lock.json
-                  patches/**
               check-latest: true
+              package-manager-cache: false
 
         - name: Set up npm
           uses: ./.github/setup-npm
@@ -40,12 +36,14 @@ runs:
           with:
               # List workspace node_modules explicitly to support all kinds of layouts - hoisted and isolated.
               # A '**/node_modules' glob follows the isolated layout's symlinks and stalls the cache step.
+              # The eval package is not a workspace: it installs its own large tree from its own lockfile.
               path: |
                   node_modules
                   packages/*/node_modules
                   routes/*/node_modules
                   storybook/node_modules
                   test/*/node_modules
+                  !test/ai-development/node_modules
                   tools/*/node_modules
                   widgets/*/node_modules
               key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-npm-${{ steps.node-version.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}

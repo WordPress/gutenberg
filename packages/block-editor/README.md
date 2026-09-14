@@ -843,7 +843,7 @@ _Parameters_
 -   _props_ `Object`: Component props.
 -   _props.value_ `string`: String value of the textarea.
 -   _props.onChange_ `Function`: Function called when the text value changes.
--   _props.ref_ `[Object]`: The component forwards the `ref` property to the `TextareaAutosize` component.
+-   _props.ref_ `[Object]`: The component forwards the `ref` property to the `textarea` element.
 
 _Returns_
 

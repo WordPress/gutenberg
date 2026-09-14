@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.0.0 (2026-09-10)
+
 ### Breaking Changes
 
 -   Increase the minimum required Node.js version to 24.18.0 and convert the package to ES modules. It can no longer be loaded with `require()` ([#82663](https://github.com/WordPress/gutenberg/pull/82663)).

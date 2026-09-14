@@ -21,5 +21,14 @@
 			"openInNewTab": true
 		}
 	],
+	"attributes": [
+		{
+			"id": "location",
+			"type": "location",
+			"label": "Event location",
+			"description": "City or region for nearby events.",
+			"relevance": "high"
+		}
+	],
 	"textdomain": "default"
 }

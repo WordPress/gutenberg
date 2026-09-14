@@ -322,7 +322,13 @@ It's important to check that:
 -   the ZIP contents (see [Downloads](https://plugins.trac.wordpress.org/browser/gutenberg/)) looks correct (doesn't have anything obvious missing)
 -   the [Gutenberg SVN repo](https://plugins.trac.wordpress.org/browser/gutenberg/) has the expected `trunk` contents and a matching `tags/X.Y.Z` folder (see [the log](https://plugins.trac.wordpress.org/browser/gutenberg/))
 
-The current WordPress.org upload workflow replaces SVN `trunk`, copies that local `trunk` checkout to `tags/$VERSION`, then commits `trunk` and `tags/$VERSION` together. Before rerunning the workflow or any mutating SVN command, inspect the existing SVN state and avoid creating a second tag for the same version.
+The WordPress.org upload workflow replaces SVN `trunk`, copies that local `trunk` checkout to `tags/$VERSION`, then commits `trunk` and `tags/$VERSION` together. Releases for older versions only import `tags/$VERSION`.
+
+After publication, the workflow exports the expected SVN paths at one revision and compares every file with the prepared release, including the updated stable tag and changelog. It retries verification for up to 15 minutes to allow changes to become readable. A failed commit response is treated as success only when this comparison succeeds. The workflow also verifies existing tags before accepting them, without overwriting them or repeating an uncertain write.
+
+A successful verification reports the SVN revision in the logs and job summary. It confirms SVN contents, not whether WordPress.org has finished generating or distributing the plugin ZIP. If verification fails, use the logged SVN or file differences to investigate. Matching version headers alone are not proof of a complete deployment. A later rerun can also fail verification if its prepared changelog differs from the published one.
+
+Before rerunning the workflow or any mutating SVN command, inspect the existing SVN state and avoid creating a second tag for the same version.
 
 Either substitute `SVN_USERNAME`, `SVN_PASSWORD`, and `VERSION` for the proper values or set them as global environment variables first:
 
