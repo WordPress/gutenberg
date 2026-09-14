@@ -1,19 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { downloadBlob } from '@wordpress/blob';
 import { dispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import {
 	scopeSlug,
 	blockSlug,
 	saveGuidelineRow,
 	deleteGuidelineRow,
+	BLOCKS_SCOPE,
 } from './data';
 import type {
 	Scope,
@@ -61,6 +55,11 @@ export function exportGuidelines(
 	const categories: Record< string, unknown > = {};
 
 	for ( const scope of scopes ) {
+		// The Blocks scope has no single row; its `blocks` entry is the
+		// per-block map written below.
+		if ( scope.slug === BLOCKS_SCOPE ) {
+			continue;
+		}
 		categories[ scope.slug ] = {
 			guidelines: bySlug[ scopeSlug( scope.slug ) ]?.content ?? '',
 		};
@@ -124,8 +123,12 @@ export async function importGuidelines(
 
 	const categories = parsed.guideline_categories;
 
-	// Registry scopes: set or clear each one.
+	// Registry scopes: set or clear each one. The Blocks scope has no single
+	// row; its per-block guidelines are handled below.
 	for ( const scope of scopes ) {
+		if ( scope.slug === BLOCKS_SCOPE ) {
+			continue;
+		}
 		const slug = scopeSlug( scope.slug );
 		const value = readGuidelines( categories[ scope.slug ] );
 		const existingId = bySlug[ slug ]?.id;

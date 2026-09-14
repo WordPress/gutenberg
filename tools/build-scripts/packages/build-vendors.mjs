@@ -2,6 +2,7 @@
 
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import esbuild from 'esbuild';
 import {
@@ -29,40 +30,58 @@ const patchReactDOM = createPatcher(
 	patchInertAttribute
 );
 
+const requireFromWorkspace = createRequire(
+	path.join( WORKSPACE_DIR, 'package.json' )
+);
+
+/**
+ * Read the React version a vendor package resolves to.
+ *
+ * @param {string} pkg Vendor package name, e.g. `@wordpress/react-18`.
+ * @return {Promise<string>} The installed `react` version, e.g. `18.3.1`.
+ */
+async function getReactVersion( pkg ) {
+	const requireFromVendor = createRequire(
+		requireFromWorkspace.resolve( `${ pkg }/package.json` )
+	);
+	const manifest = await readFile(
+		requireFromVendor.resolve( 'react/package.json' ),
+		'utf-8'
+	);
+	return JSON.parse( manifest ).version;
+}
+
+const REACT_18_VERSION = await getReactVersion( '@wordpress/react-18' );
+const REACT_19_VERSION = await getReactVersion( '@wordpress/react-19' );
+
 const VENDOR_SCRIPTS = [
 	{
-		name: 'react',
+		name: '@wordpress/react-18/react',
 		global: 'React',
 		handle: 'react',
 		dependencies: [ 'wp-polyfill' ],
-		version: '18.3.1',
+		version: REACT_18_VERSION,
 	},
 	{
-		name: 'react-dom',
+		name: '@wordpress/react-18/react-dom',
 		global: 'ReactDOM',
 		handle: 'react-dom',
 		dependencies: [ 'react' ],
-		contents: [
-			'module.exports = {',
-			'  ...require("react-dom"),',
-			'  ...require("react-dom/client"),',
-			'};',
-		].join( '\n' ),
-		version: '18.3.1',
+		version: REACT_18_VERSION,
 	},
 	{
-		name: 'react/jsx-runtime',
+		name: '@wordpress/react-18/react-jsx-runtime',
 		global: 'ReactJSXRuntime',
 		handle: 'react-jsx-runtime',
 		dependencies: [ 'react' ],
-		version: '18.3.1',
+		version: REACT_18_VERSION,
 	},
 	{
 		name: '@wordpress/react-19/react',
 		global: 'React',
 		handle: 'react-19',
 		dependencies: [ 'wp-polyfill' ],
-		version: '19.2.7',
+		version: REACT_19_VERSION,
 		patch: patchReact,
 	},
 	{
@@ -70,7 +89,7 @@ const VENDOR_SCRIPTS = [
 		global: 'ReactDOM',
 		handle: 'react-dom-19',
 		dependencies: [ 'react' ],
-		version: '19.2.7',
+		version: REACT_19_VERSION,
 		patch: patchReactDOM,
 	},
 	{
@@ -78,7 +97,7 @@ const VENDOR_SCRIPTS = [
 		global: 'ReactJSXRuntime',
 		handle: 'react-jsx-runtime-19',
 		dependencies: [ 'react' ],
-		version: '19.2.7',
+		version: REACT_19_VERSION,
 	},
 ];
 
@@ -88,7 +107,7 @@ const VENDOR_SCRIPTS = [
  * @param {Object}   config              Vendor script configuration.
  * @param {string}   config.handle       WordPress script handle.
  * @param {string[]} config.dependencies WordPress script dependencies.
- * @param {string}   config.version      Package version (`18` or `19`).
+ * @param {string}   config.version      Bundled React version (e.g. `18.3.1`).
  */
 async function generateAssetFile( config ) {
 	const { handle, version, dependencies } = config;
@@ -128,7 +147,7 @@ async function patchVendorOutput( fileName, patch ) {
  * This is used to build packages like React that don't ship UMD builds.
  *
  * @param {Object}   config              Vendor script configuration.
- * @param {string}   config.name         Package name (e.g., 'react', 'react-dom', 'react/jsx-runtime').
+ * @param {string}   config.name         Entry point name (e.g., '@wordpress/react-18/react').
  * @param {string}   config.global       Global variable name (e.g., 'React', 'ReactDOM').
  * @param {string}   config.handle       WordPress script handle (e.g., 'react', 'react-dom').
  * @param {string[]} config.dependencies WordPress script dependencies.
@@ -136,7 +155,7 @@ async function patchVendorOutput( fileName, patch ) {
  * @return {Promise<void>} Promise that resolves when all builds are finished.
  */
 async function bundleVendorScript( config ) {
-	const { name, global, handle, contents, dependencies } = config;
+	const { name, global, handle, dependencies } = config;
 
 	// Plugin that externalizes the `react` package.
 	const reactExternalPlugin = {
@@ -168,22 +187,13 @@ async function bundleVendorScript( config ) {
 		globalName: global,
 		target: 'esnext',
 		platform: 'browser',
+		entryPoints: [ name ],
 		// Resolve imports from this workspace's dependencies.
 		absWorkingDir: WORKSPACE_DIR,
 		plugins: dependencies?.includes( 'react' )
 			? [ reactExternalPlugin ]
 			: [],
 	};
-
-	if ( contents ) {
-		esbuildOptions.stdin = {
-			contents,
-			resolveDir: WORKSPACE_DIR,
-			loader: 'js',
-		};
-	} else {
-		esbuildOptions.entryPoints = [ name ];
-	}
 
 	await Promise.all( [
 		esbuild.build( {

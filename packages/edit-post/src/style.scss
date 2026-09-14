@@ -1,7 +1,6 @@
 @use "@wordpress/base-styles/default-custom-properties";
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "./components/back-button/style.scss" as *;
 @use "./components/layout/style.scss" as *;
 @use "./components/meta-boxes/meta-boxes-area/style.scss" as *;
 @use "./components/welcome-guide/style.scss" as *;
@@ -11,12 +10,16 @@ body.js.block-editor-page {
 
 	&.is-fullscreen-mode {
 		@include break-medium {
+			// Relayed through a custom property to keep `body` the subject of
+			// its own `:has()`. With `body:has(…) #wpadminbar`, every DOM change
+			// in the editor recalculates the whole document.
 			&:has(.editor-editor-interface.is-distraction-free) {
 				--wp-admin--admin-bar--height: 0px;
+				--wp-editor-admin-bar-display: none;
+			}
 
-				#wpadminbar {
-					display: none;
-				}
+			#wpadminbar {
+				display: var(--wp-editor-admin-bar-display, block);
 			}
 		}
 	}
@@ -30,7 +33,7 @@ body.js.block-editor-page {
 	}
 }
 
-.edit-post-visual-editor.is-iframed {
+.edit-post-visual-editor {
 	@include reset;
 }
 

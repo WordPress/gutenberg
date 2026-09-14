@@ -6,7 +6,7 @@ For consumer-facing usage, start with the [`@wordpress/theme` package README](ht
 
 ## Structure
 
-The design system follows the [Design Tokens Community Group (DTCG)](https://design-tokens.github.io/community-group/format/) specification and organizes tokens into distinct types based on what kind of visual property they represent. Token definitions are stored as JSON files in the `/tokens` directory:
+The design system follows the [Design Tokens Format Module](https://www.designtokens.org/tr/2025.10/format/) report from the Design Tokens Community Group (DTCG) and organizes tokens into distinct types based on what kind of visual property they represent. Token definitions are stored as JSON files in the `/tokens` directory:
 
 | File              | Description                                                                                                                      |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
@@ -14,10 +14,10 @@ The design system follows the [Design Tokens Community Group (DTCG)](https://des
 | `dimension.json`  | Spacing scale and semantic spacing tokens for padding, margins, and sizing                                                       |
 | `typography.json` | Font family stacks, font sizes, and line heights                                                                                 |
 | `border.json`     | Border radius and width values                                                                                                   |
-| `elevation.json`  | Shadow definitions for creating depth and layering                                                                               |
 | `motion.json`     | Animation durations and easing curves                                                                                            |
+| `cursor.json`     | Cursor values for interactive controls                                                                                           |
 
-Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. These files are the source of truth for the design system and are processed during the build step to generate CSS custom properties and other output formats in `/src/prebuilt`.
+Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. `wpds.resolver.json` composes those base sources with the contextual values in `/modes`. These files are the source of truth for the design system and are processed during the build step to generate published assets in `/prebuilt` and internal TypeScript sources in `/src/prebuilt`.
 
 ## Token Naming
 
@@ -68,12 +68,12 @@ Someone using the design system should never see or concern themselves with eith
 
 ## Custom Extensions
 
-The design tokens use [the `$extensions` feature](https://www.designtokens.org/tr/drafts/format/#extensions-0) of the DTCG Tokens specification to add additional, optional support for proprietary data.
+The design tokens use [the `$extensions` feature](https://www.designtokens.org/tr/2025.10/format/#extensions-0) from the Design Tokens Format Module to add additional, optional support for proprietary data.
 
 ### Figma Support
 
 The tokens are implemented so that they can be imported directly into Figma variables, using [Figma's built-in support for importing design tokens](https://help.figma.com/hc/en-us/articles/15343816063383-Modes-for-variables#h_01KAGYPSFC984XDB4YWBCNRZJ7).
 
-This also includes support for [variable modes](https://help.figma.com/hc/en-us/articles/15343816063383-Modes-for-variables), which can be found under [the `modes/` directory](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/modes/).
+This also includes support for [variable modes](https://help.figma.com/hc/en-us/articles/15343816063383-Modes-for-variables). The contextual token values are stored under [the `modes/` directory](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/modes/) and composed by `wpds.resolver.json`.
 
 Token definitions will also include relevant Figma scopes, which are useful to ensure that token values are only shown in relevant fields in the Figma interface (e.g. border radius tokens only shown in the radius selection fields). These are implemented through the `$extensions['com.figma.scopes']` extension, and a full list of supported scopes is available in [Figma's `VariableScope` developer documentation](https://developers.figma.com/docs/plugins/api/VariableScope/).

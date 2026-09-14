@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { create, split, toHTMLString } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { createListBlockFromDOMElement } from './utils';
 
 function getListContentSchema( { phrasingContentSchema } ) {

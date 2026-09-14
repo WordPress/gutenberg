@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { readdirSync, existsSync, readFileSync } from 'fs';
 import path from 'path';
 
@@ -36,11 +33,34 @@ export function getAllWidgets( rootDir ) {
  */
 
 /**
+ * @typedef {Object} WidgetActionMetadata
+ * @property {string}                id             Stable identifier, local to the widget type.
+ * @property {string}                label          Human-readable label. Translatable.
+ * @property {string}                [icon]         Registered icon name (`collection/icon-name`).
+ * @property {'high'|'medium'|'low'} [relevance]    How relevant the action is among the widget's actions.
+ * @property {string}                href           Destination the action points at.
+ * @property {string|boolean}        [download]     Download the destination; a string sets the filename.
+ * @property {boolean}               [openInNewTab] Open the destination in a new browser tab.
+ */
+
+/**
+ * @typedef {Object} WidgetAttributeMetadata
+ * @property {string}                id            Attribute key, unique within the widget.
+ * @property {string}                [type]        DataViews field type, or a registered field type name.
+ * @property {string}                [label]       Human-readable label. Translatable.
+ * @property {string}                [description] Longer description. Translatable.
+ * @property {'high'|'medium'|'low'} [relevance]   How prominently a host surfaces the attribute.
+ */
+
+/**
  * @typedef {Object} WidgetMetadata
  * @property {string}                                    name           Widget namespaced identifier.
  * @property {string}                                    [title]        Human-readable title.
  * @property {string}                                    [description]  Short description.
  * @property {WidgetHelpMetadata}                        [help]         Contextual help note for compact surfaces.
+ * @property {string}                                    [icon]         Registered icon name (`collection/icon-name`).
+ * @property {WidgetActionMetadata[]}                    [actions]      Declarative actions the widget exposes.
+ * @property {WidgetAttributeMetadata[]}                 [attributes]   Attribute schema, the JSON-expressible subset of a DataViews `Field`.
  * @property {string}                                    [category]     Grouping category.
  * @property {'framed' | 'content-bleed' | 'full-bleed'} [presentation] Authoring intent about how the widget wants to render.
  * @property {string[]}                                  [keywords]     Search aliases used to match the widget.

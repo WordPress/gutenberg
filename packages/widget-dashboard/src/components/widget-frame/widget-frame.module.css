@@ -8,7 +8,7 @@
 }
 
 /* Bleeding body reaches the card borders. Card exposes no padding-less section. */
-.bleedContent {
+.bleed-content {
 	padding: 0;
 }
 

@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Icon, Link, Popover, Stack, VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import styles from './widget-header.module.css';
 
 export interface WidgetInfotipProps {
@@ -46,7 +39,7 @@ export function WidgetInfotip( {
 			</Popover.Trigger>
 
 			<Popover.Popup
-				className={ styles.popoverPopup }
+				className={ styles[ 'popover-popup' ] }
 				positioner={ <Popover.Positioner side="top" align="start" /> }
 			>
 				<Popover.Arrow />

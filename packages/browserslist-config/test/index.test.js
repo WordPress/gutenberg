@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
 import browserslist from 'browserslist';
-
-/**
- * Internal dependencies
- */
+import { expect, it } from 'vitest';
 import config from '../';
 
 it( 'should export an array', () => {

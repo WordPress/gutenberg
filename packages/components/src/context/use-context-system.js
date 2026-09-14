@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import warn from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import { useComponentsContext } from './context-system-provider';
 import { getNamespace, getConnectedNamespace } from './utils';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
@@ -34,17 +27,26 @@ export function useContextSystem( props, namespace ) {
 	const contextProps = contextSystemProps?.[ namespace ] || {};
 
 	/** @type {ConnectedProps<P>} */
-	// @ts-ignore We fill in the missing properties below
+	// @ts-expect-error The initial object cannot satisfy the generic `P`, whose props are copied in below.
 	const finalComponentProps = {
 		...getConnectedNamespace(),
 		...getNamespace( namespace ),
 	};
 
-	const { _overrides: overrideProps, ...otherContextProps } = contextProps;
+	const { _overrides, ...otherContextProps } = contextProps;
+	/** @type {Record<string, unknown>} */
+	const overrideProps = /** @type {Record<string, unknown>} */ ( _overrides );
 
 	const initialMergedProps = Object.entries( otherContextProps ).length
 		? Object.assign( {}, otherContextProps, props )
 		: props;
+	/**
+	 * @type {P & {
+	 *   children?: React.ReactNode,
+	 *   renderChildren?: (props: P) => React.ReactNode
+	 * }}
+	 */
+	const propsWithChildren = initialMergedProps;
 
 	const cx = useCx();
 
@@ -55,24 +57,24 @@ export function useContextSystem( props, namespace ) {
 
 	// Provides the ability to customize the render of the component.
 	const rendered =
-		typeof initialMergedProps.renderChildren === 'function'
-			? initialMergedProps.renderChildren( initialMergedProps )
-			: initialMergedProps.children;
+		typeof propsWithChildren.renderChildren === 'function'
+			? propsWithChildren.renderChildren( initialMergedProps )
+			: propsWithChildren.children;
 
 	for ( const key in initialMergedProps ) {
-		// @ts-ignore filling in missing props
+		// @ts-expect-error A string key cannot index the merged props type.
 		finalComponentProps[ key ] = initialMergedProps[ key ];
 	}
 
 	for ( const key in overrideProps ) {
-		// @ts-ignore filling in missing props
+		// @ts-expect-error A string key cannot index the merged props type.
 		finalComponentProps[ key ] = overrideProps[ key ];
 	}
 
 	// Setting an `undefined` explicitly can cause unintended overwrites
 	// when a `cloneElement()` is involved.
 	if ( rendered !== undefined ) {
-		// @ts-ignore
+		// @ts-expect-error `children` does not exist on `ConnectedProps<P>`.
 		finalComponentProps.children = rendered;
 	}
 

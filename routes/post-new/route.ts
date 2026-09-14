@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { dispatch, resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 

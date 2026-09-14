@@ -4,10 +4,6 @@
  * Provides exponential backoff calculation and error classification
  * for determining whether failed uploads should be retried.
  */
-
-/**
- * Internal dependencies
- */
 import type { QueueItemId } from '../types';
 
 export interface RetryDelayOptions {

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const {
 	TRANSLATION_FUNCTIONS,
 	getTranslateFunctionName,

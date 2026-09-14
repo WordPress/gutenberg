@@ -33,18 +33,18 @@ function register_block_core_pattern() {
 function render_block_core_pattern( $attributes ) {
 	static $seen_refs = array();
 
-	if ( empty( $attributes['slug'] ) ) {
+	$slug = $attributes['slug'] ?? null;
+	if ( empty( $slug ) || ! is_string( $slug ) ) {
 		return '';
 	}
 
-	$slug     = $attributes['slug'];
 	$registry = WP_Block_Patterns_Registry::get_instance();
 
 	if ( ! $registry->is_registered( $slug ) ) {
 		return '';
 	}
 
-	if ( isset( $seen_refs[ $attributes['slug'] ] ) ) {
+	if ( isset( $seen_refs[ $slug ] ) ) {
 		// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
 		// is set in `wp_debug_mode()`.
 		$is_debug = WP_DEBUG && WP_DEBUG_DISPLAY;
@@ -58,14 +58,14 @@ function render_block_core_pattern( $attributes ) {
 	$pattern = $registry->get_registered( $slug );
 	$content = $pattern['content'];
 
-	$seen_refs[ $attributes['slug'] ] = true;
+	$seen_refs[ $slug ] = true;
 
 	$content = do_blocks( $content );
 
 	global $wp_embed;
 	$content = $wp_embed->autoembed( $content );
 
-	unset( $seen_refs[ $attributes['slug'] ] );
+	unset( $seen_refs[ $slug ] );
 	return $content;
 }
 

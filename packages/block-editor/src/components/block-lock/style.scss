@@ -29,7 +29,7 @@
 	padding: $grid-unit-15 0;
 
 	.components-checkbox-control__label {
-		font-weight: 600;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 	}
 }
 

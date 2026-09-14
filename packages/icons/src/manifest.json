@@ -181,7 +181,8 @@
 	{
 		"slug": "brush",
 		"label": "Brush",
-		"filePath": "library/brush.svg"
+		"filePath": "library/brush.svg",
+		"public": false
 	},
 	{
 		"slug": "bug",
@@ -491,7 +492,8 @@
 	{
 		"slug": "dashboard",
 		"label": "Dashboard",
-		"filePath": "library/dashboard.svg"
+		"filePath": "library/dashboard.svg",
+		"public": false
 	},
 	{
 		"slug": "desktop",
@@ -794,6 +796,11 @@
 		"public": true
 	},
 	{
+		"slug": "inline-image",
+		"label": "Inline Image",
+		"filePath": "library/inline-image.svg"
+	},
+	{
 		"slug": "insert-after",
 		"label": "Insert After",
 		"filePath": "library/insert-after.svg"
@@ -918,7 +925,8 @@
 	{
 		"slug": "link",
 		"label": "Link",
-		"filePath": "library/link.svg"
+		"filePath": "library/link.svg",
+		"public": false
 	},
 	{
 		"slug": "link-off",
@@ -979,7 +987,8 @@
 	{
 		"slug": "media",
 		"label": "Media",
-		"filePath": "library/media.svg"
+		"filePath": "library/media.svg",
+		"public": false
 	},
 	{
 		"slug": "media-and-text",
@@ -1064,7 +1073,8 @@
 	{
 		"slug": "page",
 		"label": "Page",
-		"filePath": "library/page.svg"
+		"filePath": "library/page.svg",
+		"public": false
 	},
 	{
 		"slug": "page-break",
@@ -1118,7 +1128,8 @@
 	{
 		"slug": "pin",
 		"label": "Pin",
-		"filePath": "library/pin.svg"
+		"filePath": "library/pin.svg",
+		"public": false
 	},
 	{
 		"slug": "pin-small",
@@ -1128,12 +1139,23 @@
 	{
 		"slug": "plugins",
 		"label": "Plugins",
-		"filePath": "library/plugins.svg"
+		"filePath": "library/plugins.svg",
+		"public": false
 	},
 	{
 		"slug": "play",
 		"label": "Play",
 		"filePath": "library/play.svg"
+	},
+	{
+		"slug": "playlist",
+		"label": "Playlist",
+		"filePath": "library/playlist.svg"
+	},
+	{
+		"slug": "playlist-track",
+		"label": "Playlist Track",
+		"filePath": "library/playlist-track.svg"
 	},
 	{
 		"slug": "plus",
@@ -1490,6 +1512,12 @@
 		"filePath": "library/site-logo.svg"
 	},
 	{
+		"slug": "sites",
+		"label": "Sites",
+		"filePath": "library/sites.svg",
+		"public": false
+	},
+	{
 		"slug": "square",
 		"label": "Square",
 		"filePath": "library/square.svg"
@@ -1693,7 +1721,8 @@
 	{
 		"slug": "tool",
 		"label": "Tool",
-		"filePath": "library/tool.svg"
+		"filePath": "library/tool.svg",
+		"public": false
 	},
 	{
 		"slug": "trash",
@@ -1738,7 +1767,8 @@
 	{
 		"slug": "update",
 		"label": "Update",
-		"filePath": "library/update.svg"
+		"filePath": "library/update.svg",
+		"public": false
 	},
 	{
 		"slug": "upload",
@@ -1770,6 +1800,7 @@
 	{
 		"slug": "wordpress",
 		"label": "WordPress",
-		"filePath": "library/wordpress.svg"
+		"filePath": "library/wordpress.svg",
+		"public": false
 	}
 ]

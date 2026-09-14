@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
-
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useState,
 	useCallback,
@@ -18,10 +10,6 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type {
 	CropperState,
 	HandlePosition,
@@ -104,6 +92,13 @@ export interface CropperProps {
 	freeformCrop?: boolean;
 	/** Focus the crop area when the cropper mounts. */
 	focusOnMount?: boolean;
+	/**
+	 * Ignore all crop interaction: pointer drags, wheel zoom, keyboard
+	 * pan/zoom and the stencil's resize handles. Any gesture already in
+	 * flight is cancelled. Used while the edit is being saved, so the
+	 * modifiers sent to the server cannot change after the request starts.
+	 */
+	disabled?: boolean;
 	/** Callback fired when the image is loaded. */
 	onImageLoaded?: ( size: Size ) => void;
 	/**
@@ -148,6 +143,7 @@ export interface CropperProps {
  * @param root0.aspectRatio       Fixed aspect ratio (width/height).
  * @param root0.freeformCrop      Enable resize handles.
  * @param root0.focusOnMount      Focus the crop area on mount.
+ * @param root0.disabled          Ignore all crop interaction.
  * @param root0.onImageLoaded     Image load callback.
  * @param root0.onStateChange     Every-frame state callback.
  * @param root0.onGestureStart    Gesture boundary start.
@@ -169,6 +165,7 @@ function CropperInner(
 		aspectRatio,
 		freeformCrop = false,
 		focusOnMount = false,
+		disabled = false,
 		onImageLoaded,
 		onStateChange,
 		onGestureStart,
@@ -276,8 +273,9 @@ function CropperInner(
 		onStateChange?.( state );
 	}, [ state, onStateChange ] );
 
-	// ARIA live region: announce significant state changes for screen readers.
-	const ariaMessage = useAriaAnnouncer( state );
+	// ARIA announcements: announce significant state changes for screen readers
+	// via the centralized @wordpress/a11y speak() API called inside the hook.
+	useAriaAnnouncer( state );
 
 	// Compute fitted image dimensions and visual bounds from camera math.
 	const naturalWidth = state.image?.naturalWidth ?? 0;
@@ -596,6 +594,7 @@ function CropperInner(
 		maxZoom,
 		onGestureStart,
 		onGestureEnd,
+		disabled,
 	} );
 
 	// Compose focus-visibility tracking into the canvas event handlers.
@@ -643,6 +642,7 @@ function CropperInner(
 		},
 		onPointerDown: ( event: React.PointerEvent< HTMLDivElement > ) => {
 			if (
+				disabled ||
 				isResizingRef.current ||
 				isTouchPinchingRef.current ||
 				( event.pointerType === 'touch' && event.isPrimary === false )
@@ -1078,7 +1078,7 @@ function CropperInner(
 						onEscape={ handleEscape }
 						aspectRatio={ aspectRatio }
 						freeformCrop={ freeformCrop }
-						isResizeDisabled={ isTouchPinching }
+						isResizeDisabled={ isTouchPinching || disabled }
 						stencilTransition={ settleStencilTransition }
 						cropBounds={ cropBounds }
 						minCropSize={ minCropSize }
@@ -1106,16 +1106,6 @@ function CropperInner(
 							outputHeight={ outputSize.height }
 						/>
 					) }
-				</div>
-
-				{ /* ARIA live region for screen reader announcements */ }
-				<div
-					aria-live="polite"
-					aria-atomic="true"
-					className="wp-media-editor-image-editor__aria-live"
-					style={ VISUALLY_HIDDEN_STYLE }
-				>
-					{ ariaMessage }
 				</div>
 			</div>
 		</div>

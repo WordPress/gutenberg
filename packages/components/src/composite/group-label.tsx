@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
-import { useCompositeContext } from './context';
+import { useCompositeContext, useCompositeGroupContext } from './context';
 import type { CompositeGroupLabelProps } from './types';
 
 export const CompositeGroupLabel = forwardRef<
@@ -20,6 +9,13 @@ export const CompositeGroupLabel = forwardRef<
 	WordPressComponentProps< CompositeGroupLabelProps, 'div', false >
 >( function CompositeGroupLabel( props, ref ) {
 	const context = useCompositeContext();
+	const isWithinGroup = useCompositeGroupContext();
+
+	if ( ! isWithinGroup ) {
+		throw new Error(
+			'Composite.GroupLabel can only be rendered inside Composite.Group.'
+		);
+	}
 
 	// @ts-expect-error The store prop is undocumented and only used by the
 	// legacy compat layer. The `store` prop is documented, but its type is

@@ -1,12 +1,12 @@
-.editActionsEnter,
-.editActionsExit {
+.edit-actions-enter,
+.edit-actions-exit {
 	display: inline-flex;
 	align-items: center;
 	gap: var(--wp--preset--spacing--20);
 	transform-origin: right center;
 }
 
-.editActionsDivider {
+.edit-actions-divider {
 	flex-shrink: 0;
 	align-self: center;
 	width: 1px;
@@ -15,16 +15,16 @@
 }
 
 @media not ( prefers-reduced-motion ) {
-	.editActionsEnter,
-	.editActionsExit {
+	.edit-actions-enter,
+	.edit-actions-exit {
 		will-change: opacity, transform;
 	}
 
-	.editActionsEnter {
+	.edit-actions-enter {
 		animation: actions-slide-in var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive) forwards;
 	}
 
-	.editActionsExit {
+	.edit-actions-exit {
 		animation: actions-fold-out var(--wpds-motion-duration-sm) var(--wpds-motion-easing-balanced) forwards;
 	}
 

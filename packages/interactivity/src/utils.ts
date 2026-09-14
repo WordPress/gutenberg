@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	useMemo as _useMemo,
 	useCallback as _useCallback,
@@ -10,10 +7,6 @@ import {
 	type Inputs,
 } from 'preact/hooks';
 import { effect, signal } from '@preact/signals';
-
-/**
- * Internal dependencies
- */
 import { getScope, setScope, resetScope } from './scopes';
 import { getNamespace, setNamespace, resetNamespace } from './namespaces';
 

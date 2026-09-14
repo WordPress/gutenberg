@@ -11,6 +11,10 @@ export const List = forwardRef< HTMLDivElement, AutocompleteListProps >(
 				className={ clsx( itemPopupStyles.list, className ) }
 				ref={ ref }
 				{ ...restProps }
+				// `role="grid"` disallows `aria-orientation`, which Base UI
+				// renders regardless.
+				// TODO: safe to remove after updating to Base UI >= 1.8.0
+				aria-orientation={ undefined }
 			/>
 		);
 	}
