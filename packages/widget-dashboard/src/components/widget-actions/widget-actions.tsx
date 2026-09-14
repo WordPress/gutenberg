@@ -1,6 +1,5 @@
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
-import { useRef } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 import { Icon, IconButton, Menu } from '@wordpress/ui';
 import { useWidgetHost } from '@wordpress/widget-primitives';
@@ -37,10 +36,6 @@ export function WidgetActions( {
 	actions,
 }: WidgetActionsProps ): React.ReactNode {
 	const reserveRef = useReserveHeaderSpace< HTMLSpanElement >( 'actions' );
-	const menuActionsRef = useRef< {
-		close: () => void;
-		unmount: () => void;
-	} | null >( null );
 	const { links } = useWidgetHost();
 
 	if ( actions.length === 0 ) {
@@ -49,7 +44,7 @@ export function WidgetActions( {
 
 	return (
 		<span ref={ reserveRef } className={ styles[ 'widget-actions' ] }>
-			<Menu.Root actionsRef={ menuActionsRef }>
+			<Menu.Root>
 				<Menu.Trigger
 					render={
 						<IconButton
@@ -80,16 +75,7 @@ export function WidgetActions( {
 								<Menu.LinkItem
 									key={ action.id }
 									{ ...linkProps }
-									onClick={ ( event ) => {
-										if (
-											! event.metaKey &&
-											! event.ctrlKey &&
-											! event.altKey &&
-											! event.shiftKey
-										) {
-											menuActionsRef.current?.close();
-										}
-									} }
+									closeOnClick
 									prefix={
 										action.icon ? (
 											<Icon icon={ action.icon } />

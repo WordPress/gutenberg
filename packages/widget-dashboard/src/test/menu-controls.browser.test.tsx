@@ -121,8 +121,8 @@ describe( 'Widget Dashboard menus', () => {
 		expect( trigger ).toHaveFocus();
 	} );
 
-	it.each( [ 'Meta', 'Control', 'Alt', 'Shift' ] as const )(
-		'keeps the widget action menu open for %s-click',
+	it.each( [ 'ControlOrMeta', 'Alt', 'Shift' ] as const )(
+		'closes the widget action menu for %s-click',
 		async ( modifier ) => {
 			const user = userEvent.setup();
 			await renderInBrowser(
@@ -141,13 +141,17 @@ describe( 'Widget Dashboard menus', () => {
 			const action = await screen.findByRole( 'menuitem', {
 				name: 'View report',
 			} );
-			action.addEventListener( 'click', ( event ) =>
+			const onClick = vi.fn( ( event: MouseEvent ) =>
 				event.preventDefault()
 			);
+			action.addEventListener( 'click', onClick );
 
 			await user.click( action, { modifiers: [ modifier ] } );
+			expect( onClick ).toHaveBeenCalledTimes( 1 );
 
-			expect( screen.getByRole( 'menu' ) ).toBeVisible();
+			await waitFor( () =>
+				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
+			);
 		}
 	);
 
