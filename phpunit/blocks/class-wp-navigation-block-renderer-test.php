@@ -69,7 +69,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $site_title_block );
 
-		$expected = '<li class="wp-block-navigation-item"><h1 class="wp-block-site-title"><a href="http://' . WP_TESTS_DOMAIN . '" target="_self" rel="home">Test Blog</a></h1></li>';
+		$expected = '<li class="wp-block-navigation-item wp-block-navigation-item__wrapper"><h1 class="wp-block-site-title"><a href="http://' . WP_TESTS_DOMAIN . '" target="_self" rel="home">Test Blog</a></h1></li>';
 		$this->assertEquals( $expected, $result );
 	}
 
@@ -165,7 +165,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $heading_block );
 
-		$expected = '<li class="wp-block-navigation-item"><div class="wp-block-testsuite-sample-block">Hello World</div></li>';
+		$expected = '<li class="wp-block-navigation-item wp-block-navigation-item__wrapper"><div class="wp-block-testsuite-sample-block">Hello World</div></li>';
 		$this->assertEquals( $expected, $result );
 
 		remove_filter( 'block_core_navigation_listable_blocks', $filter_needs_list_item_wrapper_function, 10, 1 );
