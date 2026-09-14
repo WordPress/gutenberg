@@ -756,7 +756,7 @@ describe( 'Cropper', () => {
 			freeformCrop: true,
 			onGestureStart,
 		};
-		const { rerender } = await render( <Cropper { ...props } /> );
+		const { rerender } = await renderCropper( <Cropper { ...props } /> );
 
 		await screen.findByRole( 'button', {
 			name: 'Resize from top-left corner',
@@ -764,7 +764,7 @@ describe( 'Cropper', () => {
 		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 
 		// A wheel zoom opens a debounced gesture.
-		fireEvent.wheel( canvas, { deltaY: -120, clientX: 100, clientY: 100 } );
+		await userEvent.wheel( canvas, { delta: { y: -120 } } );
 		await waitFor( () => expect( onGestureStart ).toHaveBeenCalled() );
 
 		// Saving cancels it, then the save fails and tools come back.
@@ -773,13 +773,13 @@ describe( 'Cropper', () => {
 		onGestureStart.mockClear();
 
 		// The next wheel zoom must open a gesture of its own.
-		fireEvent.wheel( canvas, { deltaY: -120, clientX: 100, clientY: 100 } );
+		await userEvent.wheel( canvas, { delta: { y: -120 } } );
 		await waitFor( () => expect( onGestureStart ).toHaveBeenCalled() );
 	} );
 
 	it( 'ignores wheel zoom while disabled', async () => {
 		const controller = createController();
-		await render(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ controller }
@@ -795,7 +795,10 @@ describe( 'Cropper', () => {
 		} );
 		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 
-		fireEvent.wheel( canvas, { deltaY: -120, clientX: 100, clientY: 100 } );
+		const onWheel = vi.fn();
+		canvas.addEventListener( 'wheel', onWheel, { once: true } );
+		await userEvent.wheel( canvas, { delta: { y: -120 } } );
+		await waitFor( () => expect( onWheel ).toHaveBeenCalledOnce() );
 
 		await act( async () => {
 			await new Promise( ( resolve ) =>
@@ -808,7 +811,7 @@ describe( 'Cropper', () => {
 
 	it( 'ignores keyboard pan while disabled', async () => {
 		const controller = createController();
-		await render(
+		await renderCropper(
 			<Cropper
 				src="test.jpg"
 				controller={ controller }
@@ -820,7 +823,9 @@ describe( 'Cropper', () => {
 		);
 
 		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
-		fireEvent.keyDown( canvas, { key: 'ArrowRight' } );
+		canvas.focus();
+		expect( canvas ).toHaveFocus();
+		await userEvent.keyboard( '{ArrowRight}' );
 
 		expect( controller.setPan ).not.toHaveBeenCalled();
 	} );

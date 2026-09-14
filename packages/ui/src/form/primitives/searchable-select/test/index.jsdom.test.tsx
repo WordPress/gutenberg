@@ -277,6 +277,51 @@ describe( 'SearchableSelect', () => {
 		expect( trigger ).toHaveTextContent( 'Strawberry' );
 	} );
 
+	it( 'announces statusContent in a status live region', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<SearchableSelect
+				aria-label="Fruit"
+				items={ ITEMS }
+				statusContent="Loading…"
+			/>
+		);
+
+		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
+
+		const status = await screen.findByText( 'Loading…' );
+		expect( status ).toBeVisible();
+		expect( status ).toHaveAttribute( 'role', 'status' );
+	} );
+
+	it( 'keeps the status live region mounted when statusContent is cleared', async () => {
+		const user = userEvent.setup();
+		const { rerender } = render(
+			<SearchableSelect
+				aria-label="Fruit"
+				items={ ITEMS }
+				statusContent="Loading…"
+			/>
+		);
+
+		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
+
+		const status = await screen.findByText( 'Loading…' );
+
+		rerender(
+			<SearchableSelect
+				aria-label="Fruit"
+				items={ ITEMS }
+				statusContent={ null }
+			/>
+		);
+
+		expect( status ).toBeVisible();
+		expect( status ).toHaveAttribute( 'role', 'status' );
+		expect( status ).toBeEmptyDOMElement();
+	} );
+
 	describe( 'creatable item', () => {
 		const creatableItem = {
 			value: '__create__',

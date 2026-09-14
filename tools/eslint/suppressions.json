@@ -5838,11 +5838,6 @@
 			"count": 1
 		}
 	},
-	"packages/edit-widgets/src/components/more-menu/tools-more-menu-group.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/edit-widgets/src/components/notices/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -6191,16 +6186,6 @@
 		}
 	},
 	"packages/editor/src/components/more-menu/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/more-menu/tools-more-menu-group.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/more-menu/view-more-menu-group.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -7490,16 +7475,10 @@
 	"packages/global-styles-ui/src/presets/preset-edit-header.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/presets/preset-group.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"no-restricted-imports": {
 			"count": 1
 		}
 	},
