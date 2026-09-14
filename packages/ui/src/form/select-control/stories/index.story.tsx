@@ -288,14 +288,10 @@ export const WithItemsArrayAndPartialCustomization: Story = {
 };
 
 /**
- * Pass `description` on an `items` entry for supplementary text in the
- * standard layout. It is announced as a description rather than part of
- * the item name. Compose `SelectControl.Item` children when you need
- * multiple descriptions or custom markup.
- *
- * With the default `popupWidth="content"`, labels and descriptions sit
- * on one row and the popup grows. A constrained `popupWidth` such as
- * `"anchor"` or `"sm"` wraps both at that size.
+ * Pass `description` on an `items` entry for supplementary text.
+ * It is announced as a description rather than part of the item name.
+ * Compose `SelectControl.Item` children when you need multiple
+ * descriptions or custom markup.
  */
 export const WithItemDescription: Story = {
 	args: {
