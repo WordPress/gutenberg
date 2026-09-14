@@ -18,6 +18,10 @@
 -   Document bar: Preserve the subdued template-preview icon color after the icon became stroke-based. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
 -   `useGlobalStylesOutput`: Let the styles engine derive block gap support from the config it renders, instead of a separate check that treated a theme without block gap support as supporting it and so dropped the fallback gap styles the front end renders ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
 
+### Code Quality
+
+-   Post template panel: Remove the dead template read capability check. ([#82861](https://github.com/WordPress/gutenberg/pull/82861))
+
 ### Internal
 
 -   Notes: Use the public `@wordpress/ui` Menu for note actions instead of the private Components API ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
