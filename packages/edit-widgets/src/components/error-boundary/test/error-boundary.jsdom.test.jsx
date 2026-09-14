@@ -11,7 +11,7 @@ const ChildComponent = () => {
 
 describe( 'Error Boundary', () => {
 	describe( 'when error is thrown from a Child component', () => {
-		it( 'announces the error message', () => {
+		it( 'keeps recovery actions outside the error alert', () => {
 			render(
 				<ErrorBoundary>
 					<ChildComponent />
@@ -19,9 +19,15 @@ describe( 'Error Boundary', () => {
 			);
 
 			expect( console ).toHaveErrored();
-			expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
-				'An unknown error occurred.'
+			const alert = screen.getByRole( 'alert' );
+			expect( alert ).toHaveTextContent(
+				/^An unknown error occurred\. Reload your browser to try again, or copy the error to report the problem or search\.$/
 			);
+			const copyError = screen.getByRole( 'button', {
+				name: 'Copy error',
+			} );
+			expect( copyError ).toBeVisible();
+			expect( alert ).not.toContainElement( copyError );
 		} );
 
 		it( 'calls the `editor.ErrorBoundary.errorLogged` hook action with the error object and error info', () => {
