@@ -10,6 +10,7 @@
 
 ### Bug Fixes
 
+-   `PostLockedModal`: Show the modal while real-time collaboration is enabled when the post's edit lock belongs to an editor without collaboration support, such as the classic editor or a page builder. Those sessions do not merge changes, so suppressing the modal let two people edit at once and the second save overwrote the first ([#82245](https://github.com/WordPress/gutenberg/pull/82245)).
 -   Featured image field: Only register it for the post types a theme lists in its `post-thumbnails` support, matching the classic panel. ([#82773](https://github.com/WordPress/gutenberg/pull/82773))
 -   `MediaUpload`: Coerce `multiple` to a boolean before passing it to the experimental media modal; callers such as the playlist block and the inserter media tab pass the legacy media frame's `'add'` mode. ([#82715](https://github.com/WordPress/gutenberg/pull/82715))
 -   Document bar: Preserve the subdued template-preview icon color after the icon became stroke-based. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
