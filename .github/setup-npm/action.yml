@@ -6,16 +6,45 @@ inputs:
         description: 'Optional. The directory holding the package.json to read the required npm version from. Defaults to the workspace root.'
         required: false
         default: '.'
+    cache:
+        description: 'Optional. Whether to restore and save the npm cache. Defaults to true.'
+        required: false
+        default: 'true'
 
 runs:
     using: 'composite'
     steps:
         - name: Install npm
+          id: npm
+          env:
+              WORKING_DIRECTORY: ${{ inputs.working-directory }}
           run: |
               NPM_VERSION="$(jq -r '.devEngines.packageManager.version' package.json)"
               # Contributors need the floor; CI stays on that major's newest release.
               npm install --global "npm@${NPM_VERSION/>=/^}"
               echo "Required npm version: $NPM_VERSION"
               echo "Installed npm version: $(npm --version)"
+
+              # actions/setup-node cannot restore the npm cache: it locates the
+              # directory with `npm config get cache`, which runs before this step
+              # and fails the devEngines check under the bundled npm.
+              echo "cache-dir=$(npm config get cache | tr -d '\r')" >> "$GITHUB_OUTPUT"
+
+              # Keep the hashFiles patterns workspace-relative and free of a "./"
+              # prefix, so they match the same files as every other cache key.
+              PATH_PREFIX=""
+              if [ "$WORKING_DIRECTORY" != '.' ] && [ -n "$WORKING_DIRECTORY" ]; then
+                  PATH_PREFIX="${WORKING_DIRECTORY%/}/"
+              fi
+              echo "path-prefix=$PATH_PREFIX" >> "$GITHUB_OUTPUT"
           working-directory: ${{ inputs.working-directory }}
           shell: bash
+
+        - name: Cache npm downloads
+          if: ${{ inputs.cache == 'true' }}
+          uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+          with:
+              path: ${{ steps.npm.outputs.cache-dir }}
+              key: npm-cache-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles(format('{0}package-lock.json', steps.npm.outputs.path-prefix), format('{0}patches/**', steps.npm.outputs.path-prefix)) }}
+              restore-keys: |
+                  npm-cache-${{ runner.os }}-${{ runner.arch }}-
