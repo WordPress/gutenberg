@@ -38,12 +38,24 @@ class Gutenberg_Block_Type_Transforms_Test extends WP_Test_REST_TestCase {
 		self::delete_user( self::$admin_id );
 	}
 
+	public function set_up() {
+		parent::set_up();
+
+		// A server built by an earlier test keeps its routes but not the hooks
+		// `rest_api_init` added, which the test case restores on tear-down, and
+		// one of those answers OPTIONS. Each test starts from a fresh server so
+		// it is built, and the field registered, within the test.
+		$GLOBALS['wp_rest_server'] = null;
+	}
+
 	public function tear_down() {
 		foreach ( $this->registered as $block_name ) {
 			unregister_block_type( $block_name );
 		}
 
 		$this->registered = array();
+
+		$GLOBALS['wp_rest_server'] = null;
 
 		parent::tear_down();
 	}
