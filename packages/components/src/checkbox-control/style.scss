@@ -60,6 +60,17 @@
 	&:checked::before {
 		content: none;
 	}
+
+	&::after { /* increase clickable area */
+		content: "";
+		inset: 0;
+		position: absolute;
+		width: calc(var(--checkbox-input-size) + var(--checkbox-input-margin) * 2);
+		height: calc(var(--checkbox-input-size) + var(--checkbox-input-margin) * 2);
+		padding: var(--checkbox-input-margin);
+		margin-left: calc(-1 * var(--checkbox-input-margin));
+		margin-top: calc(-1 * var(--checkbox-input-margin));
+	}
 }
 
 .components-checkbox-control__input-container {
