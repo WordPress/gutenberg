@@ -469,6 +469,100 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should preserve `rect` and `circle` shapes when sanitizing registered icons.
+	 *
+	 * @dataProvider data_icon_content_sources
+	 *
+	 * @param bool $use_file_path Whether to register the icon from a file path.
+	 */
+	public function test_rect_and_circle_survive_sanitization( bool $use_file_path ) {
+		$rect     = '<rect x="4" y="5" width="16" height="14" rx="2" ry="2" fill="currentColor" stroke="currentColor" transform="rotate(45)" vector-effect="non-scaling-stroke" />';
+		$circle   = '<circle cx="12" cy="12" r="3" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" transform="rotate(45)" vector-effect="non-scaling-stroke" />';
+		$content  = '<svg viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">' . $rect . $circle . '</svg>';
+		$name     = 'test-collection/shapes-icon';
+		$settings = array(
+			'label' => 'Shapes Icon',
+		);
+
+		if ( $use_file_path ) {
+			$settings['file_path'] = $this->create_temp_icon_file( $content );
+		} else {
+			$settings['content'] = $content;
+		}
+
+		$this->assertTrue( $this->register( $name, $settings ) );
+
+		$icon = $this->registry->get_registered_icon( $name );
+		$this->assertStringContainsString( $rect, $icon['content'] );
+		$this->assertStringContainsString( $circle, $icon['content'] );
+	}
+
+	/**
+	 * Provides every SVG file shipped in the `@wordpress/icons` library.
+	 *
+	 * @return array<string, array{0: string}> Data sets of [ $file_path ], keyed by icon slug.
+	 */
+	public function data_library_icons(): array {
+		$data = array();
+		foreach ( glob( gutenberg_dir_path() . 'packages/icons/src/library/*.svg' ) as $file_path ) {
+			$data[ basename( $file_path, '.svg' ) ] = array( $file_path );
+		}
+		return $data;
+	}
+
+	/**
+	 * Should keep every element and attribute of a library icon through sanitization.
+	 *
+	 * @dataProvider data_library_icons
+	 *
+	 * @param string $file_path Absolute path to the library SVG file.
+	 */
+	public function test_library_icon_survives_sanitization( string $file_path ) {
+		$name = 'test-collection/' . basename( $file_path, '.svg' );
+
+		$this->assertTrue(
+			$this->register(
+				$name,
+				array(
+					'label'     => 'Library Icon',
+					'file_path' => $file_path,
+				)
+			)
+		);
+
+		$icon = $this->registry->get_registered_icon( $name );
+		$this->assertSame(
+			$this->get_svg_structure( file_get_contents( $file_path ) ),
+			$this->get_svg_structure( $icon['content'] )
+		);
+	}
+
+	/**
+	 * Lists the tags of an SVG document with their attributes, in document order.
+	 *
+	 * Tag names and attribute names are compared case-insensitively because
+	 * `wp_kses()` lowercases attribute names such as `viewBox`.
+	 *
+	 * @param string $svg SVG markup.
+	 * @return array<int, array{0: string, 1: array<string, string|true|null>}> Tag name and attributes per element.
+	 */
+	private function get_svg_structure( string $svg ): array {
+		$structure = array();
+		$processor = new WP_HTML_Tag_Processor( $svg );
+
+		while ( $processor->next_tag() ) {
+			$attributes = array();
+			foreach ( $processor->get_attribute_names_with_prefix( '' ) as $attribute_name ) {
+				$attributes[ $attribute_name ] = $processor->get_attribute( $attribute_name );
+			}
+			ksort( $attributes );
+			$structure[] = array( $processor->get_tag(), $attributes );
+		}
+
+		return $structure;
+	}
+
+	/**
 	 * Should fail to register an icon that provides both `content` and `file_path`.
 	 *
 	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
