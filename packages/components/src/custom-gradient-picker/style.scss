@@ -72,9 +72,10 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 		&:focus,
 		&.is-active {
 			box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus) * 2) $white, 0 0 $border-width-focus-fallback 0 rgba($black, 0.25);
+		}
 
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: $border-width-tab solid transparent;
+		&:focus {
+			@include outset-ring__focus();
 		}
 	}
 }
