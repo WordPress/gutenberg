@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Footnotes: Mark the `footnotes` post meta as protected so the Custom Fields panel no longer lists it. A stale value resubmitted from that panel after a hard reload silently overwrote footnotes saved by the editor; an auth callback keeps the meta writable through the editor ([#80008](https://github.com/WordPress/gutenberg/pull/80008)).
 -   Cover: Grow the block with its content in Safari when an aspect ratio is set, instead of clipping the overflow. WebKit locks the box to the ratio where other engines let content expand it ([#70152](https://github.com/WordPress/gutenberg/pull/70152)).
 
 ## 11.0.0 (2026-09-10)
