@@ -51,8 +51,8 @@ When writing or migrating a test:
     the single source of truth.
 -   Run `npm test` for the complete lint and unit-test suite. For focused
     migration validation, run `npm run test:unit:routing`,
-    `npm run test:unit:conventions`, `npm run test:unit`, and
-    `npm run test:unit:vitest` together.
+    `npm run test:unit:conventions`, and `npm run test:unit` together.
+    `npm run test:unit:jest` retains the empty legacy partition until retirement.
 
 The required `All` CI check runs the routing validator. It fails when a test is
 missing, owned by both runners, or does not match the exact legacy Jest

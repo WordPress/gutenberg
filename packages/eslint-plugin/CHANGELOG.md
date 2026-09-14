@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Switch `test-unit` from Jest to `@vitest/eslint-plugin` recommended rules with explicit imports at the 27.0.0 boundary. Jest consumers must configure `eslint-plugin-jest` directly. ([#80855](https://github.com/WordPress/gutenberg/issues/80855)).
+
 ## 26.0.0 (2026-09-10)
 
 ### Breaking Changes

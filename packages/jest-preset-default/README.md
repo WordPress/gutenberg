@@ -1,5 +1,7 @@
 # Jest Preset Default
 
+> Deprecated. Move to Vitest directly using the [consumer migration guide](../scripts/docs/vitest-migration.md). There is no replacement WordPress preset or console package. Existing Jest consumers remain supported through `@wordpress/scripts` 36.x; removal is no earlier than 37.0.0 and requires published-consumer verification.
+
 Default [Jest](https://jestjs.io/) preset for WordPress development.
 
 ## Installation

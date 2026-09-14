@@ -568,7 +568,7 @@ export default dedupePlugins( [
 	},
 
 	// Override: Jest test files (unit tests).
-	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
+	...[ jestPlugin.configs[ 'flat/recommended' ] ].map( ( config ) => ( {
 		...config,
 		files: [
 			'packages/jest*/**/*.js',
@@ -1036,7 +1036,7 @@ export default dedupePlugins( [
 
 	// From packages/block-serialization-spec-parser/.eslintrc.json:
 	// Add test-unit config for shared-tests.js with jest/no-export off.
-	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
+	...[ jestPlugin.configs[ 'flat/recommended' ] ].map( ( config ) => ( {
 		...config,
 		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
 	} ) ),

@@ -33,7 +33,7 @@ Linting is static code analysis used to enforce coding standards and to avoid po
 
 To improve your developer workflow, you should setup an editor linting integration. See the [getting started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for additional information.
 
-During the Jest-to-Vitest migration, run both `npm run test:unit` and `npm run test:unit:vitest` to execute all JavaScript unit tests without the linter. The runner-specific commands continue to accept their own CLI options.
+`npm run test:unit` runs the complete Vitest suite once without the linter. `npm run test:unit:vitest` remains an alias for compatibility. The empty legacy Jest partition is available as `npm run test:unit:jest` until retirement.
 
 ### Folder structure
 
@@ -334,7 +334,7 @@ npm run test:unit:vitest:update -- path/to/tests
 
 # Update snapshots for Jest-owned JSDOM tests
 # --testPathPatterns is optional but runs only matching tests
-npm run test:unit:update -- --testPathPatterns path/to/tests
+npm run test:unit:jest -- --updateSnapshot --testPathPatterns path/to/tests
 
 # Update snapshot for e2e tests
 npm run test:e2e -- --update-snapshots path/to/spec
@@ -417,7 +417,7 @@ You might be blindsided by CI tests failing when snapshots don't match. You'll n
 npm run test:unit:vitest:update -- path/to/tests
 
 # Jest-owned JSDOM tests
-npm run test:unit:update -- --testPathPatterns path/to/tests
+npm run test:unit:jest -- --updateSnapshot --testPathPatterns path/to/tests
 ```
 
 The path is not required, but specifying one runs only matching tests and is faster.
@@ -429,7 +429,7 @@ Keep the applicable watch command running in the background as you work:
 npm run test:unit:vitest:watch -- path/to/tests
 
 # Jest-owned JSDOM tests
-npm run test:unit:watch -- --testPathPatterns path/to/tests
+npm run test:unit:jest -- --watch --testPathPatterns path/to/tests
 ```
 
 When a snapshot test fails in either runner, press `u` to update the snapshot.
@@ -504,9 +504,9 @@ Sometimes we need to mock refs for some stories which use them. Check the follow
 
 In that case, you might see test failures and `TypeError` reported by Jest in the lines which try to access a property from `ref.current`.
 
-### Debugging Jest unit tests
+### Debugging Vitest unit tests
 
-Running `npm run test:unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/learn/getting-started/debugging#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
+Running `npm run test:unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/learn/getting-started/debugging#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-tests).
 
 ## End-to-end testing
 

@@ -56,15 +56,16 @@
 		"access": "public"
 	},
 	"scripts": {
-		"test:unit": "wp-scripts test-unit-js --config jest.config.js",
+		"test:unit": "vitest run --config vitest.config.mjs",
 		"test:unit:conventions": "node scripts/validate-vitest-conventions.mjs",
 		"test:unit:vitest": "vitest run --config vitest.config.mjs",
 		"test:unit:vitest:shuffled": "npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855",
 		"test:unit:vitest:update": "vitest run --config vitest.config.mjs --update=true",
 		"test:unit:vitest:watch": "vitest --config vitest.config.mjs",
-		"test:unit:profile": "wp-scripts --cpu-prof test-unit-js --runInBand --no-cache --verbose --config jest.config.js",
+		"test:unit:profile": "vitest run --config vitest.config.mjs --pool=forks --no-file-parallelism --execArgv=--cpu-prof",
 		"test:unit:watch": "npm run test:unit -- --watch",
-		"test:unit:debug": "wp-scripts --inspect-brk test-unit-js --runInBand --no-cache --verbose --config jest.config.js",
-		"test:unit:routing": "node scripts/validate-test-routing.mjs"
+		"test:unit:debug": "vitest --config vitest.config.mjs --inspect-brk --no-file-parallelism --watch=false",
+		"test:unit:routing": "node scripts/validate-test-routing.mjs",
+		"test:unit:jest": "wp-scripts test-unit-jest --config jest.config.js"
 	}
 }

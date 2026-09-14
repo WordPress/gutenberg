@@ -122,7 +122,7 @@ jobs:
                   # version in the matrix.
                   FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
-                  npm run test:unit -- \
+                  npm run test:unit:jest -- \
                     --ci \
                     --maxWorkers="$(nproc)" \
                     --shard="$SHARD" \
@@ -179,6 +179,9 @@ jobs:
               env:
                   FK_ENV_NODEJS: '24'
               run: npm run test:unit:vitest:shuffled -- --project=browser
+
+            - name: Test isolated Vitest Browser consumer
+              run: npm run test:unit:consumers -- --browser
 
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})
