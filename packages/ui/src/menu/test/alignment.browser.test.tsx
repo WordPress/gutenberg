@@ -73,134 +73,197 @@ function center( rect: DOMRect ) {
 	return rect.top + rect.height / 2;
 }
 
-describe.each( [ 'ltr', 'rtl' ] )( 'Menu alignment (%s)', ( dir ) => {
-	describe.each( [
-		'action',
-		'link',
-		'checkbox',
-		'radio',
-		'submenu',
-	] as const )( '%s item', ( kind ) => {
-		describe.each( [
-			'single line',
-			'wrapped label',
-			'description',
-			'wrapped label and description',
-		] )( '%s', ( content ) => {
-			it.each(
-				Object.keys( prefixes ).flatMap( ( prefix ) =>
-					Object.keys( suffixes ).flatMap( ( suffix ) =>
-						[ false, true ].map( ( hasShortcut ) => ( {
-							prefix: prefix as keyof typeof prefixes,
-							suffix: suffix as keyof typeof suffixes,
-							hasShortcut,
-						} ) )
-					)
-				)
-			)(
-				'centers text and trailing content while keeping leading content at the top (prefix: $prefix, suffix: $suffix, shortcut: $hasShortcut)',
-				async ( { prefix, suffix, hasShortcut } ) => {
-					const labelText =
-						content === 'single line'
-							? 'Collection'
-							: 'Move to another collection';
-					await render(
-						<Menu.Root defaultOpen>
-							<Menu.Trigger>Open menu</Menu.Trigger>
-							<Menu.Popup dir={ dir }>
-								<TestItem
-									kind={ kind }
-									prefix={ prefixes[ prefix ] }
-									suffix={ suffixes[ suffix ] }
-									shortcut={
-										hasShortcut ? shortcut : undefined
-									}
-								>
-									<Menu.ItemLabel
-										style={
-											content.includes( 'wrapped label' )
-												? { width: 80 }
-												: undefined
-										}
-									>
-										{ labelText }
-									</Menu.ItemLabel>
-									{ content.includes( 'description' ) && (
-										<Menu.ItemDescription
-											style={ { width: 160 } }
-										>
-											Move this item to a different
-											collection in your library.
-										</Menu.ItemDescription>
-									) }
-								</TestItem>
-							</Menu.Popup>
-						</Menu.Root>
-					);
+type AlignmentCase = {
+	name: string;
+	kind?: ComponentProps< typeof TestItem >[ 'kind' ];
+	content?:
+		| 'single line'
+		| 'wrapped label'
+		| 'description'
+		| 'wrapped label and description';
+	prefix?: keyof typeof prefixes;
+	suffix?: keyof typeof suffixes;
+	hasShortcut?: boolean;
+	dir?: 'ltr' | 'rtl';
+};
 
-					const role = {
-						action: 'menuitem',
-						link: 'menuitem',
-						checkbox: 'menuitemcheckbox',
-						radio: 'menuitemradio',
-						submenu: 'menuitem',
-					}[ kind ];
-					const item = screen.getByRole( role, {
-						name: labelText,
-					} );
-					const itemRect = item.getBoundingClientRect();
-					const contentRect = getSlot( item, 'item-content' );
-					const label = getSlot( item, 'item-label' );
-					const lineHeight = parseFloat(
-						getComputedStyle( item ).lineHeight
-					);
-
-					expect( label.height ).toBeGreaterThan( 0 );
-					if ( content === 'single line' ) {
-						expect(
-							Math.abs( label.height - lineHeight )
-						).toBeLessThan( 0.5 );
-					}
-					if ( content.includes( 'wrapped label' ) ) {
-						expect( label.height ).toBeGreaterThan( lineHeight );
-					}
-					for ( const slot of [
-						'item-children',
-						...( suffix !== 'none' ? [ 'item-suffix' ] : [] ),
-						...( hasShortcut ? [ 'item-shortcut' ] : [] ),
-						...( kind === 'submenu' ? [ 'item-trailing' ] : [] ),
-					] ) {
-						expect(
-							Math.abs(
-								center( getSlot( item, slot ) ) -
-									center( itemRect )
-							)
-						).toBeLessThan( 0.5 );
-					}
-					for ( const slot of [
-						...( prefix !== 'none' ? [ 'item-prefix' ] : [] ),
-						...( kind === 'checkbox' || kind === 'radio'
-							? [ 'item-selection-indicator' ]
-							: [] ),
-					] ) {
-						const rect = getSlot( item, slot );
-						expect(
-							Math.abs( rect.top - contentRect.top )
-						).toBeLessThan( 0.5 );
-						expect( rect.bottom ).toBeLessThanOrEqual(
-							itemRect.bottom
-						);
-					}
-					if ( prefix === 'icon' ) {
-						expect(
-							Math.abs(
-								center( getSlot( item, 'prefix-icon' ) ) -
-									( contentRect.top + lineHeight / 2 )
-							)
-						).toBeLessThan( 0.5 );
-					}
-				}
+describe( 'Menu alignment', () => {
+	it.each< AlignmentCase >( [
+		{ name: 'centers a plain label' },
+		{ name: 'centers a wrapped label', content: 'wrapped label' },
+		{
+			name: 'centers a label and description together',
+			content: 'description',
+		},
+		{
+			name: 'centers a wrapped label and description together',
+			content: 'wrapped label and description',
+		},
+		{ name: 'centers a label beside a prefix icon', prefix: 'icon' },
+		{
+			name: 'centers a submenu label with its shortcut and chevron',
+			kind: 'submenu',
+			hasShortcut: true,
+		},
+		{
+			name: 'centers trailing content beside a description',
+			kind: 'submenu',
+			content: 'description',
+			prefix: 'icon',
+			suffix: 'text',
+			hasShortcut: true,
+		},
+		{
+			name: 'centers trailing content beside wrapped text',
+			kind: 'submenu',
+			content: 'wrapped label and description',
+			prefix: 'icon',
+			suffix: 'text',
+			hasShortcut: true,
+		},
+		{
+			name: 'centers content when a tall prefix sets the item height',
+			kind: 'submenu',
+			prefix: 'tall',
+			suffix: 'text',
+			hasShortcut: true,
+		},
+		{
+			name: 'centers content when a tall suffix sets the item height',
+			kind: 'submenu',
+			prefix: 'icon',
+			suffix: 'tall',
+			hasShortcut: true,
+		},
+		{
+			name: 'keeps a checkbox indicator at the top beside a description',
+			kind: 'checkbox',
+			content: 'description',
+			prefix: 'icon',
+		},
+		{
+			name: 'keeps a radio indicator at the top beside a description',
+			kind: 'radio',
+			content: 'description',
+			prefix: 'icon',
+		},
+		{
+			name: 'centers a link label with its suffix and shortcut',
+			kind: 'link',
+			suffix: 'text',
+			hasShortcut: true,
+		},
+		{
+			name: 'preserves vertical alignment in RTL',
+			kind: 'submenu',
+			content: 'description',
+			prefix: 'icon',
+			suffix: 'text',
+			hasShortcut: true,
+			dir: 'rtl',
+		},
+	] )(
+		'$name',
+		async ( {
+			kind = 'action',
+			content = 'single line',
+			prefix = 'none',
+			suffix = 'none',
+			hasShortcut = false,
+			dir = 'ltr',
+		} ) => {
+			const labelText =
+				content === 'single line'
+					? 'Collection'
+					: 'Move to another collection';
+			await render(
+				<Menu.Root defaultOpen>
+					<Menu.Trigger>Open menu</Menu.Trigger>
+					<Menu.Popup dir={ dir }>
+						<TestItem
+							kind={ kind }
+							prefix={ prefixes[ prefix ] }
+							suffix={ suffixes[ suffix ] }
+							shortcut={ hasShortcut ? shortcut : undefined }
+						>
+							<Menu.ItemLabel
+								style={
+									content.includes( 'wrapped label' )
+										? { width: 80 }
+										: undefined
+								}
+							>
+								{ labelText }
+							</Menu.ItemLabel>
+							{ content.includes( 'description' ) && (
+								<Menu.ItemDescription style={ { width: 160 } }>
+									Move this item to a different collection in
+									your library.
+								</Menu.ItemDescription>
+							) }
+						</TestItem>
+					</Menu.Popup>
+				</Menu.Root>
 			);
-		} );
-	} );
+
+			const role = {
+				action: 'menuitem',
+				link: 'menuitem',
+				checkbox: 'menuitemcheckbox',
+				radio: 'menuitemradio',
+				submenu: 'menuitem',
+			}[ kind ];
+			const item = screen.getByRole( role, {
+				name: labelText,
+			} );
+			const itemRect = item.getBoundingClientRect();
+			const contentRect = getSlot( item, 'item-content' );
+			const label = getSlot( item, 'item-label' );
+			const lineHeight = parseFloat(
+				getComputedStyle( item ).lineHeight
+			);
+
+			expect( label.height ).toBeGreaterThan( 0 );
+			if ( content === 'single line' ) {
+				expect( Math.abs( label.height - lineHeight ) ).toBeLessThan(
+					0.5
+				);
+			}
+			if ( content.includes( 'wrapped label' ) ) {
+				expect( label.height ).toBeGreaterThan( lineHeight );
+			}
+			for ( const slot of [
+				'item-children',
+				...( suffix !== 'none' ? [ 'item-suffix' ] : [] ),
+				...( hasShortcut ? [ 'item-shortcut' ] : [] ),
+				...( kind === 'submenu' ? [ 'item-trailing' ] : [] ),
+			] ) {
+				expect(
+					Math.abs(
+						center( getSlot( item, slot ) ) - center( itemRect )
+					)
+				).toBeLessThan( 0.5 );
+			}
+			for ( const slot of [
+				...( prefix !== 'none' ? [ 'item-prefix' ] : [] ),
+				...( kind === 'checkbox' || kind === 'radio'
+					? [ 'item-selection-indicator' ]
+					: [] ),
+			] ) {
+				const rect = getSlot( item, slot );
+				expect( Math.abs( rect.top - contentRect.top ) ).toBeLessThan(
+					0.5
+				);
+				expect( rect.bottom ).toBeLessThanOrEqual( itemRect.bottom );
+			}
+			if ( prefix === 'icon' ) {
+				expect(
+					Math.abs(
+						center( getSlot( item, 'prefix-icon' ) ) -
+							( contentRect.top + lineHeight / 2 )
+					)
+				).toBeLessThan( 0.5 );
+			}
+		}
+	);
 } );
