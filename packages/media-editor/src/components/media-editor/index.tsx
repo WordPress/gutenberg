@@ -694,8 +694,11 @@ function MediaEditorContent( {
 			  }
 			: undefined;
 	const handleRestoreOriginal = useCallback( () => {
+		// Restoring discards every pending edit, as the menu item says, so
+		// nothing staged against the attachment being replaced reaches a save.
+		clearEntityRecordEdits( 'postType', 'attachment', id );
 		setIsOriginalRestored( true );
-	}, [] );
+	}, [ clearEntityRecordEdits, id ] );
 
 	// A bare restore has no cropper diff, so OR the flag in explicitly.
 	const hasChanges = cropper.isCropperDirty || hasEdits || isOriginalRestored;
@@ -874,15 +877,17 @@ function MediaEditorContent( {
 			onChange={ handleChange }
 			settings={ {
 				// Disable the fields while saving, so the guard in
-				// `handleChange` is not silently swallowing typing.
-				// `readOnly` would swap the field's layout mid-save;
-				// disabled keeps it in place and greys it out.
-				fields: isSaving
-					? fields.map( ( field ) => ( {
-							...field,
-							isDisabled: true,
-						} ) )
-					: fields,
+				// `handleChange` is not silently swallowing typing, and
+				// once the original is restored, since they edit the
+				// attachment being replaced. `readOnly` would swap the
+				// field's layout; disabled keeps it in place and greys it out.
+				fields:
+					isSaving || isOriginalRestored
+						? fields.map( ( field ) => ( {
+								...field,
+								isDisabled: true,
+						  } ) )
+						: fields,
 			} }
 		>
 			<div className="media-editor">
