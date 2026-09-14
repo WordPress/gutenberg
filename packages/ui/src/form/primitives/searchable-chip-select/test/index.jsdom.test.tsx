@@ -11,6 +11,18 @@ vi.mock( import( '@wordpress/warning' ), () => ( { default: vi.fn() } ) );
 
 const mockedWarning = vi.mocked( warning );
 
+const CHIP_REMOVE_HINT = 'Press Backspace or Delete to remove.';
+
+function getChip( name: string ) {
+	return screen.getByText( ( _content, element ) => {
+		return (
+			element instanceof HTMLElement &&
+			element.hasAttribute( 'aria-description' ) &&
+			( element.textContent ?? '' ).includes( name )
+		);
+	} );
+}
+
 describe( 'SearchableChipSelect', () => {
 	beforeEach( () => {
 		mockedWarning.mockClear();
@@ -581,20 +593,12 @@ describe( 'SearchableChipSelect', () => {
 				/>
 			);
 
-			/* eslint-disable testing-library/no-node-access */
-			expect(
-				screen.getByText( 'Apple' ).closest( '[aria-description]' )
-			).toHaveAttribute(
-				'aria-description',
-				'Press Backspace or Delete to remove.'
+			expect( getChip( 'Apple' ) ).toHaveAccessibleDescription(
+				CHIP_REMOVE_HINT
 			);
-			expect(
-				screen.getByText( 'Banana' ).closest( '[aria-description]' )
-			).toHaveAttribute(
-				'aria-description',
-				'Press Backspace or Delete to remove.'
+			expect( getChip( 'Banana' ) ).toHaveAccessibleDescription(
+				CHIP_REMOVE_HINT
 			);
-			/* eslint-enable testing-library/no-node-access */
 		} );
 
 		it( 'keeps the chip Backspace or Delete description when chipsContent returns ChipWithRemove', () => {
@@ -615,14 +619,9 @@ describe( 'SearchableChipSelect', () => {
 				/>
 			);
 
-			/* eslint-disable testing-library/no-node-access */
-			expect(
-				screen.getByText( 'Apple' ).closest( '[aria-description]' )
-			).toHaveAttribute(
-				'aria-description',
-				'Press Backspace or Delete to remove.'
+			expect( getChip( 'Apple' ) ).toHaveAccessibleDescription(
+				CHIP_REMOVE_HINT
 			);
-			/* eslint-enable testing-library/no-node-access */
 		} );
 
 		it( 'keeps a consumer aria-describedby when items are selected', () => {

@@ -236,11 +236,15 @@ describe( 'Combobox', () => {
 			</Combobox.Root>
 		);
 
-		/* eslint-disable testing-library/no-node-access */
 		expect(
-			screen.getByText( 'Item 1' ).closest( '[tabindex="-1"]' )
+			screen.getByText( ( _content, element ) => {
+				return (
+					element instanceof HTMLElement &&
+					element.hasAttribute( 'aria-description' ) &&
+					( element.textContent ?? '' ).includes( 'Item 1' )
+				);
+			} )
 		).toHaveAccessibleDescription( 'Press Backspace or Delete to remove.' );
-		/* eslint-enable testing-library/no-node-access */
 	} );
 
 	it( 'renders a default trigger placeholder when no value is selected', () => {
