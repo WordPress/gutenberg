@@ -64,6 +64,25 @@ test.describe( 'HTML block', () => {
 		).toContainText( '1 < 2' );
 	} );
 
+	test( 'stays visible when the preview has no rendered height', async ( {
+		editor,
+	} ) => {
+		// Script-only content renders nothing in the canvas, because scripts
+		// are stripped from the inline preview. The block must still occupy
+		// space so it can be seen and selected.
+		await editor.setContent( `<!-- wp:html -->
+<script>window.__customHtmlBlock = true;</script>
+<!-- /wp:html -->` );
+
+		const block = editor.canvas.locator( '[data-type="core/html"]' );
+		await expect( block ).toBeVisible();
+		const box = await block.boundingBox();
+		expect( box.height ).toBeGreaterThanOrEqual( 40 );
+
+		await block.click();
+		await expect( block ).toHaveClass( /is-selected/ );
+	} );
+
 	test( 'supports editable inner blocks within static HTML', async ( {
 		editor,
 		page,
