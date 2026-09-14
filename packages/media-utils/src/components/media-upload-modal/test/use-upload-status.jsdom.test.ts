@@ -1,4 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import { useUploadStatus } from '../use-upload-status';
 import { UploadError } from '../../../utils/upload-error';
 
@@ -31,9 +32,13 @@ type BatchCallbacks = ReturnType<
 >;
 
 // isBlobURL from @wordpress/blob checks for the "blob:" prefix.
-jest.mock( '@wordpress/blob', () => ( {
-	isBlobURL: ( url: string ) => url.startsWith( 'blob:' ),
-} ) );
+vi.mock(
+	import( '@wordpress/blob' ),
+	() =>
+		( {
+			isBlobURL: ( url: string ) => url.startsWith( 'blob:' ),
+		} ) as unknown as typeof import('@wordpress/blob')
+);
 
 describe( 'useUploadStatus', () => {
 	it( 'should start with empty state', () => {
@@ -162,7 +167,7 @@ describe( 'useUploadStatus', () => {
 		} );
 
 		it( 'should call onBatchComplete exactly once even if onFileChange fires multiple times', () => {
-			const onBatchComplete = jest.fn();
+			const onBatchComplete = vi.fn();
 			const { result } = renderHook( () =>
 				useUploadStatus( { onBatchComplete } )
 			);
@@ -190,7 +195,7 @@ describe( 'useUploadStatus', () => {
 			// When __clientSideMediaProcessing is true, blob URLs are not
 			// created. onFileChange is called with a growing array as each
 			// file completes: [att1], [att1, att2], [att1, att2, att3].
-			const onBatchComplete = jest.fn();
+			const onBatchComplete = vi.fn();
 			const { result } = renderHook( () =>
 				useUploadStatus( { onBatchComplete } )
 			);
@@ -337,7 +342,7 @@ describe( 'useUploadStatus', () => {
 			// 2-3. Partial completions with blobs (ignored)
 			// 4. c.png fails → onFileChange([a, b]), successCount = 2
 			// 5. onError(c.png) → errorCount = 1, total = 3 = batchSize
-			const onBatchComplete = jest.fn();
+			const onBatchComplete = vi.fn();
 			const { result } = renderHook( () =>
 				useUploadStatus( { onBatchComplete } )
 			);
@@ -402,7 +407,7 @@ describe( 'useUploadStatus', () => {
 		} );
 
 		it( 'should handle all files erroring', () => {
-			const onBatchComplete = jest.fn();
+			const onBatchComplete = vi.fn();
 			const { result } = renderHook( () =>
 				useUploadStatus( { onBatchComplete } )
 			);

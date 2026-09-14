@@ -14,29 +14,24 @@ import {
 	formatIndent,
 } from '@wordpress/icons';
 import { useMergeRefs } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useRegistry } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
+import { useEnter, useTab, useMultiSelectTab, useMerge } from './hooks';
 import {
-	useEnter,
-	useSpace,
-	useIndentListItem,
-	useOutdentListItem,
-	useMerge,
-} from './hooks';
+	indentListItems,
+	outdentListItems,
+	getIndentTarget,
+	getOutdentTarget,
+} from './utils';
 
 export function IndentUI( { clientId } ) {
-	const indentListItem = useIndentListItem( clientId );
-	const outdentListItem = useOutdentListItem();
+	const registry = useRegistry();
 	const { canIndent, canOutdent } = useSelect(
 		( select ) => {
-			const { getBlockIndex, getBlockRootClientId, getBlockName } =
-				select( blockEditorStore );
+			const storeSelect = select( blockEditorStore );
 			return {
-				canIndent: getBlockIndex( clientId ) > 0,
-				canOutdent:
-					getBlockName(
-						getBlockRootClientId( getBlockRootClientId( clientId ) )
-					) === 'core/list-item',
+				canIndent: !! getIndentTarget( storeSelect, clientId ),
+				canOutdent: !! getOutdentTarget( storeSelect, clientId ),
 			};
 		},
 		[ clientId ]
@@ -50,7 +45,7 @@ export function IndentUI( { clientId } ) {
 				shortcut={ displayShortcut.shift( 'Tab' ) }
 				description={ __( 'Outdent list item' ) }
 				disabled={ ! canOutdent }
-				onClick={ () => outdentListItem() }
+				onClick={ () => outdentListItems( registry ) }
 			/>
 			<ToolbarButton
 				icon={ isRTL() ? formatIndentRTL : formatIndent }
@@ -58,7 +53,7 @@ export function IndentUI( { clientId } ) {
 				shortcut="Tab"
 				description={ __( 'Indent list item' ) }
 				disabled={ ! canIndent }
-				onClick={ () => indentListItem() }
+				onClick={ () => indentListItems( registry, clientId ) }
 			/>
 		</>
 	);
@@ -77,13 +72,18 @@ export default function ListItemEdit( {
 		__unstableDisableDropZone: true,
 	} );
 	const useEnterRef = useEnter( clientId );
-	const useSpaceRef = useSpace( clientId );
+	const useTabRef = useTab();
+	const useMultiSelectTabRef = useMultiSelectTab( clientId );
 	const onMerge = useMerge( clientId, mergeBlocks );
 	return (
 		<>
 			<li { ...innerBlocksProps }>
 				<RichText
-					ref={ useMergeRefs( [ useEnterRef, useSpaceRef ] ) }
+					ref={ useMergeRefs( [
+						useEnterRef,
+						useTabRef,
+						useMultiSelectTabRef,
+					] ) }
 					identifier="content"
 					tagName="div"
 					onChange={ ( nextContent ) =>

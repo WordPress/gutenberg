@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Run rendered Widget Dashboard tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
+## 0.7.0 (2026-09-10)
+
 ### New Features
 
 -   `WidgetDashboard.Policy`: a provider that governs the dashboards below
@@ -30,11 +36,24 @@
     nothing, and the wp-admin dashboard pins it where it reads its stored
     settings, so preferences persisted by the removed Columns control stay
     inert ([#82204](https://github.com/WordPress/gutenberg/pull/82204)).
+-   The staging layer enforces the policy on every instance operation,
+    whichever trigger staged the mutation: a denied `move` holds the
+    instance's index, a denied `resize` keeps its spans, a denied `edit`
+    keeps its attributes, and a new instance of a rejected type is
+    dropped ([#82256](https://github.com/WordPress/gutenberg/pull/82256)).
+
+### Documentation
+
+-   Policy contract: instance operations carry `widgetType` only while
+    the type is registered; a gone plugin or a failed load leaves it
+    absent, so locks keyed on the type do not fire
+    ([#82256](https://github.com/WordPress/gutenberg/pull/82256)).
 
 ### Internal
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+-   Declare the `@storybook/addon-docs` development dependency used by the package's story documentation ([#82676](https://github.com/WordPress/gutenberg/pull/82676)).
 
 ### Bug Fixes
 

@@ -8,7 +8,7 @@ import metadata from './block.json';
 import save from './save';
 import { unlock } from '../lock-unlock';
 
-const { fieldsKey, formKey } = unlock( blocksPrivateApis );
+const { editableRootKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -16,6 +16,9 @@ export { metadata, name };
 
 export const settings = {
 	icon,
+	// Opt into the editing host behaviour privately. It's a Symbol setting
+	// rather than a public `supports` key so it stays an internal detail.
+	[ editableRootKey ]: true,
 	example: {
 		attributes: {
 			content: __(
@@ -53,19 +56,5 @@ export const settings = {
 	edit,
 	save,
 };
-
-if ( window.__experimentalContentOnlyInspectorFields ) {
-	settings[ fieldsKey ] = [
-		{
-			id: 'content',
-			label: __( 'Content' ),
-			type: 'text',
-			Edit: 'rich-text', // TODO: replace with custom component
-		},
-	];
-	settings[ formKey ] = {
-		fields: [ 'content' ],
-	};
-}
 
 export const init = () => initBlock( { name, metadata, settings } );

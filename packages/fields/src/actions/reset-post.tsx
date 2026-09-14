@@ -169,7 +169,7 @@ const revertTemplate = async (
 
 const resetPostAction: Action< Template | TemplatePart > = {
 	id: 'reset-post',
-	label: __( 'Reset' ),
+	label: __( 'Reset…' ),
 	isEligible: ( item ) => {
 		return (
 			isTemplateOrTemplatePart( item ) &&

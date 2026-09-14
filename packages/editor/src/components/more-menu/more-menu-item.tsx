@@ -1,5 +1,6 @@
 import { Icon as WCIcon } from '@wordpress/components';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, isValidElement } from '@wordpress/element';
+import { SVG } from '@wordpress/primitives';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
 import type {
@@ -30,6 +31,11 @@ type MoreMenuItemProps = Omit<
 	 * Label of the item.
 	 */
 	children?: ReactNode;
+
+	/**
+	 * Whether the item is disabled.
+	 */
+	disabled?: boolean;
 
 	/**
 	 * Address the item navigates to, which turns it into a link.
@@ -109,6 +115,7 @@ function UnforwardedMoreMenuItem(
 		'aria-checked': ariaChecked,
 		'aria-label': ariaLabel,
 		children,
+		disabled,
 		href,
 		icon,
 		info,
@@ -128,9 +135,20 @@ function UnforwardedMoreMenuItem(
 	const description = info ? (
 		<Menu.ItemDescription>{ info }</Menu.ItemDescription>
 	) : null;
-	// Not the UI package's icon: only this one renders the Dashicon slugs
-	// `PluginMoreMenuItem` accepts.
-	const prefix = icon ? <WCIcon icon={ icon } /> : undefined;
+	let prefix: ReactNode;
+	if ( icon ) {
+		// Preserve support for Dashicon slugs and custom icon components.
+		prefix =
+			isValidElement< ComponentProps< 'svg' > >( icon ) &&
+			( icon.type === 'svg' || icon.type === SVG ) ? (
+				<Menu.PrefixIcon
+					icon={ icon }
+					className={ icon.props.className }
+				/>
+			) : (
+				<WCIcon icon={ icon } />
+			);
+	}
 	const itemShortcut = adaptShortcut( shortcut );
 	// `MenuItem` documented `isSelected`; `ComplementaryAreaToggle` sets
 	// `aria-checked`.
@@ -145,6 +163,7 @@ function UnforwardedMoreMenuItem(
 				aria-label={ itemAriaLabel }
 				checked={ checked }
 				closeOnClick
+				disabled={ disabled }
 				onClick={ onClick }
 				prefix={ prefix }
 				shortcut={ itemShortcut }
@@ -156,15 +175,19 @@ function UnforwardedMoreMenuItem(
 		);
 	}
 
-	if ( href !== undefined ) {
+	// A link item has no disabled state: it would still render an active
+	// anchor. A disabled one falls through to an inert `Menu.Item`, the way
+	// `PostPreviewMenuItem` renders it.
+	if ( href !== undefined && ! disabled ) {
 		return (
 			<Menu.LinkItem
 				ref={ ref }
 				aria-label={ itemAriaLabel }
+				closeOnClick
 				href={ href }
 				prefix={ prefix }
 				shortcut={ itemShortcut }
-				openInNewTab={ target === '_blank' }
+				target={ target }
 				onClick={ onClick }
 				{ ...props }
 			>
@@ -186,6 +209,7 @@ function UnforwardedMoreMenuItem(
 		<Menu.Item
 			ref={ ref }
 			aria-label={ itemAriaLabel }
+			disabled={ disabled }
 			prefix={ prefix }
 			shortcut={ itemShortcut }
 			onClick={ onClick }

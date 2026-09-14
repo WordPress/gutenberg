@@ -51,6 +51,7 @@ export interface BasePost extends CommonPost {
 	ping_status?: 'open' | 'closed';
 	link?: string;
 	slug?: string;
+	generated_slug?: string;
 	sticky?: boolean;
 	permalink_template?: string;
 	date?: string;

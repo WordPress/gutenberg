@@ -42,7 +42,9 @@ export default function QueryInspectorControls( props ) {
 		orderBy,
 		author: authorIds,
 		pages,
-		postType,
+		// Match `build_query_vars_from_query_block()`, which queries posts when
+		// `query` has no post type.
+		postType = 'post',
 		perPage,
 		offset,
 		sticky,
@@ -172,7 +174,7 @@ export default function QueryInspectorControls( props ) {
 		isControlAllowed( allowedControls, 'excludeCurrent' );
 	const postTypeSingularName = useSelect(
 		( select ) =>
-			select( coreStore ).getPostType( postType )?.labels.singular_name,
+			select( coreStore ).getPostType( postType )?.labels?.singular_name,
 		[ postType ]
 	);
 
@@ -432,14 +434,17 @@ export default function QueryInspectorControls( props ) {
 					{ showSearchControl && (
 						<ToolsPanelItem
 							hasValue={ () => !! querySearch }
-							label={ __( 'Keyword' ) }
+							label={ __( 'Search terms' ) }
 							onDeselect={ () => {
 								setQuery( { search: '' } );
 								setQuerySearch( '' );
 							} }
 						>
 							<TextControl
-								label={ __( 'Keyword' ) }
+								label={ __( 'Search terms' ) }
+								help={ __(
+									'Filter the query by keywords that appear in the content, title, or excerpt.'
+								) }
 								value={ querySearch }
 								onChange={ ( newQuerySearch ) => {
 									debouncedQuerySearch( newQuerySearch );

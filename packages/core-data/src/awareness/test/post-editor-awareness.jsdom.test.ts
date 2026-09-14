@@ -1,3 +1,12 @@
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	test,
+	vi,
+	type Mock,
+} from 'vitest';
 import { Y } from '@wordpress/sync';
 import { dispatch, select, subscribe, resolveSelect } from '@wordpress/data';
 import { PostEditorAwareness } from '../post-editor-awareness';
@@ -11,19 +20,16 @@ import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import type { CollaboratorInfo, PostEditorState } from '../types';
 
 // Mock WordPress dependencies
-jest.mock( '@wordpress/data', () => ( {
-	dispatch: jest.fn(),
-	select: jest.fn(),
-	subscribe: jest.fn(),
-	resolveSelect: jest.fn(),
-	// Needed because @wordpress/rich-text initialises its store at import time.
-	combineReducers: jest.fn( () => jest.fn( () => ( {} ) ) ),
-	createReduxStore: jest.fn( () => ( {} ) ),
-	register: jest.fn(),
-	createSelector: ( selector: Function ) => selector,
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	dispatch: vi.fn(),
+	select: vi.fn(),
+	subscribe: vi.fn(),
+	resolveSelect: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/block-editor', () => ( {
+// @ts-expect-error `@wordpress/block-editor` does not publish TypeScript declarations.
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	store: 'core/block-editor',
 } ) );
 
@@ -56,10 +62,10 @@ type MockBlock = {
 
 interface MockBlockEditorOverrides {
 	blocks?: MockBlock[];
-	getBlocks?: jest.Mock;
+	getBlocks?: Mock;
 	getBlockName?: string;
-	getSelectionStart?: jest.Mock;
-	getSelectionEnd?: jest.Mock;
+	getSelectionStart?: Mock;
+	getSelectionEnd?: Mock;
 }
 
 type SeededRandom = {
@@ -143,19 +149,17 @@ function mockBlockEditorStore( overrides: MockBlockEditorOverrides = {} ) {
 
 	const getBlocks =
 		overrides.getBlocks ??
-		jest.fn().mockReturnValue( overrides.blocks ?? defaultBlocks );
+		vi.fn().mockReturnValue( overrides.blocks ?? defaultBlocks );
 
-	( select as jest.Mock ).mockReturnValue( {
+	( select as Mock ).mockReturnValue( {
 		getSelectionStart:
-			overrides.getSelectionStart ?? jest.fn().mockReturnValue( {} ),
+			overrides.getSelectionStart ?? vi.fn().mockReturnValue( {} ),
 		getSelectionEnd:
-			overrides.getSelectionEnd ?? jest.fn().mockReturnValue( {} ),
-		getSelectedBlocksInitialCaretPosition: jest
-			.fn()
-			.mockReturnValue( null ),
-		getBlockIndex: jest.fn().mockReturnValue( 0 ),
-		getBlockRootClientId: jest.fn().mockReturnValue( '' ),
-		getBlockName: jest
+			overrides.getSelectionEnd ?? vi.fn().mockReturnValue( {} ),
+		getSelectedBlocksInitialCaretPosition: vi.fn().mockReturnValue( null ),
+		getBlockIndex: vi.fn().mockReturnValue( 0 ),
+		getBlockRootClientId: vi.fn().mockReturnValue( '' ),
+		getBlockName: vi
 			.fn()
 			.mockReturnValue( overrides.getBlockName ?? 'core/paragraph' ),
 		getBlocks,
@@ -285,41 +289,41 @@ function createNestedAttributeBlock(
 describe( 'PostEditorAwareness', () => {
 	let doc: Y.Doc;
 	let subscribeCallback: ( () => void ) | null = null;
-	let mockEditEntityRecord: jest.Mock;
+	let mockEditEntityRecord: Mock;
 
 	beforeEach( () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 		doc = createTestDocWithBlocks();
 
 		mockUserAgent(
 			'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 		);
 
-		jest.spyOn( Date, 'now' ).mockReturnValue( 1704067200000 );
+		vi.spyOn( Date, 'now' ).mockReturnValue( 1704067200000 );
 
 		mockBlockEditorStore();
 
 		// Mock subscribe to capture the callback
-		( subscribe as jest.Mock ).mockImplementation( ( callback ) => {
+		( subscribe as Mock ).mockImplementation( ( callback ) => {
 			subscribeCallback = callback;
-			return jest.fn(); // unsubscribe
+			return vi.fn(); // unsubscribe
 		} );
 
 		// Mock dispatch
-		mockEditEntityRecord = jest.fn();
-		( dispatch as jest.Mock ).mockReturnValue( {
+		mockEditEntityRecord = vi.fn();
+		( dispatch as Mock ).mockReturnValue( {
 			editEntityRecord: mockEditEntityRecord,
 		} );
 
 		// Mock resolveSelect for getCurrentUser
-		( resolveSelect as jest.Mock ).mockReturnValue( {
-			getCurrentUser: jest.fn().mockResolvedValue( createMockUser() ),
+		( resolveSelect as Mock ).mockReturnValue( {
+			getCurrentUser: vi.fn().mockResolvedValue( createMockUser() ),
 		} );
 	} );
 
 	afterEach( () => {
-		jest.useRealTimers();
-		jest.restoreAllMocks();
+		vi.useRealTimers();
+		vi.restoreAllMocks();
 		subscribeCallback = null;
 		doc.destroy();
 	} );
@@ -395,7 +399,7 @@ describe( 'PostEditorAwareness', () => {
 		} );
 
 		test( 'should trigger update when selection changes', () => {
-			const mockGetSelectionStart = jest
+			const mockGetSelectionStart = vi
 				.fn()
 				.mockReturnValueOnce( {} )
 				.mockReturnValueOnce( {
@@ -404,7 +408,7 @@ describe( 'PostEditorAwareness', () => {
 					offset: 5,
 				} );
 
-			const mockGetSelectionEnd = jest
+			const mockGetSelectionEnd = vi
 				.fn()
 				.mockReturnValueOnce( {} )
 				.mockReturnValueOnce( {
@@ -444,7 +448,7 @@ describe( 'PostEditorAwareness', () => {
 		} );
 
 		test( 'should debounce local cursor updates', () => {
-			const mockGetSelectionStart = jest
+			const mockGetSelectionStart = vi
 				.fn()
 				.mockReturnValueOnce( {} )
 				.mockReturnValueOnce( {
@@ -453,7 +457,7 @@ describe( 'PostEditorAwareness', () => {
 					offset: 5,
 				} );
 
-			const mockGetSelectionEnd = jest
+			const mockGetSelectionEnd = vi
 				.fn()
 				.mockReturnValueOnce( {} )
 				.mockReturnValueOnce( {
@@ -479,7 +483,7 @@ describe( 'PostEditorAwareness', () => {
 			subscribeCallback?.();
 
 			// Advance timers past debounce
-			jest.advanceTimersByTime( 10 );
+			vi.advanceTimersByTime( 10 );
 
 			// Should have processed the debounced update
 			expect( mockEditEntityRecord ).toHaveBeenCalled();
@@ -509,7 +513,7 @@ describe( 'PostEditorAwareness', () => {
 			} );
 
 			// Subscribe to track updates
-			const callback = jest.fn();
+			const callback = vi.fn();
 			awareness.onStateChange( callback );
 
 			// Emit change event
@@ -551,7 +555,7 @@ describe( 'PostEditorAwareness', () => {
 
 			awareness.setLocalStateField( 'editorState', {} );
 
-			const callback = jest.fn();
+			const callback = vi.fn();
 			awareness.onStateChange( callback );
 
 			awareness.emit( 'change', [
@@ -939,7 +943,7 @@ describe( 'PostEditorAwareness', () => {
 				'post',
 				123
 			);
-			const callback = jest.fn();
+			const callback = vi.fn();
 
 			awareness.onStateChange( callback );
 			awareness.setUp();

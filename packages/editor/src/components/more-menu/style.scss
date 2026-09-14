@@ -4,5 +4,5 @@
 	max-height: var(--available-height);
 	// Narrower than the default of the menu, closer to the previous menu,
 	// which sized itself to its longest label.
-	--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-sm);
+	max-width: var(--wpds-dimension-surface-width-sm);
 }

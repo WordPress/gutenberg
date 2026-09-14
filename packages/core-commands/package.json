@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/core-commands",
-	"version": "1.54.0",
+	"version": "1.55.0",
 	"description": "WordPress core reusable commands.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -54,7 +54,7 @@
 		"@wordpress/url": "file:../url"
 	},
 	"devDependencies": {
-		"vitest": "^4.1.10"
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",

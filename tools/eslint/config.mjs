@@ -12,7 +12,7 @@ import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
 import {
 	discoverTestFiles,
-	getTestEnvironmentName,
+	getVitestTestsByProject,
 } from '../../test/unit/scripts/discover-test-files.mjs';
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
@@ -21,25 +21,13 @@ const testMigration = require(
 	join( rootDir, 'test/unit/test-migration.json' )
 );
 
-const vitestTestPatterns = [
-	...discoverTestFiles( rootDir ).filter(
-		( testPath ) => getTestEnvironmentName( testPath ) === 'node'
-	),
-	...testMigration.vitest.files,
-	...testMigration.vitest.directories.flatMap( ( directory ) => [
-		`${ directory }/**/__tests__/**/*.[jt]s?(x)`,
-		`${ directory }/**/test/*.[jt]s?(x)`,
-		`${ directory }/**/?(*.)test.[jt]s?(x)`,
-	] ),
-];
-const vitestJsdomTestPatterns = [
-	...testMigration.vitest.files.filter( ( file ) =>
-		/\.jsdom\.test\.[cm]?[jt]sx?$/.test( file )
-	),
-	...testMigration.vitest.directories.map(
-		( directory ) => `${ directory }/**/*.jsdom.test.[cm]?[jt]s?(x)`
-	),
-];
+const vitestTestsByProject = getVitestTestsByProject(
+	discoverTestFiles( rootDir ),
+	testMigration
+);
+const vitestTestPatterns = Object.values( vitestTestsByProject ).flat();
+const vitestJsdomTestPatterns = vitestTestsByProject.jsdom;
+const vitestBrowserTestPatterns = vitestTestsByProject.browser;
 // Prefer the installed React version for linting, but fall back to the detected version.
 let reactVersion = 'detect';
 try {
@@ -540,6 +528,25 @@ export default dedupePlugins( [
 	{
 		...testingLibraryPlugin.configs[ 'flat/react' ],
 		files: vitestJsdomTestPatterns,
+	},
+	{
+		...jestDomPlugin.configs[ 'flat/recommended' ],
+		files: vitestBrowserTestPatterns,
+	},
+	{
+		...testingLibraryPlugin.configs[ 'flat/react' ],
+		files: vitestBrowserTestPatterns,
+		settings: {
+			'testing-library/utils-module': 'off',
+			'testing-library/custom-renders': 'off',
+			'testing-library/custom-queries': 'off',
+		},
+		rules: {
+			...testingLibraryPlugin.configs[ 'flat/react' ].rules,
+			// Browser Mode locators are the browser-native alternative to
+			// Testing Library's screen queries.
+			'testing-library/prefer-screen-queries': 'off',
+		},
 	},
 	{
 		plugins: jestPlugin.configs[ 'flat/recommended' ].plugins,
@@ -1081,7 +1088,7 @@ export default dedupePlugins( [
 	// Override: typings — global type declarations require `var` and define
 	// the globals that wp-global-usage warns about.
 	{
-		files: [ 'typings/**/*.d.ts' ],
+		files: [ 'tools/monorepo/typings/**/*.d.ts' ],
 		rules: {
 			'no-var': 'off',
 			'@wordpress/wp-global-usage': 'off',
