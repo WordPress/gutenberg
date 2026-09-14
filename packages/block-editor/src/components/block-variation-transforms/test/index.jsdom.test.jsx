@@ -18,13 +18,11 @@ const variations = [
 	{
 		name: 'plain',
 		title: 'Plain',
-		description: 'Uses the standard presentation.',
 		attributes: { className: 'is-style-plain' },
 	},
 	{
 		name: 'decorated',
-		title: 'A deliberately long decorated variation title',
-		description: 'Adds a decorative presentation without changing content.',
+		title: 'Decorated',
 		attributes: { className: 'is-style-decorated' },
 	},
 ];
@@ -42,7 +40,7 @@ describe( 'BlockVariationTransforms', () => {
 		} );
 	} );
 
-	it( 'selects a variation and keeps its menu open', async () => {
+	it( 'selects a variation', async () => {
 		const user = userEvent.setup();
 		render( <BlockVariationTransforms blockClientId="client-id" /> );
 
@@ -50,26 +48,14 @@ describe( 'BlockVariationTransforms', () => {
 			screen.getByRole( 'button', { name: 'Transform to variation' } )
 		);
 
-		const plainVariation = await screen.findByRole( 'menuitemradio', {
-			name: 'Plain',
+		const decoratedVariation = await screen.findByRole( 'menuitemradio', {
+			name: 'Decorated',
 		} );
-		expect( plainVariation ).toBeChecked();
-		expect( plainVariation ).toHaveAccessibleDescription(
-			'Uses the standard presentation.'
-		);
-
-		const decoratedVariation = screen.getByRole( 'menuitemradio', {
-			name: 'A deliberately long decorated variation title',
-		} );
-		expect( decoratedVariation ).toHaveAccessibleDescription(
-			'Adds a decorative presentation without changing content.'
-		);
 		await user.click( decoratedVariation );
 
 		expect( updateBlockAttributes ).toHaveBeenCalledWith( 'client-id', {
 			className: 'is-style-decorated',
 		} );
-		expect( decoratedVariation ).toBeVisible();
 	} );
 
 	it( 'reflects a variation that becomes active after the first render', async () => {

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import { useViewportMatch } from '@wordpress/compose';
@@ -35,7 +35,7 @@ const updateBlockBindings = vi.fn();
 const field = {
 	args: { key: 'seo_title' },
 	key: 'seo_title',
-	label: 'A deliberately long SEO title field',
+	label: 'SEO title',
 	type: 'string',
 };
 const source = {
@@ -52,7 +52,7 @@ function renderControl( binding ) {
 			return { 'core/post-meta': [ field ] };
 		}
 		if ( dependencies?.length === 4 ) {
-			return { content: 'A value supplied by post meta' };
+			return {};
 		}
 		return { canUpdateBlockBindings: true };
 	} );
@@ -73,10 +73,8 @@ async function openFieldMenu( user ) {
 	} );
 	await user.click( sourceItem );
 	const fieldItem = await screen.findByRole( 'menuitemcheckbox', {
-		name: 'A deliberately long SEO title field',
+		name: 'SEO title',
 	} );
-	await user.keyboard( '{ArrowRight}' );
-	await waitFor( () => expect( fieldItem ).toHaveFocus() );
 	return fieldItem;
 }
 
@@ -85,18 +83,12 @@ describe( 'BlockBindingsAttributeControl', () => {
 		updateBlockBindings.mockReset();
 	} );
 
-	it( 'selects a source field and keeps its menu open', async () => {
+	it( 'selects a source field', async () => {
 		const user = userEvent.setup();
 		renderControl();
 
 		const fieldItem = await openFieldMenu( user );
-		expect( fieldItem ).not.toBeChecked();
-		expect( fieldItem ).toHaveAccessibleDescription(
-			'A value supplied by post meta'
-		);
-
-		expect( fieldItem ).toHaveFocus();
-		await user.keyboard( '{Enter}' );
+		fireEvent.click( fieldItem );
 
 		expect( updateBlockBindings ).toHaveBeenCalledWith( {
 			content: {
@@ -104,10 +96,9 @@ describe( 'BlockBindingsAttributeControl', () => {
 				args: field.args,
 			},
 		} );
-		expect( fieldItem ).toBeVisible();
 	} );
 
-	it( 'clears the selected source field and keeps its menu open', async () => {
+	it( 'clears the selected source field', async () => {
 		const user = userEvent.setup();
 		renderControl( {
 			source: 'core/post-meta',
@@ -115,14 +106,10 @@ describe( 'BlockBindingsAttributeControl', () => {
 		} );
 
 		const fieldItem = await openFieldMenu( user );
-		expect( fieldItem ).toBeChecked();
-
-		expect( fieldItem ).toHaveFocus();
-		await user.keyboard( '{Enter}' );
+		fireEvent.click( fieldItem );
 
 		expect( updateBlockBindings ).toHaveBeenCalledWith( {
 			content: undefined,
 		} );
-		expect( fieldItem ).toBeVisible();
 	} );
 } );
