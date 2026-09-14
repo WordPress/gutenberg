@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render, renderHook } from 'vitest-browser-react';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
 
 // The inheritance treatment sits behind the
@@ -33,6 +34,26 @@ async function renderPanel( props ) {
 			{ ...props }
 		/>
 	);
+}
+
+/**
+ * Activates an item in a ToolsPanel options menu.
+ *
+ * The item is activated from the keyboard rather than clicked. This suite runs
+ * without the stylesheet that gives `.components-popover` its z-index, so the
+ * menu popover computes `z-index: auto` and a real pointer click hit-tests
+ * straight through it onto whichever panel control sits underneath. Key events
+ * go to the focused element and are not subject to hit testing, and the menu is
+ * keyboard operable in any case.
+ *
+ * @param {string}        toggleName Accessible name of the menu toggle.
+ * @param {string|RegExp} itemName   Accessible name of the menu item.
+ */
+async function activatePanelMenuItem( toggleName, itemName ) {
+	await userEvent.click( screen.getByRole( 'button', { name: toggleName } ) );
+	const item = await screen.findByRole( 'menuitem', { name: itemName } );
+	item.focus();
+	await userEvent.keyboard( '{Enter}' );
 }
 
 /**
@@ -956,5 +977,183 @@ describe( 'TypographyPanel layout className preserved regardless of inheritance 
 		expect( letterSpacingItem ).toHaveClass(
 			'is-inherited-from-global-styles'
 		);
+	} );
+} );
+
+describe( 'TypographyPanel text gradient', () => {
+	const GRADIENT =
+		'linear-gradient(135deg, rgb(74, 0, 224) 0%, rgb(142, 45, 226) 100%)';
+	const TEST_BLOCK = 'test/text-gradient';
+
+	// Text colour lives in this panel, so the gradient that replaces it does
+	// too. It needs a gradient palette and the `background.gradient` support
+	// to be selectable at all.
+	const gradientSettings = {
+		...baseSettings,
+		background: { gradient: true },
+		color: {
+			text: true,
+			palette: {
+				theme: [ { name: 'Black', slug: 'black', color: '#000000' } ],
+			},
+			gradients: {
+				theme: [
+					{ name: 'Purple', slug: 'purple-blue', gradient: GRADIENT },
+				],
+			},
+		},
+	};
+
+	// The gradient item is optional, so tests asserting on it opt it in.
+	const shownControls = { textColor: true, textGradient: true };
+
+	const withClip = ( backgroundClip ) => ( {
+		...gradientSettings,
+		background: { ...gradientSettings.background, backgroundClip },
+	} );
+
+	beforeEach( () => {
+		registerBlockType( TEST_BLOCK, {
+			apiVersion: 3,
+			title: 'Text gradient test',
+			category: 'text',
+			supports: { background: { gradient: true, backgroundClip: true } },
+		} );
+	} );
+
+	afterEach( () => {
+		unregisterBlockType( TEST_BLOCK );
+	} );
+
+	it( 'hides the gradient control when neither the block nor the theme opts in', async () => {
+		await renderPanel( {
+			settings: gradientSettings,
+			defaultControls: shownControls,
+		} );
+
+		expect(
+			screen.queryByRole( 'button', { name: /Gradient/ } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'shows the gradient control when the theme allows the text clip', async () => {
+		await renderPanel( {
+			settings: withClip( [ 'text' ] ),
+			defaultControls: shownControls,
+		} );
+
+		expect(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'shows the gradient control when the block declares clip support', async () => {
+		await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+		} );
+
+		expect(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'hides the gradient control when no gradient can be chosen', async () => {
+		await renderPanel( {
+			settings: {
+				...gradientSettings,
+				color: { text: true },
+			},
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+		} );
+
+		expect(
+			screen.queryByRole( 'button', { name: /Gradient/ } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'stores a chosen gradient as a gradient clipped to the text', async () => {
+		const onChange = vi.fn();
+		await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			onChange,
+		} );
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		);
+		const swatches = await screen.findAllByRole( 'option' );
+		await userEvent.click( swatches[ 0 ] );
+
+		const result = onChange.mock.calls.at( -1 )[ 0 ];
+		expect( result.background.gradient ).toBe(
+			'var:preset|gradient|purple-blue'
+		);
+		expect( result.background.backgroundClip ).toBe( 'text' );
+	} );
+
+	it( 'clears a legacy color gradient when a text gradient is chosen', async () => {
+		const onChange = vi.fn();
+		await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			value: { color: { gradient: 'linear-gradient(red, blue)' } },
+			onChange,
+		} );
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		);
+		const swatches = await screen.findAllByRole( 'option' );
+		await userEvent.click( swatches[ 0 ] );
+
+		const result = onChange.mock.calls.at( -1 )[ 0 ];
+		expect( result.color.gradient ).toBeUndefined();
+	} );
+
+	it( 'disables the text color control while a text gradient is applied', async () => {
+		await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			value: {
+				background: {
+					gradient: 'var:preset|gradient|purple-blue',
+					backgroundClip: 'text',
+				},
+			},
+		} );
+
+		// The control stays focusable so its tooltip remains reachable.
+		expect(
+			screen.getByRole( 'button', { name: /Color/ } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'clears both halves of the text gradient on Reset all', async () => {
+		const onChange = vi.fn();
+		await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			onChange,
+			value: {
+				typography: { lineHeight: '1.7' },
+				background: {
+					gradient: 'var:preset|gradient|purple-blue',
+					backgroundClip: 'text',
+				},
+			},
+		} );
+
+		await activatePanelMenuItem( 'Typography options', /reset all/i );
+
+		const result = onChange.mock.calls.at( -1 )[ 0 ];
+		expect( result.background.gradient ).toBeUndefined();
+		expect( result.background.backgroundClip ).toBeUndefined();
 	} );
 } );

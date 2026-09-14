@@ -397,6 +397,7 @@ function ScreenBlock( {
 					value={ style }
 					onChange={ onChangeTypography }
 					settings={ settings }
+					blockName={ name }
 					// Only expose global-settings controls (e.g. "Indent all
 					// paragraphs") when not editing a state-specific variation,
 					// because those settings are global and cannot be per-breakpoint.
