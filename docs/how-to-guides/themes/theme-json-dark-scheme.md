@@ -82,7 +82,11 @@ This emits, roughly (the `data-scheme` rules let a visitor control override the 
 }
 ```
 
-`dark` (and `light`) may contain `palette` and `gradients`.
+`dark` (and `light`) may contain `palette`, `gradients`, and `duotone`. A duotone
+override supplies replacement `colors` for a matching base duotone slug; it emits an
+additional SVG filter and redefines `--wp--preset--duotone--{slug}` under the scheme
+gate, so duotone-filtered images (cover, image, media) recolor with the scheme
+instead of staying fixed.
 
 ### Dark by default (a `light` override)
 
@@ -125,8 +129,8 @@ with its base palette. A single `theme.json` works on old and new WordPress.
 - Persisting a visitor's `data-scheme` choice across page loads. If ever added, it
   would be a dedicated visitor-preferences feature with its own privacy review, not
   a default.
-- Dark duotone variants.
-- Automatic generation of dark values — the theme must define them; the system
+- Automatic generation of scheme values — the theme must define them; the system
   never derives colors automatically.
-- Raw (non-preset) colors, per-block fixed colors, images/logos, and nested light/dark
-  surfaces. These remain the theme's responsibility.
+- Raw (non-preset) colors, per-block fixed colors, custom (non-preset) duotones,
+  transparent logos, and nested light/dark surfaces. These remain the theme's
+  responsibility.
