@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/vips",
-	"version": "4.0.0",
+	"version": "4.1.0",
 	"description": "Utils for working with libvips.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -59,8 +59,8 @@
 		"wasm-vips": "^0.0.18"
 	},
 	"devDependencies": {
-		"@types/node": "^20.19.39",
-		"vitest": "^4.1.10"
+		"@types/node": "^24.13.3",
+		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

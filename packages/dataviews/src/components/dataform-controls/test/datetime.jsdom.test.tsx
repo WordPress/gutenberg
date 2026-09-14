@@ -31,22 +31,6 @@ const field = normalizeFields< TestItem >( [
 const getMonthGrid = ( monthLabel: string ) =>
 	screen.getByRole( 'grid', { name: monthLabel } );
 
-const supportsOffsetTimeZones = () => {
-	try {
-		new Intl.DateTimeFormat( 'en', { timeZone: '+05:30' } );
-		return true;
-	} catch {
-		return false;
-	}
-};
-
-// Raw offset identifiers are supported by the target browsers and Node 22+.
-// Node 20 cannot mount Calendar with them because its Intl implementation
-// rejects the identifier before the interaction can be tested.
-const describeWithOffsetTimeZones = supportsOffsetTimeZones()
-	? describe
-	: describe.skip;
-
 function DateTimeHarness( { initialValue }: { initialValue: string } ) {
 	const [ data, setData ] = useState< TestItem >( {
 		published: initialValue,
@@ -157,7 +141,7 @@ describe( 'DateTime control', () => {
 		} );
 	}
 
-	describeWithOffsetTimeZones( 'with a manual UTC offset', () => {
+	describe( 'with a manual UTC offset', () => {
 		it( 'should move to the site month after an external value change', () => {
 			setSiteOffset( 14 );
 			const { rerender } = render(
@@ -329,9 +313,7 @@ describe( 'DateTime control', () => {
 			);
 		} );
 
-		// The manual offset reaches Calendar as a raw offset identifier,
-		// which Node 20 rejects — see `supportsOffsetTimeZones`.
-		describeWithOffsetTimeZones( 'on a site with a manual offset', () => {
+		describe( 'on a site with a manual offset', () => {
 			it( 'falls back to the UTC offset', () => {
 				setSiteOffset( 14 );
 

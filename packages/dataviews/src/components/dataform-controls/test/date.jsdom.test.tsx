@@ -359,9 +359,6 @@ describe( 'DateControl', () => {
 			name: /august 25, 2026/i,
 		} );
 		await user.click( august25 );
-		// The first click extends the existing range. Clicking its new end again
-		// starts the replacement range from that day.
-		await user.click( august25 );
 		await user.click(
 			screen.getByRole( 'button', { name: /august 27, 2026/i } )
 		);

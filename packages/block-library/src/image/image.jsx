@@ -893,9 +893,6 @@ export default function Image( {
 		</>
 	);
 
-	const hasDataFormBlockFields =
-		window?.__experimentalContentOnlyInspectorFields;
-
 	const controls = (
 		<>
 			{ showBlockControls && (
@@ -964,7 +961,7 @@ export default function Image( {
 					/>
 				</BlockControls>
 			) }
-			{ ! hasDataFormBlockFields && isSingleSelected && (
+			{ isSingleSelected && (
 				<InspectorControls group="content">
 					<ToolsPanel
 						label={ __( 'Media' ) }

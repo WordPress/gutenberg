@@ -39,6 +39,7 @@ const fields: Field< SamplePost >[] = [
 		id: 'title',
 		label: 'Title',
 		type: 'text',
+		placeholder: 'Add a title',
 	},
 	{
 		id: 'order',
@@ -272,11 +273,13 @@ const getPanelLayoutFromStoryArgs = ( {
 	labelPosition,
 	openAs,
 	editVisibility,
+	showPlaceholderIfEmpty,
 }: {
 	summary?: string[];
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
 	openAs?: PanelLayout[ 'openAs' ];
 	editVisibility?: 'default' | EditVisibility;
+	showPlaceholderIfEmpty?: boolean;
 } ): Layout | undefined => {
 	const panelLayout: PanelLayout = {
 		type: 'panel',
@@ -298,6 +301,10 @@ const getPanelLayoutFromStoryArgs = ( {
 		panelLayout.editVisibility = editVisibility;
 	}
 
+	if ( showPlaceholderIfEmpty ) {
+		panelLayout.showPlaceholderIfEmpty = true;
+	}
+
 	return panelLayout;
 };
 
@@ -305,6 +312,7 @@ const LayoutPanelComponent = ( {
 	labelPosition,
 	openAs: openAsArg,
 	editVisibility,
+	showPlaceholderIfEmpty,
 	applyLabel,
 	cancelLabel,
 }: {
@@ -312,6 +320,7 @@ const LayoutPanelComponent = ( {
 	labelPosition: 'default' | 'top' | 'side' | 'none';
 	openAs: 'default' | 'dropdown' | 'modal';
 	editVisibility: 'default' | EditVisibility;
+	showPlaceholderIfEmpty: boolean;
 	applyLabel?: string;
 	cancelLabel?: string;
 } ) => {
@@ -356,6 +365,7 @@ const LayoutPanelComponent = ( {
 				labelPosition,
 				openAs,
 				editVisibility,
+				showPlaceholderIfEmpty,
 			} ),
 			fields: [
 				'title',
@@ -368,6 +378,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 				'order',
@@ -385,6 +396,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 				{
@@ -396,6 +408,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 				{
@@ -412,6 +425,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 				{
@@ -423,11 +437,19 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 			],
 		};
-	}, [ labelPosition, openAsArg, applyLabel, cancelLabel, editVisibility ] );
+	}, [
+		labelPosition,
+		openAsArg,
+		applyLabel,
+		cancelLabel,
+		editVisibility,
+		showPlaceholderIfEmpty,
+	] );
 
 	return (
 		<DataForm< SamplePost >

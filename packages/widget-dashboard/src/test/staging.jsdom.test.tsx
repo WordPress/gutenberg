@@ -1,4 +1,3 @@
-import '@testing-library/jest-dom/vitest';
 import { act, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useEffect, useState } from '@wordpress/element';

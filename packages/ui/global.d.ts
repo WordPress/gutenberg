@@ -3,4 +3,5 @@
 // To ensure that global types are included, we need to
 // explicitly reference them here.
 import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import '@wordpress/jest-console';

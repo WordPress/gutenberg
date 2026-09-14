@@ -3,13 +3,13 @@
 
 	@layer components {
 		.root {
-			--wp-ui-checkbox-input-size: 16px;
+			--_checkbox-input-size: var(--wp-ui-checkbox-input-size, var(--wpds-dimension-size-2xs));
 
 			position: relative;
 			display: inline-block;
 			flex-shrink: 0;
-			width: var(--wp-ui-checkbox-input-size);
-			height: var(--wp-ui-checkbox-input-size);
+			width: var(--_checkbox-input-size);
+			aspect-ratio: 1;
 			border-radius: var(--wpds-border-radius-sm);
 			border:
 				var(--wpds-border-width-xs) solid
@@ -46,6 +46,17 @@
 					color: GrayText;
 					border-color: GrayText;
 				}
+			}
+
+			&::after {
+				content: "";
+				position: absolute;
+				top: 50%;
+				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical centering technique used with transform: translate(-50%, -50%) */
+				left: 50%;
+				width: max(var(--_checkbox-input-size), var(--wpds-dimension-size-sm));
+				aspect-ratio: 1;
+				transform: translate(-50%, -50%);
 			}
 		}
 

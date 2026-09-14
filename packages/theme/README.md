@@ -115,8 +115,8 @@ Use `onColorWarnings` to receive structured warnings after the provider calculat
 ```js
 <ThemeProvider
 	color={ {
-		primary: '#608010',
-		background: '#4f386e',
+		primary: '#ff0000',
+		background: '#0000ff',
 	} }
 	onColorWarnings={ ( warnings ) => {
 		// Format or display the warnings for your users.
