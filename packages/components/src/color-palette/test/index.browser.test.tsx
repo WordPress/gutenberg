@@ -1,10 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor } from '@testing-library/react';
+import { userEvent } from 'vitest/browser';
+import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import ColorPalette from '..';
-
-globalThis.wpVitest.mockMatchMedia();
 
 const EXAMPLE_COLORS = [
 	{ name: 'red', color: '#f00' },
@@ -40,7 +39,7 @@ describe( 'ColorPalette', () => {
 	it( 'should use matching values only for display in command button presentation', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
-		render(
+		await render(
 			<ColorPalette
 				aria-label="Colors"
 				colors={ DUPLICATE_COLOR_PALETTE }
@@ -64,8 +63,8 @@ describe( 'ColorPalette', () => {
 		expect( onChange ).toHaveBeenCalledWith( '#000', 0, 'dark-background' );
 	} );
 
-	it( 'should warn for asButtons and prefer an explicit presentation', () => {
-		render(
+	it( 'should warn for asButtons and prefer an explicit presentation', async () => {
+		await render(
 			<ColorPalette
 				aria-label="Colors"
 				colors={ EXAMPLE_COLORS }
@@ -85,8 +84,8 @@ describe( 'ColorPalette', () => {
 		);
 	} );
 
-	it( 'should preserve asButtons as a toggle-button alias', () => {
-		render(
+	it( 'should preserve asButtons as a toggle-button alias', async () => {
+		await render(
 			<ColorPalette
 				aria-label="Colors"
 				colors={ DUPLICATE_COLOR_PALETTE }
@@ -113,10 +112,10 @@ describe( 'ColorPalette', () => {
 		).toBeVisible();
 	} );
 
-	it( 'should render three color button options', () => {
+	it( 'should render three color button options', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -131,7 +130,7 @@ describe( 'ColorPalette', () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -149,7 +148,7 @@ describe( 'ColorPalette', () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -178,7 +177,7 @@ describe( 'ColorPalette', () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -192,10 +191,10 @@ describe( 'ColorPalette', () => {
 		expect( onChange ).toHaveBeenCalledWith( undefined );
 	} );
 
-	it( 'should render custom color picker', () => {
+	it( 'should render custom color picker', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -208,10 +207,10 @@ describe( 'ColorPalette', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'should allow disabling custom color picker', () => {
+	it( 'should allow disabling custom color picker', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				disableCustomColors
@@ -225,9 +224,9 @@ describe( 'ColorPalette', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'should render nothing when custom colors are disabled, there are no colors, and it is not clearable', () => {
+	it( 'should render nothing when custom colors are disabled, there are no colors, and it is not clearable', async () => {
 		const onChange = vi.fn();
-		const { container } = render(
+		const { container } = await render(
 			<ColorPalette
 				colors={ [] }
 				disableCustomColors
@@ -243,7 +242,7 @@ describe( 'ColorPalette', () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -279,10 +278,10 @@ describe( 'ColorPalette', () => {
 		);
 	} );
 
-	it( 'should show the clear button by default', () => {
+	it( 'should show the clear button by default', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -295,20 +294,20 @@ describe( 'ColorPalette', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'should show the clear button even when `colors` is an empty array', () => {
+	it( 'should show the clear button even when `colors` is an empty array', async () => {
 		const onChange = vi.fn();
 
-		render( <ColorPalette colors={ [] } onChange={ onChange } /> );
+		await render( <ColorPalette colors={ [] } onChange={ onChange } /> );
 
 		expect(
 			screen.getByRole( 'button', { name: 'Clear' } )
 		).toBeInTheDocument();
 	} );
 
-	it( 'should still show the clear button when colors is empty and custom colors are disabled', () => {
+	it( 'should still show the clear button when colors is empty and custom colors are disabled', async () => {
 		const onChange = vi.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ [] }
 				disableCustomColors
@@ -324,7 +323,7 @@ describe( 'ColorPalette', () => {
 	it( 'should display the selected color name and value', async () => {
 		const user = userEvent.setup();
 
-		render( <ControlledColorPalette /> );
+		await render( <ControlledColorPalette /> );
 
 		const { name: colorName, color: colorCode } = EXAMPLE_COLORS[ 0 ];
 
@@ -372,8 +371,8 @@ describe( 'ColorPalette', () => {
 	} );
 
 	describe( 'duplicate colors in palette', () => {
-		it( 'should render all swatches even when two entries share the same color value', () => {
-			render(
+		it( 'should render all swatches even when two entries share the same color value', async () => {
+			await render(
 				<ColorPalette
 					colors={ DUPLICATE_COLOR_PALETTE }
 					value={ undefined }
@@ -384,8 +383,8 @@ describe( 'ColorPalette', () => {
 			expect( screen.getAllByRole( 'option' ) ).toHaveLength( 2 );
 		} );
 
-		it( 'should select by slug when selectedSlug is provided, marking only the matching entry', () => {
-			render(
+		it( 'should select by slug when selectedSlug is provided, marking only the matching entry', async () => {
+			await render(
 				<ColorPalette
 					colors={ DUPLICATE_COLOR_PALETTE }
 					value="#000"
@@ -401,8 +400,8 @@ describe( 'ColorPalette', () => {
 			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 
-		it( 'should fall back to color-value selection and mark all matching duplicates when no selectedSlug is provided', () => {
-			render(
+		it( 'should fall back to color-value selection and mark all matching duplicates when no selectedSlug is provided', async () => {
+			await render(
 				<ColorPalette
 					colors={ DUPLICATE_COLOR_PALETTE }
 					value="#000"
@@ -417,8 +416,8 @@ describe( 'ColorPalette', () => {
 			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 
-		it( 'should treat an empty-string selectedSlug as no slug and fall back to color-value selection', () => {
-			render(
+		it( 'should treat an empty-string selectedSlug as no slug and fall back to color-value selection', async () => {
+			await render(
 				<ColorPalette
 					colors={ DUPLICATE_COLOR_PALETTE }
 					value="#000"
@@ -432,8 +431,8 @@ describe( 'ColorPalette', () => {
 			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 
-		it( 'should display the slug-matched entry name in the custom color button label', () => {
-			render(
+		it( 'should display the slug-matched entry name in the custom color button label', async () => {
+			await render(
 				<ColorPalette
 					colors={ DUPLICATE_COLOR_PALETTE }
 					value="#000"
@@ -453,7 +452,7 @@ describe( 'ColorPalette', () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 
-			render(
+			await render(
 				<ColorPalette
 					colors={ DUPLICATE_COLOR_PALETTE }
 					value={ undefined }
@@ -471,7 +470,7 @@ describe( 'ColorPalette', () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 
-			render(
+			await render(
 				<ColorPalette
 					colors={ DUPLICATE_COLOR_PALETTE }
 					value="#000"
@@ -487,14 +486,14 @@ describe( 'ColorPalette', () => {
 			expect( onChange ).toHaveBeenCalledWith( undefined );
 		} );
 
-		it( 'should handle mixed palettes with some entries having slugs and others not', () => {
+		it( 'should handle mixed palettes with some entries having slugs and others not', async () => {
 			const MIXED_PALETTE = [
 				{ name: 'Brand White', slug: 'brand-white', color: '#fff' },
 				{ name: 'Plain White', color: '#fff' },
 				{ name: 'Brand Black', slug: 'brand-black', color: '#000' },
 			];
 
-			render(
+			await render(
 				<ColorPalette
 					colors={ MIXED_PALETTE }
 					value="#fff"
