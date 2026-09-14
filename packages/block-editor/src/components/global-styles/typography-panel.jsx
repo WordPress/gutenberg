@@ -284,13 +284,7 @@ export default function TypographyPanel( {
 			newSlug
 		);
 		let changedObject = setImmutably( value, [ 'color', 'text' ], encoded );
-		// With the experiment off, keep the pre-inheritance comparison on
-		// `inheritedValue`.
-		const syncLinkColor = isGlobalStylesInheritanceEnabled()
-			? shouldSyncLinkColor( value, inheritedValue )
-			: inheritedValue?.color?.text ===
-			  inheritedValue?.elements?.link?.color?.text;
-		if ( syncLinkColor ) {
+		if ( shouldSyncLinkColor( value, inheritedValue ) ) {
 			changedObject = setImmutably(
 				changedObject,
 				[ 'elements', 'link', 'color', 'text' ],
