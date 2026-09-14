@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { buildMoveGhostIndex } from '../move-ghost-index';
 
 const resolvers = (

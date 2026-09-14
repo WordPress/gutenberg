@@ -18,7 +18,6 @@
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../dom" },
 		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../escape-html/tsconfig.build.json" },
 		{ "path": "../preferences/tsconfig.build.json" },
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
 		{ "path": "../priority-queue/tsconfig.build.json" },
@@ -40,8 +39,7 @@
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url" },
 		{ "path": "../upload-media/tsconfig.build.json" },
-		{ "path": "../warning" },
-		{ "path": "../wordcount/tsconfig.build.json" }
+		{ "path": "../warning" }
 	],
 	/*
 	 * The package has no TypeScript tests, and its two stories import

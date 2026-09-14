@@ -55,6 +55,24 @@ Use `Menu.RadioItem` within `Menu.RadioGroup` for mutually exclusive states, suc
 
 Do not use checked menu items only to recreate a Select. If choosing a value is the whole purpose of the control, use `SelectControl`, even when the options could look like radio menu items.
 
+## Add prefix icons
+
+Use `Menu.PrefixIcon` in an item's `prefix` prop for an SVG icon. It defaults to 24px and aligns with the first label line, whether or not the item has a description or selection indicator. Prefer the default size for consistent menu icons.
+
+```tsx
+import { archive } from '@wordpress/icons';
+import { Menu } from '@wordpress/ui';
+
+<Menu.Item prefix={ <Menu.PrefixIcon icon={ archive } /> }>
+	<Menu.ItemLabel>Archive</Menu.ItemLabel>
+	<Menu.ItemDescription>Move this item to the archive.</Menu.ItemDescription>
+</Menu.Item>;
+```
+
+The prefix slot already hides its contents from assistive technology. Keep meaningful text in `Menu.ItemLabel` or `Menu.ItemDescription`.
+
+Other non-interactive React content can still be passed directly to `prefix`. It retains its natural height and starts at the top of the item. `Menu.PrefixIcon` does not change the sizing of other prefix content.
+
 ## Use an ellipsis for actions that need more input
 
 Append an ellipsis (`…`) when activating an item opens another interface that requires more user input before the command can finish, such as a dialog.

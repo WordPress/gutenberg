@@ -347,7 +347,7 @@ _Returns_
 
 ### getEditedPostSlug
 
-Returns the slug for the post being edited, preferring a manually edited value if one exists, then a sanitized version of the current post title, and finally the post ID.
+Returns the slug for the post being edited, preferring a manually edited value if one exists, then the server-generated slug from the post entity, then a JS approximation of the current post title, and finally the post ID.
 
 _Parameters_
 
@@ -1393,6 +1393,8 @@ _Related_
 
 Action that restores last popped state in undo history.
 
+Refused in the read-only `view` intent: undo and redo rewrite the post the same way a keystroke does, and the header buttons stay mounted there.
+
 ### refreshPost
 
 > **Deprecated** Since WordPress 6.0.
@@ -1670,6 +1672,8 @@ Action for trashing the current post in the editor.
 ### undo
 
 Action that pops a record from undo history and undoes the edit.
+
+Refused in the read-only `view` intent — see `redo`.
 
 ### unlockPostAutosaving
 

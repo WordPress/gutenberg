@@ -9,6 +9,7 @@ import {
 	SUGGESTION_FORMAT_NAME,
 	SUGGESTION_ID_ATTRIBUTE,
 	SUGGESTION_TYPE_ATTRIBUTE,
+	SUGGESTION_AUTHOR_ATTRIBUTE,
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_DELETION,
 	findSuggestionRange,
@@ -237,6 +238,21 @@ function markerType( format: any ) {
 }
 
 /**
+ * Whether the marker belongs to the given author. An unauthored marker matches
+ * only an unknown author, the same rule `formatsAdditionRunToExtend` applies.
+ *
+ * @param format      Suggestion format object.
+ * @param authorToken Current author id as a string, or null when unknown.
+ * @return True when the author may act on the marker as their own.
+ */
+function isOwnMarker( format: any, authorToken: string | null ) {
+	return (
+		String( format?.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? '' ) ===
+		( authorToken ?? '' )
+	);
+}
+
+/**
  * HTML of the inserted run when it carries inline formatting of its own, so the
  * proposed addition can be marked up rather than flattened to plain text — a
  * pasted `<strong>`/`<a href>` reaches the block as a new `content` value, and
@@ -452,18 +468,23 @@ export function planEditMarkers(
 			return { kind: 'delete', actions: [] };
 		}
 		// The author removing their own pending addition: drop that marker.
+		// Another author's addition is not theirs to withdraw, so the edit is
+		// left unplanned like any other edit inside someone else's marker.
 		const addId = uniformMarker(
 			edit.start,
 			edit.end,
 			SUGGESTION_TYPE_ADDITION
 		);
-		if ( addId !== null ) {
+		if (
+			addId !== null &&
+			isOwnMarker( suggestionAt( record, edit.start ), authorToken )
+		) {
 			return {
 				kind: 'delete',
 				actions: [ { type: 'remove-add', id: addId } ],
 			};
 		}
-		// Mixed / straddling: leave to a later phase.
+		// Mixed / straddling, or another author's marker: leave to a later phase.
 		return { kind: 'delete', actions: [] };
 	}
 

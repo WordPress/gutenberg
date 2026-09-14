@@ -3,6 +3,8 @@ import { SelectControl } from '../';
 import {
 	WITH_DETAILS_DESCRIPTION,
 	DETAILS_EXAMPLE,
+	longLabelPopupItems,
+	narrowContainerDecorator,
 } from '../../stories/shared';
 
 const meta: Meta< typeof SelectControl > = {
@@ -34,11 +36,6 @@ const defaultItems = [
 ];
 
 export const Default: Story = {
-	parameters: {
-		// FIXME: Placeholder-like trigger text fails color-contrast (WCAG 1.4.3 applies to placeholder text).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
-	},
 	args: {
 		items: defaultItems,
 		label: 'Label',
@@ -53,11 +50,6 @@ export const Default: Story = {
  * Prefer a concise label without a trailing ellipsis.
  */
 export const WithCustomPlaceholder: Story = {
-	parameters: {
-		// FIXME: Placeholder-like trigger text fails color-contrast (WCAG 1.4.3 applies to placeholder text).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
-	},
 	args: {
 		...Default.args,
 		placeholder: 'Choose an item',
@@ -88,11 +80,6 @@ const nullValueOptionItems = [
  * from the popup.
  */
 export const WithNullValueOption: Story = {
-	parameters: {
-		// FIXME: Placeholder-like trigger text fails color-contrast (WCAG 1.4.3 applies to placeholder text).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
-	},
 	args: {
 		items: nullValueOptionItems,
 		label: 'Theme',
@@ -102,11 +89,6 @@ export const WithNullValueOption: Story = {
 };
 
 export const VisuallyHiddenLabel: Story = {
-	parameters: {
-		// FIXME: Placeholder-like trigger text fails color-contrast (WCAG 1.4.3 applies to placeholder text).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
-	},
 	args: {
 		...Default.args,
 		hideLabelFromVision: true,
@@ -115,9 +97,6 @@ export const VisuallyHiddenLabel: Story = {
 
 export const WithDetails: Story = {
 	parameters: {
-		// FIXME: Placeholder-like trigger text fails color-contrast (WCAG 1.4.3 applies to placeholder text).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
 		docs: { description: { story: WITH_DETAILS_DESCRIPTION } },
 	},
 	args: {
@@ -181,11 +160,6 @@ const groupedItems = [
  * resolution, and use `children` to render the grouped popup content.
  */
 export const Grouped: Story = {
-	parameters: {
-		// FIXME: Placeholder-like trigger text fails color-contrast (WCAG 1.4.3 applies to placeholder text).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
-	},
 	args: {
 		label: 'Fruit',
 		description: 'Choose a fruit.',
@@ -288,11 +262,6 @@ export const WithCustomTriggerAndItems: Story = {
  * the Item list in the popover will still be rendered based on the `items` array.
  */
 export const WithItemsArrayAndPartialCustomization: Story = {
-	parameters: {
-		// FIXME: Placeholder-like trigger text fails color-contrast (WCAG 1.4.3 applies to placeholder text).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
-	},
 	args: {
 		...Default.args,
 		children: [
@@ -307,5 +276,19 @@ export const WithItemsArrayAndPartialCustomization: Story = {
 				</SelectControl.Item>
 			) ),
 		],
+	},
+};
+
+/**
+ * Use `popupWidth` to control how the popup width is constrained relative to
+ * its anchor. Defaults to `content` so static option lists can grow with their
+ * labels.
+ */
+export const PopupWidth: Story = {
+	decorators: [ narrowContainerDecorator ],
+	args: {
+		label: 'Label',
+		items: longLabelPopupItems,
+		popupWidth: 'content',
 	},
 };

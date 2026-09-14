@@ -47,6 +47,21 @@ const backdropBorderColor = ( {
 	return COLORS.ui.border;
 };
 
+const backdropDisabledStyles = ( {
+	disabled,
+	isBorderless,
+}: BackdropProps ) => {
+	if ( ! disabled || isBorderless ) {
+		return undefined;
+	}
+
+	return css`
+		@media ( forced-colors: active ) {
+			border-color: GrayText;
+		}
+	`;
+};
+
 export const BackdropUI = styled.div< BackdropProps >`
 	&&& {
 		box-sizing: border-box;
@@ -64,6 +79,7 @@ export const BackdropUI = styled.div< BackdropProps >`
 		top: 0;
 
 		${ rtl( { paddingLeft: 2 } ) }
+		${ backdropDisabledStyles }
 	}
 `;
 
@@ -75,11 +91,17 @@ export const Root = styled( Flex )`
 `;
 
 const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
-	const backgroundColor = disabled
-		? COLORS.ui.backgroundDisabled
-		: COLORS.ui.background;
+	if ( ! disabled ) {
+		return undefined;
+	}
 
-	return css( { backgroundColor } );
+	return css`
+		color: ${ COLORS.ui.textDisabled };
+
+		@media ( forced-colors: active ) {
+			color: GrayText;
+		}
+	`;
 };
 
 const containerWidthStyles = ( {
@@ -110,6 +132,7 @@ export const Container = styled.div< ContainerProps >`
 	display: flex;
 	flex: 1;
 	position: relative;
+	background-color: ${ COLORS.ui.background };
 
 	${ containerDisabledStyles }
 	${ containerWidthStyles }
@@ -129,9 +152,17 @@ const disabledStyles = ( { disabled }: InputProps ) => {
 		return '';
 	}
 
-	return css( {
-		color: COLORS.ui.textDisabled,
-	} );
+	return css`
+		color: ${ COLORS.ui.textDisabled };
+
+		@media ( forced-colors: active ) {
+			color: GrayText;
+		}
+
+		&:disabled::placeholder {
+			color: ${ COLORS.ui.textDisabled };
+		}
+	`;
 };
 
 export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
@@ -271,6 +302,24 @@ export const Input = styled.input< InputProps >`
 				display: flex;
 				align-items: center;
 				height: 100%;
+			}
+		}
+
+		/* Hide Safari's value-like placeholder (e.g. \`12:30\`) in empty
+		   date/time inputs. While the input is focused, the browser's
+		   segment editor must stay visible for typing. */
+		@supports ( -webkit-hyphens: none ) and
+			( not ( -moz-appearance: none ) ) {
+			/* Safari only */
+			&[type='date'][data-empty-value]:not( :focus ),
+			&[type='time'][data-empty-value]:not( :focus ),
+			&[type='datetime-local'][data-empty-value]:not( :focus ) {
+				color: transparent;
+
+				/* Hide slashes in date when input is disabled. */
+				&:disabled::-webkit-datetime-edit-text {
+					color: transparent;
+				}
 			}
 		}
 

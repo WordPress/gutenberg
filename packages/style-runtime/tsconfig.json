@@ -3,7 +3,8 @@
 	"extends": "../../tsconfig.dev.base.json",
 	// Tests live beside src, not under it.
 	"compilerOptions": {
-		"rootDir": "."
+		"rootDir": ".",
+		"types": [ "gutenberg-vitest-test-env" ]
 	},
 	"files": [ "global.d.ts" ],
 	"include": [ "test/**/*.ts" ],

@@ -21,6 +21,7 @@ import {
 	ONE_MINUTE_IN_MS,
 	AUTOSAVE_PROPERTIES,
 	EDITOR_INTENT_SUGGEST,
+	EDITOR_INTENT_VIEW,
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { hasPendingSuggestionMarkers } from './utils/pending-suggestion-markers';
@@ -990,8 +991,8 @@ export function getPermalink( state ) {
 
 /**
  * Returns the slug for the post being edited, preferring a manually edited
- * value if one exists, then a sanitized version of the current post title, and
- * finally the post ID.
+ * value if one exists, then the server-generated slug from the post entity,
+ * then a JS approximation of the current post title, and finally the post ID.
  *
  * @param {Object} state Editor state.
  *
@@ -1000,6 +1001,7 @@ export function getPermalink( state ) {
 export function getEditedPostSlug( state ) {
 	return (
 		getEditedPostAttribute( state, 'slug' ) ||
+		getEditedPostAttribute( state, 'generated_slug' ) ||
 		cleanForSlug( getEditedPostAttribute( state, 'title' ) ) ||
 		getCurrentPostId( state )
 	);
@@ -1388,25 +1390,52 @@ export function isInserterOpened( state ) {
  *
  * @return {string} Editing mode.
  */
-export const getEditorMode = createRegistrySelector(
-	( select ) => ( state ) => {
+export const getEditorMode = createRegistrySelector( ( select ) => {
+	/*
+	 * The marker probe is memoized on the edited record rather than run per
+	 * call: this selector has a subscriber in most of the editor chrome, and
+	 * `getEditedPostContent` re-serializes the record's blocks whenever it
+	 * holds any, so probing on every call would serialize the document once
+	 * per subscriber per state change. The edited record is itself memoized
+	 * by core-data, so its identity changes exactly when the content can.
+	 */
+	const hasPendingSuggestionMarkersInPost = createSelector(
+		( state ) =>
+			hasPendingSuggestionMarkers( getEditedPostContent( state ) ),
+		( state ) => [
+			select( coreStore ).getEditedEntityRecord(
+				'postType',
+				getCurrentPostType( state ),
+				getCurrentPostId( state )
+			),
+		]
+	);
+
+	return ( state ) => {
 		/*
-		 * The `suggest` intent reports `visual` whatever the stored preference
-		 * says. The code editor is a raw `post_content` textarea: it has
-		 * nowhere to render an inline marker, and the document it hands back
-		 * is re-parsed from scratch, so an edit made there is not capturable
-		 * as a suggestion and destroys the markers already in the post.
-		 * Answering here keeps every consumer of this selector - the
-		 * interface, the header, the document tools, the mode switcher -
-		 * agreed on one mode, and leaves the preference untouched so
-		 * returning to the `edit` intent returns the user to the code editor.
+		 * The `suggest` and `view` intents both report `visual` whatever the
+		 * stored preference says. The code editor is a raw `post_content`
+		 * textarea: it has nowhere to render an inline marker, and the
+		 * document it hands back is re-parsed from scratch, so an edit made
+		 * there is not capturable as a suggestion and destroys the markers
+		 * already in the post. Viewing has the simpler reason - it is a
+		 * read-only preview, and preview rendering does not reach the
+		 * textarea, so a user whose preference is the code editor would land
+		 * in a fully writable one. Answering here keeps every consumer of
+		 * this selector - the interface, the header, the document tools, the
+		 * mode switcher - agreed on one mode, and leaves the preference
+		 * untouched so returning to the `edit` intent returns the user to the
+		 * code editor.
 		 *
 		 * The intent is read off state rather than through the private
 		 * `getEditorIntent` selector because private-selectors.js imports
 		 * from this module, so importing it back would close a cycle. The
 		 * reducer always holds a value, so there is nothing to fall back to.
 		 */
-		if ( state.editorIntent === EDITOR_INTENT_SUGGEST ) {
+		if (
+			state.editorIntent === EDITOR_INTENT_SUGGEST ||
+			state.editorIntent === EDITOR_INTENT_VIEW
+		) {
 			return 'visual';
 		}
 
@@ -1428,16 +1457,13 @@ export const getEditorMode = createRegistrySelector(
 		 * every session by default - never pays for it, and a code-editor
 		 * session is not re-serializing per keystroke the way the canvas is.
 		 */
-		if (
-			mode === 'text' &&
-			hasPendingSuggestionMarkers( getEditedPostContent( state ) )
-		) {
+		if ( mode === 'text' && hasPendingSuggestionMarkersInPost( state ) ) {
 			return 'visual';
 		}
 
 		return mode;
-	}
-);
+	};
+} );
 
 /*
  * Backward compatibility

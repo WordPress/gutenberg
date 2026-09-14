@@ -439,10 +439,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			[ sectionRootClientIdKey ]: sectionRootClientId,
-			editorTool:
-				renderingMode === 'post-only' && postType !== 'wp_template'
-					? 'edit'
-					: undefined,
 			// When editing template parts, patterns, or navigation directly,
 			// we're in an isolated editing context (focused on that entity alone).
 			[ isIsolatedEditorKey ]: [

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { wordDiff, MAX_DIFF_TOKENS } from '../word-diff';
 
 describe( 'wordDiff', () => {

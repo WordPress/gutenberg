@@ -74,6 +74,7 @@ export default function CustomGradientBar( {
 	onChange,
 	disableInserter = false,
 	disableAlpha = false,
+	disablePositioning = false,
 	__experimentalIsRenderedInSidebar = false,
 }: CustomGradientBarProps ) {
 	const gradientMarkersContainerDomRef = useRef< HTMLDivElement >( null );
@@ -169,6 +170,7 @@ export default function CustomGradientBar( {
 					}
 					disableAlpha={ disableAlpha }
 					disableRemove={ disableInserter }
+					disablePositioning={ disablePositioning }
 					gradientPickerDomRef={ gradientMarkersContainerDomRef }
 					ignoreMarkerPosition={
 						isInsertingControlPoint

@@ -12,14 +12,12 @@
 	"references": [
 		{ "path": "../../packages/a11y/tsconfig.build.json" },
 		{ "path": "../../packages/admin-ui/tsconfig.build.json" },
-		{ "path": "../../packages/api-fetch/tsconfig.build.json" },
 		{ "path": "../../packages/components/tsconfig.build.json" },
 		{ "path": "../../packages/connectors/tsconfig.build.json" },
 		{ "path": "../../packages/core-data/tsconfig.build.json" },
 		{ "path": "../../packages/data" },
 		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
-		{ "path": "../../packages/icons/tsconfig.build.json" },
 		{ "path": "../../packages/notices/tsconfig.build.json" },
 		{ "path": "../../packages/ui/tsconfig.build.json" },
 		{ "path": "../../packages/url" }

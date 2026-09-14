@@ -53,14 +53,23 @@ Error handling and chrome stay with the host, which wraps the lazy render in a `
 
 It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading) and imports each one's metadata module. It returns `[ widgetTypes, isResolvingWidgetTypes ]`; the flag stays `true` until they resolve.
 
+### `WidgetHostProvider` / `useWidgetHost`
+
+It's the seam through which the embedding application provides what only it knows, as a `WidgetHost` bag of optional capabilities. The provider merges its value over the inherited one; an absent capability degrades to the host-agnostic behavior.
+
+The first capability is `links` (`WidgetHostLinks`): `match` resolves a href to an in-app route (a string, path and query as the router takes them, or `null` for anything the application does not own), and `Link` is the router's primitive, which must render a real anchor and forward `ref` to it. A matched link action navigates client-side; `null`, `download`, and `openInNewTab` keep the plain anchor.
+
+Consumers reach the anchor through that ref: a link that drops it is skipped by keyboard navigation and loses its tooltip. The Widget Host Storybook page carries the one test that pins it.
+
 ### Contract types
 
-`WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, and `WidgetModuleRecord`. `WidgetIcon` is a rendered SVG element that hosts pass to their icon primitive as-is; in `widget.json` a widget declares a registered icon name instead, resolved before it reaches hosts.
+`WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`, and `WidgetAttributeRecord`. `WidgetIcon` is a rendered SVG element that hosts pass to their icon primitive as-is; in `widget.json` a widget declares a registered icon name instead, resolved before it reaches hosts. `WidgetAttributeRecord` is an attribute as `widget.json` declares it: the JSON-expressible subset of a DataViews `Field`.
 
 ### `WidgetAttributeField< Item >`
 
-It's an authoring helper: a DataViews `Field` whose `id` is narrowed to the widget's attribute keys.
+It's an authoring helper for a `widget.ts` entry: a DataViews `Field` whose `id` is narrowed to the widget's attribute keys.
 Its optional `relevance` hint (`'high' | 'medium' | 'low'`) marks attributes a host may promote to a prominent surface.
+`useWidgetTypes` merges such an entry by `id` over the one `widget.json` declares, so the module only carries what JSON cannot express; `isValid` merges rule by rule, so a module `custom` validator survives the JSON rules.
 
 ### `WidgetAction`
 

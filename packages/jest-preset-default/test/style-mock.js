@@ -1,4 +1,7 @@
-const clsx = require( 'clsx' );
+import { createRequire } from 'node:module';
+import clsx from 'clsx';
+import { describe, expect, it } from 'vitest';
+const require = createRequire( import.meta.url );
 const styles = require( '../scripts/style-mock' );
 
 describe( 'style mock', () => {

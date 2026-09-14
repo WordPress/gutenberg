@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { findAspectRatioOption, parseAspectRatio } from '../utils';
 
 describe( 'parseAspectRatio', () => {

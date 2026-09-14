@@ -2,7 +2,13 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "jest", "style-imports", "react-css-custom-properties" ]
+		"types": [
+			"jest",
+			"gutenberg-vitest-test-env",
+			"style-imports",
+			"react-css-custom-properties",
+			"gutenberg-env"
+		]
 	},
 	"files": [ "global.d.ts" ],
 	"references": [
@@ -31,6 +37,7 @@
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
+		{ "path": "../interface/tsconfig.build.json" },
 		{ "path": "../kebab-case" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../keyboard-shortcuts" },
@@ -40,6 +47,7 @@
 		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../plugins" },
 		{ "path": "../preferences/tsconfig.build.json" },
+		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
 		{ "path": "../server-side-render/tsconfig.build.json" },

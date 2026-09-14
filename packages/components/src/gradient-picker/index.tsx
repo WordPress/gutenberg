@@ -3,6 +3,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { useCallback, useMemo } from '@wordpress/element';
 import CircularOptionPicker, {
 	getComputeCircularOptionPickerCommonProps,
+	warnIfCircularOptionPickerAsButtonsIsSet,
 } from '../circular-option-picker';
 import CustomGradientPicker from '../custom-gradient-picker';
 import { VStack } from '../v-stack';
@@ -36,6 +37,7 @@ function SingleOrigin( {
 	onChange,
 	value,
 	selectedSlug,
+	presentation,
 	...additionalProps
 }: PickerProps< GradientObject > ) {
 	const gradientOptions = useMemo( () => {
@@ -44,9 +46,9 @@ function SingleOrigin( {
 			// strictly by slug, which keeps two entries with the same gradient
 			// value apart. Otherwise selection falls back to matching the
 			// gradient value.
-			const isSelected = selectedSlug
-				? slug === selectedSlug
-				: value === gradient;
+			const isSelected =
+				presentation !== 'command-buttons' &&
+				( selectedSlug ? slug === selectedSlug : value === gradient );
 			return (
 				<CircularOptionPicker.Option
 					key={ slug }
@@ -76,7 +78,14 @@ function SingleOrigin( {
 				/>
 			);
 		} );
-	}, [ gradients, value, onChange, clearGradient, selectedSlug ] );
+	}, [
+		gradients,
+		value,
+		onChange,
+		clearGradient,
+		selectedSlug,
+		presentation,
+	] );
 	return (
 		<CircularOptionPicker.OptionGroup
 			className={ className }
@@ -94,6 +103,7 @@ function MultipleOrigin( {
 	value,
 	selectedSlug,
 	headingLevel,
+	presentation,
 }: PickerProps< OriginObject > ) {
 	const instanceId = useInstanceId( MultipleOrigin );
 
@@ -118,6 +128,7 @@ function MultipleOrigin( {
 							}
 							value={ value }
 							selectedSlug={ selectedSlug }
+							presentation={ presentation }
 							aria-labelledby={ id }
 						/>
 					</VStack>
@@ -130,6 +141,7 @@ function MultipleOrigin( {
 function Component( props: PickerProps< any > ) {
 	const {
 		asButtons,
+		presentation,
 		loop,
 		actions,
 		headingLevel,
@@ -137,17 +149,27 @@ function Component( props: PickerProps< any > ) {
 		'aria-labelledby': ariaLabelledby,
 		...additionalProps
 	} = props;
-	const options = isMultipleOriginArray( props.gradients ) ? (
-		<MultipleOrigin headingLevel={ headingLevel } { ...additionalProps } />
-	) : (
-		<SingleOrigin { ...additionalProps } />
-	);
+	warnIfCircularOptionPickerAsButtonsIsSet( 'GradientPicker', asButtons );
 
-	const { metaProps, labelProps } = getComputeCircularOptionPickerCommonProps(
-		asButtons,
-		loop,
-		ariaLabel,
-		ariaLabelledby
+	const { metaProps, labelProps, resolvedPresentation } =
+		getComputeCircularOptionPickerCommonProps(
+			asButtons,
+			loop,
+			ariaLabel,
+			ariaLabelledby,
+			presentation
+		);
+	const options = isMultipleOriginArray( props.gradients ) ? (
+		<MultipleOrigin
+			headingLevel={ headingLevel }
+			{ ...additionalProps }
+			presentation={ resolvedPresentation }
+		/>
+	) : (
+		<SingleOrigin
+			{ ...additionalProps }
+			presentation={ resolvedPresentation }
+		/>
 	);
 
 	return (

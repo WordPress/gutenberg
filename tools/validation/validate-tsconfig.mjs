@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { fileURLToPath } from 'url';
-import { dirname, basename, join, relative, resolve } from 'path';
+import { dirname, basename, join, relative, resolve, sep } from 'path';
 import { existsSync, readFileSync } from 'fs';
-import glob from 'glob';
+import { globSync } from 'glob';
 import JSONC from 'jsonc-parser';
 
 let hasErrors = false;
@@ -76,8 +76,10 @@ const REQUIRED_BUILD_EXCLUDES = existsSync( baseConfigPath )
 	  )
 	: [];
 
-const packagesWithTypes = glob
-	.sync( 'packages/*/tsconfig.json', { cwd: repoRoot } )
+const packagesWithTypes = globSync( 'packages/*/tsconfig.json', {
+	cwd: repoRoot,
+} )
+	.sort()
 	.map( ( tsconfigPath ) => basename( dirname( tsconfigPath ) ) );
 
 /**
@@ -176,11 +178,11 @@ function srcProjectReferences( srcProject, packageName ) {
  */
 function hasDevFiles( packageName ) {
 	return (
-		glob.sync( '**/{test,tests,__tests__,stories}/**/*.{ts,tsx}', {
+		globSync( '**/{test,tests,__tests__,stories}/**/*.{ts,tsx}', {
 			cwd: resolve( repoRoot, 'packages', packageName ),
 			ignore: [ 'node_modules/**', 'build/**', 'build-*/**' ],
 		} ).length > 0 ||
-		glob.sync( '**/*.story.{ts,tsx}', {
+		globSync( '**/*.story.{ts,tsx}', {
 			cwd: resolve( repoRoot, 'packages', packageName ),
 			ignore: [ 'node_modules/**', 'build/**', 'build-*/**' ],
 		} ).length > 0
@@ -339,16 +341,16 @@ for ( const packageName of packagesWithTypes ) {
  * Route projects emit nothing and no other project references them, so only
  * the root solution registration puts them under `npm run typecheck`.
  */
-const routesWithTypes = glob
-	.sync( 'routes/*/tsconfig.json', { cwd: repoRoot } )
+const routesWithTypes = globSync( 'routes/*/tsconfig.json', { cwd: repoRoot } )
+	.sort()
 	.map( ( tsconfigPath ) => basename( dirname( tsconfigPath ) ) );
 
 /*
  * Registration is only enforced for routes with a tsconfig.json, so a route
  * without one would keep its TypeScript files out of the type check silently.
  */
-const routeNames = glob
-	.sync( 'routes/*/', { cwd: repoRoot } )
+const routeNames = globSync( 'routes/*/', { cwd: repoRoot } )
+	.sort()
 	.map( ( routeDir ) => basename( routeDir ) );
 
 for ( const routeName of routeNames ) {
@@ -356,7 +358,7 @@ for ( const routeName of routeNames ) {
 		continue;
 	}
 	const hasTypeScriptFiles =
-		glob.sync( '**/*.{ts,tsx}', {
+		globSync( '**/*.{ts,tsx}', {
 			cwd: resolve( repoRoot, 'routes', routeName ),
 			ignore: [ 'node_modules/**', 'build/**' ],
 		} ).length > 0;
@@ -383,7 +385,7 @@ for ( const routeName of routesWithTypes ) {
 	 * are only checked when a registered test project covers them.
 	 */
 	const hasTestFiles =
-		glob.sync( '**/{test,tests,__tests__}/**/*.{ts,tsx}', {
+		globSync( '**/{test,tests,__tests__}/**/*.{ts,tsx}', {
 			cwd: routeDir,
 			ignore: [ 'node_modules/**', 'build/**' ],
 		} ).length > 0;
@@ -427,6 +429,50 @@ for ( const routeName of routesWithTypes ) {
 					routeDir,
 					dependencyProject
 				) }" in ${ relative( repoRoot, routeProject ) }`
+			);
+		}
+	}
+}
+
+/*
+ * A reference into another package is a build-graph edge, so it must be backed
+ * by a declared dependency, or removed dependencies leave stale references.
+ */
+const workspaceProjects = globSync( '{packages,routes}/*/tsconfig*.json', {
+	cwd: repoRoot,
+	posix: true,
+} ).sort();
+
+for ( const projectPath of workspaceProjects ) {
+	const workspaceDir = dirname( projectPath );
+	const packageJsonPath = resolve( repoRoot, workspaceDir, 'package.json' );
+	if ( ! existsSync( packageJsonPath ) ) {
+		continue;
+	}
+	const packageJson = JSON.parse( readFileSync( packageJsonPath, 'utf8' ) );
+	const declared = new Set( [
+		...Object.keys( packageJson.dependencies ?? {} ),
+		...Object.keys( packageJson.devDependencies ?? {} ),
+		...Object.keys( packageJson.peerDependencies ?? {} ),
+		...Object.keys( packageJson.optionalDependencies ?? {} ),
+	] );
+
+	for ( const reference of referencedProjects(
+		resolve( repoRoot, projectPath )
+	) ) {
+		const referenceFromRoot = relative( repoRoot, reference )
+			.split( sep )
+			.join( '/' );
+		if ( ! referenceFromRoot.startsWith( 'packages/' ) ) {
+			continue;
+		}
+		const referencedPackage = referenceFromRoot.split( '/' )[ 1 ];
+		if ( workspaceDir === `packages/${ referencedPackage }` ) {
+			continue;
+		}
+		if ( ! declared.has( `@wordpress/${ referencedPackage }` ) ) {
+			reportError(
+				`Reference to "packages/${ referencedPackage }" in ${ projectPath } without a dependency on "@wordpress/${ referencedPackage }". Remove the reference, or add the dependency to package.json.`
 			);
 		}
 	}

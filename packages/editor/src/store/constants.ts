@@ -97,8 +97,7 @@ export const SUGGEST_LOCKED_POST_FIELDS = [ 'status' ] as const;
  * (`<mark class="wp-suggestion">`) in serialized block content.
  *
  * Mirrors `SUGGESTION_CLASS` in `components/inline-suggestions/format.js`,
- * duplicated here for the same reason `components/suggestion-mode/constants.js`
- * mirrors the intent value: the store must not import from the component tree.
+ * duplicated here because the store must not import from the component tree.
  * A serialization contract: `utils/pending-suggestion-markers.js` reads it back
  * out of saved content, so the two copies must not drift.
  *

@@ -24,7 +24,12 @@ type FeaturedMedia = {
 type DraftPost = {
 	id: number;
 	title: { rendered: string };
-	date: string;
+	/*
+	 * The REST schema allows a null date. A draft created through the UI
+	 * always has one, but a record inserted without `post_date` does not, and
+	 * both date helpers below would render a bogus relative time for it.
+	 */
+	date: string | null;
 	_embedded?: {
 		'wp:featuredmedia'?: FeaturedMedia[];
 	};
@@ -81,7 +86,7 @@ function DraftThumbnail( { post }: { post: DraftPost } ) {
 	if ( url ) {
 		return (
 			<img
-				className={ styles.thumbImage }
+				className={ styles[ 'thumb-image' ] }
 				src={ url }
 				alt=""
 				loading="lazy"
@@ -90,7 +95,7 @@ function DraftThumbnail( { post }: { post: DraftPost } ) {
 	}
 
 	return (
-		<div className={ styles.thumbPlaceholder } aria-hidden="true">
+		<div className={ styles[ 'thumb-placeholder' ] } aria-hidden="true">
 			<Icon icon={ postFeaturedImage } />
 		</div>
 	);
@@ -112,12 +117,12 @@ function DraftTitle( {
 			align="center"
 			justify="space-between"
 			gap="sm"
-			className={ styles.titleRow }
+			className={ styles[ 'title-row' ] }
 		>
 			<Link
 				href={ getEditUrl( post.id ) }
 				openInNewTab
-				className={ styles.titleLink }
+				className={ styles[ 'title-link' ] }
 			>
 				{ title }
 			</Link>
@@ -134,6 +139,10 @@ function DraftTitle( {
 }
 
 function DraftDate( { post }: { post: DraftPost } ) {
+	if ( ! post.date ) {
+		return null;
+	}
+
 	const fullDate = dateI18n( getSettings().formats.datetime, post.date );
 
 	return (
@@ -158,9 +167,7 @@ export function DraftsList() {
 	const { drafts, isLoading } = useSelect( ( select ) => {
 		const { getEntityRecords, hasFinishedResolution } =
 			select( coreDataStore );
-		const records = getEntityRecords( 'postType', 'post', DRAFTS_QUERY ) as
-			| DraftPost[]
-			| null;
+		const records = getEntityRecords( 'postType', 'post', DRAFTS_QUERY );
 
 		return {
 			drafts: records ?? [],
@@ -213,7 +220,7 @@ export function DraftsList() {
 
 	return (
 		<Stack direction="column" className={ styles.root }>
-			<Text variant="heading-md" className={ styles.titleHeader }>
+			<Text variant="heading-md" className={ styles[ 'title-header' ] }>
 				{ __( 'Your recent drafts' ) }
 			</Text>
 

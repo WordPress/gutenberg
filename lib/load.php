@@ -38,12 +38,6 @@ if ( file_exists( $constants_file ) && ! defined( 'GUTENBERG_VERSION' ) ) {
  * @return bool True when the experiment is enabled.
  */
 function gutenberg_is_experiment_enabled( $name ) {
-	// Special handling for active_templates - check if the active_templates option exists.
-	// This is not stored in the experiments array but as a separate option.
-	if ( 'active_templates' === $name ) {
-		return is_array( get_option( 'active_templates' ) );
-	}
-
 	$experiments = get_option( 'gutenberg-experiments' );
 	return ! empty( $experiments[ $name ] );
 }
@@ -55,16 +49,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
 
-	// WordPress 7.0 compat.
-	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-revisions-controller.php';
-	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-block-patterns-controller-7-0.php';
-	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-templates-controller-7-0.php';
-	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-static-templates-controller.php';
-	require __DIR__ . '/compat/wordpress-7.0/class-wp-icons-registry.php';
-	require __DIR__ . '/compat/wordpress-7.0/class-wp-rest-icons-controller.php';
-	require __DIR__ . '/compat/wordpress-7.0/template-activate.php';
-	require __DIR__ . '/compat/wordpress-7.0/rest-api.php';
-	require __DIR__ . '/compat/wordpress-7.0/global-styles.php';
 
 	// WordPress 7.1 compat.
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php';
@@ -87,6 +71,12 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/block-suggestions.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-comment-controller-7-1.php';
 
+	// WordPress 7.2 compat.
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-templates-controller-7-2.php';
+	require __DIR__ . '/compat/wordpress-7.2/view-config-api.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-view-config-controller-7-2.php';
+	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
+
 	// Real-time collaboration.
 	require __DIR__ . '/experimental/collaboration/class-gutenberg-rest-autosaves-controller.php';
 	require __DIR__ . '/experimental/collaboration/rest-api.php';
@@ -100,7 +90,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/rest-api.php';
 
 	require_once __DIR__ . '/experimental/rest-api.php';
-	require_once __DIR__ . '/experimental/kses-allowed-html.php';
 
 	require_once __DIR__ . '/experimental/class-gutenberg-hierarchical-sort.php';
 }
@@ -112,23 +101,9 @@ require_once __DIR__ . '/experimental/rest-api-overrides.php';
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 require __DIR__ . '/compat/plugin/fonts.php';
+require __DIR__ . '/compat/plugin/connectors.php';
 require __DIR__ . '/compat/plugin/style-state-aliases.php';
 
-
-// WordPress 7.0 compat.
-require __DIR__ . '/compat/wordpress-7.0/preload.php';
-require __DIR__ . '/compat/wordpress-7.0/auto-register.php';
-require __DIR__ . '/compat/wordpress-7.0/blocks.php';
-require __DIR__ . '/compat/wordpress-7.0/kses.php';
-require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
-require __DIR__ . '/compat/wordpress-7.0/script-modules.php';
-require __DIR__ . '/compat/wordpress-7.0/fonts.php';
-
-if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
-	require __DIR__ . '/compat/wordpress-7.0/class-wp-connector-registry.php';
-	require __DIR__ . '/compat/wordpress-7.0/connectors.php';
-	require __DIR__ . '/compat/wordpress-7.0/default-connectors.php';
-}
 
 // WordPress 7.1 compat.
 require __DIR__ . '/compat/wordpress-7.1/admin-bar.php';
@@ -137,6 +112,9 @@ require __DIR__ . '/compat/wordpress-7.1/kses.php';
 require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/icons.php';
+
+// WordPress 7.2 compat.
+require __DIR__ . '/compat/wordpress-7.2/kses.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';

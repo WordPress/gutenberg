@@ -380,6 +380,125 @@ export const EditMode: Story = {
 };
 
 /**
+ * Per-item width limits via `itemLimits`, in pixels. The wide tile
+ * stops shrinking at its minimum, the capped tile stops growing at its
+ * maximum, the ranged tile stays between both, and the free tiles keep
+ * the full range. Lanes take no height limits; lane heights are
+ * content-driven.
+ */
+export const SizeLimits: Story = {
+	name: 'Per-Item Size Limits',
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+	args: {
+		columns: 12,
+		editMode: true,
+		itemLimits: {
+			min: { minWidth: 360 },
+			max: { maxWidth: 500 },
+			ranged: { minWidth: 300, maxWidth: 500 },
+		},
+	},
+	render: function SizeLimitsStory( args ) {
+		const initial: ( DashboardLanesLayoutItem & {
+			tone: Tone;
+			height: number;
+			label: string;
+		} )[] = [
+			{
+				key: 'min',
+				width: 2,
+				tone: 'info',
+				height: 140,
+				label: 'min 360px wide',
+			},
+			{
+				key: 'max',
+				width: 3,
+				tone: 'warning',
+				height: 120,
+				label: 'max 500px wide',
+			},
+			{
+				key: 'ranged',
+				width: 2,
+				tone: 'brand',
+				height: 150,
+				label: 'min 300, max 500px wide',
+			},
+			{
+				key: 'free-a',
+				width: 3,
+				tone: 'neutral',
+				height: 180,
+				label: 'no limits',
+			},
+			{
+				key: 'free-b',
+				width: 2,
+				tone: 'neutral',
+				height: 100,
+				label: 'no limits',
+			},
+			{
+				key: 'free-c',
+				width: 3,
+				tone: 'neutral',
+				height: 160,
+				label: 'no limits',
+			},
+		];
+
+		const [ tiles, setTiles ] = useState( initial );
+
+		const layout: DashboardLanesLayoutItem[] = tiles.map(
+			( { tone: _tone, height: _height, label: _label, ...item } ) => item
+		);
+
+		const onChangeLayout = ( next: DashboardLanesLayoutItem[] ) => {
+			setTiles(
+				next.map( ( item ) => {
+					const existing = tiles.find( ( t ) => t.key === item.key );
+					return {
+						...item,
+						tone: existing?.tone ?? 'neutral',
+						height: existing?.height ?? 100,
+						label: existing?.label ?? item.key,
+					};
+				} )
+			);
+		};
+
+		const tileElements = useMemo(
+			() =>
+				tiles.map( ( tile ) => (
+					<Tile
+						key={ tile.key }
+						tone={ tile.tone }
+						height={ tile.height }
+					>
+						{ tile.label }
+					</Tile>
+				) ),
+			[ tiles ]
+		);
+
+		return (
+			<DashboardLanes
+				{ ...args }
+				layout={ layout }
+				onChangeLayout={ onChangeLayout }
+			>
+				{ tileElements }
+			</DashboardLanes>
+		);
+	},
+};
+
+/**
  * Example custom overlay supplied to `<DashboardLanes />` through the
  * `renderGridOverlay` prop. Receives `{ columns, isActive }` from the
  * surface (no `rowHeight` because lane heights are content-driven).

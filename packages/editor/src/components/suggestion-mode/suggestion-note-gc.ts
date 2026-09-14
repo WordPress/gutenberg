@@ -56,7 +56,7 @@ import {
 	parseSuggestionPayload,
 	rememberResolvedSuggestion,
 } from './provider';
-import { findSuggestionRange } from '../inline-suggestions';
+import { SUGGESTION_CLASS } from '../inline-suggestions';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 import { store as editorStore } from '../../store';
 import { getNoteThreadsQuery, useNoteThreads } from '../collab-sidebar/hooks';
@@ -67,6 +67,23 @@ import { getNoteThreadsQuery, useNoteThreads } from '../collab-sidebar/hooks';
  * moving between blocks) and gives the fire-time recheck a settled tree.
  */
 const GC_GRACE_MS = 500;
+
+/*
+ * A trash request that fails is retried a bounded number of times. Without a
+ * retry a transient REST failure strands the note: the effect only re-runs on
+ * a presence change, and once the editor is closed the anchor counts as never
+ * observed, so no later session collects it.
+ */
+const GC_RETRY_MS = 5000;
+const GC_MAX_ATTEMPTS = 3;
+
+/**
+ * The id attribute of a serialized inline marker. Matched on the serialized
+ * value rather than parsed: the index below runs on every block-editor store
+ * update, and every marker carries the attribute, so a match can miss no
+ * marker that is present.
+ */
+const SUGGESTION_ID_PATTERN = /data-suggestion-id="([^"]+)"/g;
 
 const PENDING_MARKER_BY_OP: Record< string, string > = {
 	'block-remove': 'pending-remove',
@@ -105,18 +122,94 @@ function describeAnchor( note: any ) {
 }
 
 /**
+ * The anchors present in the editor, indexed in one pass over the blocks.
+ *
+ * Structural anchors are the `metadata.suggestion` markers, keyed by pending
+ * type and note id. Inline anchors are the marker ids found in each block's
+ * rich-text attributes, keyed by attribute: the marker travels with content,
+ * so the content is what is scanned rather than a (possibly undone) metadata
+ * linkage. Building the index once and testing every note against it keeps a
+ * store update at one serialization per block instead of one per note.
+ *
+ * @param blockEditor      Block-editor selectors.
+ * @param inlineAttributes Attribute names any tracked inline note anchors to.
+ * @return The index.
+ */
+function buildAnchorIndex(
+	blockEditor: any,
+	inlineAttributes: Set< string >
+): { inline: Map< string, Set< string > >; structural: Set< string > } {
+	const inline = new Map< string, Set< string > >();
+	const structural = new Set< string >();
+	for ( const clientId of blockEditor.getClientIdsWithDescendants?.() ??
+		[] ) {
+		const attributes = blockEditor.getBlockAttributes( clientId );
+		if ( ! attributes ) {
+			continue;
+		}
+		const pendingType = attributes.metadata?.suggestion?.type;
+		if ( pendingType ) {
+			for ( const noteId of getNoteIdsFromMetadata(
+				attributes.metadata
+			) ) {
+				structural.add( `${ pendingType }:${ noteId }` );
+			}
+		}
+		for ( const attribute of inlineAttributes ) {
+			const value = attributes[ attribute ];
+			const html =
+				typeof value === 'string' ? value : value?.toHTMLString?.();
+			if ( ! html || ! html.includes( SUGGESTION_CLASS ) ) {
+				continue;
+			}
+			let ids = inline.get( attribute );
+			if ( ! ids ) {
+				ids = new Set();
+				inline.set( attribute, ids );
+			}
+			for ( const match of html.matchAll( SUGGESTION_ID_PATTERN ) ) {
+				ids.add( match[ 1 ] );
+			}
+		}
+	}
+	return { inline, structural };
+}
+
+type AnchorIndex = ReturnType< typeof buildAnchorIndex >;
+
+/**
+ * The rich-text attributes the given notes' inline anchors live in.
+ *
+ * @param lists Lists of tracked notes with their anchors.
+ * @return Attribute names.
+ */
+function inlineAttributesOf(
+	...lists: Array< Iterable< { anchor: any } > >
+): Set< string > {
+	const attributes = new Set< string >();
+	for ( const list of lists ) {
+		for ( const { anchor } of list ) {
+			if ( anchor.kind === 'inline' ) {
+				attributes.add( anchor.attribute );
+			}
+		}
+	}
+	return attributes;
+}
+
+/**
  * Whether a note's anchor is currently present in the editor.
  *
- * @param note        Note comment record.
- * @param anchor      Anchor descriptor from `describeAnchor`.
- * @param blockEditor Block-editor selectors.
- * @param entries     Suggestion overlay entries.
+ * @param note    Note comment record.
+ * @param anchor  Anchor descriptor from `describeAnchor`.
+ * @param index   Anchor index from `buildAnchorIndex`.
+ * @param entries Suggestion overlay entries.
  * @return True when the anchor exists.
  */
 function isAnchorPresent(
 	note: any,
 	anchor: any,
-	blockEditor: any,
+	index: AnchorIndex,
 	entries: any
 ): boolean {
 	const idKey = String( note.id );
@@ -128,34 +221,10 @@ function isAnchorPresent(
 				String( entry.commentId ) === idKey
 		);
 	}
-	const liveClientIds = blockEditor.getClientIdsWithDescendants?.() ?? [];
 	if ( anchor.kind === 'structural' ) {
-		for ( const clientId of liveClientIds ) {
-			const metadata =
-				blockEditor.getBlockAttributes( clientId )?.metadata;
-			if ( metadata?.suggestion?.type !== anchor.pendingType ) {
-				continue;
-			}
-			if (
-				getNoteIdsFromMetadata( metadata ).some(
-					( noteId ) => String( noteId ) === idKey
-				)
-			) {
-				return true;
-			}
-		}
-		return false;
+		return index.structural.has( `${ anchor.pendingType }:${ idKey }` );
 	}
-	// Inline: the marker travels with content, so scan every block's target
-	// attribute rather than trusting a (possibly undone) metadata linkage.
-	for ( const clientId of liveClientIds ) {
-		const value =
-			blockEditor.getBlockAttributes( clientId )?.[ anchor.attribute ];
-		if ( value && findSuggestionRange( value, note.id ) ) {
-			return true;
-		}
-	}
-	return false;
+	return index.inline.get( anchor.attribute )?.has( idKey ) ?? false;
 }
 
 /**
@@ -232,14 +301,19 @@ export default function SuggestionNoteGC() {
 	 */
 	const presenceSignature = useSelect(
 		( select ) => {
-			const blockEditor = select( blockEditorStore );
+			const index = buildAnchorIndex(
+				select( blockEditorStore ),
+				inlineAttributesOf(
+					suggestionNotes,
+					trashedRef.current.values(),
+					resolvedNotes
+				)
+			);
 			const parts = [];
 			for ( const { note, anchor } of suggestionNotes ) {
 				parts.push(
 					`${ note.id }:${
-						isAnchorPresent( note, anchor, blockEditor, entries )
-							? 1
-							: 0
+						isAnchorPresent( note, anchor, index, entries ) ? 1 : 0
 					}`
 				);
 			}
@@ -249,7 +323,7 @@ export default function SuggestionNoteGC() {
 						isAnchorPresent(
 							info.note,
 							info.anchor,
-							blockEditor,
+							index,
 							entries
 						)
 							? 1
@@ -260,9 +334,7 @@ export default function SuggestionNoteGC() {
 			for ( const { note, anchor } of resolvedNotes ) {
 				parts.push(
 					`r${ note.id }:${
-						isAnchorPresent( note, anchor, blockEditor, entries )
-							? 1
-							: 0
+						isAnchorPresent( note, anchor, index, entries ) ? 1 : 0
 					}`
 				);
 			}
@@ -287,6 +359,16 @@ export default function SuggestionNoteGC() {
 	useEffect( () => {
 		const blockEditor = registry.select( blockEditorStore );
 		const timers = timersRef.current;
+		const indexAnchors = () =>
+			buildAnchorIndex(
+				blockEditor,
+				inlineAttributesOf(
+					suggestionNotes,
+					trashedRef.current.values(),
+					resolvedNotesRef.current
+				)
+			);
+		const index = indexAnchors();
 
 		/*
 		 * Whether anyone has answered this note, asked of the server rather than
@@ -323,7 +405,12 @@ export default function SuggestionNoteGC() {
 		 */
 		const isWithdrawn = ( note: any, anchor: any ) => {
 			if (
-				isAnchorPresent( note, anchor, blockEditor, entriesRef.current )
+				isAnchorPresent(
+					note,
+					anchor,
+					indexAnchors(),
+					entriesRef.current
+				)
 			) {
 				return false;
 			}
@@ -341,7 +428,7 @@ export default function SuggestionNoteGC() {
 			);
 		};
 
-		const collect = async ( note: any, anchor: any ) => {
+		const collect = async ( note: any, anchor: any, attempt = 1 ) => {
 			timers.delete( String( note.id ) );
 			// Recheck against settled state: the anchor may be back (redo beat
 			// the grace period) or the note may have been decided.
@@ -420,8 +507,19 @@ export default function SuggestionNoteGC() {
 					}
 				} )
 				.catch( () => {
-					// The next presence change retries; a transient REST
-					// failure must not strand a timer.
+					// A transient REST failure must not strand the note:
+					// retry while the anchor is still absent, a bounded
+					// number of times.
+					if ( attempt < GC_MAX_ATTEMPTS ) {
+						timers.set(
+							String( note.id ),
+							// eslint-disable-next-line @wordpress/react-no-unsafe-timeout -- Tracked in `timersRef`, cleared on unmount.
+							setTimeout(
+								() => collect( note, anchor, attempt + 1 ),
+								GC_RETRY_MS
+							)
+						);
+					}
 				} );
 		};
 
@@ -430,7 +528,7 @@ export default function SuggestionNoteGC() {
 			const present = isAnchorPresent(
 				note,
 				anchor,
-				blockEditor,
+				index,
 				entriesRef.current
 			);
 			if ( present ) {
@@ -463,7 +561,7 @@ export default function SuggestionNoteGC() {
 				! isAnchorPresent(
 					info.note,
 					info.anchor,
-					blockEditor,
+					index,
 					entriesRef.current
 				)
 			) {
@@ -492,12 +590,7 @@ export default function SuggestionNoteGC() {
 		for ( const { note, anchor } of resolvedNotesRef.current ) {
 			if (
 				isSuggestionDecisionInFlight( note.id ) ||
-				! isAnchorPresent(
-					note,
-					anchor,
-					blockEditor,
-					entriesRef.current
-				)
+				! isAnchorPresent( note, anchor, index, entriesRef.current )
 			) {
 				continue;
 			}

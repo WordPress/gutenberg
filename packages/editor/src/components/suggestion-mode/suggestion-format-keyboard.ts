@@ -1,15 +1,13 @@
 import { useCallback, useEffect } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-	// @ts-expect-error No exported types
-} from '@wordpress/block-editor';
+// @ts-expect-error No exported types
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { create } from '@wordpress/rich-text';
 import { __ } from '@wordpress/i18n';
 import { useSuggestionOverlay } from './overlay-context';
+import useAbandonedNoteCleanup from './use-abandoned-note-cleanup';
 import {
 	INLINE_OP_TYPE,
 	findInlineOp,
@@ -24,12 +22,8 @@ import {
 import type { FormatPlan } from '../inline-suggestions/reconcile-format';
 import { contentKey } from './suggestion-content-reconciler';
 import { readLiveInlineSelection } from './keyboard-target';
-import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
 import { getNoteThreadsQuery } from '../collab-sidebar/hooks';
 import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-
-const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 /**
  * Owns the write side of formatting suggestions in Suggest mode.
@@ -68,13 +62,9 @@ export default function SuggestionFormatKeyboard() {
 		( select ) => select( editorStore ).getCurrentPostId(),
 		[]
 	);
-	const { createSuggestion, updateSuggestion, deleteSuggestion } =
-		useSuggestionsProvider();
-	const {
-		updateBlockAttributes,
-		selectionChange,
-		__unstableMarkNextChangeAsNotPersistent: markNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
+	const { createSuggestion, updateSuggestion } = useSuggestionsProvider();
+	const { updateBlockAttributes, selectionChange } =
+		useDispatch( blockEditorStore );
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { createNotice } = useDispatch( noticesStore );
 	const registry = useRegistry();
@@ -85,42 +75,8 @@ export default function SuggestionFormatKeyboard() {
 	} = useSuggestionOverlay();
 
 	// Trash the note created for an abandoned plan and drop its id from the
-	// block's note linkage. Best-effort: a failed trash is already surfaced
-	// by `deleteSuggestion`'s own notice.
-	const cleanupAbandonedNote = useCallback(
-		async ( clientId: string, id: any ) => {
-			if ( ! id ) {
-				return;
-			}
-			const metadata = cleanEmptyObject(
-				removeNoteIdFromMetadata(
-					getBlockAttributes( clientId )?.metadata,
-					id
-				)
-			);
-			requestInterceptorBypass( clientId );
-			/*
-			 * The linkage is bookkeeping, not a user edit, and must never take
-			 * an undo level of its own: on the retraction path that level would
-			 * pop first, restoring a `noteId` that points at a note this call is
-			 * about to trash, instead of undoing the formatting.
-			 */
-			markNextChangeAsNotPersistent?.( { history: 'ignore' } );
-			updateBlockAttributes( clientId, { metadata } );
-			try {
-				await deleteSuggestion( { commentId: id } );
-			} catch {
-				// `deleteSuggestion` surfaces its own notice.
-			}
-		},
-		[
-			getBlockAttributes,
-			updateBlockAttributes,
-			markNextChangeAsNotPersistent,
-			requestInterceptorBypass,
-			deleteSuggestion,
-		]
-	);
+	// block's note linkage.
+	const cleanupAbandonedNotes = useAbandonedNoteCleanup();
 
 	const notifyDropped = useCallback( () => {
 		createNotice(
@@ -322,7 +278,7 @@ export default function SuggestionFormatKeyboard() {
 						return;
 					}
 					writeContent( clientId, restored );
-					await cleanupAbandonedNote( clientId, commentId );
+					await cleanupAbandonedNotes( clientId, [ commentId ] );
 					return;
 				}
 				await updateSuggestion( {
@@ -359,7 +315,7 @@ export default function SuggestionFormatKeyboard() {
 			getBlockAttributes,
 			mayHaveReplies,
 			updateSuggestion,
-			cleanupAbandonedNote,
+			cleanupAbandonedNotes,
 			writeContent,
 			notifyDropped,
 			notifyKept,
@@ -420,7 +376,7 @@ export default function SuggestionFormatKeyboard() {
 					contentKey( getBlockAttributes( clientId )?.content ) !==
 					snapshotKey
 				) {
-					await cleanupAbandonedNote( clientId, id );
+					await cleanupAbandonedNotes( clientId, [ id ] );
 					notifyDropped();
 					return;
 				}
@@ -431,7 +387,7 @@ export default function SuggestionFormatKeyboard() {
 			} catch {
 				// `createSuggestion` surfaces its own error notice; trash a
 				// note created before the failure so it isn't orphaned.
-				await cleanupAbandonedNote( clientId, id );
+				await cleanupAbandonedNotes( clientId, [ id ] );
 				notifyDropped();
 			}
 		},
@@ -441,7 +397,7 @@ export default function SuggestionFormatKeyboard() {
 			getBlockAttributes,
 			runFormatExtend,
 			writeContent,
-			cleanupAbandonedNote,
+			cleanupAbandonedNotes,
 			notifyDropped,
 		]
 	);

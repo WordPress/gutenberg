@@ -9,6 +9,7 @@
 	},
 	"include": [
 		"esbuild-plugins/*.mjs",
+		"lightningcss-plugins/*.mjs",
 		"postcss-plugins/*.mjs",
 		"prebuilt/js/*.mjs",
 		"stylelint-plugins/*.mjs",

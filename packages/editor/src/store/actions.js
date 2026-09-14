@@ -2,6 +2,7 @@ import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
 import { escapeHTML } from '@wordpress/escape-html';
 import deprecated from '@wordpress/deprecated';
+import warning from '@wordpress/warning';
 import {
 	parse,
 	synchronizeBlocksWithTemplate,
@@ -19,7 +20,7 @@ import {
 	doActionAsync,
 } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { localAutosaveSet } from './local-autosave';
 import {
 	getNotificationArgumentsForSaveSuccess,
@@ -27,6 +28,7 @@ import {
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
 import { EDITOR_INTENT_SUGGEST, SUGGEST_LOCKED_POST_FIELDS } from './constants';
+import attachMediaInPost from './utils/attach-media-in-post';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
@@ -270,6 +272,10 @@ export const savePost =
 		dispatch.editPost( { content }, { undoIgnore: true } );
 
 		const previousRecord = select.getCurrentPost();
+		// Snapshotted alongside the content above, so that attaching media once
+		// the save finishes works from what was saved for the post itself.
+		const savedBlocks = select.getEditorBlocks();
+
 		let edits = {
 			id: previousRecord.id,
 			...registry
@@ -348,15 +354,26 @@ export const savePost =
 		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
+		// Attach any images in the post that aren't attached to a post yet. Not
+		// awaited: it shouldn't hold up the editor showing "Saved", and it
+		// handles its own errors.
+		//
+		// `isDeletingPost` is what catches trashing. `trashPost` deletes the post
+		// and then calls this, and the record still says what it did before the
+		// delete, so checking the status alone would miss it.
 		if (
-			typeof window !== 'undefined' &&
-			window.__experimentalTemplateActivate &&
+			! error &&
 			! options.isAutosave &&
-			previousRecord.type === 'wp_template' &&
-			( typeof previousRecord.id === 'number' ||
-				/^\d+$/.test( previousRecord.id ) )
+			! options.isPreview &&
+			! select.isDeletingPost() &&
+			previousRecord.status !== 'trash' &&
+			select.getEditorSettings().autoAttachMediaEnabled
 		) {
-			templateActivationNotice( { select, dispatch, registry } );
+			attachMediaInPost( registry, {
+				id: previousRecord.id,
+				type: previousRecord.type,
+				blocks: savedBlocks,
+			} );
 		}
 
 		if ( error ) {
@@ -417,91 +434,6 @@ export const savePost =
 			}
 		}
 	};
-
-async function templateActivationNotice( { select, registry } ) {
-	const editorSettings = select.getEditorSettings();
-
-	// Don't open for focused entity.
-	if ( editorSettings.onNavigateToPreviousEntityRecord ) {
-		return;
-	}
-
-	const { id, slug } = select.getCurrentPost();
-	const site = await registry
-		.select( coreStore )
-		.getEntityRecord( 'root', 'site' );
-
-	// Already active.
-	if ( site.active_templates[ slug ] === id ) {
-		return;
-	}
-
-	const currentTheme = await registry
-		.resolveSelect( coreStore )
-		.getCurrentTheme();
-	const templateType = currentTheme?.default_template_types.find(
-		( type ) => type.slug === slug
-	);
-
-	await registry.dispatch( noticesStore ).createNotice(
-		'info',
-		sprintf(
-			// translators: %s: The name (or slug) of the type of template.
-			__( 'Do you want to activate this "%s" template?' ),
-			templateType?.title ?? slug
-		),
-		{
-			id: 'template-activate-notice',
-			actions: [
-				{
-					label: __( 'Activate' ),
-					onClick: async () => {
-						await registry
-							.dispatch( noticesStore )
-							.createNotice(
-								'info',
-								__( 'Activating template…' ),
-								{ id: 'template-activate-notice' }
-							);
-						try {
-							const currentSite = await registry
-								.select( coreStore )
-								.getEntityRecord( 'root', 'site' );
-							await registry
-								.dispatch( coreStore )
-								.saveEntityRecord(
-									'root',
-									'site',
-									{
-										active_templates: {
-											...currentSite.active_templates,
-											[ slug ]: id,
-										},
-									},
-									{ throwOnError: true }
-								);
-							await registry
-								.dispatch( noticesStore )
-								.createSuccessNotice(
-									__( 'Template activated.' ),
-									{ id: 'template-activate-notice' }
-								);
-						} catch ( error ) {
-							await registry
-								.dispatch( noticesStore )
-								.createErrorNotice(
-									__( 'Template activation failed.' ),
-									{ id: 'template-activate-notice' }
-								);
-							// Rethrow for debugging.
-							throw error;
-						}
-					},
-				},
-			],
-		}
-	);
-}
 
 /**
  * Action for refreshing the current post.
@@ -593,8 +525,8 @@ export const autosave =
 /**
  * Save for preview.
  *
- * @param {Object}  options                     Options object.
- * @param {boolean} options.forceIsAutosaveable Whether to force the post to be autosaveable.
+ * @param {Object}  [options]                     Options object.
+ * @param {boolean} [options.forceIsAutosaveable] Whether to force the post to be autosaveable.
  *
  * @return {Function} Thunk that saves for preview and returns the preview link.
  */
@@ -620,19 +552,30 @@ export const __unstableSaveForPreview =
 
 /**
  * Action that restores last popped state in undo history.
+ *
+ * Refused in the read-only `view` intent: undo and redo rewrite the post the
+ * same way a keystroke does, and the header buttons stay mounted there.
  */
 export const redo =
 	() =>
-	( { registry } ) => {
+	( { registry, select } ) => {
+		if ( select.isEditorIntentReadOnly() ) {
+			return;
+		}
 		registry.dispatch( coreStore ).redo();
 	};
 
 /**
  * Action that pops a record from undo history and undoes the edit.
+ *
+ * Refused in the read-only `view` intent — see `redo`.
  */
 export const undo =
 	() =>
-	( { registry } ) => {
+	( { registry, select } ) => {
+		if ( select.isEditorIntentReadOnly() ) {
+			return;
+		}
 		registry.dispatch( coreStore ).undo();
 	};
 
@@ -856,10 +799,20 @@ export function updateEditorSettings( settings ) {
 export const setRenderingMode =
 	( mode ) =>
 	( { dispatch, registry, select } ) => {
-		if (
-			select.__unstableIsEditorReady() &&
-			! select.getEditorSettings().isPreviewMode
-		) {
+		const settings = select.getEditorSettings();
+
+		// An editor opened with a rendering mode of its own is showing what
+		// that context is for, so it stays in that mode. Applying that mode is
+		// what puts the editor in it, so only a move away is ignored. It warns,
+		// or the caller could not tell why nothing changed.
+		if ( settings.renderingMode && mode !== settings.renderingMode ) {
+			warning(
+				`setRenderingMode( '${ mode }' ) was ignored: this editor is using overriding rendering mode from '${ settings.renderingMode }'.`
+			);
+			return;
+		}
+
+		if ( select.__unstableIsEditorReady() && ! settings.isPreviewMode ) {
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
 		}
 
@@ -1172,23 +1125,26 @@ export const switchEditorMode =
 		 * The code editor edits raw `post_content`, which has nowhere to put
 		 * an inline marker and is re-parsed wholesale on the way back, so a
 		 * raw edit bypasses suggestion capture and takes the existing markers
-		 * down with it. `getCodeEditorUnavailableReason` owns both cases -
-		 * the `suggest` intent, and any intent while markers are still
-		 * pending - so this refusal, the disabled menu item, and the filtered
-		 * command all agree.
+		 * down with it. It is also the one editing surface the read-only
+		 * canvas does not cover, so without this the Viewing intent would
+		 * hand a user a fully writable copy of the post.
+		 * `getCodeEditorUnavailableReason` owns all three cases - the `view`
+		 * intent, the `suggest` intent, and any intent while markers are
+		 * still pending - so this refusal, the disabled menu item, and the
+		 * filtered command all agree.
 		 *
 		 * Refusing here is what actually closes the hole: the menu item is
 		 * disabled and the command is filtered out, but the keyboard shortcut
-		 * reaches this action directly. Announce it and raise a snackbar too,
-		 * because a shortcut that silently does nothing reads as a broken
-		 * editor to a sighted keyboard user.
+		 * reaches this action directly. Raise a snackbar, because a shortcut
+		 * that silently does nothing reads as a broken editor. The snackbar
+		 * is the sole announcer: it speaks its own content politely, which is
+		 * the right register for a refusal.
 		 */
 		if ( mode === 'text' ) {
 			const unavailableReason = select.getCodeEditorUnavailableReason( {
 				checkPendingSuggestions: true,
 			} );
 			if ( unavailableReason ) {
-				speak( unavailableReason, 'assertive' );
 				registry
 					.dispatch( noticesStore )
 					.createNotice( 'info', unavailableReason, {

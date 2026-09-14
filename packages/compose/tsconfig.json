@@ -20,7 +20,7 @@
 		"**/benchmark",
 		"src/higher-order/test/pipe.ts",
 		"src/higher-order/test/compose.ts",
-		"src/hooks/use-copy-on-click/test/index.tsx",
+		"src/hooks/use-copy-on-click/test/index.jsdom.test.tsx",
 		"src/utils/debounce/test/index.ts",
 		"src/utils/throttle/test/index.ts"
 	]

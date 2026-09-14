@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { computeDeleteRange } from '../delete-range';
 
 describe( 'computeDeleteRange', () => {

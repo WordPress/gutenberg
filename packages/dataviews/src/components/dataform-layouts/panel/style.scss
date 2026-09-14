@@ -132,6 +132,7 @@
 	// clip boundary for focus rings of inner controls.
 	padding-inline: var(--wpds-border-width-focus);
 	margin-inline: calc(-1 * var(--wpds-border-width-focus));
+	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
 	word-break: break-word;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 

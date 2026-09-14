@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { readInlineSelection } from '../read-inline-selection';
 
 /**
@@ -29,6 +30,16 @@ describe( 'readInlineSelection', () => {
 		const [ s, e ] = selectors(
 			{ clientId: 'a', offset: 0 },
 			{ clientId: 'a', offset: 5 }
+		);
+		expect( readInlineSelection( s, e ) ).toBeNull();
+	} );
+
+	it( 'returns null when start and end are in different attributes of the same block', () => {
+		// Two rich-text fields of one block, such as a quote's `value` and
+		// `citation`: their offsets are not comparable.
+		const [ s, e ] = selectors(
+			{ clientId: 'a', attributeKey: 'value', offset: 2 },
+			{ clientId: 'a', attributeKey: 'citation', offset: 5 }
 		);
 		expect( readInlineSelection( s, e ) ).toBeNull();
 	} );

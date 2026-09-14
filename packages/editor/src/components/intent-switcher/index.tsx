@@ -1,7 +1,13 @@
+import type { ComponentProps } from 'react';
 import { __ } from '@wordpress/i18n';
-import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { displayShortcut } from '@wordpress/keycodes';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Menu } from '@wordpress/ui';
+import {
+	ariaKeyShortcut,
+	displayShortcut,
+	shortcutAriaLabel,
+} from '@wordpress/keycodes';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import {
@@ -26,29 +32,47 @@ import PostTypeSupportCheck from '../post-type-support-check';
  * `setEditorIntent` action validates against `EDITOR_INTENTS` and silently
  * ignores unknown values.
  */
+type KeyboardShortcut = NonNullable<
+	ComponentProps< typeof Menu.RadioItem >[ 'shortcut' ]
+>;
+
+/*
+ * Builds the `Menu` shortcut shape for a `secondary` modifier combination.
+ * The editor-local helper this replaced now lives in
+ * `@wordpress/keyboard-shortcuts` as a selector keyed by shortcut name, which
+ * these module-level constants cannot reach.
+ */
+function intentShortcut( character: string ): KeyboardShortcut {
+	return {
+		ariaKeyShortcut: ariaKeyShortcut.secondary( character ),
+		displayShortcut: displayShortcut.secondary( character ),
+		label: shortcutAriaLabel.secondary( character ),
+	};
+}
+
 const INTENTS: Array< {
 	value: string;
 	label: string;
 	info: string;
-	shortcut: string;
+	shortcut: KeyboardShortcut | null;
 } > = [
 	{
 		value: EDITOR_INTENT_EDIT,
 		label: __( 'Editing' ),
 		info: __( 'Edit content directly.' ),
-		shortcut: displayShortcut.secondary( 'z' ),
+		shortcut: intentShortcut( 'z' ),
 	},
 	{
 		value: EDITOR_INTENT_SUGGEST,
 		label: __( 'Suggesting' ),
 		info: __( 'Propose changes the author can apply or reject.' ),
-		shortcut: displayShortcut.secondary( 'x' ),
+		shortcut: intentShortcut( 'x' ),
 	},
 	{
 		value: EDITOR_INTENT_VIEW,
 		label: __( 'Viewing' ),
 		info: __( 'Read-only preview of the content.' ),
-		shortcut: displayShortcut.secondary( 'c' ),
+		shortcut: intentShortcut( 'c' ),
 	},
 ];
 
@@ -71,33 +95,63 @@ function IntentSwitcher() {
 	const { setEditorIntent } = unlock( useDispatch( editorStore ) );
 
 	/*
+	 * Two adjustments per choice.
+	 *
+	 * The active choice hides its shortcut. The menu renders the selection as
+	 * a checked radio with the label; a key hint next to it reads as "press
+	 * this to get where you already are". `ModeSwitcher` drops the shortcut
+	 * from the selected mode for the same reason.
+	 *
 	 * Suggesting is visual-only - a suggestion is an inline marker in block
 	 * content, which the code editor cannot render - so it is unavailable to
 	 * a user who turned the visual editor off. `setEditorIntent` refuses it
 	 * either way; offering it disabled, with the setting to change, beats a
 	 * choice that looks live and then declines.
 	 */
-	const choices = INTENTS.map( ( choice ) =>
-		choice.value === EDITOR_INTENT_SUGGEST && ! isRichEditingEnabled
-			? {
-					...choice,
-					disabled: true,
-					info: __(
-						'You can enable the visual editor in your profile settings.'
-					),
-			  }
-			: choice
-	);
+	const choices = INTENTS.map( ( choice ) => {
+		const base =
+			choice.value === intent ? { ...choice, shortcut: null } : choice;
+
+		if (
+			choice.value === EDITOR_INTENT_SUGGEST &&
+			! isRichEditingEnabled
+		) {
+			return {
+				...base,
+				disabled: true,
+				info: __(
+					'You can enable the visual editor in your profile settings.'
+				),
+			};
+		}
+
+		return { ...base, disabled: false };
+	} );
 
 	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">
-			<MenuGroup label={ __( 'Mode' ) }>
-				<MenuItemsChoice
-					choices={ choices }
-					value={ intent }
-					onSelect={ setEditorIntent }
-				/>
-			</MenuGroup>
+			<Menu.RadioGroup
+				value={ intent }
+				onValueChange={ ( value ) => setEditorIntent( value ) }
+			>
+				<Menu.Group>
+					<Menu.GroupLabel>{ __( 'Mode' ) }</Menu.GroupLabel>
+					{ choices.map( ( choice ) => (
+						<Menu.RadioItem
+							key={ choice.value }
+							value={ choice.value }
+							disabled={ choice.disabled }
+							shortcut={ choice.shortcut ?? undefined }
+						>
+							<Menu.ItemLabel>{ choice.label }</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								{ choice.info }
+							</Menu.ItemDescription>
+						</Menu.RadioItem>
+					) ) }
+				</Menu.Group>
+			</Menu.RadioGroup>
+			<Menu.Separator />
 		</PostTypeSupportCheck>
 	);
 }

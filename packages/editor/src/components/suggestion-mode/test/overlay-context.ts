@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { overlayReducer } from '../overlay-context';
 
 describe( 'overlayReducer', () => {

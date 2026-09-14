@@ -6,7 +6,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { isKeyboardEvent } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import { unlock } from '../../lock-unlock';
-import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
+import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { getCandidateDocuments } from './keyboard-target';
 
 /*
@@ -64,8 +64,8 @@ export default function SuggestionMultiBlockFormatNotice() {
 	const isSuggestMode = useSelect(
 		( select ) =>
 			// `getEditorIntent` is private while Suggest mode is experimental.
-			unlock( select( EDITOR_STORE_NAME ) ).getEditorIntent() ===
-			SUGGEST_INTENT,
+			unlock( select( STORE_NAME ) ).getEditorIntent() ===
+			EDITOR_INTENT_SUGGEST,
 		[]
 	);
 	const hasMultiSelection = useSelect(

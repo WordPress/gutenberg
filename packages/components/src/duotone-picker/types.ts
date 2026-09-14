@@ -1,3 +1,5 @@
+import type { CircularOptionPickerProps } from '../circular-option-picker/types';
+
 export type DuotonePickerProps = {
 	/**
 	 * Whether there should be a button to clear the duotone value.
@@ -64,15 +66,33 @@ export type DuotonePickerProps = {
 		slug?: string
 	) => void;
 	/**
-	 * Whether the control should present as a set of buttons,
-	 * each with its own tab stop.
+	 * How predefined duotone swatches behave and are exposed to assistive
+	 * technology.
 	 *
+	 * - `listbox` uses one tab stop and arrow-key navigation, and exposes
+	 *   selection with `aria-selected`.
+	 * - `toggle-buttons` gives each swatch a tab stop and exposes selection with
+	 *   `aria-pressed`.
+	 * - `command-buttons` gives each swatch a tab stop and exposes no selection
+	 *   state. `value` and `selectedSlug` do not mark predefined swatches as
+	 *   selected, and activating a swatch always calls `onChange` with that
+	 *   swatch.
+	 *
+	 * @default 'listbox'
+	 */
+	presentation?: CircularOptionPickerProps[ 'presentation' ];
+	/**
+	 * Whether the control should present as toggle buttons.
+	 *
+	 * @deprecated Use `presentation="toggle-buttons"` instead. An explicit
+	 * `presentation` takes precedence.
 	 * @default false
+	 * @ignore
 	 */
 	asButtons?: boolean;
 	/**
 	 * Prevents keyboard interaction from wrapping around.
-	 * Only used when `asButtons` is not true.
+	 * Only used with the `listbox` presentation.
 	 *
 	 * @default true
 	 */

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { hasPendingSuggestionMarkers } from '../pending-suggestion-markers';
 
 const marker =
