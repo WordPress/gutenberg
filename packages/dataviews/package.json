@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dataviews",
-	"version": "18.1.0",
+	"version": "19.0.0",
 	"description": "DataViews is a component that provides an API to render datasets using different types of layouts (table, grid, list, etc.).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -79,7 +79,7 @@
 		"@wordpress/warning": "file:../warning",
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.1",
-		"colord": "^2.9.3",
+		"colord": "^2.9.4",
 		"colorjs.io": "^0.7.1",
 		"date-fns": "^4.4.0",
 		"deepmerge": "^4.3.1",
@@ -97,13 +97,14 @@
 		"@storybook/addon-docs": "^10.5.3",
 		"@storybook/react-vite": "^10.5.3",
 		"@testing-library/dom": "^10.4.1",
-		"@testing-library/jest-dom": "^6.9.1",
-		"@testing-library/react": "^16.3.2",
+		"@testing-library/jest-dom": "^7.0.1",
+		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.1",
 		"@types/node": "^24.13.3",
 		"esbuild": "^0.27.2",
 		"storybook": "^10.5.3",
-		"vitest": "^4.1.11"
+		"vitest": "^5.0.0",
+		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

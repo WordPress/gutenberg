@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`buildRamps > accent ramp snapshots for 'admin themes' 1`] = `
+exports[`buildRamps > accent ramp snapshots for admin themes 1`] = `
 [
   [
     {
@@ -1525,7 +1525,7 @@ exports[`buildRamps > accent ramp snapshots for 'admin themes' 1`] = `
 ]
 `;
 
-exports[`buildRamps > accent ramp snapshots for 'defaults' 1`] = `
+exports[`buildRamps > accent ramp snapshots for defaults 1`] = `
 [
   [
     {

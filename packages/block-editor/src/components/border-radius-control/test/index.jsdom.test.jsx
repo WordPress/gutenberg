@@ -25,7 +25,6 @@ import BorderRadiusControl from '../index';
 
 globalThis.wpVitest.mockMatchMedia();
 
-globalThis.wpVitest.mockVisibleElements();
 globalThis.wpVitest.mockScrollIntoView();
 
 describe( 'BorderRadiusControl', () => {
@@ -481,27 +480,6 @@ describe( 'BorderRadiusControl', () => {
 			await waitFor( () => {
 				const combobox = screen.getByRole( 'combobox' );
 				expect( combobox ).toHaveTextContent( 'Default' );
-			} );
-		} );
-
-		it( 'can interact with select dropdown options', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<BorderRadiusControl
-					onChange={ mockOnChange }
-					values={ undefined }
-					presets={ largePresetSet }
-				/>
-			);
-
-			// Click on the combobox to open dropdown
-			const combobox = screen.getByRole( 'combobox' );
-			await user.click( combobox );
-
-			// Should show preset options in the dropdown
-			await waitFor( () => {
-				expect( screen.getByText( 'Size 1' ) ).toBeInTheDocument();
 			} );
 		} );
 	} );

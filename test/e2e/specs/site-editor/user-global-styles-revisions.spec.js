@@ -2,6 +2,10 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
+// The rendering mode preference is keyed by theme, so the tests that set it
+// have to name the same theme the fixture activates.
+const THEME = 'emptytheme';
+
 test.use( {
 	userGlobalStylesRevisions: async (
 		{ editor, page, requestUtils },
@@ -18,7 +22,7 @@ test.describe( 'Style Revisions', () => {
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
-			requestUtils.activateTheme( 'emptytheme' ),
+			requestUtils.activateTheme( THEME ),
 			requestUtils.deleteAllTemplates( 'wp_template' ),
 			requestUtils.deleteAllTemplates( 'wp_template_part' ),
 		] );
@@ -27,7 +31,7 @@ test.describe( 'Style Revisions', () => {
 
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
-			postId: 'emptytheme//index',
+			postId: `${ THEME }//index`,
 			postType: 'wp_template',
 			canvas: 'edit',
 		} );
@@ -176,6 +180,224 @@ test.describe( 'Style Revisions', () => {
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )
 		).toBeVisible();
+	} );
+
+	test( 'should access from the site editor sidebar with a static front page', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+		userGlobalStylesRevisions,
+	} ) => {
+		// With a static front page the site editor canvas edits that page
+		// rather than a template, which used to hide the Styles sidebar and
+		// leave Revisions with nowhere to open. See
+		// https://github.com/WordPress/gutenberg/issues/82172.
+		const frontPage = await requestUtils.createPage( {
+			title: 'Home',
+			status: 'publish',
+		} );
+		await requestUtils.updateSiteSettings( {
+			show_on_front: 'page',
+			page_on_front: frontPage.id,
+		} );
+
+		try {
+			// The Revisions entry is only offered once revisions exist, so
+			// create one first — the shared `beforeEach` already opened the
+			// editor this helper saves through.
+			await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+				color: { background: 'blue' },
+			} );
+
+			if ( isSiteEditorV2 ) {
+				await admin.visitSiteEditor();
+				await page.getByRole( 'link', { name: 'Styles' } ).click();
+				await page
+					.getByRole( 'region', { name: 'Styles' } )
+					.getByRole( 'button', { name: 'Revisions' } )
+					.click();
+			} else {
+				// This flow starts from the browse-mode sidebar, not the edit
+				// mode the shared `beforeEach` opens.
+				await admin.visitSiteEditor();
+
+				const navigationContainer = page.getByRole( 'region', {
+					name: 'Navigation',
+				} );
+
+				await navigationContainer
+					.getByRole( 'button', { name: 'Styles' } )
+					.click();
+
+				// wait for the editor canvas to be ready (to contain a block)
+				await editor.canvas.locator( '.wp-block' ).first().waitFor();
+
+				await navigationContainer
+					.getByRole( 'button', { name: /\d+ Revisions?/ } )
+					.click();
+			}
+
+			await expect(
+				page.getByLabel( 'Global styles revisions list' )
+			).toBeVisible();
+		} finally {
+			await requestUtils.updateSiteSettings( {
+				show_on_front: 'posts',
+				page_on_front: 0,
+			} );
+			await requestUtils.deleteAllPages();
+		}
+	} );
+
+	// The controls this checks belong to the v1 site editor shell.
+	test( 'should show the template on the styles route whatever the user prefers', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		test.skip(
+			isSiteEditorV2,
+			'The v1 site editor shell is not present in v2.'
+		);
+
+		try {
+			// Styling the site means styling the template around it, so the
+			// styles route shows the template even when the canvas is a page
+			// and the user has turned "Show template" off while editing pages.
+			const frontPage = await requestUtils.createPage( {
+				title: 'Home',
+				status: 'publish',
+			} );
+			await requestUtils.updateSiteSettings( {
+				show_on_front: 'page',
+				page_on_front: frontPage.id,
+			} );
+
+			// Set over REST rather than dispatched, so it is persisted before
+			// the editor reads it.
+			await requestUtils.setPreferences( 'core', {
+				renderingModes: { [ THEME ]: { page: 'post-only' } },
+			} );
+
+			await admin.visitSiteEditor();
+			await page
+				.getByRole( 'region', { name: 'Navigation' } )
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
+			await editor.canvas.locator( '.wp-block' ).first().waitFor();
+
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.getRenderingMode()
+					)
+				)
+				.toBe( 'template-locked' );
+
+			// With one mode to be in, the editor does not offer to leave it.
+			await page
+				.locator(
+					'iframe.edit-site-visual-editor__editor-canvas[role="button"]'
+				)
+				.click();
+			await expect( page ).toHaveURL( /canvas=edit/ );
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'View', exact: true } )
+				.click();
+			await expect(
+				page.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
+			).toBeHidden();
+			await page.keyboard.press( 'Escape' );
+		} finally {
+			await requestUtils.setPreferences( 'core', {
+				renderingModes: {},
+			} );
+			await requestUtils.updateSiteSettings( {
+				show_on_front: 'posts',
+				page_on_front: 0,
+			} );
+			await requestUtils.deleteAllPages();
+		}
+	} );
+
+	// The back button this exercises ("Open Navigation") and the clickable
+	// canvas belong to the v1 site editor shell; v2 has no equivalent.
+	test( 'should keep the site preview clickable after leaving the styles editor', async ( {
+		admin,
+		page,
+		requestUtils,
+		userGlobalStylesRevisions,
+	} ) => {
+		test.skip(
+			isSiteEditorV2,
+			'The v1 site editor shell is not present in v2.'
+		);
+
+		// Opening a revision used to leave the canvas showing that revision's
+		// blocks, which are rendered without change or selection handlers, so
+		// the site preview stopped responding to clicks.
+		const frontPage = await requestUtils.createPage( {
+			title: 'Home',
+			status: 'publish',
+		} );
+		await requestUtils.updateSiteSettings( {
+			show_on_front: 'page',
+			page_on_front: frontPage.id,
+		} );
+
+		try {
+			await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+				color: { background: 'blue' },
+			} );
+
+			// The styles route (site-editor.php?p=%2Fstyles) is where the
+			// Revisions entry lives.
+			await admin.visitSiteEditor();
+			const navigationContainer = page.getByRole( 'region', {
+				name: 'Navigation',
+			} );
+			await navigationContainer
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
+			await expect( page ).toHaveURL( /p=%2Fstyles/ );
+
+			await navigationContainer
+				.getByRole( 'button', { name: /\d+ Revisions?/ } )
+				.click();
+
+			// The revisions sidebar is open in the editor.
+			await expect(
+				page.getByLabel( 'Global styles revisions list' )
+			).toBeVisible();
+
+			// Leave via the Back button while the revisions sidebar is still
+			// open. A client-side navigation, unlike a fresh page load, keeps
+			// the editor store intact, so anything not torn down survives.
+			await page
+				.locator( '.editor-header__back-button' )
+				.getByRole( 'button', { name: 'Open Navigation' } )
+				.click();
+
+			// Back in view mode the canvas is a button again, and clicking it
+			// enters the editor.
+			const canvasButton = page.locator(
+				'iframe.edit-site-visual-editor__editor-canvas[role="button"]'
+			);
+			await expect( canvasButton ).toBeVisible();
+			await canvasButton.click();
+			await expect( page ).toHaveURL( /canvas=edit/ );
+		} finally {
+			await requestUtils.updateSiteSettings( {
+				show_on_front: 'posts',
+				page_on_front: 0,
+			} );
+			await requestUtils.deleteAllPages();
+		}
 	} );
 
 	test( 'should allow switching to style book view', async ( {

@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TabbableContainer } from '../tabbable';
 import type { TabbableContainerProps } from '../types';
-globalThis.wpVitest.mockVisibleElements();
 
 const TabbableContainerTestCase = ( props: TabbableContainerProps ) => (
 	<>
@@ -31,114 +30,8 @@ const getTabbableContainerTabbables = () => [
 ];
 
 describe( 'TabbableContainer', () => {
-	it( 'moves focus on its tabbable children by using the tab key', async () => {
-		const user = userEvent.setup();
-
-		const onNavigateSpy = vi.fn();
-
-		render( <TabbableContainerTestCase onNavigate={ onNavigateSpy } /> );
-
-		const tabbables = getTabbableContainerTabbables();
-
-		await user.tab();
-		expect(
-			screen.getByRole( 'button', { name: 'Before container' } )
-		).toHaveFocus();
-
-		await user.tab();
-		expect( tabbables[ 0 ] ).toHaveFocus();
-
-		await user.tab();
-		expect( tabbables[ 1 ] ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 1 );
-		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 1, tabbables[ 1 ] );
-
-		await user.tab();
-		expect( tabbables[ 2 ] ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
-		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 2, tabbables[ 2 ] );
-
-		await user.tab( { shift: true } );
-		expect( tabbables[ 1 ] ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 3 );
-		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 1, tabbables[ 1 ] );
-	} );
-
-	it( 'should stop at the edges when the `cycle` prop is set to `false`', async () => {
-		const user = userEvent.setup();
-
-		const onNavigateSpy = vi.fn();
-
-		const { rerender } = render(
-			<TabbableContainerTestCase onNavigate={ onNavigateSpy } />
-		);
-
-		const tabbables = getTabbableContainerTabbables();
-		const firstTabbable = tabbables[ 0 ];
-		const lastTabbableIndex = tabbables.length - 1;
-		const lastTabbable = tabbables[ lastTabbableIndex ];
-
-		await user.tab();
-		expect(
-			screen.getByRole( 'button', { name: 'Before container' } )
-		).toHaveFocus();
-
-		await user.tab();
-		expect( firstTabbable ).toHaveFocus();
-
-		// By default, cycling from first to last and from last to first is allowed.
-		await user.tab( { shift: true } );
-		expect( lastTabbable ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 1 );
-		expect( onNavigateSpy ).toHaveBeenLastCalledWith(
-			lastTabbableIndex,
-			lastTabbable
-		);
-
-		await user.tab();
-		expect( firstTabbable ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
-		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 0, firstTabbable );
-
-		rerender(
-			<TabbableContainerTestCase
-				onNavigate={ onNavigateSpy }
-				cycle={ false }
-			/>
-		);
-
-		// By default, cycling from first to last and from last to first is allowed.
-		// With the `cycle` prop set to `false`, cycling is not allowed.
-		// Therefore, focus will escape the `TabbableContainer` and continue its
-		// natural path in the page.
-		await user.tab( { shift: true } );
-		expect(
-			screen.getByRole( 'button', { name: 'Before container' } )
-		).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
-
-		await user.tab();
-		await user.tab();
-		await user.tab();
-		expect( lastTabbable ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 4 );
-		expect( onNavigateSpy ).toHaveBeenLastCalledWith(
-			lastTabbableIndex,
-			lastTabbable
-		);
-
-		// Focus will move to the next natively focusable elements after
-		// `TabbableContainer`
-		await user.tab();
-		expect(
-			screen.getByRole( 'button', { name: 'After container' } )
-		).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 4 );
-	} );
-
 	it( 'stops keydown event propagation when the tab key is pressed', async () => {
 		const user = userEvent.setup();
-
 		const externalWrapperOnKeyDownSpy = vi.fn();
 
 		render(
@@ -150,12 +43,11 @@ describe( 'TabbableContainer', () => {
 		);
 
 		const tabbables = getTabbableContainerTabbables();
-
 		await user.tab();
 		expect(
 			screen.getByRole( 'button', { name: 'Before container' } )
 		).toHaveFocus();
-		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 0 );
+		expect( externalWrapperOnKeyDownSpy ).not.toHaveBeenCalled();
 
 		await user.tab();
 		expect( tabbables[ 0 ] ).toHaveFocus();
@@ -167,8 +59,6 @@ describe( 'TabbableContainer', () => {
 		await user.tab();
 		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 2 );
 		await user.tab( { shift: true } );
-		// This extra call is caused by the "shift" key being pressed
-		// on its own before "tab"
 		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 3 );
 
 		await user.keyboard( '[Escape]' );

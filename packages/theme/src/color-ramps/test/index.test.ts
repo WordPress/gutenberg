@@ -2,7 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { getLuminance, serialize, to, HSL, sRGB } from 'colorjs.io/fn';
 import { buildAccentRamp, buildBgRamp } from '..';
 import { buildRamp } from '../lib';
-import { clampToGamut, getColorString, getContrast } from '../lib/color-utils';
+import {
+	clampToGamut,
+	getColorString,
+	getContrast,
+	parseSeedColor,
+} from '../lib/color-utils';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
 import {
@@ -252,8 +257,8 @@ describe( 'buildRamps', () => {
 		);
 		expect(
 			computeBetterFgColorDirection( [
-				clampToGamut( '#333' ),
-				clampToGamut( '#eee' ),
+				clampToGamut( parseSeedColor( '#333' ) ),
+				clampToGamut( parseSeedColor( '#eee' ) ),
 			] ).better
 		).toBe( 'darker' );
 	} );
