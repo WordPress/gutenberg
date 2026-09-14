@@ -24,9 +24,37 @@ The Awareness protocol should not be considered a public API. It is a third-part
 
 In general, awareness for core entity types is implemented by the `core-data` package and third-party Yjs providers should not provide their own awareness implementation. However, it may be desirable for custom entities to have a custom awareness implementation.
 
-### privateApis
+### ConnectionErrorCode
 
-Private @wordpress/sync APIs.
+Error codes reported by a sync provider when its connection fails.
+
+### CRDT_DOC_META_PERSISTENCE_KEY
+
+Key of the in-memory meta entry marking a CRDT document as loaded from persistence. It is not synced or persisted.
+
+### CRDT_RECORD_MAP_KEY
+
+Root-level key for the map that holds the entity record data.
+
+### createSyncManager
+
+Creates the sync manager, which orchestrates the lifecycle of syncing entity records: it creates Yjs documents, connects to providers, creates awareness instances, and coordinates with the `core-data` store.
+
+### Delta
+
+Quill Delta implementation used to describe rich text changes.
+
+### LOCAL_EDITOR_ORIGIN
+
+Origin string for CRDT document changes originating from the local editor.
+
+### LOCAL_UNDO_IGNORED_ORIGIN
+
+Origin string for CRDT document changes that should be synced but not recorded in the undo history (e.g. status changes during publish).
+
+### retrySyncConnection
+
+Immediately retries the HTTP polling sync connection instead of waiting for the next automatic retry.
 
 ### Y
 
