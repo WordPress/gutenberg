@@ -1,0 +1,34 @@
+on:
+    pull_request_target:
+        types: [opened]
+    push:
+name: Pull request automation
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    pull-request-automation:
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+            issues: write
+            pull-requests: write
+        if: ${{ github.repository == 'WordPress/gutenberg' }}
+
+        steps:
+            # Checkout defaults to using the branch which triggered the event, which
+            # isn't necessarily `trunk` (e.g. in the case of a merge).
+            - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+              with:
+                  ref: trunk
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - uses: ./packages/project-management-automation
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
