@@ -60,10 +60,19 @@ jobs:
       run: npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
   unit-php:
-    name: PHP
+    name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}
 
     runs-on: 'ubuntu-24.04'
     timeout-minutes: 20
+
+    env:
+      LOCAL_PHP: ${{ matrix.php }}-fpm
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['5.6', '7.0', '7.4', '8.0']
+        multisite: [false, true]
 
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -97,4 +106,9 @@ jobs:
         npm run wp-env start
 
     - name: Running the tests
-      run: npm run test-php && npm run test-unit-php-multisite
+      if: ${{ ! matrix.multisite }}
+      run: npm run test-php
+
+    - name: Running the tests (multisite)
+      if: ${{ matrix.multisite }}
+      run: npm run test-unit-php-multisite
