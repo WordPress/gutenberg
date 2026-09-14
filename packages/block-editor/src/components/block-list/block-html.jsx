@@ -48,24 +48,23 @@ function BlockHTML( { clientId } ) {
 		// If html is empty  we reset the block to the default HTML and mark it as valid to avoid triggering an error
 		const content = html ? html : getSaveContent( blockType, attributes );
 
-		let updatedAttributes = attributes;
-		let isValid = true;
+		const updatedBlock = {
+			...block,
+			attributes,
+			originalContent: content,
+		};
+		const [ isValid ] = html ? validateBlock( updatedBlock ) : [ true ];
 
-		if ( html ) {
-			// `getBlockAttributes` only sources what the save output declares,
-			// so recover hand-typed `id`/`class`/`aria-label` as the parser does.
-			const fixedBlock = applyBuiltInValidationFixes(
-				{ ...block, attributes, originalContent: content },
-				blockType
-			);
-			updatedAttributes = fixedBlock.attributes;
-			[ isValid ] = validateBlock( fixedBlock );
-		}
+		// `getBlockAttributes` only sources what the save output declares,
+		// so recover hand-typed `id`/`class`/`aria-label` for invalid blocks.
+		const fixedBlock = isValid
+			? updatedBlock
+			: applyBuiltInValidationFixes( updatedBlock, blockType );
 
 		updateBlock( clientId, {
-			attributes: updatedAttributes,
+			attributes: fixedBlock.attributes,
 			originalContent: content,
-			isValid,
+			isValid: isValid || validateBlock( fixedBlock )[ 0 ],
 		} );
 
 		// Ensure the state is updated if we reset so it displays the default content.
