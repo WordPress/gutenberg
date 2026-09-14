@@ -90,7 +90,17 @@
 				"style": true
 			}
 		},
-		"interactivity": true
+		"interactivity": true,
+		"layout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"allowOrientation": false,
+			"allowVerticalAlignment": false,
+			"allowWrap": false,
+			"default": {
+				"type": "flex"
+			}
+		}
 	},
 	"editorStyle": "wp-block-file-editor",
 	"style": "wp-block-file"
