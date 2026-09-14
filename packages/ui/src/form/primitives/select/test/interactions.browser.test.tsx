@@ -14,8 +14,12 @@ describe( 'Select interactions', () => {
 			>
 				<Select.Trigger />
 				<Select.Popup>
-					<Select.Item value="Apple">Apple</Select.Item>
-					<Select.Item value="Banana">Banana</Select.Item>
+					<Select.Item value="Apple">
+						<Select.ItemLabel>Apple</Select.ItemLabel>
+					</Select.Item>
+					<Select.Item value="Banana">
+						<Select.ItemLabel>Banana</Select.ItemLabel>
+					</Select.Item>
 				</Select.Popup>
 			</Select.Root>
 		);
