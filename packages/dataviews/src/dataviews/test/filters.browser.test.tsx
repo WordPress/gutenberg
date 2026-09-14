@@ -2,14 +2,9 @@ import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
 import { describe, expect, it } from 'vitest';
 import { useState } from '@wordpress/element';
-// Load the styles WordPress enqueues for the filter popover and results table.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/components/src/style.scss';
 import DataViews from '../index';
 import type { Field, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '../../style.scss';
 
 type Post = {
 	id: number;

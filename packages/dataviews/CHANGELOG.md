@@ -231,7 +231,6 @@
 -   DataForm panel layout: remove button/dropdown-specific overrides from `.dataforms-layouts-panel__field-control`; those overrides are no longer needed. [#79275](https://github.com/WordPress/gutenberg/pull/79275)
 -   DataForm panel layout: align `label-side` gap with the regular layout by using `--wpds-dimension-gap-sm` (8px). [#79311](https://github.com/WordPress/gutenberg/pull/79311)
 
-
 ### Documentation
 
 -   Fix `overriden` typo to `overridden` in README. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
@@ -257,7 +256,6 @@
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
-
 
 ### Documentation
 
