@@ -2,12 +2,14 @@ import { __ } from '@wordpress/i18n';
 import { navigation as icon } from '@wordpress/icons';
 import { select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { decodeEntities } from '@wordpress/html-entities';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import deprecated from './deprecated';
+import getNavigationMenuBySlug from './get-navigation-menu-by-slug';
+import getNavigationMenuTitle from './get-navigation-menu-title';
+import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 
 const { name } = metadata;
 
@@ -48,9 +50,23 @@ export const settings = {
 	},
 	edit,
 	save,
-	__experimentalLabel: ( { ref } ) => {
-		if ( ! ref ) {
+	__experimentalLabel: ( { ref, slug } ) => {
+		if ( ! ref && ! slug ) {
 			return;
+		}
+
+		// A slug reference resolves against the loaded Navigation Menus rather
+		// than a post ID, so the matching record is used directly.
+		if ( slug ) {
+			const navigationMenus = select( coreStore ).getEntityRecords(
+				'postType',
+				'wp_navigation',
+				PRELOADED_NAVIGATION_MENUS_QUERY
+			);
+
+			return getNavigationMenuTitle(
+				getNavigationMenuBySlug( navigationMenus, slug )
+			);
 		}
 
 		const navigation = select( coreStore ).getEditedEntityRecord(
@@ -59,11 +75,7 @@ export const settings = {
 			ref
 		);
 
-		if ( ! navigation?.title ) {
-			return;
-		}
-
-		return decodeEntities( navigation.title );
+		return getNavigationMenuTitle( navigation );
 	},
 	deprecated,
 };

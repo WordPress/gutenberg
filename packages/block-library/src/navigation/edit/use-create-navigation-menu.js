@@ -3,6 +3,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
 import useGenerateDefaultNavigationTitle from './use-generate-default-navigation-title';
+import { SELECT_NAVIGATION_MENUS_ARGS } from '../constants';
 
 export const CREATE_NAVIGATION_MENU_SUCCESS = 'success';
 export const CREATE_NAVIGATION_MENU_ERROR = 'error';
@@ -14,13 +15,14 @@ export default function useCreateNavigationMenu( clientId ) {
 	const [ value, setValue ] = useState( null );
 	const [ error, setError ] = useState( null );
 
-	const { saveEntityRecord, editEntityRecord } = useDispatch( coreStore );
+	const { saveEntityRecord, editEntityRecord, invalidateResolution } =
+		useDispatch( coreStore );
 	const generateDefaultTitle = useGenerateDefaultNavigationTitle( clientId );
 
 	// This callback uses data from the two placeholder steps and only creates
 	// a new navigation menu when the user completes the final step.
 	const create = useCallback(
-		async ( title = null, blocks = [], postStatus ) => {
+		async ( title = null, blocks = [], postStatus, options = {} ) => {
 			// Guard against creating Navigations without a title.
 			// Note you can pass no title, but if one is passed it must be
 			// a string otherwise the title may end up being empty.
@@ -56,11 +58,27 @@ export default function useCreateNavigationMenu( clientId ) {
 				status: postStatus,
 			};
 
+			// A block referencing its menu by slug needs the created menu to
+			// adopt that slug, so that the reference resolves to it.
+			if ( options.slug ) {
+				record.slug = options.slug;
+			}
+
 			// Return affords ability to await on this function directly
 			return saveEntityRecord( 'postType', 'wp_navigation', record )
 				.then( ( response ) => {
 					setValue( response );
 					setStatus( CREATE_NAVIGATION_MENU_SUCCESS );
+
+					// Slug references resolve against the Navigation Menus
+					// collection, so it has to be refetched for a newly
+					// created menu to be resolvable.
+					if ( options.slug ) {
+						invalidateResolution(
+							'getEntityRecords',
+							SELECT_NAVIGATION_MENUS_ARGS
+						);
+					}
 
 					// Set the status to publish so that the Navigation block
 					// shows up in the multi entity save flow.
@@ -83,7 +101,12 @@ export default function useCreateNavigationMenu( clientId ) {
 					} );
 				} );
 		},
-		[ saveEntityRecord, editEntityRecord, generateDefaultTitle ]
+		[
+			saveEntityRecord,
+			editEntityRecord,
+			invalidateResolution,
+			generateDefaultTitle,
+		]
 	);
 
 	return {

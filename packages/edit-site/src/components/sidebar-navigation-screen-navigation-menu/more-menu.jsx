@@ -14,7 +14,8 @@ const POPOVER_PROPS = {
 };
 
 export default function ScreenNavigationMoreMenu( props ) {
-	const { onDelete, onSave, onDuplicate, menuTitle, menuId } = props;
+	const { onDelete, onSave, onDuplicate, menuTitle, menuId, menuSlug } =
+		props;
 
 	const [ renameModalOpen, setRenameModalOpen ] = useState( false );
 	const [ deleteConfirmDialogOpen, setDeleteConfirmDialogOpen ] =
@@ -88,7 +89,9 @@ export default function ScreenNavigationMoreMenu( props ) {
 			{ renameModalOpen && (
 				<RenameModal
 					onClose={ closeModals }
+					menuId={ menuId }
 					menuTitle={ menuTitle }
+					menuSlug={ menuSlug }
 					onSave={ onSave }
 				/>
 			) }
