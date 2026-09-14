@@ -10,7 +10,6 @@
 
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: space-between;
 	align-items: center;
 	margin-bottom: 0;
 
@@ -32,8 +31,9 @@
 		left: 0;
 	}
 
+	// Let the block's flex layout place the file name and button.
 	.wp-block-file__content-wrapper {
-		flex-grow: 1;
+		display: contents;
 	}
 
 	a {
@@ -46,6 +46,5 @@
 
 	.wp-block-file__button-richtext-wrapper {
 		display: inline-block;
-		margin-left: 0.75em;
 	}
 }
