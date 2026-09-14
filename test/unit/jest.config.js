@@ -10,6 +10,8 @@ const transpiledPackageNames = glob( 'packages/*/src/index.{js,ts,tsx}' ).map(
 
 // Make sure the tests run in UTC timezone, regardless of the system timezone.
 process.env.TZ = 'UTC';
+// Avoid time-based caniuse-lite warnings tripping jest-console assertions.
+process.env.BROWSERSLIST_IGNORE_OLD_DATA = 'true';
 
 module.exports = {
 	rootDir: '../../',
