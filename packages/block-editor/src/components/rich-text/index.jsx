@@ -543,6 +543,7 @@ function RichTextWrapper(
 	useMarkPersistent( {
 		html: adjustedValue,
 		value,
+		getValue,
 		onMarkPersistent: __unstableMarkLastChangeAsPersistent,
 	} );
 

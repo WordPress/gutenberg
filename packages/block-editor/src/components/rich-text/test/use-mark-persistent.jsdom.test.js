@@ -5,10 +5,13 @@ import { useMarkPersistent } from '../use-mark-persistent';
 
 const markPersistent = vi.fn();
 
-function props( html, text = html, activeFormats = [] ) {
+// `text` is what the rich text record held when the hook rendered;
+// `liveText` is what it holds by the time layout effects run.
+function props( html, text = html, activeFormats = [], liveText = text ) {
 	return {
 		html,
 		value: { text, activeFormats },
+		getValue: () => ( { text: liveText, activeFormats } ),
 		onMarkPersistent: markPersistent,
 	};
 }
@@ -76,6 +79,25 @@ describe( 'useMarkPersistent', () => {
 		// The text updates first, e.g. when the block debounces
 		// `setAttributes`.
 		rerender( props( 'a', 'ab' ) );
+		rerender( props( 'ab' ) );
+
+		expect( markPersistent ).not.toHaveBeenCalled();
+
+		vi.advanceTimersByTime( 1000 );
+
+		expect( markPersistent ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	// When the html changes from outside, such as another container editing
+	// the same entity, useRichText applies it to its record in a layout
+	// effect of its own, so the record seen at render time is one change
+	// behind. The hook has to judge the change by the live record.
+	it( 'treats an external html change as typing when the record has not caught up', () => {
+		const { rerender } = renderHook( useMarkPersistent, {
+			initialProps: props( 'a' ),
+		} );
+
+		rerender( props( 'ab', 'a', [], 'ab' ) );
 		rerender( props( 'ab' ) );
 
 		expect( markPersistent ).not.toHaveBeenCalled();

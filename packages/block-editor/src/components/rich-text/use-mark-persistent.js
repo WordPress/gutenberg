@@ -22,12 +22,18 @@ function getChangeType( previous, next ) {
 	return previous.text === next.text ? 'discrete' : 'typing';
 }
 
-export function useMarkPersistent( { html, value, onMarkPersistent } ) {
+export function useMarkPersistent( {
+	html,
+	value,
+	getValue,
+	onMarkPersistent,
+} ) {
 	const { text } = value;
 	const hasActiveFormats = !! value.activeFormats?.length;
 	const previousRef = useRef();
 	// Stable, so a new callback doesn't reset the debounce.
 	const markPersistent = useEvent( onMarkPersistent );
+	const getLiveValue = useEvent( getValue );
 	// Don't create an undo level for every character. Create one after a
 	// second of no input.
 	const markPersistentDebounced = useDebounce(
@@ -38,7 +44,10 @@ export function useMarkPersistent( { html, value, onMarkPersistent } ) {
 	// Must be set synchronously to make sure it applies to the last change.
 	useLayoutEffect( () => {
 		const previous = previousRef.current;
-		const next = { html, text, hasActiveFormats };
+		// An html change made elsewhere is applied to the rich text record in
+		// a layout effect of its own, so the record seen at render time is
+		// one change behind it. Read the live record instead.
+		const next = { html, text: getLiveValue().text, hasActiveFormats };
 
 		// Ignore mount.
 		if ( ! previous ) {
@@ -67,6 +76,7 @@ export function useMarkPersistent( { html, value, onMarkPersistent } ) {
 		html,
 		text,
 		hasActiveFormats,
+		getLiveValue,
 		markPersistent,
 		markPersistentDebounced,
 	] );
