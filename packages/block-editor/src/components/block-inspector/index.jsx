@@ -506,9 +506,12 @@ const BlockInspectorSingleBlock = ( {
 				<div className="block-editor-block-inspector__state-badges">
 					<Text
 						variant="body-sm"
-						className="block-editor-block-inspector__state-badges-label"
+						className="block-editor-block-inspector__state-badges-text"
 					>
-						{ __( 'Editing:' ) }
+						{
+							/* translators: Instructive text shown before the style state badges in the block inspector; the badges indicate the style states the user is currently editing. */
+							__( 'Editing:' )
+						}
 					</Text>
 					<BlockStateBadges
 						name={ blockName }
