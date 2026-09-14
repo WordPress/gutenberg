@@ -764,14 +764,16 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
-	const submenuAccessibilityNotice =
-		! showSubmenuIcon &&
-		submenuVisibility !== 'click' &&
-		submenuVisibility !== 'always'
-			? __(
-					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
-			  )
-			: '';
+	let submenuAccessibilityNotice = '';
+	if ( ! showSubmenuIcon && submenuVisibility === 'hover' ) {
+		submenuAccessibilityNotice = __(
+			'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
+		);
+	} else if ( ! showSubmenuIcon && submenuVisibility === 'click' ) {
+		submenuAccessibilityNotice = __(
+			'Hiding the arrow removes the only visual cue that a menu item opens a submenu. Add another indicator to the menu item text so visitors can tell submenus apart from links.'
+		);
+	}
 
 	const isFirstRender = useRef( true ); // Don't speak on first render.
 	useEffect( () => {
@@ -835,11 +837,10 @@ function Navigation( {
 											if ( value === 'always' ) {
 												newAttributes.showSubmenuIcon = false;
 											} else if (
-												value === 'click' ||
 												prevSubmenuVisibility ===
-													'always'
+												'always'
 											) {
-												// When switching to "click" or away from "always", show the arrow
+												// Restore the arrow when switching away from "always", which forces it off.
 												newAttributes.showSubmenuIcon = true;
 											}
 
@@ -873,7 +874,6 @@ function Navigation( {
 										} )
 									}
 									isDisabled={
-										submenuVisibility === 'click' ||
 										submenuVisibility === 'always'
 									}
 									isShownByDefault
@@ -886,7 +886,6 @@ function Navigation( {
 											} );
 										} }
 										disabled={
-											submenuVisibility === 'click' ||
 											submenuVisibility === 'always'
 										}
 										label={ __( 'Show arrow' ) }

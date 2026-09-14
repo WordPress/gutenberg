@@ -394,7 +394,7 @@ export default function NavigationSubmenuEdit( {
 						/>
 					) }
 				</ParentElement>
-				{ ( showSubmenuIcon || openSubmenusOnClick ) && (
+				{ showSubmenuIcon && (
 					<span className="wp-block-navigation__submenu-icon">
 						<ItemSubmenuIcon />
 					</span>
