@@ -99,6 +99,8 @@ Settings related to colors.
 | custom | Allow users to select custom colors. | `boolean` | `true` |
 | customDuotone | Allow users to create custom duotone filters. | `boolean` | `true` |
 | customGradient | Allow users to create custom gradients. | `boolean` | `true` |
+| dark | Dark-scheme overrides for color presets. Presets are matched by slug to the base palette/gradients and emitted as `--wp--preset--*` custom properties under a `prefers-color-scheme: dark` gate (and a `data-scheme="dark"` override). Use for a light-by-default theme. Fully opt-in: omit to leave output unchanged. | `{ palette, gradients }` |  |
+| light | Light-scheme overrides for color presets. Mirrors `dark`, but emitted under a `prefers-color-scheme: light` gate (and a `data-scheme="light"` override). Use for a dark-by-default theme that wants a light alternative. Fully opt-in. | `{ palette, gradients }` |  |
 | defaultDuotone | Allow users to choose filters from the default duotone filter presets. | `boolean` | `true` |
 | defaultGradients | Allow users to choose colors from the default gradients. | `boolean` | `true` |
 | defaultPalette | Allow users to choose colors from the default palette. | `boolean` | `true` |

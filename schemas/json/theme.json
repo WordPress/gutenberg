@@ -152,6 +152,112 @@
 							"type": "boolean",
 							"default": true
 						},
+						"dark": {
+							"description": "Dark-scheme overrides for color presets. Presets are matched by slug to the base palette/gradients and emitted as `--wp--preset--*` custom properties under a `prefers-color-scheme: dark` gate (and a `data-scheme=\"dark\"` override). Use for a light-by-default theme. Fully opt-in: omit to leave output unchanged.",
+							"type": "object",
+							"properties": {
+								"palette": {
+									"description": "Dark-scheme color palette. Slugs override matching entries in `palette`; unmatched base slugs keep their single value in both schemes.",
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"name": {
+												"description": "Name of the color preset, translatable.",
+												"type": "string"
+											},
+											"slug": {
+												"description": "Kebab-case identifier matching a base palette slug.",
+												"type": "string"
+											},
+											"color": {
+												"description": "CSS hex or rgb(a) string for the dark scheme.",
+												"type": "string"
+											}
+										},
+										"required": [ "slug", "color" ],
+										"additionalProperties": false
+									}
+								},
+								"gradients": {
+									"description": "Dark-scheme gradient presets. Slugs override matching entries in `gradients`.",
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"name": {
+												"description": "Name of the gradient preset, translatable.",
+												"type": "string"
+											},
+											"slug": {
+												"description": "Kebab-case identifier matching a base gradient slug.",
+												"type": "string"
+											},
+											"gradient": {
+												"description": "CSS gradient string for the dark scheme.",
+												"type": "string"
+											}
+										},
+										"required": [ "slug", "gradient" ],
+										"additionalProperties": false
+									}
+								}
+							},
+							"additionalProperties": false
+						},
+						"light": {
+							"description": "Light-scheme overrides for color presets. Mirrors `dark`, but emitted under a `prefers-color-scheme: light` gate (and a `data-scheme=\"light\"` override). Use for a dark-by-default theme that wants a light alternative. Fully opt-in.",
+							"type": "object",
+							"properties": {
+								"palette": {
+									"description": "Light-scheme color palette. Slugs override matching entries in `palette`; unmatched base slugs keep their single value in every scheme.",
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"name": {
+												"description": "Name of the color preset, translatable.",
+												"type": "string"
+											},
+											"slug": {
+												"description": "Kebab-case identifier matching a base palette slug.",
+												"type": "string"
+											},
+											"color": {
+												"description": "CSS hex or rgb(a) string for the light scheme.",
+												"type": "string"
+											}
+										},
+										"required": [ "slug", "color" ],
+										"additionalProperties": false
+									}
+								},
+								"gradients": {
+									"description": "Light-scheme gradient presets. Slugs override matching entries in `gradients`.",
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"name": {
+												"description": "Name of the gradient preset, translatable.",
+												"type": "string"
+											},
+											"slug": {
+												"description": "Kebab-case identifier matching a base gradient slug.",
+												"type": "string"
+											},
+											"gradient": {
+												"description": "CSS gradient string for the light scheme.",
+												"type": "string"
+											}
+										},
+										"required": [ "slug", "gradient" ],
+										"additionalProperties": false
+									}
+								}
+							},
+							"additionalProperties": false
+						},
 						"defaultDuotone": {
 							"description": "Allow users to choose filters from the default duotone filter presets.",
 							"type": "boolean",
