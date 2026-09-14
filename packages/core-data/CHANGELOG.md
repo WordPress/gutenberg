@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   Resolve the default template from a post's saved slug rather than its edited one, so typing in the slug field no longer sends a `/templates/lookup` request per keystroke ([#82515](https://github.com/WordPress/gutenberg/pull/82515)).
 -   Keep a query's `totalItems` in sync when records are removed from it, so the page count is correct after a deletion instead of only after the next fetch ([#82244](https://github.com/WordPress/gutenberg/pull/82244)).
 -   `EntityProvider`: a `revisionId` now only affects the entity it is set on. Other entities rendered inside it, such as the posts in a Query Loop, keep showing their own data ([#82517](https://github.com/WordPress/gutenberg/pull/82517)).
 -   `getEntityRecord` and `getRevision` return the same record for queries that request the same `_fields`, instead of a new object on every call, which made `useSelect` warn under `SCRIPT_DEBUG` ([#82552](https://github.com/WordPress/gutenberg/pull/82552)).
