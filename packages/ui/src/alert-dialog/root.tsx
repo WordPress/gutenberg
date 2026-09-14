@@ -1,11 +1,13 @@
 import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import { speak } from '@wordpress/a11y';
+import { useEvent } from '@wordpress/compose';
 import {
 	useCallback,
 	useEffect,
 	useMemo,
 	useRef,
 	useState,
+	useSyncExternalStore,
 } from '@wordpress/element';
 import { AlertDialogContext } from './context';
 import type { Phase } from './context';
@@ -17,6 +19,35 @@ function isThenable( value: unknown ): value is PromiseLike< unknown > {
 		value !== undefined &&
 		typeof ( value as PromiseLike< unknown > ).then === 'function'
 	);
+}
+
+interface LifecycleState {
+	phase: Phase;
+	showSpinner: boolean;
+	errorMessage?: string;
+}
+
+function createLifecycleState() {
+	let value: LifecycleState = {
+		phase: 'idle',
+		showSpinner: false,
+		errorMessage: undefined,
+	};
+	const listeners = new Set< () => void >();
+
+	return {
+		getValue: () => value,
+		subscribe: ( listener: () => void ) => {
+			listeners.add( listener );
+			return () => {
+				listeners.delete( listener );
+			};
+		},
+		update: ( updates: Partial< LifecycleState > ) => {
+			value = { ...value, ...updates };
+			listeners.forEach( ( listener ) => listener() );
+		},
+	};
 }
 
 /**
@@ -70,19 +101,16 @@ function Root( {
 	//
 	// Buttons are disabled whenever phase !== 'idle'.
 	// Dismiss (Escape / Cancel) is blocked during 'pending'.
-	const [ phase, setPhase ] = useState< Phase >( 'idle' );
-	const [ showSpinner, setShowSpinner ] = useState( false );
-	const [ errorMessage, setErrorMessage ] = useState< string >();
+	const [ lifecycle ] = useState( createLifecycleState );
+	const lifecycleState = useSyncExternalStore(
+		lifecycle.subscribe,
+		lifecycle.getValue,
+		lifecycle.getValue
+	);
 
 	const actionsRef = useRef< _AlertDialog.Root.Actions | null >( null );
 
-	const onConfirmRef = useRef( onConfirm );
-	onConfirmRef.current = onConfirm;
-
-	// Ref keeps phase accessible synchronously from callbacks that may
-	// run between a setState call and the subsequent React re-render.
-	const phaseRef = useRef( phase );
-	phaseRef.current = phase;
+	const onConfirmEvent = useEvent( onConfirm );
 
 	// Generation counter — safety net for the edge case where the component
 	// unmounts while an async confirm is in flight. Also incremented when
@@ -96,12 +124,10 @@ function Root( {
 	// (i.e. does not react to `onOpenChange`), the phase would be stuck
 	// at 'closing'. Detect the contradiction and reset to idle.
 	useEffect( () => {
-		if ( effectiveOpen && phase === 'closing' ) {
-			phaseRef.current = 'idle';
-			setPhase( 'idle' );
-			setShowSpinner( false );
+		if ( effectiveOpen && lifecycleState.phase === 'closing' ) {
+			lifecycle.update( { phase: 'idle', showSpinner: false } );
 		}
-	}, [ effectiveOpen, phase ] );
+	}, [ effectiveOpen, lifecycle, lifecycleState.phase ] );
 
 	const handleOpenChange = useCallback(
 		(
@@ -109,39 +135,36 @@ function Root( {
 			eventDetails: _AlertDialog.Root.ChangeEventDetails
 		) => {
 			// Block dismiss while a confirm action is pending.
-			if ( ! nextOpen && phaseRef.current === 'pending' ) {
+			if ( ! nextOpen && lifecycle.getValue().phase === 'pending' ) {
 				return;
 			}
 
-			if ( ! nextOpen && phaseRef.current === 'idle' ) {
-				phaseRef.current = 'closing';
-				setPhase( 'closing' );
+			if ( ! nextOpen && lifecycle.getValue().phase === 'idle' ) {
+				lifecycle.update( { phase: 'closing' } );
 			}
 
 			setInternalOpen( nextOpen );
 			onOpenChange?.( nextOpen, eventDetails );
 		},
-		[ onOpenChange ]
+		[ lifecycle, onOpenChange ]
 	);
 
 	const confirm = useCallback( async () => {
-		if ( phaseRef.current !== 'idle' ) {
+		if ( lifecycle.getValue().phase !== 'idle' ) {
 			return;
 		}
 
-		phaseRef.current = 'pending';
-		setPhase( 'pending' );
-		setErrorMessage( undefined );
+		lifecycle.update( { phase: 'pending', errorMessage: undefined } );
 
 		const id = ++confirmIdRef.current;
 
 		try {
-			const rawResult = onConfirmRef.current?.();
+			const rawResult = onConfirmEvent?.();
 
 			// Show spinner only for async handlers (Promises).
 			// Sync handlers resolve in the same tick — no spinner needed.
 			if ( isThenable( rawResult ) ) {
-				setShowSpinner( true );
+				lifecycle.update( { showSpinner: true } );
 			}
 
 			const result = await Promise.resolve( rawResult );
@@ -154,10 +177,11 @@ function Root( {
 
 			// An error message implies the dialog should stay open.
 			if ( result?.error ) {
-				phaseRef.current = 'idle';
-				setPhase( 'idle' );
-				setShowSpinner( false );
-				setErrorMessage( result.error );
+				lifecycle.update( {
+					phase: 'idle',
+					showSpinner: false,
+					errorMessage: result.error,
+				} );
 				speak( result.error, 'assertive' );
 				return;
 			}
@@ -165,46 +189,43 @@ function Root( {
 			const shouldClose = result?.close !== false;
 
 			if ( shouldClose ) {
-				phaseRef.current = 'closing';
-				setPhase( 'closing' );
+				lifecycle.update( { phase: 'closing' } );
 				actionsRef.current?.close();
 			} else {
-				phaseRef.current = 'idle';
-				setPhase( 'idle' );
-				setShowSpinner( false );
+				lifecycle.update( { phase: 'idle', showSpinner: false } );
 			}
 		} catch ( error ) {
 			if ( confirmIdRef.current !== id ) {
 				return;
 			}
-			phaseRef.current = 'idle';
-			setPhase( 'idle' );
-			setShowSpinner( false );
+			lifecycle.update( { phase: 'idle', showSpinner: false } );
 			// eslint-disable-next-line no-console
 			console.error( error );
 		}
-	}, [] );
+	}, [ lifecycle, onConfirmEvent ] );
 
-	const handleOpenChangeComplete = useCallback( ( open: boolean ) => {
-		if ( ! open ) {
-			// Invalidate any in-flight async so a stale promise settling
-			// after dismiss+reopen doesn't close the new session.
-			confirmIdRef.current++;
-			phaseRef.current = 'idle';
-			setPhase( 'idle' );
-			setShowSpinner( false );
-			setErrorMessage( undefined );
-		}
-	}, [] );
+	const handleOpenChangeComplete = useCallback(
+		( open: boolean ) => {
+			if ( ! open ) {
+				// Invalidate any in-flight async so a stale promise settling
+				// after dismiss+reopen doesn't close the new session.
+				confirmIdRef.current++;
+				lifecycle.update( {
+					phase: 'idle',
+					showSpinner: false,
+					errorMessage: undefined,
+				} );
+			}
+		},
+		[ lifecycle ]
+	);
 
 	const contextValue = useMemo(
 		() => ( {
-			phase,
-			showSpinner,
-			errorMessage,
+			...lifecycleState,
 			confirm,
 		} ),
-		[ phase, showSpinner, errorMessage, confirm ]
+		[ lifecycleState, confirm ]
 	);
 
 	return (

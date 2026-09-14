@@ -88,6 +88,91 @@ function block_core_gallery_get_column_gap_value( $gap, $fallback_gap ) {
 }
 
 /**
+ * Returns Gallery-specific responsive Flex rules for a viewport.
+ *
+ * @since 7.1.0
+ *
+ * @param string $selector       Gallery block selector.
+ * @param mixed  $viewport_style Viewport style data.
+ * @param string $media_query    Viewport media query.
+ * @return array[] Gallery responsive Flex rules.
+ */
+function block_core_gallery_get_responsive_flex_style_rules( $selector, $viewport_style, $media_query ) {
+	if ( ! is_array( $viewport_style ) || ! is_string( $media_query ) ) {
+		return array();
+	}
+
+	$rules            = array();
+	$gallery_selector = "{$selector}.wp-block-gallery.has-nested-images:where(.is-layout-flex)";
+	$image_selector   = "{$gallery_selector} figure.wp-block-image:not(#individual-image)";
+	$columns          = $viewport_style['columns'] ?? null;
+
+	if ( is_int( $columns ) && $columns >= 1 && $columns <= 8 ) {
+		$width   = 1 === $columns
+			? '100%'
+			: sprintf(
+				'calc((100%% - (var(--wp--style--unstable-gallery-gap, 16px) * %1$d)) / %2$d)',
+				$columns - 1,
+				$columns
+			);
+		$rules[] = array(
+			'selector'     => $image_selector,
+			'declarations' => array( 'width' => "{$width} !important" ),
+			'rules_group'  => $media_query,
+		);
+	}
+
+	$image_crop = $viewport_style['imageCrop'] ?? null;
+	if ( ! is_bool( $image_crop ) ) {
+		return $rules;
+	}
+
+	$rules[] = array(
+		'selector'     => $image_selector,
+		'declarations' => $image_crop
+			? array(
+				'align-self'    => 'inherit !important',
+				'margin-bottom' => '0 !important',
+			)
+			: array(
+				'align-self'    => 'auto !important',
+				'margin-top'    => '0 !important',
+				'margin-bottom' => 'auto !important',
+			),
+		'rules_group'  => $media_query,
+	);
+	$rules[] = array(
+		'selector'     => "{$image_selector} > div:not(.components-drop-zone)",
+		'declarations' => array( 'display' => $image_crop ? 'flex !important' : 'block !important' ),
+		'rules_group'  => $media_query,
+	);
+	$rules[] = array(
+		'selector'     => "{$image_selector} > a",
+		'declarations' => array( 'display' => $image_crop ? 'flex !important' : 'inline-block !important' ),
+		'rules_group'  => $media_query,
+	);
+	$rules[] = array(
+		'selector'     => "{$image_selector} a,{$image_selector} img",
+		'declarations' => $image_crop
+			? array(
+				'width'      => '100% !important',
+				'flex'       => '1 0 0% !important',
+				'height'     => '100% !important',
+				'object-fit' => 'cover !important',
+			)
+			: array(
+				'width'      => 'auto !important',
+				'flex'       => '0 1 auto !important',
+				'height'     => 'auto !important',
+				'object-fit' => 'fill !important',
+			),
+		'rules_group'  => $media_query,
+	);
+
+	return $rules;
+}
+
+/**
  * Resolves a Gallery block's `dynamicContent` to an ordered list of image
  * attachment IDs.
  *
@@ -309,8 +394,15 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
 function block_core_gallery_render( $attributes, $content, $block ) {
 	static $global_styles = null;
 
+	// Gallery blocks created before layout variations existed do not have an
+	// explicit layout attribute. Missing and malformed layout data therefore
+	// falls back to Flex so existing galleries retain their current appearance.
+	$layout         = is_array( $attributes['layout'] ?? null ) ? $attributes['layout'] : array();
+	$layout_type    = $layout['type'] ?? null;
+	$is_flex_layout = ! is_string( $layout_type ) || '' === $layout_type || 'flex' === $layout_type;
+
 	// In dynamic mode the gallery's images are resolved at render time instead of
-	// being authored as inner blocks, so `save.js` persists at most the
+	// being authored as inner blocks, so `save.jsx` persists at most the
 	// gallery-level caption — a bare `<figcaption>`, or nothing when there is no
 	// caption. Resolve the configured source to a list of attachments, render an
 	// image block for each, and build the gallery `<figure>` wrapper from scratch.
@@ -357,123 +449,133 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 		// Build the wrapper rather than parsing/splicing saved markup.
 		// `get_block_wrapper_attributes()` supplies the block-support
 		// classes/styles (align, color, border, spacing, anchor id); the layout
-		// render filter adds the flex layout classes downstream — the same way a
+		// render filter adds the active layout classes downstream — the same way a
 		// static gallery's wrapper is composed (`useBlockProps.save()` plus that
 		// filter). Only the gallery-specific classes are added explicitly, and
-		// they mirror `save.js` (kept in sync deliberately — see that file).
-		$gallery_classes  = 'wp-block-gallery has-nested-images';
-		$gallery_classes .= isset( $attributes['columns'] )
-			? ' columns-' . (int) $attributes['columns']
-			: ' columns-default';
-		if ( $attributes['imageCrop'] ?? true ) {
-			$gallery_classes .= ' is-cropped';
+		// they mirror `save.jsx` (kept in sync deliberately — see that file).
+		$gallery_classes = 'wp-block-gallery has-nested-images';
+		if ( $is_flex_layout ) {
+			$gallery_classes .= isset( $attributes['columns'] )
+				? ' columns-' . (int) $attributes['columns']
+				: ' columns-default';
+			if ( $attributes['imageCrop'] ?? true ) {
+				$gallery_classes .= ' is-cropped';
+			}
 		}
 		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $gallery_classes ) );
 
-		// In dynamic mode `save.js` persists only the gallery-level caption, so
+		// In dynamic mode `save.jsx` persists only the gallery-level caption, so
 		// `$content` is the saved `<figcaption>` (or empty). Append it after the
 		// resolved images — matching the static gallery's `{images}{caption}`
 		// order — without parsing it.
 		$content = sprintf( '<figure %s>%s%s</figure>', $wrapper_attributes, $images_markup, $content );
 	}
 
-	// Adds a style tag for the --wp--style--unstable-gallery-gap var.
-	// The Gallery block needs to recalculate Image block width based on
-	// the current gap setting in order to maintain the number of flex columns
-	// so a css var is added to allow this.
-
-	$style_attr = is_array( $attributes['style'] ?? null )
-		? $attributes['style']
-		: array();
-	if (
-		defined( 'IS_GUTENBERG_PLUGIN' ) &&
-		IS_GUTENBERG_PLUGIN &&
-		function_exists( 'gutenberg_resolve_style_state_aliases' )
-	) {
-		$style_attr = gutenberg_resolve_style_state_aliases( $style_attr, 'core/gallery' );
-	}
-
-	$unique_gallery_classname = wp_unique_id( 'wp-block-gallery-' );
-	$processed_content        = new WP_HTML_Tag_Processor( $content );
+	$processed_content = new WP_HTML_Tag_Processor( $content );
 	$processed_content->next_tag();
-	$processed_content->add_class( $unique_gallery_classname );
 
-	// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
-	// gap on the gallery.
-	$fallback_gap = 'var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )';
-
-	if ( null === $global_styles ) {
-		$global_styles = function_exists( 'wp_get_global_styles' ) ? wp_get_global_styles() : array();
-	}
-
-	$global_gallery_styles = $global_styles['blocks']['core/gallery'] ?? array();
-	$global_gallery_gap    = $global_gallery_styles['spacing']['blockGap'] ?? $fallback_gap;
-	$has_block_gap         = is_array( $style_attr['spacing'] ?? null ) && array_key_exists( 'blockGap', $style_attr['spacing'] );
-	// Prefer the block's own gap value, then Gallery global styles. Missing
-	// values fall back to the Gallery blockGap default.
-	$block_gap  = $has_block_gap
-		? $style_attr['spacing']['blockGap']
-		: $global_gallery_gap;
-	$gap_column = block_core_gallery_get_column_gap_value( $block_gap, $fallback_gap );
-
-	// Set the CSS variable to the column value for Gallery's flex width calculations.
-	$gallery_styles = array(
-		array(
-			'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
-			'declarations' => array(
-				'--wp--style--unstable-gallery-gap' => $gap_column,
-			),
-		),
-	);
-
-	$global_settings          = wp_get_global_settings();
-	$viewport_settings        = $global_settings['viewport'] ?? null;
-	$responsive_media_queries = array();
-	foreach ( array( 'WP_Theme_JSON_Gutenberg', 'WP_Theme_JSON' ) as $theme_json_class_name ) {
-		if ( method_exists( $theme_json_class_name, 'get_viewport_media_queries' ) ) {
-			$responsive_media_queries = $theme_json_class_name::get_viewport_media_queries( $viewport_settings );
-			break;
-		}
-	}
-
-	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
-		$viewport_style                = $style_attr[ $breakpoint ] ?? null;
-		$has_viewport_block_gap        = is_array( $viewport_style ) &&
-			is_array( $viewport_style['spacing'] ?? null ) &&
-			array_key_exists( 'blockGap', $viewport_style['spacing'] );
-		$has_global_viewport_block_gap = is_array( $global_gallery_styles[ $breakpoint ]['spacing'] ?? null ) &&
-			array_key_exists( 'blockGap', $global_gallery_styles[ $breakpoint ]['spacing'] );
-
-		// Viewport-specific block values win. Gallery global viewport values
-		// only apply when the block has no base gap, so they do not override an instance value.
-		if ( $has_viewport_block_gap ) {
-			$viewport_gap = $viewport_style['spacing']['blockGap'];
-		} elseif ( ! $has_block_gap && $has_global_viewport_block_gap ) {
-			$viewport_gap = $global_gallery_styles[ $breakpoint ]['spacing']['blockGap'];
-		} else {
-			continue;
+	if ( $is_flex_layout ) {
+		// Add a style tag for the --wp--style--unstable-gallery-gap var. The
+		// Gallery's custom Flex layout recalculates Image block widths based on
+		// the current gap so it can maintain the selected number of columns.
+		$style_attr = is_array( $attributes['style'] ?? null )
+			? $attributes['style']
+			: array();
+		if (
+			defined( 'IS_GUTENBERG_PLUGIN' ) &&
+			IS_GUTENBERG_PLUGIN &&
+			function_exists( 'gutenberg_resolve_style_state_aliases' )
+		) {
+			$style_attr = gutenberg_resolve_style_state_aliases( $style_attr, 'core/gallery' );
 		}
 
-		if ( null === $viewport_gap ) {
-			continue;
+		$unique_gallery_classname = wp_unique_id( 'wp-block-gallery-' );
+		$processed_content->add_class( $unique_gallery_classname );
+
+		// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
+		// gap on the gallery.
+		$fallback_gap = 'var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )';
+
+		if ( null === $global_styles ) {
+			$global_styles = function_exists( 'wp_get_global_styles' ) ? wp_get_global_styles() : array();
 		}
 
-		$gallery_styles[] = array(
-			'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
-			'declarations' => array(
-				'--wp--style--unstable-gallery-gap' => block_core_gallery_get_column_gap_value(
-					$viewport_gap,
-					$fallback_gap
+		$global_gallery_styles = $global_styles['blocks']['core/gallery'] ?? array();
+		$global_gallery_gap    = $global_gallery_styles['spacing']['blockGap'] ?? $fallback_gap;
+		$has_block_gap         = is_array( $style_attr['spacing'] ?? null ) && array_key_exists( 'blockGap', $style_attr['spacing'] );
+		// Prefer the block's own gap value, then Gallery global styles. Missing
+		// values fall back to the Gallery blockGap default.
+		$block_gap  = $has_block_gap
+			? $style_attr['spacing']['blockGap']
+			: $global_gallery_gap;
+		$gap_column = block_core_gallery_get_column_gap_value( $block_gap, $fallback_gap );
+
+		// Set the CSS variable to the column value for Gallery's flex width calculations.
+		$gallery_styles = array(
+			array(
+				'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
+				'declarations' => array(
+					'--wp--style--unstable-gallery-gap' => $gap_column,
 				),
 			),
-			'rules_group'  => $media_query,
+		);
+
+		$global_settings          = wp_get_global_settings();
+		$viewport_settings        = $global_settings['viewport'] ?? null;
+		$responsive_media_queries = array();
+		foreach ( array( 'WP_Theme_JSON_Gutenberg', 'WP_Theme_JSON' ) as $theme_json_class_name ) {
+			if ( method_exists( $theme_json_class_name, 'get_viewport_media_queries' ) ) {
+				$responsive_media_queries = $theme_json_class_name::get_viewport_media_queries( $viewport_settings );
+				break;
+			}
+		}
+
+		foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
+			$viewport_style                = $style_attr[ $breakpoint ] ?? null;
+			$has_viewport_block_gap        = is_array( $viewport_style ) &&
+				is_array( $viewport_style['spacing'] ?? null ) &&
+				array_key_exists( 'blockGap', $viewport_style['spacing'] );
+			$has_global_viewport_block_gap = is_array( $global_gallery_styles[ $breakpoint ]['spacing'] ?? null ) &&
+				array_key_exists( 'blockGap', $global_gallery_styles[ $breakpoint ]['spacing'] );
+
+			// Viewport-specific block values win. Gallery global viewport values
+			// only apply when the block has no base gap, so they do not override an instance value.
+			if ( $has_viewport_block_gap ) {
+				$viewport_gap = $viewport_style['spacing']['blockGap'];
+			} elseif ( ! $has_block_gap && $has_global_viewport_block_gap ) {
+				$viewport_gap = $global_gallery_styles[ $breakpoint ]['spacing']['blockGap'];
+			} else {
+				$viewport_gap = null;
+			}
+
+			if ( null !== $viewport_gap ) {
+				$gallery_styles[] = array(
+					'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
+					'declarations' => array(
+						'--wp--style--unstable-gallery-gap' => block_core_gallery_get_column_gap_value(
+							$viewport_gap,
+							$fallback_gap
+						),
+					),
+					'rules_group'  => $media_query,
+				);
+			}
+
+			$gallery_styles = array_merge(
+				$gallery_styles,
+				block_core_gallery_get_responsive_flex_style_rules(
+					".{$unique_gallery_classname}",
+					$viewport_style,
+					$media_query
+				)
+			);
+		}
+
+		wp_style_engine_get_stylesheet_from_css_rules(
+			$gallery_styles,
+			array( 'context' => 'block-supports' )
 		);
 	}
-
-	wp_style_engine_get_stylesheet_from_css_rules(
-		$gallery_styles,
-		array( 'context' => 'block-supports' )
-	);
 
 	// The WP_HTML_Tag_Processor class calls get_updated_html() internally
 	// when the instance is treated as a string, but here we explicitly

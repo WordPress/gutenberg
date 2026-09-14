@@ -164,6 +164,21 @@ export interface BaseProps
 		'onSelect' | 'defaultValue' | 'role'
 	> {
 	/**
+	 * The ARIA role for the calendar's root element.
+	 *
+	 * The default `application` role helps assistive technologies pass calendar
+	 * navigation keys to the component. Its accessible name includes the current
+	 * month.
+	 *
+	 * Changing this role can affect screen-reader keyboard navigation. Only
+	 * override it for a tested composition. Apply roles that require additional
+	 * behavior, such as `dialog`, to a wrapper.
+	 *
+	 * @default 'application'
+	 */
+	role?: ComponentProps< 'div' >[ 'role' ];
+
+	/**
 	 * Whether the selection is required.
 	 * When `true`, there always needs to be a date selected.
 	 * @default false
@@ -344,6 +359,14 @@ export interface RangeProps {
 	 * When `true`, the range will reset when including a disabled day.
 	 */
 	excludeDisabled?: boolean;
+	/**
+	 * When `true`, clicking a day starts a new range if there is no current start
+	 * date or if a range is already complete. In those cases, the clicked day
+	 * becomes the start of the new range. When `required` is `false`, clicking
+	 * the same day of a single-day range clears the selection.
+	 * @default true
+	 */
+	resetOnSelect?: boolean;
 	/**
 	 * The minimum number of nights to include in the range.
 	 */

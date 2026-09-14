@@ -4,8 +4,15 @@
 
 ### Breaking Changes
 
--   Stop registering the package as a WordPress script. `@wordpress/sync` is now bundled into its consumers, so the `wp-sync` script handle and the `wp.sync` global are no longer exposed ([#81736](https://github.com/WordPress/gutenberg/issues/81736)).
--   Sync providers registered via the `sync.providers` filter now receive the Yjs module as the `Y` property of the provider creator options. Providers must use it instead of `window.wp.sync.Y` to share the editor's Yjs instance ([#81736](https://github.com/WordPress/gutenberg/issues/81736)).
+-   Stop registering the package as a WordPress script. `@wordpress/sync` is now bundled into its consumers, so the `wp-sync` script handle and the `wp.sync` global are no longer exposed ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).
+
+### New Features
+
+-   Pass the Yjs module to sync provider creators as the `Y` property of the provider creator options. Providers should use it instead of the `window.wp.sync.Y` global, which will be removed in a future release ([#81736](https://github.com/WordPress/gutenberg/issues/81736)).
+
+## 1.55.0 (2026-09-10)
+
+## 1.54.0 (2026-08-26)
 
 ### Internal
 

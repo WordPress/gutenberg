@@ -50,11 +50,13 @@ test.describe( 'Collaboration - Notification preferences', () => {
 		// the admin editor show the join notice.
 		await collaborationUtils.openCollaborativeSession( post.id );
 
-		// Scope to the last snackbar so a stray/earlier snackbar can't
-		// cause a Playwright strict-mode violation on this locator.
-		await expect( page.getByTestId( 'snackbar' ).last() ).toContainText(
-			`${ SECOND_USER_DISPLAY_NAME } has joined the post.`,
-			{ timeout: 10000 }
-		);
+		const joinNoticeText = `${ SECOND_USER_DISPLAY_NAME } has joined the post.`;
+		const joinNotice = page
+			.getByTestId( 'snackbar' )
+			.filter( { hasText: joinNoticeText } );
+		await expect( joinNotice ).toContainText( joinNoticeText, {
+			timeout: 10000,
+		} );
+		await expect( joinNotice ).toBeHidden( { timeout: 10000 } );
 	} );
 } );

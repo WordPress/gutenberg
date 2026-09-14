@@ -4,7 +4,7 @@ import type { ButtonAsButtonProps } from '../button/types';
 import type { DropdownProps } from '../dropdown/types';
 import type { WordPressComponentProps } from '../context';
 
-type CommonCircularOptionPickerProps = {
+export type CircularOptionPickerProps = {
 	/**
 	 * An ID to apply to the component.
 	 */
@@ -30,6 +30,35 @@ type CommonCircularOptionPickerProps = {
 	 */
 	children?: ReactNode;
 	/**
+	 * How the swatches behave and are exposed to assistive technology.
+	 *
+	 * - `listbox` uses one tab stop and arrow-key navigation, and exposes
+	 *   selection with `aria-selected`.
+	 * - `toggle-buttons` gives each swatch a tab stop and exposes selection with
+	 *   `aria-pressed`.
+	 * - `command-buttons` gives each swatch a tab stop and exposes no selection
+	 *   state. Use it when swatches run commands such as opening an editor.
+	 *
+	 * @default 'listbox'
+	 */
+	presentation?: 'listbox' | 'toggle-buttons' | 'command-buttons';
+	/**
+	 * Whether the control should present as toggle buttons.
+	 *
+	 * @deprecated Use `presentation="toggle-buttons"` instead. An explicit
+	 * `presentation` takes precedence.
+	 * @default false
+	 * @ignore
+	 */
+	asButtons?: boolean;
+	/**
+	 * Prevents keyboard interaction from wrapping around.
+	 * Only used with the `listbox` presentation.
+	 *
+	 * @default true
+	 */
+	loop?: boolean;
+	/**
 	 * The ID reference list of one or more elements that label the wrapper
 	 * element.
 	 */
@@ -45,40 +74,16 @@ type WithBaseId = {
 	baseId: string;
 };
 
-type FullListboxCircularOptionPickerProps = CommonCircularOptionPickerProps & {
-	/**
-	 * Whether the control should present as a set of buttons,
-	 * each with its own tab stop.
-	 */
-	asButtons?: false;
-	/**
-	 * Prevents keyboard interaction from wrapping around.
-	 * Only used when `asButtons` is not true.
-	 *
-	 * @default true
-	 */
-	loop?: boolean;
-};
-
 export type ListboxCircularOptionPickerProps = WithBaseId &
-	Omit< FullListboxCircularOptionPickerProps, 'asButtons' >;
-
-type FullButtonsCircularOptionPickerProps = CommonCircularOptionPickerProps & {
-	/**
-	 * Whether the control should present as a set of buttons,
-	 * each with its own tab stop.
-	 *
-	 * @default false
-	 */
-	asButtons: true;
-};
+	Omit< CircularOptionPickerProps, 'asButtons' | 'presentation' >;
 
 export type ButtonsCircularOptionPickerProps = WithBaseId &
-	Omit< FullButtonsCircularOptionPickerProps, 'asButtons' >;
-
-export type CircularOptionPickerProps =
-	| FullListboxCircularOptionPickerProps
-	| FullButtonsCircularOptionPickerProps;
+	Omit< CircularOptionPickerProps, 'asButtons' | 'presentation' | 'loop' > & {
+		presentation: Exclude<
+			NonNullable< CircularOptionPickerProps[ 'presentation' ] >,
+			'listbox'
+		>;
+	};
 
 export type DropdownLinkActionProps = {
 	buttonProps?: Omit<
@@ -116,4 +121,5 @@ export type CircularOptionPickerContextProps = {
 	baseId?: string;
 	activeId?: string | null | undefined;
 	setActiveId?: ( newId: string | null | undefined ) => void;
+	presentation?: CircularOptionPickerProps[ 'presentation' ];
 };

@@ -200,7 +200,7 @@ export default function useDynamicGallery( {
 	// current post. Clearing the inner blocks removes the manually-added images:
 	// they're the gallery's image data, so there's nothing else to reset. The
 	// legacy `images`/`ids` attributes aren't touched — they're back-compat shims
-	// for the pre-innerBlocks format (see `deprecated.js`/`transforms.js`), empty
+	// for the pre-innerBlocks format (see `deprecated.jsx`/`transforms.js`), empty
 	// on any gallery reachable here.
 	function enableDynamicMode() {
 		// Batch the attribute change and the inner-block reset into a single
