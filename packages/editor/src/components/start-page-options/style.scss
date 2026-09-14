@@ -12,8 +12,8 @@ $pattern-min-width: 220px;
 		width: 100%;
 		height: $actions-height;
 		background-color: $white;
-		margin-left: - $grid-unit-30;
-		margin-right: - $grid-unit-30;
+		margin-left: -$grid-unit-30;
+		margin-right: -$grid-unit-30;
 		padding-left: $grid-unit-30;
 		padding-right: $grid-unit-30;
 		border-top: 1px solid $gray-300;
@@ -53,6 +53,11 @@ $pattern-min-width: 220px;
 	@include break-medium() {
 		margin-left: $sidebar-width;
 	}
+}
+
+.editor-start-page-options__no-results {
+	padding: $grid-unit-40;
+	text-align: center;
 }
 
 .editor-start-page-options__modal-content .block-editor-block-patterns-list {
