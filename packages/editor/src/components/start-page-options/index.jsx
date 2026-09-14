@@ -155,33 +155,34 @@ function StartPageOptionsModal( { onClose } ) {
 	const hasCategories = patternCategories.length > 0;
 	const hasStartPattern = startPatterns.length > 0;
 
+	// The selected category can stop existing while the modal stays mounted,
+	// for instance when the edited post changes. A controlled `Tabs` value
+	// that matches no tab renders no panel at all, so fall back to all
+	// patterns.
+	const activeCategory = patternCategories.some(
+		( { name } ) => name === selectedCategory
+	)
+		? selectedCategory
+		: ALL_PATTERNS_CATEGORY.name;
+
 	const filteredStartPatterns = useMemo( () => {
 		let patterns = startPatterns;
-		if (
-			hasCategories &&
-			selectedCategory !== ALL_PATTERNS_CATEGORY.name
-		) {
+		if ( activeCategory !== ALL_PATTERNS_CATEGORY.name ) {
 			patterns = patterns.filter( ( pattern ) =>
-				selectedCategory === 'uncategorized'
+				activeCategory === 'uncategorized'
 					? ! pattern.categories?.some( ( patternCategory ) =>
 							patternCategories.some(
 								( { name } ) => name === patternCategory
 							)
 					  )
-					: pattern.categories?.includes( selectedCategory )
+					: pattern.categories?.includes( activeCategory )
 			);
 		}
 		if ( searchValue ) {
 			patterns = searchItems( patterns, searchValue );
 		}
 		return patterns;
-	}, [
-		startPatterns,
-		hasCategories,
-		selectedCategory,
-		patternCategories,
-		searchValue,
-	] );
+	}, [ startPatterns, activeCategory, patternCategories, searchValue ] );
 
 	if ( ! hasStartPattern ) {
 		return null;
@@ -202,7 +203,7 @@ function StartPageOptionsModal( { onClose } ) {
 			{ hasCategories ? (
 				<Tabs.Root
 					orientation="vertical"
-					value={ selectedCategory }
+					value={ activeCategory }
 					onValueChange={ setSelectedCategory }
 				>
 					<Stack
