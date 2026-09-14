@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import { DuotonePicker } from '..';
@@ -114,7 +114,7 @@ describe( 'DuotonePicker', () => {
 	} );
 
 	describe( 'duplicate duotones in palette', () => {
-		it( 'should render all swatches even when two entries share the same colors', () => {
+		it( 'should render all swatches even when two entries share the same colors', async () => {
 			render(
 				<DuotonePicker
 					aria-label="Duotone"
@@ -127,10 +127,12 @@ describe( 'DuotonePicker', () => {
 				/>
 			);
 
-			expect( screen.getAllByRole( 'option' ) ).toHaveLength( 3 );
+			await waitFor( () =>
+				expect( screen.getAllByRole( 'option' ) ).toHaveLength( 3 )
+			);
 		} );
 
-		it( 'should select by slug when selectedSlug is provided, marking only the matching entry', () => {
+		it( 'should select by slug when selectedSlug is provided, marking only the matching entry', async () => {
 			render(
 				<DuotonePicker
 					aria-label="Duotone"
@@ -145,13 +147,21 @@ describe( 'DuotonePicker', () => {
 				/>
 			);
 
-			const options = screen.getAllByRole( 'option' );
-			// "dark-background" is index 0, "dark-text" is index 1.
-			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'false' );
-			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			await waitFor( () => {
+				const options = screen.getAllByRole( 'option' );
+				// "dark-background" is index 0, "dark-text" is index 1.
+				expect( options[ 0 ] ).toHaveAttribute(
+					'aria-selected',
+					'false'
+				);
+				expect( options[ 1 ] ).toHaveAttribute(
+					'aria-selected',
+					'true'
+				);
+			} );
 		} );
 
-		it( 'should fall back to value selection and mark all matching duplicates when no selectedSlug is provided', () => {
+		it( 'should fall back to value selection and mark all matching duplicates when no selectedSlug is provided', async () => {
 			render(
 				<DuotonePicker
 					aria-label="Duotone"
@@ -165,12 +175,20 @@ describe( 'DuotonePicker', () => {
 				/>
 			);
 
-			const options = screen.getAllByRole( 'option' );
-			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
-			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			await waitFor( () => {
+				const options = screen.getAllByRole( 'option' );
+				expect( options[ 0 ] ).toHaveAttribute(
+					'aria-selected',
+					'true'
+				);
+				expect( options[ 1 ] ).toHaveAttribute(
+					'aria-selected',
+					'true'
+				);
+			} );
 		} );
 
-		it( 'should treat an empty-string selectedSlug as no slug and fall back to value selection', () => {
+		it( 'should treat an empty-string selectedSlug as no slug and fall back to value selection', async () => {
 			render(
 				<DuotonePicker
 					aria-label="Duotone"
@@ -185,9 +203,17 @@ describe( 'DuotonePicker', () => {
 				/>
 			);
 
-			const options = screen.getAllByRole( 'option' );
-			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
-			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			await waitFor( () => {
+				const options = screen.getAllByRole( 'option' );
+				expect( options[ 0 ] ).toHaveAttribute(
+					'aria-selected',
+					'true'
+				);
+				expect( options[ 1 ] ).toHaveAttribute(
+					'aria-selected',
+					'true'
+				);
+			} );
 		} );
 
 		it( 'should pass index and slug to onChange when a swatch is clicked', async () => {
@@ -322,7 +348,7 @@ describe( 'DuotonePicker', () => {
 	} );
 
 	describe( 'distinct duotones', () => {
-		it( 'should mark the preset matching value as selected', () => {
+		it( 'should mark the preset matching value as selected', async () => {
 			render(
 				<DuotonePicker
 					aria-label="Duotone"
@@ -339,9 +365,17 @@ describe( 'DuotonePicker', () => {
 				/>
 			);
 
-			const options = screen.getAllByRole( 'option' );
-			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'false' );
-			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			await waitFor( () => {
+				const options = screen.getAllByRole( 'option' );
+				expect( options[ 0 ] ).toHaveAttribute(
+					'aria-selected',
+					'false'
+				);
+				expect( options[ 1 ] ).toHaveAttribute(
+					'aria-selected',
+					'true'
+				);
+			} );
 		} );
 	} );
 } );
