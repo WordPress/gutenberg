@@ -23,6 +23,7 @@
 -   Block states: Undo a text gradient set in Global Styles, for the block type or an applied block style variation, when a state or breakpoint sets a box clip or text color. A breakpoint pseudo-state now also undoes one set by the default pseudo-state ([#86245](https://github.com/WordPress/gutenberg/pull/86245)).
 -   List View: Arrow Left moves to the parent row when the parent is outside the render window ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
 -   Block Bindings: Restore selection, connection, and labels for legacy key-only fields ([#86492](https://github.com/WordPress/gutenberg/pull/86492)).
+-   Inner block controllers rendering one entity, such as two Template Parts on the same slug or two Navigation blocks on the same menu, no longer split typing in one of them into an undo level per character, lose keystrokes, or move the selection into the other one. A controller now updates its existing clones in place when only attributes changed, and a history-ignored change to other blocks no longer ends a typing run ([#82706](https://github.com/WordPress/gutenberg/pull/82706)).
 
 ### Internal
 
