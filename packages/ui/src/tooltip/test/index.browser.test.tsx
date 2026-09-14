@@ -1,11 +1,12 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { createRef } from '@wordpress/element';
 import type { ReactNode } from 'react';
+import { afterEach, describe, expect, it } from 'vitest';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
+import { page, userEvent } from 'vitest/browser';
+import { createRef } from '@wordpress/element';
+import type { ProviderProps } from '../types';
 import * as Tooltip from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
-import type { ProviderProps } from '../types';
 
 // Test wrapper that sets delay={0} to avoid real-time delays in tests.
 function TestProvider( { children, ...props }: ProviderProps ) {
@@ -17,12 +18,43 @@ function TestProvider( { children, ...props }: ProviderProps ) {
 }
 
 describe( 'Tooltip', () => {
+	it( 'shows tooltip on hover', async () => {
+		await render(
+			<Tooltip.Provider delay={ 0 }>
+				<Tooltip.Root>
+					<Tooltip.Trigger>Hover me</Tooltip.Trigger>
+					<Tooltip.Popup>Tooltip content</Tooltip.Popup>
+				</Tooltip.Root>
+			</Tooltip.Provider>
+		);
+
+		await page.getByRole( 'button', { name: 'Hover me' } ).hover();
+		await expect
+			.element( page.getByText( 'Tooltip content' ) )
+			.toBeVisible();
+	} );
+
+	it( 'does not show tooltip when disabled', async () => {
+		await render(
+			<Tooltip.Provider delay={ 0 }>
+				<Tooltip.Root disabled>
+					<Tooltip.Trigger>Hover me</Tooltip.Trigger>
+					<Tooltip.Popup>Tooltip content</Tooltip.Popup>
+				</Tooltip.Root>
+			</Tooltip.Provider>
+		);
+
+		await page.getByRole( 'button', { name: 'Hover me' } ).hover();
+		await expect
+			.element( page.getByText( 'Tooltip content' ) )
+			.not.toBeInTheDocument();
+	} );
 	it( 'forwards ref', async () => {
-		const user = userEvent.setup();
+		const user = userEvent;
 		const triggerRef = createRef< HTMLButtonElement >();
 		const popupRef = createRef< HTMLDivElement >();
 
-		render(
+		await render(
 			<TestProvider>
 				<Tooltip.Root>
 					<Tooltip.Trigger ref={ triggerRef }>
@@ -45,55 +77,12 @@ describe( 'Tooltip', () => {
 		} );
 	} );
 
-	it( 'shows tooltip on hover', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<TestProvider>
-				<Tooltip.Root>
-					<Tooltip.Trigger>Hover me</Tooltip.Trigger>
-					<Tooltip.Popup>Tooltip content</Tooltip.Popup>
-				</Tooltip.Root>
-			</TestProvider>
-		);
-
-		const trigger = screen.getByRole( 'button', { name: 'Hover me' } );
-		await user.hover( trigger );
-
-		// waitFor is used intentionally: even with delay={0}, the popup appearing
-		// is conceptually async (state change → render → portal mount). This also
-		// makes the test resilient to future internal changes in base-ui.
-		await waitFor( () => {
-			expect( screen.getByText( 'Tooltip content' ) ).toBeVisible();
-		} );
-	} );
-
-	it( 'does not show tooltip when disabled', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<TestProvider>
-				<Tooltip.Root disabled>
-					<Tooltip.Trigger>Hover me</Tooltip.Trigger>
-					<Tooltip.Popup>Tooltip content</Tooltip.Popup>
-				</Tooltip.Root>
-			</TestProvider>
-		);
-
-		const trigger = screen.getByRole( 'button', { name: 'Hover me' } );
-		await user.hover( trigger );
-
-		expect(
-			screen.queryByText( 'Tooltip content' )
-		).not.toBeInTheDocument();
-	} );
-
 	describe( 'portal', () => {
 		it( 'should render inside the portal container when a custom target is provided', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			const containerRef = createRef< HTMLDivElement >();
 
-			render(
+			await render(
 				<TestProvider>
 					<div data-testid="wrapper">
 						<Tooltip.Root>
@@ -121,7 +110,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const content = await screen.findByText( 'Tooltip content' );
-			expect( content ).toBeVisible();
+			await expect.element( content ).toBeVisible();
 
 			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
 				content
@@ -129,9 +118,9 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'should render with a portal by default', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 
-			render(
+			await render(
 				<TestProvider>
 					<div data-testid="wrapper">
 						<Tooltip.Root>
@@ -147,7 +136,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const content = await screen.findByText( 'Tooltip content' );
-			expect( content ).toBeVisible();
+			await expect.element( content ).toBeVisible();
 
 			expect( screen.getByTestId( 'wrapper' ) ).not.toContainElement(
 				content
@@ -176,9 +165,9 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'portals the popup into the slot when the consumer opts in', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 
-			render(
+			await render(
 				<WithSlotEnabled>
 					<TestProvider>
 						<Tooltip.Root>
@@ -194,7 +183,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const content = await screen.findByText( 'Tooltip content' );
-			expect( content ).toBeVisible();
+			await expect.element( content ).toBeVisible();
 
 			const slot = document.querySelector( SLOT_SELECTOR );
 			expect( slot ).not.toBeNull();
@@ -202,9 +191,9 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'does not create a slot when the consumer has not opted in (dormant default)', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 
-			render(
+			await render(
 				<TestProvider>
 					<Tooltip.Root>
 						<Tooltip.Trigger>Hover me</Tooltip.Trigger>
@@ -218,16 +207,16 @@ describe( 'Tooltip', () => {
 			);
 
 			const content = await screen.findByText( 'Tooltip content' );
-			expect( content ).toBeVisible();
+			await expect.element( content ).toBeVisible();
 
 			expect( document.querySelector( SLOT_SELECTOR ) ).toBeNull();
 		} );
 
 		it( 'lets a caller-supplied portal container override the slot', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			const containerRef = createRef< HTMLDivElement >();
 
-			render(
+			await render(
 				<WithSlotEnabled>
 					<TestProvider>
 						<Tooltip.Root>
@@ -255,7 +244,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const content = await screen.findByText( 'Tooltip content' );
-			expect( content ).toBeVisible();
+			await expect.element( content ).toBeVisible();
 			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
 				content
 			);
