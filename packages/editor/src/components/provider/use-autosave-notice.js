@@ -10,17 +10,17 @@ import useEntityContainsSnapshot from './use-entity-contains-snapshot';
 /**
  * Creates the warning notice about a more recent autosave.
  *
- * @param {Object}   props                      Function props.
- * @param {Object}   props.autosave             The `autosave` editor setting.
- * @param {Function} props.createWarningNotice  Action that creates the notice.
- * @param {Object}   props.registry             The data registry.
- * @param {Function} props.setCurrentRevisionId Action that opens a revision.
+ * @param {Object}   props                     Function props.
+ * @param {Object}   props.autosave            The `autosave` editor setting.
+ * @param {Function} props.createWarningNotice Action that creates the notice.
+ * @param {Object}   props.registry            The data registry.
+ * @param {Function} props.openRevision        Action that opens a revision.
  */
 function showAutosaveExistsNotice( {
 	autosave,
 	createWarningNotice,
 	registry,
-	setCurrentRevisionId,
+	openRevision,
 } ) {
 	// The only place core exposes the autosave ID is the edit
 	// link, always `revision.php?revision=<autosave ID>`.
@@ -47,7 +47,7 @@ function showAutosaveExistsNotice( {
 											autosave.editLink;
 										return;
 									}
-									setCurrentRevisionId( autosaveId );
+									openRevision( autosaveId );
 								},
 							}
 						: { url: autosave.editLink } ),
@@ -82,7 +82,7 @@ function showAutosaveExistsNotice( {
 export default function useAutosaveNotice( { post, recovery, settings } ) {
 	const registry = useRegistry();
 	const { createWarningNotice } = useDispatch( noticesStore );
-	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
+	const { openRevision } = unlock( useDispatch( editorStore ) );
 
 	// Assume the notice is not needed in the case of an error recovery.
 	// Passing no snapshot resolves the snapshot status immediately.
@@ -112,7 +112,7 @@ export default function useAutosaveNotice( { post, recovery, settings } ) {
 			autosave: settings.autosave,
 			createWarningNotice,
 			registry,
-			setCurrentRevisionId,
+			openRevision,
 		} );
 
 		// The snapshot status settles at most once, so the notice is
