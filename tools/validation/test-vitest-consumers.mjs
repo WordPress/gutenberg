@@ -160,6 +160,8 @@ if ( values.lockfile ) {
 }
 console.log( `Consumer: ${ consumer }` );
 run( 'npm', [ 'install', '--engine-strict', '--no-audit', '--no-fund' ] );
+// A replayed lockfile can install despite an incompatible peer range.
+run( 'npm', [ 'ls', 'vite', 'vitest', '--all' ] );
 assert.match(
 	readFileSync(
 		path.join(

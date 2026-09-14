@@ -1,8 +1,12 @@
 # Vitest migration routing
 
-Every new JavaScript unit and integration test runs in Vitest. The migration
-manifest in `test-migration.json` contains the exact list of remaining legacy
-Jest tests while the repository finishes moving them to Vitest.
+All repository JavaScript unit and integration tests run in Vitest. The retained
+`test-migration.json` manifest has an empty `jest.files` list. The explicit
+`npm run test:unit:jest` compatibility check exits with no tests until final
+retirement removes that command and the manifest.
+
+The permanent [testing guide](/docs/contributors/code/testing-overview.md) covers
+setup, commands, examples, and the filename-based environment conventions.
 
 The routing validator derives the current test inventory from both runners and
 the repository's static test-file patterns. It does not depend on a fixed test
@@ -13,13 +17,8 @@ When writing or migrating a test:
 
 -   New Node, JSDOM, and Browser Mode tests run in Vitest automatically. They do
     not need migration metadata.
--   When migrating a legacy Jest test, remove its exact path from `jest.files`.
--   When renaming or moving a directory that contains legacy Jest tests, migrate
-    those tests to Vitest in the same pull request. The validator treats their
-    new paths as additions to the Jest allowlist.
--   Do not add directories, glob patterns, or new files to `jest.files`. The
-    routing validator compares it with the pull request base and accepts only
-    removals.
+-   Do not add entries to `jest.files`. The validator rejects additions to the
+    empty legacy allowlist.
 -   Name tests `*.jsdom.test.*` to use JSDOM or `*.browser.test.*` to use Browser
     Mode.
 -   Use Node for pure JavaScript, data, stores, schemas, build tooling, and

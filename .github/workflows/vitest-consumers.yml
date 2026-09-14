@@ -24,7 +24,7 @@ jobs:
             fail-fast: false
             matrix:
                 node: ['22.22.2', '24.15.0', '26.0.0']
-                vite: ['6.4.0', '7.0.0', '8.0.0', '8.2.2']
+                vite: ['7.0.0', '8.0.0', '8.2.2']
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:

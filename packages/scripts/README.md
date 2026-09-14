@@ -552,7 +552,7 @@ before the command inspects the wrapper process instead.
 
 Tests can be debugged by any [inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) that supports the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/).
 
-Follow the instructions for debugging Node.js with your favorite supported browser or IDE. When the instructions say to use `node --inspect script.js` or `node --inspect-brk script.js`, simply use `wp-scripts --inspect script` or `wp-scripts --inspect-brk script` instead.
+For unit tests, keep the inspector flags after `test-unit-js` so they reach the Vitest worker. See the [consumer migration guide](./docs/vitest-migration.md) for the complete command setup.
 
 Google Chrome and Visual Studio Code are used as examples below.
 
@@ -562,7 +562,7 @@ Place `debugger;` statements in any test and run `wp-scripts test-unit-js --insp
 
 Then open `about:inspect` in Google Chrome and select `inspect` on your process.
 
-A breakpoint will be set at the first line of the script (this is done to give you time to open the developer tools and to prevent Jest from executing before you have time to do so). Click the resume button in the upper right panel of the dev tools to continue execution. When Jest executes the test that contains the debugger statement, execution will pause and you can examine the current scope and call stack.
+The test worker pauses before execution so you can attach the debugger. Resume execution in the developer tools. When Vitest reaches a `debugger;` statement, execution pauses again so you can inspect the scope and call stack.
 
 #### Debugging in Visual Studio Code
 
