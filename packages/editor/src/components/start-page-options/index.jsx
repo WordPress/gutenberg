@@ -81,11 +81,13 @@ export function useStartPatterns() {
 
 function useStartPatternCategories( startPatterns ) {
 	const { registeredCategories, userCategories } = useSelect( ( select ) => {
-		const { getBlockPatternCategories, getUserPatternCategories } =
-			select( coreStore );
 		return {
-			registeredCategories: getBlockPatternCategories(),
-			userCategories: getUserPatternCategories(),
+			// The block editor settings already merge the categories from the
+			// REST API with the ones added through `block_editor_settings_all`.
+			registeredCategories:
+				select( blockEditorStore ).getSettings()
+					.__experimentalBlockPatternCategories,
+			userCategories: select( coreStore ).getUserPatternCategories(),
 		};
 	}, [] );
 
