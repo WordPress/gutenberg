@@ -524,7 +524,7 @@ function MediaTextEdit( {
 
 	return (
 		<>
-			{ mediaInspectorPanel }
+			{ isSelected && mediaInspectorPanel }
 			<InspectorControls>{ mediaTextGeneralSettings }</InspectorControls>
 			<BlockControls group="block">
 				{ blockEditingMode === 'default' && (
