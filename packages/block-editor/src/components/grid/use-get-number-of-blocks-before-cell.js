@@ -8,10 +8,15 @@ export function useGetNumberOfBlocksBeforeCell( gridClientId, numColumns ) {
 		const targetIndex = ( row - 1 ) * numColumns + column - 1;
 
 		let count = 0;
-		for ( const clientId of getBlockOrder( gridClientId ) ) {
+		const blockOrder = getBlockOrder( gridClientId );
+		for ( let i = 0; i < blockOrder.length; i++ ) {
+			const clientId = blockOrder[ i ];
 			const { columnStart, rowStart } =
-				getBlockAttributes( clientId ).style?.layout ?? {};
-			const cellIndex = ( rowStart - 1 ) * numColumns + columnStart - 1;
+				getBlockAttributes( clientId )?.style?.layout ?? {};
+			const cellIndex =
+				columnStart && rowStart
+					? ( rowStart - 1 ) * numColumns + columnStart - 1
+					: i;
 			if ( cellIndex < targetIndex ) {
 				count++;
 			}
