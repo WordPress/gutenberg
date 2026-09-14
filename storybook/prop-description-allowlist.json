@@ -54,6 +54,7 @@
 	"ResizableBox:defaultSize",
 	"ResizableBox:enable",
 	"ResizableBox:grid",
+	"ResizableBox:gridGap",
 	"ResizableBox:handleClasses",
 	"ResizableBox:handleComponent",
 	"ResizableBox:handleStyles",
