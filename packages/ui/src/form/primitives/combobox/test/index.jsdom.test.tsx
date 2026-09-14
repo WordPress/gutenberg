@@ -213,6 +213,40 @@ describe( 'Combobox', () => {
 		).toBeVisible();
 	} );
 
+	it( 'describes ChipWithRemove with the Backspace or Delete hint by default', () => {
+		render(
+			<Combobox.Root< Item, true >
+				items={ ITEMS }
+				multiple
+				defaultValue={ [ ITEMS[ 0 ] ] }
+			>
+				<Combobox.Chips>
+					<Combobox.Value>
+						{ ( value: Item[] ) => (
+							<>
+								{ value.map( ( item ) => (
+									<Combobox.ChipWithRemove key={ item.id }>
+										{ item.value }
+									</Combobox.ChipWithRemove>
+								) ) }
+							</>
+						) }
+					</Combobox.Value>
+				</Combobox.Chips>
+			</Combobox.Root>
+		);
+
+		expect(
+			screen.getByText( ( _content, element ) => {
+				return (
+					element instanceof HTMLElement &&
+					element.hasAttribute( 'aria-description' ) &&
+					( element.textContent ?? '' ).includes( 'Item 1' )
+				);
+			} )
+		).toHaveAccessibleDescription( 'Press Backspace or Delete to remove.' );
+	} );
+
 	it( 'renders a default trigger placeholder when no value is selected', () => {
 		render(
 			<Combobox.Root items={ ITEMS }>

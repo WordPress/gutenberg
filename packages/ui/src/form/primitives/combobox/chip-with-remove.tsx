@@ -15,7 +15,16 @@ export const ChipWithRemove = forwardRef<
 	HTMLDivElement,
 	ComboboxChipWithRemoveProps
 >( function ChipWithRemove(
-	{ className, children, prefix, removeLabel = __( 'Remove' ), ...restProps },
+	{
+		className,
+		children,
+		prefix,
+		removeLabel = __( 'Remove' ),
+		'aria-description': ariaDescription = __(
+			'Press Backspace or Delete to remove.'
+		),
+		...restProps
+	},
 	ref
 ) {
 	return (
@@ -23,6 +32,7 @@ export const ChipWithRemove = forwardRef<
 			ref={ ref }
 			className={ clsx( styles.chip, className ) }
 			{ ...restProps }
+			aria-description={ ariaDescription }
 		>
 			{ prefix && (
 				<span className={ styles[ 'chip-prefix' ] }>{ prefix }</span>

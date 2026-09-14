@@ -11,6 +11,18 @@ vi.mock( import( '@wordpress/warning' ), () => ( { default: vi.fn() } ) );
 
 const mockedWarning = vi.mocked( warning );
 
+const CHIP_REMOVE_HINT = 'Press Backspace or Delete to remove.';
+
+function getChip( name: string ) {
+	return screen.getByText( ( _content, element ) => {
+		return (
+			element instanceof HTMLElement &&
+			element.hasAttribute( 'aria-description' ) &&
+			( element.textContent ?? '' ).includes( name )
+		);
+	} );
+}
+
 describe( 'SearchableChipSelect', () => {
 	beforeEach( () => {
 		mockedWarning.mockClear();
@@ -514,6 +526,132 @@ describe( 'SearchableChipSelect', () => {
 			expect(
 				screen.queryByRole( 'option', { name: 'Apple' } )
 			).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'selection accessibility', () => {
+		it( 'does not describe the combobox with a selection hint when nothing is selected', () => {
+			render(
+				<SearchableChipSelect aria-label="Fruit" items={ ITEMS } />
+			);
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Fruit' } )
+			).not.toHaveAccessibleDescription();
+			expect(
+				screen.queryByRole( 'toolbar', { name: 'Selected item' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'toolbar', { name: 'Selected items' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'labels the chips toolbar as Selected item when one item is selected', () => {
+			render(
+				<SearchableChipSelect
+					aria-label="Fruit"
+					items={ ITEMS }
+					defaultValue={ [ ITEMS[ 0 ] ] }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'toolbar', { name: 'Selected item' } )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'combobox', { name: 'Fruit' } )
+			).toHaveAccessibleDescription(
+				'1 item selected. From the start of the input, press Left Arrow to move to the selected item.'
+			);
+		} );
+
+		it( 'labels the chips toolbar as Selected items when two items are selected', () => {
+			render(
+				<SearchableChipSelect
+					aria-label="Fruit"
+					items={ ITEMS }
+					defaultValue={ [ ITEMS[ 0 ], ITEMS[ 2 ] ] }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'toolbar', { name: 'Selected items' } )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'combobox', { name: 'Fruit' } )
+			).toHaveAccessibleDescription(
+				'2 items selected. From the start of the input, press Left Arrow to move to the selected items.'
+			);
+		} );
+
+		it( 'describes each selected chip with the Backspace or Delete hint', () => {
+			render(
+				<SearchableChipSelect
+					aria-label="Fruit"
+					items={ ITEMS }
+					defaultValue={ [ ITEMS[ 0 ], ITEMS[ 2 ] ] }
+				/>
+			);
+
+			expect( getChip( 'Apple' ) ).toHaveAccessibleDescription(
+				CHIP_REMOVE_HINT
+			);
+			expect( getChip( 'Banana' ) ).toHaveAccessibleDescription(
+				CHIP_REMOVE_HINT
+			);
+		} );
+
+		it( 'keeps the chip Backspace or Delete description when chipsContent returns ChipWithRemove', () => {
+			render(
+				<SearchableChipSelect
+					aria-label="Fruit"
+					items={ ITEMS }
+					defaultValue={ [ ITEMS[ 0 ] ] }
+					chipsContent={ ( selected ) =>
+						selected.map( ( item ) => (
+							<SearchableChipSelect.ChipWithRemove
+								key={ item.value }
+							>
+								{ item.label }
+							</SearchableChipSelect.ChipWithRemove>
+						) )
+					}
+				/>
+			);
+
+			expect( getChip( 'Apple' ) ).toHaveAccessibleDescription(
+				CHIP_REMOVE_HINT
+			);
+		} );
+
+		it( 'keeps a consumer aria-describedby when items are selected', () => {
+			render(
+				<>
+					<SearchableChipSelect
+						aria-label="Fruit"
+						items={ ITEMS }
+						defaultValue={ [ ITEMS[ 0 ] ] }
+						aria-describedby="searchable-chip-select-description"
+					/>
+					{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
+					<p id="searchable-chip-select-description">
+						My description
+					</p>
+				</>
+			);
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Fruit' } )
+			).toHaveAccessibleDescription(
+				expect.stringContaining( 'My description' )
+			);
+			expect(
+				screen.getByRole( 'combobox', { name: 'Fruit' } )
+			).toHaveAccessibleDescription(
+				expect.stringContaining(
+					'1 item selected. From the start of the input, press Left Arrow to move to the selected item.'
+				)
+			);
 		} );
 	} );
 
