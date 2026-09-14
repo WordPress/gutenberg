@@ -34,11 +34,12 @@ export default function getNavigationMenuBySlug( navigationMenus, slug ) {
 		return undefined;
 	}
 
-	const matches = navigationMenus.filter(
-		( menu ) => normalizeNavigationMenuSlug( menu?.slug ) === normalizedSlug
-	);
+	const hasSlug = ( menu ) =>
+		normalizeNavigationMenuSlug( menu?.slug ) === normalizedSlug;
 
 	return (
-		matches.find( ( menu ) => menu?.status === 'publish' ) ?? matches[ 0 ]
+		navigationMenus.find(
+			( menu ) => hasSlug( menu ) && menu.status === 'publish'
+		) ?? navigationMenus.find( hasSlug )
 	);
 }

@@ -523,7 +523,7 @@ function Navigation( {
 
 	useEffect( () => {
 		// If:
-		// - there is an existing menu, OR
+		// - the block already references a menu, by ref or by slug, OR
 		// - there are existing (uncontrolled) inner blocks
 		// ...then don't request a fallback menu.
 		if (
