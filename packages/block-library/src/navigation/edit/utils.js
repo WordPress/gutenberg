@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { paramCase as kebabCase } from 'change-case';
 

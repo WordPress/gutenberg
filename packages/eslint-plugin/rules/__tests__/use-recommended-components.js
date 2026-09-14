@@ -1,5 +1,8 @@
-import { RuleTester } from 'eslint';
+import { describe, expect, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule, { ALLOWLIST, DENYLIST } from '../use-recommended-components';
+
+const RuleTester = configureRuleTester( { describe, it } );
 
 const ruleTester = new RuleTester( {
 	languageOptions: {
@@ -20,11 +23,6 @@ ruleTester.run( 'use-recommended-components', rule, {
 
 		// Allowed @wordpress/ui components.
 		"import { Badge } from '@wordpress/ui';",
-		"import { Icon } from '@wordpress/ui';",
-		"import { Link } from '@wordpress/ui';",
-		"import { Stack } from '@wordpress/ui';",
-		"import { Text } from '@wordpress/ui';",
-		"import { Badge, Icon, Link, Stack, Tabs, Text } from '@wordpress/ui';",
 
 		// Unlocked private APIs are only checked for denied names.
 		"import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { SomethingElse } = unlock( privateApis );",
@@ -84,17 +82,6 @@ ruleTester.run( 'use-recommended-components', rule, {
 				{
 					message:
 						'__experimentalZStack is planned for deprecation. Write your own CSS instead.',
-				},
-			],
-		},
-		{
-			code: "import { Tabs, TabPanel } from '@wordpress/components';",
-			errors: [
-				{
-					message: 'Use `Tabs` from `@wordpress/ui` instead.',
-				},
-				{
-					message: 'Use `Tabs` from `@wordpress/ui` instead.',
 				},
 			],
 		},

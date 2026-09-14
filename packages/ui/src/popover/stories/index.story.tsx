@@ -5,6 +5,7 @@ import * as Popover from '../';
 import { VisuallyHidden } from '../../visually-hidden';
 import { Icon } from '../../icon';
 import { IconButton } from '../../icon-button';
+import { Link } from '../../link';
 import { GenericIframe, useMeasure } from './utils';
 
 const meta: Meta< typeof Popover.Root > = {
@@ -40,24 +41,20 @@ export const Default: Story = {
 		children: { control: { type: 'text' } },
 	},
 	args: {
-		children: (
-			<>
-				<Popover.Trigger>Open Popover</Popover.Trigger>
-				<Popover.Popup>
-					<Popover.Arrow />
-					<Popover.Title
-						style={ {
-							marginBottom: 'var(--wpds-dimension-gap-xs)',
-						} }
-					>
-						Popover title
-					</Popover.Title>
-					<Popover.Description>
-						Popover description
-					</Popover.Description>
-				</Popover.Popup>
-			</>
-		),
+		children: [
+			<Popover.Trigger key="trigger">Open Popover</Popover.Trigger>,
+			<Popover.Popup key="popup">
+				<Popover.Arrow />
+				<Popover.Title
+					style={ {
+						marginBottom: 'var(--wpds-dimension-gap-xs)',
+					} }
+				>
+					Popover title
+				</Popover.Title>
+				<Popover.Description>Popover description</Popover.Description>
+			</Popover.Popup>,
+		],
 	},
 };
 
@@ -67,23 +64,19 @@ export const Default: Story = {
  */
 export const NoArrow: Story = {
 	args: {
-		children: (
-			<>
-				<Popover.Trigger>Open Popover</Popover.Trigger>
-				<Popover.Popup>
-					<Popover.Title
-						style={ {
-							marginBottom: 'var(--wpds-dimension-gap-xs)',
-						} }
-					>
-						Popover title
-					</Popover.Title>
-					<Popover.Description>
-						Popover description
-					</Popover.Description>
-				</Popover.Popup>
-			</>
-		),
+		children: [
+			<Popover.Trigger key="trigger">Open Popover</Popover.Trigger>,
+			<Popover.Popup key="popup">
+				<Popover.Title
+					style={ {
+						marginBottom: 'var(--wpds-dimension-gap-xs)',
+					} }
+				>
+					Popover title
+				</Popover.Title>
+				<Popover.Description>Popover description</Popover.Description>
+			</Popover.Popup>,
+		],
 	},
 };
 
@@ -151,39 +144,37 @@ export const Positioning: Story = {
  */
 export const WithCloseButton: Story = {
 	args: {
-		children: (
-			<>
-				<Popover.Trigger>Settings</Popover.Trigger>
-				<Popover.Popup>
-					<Popover.Arrow />
-					<div
-						style={ {
-							display: 'flex',
-							justifyContent: 'space-between',
-							alignItems: 'center',
-							marginBottom: 'var(--wpds-dimension-gap-sm)',
-						} }
-					>
-						<Popover.Title>Settings</Popover.Title>
-						<Popover.Close
-							render={
-								<IconButton
-									variant="minimal"
-									size="compact"
-									tone="neutral"
-									icon={ close }
-									label="Close"
-								/>
-							}
-						/>
-					</div>
-					<Popover.Description>
-						Configure your notification preferences and display
-						settings.
-					</Popover.Description>
-				</Popover.Popup>
-			</>
-		),
+		children: [
+			<Popover.Trigger key="trigger">Settings</Popover.Trigger>,
+			<Popover.Popup key="popup">
+				<Popover.Arrow />
+				<div
+					style={ {
+						display: 'flex',
+						justifyContent: 'space-between',
+						alignItems: 'center',
+						marginBottom: 'var(--wpds-dimension-gap-sm)',
+					} }
+				>
+					<Popover.Title>Settings</Popover.Title>
+					<Popover.Close
+						render={
+							<IconButton
+								variant="minimal"
+								size="compact"
+								tone="neutral"
+								icon={ close }
+								label="Close"
+							/>
+						}
+					/>
+				</div>
+				<Popover.Description>
+					Configure your notification preferences and display
+					settings.
+				</Popover.Description>
+			</Popover.Popup>,
+		],
 	},
 };
 
@@ -202,24 +193,22 @@ export const Controlled: Story = {
 		defaultOpen: { control: false },
 	},
 	args: {
-		children: (
-			<>
-				<Popover.Trigger>Toggle Popover</Popover.Trigger>
-				<Popover.Popup>
-					<Popover.Arrow />
-					<Popover.Title
-						style={ {
-							marginBottom: 'var(--wpds-dimension-gap-xs)',
-						} }
-					>
-						Controlled Popover
-					</Popover.Title>
-					<Popover.Description>
-						This popover is controlled by external state.
-					</Popover.Description>
-				</Popover.Popup>
-			</>
-		),
+		children: [
+			<Popover.Trigger key="trigger">Toggle Popover</Popover.Trigger>,
+			<Popover.Popup key="popup">
+				<Popover.Arrow />
+				<Popover.Title
+					style={ {
+						marginBottom: 'var(--wpds-dimension-gap-xs)',
+					} }
+				>
+					Controlled Popover
+				</Popover.Title>
+				<Popover.Description>
+					This popover is controlled by external state.
+				</Popover.Description>
+			</Popover.Popup>,
+		],
 	},
 	render: function Render( args ) {
 		const [ isOpen, setIsOpen ] = useState( false );
@@ -290,83 +279,81 @@ export const Modal: Story = {
 	argTypes: { modal: { control: false } },
 	args: {
 		modal: true,
-		children: (
-			<>
-				<Popover.Trigger>Edit Settings</Popover.Trigger>
-				<Popover.Popup backdrop>
-					<Popover.Arrow />
-					<Popover.Title
-						style={ {
-							marginBottom: 'var(--wpds-dimension-gap-xs)',
-						} }
-					>
-						Settings
-					</Popover.Title>
-					<form
+		children: [
+			<Popover.Trigger key="trigger">Edit Settings</Popover.Trigger>,
+			<Popover.Popup backdrop key="popup">
+				<Popover.Arrow />
+				<Popover.Title
+					style={ {
+						marginBottom: 'var(--wpds-dimension-gap-xs)',
+					} }
+				>
+					Settings
+				</Popover.Title>
+				<form
+					style={ {
+						display: 'flex',
+						flexDirection: 'column',
+						gap: 'var(--wpds-dimension-gap-sm)',
+						marginTop: 'var(--wpds-dimension-gap-sm)',
+					} }
+					onSubmit={ ( e ) => e.preventDefault() }
+				>
+					<label
+						htmlFor="popover-test-name-id"
 						style={ {
 							display: 'flex',
 							flexDirection: 'column',
-							gap: 'var(--wpds-dimension-gap-sm)',
-							marginTop: 'var(--wpds-dimension-gap-sm)',
+							gap: 'var(--wpds-dimension-gap-xs)',
+							fontSize: 'inherit',
 						} }
-						onSubmit={ ( e ) => e.preventDefault() }
 					>
-						<label
-							htmlFor="popover-test-name-id"
+						Name
+						<input
+							// eslint-disable-next-line no-restricted-syntax
+							id="popover-test-name-id"
+							type="text"
+							placeholder="Enter your name"
+						/>
+					</label>
+					<label
+						htmlFor="popover-test-email-id"
+						style={ {
+							display: 'flex',
+							flexDirection: 'column',
+							gap: 'var(--wpds-dimension-gap-xs)',
+							fontSize: 'inherit',
+						} }
+					>
+						Email
+						<input
+							// eslint-disable-next-line no-restricted-syntax
+							id="popover-test-email-id"
+							type="email"
+							placeholder="Enter your email"
+						/>
+					</label>
+					<div
+						style={ {
+							display: 'flex',
+							justifyContent: 'flex-end',
+							gap: 'var(--wpds-dimension-gap-sm)',
+							marginTop: 'var(--wpds-dimension-gap-xs)',
+						} }
+					>
+						<Popover.Close
 							style={ {
-								display: 'flex',
-								flexDirection: 'column',
-								gap: 'var(--wpds-dimension-gap-xs)',
-								fontSize: 'inherit',
+								all: 'unset',
+								cursor: 'pointer',
 							} }
 						>
-							Name
-							<input
-								// eslint-disable-next-line no-restricted-syntax
-								id="popover-test-name-id"
-								type="text"
-								placeholder="Enter your name"
-							/>
-						</label>
-						<label
-							htmlFor="popover-test-email-id"
-							style={ {
-								display: 'flex',
-								flexDirection: 'column',
-								gap: 'var(--wpds-dimension-gap-xs)',
-								fontSize: 'inherit',
-							} }
-						>
-							Email
-							<input
-								// eslint-disable-next-line no-restricted-syntax
-								id="popover-test-email-id"
-								type="email"
-								placeholder="Enter your email"
-							/>
-						</label>
-						<div
-							style={ {
-								display: 'flex',
-								justifyContent: 'flex-end',
-								gap: 'var(--wpds-dimension-gap-sm)',
-								marginTop: 'var(--wpds-dimension-gap-xs)',
-							} }
-						>
-							<Popover.Close
-								style={ {
-									all: 'unset',
-									cursor: 'pointer',
-								} }
-							>
-								Cancel
-							</Popover.Close>
-							<button type="submit">Save</button>
-						</div>
-					</form>
-				</Popover.Popup>
-			</>
-		),
+							Cancel
+						</Popover.Close>
+						<button type="submit">Save</button>
+					</div>
+				</form>
+			</Popover.Popup>,
+		],
 	},
 };
 
@@ -376,24 +363,22 @@ export const Modal: Story = {
  */
 export const Unstyled: Story = {
 	args: {
-		children: (
-			<>
-				<Popover.Trigger>Open Unstyled</Popover.Trigger>
-				<Popover.Popup variant="unstyled">
-					<Popover.Title
-						style={ {
-							marginBottom: 'var(--wpds-dimension-gap-xs)',
-						} }
-					>
-						Custom Styled
-					</Popover.Title>
-					<Popover.Description>
-						This popup has no default styling — the consumer
-						controls all visual appearance.
-					</Popover.Description>
-				</Popover.Popup>
-			</>
-		),
+		children: [
+			<Popover.Trigger key="trigger">Open Unstyled</Popover.Trigger>,
+			<Popover.Popup variant="unstyled" key="popup">
+				<Popover.Title
+					style={ {
+						marginBottom: 'var(--wpds-dimension-gap-xs)',
+					} }
+				>
+					Custom Styled
+				</Popover.Title>
+				<Popover.Description>
+					This popup has no default styling — the consumer controls
+					all visual appearance.
+				</Popover.Description>
+			</Popover.Popup>,
+		],
 	},
 };
 
@@ -481,6 +466,7 @@ export const Inline: Story = {
 						ref={ inlineContainerRef }
 						style={ { display: 'contents' } }
 					/>
+
 					<Popover.Popup
 						portal={
 							<Popover.Portal container={ inlineContainerRef } />
@@ -715,32 +701,31 @@ export const CrossIframe: Story = {
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
 	args: {
-		children: (
-			<>
-				<Popover.Trigger>Open Popover</Popover.Trigger>
-				<Popover.Popup
-					portal={
-						<Popover.Portal
-							style={ { '--wp-ui-popover-z-index': '9999' } }
-						/>
-					}
+		children: [
+			<Popover.Trigger key="trigger">Open Popover</Popover.Trigger>,
+			<Popover.Popup
+				portal={
+					<Popover.Portal
+						style={ { '--wp-ui-popover-z-index': '9999' } }
+					/>
+				}
+				key="popup"
+			>
+				<Popover.Arrow />
+				<Popover.Title
+					style={ {
+						marginBottom: 'var(--wpds-dimension-gap-xs)',
+					} }
 				>
-					<Popover.Arrow />
-					<Popover.Title
-						style={ {
-							marginBottom: 'var(--wpds-dimension-gap-xs)',
-						} }
-					>
-						Custom z-index
-					</Popover.Title>
-					<Popover.Description>
-						This popover renders at `z-index: 9999` via the
-						`--wp-ui-popover-z-index` CSS custom property, set on
-						`Popover.Portal` through the `portal` prop.
-					</Popover.Description>
-				</Popover.Popup>
-			</>
-		),
+					Custom z-index
+				</Popover.Title>
+				<Popover.Description>
+					This popover renders at `z-index: 9999` via the
+					`--wp-ui-popover-z-index` CSS custom property, set on
+					`Popover.Portal` through the `portal` prop.
+				</Popover.Description>
+			</Popover.Popup>,
+		],
 	},
 };
 
@@ -910,31 +895,30 @@ export const Anchor: Story = {
  */
 export const ToolbarVariant: Story = {
 	args: {
-		children: (
-			<>
-				<Popover.Trigger>Open Toolbar</Popover.Trigger>
-				<Popover.Popup
-					variant="unstyled"
-					style={ {
-						display: 'flex',
-						gap: 'var(--wpds-dimension-gap-xs)',
-						padding: '4px 8px',
-						border: '1px solid #1e1e1e',
-						borderRadius: 2,
-						background: '#fff',
-						fontSize: 13,
-					} }
-				>
-					<VisuallyHidden render={ <Popover.Title /> }>
-						Formatting
-					</VisuallyHidden>
-					<button type="button">B</button>
-					<button type="button">I</button>
-					<button type="button">U</button>
-					<button type="button">Link</button>
-				</Popover.Popup>
-			</>
-		),
+		children: [
+			<Popover.Trigger key="trigger">Open Toolbar</Popover.Trigger>,
+			<Popover.Popup
+				variant="unstyled"
+				style={ {
+					display: 'flex',
+					gap: 'var(--wpds-dimension-gap-xs)',
+					padding: '4px 8px',
+					border: '1px solid #1e1e1e',
+					borderRadius: 2,
+					background: '#fff',
+					fontSize: 13,
+				} }
+				key="popup"
+			>
+				<VisuallyHidden render={ <Popover.Title /> }>
+					Formatting
+				</VisuallyHidden>
+				<button type="button">B</button>
+				<button type="button">I</button>
+				<button type="button">U</button>
+				<button type="button">Link</button>
+			</Popover.Popup>,
+		],
 	},
 };
 
@@ -1118,6 +1102,7 @@ export const InitialFocus: Story = {
 							type="text"
 							placeholder="Enter name"
 						/>
+
 						<label
 							htmlFor={ emailId }
 							style={ {
@@ -1244,8 +1229,9 @@ export const HoverTrigger: Story = {
 
 /**
  * Popups that open when hovering an info icon should use Popover with the
- * `openOnHover` prop on the trigger instead of a tooltip. This way, touch
- * users and screen reader users can access the content.
+ * `openOnHover` prop on the trigger instead of a
+ * [tooltip](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-tooltip--docs).
+ * This way, touch users and screen reader users can access the content.
  *
  * To know when to reach for a popover instead of a tooltip, consider the
  * purpose of the trigger element: If the trigger's purpose is to open the
@@ -1291,6 +1277,63 @@ export const Infotip: Story = {
 							This is additional context about the label. Unlike
 							tooltips, this content is accessible to touch and
 							screen reader users.
+						</Popover.Description>
+					</Popover.Popup>
+				</Popover.Root>
+			</div>
+		);
+	},
+};
+
+/**
+ * An infotip popup can contain interactive content, such as a `Link`. The
+ * popup stays open while the pointer moves from the trigger onto the popup
+ * itself, so the link stays reachable — satisfying the "hoverable"
+ * requirement of
+ * [WCAG 1.4.13 Content on Hover or Focus](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html).
+ * The link is also reachable by tabbing to it, since the trigger opens on
+ * focus as well as hover.
+ */
+export const InfotipWithLink: Story = {
+	parameters: { controls: { disable: true } },
+	render: function Render( args ) {
+		return (
+			<div
+				style={ {
+					display: 'flex',
+					alignItems: 'center',
+					gap: 'var(--wpds-dimension-gap-xs)',
+				} }
+			>
+				<span>Label</span>
+				<Popover.Root { ...args }>
+					<Popover.Trigger
+						openOnHover
+						delay={ 200 }
+						closeDelay={ 200 }
+						aria-label="More information"
+						style={ {
+							background: 'none',
+							border: 'none',
+							padding: 0,
+							cursor: 'var(--wpds-cursor-control)',
+							display: 'inline-flex',
+							alignItems: 'center',
+							borderRadius: 'var(--wpds-border-radius-sm)',
+						} }
+					>
+						<Icon icon={ info } size={ 20 } />
+					</Popover.Trigger>
+					<Popover.Popup>
+						<Popover.Arrow />
+						<VisuallyHidden render={ <Popover.Title /> }>
+							More information
+						</VisuallyHidden>
+						<Popover.Description>
+							This is additional context about the label.{ ' ' }
+							<Link href="https://wordpress.org" openInNewTab>
+								Read more
+							</Link>
 						</Popover.Description>
 					</Popover.Popup>
 				</Popover.Root>

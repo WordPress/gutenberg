@@ -1,7 +1,4 @@
 'use strict';
-/**
- * Internal dependencies
- */
 const mergeConfigs = require( './merge-configs' );
 const addOrReplacePort = require( './add-or-replace-port' );
 const { ValidationError } = require( './validate-config' );

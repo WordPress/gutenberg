@@ -10,6 +10,7 @@
 	padding: 0;
 	position: absolute;
 	width: 1px;
+	// stylelint-disable-next-line property-no-deprecated -- Pending review of overflow-wrap alternative.
 	word-wrap: normal !important;
 	word-break: normal !important;
 }
@@ -32,7 +33,7 @@
 }
 
 .block-editor-responsive-block-control__label {
-	font-weight: 600;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	margin-bottom: 0.6em;
 	margin-left: -3px; // visual compensation
 }

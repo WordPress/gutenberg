@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createHigherOrderComponent } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { RegistryConsumer } from '../registry-provider';
 
 /**

@@ -49,6 +49,7 @@ _Parameters_
 -   _blockName_ `string`: Name of block (example: "core/columns").
 -   _attributes_ `Record< string, unknown >`: Block attributes used to determine active variation.
 -   _scope_ `BlockVariationScope`: Block variation scope name.
+-   _innerContent_ `Array< string | null >`: Block inner content used to determine the active variation for blocks (such as the Custom HTML block) whose variations declare static inner content.
 
 _Returns_
 

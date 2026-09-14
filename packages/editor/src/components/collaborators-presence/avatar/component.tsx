@@ -1,23 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { colord, extend } from 'colord';
 import a11yPlugin from 'colord/plugins/a11y';
-
 extend( [ a11yPlugin ] );
-
-/**
- * WordPress dependencies
- */
 import { Icon as WCIcon } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { AvatarProps } from './types';
 import { useImageLoadingStatus } from './use-image-loading-status';
 

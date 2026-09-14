@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
-import type { DashboardWidget } from '../../widget-dashboard';
+import type { DashboardWidget } from '@wordpress/widget-dashboard';
 
 const SCOPE = 'core/dashboard';
 const KEY = 'dashboardLayout';

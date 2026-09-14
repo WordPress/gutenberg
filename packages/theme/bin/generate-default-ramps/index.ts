@@ -9,17 +9,17 @@ import {
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
 
-const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.bg );
+const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
 const accentRamps = Object.fromEntries(
 	[ ...Object.entries( DEFAULT_SEED_COLORS ) ]
-		.filter( ( [ scaleName ] ) => scaleName !== 'bg' )
+		.filter( ( [ scaleName ] ) => scaleName !== 'background' )
 		.map( ( [ scaleName, seed ] ) => [
 			scaleName,
 			buildAccentRamp( seed, bgRamp ),
 		] )
 );
 
-const ramps = { bg: bgRamp, ...accentRamps };
+const ramps = { background: bgRamp, ...accentRamps };
 
 const outputPath = join(
 	__dirname,
@@ -27,8 +27,8 @@ const outputPath = join(
 );
 
 const content = `
-import type { RampResult } from './types';
-import type { DEFAULT_SEED_COLORS } from './constants';
+import type { RampResult } from './types.ts';
+import type { DEFAULT_SEED_COLORS } from './constants.ts';
 
 export const DEFAULT_RAMPS: Record<
 	keyof typeof DEFAULT_SEED_COLORS,

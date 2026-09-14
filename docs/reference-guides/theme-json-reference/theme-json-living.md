@@ -65,6 +65,16 @@ Settings related to background.
 
 ---
 
+### blockVisibility
+
+Settings related to block visibility.
+
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| allowEditing | Whether block visibility can be edited in the editor. Set to `false` to hide the block visibility controls. Saved block visibility attributes are always rendered regardless of this setting. | `boolean` | `true` |
+
+---
+
 ### border
 
 Settings related to borders.
@@ -199,11 +209,25 @@ Settings related to typography.
 | textAlign | Allow users to set the text align. | `boolean` | `true` |
 | textColumns | Allow users to set the number of text columns. | `boolean` | `false` |
 | textDecoration | Allow users to set custom text decorations. | `boolean` | `true` |
+| textShadow | Allow users to set custom text shadows. | `boolean` | `true` |
+| defaultTextShadowPresets | Allow users to choose text shadows from the default text shadow presets. | `boolean` | `true` |
+| textShadowPresets | Text shadow presets for the text shadow picker. | `[ { name, slug, textShadow } ]` |  |
 | writingMode | Allow users to set the writing mode. | `boolean` | `false` |
 | textTransform | Allow users to set custom text transforms. | `boolean` | `true` |
 | dropCap | Enable drop cap. | `boolean` | `true` |
 | fontSizes | Font size presets for the font size selector. | `[ { name, slug, size, fluid } ]` |  |
 | fontFamilies | Font family presets for the font family selector. | `[ { name, slug, fontFamily, fontFace } ]` |  |
+
+---
+
+### viewport
+
+Viewport breakpoint settings used for responsive block styles and block visibility. Invalid breakpoint values are ignored. If only one valid breakpoint is declared, it remains keyed by its configured viewport and uses a single max-width query. If neither breakpoint is valid, the default breakpoints are used. If `mobile` is greater than or equal to `tablet`, only the `mobile` breakpoint is used.
+
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| mobile | Maximum viewport width for mobile styles. | `string` | `"480px"` |
+| tablet | Maximum viewport width for tablet styles. Tablet styles apply above the mobile width and up to this width when both breakpoints are configured, or up to this width when tablet is the only valid breakpoint. | `string` | `"782px"` |
 
 ---
 
@@ -216,6 +240,8 @@ Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-
 ## styles
 
 Organized way to set CSS properties. Styles in the top-level will be added in the `body` selector.
+
+In a block style variation partial (a theme.json file with a `blockTypes` property), the styles are scoped to the listed block types instead, and the responsive (`@mobile`, `@tablet`) and pseudo-selector (`:hover`, `:focus`, `:focus-visible`, `:active`) states available to block style variations are also allowed at this level.
 
 ### background
 
@@ -337,6 +363,7 @@ Typography styles.
 | textAlign | Sets the `text-align` CSS property. | `string`, `{ ref }` |
 | textColumns | Sets the `column-count` CSS property. | `string`, `{ ref }` |
 | textDecoration | Sets the `text-decoration` CSS property. | `string`, `{ ref }` |
+| textShadow | Sets the `text-shadow` CSS property. | `string`, `{ ref }` |
 | writingMode | Sets the `writing-mode` CSS property. | `string`, `{ ref }` |
 | textTransform | Sets the `text-transform` CSS property. | `string`, `{ ref }` |
 

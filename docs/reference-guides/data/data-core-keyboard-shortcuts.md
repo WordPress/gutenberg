@@ -153,6 +153,47 @@ _Returns_
 
 -   `string[]`: Shortcut names.
 
+### getKeyboardShortcut
+
+Returns the three values used to display and describe the main key combination of a registered shortcut: its display string, its `aria-keyshortcuts` value and its plain-text label. Returns `null` when no shortcut is registered under the name.
+
+The raw representation and aliases are not included; use `getShortcutRepresentation` and `getShortcutAliases` for those.
+
+The returned object can be passed to the `shortcut` prop of the `@wordpress/ui` components.
+
+_Usage_
+
+```js
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { useSelect } from '@wordpress/data';
+import { Menu } from '@wordpress/ui';
+
+const ExampleComponent = () => {
+	const shortcut = useSelect(
+		( select ) =>
+			select( keyboardShortcutsStore ).getKeyboardShortcut(
+				'core/editor/next-region'
+			),
+		[]
+	);
+
+	return (
+		<Menu.Item shortcut={ shortcut ?? undefined }>
+			<Menu.ItemLabel>Next region</Menu.ItemLabel>
+		</Menu.Item>
+	);
+};
+```
+
+_Parameters_
+
+-   _state_ `Object`: Global state.
+-   _name_ `string`: Shortcut name.
+
+_Returns_
+
+-   `WPKeyboardShortcut?`: Shortcut display values.
+
 ### getShortcutAliases
 
 Returns the aliases for a given shortcut name.

@@ -54,7 +54,7 @@ To update an existing page:
 
 ### Create a new document
 
-To add a new document requires a working JavaScript development environment to build the documentation, see the [JavaScript build setup documentation](/docs/how-to-guides/javascript/js-build-setup.md):
+To add a new document requires a working JavaScript development environment to build the documentation, see the [Working with JavaScript for the Block Editor](/docs/getting-started/fundamentals/javascript-in-the-block-editor.md) guide:
 
 1. Create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/HEAD/docs) folder, use lower-case, no spaces, if needed a dash separator, and `.md` extension.
 2. Add content using markdown notation. All documents require one and only `h1` tag.
@@ -184,6 +184,28 @@ An example config for using Visual Studio Code and the Prettier extensions:
 
 <div class="callout callout-info">
 Depending on where you are viewing this document, the brackets may show as double. The proper format is just a single bracket.
+</div>
+
+### Images
+
+Images displayed in the Block Editor Handbook must be hosted in the [developer.wordpress.org](https://developer.wordpress.org/) Media Library, not linked from GitHub.
+
+Images linked directly from GitHub (for example, URLs starting with `https://raw.githubusercontent.com`) are subject to rate limiting and can fail to load once the documentation is synced to the Block Editor Handbook. Hosting them in the Media Library avoids this.
+
+To add an image:
+
+1. Upload the image to the Media Library on developer.wordpress.org. This requires additional permissions—if you don't have access, ask in the `#docs` channel in [Make WordPress Slack](https://make.wordpress.org/chat) for assistance.
+2. Copy the URL of the uploaded image. It should look something like `https://developer.wordpress.org/files/2026/06/your-image.png`.
+3. Reference the image in markdown using that URL, with descriptive alt text.
+
+For example:
+
+```md
+![Descriptive alt text](https://developer.wordpress.org/files/2026/06/your-image.png)
+```
+
+<div class="callout callout-info">
+The Media Library does not accept SVG uploads. If an SVG is <strong>displayed</strong> in the handbook, upload a raster version (such as a PNG) to the Media Library and reference that. Only keep an SVG in the repository and link to it directly when it is meant to be <strong>downloaded</strong> (for example, a logo offered as a vector file)—a download link isn't fetched on every page render, so it isn't affected by the rate limiting.
 </div>
 
 ### Video embeds

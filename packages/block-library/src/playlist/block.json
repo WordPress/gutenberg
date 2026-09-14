@@ -1,7 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"__experimental": true,
 	"name": "core/playlist",
 	"title": "Playlist",
 	"category": "media",
@@ -10,9 +9,6 @@
 	"textdomain": "default",
 	"allowedBlocks": [ "core/playlist-track" ],
 	"attributes": {
-		"currentTrack": {
-			"type": "string"
-		},
 		"type": {
 			"type": "string",
 			"default": "audio"
@@ -29,6 +25,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"showPlayButtonArtwork": {
+			"type": "boolean",
+			"default": false
+		},
 		"showArtists": {
 			"type": "boolean",
 			"default": true
@@ -41,13 +41,30 @@
 			"type": "boolean",
 			"default": true
 		},
+		"waveformStyle": {
+			"type": "string",
+			"enum": [ "bars", "mirror", "line", "blocks", "dots", "seekbar" ],
+			"default": "bars"
+		},
+		"waveformColor": {
+			"type": "string"
+		},
+		"waveformGradient": {
+			"type": "string"
+		},
+		"waveformBackgroundColor": {
+			"type": "string"
+		},
+		"waveformBackgroundGradient": {
+			"type": "string"
+		},
 		"caption": {
 			"type": "string"
 		}
 	},
 	"providesContext": {
 		"showArtists": "showArtists",
-		"currentTrack": "currentTrack"
+		"showImages": "showImages"
 	},
 	"supports": {
 		"anchor": true,
@@ -62,12 +79,10 @@
 		},
 		"__experimentalBorder": {
 			"color": true,
-			"radius": true,
 			"style": true,
 			"width": true,
 			"__experimentalDefaultControls": {
 				"color": true,
-				"radius": true,
 				"style": true,
 				"width": true
 			}
@@ -76,16 +91,14 @@
 		"spacing": {
 			"margin": true,
 			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		}
 	},
-	"styles": [
-		{ "name": "bars", "label": "Bars", "isDefault": true },
-		{ "name": "mirror", "label": "Mirror" },
-		{ "name": "line", "label": "Line" },
-		{ "name": "blocks", "label": "Blocks" },
-		{ "name": "dots", "label": "Dots" },
-		{ "name": "seekbar", "label": "Seekbar" }
-	],
 	"editorStyle": "wp-block-playlist-editor",
 	"style": "wp-block-playlist"
 }

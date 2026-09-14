@@ -1,14 +1,42 @@
-import { privateApis as themeApis } from '@wordpress/theme';
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+import { ThemeProvider } from '@wordpress/theme';
 import type { StoryContext } from 'storybook/internal/types';
-import { storyIdMatchesDesignSystemTheme } from './utils/design-system-theme-story-matchers';
+import {
+	DARK_THEME_COLORS,
+	getCustomThemeColors,
+	LIGHT_THEME_COLORS,
+	normalizeColorTheme,
+} from '../addons/design-system-theme/constants';
 
-const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
-	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
-	'@wordpress/theme'
-);
+type ThemeProviderProps = React.ComponentProps< typeof ThemeProvider >;
+type ThemeProviderSettings = Pick<
+	ThemeProviderProps,
+	'color' | 'cornerRadius' | 'cursor'
+>;
 
-const { ThemeProvider } = unlock( themeApis );
+export function getDesignSystemThemeSettings(
+	globals: StoryContext[ 'globals' ]
+): ThemeProviderSettings {
+	const colorTheme = normalizeColorTheme( globals.dsColorTheme );
+	const cursorControl = globals.dsCursorControl || undefined;
+	const cornerRadiusPreset: ThemeProviderProps[ 'cornerRadius' ] =
+		globals.dsCornerRadius || undefined;
+
+	let color: ThemeProviderProps[ 'color' ] = LIGHT_THEME_COLORS;
+	if ( colorTheme === 'dark' ) {
+		color = DARK_THEME_COLORS;
+	} else if ( colorTheme === 'custom' ) {
+		color = getCustomThemeColors(
+			globals.dsPrimaryColor,
+			globals.dsBackgroundColor
+		);
+	}
+
+	return {
+		color,
+		cursor: cursorControl ? { control: cursorControl } : undefined,
+		cornerRadius: cornerRadiusPreset,
+	};
+}
 
 /**
  * Decorator that applies Design System theme based on toolbar selections.
@@ -21,33 +49,22 @@ export function WithDesignSystemTheme(
 	Story: React.ComponentType< any >,
 	context: StoryContext
 ) {
-	const shouldApplyDesignSystemTheme = storyIdMatchesDesignSystemTheme(
-		context.id
-	);
-	if ( ! shouldApplyDesignSystemTheme ) {
-		return <Story { ...context } />;
-	}
-
-	const colorTheme = context.globals.dsColorTheme;
-	const cursorControl = context.globals.dsCursorControl || undefined;
-
-	let color;
-	if ( colorTheme === 'dark' ) {
-		color = { bg: '#1e1e1e', primary: '#3858e9' };
-	}
+	const colorTheme = normalizeColorTheme( context.globals.dsColorTheme );
+	const themeSettings = getDesignSystemThemeSettings( context.globals );
+	const hasColorOverride = colorTheme !== 'light';
 
 	return (
 		<ThemeProvider
-			color={ color }
-			cursor={ cursorControl ? { control: cursorControl } : undefined }
-			isRoot
+			{ ...themeSettings }
+			isRoot={ context.viewMode !== 'docs' }
 		>
 			<div
 				style={
-					color?.bg
+					hasColorOverride
 						? {
 								background:
-									'var(--wpds-color-bg-surface-neutral-strong)',
+									'var(--wpds-color-background-surface-neutral-strong)',
+								color: 'var(--wpds-color-foreground-content-neutral)',
 								padding:
 									'var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-sm)',
 								outline:
@@ -58,14 +75,14 @@ export function WithDesignSystemTheme(
 				}
 			>
 				<Story { ...context } />
-				{ color?.bg && (
+				{ hasColorOverride && (
 					<small
 						style={ {
 							display: 'block',
 							opacity: 0.5,
 							marginTop: 'var(--wpds-dimension-gap-md)',
 							fontSize: 'var(--wpds-typography-font-size-xs)',
-							color: 'var(--wpds-color-fg-content-neutral-weak)',
+							color: 'var(--wpds-color-foreground-content-neutral-weak)',
 							textTransform: 'uppercase',
 							textAlign: 'end',
 						} }

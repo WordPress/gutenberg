@@ -9,8 +9,14 @@
 	isolation: isolate;
 }
 
-.editor-editor-interface .editor-notices {
-	padding: var(--wpds-dimension-padding-md);
+.editor-notices.notices-inline-notices-wrapper,
+.editor-notices .components-notice-list {
+	gap: 0;
+}
+
+.editor-notices .components-notice {
+	border-top-width: 0;
+	border-inline-width: 0;
 }
 
 .editor-visual-editor {

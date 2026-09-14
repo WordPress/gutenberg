@@ -4,24 +4,19 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # WordPress Design System
 
-## What is a Design System?
-
-A design system is a collection of reusable components, design tokens, and guidelines that work together to create consistent, accessible user interfaces. It serves as a single source of truth that bridges design and development, ensuring cohesion across different parts of an application.
+The WordPress Design System is a collection of reusable components, design tokens, and guidelines that work together to help developers build consistent, accessible user interfaces in the WordPress administrative dashboard.
 
 Rather than building UI elements from scratch each time, a design system provides pre-built, themeable components built on a foundation of design tokens. Design tokens encode design decisions like colors, spacing, and typography and can be customized to match different contexts while maintaining consistency.
 
-## How is this different from existing components?
+## Using the Design System
 
-While similar in scope to the existing [`@wordpress/components`](https://github.com/WordPress/gutenberg/tree/trunk/packages/components) package, there are key differences:
+Most often, you'll be interested in using components of the design system, like those provided through [the `@wordpress/ui` package](https://github.com/WordPress/gutenberg/blob/trunk/packages/ui/README.md) and other packages described below in "Parts of the Design System".
 
--   **Cohesive by design**: Unlike `@wordpress/components`, which grew organically as a collection of unrelated UI elements, this design system guarantees user- and developer-facing cohesion through a unified token system and consistent component patterns.
--   **Flexible theming**: Built from the ground up to support customizable color schemes and user personalization—capabilities needed to support the [Phase 3 admin redesign initiative](https://github.com/WordPress/gutenberg/issues/71196).
--   **Modern distribution**: Distributed as a versioned npm package following [semantic versioning](https://semver.org/), rather than being bundled as a WordPress script on the `window.wp` global.
--   **Composable architecture**: Components follow consistent patterns with proper composability, ref forwarding, and flexible rendering—avoiding the bloated abstractions that emerged from historical scope creep.
+If you want to build your own components that inherit the same styles as the design system's own components, the [theming system](/story/design-system-theme-introduction--docs) provides a number of [custom CSS properties](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) that you can use in your own stylesheet.
 
-For more context on the motivations and goals behind this work, see the [Design System: Support for admin redesign](https://github.com/WordPress/gutenberg/issues/71196) overview issue.
+The [WordPress Design System MCP Server](https://github.com/WordPress/gutenberg/tree/trunk/packages/design-system-mcp) is recommended when working with AI agents for design or development in a project that uses the design system. It provides AI agents with component documentation, usage examples, and design tokens, so they correctly follow the latest design system guidance.
 
-## What are the parts of the design system?
+## Parts of the Design System
 
 Describing the parts of a design system can be challenging, because ideally every part of the application inherits and builds from the design system fundamentals in some way.
 
@@ -85,3 +80,14 @@ High-level building blocks for consistent WordPress admin page layouts:
 -   **Consistency by default**: Enforces a predictable admin experience across features without each team re-deriving the same layout patterns.
 
 See the [`@wordpress/admin-ui` README](https://github.com/WordPress/gutenberg/tree/trunk/packages/admin-ui) for API reference and usage guidance.
+
+## Principles of the Design System
+
+The design system is guided by a few principles that distinguish it from the existing [@wordpress/components](https://github.com/WordPress/gutenberg/tree/trunk/packages/components) package:
+
+-   **Cohesive by design**: Unlike `@wordpress/components`, which grew organically as a collection of unrelated UI elements, this design system guarantees user- and developer-facing cohesion through a unified token system and consistent component patterns.
+-   **Flexible theming**: Built from the ground up to support customizable color schemes and user personalization—capabilities needed to support the [Phase 3 admin redesign initiative](https://github.com/WordPress/gutenberg/issues/71196).
+-   **Modern distribution**: Distributed as a versioned npm package following [semantic versioning](https://semver.org/), rather than being bundled as a WordPress script on the `window.wp` global.
+-   **Composable architecture**: Components follow consistent patterns with proper composability, ref forwarding, and flexible rendering—avoiding the bloated abstractions that emerged from historical scope creep.
+
+For more context on the motivations and goals behind this work, see the [Design System: Support for admin redesign](https://github.com/WordPress/gutenberg/issues/71196) overview issue.

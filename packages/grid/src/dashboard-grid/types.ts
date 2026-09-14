@@ -1,8 +1,6 @@
-/**
- * Internal dependencies
- */
 import type {
 	DragPreviewRenderProps,
+	GridItemLimits,
 	GridOverlayRenderProps,
 	ResizeDelta,
 	ResizeHandleRenderProps,
@@ -41,6 +39,22 @@ export type DashboardGridLayoutItem = {
 	 * omitted, the item falls back to its index in the `layout` array.
 	 */
 	order?: number;
+
+	/**
+	 * Whether the item can be dragged while the surface is in edit mode.
+	 * When `false`, the item is pinned: it also holds its index while the
+	 * other items reorder around it.
+	 *
+	 * @default true
+	 */
+	draggable?: boolean;
+
+	/**
+	 * Whether the item can be resized while the surface is in edit mode.
+	 *
+	 * @default true
+	 */
+	resizable?: boolean;
 };
 
 /**
@@ -63,6 +77,20 @@ export type GridItemProps = {
 	 * @default false
 	 */
 	disabled?: boolean;
+
+	/**
+	 * Whether the item can be dragged. Combined with `disabled`.
+	 *
+	 * @default true
+	 */
+	draggable?: boolean;
+
+	/**
+	 * Whether the item can be resized. Combined with `disabled`.
+	 *
+	 * @default true
+	 */
+	resizable?: boolean;
 
 	/**
 	 * Whether the item can be resized vertically. Disabled when the
@@ -129,6 +157,18 @@ export type GridItemProps = {
 	 * Omitted when vertical resize is disabled.
 	 */
 	minResizeHeightPx?: number;
+
+	/**
+	 * Maximum tile width while resizing, in pixels. Omitted when the
+	 * item declares no width limit.
+	 */
+	maxResizeWidthPx?: number;
+
+	/**
+	 * Maximum tile height while resizing, in pixels. Omitted when
+	 * vertical resize is disabled or the item declares no height limit.
+	 */
+	maxResizeHeightPx?: number;
 
 	/**
 	 * Callback fired when the resize gesture ends.
@@ -228,6 +268,9 @@ export interface DashboardGridProps
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
 
 	/**
+	 * Custom wrapper for the dragged-clone visual mounted inside
+	 * `<DragOverlay>`. The surface always wraps the clone with a thin
+	 * functional frame (lift scale, grabbing cursor, pointer pass-
 	 * through) and mounts this component inside it; the consumer
 	 * owns the visual chrome (shadow, radius, padding).
 	 *
@@ -253,23 +296,23 @@ export interface DashboardGridProps
 	renderGridOverlay?: React.ComponentType< GridOverlayRenderProps >;
 
 	/**
-	 * Target column count (cap). When set alone, the grid renders this
-	 * many columns and tiles scale with the container.
-	 *
-	 * Composes with `minColumnWidth`: if both are set, the effective
-	 * column count is `min( columns, fitsAtMinWidth )`. When omitted
-	 * but `minColumnWidth` is set, the count is uncapped and derives
-	 * purely from the container width. When both are omitted, the
-	 * grid renders six columns.
+	 * Target column count, used as a cap. Defaults to six when neither
+	 * `columns` nor `minColumnWidth` is set; with `minColumnWidth` set
+	 * it can resolve lower on narrow containers.
 	 */
 	columns?: number;
 
 	/**
-	 * Per-tile minimum width in pixels. The effective column count is
-	 * derived from container width, floored by this value, down to 1.
-	 *
-	 * Composes with `columns`: when both are set, this acts as a floor
-	 * that can reduce the count below `columns` on narrow containers.
+	 * Per-tile minimum width in pixels. Enables responsive mode: the
+	 * column count derives from container width, floored by this value,
+	 * down to 1.
 	 */
 	minColumnWidth?: number;
+
+	/**
+	 * Per-item size limits in pixels, keyed by layout item key. Width
+	 * bounds saturate at the column count; `'full'` and `'fill'` widths
+	 * respect a maximum.
+	 */
+	itemLimits?: Record< string, GridItemLimits >;
 }
