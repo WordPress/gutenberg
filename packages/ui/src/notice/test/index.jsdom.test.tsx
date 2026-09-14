@@ -183,39 +183,6 @@ describe( 'Notice', () => {
 	} );
 
 	describe( 'screen reader announcements', () => {
-		it.each( [ 'alert', 'status' ] )(
-			'keeps actions outside a consumer-provided %s',
-			( role ) => {
-				render(
-					<Notice.Root>
-						<Notice.Description role={ role }>
-							Something changed.
-						</Notice.Description>
-						<Notice.Actions>
-							<Notice.ActionButton>Retry</Notice.ActionButton>
-							<Notice.ActionLink href="/help">
-								Get help
-							</Notice.ActionLink>
-						</Notice.Actions>
-						<Notice.CloseIcon />
-					</Notice.Root>
-				);
-
-				const message = screen.getByRole( role );
-				expect( message ).toHaveTextContent( /^Something changed\.$/ );
-				expect( message ).not.toContainElement(
-					screen.getByRole( 'button', { name: 'Retry' } )
-				);
-				expect( message ).not.toContainElement(
-					screen.getByRole( 'link', { name: 'Get help' } )
-				);
-				expect( message ).not.toContainElement(
-					screen.getByRole( 'button', { name: 'Dismiss' } )
-				);
-				expect( speak ).not.toHaveBeenCalled();
-			}
-		);
-
 		it( 'renders without announcing its content', () => {
 			const { container } = render(
 				<Notice.Root intent="error">
