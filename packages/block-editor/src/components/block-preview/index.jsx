@@ -142,8 +142,7 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 		ref,
 		className: clsx(
 			props.className,
-			'block-editor-block-preview__live-content',
-			'components-disabled'
+			'block-editor-block-preview__live-content'
 		),
 		children: blocks?.length ? children : null,
 	};

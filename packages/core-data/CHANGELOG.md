@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.0.0 (2026-09-10)
+
 ### Breaking Changes
 
 -   The entity record selectors infer the record from their `kind` and `name` arguments with a `const` type parameter. TypeScript consumers now require TypeScript 5 or newer. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
@@ -9,13 +11,11 @@
 -   The `getGlobalStyles` and `saveGlobalStyles` shortcuts now use `GlobalStyles` instead of the unrelated `GlobalStylesRevision` record. `saveGlobalStyles` requires the record ID and accepts a plain string title, matching the REST API update route and schema. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 -   `RenderedText` omits `raw` outside the edit context instead of typing it as `never`, so a record requested with `context: 'view'` or `context: 'embed'` no longer exposes `title.raw` or `content.raw`. Read `rendered` in those contexts, or request the record with `context: 'edit'`. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 
-### Enhancements
-
--   Add `page_for_privacy_policy` to the `Settings` entity type, exposed by the Gutenberg plugin from the `wp_page_for_privacy_policy` option ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
-
 ### Bug Fixes
 
 -   Keep a query's `totalItems` in sync when records are removed from it, so the page count is correct after a deletion instead of only after the next fetch ([#82244](https://github.com/WordPress/gutenberg/pull/82244)).
+-   `EntityProvider`: a `revisionId` now only affects the entity it is set on. Other entities rendered inside it, such as the posts in a Query Loop, keep showing their own data ([#82517](https://github.com/WordPress/gutenberg/pull/82517)).
+-   `getEntityRecord` and `getRevision` return the same record for queries that request the same `_fields`, instead of a new object on every call, which made `useSelect` warn under `SCRIPT_DEBUG` ([#82552](https://github.com/WordPress/gutenberg/pull/82552)).
 
 ### Enhancements
 
@@ -26,6 +26,7 @@
 -   Match the Navigation embed record and current global styles ID types to their REST responses. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 -   Export `ContextualField` so plugins can describe context-sensitive fields when extending the entity record map. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 -   `PostStatus` accepts statuses registered by WordPress or plugins while preserving autocomplete for the built-in values. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   Add `page_for_privacy_policy` to the `Settings` entity type, exposed by the Gutenberg plugin from the `wp_page_for_privacy_policy` option ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
 
 ### Internal
 

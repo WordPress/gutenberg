@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/preferences",
-	"version": "4.54.0",
+	"version": "4.55.0",
 	"description": "Utilities for managing WordPress preferences.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -62,8 +62,7 @@
 		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0",
-		"vitest": "^4.1.10"
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

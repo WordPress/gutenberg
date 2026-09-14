@@ -1,10 +1,11 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import deprecated from '@wordpress/deprecated';
 import { useRef } from '@wordpress/element';
 import useCopyOnClick from '../';
 
-jest.mock( '@wordpress/deprecated' );
+vi.mock( import( '@wordpress/deprecated' ) );
 
 interface TestComponentProps {
 	text: string | ( () => string );
@@ -12,6 +13,10 @@ interface TestComponentProps {
 }
 
 describe( 'useCopyOnClick', () => {
+	afterEach( () => {
+		vi.useRealTimers();
+	} );
+
 	const TestComponent = ( { text, timeout = 4000 }: TestComponentProps ) => {
 		const ref = useRef< HTMLButtonElement >( null );
 		const hasCopied = useCopyOnClick( ref, text, timeout );
@@ -23,7 +28,7 @@ describe( 'useCopyOnClick', () => {
 	};
 
 	it( 'should call deprecated when the hook is used', () => {
-		jest.mocked( deprecated ).mockClear();
+		vi.mocked( deprecated ).mockClear();
 		render( <TestComponent text="test text" /> );
 
 		expect( deprecated ).toHaveBeenCalledWith(
@@ -39,7 +44,7 @@ describe( 'useCopyOnClick', () => {
 		const user = userEvent.setup();
 		render( <TestComponent text="test text" /> );
 
-		const writeTextMock = jest
+		const writeTextMock = vi
 			.spyOn( navigator.clipboard, 'writeText' )
 			.mockResolvedValue();
 
@@ -53,7 +58,7 @@ describe( 'useCopyOnClick', () => {
 		const user = userEvent.setup();
 		render( <TestComponent text="test text" /> );
 
-		jest.spyOn( navigator.clipboard, 'writeText' ).mockResolvedValue();
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockResolvedValue();
 
 		expect( screen.getByRole( 'button' ) ).toHaveTextContent( 'Copy' );
 
@@ -67,36 +72,32 @@ describe( 'useCopyOnClick', () => {
 	} );
 
 	it( 'should reset hasCopied after timeout', async () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers( { shouldAdvanceTime: true } );
 		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
+			advanceTimers: ( delay ) => vi.advanceTimersByTime( delay ),
 		} );
 		render( <TestComponent text="test text" timeout={ 1000 } /> );
 
-		jest.spyOn( navigator.clipboard, 'writeText' ).mockResolvedValue();
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockResolvedValue();
 
 		await user.click( screen.getByRole( 'button' ) );
 
 		await act( async () => {
-			const p = new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
-			jest.advanceTimersByTime( 0 );
-			await p;
+			await vi.advanceTimersByTimeAsync( 0 );
 		} );
 		expect( screen.getByRole( 'button' ) ).toHaveTextContent( 'Copied!' );
 
-		act( () => {
-			jest.advanceTimersByTime( 1000 );
+		await act( async () => {
+			await vi.advanceTimersByTimeAsync( 1000 );
 		} );
 		expect( screen.getByRole( 'button' ) ).toHaveTextContent( 'Copy' );
-
-		jest.useRealTimers();
 	} );
 
 	it( 'should not set hasCopied when copy fails', async () => {
 		const user = userEvent.setup();
 		render( <TestComponent text="test text" /> );
 
-		jest.spyOn( navigator.clipboard, 'writeText' ).mockRejectedValue(
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockRejectedValue(
 			new Error()
 		);
 
@@ -110,7 +111,7 @@ describe( 'useCopyOnClick', () => {
 	} );
 
 	it( 'should not update hasCopied after unmount', async () => {
-		const renderSpy = jest.fn();
+		const renderSpy = vi.fn();
 
 		const SpyComponent = ( { text }: { text: string } ) => {
 			const ref = useRef< HTMLButtonElement >( null );
@@ -127,7 +128,7 @@ describe( 'useCopyOnClick', () => {
 		const delayedPromise = new Promise< void >( ( resolve ) => {
 			resolvePromise = resolve;
 		} );
-		jest.spyOn( navigator.clipboard, 'writeText' ).mockReturnValue(
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockReturnValue(
 			delayedPromise as Promise< void >
 		);
 

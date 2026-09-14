@@ -1,19 +1,20 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useDelayedLoading, useMediaResults } from '../hooks';
 
 describe( 'useDelayedLoading', () => {
 	beforeEach( () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 	} );
 	afterEach( () => {
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
 	it( 'does not surface loading before the delay elapses', () => {
 		const { result } = renderHook( () => useDelayedLoading( true, 400 ) );
 		expect( result.current ).toBe( false );
 		act( () => {
-			jest.advanceTimersByTime( 399 );
+			vi.advanceTimersByTime( 399 );
 		} );
 		expect( result.current ).toBe( false );
 	} );
@@ -21,7 +22,7 @@ describe( 'useDelayedLoading', () => {
 	it( 'surfaces loading once the delay elapses', () => {
 		const { result } = renderHook( () => useDelayedLoading( true, 400 ) );
 		act( () => {
-			jest.advanceTimersByTime( 400 );
+			vi.advanceTimersByTime( 400 );
 		} );
 		expect( result.current ).toBe( true );
 	} );
@@ -32,11 +33,11 @@ describe( 'useDelayedLoading', () => {
 			{ initialProps: { isLoading: true } }
 		);
 		act( () => {
-			jest.advanceTimersByTime( 200 );
+			vi.advanceTimersByTime( 200 );
 		} );
 		rerender( { isLoading: false } );
 		act( () => {
-			jest.advanceTimersByTime( 400 );
+			vi.advanceTimersByTime( 400 );
 		} );
 		expect( result.current ).toBe( false );
 	} );
@@ -47,7 +48,7 @@ describe( 'useDelayedLoading', () => {
 			{ initialProps: { isLoading: true } }
 		);
 		act( () => {
-			jest.advanceTimersByTime( 400 );
+			vi.advanceTimersByTime( 400 );
 		} );
 		expect( result.current ).toBe( true );
 		rerender( { isLoading: false } );
@@ -58,7 +59,7 @@ describe( 'useDelayedLoading', () => {
 describe( 'useMediaResults', () => {
 	const createCategory = ( name, items ) => ( {
 		name,
-		fetch: jest.fn( async () => items ),
+		fetch: vi.fn( async () => items ),
 	} );
 
 	it( 'fetches and returns media for the query', async () => {
@@ -119,7 +120,7 @@ describe( 'useMediaResults', () => {
 	it( 'surfaces paging totals from a source that returns them', async () => {
 		const category = {
 			name: 'images',
-			fetch: jest.fn( async () => ( {
+			fetch: vi.fn( async () => ( {
 				mediaItems: [ { id: 1 } ],
 				totalItems: 42,
 				totalPages: 3,
@@ -207,7 +208,7 @@ describe( 'useMediaResults', () => {
 		let resolveFetch;
 		const secondCategory = {
 			name: 'attached-images',
-			fetch: jest.fn(
+			fetch: vi.fn(
 				() =>
 					new Promise( ( resolve ) => {
 						resolveFetch = resolve;
@@ -231,7 +232,7 @@ describe( 'useMediaResults', () => {
 	} );
 
 	it( 'does not refetch when only the category wrapper changes', async () => {
-		const fetch = jest.fn( async () => [ { id: 1 } ] );
+		const fetch = vi.fn( async () => [ { id: 1 } ] );
 		const { result, rerender } = renderHook(
 			( { category } ) => useMediaResults( category, { search: '' }, 0 ),
 			{

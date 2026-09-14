@@ -4,6 +4,7 @@ import { Button } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore, ActionItem } from '@wordpress/interface';
+import { keyboardShortcut } from '@wordpress/keycodes';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
 import CopyContentMenuItem from './copy-content-menu-item';
@@ -14,16 +15,6 @@ import MoreMenuPreferenceItem from './more-menu-preference-item';
 import ToolsMoreMenuGroup from './tools-more-menu-group';
 import ViewMoreMenuGroup from './view-more-menu-group';
 import { store as editorStore } from '../../store';
-import { getKeyboardShortcut } from '../../utils/keyboard-shortcut';
-
-const DISTRACTION_FREE_SHORTCUT = getKeyboardShortcut( {
-	character: '\\',
-	modifier: 'primaryShift',
-} );
-const KEYBOARD_SHORTCUTS_SHORTCUT = getKeyboardShortcut( {
-	character: 'h',
-	modifier: 'access',
-} );
 
 export default function MoreMenu( { isRevisionMode = false } ) {
 	const { openModal } = useDispatch( interfaceStore );
@@ -104,7 +95,7 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 						messageDeactivated={ __(
 							'Distraction free mode deactivated.'
 						) }
-						shortcut={ DISTRACTION_FREE_SHORTCUT }
+						shortcut={ keyboardShortcut.primaryShift( '\\' ) }
 					/>
 					<MoreMenuPreferenceItem
 						scope="core"
@@ -137,7 +128,7 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 						onClick={ () =>
 							openModal( 'editor/keyboard-shortcut-help' )
 						}
-						shortcut={ KEYBOARD_SHORTCUTS_SHORTCUT }
+						shortcut={ keyboardShortcut.access( 'h' ) }
 					>
 						<Menu.ItemLabel>
 							{ __( 'Keyboard shortcuts' ) }

@@ -1,9 +1,16 @@
+import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { MediaEditorModal } from '../index';
 
-let mockSaveResult = {
+let mockSaveResult: {
+	id: number;
+	url: string;
+	media: { id: number; source_url: string };
+	previous?: { id: number; url: string };
+} = {
 	id: 11,
 	url: 'edited.jpg',
 	media: { id: 11, source_url: 'edited.jpg' },
@@ -12,50 +19,73 @@ let mockSaveResult = {
 		url: 'original.jpg',
 	},
 };
-const mockOnUpdate = jest.fn();
-const mockOnClose = jest.fn();
-const mockCloseMediaEditorModal = jest.fn();
-const mockCreateSuccessNotice = jest.fn();
+const mockOnUpdate = vi.fn();
+const mockOnClose = vi.fn();
+const mockCloseMediaEditorModal = vi.fn();
+const mockCreateSuccessNotice = vi.fn();
 
-jest.mock( '@wordpress/data', () => ( {
-	useDispatch: jest.fn(),
-	useSelect: jest.fn(),
-} ) );
+vi.mock(
+	import( '@wordpress/data' ),
+	() =>
+		( {
+			useDispatch: vi.fn(),
+			useSelect: vi.fn(),
+		} ) as unknown as typeof import('@wordpress/data')
+);
 
-jest.mock( '@wordpress/components', () => ( {
-	Modal: ( { children } ) => children,
-} ) );
+vi.mock(
+	import( '@wordpress/components' ),
+	() =>
+		( {
+			Modal: ( { children }: { children: ReactNode } ) => children,
+		} ) as unknown as typeof import('@wordpress/components')
+);
 
-jest.mock( '@wordpress/keyboard-shortcuts', () => ( {
-	ShortcutProvider: ( { children } ) => children,
-} ) );
+vi.mock(
+	import( '@wordpress/keyboard-shortcuts' ),
+	() =>
+		( {
+			ShortcutProvider: ( { children }: { children: ReactNode } ) =>
+				children,
+		} ) as unknown as typeof import('@wordpress/keyboard-shortcuts')
+);
 
-jest.mock( '@wordpress/notices', () => ( {
-	store: { name: 'notices' },
-} ) );
+vi.mock(
+	import( '@wordpress/notices' ),
+	() =>
+		( {
+			store: { name: 'notices' },
+		} ) as unknown as typeof import('@wordpress/notices')
+);
 
-jest.mock( '../../../store', () => ( {
-	store: { name: 'media-editor' },
-} ) );
+vi.mock(
+	import( '../../../store' ),
+	() =>
+		( {
+			store: { name: 'media-editor' },
+		} ) as unknown as typeof import('../../../store')
+);
 
-jest.mock( '../../media-editor', () => {
-	const { createElement } = jest.requireActual( '@wordpress/element' );
+vi.mock( import( '../../media-editor' ), async () => {
+	const { createElement } =
+		await vi.importActual< typeof import('@wordpress/element') >(
+			'@wordpress/element'
+		);
 
 	return {
-		__esModule: true,
-		default: jest.fn( ( props ) =>
+		default: vi.fn( ( props ) =>
 			createElement(
 				'button',
 				{ onClick: () => props.onSaved( mockSaveResult ) },
 				'Save result'
 			)
 		),
-	};
+	} as unknown as typeof import('../../media-editor');
 } );
 
 describe( 'MediaEditorModal', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		mockSaveResult = {
 			id: 11,
 			url: 'edited.jpg',
@@ -66,7 +96,7 @@ describe( 'MediaEditorModal', () => {
 			},
 		};
 
-		( useSelect as jest.Mock ).mockImplementation( ( mapSelect ) =>
+		( useSelect as Mock ).mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				isOpen: () => true,
 				getId: () => 10,
@@ -74,7 +104,7 @@ describe( 'MediaEditorModal', () => {
 				getOnClose: () => mockOnClose,
 			} ) )
 		);
-		( useDispatch as jest.Mock ).mockImplementation( ( store ) =>
+		( useDispatch as Mock ).mockImplementation( ( store ) =>
 			store === noticesStore
 				? { createSuccessNotice: mockCreateSuccessNotice }
 				: { closeMediaEditorModal: mockCloseMediaEditorModal }

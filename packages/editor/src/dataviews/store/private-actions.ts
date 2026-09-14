@@ -245,10 +245,17 @@ export const registerPostTypeSchema =
 			const postTypeSlug = postTypeConfig.slug;
 			const isDesignPostType = DESIGN_POST_TYPES.includes( postTypeSlug );
 			const isPattern = postTypeSlug === 'wp_block';
+			// `post-thumbnails` is `true` or the list of post types the theme
+			// opted in.
+			const postThumbnails =
+				currentTheme?.theme_supports?.[ 'post-thumbnails' ];
+			const themeSupportsThumbnails = Array.isArray( postThumbnails )
+				? postThumbnails.includes( postTypeSlug )
+				: !! postThumbnails;
 
 			fields = [
 				postTypeConfig.supports?.thumbnail &&
-					currentTheme?.theme_supports?.[ 'post-thumbnails' ] &&
+					themeSupportsThumbnails &&
 					featuredImageField,
 				! isDesignPostType &&
 					postTypeConfig.supports?.author &&

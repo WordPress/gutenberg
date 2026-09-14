@@ -1,5 +1,8 @@
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { lock } from '../../lock-unlock';
 import postMetaBindings from '../post-meta';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'post-meta bindings', () => {
 	let context, select, selectReturn;

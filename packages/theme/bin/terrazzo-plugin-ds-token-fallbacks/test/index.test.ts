@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { computeBrandFallback, formatDesignTokenFallbacksScss } from '../index';
+import {
+	computeBrandFallback,
+	formatDesignTokenFallbacksScss,
+} from '../index.ts';
 
 describe( 'computeBrandFallback', () => {
 	it( 'throws on colors with alpha (8-digit hex)', () => {

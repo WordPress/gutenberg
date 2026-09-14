@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -8,7 +9,7 @@ import { useEnableWpCompatOverlaySlot } from '../../../../utils/use-enable-wp-co
 describe( 'Select', () => {
 	it( 'supports object item values', async () => {
 		const user = userEvent.setup();
-		const onValueChange = jest.fn();
+		const onValueChange = vi.fn();
 		const users = [
 			{ value: '1', label: 'User 1' },
 			{ value: '2', label: 'User 2' },
