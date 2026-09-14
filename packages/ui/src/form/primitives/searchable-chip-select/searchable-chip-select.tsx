@@ -12,26 +12,15 @@ import styles from './style.module.css';
 import { warnSearchableChipSelectProps } from './dev-warnings';
 import type { Item, SearchableChipSelectProps } from './types';
 
-type ChipSelectA11y =
-	| { status: 'empty' }
-	| { status: 'selected'; count: number };
-
-function toChipSelectA11y( value: ReadonlyArray< unknown > ): ChipSelectA11y {
-	if ( value.length === 0 ) {
-		return { status: 'empty' };
-	}
-	return { status: 'selected', count: value.length };
-}
-
-function chipsToolbarLabel( a11y: ChipSelectA11y ): string | undefined {
-	if ( a11y.status === 'empty' ) {
+function getChipsToolbarLabel( selectedCount: number ): string | undefined {
+	if ( selectedCount === 0 ) {
 		return undefined;
 	}
-	return _n( 'Selected item', 'Selected items', a11y.count );
+	return _n( 'Selected item', 'Selected items', selectedCount );
 }
 
-function inputSelectionHint( a11y: ChipSelectA11y ): string | undefined {
-	if ( a11y.status === 'empty' ) {
+function getInputSelectionHint( selectedCount: number ): string | undefined {
+	if ( selectedCount === 0 ) {
 		return undefined;
 	}
 	return sprintf(
@@ -39,9 +28,9 @@ function inputSelectionHint( a11y: ChipSelectA11y ): string | undefined {
 		_n(
 			'%1$d item selected. From the start of the input, press %2$s to move to the selected item.',
 			'%1$d items selected. From the start of the input, press %2$s to move to the selected items.',
-			a11y.count
+			selectedCount
 		),
-		a11y.count,
+		selectedCount,
 		isRTL() ? __( 'Right Arrow' ) : __( 'Left Arrow' )
 	);
 }
@@ -95,8 +84,9 @@ export const SearchableChipSelect = forwardRef<
 			<Combobox.InputGroup>
 				<Combobox.Value>
 					{ ( value: Item[] ) => {
-						const a11y = toChipSelectA11y( value );
-						const selectionHint = inputSelectionHint( a11y );
+						const selectedCount = value.length;
+						const selectionHint =
+							getInputSelectionHint( selectedCount );
 
 						return (
 							<>
@@ -112,9 +102,11 @@ export const SearchableChipSelect = forwardRef<
 											visuallyDisabled={ disabled }
 										/>
 									}
-									aria-label={ chipsToolbarLabel( a11y ) }
+									aria-label={ getChipsToolbarLabel(
+										selectedCount
+									) }
 								>
-									{ a11y.status === 'selected' && (
+									{ selectedCount > 0 && (
 										<Stack
 											align="start"
 											className={
@@ -166,7 +158,7 @@ export const SearchableChipSelect = forwardRef<
 										aria-labelledby={ ariaLabelledby }
 										aria-describedby={ mergeDescribedBy(
 											ariaDescribedby,
-											a11y.status === 'selected'
+											selectedCount > 0
 												? inputHintId
 												: undefined
 										) }
