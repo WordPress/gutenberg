@@ -24,7 +24,3 @@ Paths inside these presets fall into two groups, and the difference matters when
 `typings/` holds the ambient type declarations the whole repo relies on: the `gutenberg-env`, `gutenberg-test-env` and `gutenberg-vitest-test-env` globals, the CSS and style-import module shims, and the stubs that stand in for packages that ship no types yet. They live here so `tsconfig/base.json` can point at them without walking out of the workspace, which is why it needs a single type root rather than one per consumer.
 
 See the TypeScript section of [`packages/README.md`](../../packages/README.md) for how a package lays its projects out.
-
-## Patching
-
-[`patching/`](./patching) creates and applies the dependency patches in [`patches/`](../../patches). `patch apply` runs from the repository root's `postinstall`.
