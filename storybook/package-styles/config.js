@@ -88,6 +88,12 @@ const CONFIG = [
 		rtl: [ designTokens ],
 	},
 	{
+		// Dashboard stories include form controls and the command palette.
+		componentIdMatcher: /^widget-dashboard-/,
+		ltr: [ componentsLtr ],
+		rtl: [ componentsRtl ],
+	},
+	{
 		componentIdMatcher: /^tokens-/,
 		ltr: [ designTokens ],
 		rtl: [ designTokens ],

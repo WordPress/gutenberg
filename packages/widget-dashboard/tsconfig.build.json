@@ -6,7 +6,6 @@
 		"checkJs": false
 	},
 	"references": [
-		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../dataviews/tsconfig.build.json" },

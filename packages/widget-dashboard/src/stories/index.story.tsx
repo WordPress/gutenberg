@@ -9,8 +9,6 @@ import type {
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/commands/build-style/style.css';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/components/build-style/style.css';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/dataviews/build-style/style.css';
 import { Page } from '@wordpress/admin-ui';
 import { CommandMenu } from '@wordpress/commands';
