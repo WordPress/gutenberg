@@ -282,7 +282,7 @@ class Gutenberg_Block_Transforms {
 			_doing_it_wrong(
 				__METHOD__,
 				__( 'A block transform cannot reference its callback by name, because a name can be written into `block.json` and data must not choose what runs. Register the block from PHP with a closure to attach one.', 'gutenberg' ),
-				'23.9.0'
+				'24.1.0'
 			);
 
 			return false;

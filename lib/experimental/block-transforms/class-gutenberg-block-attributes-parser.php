@@ -283,7 +283,7 @@ class Gutenberg_Block_Attributes_Parser {
 					_doing_it_wrong(
 						__METHOD__,
 						__( 'An "attribute" block attribute source has to name the attribute it reads.', 'gutenberg' ),
-						'23.9.0'
+						'24.1.0'
 					);
 
 					return null;
@@ -354,7 +354,7 @@ class Gutenberg_Block_Attributes_Parser {
 				__( 'The "%s" block attribute source is not supported on the server.', 'gutenberg' ),
 				$source
 			),
-			'23.9.0'
+			'24.1.0'
 		);
 
 		return null;

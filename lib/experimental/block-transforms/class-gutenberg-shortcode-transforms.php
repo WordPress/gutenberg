@@ -529,7 +529,7 @@ class Gutenberg_Shortcode_Transforms {
 				is_string( $tag ) ? $tag : gettype( $tag ),
 				$reason
 			),
-			'23.9.0'
+			'24.1.0'
 		);
 
 		return false;

@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import {
 	createBlock,
 	getBlockTransforms,
@@ -14,6 +15,22 @@ import {
 } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { autop, removep } from '@wordpress/autop';
+import codeMetadata from '../../packages/block-library/src/code/block.json';
+import headingMetadata from '../../packages/block-library/src/heading/block.json';
+import imageMetadata from '../../packages/block-library/src/image/block.json';
+import listMetadata from '../../packages/block-library/src/list/block.json';
+import listItemMetadata from '../../packages/block-library/src/list-item/block.json';
+import moreMetadata from '../../packages/block-library/src/more/block.json';
+import nextpageMetadata from '../../packages/block-library/src/nextpage/block.json';
+import paragraphMetadata from '../../packages/block-library/src/paragraph/block.json';
+import preformattedMetadata from '../../packages/block-library/src/preformatted/block.json';
+import quoteMetadata from '../../packages/block-library/src/quote/block.json';
+import separatorMetadata from '../../packages/block-library/src/separator/block.json';
+import tableMetadata from '../../packages/block-library/src/table/block.json';
+// Load the hooks that add the block support attributes.
+import '../../packages/editor/src/hooks';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 /**
  * The fields `get_block_editor_server_block_settings()` sends to the editor.
@@ -46,32 +63,25 @@ const SERVER_PROVIDED_FIELDS = [
 ];
 
 const BLOCKS_DECLARING_RAW_TRANSFORMS = [
-	'code',
-	'heading',
-	'image',
-	'list',
-	'list-item',
-	'more',
-	'nextpage',
-	'paragraph',
-	'preformatted',
-	'quote',
-	'separator',
-	'table',
+	codeMetadata,
+	headingMetadata,
+	imageMetadata,
+	listMetadata,
+	listItemMetadata,
+	moreMetadata,
+	nextpageMetadata,
+	paragraphMetadata,
+	preformattedMetadata,
+	quoteMetadata,
+	separatorMetadata,
+	tableMetadata,
 ];
 
 describe( 'Transforms declared in block metadata', () => {
 	beforeAll( () => {
-		// Load the hooks that add the block support attributes.
-		require( '../../packages/editor/src/hooks' );
-
 		const definitions = {};
 
-		BLOCKS_DECLARING_RAW_TRANSFORMS.forEach( ( slug ) => {
-			const metadata = require(
-				`../../packages/block-library/src/${ slug }/block.json`
-			);
-
+		BLOCKS_DECLARING_RAW_TRANSFORMS.forEach( ( metadata ) => {
 			definitions[ metadata.name ] = Object.fromEntries(
 				Object.entries( metadata ).filter( ( [ key ] ) =>
 					SERVER_PROVIDED_FIELDS.includes( key )
@@ -90,11 +100,7 @@ describe( 'Transforms declared in block metadata', () => {
 		);
 		const blockNames = rawTransforms.map( ( { blockName } ) => blockName );
 
-		BLOCKS_DECLARING_RAW_TRANSFORMS.forEach( ( slug ) => {
-			const { name } = require(
-				`../../packages/block-library/src/${ slug }/block.json`
-			);
-
+		BLOCKS_DECLARING_RAW_TRANSFORMS.forEach( ( { name } ) => {
 			expect( blockNames ).toContain( name );
 		} );
 	} );

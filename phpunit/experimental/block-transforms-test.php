@@ -3561,15 +3561,16 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 	}
 
 	public function test_keeps_the_text_inside_an_iframe() {
-		// WordPress 6.9 serializes it as nothing at all.
+		// WordPress 7.0 serializes it as nothing at all.
 		$blocks = gutenberg_html_to_blocks( '<iframe src="https://example.com/">fallback &lt;b&gt;</iframe>' );
 
 		$this->assertStringContainsString( '>fallback &lt;b&gt;</iframe>', $blocks[0]['innerHTML'] );
 	}
 
 	public function test_reads_deeply_nested_markup_without_running_out_of_room() {
-		// WordPress 6.9 gives its processor a hundred bookmarks and lets it
-		// throw past that; a theme's nested divisions come close enough.
+		// The processor throws past its bookmark limit rather than recording
+		// an error, and nested divisions out of a page builder are the markup
+		// most likely to reach whatever the limit is.
 		$html   = '<p>Intro</p>' . str_repeat( '<div class="row"><div class="col">', 60 ) . '<p>x</p>' . str_repeat( '</div></div>', 60 ) . '<p>Outro</p>';
 		$blocks = gutenberg_html_to_blocks( $html );
 

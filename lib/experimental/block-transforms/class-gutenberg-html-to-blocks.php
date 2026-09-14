@@ -402,7 +402,7 @@ class Gutenberg_HTML_To_Blocks {
 					__( 'The attribute path "%s" has an empty step, so no attribute can be written.', 'gutenberg' ),
 					(string) $path
 				),
-				'23.9.0'
+				'24.1.0'
 			);
 
 			return;

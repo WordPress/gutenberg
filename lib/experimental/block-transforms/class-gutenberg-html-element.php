@@ -122,10 +122,11 @@ class Gutenberg_HTML_Element {
 			self::read_tokens( $processor, $root, $stack );
 		} catch ( Exception $e ) {
 			/*
-			 * WordPress 6.9 lets the exception its processor raises on markup
-			 * nested deeper than it has bookmarks for escape; later versions
-			 * turn it into a parse error. Either way the markup could not be
-			 * read, which the caller keeps whole.
+			 * The processor raises an exception on markup nested deeper than
+			 * it has bookmarks for — ten thousand open elements since
+			 * WordPress 7.0 — and lets it escape rather than recording a
+			 * parse error. Either way the markup could not be read, which the
+			 * caller keeps whole.
 			 */
 			return null;
 		}
@@ -237,9 +238,9 @@ class Gutenberg_HTML_Element {
 			$node->opening_html = $processor->serialize_token();
 
 			/*
-			 * WordPress 6.9 serializes the text inside an `iframe`, `noembed`
-			 * or `noframes` as nothing at all; it is raw text, so the text
-			 * itself is its serialization.
+			 * WordPress 7.0 serializes the text inside an `iframe`, `noembed`
+			 * or `noframes` as nothing at all, which 7.1 corrected; it is raw
+			 * text, so the text itself is its serialization.
 			 */
 			if (
 				self::TEXT === $node->type
@@ -1024,7 +1025,7 @@ class Gutenberg_HTML_Element {
 				_doing_it_wrong(
 					__METHOD__,
 					__( 'A selector has to be a string, so this one matches nothing.', 'gutenberg' ),
-					'23.9.0'
+					'24.1.0'
 				);
 			}
 
@@ -1057,7 +1058,7 @@ class Gutenberg_HTML_Element {
 					__( 'The "%s" selector uses CSS that is not supported on the server, so it matches nothing.', 'gutenberg' ),
 					$selector
 				),
-				'23.9.0'
+				'24.1.0'
 			);
 		}
 

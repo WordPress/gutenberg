@@ -122,7 +122,7 @@ class Gutenberg_Embed_Transforms {
 						__( 'The "%s" pattern is not a valid regular expression, so it matches nothing.', 'gutenberg' ),
 						$pattern
 					),
-					'23.9.0'
+					'24.1.0'
 				);
 			}
 		}
