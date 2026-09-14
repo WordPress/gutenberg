@@ -8,6 +8,7 @@
 
 ### Internal
 
+-   Update `@base-ui/react` to 1.8.0 for the bundled UI components in the `/wp` entrypoint ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
 -   Update Ariakit to 0.4.39 and wait for scheduled composite item registration in jsdom tests ([#82831](https://github.com/WordPress/gutenberg/pull/82831)).
 -   Run rendered DataViews tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
 -   DataForm panel layout: Replace deprecated `word-break: break-word` with `word-break: normal` and `overflow-wrap: anywhere` on field summary controls. ([#82776](https://github.com/WordPress/gutenberg/pull/82776)).
