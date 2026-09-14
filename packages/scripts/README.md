@@ -483,9 +483,9 @@ and Browser Mode examples, dependencies, and support ranges.
 ### `test-unit-jest`
 
 Deprecated compatibility command. It continues to run the bundled Jest with
-`@wordpress/jest-preset-default`, including `--config`, `jest-unit.config.*`,
-`jest.config.*`, and the `jest` field in `package.json`. It is no longer an alias
-of `test-unit-js`.
+`@wordpress/jest-preset-default`. It accepts an explicit `--config` and discovers
+`jest-unit.config.js`, `jest.config.js`, `jest.config.json`, `jest.config.ts`, or
+the `jest` field in `package.json`. It is no longer an alias of `test-unit-js`.
 
 Existing Jest consumers can use this command throughout `@wordpress/scripts`
 36.x while migrating. Removal is scheduled no earlier than 37.0.0, and only

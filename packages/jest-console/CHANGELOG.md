@@ -4,7 +4,7 @@
 
 ### Deprecations
 
--   Deprecate this package. Use local Vitest console spies and assertions as described in the [consumer migration guide](../scripts/docs/vitest-migration.md). No public WordPress Vitest console package will replace it. Existing Jest support remains through scripts 36.x and cannot be removed before 37.0.0 and published-consumer verification. ([#80855](https://github.com/WordPress/gutenberg/issues/80855)).
+-   Deprecate this package. Use local Vitest console spies and assertions as described in the [consumer migration guide](../scripts/docs/vitest-migration.md). No public WordPress Vitest console package will replace it. Existing Jest support remains through scripts 36.x and cannot be removed before 37.0.0 and published-consumer verification. ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
 
 ## 9.3.0 (2026-09-10)
 
