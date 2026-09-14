@@ -17,7 +17,7 @@
 
 ### Bug Fixes
 
--   Edit as HTML: Apply the parser's built-in validation fixes before validating, so an `id`, `class` or `aria-label` typed by hand no longer drops the block into recovery ([#82683](https://github.com/WordPress/gutenberg/issues/82683)).
+-   Edit as HTML: Apply the parser's built-in validation fixes before validating, so an `id`, `class` or `aria-label` typed by hand no longer drops the block into recovery ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
 -   `InnerBlocks`: Resolve a container's legacy layout markup (`inherit: true`, or a bare `contentSize` / `wideSize` with no `type`) to a constrained layout for its inner blocks, so they are offered the wide and full alignments. Previously only the container's styles honoured the legacy form, and the inner blocks resolved to the flow layout ([#82637](https://github.com/WordPress/gutenberg/pull/82637)).
 -   Block Patterns and Block Visibility: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
 
