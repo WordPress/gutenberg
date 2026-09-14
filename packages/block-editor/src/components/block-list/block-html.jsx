@@ -52,13 +52,8 @@ function BlockHTML( { clientId } ) {
 		let isValid = true;
 
 		if ( html ) {
-			/*
-			 * `getBlockAttributes` only sources what the block's save output
-			 * declares, so global attributes typed by hand here — `id`,
-			 * `class`, `aria-label` — never reach the block. The parser
-			 * recovers them with these same fixes; without them a hand-added
-			 * anchor fails validation and the block drops into recovery.
-			 */
+			// `getBlockAttributes` only sources what the save output declares,
+			// so recover hand-typed `id`/`class`/`aria-label` as the parser does.
 			const fixedBlock = applyBuiltInValidationFixes(
 				{ ...block, attributes, originalContent: content },
 				blockType
