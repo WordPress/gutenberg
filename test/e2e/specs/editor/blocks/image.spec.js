@@ -335,18 +335,19 @@ test.describe( 'Image', () => {
 
 			await blockLibrary.getByRole( 'tab', { name: 'Media' } ).click();
 
+			// Each media source is a collapsible panel; open the Openverse one.
 			await blockLibrary
 				.getByRole( 'tabpanel', { name: 'Media' } )
-				.getByRole( 'tab', { name: 'Openverse' } )
+				.getByRole( 'button', { name: 'Openverse' } )
 				.click();
 		}
 
 		await openMediaTab();
 
-		// Drag the first image from the media library into the image block.
+		// Drag the first image from the media grid into the image block.
 		await blockLibrary
-			.getByRole( 'listbox', { name: 'Media List' } )
-			.getByRole( 'option' )
+			.getByRole( 'grid' )
+			.locator( '.block-editor-inserter__media-grid__preview' )
 			.first()
 			.dragTo( imageBlock, { steps: 3 } );
 
@@ -376,10 +377,10 @@ test.describe( 'Image', () => {
 
 		await openMediaTab();
 
-		// Drag the second image from the media library into the image block.
+		// Drag the second image from the media grid into the image block.
 		await blockLibrary
-			.getByRole( 'listbox', { name: 'Media List' } )
-			.getByRole( 'option' )
+			.getByRole( 'grid' )
+			.locator( '.block-editor-inserter__media-grid__preview' )
 			.nth( 1 )
 			.dragTo( imageBlock, { steps: 3 } );
 
