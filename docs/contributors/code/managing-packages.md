@@ -23,3 +23,7 @@ npm install-scripts ls              # list what is not covered yet
 npm install-scripts deny <pkg>      # the package works without its install script
 npm install-scripts approve <pkg>   # the script is required; approval is pinned to the reviewed version
 ```
+
+## Peer dependencies
+
+`.npmrc` sets `strict-peer-deps`, so a peer range conflict fails the install with `ERESOLVE`. When a third-party package declares a wrong or outdated peer range, repair its manifest in the root [`.npm-extension.mjs`](https://docs.npmjs.com/cli/configuring-npm/npm-extension) with a link to the upstream issue, and remove the repair once the fix is released.
