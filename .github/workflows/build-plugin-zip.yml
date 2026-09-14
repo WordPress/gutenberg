@@ -120,6 +120,8 @@ jobs:
             # the dependency tree before it can compute the next version.
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
+              with:
+                  cache: false
 
             - name: Compute old and new version
               id: get_version
@@ -249,12 +251,13 @@ jobs:
               uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
               with:
                   node-version-file: '.nvmrc'
-                  package-manager-cache: ${{ matrix.IS_GUTENBERG_PLUGIN && github.event_name == 'pull_request' && 'true' || 'false' }}
                   check-latest: true
                   package-manager-cache: false
 
             - name: Set up npm
               uses: ./.github/setup-npm
+              with:
+                  cache: ${{ matrix.IS_GUTENBERG_PLUGIN && github.event_name == 'pull_request' && 'true' || 'false' }}
 
             - name: Configure build for wordpress-develop
               if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
@@ -586,7 +589,6 @@ jobs:
                   package-manager-cache: false
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
-                  package-manager-cache: false
 
             - name: Set up npm
               uses: ./main/.github/setup-npm
