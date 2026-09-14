@@ -3699,7 +3699,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	/**
 	 * @covers WP_Theme_JSON_Gutenberg::remove_insecure_properties
 	 */
-	public function test_remove_insecure_properties_preserves_responsive_block_element_styles() {
+	public function test_remove_insecure_properties_strips_breakpoints_set_on_a_block_element() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -3729,6 +3729,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
+		// The breakpoints are dropped. Only the element's own styles remain.
 		$expected = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'styles'  => array(
@@ -3736,20 +3737,50 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'core/group' => array(
 						'elements' => array(
 							'link' => array(
-								'color'   => array(
+								'color' => array(
 									'text' => 'var(--wp--preset--color--dark-gray)',
 								),
-								'@mobile' => array(
-									'color' => array(
-										'text' => 'var(--wp--preset--color--dark-pink)',
-									),
-								),
-								'@tablet' => array(
-									'color' => array(
-										'text' => 'var(--wp--preset--color--dark-red)',
-									),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::remove_insecure_properties
+	 */
+	public function test_remove_insecure_properties_strips_breakpoints_set_on_a_top_level_element() {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'link' => array(
+							'color'   => array(
+								'text' => 'var:preset|color|dark-gray',
+							),
+							'@mobile' => array(
+								'color' => array(
+									'text' => 'var:preset|color|dark-pink',
 								),
 							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'elements' => array(
+					'link' => array(
+						'color' => array(
+							'text' => 'var(--wp--preset--color--dark-gray)',
 						),
 					),
 				),
