@@ -83,14 +83,6 @@ const commonProjectConfig = {
 			'packages/$1/src',
 	},
 	preset: require.resolve( '@wordpress/jest-preset-default' ),
-	setupFiles: [
-		'<rootDir>/test/unit/config/global-mocks.js',
-		'<rootDir>/test/unit/config/gutenberg-env.js',
-	],
-	setupFilesAfterEnv: [
-		'<rootDir>/test/unit/config/testing-library.js',
-		'<rootDir>/test/unit/mocks/match-media.js',
-	],
 	testLocationInResults: true,
 	testPathIgnorePatterns: [
 		'/\\.git($|/)',
@@ -103,16 +95,9 @@ const commonProjectConfig = {
 		'<rootDir>/.+\\.d\\.ts$',
 	],
 	resolver: '<rootDir>/test/unit/scripts/resolver.js',
-	transform: {
-		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
-	},
 	transformIgnorePatterns: [
 		`/node_modules/(?!(${ dependenciesToTransform.join( '|' ) })/)`,
 		'\\.pnp\\.[^\\/]+$',
-	],
-	snapshotSerializers: [
-		require.resolve( '@emotion/jest/serializer' ),
-		require.resolve( 'snapshot-diff/serializer' ),
 	],
 	snapshotFormat: {
 		escapeString: false,

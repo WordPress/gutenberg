@@ -134,6 +134,8 @@
 			gap: 0;
 			/* Keep every slot anchored to the label's first line. */
 			align-items: start;
+			/* Center a single line without shifting wrapped content. */
+			align-content: center;
 			justify-content: stretch;
 			min-width: 0;
 			min-height: var(--wp-ui-menu-item-height);

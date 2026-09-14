@@ -69,11 +69,18 @@ const TEST_TYPES = new Set( [ 'jest', 'gutenberg-test-env' ] );
  * A package exclude replaces the inherited one, so a build project that sets
  * its own must keep every dev-file pattern the base config excludes.
  */
-const baseConfigPath = resolve( repoRoot, 'tsconfig.base.json' );
+const baseConfigPath = fileURLToPath(
+	import.meta.resolve( '@wordpress/monorepo-tools/tsconfig/base.json' )
+);
+/*
+ * The base config anchors its patterns with `${configDir}` so each project
+ * excludes its own files. Package projects spell the same patterns relative to
+ * themselves, so drop that prefix before comparing.
+ */
 const REQUIRED_BUILD_EXCLUDES = existsSync( baseConfigPath )
-	? ( readTsconfig( baseConfigPath ).exclude ?? [] ).filter( ( pattern ) =>
-			/test|stories|story/.test( pattern )
-	  )
+	? ( readTsconfig( baseConfigPath ).exclude ?? [] )
+			.map( ( pattern ) => pattern.replace( /^\$\{configDir\}\//, '' ) )
+			.filter( ( pattern ) => /test|stories|story/.test( pattern ) )
 	: [];
 
 const packagesWithTypes = globSync( 'packages/*/tsconfig.json', {
@@ -92,8 +99,7 @@ const packagesWithTypes = globSync( 'packages/*/tsconfig.json', {
 function isDevProject( tsconfigPath ) {
 	const extended = readTsconfig( tsconfigPath ).extends;
 	return (
-		typeof extended === 'string' &&
-		basename( extended ) === 'tsconfig.dev.base.json'
+		typeof extended === 'string' && basename( extended ) === 'dev.base.json'
 	);
 }
 
