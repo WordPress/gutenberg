@@ -35,7 +35,7 @@ import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceEnabled,
+	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
 
 const MIN_TEXT_COLUMNS = 1;
@@ -256,7 +256,7 @@ export default function TypographyPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	isGlobalStyles = false,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 	contrastWarning,
 } ) {
 	const { colors, allColors, areCustomSolidsEnabled, decodeValue } =
