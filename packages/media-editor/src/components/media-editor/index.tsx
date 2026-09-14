@@ -308,7 +308,9 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 									<MenuItem
 										icon={ backup }
 										iconPosition="left"
-										disabled={ isOriginalRestored }
+										disabled={
+											isOriginalRestored || isSaving
+										}
 										info={ __(
 											'Discards all edits and loads the unedited file.'
 										) }
