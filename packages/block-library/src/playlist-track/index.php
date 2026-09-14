@@ -35,7 +35,7 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 	$title       = isset( $attributes['title'] ) && ! empty( $attributes['title'] ) ? $attributes['title'] : __( 'Unknown title' );
 
 	$html  = '<li ' . $wrapper_attributes . '>';
-	$html .= '<button data-wp-on--click="actions.changeTrack" data-wp-bind--aria-current="state.isCurrentTrack" class="wp-block-playlist-track__button">';
+	$html .= '<button data-wp-on--click="actions.changeTrack" data-wp-on--keydown="actions.moveFocusToTrack" data-wp-bind--aria-current="state.isCurrentTrack" data-wp-bind--tabindex="state.trackTabIndex" class="wp-block-playlist-track__button">';
 
 	if ( $show_images && $image ) {
 		$html .= '<img class="wp-block-playlist-track__image" src="' . esc_url( $image ) . '" alt="' . esc_attr( $alt ) . '" />';
