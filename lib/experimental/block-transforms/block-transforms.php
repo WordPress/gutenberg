@@ -1,174 +1,15 @@
 <?php
 /**
- * Block transforms declared in `block.json`, and the conversions that read them.
+ * Server-side conversions reading the block transforms declared in `block.json`.
+ *
+ * Getting the `transforms` field itself onto `WP_Block_Type`, to the editor and
+ * onto the REST API is a WordPress 7.2 change, backported in
+ * `lib/compat/wordpress-7.2/block-type-transforms.php`.
  *
  * See https://github.com/WordPress/gutenberg/issues/13163.
  *
  * @package gutenberg
  */
-
-/**
- * Passes a block type's `transforms` through to its server-side registration.
- *
- * `register_block_type_from_metadata()` copies a fixed list of `block.json`
- * fields onto the block type. This adds `transforms` to it for the WordPress
- * versions the plugin supports that do not copy the field themselves.
- *
- * @param array $settings Block type settings.
- * @param array $metadata Raw `block.json` metadata.
- * @return array Filtered block type settings.
- */
-function gutenberg_register_block_transforms_from_metadata( $settings, $metadata ) {
-	// Core copies the field itself once `WP_Block_Type` declares it.
-	if ( property_exists( 'WP_Block_Type', 'transforms' ) ) {
-		return $settings;
-	}
-
-	return gutenberg_add_declared_block_transforms( $settings, $metadata );
-}
-add_filter( 'block_type_metadata_settings', 'gutenberg_register_block_transforms_from_metadata', 10, 2 );
-
-/**
- * Adds a block's declared transforms to its registration settings.
- *
- * Settings passed to `register_block_type()` win over the declaration, as they
- * do for every field core reads from `block.json` itself: the arguments are
- * merged over the metadata before the filter this serves runs, so a transform
- * registered from PHP — one carrying an `isMatch` closure, say — is kept
- * rather than replaced by the declared list.
- *
- * @param array $settings Block type settings.
- * @param array $metadata Raw `block.json` metadata.
- * @return array Settings carrying the declared transforms, unless they already carried some.
- */
-function gutenberg_add_declared_block_transforms( $settings, $metadata ) {
-	if ( isset( $settings['transforms'] ) ) {
-		return $settings;
-	}
-
-	if ( isset( $metadata['transforms'] ) && is_array( $metadata['transforms'] ) ) {
-		$settings['transforms'] = $metadata['transforms'];
-	}
-
-	return $settings;
-}
-
-/**
- * Sends the transforms block types declare to the editor.
- *
- * `get_block_editor_server_block_settings()` picks a fixed list of block type
- * fields and offers no filter, so the field travels in a bootstrap call of its
- * own. The block store keeps the definition it already has and takes only what
- * it lacks from a later call, which leaves everything core sent untouched. A
- * core that declares `WP_Block_Type::$transforms` sends the field in its own
- * bootstrap, so this one is skipped rather than shipping the payload twice.
- *
- * @return void
- */
-function gutenberg_bootstrap_block_transforms() {
-	if ( property_exists( 'WP_Block_Type', 'transforms' ) ) {
-		return;
-	}
-
-	$definitions = array();
-
-	foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $block_type ) {
-		if ( ! empty( $block_type->transforms ) && is_array( $block_type->transforms ) ) {
-			$definitions[ $block_type->name ] = array(
-				'transforms' => gutenberg_prepare_transforms_for_editor( $block_type->transforms ),
-			);
-		}
-	}
-
-	if ( empty( $definitions ) ) {
-		return;
-	}
-
-	wp_add_inline_script(
-		'wp-blocks',
-		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( $definitions, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ');'
-	);
-}
-add_action( 'enqueue_block_editor_assets', 'gutenberg_bootstrap_block_transforms' );
-
-/**
- * Keeps the parts of a block type's transforms the editor can read.
- *
- * A block registered from PHP may attach `isMatch` and `transform` callables,
- * which JSON cannot express: `wp_json_encode()` writes a closure as `{}`, and
- * the editor, handed `{}` where it expects a function, would throw on every
- * paste. The callables stay server-side, where they run; only data travels.
- *
- * @param array $transforms Transforms declaration.
- * @return array The declaration with everything JSON cannot express removed.
- */
-function gutenberg_prepare_transforms_for_editor( $transforms ) {
-	foreach ( array( 'from', 'to' ) as $direction ) {
-		if ( ! isset( $transforms[ $direction ] ) || ! is_array( $transforms[ $direction ] ) ) {
-			continue;
-		}
-
-		foreach ( $transforms[ $direction ] as $at => $transform ) {
-			if ( ! is_array( $transform ) ) {
-				continue;
-			}
-
-			/*
-			 * An `enter`, `files` or `prefix` transform is nothing without
-			 * its `transform` function, and a function cannot travel: sending
-			 * the husk would leave editor code that calls it unguarded — the
-			 * file-drop handler, the input rules — holding a non-function.
-			 */
-			if ( isset( $transform['type'] ) && in_array( $transform['type'], array( 'enter', 'files', 'prefix' ), true ) ) {
-				unset( $transforms[ $direction ][ $at ] );
-				continue;
-			}
-
-			unset( $transform['isMatch'], $transform['transform'] );
-
-			// A schema can only be declared as an object; a string names a
-			// PHP callable, which stays server-side like the rest.
-			if ( isset( $transform['schema'] ) && is_string( $transform['schema'] ) ) {
-				unset( $transform['schema'] );
-			}
-
-			// A `shortcode` reader on an attribute definition is the
-			// JavaScript API's function spelling; declared attributes use
-			// `source` instead.
-			if ( isset( $transform['attributes'] ) && is_array( $transform['attributes'] ) ) {
-				foreach ( $transform['attributes'] as $name => $definition ) {
-					if ( is_array( $definition ) ) {
-						unset( $transform['attributes'][ $name ]['shortcode'] );
-					}
-				}
-			}
-
-			$transforms[ $direction ][ $at ] = gutenberg_remove_transform_objects( $transform );
-		}
-
-		$transforms[ $direction ] = array_values( $transforms[ $direction ] );
-	}
-
-	return $transforms;
-}
-
-/**
- * Removes the object values JSON cannot carry from transform data.
- *
- * @param array $value Transform data.
- * @return array The data without objects or closures.
- */
-function gutenberg_remove_transform_objects( $value ) {
-	foreach ( $value as $key => $entry ) {
-		if ( is_object( $entry ) ) {
-			unset( $value[ $key ] );
-		} elseif ( is_array( $entry ) ) {
-			$value[ $key ] = gutenberg_remove_transform_objects( $entry );
-		}
-	}
-
-	return $value;
-}
 
 /**
  * Reports which blocks a server-side conversion can produce.
@@ -247,6 +88,15 @@ function gutenberg_get_block_conversion_support() {
  * every registered block type, mirroring `rawHandler()` in the editor. Markup
  * no block claims is preserved in a Custom HTML block rather than guessed at.
  *
+ * The result is not sanitized. A block's content is reduced to what its
+ * transform's schema allows, as a paste is, which drops an `onclick` along
+ * the way; but a `javascript:` URL the schema keeps is kept, and a `<script>`
+ * no block claims is kept whole in a Custom HTML block. Content from a source
+ * that is not trusted, or converted on behalf of a user without
+ * `unfiltered_html`, needs the filtering a save applies: `wp_insert_post()`
+ * runs it for the current user, and `wp_kses_post()` does the same where
+ * there is none, as in a WP-CLI command or a cron job.
+ *
  * @param string $html HTML to convert.
  * @return array[] Parsed block arrays, in the shape returned by `parse_blocks()`.
  */
@@ -256,6 +106,9 @@ function gutenberg_html_to_blocks( $html ) {
 
 /**
  * Converts HTML into serialized block markup.
+ *
+ * The markup is not sanitized; see `gutenberg_html_to_blocks()` for what the
+ * caller owes it before storing it.
  *
  * @param string $html HTML to convert.
  * @return string Block markup, ready to store as post content.
@@ -273,6 +126,9 @@ function gutenberg_html_to_block_markup( $html ) {
  * A transform produces the target block's attributes, not its saved markup, which
  * only its JavaScript `save()` can generate. Conversion is refused for a target
  * that saves markup, and allowed for one that renders on the server.
+ *
+ * Attribute values read from the source blocks travel as they are; nothing is
+ * sanitized here, as `gutenberg_html_to_blocks()` describes.
  *
  * @param array[]|array $blocks      Parsed block array, or a list of them.
  * @param string        $target_name Name of the block type to convert to.

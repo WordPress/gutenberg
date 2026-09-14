@@ -532,7 +532,7 @@ Transforms describe how a block converts to and from other content. They have al
 
 Declaring them here instead means the editor and PHP read the same definition. That makes server-side conversion possible — during an import, in WP-CLI, or from any code holding HTML that wants block markup — and it works for every registered block, including third-party ones, without their shipping any conversion code.
 
-The editor reads a declared transform wherever `@wordpress/blocks` is new enough. Reading one in PHP, and the server-side conversion built on it, currently need the Gutenberg plugin: WordPress does not yet copy `transforms` onto a block type registered from `block.json`, nor send it to the editor.
+The editor reads a declared transform wherever `@wordpress/blocks` is new enough. Reading one in PHP, and the server-side conversion built on it, currently need the Gutenberg plugin: WordPress does not yet copy `transforms` onto a block type registered from `block.json`, send it to the editor, or expose it on the block types REST endpoint, so the plugin fills in all three until it does.
 
 Three kinds of transform are read: `raw`, which matches markup, `block`, which matches another block type, and `shortcode`, which matches a shortcode.
 

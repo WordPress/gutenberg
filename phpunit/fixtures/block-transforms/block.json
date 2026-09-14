@@ -1,0 +1,23 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "test/declared-transforms",
+	"title": "Declared transforms",
+	"category": "text",
+	"attributes": {
+		"content": {
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": "aside"
+		}
+	},
+	"transforms": {
+		"from": [
+			{
+				"type": "raw",
+				"selector": "aside",
+				"priority": 2
+			}
+		]
+	}
+}

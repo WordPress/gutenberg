@@ -3458,36 +3458,20 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		$this->assertSame( 'core/shortcode', $blocks[0]['blockName'] );
 	}
 
-	public function test_keeps_transforms_registered_from_php_over_declared_ones() {
-		$registered = array(
-			'from' => array(
-				array(
-					'type'     => 'raw',
-					'selector' => 'aside',
-					'isMatch'  => static function () {
-						return true;
-					},
-				),
-			),
-		);
-		$declared   = array(
-			'from' => array(
-				array(
-					'type'     => 'raw',
-					'selector' => 'aside',
-				),
-			),
-		);
+	public function test_leaves_sanitization_to_the_caller() {
+		// A block's content is reduced to what its transform's schema allows,
+		// as a paste is, which drops an event handler along the way...
+		$blocks = gutenberg_html_to_blocks( '<p onclick="a()">Hi <a href="javascript:b()" onclick="c()">there</a></p>' );
 
-		// The arguments passed to `register_block_type()` are merged over the
-		// metadata before the filter runs, as they are for every other field.
-		$settings = gutenberg_add_declared_block_transforms( array( 'transforms' => $registered ), array( 'transforms' => $declared ) );
+		$this->assertSame( 'core/paragraph', $blocks[0]['blockName'] );
+		// ...but a URL the schema keeps is kept as it came.
+		$this->assertSame( '<p>Hi <a href="javascript:b()">there</a></p>', $blocks[0]['innerHTML'] );
 
-		$this->assertSame( $registered, $settings['transforms'] );
+		// Markup no block claims is kept whole, script included.
+		$blocks = gutenberg_html_to_blocks( '<div><script>alert(1)</script><p>After</p></div>' );
 
-		$settings = gutenberg_add_declared_block_transforms( array(), array( 'transforms' => $declared ) );
-
-		$this->assertSame( $declared, $settings['transforms'] );
+		$this->assertSame( 'core/html', $blocks[0]['blockName'] );
+		$this->assertSame( '<div><script>alert(1)</script><p>After</p></div>', $blocks[0]['innerHTML'] );
 	}
 
 	public function test_compiles_a_provider_pattern_escaping_its_own_hash() {
