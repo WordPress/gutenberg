@@ -13,6 +13,8 @@ import {
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import useRegistry from '../registry-provider/use-registry';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
+import { trackReads } from '../../utils/track-state';
+import type { PathsByStore } from '../../utils/track-state';
 import type {
 	MapSelect,
 	SelectFunction,
@@ -20,6 +22,7 @@ import type {
 	AnyConfig,
 	UseSelectReturn,
 	DataRegistry,
+	SubscriptionDeps,
 } from '../../types';
 
 const renderQueue = createQueue();
@@ -49,6 +52,7 @@ function warnOnUnstableReference(
 interface StoreSubscriber {
 	subscribe: ( listener: () => void ) => () => void;
 	updateStores: ( newStores: string[] ) => void;
+	setPaths: ( paths: PathsByStore ) => void;
 }
 
 function Store( registry: DataRegistry, suspense: boolean ) {
@@ -80,6 +84,23 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 		// be called multiple times to establish multiple subscriptions. That's why we need to
 		// keep a set of active subscriptions;
 		const activeSubscriptions = new Set< ( storeName: string ) => void >();
+
+		// The state paths the last `mapSelect` run read, per store. The
+		// store only calls the listener when one of them changed.
+		const depsByStore = new Map< string, SubscriptionDeps >();
+		function getDeps( storeName: string ): SubscriptionDeps {
+			let deps = depsByStore.get( storeName );
+			if ( ! deps ) {
+				deps = { paths: null };
+				depsByStore.set( storeName, deps );
+			}
+			return deps;
+		}
+		function setPaths( paths: PathsByStore ) {
+			for ( const storeName of activeStores ) {
+				getDeps( storeName ).paths = paths.get( storeName ) ?? null;
+			}
+		}
 
 		function subscribe( listener: () => void ): () => void {
 			// Maybe invalidate the value right after subscription was created.
@@ -117,7 +138,13 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 
 			const unsubs: Array< VoidFunction > = [];
 			function subscribeStore( storeName: string ) {
-				unsubs.push( registry.subscribe( onChange, storeName ) );
+				unsubs.push(
+					registry.subscribe(
+						onChange,
+						storeName,
+						getDeps( storeName )
+					)
+				);
 			}
 
 			for ( const storeName of activeStores ) {
@@ -155,7 +182,7 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 			}
 		}
 
-		return { subscribe, updateStores };
+		return { subscribe, updateStores, setPaths };
 	};
 
 	return ( mapSelect: MapSelect, isAsync: boolean ) => {
@@ -168,14 +195,18 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 			}
 
 			const listeningStores = { current: null as string[] | null };
-			const mapResult = registry.__unstableMarkListeningStores(
-				() => mapSelect( select, registry ),
-				listeningStores
+			const { result: mapResult, paths } = trackReads( () =>
+				registry.__unstableMarkListeningStores(
+					() => mapSelect( select, registry ),
+					listeningStores
+				)
 			);
 
 			if ( ( globalThis as any ).SCRIPT_DEBUG ) {
 				if ( ! didWarnUnstableReference ) {
-					const secondMapResult = mapSelect( select, registry );
+					const { result: secondMapResult } = trackReads( () =>
+						mapSelect( select, registry )
+					);
 					if ( ! isShallowEqual( mapResult, secondMapResult ) ) {
 						warnOnUnstableReference( mapResult, secondMapResult );
 						didWarnUnstableReference = true;
@@ -191,6 +222,7 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 			} else {
 				subscriber.updateStores( listeningStores.current! );
 			}
+			subscriber.setPaths( paths );
 
 			// If the new value is shallow-equal to the old one, keep the old one so
 			// that we don't trigger unwanted updates that do a `===` check.
