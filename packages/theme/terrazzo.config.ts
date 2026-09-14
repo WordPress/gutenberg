@@ -1,12 +1,12 @@
 import { defineConfig, type Config } from '@terrazzo/parser';
 import pluginCSS from '@terrazzo/plugin-css';
 import { makeCSSVar } from '@terrazzo/token-tools/css';
-import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index';
-import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
-import pluginDsTokenFallbacks from './bin/terrazzo-plugin-ds-token-fallbacks/index';
-import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index';
-import typescriptTypes from './bin/terrazzo-plugin-typescript-types/index';
-import { SEMANTIC_COLOR_CONTRAST_PAIRS } from './src/semantic-color-contrast-pairs';
+import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index.ts';
+import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index.ts';
+import pluginDsTokenFallbacks from './bin/terrazzo-plugin-ds-token-fallbacks/index.ts';
+import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index.ts';
+import typescriptTypes from './bin/terrazzo-plugin-typescript-types/index.ts';
+import { SEMANTIC_COLOR_CONTRAST_PAIRS } from './src/semantic-color-contrast-pairs.ts';
 
 const cornerRadiusPermutations = [
 	'none',

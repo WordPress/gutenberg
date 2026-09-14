@@ -832,6 +832,14 @@ class WP_Navigation_Block_Renderer {
 			$responsive_container_content_directives = '
 				data-wp-watch="callbacks.focusFirstElement"
 			';
+
+			// The default overlay displays every submenu it contains; a custom overlay
+			// opts out through the `disable-default-overlay` class on this container.
+			// Submenus inherit this flag to tell the two apart, derived from the same
+			// value as that class so the markup and the styles cannot disagree.
+			if ( $has_custom_overlay ) {
+				$responsive_container_directives .= ' ' . wp_interactivity_data_wp_context( array( 'hasCustomOverlay' => true ) );
+			}
 		}
 
 		// Don't apply overlay inline styles if using a custom overlay template part.
