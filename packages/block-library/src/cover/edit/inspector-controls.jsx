@@ -110,6 +110,7 @@ export default function CoverInspectorControls( {
 	updateDimRatio,
 	onClearMedia,
 	featuredImage,
+	isSelected,
 } ) {
 	const {
 		useFeaturedImage,
@@ -347,7 +348,7 @@ export default function CoverInspectorControls( {
 
 	return (
 		<>
-			{ mediaInspectorPanel }
+			{ isSelected && mediaInspectorPanel }
 			{ ( !! url || useFeaturedImage ) && (
 				<InspectorControls>
 					<ToolsPanel

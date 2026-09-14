@@ -709,6 +709,7 @@ function CoverEdit( {
 			updateDimRatio={ onUpdateDimRatio }
 			onClearMedia={ onClearMedia }
 			featuredImage={ media }
+			isSelected={ isSelected }
 		/>
 	);
 
