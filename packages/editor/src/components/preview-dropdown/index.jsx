@@ -31,6 +31,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 		isViewable,
 		showIconLabels,
 		isTemplateHidden,
+		hasRenderingMode,
 		templateId,
 		isResponsiveEditing,
 		isResponsiveEditingEnabled,
@@ -64,6 +65,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 			isViewable: getPostType( _currentPostType )?.viewable ?? false,
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isTemplateHidden: getRenderingMode() === 'post-only',
+			hasRenderingMode: !! getEditorSettings().renderingMode,
 			templateId: getCurrentTemplateId(),
 			isResponsiveEditing: _isResponsiveEditing(),
 			isResponsiveEditingEnabled:
@@ -229,7 +231,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 						</Menu.Group>
 					</>
 				) }
-				{ ! isTemplate && !! templateId && (
+				{ ! isTemplate && !! templateId && ! hasRenderingMode && (
 					<>
 						<Menu.Separator />
 						<Menu.Group>

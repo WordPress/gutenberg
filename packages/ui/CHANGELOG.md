@@ -2,6 +2,27 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `CheckboxGroup` form primitive ([#82556](https://github.com/WordPress/gutenberg/pull/82556)).
+
+### Enhancements
+
+-   `Fieldset`: Use a tighter gap between the legend and an immediately following description or details ([#82729](https://github.com/WordPress/gutenberg/pull/82729)).
+-   `Checkbox`: Enlarge the hit target to 24px without changing the visual size. ([#82597](https://github.com/WordPress/gutenberg/pull/82597))
+-   `SearchableChipSelect`, `SearchableChipSelectControl`, `SearchableSelect`: Add `statusContent` for the list status live region. The region stays mounted. Use it for async loading. Use `emptyContent` for the empty list. ([#82592](https://github.com/WordPress/gutenberg/pull/82592))
+-   `Autocomplete`, `Combobox`, `SearchableChipSelect`, `SearchableChipSelectControl`, `SearchableSelect`: Export a `useFilteredItems` hook that returns the client-side filtered item list, for result-count status. ([#82592](https://github.com/WordPress/gutenberg/pull/82592))
+
+### Bug Fixes
+
+-   `Menu`: vertically center single-line item labels while preserving first-line alignment for wrapped content. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
+
+### Internal
+
+-   Run UI interaction tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
+## 0.22.0 (2026-09-10)
+
 ### Breaking Changes
 
 -   `SearchableSelect`, `SearchableChipSelect`, and `SearchableChipSelectControl`: Hide the creatable footer when the create action is not in the filtered results. It still renders in the footer (not the main list) when it remains in `items` and matches the query. To keep a create action after an unmatched query, keep that item in `items` with a label or `filter` that matches ([#82566](https://github.com/WordPress/gutenberg/pull/82566)).
@@ -12,7 +33,6 @@
 
 ### New Features
 
--   Add `CheckboxGroup` form primitive ([#82556](https://github.com/WordPress/gutenberg/pull/82556)).
 -   Add `CheckboxControl` component ([#82213](https://github.com/WordPress/gutenberg/pull/82213)).
 -   Add `Radio` form primitive ([#82214](https://github.com/WordPress/gutenberg/pull/82214)).
 -   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
@@ -22,7 +42,6 @@
 
 ### Enhancements
 
--   `Fieldset`: Use a tighter gap between the legend and an immediately following description or details ([#82729](https://github.com/WordPress/gutenberg/pull/82729)).
 -   `Select.Popup`: Put overflow on `Select.List` instead of a nested wrapper, so the listbox is the scroll container. ([#82470](https://github.com/WordPress/gutenberg/pull/82470))
 -   Compound components: Throw clear development errors when required parent context is missing ([#82510](https://github.com/WordPress/gutenberg/pull/82510)).
 -   Give input fields and checkboxes solid, state-aware themed backgrounds while keeping minimal Select triggers transparent. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))

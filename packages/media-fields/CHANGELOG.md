@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.20.0 (2026-09-10)
+
 ### Bug Fixes
 
 -   `author`: Drop the custom `sort` callback, which read `_embedded.author` from the arguments although `Field.sort` receives the field values (the author ids), so every comparison returned `0` and in-memory sorting by author was a no-op. The field now sorts by author id through the `integer` type, matching the order the REST API returns for `orderby=author` ([#82559](https://github.com/WordPress/gutenberg/pull/82559)).
