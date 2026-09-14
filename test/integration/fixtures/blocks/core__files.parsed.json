@@ -1,0 +1,39 @@
+[
+	{
+		"blockName": "core/files",
+		"attrs": {},
+		"innerBlocks": [
+			{
+				"blockName": "core/file",
+				"attrs": {
+					"href": "http://localhost:8888/wp-content/uploads/2018/05/report.pdf",
+					"displayPreview": false
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n<div class=\"wp-block-file\"><a id=\"wp-block-file--media-_clientId_0\" href=\"http://localhost:8888/wp-content/uploads/2018/05/report.pdf\">report</a><a href=\"http://localhost:8888/wp-content/uploads/2018/05/report.pdf\" class=\"wp-block-file__button wp-element-button\" download aria-describedby=\"wp-block-file--media-_clientId_0\">Download</a></div>\n",
+				"innerContent": [
+					"\n<div class=\"wp-block-file\"><a id=\"wp-block-file--media-_clientId_0\" href=\"http://localhost:8888/wp-content/uploads/2018/05/report.pdf\">report</a><a href=\"http://localhost:8888/wp-content/uploads/2018/05/report.pdf\" class=\"wp-block-file__button wp-element-button\" download aria-describedby=\"wp-block-file--media-_clientId_0\">Download</a></div>\n"
+				]
+			},
+			{
+				"blockName": "core/file",
+				"attrs": {
+					"href": "http://localhost:8888/wp-content/uploads/2018/05/notes.txt"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n<div class=\"wp-block-file\"><a id=\"wp-block-file--media-_clientId_1\" href=\"http://localhost:8888/wp-content/uploads/2018/05/notes.txt\">notes</a><a href=\"http://localhost:8888/wp-content/uploads/2018/05/notes.txt\" class=\"wp-block-file__button wp-element-button\" download aria-describedby=\"wp-block-file--media-_clientId_1\">Download</a></div>\n",
+				"innerContent": [
+					"\n<div class=\"wp-block-file\"><a id=\"wp-block-file--media-_clientId_1\" href=\"http://localhost:8888/wp-content/uploads/2018/05/notes.txt\">notes</a><a href=\"http://localhost:8888/wp-content/uploads/2018/05/notes.txt\" class=\"wp-block-file__button wp-element-button\" download aria-describedby=\"wp-block-file--media-_clientId_1\">Download</a></div>\n"
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-files\">\n\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-files\">",
+			null,
+			"\n\n",
+			null,
+			"</div>\n"
+		]
+	}
+]
