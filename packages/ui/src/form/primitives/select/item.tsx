@@ -62,9 +62,9 @@ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
 					) }
 					size={ size === 'small' ? 20 : 24 }
 				/>
-				<span className={ itemPopupStyles[ 'item-text' ] }>
+				<div className={ itemPopupStyles[ 'item-text' ] }>
 					{ contentChildren }
-				</span>
+				</div>
 			</_Select.Item>
 		);
 	}

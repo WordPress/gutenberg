@@ -447,6 +447,30 @@ describe( 'Select', () => {
 		);
 	} );
 
+	it( 'renders the default item label as a div in a div grouping box', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Select.Root>
+				<Select.Trigger />
+				<Select.Popup>
+					<Select.Item value="apple">
+						<Select.ItemLabel>Apple</Select.ItemLabel>
+					</Select.Item>
+				</Select.Popup>
+			</Select.Root>
+		);
+
+		await user.click( screen.getByRole( 'combobox' ) );
+
+		const item = await screen.findByRole( 'option', { name: 'Apple' } );
+		expect( item ).toBeVisible();
+
+		const label = screen.getByText( 'Apple' );
+		expect( label.tagName ).toBe( 'DIV' );
+		expect( label.parentElement?.tagName ).toBe( 'DIV' );
+	} );
+
 	it( 'keeps ItemDescription out of the trigger', async () => {
 		const user = userEvent.setup();
 		const items = [ { value: 'apple', label: 'Apple' } ];

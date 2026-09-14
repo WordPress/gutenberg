@@ -77,7 +77,7 @@ export type SelectPopupProps = ComponentProps< typeof _Select.Popup > &
 		positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
 	};
 
-export interface SelectItemLabelProps extends ComponentProps< 'span' > {
+export interface SelectItemLabelProps extends ComponentProps< 'div' > {
 	/**
 	 * The primary label for a select item. Use as the first direct child of
 	 * every select item. The trigger label still comes from the selected
