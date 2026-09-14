@@ -208,7 +208,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'External link',
-				intent: 'draft',
+				intent: 'none',
 			} );
 		} );
 
@@ -233,7 +233,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Internal link',
-				intent: 'draft',
+				intent: 'none',
 			} );
 		} );
 
@@ -375,7 +375,7 @@ it( 'should show "Internal link" badge for hash links even when type is present'
 	// Should prioritize hash link detection over type
 	expect( badges ).toContainEqual( {
 		label: 'Internal link',
-		intent: 'draft',
+		intent: 'none',
 	} );
 	// Should NOT show Page badge
 	expect( badges ).not.toContainEqual( {
@@ -420,7 +420,7 @@ test.each( [
 		// Should prioritize external link detection over type
 		expect( badges ).toContainEqual( {
 			label: 'External link',
-			intent: 'draft',
+			intent: 'none',
 		} );
 		// Should NOT show Page badge
 		expect( badges ).not.toContainEqual( {
@@ -445,7 +445,7 @@ it( 'should show "Page" badge for internal custom links', () => {
 	// Should NOT show Custom badge
 	expect( badges ).not.toContainEqual( {
 		label: 'Custom',
-		intent: 'draft',
+		intent: 'none',
 	} );
 } );
 

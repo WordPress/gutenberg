@@ -131,14 +131,14 @@ export function computeBadges( {
 		if ( isExternal ) {
 			badges.push( {
 				label: __( 'External link' ),
-				intent: 'draft',
+				intent: 'none',
 			} );
 		} else if ( isHashLink( url ) ) {
 			// Hash links should be detected before type check
 			// because they're not entity links even if type is set
 			badges.push( {
 				label: __( 'Internal link' ),
-				intent: 'draft',
+				intent: 'none',
 			} );
 		} else if ( isHomepage( url, homeUrl ) ) {
 			badges.push( {
@@ -176,7 +176,7 @@ export function computeBadges( {
 			future: { label: __( 'Scheduled' ), intent: 'informational' },
 			draft: { label: __( 'Draft' ), intent: 'low' },
 			pending: { label: __( 'Pending' ), intent: 'low' },
-			private: { label: __( 'Private' ), intent: 'draft' },
+			private: { label: __( 'Private' ), intent: 'none' },
 			trash: { label: __( 'Trashed' ), intent: 'high' },
 		};
 		const badge = statusMap[ entityStatus ];
