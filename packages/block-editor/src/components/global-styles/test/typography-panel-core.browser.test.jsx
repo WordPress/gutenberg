@@ -62,7 +62,7 @@ const getItem = ( name ) => {
 	return control.closest( '.components-tools-panel-item' );
 };
 
-describe( 'TypographyPanel — experiment off', () => {
+describe( 'TypographyPanel with the indicator experiment off', () => {
 	// `showInheritanceLabelIndicators` defaults to the experiment flag, so a
 	// caller that passes no prop gets no inheritance treatment. The layout
 	// className must still come through.
@@ -114,6 +114,33 @@ describe( 'TypographyPanel — experiment off', () => {
 		expect(
 			screen.getByRole( 'button', { name: /^reset$/i } )
 		).toBeInTheDocument();
+	} );
+
+	// The point of the change: the value reaches the control for everyone,
+	// while every part of the indicator treatment stays behind the experiment.
+	it( 'shows the inherited value on the control and no inheritance treatment', async () => {
+		await renderPanel( {
+			value: {},
+			inheritedValue: { typography: { lineHeight: '1.5' } },
+			showInheritanceLabelIndicators: false,
+		} );
+
+		expect(
+			screen.getByRole( 'spinbutton', { name: /line height/i } )
+		).toHaveValue( 1.5 );
+
+		const lineHeightItem = getItem( /line height/i );
+		expect( lineHeightItem ).not.toHaveClass(
+			'is-inherited-from-global-styles'
+		);
+		expect( lineHeightItem ).not.toHaveClass(
+			'has-local-override-from-global-styles'
+		);
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Reset to inherited value',
+			} )
+		).not.toBeInTheDocument();
 	} );
 } );
 
