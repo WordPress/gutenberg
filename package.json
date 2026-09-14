@@ -99,28 +99,6 @@
 		"syncpack": "^15.3.1",
 		"wait-on": "^8.0.1"
 	},
-	"overrides": {
-		"jsdom": "26.1.0",
-		"sockjs": {
-			"uuid": "^11.1.1"
-		},
-		"lerna": {
-			"js-yaml": "4.3.2",
-			"pacote": "21.5.1"
-		},
-		"@y/websocket-server": {
-			"yjs": "npm:@y/y@^14.0.0-rc.7"
-		},
-		"eslint-plugin-import": {
-			"eslint": "^10.0.0"
-		},
-		"eslint-plugin-jsx-a11y": {
-			"eslint": "^10.0.0"
-		},
-		"eslint-plugin-react": {
-			"eslint": "^10.0.0"
-		}
-	},
 	"scripts": {
 		"agents:setup": "npm run --workspace @wordpress/agent-tools setup --",
 		"build": "npm run --workspace @wordpress/build-scripts build:all --",

@@ -28,3 +28,7 @@ When an install fails that way, read the script, then edit `allowScripts` by han
 ```
 
 Do not use the `npm install-scripts` subcommands until an npm release ships [npm/cli#9941](https://github.com/npm/cli/pull/9941). All of them read the hoisted layout, so under `install-strategy=linked` they misbehave: `ls` reports covered packages as uncovered, `prune` deletes every entry as unused, and `approve` and `deny` write unusable `node_modules/.store` paths instead of the package name.
+
+## Peer dependencies
+
+`.npmrc` sets `strict-peer-deps`, so a peer range conflict fails the install with `ERESOLVE`. When a third-party package declares a wrong or outdated peer range, repair its manifest in the root [`.npm-extension.mjs`](https://docs.npmjs.com/cli/configuring-npm/npm-extension) with a link to the upstream issue, and remove the repair once the fix is released.
