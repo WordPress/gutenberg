@@ -2,6 +2,7 @@ import border from './border';
 import color from './color';
 import dimensions from './dimensions';
 import background from './background';
+import backdropFilter from './backdrop-filter';
 import shadow from './shadow';
 import outline from './outline';
 import spacing from './spacing';
@@ -16,4 +17,5 @@ export const styleDefinitions = [
 	...typography,
 	...shadow,
 	...background,
+	...backdropFilter,
 ];
