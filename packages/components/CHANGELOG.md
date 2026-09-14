@@ -21,7 +21,7 @@
 
 ### Internal
 
--   Update Ariakit to 0.4.39 and run synthetic keyboard click coverage in Browser Mode ([#82831](https://github.com/WordPress/gutenberg/pull/82831)).
+-   Update Ariakit to 0.4.39 and run affected interaction coverage in Browser Mode ([#82831](https://github.com/WordPress/gutenberg/pull/82831)).
 -   `Notice`: Remove dismiss button style overrides that now duplicate `Button` defaults, and drop an unused Sass import ([#82640](https://github.com/WordPress/gutenberg/pull/82640)).
 -   Run Components interaction tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
 
