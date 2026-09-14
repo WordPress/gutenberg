@@ -347,11 +347,10 @@ const baselineJestInfrastructure = new Set(
 );
 // These are the existing empty Jest partition under its explicit compatibility
 // name. Keep the public runner through scripts 36.x and the release gate in
-// packages/scripts/docs/vitest-migration.md. Do not allow other Jest additions.
+// test/unit/VITEST_MIGRATION.md. Do not allow other Jest additions.
 const retainedJestCommands = new Set( [
 	'command:package.json:scripts.test:unit:jest=npm run --workspace @wordpress/unit-tests test:unit:jest --',
 	'command:test/unit/package.json:scripts.test:unit:jest=wp-scripts test-unit-jest --config jest.config.js',
-	'command:.github/workflows/unit-test.yml=npm run test:unit:jest -- --ci --maxWorkers="$(nproc)" --shard="$SHARD" --cacheDirectory="$HOME/.jest-cache" --passWithNoTests',
 ] );
 const addedJestInfrastructure = currentJestInfrastructure.filter(
 	( entry ) =>

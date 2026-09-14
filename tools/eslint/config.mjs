@@ -548,6 +548,8 @@ export default dedupePlugins( [
 			'testing-library/prefer-screen-queries': 'off',
 		},
 	},
+	// Keep the repository's existing rule set during the runner migration.
+	// Adopting the public Vitest rules requires a separate suite-wide lint migration.
 	{
 		plugins: jestPlugin.configs[ 'flat/recommended' ].plugins,
 		files: vitestTestPatterns,
@@ -568,8 +570,8 @@ export default dedupePlugins( [
 	},
 
 	// Override: Jest test files (unit tests).
-	...[ jestPlugin.configs[ 'flat/recommended' ] ].map( ( config ) => ( {
-		...config,
+	{
+		...jestPlugin.configs[ 'flat/recommended' ],
 		files: [
 			'packages/jest*/**/*.js',
 			'**/test/**/*.{js,jsx}',
@@ -580,7 +582,7 @@ export default dedupePlugins( [
 			'test/performance/**/*.js',
 			...vitestTestPatterns,
 		],
-	} ) ),
+	},
 
 	// Override: Test files — jest-dom, testing-library, jest recommended.
 	{
@@ -1036,10 +1038,10 @@ export default dedupePlugins( [
 
 	// From packages/block-serialization-spec-parser/.eslintrc.json:
 	// Add test-unit config for shared-tests.js with jest/no-export off.
-	...[ jestPlugin.configs[ 'flat/recommended' ] ].map( ( config ) => ( {
-		...config,
+	{
+		...jestPlugin.configs[ 'flat/recommended' ],
 		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
-	} ) ),
+	},
 	{
 		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
 		rules: {

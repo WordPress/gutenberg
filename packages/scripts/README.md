@@ -446,8 +446,7 @@ This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll l
 
 ### `test-unit-js`
 
-Runs the consumer's installed [Vitest](https://vitest.dev/) once. Install Vitest
-and Vite in the project that owns the tests:
+Runs the consumer's installed [Vitest](https://vitest.dev/) once. Install Vitest and Vite in the project that owns the tests:
 
 ```sh
 npm install --save-dev vitest@^5 vite@^8
@@ -465,33 +464,39 @@ npm install --save-dev vitest@^5 vite@^8
 }
 ```
 
-The default environment is Node. Vitest APIs must be imported explicitly.
-Vitest discovers `*.test.*` and `*.spec.*` files. A file named `test/index.js`
-needs renaming or an explicit `test.include` pattern in the consumer config.
+The default environment is Node. Vitest APIs must be imported explicitly. Vitest discovers `*.test.*` and `*.spec.*` files. A file named `test/index.js` needs renaming or an explicit `test.include` pattern in the consumer config.
 
-Vitest discovers `vitest.config.*`, then `vite.config.*`, in the current working
-directory. A Vitest config takes precedence over a Vite config; it does not
-merge the two automatically. Use `--config path/to/config.mjs` to select another
-file. ESM and TypeScript configs use Vite's config loader. Jest config
-files and the `jest` field in `package.json` do not configure this command.
+Vitest discovers `vitest.config.*`, then `vite.config.*`, in the current working directory. A Vitest config takes precedence over a Vite config; it does not merge the two automatically. Use `--config path/to/config.mjs` to select another file. ESM and TypeScript configs use Vite's config loader. Jest config files and the `jest` field in `package.json` do not configure this command.
 
-`@wordpress/scripts` supplies no Vitest preset, shared setup, DOM environment,
-React transform, aliases, console assertions, or CSS mocks. See the
-[consumer migration guide](./docs/vitest-migration.md) for tested Node, jsdom,
-and Browser Mode examples, dependencies, and support ranges.
+`@wordpress/scripts` supplies no Vitest preset, shared setup, DOM environment, React transform, aliases, console assertions, or CSS mocks. See the [consumer migration guide](./docs/vitest-migration.md) for tested Node, jsdom, and Browser Mode examples, dependencies, and support ranges.
 
 ### `test-unit-jest`
 
-Deprecated compatibility command. It continues to run the bundled Jest with
-`@wordpress/jest-preset-default`. It accepts an explicit `--config` and discovers
-`jest-unit.config.js`, `jest.config.js`, `jest.config.json`, `jest.config.ts`, or
-the `jest` field in `package.json`. It is no longer an alias of `test-unit-js`.
+Deprecated compatibility command. It continues to run the bundled Jest with `@wordpress/jest-preset-default`. It accepts an explicit `--config` and discovers `jest-unit.config.js`, `jest.config.js`, `jest.config.json`, `jest.config.ts`, or the `jest` field in `package.json`. It is no longer an alias of `test-unit-js`.
 
-Existing Jest consumers can use this command throughout `@wordpress/scripts`
-36.x while migrating. Removal is scheduled no earlier than 37.0.0, and only
-after the Vitest switch has been published and verified in isolated consumers.
-If migration takes longer, pin 36.x or run an independently installed Jest.
-New projects should use Vitest directly or `test-unit-js`.
+Existing Jest consumers can use this command throughout `@wordpress/scripts` 36.x while migrating. Removal is scheduled no earlier than 37.0.0, and only after the Vitest switch has been published and verified in isolated consumers. If migration takes longer, pin 36.x or run an independently installed Jest. New projects should use Vitest directly or `test-unit-js`.
+
+The default `wp-scripts lint-js` config also switches to Vitest in 36.0.0 and no longer declares Jest globals such as `describe`, `it`, and `expect`. To keep linting Jest tests, install `eslint-plugin-jest` and add an `eslint.config.cjs` in your project. If you already have a custom config, apply the Jest override to your Jest files instead of the public `test-unit` config.
+
+```sh
+npm install --save-dev eslint-plugin-jest
+```
+
+```js
+const wpPlugin = require( '@wordpress/eslint-plugin' );
+const jestPlugin = require( 'eslint-plugin-jest' );
+
+module.exports = [
+	...wpPlugin.configs.recommended,
+	{
+		...jestPlugin.configs[ 'flat/recommended' ],
+		files: [
+			'**/@(test|__tests__)/**/*.{js,jsx,ts,tsx,mjs,cjs}',
+			'**/*.@(test|spec).{js,jsx,ts,tsx,mjs,cjs}',
+		],
+	},
+];
+```
 
 ### `test-e2e`
 
@@ -546,9 +551,7 @@ wp-scripts [NODE_OPTIONS] script
 
 ### Debugging tests
 
-For Vitest tests, pass `--inspect-brk --no-file-parallelism` after `test-unit-js`.
-Vitest then opens the inspector in the test worker. Passing `--inspect-brk`
-before the command inspects the wrapper process instead.
+For Vitest tests, pass `--inspect-brk --no-file-parallelism` after `test-unit-js`. Vitest then opens the inspector in the test worker. Passing `--inspect-brk` before the command inspects the wrapper process instead.
 
 Tests can be debugged by any [inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) that supports the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/).
 

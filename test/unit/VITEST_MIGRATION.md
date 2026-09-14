@@ -68,3 +68,30 @@ between tests. Tests must configure required mock implementations in their own
 setup hooks. Mutable state held by an imported module is not reset
 automatically; reset it explicitly or use `vi.resetModules()` when a fresh
 module instance is required.
+
+## Verification and release gate
+
+
+Run `npm run test:unit:consumers` from Gutenberg to pack the changed public
+packages, install them outside the workspace, and run the documented configs.
+Use `--vite=<version>` to select a supported Vite version and `--browser` to
+include Chromium. `--node=/absolute/path/to/node` selects a consumer runtime.
+The check reports the actual Node, Vite, Vitest, and build versions. To replay
+a recorded dependency resolution, pass `--lockfile=/path/to/package-lock.json`
+from an earlier consumer run. The changed packages are still repacked and installed.
+
+Before final Jest retirement:
+
+1. Publish scripts 36 and eslint-plugin 27 through the existing protected
+   WordPress packages release workflow. Publish the Jest package deprecation
+   notices and apply npm deprecation messages through the release process.
+2. Run the isolated checks with `--scripts=<published-version>` and
+   `--eslint-plugin=<published-version>` against the registry releases.
+   Record the published versions and the Node/Vite results in the tooling PR.
+3. Verify Node, jsdom, Browser Mode, generated CSS, config discovery, linting,
+   and default/watch/debug/update commands. Preserve the Node 24/26 repository
+   matrix, single Chromium job, timezone checks, and Storybook smoke coverage.
+4. Only then remove internal Jest infrastructure. Public `test-unit-jest` and
+   its dependencies cannot be removed before scripts 37.0.0.
+
+Packed-source checks before publication do not satisfy the release gate.
