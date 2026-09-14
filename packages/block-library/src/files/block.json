@@ -1,0 +1,55 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"__experimental": true,
+	"name": "core/files",
+	"title": "Files",
+	"category": "media",
+	"allowedBlocks": [ "core/file" ],
+	"description": "Display a list of downloadable files.",
+	"keywords": [ "documents", "pdf", "downloads", "attachments" ],
+	"textdomain": "default",
+	"supports": {
+		"anchor": true,
+		"align": [ "wide", "full" ],
+		"html": false,
+		"color": {
+			"gradients": true,
+			"link": true,
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"link": true
+			}
+		},
+		"spacing": {
+			"blockGap": true,
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"blockGap": true,
+				"padding": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
+		"layout": {
+			"allowEditing": false
+		},
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"listView": true
+	},
+	"style": "wp-block-files"
+}

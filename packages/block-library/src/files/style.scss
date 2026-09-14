@@ -1,0 +1,9 @@
+.wp-block-files {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
+	// The block gap spaces the rows, so drop each File block's own bottom margin.
+	> .wp-block-file {
+		margin-bottom: 0;
+	}
+}
