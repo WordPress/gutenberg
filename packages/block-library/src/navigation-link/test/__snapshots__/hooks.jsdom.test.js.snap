@@ -135,11 +135,9 @@ exports[`hooks > enhanceNavigationLinkVariations > enhances variations with icon
           d="M4.75 12.5429V4.85C4.75 4.79477 4.79477 4.75 4.85 4.75H12.5429C12.6755 4.75 12.8027 4.80268 12.8964 4.89645L20.1464 12.1464C20.3417 12.3417 20.3417 12.6583 20.1464 12.8536L12.8536 20.1464C12.6583 20.3417 12.3417 20.3417 12.1464 20.1464L4.89645 12.8964C4.80268 12.8027 4.75 12.6755 4.75 12.5429Z"
           vectorEffect="non-scaling-stroke"
         />
-        <Circle
-          cx="8.75"
-          cy="8.75"
+        <Path
+          d="M9.75 8.75a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"
           fill="currentColor"
-          r="1"
           stroke="none"
         />
       </SVG>,
