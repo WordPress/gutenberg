@@ -48,6 +48,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `paginationArrow`
 - `showLabel`
 - `enhancedPagination`
+- `useAlphabeticalPagination`
 
 ## Block Markup
 
