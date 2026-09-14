@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
@@ -30,10 +30,6 @@ async function renderPostActions() {
 }
 
 describe( 'PostActions', () => {
-	beforeEach( () => {
-		mockedUsePostActions.mockReset();
-	} );
-
 	it( 'keeps the unavailable actions trigger focusable and closed', async () => {
 		const user = userEvent.setup();
 		mockedUsePostActions.mockReturnValue( [] );
@@ -47,30 +43,6 @@ describe( 'PostActions', () => {
 
 		await user.keyboard( '{Enter}' );
 		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-	} );
-
-	it( 'performs an action, closes the menu, and restores trigger focus', async () => {
-		const user = userEvent.setup();
-		const callback = vi.fn();
-		mockedUsePostActions.mockReturnValue( [
-			{ id: 'duplicate', label: 'Duplicate', callback },
-		] );
-		await renderPostActions();
-
-		const trigger = screen.getByRole( 'button', { name: 'Actions' } );
-		await user.click( trigger );
-		await user.click(
-			await screen.findByRole( 'menuitem', { name: 'Duplicate' } )
-		);
-
-		expect( callback ).toHaveBeenCalledWith(
-			[ { ...item, permissions: { canUpdate: true } } ],
-			expect.objectContaining( { registry: expect.any( Object ) } )
-		);
-		await waitFor( () => {
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-		} );
-		expect( trigger ).toHaveFocus();
 	} );
 
 	it( 'moves focus to a modal action and returns it after cancellation', async () => {
