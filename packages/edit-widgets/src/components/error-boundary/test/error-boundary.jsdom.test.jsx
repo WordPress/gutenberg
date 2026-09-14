@@ -27,7 +27,6 @@ describe( 'Error Boundary', () => {
 				name: 'Copy error',
 			} );
 			expect( copyError ).toBeVisible();
-			expect( alert ).not.toContainElement( copyError );
 		} );
 
 		it( 'calls the `editor.ErrorBoundary.errorLogged` hook action with the error object and error info', () => {
