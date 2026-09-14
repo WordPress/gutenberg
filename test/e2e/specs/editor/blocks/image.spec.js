@@ -413,6 +413,64 @@ test.describe( 'Image', () => {
 				title: 'test',
 			} );
 		} );
+
+		// The Openverse media category searches, and then downloads the
+		// dragged image from, the real external Openverse API. Mock both
+		// requests so the test doesn't depend on a live third-party service.
+		const openverseImageBuffer = await fs.readFile(
+			path.join(
+				__dirname,
+				'..',
+				'..',
+				'..',
+				'assets',
+				'10x10_e2e_test_image_z9T8jK.png'
+			)
+		);
+		const openverseResults = [ 1, 2 ].map( ( i ) => ( {
+			id: `e2e-test-openverse-image-${ i }`,
+			title: `E2E Test Openverse Image ${ i }`,
+			url: `https://example-openverse-mock.test/openverse-image-${ i }.png`,
+			thumbnail: `https://example-openverse-mock.test/openverse-image-${ i }.png`,
+			foreign_landing_url: `https://example-openverse-mock.test/openverse-image-${ i }`,
+			creator: 'test-creator',
+			creator_url: 'https://example-openverse-mock.test/test-creator',
+			license: 'cc0',
+			license_version: '1.0',
+			license_url: 'https://creativecommons.org/publicdomain/zero/1.0/',
+		} ) );
+
+		await page.route(
+			( url ) => url.href.includes( 'api.openverse.engineering' ),
+			async ( route ) => {
+				if ( route.request().method() !== 'GET' ) {
+					await route.continue();
+					return;
+				}
+				await route.fulfill( {
+					status: 200,
+					contentType: 'application/json',
+					headers: { 'Access-Control-Allow-Origin': '*' },
+					body: JSON.stringify( { results: openverseResults } ),
+				} );
+			}
+		);
+		await page.route(
+			( url ) => url.href.includes( 'example-openverse-mock.test' ),
+			async ( route ) => {
+				if ( route.request().method() !== 'GET' ) {
+					await route.continue();
+					return;
+				}
+				await route.fulfill( {
+					status: 200,
+					contentType: 'image/png',
+					headers: { 'Access-Control-Allow-Origin': '*' },
+					body: openverseImageBuffer,
+				} );
+			}
+		);
+
 		await editor.insertBlock( { name: 'core/image' } );
 		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
