@@ -149,6 +149,7 @@ export default function useBlockSync( {
 		resetSelection,
 		replaceInnerBlocks,
 		setHasControlledInnerBlocks,
+		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
 	const {
@@ -279,6 +280,54 @@ export default function useBlockSync( {
 		return false;
 	};
 
+	// Whether the controlled value has the same structure as the clones
+	// already in the store: the same external IDs in the same order, all
+	// the way down. A nested controller owns its own inner blocks, so those
+	// are left to it.
+	const hasSameStructure = ( blocks, clones ) =>
+		blocks.length === clones.length &&
+		blocks.every( ( block, index ) => {
+			const clone = clones[ index ];
+			return (
+				idMappingRef.current.internalToExternal.get(
+					clone.clientId
+				) === block.clientId &&
+				block.name === clone.name &&
+				( areInnerBlocksControlled( clone.clientId ) ||
+					hasSameStructure( block.innerBlocks, clone.innerBlocks ) )
+			);
+		} );
+
+	// Collects, per clone, the attributes whose values differ from the
+	// controlled value. Only called once the structures are known to match.
+	const collectAttributeChanges = ( blocks, clones, changes = {} ) => {
+		blocks.forEach( ( block, index ) => {
+			const clone = clones[ index ];
+			const changed = {};
+			let hasChanged = false;
+			for ( const key of new Set( [
+				...Object.keys( block.attributes ),
+				...Object.keys( clone.attributes ),
+			] ) ) {
+				if ( block.attributes[ key ] !== clone.attributes[ key ] ) {
+					changed[ key ] = block.attributes[ key ];
+					hasChanged = true;
+				}
+			}
+			if ( hasChanged ) {
+				changes[ clone.clientId ] = changed;
+			}
+			if ( ! areInnerBlocksControlled( clone.clientId ) ) {
+				collectAttributeChanges(
+					block.innerBlocks,
+					clone.innerBlocks,
+					changes
+				);
+			}
+		} );
+		return changes;
+	};
+
 	const setControlledBlocks = () => {
 		if ( ! controlledBlocks ) {
 			return;
@@ -288,6 +337,35 @@ export default function useBlockSync( {
 		// controlled inner blocks when the change was caused by an entity,
 		// and so it would already be persisted.
 		if ( clientId ) {
+			// A value with the same structure as the current clones differs
+			// in attributes at most, as when the same entity is typed into
+			// through another container. Update the clones in place: the
+			// mapping, the mounted components and the selection all stay
+			// valid, and nothing is torn down between two keystrokes.
+			const clones = getBlocks( clientId );
+			if (
+				areInnerBlocksControlled( clientId ) &&
+				hasSameStructure( controlledBlocks, clones )
+			) {
+				const changes = collectAttributeChanges(
+					controlledBlocks,
+					clones
+				);
+				const changedClientIds = Object.keys( changes );
+				if ( changedClientIds.length ) {
+					if ( subscribedRef.current ) {
+						pendingChangesRef.current.incoming = clones;
+					}
+					__unstableMarkNextChangeAsNotPersistent( {
+						history: 'ignore',
+					} );
+					updateBlockAttributes( changedClientIds, changes, {
+						uniqueByBlock: true,
+					} );
+				}
+				return;
+			}
+
 			// Batch so that the controlled flag and block replacement
 			// are applied atomically — subscribers see a consistent state.
 			registry.batch( () => {
