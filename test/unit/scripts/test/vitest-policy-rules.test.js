@@ -88,13 +88,22 @@ describe( 'Vitest policy rules', () => {
 	} );
 
 	it( 'rejects jsdom browser APIs without a reason', () => {
-		const source = 'new ResizeObserver( () => {} );';
-
-		expectViolation( source, 'require Browser Mode', { project: 'jsdom' } );
-		expectValid( source, {
-			allowJsdomBrowserApis: true,
-			project: 'jsdom',
-		} );
+		for ( const source of [
+			'new ResizeObserver( () => {} );',
+			"import { vi } from 'vitest'; vi.stubGlobal( 'ResizeObserver', class {} );",
+			"import { vi as mocker } from 'vitest'; mocker.stubGlobal( 'innerWidth', 320 );",
+			"import * as vitest from 'vitest'; vitest.vi.spyOn( HTMLElement.prototype, 'getBoundingClientRect' );",
+			"import { vi } from 'vitest'; vi.spyOn( window, 'matchMedia' );",
+			"import { vi } from 'vitest'; const element = document.createElement( 'div' ); vi.spyOn( element, 'offsetWidth', 'get' );",
+		] ) {
+			expectViolation( source, 'require Browser Mode', {
+				project: 'jsdom',
+			} );
+			expectValid( source, {
+				allowJsdomBrowserApis: true,
+				project: 'jsdom',
+			} );
+		}
 	} );
 
 	it( 'allows type-only jsdom browser API references', () => {
@@ -114,6 +123,14 @@ describe( 'Vitest policy rules', () => {
 			'const fake = { scrollTop: 0 };\nfake.scrollTop;\nconst mockLayout = { getBoundingClientRect() {} };\nmockLayout.getBoundingClientRect();',
 			{ project: 'jsdom' }
 		);
+		for ( const source of [
+			"import { vi } from 'vitest'; const fake = { getBoundingClientRect() {} }; vi.spyOn( fake, 'getBoundingClientRect' );",
+			"import { vi } from 'vitest'; function mockRect( value ) { vi.spyOn( value, 'getBoundingClientRect' ); } const fake = { getBoundingClientRect() {} }; mockRect( fake );",
+			"import { vi } from 'vitest'; vi.stubGlobal( 'fetch', () => {} );",
+			"const vi = { stubGlobal() {}, spyOn() {} }; vi.stubGlobal( 'ResizeObserver', class {} ); vi.spyOn( HTMLElement.prototype, 'getBoundingClientRect' );",
+		] ) {
+			expectValid( source, { project: 'jsdom' } );
+		}
 	} );
 
 	it( 'rejects animation APIs on DOM-derived jsdom objects', () => {
@@ -136,6 +153,14 @@ describe( 'Vitest policy rules', () => {
 				project: 'jsdom',
 			} );
 		}
+	} );
+
+	it( 'tracks DOM values through local helper parameters', () => {
+		expectViolation(
+			"import { vi } from 'vitest';\nfunction mockRect( element ) { vi.spyOn( element, 'getBoundingClientRect' ); }\nconst element = document.createElement( 'div' );\nmockRect( element );",
+			'require Browser Mode',
+			{ project: 'jsdom' }
+		);
 	} );
 
 	it( 'tracks Testing Library DOM results and later assignments', () => {
