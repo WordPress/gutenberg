@@ -662,4 +662,97 @@ describe( 'useBlockSync hook', () => {
 		// The internal IDs should be different from the external IDs (due to cloning)
 		expect( replacedBlocks[ 0 ].clientId ).not.toBe( originalClientId );
 	} );
+
+	describe( 'controlled value with the same structure', () => {
+		const block = ( attributes ) => ( {
+			name: 'test/test-block',
+			clientId: 'external',
+			innerBlocks: [
+				{
+					name: 'test/test-block',
+					clientId: 'external-inner',
+					innerBlocks: [],
+					attributes: { foo: 10 },
+				},
+			],
+			attributes,
+		} );
+
+		function renderController() {
+			let registry;
+			const onChange = vi.fn();
+			const onInput = vi.fn();
+			const view = render(
+				<TestWrapper
+					clientId="controller"
+					setRegistry={ ( reg ) => {
+						registry = reg;
+					} }
+					value={ [ block( { foo: 1 } ) ] }
+					onChange={ onChange }
+					onInput={ onInput }
+				/>
+			);
+			const getClones = () =>
+				registry.select( blockEditorStore ).getBlocks( 'controller' );
+			return { view, getClones, onChange, onInput };
+		}
+
+		it( 'updates the existing clones in place instead of re-cloning', () => {
+			const replaceInnerBlocks = vi.spyOn(
+				blockEditorActions,
+				'replaceInnerBlocks'
+			);
+			const { view, getClones, onChange, onInput } = renderController();
+			const [ clone ] = getClones();
+			replaceInnerBlocks.mockClear();
+
+			view.rerender(
+				<TestWrapper
+					clientId="controller"
+					value={ [ block( { foo: 2 } ) ] }
+					onChange={ onChange }
+					onInput={ onInput }
+				/>
+			);
+
+			expect( replaceInnerBlocks ).not.toHaveBeenCalled();
+			const [ updated ] = getClones();
+			// Same clone, so nothing holding its client ID is invalidated.
+			expect( updated.clientId ).toBe( clone.clientId );
+			expect( updated.attributes ).toEqual( { foo: 2 } );
+			expect( updated.innerBlocks[ 0 ].clientId ).toBe(
+				clone.innerBlocks[ 0 ].clientId
+			);
+			// The change came from the entity, so it is not reported back.
+			expect( onChange ).not.toHaveBeenCalled();
+			expect( onInput ).not.toHaveBeenCalled();
+		} );
+
+		it( 'still re-clones when the structure changes', () => {
+			const replaceInnerBlocks = vi.spyOn(
+				blockEditorActions,
+				'replaceInnerBlocks'
+			);
+			const { view, onChange, onInput } = renderController();
+			replaceInnerBlocks.mockClear();
+
+			const added = {
+				name: 'test/test-block',
+				clientId: 'external-added',
+				innerBlocks: [],
+				attributes: {},
+			};
+			view.rerender(
+				<TestWrapper
+					clientId="controller"
+					value={ [ block( { foo: 1 } ), added ] }
+					onChange={ onChange }
+					onInput={ onInput }
+				/>
+			);
+
+			expect( replaceInnerBlocks ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
 } );

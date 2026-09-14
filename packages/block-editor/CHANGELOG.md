@@ -25,6 +25,7 @@
 
 ### Bug Fixes
 
+-   Inner block controllers rendering one entity, such as two Template Parts on the same slug or two Navigation blocks on the same menu, no longer split typing in one of them into an undo level per character, lose keystrokes, or move the selection into the other one. A controller now updates its existing clones in place when only attributes changed, and a history-ignored change to other blocks no longer ends a typing run ([#82706](https://github.com/WordPress/gutenberg/pull/82706)).
 -   Writing Flow: Preserve rich text selection on Shift+click within the same block ([#84579](https://github.com/WordPress/gutenberg/pull/84579)).
 -   List View: Show the appender when the container is contentOnly ([#84713](https://github.com/WordPress/gutenberg/pull/84713)).
 -   NavigableToolbar: Ignore menu focus guards so menus from `@wordpress/ui` open on the first click ([#84547](https://github.com/WordPress/gutenberg/pull/84547)).
