@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `InputLayout`: Prefix, suffix, and select or combobox trigger text stay at the `md` font size on small viewports. Native text inputs and textareas still use at least 16px below 600px to avoid iOS Safari zoom. ([#82764](https://github.com/WordPress/gutenberg/pull/82764))
 -   `Checkbox`: Enlarge the hit target to 24px without changing the visual size. ([#82597](https://github.com/WordPress/gutenberg/pull/82597))
 -   `SearchableChipSelect`, `SearchableChipSelectControl`, `SearchableSelect`: Add `statusContent` for the list status live region. The region stays mounted. Use it for async loading. Use `emptyContent` for the empty list. ([#82592](https://github.com/WordPress/gutenberg/pull/82592))
 -   `Autocomplete`, `Combobox`, `SearchableChipSelect`, `SearchableChipSelectControl`, `SearchableSelect`: Export a `useFilteredItems` hook that returns the client-side filtered item list, for result-count status. ([#82592](https://github.com/WordPress/gutenberg/pull/82592))
