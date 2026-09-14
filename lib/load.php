@@ -149,6 +149,7 @@ require __DIR__ . '/demo.php';
 require __DIR__ . '/experimental/experiments/load.php';
 require __DIR__ . '/interactivity-api.php';
 require __DIR__ . '/block-template-utils.php';
+require __DIR__ . '/icons.php';
 
 // Copied package PHP files.
 if ( is_dir( __DIR__ . '/../build/scripts/style-engine' ) ) {
