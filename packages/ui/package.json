@@ -67,6 +67,7 @@
 		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.1",
 		"@types/node": "^24.13.3",
+		"@types/react-dom": "^18.3.1",
 		"@wordpress/base-styles": "file:../base-styles",
 		"fast-glob": "^3.2.7",
 		"storybook": "^10.5.3",

@@ -61,6 +61,31 @@ const UNUSED_OPTIONAL_PEERS = {
 	vite: [ 'yaml' ],
 };
 
+/**
+ * Packages whose declarations import React types they never declare. Under
+ * `install-strategy=linked` those types resolve to `any` for every consumer.
+ */
+const UNDECLARED_TYPES = {
+	'@ariakit/react-components': [ '@types/react' ],
+	'@ariakit/react-utils': [ '@types/react' ],
+	'@dnd-kit/core': [ '@types/react' ],
+	'@dnd-kit/sortable': [ '@types/react' ],
+	'@dnd-kit/utilities': [ '@types/react' ],
+	'@emotion/use-insertion-effect-with-fallbacks': [ '@types/react' ],
+	'@floating-ui/react-dom': [ '@types/react' ],
+	'@react-spring/animated': [ '@types/react' ],
+	'@react-spring/core': [ '@types/react' ],
+	'@react-spring/shared': [ '@types/react' ],
+	'@react-spring/types': [ '@types/react' ],
+	'@react-spring/web': [ '@types/react' ],
+	'@tanstack/react-router': [ '@types/react' ],
+	cmdk: [ '@types/react' ],
+	'framer-motion': [ '@types/react' ],
+	're-resizable': [ '@types/react' ],
+	'react-colorful': [ '@types/react' ],
+	'react-easy-crop': [ '@types/react' ],
+};
+
 const getMajor = ( version ) => Number( version.split( '.' )[ 0 ] );
 
 export function transformManifest( pkg, context ) {
@@ -93,6 +118,20 @@ export function transformManifest( pkg, context ) {
 			delete pkg.peerDependencies[ name ];
 			delete pkg.peerDependenciesMeta[ name ];
 			context.log( `dropped optional peer ${ name } of ${ pkg.name }` );
+		}
+	}
+
+	for ( const name of UNDECLARED_TYPES[ pkg.name ] ?? [] ) {
+		if (
+			! pkg.dependencies?.[ name ] &&
+			! pkg.peerDependencies?.[ name ]
+		) {
+			pkg.peerDependencies = { ...pkg.peerDependencies, [ name ]: '*' };
+			pkg.peerDependenciesMeta = {
+				...pkg.peerDependenciesMeta,
+				[ name ]: { optional: true },
+			};
+			context.log( `added optional peer ${ name } to ${ pkg.name }` );
 		}
 	}
 
