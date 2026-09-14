@@ -132,16 +132,6 @@ jobs:
                     - '8.0'
                     - '8.5'
                 multisite: [false, true]
-                exclude:
-                    # On PRs: Only test PHP 8.5, single-site
-                    - event: 'pull_request'
-                      php: '7.2'
-                    - event: 'pull_request'
-                      php: '7.4'
-                    - event: 'pull_request'
-                      php: '8.0'
-                    - event: 'pull_request'
-                      multisite: true
 
         env:
             WP_ENV_PHP_VERSION: ${{ matrix.php }}
