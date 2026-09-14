@@ -6,7 +6,11 @@ import {
 	withSyncEvent,
 	withScope,
 } from '@wordpress/interactivity';
-import { IMAGE_PRELOAD_DELAY } from './constants';
+import {
+	IMAGE_PRELOAD_DELAY,
+	LIGHTBOX_SHORT_VIEWPORT_HEIGHT,
+	LIGHTBOX_SHORT_VIEWPORT_PADDING,
+} from './constants';
 
 /**
  * Tracks whether user is touching screen; used to differentiate behavior for
@@ -541,6 +545,19 @@ const { state, actions, callbacks } = store(
 				if ( 960 < window.innerWidth ) {
 					horizontalPadding = state.hasNavigation ? 320 : 80;
 					verticalPadding = 80;
+				}
+
+				// The breakpoints above measure width only, so a phone rotated to
+				// landscape keeps the reservation meant for a tall portrait screen
+				// while having less than half the height to spend it from, and the
+				// image ends up smaller than it was before the rotation. The close
+				// and navigation buttons paint above the image, so a short viewport
+				// reserves breathing room instead of clearance for them.
+				if ( window.innerHeight <= LIGHTBOX_SHORT_VIEWPORT_HEIGHT ) {
+					verticalPadding = Math.min(
+						verticalPadding,
+						LIGHTBOX_SHORT_VIEWPORT_PADDING
+					);
 				}
 
 				const targetMaxWidth = Math.min(
