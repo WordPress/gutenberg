@@ -1,5 +1,39 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+async function navigateToRegion( page, pageUtils, region ) {
+	const regionCount = await page
+		.locator( '[role="region"][tabindex="-1"]' )
+		.count();
+
+	for ( let index = 0; index < regionCount; index++ ) {
+		await pageUtils.pressKeys( 'ctrl+`' );
+		if (
+			await region.evaluate(
+				( element ) => element === document.activeElement
+			)
+		) {
+			return;
+		}
+	}
+}
+
+async function expectRegionToFillEditor( page, region, openPanelButton ) {
+	await expect( region ).toBeVisible();
+	const editor = page
+		.locator( '.interface-interface-skeleton' )
+		.filter( { has: region } )
+		.last();
+	const [ regionBox, editorBox, buttonBox ] = await Promise.all( [
+		region.boundingBox(),
+		editor.boundingBox(),
+		openPanelButton.boundingBox(),
+	] );
+
+	expect( regionBox.y ).toBe( editorBox.y );
+	expect( regionBox.height ).toBe( editorBox.height );
+	expect( buttonBox.y ).toBeLessThan( regionBox.y + regionBox.height / 2 );
+}
+
 test.describe( 'Region navigation (@firefox, @webkit)', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -58,5 +92,23 @@ test.describe( 'Region navigation (@firefox, @webkit)', () => {
 		}
 
 		await expect( editorTopBar ).toBeFocused();
+	} );
+
+	test( 'shows a closed publish region at full editor height', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		const publishRegion = page.getByRole( 'region', {
+			name: 'Editor publish',
+		} );
+
+		await navigateToRegion( page, pageUtils, publishRegion );
+
+		await expect( publishRegion ).toBeFocused();
+		const openPublishPanel = publishRegion.getByRole( 'button', {
+			name: 'Open publish panel',
+		} );
+		await expect( openPublishPanel ).toBeVisible();
+		await expectRegionToFillEditor( page, publishRegion, openPublishPanel );
 	} );
 } );

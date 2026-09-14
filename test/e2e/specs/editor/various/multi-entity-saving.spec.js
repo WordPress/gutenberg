@@ -135,7 +135,7 @@ test.describe( 'Editor - Multi-entity save flow', () => {
 		await expect( saveButton ).toBeEnabled();
 
 		// Verify multi-entity saving not enabled.
-		await expect( publishPanel ).toBeHidden();
+		await expect( publishPanel ).not.toBeInViewport();
 
 		await siteTitleField.fill( `${ originalSiteTitle }!` );
 

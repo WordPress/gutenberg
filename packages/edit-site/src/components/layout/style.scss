@@ -190,15 +190,8 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 
 	&:focus,
 	&:focus-within {
-		top: auto;
+		top: var(--wp-admin--admin-bar--height, 0);
 		bottom: 0;
-	}
-
-	&.is-entity-save-view-open {
-		&:focus,
-		&:focus-within {
-			top: var(--wp-admin--admin-bar--height, 0);
-		}
 	}
 
 	@include break-medium {

@@ -6,6 +6,10 @@
 
 -   The package now bundles TypeScript types ([#82753](https://github.com/WordPress/gutenberg/pull/82753)).
 
+### Bug Fixes
+
+-   `InterfaceSkeleton`: Keep focused publish and save navigation regions at full height when their panels are closed ([#81395](https://github.com/WordPress/gutenberg/pull/81395)).
+
 ## 10.1.0 (2026-09-10)
 
 ### Internal

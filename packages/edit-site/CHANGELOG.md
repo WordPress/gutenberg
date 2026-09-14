@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keep the closed save panel control at the top of its full-height navigation region ([#81395](https://github.com/WordPress/gutenberg/pull/81395)).
+
 ## 7.4.0 (2026-09-10)
 
 ### Enhancements
