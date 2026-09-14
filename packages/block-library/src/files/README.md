@@ -8,7 +8,7 @@ Display a list of downloadable files.
 - **Name:** `core/files`
 - **Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 - **API Version:** [3](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/)
-- **Block Type:** Unknown
+- **Block Type:** [Dynamic](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) (server-rendered)
 - **Keywords:** `documents`, `pdf`, `downloads`, `attachments`
 
 ## Block Relationships
@@ -45,11 +45,19 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 
 ## Block Markup
 
-This is a [**static block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). The markup is saved directly in the post content.
+This is a [**dynamic block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It is rendered on the server and does not save HTML in post content.
+
+In post content, it is stored as a block comment:
 
 ```html
 <!-- wp:files -->
-<!-- Content... -->
+<div class="wp-block-files"><!-- wp:file {"href":"http://localhost:8888/wp-content/uploads/2018/05/report.pdf","displayPreview":false} -->
+<div class="wp-block-file"><a id="wp-block-file--media-_clientId_0" href="http://localhost:8888/wp-content/uploads/2018/05/report.pdf">report</a><a href="http://localhost:8888/wp-content/uploads/2018/05/report.pdf" class="wp-block-file__button wp-element-button" download aria-describedby="wp-block-file--media-_clientId_0">Download</a></div>
+<!-- /wp:file -->
+
+<!-- wp:file {"href":"http://localhost:8888/wp-content/uploads/2018/05/notes.txt"} -->
+<div class="wp-block-file"><a id="wp-block-file--media-_clientId_1" href="http://localhost:8888/wp-content/uploads/2018/05/notes.txt">notes</a><a href="http://localhost:8888/wp-content/uploads/2018/05/notes.txt" class="wp-block-file__button wp-element-button" download aria-describedby="wp-block-file--media-_clientId_1">Download</a></div>
+<!-- /wp:file --></div>
 <!-- /wp:files -->
 ```
 
