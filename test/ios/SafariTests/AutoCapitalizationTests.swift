@@ -67,6 +67,39 @@ final class AutoCapitalizationTests: XCTestCase {
 		XCTAssertEqual( XCTWaiter.wait( for: [ done ], timeout: 10 ), .completed, message )
 	}
 
+	/// The line the caret is on: the focused field's text, or its last line
+	/// once the canvas is the editing host and the focused field holds the
+	/// text of every block. Padding characters do not count.
+	var caretLine: String {
+		let value = ( focusedField.value as? String ?? "" )
+			.replacingOccurrences( of: "\u{FEFF}", with: "" )
+		return value.split( separator: "\n", omittingEmptySubsequences: false )
+			.last.map( String.init ) ?? ""
+	}
+
+	/// Waits until the caret is in a new empty field with this aria-label:
+	/// a focused empty field of its own, or, once the canvas is the editing
+	/// host, the focused canvas whose last line is empty (a list item's
+	/// line starts with its bullet).
+	func waitForEmptyField( _ label: String, _ message: String ) {
+		let matches = NSPredicate { _, _ in
+			let field = self.focusedField
+			guard field.exists, let value = field.value as? String else {
+				return false
+			}
+			if field.label == "Editor canvas" {
+				return self.caretLine.trimmingCharacters( in: CharacterSet( charactersIn: "•· " ) ).isEmpty
+			}
+			return field.label == label && value.count < 2
+		}
+		let done = XCTNSPredicateExpectation( predicate: matches, object: nil )
+		XCTAssertEqual( XCTWaiter.wait( for: [ done ], timeout: 10 ), .completed, message )
+	}
+
+	func waitForEmptyParagraph( _ message: String ) {
+		waitForEmptyField( "Empty block; start writing or type forward slash to choose a block", message )
+	}
+
 	/// The keyboard updates shortly after focus moves.
 	func assertCapitalized( _ message: String ) {
 		let upperCase = NSPredicate( format: "label == 'A'" )
@@ -95,23 +128,23 @@ final class AutoCapitalizationTests: XCTestCase {
 		XCTAssertFalse( key( "shift" ).isSelected, "After a word the keyboard should be lowercase" )
 
 		key( "return" ).tap()
-		waitForFocus(
-			on: "Empty block; start writing or type forward slash to choose a block",
-			"Return in the title did not focus an empty paragraph"
-		)
+		waitForEmptyParagraph( "Return in the title did not focus an empty paragraph" )
 		assertCapitalized( "The paragraph after the title should start capitalized" )
 
 		type( "hello" )
-		XCTAssertEqual( focusedField.value as? String, "Hello", "The keyboard should have capitalized the first letter" )
-		XCTAssertEqual( focusedField.label, "Block: Paragraph" )
+		XCTAssertEqual( caretLine, "Hello", "The keyboard should have capitalized the first letter" )
 		XCTAssertFalse( key( "shift" ).isSelected, "After a word the keyboard should be lowercase" )
 
+		// With a second paragraph the canvas becomes the editing host: one
+		// field holding every block, with the caret on its last line.
 		key( "return" ).tap()
-		waitForFocus(
-			on: "Empty block; start writing or type forward slash to choose a block",
-			"Return did not focus a new empty paragraph"
-		)
+		waitForEmptyParagraph( "Return did not start a new empty paragraph" )
 		assertCapitalized( "The paragraph after Return should start capitalized" )
+
+		// Return inside the editing host, from an empty paragraph.
+		key( "return" ).tap()
+		waitForEmptyParagraph( "Return on the empty paragraph did not start another one" )
+		assertCapitalized( "The paragraph after Return in the editing host should start capitalized" )
 
 		// A list item splits differently from a paragraph. Turn this paragraph
 		// into a list with the "- " prefix; the dash is on the numbers layout.
@@ -120,23 +153,20 @@ final class AutoCapitalizationTests: XCTestCase {
 		key( " " ).tap()
 		waitForFocus( on: "List text", "The prefix did not turn the paragraph into a list" )
 		type( "one" )
-		XCTAssertEqual( focusedField.value as? String, "One", "The keyboard should have capitalized the first letter" )
+		XCTAssertEqual( caretLine.trimmingCharacters( in: CharacterSet( charactersIn: "•· " ) ), "One", "The keyboard should have capitalized the first letter" )
 
 		key( "return" ).tap()
-		waitForFocus( on: "List text", "Return did not focus a new list item" )
+		waitForEmptyField( "List text", "Return did not start a new list item" )
 		assertCapitalized( "The list item after Return should start capitalized" )
 
 		// Return on an empty list item ends the list with a paragraph, a
 		// separate handler in the list item block.
 		key( "return" ).tap()
-		waitForFocus(
-			on: "Empty block; start writing or type forward slash to choose a block",
-			"Return on the empty list item did not focus a paragraph after the list"
-		)
+		waitForEmptyParagraph( "Return on the empty list item did not start a paragraph after the list" )
 		assertCapitalized( "The paragraph after the list should start capitalized" )
 
 		// The earlier fields kept their text.
 		XCTAssertEqual( web.textViews[ "Add title" ].value as? String, "Title" )
-		XCTAssertEqual( web.textViews[ "Block: Paragraph" ].value as? String, "Hello" )
+		XCTAssertTrue( web.textViews.matching( NSPredicate( format: "value CONTAINS 'Hello'" ) ).firstMatch.exists )
 	}
 }
