@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Show the selected widget width in its options menu and add an ellipsis to
+    the reset action that opens a confirmation dialog ([#81929](https://github.com/WordPress/gutenberg/pull/81929)).
+
 ### Internal
 
 -   Migrate dashboard menus from the private Components API to the public

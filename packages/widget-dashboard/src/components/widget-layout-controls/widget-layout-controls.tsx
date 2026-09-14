@@ -89,25 +89,22 @@ export function WidgetLayoutControls( {
 					/>
 
 					<Menu.Popup>
-						<Menu.Group>
+						<Menu.RadioGroup
+							value={ width ?? null }
+							onValueChange={ onNamedWidthChange }
+						>
 							<Menu.GroupLabel>{ __( 'Width' ) }</Menu.GroupLabel>
-							<Menu.Item
-								disabled={ width === 'fill' }
-								onClick={ () => onNamedWidthChange( 'fill' ) }
-							>
+							<Menu.RadioItem value="fill" closeOnClick>
 								<Menu.ItemLabel>
 									{ __( 'Use available width' ) }
 								</Menu.ItemLabel>
-							</Menu.Item>
-							<Menu.Item
-								disabled={ width === 'full' }
-								onClick={ () => onNamedWidthChange( 'full' ) }
-							>
+							</Menu.RadioItem>
+							<Menu.RadioItem value="full" closeOnClick>
 								<Menu.ItemLabel>
 									{ __( 'Make full width' ) }
 								</Menu.ItemLabel>
-							</Menu.Item>
-						</Menu.Group>
+							</Menu.RadioItem>
+						</Menu.RadioGroup>
 					</Menu.Popup>
 				</Menu.Root>
 			) }

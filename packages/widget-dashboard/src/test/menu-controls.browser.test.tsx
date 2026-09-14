@@ -11,9 +11,14 @@ import { useDashboardInternalContext } from '../context/dashboard-context';
 import type { DashboardWidget } from '../types';
 import { WidgetDashboard } from '../widget-dashboard';
 
-function LayoutWidth() {
+function LayoutControls() {
 	const { layout } = useDashboardInternalContext();
-	return <output>{ layout[ 0 ].placement?.width }</output>;
+	return (
+		<>
+			<WidgetLayoutControls widget={ layout[ 0 ] } />
+			<output>{ layout[ 0 ].placement?.width }</output>
+		</>
+	);
 }
 
 describe( 'Widget Dashboard menus', () => {
@@ -169,8 +174,7 @@ describe( 'Widget Dashboard menus', () => {
 				widgetTypes={ [] }
 				editMode
 			>
-				<WidgetLayoutControls widget={ widget } />
-				<LayoutWidth />
+				<LayoutControls />
 			</WidgetDashboard>
 		);
 
@@ -178,16 +182,29 @@ describe( 'Widget Dashboard menus', () => {
 			name: 'Widget options',
 		} );
 		await user.click( trigger );
-		await user.click(
-			await screen.findByRole( 'menuitem', {
-				name: 'Make full width',
-			} )
-		);
+		const fullWidth = await screen.findByRole( 'menuitemradio', {
+			name: 'Make full width',
+		} );
+		expect( fullWidth ).not.toBeChecked();
+		expect(
+			screen.getByRole( 'menuitemradio', { name: 'Use available width' } )
+		).not.toBeChecked();
+		await user.click( fullWidth );
 
 		expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'full' );
 		await waitFor( () =>
 			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
 		);
 		expect( trigger ).toHaveFocus();
+
+		await user.click( trigger );
+		expect(
+			await screen.findByRole( 'menuitemradio', {
+				name: 'Make full width',
+			} )
+		).toBeChecked();
+		expect(
+			screen.getByRole( 'menuitemradio', { name: 'Use available width' } )
+		).not.toBeChecked();
 	} );
 } );
