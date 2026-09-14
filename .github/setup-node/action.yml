@@ -59,7 +59,7 @@ runs:
               path: C:\npm\cache\_logs
 
         # On cache hit, we run the post-install script to match the native `npm ci` behavior.
-        # An example of this is to patch `node_modules` using patch-package.
+        # An example of this is to set up the agent skills.
         - name: Post-install
           if: ${{ steps.cache-node_modules.outputs.cache-hit == 'true' }}
           run: |
