@@ -213,6 +213,36 @@ describe( 'Combobox', () => {
 		).toBeVisible();
 	} );
 
+	it( 'describes ChipWithRemove with the Backspace or Delete hint by default', () => {
+		render(
+			<Combobox.Root< Item, true >
+				items={ ITEMS }
+				multiple
+				defaultValue={ [ ITEMS[ 0 ] ] }
+			>
+				<Combobox.Chips>
+					<Combobox.Value>
+						{ ( value: Item[] ) => (
+							<>
+								{ value.map( ( item ) => (
+									<Combobox.ChipWithRemove key={ item.id }>
+										{ item.value }
+									</Combobox.ChipWithRemove>
+								) ) }
+							</>
+						) }
+					</Combobox.Value>
+				</Combobox.Chips>
+			</Combobox.Root>
+		);
+
+		/* eslint-disable testing-library/no-node-access */
+		expect(
+			screen.getByText( 'Item 1' ).closest( '[tabindex="-1"]' )
+		).toHaveAccessibleDescription( 'Press Backspace or Delete to remove.' );
+		/* eslint-enable testing-library/no-node-access */
+	} );
+
 	it( 'renders a default trigger placeholder when no value is selected', () => {
 		render(
 			<Combobox.Root items={ ITEMS }>
