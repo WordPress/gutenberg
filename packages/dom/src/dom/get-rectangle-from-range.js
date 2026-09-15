@@ -78,26 +78,31 @@ export default function getRectangleFromRange( range ) {
 		startContainer = parentNode;
 	}
 
-	// An empty text node renders nothing: a position in it is the same spot
-	// as its index in its parent.
-	if (
-		startContainer.nodeType === startContainer.TEXT_NODE &&
-		/** @type {Text} */ ( startContainer ).length === 0
-	) {
-		const { parentNode } = startContainer;
-		assertIsDefined( parentNode, 'parentNode' );
-		startOffset = /** @type {Node[]} */ (
-			Array.from( parentNode.childNodes )
-		).indexOf( startContainer );
-		startContainer = parentNode;
-	}
-
 	// A position on an element, between two of its children, is the same
-	// spot as the start or the end of the text next to it, but only a
-	// position inside a text node with content has a caret rectangle.
-	// Translate it.
+	// spot as the start of the child after it or the end of the child before
+	// it, but only a position inside a text node has a caret rectangle.
+	// Translate it. An inline element with nothing to stand in, like the
+	// placeholder, holds no caret position of its own, so a position in it
+	// is the same spot as the positions beside the element.
 	if ( startContainer.nodeType !== startContainer.TEXT_NODE ) {
-		const position = getTextPosition( startContainer, startOffset );
+		let node = startContainer;
+		let position = getTextPosition(
+			node.childNodes[ startOffset ],
+			node.childNodes[ startOffset - 1 ]
+		);
+		while (
+			! position &&
+			node.nodeType === node.ELEMENT_NODE &&
+			getComputedStyle(
+				/** @type {Element} */ ( node )
+			).display.startsWith( 'inline' )
+		) {
+			position = getTextPosition(
+				node.nextSibling,
+				node.previousSibling
+			);
+			node = /** @type {Node} */ ( node.parentNode );
+		}
 		if ( position ) {
 			[ startContainer, startOffset ] = position;
 		}
@@ -150,74 +155,34 @@ export default function getRectangleFromRange( range ) {
 }
 
 /**
- * The first or last non-empty text node inside a node, in document order.
+ * The text position at the start of one node, else at the end of another:
+ * the innermost first node of the first, or the innermost last node of the
+ * second, when that is a text node.
  *
- * @param {Node}    node The node.
- * @param {boolean} last Whether to find the last one rather than the first.
+ * @param {Node?} after  The node to stand at the start of.
+ * @param {Node?} before The node to stand at the end of otherwise.
  *
- * @return {Text?} The text node.
+ * @return {[Text, number]?} The text node and offset, or null.
  */
-function findText( node, last ) {
-	if ( node.nodeType === node.TEXT_NODE ) {
-		return /** @type {Text} */ ( node ).length
-			? /** @type {Text} */ ( node )
-			: null;
+function getTextPosition( after, before ) {
+	let node = after;
+	while ( node?.firstChild ) {
+		node = node.firstChild;
 	}
-	const children = Array.from( node.childNodes );
-	if ( last ) {
-		children.reverse();
+	if ( node && node.nodeType === node.TEXT_NODE ) {
+		return [ /** @type {Text} */ ( node ), 0 ];
 	}
-	for ( const child of children ) {
-		const text = findText( child, last );
-		if ( text ) {
-			return text;
-		}
-	}
-	return null;
-}
 
-/**
- * Translates a position on an element to the same spot inside the text next
- * to it: the start of the text that follows, else the end of the text that
- * precedes. A position after a line break belongs to the next line, which
- * is why the following text comes first. An inline element with no text
- * inside it, like the placeholder, takes up no caret position of its own,
- * so a position in it is the same spot as its own position in its parent.
- *
- * @param {Node}   node   The element.
- * @param {number} offset The offset between its children.
- *
- * @return {[Text, number]?} The text node and offset, or null when there is
- *                           no text on either side.
- */
-function getTextPosition( node, offset ) {
-	const children = Array.from( node.childNodes );
-	for ( const child of children.slice( offset ) ) {
-		const text = findText( child, false );
-		if ( text ) {
-			return [ text, 0 ];
-		}
+	node = before;
+	while ( node?.lastChild ) {
+		node = node.lastChild;
 	}
-	for ( const child of children.slice( 0, offset ).reverse() ) {
-		const text = findText( child, true );
-		if ( text ) {
-			return [ text, text.length ];
-		}
+	if ( node && node.nodeType === node.TEXT_NODE ) {
+		return [
+			/** @type {Text} */ ( node ),
+			/** @type {Text} */ ( node ).length,
+		];
 	}
-	const { parentNode } = node;
-	if (
-		parentNode &&
-		node.nodeType === node.ELEMENT_NODE &&
-		getComputedStyle( /** @type {Element} */ ( node ) ).display.startsWith(
-			'inline'
-		)
-	) {
-		return getTextPosition(
-			parentNode,
-			/** @type {Node[]} */ (
-				Array.from( parentNode.childNodes )
-			).indexOf( node )
-		);
-	}
+
 	return null;
 }

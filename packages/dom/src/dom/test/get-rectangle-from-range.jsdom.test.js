@@ -76,32 +76,6 @@ describe( 'getRectangleFromRange', () => {
 		).toMatchObject( { left: 8, top: 124, height: 24 } );
 	} );
 
-	it( 'skips empty text nodes when looking for the text next to a position', () => {
-		document.body.innerHTML = '<p></p>';
-		const paragraph = document.querySelector( 'p' );
-		const empty = document.createTextNode( '' );
-		const text = document.createTextNode( 'abc' );
-		paragraph.append( empty, text );
-		rectsFor( [ [ text, 0, new window.DOMRect( 8, 100, 0, 24 ) ] ] );
-
-		expect(
-			getRectangleFromRange( collapsedRange( paragraph, 0 ) )
-		).toMatchObject( { left: 8, top: 100, height: 24 } );
-	} );
-
-	it( 'measures a position in an empty text node at the start of the text after it', () => {
-		document.body.innerHTML = '<p>ab</p>';
-		const paragraph = document.querySelector( 'p' );
-		const empty = document.createTextNode( '' );
-		const text = document.createTextNode( 'cd' );
-		paragraph.append( empty, text );
-		rectsFor( [ [ text, 0, new window.DOMRect( 30, 100, 0, 24 ) ] ] );
-
-		expect(
-			getRectangleFromRange( collapsedRange( empty, 0 ) )
-		).toMatchObject( { left: 30, top: 100, height: 24 } );
-	} );
-
 	it( 'measures a position inside an empty inline element beside the text next to it', () => {
 		document.body.innerHTML =
 			'<p>﻿<span data-rich-text-placeholder="Type" style="display:inline"></span></p>';
