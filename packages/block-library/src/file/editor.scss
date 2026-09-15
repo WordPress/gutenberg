@@ -48,3 +48,9 @@
 		display: inline-block;
 	}
 }
+
+// Classic themes center blocks with a `data-align` wrapper instead of
+// `.aligncenter`. Zero specificity, so a justification chosen in the editor wins.
+:where(.wp-block[data-align="center"] > .wp-block-file) {
+	justify-content: center;
+}
