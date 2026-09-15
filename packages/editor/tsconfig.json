@@ -6,7 +6,8 @@
 			"jest",
 			"gutenberg-vitest-test-env",
 			"style-imports",
-			"react-css-custom-properties"
+			"react-css-custom-properties",
+			"gutenberg-env"
 		]
 	},
 	"files": [ "global.d.ts" ],
