@@ -17,6 +17,8 @@
 
 ### Bug Fixes
 
+-   `SelectControl`: Stop forcing a fill on the chevron icon, so the stroke-based chevron renders as a line again instead of a filled shape ([#82949](https://github.com/WordPress/gutenberg/pull/82949)).
+-   `BorderBoxControl`: Restore the split borders layout. The top and bottom controls are centred across the row and the right control sits at the end of its column again, after `BorderControl`'s own `margin: 0` began overriding both ([#82939](https://github.com/WordPress/gutenberg/pull/82939)).
 -   `PaletteEdit`: Separate adjacent header action buttons so their focus rings do not overlap ([#82768](https://github.com/WordPress/gutenberg/pull/82768)).
 
 ### Internal

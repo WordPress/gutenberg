@@ -12,6 +12,7 @@
 -   Route link actions through `HostLink` from `@wordpress/widget-primitives`,
     replacing the per-surface host link gating and `getActionRoute`
     ([#82952](https://github.com/WordPress/gutenberg/pull/82952)).
+-   Use UI Spinner and remove the direct Components dependency ([#82837](https://github.com/WordPress/gutenberg/pull/82837)).
 -   Migrate dashboard menus from the private Components API to the public
     `@wordpress/ui` Menu ([#81929](https://github.com/WordPress/gutenberg/pull/81929)).
 -   Run rendered Widget Dashboard tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
