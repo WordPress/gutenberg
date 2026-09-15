@@ -118,23 +118,5 @@ export default function getRectangleFromRange( range ) {
 		}
 	}
 
-	let rect = rects[ 0 ];
-
-	// If the collapsed range starts (and therefore ends) at an element node,
-	// `getClientRects` can be empty in some browsers. This can be resolved
-	// by adding a temporary text node with zero-width space to the range.
-	//
-	// See: https://stackoverflow.com/a/6847328/995445
-	if ( ! rect || rect.height === 0 ) {
-		assertIsDefined( ownerDocument, 'ownerDocument' );
-		const padNode = ownerDocument.createTextNode( '\u200b' );
-		// Do not modify the live range.
-		range = range.cloneRange();
-		range.insertNode( padNode );
-		rect = range.getClientRects()[ 0 ];
-		assertIsDefined( padNode.parentNode, 'padNode.parentNode' );
-		padNode.parentNode.removeChild( padNode );
-	}
-
-	return rect;
+	return rects[ 0 ] ?? null;
 }
