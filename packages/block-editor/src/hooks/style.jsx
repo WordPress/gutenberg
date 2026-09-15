@@ -36,6 +36,7 @@ import {
 	cleanEmptyObject,
 	shouldSkipSerialization,
 	useStyleOverride,
+	usePrivateStyleOverride,
 	useBlockSettings,
 } from './utils';
 import {
@@ -993,7 +994,7 @@ function getElementCSSRules( blockElementStyles, blockName, baseSelector ) {
 	return rules.length > 0 ? rules.join( '' ) : undefined;
 }
 
-function useBlockProps( { name, style } ) {
+function useBlockProps( { clientId, name, style } ) {
 	const blockElementsContainerIdentifier = useInstanceId(
 		STYLE_BLOCK_PROPS_REFERENCE,
 		'wp-elements'
@@ -1037,7 +1038,7 @@ function useBlockProps( { name, style } ) {
 		viewportSettings,
 	] );
 
-	useStyleOverride( { css: styles } );
+	usePrivateStyleOverride( { css: styles, clientId } );
 
 	return addSaveProps(
 		{ className: blockElementsContainerIdentifier },

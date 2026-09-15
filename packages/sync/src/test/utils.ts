@@ -1,6 +1,6 @@
 import * as Y from 'yjs';
 import * as buffer from 'lib0/buffer';
-import { describe, expect, it, beforeEach } from '@jest/globals';
+import { beforeEach, describe, expect, it } from 'vitest';
 import {
 	createYjsDoc,
 	initializeYjsDoc,

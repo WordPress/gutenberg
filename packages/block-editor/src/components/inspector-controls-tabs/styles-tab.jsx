@@ -4,7 +4,6 @@ import { useMemo } from '@wordpress/element';
 import BlockStyles from '../block-styles';
 import InspectorControls from '../inspector-controls';
 import PositionControls from './position-controls-panel';
-import { useBorderPanelLabel } from '../../hooks/border';
 import { useBlockSettings } from '../../hooks/utils';
 import { store as blockEditorStore } from '../../store';
 import { ElementsEdit } from '../../hooks/elements';
@@ -103,8 +102,6 @@ const StylesTab = ( {
 	isSectionBlock,
 	contentClientIds,
 } ) => {
-	const borderPanelLabel = useBorderPanelLabel( { clientId } );
-
 	return (
 		<>
 			{ hasBlockStyles && <BlockStyles clientId={ clientId } /> }
@@ -148,7 +145,7 @@ const StylesTab = ( {
 					/>
 					<InspectorControls.Slot
 						group="border"
-						label={ borderPanelLabel }
+						label={ __( 'Borders' ) }
 					/>
 					<InspectorControls.Slot
 						group="elements"
