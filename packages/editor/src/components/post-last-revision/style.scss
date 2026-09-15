@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 .editor-post-last-revision__title {
@@ -17,7 +18,8 @@
 	}
 
 	&:focus {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		@include outset-ring__focus();
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
 		border-radius: 0;
 	}
 }
