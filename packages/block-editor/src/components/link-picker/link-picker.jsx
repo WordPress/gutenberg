@@ -24,17 +24,19 @@ import { LinkPreview } from './link-preview';
  * LinkPicker component that combines the preview button and search input.
  * Shows a preview button as a trigger, and opens a popover with search input when clicked.
  *
- * @param {Object}            props                  - Component props
- * @param {LinkPickerPreview} props.preview          - Preview data object
- * @param {Function}          props.onSelect         - Callback when a suggestion is selected
- * @param {Object}            props.suggestionsQuery - Query parameters for suggestions
- * @param {string}            props.label            - Label for the control
- * @param {string}            props.help             - Help text for the control
+ * @param {Object}            props                      - Component props
+ * @param {LinkPickerPreview} props.preview              - Preview data object
+ * @param {Function}          props.onSelect             - Callback when a suggestion is selected
+ * @param {Object}            props.suggestionsQuery     - Query parameters for suggestions
+ * @param {Function}          props.transformSuggestions - Filters and orders suggestions before they are shown
+ * @param {string}            props.label                - Label for the control
+ * @param {string}            props.help                 - Help text for the control
  */
 export function LinkPicker( {
 	preview,
 	onSelect,
 	suggestionsQuery,
+	transformSuggestions,
 	label,
 	help,
 } ) {
@@ -114,6 +116,7 @@ export function LinkPicker( {
 							value={ null }
 							onChange={ handleChange }
 							suggestionsQuery={ suggestionsQuery }
+							transformSuggestions={ transformSuggestions }
 							showInitialSuggestions
 							forceIsEditingLink
 							settings={ [] }
