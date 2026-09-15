@@ -1686,7 +1686,7 @@ This can be useful to disable fields based on the state of other fields. For exa
  id: 'password',
  type: 'password',
  label: 'Password',
- isDisabled: ( item ) => item.status === 'private',
+ isDisabled: ( { item } ) => item.status === 'private',
 },
 ```
 
