@@ -35,17 +35,19 @@
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
+			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
 		"./build-style/*": "./build-style/*"
 	},
+	"types": "build-types",
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
-		"src/index.js",
-		"src/store/index.js",
+		"src/index.ts",
+		"src/store/index.ts",
 		"build/index.cjs",
 		"build/store/index.cjs",
 		"build-module/index.mjs",
@@ -72,8 +74,14 @@
 		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
+		"@types/react": "^18 || ^19",
 		"react": "^18 || ^19",
 		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

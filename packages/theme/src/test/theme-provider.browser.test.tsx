@@ -312,22 +312,41 @@ describe( 'ThemeProvider', () => {
 				.spyOn( console, 'warn' )
 				.mockImplementation( () => {} );
 
-			await render(
-				<>
-					<ThemeProvider isRoot color={ { primary: PRIMARY } }>
-						<div>a</div>
-					</ThemeProvider>
-					<ThemeProvider isRoot color={ { primary: OTHER_PRIMARY } }>
-						<div>b</div>
-					</ThemeProvider>
-				</>
-			);
+			// Competing root providers intentionally conflict. Keep their document
+			// separate so their cleanup order cannot change later tests' tokens.
+			const iframe = document.createElement( 'iframe' );
+			document.body.appendChild( iframe );
+			const iframeDoc = iframe.contentDocument!;
+			const container = iframeDoc.createElement( 'div' );
+			iframeDoc.body.appendChild( container );
+			let unmount:
+				| Awaited< ReturnType< typeof render > >[ 'unmount' ]
+				| undefined;
 
-			expect( warn ).toHaveBeenCalledWith(
-				expect.stringContaining( 'More than one root provider' )
-			);
+			try {
+				( { unmount } = await render(
+					<>
+						<ThemeProvider isRoot color={ { primary: PRIMARY } }>
+							<div>a</div>
+						</ThemeProvider>
+						<ThemeProvider
+							isRoot
+							color={ { primary: OTHER_PRIMARY } }
+						>
+							<div>b</div>
+						</ThemeProvider>
+					</>,
+					{ container }
+				) );
 
-			warn.mockRestore();
+				expect( warn ).toHaveBeenCalledWith(
+					expect.stringContaining( 'More than one root provider' )
+				);
+			} finally {
+				await unmount?.();
+				iframe.remove();
+				warn.mockRestore();
+			}
 		} );
 
 		it( 'does not warn for a single root provider', async () => {

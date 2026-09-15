@@ -1,13 +1,39 @@
-import { describe, expect, it, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { queryByAttribute, screen, waitFor } from '@testing-library/react';
 import { render, renderHook } from 'vitest-browser-react';
+import { logged } from '@wordpress/deprecated';
 import {
 	Composite,
 	CompositeGroup,
 	CompositeItem,
 	useCompositeState,
 } from '..';
+
+const DEPRECATION_MESSAGES = {
+	useCompositeState:
+		'wp.components.__unstableUseCompositeState is deprecated since version 6.7. Please use Composite instead.',
+	Composite:
+		'wp.components.__unstableComposite is deprecated since version 6.7. Please use Composite instead.',
+	CompositeItem:
+		'wp.components.__unstableCompositeItem is deprecated since version 6.7. Please use Composite.Item instead.',
+	CompositeGroup:
+		'wp.components.__unstableCompositeGroup is deprecated since version 6.7. Please use Composite.Group or Composite.Row instead.',
+};
+
+// Interaction cases start with their known deprecations already logged.
+// Each warning case clears only its own message before rendering.
+beforeEach( () => {
+	for ( const message of Object.values( DEPRECATION_MESSAGES ) ) {
+		logged[ message ] = true;
+	}
+} );
+
+afterEach( () => {
+	for ( const message of Object.values( DEPRECATION_MESSAGES ) ) {
+		delete logged[ message ];
+	}
+} );
 
 type InitialState = Parameters< typeof useCompositeState >[ 0 ];
 type CompositeState = ReturnType< typeof useCompositeState >;
@@ -128,26 +154,25 @@ function getShiftTestItems() {
 	};
 }
 
-// Checking for deprecation warnings before other tests because the `deprecated`
-// utility only fires a console.warn the first time a component is rendered.
 describe( 'Shows a deprecation warning', () => {
 	it( 'useCompositeState', async () => {
+		delete logged[ DEPRECATION_MESSAGES.useCompositeState ];
 		await renderHook( () => useCompositeState() );
 		expect( console ).toHaveWarnedWith(
-			'wp.components.__unstableUseCompositeState is deprecated since version 6.7. Please use Composite instead.'
+			DEPRECATION_MESSAGES.useCompositeState
 		);
 	} );
 	it( 'Composite', async () => {
+		delete logged[ DEPRECATION_MESSAGES.Composite ];
 		const Test = () => {
 			const props = useCompositeState();
 			return <Composite { ...props } />;
 		};
 		await render( <Test /> );
-		expect( console ).toHaveWarnedWith(
-			'wp.components.__unstableComposite is deprecated since version 6.7. Please use Composite instead.'
-		);
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGES.Composite );
 	} );
 	it( 'CompositeItem', async () => {
+		delete logged[ DEPRECATION_MESSAGES.CompositeItem ];
 		const Test = () => {
 			const props = useCompositeState();
 			return (
@@ -158,10 +183,11 @@ describe( 'Shows a deprecation warning', () => {
 		};
 		await render( <Test /> );
 		expect( console ).toHaveWarnedWith(
-			'wp.components.__unstableCompositeItem is deprecated since version 6.7. Please use Composite.Item instead.'
+			DEPRECATION_MESSAGES.CompositeItem
 		);
 	} );
 	it( 'CompositeGroup', async () => {
+		delete logged[ DEPRECATION_MESSAGES.CompositeGroup ];
 		const Test = () => {
 			const props = useCompositeState();
 			return (
@@ -174,7 +200,7 @@ describe( 'Shows a deprecation warning', () => {
 		};
 		await render( <Test /> );
 		expect( console ).toHaveWarnedWith(
-			'wp.components.__unstableCompositeGroup is deprecated since version 6.7. Please use Composite.Group or Composite.Row instead.'
+			DEPRECATION_MESSAGES.CompositeGroup
 		);
 	} );
 } );
