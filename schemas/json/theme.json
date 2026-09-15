@@ -588,7 +588,9 @@
 										"vmax",
 										"svmax",
 										"lvmax",
-										"dvmax"
+										"dvmax",
+										"lh",
+										"rlh"
 									],
 									"default": "rem"
 								}
