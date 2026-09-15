@@ -1,12 +1,9 @@
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	PanelBody,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalSpacer as Spacer,
 	__experimentalHasSplitBorders as hasSplitBorders,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 // @ts-expect-error: Not typed yet.
@@ -34,37 +31,53 @@ const {
 } = unlock( blockEditorPrivateApis );
 
 const elements = {
-	text: {
-		description: __( 'Manage the fonts used on the site.' ),
-		title: __( 'Text' ),
-	},
 	link: {
-		description: __( 'Manage the fonts and typography used on the links.' ),
-		title: __( 'Links' ),
-	},
-	heading: {
-		description: __( 'Manage the fonts and typography used on headings.' ),
-		title: __( 'Headings' ),
+		description: __( 'Manage the appearance of links.' ),
+		title: __( 'Link' ),
 	},
 	caption: {
-		description: __( 'Manage the fonts and typography used on captions.' ),
-		title: __( 'Captions' ),
+		description: __( 'Manage the appearance of captions.' ),
+		title: __( 'Caption' ),
 	},
 	cite: {
-		description: __( 'Manage the fonts and typography used on citations.' ),
-		title: __( 'Citations' ),
+		description: __( 'Manage the appearance of citations.' ),
+		title: __( 'Citation' ),
 	},
-	button: {
-		description: __( 'Manage the appearance of buttons.' ),
-		title: __( 'Buttons' ),
+	h1: {
+		description: __( 'Manage the appearance of level 1 headings.' ),
+		title: __( 'Heading 1' ),
+	},
+	h2: {
+		description: __( 'Manage the appearance of level 2 headings.' ),
+		title: __( 'Heading 2' ),
+	},
+	h3: {
+		description: __( 'Manage the appearance of level 3 headings.' ),
+		title: __( 'Heading 3' ),
+	},
+	h4: {
+		description: __( 'Manage the appearance of level 4 headings.' ),
+		title: __( 'Heading 4' ),
+	},
+	h5: {
+		description: __( 'Manage the appearance of level 5 headings.' ),
+		title: __( 'Heading 5' ),
+	},
+	h6: {
+		description: __( 'Manage the appearance of level 6 headings.' ),
+		title: __( 'Heading 6' ),
 	},
 	textInput: {
 		description: __( 'Manage the appearance of inputs.' ),
-		title: __( 'Inputs' ),
+		title: __( 'Input' ),
 	},
 	select: {
 		description: __( 'Manage the appearance of selects.' ),
-		title: __( 'Selects' ),
+		title: __( 'Select' ),
+	},
+	button: {
+		description: __( 'Manage the appearance of buttons.' ),
+		title: __( 'Button' ),
 	},
 };
 
@@ -111,9 +124,7 @@ function applyAllFallbackStyles( border: any ) {
 
 /**
  * Renders the style panels that read and write `styles.elements.<name>`
- * directly. Typography and color are handled separately because they are
- * scoped differently: color controls for an element are exposed through the
- * root color panel.
+ * directly. Typography has its own wrapper, which also carries text color.
  *
  * @param props
  * @param props.element The element being styled.
@@ -244,9 +255,6 @@ function ElementStylePanels( {
 }
 
 function ScreenElement( { element }: ScreenElementProps ) {
-	const [ headingLevel, setHeadingLevel ] = useState( 'heading' );
-	const usedElement = element === 'heading' ? headingLevel : element;
-
 	return (
 		<>
 			<ScreenHeader
@@ -254,82 +262,13 @@ function ScreenElement( { element }: ScreenElementProps ) {
 				description={ elements[ element ].description }
 			/>
 			<Spacer marginX={ 4 }>
-				<ElementPreview
-					element={ element }
-					headingLevel={ headingLevel }
-				/>
+				<ElementPreview element={ element } />
 			</Spacer>
-			{ element === 'heading' && (
-				<Spacer marginX={ 4 } marginBottom="1em">
-					<ToggleGroupControl
-						label={ __( 'Select heading level' ) }
-						hideLabelFromVision
-						value={ headingLevel }
-						onChange={ ( value ) =>
-							setHeadingLevel( value as string )
-						}
-						isBlock
-					>
-						<ToggleGroupControlOption
-							value="heading"
-							showTooltip
-							aria-label={ __( 'All headings' ) }
-							label={ _x( 'All', 'heading levels' ) }
-						/>
-						<ToggleGroupControlOption
-							value="h1"
-							showTooltip
-							aria-label={ __( 'Heading 1' ) }
-							label={ __( 'H1' ) }
-						/>
-						<ToggleGroupControlOption
-							value="h2"
-							showTooltip
-							aria-label={ __( 'Heading 2' ) }
-							label={ __( 'H2' ) }
-						/>
-						<ToggleGroupControlOption
-							value="h3"
-							showTooltip
-							aria-label={ __( 'Heading 3' ) }
-							label={ __( 'H3' ) }
-						/>
-						<ToggleGroupControlOption
-							value="h4"
-							showTooltip
-							aria-label={ __( 'Heading 4' ) }
-							label={ __( 'H4' ) }
-						/>
-						<ToggleGroupControlOption
-							value="h5"
-							showTooltip
-							aria-label={ __( 'Heading 5' ) }
-							label={ __( 'H5' ) }
-						/>
-						<ToggleGroupControlOption
-							value="h6"
-							showTooltip
-							aria-label={ __( 'Heading 6' ) }
-							label={ __( 'H6' ) }
-						/>
-					</ToggleGroupControl>
-				</Spacer>
-			) }
-			<TypographyPanel
+			<TypographyPanel element={ element } />
+			<ElementStylePanels
 				element={ element }
-				headingLevel={ headingLevel }
+				label={ elements[ element ].title }
 			/>
-			{ /*
-			   "Text" is the root rather than an element, so there is no
-			   `styles.elements.text` node for these panels to write into.
-			*/ }
-			{ element !== 'text' && (
-				<ElementStylePanels
-					key={ usedElement }
-					element={ usedElement }
-					label={ elements[ element ].title }
-				/>
-			) }
 		</>
 	);
 }

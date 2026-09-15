@@ -8,22 +8,10 @@ const { useSettingsForBlockElement, TypographyPanel: StylesTypographyPanel } =
 
 interface TypographyPanelProps {
 	element: string;
-	headingLevel: string;
-	showTextColor?: boolean;
 }
 
-export default function TypographyPanel( {
-	element,
-	headingLevel,
-	showTextColor = true,
-}: TypographyPanelProps ) {
-	let prefixParts: string[] = [];
-	if ( element === 'heading' ) {
-		prefixParts = prefixParts.concat( [ 'elements', headingLevel ] );
-	} else if ( element && element !== 'text' ) {
-		prefixParts = prefixParts.concat( [ 'elements', element ] );
-	}
-	const prefix = prefixParts.join( '.' );
+export default function TypographyPanel( { element }: TypographyPanelProps ) {
+	const prefix = `elements.${ element }`;
 
 	const [ style ] = useStyle( prefix, '', 'user', false );
 	const [ inheritedStyle, setStyle ] = useStyle(
@@ -33,21 +21,11 @@ export default function TypographyPanel( {
 		false
 	);
 	const [ rawSettings ] = useSetting( '' );
-	const usedElement = element === 'heading' ? headingLevel : element;
-	const elementSettings = useSettingsForBlockElement(
+	const settings = useSettingsForBlockElement(
 		rawSettings,
 		undefined,
-		usedElement
+		element
 	);
-	const settings = showTextColor
-		? elementSettings
-		: {
-				...elementSettings,
-				color: {
-					...elementSettings.color,
-					text: false,
-				},
-		  };
 
 	return (
 		<StylesTypographyPanel
