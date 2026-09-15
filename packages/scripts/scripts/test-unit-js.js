@@ -18,7 +18,7 @@ try {
 	console.error(
 		'wp-scripts test-unit-js requires Vitest 5 and Vite 7 or 8. ' +
 			'Install Vitest with npm install --save-dev vitest@^5. ' +
-			'Keep your existing Vite 7 or 8, or install it with npm install --save-dev "vite@^7 || ^8". ' +
+			'For a new setup, install Vite with npm install --save-dev vite@^8. Existing Vite 7 or 8 installations can be kept. ' +
 			'To keep using Jest, switch your command to wp-scripts test-unit-jest and follow ' +
 			'https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md#keep-an-existing-jest-suite.'
 	);

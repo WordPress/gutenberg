@@ -448,13 +448,13 @@ This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll l
 
 Runs the consumer's installed [Vitest](https://vitest.dev/) once. Install the test runner in the project that owns the tests.
 
-Vite 7 remains supported so existing projects can adopt Vitest without a Vite major upgrade.
-
-If your project already uses Vite 7 or 8, keep it and install only `vitest@^5`. Otherwise, install both packages:
+For a new test setup, install Vitest 5 and Vite 8:
 
 ```sh
-npm install --save-dev vitest@^5 "vite@^7 || ^8"
+npm install --save-dev vitest@^5 vite@^8
 ```
+
+If your project already uses Vite 7 or 8, keep it and install only `vitest@^5`.
 
 ```json
 {

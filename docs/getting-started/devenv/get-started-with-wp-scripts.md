@@ -125,11 +125,13 @@ Regularly linting and formatting your code ensures it's functional, clear, and m
 
 ### Running tests
 
-`wp-scripts test-unit-js` runs your project's installed [Vitest](https://vitest.dev/) for unit tests. Install Vitest and Vite as development dependencies. If you already use Vite 7 or 8, keep it and install only `vitest@^5`.
+`wp-scripts test-unit-js` runs your project's installed [Vitest](https://vitest.dev/) for unit tests. For a new test setup, install Vitest 5 and Vite 8 as development dependencies:
 
 ```sh
-npm install --save-dev vitest@^5 "vite@^7 || ^8"
+npm install --save-dev vitest@^5 vite@^8
 ```
+
+If your project already uses Vite 7 or 8, keep it and install only `vitest@^5`.
 
 `wp-scripts` also provides [Playwright](https://playwright.dev/) for end-to-end tests. Add these commands to `package.json`:
 
