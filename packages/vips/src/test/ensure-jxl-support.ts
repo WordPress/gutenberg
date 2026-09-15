@@ -25,12 +25,10 @@ vi.mock( '@wordpress/worker-threads', () => ( {
 // cannot be resolved from a unit test run.
 // The specifier has to match the one vips-worker.ts imports, extension and
 // all, or the virtual mock is not consulted and the resolve fails.
-vi.mock( '../worker-code.ts', () => ( { workerCode: '' } ), {
-	virtual: true,
-} );
+vi.mock( '../worker-code.ts', () => ( { workerCode: '' } ) );
 
-// Stands in for fetching the ~3 MB JXL chunk. Throwing from the factory is how
-// a failed chunk load surfaces: the dynamic import rejects.
+// Stands in for fetching the ~3 MB JXL chunk. Throwing from here is how a
+// failed chunk load surfaces, by way of the `default` getter below.
 const mockJxlImport = vi.fn( () => ( {
 	__esModule: true,
 	default: new Uint8Array( [ 1, 2, 3, 4 ] ),
@@ -59,7 +57,17 @@ async function loadWorkerModule() {
 	// imported lazily from inside vipsEnsureJxlSupport, long after this
 	// function returns, so it has to resolve against the same registry.
 	vi.resetModules();
-	vi.doMock( '@wordpress/vips/jxl-wasm', () => mockJxlImport() );
+	/*
+	 * A `default` getter rather than a factory that throws: Vitest replaces an
+	 * error thrown while building the mock module with its own, so the failure
+	 * has to surface where the consumer reads the export for the original to
+	 * reach `vipsEnsureJxlSupport`.
+	 */
+	vi.doMock( '@wordpress/vips/jxl-wasm', () => ( {
+		get default() {
+			return mockJxlImport().default;
+		},
+	} ) );
 	return await import( '../vips-worker' );
 }
 

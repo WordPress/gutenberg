@@ -28,12 +28,9 @@ const mockVipsFactory = vi.fn( () => ( {
 	shutdown: mockShutdown,
 } ) );
 
-vi.mock(
-	'wasm-vips',
-	() =>
-		( ...args: unknown[] ) =>
-			mockVipsFactory( ...( args as [] ) )
-);
+vi.mock( 'wasm-vips', () => ( {
+	default: ( ...args: unknown[] ) => mockVipsFactory( ...( args as [] ) ),
+} ) );
 
 /**
  * Loads a fresh copy of the module.
@@ -45,12 +42,10 @@ vi.mock(
  * @return The module's exports.
  */
 async function loadVips() {
-	let vips: typeof import('../');
-	await vi.isolateModulesAsync( async () => {
-		vips = await import( '../' );
-	} );
-	// @ts-expect-error - assigned inside the isolated module callback.
-	return vips;
+	// Vitest has no isolateModules; resetting the registry gives the next
+	// import its own module instance, which is what these tests need.
+	vi.resetModules();
+	return await import( '../' );
 }
 
 /**

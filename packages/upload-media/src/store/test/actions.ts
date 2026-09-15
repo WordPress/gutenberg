@@ -52,6 +52,20 @@ vi.mock(
 		} ) as unknown as typeof import('../utils')
 );
 
+/*
+ * actions.ts transitively imports private-actions, which also pulls in
+ * convertGifToVideo / isUnsupportedConversionError, so the mock must cover the
+ * whole module surface. isUnsupportedConversionError is kept real.
+ */
+vi.mock( import( '../utils/video-conversion' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
+	return {
+		convertGifToVideo: vi.fn(),
+		cancelGifToVideoOperations: vi.fn( () => Promise.resolve( true ) ),
+		terminateVideoConversionWorker: vi.fn(),
+		isUnsupportedConversionError: actual.isUnsupportedConversionError,
+	};
+} );
 
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
