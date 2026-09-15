@@ -17,11 +17,7 @@
 		text-align: right;
 	}
 
-	// The flex layout spaces the file name and button with `gap` instead.
-	&:not(.is-layout-flex) * + .wp-block-file__button {
-		margin-left: 0.75em;
-	}
-
+	// Space the file name and button as before the flex layout, whatever the theme's block gap.
 	&.is-layout-flex {
 		gap: 0.75em;
 	}
