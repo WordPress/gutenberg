@@ -1,15 +1,17 @@
+import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { type ButtonIconProps } from './types';
 import { Icon } from '../icon';
+import styles from './style.module.css';
 
 export const ButtonIcon = forwardRef< SVGSVGElement, ButtonIconProps >(
-	function ButtonIcon( { icon, ...props }, ref ) {
+	function ButtonIcon( { className, icon, ...props }, ref ) {
 		return (
 			<Icon
 				ref={ ref }
 				icon={ icon }
-				viewBox="4 4 16 16"
-				size={ 16 }
+				className={ clsx( styles.icon, className ) }
+				size={ 24 }
 				{ ...props }
 			/>
 		);

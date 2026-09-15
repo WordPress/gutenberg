@@ -1,0 +1,58 @@
+import { ArgTypes, Meta, Stories } from '@storybook/addon-docs/blocks';
+import * as OverviewStories from './overview.story';
+import { ValidatedInputControl } from '../validated-input-control';
+
+<Meta
+	of={ OverviewStories }
+	title="Design System/Components/Form/With Validation/Overview"
+/>
+
+# Validated Form Controls
+
+This section documents form controls in `@wordpress/ui` that wrap higher-level `*Control` components with inline validation feedback via [`ControlWithError`](?path=/docs/design-system-components-form-primitives-controlwitherror--docs).
+
+## Status
+
+We are still gathering feedback and iterating on these components. APIs and behavior may change before they stabilize. Please get in touch with `@WordPress/gutenberg-components` if you are interested in trying them out in the Gutenberg app.
+
+## Usage
+
+Component APIs are the same as the underlying control, with the addition of some optional props:
+
+<ArgTypes
+	of={ ValidatedInputControl }
+	include={ [ 'required', 'markWhenOptional', 'customValidity' ] }
+/>
+
+## Implementation
+
+These components are designed to work with the native HTML5 [Constraint Validation API](https://developer.mozilla.org/en-US/docs/Web/API/Constraint_validation). Using this browser API as the "source of truth" for form element errors has these benefits:
+
+-   Ability to use CSS selectors like `:invalid`, `:user-invalid`, `:required`, and `:optional`.
+-   Ability to use simple HTML attribute-based constraints (e.g. `min`, `max`, `required`, `pattern`, `type`) together with fully custom validation logic (with the `setCustomValidity()` method).
+-   Attribute-based constraints will already have localized, user-facing error messages built in.
+-   When a user clicks the form submit button, the browser will automatically check the validity states of all enclosed form elements and block the submit when there are errors. It will also automatically scroll and focus to the first erroring element and show a prominent error popover.
+-   While not _all_ aspects of the Constraint Validation API are well-supported in all screen readers yet, many aspects are, and will continue to improve. We can supplement any accessibility shortcomings with things like `aria-live` announcements of error messages.
+
+## Current limitations
+
+### No easy access to underlying validation APIs
+
+-   The consumer does not have a simple way to show validation messages at an arbitrary point in time, unless the fields are wrapped in a `form` element. Currently, when to show validation messages to the user are handled by the component — any messages are first made visible on `blur` after the field is considered "touched", or if the user tries to submit the enclosing `form`. Messages can also be triggered to show at any time by calling the `reportValidity()` method on the wrapping `<form>` element.
+-   The consumer does not have direct access to the [`validity` object](https://developer.mozilla.org/en-US/docs/Web/API/ValidityState) of the underlying element.
+
+We don't foresee these being needed much, but it is technically possible by the consumer accessing the target element's validation APIs via `ref`. Better docs or ergonomics can be added when we have actual use cases.
+
+### Delegate elements
+
+Some validated controls may not be able to use their visible interactive element for constraint validation directly — for example, when the underlying component renders a custom widget rather than a native form control.
+
+In those cases, the implementation may use a delegate element: a visually hidden native form element that handles Constraint Validation API concerns on behalf of the visible control. This keeps behavior consistent across validated controls, such as scrolling to the first invalid field on submit and blocking form submission when there are errors.
+
+### Controlled mode only
+
+Some of the `@wordpress/components` controls currently do not fully support uncontrolled mode, and the validation components are not tested to work when uncontrolled. For now, we recommend sticking to controlled mode to avoid any issues.
+
+## Examples
+
+<Stories />

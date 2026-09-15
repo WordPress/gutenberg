@@ -11,7 +11,14 @@ import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
 import { WithDesignSystemTheme } from './decorators/with-design-system-theme';
 import { ComponentStatusIndicator } from './components/component-status-indicator';
+import { handlePreloadError } from './load-error-recovery';
 import theme from './theme';
+
+if ( typeof window !== 'undefined' ) {
+	window.addEventListener( 'vite:preloadError', handlePreloadError, {
+		once: true,
+	} );
+}
 
 export const globalTypes = {
 	direction: {
@@ -58,8 +65,10 @@ export const globalTypes = {
 		},
 	},
 	dsColorTheme: {},
+	dsPrimaryColor: {},
+	dsBackgroundColor: {},
 	dsCursorControl: {},
-	dsDensity: {},
+	dsCornerRadius: {},
 };
 
 export const decorators = [
@@ -70,6 +79,9 @@ export const decorators = [
 ];
 
 export const parameters = {
+	a11y: {
+		test: 'error',
+	},
 	controls: {
 		sort: 'requiredFirst',
 	},
@@ -116,6 +128,10 @@ export const parameters = {
 				],
 				'Icons',
 				'Design System',
+				'Widget Primitives',
+				[ 'Introduction', 'Anatomy', 'System Architecture' ],
+				'Widget Dashboard',
+				[ 'Introduction', 'Anatomy', 'Widget Chrome', 'Playground' ],
 			];
 			const PRIORITIZED_MDX_DOCS = [ 'Introduction', 'Overview' ];
 

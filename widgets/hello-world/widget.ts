@@ -1,8 +1,8 @@
-/**
- * Widget type definition
- */
 export default {
 	name: 'core/hello-world',
-	title: 'Hello World',
-	icon: 'wordpress',
+	example: {
+		attributes: {
+			message: 'Hello World',
+		},
+	},
 };

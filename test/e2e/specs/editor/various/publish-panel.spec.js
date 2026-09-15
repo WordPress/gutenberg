@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post publish panel', () => {
@@ -31,7 +28,12 @@ test.describe( 'Post publish panel', () => {
 		await expect( cancelButton ).toBeEnabled();
 		await cancelButton.click();
 
-		// Test focus is moved back to the Publish panel toggle button.
+		// Wait for the close transition before checking focus return.
+		await expect( publishPanelToggleButton ).toHaveAttribute(
+			'aria-expanded',
+			'false'
+		);
+
 		await expect( publishPanelToggleButton ).toBeFocused();
 	} );
 

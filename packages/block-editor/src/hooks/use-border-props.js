@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getInlineStyles } from './style';
 import { getBorderClasses, getMultiOriginColor } from './border';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';

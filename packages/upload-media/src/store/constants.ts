@@ -16,6 +16,21 @@ export const DEFAULT_MAX_CONCURRENT_UPLOADS = 5;
 export const DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING = 2;
 
 /**
+ * Default automatic retry behavior for failed uploads.
+ *
+ * Four total attempts (initial + 3 retries) with exponential backoff:
+ * ~1s, then ~2s, capped at 30s. The jitter factor adds randomness to
+ * the delay so simultaneous failures do not retry in lockstep.
+ */
+export const DEFAULT_RETRY_SETTINGS = {
+	maxRetryAttempts: 3,
+	initialRetryDelayMs: 1000,
+	maxRetryDelayMs: 30000,
+	backoffMultiplier: 2,
+	retryJitter: 0.1,
+} as const;
+
+/**
  * MIME types supported by client-side media processing.
  *
  * These are the image formats that can be processed using

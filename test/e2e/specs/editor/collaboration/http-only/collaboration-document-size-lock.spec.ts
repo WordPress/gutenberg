@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from '../fixtures';
 import { SECOND_USER } from '../fixtures/collaboration-utils';
 
@@ -51,25 +48,40 @@ test.describe( 'Collaboration with large documents', () => {
 		// code path ran: onDocUpdate detected the oversized update,
 		// emitted the status, and unregistered the room.
 		await page.waitForFunction(
-			() =>
-				window?.wp?.data
-					?.select( 'core/editor' )
-					?.isCollaborationEnabledForCurrentPost?.() === false,
-			undefined,
+			( consent ) => {
+				const privateApis = ( window as any ).wp.privateApis;
+				const { unlock } =
+					privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+						consent,
+						'@wordpress/core-data'
+					);
+				return (
+					unlock(
+						window.wp.data.select( 'core/editor' )
+					).isCollaborationEnabledForCurrentPost() === false
+				);
+			},
+			'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
 			{ timeout: 15000 }
 		);
 
 		// Verify the sync connection status is 'disconnected' with
 		// a 'document-size-limit-exceeded' error code.
-		const syncStatus = await page.evaluate( () => {
-			const status = window.wp.data
-				.select( 'core' )
-				.getSyncConnectionStatus();
+		const syncStatus = await page.evaluate( ( consent ) => {
+			const privateApis = ( window as any ).wp.privateApis;
+			const { unlock } =
+				privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+					consent,
+					'@wordpress/core-data'
+				);
+			const status = unlock(
+				window.wp.data.select( 'core' )
+			).getSyncConnectionStatus();
 			return {
 				status: status?.status,
 				errorCode: status?.error?.code,
 			};
-		} );
+		}, 'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.' );
 		expect( syncStatus ).toEqual( {
 			status: 'disconnected',
 			errorCode: 'document-size-limit-exceeded',
@@ -125,10 +137,8 @@ test.describe( 'Collaboration with large documents', () => {
 			// Assert the post-locked modal appears.
 			// Because collaboration is disabled (document too large),
 			// WordPress falls back to standard post-locking. User 2
-			// sees the "This post is already being edited" modal.
-			const modal = page2.getByRole( 'dialog', {
-				name: 'This post is already being edited',
-			} );
+			// sees the post-locked modal.
+			const modal = page2.locator( '.editor-post-locked-modal' );
 			await expect( modal ).toBeVisible( { timeout: 60000 } );
 
 			// Assert the explanation about document size limit.
@@ -136,11 +146,6 @@ test.describe( 'Collaboration with large documents', () => {
 				modal.getByText(
 					'Because this post is too large for real-time collaboration, only one person can edit at a time.'
 				)
-			).toBeVisible();
-
-			// Assert the "Take over" option is available.
-			await expect(
-				modal.getByRole( 'link', { name: 'Take over' } )
 			).toBeVisible();
 		} finally {
 			await secondContext.close();

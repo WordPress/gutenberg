@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { TEMPLATE_ORIGINS } from './constants';
 
 /**

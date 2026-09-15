@@ -1,0 +1,41 @@
+<svg viewBox="0 0 860 182" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The widget header row, made of three semantic sections: an identity cluster (icon, title, help) on the leading edge, the attribute controls in the middle, and the actions menu on the trailing edge.">
+  <rect x="6" y="6" width="848" height="170" rx="12" fill="#ffffff"/>
+
+  <text x="430" y="34" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#64748b">the header row</text>
+
+  <!-- The row -->
+  <rect x="40" y="54" width="780" height="54" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+
+  <!-- Identity: icon + title + help -->
+  <rect x="56" y="68" width="26" height="26" rx="6" fill="#e2ecfd" stroke="#2f54a5" stroke-width="1.4"/>
+  <text x="92" y="86" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1e3a8a">Traffic Snapshot</text>
+  <circle cx="224" cy="81" r="8" fill="#eef4fe" stroke="#7f9cd8" stroke-width="1.2"/>
+  <text x="224" y="85" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" font-weight="700" font-style="italic" fill="#3b62b0">i</text>
+
+  <!-- Attributes: two inline field controls -->
+  <rect x="468" y="70" width="118" height="22" rx="6" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="480" y="85" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#475569">Metric</text>
+  <path d="M564 79 l7 0 l-3.5 5 z" fill="#94a3b8"/>
+  <rect x="598" y="70" width="118" height="22" rx="6" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="610" y="85" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#475569">Period</text>
+  <path d="M694 79 l7 0 l-3.5 5 z" fill="#94a3b8"/>
+
+  <!-- More: actions menu -->
+  <rect x="764" y="70" width="44" height="22" rx="6" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <circle cx="786" cy="76" r="1.8" fill="#475569"/>
+  <circle cx="786" cy="81" r="1.8" fill="#475569"/>
+  <circle cx="786" cy="86" r="1.8" fill="#475569"/>
+
+  <!-- Section brackets -->
+  <path d="M56 120 L56 126 L232 126 L232 120" fill="none" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="144" y="143" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#334155">Identity</text>
+  <text x="144" y="158" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">icon · title · help</text>
+
+  <path d="M468 120 L468 126 L716 126 L716 120" fill="none" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="592" y="143" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#334155">Attributes</text>
+  <text x="592" y="158" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">high-relevance fields</text>
+
+  <path d="M764 120 L764 126 L808 126 L808 120" fill="none" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="786" y="143" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#334155">More</text>
+  <text x="786" y="158" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">actions</text>
+</svg>

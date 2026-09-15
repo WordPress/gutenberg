@@ -2,9 +2,7 @@
  * Tests for schema validation utilities.
  */
 
-/**
- * Internal dependencies
- */
+import { describe, expect, it, vi } from 'vitest';
 import { validateValueFromSchema } from '../validation';
 
 describe( 'validateValueFromSchema', () => {
@@ -137,9 +135,9 @@ describe( 'validateValueFromSchema', () => {
 
 	describe( 'edge cases', () => {
 		it( 'should pass validation when empty schema provided', () => {
-			const consoleSpy = jest
+			const consoleSpy = vi
 				.spyOn( console, 'warn' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 
 			expect( validateValueFromSchema( 'anything', {} ) ).toBe( true );
 			expect( consoleSpy ).toHaveBeenCalledWith(
@@ -150,9 +148,9 @@ describe( 'validateValueFromSchema', () => {
 		} );
 
 		it( 'should warn when type is missing but still pass validation', () => {
-			const consoleSpy = jest
+			const consoleSpy = vi
 				.spyOn( console, 'warn' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 			const schema = { properties: { name: { type: 'string' } } };
 			const result = validateValueFromSchema( { name: 'test' }, schema );
 
@@ -165,9 +163,9 @@ describe( 'validateValueFromSchema', () => {
 		} );
 
 		it( 'should include param name in warning when provided', () => {
-			const consoleSpy = jest
+			const consoleSpy = vi
 				.spyOn( console, 'warn' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 			const schema = { format: 'email' }; // Schema without type
 			const result = validateValueFromSchema(
 				'test@example.com',
@@ -247,6 +245,16 @@ describe( 'validateValueFromSchema', () => {
 			);
 			expect( validateValueFromSchema( 'not a hostname!', schema ) ).toBe(
 				' is not a valid hostname.'
+			);
+		} );
+
+		it( 'should validate URI format', () => {
+			const schema = { type: 'string', format: 'uri' };
+			expect(
+				validateValueFromSchema( 'https://example.com/path', schema )
+			).toBe( true );
+			expect( validateValueFromSchema( 'not a uri', schema ) ).toBe(
+				' is not a valid URI.'
 			);
 		} );
 	} );
@@ -443,9 +451,9 @@ describe( 'validateValueFromSchema', () => {
 
 	describe( 'schema edge cases and errors', () => {
 		it( 'should handle empty schema object as valid but warn about missing type', () => {
-			const consoleSpy = jest
+			const consoleSpy = vi
 				.spyOn( console, 'warn' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 
 			// Empty object schema triggers warning about missing type
 			expect( validateValueFromSchema( 'anything', {} ) ).toBe( true );
@@ -457,9 +465,9 @@ describe( 'validateValueFromSchema', () => {
 		} );
 
 		it( 'should warn for invalid schema types but still pass validation', () => {
-			const consoleSpy = jest
+			const consoleSpy = vi
 				.spyOn( console, 'warn' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 
 			// Testing edge cases where schema is not a valid object
 			expect(
@@ -500,9 +508,9 @@ describe( 'validateValueFromSchema', () => {
 		it( 'should handle schema compilation errors', () => {
 			// Pass an invalid schema that will cause compilation error
 			const invalidSchema = { type: 'invalid-type' };
-			const consoleErrorSpy = jest
+			const consoleErrorSpy = vi
 				.spyOn( console, 'error' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 
 			const result = validateValueFromSchema( 'test', invalidSchema );
 
@@ -527,6 +535,73 @@ describe( 'validateValueFromSchema', () => {
 			expect( validateValueFromSchema( 'different-value', schema ) ).toBe(
 				'must be equal to constant'
 			);
+		} );
+	} );
+
+	describe( 'WordPress-specific schema keywords', () => {
+		// All of these keywords are valid on WordPress REST API schemas
+		// (sanitize_callback / validate_callback / arg_options from
+		// register_meta and route args, context / readonly from REST
+		// response shaping, example / examples from OpenAPI-style docs,
+		// and boolean `required` from per-arg flags) but are not part of
+		// JSON Schema draft-04. AJV rejects them at compile time (either
+		// strict mode or meta-schema), so the catch block surfaces a
+		// generic "Invalid schema" error rather than ignoring them.
+		it.each( [
+			[ 'sanitize_callback', 'sanitize_text_field' ],
+			[ 'validate_callback', 'rest_validate_request_arg' ],
+			[ 'arg_options', { sanitize_callback: 'sanitize_key' } ],
+			[ 'example', 'an example value' ],
+			[ 'examples', [ 'first', 'second' ] ],
+			[ 'context', [ 'view', 'edit', 'embed' ] ],
+			[ 'readonly', true ],
+			[ 'required', true ],
+		] )(
+			'should fail compilation when a property uses `%s`',
+			( keyword, value ) => {
+				const schema = {
+					type: 'object',
+					properties: {
+						name: {
+							type: 'string',
+							[ keyword ]: value,
+						},
+					},
+				};
+				const consoleErrorSpy = vi
+					.spyOn( console, 'error' )
+					.mockImplementation( () => {} );
+
+				expect(
+					validateValueFromSchema( { name: 'hello' }, schema )
+				).toBe( 'Invalid schema provided for validation.' );
+				expect( consoleErrorSpy ).toHaveBeenCalledWith(
+					'Schema compilation error:',
+					expect.any( Error )
+				);
+
+				consoleErrorSpy.mockRestore();
+			}
+		);
+
+		it( 'should fail compilation when a WP-specific keyword sits at the top level of the schema', () => {
+			const schema = {
+				type: 'string',
+				sanitize_callback: 'sanitize_text_field',
+			};
+			const consoleErrorSpy = vi
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+
+			expect( validateValueFromSchema( 'hello', schema ) ).toBe(
+				'Invalid schema provided for validation.'
+			);
+			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+				'Schema compilation error:',
+				expect.any( Error )
+			);
+
+			consoleErrorSpy.mockRestore();
 		} );
 	} );
 } );

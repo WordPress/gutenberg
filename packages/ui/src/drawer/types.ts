@@ -1,10 +1,10 @@
 import type { Drawer as _Drawer } from '@base-ui/react/drawer';
-import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import type { Button } from '../button';
 import type { IconButton } from '../icon-button';
 import type { ComponentProps } from '../utils/types';
 
-export type PortalProps = ComponentPropsWithoutRef< typeof _Drawer.Portal >;
+export type PortalProps = ComponentProps< typeof _Drawer.Portal >;
 
 export interface RootProps
 	extends Pick<
@@ -34,12 +34,17 @@ export interface RootProps
 	children?: ReactNode;
 }
 
-export interface TriggerProps extends ComponentProps< 'button' > {
+// Detached triggers require handle and payload APIs that Drawer does not
+// expose.
+export type TriggerProps = Omit<
+	ComponentProps< typeof _Drawer.Trigger >,
+	'handle' | 'payload'
+> & {
 	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
-}
+};
 
 export interface PopupProps
 	extends ComponentProps< 'div' >,

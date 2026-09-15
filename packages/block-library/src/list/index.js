@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { list as icon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -17,6 +10,8 @@ import transforms from './transforms';
 const { name } = metadata;
 
 export { metadata, name };
+
+const TEMPLATE = [ [ 'core/list-item' ] ];
 
 const settings = {
 	icon,
@@ -45,6 +40,8 @@ const settings = {
 		],
 	},
 	transforms,
+	template: TEMPLATE,
+	templateInsertUpdatesSelection: true,
 	edit,
 	save,
 	deprecated,

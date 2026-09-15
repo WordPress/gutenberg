@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, withSyncEvent, getContext } from '@wordpress/interactivity';
 
 const { state } = store( 'router', {

@@ -1,18 +1,9 @@
-/**
- * WordPress dependencies
- */
-import { privateApis, Spinner } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
 import useElements from '../../hooks/use-elements';
-import { unlock } from '../../lock-unlock';
+import { ValidatedSelectControl } from '../validated-form-controls';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { ValidatedSelectControl } = unlock( privateApis );
 
 export default function Select< Item >( {
 	data,
@@ -53,7 +44,6 @@ export default function Select< Item >( {
 			help={ description }
 			options={ elements }
 			onChange={ onChangeControl }
-			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
 			multiple={ isMultiple }
 			disabled={ disabled }

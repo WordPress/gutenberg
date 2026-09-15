@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Props as TextProps } from '../text/types';
 
 export type HeadingSize =

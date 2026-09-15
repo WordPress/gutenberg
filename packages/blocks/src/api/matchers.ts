@@ -1,17 +1,5 @@
-/**
- * External dependencies
- */
-// @ts-ignore
 export { attr, prop, text, query } from 'hpq';
-
-/**
- * WordPress dependencies
- */
 import { RichTextData } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 export { matcher as node } from './node';
 export { matcher as children } from './children';
 

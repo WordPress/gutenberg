@@ -125,7 +125,7 @@ Regularly linting and formatting your code ensures it's functional, clear, and m
 
 ### Running tests
 
-Beyond just writing code, verifying its functionality is crucial. `wp-scripts` includes [Jest](https://jestjs.io/), a JavaScript testing framework, and both end-to-end and unit testing scripts:
+Beyond just writing code, verifying its functionality is crucial. `wp-scripts` includes [Jest](https://jestjs.io/), a JavaScript testing framework, for unit testing, and [Playwright](https://playwright.dev/) for end-to-end testing:
 
 ```json
 {

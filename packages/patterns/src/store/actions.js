@@ -1,14 +1,6 @@
-/**
- * WordPress dependencies
- */
-
 import { getBlockType, cloneBlock } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { PATTERN_SYNC_TYPES } from '../constants';
 
 /**

@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import loadAssets from '@wordpress/asset-loader';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useState, useEffect } from '@wordpress/element';
 import { resolveSelect, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 let loadAssetsPromise: Promise< void >;

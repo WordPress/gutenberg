@@ -1,12 +1,8 @@
-/**
- * WordPress dependencies
- */
 import type { ConnectionStatusDisconnected, Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
-import type { SelectionType } from './utils/crdt-user-selections';
+import type {
+	SelectionType,
+	SelectionDirection,
+} from './utils/crdt-user-selections';
 
 export type { ConnectionStatus } from '@wordpress/sync';
 
@@ -127,17 +123,11 @@ export type CursorPosition = {
 	// character. With both of these values as editor state, a change in perceived
 	// position will always result in a redraw.
 	absoluteOffset: number;
-};
 
-/**
- * The direction of a text selection, indicating where the caret sits.
- */
-export enum SelectionDirection {
-	/** The caret is at the end of the selection (default / left-to-right). */
-	Forward = 'f',
-	/** The caret is at the start of the selection (right-to-left). */
-	Backward = 'b',
-}
+	// The sender's `WPBlockSelection.attributeKey` (e.g. `content` or
+	// `body.0.cells.0.content`).
+	attributeKey?: string;
+};
 
 export type SelectionNone = {
 	// The user has not made a selection.
@@ -163,13 +153,22 @@ export type SelectionInOneBlock = {
 	selectionDirection?: SelectionDirection;
 };
 
+/**
+ * One end of a multi-block selection. Uses SelectionCursor when the endpoint
+ * lands inside a RichText field (character-level anchor) or SelectionWholeBlock
+ * when the entire block is selected (block-slot anchor). The type discriminant
+ * tells the receiver how to resolve this endpoint.
+ */
+export type SelectionEndpoint = SelectionCursor | SelectionWholeBlock;
+
 export type SelectionInMultipleBlocks = {
-	// The user has highlighted text over multiple blocks.
-	// The blocks are derived on the receiver side by navigating up from the
-	// resolved cursor positions via Y.AbstractType.parent.
+	// The user's selection spans more than one block. Each endpoint is resolved
+	// independently: text blocks carry a character-level CursorEndpoint while
+	// blocks without a RichText field (or selected as whole blocks) carry a
+	// WholeBlockEndpoint. Mixed combinations (e.g. paragraph → image) are valid.
 	type: SelectionType.SelectionInMultipleBlocks;
-	cursorStartPosition: CursorPosition;
-	cursorEndPosition: CursorPosition;
+	startEndpoint: SelectionEndpoint;
+	endEndpoint: SelectionEndpoint;
 	// The direction of the selection, indicating where the caret sits.
 	selectionDirection?: SelectionDirection;
 };
@@ -192,4 +191,12 @@ export type SelectionState =
 export interface ResolvedSelection {
 	richTextOffset: number | null;
 	localClientId: string | null;
+
+	// Identifier of the RichText attribute within the block, e.g.:
+	// - `content` on a core/paragraph block
+	// - `citation` on a quote block
+	// - a dot path into a nested attribute like `body.0.cells.0.content` for a
+	//   core/table cell.
+	// Set to `null` for WholeBlock selections.
+	attributeKey: string | null;
 }

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { __experimentalText as WCText } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import {
 	LAYOUT_GRID,
