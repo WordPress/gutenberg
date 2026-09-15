@@ -20,19 +20,22 @@
 					"type": "string",
 					"source": "attribute",
 					"selector": "img",
-					"attribute": "src"
+					"attribute": "src",
+					"role": "content"
 				},
 				"fullUrl": {
 					"type": "string",
 					"source": "attribute",
 					"selector": "img",
-					"attribute": "data-full-url"
+					"attribute": "data-full-url",
+					"role": "content"
 				},
 				"link": {
 					"type": "string",
 					"source": "attribute",
 					"selector": "img",
-					"attribute": "data-link"
+					"attribute": "data-link",
+					"role": "content"
 				},
 				"alt": {
 					"type": "string",
@@ -45,12 +48,14 @@
 					"type": "string",
 					"source": "attribute",
 					"selector": "img",
-					"attribute": "data-id"
+					"attribute": "data-id",
+					"role": "content"
 				},
 				"caption": {
 					"type": "rich-text",
 					"source": "rich-text",
-					"selector": ".blocks-gallery-item__caption"
+					"selector": ".blocks-gallery-item__caption",
+					"role": "content"
 				}
 			}
 		},
