@@ -87,7 +87,7 @@ const UnconnectedMenu = ( props: Props ) => {
  * rendering the `Menu.TriggerButton` (or the `Menu.SubmenuTriggerItem`)
  * component, and the `Menu.Popover` component.
  *
- * This component is deprecated. Use `Menu` from `@wordpress/ui` instead.
+ * This component is deprecated. Continue using `DropdownMenu` for now.
  *
  * @deprecated
  */
