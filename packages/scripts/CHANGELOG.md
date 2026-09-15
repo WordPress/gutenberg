@@ -10,6 +10,10 @@
 
 -   `lint-md-docs`: Detect `.markdownlint.jsonc` so the bundled default config is not used when one is present ([#81917](https://github.com/WordPress/gutenberg/pull/81917)).
 
+### Bug Fixes
+
+-   Update the bundled webpack to `^5.111.0`, which fixes a code-generation regression in webpack 5.110.3 that can make production bundles fail at startup ([#82698](https://github.com/WordPress/gutenberg/pull/82698)).
+
 ## 35.0.0 (2026-09-10)
 
 ### Breaking Changes

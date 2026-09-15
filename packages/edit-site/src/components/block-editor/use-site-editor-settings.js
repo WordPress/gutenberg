@@ -31,9 +31,7 @@ function useNavigateToPreviousEntityRecord() {
 	return goBack;
 }
 
-export function useSpecificEditorSettings( {
-	defaultRenderingMode = 'post-only',
-} = {} ) {
+export function useSpecificEditorSettings() {
 	const { query } = useLocation();
 	const { canvas = 'view' } = query;
 	const onNavigateToEntityRecord = useNavigateToEntityRecord();
@@ -96,14 +94,12 @@ export function useSpecificEditorSettings( {
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			isPreviewMode: canvas === 'view',
-			defaultRenderingMode,
 		};
 	}, [
 		settings,
 		globalStyles,
 		globalSettings,
 		canvas,
-		defaultRenderingMode,
 		currentPostIsTrashed,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
