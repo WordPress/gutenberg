@@ -147,10 +147,6 @@ export const Select = styled.select< SelectProps >`
 export const DownArrowWrapper = styled.div`
 	margin-inline-end: ${ space( -1 ) }; // optically adjust the icon
 	line-height: 0;
-
-	path {
-		fill: currentColor;
-	}
 `;
 
 export const InputControlSuffixWrapperWithClickThrough = styled(
