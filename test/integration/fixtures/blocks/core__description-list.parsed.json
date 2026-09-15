@@ -1,0 +1,30 @@
+[
+	{
+		"blockName": "core/description-list",
+		"attrs": {},
+		"innerBlocks": [
+			{
+				"blockName": "core/description-term",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<dt>Term</dt>\n\t",
+				"innerContent": [ "\n\t<dt>Term</dt>\n\t" ]
+			},
+			{
+				"blockName": "core/description-detail",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<dd>Description</dd>\n\t",
+				"innerContent": [ "\n\t<dd>Description</dd>\n\t" ]
+			}
+		],
+		"innerHTML": "\n<dl class=\"wp-block-description-list\">\n\t\n\n\t\n</dl>\n",
+		"innerContent": [
+			"\n<dl class=\"wp-block-description-list\">\n\t",
+			null,
+			"\n\n\t",
+			null,
+			"\n</dl>\n"
+		]
+	}
+]
