@@ -1,10 +1,40 @@
-/* global afterEach, expect, test */
-const { spawnSync } = require( 'node:child_process' );
-const { mkdtempSync, mkdirSync, rmSync, writeFileSync } = require( 'node:fs' );
-const { tmpdir } = require( 'node:os' );
-const { dirname, join } = require( 'node:path' );
+import { spawnSync } from 'node:child_process';
+import {
+	mkdtempSync,
+	mkdirSync,
+	readFileSync,
+	rmSync,
+	writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { parse } from 'jsonc-parser';
+import { afterEach, expect, test } from 'vitest';
 
-const validatorPath = join( __dirname, 'validate-tsconfig.mjs' );
+const validatorPath = fileURLToPath(
+	new URL( 'validate-tsconfig.mjs', import.meta.url )
+);
+
+/*
+ * The validator resolves the base config by package name, so it always reads
+ * the real one rather than anything a fixture writes. Derive the patterns a
+ * build project has to keep the same way it does, so adding a pattern to the
+ * base config does not strand these fixtures.
+ */
+const REQUIRED_BUILD_EXCLUDES = parse(
+	readFileSync(
+		fileURLToPath(
+			import.meta.resolve(
+				'@wordpress/monorepo-tools/tsconfig/base.json'
+			)
+		),
+		'utf8'
+	)
+)
+	.exclude.map( ( pattern ) => pattern.replace( /^\$\{configDir\}\//, '' ) )
+	.filter( ( pattern ) => /test|stories|story/.test( pattern ) );
+
 const temporaryRoots = [];
 
 afterEach( () => {
@@ -14,6 +44,7 @@ afterEach( () => {
 } );
 
 function writeJson( path, contents ) {
+	mkdirSync( dirname( path ), { recursive: true } );
 	writeFileSync( path, JSON.stringify( contents, null, '\t' ) + '\n' );
 }
 
@@ -22,7 +53,7 @@ function writeJson( path, contents ) {
  * given packages.
  *
  * @param {Object} repo          Repository description.
- * @param {Object} repo.packages Package name to `{ tsconfigs, dependencies }`.
+ * @param {Object} repo.packages Package name to `{ tsconfigs, dependencies, devDependencies }`.
  * @param {Object} [repo.routes] Route name to `{ tsconfigs, dependencies, devDependencies, manifest }`.
  * @param {Array}  repo.build    References of the build solution.
  * @param {Array}  repo.root     References of the root solution.
@@ -32,9 +63,6 @@ function createRepo( { packages, routes, build, root } ) {
 	const repoRoot = mkdtempSync( join( tmpdir(), 'validate-tsconfig-' ) );
 	temporaryRoots.push( repoRoot );
 
-	writeJson( join( repoRoot, 'tsconfig.base.json' ), {
-		exclude: [ '**/benchmark', '**/test/**', '**/stories/**' ],
-	} );
 	writeJson( join( repoRoot, 'tsconfig.build.json' ), {
 		references: build.map( ( path ) => ( { path } ) ),
 	} );
@@ -69,15 +97,17 @@ function createRepo( { packages, routes, build, root } ) {
 		}
 	}
 
-	for ( const [ name, { tsconfigs, dependencies } ] of Object.entries(
-		packages
-	) ) {
+	for ( const [
+		name,
+		{ tsconfigs, dependencies, devDependencies },
+	] of Object.entries( packages ) ) {
 		const packageDir = join( repoRoot, 'packages', name );
 		mkdirSync( packageDir, { recursive: true } );
 		writeJson( join( packageDir, 'package.json' ), {
 			name: `@wordpress/${ name }`,
 			version: '1.0.0',
 			...( dependencies && { dependencies } ),
+			...( devDependencies && { devDependencies } ),
 		} );
 		for ( const [ fileName, tsconfig ] of Object.entries( tsconfigs ) ) {
 			const { references = [], ...rest } = Array.isArray( tsconfig )
@@ -315,7 +345,7 @@ test( 'fails when the root solution does not reference the build solution', () =
 const devOnlyPackage = {
 	tsconfigs: {
 		'tsconfig.json': {
-			extends: '../../tsconfig.dev.base.json',
+			extends: '@wordpress/monorepo-tools/tsconfig/dev.base.json',
 			references: [],
 		},
 	},
@@ -435,7 +465,7 @@ function typedSplitPackage( buildTypes, devTypes ) {
 	return {
 		tsconfigs: {
 			'tsconfig.json': {
-				extends: '../../tsconfig.dev.base.json',
+				extends: '@wordpress/monorepo-tools/tsconfig/dev.base.json',
 				compilerOptions: { types: devTypes },
 				references: [ './tsconfig.build.json' ],
 			},
@@ -498,7 +528,8 @@ test( 'checks the stories project of a package without a build project', () => {
 				icons: {
 					tsconfigs: {
 						'tsconfig.json': {
-							extends: '../../tsconfig.dev.base.json',
+							extends:
+								'@wordpress/monorepo-tools/tsconfig/dev.base.json',
 							references: [],
 						},
 						'tsconfig.stories.json': [],
@@ -523,13 +554,14 @@ test( 'fails when a build project exclude omits a dev-file pattern of the base',
 				blob: {
 					tsconfigs: {
 						'tsconfig.json': {
-							extends: '../../tsconfig.dev.base.json',
+							extends:
+								'@wordpress/monorepo-tools/tsconfig/dev.base.json',
 							references: [ './tsconfig.build.json' ],
 						},
 						'tsconfig.build.json': {
 							exclude: [
 								'**/benchmark',
-								'**/test/**',
+								...REQUIRED_BUILD_EXCLUDES.slice( 0, -1 ),
 								'src/legacy.js',
 							],
 							references: [],
@@ -544,7 +576,9 @@ test( 'fails when a build project exclude omits a dev-file pattern of the base',
 
 	expect( result.status ).not.toBe( 0 );
 	expect( result.stderr ).toContain(
-		'Missing exclude "**/stories/**" in packages/blob/tsconfig.build.json'
+		`Missing exclude "${ REQUIRED_BUILD_EXCLUDES.at(
+			-1
+		) }" in packages/blob/tsconfig.build.json`
 	);
 } );
 
@@ -555,14 +589,14 @@ test( 'passes when a build project keeps every dev-file pattern of the base', ()
 				blob: {
 					tsconfigs: {
 						'tsconfig.json': {
-							extends: '../../tsconfig.dev.base.json',
+							extends:
+								'@wordpress/monorepo-tools/tsconfig/dev.base.json',
 							references: [ './tsconfig.build.json' ],
 						},
 						'tsconfig.build.json': {
 							exclude: [
 								'**/benchmark',
-								'**/test/**',
-								'**/stories/**',
+								...REQUIRED_BUILD_EXCLUDES,
 								'src/legacy.js',
 							],
 							references: [],
@@ -828,4 +862,46 @@ test( 'passes when a route test project covers the test files', () => {
 	);
 	expect( stderr ).toBe( '' );
 	expect( status ).toBe( 0 );
+} );
+
+test( 'fails when a package references a package that is not a dependency', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: {
+				blob: splitPackage,
+				blocks: {
+					tsconfigs: {
+						'tsconfig.json': [ '../blob/tsconfig.build.json' ],
+					},
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json', 'packages/blocks' ],
+			root: [ './tsconfig.build.json', 'packages/blob' ],
+		} )
+	);
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'Reference to "packages/blob" in packages/blocks/tsconfig.json without a dependency on "@wordpress/blob"'
+	);
+} );
+
+test( 'passes when a reference is backed by a devDependency', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: {
+				blob: splitPackage,
+				blocks: {
+					tsconfigs: {
+						'tsconfig.json': [ '../blob/tsconfig.build.json' ],
+					},
+					devDependencies: { '@wordpress/blob': 'file:../blob' },
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json', 'packages/blocks' ],
+			root: [ './tsconfig.build.json', 'packages/blob' ],
+		} )
+	);
+
+	expect( result.status ).toBe( 0 );
 } );

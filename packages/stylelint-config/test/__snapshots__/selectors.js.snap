@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`flags warnings with invalid selectors css snapshot matches warnings 1`] = `
+exports[`flags warnings with invalid selectors css > snapshot matches warnings 1`] = `
 [
   {
     "column": 12,
@@ -18,7 +18,7 @@ exports[`flags warnings with invalid selectors css snapshot matches warnings 1`]
     "line": 18,
     "rule": "declaration-property-unit-allowed-list",
     "severity": "error",
-    "text": "Unexpected unit "%" for property "line-height" (declaration-property-unit-allowed-list)",
+    "text": "Disallowed unit "%" for property "line-height" (declaration-property-unit-allowed-list)",
   },
   {
     "column": 1,

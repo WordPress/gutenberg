@@ -52,22 +52,27 @@ export const createTemplate =
 					template: savedTemplate.slug,
 				}
 			);
+		const { defaultRenderingMode, renderingMode } =
+			select.getEditorSettings();
 		registry
 			.dispatch( noticesStore )
 			.createSuccessNotice(
 				__( "Custom template created. You're in template mode now." ),
 				{
 					type: 'snackbar',
-					actions: [
-						{
-							label: __( 'Go back' ),
-							onClick: () =>
-								dispatch.setRenderingMode(
-									select.getEditorSettings()
-										.defaultRenderingMode
-								),
-						},
-					],
+					// An editor with a fixed rendering mode has no other mode
+					// to go back to, so the action is not offered.
+					actions: renderingMode
+						? []
+						: [
+								{
+									label: __( 'Back' ),
+									onClick: () =>
+										dispatch.setRenderingMode(
+											defaultRenderingMode
+										),
+								},
+						  ],
 				}
 			);
 		return savedTemplate;
@@ -689,8 +694,8 @@ export const restoreRevision =
 						'modified',
 						'author',
 						'meta',
-						'title.raw',
-						'excerpt.raw',
+						'title',
+						'excerpt',
 						'content.raw',
 						revisionKey,
 					] ),

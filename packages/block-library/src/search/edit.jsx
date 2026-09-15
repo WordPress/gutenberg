@@ -25,10 +25,11 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { Icon, search } from '@wordpress/icons';
+import { Icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { speak } from '@wordpress/a11y';
+import { Path, SVG } from '@wordpress/primitives';
 import {
 	PC_WIDTH_DEFAULT,
 	PX_WIDTH_DEFAULT,
@@ -55,6 +56,15 @@ const TAG_NAME_MESSAGES = {
 // button is placed inside wrapper.
 const DEFAULT_INNER_PADDING = '4px';
 const PERCENTAGE_WIDTHS = [ 25, 50, 75, 100 ];
+
+// Keep this block-specific icon aligned with the PHP renderer. Unlike the
+// Search icon from @wordpress/icons, it remains fill-based so existing theme
+// styles continue to work in both the editor and the front end.
+const searchBlockIcon = (
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<Path d="M13 5c-3.3 0-6 2.7-6 6 0 1.4.5 2.7 1.3 3.7l-3.8 3.8 1.1 1.1 3.8-3.8c1 .8 2.3 1.3 3.7 1.3 3.3 0 6-2.7 6-6S16.3 5 13 5zm0 10.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5z" />
+	</SVG>
+);
 
 export default function SearchEdit( {
 	className,
@@ -294,7 +304,7 @@ export default function SearchEdit( {
 						}
 						ref={ buttonRef }
 					>
-						<Icon icon={ search } />
+						<Icon icon={ searchBlockIcon } />
 					</button>
 				) }
 

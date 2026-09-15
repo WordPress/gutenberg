@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { wrap, terminate } from '../main-thread';
 import { WORKER_SYMBOL } from '../types';
 
@@ -7,8 +8,8 @@ import { WORKER_SYMBOL } from '../types';
  * error/messageerror events used for worker failure detection.
  */
 class MockWorker {
-	postMessage = jest.fn();
-	terminate = jest.fn();
+	postMessage = vi.fn();
+	terminate = vi.fn();
 
 	private listeners: Map< string, Array< ( event: Event ) => void > > =
 		new Map();
