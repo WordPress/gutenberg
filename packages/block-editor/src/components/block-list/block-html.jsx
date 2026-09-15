@@ -5,10 +5,14 @@ import {
 	getBlockContent,
 	getBlockType,
 	getSaveContent,
+	privateApis as blocksPrivateApis,
 	validateBlock,
 } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { useNativeUndo } from '../../utils/native-undo';
+
+const { applyBuiltInValidationFixes } = unlock( blocksPrivateApis );
 
 function BlockHTML( { clientId } ) {
 	const [ html, setHtml ] = useState( '' );
@@ -43,18 +47,24 @@ function BlockHTML( { clientId } ) {
 
 		// If html is empty  we reset the block to the default HTML and mark it as valid to avoid triggering an error
 		const content = html ? html : getSaveContent( blockType, attributes );
-		const [ isValid ] = html
-			? validateBlock( {
-					...block,
-					attributes,
-					originalContent: content,
-			  } )
-			: [ true ];
 
-		updateBlock( clientId, {
+		const updatedBlock = {
+			...block,
 			attributes,
 			originalContent: content,
-			isValid,
+		};
+		const [ isValid ] = html ? validateBlock( updatedBlock ) : [ true ];
+
+		// `getBlockAttributes` only sources what the save output declares,
+		// so recover hand-typed `id`/`class`/`aria-label` for invalid blocks.
+		const fixedBlock = isValid
+			? updatedBlock
+			: applyBuiltInValidationFixes( updatedBlock, blockType );
+
+		updateBlock( clientId, {
+			attributes: fixedBlock.attributes,
+			originalContent: content,
+			isValid: isValid || validateBlock( fixedBlock )[ 0 ],
 		} );
 
 		// Ensure the state is updated if we reset so it displays the default content.
