@@ -10,6 +10,15 @@ const getFormattedDate = ( dateToDisplay: string | null ) =>
 	);
 
 const DateView = ( { item }: { item: BasePost } ) => {
+	// Every branch below formats `item.date`, and `getDate( null )` falls back
+	// to the current time, so with no date at all we would render a moment the
+	// post has no relation to. A `null` date is different: it means the date is
+	// being cleared and the post will take the time it is saved at, which is
+	// what the current time then stands for.
+	if ( item.date === undefined ) {
+		return null;
+	}
+
 	const isDraftOrPrivate = [ 'draft', 'private' ].includes(
 		item.status ?? ''
 	);
