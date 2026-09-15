@@ -92,7 +92,13 @@ type MatchersObject = Record<
 	MatcherFunction | MatcherWithArgsFunction
 >;
 
-expect.extend(
+const jestExpect = (
+	globalThis as unknown as {
+		expect: { extend: ( matchers: MatchersObject ) => void };
+	}
+ ).expect;
+
+jestExpect.extend(
 	Object.entries( supportedMatchers ).reduce< MatchersObject >(
 		( result, [ methodName, matcherName ] ) => {
 			const matcherNameWith = `${ matcherName }With`;

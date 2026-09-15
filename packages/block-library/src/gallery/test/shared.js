@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { isGalleryFlexLayout } from '../shared';
 
 describe( 'isGalleryFlexLayout', () => {

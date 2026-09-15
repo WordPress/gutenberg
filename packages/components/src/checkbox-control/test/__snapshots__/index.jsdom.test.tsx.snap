@@ -1,11 +1,11 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`CheckboxControl Basic rendering should render the indeterminate icon when in the indeterminate state 1`] = `
+exports[`CheckboxControl > Basic rendering > should render the indeterminate icon when in the indeterminate state 1`] = `
 Snapshot Diff:
 - First value
 + Second value
 
-@@ -14,14 +14,29 @@
+@@ -14,14 +14,32 @@
           <span
             class="components-checkbox-control__input-container"
           >
@@ -15,21 +15,24 @@ Snapshot Diff:
 +             id="inspector-checkbox-control-7"
               type="checkbox"
               value="1"
-            />
++           />
 +           <svg
 +             aria-hidden="true"
 +             class="components-checkbox-control__indeterminate"
-+             fill="currentColor"
 +             focusable="false"
-+             height="24"
++             height="16"
 +             role="presentation"
-+             viewBox="0 0 24 24"
-+             width="24"
++             stroke="currentColor"
++             stroke-width="1.5"
++             style="fill: none;"
++             viewBox="4 4 16 16"
++             width="16"
 +             xmlns="http://www.w3.org/2000/svg"
 +           >
 +             <path
-+               d="M7 11.5h10V13H7z"
-+             />
++               d="M7 12H17"
++               vector-effect="non-scaling-stroke"
+              />
 +           </svg>
           </span>
         </div>

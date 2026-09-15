@@ -79,10 +79,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		editor,
 		insertingBlocksUtils,
 	}, testInfo ) => {
-		testInfo.fixme(
-			testInfo.project.name === 'firefox',
-			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
-		);
 		testInfo.skip(
 			testInfo.project.name === 'webkit',
 			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
@@ -150,10 +146,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		insertingBlocksUtils,
 	}, testInfo ) => {
 		testInfo.skip(
-			testInfo.project.name === 'firefox',
-			'Firefox does not dispatch drag events to the iframe content when dragging from outside the iframe.'
-		);
-		testInfo.skip(
 			testInfo.project.name === 'webkit',
 			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
 		);
@@ -218,10 +210,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		editor,
 		insertingBlocksUtils,
 	}, testInfo ) => {
-		testInfo.fixme(
-			testInfo.project.name === 'firefox',
-			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
-		);
 		testInfo.skip(
 			testInfo.project.name === 'webkit',
 			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
@@ -285,10 +273,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		editor,
 		insertingBlocksUtils,
 	}, testInfo ) => {
-		testInfo.fixme(
-			testInfo.project.name === 'firefox',
-			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
-		);
 		testInfo.skip(
 			testInfo.project.name === 'webkit',
 			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
@@ -390,10 +374,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		editor,
 		insertingBlocksUtils,
 	}, testInfo ) => {
-		testInfo.skip(
-			testInfo.project.name === 'firefox',
-			'Firefox does not dispatch drag events to the iframe content when dragging from outside the iframe.'
-		);
 		testInfo.skip(
 			testInfo.project.name === 'webkit',
 			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
@@ -1057,23 +1037,23 @@ class InsertingBlocksUtils {
 		);
 	}
 	async dragOver( boundingBox ) {
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await this.page.mouse.move(
-				// Hover on the right side of the block to avoid collapsing with the preview.
-				// But not too far to avoid triggering the grouping block inserter.
-				boundingBox.x + boundingBox.width - 32,
-				// Hover on the bottom of the paragraph block.
-				boundingBox.y + boundingBox.height - 1
-			);
-		}
+		// Hover on the right side of the block to avoid collapsing with the preview.
+		// But not too far to avoid triggering the grouping block inserter.
+		const x = boundingBox.x + boundingBox.width - 32;
+		// Hover on the bottom of the paragraph block.
+		const y = boundingBox.y + boundingBox.height - 1;
+
+		// Move gradually into the editor iframe so Firefox dispatches drag events there.
+		await this.page.mouse.move( x, y, { steps: 10 } );
 	}
 
 	async expectIndicatorBelowParagraph( paragraphBoundingBox ) {
 		// Expect the indicator to be below the paragraph block.
 		await expect
-			.poll( () => this.indicator.boundingBox().then( ( { y } ) => y ) )
+			.poll( async () => {
+				const indicatorBoundingBox = await this.indicator.boundingBox();
+				return indicatorBoundingBox?.y ?? Number.NEGATIVE_INFINITY;
+			} )
 			.toBeGreaterThan( paragraphBoundingBox.y );
 	}
 }

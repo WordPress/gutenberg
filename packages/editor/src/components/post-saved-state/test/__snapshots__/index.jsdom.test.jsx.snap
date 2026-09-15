@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`PostSavedState returns a disabled button if the post is not saveable 1`] = `
+exports[`PostSavedState > returns a disabled button if the post is not saveable 1`] = `
 <button
   aria-disabled="true"
   aria-label="Save draft"
@@ -23,7 +23,7 @@ exports[`PostSavedState returns a disabled button if the post is not saveable 1`
 </button>
 `;
 
-exports[`PostSavedState should return Save button if edits to be saved 1`] = `
+exports[`PostSavedState > should return Save button if edits to be saved 1`] = `
 <button
   aria-label="Save draft"
   class="components-button editor-post-save-draft is-compact is-tertiary"

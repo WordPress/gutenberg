@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { createRef } from '@wordpress/element';
 import * as Field from '../index';
@@ -77,5 +78,17 @@ describe( 'Field', () => {
 		).toBeVisible();
 
 		expect( screen.getByRole( 'link', { name: 'Details' } ) ).toBeVisible();
+	} );
+
+	it( 'forwards ref on Field.VisualLabel', () => {
+		const visualLabelRef = createRef< HTMLSpanElement >();
+
+		render(
+			<Field.VisualLabel ref={ visualLabelRef }>
+				Visual label
+			</Field.VisualLabel>
+		);
+
+		expect( visualLabelRef.current ).toBeInstanceOf( HTMLSpanElement );
 	} );
 } );

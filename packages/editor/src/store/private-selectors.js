@@ -354,8 +354,10 @@ export function buildRevisionsPageQuery( revisionKey, page ) {
 				'author',
 				'slug',
 				'meta',
-				'title.raw',
-				'excerpt.raw',
+				'title',
+				'excerpt',
+				// Not the whole field: `content.rendered` would blow up the
+				// payload of a page of revisions.
 				'content.raw',
 				revisionKey,
 			] ),
