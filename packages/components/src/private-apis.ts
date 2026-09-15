@@ -1,4 +1,5 @@
 import { useDrag } from '@use-gesture/react';
+import deprecated from '@wordpress/deprecated';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
 import { Menu } from './menu';
 import { ComponentsContext } from './context/context-system-provider';
@@ -18,7 +19,16 @@ lock( privateApis, {
 	__experimentalPopoverLegacyPositionToPlacement,
 	ComponentsContext,
 	Tabs,
-	Menu,
+	// Retained for older bundled consumers. Check compatibility before removal.
+	get Menu() {
+		deprecated( '`privateApis.Menu` from `@wordpress/components`', {
+			since: '7.2',
+			version: '7.4',
+			alternative: '`DropdownMenu` from `@wordpress/components`',
+			hint: 'You can try `Menu` from `@wordpress/ui`, but it is not yet recommended.',
+		} );
+		return Menu;
+	},
 	Badge,
 	useDrag,
 	ValidatedInputControl,

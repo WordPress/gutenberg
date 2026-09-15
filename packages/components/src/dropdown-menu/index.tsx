@@ -215,6 +215,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
  * after the user has interacted with an element (a button or icon) or when
  * they perform a specific action.
  *
+ * Continue using `DropdownMenu` for now. You can try `Menu` from `@wordpress/ui`,
+ * but it is not yet recommended.
+ *
  * Render a Dropdown Menu with a set of controls:
  *
  * ```jsx
