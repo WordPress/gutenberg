@@ -74,7 +74,7 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 				0 0 $border-width-focus-fallback 0 rgba($black, 0.25);
 		}
 
-		&:focus:not(:disabled):not(:active) {
+		&:focus:not(:active) {
 			// Back Button's focus outline with 1px of solid color on both sides.
 			outline-offset: 1px;
 			box-shadow:
