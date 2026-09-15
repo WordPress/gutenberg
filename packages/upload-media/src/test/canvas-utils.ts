@@ -333,17 +333,17 @@ describe( 'canvasConvertToJpeg', () => {
 
 	describe( 'encoder injection', () => {
 		const setupStrategy1 = ( canvasJpeg: Blob ) => {
-			const mockBitmap = { width: 32, height: 32, close: jest.fn() };
-			const convertToBlob = jest.fn().mockResolvedValue( canvasJpeg );
-			global.createImageBitmap = jest
+			const mockBitmap = { width: 32, height: 32, close: vi.fn() };
+			const convertToBlob = vi.fn().mockResolvedValue( canvasJpeg );
+			global.createImageBitmap = vi
 				.fn()
 				.mockResolvedValue( mockBitmap );
-			global.OffscreenCanvas = jest.fn().mockImplementation( () => ( {
+			global.OffscreenCanvas = vi.fn().mockImplementation( () => ( {
 				width: 32,
 				height: 32,
-				getContext: jest
+				getContext: vi
 					.fn()
-					.mockReturnValue( { drawImage: jest.fn() } ),
+					.mockReturnValue( { drawImage: vi.fn() } ),
 				convertToBlob,
 			} ) );
 			return convertToBlob;
@@ -357,7 +357,7 @@ describe( 'canvasConvertToJpeg', () => {
 			const convertToBlob = setupStrategy1(
 				new Blob( [ 'canvas-jpeg' ], { type: 'image/jpeg' } )
 			);
-			const encode = jest
+			const encode = vi
 				.fn()
 				.mockResolvedValue(
 					new Blob( [ 'vips-jpeg' ], { type: 'image/jpeg' } )
@@ -379,7 +379,7 @@ describe( 'canvasConvertToJpeg', () => {
 			const convertToBlob = setupStrategy1(
 				new Blob( [ 'canvas-jpeg' ], { type: 'image/jpeg' } )
 			);
-			const encode = jest.fn().mockResolvedValue( null );
+			const encode = vi.fn().mockResolvedValue( null );
 
 			const result = await canvasConvertToJpeg( file, 0.5, encode );
 
@@ -394,7 +394,7 @@ describe( 'canvasConvertToJpeg', () => {
 			const convertToBlob = setupStrategy1(
 				new Blob( [ 'canvas-jpeg' ], { type: 'image/jpeg' } )
 			);
-			const encode = jest
+			const encode = vi
 				.fn()
 				.mockRejectedValue( new Error( 'worker crashed' ) );
 
