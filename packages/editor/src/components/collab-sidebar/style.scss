@@ -262,9 +262,9 @@ mark.wp-note {
 //
 // The add-reaction trigger and the reaction pills are Design System
 // Buttons: the pill shape comes from the row's `pronounced` corner
-// radius, the outline treatment marks reactions left by others, and the
-// neutral minimal pressed treatment marks the current user's own. Only
-// the row layout and the emoji's own metrics live here.
+// radius, the neutral minimal treatment marks the trigger and reactions
+// left by others, and the brand outline marks the current user's own.
+// Only the row layout and the emoji's own metrics live here.
 .editor-collab-sidebar-panel__add-reaction {
 	// `Dropdown` wraps its trigger in an inline-block container. As a
 	// flex item that becomes a block, leaving the inline-flex trigger on

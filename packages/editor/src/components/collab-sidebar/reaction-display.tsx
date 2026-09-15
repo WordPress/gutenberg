@@ -296,21 +296,22 @@ function ReactionButton( {
 	const accessibleLabel = tooltipText || defaultLabel;
 
 	return (
-		// A neutral minimal Button is the Design System's toggle treatment:
-		// a quiet fill at rest and the strong neutral fill under
-		// `aria-pressed`, which is how "you reacted" reads without the pill
+		// Per the design, a reaction someone else left is quiet text with no
+		// border or fill, and the current user's own is the brand outline:
+		// a blue ring and count on a transparent pill. Neither variant
+		// carries a solid fill, so a row of pills never reads as a dark bar
 		// competing with the note it belongs to.
 		<Tooltip.Root>
 			<Tooltip.Trigger
 				render={
 					<Button
 						size="small"
-						// The Design System styles `aria-pressed` only on the
-						// neutral minimal variant, so the current user's own
-						// reaction takes that solid chip while everyone else's
-						// reads as a quieter outline.
-						variant={ isActive ? 'minimal' : 'outline' }
-						tone="neutral"
+						// `aria-pressed` carries the state for assistive tech;
+						// the brand outline is what shows it, since the Design
+						// System gives the pressed neutral minimal Button a
+						// solid dark fill the design does not use.
+						variant={ isActive ? 'outline' : 'minimal' }
+						tone={ isActive ? 'brand' : 'neutral' }
 						className="editor-collab-sidebar-panel__reaction-button"
 						disabled={ disabled }
 						aria-pressed={ isActive }
@@ -388,7 +389,7 @@ export default function ReactionDisplay( {
 	}
 
 	return (
-		// `sm`: at `xs` two adjacent pressed pills read as one solid bar.
+		// `sm`: at `xs` two adjacent outlined pills read as one shape.
 		<Stack
 			direction="row"
 			gap="sm"
