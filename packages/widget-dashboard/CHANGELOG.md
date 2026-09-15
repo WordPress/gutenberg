@@ -6,7 +6,8 @@
 
 -   Tile padding defaults to `--wpds-dimension-padding-lg` instead of the
     Card's `--wpds-dimension-padding-2xl`, and the header/body gap follows it;
-    `--wp-widget-dashboard-tile-padding` still overrides both.
+    `--wp-widget-dashboard-tile-padding` still overrides both
+    ([#82961](https://github.com/WordPress/gutenberg/pull/82961)).
 -   Show the selected widget width in its options menu and add an ellipsis to
     the reset action that opens a confirmation dialog ([#81929](https://github.com/WordPress/gutenberg/pull/81929)).
 
