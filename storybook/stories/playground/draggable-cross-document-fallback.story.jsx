@@ -47,7 +47,7 @@ export const InsideIframeWithCompatSlot = () => {
 				onLoad={ updateIframeDoc }
 				srcDoc='<!doctype html><html><head></head><body style="margin:0;"></body></html>'
 				style={ {
-					border: '2px dashed #707070',
+					border: '2px dashed #757575',
 					height: 240,
 					marginBlockStart: 80,
 					marginInlineStart: 120,

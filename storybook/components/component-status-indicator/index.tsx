@@ -46,7 +46,7 @@ export function ComponentStatusIndicator() {
 					style={ {
 						margin: 0,
 						fontStyle: 'normal',
-						color: '#707070',
+						color: '#757575',
 					} }
 				>
 					Status
@@ -75,7 +75,7 @@ export function ComponentStatusIndicator() {
 						style={ {
 							margin: 0,
 							fontStyle: 'normal',
-							color: '#707070',
+							color: '#757575',
 						} }
 					>
 						Notes
