@@ -56,7 +56,7 @@ vi.mock( import( '../utils/video-conversion' ), async ( importOriginal ) => {
 		convertGifToVideo: vi.fn(),
 		// Never settles: keeps an item parked in TranscodeVideo so the
 		// concurrency gate can be exercised.
-		transcodeVideo: vi.fn( () => new Promise( () => {} ) ),
+		transcodeVideo: vi.fn( () => new Promise< File >( () => {} ) ),
 		cancelGifToVideoOperations: vi.fn( () => Promise.resolve( true ) ),
 		terminateVideoConversionWorker: vi.fn(),
 		isUnsupportedConversionError: actual.isUnsupportedConversionError,
