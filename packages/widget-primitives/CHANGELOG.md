@@ -4,6 +4,10 @@
 
 ### New Features
 
+-   `HostLink`: an anchor that mounts the host router's link for a target
+    `links.match` recognizes, and a plain anchor otherwise, including for a
+    `download` or a `_blank` target. Composes through the `render` prop of a
+    UI link.
 -   `WidgetModuleRecord.attributes`: a record carries the attribute schema
     `widget.json` declares, as `WidgetAttributeRecord[]`; `useWidgetTypes`
     merges it by `id` over the module's entries, the record winning a shared

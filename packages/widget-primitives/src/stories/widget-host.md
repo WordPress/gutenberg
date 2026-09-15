@@ -67,4 +67,20 @@ render(
 expect( ref.current ).toBe( screen.getByRole( 'link', { name: 'Reports' } ) );
 ```
 
+## Consuming it
+
+`HostLink` reads the capability and decides: the host's `Link` on a match, a plain anchor otherwise, and a plain anchor whenever the anchor props name a new document. It composes through the `render` prop of a UI link, which merges its own anchor props in:
+
+```tsx
+<Link
+	download={ action.download }
+	openInNewTab={ action.openInNewTab }
+	render={ <HostLink href={ action.href } /> }
+>
+	{ action.label }
+</Link>
+```
+
+`Link`, `LinkButton` and `Menu.LinkItem` take the same anchor props, so one composition serves all three. A consumer that needs the answer before it renders reads `match` itself.
+
 See the Actions page for the materialization rules this serves: the widget declares where to go, the host decides how to get there.

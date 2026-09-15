@@ -61,6 +61,10 @@ The first capability is `links` (`WidgetHostLinks`): `match` resolves a href to 
 
 Consumers reach the anchor through that ref: a link that drops it is skipped by keyboard navigation and loses its tooltip. The Widget Host Storybook page carries the one test that pins it.
 
+### `HostLink`
+
+It's the anchor a consumer mounts for a link target: the host's `Link` when `match` recognizes it, a plain anchor otherwise, and a plain anchor whenever the anchor props name a new document. It takes `href` plus anchor props and composes through the `render` prop of a UI link, which merges its own anchor props in. A consumer that needs the answer before it renders reads `match` itself.
+
 ### Contract types
 
 `WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`, and `WidgetAttributeRecord`. `WidgetIcon` is a rendered SVG element that hosts pass to their icon primitive as-is; in `widget.json` a widget declares a registered icon name instead, resolved before it reaches hosts. `WidgetAttributeRecord` is an attribute as `widget.json` declares it: the JSON-expressible subset of a DataViews `Field`.

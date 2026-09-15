@@ -21,8 +21,8 @@ export { registerIconResolver } from './icon-resolver';
 /**
  * Host capabilities
  */
-export { WidgetHostProvider, useWidgetHost } from './widget-host';
-export type { WidgetHost, WidgetHostLinks } from './widget-host';
+export { WidgetHostProvider, useWidgetHost, HostLink } from './widget-host';
+export type { WidgetHost, WidgetHostLinks, HostLinkProps } from './widget-host';
 
 /**
  * Types
