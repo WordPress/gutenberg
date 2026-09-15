@@ -18,7 +18,14 @@ import type { EmojibaseEntry } from '../emojibase-data';
 
 globalThis.wpVitest.mockMatchMedia();
 
-vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		speak: vi.fn(),
+	} as unknown as typeof original;
+} );
 
 const mockSpeak = vi.mocked( speak );
 
