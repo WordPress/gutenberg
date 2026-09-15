@@ -7,6 +7,7 @@
 -   Remove the `react-autosize-textarea` dependency. The post editor's "Code editor" view now auto-grows with CSS `field-sizing: content`. Browsers without support use a scrollable field ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).
 -   `PostTaxonomiesFlatTermSelector`: The field renders with the `SearchableChipSelectControl` component of `@wordpress/ui` instead of `FormTokenField` ([#80967](https://github.com/WordPress/gutenberg/pull/80967)).
 -   `CollaboratorsPresence`: Show focus ring for avatar stack in header with button's outline instead of previous box-shadow override ([#82941](https://github.com/WordPress/gutenberg/pull/82941)).
+-   Global Styles sidebar: Give the revisions screen a bounded height so its DataViews timeline scrolls internally and the pagination footer stays pinned to the bottom ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
 
 ### Bug Fixes
 
