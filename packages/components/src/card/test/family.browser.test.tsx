@@ -1,7 +1,9 @@
-import { cleanup, render } from '@testing-library/react';
-import type { CSSProperties } from 'react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { render } from 'vitest-browser-react';
+import { describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
+// Load the tokens that the production build also supplies as fallbacks.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '../../../../theme/prebuilt/css/design-tokens.css';
 import {
 	Card,
 	CardBody,
@@ -12,8 +14,6 @@ import {
 } from '../';
 
 const borderColor = 'rgba(0, 0, 0, 0.1)';
-
-afterEach( cleanup );
 
 describe( 'Card styles', () => {
 	it.each( [
@@ -26,8 +26,8 @@ describe( 'Card styles', () => {
 		{ size: 'large', padding: '24px 32px' },
 	] as const )(
 		'applies $size padding to each section',
-		( { size, padding } ) => {
-			render(
+		async ( { size, padding } ) => {
+			await render(
 				<Card size={ size }>
 					<CardHeader data-testid="header">Header</CardHeader>
 					<CardBody data-testid="body">Body</CardBody>
@@ -44,30 +44,37 @@ describe( 'Card styles', () => {
 		}
 	);
 
-	it.each( [ 'ltr', 'rtl' ] )( 'applies logical padding in %s', ( dir ) => {
-		render(
-			<Card
-				dir={ dir }
-				size={ {
-					blockStart: 'none',
-					blockEnd: 'xSmall',
-					inlineStart: 'small',
-					inlineEnd: 'large',
-				} }
-			>
-				<CardBody data-testid="body">Body</CardBody>
-			</Card>
-		);
+	it.each( [ 'ltr', 'rtl' ] )(
+		'applies logical padding in %s',
+		async ( dir ) => {
+			await render(
+				<Card
+					dir={ dir }
+					size={ {
+						blockStart: 'none',
+						blockEnd: 'xSmall',
+						inlineStart: 'small',
+						inlineEnd: 'large',
+					} }
+				>
+					<CardBody data-testid="body">Body</CardBody>
+				</Card>
+			);
 
-		const style = getComputedStyle( page.getByTestId( 'body' ).element() );
-		expect( style.paddingTop ).toBe( '0px' );
-		expect( style.paddingBottom ).toBe( '8px' );
-		expect( style.paddingLeft ).toBe( dir === 'ltr' ? '16px' : '32px' );
-		expect( style.paddingRight ).toBe( dir === 'ltr' ? '32px' : '16px' );
-	} );
+			const style = getComputedStyle(
+				page.getByTestId( 'body' ).element()
+			);
+			expect( style.paddingTop ).toBe( '0px' );
+			expect( style.paddingBottom ).toBe( '8px' );
+			expect( style.paddingLeft ).toBe( dir === 'ltr' ? '16px' : '32px' );
+			expect( style.paddingRight ).toBe(
+				dir === 'ltr' ? '32px' : '16px'
+			);
+		}
+	);
 
-	it( 'lets section props override inherited border and size defaults', () => {
-		render(
+	it( 'lets section props override inherited border and size defaults', async () => {
+		await render(
 			<Card isBorderless size="large" data-testid="card">
 				<CardHeader
 					isBorderless={ false }
@@ -111,25 +118,13 @@ describe( 'Card styles', () => {
 		expect( footer.justifyContent ).toBe( 'flex-end' );
 	} );
 
-	it( 'removes section borders while preserving explicit Surface borders', () => {
-		render(
-			// Source SCSS does not include the build's theme token fallbacks.
-			<div
-				style={
-					{
-						/* eslint-disable @wordpress/no-setting-ds-tokens -- The source-SCSS fixture needs the theme values normally supplied by the build. */
-						'--wpds-border-width-xs': '1px',
-						'--wpds-color-stroke-surface-neutral': '#dbdbdb',
-						/* eslint-enable @wordpress/no-setting-ds-tokens */
-					} as CSSProperties
-				}
-			>
-				<Card isBorderless borderTop data-testid="card">
-					<CardHeader data-testid="header">Header</CardHeader>
-					<CardBody>Body</CardBody>
-					<CardFooter data-testid="footer">Footer</CardFooter>
-				</Card>
-			</div>
+	it( 'removes section borders while preserving explicit Surface borders', async () => {
+		await render(
+			<Card isBorderless borderTop data-testid="card">
+				<CardHeader data-testid="header">Header</CardHeader>
+				<CardBody>Body</CardBody>
+				<CardFooter data-testid="footer">Footer</CardFooter>
+			</Card>
 		);
 
 		const card = getComputedStyle( page.getByTestId( 'card' ).element() );
@@ -145,8 +140,8 @@ describe( 'Card styles', () => {
 		).toBe( '0px' );
 	} );
 
-	it( 'rounds only the outside section corners', () => {
-		render(
+	it( 'rounds only the outside section corners', async () => {
+		await render(
 			<Card>
 				<CardHeader data-testid="header">Header</CardHeader>
 				<CardBody data-testid="body">Body</CardBody>
@@ -181,8 +176,8 @@ describe( 'Card styles', () => {
 			name: 'footer',
 			section: <CardFooter data-testid="section">Footer</CardFooter>,
 		},
-	] )( 'rounds every corner of a sole $name', ( { section } ) => {
-		render( <Card>{ section }</Card> );
+	] )( 'rounds every corner of a sole $name', async ( { section } ) => {
+		await render( <Card>{ section }</Card> );
 
 		const style = getComputedStyle(
 			page.getByTestId( 'section' ).element()
@@ -194,8 +189,8 @@ describe( 'Card styles', () => {
 
 	it.each( [ 'horizontal', 'vertical' ] as const )(
 		'retains CardDivider width and color when %s',
-		( orientation ) => {
-			render(
+		async ( orientation ) => {
+			await render(
 				<Card style={ { width: 240, height: 100 } }>
 					<CardDivider
 						orientation={ orientation }
@@ -222,8 +217,8 @@ describe( 'Card styles', () => {
 		}
 	);
 
-	it( 'fits media to the Card width', () => {
-		render(
+	it( 'fits media to the Card width', async () => {
+		await render(
 			<Card style={ { width: 240 } }>
 				<CardMedia data-testid="media">
 					<img
@@ -251,8 +246,8 @@ describe( 'Card styles', () => {
 
 	it.each( [ false, true ] )(
 		'keeps the body height for isScrollable=%s',
-		( isScrollable ) => {
-			render(
+		async ( isScrollable ) => {
+			await render(
 				<Card style={ { height: 200 } }>
 					<CardBody isScrollable={ isScrollable } data-testid="body">
 						<div style={ { height: 60 } }>Short content</div>
@@ -267,8 +262,8 @@ describe( 'Card styles', () => {
 		}
 	);
 
-	it( 'allows the body to scroll overflowing content', () => {
-		render(
+	it( 'allows the body to scroll overflowing content', async () => {
+		await render(
 			<Card style={ { height: 150 } }>
 				<CardBody isScrollable data-testid="body">
 					<div style={ { height: 400 } }>Long content</div>
