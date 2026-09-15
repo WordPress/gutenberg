@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 /**
  * Tests for on-demand JPEG XL support.
  *
@@ -7,27 +8,27 @@
  * only place in the package where a live vips instance is thrown away.
  */
 
-const mockWriteToBuffer = jest.fn( () => ( { buffer: '' } ) );
-const mockShutdown = jest.fn();
+const mockWriteToBuffer = vi.fn( () => ( { buffer: '' } ) );
+const mockShutdown = vi.fn();
 
 class MockImage {
 	width = 100;
 	height = 100;
 	pageHeight = 100;
 	writeToBuffer = mockWriteToBuffer;
-	getInt = jest.fn( () => 0 );
+	getInt = vi.fn( () => 0 );
 	onProgress: ( () => void ) | undefined;
 	kill = false;
 }
 
-const mockNewFromBuffer = jest.fn( () => new MockImage() );
-const mockVipsFactory = jest.fn( () => ( {
+const mockNewFromBuffer = vi.fn( () => new MockImage() );
+const mockVipsFactory = vi.fn( () => ( {
 	Image: { newFromBuffer: mockNewFromBuffer },
-	Cache: { max: jest.fn() },
+	Cache: { max: vi.fn() },
 	shutdown: mockShutdown,
 } ) );
 
-jest.mock(
+vi.mock(
 	'wasm-vips',
 	() =>
 		( ...args: unknown[] ) =>
@@ -45,7 +46,7 @@ jest.mock(
  */
 async function loadVips() {
 	let vips: typeof import('../');
-	await jest.isolateModulesAsync( async () => {
+	await vi.isolateModulesAsync( async () => {
 		vips = await import( '../' );
 	} );
 	// @ts-expect-error - assigned inside the isolated module callback.
@@ -84,7 +85,7 @@ async function runOperation( vips: typeof import('../') ) {
 
 describe( 'JPEG XL support', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'omits the JXL library until the bytes arrive', async () => {

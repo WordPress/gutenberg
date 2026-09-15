@@ -1,3 +1,4 @@
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 /**
  * Tests for `vipsEnsureJxlSupport`, the main-thread half of on-demand JXL.
  *
@@ -6,16 +7,16 @@
  * it must not be permanently disabled by one failed download.
  */
 
-const mockSetJxlWasm = jest.fn( () => Promise.resolve() );
-const mockTerminate = jest.fn();
+const mockSetJxlWasm = vi.fn( () => Promise.resolve() );
+const mockTerminate = vi.fn();
 
 // One wrapped API object per worker, so a test can tell a recycled worker from
 // a reused one by identity - exactly what the implementation keys off.
-const mockWrap = jest.fn( () => ( {
+const mockWrap = vi.fn( () => ( {
 	setJxlWasm: mockSetJxlWasm,
 } ) );
 
-jest.mock( '@wordpress/worker-threads', () => ( {
+vi.mock( '@wordpress/worker-threads', () => ( {
 	wrap: ( ...args: unknown[] ) => mockWrap( ...( args as [] ) ),
 	terminate: ( ...args: unknown[] ) => mockTerminate( ...( args as [] ) ),
 } ) );
@@ -24,13 +25,13 @@ jest.mock( '@wordpress/worker-threads', () => ( {
 // cannot be resolved from a unit test run.
 // The specifier has to match the one vips-worker.ts imports, extension and
 // all, or the virtual mock is not consulted and the resolve fails.
-jest.mock( '../worker-code.ts', () => ( { workerCode: '' } ), {
+vi.mock( '../worker-code.ts', () => ( { workerCode: '' } ), {
 	virtual: true,
 } );
 
 // Stands in for fetching the ~3 MB JXL chunk. Throwing from the factory is how
 // a failed chunk load surfaces: the dynamic import rejects.
-const mockJxlImport = jest.fn( () => ( {
+const mockJxlImport = vi.fn( () => ( {
 	__esModule: true,
 	default: new Uint8Array( [ 1, 2, 3, 4 ] ),
 } ) );
@@ -41,8 +42,8 @@ beforeAll( () => {
 			terminate() {}
 		},
 	} );
-	URL.createObjectURL = jest.fn( () => 'blob:worker' );
-	URL.revokeObjectURL = jest.fn();
+	URL.createObjectURL = vi.fn( () => 'blob:worker' );
+	URL.revokeObjectURL = vi.fn();
 } );
 
 /**
@@ -57,14 +58,14 @@ async function loadWorkerModule() {
 	// A plain registry reset rather than isolateModules: the JXL chunk is
 	// imported lazily from inside vipsEnsureJxlSupport, long after this
 	// function returns, so it has to resolve against the same registry.
-	jest.resetModules();
-	jest.doMock( '@wordpress/vips/jxl-wasm', () => mockJxlImport() );
+	vi.resetModules();
+	vi.doMock( '@wordpress/vips/jxl-wasm', () => mockJxlImport() );
 	return await import( '../vips-worker' );
 }
 
 describe( 'vipsEnsureJxlSupport', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		mockJxlImport.mockImplementation( () => ( {
 			__esModule: true,
 			default: new Uint8Array( [ 1, 2, 3, 4 ] ),
