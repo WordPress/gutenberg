@@ -41,7 +41,8 @@ export default function usePostTitle() {
 		'postType',
 		postType,
 		'title',
-		postId
+		postId,
+		{ coalesce: true }
 	);
 
 	const value = useMemo(

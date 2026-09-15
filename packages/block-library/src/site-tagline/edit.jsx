@@ -29,7 +29,8 @@ export default function SiteTaglineEdit( props ) {
 		'root',
 		canUserEdit ? 'site' : '__unstableBase',
 		'description',
-		undefined
+		undefined,
+		{ coalesce: true }
 	);
 
 	const TagName = level === 0 ? 'p' : `h${ level }`;

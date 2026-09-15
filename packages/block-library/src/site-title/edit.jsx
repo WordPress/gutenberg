@@ -37,7 +37,8 @@ export default function SiteTitleEdit( props ) {
 		'root',
 		canUserEdit ? 'site' : '__unstableBase',
 		canUserEdit ? 'title' : 'name',
-		undefined
+		undefined,
+		{ coalesce: true }
 	);
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockEditingMode = useBlockEditingMode();
