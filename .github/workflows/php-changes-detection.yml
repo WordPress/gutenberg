@@ -38,7 +38,7 @@ jobs:
                   echo "formatted_change_list=$formatted_change_list" >> $GITHUB_OUTPUT
 
             - name: Find Comment
-              uses: peter-evans/find-comment@v3
+              uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4.0.0
               id: find-comment
               with:
                   issue-number: ${{ github.event.pull_request.number }}
