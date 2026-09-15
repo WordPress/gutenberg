@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { resolveRestoreTarget } from '../restore-sidebar';
 import { ALL_NOTES_SIDEBAR } from '../constants';
 
