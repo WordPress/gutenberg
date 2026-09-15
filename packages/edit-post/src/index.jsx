@@ -60,7 +60,6 @@ export function initializeEditor(
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
 		editorMode: 'visual',
-		editorTool: 'edit',
 		fixedToolbar: false,
 		hiddenBlockTypes: [],
 		inactivePanels: [],

@@ -20,12 +20,52 @@ concurrency:
 permissions: {}
 
 jobs:
+    # Analyzes the list of files modified in a pull request to detect any changes that could
+    # potentially impact E2E tests. A series of ignore patterns are used in place of an include
+    # list to ensure tests run even if the list of filters happens to become stale.
+    detect-relevant-changes:
+        name: Detect changes relevant to E2E tests
+        runs-on: 'ubuntu-24.04'
+        timeout-minutes: 5
+        permissions:
+            pull-requests: read
+        outputs:
+            relevant: ${{ steps.filter.outputs.relevant }}
+        steps:
+            - name: Check for changes that may impact E2E test results
+              id: filter
+              if: ${{ github.event_name == 'pull_request' }}
+              uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+              with:
+                  predicate-quantifier: 'every'
+                  filters: |
+                      relevant:
+                          # Start from every file, then exclude what cannot change a test result.
+                          - '**'
+                          # Documentation.
+                          - '!**/*.md'
+                          - '!{backport-changelog,docs,phpunit,storybook}/**'
+                          # Other test suites, which cannot affect this one.
+                          - '!test/{integration,performance,php,storybook-playwright,unit}/**'
+                          - '!{packages,tools}/**/{test,tests}/**'
+                          # Development tooling and its configuration.
+                          - '!packages/{create-block,docgen,eslint-plugin,jest-*,npm-package-json-lint-config,prettier-config,project-management-automation,stylelint-config}/**'
+                          - '!tools/{docs,eslint,stylelint,validation}/**'
+                          - '!{eslint,lint-staged,prettier,syncpack}.config*'
+                          - '!{phpcs,phpunit}*'
+                          # Repository metadata.
+                          - '!{changelog,readme}.txt'
+                          - '!.{editorconfig,gitignore,prettierrc*,stylelintrc*}'
+                          # Other workflows, and everything under .github that this one does not use.
+                          - '!.github/{*,!(workflows|setup-node|setup-playwright)/**,workflows/!(end2end-test.yml)}'
+
     build:
         name: Build
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        needs: [detect-relevant-changes]
         permissions:
             contents: read
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         timeout-minutes: 30
 
         steps:
@@ -209,15 +249,91 @@ jobs:
                   path: test/e2e/flaky-tests
                   if-no-files-found: ignore
 
+    e2e-playwright-site-editor-v2:
+        name: Playwright - Site Editor v2
+        runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        needs: build
+        timeout-minutes: 45
+        # A skipped check counts as passing for required status checks, so a
+        # broken build must not skip these jobs — they have to start and go red
+        # (see the guard step below). `!cancelled()` is what drops the implicit
+        # `success()`; `!= 'skipped'` keeps the fork/repository filter that now
+        # lives on the build job.
+        if: ${{ !cancelled() && needs.build.result != 'skipped' }}
+        permissions:
+            contents: read
+            id-token: write
+
+        steps:
+            # Bail out before checkout and `npm ci` rather than after.
+            - name: Fail if the build job failed
+              if: ${{ needs.build.result != 'success' }}
+              run: exit 1
+
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Download build output
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  name: build-output
+
+            # The site editor v2 config only defines a chromium project.
+            - name: Install Playwright dependencies
+              uses: ./.github/setup-playwright
+              with:
+                  workspace: '@wordpress/e2e-tests-playwright'
+                  browsers: chromium
+
+            - name: Install WordPress and start the server
+              run: |
+                  npm run wp-env-test start
+
+            - name: Run the tests
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+                  # Label flaky reports so this job's diagnostics don't collide
+                  # with the default suite's when artifacts are merged, and so
+                  # extensible-site-editor flakes are reported as their own
+                  # issues.
+                  FLAKY_TESTS_REPORT_LABEL: 'Site Editor v2'
+              run: |
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e:site-editor-v2
+
+            - name: Archive blob reports (HTML)
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              if: ${{ !cancelled() }}
+              with:
+                  name: blob-reports--site-editor-v2
+                  path: test/e2e/blob-report
+                  if-no-files-found: ignore
+
+            - name: Archive flaky tests report
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              if: ${{ !cancelled() }}
+              with:
+                  name: flaky-tests-report--site-editor-v2
+                  path: test/e2e/flaky-tests
+                  if-no-files-found: ignore
+
     merge-artifacts:
         name: Merge Artifacts
-        if: ${{ !cancelled() }}
-        needs: [e2e-playwright, e2e-playwright-rtc-websocket]
+        if: ${{ ! cancelled() && ( github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        needs:
+            [
+                detect-relevant-changes,
+                e2e-playwright,
+                e2e-playwright-rtc-websocket,
+                e2e-playwright-site-editor-v2,
+            ]
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
-            # Needed to comment the flaky tests report on the pull request.
-            pull-requests: write
         timeout-minutes: 5
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -245,15 +361,18 @@ jobs:
                   pattern: blob-reports--*
                   delete-merged: true
 
+            # The merge runs through the workspace that declares playwright, so
+            # it also resolves under the isolated install strategy. That puts
+            # its working directory in the workspace, hence the paths below.
             - name: Download merged blob reports
               uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               continue-on-error: true
               with:
                   name: blob-reports-merged
-                  path: all-blob-reports
+                  path: test/e2e/all-blob-reports
 
             - name: Merge blob reports into HTML report
-              run: npx playwright merge-reports --reporter html ./all-blob-reports
+              run: npm exec --no --workspace @wordpress/e2e-tests-playwright -- playwright merge-reports --reporter html ./all-blob-reports
               continue-on-error: true
 
             - name: Upload merged HTML report
@@ -261,7 +380,7 @@ jobs:
               continue-on-error: true
               with:
                   name: html-report--attempt-${{ github.run_attempt }}
-                  path: playwright-report
+                  path: test/e2e/playwright-report
                   if-no-files-found: ignore
 
             # Flaky tests are only reported as a comment on the pull request. The
@@ -275,9 +394,97 @@ jobs:
                   name: flaky-tests-report
                   path: flaky-tests
 
-            - name: Report flaky tests
+            - name: Render the flaky tests report
               if: ${{ steps.download-flaky-tests-report.outcome == 'success' }}
               uses: ./packages/report-flaky-tests
               with:
-                  repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   artifact-path: flaky-tests
+                  output-path: pr-meta/body.md
+
+            - name: Upload the flaky tests report
+              if: ${{ steps.download-flaky-tests-report.outcome == 'success' }}
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: pr-meta--flaky-tests
+                  path: pr-meta
+                  if-no-files-found: ignore
+
+    pr-meta:
+        name: Update PR meta comment
+        needs: merge-artifacts
+        # Runs on every pull request, including the clean ones: a run with no
+        # flaky test uploads no report, and the empty section clears a stale one.
+        # Only when the job above succeeded, though, since a missing report then
+        # means the run was clean rather than that rendering it failed.
+        # Skipped on a fork, whose token cannot write a comment.
+        if: ${{ needs.merge-artifacts.result == 'success' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+            pull-requests: write
+        timeout-minutes: 5
+        # Shared with every other writer of this comment. See bundle-size.yml.
+        concurrency:
+            group: pr-meta-${{ github.event.number }}
+            cancel-in-progress: false
+            queue: max
+
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  sparse-checkout: tools/pr-meta
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              continue-on-error: true
+              with:
+                  name: pr-meta--flaky-tests
+                  path: pr-meta
+
+            - uses: ./tools/pr-meta
+              with:
+                  repo-token: ${{ secrets.GITHUB_TOKEN }}
+                  section: flaky-tests
+                  body-path: pr-meta/body.md
+                  commit-sha: ${{ github.event.pull_request.head.sha }}
+                  run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+    # Runs on every event so it can serve as the workflow's only required status check while the
+    # preceding jobs are path-filtered away.
+    #
+    # GitHub Actions can only be configured as required status checks on a per job basis using the
+    # job's `name`. When the `name` changes PRs are temporarily blocked from being merged until
+    # a privileged user can update the status checks, a process which is also error prone.
+    #
+    # The script reads every job in the run, so `needs` is only about waiting: it must cover
+    # every job that would otherwise still be running when the script looks. `--ignore` then
+    # names the jobs whose results do not count. Here that is this job itself, and the
+    # housekeeping that runs alongside it.
+    e2e-status-check:
+        name: End-to-End Tests - Status Check
+        runs-on: 'ubuntu-24.04'
+        timeout-minutes: 5
+        permissions:
+            contents: read
+            actions: read
+        needs:
+            [
+                detect-relevant-changes,
+                e2e-playwright,
+                e2e-playwright-rtc-websocket,
+                e2e-playwright-site-editor-v2,
+            ]
+        if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  sparse-checkout: .github/workflows/scripts
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Check for any failures of required jobs
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: node .github/workflows/scripts/ci-status-check.js --ignore 'End-to-End Tests - Status Check,Merge Artifacts,Update PR meta comment'

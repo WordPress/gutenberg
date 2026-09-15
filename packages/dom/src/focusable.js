@@ -46,14 +46,28 @@ function buildSelector( sequential ) {
 }
 
 /**
- * Returns true if the specified element is visible (i.e. neither display: none
- * nor visibility: hidden).
+ * Returns true if the specified element has a layout box and is not hidden by
+ * CSS visibility or content visibility.
  *
  * @param {HTMLElement} element DOM element to test.
  *
  * @return {boolean} Whether element is visible.
  */
 function isVisible( element ) {
+	if ( typeof element.checkVisibility === 'function' ) {
+		if ( ! element.checkVisibility( { visibilityProperty: true } ) ) {
+			return false;
+		}
+	} else {
+		const visibility =
+			element.ownerDocument.defaultView?.getComputedStyle(
+				element
+			).visibility;
+		if ( visibility === 'hidden' || visibility === 'collapse' ) {
+			return false;
+		}
+	}
+
 	return (
 		element.offsetWidth > 0 ||
 		element.offsetHeight > 0 ||
@@ -81,7 +95,7 @@ function isValidFocusableArea( element ) {
 	const img = element.ownerDocument.querySelector(
 		'img[usemap="#' + map.name + '"]'
 	);
-	return !! img && isVisible( img );
+	return !! img && ! img.closest( '[inert]' ) && isVisible( img );
 }
 
 /**
@@ -103,8 +117,12 @@ export function find( context, { sequential = false } = {} ) {
 	const elements = context.querySelectorAll( buildSelector( sequential ) );
 
 	return Array.from( elements ).filter( ( element ) => {
-		if ( ! isVisible( element ) ) {
-			return false;
+		const { nodeName } = element;
+		if ( 'AREA' === nodeName ) {
+			// The mapped image determines whether this region is visible or inert.
+			return isValidFocusableArea(
+				/** @type {HTMLAreaElement} */ ( element )
+			);
 		}
 
 		// Elements inside an inert subtree are not focusable.
@@ -112,13 +130,6 @@ export function find( context, { sequential = false } = {} ) {
 			return false;
 		}
 
-		const { nodeName } = element;
-		if ( 'AREA' === nodeName ) {
-			return isValidFocusableArea(
-				/** @type {HTMLAreaElement} */ ( element )
-			);
-		}
-
-		return true;
+		return isVisible( element );
 	} );
 }

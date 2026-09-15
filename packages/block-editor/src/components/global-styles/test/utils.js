@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getDuotoneSlugFromPreset } from '../utils';
 
 describe( 'global styles utils', () => {

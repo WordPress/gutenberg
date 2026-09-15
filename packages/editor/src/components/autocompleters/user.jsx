@@ -43,6 +43,14 @@ export default {
 	className: 'editor-autocompleters__user',
 	triggerPrefix: '@',
 
+	allowContext( before ) {
+		// Only trigger when the preceding character is not a word character,
+		// so typing an email address does not open the mention popup, while
+		// mentions still work at the start of a line or after spaces and
+		// punctuation such as an opening parenthesis.
+		return /\B$/.test( before );
+	},
+
 	useItems( filterValue ) {
 		const users = useSelect(
 			( select ) => {

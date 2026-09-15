@@ -7,7 +7,7 @@ import {
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect } from '@wordpress/data';
-import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
+import { DataViews } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useEvent, usePrevious } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
@@ -176,27 +176,14 @@ export default function PostList( { postType } ) {
 	const { notesCount, isLoading: isLoadingNotesCount } =
 		useNotesCount( postIds );
 
-	// The REST API sort the authors by ID, but we want to sort them by name.
-	const data = useMemo( () => {
-		let processedRecords = records;
-
-		if ( view?.sort?.field === 'author' ) {
-			processedRecords = filterSortAndPaginate(
-				records,
-				{ sort: { ...view.sort } },
-				fields
-			).data;
-		}
-
-		if ( processedRecords ) {
-			return processedRecords.map( ( record ) => ( {
+	const data = useMemo(
+		() =>
+			records?.map( ( record ) => ( {
 				...record,
 				notesCount: notesCount[ record.id ] ?? 0,
-			} ) );
-		}
-
-		return processedRecords;
-	}, [ records, fields, view?.sort, notesCount ] );
+			} ) ),
+		[ records, notesCount ]
+	);
 
 	const ids = data?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];

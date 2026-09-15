@@ -2,12 +2,19 @@
 
 ## Unreleased
 
+### Internal
+
+-   Run rendered Grid tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
+## 0.7.0 (2026-09-10)
+
 ### New Features
 
 -   Layout items accept `draggable` and `resizable` flags. A non-draggable
     item is pinned: it cannot be dragged and holds its index while the
     other items reorder; a non-resizable item keeps its size
     ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
+-   `DashboardGrid` and `DashboardLanes` accept `itemLimits`: per-item minimum and maximum tile sizes in pixels (`GridItemLimits`; width-only `GridItemWidthLimits` on lanes), enforced on rendered spans and resize gestures without being written into the layout ([#81899](https://github.com/WordPress/gutenberg/pull/81899)).
 
 ### Internal
 

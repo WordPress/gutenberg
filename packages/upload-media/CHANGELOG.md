@@ -6,9 +6,17 @@
 
 -   Support HEIC/HEIF image sequences (Apple Live Photos, Android bursts). The sequence's first frame is decoded to a JPEG and uploaded as the attachment, and its motion is re-encoded to a web-safe video (MP4/WebM) sideloaded as an `animated_video` companion — the same model animated GIFs use. Sequences are detected by sniffing the container, since exported Live Photos routinely arrive typed as ordinary `image/heic` stills. Falls back to uploading the original untouched when the platform cannot decode HEVC ([#79642](https://github.com/WordPress/gutenberg/issues/79642)).
 
+## 0.40.0 (2026-09-10)
+
+### Bug Fixes
+
+-   A HEIC file that fails to convert for a reason other than a missing decoder, such as a damaged or truncated file or a canvas that could not be created, is no longer reported as the browser being unable to read HEIC. That message names a browser that would decode HEIC instead, which is no help when the codec was never the problem. It is now kept for the one case that earns it, where no decoding strategy is available at all; everything else reports a processing error ([#81123](https://github.com/WordPress/gutenberg/issues/81123)).
+
 ### Internal
 
+-   Add a private `getFailureCount` selector, a running tally of top-level items cancelled because they failed. Failed items leave the queue just like successful ones, so this is the only record that an upload did not make it ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).
 -   Remove unused dependency `@wordpress/preferences` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
 
 ## 0.39.0 (2026-08-26)
 
