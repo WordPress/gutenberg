@@ -435,7 +435,7 @@ describe( 'actions', () => {
 				'example.jpg',
 				{ type: 'image/jpeg' }
 			);
-			const onError = jest.fn();
+			const onError = vi.fn();
 
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: heicNamedJpeg,
