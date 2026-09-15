@@ -4,7 +4,14 @@ import userEvent from '@testing-library/user-event';
 import apiFetch from '@wordpress/api-fetch';
 import ReactionDisplay, { AddReactionButton } from '../reaction-display';
 
-vi.mock( import( '@wordpress/api-fetch' ), () => ( { default: vi.fn() } ) );
+vi.mock( import( '@wordpress/api-fetch' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		default: vi.fn(),
+	} as unknown as typeof original;
+} );
 
 const mockApiFetch = vi.mocked( apiFetch );
 
