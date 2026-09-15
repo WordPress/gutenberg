@@ -722,25 +722,33 @@ export const insertBlocks =
 					initialPosition
 				);
 				if ( updateSelection && initialPosition === 0 ) {
-					selectTextStart( select, dispatch );
+					selectDefaultBlockTextStart( select, dispatch );
 				}
 			} );
 		}
 	};
 
 /**
- * Selects the start of the selected block's text, so its field places the
- * caret as it mounts. Focusing the field later instead resets the iOS
- * keyboard's capitalization.
+ * Selects the start of the selected block's text when it is the default
+ * block, so its field places the caret as it mounts. Scoped to the default
+ * block because it has a single rich text field, so the store selection
+ * cannot point at a different field than the one the block focuses. Placing
+ * the caret by focusing the field later resets the iOS keyboard instead.
  *
  * @param {Object} select   Store selectors.
  * @param {Object} dispatch Store actions.
  */
-function selectTextStart( select, dispatch ) {
+function selectDefaultBlockTextStart( select, dispatch ) {
 	const clientId = select.getSelectedBlockClientId();
-	const blockType =
-		clientId && getBlockType( select.getBlockName( clientId ) );
-	const attributeKey = blockType && findRichTextAttributeKey( blockType );
+	if (
+		! clientId ||
+		select.getBlockName( clientId ) !== getDefaultBlockName()
+	) {
+		return;
+	}
+	const attributeKey = findRichTextAttributeKey(
+		getBlockType( getDefaultBlockName() )
+	);
 	if ( attributeKey ) {
 		dispatch.selectionChange( clientId, attributeKey, 0, 0 );
 	}
@@ -1189,7 +1197,18 @@ export const __unstableSplitSelection =
 					head,
 					tail,
 				] );
-				selectTextStart( select, dispatch );
+				// Select the start of the tail field in the same batch, like
+				// the branches below, so the field places the caret as it
+				// mounts rather than being focused later. Skipped when the
+				// tail changed block type and lost the attribute.
+				if ( Object.hasOwn( tail.attributes, attributeKeyB ) ) {
+					dispatch.selectionChange(
+						tail.clientId,
+						attributeKeyB,
+						0,
+						0
+					);
+				}
 			} );
 			return;
 		}

@@ -5,6 +5,8 @@ import {
 	getBlockTypes,
 	unregisterBlockType,
 	registerBlockType,
+	setDefaultBlockName,
+	getDefaultBlockName,
 	createBlock,
 } from '@wordpress/blocks';
 import * as selectors from '../selectors';
@@ -486,17 +488,19 @@ describe( 'actions', () => {
 			);
 		} );
 
-		it( 'selects the start of the text of an inserted rich text block', () => {
-			registerBlockType( 'core/test-text', {
+		it( "selects the start of an inserted default block's text", () => {
+			registerBlockType( 'core/test-default', {
 				...defaultBlockSettings,
 				attributes: { content: { source: 'rich-text' } },
 			} );
+			const previousDefault = getDefaultBlockName();
+			setDefaultBlockName( 'core/test-default' );
 
-			const block = createBlock( 'core/test-text' );
+			const block = createBlock( 'core/test-default' );
 			const select = {
 				getSettings: () => null,
 				getSelectedBlockClientId: () => block.clientId,
-				getBlockName: () => 'core/test-text',
+				getBlockName: () => 'core/test-default',
 				canInsertBlockType: () => true,
 			};
 			const dispatch = vi.fn();
@@ -521,20 +525,21 @@ describe( 'actions', () => {
 				0
 			);
 
+			// A block that is not the default block is left to place its own
+			// caret, since the store cannot know which field it focuses.
 			dispatch.selectionChange.mockClear();
+			select.getBlockName = () => 'core/test-item';
+			registerBlockType( 'core/test-item', defaultBlockSettings );
 			insertBlocks(
-				[ block ],
+				[ createBlock( 'core/test-item' ) ],
 				0,
 				undefined,
 				true,
-				null
-			)( {
-				select,
-				dispatch,
-				registry: { batch: ( fn ) => fn() },
-			} );
-
+				0
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
+
+			setDefaultBlockName( previousDefault );
 		} );
 
 		it( 'should not apply block type templates to blocks with inner blocks', () => {
