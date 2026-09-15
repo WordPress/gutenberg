@@ -4,10 +4,12 @@ import type { NormalizedField } from '../../types';
  * Whether a field can render its read-only value or an edit control.
  *
  * @param field The normalized field definition.
+ * @param item  The item being edited.
  * @return Whether the field can render.
  */
 export function canRenderField< Item >(
-	field: NormalizedField< Item > | undefined
+	field: NormalizedField< Item > | undefined,
+	item: Item
 ): field is NormalizedField< Item > {
-	return !! field && ( field.readOnly === true || !! field.Edit );
+	return !! field && ( field.readOnly( { item, field } ) || !! field.Edit );
 }

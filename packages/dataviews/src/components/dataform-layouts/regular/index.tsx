@@ -71,7 +71,7 @@ export default function FormRegularField< Item >( {
 		( fieldDef ) => fieldDef.id === field.id
 	);
 
-	if ( ! canRenderField( fieldDefinition ) ) {
+	if ( ! canRenderField( fieldDefinition, data ) ) {
 		return null;
 	}
 
@@ -93,7 +93,10 @@ export default function FormRegularField< Item >( {
 					</BaseControl.VisualLabel>
 				</div>
 				<div className="dataforms-layouts-regular__field-control">
-					{ fieldDefinition.readOnly === true ? (
+					{ fieldDefinition.readOnly( {
+						item: data,
+						field: fieldDefinition,
+					} ) ? (
 						<fieldDefinition.render
 							item={ data }
 							field={ fieldDefinition }
@@ -118,7 +121,10 @@ export default function FormRegularField< Item >( {
 
 	return (
 		<div className="dataforms-layouts-regular__field">
-			{ fieldDefinition.readOnly === true ? (
+			{ fieldDefinition.readOnly( {
+				item: data,
+				field: fieldDefinition,
+			} ) ? (
 				<>
 					<>
 						{ ! hideLabelFromVision && labelPosition !== 'none' && (

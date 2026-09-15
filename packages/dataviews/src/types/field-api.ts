@@ -415,8 +415,14 @@ export type Field< Item > = {
 	/**
 	 * Whether the field is readOnly.
 	 * If `true`, the value will be rendered using the `render` callback.
+	 * Can be a boolean or a callback receiving the current item and field.
 	 */
-	readOnly?: boolean;
+	readOnly?:
+		| boolean
+		| ( ( args: {
+				item: Item;
+				field: NormalizedField< Item >;
+		  } ) => boolean );
 
 	/**
 	 * Callback used to retrieve the value of the field from the item.
@@ -611,9 +617,13 @@ export type NormalizedField< Item > = Omit<
 	filter: FilterOperatorMap< Item >;
 
 	/**
-	 * Whether the field is readOnly. Defaults to false.
+	 * Callback used to decide if a field is readOnly.
+	 * Defaults to returning false.
 	 */
-	readOnly: boolean;
+	readOnly: ( args: {
+		item: Item;
+		field: NormalizedField< Item >;
+	} ) => boolean;
 
 	/**
 	 * Callback used to decide if a field should be disabled.

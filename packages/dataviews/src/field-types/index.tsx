@@ -100,7 +100,10 @@ export default function normalizeFields< Item >(
 					? field.isDisabled
 					: () => !! field.isDisabled,
 			enableHiding: field.enableHiding ?? true,
-			readOnly: field.readOnly ?? false,
+			readOnly:
+				typeof field.readOnly === 'function'
+					? field.readOnly
+					: () => !! field.readOnly,
 			// The type provides defaults for the following props
 			type: fieldType.type,
 			render: field.render ?? fieldType.render,

@@ -273,7 +273,7 @@ export default function FormCardField< Item >( {
 			( fieldDef ) => fieldDef.id === field.id
 		);
 
-		if ( ! canRenderField( fieldDefinition ) ) {
+		if ( ! canRenderField( fieldDefinition, data ) ) {
 			return null;
 		}
 

@@ -133,6 +133,46 @@ describe( 'DataForm component', () => {
 			}
 		);
 
+		it( 'renders a field read-only per item when `readOnly` is a callback', () => {
+			const lockedFields = [
+				{
+					id: 'title',
+					label: 'Title',
+					type: 'text' as const,
+					readOnly: ( { item }: { item: { locked: boolean } } ) =>
+						item.locked,
+				},
+			];
+			const lockedForm = { fields: [ 'title' ] };
+
+			const { rerender } = render(
+				<Dataform
+					onChange={ noop }
+					fields={ lockedFields }
+					form={ lockedForm }
+					data={ { title: 'Locked title', locked: true } }
+				/>
+			);
+
+			expect( screen.getByText( 'Locked title' ) ).toBeVisible();
+			expect(
+				screen.queryByRole( 'textbox', { name: 'Title' } )
+			).not.toBeInTheDocument();
+
+			rerender(
+				<Dataform
+					onChange={ noop }
+					fields={ lockedFields }
+					form={ lockedForm }
+					data={ { title: 'Open title', locked: false } }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'textbox', { name: 'Title' } )
+			).toHaveValue( 'Open title' );
+		} );
+
 		it( 'keeps an editable field without an edit control hidden', () => {
 			render(
 				<Dataform

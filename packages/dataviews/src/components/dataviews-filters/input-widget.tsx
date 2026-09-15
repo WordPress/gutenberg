@@ -55,6 +55,8 @@ export default function InputWidget( {
 				isValid: {} satisfies NormalizedRules< any >,
 				// Filter controls are always enabled.
 				isDisabled: () => false,
+				// Filter controls are never read-only.
+				readOnly: () => false,
 				// Filter controls are always visible.
 				isVisible: () => true,
 				// Configure getValue/setValue as if Item was a plain object.

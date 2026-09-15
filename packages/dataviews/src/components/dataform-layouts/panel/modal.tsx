@@ -183,7 +183,10 @@ function PanelModal< Item >( {
 				summaryFields={ summaryFields }
 				validity={ validity }
 				touched={ touched }
-				disabled={ fieldDefinition.readOnly === true }
+				disabled={ fieldDefinition.readOnly( {
+					item: data,
+					field: fieldDefinition,
+				} ) }
 				onClick={ () => setIsOpen( true ) }
 				isOpen={ isOpen }
 			/>

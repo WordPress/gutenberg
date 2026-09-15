@@ -1653,9 +1653,9 @@ Finally, the field author can always provide its own custom `Edit` control. It r
 
 ### `readOnly`
 
-Boolean indicating that the field is not editable. Fields that are not editable use the `render` function to display their value in Edit contexts.
+Whether the field is not editable. Fields that are not editable use the `render` function to display their value in Edit contexts. A callback receives the current item and field, so a field can be read-only for some records only.
 
--   Type: `boolean`.
+-   Type: `boolean` or `( args: { item: Item, field: NormalizedField< Item > } ) => boolean`.
 -   Optional.
 -   Defaults to `false`.
 
