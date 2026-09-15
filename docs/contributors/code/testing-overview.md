@@ -23,9 +23,7 @@ JavaScript unit and integration tests use [Vitest](https://vitest.dev/). Import 
 
 ### Setup and commands
 
-Follow the [worktree setup instructions](/docs/contributors/code/getting-started-with-code-contribution.md#set-up-each-worktree). Install dependencies and build in each fresh worktree. Do not copy `node_modules` or generated packages from another checkout.
-
-From the repository root:
+Start with the [development prerequisites](/docs/contributors/code/getting-started-with-code-contribution.md#prerequisites), then run these commands from the repository root:
 
 ```sh
 npm ci
@@ -33,7 +31,7 @@ npm run build
 npm exec --no --workspace @wordpress/unit-tests -- playwright install chromium
 ```
 
-Use the Node version in `.nvmrc` and the npm range in the root `package.json`. Chromium is required for the full suite because it includes Browser Mode tests. A local WordPress site is not required for JavaScript unit tests.
+Chromium is required for the full suite because it includes Browser Mode tests. A local WordPress site is not required for JavaScript unit tests.
 
 ```sh
 # Lint, then run the complete Vitest suite once.
