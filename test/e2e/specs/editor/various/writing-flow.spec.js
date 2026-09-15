@@ -356,11 +356,11 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			},
 		] );
 
-		// Each ArrowUp must stop on the next line up, not leave the block.
+		// The second ArrowUp starts on the empty line and must stop on the
+		// first line, not leave the block.
 		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.type( '2' );
+		await page.keyboard.type( 'X' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -369,7 +369,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			},
 			{
 				name: 'core/preformatted',
-				attributes: { content: 'P2re block<br>1<br>Foo' },
+				attributes: { content: 'PreX block<br><br>Foo' },
 			},
 		] );
 	} );
