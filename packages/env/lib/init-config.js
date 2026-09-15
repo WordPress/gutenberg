@@ -129,6 +129,18 @@ RUN sed -i 's|deb.debian.org/debian stretch|archive.debian.org/debian stretch|g'
 RUN sed -i 's|security.debian.org/debian-security stretch|archive.debian.org/debian-security stretch|g' /etc/apt/sources.list
 RUN sed -i '/stretch-updates/d' /etc/apt/sources.list
 
+# buster (https://lists.debian.org/debian-devel-announce/2025/06/msg00001.html)
+RUN sed -i 's|deb.debian.org/debian buster|archive.debian.org/debian buster|g' /etc/apt/sources.list
+RUN sed -i 's|security.debian.org/debian-security buster/updates|archive.debian.org/debian-security buster/updates|g' /etc/apt/sources.list
+RUN sed -i '/buster-updates/d' /etc/apt/sources.list
+
+# bullseye (https://www.debian.org/News/2026/20260831)
+# The security suite is not on archive.debian.org yet, so it is dropped rather
+# than rewritten.
+RUN sed -i 's|deb.debian.org/debian bullseye|archive.debian.org/debian bullseye|g' /etc/apt/sources.list
+RUN sed -i '/bullseye-security/d' /etc/apt/sources.list
+RUN sed -i '/bullseye-updates/d' /etc/apt/sources.list
+
 # Create the host's user so that we can match ownership in the container.
 ARG HOST_USERNAME
 ARG HOST_UID
