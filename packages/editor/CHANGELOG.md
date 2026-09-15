@@ -13,7 +13,7 @@
 
 ### Internal
 
--   Template options: Use the public `Menu` from `@wordpress/ui`.
+-   Template options: Use the public `Menu` from `@wordpress/ui` ([#82964](https://github.com/WordPress/gutenberg/pull/82964)).
 
 ## 15.1.0 (2026-09-23)
 
