@@ -132,6 +132,7 @@ $navigation-icon-size: 24px;
 	&.items-justified-center {
 		--navigation-layout-justification-setting: center;
 		--navigation-layout-justify: center;
+		--navigation-layout-text-align: center;
 
 		&.is-vertical {
 			--navigation-layout-align: center;
@@ -141,6 +142,7 @@ $navigation-icon-size: 24px;
 	&.items-justified-right {
 		--navigation-layout-justification-setting: flex-end;
 		--navigation-layout-justify: flex-end;
+		--navigation-layout-text-align: right;
 
 		&.is-vertical {
 			--navigation-layout-align: flex-end;
@@ -607,6 +609,7 @@ button.wp-block-navigation-item__content {
 
 				// Inherit alignment settings from container.
 				align-items: var(--navigation-layout-justification-setting, inherit);
+				text-align: var(--navigation-layout-text-align, inherit);
 
 				// Always align the contents of the menu to the top.
 				&,
@@ -660,6 +663,7 @@ button.wp-block-navigation-item__content {
 					flex-direction: column;
 					// Inherit alignment settings from container.
 					align-items: var(--navigation-layout-justification-setting, initial);
+					text-align: var(--navigation-layout-text-align, inherit);
 				}
 			}
 
