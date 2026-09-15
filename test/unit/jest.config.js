@@ -96,7 +96,9 @@ const commonProjectConfig = {
 	],
 	resolver: '<rootDir>/test/unit/scripts/resolver.js',
 	transformIgnorePatterns: [
-		`/node_modules/(?!(${ dependenciesToTransform.join( '|' ) })/)`,
+		`/node_modules/(?!(\\.store/.+/node_modules/)?(${ dependenciesToTransform.join(
+			'|'
+		) })/)`,
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotFormat: {
