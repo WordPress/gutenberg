@@ -105,6 +105,25 @@ test.describe( 'Template resolution (DataForm inspector)', () => {
 				summary.getByRole( 'button', { name: 'Edit Template' } )
 			).toHaveAccessibleDescription( 'Custom' );
 
+			// The template actions panel offers no template editing or creation.
+			const sidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const panelToggle = sidebar.getByRole( 'button', {
+				name: 'Template: Custom',
+			} );
+			await panelToggle.click();
+			await expect( panelToggle ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect(
+				sidebar.getByRole( 'button', { name: 'Edit', exact: true } )
+			).toBeHidden();
+			await expect(
+				sidebar.getByRole( 'button', { name: 'Create new' } )
+			).toBeHidden();
+
 			await context.close();
 		} );
 	} );
