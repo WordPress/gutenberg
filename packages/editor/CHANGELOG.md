@@ -8,6 +8,8 @@
 -   `PostTaxonomiesFlatTermSelector`: The field renders with the `SearchableChipSelectControl` component of `@wordpress/ui` instead of `FormTokenField` ([#80967](https://github.com/WordPress/gutenberg/pull/80967)).
 -   `CollaboratorsPresence`: Show focus ring for avatar stack in header with button's outline instead of previous box-shadow override ([#82941](https://github.com/WordPress/gutenberg/pull/82941)).
 -   Add category filtering and search to the "Choose a pattern" modal shown when creating a new page or post. Only the categories containing start patterns for the current post type are listed, with labels pulled from the registered pattern categories ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
+-   `PostLastRevisionPanel`: Show the revisions button's focus ring with the design system's outline instead of a legacy box-shadow that doubled up with `Button`'s own ring ([#82955](https://github.com/WordPress/gutenberg/pull/82955)).
+
 
 ### Bug Fixes
 
