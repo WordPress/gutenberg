@@ -17,6 +17,15 @@ bundles no longer need it. Keep the implementation, styles, and private API
 opt-ins until the [package compatibility checks](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/package-runtime-compatibility.md)
 pass, or explicitly change the supported consumer versions.
 
+Menu is a collection of React components that combine to render
+ARIA-compliant [menu](https://www.w3.org/WAI/ARIA/apg/patterns/menu/) and
+[menu button](https://www.w3.org/WAI/ARIA/apg/patterns/menubutton/) patterns.
+
+`Menu` itself is a wrapper component and context provider.
+It is responsible for managing the state of the menu and its items, and for
+rendering the `Menu.TriggerButton` (or the `Menu.SubmenuTriggerItem`)
+component, and the `Menu.Popover` component.
+
 ## Props
 
 ### `as`
