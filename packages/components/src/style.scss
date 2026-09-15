@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/default-custom-properties";
 @use "./animate/style.scss" as *;
 @use "./autocomplete/style.scss" as *;
 @use "./badge/styles.scss" as *;
@@ -46,9 +47,3 @@
 @use "./toolbar/toolbar-group/style.scss" as *;
 @use "./tooltip/style.scss" as *;
 @use "./validated-form-controls/style.scss" as *;
-
-// Include the default WP Components color variables.
-// TODO: Remove this once all admin-scheme variables are accounted for in the wp-components fallback values.
-:root {
-	@include admin-scheme( #3858e9 );
-}
