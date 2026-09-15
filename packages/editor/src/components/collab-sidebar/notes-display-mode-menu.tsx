@@ -61,7 +61,7 @@ export function NotesDisplayModeMenu( {
 	];
 
 	return (
-		<NotesMoreMenuGroup>
+		<NotesMoreMenuGroup.Fill>
 			<Menu.SubmenuRoot>
 				<Menu.SubmenuTrigger
 					prefix={ <Menu.PrefixIcon icon={ commentIcon } /> }
@@ -90,6 +90,6 @@ export function NotesDisplayModeMenu( {
 					</Menu.RadioGroup>
 				</Menu.Popup>
 			</Menu.SubmenuRoot>
-		</NotesMoreMenuGroup>
+		</NotesMoreMenuGroup.Fill>
 	);
 }
