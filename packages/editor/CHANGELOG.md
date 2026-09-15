@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Suggest mode: keep a suggestion note the collector would trash when it has replies. A pending note whose anchor disappeared was trashed 500ms later without checking whether anyone had answered it, and replies are children of the root comment, so undoing your own suggestion - or deleting the marked text while editing - silently deleted a collaborator's comment along with it. A note with replies is now kept and the withdrawal announced instead, counted at the server so a reply written in another session stops the collection too ([#81997](https://github.com/WordPress/gutenberg/pull/81997)).
 -   Featured image field: Only register it for the post types a theme lists in its `post-thumbnails` support, matching the classic panel. ([#82773](https://github.com/WordPress/gutenberg/pull/82773))
 -   `MediaUpload`: Coerce `multiple` to a boolean before passing it to the experimental media modal; callers such as the playlist block and the inserter media tab pass the legacy media frame's `'add'` mode. ([#82715](https://github.com/WordPress/gutenberg/pull/82715))
 -   Document bar: Preserve the subdued template-preview icon color after the icon became stroke-based. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))

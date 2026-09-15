@@ -1,10 +1,20 @@
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import {
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import { render, act } from '@testing-library/react';
+import apiFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider, select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as noticesStore } from '@wordpress/notices';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { RichTextData, store as richTextStore } from '@wordpress/rich-text';
 import SuggestionNoteGC from '../suggestion-note-gc';
@@ -25,8 +35,27 @@ vi.hoisted( () => {
 	globalThis.wpVitest.mockMatchMedia();
 } );
 
+vi.mock( import( '@wordpress/api-fetch' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		default: vi.fn(),
+	} as unknown as typeof original;
+} );
+
+/*
+ * What the comments endpoint answers with. The reply guard asks the server
+ * directly rather than reading the store, so these - not the records seeded
+ * into the cache - are what it sees. `serverReplies` answers the collector's
+ * `parent=<note>` probe; an `Error` makes that request fail.
+ */
+let serverThreads: any[] = [];
+let serverReplies: any[] | Error = [];
+
 const POST_ID = 77;
 const NOTE_ID = 9;
+const REPLY_ID = 10;
 const TEST_BLOCK_NAME = 'test/note-gc-block';
 
 const THREADS_QUERY = {
@@ -62,6 +91,19 @@ function note( { status = 'approved', lifecycle = 'applied' } = {} ) {
 	};
 }
 
+/*
+ * A reply to the note above. Replies are children of the root comment, which
+ * is why a withdrawal that trashes the root takes them with it.
+ */
+function reply() {
+	return {
+		id: REPLY_ID,
+		parent: NOTE_ID,
+		status: 'hold',
+		meta: {},
+	};
+}
+
 const MARKED = `Hello <mark class="wp-suggestion" data-suggestion-id="${ NOTE_ID }" data-suggestion-type="add" data-author="1">world</mark>`;
 
 beforeAll( () => {
@@ -85,11 +127,29 @@ beforeAll( () => {
 } );
 
 function setup( { content, threads }: { content: string; threads: any[] } ) {
+	serverThreads = threads;
+	serverReplies = threads.filter(
+		( thread: any ) => thread.parent === NOTE_ID
+	);
+	( apiFetch as unknown as ReturnType< typeof vi.fn > ).mockReset();
+	( apiFetch as unknown as ReturnType< typeof vi.fn > ).mockImplementation(
+		async ( { path }: any ) => {
+			if ( ! path.includes( `parent=${ NOTE_ID }` ) ) {
+				return serverThreads;
+			}
+			if ( serverReplies instanceof Error ) {
+				throw serverReplies;
+			}
+			return serverReplies;
+		}
+	);
+
 	const registry = createRegistry();
 	registry.register( coreStore );
 	registry.register( preferencesStore );
 	registry.register( blockEditorStore );
 	registry.register( editorStore );
+	registry.register( noticesStore );
 
 	registry.dispatch( editorStore ).setEditedPost( 'post', POST_ID as any );
 
@@ -114,7 +174,7 @@ function setup( { content, threads }: { content: string; threads: any[] } ) {
 		</RegistryProvider>
 	);
 
-	return { registry, saveEntityRecord };
+	return { registry, saveEntityRecord, clientId: block.clientId };
 }
 
 afterEach( () => {
@@ -243,5 +303,128 @@ describe( 'SuggestionNoteGC collecting a withdrawn marker', () => {
 			{ id: NOTE_ID, status: 'trash' },
 			expect.anything()
 		);
+	} );
+} );
+
+describe( 'SuggestionNoteGC collecting a withdrawn suggestion', () => {
+	beforeEach( () => {
+		/*
+		 * Only the timers: the collection awaits a real request between its
+		 * two withdrawal checks, so the promise jobs have to keep running.
+		 */
+		vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
+	} );
+
+	afterEach( () => {
+		vi.useRealTimers();
+	} );
+
+	/**
+	 * Mounts the collector on a marked block, then takes the marker away the
+	 * way an undo would, and lets the grace period run out.
+	 *
+	 * @param threads    Note threads the sidebar query resolves to at mount.
+	 * @param repliesNow What the server reports for the note's replies once the
+	 *                   marker is gone, when that differs from what the editor
+	 *                   loaded: the replies a peer added since, or `null` for a
+	 *                   request that fails.
+	 * @return The registry and the `saveEntityRecord` spy.
+	 */
+	async function withdrawMarker( threads: any[], repliesNow?: any[] | null ) {
+		let harness: any;
+		await act( async () => {
+			harness = setup( { content: MARKED, threads } );
+		} );
+
+		if ( repliesNow === null ) {
+			serverReplies = new Error( 'Network error' );
+		} else if ( repliesNow !== undefined ) {
+			serverReplies = repliesNow;
+		}
+
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					content: RichTextData.fromHTMLString( 'Hello world' ),
+				} );
+		} );
+
+		await act( async () => {
+			vi.advanceTimersByTime( 1000 );
+		} );
+
+		/*
+		 * The collection waits on a request before it decides. Each round runs
+		 * the timers the last one queued and flushes the promises they settle.
+		 */
+		for ( let round = 0; round < 3; round++ ) {
+			await act( async () => {
+				vi.runOnlyPendingTimers();
+			} );
+		}
+
+		return harness;
+	}
+
+	it( 'trashes a pending note nobody has replied to', async () => {
+		const { saveEntityRecord } = await withdrawMarker( [
+			note( { status: 'hold', lifecycle: 'pending' } ),
+		] );
+
+		expect( saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+	} );
+
+	it( 'keeps a pending note that has replies, and says so', async () => {
+		const { registry, saveEntityRecord } = await withdrawMarker( [
+			note( { status: 'hold', lifecycle: 'pending' } ),
+			reply(),
+		] );
+
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+		expect(
+			( registry.select( noticesStore ) as any ).getNotices()[ 0 ].content
+		).toContain( 'kept because it has replies' );
+	} );
+
+	it( 'keeps a pending note whose reply arrived in another session', async () => {
+		/*
+		 * The reported case (#81958): the colleague answered after this editor
+		 * loaded its thread list, so the copy in the store still says nobody
+		 * replied. Reading that copy would take their comment with the
+		 * withdrawal - the guard has to ask the server.
+		 */
+		const { registry, saveEntityRecord } = await withdrawMarker(
+			[ note( { status: 'hold', lifecycle: 'pending' } ) ],
+			[ reply() ]
+		);
+
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+		expect(
+			( registry.select( noticesStore ) as any ).getNotices()[ 0 ].content
+		).toContain( 'kept because it has replies' );
+	} );
+
+	it( 'keeps a pending note without announcing when the reply check fails', async () => {
+		/*
+		 * A failed check answers "unknown", not "no replies". Keep the note,
+		 * but claim nothing about why: the snackbar would assert replies that
+		 * may not exist. Nothing is latched either, so the next presence change
+		 * asks again.
+		 */
+		const { registry, saveEntityRecord } = await withdrawMarker(
+			[ note( { status: 'hold', lifecycle: 'pending' } ) ],
+			null
+		);
+
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+		expect(
+			( registry.select( noticesStore ) as any ).getNotices()
+		).toHaveLength( 0 );
 	} );
 } );
