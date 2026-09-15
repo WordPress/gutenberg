@@ -344,6 +344,16 @@
 		opacity: 0.9;
 	}
 
+	// When image lightbox is zoomed-in and active, prevent
+	// scrolling on the body
+	&.zoom.active {
+
+		body:has(&) {
+			overflow: hidden;
+			height: 100vh;
+		}
+	}
+
 	// When fading, make the image come in slightly slower
 	// or faster than the scrim to give a sense of depth.
 	&.active {
