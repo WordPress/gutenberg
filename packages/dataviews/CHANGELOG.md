@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   DataForm: `readOnly` accepts a callback receiving the current item and field, so a field can be read-only for some records only. The normalized field's `readOnly` is now always a callback, so code reading it as a boolean must call it instead ([#82946](https://github.com/WordPress/gutenberg/pull/82946)).
+
 ### Bug Fixes
 
 -   Grid layout: when the title is hidden (`showTitle: false`) and items are clickable, label each item's clickable media area with its title instead of the generic "Navigate to item" ([#82639](https://github.com/WordPress/gutenberg/pull/82639)).
