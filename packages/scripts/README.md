@@ -472,9 +472,15 @@ Vitest discovers `vitest.config.*`, then `vite.config.*`, in the current working
 
 ### `test-unit-jest`
 
-Deprecated compatibility command. It continues to run the bundled Jest with `@wordpress/jest-preset-default`. It accepts an explicit `--config` and discovers `jest-unit.config.js`, `jest.config.js`, `jest.config.json`, `jest.config.ts`, or the `jest` field in `package.json`. It is no longer an alias of `test-unit-js`.
+Maintenance-only adapter for a project-installed Jest 30. It forwards Jest CLI arguments and preserves its exit status, with `NODE_ENV` and `BABEL_ENV` set to `test`. Vitest remains the default through `test-unit-js`. There is no scheduled removal of this adapter.
 
-Existing Jest consumers can use this command throughout `@wordpress/scripts` 36.x while migrating. Removal is scheduled no earlier than 37.0.0, and only after the Vitest switch has been published and verified in isolated consumers. If migration takes longer, pin 36.x or run an independently installed Jest. New projects should use Vitest directly or `test-unit-js`.
+```sh
+npm install --save-dev jest@30.5.0
+```
+
+Use `wp-scripts test-unit-jest` in your npm test command. Jest discovers your project's configuration; pass `--config` for custom filenames such as `jest-unit.config.js`. Scripts no longer bundles Jest, jsdom, the WordPress Jest preset, its Babel transformer, or its GitHub Actions reporter.
+
+Existing suites can keep using the published WordPress Jest packages. Follow [Keep an existing Jest suite](./docs/vitest-migration.md#keep-an-existing-jest-suite) to install their dependencies and restore the previous defaults in a consumer-owned config. Maintenance covers this adapter and the documented legacy setup. New testing features target Vitest.
 
 The default `wp-scripts lint-js` config also switches to Vitest in 36.0.0 and no longer declares Jest globals such as `describe`, `it`, and `expect`. To keep linting Jest tests, install `eslint-plugin-jest` and add an `eslint.config.cjs` in your project. If you already have a custom config, apply the Jest override to your Jest files instead of the public `test-unit` config.
 

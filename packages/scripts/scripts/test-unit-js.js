@@ -25,9 +25,10 @@ try {
 // Run once by default, including in a terminal. Leave explicit watch options
 // and Vitest's watch subcommands to the native CLI parser.
 const args = process.argv.slice( 2 );
-const hasWatchOption = args.some( ( arg ) =>
-	/^(--watch(?:=|$)|--no-watch$|-w$|watch$|dev$)/.test( arg )
-);
+const hasWatchOption =
+	args[ 0 ] === 'watch' ||
+	args[ 0 ] === 'dev' ||
+	args.some( ( arg ) => /^(--watch(?:=|$)|--no-watch$|-w$)/.test( arg ) );
 process.argv = [
 	process.execPath,
 	vitestCli,

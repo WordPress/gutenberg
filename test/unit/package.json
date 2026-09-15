@@ -32,7 +32,7 @@
 		"@vitejs/plugin-react-swc": "^4.3.3",
 		"@vitest/browser-playwright": "^5.0.0",
 		"@wordpress/html-entities": "file:../../packages/html-entities",
-		"@wordpress/jest-preset-default": "file:../../packages/jest-preset-default",
+		"@wordpress/jest-preset-default": "14.2.0",
 		"@wordpress/scripts": "file:../../packages/scripts",
 		"@wordpress/video-conversion": "file:../../packages/video-conversion",
 		"@wordpress/vips": "file:../../packages/vips",

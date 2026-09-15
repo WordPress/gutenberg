@@ -1,7 +1,7 @@
 # Vitest migration routing
 
 All repository JavaScript unit and integration tests run in Vitest. The retained
-`test-migration.json` manifest has an empty `jest.files` list. The explicit
+`test-migration.json` manifest has an empty `jest.files` list. The internal Jest runner uses the published preset. The explicit
 `npm run test:unit:jest` compatibility check exits with no tests until final
 retirement removes that command and the manifest.
 
@@ -71,7 +71,6 @@ module instance is required.
 
 ## Verification and release gate
 
-
 Run `npm run test:unit:consumers` from Gutenberg to pack the changed public
 packages, install them outside the workspace, and run the documented configs.
 Use `--vite=<version>` to select a supported Vite version and `--browser` to
@@ -80,18 +79,22 @@ The check reports the actual Node, Vite, Vitest, and build versions. To replay
 a recorded dependency resolution, pass `--lockfile=/path/to/package-lock.json`
 from an earlier consumer run. The changed packages are still repacked and installed.
 
-Before final Jest retirement:
+Release and internal cleanup:
 
 1. Publish scripts 36 and eslint-plugin 27 through the existing protected
-   WordPress packages release workflow. Publish the Jest package deprecation
-   notices and apply npm deprecation messages through the release process.
+   WordPress packages release workflow. Apply npm deprecation messages to
+   `@wordpress/jest-preset-default` and `@wordpress/jest-console` through that
+   process, linking to the permanent consumer guide. Keep their published
+   versions available; do not unpublish them.
 2. Run the isolated checks with `--scripts=<published-version>` and
    `--eslint-plugin=<published-version>` against the registry releases.
    Record the published versions and the Node/Vite results in the tooling PR.
 3. Verify Node, jsdom, Browser Mode, generated CSS, config discovery, linting,
    and default/watch/debug/update commands. Preserve the Node 24/26 repository
    matrix, single Chromium job, timezone checks, and Storybook smoke coverage.
-4. Only then remove internal Jest infrastructure. Public `test-unit-jest` and
-   its dependencies cannot be removed before scripts 37.0.0.
+4. Only then remove the remaining internal Jest routing infrastructure. The
+   public `test-unit-jest` adapter remains in maintenance mode with no scheduled
+   removal. Its consumer checks use project-installed Jest and the published
+   WordPress preset, independently of the repository runner.
 
 Packed-source checks before publication do not satisfy the release gate.

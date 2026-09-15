@@ -386,6 +386,22 @@ if ( values.browser ) {
 	] );
 	command( '--config', 'vitest.browser.config.mjs' );
 }
+// Legacy consumers own the runner and preset dependencies. Install them only
+// after the Vitest checks, so those checks cannot rely on bundled Jest.
+run( 'npm', [
+	'install',
+	'--save-dev',
+	'--save-exact',
+	'--engine-strict',
+	'--no-audit',
+	'--no-fund',
+	'jest@30.5.0',
+	'jest-environment-jsdom@30.5.0',
+	'@wordpress/jest-preset-default@14.2.0',
+	'babel-jest@30.5.0',
+	'@babel/core@7.29.0',
+	'@wordpress/babel-preset-default@8.55.0',
+] );
 write(
 	'legacy.test.cjs',
 	"test( 'retains Jest', () => expect( 2 + 2 ).toBe( 4 ) );"
@@ -410,11 +426,16 @@ write(
 	'legacy.test.js',
 	"test('retains the WordPress Jest preset', () => { expect(document.createElement('div')).toBeDefined(); expect(console).not.toHaveWarned(); });"
 );
+write(
+	'jest.config.cjs',
+	`module.exports = { preset: '@wordpress/jest-preset-default', transform: { '\\\\.[jt]sx?$': [ 'babel-jest', { presets: [ '@wordpress/babel-preset-default' ] } ] } };`
+);
 assert.match(
 	run( values.node, [ wpScripts, 'test-unit-jest', '--runInBand' ] ),
 	/1 passed/
 );
 rmSync( path.join( consumer, 'legacy.test.js' ) );
+rmSync( path.join( consumer, 'jest.config.cjs' ) );
 // Inspect the actual fallback lint config, including TS and spec discovery.
 for ( const name of [ 'example.test.js', 'example.spec.ts' ] ) {
 	write(

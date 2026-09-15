@@ -1,20 +1,24 @@
-// Do this as the first thing so that any code reading it knows the right env.
+const { createRequire } = require( 'node:module' );
+const path = require( 'node:path' );
+
+// Keep the legacy test environment while delegating configuration to Jest.
 process.env.BABEL_ENV = 'test';
 process.env.NODE_ENV = 'test';
 
-// Makes the script crash on unhandled rejections instead of silently
-// ignoring them. In the future, promise rejections that are not handled will
-// terminate the Node.js process with a non-zero exit code.
-process.on( 'unhandledRejection', ( err ) => {
-	throw err;
-} );
-const jest = require( 'jest' );
-const { getJestOverrideConfigFile, getArgsFromCLI } = require( '../utils' );
+const consumerRequire = createRequire( path.resolve( 'package.json' ) );
+let jestCli;
+try {
+	jestCli = consumerRequire.resolve( 'jest/bin/jest' );
+} catch ( error ) {
+	if ( error.code !== 'MODULE_NOT_FOUND' ) {
+		throw error;
+	}
+	console.error(
+		'wp-scripts test-unit-jest requires a project-installed Jest. ' +
+			'Install it with npm install --save-dev jest@^30. ' +
+			'See @wordpress/scripts/docs/vitest-migration.md for legacy configuration.'
+	);
+	process.exit( 1 );
+}
 
-const configFile = getJestOverrideConfigFile( 'unit' );
-
-const config = configFile
-	? [ '--config', JSON.stringify( require( configFile ) ) ]
-	: [];
-
-jest.run( [ ...config, ...getArgsFromCLI() ] );
+require( jestCli );
