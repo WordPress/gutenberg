@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { Button, privateApis } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Button } from '@wordpress/components';
+import { Stack, ValidatedInputControl } from '@wordpress/ui';
 import DataForm from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
 import type {
@@ -10,9 +10,6 @@ import type {
 	NormalizedRules,
 } from '../../types';
 import DateControl from '../../components/dataform-controls/date';
-import { unlock } from '../../lock-unlock';
-
-const { ValidatedInputControl } = unlock( privateApis );
 
 function getCustomValidity< Item >(
 	isValid: NormalizedRules< Item >,
@@ -22,8 +19,11 @@ function getCustomValidity< Item >(
 	if ( isValid?.required && validity?.required ) {
 		// If the consumer provides a message for required,
 		// use it instead of the native built-in message.
-		customValidity = validity?.required?.message
-			? validity.required
+		customValidity = validity.required.message
+			? {
+					type: validity.required.type,
+					message: validity.required.message,
+			  }
 			: undefined;
 	} else if ( isValid?.elements && validity?.elements ) {
 		customValidity = validity.elements;
@@ -58,8 +58,13 @@ function CustomEditControl< Item >( {
 			label={ label }
 			placeholder={ placeholder }
 			value={ value ?? '' }
-			help={ description }
-			onChange={ onChangeControl }
+			description={
+				typeof description === 'string' ? description : undefined
+			}
+			details={
+				typeof description === 'string' ? undefined : description
+			}
+			onValueChange={ onChangeControl }
 			hideLabelFromVision={ hideLabelFromVision }
 		/>
 	);

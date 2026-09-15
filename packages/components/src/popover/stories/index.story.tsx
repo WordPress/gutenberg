@@ -242,6 +242,7 @@ export const DynamicHeight: StoryObj< typeof Popover > = {
 	],
 	args: {
 		...Default.args,
+		animate: false,
 		children: (
 			<div
 				style={ {

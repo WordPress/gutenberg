@@ -26,8 +26,15 @@
 	flex-shrink: 0;
 }
 
+/* Let the title cluster shrink below its content width, so a long title
+truncates instead of overflowing the page horizontally. */
+.header-lockup {
+	min-width: 0;
+}
+
 /* @TODO: Remove truncation styles once `Text` supports truncation natively. See https://github.com/WordPress/gutenberg/issues/77391 */
 .header-title {
+	min-width: 0;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;

@@ -13,9 +13,24 @@ import { useSyncExternalStore } from '@wordpress/element';
  *
  * The tracker holds at most one "session" at a time — if a new batch starts
  * while one is in progress, its files are appended to the existing session.
+ *
+ * Files that failed are tallied separately from the session state, which is
+ * discarded once the session ends. See `getFailureCount`.
  */
 
 let state = null;
+
+/**
+ * Running tally of files that finished by failing, counted since the editor
+ * loaded rather than per session. Deliberately not a sibling of `total`,
+ * `completed` and `pending` inside `state`: `state` is cleared the moment a
+ * session finishes, which is exactly when a consumer needs to know whether
+ * anything actually uploaded. It only ever grows; see `getFailureCount`.
+ *
+ * @type {number}
+ */
+let cumulativeFailures = 0;
+
 const listeners = new Set();
 
 function notify() {
@@ -43,14 +58,38 @@ export function addFiles( filenames ) {
 }
 
 /**
- * Advances the tracker by a number of finished files (success or error).
+ * Advances the tracker by a number of successfully uploaded files.
  *
  * @param {number} count Number of files that finished since the last call.
  */
 export function advance( count ) {
+	finish( count, 0 );
+}
+
+/**
+ * Advances the tracker by a number of files that finished by failing.
+ *
+ * Failed files still count as finished - they leave the queue like any other -
+ * but they are also tallied so consumers can tell an empty queue that uploaded
+ * everything from one that uploaded nothing.
+ *
+ * @param {number} [count] Number of files that failed since the last call.
+ */
+export function advanceFailed( count = 1 ) {
+	finish( count, count );
+}
+
+/**
+ * Advances the tracker by a number of finished files.
+ *
+ * @param {number} count  Number of files that finished since the last call.
+ * @param {number} failed How many of those files failed.
+ */
+function finish( count, failed ) {
 	if ( ! state || count <= 0 ) {
 		return;
 	}
+	cumulativeFailures += failed;
 	const completed = Math.min( state.total, state.completed + count );
 	const pending = state.pending.slice( count );
 	if ( completed >= state.total ) {
@@ -69,11 +108,26 @@ export function advance( count ) {
  * `advance` clears the state on its own once every file in a batch finishes.
  */
 export function reset() {
+	cumulativeFailures = 0;
 	if ( state === null ) {
 		return;
 	}
 	state = null;
 	notify();
+}
+
+/**
+ * Returns how many tracked files have failed.
+ *
+ * Read imperatively rather than through `useTracker`, because the state the
+ * hook exposes is gone by the time a session ends. The tally only ever grows:
+ * to learn how many files failed within one session, read it when the session
+ * starts and subtract that from its later value.
+ *
+ * @return {number} Number of failed uploads since the editor loaded.
+ */
+export function getFailureCount() {
+	return cumulativeFailures;
 }
 
 /**

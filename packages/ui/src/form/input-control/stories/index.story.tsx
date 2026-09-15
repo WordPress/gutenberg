@@ -6,8 +6,8 @@ import { IconButton } from '../../../icon-button';
 import { InputLayout } from '../../primitives/input-layout';
 import { Stack } from '../../../stack';
 import {
-	WithPrefix,
-	WithSuffixControl,
+	WithPrefix as InputWithPrefix,
+	WithSuffixControl as InputWithSuffixControl,
 } from '../../primitives/input/stories/index.story';
 import {
 	WITH_DETAILS_DESCRIPTION,
@@ -61,25 +61,24 @@ export const WithDetails: Story = {
 	},
 };
 
-WithPrefix.args = {
-	...WithPrefix.args,
-	...Default.args,
-};
-// Copied rather than mutated: the story object is shared with the Input story,
-// which opts out of the accessibility test because it shows the control
-// without a label. This story does label the control, so it opts back in.
-const InputControlWithSuffixControl: typeof WithSuffixControl = {
-	...WithSuffixControl,
+export const WithPrefix: Story = {
 	args: {
-		...WithSuffixControl.args,
+		...InputWithPrefix.args,
+		ref: undefined,
+		...Default.args,
+	},
+};
+
+export const WithSuffixControl: Story = {
+	args: {
+		...InputWithSuffixControl.args,
+		ref: undefined,
 		...Default.args,
 	},
 	parameters: {
-		...WithSuffixControl.parameters,
 		a11y: { test: 'error' },
 	},
 };
-export { WithPrefix, InputControlWithSuffixControl as WithSuffixControl };
 
 export const Password: Story = {
 	render: function Template( args ) {

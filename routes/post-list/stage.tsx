@@ -5,10 +5,10 @@ import {
 	Link,
 	useInvalidate,
 } from '@wordpress/route';
-import { useView } from '@wordpress/views';
+import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
-import type { View, Action } from '@wordpress/dataviews';
+import type { View, Action, SupportedLayouts } from '@wordpress/dataviews';
 import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
@@ -25,11 +25,10 @@ import { drawerRight } from '@wordpress/icons';
 import type { Post } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import {
-	getDefaultView,
-	getActiveViewOverridesForTab,
-	DEFAULT_VIEWS,
-	DEFAULT_LAYOUTS,
+	getActiveViewOverrides,
 	viewToQuery,
+	type ViewListEntry,
+	type ViewOverrides,
 } from './view-utils';
 import { QuickEditModal } from './quick-edit-modal';
 // Unlock WordPress private APIs
@@ -52,10 +51,56 @@ function getItemLevel( item: Post ) {
 }
 
 function PostList() {
-	const invalidate = useInvalidate();
 	const { type: postType, slug = 'all' } = useParams( {
 		from: '/types/$type/list/$slug',
 	} );
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+	} = useViewConfig( {
+		kind: 'postType',
+		name: postType,
+	} );
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverrides( viewList, slug ),
+		[ viewList, slug ]
+	);
+
+	if ( ! defaultView ) {
+		// The route canvas resolves the view configuration before the stage
+		// mounts, so this only guards against the store being reset.
+		return null;
+	}
+
+	return (
+		<PostListView
+			postType={ postType }
+			slug={ slug }
+			defaultView={ defaultView }
+			defaultLayouts={ defaultLayouts }
+			viewList={ viewList }
+			activeViewOverrides={ activeViewOverrides }
+		/>
+	);
+}
+
+function PostListView( {
+	postType,
+	slug,
+	defaultView,
+	defaultLayouts,
+	viewList,
+	activeViewOverrides,
+}: {
+	postType: string;
+	slug: string;
+	defaultView: View;
+	defaultLayouts: SupportedLayouts | undefined;
+	viewList: ViewListEntry[] | undefined;
+	activeViewOverrides: ViewOverrides;
+} ) {
+	const invalidate = useInvalidate();
 	const navigate = useNavigate();
 	const searchParams = useSearch( { from: '/types/$type/list/$slug' } );
 	const postTypeObject = useSelect(
@@ -71,15 +116,6 @@ function PostList() {
 				name: postType,
 			} ),
 		[ postType ]
-	);
-
-	const defaultView: View = useMemo( () => {
-		return getDefaultView( postTypeObject );
-	}, [ postTypeObject ] );
-
-	const activeViewOverrides = useMemo(
-		() => getActiveViewOverridesForTab( slug ),
-		[ slug ]
 	);
 
 	// Callback to handle URL query parameter changes
@@ -101,6 +137,7 @@ function PostList() {
 		name: postType,
 		slug: 'default-new',
 		defaultView,
+		defaultLayouts,
 		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
@@ -333,23 +370,18 @@ function PostList() {
 			}
 			hasPadding={ false }
 		>
-			{ DEFAULT_VIEWS.length > 1 && (
+			{ viewList && viewList.length > 1 && (
 				<div className="routes-post-list__tabs-wrapper">
-					<Tabs
-						onSelect={ handleTabChange }
-						selectedTabId={ slug ?? 'all' }
-					>
+					<Tabs onSelect={ handleTabChange } selectedTabId={ slug }>
 						<Tabs.TabList>
-							{ DEFAULT_VIEWS.map(
-								( filter: { slug: string; label: string } ) => (
-									<Tabs.Tab
-										tabId={ filter.slug }
-										key={ filter.slug }
-									>
-										{ filter.label }
-									</Tabs.Tab>
-								)
-							) }
+							{ viewList.map( ( entry ) => (
+								<Tabs.Tab
+									tabId={ entry.slug }
+									key={ entry.slug }
+								>
+									{ entry.title }
+								</Tabs.Tab>
+							) ) }
 						</Tabs.TabList>
 					</Tabs>
 				</div>
@@ -365,7 +397,7 @@ function PostList() {
 					totalItems,
 					totalPages,
 				} }
-				defaultLayouts={ DEFAULT_LAYOUTS }
+				defaultLayouts={ defaultLayouts }
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
 				selection={ selection }

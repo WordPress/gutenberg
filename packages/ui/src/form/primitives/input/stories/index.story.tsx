@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Input } from '../index';
 import { InputLayout } from '../../input-layout';
-import { WithSuffixControl } from '../../input-layout/stories/index.story';
+import { WithSuffixControl as InputLayoutWithSuffixControl } from '../../input-layout/stories/index.story';
 
 const meta: Meta< typeof Input > = {
 	tags: [ 'manifest' ],
@@ -32,6 +32,7 @@ type Story = StoryObj< typeof Input >;
 export const Default: Story = {
 	args: {
 		placeholder: 'Placeholder',
+		'aria-label': 'Value',
 	},
 };
 
@@ -42,26 +43,17 @@ export const Default: Story = {
 export const WithPrefix: Story = {
 	args: {
 		placeholder: 'username',
+		'aria-label': 'Username',
 		prefix: <InputLayout.Slot>@</InputLayout.Slot>,
 	},
 };
 
-// Copied rather than mutated: the story object is shared with the InputLayout
-// and InputControl stories, and assigning to it would apply these args and
-// parameters to their copies of the story too.
-const InputWithSuffixControl: typeof WithSuffixControl = {
-	...WithSuffixControl,
+export const WithSuffixControl: Story = {
 	args: {
-		...WithSuffixControl.args,
-		children: undefined,
-	},
-	parameters: {
-		// FIXME: Story shows Input without a visible label (label).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
+		'aria-label': 'Value',
+		suffix: InputLayoutWithSuffixControl.args?.suffix,
 	},
 };
-export { InputWithSuffixControl as WithSuffixControl };
 
 export const Disabled: Story = {
 	args: {

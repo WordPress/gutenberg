@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { COLORS, CONFIG } from '../utils';
 import { getPaddingBySize } from './get-padding-by-size';
-import type { FooterProps, HeaderProps, Props } from './types';
+import type { BodyProps, FooterProps, HeaderProps, Props } from './types';
 
 // Since the border for `Card` is rendered via the `box-shadow` property
 // (as opposed to the `border` property), the value of the border radius needs
@@ -41,6 +41,16 @@ export const Body = css`
 	height: auto;
 	max-height: 100%;
 `;
+
+const ScrollableBody = css`
+	height: 100%;
+`;
+
+export function getCardBodyStyles( {
+	isScrollable,
+}: Pick< BodyProps, 'isScrollable' > ) {
+	return isScrollable ? css( Body, ScrollableBody ) : Body;
+}
 
 export const Media = css`
 	box-sizing: border-box;

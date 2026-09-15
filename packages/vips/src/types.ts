@@ -214,6 +214,14 @@ export interface SaveOptions< T extends string > {
 	 * Only used by gifsave; do not provide for any other type!
 	 */
 	interpalette_maxerror?: number;
+	/**
+	 * Quantise to an 8bpp palette. Only supported by PNG.
+	 * Do not provide for any other type!
+	 *
+	 * Used to keep indexed (palette) sources indexed instead of writing them
+	 * back out as truecolour RGB/RGBA.
+	 */
+	palette?: boolean;
 }
 
 export interface ThumbnailOptions {

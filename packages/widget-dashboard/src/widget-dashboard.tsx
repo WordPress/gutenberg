@@ -6,6 +6,7 @@ import { NoWidgetsState } from './components/no-widgets-state';
 import { ResetConfirmation } from './components/reset-confirmation';
 import { WidgetChrome } from './components/widget-chrome';
 import { WidgetInserter } from './components/widget-inserter';
+import { WidgetDashboardPolicy } from './components/dashboard-policy';
 import { WidgetSettings } from './components/widget-settings';
 import { Widgets } from './components/widgets';
 import type { WidgetDashboardProps } from './types';
@@ -48,6 +49,10 @@ import type { WidgetDashboardProps } from './types';
  * mounted by the engine and driven by shared UI state, so a trigger works
  * wherever it is composed without a matching target in the tree. Omitting
  * `children` renders the default arrangement.
+ *
+ * `Policy` mounts above one or several dashboards and governs what users
+ * may do on them; every compound asks the resolved policy through the
+ * internal context.
  */
 export const WidgetDashboard = Object.assign(
 	function WidgetDashboard( {
@@ -91,5 +96,12 @@ export const WidgetDashboard = Object.assign(
 			</WidgetDashboardProvider>
 		);
 	},
-	{ Actions, Widgets, WidgetChrome, NoWidgetsState, Commands }
+	{
+		Actions,
+		Widgets,
+		WidgetChrome,
+		NoWidgetsState,
+		Commands,
+		Policy: WidgetDashboardPolicy,
+	}
 );
