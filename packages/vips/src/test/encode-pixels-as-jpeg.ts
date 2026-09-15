@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { encodePixelsAsJpeg } from '../';
@@ -16,9 +17,9 @@ import { encodePixelsAsJpeg } from '../';
  *         -o exif-camera.heic exif-rotated-90cw.heic
  */
 
-jest.mock( 'wasm-vips', () => {
-	const RealVips = jest.requireActual( 'wasm-vips' );
-	return jest.fn( ( options: Record< string, unknown > = {} ) =>
+vi.mock( 'wasm-vips', () => {
+	const RealVips = vi.requireActual( 'wasm-vips' );
+	return vi.fn( ( options: Record< string, unknown > = {} ) =>
 		RealVips( { dynamicLibraries: options.dynamicLibraries } )
 	);
 } );
@@ -60,7 +61,7 @@ describe( 'encodePixelsAsJpeg', () => {
 	let vips: any;
 
 	beforeAll( async () => {
-		const Vips = jest.requireActual( 'wasm-vips' );
+		const Vips = vi.requireActual( 'wasm-vips' );
 		vips = await Vips( { dynamicLibraries: [ 'vips-heif.wasm' ] } );
 	} );
 
