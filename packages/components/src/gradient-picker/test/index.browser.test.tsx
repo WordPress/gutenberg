@@ -1,9 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
+import { userEvent } from 'vitest/browser';
+import { render } from 'vitest-browser-react';
 import GradientPicker from '..';
-
-globalThis.wpVitest.mockMatchMedia();
 
 const GRADIENT_A =
 	'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)';
@@ -19,7 +18,7 @@ describe( 'GradientPicker', () => {
 	it( 'should use matching values only for display in command button presentation', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
-		render(
+		await render(
 			<GradientPicker
 				aria-label="Gradients"
 				gradients={ DUPLICATE_GRADIENTS }
@@ -49,8 +48,8 @@ describe( 'GradientPicker', () => {
 		);
 	} );
 
-	it( 'should warn for asButtons and prefer an explicit presentation', () => {
-		render(
+	it( 'should warn for asButtons and prefer an explicit presentation', async () => {
+		await render(
 			<GradientPicker
 				aria-label="Gradients"
 				gradients={ DUPLICATE_GRADIENTS }
@@ -72,8 +71,8 @@ describe( 'GradientPicker', () => {
 		);
 	} );
 
-	it( 'should preserve asButtons as a toggle-button alias', () => {
-		render(
+	it( 'should preserve asButtons as a toggle-button alias', async () => {
+		await render(
 			<GradientPicker
 				aria-label="Gradients"
 				gradients={ DUPLICATE_GRADIENTS }
@@ -101,8 +100,8 @@ describe( 'GradientPicker', () => {
 	} );
 
 	describe( 'duplicate gradients in palette', () => {
-		it( 'should render all swatches even when two entries share the same gradient value', () => {
-			render(
+		it( 'should render all swatches even when two entries share the same gradient value', async () => {
+			await render(
 				<GradientPicker
 					aria-label="Gradient"
 					gradients={ DUPLICATE_GRADIENTS }
@@ -115,8 +114,8 @@ describe( 'GradientPicker', () => {
 			expect( screen.getAllByRole( 'option' ) ).toHaveLength( 2 );
 		} );
 
-		it( 'should select by slug when selectedSlug is provided, marking only the matching entry', () => {
-			render(
+		it( 'should select by slug when selectedSlug is provided, marking only the matching entry', async () => {
+			await render(
 				<GradientPicker
 					aria-label="Gradient"
 					gradients={ DUPLICATE_GRADIENTS }
@@ -133,8 +132,8 @@ describe( 'GradientPicker', () => {
 			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 
-		it( 'should fall back to value selection and mark all matching duplicates when no selectedSlug is provided', () => {
-			render(
+		it( 'should fall back to value selection and mark all matching duplicates when no selectedSlug is provided', async () => {
+			await render(
 				<GradientPicker
 					aria-label="Gradient"
 					gradients={ DUPLICATE_GRADIENTS }
@@ -149,8 +148,8 @@ describe( 'GradientPicker', () => {
 			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 
-		it( 'should treat an empty-string selectedSlug as no slug and fall back to value selection', () => {
-			render(
+		it( 'should treat an empty-string selectedSlug as no slug and fall back to value selection', async () => {
+			await render(
 				<GradientPicker
 					aria-label="Gradient"
 					gradients={ DUPLICATE_GRADIENTS }
@@ -170,7 +169,7 @@ describe( 'GradientPicker', () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 
-			render(
+			await render(
 				<GradientPicker
 					aria-label="Gradient"
 					gradients={ DUPLICATE_GRADIENTS }
@@ -195,7 +194,7 @@ describe( 'GradientPicker', () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 
-			render(
+			await render(
 				<GradientPicker
 					aria-label="Gradient"
 					gradients={ [
