@@ -749,6 +749,7 @@ export default dedupePlugins( [
 		rules: {
 			'react-hooks/rules-of-hooks': 'off',
 			'react-hooks/static-components': 'off',
+			'@wordpress/no-storybook-build-style-imports': 'error',
 		},
 	},
 

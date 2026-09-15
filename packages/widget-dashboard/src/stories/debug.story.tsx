@@ -1,9 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ComponentType } from 'react';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/components/build-style/style.css';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/dataviews/build-style/style.css';
 import { Button } from '@wordpress/components';
 import {
 	createContext,
