@@ -766,7 +766,7 @@ function PolicyStory( { profile }: PolicyStoryProps ) {
 				] }
 				layout={ layout }
 				onLayoutChange={ setLayout }
-				onLayoutReset={ () => setLayout( INITIAL_LAYOUT ) }
+				onLayoutReset={ () => setLayout( [ ...INITIAL_LAYOUT ] ) }
 				editMode={ editMode }
 				onEditChange={ setEditMode }
 				resolveWidgetModule={ resolveDemoModule }

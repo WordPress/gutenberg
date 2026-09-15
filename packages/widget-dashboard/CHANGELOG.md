@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Reset to default now drops staged edits, so a consumer that resets to the layout it is already rendering no longer leaves uncommitted changes on screen for the next commit to publish ([#82850](https://github.com/WordPress/gutenberg/issues/82850)).
+
 ### Internal
 
 -   Run rendered Widget Dashboard tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
