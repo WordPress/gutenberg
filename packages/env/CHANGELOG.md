@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Point the apt sources of the buster- and bullseye-based WordPress images at `archive.debian.org`, so building them no longer fails now that Debian 10 and 11 have reached end-of-life and left the regular mirrors.
+
 ## 10.8.0 (2024-09-19)
 
 ## 10.7.0 (2024-09-05)
