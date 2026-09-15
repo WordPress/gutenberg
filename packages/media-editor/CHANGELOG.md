@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Use `@wordpress/ui` Menu for the crop aspect ratio in the compact image controls.
+
 ## 0.18.0 (2026-09-10)
 
 ### Internal
