@@ -715,18 +715,25 @@ export default function GalleryEdit( props ) {
 		const aspectRatioText = aspectRatioOptions.find(
 			( option ) => option.value === noticeValue
 		);
+		const noticeText = isViewportStyleState
+			? sprintf(
+					/* translators: 1: viewport name, 2: aspect ratio setting */
+					__(
+						'Gallery images in the %1$s viewport updated to aspect ratio: %2$s'
+					),
+					selectedStyleState.viewport.replace( '@', '' ),
+					aspectRatioText?.label || noticeValue
+			  )
+			: sprintf(
+					/* translators: %s: aspect ratio setting */
+					__( 'All gallery images updated to aspect ratio: %s' ),
+					aspectRatioText?.label || noticeValue
+			  );
 
-		createSuccessNotice(
-			sprintf(
-				/* translators: %s: aspect ratio setting */
-				__( 'All gallery images updated to aspect ratio: %s' ),
-				aspectRatioText?.label || noticeValue
-			),
-			{
-				id: 'gallery-attributes-aspectRatio',
-				type: 'snackbar',
-			}
-		);
+		createSuccessNotice( noticeText, {
+			id: 'gallery-attributes-aspectRatio',
+			type: 'snackbar',
+		} );
 	}
 
 	useEffect( () => {
