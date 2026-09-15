@@ -67,6 +67,7 @@ For full architecture details, see `docs/explanations/architecture/`.
 ## Common pitfalls
 
 -   Do not add dependencies to the root `package.json`. Add them to the workspace that uses them, or create a new workspace under `tools/` (or `test/` for test infrastructure). See [Workspace Development](docs/contributors/code/workspace-development.md).
+-   Published package runtime files and emitted type declarations must resolve through the package's declared dependency surface; never rely on root hoisting or workspace links. Prefer fixing accidentally leaked public types over adding an unrelated heavy dependency, and run `npm run lint:published-deps` when changing package dependencies or exported types.
 -   PHP features in `lib/compat/` MUST go in the `wordpress-X.Y/` directory for their intended WordPress release. Inspect the available compatibility directories first; do not assume the newest one is right.
 -   Avoid using private APIs in bundled packages (packages without `wpScript` or `wpModuleExports`). Private APIs are intended for Core usage; bundled packages may also be imported via npm into plugin scripts, causing incompatibilities.
 -   Avoid adding new APIs prefixed with `__experimental` or `__unstable`. This pattern is now not used. Instead use private APIs or in bundled packages regular exports.
