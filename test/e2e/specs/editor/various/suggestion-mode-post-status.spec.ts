@@ -32,6 +32,19 @@ async function switchIntent( page: any, intentLabel: string ) {
 	await page.keyboard.press( 'Escape' );
 }
 
+/*
+ * Returns a promise for the debounced suggestion auto-save REST call. Call
+ * this BEFORE performing the edit that triggers the auto-save.
+ */
+function suggestionSavedPromise( page: any ) {
+	return page.waitForResponse(
+		( response: any ) =>
+			/\/wp\/v2\/comments(\?|$|\/)/.test( response.url() ) &&
+			[ 'POST', 'PUT' ].includes( response.request().method() ) &&
+			response.ok()
+	);
+}
+
 function getEditedStatus( page: any ) {
 	return page.evaluate( () =>
 		window.wp.data
@@ -168,6 +181,60 @@ test.describe( 'Suggestion mode post status', () => {
 			path: `/wp/v2/posts/${ postId }`,
 		} );
 		expect( post.status ).toBe( 'draft' );
+	} );
+
+	test( 'a published post can still be saved while suggesting', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Suggest mode published post',
+			content: '<!-- wp:paragraph --><p>Body</p><!-- /wp:paragraph -->',
+			status: 'publish',
+		} as any );
+		await admin.editPost( post.id );
+
+		await switchIntent( page, 'Suggesting' );
+
+		// A suggestion writes its marker into the post content, so the post
+		// is dirty until it is saved. On a published post the Save button is
+		// the only way to do that.
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page.keyboard.type( ' and more' );
+		await suggestionSaved;
+
+		const saveButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save', exact: true } );
+		await expect( saveButton ).toHaveAttribute( 'aria-disabled', 'false' );
+
+		await saveButton.click();
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Post updated' } )
+			.waitFor();
+
+		// Once saved, nothing is left unsaved: no beforeunload trap.
+		const isDirty = await page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).isEditedPostDirty()
+		);
+		expect( isDirty ).toBe( false );
+
+		// Saving is not publishing: the status is untouched and the marker
+		// went out with the content.
+		const saved = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ post.id }`,
+			params: { context: 'edit' },
+		} );
+		expect( saved.status ).toBe( 'publish' );
+		expect( saved.content.raw ).toContain( 'wp-suggestion' );
 	} );
 
 	test( 'the refusal is visible, not only announced', async ( { page } ) => {
