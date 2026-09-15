@@ -1,5 +1,6 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMemo, useState } from '@wordpress/element';
 import DataViews from '../index';
 import {
@@ -11,6 +12,9 @@ import {
 import type { Action, SupportedLayouts, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 
+globalThis.wpVitest.mockMatchMedia();
+
+globalThis.wpVitest.mockCSSSupports();
 type Data = {
 	id: number;
 	title: string;
@@ -139,17 +143,17 @@ function DataViewWrapper( {
 	return <DataViews { ...dataViewProps } />;
 }
 
-// jest.useFakeTimers();
-
 // Tests run against a DataView which is 500px wide.
-const mockUseViewportMatch = jest.fn(
+const mockUseViewportMatch = vi.fn(
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	( _viewport: string, _operator: string ) => false
 );
-jest.mock( '@wordpress/compose', () => {
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
 	return {
-		...jest.requireActual( '@wordpress/compose' ),
-		useResizeObserver: jest.fn( ( callback ) => {
+		...original,
+		useResizeObserver: vi.fn( ( callback ) => {
 			setTimeout( () => {
 				callback( [
 					{
@@ -161,7 +165,7 @@ jest.mock( '@wordpress/compose', () => {
 		} ),
 		useViewportMatch: ( viewport: string, operator: string ): boolean =>
 			mockUseViewportMatch( viewport, operator ),
-	};
+	} as unknown as typeof original;
 } );
 
 describe( 'DataViews component', () => {
@@ -229,59 +233,82 @@ describe( 'DataViews component', () => {
 		expect( screen.getByText( 'TEST TITLE' ) ).toBeInTheDocument();
 	} );
 
-	it( 'should trigger infinite scroll when the layout container scrolls', async () => {
-		const onChangeView = jest.fn();
+	describe( 'page clamping', () => {
+		it( 'moves the view to the last page when it points past the end of the collection', async () => {
+			const onChangeView = vi.fn();
+			// Three items, one per page: page 5 doesn't exist.
+			render(
+				<DataViewWrapper
+					view={ { type: LAYOUT_TABLE, page: 5, perPage: 1 } }
+					onChangeView={ onChangeView }
+				/>
+			);
 
-		if ( typeof global.IntersectionObserver === 'undefined' ) {
-			( global as any ).IntersectionObserver = jest.fn( () => ( {
-				observe: jest.fn(),
-				unobserve: jest.fn(),
-				disconnect: jest.fn(),
-			} ) );
-		}
-
-		const { container } = render(
-			<DataViewWrapper
-				view={ {
-					type: LAYOUT_GRID,
-					infiniteScrollEnabled: true,
-					perPage: 1,
-				} }
-				onChangeView={ onChangeView }
-			/>
-		);
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-		const layoutContainer = container.querySelector(
-			'.dataviews-layout__container'
-		) as HTMLDivElement;
-
-		Object.defineProperties( layoutContainer, {
-			scrollTop: {
-				configurable: true,
-				value: 500,
-			},
-			scrollHeight: {
-				configurable: true,
-				value: 1000,
-			},
-			clientHeight: {
-				configurable: true,
-				value: 500,
-			},
+			await waitFor( () => {
+				expect( onChangeView ).toHaveBeenCalledWith(
+					expect.objectContaining( { page: 3, perPage: 1 } )
+				);
+			} );
 		} );
 
-		fireEvent.scroll( layoutContainer );
-
-		await waitFor( () => {
-			expect( onChangeView ).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					infiniteScrollEnabled: true,
-					startPosition: 2,
-				} )
+		it( 'falls back to the first page when the collection is empty', async () => {
+			const onChangeView = vi.fn();
+			render(
+				<DataViewWrapper
+					view={ { type: LAYOUT_TABLE, page: 2 } }
+					data={ [] }
+					paginationInfo={ { totalItems: 0, totalPages: 0 } }
+					onChangeView={ onChangeView }
+				/>
 			);
+
+			await waitFor( () => {
+				expect( onChangeView ).toHaveBeenCalledWith(
+					expect.objectContaining( { page: 1 } )
+				);
+			} );
+		} );
+
+		it( 'leaves the page alone while loading', () => {
+			const onChangeView = vi.fn();
+			render(
+				<DataViewWrapper
+					view={ { type: LAYOUT_TABLE, page: 5, perPage: 1 } }
+					isLoading
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			expect( onChangeView ).not.toHaveBeenCalled();
+		} );
+
+		it( 'leaves the page alone when the total is unknown', () => {
+			const onChangeView = vi.fn();
+			render(
+				<DataViewWrapper
+					view={ { type: LAYOUT_TABLE, page: 5, perPage: 1 } }
+					paginationInfo={
+						{ totalItems: null, totalPages: null } as any
+					}
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			expect( onChangeView ).not.toHaveBeenCalled();
+		} );
+
+		it( 'leaves a valid page alone', () => {
+			const onChangeView = vi.fn();
+			render(
+				<DataViewWrapper
+					view={ { type: LAYOUT_TABLE, page: 3, perPage: 1 } }
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			expect( onChangeView ).not.toHaveBeenCalled();
 		} );
 	} );
-
 	describe( 'in table view', () => {
 		it( 'should display columns for each field', () => {
 			render( <DataViewWrapper /> );
@@ -302,6 +329,61 @@ describe( 'DataViews component', () => {
 					screen.getAllByText( item.title )[ 0 ]
 				).toBeInTheDocument();
 			}
+		} );
+
+		it( 'should not render a column for a field id without a field definition', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [ 'title', 'missing', 'order' ],
+					} }
+				/>
+			);
+
+			const headers = screen.getAllByRole( 'columnheader' );
+			expect( headers ).toHaveLength( 2 );
+			expect(
+				within( headers[ 0 ] ).getByRole( 'button', { name: 'Title' } )
+			).toBeInTheDocument();
+			expect(
+				within( headers[ 1 ] ).getByRole( 'button', { name: 'Order' } )
+			).toBeInTheDocument();
+
+			// The header row plus one row per item.
+			const rows = screen.getAllByRole( 'row' );
+			expect( rows ).toHaveLength( data.length + 1 );
+			for ( const row of rows.slice( 1 ) ) {
+				expect( within( row ).getAllByRole( 'cell' ) ).toHaveLength(
+					2
+				);
+			}
+		} );
+
+		it( 'should move a column past a field id without a field definition', async () => {
+			const user = userEvent.setup();
+			const onChangeView = vi.fn();
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [ 'title', 'missing', 'order' ],
+					} }
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Title' } ) );
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Move right' } )
+			);
+
+			// The move is computed against the rendered columns, so the
+			// title lands after the order column rather than swapping places
+			// with the skipped id, which is dropped from the view.
+			expect( onChangeView ).toHaveBeenCalledWith(
+				expect.objectContaining( { fields: [ 'order', 'title' ] } )
+			);
 		} );
 
 		it( 'should display title column if defined using titleField', () => {
@@ -327,7 +409,7 @@ describe( 'DataViews component', () => {
 		} );
 
 		it( 'should trigger the onClickItem callback if isItemClickable returns true and title field is clicked', async () => {
-			const onClickItemCallback = jest.fn();
+			const onClickItemCallback = vi.fn();
 
 			render(
 				<DataViewWrapper
@@ -564,7 +646,7 @@ describe( 'DataViews component', () => {
 		} );
 
 		it( 'swallows modifier clicks on non-selectable items and skips them in ranges', async () => {
-			const onClickItem = jest.fn();
+			const onClickItem = vi.fn();
 			render(
 				<DataViewWrapper
 					view={ {
@@ -620,7 +702,7 @@ describe( 'DataViews component', () => {
 		} );
 
 		it( 'passes only eligible items to a bulk action callback', async () => {
-			const restore = jest.fn();
+			const restore = vi.fn();
 			render(
 				<DataViewWrapper
 					view={ {
@@ -644,7 +726,7 @@ describe( 'DataViews component', () => {
 							// Makes the second item selectable even though it
 							// is not eligible for the restore action.
 							isEligible: ( item: Data ) => item.id !== 1,
-							callback: jest.fn(),
+							callback: vi.fn(),
 						},
 					] }
 				/>
@@ -669,7 +751,7 @@ describe( 'DataViews component', () => {
 	} );
 
 	describe( 'in grid view', () => {
-		it( 'should display the passed in data', () => {
+		it( 'should display the passed in data', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -677,14 +759,16 @@ describe( 'DataViews component', () => {
 					} }
 				/>
 			);
-			for ( const item of data ) {
-				expect(
-					screen.getAllByText( item.title )[ 0 ]
-				).toBeInTheDocument();
-			}
+			await waitFor( () => {
+				for ( const item of data ) {
+					expect(
+						screen.getAllByText( item.title )[ 0 ]
+					).toBeInTheDocument();
+				}
+			} );
 		} );
 
-		it( 'should render mediaField if defined', () => {
+		it( 'should render mediaField if defined', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -693,14 +777,16 @@ describe( 'DataViews component', () => {
 					} }
 				/>
 			);
-			for ( const item of data ) {
-				expect(
-					screen.getByTestId( 'image-field-' + item.id )
-				).toBeInTheDocument();
-			}
+			await waitFor( () => {
+				for ( const item of data ) {
+					expect(
+						screen.getByTestId( 'image-field-' + item.id )
+					).toBeInTheDocument();
+				}
+			} );
 		} );
 
-		it( 'should render actions dropdown if actions are supported and passed in for each grid item', () => {
+		it( 'should render actions dropdown if actions are supported and passed in for each grid item', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -710,12 +796,16 @@ describe( 'DataViews component', () => {
 				/>
 			);
 			expect(
-				screen.getAllByRole( 'button', { name: 'Actions' } ).length
+				(
+					await screen.findAllByRole( 'button', {
+						name: 'Actions',
+					} )
+				).length
 			).toEqual( 3 );
 		} );
 
 		it( 'should trigger the onClickItem callback if isItemClickable returns true and a media field is clicked', async () => {
-			const mediaClickItemCallback = jest.fn();
+			const mediaClickItemCallback = vi.fn();
 
 			render(
 				<DataViewWrapper
@@ -743,6 +833,57 @@ describe( 'DataViews component', () => {
 			const user = userEvent.setup();
 			await user.click( imageField );
 			expect( mediaClickItemCallback ).toHaveBeenCalledWith( data[ 0 ] );
+		} );
+
+		it( 'labels the clickable media area with the title when the title is hidden', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: 'grid',
+						titleField: 'title',
+						mediaField: 'image',
+						showTitle: false,
+					} }
+					isItemClickable={ () => true }
+					onClickItem={ () => {} }
+				/>
+			);
+			await waitFor( () => {
+				for ( const item of data ) {
+					expect(
+						screen.getByRole( 'button', { name: item.title } )
+					).toBeInTheDocument();
+				}
+			} );
+			expect(
+				screen.queryByRole( 'button', { name: 'Navigate to item' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'labels the clickable media area by the visible title when the title is shown', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: 'grid',
+						titleField: 'title',
+						mediaField: 'image',
+					} }
+					isItemClickable={ () => true }
+					onClickItem={ () => {} }
+				/>
+			);
+			// Both the media area and the title are clickable and share the
+			// name; the media area points at the rendered title
+			// (`aria-labelledby`) rather than carrying a label of its own.
+			const mediaButton = (
+				await screen.findAllByRole( 'button', {
+					name: data[ 0 ].title,
+				} )
+			).find( ( button ) =>
+				button.classList.contains( 'dataviews-view-grid__media' )
+			);
+			expect( mediaButton ).toHaveAttribute( 'aria-labelledby' );
+			expect( mediaButton ).not.toHaveAttribute( 'aria-label' );
 		} );
 
 		it( 'accepts checkbox click for selection', async () => {
@@ -1000,19 +1141,29 @@ describe( 'DataViews component', () => {
 			// class the previews are styled from.
 			const getGrid = () => screen.getByRole( 'grid' );
 
-			it( 'crops previews by default', () => {
+			it( 'crops previews by default', async () => {
 				renderGrid();
-				expect( getGrid() ).not.toHaveClass( 'has-media-fit-contain' );
+				await waitFor( () =>
+					expect( getGrid() ).not.toHaveClass(
+						'has-media-fit-contain'
+					)
+				);
 			} );
 
-			it( 'fits previews when configured to contain', () => {
+			it( 'fits previews when configured to contain', async () => {
 				renderGrid( { mediaFit: 'contain' } );
-				expect( getGrid() ).toHaveClass( 'has-media-fit-contain' );
+				await waitFor( () =>
+					expect( getGrid() ).toHaveClass( 'has-media-fit-contain' )
+				);
 			} );
 
-			it( 'ignores an unsupported value and falls back to cropping', () => {
+			it( 'ignores an unsupported value and falls back to cropping', async () => {
 				renderGrid( { mediaFit: 'fill' } );
-				expect( getGrid() ).not.toHaveClass( 'has-media-fit-contain' );
+				await waitFor( () =>
+					expect( getGrid() ).not.toHaveClass(
+						'has-media-fit-contain'
+					)
+				);
 			} );
 
 			it( 'hides the control unless the consumer opts in', async () => {
@@ -1041,7 +1192,7 @@ describe( 'DataViews component', () => {
 	} );
 
 	describe( 'in list view', () => {
-		it( 'should display the passed in data', () => {
+		it( 'should display the passed in data', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -1051,12 +1202,12 @@ describe( 'DataViews component', () => {
 			);
 			for ( const item of data ) {
 				expect(
-					screen.getAllByText( item.title )[ 0 ]
+					( await screen.findAllByText( item.title ) )[ 0 ]
 				).toBeInTheDocument();
 			}
 		} );
 
-		it( 'should render actions dropdown if actions are supported and passed in for each list item', () => {
+		it( 'should render actions dropdown if actions are supported and passed in for each list item', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -1066,7 +1217,11 @@ describe( 'DataViews component', () => {
 				/>
 			);
 			expect(
-				screen.getAllByRole( 'button', { name: 'Actions' } ).length
+				(
+					await screen.findAllByRole( 'button', {
+						name: 'Actions',
+					} )
+				).length
 			).toEqual( 3 );
 		} );
 
@@ -1080,14 +1235,16 @@ describe( 'DataViews component', () => {
 				layout: { density: 'compact' },
 			};
 
-			it( 'should apply the configured density', () => {
+			it( 'should apply the configured density', async () => {
 				const { container } = render(
 					<DataViewWrapper view={ view } />
 				);
-				expect(
-					// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-					container.querySelector( '.dataviews-view-list' )
-				).toHaveClass( 'has-compact-density' );
+				await waitFor( () =>
+					expect(
+						// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+						container.querySelector( '.dataviews-view-list' )
+					).toHaveClass( 'has-compact-density' )
+				);
 			} );
 
 			it( 'should become inert while loading and refreshing once the delay elapses', async () => {

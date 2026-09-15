@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`props should render alignment 1`] = `
+exports[`props > should render alignment 1`] = `
 <div>
   <div
     class="style-flex style-items-column components-flex components-h-stack components-v-stack"
@@ -14,7 +14,7 @@ exports[`props should render alignment 1`] = `
 </div>
 `;
 
-exports[`props should render correctly 1`] = `
+exports[`props > should render correctly 1`] = `
 <div>
   <div
     class="style-flex style-items-column components-flex components-h-stack components-v-stack"
@@ -28,7 +28,7 @@ exports[`props should render correctly 1`] = `
 </div>
 `;
 
-exports[`props should render spacing 1`] = `
+exports[`props > should render spacing 1`] = `
 <div>
   <div
     class="style-flex style-items-column components-flex components-h-stack components-v-stack"

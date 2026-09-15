@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import { toggleFormat } from '../toggle-format';
 import { getSparseArrayLength } from './helpers';

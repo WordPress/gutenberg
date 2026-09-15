@@ -1,3 +1,5 @@
+import { mat2d as m2d, vec2 } from 'gl-matrix';
+import { describe, expect, it } from 'vitest';
 import {
 	createCamera,
 	worldToScreen,
@@ -302,7 +304,6 @@ describe( 'createExportCamera', () => {
 		const state = makeState();
 		const outputSize = { width: 400, height: 225 };
 		const camera = createExportCamera( state, IMAGE, outputSize );
-		const { vec2 } = require( 'gl-matrix' );
 		const out = vec2.create();
 		vec2.transformMat2d(
 			out,
@@ -317,7 +318,6 @@ describe( 'createExportCamera', () => {
 		const state = makeState();
 		const outputSize = { width: IMAGE.width, height: IMAGE.height };
 		const camera = createExportCamera( state, IMAGE, outputSize );
-		const { vec2 } = require( 'gl-matrix' );
 		const topLeft = vec2.create();
 		vec2.transformMat2d( topLeft, [ 0, 0 ], camera );
 		expect( topLeft[ 0 ] ).toBeCloseTo( 0, 0 );
@@ -381,7 +381,6 @@ describe( 'createExportCamera', () => {
 		// output canvas.
 		const outputSize = { width: 400, height: 300 };
 		const exportCamera = createExportCamera( state, IMAGE, outputSize );
-		const { mat2d: m2d, vec2 } = require( 'gl-matrix' );
 		const inv = m2d.create();
 		m2d.invert( inv, exportCamera );
 		const exportPxVec = vec2.create();
