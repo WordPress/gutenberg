@@ -1,4 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
 import { createRegistry } from '@wordpress/data';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 import { store as uploadStore } from '..';
@@ -41,7 +49,7 @@ describe( 'optimizeExistingItem', () => {
 	let registry: WPDataRegistry;
 	beforeEach( () => {
 		vi.clearAllMocks();
-		( isClientSideMediaSupported as vi.Mock ).mockReturnValue( true );
+		( isClientSideMediaSupported as Mock ).mockReturnValue( true );
 		registry = createRegistryWithStores();
 		unlock( registry.dispatch( uploadStore ) ).pauseQueue();
 	} );
@@ -87,7 +95,7 @@ describe( 'optimizeExistingItem', () => {
 	} );
 
 	it( 'does not enqueue and reports an error when unsupported', async () => {
-		( isClientSideMediaSupported as vi.Mock ).mockReturnValue( false );
+		( isClientSideMediaSupported as Mock ).mockReturnValue( false );
 		const onError = vi.fn();
 
 		await registry.dispatch( uploadStore ).optimizeExistingItem( {
@@ -149,7 +157,7 @@ describe( 'fetchRemoteFile', () => {
 		global.fetch = originalFetch;
 	} );
 
-	async function addStubItem( onError?: vi.Mock ) {
+	async function addStubItem( onError?: Mock ) {
 		await unlock( registry.dispatch( uploadStore ) ).addItem( {
 			file: new StubFile(),
 			onError,
@@ -175,7 +183,7 @@ describe( 'fetchRemoteFile', () => {
 			ok: true,
 			blob: async () =>
 				new Blob( [ 'image-bytes' ], { type: 'image/jpeg' } ),
-		} ) as vi.Mock;
+		} ) as Mock;
 
 		const item = await addStubItem();
 
@@ -201,7 +209,7 @@ describe( 'fetchRemoteFile', () => {
 	it( 'cancels the item and reports an error when the fetch fails', async () => {
 		global.fetch = vi
 			.fn()
-			.mockResolvedValue( { ok: false, status: 404 } ) as vi.Mock;
+			.mockResolvedValue( { ok: false, status: 404 } ) as Mock;
 
 		const onError = vi.fn();
 		const item = await addStubItem( onError );
