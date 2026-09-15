@@ -1,3 +1,5 @@
+import type { ImageEditModifier } from '@wordpress/vips/worker';
+
 /**
  * Sub-size data returned by the sideload endpoint.
  *
@@ -325,6 +327,7 @@ export enum ItemStatus {
 
 export enum OperationType {
 	Prepare = 'PREPARE',
+	EditImage = 'EDIT_IMAGE',
 	Upload = 'UPLOAD',
 	ResizeCrop = 'RESIZE_CROP',
 	Rotate = 'ROTATE',
@@ -378,6 +381,13 @@ export interface OperationArgs {
 		 * Used to apply the correct rotation/flip transformation.
 		 */
 		orientation: number;
+	};
+	[ OperationType.EditImage ]: {
+		/**
+		 * Edits (flip, rotate, crop) to apply, in order, in the shape of the
+		 * REST `media/<id>/edit` endpoint's `modifiers` parameter.
+		 */
+		modifiers: ImageEditModifier[];
 	};
 	[ OperationType.TranscodeImage ]: {
 		/** Target output format. */
