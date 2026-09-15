@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Icon: Don't render icons registered with `public: false` on the front end, matching the editor, where they aren't available through the icons REST API ([#82774](https://github.com/WordPress/gutenberg/pull/82774)).
+
 ### Bug Fixes
 
 -   Image: Inject the lightbox trigger with a literal string replacement instead of `preg_replace`, so `$` and `\` sequences in author-controlled image attributes (such as a price in the alt text) are no longer interpreted as regex backreferences and silently removed ([#79369](https://github.com/WordPress/gutenberg/pull/79369)).
