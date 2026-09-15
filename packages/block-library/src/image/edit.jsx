@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { isBlobURL, createBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockBindingsSource } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import {
 	BlockIcon,
 	useBlockProps,
@@ -19,7 +19,11 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useResizeObserver } from '@wordpress/compose';
 import { getProtocol, prependHTTPS } from '@wordpress/url';
 import { store as uploadStore } from '@wordpress/upload-media';
-import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import {
+	useUploadMediaFromBlobURL,
+	useResumeUploadFromMarker,
+} from '../utils/hooks';
+import { unlock } from '../lock-unlock';
 import Image from './image';
 import { isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
@@ -139,7 +143,21 @@ export function ImageEdit( {
 	} = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 
+	const registry = useRegistry();
 	const { createErrorNotice } = useDispatch( noticesStore );
+
+	function setUploadIdAttribute( uploadId ) {
+		/*
+		 * The marker write must not create its own undo level; otherwise
+		 * undoing a finished upload would restore the marker instead of the
+		 * pristine block.
+		 */
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( { uploadId } );
+	}
+
 	function onUploadError( message ) {
 		/*
 		 * Upload errors explain what went wrong and what to do about it, which
@@ -156,6 +174,7 @@ export function ImageEdit( {
 			id: undefined,
 			url: undefined,
 			blob: undefined,
+			uploadId: undefined,
 		} );
 	}
 
@@ -219,6 +238,7 @@ export function ImageEdit( {
 				title: undefined,
 				caption: undefined,
 				blob: undefined,
+				uploadId: undefined,
 			} );
 			setTemporaryURL();
 
@@ -227,6 +247,21 @@ export function ImageEdit( {
 
 		if ( isBlobURL( media.url ) ) {
 			setTemporaryURL( media.url );
+
+			/*
+			 * A placeholder-initiated upload bypasses
+			 * useUploadMediaFromBlobURL, so no durable marker was written.
+			 * Adopt the queue item's marker so the upload can be reconnected
+			 * to this block after a reload. Overwrites a stale marker (e.g.
+			 * left behind by undoing a previous upload) so the block always
+			 * points at its current upload.
+			 */
+			const item = unlock(
+				registry.select( uploadStore )
+			).getItemByPreviewUrl( media.url );
+			if ( item?.uploadId && item.uploadId !== attributes.uploadId ) {
+				setUploadIdAttribute( item.uploadId );
+			}
 			return;
 		}
 
@@ -311,6 +346,7 @@ export function ImageEdit( {
 
 		setAttributes( {
 			blob: undefined,
+			uploadId: undefined,
 			...mediaAttributes,
 			...additionalAttributes,
 			linkDestination,
@@ -326,6 +362,7 @@ export function ImageEdit( {
 		if ( normalizedNewURL !== url ) {
 			setAttributes( {
 				blob: undefined,
+				uploadId: undefined,
 				url: normalizedNewURL,
 				id: undefined,
 				sizeSlug: getSettings().imageDefaultSize,
@@ -339,7 +376,22 @@ export function ImageEdit( {
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectImage,
 		onError: onUploadError,
+		uploadId: attributes.uploadId,
+		onUploadStart: setUploadIdAttribute,
 	} );
+
+	const resumePreviewURL = useResumeUploadFromMarker( {
+		uploadId: attributes.uploadId,
+		onChange: onSelectImage,
+		onError: onUploadError,
+	} );
+
+	// Show the recreated preview while a resumed upload is pending.
+	useEffect( () => {
+		if ( resumePreviewURL && ! temporaryURL ) {
+			setTemporaryURL( resumePreviewURL );
+		}
+	}, [ resumePreviewURL, temporaryURL ] );
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;

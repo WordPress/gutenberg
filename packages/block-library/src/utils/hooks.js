@@ -1,9 +1,12 @@
-import { useSelect } from '@wordpress/data';
-import { useLayoutEffect, useEffect, useRef } from '@wordpress/element';
+import { v4 as uuidv4 } from 'uuid';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
 import { useViewportMatch } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect, useRegistry } from '@wordpress/data';
+import { useLayoutEffect, useEffect, useRef } from '@wordpress/element';
+import { store as uploadStore } from '@wordpress/upload-media';
+import { unlock } from '../lock-unlock';
 
 /**
  * Returns whether the current user can edit the given entity.
@@ -27,11 +30,13 @@ export function useCanEditEntity( kind, name, recordId ) {
 /**
  * Handles uploading a media file from a blob URL on mount.
  *
- * @param {Object}   args              Upload media arguments.
- * @param {string}   args.url          Blob URL.
- * @param {?Array}   args.allowedTypes Array of allowed media types.
- * @param {Function} args.onChange     Function called when the media is uploaded.
- * @param {Function} args.onError      Function called when an error happens.
+ * @param {Object}    args               Upload media arguments.
+ * @param {string}    args.url           Blob URL.
+ * @param {?Array}    args.allowedTypes  Array of allowed media types.
+ * @param {Function}  args.onChange      Function called when the media is uploaded.
+ * @param {Function}  args.onError       Function called when an error happens.
+ * @param {?string}   args.uploadId      Durable upload identifier. When omitted a new one is generated.
+ * @param {?Function} args.onUploadStart Function called with the resolved upload id when the upload starts.
  */
 export function useUploadMediaFromBlobURL( args = {} ) {
 	const latestArgsRef = useRef( args );
@@ -60,7 +65,14 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 			return;
 		}
 
-		const { url, allowedTypes, onChange, onError } = latestArgsRef.current;
+		const {
+			url,
+			allowedTypes,
+			onChange,
+			onError,
+			uploadId,
+			onUploadStart,
+		} = latestArgsRef.current;
 		const { mediaUpload } = getSettings();
 
 		if ( ! mediaUpload ) {
@@ -69,9 +81,15 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 
 		hasUploadStartedRef.current = true;
 
+		// Derive a durable upload identifier and notify the block so it can
+		// persist the marker to its attributes before the upload begins.
+		const resolvedUploadId = uploadId || uuidv4();
+		onUploadStart?.( resolvedUploadId );
+
 		mediaUpload( {
 			filesList: [ file ],
 			allowedTypes,
+			uploadId: resolvedUploadId,
 			onFileChange: ( [ media ] ) => {
 				if ( isBlobURL( media?.url ) ) {
 					return;
@@ -110,4 +128,70 @@ export function useToolsPanelDropdownMenuProps() {
 				},
 		  }
 		: {};
+}
+
+/**
+ * Reconnects a block to an upload that was interrupted and is awaiting resume.
+ *
+ * When the block's durable `uploadId` matches a persisted (PendingResume) queue
+ * item, the block's callbacks are registered so the resumed upload routes its
+ * result back to the block. Returns a recreated preview URL while the resumed
+ * upload is pending, or undefined when there is no matching item.
+ *
+ * @param {Object}    options
+ * @param {?string}   options.uploadId Durable marker stored in block attributes.
+ * @param {Function}  options.onChange Called with the attachment when available.
+ * @param {?Function} options.onError  Called when the upload fails.
+ * @return {string|undefined} A recreated preview blob URL, if available.
+ */
+export function useResumeUploadFromMarker( { uploadId, onChange, onError } ) {
+	const registry = useRegistry();
+
+	// Keep the latest callbacks in a ref so registration happens exactly once
+	// per item while the store still calls the current handlers. Registering
+	// on every callback identity change would loop: dispatching
+	// registerItemCallbacks replaces the queue item, which would re-trigger
+	// an effect depending on it.
+	const latestCallbacksRef = useRef( { onChange, onError } );
+	useLayoutEffect( () => {
+		latestCallbacksRef.current = { onChange, onError };
+	} );
+	const registeredItemIdRef = useRef();
+
+	// Only PendingResume (loaded-from-storage) items need the block to
+	// re-register callbacks; live uploads already carry them.
+	const item = useSelect(
+		( select ) =>
+			uploadId
+				? unlock( select( uploadStore ) ).getResumableItemByUploadId(
+						uploadId
+				  )
+				: undefined,
+		[ uploadId ]
+	);
+
+	useEffect( () => {
+		if ( ! uploadId || ! item ) {
+			return;
+		}
+		if ( registeredItemIdRef.current === item.id ) {
+			return;
+		}
+		registeredItemIdRef.current = item.id;
+		// Only onChange and onError are registered here. The store fires onChange
+		// with the final attachment (which the block's onSelectImage uses to swap
+		// in the real URL and clear the marker) before onSuccess, so onSuccess is
+		// intentionally omitted.
+		unlock( registry.dispatch( uploadStore ) ).registerItemCallbacks(
+			uploadId,
+			{
+				onChange: ( attachments ) =>
+					latestCallbacksRef.current.onChange?.( attachments?.[ 0 ] ),
+				onError: ( error ) =>
+					latestCallbacksRef.current.onError?.( error ),
+			}
+		);
+	}, [ uploadId, item, registry ] );
+
+	return item?.attachment?.url;
 }
