@@ -180,8 +180,6 @@ function FileEdit( {
 
 	const blockProps = useBlockProps( {
 		className: clsx(
-			// The placeholder keeps its full width, so the layout only applies
-			// once there's a file.
 			layoutClassNames,
 			!! temporaryURL && getAnimateClassName( { type: 'loading' } ),
 			{
