@@ -16,6 +16,7 @@
 -   `Snackbar`: Show the action's focus ring with the design system's outline instead of a legacy dotted outline, and let `Button`/`ExternalLink` own the ring ([#82640](https://github.com/WordPress/gutenberg/pull/82640)).
 -   `CircularOptionPicker`: Updated to show outline via design system's mixin for focus ring instead of previous border implementation ([#82521](https://github.com/WordPress/gutenberg/pull/82521)).
 -   `Autocomplete`: Show focus ring with the design system's outline instead of previous box-shadow implementation ([#82766](https://github.com/WordPress/gutenberg/pull/82766)).
+-   `CustomGradientPicker`: Show the control point's focus ring with the design system's outline and a contrasting backing to separate it from the gradient ([#82834](https://github.com/WordPress/gutenberg/pull/82834)).
 
 ### Bug Fixes
 
