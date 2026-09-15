@@ -2,8 +2,24 @@
 
 ## Unreleased
 
-## 7.53.0 (2026-08-12)
+## 7.55.0 (2026-09-10)
 
+### New Features
+
+-   Add `apiFetch.unregister` to remove a registered middleware, and expose `apiFetch.httpV1Middleware` so the `X-HTTP-Method-Override` behavior can be opted out of ([#82408](https://github.com/WordPress/gutenberg/pull/82408)).
+-   Expose `apiFetch.defaultFetchHandler` so the default fetch handler can be restored after `setFetchHandler` overrides it ([#82553](https://github.com/WordPress/gutenberg/pull/82553))
+
+### Bug Fixes
+
+-   Resolve to `null` for a `200` response with an empty body instead of throwing an `invalid_json` error ([#79325](https://github.com/WordPress/gutenberg/pull/79325)).
+
+## 7.54.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 7.53.0 (2026-08-12)
 
 ## 7.52.0 (2026-07-29)
 

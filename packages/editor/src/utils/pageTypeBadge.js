@@ -8,27 +8,33 @@ import { store as coreStore } from '@wordpress/core-data';
  * @param {number|string} postId postId of the current post being edited.
  */
 export default function usePageTypeBadge( postId ) {
-	const { isFrontPage, isPostsPage } = useSelect( ( select ) => {
-		const { canUser, getEditedEntityRecord } = select( coreStore );
-		const siteSettings = canUser( 'read', {
-			kind: 'root',
-			name: 'site',
-		} )
-			? getEditedEntityRecord( 'root', 'site' )
-			: undefined;
+	const { isFrontPage, isPostsPage, isPrivacyPolicyPage } = useSelect(
+		( select ) => {
+			const { canUser, getEditedEntityRecord } = select( coreStore );
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
+				? getEditedEntityRecord( 'root', 'site' )
+				: undefined;
 
-		const _postId = parseInt( postId, 10 );
+			const _postId = parseInt( postId, 10 );
 
-		return {
-			isFrontPage: siteSettings?.page_on_front === _postId,
-			isPostsPage: siteSettings?.page_for_posts === _postId,
-		};
-	} );
+			return {
+				isFrontPage: siteSettings?.page_on_front === _postId,
+				isPostsPage: siteSettings?.page_for_posts === _postId,
+				isPrivacyPolicyPage:
+					siteSettings?.page_for_privacy_policy === _postId,
+			};
+		}
+	);
 
 	if ( isFrontPage ) {
 		return __( 'Homepage' );
 	} else if ( isPostsPage ) {
 		return __( 'Posts Page' );
+	} else if ( isPrivacyPolicyPage ) {
+		return __( 'Privacy Policy Page' );
 	}
 
 	return false;

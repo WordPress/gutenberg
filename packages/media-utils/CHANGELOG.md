@@ -2,8 +2,32 @@
 
 ## Unreleased
 
-## 5.53.0 (2026-08-12)
+## 5.55.0 (2026-09-10)
 
+### New Features
+
+-   Media Library modal: Add an "Attached to" filter offering "Unattached" and an option for the post the modal was opened from, labelled with that post type's `uploaded_to_this_item` label as the classic media frame does. Adds `postId` and `postType` props supplying the post. The filter is not persisted with the rest of the view: it describes the task at hand rather than a standing preference ([#81974](https://github.com/WordPress/gutenberg/pull/81974)).
+
+### Bug Fixes
+
+-   Preserve array-valued fields in multipart form data so grouped image-size sideload requests reach the REST API as arrays ([#82353](https://github.com/WordPress/gutenberg/pull/82353)).
+
+## 5.54.0 (2026-08-26)
+
+### Enhancements
+
+-   Media upload modal: Show thumbnails at their original aspect ratio inside the grid cell rather than cropping them to a square, so a media item's orientation is visible before it is inserted. Adds an "Original aspect ratio" toggle to the view options for switching back to cropped previews ([#81604](https://github.com/WordPress/gutenberg/pull/81604)).
+
+### Bug Fixes
+
+-   Report a server-side upload failure in plain language instead of passing on the REST client's `invalid_json` and `unknown_error` messages ([#81735](https://github.com/WordPress/gutenberg/pull/81735)).
+-   Prevent editor block removal by stopping undo/redo event propagation when the Media Library modal is open ([#79898](https://github.com/WordPress/gutenberg/pull/79898)).
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 5.53.0 (2026-08-12)
 
 ## 5.52.0 (2026-07-29)
 

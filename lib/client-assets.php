@@ -26,9 +26,9 @@ function gutenberg_dir_path() {
  *
  * @since 0.1.0
  *
- * @param  string $path Relative path of the desired file.
+ * @param string $path Relative path of the desired file.
  *
- * @return string       Fully qualified URL pointing to the desired file.
+ * @return string Fully qualified URL pointing to the desired file.
  */
 function gutenberg_url( $path ) {
 	return plugins_url( $path, __DIR__ );

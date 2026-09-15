@@ -1,5 +1,12 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// Whether the run targets the extensible site editor (v2). Its Pages screen
+// renders the view list as tabs, the classic editor's as sidebar buttons.
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
+
+const getViewItem = ( page, name ) =>
+	page.getByRole( isSiteEditorV2 ? 'tab' : 'button', { name, exact: true } );
+
 const PLUGIN_SLUG = 'gutenberg-test-view-config-extensibility';
 const MATCHING_PAGE_TITLE = 'Published in 2021';
 const NONMATCHING_PAGE_TITLE = 'Published in 2020';
@@ -62,27 +69,14 @@ test.describe( 'View config extensibility', () => {
 		await admin.visitSiteEditor( { postType: 'page' } );
 
 		// The filtered view list reaches the Site Editor sidebar.
+		await expect( getViewItem( page, 'Published' ) ).toBeVisible();
+		await expect( getViewItem( page, 'In progress' ) ).toBeVisible();
 		await expect(
-			page.getByRole( 'button', { name: 'Published', exact: true } )
+			getViewItem( page, 'Published after 2020' )
 		).toBeVisible();
-		await expect(
-			page.getByRole( 'button', { name: 'In progress', exact: true } )
-		).toBeVisible();
-		await expect(
-			page.getByRole( 'button', {
-				name: 'Published after 2020',
-				exact: true,
-			} )
-		).toBeVisible();
-		await expect(
-			page.getByRole( 'button', { name: 'Drafts', exact: true } )
-		).toHaveCount( 0 );
-		await expect(
-			page.getByRole( 'button', { name: 'Scheduled', exact: true } )
-		).toHaveCount( 0 );
-		await expect(
-			page.getByRole( 'button', { name: 'Pending', exact: true } )
-		).toBeVisible();
+		await expect( getViewItem( page, 'Drafts' ) ).toHaveCount( 0 );
+		await expect( getViewItem( page, 'Scheduled' ) ).toHaveCount( 0 );
+		await expect( getViewItem( page, 'Pending' ) ).toBeVisible();
 
 		// The default view and the only allowed layout reach DataViews.
 		const table = page.getByRole( 'table' );
@@ -114,12 +108,7 @@ test.describe( 'View config extensibility', () => {
 		await page.keyboard.press( 'Escape' );
 
 		// A newly added view applies all of its custom filters.
-		await page
-			.getByRole( 'button', {
-				name: 'Published after 2020',
-				exact: true,
-			} )
-			.click();
+		await getViewItem( page, 'Published after 2020' ).click();
 		await expect(
 			table.getByRole( 'row', {
 				name: new RegExp( MATCHING_PAGE_TITLE ),
@@ -143,9 +132,7 @@ test.describe( 'View config extensibility', () => {
 		).toHaveCount( 0 );
 
 		// The existing Drafts view keeps its status filter and gains the date filter.
-		await page
-			.getByRole( 'button', { name: 'In progress', exact: true } )
-			.click();
+		await getViewItem( page, 'In progress' ).click();
 		await expect(
 			table.getByRole( 'row', { name: /Draft Included/ } )
 		).toBeVisible();
@@ -163,16 +150,24 @@ test.describe( 'View config extensibility', () => {
 			} )
 		).toHaveCount( 0 );
 
-		await page
-			.getByRole( 'button', { name: 'Published', exact: true } )
-			.click();
+		await getViewItem( page, 'Published' ).click();
 		await expect(
 			table.getByRole( 'row', {
 				name: new RegExp( MATCHING_PAGE_TITLE ),
 			} )
 		).toBeVisible();
+	} );
 
-		// The filtered form reaches the Quick Edit DataForm.
+	// v2 gap: the extensible site editor's Pages screen consumes the view
+	// config for its views and layouts, but its Quick Edit form does not
+	// consume the form section yet.
+	test( 'applies the filtered form to the Quick Edit DataForm @site-editor-v1-only', async ( {
+		admin,
+		page,
+	} ) => {
+		await admin.visitSiteEditor( { postType: 'page' } );
+
+		const table = page.getByRole( 'table' );
 		const matchingPageRow = table.getByRole( 'row', {
 			name: new RegExp( MATCHING_PAGE_TITLE ),
 		} );

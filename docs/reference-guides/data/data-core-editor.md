@@ -347,7 +347,7 @@ _Returns_
 
 ### getEditedPostSlug
 
-Returns the slug for the post being edited, preferring a manually edited value if one exists, then a sanitized version of the current post title, and finally the post ID.
+Returns the slug for the post being edited, preferring a manually edited value if one exists, then the server-generated slug from the post entity, then a JS approximation of the current post title, and finally the post ID.
 
 _Parameters_
 

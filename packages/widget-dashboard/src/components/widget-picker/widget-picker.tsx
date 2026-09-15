@@ -74,18 +74,30 @@ interface WidgetPickerProps {
  * exposes a single "Select" action with bulk support so users can insert one
  * or several widgets at once.
  *
+ * The policy in effect scopes the listing: a type it rejects for `insert`
+ * is not offered but keeps rendering where already placed.
+ *
  * @param {WidgetPickerProps} props Component props.
  */
 export function WidgetPicker( {
 	onSelect,
 	itemListLabel = __( 'Widget list' ),
 }: WidgetPickerProps ) {
-	const { widgetTypes: registeredTypes } = useDashboardInternalContext();
+	const { widgetTypes: registeredTypes, canPerform } =
+		useDashboardInternalContext();
 	const [ selection, setSelection ] = useState< string[] >( [] );
 	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
 
+	const insertableTypes = useMemo(
+		() =>
+			registeredTypes.filter( ( widgetType ) =>
+				canPerform( { operation: 'insert', widgetType } )
+			),
+		[ registeredTypes, canPerform ]
+	);
+
 	const { data: widgetTypes } = filterSortAndPaginate(
-		registeredTypes,
+		insertableTypes,
 		view,
 		fields
 	);

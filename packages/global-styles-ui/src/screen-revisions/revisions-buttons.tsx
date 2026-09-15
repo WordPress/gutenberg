@@ -1,18 +1,12 @@
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	Button,
-	Composite,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Button, Composite } from '@wordpress/components';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { getGlobalStylesChanges } from '@wordpress/global-styles-engine';
 import { ENTER, SPACE } from '@wordpress/keycodes';
+import { Badge } from '@wordpress/ui';
 import type { Revision } from './types';
-import { unlock } from '../lock-unlock';
-
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 
@@ -229,18 +223,26 @@ function RevisionsButtons( {
 						</span>
 						{ isSelected &&
 							( areStylesEqual ? (
-								<WCBadge
+								<Badge
 									className="global-styles-ui-screen-revisions__active-badge"
-									intent="info"
+									intent="informational"
 								>
 									{ __( 'Active' ) }
-								</WCBadge>
+								</Badge>
 							) : (
 								<Button
 									size="compact"
 									variant="primary"
 									className="global-styles-ui-screen-revisions__apply-button"
-									onClick={ onApplyRevision }
+									onClick={ ( event: React.MouseEvent ) => {
+										// This button sits inside the option,
+										// whose own click handler selects the
+										// revision. Without this the selection
+										// would re-run and navigate back to
+										// the revision just applied.
+										event.stopPropagation();
+										onApplyRevision?.();
+									} }
 									aria-label={ __(
 										'Apply the selected revision to your site.'
 									) }

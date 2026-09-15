@@ -77,16 +77,6 @@ AppearBottomRight.args = {
 	),
 };
 
-export const Loading = Template.bind( {} );
-Loading.args = {
-	type: 'loading',
-	children: ( { className } ) => (
-		<Notice className={ className } status="success">
-			<p>Loading animation.</p>
-		</Notice>
-	),
-};
-
 export const SlideIn = Template.bind( {} );
 SlideIn.args = {
 	type: 'slide-in',

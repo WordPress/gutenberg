@@ -1,5 +1,9 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// Whether the run targets the extensible site editor (v2), whose sidebar
+// items are links rather than buttons.
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
+
 test.describe( 'Site editor with dark background theme', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'darktheme' );
@@ -51,7 +55,11 @@ test.describe( 'Site editor with light background theme and theme variations', (
 			editor,
 		} ) => {
 			// Click "Styles"
-			await page.getByRole( 'button', { name: 'Styles' } ).click();
+			await page
+				.getByRole( isSiteEditorV2 ? 'link' : 'button', {
+					name: 'Styles',
+				} )
+				.click();
 
 			// Click "Browse styles"
 			await page.getByRole( 'button', { name: 'Browse styles' } ).click();

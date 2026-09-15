@@ -9,6 +9,7 @@ import { resolveIcon } from '../icon-resolver';
 import type {
 	WidgetAction,
 	WidgetActionRecord,
+	WidgetAttributeRecord,
 	WidgetIcon,
 	WidgetModuleRecord,
 	WidgetName,
@@ -17,41 +18,124 @@ import type {
 
 /*
  * Transparent stand-in for an icon reference that has not resolved yet:
- * it holds the icon slot so titles do not shift when the icon lands.
+ * it holds the icon slot so titles do not shift and actions keep their
+ * icon shape while the icon lands.
  */
 const pendingIcon: WidgetIcon = createElement( 'svg', {
 	viewBox: '0 0 24 24',
 } );
 
 /**
- * Emitted actions carry only renderable icons: a wire reference resolves
- * after the gate and patches in; anything else non-renderable drops.
+ * Emitted actions carry only renderable icons: a wire reference holds the
+ * slot with the stand-in while it resolves; anything else non-renderable
+ * drops.
  *
- * @param actions Declared actions, from the record or the module.
+ * @param actions     Declared actions, from the record or the module.
+ * @param holdPending Whether wire references resolve later (record actions).
  */
 function withRenderableIcons(
-	actions: ( WidgetAction | WidgetActionRecord )[]
+	actions: ( WidgetAction | WidgetActionRecord )[],
+	holdPending: boolean
 ): WidgetAction[] {
-	return actions.map( ( { icon, ...action } ) => ( {
-		...action,
-		...( isValidElement( icon ) ? { icon: icon as WidgetIcon } : {} ),
-	} ) );
+	return actions.map( ( { icon, ...action } ) => {
+		if ( isValidElement( icon ) ) {
+			return { ...action, icon: icon as WidgetIcon };
+		}
+
+		if ( holdPending && typeof icon === 'string' ) {
+			return { ...action, icon: pendingIcon };
+		}
+
+		return action;
+	} );
+}
+
+type WidgetAttributes = NonNullable< WidgetType[ 'attributes' ] >;
+
+/*
+ * Record entries lead, each completed by the module entry sharing its `id`
+ * (the record wins a shared key); module-only entries follow. `isValid`
+ * merges rule by rule, so the record's serializable rules keep the
+ * module's `custom` validator.
+ */
+function mergeAttributes(
+	recordAttributes: WidgetAttributeRecord[] | null | undefined,
+	moduleAttributes: WidgetAttributes | undefined
+): WidgetAttributes | undefined {
+	if ( ! recordAttributes ) {
+		return moduleAttributes;
+	}
+	if ( ! moduleAttributes ) {
+		return recordAttributes as WidgetAttributes;
+	}
+
+	const moduleById = new Map(
+		moduleAttributes.map(
+			( attribute ) => [ attribute.id, attribute ] as const
+		)
+	);
+	const recordIds = new Set(
+		recordAttributes.map( ( attribute ) => attribute.id )
+	);
+
+	return [
+		...recordAttributes.map( ( attribute ) => {
+			const moduleAttribute = moduleById.get( attribute.id );
+			if ( ! moduleAttribute?.isValid || ! attribute.isValid ) {
+				return { ...moduleAttribute, ...attribute };
+			}
+
+			return {
+				...moduleAttribute,
+				...attribute,
+				isValid: { ...moduleAttribute.isValid, ...attribute.isValid },
+			};
+		} ),
+		...moduleAttributes.filter(
+			( attribute ) => ! recordIds.has( attribute.id )
+		),
+	] as WidgetAttributes;
 }
 
 /* `true` while records or their metadata imports are still resolving; hosts
    must not treat a widget instance as missing until it is `false`. */
 type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
 
+/*
+ * Applied when neither the record nor its metadata module declares one.
+ */
+const DEFAULT_API_VERSION = 1;
+
+/*
+ * The record fields that overlay a module's metadata, shared by both
+ * resolution paths so they cannot drift.
+ */
+function recordOverlay( record: WidgetModuleRecord ) {
+	return {
+		name: record.name as WidgetName,
+		renderModule: record.render_module ?? '',
+		...( record.presentation ? { presentation: record.presentation } : {} ),
+		...( record.category ? { category: record.category } : {} ),
+		...( record.description ? { description: record.description } : {} ),
+		...( record.help ? { help: record.help } : {} ),
+		...( record.keywords ? { keywords: record.keywords } : {} ),
+	};
+}
+
 /**
  * Resolves widget types from host-supplied records.
  *
  * For each record it dynamically imports `widget_module` and merges the
  * module's default export with the runtime fields (`name`, `renderModule`).
- * Attribute schemas pass through `resolveFields`, so attributes referencing
- * registered field types reach hosts as plain DataViews fields. Icon
- * references resolve through the registered icon resolver, off the loading
- * flag: widget types emit as soon as their modules land, and each resolved
- * icon patches in afterwards. Action icon references resolve the same way.
+ * A record without a metadata module resolves from its own fields alone,
+ * so a widget declared entirely by its manifest needs no module stub.
+ * A record's `attributes` lead the module's, merged by `id` with `isValid`
+ * merged rule by rule; the merged schema passes through `resolveFields`, so
+ * attributes referencing registered field types reach hosts as plain
+ * DataViews fields. Icon references resolve through the registered icon
+ * resolver, off the loading flag: widget types emit as soon as their modules
+ * land, and each resolved icon patches in afterwards. Action icon references
+ * resolve the same way.
  * Pass `null`/`undefined` while records are still loading.
  *
  * @param records Host-supplied records, or `null`/`undefined` while loading.
@@ -81,7 +165,38 @@ export function useWidgetTypes(
 		Promise.all(
 			records.map( async ( record ) => {
 				if ( ! record.widget_module ) {
-					return null;
+					/*
+					 * No metadata module: the widget is declared entirely
+					 * by its manifest, so the record carries the metadata
+					 * and the render module carries the body. Without a
+					 * render module there is nothing to mount, and the
+					 * record drops.
+					 */
+					if ( ! record.render_module ) {
+						return null;
+					}
+
+					return {
+						apiVersion: DEFAULT_API_VERSION,
+						title: record.title ?? record.name,
+						...( record.attributes
+							? {
+									attributes: resolveFields(
+										record.attributes
+									),
+							  }
+							: {} ),
+						...( record.icon ? { icon: pendingIcon } : {} ),
+						...( record.actions
+							? {
+									actions: withRenderableIcons(
+										record.actions,
+										true
+									),
+							  }
+							: {} ),
+						...recordOverlay( record ),
+					} as WidgetType;
 				}
 
 				try {
@@ -107,18 +222,17 @@ export function useWidgetTypes(
 						moduleIcon ?? ( record.icon ? pendingIcon : undefined );
 
 					const actions = record.actions ?? metadata.actions;
+					const attributes = mergeAttributes(
+						record.attributes,
+						metadata.attributes
+					);
 
 					return {
+						apiVersion: DEFAULT_API_VERSION,
 						...metadata,
-						...( metadata.attributes
-							? {
-									attributes: resolveFields(
-										metadata.attributes
-									),
-							  }
+						...( attributes
+							? { attributes: resolveFields( attributes ) }
 							: {} ),
-						name: record.name as WidgetName,
-						renderModule: record.render_module ?? '',
 						icon,
 						/*
 						 * `title` is required:
@@ -127,22 +241,15 @@ export function useWidgetTypes(
 						 * - Then the record's name as fallback
 						 */
 						title: record.title ?? metadata.title ?? record.name,
-						...( record.presentation
-							? { presentation: record.presentation }
-							: {} ),
-						...( record.category
-							? { category: record.category }
-							: {} ),
-						...( record.description
-							? { description: record.description }
-							: {} ),
-						...( record.help ? { help: record.help } : {} ),
-						...( record.keywords
-							? { keywords: record.keywords }
-							: {} ),
 						...( actions
-							? { actions: withRenderableIcons( actions ) }
+							? {
+									actions: withRenderableIcons(
+										actions,
+										actions === record.actions
+									),
+							  }
 							: {} ),
+						...recordOverlay( record ),
 					} as WidgetType;
 				} catch {
 					return null;
@@ -192,9 +299,8 @@ export function useWidgetTypes(
 			}
 
 			/*
-			 * Each record action's icon reference resolves off the gate
-			 * and patches into the emitted action; an unresolvable
-			 * reference leaves the action without an icon.
+			 * Record action icon references resolve off the gate and
+			 * patch in; an unresolvable reference clears the stand-in.
 			 */
 			for ( const record of records ) {
 				for ( const action of record.actions ?? [] ) {
@@ -203,7 +309,7 @@ export function useWidgetTypes(
 					}
 
 					void resolveIcon( action.icon ).then( ( resolved ) => {
-						if ( cancelled || ! resolved ) {
+						if ( cancelled ) {
 							return;
 						}
 
@@ -215,11 +321,22 @@ export function useWidgetTypes(
 
 								return {
 									...type,
-									actions: type.actions?.map( ( entry ) =>
-										entry.id === action.id
-											? { ...entry, icon: resolved }
-											: entry
-									),
+									actions: type.actions?.map( ( entry ) => {
+										if ( entry.id !== action.id ) {
+											return entry;
+										}
+
+										if ( resolved ) {
+											return {
+												...entry,
+												icon: resolved,
+											};
+										}
+
+										return entry.icon === pendingIcon
+											? { ...entry, icon: undefined }
+											: entry;
+									} ),
 								};
 							} )
 						);

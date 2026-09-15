@@ -527,7 +527,7 @@ export const WithRelevance: StoryObj = {
 		docs: {
 			description: {
 				story: `
-Each attribute may carry a \`relevance\` hint (\`'high' | 'low'\`). The widget declares importance; the host chooses the surface. When absent, treat the hint as \`'low'\`.
+Each attribute may carry a \`relevance\` hint (\`'high' | 'medium' | 'low'\`). The widget declares importance; the host chooses the surface. When absent, treat the hint as \`'low'\`.
 
 **In this demo**
 

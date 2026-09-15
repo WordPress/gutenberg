@@ -165,3 +165,27 @@ export function shadowObjectToString( shadowObj: ShadowObject ): string {
 		shadowObj.color || ''
 	}`.trim();
 }
+
+// A text-shadow is a box-shadow without the spread radius and `inset` keyword,
+// so we reuse the box-shadow parser and only keep the supported fields.
+export type TextShadowObject = Pick<
+	ShadowObject,
+	'x' | 'y' | 'blur' | 'color'
+>;
+
+export function textShadowStringToObject(
+	textShadowValue: string
+): TextShadowObject {
+	const { x, y, blur, color } = shadowStringToObject( textShadowValue );
+	return { x, y, blur, color };
+}
+
+export function textShadowObjectToString(
+	textShadowObj: TextShadowObject
+): string {
+	const lengths = `${ textShadowObj.x || '0px' } ${
+		textShadowObj.y || '0px'
+	} ${ textShadowObj.blur || '0px' }`;
+
+	return `${ lengths } ${ textShadowObj.color || '' }`.trim();
+}

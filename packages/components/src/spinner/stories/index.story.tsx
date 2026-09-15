@@ -3,7 +3,6 @@ import Spinner from '../';
 import { space } from '../../utils/space';
 
 const meta: Meta< typeof Spinner > = {
-	tags: [ 'manifest' ],
 	title: 'Components/Feedback/Spinner',
 	id: 'components-spinner',
 	component: Spinner,
@@ -13,8 +12,9 @@ const meta: Meta< typeof Spinner > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'recommended',
+			status: 'not-recommended',
 			whereUsed: 'global',
+			notes: 'Use [`Spinner`](?path=/docs/design-system-components-spinner--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };

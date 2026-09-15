@@ -4,6 +4,12 @@ import { formDecorator } from './story-utils';
 import { ValidatedContentEditableControl } from '../content-editable-control';
 
 const meta: Meta< typeof ValidatedContentEditableControl > = {
+	parameters: {
+		// FIXME: Contenteditable control is unlabeled (label).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+
 	title: 'Components/Selection & Input/Validated Form Controls/ValidatedContentEditableControl',
 	id: 'components-validatedcontenteditablecontrol',
 	component: ValidatedContentEditableControl,
