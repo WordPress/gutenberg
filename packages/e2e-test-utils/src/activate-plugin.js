@@ -26,6 +26,9 @@ export async function activatePlugin( slug ) {
 	if ( ! isCurrentURL( 'plugins.php' ) ) {
 		await visitAdminPage( 'plugins.php' );
 	}
-	await page.waitForSelector( `tr[data-slug="${ slug }"] .deactivate a` );
+	// Puppeteer's 30-second default is too short for this page under CI load.
+	await page.waitForSelector( `tr[data-slug="${ slug }"] .deactivate a`, {
+		timeout: 60000,
+	} );
 	await switchUserToTest();
 }

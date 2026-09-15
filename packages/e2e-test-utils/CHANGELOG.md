@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-    Increase the `waitForSelector` timeout in `activatePlugin`/`deactivatePlugin` from Puppeteer's 30-second default to 60 seconds, to avoid spurious CI failures under resource contention.
+
 ## 10.13.0 (2023-09-20)
 
 ### Enhancement
