@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Show the selected crop aspect ratio in a native select in the compact image controls.
+-   Show the selected crop aspect ratio in a native select in the compact image controls ([#82969](https://github.com/WordPress/gutenberg/pull/82969)).
 
 ## 0.19.0 (2026-09-23)
 
