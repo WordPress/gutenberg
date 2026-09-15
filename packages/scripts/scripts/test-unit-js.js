@@ -16,8 +16,9 @@ try {
 		throw error;
 	}
 	console.error(
-		'wp-scripts test-unit-js requires Vitest 5 and Vite. ' +
-			'Install them with npm install --save-dev vitest@^5 vite@^8.'
+		'wp-scripts test-unit-js requires Vitest 5 and Vite 7 or 8. ' +
+			'Install Vitest with npm install --save-dev vitest@^5. ' +
+			'Keep your existing Vite 7 or 8, or install it with npm install --save-dev "vite@^7 || ^8".'
 	);
 	process.exit( 1 );
 }

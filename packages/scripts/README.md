@@ -446,10 +446,12 @@ This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll l
 
 ### `test-unit-js`
 
-Runs the consumer's installed [Vitest](https://vitest.dev/) once. Install Vitest and Vite in the project that owns the tests:
+Runs the consumer's installed [Vitest](https://vitest.dev/) once. Install the test runner in the project that owns the tests.
+
+If your project already uses Vite 7 or 8, keep it and install only `vitest@^5`. Otherwise, install both packages:
 
 ```sh
-npm install --save-dev vitest@^5 vite@^8
+npm install --save-dev vitest@^5 "vite@^7 || ^8"
 ```
 
 ```json

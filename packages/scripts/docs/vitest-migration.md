@@ -160,8 +160,10 @@ Install Vitest and Vite as direct development dependencies in the consumer. They
 
 ## Start with Node
 
+If your project already uses Vite 7 or 8, keep it and install only `vitest@^5`. Otherwise, install both packages:
+
 ```sh
-npm install --save-dev vitest@^5 vite@^8
+npm install --save-dev vitest@^5 "vite@^7 || ^8"
 ```
 
 ```json
