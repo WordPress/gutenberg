@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add `optimizeExistingItem` action and a `FetchRemoteFile` operation (with a `fetchFile` utility) to re-process an already-uploaded attachment client-side: fetch the original, re-compress it, regenerate sub-sizes, and upload the result as a new attachment ([#79509](https://github.com/WordPress/gutenberg/pull/79509)).
+
 ## 0.40.0 (2026-09-10)
 
 ### Bug Fixes
