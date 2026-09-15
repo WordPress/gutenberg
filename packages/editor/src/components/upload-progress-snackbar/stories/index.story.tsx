@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Snackbar } from '@wordpress/components';
-import { UPLOAD_DONE, UPLOAD_SPINNER } from '../index';
+import { UPLOAD_DONE, UPLOAD_SPINNER, uploadProgressBar } from '../index';
 
 /**
  * The `UploadProgressSnackbar` component itself renders no UI: it manages a
@@ -41,6 +41,19 @@ export const UploadingMultiple: Story = {
 	},
 };
 
+/**
+ * Shown while a long-running client-side operation (currently GIF-to-video
+ * conversion) reports determinate progress: the spinner is replaced with a
+ * progress bar and the verb changes to "Processing".
+ */
+export const Processing: Story = {
+	args: {
+		icon: uploadProgressBar( 60 ),
+		children: 'Processing — dancing-megaman.gif',
+		explicitDismiss: true,
+	},
+};
+
 export const Complete: Story = {
 	args: {
 		icon: UPLOAD_DONE,
@@ -67,6 +80,9 @@ export const AllStates: Story = {
 			</Snackbar>
 			<Snackbar icon={ UPLOAD_SPINNER } explicitDismiss>
 				Uploading 1 of 3 — sunset-over-the-bay.jpg
+			</Snackbar>
+			<Snackbar icon={ uploadProgressBar( 60 ) } explicitDismiss>
+				Processing — dancing-megaman.gif
 			</Snackbar>
 			<Snackbar icon={ UPLOAD_DONE }>Upload complete</Snackbar>
 		</div>
