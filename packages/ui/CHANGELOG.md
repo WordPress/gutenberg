@@ -34,6 +34,7 @@
 
 -   Update `@base-ui/react` from 1.7.0 to 1.8.0 ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
 -   Run UI interaction tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+- `VisuallyHidden`: Replace deprecated `word-wrap` with `overflow-wrap` and remove related Stylelint suppression ([#82970](https://github.com/WordPress/gutenberg/pull/82970)).
 
 ## 0.22.0 (2026-09-10)
 
