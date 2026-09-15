@@ -7,16 +7,16 @@ These tests live in the internal `@wordpress/integration-tests` workspace packag
 
 Unlike unit tests that test individual functions in isolation, these tests exercise multiple packages working together. They cover:
 
-| Test file | What it tests |
-|---|---|
-| `blocks-schema.test.js` | Validates all `block.json` files in the repo against the JSON schema |
-| `theme-schema.test.js` | Validates all `theme.json` files in the repo against the JSON schema |
-| `wp-env-schema.test.js` | Validates `.wp-env.json` against the JSON schema |
-| `blocks-raw-handling.jsdom.test.js` | Tests raw paste/HTML handling across the full block pipeline |
-| `full-content/full-content.jsdom.test.js` | Tests full block serialization round-trips using fixtures |
-| `is-valid-block.jsdom.test.js` | Tests block validation with editor hooks applied |
-| `shortcode-converter.jsdom.test.js` | Tests shortcode-to-block conversion |
-| `non-matched-tags-handling.jsdom.test.js` | Tests handling of unrecognized HTML tags during paste |
+| Test file                                 | What it tests                                                        |
+| ----------------------------------------- | -------------------------------------------------------------------- |
+| `blocks-schema.test.js`                   | Validates all `block.json` files in the repo against the JSON schema |
+| `theme-schema.test.js`                    | Validates all `theme.json` files in the repo against the JSON schema |
+| `wp-env-schema.test.js`                   | Validates `.wp-env.json` against the JSON schema                     |
+| `blocks-raw-handling.jsdom.test.js`       | Tests raw paste/HTML handling across the full block pipeline         |
+| `full-content/full-content.jsdom.test.js` | Tests full block serialization round-trips using fixtures            |
+| `is-valid-block.jsdom.test.js`            | Tests block validation with editor hooks applied                     |
+| `shortcode-converter.jsdom.test.js`       | Tests shortcode-to-block conversion                                  |
+| `non-matched-tags-handling.jsdom.test.js` | Tests handling of unrecognized HTML tags during paste                |
 
 ## Running the Tests
 
@@ -60,13 +60,13 @@ npm run fixtures:regenerate
 
 `theme-schema.test.js` decides what to expect from where a file sits, so adding a case means adding a file and nothing else.
 
-| Location | Expectation |
-|---|---|
+| Location                                                                 | Expectation                           |
+| ------------------------------------------------------------------------ | ------------------------------------- |
 | any `theme.json` under `lib/`, `phpunit/`, `test/`, or `packages/*/src/` | must validate, and must set `$schema` |
-| any `.json` file directly in `fixtures/schemas/` | must fail validation |
+| any `.json` file directly in `fixtures/schemas/`                         | must fail validation                  |
 
 Name an invalid fixture after the schema definition that rejects it, adding a `_suffix` when one definition needs several cases, as in `stylesPropertiesAndElementsComplete_pseudo.json`. Nothing enforces the name, so check the failure comes from the definition you meant to test.
 
-## Jest Configuration
+## Vitest configuration
 
-These tests reuse the Jest configuration from `test/unit/jest.config.js`. There is no separate Jest config in this directory — `test/unit`'s config sets `rootDir` to the repo root, which automatically discovers tests in this directory.
+These tests use [the shared Vitest configuration](/test/unit/vitest.config.mjs), which discovers tests from the repository root. The [filename-based environment conventions](/docs/contributors/code/testing-overview.md#folder-structure) select Node, jsdom, or Browser Mode. Run a focused set with `npm run test:unit -- test/integration/<path>`.
