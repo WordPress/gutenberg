@@ -2,8 +2,16 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Show the selected widget width in its options menu and add an ellipsis to
+    the reset action that opens a confirmation dialog ([#81929](https://github.com/WordPress/gutenberg/pull/81929)).
+
 ### Internal
 
+-   Use UI Spinner and remove the direct Components dependency ([#82837](https://github.com/WordPress/gutenberg/pull/82837)).
+-   Migrate dashboard menus from the private Components API to the public
+    `@wordpress/ui` Menu ([#81929](https://github.com/WordPress/gutenberg/pull/81929)).
 -   Run rendered Widget Dashboard tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
 
 ## 0.7.0 (2026-09-10)

@@ -199,6 +199,11 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/block-bindings/test/attribute-control.jsdom.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/components/block-breadcrumb/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -338,9 +343,6 @@
 		}
 	},
 	"packages/block-editor/src/components/block-inspector/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -760,6 +762,11 @@
 		}
 	},
 	"packages/block-editor/src/components/block-variation-transforms/index.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-variation-transforms/test/index.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4663,11 +4670,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/grid/hook.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/input-control/input-field.tsx": {
 		"react-hooks/immutability": {
 			"count": 2
@@ -5838,11 +5840,6 @@
 			"count": 1
 		}
 	},
-	"packages/edit-widgets/src/components/more-menu/tools-more-menu-group.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/edit-widgets/src/components/notices/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -6191,16 +6188,6 @@
 		}
 	},
 	"packages/editor/src/components/more-menu/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/more-menu/tools-more-menu-group.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/more-menu/view-more-menu-group.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -7490,16 +7477,10 @@
 	"packages/global-styles-ui/src/presets/preset-edit-header.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/presets/preset-group.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"no-restricted-imports": {
 			"count": 1
 		}
 	},
@@ -7667,46 +7648,6 @@
 	"packages/interactivity/src/hooks.tsx": {
 		"react-hooks/immutability": {
 			"count": 5
-		}
-	},
-	"packages/interface/src/components/action-item/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/interface/src/components/complementary-area-header/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/interface/src/components/complementary-area-more-menu-item/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/interface/src/components/complementary-area-toggle/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/interface/src/components/complementary-area/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/interface/src/components/fullscreen-mode/test/index.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/interface/src/components/interface-skeleton/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/interface/src/components/pinned-items/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/lazy-editor/src/components/preview/index.tsx": {
@@ -7892,22 +7833,7 @@
 			"count": 1
 		}
 	},
-	"packages/widget-dashboard/src/components/actions-menu/actions-menu.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/widget-dashboard/src/components/commands/commands.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/widget-dashboard/src/components/widget-actions/widget-actions.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/widget-dashboard/src/components/widget-layout-controls/widget-layout-controls.tsx": {
 		"no-restricted-imports": {
 			"count": 1
 		}

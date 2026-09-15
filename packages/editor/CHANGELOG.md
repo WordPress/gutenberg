@@ -5,11 +5,21 @@
 ### Enhancements
 
 -   Remove the `react-autosize-textarea` dependency. The post editor's "Code editor" view now auto-grows with CSS `field-sizing: content`. Browsers without support use a scrollable field ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).
+-   `PostTaxonomiesFlatTermSelector`: The field renders with the `SearchableChipSelectControl` component of `@wordpress/ui` instead of `FormTokenField` ([#80967](https://github.com/WordPress/gutenberg/pull/80967)).
+-   `CollaboratorsPresence`: Show focus ring for avatar stack in header with button's outline instead of previous box-shadow override ([#82941](https://github.com/WordPress/gutenberg/pull/82941)).
 
 ### Bug Fixes
 
+-   Notes: Focus the text field when editing a note ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
+-   Template panel: Hide edit and create actions from users who can't create templates. ([#82858](https://github.com/WordPress/gutenberg/pull/82858))
+-   Featured image field: Only register it for the post types a theme lists in its `post-thumbnails` support, matching the classic panel. ([#82773](https://github.com/WordPress/gutenberg/pull/82773))
 -   `MediaUpload`: Coerce `multiple` to a boolean before passing it to the experimental media modal; callers such as the playlist block and the inserter media tab pass the legacy media frame's `'add'` mode. ([#82715](https://github.com/WordPress/gutenberg/pull/82715))
 -   Document bar: Preserve the subdued template-preview icon color after the icon became stroke-based. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+
+### Internal
+
+-   Notes: Use the public `@wordpress/ui` Menu for note actions instead of the private Components API ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
+-   Post actions: Use the public `Menu` from `@wordpress/ui` instead of the private Components API ([#81922](https://github.com/WordPress/gutenberg/pull/81922)).
 
 ## 15.0.0 (2026-09-10)
 
@@ -27,6 +37,7 @@
 -   Post actions: Append an ellipsis (`…`) to the "Set as homepage" and "Set as posts page" action labels, which open a confirmation dialog, following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
 -   Show a "Privacy Policy Page" badge in the document bar and the post card panel for the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
 -   `PostCardPanel`: Migrate the page-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82500](https://github.com/WordPress/gutenberg/pull/82500)).
+-   `EditorProvider`: Add a `renderingMode` prop for editors that exist to show one rendering mode. It replaces the usual resolution, so the user's saved "Show template" preference cannot override it, and the controls that switch modes are not offered ([#82711](https://github.com/WordPress/gutenberg/pull/82711)).
 
 ### Bug Fixes
 
@@ -42,6 +53,7 @@
 
 ### Internal
 
+-   Global Styles: replace the sidebar action `DropdownMenu` from `@wordpress/components` with the public `Menu` from `@wordpress/ui`. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
 -   Stop passing the unused `editorTool` block editor setting; the selector that read it was removed with the Write/Design tool in [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
 -   Remove the template activation (`active_templates`) experiment: the post-save activation notice, the "Edit template" auto-activation, and template duplication in the actions list ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
 -   Remove unused dependencies `@wordpress/reusable-blocks`, `client-zip` and `fast-deep-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

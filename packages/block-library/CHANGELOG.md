@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Image: Inject the lightbox trigger with a literal string replacement instead of `preg_replace`, so `$` and `\` sequences in author-controlled image attributes (such as a price in the alt text) are no longer interpreted as regex backreferences and silently removed ([#79369](https://github.com/WordPress/gutenberg/pull/79369)).
+-   Cover: Grow the block with its content in Safari when an aspect ratio is set, instead of clipping the overflow. WebKit locks the box to the ratio where other engines let content expand it ([#70152](https://github.com/WordPress/gutenberg/pull/70152)).
+
+### Internal
+
+-   Button: Replace deprecated `word-break: break-word` with `word-break: normal` and `overflow-wrap: anywhere` to clear the Stylelint suppression ([#82854](https://github.com/WordPress/gutenberg/pull/82854)).
+
 ## 11.0.0 (2026-09-10)
 
 ### Breaking Changes
@@ -16,6 +25,7 @@
 
 ### Bug Fixes
 
+-   Navigation: Give the block appender an explicit width so it renders square, matching the appender in other container blocks ([#82718](https://github.com/WordPress/gutenberg/pull/82718)).
 -   Footnotes: Prefix newly created footnote IDs with `fn-` so they always start with a letter. A bare UUID often starts with a digit, and an ID that does is not a valid CSS identifier, so `querySelector( '#' + id )` threw and `#id` style rules never matched. Existing footnotes keep their IDs ([#82398](https://github.com/WordPress/gutenberg/pull/82398)).
 -   Navigation: Restore `flex-grow` on the menu container in the editor, where the visually hidden menu description breaks the `:only-child` selector the front end relies on, so the "Space between" and other justification settings apply in the canvas as they do on the front end ([#78447](https://github.com/WordPress/gutenberg/pull/78447)).
 -   Image: Fix cropped galleries rendering images at their natural height in the editor canvas. The baseline inline `height: auto` is no longer emitted for images inside a cropped gallery, so the gallery's own cropping CSS applies ([#82318](https://github.com/WordPress/gutenberg/pull/82318)).

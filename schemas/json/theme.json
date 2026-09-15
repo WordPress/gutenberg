@@ -2095,6 +2095,37 @@
 				}
 			}
 		},
+		"stylesVariationPartialRootPropertiesComplete": {
+			"description": "Styles at the root of a block style variation partial (a theme.json file with a `blockTypes` property). Supports everything allowed at the top-level styles of a regular theme.json, plus the responsive and pseudo-selector states available to a variation declared inline in theme.json.",
+			"type": "object",
+			"allOf": [
+				{
+					"$ref": "#/definitions/stylesBlocksResponsiveSelectorsWithPseudoProperties"
+				},
+				{
+					"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+				},
+				{
+					"type": "object",
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"enum": [ "elements", "blocks", "variations" ]
+							},
+							{
+								"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
+							},
+							{
+								"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+							}
+						]
+					}
+				}
+			]
+		},
 		"stylesBlockVariationsWithPseudoProperties": {
 			"description": "Block style variations for blocks that support pseudo-selectors. Each variation supports the same style properties, responsive states and pseudo-selectors as the block itself.",
 			"type": "object",
@@ -3520,7 +3551,7 @@
 			]
 		},
 		"styles": {
-			"description": "Organized way to set CSS properties. Styles in the top-level will be added in the `body` selector.",
+			"description": "Organized way to set CSS properties. Styles in the top-level will be added in the `body` selector.\n\nIn a block style variation partial (a theme.json file with a `blockTypes` property), the styles are scoped to the listed block types instead, and the responsive (`@mobile`, `@tablet`) and pseudo-selector (`:hover`, `:focus`, `:focus-visible`, `:active`) states available to block style variations are also allowed at this level.",
 			"allOf": [
 				{
 					"$ref": "#/definitions/stylesProperties"
@@ -3537,19 +3568,6 @@
 						"variations": {
 							"$ref": "#/definitions/stylesVariationsProperties"
 						}
-					}
-				},
-				{
-					"type": "object",
-					"propertyNames": {
-						"anyOf": [
-							{
-								"$ref": "#/definitions/stylesPropertyNames"
-							},
-							{
-								"enum": [ "elements", "blocks", "variations" ]
-							}
-						]
 					}
 				}
 			]
@@ -3610,6 +3628,40 @@
 			"type": "array",
 			"items": {
 				"type": "string"
+			}
+		}
+	},
+	"if": {
+		"type": "object",
+		"required": [ "blockTypes" ],
+		"properties": {
+			"blockTypes": {
+				"type": "array",
+				"minItems": 1
+			}
+		}
+	},
+	"then": {
+		"properties": {
+			"styles": {
+				"$ref": "#/definitions/stylesVariationPartialRootPropertiesComplete"
+			}
+		}
+	},
+	"else": {
+		"properties": {
+			"styles": {
+				"type": "object",
+				"propertyNames": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/stylesPropertyNames"
+						},
+						{
+							"enum": [ "elements", "blocks", "variations" ]
+						}
+					]
+				}
 			}
 		}
 	},

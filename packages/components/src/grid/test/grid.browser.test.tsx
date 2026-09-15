@@ -107,6 +107,22 @@ describe( 'props', () => {
 		expect( style.justifyContent ).toBe( 'space-between' );
 	} );
 
+	test( 'should ignore unsupported runtime alignment values', async () => {
+		await render(
+			<Grid
+				// @ts-expect-error Runtime JavaScript consumers can pass unsupported values.
+				alignment="unsupported"
+				data-testid="grid"
+			>
+				<View />
+			</Grid>
+		);
+
+		const style = readStyle();
+		expect( style.alignItems ).toBe( 'normal' );
+		expect( style.justifyContent ).toBe( 'normal' );
+	} );
+
 	test( 'should render justify', async () => {
 		await render(
 			<Grid justify="flex-start" data-testid="grid">
@@ -170,5 +186,157 @@ describe( 'props', () => {
 		const style = readStyle();
 		expect( style.display ).toBe( 'grid' );
 		expect( style.gridTemplateRows ).toBe( '126px 24px 126px' );
+	} );
+} );
+
+describe( 'style composition', () => {
+	test( 'specific layout props override their fallbacks', async () => {
+		await render(
+			<Grid
+				data-testid="grid"
+				alignment="spaced"
+				align="end"
+				justify="end"
+				gap={ 5 }
+				rowGap={ 0 }
+				columnGap="2em"
+				style={ { fontSize: 14 } }
+			>
+				<View />
+			</Grid>
+		);
+		const style = getComputedStyle( screen.getByTestId( 'grid' ) );
+		expect( style.alignItems ).toBe( 'center' );
+		expect( style.justifyContent ).toBe( 'space-between' );
+		expect( style.rowGap ).toBe( '0px' );
+		expect( style.columnGap ).toBe( '28px' );
+	} );
+
+	test( 'nested Grids use their own layout props', async () => {
+		await render(
+			<Grid
+				columns={ 1 }
+				rows={ 2 }
+				rowGap={ 40 }
+				columnGap={ 50 }
+				align="end"
+				justify="end"
+			>
+				<Grid data-testid="grid" style={ { width: 300 } }>
+					<View />
+					<View />
+				</Grid>
+			</Grid>
+		);
+		const style = getComputedStyle( screen.getByTestId( 'grid' ) );
+		expect( style.gridTemplateColumns ).toBe( '144px 144px' );
+		expect( style.rowGap ).toBe( '12px' );
+		expect( style.columnGap ).toBe( '12px' );
+		expect( style.alignItems ).toBe( 'normal' );
+		expect( style.justifyContent ).toBe( 'normal' );
+	} );
+
+	test( 'inline styles override layout props', async () => {
+		await render(
+			<Grid
+				data-testid="grid"
+				align="end"
+				gap={ 5 }
+				columns={ 3 }
+				style={ {
+					display: 'flex',
+					gap: 9,
+					alignItems: 'start',
+					gridTemplateColumns: '50px',
+				} }
+			>
+				<View />
+			</Grid>
+		);
+		const style = getComputedStyle( screen.getByTestId( 'grid' ) );
+		expect( style.display ).toBe( 'flex' );
+		expect( style.gap ).toBe( '9px' );
+		expect( style.alignItems ).toBe( 'start' );
+		expect( style.gridTemplateColumns ).toBe( '50px' );
+	} );
+
+	test( 'consumer stylesheets retain precedence', async () => {
+		const consumerStyle = document.createElement( 'style' );
+		consumerStyle.textContent =
+			'.grid-consumer.grid-consumer, .grid-disabled { align-items: end; justify-content: end; grid-template-columns: 100px; grid-template-rows: 90px; }';
+		document.head.prepend( consumerStyle );
+
+		try {
+			await render(
+				<>
+					<Grid
+						data-testid="grid-with-props"
+						className="grid-consumer"
+						align="start"
+						justify="start"
+						columns={ 3 }
+						rows={ 2 }
+					>
+						<View />
+					</Grid>
+					<Grid
+						data-testid="grid-with-disabled-tracks"
+						className="grid-disabled"
+						columns={ [ 0 ] }
+						rows={ [ 0 ] }
+					>
+						<View />
+					</Grid>
+				</>
+			);
+
+			for ( const testId of [
+				'grid-with-props',
+				'grid-with-disabled-tracks',
+			] ) {
+				const style = getComputedStyle( screen.getByTestId( testId ) );
+				expect( style.alignItems ).toBe( 'end' );
+				expect( style.justifyContent ).toBe( 'end' );
+				expect( style.gridTemplateColumns ).toBe( '100px' );
+				expect( style.gridTemplateRows ).toBe( '90px' );
+			}
+		} finally {
+			consumerStyle.remove();
+		}
+	} );
+
+	test( 'CSS-wide values apply to the layout properties', async () => {
+		await render(
+			<div
+				style={ {
+					display: 'grid',
+					alignItems: 'end',
+					justifyContent: 'end',
+					rowGap: 27,
+					columnGap: 29,
+					gridTemplateColumns: '300px',
+					gridTemplateRows: '100px',
+				} }
+			>
+				<Grid
+					data-testid="grid"
+					align="inherit"
+					justify="inherit"
+					rowGap="inherit"
+					columnGap="inherit"
+					templateColumns="inherit"
+					templateRows="inherit"
+				>
+					<View />
+				</Grid>
+			</div>
+		);
+		const style = getComputedStyle( screen.getByTestId( 'grid' ) );
+		expect( style.alignItems ).toBe( 'end' );
+		expect( style.justifyContent ).toBe( 'end' );
+		expect( style.rowGap ).toBe( '27px' );
+		expect( style.columnGap ).toBe( '29px' );
+		expect( style.gridTemplateColumns ).toBe( '300px' );
+		expect( style.gridTemplateRows ).toBe( '100px' );
 	} );
 } );
