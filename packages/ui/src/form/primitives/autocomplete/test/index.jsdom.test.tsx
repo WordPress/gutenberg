@@ -93,8 +93,7 @@ describe( 'Autocomplete', () => {
 			} );
 		} );
 
-		// TODO: Remove with the `Autocomplete.List` override after updating to Base UI >= 1.8.0
-		it( 'does not set `aria-orientation`, which `role="grid"` disallows', async () => {
+		it( 'uses grid semantics for grouped items', async () => {
 			render(
 				<Autocomplete.Root items={ GRID_ITEMS } grid inline open>
 					<Autocomplete.List>
@@ -121,6 +120,9 @@ describe( 'Autocomplete', () => {
 
 			expect( await screen.findByRole( 'grid' ) ).not.toHaveAttribute(
 				'aria-orientation'
+			);
+			expect( screen.getAllByRole( 'rowgroup' ) ).toHaveLength(
+				GRID_ITEMS.length
 			);
 		} );
 	} );

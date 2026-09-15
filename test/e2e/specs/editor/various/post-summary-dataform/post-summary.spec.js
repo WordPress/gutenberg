@@ -1,4 +1,8 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	test,
+	expect,
+	Editor,
+} = require( '@wordpress/e2e-test-utils-playwright' );
 const { EXPERIMENTS, EDITOR_CONTEXTS, openPostSummary } = require( './utils' );
 
 /*
@@ -397,6 +401,86 @@ test.describe( 'Post Summary', () => {
 					)
 				)
 				.toBe( secondAuthor.id );
+		} );
+	} );
+
+	test.describe( 'without publish capability', () => {
+		let postId;
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			const contributor = await requestUtils.createUser( {
+				username: 'contributor',
+				email: 'contributor@example.com',
+				password: 'contributorpassword',
+				roles: [ 'contributor' ],
+			} );
+			const post = await requestUtils.createPost( {
+				title: 'Contributor draft',
+				status: 'draft',
+				author: contributor.id,
+			} );
+			postId = post.id;
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPosts();
+			await requestUtils.deleteAllUsers();
+		} );
+
+		test( 'hides the date, author and password fields for a contributor', async ( {
+			browser,
+			requestUtils,
+		} ) => {
+			const context = await browser.newContext( {
+				baseURL: requestUtils.baseURL,
+				storageState: { cookies: [], origins: [] },
+			} );
+			const page = await context.newPage();
+			await page.goto( '/wp-login.php' );
+			await page
+				.getByLabel( 'Username or Email Address' )
+				.fill( 'contributor' );
+			await page
+				.getByLabel( 'Password', { exact: true } )
+				.fill( 'contributorpassword' );
+			await page.getByRole( 'button', { name: 'Log In' } ).click();
+			await page.waitForURL( '**/wp-admin/**' );
+
+			await page.goto(
+				`/wp-admin/post.php?post=${ postId }&action=edit`
+			);
+			await page.waitForFunction( () => !! window.wp?.data );
+			await page.evaluate( () => {
+				window.wp.data
+					.dispatch( 'core/preferences' )
+					.set( 'core/edit-post', 'welcomeGuide', false );
+			} );
+
+			const summary = await openPostSummary( {
+				editor: new Editor( { page } ),
+				page,
+			} );
+			await expect(
+				summary.getByRole( 'button', { name: 'Edit Status' } )
+			).toBeVisible();
+			await expect(
+				summary.getByRole( 'button', { name: 'Edit Date' } )
+			).toBeHidden();
+			await expect(
+				summary.getByRole( 'button', { name: 'Edit Author' } )
+			).toBeHidden();
+
+			await summary
+				.getByRole( 'button', { name: 'Edit Status' } )
+				.click();
+			await expect(
+				page.getByRole( 'radio', { name: 'Draft' } )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'checkbox', { name: 'Password protected' } )
+			).toBeHidden();
+
+			await context.close();
 		} );
 	} );
 
