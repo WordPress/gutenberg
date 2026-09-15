@@ -19,7 +19,12 @@ import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function Notes( { notes, sidebarRef, isFloating = false } ) {
+export function Notes( {
+	notes,
+	sidebarRef,
+	isFloating = false,
+	isCompact = false,
+} ) {
 	const {
 		onCreate: onAddReply,
 		onEdit: onEditNote,
@@ -296,6 +301,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 								onDeleteNote={ handleDelete }
 								onEditNote={ onEditNote }
 								isSelected={ selectedNote === thread.id }
+								isCompact={ isCompact }
 								sidebarRef={ sidebarRef }
 								floating={
 									isFloating
