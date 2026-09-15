@@ -107,7 +107,7 @@ class WP_Block_Supports_Position_Test extends WP_UnitTestCase {
 			'Position block wrapper markup should be correct'
 		);
 
-		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 
 		$this->assertMatchesRegularExpression(
 			$expected_styles,

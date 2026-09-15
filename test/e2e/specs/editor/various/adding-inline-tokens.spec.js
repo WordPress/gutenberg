@@ -16,7 +16,7 @@ test.describe( 'adding inline tokens', () => {
 	} ) => {
 		// Create a paragraph.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( 'a ' );

@@ -21,6 +21,20 @@ export { metadata, name };
 export const settings = {
 	icon,
 	template: TEMPLATE,
+	__experimentalLabel( attributes, { context } ) {
+		const { label } = attributes;
+
+		const customName = attributes?.metadata?.name;
+		const hasLabel = label?.trim().length > 0;
+
+		if ( context === 'list-view' && ( customName || hasLabel ) ) {
+			return customName || label;
+		}
+
+		if ( context === 'breadcrumb' && customName ) {
+			return customName;
+		}
+	},
 	edit,
 	save,
 };

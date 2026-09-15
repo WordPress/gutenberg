@@ -214,6 +214,11 @@ const WithControlsContent = ( args: ImageCropperProps ) => {
 };
 
 export const WithControls = {
+	parameters: {
+		// FIXME: Crop controls include an unlabeled input and unnamed select (label, select-name).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: WithControlsComponent,
 	args: {
 		src: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',

@@ -67,12 +67,14 @@ jobs:
                   NODE_ENV: test
               run: npm run storybook:e2e:build
 
-            # The Storybook test runner only launches Chromium.
+            # The story tests only launch Chromium.
             - name: Install Playwright browsers
               uses: ./.github/setup-playwright
               with:
                   workspace: '@wordpress/storybook'
                   browsers: chromium
 
-            - name: Serve Storybook and run tests
+            # Vitest renders every story in Chromium through the Storybook
+            # plugin. A render or play function error fails the job.
+            - name: Run story tests
               run: npm run --workspace @wordpress/storybook test:smoke

@@ -18,7 +18,6 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	retrieveSelectedAttribute,
 	findRichTextAttributeKey,
@@ -322,13 +321,31 @@ export const multiSelect =
 		} );
 
 		const blockCount = select.getSelectedBlockCount();
+		const nestedBlockCount = select.getClientIdsOfDescendants(
+			select.getMultiSelectedBlockClientIds()
+		).length;
 
 		speak(
-			sprintf(
-				/* translators: %s: number of selected blocks */
-				_n( '%s block selected.', '%s blocks selected.', blockCount ),
-				blockCount
-			),
+			nestedBlockCount
+				? sprintf(
+						/* translators: 1: number of selected blocks. 2: number of blocks including nested blocks. */
+						_n(
+							'%1$s block selected, %2$s including nested blocks.',
+							'%1$s blocks selected, %2$s including nested blocks.',
+							blockCount
+						),
+						blockCount,
+						blockCount + nestedBlockCount
+				  )
+				: sprintf(
+						/* translators: %s: number of selected blocks */
+						_n(
+							'%s block selected.',
+							'%s blocks selected.',
+							blockCount
+						),
+						blockCount
+				  ),
 			'assertive'
 		);
 	};
@@ -1353,7 +1370,20 @@ export const mergeBlocks =
 			return;
 		}
 
-		if ( isUnmodifiedDefaultBlock( blockA ) ) {
+		// An unmodified default block adds nothing to the merge. Neither
+		// does an empty text block of a different type, where merging would
+		// transform blockB into blockA's type instead (a paragraph deleted
+		// into an empty heading became a heading), so remove blockA in both
+		// cases. The merge function requirement keeps containers out: a
+		// columns block has no content attributes, so it would otherwise
+		// always count as empty and be removed on Backspace instead of
+		// selected.
+		if (
+			isUnmodifiedDefaultBlock( blockA ) ||
+			( !! blockAType.merge &&
+				blockA.name !== blockB.name &&
+				isUnmodifiedBlock( blockA, 'content' ) )
+		) {
 			const isASelected = select.isBlockSelected( clientIdA );
 
 			if ( isASelected ) {
@@ -1790,21 +1820,24 @@ export const __unstableMarkAutomaticChange =
 	};
 
 /**
- * Action that sets the editor mode
+ * Action that used to set the editor mode (Write/Design tool).
  *
- * @param {string} mode Editor mode
+ * @deprecated
+ *
+ * @return {Object} Action object.
  */
-export const __unstableSetEditorMode =
-	( mode ) =>
-	( { registry } ) => {
-		registry.dispatch( preferencesStore ).set( 'core', 'editorTool', mode );
-
-		if ( mode === 'navigation' ) {
-			speak( __( 'You are currently in Write mode.' ) );
-		} else if ( mode === 'edit' ) {
-			speak( __( 'You are currently in Design mode.' ) );
+export function __unstableSetEditorMode() {
+	deprecated(
+		'wp.data.dispatch( "core/block-editor" ).__unstableSetEditorMode',
+		{
+			since: '7.2',
+			hint: 'The Write/Design editor tool has been removed.',
 		}
+	);
+	return {
+		type: 'DO_NOTHING',
 	};
+}
 
 /**
  * Set the block moving client ID.

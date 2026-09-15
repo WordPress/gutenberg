@@ -1,4 +1,3 @@
-import type { ReactNode, ComponentProps, ReactElement } from 'react';
 import clsx from 'clsx';
 import {
 	useContext,
@@ -29,44 +28,9 @@ import DataViewsViewConfig, {
 import normalizeFields from '../field-types';
 import useData from '../hooks/use-data';
 import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
-import type { Action, Field, View, SupportedLayouts } from '../types';
+import usePageClamp from '../hooks/use-page-clamp';
+import type { SupportedLayouts, DataViewsProps, ItemWithId } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
-type ItemWithId = { id: string };
-
-type DataViewsProps< Item > = {
-	view: View;
-	onChangeView: ( view: View ) => void;
-	fields: Field< Item >[];
-	search?: boolean;
-	searchLabel?: string;
-	actions?: Action< Item >[];
-	data: Item[];
-	isLoading?: boolean;
-	paginationInfo: {
-		totalItems: number;
-		totalPages: number;
-	};
-	defaultLayouts?: SupportedLayouts;
-	selection?: string[];
-	onChangeSelection?: ( items: string[] ) => void;
-	onClickItem?: ( item: Item ) => void;
-	renderItemLink?: (
-		props: {
-			item: Item;
-		} & ComponentProps< 'a' >
-	) => ReactElement;
-	isItemClickable?: ( item: Item ) => boolean;
-	header?: ReactNode;
-	getItemLevel?: ( item: Item ) => number;
-	children?: ReactNode;
-	config?: {
-		perPageSizes: number[];
-	};
-	empty?: ReactNode;
-	onReset?: ( () => void ) | false;
-} & ( Item extends ItemWithId
-	? { getItemId?: ( item: Item ) => string }
-	: { getItemId: ( item: Item ) => string } );
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const defaultIsItemClickable = () => true;
@@ -223,6 +187,13 @@ function DataViews< Item >( {
 		paginationInfo,
 		containerRef,
 		setVisibleEntries,
+	} );
+
+	usePageClamp( {
+		view,
+		onChangeView,
+		isLoading,
+		totalPages: paginationInfo.totalPages,
 	} );
 
 	useEffect( () => {

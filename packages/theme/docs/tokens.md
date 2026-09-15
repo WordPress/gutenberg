@@ -205,6 +205,9 @@ The semantic token set is role-based, not a complete matrix of every property, t
 | `--wpds-color-background-surface-caution-weak`                | Background color for surfaces with caution tone and weak emphasis.                                                                          |
 | `--wpds-color-background-surface-error`                       | Background color for surfaces with error tone and normal emphasis.                                                                          |
 | `--wpds-color-background-surface-error-weak`                  | Background color for surfaces with error tone and weak emphasis.                                                                            |
+| `--wpds-color-background-interactive-neutral`                 | Solid background color for neutral interactive controls, such as input fields and unchecked checkboxes.                                     |
+| `--wpds-color-background-interactive-neutral-active`          | Solid background color for neutral interactive controls that are hovered, focused, or active.                                               |
+| `--wpds-color-background-interactive-neutral-disabled`        | Solid background color for neutral interactive controls in their disabled state.                                                            |
 | `--wpds-color-background-interactive-neutral-strong`          | Background color for interactive elements with neutral tone and strong emphasis.                                                            |
 | `--wpds-color-background-interactive-neutral-strong-active`   | Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active.                       |
 | `--wpds-color-background-interactive-neutral-strong-disabled` | Background color for interactive elements with neutral tone and strong emphasis, in their disabled state.                                   |

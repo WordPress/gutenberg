@@ -166,7 +166,7 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		// inserting: an insert dispatched during setup is wiped by the
 		// editor's initial blocks reset.
 		await expect(
-			editor.canvas.getByRole( 'button', { name: 'Add default block' } )
+			editor.canvas.getByRole( 'document', { name: 'Add default block' } )
 		).toBeVisible();
 
 		// The GIF uploads as a normal image attachment and a transcoded
@@ -347,7 +347,7 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		 * the upload queue, so the spinner never cleared.
 		 */
 		await expect(
-			editor.canvas.getByRole( 'button', { name: 'Add default block' } )
+			editor.canvas.getByRole( 'document', { name: 'Add default block' } )
 		).toBeVisible();
 
 		await editor.insertBlock( { name: 'core/image' } );
@@ -431,7 +431,7 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		 * https://github.com/WordPress/gutenberg/issues/80266.
 		 */
 		await expect(
-			editor.canvas.getByRole( 'button', { name: 'Add default block' } )
+			editor.canvas.getByRole( 'document', { name: 'Add default block' } )
 		).toBeVisible();
 
 		await editor.insertBlock( { name: 'core/image' } );

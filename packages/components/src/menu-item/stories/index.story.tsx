@@ -3,6 +3,7 @@ import { link, more, check } from '@wordpress/icons';
 import MenuGroup from '../../menu-group';
 import MenuItem from '..';
 import Shortcut from '../../shortcut';
+import { NavigableMenu } from '../../navigable-container';
 
 const meta: Meta< typeof MenuItem > = {
 	tags: [ 'manifest' ],
@@ -37,9 +38,11 @@ export default meta;
 
 const Template: StoryFn< typeof MenuItem > = ( props ) => {
 	return (
-		<MenuGroup>
-			<MenuItem { ...props }>Menu Item 1</MenuItem>
-		</MenuGroup>
+		<NavigableMenu>
+			<MenuGroup>
+				<MenuItem { ...props }>Menu Item 1</MenuItem>
+			</MenuGroup>
+		</NavigableMenu>
 	);
 };
 

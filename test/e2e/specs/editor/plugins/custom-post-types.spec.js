@@ -18,7 +18,7 @@ test.describe( 'Test Custom Post Types', () => {
 	} ) => {
 		await admin.createNewPost( { postType: 'hierar-no-title' } );
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Parent Post' );
 		await editor.publishPost();
@@ -44,7 +44,7 @@ test.describe( 'Test Custom Post Types', () => {
 		const parentPage = await parentPageLocator.inputValue();
 
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Child Post' );
 		await editor.publishPost();

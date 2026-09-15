@@ -1,6 +1,5 @@
 {
-	"vitest": {
-		"files": [],
-		"directories": []
+	"jest": {
+		"files": []
 	}
 }

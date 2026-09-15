@@ -1,66 +1,41 @@
-import {
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	__experimentalItemGroup as ItemGroup,
-	Button,
-	FlexItem,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
-import { __, sprintf, isRTL } from '@wordpress/i18n';
-import {
-	plus,
-	Icon,
-	chevronLeft,
-	chevronRight,
-	moreVertical,
-} from '@wordpress/icons';
-import { useState } from '@wordpress/element';
-import { Subtitle } from './subtitle';
-import { NavigationButtonAsItem } from './navigation-button';
+import { __, sprintf } from '@wordpress/i18n';
+import { Stack } from '@wordpress/ui';
 import { ScreenHeader } from './screen-header';
 import { ScreenBody } from './screen-body';
-import { getNewIndexFromPresets } from './utils';
-import ConfirmResetShadowDialog from './confirm-reset-shadow-dialog';
+import PresetGroup from './presets/preset-group';
+import { usePresets } from './presets/use-presets';
 import { useSetting } from './hooks';
-import { unlock } from './lock-unlock';
-
-const { Menu } = unlock( componentsPrivateApis );
+import { getNewIndexFromPresets } from './utils';
 
 export const defaultShadow = '6px 6px 9px rgba(0, 0, 0, 0.2)';
 
+interface ShadowPreset {
+	name: string;
+	slug: string;
+	shadow: string;
+}
+
 export default function ShadowsPanel() {
-	const [ defaultShadows ] = useSetting( 'shadow.presets.default' );
-	const [ defaultShadowsEnabled ] = useSetting( 'shadow.defaultPresets' );
-	const [ themeShadows ] = useSetting( 'shadow.presets.theme' );
-	const [ customShadows, setCustomShadows ] = useSetting(
-		'shadow.presets.custom'
-	);
+	const [ defaultEnabled ] = useSetting< boolean >( 'shadow.defaultPresets' );
+	const def = usePresets< ShadowPreset >( 'shadow.presets', 'default' );
+	const theme = usePresets< ShadowPreset >( 'shadow.presets', 'theme' );
+	const custom = usePresets< ShadowPreset >( 'shadow.presets', 'custom' );
 
-	const onCreateShadow = ( shadow: any ) => {
-		setCustomShadows( [ ...( customShadows || [] ), shadow ] );
+	const addCustomShadow = () => {
+		const index = getNewIndexFromPresets( custom.presets, 'shadow-' );
+		custom.setPresets( [
+			...custom.presets,
+			{
+				/* translators: %d: is an index for a preset */
+				name: sprintf( __( 'Shadow %d' ), index ),
+				shadow: defaultShadow,
+				slug: `shadow-${ index }`,
+			},
+		] );
 	};
-
-	const handleResetShadows = () => {
-		setCustomShadows( [] );
-	};
-
-	const [ isResetDialogOpen, setIsResetDialogOpen ] = useState( false );
-
-	const toggleResetDialog = () => setIsResetDialogOpen( ! isResetDialogOpen );
 
 	return (
 		<>
-			{ isResetDialogOpen && (
-				<ConfirmResetShadowDialog
-					text={ __(
-						'Are you sure you want to remove all custom shadows?'
-					) }
-					confirmButtonText={ __( 'Remove' ) }
-					isOpen={ isResetDialogOpen }
-					toggleOpen={ toggleResetDialog }
-					onConfirm={ handleResetShadows }
-				/>
-			) }
 			<ScreenHeader
 				title={ __( 'Shadows' ) }
 				description={ __(
@@ -68,134 +43,49 @@ export default function ShadowsPanel() {
 				) }
 			/>
 			<ScreenBody>
-				<VStack
+				<Stack
+					direction="column"
 					className="global-styles-ui__shadows-panel"
-					spacing={ 7 }
+					gap="xl"
 				>
-					{ defaultShadowsEnabled && (
-						<ShadowList
+					{ defaultEnabled && (
+						<PresetGroup
 							label={ __( 'Default' ) }
-							shadows={ defaultShadows || [] }
-							category="default"
+							items={ def.presets }
+							getEditPath={ ( slug ) =>
+								`/shadows/edit/default/${ slug }`
+							}
 						/>
 					) }
-					{ themeShadows && themeShadows.length > 0 && (
-						<ShadowList
+					{ theme.presets.length > 0 && (
+						<PresetGroup
 							label={ __( 'Theme' ) }
-							shadows={ themeShadows || [] }
-							category="theme"
+							items={ theme.presets }
+							getEditPath={ ( slug ) =>
+								`/shadows/edit/theme/${ slug }`
+							}
 						/>
 					) }
-					<ShadowList
+					<PresetGroup
 						label={ __( 'Custom' ) }
-						shadows={ customShadows || [] }
-						category="custom"
-						canCreate
-						onCreate={ onCreateShadow }
-						onReset={ toggleResetDialog }
+						items={ custom.presets }
+						getEditPath={ ( slug ) =>
+							`/shadows/edit/custom/${ slug }`
+						}
+						addLabel={ __( 'Add shadow' ) }
+						onAdd={ addCustomShadow }
+						menuAction={ {
+							label: __( 'Remove all custom shadows' ),
+							optionsLabel: __( 'Shadow options' ),
+							confirmText: __(
+								'Are you sure you want to remove all custom shadows?'
+							),
+							confirmButtonText: __( 'Remove' ),
+							onConfirm: () => custom.setPresets( [] ),
+						} }
 					/>
-				</VStack>
+				</Stack>
 			</ScreenBody>
 		</>
-	);
-}
-
-interface ShadowListProps {
-	label: string;
-	shadows: any[];
-	category: string;
-	canCreate?: boolean;
-	onCreate?: ( shadow: any ) => void;
-	onReset?: () => void;
-}
-
-function ShadowList( {
-	label,
-	shadows,
-	category,
-	canCreate,
-	onCreate,
-	onReset,
-}: ShadowListProps ) {
-	const handleAddShadow = () => {
-		const newIndex = getNewIndexFromPresets( shadows, 'shadow-' );
-		onCreate?.( {
-			name: sprintf(
-				/* translators: %d: is an index for a preset */
-				__( 'Shadow %d' ),
-				newIndex
-			),
-			shadow: defaultShadow,
-			slug: `shadow-${ newIndex }`,
-		} );
-	};
-
-	return (
-		<VStack spacing={ 2 }>
-			<HStack justify="space-between">
-				<Subtitle level={ 3 }>{ label }</Subtitle>
-				<FlexItem className="global-styles-ui__shadows-panel__options-container">
-					{ canCreate && (
-						<Button
-							size="small"
-							icon={ plus }
-							label={ __( 'Add shadow' ) }
-							onClick={ () => {
-								handleAddShadow();
-							} }
-						/>
-					) }
-					{ !! shadows?.length && category === 'custom' && (
-						<Menu>
-							<Menu.TriggerButton
-								render={
-									<Button
-										size="small"
-										icon={ moreVertical }
-										label={ __( 'Shadow options' ) }
-									/>
-								}
-							/>
-							<Menu.Popover>
-								<Menu.Item onClick={ onReset }>
-									<Menu.ItemLabel>
-										{ __( 'Remove all custom shadows' ) }
-									</Menu.ItemLabel>
-								</Menu.Item>
-							</Menu.Popover>
-						</Menu>
-					) }
-				</FlexItem>
-			</HStack>
-			{ shadows.length > 0 && (
-				<ItemGroup isBordered isSeparated>
-					{ shadows.map( ( shadow ) => (
-						<ShadowItem
-							key={ shadow.slug }
-							shadow={ shadow }
-							category={ category }
-						/>
-					) ) }
-				</ItemGroup>
-			) }
-		</VStack>
-	);
-}
-
-interface ShadowItemProps {
-	shadow: any;
-	category: string;
-}
-
-function ShadowItem( { shadow, category }: ShadowItemProps ) {
-	return (
-		<NavigationButtonAsItem
-			path={ `/shadows/edit/${ category }/${ shadow.slug }` }
-		>
-			<HStack>
-				<FlexItem>{ shadow.name }</FlexItem>
-				<Icon icon={ isRTL() ? chevronLeft : chevronRight } />
-			</HStack>
-		</NavigationButtonAsItem>
 	);
 }

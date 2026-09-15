@@ -19,7 +19,7 @@ test.describe( 'Using Format API', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'First paragraph' );
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
@@ -65,7 +65,7 @@ test.describe( 'Using Format API', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'First paragraph' );
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );

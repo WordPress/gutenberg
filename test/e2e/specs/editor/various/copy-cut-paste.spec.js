@@ -11,7 +11,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Copy - collapsed selection' );
 		await page.keyboard.press( 'Enter' );
@@ -31,7 +31,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Cut - collapsed selection' );
 		await page.keyboard.press( 'Enter' );
@@ -89,7 +89,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( 'First block' );
@@ -243,7 +243,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A block' );
 		await page.keyboard.press( 'Enter' );
@@ -276,7 +276,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A block' );
 		await editor.insertBlock( { name: 'core/spacer' } );
@@ -310,7 +310,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A block' );
 		await page.keyboard.press( 'Enter' );
@@ -343,7 +343,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A block' );
 		await editor.insertBlock( { name: 'core/spacer' } );

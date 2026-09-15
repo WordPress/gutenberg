@@ -5,6 +5,7 @@ import { parseArgs } from 'util';
 import path from 'path';
 import fs from 'fs';
 import spawn from 'cross-spawn';
+import { spawnWatchProcess, stopWatchProcess } from './process.mjs';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
@@ -70,23 +71,6 @@ function exec( command, args = [], options = {} ) {
 		} );
 
 		child.on( 'error', reject );
-	} );
-}
-
-/**
- * Execute a command without waiting for it to complete.
- * Used for starting watch processes.
- *
- * @param {string}   command Command to execute.
- * @param {string[]} args    Command arguments.
- * @param {Object}   options Spawn options.
- * @return {Object} Child process.
- */
-function execAsync( command, args = [], options = {} ) {
-	return spawn( command, args, {
-		cwd: ROOT_DIR,
-		stdio: 'inherit',
-		...options,
 	} );
 }
 
@@ -214,11 +198,11 @@ async function dev() {
 		// Start TypeScript watch (unless types are skipped).
 		const tscWatch = skipTypes
 			? null
-			: execAsync( 'tsc', [
-					'--build',
-					'--watch',
-					'--preserveWatchOutput',
-			  ] );
+			: spawnWatchProcess(
+					'tsc',
+					[ '--build', '--watch', '--preserveWatchOutput' ],
+					{ cwd: ROOT_DIR, stdio: 'inherit' }
+			  );
 
 		// Start package build watch and wait for initial build to complete
 		// before signaling ready. wp-build outputs "Watching for changes..."
@@ -232,7 +216,7 @@ async function dev() {
 		// Handle process termination
 		const cleanup = () => {
 			console.log( '\n\n👋 Stopping watch mode...' );
-			tscWatch?.kill();
+			stopWatchProcess( tscWatch );
 			buildWatch.kill();
 			readyMarkerFile.cleanup();
 			process.exit( 0 );

@@ -25,4 +25,8 @@
 	flex-direction: column;
 	height: 100%;
 	min-height: 0;
+
+	/* Same tile spacing bridge as the live chrome, so previews stay faithful. */
+	--wp-ui-card-padding: var(--wp-widget-dashboard-tile-padding, var(--wpds-dimension-padding-2xl));
+	--wp-ui-card-header-content-gap: var(--wp-widget-dashboard-tile-header-gap, var(--wp-widget-dashboard-tile-padding, var(--wpds-dimension-gap-xl)));
 }

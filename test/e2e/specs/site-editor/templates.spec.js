@@ -11,8 +11,7 @@ test.describe( 'Templates', () => {
 
 	test( 'Create a custom template', async ( { admin, page } ) => {
 		const templateName = 'demo';
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Templates' } ).click();
+		await admin.visitSiteEditor( { postType: 'wp_template' } );
 		await page.getByRole( 'button', { name: 'Add template' } ).click();
 		await page
 			.getByRole( 'button', {
@@ -44,8 +43,7 @@ test.describe( 'Templates', () => {
 		page,
 		admin,
 	} ) => {
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Templates' } ).click();
+		await admin.visitSiteEditor( { postType: 'wp_template' } );
 
 		// Search templates
 		await page.getByRole( 'searchbox', { name: 'Search' } ).fill( 'Index' );

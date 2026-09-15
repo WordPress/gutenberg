@@ -1,6 +1,9 @@
 import { dispatch } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
-import { registerCoreBlocks } from '@wordpress/block-library';
+import {
+	registerCoreBlocks,
+	// @ts-expect-error - No type declarations available for @wordpress/block-library
+} from '@wordpress/block-library';
 
 let bootstrapped = false;
 
