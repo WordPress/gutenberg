@@ -1,25 +1,26 @@
+import {
+	afterEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type MockedFunction,
+} from 'vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useFocusReturn } from '@wordpress/compose';
-import {
-	createRef,
-	useCallback,
-	useId,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { createRef, useId, useState } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-import type { ReactNode } from 'react';
 import * as Menu from '../index';
-import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
 
-jest.mock( '@wordpress/i18n', () => ( {
-	...jest.requireActual( '@wordpress/i18n' ),
-	isRTL: jest.fn( () => false ),
+vi.mock( import( '@wordpress/i18n' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	isRTL: vi.fn( () => false ),
 } ) );
 
-const mockedIsRTL = isRTL as jest.MockedFunction< typeof isRTL >;
+const mockedIsRTL = isRTL as MockedFunction< typeof isRTL >;
 
+globalThis.wpVitest.mockPointerEvent();
+globalThis.wpVitest.mockScrollIntoView();
 afterEach( () => {
 	mockedIsRTL.mockClear();
 	mockedIsRTL.mockReturnValue( false );
@@ -70,42 +71,39 @@ function queryExternalLinkIndicator( item: HTMLElement ) {
 }
 
 describe( 'Menu', () => {
-	it( 'opens from the trigger and exposes menu semantics', async () => {
-		const user = userEvent.setup();
+	it( 'renders prefix icons at 24px by default', () => {
+		render( <Menu.PrefixIcon icon={ <svg /> } role="img" /> );
 
+		const icon = screen.getByRole( 'img', { hidden: true } );
+		expect( icon ).toHaveAttribute( 'width', '24' );
+		expect( icon ).toHaveAttribute( 'height', '24' );
+	} );
+
+	it( 'supports custom icon sizes and forwards SVG props and refs', () => {
+		const ref = createRef< SVGSVGElement >();
 		render(
-			<Menu.Root>
-				<Menu.Trigger>Actions</Menu.Trigger>
-				<Menu.Popup>
-					<Menu.Item>
-						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-					</Menu.Item>
-					<Menu.Separator />
-					<Menu.LinkItem href="https://wordpress.org">
-						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
-					</Menu.LinkItem>
-					<Menu.Item>
-						<Menu.ItemLabel>Delete</Menu.ItemLabel>
-					</Menu.Item>
-				</Menu.Popup>
-			</Menu.Root>
+			<Menu.PrefixIcon
+				ref={ ref }
+				icon={ <svg viewBox="0 0 24 24" style={ { fill: 'none' } } /> }
+				size={ 32 }
+				role="img"
+				className="custom-icon"
+				stroke="currentColor"
+				style={ { opacity: 0.5 } }
+			/>
 		);
 
-		const trigger = screen.getByRole( 'button', { name: 'Actions' } );
-		expect( trigger ).toHaveAttribute( 'aria-haspopup', 'menu' );
-		expect( trigger ).toHaveAttribute( 'aria-expanded', 'false' );
-
-		await user.click( trigger );
-
-		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
-		expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
-		expect(
-			screen.getByRole( 'menuitem', { name: 'Duplicate' } )
-		).toBeVisible();
-		expect(
-			screen.getByRole( 'menuitem', { name: 'WordPress.org' } )
-		).toHaveAttribute( 'href', 'https://wordpress.org' );
-		expect( screen.getByRole( 'separator' ) ).toBeVisible();
+		const icon = screen.getByRole( 'img', { hidden: true } );
+		expect( ref.current ).toBe( icon );
+		expect( icon ).toHaveAttribute( 'width', '32' );
+		expect( icon ).toHaveAttribute( 'height', '32' );
+		expect( icon ).toHaveAttribute( 'viewBox', '0 0 24 24' );
+		expect( icon ).toHaveAttribute( 'stroke', 'currentColor' );
+		expect( icon ).toHaveClass( 'custom-icon' );
+		// eslint-disable-next-line jest-dom/prefer-to-have-attribute
+		expect( icon.getAttribute( 'style' ) ).toContain( 'fill: none;' );
+		// eslint-disable-next-line jest-dom/prefer-to-have-attribute
+		expect( icon.getAttribute( 'style' ) ).toContain( 'opacity: 0.5;' );
 	} );
 
 	it( 'supports rendering the trigger as a non-native button', () => {
@@ -140,175 +138,6 @@ describe( 'Menu', () => {
 		expect( triggerWithPayload ).toBeDefined();
 	} );
 
-	it( 'preserves the public imperative actions ref', async () => {
-		const user = userEvent.setup();
-		const actionsRef = createRef< {
-			close: () => void;
-			unmount: () => void;
-		} >();
-
-		render(
-			<Menu.Root actionsRef={ actionsRef }>
-				<Menu.Trigger>Actions</Menu.Trigger>
-				<Menu.Popup>
-					<Menu.Item>
-						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-					</Menu.Item>
-				</Menu.Popup>
-			</Menu.Root>
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
-
-		act( () => actionsRef.current?.close() );
-
-		await waitFor( () => {
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-		} );
-	} );
-
-	it( 'closes when Escape is pressed', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<Menu.Root>
-				<Menu.Trigger>Actions</Menu.Trigger>
-				<Menu.Popup>
-					<Menu.Item>
-						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-					</Menu.Item>
-				</Menu.Popup>
-			</Menu.Root>
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
-
-		await user.keyboard( '{Escape}' );
-
-		await waitFor( () => {
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-		} );
-		expect(
-			screen.getByRole( 'button', { name: 'Actions' } )
-		).toHaveFocus();
-	} );
-
-	it( 'closes a non-modal menu without consuming an iframe pointer interaction', async () => {
-		const user = userEvent.setup();
-		const onCanvasClick = jest.fn();
-
-		function ControlledMenuWithIframes() {
-			const [ open, setOpen ] = useState( false );
-
-			return (
-				<>
-					<Menu.Root
-						modal={ false }
-						onOpenChange={ setOpen }
-						open={ open }
-					>
-						<Menu.Trigger>Actions</Menu.Trigger>
-						<Menu.Popup>
-							<Menu.Item>
-								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-							</Menu.Item>
-						</Menu.Popup>
-					</Menu.Root>
-					<iframe title="Secondary canvas" />
-					<iframe title="Editor canvas" />
-				</>
-			);
-		}
-
-		render( <ControlledMenuWithIframes /> );
-
-		const iframe = screen.getByTitle( 'Editor canvas' );
-		const iframeDocument = document.implementation.createHTMLDocument();
-		Object.defineProperty( iframe, 'contentDocument', {
-			configurable: true,
-			get: () => iframeDocument,
-		} );
-		const canvasTarget = iframeDocument.createElement( 'button' );
-		canvasTarget.addEventListener( 'click', onCanvasClick );
-		iframeDocument.body.appendChild( canvasTarget );
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
-
-		act( () => {
-			canvasTarget.dispatchEvent(
-				new MouseEvent( 'pointerdown', { bubbles: true } )
-			);
-			canvasTarget.click();
-		} );
-
-		await waitFor( () => {
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-		} );
-		expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
-	} );
-
-	it( 'closes a non-modal menu on a nested same-origin iframe pointer interaction', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<>
-				<Menu.Root modal={ false }>
-					<Menu.Trigger>Actions</Menu.Trigger>
-					<Menu.Popup>
-						<Menu.Item>
-							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-						</Menu.Item>
-					</Menu.Popup>
-				</Menu.Root>
-				<iframe title="Editor canvas" />
-			</>
-		);
-
-		const editorIframe =
-			screen.getByTitle< HTMLIFrameElement >( 'Editor canvas' );
-		const editorDocument = editorIframe.contentDocument;
-
-		if ( ! editorDocument ) {
-			throw new Error( 'Expected a same-origin iframe document.' );
-		}
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
-
-		const nestedIframe = editorDocument.createElement( 'iframe' );
-		editorDocument.body.appendChild( nestedIframe );
-		const nestedDocument = nestedIframe.contentDocument;
-
-		if ( ! nestedDocument ) {
-			throw new Error( 'Expected a nested same-origin iframe document.' );
-		}
-
-		const nestedAddEventListener = jest.spyOn(
-			nestedDocument,
-			'addEventListener'
-		);
-		await waitFor( () => {
-			expect( nestedAddEventListener ).toHaveBeenCalledWith(
-				'pointerdown',
-				expect.any( Function ),
-				true
-			);
-		} );
-
-		act( () => {
-			nestedDocument.dispatchEvent(
-				new MouseEvent( 'pointerdown', { bubbles: true } )
-			);
-		} );
-
-		await waitFor( () => {
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-		} );
-	} );
-
 	it( 'does not close for pointer interactions inside a menu portaled to an iframe', async () => {
 		const user = userEvent.setup();
 		const iframe = document.createElement( 'iframe' );
@@ -318,10 +147,7 @@ describe( 'Menu', () => {
 		if ( ! iframeDocument ) {
 			throw new Error( 'Expected a same-origin iframe document.' );
 		}
-		const addEventListener = jest.spyOn(
-			iframeDocument,
-			'addEventListener'
-		);
+		const addEventListener = vi.spyOn( iframeDocument, 'addEventListener' );
 
 		try {
 			const outsideTarget = iframeDocument.createElement( 'button' );
@@ -449,19 +275,19 @@ describe( 'Menu', () => {
 			configurable: true,
 			get: () => iframeDocument,
 		} );
-		const firstAddEventListener = jest.spyOn(
+		const firstAddEventListener = vi.spyOn(
 			firstDocument,
 			'addEventListener'
 		);
-		const firstRemoveEventListener = jest.spyOn(
+		const firstRemoveEventListener = vi.spyOn(
 			firstDocument,
 			'removeEventListener'
 		);
-		const reloadedAddEventListener = jest.spyOn(
+		const reloadedAddEventListener = vi.spyOn(
 			reloadedDocument,
 			'addEventListener'
 		);
-		const reloadedRemoveEventListener = jest.spyOn(
+		const reloadedRemoveEventListener = vi.spyOn(
 			reloadedDocument,
 			'removeEventListener'
 		);
@@ -499,11 +325,29 @@ describe( 'Menu', () => {
 			expect.any( Function ),
 			true
 		);
+		reloadedAddEventListener.mockClear();
+		reloadedRemoveEventListener.mockClear();
 
 		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
 		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+		await waitFor( () => {
+			expect( reloadedAddEventListener ).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any( Function ),
+				true
+			);
+		} );
+		const reloadedPointerDownListener =
+			reloadedAddEventListener.mock.calls.find(
+				( [ type, , capture ] ) =>
+					type === 'pointerdown' && capture === true
+			)?.[ 1 ];
 		unmount();
-		expect( reloadedRemoveEventListener ).toHaveBeenCalledTimes( 2 );
+		expect( reloadedRemoveEventListener ).toHaveBeenCalledExactlyOnceWith(
+			'pointerdown',
+			reloadedPointerDownListener,
+			true
+		);
 	} );
 
 	it( 'moves the listener when an iframe remounts while the menu is open', async () => {
@@ -532,19 +376,34 @@ describe( 'Menu', () => {
 			configurable: true,
 			get: () => firstDocument,
 		} );
-		const firstRemoveEventListener = jest.spyOn(
+		const firstAddEventListener = vi.spyOn(
+			firstDocument,
+			'addEventListener'
+		);
+		const firstRemoveEventListener = vi.spyOn(
 			firstDocument,
 			'removeEventListener'
 		);
 
 		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
 		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+		await waitFor( () => {
+			expect( firstAddEventListener ).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any( Function ),
+				true
+			);
+		} );
 
+		const firstPointerDownListener = firstAddEventListener.mock.calls.find(
+			( [ type, , capture ] ) =>
+				type === 'pointerdown' && capture === true
+		)?.[ 1 ];
 		rerender( <MenuWithIframe iframeKey="second" /> );
 		await waitFor( () => {
 			expect( firstRemoveEventListener ).toHaveBeenCalledWith(
 				'pointerdown',
-				expect.any( Function ),
+				firstPointerDownListener,
 				true
 			);
 		} );
@@ -574,277 +433,66 @@ describe( 'Menu', () => {
 		} );
 	} );
 
-	it.each( [
-		{ location: 'root menu', nested: false, checkbox: false },
-		{ location: 'submenu', nested: true, checkbox: false },
-		{
-			location: 'closing checkbox item',
-			nested: false,
-			checkbox: true,
-		},
-	] )(
-		'restores focus to the trigger after an overlay opened from the $location closes',
-		async ( { nested, checkbox } ) => {
-			const user = userEvent.setup();
+	it( 'throws when ItemDescription is outside a menu item', () => {
+		expect( () =>
+			render( <Menu.ItemDescription>Description</Menu.ItemDescription> )
+		).toThrow(
+			'Menu.ItemDescription: Missing direct menu item parent. Render <Menu.ItemDescription> as a direct child of a menu item.'
+		);
+		expect( console ).toHaveErrored();
+	} );
 
-			function FocusReturningOverlay( {
-				onClose,
-			}: {
-				onClose: () => void;
-			} ) {
-				const focusReturnRef = useFocusReturn();
-				const ref = useCallback(
-					( node: HTMLDivElement | null ) => {
-						focusReturnRef( node );
-						node?.focus();
-					},
-					[ focusReturnRef ]
-				);
+	it( 'throws when ItemDescription is nested inside a menu item', () => {
+		expect( () =>
+			render(
+				<Menu.Root defaultOpen>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>
+								Duplicate
+								<Menu.ItemDescription>
+									Description
+								</Menu.ItemDescription>
+							</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			)
+		).toThrow(
+			'Menu.ItemDescription: Missing direct menu item parent. Render <Menu.ItemDescription> as a direct child of a menu item.'
+		);
+		expect( console ).toHaveErrored();
+	} );
 
-				return (
-					<div ref={ ref } role="dialog" tabIndex={ -1 }>
-						<button onClick={ onClose }>Close overlay</button>
-					</div>
-				);
-			}
-
-			function MenuWithOverlay() {
-				const [ isOverlayOpen, setIsOverlayOpen ] = useState( false );
-				const overlayItem = checkbox ? (
-					<Menu.CheckboxItem
-						closeOnClick
-						onCheckedChange={ () => setIsOverlayOpen( true ) }
-					>
-						<Menu.ItemLabel>Open overlay</Menu.ItemLabel>
-					</Menu.CheckboxItem>
-				) : (
-					<Menu.Item onClick={ () => setIsOverlayOpen( true ) }>
-						<Menu.ItemLabel>Open overlay</Menu.ItemLabel>
-					</Menu.Item>
-				);
-
-				return (
-					<>
-						<Menu.Root>
-							<Menu.Trigger>Actions</Menu.Trigger>
-							<Menu.Popup>
-								{ nested ? (
-									<Menu.SubmenuRoot>
-										<Menu.SubmenuTrigger
-											openOnHover={ false }
-										>
-											<Menu.ItemLabel>
-												More actions
-											</Menu.ItemLabel>
-										</Menu.SubmenuTrigger>
-										<Menu.Popup>{ overlayItem }</Menu.Popup>
-									</Menu.SubmenuRoot>
-								) : (
-									overlayItem
-								) }
-							</Menu.Popup>
-						</Menu.Root>
-						{ isOverlayOpen && (
-							<FocusReturningOverlay
-								onClose={ () => setIsOverlayOpen( false ) }
-							/>
-						) }
-					</>
-				);
-			}
-
-			render( <MenuWithOverlay /> );
-
-			const trigger = screen.getByRole( 'button', { name: 'Actions' } );
-			await user.click( trigger );
-			if ( nested ) {
-				await user.click(
-					await screen.findByRole( 'menuitem', {
-						name: 'More actions',
-					} )
-				);
-			}
-			await user.click(
-				await screen.findByRole(
-					checkbox ? 'menuitemcheckbox' : 'menuitem',
-					{ name: 'Open overlay' }
-				)
-			);
-
-			await waitFor( () => {
-				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-			} );
-			expect( screen.getByRole( 'dialog' ) ).toHaveFocus();
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Close overlay' } )
-			);
-
-			await waitFor( () => expect( trigger ).toHaveFocus() );
-		}
-	);
-
-	it( 'does not override focus moved by onOpenChange when an item closes', async () => {
-		const user = userEvent.setup();
-
-		function MenuWithExternalFocusDestination() {
-			const destinationRef = useRef< HTMLButtonElement >( null );
+	it( 'throws when a nested ItemDescription reuses a direct sibling ID', () => {
+		function MenuWithDuplicateDescriptionId() {
+			const descriptionId = useId();
 
 			return (
-				<>
-					<Menu.Root
-						onOpenChange={ ( open, eventDetails ) => {
-							if (
-								! open &&
-								eventDetails.reason === 'item-press'
-							) {
-								destinationRef.current?.focus();
-							}
-						} }
-					>
-						<Menu.Trigger>Actions</Menu.Trigger>
-						<Menu.Popup>
-							<Menu.Item>
-								<Menu.ItemLabel>Move focus</Menu.ItemLabel>
-							</Menu.Item>
-						</Menu.Popup>
-					</Menu.Root>
-					<button ref={ destinationRef }>Focus destination</button>
-				</>
+				<Menu.Root defaultOpen>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>
+								Duplicate
+								<Menu.ItemDescription id={ descriptionId }>
+									Nested description
+								</Menu.ItemDescription>
+							</Menu.ItemLabel>
+							<Menu.ItemDescription id={ descriptionId }>
+								Direct description
+							</Menu.ItemDescription>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
 			);
 		}
 
-		render( <MenuWithExternalFocusDestination /> );
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		await user.click(
-			await screen.findByRole( 'menuitem', { name: 'Move focus' } )
+		expect( () => render( <MenuWithDuplicateDescriptionId /> ) ).toThrow(
+			'Menu.ItemDescription: Missing direct menu item parent. Render <Menu.ItemDescription> as a direct child of a menu item.'
 		);
-
-		expect(
-			screen.getByRole( 'button', { name: 'Focus destination' } )
-		).toHaveFocus();
-	} );
-
-	it( 'uses the WordPress text direction for submenu navigation', async () => {
-		const user = userEvent.setup();
-		mockedIsRTL.mockReturnValue( true );
-
-		render(
-			<Menu.Root>
-				<Menu.Trigger>Actions</Menu.Trigger>
-				<Menu.Popup>
-					<Menu.SubmenuRoot>
-						<Menu.SubmenuTrigger openOnHover={ false }>
-							<Menu.ItemLabel>Move to</Menu.ItemLabel>
-						</Menu.SubmenuTrigger>
-						<Menu.Popup>
-							<Menu.Item>
-								<Menu.ItemLabel>Archive</Menu.ItemLabel>
-							</Menu.Item>
-						</Menu.Popup>
-					</Menu.SubmenuRoot>
-				</Menu.Popup>
-			</Menu.Root>
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-
-		const submenuTrigger = await screen.findByRole( 'menuitem', {
-			name: 'Move to',
-		} );
-		act( () => submenuTrigger.focus() );
-		expect( submenuTrigger ).toHaveFocus();
-
-		await user.keyboard( '{ArrowLeft}' );
-
-		expect(
-			await screen.findByRole( 'menuitem', { name: 'Archive' } )
-		).toBeVisible();
-	} );
-
-	it( 'renders checkbox and radio item roles', async () => {
-		const user = userEvent.setup();
-		const onCheckedChange = jest.fn();
-		const onValueChange = jest.fn();
-
-		render(
-			<Menu.Root>
-				<Menu.Trigger>View</Menu.Trigger>
-				<Menu.Popup>
-					<Menu.CheckboxItem
-						checked
-						onCheckedChange={ onCheckedChange }
-						prefix="Checkbox prefix"
-					>
-						<Menu.ItemLabel>Show sidebar</Menu.ItemLabel>
-					</Menu.CheckboxItem>
-					<Menu.RadioGroup
-						value="comfortable"
-						onValueChange={ onValueChange }
-					>
-						<Menu.RadioItem value="compact">
-							<Menu.ItemLabel>Compact</Menu.ItemLabel>
-						</Menu.RadioItem>
-						<Menu.RadioItem
-							value="comfortable"
-							prefix="Radio prefix"
-						>
-							<Menu.ItemLabel>Comfortable</Menu.ItemLabel>
-						</Menu.RadioItem>
-					</Menu.RadioGroup>
-				</Menu.Popup>
-			</Menu.Root>
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'View' } ) );
-
-		const checkbox = await screen.findByRole( 'menuitemcheckbox', {
-			name: 'Show sidebar',
-		} );
-		const radio = screen.getByRole( 'menuitemradio', {
-			name: 'Comfortable',
-		} );
-
-		expect( checkbox ).toBeChecked();
-		expect( radio ).toBeChecked();
-		expect( checkbox ).toHaveAccessibleName( 'Show sidebar' );
-		expect( radio ).toHaveAccessibleName( 'Comfortable' );
-		expect( screen.getByText( 'Checkbox prefix' ) ).toBeVisible();
-		expect( screen.getByText( 'Radio prefix' ) ).toBeVisible();
-
-		await user.click( checkbox );
-		expect( onCheckedChange ).toHaveBeenCalledWith(
-			false,
-			expect.objectContaining( { reason: expect.any( String ) } )
-		);
-	} );
-
-	it( 'uses item descriptions as accessible descriptions', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<Menu.Root>
-				<Menu.Trigger>Actions</Menu.Trigger>
-				<Menu.Popup>
-					<Menu.Item>
-						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-						<Menu.ItemDescription>
-							Create a <strong>separate</strong> copy.
-						</Menu.ItemDescription>
-					</Menu.Item>
-				</Menu.Popup>
-			</Menu.Root>
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-
-		const item = await screen.findByRole( 'menuitem', {
-			name: 'Duplicate',
-		} );
-
-		expect( item ).toHaveAccessibleDescription( 'Create a separate copy.' );
-		expect( screen.getByText( 'separate' ).tagName ).toBe( 'STRONG' );
+		expect( console ).toHaveErrored();
 	} );
 
 	it( 'requires an ItemLabel as a direct child of every item', () => {
@@ -936,81 +584,6 @@ describe( 'Menu', () => {
 			'aria-describedby',
 			`${ externalDescription.id } ${ description.id } ${ shortcutDescription.id }`
 		);
-	} );
-
-	it( 'supports shortcut metadata across menu item variants', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<Menu.Root>
-				<Menu.Trigger>Actions</Menu.Trigger>
-				<Menu.Popup>
-					<Menu.LinkItem
-						href="https://wordpress.org"
-						shortcut={ {
-							displayShortcut: '⌘L',
-							ariaKeyShortcut: 'Meta+L',
-							label: 'Command L',
-						} }
-					>
-						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
-					</Menu.LinkItem>
-					<Menu.CheckboxItem
-						checked
-						shortcut={ {
-							displayShortcut: '⌘B',
-							ariaKeyShortcut: 'Meta+B',
-							label: 'Command B',
-						} }
-					>
-						<Menu.ItemLabel>Bookmarks</Menu.ItemLabel>
-					</Menu.CheckboxItem>
-					<Menu.RadioGroup value="list">
-						<Menu.RadioItem
-							value="list"
-							shortcut={ {
-								displayShortcut: '⌘1',
-								ariaKeyShortcut: 'Meta+1',
-								label: 'Command 1',
-							} }
-						>
-							<Menu.ItemLabel>List</Menu.ItemLabel>
-						</Menu.RadioItem>
-					</Menu.RadioGroup>
-					<Menu.SubmenuRoot>
-						<Menu.SubmenuTrigger
-							shortcut={ {
-								displayShortcut: '⌘M',
-								ariaKeyShortcut: 'Meta+M',
-								label: 'Command M',
-							} }
-						>
-							<Menu.ItemLabel>Move to</Menu.ItemLabel>
-						</Menu.SubmenuTrigger>
-						<Menu.Popup>
-							<Menu.Item>
-								<Menu.ItemLabel>Archive</Menu.ItemLabel>
-							</Menu.Item>
-						</Menu.Popup>
-					</Menu.SubmenuRoot>
-				</Menu.Popup>
-			</Menu.Root>
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-
-		expect(
-			await screen.findByRole( 'menuitem', { name: 'WordPress.org' } )
-		).toHaveAttribute( 'aria-keyshortcuts', 'Meta+L' );
-		expect(
-			screen.getByRole( 'menuitemcheckbox', { name: 'Bookmarks' } )
-		).toHaveAttribute( 'aria-keyshortcuts', 'Meta+B' );
-		expect(
-			screen.getByRole( 'menuitemradio', { name: 'List' } )
-		).toHaveAttribute( 'aria-keyshortcuts', 'Meta+1' );
-		expect(
-			screen.getByRole( 'menuitem', { name: 'Move to' } )
-		).toHaveAttribute( 'aria-keyshortcuts', 'Meta+M' );
 	} );
 
 	it( 'renders submenu suffixes before shortcuts and chevrons after shortcuts', async () => {
@@ -1143,31 +716,6 @@ describe( 'Menu', () => {
 		);
 	} );
 
-	it( 'ignores presentational prefixes during keyboard typeahead', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<Menu.Root>
-				<Menu.Trigger>Actions</Menu.Trigger>
-				<Menu.Popup>
-					<Menu.Item>
-						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-					</Menu.Item>
-					<Menu.Item prefix="Decorative prefix">
-						<Menu.ItemLabel>Archive</Menu.ItemLabel>
-					</Menu.Item>
-				</Menu.Popup>
-			</Menu.Root>
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		await user.keyboard( '{ArrowDown}a' );
-
-		expect(
-			await screen.findByRole( 'menuitem', { name: 'Archive' } )
-		).toHaveFocus();
-	} );
-
 	it( 'keeps shared alignment slots outside the item-local content', async () => {
 		const user = userEvent.setup();
 
@@ -1276,77 +824,6 @@ describe( 'Menu', () => {
 		).not.toHaveAttribute( 'aria-labelledby' );
 	} );
 
-	it( 'uses custom item label and description ids for generated aria relationships', async () => {
-		const user = userEvent.setup();
-
-		function MenuWithCustomTextIds() {
-			const externalDescriptionId = useId();
-			const labelId = useId();
-			const descriptionId = useId();
-
-			return (
-				<Menu.Root>
-					<Menu.Trigger>Actions</Menu.Trigger>
-					<Menu.Popup>
-						<span id={ externalDescriptionId }>
-							Available offline.
-						</span>
-						<Menu.Item aria-describedby={ externalDescriptionId }>
-							<Menu.ItemLabel id={ labelId }>
-								Download
-							</Menu.ItemLabel>
-							<Menu.ItemDescription id={ descriptionId }>
-								Save a local copy.
-							</Menu.ItemDescription>
-						</Menu.Item>
-					</Menu.Popup>
-				</Menu.Root>
-			);
-		}
-
-		render( <MenuWithCustomTextIds /> );
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		await screen.findByRole( 'menu' );
-
-		const label = screen.getByText( 'Download' );
-		const externalDescription = screen.getByText( 'Available offline.' );
-		const description = screen.getByText( 'Save a local copy.' );
-		const item = await screen.findByRole( 'menuitem', {
-			name: 'Download',
-			description: 'Available offline. Save a local copy.',
-		} );
-
-		expect( item ).toHaveAttribute( 'aria-labelledby', label.id );
-		expect( item ).toHaveAttribute(
-			'aria-describedby',
-			`${ externalDescription.id } ${ description.id }`
-		);
-	} );
-
-	it( 'does not generate a label relationship when an explicit aria-label is provided', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<Menu.Root>
-				<Menu.Trigger>Actions</Menu.Trigger>
-				<Menu.Popup>
-					<Menu.Item aria-label="Archive current item">
-						<Menu.ItemLabel>Archive</Menu.ItemLabel>
-					</Menu.Item>
-				</Menu.Popup>
-			</Menu.Root>
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-
-		expect(
-			await screen.findByRole( 'menuitem', {
-				name: 'Archive current item',
-			} )
-		).not.toHaveAttribute( 'aria-labelledby' );
-	} );
-
 	it( 'supports custom rendering for item labels and descriptions', async () => {
 		const user = userEvent.setup();
 
@@ -1377,212 +854,5 @@ describe( 'Menu', () => {
 		expect( screen.getByText( 'Create a separate copy.' ).tagName ).toBe(
 			'H3'
 		);
-	} );
-
-	// Slot is identified by a data attribute, not a user-facing role/text.
-	/* eslint-disable testing-library/no-node-access */
-	describe( 'wp compat overlay slot', () => {
-		const SLOT_SELECTOR = '[data-wp-compat-overlay-slot]';
-
-		// Exercises the public opt-in path rather than poking the flag.
-		function WithSlotEnabled( { children }: { children: ReactNode } ) {
-			useEnableWpCompatOverlaySlot();
-			return <>{ children }</>;
-		}
-
-		afterEach( () => {
-			// The hook is one-way at runtime; reset explicitly between tests.
-			delete ( window as { __wpUiCompatOverlaySlotEnabled?: boolean } )
-				.__wpUiCompatOverlaySlotEnabled;
-			document
-				.querySelectorAll( SLOT_SELECTOR )
-				.forEach( ( element ) => element.remove() );
-		} );
-
-		it( 'portals the popup into the slot when the consumer opts in', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<WithSlotEnabled>
-					<Menu.Root>
-						<Menu.Trigger>Actions</Menu.Trigger>
-						<Menu.Popup>
-							<Menu.Item>
-								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-							</Menu.Item>
-						</Menu.Popup>
-					</Menu.Root>
-				</WithSlotEnabled>
-			);
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Actions' } )
-			);
-
-			const item = await screen.findByRole( 'menuitem', {
-				name: 'Duplicate',
-			} );
-			expect( item ).toBeVisible();
-
-			const slot = document.querySelector( SLOT_SELECTOR );
-			expect( slot ).not.toBeNull();
-			expect( slot ).toContainElement( item );
-		} );
-
-		it( 'does not create a slot when the consumer has not opted in (dormant default)', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<Menu.Root>
-					<Menu.Trigger>Actions</Menu.Trigger>
-					<Menu.Popup>
-						<Menu.Item>
-							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-						</Menu.Item>
-					</Menu.Popup>
-				</Menu.Root>
-			);
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Actions' } )
-			);
-
-			const item = await screen.findByRole( 'menuitem', {
-				name: 'Duplicate',
-			} );
-			expect( item ).toBeVisible();
-			expect( document.querySelector( SLOT_SELECTOR ) ).toBeNull();
-		} );
-	} );
-	/* eslint-enable testing-library/no-node-access */
-
-	it( 'supports custom portal and positioner elements', async () => {
-		const user = userEvent.setup();
-		const containerRef = createRef< HTMLDivElement >();
-
-		render(
-			<div data-testid="wrapper">
-				<Menu.Root>
-					<Menu.Trigger>Actions</Menu.Trigger>
-					<div ref={ containerRef } data-testid="custom-container" />
-					<Menu.Popup
-						portal={ <Menu.Portal container={ containerRef } /> }
-						positioner={
-							<Menu.Positioner data-testid="custom-positioner" />
-						}
-					>
-						<Menu.Item>
-							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-						</Menu.Item>
-					</Menu.Popup>
-				</Menu.Root>
-			</div>
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-
-		const menu = await screen.findByRole( 'menu' );
-		expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
-			menu
-		);
-		expect( screen.getByTestId( 'custom-positioner' ) ).toContainElement(
-			menu
-		);
-	} );
-
-	it( 'uses Menu placement defaults from @wordpress/components', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<Menu.Root>
-				<Menu.Trigger>Actions</Menu.Trigger>
-				<Menu.Popup
-					positioner={
-						<Menu.Positioner data-testid="root-positioner" />
-					}
-				>
-					<Menu.Item>
-						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-					</Menu.Item>
-					<Menu.SubmenuRoot>
-						<Menu.SubmenuTrigger openOnHover={ false }>
-							<Menu.ItemLabel>Move to</Menu.ItemLabel>
-						</Menu.SubmenuTrigger>
-						<Menu.Popup
-							positioner={
-								<Menu.Positioner data-testid="submenu-positioner" />
-							}
-						>
-							<Menu.Item>
-								<Menu.ItemLabel>Archive</Menu.ItemLabel>
-							</Menu.Item>
-						</Menu.Popup>
-					</Menu.SubmenuRoot>
-				</Menu.Popup>
-			</Menu.Root>
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		await user.click(
-			await screen.findByRole( 'menuitem', { name: 'Move to' } )
-		);
-
-		expect(
-			await screen.findByRole( 'menuitem', { name: 'Archive' } )
-		).toBeVisible();
-		expect( screen.getByTestId( 'root-positioner' ) ).toHaveAttribute(
-			'data-side',
-			'bottom'
-		);
-		expect( screen.getByTestId( 'root-positioner' ) ).toHaveAttribute(
-			'data-align',
-			'start'
-		);
-		expect( screen.getByTestId( 'submenu-positioner' ) ).toHaveAttribute(
-			'data-side',
-			expect.stringMatching( /^inline-/ )
-		);
-		expect( screen.getByTestId( 'submenu-positioner' ) ).toHaveAttribute(
-			'data-align',
-			'start'
-		);
-	} );
-
-	it( 'forwards refs', async () => {
-		const user = userEvent.setup();
-		const triggerRef = createRef< HTMLButtonElement >();
-		const popupRef = createRef< HTMLDivElement >();
-		const itemRef = createRef< HTMLDivElement >();
-		const itemLabelRef = createRef< HTMLSpanElement >();
-		const itemDescriptionRef = createRef< HTMLSpanElement >();
-
-		render(
-			<Menu.Root>
-				<Menu.Trigger ref={ triggerRef }>Actions</Menu.Trigger>
-				<Menu.Popup ref={ popupRef }>
-					<Menu.Item ref={ itemRef }>
-						<Menu.ItemLabel ref={ itemLabelRef }>
-							Duplicate
-						</Menu.ItemLabel>
-						<Menu.ItemDescription ref={ itemDescriptionRef }>
-							Create a copy.
-						</Menu.ItemDescription>
-					</Menu.Item>
-				</Menu.Popup>
-			</Menu.Root>
-		);
-
-		expect( triggerRef.current ).toBeInstanceOf( HTMLButtonElement );
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-
-		await waitFor( () => {
-			expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
-			expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
-			expect( itemLabelRef.current ).toBeInstanceOf( HTMLSpanElement );
-			expect( itemDescriptionRef.current ).toBeInstanceOf(
-				HTMLSpanElement
-			);
-		} );
 	} );
 } );

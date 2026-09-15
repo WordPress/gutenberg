@@ -1,4 +1,5 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { useFormValidity } from '../use-form-validity';
 import type { Field } from '../../types';
 
@@ -320,6 +321,44 @@ describe( 'useFormValidity', () => {
 				},
 			} );
 			expect( isValid ).toBe( false );
+		} );
+
+		// See https://github.com/WordPress/gutenberg/pull/81377#discussion_r3750984349
+		it( 'a combined field never resolves its own id against the field definitions', () => {
+			type Item = { isActive: boolean; a?: string };
+			const combinedFields: Field< Item >[] = [
+				// Shares the id of the form's combined field. It must be
+				// ignored: a combined field is a container, not a field, so
+				// neither its `isValid` nor its `isVisible` apply to the group.
+				{
+					id: 'group',
+					type: 'text',
+					isVisible: () => false,
+					isValid: { required: true },
+				},
+				{
+					id: 'a',
+					type: 'text',
+					isVisible: () => false,
+					isValid: { required: true },
+				},
+			];
+			const combinedForm = {
+				fields: [ { id: 'group', children: [ 'a' ] } ],
+			};
+			const item: Item = { isActive: false, a: undefined };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () =>
+				useFormValidity( item, combinedFields, combinedForm )
+			);
+
+			// The hidden child `a` is skipped and the `group` definition's
+			// `required` rule is not applied to the combined field.
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
 		} );
 
 		it( 'a stale async result does not resurface after the field is hidden', async () => {

@@ -27,13 +27,13 @@ export type ItemPopupWidthProps = {
 	 *
 	 * @default 'anchor'
 	 */
-	popupWidth?: ItemPopupWidth;
+	width?: ItemPopupWidth;
 };
 
 export function getItemPopupWidthClassName(
-	popupWidth: ItemPopupWidth | undefined = 'anchor'
+	width: ItemPopupWidth | undefined = 'anchor'
 ): string | false {
-	switch ( popupWidth ) {
+	switch ( width ) {
 		case 'available':
 			return itemPopupStyles[ 'is-width-available' ];
 		case 'content':

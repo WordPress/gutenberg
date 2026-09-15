@@ -1,7 +1,11 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ComponentProps } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useId } from '@wordpress/element';
 import { BorderBoxControl } from '..';
+
+globalThis.wpVitest.mockMatchMedia();
 
 const colors = [
 	{ name: 'Gray', color: '#f6f7f7' },
@@ -34,7 +38,7 @@ const mixedBorders = {
 const props = {
 	colors,
 	label: 'Border Box',
-	onChange: jest.fn().mockImplementation( ( newValue ) => {
+	onChange: vi.fn().mockImplementation( ( newValue ) => {
 		props.value = newValue;
 	} ),
 	value: undefined,
@@ -50,6 +54,102 @@ function TestBorderBoxControl(
 }
 
 describe( 'BorderBoxControl', () => {
+	describe( 'Labelling', () => {
+		it( 'should give the group of controls an accessible name from the label', () => {
+			render( <TestBorderBoxControl { ...props } /> );
+
+			expect(
+				screen.getByRole( 'group', { name: props.label } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should name the group of controls even when the label is hidden', () => {
+			render( <TestBorderBoxControl { ...props } hideLabelFromVision /> );
+
+			expect(
+				screen.getByRole( 'group', { name: props.label } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should let a consumer-provided `aria-label` take precedence over the label', () => {
+			render(
+				<TestBorderBoxControl { ...props } aria-label="Outer borders" />
+			);
+
+			expect(
+				screen.getByRole( 'group', { name: 'Outer borders' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should let a consumer-provided `aria-labelledby` take precedence over the label', () => {
+			const ExternallyLabelledControl = () => {
+				const id = useId();
+				return (
+					<>
+						<span id={ id }>Outer borders</span>
+						<TestBorderBoxControl
+							{ ...props }
+							aria-labelledby={ id }
+						/>
+					</>
+				);
+			};
+
+			render( <ExternallyLabelledControl /> );
+
+			expect(
+				screen.getByRole( 'group', { name: 'Outer borders' } )
+			).toBeInTheDocument();
+
+			// With an external name in play, the internal label is no longer
+			// referenced, so it shouldn't carry a generated ID either.
+			expect( screen.getByText( props.label ) ).not.toHaveAttribute(
+				'id'
+			);
+		} );
+
+		it( 'should form a group when named only by `aria-label`', () => {
+			render(
+				<TestBorderBoxControl
+					{ ...props }
+					label={ undefined }
+					aria-label="Outer borders"
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'group', { name: 'Outer borders' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should fall back to the label when an ARIA naming prop is empty', () => {
+			// An empty `aria-label` is skipped by the accessible name
+			// computation, so it shouldn't suppress the label association and
+			// leave the group unnamed.
+			render( <TestBorderBoxControl { ...props } aria-label="" /> );
+
+			expect(
+				screen.getByRole( 'group', { name: props.label } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should give each instance its own label association', () => {
+			render(
+				<>
+					<TestBorderBoxControl { ...props } label="First" />
+					<TestBorderBoxControl { ...props } label="Second" />
+				</>
+			);
+
+			expect(
+				screen.getByRole( 'group', { name: 'First' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'group', { name: 'Second' } )
+			).toBeInTheDocument();
+		} );
+	} );
+
 	describe( 'Linked view rendering', () => {
 		it( 'should render correctly when no value provided', () => {
 			render( <TestBorderBoxControl { ...props } /> );
@@ -74,6 +174,42 @@ describe( 'BorderBoxControl', () => {
 			expect( unitSelect ).toBeInTheDocument();
 			expect( slider ).toBeInTheDocument();
 			expect( linkedButton ).toBeInTheDocument();
+		} );
+
+		// `getAllByRole` returns document order, so the sign of this offset is
+		// which side of the border inputs the linked button sits on. The color
+		// button is the first of those inputs.
+		const getLinkedButtonOffsetFromColorButton = () => {
+			const buttons = screen.getAllByRole( 'button' );
+			const linkedButtonIndex = buttons.indexOf(
+				screen.getByLabelText( 'Unlink sides' )
+			);
+			const colorButtonIndex = buttons.indexOf(
+				screen.getByLabelText( toggleLabelRegex )
+			);
+
+			// Both queries throw when absent, and `indexOf` gives -1 for a
+			// button outside the list, which would read as "earlier than".
+			expect( linkedButtonIndex ).toBeGreaterThanOrEqual( 0 );
+			expect( colorButtonIndex ).toBeGreaterThanOrEqual( 0 );
+
+			return linkedButtonIndex - colorButtonIndex;
+		};
+
+		it( 'should place the linked button before the border inputs when the label is visible', () => {
+			render( <TestBorderBoxControl { ...props } /> );
+
+			// Sharing the label's row is what lines it up with the equivalent
+			// button on sibling controls such as border radius.
+			expect( getLinkedButtonOffsetFromColorButton() ).toBeLessThan( 0 );
+		} );
+
+		it( 'should place the linked button after the border inputs when the label is hidden', () => {
+			render( <TestBorderBoxControl { ...props } hideLabelFromVision /> );
+
+			expect( getLinkedButtonOffsetFromColorButton() ).toBeGreaterThan(
+				0
+			);
 		} );
 
 		it( 'should hide label', () => {
@@ -318,7 +454,7 @@ describe( 'BorderBoxControl', () => {
 
 	describe( 'onChange handling', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 			props.value = undefined;
 		} );
 

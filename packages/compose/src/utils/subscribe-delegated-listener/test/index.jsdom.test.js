@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import subscribeDelegatedListener from '..';
 
 describe( 'subscribeDelegatedListener', () => {
@@ -27,14 +28,14 @@ describe( 'subscribeDelegatedListener', () => {
 	}
 
 	test( 'invokes element subscriber when event fires on that element', () => {
-		const cb = jest.fn();
+		const cb = vi.fn();
 		subscribeDelegatedListener( target, 'click', cb );
 		fire( target );
 		expect( cb ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	test( 'invokes element subscriber when event fires on a descendant', () => {
-		const cb = jest.fn();
+		const cb = vi.fn();
 		const child = document.createElement( 'b' );
 		target.appendChild( child );
 		subscribeDelegatedListener( target, 'click', cb );
@@ -43,7 +44,7 @@ describe( 'subscribeDelegatedListener', () => {
 	} );
 
 	test( 'does not invoke element subscriber when event fires outside its subtree', () => {
-		const cb = jest.fn();
+		const cb = vi.fn();
 		const sibling = document.createElement( 'div' );
 		document.body.appendChild( sibling );
 		subscribeDelegatedListener( target, 'click', cb );
@@ -83,8 +84,8 @@ describe( 'subscribeDelegatedListener', () => {
 	} );
 
 	test( 'capture and bubble registries are independent', () => {
-		const captureCb = jest.fn();
-		const bubbleCb = jest.fn();
+		const captureCb = vi.fn();
+		const bubbleCb = vi.fn();
 		subscribeDelegatedListener( target, 'click', captureCb, true );
 		subscribeDelegatedListener( target, 'click', bubbleCb, false );
 		fire( target );
@@ -93,15 +94,15 @@ describe( 'subscribeDelegatedListener', () => {
 	} );
 
 	test( 'document subscriber always fires for events in the document', () => {
-		const cb = jest.fn();
+		const cb = vi.fn();
 		subscribeDelegatedListener( document, 'click', cb );
 		fire( target );
 		expect( cb ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	test( 'window subscriber fans out independently of element subscribers', () => {
-		const winCb = jest.fn();
-		const elCb = jest.fn();
+		const winCb = vi.fn();
+		const elCb = vi.fn();
 		subscribeDelegatedListener( window, 'resize', winCb );
 		subscribeDelegatedListener( target, 'resize', elCb );
 		window.dispatchEvent( new Event( 'resize' ) );
@@ -111,8 +112,8 @@ describe( 'subscribeDelegatedListener', () => {
 	} );
 
 	test( 'multiple callbacks for the same element all fire', () => {
-		const a = jest.fn();
-		const b = jest.fn();
+		const a = vi.fn();
+		const b = vi.fn();
 		subscribeDelegatedListener( target, 'click', a );
 		subscribeDelegatedListener( target, 'click', b );
 		fire( target );
@@ -121,7 +122,7 @@ describe( 'subscribeDelegatedListener', () => {
 	} );
 
 	test( 'unsubscribe stops further dispatch', () => {
-		const cb = jest.fn();
+		const cb = vi.fn();
 		const unsub = subscribeDelegatedListener( target, 'click', cb );
 		fire( target );
 		expect( cb ).toHaveBeenCalledTimes( 1 );
@@ -131,12 +132,12 @@ describe( 'subscribeDelegatedListener', () => {
 	} );
 
 	test( 'attaches one native listener per (root, eventType, phase) regardless of subscriber count', () => {
-		const spy = jest.spyOn( document, 'addEventListener' );
+		const spy = vi.spyOn( document, 'addEventListener' );
 		// First subscribe attaches the native listener; subsequent ones
 		// for the same key share it.
-		subscribeDelegatedListener( target, 'mousemove', jest.fn() );
-		subscribeDelegatedListener( root, 'mousemove', jest.fn() );
-		subscribeDelegatedListener( document, 'mousemove', jest.fn() );
+		subscribeDelegatedListener( target, 'mousemove', vi.fn() );
+		subscribeDelegatedListener( root, 'mousemove', vi.fn() );
+		subscribeDelegatedListener( document, 'mousemove', vi.fn() );
 		const nativeMousemoves = spy.mock.calls.filter(
 			( [ type, , opts ] ) => type === 'mousemove' && ! opts // bubble-phase only
 		).length;
@@ -154,7 +155,7 @@ describe( 'subscribeDelegatedListener', () => {
 		const iframeTarget = iframeDoc.createElement( 'span' );
 		iframeDoc.body.appendChild( iframeTarget );
 
-		const cb = jest.fn();
+		const cb = vi.fn();
 		expect( () =>
 			subscribeDelegatedListener( iframeTarget, 'click', cb )
 		).not.toThrow();

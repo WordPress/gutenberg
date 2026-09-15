@@ -1,3 +1,4 @@
+import { beforeAll, describe, expect, it } from 'vitest';
 import plugin from '../no-token-fallback-values.mjs';
 import { getStylelintResult } from './utils';
 

@@ -17,7 +17,7 @@ class Tests_Icons_WpGetIcon extends WP_UnitTestCase {
 		if ( ! WP_Icon_Collections_Registry::get_instance()->is_registered( 'core' ) ) {
 			gutenberg_register_default_icon_collections();
 		}
-		if ( empty( WP_Icons_Registry::get_instance()->get_registered_icons() ) ) {
+		if ( empty( WP_Icons_Registry_Gutenberg::get_instance()->get_registered_icons() ) ) {
 			gutenberg_register_default_icons();
 		}
 	}
@@ -52,7 +52,8 @@ class Tests_Icons_WpGetIcon extends WP_UnitTestCase {
 
 	public function test_wp_get_icon_size_null_leaves_dimensions_untouched() {
 		$output = wp_get_icon( 'core/plus', array( 'size' => null ) );
-		$this->assertStringNotContainsString( 'width=', $output );
+		// Leading space to avoid matching `stroke-width`.
+		$this->assertStringNotContainsString( ' width=', $output );
 		$this->assertStringNotContainsString( 'height=', $output );
 	}
 

@@ -268,7 +268,9 @@ function VisualEditor( {
 				? editedPostTemplate?.content
 				: '';
 
-		return getPostContentAttributes( parse( parseableContent ) ) || {};
+		// Returns `undefined` when the template has no Post Content block, so that
+		// callers can tell "no such block" apart from "block without attributes".
+		return getPostContentAttributes( parse( parseableContent ) );
 	}, [
 		editedPostTemplate?.content,
 		editedPostTemplate?.blocks,
@@ -335,7 +337,13 @@ function VisualEditor( {
 
 	// If there is a Post Content block we use its layout for the block list;
 	// if not, this must be a classic theme, in which case we use the fallback layout.
-	const blockListLayout = postContentAttributes
+	//
+	// This reads `newestPostContentAttributes` rather than the `postContentAttributes`
+	// editor setting because that setting is built server-side from `global $post_ID`,
+	// which is not the post being edited in the site editor. There the setting never
+	// arrives, and the block list would fall back to the theme.json layout and offer
+	// wide and full alignments that the template does not support.
+	const blockListLayout = newestPostContentAttributes
 		? postContentLayout
 		: fallbackLayout;
 

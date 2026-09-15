@@ -12,10 +12,10 @@ const manifest = require( '../../../package.json' );
 
 const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';
 
-/** @typedef {import('@octokit/rest')} GitHub */
-/** @typedef {import('@octokit/rest').IssuesListForRepoResponseItem} IssuesListForRepoResponseItem */
-/** @typedef {import('@octokit/rest').IssuesListMilestonesForRepoResponseItem} OktokitIssuesListMilestonesForRepoResponseItem */
-/** @typedef {import('@octokit/rest').ReposListReleasesResponseItem} ReposListReleasesResponseItem */
+/** @typedef {import('@octokit/rest').Octokit} GitHub */
+/** @typedef {import('@octokit/rest').RestEndpointMethodTypes} RestEndpointMethodTypes */
+/** @typedef {RestEndpointMethodTypes['issues']['listForRepo']['response']['data'][number]} IssuesListForRepoResponseItem */
+/** @typedef {RestEndpointMethodTypes['repos']['listReleases']['response']['data'][number]} ReposListReleasesResponseItem */
 
 /**
  * @typedef WPChangelogCommandOptions
@@ -66,6 +66,7 @@ const LABEL_TYPE_MAPPING = {
 	'[Package] Scripts': 'Tools',
 	'[Type] Build Tooling': 'Tools',
 	'[Type] Automated Testing': 'Tools',
+	'[Type] Flaky Test': 'Tools',
 	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
 	'[Type] Code Quality': 'Code Quality',
 	'[Focus] Accessibility (a11y)': 'Accessibility',
@@ -670,7 +671,7 @@ async function getLatestReleaseInSeries( octokit, owner, repo, series ) {
 	let latestReleaseForMilestone;
 
 	/**
-	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').ReposListReleasesResponse>>}
+	 * @type {AsyncIterableIterator<{ data: ReposListReleasesResponseItem[] }>}
 	 */
 	const releases = octokit.paginate.iterator( releaseOptions );
 

@@ -1,10 +1,11 @@
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { useBlockProps } from '@wordpress/block-editor';
 import SeparatorEdit from '../edit';
 
-jest.mock( '@wordpress/block-editor', () => ( {
-	...jest.requireActual( '@wordpress/block-editor' ),
-	useBlockProps: jest.fn(),
+vi.mock( import( '@wordpress/block-editor' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useBlockProps: vi.fn(),
 } ) );
 
 const defaultAttributes = {
@@ -16,7 +17,7 @@ const defaultAttributes = {
 };
 const defaultProps = {
 	attributes: defaultAttributes,
-	setAttributes: jest.fn(),
+	setAttributes: vi.fn(),
 };
 
 describe( 'Separator block edit method', () => {

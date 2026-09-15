@@ -1,10 +1,12 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.dev.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"compilerOptions": {
 		"types": [
-			"jest",
 			"gutenberg-env",
+			"gutenberg-vitest-test-env",
+			"jest",
+			"node",
 			"style-imports",
 			"react-css-custom-properties"
 		]

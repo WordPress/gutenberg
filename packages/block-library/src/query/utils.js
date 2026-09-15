@@ -4,11 +4,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-import {
-	cloneBlock,
-	getBlockSupport,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { cloneBlock, store as blocksStore } from '@wordpress/blocks';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('@wordpress/components/build-types/query-controls/types').OrderByOption} OrderByOption */
@@ -431,17 +427,20 @@ export const usePatterns = ( clientId, name ) => {
 };
 
 /**
- * Hook that, given a block clientId, determines if it has unsupported blocks or not.
+ * Hook that, given a block clientId, returns the titles of the unsupported
+ * blocks it contains, without duplicates.
  *
  * @param {string} clientId The block's client ID.
- * @return {boolean} True if there are any unsupported blocks.
+ * @return {string[]} The titles of the unsupported blocks.
  */
 export const useUnsupportedBlocks = ( clientId ) => {
 	return useSelect(
 		( select ) => {
 			const { getClientIdsOfDescendants, getBlockName } =
 				select( blockEditorStore );
-			return getClientIdsOfDescendants( clientId ).some(
+			const { getBlockSupport, getBlockType } = select( blocksStore );
+			const blockTitles = new Set();
+			getClientIdsOfDescendants( clientId ).forEach(
 				( descendantClientId ) => {
 					const blockName = getBlockName( descendantClientId );
 					/*
@@ -459,12 +458,17 @@ export const useUnsupportedBlocks = ( clientId ) => {
 							'interactivity.clientNavigation'
 						);
 
-					return (
+					if (
 						! blockSupportsInteractivity &&
 						! blockSupportsInteractivityClientNavigation
-					);
+					) {
+						blockTitles.add(
+							getBlockType( blockName )?.title || blockName
+						);
+					}
 				}
 			);
+			return [ ...blockTitles ];
 		},
 		[ clientId ]
 	);
