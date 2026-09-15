@@ -3631,3 +3631,118 @@ describe( 'Link preview with entity data from navigation blocks', () => {
 		} );
 	} );
 } );
+
+describe( 'Transforming suggestions', () => {
+	it( 'should pass fetched suggestions through transformSuggestions before rendering', async () => {
+		const user = userEvent.setup();
+		const transformSuggestions = vi.fn( ( suggestions ) => suggestions );
+
+		render( <LinkControl transformSuggestions={ transformSuggestions } /> );
+
+		await user.type(
+			screen.getByRole( 'combobox', { name: 'Search or type URL' } ),
+			'Hello'
+		);
+
+		await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
+
+		expect( transformSuggestions ).toHaveBeenCalledWith(
+			fauxEntitySuggestions,
+			expect.objectContaining( {
+				isInitialSuggestions: false,
+				searchTerm: 'Hello',
+			} )
+		);
+	} );
+
+	it( 'should render only the suggestions that transformSuggestions returns', async () => {
+		const user = userEvent.setup();
+		const [ firstSuggestion ] = fauxEntitySuggestions;
+
+		render(
+			<LinkControl transformSuggestions={ () => [ firstSuggestion ] } />
+		);
+
+		await user.type(
+			screen.getByRole( 'combobox', { name: 'Search or type URL' } ),
+			'Hello'
+		);
+
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
+
+		const options = within( searchResults ).getAllByRole( 'option' );
+
+		expect( options ).toHaveLength( 1 );
+		expect( options[ 0 ] ).toHaveTextContent( firstSuggestion.title );
+	} );
+
+	it( 'should reorder the rendered suggestions to match transformSuggestions', async () => {
+		const user = userEvent.setup();
+		const reversed = [ ...fauxEntitySuggestions ].reverse();
+
+		render( <LinkControl transformSuggestions={ () => reversed } /> );
+
+		await user.type(
+			screen.getByRole( 'combobox', { name: 'Search or type URL' } ),
+			'Hello'
+		);
+
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
+
+		const options = within( searchResults ).getAllByRole( 'option' );
+
+		expect( options[ 0 ] ).toHaveTextContent( reversed[ 0 ].title );
+	} );
+
+	it( 'should still append the create suggestion after transforming', async () => {
+		const user = userEvent.setup();
+		const [ firstSuggestion ] = fauxEntitySuggestions;
+
+		render(
+			<LinkControl
+				createSuggestion={ vi.fn() }
+				transformSuggestions={ () => [ firstSuggestion ] }
+			/>
+		);
+
+		await user.type(
+			screen.getByRole( 'combobox', { name: 'Search or type URL' } ),
+			'Hello'
+		);
+
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
+
+		const options = within( searchResults ).getAllByRole( 'option' );
+
+		expect( options ).toHaveLength( 2 );
+		expect( options[ 1 ] ).toHaveTextContent( /^Create:/ );
+	} );
+
+	it( 'should call transformSuggestions for initial suggestions too', async () => {
+		const transformSuggestions = vi.fn( ( suggestions ) => suggestions );
+
+		render(
+			<LinkControl
+				showInitialSuggestions
+				transformSuggestions={ transformSuggestions }
+			/>
+		);
+
+		await screen.findByRole( 'listbox', {
+			name: 'Suggestions',
+		} );
+
+		expect( transformSuggestions ).toHaveBeenCalledWith(
+			fauxEntitySuggestions.slice( 0, 3 ),
+			expect.objectContaining( { isInitialSuggestions: true } )
+		);
+	} );
+} );

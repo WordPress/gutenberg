@@ -2205,6 +2205,191 @@ test.describe( 'Navigation block', () => {
 			} );
 		} );
 	} );
+
+	test.describe( 'Searching for links to add to a Navigation', () => {
+		const CATEGORY_NAME = 'Animals Weekly';
+		let category;
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			await Promise.all( [
+				requestUtils.deleteAllPosts(),
+				requestUtils.deleteAllPages(),
+				requestUtils.deleteAllMenus(),
+			] );
+
+			await requestUtils.createPage( {
+				title: 'Animals Overview',
+				status: 'publish',
+			} );
+			await requestUtils.createPost( {
+				title: 'Animals in the Wild',
+				status: 'publish',
+			} );
+			// Terms are not covered by the deleteAll* helpers, so clear any
+			// left behind by an interrupted run before creating a new one.
+			const staleTerms = await requestUtils.rest( {
+				path: '/wp/v2/categories',
+				params: { search: CATEGORY_NAME },
+			} );
+			await Promise.all(
+				staleTerms.map( ( term ) =>
+					requestUtils.rest( {
+						method: 'DELETE',
+						path: `/wp/v2/categories/${ term.id }`,
+						params: { force: true },
+					} )
+				)
+			);
+
+			category = await requestUtils.createRecord( 'categories', {
+				name: CATEGORY_NAME,
+			} );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await Promise.all( [
+				requestUtils.deleteAllPosts(),
+				requestUtils.deleteAllPages(),
+				requestUtils.deleteAllMenus(),
+			] );
+			await requestUtils.rest( {
+				method: 'DELETE',
+				path: `/wp/v2/categories/${ category.id }`,
+				params: { force: true },
+			} );
+		} );
+
+		test.describe( 'from the appender', () => {
+			test.beforeEach(
+				async ( { admin, editor, navigation, requestUtils } ) => {
+					await requestUtils.deleteAllMenus();
+					await admin.createNewPost();
+					await requestUtils.createNavigationMenu( {
+						title: 'Animals',
+						content: '',
+					} );
+					await editor.insertBlock( { name: 'core/navigation' } );
+					await expect(
+						navigation.getNavBlockInserter()
+					).toBeVisible();
+				}
+			);
+
+			test( 'lists a category alongside posts and pages and adds it to the menu', async ( {
+				editor,
+				navigation,
+				pageUtils,
+			} ) => {
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+
+				const searchResults =
+					await navigation.searchLinkControl( 'Animals' );
+
+				const categoryOption = searchResults.getByRole( 'option', {
+					name: /Animals Weekly/,
+				} );
+
+				await expect( categoryOption ).toBeVisible();
+				await categoryOption.click();
+
+				await expect(
+					editor.canvas.getByRole( 'document', {
+						name: 'Block: Category Link',
+					} )
+				).toBeVisible();
+			} );
+
+			test( 'shows the type of each link in the search results', async ( {
+				navigation,
+				pageUtils,
+			} ) => {
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+
+				const searchResults =
+					await navigation.searchLinkControl( 'Animals' );
+
+				await expect(
+					searchResults.getByRole( 'option', { name: /Page$/ } )
+				).toBeVisible();
+				await expect(
+					searchResults.getByRole( 'option', { name: /Post$/ } )
+				).toBeVisible();
+				await expect(
+					searchResults.getByRole( 'option', { name: /Category$/ } )
+				).toBeVisible();
+			} );
+
+			test( 'lists pages before other types of link', async ( {
+				navigation,
+				pageUtils,
+			} ) => {
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+
+				const searchResults =
+					await navigation.searchLinkControl( 'Animals' );
+
+				await expect(
+					searchResults.getByRole( 'option' ).first()
+				).toHaveText( /Animals Overview/ );
+			} );
+		} );
+
+		test( 'lists categories first when editing a category link', async ( {
+			admin,
+			editor,
+			navigation,
+			page,
+			pageUtils,
+			requestUtils,
+		} ) => {
+			await requestUtils.deleteAllMenus();
+			await admin.createNewPost();
+
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Animals',
+				content: `<!-- wp:navigation-link {"label":"Animals Weekly","type":"category","id":${ category.id },"url":"/?cat=${ category.id }","kind":"taxonomy"} /-->`,
+			} );
+
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: menu.id },
+			} );
+
+			const categoryLink = editor.canvas
+				.getByRole( 'document', { name: 'Block: Category Link' } )
+				.first();
+
+			await expect( categoryLink ).toBeVisible( { timeout: 10000 } );
+			await editor.selectBlocks( categoryLink );
+			await pageUtils.pressKeys( 'primary+k' );
+
+			const linkPopover = navigation.getLinkPopover();
+			await expect( linkPopover ).toBeVisible();
+			await linkPopover
+				.getByRole( 'button', { name: 'Edit link' } )
+				.click();
+
+			// When editing an existing link the search field is labelled
+			// "Link", because the separate "Text" field is shown alongside it.
+			const linkInput = linkPopover.getByRole( 'combobox', {
+				name: 'Link',
+			} );
+			await linkInput.fill( '' );
+			await linkInput.pressSequentially( 'Animals', { delay: 50 } );
+
+			const searchResults = page.getByRole( 'listbox', {
+				name: /Search results for/,
+			} );
+			await expect( searchResults ).toBeVisible();
+
+			await expect(
+				searchResults.getByRole( 'option' ).first()
+			).toHaveText( /Animals Weekly/ );
+		} );
+	} );
 } );
 
 class Navigation {
@@ -2320,6 +2505,28 @@ class Navigation {
 
 	async addSubmenuPage( label ) {
 		await this.addPage( label, true );
+	}
+
+	/**
+	 * Types into an open link control search field and waits for results.
+	 *
+	 * @param {string} term Text to search for.
+	 * @return {Object} Locator for the search results listbox.
+	 */
+	async searchLinkControl( term ) {
+		const linkControlSearch = this.getLinkControlSearch();
+
+		await expect( linkControlSearch ).toBeFocused();
+
+		await this.page.keyboard.type( term, { delay: 50 } );
+
+		const searchResults = this.page.getByRole( 'listbox', {
+			name: /Search results for/,
+		} );
+
+		await expect( searchResults ).toBeVisible();
+
+		return searchResults;
 	}
 
 	async useLinkControlSearch( label ) {

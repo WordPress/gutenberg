@@ -13,12 +13,14 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { external } from '@wordpress/icons';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
 import { getSuggestionsQuery } from '../link-ui';
+import { transformSuggestions } from '../link-ui/transform-suggestions';
 import { useLinkPreview } from './use-link-preview';
 import { useIsInvalidLink } from './use-is-invalid-link';
 import { unlock } from '../../lock-unlock';
@@ -91,6 +93,17 @@ export function Controls( {
 		attributes.type,
 		entityRecord?.id,
 		hasUrlBinding
+	);
+
+	// The search is unscoped, so results are filtered and ordered for the
+	// Navigation once they arrive.
+	const transformSuggestionsForNavigation = useCallback(
+		( suggestions ) =>
+			transformSuggestions( suggestions, {
+				type: attributes.type,
+				kind: attributes.kind,
+			} ),
+		[ attributes.type, attributes.kind ]
 	);
 
 	let helpText = '';
@@ -202,6 +215,9 @@ export function Controls( {
 								attributes.type,
 								attributes.kind
 							) }
+							transformSuggestions={
+								transformSuggestionsForNavigation
+							}
 							label={ __( 'Link to' ) }
 							help={ helpText ? helpText : undefined }
 						/>
