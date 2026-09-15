@@ -37,12 +37,7 @@ export default {
 			'line-height': [ 'px' ],
 		},
 		'font-family-name-quotes': 'always-where-recommended',
-		'font-weight-notation': [
-			'numeric',
-			{
-				ignore: [ 'relative' ],
-			},
-		],
+		'font-weight-notation': 'numeric',
 		'function-name-case': [
 			'lower',
 			{

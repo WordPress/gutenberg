@@ -5,7 +5,9 @@
 ### Breaking Changes
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `BoxControl` ([#82570](https://github.com/WordPress/gutenberg/pull/82570))
     -   `Grid` ([#82571](https://github.com/WordPress/gutenberg/pull/82571))
+    -   `Elevation` ([#82572](https://github.com/WordPress/gutenberg/pull/82572))
 
 ### Enhancements
 
@@ -17,6 +19,9 @@
 
 ### Bug Fixes
 
+-   `Card`: Keep shadow radii aligned with the Card's actual radius regardless of render order ([#82572](https://github.com/WordPress/gutenberg/pull/82572)).
+-   `SelectControl`: Stop forcing a fill on the chevron icon, so the stroke-based chevron renders as a line again instead of a filled shape ([#82949](https://github.com/WordPress/gutenberg/pull/82949)).
+-   `BorderBoxControl`: Restore the split borders layout. The top and bottom controls are centred across the row and the right control sits at the end of its column again, after `BorderControl`'s own `margin: 0` began overriding both ([#82939](https://github.com/WordPress/gutenberg/pull/82939)).
 -   `PaletteEdit`: Separate adjacent header action buttons so their focus rings do not overlap ([#82768](https://github.com/WordPress/gutenberg/pull/82768)).
 
 ### Internal
