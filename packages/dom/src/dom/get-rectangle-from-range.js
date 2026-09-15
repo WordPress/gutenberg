@@ -74,22 +74,31 @@ export default function getRectangleFromRange( range ) {
 	// placeholder, is the same spot as the position before that element in
 	// its parent. Translate it.
 	if ( startContainer.nodeType !== startContainer.TEXT_NODE ) {
-		while (
-			! startContainer.childNodes.length &&
-			startContainer.parentNode
-		) {
+		if ( ! startContainer.childNodes.length && startContainer.parentNode ) {
 			const { parentNode } = startContainer;
 			startOffset = /** @type {Node[]} */ (
 				Array.from( parentNode.childNodes )
 			).indexOf( startContainer );
 			startContainer = parentNode;
 		}
-		const position = getTextPosition(
-			startContainer.childNodes[ startOffset ],
-			startContainer.childNodes[ startOffset - 1 ]
-		);
-		if ( position ) {
-			[ startContainer, startOffset ] = position;
+		// The start of the child at the offset, descended to its innermost
+		// first node, else the end of the child before it, descended to its
+		// innermost last node.
+		let node = startContainer.childNodes[ startOffset ];
+		let offset = 0;
+		while ( node?.firstChild ) {
+			node = node.firstChild;
+		}
+		if ( ! node || node.nodeType !== node.TEXT_NODE ) {
+			node = startContainer.childNodes[ startOffset - 1 ];
+			while ( node?.lastChild ) {
+				node = node.lastChild;
+			}
+			offset = /** @type {Text} */ ( node )?.length;
+		}
+		if ( node && node.nodeType === node.TEXT_NODE ) {
+			startContainer = node;
+			startOffset = offset;
 		}
 	}
 
@@ -137,37 +146,4 @@ export default function getRectangleFromRange( range ) {
 	}
 
 	return rects[ 0 ] ?? null;
-}
-
-/**
- * The text position at the start of one node, else at the end of another:
- * the innermost first node of the first, or the innermost last node of the
- * second, when that is a text node.
- *
- * @param {Node?} after  The node to stand at the start of.
- * @param {Node?} before The node to stand at the end of otherwise.
- *
- * @return {[Text, number]?} The text node and offset, or null.
- */
-function getTextPosition( after, before ) {
-	let node = after;
-	while ( node?.firstChild ) {
-		node = node.firstChild;
-	}
-	if ( node && node.nodeType === node.TEXT_NODE ) {
-		return [ /** @type {Text} */ ( node ), 0 ];
-	}
-
-	node = before;
-	while ( node?.lastChild ) {
-		node = node.lastChild;
-	}
-	if ( node && node.nodeType === node.TEXT_NODE ) {
-		return [
-			/** @type {Text} */ ( node ),
-			/** @type {Text} */ ( node ).length,
-		];
-	}
-
-	return null;
 }
