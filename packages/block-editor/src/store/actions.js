@@ -12,6 +12,7 @@ import {
 	getBlockSupport,
 	isUnmodifiedDefaultBlock,
 	isUnmodifiedBlock,
+	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -29,8 +30,11 @@ import {
 	editContentOnlySection,
 } from './private-actions';
 import { getSiblingBlockAttributes } from '../utils/sibling-block-attributes';
+import { unlock } from '../lock-unlock';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
+
+const { editableRootKey } = unlock( blocksPrivateApis );
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -722,33 +726,43 @@ export const insertBlocks =
 					initialPosition
 				);
 				if ( updateSelection && initialPosition === 0 ) {
-					selectDefaultBlockTextStart( select, dispatch );
+					selectEditableRootTextStart( select, dispatch );
 				}
 			} );
 		}
 	};
 
 /**
- * Selects the start of the selected block's text when it is the default
- * block, so its field places the caret as it mounts. Scoped to the default
- * block because it has a single rich text field, so the store selection
- * cannot point at a different field than the one the block focuses. Placing
- * the caret by focusing the field later resets the iOS keyboard instead.
+ * Whether the block type opts into the editable root: a block with a single
+ * text field that the writing flow hosts in one editable canvas.
+ *
+ * @param {string} name Block name.
+ *
+ * @return {boolean} Whether the block opts in.
+ */
+function isEditableRootBlockType( name ) {
+	return !! getBlockType( name )?.[ editableRootKey ];
+}
+
+/**
+ * Selects the start of the selected block's text when the block opts into
+ * the editable root, so its single field places the caret as it mounts.
+ * Focusing the field later would move focus off the host and back, which
+ * resets the iOS keyboard's capitalization.
  *
  * @param {Object} select   Store selectors.
  * @param {Object} dispatch Store actions.
  */
-function selectDefaultBlockTextStart( select, dispatch ) {
+function selectEditableRootTextStart( select, dispatch ) {
 	const clientId = select.getSelectedBlockClientId();
-	if (
-		! clientId ||
-		select.getBlockName( clientId ) !== getDefaultBlockName()
-	) {
+	if ( ! clientId ) {
 		return;
 	}
-	const attributeKey = findRichTextAttributeKey(
-		getBlockType( getDefaultBlockName() )
-	);
+	const name = select.getBlockName( clientId );
+	if ( ! isEditableRootBlockType( name ) ) {
+		return;
+	}
+	const attributeKey = findRichTextAttributeKey( getBlockType( name ) );
 	if ( attributeKey ) {
 		dispatch.selectionChange( clientId, attributeKey, 0, 0 );
 	}
@@ -1199,9 +1213,13 @@ export const __unstableSplitSelection =
 				] );
 				// Select the start of the tail field in the same batch, like
 				// the branches below, so the field places the caret as it
-				// mounts rather than being focused later. Skipped when the
-				// tail changed block type and lost the attribute.
-				if ( Object.hasOwn( tail.attributes, attributeKeyB ) ) {
+				// mounts rather than being focused later. Only for blocks
+				// that opt into the editable root, and not when the tail
+				// changed block type and lost the attribute.
+				if (
+					isEditableRootBlockType( tail.name ) &&
+					Object.hasOwn( tail.attributes, attributeKeyB )
+				) {
 					dispatch.selectionChange(
 						tail.clientId,
 						attributeKeyB,

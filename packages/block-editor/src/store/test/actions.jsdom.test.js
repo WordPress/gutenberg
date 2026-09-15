@@ -5,14 +5,16 @@ import {
 	getBlockTypes,
 	unregisterBlockType,
 	registerBlockType,
-	setDefaultBlockName,
-	getDefaultBlockName,
 	createBlock,
+	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import * as selectors from '../selectors';
 import reducer from '../reducer';
 import * as actions from '../actions';
 import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
+import { unlock } from '../../lock-unlock';
+
+const { editableRootKey } = unlock( blocksPrivateApis );
 
 const noop = () => {};
 
@@ -488,19 +490,18 @@ describe( 'actions', () => {
 			);
 		} );
 
-		it( "selects the start of an inserted default block's text", () => {
-			registerBlockType( 'core/test-default', {
+		it( 'selects the start of an inserted editable root block text', () => {
+			registerBlockType( 'core/test-host', {
 				...defaultBlockSettings,
 				attributes: { content: { source: 'rich-text' } },
+				[ editableRootKey ]: true,
 			} );
-			const previousDefault = getDefaultBlockName();
-			setDefaultBlockName( 'core/test-default' );
 
-			const block = createBlock( 'core/test-default' );
+			const block = createBlock( 'core/test-host' );
 			const select = {
 				getSettings: () => null,
 				getSelectedBlockClientId: () => block.clientId,
-				getBlockName: () => 'core/test-default',
+				getBlockName: () => 'core/test-host',
 				canInsertBlockType: () => true,
 			};
 			const dispatch = vi.fn();
@@ -525,11 +526,14 @@ describe( 'actions', () => {
 				0
 			);
 
-			// A block that is not the default block is left to place its own
-			// caret, since the store cannot know which field it focuses.
+			// A block that does not opt in is left to place its own caret,
+			// since the store cannot know which field it focuses.
 			dispatch.selectionChange.mockClear();
 			select.getBlockName = () => 'core/test-item';
-			registerBlockType( 'core/test-item', defaultBlockSettings );
+			registerBlockType( 'core/test-item', {
+				...defaultBlockSettings,
+				attributes: { content: { source: 'rich-text' } },
+			} );
 			insertBlocks(
 				[ createBlock( 'core/test-item' ) ],
 				0,
@@ -538,8 +542,6 @@ describe( 'actions', () => {
 				0
 			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
 			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
-
-			setDefaultBlockName( previousDefault );
 		} );
 
 		it( 'should not apply block type templates to blocks with inner blocks', () => {
