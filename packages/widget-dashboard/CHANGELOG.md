@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Reset to default now drops staged edits, so a consumer that resets to the layout it is already rendering no longer leaves uncommitted changes on screen for the next commit to publish ([#82850](https://github.com/WordPress/gutenberg/issues/82850)).
+-   Reset to default now drops staged edits, so a consumer that resets to the layout it is already rendering no longer leaves uncommitted changes on screen for the next commit to publish ([#82953](https://github.com/WordPress/gutenberg/pull/82953)).
 
 ### Internal
 
