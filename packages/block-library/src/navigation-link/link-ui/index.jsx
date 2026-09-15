@@ -7,6 +7,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { LinkControl, useBlockEditingMode } from '@wordpress/block-editor';
 import {
+	useCallback,
 	useMemo,
 	useState,
 	useRef,
@@ -21,47 +22,8 @@ import { isURL } from '@wordpress/url';
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
 import { useEntityBinding, useLinkPreview } from '../shared';
-
-/**
- * Given the Link block's type attribute, return the query params to give to
- * /wp/v2/search.
- *
- * @param {string} type Link block's type attribute.
- * @param {string} kind Link block's entity of kind (post-type|taxonomy)
- * @return {{ type?: string, subtype?: string }} Search query params.
- */
-export function getSuggestionsQuery( type, kind ) {
-	// How many results to show initially and per search.
-	const perPage = 20;
-
-	switch ( type ) {
-		case 'post':
-		case 'page':
-			return { type: 'post', subtype: type, perPage };
-		case 'category':
-			return { type: 'term', subtype: 'category', perPage };
-		case 'tag':
-			return { type: 'term', subtype: 'post_tag', perPage };
-		case 'post_format':
-			return { type: 'post-format', perPage };
-		default:
-			if ( kind === 'taxonomy' ) {
-				return { type: 'term', subtype: type, perPage };
-			}
-			if ( kind === 'post-type' ) {
-				return { type: 'post', subtype: type, perPage };
-			}
-			return {
-				// for custom link which has no type
-				// always show pages as initial suggestions
-				initialSuggestionsSearchOptions: {
-					type: 'post',
-					subtype: 'page',
-					perPage,
-				},
-			};
-	}
-}
+import { getSuggestionsQuery } from './get-suggestions-query';
+import { transformSuggestions as transformNavigationSuggestions } from './transform-suggestions';
 
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind, id } = props.link;
@@ -180,6 +142,14 @@ function UnforwardedLinkUI( props, ref ) {
 
 	const blockEditingMode = useBlockEditingMode();
 
+	// The search is unscoped, so results are filtered and ordered for the
+	// Navigation once they arrive.
+	const transformSuggestions = useCallback(
+		( suggestions ) =>
+			transformNavigationSuggestions( suggestions, { type, kind } ),
+		[ type, kind ]
+	);
+
 	return (
 		<Popover
 			ref={ ref }
@@ -213,6 +183,7 @@ function UnforwardedLinkUI( props, ref ) {
 						noDirectEntry={ !! type }
 						noURLSuggestion={ !! type }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
+						transformSuggestions={ transformSuggestions }
 						onChange={ props.onChange }
 						onInputChange={ ( value ) => {
 							// Observe the input value so we can pass the value to the page creator
@@ -289,6 +260,8 @@ function UnforwardedLinkUI( props, ref ) {
 }
 
 export const LinkUI = forwardRef( UnforwardedLinkUI );
+
+export { getSuggestionsQuery };
 
 const LinkUITools = ( {
 	addPageButtonRef,

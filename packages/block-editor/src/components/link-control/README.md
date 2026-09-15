@@ -172,6 +172,21 @@ Controls the query parameters used to search for suggestions. For example, to li
 />
 ```
 
+### transformSuggestions
+
+-   Type: `Function`
+-   Required: No
+
+Filters and orders the fetched suggestions before they are shown. Called with the suggestions and an object containing `isInitialSuggestions` and `searchTerm`, and must return the suggestions to display. Runs before the "create" suggestion is appended, so that option always remains last.
+
+```jsx
+<LinkControl
+	transformSuggestions={ ( suggestions ) =>
+		suggestions.filter( ( suggestion ) => suggestion.kind !== 'media' )
+	}
+/>
+```
+
 ### forceIsEditingLink
 
 -   Type: `boolean`
