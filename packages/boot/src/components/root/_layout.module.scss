@@ -122,6 +122,16 @@
 			margin-top: 0;
 			margin-inline-start: 0;
 		}
+
+		/*
+		 * #wpwrap already pads the bottom and end when the rounded admin
+		 * canvas is active — drop the matching surface margins to avoid a
+		 * double frame.
+		 */
+		:global(body.admin-content-rounded) .layout-single-page & {
+			margin-bottom: 0;
+			margin-inline-end: 0;
+		}
 	}
 }
 
