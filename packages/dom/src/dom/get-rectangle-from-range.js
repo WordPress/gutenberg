@@ -63,24 +63,21 @@ export default function getRectangleFromRange( range ) {
 		);
 	}
 
-	let { startContainer, startOffset } = range;
-	const { ownerDocument } = startContainer;
-	assertIsDefined( ownerDocument, 'ownerDocument' );
-
 	// Only a position inside a text node has a caret rectangle. A position
 	// on an element, between two of its children, is the same spot as the
 	// start of the child after it or the end of the child before it, and a
 	// position inside an element with no children, like a line break or the
 	// placeholder, is the same spot as the position before that element in
-	// its parent. Translate it.
-	if ( startContainer.nodeType !== startContainer.TEXT_NODE ) {
-		if ( ! startContainer.childNodes.length && startContainer.parentNode ) {
-			const { parentNode } = startContainer;
-			startOffset = /** @type {Node[]} */ (
-				Array.from( parentNode.childNodes )
-			).indexOf( startContainer );
-			startContainer = parentNode;
+	// its parent. Measure a range at that text position instead.
+	if ( range.startContainer.nodeType !== range.startContainer.TEXT_NODE ) {
+		range = range.cloneRange();
+		if (
+			! range.startContainer.childNodes.length &&
+			range.startContainer.parentNode
+		) {
+			range.setStartBefore( range.startContainer );
 		}
+		const { startContainer, startOffset } = range;
 		// The start of the child at the offset, descended to its innermost
 		// first node, else the end of the child before it, descended to its
 		// innermost last node.
@@ -97,16 +94,14 @@ export default function getRectangleFromRange( range ) {
 			offset = /** @type {Text} */ ( node )?.length;
 		}
 		if ( node && node.nodeType === node.TEXT_NODE ) {
-			startContainer = node;
-			startOffset = offset;
+			range.setStart( node, offset );
 		}
+		range.collapse( true );
 	}
 
-	if ( startContainer !== range.startContainer ) {
-		range = ownerDocument.createRange();
-		range.setStart( startContainer, startOffset );
-		range.setEnd( startContainer, startOffset );
-	}
+	const { startContainer, startOffset } = range;
+	const { ownerDocument } = startContainer;
+	assertIsDefined( ownerDocument, 'ownerDocument' );
 
 	const rects = range.getClientRects();
 
