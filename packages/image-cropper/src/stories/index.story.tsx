@@ -13,7 +13,8 @@ import { MIN_ZOOM, MAX_ZOOM } from '../constants';
 import './style.css';
 
 export default {
-	title: 'ImageCropper/ImageCropper',
+	id: 'imagecropper-imagecropper',
+	title: 'Editor/Image Cropper/ImageCropper',
 	component: ImageCropper,
 };
 
