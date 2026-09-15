@@ -92,20 +92,20 @@ describe( 'Header', () => {
 		expect( sidebar.redo ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'updates the undo and redo buttons when the history changes', () => {
+	it( 'updates the undo and redo buttons when the history changes', async () => {
 		const sidebar = createSidebar();
 		renderHeader( sidebar );
 
 		const undoButton = screen.getByRole( 'button', { name: 'Undo' } );
 		const redoButton = screen.getByRole( 'button', { name: 'Redo' } );
 
-		act( () => {
+		await act( async () => {
 			sidebar.setHistory( { hasUndo: true, hasRedo: false } );
 		} );
 		expect( undoButton ).not.toHaveAttribute( 'aria-disabled', 'true' );
 		expect( redoButton ).toHaveAttribute( 'aria-disabled', 'true' );
 
-		act( () => {
+		await act( async () => {
 			sidebar.setHistory( { hasUndo: false, hasRedo: true } );
 		} );
 		expect( undoButton ).toHaveAttribute( 'aria-disabled', 'true' );
