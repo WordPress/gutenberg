@@ -67,8 +67,11 @@ describe( 'encodePixelsAsJpeg', () => {
 	let vips: any;
 
 	beforeAll( async () => {
-		const { default: Vips } =
-			await vi.importActual< typeof import('wasm-vips') >( 'wasm-vips' );
+		// wasm-vips is a CJS `export =`, so its ESM namespace puts the
+		// factory on `default` even though the module type is the factory.
+		const { default: Vips } = await vi.importActual< {
+			default: typeof import('wasm-vips');
+		} >( 'wasm-vips' );
 		vips = await Vips( { dynamicLibraries: [ 'vips-heif.wasm' ] } );
 	} );
 
