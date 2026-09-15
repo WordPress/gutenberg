@@ -35,6 +35,7 @@ import type { Navigation } from '../navigation';
 import type { Page } from '../page';
 import type { Post } from '../post';
 import type { Term } from '../term';
+import type { User } from '../user';
 
 /**
  * Resolves to `true` only when `A` and `B` are mutually assignable, so a
@@ -399,6 +400,24 @@ describe( 'Entity record types', () => {
 			actions.saveGlobalStyles( { id: 1, title: 'My variation' } );
 			// @ts-expect-error -- the update route requires the record ID.
 			actions.saveGlobalStyles( { title: 'My variation' } );
+		};
+	} );
+
+	it( 'the save and delete shortcuts resolve with the REST response', () => {
+		async () => {
+			const actions = dispatch( coreStore );
+
+			const saved = await actions.saveUser( { id: 1, name: 'Name' } );
+			true satisfies Expect< typeof saved, User< 'edit' > | undefined >;
+
+			const deleted = await actions.deleteUser( 1, { force: true } );
+			true satisfies Expect<
+				typeof deleted,
+				| User< 'edit' >
+				| { deleted: true; previous: User< 'edit' > }
+				| false
+				| undefined
+			>;
 		};
 	} );
 
