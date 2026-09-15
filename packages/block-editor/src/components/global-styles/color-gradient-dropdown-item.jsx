@@ -19,7 +19,7 @@ import {
 	getInheritanceProps,
 	InheritanceResetButton,
 	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceEnabled,
+	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
 
 const { Tabs } = unlock( componentsPrivateApis );
@@ -203,7 +203,7 @@ export default function ColorGradientDropdownItem( {
 	className = 'block-editor-tools-panel-color-gradient-settings__item',
 	isPlaceholder = false,
 	hasInheritedValue = false,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 } ) {
 	const colorGradientDropdownButtonRef = useRef( undefined );
 	const itemClassName = clsx( 'block-editor-color-gradient-item', className );
