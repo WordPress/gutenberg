@@ -12,19 +12,8 @@ function buildBlueprint( config ) {
 	const blueprint = {
 		$schema: 'https://playground.wordpress.net/blueprint-schema.json',
 		landingPage: '/wp-admin/',
-		preferredVersions: {
-			php: envConfig.phpVersion || '8.2',
-			wp: 'latest',
-		},
 		steps: [],
 	};
-
-	// Login step - matches wp-env default credentials
-	blueprint.steps.push( {
-		step: 'login',
-		username: 'admin',
-		password: 'password',
-	} );
 
 	// Add plugins
 	for ( const plugin of envConfig.pluginSources || [] ) {
