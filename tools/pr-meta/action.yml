@@ -23,6 +23,9 @@ inputs:
     run-url:
         description: 'URL of the workflow run that produced the content.'
         required: false
+    generation:
+        description: 'Orders writes to a section that has no commit to order them by. Pass `github.run_number`, which increments with each run of a workflow, and only from the one workflow that owns the section.'
+        required: false
 runs:
     # Node 24 strips the types on the fly, so the action runs straight from its
     # TypeScript sources without a build step. This requires every relative

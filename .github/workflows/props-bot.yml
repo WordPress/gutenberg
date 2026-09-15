@@ -29,11 +29,13 @@ on:
         types:
             - created
 
-# Cancels all previous workflow runs for pull requests that have not completed.
+# Cancels all previous runs for a pull request that have not completed.
 concurrency:
-    # The concurrency group contains the workflow name and the branch name for pull requests
-    # or the commit hash for any other events.
-    group: ${{ github.workflow }}-${{ contains( fromJSON( '["pull_request_target", "pull_request_review", "pull_request_review_comment"]' ), github.event_name ) && github.head_ref || github.sha }}
+    # Keyed by the pull request, which the four events carry in three different
+    # places. `github.sha` would not do: on `issue_comment` it is the default
+    # branch tip, the same value for every issue and pull request in the
+    # repository, so one comment anywhere would cancel every other run.
+    group: ${{ github.workflow }}-${{ github.event.number || github.event.issue.number || github.event.pull_request.number || github.run_id }}
     cancel-in-progress: true
 
 # Disable permissions for all available scopes by default.
@@ -44,16 +46,19 @@ jobs:
     # Compiles a list of props for a pull request.
     #
     # Performs the following steps:
-    # - Collects a list of contributor props and leaves a comment.
+    # - Collects a list of contributor props for the PR meta comment to post.
     # - Removes the props-bot label, if necessary.
     props-bot:
         name: Generate a list of props
         runs-on: 'ubuntu-24.04'
         permissions:
-            # The action needs permission `write` permission for PRs in order to add a comment.
+            # Read to gather the contributors, write to remove the label below.
+            # The action itself posts nothing, see `post-comment`.
             pull-requests: write
             contents: read
         timeout-minutes: 20
+        outputs:
+            comment-body: ${{ steps.props.outputs.comment-body }}
         # The job will run when pull requests are open, ready for review and:
         #
         # - A comment is added to the pull request.
@@ -71,7 +76,12 @@ jobs:
 
         steps:
             - name: Gather a list of contributors
+              id: props
               uses: WordPress/props-bot-action@trunk
+              with:
+                  # The PR meta comment carries the list, so the action renders
+                  # it to an output and posts nothing itself.
+                  post-comment: false
 
             - name: Remove the props-bot label
               uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
@@ -88,3 +98,44 @@ jobs:
                         issue_number: process.env.ISSUE_NUMBER,
                         name: 'props-bot'
                       });
+
+    pr-meta:
+        name: Update PR meta comment
+        needs: props-bot
+        # Only when the list was gathered: an empty body from a failed run would
+        # clear a props list nothing had disproved.
+        if: ${{ needs.props-bot.result == 'success' }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+            pull-requests: write
+        timeout-minutes: 5
+        # Shared with every other writer of this comment. See bundle-size.yml.
+        # This workflow runs on four events, and only some of them carry the
+        # pull request at the same place in the payload.
+        concurrency:
+            group: pr-meta-${{ github.event.number || github.event.issue.number || github.event.pull_request.number }}
+            cancel-in-progress: false
+            queue: max
+
+        steps:
+            # This job holds a writable token, and the review events check out
+            # `refs/pull/N/merge` by default, which carries the pull request's
+            # own code. Pin the action to the default branch so a pull request
+            # cannot supply the code that runs here.
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: ${{ github.event.repository.default_branch }}
+                  sparse-checkout: tools/pr-meta
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - uses: ./tools/pr-meta
+              with:
+                  repo-token: ${{ secrets.GITHUB_TOKEN }}
+                  section: props
+                  body: ${{ needs.props-bot.outputs.comment-body }}
+                  # The list is gathered before this job takes the lock, so two
+                  # runs can queue out of order. `run_number` increments with
+                  # every run of this workflow, so the newer list wins.
+                  generation: ${{ github.run_number }}
