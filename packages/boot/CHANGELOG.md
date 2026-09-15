@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Skip syncing the layout background onto `document.body` when the rounded admin canvas experiment is active, so the dark admin chrome frame stays visible on overscroll ([#NNNN](https://github.com/WordPress/gutenberg/pull/NNNN)).
+
 ## 0.22.0 (2026-09-10)
 
 ### Internal

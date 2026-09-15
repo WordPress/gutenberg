@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `checkbox-control`: Use the design system disabled fill and border tokens ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
+-   Add `common-override` stylesheet for the rounded admin canvas experiment (dark frame + rounded `#wpcontent`, depending on `wp-theme`) ([#NNNN](https://github.com/WordPress/gutenberg/pull/NNNN)).
 
 ## 13.1.0 (2026-09-10)
 

@@ -114,6 +114,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'React 19', 'gutenberg' ),
 					'description' => __( 'Registers React 19 as the bundled React version, replacing the default React 18 scripts.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-rounded-admin-canvas',
+					'label'       => __( 'Rounded admin canvas', 'gutenberg' ),
+					'description' => __( 'Applies rounded corners to the wp-admin content canvas, matching the stage treatment used by Boot-based admin pages.', 'gutenberg' ),
+				),
 			),
 		),
 	);

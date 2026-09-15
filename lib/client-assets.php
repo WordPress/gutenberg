@@ -169,6 +169,22 @@ function gutenberg_register_packages_styles( $styles ) {
 	$styles->add_data( 'wp-base-styles', 'path', gutenberg_dir_path() . 'build/styles/base-styles/admin-schemes' . $suffix . '.css' );
 	$styles->query( 'wp-admin', 'registered' )->deps[] = 'wp-base-styles';
 
+	/*
+	 * Rounded admin canvas overrides (experiment). Depends on wp-theme for
+	 * WPDS tokens and on colors so scheme backgrounds win the cascade.
+	 * Enqueued from lib/experimental/rounded-admin-canvas.php when enabled.
+	 */
+	gutenberg_override_style(
+		$styles,
+		'wp-common-override',
+		gutenberg_url( 'build/styles/base-styles/common-override' . $suffix . '.css' ),
+		array( 'wp-theme', 'common', 'colors' ),
+		$version
+	);
+	$styles->add_data( 'wp-common-override', 'rtl', 'replace' );
+	$styles->add_data( 'wp-common-override', 'suffix', $suffix );
+	$styles->add_data( 'wp-common-override', 'path', gutenberg_dir_path() . 'build/styles/base-styles/common-override' . $suffix . '.css' );
+
 	gutenberg_override_style(
 		$styles,
 		'wp-block-editor-content',

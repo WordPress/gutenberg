@@ -1,0 +1,124 @@
+/**
+ * Rounded admin canvas overrides for wp-admin.
+ *
+ * Dark frame around a rounded #wpcontent canvas. Loaded only when the
+ * "Rounded admin canvas" Gutenberg experiment is enabled.
+ */
+
+@use "../internal/wpds-token-fallbacks" as wpds;
+
+#wpwrap {
+	min-height: calc(100vh - var(--wp-admin--admin-bar--height, 32px));
+	overflow-y: auto;
+	box-sizing: border-box;
+}
+
+@media (min-width: 782px) {
+	body.admin-stage-rounded #wpwrap {
+		padding-bottom: wpds.var("--wpds-dimension-padding-sm");
+		padding-right: wpds.var("--wpds-dimension-padding-sm");
+	}
+}
+
+#wpcontent {
+	/* Fill the viewport when short; grow with content when taller. */
+	height: auto;
+	min-height: calc(100vh - var(--wp-admin--admin-bar--height, 32px));
+	box-sizing: border-box;
+}
+
+@media (min-width: 782px) {
+	body.admin-stage-rounded #wpcontent {
+		border-radius: wpds.var("--wpds-border-radius-xl");
+		min-height: calc(100vh - var(--wp-admin--admin-bar--height, 32px) - #{wpds.var("--wpds-dimension-padding-sm")});
+		overflow: clip;
+	}
+}
+
+@media (min-width: 782px) {
+	#wpwrap {
+		overflow-y: initial;
+	}
+}
+
+#wpfooter {
+	bottom: wpds.var("--wpds-dimension-padding-sm");
+	right: wpds.var("--wpds-dimension-padding-sm");
+	padding: 10px 28px 18px 20px;
+}
+
+@media (min-width: 782px) {
+	body.admin-stage-rounded #wpfooter {
+		border-radius: 0 0 wpds.var("--wpds-border-radius-xl") wpds.var("--wpds-border-radius-xl");
+		overflow: clip;
+	}
+}
+
+/*
+ * Color schemes: move the menu/frame color onto body + #wpwrap, and the
+ * former body surface color onto #wpcontent / #wpfooter (Core _admin.scss).
+ *
+ * `body:has(#wpwrap)` avoids overriding full-page Boot takeovers that print
+ * their own document without classic admin chrome.
+ *
+ * Values match each scheme's $base-color / $body-background.
+ */
+body:has(#wpwrap),
+#wpwrap {
+	background: #1e1e1e;
+}
+
+#wpcontent,
+#wpfooter {
+	background: #f0f0f1;
+}
+
+body.admin-color-fresh:has(#wpwrap),
+body.admin-color-fresh #wpwrap {
+	background: #1d2327;
+}
+
+body.admin-color-modern:has(#wpwrap),
+body.admin-color-modern #wpwrap {
+	background: #1e1e1e;
+}
+
+body.admin-color-midnight:has(#wpwrap),
+body.admin-color-midnight #wpwrap {
+	background: #333c42;
+}
+
+body.admin-color-coffee:has(#wpwrap),
+body.admin-color-coffee #wpwrap {
+	background: #5c4c40;
+}
+
+body.admin-color-ocean:has(#wpwrap),
+body.admin-color-ocean #wpwrap {
+	background: #39535a;
+}
+
+body.admin-color-blue:has(#wpwrap),
+body.admin-color-blue #wpwrap {
+	background: #245278;
+}
+
+body.admin-color-ectoplasm:has(#wpwrap),
+body.admin-color-ectoplasm #wpwrap {
+	background: #4a3369;
+}
+
+body.admin-color-sunrise:has(#wpwrap),
+body.admin-color-sunrise #wpwrap {
+	background: #8a312d;
+}
+
+body.admin-color-light:has(#wpwrap),
+body.admin-color-light #wpwrap {
+	background: #e5e5e5;
+}
+
+body.admin-color-light #wpcontent,
+body.admin-color-light #wpfooter {
+	background: #f5f5f5;
+}

@@ -274,7 +274,14 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 		#wpwrap {
 			overflow-y: auto;
 		}
-		body.js {
+
+		/*
+		 * Fallback surface when the rounded admin canvas experiment (or Core
+		 * equivalent) is off. When `.gutenberg-rounded-admin-canvas` is present,
+		 * body / #wpwrap / #wpcontent colors come from common-override.css so the
+		 * dark frame and content canvas stay consistent with classic admin pages.
+		 */
+		body.js:not(.gutenberg-rounded-admin-canvas) {
 			background: #fff;
 		}
 
@@ -300,10 +307,14 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 			top: -1px;
 		}
 
-		/* Admin menu indicators */
-		ul#adminmenu a.wp-has-current-submenu::after,
-		ul#adminmenu > li.current > a.current::after {
+		/* Admin menu indicators — match the content surface behind the arrow */
+		body:not(.gutenberg-rounded-admin-canvas) ul#adminmenu a.wp-has-current-submenu::after,
+		body:not(.gutenberg-rounded-admin-canvas) ul#adminmenu > li.current > a.current::after {
 			border-inline-end-color: #fff;
+		}
+		body.gutenberg-rounded-admin-canvas ul#adminmenu a.wp-has-current-submenu::after,
+		body.gutenberg-rounded-admin-canvas ul#adminmenu > li.current > a.current::after {
+			border-inline-end-color: #f0f0f1;
 		}
 
 		/* Media frame fix */
