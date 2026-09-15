@@ -151,8 +151,12 @@
 				color: var(--wpds-color-foreground-interactive-neutral);
 				outline: none; /* Disable user agent focus ring */
 
+				/*
+				 * Set the outline through the global CSS defense bridge, since
+				 * wp-admin's unlayered `div { outline: 0 }` beats layered styles.
+				 */
 				@media ( forced-colors: active ) {
-					outline: 1px solid Highlight;
+					--_gcd-div-outline: var(--wpds-border-width-focus) solid Highlight;
 				}
 			}
 
@@ -172,6 +176,27 @@
 
 		.item-icon {
 			flex-shrink: 0;
+		}
+
+		.item-text {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+			min-width: 0;
+			flex: 1;
+		}
+
+		.item-label {
+			min-width: 0;
+		}
+
+		.item-description {
+			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
+		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
+		.item[aria-disabled="true"] .item-description {
+			color: inherit;
 		}
 
 		.status {
