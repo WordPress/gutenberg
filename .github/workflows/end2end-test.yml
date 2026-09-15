@@ -18,7 +18,7 @@ concurrency:
 jobs:
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
@@ -71,7 +71,7 @@ jobs:
         name: Merge Artifacts
         if: ${{ !cancelled() }}
         needs: [e2e-playwright]
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         steps:
             - name: Merge failures artifacts
               uses: actions/upload-artifact/merge@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
