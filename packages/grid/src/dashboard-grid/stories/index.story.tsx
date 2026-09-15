@@ -647,6 +647,160 @@ export const EditMode: Story = {
 	},
 };
 
+// Human-readable summary of each constrained tile's `itemLimits` entry,
+// rendered inside the tile beside its live width label.
+const LIMIT_LABELS: Record< string, string > = {
+	floor: 'min 320 × 200 px',
+	ceiling: 'max 500 × 400 px',
+	ranged: 'min 200, max 600 wide',
+	bounded: 'min 300 × 160, max 600 × 320 px',
+};
+
+/**
+ * Per-item size limits via `itemLimits`, in pixels: a floor, a ceiling,
+ * a width range, and a tile bounded on both axes. Constrained tiles pin
+ * at their bounds while the pointer overshoots, and release commits
+ * spans inside the limits. `'full'` and `'fill'` stop at the tile's
+ * maximum span; the per-tile toggles exercise both.
+ */
+export const SizeLimits: Story = {
+	name: 'Per-Item Size Limits',
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+	args: {
+		columns: 12,
+		rowHeight: 80,
+		editMode: true,
+		itemLimits: {
+			floor: { minWidth: 320, minHeight: 200 },
+			ceiling: { maxWidth: 500, maxHeight: 400 },
+			ranged: { minWidth: 200, maxWidth: 600 },
+			bounded: {
+				minWidth: 300,
+				minHeight: 160,
+				maxWidth: 600,
+				maxHeight: 320,
+			},
+		},
+	},
+	render: function SizeLimitsRender( args ) {
+		const initialLayout: ( DashboardGridLayoutItem & {
+			tone: Tone;
+		} )[] = [
+			{ key: 'floor', width: 4, height: 2, order: 1, tone: 'info' },
+			{ key: 'ceiling', width: 2, height: 2, order: 2, tone: 'warning' },
+			{ key: 'ranged', width: 3, height: 1, order: 3, tone: 'brand' },
+			{ key: 'bounded', width: 2, height: 1, order: 4, tone: 'success' },
+			{ key: 'free', width: 3, height: 1, order: 5, tone: 'neutral' },
+		];
+
+		const [ tiles, setTiles ] = useState( initialLayout );
+		const [ previewLayout, setPreviewLayout ] = useState<
+			DashboardGridLayoutItem[] | null
+		>( null );
+
+		const layout: DashboardGridLayoutItem[] = tiles.map(
+			( { tone: _tone, ...item } ) => item
+		);
+
+		const onChangeLayout = ( next: DashboardGridLayoutItem[] ) => {
+			setTiles(
+				next.map( ( item ) => {
+					const existing = tiles.find( ( t ) => t.key === item.key );
+					return {
+						...item,
+						tone: existing?.tone ?? 'neutral',
+					};
+				} )
+			);
+			setPreviewLayout( null );
+		};
+
+		const removeTile = ( key: string ) => {
+			setTiles( tiles.filter( ( tile ) => tile.key !== key ) );
+		};
+
+		const toggleFill = ( key: string ) => {
+			setTiles(
+				tiles.map( ( tile ) =>
+					tile.key === key
+						? {
+								...tile,
+								width:
+									tile.width === 'fill' ? undefined : 'fill',
+						  }
+						: tile
+				)
+			);
+		};
+
+		const toggleFull = ( key: string ) => {
+			setTiles(
+				tiles.map( ( tile ) =>
+					tile.key === key
+						? {
+								...tile,
+								width:
+									tile.width === 'full' ? undefined : 'full',
+						  }
+						: tile
+				)
+			);
+		};
+
+		const tileElements = useMemo(
+			() =>
+				tiles.map( ( tile ) => (
+					<Tile
+						key={ tile.key }
+						tone={ tile.tone }
+						actionableArea={
+							<TileActions
+								isFill={ tile.width === 'fill' }
+								isFull={ tile.width === 'full' }
+								onToggleFill={ () => toggleFill( tile.key ) }
+								onToggleFull={ () => toggleFull( tile.key ) }
+								onRemove={ () => removeTile( tile.key ) }
+							/>
+						}
+					>
+						<span style={ { textAlign: 'center' } }>
+							{ formatTileLabel( tile ) }
+							<br />
+							{ LIMIT_LABELS[ tile.key ] ?? 'no limits' }
+						</span>
+					</Tile>
+				) ),
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+			[ tiles ]
+		);
+
+		return (
+			<Stack direction="row" gap="lg" align="flex-start">
+				<div style={ { width: '800px' } }>
+					<DashboardGrid
+						{ ...args }
+						layout={ layout }
+						onChangeLayout={ onChangeLayout }
+						onPreviewLayout={ setPreviewLayout }
+					>
+						{ tileElements }
+					</DashboardGrid>
+				</div>
+
+				<LayoutStatePanel
+					label={ previewLayout ? 'Staging' : 'Committed' }
+					layout={ previewLayout ?? layout }
+					tone={ previewLayout ? 'warning' : 'success' }
+				/>
+			</Stack>
+		);
+	},
+};
+
 /**
  * Custom corner-resize glyph: a diagonal line plus a filled triangle,
  * both leaning toward the bottom-right corner of the tile.

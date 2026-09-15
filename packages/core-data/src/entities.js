@@ -213,14 +213,6 @@ export const rootEntitiesConfig = [
 		supportsPagination: false,
 	},
 	{
-		label: __( 'Registered Templates' ),
-		name: 'registeredTemplate',
-		kind: 'root',
-		baseURL: '/wp/v2/registered-templates',
-		key: 'id',
-		supportsPagination: false,
-	},
-	{
 		label: __( 'Font Collections' ),
 		name: 'fontCollection',
 		kind: 'root',
@@ -396,22 +388,15 @@ async function loadPostTypeEntities() {
 				prePersistPostType( persistedRecord, edits, name, isTemplate ),
 			__unstable_rest_base: postType.rest_base,
 			// The templates controller returns the whole collection and never
-			// paginates. It serves `wp_template_part` always, and `wp_template`
-			// until the template activate experiment moves it to a posts
-			// controller.
-			supportsPagination: window?.__experimentalTemplateActivate
-				? name !== 'wp_template_part'
-				: ! isTemplate,
+			// paginates.
+			supportsPagination: ! isTemplate,
 			getRevisionsUrl: ( parentId, revisionId ) =>
 				`/${ namespace }/${
 					postType.rest_base
 				}/${ parentId }/revisions${
 					revisionId ? '/' + revisionId : ''
 				}`,
-			revisionKey:
-				isTemplate && ! window?.__experimentalTemplateActivate
-					? 'wp_id'
-					: DEFAULT_ENTITY_KEY,
+			revisionKey: isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 		};
 
 		if ( ! window.__experimentalEnableRealTimeCollaboration ) {
