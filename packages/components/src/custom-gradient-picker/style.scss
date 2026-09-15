@@ -73,10 +73,6 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 		&.is-active {
 			box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus) * 2) $white, 0 0 $border-width-focus-fallback 0 rgba($black, 0.25);
 		}
-
-		&:focus {
-			@include outset-ring__focus();
-		}
 	}
 }
 
