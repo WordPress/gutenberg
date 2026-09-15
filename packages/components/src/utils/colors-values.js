@@ -19,8 +19,8 @@ const white = '#fff';
 const GRAY = {
 	900: '#1e1e1e',
 	800: '#2f2f2f',
-	/** Meets 4.6:1 text contrast against white. Equivalent of --wpds-color-foreground-content-neutral-weak: #707070; */
-	700: '#707070',
+	/** Meets 4.6:1 text contrast against white. */
+	700: '#757575',
 	/** Meets 3:1 UI or large text contrast against white. */
 	600: '#949494',
 	400: '#ccc',
