@@ -11,7 +11,7 @@ import { createRegistry } from '@wordpress/data';
 import { store as uploadStore } from '..';
 import { ItemStatus, OperationType, type QueueItem } from '../types';
 import { unlock } from '../../lock-unlock';
-import { UploadError } from '../../upload-error';
+import { ErrorCode, UploadError } from '../../upload-error';
 import { vipsCancelOperations, vipsResizeImage } from '../utils';
 import { cancelGifToVideoOperations } from '../utils/video-conversion';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
@@ -413,6 +413,58 @@ describe( 'actions', () => {
 				true
 			);
 			expect( updatedItem.additionalData.convert_format ).toBe( true );
+		} );
+
+		it( 'routes a HEIC file named .jpg through the HEIC conversion path', async () => {
+			// A HEIC File Type Box under a name that makes the browser report
+			// the file as a JPEG. Taking it at its word sends undecodable
+			// bytes down the vips path, where the upload strands (#81707).
+			const ftyp = 'ftypheic\0\0\0\0mif1miaf';
+			const heicNamedJpeg = new File(
+				[
+					new Uint8Array( [
+						0x00,
+						0x00,
+						0x00,
+						4 + ftyp.length,
+						...[ ...ftyp ].map( ( character ) =>
+							character.charCodeAt( 0 )
+						),
+					] ),
+				],
+				'example.jpg',
+				{ type: 'image/jpeg' }
+			);
+			const onError = vi.fn();
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: heicNamedJpeg,
+				onError,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			/*
+			 * jsdom exposes none of the decoders canvasConvertToJpeg tries, so
+			 * reaching the HEIC path here means failing to decode. The point is
+			 * that it reports that failure rather than uploading the file.
+			 *
+			 * The fixture is a bare File Type Box with no meta box, so it fails
+			 * the container parse rather than the codec lookup, and is reported
+			 * as a processing error. `HEIC_DECODE_ERROR` is reserved for the
+			 * case where no decoding strategy exists at all (#81123).
+			 */
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					code: ErrorCode.IMAGE_TRANSCODING_ERROR,
+				} )
+			);
 		} );
 	} );
 

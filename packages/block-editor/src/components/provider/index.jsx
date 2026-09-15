@@ -7,6 +7,7 @@ import {
 	store as uploadStore,
 	detectClientSideMediaSupport,
 	isHeicCanvasSupported,
+	isHeicFile,
 } from '@wordpress/upload-media';
 import withRegistryProvider from './with-registry-provider';
 import useBlockSync from './use-block-sync';
@@ -38,12 +39,6 @@ let isClientSideMediaEnabledCache = null;
  * Cached result of whether HEIC-only canvas processing should be enabled.
  */
 let isHeicCanvasEnabledCache = null;
-
-/**
- * HEIC MIME types that should be routed through the upload-media pipeline
- * when in HEIC-only mode.
- */
-const HEIC_MIME_TYPES = [ 'image/heic', 'image/heif' ];
 
 /**
  * Refuses a batch of more than one file on behalf of a caller that only takes
@@ -222,7 +217,7 @@ function mediaUpload(
  * @param {Function}       $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
  * @param {boolean}        $3.multiple       Whether the caller accepts more than one file.
  */
-function heicMediaUpload(
+async function heicMediaUpload(
 	registry,
 	settings,
 	{
@@ -241,12 +236,17 @@ function heicMediaUpload(
 	}
 
 	const files = Array.from( filesList );
-	const heicFiles = files.filter( ( file ) =>
-		HEIC_MIME_TYPES.includes( file.type )
-	);
-	const otherFiles = files.filter(
-		( file ) => ! HEIC_MIME_TYPES.includes( file.type )
-	);
+
+	/*
+	 * Sorted by content rather than by `File.type`, which a browser derives
+	 * from the file extension: a HEIC photo saved as .jpg would otherwise be
+	 * handed to the server-side path, which cannot convert it either.
+	 */
+	const heicFiles = [];
+	const otherFiles = [];
+	for ( const file of files ) {
+		( ( await isHeicFile( file ) ) ? heicFiles : otherFiles ).push( file );
+	}
 
 	// When the batch contains both HEIC and non-HEIC files, coordinate
 	// onBatchSuccess so it fires only after *both* paths have completed.
