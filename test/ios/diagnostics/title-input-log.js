@@ -46,6 +46,21 @@
 		);
 	}
 
+	function describeChildren( title ) {
+		return Array.from( title.childNodes )
+			.slice( 0, 6 )
+			.map( ( node ) => {
+				if ( node.nodeType === 3 ) {
+					return JSON.stringify( node.data.slice( 0, 4 ) );
+				}
+				const placeholder = node.hasAttribute(
+					'data-rich-text-placeholder'
+				);
+				return node.nodeName + ( placeholder ? '[placeholder]' : '' );
+			} )
+			.join( ',' );
+	}
+
 	function record( doc, title, what ) {
 		const active = doc.activeElement;
 		entries.push(
@@ -58,13 +73,22 @@
 				' title=' +
 				JSON.stringify( ( title.textContent || '' ).slice( 0, 12 ) ) +
 				' kids=' +
-				title.childNodes.length +
+				describeChildren( title ) +
 				' active=' +
 				( active
 					? active.nodeName + ( active === title ? '(title)' : '' )
 					: '-' )
 		);
-		log.textContent = 'TLOG ' + entries.slice( -40 ).join( ' | ' );
+		// Everything from just before the first key onward.
+		const first = entries.findIndex( ( entry ) =>
+			entry.includes( 'keydown<' )
+		);
+		const from =
+			first === -1
+				? Math.max( 0, entries.length - 12 )
+				: Math.max( 0, first - 8 );
+		log.textContent =
+			'TLOG ' + entries.slice( from, from + 70 ).join( ' | ' );
 	}
 
 	function attach() {
