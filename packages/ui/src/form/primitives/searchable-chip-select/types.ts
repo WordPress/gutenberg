@@ -5,6 +5,7 @@ import type {
 	ComboboxEmptyProps,
 	ComboboxInputProps,
 	ComboboxRootProps,
+	ComboboxStatusProps,
 } from '../combobox/types';
 
 export type Item = {
@@ -124,6 +125,10 @@ export type SearchableChipSelectProps = Omit<
 		 * which shows whenever there are no matching items.
 		 */
 		emptyContent?: ComboboxEmptyProps[ 'children' ];
+		/**
+		 * Content for the list status live region. The region stays mounted.
+		 */
+		statusContent?: ComboboxStatusProps[ 'children' ];
 		/**
 		 * The placeholder text to use for the search input.
 		 */

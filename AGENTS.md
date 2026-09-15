@@ -42,6 +42,8 @@ Read only what your task needs, when it needs it:
 
 ## Code quality
 
+Fix ESLint and Stylelint violations in the code whenever possible. Add entries or increase counts in `tools/eslint/suppressions.json` or `tools/stylelint/stylelint-suppressions.json` only as a last resort, and explain in the PR why a code fix is not practical. Keep suppressions limited to the specific violations that need them. After fixing suppressed violations, run `npm run lint:js:prune-suppressions` for ESLint. For Stylelint, first ensure `npm run lint:css` passes, then run `npm run lint:css:update-suppressions`. Review and commit the reductions.
+
 ```bash
 npm run format            # Fix JS formatting
 npm run lint:js          # Check JS linting
@@ -67,11 +69,13 @@ For full architecture details, see `docs/explanations/architecture/`.
 ## Common pitfalls
 
 -   Do not add dependencies to the root `package.json`. Add them to the workspace that uses them, or create a new workspace under `tools/` (or `test/` for test infrastructure). See [Workspace Development](docs/contributors/code/workspace-development.md).
+-   Published package runtime files and emitted type declarations must resolve through the package's declared dependency surface; never rely on root hoisting or workspace links. Prefer fixing accidentally leaked public types over adding an unrelated heavy dependency, and run `npm run lint:published-deps` when changing package dependencies or exported types.
 -   PHP features in `lib/compat/` MUST go in the `wordpress-X.Y/` directory for their intended WordPress release. Inspect the available compatibility directories first; do not assume the newest one is right.
 -   Avoid using private APIs in bundled packages (packages without `wpScript` or `wpModuleExports`). Private APIs are intended for Core usage; bundled packages may also be imported via npm into plugin scripts, causing incompatibilities.
 -   Avoid adding new APIs prefixed with `__experimental` or `__unstable`. This pattern is now not used. Instead use private APIs or in bundled packages regular exports.
 -   `block-editor` is a WordPress-agnostic package. NEVER add `core-data` dependencies or direct REST API calls to it.
 -   `@wordpress/build` (`packages/wp-build`) is a generic build tool used both in Gutenberg and by plugins targeting WordPress Core directly. Avoid Gutenberg-specific changes in it.
+-   Pages and routes are stable by default. Mark experimental pages with `"experimental": true` in `wpPlugin.pages`; WordPress Core builds exclude those pages and routes used only by experimental pages. Do not introduce separate `stable` or `core` flags for this distinction.
 -   Never invoke a CLI through `npx`. When the binary is missing locally, `npx` installs whatever the public registry serves under that name: WordPress ships its own `wp-prettier` fork, and a bare `npx wp-scripts` can resolve to an unrelated third-party package rather than `@wordpress/scripts`. Use the npm scripts (`npm run format`, `npm run lint:js`, `npm run lint:css` and so on), which run the binaries from local `node_modules`. Where no script fits, use `npm exec --no -- <binary>` (adding `--workspace <name>` when the workspace that declares the dependency is not the one you are in), which fails instead of downloading. A bare `npm exec` behaves exactly like `npx`, so it needs `--no` too. The exception is a doc example handing the reader a tool they have not installed, such as `npx @wordpress/create-block@latest`: it names an exact package rather than a hijackable bin name.
 -   PHP function and class names are renamed at build time (`gutenberg_*` prefix, `*_Gutenberg` suffix) to avoid conflicts with WordPress Core — the built names, not the source names, are what runs (and what tests must call). See `docs/contributors/code/build-system-function-prefixing.md`.
 -   Code changes in a package that have an external impact to consumers should be accompanied by an entry in that package's `CHANGELOG.md`. Entries in the changelog should have a PR reference. In some cases you may not know the PR reference, ask the user. See `docs/contributors/code/managing-packages.md`.
