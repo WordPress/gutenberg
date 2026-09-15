@@ -38,11 +38,18 @@ function IconAction( { action }: IconActionProps ): React.ReactNode {
 						size="compact"
 						className={ styles[ 'icon-action' ] }
 						aria-label={ label }
-						download={ action.download }
-						{ ...( action.openInNewTab
-							? { target: '_blank', rel: 'noopener noreferrer' }
-							: {} ) }
-						render={ <HostLink href={ action.href } /> }
+						render={
+							<HostLink
+								href={ action.href }
+								download={ action.download }
+								{ ...( action.openInNewTab
+									? {
+											target: '_blank',
+											rel: 'noopener noreferrer',
+									  }
+									: {} ) }
+							/>
+						}
 					/>
 				}
 			>
