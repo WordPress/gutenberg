@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import apiFetch from '@wordpress/api-fetch';
@@ -6,9 +7,9 @@ import { dispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import ReactionDisplay, { invalidateReactionNames } from '../reaction-display';
 
-jest.mock( '@wordpress/api-fetch', () => jest.fn() );
+vi.mock( import( '@wordpress/api-fetch' ), () => ( { default: vi.fn() } ) );
 
-const mockApiFetch = jest.mocked( apiFetch );
+const mockApiFetch = vi.mocked( apiFetch );
 
 /*
  * The tooltip name cache in reaction-display.js is module-level and keyed
@@ -101,7 +102,7 @@ describe( 'ReactionDisplay', () => {
 			noteEmojibaseUrl: 'https://example.test/emojibase',
 		} );
 		const originalFetch = global.fetch;
-		global.fetch = jest.fn( ( url: RequestInfo | URL ) =>
+		global.fetch = vi.fn( ( url: RequestInfo | URL ) =>
 			Promise.resolve( {
 				ok: true,
 				json: () =>
@@ -162,7 +163,7 @@ describe( 'ReactionDisplay', () => {
 
 	it( 'calls onToggleReaction with the slug when a pill is clicked', async () => {
 		const user = userEvent.setup();
-		const onToggleReaction = jest.fn();
+		const onToggleReaction = vi.fn();
 		render(
 			<ReactionDisplay
 				noteId={ uniqueNoteId }
@@ -354,7 +355,7 @@ describe( 'ReactionDisplay', () => {
 		const datasetGate = new Promise< void >( ( resolve ) => {
 			resolveDataset = resolve;
 		} );
-		global.fetch = jest.fn( ( url: RequestInfo | URL ) =>
+		global.fetch = vi.fn( ( url: RequestInfo | URL ) =>
 			datasetGate.then(
 				() =>
 					( {
@@ -501,7 +502,7 @@ describe( 'ReactionDisplay', () => {
 
 	it( 'leaves pills focusable but inert on a resolved thread', async () => {
 		const user = userEvent.setup();
-		const onToggleReaction = jest.fn();
+		const onToggleReaction = vi.fn();
 		render(
 			<ReactionDisplay
 				noteId={ uniqueNoteId }
