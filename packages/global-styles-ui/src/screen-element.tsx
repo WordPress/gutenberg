@@ -13,7 +13,6 @@ import type {
 	GlobalStylesSettings,
 	GlobalStylesStyles,
 } from '@wordpress/global-styles-engine';
-import TypographyPanel from './typography-panel';
 import { ScreenHeader } from './screen-header';
 import ElementPreview from './element-preview';
 import { useSetting, useStyle } from './hooks';
@@ -24,9 +23,11 @@ const {
 	useHasBackgroundPanel,
 	useHasBorderPanel,
 	useHasDimensionsPanel,
+	useHasTypographyPanel,
 	BackgroundPanel: StylesBackgroundPanel,
 	BorderPanel: StylesBorderPanel,
 	DimensionsPanel: StylesDimensionsPanel,
+	TypographyPanel: StylesTypographyPanel,
 	AdvancedPanel: StylesAdvancedPanel,
 } = unlock( blockEditorPrivateApis );
 
@@ -123,8 +124,8 @@ function applyAllFallbackStyles( border: any ) {
 }
 
 /**
- * Renders the style panels that read and write `styles.elements.<name>`
- * directly. Typography has its own wrapper, which also carries text color.
+ * Renders every style panel for an element. The element's styles and settings
+ * are resolved once here and shared by all the panels.
  *
  * @param props
  * @param props.element The element being styled.
@@ -157,6 +158,7 @@ function ElementStylePanels( {
 		element
 	);
 
+	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
@@ -207,6 +209,15 @@ function ElementStylePanels( {
 
 	return (
 		<>
+			{ hasTypographyPanel && (
+				<StylesTypographyPanel
+					inheritedValue={ inheritedStyle }
+					value={ style }
+					onChange={ setStyle }
+					settings={ settings }
+					showInheritanceLabelIndicators={ false }
+				/>
+			) }
 			{ hasBackgroundPanel && (
 				<StylesBackgroundPanel
 					inheritedValue={ inheritedStyle }
@@ -264,7 +275,6 @@ function ScreenElement( { element }: ScreenElementProps ) {
 			<Spacer marginX={ 4 }>
 				<ElementPreview element={ element } />
 			</Spacer>
-			<TypographyPanel element={ element } />
 			<ElementStylePanels
 				element={ element }
 				label={ elements[ element ].title }
