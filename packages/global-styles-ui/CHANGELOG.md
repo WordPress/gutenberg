@@ -26,8 +26,6 @@
 
 -   Font Library: Wait for the current global styles ID before loading its entity record. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 -   Background panels: Resolve theme-relative (`file:./…`) background image URLs and `ref` pointers before rendering thumbnails and the focal point picker. The screens render inside the package's own `BlockEditorProvider`, which cannot carry the private settings the panels previously resolved these against ([#82242](https://github.com/WordPress/gutenberg/pull/82242)).
--   Expose typography and color controls for citations, inputs, and selects in Global Styles ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).
--   Mark blocks that have user styles in the block list, and add a filter to show only those blocks ([#81373](https://github.com/WordPress/gutenberg/pull/81373)).
 
 ### Internal
 
