@@ -817,20 +817,28 @@ export async function resizeImage(
 		 * When writing an animated GIF, tune gifsave for speed and size:
 		 * per-frame palette quantization dominates the re-encode cost, and
 		 * the defaults can produce sub-sizes larger than the original file.
-		 * Lower effort plus allowing slight inter-frame/inter-palette error
-		 * is 4-8x faster and eliminates the size bloat, with no visible
-		 * quality difference at sub-size dimensions.
+		 * Nearly all of that win comes from the lower effort, which is
+		 * roughly 7x faster with no visible quality difference at sub-size
+		 * dimensions. Rendering near-identical pixels as transparent adds a
+		 * couple of percent off the file size for a negligible further loss.
+		 *
+		 * `interpalette_maxerror` is deliberately left at the libvips default
+		 * (3). Raising it to reuse the previous frame's palette more often
+		 * only pays off when successive palettes are already close; on an
+		 * animation whose colours genuinely shift, frames reuse a palette
+		 * that no longer fits and have to be dithered harder to compensate.
+		 * Measured on a 48-frame colour-cycling GIF resized to 300px, a value
+		 * of 16 was ~50% slower and more than doubled the mean per-pixel
+		 * colour error against the default, to save 1.7% of the file size.
 		 *
 		 * This is keyed off the frame count rather than the opt-in: the
-		 * inter-frame and inter-palette tolerances mean nothing for a single
-		 * frame, so a static GIF would only pay the lower effort in worse
-		 * compression.
+		 * inter-frame tolerance means nothing for a single frame, so a static
+		 * GIF would only pay the lower effort in worse compression.
 		 * See https://github.com/WordPress/gutenberg/issues/80266.
 		 */
 		if ( frames > 1 && 'image/gif' === type ) {
 			saveOptions.effort = 2;
 			saveOptions.interframe_maxerror = 8;
-			saveOptions.interpalette_maxerror = 16;
 		}
 
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );

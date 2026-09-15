@@ -203,7 +203,18 @@ describe( 'resizeImage', () => {
 				expect.objectContaining( {
 					effort: 2,
 					interframe_maxerror: 8,
-					interpalette_maxerror: 16,
+				} )
+			);
+			/*
+			 * `interpalette_maxerror` stays at the libvips default: raising it
+			 * makes frames reuse a palette that no longer fits when the colours
+			 * shift, which costs encode time and visible colour accuracy for a
+			 * negligible size saving.
+			 */
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( {
+					interpalette_maxerror: expect.anything(),
 				} )
 			);
 		} );
