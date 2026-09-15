@@ -6,9 +6,9 @@ import { comment as commentIcon } from '@wordpress/icons';
 import { Menu } from '@wordpress/ui';
 import type { ComponentProps } from 'react';
 import NotesMoreMenuGroup from '../more-menu/notes-more-menu-group';
-import { getKeyboardShortcut } from '../../utils/keyboard-shortcut';
 
 type MenuShortcut = ComponentProps< typeof Menu.RadioItem >[ 'shortcut' ];
+type ModeShortcuts = Record< NotesDisplayMode, MenuShortcut >;
 
 /**
  * How the floating notes render in the canvas: full threads, minimized
@@ -41,26 +41,17 @@ export function NotesDisplayModeMenu( {
 	value,
 	onChange,
 }: NotesDisplayModeMenuProps ) {
-	// Each choice advertises its keyboard shortcut alongside the label.
-	const shortcuts = useSelect( ( select ) => {
-		const { getShortcutKeyCombination } = select( keyboardShortcutsStore );
-		const entries = Object.entries( MODE_SHORTCUTS ).map(
-			( [ mode, name ] ) => {
-				const combination = getShortcutKeyCombination( name );
-				return [
-					mode,
-					combination
-						? ( getKeyboardShortcut( {
-								character: combination.character,
-								modifier: combination.modifier ?? null,
-						  } ) as MenuShortcut | undefined )
-						: undefined,
-				];
-			}
-		);
-		return Object.fromEntries( entries ) as Partial<
-			Record< NotesDisplayMode, MenuShortcut >
-		>;
+	// Each choice advertises its keyboard shortcut alongside the label. The
+	// selector memoizes per shortcut name, so the mapped object stays shallow
+	// equal between renders.
+	const shortcuts = useSelect( ( select ): ModeShortcuts => {
+		const { getKeyboardShortcut } = select( keyboardShortcutsStore );
+		return {
+			hidden: getKeyboardShortcut( MODE_SHORTCUTS.hidden ) ?? undefined,
+			minimized:
+				getKeyboardShortcut( MODE_SHORTCUTS.minimized ) ?? undefined,
+			full: getKeyboardShortcut( MODE_SHORTCUTS.full ) ?? undefined,
+		};
 	}, [] );
 
 	const choices: { value: NotesDisplayMode; label: string }[] = [
