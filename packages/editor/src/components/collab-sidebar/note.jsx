@@ -11,7 +11,8 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
-import ReactionDisplay, { AddReactionButton } from './reaction-display';
+import ReactionDisplay from './reaction-display';
+import { AddReactionButton } from './add-reaction-picker';
 
 function NoteActionsMenu( { items, buttonRef } ) {
 	return (
@@ -222,7 +223,7 @@ export function Note( {
 				<ThemeProvider cornerRadius="pronounced">
 					<Stack
 						direction="row"
-						gap="xs"
+						gap="sm"
 						justify="flex-start"
 						// The pills wrap onto further rows; without this the
 						// trigger stretches to the full wrapped height.
