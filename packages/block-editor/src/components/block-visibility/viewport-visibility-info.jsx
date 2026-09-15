@@ -1,12 +1,8 @@
-import {
-	Icon as WCIcon,
-	__experimentalText as WCText,
-	__experimentalHStack as HStack,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { unseen } from '@wordpress/icons';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Notice } from '@wordpress/ui';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import useBlockVisibility from './use-block-visibility';
@@ -14,7 +10,6 @@ import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { deviceTypeKey } from '../../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
 
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 const DEFAULT_VISIBILITY_STATE = {
 	currentBlockVisibility: undefined,
 	hasParentHiddenEverywhere: false,
@@ -125,11 +120,12 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 	}
 
 	return (
-		<WCBadge className="block-editor-block-visibility-info">
-			<HStack spacing={ 2 } justify="start">
-				<WCIcon icon={ unseen } />
-				<WCText>{ label }</WCText>
-			</HStack>
-		</WCBadge>
+		<Notice.Root
+			className="block-editor-block-visibility-info"
+			icon={ unseen }
+			intent="info"
+		>
+			<Notice.Description>{ label }</Notice.Description>
+		</Notice.Root>
 	);
 }
