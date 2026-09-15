@@ -26,6 +26,10 @@
 -   `Menu`: Center labels, descriptions, suffixes, shortcuts, and submenu chevrons within items, including items with taller prefix or suffix content. ([#82847](https://github.com/WordPress/gutenberg/pull/82847))
 -   `Menu`: vertically center single-line item labels while preserving first-line alignment for wrapped content. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
 
+### Bug Fixes
+
+-   `Autocomplete`, `Combobox`, `Menu`, and `Select`: Restore the highlighted item indicator in forced-colors mode, which wp-admin's global CSS was suppressing. ([#82772](https://github.com/WordPress/gutenberg/pull/82772))
+
 ### Internal
 
 -   Update `@base-ui/react` from 1.7.0 to 1.8.0 ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
