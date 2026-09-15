@@ -133,7 +133,6 @@ module.exports = {
 	],
 	reporters: [
 		'default',
-		'<rootDir>packages/scripts/config/jest-github-actions-reporter/index.js',
 		/*
 		 * Only interact with flakiness.io for the official WordPress/Gutenberg
 		 * repository. Forks and private mirrors should behave the same as

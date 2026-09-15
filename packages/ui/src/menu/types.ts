@@ -116,7 +116,7 @@ export interface PopupProps extends ComponentProps< typeof _Menu.Popup > {
 export interface MenuItemLayoutProps {
 	/**
 	 * Presentational content displayed before the item label.
-	 * Use `Menu.PrefixIcon` for an icon aligned with the label.
+	 * Use `Menu.PrefixIcon` for consistent icon sizing and alignment.
 	 */
 	prefix?: ReactNode;
 
