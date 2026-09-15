@@ -450,12 +450,19 @@ describe( 'actions', () => {
 				item.id
 			);
 
-			// jsdom exposes none of the decoders canvasConvertToJpeg tries, so
-			// reaching the HEIC path here means failing to decode. The point is
-			// that it reports that failure rather than uploading the file.
+			/*
+			 * jsdom exposes none of the decoders canvasConvertToJpeg tries, so
+			 * reaching the HEIC path here means failing to decode. The point is
+			 * that it reports that failure rather than uploading the file.
+			 *
+			 * The fixture is a bare File Type Box with no meta box, so it fails
+			 * the container parse rather than the codec lookup, and is reported
+			 * as a processing error. `HEIC_DECODE_ERROR` is reserved for the
+			 * case where no decoding strategy exists at all (#81123).
+			 */
 			expect( onError ).toHaveBeenCalledWith(
 				expect.objectContaining( {
-					code: ErrorCode.HEIC_DECODE_ERROR,
+					code: ErrorCode.IMAGE_TRANSCODING_ERROR,
 				} )
 			);
 		} );
