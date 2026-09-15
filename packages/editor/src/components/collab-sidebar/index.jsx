@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -17,18 +17,28 @@ import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useNoteThreads } from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
+import { resolveRestoreTarget } from './restore-sidebar';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
 function NotesSidebar( { postId } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
 	const { toggleBlockSpotlight, selectBlock } = unlock(
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const sidebarRef = useRef( null );
+	/*
+	 * The sidebar the add-note flow displaced, so the composer can put it back
+	 * when it is cancelled. Transient memory for a single in-flight composer:
+	 * a ref keeps it out of the render path and out of the preferences that
+	 * persist the active area, where a stale target could misfire in a later
+	 * session. Holds a `SidebarCapture` from `./restore-sidebar`, or nothing.
+	 */
+	const restoreAreaRef = useRef();
 
 	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
@@ -78,6 +88,51 @@ function NotesSidebar( { postId } ) {
 		( unresolvedNotes.length > 0 || selectedNoteId !== undefined ) &&
 		! isAllNotesSidebarOpen;
 
+	/*
+	 * Put the displaced sidebar back once the composer closes without saving.
+	 * Keyed to the note selection rather than to the sidebar's own visibility,
+	 * so it covers every dismissal - Cancel, Escape, clicking away, switching
+	 * blocks - and fires whether or not the post has other notes. Submitting
+	 * leaves the notes sidebar open: it is where the new note now lives, and
+	 * it has a close button.
+	 */
+	const prevSelectedNoteIdRef = useRef( selectedNoteId );
+	useEffect( () => {
+		const prevSelectedNoteId = prevSelectedNoteIdRef.current;
+		if ( prevSelectedNoteId === selectedNoteId ) {
+			return;
+		}
+		prevSelectedNoteIdRef.current = selectedNoteId;
+
+		if ( prevSelectedNoteId !== 'new' ) {
+			return;
+		}
+
+		// The composer is gone either way, so the capture is spent.
+		const capture = restoreAreaRef.current;
+		restoreAreaRef.current = undefined;
+		if ( ! capture || selectedNoteId !== undefined ) {
+			return;
+		}
+
+		const target = resolveRestoreTarget( {
+			capturedArea: capture.capturedArea,
+			activeArea: getActiveComplementaryArea( 'core' ),
+			openedArea: capture.openedArea,
+		} );
+
+		if ( target.type === 'enable' ) {
+			enableComplementaryArea( 'core', target.area );
+		} else if ( target.type === 'disable' ) {
+			disableComplementaryArea( 'core' );
+		}
+	}, [
+		selectedNoteId,
+		getActiveComplementaryArea,
+		enableComplementaryArea,
+		disableComplementaryArea,
+	] );
+
 	async function focusNote( {
 		targetClientId,
 		noteId: targetNoteId,
@@ -92,6 +147,23 @@ function NotesSidebar( { postId } ) {
 		// viewports the floating notes show automatically once a note is
 		// selected, so no sidebar needs to be opened.
 		if ( isApproved || ! showFloatingNotes ) {
+			/*
+			 * Remember what this open is about to displace so cancelling the
+			 * composer can put it back. Only the new-note flow is cancellable,
+			 * and an already open "All notes" sidebar displaced nothing, which
+			 * also stops a second "Add note" during composition from
+			 * overwriting the original capture.
+			 */
+			const capturedArea = getActiveComplementaryArea( 'core' );
+			if (
+				targetNoteId === 'new' &&
+				capturedArea !== ALL_NOTES_SIDEBAR
+			) {
+				restoreAreaRef.current = {
+					capturedArea,
+					openedArea: ALL_NOTES_SIDEBAR,
+				};
+			}
 			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
 		}
 
