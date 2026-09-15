@@ -8276,6 +8276,16 @@
 			"count": 1
 		}
 	},
+	"packages/ui/src/form/primitives/select/item-description.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/select/item-label.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
 	"packages/ui/src/form/primitives/select/item.tsx": {
 		"@typescript-eslint/no-shadow": {
 			"count": 1
