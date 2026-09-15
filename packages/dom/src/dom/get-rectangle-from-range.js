@@ -120,9 +120,6 @@ export default function getRectangleFromRange( range ) {
 			) {
 				return null;
 			}
-			if ( ! afterRect ) {
-				afterRange = beforeRange;
-			}
 		}
 
 		if ( afterRange ) {
