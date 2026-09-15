@@ -575,7 +575,12 @@ test.describe( 'Block Notes: floating panel', () => {
 		await pageUtils.pressKeys( 'ArrowLeft' );
 		await expect( trigger ).toBeFocused();
 
+		// Reopening moves focus into the submenu asynchronously; wait for it
+		// before confirming the choice.
 		await pageUtils.pressKeys( 'ArrowRight' );
+		await expect(
+			page.getByRole( 'menuitemradio', { name: 'Hide notes' } )
+		).toBeFocused();
 		await pageUtils.pressKeys( 'Enter' );
 		await expect( notes ).toBeHidden();
 	} );
