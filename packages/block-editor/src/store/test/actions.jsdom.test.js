@@ -460,10 +460,12 @@ describe( 'actions', () => {
 				getSettings: () => null,
 				// The insertion selects the inserted block.
 				getSelectedBlockClientId: () => containerBlock.clientId,
+				getBlockName: () => 'core/test-container',
 				canInsertBlockType: () => true,
 			};
 			const dispatch = vi.fn();
 			dispatch.selectBlock = vi.fn();
+			dispatch.selectionChange = vi.fn();
 
 			insertBlocks(
 				[ containerBlock ],
@@ -482,6 +484,57 @@ describe( 'actions', () => {
 				insertedBlocks[ 0 ].innerBlocks[ 0 ].clientId,
 				0
 			);
+		} );
+
+		it( 'selects the start of the text of an inserted rich text block', () => {
+			registerBlockType( 'core/test-text', {
+				...defaultBlockSettings,
+				attributes: { content: { source: 'rich-text' } },
+			} );
+
+			const block = createBlock( 'core/test-text' );
+			const select = {
+				getSettings: () => null,
+				getSelectedBlockClientId: () => block.clientId,
+				getBlockName: () => 'core/test-text',
+				canInsertBlockType: () => true,
+			};
+			const dispatch = vi.fn();
+			dispatch.selectionChange = vi.fn();
+
+			insertBlocks(
+				[ block ],
+				0,
+				undefined,
+				true,
+				0
+			)( {
+				select,
+				dispatch,
+				registry: { batch: ( fn ) => fn() },
+			} );
+
+			expect( dispatch.selectionChange ).toHaveBeenCalledWith(
+				block.clientId,
+				'content',
+				0,
+				0
+			);
+
+			dispatch.selectionChange.mockClear();
+			insertBlocks(
+				[ block ],
+				0,
+				undefined,
+				true,
+				null
+			)( {
+				select,
+				dispatch,
+				registry: { batch: ( fn ) => fn() },
+			} );
+
+			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should not apply block type templates to blocks with inner blocks', () => {

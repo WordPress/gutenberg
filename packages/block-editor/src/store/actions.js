@@ -721,9 +721,30 @@ export const insertBlocks =
 					blocksWithTemplates,
 					initialPosition
 				);
+				if ( updateSelection && initialPosition === 0 ) {
+					selectTextStart( select, dispatch );
+				}
 			} );
 		}
 	};
+
+/**
+ * Selects the start of the selected block's text, so its field places the
+ * caret as it mounts. Focusing the field later instead resets the iOS
+ * keyboard's capitalization.
+ *
+ * @param {Object} select   Store selectors.
+ * @param {Object} dispatch Store actions.
+ */
+function selectTextStart( select, dispatch ) {
+	const clientId = select.getSelectedBlockClientId();
+	const blockType =
+		clientId && getBlockType( select.getBlockName( clientId ) );
+	const attributeKey = blockType && findRichTextAttributeKey( blockType );
+	if ( attributeKey ) {
+		dispatch.selectionChange( clientId, attributeKey, 0, 0 );
+	}
+}
 
 /**
  * Action that shows the insertion point.
@@ -1163,10 +1184,13 @@ export const __unstableSplitSelection =
 		}
 
 		if ( ! blocks.length ) {
-			dispatch.replaceBlocks( select.getSelectedBlockClientIds(), [
-				head,
-				tail,
-			] );
+			registry.batch( () => {
+				dispatch.replaceBlocks( select.getSelectedBlockClientIds(), [
+					head,
+					tail,
+				] );
+				selectTextStart( select, dispatch );
+			} );
 			return;
 		}
 
