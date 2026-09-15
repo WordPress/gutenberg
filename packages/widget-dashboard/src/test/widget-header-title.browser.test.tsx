@@ -1,0 +1,162 @@
+import { screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
+import { userEvent } from 'vitest/browser';
+import { describe, expect, it } from 'vitest';
+import { Tooltip } from '@wordpress/ui';
+import type { WidgetType } from '@wordpress/widget-primitives';
+import { WidgetHeader } from '../components/widget-header';
+
+const LONG_TITLE = 'Traffic Snapshot Against the Quarterly Revenue Target';
+const SHORT_TITLE = 'Traffic';
+
+function widgetTypeWith( title: string ): WidgetType {
+	return {
+		apiVersion: 1,
+		name: 'test/traffic',
+		title,
+		renderModule: 'test-traffic',
+	} as WidgetType;
+}
+
+function Header( { title, width }: { title: string; width: number } ) {
+	return (
+		<Tooltip.Provider delay={ 0 }>
+			<div style={ { width } }>
+				<WidgetHeader
+					widgetType={ widgetTypeWith( title ) }
+					titleId="tile-title"
+					showIdentity
+				/>
+			</div>
+			{ /* Far enough down that an open popup cannot cover it. */ }
+			<div
+				data-testid="outside"
+				style={ { height: 40, marginBlockStart: 160 } }
+			/>
+		</Tooltip.Provider>
+	);
+}
+
+// The tooltip opens on `mouseenter`, so the pointer has to arrive from
+// outside the heading; where the previous test left it is not guaranteed.
+async function hoverFromOutside( element: HTMLElement ) {
+	await userEvent.hover( screen.getByTestId( 'outside' ) );
+	await userEvent.hover( element );
+}
+
+describe( 'WidgetHeader title', () => {
+	it( 'shows the full title in a tooltip on hover when the row clips it', async () => {
+		await render( <Header title={ LONG_TITLE } width={ 240 } /> );
+
+		const heading = screen.getByRole( 'heading', { name: LONG_TITLE } );
+		expect( heading.scrollWidth ).toBeGreaterThan( heading.clientWidth );
+		await waitFor( () =>
+			expect( heading ).toHaveAttribute( 'tabindex', '0' )
+		);
+
+		await hoverFromOutside( heading );
+
+		await waitFor( () =>
+			expect( screen.getAllByText( LONG_TITLE ) ).toHaveLength( 2 )
+		);
+	} );
+
+	it( 'makes a clipped title focusable and shows the tooltip on focus', async () => {
+		await render( <Header title={ LONG_TITLE } width={ 240 } /> );
+
+		const heading = screen.getByRole( 'heading', { name: LONG_TITLE } );
+		await waitFor( () =>
+			expect( heading ).toHaveAttribute( 'tabindex', '0' )
+		);
+
+		await userEvent.keyboard( '{Tab}' );
+
+		expect( heading ).toHaveFocus();
+		await waitFor( () =>
+			expect( screen.getAllByText( LONG_TITLE ) ).toHaveLength( 2 )
+		);
+	} );
+
+	it( 'keeps focus on the title when a resize un-clips it', async () => {
+		const view = await render(
+			<Header title={ LONG_TITLE } width={ 240 } />
+		);
+
+		const heading = screen.getByRole( 'heading', { name: LONG_TITLE } );
+		await waitFor( () =>
+			expect( heading ).toHaveAttribute( 'tabindex', '0' )
+		);
+		await userEvent.keyboard( '{Tab}' );
+		expect( heading ).toHaveFocus();
+
+		await view.rerender( <Header title={ LONG_TITLE } width={ 640 } /> );
+
+		await waitFor( () =>
+			expect( heading.scrollWidth ).toBeLessThanOrEqual(
+				heading.clientWidth
+			)
+		);
+		expect( heading ).toHaveFocus();
+		expect( heading ).toHaveAttribute( 'tabindex', '0' );
+
+		await userEvent.keyboard( '{Tab}' );
+		expect( heading ).not.toHaveFocus();
+		await waitFor( () =>
+			expect( heading ).not.toHaveAttribute( 'tabindex' )
+		);
+	} );
+
+	it( 'does not reopen the tooltip on its own after the title is clipped again', async () => {
+		const view = await render(
+			<Header title={ LONG_TITLE } width={ 240 } />
+		);
+
+		const heading = screen.getByRole( 'heading', { name: LONG_TITLE } );
+		await waitFor( () =>
+			expect( heading ).toHaveAttribute( 'tabindex', '0' )
+		);
+		await hoverFromOutside( heading );
+		await waitFor( () =>
+			expect( screen.getAllByText( LONG_TITLE ) ).toHaveLength( 2 )
+		);
+
+		// Un-clip while the tooltip is open, then leave and clip again.
+		await view.rerender( <Header title={ LONG_TITLE } width={ 640 } /> );
+		await waitFor( () =>
+			expect( screen.getAllByText( LONG_TITLE ) ).toHaveLength( 1 )
+		);
+		await userEvent.hover( screen.getByTestId( 'outside' ) );
+		await view.rerender( <Header title={ LONG_TITLE } width={ 240 } /> );
+		await waitFor( () =>
+			expect( heading ).toHaveAttribute( 'tabindex', '0' )
+		);
+
+		await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
+		expect( screen.getAllByText( LONG_TITLE ) ).toHaveLength( 1 );
+	} );
+
+	it( 'leaves a title that fits alone: no tooltip, not focusable', async () => {
+		await render( <Header title={ SHORT_TITLE } width={ 480 } /> );
+
+		const heading = screen.getByRole( 'heading', { name: SHORT_TITLE } );
+		expect( heading.scrollWidth ).toBeLessThanOrEqual(
+			heading.clientWidth
+		);
+		expect( heading ).not.toHaveAttribute( 'tabindex' );
+
+		await hoverFromOutside( heading );
+
+		// The popup mounts asynchronously, so give a wrongly enabled tooltip a
+		// chance to appear before asserting it never did.
+		await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
+		expect( screen.getAllByText( SHORT_TITLE ) ).toHaveLength( 1 );
+	} );
+
+	it( "keeps the title id so the tile's labelled region still resolves", async () => {
+		await render( <Header title={ LONG_TITLE } width={ 240 } /> );
+
+		expect(
+			screen.getByRole( 'heading', { name: LONG_TITLE } )
+		).toHaveAttribute( 'id', 'tile-title' );
+	} );
+} );

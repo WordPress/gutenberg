@@ -2,9 +2,10 @@ import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { useResizeObserver } from '@wordpress/compose';
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { Card, Icon, Stack } from '@wordpress/ui';
+import { Card, Icon, Stack, Tooltip } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetInfotip } from './widget-header-infotip';
+import { useIsTruncated } from './use-is-truncated';
 import {
 	WidgetHeaderAvailableSizeProvider,
 	WidgetHeaderReserveProvider,
@@ -110,6 +111,14 @@ export function WidgetHeader( {
 		[ registerReserved, unregisterReserved ]
 	);
 
+	// A clipped title gets a tooltip and a tab stop, so keyboard users can
+	// open it too. The tab stop outlives the clipping while focused, so a
+	// resize does not drop focus to the body.
+	const [ titleMeasureRef, isTitleTruncated ] =
+		useIsTruncated< HTMLElement >();
+	const [ isTitleFocusPinned, setIsTitleFocusPinned ] = useState( false );
+	const isTitleFocusable = isTitleTruncated || isTitleFocusPinned;
+
 	const hasIdentity = showIdentity && !! widgetType?.title;
 	const totalReserved = Object.values( reserved ).reduce(
 		( sum, width ) => sum + width,
@@ -146,13 +155,25 @@ export function WidgetHeader( {
 						</span>
 					) }
 
-					<Card.Title
-						id={ titleId }
-						render={ <h2 /> }
-						className={ styles.title }
-					>
-						{ widgetType.title }
-					</Card.Title>
+					<Tooltip.Root disabled={ ! isTitleTruncated }>
+						<Tooltip.Trigger
+							ref={ titleMeasureRef }
+							id={ titleId }
+							tabIndex={ isTitleFocusable ? 0 : undefined }
+							onFocus={ () =>
+								setIsTitleFocusPinned( isTitleTruncated )
+							}
+							onBlur={ () => setIsTitleFocusPinned( false ) }
+							className={ styles.title }
+							render={ <Card.Title render={ <h2 /> } /> }
+						>
+							{ widgetType.title }
+						</Tooltip.Trigger>
+
+						{ /* Always mounted: Base UI closes through the popup's
+						   ref, so unmounting it mid-close leaves it stuck open. */ }
+						<Tooltip.Popup>{ widgetType.title }</Tooltip.Popup>
+					</Tooltip.Root>
 
 					{ widgetType.help && (
 						<WidgetInfotip
