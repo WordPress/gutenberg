@@ -100,6 +100,12 @@ function register_block_core_footnotes_post_meta() {
 					'single'            => true,
 					'type'              => 'string',
 					'revisions_enabled' => true,
+					// The meta is registered as protected below to keep it out
+					// of the Custom Fields panel, so it needs an auth callback
+					// for the editor to be able to save it.
+					'auth_callback'     => static function ( $allowed, $meta_key, $post_id, $user_id ) {
+						return user_can( $user_id, 'edit_post', $post_id );
+					},
 				)
 			);
 		}
@@ -141,3 +147,23 @@ function wp_get_footnotes_from_revision( $revision_field, $field, $revision ) {
 	return get_metadata( 'post', $revision->ID, $field, true );
 }
 add_filter( '_wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision', 10, 3 );
+
+/**
+ * Marks the footnotes post meta as protected, keeping it out of the Custom
+ * Fields meta box. Values edited there would overwrite the footnotes saved by
+ * the editor, and the serialized format is not meant for manual editing.
+ *
+ * @since 7.2.0
+ *
+ * @param bool   $is_protected Whether the key is protected.
+ * @param string $meta_key     The meta key.
+ * @param string $meta_type    The type of object the meta is registered to.
+ * @return bool Whether the key is protected.
+ */
+function block_core_footnotes_is_protected_meta( $is_protected, $meta_key, $meta_type ) {
+	if ( 'footnotes' === $meta_key && 'post' === $meta_type ) {
+		return true;
+	}
+	return $is_protected;
+}
+add_filter( 'is_protected_meta', 'block_core_footnotes_is_protected_meta', 10, 3 );
