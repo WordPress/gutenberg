@@ -87,6 +87,27 @@ describe( 'Menu keyboard navigation', () => {
 		await waitForFocusedMenuItem( 'First item' );
 	} );
 
+	it( 'should open when pressing the space key on the trigger', async () => {
+		const user = userEvent.setup();
+		await render(
+			<Menu>
+				<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+				<Menu.Popover>
+					<Menu.Item>First item</Menu.Item>
+					<Menu.Item>Second item</Menu.Item>
+				</Menu.Popover>
+			</Menu>
+		);
+
+		await user.tab();
+		await user.keyboard( ' ' );
+
+		await expect
+			.element( page.getByRole( 'button', { name: 'Open dropdown' } ) )
+			.toHaveAttribute( 'aria-expanded', 'true' );
+		await expect.element( page.getByRole( 'menu' ) ).toBeInTheDocument();
+	} );
+
 	it( 'should close when pressing the escape key', async () => {
 		const user = userEvent.setup();
 		await render(
