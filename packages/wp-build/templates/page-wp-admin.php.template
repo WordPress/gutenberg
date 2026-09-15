@@ -277,10 +277,10 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 
 		/*
 		 * Fallback surface when the rounded admin canvas experiment is off.
-		 * When `.gutenberg-rounded-admin-canvas` is present, body / #wpwrap /
+		 * When `.admin-content-rounded` is present, body / #wpwrap /
 		 * #wpcontent colors come from common-override.css.
 		 */
-		body.js:not(.gutenberg-rounded-admin-canvas) {
+		body.js:not(.admin-content-rounded) {
 			background: #fff;
 		}
 
@@ -304,15 +304,15 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 		 * Fill the rounded #wpcontent canvas so Boot's absolute layout is
 		 * sized to the framed stage rather than the full viewport.
 		 */
-		body.admin-stage-rounded.js #wpcontent {
+		body.admin-content-rounded.js #wpcontent {
 			position: relative;
 		}
-		body.admin-stage-rounded.js #wpbody,
-		body.admin-stage-rounded.js #wpbody-content {
+		body.admin-content-rounded.js #wpbody,
+		body.admin-content-rounded.js #wpbody-content {
 			min-height: inherit;
 			height: 100%;
 		}
-		body.admin-stage-rounded #{{PAGE_SLUG}}-wp-admin-app.boot-layout-container {
+		body.admin-content-rounded #{{PAGE_SLUG}}-wp-admin-app.boot-layout-container {
 			position: relative;
 			min-height: inherit;
 			height: 100%;
@@ -325,12 +325,12 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 		}
 
 		/* Admin menu indicators — match the content surface behind the arrow */
-		body:not(.gutenberg-rounded-admin-canvas) ul#adminmenu a.wp-has-current-submenu::after,
-		body:not(.gutenberg-rounded-admin-canvas) ul#adminmenu > li.current > a.current::after {
+		body:not(.admin-content-rounded) ul#adminmenu a.wp-has-current-submenu::after,
+		body:not(.admin-content-rounded) ul#adminmenu > li.current > a.current::after {
 			border-inline-end-color: #fff;
 		}
-		body.gutenberg-rounded-admin-canvas ul#adminmenu a.wp-has-current-submenu::after,
-		body.gutenberg-rounded-admin-canvas ul#adminmenu > li.current > a.current::after {
+		body.admin-content-rounded ul#adminmenu a.wp-has-current-submenu::after,
+		body.admin-content-rounded ul#adminmenu > li.current > a.current::after {
 			border-inline-end-color: #f0f0f1;
 		}
 

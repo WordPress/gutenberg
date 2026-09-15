@@ -5,7 +5,7 @@
 ### Enhancements
 
 -   Skip syncing the layout background onto `document.body` when the rounded admin canvas experiment is active, so the dark admin chrome frame stays visible on overscroll ([#NNNN](https://github.com/WordPress/gutenberg/pull/NNNN)).
--   Size single-page layout to the framed `#wpcontent` under `admin-stage-rounded`, and drop the rounded frame while full-canvas editing is open ([#NNNN](https://github.com/WordPress/gutenberg/pull/NNNN)).
+-   Size single-page layout to the framed `#wpcontent` under `admin-content-rounded`, and drop the rounded frame while full-canvas editing is open ([#NNNN](https://github.com/WordPress/gutenberg/pull/NNNN)).
 
 ## 0.22.0 (2026-09-10)
 

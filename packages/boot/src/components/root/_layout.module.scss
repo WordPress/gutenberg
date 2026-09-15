@@ -33,7 +33,7 @@
 	 * #wpcontent stage instead of the full viewport, so content is not
 	 * clipped by #wpcontent's overflow: clip.
 	 */
-	:global(body.admin-stage-rounded) &.layout-single-page {
+	:global(body.admin-content-rounded) &.layout-single-page {
 		@include mixins.break-medium {
 			min-height: 100%;
 		}
@@ -272,7 +272,7 @@
  * position: fixed is not trapped by overflow: clip.
  */
 @include mixins.break-medium {
-	:global(body.admin-stage-rounded):has(.layout.has-full-canvas) {
+	:global(body.admin-content-rounded):has(.layout.has-full-canvas) {
 		:global(#wpwrap) {
 			padding-bottom: 0;
 			/* Mirror common-override / Core #wpwrap frame padding (physical). */

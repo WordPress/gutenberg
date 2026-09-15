@@ -14,7 +14,7 @@
 }
 
 @media (min-width: 782px) {
-	body.admin-stage-rounded #wpwrap {
+	body.admin-content-rounded #wpwrap {
 		padding-bottom: wpds.var("--wpds-dimension-padding-sm");
 		padding-right: wpds.var("--wpds-dimension-padding-sm");
 	}
@@ -28,7 +28,7 @@
 }
 
 @media (min-width: 782px) {
-	body.admin-stage-rounded #wpcontent {
+	body.admin-content-rounded #wpcontent {
 		border-radius: wpds.var("--wpds-border-radius-xl");
 		min-height: calc(100vh - var(--wp-admin--admin-bar--height, 32px) - #{wpds.var("--wpds-dimension-padding-sm")});
 		overflow: clip;
@@ -48,7 +48,7 @@
 }
 
 @media (min-width: 782px) {
-	body.admin-stage-rounded #wpfooter {
+	body.admin-content-rounded #wpfooter {
 		border-radius: 0 0 wpds.var("--wpds-border-radius-xl") wpds.var("--wpds-border-radius-xl");
 		overflow: clip;
 	}

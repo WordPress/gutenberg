@@ -9,25 +9,20 @@
  */
 
 /**
- * Adds body classes for the rounded admin canvas experiment.
- *
- * `gutenberg-rounded-admin-canvas` marks the experiment as active on every
- * admin screen so styles and Boot can adapt.
- * `admin-stage-rounded` enables the rounded #wpcontent treatment — skipped
- * for full-screen block editors, which bring their own chrome.
+ * Adds the admin-content-rounded body class for the rounded admin canvas
+ * experiment. Skipped for full-screen block editors, which bring their own
+ * chrome.
  *
  * @param string $classes Space-separated admin body classes.
  * @return string
  */
 function gutenberg_rounded_admin_canvas_body_class( $classes ) {
-	$classes .= ' gutenberg-rounded-admin-canvas';
-
 	$screen = get_current_screen();
 	if ( $screen && $screen->is_block_editor() ) {
 		return $classes;
 	}
 
-	$classes .= ' admin-stage-rounded';
+	$classes .= ' admin-content-rounded';
 
 	return $classes;
 }
