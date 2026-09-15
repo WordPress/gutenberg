@@ -7,13 +7,20 @@ import { Popover } from '@wordpress/components';
 import { ValidatedTextareaControl, Link } from '@wordpress/ui';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const { latex, mathML } = attributes;
 	const [ blockRef, setBlockRef ] = useState();
 	const [ error, setError ] = useState( null );
 	const [ latexToMathML, setLatexToMathML ] = useState();
-	const initialLatex = useRef( latex );
+	// Tracks the latest `latex` so the one-shot effect below can read it
+	// when the dynamic import resolves rather than the value captured at
+	// mount.
+	const latestLatexRef = useRef( latex );
+	useEffect( () => {
+		latestLatexRef.current = latex;
+	} );
 	const formRef = useRef();
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -21,20 +28,25 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	useEffect( () => {
 		import( '@wordpress/latex-to-mathml' ).then( ( module ) => {
 			setLatexToMathML( () => module.default );
-			if ( initialLatex.current ) {
+			const currentLatex = latestLatexRef.current;
+			if ( currentLatex ) {
+				// `wp_kses` runs on block attributes for users without
+				// `unfiltered_html`, encoding `&` to `&amp;`. LaTeX uses
+				// `&` (e.g. as a column separator in `pmatrix`), so decode
+				// entities before rendering.
+				const decodedLatex = decodeEntities( currentLatex );
 				__unstableMarkNextChangeAsNotPersistent();
 				setAttributes( {
-					mathML: module.default( initialLatex.current, {
+					mathML: module.default( decodedLatex, {
 						displayMode: true,
+					} ),
+					...( decodedLatex !== currentLatex && {
+						latex: decodedLatex,
 					} ),
 				} );
 			}
 		} );
-	}, [
-		initialLatex,
-		setAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
-	] );
+	}, [ setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 
 	const blockProps = useBlockProps( {
 		ref: setBlockRef,
