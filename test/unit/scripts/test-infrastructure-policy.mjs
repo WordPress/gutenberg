@@ -32,7 +32,9 @@ function normalizeShellCommand( command ) {
 
 function isJestOnlyDependency( dependency ) {
 	return (
-		dependency !== '@testing-library/jest-dom' &&
+		! [ '@testing-library/jest-dom', 'eslint-plugin-jest-dom' ].includes(
+			dependency
+		) &&
 		( dependency.startsWith( '@jest/' ) ||
 			/(?:^|[\/_-])jest(?:$|[\/_-])/.test( dependency ) )
 	);
