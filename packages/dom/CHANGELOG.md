@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `safeHTML`: Harden with URI scheme validation and dangerous tag blocklist ([#82277](https://github.com/WordPress/gutenberg/pull/82277)).
+
 ### Bug Fixes
 
 -   `focusable.find`: Return linked image-map areas when their mapped image is visible and outside an inert subtree ([#82736](https://github.com/WordPress/gutenberg/pull/82736)).
