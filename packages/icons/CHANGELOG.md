@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+-   `cornerBottomLeft`, `cornerBottomRight`, `cornerTopLeft`, `cornerTopRight`, `sidesBottom`, `sidesHorizontal`, `sidesLeft`, `sidesRight`, `sidesTop` and `sidesVertical`: dim the rest of the box again, so each variant reads as one highlighted side or corner rather than a plain box. The dimming was dropped when these were redrawn as stroke icons. ([#PLACEHOLDER](https://github.com/WordPress/gutenberg/pull/PLACEHOLDER))
 -   `formatIndent`, `formatIndentRTL`, `formatOutdent` and `formatOutdentRTL`: correct the arrow geometry, which was malformed in the previous drawings. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
 
 ### Internal
