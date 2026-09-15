@@ -9,6 +9,7 @@
 ### New Features
 
 -   Add a text shadow block support and its control in the typography panel ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+-   `URLInput`: Add an opt-in `closeSuggestionsOnNavigateOutside` prop that closes the suggestions list when focus moves outside the field, dismisses it on Escape without also closing an enclosing popover, and only opens the list while the field has focus ([#80879](https://github.com/WordPress/gutenberg/pull/80879)).
 
 ### Enhancements
 
