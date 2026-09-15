@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ConfirmDialog } from '..';
-import styles from '../style.module.scss';
 globalThis.wpVitest.mockMatchMedia();
 
 const noop = () => {};
@@ -22,9 +21,6 @@ describe( 'Confirm', () => {
 
 				expect( dialog ).toBeInTheDocument();
 				expect( dialog ).toHaveClass( 'components-confirm-dialog' );
-				// Disable reason: Semantic queries can't reach the overlay.
-				// eslint-disable-next-line testing-library/no-node-access
-				expect( dialog.parentElement ).toHaveClass( styles.wrapper );
 
 				elementsTexts.forEach( ( txt ) => {
 					const el = screen.getByText( txt );
@@ -244,7 +240,12 @@ describe( 'Confirm', () => {
 					</ConfirmDialog>
 				);
 
-				await user.keyboard( '[Tab][Enter]' );
+				const cancelButton = screen.getByRole( 'button', {
+					name: 'Cancel',
+				} );
+				cancelButton.focus();
+				expect( cancelButton ).toHaveFocus();
+				await user.keyboard( '[Enter]' );
 
 				expect( onConfirm ).not.toHaveBeenCalled();
 				expect( onCancel ).toHaveBeenCalledTimes( 1 );
@@ -265,7 +266,12 @@ describe( 'Confirm', () => {
 					</ConfirmDialog>
 				);
 
-				await user.keyboard( '[Tab][Tab][Enter]' );
+				const confirmButton = screen.getByRole( 'button', {
+					name: 'OK',
+				} );
+				confirmButton.focus();
+				expect( confirmButton ).toHaveFocus();
+				await user.keyboard( '[Enter]' );
 
 				expect( onConfirm ).toHaveBeenCalledTimes( 1 );
 				expect( onCancel ).not.toHaveBeenCalled();

@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Hide the date, author and password fields when the post's `_links` lack the `wp:action-publish` / `wp:action-assign-author` relations, matching the classic sidebar. ([#82844](https://github.com/WordPress/gutenberg/pull/82844))
+-   Template field: Show it on block themes to users who can't create templates, like the post editor's template panel. ([#82857](https://github.com/WordPress/gutenberg/pull/82857))
+-   `MediaEdit`: Show a message instead of the picker when the user lacks permission to upload media. ([#82720](https://github.com/WordPress/gutenberg/pull/82720))
+
+### Internal
+
+- 	Replace deprecated `word-break: break-word` with `overflow-wrap: anywhere` on the slug permalink help link to clear the Stylelint suppression. ([#82693](https://github.com/WordPress/gutenberg/pull/82693))
+
+## 0.47.0 (2026-09-10)
+
 ### Enhancements
 
 -   Show a "Privacy Policy Page" badge next to the title of the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   The `save<Entity>` and `delete<Entity>` shortcut actions resolve with their saved or deleted record types instead of `void` ([#77162](https://github.com/WordPress/gutenberg/pull/77162)).
+
+## 8.0.0 (2026-09-10)
+
 ### Breaking Changes
 
 -   The entity record selectors infer the record from their `kind` and `name` arguments with a `const` type parameter. TypeScript consumers now require TypeScript 5 or newer. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
