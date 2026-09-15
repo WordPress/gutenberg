@@ -1,12 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-
 import type { __experimentalApiKeySource as ApiKeySource } from '@wordpress/connectors';
 
 export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';

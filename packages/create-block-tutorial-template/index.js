@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const { join } = require( 'path' );
 
 module.exports = {

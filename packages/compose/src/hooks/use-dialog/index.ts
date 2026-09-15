@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import type {
 	KeyboardEvent,
 	KeyboardEventHandler,
 	RefCallback,
 	SyntheticEvent,
 } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useRef, useEffect, useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useConstrainedTabbing from '../use-constrained-tabbing';
 import { useFocusOnMount } from '../use-focus-on-mount';
 import useFocusReturn from '../use-focus-return';

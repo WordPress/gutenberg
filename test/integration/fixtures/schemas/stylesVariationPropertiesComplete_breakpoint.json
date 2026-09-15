@@ -1,0 +1,23 @@
+{
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
+	"styles": {
+		"blocks": {
+			"core/group": {
+				"variations": {
+					"custom-variation": {
+						"@mobile": {
+							"blocks": {
+								"core/paragraph": {
+									"color": {
+										"text": "red"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,12 +1,9 @@
-/**
- * Internal dependencies
- */
 import type { GetRecordsHttpQuery, State } from './selectors';
 import type * as ET from './entity-types';
 
 export type WPEntityTypes< C extends ET.Context = 'edit' > = {
 	Comment: ET.Comment< C >;
-	GlobalStyles: ET.GlobalStylesRevision< C >;
+	GlobalStyles: ET.GlobalStyles< C >;
 	Media: ET.Attachment< C >;
 	Menu: ET.NavMenu< C >;
 	MenuItem: ET.NavMenuItem< C >;
@@ -92,9 +89,11 @@ type DeleteRecordsHttpQuery = Record< string, any >;
 
 export type SaveActions = {
 	[ Key in `save${ keyof WPEntityTypes }` ]: (
-		data: Partial<
-			WPEntityTypes[ Key extends `save${ infer E }` ? E : never ]
-		>,
+		data: Key extends 'saveGlobalStyles'
+			? ET.GlobalStylesUpdate
+			: Partial<
+					WPEntityTypes[ Key extends `save${ infer E }` ? E : never ]
+			  >,
 		options?: ActionOptions
 	) => Promise< void >;
 };

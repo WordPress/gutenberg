@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Page } from '@playwright/test';
-
-/**
- * WordPress dependencies
- */
 import type { Editor } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 import type { UserCredentials } from './fixtures/collaboration-utils';
 

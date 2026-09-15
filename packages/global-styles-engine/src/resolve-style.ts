@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getResolvedValue } from './utils/common';
 import { getValueFromObjectPath } from './utils/object';
 import { getVariationStyle } from './variation';

@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { next, replace, attrs, string } from '../';
 
 describe( 'shortcode', () => {

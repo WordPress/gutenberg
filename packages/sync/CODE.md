@@ -12,7 +12,7 @@ Relevant docs and discussions:
 
 -   **CRDT document**: A [Yjs `Y.Doc`](https://docs.yjs.dev/api/y.doc) that holds synced entity data. CRDTs (Conflict-free Replicated Data Types) allow concurrent edits from multiple peers to be merged automatically without conflicts.
 -   **Sync manager**: Orchestrates the lifecycle of synced entities: creating CRDT documents, connecting providers, attaching observers, and coordinating updates.
--   **Provider**: A transport layer that syncs CRDT document updates between peers. The default provider uses HTTP polling; plugins can substitute their own provider via the `sync.providers` filter.
+-   **Provider**: A transport layer that syncs CRDT document updates between peers. The Real-Time Collaboration experiment uses HTTP polling by default; plugins can replace it via the `sync.providers` filter.
 -   **Awareness**: Ephemeral presence state (e.g., cursor positions, user identity) shared between peers. Unlike CRDT document state, awareness is not persisted.
 -   **Sync config**: An entity-level configuration object that defines how local changes are written to the CRDT document and how remote changes are extracted from it. See the `SyncConfig` type in `src/types.ts`.
 -   **Origin**: A value attached to each Yjs transaction to identify the source of a change (e.g., local editor, sync manager, undo manager, or remote peer). Origins are used to decide which changes should trigger store updates and which should be tracked by the undo manager.
@@ -60,9 +60,9 @@ The sync config "owns" the sync behavior of the entity; it has sole knowledge of
 
 A provider is a transport layer that syncs Yjs document updates between peers. This package uses a pluggable provider system defined in `src/providers/`.
 
-### Default: HTTP polling
+### Default HTTP polling provider
 
-The default provider (`src/providers/http-polling/`) uses HTTP polling to exchange updates with a central sync server. A shared polling manager batches updates for all rooms (entities) into a single request per poll cycle. See [the HTTP polling README](./src/providers/http-polling/README.md) for full details including the REST API format, sync protocol, and compaction.
+When the **Real-Time Collaboration** experiment is enabled, the default provider (`src/providers/http-polling/`) uses HTTP polling to exchange updates with a central sync server. Plugins can replace the polling provider through the `sync.providers` filter. A shared polling manager batches updates for all rooms (entities) into a single request per poll cycle. See [the HTTP polling README](./src/providers/http-polling/README.md) for full details including the REST API format, sync protocol, and compaction.
 
 -   Poll interval: 4 seconds when editing alone, 1 second when collaborators are detected.
 -   The `sync.pollingManager.pollingInterval` and `sync.pollingManager.pollingIntervalWithCollaborators` filters can make active-tab polling faster, but slower values are clamped to the defaults.

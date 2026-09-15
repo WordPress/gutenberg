@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type {
 	CropperAction,
 	CropperState,

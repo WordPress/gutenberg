@@ -32,7 +32,10 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 	public function test_comment_kses_strips_mention_span_by_default() {
 		// Baseline proving the allowance is required at all: without the
 		// notes filter, the comment kses context strips `span` entirely.
+		// WordPress trunk ships the allowance natively (see r62832), hooked
+		// as `_wp_kses_allow_note_mention_span`, so detach that one too.
 		remove_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_span' );
+		remove_filter( 'wp_kses_allowed_html', '_wp_kses_allow_note_mention_span' );
 
 		$stripped = wp_kses( self::MENTION_CONTENT, 'pre_comment_content' );
 

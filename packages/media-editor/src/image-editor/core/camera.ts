@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { mat2d, vec2 } from 'gl-matrix';
-
-/**
- * Internal dependencies
- */
 import type {
 	CropperState,
 	NormalizedPoint,

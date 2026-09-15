@@ -1,14 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-import { TextareaControl } from '@wordpress/components';
 import type { Attachment, Updatable } from '@wordpress/core-data';
 import type { Field } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import { getRawContent } from '../utils/get-raw-content';
 
 const descriptionField: Partial< Field< Updatable< Attachment > > > = {
@@ -19,15 +11,9 @@ const descriptionField: Partial< Field< Updatable< Attachment > > > = {
 	render: ( { item } ) => (
 		<div>{ getRawContent( item?.description ) || '-' }</div>
 	),
-	Edit: ( { field, onChange, data } ) => {
-		return (
-			<TextareaControl
-				label={ field.label }
-				value={ getRawContent( data.description ) || '' }
-				onChange={ ( value ) => onChange( { description: value } ) }
-				rows={ 5 }
-			/>
-		);
+	Edit: {
+		control: 'textarea',
+		rows: 5,
 	},
 	enableSorting: false,
 	filterBy: false,

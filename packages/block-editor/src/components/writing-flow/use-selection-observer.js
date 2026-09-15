@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import {
@@ -8,13 +5,8 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { isSelectionForward } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
-import { canHostEditableRoot } from './use-editable-root';
 import { setContentEditableWrapper } from './utils';
 import { unlock } from '../../lock-unlock';
 
@@ -109,7 +101,6 @@ export default function useSelectionObserver() {
 		startMultiSelect,
 		stopMultiSelect,
 	} = useDispatch( blockEditorStore );
-	const blockEditorSelectors = useSelect( blockEditorStore );
 	const {
 		getBlockParents,
 		getBlockSelectionStart,
@@ -117,7 +108,8 @@ export default function useSelectionObserver() {
 		getSelectionStart,
 		getSelectionEnd,
 		getSelectedBlockClientId,
-	} = blockEditorSelectors;
+		canHostEditableRoot,
+	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -185,10 +177,7 @@ export default function useSelectionObserver() {
 						// always move it), which must not re-enable the wrapper
 						// after another block has been selected.
 						collapsedClientId === getSelectedBlockClientId() &&
-						canHostEditableRoot(
-							blockEditorSelectors,
-							collapsedClientId
-						)
+						canHostEditableRoot( collapsedClientId )
 					) {
 						setContentEditableWrapper( node, true );
 
@@ -217,12 +206,21 @@ export default function useSelectionObserver() {
 						! isMultiSelecting()
 					) {
 						setContentEditableWrapper( node, false );
-						let element =
-							startNode.nodeType === startNode.ELEMENT_NODE
-								? startNode
-								: startNode.parentElement;
-						element = element?.closest( '[contenteditable]' );
-						element?.focus();
+						// Only return focus to the field if the wrapper had
+						// it. If Escape moved focus to the canvas stop in the
+						// parent document, the wrapper is only the stale
+						// active element and focus must not come back.
+						if (
+							ownerDocument.activeElement === node &&
+							ownerDocument.hasFocus()
+						) {
+							let element =
+								startNode.nodeType === startNode.ELEMENT_NODE
+									? startNode
+									: startNode.parentElement;
+							element = element?.closest( '[contenteditable]' );
+							element?.focus();
+						}
 					}
 					return;
 				}

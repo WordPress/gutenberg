@@ -1,17 +1,10 @@
-/**
- * External dependencies
- */
-const { setFailed, getInput } = require( '@actions/core' );
-const { getOctokit, context } = require( '@actions/github' );
-
-/**
- * Internal dependencies
- */
-const assignFixedIssues = require( './tasks/assign-fixed-issues' );
-const firstTimeContributorAccountLink = require( './tasks/first-time-contributor-account-link' );
-const firstTimeContributorLabel = require( './tasks/first-time-contributor-label' );
-const addMilestone = require( './tasks/add-milestone' );
-const debug = require( './debug' );
+import { setFailed, getInput } from '@actions/core';
+import { getOctokit, context } from '@actions/github';
+import assignFixedIssues from './tasks/assign-fixed-issues/index.js';
+import firstTimeContributorAccountLink from './tasks/first-time-contributor-account-link/index.js';
+import firstTimeContributorLabel from './tasks/first-time-contributor-label/index.js';
+import addMilestone from './tasks/add-milestone/index.js';
+import debug from './debug.js';
 
 /**
  * Automation task function.

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import blockEditorLtr from '../package-styles/block-editor-ltr.lazy.scss?inline';
 import blockEditorRtl from '../package-styles/block-editor-rtl.lazy.scss?inline';
 import blockLibraryLtr from '../package-styles/block-library-ltr.lazy.scss?inline';
@@ -74,16 +71,6 @@ const CONFIG = [
 		componentIdMatcher: /^dataviews-/,
 		ltr: [ designTokens, componentsLtr, dataviewsLtr ],
 		rtl: [ designTokens, componentsRtl, dataviewsRtl ],
-	},
-	{
-		// The DataForm stories include a `richtext` control, which renders
-		// format UI from `@wordpress/format-library` and the inline link
-		// popover (`LinkControl`) from `@wordpress/block-editor`. Stack those
-		// styles on top of the `dataviews-` set above (all matching entries
-		// apply); the control's own styles ship with `@wordpress/components`.
-		componentIdMatcher: /^dataviews-dataform/,
-		ltr: [ blockEditorLtr, formatLibraryLtr ],
-		rtl: [ blockEditorRtl, formatLibraryRtl ],
 	},
 	{
 		componentIdMatcher: /^fields-/,

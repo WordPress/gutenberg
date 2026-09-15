@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import migrateFontFamily from '../utils/migrate-font-family';
 import migrateTextAlign from '../utils/migrate-text-align';
 

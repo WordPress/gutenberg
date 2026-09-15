@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import usePostContentBlockTypes from './use-post-content-block-types';

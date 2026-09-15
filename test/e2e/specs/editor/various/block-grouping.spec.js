@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /** @typedef {import('@playwright/test').Page} Page */
@@ -91,6 +88,52 @@ test.describe( 'Block Grouping', () => {
 						{
 							name: 'core/paragraph',
 							attributes: { content: 'Some paragraph' },
+						},
+					],
+				},
+			] );
+		} );
+
+		test( 'wraps a block with its own transform to the group block, instead of transforming it', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/quote',
+				attributes: { citation: 'someone' },
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'quoted words' },
+					},
+				],
+			} );
+
+			// The quote is also ungroupable, so an exact name is needed:
+			// the block options menu contains both Group and Ungroup.
+			await editor.clickBlockToolbarButton( 'Options' );
+			await page
+				.getByRole( 'menu', { name: 'Options' } )
+				.getByRole( 'menuitem', { name: 'Group', exact: true } )
+				.click();
+
+			// The quote survives whole inside the group; its transform to
+			// the group block (which dissolves it) must not be used.
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/group',
+					innerBlocks: [
+						{
+							name: 'core/quote',
+							attributes: { citation: 'someone' },
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: {
+										content: 'quoted words',
+									},
+								},
+							],
 						},
 					],
 				},
