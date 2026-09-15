@@ -330,4 +330,80 @@ describe( 'canvasConvertToJpeg', () => {
 			).toHaveBeenCalledWith( 'image/heic' );
 		} );
 	} );
+
+	describe( 'encoder injection', () => {
+		const setupStrategy1 = ( canvasJpeg: Blob ) => {
+			const mockBitmap = { width: 32, height: 32, close: vi.fn() };
+			const convertToBlob = vi.fn().mockResolvedValue( canvasJpeg );
+			global.createImageBitmap = vi.fn().mockResolvedValue( mockBitmap );
+			global.OffscreenCanvas = vi
+				.fn()
+				.mockImplementation( function OffscreenCanvas() {
+					return {
+						width: 32,
+						height: 32,
+						getContext: vi
+							.fn()
+							.mockReturnValue( { drawImage: vi.fn() } ),
+						convertToBlob,
+					};
+				} );
+			return convertToBlob;
+		};
+
+		const file = new File( [ 'data' ], 'photo.heic', {
+			type: 'image/heic',
+		} );
+
+		it( 'encodes the decoded canvas with the given encoder', async () => {
+			const convertToBlob = setupStrategy1(
+				new Blob( [ 'canvas-jpeg' ], { type: 'image/jpeg' } )
+			);
+			const encode = vi
+				.fn()
+				.mockResolvedValue(
+					new Blob( [ 'vips-jpeg' ], { type: 'image/jpeg' } )
+				);
+
+			const result = await canvasConvertToJpeg( file, 0.5, encode );
+
+			expect( encode ).toHaveBeenCalledWith(
+				expect.objectContaining( { width: 32, height: 32 } ),
+				0.5
+			);
+			expect( convertToBlob ).not.toHaveBeenCalled();
+			expect( await result.text() ).toBe( 'vips-jpeg' );
+			expect( result.name ).toBe( 'photo.jpg' );
+			expect( result.type ).toBe( 'image/jpeg' );
+		} );
+
+		it( 'falls back to the canvas encoder when the encoder declines', async () => {
+			const convertToBlob = setupStrategy1(
+				new Blob( [ 'canvas-jpeg' ], { type: 'image/jpeg' } )
+			);
+			const encode = vi.fn().mockResolvedValue( null );
+
+			const result = await canvasConvertToJpeg( file, 0.5, encode );
+
+			expect( convertToBlob ).toHaveBeenCalledWith( {
+				type: 'image/jpeg',
+				quality: 0.5,
+			} );
+			expect( await result.text() ).toBe( 'canvas-jpeg' );
+		} );
+
+		it( 'falls back to the canvas encoder when the encoder fails', async () => {
+			const convertToBlob = setupStrategy1(
+				new Blob( [ 'canvas-jpeg' ], { type: 'image/jpeg' } )
+			);
+			const encode = vi
+				.fn()
+				.mockRejectedValue( new Error( 'worker crashed' ) );
+
+			const result = await canvasConvertToJpeg( file, 0.5, encode );
+
+			expect( convertToBlob ).toHaveBeenCalled();
+			expect( await result.text() ).toBe( 'canvas-jpeg' );
+		} );
+	} );
 } );

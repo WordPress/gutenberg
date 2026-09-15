@@ -14,6 +14,7 @@ import {
 	rotateImage,
 	hasTransparency,
 	getUltraHdrInfo,
+	encodePixelsAsJpeg,
 } from './index.ts';
 
 /**
@@ -27,6 +28,7 @@ const api = {
 	rotateImage,
 	hasTransparency,
 	getUltraHdrInfo,
+	encodePixelsAsJpeg,
 };
 
 expose( api );

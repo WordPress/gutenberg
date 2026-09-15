@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   HEIC images converted to JPEG in the browser no longer lose their EXIF metadata when client-side media processing is active. vips encodes the decoded pixels and copies the EXIF block over from the HEIC container (with the orientation reset, since rotation is baked into the pixels), so the server can populate the attachment's title, caption, alt text and `image_meta` the same way it does for a direct upload ([#82033](https://github.com/WordPress/gutenberg/issues/82033)).
+
 ## 0.40.0 (2026-09-10)
 
 ### Bug Fixes

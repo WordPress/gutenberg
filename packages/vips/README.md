@@ -59,6 +59,24 @@ _Parameters_
 -   _outputType_ `string`: Output mime type.
 -   _options_ `ConvertImageOptions`: Conversion options.
 
+### encodePixelsAsJpeg
+
+Encodes raw RGBA pixels as a JPEG, optionally carrying over the EXIF block from the file the pixels were decoded from.
+
+This backs the HEIC upload path: wasm-vips ships no HEVC decoder, so the browser decodes HEIC to pixels with its platform codecs, and a canvas re-encode would drop all metadata. libvips reads the source's EXIF from the container header alone, so no HEVC decoding is needed here either.
+
+_Parameters_
+
+-   _id_ `ItemId`: Item ID.
+-   _pixels_ `ArrayBuffer`: Tightly packed 8-bit RGBA pixel data, as returned by `ImageData.data`.
+-   _width_ `number`: Image width in pixels.
+-   _height_ `number`: Image height in pixels.
+-   _options_ `EncodePixelsOptions`: Encoding options.
+
+_Returns_
+
+-   `Promise< ArrayBuffer | ArrayBufferLike >`: JPEG file data.
+
 ### getUltraHdrInfo
 
 Probes a JPEG to determine whether it is an UltraHDR image with an embedded gain map.
@@ -164,6 +182,24 @@ _Parameters_
 -   _inputType_ `string`: Input mime type.
 -   _outputType_ `string`: Output mime type.
 -   _options_ `ConvertImageOptions`: Conversion options.
+
+### vipsEncodePixelsAsJpeg
+
+Encodes raw RGBA pixels as a JPEG, optionally carrying over the EXIF block from the file the pixels were decoded from.
+
+This backs the HEIC upload path: wasm-vips ships no HEVC decoder, so the browser decodes HEIC to pixels with its platform codecs, and a canvas re-encode would drop all metadata. libvips reads the source's EXIF from the container header alone, so no HEVC decoding is needed here either.
+
+_Parameters_
+
+-   _id_ `ItemId`: Item ID.
+-   _pixels_ `ArrayBuffer`: Tightly packed 8-bit RGBA pixel data, as returned by `ImageData.data`.
+-   _width_ `number`: Image width in pixels.
+-   _height_ `number`: Image height in pixels.
+-   _options_ `EncodePixelsOptions`: Encoding options.
+
+_Returns_
+
+-   `Promise< ArrayBuffer | ArrayBufferLike >`: JPEG file data.
 
 ### vipsGetUltraHdrInfo
 
