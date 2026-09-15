@@ -233,8 +233,43 @@ describe( 'PostPublishButton', () => {
 			expect(
 				screen.getByRole( 'button', { name: 'Publish' } )
 			).toHaveAccessibleDescription(
-				'Switch to Editing to publish or update this post.'
+				'Switch to Editing to change the post status.'
 			);
+		} );
+
+		it( 'should stay enabled when the click would only save', () => {
+			mockHasPublishAction( true );
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'isCurrentPostPublished', true );
+			mockSelector( 'getEditedPostAttribute', 'publish' );
+			setEditorIntent( EDITOR_INTENT_SUGGEST );
+
+			render( <PostPublishButton /> );
+
+			// Suggestions write their markers into the post content, and
+			// there is no save lock while suggesting, so a published post
+			// has to stay saveable or the suggester is trapped behind an
+			// unsaved-changes warning.
+			const button = screen.getByRole( 'button', { name: 'Save' } );
+			expect( button ).toHaveAttribute( 'aria-disabled', 'false' );
+			expect( button ).not.toHaveAccessibleDescription();
+		} );
+
+		it( 'should save a published post when clicked', async () => {
+			const user = userEvent.setup();
+			mockHasPublishAction( true );
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'isCurrentPostPublished', true );
+			mockSelector( 'getEditedPostAttribute', 'publish' );
+			setEditorIntent( EDITOR_INTENT_SUGGEST );
+
+			render( <PostPublishButton /> );
+
+			await user.click( screen.getByRole( 'button', { name: 'Save' } ) );
+
+			expect( dispatch( editorStore ).savePost ).toHaveBeenCalled();
 		} );
 	} );
 
