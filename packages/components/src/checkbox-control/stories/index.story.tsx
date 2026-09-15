@@ -29,7 +29,7 @@ const meta: Meta< typeof CheckboxControl > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Continue using for now. You can try [`CheckboxControl`](?path=/docs/design-system-components-form-checkboxcontrol--docs) from `@wordpress/ui`, but it is not yet recommended.',
+			notes: 'Will be superseded by [`CheckboxControl`](?path=/docs/design-system-components-form-checkboxcontrol--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };

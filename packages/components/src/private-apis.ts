@@ -25,6 +25,7 @@ lock( privateApis, {
 			since: '7.2',
 			version: '7.4',
 			alternative: '`DropdownMenu` from `@wordpress/components`',
+			hint: 'You can try `Menu` from `@wordpress/ui`, but it is not yet recommended.',
 		} );
 		return Menu;
 	},
