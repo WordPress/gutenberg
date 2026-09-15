@@ -7521,12 +7521,17 @@
 	"packages/global-styles-ui/src/screen-colors.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		}
+	},
+	"packages/global-styles-ui/src/screen-css.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
 		},
 		"no-restricted-imports": {
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/screen-css.tsx": {
+	"packages/global-styles-ui/src/screen-element.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		},
@@ -7549,17 +7554,12 @@
 	},
 	"packages/global-styles-ui/src/screen-root.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 8
+			"count": 6
 		}
 	},
 	"packages/global-styles-ui/src/screen-style-variations.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		}
-	},
-	"packages/global-styles-ui/src/screen-typography-element.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/shadows-edit-panel.tsx": {
@@ -7595,11 +7595,6 @@
 	"packages/global-styles-ui/src/test/screen-header.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
-		}
-	},
-	"packages/global-styles-ui/src/typography-elements.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
 		}
 	},
 	"packages/global-styles-ui/src/typography-panel.tsx": {

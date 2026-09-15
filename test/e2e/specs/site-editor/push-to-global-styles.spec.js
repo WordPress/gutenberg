@@ -123,9 +123,7 @@ test.describe( 'Push to Global Styles button', () => {
 		await page
 			.getByRole( 'button', { name: 'Styles', exact: true } )
 			.click();
-		await page
-			.getByRole( 'button', { name: 'Blocks & Elements' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Blocks & Elements' } ).click();
 		// A customized block's row is marked as having custom styles, so the
 		// accessible name is "Heading Has custom styles" rather than just
 		// "Heading". Anchor both ends so the heading element rows in the same

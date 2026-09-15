@@ -17,7 +17,6 @@ import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenElement from './screen-element';
 import ScreenColors from './screen-colors';
-import ScreenForms from './screen-forms';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackground from './screen-background';
 import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
@@ -246,14 +245,8 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/blocks">
 						<ScreenBlockList />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/text">
-						<ScreenElement element="text" />
-					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks/elements/link">
 						<ScreenElement element="link" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/heading">
-						<ScreenElement element="heading" />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks/elements/caption">
 						<ScreenElement element="caption" />
@@ -261,16 +254,31 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/blocks/elements/cite">
 						<ScreenElement element="cite" />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/form-controls">
-						<ScreenForms />
+					<GlobalStylesNavigationScreen path="/blocks/elements/h1">
+						<ScreenElement element="h1" />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/form-controls/textInput">
+					<GlobalStylesNavigationScreen path="/blocks/elements/h2">
+						<ScreenElement element="h2" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/h3">
+						<ScreenElement element="h3" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/h4">
+						<ScreenElement element="h4" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/h5">
+						<ScreenElement element="h5" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/h6">
+						<ScreenElement element="h6" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/textInput">
 						<ScreenElement element="textInput" />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/form-controls/select">
+					<GlobalStylesNavigationScreen path="/blocks/elements/select">
 						<ScreenElement element="select" />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/form-controls/button">
+					<GlobalStylesNavigationScreen path="/blocks/elements/button">
 						<ScreenElement element="button" />
 					</GlobalStylesNavigationScreen>
 					{ blocks.map( ( block ) => (

@@ -29,13 +29,19 @@ import {
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import {
+	button,
 	caption,
+	chevronUpDown,
+	formInput,
 	funnel,
-	heading,
+	headingLevel1,
+	headingLevel2,
+	headingLevel3,
+	headingLevel4,
+	headingLevel5,
+	headingLevel6,
 	link,
 	quote,
-	settings as settingsIcon,
-	typography,
 } from '@wordpress/icons';
 import { useBlockVariations } from './variations/variations-panel';
 import { ScreenHeader } from './screen-header';
@@ -54,24 +60,47 @@ const {
 	useHasBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
 
-const ELEMENTS = [
-	{ icon: typography, label: __( 'Text' ), path: '/blocks/elements/text' },
-	{ icon: link, label: __( 'Links' ), path: '/blocks/elements/link' },
+interface ElementItem {
+	/** The element's key under `styles.elements`. */
+	name: string;
+	icon: any;
+	label: string;
+}
+
+/*
+ * Elements are listed alongside blocks, grouped under subheadings, so that
+ * anything styleable is one list away rather than behind its own drilldown.
+ * Labels are singular to match how blocks are listed.
+ */
+const ELEMENT_GROUPS: { title: string; elements: ElementItem[] }[] = [
 	{
-		icon: heading,
-		label: __( 'Headings' ),
-		path: '/blocks/elements/heading',
+		title: __( 'Elements' ),
+		elements: [
+			{ name: 'link', icon: link, label: __( 'Link' ) },
+			{ name: 'caption', icon: caption, label: __( 'Caption' ) },
+			{ name: 'cite', icon: quote, label: __( 'Citation' ) },
+		],
 	},
 	{
-		icon: caption,
-		label: __( 'Captions' ),
-		path: '/blocks/elements/caption',
+		title: __( 'Headings' ),
+		elements: [
+			{ name: 'h1', icon: headingLevel1, label: __( 'Heading 1' ) },
+			{ name: 'h2', icon: headingLevel2, label: __( 'Heading 2' ) },
+			{ name: 'h3', icon: headingLevel3, label: __( 'Heading 3' ) },
+			{ name: 'h4', icon: headingLevel4, label: __( 'Heading 4' ) },
+			{ name: 'h5', icon: headingLevel5, label: __( 'Heading 5' ) },
+			{ name: 'h6', icon: headingLevel6, label: __( 'Heading 6' ) },
+		],
 	},
-	{ icon: quote, label: __( 'Citations' ), path: '/blocks/elements/cite' },
 	{
-		icon: settingsIcon,
-		label: __( 'Form controls' ),
-		path: '/blocks/elements/form-controls',
+		title: __( 'Form controls' ),
+		elements: [
+			{ name: 'textInput', icon: formInput, label: __( 'Input' ) },
+			{ name: 'select', icon: chevronUpDown, label: __( 'Select' ) },
+			// Disambiguated from the Button block, which sits further down
+			// the same list.
+			{ name: 'button', icon: button, label: __( 'Button (element)' ) },
+		],
 	},
 ];
 
@@ -122,6 +151,23 @@ export function hasUserStylesForBlock(
 		hasAnyValue( user?.styles?.blocks?.[ blockName ] ) ||
 		hasAnyValue( user?.settings?.blocks?.[ blockName ] )
 	);
+}
+
+/**
+ * Whether the user has customized an element.
+ *
+ * Reads the user layer only, for the same reason as blocks: the merged config
+ * would match most elements, because themes style them.
+ *
+ * @param user        The user's global styles config.
+ * @param elementName The element to check, e.g. `button` or `h2`.
+ * @return Whether the user has any styles for that element.
+ */
+export function hasUserStylesForElement(
+	user: GlobalStylesConfig | undefined,
+	elementName: string
+): boolean {
+	return hasAnyValue( user?.styles?.elements?.[ elementName ] );
 }
 
 type StyleFilter = 'all' | 'customized';
@@ -205,6 +251,37 @@ function BlockMenuItem( { block, isCustomized }: BlockMenuItemProps ) {
 	);
 }
 
+function ElementMenuItem( {
+	element,
+	isCustomized,
+}: {
+	element: ElementItem;
+	isCustomized: boolean;
+} ) {
+	return (
+		<NavigationButtonAsItem path={ '/blocks/elements/' + element.name }>
+			<HStack justify="flex-start" spacing={ 2 }>
+				<BlockIcon
+					className="global-styles-ui-block-types-item__icon"
+					icon={ element.icon }
+				/>
+				<FlexItem>{ element.label }</FlexItem>
+				{ isCustomized && (
+					<>
+						<VisuallyHidden>
+							{ __( 'Has custom styles' ) }
+						</VisuallyHidden>
+						<span
+							aria-hidden="true"
+							className="global-styles-ui-block-types-item__indicator"
+						/>
+					</>
+				) }
+			</HStack>
+		</NavigationButtonAsItem>
+	);
+}
+
 interface ListGroupProps {
 	title: string;
 	children: React.ReactNode;
@@ -232,7 +309,7 @@ function EmptyList( {
 	// or not the customized filter is also on.
 	const label =
 		'customized' === styleFilter && ! filterValue
-			? __( "You haven't customized any blocks yet." )
+			? __( "You haven't customized any blocks or elements yet." )
 			: __( 'No results found.' );
 	return (
 		<WCText
@@ -250,14 +327,22 @@ interface ListProps {
 	styleFilter: StyleFilter;
 }
 
-function getFilteredElements( filterValue: string ) {
+function getFilteredElementGroups(
+	filterValue: string,
+	styleFilter: StyleFilter,
+	customizedElementNames: Set< string >
+) {
 	const search = filterValue.trim().toLowerCase();
-	if ( ! search ) {
-		return ELEMENTS;
-	}
-	return ELEMENTS.filter( ( { label } ) =>
-		label.toLowerCase().includes( search )
-	);
+	return ELEMENT_GROUPS.map( ( group ) => ( {
+		...group,
+		elements: group.elements.filter(
+			( element ) =>
+				( ! search ||
+					element.label.toLowerCase().includes( search ) ) &&
+				( styleFilter !== 'customized' ||
+					customizedElementNames.has( element.name ) )
+		),
+	} ) ).filter( ( group ) => group.elements.length > 0 );
 }
 
 function BlockAndElementList( { filterValue, styleFilter }: ListProps ) {
@@ -282,10 +367,21 @@ function BlockAndElementList( { filterValue, styleFilter }: ListProps ) {
 		return names;
 	}, [ user ] );
 
-	// The customized filter is about blocks, so elements step aside while it
-	// is on rather than each pretending to be customized or not.
-	const filteredElements =
-		styleFilter === 'customized' ? [] : getFilteredElements( filterValue );
+	const customizedElementNames = useMemo( () => {
+		const names = new Set< string >();
+		Object.keys( user?.styles?.elements ?? {} ).forEach( ( name ) => {
+			if ( hasUserStylesForElement( user, name ) ) {
+				names.add( name );
+			}
+		} );
+		return names;
+	}, [ user ] );
+
+	const filteredElementGroups = getFilteredElementGroups(
+		filterValue,
+		styleFilter,
+		customizedElementNames
+	);
 
 	const searchedBlockTypes = ! filterValue
 		? sortedBlockTypes
@@ -301,7 +397,10 @@ function BlockAndElementList( { filterValue, styleFilter }: ListProps ) {
 			: searchedBlockTypes;
 
 	const blockTypesListRef = useRef< HTMLDivElement >( null );
-	const elementCount = filteredElements.length;
+	const elementCount = filteredElementGroups.reduce(
+		( total, group ) => total + group.elements.length,
+		0
+	);
 
 	// Announce result count on change
 	const hasBlockResults = filteredBlockTypes.length > 0;
@@ -327,31 +426,40 @@ function BlockAndElementList( { filterValue, styleFilter }: ListProps ) {
 			count
 		);
 		debouncedSpeak( resultsFoundMessage, 'polite' );
-	}, [ filterValue, styleFilter, hasBlockResults, elementCount, debouncedSpeak ] );
+	}, [
+		filterValue,
+		styleFilter,
+		hasBlockResults,
+		elementCount,
+		debouncedSpeak,
+	] );
 
 	if ( ! elementCount && ! hasBlockResults ) {
 		return (
-			<EmptyList filterValue={ filterValue } styleFilter={ styleFilter } />
+			<EmptyList
+				filterValue={ filterValue }
+				styleFilter={ styleFilter }
+			/>
 		);
 	}
 
 	return (
 		<>
-			{ elementCount > 0 && (
-				<ListGroup title={ __( 'Elements' ) }>
+			{ filteredElementGroups.map( ( group ) => (
+				<ListGroup key={ group.title } title={ group.title }>
 					<ItemGroup>
-						{ filteredElements.map( ( { icon, label, path } ) => (
-							<NavigationButtonAsItem
-								key={ path }
-								icon={ icon }
-								path={ path }
-							>
-								{ label }
-							</NavigationButtonAsItem>
+						{ group.elements.map( ( element ) => (
+							<ElementMenuItem
+								key={ element.name }
+								element={ element }
+								isCustomized={ customizedElementNames.has(
+									element.name
+								) }
+							/>
 						) ) }
 					</ItemGroup>
 				</ListGroup>
-			) }
+			) ) }
 			{ hasBlockResults && (
 				<ListGroup title={ __( 'Blocks' ) }>
 					<div
