@@ -62,11 +62,46 @@ Default budget for total decoded pixels (width × height × frame count) beyond 
 
 Conversion cost is roughly proportional to the total number of decoded pixels. 300 megapixels approximates what a mid-range machine converts within the ~30s the caller is willing to wait (e.g. a 1920x1080 GIF at ~145 frames); anything larger would likely be abandoned anyway, so it is cheaper to not start. Pass `0` to disable the check.
 
+### getVideoMetadata
+
+Reads metadata from a video file's primary video track.
+
+Only the container headers are read (not the full media), so this is cheap enough to run on every upload to decide whether the video is already web-safe. The bitrate is best-effort: if it cannot be computed it is returned as 0, and the format/dimension checks still suffice.
+
+Accepts the video as a Blob/File so the bytes are read here in the worker. An ArrayBuffer is still accepted for direct callers and tests.
+
+_Parameters_
+
+-   _source_ `ArrayBuffer | Blob`: Video file as a Blob/File or ArrayBuffer.
+
+_Returns_
+
+-   `Promise< VideoMetadata >`: The primary video track's metadata.
+
 ### SIZE_LIMIT_ERROR_PREFIX
 
 Message prefix for GIFs skipped because they exceed the total-pixel budget.
 
 Starts with UNSUPPORTED_ERROR_PREFIX so existing consumers treat the skip as a graceful fallback (keep the uploaded GIF, no companion video); the longer prefix lets consumers distinguish it, e.g. to log a warning. Like UNSUPPORTED_ERROR_PREFIX, the contract is the message prefix because only the message string survives the worker boundary.
+
+### transcodeVideo
+
+Transcodes a video to a web-safe format (MP4/H.264 or WebM/VP9).
+
+Re-encodes the input with mediabunny / WebCodecs, optionally downscaling to a maximum dimension and capping the frame rate. The MP4 output uses Fast Start (moov atom at the front) for progressive playback.
+
+Accepts the video as a Blob/File so the bytes are read once, here in the worker, instead of being materialized on the main thread and transferred. An ArrayBuffer is still accepted for direct callers and tests.
+
+_Parameters_
+
+-   _id_ `ItemId`: Item ID.
+-   _source_ `ArrayBuffer | Blob`: Video file as a Blob/File or ArrayBuffer.
+-   _outputMimeType_ `string`: Output MIME type ('video/mp4' or 'video/webm').
+-   _options_ `TranscodeVideoOptions`: Transcoding options (max dimension, frame rate, bitrate).
+
+_Returns_
+
+-   `Promise< ArrayBuffer >`: Encoded video buffer.
 
 ### UNSUPPORTED_ERROR_PREFIX
 

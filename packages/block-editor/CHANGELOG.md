@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Pass the `videoKeepOriginal` media upload setting through to the upload pipeline, so a site can opt out of keeping the original video file alongside its web-safe transcode ([#79375](https://github.com/WordPress/gutenberg/pull/79375)).
+
 ### Internal
 
 -   Remove the `crossorigin` MutationObserver. Under `Document-Isolation-Policy: isolate-and-credentialless` cross-origin resources load without the attribute, and adding it broke any resource served without CORS headers ([#82614](https://github.com/WordPress/gutenberg/pull/82614)).

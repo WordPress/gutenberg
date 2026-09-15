@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Video: Play the web-safe transcoded companion when the uploaded video has one, and add a toolbar control to switch playback back to the original file ([#79375](https://github.com/WordPress/gutenberg/pull/79375)).
+
 ### Bug Fixes
 
 -   Image: Inject the lightbox trigger with a literal string replacement instead of `preg_replace`, so `$` and `\` sequences in author-controlled image attributes (such as a price in the alt text) are no longer interpreted as regex backreferences and silently removed ([#79369](https://github.com/WordPress/gutenberg/pull/79369)).
