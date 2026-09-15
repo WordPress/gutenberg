@@ -322,7 +322,10 @@ mark.wp-note {
 		}
 	}
 
-	.editor-collab-sidebar-panel__thread:hover
+	// Scoped to the note under the pointer, not the thread around it: a
+	// reaction belongs to one note, so a thread-wide reveal would offer the
+	// option on every note in it at once.
+	.editor-collab-sidebar-panel__note:hover
 	.editor-collab-sidebar-panel__add-reaction,
 	// Reveal on the trigger itself rather than on the thread: the thread is
 	// `tabIndex={ 0 }`, so a thread-level `:focus-within` would hold for as

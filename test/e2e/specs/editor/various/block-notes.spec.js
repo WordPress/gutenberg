@@ -1236,9 +1236,7 @@ test.describe( 'Block Notes', () => {
 			const trigger = page.locator(
 				'.editor-collab-sidebar-panel__add-reaction'
 			);
-			const thread = page.locator(
-				'.editor-collab-sidebar-panel__thread'
-			);
+			const note = page.locator( '.editor-collab-sidebar-panel__note' );
 
 			// The trigger floats in the note's top corner rather than
 			// claiming a row: the note is no taller for carrying it.
@@ -1279,7 +1277,7 @@ test.describe( 'Block Notes', () => {
 			await page.mouse.move( 0, 0 );
 			await expect( trigger ).toHaveCSS( 'opacity', '0' );
 
-			await thread.hover();
+			await note.hover();
 			await expect( trigger ).toHaveCSS( 'opacity', '1' );
 
 			// Keyboard reaches it too: the reveal hangs off the trigger, not
@@ -1288,6 +1286,43 @@ test.describe( 'Block Notes', () => {
 			await expect( trigger ).toHaveCSS( 'opacity', '0' );
 			await page.getByRole( 'button', { name: 'Add reaction' } ).focus();
 			await expect( trigger ).toHaveCSS( 'opacity', '1' );
+		} );
+
+		test( 'only the hovered note in a thread reveals its trigger', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing per-note hover' },
+				comment: 'Test comment for per-note hover',
+			} );
+
+			const replyForm = page.getByRole( 'textbox', { name: 'Reply to' } );
+			await replyForm.click();
+			await replyForm.pressSequentially(
+				'Test reply for per-note hover'
+			);
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Reply', exact: true } )
+				.click();
+
+			const notes = page.locator( '.editor-collab-sidebar-panel__note' );
+			await expect( notes ).toHaveCount( 2 );
+			const triggers = page.locator(
+				'.editor-collab-sidebar-panel__add-reaction'
+			);
+
+			// Reacting is per note, so the pointer resting on one note should
+			// not offer the option on the other.
+			await notes.first().hover();
+			await expect( triggers.first() ).toHaveCSS( 'opacity', '1' );
+			await expect( triggers.last() ).toHaveCSS( 'opacity', '0' );
+
+			await notes.last().hover();
+			await expect( triggers.last() ).toHaveCSS( 'opacity', '1' );
+			await expect( triggers.first() ).toHaveCSS( 'opacity', '0' );
 		} );
 
 		test( 'reactions stay visible once the thread is deselected', async ( {

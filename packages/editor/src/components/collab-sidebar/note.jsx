@@ -217,6 +217,7 @@ export function Note( {
 		<NoteCard
 			note={ note }
 			actions={ actions }
+			className="editor-collab-sidebar-panel__note"
 			role={ note.parent !== 0 ? 'treeitem' : undefined }
 		>
 			<div className="editor-collab-sidebar-panel__note-body">
