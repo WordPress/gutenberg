@@ -813,7 +813,7 @@ describe( 'reducer', () => {
 
 	describe( 'RegisterCallbacks', () => {
 		it( 'attaches callbacks to the matching item', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const initial = {
 				...reducer( undefined, { type: Type.Unknown } as any ),
 				queue: [
@@ -829,7 +829,7 @@ describe( 'reducer', () => {
 		} );
 
 		it( 'preserves existing callbacks when an action field is undefined', () => {
-			const existingOnError = jest.fn();
+			const existingOnError = vi.fn();
 			const initial = {
 				...reducer( undefined, { type: Type.Unknown } as any ),
 				queue: [
@@ -843,7 +843,7 @@ describe( 'reducer', () => {
 			const state = reducer( initial, {
 				type: Type.RegisterCallbacks,
 				id: 'p1',
-				onChange: jest.fn(),
+				onChange: vi.fn(),
 				// onError deliberately omitted
 			} as any );
 			expect( state.queue[ 0 ].onError ).toBe( existingOnError );
