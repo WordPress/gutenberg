@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 import { Button } from '../../button';
 import { Stack } from '../../stack';
 import * as Notice from '../index';
@@ -32,18 +33,21 @@ export const StaticNotice: Story = {
 export const UrgentError: Story = {
 	render: function UrgentErrorExample() {
 		const [ hasError, setHasError ] = useState( false );
+		const title = 'Changes not saved';
+		const description =
+			'Your changes could not be saved because the connection was lost. Check your connection and try again.';
+
+		function saveChanges() {
+			setHasError( true );
+			speak( `${ title }. ${ description }`, 'assertive' );
+		}
 		return (
 			<Stack direction="column" gap="md">
-				<Button onClick={ () => setHasError( true ) }>
-					Save changes
-				</Button>
+				<Button onClick={ saveChanges }>Save changes</Button>
 				{ hasError && (
 					<Notice.Root intent="error">
-						<Notice.Description role="alert">
-							Your changes could not be saved because the
-							connection was lost. Check your connection and try
-							again.
-						</Notice.Description>
+						<Notice.Title>{ title }</Notice.Title>
+						<Notice.Description>{ description }</Notice.Description>
 						<Notice.Actions>
 							<Notice.ActionButton
 								onClick={ () => setHasError( false ) }
@@ -61,20 +65,31 @@ export const UrgentError: Story = {
 export const PoliteStatus: Story = {
 	render: function PoliteStatusExample() {
 		const [ isSaved, setIsSaved ] = useState( false );
+		const title = 'Draft saved';
+		const description = 'Your draft has been saved.';
+
+		function saveDraft() {
+			setIsSaved( true );
+			speak( `${ title }. ${ description }`, 'polite' );
+		}
+
 		return (
-			<Notice.Root intent="success">
-				<Notice.Title>Draft status</Notice.Title>
-				<Notice.Description role="status">
-					{ isSaved ? 'Your draft has been saved.' : '' }
-				</Notice.Description>
-				<Notice.Actions>
-					<Notice.ActionButton
-						onClick={ () => setIsSaved( ! isSaved ) }
-					>
-						{ isSaved ? 'Undo' : 'Save draft' }
-					</Notice.ActionButton>
-				</Notice.Actions>
-			</Notice.Root>
+			<Stack direction="column" gap="md">
+				<Button onClick={ saveDraft }>Save draft</Button>
+				{ isSaved && (
+					<Notice.Root intent="success">
+						<Notice.Title>{ title }</Notice.Title>
+						<Notice.Description>{ description }</Notice.Description>
+						<Notice.Actions>
+							<Notice.ActionButton
+								onClick={ () => setIsSaved( false ) }
+							>
+								Dismiss
+							</Notice.ActionButton>
+						</Notice.Actions>
+					</Notice.Root>
+				) }
+			</Stack>
 		);
 	},
 };

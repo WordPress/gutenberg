@@ -18,7 +18,7 @@ const meta: Meta< typeof Notice.Root > = {
 		docs: {
 			description: {
 				component:
-					'Notice does not announce its content automatically. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for role examples and migration from `spokenMessage` and `politeness`.',
+					'Notice does not announce its content automatically. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for announcement examples and migration from `spokenMessage` and `politeness`.',
 			},
 		},
 		componentStatus: {

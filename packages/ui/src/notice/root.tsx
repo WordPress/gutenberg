@@ -19,8 +19,8 @@ const icons: { [ key in NoticeIntent ]: IconProps[ 'icon' ] | null } = {
 /**
  * A notice component that communicates system status and provides actions.
  * It does not announce its content to assistive technology. Consumers are
- * responsible for adding suitable live-region semantics when a dynamic notice
- * needs to be announced.
+ * responsible for announcing dynamic updates, for example with `speak()` from
+ * `@wordpress/a11y`.
  *
  * ```jsx
  * import { Notice } from '@wordpress/ui';

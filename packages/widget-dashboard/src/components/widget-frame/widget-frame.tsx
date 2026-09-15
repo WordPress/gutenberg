@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
+import { speak } from '@wordpress/a11y';
 import { Component, Suspense } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
@@ -30,11 +31,15 @@ class WidgetErrorBoundary extends Component<
 		return { hasError: true };
 	}
 
+	componentDidCatch() {
+		speak( __( 'This widget encountered an error.' ), 'polite' );
+	}
+
 	render() {
 		if ( this.state.hasError ) {
 			return (
 				<Notice.Root intent="error">
-					<Notice.Description role="alert">
+					<Notice.Description>
 						{ __( 'This widget encountered an error.' ) }
 					</Notice.Description>
 				</Notice.Root>
