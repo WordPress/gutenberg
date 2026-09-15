@@ -162,6 +162,29 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 	);
 }
 
+/**
+ * Returns true if the blocks that the given action updated are the same in
+ * both states, or false otherwise. Only attribute updates are considered.
+ *
+ * @param {Object} state      Previous state.
+ * @param {Object} nextState  Next state.
+ * @param {Object} lastAction Previously dispatched action.
+ *
+ * @return {boolean} Whether the updated blocks are untouched.
+ */
+function leavesBlocksUntouched( state, nextState, lastAction ) {
+	return (
+		lastAction?.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
+		lastAction.clientIds.every(
+			( clientId ) =>
+				nextState.byClientId.get( clientId ) ===
+					state?.byClientId.get( clientId ) &&
+				nextState.attributes.get( clientId ) ===
+					state?.attributes.get( clientId )
+		)
+	);
+}
+
 function updateBlockTreeForBlocks( state, blocks ) {
 	const treeToUpdate = state.tree;
 	const stack = [ ...blocks ];
@@ -439,7 +462,19 @@ function withPersistentBlockChange( reducer ) {
 		// In comparing against the previous action, consider only those which
 		// would have qualified as one which would have been ignored or not
 		// have resulted in a changed state.
-		lastAction = action;
+		//
+		// A change that history ignores and that leaves the blocks of the
+		// previous action untouched is invisible to the undo stack, so it
+		// must not split a typing run into separate undo levels either. A
+		// container re-cloning its blocks while the same entity is typed
+		// into elsewhere is such a change. One that does replace those
+		// blocks, like a reset after an undo, still starts a new level.
+		if (
+			pendingHistoryMode !== 'ignore' ||
+			! leavesBlocksUntouched( state, nextState, lastAction )
+		) {
+			lastAction = action;
+		}
 
 		if ( pendingHistoryMode === 'ignore' ) {
 			return {

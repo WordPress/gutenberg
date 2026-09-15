@@ -83,6 +83,43 @@ test.describe( 'undo', () => {
 		} );
 	} );
 
+	test( 'should restore the caret to the undone block when another block is selected', async ( {
+		editor,
+		page,
+		pageUtils,
+		undoUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'first' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'first' } },
+			{ name: 'core/paragraph', attributes: { content: 'second' } },
+		] );
+
+		// Move the selection away from the block that is about to be undone.
+		// The undone block still exists afterwards, so the store would happily
+		// keep this selection across the block reset — the selection recorded
+		// with the undo level has to win over it.
+		await editor.canvas.locator( 'text=first' ).click();
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'first' } },
+			{ name: 'core/paragraph', attributes: { content: '' } },
+		] );
+		await expect.poll( undoUtils.getSelection ).toEqual( {
+			blockIndex: 1,
+			startOffset: 0,
+			endOffset: 0,
+		} );
+	} );
+
 	test( 'should undo typing after non input change', async ( {
 		editor,
 		page,
