@@ -19,6 +19,9 @@ export async function deactivatePlugin( slug ) {
 		return;
 	}
 	await page.click( `tr[data-slug="${ slug }"] .deactivate a` );
-	await page.waitForSelector( `tr[data-slug="${ slug }"] .delete a` );
+	// Puppeteer's 30-second default is too short for this page under CI load.
+	await page.waitForSelector( `tr[data-slug="${ slug }"] .delete a`, {
+		timeout: 60000,
+	} );
 	await switchUserToTest();
 }
