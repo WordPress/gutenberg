@@ -145,8 +145,9 @@ final class AutoCapitalizationTests: XCTestCase {
 		assertCapitalized( "An empty title should start capitalized" )
 
 		type( "title" )
-		let typed = focusedField.value as? String
-		XCTAssertEqual( typed, "Title", "The keyboard should have capitalized the first letter. Page log: " + titleLog.label.split( separator: "|" ).joined( separator: "\n  " ) )
+		// Diagnostic only: what the page saw around each key, landed or not.
+		print( "TLOG-AFTER-TITLE\n  " + titleLog.label.split( separator: "|" ).joined( separator: "\n  " ) )
+		XCTAssertEqual( focusedField.value as? String, "Title", "The keyboard should have capitalized the first letter" )
 		XCTAssertFalse( key( "shift" ).isSelected, "After a word the keyboard should be lowercase" )
 
 		key( "return" ).tap()
