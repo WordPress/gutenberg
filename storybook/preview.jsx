@@ -125,7 +125,7 @@ export const parameters = {
 					'Admin UI',
 					'Icons',
 				],
-				'Components',
+				'Classic Components',
 				[
 					'Introduction',
 					'Actions',

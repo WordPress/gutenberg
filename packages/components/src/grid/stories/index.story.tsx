@@ -4,7 +4,8 @@ import { Grid } from '..';
 
 const meta: Meta< typeof Grid > = {
 	component: Grid,
-	title: 'Components/Grid',
+	id: 'components-grid',
+	title: 'Classic Components/Grid',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		align: { control: { type: 'text' } },

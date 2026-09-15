@@ -4,7 +4,7 @@ import { Text } from '../../text';
 
 const meta: Meta< typeof Surface > = {
 	component: Surface,
-	title: 'Components/Deprecated/Surface',
+	title: 'Classic Components/Deprecated/Surface',
 	id: 'components-surface',
 	argTypes: {
 		children: { control: false },

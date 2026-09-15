@@ -5,7 +5,7 @@ import Snackbar from '..';
 
 const meta: Meta< typeof Snackbar > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Feedback/Snackbar',
+	title: 'Classic Components/Feedback/Snackbar',
 	id: 'components-snackbar',
 	component: Snackbar,
 	argTypes: {

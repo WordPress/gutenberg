@@ -4,7 +4,8 @@ import { useState } from '@wordpress/element';
 import { AnglePickerControl } from '..';
 
 const meta: Meta< typeof AnglePickerControl > = {
-	title: 'Components/AnglePickerControl',
+	id: 'components-anglepickercontrol',
+	title: 'Classic Components/AnglePickerControl',
 	component: AnglePickerControl,
 	argTypes: {
 		as: { control: false },

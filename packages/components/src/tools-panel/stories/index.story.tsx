@@ -12,7 +12,8 @@ import UnitControl from '../../unit-control';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 
 const meta: Meta< typeof ToolsPanel > = {
-	title: 'Components/ToolsPanel',
+	id: 'components-toolspanel',
+	title: 'Classic Components/ToolsPanel',
 	component: ToolsPanel,
 	subcomponents: { ToolsPanelItem },
 	argTypes: {

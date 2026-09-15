@@ -3,7 +3,7 @@ import Spinner from '../';
 import { space } from '../../utils/space';
 
 const meta: Meta< typeof Spinner > = {
-	title: 'Components/Feedback/Spinner',
+	title: 'Classic Components/Feedback/Spinner',
 	id: 'components-spinner',
 	component: Spinner,
 	parameters: {

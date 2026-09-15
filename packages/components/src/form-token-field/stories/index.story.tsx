@@ -6,7 +6,7 @@ import FormTokenField from '../';
 const meta: Meta< typeof FormTokenField > = {
 	tags: [ 'manifest' ],
 	component: FormTokenField,
-	title: 'Components/Selection & Input/Common/FormTokenField',
+	title: 'Classic Components/Selection & Input/Common/FormTokenField',
 	id: 'components-formtokenfield',
 	argTypes: {
 		value: {

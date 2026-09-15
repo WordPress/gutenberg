@@ -9,7 +9,7 @@ import type { ModalProps } from '../types';
 const meta: Meta< typeof Modal > = {
 	tags: [ 'manifest' ],
 	component: Modal,
-	title: 'Components/Overlays/Modal',
+	title: 'Classic Components/Overlays/Modal',
 	id: 'components-modal',
 	argTypes: {
 		children: {

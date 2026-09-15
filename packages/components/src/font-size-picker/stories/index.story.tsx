@@ -4,7 +4,8 @@ import { useState } from '@wordpress/element';
 import FontSizePicker from '../';
 
 const meta: Meta< typeof FontSizePicker > = {
-	title: 'Components/FontSizePicker',
+	id: 'components-fontsizepicker',
+	title: 'Classic Components/FontSizePicker',
 	component: FontSizePicker,
 	argTypes: {
 		value: { control: false },

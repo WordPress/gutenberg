@@ -5,7 +5,8 @@ import { BorderControl } from '..';
 import type { Border } from '../types';
 
 const meta: Meta< typeof BorderControl > = {
-	title: 'Components/BorderControl',
+	id: 'components-bordercontrol',
+	title: 'Classic Components/BorderControl',
 	component: BorderControl,
 	argTypes: {
 		onChange: {

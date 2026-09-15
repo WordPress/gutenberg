@@ -11,7 +11,7 @@ import Button from '..';
 
 const meta: Meta< typeof Button > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Actions/Button',
+	title: 'Classic Components/Actions/Button',
 	id: 'components-button',
 	component: Button,
 	argTypes: {

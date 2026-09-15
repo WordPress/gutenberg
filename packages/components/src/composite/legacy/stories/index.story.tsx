@@ -8,7 +8,7 @@ import {
 import { UseCompositeStatePlaceholder, transform } from './utils';
 
 const meta: Meta< typeof UseCompositeStatePlaceholder > = {
-	title: 'Components/Deprecated/Composite (Unstable)',
+	title: 'Classic Components/Deprecated/Composite (Unstable)',
 	id: 'components-composite-unstable',
 	component: UseCompositeStatePlaceholder,
 	subcomponents: {

@@ -3,7 +3,7 @@ import { Heading } from '..';
 
 const meta: Meta< typeof Heading > = {
 	component: Heading,
-	title: 'Components/Typography/Heading',
+	title: 'Classic Components/Typography/Heading',
 	id: 'components-heading',
 	argTypes: {
 		as: { control: { type: 'text' } },
