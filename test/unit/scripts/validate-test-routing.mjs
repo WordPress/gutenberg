@@ -345,8 +345,18 @@ const baselineJestInfrastructure = new Set(
 		readBaselineFile( baselineRef, file )
 	)
 );
+// These are the existing empty Jest partition under its explicit compatibility
+// name. The public adapter uses an optional peer instead of bundled Jest.
+// See test/unit/VITEST_MIGRATION.md. Do not allow other Jest additions.
+const retainedJestInfrastructure = new Set( [
+	'dependency:packages/scripts/package.json:peerDependencies.jest',
+	'command:package.json:scripts.test:unit:jest=npm run --workspace @wordpress/unit-tests test:unit:jest --',
+	'command:test/unit/package.json:scripts.test:unit:jest=wp-scripts test-unit-jest --config jest.config.js',
+] );
 const addedJestInfrastructure = currentJestInfrastructure.filter(
-	( entry ) => ! baselineJestInfrastructure.has( entry )
+	( entry ) =>
+		! baselineJestInfrastructure.has( entry ) &&
+		! retainedJestInfrastructure.has( entry )
 );
 assert.deepEqual(
 	addedJestInfrastructure,
