@@ -5,12 +5,18 @@
 ### Enhancements
 
 -   Remove the `react-autosize-textarea` dependency. The post editor's "Code editor" view now auto-grows with CSS `field-sizing: content`. Browsers without support use a scrollable field ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).
+-   `PostTaxonomiesFlatTermSelector`: The field renders with the `SearchableChipSelectControl` component of `@wordpress/ui` instead of `FormTokenField` ([#80967](https://github.com/WordPress/gutenberg/pull/80967)).
+
 
 ### Bug Fixes
 
 -   Featured image field: Only register it for the post types a theme lists in its `post-thumbnails` support, matching the classic panel. ([#82773](https://github.com/WordPress/gutenberg/pull/82773))
 -   `MediaUpload`: Coerce `multiple` to a boolean before passing it to the experimental media modal; callers such as the playlist block and the inserter media tab pass the legacy media frame's `'add'` mode. ([#82715](https://github.com/WordPress/gutenberg/pull/82715))
 -   Document bar: Preserve the subdued template-preview icon color after the icon became stroke-based. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+
+### Internal
+
+-   Post actions: Use the public `Menu` from `@wordpress/ui` instead of the private Components API ([#81922](https://github.com/WordPress/gutenberg/pull/81922)).
 
 ## 15.0.0 (2026-09-10)
 
