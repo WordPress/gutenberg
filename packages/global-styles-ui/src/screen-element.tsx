@@ -2,20 +2,17 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	PanelBody,
 	__experimentalSpacer as Spacer,
-	__experimentalHasSplitBorders as hasSplitBorders,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import type {
-	GlobalStylesConfig,
 	GlobalStylesSettings,
 	GlobalStylesStyles,
 } from '@wordpress/global-styles-engine';
 import { ScreenHeader } from './screen-header';
 import ElementPreview from './element-preview';
-import { useSetting, useStyle } from './hooks';
+import { useSetting, useStyle, useCanEditCSS } from './hooks';
+import { normalizeBorderStyle } from './border-utils';
 import { unlock } from './lock-unlock';
 
 const {
@@ -88,41 +85,6 @@ interface ScreenElementProps {
 	element: ElementName;
 }
 
-function applyFallbackStyle( border: any ) {
-	if ( ! border ) {
-		return border;
-	}
-
-	const hasColorOrWidth = border.color || border.width;
-
-	if ( ! border.style && hasColorOrWidth ) {
-		return { ...border, style: 'solid' };
-	}
-
-	if ( border.style && ! hasColorOrWidth ) {
-		return undefined;
-	}
-
-	return border;
-}
-
-function applyAllFallbackStyles( border: any ) {
-	if ( ! border ) {
-		return border;
-	}
-
-	if ( hasSplitBorders( border ) ) {
-		return {
-			top: applyFallbackStyle( border.top ),
-			right: applyFallbackStyle( border.right ),
-			bottom: applyFallbackStyle( border.bottom ),
-			left: applyFallbackStyle( border.left ),
-		};
-	}
-
-	return applyFallbackStyle( border );
-}
-
 /**
  * Renders every style panel for an element. The element's styles and settings
  * are resolved once here and shared by all the panels.
@@ -163,49 +125,9 @@ function ElementStylePanels( {
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
 
-	const { canEditCSS } = useSelect( ( select ) => {
-		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-			select( coreStore );
-
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		const globalStyles = globalStylesId
-			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-			: undefined;
-
-		return {
-			canEditCSS: !! ( globalStyles as GlobalStylesConfig )?._links?.[
-				'wp:action-edit-css'
-			],
-		};
-	}, [] );
-
-	// Global Styles cannot generate a border declaration conditionally on
-	// whether a sibling property is set, so split and flat border definitions
-	// have to be reconciled before they are stored. Mirrors the block screen.
-	const onChangeBorders = ( newStyle: any ) => {
-		if ( ! newStyle?.border ) {
-			setStyle( newStyle );
-			return;
-		}
-
-		const { radius, ...newBorder } = newStyle.border;
-		const border = applyAllFallbackStyles( newBorder );
-		const updatedBorder = ! hasSplitBorders( border )
-			? {
-					top: border,
-					right: border,
-					bottom: border,
-					left: border,
-			  }
-			: {
-					color: null,
-					style: null,
-					width: null,
-					...border,
-			  };
-
-		setStyle( { ...newStyle, border: { ...updatedBorder, radius } } );
-	};
+	const canEditCSS = useCanEditCSS();
+	const onChangeBorders = ( newStyle: any ) =>
+		setStyle( normalizeBorderStyle( newStyle ) );
 
 	return (
 		<>
