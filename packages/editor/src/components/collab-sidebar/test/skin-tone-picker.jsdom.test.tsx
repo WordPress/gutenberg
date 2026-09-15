@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SkinTonePicker, { SKIN_TONES, applySkinTone } from '../skin-tone-picker';
@@ -159,7 +160,7 @@ describe( 'SkinTonePicker', () => {
 
 	it( 'reports the chosen tone and closes the flyout', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		render( <SkinTonePicker value={ 0 } onChange={ onChange } /> );
 
 		await user.click(
