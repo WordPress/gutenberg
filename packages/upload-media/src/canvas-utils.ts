@@ -1,6 +1,9 @@
 import { getFileBasename } from './utils';
-import { parseHeic, type HeicImageData } from './heic-parser';
-import type { HeicSequenceData } from './heic-parser';
+import {
+	parseHeic,
+	type HeicImageData,
+	type HeicSequenceData,
+} from './heic-parser';
 import { getHeicUnsupportedMessage } from './heic-support';
 
 /**

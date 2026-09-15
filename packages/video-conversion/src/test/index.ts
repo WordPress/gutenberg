@@ -1,12 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-	convertGifToVideo,
-	convertHeicSequenceToVideo,
-	cancelOperations,
-	UNSUPPORTED_ERROR_PREFIX,
-	SIZE_LIMIT_ERROR_PREFIX,
-	DEFAULT_MAX_TOTAL_PIXELS,
-} from '../index';
 import type { HeicSequenceInput } from '../types';
 
 // Configurable decoded-frame dimensions; the default (10x10) is even so the
@@ -231,6 +223,7 @@ vi.doMock( import( 'mediabunny' ), async ( importOriginal ) => {
 
 const {
 	convertGifToVideo,
+	convertHeicSequenceToVideo,
 	cancelOperations,
 	UNSUPPORTED_ERROR_PREFIX,
 	SIZE_LIMIT_ERROR_PREFIX,
