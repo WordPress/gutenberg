@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove the `crossorigin` MutationObserver. Under `Document-Isolation-Policy: isolate-and-credentialless` cross-origin resources load without the attribute, and adding it broke any resource served without CORS headers ([#82614](https://github.com/WordPress/gutenberg/pull/82614)).
+
 ### New Features
 
 -   Add a text shadow block support and its control in the typography panel ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
@@ -18,6 +22,7 @@
 
 ### Internal
 
+-   Block bindings and variation transforms: Use the public `Menu` from `@wordpress/ui` instead of the private Components API. ([#81925](https://github.com/WordPress/gutenberg/pull/81925))
 -   Layout hooks: Use `normalizeLegacyLayout` in `useLayoutClasses`, `useLayoutStyles`, the block layout styles wrapper and `isAxialBlockGapAllowed`, replacing four inline copies of the legacy `inherit` / size check ([#82710](https://github.com/WordPress/gutenberg/pull/82710)).
 
 ## 17.1.0 (2026-09-10)
@@ -28,6 +33,7 @@
 
 ### Enhancements
 
+-   `BlockAlignmentControl`: List Wide and Full width as unavailable when a parent layout withholds them but the theme itself offers them, instead of removing them from the menu without explanation. A theme that offers neither keeps them hidden, since it is curating its own options. Blocks whose only alignments are wide and full, such as Group and Columns, now keep an alignment control in layouts that offer neither ([#82600](https://github.com/WordPress/gutenberg/pull/82600)).
 -   Borders: rename the "Border & Shadow" panel to "Borders", whichever of its controls are available, and always show the Border and Shadow controls' visible labels. A stable panel title is what lets the Border label render unconditionally, so its "Unlink sides" toggle lines up with the border radius one ([#82163](https://github.com/WordPress/gutenberg/pull/82163)).
 -   `ListView`: Updated to use `outset-ring__focus()` mixin for focus outline wherever applicable instead of the previous box-shadow implementation. ([#82129](https://github.com/WordPress/gutenberg/pull/82129))
 
