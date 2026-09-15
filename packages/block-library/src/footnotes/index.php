@@ -155,15 +155,15 @@ add_filter( '_wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision
  *
  * @since 7.2.0
  *
- * @param bool   $protected Whether the key is protected.
- * @param string $meta_key  The meta key.
- * @param string $meta_type The type of object the meta is registered to.
+ * @param bool   $is_protected Whether the key is protected.
+ * @param string $meta_key     The meta key.
+ * @param string $meta_type    The type of object the meta is registered to.
  * @return bool Whether the key is protected.
  */
-function block_core_footnotes_is_protected_meta( $protected, $meta_key, $meta_type ) {
+function block_core_footnotes_is_protected_meta( $is_protected, $meta_key, $meta_type ) {
 	if ( 'footnotes' === $meta_key && 'post' === $meta_type ) {
 		return true;
 	}
-	return $protected;
+	return $is_protected;
 }
 add_filter( 'is_protected_meta', 'block_core_footnotes_is_protected_meta', 10, 3 );
