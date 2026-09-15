@@ -298,6 +298,14 @@ You can start with this workspace settings file:
 
 If you use Visual Studio Code, use the extension and settings listed in the [Visual Studio Code](#visual-studio-code) section above. For other editors, see the [ESLint editor integration docs](https://eslint.org/docs/user-guide/integrations).
 
+#### ESLint suppressions
+
+[`tools/eslint/suppressions.json`](https://github.com/WordPress/gutenberg/blob/trunk/tools/eslint/suppressions.json) records pre-existing lint violations. Fix new violations in the code. Do not add entries, increase counts, or regenerate the baseline with `--suppress-all` or `--suppress-rule` to make a feature or bug fix pass lint. Adding a baseline for a newly enabled rule belongs in an explicitly agreed lint-rule migration, with its scope and rationale documented in the PR.
+
+For a false positive or a necessary exception, use the narrowest rule-specific inline disable and explain why it is needed. Do not disable rules across a file or change lint configuration just to hide new violations. If a fix is outside the scope of your change, report the failure instead of suppressing it.
+
+After fixing a suppressed violation, run `npm run lint:js:prune-suppressions` from the repository root. Review and commit the resulting removals or count reductions, then run `npm run lint:js` again. Do not use `--pass-on-unpruned-suppressions` to bypass stale entries. See [ESLint's bulk suppression documentation](https://eslint.org/docs/latest/use/suppressions) for how the flags work.
+
 ### Prettier
 
 [Prettier](https://prettier.io/) is a tool that allows you to define an opinionated format, and automate fixing the code to match that format. Prettier and ESLint are similar, Prettier is more about formatting and style, while ESLint is for detecting coding errors.

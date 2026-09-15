@@ -42,6 +42,8 @@ Read only what your task needs, when it needs it:
 
 ## Code quality
 
+Fix ESLint violations in the code. Do not add entries or increase counts in `tools/eslint/suppressions.json` to make lint pass. Before changing suppressions, read the [ESLint suppression guidelines](docs/contributors/code/getting-started-with-code-contribution.md#eslint-suppressions).
+
 ```bash
 npm run format            # Fix JS formatting
 npm run lint:js          # Check JS linting
