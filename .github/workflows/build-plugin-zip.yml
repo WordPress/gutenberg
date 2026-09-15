@@ -20,7 +20,7 @@ concurrency:
 jobs:
     compute-stable-branches:
         name: Compute current and next stable release branches
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         if: ${{ github.event_name == 'workflow_dispatch' }}
         outputs:
             current_stable_branch: ${{ steps.get_branches.outputs.current_stable_branch }}
@@ -45,7 +45,7 @@ jobs:
 
     bump-version:
         name: Bump version
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         needs: compute-stable-branches
         if: |
             github.event_name == 'workflow_dispatch' && (
@@ -152,7 +152,7 @@ jobs:
 
     build:
         name: Build Release Artifact
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         needs: bump-version
         if: |
             always() && (
@@ -213,7 +213,7 @@ jobs:
     revert-version-bump:
         name: Revert version bump if build failed
         needs: [bump-version, build]
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         if: |
             always() &&
             ( needs.build.outputs.job_status == 'failure' ) &&
@@ -259,7 +259,7 @@ jobs:
     create-release:
         name: Create Release Draft and Attach Asset
         needs: [bump-version, build]
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
 
         steps:
             - name: Set Release Version
@@ -304,7 +304,7 @@ jobs:
 
     npm-publish:
         name: Publish WordPress packages to npm
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         environment: WordPress packages
         needs: [bump-version, build]
         if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}

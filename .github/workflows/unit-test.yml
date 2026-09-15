@@ -22,7 +22,7 @@ concurrency:
 jobs:
     unit-js:
         name: JavaScript ${{ matrix.shard }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
@@ -54,7 +54,7 @@ jobs:
 
     unit-js-date:
         name: JavaScript Date Tests
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
@@ -77,7 +77,7 @@ jobs:
 
     build-assets:
         name: Build JavaScript assets for PHP unit tests
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
@@ -96,9 +96,9 @@ jobs:
                   path: ./build/
 
     test-php:
-        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on ubuntu-latest
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on 'ubuntu-24.04'
         needs: [build-assets]
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
@@ -219,7 +219,7 @@ jobs:
 
     phpcs:
         name: PHP coding standards
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
@@ -272,7 +272,7 @@ jobs:
     # This job is deprecated but be present for compatibility reasons.
     unit-php:
         name: PHP
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         needs: [test-php, phpcs]
         if: ${{ always() }}
         steps:
@@ -290,7 +290,7 @@ jobs:
 
     mobile-unit-js:
         name: Mobile
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
