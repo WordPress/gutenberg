@@ -31,64 +31,71 @@ const mockExecute = vi.fn().mockResolvedValue( undefined );
 const mockCancel = vi.fn().mockResolvedValue( undefined );
 const mockCanEncodeVideo = vi.fn().mockResolvedValue( true );
 
-vi.mock( 'mediabunny', () => ( {
-	// Defined inline because a vi.mock factory may only reference
-	// `mock`-prefixed out-of-scope variables. Reads the shared mockTrack.
-	Input: class {
-		async getPrimaryVideoTrack() {
-			// Read into a local so the accessors below close over a
-			// non-nullable value rather than the mutable module variable.
-			const track = mockTrack;
-			if ( ! track ) {
-				return null;
-			}
-			return {
-				getCodec: async () => track.codec,
-				getDisplayWidth: async () => track.width,
-				getDisplayHeight: async () => track.height,
-				computePacketStats: async () => ( {
-					averageBitrate: track.bitrate,
-					averagePacketRate: 30,
-					packetCount: 360,
-				} ),
-			};
-		}
-	},
-	Output: class {
-		target: { buffer: ArrayBuffer | null };
-		constructor( opts: { target: { buffer: ArrayBuffer | null } } ) {
-			this.target = opts.target;
-			// Populate the buffer so execute() yields a non-empty result.
-			this.target.buffer = new Uint8Array( [ 1, 2, 3 ] ).buffer;
-		}
-	},
-	Conversion: {
-		init: async ( options: {
-			video: Record< string, unknown >;
-			audio: Record< string, unknown >;
-		} ) => {
-			mockConversionVideoOptions = options.video;
-			mockConversionAudioOptions = options.audio;
-			return {
-				execute: mockExecute,
-				cancel: mockCancel,
-				isValid: true,
-				discardedTracks: mockDiscardedTracks,
-			};
-		},
-	},
-	BlobSource: class {},
-	BufferTarget: class {
-		buffer: ArrayBuffer | null = null;
-	},
-	Mp4OutputFormat: class {},
-	WebMOutputFormat: class {},
-	VideoSampleSource: class {},
-	VideoSample: class {},
-	QUALITY_HIGH: 'quality-high',
-	ALL_FORMATS: [],
-	canEncodeVideo: ( ...args: unknown[] ) => mockCanEncodeVideo( ...args ),
-} ) );
+vi.mock(
+	import( 'mediabunny' ),
+	() =>
+		( {
+			// Defined inline because a vi.mock factory may only reference
+			// `mock`-prefixed out-of-scope variables. Reads the shared mockTrack.
+			Input: class {
+				async getPrimaryVideoTrack() {
+					// Read into a local so the accessors below close over a
+					// non-nullable value rather than the mutable module variable.
+					const track = mockTrack;
+					if ( ! track ) {
+						return null;
+					}
+					return {
+						getCodec: async () => track.codec,
+						getDisplayWidth: async () => track.width,
+						getDisplayHeight: async () => track.height,
+						computePacketStats: async () => ( {
+							averageBitrate: track.bitrate,
+							averagePacketRate: 30,
+							packetCount: 360,
+						} ),
+					};
+				}
+			},
+			Output: class {
+				target: { buffer: ArrayBuffer | null };
+				constructor( opts: {
+					target: { buffer: ArrayBuffer | null };
+				} ) {
+					this.target = opts.target;
+					// Populate the buffer so execute() yields a non-empty result.
+					this.target.buffer = new Uint8Array( [ 1, 2, 3 ] ).buffer;
+				}
+			},
+			Conversion: {
+				init: async ( options: {
+					video: Record< string, unknown >;
+					audio: Record< string, unknown >;
+				} ) => {
+					mockConversionVideoOptions = options.video;
+					mockConversionAudioOptions = options.audio;
+					return {
+						execute: mockExecute,
+						cancel: mockCancel,
+						isValid: true,
+						discardedTracks: mockDiscardedTracks,
+					};
+				},
+			},
+			BlobSource: class {},
+			BufferTarget: class {
+				buffer: ArrayBuffer | null = null;
+			},
+			Mp4OutputFormat: class {},
+			WebMOutputFormat: class {},
+			VideoSampleSource: class {},
+			VideoSample: class {},
+			QUALITY_HIGH: 'quality-high',
+			ALL_FORMATS: [],
+			canEncodeVideo: ( ...args: unknown[] ) =>
+				mockCanEncodeVideo( ...args ),
+		} ) as unknown as typeof import('mediabunny')
+);
 
 beforeEach( () => {
 	mockTrack = {
