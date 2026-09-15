@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry } from '@wordpress/data';
 import { store as uploadStore } from '../';
 import { unlock } from '../../lock-unlock';
@@ -5,11 +6,11 @@ import { getAllItems, toPersistedRecord } from '../utils/persistence';
 import { buildIndexedDBMock } from '../utils/test/fixtures/build-idb-mock';
 import { ItemStatus } from '../types';
 
-jest.mock( '@wordpress/blob', () => ( {
+vi.mock( '@wordpress/blob', () => ( {
 	__esModule: true,
-	createBlobURL: jest.fn( () => 'blob:foo' ),
-	isBlobURL: jest.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
-	revokeBlobURL: jest.fn(),
+	createBlobURL: vi.fn( () => 'blob:foo' ),
+	isBlobURL: vi.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
+	revokeBlobURL: vi.fn(),
 } ) );
 
 function flush() {

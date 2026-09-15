@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { createRegistry } from '@wordpress/data';
 import { store as uploadStore } from '../';
 import { unlock } from '../../lock-unlock';
@@ -8,11 +9,11 @@ import {
 import { buildIndexedDBMock } from '../utils/test/fixtures/build-idb-mock';
 import { ItemStatus, OperationType } from '../types';
 
-jest.mock( '@wordpress/blob', () => ( {
+vi.mock( '@wordpress/blob', () => ( {
 	__esModule: true,
-	createBlobURL: jest.fn( () => 'blob:foo' ),
-	isBlobURL: jest.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
-	revokeBlobURL: jest.fn(),
+	createBlobURL: vi.fn( () => 'blob:foo' ),
+	isBlobURL: vi.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
+	revokeBlobURL: vi.fn(),
 } ) );
 
 function flush() {
@@ -73,7 +74,7 @@ describe( 'resume orchestration', () => {
 		await unlock( registry.dispatch( uploadStore ) ).loadPersistedQueue();
 		await flush();
 
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		await unlock( registry.dispatch( uploadStore ) ).registerItemCallbacks(
 			'u1',
 			{ onChange }

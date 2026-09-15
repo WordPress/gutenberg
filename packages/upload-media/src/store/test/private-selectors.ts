@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getItemByUploadId, getResumableItems } from '../private-selectors';
 import { ItemStatus } from '../types';
 
