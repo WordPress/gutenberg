@@ -1,14 +1,13 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import CustomGradientPicker from '..';
-
-afterEach( cleanup );
 
 describe( 'CustomGradientPicker layout', () => {
 	it.each( [ 'linear', 'radial' ] )(
 		'preserves control sizing for %s gradients',
-		( type ) => {
-			render(
+		async ( type ) => {
+			await render(
 				<div style={ { width: 180 } }>
 					<CustomGradientPicker
 						value={ `${ type }-gradient(rgb(0,0,0) 0%,rgb(255,255,255) 100%)` }
@@ -21,9 +20,11 @@ describe( 'CustomGradientPicker layout', () => {
 				name: 'Type',
 			} );
 			// These layout wrappers are presentational and have no accessible roles.
+			// eslint-disable-next-line testing-library/no-node-access
 			const line = typeControl.closest(
 				'.components-custom-gradient-picker__ui-line'
 			) as HTMLElement;
+			// eslint-disable-next-line testing-library/no-node-access
 			const wrappers = Array.from( line.children );
 
 			expect( wrappers ).toHaveLength( 2 );
