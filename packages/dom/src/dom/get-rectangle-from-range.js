@@ -95,29 +95,43 @@ export default function getRectangleFromRange( range ) {
 			after = after.firstChild;
 		}
 
-		range = ownerDocument.createRange();
-		let beforeRect;
+		let beforeRange;
 		if ( before && before.nodeType === before.TEXT_NODE ) {
-			range.setStart( before, /** @type {Text} */ ( before ).length );
-			range.collapse( true );
-			beforeRect = range.getClientRects()[ 0 ];
+			beforeRange = ownerDocument.createRange();
+			beforeRange.setStart(
+				before,
+				/** @type {Text} */ ( before ).length
+			);
+			beforeRange.collapse( true );
 		}
-		let afterRect;
+		let afterRange;
 		if ( after && after.nodeType === after.TEXT_NODE ) {
-			range.setStart( after, 0 );
-			range.collapse( true );
-			afterRect = range.getClientRects()[ 0 ];
+			afterRange = ownerDocument.createRange();
+			afterRange.setStart( after, 0 );
+			afterRange.collapse( true );
 		}
 
-		if ( beforeRect && afterRect && beforeRect.bottom <= afterRect.top ) {
-			return null;
-		}
-		if ( ! afterRect ) {
-			if ( ! beforeRect ) {
+		if ( beforeRange && afterRange ) {
+			const beforeRect = beforeRange.getClientRects()[ 0 ];
+			const afterRect = afterRange.getClientRects()[ 0 ];
+			if (
+				beforeRect &&
+				afterRect &&
+				beforeRect.bottom <= afterRect.top
+			) {
 				return null;
 			}
-			range.setStart( before, /** @type {Text} */ ( before ).length );
-			range.collapse( true );
+			if ( ! afterRect ) {
+				afterRange = beforeRange;
+			}
+		}
+
+		if ( afterRange ) {
+			range = afterRange;
+		} else if ( beforeRange ) {
+			range = beforeRange;
+		} else {
+			return null;
 		}
 	}
 
