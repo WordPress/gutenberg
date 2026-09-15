@@ -38,10 +38,6 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
-            - name: Determine the number of CPU cores
-              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
-              id: cpu-cores
-
             - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
@@ -52,7 +48,7 @@ jobs:
               run: |
                   npm run test:unit -- \
                     --ci \
-                    --maxWorkers="${{ steps.cpu-cores.outputs.count }}" \
+                    --maxWorkers="$(nproc)" \
                     --shard="${{ matrix.shard }}" \
                     --cacheDirectory="$HOME/.jest-cache"
 
@@ -70,10 +66,6 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
-            - name: Determine the number of CPU cores
-              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
-              id: cpu-cores
-
             - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
@@ -81,7 +73,7 @@ jobs:
               run: npx lerna run build
 
             - name: Run the date tests
-              run: npm run test:unit:date -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:unit:date -- --ci --maxWorkers="$(nproc)" --cacheDirectory="$HOME/.jest-cache"
 
     build-assets:
         name: Build JavaScript assets for PHP unit tests
@@ -307,10 +299,6 @@ jobs:
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            - name: Determine the number of CPU cores
-              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
-              id: cpu-cores
-
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
@@ -321,4 +309,4 @@ jobs:
               run: npx lerna run build
 
             - name: Running the tests
-              run: npm run test:native -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:native -- --ci --maxWorkers="$(nproc)" --cacheDirectory="$HOME/.jest-cache"
