@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { comment as commentIcon } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
+import MoreMenuSubmenu from '../more-menu/more-menu-submenu';
 import NotesMoreMenuGroup from '../more-menu/notes-more-menu-group';
 
 /**
@@ -37,33 +38,24 @@ export function NotesDisplayModeMenu( {
 
 	return (
 		<NotesMoreMenuGroup.Fill>
-			<Menu.SubmenuRoot>
-				<Menu.SubmenuTrigger
-					prefix={ <Menu.PrefixIcon icon={ commentIcon } /> }
+			<MoreMenuSubmenu icon={ commentIcon } label={ __( 'Notes' ) }>
+				<Menu.RadioGroup
+					value={ value }
+					onValueChange={ ( mode ) =>
+						onChange( mode as NotesDisplayMode )
+					}
 				>
-					<Menu.ItemLabel>{ __( 'Notes' ) }</Menu.ItemLabel>
-				</Menu.SubmenuTrigger>
-				<Menu.Popup>
-					<Menu.RadioGroup
-						value={ value }
-						onValueChange={ ( mode ) =>
-							onChange( mode as NotesDisplayMode )
-						}
-					>
-						{ choices.map( ( choice ) => (
-							<Menu.RadioItem
-								key={ choice.value }
-								value={ choice.value }
-								closeOnClick
-							>
-								<Menu.ItemLabel>
-									{ choice.label }
-								</Menu.ItemLabel>
-							</Menu.RadioItem>
-						) ) }
-					</Menu.RadioGroup>
-				</Menu.Popup>
-			</Menu.SubmenuRoot>
+					{ choices.map( ( choice ) => (
+						<Menu.RadioItem
+							key={ choice.value }
+							value={ choice.value }
+							closeOnClick
+						>
+							<Menu.ItemLabel>{ choice.label }</Menu.ItemLabel>
+						</Menu.RadioItem>
+					) ) }
+				</Menu.RadioGroup>
+			</MoreMenuSubmenu>
 		</NotesMoreMenuGroup.Fill>
 	);
 }
