@@ -54,10 +54,7 @@ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
 				{ ...itemAriaProps }
 				{ ...restProps }
 			>
-				<span
-					className={ itemPopupStyles[ 'item-icon' ] }
-					aria-hidden="true"
-				>
+				<span className={ itemPopupStyles[ 'item-icon' ] }>
 					<Icon
 						icon={ check }
 						className={ itemPopupStyles[ 'item-indicator-icon' ] }

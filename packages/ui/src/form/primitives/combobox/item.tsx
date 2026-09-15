@@ -22,10 +22,7 @@ export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 				ref={ ref }
 				{ ...restProps }
 			>
-				<span
-					className={ itemPopupStyles[ 'item-icon' ] }
-					aria-hidden="true"
-				>
+				<span className={ itemPopupStyles[ 'item-icon' ] }>
 					<Icon
 						icon={ variant === 'creatable' ? plus : check }
 						className={
