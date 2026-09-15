@@ -34,7 +34,8 @@
 }
 
 :where(.wp-block-file.is-layout-flex.alignright) {
-	justify-content: flex-end;
+	// RTL rows start on the right, so flip the value to keep the block on the right.
+	justify-content: flex-end #{"/*rtl:flex-start;*/"};
 }
 
 // Lowest specificity to avoid overriding layout styles.
