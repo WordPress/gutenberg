@@ -169,6 +169,28 @@ isKeyboardEvent.primary( event, 'm' );
 
 Keyed map of functions to match events.
 
+### keyboardShortcut
+
+An object that contains functions returning the three values used to display and describe a keyboard shortcut: its display string, its `aria-keyshortcuts` value and its plain-text label.
+
+The raw representation is not included; use `rawShortcut` for that.
+
+Use it in place of calling `displayShortcut`, `ariaKeyShortcut` and `shortcutAriaLabel` separately, for example to build the `shortcut` prop of the `@wordpress/ui` components.
+
+_Usage_
+
+```js
+// Assuming macOS:
+keyboardShortcut.primaryShift( 'm' );
+// {
+//   displayShortcut: "⇧⌘M",
+//   ariaKeyShortcut: "Shift+Meta+M",
+//   label: "Shift Command M",
+// }
+```
+
+Keyed map of functions to shortcut display values.
+
 ### LEFT
 
 Keycode for LEFT key.
@@ -236,6 +258,20 @@ Keycode for TAB key.
 ### UP
 
 Keycode for UP key.
+
+### withIgnoreIMEEvents
+
+A higher-order function that wraps a keyboard event handler to ensure it is not an IME event.
+
+In CJK languages, an IME (Input Method Editor) is used to input complex characters. During an IME composition, keyboard events (e.g. Enter or Escape) can be fired which are intended to control the IME and not the application. These events should be ignored by any application logic.
+
+_Parameters_
+
+-   _handler_ `( event: E ) => void`: The keyboard event handler to execute after ensuring it was not an IME event.
+
+_Returns_
+
+-   A wrapped version of the given event handler that ignores IME events.
 
 ### ZERO
 

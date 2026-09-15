@@ -1,20 +1,15 @@
-/**
- * Internal dependencies
- */
 import {
 	createBlockEditFilter,
 	createBlockListBlockFilter,
 	createBlockSaveFilter,
 } from './utils';
 import './compat';
-import './cross-origin-isolation';
 import align from './align';
 import background from './background';
 import './lock';
 import allowedBlocks from './allowed-blocks';
 import anchor from './anchor';
 import ariaLabel from './aria-label';
-import blockFields from './block-fields';
 import customClassName from './custom-class-name';
 import './generated-class-name';
 import style from './style';
@@ -25,6 +20,7 @@ import duotone from './duotone';
 import fontFamily from './font-family';
 import fontSize from './font-size';
 import textAlign from './text-align';
+import textShadow from './text-shadow';
 import fitText from './fit-text';
 import border from './border';
 import customCSS from './custom-css';
@@ -56,7 +52,6 @@ createBlockEditFilter(
 		blockBindingsPanel,
 		childLayout,
 		allowedBlocks,
-		blockFields,
 		listView,
 		AutoRegisterControls,
 	].filter( Boolean )
@@ -71,6 +66,7 @@ createBlockListBlockFilter( [
 	duotone,
 	fontFamily,
 	fontSize,
+	textShadow,
 	fitText,
 	border,
 	customCSS,
@@ -91,6 +87,7 @@ createBlockSaveFilter( [
 	style,
 	fontFamily,
 	fontSize,
+	textShadow,
 ] );
 
 export { useCustomSides } from './dimensions';

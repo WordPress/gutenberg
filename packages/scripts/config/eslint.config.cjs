@@ -4,12 +4,7 @@
  * Projects using `wp-scripts lint-js` that do not provide their own
  * eslint.config.* will use this config automatically.
  */
-
-/**
- * Internal dependencies
- */
 const { hasBabelConfig } = require( '../utils' );
-
 const wpPlugin = require( '@wordpress/eslint-plugin' );
 
 const config = [
@@ -24,7 +19,10 @@ const config = [
 	// Unit test overrides.
 	...wpPlugin.configs[ 'test-unit' ].map( ( c ) => ( {
 		...c,
-		files: [ '**/@(test|__tests__)/**/*.js', '**/?(*.)test.js' ],
+		files: [
+			'**/@(test|__tests__)/**/*.{js,jsx}',
+			'**/?(*.)test.{js,jsx}',
+		],
 	} ) ),
 ];
 

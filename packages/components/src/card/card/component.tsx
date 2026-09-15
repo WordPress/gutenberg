@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect, ContextSystemProvider } from '../../context';
 import { Elevation } from '../../elevation';

@@ -1,12 +1,8 @@
-/**
- * External dependencies
- */
-import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule from '../no-unsafe-wp-apis';
+
+const RuleTester = configureRuleTester( { describe, it } );
 
 const ruleTester = new RuleTester( {
 	languageOptions: {
@@ -54,6 +50,13 @@ ruleTester.run( 'no-unsafe-wp-apis', rule, {
 			options,
 		},
 		{ code: "import * as s from '@wordpress/package';", options },
+		{
+			// String-literal imports (e.g. `import { 'a' as b }`) have a
+			// non-identifier `imported` node and are ignored by the rule.
+			code: "import { '__experimentalUnsafe' as s } from '@wordpress/package';",
+			options,
+			languageOptions: { sourceType: 'module', ecmaVersion: 2022 },
+		},
 	],
 
 	invalid: [

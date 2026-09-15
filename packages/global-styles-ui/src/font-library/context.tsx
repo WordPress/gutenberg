@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useState, useEffect } from '@wordpress/element';
 import {
 	useSelect,
@@ -25,10 +22,6 @@ import type {
 	FontFamily,
 	WpFontFamily,
 } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { fetchInstallFontFamily } from './api';
 import {
 	setUIValuesNeeded,
@@ -62,7 +55,8 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 	const globalStyles = useEntityRecord< GlobalStylesConfig >(
 		'root',
 		'globalStyles',
-		globalStylesId
+		globalStylesId ?? 0,
+		{ enabled: globalStylesId !== undefined }
 	);
 
 	const [ isInstalling, setIsInstalling ] = useState( false );

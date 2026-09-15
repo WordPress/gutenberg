@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useSurface } from '../../surface';
@@ -57,9 +50,10 @@ export function useCard( props: CardProps ) {
 
 	const classes = useMemo( () => {
 		return cx(
-			styles.Card,
-			isBorderless && styles.boxShadowless,
-			isRounded && styles.rounded,
+			styles.getCardStyles( {
+				isBorderless,
+				isRounded,
+			} ),
 			className
 		);
 	}, [ className, cx, isBorderless, isRounded ] );

@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useLayoutEffect, useState } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
 

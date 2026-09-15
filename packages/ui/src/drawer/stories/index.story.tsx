@@ -43,25 +43,23 @@ type Story = StoryObj< typeof Drawer.Root >;
  */
 export const _Default: Story = {
 	args: {
-		children: (
-			<>
-				<Drawer.Trigger>Open Drawer</Drawer.Trigger>
-				<Drawer.Popup>
-					<Drawer.Header>
-						<Drawer.Title>Navigation</Drawer.Title>
-						<Drawer.CloseIcon />
-					</Drawer.Header>
-					<Drawer.Content>
-						<Drawer.Description>
-							Browse through the available sections below.
-						</Drawer.Description>
-					</Drawer.Content>
-					<Drawer.Footer>
-						<Drawer.Action>Done</Drawer.Action>
-					</Drawer.Footer>
-				</Drawer.Popup>
-			</>
-		),
+		children: [
+			<Drawer.Trigger key="trigger">Open Drawer</Drawer.Trigger>,
+			<Drawer.Popup key="popup">
+				<Drawer.Header>
+					<Drawer.Title>Navigation</Drawer.Title>
+					<Drawer.CloseIcon />
+				</Drawer.Header>
+				<Drawer.Content>
+					<Drawer.Description>
+						Browse through the available sections below.
+					</Drawer.Description>
+				</Drawer.Content>
+				<Drawer.Footer>
+					<Drawer.Action>Done</Drawer.Action>
+				</Drawer.Footer>
+			</Drawer.Popup>,
+		],
 	},
 };
 
@@ -133,26 +131,26 @@ export const Controlled: Story = {
 		);
 	},
 	args: {
-		children: (
-			<>
-				<Drawer.Trigger>Open Controlled Drawer</Drawer.Trigger>
-				<Drawer.Popup>
-					<Drawer.Header>
-						<Drawer.Title>Controlled Drawer</Drawer.Title>
-						<Drawer.CloseIcon />
-					</Drawer.Header>
-					<Drawer.Content>
-						<Drawer.Description>
-							The open state is managed externally via{ ' ' }
-							<code>open</code> and <code>onOpenChange</code>.
-						</Drawer.Description>
-					</Drawer.Content>
-					<Drawer.Footer>
-						<Drawer.Action>Close</Drawer.Action>
-					</Drawer.Footer>
-				</Drawer.Popup>
-			</>
-		),
+		children: [
+			<Drawer.Trigger key="trigger">
+				Open Controlled Drawer
+			</Drawer.Trigger>,
+			<Drawer.Popup key="popup">
+				<Drawer.Header>
+					<Drawer.Title>Controlled Drawer</Drawer.Title>
+					<Drawer.CloseIcon />
+				</Drawer.Header>
+				<Drawer.Content>
+					<Drawer.Description>
+						The open state is managed externally via{ ' ' }
+						<code>open</code> and <code>onOpenChange</code>.
+					</Drawer.Description>
+				</Drawer.Content>
+				<Drawer.Footer>
+					<Drawer.Action>Close</Drawer.Action>
+				</Drawer.Footer>
+			</Drawer.Popup>,
+		],
 	},
 	argTypes: {
 		open: { control: false },
@@ -170,26 +168,26 @@ export const NonModal: Story = {
 	args: {
 		swipeDirection: 'right',
 		modal: false,
-		children: (
-			<>
-				<Drawer.Trigger>Open Non-Modal Drawer</Drawer.Trigger>
-				<Drawer.Popup>
-					<Drawer.Header>
-						<Drawer.Title>Non-Modal</Drawer.Title>
-						<Drawer.CloseIcon />
-					</Drawer.Header>
-					<Drawer.Content>
-						<Drawer.Description>
-							This drawer does not trap focus and allows
-							interaction with the rest of the page while open.
-						</Drawer.Description>
-					</Drawer.Content>
-					<Drawer.Footer>
-						<Drawer.Action>Close</Drawer.Action>
-					</Drawer.Footer>
-				</Drawer.Popup>
-			</>
-		),
+		children: [
+			<Drawer.Trigger key="trigger">
+				Open Non-Modal Drawer
+			</Drawer.Trigger>,
+			<Drawer.Popup key="popup">
+				<Drawer.Header>
+					<Drawer.Title>Non-Modal</Drawer.Title>
+					<Drawer.CloseIcon />
+				</Drawer.Header>
+				<Drawer.Content>
+					<Drawer.Description>
+						This drawer does not trap focus and allows interaction
+						with the rest of the page while open.
+					</Drawer.Description>
+				</Drawer.Content>
+				<Drawer.Footer>
+					<Drawer.Action>Close</Drawer.Action>
+				</Drawer.Footer>
+			</Drawer.Popup>,
+		],
 	},
 	render: function NonModalRender( args ) {
 		return <Drawer.Root { ...args }>{ args.children }</Drawer.Root>;
@@ -286,34 +284,33 @@ function DirectionSelector( {
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
 	args: {
-		children: (
-			<>
-				<Drawer.Trigger>Open Drawer</Drawer.Trigger>
-				<Drawer.Popup
-					portal={
-						<Drawer.Portal
-							style={ { '--wp-ui-drawer-z-index': '9999' } }
-						/>
-					}
-				>
-					<Drawer.Header>
-						<Drawer.Title>Custom z-index</Drawer.Title>
-						<Drawer.CloseIcon />
-					</Drawer.Header>
-					<Drawer.Content>
-						<Drawer.Description>
-							The backdrop, viewport, and popup render at
-							`z-index: 9999` via the `--wp-ui-drawer-z-index` CSS
-							custom property, set on `Drawer.Portal` through the
-							`portal` prop.
-						</Drawer.Description>
-					</Drawer.Content>
-					<Drawer.Footer>
-						<Drawer.Action>Got it</Drawer.Action>
-					</Drawer.Footer>
-				</Drawer.Popup>
-			</>
-		),
+		children: [
+			<Drawer.Trigger key="trigger">Open Drawer</Drawer.Trigger>,
+			<Drawer.Popup
+				portal={
+					<Drawer.Portal
+						style={ { '--wp-ui-drawer-z-index': '9999' } }
+					/>
+				}
+				key="popup"
+			>
+				<Drawer.Header>
+					<Drawer.Title>Custom z-index</Drawer.Title>
+					<Drawer.CloseIcon />
+				</Drawer.Header>
+				<Drawer.Content>
+					<Drawer.Description>
+						The backdrop, viewport, and popup render at `z-index:
+						9999` via the `--wp-ui-drawer-z-index` CSS custom
+						property, set on `Drawer.Portal` through the `portal`
+						prop.
+					</Drawer.Description>
+				</Drawer.Content>
+				<Drawer.Footer>
+					<Drawer.Action>Got it</Drawer.Action>
+				</Drawer.Footer>
+			</Drawer.Popup>,
+		],
 	},
 };
 
@@ -342,6 +339,7 @@ export const SizePlayground: Story = {
 						value={ direction }
 						onChange={ setDirection }
 					/>
+
 					<SizeSelector value={ size } onChange={ setSize } />
 					<Drawer.Trigger>Open Drawer</Drawer.Trigger>
 				</div>
@@ -362,6 +360,7 @@ export const SizePlayground: Story = {
 									value={ size }
 									onChange={ setSize }
 								/>
+
 								<DirectionSelector
 									value={ direction }
 									onChange={ setDirection }
@@ -419,6 +418,7 @@ function StickyToggle( {
 					checked={ stickyHeader }
 					onChange={ ( e ) => setStickyHeader( e.target.checked ) }
 				/>
+
 				<label htmlFor={ headerId }>Sticky header</label>
 			</Stack>
 			<Stack direction="row" gap="xs" align="center">
@@ -428,6 +428,7 @@ function StickyToggle( {
 					checked={ stickyFooter }
 					onChange={ ( e ) => setStickyFooter( e.target.checked ) }
 				/>
+
 				<label htmlFor={ footerId }>Sticky footer</label>
 			</Stack>
 		</Stack>
@@ -504,6 +505,7 @@ export const Scrollable: Story = {
 				<Drawer.CloseIcon />
 			</Drawer.Header>
 		);
+
 		const footer = (
 			<Drawer.Footer>
 				<Drawer.Action variant="outline">Decline</Drawer.Action>

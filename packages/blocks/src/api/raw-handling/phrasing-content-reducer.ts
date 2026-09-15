@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { wrap, replaceTag } from '@wordpress/dom';
 
 export default function phrasingContentReducer(

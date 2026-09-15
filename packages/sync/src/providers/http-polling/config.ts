@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { applyFilters } from '@wordpress/hooks';
 
 export const DEFAULT_CLIENT_LIMIT_PER_ROOM = 3;

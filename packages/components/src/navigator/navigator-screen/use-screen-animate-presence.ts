@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useState,
 	useEffect,
@@ -9,10 +6,6 @@ import {
 } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { isRTL as isRTLFn } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import * as styles from '../styles';
 
 // Possible values:

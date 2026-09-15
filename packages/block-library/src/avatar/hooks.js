@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore, useEntityProp } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useDefaultAvatar } from '../utils/hooks';
 
 function getAvatarSizes( sizes ) {
