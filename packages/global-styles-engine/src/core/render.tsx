@@ -738,6 +738,46 @@ export function getStylesDeclarations(
 }
 
 /**
+ * Converts `width` declarations to `flex-basis` for column blocks.
+ *
+ * The column block sizes itself with `flex-basis` rather than `width` because
+ * it lives in a flex container. This post-processes the computed declarations
+ * so the correct CSS property is output.
+ *
+ * Keep in sync with `WP_Theme_JSON_Gutenberg::update_column_width_declarations`.
+ *
+ * @param declarations CSS declarations.
+ * @return The updated declarations.
+ */
+function updateColumnWidthDeclarations( declarations: string[] ): string[] {
+	let hasWidth = false;
+
+	const updated = declarations.map( ( declaration ) => {
+		const separatorIndex = declaration.indexOf( ':' );
+		if (
+			separatorIndex === -1 ||
+			declaration.slice( 0, separatorIndex ).trim() !== 'width'
+		) {
+			return declaration;
+		}
+
+		hasWidth = true;
+		return `flex-basis:${ declaration.slice( separatorIndex + 1 ) }`;
+	} );
+
+	/*
+	 * Columns without a width divide the remaining space between them via
+	 * `flex-grow`. A column given a width should keep it instead, matching
+	 * the behaviour of a width set on the block itself.
+	 */
+	if ( hasWidth ) {
+		updated.push( 'flex-grow: 0' );
+	}
+
+	return updated;
+}
+
+/**
  * Get generated CSS for layout styles by looking up layout definitions provided
  * in theme.json, and outputting common layout styles, and specific blockGap values.
  *
@@ -1712,13 +1752,18 @@ function renderStylesNode(
 	}
 
 	// Process the remaining block styles (they use either normal block class or __experimentalSelector).
-	const styleDeclarations = getStylesDeclarations(
+	let styleDeclarations = getStylesDeclarations(
 		styles,
 		effectiveSelector,
 		useRootPaddingAlign,
 		tree,
 		disableRootPadding
 	);
+
+	if ( name === 'core/column' ) {
+		styleDeclarations = updateColumnWidthDeclarations( styleDeclarations );
+	}
+
 	if ( styleDeclarations?.length ) {
 		const generalSelector = skipSelectorWrapper
 			? effectiveSelector
