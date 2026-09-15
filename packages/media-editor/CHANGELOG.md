@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Use `@wordpress/ui` Menu for the crop aspect ratio in the compact image controls.
+-   Use `@wordpress/ui` Menu for the crop aspect ratio in the compact image controls ([#82968](https://github.com/WordPress/gutenberg/pull/82968)).
 
 ## 0.19.0 (2026-09-23)
 
