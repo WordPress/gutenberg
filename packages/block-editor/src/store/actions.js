@@ -725,48 +725,31 @@ export const insertBlocks =
 					blocksWithTemplates,
 					initialPosition
 				);
+				// Select the start of the inserted block's text when the block
+				// opts into the editable root, so its single field places the
+				// caret as it mounts. Focusing the field later would move focus
+				// off the host and back, which resets the iOS keyboard's
+				// capitalization.
 				if ( updateSelection && initialPosition === 0 ) {
-					selectEditableRootTextStart( select, dispatch );
+					const clientId = select.getSelectedBlockClientId();
+					const blockType =
+						clientId &&
+						getBlockType( select.getBlockName( clientId ) );
+					const attributeKey =
+						blockType?.[ editableRootKey ] &&
+						findRichTextAttributeKey( blockType );
+					if ( attributeKey ) {
+						dispatch.selectionChange(
+							clientId,
+							attributeKey,
+							0,
+							0
+						);
+					}
 				}
 			} );
 		}
 	};
-
-/**
- * Whether the block type opts into the editable root: a block with a single
- * text field that the writing flow hosts in one editable canvas.
- *
- * @param {string} name Block name.
- *
- * @return {boolean} Whether the block opts in.
- */
-function isEditableRootBlockType( name ) {
-	return !! getBlockType( name )?.[ editableRootKey ];
-}
-
-/**
- * Selects the start of the selected block's text when the block opts into
- * the editable root, so its single field places the caret as it mounts.
- * Focusing the field later would move focus off the host and back, which
- * resets the iOS keyboard's capitalization.
- *
- * @param {Object} select   Store selectors.
- * @param {Object} dispatch Store actions.
- */
-function selectEditableRootTextStart( select, dispatch ) {
-	const clientId = select.getSelectedBlockClientId();
-	if ( ! clientId ) {
-		return;
-	}
-	const name = select.getBlockName( clientId );
-	if ( ! isEditableRootBlockType( name ) ) {
-		return;
-	}
-	const attributeKey = findRichTextAttributeKey( getBlockType( name ) );
-	if ( attributeKey ) {
-		dispatch.selectionChange( clientId, attributeKey, 0, 0 );
-	}
-}
 
 /**
  * Action that shows the insertion point.
@@ -1217,7 +1200,7 @@ export const __unstableSplitSelection =
 				// that opt into the editable root, and not when the tail
 				// changed block type and lost the attribute.
 				if (
-					isEditableRootBlockType( tail.name ) &&
+					getBlockType( tail.name )?.[ editableRootKey ] &&
 					Object.hasOwn( tail.attributes, attributeKeyB )
 				) {
 					dispatch.selectionChange(
