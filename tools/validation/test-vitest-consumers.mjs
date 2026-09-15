@@ -135,14 +135,13 @@ write(
 			'@wordpress/style-runtime': '0.11.0',
 			'@wordpress/theme': '2.1.0',
 			'@vitejs/plugin-react-swc': '4.3.3',
-			'@vitest/browser-playwright': '5.0.0',
 			'@testing-library/react': '16.3.3',
 			'@testing-library/dom': '10.4.1',
 			'@testing-library/jest-dom': '7.0.1',
 			'vitest-browser-react': '2.3.0',
 			eslint: '10.0.0',
 			eslint9: 'npm:eslint@9.39.4',
-			vitest: '5.0.0',
+			vitest: '^5',
 			vite: values.vite,
 			jsdom: '26.1.0',
 			playwright: '1.63.0',
@@ -160,8 +159,18 @@ if ( values.lockfile ) {
 }
 console.log( `Consumer: ${ consumer }` );
 run( 'npm', [ 'install', '--engine-strict', '--no-audit', '--no-fund' ] );
+// Follow the guide's Node -> Browser installation order to catch version drift
+// between the runner and its provider, including matching patch-version peers.
+run( 'npm', [
+	'install',
+	'--save-dev',
+	'--engine-strict',
+	'--no-audit',
+	'--no-fund',
+	'@vitest/browser-playwright@^5',
+] );
 // A replayed lockfile can install despite an incompatible peer range.
-run( 'npm', [ 'ls', 'vite', 'vitest', '--all' ] );
+run( 'npm', [ 'ls', 'vite', 'vitest', '@vitest/browser-playwright', '--all' ] );
 assert.match(
 	readFileSync(
 		path.join(

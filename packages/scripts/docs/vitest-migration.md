@@ -262,7 +262,7 @@ Run `npm test -- dom.test.jsx` using the scripts above. Supply browser API mocks
 Use this as an alternative to the jsdom configuration. Create a separate consumer directory and first install Vitest/Vite and add the npm scripts from [Start with Node](#start-with-node), or replace `vitest.config.mjs` and run only the Browser example. Do not add the jsdom setup file to the Browser config.
 
 ```sh
-npm install --save-dev @vitest/browser-playwright@5.0.0 playwright@1.63.0
+npm install --save-dev @vitest/browser-playwright@^5 playwright@1.63.0
 npm install --save-dev @vitejs/plugin-react-swc@4.3.3 vitest-browser-react@2.3.0 react@18.3.1 react-dom@18.3.1
 npm exec --no -- playwright install chromium
 ```
