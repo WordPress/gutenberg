@@ -797,7 +797,7 @@ describe( 'parseHeicSequence', () => {
 		const pitm = buildPitm( 1 );
 		const iloc = buildIloc( [ [ 1, [ [ 0, 4 ] ] ] ] );
 		const meta = buildFullBox( 'meta', 0, 0, concat( hdlr, pitm, iloc ) );
-		expect( () => parseHeicSequence( meta.buffer ) ).toThrow(
+		expect( () => parseHeicSequence( toArrayBuffer( meta ) ) ).toThrow(
 			'No moov box'
 		);
 	} );
@@ -826,7 +826,7 @@ describe( 'isHeicSequence', () => {
 		const iloc = buildIloc( [ [ 1, [ [ 0, 4 ] ] ] ] );
 		const meta = buildFullBox( 'meta', 0, 0, concat( hdlr, pitm, iloc ) );
 
-		expect( isHeicSequence( meta.buffer ) ).toBe( false );
+		expect( isHeicSequence( toArrayBuffer( meta ) ) ).toBe( false );
 	} );
 
 	it( 'rejects a buffer that is not ISOBMFF at all', () => {
