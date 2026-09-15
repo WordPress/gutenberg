@@ -80,11 +80,10 @@ export default function getRectangleFromRange( range ) {
 		return getRectangleFromRange( range );
 	}
 
-	// Only a position inside a text node has a caret rectangle. A position
-	// on an element, between two of its children, is the same spot as the
-	// end of the text before it and the start of the text after it, so
-	// measure there instead. When the two sit on different lines there is
-	// no way to know which line the caret is on, so don't return anything.
+	// A collapsed range at an element offset has no rectangle. Translate it
+	// to the text offset next to it: the end of the text before or the start
+	// of the text after. When those sit on different lines the caret could
+	// be on either, so return null.
 	if ( startContainer.nodeType !== startContainer.TEXT_NODE ) {
 		let before = startContainer.childNodes[ startOffset - 1 ];
 		while ( before?.lastChild ) {
