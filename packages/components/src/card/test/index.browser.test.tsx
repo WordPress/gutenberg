@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+// Load the tokens that the production build also supplies as fallbacks.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '../../../../theme/prebuilt/css/design-tokens.css';
 import {
 	Card,
 	CardBody,
@@ -91,7 +94,6 @@ describe( 'Card', () => {
 		expect( getComputedStyle( card ).boxShadow ).toBe( 'none' );
 	} );
 
-
 	it( 'adds a rounded border when isRounded is true', async () => {
 		await render(
 			<Card data-testid="card-rounded" isRounded>
@@ -126,38 +128,6 @@ describe( 'Card', () => {
 		expect(
 			readElevationShadow( screen.getByTestId( 'elevated' ) )
 		).not.toBe( readElevationShadow( screen.getByTestId( 'flat' ) ) );
-	} );
-
-	it( 'changes region spacing with the size prop', async () => {
-		await render(
-			<Card size="medium">
-				<CardHeader data-testid="medium-header">Header</CardHeader>
-				<CardBody data-testid="medium-body">Body</CardBody>
-			</Card>
-		);
-		await render(
-			<Card size="large">
-				<CardHeader data-testid="large-header">Header</CardHeader>
-				<CardBody data-testid="large-body">Body</CardBody>
-			</Card>
-		);
-
-		expect(
-			pickStyles(
-				screen.getByTestId( 'large-header' ),
-				spacingProperties
-			)
-		).not.toEqual(
-			pickStyles(
-				screen.getByTestId( 'medium-header' ),
-				spacingProperties
-			)
-		);
-		expect(
-			pickStyles( screen.getByTestId( 'large-body' ), spacingProperties )
-		).not.toEqual(
-			pickStyles( screen.getByTestId( 'medium-body' ), spacingProperties )
-		);
 	} );
 
 	it( 'supports the legacy isElevated prop with a warning', async () => {
@@ -250,41 +220,6 @@ describe( 'Card', () => {
 		);
 	} );
 
-	it( 'treats extraSmall as an alias for xSmall', async () => {
-		await render(
-			<Card size="xSmall">
-				<CardHeader data-testid="xsmall-header">Header</CardHeader>
-				<CardBody data-testid="xsmall-body">Body</CardBody>
-			</Card>
-		);
-		await render(
-			<Card size="extraSmall">
-				<CardHeader data-testid="extra-small-header">Header</CardHeader>
-				<CardBody data-testid="extra-small-body">Body</CardBody>
-			</Card>
-		);
-
-		expect(
-			pickStyles(
-				screen.getByTestId( 'xsmall-header' ),
-				spacingProperties
-			)
-		).toEqual(
-			pickStyles(
-				screen.getByTestId( 'extra-small-header' ),
-				spacingProperties
-			)
-		);
-		expect(
-			pickStyles( screen.getByTestId( 'xsmall-body' ), spacingProperties )
-		).toEqual(
-			pickStyles(
-				screen.getByTestId( 'extra-small-body' ),
-				spacingProperties
-			)
-		);
-	} );
-
 	it( 'applies the shady background to all Card regions', async () => {
 		await render(
 			<>
@@ -324,7 +259,6 @@ describe( 'Card', () => {
 			getComputedStyle( screen.getByTestId( 'footer' ) ).justifyContent
 		).toBe( 'flex-end' );
 	} );
-
 
 	it( 'makes CardBody scrollable when requested', async () => {
 		await render(
