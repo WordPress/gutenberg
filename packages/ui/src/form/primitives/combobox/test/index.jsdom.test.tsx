@@ -236,15 +236,19 @@ describe( 'Combobox', () => {
 			</Combobox.Root>
 		);
 
-		expect(
-			screen.getByText( ( _content, element ) => {
-				return (
-					element instanceof HTMLElement &&
-					element.hasAttribute( 'aria-description' ) &&
-					( element.textContent ?? '' ).includes( 'Item 1' )
-				);
-			} )
-		).toHaveAccessibleDescription( 'Press Backspace or Delete to remove.' );
+		const chip = screen.getByText( ( _content, element ) => {
+			return (
+				element instanceof HTMLElement &&
+				element.tagName === 'DIV' &&
+				element.hasAttribute( 'aria-describedby' ) &&
+				( element.textContent ?? '' ).includes( 'Item 1' )
+			);
+		} );
+
+		expect( chip ).toHaveAccessibleDescription(
+			'Press Backspace or Delete to remove.'
+		);
+		expect( chip ).not.toHaveAttribute( 'aria-description' );
 	} );
 
 	it( 'renders a default trigger placeholder when no value is selected', () => {

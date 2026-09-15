@@ -17,7 +17,8 @@ function getChip( name: string ) {
 	return screen.getByText( ( _content, element ) => {
 		return (
 			element instanceof HTMLElement &&
-			element.hasAttribute( 'aria-description' ) &&
+			element.tagName === 'DIV' &&
+			element.hasAttribute( 'aria-describedby' ) &&
 			( element.textContent ?? '' ).includes( name )
 		);
 	} );
@@ -596,8 +597,14 @@ describe( 'SearchableChipSelect', () => {
 			expect( getChip( 'Apple' ) ).toHaveAccessibleDescription(
 				CHIP_REMOVE_HINT
 			);
+			expect( getChip( 'Apple' ) ).not.toHaveAttribute(
+				'aria-description'
+			);
 			expect( getChip( 'Banana' ) ).toHaveAccessibleDescription(
 				CHIP_REMOVE_HINT
+			);
+			expect( getChip( 'Banana' ) ).not.toHaveAttribute(
+				'aria-description'
 			);
 		} );
 

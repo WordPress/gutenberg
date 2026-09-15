@@ -1,11 +1,19 @@
 import { Combobox as _Combobox } from '@base-ui/react/combobox';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useId } from '@wordpress/element';
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { IconButton } from '../../../icon-button';
+import { VisuallyHidden } from '../../../visually-hidden';
 import type { ComboboxChipWithRemoveProps } from './types';
 import styles from './style.module.css';
+
+function mergeDescribedBy(
+	...ids: Array< string | undefined >
+): string | undefined {
+	const merged = ids.filter( Boolean ).join( ' ' );
+	return merged === '' ? undefined : merged;
+}
 
 /**
  * A utility component that combines a chip and a remove button,
@@ -20,41 +28,57 @@ export const ChipWithRemove = forwardRef<
 		children,
 		prefix,
 		removeLabel = __( 'Remove' ),
-		'aria-description': ariaDescription = __(
+		'aria-description': descriptionText = __(
 			'Press Backspace or Delete to remove.'
 		),
+		'aria-describedby': ariaDescribedby,
 		...restProps
 	},
 	ref
 ) {
-	return (
-		<_Combobox.Chip
-			ref={ ref }
-			className={ clsx( styles.chip, className ) }
-			{ ...restProps }
-			aria-description={ ariaDescription }
-		>
-			{ prefix && (
-				<span className={ styles[ 'chip-prefix' ] }>{ prefix }</span>
-			) }
-			<span className={ styles[ 'chip-content' ] }>{ children }</span>
+	const hintId = useId();
+	const hasDescription = descriptionText !== '';
 
-			<_Combobox.ChipRemove
-				className={ styles[ 'chip-remove' ] }
-				render={ ( props, { disabled } ) => (
-					<IconButton
-						icon={ closeSmall }
-						label={ removeLabel }
-						size="small"
-						variant="minimal"
-						tone="neutral"
-						focusableWhenDisabled={ false }
-						disabled={ disabled }
-						aria-hidden={ disabled || undefined }
-						{ ...props }
-					/>
+	return (
+		<>
+			<_Combobox.Chip
+				ref={ ref }
+				className={ clsx( styles.chip, className ) }
+				{ ...restProps }
+				aria-describedby={ mergeDescribedBy(
+					ariaDescribedby,
+					hasDescription ? hintId : undefined
 				) }
-			/>
-		</_Combobox.Chip>
+			>
+				{ prefix && (
+					<span className={ styles[ 'chip-prefix' ] }>
+						{ prefix }
+					</span>
+				) }
+				<span className={ styles[ 'chip-content' ] }>{ children }</span>
+
+				<_Combobox.ChipRemove
+					className={ styles[ 'chip-remove' ] }
+					render={ ( props, { disabled } ) => (
+						<IconButton
+							icon={ closeSmall }
+							label={ removeLabel }
+							size="small"
+							variant="minimal"
+							tone="neutral"
+							focusableWhenDisabled={ false }
+							disabled={ disabled }
+							aria-hidden={ disabled || undefined }
+							{ ...props }
+						/>
+					) }
+				/>
+			</_Combobox.Chip>
+			{ hasDescription && (
+				<VisuallyHidden id={ hintId } render={ <span /> }>
+					{ descriptionText }
+				</VisuallyHidden>
+			) }
+		</>
 	);
 } );
