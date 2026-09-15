@@ -1,4 +1,3 @@
-import TextareaAutosize from 'react-autosize-textarea';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -69,7 +68,7 @@ function BlockHTML( { clientId } ) {
 	}, [ blockContent ] );
 
 	return (
-		<TextareaAutosize
+		<textarea
 			className="block-editor-block-list__block-html-textarea"
 			value={ html }
 			onBlur={ onChange }

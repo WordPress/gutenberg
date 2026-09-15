@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Carry a widget's `attributes` from `widget.json` into `build/widgets/registry.php` ([#82485](https://github.com/WordPress/gutenberg/pull/82485)).
+
+## 0.23.0 (2026-09-10)
+
 ### Breaking Changes
 
 -   `@wordpress/build` no longer parses JSX syntax in `.js` source files. Rename these files to `.jsx` or `.tsx` before building ([#82189](https://github.com/WordPress/gutenberg/pull/82189)).
@@ -13,9 +19,14 @@
 
 ### Bug Fixes
 
+-   Fix generated regular CSS injection in Browser Mode while retaining the existing Node and jsdom test behavior ([#82154](https://github.com/WordPress/gutenberg/pull/82154)).
 -   Pages: require authentication and a configurable capability (new `capability` page setting, default `manage_options`) before rendering generated standalone pages, so `admin_init` entry points such as `admin-post.php` no longer serve them to logged-out visitors ([#82254](https://github.com/WordPress/gutenberg/pull/82254)).
 -   Widen the optional `@wordpress/theme` peer dependency range to allow 2.x releases. ([#82139](https://github.com/WordPress/gutenberg/pull/82139))
 -   Pages: preserve the Core Boot layout compatibility class in generated wp-admin page templates so short pages fill the viewport when using Core's bundled Boot module ([#82112](https://github.com/WordPress/gutenberg/pull/82112)).
+
+### Internal
+
+-   Update the `@types/node` development dependency to v24, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
 
 ## 0.22.0 (2026-08-26)
 

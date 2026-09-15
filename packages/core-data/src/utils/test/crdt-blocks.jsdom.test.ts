@@ -1,23 +1,30 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Y } from '@wordpress/sync';
+import { RichTextData } from '@wordpress/rich-text';
 import {
-	describe,
-	expect,
-	it,
-	jest,
-	beforeEach,
-	afterEach,
-} from '@jest/globals';
+	mergeCrdtBlocks,
+	mergeRichTextUpdate,
+	type Block,
+	type YBlock,
+	type YBlocks,
+	type YBlockAttributes,
+} from '../crdt-blocks';
+import { getCachedRichTextData, createRichTextDataCache } from '../crdt-text';
+import { asHtmlStringIndex, asRichTextOffset } from '../crdt-utils';
+import { type WPBlockSelection } from '../../types';
 /**
  * Mock uuid module
  */
-jest.mock( 'uuid', () => ( {
+vi.mock( import( 'uuid' ), () => ( {
 	v4: () => 'mocked-uuid-' + Math.random(),
 } ) );
+
 /**
  * Mock @wordpress/blocks module
  */
-jest.mock( '@wordpress/blocks', () => ( {
-	getBlockTypes: () => [
+vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	getBlockTypes: ( () => [
 		{
 			name: 'core/paragraph',
 			attributes: { content: { type: 'rich-text' } },
@@ -90,20 +97,8 @@ jest.mock( '@wordpress/blocks', () => ( {
 				},
 			},
 		},
-	],
+	] ) as unknown as typeof import('@wordpress/blocks').getBlockTypes,
 } ) );
-import { RichTextData } from '@wordpress/rich-text';
-import {
-	mergeCrdtBlocks,
-	mergeRichTextUpdate,
-	type Block,
-	type YBlock,
-	type YBlocks,
-	type YBlockAttributes,
-} from '../crdt-blocks';
-import { getCachedRichTextData, createRichTextDataCache } from '../crdt-text';
-import { asHtmlStringIndex, asRichTextOffset } from '../crdt-utils';
-import { type WPBlockSelection } from '../../types';
 
 function createCursorSelection( offset: number ): WPBlockSelection {
 	return {
@@ -120,7 +115,7 @@ describe( 'crdt-blocks', () => {
 	beforeEach( () => {
 		doc = new Y.Doc();
 		yblocks = doc.getArray< YBlock >();
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	afterEach( () => {
@@ -3095,10 +3090,10 @@ describe( 'crdt-blocks', () => {
 } );
 
 describe( 'getCachedRichTextData', () => {
-	let spy: ReturnType< typeof jest.spyOn >;
+	let spy: ReturnType< typeof vi.spyOn >;
 
 	beforeEach( () => {
-		spy = jest.spyOn( RichTextData, 'fromHTMLString' );
+		spy = vi.spyOn( RichTextData, 'fromHTMLString' );
 	} );
 
 	afterEach( () => {

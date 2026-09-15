@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
 	RichTextData,
 	create,
@@ -22,6 +23,8 @@ import {
 	getNoteMarkerSelector,
 } from '../utils';
 import { noteFormat } from '../format';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 function makeRect( top ) {
 	return { top };

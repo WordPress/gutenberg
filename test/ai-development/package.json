@@ -21,7 +21,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=22.22.0"
+		"node": ">=24.18.0"
 	},
 	"type": "module",
 	"devDependencies": {
@@ -29,9 +29,7 @@
 		"promptfoo": "0.122.1"
 	},
 	"overrides": {
-		"@huggingface/transformers": {
-			"sharp": "0.35.4"
-		},
+		"sharp": "0.35.4",
 		"onnxruntime-node": {
 			"adm-zip": "0.6.0"
 		}
@@ -40,11 +38,8 @@
 		"access": "public"
 	},
 	"scripts": {
-		"check:node": "node lib/check-node.mjs",
-		"prevalidate": "npm run check:node",
 		"validate": "node lib/run-configs.mjs validate",
 		"test:utils": "node --test \"lib/test/*.mjs\" \"utils/test/*.mjs\"",
-		"preeval": "npm run check:node",
 		"eval": "node lib/run-configs.mjs eval",
 		"view": "node lib/run-configs.mjs view"
 	}

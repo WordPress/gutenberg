@@ -1,9 +1,11 @@
 import { createSelector } from '@wordpress/data';
 import {
 	displayShortcut,
+	keyboardShortcut,
 	shortcutAriaLabel,
 	rawShortcut,
 } from '@wordpress/keycodes';
+import type { WPKeyboardShortcut } from '@wordpress/keycodes';
 import type { ShortcutKeyCombination } from './actions';
 
 interface ShortcutState {
@@ -157,6 +159,62 @@ export function getShortcutRepresentation(
 	const shortcut = getShortcutKeyCombination( state, name );
 	return getKeyCombinationRepresentation( shortcut, representation );
 }
+
+/**
+ * Returns the three values used to display and describe the main key
+ * combination of a registered shortcut: its display string, its
+ * `aria-keyshortcuts` value and its plain-text label. Returns `null` when no
+ * shortcut is registered under the name.
+ *
+ * The raw representation and aliases are not included; use
+ * `getShortcutRepresentation` and `getShortcutAliases` for those.
+ *
+ * The returned object can be passed to the `shortcut` prop of the
+ * `@wordpress/ui` components.
+ *
+ * @param {Object} state Global state.
+ * @param {string} name  Shortcut name.
+ *
+ * @example
+ *
+ *```js
+ * import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+ * import { useSelect } from '@wordpress/data';
+ * import { Menu } from '@wordpress/ui';
+ *
+ * const ExampleComponent = () => {
+ *     const shortcut = useSelect(
+ *         ( select ) =>
+ *             select( keyboardShortcutsStore ).getKeyboardShortcut(
+ *                 'core/editor/next-region'
+ *             ),
+ *         []
+ *     );
+ *
+ *     return (
+ *         <Menu.Item shortcut={ shortcut ?? undefined }>
+ *             <Menu.ItemLabel>Next region</Menu.ItemLabel>
+ *         </Menu.Item>
+ *     );
+ * };
+ *```
+ *
+ * @return {WPKeyboardShortcut?} Shortcut display values.
+ */
+export const getKeyboardShortcut = createSelector(
+	( state: ShortcutsState, name: string ): WPKeyboardShortcut | null => {
+		const combination = getShortcutKeyCombination( state, name );
+
+		if ( ! combination ) {
+			return null;
+		}
+
+		return keyboardShortcut[ combination.modifier ?? 'undefined' ](
+			combination.character
+		);
+	},
+	( state: ShortcutsState, name: string ) => [ state[ name ] ]
+);
 
 /**
  * Returns the shortcut description given its name.

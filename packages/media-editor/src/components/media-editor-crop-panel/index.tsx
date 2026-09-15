@@ -16,6 +16,8 @@ export interface MediaEditorCropPanelProps {
 	onAspectRatioChange: ( value: string ) => void;
 	/** Aspect-ratio presets to display in the selector. */
 	aspectRatioOptions: AspectRatioPreset[];
+	/** Disable every control in the panel while the edit is saving. */
+	disabled?: boolean;
 }
 
 /**
@@ -26,11 +28,13 @@ export interface MediaEditorCropPanelProps {
  * @param props.aspectRatioValue
  * @param props.onAspectRatioChange
  * @param props.aspectRatioOptions
+ * @param props.disabled
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
 	onAspectRatioChange,
 	aspectRatioOptions,
+	disabled = false,
 }: MediaEditorCropPanelProps ) {
 	return (
 		// Tag the whole panel as a crop-control region so the modal's
@@ -44,11 +48,12 @@ export default function MediaEditorCropPanel( {
 			<VisuallyHidden render={ <h2 /> }>
 				{ __( 'Crop options' ) }
 			</VisuallyHidden>
-			<MediaEditorImageControls withLabels />
+			<MediaEditorImageControls withLabels disabled={ disabled } />
 			<SelectControl
 				label={ __( 'Aspect ratio' ) }
 				value={ aspectRatioValue }
 				onChange={ onAspectRatioChange }
+				disabled={ disabled }
 				options={ aspectRatioOptions.map( ( preset ) => ( {
 					label: preset.label,
 					value: preset.value.toString(),

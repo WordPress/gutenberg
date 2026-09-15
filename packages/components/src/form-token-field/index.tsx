@@ -399,7 +399,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	function handleUpArrowKey() {
 		setSelectedSuggestionIndex( ( index ) => {
 			return (
-				( index === 0
+				( index <= 0
 					? getMatchingSuggestions(
 							incompleteTokenValue,
 							suggestions,

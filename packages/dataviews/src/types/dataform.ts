@@ -129,6 +129,13 @@ export type PanelLayout = {
 	 * When the edit trigger is visible: always, or only on hover/focus (default).
 	 */
 	editVisibility?: EditVisibility;
+
+	/**
+	 * Whether the summary shows the field's `placeholder` instead of its
+	 * `render` output when the value is `undefined`, `null`, or an empty
+	 * string. `false` by default.
+	 */
+	showPlaceholderIfEmpty?: boolean;
 };
 
 /**
@@ -159,6 +166,11 @@ export type NormalizedPanelLayout = {
 	 * When the edit trigger is visible.
 	 */
 	editVisibility: EditVisibility;
+
+	/**
+	 * Whether the summary shows the field's `placeholder` when the value is empty.
+	 */
+	showPlaceholderIfEmpty: boolean;
 };
 
 /**

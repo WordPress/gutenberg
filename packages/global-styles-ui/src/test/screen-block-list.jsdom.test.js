@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { hasUserStylesForBlock } from '../screen-block-list';
 
 describe( 'hasUserStylesForBlock', () => {
