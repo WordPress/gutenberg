@@ -1,5 +1,4 @@
 import { assertIsDefined } from '../utils/assert-is-defined';
-import getComputedStyle from './get-computed-style';
 
 /**
  * Get the rectangle of a given Range. Returns `null` if no suitable rectangle
@@ -68,41 +67,27 @@ export default function getRectangleFromRange( range ) {
 	const { ownerDocument } = startContainer;
 	assertIsDefined( ownerDocument, 'ownerDocument' );
 
-	// Correct invalid "BR" ranges. The cannot contain any children.
-	if ( startContainer.nodeName === 'BR' ) {
-		const { parentNode } = startContainer;
-		assertIsDefined( parentNode, 'parentNode' );
-		startOffset = /** @type {Node[]} */ (
-			Array.from( parentNode.childNodes )
-		).indexOf( startContainer );
-		startContainer = parentNode;
-	}
-
-	// A position on an element, between two of its children, is the same
-	// spot as the start of the child after it or the end of the child before
-	// it, but only a position inside a text node has a caret rectangle.
-	// Translate it. An inline element with nothing to stand in, like the
-	// placeholder, holds no caret position of its own, so a position in it
-	// is the same spot as the positions beside the element.
+	// Only a position inside a text node has a caret rectangle. A position
+	// on an element, between two of its children, is the same spot as the
+	// start of the child after it or the end of the child before it, and a
+	// position inside an element with no children, like a line break or the
+	// placeholder, is the same spot as the position before that element in
+	// its parent. Translate it.
 	if ( startContainer.nodeType !== startContainer.TEXT_NODE ) {
-		let node = startContainer;
-		let position = getTextPosition(
-			node.childNodes[ startOffset ],
-			node.childNodes[ startOffset - 1 ]
-		);
 		while (
-			! position &&
-			node.nodeType === node.ELEMENT_NODE &&
-			getComputedStyle(
-				/** @type {Element} */ ( node )
-			).display.startsWith( 'inline' )
+			! startContainer.childNodes.length &&
+			startContainer.parentNode
 		) {
-			position = getTextPosition(
-				node.nextSibling,
-				node.previousSibling
-			);
-			node = /** @type {Node} */ ( node.parentNode );
+			const { parentNode } = startContainer;
+			startOffset = /** @type {Node[]} */ (
+				Array.from( parentNode.childNodes )
+			).indexOf( startContainer );
+			startContainer = parentNode;
 		}
+		const position = getTextPosition(
+			startContainer.childNodes[ startOffset ],
+			startContainer.childNodes[ startOffset - 1 ]
+		);
 		if ( position ) {
 			[ startContainer, startOffset ] = position;
 		}

@@ -78,7 +78,7 @@ describe( 'getRectangleFromRange', () => {
 
 	it( 'measures a position inside an empty inline element beside the text next to it', () => {
 		document.body.innerHTML =
-			'<p>﻿<span data-rich-text-placeholder="Type" style="display:inline"></span></p>';
+			'<p>﻿<span data-rich-text-placeholder="Type"></span></p>';
 		const paragraph = document.querySelector( 'p' );
 		const placeholder = paragraph.querySelector( 'span' );
 		rectsFor( [
@@ -90,20 +90,18 @@ describe( 'getRectangleFromRange', () => {
 		).toMatchObject( { left: 8, top: 100, height: 24 } );
 	} );
 
-	it( 'does not measure a position inside an empty block element from outside it', () => {
-		document.body.innerHTML = '<div>abc<p></p></div>';
+	it( 'measures a position inside a line break at the end of the text before it', () => {
+		document.body.innerHTML = '<p>abc<br>def</p>';
 		const paragraph = document.querySelector( 'p' );
 		rectsFor( [
-			[
-				document.querySelector( 'div' ).firstChild,
-				3,
-				new window.DOMRect( 40, 100, 0, 24 ),
-			],
+			[ paragraph.firstChild, 3, new window.DOMRect( 40, 100, 0, 24 ) ],
 		] );
 
 		expect(
-			getRectangleFromRange( collapsedRange( paragraph, 0 ) )
-		).toBeNull();
+			getRectangleFromRange(
+				collapsedRange( paragraph.querySelector( 'br' ), 0 )
+			)
+		).toMatchObject( { left: 40, top: 100, height: 24 } );
 	} );
 
 	it( 'returns null for a position with no text on either side', () => {
