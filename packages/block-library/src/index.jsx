@@ -49,6 +49,7 @@ import * as cover from './cover';
 import * as details from './details';
 import * as embed from './embed';
 import * as file from './file';
+import * as files from './files';
 import * as gallery from './gallery';
 import * as group from './group';
 import * as heading from './heading';
@@ -169,6 +170,7 @@ const getAllBlocks = () => {
 		details,
 		embed,
 		file,
+		files,
 		group,
 		html,
 		math,
