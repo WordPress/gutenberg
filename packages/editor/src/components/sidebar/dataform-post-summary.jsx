@@ -13,6 +13,11 @@ import PostTrash from '../post-trash';
 import usePostFields from '../post-fields';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
 import revisionsField from '../../dataviews/fields/revisions';
+import {
+	EDITOR_INTENT_SUGGEST,
+	SUGGEST_LOCKED_POST_FIELDS,
+} from '../../store/constants';
+import { unlock } from '../../lock-unlock';
 import readingSettingsField from '../../dataviews/fields/reading-settings';
 
 const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
@@ -170,26 +175,34 @@ function bindFieldToNamespace( field, namespace, isVisible = () => true ) {
 }
 
 export default function DataFormPostSummary( { onActionPerformed } ) {
-	const { postType, postId, isPostStatusRemoved, availableTemplates } =
-		useSelect( ( select ) => {
-			const {
-				getCurrentPostType,
-				getCurrentPostId,
-				isEditorPanelRemoved,
-				getEditorSettings,
-			} = select( editorStore );
-			const _availableTemplates = select(
-				coreDataStore
-			).getCurrentTheme()?.is_block_theme
-				? null
-				: getEditorSettings().availableTemplates ?? null;
-			return {
-				postType: getCurrentPostType(),
-				postId: getCurrentPostId(),
-				isPostStatusRemoved: isEditorPanelRemoved( 'post-status' ),
-				availableTemplates: _availableTemplates,
-			};
-		}, [] );
+	const {
+		postType,
+		postId,
+		isPostStatusRemoved,
+		availableTemplates,
+		isSuggesting,
+	} = useSelect( ( select ) => {
+		const {
+			getCurrentPostType,
+			getCurrentPostId,
+			isEditorPanelRemoved,
+			getEditorSettings,
+		} = select( editorStore );
+		const _availableTemplates = select( coreDataStore ).getCurrentTheme()
+			?.is_block_theme
+			? null
+			: getEditorSettings().availableTemplates ?? null;
+		return {
+			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
+			isPostStatusRemoved: isEditorPanelRemoved( 'post-status' ),
+			availableTemplates: _availableTemplates,
+			// `getEditorIntent` is private while Suggest mode is experimental.
+			isSuggesting:
+				unlock( select( editorStore ) ).getEditorIntent() ===
+				EDITOR_INTENT_SUGGEST,
+		};
+	}, [] );
 	const { form: formConfig } = useViewConfig( {
 		kind: 'postType',
 		name: postType,
@@ -296,6 +309,11 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 							elements: field.elements.filter(
 								( element ) => element.value !== 'trash'
 							),
+							// A status change is an editorial decision the
+							// suggestion layer has no way to hold as pending,
+							// so Suggest mode shows it without offering to
+							// change it. See issue #73411 (F-15).
+							readOnly: isSuggesting,
 						};
 					}
 					if ( field.id === 'template' ) {
@@ -330,6 +348,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 			availableTemplates,
 			fieldNamespaces,
 			postType,
+			isSuggesting,
 		]
 	);
 
@@ -354,6 +373,25 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 		}
 
 		if ( ! Object.keys( baseEdits ).length ) {
+			return;
+		}
+
+		/*
+		 * `editPost` owns the Suggest-mode refusal, but this panel writes to
+		 * the entity directly and so never reaches it. `readOnly` on the status
+		 * field keeps the control from offering the change; this keeps a form
+		 * that doesn't go through that control - a different layout, a
+		 * plugin-supplied field config - from writing the status anyway. The
+		 * whole call is dropped rather than the one key, because the co-dependent
+		 * `date` and `password` edits below are derived from the status.
+		 */
+		if (
+			isSuggesting &&
+			SUGGEST_LOCKED_POST_FIELDS.some(
+				( key ) =>
+					key in baseEdits && baseEdits[ key ] !== record?.[ key ]
+			)
+		) {
 			return;
 		}
 
