@@ -96,7 +96,7 @@ export default function BlockThemeControl() {
 	return (
 		<>
 			<PostPanelRow label={ __( 'Template' ) } ref={ setPopoverAnchor }>
-				<Menu.Root>
+				<Menu.Root modal={ false }>
 					<Menu.Trigger
 						render={
 							<Button

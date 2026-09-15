@@ -345,7 +345,7 @@ test.describe( 'Pages', () => {
 		await templateOptionsButton.click();
 		await page
 			.getByRole( 'menu', { name: 'Template options' } )
-			.getByText( 'Change template' )
+			.getByRole( 'menuitem', { name: 'Change template' } )
 			.click();
 		const templateItem = page.locator(
 			'.block-editor-block-patterns-list__item-title'
@@ -362,7 +362,7 @@ test.describe( 'Pages', () => {
 		await templateOptionsButton.click();
 		const resetButton = page
 			.getByRole( 'menu', { name: 'Template options' } )
-			.getByText( 'Use default template' );
+			.getByRole( 'menuitem', { name: 'Use default template' } );
 		await expect( resetButton ).toBeVisible();
 		await resetButton.click();
 		await expect( templateOptionsButton ).toHaveText( 'Single Entries' );
