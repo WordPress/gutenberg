@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added [`no-storybook-build-style-imports`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-storybook-build-style-imports.md) rule to prevent importing package build-style stylesheets as Vite side effects from Storybook stories ([#82960](https://github.com/WordPress/gutenberg/pull/82960)).
+
 ## 26.0.0 (2026-09-10)
 
 ### Breaking Changes

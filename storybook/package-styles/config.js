@@ -12,6 +12,8 @@ import editSiteLtr from '../package-styles/edit-site-ltr.lazy.scss?inline';
 import editSiteRtl from '../package-styles/edit-site-rtl.lazy.scss?inline';
 import dataviewsLtr from '../package-styles/dataviews-ltr.lazy.scss?inline';
 import dataviewsRtl from '../package-styles/dataviews-rtl.lazy.scss?inline';
+import commandsLtr from '../package-styles/commands-ltr.lazy.scss?inline';
+import commandsRtl from '../package-styles/commands-rtl.lazy.scss?inline';
 import fieldsLtr from '../package-styles/fields-ltr.lazy.scss?inline';
 import fieldsRtl from '../package-styles/fields-rtl.lazy.scss?inline';
 import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss?inline';
@@ -104,6 +106,16 @@ const CONFIG = [
 	},
 	{
 		componentIdMatcher: /^design-system-patterns-/,
+		ltr: [ componentsLtr, dataviewsLtr ],
+		rtl: [ componentsRtl, dataviewsRtl ],
+	},
+	{
+		componentIdMatcher: /^widget-dashboard-/,
+		ltr: [ componentsLtr, dataviewsLtr, commandsLtr ],
+		rtl: [ componentsRtl, dataviewsRtl, commandsRtl ],
+	},
+	{
+		componentIdMatcher: /^widget-primitives-/,
 		ltr: [ componentsLtr, dataviewsLtr ],
 		rtl: [ componentsRtl, dataviewsRtl ],
 	},
