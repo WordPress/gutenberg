@@ -112,10 +112,14 @@ export type DeleteActions = {
 		id: number | string,
 		query?: DeleteRecordsHttpQuery,
 		options?: ActionOptions
-	) => (
-		thunkArgs: ThunkArgs
-	) => Promise<
+	) => ( thunkArgs: ThunkArgs ) => Promise<
 		| WPEntityTypes[ Key extends `delete${ infer E }` ? E : never ]
+		| {
+				deleted: true;
+				previous: WPEntityTypes[ Key extends `delete${ infer E }`
+					? E
+					: never ];
+		  }
 		| false
 		| undefined
 	>;
