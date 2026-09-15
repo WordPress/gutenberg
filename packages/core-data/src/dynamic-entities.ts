@@ -1,3 +1,4 @@
+import type { ThunkArgs } from '@wordpress/data';
 import type { GetRecordsHttpQuery, State } from './selectors';
 import type * as ET from './entity-types';
 
@@ -87,6 +88,10 @@ type ActionOptions = {
 
 type DeleteRecordsHttpQuery = Record< string, any >;
 
+/**
+ * Typed as thunks, like the runtime wrappers in `index.js`, so dispatching
+ * resolves to a single Promise instead of `Promise< Promise< ... > >`.
+ */
 export type SaveActions = {
 	[ Key in `save${ keyof WPEntityTypes }` ]: (
 		data: Key extends 'saveGlobalStyles'
@@ -95,7 +100,11 @@ export type SaveActions = {
 					WPEntityTypes[ Key extends `save${ infer E }` ? E : never ]
 			  >,
 		options?: ActionOptions
-	) => Promise< void >;
+	) => (
+		thunkArgs: ThunkArgs
+	) => Promise<
+		WPEntityTypes[ Key extends `save${ infer E }` ? E : never ] | undefined
+	>;
 };
 
 export type DeleteActions = {
@@ -103,7 +112,17 @@ export type DeleteActions = {
 		id: number | string,
 		query?: DeleteRecordsHttpQuery,
 		options?: ActionOptions
-	) => Promise< void >;
+	) => ( thunkArgs: ThunkArgs ) => Promise<
+		| WPEntityTypes[ Key extends `delete${ infer E }` ? E : never ]
+		| {
+				deleted: true;
+				previous: WPEntityTypes[ Key extends `delete${ infer E }`
+					? E
+					: never ];
+		  }
+		| false
+		| undefined
+	>;
 };
 
 export let dynamicActions: SaveActions & DeleteActions;
