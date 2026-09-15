@@ -42,7 +42,7 @@ Read only what your task needs, when it needs it:
 
 ## Code quality
 
-Do not add entries or increase counts in `tools/eslint/suppressions.json` to make lint pass; fix the code instead. Expanding the baseline requires an explicitly requested lint-rule migration. After fixing suppressed violations, run `npm run lint:js:prune-suppressions` and commit the reductions.
+Fix ESLint violations in the code whenever possible. Add entries or increase counts in `tools/eslint/suppressions.json` only as a last resort, and explain in the PR why a code fix is not practical. Keep suppressions limited to the specific violations that need them. After fixing suppressed violations, run `npm run lint:js:prune-suppressions` and commit the reductions.
 
 ```bash
 npm run format            # Fix JS formatting
