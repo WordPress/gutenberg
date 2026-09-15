@@ -184,7 +184,7 @@ function FileEdit( {
 		className: clsx(
 			// The placeholder keeps its full width, so the layout only applies
 			// once there's a file.
-			( href || temporaryURL ) && layoutClassNames,
+			layoutClassNames,
 			!! temporaryURL && getAnimateClassName( { type: 'loading' } ),
 			{
 				'is-transient': !! temporaryURL,
