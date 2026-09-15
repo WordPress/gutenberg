@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Use `@wordpress/ui` for the Options menu.
+
 ### Bug Fixes
 
 -   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
