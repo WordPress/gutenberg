@@ -1653,7 +1653,7 @@ Finally, the field author can always provide its own custom `Edit` control. It r
 
 ### `readOnly`
 
-Boolean indicating that the field doesn't have an Edit component. Read-only fields use the `render` function to display their value in Edit contexts (e.g., DataForm). This is different from disabled fields (see `isDisabled`) that still have an Edit component but are situationally disabled.
+Boolean indicating that the field doesn't have an Edit  be rendered as read-only in Edit contexts. Read-only fields use the `render` function instead of their `Edit` component to display their value (e.g., in DataForm). This is different from disabled fields (see `isDisabled`) that still render their Edit component but are situationally disabled.
 
 -   Type: `boolean`.
 -   Optional.
@@ -1661,9 +1661,9 @@ Boolean indicating that the field doesn't have an Edit component. Read-only fiel
 
 ### `isDisabled`
 
-Function that indicates if the field should be disabled in Edit contexts (e.g., DataForm). Unlike read-only fields (see `readOnly`), disabled fields still render their Edit component, but the control is disabled.
+Whether the field should be disabled in Edit contexts (e.g., DataForm). Unlike read-only fields (see `readOnly`), disabled fields have an Edit component, but the control is situationally disabled.
 
--   Type: `function`.
+-   Type: `boolean` or `function`.
 -   Optional.
 -   Args
     -   `item`: the data to be processed
