@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Meta Boxes: Initialize classic meta boxes even when a stale `template-locked` rendering mode cannot resolve a template, so meta box values keep saving on Update. ([#82951](https://github.com/WordPress/gutenberg/issues/82951))
+
 ### Enhancements
 
 -   Mark the Welcome Guide item of the Options menu with `aria-haspopup="dialog"`, since it opens a modal dialog ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
