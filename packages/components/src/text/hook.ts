@@ -1,18 +1,24 @@
-import type { SerializedStyles } from '@emotion/react';
-import { css } from '@emotion/react';
+import clsx from 'clsx';
 import type React from 'react';
 import { useMemo, Children, cloneElement } from '@wordpress/element';
 import type { WordPressComponentProps } from '../context';
 import { hasConnectNamespace, useContextSystem } from '../context';
 import { useTruncate } from '../truncate';
 import { getOptimalTextShade } from '../utils/colors';
-import * as styles from './styles';
+import styles from './style.module.scss';
 import { createHighlighterText } from './utils';
 import { getFontSize } from '../utils/font-size';
-import { CONFIG, COLORS } from '../utils';
+import { CONFIG } from '../utils';
 import { getLineHeight } from './get-line-height';
-import { useCx } from '../utils/hooks/use-cx';
 import type { Props } from './types';
+
+const CSS_WIDE_KEYWORDS = new Set( [
+	'inherit',
+	'initial',
+	'unset',
+	'revert',
+	'revert-layer',
+] );
 
 /**
  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'span'>} props
@@ -38,6 +44,7 @@ export default function useText(
 		lineHeight: lineHeightProp,
 		optimizeReadabilityFor,
 		size,
+		style,
 		truncate = false,
 		upperCase = false,
 		variant,
@@ -65,70 +72,68 @@ export default function useText(
 		} );
 	}
 
-	const cx = useCx();
-
-	const classes = useMemo( () => {
-		const lineHeight = getLineHeight(
+	const optimalTextShade = useMemo(
+		() =>
+			optimizeReadabilityFor &&
+			getOptimalTextShade( optimizeReadabilityFor ),
+		[ optimizeReadabilityFor ]
+	);
+	const typography = {
+		color,
+		display,
+		'font-size': getFontSize( size ),
+		'font-weight': weight,
+		'line-height': getLineHeight(
 			adjustLineHeightForInnerControls,
 			lineHeightProp
-		);
+		),
+		'letter-spacing':
+			typeof letterSpacing === 'number'
+				? `${ letterSpacing }px`
+				: letterSpacing,
+		'text-align': align,
+	};
+	const textStyle: React.CSSProperties & {
+		[ key: `--wp-components-text-${ string }` ]:
+			| string
+			| number
+			| undefined;
+	} = {};
+	const keywordClasses: string[] = [];
 
-		const base = css( {
-			color,
-			display,
-			fontSize: getFontSize( size ),
-			fontWeight: weight,
-			lineHeight,
-			letterSpacing,
-			textAlign: align,
-		} );
-
-		const upperCaseStyles = css( { textTransform: 'uppercase' } );
-
-		let optimalTextColor: SerializedStyles | null = null;
-
-		if ( optimizeReadabilityFor ) {
-			const isOptimalTextColorDark =
-				getOptimalTextShade( optimizeReadabilityFor ) === 'dark';
-
-			// Should not use theme colors
-			optimalTextColor = isOptimalTextColorDark
-				? css( { color: COLORS.gray[ 900 ] } )
-				: css( { color: COLORS.white } );
+	for ( const [ property, value ] of Object.entries( typography ) ) {
+		const keyword =
+			typeof value === 'string' ? value.trim().toLowerCase() : undefined;
+		if ( keyword && CSS_WIDE_KEYWORDS.has( keyword ) ) {
+			// CSS-wide keywords must apply to the declaration, not its custom property.
+			keywordClasses.push( styles[ `${ property }-${ keyword }` ] );
+		} else {
+			textStyle[ `--wp-components-text-${ property }` ] =
+				value === '' ? undefined : value;
 		}
+	}
 
-		const textStyles = css(
-			styles.Text,
-			base,
-			optimalTextColor,
-			isDestructive && styles.destructive,
-			!! isHighlighter && styles.highlighterText,
-			isBlock && styles.block,
-			isCaption && styles.muted,
-			variant && styles[ variant ],
-			upperCase && upperCaseStyles
-		);
-
-		return cx( textStyles, className );
-	}, [
-		adjustLineHeightForInnerControls,
-		align,
-		className,
-		color,
-		cx,
-		display,
-		isBlock,
-		isCaption,
-		isDestructive,
-		isHighlighter,
-		letterSpacing,
-		lineHeightProp,
-		optimizeReadabilityFor,
-		size,
-		upperCase,
-		variant,
-		weight,
-	] );
+	const classes = clsx(
+		styles.text,
+		{
+			[ styles[ 'has-display' ] ]: !! display,
+			[ styles[ 'has-letter-spacing' ] ]:
+				letterSpacing !== undefined && letterSpacing !== '',
+			[ styles[ 'has-text-align' ] ]: !! align,
+		},
+		keywordClasses,
+		{
+			[ styles[ 'readability-dark' ] ]: optimalTextShade === 'dark',
+			[ styles[ 'readability-light' ] ]:
+				!! optimalTextShade && optimalTextShade !== 'dark',
+			[ styles.destructive ]: isDestructive,
+			[ styles[ 'highlighter-text' ] ]: isHighlighter,
+			[ styles.block ]: isBlock,
+			[ styles.muted ]: isCaption || variant === 'muted',
+			[ styles[ 'upper-case' ] ]: upperCase,
+		},
+		className
+	);
 
 	let finalEllipsizeMode: undefined | 'auto' | 'none';
 	if ( truncate === true ) {
@@ -141,6 +146,7 @@ export default function useText(
 	const finalComponentProps = {
 		...otherProps,
 		className: classes,
+		style: { ...textStyle, ...style },
 		children,
 		ellipsizeMode: ellipsizeMode || finalEllipsizeMode,
 	};
