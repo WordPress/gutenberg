@@ -350,22 +350,33 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		$bypass_mime_check = false === $request['generate_sub_sizes'];
 
 		/*
-		 * Always allow still HEIC/HEIF uploads through even if the server's
-		 * image editor doesn't support them. The client-side canvas fallback
-		 * handles processing using the browser's native HEVC decoder.
+		 * Always allow HEIC/HEIF uploads through even if the server's image
+		 * editor doesn't support them. The client-side canvas fallback handles
+		 * processing using the browser's native HEVC decoder.
 		 *
-		 * The '-sequence' variants (multi-frame Live Photos) are deliberately
-		 * excluded: neither the server nor the browser fallback can process
-		 * them yet, so they should fall through to the standard unsupported
-		 * mime-type error rather than be stored unprocessable.
+		 * The '-sequence' variants (multi-frame Live Photos and bursts) are
+		 * included: the editor normally uploads a decoded still frame instead,
+		 * and reaches this path only when the browser cannot decode HEVC at
+		 * all. Rejecting those is inconsistent with the rest of the pipeline —
+		 * wp_check_filetype_and_ext() renames a '.heics' upload to '.heic' and
+		 * records it as 'image/heic', so a file turned away here is one the
+		 * very next step would have treated as an ordinary still.
+		 *
+		 * Core's wp_is_heic_image_mime_type() covers exactly this list, but it
+		 * only exists in WordPress 7.1 and later, and this plugin supports 6.9.
 		 */
 		if ( ! $bypass_mime_check ) {
-			$still_heic_mime_types = array( 'image/heic', 'image/heif' );
-			$files                 = $request->get_file_params();
+			$heic_mime_types = array(
+				'image/heic',
+				'image/heif',
+				'image/heic-sequence',
+				'image/heif-sequence',
+			);
+			$files           = $request->get_file_params();
 
 			if (
 				! empty( $files['file']['type'] ) &&
-				in_array( $files['file']['type'], $still_heic_mime_types, true )
+				in_array( $files['file']['type'], $heic_mime_types, true )
 			) {
 				$bypass_mime_check = true;
 			}

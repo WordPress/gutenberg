@@ -1,4 +1,5 @@
 import { getFileBasename } from '../../utils';
+import { parseHeicSequence } from '../../heic-parser';
 import type { QueueItemId } from '../types';
 
 /**
@@ -17,18 +18,17 @@ import type { QueueItemId } from '../types';
 const UNSUPPORTED_ERROR_PREFIX = 'Unsupported';
 
 /**
- * Message prefix used by @wordpress/video-conversion for GIFs skipped
+ * Message prefix used by @wordpress/video-conversion for sources skipped
  * because they exceed the total-pixel budget. This MUST mirror the
  * package's exported `SIZE_LIMIT_ERROR_PREFIX`; it is duplicated here for
  * the same bundle-size reason as UNSUPPORTED_ERROR_PREFIX above.
  */
-const SIZE_LIMIT_ERROR_PREFIX = `${ UNSUPPORTED_ERROR_PREFIX }: GIF exceeds maximum conversion size`;
+const SIZE_LIMIT_ERROR_PREFIX = `${ UNSUPPORTED_ERROR_PREFIX }: exceeds maximum conversion size`;
 
 /**
- * Message prefix for conversions abandoned by the timeout in
- * `convertGifToVideo` below. Thrown and detected on the main thread, but
- * kept as a message-prefix contract for consistency with the other
- * conversion outcomes.
+ * Message prefix for conversions abandoned by the timeout below. Thrown and
+ * detected on the main thread, but kept as a message-prefix contract for
+ * consistency with the other conversion outcomes.
  */
 const CONVERSION_TIMEOUT_ERROR_PREFIX = 'GIF to video conversion timed out';
 
@@ -131,12 +131,12 @@ function loadVideoConversionModule(): Promise<
 	return videoConversionModulePromise;
 }
 
-interface ConvertGifToVideoOptions {
+interface ConvertToVideoOptions {
 	/** Maximum dimension for downscaling. */
 	maxDimensions?: number;
 	/**
 	 * Time in milliseconds before the conversion is abandoned and only the
-	 * original GIF is kept. `0` disables the timeout.
+	 * uploaded original is kept. `0` disables the timeout.
 	 */
 	timeout?: number;
 	/**
@@ -145,6 +145,81 @@ interface ConvertGifToVideoOptions {
 	 * `@wordpress/video-conversion` package default; `0` disables the check.
 	 */
 	maxTotalPixels?: number;
+}
+
+/**
+ * Abandons a conversion that runs past the allowed time.
+ *
+ * The timeout covers only the conversion itself, never the lazy load of the
+ * worker module (which has its own retry handling). On timeout the worker-side
+ * operation is cancelled so it stops churning, and the returned promise
+ * rejects with an error recognized by `isConversionTimeoutError`.
+ *
+ * @param id         Queue item ID, used to cancel the worker-side operation.
+ * @param conversion In-flight conversion promise.
+ * @param timeout    Milliseconds to allow. `0` disables the timeout.
+ * @return Encoded video buffer.
+ */
+async function withConversionTimeout(
+	id: QueueItemId,
+	conversion: Promise< ArrayBuffer >,
+	timeout: number
+): Promise< ArrayBuffer > {
+	if ( timeout <= 0 ) {
+		return conversion;
+	}
+
+	let timer: ReturnType< typeof setTimeout > | undefined;
+	try {
+		return await Promise.race( [
+			conversion,
+			new Promise< never >( ( _, reject ) => {
+				timer = setTimeout( () => {
+					reject(
+						new Error(
+							`${ CONVERSION_TIMEOUT_ERROR_PREFIX } after ${ timeout }ms`
+						)
+					);
+				}, timeout );
+			} ),
+		] );
+	} catch ( error ) {
+		if ( isConversionTimeoutError( error ) ) {
+			/*
+			 * The race already settled; swallow the orphaned conversion
+			 * promise's eventual rejection ("Operation cancelled") so it
+			 * is not reported as unhandled.
+			 */
+			conversion.catch( () => {} );
+			// Stop the worker loop at its next async boundary.
+			void cancelGifToVideoOperations( id ).catch( () => {} );
+		}
+		throw error;
+	} finally {
+		clearTimeout( timer );
+	}
+}
+
+/**
+ * Wraps an encoded video buffer in a File named after its source.
+ *
+ * @param buffer         Encoded video buffer.
+ * @param sourceFileName Name of the file the video was converted from.
+ * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
+ * @return Video file.
+ */
+function toVideoFile(
+	buffer: ArrayBuffer,
+	sourceFileName: string,
+	outputMimeType: string
+): File {
+	const ext = outputMimeType === 'video/webm' ? 'webm' : 'mp4';
+	const fileName = `${ getFileBasename( sourceFileName ) }.${ ext }`;
+	return new File(
+		[ new Blob( [ buffer ], { type: outputMimeType } ) ],
+		fileName,
+		{ type: outputMimeType }
+	);
 }
 
 /**
@@ -174,61 +249,72 @@ export async function convertGifToVideo(
 		maxDimensions,
 		timeout = DEFAULT_CONVERSION_TIMEOUT,
 		maxTotalPixels,
-	}: ConvertGifToVideoOptions = {}
+	}: ConvertToVideoOptions = {}
 ) {
 	const mod = await loadVideoConversionModule();
 	// Pass the File straight through: the worker reads its bytes once, off
 	// the main thread, instead of materializing an ArrayBuffer here.
-	const conversion = mod.convertGifToVideo(
+	const buffer = await withConversionTimeout(
 		id,
-		file,
-		outputMimeType,
+		mod.convertGifToVideo(
+			id,
+			file,
+			outputMimeType,
+			maxDimensions,
+			maxTotalPixels
+		),
+		timeout
+	);
+
+	return toVideoFile( buffer, file.name, outputMimeType );
+}
+
+/**
+ * Converts a HEIC/HEIF image sequence (Live Photo / burst) to a video file.
+ *
+ * The sequence is demuxed here on the main thread (keeping the heic-parser
+ * within the upload-media package), then its HEVC frames are decoded and
+ * re-encoded to a web-safe video in the worker. Throws an
+ * "Unsupported"-prefixed error (see `isUnsupportedConversionError`) when
+ * WebCodecs or the codecs are unavailable.
+ *
+ * @param id                     Queue item ID.
+ * @param file                   HEIC/HEIF sequence file object.
+ * @param outputMimeType         Output MIME type ('video/mp4' or 'video/webm').
+ * @param options                Conversion options.
+ * @param options.maxDimensions  Maximum dimension for downscaling.
+ * @param options.timeout        Milliseconds before the conversion is
+ *                               abandoned. `0` disables the timeout.
+ * @param options.maxTotalPixels Budget for total decoded pixels
+ *                               (width × height × frame count). `0` disables.
+ * @return Converted video file.
+ */
+export async function convertHeicSequenceToVideo(
+	id: QueueItemId,
+	file: File,
+	outputMimeType: string,
+	{
 		maxDimensions,
-		maxTotalPixels
+		timeout = DEFAULT_CONVERSION_TIMEOUT,
+		maxTotalPixels,
+	}: ConvertToVideoOptions = {}
+) {
+	const sequence = parseHeicSequence( await file.arrayBuffer() );
+
+	const mod = await loadVideoConversionModule();
+	const buffer = await withConversionTimeout(
+		id,
+		mod.convertHeicSequenceToVideo(
+			id,
+			sequence,
+			outputMimeType,
+			maxDimensions,
+			maxTotalPixels
+		),
+		timeout
 	);
 
-	let buffer: ArrayBuffer;
-	if ( timeout > 0 ) {
-		let timer: ReturnType< typeof setTimeout > | undefined;
-		try {
-			buffer = await Promise.race( [
-				conversion,
-				new Promise< never >( ( _, reject ) => {
-					timer = setTimeout( () => {
-						reject(
-							new Error(
-								`${ CONVERSION_TIMEOUT_ERROR_PREFIX } after ${ timeout }ms`
-							)
-						);
-					}, timeout );
-				} ),
-			] );
-		} catch ( error ) {
-			if ( isConversionTimeoutError( error ) ) {
-				/*
-				 * The race already settled; swallow the orphaned conversion
-				 * promise's eventual rejection ("Operation cancelled") so it
-				 * is not reported as unhandled.
-				 */
-				conversion.catch( () => {} );
-				// Stop the worker loop at its next async boundary.
-				mod.cancelGifToVideoOperations( id ).catch( () => {} );
-			}
-			throw error;
-		} finally {
-			clearTimeout( timer );
-		}
-	} else {
-		buffer = await conversion;
-	}
-
-	const ext = outputMimeType === 'video/webm' ? 'webm' : 'mp4';
-	const fileName = `${ getFileBasename( file.name ) }.${ ext }`;
-	return new File(
-		[ new Blob( [ buffer as ArrayBuffer ], { type: outputMimeType } ) ],
-		fileName,
-		{ type: outputMimeType }
-	);
+	return toVideoFile( buffer, file.name, outputMimeType );
 }
 
 /**

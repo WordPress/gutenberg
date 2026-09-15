@@ -8,6 +8,7 @@ import {
 	finalizeItem,
 	prepareItem,
 	transcodeGifItem,
+	transcodeHeicSequenceItem,
 	detectUltraHdr,
 	removeItem,
 	uploadItem,
@@ -22,9 +23,14 @@ import {
 } from '../utils';
 import {
 	convertGifToVideo,
+	convertHeicSequenceToVideo,
 	terminateVideoConversionWorker,
 } from '../utils/video-conversion';
-import { canvasConvertToJpeg, HeicUnsupportedError } from '../../canvas-utils';
+import {
+	canvasConvertToJpeg,
+	convertHeicSequenceToStillJpeg,
+	HeicUnsupportedError,
+} from '../../canvas-utils';
 
 // Mock @wordpress/blob
 vi.mock( import( '@wordpress/blob' ), () => ( {
@@ -49,13 +55,15 @@ vi.mock( import( '../utils' ), async ( importOriginal ) => {
 	};
 } );
 
-// Mock the HEIC conversion so prepareItem's failure branch can be driven.
+// Mock the canvas decoders, which need browser codecs. The sequence demuxer
+// itself (heic-parser) is left real and exercised against a genuine fixture.
 // HeicUnsupportedError is kept real: prepareItem tells the two failures apart
 // with instanceof, so a stubbed class would make the test pass vacuously.
 vi.mock( import( '../../canvas-utils' ), async ( importOriginal ) => {
 	const actual = await importOriginal();
 	return {
 		canvasConvertToJpeg: vi.fn(),
+		convertHeicSequenceToStillJpeg: vi.fn(),
 		HeicUnsupportedError: actual.HeicUnsupportedError,
 	};
 } );
@@ -67,6 +75,7 @@ vi.mock( import( '../utils/video-conversion' ), async ( importOriginal ) => {
 	const actual = await importOriginal();
 	return {
 		convertGifToVideo: vi.fn(),
+		convertHeicSequenceToVideo: vi.fn(),
 		cancelGifToVideoOperations: vi.fn(),
 		terminateVideoConversionWorker: vi.fn(),
 		isUnsupportedConversionError: actual.isUnsupportedConversionError,
@@ -723,6 +732,182 @@ describe( 'private actions', () => {
 		} );
 	} );
 
+	describe( 'prepareItem HEIC sequence', () => {
+		/*
+		 * A real 120-frame HEIF image sequence. Note the `.heic` name and
+		 * `image/heic` type: exported Live Photos routinely look like stills
+		 * until the container is sniffed, which is exactly what prepareItem
+		 * has to cope with.
+		 */
+		const sequenceBytes = readFileSync(
+			join( __dirname, '../../test/fixtures/msf1.heic' )
+		);
+
+		function createSequenceFile() {
+			return new File( [ sequenceBytes ], 'live-photo.heic', {
+				type: 'image/heic',
+			} );
+		}
+
+		const stillJpeg = new File( [ 'still' ], 'live-photo.jpg', {
+			type: 'image/jpeg',
+		} );
+
+		function flattenOperations( operations ) {
+			return ( operations || [] ).map( ( op ) =>
+				Array.isArray( op ) ? op[ 0 ] : op
+			);
+		}
+
+		async function runPrepareItem( file ) {
+			const item = { id: 'seq-id', file, additionalData: {} };
+
+			let dispatchedOperations;
+			const dispatch = ( action ) => {
+				if ( action?.type === 'ADD_OPERATIONS' ) {
+					dispatchedOperations = action.operations;
+				}
+			};
+			dispatch.cancelItem = vi.fn();
+			dispatch.finishOperation = vi.fn();
+
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {} ),
+			};
+
+			const thunk = prepareItem( 'seq-id' );
+			await thunk( { select, dispatch } );
+
+			return { operations: dispatchedOperations, dispatch, item };
+		}
+
+		beforeEach( () => {
+			convertHeicSequenceToStillJpeg.mockReset();
+			convertHeicSequenceToStillJpeg.mockResolvedValue( stillJpeg );
+			global.VideoDecoder = function () {};
+			global.VideoDecoder.isConfigSupported = vi.fn( async () => ( {
+				supported: true,
+			} ) );
+			global.VideoEncoder = function () {};
+		} );
+
+		afterEach( () => {
+			delete global.VideoDecoder;
+			delete global.VideoEncoder;
+		} );
+
+		it( 'uploads the still frame as the attachment, through the image pipeline', async () => {
+			const { operations, dispatch } = await runPrepareItem(
+				createSequenceFile()
+			);
+
+			expect( convertHeicSequenceToStillJpeg ).toHaveBeenCalled();
+			expect( flattenOperations( operations ) ).toEqual( [
+				OperationType.Upload,
+				OperationType.ThumbnailGeneration,
+				OperationType.Finalize,
+			] );
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith(
+				'seq-id',
+				expect.objectContaining( {
+					file: stillJpeg,
+					sourceFile: stillJpeg,
+				} )
+			);
+			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'keeps the original sequence for the companion video and the source original', async () => {
+			const file = createSequenceFile();
+			const { dispatch } = await runPrepareItem( file );
+
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith(
+				'seq-id',
+				expect.objectContaining( {
+					heicSequenceFile: file,
+					originalHeicFile: file,
+				} )
+			);
+		} );
+
+		it( 'decodes the still from the sequence it demuxed', async () => {
+			await runPrepareItem( createSequenceFile() );
+
+			const [ sequence ] = convertHeicSequenceToStillJpeg.mock.calls[ 0 ];
+			expect( sequence.samples ).toHaveLength( 120 );
+			expect( sequence.codedWidth ).toBe( 256 );
+		} );
+
+		it( 'uploads the original untouched when WebCodecs is unavailable', async () => {
+			delete global.VideoDecoder;
+
+			const { operations, dispatch } = await runPrepareItem(
+				createSequenceFile()
+			);
+
+			// The server collapses the sequence to a still; nothing is
+			// cancelled and no client-side decode is attempted.
+			expect( convertHeicSequenceToStillJpeg ).not.toHaveBeenCalled();
+			expect( flattenOperations( operations ) ).toEqual( [
+				OperationType.Upload,
+			] );
+			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith(
+				'seq-id',
+				expect.objectContaining( {
+					additionalData: expect.objectContaining( {
+						generate_sub_sizes: true,
+					} ),
+				} )
+			);
+		} );
+
+		it( 'uploads the original untouched when the platform lacks the HEVC codec', async () => {
+			global.VideoDecoder.isConfigSupported = vi.fn( async () => ( {
+				supported: false,
+			} ) );
+
+			const { operations, dispatch } = await runPrepareItem(
+				createSequenceFile()
+			);
+
+			expect( convertHeicSequenceToStillJpeg ).not.toHaveBeenCalled();
+			expect( flattenOperations( operations ) ).toEqual( [
+				OperationType.Upload,
+			] );
+			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'uploads the original untouched when the still decode fails', async () => {
+			convertHeicSequenceToStillJpeg.mockRejectedValue(
+				new Error( 'decoder exploded' )
+			);
+
+			const { operations, dispatch } = await runPrepareItem(
+				createSequenceFile()
+			);
+
+			// A hard decode failure must not fail the upload: the user still
+			// gets the photo the server can make of it.
+			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+			expect( flattenOperations( operations ) ).toEqual( [
+				OperationType.Upload,
+			] );
+		} );
+
+		it( 'leaves a still HEIC on the ordinary still path', async () => {
+			const still = new File( [ 'not-a-sequence' ], 'photo.heic', {
+				type: 'image/heic',
+			} );
+
+			await runPrepareItem( still );
+
+			expect( convertHeicSequenceToStillJpeg ).not.toHaveBeenCalled();
+			expect( canvasConvertToJpeg ).toHaveBeenCalled();
+		} );
+	} );
+
 	describe( 'prepareItem HEIC conversion failures', () => {
 		async function runPrepareItem() {
 			const file = new File( [ 'data' ], 'IMG_1982.heic', {
@@ -952,7 +1137,7 @@ describe( 'private actions', () => {
 			// why no companion video was produced.
 			convertGifToVideo.mockRejectedValue(
 				new Error(
-					'Unsupported: GIF exceeds maximum conversion size (5000x5000 x 100 frames = 2500000000 pixels; limit is 300000000)'
+					'Unsupported: exceeds maximum conversion size (GIF is 5000x5000 x 100 frames = 2500000000 pixels; limit is 300000000)'
 				)
 			);
 			const { select, dispatch } = buildArgs();
@@ -1127,6 +1312,219 @@ describe( 'private actions', () => {
 			const dispatchFn = await runGenerate( { item, settings: {} } );
 
 			expect( dispatchFn.addSideloadItem ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'generateThumbnails (HEIC sequence video sideload)', () => {
+		function runGenerate( { item, settings } ) {
+			const dispatchFn = vi.fn();
+			dispatchFn.finishOperation = vi.fn();
+			dispatchFn.addSideloadItem = vi.fn();
+			const select = {
+				getItem: () => item,
+				getSettings: () => settings,
+			};
+			const thunk = generateThumbnails( item.id );
+			return thunk( { select, dispatch: dispatchFn } ).then(
+				() => dispatchFn
+			);
+		}
+
+		const sequence = new File( [ 'seq' ], 'live-photo.heic', {
+			type: 'image/heic',
+		} );
+		const still = new File( [ 'still' ], 'live-photo.jpg', {
+			type: 'image/jpeg',
+		} );
+
+		function makeItem( id, extra = {} ) {
+			return {
+				id,
+				sourceFile: still,
+				file: still,
+				heicSequenceFile: sequence,
+				attachment: { id: 42 },
+				...extra,
+			};
+		}
+
+		it( 'sideloads the converted video as an animated_video companion', async () => {
+			const dispatchFn = await runGenerate( {
+				item: makeItem( 's1' ),
+				settings: { videoOutputFormat: 'video/mp4' },
+			} );
+
+			const sideloads = dispatchFn.addSideloadItem.mock.calls.map(
+				( [ arg ] ) => arg
+			);
+			const video = sideloads.find(
+				( s ) => s.additionalData.image_size === 'animated_video'
+			);
+
+			expect( video.file ).toBe( sequence );
+			expect( video.parentId ).toBe( 's1' );
+			expect( video.additionalData ).toEqual(
+				expect.objectContaining( {
+					post: 42,
+					image_size: 'animated_video',
+					convert_format: false,
+				} )
+			);
+			expect( video.operations ).toEqual( [
+				[
+					OperationType.TranscodeHeicSequence,
+					{ outputFormat: 'mp4' },
+				],
+				OperationType.Upload,
+			] );
+		} );
+
+		it( 'needs no poster companion: the uploaded still is the first frame', async () => {
+			const dispatchFn = await runGenerate( {
+				item: makeItem( 's2' ),
+				settings: {},
+			} );
+
+			const sizes = dispatchFn.addSideloadItem.mock.calls.map(
+				( [ arg ] ) => arg.additionalData.image_size
+			);
+			expect( sizes ).not.toContain( 'animated_video_poster' );
+		} );
+
+		it( 'uses webm when videoOutputFormat is video/webm', async () => {
+			const dispatchFn = await runGenerate( {
+				item: makeItem( 's3' ),
+				settings: { videoOutputFormat: 'video/webm' },
+			} );
+
+			const video = dispatchFn.addSideloadItem.mock.calls
+				.map( ( [ arg ] ) => arg )
+				.find(
+					( s ) => s.additionalData.image_size === 'animated_video'
+				);
+			expect( video.operations[ 0 ] ).toEqual( [
+				OperationType.TranscodeHeicSequence,
+				{ outputFormat: 'webm' },
+			] );
+		} );
+	} );
+
+	describe( 'transcodeHeicSequenceItem', () => {
+		const sequenceFile = new File( [ 'seq' ], 'live-photo.heic', {
+			type: 'image/heic',
+		} );
+
+		function buildArgs() {
+			const dispatch = Object.assign( vi.fn(), {
+				finishOperation: vi.fn(),
+				cancelItem: vi.fn(),
+				addSideloadItem: vi.fn(),
+			} );
+			const select = {
+				getItem: vi.fn( () => ( {
+					id: 'seq-1',
+					file: sequenceFile,
+					parentId: 'parent-1',
+					additionalData: { post: 42 },
+				} ) ),
+			};
+			return { dispatch, select };
+		}
+
+		beforeEach( () => {
+			vi.clearAllMocks();
+		} );
+
+		it( 'hands the converted video to the next upload operation', async () => {
+			const video = new File( [ 'mp4' ], 'live-photo.mp4', {
+				type: 'video/mp4',
+			} );
+			convertHeicSequenceToVideo.mockResolvedValue( video );
+
+			const { dispatch, select } = buildArgs();
+			await transcodeHeicSequenceItem( 'seq-1', {
+				outputFormat: 'mp4',
+			} )( { select, dispatch } );
+
+			expect( convertHeicSequenceToVideo ).toHaveBeenCalledWith(
+				'seq-1',
+				sequenceFile,
+				'video/mp4',
+				expect.any( Object )
+			);
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith( 'seq-1', {
+				file: video,
+			} );
+			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'silently drops the companion when conversion is unsupported', async () => {
+			convertHeicSequenceToVideo.mockRejectedValue(
+				new Error( 'Unsupported: HEVC decoder not supported' )
+			);
+
+			const { dispatch, select } = buildArgs();
+			await transcodeHeicSequenceItem( 'seq-1' )( { select, dispatch } );
+
+			// Silent: the still attachment stands alone, and the user sees no
+			// error on what they uploaded as a photo.
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'seq-1',
+				expect.any( Error ),
+				true
+			);
+			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
+		} );
+
+		it( 'silently drops the companion when the sequence is over budget', async () => {
+			convertHeicSequenceToVideo.mockRejectedValue(
+				new Error(
+					'Unsupported: exceeds maximum conversion size (sequence is 4000x3000 x 120 frames = 1440000000 pixels; limit is 300000000)'
+				)
+			);
+
+			const { dispatch, select } = buildArgs();
+			await transcodeHeicSequenceItem( 'seq-1' )( { select, dispatch } );
+
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'seq-1',
+				expect.any( Error ),
+				true
+			);
+		} );
+
+		it( 'silently drops the companion when conversion times out', async () => {
+			convertHeicSequenceToVideo.mockRejectedValue(
+				new Error( 'GIF to video conversion timed out after 30000ms' )
+			);
+
+			const { dispatch, select } = buildArgs();
+			await transcodeHeicSequenceItem( 'seq-1' )( { select, dispatch } );
+
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'seq-1',
+				expect.any( Error ),
+				true
+			);
+		} );
+
+		it( 'silently drops the companion on a hard engine failure', async () => {
+			// eslint-disable-next-line no-console
+			console.error = vi.fn();
+			convertHeicSequenceToVideo.mockRejectedValue(
+				new Error( 'encoder exploded' )
+			);
+
+			const { dispatch, select } = buildArgs();
+			await transcodeHeicSequenceItem( 'seq-1' )( { select, dispatch } );
+
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'seq-1',
+				expect.objectContaining( {
+					code: ErrorCode.MEDIA_TRANSCODING_ERROR,
+				} ),
+				true
+			);
 		} );
 	} );
 
