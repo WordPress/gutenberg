@@ -22,7 +22,7 @@ const meta: Meta< typeof Notice > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by [`Notice`](?path=/docs/design-system-components-notice--docs) in `@wordpress/ui`, but continue using for now.',
+			notes: 'Continue using for now. You can try [`Notice`](?path=/docs/design-system-components-notice--docs) from `@wordpress/ui`, but it is not yet recommended.',
 		},
 	},
 };

@@ -44,7 +44,7 @@ const meta: Meta< typeof Button > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by [`Button`](?path=/docs/design-system-components-button--docs) in `@wordpress/ui`, but continue using for now.',
+			notes: 'Continue using for now. You can try [`Button`](?path=/docs/design-system-components-button--docs) from `@wordpress/ui`, but it is not yet recommended.',
 		},
 	},
 };

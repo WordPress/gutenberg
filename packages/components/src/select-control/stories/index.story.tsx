@@ -25,7 +25,7 @@ const meta: Meta< typeof SelectControl > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui`, but continue using for now.',
+			notes: 'Continue using for now. You can try [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) from `@wordpress/ui`, but it is not yet recommended.',
 		},
 	},
 };
