@@ -14,6 +14,7 @@
 		"packages/ui/src/breadcrumb/test/index.jsdom.test.tsx": "Injects sizes, ResizeObserver notifications, font readiness, and animation frames to verify deterministic overflow state and measurement lifecycle. Real responsive layout is covered in index.browser.test.tsx.",
 		"packages/grid/src/dashboard-grid/test/item-limits.jsdom.test.tsx": "Supplies fixed tile rectangles and timers to verify minimum-size quantization and stored layout updates independently of browser layout.",
 		"packages/grid/src/dashboard-lanes/test/item-limits.jsdom.test.tsx": "Supplies two container geometries and timers to verify lane-width quantization and minimum-size clamping independently of browser layout.",
-		"packages/components/src/custom-gradient-picker/gradient-bar/test/utils.jsdom.test.ts": "Supplies fixed rectangles to verify coordinate-to-percentage conversion, rounding, and clamping without relying on browser layout."
+		"packages/components/src/custom-gradient-picker/gradient-bar/test/utils.jsdom.test.ts": "Supplies fixed rectangles to verify coordinate-to-percentage conversion, rounding, and clamping without relying on browser layout.",
+		"packages/dom/src/dom/test/get-rectangle-from-range.jsdom.test.js": "Supplies DOMRect fixtures by text node and offset to test which position a collapsed range is measured at, without rendered layout."
 	}
 }
