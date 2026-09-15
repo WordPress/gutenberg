@@ -1653,11 +1653,42 @@ Finally, the field author can always provide its own custom `Edit` control. It r
 
 ### `readOnly`
 
-Boolean indicating that the field is not editable. Fields that are not editable use the `render` function to display their value in Edit contexts.
+Boolean indicating that the field doesn't have an Edit component. Read-only fields use the `render` function to display their value in Edit contexts (e.g., DataForm). This is different from disabled fields (see `isDisabled`) that still have an Edit component but are situationally disabled.
 
 -   Type: `boolean`.
 -   Optional.
 -   Defaults to `false`.
+
+### `isDisabled`
+
+Function that indicates if the field should be disabled in Edit contexts (e.g., DataForm). Unlike read-only fields (see `readOnly`), disabled fields still render their Edit component, but the control is disabled.
+
+-   Type: `function`.
+-   Optional.
+-   Args
+    -   `item`: the data to be processed
+    -   `field`: the field definition
+-   Returns a `boolean` indicating if the field should be disabled (`true`) or not (`false`).
+
+This can be useful to disable fields based on the state of other fields. For example, a `password` field can be disabled depending on the value of the `status` field:
+
+```js
+{
+ id: 'status',
+ type: 'text',
+ label: 'Status',
+ elements: [
+  { value: 'public', label: 'Public' },
+  { value: 'private', label: 'Private' },
+ ],
+},
+{
+ id: 'password',
+ type: 'password',
+ label: 'Password',
+ isDisabled: ( item ) => item.status === 'private',
+},
+```
 
 ### `sort`
 
