@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
 	transcodeVideo,
 	getVideoMetadata,
@@ -26,12 +27,12 @@ let mockConversionAudioOptions: Record< string, unknown > | undefined;
 // Tracks the fake Conversion reports as discarded after init.
 let mockDiscardedTracks: { track: { isAudioTrack: () => boolean } }[] = [];
 
-const mockExecute = jest.fn().mockResolvedValue( undefined );
-const mockCancel = jest.fn().mockResolvedValue( undefined );
-const mockCanEncodeVideo = jest.fn().mockResolvedValue( true );
+const mockExecute = vi.fn().mockResolvedValue( undefined );
+const mockCancel = vi.fn().mockResolvedValue( undefined );
+const mockCanEncodeVideo = vi.fn().mockResolvedValue( true );
 
-jest.mock( 'mediabunny', () => ( {
-	// Defined inline because a jest.mock factory may only reference
+vi.mock( 'mediabunny', () => ( {
+	// Defined inline because a vi.mock factory may only reference
 	// `mock`-prefixed out-of-scope variables. Reads the shared mockTrack.
 	Input: class {
 		async getPrimaryVideoTrack() {
