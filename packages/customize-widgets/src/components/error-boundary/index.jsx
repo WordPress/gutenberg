@@ -1,4 +1,5 @@
 import { Component } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components -- The fallback UI renders outside the editor's notice system.
 import { Card, CollapsibleCard, Notice, Stack, Text } from '@wordpress/ui';
@@ -125,6 +126,12 @@ export default class ErrorBoundary extends Component {
 	}
 
 	componentDidCatch( error, errorInfo ) {
+		speak(
+			__(
+				'The editor has crashed. An unknown error occurred. Reload your browser to try again, or copy the error to report the problem or search.'
+			),
+			'assertive'
+		);
 		this.setState( { componentStack: errorInfo?.componentStack } );
 		doAction( 'editor.ErrorBoundary.errorLogged', error, errorInfo );
 	}

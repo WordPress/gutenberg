@@ -10,6 +10,7 @@
 
 ### Bug Fixes
 
+-   Error boundary: Explicitly announce the error title and description, excluding action labels. ([#82737](https://github.com/WordPress/gutenberg/pull/82737))
 -   Notes: Focus the text field when editing a note ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
 -   Template panel: Hide edit and create actions from users who can't create templates. ([#82858](https://github.com/WordPress/gutenberg/pull/82858))
 -   Featured image field: Only register it for the post types a theme lists in its `post-thumbnails` support, matching the classic panel. ([#82773](https://github.com/WordPress/gutenberg/pull/82773))
