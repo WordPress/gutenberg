@@ -286,7 +286,10 @@
 
 	}
 
-	.components-editor-notices__dismissible {
+	// Overlay the notices instead of reserving layout space for them, and keep
+	// them above the faded top bar. The interface renders them through
+	// `InlineNotices` with the `editor-notices__dismissible` class.
+	.editor-notices__dismissible {
 		position: absolute;
 		z-index: 35;
 	}
