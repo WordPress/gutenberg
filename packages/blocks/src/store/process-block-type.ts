@@ -3,6 +3,7 @@ import { isValidElementType } from 'react-is';
 import deprecated from '@wordpress/deprecated';
 import { applyFilters } from '@wordpress/hooks';
 import warning from '@wordpress/warning';
+import { mergeBlockTransforms } from '../api/metadata-transforms';
 import { isValidIcon, normalizeIconObject, omit } from '../api/utils';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../api/constants';
 import type {
@@ -79,6 +80,17 @@ export const processBlockType =
 	} ): BlockType | undefined => {
 		const bootstrappedBlockType = select.getBootstrappedBlockType( name );
 
+		/*
+		 * A block declares transforms in `block.json`, which reaches here
+		 * bootstrapped, and may register more from JavaScript. Both describe
+		 * the same block, so the merged result is the more complete of the
+		 * two rather than whichever arrived last.
+		 */
+		const transforms = mergeBlockTransforms(
+			bootstrappedBlockType?.transforms,
+			blockSettings?.transforms
+		);
+
 		const blockType = {
 			apiVersion: 1,
 			name,
@@ -103,6 +115,9 @@ export const processBlockType =
 					? blockSettings.variations
 					: []
 			),
+			// A block with no transforms on either side has no key for them,
+			// as before they were merged here.
+			...( transforms ? { transforms } : {} ),
 		};
 
 		// If the block is registering attributes as null or undefined, warn and default to empty object.

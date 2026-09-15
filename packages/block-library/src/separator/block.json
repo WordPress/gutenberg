@@ -43,6 +43,21 @@
 		{ "name": "wide", "label": "Wide Line" },
 		{ "name": "dots", "label": "Dots" }
 	],
+	"transforms": {
+		"from": [
+			{
+				"name": "from-raw",
+				"type": "raw",
+				"selector": "hr",
+				"serverConversion": {
+					"classes": [ "has-alpha-channel-opacity" ]
+				},
+				"schema": {
+					"hr": {}
+				}
+			}
+		]
+	},
 	"editorStyle": "wp-block-separator-editor",
 	"style": "wp-block-separator"
 }

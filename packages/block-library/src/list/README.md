@@ -24,7 +24,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `values` | `string` | `""` | [Source](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `html`. [Selector](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `ol,ul`. [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `type` | `string` | — | — |
 | `start` | `number` | — | — |
-| `reversed` | `boolean` | — | — |
+| `reversed` | `boolean` | `false` | — |
 | `placeholder` | `string` | — | — |
 
 ## Supports
@@ -58,7 +58,7 @@ _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/refe
 This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
 
 ```html
-<!-- wp:list {"ordered":false,"values":""} -->
+<!-- wp:list {"ordered":false,"values":"","reversed":false} -->
 <!-- Content... -->
 <!-- /wp:list -->
 ```

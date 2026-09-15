@@ -12,6 +12,13 @@ export function getBlockContentSchemaFromTransforms(
 	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
 		const hasAnchorSupport = hasBlockSupport( blockName, 'anchor' );
 
+		// Only a function can decide a match: anything else — such as a
+		// PHP-registered callable that travelled through JSON as `{}` — must
+		// not end up where `cleanNodeList` would call it.
+		if ( typeof isMatch !== 'function' ) {
+			isMatch = undefined;
+		}
+
 		schema = typeof schema === 'function' ? schema( schemaArgs ) : schema;
 
 		// If the block does not has anchor support and the transform does not
@@ -27,8 +34,9 @@ export function getBlockContentSchemaFromTransforms(
 		return Object.fromEntries(
 			Object.entries( schema ).map( ( [ key, value ]: any[] ) => {
 				let attributes = ( value as any ).attributes || [];
-				// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
-				if ( hasAnchorSupport ) {
+				// If the block supports the "anchor" functionality, it needs
+				// to keep its ID attribute. `'*'` already keeps every one.
+				if ( hasAnchorSupport && attributes !== '*' ) {
 					attributes = [ ...attributes, 'id' ];
 				}
 				return [
@@ -61,6 +69,11 @@ export function getBlockContentSchemaFromTransforms(
 			}
 			case 'attributes':
 			case 'require': {
+				// `'*'` keeps every attribute, so it absorbs any list.
+				if ( objValue === '*' || srcValue === '*' ) {
+					return '*';
+				}
+
 				return Array.from(
 					new Set( [ ...( objValue || [] ), ...( srcValue || [] ) ] )
 				);

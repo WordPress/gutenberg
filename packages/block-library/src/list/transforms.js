@@ -64,8 +64,9 @@ const transforms = {
 			},
 		},
 		{
-			type: 'raw',
-			selector: 'ol,ul',
+			// Matching and the ordered/start/reversed attributes are declared in
+			// `block.json`. The content schema is recursive, so it stays here.
+			name: 'from-raw',
 			schema: ( args ) => ( {
 				ol: getListContentSchema( args ).ol,
 				ul: getListContentSchema( args ).ul,

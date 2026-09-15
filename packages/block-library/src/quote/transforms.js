@@ -49,30 +49,6 @@ const transforms = {
 				] ),
 		},
 		{
-			type: 'raw',
-			schema: () => ( {
-				blockquote: {
-					children: '*',
-				},
-			} ),
-			selector: 'blockquote',
-			transform: ( node, handler ) => {
-				return createBlock(
-					'core/quote',
-					// Don't try to parse any `cite` out of this content.
-					// * There may be more than one cite.
-					// * There may be more attribution text than just the cite.
-					// * If the cite is nested in the quoted text, it's wrong to
-					//   remove it.
-					{},
-					handler( {
-						HTML: node.innerHTML,
-						mode: 'BLOCKS',
-					} )
-				);
-			},
-		},
-		{
 			type: 'block',
 			isMultiBlock: true,
 			blocks: [ '*' ],

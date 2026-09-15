@@ -2,6 +2,10 @@ import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
 import i18nBlockSchema from './i18n-block.json';
+import {
+	holdsFunctionTransforms,
+	normalizeMetadataTransforms,
+} from './metadata-transforms';
 import { store as blocksStore } from '../store';
 import { unlock } from '../lock-unlock';
 import type {
@@ -34,8 +38,53 @@ export function unstable__bootstrapServerSideBlockDefinitions(
 ): void {
 	const { addBootstrappedBlockType } = unlock( dispatch( blocksStore ) );
 	for ( const [ name, blockType ] of Object.entries( definitions ) ) {
-		addBootstrappedBlockType( name, blockType );
+		addBootstrappedBlockType(
+			name,
+			withNormalizedTransforms( name, blockType, blockType.transforms )
+		);
 	}
+}
+
+/**
+ * Replaces a definition's transforms with the shape the editor runs them in.
+ *
+ * Transforms arrive as they are declared in `block.json`; every path into the
+ * bootstrapped store normalizes them the same way, so the store only ever
+ * holds runnable ones.
+ *
+ * @param name       Block name.
+ * @param definition Block definition to bootstrap.
+ * @param transforms The declared transforms, wherever the caller reads them from.
+ *
+ * @return The definition, with any transforms normalized.
+ */
+function withNormalizedTransforms(
+	name: string,
+	definition: Record< string, unknown >,
+	transforms: unknown
+): Record< string, unknown > {
+	if ( ! transforms ) {
+		return definition;
+	}
+
+	/*
+	 * Functions cannot come out of `block.json`. Their presence means
+	 * JavaScript configuration was passed where metadata belongs — commonly
+	 * `registerBlockType( config, config )` — and those transforms are
+	 * runnable exactly as written: normalizing would swap the authored
+	 * functions for generated stand-ins that source nothing.
+	 */
+	if ( holdsFunctionTransforms( transforms ) ) {
+		return {
+			...definition,
+			transforms,
+		};
+	}
+
+	return {
+		...definition,
+		transforms: normalizeMetadataTransforms( transforms as any, name ),
+	};
 }
 
 /**
@@ -171,7 +220,34 @@ export function registerBlockType<
 
 	if ( isObject( blockNameOrMetadata ) ) {
 		const metadata = getBlockSettingsFromMetadata( blockNameOrMetadata );
-		addBootstrappedBlockType( name, metadata );
+
+		/*
+		 * Transforms travel with the rest of the metadata rather than being
+		 * merged into the settings here, so that a block registered by name
+		 * against a server-bootstrapped definition keeps the transforms that
+		 * definition declared. `processBlockType` merges the two.
+		 */
+		addBootstrappedBlockType(
+			name,
+			withNormalizedTransforms(
+				name,
+				metadata,
+				blockNameOrMetadata.transforms
+			)
+		);
+
+		/*
+		 * One configuration passed as metadata and settings alike —
+		 * `registerBlockType( config, config )` — carries its transforms on
+		 * both sides. They are one set, bootstrapped just above, so the
+		 * settings do not offer them again to be merged as a second.
+		 */
+		if (
+			settings?.transforms &&
+			settings.transforms === blockNameOrMetadata.transforms
+		) {
+			settings = { ...settings, transforms: undefined };
+		}
 	}
 
 	addUnprocessedBlockType( name, settings );

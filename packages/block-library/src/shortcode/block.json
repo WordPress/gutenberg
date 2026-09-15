@@ -13,6 +13,22 @@
 			"role": "content"
 		}
 	},
+	"transforms": {
+		"from": [
+			{
+				"name": "from-shortcode",
+				"type": "shortcode",
+				"tag": "[a-z][a-z0-9_-]*",
+				"priority": 20,
+				"attributes": {
+					"text": {
+						"type": "string",
+						"source": "shortcodeText"
+					}
+				}
+			}
+		]
+	},
 	"supports": {
 		"className": false,
 		"customClassName": false,

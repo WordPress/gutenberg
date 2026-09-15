@@ -56,12 +56,6 @@ function bootstrappedBlockTypes(
 	switch ( action.type ) {
 		case 'ADD_BOOTSTRAPPED_BLOCK_TYPE':
 			const { name, blockType } = action;
-			const serverDefinition = state[ name ];
-			// Don't overwrite if already set. It covers the case when metadata
-			// was initialized from the server.
-			if ( serverDefinition ) {
-				return state;
-			}
 			const newDefinition: Record< string, unknown > = Object.fromEntries(
 				Object.entries( blockType )
 					.filter(
@@ -70,6 +64,60 @@ function bootstrappedBlockTypes(
 					.map( ( [ key, value ] ) => [ camelCase( key ), value ] )
 			);
 			newDefinition.name = name;
+
+			const serverDefinition = state[ name ];
+
+			/*
+			 * A definition already in place wins, because it was initialized
+			 * from the server — including the keys the server chose not to
+			 * send, which a site filter may have removed on purpose. The one
+			 * key that fills in, in either order, is `transforms`: a server
+			 * that predates the field cannot send it, so it reaches the store
+			 * in a call of its own — or with the block's `block.json` — and
+			 * contributes nothing else.
+			 */
+			const isTransformsStub = (
+				definition: Record< string, unknown >
+			) =>
+				'transforms' in definition &&
+				Object.keys( definition ).every(
+					( key ) => 'name' === key || 'transforms' === key
+				);
+
+			if ( serverDefinition ) {
+				if (
+					'transforms' in newDefinition &&
+					! ( 'transforms' in serverDefinition )
+				) {
+					return {
+						...state,
+						[ name ]: {
+							...serverDefinition,
+							transforms: newDefinition.transforms,
+						} as Partial< BlockType >,
+					};
+				}
+
+				if (
+					isTransformsStub(
+						serverDefinition as Record< string, unknown >
+					) &&
+					! isTransformsStub( newDefinition )
+				) {
+					return {
+						...state,
+						[ name ]: {
+							...newDefinition,
+							transforms: (
+								serverDefinition as Record< string, unknown >
+							 ).transforms,
+						} as Partial< BlockType >,
+					};
+				}
+
+				return state;
+			}
+
 			return {
 				...state,
 				[ name ]: newDefinition as Partial< BlockType >,

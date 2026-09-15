@@ -225,6 +225,13 @@ export interface BlockAttribute {
  */
 interface BlockTransformBase {
 	/**
+	 * A name identifying the transform. A transform registered in JavaScript
+	 * is merged over the transform of the same name declared in `block.json`,
+	 * which is how a block declares its matching for the server while keeping
+	 * a `transform` function only JavaScript can express.
+	 */
+	name?: string;
+	/**
 	 * The transform's priority. A lower number means a higher priority.
 	 * Defaults to `10`.
 	 */
@@ -265,6 +272,13 @@ export interface BlockBlockTransform<
 	 * case `isMatch` and `transform` receive arrays.
 	 */
 	isMultiBlock?: boolean;
+	/**
+	 * How a transform declared in `block.json` derives the produced block's
+	 * attributes without a `transform` function: `all` carries the source
+	 * block's attributes over as they are, and an object maps each attribute
+	 * of the produced block to the source attribute it is read from.
+	 */
+	attributes?: 'all' | Record< string, string >;
 	isMatch?: (
 		attributes: Attributes | Attributes[],
 		block: Block | Block[]
@@ -369,6 +383,31 @@ export interface BlockRawTransform extends BlockTransformBase {
 				phrasingContentSchema: Record< string, unknown >;
 				isPaste: boolean;
 		  } ) => Record< string, unknown > );
+	/**
+	 * Whether a transform declared in `block.json` derives the block's
+	 * attributes from the matched markup through the block's own attribute
+	 * sources. Defaults to `true`.
+	 */
+	sourceAttributes?: boolean;
+	/**
+	 * Attribute values a transform declared in `block.json` sets on the block,
+	 * or attribute definitions read from the matched markup the way a block
+	 * attribute is, optionally with a `map` from the sourced value to the
+	 * value stored.
+	 */
+	attributes?: Record< string, unknown >;
+	/**
+	 * Which of the matched element's content becomes inner blocks: `true`
+	 * converts all of it, and a CSS selector converts only the matching child
+	 * elements.
+	 */
+	innerBlocks?: boolean | string;
+	/**
+	 * What the server may build from the matched markup: `false` when the
+	 * block rebuilds its markup on save, or an object naming the content the
+	 * block is able to save back. Read by the server only.
+	 */
+	serverConversion?: false | Record< string, unknown >;
 	isMatch?: ( node: Element ) => boolean;
 	transform?: ( node: Element, handler: RawHandler ) => Block | Block[];
 }

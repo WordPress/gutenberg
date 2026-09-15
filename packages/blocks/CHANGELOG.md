@@ -4,7 +4,23 @@
 
 ### New Features
 
+-   Block transforms can be declared in `block.json`, where PHP can read them too, instead of only in JavaScript. Declared transforms are merged with those registered in JavaScript: a block registering transforms only in JavaScript is unaffected, and a JavaScript transform sharing a declared transform's `name` is merged over it ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   `shortcode` transforms can be declared in `block.json` alongside `raw` and `block` ones. A declared attribute names where to read its value: `"source": "shortcodeText"` takes the shortcode as it was written, and `"source": "shortcodeAttribute"` takes the named `attribute`, or the first one present when it names several ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   A declared transform attribute can read one inline CSS declaration with `"source": "style"` and a `property`, and its name can be a dotted path such as `style.typography.textAlign`, which writes into a nested attribute rather than replacing it ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   `unstable__bootstrapServerSideBlockDefinitions` no longer ignores a repeat call for a block it already knows: the definition in place still wins, except that transforms are contributed when it carried none ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
 -   Add support for the text shadow style property ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+
+### Bug Fixes
+
+-   `registerBlockType` no longer discards the transforms a server-bootstrapped definition declared when a block is registered by name with transforms of its own; the two are merged in `processBlockType`, beside the merge `variations` already gets ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   `rawHandler` keeps the matched element's classes on a block whose transform is only declared in `block.json`, which previously dropped them ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   A `<!--more-->` or `<!--nextpage-->` that is not inside a paragraph no longer disappears during raw handling ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   An invalid or unsupported CSS selector on a declared `raw` transform now warns and matches nothing, instead of the selector engine's error aborting the whole paste or conversion ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   `rawHandler` keeps the classes rule consistent with the server: the block's own generated class is no longer written into `className`, an empty `class` attribute sets nothing, a block opting out of `customClassName` keeps nothing, and an `id` becomes the block's `anchor` when the block supports one ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   A `<!--more-->` or `<!--nextpage-->` nested inside another element is hoisted out to become a block during raw handling, instead of being swallowed into a Custom HTML block ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   A declared transform attribute with `"source": "attribute"` and a numeric `type` now coerces the attribute string to a number, matching the server-side parser; its `map` result is validated against the declared `type` and `enum` the same way ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   A declared transform extracting inner blocks with a selector converts the matched children in place, so a child selector such as the List Item's `ol > li` can match them ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   A declared content schema's `"attributes": "*"` now keeps every attribute in the editor too, rather than being read as a list of characters ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
 
 ## 16.0.0 (2026-09-10)
 
