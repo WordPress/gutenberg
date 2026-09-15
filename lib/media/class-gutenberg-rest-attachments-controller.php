@@ -35,6 +35,19 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	const IMAGE_SIZE_SOURCE_ORIGINAL = 'source_original';
 
 	/**
+	 * Image size token for the JXL original preserved alongside its
+	 * web-viewable derivative.
+	 *
+	 * Handled identically to {@see self::IMAGE_SIZE_SOURCE_ORIGINAL} - it is a
+	 * companion file with no dimension constraint whose basename is stored in
+	 * {@see self::META_KEY_SOURCE_IMAGE} - but kept as its own token so the
+	 * client can name the JXL companion explicitly.
+	 *
+	 * @var string
+	 */
+	const IMAGE_SIZE_SOURCE_ORIGINAL_JXL = 'original-jxl';
+
+	/**
 	 * Metadata key holding the basename of the source-format original.
 	 *
 	 * Deliberately specific so it never collides with the generic `original`
@@ -901,6 +914,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			'scaled',
 			// Source-format original (e.g. the HEIC kept alongside its JPEG derivative).
 			self::IMAGE_SIZE_SOURCE_ORIGINAL,
+			// JXL companion original, kept alongside its web-viewable derivative.
+			self::IMAGE_SIZE_SOURCE_ORIGINAL_JXL,
 			// Converted-video companions for an animated GIF (the MP4/WebM and its poster).
 			self::IMAGE_SIZE_ANIMATED_VIDEO,
 			self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER,
@@ -926,9 +941,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		// Source-format original companion file: no dimension constraint, and
-		// the caller passes (0, 0) because the source format (e.g. HEIC) may
-		// not be readable by wp_getimagesize() at all.
-		if ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
+		// the caller passes (0, 0) because the source format (e.g. HEIC, JXL)
+		// may not be readable by wp_getimagesize() at all.
+		if (
+			self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ||
+			self::IMAGE_SIZE_SOURCE_ORIGINAL_JXL === $image_size
+		) {
 			return true;
 		}
 
@@ -1178,12 +1196,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// ('source_original', e.g. the HEIC kept next to its JPEG derivative)
 		// are exempt for the same reason: their dimensions are neither
 		// validated nor recorded, and wp_getimagesize() may not be able to
-		// read the source format at all on servers without HEIC/HEIF support.
-		// Skip the read for both cases; validate_image_dimensions() also
-		// short-circuits them below.
+		// read the source format at all on servers without HEIC/HEIF/JXL
+		// support. Skip the read for those cases; validate_image_dimensions()
+		// also short-circuits them below.
 		$skip_dimension_read =
 			self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ||
-			self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size;
+			self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ||
+			self::IMAGE_SIZE_SOURCE_ORIGINAL_JXL === $image_size;
 
 		$size = $skip_dimension_read ? array( 0, 0 ) : wp_getimagesize( $path );
 
@@ -1221,7 +1240,10 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$sub_size_data['file']      = wp_basename( $path );
 			$sub_size_data['mime_type'] = $type;
 			$sub_size_data['filesize']  = wp_filesize( $path );
-		} elseif ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
+		} elseif (
+			self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ||
+			self::IMAGE_SIZE_SOURCE_ORIGINAL_JXL === $image_size
+		) {
 			// Source-format original. finalize_item() writes the filename to
 			// $metadata[ self::META_KEY_SOURCE_IMAGE ] (separate from
 			// 'original_image', which the scaled-sideload flow owns). Cleanup on
@@ -1627,7 +1649,10 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				if ( ! empty( $metadata['image_meta']['orientation'] ) ) {
 					$metadata['image_meta']['orientation'] = 1;
 				}
-			} elseif ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
+			} elseif (
+				self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ||
+				self::IMAGE_SIZE_SOURCE_ORIGINAL_JXL === $image_size
+			) {
 				// As above: `file` is not required by the schema, and each of
 				// these sizes is nothing but the file it names.
 				if ( empty( $sub_size['file'] ) ) {

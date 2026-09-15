@@ -32,6 +32,10 @@ export interface QueueItem {
 	// as the attachment's "original_image" after the converted JPEG is
 	// uploaded. Not set for non-HEIC items.
 	originalHeicFile?: File;
+	// Original JPEG XL file, kept separately so it can be sideloaded as the
+	// attachment's preserved original after the converted JPEG is uploaded.
+	// Not set for non-JXL items.
+	originalJxlFile?: File;
 	// Original animated GIF, kept separately so it can be transcoded to a
 	// video and sideloaded as a companion file of the GIF image attachment
 	// (recorded in attachment metadata as `animated_video`). Not set for
@@ -425,7 +429,7 @@ export interface SideloadAdditionalData extends AdditionalData {
 	image_size: string | string[];
 }
 
-export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif';
+export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif' | 'jxl';
 
 /**
  * Configuration for automatic retry behavior on upload failures.
