@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { _x, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { formatFontStyle } from './format-font-style';
 import { formatFontWeight } from './format-font-weight';
 import type {

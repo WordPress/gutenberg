@@ -1,19 +1,7 @@
-/**
- * External dependencies
- */
 import { v4 as uuidv4 } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import type { createRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-
 type WPDataRegistry = ReturnType< typeof createRegistry >;
-
-/**
- * Internal dependencies
- */
 import type {
 	AdditionalData,
 	CancelAction,

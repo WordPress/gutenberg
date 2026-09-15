@@ -30,13 +30,19 @@
 
 		border-radius: var(--wpds-border-radius-sm);
 		top: -1px;
-		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve the indicator's physical offset. */
+		/* stylelint-disable-next-line logical-css/require-logical-properties -- Preserve the indicator's physical offset. */
 		left: -2px;
 		width: calc(calc(var(--selected-width, 0) * 1px) + 2px);
 		height: calc(calc(var(--selected-height, 0) * 1px) + 2px);
 		transform: translateX(calc(var(--selected-left, 0) * 1px));
 		/* Hide when dimensions are unset (0) */
 		opacity: min(1, max(0, var(--selected-width, 0), var(--selected-height, 0)));
+	}
+
+	&[aria-disabled="true"] {
+		&::before {
+			opacity: calc(min(1, max(0, var(--selected-width, 0), var(--selected-height, 0))) * 0.4);
+		}
 	}
 }
 
@@ -45,15 +51,13 @@
 }
 
 .has-enclosing-borders {
-	&:hover {
+	&:hover:not([aria-disabled="true"]) {
 		border-color: $components-color-gray-400;
 	}
 
 	&:focus-within {
 		z-index: 1;
 		@include mixins.outset-ring__focus();
-		// Preserve validated-control accent overrides.
-		outline-color: $components-color-focus;
 	}
 }
 

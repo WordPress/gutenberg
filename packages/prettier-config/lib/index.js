@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const prettierPackage = require( require.resolve( 'prettier/package.json' ) );
 
 /** @typedef {import('prettier').Config} PrettierConfig */

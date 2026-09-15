@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const { defineConfig, devices } = require( '@playwright/test' );
 

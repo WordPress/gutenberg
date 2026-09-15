@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { getMimeTypesArray } from '../get-mime-types-array';
 
 describe( 'getMimeTypesArray', () => {

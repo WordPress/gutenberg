@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import * as styles from '../styles';
@@ -29,7 +22,7 @@ export function useCardBody(
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.Body,
+				styles.getCardBodyStyles( { isScrollable } ),
 				styles.borderRadius,
 				getPaddingBySize( size ),
 				isShady && styles.shady,
@@ -37,7 +30,7 @@ export function useCardBody(
 				'components-card__body',
 				className
 			),
-		[ className, cx, isShady, size ]
+		[ className, cx, isScrollable, isShady, size ]
 	);
 
 	return {

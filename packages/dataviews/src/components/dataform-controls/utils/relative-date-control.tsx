@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	BaseControl,
 	SelectControl,
@@ -14,10 +7,6 @@ import {
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../../constants';
 import type { DataFormControlProps } from '../../../types';
 

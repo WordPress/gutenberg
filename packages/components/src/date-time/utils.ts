@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { UTCDateMini } from '@date-fns/utc';
-
-/**
- * WordPress dependencies
- */
 import { date as formatDate, getDate } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
 import type { InputState } from '../input-control/reducer/state';
 import type { InputAction } from '../input-control/reducer/actions';
 import { COMMIT, PRESS_DOWN, PRESS_UP } from '../input-control/reducer/actions';

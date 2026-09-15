@@ -1,16 +1,12 @@
-/**
- * WordPress dependencies
- */
-import { useEffect } from '@wordpress/element';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as commandsStore } from '../store';
 
 /**
  * Attach a command loader to the command palette. Used for dynamic commands.
+ *
+ * The palette always calls the most recent `hook`. Changing the `hook` instance
+ * doesn't re-render the palette.
  *
  * @param {import('../store/actions').WPCommandLoaderConfig} loader command loader config.
  *
@@ -82,13 +78,25 @@ import { store as commandsStore } from '../store';
 export default function useCommandLoader( loader ) {
 	const { registerCommandLoader, unregisterCommandLoader } =
 		useDispatch( commandsStore );
+	const currentHookRef = useRef( loader.hook );
+	useEffect( () => {
+		currentHookRef.current = loader.hook;
+	}, [ loader.hook ] );
+
+	// Stable identity, so a hook rebuilt on every render does not re-register
+	// the loader.
+	const hook = useCallback(
+		( ...args ) => currentHookRef.current( ...args ),
+		[]
+	);
+
 	useEffect( () => {
 		if ( loader.disabled ) {
 			return;
 		}
 		registerCommandLoader( {
 			name: loader.name,
-			hook: loader.hook,
+			hook,
 			context: loader.context,
 			category: loader.category,
 		} );
@@ -97,7 +105,7 @@ export default function useCommandLoader( loader ) {
 		};
 	}, [
 		loader.name,
-		loader.hook,
+		hook,
 		loader.context,
 		loader.category,
 		loader.disabled,

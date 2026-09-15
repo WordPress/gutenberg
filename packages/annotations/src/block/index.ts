@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ComponentType } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 import { withSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store } from '../store';
 import type { Annotation } from '../types';
 

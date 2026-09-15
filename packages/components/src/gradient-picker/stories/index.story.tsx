@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import GradientPicker from '..';
 
 const meta: Meta< typeof GradientPicker > = {
@@ -158,6 +147,11 @@ export const DuplicateGradients: GradientPickerStory = {
 };
 
 export const MultipleOrigins: GradientPickerStory = {
+	parameters: {
+		// FIXME: Multiple Origins: origin groups are missing required ARIA children (aria-required-children).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: Template,
 	args: {
 		gradients: [

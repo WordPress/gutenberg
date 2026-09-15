@@ -1,7 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
+import { useEffect } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
+import { store as editorStore } from '../../store';
+import { SIDEBARS } from './constants';
+import { unlock } from '../../lock-unlock';
 
 export const NOTE_FORMAT_NAME = 'core/note';
 
@@ -20,5 +23,41 @@ export const noteFormat = {
 	attributes: {
 		'data-id': 'data-id',
 	},
-	edit: () => null,
+	edit: NoteFormat,
 };
+
+function NoteFormat( { isActive, activeAttributes } ) {
+	const { getActiveComplementaryArea } = useSelect( interfaceStore );
+	const { getSelectedNote } = unlock( useSelect( editorStore ) );
+	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const noteId = activeAttributes?.[ 'data-id' ];
+
+	useEffect( () => {
+		if ( ! isActive || ! noteId ) {
+			return;
+		}
+
+		// Sync an already-open sidebar to the marker under the caret. Read
+		// imperatively so it triggers on caret movement, not sidebar state.
+		if ( ! SIDEBARS.includes( getActiveComplementaryArea( 'core' ) ) ) {
+			return;
+		}
+
+		if ( String( getSelectedNote() ) === String( noteId ) ) {
+			return;
+		}
+
+		// Select-only; no cleanup on leave. The block-level sync owns
+		// clearing/reverting, and deselecting here would drop the block's
+		// note while the caret is still inside the block.
+		selectNote( Number( noteId ) );
+	}, [
+		isActive,
+		noteId,
+		getActiveComplementaryArea,
+		getSelectedNote,
+		selectNote,
+	] );
+
+	return null;
+}

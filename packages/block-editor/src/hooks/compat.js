@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { hasBlockSupport } from '@wordpress/blocks';
 import { addFilter } from '@wordpress/hooks';
 

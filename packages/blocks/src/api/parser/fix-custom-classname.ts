@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { hasBlockSupport } from '../registration';
 import { getSaveContent } from '../serializer';
 import { parseWithAttributeSchema } from './get-block-attributes';

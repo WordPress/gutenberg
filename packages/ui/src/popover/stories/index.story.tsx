@@ -5,6 +5,7 @@ import * as Popover from '../';
 import { VisuallyHidden } from '../../visually-hidden';
 import { Icon } from '../../icon';
 import { IconButton } from '../../icon-button';
+import { Link } from '../../link';
 import { GenericIframe, useMeasure } from './utils';
 
 const meta: Meta< typeof Popover.Root > = {
@@ -1228,8 +1229,9 @@ export const HoverTrigger: Story = {
 
 /**
  * Popups that open when hovering an info icon should use Popover with the
- * `openOnHover` prop on the trigger instead of a tooltip. This way, touch
- * users and screen reader users can access the content.
+ * `openOnHover` prop on the trigger instead of a
+ * [tooltip](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-tooltip--docs).
+ * This way, touch users and screen reader users can access the content.
  *
  * To know when to reach for a popover instead of a tooltip, consider the
  * purpose of the trigger element: If the trigger's purpose is to open the
@@ -1275,6 +1277,63 @@ export const Infotip: Story = {
 							This is additional context about the label. Unlike
 							tooltips, this content is accessible to touch and
 							screen reader users.
+						</Popover.Description>
+					</Popover.Popup>
+				</Popover.Root>
+			</div>
+		);
+	},
+};
+
+/**
+ * An infotip popup can contain interactive content, such as a `Link`. The
+ * popup stays open while the pointer moves from the trigger onto the popup
+ * itself, so the link stays reachable — satisfying the "hoverable"
+ * requirement of
+ * [WCAG 1.4.13 Content on Hover or Focus](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html).
+ * The link is also reachable by tabbing to it, since the trigger opens on
+ * focus as well as hover.
+ */
+export const InfotipWithLink: Story = {
+	parameters: { controls: { disable: true } },
+	render: function Render( args ) {
+		return (
+			<div
+				style={ {
+					display: 'flex',
+					alignItems: 'center',
+					gap: 'var(--wpds-dimension-gap-xs)',
+				} }
+			>
+				<span>Label</span>
+				<Popover.Root { ...args }>
+					<Popover.Trigger
+						openOnHover
+						delay={ 200 }
+						closeDelay={ 200 }
+						aria-label="More information"
+						style={ {
+							background: 'none',
+							border: 'none',
+							padding: 0,
+							cursor: 'var(--wpds-cursor-control)',
+							display: 'inline-flex',
+							alignItems: 'center',
+							borderRadius: 'var(--wpds-border-radius-sm)',
+						} }
+					>
+						<Icon icon={ info } size={ 20 } />
+					</Popover.Trigger>
+					<Popover.Popup>
+						<Popover.Arrow />
+						<VisuallyHidden render={ <Popover.Title /> }>
+							More information
+						</VisuallyHidden>
+						<Popover.Description>
+							This is additional context about the label.{ ' ' }
+							<Link href="https://wordpress.org" openInNewTab>
+								Read more
+							</Link>
 						</Popover.Description>
 					</Popover.Popup>
 				</Popover.Root>

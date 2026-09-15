@@ -63,7 +63,7 @@
 	inset-inline: 0;
 	z-index: 1;
 	pointer-events: none;
-	--wp-ui-card-padding: var(--wpds-dimension-padding-2xl);
+	--wp-ui-card-padding: var(--wp-widget-dashboard-tile-padding, var(--wpds-dimension-padding-2xl));
 }
 
 .overlay .toolbar {

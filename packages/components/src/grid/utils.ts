@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
 
 const ALIGNMENTS = {
@@ -21,7 +18,7 @@ export function getAlignmentProps( alignment?: keyof typeof ALIGNMENTS ): {
 	alignItems?: CSSProperties[ 'alignItems' ];
 	justifyContent?: CSSProperties[ 'justifyContent' ];
 } {
-	const alignmentProps = alignment ? ALIGNMENTS[ alignment ] : {};
+	const alignmentProps = alignment ? ALIGNMENTS[ alignment ] ?? {} : {};
 
 	return alignmentProps;
 }

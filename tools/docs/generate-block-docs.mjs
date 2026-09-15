@@ -149,7 +149,9 @@ function readBlockJson( blockDir ) {
 function getBlockFiles( blockDir ) {
 	const dir = path.join( BLOCK_LIBRARY_DIR, blockDir );
 	return {
-		hasSaveJs: fs.existsSync( path.join( dir, 'save.js' ) ),
+		hasSaveScript: [ 'save.js', 'save.jsx' ].some( ( filename ) =>
+			fs.existsSync( path.join( dir, filename ) )
+		),
 		hasIndexPhp: fs.existsSync( path.join( dir, 'index.php' ) ),
 	};
 }
@@ -547,9 +549,9 @@ function formatSelectors( selectors ) {
  * Server-side rendering is indicated by index.php (render_callback) or the
  * `render` property in block.json (typically `file:./render.php`).
  *
- * - save.js only              → static:  markup is saved in post content by the editor.
+ * - save script only          → static:  markup is saved in post content by the editor.
  * - server rendering only     → dynamic: markup is rendered on the server at request time.
- * - save.js + server rendering → hybrid:  editor saves static markup, server may enhance
+ * - save script + server rendering → hybrid: editor saves static markup, server may enhance
  *   it during rendering (e.g. injecting dynamic data or wrapping with extra HTML).
  *
  * @param {Object} files     File existence flags from getBlockFiles().
@@ -559,10 +561,10 @@ function formatSelectors( selectors ) {
 function getBlockType( files, blockJson ) {
 	const hasServerRender = files.hasIndexPhp || !! blockJson.render;
 
-	if ( files.hasSaveJs && hasServerRender ) {
+	if ( files.hasSaveScript && hasServerRender ) {
 		return 'hybrid';
 	}
-	if ( files.hasSaveJs ) {
+	if ( files.hasSaveScript ) {
 		return 'static';
 	}
 	if ( hasServerRender ) {
@@ -805,7 +807,7 @@ function generateBlockApiSection( blockDir ) {
 		`- [block.json](${ SOURCE_URL_BASE }${ blockDir }/block.json) ([reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/))`
 	);
 	lines.push(
-		`- [Source directory](${ SOURCE_URL_BASE }${ blockDir }/) — browse \`edit.js\`, \`save.js\`, \`index.php\`, and more.`
+		`- [Source directory](${ SOURCE_URL_BASE }${ blockDir }/) — browse the \`edit\` and \`save\` source files, \`index.php\`, and more.`
 	);
 	lines.push( '' );
 

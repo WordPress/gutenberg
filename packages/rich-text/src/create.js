@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as richTextStore } from './store';
 import { createElement } from './create-element';
 import { mergePair } from './concat';

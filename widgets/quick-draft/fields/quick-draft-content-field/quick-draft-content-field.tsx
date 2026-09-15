@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
-import { TextareaControl } from '@wordpress/components';
+import { TextareaControl as WCTextareaControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import type { DataFormControlProps, FieldValidity } from '@wordpress/dataviews';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import styles from './quick-draft-content-field.module.css';
 
 /*
@@ -56,7 +49,7 @@ export default function QuickDraftContentField< Item >( {
 
 	return (
 		<Stack direction="column" className={ styles.root }>
-			<TextareaControl
+			<WCTextareaControl
 				label={ field.label }
 				hideLabelFromVision={ hideLabelFromVision }
 				value={ value ?? '' }

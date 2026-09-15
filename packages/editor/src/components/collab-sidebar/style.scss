@@ -4,10 +4,10 @@
 
 .interface-interface-skeleton__sidebar:has(.editor-collab-sidebar) {
 	box-shadow: none;
+}
 
-	.interface-complementary-area-header {
-		display: none;
-	}
+.editor-collab-sidebar__header {
+	display: none;
 }
 
 .editor-collab-sidebar {
@@ -59,13 +59,17 @@
 	}
 }
 
+.editor-collab-sidebar-panel__user-info {
+	flex: 1;
+}
+
 .editor-collab-sidebar-panel__user-name {
 	font-size: 12px;
 	font-weight: 400;
 	line-height: 16px;
 	text-align: left;
 	color: $gray-700;
-	text-transform: capitalize;
+	overflow-wrap: anywhere;
 }
 
 .editor-collab-sidebar-panel__user-time {
@@ -89,6 +93,8 @@
 }
 
 .editor-collab-sidebar-panel__note-content {
+	overflow-wrap: break-word;
+
 	p:last-child {
 		margin-bottom: 0;
 	}
@@ -158,7 +164,7 @@
 	max-height: calc(20px * 20 + 18px); // 20 rows + vertical padding.
 	overflow-y: auto;
 	white-space: pre-wrap;
-	word-wrap: break-word;
+	overflow-wrap: break-word;
 
 	// Inline formats inherit the surrounding text styles but keep
 	// their semantic emphasis (RichText renders <strong>, <em>, etc.).
@@ -255,7 +261,6 @@ mark.wp-note {
 	background: var(--wpds-color-background-surface-brand);
 	color: var(--wpds-color-foreground-interactive-brand);
 	font-weight: var(--wpds-typography-font-weight-emphasis);
-	white-space: nowrap;
 
 	// Keep the chip boundary visible when forced-colors drops the background tint.
 	@media (forced-colors: active) {

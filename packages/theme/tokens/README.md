@@ -17,7 +17,7 @@ The design system follows the [Design Tokens Format Module](https://www.designto
 | `motion.json`     | Animation durations and easing curves                                                                                            |
 | `cursor.json`     | Cursor values for interactive controls                                                                                           |
 
-Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. These files are the source of truth for the design system and are processed during the build step to generate published assets in `/prebuilt` and internal TypeScript sources in `/src/prebuilt`.
+Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. `wpds.resolver.json` composes those base sources with the contextual values in `/modes`. These files are the source of truth for the design system and are processed during the build step to generate published assets in `/prebuilt` and internal TypeScript sources in `/src/prebuilt`.
 
 ## Token Naming
 
@@ -74,6 +74,6 @@ The design tokens use [the `$extensions` feature](https://www.designtokens.org/t
 
 The tokens are implemented so that they can be imported directly into Figma variables, using [Figma's built-in support for importing design tokens](https://help.figma.com/hc/en-us/articles/15343816063383-Modes-for-variables#h_01KAGYPSFC984XDB4YWBCNRZJ7).
 
-This also includes support for [variable modes](https://help.figma.com/hc/en-us/articles/15343816063383-Modes-for-variables), which can be found under [the `modes/` directory](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/modes/).
+This also includes support for [variable modes](https://help.figma.com/hc/en-us/articles/15343816063383-Modes-for-variables). The contextual token values are stored under [the `modes/` directory](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/modes/) and composed by `wpds.resolver.json`.
 
 Token definitions will also include relevant Figma scopes, which are useful to ensure that token values are only shown in relevant fields in the Figma interface (e.g. border radius tokens only shown in the radius selection fields). These are implemented through the `$extensions['com.figma.scopes']` extension, and a full list of supported scopes is available in [Figma's `VariableScope` developer documentation](https://developers.figma.com/docs/plugins/api/VariableScope/).

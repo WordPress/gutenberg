@@ -1,10 +1,5 @@
-/**
- * WordPress dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { footer, header, layout } from '@wordpress/icons';
-/**
- * Internal dependencies
- */
 import { getTemplateInfo } from '../get-template-info';
 
 describe( '__experimentalGetTemplateInfo', () => {

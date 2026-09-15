@@ -195,7 +195,7 @@ add_action( 'admin_enqueue_scripts', 'load_custom_wp_admin_scripts' );
 
 ## Setting up the build pipeline
 
-This tutorial will proceed assuming the reader is familiar with ESNext syntax and the concept of build tools (like webpack). If that sounds confusing, you may want to review the [Getting started with JavaScript Build Setup](/docs/how-to-guides/javascript/js-build-setup.md) first.
+This tutorial will proceed assuming the reader is familiar with ESNext syntax and the concept of build tools (like webpack). If that sounds confusing, you may want to review the [Working with JavaScript for the Block Editor](/docs/getting-started/fundamentals/javascript-in-the-block-editor.md) guide first.
 
 To install the build tool, navigate to the plugin directory using your terminal and run `npm install`.
 
