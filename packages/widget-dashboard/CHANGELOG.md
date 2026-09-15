@@ -6,8 +6,15 @@
 
 -   Reset to default now drops staged edits, so a consumer that resets to the layout it is already rendering no longer leaves uncommitted changes on screen for the next commit to publish ([#82953](https://github.com/WordPress/gutenberg/pull/82953)).
 
+### Enhancements
+
+-   Show the selected widget width in its options menu and add an ellipsis to
+    the reset action that opens a confirmation dialog ([#81929](https://github.com/WordPress/gutenberg/pull/81929)).
+
 ### Internal
 
+-   Migrate dashboard menus from the private Components API to the public
+    `@wordpress/ui` Menu ([#81929](https://github.com/WordPress/gutenberg/pull/81929)).
 -   Run rendered Widget Dashboard tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
 
 ## 0.7.0 (2026-09-10)
