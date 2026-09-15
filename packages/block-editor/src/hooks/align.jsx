@@ -6,7 +6,9 @@ import {
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import { BlockControls, BlockAlignmentControl } from '../components';
-import useAvailableAlignments from '../components/block-alignment-control/use-available-alignments';
+import useAvailableAlignments, {
+	useAlignmentMenu,
+} from '../components/block-alignment-control/use-available-alignments';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
 /**
@@ -110,11 +112,18 @@ function BlockEditAlignmentToolbarControlsPure( {
 		hasBlockSupport( blockName, 'alignWide', true )
 	);
 
-	const validAlignments = useAvailableAlignments(
-		blockAllowedAlignments
-	).map( ( { name } ) => name );
+	const { enabled, unavailable } = useAlignmentMenu( blockAllowedAlignments );
 	const blockEditingMode = useBlockEditingMode();
-	if ( ! validAlignments.length || blockEditingMode !== 'default' ) {
+	/*
+	 * Render whenever there is something to say, which includes having only
+	 * unavailable alignments to report: a Group supports nothing but wide and
+	 * full, so in a layout offering neither the control would otherwise vanish
+	 * from the block most likely to want them.
+	 */
+	if (
+		( ! enabled.length && ! unavailable.length ) ||
+		blockEditingMode !== 'default'
+	) {
 		return null;
 	}
 
@@ -134,7 +143,14 @@ function BlockEditAlignmentToolbarControlsPure( {
 			<BlockAlignmentControl
 				value={ align }
 				onChange={ updateAlignment }
-				controls={ validAlignments }
+				/*
+				 * Pass the alignments the block itself supports rather than the
+				 * ones the current layout leaves available. The control filters
+				 * them again, but keeping the unfiltered list lets it tell the
+				 * difference between an alignment this block never had and one a
+				 * parent layout has taken away.
+				 */
+				controls={ blockAllowedAlignments }
 			/>
 		</BlockControls>
 	);

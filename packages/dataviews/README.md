@@ -264,7 +264,7 @@ Properties:
 
 -   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 -   `enableMoving`: whether the table columns should display moving controls.
--   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column. The `align` property accepts `'start'`, `'center'`, or `'end'`.
+-   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for the columns listed in `fields`, keyed by field id. The `align` property accepts `'start'`, `'center'`, or `'end'`. Neither layout applies these styles to the primary column (the one that renders `titleField`, `mediaField`, and `descriptionField`). In the `table` layout, that column is the flexible one: the table sizes every other column to fit its content and gives the primary column whatever width is left, so a `width` or `maxWidth` set on it would not be honored by the browser's table layout, and long titles are truncated instead. When the `table` view has no primary column, the last column in `fields` takes the leftover width in the same way. The `pickerTable` layout lets the browser share the width among all columns, but it does not apply the styles to the primary column either.
 -   `aspectRatio` (`table` only): one of the preset ratios `'1/1'`, `'4/3'`, `'3/4'`, `'3/2'`, `'2/3'`, `'16/9'`, or `'9/16'`, applied to the primary column's media preview. Defaults to `'1/1'`.
 
 **For column alignment (`align` property), follow these guidelines:**
@@ -1993,7 +1993,7 @@ Or multi-selection operators:
 		{ value: 'd', label: 'Product D' },
 	],
 	filterBy: {
-		operators: [ `isAny`, `isNone`, `isAll` ];
+		operators: [ `isAny`, `isNone` ];
 	}
 }
 ```
@@ -2033,15 +2033,15 @@ Valid operators per field type:
 -   color: `is`, `isNot`, `isAny`, `isNone`.
 -   date: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`, `between`.
 -   datetime: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`.
--   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
--   integer: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`.
+-   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`.
+-   integer: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`.
 -   media: none.
--   number: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`.
+-   number: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`.
 -   password: none.
--   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
--   text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   telephone: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`.
+-   text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`.
 -   time: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `between`.
--   url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`.
 -   fields with no type: any operator.
 
 `time` shares the ordering operators with `date` and `datetime`, which compare temporal values generically: a date or datetime compares by its position on the calendar, a time by its position within the day. Comparisons are precision-insensitive, so a filter for `'09:00'` matches a stored `'09:00:00'`.
@@ -2200,6 +2200,7 @@ For example:
 -   `type`: `panel`. Required.
 -   `labelPosition`: one of `side`, `top`, or `none`. Optional. `side` by default.
 -   `editVisibility`: one of `always`, or `on-hover`. Optional. `on-hover` by default.
+-   `showPlaceholderIfEmpty`: boolean. Optional. `false` by default. Whether the summary shows the field's `placeholder` instead of its `render` output when the field's value is `undefined`, `null`, or an empty string.
 -   `openAs`: one of `dropdown`, `modal`. Optional. `dropdown` by default.
 -   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
     -   A string (single field ID)

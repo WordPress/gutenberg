@@ -139,37 +139,61 @@
 	overflow: hidden;
 }
 
-.global-styles-ui__shadow-preview-panel {
+.global-styles-ui__shadow-preview-panel,
+.global-styles-ui__text-shadow-preview-panel {
 	height: 144px;
 	border: #ddd 1px solid;
 	border-radius: 2px;
 	overflow: auto;
 	@include mixins.checkerboard-background( 8px );
-
-	.global-styles-ui__shadow-preview-block {
-		border: #ddd 1px solid;
-		border-radius: 2px;
-		background-color: #fff;
-		width: 60%;
-		height: 60px;
-	}
 }
 
-.global-styles-ui__shadow-editor__dropdown-content {
+.global-styles-ui__shadow-preview-block {
+	border: #ddd 1px solid;
+	border-radius: 2px;
+	background-color: #fff;
+	width: 60%;
+	height: 60px;
+}
+
+.global-styles-ui__text-shadow-preview-panel {
+	// Pull up against the screen header and separate from the editor below.
+	margin-block: variables.$grid-unit-10 * -1 variables.$grid-unit-20;
+}
+
+.global-styles-ui__text-shadow-preview-text {
+	font-size: 24px;
+}
+
+.global-styles-ui__text-shadow-editor__header {
+	margin-block-end: variables.$grid-unit-10;
+}
+
+.global-styles-ui__text-shadow-editor__inputs {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: variables.$grid-unit-20;
+}
+
+.global-styles-ui__shadow-editor__dropdown-content,
+.global-styles-ui__text-shadow-editor__dropdown-content {
 	width: 280px;
 }
 
-.global-styles-ui__shadow-editor-panel {
+.global-styles-ui__shadow-editor-panel,
+.global-styles-ui__text-shadow-editor-panel {
 	// because tooltip of the range control is too close to the edge and creates overflow
 	margin-bottom: 4px;
 }
 
-.global-styles-ui__shadow-editor__dropdown {
+.global-styles-ui__shadow-editor__dropdown,
+.global-styles-ui__text-shadow-editor__dropdown {
 	width: 100%;
 	position: relative;
 }
 
-.global-styles-ui__shadow-editor__dropdown-toggle {
+.global-styles-ui__shadow-editor__dropdown-toggle,
+.global-styles-ui__text-shadow-editor__dropdown-toggle {
 	width: 100%;
 	height: auto;
 	padding-top: 8px;
@@ -183,13 +207,15 @@
 	}
 }
 
-.global-styles-ui__shadow-editor__remove-button {
+.global-styles-ui__shadow-editor__remove-button,
+.global-styles-ui__text-shadow-editor__remove-button {
 	position: absolute;
 	right: 8px;
 	top: 8px;
 	opacity: 0;
 
 	.global-styles-ui__shadow-editor__dropdown-toggle:hover + &,
+	.global-styles-ui__text-shadow-editor__dropdown-toggle:hover + &,
 	&:focus,
 	&:hover {
 		opacity: 1;

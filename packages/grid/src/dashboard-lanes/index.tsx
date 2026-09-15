@@ -27,7 +27,8 @@ import { LanesItem } from './lanes-item';
 import { useLanePlacement } from './use-lane-placement';
 import { arrayMoveWithPinned } from '../shared/array-move-with-pinned';
 import { GridOverlay } from '../shared/grid-overlay';
-import { gridSpanToPixelSize } from '../shared/resize-snap';
+import { clampSpan, gridSpanToPixelSize } from '../shared/resize-snap';
+import { useResizePixelLimits, useSpanBounds } from '../shared/use-span-bounds';
 import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
 import { ItemExitOverlay } from '../shared/item-exit-overlay';
 import {
@@ -109,6 +110,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			flowTolerance = 16,
 			rowUnit = 4,
 			minColumnWidth,
+			itemLimits,
 			editMode = false,
 			onChangeLayout,
 			onPreviewLayout,
@@ -197,6 +199,21 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			null
 		).widthPx;
 
+		// Height limits do not apply: lane heights are content-driven.
+		const widthBoundsByKey = useSpanBounds(
+			itemLimits,
+			columnWidth,
+			gapPx,
+			null,
+			effectiveColumns
+		);
+		const resizeLimitsByKey = useResizePixelLimits(
+			widthBoundsByKey,
+			columnWidth,
+			gapPx,
+			null
+		);
+
 		const layoutMap = useMemo( () => {
 			const map = new Map< string, DashboardLanesLayoutItem >();
 			activeLayout.forEach( ( item ) => map.set( item.key, item ) );
@@ -225,21 +242,42 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		);
 		const items = sortedItems;
 
-		// Placement input for the hook: each item with its clamped span
+		// Span each item renders at: the stored width clamped to the lane
+		// count and to the item's width bounds. Placement, the resize
+		// baseline, and the commit check all read it, so a gesture starts
+		// from the span on screen and commits nothing until it leaves it.
+		const renderedSpanByKey = useMemo( () => {
+			const map = new Map< string, number >();
+			for ( const [ key, item ] of layoutMap ) {
+				const span =
+					typeof item.width === 'number'
+						? Math.max(
+								1,
+								Math.min( item.width, effectiveColumns )
+						  )
+						: 1;
+				const bounds = widthBoundsByKey.get( key );
+				map.set(
+					key,
+					bounds
+						? clampSpan( span, bounds.minWidth, bounds.maxWidth )
+						: span
+				);
+			}
+			return map;
+		}, [ layoutMap, effectiveColumns, widthBoundsByKey ] );
+
+		// Placement input for the hook: each item with its rendered span
 		// in source (sorted) order. `lane` forwards the optional explicit
 		// pin from the layout item; the algorithm clamps out-of-range
 		// values, so no surface-level guard is needed.
 		const placementItems = useMemo( () => {
-			return items.map( ( key ) => {
-				const item = layoutMap.get( key );
-				const width = item?.width;
-				const span =
-					typeof width === 'number'
-						? Math.max( 1, Math.min( width, effectiveColumns ) )
-						: 1;
-				return { key, span, lane: item?.lane };
-			} );
-		}, [ items, layoutMap, effectiveColumns ] );
+			return items.map( ( key ) => ( {
+				key,
+				span: renderedSpanByKey.get( key ) ?? 1,
+				lane: layoutMap.get( key )?.lane,
+			} ) );
+		}, [ items, layoutMap, renderedSpanByKey ] );
 
 		const { itemStyles } = useLanePlacement( container, {
 			items: placementItems,
@@ -428,15 +466,14 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			);
 
 			if ( resizeBaselineRef.current === null ) {
-				const baseItem = layoutMap.get( id );
-				const baseWidth =
-					typeof baseItem?.width === 'number' ? baseItem.width : 1;
-				resizeBaselineRef.current = baseWidth;
+				resizeBaselineRef.current = renderedSpanByKey.get( id ) ?? 1;
 			}
 			const baseline = resizeBaselineRef.current;
-			const newWidth = Math.max(
-				1,
-				Math.min( baseline + relativeDelta, effectiveColumns )
+			const bounds = widthBoundsByKey.get( id );
+			const newWidth = clampSpan(
+				baseline + relativeDelta,
+				bounds?.minWidth ?? 1,
+				bounds?.maxWidth ?? effectiveColumns
 			);
 
 			setResizeSnapPreview( {
@@ -450,11 +487,14 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				),
 			} );
 
+			// Bail when the snap target matches the span staged for commit,
+			// or the rendered span while nothing is staged.
 			const pendingItem = latestLayoutRef.current?.find(
 				( item ) => item.key === id
 			);
-			const currentItem = pendingItem ?? layoutMap.get( id );
-			if ( currentItem && currentItem.width === newWidth ) {
+			const currentWidth =
+				pendingItem?.width ?? renderedSpanByKey.get( id );
+			if ( currentWidth === newWidth ) {
 				return;
 			}
 
@@ -581,6 +621,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 							if ( ! child ) {
 								return null;
 							}
+							const limitsPx = resizeLimitsByKey.get( id );
 							return (
 								<LanesItem
 									key={ id }
@@ -604,7 +645,10 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 											? resizeSnapPreview.snap
 											: null
 									}
-									minResizeWidthPx={ minResizeWidthPx }
+									minResizeWidthPx={
+										limitsPx?.minWidthPx ?? minResizeWidthPx
+									}
+									maxResizeWidthPx={ limitsPx?.maxWidthPx }
 									actionableArea={ actionableAreaMap.get(
 										id
 									) }
