@@ -224,7 +224,7 @@ describe( 'convertGifToVideo', () => {
 	} );
 
 	it( 'reports per-frame progress fractions ending at 1', async () => {
-		const onProgress = jest.fn();
+		const onProgress = vi.fn();
 		await convertGifToVideo(
 			'item-progress',
 			GIF_BUFFER,
@@ -242,7 +242,7 @@ describe( 'convertGifToVideo', () => {
 
 	it( 'throttles progress reports to whole-percent increments', async () => {
 		mockFrameCount = 300;
-		const onProgress = jest.fn();
+		const onProgress = vi.fn();
 		await convertGifToVideo(
 			'item-progress-throttle',
 			GIF_BUFFER,
