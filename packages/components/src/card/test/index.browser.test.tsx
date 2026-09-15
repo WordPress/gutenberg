@@ -130,6 +130,38 @@ describe( 'Card', () => {
 		).not.toBe( readElevationShadow( screen.getByTestId( 'flat' ) ) );
 	} );
 
+	it( 'changes region spacing with the size prop', async () => {
+		await render(
+			<Card size="medium">
+				<CardHeader data-testid="medium-header">Header</CardHeader>
+				<CardBody data-testid="medium-body">Body</CardBody>
+			</Card>
+		);
+		await render(
+			<Card size="large">
+				<CardHeader data-testid="large-header">Header</CardHeader>
+				<CardBody data-testid="large-body">Body</CardBody>
+			</Card>
+		);
+
+		expect(
+			pickStyles(
+				screen.getByTestId( 'large-header' ),
+				spacingProperties
+			)
+		).not.toEqual(
+			pickStyles(
+				screen.getByTestId( 'medium-header' ),
+				spacingProperties
+			)
+		);
+		expect(
+			pickStyles( screen.getByTestId( 'large-body' ), spacingProperties )
+		).not.toEqual(
+			pickStyles( screen.getByTestId( 'medium-body' ), spacingProperties )
+		);
+	} );
+
 	it( 'supports the legacy isElevated prop with a warning', async () => {
 		await render(
 			<Card isElevated data-testid="legacy-elevated">
@@ -217,6 +249,41 @@ describe( 'Card', () => {
 		);
 		expect( pickStyles( inherited, spacingProperties ) ).not.toEqual(
 			pickStyles( overridden, spacingProperties )
+		);
+	} );
+
+	it( 'treats extraSmall as an alias for xSmall', async () => {
+		await render(
+			<Card size="xSmall">
+				<CardHeader data-testid="xsmall-header">Header</CardHeader>
+				<CardBody data-testid="xsmall-body">Body</CardBody>
+			</Card>
+		);
+		await render(
+			<Card size="extraSmall">
+				<CardHeader data-testid="extra-small-header">Header</CardHeader>
+				<CardBody data-testid="extra-small-body">Body</CardBody>
+			</Card>
+		);
+
+		expect(
+			pickStyles(
+				screen.getByTestId( 'xsmall-header' ),
+				spacingProperties
+			)
+		).toEqual(
+			pickStyles(
+				screen.getByTestId( 'extra-small-header' ),
+				spacingProperties
+			)
+		);
+		expect(
+			pickStyles( screen.getByTestId( 'xsmall-body' ), spacingProperties )
+		).toEqual(
+			pickStyles(
+				screen.getByTestId( 'extra-small-body' ),
+				spacingProperties
+			)
 		);
 	} );
 
