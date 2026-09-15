@@ -16,6 +16,7 @@ import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
 import PostTypeSupportCheck from '../post-type-support-check';
+import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useRichText } = unlock( richTextPrivateApis );
@@ -47,6 +48,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 
 	const { clearSelectedBlock, insertBlocks, insertDefaultBlock } =
 		useDispatch( blockEditorStore );
+	const { setIsEditingPostTitle } = unlock( useDispatch( editorStore ) );
 
 	const decodedPlaceholder =
 		decodeEntities( placeholder ) || __( 'Add title' );
@@ -84,6 +86,16 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 
 	function onSelect() {
 		setIsSelected( true );
+		/*
+		 * Clearing the block selection leaves nothing for the sidebar to
+		 * describe, so record that the title is what is being edited.
+		 *
+		 * This is deliberately not cleared on blur. Opening the sidebar's Block
+		 * tab moves focus out of the title, so a blur would unset this before
+		 * the tab it feeds could render. Selecting a block is what supersedes
+		 * it, and the sidebar already checks for that.
+		 */
+		setIsEditingPostTitle( true );
 		clearSelectedBlock();
 	}
 

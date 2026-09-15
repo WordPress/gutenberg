@@ -479,6 +479,27 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Tracks whether the post title field has focus.
+ *
+ * The title in post-only rendering mode is editor chrome rather than a block,
+ * so nothing in the block editor store changes when it is clicked. This is what
+ * lets the sidebar tell "the title is being edited" apart from "nothing is
+ * selected", which otherwise look identical.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isEditingPostTitle( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_EDITING_POST_TITLE':
+			return action.isEditing;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -504,5 +525,6 @@ export default combineReducers( {
 	revisionPage,
 	showRevisionDiff,
 	selectedNote,
+	isEditingPostTitle,
 	dataviews: dataviewsReducer,
 } );
