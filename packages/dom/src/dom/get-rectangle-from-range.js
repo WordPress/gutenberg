@@ -99,9 +99,8 @@ export default function getRectangleFromRange( range ) {
 		range.collapse( true );
 	}
 
-	const { startContainer, startOffset } = range;
+	const { startContainer } = range;
 	const { ownerDocument } = startContainer;
-	assertIsDefined( ownerDocument, 'ownerDocument' );
 
 	const rects = range.getClientRects();
 
@@ -120,9 +119,10 @@ export default function getRectangleFromRange( range ) {
 	if (
 		rects.length === 1 &&
 		startContainer.nodeType === startContainer.TEXT_NODE &&
-		startOffset > 0 &&
-		startOffset < /** @type {Text} */ ( startContainer ).length
+		range.startOffset > 0 &&
+		range.startOffset < /** @type {Text} */ ( startContainer ).length
 	) {
+		assertIsDefined( ownerDocument, 'ownerDocument' );
 		const measure = (
 			/** @type {number} */ start,
 			/** @type {number} */ end
@@ -132,8 +132,8 @@ export default function getRectangleFromRange( range ) {
 			charRange.setEnd( startContainer, end );
 			return charRange.getBoundingClientRect();
 		};
-		const before = measure( startOffset - 1, startOffset );
-		const after = measure( startOffset, startOffset + 1 );
+		const before = measure( range.startOffset - 1, range.startOffset );
+		const after = measure( range.startOffset, range.startOffset + 1 );
 
 		if ( before.bottom <= after.top ) {
 			return null;
