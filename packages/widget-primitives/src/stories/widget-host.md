@@ -67,7 +67,7 @@ expect( ref.current ).toBe( screen.getByRole( 'link', { name: 'Reports' } ) );
 
 ## Consuming it
 
-`HostLink` reads the capability and decides: the host's `Link` on a match, a plain anchor otherwise. A new document never routes, because a router link buys nothing for it, and `HostLink` reads that off the anchor props: a `download` other than `false`, or the `_blank` target a UI link resolves `openInNewTab` into.
+Most consumers touch the seam here and nowhere else. `HostLink` reads the capability and decides: the host's `Link` on a match, a plain anchor otherwise. A new document never routes, because a router link buys nothing for it, and `HostLink` reads that off the anchor props: a `download` other than `false`, or the `_blank` target a UI link resolves `openInNewTab` into.
 
 It composes through the `render` prop of a UI link, which merges its own anchor props in:
 
@@ -82,6 +82,8 @@ It composes through the `render` prop of a UI link, which merges its own anchor 
 ```
 
 `Link`, `LinkButton` and `Menu.LinkItem` take the same anchor props, so one composition serves all three. A consumer that needs the answer before it renders reads `match` itself.
+
+`useWidgetHost` stays available for a capability no component covers yet, or an answer a consumer needs before it renders.
 
 The **WithHostLink** story runs it against a demo router, with a toggle that removes the capability from the host bag.
 
