@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Icon, IconButton, Menu } from '@wordpress/ui';
+import { IconButton, Menu } from '@wordpress/ui';
 import { useWidgetHost } from '@wordpress/widget-primitives';
 import type { WidgetAction } from '@wordpress/widget-primitives';
 import { getActionRoute } from './get-action-route';
@@ -78,7 +78,9 @@ export function WidgetActions( {
 									closeOnClick
 									prefix={
 										action.icon ? (
-											<Icon icon={ action.icon } />
+											<Menu.PrefixIcon
+												icon={ action.icon }
+											/>
 										) : undefined
 									}
 								>
