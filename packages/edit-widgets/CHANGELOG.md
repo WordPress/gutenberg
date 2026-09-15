@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Use `@wordpress/ui` for the Options menu while preserving legacy Tools fills.
+-   Use `@wordpress/ui` for the Options menu while preserving legacy Tools fills ([#82967](https://github.com/WordPress/gutenberg/pull/82967)).
 
 ### Bug Fixes
 
