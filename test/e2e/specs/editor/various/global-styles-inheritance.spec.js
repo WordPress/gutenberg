@@ -32,16 +32,18 @@ test.describe( 'Inherited Global Styles in the block inspector', () => {
 			name: 'Line height',
 		} );
 
-		// Line height is not one of the panel's default controls, so reveal it.
-		if ( ( await lineHeight.count() ) === 0 ) {
-			await settings
-				.getByRole( 'button', { name: 'Typography options' } )
-				.click();
-			await page
-				.getByRole( 'menuitemcheckbox', { name: 'Line height' } )
-				.click();
-			await page.keyboard.press( 'Escape' );
+		await settings
+			.getByRole( 'button', { name: 'Typography options' } )
+			.click();
+		const lineHeightToggle = page.getByRole( 'menuitemcheckbox', {
+			name: 'Line height',
+		} );
+		if (
+			( await lineHeightToggle.getAttribute( 'aria-checked' ) ) !== 'true'
+		) {
+			await lineHeightToggle.click();
 		}
+		await page.keyboard.press( 'Escape' );
 
 		// The theme's value reaches the control with nothing set on the block.
 		await expect( lineHeight ).toHaveValue( '1.2' );
