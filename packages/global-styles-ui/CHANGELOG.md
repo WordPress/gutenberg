@@ -12,7 +12,7 @@
 
 ### Internal
 
--   Font Library: Use the public `Menu` from `@wordpress/ui` for font collection actions.
+-   Font Library: Use the public `Menu` from `@wordpress/ui` for font collection actions ([#82965](https://github.com/WordPress/gutenberg/pull/82965)).
 
 -   Global Styles UI: replace the private `Menu` from `@wordpress/components` with the public `Menu` from `@wordpress/ui` for preset actions and the block filter. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
 
