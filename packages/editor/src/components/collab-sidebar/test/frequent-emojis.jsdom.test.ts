@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import {
 	DEFAULT_FREQUENT_EMOJI_KEYS,
 	MAX_FREQUENT_EMOJIS,

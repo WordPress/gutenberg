@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { speak } from '@wordpress/a11y';
@@ -15,9 +16,11 @@ import EmojiPicker, {
 import { EMOJIBASE_LOCALES, resolveEmojibaseLocale } from '../emojibase-data';
 import type { EmojibaseEntry } from '../emojibase-data';
 
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
+globalThis.wpVitest.mockMatchMedia();
 
-const mockSpeak = jest.mocked( speak );
+vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
+
+const mockSpeak = vi.mocked( speak );
 
 describe( 'resolveEmojibaseLocale', () => {
 	it( 'falls back to English for empty/invalid input', () => {
@@ -257,7 +260,7 @@ describe( 'EmojiPicker search announcements', () => {
 		dispatch( blockEditorStore ).updateSettings( {
 			noteEmojibaseUrl: 'https://example.test/emojibase',
 		} );
-		global.fetch = jest.fn( ( url: RequestInfo | URL ) =>
+		global.fetch = vi.fn( ( url: RequestInfo | URL ) =>
 			Promise.resolve( {
 				ok: true,
 				json: () =>

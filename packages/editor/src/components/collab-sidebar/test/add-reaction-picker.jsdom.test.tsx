@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import apiFetch from '@wordpress/api-fetch';
@@ -7,11 +8,13 @@ import { dispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { AddReactionButton } from '../add-reaction-picker';
 
-jest.mock( '@wordpress/api-fetch', () => jest.fn() );
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
+globalThis.wpVitest.mockMatchMedia();
 
-const mockApiFetch = jest.mocked( apiFetch );
-const mockSpeak = jest.mocked( speak );
+vi.mock( import( '@wordpress/api-fetch' ), () => ( { default: vi.fn() } ) );
+vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
+
+const mockApiFetch = vi.mocked( apiFetch );
+const mockSpeak = vi.mocked( speak );
 
 /*
  * The tooltip name cache in reaction-display.tsx is module-level and
@@ -30,7 +33,7 @@ describe( 'AddReactionButton', () => {
 
 	it( 'falls back to the curated quick row when no Emojibase URL is set', async () => {
 		const user = userEvent.setup();
-		const onToggleReaction = jest.fn();
+		const onToggleReaction = vi.fn();
 		render(
 			<AddReactionButton
 				noteId={ uniqueNoteId }
@@ -72,7 +75,7 @@ describe( 'AddReactionButton', () => {
 		// `1f44d`, so it aggregates into the same reaction_summary bucket
 		// as historical quick-row picks.
 		const originalFetch = global.fetch;
-		global.fetch = jest.fn( ( url: RequestInfo | URL ) =>
+		global.fetch = vi.fn( ( url: RequestInfo | URL ) =>
 			Promise.resolve( {
 				ok: true,
 				json: () =>
@@ -99,7 +102,7 @@ describe( 'AddReactionButton', () => {
 
 		try {
 			const user = userEvent.setup();
-			const onToggleReaction = jest.fn();
+			const onToggleReaction = vi.fn();
 			render(
 				<AddReactionButton
 					noteId={ uniqueNoteId }
@@ -152,7 +155,7 @@ describe( 'AddReactionButton', () => {
 		} );
 		const originalFetch = global.fetch;
 		let failRequests = true;
-		global.fetch = jest.fn( ( url: RequestInfo | URL ) =>
+		global.fetch = vi.fn( ( url: RequestInfo | URL ) =>
 			failRequests
 				? Promise.reject( new Error( 'network down' ) )
 				: Promise.resolve( {
@@ -175,7 +178,7 @@ describe( 'AddReactionButton', () => {
 
 		try {
 			const user = userEvent.setup();
-			const onToggleReaction = jest.fn();
+			const onToggleReaction = vi.fn();
 			render(
 				<AddReactionButton
 					noteId={ uniqueNoteId }
@@ -223,7 +226,9 @@ describe( 'AddReactionButton', () => {
 			).not.toHaveLength( 0 );
 		} finally {
 			global.fetch = originalFetch;
-			act( () => {
+			// The settings reset re-renders the mounted picker, and its
+			// Composite settles a tick later, so the wrapper has to await.
+			await act( async () => {
 				dispatch( blockEditorStore ).updateSettings( {
 					noteEmojibaseUrl: undefined,
 				} );
