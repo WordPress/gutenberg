@@ -14,6 +14,12 @@
     key and `isValid` merging rule by rule
     ([#82485](https://github.com/WordPress/gutenberg/pull/82485)).
 
+### Documentation
+
+-   Add a `WithHostLink` story: the same action declarations routed through
+    `HostLink` against a demo router, with a toggle that removes the `links`
+    capability ([#82952](https://github.com/WordPress/gutenberg/pull/82952)).
+
 ## 0.7.0 (2026-09-10)
 
 ### Documentation
