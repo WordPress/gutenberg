@@ -16,28 +16,39 @@ import { StubFile } from '../../stub-file';
 import { ErrorCode } from '../../upload-error';
 import { isClientSideMediaSupported } from '../../feature-detection';
 
-vi.mock( '@wordpress/blob', () => ( {
-	__esModule: true,
-	createBlobURL: vi.fn( () => 'blob:foo' ),
-	isBlobURL: vi.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
-	revokeBlobURL: vi.fn(),
-} ) );
+vi.mock(
+	import( '@wordpress/blob' ),
+	() =>
+		( {
+			createBlobURL: vi.fn( () => 'blob:foo' ),
+			isBlobURL: vi.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
+			revokeBlobURL: vi.fn(),
+		} ) as unknown as typeof import('@wordpress/blob')
+);
 
-vi.mock( '../utils', () => ( {
-	vipsCancelOperations: vi.fn( () => Promise.resolve( true ) ),
-	vipsConvertImageFormat: vi.fn(),
-	vipsResizeImage: vi.fn(),
-	vipsRotateImage: vi.fn(),
-	vipsHasTransparency: vi.fn( () => Promise.resolve( false ) ),
-	vipsGetUltraHdrInfo: vi.fn(),
-	terminateVipsWorker: vi.fn(),
-	maybeRecycleVipsWorker: vi.fn(),
-} ) );
+vi.mock(
+	import( '../utils' ),
+	() =>
+		( {
+			vipsCancelOperations: vi.fn( () => Promise.resolve( true ) ),
+			vipsConvertImageFormat: vi.fn(),
+			vipsResizeImage: vi.fn(),
+			vipsRotateImage: vi.fn(),
+			vipsHasTransparency: vi.fn( () => Promise.resolve( false ) ),
+			vipsGetUltraHdrInfo: vi.fn(),
+			terminateVipsWorker: vi.fn(),
+			maybeRecycleVipsWorker: vi.fn(),
+		} ) as unknown as typeof import('../utils')
+);
 
-vi.mock( '../../feature-detection', () => ( {
-	isClientSideMediaSupported: vi.fn( () => true ),
-	exceedsClientProcessingMemory: vi.fn( () => false ),
-} ) );
+vi.mock(
+	import( '../../feature-detection' ),
+	() =>
+		( {
+			isClientSideMediaSupported: vi.fn( () => true ),
+			exceedsClientProcessingMemory: vi.fn( () => false ),
+		} ) as unknown as typeof import('../../feature-detection')
+);
 
 function createRegistryWithStores() {
 	const registry = createRegistry();
