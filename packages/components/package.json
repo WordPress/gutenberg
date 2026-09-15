@@ -50,7 +50,7 @@
 		"src/**/*.scss"
 	],
 	"dependencies": {
-		"@ariakit/react": "^0.4.37",
+		"@ariakit/react": "^0.4.39",
 		"@date-fns/utc": "^2.1.1",
 		"@emotion/cache": "^11.14.0",
 		"@emotion/css": "^11.13.5",
@@ -110,7 +110,6 @@
 		"@testing-library/user-event": "^14.6.1",
 		"@types/jest": "^30.0.0",
 		"@types/react-dom": "^18.3.1",
-		"@wordpress/jest-console": "file:../jest-console",
 		"@wordpress/stylelint-tools": "file:../../tools/stylelint",
 		"snapshot-diff": "^0.10.0",
 		"storybook": "^10.5.3",
