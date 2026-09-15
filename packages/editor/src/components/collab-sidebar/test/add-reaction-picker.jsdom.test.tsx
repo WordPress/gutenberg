@@ -10,8 +10,22 @@ import { AddReactionButton } from '../add-reaction-picker';
 
 globalThis.wpVitest.mockMatchMedia();
 
-vi.mock( import( '@wordpress/api-fetch' ), () => ( { default: vi.fn() } ) );
-vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
+vi.mock( import( '@wordpress/api-fetch' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		default: vi.fn(),
+	} as unknown as typeof original;
+} );
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		speak: vi.fn(),
+	} as unknown as typeof original;
+} );
 
 const mockApiFetch = vi.mocked( apiFetch );
 const mockSpeak = vi.mocked( speak );

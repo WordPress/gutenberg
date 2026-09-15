@@ -4,6 +4,10 @@ import userEvent from '@testing-library/user-event';
 import SkinTonePicker, { SKIN_TONES, applySkinTone } from '../skin-tone-picker';
 import type { EmojibaseEntry } from '../emojibase-data';
 
+// The Dropdown's popover animates from opacity 0; the mock reports
+// reduced motion, so the flyout is visible as soon as it opens.
+globalThis.wpVitest.mockMatchMedia();
+
 const RAISED_HAND: EmojibaseEntry = {
 	label: 'raised hand',
 	hexcode: '270B',
