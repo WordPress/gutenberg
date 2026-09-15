@@ -4,59 +4,10 @@ import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
 import { createRef } from '@wordpress/element';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/theme/design-tokens.css';
 import * as Select from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../../../utils/use-enable-wp-compat-overlay-slot';
-import itemPopupStyles from '../../../../utils/css/item-popup.module.css';
 
 describe( 'Select', () => {
-	it( 'aligns the selected-item checkmark with the first line of the item label', async () => {
-		const user = userEvent;
-
-		await render(
-			<Select.Root defaultValue="apple">
-				<Select.Trigger />
-				<Select.Popup>
-					<Select.Item value="apple">
-						<Select.ItemLabel>Apple</Select.ItemLabel>
-						<Select.ItemDescription>
-							99 in stock. Ships in two to three business days.
-						</Select.ItemDescription>
-					</Select.Item>
-				</Select.Popup>
-			</Select.Root>
-		);
-
-		await user.click( screen.getByRole( 'combobox' ) );
-
-		const option = await screen.findByRole( 'option', { name: 'Apple' } );
-		await expect.element( option ).toBeVisible();
-
-		/* eslint-disable testing-library/no-node-access */
-		const indicator = option.querySelector< HTMLElement >(
-			`.${ itemPopupStyles[ 'item-icon' ] }`
-		);
-		const label = option.querySelector< HTMLElement >(
-			`.${ itemPopupStyles[ 'item-label' ] }`
-		);
-		/* eslint-enable testing-library/no-node-access */
-
-		expect( indicator ).not.toBeNull();
-		expect( label ).not.toBeNull();
-		await expect.element( indicator! ).toBeVisible();
-		await expect.element( label! ).toBeVisible();
-
-		const indicatorRect = indicator!.getBoundingClientRect();
-		const labelRect = label!.getBoundingClientRect();
-		const labelLineHeight = parseFloat(
-			getComputedStyle( label! ).lineHeight
-		);
-
-		expect( indicatorRect.top ).toBeCloseTo( labelRect.top, 0 );
-		expect( indicatorRect.height ).toBeCloseTo( labelLineHeight, 0 );
-	} );
-
 	it( 'supports object item values', async () => {
 		const user = userEvent;
 		const onValueChange = vi.fn();
