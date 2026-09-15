@@ -342,7 +342,7 @@ function MediaTextEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
-	const mediaInspectorPanel = (
+	const mediaInspectorPanel = isSelected ? (
 		<InspectorControls group="content">
 			<ToolsPanel
 				label={ __( 'Media' ) }
@@ -374,7 +374,7 @@ function MediaTextEdit( {
 				</ToolsPanelItem>
 			</ToolsPanel>
 		</InspectorControls>
-	);
+	) : null;
 
 	const mediaTextGeneralSettings = (
 		<ToolsPanel
@@ -524,7 +524,7 @@ function MediaTextEdit( {
 
 	return (
 		<>
-			{ isSelected && mediaInspectorPanel }
+			{ mediaInspectorPanel }
 			<InspectorControls>{ mediaTextGeneralSettings }</InspectorControls>
 			<BlockControls group="block">
 				{ blockEditingMode === 'default' && (
