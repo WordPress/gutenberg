@@ -33,7 +33,7 @@ vi.mock( import( '../../../lock-unlock' ), () => ( {
 const { entityContainsSnapshot } = coreDataPrivateApis;
 
 const createWarningNotice = vi.fn();
-const setCurrentRevisionId = vi.fn();
+const openRevision = vi.fn();
 const isCollaborationEnabledForCurrentPost = vi.fn();
 const getEntitySyncConnectionStatus = vi.fn();
 const getEditorSettings = vi.fn();
@@ -73,7 +73,7 @@ describe( 'useAutosaveNotice', () => {
 				return { createWarningNotice };
 			}
 
-			return { setCurrentRevisionId };
+			return { openRevision };
 		} );
 
 		entityContainsSnapshot.mockReturnValue( false );
@@ -239,7 +239,7 @@ describe( 'useAutosaveNotice', () => {
 
 			action.onClick();
 
-			expect( setCurrentRevisionId ).toHaveBeenCalledWith( 123 );
+			expect( openRevision ).toHaveBeenCalledWith( 123 );
 		} );
 
 		it( 'links to the edit screen when the edit link has no revision ID', () => {
