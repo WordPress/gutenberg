@@ -1,12 +1,19 @@
-/**
- * External dependencies
- */
-const path = require( 'path' );
-const { spawnSync } = require( 'child_process' );
+import { spawnSync } from 'node:child_process';
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { describe, expect, it } from 'vitest';
 
-const cliPath = path.resolve( __dirname, '../cli.js' );
+const require = createRequire( import.meta.url );
+const currentDirectory = path.dirname( fileURLToPath( import.meta.url ) );
+const cliPath = path.resolve( currentDirectory, '../cli.js' );
+/*
+ * Resolve from this file: an `-e` script resolves requires from the cwd,
+ * which is the repo root under Jest and has no `commander` installed.
+ */
+const commanderPath = require.resolve( 'commander' );
 const script = `
-	const { Command } = require( 'commander' );
+	const { Command } = require( ${ JSON.stringify( commanderPath ) } );
 	const { run } = require( ${ JSON.stringify( cliPath ) } );
 	const program = new Command();
 	program.command( 'reject' ).action( async () => {

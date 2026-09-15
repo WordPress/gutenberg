@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import BlockDraggableChip from '../draggable-chip';
 
 export default { title: 'BlockEditor/BlockDraggable' };

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { defaultSettings } from './defaultSettings';
 import stripTags from './stripTags';
 import transposeAstralsToCountableChar from './transposeAstralsToCountableChar';
@@ -11,7 +8,6 @@ import stripHTMLComments from './stripHTMLComments';
 import stripShortcodes from './stripShortcodes';
 import stripSpaces from './stripSpaces';
 import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCountableChars';
-
 import type { Settings, UserSettings, Strategy } from './types';
 
 /**

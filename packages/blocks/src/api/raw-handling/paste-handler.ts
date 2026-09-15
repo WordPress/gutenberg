@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
 import { getBlockInnerHTML } from '../serializer';
@@ -36,7 +29,7 @@ import slackParagraphCorrector from './slack-paragraph-corrector';
 import isLatexMathMode from './latex-to-math';
 import { createBlock } from '../factory';
 import headingTransformer from './heading-transformer';
-import type { Block } from '../../types';
+import type { Block, RawHandlerOptions } from '../../types';
 
 const log = ( ...args: unknown[] ): void => window?.console?.log?.( ...args );
 
@@ -94,12 +87,7 @@ export function pasteHandler( {
 	plainText = '',
 	mode = 'AUTO',
 	tagName,
-}: {
-	HTML?: string;
-	plainText?: string;
-	mode?: 'AUTO' | 'INLINE' | 'BLOCKS';
-	tagName?: string;
-} ): Block[] | string {
+}: RawHandlerOptions ): Block[] | string {
 	// Allows us to ask for this information when we get a report.
 	log( 'Received HTML (pasteHandler):\n\n', HTML );
 	log( 'Received plain text (pasteHandler):\n\n', plainText );

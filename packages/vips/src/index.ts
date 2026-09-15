@@ -1,17 +1,8 @@
-/**
- * External dependencies
- */
 import Vips from 'wasm-vips';
-
 // @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsModule from 'wasm-vips/vips.wasm';
-
 // @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
-
-/**
- * Internal dependencies
- */
 import type {
 	ItemId,
 	ImageSizeCrop,
@@ -20,8 +11,12 @@ import type {
 	ThumbnailOptions,
 	ConvertImageOptions,
 	ResizeImageOptions,
-} from './types';
-import { supportsAnimation, supportsInterlace, supportsQuality } from './utils';
+} from './types.ts';
+import {
+	supportsAnimation,
+	supportsInterlace,
+	supportsQuality,
+} from './utils.ts';
 
 interface EmscriptenModule {
 	setAutoDeleteLater: ( autoDelete: boolean ) => void;
@@ -208,6 +203,15 @@ export async function convertImageFormat(
 
 		if ( interlaced && supportsInterlace( outputType ) ) {
 			saveOptions.interlace = interlaced;
+		}
+
+		// Keep indexed sources indexed. libvips decodes a palette image into
+		// RGB(A) pixels, so without this a compressed or converted PNG is
+		// written as truecolour and can grow several times larger than the
+		// indexed original.
+		// See https://core.trac.wordpress.org/ticket/65922.
+		if ( 'image/png' === outputType && isPaletteImage( image ) ) {
+			saveOptions.palette = true;
 		}
 
 		// See https://github.com/swissspidy/media-experiments/issues/324.
@@ -403,6 +407,25 @@ function applyResizeAndCrop<
 }
 
 /**
+ * Determines whether a decoded image came from an indexed (palette) source.
+ *
+ * libvips decodes indexed images into full RGB(A) pixels and flags the source
+ * encoding with a `palette` metadata field. Writing such an image back out
+ * without asking for quantisation produces a truecolour PNG, which for
+ * palette-based artwork is typically several times larger than the indexed
+ * original. See https://core.trac.wordpress.org/ticket/65922.
+ *
+ * libvips only attaches the field when the source was indexed, so its presence
+ * is the signal. `getTypeof` reports the GType of a field, or 0 when absent.
+ *
+ * @param image Decoded vips image.
+ * @return Whether the source image used a palette.
+ */
+function isPaletteImage( image: Vips.Image ): boolean {
+	return image.getTypeof( 'palette' ) !== 0;
+}
+
+/**
  * Reads the source bit depth of a decoded HEIF/AVIF image.
  *
  * High-bit-depth (10/12-bit) AVIF/HEIF images decode into a 16-bit `ushort`
@@ -413,9 +436,7 @@ function applyResizeAndCrop<
  * @param image Decoded vips image.
  * @return Source bit depth (typically 8, 10, or 12).
  */
-function getSourceBitdepth< T extends { getInt: ( name: string ) => number } >(
-	image: T
-): number {
+function getSourceBitdepth( image: Vips.Image ): number {
 	try {
 		const bitdepth = image.getInt( 'heif-bitdepth' );
 		if ( bitdepth > 8 ) {
@@ -453,19 +474,30 @@ function resolveSaveBitdepth(
 /**
  * Builds save options for writing an image to a buffer.
  *
- * @param type      Output mime type.
- * @param quality   Desired quality (0-1).
- * @param bitdepth  Save bit depth; values above 8 are preserved for AVIF.
- * @param stripMeta Whether to strip metadata (except color profiles),
- *                  from the `image_strip_meta` filter.
+ * @param options           Save option inputs.
+ * @param options.type      Output mime type.
+ * @param options.quality   Desired quality (0-1).
+ * @param options.bitdepth  Save bit depth; values above 8 are preserved for
+ *                          AVIF.
+ * @param options.stripMeta Whether to strip metadata (except color
+ *                          profiles), from the `image_strip_meta` filter.
+ * @param options.isPalette Whether the source image was indexed (palette)
+ *                          encoded.
  * @return Save options object.
  */
-function buildSaveOptions(
-	type: string,
-	quality: number,
+function buildSaveOptions( {
+	type,
+	quality,
 	bitdepth = 8,
-	stripMeta = true
-): SaveOptions< typeof type > {
+	stripMeta = true,
+	isPalette = false,
+}: {
+	type: string;
+	quality: number;
+	bitdepth?: number;
+	stripMeta?: boolean;
+	isPalette?: boolean;
+} ): SaveOptions< string > {
 	const saveOptions: SaveOptions< typeof type > = {
 		// Strip metadata except ICC color profiles or gainmaps,
 		// matching WordPress core's behavior. The `image_strip_meta`
@@ -475,6 +507,14 @@ function buildSaveOptions(
 
 	if ( supportsQuality( type ) ) {
 		saveOptions.Q = quality * 100;
+	}
+
+	// Keep indexed sources indexed. libvips decodes a palette PNG into RGB(A)
+	// pixels, so without this the sub-sizes are written as truecolour and can
+	// end up larger than the indexed original.
+	// See https://core.trac.wordpress.org/ticket/65922.
+	if ( 'image/png' === type && isPalette ) {
+		saveOptions.palette = true;
 	}
 
 	// See https://github.com/swissspidy/media-experiments/issues/324.
@@ -560,6 +600,15 @@ function resizeHighBitDepth<
  * decode the gain map alongside the base image, and `jpegsave*` delegates
  * to `uhdrsave*` on output when a gain map is attached.
  *
+ * Sub-sizes of animated images are generated from the first frame only,
+ * matching WordPress core's server-side behavior: both GD and Imagick
+ * flatten animated images when resizing, and `wp_calculate_image_srcset()`
+ * prevents flattened sub-sizes and the animated full-size image from mixing
+ * in a srcset. Loading all frames (`[n=-1]`) would re-encode a full animated
+ * GIF per sub-size, which takes tens of seconds for long animations and can
+ * produce sub-sizes larger than the original file.
+ * See https://github.com/WordPress/gutenberg/issues/80266.
+ *
  * @param id      Item ID.
  * @param buffer  Original file buffer.
  * @param type    Mime type.
@@ -593,16 +642,6 @@ export async function resizeImage(
 	try {
 		const vips = await getVips();
 
-		let strOptions = '';
-		const loadOptions: LoadOptions< typeof type > = {};
-
-		// To ensure all frames are loaded in case the image is animated.
-		// But only if we're not cropping.
-		if ( supportsAnimation( type ) && ! resize.crop ) {
-			strOptions = '[n=-1]';
-			( loadOptions as LoadOptions< typeof type > ).n = -1;
-		}
-
 		// TODO: Report progress, see https://github.com/swissspidy/media-experiments/issues/327.
 		const onProgress = () => {
 			if ( ! inProgressOperations.has( id ) ) {
@@ -610,7 +649,7 @@ export async function resizeImage(
 			}
 		};
 
-		let image = vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
+		let image = vips.Image.newFromBuffer( buffer );
 
 		image.onProgress = onProgress;
 
@@ -618,13 +657,9 @@ export async function resizeImage(
 
 		// Detect high-bit-depth (10/12-bit) AVIF sources. `thumbnail` would
 		// flatten these to 8-bit sRGB, so they are resized directly from the
-		// decoded 16-bit image, which keeps full precision. Animated images
-		// keep the streaming `thumbnail` path (multi-page resize/crop is not
-		// handled here, and HDR is a still-image concern).
+		// decoded 16-bit image, which keeps full precision.
 		const sourceBitdepth =
-			'image/avif' === type && ! strOptions
-				? getSourceBitdepth( image )
-				: 8;
+			'image/avif' === type ? getSourceBitdepth( image ) : 8;
 		// The `image_max_bit_depth` filter can cap the output depth. When the
 		// cap flattens the image to 8-bit anyway, the regular colour-managed
 		// `thumbnail` path is used, matching standard-depth sources.
@@ -650,9 +685,6 @@ export async function resizeImage(
 					resized.onProgress = onProgress;
 					return resized;
 				}
-				if ( strOptions ) {
-					thumbnailOptions.option_string = strOptions;
-				}
 				const thumb = vips.Image.thumbnailBuffer(
 					buffer,
 					resizeWidth,
@@ -663,12 +695,13 @@ export async function resizeImage(
 			}
 		);
 
-		const saveOptions = buildSaveOptions(
+		const saveOptions = buildSaveOptions( {
 			type,
 			quality,
-			saveBitdepth,
-			stripMeta
-		);
+			bitdepth: saveBitdepth,
+			stripMeta,
+			isPalette: isPaletteImage( sourceImage ),
+		} );
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {
@@ -801,6 +834,10 @@ export async function rotateImage(
 			}
 		};
 
+		// Read this off the source, before the transforms below replace
+		// `image` with their result.
+		const isPalette = isPaletteImage( image );
+
 		// Apply transformation based on EXIF orientation.
 		// See: https://exiftool.org/TagNames/EXIF.html#:~:text=0x0112,Orientation
 		switch ( orientation ) {
@@ -847,6 +884,15 @@ export async function rotateImage(
 		image.remove( 'orientation' );
 
 		const saveOptions: SaveOptions< typeof type > = {};
+
+		// Keep indexed sources indexed, as the resize and convert paths do.
+		// Rotating writes the full-size file, so losing the palette here
+		// inflates the image the user actually uploaded.
+		// See https://github.com/WordPress/gutenberg/issues/81895.
+		if ( 'image/png' === type && isPalette ) {
+			saveOptions.palette = true;
+		}
+
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useLayoutEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 export function useMarkPersistent( { html, value } ) {

@@ -47,6 +47,39 @@ function gutenberg_add_date_wp_template_schema() {
 add_filter( 'rest_api_init', 'gutenberg_add_date_wp_template_schema' );
 
 /**
+ * Reports a `null` `modified` date for templates that have never been saved.
+ *
+ * `WP_REST_Templates_Controller::prepare_item_for_response()` passes the template's
+ * `modified` property straight to `mysql_to_rfc3339()`, which returns `false` for
+ * file-backed templates because they have no modification date. That value matches
+ * neither the documented `string` type nor anything a client can format, so it is
+ * replaced with `null` and the schema widened to allow it.
+ *
+ * @since 7.1.0 Allowed 'modified' to be null.
+ */
+function gutenberg_allow_null_modified_wp_template_field() {
+	register_rest_field(
+		array( 'wp_template', 'wp_template_part' ),
+		'modified',
+		array(
+			'schema'       => array(
+				'description' => __( "The date the template was last modified, in the site's timezone.", 'gutenberg' ),
+				'type'        => array( 'string', 'null' ),
+				'format'      => 'date-time',
+				'context'     => array( 'view', 'edit' ),
+				'readonly'    => true,
+			),
+			// The controller has already converted the date by the time this runs, so
+			// the prepared value is reused and only the `false` case is replaced.
+			'get_callback' => function ( $item ) {
+				return isset( $item['modified'] ) && false !== $item['modified'] ? $item['modified'] : null;
+			},
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_allow_null_modified_wp_template_field' );
+
+/**
  * Registers the Icon Collections Registry REST API routes.
  */
 function gutenberg_register_icon_collections_controller_endpoints() {
@@ -73,27 +106,3 @@ function gutenberg_override_attachments_rest_controller( $args, $post_type ) {
 	return $args;
 }
 add_filter( 'register_post_type_args', 'gutenberg_override_attachments_rest_controller', 10, 2 );
-
-/**
- * Overrides the default REST controller for autosaves to fix real-time
- * collaboration on draft posts.
- *
- * When RTC is enabled, draft autosaves from all users update the post directly
- * instead of creating per-user autosave revisions depending on post lock and
- * assigned author.
- *
- * Only overrides when autosave_rest_controller_class is not explicitly set,
- * i.e. when WP_REST_Autosaves_Controller would be used by default. Post types
- * with their own specialized autosave controller (e.g. templates) are left alone.
- *
- * @param array $args Array of arguments for registering a post type.
- * @return array Modified array of arguments.
- */
-function gutenberg_override_autosaves_rest_controller( $args ) {
-	if ( empty( $args['autosave_rest_controller_class'] ) ) {
-		$args['autosave_rest_controller_class'] = 'Gutenberg_REST_Autosaves_Controller';
-	}
-	return $args;
-}
-
-add_filter( 'register_post_type_args', 'gutenberg_override_autosaves_rest_controller', 10, 1 );

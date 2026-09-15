@@ -10,10 +10,6 @@
  * The `resolveFields` function converts any reference to a registered name
  * into the standard per-field `Field` properties that DataViews recognizes.
  */
-
-/**
- * WordPress dependencies
- */
 import type { Field, FieldTypeName } from '@wordpress/dataviews';
 
 /**

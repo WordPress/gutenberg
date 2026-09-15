@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DatePicker from '../date-picker';
 import { daysFromNow, isWeekend } from './utils';
 
