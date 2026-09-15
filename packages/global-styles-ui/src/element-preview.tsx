@@ -11,7 +11,6 @@ import {
 
 interface ElementPreviewProps {
 	element: string;
-	headingLevel: string;
 }
 
 /*
@@ -60,13 +59,9 @@ const PREVIEW_CSS = `
  * properties copied across by hand.
  *
  * @param props
- * @param props.element      The element being previewed.
- * @param props.headingLevel Which heading the Headings screen has selected.
+ * @param props.element The element being previewed.
  */
-export default function ElementPreview( {
-	element,
-	headingLevel,
-}: ElementPreviewProps ) {
+export default function ElementPreview( { element }: ElementPreviewProps ) {
 	const styles = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().styles,
 		[]
@@ -133,15 +128,18 @@ export default function ElementPreview( {
 		case 'link':
 			sample = <a href="#anchor">{ __( 'A link' ) }</a>;
 			break;
-		case 'heading': {
-			const Tag = (
-				headingLevel === 'heading' ? 'h2' : headingLevel
-			) as keyof JSX.IntrinsicElements;
+		default: {
+			// The heading elements are named after their tag.
+			const Tag = ( /^h[1-6]$/.test( element ) ? element : 'p' ) as
+				| 'h1'
+				| 'h2'
+				| 'h3'
+				| 'h4'
+				| 'h5'
+				| 'h6'
+				| 'p';
 			sample = <Tag>{ __( 'Aa' ) }</Tag>;
-			break;
 		}
-		default:
-			sample = <p>{ __( 'Aa' ) }</p>;
 	}
 
 	return (

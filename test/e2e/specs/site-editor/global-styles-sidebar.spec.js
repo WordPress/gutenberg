@@ -31,7 +31,9 @@ test.describe( 'Global styles sidebar', () => {
 			name: 'Editor settings',
 		} );
 
-		await settings.getByRole( 'button', { name: 'Blocks' } ).click();
+		await settings
+			.getByRole( 'button', { name: 'Blocks & Elements' } )
+			.click();
 		await settings
 			.getByRole( 'button', { name: 'Heading', exact: true } )
 			.click();
