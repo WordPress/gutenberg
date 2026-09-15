@@ -164,6 +164,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 				<Editor
 					postType={ canvas.postType }
 					postId={ canvas.postId }
+					renderingMode={ canvas.renderingMode }
 					settings={ settings }
 					backButton={ backButton }
 					onActionPerformed={ onActionPerformed }

@@ -1,6 +1,6 @@
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { blockDefault } from '@wordpress/icons';
+import { layout } from '@wordpress/icons';
 import { BlockIcon } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -40,7 +40,7 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 	return (
 		<div className="edit-widgets-widget-areas">
 			<div className="edit-widgets-widget-areas__top-container">
-				<BlockIcon icon={ blockDefault } />
+				<BlockIcon icon={ layout } />
 				<div>
 					<p
 						// Use `dangerouslySetInnerHTML` to keep backwards

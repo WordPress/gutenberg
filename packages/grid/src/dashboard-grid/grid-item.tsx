@@ -41,6 +41,8 @@ export function GridItem( {
 	resizeSnapPreview = null,
 	minResizeWidthPx,
 	minResizeHeightPx,
+	maxResizeWidthPx,
+	maxResizeHeightPx,
 	renderResizeHandle,
 }: GridItemProps ) {
 	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
@@ -104,10 +106,18 @@ export function GridItem( {
 			height: verticalResizable ? delta.height : 0,
 		};
 		if ( baselineSize ) {
-			clamped = clampResizeDelta( clamped, baselineSize, {
-				width: minResizeWidthPx,
-				height: verticalResizable ? minResizeHeightPx : undefined,
-			} );
+			clamped = clampResizeDelta(
+				clamped,
+				baselineSize,
+				{
+					width: minResizeWidthPx,
+					height: verticalResizable ? minResizeHeightPx : undefined,
+				},
+				{
+					width: maxResizeWidthPx,
+					height: verticalResizable ? maxResizeHeightPx : undefined,
+				}
+			);
 		}
 		setResizeDelta( clamped );
 		onResize( item.key, clamped );

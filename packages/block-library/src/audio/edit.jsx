@@ -7,6 +7,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 import {
 	BlockControls,
 	BlockIcon,
@@ -89,12 +90,6 @@ function AudioEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
-	}
-
-	function getAutoplayHelp( checked ) {
-		return checked
-			? __( 'Autoplay may cause usability issues for some users.' )
-			: null;
 	}
 
 	function onSelectAudio( media ) {
@@ -181,6 +176,11 @@ function AudioEdit( {
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
+					<Text className="wp-block-audio__autoplay-help-text">
+						{ __(
+							'Most browsers block audio until a visitor interacts with the page, so autoplay often won’t work, especially on mobile. Unexpected sound can also be disruptive for screen reader users.'
+						) }
+					</Text>
 					<ToolsPanelItem
 						label={ __( 'Autoplay' ) }
 						isShownByDefault
@@ -195,7 +195,6 @@ function AudioEdit( {
 							label={ __( 'Autoplay' ) }
 							onChange={ toggleAttribute( 'autoplay' ) }
 							checked={ !! autoplay }
-							help={ getAutoplayHelp }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
