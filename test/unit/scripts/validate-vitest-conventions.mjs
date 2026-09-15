@@ -34,12 +34,6 @@ const ROOT_DIR = path.resolve(
 	'../../..'
 );
 const require = createRequire( import.meta.url );
-const migration = JSON.parse(
-	readFileSync(
-		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
-		'utf8'
-	)
-);
 const policyExceptions = JSON.parse(
 	readFileSync(
 		path.join( ROOT_DIR, 'test/unit/vitest-policy-exceptions.json' ),
@@ -47,8 +41,7 @@ const policyExceptions = JSON.parse(
 	)
 );
 const vitestTestsByProject = getVitestTestsByProject(
-	discoverTestFiles( ROOT_DIR ),
-	migration
+	discoverTestFiles( ROOT_DIR )
 );
 const vitestTests = Object.values( vitestTestsByProject ).flat().sort();
 const vitestTestSet = new Set( vitestTests );

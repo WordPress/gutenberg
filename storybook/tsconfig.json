@@ -5,7 +5,7 @@
 		"jsx": "react-jsx",
 		"rootDir": ".",
 		"noEmit": true,
-		"types": [ "jest" ]
+		"types": []
 	},
 	"include": [
 		"**/*.tsx",

@@ -63,7 +63,12 @@ if ( ! rootSolutionReferences.has( buildSolutionPath ) ) {
 }
 
 /* Ambient types only test files may use. */
-const TEST_TYPES = new Set( [ 'jest', 'gutenberg-test-env' ] );
+const TEST_TYPES = new Set( [
+	'jest',
+	'gutenberg-test-env',
+	'gutenberg-vitest-test-env',
+	'vitest/globals',
+] );
 
 /*
  * A package exclude replaces the inherited one, so a build project that sets
@@ -105,7 +110,7 @@ function isDevProject( tsconfigPath ) {
 
 /**
  * Returns the projects of a package: src, dev files, and, where stories are
- * type checked against sources without jest types, `tsconfig.stories.json`.
+ * type checked against sources without test types, `tsconfig.stories.json`.
  *
  * @param {string} packageName Package directory name.
  * @return {{srcProject: string|undefined, devProject: string|undefined, storiesProject: string|undefined}} Absolute paths.
@@ -256,7 +261,7 @@ for ( const packageName of packagesWithTypes ) {
 		const buildTypes =
 			readTsconfig( srcProject ).compilerOptions?.types ?? [];
 		const devTypes = readTsconfig( devProject ).compilerOptions?.types ?? [
-			'jest',
+			'gutenberg-vitest-test-env',
 		];
 		for ( const type of buildTypes ) {
 			if ( TEST_TYPES.has( type ) ) {
