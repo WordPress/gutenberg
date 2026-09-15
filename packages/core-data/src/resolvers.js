@@ -718,8 +718,11 @@ canUser.getResolutionArgs = ( action, resource, id ) => [ resource, id ];
  * @param {string}        name     Entity name.
  * @param {number|string} recordId Record's id.
  */
-export const canUserEditEntityRecord = ( kind, name, recordId ) =>
-	canUser( { kind, name, id: recordId } );
+export const canUserEditEntityRecord =
+	( kind, name, recordId ) =>
+	async ( { resolveSelect } ) => {
+		await resolveSelect.canUser( 'update', { kind, name, id: recordId } );
+	};
 
 /**
  * Request autosave data from the REST API.
