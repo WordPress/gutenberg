@@ -88,6 +88,7 @@ const UnconnectedMenu = ( props: Props ) => {
  * component, and the `Menu.Popover` component.
  *
  * This component is deprecated. Continue using `DropdownMenu` for now.
+ * You can try `Menu` from `@wordpress/ui`, but it is not yet recommended.
  *
  * @deprecated
  */
