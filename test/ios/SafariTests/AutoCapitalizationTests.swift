@@ -48,14 +48,27 @@ final class AutoCapitalizationTests: XCTestCase {
 	}
 
 	/// Taps the letters as given, without touching shift: the keyboard's own
-	/// state decides the case that lands in the field.
+	/// state decides the case that lands in the field. A slow runner can drop
+	/// the first tap after the keyboard appears, so each letter is tapped
+	/// again when it does not land.
 	func type( _ word: String ) {
 		if key( "letters" ).exists {
 			key( "letters" ).tap()
 		}
 		for letter in word {
+			let before = caretLine.count
 			key( String( letter ) ).tap()
+			if !waitForCaretLine( count: before + 1 ) {
+				key( String( letter ) ).tap()
+				XCTAssertTrue( waitForCaretLine( count: before + 1 ), "The letter \( letter ) did not land" )
+			}
 		}
+	}
+
+	func waitForCaretLine( count: Int ) -> Bool {
+		let landed = NSPredicate { _, _ in self.caretLine.count == count }
+		let done = XCTNSPredicateExpectation( predicate: landed, object: nil )
+		return XCTWaiter.wait( for: [ done ], timeout: 2 ) == .completed
 	}
 
 	/// Waits until the field with the keyboard is an empty one with this
