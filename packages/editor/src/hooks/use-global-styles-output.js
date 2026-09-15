@@ -8,10 +8,6 @@ import { useGlobalStyles } from '../components/global-styles';
 /**
  * Returns the global styles output based on the provided global styles config.
  *
- * Whether the theme supports block gap is derived by the styles engine from
- * the `spacing.blockGap` setting of the config being rendered, matching the
- * server-side check.
- *
  * @param {Object}  mergedConfig       The merged global styles config.
  * @param {boolean} disableRootPadding Disable root padding styles.
  *
