@@ -10,6 +10,7 @@ import {
 	placementToMotionAnimationProps,
 } from '../utils';
 import Popover from '..';
+import { Provider as SlotFillProvider } from '../../slot-fill';
 import type { PopoverProps } from '../types';
 import { PopoverInsideIframeRenderedInExternalSlot } from './utils/index.js';
 
@@ -266,23 +267,59 @@ describe( 'Popover', () => {
 			const setup = async (
 				props?: Partial< React.ComponentProps< typeof Popover > >
 			) => {
-				const user = await userEvent.setup();
+				const user = userEvent.setup();
+				function Test() {
+					const [ isOpen, setIsOpen ] = useState( false );
+					return (
+						<>
+							<button onClick={ () => setIsOpen( true ) }>
+								Before popover
+							</button>
+							<Popover.Slot />
+							{ isOpen && (
+								<Popover
+									data-testid="popover-element"
+									{ ...props }
+								>
+									<button>Button 1</button>
+									<button>Button 2</button>
+									<button>Button 3</button>
+								</Popover>
+							) }
+							<button>After popover</button>
+						</>
+					);
+				}
 				const view = await render(
-					<Popover data-testid="popover-element" { ...props }>
-						<button>Button 1</button>
-						<button>Button 2</button>
-						<button>Button 3</button>
-					</Popover>
+					<SlotFillProvider>
+						<Test />
+					</SlotFillProvider>
 				);
+				const beforeButton = screen.getByRole( 'button', {
+					name: 'Before popover',
+				} );
+				const afterButton = screen.getByRole( 'button', {
+					name: 'After popover',
+				} );
+				await user.click( beforeButton );
 
 				const popover = screen.getByTestId( 'popover-element' );
 				await waitFor( () => expect( popover ).toBeVisible() );
 
-				const [ firstButton, secondButton, thirdButton ] =
-					screen.getAllByRole( 'button' );
+				const firstButton = screen.getByRole( 'button', {
+					name: 'Button 1',
+				} );
+				const secondButton = screen.getByRole( 'button', {
+					name: 'Button 2',
+				} );
+				const thirdButton = screen.getByRole( 'button', {
+					name: 'Button 3',
+				} );
 
 				return {
 					...view,
+					beforeButton,
+					afterButton,
 					popover,
 					firstButton,
 					secondButton,
@@ -351,7 +388,7 @@ describe( 'Popover', () => {
 				test( 'when `focusOnMount` is false if `constrainTabbing` is true', async () => {
 					const {
 						user,
-						baseElement,
+						beforeButton,
 						firstButton,
 						secondButton,
 						thirdButton,
@@ -360,7 +397,7 @@ describe( 'Popover', () => {
 						constrainTabbing: true,
 					} );
 
-					expect( baseElement ).toHaveFocus();
+					expect( beforeButton ).toHaveFocus();
 					await user.tab();
 					expect( firstButton ).toHaveFocus();
 					await user.tab();
@@ -382,7 +419,8 @@ describe( 'Popover', () => {
 
 					const {
 						user,
-						baseElement,
+						beforeButton,
+						afterButton,
 						firstButton,
 						secondButton,
 						thirdButton,
@@ -394,23 +432,28 @@ describe( 'Popover', () => {
 					await user.tab();
 					expect( thirdButton ).toHaveFocus();
 					await user.tab();
-					expect( baseElement ).toHaveFocus();
-					await user.tab();
+					expect( afterButton ).toHaveFocus();
+					await user.tab( { shift: true } );
+					expect( thirdButton ).toHaveFocus();
+					await user.tab( { shift: true } );
+					expect( secondButton ).toHaveFocus();
+					await user.tab( { shift: true } );
 					expect( firstButton ).toHaveFocus();
 					await user.tab( { shift: true } );
-					expect( baseElement ).toHaveFocus();
+					expect( beforeButton ).toHaveFocus();
 				} );
 
 				test( 'when `focusOnMount` is false', async () => {
 					const {
 						user,
-						baseElement,
+						beforeButton,
+						afterButton,
 						firstButton,
 						secondButton,
 						thirdButton,
 					} = await setup( { focusOnMount: false } );
 
-					expect( baseElement ).toHaveFocus();
+					expect( beforeButton ).toHaveFocus();
 					await user.tab();
 					expect( firstButton ).toHaveFocus();
 					await user.tab();
@@ -418,17 +461,22 @@ describe( 'Popover', () => {
 					await user.tab();
 					expect( thirdButton ).toHaveFocus();
 					await user.tab();
-					expect( baseElement ).toHaveFocus();
-					await user.tab();
+					expect( afterButton ).toHaveFocus();
+					await user.tab( { shift: true } );
+					expect( thirdButton ).toHaveFocus();
+					await user.tab( { shift: true } );
+					expect( secondButton ).toHaveFocus();
+					await user.tab( { shift: true } );
 					expect( firstButton ).toHaveFocus();
 					await user.tab( { shift: true } );
-					expect( baseElement ).toHaveFocus();
+					expect( beforeButton ).toHaveFocus();
 				} );
 
 				test( 'when `focusOnMount` is true if `constrainTabbing` is false', async () => {
 					const {
 						user,
-						baseElement,
+						beforeButton,
+						afterButton,
 						popover,
 						firstButton,
 						secondButton,
@@ -446,17 +494,22 @@ describe( 'Popover', () => {
 					await user.tab();
 					expect( thirdButton ).toHaveFocus();
 					await user.tab();
-					expect( baseElement ).toHaveFocus();
-					await user.tab();
+					expect( afterButton ).toHaveFocus();
+					await user.tab( { shift: true } );
+					expect( thirdButton ).toHaveFocus();
+					await user.tab( { shift: true } );
+					expect( secondButton ).toHaveFocus();
+					await user.tab( { shift: true } );
 					expect( firstButton ).toHaveFocus();
 					await user.tab( { shift: true } );
-					expect( baseElement ).toHaveFocus();
+					expect( beforeButton ).toHaveFocus();
 				} );
 
 				test( 'when `focusOnMount` is "firstElement" if `constrainTabbing` is false', async () => {
 					const {
 						user,
-						baseElement,
+						beforeButton,
+						afterButton,
 						firstButton,
 						secondButton,
 						thirdButton,
@@ -471,11 +524,15 @@ describe( 'Popover', () => {
 					await user.tab();
 					expect( thirdButton ).toHaveFocus();
 					await user.tab();
-					expect( baseElement ).toHaveFocus();
-					await user.tab();
+					expect( afterButton ).toHaveFocus();
+					await user.tab( { shift: true } );
+					expect( thirdButton ).toHaveFocus();
+					await user.tab( { shift: true } );
+					expect( secondButton ).toHaveFocus();
+					await user.tab( { shift: true } );
 					expect( firstButton ).toHaveFocus();
 					await user.tab( { shift: true } );
-					expect( baseElement ).toHaveFocus();
+					expect( beforeButton ).toHaveFocus();
 				} );
 			} );
 		} );
