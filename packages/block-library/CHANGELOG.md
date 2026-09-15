@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Cover: Allow video backgrounds to use the "Fixed background" (parallax) option, matching image backgrounds. Videos cannot use `background-attachment: fixed`, so the video is pinned to the viewport and clipped to the block's bounds, with fallbacks/preferences ([#74289](https://github.com/WordPress/gutenberg/pull/74289)).
+
 ### Bug Fixes
 
 -   Image: Inject the lightbox trigger with a literal string replacement instead of `preg_replace`, so `$` and `\` sequences in author-controlled image attributes (such as a price in the alt text) are no longer interpreted as regex backreferences and silently removed ([#79369](https://github.com/WordPress/gutenberg/pull/79369)).
