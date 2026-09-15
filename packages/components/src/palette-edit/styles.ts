@@ -52,11 +52,6 @@ export const PaletteHeading = styled( Heading )`
 	}
 `;
 
-export const PaletteActionsContainer = styled( View )`
-	height: ${ space( 6 ) };
-	display: flex;
-`;
-
 export const PaletteEditContents = styled( View )`
 	margin-top: ${ space( 2 ) };
 `;

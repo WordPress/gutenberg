@@ -350,7 +350,7 @@ Both extend shared base configurations (comments are not necessary):
 // tsconfig.build.json
 {
 	// Extends a base configuration common to most packages.
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 
 	// Dependencies that have opted in to TypeScript are referenced here: a
 	// split one by its build project, one on a single config by its
@@ -367,7 +367,7 @@ Both extend shared base configurations (comments are not necessary):
 {
 	// Extends the shared dev project configuration (noEmit, jest types,
 	// test and story includes).
-	"extends": "../../tsconfig.dev.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 
 	// The dev project checks against the build project's declarations.
 	"references": [ { "path": "./tsconfig.build.json" } ]
@@ -383,7 +383,7 @@ Two rules keep the projects consistent, and `npm run lint:tsconfig` enforces bot
 -   The build project excludes every dev file (`**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/stories/**`, `**/*.story.*`) and never lists a test type such as `jest` or `gutenberg-test-env` in `types`, so `src` cannot use test globals and no dev declaration is published. A package `exclude` replaces the inherited one, so list all of them.
 -   The dev project's `types` starts from the build project's list and adds `jest`, so tests see every ambient type the sources see. Ambient types only dev files need (`@types/jest`, `@types/node`, `@testing-library/jest-dom`) belong in the package's own `devDependencies`.
 
-A few packages emit declarations through a different layout and keep only the parts of the split that apply. `jest-console` compiles nothing: a dev project checks its TypeScript sources and tests, and the package ships a handwritten `declarations.d.ts` instead of `build-types`. `interactivity-router` pairs its dev project with two specialized build projects (`tsconfig.main.json` and `tsconfig.full-page.json`), which take the standard build project's place in the root `tsconfig.build.json` references. The rules above still apply to whichever projects such a package has.
+A few packages emit declarations through a different layout and keep only the parts of the split that apply. `interactivity-router` pairs its dev project with two specialized build projects (`tsconfig.main.json` and `tsconfig.full-page.json`), which take the standard build project's place in the root `tsconfig.build.json` references. The rules above still apply to whichever projects such a package has.
 
 The build project inherits `rootDir`, `declarationDir`, and `include` from the base configuration, so a package only sets what differs. Test files that do not type check yet are listed in the dev project's `exclude` with a comment, so the debt stays visible per file.
 

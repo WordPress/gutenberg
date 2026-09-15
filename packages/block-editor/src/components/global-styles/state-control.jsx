@@ -16,6 +16,7 @@ import { Stack } from '@wordpress/ui';
  * @param {Function} props.onChangePseudoState Callback when pseudo state selection changes.
  * @param {boolean}  props.showText            Whether to show text label on the toggle. Default true.
  * @param {Object}   props.popoverProps        Popover props for the dropdown menu.
+ * @param {Element}  props.children            Optional menu content rendered after the state groups.
  * @return {Element|null} State control component.
  */
 export default function StateControl( {
@@ -27,6 +28,7 @@ export default function StateControl( {
 	onChangePseudoState,
 	showText = true,
 	popoverProps = {},
+	children,
 } ) {
 	if ( ! viewportStates.length && ! pseudoStates.length ) {
 		return null;
@@ -120,7 +122,10 @@ export default function StateControl( {
 										key={ `viewport-${ option.value }` }
 										onClick={ () => {
 											onChangeViewport?.( option.value );
-											if ( ! hasPseudoStateOptions ) {
+											if (
+												! hasPseudoStateOptions &&
+												! children
+											) {
 												onClose();
 											}
 										} }
@@ -144,7 +149,10 @@ export default function StateControl( {
 											onChangePseudoState?.(
 												option.value
 											);
-											if ( ! hasViewportOptions ) {
+											if (
+												! hasViewportOptions &&
+												! children
+											) {
 												onClose();
 											}
 										} }
@@ -159,6 +167,7 @@ export default function StateControl( {
 								) ) }
 							</MenuGroup>
 						) }
+						{ children }
 					</>
 				) }
 			</DropdownMenu>
