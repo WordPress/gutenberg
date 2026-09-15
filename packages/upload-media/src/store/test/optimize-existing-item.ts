@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry } from '@wordpress/data';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 import { store as uploadStore } from '..';
@@ -7,27 +8,27 @@ import { StubFile } from '../../stub-file';
 import { ErrorCode } from '../../upload-error';
 import { isClientSideMediaSupported } from '../../feature-detection';
 
-jest.mock( '@wordpress/blob', () => ( {
+vi.mock( '@wordpress/blob', () => ( {
 	__esModule: true,
-	createBlobURL: jest.fn( () => 'blob:foo' ),
-	isBlobURL: jest.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
-	revokeBlobURL: jest.fn(),
+	createBlobURL: vi.fn( () => 'blob:foo' ),
+	isBlobURL: vi.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
+	revokeBlobURL: vi.fn(),
 } ) );
 
-jest.mock( '../utils', () => ( {
-	vipsCancelOperations: jest.fn( () => Promise.resolve( true ) ),
-	vipsConvertImageFormat: jest.fn(),
-	vipsResizeImage: jest.fn(),
-	vipsRotateImage: jest.fn(),
-	vipsHasTransparency: jest.fn( () => Promise.resolve( false ) ),
-	vipsGetUltraHdrInfo: jest.fn(),
-	terminateVipsWorker: jest.fn(),
-	maybeRecycleVipsWorker: jest.fn(),
+vi.mock( '../utils', () => ( {
+	vipsCancelOperations: vi.fn( () => Promise.resolve( true ) ),
+	vipsConvertImageFormat: vi.fn(),
+	vipsResizeImage: vi.fn(),
+	vipsRotateImage: vi.fn(),
+	vipsHasTransparency: vi.fn( () => Promise.resolve( false ) ),
+	vipsGetUltraHdrInfo: vi.fn(),
+	terminateVipsWorker: vi.fn(),
+	maybeRecycleVipsWorker: vi.fn(),
 } ) );
 
-jest.mock( '../../feature-detection', () => ( {
-	isClientSideMediaSupported: jest.fn( () => true ),
-	exceedsClientProcessingMemory: jest.fn( () => false ),
+vi.mock( '../../feature-detection', () => ( {
+	isClientSideMediaSupported: vi.fn( () => true ),
+	exceedsClientProcessingMemory: vi.fn( () => false ),
 } ) );
 
 function createRegistryWithStores() {
@@ -39,8 +40,8 @@ function createRegistryWithStores() {
 describe( 'optimizeExistingItem', () => {
 	let registry: WPDataRegistry;
 	beforeEach( () => {
-		jest.clearAllMocks();
-		( isClientSideMediaSupported as jest.Mock ).mockReturnValue( true );
+		vi.clearAllMocks();
+		( isClientSideMediaSupported as vi.Mock ).mockReturnValue( true );
 		registry = createRegistryWithStores();
 		unlock( registry.dispatch( uploadStore ) ).pauseQueue();
 	} );
@@ -86,8 +87,8 @@ describe( 'optimizeExistingItem', () => {
 	} );
 
 	it( 'does not enqueue and reports an error when unsupported', async () => {
-		( isClientSideMediaSupported as jest.Mock ).mockReturnValue( false );
-		const onError = jest.fn();
+		( isClientSideMediaSupported as vi.Mock ).mockReturnValue( false );
+		const onError = vi.fn();
 
 		await registry.dispatch( uploadStore ).optimizeExistingItem( {
 			id: 7,
@@ -102,7 +103,7 @@ describe( 'optimizeExistingItem', () => {
 	} );
 
 	it( 'does not enqueue non-image file types', async () => {
-		const onError = jest.fn();
+		const onError = vi.fn();
 
 		await registry.dispatch( uploadStore ).optimizeExistingItem( {
 			id: 8,
@@ -139,7 +140,7 @@ describe( 'fetchRemoteFile', () => {
 	const originalFetch = global.fetch;
 
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		registry = createRegistryWithStores();
 		unlock( registry.dispatch( uploadStore ) ).pauseQueue();
 	} );
@@ -148,7 +149,7 @@ describe( 'fetchRemoteFile', () => {
 		global.fetch = originalFetch;
 	} );
 
-	async function addStubItem( onError?: jest.Mock ) {
+	async function addStubItem( onError?: vi.Mock ) {
 		await unlock( registry.dispatch( uploadStore ) ).addItem( {
 			file: new StubFile(),
 			onError,
@@ -170,11 +171,11 @@ describe( 'fetchRemoteFile', () => {
 	}
 
 	it( 'downloads and renames the file, then advances the queue', async () => {
-		global.fetch = jest.fn().mockResolvedValue( {
+		global.fetch = vi.fn().mockResolvedValue( {
 			ok: true,
 			blob: async () =>
 				new Blob( [ 'image-bytes' ], { type: 'image/jpeg' } ),
-		} ) as jest.Mock;
+		} ) as vi.Mock;
 
 		const item = await addStubItem();
 
@@ -198,11 +199,11 @@ describe( 'fetchRemoteFile', () => {
 	} );
 
 	it( 'cancels the item and reports an error when the fetch fails', async () => {
-		global.fetch = jest
+		global.fetch = vi
 			.fn()
-			.mockResolvedValue( { ok: false, status: 404 } ) as jest.Mock;
+			.mockResolvedValue( { ok: false, status: 404 } ) as vi.Mock;
 
-		const onError = jest.fn();
+		const onError = vi.fn();
 		const item = await addStubItem( onError );
 
 		await unlock( registry.dispatch( uploadStore ) ).fetchRemoteFile(
