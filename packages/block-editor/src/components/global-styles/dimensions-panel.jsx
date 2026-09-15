@@ -25,7 +25,7 @@ import {
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceEnabled,
+	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
@@ -349,7 +349,7 @@ export default function DimensionsPanel( {
 	includeLayoutControls = false,
 	allowAxialBlockGap = true,
 	styleState = DEFAULT_BLOCK_STYLE_STATE,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 } ) {
 	const { dimensions, spacing } = settings;
 
