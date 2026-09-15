@@ -8,13 +8,7 @@ const { mockSyncManager, mockCreateSyncManager } = vi.hoisted( () => {
 } );
 
 vi.mock( '@wordpress/sync', () => ( {
-	privateApis: {
-		createSyncManager: mockCreateSyncManager,
-	},
-} ) );
-
-vi.mock( '../lock-unlock', () => ( {
-	unlock: ( privateApis ) => privateApis,
+	createSyncManager: mockCreateSyncManager,
 } ) );
 
 async function loadSync() {
