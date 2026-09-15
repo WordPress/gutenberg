@@ -19,6 +19,8 @@
 
 ### Internal
 
+-   Template options: Use the public `Menu` from `@wordpress/ui`.
+
 -   Notes: Use the public `@wordpress/ui` Menu for note actions instead of the private Components API ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
 -   Post actions: Use the public `Menu` from `@wordpress/ui` instead of the private Components API ([#81922](https://github.com/WordPress/gutenberg/pull/81922)).
 

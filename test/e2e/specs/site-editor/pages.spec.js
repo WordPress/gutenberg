@@ -385,7 +385,7 @@ test.describe( 'Pages', () => {
 		await expect(
 			page
 				.getByRole( 'menu', { name: 'Template options' } )
-				.getByText( 'Change template' )
+				.getByRole( 'menuitem', { name: 'Change template' } )
 		).toBeDisabled();
 	} );
 

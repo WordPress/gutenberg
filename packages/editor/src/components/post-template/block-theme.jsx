@@ -1,18 +1,20 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
-import { useState, useMemo } from '@wordpress/element';
+import { Button } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu } from '@wordpress/ui';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
-import { check } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
-import SwapTemplateButton from './swap-template-button';
+import SwapTemplateButton, { SwapTemplateModal } from './swap-template-button';
 import ResetDefaultTemplate from './reset-default-template';
 import { unlock } from '../../lock-unlock';
 import CreateNewTemplate from './create-new-template';
+import CreateNewTemplateModal from './create-new-template-modal';
 
 export default function BlockThemeControl() {
 	const {
@@ -63,19 +65,7 @@ export default function BlockThemeControl() {
 	);
 
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
-	// Memoize popoverProps to avoid returning a new object every time.
-	const popoverProps = useMemo(
-		() => ( {
-			// Anchor the popover to the middle of the entire row so that it doesn't
-			// move around when the label changes.
-			anchor: popoverAnchor,
-			className: 'editor-post-template__dropdown',
-			placement: 'left-start',
-			offset: 36,
-			shift: true,
-		} ),
-		[ popoverAnchor ]
-	);
+	const [ activeModal, setActiveModal ] = useState( null );
 
 	if ( ! hasResolved ) {
 		return null;
@@ -104,67 +94,97 @@ export default function BlockThemeControl() {
 		}
 	};
 	return (
-		<PostPanelRow label={ __( 'Template' ) } ref={ setPopoverAnchor }>
-			<DropdownMenu
-				popoverProps={ popoverProps }
-				focusOnMount
-				toggleProps={ {
-					size: 'compact',
-					variant: 'tertiary',
-					tooltipPosition: 'middle left',
-				} }
-				label={ __( 'Template options' ) }
-				text={ decodeEntities( template.title ) }
-				icon={ null }
-			>
-				{ ( { onClose } ) => (
-					<>
-						<MenuGroup>
+		<>
+			<PostPanelRow label={ __( 'Template' ) } ref={ setPopoverAnchor }>
+				<Menu.Root>
+					<Menu.Trigger
+						render={
+							<Button
+								size="compact"
+								variant="tertiary"
+								tooltipPosition="middle left"
+								label={ __( 'Template options' ) }
+							/>
+						}
+					>
+						{ decodeEntities( template.title ) }
+					</Menu.Trigger>
+					<Menu.Popup
+						className="editor-post-template__dropdown"
+						positioner={
+							<Menu.Positioner
+								anchor={ popoverAnchor }
+								side="left"
+								align="start"
+								sideOffset={ 36 }
+							/>
+						}
+					>
+						<Menu.Group>
 							{ canCreateTemplate && (
-								<MenuItem
+								<Menu.Item
 									onClick={ () => {
 										onNavigateToEntityRecord( {
 											postId: template.id,
 											postType: 'wp_template',
 										} );
-										onClose();
 										mayShowTemplateEditNotice();
 									} }
 								>
-									{ __( 'Edit template' ) }
-								</MenuItem>
+									<Menu.ItemLabel>
+										{ __( 'Edit template' ) }
+									</Menu.ItemLabel>
+								</Menu.Item>
 							) }
-
-							<SwapTemplateButton onClick={ onClose } />
-							<ResetDefaultTemplate onClick={ onClose } />
-							{ canCreateTemplate && <CreateNewTemplate /> }
-						</MenuGroup>
+							<SwapTemplateButton
+								onClick={ () => setActiveModal( 'swap' ) }
+							/>
+							<ResetDefaultTemplate />
+							{ canCreateTemplate && (
+								<CreateNewTemplate
+									onClick={ () => setActiveModal( 'create' ) }
+								/>
+							) }
+						</Menu.Group>
 						{ ! hasRenderingMode && (
-							<MenuGroup>
-								<MenuItem
-									icon={
-										! isTemplateHidden ? check : undefined
-									}
-									isSelected={ ! isTemplateHidden }
-									role="menuitemcheckbox"
-									onClick={ () => {
-										const newRenderingMode =
-											isTemplateHidden
+							<>
+								<Menu.Separator />
+								<Menu.Group>
+									<Menu.CheckboxItem
+										checked={ ! isTemplateHidden }
+										closeOnClick={ false }
+										onCheckedChange={ ( checked ) => {
+											const newRenderingMode = checked
 												? 'template-locked'
 												: 'post-only';
-										setRenderingMode( newRenderingMode );
-										setDefaultRenderingMode(
-											newRenderingMode
-										);
-									} }
-								>
-									{ __( 'Show template' ) }
-								</MenuItem>
-							</MenuGroup>
+											setRenderingMode(
+												newRenderingMode
+											);
+											setDefaultRenderingMode(
+												newRenderingMode
+											);
+										} }
+									>
+										<Menu.ItemLabel>
+											{ __( 'Show template' ) }
+										</Menu.ItemLabel>
+									</Menu.CheckboxItem>
+								</Menu.Group>
+							</>
 						) }
-					</>
-				) }
-			</DropdownMenu>
-		</PostPanelRow>
+					</Menu.Popup>
+				</Menu.Root>
+			</PostPanelRow>
+			{ activeModal === 'swap' && (
+				<SwapTemplateModal
+					onRequestClose={ () => setActiveModal( null ) }
+				/>
+			) }
+			{ activeModal === 'create' && (
+				<CreateNewTemplateModal
+					onClose={ () => setActiveModal( null ) }
+				/>
+			) }
+		</>
 	);
 }
