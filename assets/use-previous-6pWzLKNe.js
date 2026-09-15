@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-DiifJuVD.js";import{n as r,t as s}from"./react-jbyP5ryc.js";function usePrevious(e){const r=(0,s.useRef)(void 0);return(0,s.useEffect)(()=>{r.current=e},[e]),r.current}function init_use_previous(){return(init_use_previous=e(()=>{r()}))()}export{usePrevious as n,init_use_previous as t};
