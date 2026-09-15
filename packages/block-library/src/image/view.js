@@ -30,6 +30,39 @@ const touchStartEvent = {
 	startTime: 0,
 };
 
+/**
+ * Per-gesture state for the in-progress horizontal drag on the lightbox.
+ *
+ * `direction` latches to 'horizontal' or 'vertical' once the gesture exceeds a
+ * small disambiguation threshold; vertical gestures bypass the drag-tracking
+ * path so native scroll suppression keeps working unchanged.
+ */
+const touchDrag = {
+	isDragging: false,
+	direction: 'unknown',
+	overlayEl: null,
+	// Pending id for the post-commit slide timer, so a rapid follow-up gesture
+	// can cancel it before it resets the offset mid-swipe.
+	slideTimeout: 0,
+};
+
+// Duration of the commit slide, in milliseconds. Must stay in sync with the
+// `transition: transform` duration on `.is-animating-slide` in `style.scss`.
+const SLIDE_TRANSITION_MS = 220;
+
+// Movement (px) needed before a gesture latches to horizontal or vertical.
+const DIRECTION_LATCH_THRESHOLD_PX = 10;
+
+// Horizontal movement must exceed vertical by this ratio to count as a swipe.
+const HORIZONTAL_DOMINANCE_RATIO = 1.5;
+
+// Fraction of the viewport width a drag must pass to commit to the next image.
+const COMMIT_DISTANCE_RATIO = 0.2;
+
+// A short, fast horizontal flick commits even below the distance threshold.
+const FLICK_DISTANCE_PX = 50;
+const FLICK_MAX_DURATION_MS = 300;
+
 const focusableSelectors = [
 	'.wp-lightbox-close-button',
 	'.wp-lightbox-navigation-button',
@@ -285,14 +318,51 @@ const { state, actions, callbacks } = store(
 				}
 			} ),
 			handleTouchMove: withSyncEvent( ( event ) => {
-				// On mobile devices, prevents triggering the scroll event because
-				// otherwise the page jumps around when it resets the scroll position.
-				// This also means that closing the lightbox requires that a user
-				// perform a simple tap. This may be changed in the future if there is a
-				// better alternative to override or reset the scroll position during
-				// swipe actions.
-				if ( state.overlayEnabled ) {
-					event.preventDefault();
+				if ( ! state.overlayEnabled ) {
+					return;
+				}
+
+				// Prevents triggering the scroll event because otherwise the page
+				// jumps around when it resets the scroll position. This also means
+				// that closing the lightbox requires a simple tap. May change in
+				// the future with a better way to reset scroll during swipes.
+				event.preventDefault();
+
+				const t = event.touches && event.touches[ 0 ];
+				if ( ! t || ! state.hasNavigation ) {
+					return;
+				}
+
+				const deltaX = t.clientX - touchStartEvent.startX;
+				const deltaY = t.clientY - touchStartEvent.startY;
+				const absDeltaX = Math.abs( deltaX );
+				const absDeltaY = Math.abs( deltaY );
+
+				// Latches direction once the user has moved past a small
+				// disambiguation threshold, then sticks with that decision for the
+				// rest of the gesture.
+				if (
+					touchDrag.direction === 'unknown' &&
+					( absDeltaX > DIRECTION_LATCH_THRESHOLD_PX ||
+						absDeltaY > DIRECTION_LATCH_THRESHOLD_PX )
+				) {
+					touchDrag.direction =
+						absDeltaX > absDeltaY ? 'horizontal' : 'vertical';
+					touchDrag.overlayEl = event.currentTarget;
+				}
+
+				if (
+					touchDrag.direction === 'horizontal' &&
+					touchDrag.overlayEl
+				) {
+					touchDrag.isDragging = true;
+					touchDrag.overlayEl.classList.remove(
+						'is-animating-slide'
+					);
+					touchDrag.overlayEl.style.setProperty(
+						'--wp--lightbox-drag-offset',
+						`${ deltaX }px`
+					);
 				}
 			} ),
 			handleTouchStart( event ) {
@@ -303,6 +373,15 @@ const { state, actions, callbacks } = store(
 					touchStartEvent.startY = t.clientY;
 					touchStartEvent.startTime = Date.now();
 				}
+				// Cancels a still-pending slide from the previous gesture so it
+				// can't reset the offset in the middle of this new one.
+				if ( touchDrag.slideTimeout ) {
+					clearTimeout( touchDrag.slideTimeout );
+					touchDrag.slideTimeout = 0;
+				}
+				touchDrag.isDragging = false;
+				touchDrag.direction = 'unknown';
+				touchDrag.overlayEl = null;
 			},
 			handleTouchEnd: withSyncEvent( ( event ) => {
 				const touchEndEvent =
@@ -318,26 +397,77 @@ const { state, actions, callbacks } = store(
 					const absDeltaX = Math.abs( deltaX );
 					const absDeltaY = Math.abs( deltaY );
 					const elapsedMs = now - touchStartEvent.startTime;
-					const isHorizontalSwipe =
-						// Swipe distance is greater than 50px
-						absDeltaX > 50 &&
-						// Horizontal movement is much larger than the vertical movement
-						absDeltaX > absDeltaY * 1.5 &&
-						// Fast action of less than 800ms
-						elapsedMs < 800;
+					const isHorizontalDominant =
+						absDeltaX > absDeltaY * HORIZONTAL_DOMINANCE_RATIO;
+					const pastDistanceThreshold =
+						absDeltaX > window.innerWidth * COMMIT_DISTANCE_RATIO;
+					const isFastFlick =
+						absDeltaX > FLICK_DISTANCE_PX &&
+						elapsedMs < FLICK_MAX_DURATION_MS;
+					const shouldCommit =
+						touchDrag.isDragging &&
+						isHorizontalDominant &&
+						( pastDistanceThreshold || isFastFlick );
 
-					if ( isHorizontalSwipe ) {
+					if ( touchDrag.isDragging ) {
 						event.preventDefault();
-						if ( deltaX < 0 ) {
-							actions.showNextImage( event );
+						const overlayEl = touchDrag.overlayEl;
+						const prefersReducedMotion = window.matchMedia(
+							'(prefers-reduced-motion: reduce)'
+						).matches;
+						const direction = deltaX < 0 ? 'next' : 'previous';
+
+						const advance = () => {
+							touchDrag.slideTimeout = 0;
+							overlayEl.classList.remove( 'is-animating-slide' );
+							overlayEl.style.setProperty(
+								'--wp--lightbox-drag-offset',
+								'0px'
+							);
+							if ( shouldCommit ) {
+								if ( direction === 'next' ) {
+									actions.showNextImage( event );
+								} else {
+									actions.showPreviousImage( event );
+								}
+								// Re-triggers the fade-in animation on rapid
+								// successive swipes by toggling the class with a
+								// forced reflow in between.
+								overlayEl.classList.remove( 'is-fading-in' );
+								// eslint-disable-next-line no-unused-expressions
+								overlayEl.offsetWidth;
+								overlayEl.classList.add( 'is-fading-in' );
+							}
+						};
+
+						if ( prefersReducedMotion ) {
+							advance();
 						} else {
-							actions.showPreviousImage( event );
+							overlayEl.classList.add( 'is-animating-slide' );
+							let commitOffset = 0;
+							if ( shouldCommit ) {
+								commitOffset =
+									deltaX < 0
+										? -window.innerWidth
+										: window.innerWidth;
+							}
+							overlayEl.style.setProperty(
+								'--wp--lightbox-drag-offset',
+								`${ commitOffset }px`
+							);
+							touchDrag.slideTimeout = setTimeout(
+								withScope( advance ),
+								SLIDE_TRANSITION_MS
+							);
 						}
 					}
 				}
 
 				lastTouchTime = now;
 				isTouching = false;
+				touchDrag.isDragging = false;
+				touchDrag.direction = 'unknown';
+				touchDrag.overlayEl = null;
 			} ),
 			handleScroll() {
 				// Prevents scrolling behaviors that trigger content shift while the
