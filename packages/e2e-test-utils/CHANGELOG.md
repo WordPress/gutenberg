@@ -5,6 +5,7 @@
 ### Enhancement
 
 -    Increase the `waitForSelector` timeout in `activatePlugin`/`deactivatePlugin` from Puppeteer's 30-second default to 60 seconds, to avoid spurious CI failures under resource contention.
+-    Retry `activatePlugin`/`deactivatePlugin`'s click-and-wait sequence up to 3 times if the 60-second wait above still times out, since these usually run in a `beforeAll`/`afterAll` hook that doesn't benefit from Jest's own test-level retry safety net.
 
 ## 10.13.0 (2023-09-20)
 
