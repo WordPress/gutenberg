@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Error boundary: Announce only the error message instead of the entire notice and its action labels. ([#82737](https://github.com/WordPress/gutenberg/pull/82737))
+-   Error boundary: Explicitly announce the error title and description, excluding action labels. ([#82737](https://github.com/WordPress/gutenberg/pull/82737))
 -   Open the Welcome Guide from a plain menu item instead of a preference toggle, so the Options menu no longer announces "Preference activated - Welcome Guide" ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
 
 ## 5.55.0 (2026-09-10)
