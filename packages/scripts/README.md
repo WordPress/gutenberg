@@ -480,29 +480,9 @@ npm install --save-dev jest@30.5.0
 
 Use `wp-scripts test-unit-jest` in your npm test command. Jest discovers your project's configuration; pass `--config` for custom filenames such as `jest-unit.config.js`. Scripts no longer bundles Jest, jsdom, the WordPress Jest preset, its Babel transformer, or its GitHub Actions reporter.
 
-Existing suites can keep using the published WordPress Jest packages. Follow [Keep an existing Jest suite](./docs/vitest-migration.md#keep-an-existing-jest-suite) to install their dependencies and restore the previous defaults in a consumer-owned config. Maintenance covers this adapter and the documented legacy setup. New testing features target Vitest.
+Existing suites can keep using the published WordPress Jest packages. Maintenance covers this adapter and the documented legacy setup. New testing features target Vitest.
 
-The default `wp-scripts lint-js` config also switches to Vitest in 36.0.0 and no longer declares Jest globals such as `describe`, `it`, and `expect`. To keep linting Jest tests, install `eslint-plugin-jest` and add an `eslint.config.cjs` in your project. If you already have a custom config, apply the Jest override to your Jest files instead of the public `test-unit` config.
-
-```sh
-npm install --save-dev eslint-plugin-jest
-```
-
-```js
-const wpPlugin = require( '@wordpress/eslint-plugin' );
-const jestPlugin = require( 'eslint-plugin-jest' );
-
-module.exports = [
-	...wpPlugin.configs.recommended,
-	{
-		...jestPlugin.configs[ 'flat/recommended' ],
-		files: [
-			'**/@(test|__tests__)/**/*.{js,jsx,ts,tsx,mjs,cjs}',
-			'**/*.@(test|spec).{js,jsx,ts,tsx,mjs,cjs}',
-		],
-	},
-];
-```
+The default `wp-scripts lint-js` config also switches to Vitest. The [Jest upgrade checklist](./docs/vitest-migration.md#keep-an-existing-jest-suite) covers test commands, dependencies, Jest configuration, and a complete ESLint configuration. You can keep your Jest tests without installing Vitest or Vite.
 
 ### `test-e2e`
 

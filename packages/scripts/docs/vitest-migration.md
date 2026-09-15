@@ -10,23 +10,69 @@ The `test-unit-jest` command remains as a maintenance-only adapter with no sched
 
 ## Keep an existing Jest suite
 
-Switch the npm test command to `wp-scripts test-unit-jest`. Install Jest in the project that owns the tests:
+Follow these steps to upgrade `@wordpress/scripts` while keeping Jest. You can keep your tests, snapshots, and Jest APIs. You do not need to install Vitest or Vite for this path. Leaving `test-unit-js` unchanged selects Vitest, even when a Jest config is present.
+
+### 1. Change the test commands
+
+In `package.json`, replace `test-unit-js` with `test-unit-jest` in every command that runs Jest, including watch, debug, snapshot, and CI commands. Keep your existing script names and Jest arguments.
+
+Before:
+
+```json
+{
+	"scripts": {
+		"test:unit": "wp-scripts test-unit-js",
+		"test:unit:watch": "wp-scripts test-unit-js --watch",
+		"test:unit:debug": "wp-scripts --inspect-brk test-unit-js --runInBand",
+		"test:unit:update": "wp-scripts test-unit-js --updateSnapshot"
+	}
+}
+```
+
+After:
+
+```json
+{
+	"scripts": {
+		"test:unit": "wp-scripts test-unit-jest",
+		"test:unit:watch": "wp-scripts test-unit-jest --watch",
+		"test:unit:debug": "wp-scripts --inspect-brk test-unit-jest --runInBand",
+		"test:unit:update": "wp-scripts test-unit-jest --updateSnapshot"
+	}
+}
+```
+
+The adapter preserves Jest CLI arguments and exit status, and sets `NODE_ENV` and `BABEL_ENV` to `test`. Projects can also invoke Jest directly.
+
+### 2. Install Jest and check its configuration
+
+Choose the case that matches your project.
+
+#### Your Jest configuration is independent of scripts
+
+Install Jest in the project that owns the tests, along with any environments, transforms, or setup packages your configuration references:
 
 ```sh
 npm install --save-dev jest@30.5.0
 ```
 
-The adapter preserves Jest CLI arguments and exit status, and sets `NODE_ENV` and `BABEL_ENV` to `test`. Jest discovers the project's configuration. Pass `--config` for a custom filename, including the old `jest-unit.config.js` name. Projects can also invoke Jest directly.
+Keep your existing configuration. Jest discovers standard names such as `jest.config.js` and `jest.config.cjs`, or the `jest` field in `package.json`. For a custom filename, add `--config` to each test command. The old `jest-unit.config.js` filename needs this argument:
 
-If the project already owns its Jest configuration, keep it and install the dependencies it references. Remove imports of `@wordpress/scripts/config/jest-unit.config`, `@wordpress/scripts/config/babel-transform`, or the scripts GitHub Actions reporter. Those files are no longer shipped. Jest's built-in `github-actions` reporter can replace the removed reporter when needed.
+```sh
+wp-scripts test-unit-jest --config ./jest-unit.config.js
+```
 
-For projects that relied on the previous WordPress defaults, install the published preset and its environment. This is a tested legacy combination, not a requirement to migrate the tests to Vitest:
+If your config imports a file from `@wordpress/scripts/config`, follow the next case to replace the removed defaults.
+
+#### Your suite uses the WordPress defaults from scripts
+
+Install this tested legacy combination:
 
 ```sh
 npm install --save-dev jest@30.5.0 jest-environment-jsdom@30.5.0 @wordpress/jest-preset-default@14.2.0 babel-jest@30.5.0 @babel/core@^7 @wordpress/babel-preset-default@8.55.0
 ```
 
-Create `jest.config.cjs`:
+Create `jest.config.cjs` if you have no Jest configuration. Otherwise, merge these settings into your existing config and preserve your project-specific options. Keep only one Jest configuration, or select it explicitly with `--config`.
 
 ```js
 module.exports = {
@@ -40,11 +86,64 @@ module.exports = {
 };
 ```
 
-The preset supplies jsdom defaults, CSS mocks, test setup, and console assertions through its dependency on `@wordpress/jest-console`. If you already configure Babel, preserve that configuration instead of adding the transform above. No separate console package installation is needed unless your own setup imports it directly; in that case install `@wordpress/jest-console@9.3.0`.
+Replace imports of `@wordpress/scripts/config/jest-unit.config` with the published preset, and replace `@wordpress/scripts/config/babel-transform` with `babel-jest` as shown above. If you already configure Babel for Jest, preserve that configuration instead of adding the example transform. Remove the scripts GitHub Actions reporter from `reporters`; Jest's built-in `github-actions` reporter can replace it. These scripts config files are no longer shipped.
 
-The public `test-unit` lint config now targets Vitest. For Jest tests, install `eslint-plugin-jest` and use its `flat/recommended` configuration, as shown under [`test-unit-jest`](../README.md#test-unit-jest). Apply each runner's lint rules only to its own test files when using both runners.
+The published preset supplies jsdom defaults, CSS mocks, test setup, and console assertions through its dependency on `@wordpress/jest-console`. You do not need a separate console package installation unless your own setup imports it directly. In that case, install it explicitly:
 
-Maintenance covers the adapter and smoke-tested legacy setup. It does not promise new features or compatibility with future Jest, Node.js, or preset releases. The retired packages remain installable from npm.
+```sh
+npm install --save-dev @wordpress/jest-console@9.3.0
+```
+
+### 3. Keep Jest lint rules
+
+The public `test-unit` config and the default `wp-scripts lint-js` unit-test rules now target Vitest. To keep linting Jest tests, install the Jest ESLint plugin and the WordPress lint config:
+
+```sh
+npm install --save-dev eslint-plugin-jest @wordpress/eslint-plugin@^27
+```
+
+If you already have an ESLint config, replace its `test-unit` entries for Jest files with the Jest override below. Keep your other rules and parser settings. If you use both runners, apply each runner's rules only to its own test files.
+
+If you relied on the scripts default lint config, create `eslint.config.cjs` with the following contents. The parser settings replace the Babel defaults that scripts supplied. Install `@babel/core@^7` and `@wordpress/babel-preset-default@8.55.0` if you did not install them in step 2. If you already have a Babel config, omit the `languageOptions` entry and keep your Babel settings.
+
+```js
+const wpPlugin = require( '@wordpress/eslint-plugin' );
+const jestPlugin = require( 'eslint-plugin-jest' );
+
+module.exports = [
+	{ ignores: [ '**/build/**', '**/node_modules/**', '**/vendor/**' ] },
+	...wpPlugin.configs.recommended,
+	{
+		languageOptions: {
+			parserOptions: {
+				requireConfigFile: false,
+				babelOptions: {
+					presets: [
+						require.resolve( '@wordpress/babel-preset-default' ),
+					],
+				},
+			},
+		},
+	},
+	{
+		...jestPlugin.configs[ 'flat/recommended' ],
+		files: [
+			'**/@(test|__tests__)/**/*.{js,jsx,ts,tsx,mjs,cjs}',
+			'**/*.@(test|spec).{js,jsx,ts,tsx,mjs,cjs}',
+		],
+	},
+];
+```
+
+Adjust `files` to match your Jest tests. Your existing `wp-scripts lint-js` command will use this config.
+
+### 4. Verify the upgrade
+
+Run your existing test and lint commands. With the script names above, run `npm run test:unit`; run `wp-scripts lint-js` through your project's lint script. Confirm that Jest runs the expected tests and ESLint recognizes Jest globals such as `describe`, `it`, and `expect`.
+
+The Jest migration is complete when these checks pass. Stop here if you are keeping Jest; the remaining sections describe migrating to Vitest.
+
+Maintenance covers the adapter and the tested legacy setup. It does not promise new features or compatibility with future Jest, Node.js, or preset releases. The retired packages remain installable from npm.
 
 ## Supported versions
 
