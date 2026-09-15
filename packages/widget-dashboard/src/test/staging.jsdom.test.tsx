@@ -1,8 +1,10 @@
-import { act, render } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useEffect, useState } from '@wordpress/element';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../context/dashboard-context';
+import { useDashboardUIContext } from '../context/ui-context';
 import { WidgetDashboard } from '../widget-dashboard';
 import type { DashboardWidget } from '../types';
 
@@ -24,12 +26,14 @@ interface ProbeApi {
 	cancel: () => void;
 	scheduleAutoSave: () => void;
 	flushAutoSave: () => void;
+	openResetDialog: () => void;
 }
 
 const probeRef: { current: ProbeApi | null } = { current: null };
 
 function Probe() {
 	const ctx = useDashboardInternalContext();
+	const { setResetDialogOpen } = useDashboardUIContext();
 	useEffect( () => {
 		probeRef.current = {
 			layout: ctx.layout,
@@ -40,6 +44,7 @@ function Probe() {
 			cancel: ctx.cancel,
 			scheduleAutoSave: ctx.scheduleAutoSave,
 			flushAutoSave: ctx.flushAutoSave,
+			openResetDialog: () => setResetDialogOpen( true ),
 		};
 	} );
 	return null;
@@ -56,12 +61,14 @@ interface HarnessProps {
 	layout: DashboardWidget[];
 	onLayoutChange: ( next: DashboardWidget[] ) => void;
 	initialEditMode?: boolean;
+	onLayoutReset?: () => void;
 }
 
 function Harness( {
 	layout,
 	onLayoutChange,
 	initialEditMode = true,
+	onLayoutReset,
 }: HarnessProps ) {
 	const [ editMode, setEditMode ] = useState( initialEditMode );
 
@@ -72,6 +79,7 @@ function Harness( {
 			widgetTypes={ widgetTypes }
 			editMode={ editMode }
 			onEditChange={ setEditMode }
+			onLayoutReset={ onLayoutReset }
 		>
 			<Probe />
 		</WidgetDashboard>
@@ -253,6 +261,71 @@ describe( 'WidgetDashboard staging layer', () => {
 		for ( const widget of committed ) {
 			expect( widget.placement ).not.toHaveProperty( 'order' );
 		}
+	} );
+
+	it( 'drops staged edits when reset keeps the same layout reference', async () => {
+		const user = userEvent.setup();
+		// The consumer resets to the array it already renders, so the
+		// `layout` prop never changes identity.
+		const onLayoutReset = vi.fn();
+
+		render(
+			<Harness
+				layout={ initialLayout }
+				onLayoutChange={ () => {} }
+				onLayoutReset={ onLayoutReset }
+			/>
+		);
+
+		act( () => {
+			readProbe().mutate( [ initialLayout[ 1 ], initialLayout[ 0 ] ] );
+		} );
+		expect( readProbe().hasUncommittedChanges ).toBe( true );
+
+		act( () => {
+			readProbe().openResetDialog();
+		} );
+		await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+
+		expect( onLayoutReset ).toHaveBeenCalled();
+		expect( readProbe().hasUncommittedChanges ).toBe( false );
+		expect( readProbe().editMode ).toBe( false );
+	} );
+
+	it( 'resets to the default after a previous commit', async () => {
+		const user = userEvent.setup();
+		const swapped = [ initialLayout[ 1 ], initialLayout[ 0 ] ];
+
+		function StatefulHarness() {
+			const [ layout, setLayout ] =
+				useState< DashboardWidget[] >( initialLayout );
+			return (
+				<Harness
+					layout={ layout }
+					onLayoutChange={ setLayout }
+					onLayoutReset={ () => setLayout( initialLayout ) }
+				/>
+			);
+		}
+
+		render( <StatefulHarness /> );
+
+		// Publish first, so the committed layout is no longer the default.
+		act( () => {
+			readProbe().mutate( swapped );
+		} );
+		act( () => {
+			readProbe().commit();
+		} );
+		expect( readProbe().hasUncommittedChanges ).toBe( false );
+
+		act( () => {
+			readProbe().openResetDialog();
+		} );
+		await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+
+		expect( readProbe().layout ).toEqual( initialLayout );
+		expect( readProbe().hasUncommittedChanges ).toBe( false );
 	} );
 
 	it( 'forces edit mode when the layout becomes empty', () => {
