@@ -1088,6 +1088,10 @@ describe( 'actions', () => {
 						second.id
 					)?.currentOperation
 				).toBe( OperationType.TranscodeVideo );
+
+				// The cancelled item carries no onError, so cancelItem reports
+				// the failure through the console instead.
+				expect( console ).toHaveErrored();
 			} );
 		} );
 	} );
