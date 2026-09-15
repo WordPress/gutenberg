@@ -48,27 +48,14 @@ final class AutoCapitalizationTests: XCTestCase {
 	}
 
 	/// Taps the letters as given, without touching shift: the keyboard's own
-	/// state decides the case that lands in the field. A slow runner can drop
-	/// the first tap after the keyboard appears, so each letter is tapped
-	/// again when it does not land.
+	/// state decides the case that lands in the field.
 	func type( _ word: String ) {
 		if key( "letters" ).exists {
 			key( "letters" ).tap()
 		}
 		for letter in word {
-			let before = caretLine.count
 			key( String( letter ) ).tap()
-			if !waitForCaretLine( count: before + 1 ) {
-				key( String( letter ) ).tap()
-				XCTAssertTrue( waitForCaretLine( count: before + 1 ), "The letter \( letter ) did not land" )
-			}
 		}
-	}
-
-	func waitForCaretLine( count: Int ) -> Bool {
-		let landed = NSPredicate { _, _ in self.caretLine.count == count }
-		let done = XCTNSPredicateExpectation( predicate: landed, object: nil )
-		return XCTWaiter.wait( for: [ done ], timeout: 2 ) == .completed
 	}
 
 	/// Waits until the field with the keyboard is an empty one with this
@@ -113,6 +100,24 @@ final class AutoCapitalizationTests: XCTestCase {
 		waitForEmptyField( "Empty block; start writing or type forward slash to choose a block", message )
 	}
 
+	/// Waits for the keyboard to finish sliding in. XCUITest waits for
+	/// Safari to go idle before a tap, not for the keyboard, which runs in
+	/// its own process; a tap during its animation is dropped.
+	func waitForKeyboard() {
+		let shown = XCTNSPredicateExpectation( predicate: NSPredicate( format: "hittable == true" ), object: key( "return" ) )
+		XCTAssertEqual( XCTWaiter.wait( for: [ shown ], timeout: 10 ), .completed, "No software keyboard" )
+		var previous = CGRect.null
+		for _ in 0 ..< 50 {
+			let frame = keyboard.frame
+			if frame == previous {
+				return
+			}
+			previous = frame
+			usleep( 100_000 )
+		}
+		XCTFail( "The keyboard kept moving" )
+	}
+
 	/// The keyboard updates shortly after focus moves.
 	func assertCapitalized( _ message: String ) {
 		let upperCase = NSPredicate( format: "label == 'A'" )
@@ -130,10 +135,7 @@ final class AutoCapitalizationTests: XCTestCase {
 			"The new post has no title field"
 		)
 		waitForFocus( on: "Add title", "The title is not focused" )
-		// The keyboard element exists even when a hardware keyboard keeps
-		// it off screen; a key that can be tapped shows it is on screen.
-		let shown = XCTNSPredicateExpectation( predicate: NSPredicate( format: "hittable == true" ), object: key( "return" ) )
-		XCTAssertEqual( XCTWaiter.wait( for: [ shown ], timeout: 10 ), .completed, "No software keyboard" )
+		waitForKeyboard()
 		assertCapitalized( "An empty title should start capitalized" )
 
 		type( "title" )
