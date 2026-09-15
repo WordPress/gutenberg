@@ -6,15 +6,14 @@
  */
 
 /**
- * Render the custom CSS stylesheet and add class name to block as required.
+ * Generates the custom CSS class name for a block and enqueues its stylesheet.
  *
  * @param array $parsed_block The parsed block.
- * @return array The same parsed block with custom CSS class name added if appropriate.
+ * @return string|null The generated class name, or null if the block has no custom CSS to render.
  *
  * @phpstan-param array{
  *     blockName: string|null,
  *     attrs: array{
- *         className?: string,
  *         style?: array{
  *             css?: string,
  *             ...
@@ -24,30 +23,24 @@
  *     ...
  * } $parsed_block
  */
-function gutenberg_render_custom_css_support_styles( $parsed_block ) {
+function gutenberg_generate_custom_css_class_name( $parsed_block ) {
 	$custom_css = $parsed_block['attrs']['style']['css'] ?? null;
 	if ( ! is_string( $custom_css ) || '' === trim( $custom_css ) ) {
-		return $parsed_block;
+		return null;
 	}
 
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $parsed_block['blockName'] );
 	if ( ! block_has_support( $block_type, 'customCSS', true ) ) {
-		return $parsed_block;
+		return null;
 	}
 
 	// Validate CSS doesn't contain HTML markup (same validation as global styles REST API).
 	if ( preg_match( '#</?\w+#', $custom_css ) ) {
-		return $parsed_block;
+		return null;
 	}
 
 	// Generate a unique class name for this block instance.
-	$class_name          = wp_unique_id_from_values( $parsed_block, 'wp-custom-css-' );
-	$existing_class_name = $parsed_block['attrs']['className'] ?? null;
-	$updated_class_name  = is_string( $existing_class_name )
-		? "$existing_class_name $class_name"
-		: $class_name;
-
-	$parsed_block['attrs']['className'] = $updated_class_name;
+	$class_name = wp_unique_id_from_values( $parsed_block, 'wp-custom-css-' );
 
 	// Process the custom CSS using the same method as global styles.
 	$selector      = '.' . $class_name;
@@ -73,6 +66,41 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 		}
 	}
 
+	return $class_name;
+}
+
+/**
+ * Render the custom CSS stylesheet and add class name to block as required.
+ *
+ * @param array $parsed_block The parsed block.
+ * @return array The same parsed block with custom CSS class name added if appropriate.
+ *
+ * @phpstan-param array{
+ *     blockName: string|null,
+ *     attrs: array{
+ *         className?: string,
+ *         style?: array{
+ *             css?: string,
+ *             ...
+ *         },
+ *         ...
+ *     },
+ *     ...
+ * } $parsed_block
+ */
+function gutenberg_render_custom_css_support_styles( $parsed_block ) {
+	$class_name = gutenberg_generate_custom_css_class_name( $parsed_block );
+	if ( null === $class_name ) {
+		return $parsed_block;
+	}
+
+	$existing_class_name = $parsed_block['attrs']['className'] ?? null;
+	$updated_class_name  = is_string( $existing_class_name )
+		? "$existing_class_name $class_name"
+		: $class_name;
+
+	$parsed_block['attrs']['className'] = $updated_class_name;
+
 	return $parsed_block;
 }
 
@@ -94,31 +122,47 @@ function gutenberg_enqueue_block_custom_css() {
  * @return string Filtered block content.
  *
  * @phpstan-param array{
+ *     blockName: string|null,
  *     attrs: array{
  *         className?: string,
+ *         style?: array{
+ *             css?: string,
+ *             ...
+ *         },
  *         ...
  *     },
  *     ...
  * } $block
  */
 function gutenberg_render_custom_css_class_name( $block_content, $block ) {
-	$class_name_attr   = $block['attrs']['className'] ?? null;
-	$class_name_prefix = 'wp-custom-css-';
-	if ( ! is_string( $class_name_attr ) || ! str_contains( $class_name_attr, $class_name_prefix ) ) {
-		return $block_content;
-	}
+	$class_name_attr    = $block['attrs']['className'] ?? null;
+	$class_name_prefix  = 'wp-custom-css-';
+	$matched_class_name = null;
 
 	// Parse out the 'wp-custom-css-*' class name added by gutenberg_render_custom_css_support_styles().
-	$matched_class_name = null;
-	$token_delimiter    = " \t\f\r\n";
-	$class_token        = strtok( $class_name_attr, $token_delimiter );
-	while ( false !== $class_token ) {
-		if ( str_starts_with( $class_token, $class_name_prefix ) ) {
-			$matched_class_name = $class_token;
-			break;
+	if ( is_string( $class_name_attr ) && str_contains( $class_name_attr, $class_name_prefix ) ) {
+		$token_delimiter = " \t\f\r\n";
+		$class_token     = strtok( $class_name_attr, $token_delimiter );
+		while ( false !== $class_token ) {
+			if ( str_starts_with( $class_token, $class_name_prefix ) ) {
+				$matched_class_name = $class_token;
+				break;
+			}
+			$class_token = strtok( $token_delimiter );
 		}
-		$class_token = strtok( $token_delimiter );
 	}
+
+	/*
+	 * `render_block_data` is only applied by `WP_Block::render()` as it walks its
+	 * own inner content, so it never runs for blocks that a parent block parsed
+	 * and rendered itself, such as the blocks of a `wp_navigation` post rendered
+	 * by `core/navigation`. Those blocks do still pass through `render_block`, so
+	 * generate the class name and stylesheet for them here instead.
+	 */
+	if ( null === $matched_class_name ) {
+		$matched_class_name = gutenberg_generate_custom_css_class_name( $block );
+	}
+
 	if ( null === $matched_class_name ) {
 		return $block_content;
 	}
