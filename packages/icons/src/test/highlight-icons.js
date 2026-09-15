@@ -28,32 +28,40 @@ const HIGHLIGHT_ICONS = [
 	'sides-vertical',
 ];
 
-describe( 'side and corner highlight icons', () => {
-	it.each( HIGHLIGHT_ICONS )( '%s dims one of its two paths', ( slug ) => {
-		const svg = readFileSync(
-			path.join( LIBRARY_DIR, `${ slug }.svg` ),
-			'utf8'
-		);
-		const paths = svg.match( /<path\b[^>]*\/>/g ) ?? [];
+const DIMMED_OPACITY = 0.25;
 
-		expect( paths ).toHaveLength( 2 );
-		expect(
-			paths.filter( ( element ) => element.includes( 'opacity=' ) )
-		).toHaveLength( 1 );
+// One entry per path, holding its opacity as a number, or undefined where the
+// path carries no opacity at all.
+const readPathOpacities = ( slug ) => {
+	const svg = readFileSync(
+		path.join( LIBRARY_DIR, `${ slug }.svg` ),
+		'utf8'
+	);
+
+	return ( svg.match( /<path\b[^>]*\/>/g ) ?? [] ).map( ( element ) => {
+		const opacity = element.match( /\sopacity="([^"]*)"/ )?.[ 1 ];
+		return opacity === undefined ? undefined : Number.parseFloat( opacity );
 	} );
+};
+
+describe( 'side and corner highlight icons', () => {
+	it.each( HIGHLIGHT_ICONS )(
+		`%s dims one of its two paths to ${ DIMMED_OPACITY }`,
+		( slug ) => {
+			const opacities = readPathOpacities( slug );
+
+			expect( opacities ).toHaveLength( 2 );
+			expect(
+				opacities.filter( ( value ) => value !== undefined )
+			).toEqual( [ DIMMED_OPACITY ] );
+		}
+	);
 
 	// The "all" variants highlight the whole box, so they have nothing to dim.
 	it.each( [ 'corner-all', 'sides-all' ] )(
 		'%s draws a single undimmed path',
 		( slug ) => {
-			const svg = readFileSync(
-				path.join( LIBRARY_DIR, `${ slug }.svg` ),
-				'utf8'
-			);
-			const paths = svg.match( /<path\b[^>]*\/>/g ) ?? [];
-
-			expect( paths ).toHaveLength( 1 );
-			expect( paths[ 0 ] ).not.toContain( 'opacity=' );
+			expect( readPathOpacities( slug ) ).toEqual( [ undefined ] );
 		}
 	);
 } );
