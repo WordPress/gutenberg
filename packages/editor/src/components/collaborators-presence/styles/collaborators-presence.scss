@@ -9,10 +9,7 @@
 	background: $gray-100;
 	border-radius: $grid-unit-05;
 
-	&:hover {
-		background-color: $gray-200;
-	}
-
+	&:hover,
 	&:has(.is-pressed) {
 		background-color: $gray-200;
 	}
@@ -31,10 +28,9 @@
 	border-radius: $grid-unit-05;
 	height: 100%;
 	box-sizing: border-box;
-	color: $gray-800;
-	background: transparent;
 
-	// Override default button hover & pressed state - let the container handle the background
+	// Override button's default rest, hover & pressed state - let the container handle the background
+	&,
 	&:hover,
 	&.is-pressed,
 	&.is-pressed:hover {
