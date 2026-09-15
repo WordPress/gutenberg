@@ -133,6 +133,10 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
 	require __DIR__ . '/experimental/workflow-palette.php';
 }
 
+if ( gutenberg_is_experiment_enabled( 'gutenberg-rounded-admin-canvas' ) ) {
+	require __DIR__ . '/experimental/rounded-admin-canvas.php';
+}
+
 // Plugin specific code.
 require __DIR__ . '/script-loader.php';
 require __DIR__ . '/global-styles-and-settings.php';

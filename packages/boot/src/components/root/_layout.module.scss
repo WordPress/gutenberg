@@ -27,6 +27,17 @@
 			min-height: 100vh;
 		}
 	}
+
+	/*
+	 * Rounded admin canvas: size the single-page layout to the framed
+	 * #wpcontent stage instead of the full viewport, so content is not
+	 * clipped by #wpcontent's overflow: clip.
+	 */
+	:global(body.admin-content-rounded) &.layout-single-page {
+		@include mixins.break-medium {
+			min-height: 100%;
+		}
+	}
 }
 
 :where(.layout) img {
@@ -110,6 +121,16 @@
 		.layout-single-page & {
 			margin-top: 0;
 			margin-inline-start: 0;
+		}
+
+		/*
+		 * #wpwrap already pads the bottom and end when the rounded admin
+		 * canvas is active — drop the matching surface margins to avoid a
+		 * double frame.
+		 */
+		:global(body.admin-content-rounded) .layout-single-page & {
+			margin-bottom: 0;
+			margin-inline-end: 0;
 		}
 	}
 }
@@ -252,6 +273,27 @@
 		@include mixins.break-medium {
 			top: variables.$admin-bar-height;
 
+		}
+	}
+}
+
+/*
+ * Drop the rounded #wpcontent frame while full-canvas editing is open so
+ * position: fixed is not trapped by overflow: clip.
+ */
+@include mixins.break-medium {
+	:global(body.admin-content-rounded):has(.layout.has-full-canvas) {
+		:global(#wpwrap) {
+			padding-bottom: 0;
+			/* Mirror common-override / Core #wpwrap frame padding (physical). */
+			/* stylelint-disable-next-line logical-css/require-logical-properties -- Match admin canvas frame padding-right. */
+			padding-right: 0;
+		}
+
+		:global(#wpcontent) {
+			border-radius: 0;
+			overflow: visible;
+			min-height: calc(100vh - var(--wp-admin--admin-bar--height, 32px));
 		}
 	}
 }

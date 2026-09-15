@@ -274,7 +274,13 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 		#wpwrap {
 			overflow-y: auto;
 		}
-		body.js {
+
+		/*
+		 * Fallback surface when the rounded admin canvas experiment is off.
+		 * When `.admin-content-rounded` is present, body / #wpwrap /
+		 * #wpcontent colors come from common-override.css.
+		 */
+		body.js:not(.admin-content-rounded) {
 			background: #fff;
 		}
 
@@ -294,16 +300,38 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 			display: none;
 		}
 
+		/*
+		 * Fill the rounded #wpcontent canvas so Boot's absolute layout is
+		 * sized to the framed stage rather than the full viewport.
+		 */
+		body.admin-content-rounded.js #wpcontent {
+			position: relative;
+		}
+		body.admin-content-rounded.js #wpbody,
+		body.admin-content-rounded.js #wpbody-content {
+			min-height: inherit;
+			height: 100%;
+		}
+		body.admin-content-rounded #{{PAGE_SLUG}}-wp-admin-app.boot-layout-container {
+			position: relative;
+			min-height: inherit;
+			height: 100%;
+		}
+
 		/* Accessibility regions */
 		.a11y-speak-region {
 			inset-inline-start: -1px;
 			top: -1px;
 		}
 
-		/* Admin menu indicators */
-		ul#adminmenu a.wp-has-current-submenu::after,
-		ul#adminmenu > li.current > a.current::after {
+		/* Admin menu indicators — match the content surface behind the arrow */
+		body:not(.admin-content-rounded) ul#adminmenu a.wp-has-current-submenu::after,
+		body:not(.admin-content-rounded) ul#adminmenu > li.current > a.current::after {
 			border-inline-end-color: #fff;
+		}
+		body.admin-content-rounded ul#adminmenu a.wp-has-current-submenu::after,
+		body.admin-content-rounded ul#adminmenu > li.current > a.current::after {
+			border-inline-end-color: #f0f0f1;
 		}
 
 		/* Media frame fix */
