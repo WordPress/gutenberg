@@ -153,6 +153,12 @@ function gutenberg_get_layout_definitions() {
 					),
 				),
 				array(
+					'selector' => ':has(> .block-list-appender) > :nth-last-child(2)',
+					'rules'    => array(
+						'margin-block-end' => '0',
+					),
+				),
+				array(
 					'selector' => ' > *',
 					'rules'    => array(
 						'margin-block-start' => null,
