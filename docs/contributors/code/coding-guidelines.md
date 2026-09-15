@@ -816,6 +816,8 @@ The easiest way to use PHPCS is [local environment](/docs/contributors/code/gett
 
 If you prefer to install PHPCS locally, you should use `composer`. [Install `composer`](https://getcomposer.org/download/) on your computer, then run `composer install`. This will install `phpcs` and `WordPress-Coding-Standards` which you can then run via `composer lint`.
 
+The naming conventions for the plugin's PHP code, including when to use the `gutenberg_` or `wp_` prefix, are documented in the [Gutenberg PHP guide](/lib/README.md).
+
 ## GitHub Actions workflow files
 
 GitHub Actions workflows operate in a privileged software supply chain environment, therefore all workflow files must adhere to a high degree of quality and security standards.
