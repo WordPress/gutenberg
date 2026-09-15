@@ -46,7 +46,7 @@ export default function MoreMenuGroup( {
  *
  * @return The fills as menu items.
  */
-function toMenuItems( fills: ReactNode ) {
+export function toMenuItems( fills: ReactNode ) {
 	return Children.map( fills, ( fill ) => {
 		if (
 			! isValidElement< { href?: string } >( fill ) ||
