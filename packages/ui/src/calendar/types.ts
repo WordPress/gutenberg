@@ -360,6 +360,14 @@ export interface RangeProps {
 	 */
 	excludeDisabled?: boolean;
 	/**
+	 * When `true`, clicking a day starts a new range if there is no current start
+	 * date or if a range is already complete. In those cases, the clicked day
+	 * becomes the start of the new range. When `required` is `false`, clicking
+	 * the same day of a single-day range clears the selection.
+	 * @default true
+	 */
+	resetOnSelect?: boolean;
+	/**
 	 * The minimum number of nights to include in the range.
 	 */
 	min?: number;

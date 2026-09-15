@@ -28,14 +28,18 @@ const SubmenuTrigger = forwardRef< HTMLDivElement, SubmenuTriggerProps >(
 		},
 		ref
 	) {
-		const { contentContextValue, itemAriaProps, shortcutDescriptionId } =
-			useItemContent( children, {
-				'aria-describedby': ariaDescribedBy,
-				'aria-keyshortcuts': ariaKeyShortcuts,
-				'aria-label': ariaLabel,
-				'aria-labelledby': ariaLabelledBy,
-				shortcut,
-			} );
+		const {
+			contentChildren,
+			contentContextValue,
+			itemAriaProps,
+			shortcutDescriptionId,
+		} = useItemContent( children, {
+			'aria-describedby': ariaDescribedBy,
+			'aria-keyshortcuts': ariaKeyShortcuts,
+			'aria-label': ariaLabel,
+			'aria-labelledby': ariaLabelledBy,
+			shortcut,
+		} );
 
 		return (
 			<_Menu.SubmenuTrigger
@@ -63,7 +67,7 @@ const SubmenuTrigger = forwardRef< HTMLDivElement, SubmenuTriggerProps >(
 							/>
 						}
 					>
-						{ children }
+						{ contentChildren }
 					</ItemContent>
 				</MenuItemContentContext.Provider>
 			</_Menu.SubmenuTrigger>

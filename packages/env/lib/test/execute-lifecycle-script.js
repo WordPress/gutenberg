@@ -1,5 +1,7 @@
-'use strict';
-/* eslint-disable jest/no-conditional-expect */
+import { EventEmitter } from 'node:events';
+import { createRequire } from 'node:module';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
 const {
 	LifecycleScriptError,
 	executeLifecycleScript,
@@ -7,11 +9,11 @@ const {
 
 describe( 'executeLifecycleScript', () => {
 	const spinner = {
-		info: jest.fn(),
+		info: vi.fn(),
 	};
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'should do nothing without event option when debugging', async () => {
@@ -52,5 +54,45 @@ describe( 'executeLifecycleScript', () => {
 			expect( error.message ).toMatch( /test Error:\n.*bad option/ );
 		}
 	} );
+
+	it( 'includes all stderr when the process fails', async () => {
+		const childProcess = new EventEmitter();
+		childProcess.stdout = new EventEmitter();
+		childProcess.stderr = new EventEmitter();
+
+		const childProcessModule = require( 'node:child_process' );
+		const exec = vi
+			.spyOn( childProcessModule, 'exec' )
+			.mockReturnValue( childProcess );
+		const modulePath = require.resolve( '../execute-lifecycle-script' );
+		delete require.cache[ modulePath ];
+		const {
+			LifecycleScriptError: MockedLifecycleScriptError,
+			executeLifecycleScript: executeLifecycleScriptWithMock,
+		} = require( modulePath );
+
+		try {
+			const execution = executeLifecycleScriptWithMock(
+				'test',
+				{ lifecycleScripts: { test: 'failing-command' } },
+				spinner
+			);
+
+			childProcess.stderr.emit( 'data', 'first line\n' );
+			childProcess.emit( 'exit', 1 );
+			childProcess.stderr.emit( 'data', 'last line\n' );
+			childProcess.emit( 'close', 1 );
+
+			await expect( execution ).rejects.toMatchObject( {
+				event: 'test',
+				message: 'test Error:\nfirst line\nlast line',
+			} );
+			await expect( execution ).rejects.toBeInstanceOf(
+				MockedLifecycleScriptError
+			);
+		} finally {
+			exec.mockRestore();
+			delete require.cache[ modulePath ];
+		}
+	} );
 } );
-/* eslint-enable jest/no-conditional-expect */

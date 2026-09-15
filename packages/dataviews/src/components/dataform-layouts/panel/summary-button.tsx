@@ -13,6 +13,32 @@ import getLabelClassName from './utils/get-label-classname';
 import FieldLabelContent from './field-label-content';
 import getFirstValidationError from './utils/get-first-validation-error';
 
+function SummaryValue< Item >( {
+	item,
+	field,
+	showPlaceholderIfEmpty,
+}: {
+	item: Item;
+	field: NormalizedField< Item >;
+	showPlaceholderIfEmpty: boolean;
+} ) {
+	// The same notion of empty as the `required` validator: a field whose
+	// empty value differs (an id of `0`, an object) normalizes it in `getValue`.
+	if (
+		showPlaceholderIfEmpty &&
+		field.placeholder &&
+		[ undefined, null, '' ].includes( field.getValue( { item } ) )
+	) {
+		return (
+			<span className="dataforms-layouts-panel__field-placeholder">
+				{ field.placeholder }
+			</span>
+		);
+	}
+
+	return <field.render item={ item } field={ field } />;
+}
+
 export default function SummaryButton< Item >( {
 	data,
 	field,
@@ -34,7 +60,7 @@ export default function SummaryButton< Item >( {
 	isOpen: boolean;
 	onClick: () => void;
 } ) {
-	const { labelPosition, editVisibility } =
+	const { labelPosition, editVisibility, showPlaceholderIfEmpty } =
 		field.layout as NormalizedPanelLayout;
 	const errorMessage = getFirstValidationError( validity );
 	const showError = touched && !! errorMessage;
@@ -106,19 +132,23 @@ export default function SummaryButton< Item >( {
 								key={ summaryField.id }
 								style={ { width: '100%' } }
 							>
-								<summaryField.render
+								<SummaryValue
 									item={ data }
 									field={ summaryField }
+									showPlaceholderIfEmpty={
+										showPlaceholderIfEmpty
+									}
 								/>
 							</span>
 						) ) }
 					</span>
 				) : (
 					summaryFields.map( ( summaryField ) => (
-						<summaryField.render
+						<SummaryValue
 							key={ summaryField.id }
 							item={ data }
 							field={ summaryField }
+							showPlaceholderIfEmpty={ showPlaceholderIfEmpty }
 						/>
 					) )
 				) }
