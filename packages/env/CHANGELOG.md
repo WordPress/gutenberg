@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Respect configured WordPress and PHP versions in the Playground runtime by keeping runtime selection and login in CLI arguments and removing duplicate Blueprint configuration and the deprecated worker flag ([WordPress/wordpress-playground#1779](https://github.com/WordPress/wordpress-playground/issues/1779)).
 -   Wait for lifecycle script output streams to close before reporting command failures, so their error output is not lost ([#82735](https://github.com/WordPress/gutenberg/pull/82735)).
 
 ## 11.15.0 (2026-09-10)
