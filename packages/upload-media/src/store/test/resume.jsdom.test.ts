@@ -9,12 +9,15 @@ import {
 import { buildIndexedDBMock } from '../utils/test/fixtures/build-idb-mock';
 import { ItemStatus, OperationType } from '../types';
 
-vi.mock( '@wordpress/blob', () => ( {
-	__esModule: true,
-	createBlobURL: vi.fn( () => 'blob:foo' ),
-	isBlobURL: vi.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
-	revokeBlobURL: vi.fn(),
-} ) );
+vi.mock(
+	import( '@wordpress/blob' ),
+	() =>
+		( {
+			createBlobURL: vi.fn( () => 'blob:foo' ),
+			isBlobURL: vi.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
+			revokeBlobURL: vi.fn(),
+		} ) as unknown as typeof import('@wordpress/blob')
+);
 
 function flush() {
 	return new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
