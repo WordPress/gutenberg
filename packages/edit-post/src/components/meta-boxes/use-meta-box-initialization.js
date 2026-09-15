@@ -1,9 +1,11 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+
+const NO_META_BOXES = Object.freeze( [] );
 
 /**
  * Initializes WordPress `postboxes` script and the logic for saving meta boxes.
@@ -14,7 +16,7 @@ export const useMetaBoxInitialization = ( enabled ) => {
 	const {
 		isEnabledAndEditorReady,
 		isCollaborationEnabled,
-		hasIncompatibleMetaBoxes,
+		metaBoxes,
 		hasActiveMetaBoxes,
 	} = useSelect(
 		( select ) => {
@@ -25,16 +27,37 @@ export const useMetaBoxInitialization = ( enabled ) => {
 			return {
 				isEnabledAndEditorReady: enabled && __unstableIsEditorReady(),
 				isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
-				hasIncompatibleMetaBoxes: enabled
-					? select( editPostStore )
-							.getAllMetaBoxes()
-							.some( ( metaBox ) => ! metaBox.__rtc_compatible )
-					: false,
+				metaBoxes: enabled
+					? select( editPostStore ).getAllMetaBoxes()
+					: NO_META_BOXES,
 				hasActiveMetaBoxes:
 					enabled && select( editPostStore ).hasMetaBoxes(),
 			};
 		},
 		[ enabled ]
+	);
+
+	const hasIncompatibleMetaBoxes = useMemo(
+		() => metaBoxes.some( ( metaBox ) => ! metaBox.__rtc_compatible ),
+		[ metaBoxes ]
+	);
+
+	/*
+	 * Named so the lock-out can say which plugins to look at rather than only
+	 * that something is incompatible. The plugin name is resolved server side;
+	 * the meta box title stands in when it cannot be. One plugin can register
+	 * several meta boxes, so names are deduplicated.
+	 */
+	const incompatiblePlugins = useMemo(
+		() => [
+			...new Set(
+				metaBoxes
+					.filter( ( metaBox ) => ! metaBox.__rtc_compatible )
+					.map( ( metaBox ) => metaBox.plugin || metaBox.title )
+					.filter( Boolean )
+			),
+		],
+		[ metaBoxes ]
 	);
 	const { setCollaborationSupported } = unlock( useDispatch( coreStore ) );
 	const { updateEditorSettings } = useDispatch( editorStore );
@@ -48,7 +71,7 @@ export const useMetaBoxInitialization = ( enabled ) => {
 
 			// Disable real-time collaboration when incompatible meta boxes are detected.
 			if ( isCollaborationEnabled && hasIncompatibleMetaBoxes ) {
-				setCollaborationSupported( false );
+				setCollaborationSupported( false, incompatiblePlugins );
 			}
 
 			// Classic meta box values are saved through a separate
@@ -66,6 +89,7 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		isCollaborationEnabled,
 		setCollaborationSupported,
 		hasIncompatibleMetaBoxes,
+		incompatiblePlugins,
 		hasActiveMetaBoxes,
 		updateEditorSettings,
 	] );

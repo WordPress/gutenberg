@@ -163,14 +163,24 @@ export function receiveEditorAssets( assets ) {
  * Returns an action object used to set whether collaboration is supported.
  * When set to false, also disconnects all sync entities.
  *
- * @param {boolean} supported Whether collaboration is supported.
+ * @param {boolean}  supported             Whether collaboration is supported.
+ * @param {string[]} [incompatiblePlugins] Names of the plugins that make
+ *                                         collaboration unsupported, so the
+ *                                         editor can tell the user which ones
+ *                                         to look at. A meta box title stands
+ *                                         in where the plugin behind it cannot
+ *                                         be resolved. Ignored when supported.
  *
  * @return {Object} Action object.
  */
 export const setCollaborationSupported =
-	( supported ) =>
+	( supported, incompatiblePlugins = [] ) =>
 	( { dispatch } ) => {
-		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
+		dispatch( {
+			type: 'SET_COLLABORATION_SUPPORTED',
+			supported,
+			incompatiblePlugins,
+		} );
 		if ( ! supported && hasSyncManager() ) {
 			getSyncManager().unloadAll();
 			dispatch.__unstableNotifySyncUndoManagerChange( {
