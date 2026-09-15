@@ -95,7 +95,7 @@ export function Actions(): React.ReactNode {
 	const menuItems: ActionsMenuItem[] = canPerform( { operation: 'reset' } )
 		? [
 				{
-					label: __( 'Reset to default' ),
+					label: __( 'Reset to default…' ),
 					onClick: () => setResetDialogOpen( true ),
 					disabled: ! onLayoutReset,
 				},

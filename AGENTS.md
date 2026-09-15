@@ -42,6 +42,8 @@ Read only what your task needs, when it needs it:
 
 ## Code quality
 
+Fix ESLint and Stylelint violations in the code whenever possible. Add entries or increase counts in `tools/eslint/suppressions.json` or `tools/stylelint/stylelint-suppressions.json` only as a last resort, and explain in the PR why a code fix is not practical. Keep suppressions limited to the specific violations that need them. After fixing suppressed violations, run `npm run lint:js:prune-suppressions` for ESLint. For Stylelint, first ensure `npm run lint:css` passes, then run `npm run lint:css:update-suppressions`. Review and commit the reductions.
+
 ```bash
 npm run format            # Fix JS formatting
 npm run lint:js          # Check JS linting
