@@ -4,12 +4,6 @@ import type {
 	ComponentPropsWithoutRef,
 	ComponentType,
 } from 'react';
-// Form controls and the command palette read these stylesheets, normally
-// enqueued by WordPress.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/commands/build-style/style.css';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/dataviews/build-style/style.css';
 import { Page } from '@wordpress/admin-ui';
 import { CommandMenu } from '@wordpress/commands';
 import {
