@@ -28,6 +28,7 @@
  * sideways during fine rotation would have been caught by this test —
  * the center would agree (symmetric bug) but the corners would drift.
  */
+import { describe, expect, it } from 'vitest';
 import { mat2d, vec2 } from 'gl-matrix';
 import {
 	createCamera,
@@ -124,8 +125,8 @@ const PROBES: { label: string; u: number; v: number }[] = [
 	{ label: 'interior-2', u: 0.8, v: 0.25 },
 ];
 
-// All (state × output-size × probe) combinations flattened into rows
-// for `it.each`. Each row is self-describing; on failure, the label
+// All (state × output-size × probe) combinations flattened into rows.
+// Each row is self-describing; on failure, the label
 // pinpoints the exact state and probe point where preview / export
 // disagreed.
 interface ParityRow {
@@ -216,26 +217,33 @@ describe( 'Preview ↔ Export parity', () => {
 	// miss.
 	const rows = buildRows();
 
-	it.each( rows )( '$label', ( { state, outputSize, u, v } ) => {
-		const screen = stencilScreenPoint( state, CONTAINER, IMAGE, u, v );
-		const outputPoint = {
-			x: u * outputSize.width,
-			y: v * outputSize.height,
-		};
-		const preview = previewSourcePixel( state, CONTAINER, IMAGE, screen );
-		const exported = exportSourcePixel(
-			state,
-			IMAGE,
-			outputSize,
-			outputPoint
-		);
+	for ( const { label, state, outputSize, u, v } of rows ) {
+		it( label, () => {
+			const screen = stencilScreenPoint( state, CONTAINER, IMAGE, u, v );
+			const outputPoint = {
+				x: u * outputSize.width,
+				y: v * outputSize.height,
+			};
+			const preview = previewSourcePixel(
+				state,
+				CONTAINER,
+				IMAGE,
+				screen
+			);
+			const exported = exportSourcePixel(
+				state,
+				IMAGE,
+				outputSize,
+				outputPoint
+			);
 
-		// Tolerance of 1 source pixel. Intermediate scale factors differ
-		// between the preview (container pixels) and export (output
-		// pixels) paths, so sub-pixel agreement is unrealistic. A drift
-		// of ~1px is still visibly correct; anything larger is a real
-		// coordinate-system mismatch.
-		expect( preview.x ).toBeCloseTo( exported.x, 0 );
-		expect( preview.y ).toBeCloseTo( exported.y, 0 );
-	} );
+			// Tolerance of 1 source pixel. Intermediate scale factors differ
+			// between the preview (container pixels) and export (output
+			// pixels) paths, so sub-pixel agreement is unrealistic. A drift
+			// of ~1px is still visibly correct; anything larger is a real
+			// coordinate-system mismatch.
+			expect( preview.x ).toBeCloseTo( exported.x, 0 );
+			expect( preview.y ).toBeCloseTo( exported.y, 0 );
+		} );
+	}
 } );

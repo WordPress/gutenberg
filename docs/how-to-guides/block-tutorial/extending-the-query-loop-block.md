@@ -74,7 +74,11 @@ registerBlockVariation( 'core/query', {
 } );
 ```
 
-In this way, the users won't have to choose the custom `postType` from the dropdown, and be already presented with the correct configuration. However, you might ask, how is a user going to find and insert this variation? Good question! To enable this, you should add:
+In this way, the users won't have to choose the custom `postType` from the dropdown, and be already presented with the correct configuration.
+
+A variation's `query` replaces the block's default `query` object instead of merging into it, so include every property your variation relies on, not only the ones you change. Always set `postType`: when it's missing, the block queries posts, both in the editor and on the front end.
+
+However, you might ask, how is a user going to find and insert this variation? Good question! To enable this, you should add:
 
 ```js
 {

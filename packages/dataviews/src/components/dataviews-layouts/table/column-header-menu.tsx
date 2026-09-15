@@ -4,7 +4,7 @@ import { arrowLeft, arrowRight, unseen, funnel } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { forwardRef, Children, Fragment, useContext } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Icon, Menu } from '@wordpress/ui';
+import { Menu } from '@wordpress/ui';
 import { SORTING_DIRECTIONS, sortArrows, sortLabels } from '../../../constants';
 import type {
 	NormalizedField,
@@ -15,6 +15,7 @@ import type {
 } from '../../../types';
 import DataViewsContext from '../../dataviews-context';
 import getHideableFields from '../../../utils/get-hideable-fields';
+import getTableColumns from '../utils/get-table-columns';
 
 interface HeaderMenuProps< Item > {
 	fieldId: string;
@@ -53,8 +54,6 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	}: HeaderMenuProps< Item >,
 	ref: Ref< HTMLButtonElement >
 ) {
-	const visibleFieldIds = view.fields ?? [];
-	const index = visibleFieldIds?.indexOf( fieldId ) as number;
 	const isSorted = view.sort?.field === fieldId;
 	let isHidable = false;
 	let isSortable = false;
@@ -91,6 +90,11 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		return header;
 	}
 
+	// Operate on the rendered columns rather than the raw `view.fields`, so an
+	// id without a field definition (which the table skips) can't offset the
+	// indexes that move and insert rely on.
+	const visibleFieldIds = getTableColumns( view, fields );
+	const index = visibleFieldIds.indexOf( fieldId );
 	const hiddenFields = getHideableFields( view, fields ).filter(
 		( f ) => ! visibleFieldIds.includes( f.id )
 	);
@@ -155,7 +159,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 					{ canAddFilter && (
 						<Menu.Group>
 							<Menu.Item
-								prefix={ <Icon icon={ funnel } /> }
+								prefix={ <Menu.PrefixIcon icon={ funnel } /> }
 								onClick={ () => {
 									setOpenedFilter( fieldId );
 									setIsShowingFilter( true );
@@ -183,7 +187,9 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 						<Menu.Group>
 							{ canMove && (
 								<Menu.Item
-									prefix={ <Icon icon={ arrowLeft } /> }
+									prefix={
+										<Menu.PrefixIcon icon={ arrowLeft } />
+									}
 									disabled={
 										isRtl
 											? index >=
@@ -217,7 +223,9 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							) }
 							{ canMove && (
 								<Menu.Item
-									prefix={ <Icon icon={ arrowRight } /> }
+									prefix={
+										<Menu.PrefixIcon icon={ arrowRight } />
+									}
 									disabled={
 										isRtl
 											? index < 1
@@ -331,7 +339,9 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							) }
 							{ isHidable && field && (
 								<Menu.Item
-									prefix={ <Icon icon={ unseen } /> }
+									prefix={
+										<Menu.PrefixIcon icon={ unseen } />
+									}
 									onClick={ () => {
 										onHide( field );
 										onChangeView( {

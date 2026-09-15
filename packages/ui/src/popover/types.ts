@@ -17,14 +17,17 @@ export interface RootProps
 	children?: ReactNode;
 }
 
-export interface TriggerProps
-	extends ComponentProps< 'button' >,
-		Pick< _Popover.Trigger.Props, 'openOnHover' | 'delay' | 'closeDelay' > {
+// Detached triggers require handle and payload APIs that Popover does not
+// expose.
+export type TriggerProps = Omit<
+	ComponentProps< typeof _Popover.Trigger >,
+	'handle' | 'payload'
+> & {
 	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
-}
+};
 
 export interface PopupProps
 	extends ComponentProps< 'div' >,
