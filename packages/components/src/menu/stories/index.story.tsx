@@ -45,7 +45,7 @@ const meta: Meta< typeof Menu > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Deprecated. Continue using `DropdownMenu` for now.',
+			notes: 'Deprecated. Continue using `DropdownMenu` for now. You can try [`Menu`](?path=/docs/design-system-components-menu--docs) from `@wordpress/ui`, but it is not yet recommended.',
 		},
 	},
 };
