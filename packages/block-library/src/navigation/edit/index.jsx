@@ -270,20 +270,30 @@ function Navigation( {
 	} = attributes;
 
 	const ref = attributes.ref;
+	const slug = attributes.slug;
+	const hasNavigationMenuReference = !! ( ref || slug );
 	useLayoutCustomProperties( {
 		clientId,
 		layout: attributes.layout,
 		style: attributes.style,
 	} );
 
-	const setRef = useCallback(
-		( postId ) => {
-			setAttributes( { ref: postId } );
+	const setNavigationMenuReference = useCallback(
+		( menu ) => {
+			// A block that already references its menu by slug keeps doing so,
+			// so that switching menus does not silently downgrade a portable
+			// reference to a site specific post ID.
+			if ( slug && menu?.slug ) {
+				setAttributes( { slug: menu.slug, ref: undefined } );
+				return;
+			}
+
+			setAttributes( { ref: menu?.id, slug: undefined } );
 		},
-		[ setAttributes ]
+		[ slug, setAttributes ]
 	);
 
-	const recursionId = `navigationMenu/${ ref }`;
+	const recursionId = `navigationMenu/${ slug || ref }`;
 
 	// Skip recursion check when in preview mode.
 	const recursionDetected = useHasRecursion( recursionId );
@@ -355,7 +365,9 @@ function Navigation( {
 	} = useCreateNavigationMenu( clientId );
 
 	const createUntitledEmptyNavigationMenu = async () => {
-		await createNavigationMenu( '' );
+		// A block referencing a menu by slug creates the missing menu under
+		// that slug, so the existing reference resolves without being edited.
+		await createNavigationMenu( '', [], undefined, { slug } );
 	};
 
 	const {
@@ -463,7 +475,9 @@ function Navigation( {
 		canUserCreateNavigationMenus,
 		isResolvingCanUserCreateNavigationMenus,
 		hasResolvedCanUserCreateNavigationMenus,
-	} = useNavigationMenu( ref );
+		navigationMenuId,
+		navigationMenus,
+	} = useNavigationMenu( ref, slug );
 
 	const navMenuResolvedButMissing =
 		hasResolvedNavigationMenus && isNavigationMenuMissing;
@@ -478,14 +492,14 @@ function Navigation( {
 		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
 
 	const handleUpdateMenu = useCallback(
-		( menuId, options = { focusNavigationBlock: false } ) => {
+		( menu, options = { focusNavigationBlock: false } ) => {
 			const { focusNavigationBlock } = options;
-			setRef( menuId );
+			setNavigationMenuReference( menu );
 			if ( focusNavigationBlock ) {
 				selectBlock( clientId );
 			}
 		},
-		[ selectBlock, clientId, setRef ]
+		[ selectBlock, clientId, setNavigationMenuReference ]
 	);
 
 	const isEntityAvailable =
@@ -501,16 +515,22 @@ function Navigation( {
 
 	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
 
-	const navigationFallbackId = ! ( ref || hasUnsavedBlocks )
+	const navigationFallbackId = ! (
+		hasNavigationMenuReference || hasUnsavedBlocks
+	)
 		? getNavigationFallbackId()
 		: null;
 
 	useEffect( () => {
 		// If:
-		// - there is an existing menu, OR
+		// - the block already references a menu, by ref or by slug, OR
 		// - there are existing (uncontrolled) inner blocks
 		// ...then don't request a fallback menu.
-		if ( ref || hasUnsavedBlocks || ! navigationFallbackId ) {
+		if (
+			hasNavigationMenuReference ||
+			hasUnsavedBlocks ||
+			! navigationFallbackId
+		) {
 			return;
 		}
 
@@ -521,10 +541,10 @@ function Navigation( {
 		 */
 
 		__unstableMarkNextChangeAsNotPersistent();
-		setRef( navigationFallbackId );
+		setNavigationMenuReference( { id: navigationFallbackId } );
 	}, [
-		ref,
-		setRef,
+		hasNavigationMenuReference,
+		setNavigationMenuReference,
 		hasUnsavedBlocks,
 		navigationFallbackId,
 		__unstableMarkNextChangeAsNotPersistent,
@@ -540,12 +560,12 @@ function Navigation( {
 	const TagName = isWithinOverlay ? 'div' : 'nav';
 
 	// "placeholder" shown if:
-	// - there is no ref attribute pointing to a Navigation Post.
+	// - there is no ref or slug attribute pointing to a Navigation Post.
 	// - there is no classic menu conversion process in progress.
 	// - there is no menu creation process in progress.
 	// - there are no uncontrolled blocks.
 	const isPlaceholder =
-		! ref &&
+		! hasNavigationMenuReference &&
 		! isCreatingNavigationMenu &&
 		! isConvertingClassicMenu &&
 		hasResolvedNavigationMenus &&
@@ -556,13 +576,17 @@ function Navigation( {
 	// - there is a menu creation process in progress.
 	// - there is a classic menu conversion process in progress.
 	// OR:
-	// - there is a ref attribute pointing to a Navigation Post
+	// - there is a ref or slug attribute pointing to a Navigation Post
 	// - the Navigation Post isn't available (hasn't resolved) yet.
 	const isLoading =
 		! hasResolvedNavigationMenus ||
 		isCreatingNavigationMenu ||
 		isConvertingClassicMenu ||
-		!! ( ref && ! isEntityAvailable && ! isConvertingClassicMenu );
+		!! (
+			hasNavigationMenuReference &&
+			! isEntityAvailable &&
+			! isConvertingClassicMenu
+		);
 
 	const textDecoration = attributes.style?.typography?.textDecoration;
 
@@ -587,7 +611,7 @@ function Navigation( {
 		}
 
 		// Set vertical orientation and always-open submenus for new blocks.
-		if ( ! hasSetOverlayDefault.current && ! ref ) {
+		if ( ! hasSetOverlayDefault.current && ! hasNavigationMenuReference ) {
 			hasSetOverlayDefault.current = true;
 			setAttributes( {
 				submenuVisibility: 'always',
@@ -600,9 +624,9 @@ function Navigation( {
 		}
 	}, [
 		attributes.layout,
+		hasNavigationMenuReference,
 		isWithinOverlay,
 		overlayMenu,
-		ref,
 		setAttributes,
 	] );
 
@@ -646,7 +670,11 @@ function Navigation( {
 	};
 
 	const onSelectNavigationMenu = ( menuId ) => {
-		handleUpdateMenu( menuId );
+		handleUpdateMenu(
+			navigationMenus?.find( ( menu ) => menu.id === menuId ) ?? {
+				id: menuId,
+			}
+		);
 	};
 
 	useEffect( () => {
@@ -657,7 +685,7 @@ function Navigation( {
 		}
 
 		if ( createNavigationMenuIsSuccess ) {
-			handleUpdateMenu( createNavigationMenuPost?.id, {
+			handleUpdateMenu( createNavigationMenuPost, {
 				focusNavigationBlock: true,
 			} );
 
@@ -674,7 +702,7 @@ function Navigation( {
 	}, [
 		createNavigationMenuStatus,
 		createNavigationMenuError,
-		createNavigationMenuPost?.id,
+		createNavigationMenuPost,
 		createNavigationMenuIsError,
 		createNavigationMenuIsSuccess,
 		isCreatingNavigationMenu,
@@ -693,7 +721,7 @@ function Navigation( {
 			showClassicMenuConversionNotice(
 				__( 'Classic menu imported successfully.' )
 			);
-			handleUpdateMenu( createNavigationMenuPost?.id, {
+			handleUpdateMenu( createNavigationMenuPost, {
 				focusNavigationBlock: true,
 			} );
 		}
@@ -708,7 +736,7 @@ function Navigation( {
 		classicMenuConversionError,
 		hideClassicMenuConversionNotice,
 		showClassicMenuConversionNotice,
-		createNavigationMenuPost?.id,
+		createNavigationMenuPost,
 		handleUpdateMenu,
 	] );
 
@@ -719,7 +747,7 @@ function Navigation( {
 
 		if ( isSelected || isInnerBlockSelected ) {
 			if (
-				ref &&
+				navigationMenuId &&
 				! navMenuResolvedButMissing &&
 				hasResolvedCanUserUpdateNavigationMenu &&
 				! canUserUpdateNavigationMenu
@@ -732,7 +760,7 @@ function Navigation( {
 			}
 
 			if (
-				! ref &&
+				! hasNavigationMenuReference &&
 				hasResolvedCanUserCreateNavigationMenus &&
 				! canUserCreateNavigationMenus
 			) {
@@ -750,7 +778,8 @@ function Navigation( {
 		hasResolvedCanUserUpdateNavigationMenu,
 		canUserCreateNavigationMenus,
 		hasResolvedCanUserCreateNavigationMenus,
-		ref,
+		hasNavigationMenuReference,
+		navigationMenuId,
 		hideNavigationMenuPermissionsNotice,
 		showNavigationMenuPermissionsNotice,
 		navMenuResolvedButMissing,
@@ -966,8 +995,10 @@ function Navigation( {
 						createNavigationMenuIsSuccess
 					}
 					createNavigationMenuIsError={ createNavigationMenuIsError }
-					currentMenuId={ ref }
-					isNavigationMenuMissing={ isNavigationMenuMissing }
+					currentMenuId={ navigationMenuId }
+					isNavigationMenuMissing={
+						hasNavigationMenuReference && isNavigationMenuMissing
+					}
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
@@ -1011,7 +1042,7 @@ function Navigation( {
 
 	// Show a warning if the selected menu is no longer available.
 	// TODO - the user should be able to select a new one?
-	if ( ref && isNavigationMenuMissing ) {
+	if ( hasNavigationMenuReference && isNavigationMenuMissing ) {
 		return (
 			<>
 				<MenuInspectorControls
@@ -1020,8 +1051,10 @@ function Navigation( {
 						createNavigationMenuIsSuccess
 					}
 					createNavigationMenuIsError={ createNavigationMenuIsError }
-					currentMenuId={ ref }
-					isNavigationMenuMissing={ isNavigationMenuMissing }
+					currentMenuId={ navigationMenuId }
+					isNavigationMenuMissing={
+						hasNavigationMenuReference && isNavigationMenuMissing
+					}
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
@@ -1067,7 +1100,7 @@ function Navigation( {
 			<TagName { ...blockProps }>
 				<PlaceholderComponent
 					isSelected={ isSelected }
-					currentMenuId={ ref }
+					currentMenuId={ navigationMenuId }
 					clientId={ clientId }
 					canUserCreateNavigationMenus={
 						canUserCreateNavigationMenus
@@ -1089,8 +1122,10 @@ function Navigation( {
 				clientId={ clientId }
 				createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
 				createNavigationMenuIsError={ createNavigationMenuIsError }
-				currentMenuId={ ref }
-				isNavigationMenuMissing={ isNavigationMenuMissing }
+				currentMenuId={ navigationMenuId }
+				isNavigationMenuMissing={
+					hasNavigationMenuReference && isNavigationMenuMissing
+				}
 				isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 				onCreateNew={ createUntitledEmptyNavigationMenu }
 				onSelectClassicMenu={ onSelectClassicMenu }
@@ -1099,7 +1134,11 @@ function Navigation( {
 				blockEditingMode={ blockEditingMode }
 			/>
 			{ blockEditingMode === 'default' && stylingInspectorControls }
-			<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
+			<EntityProvider
+				kind="postType"
+				type="wp_navigation"
+				id={ navigationMenuId }
+			>
 				<RecursionProvider uniqueId={ recursionId }>
 					{ blockEditingMode === 'contentOnly' &&
 						isEntityAvailable && (
