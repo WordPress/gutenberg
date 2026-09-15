@@ -1,4 +1,4 @@
-import type { MouseEvent } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 import { __, sprintf, _n } from '@wordpress/i18n';
 /*
  * `Button` is pending Design System review (WordPress/gutenberg#76135);
@@ -70,7 +70,7 @@ function hasUserReacted(
  * @param reactions The reactions summary (keyed by slug).
  * @return Array of slugs with reactions.
  */
-function getReactedSlugs(
+export function getReactedSlugs(
 	reactions: ReactionSummary | null | undefined
 ): string[] {
 	if ( ! reactions ) {
@@ -296,21 +296,22 @@ function ReactionButton( {
 	const accessibleLabel = tooltipText || defaultLabel;
 
 	return (
-		// A neutral minimal Button is the Design System's toggle treatment:
-		// a quiet fill at rest and the strong neutral fill under
-		// `aria-pressed`, which is how "you reacted" reads without the pill
+		// Per the design, a reaction someone else left is quiet text with no
+		// border or fill, and the current user's own is the brand outline:
+		// a blue ring and count on a transparent pill. Neither variant
+		// carries a solid fill, so a row of pills never reads as a dark bar
 		// competing with the note it belongs to.
 		<Tooltip.Root>
 			<Tooltip.Trigger
 				render={
 					<Button
 						size="small"
-						// The Design System styles `aria-pressed` only on the
-						// neutral minimal variant, so the current user's own
-						// reaction takes that solid chip while everyone else's
-						// reads as a quieter outline.
-						variant={ isActive ? 'minimal' : 'outline' }
-						tone="neutral"
+						// `aria-pressed` carries the state for assistive tech;
+						// the brand outline is what shows it, since the Design
+						// System gives the pressed neutral minimal Button a
+						// solid dark fill the design does not use.
+						variant={ isActive ? 'outline' : 'minimal' }
+						tone={ isActive ? 'brand' : 'neutral' }
 						className="editor-collab-sidebar-panel__reaction-button"
 						disabled={ disabled }
 						aria-pressed={ isActive }
@@ -351,6 +352,7 @@ interface ReactionDisplayProps {
 	reactions: ReactionSummary | null | undefined;
 	disabled?: boolean;
 	onToggleReaction: ( slug: string ) => void;
+	children?: ReactNode;
 }
 
 /**
@@ -362,12 +364,16 @@ interface ReactionDisplayProps {
  * @param props.disabled         Whether reactions can no longer be toggled
  *                               (the thread is resolved).
  * @param props.onToggleReaction Callback to toggle a reaction.
+ * @param props.children         Rendered after the last pill, inside the same
+ *                               wrapping row, so a trailing control follows
+ *                               the pills onto whichever line they end on.
  */
 export default function ReactionDisplay( {
 	noteId,
 	reactions,
 	disabled = false,
 	onToggleReaction,
+	children,
 }: ReactionDisplayProps ) {
 	// The list is filterable server-side (and static per page load),
 	// so index it once per list identity.
@@ -378,13 +384,19 @@ export default function ReactionDisplay( {
 	);
 	const reactedSlugs = getReactedSlugs( reactions );
 
-	if ( reactedSlugs.length === 0 ) {
+	if ( reactedSlugs.length === 0 && ! children ) {
 		return null;
 	}
 
 	return (
-		// `sm`: at `xs` two adjacent pressed pills read as one solid bar.
-		<Stack direction="row" gap="sm" justify="flex-start" wrap="wrap">
+		// `sm`: at `xs` two adjacent outlined pills read as one shape.
+		<Stack
+			direction="row"
+			gap="sm"
+			align="flex-start"
+			justify="flex-start"
+			wrap="wrap"
+		>
 			{ reactedSlugs.map( ( slug ) => {
 				const count = getReactionCount( reactions, slug );
 				const isActive = hasUserReacted( reactions, slug );
@@ -404,6 +416,7 @@ export default function ReactionDisplay( {
 					/>
 				);
 			} ) }
+			{ children }
 		</Stack>
 	);
 }
