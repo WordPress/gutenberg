@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Font Library: Use the public `Menu` from `@wordpress/ui` for font collection actions.
+
 ## 1.23.0 (2026-09-23)
 
 ### Enhancements
