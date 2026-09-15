@@ -69,10 +69,17 @@ function flatToEslintrc( flatConfigs ) {
 	let parser;
 
 	for ( const config of flatConfigs ) {
-		// Scoped plugins use their npm namespace in eslintrc rule names.
+		// Use the same plugin namespaces for rule names and plugin registration.
 		const configRules = Object.fromEntries(
 			Object.entries( config.rules ?? {} ).map( ( [ name, value ] ) => [
-				name.replace( /^vitest\//, '@vitest/' ),
+				name.replace(
+					/^(.+)\//,
+					( _, namespace ) =>
+						`${
+							PLUGIN_NAMESPACE_TO_ESLINTRC_NAME[ namespace ] ??
+							namespace
+						}/`
+				),
 				value,
 			] )
 		);
