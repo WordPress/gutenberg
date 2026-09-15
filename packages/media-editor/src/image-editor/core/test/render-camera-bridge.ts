@@ -24,6 +24,7 @@
  *
  * ...run these tests to verify the two paths still agree.
  */
+import { describe, expect, it } from 'vitest';
 import {
 	createCamera,
 	worldToScreen,

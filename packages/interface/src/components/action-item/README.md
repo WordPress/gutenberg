@@ -25,7 +25,10 @@ The component used as the container of the fills. Defaults to the `MenuGroup` co
 
 ### fillProps
 
-Props passed to every fill. An `as` among them provides the component the items render as, unless the item asks for one of its own.
+Defaults applied to every `ActionItem` in the slot. Only `as` and `onClick` are used:
+
+-   `as`: the component the items render as. An item's own `as` overrides it.
+-   `onClick`: a handler run on every item, in addition to the item's own `onClick`.
 
 -   Type: `Object`
 -   Required: no
@@ -50,7 +53,7 @@ The name of the slot and fill pair passed to the `Fill` component.
 
 ### onClick
 
-Callback function executed when a click on the item happens.
+Callback function executed when a click on the item happens. The slot's `fillProps.onClick` runs as well, if set.
 
 -   Type: `Function`
 -   Required: no

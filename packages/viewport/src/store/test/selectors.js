@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { isViewportMatch } from '../selectors';
 
 describe( 'selectors', () => {

@@ -1,6 +1,7 @@
 import { createRequire } from 'module';
 import { join, resolve } from 'path';
 import globals from 'globals';
+import { globSync } from 'glob';
 import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
 import storybookPlugin from 'eslint-plugin-storybook';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
@@ -9,12 +10,24 @@ import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
+import {
+	discoverTestFiles,
+	getVitestTestsByProject,
+} from '../../test/unit/scripts/discover-test-files.mjs';
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
-// React is loaded conditionally below, so these CommonJS imports cannot form
-// one contiguous block.
-// eslint-disable-next-line import/order
 const wpPlugin = require( '@wordpress/eslint-plugin' );
+const testMigration = require(
+	join( rootDir, 'test/unit/test-migration.json' )
+);
+
+const vitestTestsByProject = getVitestTestsByProject(
+	discoverTestFiles( rootDir ),
+	testMigration
+);
+const vitestTestPatterns = Object.values( vitestTestsByProject ).flat();
+const vitestJsdomTestPatterns = vitestTestsByProject.jsdom;
+const vitestBrowserTestPatterns = vitestTestsByProject.browser;
 // Prefer the installed React version for linting, but fall back to the detected version.
 let reactVersion = 'detect';
 try {
@@ -29,24 +42,26 @@ try {
  * of the same plugin name resolves to a single shared reference.
  *
  * @param {Object[]} configs Flat config array.
- * @return {Object[]} The same array with plugin references deduplicated.
+ * @return {Object[]} Configs with plugin references deduplicated.
  */
 function dedupePlugins( configs ) {
 	/** @type {Record<string,Object>} */
 	const seen = Object.create( null );
-	for ( const config of configs ) {
+	return configs.map( ( config ) => {
 		if ( ! config.plugins ) {
-			continue;
+			return config;
 		}
-		for ( const name of Object.keys( config.plugins ) ) {
+		const plugins = {};
+		for ( const [ name, plugin ] of Object.entries( config.plugins ) ) {
 			if ( name in seen ) {
-				config.plugins[ name ] = seen[ name ];
+				plugins[ name ] = seen[ name ];
 			} else {
-				seen[ name ] = config.plugins[ name ];
+				seen[ name ] = plugin;
+				plugins[ name ] = plugin;
 			}
 		}
-	}
-	return configs;
+		return { ...config, plugins };
+	} );
 }
 
 /**
@@ -64,15 +79,22 @@ const developmentFiles = [
 ];
 
 // All files from packages that have types provided with TypeScript.
-const glob = require( 'glob' ).sync;
-const typedFiles = glob( 'packages/*/package.json', { cwd: rootDir } )
+const typedFiles = globSync( 'packages/*/package.json', {
+	cwd: rootDir,
+	posix: true,
+} )
+	.sort()
 	.filter( ( fileName ) => require( join( rootDir, fileName ) ).types )
 	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.{js,jsx}' ) );
 
 // All files from bundled packages: packages not registered as WordPress
 // scripts or script modules, which plugins therefore compile into their own
 // bundles when importing them via npm.
-const bundledPackageFiles = glob( 'packages/*/package.json', { cwd: rootDir } )
+const bundledPackageFiles = globSync( 'packages/*/package.json', {
+	cwd: rootDir,
+	posix: true,
+} )
+	.sort()
 	.filter( ( fileName ) => {
 		const pkg = require( join( rootDir, fileName ) );
 		return ! pkg.wpScript && ! pkg.wpScriptModuleExports;
@@ -498,6 +520,53 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: Vitest files — runner-neutral jest-dom and Testing Library rules.
+	{
+		...jestDomPlugin.configs[ 'flat/recommended' ],
+		files: vitestJsdomTestPatterns,
+	},
+	{
+		...testingLibraryPlugin.configs[ 'flat/react' ],
+		files: vitestJsdomTestPatterns,
+	},
+	{
+		...jestDomPlugin.configs[ 'flat/recommended' ],
+		files: vitestBrowserTestPatterns,
+	},
+	{
+		...testingLibraryPlugin.configs[ 'flat/react' ],
+		files: vitestBrowserTestPatterns,
+		settings: {
+			'testing-library/utils-module': 'off',
+			'testing-library/custom-renders': 'off',
+			'testing-library/custom-queries': 'off',
+		},
+		rules: {
+			...testingLibraryPlugin.configs[ 'flat/react' ].rules,
+			// Browser Mode locators are the browser-native alternative to
+			// Testing Library's screen queries.
+			'testing-library/prefer-screen-queries': 'off',
+		},
+	},
+	{
+		plugins: jestPlugin.configs[ 'flat/recommended' ].plugins,
+		files: vitestTestPatterns,
+		settings: {
+			jest: {
+				globalPackage: 'vitest',
+			},
+		},
+		rules: {
+			...jestPlugin.configs[ 'flat/recommended' ].rules,
+			// Preserve existing test patterns while changing runners. These rules
+			// newly flag valid patterns once the globals are imported from Vitest.
+			'jest/no-conditional-expect': 'off',
+			'jest/valid-describe-callback': 'off',
+			'jest/valid-expect-in-promise': 'off',
+			'jest/valid-title': 'off',
+		},
+	},
+
 	// Override: Jest test files (unit tests).
 	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
 		...config,
@@ -506,7 +575,11 @@ export default dedupePlugins( [
 			'**/test/**/*.{js,jsx}',
 			'**/__tests__/**/*.{js,jsx}',
 		],
-		ignores: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
+		ignores: [
+			'test/e2e/**/*.js',
+			'test/performance/**/*.js',
+			...vitestTestPatterns,
+		],
 	} ) ),
 
 	// Override: Test files — jest-dom, testing-library, jest recommended.
@@ -517,6 +590,7 @@ export default dedupePlugins( [
 			'test/e2e/**/*.[tj]s?(x)',
 			'test/performance/**/*.[tj]s?(x)',
 			'test/storybook-playwright/**/*.[tj]s?(x)',
+			...vitestTestPatterns,
 		],
 	},
 	{
@@ -526,6 +600,7 @@ export default dedupePlugins( [
 			'test/e2e/**/*.[tj]s?(x)',
 			'test/performance/**/*.[tj]s?(x)',
 			'test/storybook-playwright/**/*.[tj]s?(x)',
+			...vitestTestPatterns,
 		],
 	},
 	{
@@ -535,6 +610,7 @@ export default dedupePlugins( [
 			'test/e2e/**/*.[tj]s?(x)',
 			'test/performance/**/*.[tj]s?(x)',
 			'test/storybook-playwright/**/*.[tj]s?(x)',
+			...vitestTestPatterns,
 		],
 		rules: {
 			...jestPlugin.configs[ 'flat/recommended' ].rules,
@@ -1012,7 +1088,7 @@ export default dedupePlugins( [
 	// Override: typings — global type declarations require `var` and define
 	// the globals that wp-global-usage warns about.
 	{
-		files: [ 'typings/**/*.d.ts' ],
+		files: [ 'tools/monorepo/typings/**/*.d.ts' ],
 		rules: {
 			'no-var': 'off',
 			'@wordpress/wp-global-usage': 'off',

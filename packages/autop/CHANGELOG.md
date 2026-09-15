@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 4.55.0 (2026-09-10)
+
+### Internal
+
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
 ## 4.54.0 (2026-08-26)
 
 ### Internal

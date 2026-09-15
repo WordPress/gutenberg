@@ -31,6 +31,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `padding`: `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
+- [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - `clientNavigation`: `true`
 
 ## Block Markup
 
