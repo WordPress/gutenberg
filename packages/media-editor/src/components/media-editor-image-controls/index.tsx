@@ -1,13 +1,6 @@
-import {
-	Button,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-} from '@wordpress/components';
+import { Button, SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
-	aspectRatio as aspectRatioIcon,
-	check,
 	rotateLeft,
 	rotateRight,
 	flipHorizontal,
@@ -36,7 +29,7 @@ export interface MediaEditorImageControlsProps {
 	/**
 	 * When `true`, render rotate, flip and zoom as labelled groups — the Crop
 	 * panel layout used on wide viewports. When `false` (default), render a
-	 * single flat row of icon buttons — the footer layout used at narrower
+	 * compact row of controls that wraps as needed — the footer layout used at narrower
 	 * widths.
 	 */
 	withLabels?: boolean;
@@ -173,40 +166,24 @@ export default function MediaEditorImageControls( {
 		</>
 	);
 
-	const aspectRatioDropdown = hasAspectRatioControl ? (
-		<DropdownMenu
-			icon={ aspectRatioIcon }
+	const aspectRatioSelect = hasAspectRatioControl ? (
+		<SelectControl
+			className="media-editor-image-controls__aspect-ratio"
 			label={ __( 'Aspect ratio' ) }
-			popoverProps={ { placement: 'top' } }
-			toggleProps={ { size: 'compact', disabled } }
-		>
-			{ ( { onClose } ) => (
-				<MenuGroup label={ __( 'Aspect ratio' ) }>
-					{ aspectRatioOptions.map( ( preset ) => {
-						const value = preset.value.toString();
-						const isSelected = value === aspectRatioValue;
-						return (
-							<MenuItem
-								key={ value }
-								role="menuitemradio"
-								isSelected={ isSelected }
-								icon={ isSelected ? check : undefined }
-								disabled={ disabled }
-								onClick={ () => {
-									if ( disabled ) {
-										return;
-									}
-									setAspectRatioValue( value );
-									onClose();
-								} }
-							>
-								{ preset.label }
-							</MenuItem>
-						);
-					} ) }
-				</MenuGroup>
-			) }
-		</DropdownMenu>
+			hideLabelFromVision
+			size="compact"
+			value={ aspectRatioValue }
+			onChange={ ( value ) => {
+				if ( ! disabled ) {
+					setAspectRatioValue( value );
+				}
+			} }
+			disabled={ disabled }
+			options={ aspectRatioOptions.map( ( preset ) => ( {
+				label: preset.label,
+				value: preset.value.toString(),
+			} ) ) }
+		/>
 	) : null;
 
 	if ( withLabels ) {
@@ -268,7 +245,7 @@ export default function MediaEditorImageControls( {
 			{ rotateButtons }
 			{ flipButtons }
 			{ zoomButtons }
-			{ aspectRatioDropdown }
+			{ aspectRatioSelect }
 		</div>
 	);
 }
