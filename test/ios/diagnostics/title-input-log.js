@@ -46,6 +46,19 @@
 		);
 	}
 
+	function describeNode( node ) {
+		if ( ! node ) {
+			return '-';
+		}
+		if ( node.nodeType === 3 ) {
+			return JSON.stringify( node.data.slice( 0, 4 ) );
+		}
+		const placeholder =
+			node.hasAttribute &&
+			node.hasAttribute( 'data-rich-text-placeholder' );
+		return node.nodeName + ( placeholder ? '[placeholder]' : '' );
+	}
+
 	function describeChildren( title ) {
 		return Array.from( title.childNodes )
 			.slice( 0, 6 )
@@ -98,7 +111,11 @@
 			.split( '\n' )
 			.slice( 4, 8 )
 			.map( ( line ) =>
-				line.trim().replace( /^.*\//, '' ).replace( /\)$/, '' )
+				line
+					.trim()
+					.replace( /^.*\/([^/]+\/[^/]+)$/, '$1' )
+					.replace( /\?[^:]*/, '' )
+					.replace( /\)$/, '' )
 			)
 			.join( ' > ' );
 	}
@@ -130,7 +147,14 @@
 			const original = win.Node.prototype[ method ];
 			win.Node.prototype[ method ] = function ( ...args ) {
 				if ( inTitle( this ) ) {
-					note( method );
+					note(
+						method +
+							' ' +
+							describeNode( args[ 0 ] ) +
+							( args[ 1 ]
+								? ' / ' + describeNode( args[ 1 ] )
+								: '' )
+					);
 				}
 				return original.apply( this, args );
 			};
@@ -144,7 +168,14 @@
 			const original = win.CharacterData.prototype[ method ];
 			win.CharacterData.prototype[ method ] = function ( ...args ) {
 				if ( inTitle( this ) ) {
-					note( method );
+					note(
+						method +
+							' ' +
+							describeNode( args[ 0 ] ) +
+							( args[ 1 ]
+								? ' / ' + describeNode( args[ 1 ] )
+								: '' )
+					);
 				}
 				return original.apply( this, args );
 			};
@@ -235,21 +266,32 @@
 				title,
 				'mutation ' +
 					mutations
-						.map(
-							( m ) =>
-								m.type +
-								( m.type === 'childList'
-									? '+' +
-									  m.addedNodes.length +
-									  '-' +
-									  m.removedNodes.length
-									: '' )
+						.map( ( m ) =>
+							m.type === 'childList'
+								? 'in ' +
+								  describeNode( m.target ) +
+								  ' +[' +
+								  Array.from( m.addedNodes )
+										.map( describeNode )
+										.join( ' ' ) +
+								  '] -[' +
+								  Array.from( m.removedNodes )
+										.map( describeNode )
+										.join( ' ' ) +
+								  ']'
+								: 'data ' +
+								  describeNode( m.target ) +
+								  ' was ' +
+								  JSON.stringify(
+										( m.oldValue || '' ).slice( 0, 4 )
+								  )
 						)
-						.join( ',' )
+						.join( ', ' )
 			)
 		).observe( title, {
 			childList: true,
 			characterData: true,
+			characterDataOldValue: true,
 			subtree: true,
 		} );
 		// The canvas can be replaced; keep looking for a new one.
