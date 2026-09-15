@@ -63,44 +63,63 @@ export default function getRectangleFromRange( range ) {
 		);
 	}
 
-	// Only a position inside a text node has a caret rectangle. A position
-	// on an element, between two of its children, is the same spot as the
-	// start of the child after it or the end of the child before it, and a
-	// position inside an element with no children, like a line break or the
-	// placeholder, is the same spot as the position before that element in
-	// its parent. Measure a range at that text position instead.
-	if ( range.startContainer.nodeType !== range.startContainer.TEXT_NODE ) {
-		range = range.cloneRange();
-		if (
-			! range.startContainer.childNodes.length &&
-			range.startContainer.parentNode
-		) {
-			range.setStartBefore( range.startContainer );
-		}
-		const { startContainer, startOffset } = range;
-		// The start of the child at the offset, descended to its innermost
-		// first node, else the end of the child before it, descended to its
-		// innermost last node.
-		let node = startContainer.childNodes[ startOffset ];
-		let offset = 0;
-		while ( node?.firstChild ) {
-			node = node.firstChild;
-		}
-		if ( ! node || node.nodeType !== node.TEXT_NODE ) {
-			node = startContainer.childNodes[ startOffset - 1 ];
-			while ( node?.lastChild ) {
-				node = node.lastChild;
-			}
-			offset = /** @type {Text} */ ( node )?.length;
-		}
-		if ( node && node.nodeType === node.TEXT_NODE ) {
-			range.setStart( node, offset );
-		}
+	const { startContainer, startOffset } = range;
+	const { ownerDocument } = startContainer;
+	assertIsDefined( ownerDocument, 'ownerDocument' );
+
+	// A range inside an element with no children, like a line break or the
+	// placeholder, is the same spot as the position before that element.
+	if (
+		startContainer.nodeType !== startContainer.TEXT_NODE &&
+		! startContainer.childNodes.length &&
+		startContainer.parentNode
+	) {
+		range = ownerDocument.createRange();
+		range.setStartBefore( startContainer );
 		range.collapse( true );
+		return getRectangleFromRange( range );
 	}
 
-	const { startContainer } = range;
-	const { ownerDocument } = startContainer;
+	// Only a position inside a text node has a caret rectangle. A position
+	// on an element, between two of its children, is the same spot as the
+	// end of the text before it and the start of the text after it, so
+	// measure there instead. When the two sit on different lines there is
+	// no way to know which line the caret is on, so don't return anything.
+	if ( startContainer.nodeType !== startContainer.TEXT_NODE ) {
+		let before = startContainer.childNodes[ startOffset - 1 ];
+		while ( before?.lastChild ) {
+			before = before.lastChild;
+		}
+		let after = startContainer.childNodes[ startOffset ];
+		while ( after?.firstChild ) {
+			after = after.firstChild;
+		}
+
+		range = ownerDocument.createRange();
+		let beforeRect;
+		if ( before && before.nodeType === before.TEXT_NODE ) {
+			range.setStart( before, /** @type {Text} */ ( before ).length );
+			range.collapse( true );
+			beforeRect = range.getClientRects()[ 0 ];
+		}
+		let afterRect;
+		if ( after && after.nodeType === after.TEXT_NODE ) {
+			range.setStart( after, 0 );
+			range.collapse( true );
+			afterRect = range.getClientRects()[ 0 ];
+		}
+
+		if ( beforeRect && afterRect && beforeRect.bottom <= afterRect.top ) {
+			return null;
+		}
+		if ( ! afterRect ) {
+			if ( ! beforeRect ) {
+				return null;
+			}
+			range.setStart( before, /** @type {Text} */ ( before ).length );
+			range.collapse( true );
+		}
+	}
 
 	const rects = range.getClientRects();
 

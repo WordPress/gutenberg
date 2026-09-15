@@ -65,15 +65,48 @@ describe( 'getRectangleFromRange', () => {
 	it( 'measures a position after a line break at the start of the next line', () => {
 		document.body.innerHTML = '<p>abc<br>def</p>';
 		const paragraph = document.querySelector( 'p' );
-		const nextLine = paragraph.lastChild;
 		rectsFor( [
 			[ paragraph.firstChild, 3, new window.DOMRect( 40, 100, 0, 24 ) ],
-			[ nextLine, 0, new window.DOMRect( 8, 124, 0, 24 ) ],
+			[ paragraph.lastChild, 0, new window.DOMRect( 8, 124, 0, 24 ) ],
 		] );
 
 		expect(
 			getRectangleFromRange( collapsedRange( paragraph, 2 ) )
 		).toMatchObject( { left: 8, top: 124, height: 24 } );
+	} );
+
+	it( 'returns null for a position between texts on different lines', () => {
+		document.body.innerHTML = '<p>abc<em>def</em></p>';
+		const paragraph = document.querySelector( 'p' );
+		rectsFor( [
+			[ paragraph.firstChild, 3, new window.DOMRect( 40, 100, 0, 24 ) ],
+			[
+				paragraph.lastChild.firstChild,
+				0,
+				new window.DOMRect( 8, 124, 0, 24 ),
+			],
+		] );
+
+		expect(
+			getRectangleFromRange( collapsedRange( paragraph, 1 ) )
+		).toBeNull();
+	} );
+
+	it( 'measures a position between texts on the same line', () => {
+		document.body.innerHTML = '<p>abc<em>def</em></p>';
+		const paragraph = document.querySelector( 'p' );
+		rectsFor( [
+			[ paragraph.firstChild, 3, new window.DOMRect( 40, 100, 0, 24 ) ],
+			[
+				paragraph.lastChild.firstChild,
+				0,
+				new window.DOMRect( 40, 100, 0, 24 ),
+			],
+		] );
+
+		expect(
+			getRectangleFromRange( collapsedRange( paragraph, 1 ) )
+		).toMatchObject( { left: 40, top: 100, height: 24 } );
 	} );
 
 	it( 'measures a position inside an empty inline element beside the text next to it', () => {
