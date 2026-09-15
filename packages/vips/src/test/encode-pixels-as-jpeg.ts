@@ -1,6 +1,6 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { encodePixelsAsJpeg } from '../';
 
 /**
@@ -17,11 +17,17 @@ import { encodePixelsAsJpeg } from '../';
  *         -o exif-camera.heic exif-rotated-90cw.heic
  */
 
-vi.mock( 'wasm-vips', () => {
-	const RealVips = vi.requireActual( 'wasm-vips' );
-	return vi.fn( ( options: Record< string, unknown > = {} ) =>
-		RealVips( { dynamicLibraries: options.dynamicLibraries } )
-	);
+vi.mock( import( 'wasm-vips' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		default: vi.fn( ( options: { dynamicLibraries?: string[] } = {} ) =>
+			original.default( {
+				dynamicLibraries: options.dynamicLibraries,
+			} )
+		) as unknown as typeof original.default,
+	};
 } );
 
 const FIXTURES = join( __dirname, 'fixtures' );
@@ -61,7 +67,8 @@ describe( 'encodePixelsAsJpeg', () => {
 	let vips: any;
 
 	beforeAll( async () => {
-		const Vips = vi.requireActual( 'wasm-vips' );
+		const { default: Vips } =
+			await vi.importActual< typeof import('wasm-vips') >( 'wasm-vips' );
 		vips = await Vips( { dynamicLibraries: [ 'vips-heif.wasm' ] } );
 	} );
 

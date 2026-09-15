@@ -335,17 +335,19 @@ describe( 'canvasConvertToJpeg', () => {
 		const setupStrategy1 = ( canvasJpeg: Blob ) => {
 			const mockBitmap = { width: 32, height: 32, close: vi.fn() };
 			const convertToBlob = vi.fn().mockResolvedValue( canvasJpeg );
-			global.createImageBitmap = vi
+			global.createImageBitmap = vi.fn().mockResolvedValue( mockBitmap );
+			global.OffscreenCanvas = vi
 				.fn()
-				.mockResolvedValue( mockBitmap );
-			global.OffscreenCanvas = vi.fn().mockImplementation( () => ( {
-				width: 32,
-				height: 32,
-				getContext: vi
-					.fn()
-					.mockReturnValue( { drawImage: vi.fn() } ),
-				convertToBlob,
-			} ) );
+				.mockImplementation( function OffscreenCanvas() {
+					return {
+						width: 32,
+						height: 32,
+						getContext: vi
+							.fn()
+							.mockReturnValue( { drawImage: vi.fn() } ),
+						convertToBlob,
+					};
+				} );
 			return convertToBlob;
 		};
 
