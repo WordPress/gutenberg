@@ -8,7 +8,6 @@ const meta: Meta< typeof ColorPicker > = {
 	title: 'Components/Selection & Input/Color/ColorPicker',
 	id: 'components-colorpicker',
 	argTypes: {
-		as: { control: false },
 		color: { control: false },
 	},
 	args: {
