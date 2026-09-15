@@ -83,10 +83,15 @@ export const LayoutPanel = {
 				'Custom text for the modal cancel button. Defaults to "Cancel".',
 			if: { arg: 'openAs', eq: 'modal' },
 		},
+		disabled: {
+			control: { type: 'boolean' },
+			description: 'Disable all fields in the form.',
+		},
 	},
 	args: {
 		openAs: 'default',
 		showPlaceholderIfEmpty: false,
+		disabled: false,
 	},
 };
 

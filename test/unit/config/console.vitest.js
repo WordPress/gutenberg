@@ -27,8 +27,7 @@ function createErrorMessage( state, spyInfo ) {
 		'\n\n' +
 		message +
 		'\n\n' +
-		`console.${ methodName }() should not be used unless explicitly expected\n` +
-		'See https://www.npmjs.com/package/@wordpress/jest-console for details.';
+		`console.${ methodName }() should not be used unless explicitly expected.`;
 }
 
 function createSpyInfo( state, spy, matcherName, methodName, expected ) {
