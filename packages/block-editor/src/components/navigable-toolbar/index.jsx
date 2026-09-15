@@ -68,7 +68,13 @@ function useIsAccessibleToolbar( toolbarRef ) {
 	);
 
 	const determineIsAccessibleToolbar = useCallback( () => {
-		const tabbables = focus.tabbable.find( toolbarRef.current );
+		// Portaled menus add focus guards beside their trigger. These are not controls.
+		const tabbables = focus.tabbable
+			.find( toolbarRef.current )
+			.filter(
+				( element ) =>
+					! element.hasAttribute( 'data-base-ui-focus-guard' )
+			);
 		// A hidden toolbar has no tabbables, so keep its current classification.
 		if ( tabbables.length === 0 ) {
 			return;
