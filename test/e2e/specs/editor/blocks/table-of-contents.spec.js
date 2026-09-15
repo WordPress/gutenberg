@@ -104,7 +104,9 @@ test.describe( 'Table of Contents', () => {
 			await admin.createNewPost();
 		} );
 
-		test( 'updates in the editor as headings are added, removed, or reordered', async ( {
+		// A newly created post must be saved before its table of contents can be
+		// shown. The before-save experience is covered separately below.
+		test( 'shows heading changes after saving the post', async ( {
 			editor,
 		} ) => {
 			await editor.setContent(
@@ -112,6 +114,7 @@ test.describe( 'Table of Contents', () => {
 					{ content: 'First section', anchor: 'first-section' },
 				] )
 			);
+			await editor.saveDraft();
 
 			const tableOfContents = getTableOfContentsEditorBlock( editor );
 			await expect(
@@ -126,6 +129,10 @@ test.describe( 'Table of Contents', () => {
 			);
 			await expect( tableOfContents.getByRole( 'link' ) ).toHaveText( [
 				'First section',
+			] );
+			await editor.saveDraft();
+			await expect( tableOfContents.getByRole( 'link' ) ).toHaveText( [
+				'First section',
 				'Second section',
 			] );
 
@@ -134,6 +141,7 @@ test.describe( 'Table of Contents', () => {
 					{ content: 'Second section', anchor: 'second-section' },
 				] )
 			);
+			await editor.saveDraft();
 			await expect(
 				tableOfContents.getByRole( 'link', { name: 'Second section' } )
 			).toBeVisible();
@@ -147,13 +155,33 @@ test.describe( 'Table of Contents', () => {
 					{ content: 'First section', anchor: 'first-section' },
 				] )
 			);
+			await editor.saveDraft();
 			await expect( tableOfContents.getByRole( 'link' ) ).toHaveText( [
 				'Second section',
 				'First section',
 			] );
 		} );
 
-		test( 'shows the same nested heading list in the editor and after publish', async ( {
+		test( 'does not show a table of contents until a new post is saved', async ( {
+			editor,
+		} ) => {
+			await editor.setContent(
+				postContentWithTocAndHeadings( [
+					{
+						content: 'Unsaved first section',
+						anchor: 'unsaved-first-section',
+					},
+				] )
+			);
+
+			await expect(
+				editor.canvas.getByRole( 'navigation', {
+					name: 'Table of Contents',
+				} )
+			).toHaveCount( 0 );
+		} );
+
+		test( 'shows the same server-rendered nested heading list in the editor and after publish', async ( {
 			editor,
 			page,
 			requestUtils,
@@ -168,6 +196,7 @@ test.describe( 'Table of Contents', () => {
 					},
 				] )
 			);
+			await editor.saveDraft();
 
 			const tableOfContents = getTableOfContentsEditorBlock( editor );
 			await expect( tableOfContents.getByRole( 'link' ) ).toHaveText( [
@@ -300,6 +329,7 @@ test.describe( 'Table of Contents', () => {
 					},
 				] )
 			);
+			await editor.saveDraft();
 
 			await getTableOfContentsEditorBlock( editor ).click();
 			await editor.openDocumentSettingsSidebar();
@@ -345,6 +375,7 @@ test.describe( 'Table of Contents', () => {
 					{ content: 'List style section', anchor: 'list-style' },
 				] )
 			);
+			await editor.saveDraft();
 
 			const tableOfContents = getTableOfContentsEditorBlock( editor );
 			const list = tableOfContents.getByRole( 'list' ).first();
@@ -372,19 +403,17 @@ test.describe( 'Table of Contents', () => {
 			).toHaveCSS( 'list-style-type', 'disc' );
 		} );
 
-		test( 'shows an editor notice and does not render on the front of site when no headings exist', async ( {
+		test( 'does not render a table of contents when no headings exist', async ( {
 			editor,
 			page,
 		} ) => {
 			await editor.insertBlock( { name: 'core/table-of-contents' } );
 
-			const tableOfContents = getTableOfContentsEditorBlock( editor );
-			await expect( tableOfContents ).toContainText(
-				'Start adding Heading blocks to create a table of contents.'
-			);
-			await expect( tableOfContents ).toContainText(
-				'Headings with HTML anchors will be linked here.'
-			);
+			await expect(
+				editor.canvas.getByRole( 'navigation', {
+					name: 'Table of Contents',
+				} )
+			).toHaveCount( 0 );
 
 			const postId = await editor.publishPost();
 			await openPostOnFrontend( page, postId );

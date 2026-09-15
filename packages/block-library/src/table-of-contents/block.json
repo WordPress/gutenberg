@@ -29,6 +29,7 @@
 			"default": true
 		}
 	},
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"anchor": true,
 		"ariaLabel": true,
