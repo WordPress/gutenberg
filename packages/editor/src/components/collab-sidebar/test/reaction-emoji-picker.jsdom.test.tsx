@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { dispatch } from '@wordpress/data';
@@ -29,11 +30,13 @@ describe( 'buildEmojiBySlugMap', () => {
 } );
 
 describe( 'ReactionEmojiPicker', () => {
-	it( 'renders a labelled group with one button per curated emoji', () => {
+	it( 'renders a labelled group with one button per curated emoji', async () => {
 		render( <ReactionEmojiPicker onSelect={ () => {} } /> );
 
+		// Composite settles its active item after mount, so the first query
+		// awaits that update instead of letting it land outside the test.
 		expect(
-			screen.getByRole( 'group', {
+			await screen.findByRole( 'group', {
 				name: 'Add an emoji reaction',
 			} )
 		).toBeVisible();
@@ -49,7 +52,7 @@ describe( 'ReactionEmojiPicker', () => {
 
 	it( 'calls onSelect with the storage slug, not the emoji character', async () => {
 		const user = userEvent.setup();
-		const onSelect = jest.fn();
+		const onSelect = vi.fn();
 		render( <ReactionEmojiPicker onSelect={ onSelect } /> );
 
 		await user.click( screen.getByRole( 'button', { name: 'Smile' } ) );
@@ -69,7 +72,7 @@ describe( 'ReactionEmojiPicker', () => {
 			} );
 		} );
 
-		it( 'renders the list from editor settings when present', () => {
+		it( 'renders the list from editor settings when present', async () => {
 			dispatch( blockEditorStore ).updateSettings( {
 				noteReactionEmojis: [
 					...REACTION_EMOJIS,
@@ -78,7 +81,7 @@ describe( 'ReactionEmojiPicker', () => {
 			} );
 			render( <ReactionEmojiPicker onSelect={ () => {} } /> );
 
-			expect( screen.getAllByRole( 'button' ) ).toHaveLength(
+			expect( await screen.findAllByRole( 'button' ) ).toHaveLength(
 				REACTION_EMOJIS.length + 1
 			);
 			expect(
@@ -86,7 +89,7 @@ describe( 'ReactionEmojiPicker', () => {
 			).toBeVisible();
 		} );
 
-		it( 'drops malformed entries and falls back to defaults when none survive', () => {
+		it( 'drops malformed entries and falls back to defaults when none survive', async () => {
 			dispatch( blockEditorStore ).updateSettings( {
 				noteReactionEmojis: [
 					null,
@@ -96,7 +99,7 @@ describe( 'ReactionEmojiPicker', () => {
 			} );
 			render( <ReactionEmojiPicker onSelect={ () => {} } /> );
 
-			expect( screen.getAllByRole( 'button' ) ).toHaveLength(
+			expect( await screen.findAllByRole( 'button' ) ).toHaveLength(
 				REACTION_EMOJIS.length
 			);
 		} );

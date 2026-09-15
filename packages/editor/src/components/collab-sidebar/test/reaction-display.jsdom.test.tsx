@@ -1,11 +1,12 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import apiFetch from '@wordpress/api-fetch';
 import ReactionDisplay, { AddReactionButton } from '../reaction-display';
 
-jest.mock( '@wordpress/api-fetch', () => jest.fn() );
+vi.mock( import( '@wordpress/api-fetch' ), () => ( { default: vi.fn() } ) );
 
-const mockApiFetch = jest.mocked( apiFetch );
+const mockApiFetch = vi.mocked( apiFetch );
 
 /*
  * The tooltip name cache in reaction-display.js is module-level and keyed
@@ -95,7 +96,7 @@ describe( 'ReactionDisplay', () => {
 
 	it( 'calls onToggleReaction with the slug when a pill is clicked', async () => {
 		const user = userEvent.setup();
-		const onToggleReaction = jest.fn();
+		const onToggleReaction = vi.fn();
 		render(
 			<ReactionDisplay
 				noteId={ uniqueNoteId }
@@ -270,7 +271,7 @@ describe( 'ReactionDisplay', () => {
 
 	it( 'leaves pills focusable but inert on a resolved thread', async () => {
 		const user = userEvent.setup();
-		const onToggleReaction = jest.fn();
+		const onToggleReaction = vi.fn();
 		render(
 			<ReactionDisplay
 				noteId={ uniqueNoteId }
@@ -324,7 +325,7 @@ describe( 'AddReactionButton', () => {
 
 	it( 'opens the curated picker and toggles the chosen reaction', async () => {
 		const user = userEvent.setup();
-		const onToggleReaction = jest.fn();
+		const onToggleReaction = vi.fn();
 		render(
 			<AddReactionButton
 				noteId={ uniqueNoteId }
