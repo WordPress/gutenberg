@@ -582,10 +582,13 @@ test.describe( 'Page List', () => {
 			await page.getByRole( 'button', { name: 'Layout' } ).click();
 			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 
-			await page
-				.getByRole( 'table' )
-				.getByRole( 'checkbox', { name: 'Select all' } )
-				.check();
+			const table = page.getByRole( 'table' );
+			await table.getByRole( 'checkbox', { name: 'Select all' } ).click();
+			// The extensible site editor keeps the selection in the URL, so
+			// the checkbox only flips once the route has re-rendered.
+			await expect(
+				table.getByRole( 'checkbox', { name: 'Deselect all' } )
+			).toBeChecked();
 			await page
 				.locator( '.dataviews-bulk-actions-footer__container' )
 				.getByRole( 'button', { name: 'Quick Edit' } )
