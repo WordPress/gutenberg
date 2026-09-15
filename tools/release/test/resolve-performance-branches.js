@@ -1,12 +1,13 @@
-const fs = require( 'node:fs' );
-const path = require( 'node:path' );
-const {
+import fs from 'node:fs';
+import path from 'node:path';
+import { describe, expect, it } from 'vitest';
+import {
 	resolveBranches,
 	resolveShards,
 	computeBuildKey,
 	getTestedUpToMajor,
 	REFERENCE_COMMIT,
-} = require( '../resolve-performance-branches.mjs' );
+} from '../resolve-performance-branches.mjs';
 
 const sha = 'a'.repeat( 40 );
 const baseSha = 'b'.repeat( 40 );

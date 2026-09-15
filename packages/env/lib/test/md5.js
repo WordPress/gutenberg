@@ -1,4 +1,6 @@
-'use strict';
+import { createRequire } from 'node:module';
+import { describe, expect, it } from 'vitest';
+const require = createRequire( import.meta.url );
 const md5 = require( '../md5' );
 
 describe( 'md5', () => {

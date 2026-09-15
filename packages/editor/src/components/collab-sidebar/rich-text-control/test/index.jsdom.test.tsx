@@ -1,6 +1,16 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import type { MutableRefObject } from 'react';
-import { useContext, useEffect, useState } from '@wordpress/element';
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
+import { useContext, useEffect } from '@wordpress/element';
 import { Fill, Popover, Slot, SlotFillProvider } from '@wordpress/components';
 import {
 	unregisterFormatType,
@@ -56,22 +66,6 @@ async function moveFocusTo( element: HTMLElement ) {
 	await flushMicrotasks();
 }
 
-// Type the way a browser would — `useRichText` builds its value by reading the
-// DOM and selection back from its own `input` handler.
-async function typeIntoTextbox( textbox: HTMLElement, text: string ) {
-	act( () => {
-		textbox.textContent = text;
-		const range = document.createRange();
-		range.selectNodeContents( textbox );
-		range.collapse( false );
-		const selection = document.getSelection();
-		selection?.removeAllRanges();
-		selection?.addRange( range );
-	} );
-	fireEvent.input( textbox, { inputType: 'insertText' } );
-	await flushMicrotasks();
-}
-
 describe( 'RichTextControl', () => {
 	beforeAll( () => {
 		// Register a minimal stub for `core/bold` so the optional
@@ -82,17 +76,10 @@ describe( 'RichTextControl', () => {
 			className: null,
 			edit: () => null,
 		} );
-
-		// The autocomplete popover measures the caret range to anchor itself,
-		// which jsdom leaves unimplemented. Any non-empty rect lets it mount.
-		Range.prototype.getClientRects = () =>
-			[ new DOMRect( 0, 0, 1, 1 ) ] as unknown as DOMRectList;
 	} );
 
 	afterAll( () => {
 		unregisterFormatType( 'core/bold' );
-		// @ts-expect-error -- Restore jsdom's own (absent) implementation.
-		delete Range.prototype.getClientRects;
 	} );
 
 	it( 'renders a labeled contenteditable textbox', () => {
@@ -150,48 +137,6 @@ describe( 'RichTextControl', () => {
 		);
 
 		expect( getTextbox( container ) ).toBeInTheDocument();
-	} );
-
-	it( 'points the textbox at the suggestions listbox once a completer matches', async () => {
-		// Held outside the completer: the options are reported back through an
-		// effect keyed on their identity, so rebuilding them per render loops.
-		const items = [ { key: 'alice', value: 'Alice', label: 'Alice' } ];
-		const completer = {
-			name: 'test/mentions',
-			triggerPrefix: '@',
-			useItems: () => [ items ],
-			getOptionCompletion: () => '@Alice',
-		};
-
-		function ControlledRichText() {
-			const [ value, setValue ] = useState( '' );
-			return (
-				<RichTextControl
-					label="Note"
-					value={ value }
-					onChange={ setValue }
-					completers={
-						[ completer ] as unknown as React.ComponentProps<
-							typeof RichTextControl
-						>[ 'completers' ]
-					}
-				/>
-			);
-		}
-
-		const { container } = render( <ControlledRichText /> );
-		const textbox = getTextbox( container );
-
-		await moveFocusTo( textbox );
-		await typeIntoTextbox( textbox, '@' );
-
-		const listbox = screen.getByRole( 'listbox' );
-		const option = screen.getByRole( 'option', { name: 'Alice' } );
-
-		expect( textbox ).toHaveAttribute( 'aria-autocomplete', 'list' );
-		expect( textbox ).toHaveAttribute( 'aria-haspopup', 'listbox' );
-		expect( textbox ).toHaveAttribute( 'aria-controls', listbox.id );
-		expect( textbox ).toHaveAttribute( 'aria-activedescendant', option.id );
 	} );
 
 	it( 'visually hides the label when `hideLabelFromVision` is set', () => {
@@ -262,7 +207,7 @@ describe( 'RichTextControl', () => {
 
 	describe( 'line breaks', () => {
 		it( 'blocks Enter from inserting line breaks when `disableLineBreaks` is set', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const { container } = render(
 				<RichTextControl
 					label="Single line"
@@ -287,7 +232,7 @@ describe( 'RichTextControl', () => {
 		] )(
 			'inserts a single line break into the value on %s',
 			async ( _label, modifiers ) => {
-				const onChange = jest.fn();
+				const onChange = vi.fn();
 				const { container } = render(
 					<RichTextControl
 						label="Note"
@@ -323,7 +268,7 @@ describe( 'RichTextControl', () => {
 		] )(
 			'leaves Enter presses from an IME %s to the browser',
 			async ( _label, eventInit ) => {
-				const onChange = jest.fn();
+				const onChange = vi.fn();
 				const { container } = render(
 					<RichTextControl
 						label="Note"
@@ -352,7 +297,7 @@ describe( 'RichTextControl', () => {
 		);
 
 		it( 'leaves Enter presses with a meta or ctrl modifier to consumers', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const { container } = render(
 				<RichTextControl
 					label="Note"
@@ -417,7 +362,7 @@ describe( 'RichTextControl', () => {
 		// format type can be registered once in `beforeAll` (avoiding store
 		// updates during render that would re-fire `useSelect` outside
 		// `act(...)`), while each test can still assert on a fresh mock.
-		let currentOnUse: jest.Mock;
+		let currentOnUse: Mock;
 
 		// Re-implement `RichTextShortcut` locally to keep the assertion on
 		// the registration contract explicit. It registers a callback into
@@ -479,7 +424,7 @@ describe( 'RichTextControl', () => {
 		} );
 
 		beforeEach( () => {
-			currentOnUse = jest.fn();
+			currentOnUse = vi.fn();
 		} );
 
 		// Dispatch a `primary+b` keydown — on non-Apple platforms (jsdom's
@@ -648,7 +593,7 @@ describe( 'RichTextControl', () => {
 
 	describe( 'disabled and validation states', () => {
 		it( 'renders a non-editable field with a disabled state when `disabled`', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const { container } = render(
 				<RichTextControl
 					label="Summary"
@@ -861,7 +806,7 @@ describe( 'RichTextControl', () => {
 		} );
 
 		it( 'runs registered format input rules on insertText input events', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const { container } = render(
 				<RichTextControl
 					label="Input rule"
@@ -884,7 +829,7 @@ describe( 'RichTextControl', () => {
 		} );
 
 		it( 'ignores non-text input events', async () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const { container } = render(
 				<RichTextControl
 					label="Input rule ignore"

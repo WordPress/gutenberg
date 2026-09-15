@@ -222,12 +222,8 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 					slug: slug.toString(),
 					status: 'publish',
 					title,
-					// This adds post meta fields in template
-					meta: {
-						is_wp_suggestion: isWPSuggestion,
-						// Mark as inactive by default when template activation is enabled
-						is_inactive_by_default: true,
-					},
+					// This adds a post meta field in template that is part of `is_custom` value calculation.
+					is_wp_suggestion: isWPSuggestion,
 				},
 				{ throwOnError: true }
 			);

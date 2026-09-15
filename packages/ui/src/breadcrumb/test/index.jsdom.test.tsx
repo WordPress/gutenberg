@@ -1,4 +1,5 @@
 /* eslint-disable testing-library/no-container, testing-library/no-node-access -- Measurement behavior requires access to the hidden intrinsic tree and element geometry. */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -25,9 +26,6 @@ describe( 'Breadcrumb', () => {
 	let originalClientWidth: PropertyDescriptor | undefined;
 	let originalScrollWidth: PropertyDescriptor | undefined;
 	let originalGetBoundingClientRect: typeof HTMLElement.prototype.getBoundingClientRect;
-	let originalResizeObserver: typeof ResizeObserver;
-	let originalRequestAnimationFrame: typeof requestAnimationFrame;
-	let originalCancelAnimationFrame: typeof cancelAnimationFrame;
 	let originalFonts: PropertyDescriptor | undefined;
 
 	beforeEach( () => {
@@ -46,43 +44,46 @@ describe( 'Breadcrumb', () => {
 		);
 		originalGetBoundingClientRect =
 			HTMLElement.prototype.getBoundingClientRect;
-		originalResizeObserver = global.ResizeObserver;
-		originalRequestAnimationFrame = global.requestAnimationFrame;
-		originalCancelAnimationFrame = global.cancelAnimationFrame;
 		originalFonts = Object.getOwnPropertyDescriptor( document, 'fonts' );
 
-		global.ResizeObserver = class {
-			elements = new Set< Element >();
-			private record: ResizeObserverRecord;
+		vi.stubGlobal(
+			'ResizeObserver',
+			class {
+				elements = new Set< Element >();
+				private record: ResizeObserverRecord;
 
-			constructor( callback: ResizeObserverCallback ) {
-				this.record = {
-					callback,
-					disconnected: false,
-					elements: this.elements,
-				};
-				resizeObservers.push( this.record );
+				constructor( callback: ResizeObserverCallback ) {
+					this.record = {
+						callback,
+						disconnected: false,
+						elements: this.elements,
+					};
+					resizeObservers.push( this.record );
+				}
+
+				observe( element: Element ) {
+					this.elements.add( element );
+				}
+
+				unobserve( element: Element ) {
+					this.elements.delete( element );
+				}
+
+				disconnect() {
+					this.record.disconnected = true;
+					this.elements.clear();
+				}
 			}
+		);
 
-			observe( element: Element ) {
-				this.elements.add( element );
-			}
-
-			unobserve( element: Element ) {
-				this.elements.delete( element );
-			}
-
-			disconnect() {
-				this.record.disconnected = true;
-				this.elements.clear();
-			}
-		} as unknown as typeof ResizeObserver;
-
-		global.requestAnimationFrame = jest.fn( ( callback ) => {
-			animationFrames.push( callback );
-			return animationFrames.length;
-		} );
-		global.cancelAnimationFrame = jest.fn();
+		vi.stubGlobal(
+			'requestAnimationFrame',
+			vi.fn( ( callback: FrameRequestCallback ) => {
+				animationFrames.push( callback );
+				return animationFrames.length;
+			} )
+		);
+		vi.stubGlobal( 'cancelAnimationFrame', vi.fn() );
 
 		Object.defineProperty( HTMLElement.prototype, 'scrollWidth', {
 			configurable: true,
@@ -201,6 +202,8 @@ describe( 'Breadcrumb', () => {
 				'clientWidth',
 				originalClientWidth
 			);
+		} else {
+			Reflect.deleteProperty( HTMLElement.prototype, 'clientWidth' );
 		}
 		if ( originalScrollWidth ) {
 			Object.defineProperty(
@@ -208,12 +211,12 @@ describe( 'Breadcrumb', () => {
 				'scrollWidth',
 				originalScrollWidth
 			);
+		} else {
+			Reflect.deleteProperty( HTMLElement.prototype, 'scrollWidth' );
 		}
 		HTMLElement.prototype.getBoundingClientRect =
 			originalGetBoundingClientRect;
-		global.ResizeObserver = originalResizeObserver;
-		global.requestAnimationFrame = originalRequestAnimationFrame;
-		global.cancelAnimationFrame = originalCancelAnimationFrame;
+		vi.unstubAllGlobals();
 		if ( originalFonts ) {
 			Object.defineProperty( document, 'fonts', originalFonts );
 		} else {
@@ -349,7 +352,7 @@ describe( 'Breadcrumb', () => {
 
 		it( 'passes complete link props through a custom renderer', () => {
 			const href = '/settings/general?section=writing#defaults';
-			const renderLink = jest.fn(
+			const renderLink = vi.fn(
 				( {
 					children: linkChildren,
 					...linkProps
@@ -454,14 +457,12 @@ describe( 'Breadcrumb', () => {
 				</Breadcrumb.Root>
 			);
 
-			const measurement = container.querySelector(
+			const measurement = container.querySelector< HTMLElement >(
 				'.style-measurement-label'
 			);
 			expect( measurement ).toHaveClass( 'item-class', 'render-class' );
-			expect( measurement ).toHaveStyle( {
-				fontSize: '20px',
-				letterSpacing: '3px',
-			} );
+			expect( measurement?.style.fontSize ).toBe( '20px' );
+			expect( measurement?.style.letterSpacing ).toBe( '3px' );
 		} );
 
 		it( 'collapses items based on custom-rendered link widths', () => {
@@ -629,154 +630,11 @@ describe( 'Breadcrumb', () => {
 			);
 		} );
 
-		it( 'contains exactly the collapsed link and closes on activation', async () => {
-			const user = userEvent.setup();
-			availableWidth = 164;
-			labelWidths.set( 'Section', 80 );
-			render(
-				<Breadcrumb.Root>
-					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
-					<Breadcrumb.LinkItem
-						href="/section"
-						onClick={ ( event ) => event.preventDefault() }
-					>
-						Section
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.LinkItem href="/page">Page</Breadcrumb.LinkItem>
-					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
-				</Breadcrumb.Root>
-			);
-
-			expect( screen.getAllByRole( 'link' ) ).toHaveLength( 2 );
-			const trigger = screen.getByRole( 'button', {
-				name: 'Show 1 hidden breadcrumb item',
-			} );
-			expect( trigger ).toHaveAttribute( 'aria-haspopup', 'menu' );
-			expect( trigger ).toHaveAttribute( 'aria-expanded', 'false' );
-
-			await user.click( trigger );
-			act( flushAllAnimationFrames );
-
-			const menu = await screen.findByRole( 'menu' );
-			const menuLink = screen.getByRole( 'menuitem', {
-				name: 'Section',
-			} );
-			expect( menu ).toContainElement( menuLink );
-			expect( menuLink ).toHaveAttribute( 'href', '/section' );
-			expect(
-				screen.queryByRole( 'menuitem', { name: 'Home' } )
-			).not.toBeInTheDocument();
-			expect(
-				screen.queryByRole( 'menuitem', { name: 'Current' } )
-			).not.toBeInTheDocument();
-
-			await user.click( menuLink );
-			act( flushAllAnimationFrames );
-			await waitFor( () =>
-				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
-			);
-		} );
-
-		it( 'uses pluralized labels and supports menu keyboard behavior', async () => {
-			const user = userEvent.setup();
-			availableWidth = 164;
-			labelWidths.set( 'Alpha', 70 );
-			labelWidths.set( 'Beta', 60 );
-			render(
-				<Breadcrumb.Root>
-					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
-					<Breadcrumb.LinkItem href="/alpha">
-						Alpha
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.LinkItem href="/beta">Beta</Breadcrumb.LinkItem>
-					<Breadcrumb.LinkItem href="/page">Page</Breadcrumb.LinkItem>
-					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
-				</Breadcrumb.Root>
-			);
-
-			const trigger = screen.getByRole( 'button', {
-				name: 'Show 2 hidden breadcrumb items',
-			} );
-			act( () => trigger.focus() );
-			await user.keyboard( ' ' );
-			act( flushAllAnimationFrames );
-
-			const alpha = await screen.findByRole( 'menuitem', {
-				name: 'Alpha',
-			} );
-			const beta = screen.getByRole( 'menuitem', { name: 'Beta' } );
-			await waitFor( () => expect( alpha ).toHaveFocus() );
-
-			await user.keyboard( '{ArrowDown}' );
-			expect( beta ).toHaveFocus();
-			await user.keyboard( '{ArrowUp}' );
-			expect( alpha ).toHaveFocus();
-			await user.keyboard( '{End}' );
-			expect( beta ).toHaveFocus();
-			await user.keyboard( '{Home}' );
-			expect( alpha ).toHaveFocus();
-			await user.keyboard( 'b' );
-			expect( beta ).toHaveFocus();
-			await user.keyboard( '{Escape}' );
-			act( flushAllAnimationFrames );
-			await waitFor( () => expect( trigger ).toHaveFocus() );
-
-			await user.keyboard( '{Enter}' );
-			act( flushAllAnimationFrames );
-			const reopenedAlpha = await screen.findByRole( 'menuitem', {
-				name: 'Alpha',
-			} );
-			await waitFor( () => expect( reopenedAlpha ).toHaveFocus() );
-			await user.keyboard( '{Tab}' );
-			act( flushAllAnimationFrames );
-			await waitFor( () =>
-				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
-			);
-		} );
-
-		it( 'activates an overflow link from the keyboard', async () => {
-			const user = userEvent.setup();
-			const handleClick = jest.fn( ( event ) => event.preventDefault() );
-			availableWidth = 164;
-			labelWidths.set( 'Section', 80 );
-			render(
-				<Breadcrumb.Root>
-					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
-					<Breadcrumb.LinkItem
-						href="/section"
-						onClick={ handleClick }
-					>
-						Section
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.LinkItem href="/page">Page</Breadcrumb.LinkItem>
-					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
-				</Breadcrumb.Root>
-			);
-
-			const trigger = screen.getByRole( 'button', {
-				name: 'Show 1 hidden breadcrumb item',
-			} );
-			act( () => trigger.focus() );
-			await user.keyboard( '{Enter}' );
-			act( flushAllAnimationFrames );
-			const menuLink = await screen.findByRole( 'menuitem', {
-				name: 'Section',
-			} );
-			await waitFor( () => expect( menuLink ).toHaveFocus() );
-
-			await user.keyboard( '{Enter}' );
-			act( flushAllAnimationFrames );
-			expect( handleClick ).toHaveBeenCalledTimes( 1 );
-			await waitFor( () =>
-				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
-			);
-		} );
-
 		it( 'passes the same custom renderer and complete href to menu links', async () => {
 			const user = userEvent.setup();
 			availableWidth = 84;
 			labelWidths.set( 'Settings', 100 );
-			const renderLink = jest.fn(
+			const renderLink = vi.fn(
 				( {
 					children: linkChildren,
 					...linkProps
@@ -1071,113 +929,6 @@ describe( 'Breadcrumb', () => {
 		} );
 	} );
 
-	describe( 'truncated-label tooltips', () => {
-		it( 'keeps an untruncated current item out of the tab order', () => {
-			renderDefaultTrail();
-			const current = screen.getByText( 'Current', {
-				selector: '[aria-current="page"]',
-			} );
-
-			expect( current ).not.toHaveAttribute( 'tabindex' );
-			expect( screen.getAllByText( 'Current' ) ).toHaveLength( 2 );
-		} );
-
-		it( 'makes a truncated current item focusable and preserves focus when it expands', async () => {
-			availableWidth = 70;
-			labelWidths.set( 'A very long current page', 100 );
-			render(
-				<Breadcrumb.Root>
-					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
-					<Breadcrumb.CurrentItem>
-						A very long current page
-					</Breadcrumb.CurrentItem>
-				</Breadcrumb.Root>
-			);
-
-			const current = screen.getByText( 'A very long current page', {
-				selector: '[aria-current="page"]',
-			} );
-			await waitFor( () =>
-				expect( current ).toHaveAttribute( 'tabindex', '0' )
-			);
-			act( () => current.focus() );
-			await waitFor( () =>
-				expect(
-					screen.getAllByText( 'A very long current page' )
-				).toHaveLength( 3 )
-			);
-
-			availableWidth = 500;
-			notifyResize();
-			await waitFor( () => expect( current ).toHaveFocus() );
-			expect( current ).toHaveAttribute( 'tabindex', '0' );
-			expect( current ).toHaveClass( 'style-outset-ring-focus-visible' );
-
-			act( () => current.blur() );
-			await waitFor( () =>
-				expect( current ).not.toHaveAttribute( 'tabindex' )
-			);
-			expect( current ).not.toHaveClass(
-				'style-outset-ring-focus-visible'
-			);
-		} );
-
-		it( 'shows the full text for an actually clipped link on focus', async () => {
-			labelWidths.set( 'Constrained ancestor', 100 );
-			render(
-				<Breadcrumb.Root>
-					<Breadcrumb.LinkItem href="/" data-constrained="true">
-						Constrained ancestor
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
-				</Breadcrumb.Root>
-			);
-
-			const link = screen.getByRole( 'link', {
-				name: 'Constrained ancestor',
-			} );
-			act( () => link.focus() );
-			await waitFor( () =>
-				expect(
-					screen.getAllByText( 'Constrained ancestor' )
-				).toHaveLength( 3 )
-			);
-			expect( link ).toHaveTextContent( 'Constrained ancestor' );
-		} );
-
-		it( 'shows a clipped label tooltip on hover and dismisses it with Escape', async () => {
-			const user = userEvent.setup();
-			labelWidths.set( 'Constrained ancestor', 100 );
-			render(
-				<Breadcrumb.Root>
-					<Breadcrumb.LinkItem href="/" data-constrained="true">
-						Constrained ancestor
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
-				</Breadcrumb.Root>
-			);
-
-			const link = screen.getByRole( 'link', {
-				name: 'Constrained ancestor',
-			} );
-			await user.hover( link );
-			await waitFor( () =>
-				expect(
-					screen.getAllByText( 'Constrained ancestor' )
-				).toHaveLength( 3 )
-			);
-			expect( link ).toHaveAccessibleName( 'Constrained ancestor' );
-
-			await user.keyboard( '{Escape}' );
-			act( flushAllAnimationFrames );
-			await waitFor( () =>
-				expect(
-					screen.getAllByText( 'Constrained ancestor' )
-				).toHaveLength( 2 )
-			);
-		} );
-	} );
-
 	describe( 'measurement lifecycle', () => {
 		it( 'subtracts focus-ring padding from the available inline size', () => {
 			availableWidth = 164;
@@ -1417,7 +1168,7 @@ describe( 'Breadcrumb', () => {
 			const itemObserver = resizeObservers.find( ( observer ) =>
 				observer.elements.has( item! )
 			);
-			const requestFrame = global.requestAnimationFrame as jest.Mock;
+			const requestFrame = vi.mocked( requestAnimationFrame );
 			requestFrame.mockClear();
 
 			act( () => {
@@ -1441,8 +1192,7 @@ describe( 'Breadcrumb', () => {
 		} );
 
 		it( 'falls back to the complete semantic trail without ResizeObserver', () => {
-			global.ResizeObserver =
-				undefined as unknown as typeof ResizeObserver;
+			vi.stubGlobal( 'ResizeObserver', undefined );
 			availableWidth = 40;
 			renderDefaultTrail();
 

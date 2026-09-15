@@ -8,13 +8,13 @@ import {
 	useInnerBlocksProps,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
 import EnhancedPaginationControl from './inspector-controls/enhanced-pagination-control';
 import { unlock } from '../../lock-unlock';
 import QueryInspectorControls from './inspector-controls';
-import EnhancedPaginationModal from './enhanced-pagination-modal';
-import { getQueryContextFromTemplate } from '../utils';
+import { getQueryContextFromTemplate, useUnsupportedBlocks } from '../utils';
 import QueryToolbar from './query-toolbar';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
@@ -41,6 +41,8 @@ export default function QueryContent( {
 		getQueryContextFromTemplate( templateSlug );
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
+	const { createNotice } = useDispatch( noticesStore );
+	const unsupportedBlocks = useUnsupportedBlocks( clientId );
 	const instanceId = useInstanceId( QueryContent );
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps );
@@ -139,6 +141,32 @@ export default function QueryContent( {
 		__unstableMarkNextChangeAsNotPersistent,
 		setAttributes,
 	] );
+	useEffect( () => {
+		if ( enhancedPagination && unsupportedBlocks.length ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { enhancedPagination: false } );
+			const message = sprintf(
+				/* translators: %s: A list of block titles. */
+				__(
+					`"Reload full page" was enabled because some blocks inside the Query block aren't supported: %s.`
+				),
+				unsupportedBlocks.join(
+					/* translators: Used between list items, there is a space after the comma. */
+					__( ', ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
+				)
+			);
+			createNotice( 'info', message, {
+				type: 'snackbar',
+				id: 'query-enhanced-pagination-disabled',
+			} );
+		}
+	}, [
+		enhancedPagination,
+		unsupportedBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
+		setAttributes,
+		createNotice,
+	] );
 
 	return (
 		<>
@@ -149,11 +177,6 @@ export default function QueryContent( {
 					hasInnerBlocks
 				/>
 			) }
-			<EnhancedPaginationModal
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				clientId={ clientId }
-			/>
 			<InspectorControls>
 				<QueryInspectorControls
 					name={ name }

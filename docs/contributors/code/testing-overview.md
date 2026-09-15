@@ -21,7 +21,7 @@ When writing tests consider the following:
 
 JavaScript unit tests are partitioned between Jest and Vitest during the [Vitest migration](/test/unit/VITEST_MIGRATION.md). Jest-owned tests use the Jest API for [globals](https://jestjs.io/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on), [assertions](https://jestjs.io/docs/en/expect.html), [mocks](https://jestjs.io/docs/en/mock-functions.html), [spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname), and [mock functions](https://jestjs.io/docs/en/mock-function-api.html). If needed, you can also use [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) for React component testing.
 
-_It should be noted that in the past, React components were unit tested with [Enzyme](https://github.com/airbnb/enzyme). However, React Testing Library (RTL) is now used for all existing and new tests instead._
+Older React tests used [Enzyme](https://github.com/airbnb/enzyme). Current jsdom tests use React Testing Library. Direct React tests in Vitest Browser Mode use the asynchronous `vitest-browser-react` renderer. Testing Library query helpers can remain when Browser Mode has no direct equivalent.
 
 Assuming you've followed the [instructions](/docs/contributors/code/getting-started-with-code-contribution.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
 
@@ -39,7 +39,11 @@ During the Jest-to-Vitest migration, run both `npm run test:unit` and `npm run t
 
 Keep your tests in a `test` folder in your working directory. The test file should have the same name as the test subject file.
 
-Use `*.jsdom.test.*` for tests that only require a virtual DOM. Use `*.browser.test.*` for tests that require Vitest Browser Mode. Leave Node-compatible test names without an environment suffix. The filename selects the test environment in both Jest and Vitest. During the migration, the manifest only selects the runner. Do not use per-file environment overrides.
+Use `*.jsdom.test.*` for DOM structure, semantics, events, state, and other deterministic behavior that does not depend on browser rendering. Use `*.browser.test.*` for generated and computed styles, cascade, responsive behavior, layout, geometry, rendered visibility, animation, scrolling, native focusability and Tab order, pointer behavior, caret geometry, `ResizeObserver`, and media queries.
+
+Browser Mode loads only CSS imported by the test graph or its setup. Import a package's global Sass explicitly when the assertion depends on styles that WordPress normally enqueues separately. Keep deterministic browser API mocks local to nonvisual tests and restore them afterwards.
+
+Leave Node-compatible test names without an environment suffix. Every new test runs in Vitest automatically. The filename selects its environment. During the remaining migration, the manifest lists only legacy JSDOM tests that still run in Jest. Do not use per-file environment overrides.
 
 ```
 +-- test
@@ -293,11 +297,11 @@ test( 'fires onChange when a new value is typed', async () => {
 
 ### Integration testing for block UI
 
-Integration testing is defined as a type of testing where different parts are tested as a group. In this case, the parts that we want to test are the different components that are required to be rendered for a specific block or editor logic. In the end, they are very similar to unit tests as they are run with the same command using the Jest library. The main difference is that for the integration tests the blocks are run within a [`special instance of the block editor`](https://github.com/WordPress/gutenberg/blob/trunk/test/integration/helpers/integration-test-editor.jsx#L60).
+Integration tests render the components needed for a block or editor behavior as a group. They run with the unit-test commands. Their filename selects jsdom or Browser Mode. The tests render blocks in a [`special instance of the block editor`](https://github.com/WordPress/gutenberg/blob/trunk/test/integration/helpers/integration-test-editor.jsx#L60).
 
-The advantage of this approach is that the bulk of a block editor's functionality (block toolbar and inspector panel interactions, etc.) can be tested without having to fire up the full e2e test framework. This means the tests can run much faster and more reliably. It is suggested that as much of a block's UI functionality as possible is covered with integration tests, with e2e tests used for interactions that require a full browser environment, eg. file uploads, drag and drop, etc.
+This approach tests most block editor behavior without the full end-to-end framework. Use Browser Mode when an integration test depends on browser rendering or native input. Keep end-to-end tests for behavior that requires a complete WordPress site or navigation between pages.
 
-[`The Cover block`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/test/edit.jsdom.test.js) is an example of a block that uses this level of testing to provide coverage for a large percentage of the editor interactions.
+[`The Cover block`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/test/edit.browser.test.js) is an example of a block that uses this level of testing to provide coverage for a large percentage of the editor interactions.
 
 To set up a jest file for integration tests:
 
@@ -310,7 +314,7 @@ async function setup( attributes ) {
 }
 ```
 
-The `initializeEditor` function returns the output of the `@testing-library/react` `render` method. It will also accept an array of block metadata objects, allowing you to set up the editor with multiple blocks.
+The `initializeEditor` function returns the output of the `@testing-library/react` `render` method. This shared helper is the remaining exception to the standard Browser Mode renderer. New direct React Browser Mode tests must import and await `render` from `vitest-browser-react`. The helper also accepts an array of block metadata objects, allowing you to set up the editor with multiple blocks.
 
 The integration test editor module also exports a `selectBlock` which can be used to select the block to be tested by the aria-label on the block wrapper, eg. "Block: Cover".
 
@@ -325,8 +329,12 @@ When a snapshot test fails, it just means that a component's rendering has chang
 However, if the change was intentional, follow these steps to update the snapshot. Run the following to update the snapshots:
 
 ```sh
-# --testPathPatterns is optional but will be much faster by only running matching tests
-npm run test:unit -- --updateSnapshot --testPathPatterns path/to/tests
+# Update snapshots for Node or Vitest-owned DOM tests
+npm run test:unit:vitest:update -- path/to/tests
+
+# Update snapshots for Jest-owned JSDOM tests
+# --testPathPatterns is optional but runs only matching tests
+npm run test:unit:update -- --testPathPatterns path/to/tests
 
 # Update snapshot for e2e tests
 npm run test:e2e -- --update-snapshots path/to/spec
@@ -402,15 +410,29 @@ Reducer tests are also a great fit for snapshots. They are often large, complex 
 
 #### Working with snapshots
 
-You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. The quick and dirty solution is to invoke Jest with `--updateSnapshot`. That can be done as follows:
+You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. Use the command for the test's runner:
 
 ```sh
-npm run test:unit -- --updateSnapshot --testPathPatterns path/to/tests
+# Node or Vitest-owned DOM tests
+npm run test:unit:vitest:update -- path/to/tests
+
+# Jest-owned JSDOM tests
+npm run test:unit:update -- --testPathPatterns path/to/tests
 ```
 
-`--testPathPatterns` is not required, but specifying a path will speed things up by running a subset of tests.
+The path is not required, but specifying one runs only matching tests and is faster.
 
-It's a great idea to keep `npm run test:unit:watch` running in the background as you work. Jest will run only the relevant tests for changed files, and when snapshot tests fail, just hit `u` to update a snapshot!
+Keep the applicable watch command running in the background as you work:
+
+```sh
+# Node or Vitest-owned DOM tests
+npm run test:unit:vitest:watch -- path/to/tests
+
+# Jest-owned JSDOM tests
+npm run test:unit:watch -- --testPathPatterns path/to/tests
+```
+
+When a snapshot test fails in either runner, press `u` to update the snapshot.
 
 #### Pain points
 
@@ -448,7 +470,7 @@ test( 'should contain mars if planets is true', () => {
 } );
 ```
 
-Another good technique is to use the `toMatchDiffSnapshot` function (provided by the [`snapshot-diff` package](https://github.com/jest-community/snapshot-diff)), which allows to snapshot only the difference between two different states of the DOM. This approach is useful to test the effects of a prop change on the resulting DOM while generating a much smaller snapshot, like in this example:
+Another good technique is to use the `toMatchDiffSnapshot` matcher, which snapshots only the difference between two different states of the DOM. This approach is useful to test the effects of a prop change on the resulting DOM while generating a much smaller snapshot, like in this example:
 
 ```jsx
 test( 'should render a darker background when isShady is true', () => {
@@ -460,13 +482,17 @@ test( 'should render a darker background when isShady is true', () => {
 } );
 ```
 
-Similarly, the `toMatchStyleDiffSnapshot` function allows to snapshot only the difference between the _styles_ associated to two different states of a component, like in this example:
+Test rendered style behavior in Browser Mode with a narrow computed-style or behavior assertion. This verifies the browser result instead of a serialized representation of generated styles. Import any global stylesheet that the assertion needs because Browser Mode does not load WordPress-enqueued Sass automatically.
 
 ```jsx
-test( 'should render margin', () => {
-	const { container: spacer } = render( <Spacer /> );
-	const { container: spacerWithMargin } = render( <Spacer margin={ 5 } /> );
-	expect( spacerWithMargin ).toMatchStyleDiffSnapshot( spacer );
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
+
+test( 'should render margin', async () => {
+	await render( <Spacer data-testid="spacer" margin={ 5 } /> );
+	expect( getComputedStyle( screen.getByTestId( 'spacer' ) ).marginTop ).toBe(
+		'20px'
+	);
 } );
 ```
 
@@ -616,16 +642,16 @@ npm run test:performance
 
 This gives you the result for the current branch/code on the running environment.
 
-In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `npm exec release-cli -- perf [branches]`, example:
+In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `npm exec --no release-cli -- perf [branches]`, example:
 
-```
-npm exec release-cli -- perf trunk v8.1.0 v8.0.0
+```sh
+npm exec --no release-cli -- perf trunk v8.1.0 v8.0.0
 ```
 
 Finally, you can pass an additional `--tests-branch` argument to specify which branch's performance test files you'd like to run. This is particularly useful when modifying/extending the perf tests:
 
-```
-npm exec release-cli -- perf trunk v8.1.0 v8.0.0 --tests-branch add/perf-tests-coverage
+```sh
+npm exec --no release-cli -- perf trunk v8.1.0 v8.0.0 --tests-branch add/perf-tests-coverage
 ```
 
 **Note** This command needs may take some time to perform the benchmark. While running make sure to avoid using your computer or have a lot of background process to minimize external factors that can impact the results across branches.

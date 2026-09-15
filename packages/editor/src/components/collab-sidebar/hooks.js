@@ -683,7 +683,7 @@ export function useEnableFloatingSidebar( enabled = false ) {
 			if (
 				getActiveComplementaryArea( 'core' ) === FLOATING_NOTES_SIDEBAR
 			) {
-				disableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
+				disableComplementaryArea( 'core' );
 			}
 		};
 	}, [ enabled, registry ] );

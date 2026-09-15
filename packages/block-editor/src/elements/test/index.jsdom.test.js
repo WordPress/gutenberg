@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { __experimentalGetElementClassName } from '@wordpress/block-editor';
 
 describe( 'element class names', () => {

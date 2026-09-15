@@ -193,6 +193,7 @@ type CanPerformDashboardOperation = (
 
 type DashboardOperationRequest =
 	| { operation: 'customize' }
+	| { operation: 'reset' }
 	| { operation: 'insert'; widgetType: WidgetType }
 	| {
 			operation: 'remove' | 'move' | 'resize' | 'edit';
@@ -225,13 +226,18 @@ Each request names the operation and carries its subject, so a branch on `reques
 | Operation   | Subject                 | What it gates                                                                                                                                                                                     |
 | ----------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `customize` | none                    | The Customize button, the `core/dashboard/customize` command, the `core/dashboard/add-widgets` command outside edit mode, and the automatic entry into customize mode on an empty layout.         |
+| `reset`     | none                    | The Reset to default entry in the overflow menu, the `core/dashboard/reset-to-default` command, and the confirmation prompt they open. A denied reset is hidden, not disabled.                    |
 | `insert`    | `widgetType`            | Whether the inserter offers the type; a rejected type keeps rendering where already placed. The Add widget button and command show only while some registered type is insertable.                 |
-| `remove`    | `widget`, `widgetType?` | The Remove control in customize mode. The staging layer re-asserts, in place, a locked instance dropped by any trigger.                                                                           |
+| `remove`    | `widget`, `widgetType?` | The Remove control in customize mode.                                                                                                                                                             |
 | `move`      | `widget`, `widgetType?` | Dragging the tile in customize mode. A denied tile is pinned: it holds its index while the other tiles reorder around it; a change ahead of it can still reflow the cell it lands in.             |
 | `resize`    | `widget`, `widgetType?` | The resize handle and the width menu.                                                                                                                                                             |
 | `edit`      | `widget`, `widgetType?` | Attribute editing: the inline fields and the settings trigger in the header, the settings surface, and the widget's `setAttributes`, which is absent when denied so the widget renders read-only. |
 
 The engine resolves the policy once, in its provider, and every surface asks that resolved answer, so further sources join at the same point without touching the surfaces.
+
+The staging layer enforces the same answers. Every mutation is diffed per instance on arrival, whichever trigger staged it, and each change the policy denies is re-asserted before it lands: a removed locked instance returns at its index, a denied move holds its index, a denied resize keeps its spans, a denied edit keeps its attributes, and a new instance of a rejected type is dropped. What the interface hides, the staging layer rejects.
+
+Instance operations carry `widgetType` only while that type is still in `widgetTypes`. A plugin that is gone, or a render module that failed to load, leaves the field absent: the engine still asks, because the instance is still on the board, but a policy that keys its locks on the type has nothing to match. Locks that must survive that case belong on the instance itself. The same absence is why a new instance of an unregistered type is not dropped: there is no type to ask about.
 
 Rules of the contract:
 
@@ -252,7 +258,7 @@ The exported kit for handling them:
 -   `DEFAULT_GRID` — canonical default settings, applied when `gridSettings` is omitted.
 -   `normalizeGridSettings( settings, defaultRowHeight )` — coerces legacy freeform row heights to the nearest preset. Run it over stored payloads before passing them in.
 -   `ROW_HEIGHT_PRESETS` / `DEFAULT_ROW_HEIGHT` — the row-height presets (`small`, `medium`, `large`) that `rowHeight` values normalize to.
--   `WIDGET_DASHBOARD_COLUMN_COUNT` — maximum column count on wide containers. The effective count steps down from container width; persisted `columns` values are ignored.
+-   `WIDGET_DASHBOARD_COLUMN_COUNT` — column count used on wide containers when the host sets no `gridSettings.columns`. A default, not a ceiling: a finite `columns` is floored, with a floor of `1`, and rendered as asked. The effective count steps down from container width: the count at `960px` and above, `min( 2, count )` below that, one column below `600px`.
 
 ```tsx
 <WidgetDashboard
