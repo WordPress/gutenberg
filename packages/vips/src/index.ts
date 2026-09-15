@@ -28,11 +28,12 @@ let cleanup: () => void;
 let vipsPromise: Promise< typeof Vips > | undefined;
 
 /**
- * Estimated bytes of WASM memory required per decoded pixel.
+ * Bytes of WASM memory a decoded pixel occupies.
  *
- * A decoded image needs roughly width * height * 4 bytes (RGBA), plus working
- * buffers while vips resizes and re-encodes it. Four bytes per pixel is a
- * deliberately conservative lower bound.
+ * This is RGBA at one byte per channel, nothing more: it does not account for
+ * the working buffers vips allocates while resizing and re-encoding. All of
+ * the safety margin lives in `ANIMATION_MEMORY_BUDGET` being well under the
+ * heap size, so raise that constant rather than assuming slack here.
  */
 const BYTES_PER_PIXEL = 4;
 
@@ -42,11 +43,50 @@ const BYTES_PER_PIXEL = 4;
  * wasm-vips runs in a fixed 1 GiB WASM heap that cannot grow (wasm-vips 0.0.18
  * builds with `INITIAL_MEMORY` === `MAXIMUM_MEMORY` === 1 GiB), so an
  * animation loaded with `[n=-1]` — every frame stacked into one tall image —
- * costs roughly frames * width * pageHeight * 4 bytes. A long animation of
- * otherwise modest dimensions therefore exhausts the heap even though a single
- * frame is small. ~0.5 GiB leaves headroom for the resize and re-encode steps.
+ * costs at most frames * width * pageHeight * 4 bytes. A long animation of
+ * otherwise modest dimensions can therefore exhaust the heap even though a
+ * single frame is small. ~0.5 GiB leaves headroom for the resize and re-encode
+ * steps.
+ *
+ * The estimate is the fully materialized frame stack, which is an upper bound:
+ * libvips streams the sequential load/resize/save pipeline, so real peak usage
+ * is lower and by how much depends on the operation. The check therefore errs
+ * toward flattening, trading the occasional static sub-size for an animation
+ * that would have fit against never failing an upload outright. See
+ * `logAnimationFallback()` for how that decision is surfaced.
  */
 const ANIMATION_MEMORY_BUDGET = 0.5 * 1024 * 1024 * 1024;
+
+/**
+ * Warns that an animation was flattened despite the site opting in.
+ *
+ * A site reaches this only by enabling `wp_generate_animated_image_subsizes`,
+ * so silently producing a static sub-size would look like the filter had no
+ * effect. `ANIMATION_MEMORY_BUDGET` is a deliberate over-estimate, so this is
+ * also the signal that tells someone tuning it which uploads it turned away.
+ *
+ * @param frames         Frame count of the source animation.
+ * @param width          Width of a single frame, in pixels.
+ * @param pageHeight     Height of a single frame, in pixels.
+ * @param estimatedBytes Estimated bytes to hold every decoded frame at once.
+ */
+function logAnimationFallback(
+	frames: number,
+	width: number,
+	pageHeight: number,
+	estimatedBytes: number
+): void {
+	const mib = ( bytes: number ) => Math.round( bytes / ( 1024 * 1024 ) );
+
+	// eslint-disable-next-line no-console -- Deliberately log the degradation.
+	console.warn(
+		`[vips] Generating a static sub-size from the first frame: decoding all ${ frames } frames of this ${ width }x${ pageHeight } animation needs up to ${ mib(
+			estimatedBytes
+		) } MiB, over the ${ mib(
+			ANIMATION_MEMORY_BUDGET
+		) } MiB budget for the 1 GiB WASM heap.`
+	);
+}
 
 /**
  * Caches Blob URLs created for inlined WASM binaries.
@@ -706,6 +746,12 @@ export async function resizeImage(
 			const estimatedBytes =
 				image.width * image.pageHeight * frames * BYTES_PER_PIXEL;
 			if ( estimatedBytes > ANIMATION_MEMORY_BUDGET ) {
+				logAnimationFallback(
+					frames,
+					image.width,
+					image.pageHeight,
+					estimatedBytes
+				);
 				strOptions = '';
 				frames = 1;
 				image = vips.Image.newFromBuffer( buffer, strOptions, {} );

@@ -295,6 +295,10 @@ describe( 'resizeImage', () => {
 			mockState.pageHeight = 900;
 			mockState.height = 900 * 150;
 
+			const warn = vi
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
+
 			await resizeImage(
 				'itemId',
 				buffer,
@@ -316,6 +320,15 @@ describe( 'resizeImage', () => {
 					interframe_maxerror: expect.anything(),
 				} )
 			);
+			/*
+			 * The site opted in, so a silent flatten would look like the
+			 * filter had no effect. The warning names the frame count and the
+			 * budget it was measured against.
+			 */
+			expect( warn ).toHaveBeenCalledWith(
+				expect.stringContaining( '150 frames' )
+			);
+			warn.mockRestore();
 		} );
 
 		it( 'has no effect on still image formats', async () => {
