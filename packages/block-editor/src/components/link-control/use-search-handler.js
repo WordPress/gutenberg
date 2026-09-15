@@ -91,6 +91,10 @@ export default function useSearchHandler(
 	suggestionsQuery,
 	allowDirectEntry,
 	withCreateSuggestion,
+	// Currently unused. Callers have always passed it, but it has never been
+	// read, so `noURLSuggestion` on LinkControl has no effect. Kept in place so
+	// that fixing or removing it stays a separate change.
+	withURLSuggestion,
 	transformSuggestions
 ) {
 	const { fetchSearchSuggestions, pageOnFront, pageForPosts } = useSelect(
