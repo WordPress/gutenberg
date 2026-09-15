@@ -27,7 +27,7 @@ jobs:
     performance:
         timeout-minutes: 60
         name: Run performance tests
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         if: ${{ github.repository == 'WordPress/gutenberg' }}
         env:
             WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
