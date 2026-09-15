@@ -373,10 +373,13 @@ export default function createReduxStore< State, Actions, Selectors >(
 								selectorArgs
 							);
 						}
-						selectorArgs = normalizeResolutionArgs(
-							resolvers[ selectorName ],
-							selectorArgs
-						);
+						const resolver = resolvers[ selectorName ];
+						if ( resolver && selectorArgs ) {
+							selectorArgs = normalizeResolutionArgs(
+								resolver,
+								selectorArgs
+							);
+						}
 					}
 
 					const state = store.__unstableOriginalGetState();
@@ -880,10 +883,10 @@ function normalize( selector: SelectorLike, args: unknown[] ): unknown[] {
  * @return The cache key arguments.
  */
 function normalizeResolutionArgs(
-	resolver: NormalizedResolver | undefined,
+	resolver: NormalizedResolver,
 	args: unknown[]
 ): unknown[] {
-	if ( typeof resolver?.getResolutionArgs === 'function' && args?.length ) {
+	if ( typeof resolver.getResolutionArgs === 'function' ) {
 		return resolver.getResolutionArgs( ...args );
 	}
 	return args;

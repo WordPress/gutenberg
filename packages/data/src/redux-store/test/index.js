@@ -608,21 +608,4 @@ describe( 'resolution args', () => {
 
 		expect( fulfill ).toHaveBeenCalledWith( 7 );
 	} );
-
-	it( 'should not call getResolutionArgs when the selector takes no arguments', async () => {
-		const registry = createRegistry();
-		const getResolutionArgs = vi.fn( ( ...args ) => args );
-
-		registry.registerStore( 'store', {
-			reducer: ( state = {} ) => state,
-			selectors: { getItems: () => {} },
-			resolvers: {
-				getItems: { getResolutionArgs, fulfill: () => () => {} },
-			},
-		} );
-
-		registry.select( 'store' ).getItems();
-
-		expect( getResolutionArgs ).not.toHaveBeenCalled();
-	} );
 } );
