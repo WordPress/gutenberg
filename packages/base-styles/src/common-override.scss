@@ -122,20 +122,3 @@ body.admin-color-light #wpcontent,
 body.admin-color-light #wpfooter {
 	background: #f5f5f5;
 }
-
-/*
- * Boot full-canvas editing uses position: fixed to cover the viewport.
- * Drop the rounded frame so overflow: clip on #wpcontent does not trap it.
- */
-@media (min-width: 782px) {
-	body.admin-stage-rounded:has(.boot-is-full-canvas) #wpwrap {
-		padding-bottom: 0;
-		padding-right: 0;
-	}
-
-	body.admin-stage-rounded:has(.boot-is-full-canvas) #wpcontent {
-		border-radius: 0;
-		overflow: visible;
-		min-height: calc(100vh - var(--wp-admin--admin-bar--height, 32px));
-	}
-}
