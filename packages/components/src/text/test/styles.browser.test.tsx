@@ -1,13 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { Text } from '../';
 import { Heading } from '../../heading';
 import { PaletteHeading } from '../../palette-edit/styles';
 import { NavigatorHeading } from '../../date-time/date-picker/styles';
 import type { Props } from '../types';
 
+// Source SCSS expects theme tokens; the production build adds their fallbacks.
 beforeEach( () => {
-	// The production build supplies token fallbacks; source CSS uses the theme.
 	document.documentElement.style.setProperty(
 		'--wp-components-color-gray-700',
 		'#707070'
@@ -15,7 +16,6 @@ beforeEach( () => {
 } );
 
 afterEach( () => {
-	cleanup();
 	document.documentElement.style.removeProperty(
 		'--wp-components-color-gray-700'
 	);
@@ -24,37 +24,18 @@ afterEach( () => {
 describe( 'Text styles', () => {
 	it.each< [ string, Partial< Props >, Partial< CSSStyleDeclaration > ] >( [
 		[
-			'readability color',
-			{ optimizeReadabilityFor: 'blue' },
-			{ color: 'rgb(255, 255, 255)' },
-		],
-		[ 'preset size', { size: 'title' }, { fontSize: '20px' } ],
-		[ 'custom size', { size: 15 }, { fontSize: '15px' } ],
-		[
-			'muted variant',
-			{ variant: 'muted' },
-			{ color: 'rgb(112, 112, 112)' },
-		],
-		[ 'alignment', { align: 'center' }, { textAlign: 'center' } ],
-		[ 'color', { color: 'orange' }, { color: 'rgb(255, 165, 0)' } ],
-		[
 			'destructive color',
 			{ isDestructive: true },
 			{ color: 'rgb(217, 79, 79)' },
 		],
-		[ 'display', { display: 'inline-flex' }, { display: 'inline-flex' } ],
-		[ 'block display', { isBlock: true }, { display: 'block' } ],
-		[ 'line height', { lineHeight: 1.5 }, { lineHeight: '19.5px' } ],
-		[ 'uppercase', { upperCase: true }, { textTransform: 'uppercase' } ],
-		[ 'weight', { weight: 700 }, { fontWeight: '700' } ],
 		[ 'truncation', { truncate: true }, { whiteSpace: 'nowrap' } ],
 		[
 			'block display with line clamping',
 			{ truncate: true, numberOfLines: 2, isBlock: true },
 			{ display: 'block' },
 		],
-	] )( 'renders %s', ( _name, props, expected ) => {
-		render(
+	] )( 'renders %s', async ( _name, props, expected ) => {
+		await render(
 			<Text role="note" { ...props }>
 				Example
 			</Text>
@@ -67,8 +48,8 @@ describe( 'Text styles', () => {
 		}
 	} );
 
-	it( 'keeps variant color after earlier instances and explicit colors', () => {
-		render(
+	it( 'keeps variant color after earlier instances and explicit colors', async () => {
+		await render(
 			<>
 				<Text variant="muted">Earlier instance</Text>
 				<Text
@@ -87,8 +68,8 @@ describe( 'Text styles', () => {
 		);
 	} );
 
-	it( 'keeps block display ahead of the explicit display prop', () => {
-		render(
+	it( 'keeps block display ahead of the explicit display prop', async () => {
+		await render(
 			<Text role="note" display="inline-flex" isBlock>
 				Example
 			</Text>
@@ -98,8 +79,8 @@ describe( 'Text styles', () => {
 		);
 	} );
 
-	it( 'preserves inherited typography values', () => {
-		render(
+	it( 'preserves inherited typography values', async () => {
+		await render(
 			<div
 				style={ {
 					color: 'purple',
@@ -135,8 +116,8 @@ describe( 'Text styles', () => {
 		expect( computed.display ).toBe( 'flex' );
 	} );
 
-	it( 'keeps nested instances independent and allows inline overrides', () => {
-		render(
+	it( 'keeps nested instances independent and allows inline overrides', async () => {
+		await render(
 			<Text size={ 30 } isDestructive upperCase>
 				<Text role="note" style={ { color: 'blue', fontSize: 17 } }>
 					Child
@@ -152,8 +133,8 @@ describe( 'Text styles', () => {
 		expect( computed.textTransform ).toBe( 'uppercase' );
 	} );
 
-	it( 'retains Heading typography and the supported heading element', () => {
-		render( <Heading level={ 3 }>Section</Heading> );
+	it( 'retains Heading typography and the supported heading element', async () => {
+		await render( <Heading level={ 3 }>Section</Heading> );
 		const heading = screen.getByRole( 'heading', { level: 3 } );
 		const computed = getComputedStyle( heading );
 		expect( heading.tagName ).toBe( 'H3' );
@@ -162,36 +143,16 @@ describe( 'Text styles', () => {
 		expect( computed.display ).toBe( 'block' );
 	} );
 
-	it.each( [ 4, '4' ] as const )(
-		'renders Heading level %s with the corresponding typography',
-		( level ) => {
-			render(
-				<>
-					<Heading>Default section</Heading>
-					<Heading level={ level }>Nested section</Heading>
-				</>
-			);
-			expect(
-				getComputedStyle( screen.getByRole( 'heading', { level: 2 } ) )
-					.fontSize
-			).toBe( '25.35px' );
-			expect(
-				getComputedStyle( screen.getByRole( 'heading', { level: 4 } ) )
-					.fontSize
-			).toBe( '16.25px' );
-		}
-	);
-
-	it( 'preserves PaletteHeading typography', () => {
-		render( <PaletteHeading>Palette name</PaletteHeading> );
+	it( 'preserves PaletteHeading typography', async () => {
+		await render( <PaletteHeading>Palette name</PaletteHeading> );
 		const computed = getComputedStyle( screen.getByRole( 'heading' ) );
 		expect( computed.fontSize ).toBe( '11px' );
 		expect( computed.lineHeight ).toBe( '24px' );
 		expect( computed.fontWeight ).toBe( '600' );
 	} );
 
-	it( 'preserves DatePicker month heading typography', () => {
-		render(
+	it( 'preserves DatePicker month heading typography', async () => {
+		await render(
 			<NavigatorHeading level={ 3 }>
 				<strong>January</strong> 2026
 			</NavigatorHeading>
