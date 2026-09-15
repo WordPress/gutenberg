@@ -1,3 +1,4 @@
+import type { ThunkArgs } from '@wordpress/data';
 import type { GetRecordsHttpQuery, State } from './selectors';
 import type * as ET from './entity-types';
 
@@ -103,7 +104,7 @@ export type SaveActions = {
 			  >,
 		options?: ActionOptions
 	) => (
-		thunkArgs: any
+		thunkArgs: ThunkArgs
 	) => Promise<
 		WPEntityTypes[ Key extends `save${ infer E }` ? E : never ] | undefined
 	>;
@@ -115,7 +116,7 @@ export type DeleteActions = {
 		query?: DeleteRecordsHttpQuery,
 		options?: ActionOptions
 	) => (
-		thunkArgs: any
+		thunkArgs: ThunkArgs
 	) => Promise<
 		| WPEntityTypes[ Key extends `delete${ infer E }` ? E : never ]
 		| false
