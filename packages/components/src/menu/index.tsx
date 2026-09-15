@@ -78,6 +78,19 @@ const UnconnectedMenu = ( props: Props ) => {
 };
 
 /**
+ * This component is deprecated. Migrate to `Menu` from `@wordpress/ui`
+ * using its [documentation](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-menu--docs).
+ * The APIs differ: for example, use `Menu.Root`, `Menu.Trigger`, and `Menu.Popup`
+ * in place of `Menu`, `Menu.TriggerButton`, and `Menu.Popover`.
+ *
+ * The private export remains available for older bundled consumers.
+ * Removal is targeted for WordPress 7.4, subject to verifying that supported
+ * bundles no longer need it. Keep the implementation, styles, and private API
+ * opt-ins until the [package compatibility checks](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/package-runtime-compatibility.md)
+ * pass, or explicitly change the supported consumer versions.
+ *
+ * @deprecated
+ *
  * Menu is a collection of React components that combine to render
  * ARIA-compliant [menu](https://www.w3.org/WAI/ARIA/apg/patterns/menu/) and
  * [menu button](https://www.w3.org/WAI/ARIA/apg/patterns/menubutton/) patterns.
