@@ -70,6 +70,7 @@ export default function Root() {
 								[ styles[ 'has-canvas' ] ]:
 									!! canvas || canvas === null,
 								[ styles[ 'has-full-canvas' ] ]: isFullScreen,
+								'boot-is-full-canvas': isFullScreen,
 							} ) }
 						>
 							<UnsavedChangesWarning />

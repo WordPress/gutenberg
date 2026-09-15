@@ -5,7 +5,7 @@
 ### Enhancements
 
 -   Carry a widget's `attributes` from `widget.json` into `build/widgets/registry.php` ([#82485](https://github.com/WordPress/gutenberg/pull/82485)).
--   Pages: adapt wp-admin critical CSS for the rounded admin canvas experiment so Boot pages keep a dark chrome frame and matching menu-arrow colors ([#NNNN](https://github.com/WordPress/gutenberg/pull/NNNN)).
+-   Pages: adapt wp-admin critical CSS for the rounded admin canvas experiment so Boot pages keep a dark chrome frame, fill the rounded `#wpcontent` stage, and matching menu-arrow colors ([#NNNN](https://github.com/WordPress/gutenberg/pull/NNNN)).
 
 ## 0.23.0 (2026-09-10)
 

@@ -27,6 +27,17 @@
 			min-height: 100vh;
 		}
 	}
+
+	/*
+	 * Rounded admin canvas: size the single-page layout to the framed
+	 * #wpcontent stage instead of the full viewport, so content is not
+	 * clipped by #wpcontent's overflow: clip.
+	 */
+	:global(body.admin-stage-rounded) &.layout-single-page {
+		@include mixins.break-medium {
+			min-height: 100%;
+		}
+	}
 }
 
 :where(.layout) img {
