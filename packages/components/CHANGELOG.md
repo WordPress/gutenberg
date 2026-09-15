@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `BoxControl` ([#82570](https://github.com/WordPress/gutenberg/pull/82570))
     -   `Grid` ([#82571](https://github.com/WordPress/gutenberg/pull/82571))
 
 ### Enhancements
