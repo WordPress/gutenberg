@@ -2129,8 +2129,17 @@ export function generateGlobalStyles(
 	// Use provided block types or fall back to getBlockTypes()
 	const blocks = blockTypes.length > 0 ? blockTypes : getBlockTypes();
 
+	/*
+	 * Mirror the server, which checks the setting with `isset()`: a theme opts
+	 * into block gap by giving `spacing.blockGap` a non-null value. WordPress'
+	 * default theme.json sets it to `null` for themes that do not opt in, and
+	 * `getSetting` returns `undefined` for a `null` setting, so an `undefined`
+	 * value must count as "not supported" as well.
+	 */
 	const blockGap = getSetting( config, 'spacing.blockGap' );
-	const hasBlockGapSupport = hasBlockGapSupportOption ?? blockGap !== null;
+	const hasBlockGapSupport =
+		hasBlockGapSupportOption ??
+		( blockGap !== null && blockGap !== undefined );
 	const hasFallbackGapSupport =
 		hasFallbackGapSupportOption ?? ! hasBlockGapSupport;
 
