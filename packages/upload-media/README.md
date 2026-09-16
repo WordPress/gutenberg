@@ -50,14 +50,14 @@ When the edit step itself fails, `onError` receives an `UploadError` with the `I
 
 _Parameters_
 
--   _$0_ `AddEditedImageArgs`:
--   _$0.file_ `AddEditedImageArgs[ 'file' ]`: The attachment's original (full-size) file.
--   _$0.modifiers_ `AddEditedImageArgs[ 'modifiers' ]`: Edits to apply, in order.
--   _$0.sourceAttachmentId_ `[AddEditedImageArgs[ 'sourceAttachmentId' ]]`: ID of the attachment being edited.
--   _$0.onChange_ `[AddEditedImageArgs[ 'onChange' ]]`: Function called each time a file or a temporary representation of the file is available.
--   _$0.onSuccess_ `[AddEditedImageArgs[ 'onSuccess' ]]`: Function called after the file is uploaded.
--   _$0.onError_ `[AddEditedImageArgs[ 'onError' ]]`: Function called when an error happens.
--   _$0.additionalData_ `[AddEditedImageArgs[ 'additionalData' ]]`: Additional data to include in the request.
+- _$0_ `AddEditedImageArgs`:
+- _$0.file_ `AddEditedImageArgs[ 'file' ]`: The attachment's original (full-size) file.
+- _$0.modifiers_ `AddEditedImageArgs[ 'modifiers' ]`: Edits to apply, in order.
+- _$0.sourceAttachmentId_ `[AddEditedImageArgs[ 'sourceAttachmentId' ]]`: ID of the attachment being edited.
+- _$0.onChange_ `[AddEditedImageArgs[ 'onChange' ]]`: Function called each time a file or a temporary representation of the file is available.
+- _$0.onSuccess_ `[AddEditedImageArgs[ 'onSuccess' ]]`: Function called after the file is uploaded.
+- _$0.onError_ `[AddEditedImageArgs[ 'onError' ]]`: Function called when an error happens.
+- _$0.additionalData_ `[AddEditedImageArgs[ 'additionalData' ]]`: Additional data to include in the request.
 
 #### addItems
 

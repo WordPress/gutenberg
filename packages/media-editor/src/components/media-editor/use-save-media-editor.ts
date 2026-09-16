@@ -135,7 +135,7 @@ export function useSaveMediaEditor( {
 								pendingEdits,
 								media
 							),
-					  } )
+						} )
 					: null;
 
 				if ( editedId ) {

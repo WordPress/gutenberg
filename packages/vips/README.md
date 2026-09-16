@@ -69,15 +69,15 @@ Only the first frame of an animated image is edited, as core's GD editor does.
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
--   _buffer_ `ArrayBuffer`: Original file buffer.
--   _type_ `string`: Mime type.
--   _modifiers_ `ImageEditModifier[]`: Edits to apply, in order.
--   _options_ `EditImageOptions`: Edit options.
+- _id_ `ItemId`: Item ID.
+- _buffer_ `ArrayBuffer`: Original file buffer.
+- _type_ `string`: Mime type.
+- _modifiers_ `ImageEditModifier[]`: Edits to apply, in order.
+- _options_ `EditImageOptions`: Edit options.
 
 _Returns_
 
--   `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; } >`: Edited file data plus the new dimensions.
+- `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; } >`: Edited file data plus the new dimensions.
 
 ### getUltraHdrInfo
 
@@ -195,15 +195,15 @@ Only the first frame of an animated image is edited, as core's GD editor does.
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
--   _buffer_ `ArrayBuffer`: Original file buffer.
--   _type_ `string`: Mime type.
--   _modifiers_ `ImageEditModifier[]`: Edits to apply, in order.
--   _options_ `EditImageOptions`: Edit options.
+- _id_ `ItemId`: Item ID.
+- _buffer_ `ArrayBuffer`: Original file buffer.
+- _type_ `string`: Mime type.
+- _modifiers_ `ImageEditModifier[]`: Edits to apply, in order.
+- _options_ `EditImageOptions`: Edit options.
 
 _Returns_
 
--   `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; } >`: Edited file data plus the new dimensions.
+- `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; } >`: Edited file data plus the new dimensions.
 
 ### vipsGetUltraHdrInfo
 
