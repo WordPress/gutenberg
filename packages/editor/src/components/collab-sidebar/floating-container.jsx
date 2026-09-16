@@ -40,9 +40,9 @@ export function FloatingContainer( {
 								: {
 										opacity: 0,
 										pointerEvents: 'none',
-								  } ),
+									} ),
 							...style,
-					  }
+						}
 					: style
 			}
 			{ ...props }

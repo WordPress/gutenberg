@@ -70,7 +70,7 @@ export default function SuggestionMoveGhost( {
 					'--suggestion-author-color': getAvatarBorderColor(
 						moved.authorId
 					),
-			  }
+				}
 			: undefined;
 
 	return (
