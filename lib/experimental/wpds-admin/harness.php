@@ -122,11 +122,12 @@ function gutenberg_wpds_admin_render_harness() {
 	echo '</p>';
 
 	echo '<h2>' . esc_html__( 'Button groups', 'gutenberg' ) . '</h2>';
-	echo '<p>' . esc_html__( 'Grouped buttons join into one control: square inner corners, and borders that overlap rather than double.', 'gutenberg' ) . '</p>';
+	echo '<p>' . esc_html__( 'Grouped buttons join into one control: square inner corners, and borders that overlap rather than double. The last group has a selected button, marked with the `.active` class, as groups used as toggles do — for example the alignment and link settings in the media modal.', 'gutenberg' ) . '</p>';
 	$groups = array(
 		array( '', array( 'button', 'button', 'button' ) ),
 		array( '', array( 'button button-primary', 'button', 'button' ) ),
 		array( ' button-compact', array( 'button', 'button', 'button' ) ),
+		array( '', array( 'button', 'button active', 'button' ) ),
 	);
 	echo '<p style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">';
 	foreach ( $groups as $group ) {
