@@ -379,7 +379,7 @@ export function BlockSettingsDropdown( {
 									? children( { onClose } )
 									: Children.map( ( child ) =>
 											cloneElement( child, { onClose } )
-									  ) }
+										) }
 								{ canRemove && (
 									<MenuGroup>
 										<MenuItem

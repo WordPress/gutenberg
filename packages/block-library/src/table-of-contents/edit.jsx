@@ -187,10 +187,10 @@ export default function TableOfContentsEdit( {
 							onlyIncludeCurrentPage
 								? __(
 										'Only including headings from the current page (if the post is paginated).'
-								  )
+									)
 								: __(
 										'Include headings from all pages (if the post is paginated).'
-								  )
+									)
 						}
 					/>
 				</ToolsPanelItem>
@@ -223,10 +223,10 @@ export default function TableOfContentsEdit( {
 							! maxLevel
 								? __(
 										'Including all heading levels in the table of contents.'
-								  )
+									)
 								: __(
 										'Only include headings up to and including this level.'
-								  )
+									)
 						}
 					/>
 				</ToolsPanelItem>

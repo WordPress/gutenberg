@@ -92,8 +92,7 @@ interface UnregisterAbilityCategoryAction {
 type AbilitiesAction = RegisterAbilityAction | UnregisterAbilityAction;
 
 type AbilitiesCategoryAction =
-	| RegisterAbilityCategoryAction
-	| UnregisterAbilityCategoryAction;
+	RegisterAbilityCategoryAction | UnregisterAbilityCategoryAction;
 
 const DEFAULT_STATE: Record< string, Ability > = {};
 
