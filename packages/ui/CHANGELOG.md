@@ -9,6 +9,7 @@
 
 ### New Features
 
+-   Add `RadioGroup` form primitive.
 -   Add `CheckboxGroup` form primitive ([#82556](https://github.com/WordPress/gutenberg/pull/82556)).
 
 ### Enhancements
