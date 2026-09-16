@@ -15,7 +15,7 @@
 
 ### Enhancements
 
--   Post Title: Add Fit text support, so the title can resize to fill its container as it already can in the Heading, Paragraph, and Site Title blocks.
+-   Post Title: Add Fit text support, so the title can resize to fill its container ([#83036](https://github.com/WordPress/gutenberg/pull/83036)).
 
 ## 11.0.0 (2026-09-10)
 
