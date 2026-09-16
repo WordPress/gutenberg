@@ -40,6 +40,7 @@ function gutenberg_get_allowed_icon_svg_tags(): array {
 				'fill-rule' => true,
 				'clip-rule' => true,
 				'd'         => true,
+				'opacity'   => true,
 				'transform' => true,
 			),
 			$stroke_attributes
