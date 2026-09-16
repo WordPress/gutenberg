@@ -31,6 +31,14 @@ module.exports = {
 			}
 		}
 
+		function reportExportedModule( node ) {
+			if ( ! node.source || node.exportKind === 'type' ) {
+				return;
+			}
+
+			reportIfLeak( node, node.source.value );
+		}
+
 		return {
 			ImportDeclaration( node ) {
 				if ( node.importKind === 'type' ) {
@@ -41,6 +49,12 @@ module.exports = {
 			},
 			ImportExpression( node ) {
 				reportIfLeak( node, getStaticModuleSpecifier( node.source ) );
+			},
+			ExportNamedDeclaration( node ) {
+				reportExportedModule( node );
+			},
+			ExportAllDeclaration( node ) {
+				reportExportedModule( node );
 			},
 		};
 	},
@@ -67,6 +81,10 @@ function classifyBuildStyleImport( sourceValue ) {
 
 	if ( queryKeys.includes( 'raw' ) ) {
 		return { status: 'allowed-query', pathname, query: 'raw' };
+	}
+
+	if ( queryKeys.includes( 'url' ) ) {
+		return { status: 'allowed-query', pathname, query: 'url' };
 	}
 
 	return { status: 'leak', pathname };

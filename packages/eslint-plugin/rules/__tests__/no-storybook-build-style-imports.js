@@ -38,6 +38,15 @@ ruleTester.run( 'no-storybook-build-style-imports', rule, {
 		{
 			code: 'import( `@wordpress/dataviews/build-style/${ name }.css` );',
 		},
+		{
+			code: "import sheet from '@wordpress/components/build-style/style.css?url';",
+		},
+		{
+			code: "import( '@wordpress/components/build-style/style.css?url' );",
+		},
+		{
+			code: "export { sheet } from '@wordpress/components/build-style/style.css?url';",
+		},
 	],
 	invalid: [
 		{
@@ -78,6 +87,14 @@ ruleTester.run( 'no-storybook-build-style-imports', rule, {
 		},
 		{
 			code: "import '..\\\\..\\\\dataviews\\\\build-style\\\\style.css';",
+			errors: [ { messageId: 'usePackageStylesMatcher' } ],
+		},
+		{
+			code: "export * from '@wordpress/dataviews/build-style/style.css';",
+			errors: [ { messageId: 'usePackageStylesMatcher' } ],
+		},
+		{
+			code: "export { styles } from '@wordpress/dataviews/build-style/style.css';",
 			errors: [ { messageId: 'usePackageStylesMatcher' } ],
 		},
 	],

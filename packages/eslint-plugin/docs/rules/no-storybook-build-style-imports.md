@@ -21,6 +21,10 @@ import styles from '@wordpress/components/build-style/style.css';
 import( '@wordpress/dataviews/build-style/style.css' );
 ```
 
+```js
+export * from '@wordpress/dataviews/build-style/style.css';
+```
+
 Examples of **correct** code for this rule:
 
 ```js
@@ -37,6 +41,10 @@ import sheet from '@wordpress/block-library/build-style/style.css?raw';
 
 ```js
 import '@wordpress/components/build-style/style.css?inline';
+```
+
+```js
+import sheetUrl from '@wordpress/components/build-style/style.css?url';
 ```
 
 ```js
