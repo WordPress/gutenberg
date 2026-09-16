@@ -63,9 +63,8 @@ function getEsbuildTarget() {
 // package is not installed (it is an optional peerDependency).
 let dsTokenFallbacksJs;
 try {
-	const { default: esbuildPlugin } = await import(
-		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
-	);
+	const { default: esbuildPlugin } =
+		await import( '@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks' );
 	dsTokenFallbacksJs = esbuildPlugin;
 } catch {
 	// @wordpress/theme is optional; skip token fallbacks if not available.
@@ -1813,7 +1812,7 @@ async function buildRoutes( experimentalPageIds = new Set() ) {
 					return metadata.pages.some(
 						( page ) => ! experimentalPageIds.has( page )
 					);
-			  } );
+				} );
 
 	if ( routes.length === 0 ) {
 		console.log( '   No routes found, skipping.\n' );
@@ -1823,9 +1822,7 @@ async function buildRoutes( experimentalPageIds = new Set() ) {
 	await Promise.all(
 		routes.map( async ( routeName ) => {
 			const buildTime = await buildRoute( routeName );
-			console.log(
-				`   ✔ Built route ${ routeName } (${ buildTime }ms)`
-			);
+			console.log( `   ✔ Built route ${ routeName } (${ buildTime }ms)` );
 		} )
 	);
 }
@@ -2112,10 +2109,10 @@ function toPhpActionsLiteral( actions ) {
 					typeof action.download === 'boolean'
 						? `'download' => ${
 								action.download ? 'true' : 'false'
-						  }`
+							}`
 						: `'download' => ${ toPhpStringLiteral(
 								action.download
-						  ) }`
+							) }`
 				);
 			}
 
@@ -2396,7 +2393,7 @@ async function buildAll( baseUrlExpression ) {
 				normalizedPages
 					.filter( ( page ) => page.experimental )
 					.map( ( page ) => page.id )
-		  )
+			)
 		: new Set();
 	await buildRoutes( experimentalPageIds );
 
@@ -2483,9 +2480,7 @@ async function buildAll( baseUrlExpression ) {
 	if ( pageData.length > 0 ) {
 		console.log( '   ✔ Generated build/pages.php' );
 		for ( const page of pageData ) {
-			console.log(
-				`   ✔ Generated build/pages/${ page.slug }/page.php`
-			);
+			console.log( `   ✔ Generated build/pages/${ page.slug }/page.php` );
 			console.log(
 				`   ✔ Generated build/pages/${ page.slug }/page-wp-admin.php`
 			);
@@ -2836,10 +2831,10 @@ async function main() {
 			'base-url': {
 				type: 'string',
 				default:
-					boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+					( boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
 					boolConfigVal(
 						process.env.npm_package_config_IS_WORDPRESS_CORE
-					)
+					) )
 						? "includes_url( 'build/' )"
 						: 'plugin_dir_url( __FILE__ )',
 			},
