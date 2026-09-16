@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useState,
 	useMemo,
@@ -13,10 +10,6 @@ import {
 } from '@wordpress/components';
 import { __, _n } from '@wordpress/i18n';
 import { Card, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
@@ -174,7 +167,9 @@ export const FreeCompositionComponent = () => {
 						No planets
 					</WCText>
 					<WCText variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</WCText>
-					<Button variant="secondary">Create new planet</Button>
+					<Button variant="secondary" __next40pxDefaultSize>
+						Create new planet
+					</Button>
 				</Stack>
 			}
 		>

@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { DndContext, useDraggable } from '@dnd-kit/core';
 import type { DragMoveEvent } from '@dnd-kit/core';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { useMergeRefs, useThrottle } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { ResizeDelta, ResizeHandleProps } from './types';
 import styles from './resize-handle.module.css';
 
@@ -155,7 +144,9 @@ export default function ResizeHandleWrapper( props: ResizeHandleProps ) {
 			onDragMove={ handleDragMove }
 			onDragEnd={ handleDragEnd }
 		>
-			<ResizeHandle { ...props } />
+			<div className={ styles[ 'resize-handle-slot' ] }>
+				<ResizeHandle { ...props } />
+			</div>
 		</DndContext>
 	);
 }

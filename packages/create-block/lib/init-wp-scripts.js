@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const { command } = require( 'execa' );
-
-/**
- * Internal dependencies
- */
 const { info } = require( './log' );
 
 module.exports = async ( { rootDirectory } ) => {

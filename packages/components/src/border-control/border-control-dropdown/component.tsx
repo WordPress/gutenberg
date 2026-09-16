@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import BorderControlStylePicker from '../border-control-style-picker';
 import Button from '../../button';
 import ColorIndicator from '../../color-indicator';
@@ -21,7 +10,6 @@ import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderControlDropdown } from './hook';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
-
 import type { ColorObject } from '../../color-palette/types';
 import { isMultiplePaletteArray } from '../../color-palette/utils';
 import type { DropdownProps as DropdownComponentProps } from '../../dropdown/types';
@@ -80,7 +68,7 @@ const getToggleAriaLabel = (
 						colorObject.name,
 						ariaLabelValue,
 						style
-				  )
+					)
 				: sprintf(
 						// translators: 1: The name of the color e.g. "vivid red". 2: The color's hex code e.g.: "#f00:".
 						__(
@@ -88,7 +76,7 @@ const getToggleAriaLabel = (
 						),
 						colorObject.name,
 						ariaLabelValue
-				  );
+					);
 		}
 
 		if ( colorValue ) {
@@ -101,14 +89,14 @@ const getToggleAriaLabel = (
 						),
 						ariaLabelValue,
 						style
-				  )
+					)
 				: sprintf(
 						// translators: %s: The color's hex code e.g: "#f00".
 						__(
 							'Border color and style picker. The currently selected color has a value of "%s".'
 						),
 						ariaLabelValue
-				  );
+					);
 		}
 
 		return __( 'Border color and style picker.' );
@@ -149,16 +137,14 @@ const BorderControlDropdown = (
 		disableCustomColors,
 		enableAlpha,
 		enableStyle,
-		indicatorClassName,
 		indicatorWrapperClassName,
+		indicatorWrapperStyle,
 		isStyleSettable,
 		onReset,
 		onColorChange,
 		onStyleChange,
-		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonWrapperClassName,
-		size,
 		__unstablePopoverProps,
 		...otherProps
 	} = useBorderControlDropdown( props );
@@ -188,13 +174,13 @@ const BorderControlDropdown = (
 			tooltipPosition={ dropdownPosition }
 			label={ __( 'Border color and style picker' ) }
 			showTooltip
-			__next40pxDefaultSize={ size === '__unstable-large' }
+			__next40pxDefaultSize
 		>
-			<span className={ indicatorWrapperClassName }>
-				<ColorIndicator
-					className={ indicatorClassName }
-					colorValue={ color }
-				/>
+			<span
+				className={ indicatorWrapperClassName }
+				style={ indicatorWrapperStyle }
+			>
+				<ColorIndicator colorValue={ color } />
 			</span>
 		</Button>
 	);
@@ -204,7 +190,6 @@ const BorderControlDropdown = (
 			<DropdownContentWrapper paddingSize="medium">
 				<VStack className={ popoverControlsClassName } spacing={ 6 }>
 					<ColorPalette
-						className={ popoverContentClassName }
 						value={ color }
 						onChange={ onColorChange }
 						{ ...{ colors, disableCustomColors } }

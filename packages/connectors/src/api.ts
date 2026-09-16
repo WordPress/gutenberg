@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { dispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store } from './store';
 import { unlock } from './lock-unlock';
 import type { ConnectorConfig } from './types';

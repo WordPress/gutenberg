@@ -29,11 +29,11 @@
 		}
 
 		&-checkbox--everywhere {
-			font-weight: 600;
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 		}
 
 		&-icon--checked {
-			fill: $gray-300;
+			color: $gray-300;
 		}
 	}
 

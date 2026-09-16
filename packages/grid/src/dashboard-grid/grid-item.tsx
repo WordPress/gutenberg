@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
 import { useSortable } from '@dnd-kit/sortable';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useState, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
+import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
 import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 import ResizeHandle from '../shared/resize-handle';
-import type { ResizeSnapSize } from '../shared/resize-snap';
+import { clampResizeDelta, type ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
 import type { GridItemProps } from './types';
 import styles from './grid-item.module.css';
@@ -39,13 +29,20 @@ export function GridItem( {
 	item,
 	maxColumns,
 	disabled = false,
+	draggable = true,
+	resizable = true,
 	verticalResizable = true,
 	interacting = false,
+	dragging = false,
 	children,
 	actionableArea = null,
 	onResize,
 	onResizeEnd,
 	resizeSnapPreview = null,
+	minResizeWidthPx,
+	minResizeHeightPx,
+	maxResizeWidthPx,
+	maxResizeHeightPx,
 	renderResizeHandle,
 }: GridItemProps ) {
 	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
@@ -57,6 +54,8 @@ export function GridItem( {
 	} | null >( null );
 	const itemRef = useRef< HTMLDivElement >( null );
 	const contentRef = useRef< HTMLDivElement >( null );
+	const dragDisabled = disabled || ! draggable;
+	const resizeDisabled = disabled || ! resizable;
 	const {
 		attributes,
 		listeners,
@@ -65,7 +64,7 @@ export function GridItem( {
 		isDragging,
 	} = useSortable( {
 		id: item.key,
-		disabled,
+		disabled: dragDisabled,
 	} );
 	const mergedRef = useMergeRefs( [ itemRef, setNodeRef ] );
 	const contentMergedRef = useMergeRefs( [ contentRef ] );
@@ -82,7 +81,7 @@ export function GridItem( {
 				: Math.min(
 						typeof item.width === 'number' ? item.width : 1,
 						maxColumns
-				  )
+					)
 		}`,
 		gridRowEnd: `span ${ item.height || 1 }`,
 	};
@@ -95,14 +94,30 @@ export function GridItem( {
 	);
 
 	const handleResize = ( delta: ResizeDelta ) => {
-		const clamped = {
+		const contentNode = contentRef.current;
+		let baselineSize = initialContentSize;
+		if ( contentNode && ! baselineSize ) {
+			const { width, height } = contentNode.getBoundingClientRect();
+			baselineSize = { width, height };
+			setInitialContentSize( baselineSize );
+		}
+		let clamped: ResizeDelta = {
 			width: delta.width,
 			height: verticalResizable ? delta.height : 0,
 		};
-		const contentNode = contentRef.current;
-		if ( contentNode && ! initialContentSize ) {
-			const { width, height } = contentNode.getBoundingClientRect();
-			setInitialContentSize( { width, height } );
+		if ( baselineSize ) {
+			clamped = clampResizeDelta(
+				clamped,
+				baselineSize,
+				{
+					width: minResizeWidthPx,
+					height: verticalResizable ? minResizeHeightPx : undefined,
+				},
+				{
+					width: maxResizeWidthPx,
+					height: verticalResizable ? maxResizeHeightPx : undefined,
+				}
+			);
 		}
 		setResizeDelta( clamped );
 		onResize( item.key, clamped );
@@ -121,7 +136,7 @@ export function GridItem( {
 					height: verticalResizable
 						? initialContentSize.height + resizeDelta.height
 						: undefined,
-			  }
+				}
 			: undefined;
 
 	const previewOverlay = resizeSnapPreview ? (
@@ -134,13 +149,18 @@ export function GridItem( {
 			className={ itemClassName }
 			style={ style }
 			{ ...{ [ GRID_ITEM_DATA_KEY ]: item.key } }
+			data-wp-grid-item-resizing={ isResizing || undefined }
 		>
 			{ actionableArea ? (
 				<div
-					style={ { display: 'contents' } }
-					{ ...( interacting ? { inert: '' } : {} ) }
+					className={ actionableAreaStyles[ 'actionable-area-slot' ] }
 				>
-					{ actionableArea }
+					<div
+						style={ { display: 'contents' } }
+						{ ...( dragging ? { inert: '' } : {} ) }
+					>
+						{ actionableArea }
+					</div>
 				</div>
 			) : null }
 
@@ -150,7 +170,7 @@ export function GridItem( {
 				{ ...listeners }
 				style={ {
 					height: '100%',
-					cursor: getItemCursor( disabled, interacting ),
+					cursor: getItemCursor( dragDisabled, interacting ),
 				} }
 			>
 				<div
@@ -159,7 +179,7 @@ export function GridItem( {
 					style={ continuousContentStyle }
 				>
 					{ children }
-					{ ! disabled && (
+					{ ! resizeDisabled && (
 						<ResizeHandle
 							itemId={ item.key }
 							verticalResizable={ verticalResizable }

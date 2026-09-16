@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { paramCase as kebabCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -63,7 +56,6 @@ function AddCustomGenericTemplateModalContent( {
 		<form onSubmit={ onCreateTemplate }>
 			<VStack spacing={ 6 }>
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Name' ) }
 					value={ title }
 					onChange={ setTitle }

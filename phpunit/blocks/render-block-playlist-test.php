@@ -55,21 +55,20 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	/**
 	 * @covers ::render_block_core_playlist
 	 */
-	public function test_returns_empty_when_current_track_is_missing() {
+	public function test_renders_when_current_track_is_missing() {
 		$markup = $this->build_playlist_markup(
 			array(),
 			array(
 				array(
-					'id'       => 1,
-					'uniqueId' => 'track-1',
-					'title'    => 'Song One',
-					'src'      => 'http://example.com/song1.mp3',
+					'id'    => 1,
+					'title' => 'Song One',
+					'src'   => 'http://example.com/song1.mp3',
 				),
 			)
 		);
 
 		$output = do_blocks( $markup );
-		$this->assertEmpty( trim( $output ) );
+		$this->assertStringContainsString( 'wp-block-playlist__waveform-player', $output );
 	}
 
 	/**
@@ -77,7 +76,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	 */
 	public function test_returns_empty_when_no_inner_blocks() {
 		$markup = $this->build_playlist_markup(
-			array( 'currentTrack' => 'track-1' )
+			array()
 		);
 
 		$output = do_blocks( $markup );
@@ -87,21 +86,20 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	/**
 	 * @covers ::render_block_core_playlist
 	 */
-	public function test_returns_empty_when_current_track_does_not_match_any_track() {
+	public function test_renders_when_current_track_does_not_match_any_track() {
 		$markup = $this->build_playlist_markup(
 			array( 'currentTrack' => 'nonexistent-track' ),
 			array(
 				array(
-					'id'       => 1,
-					'uniqueId' => 'track-1',
-					'title'    => 'Song One',
-					'src'      => 'http://example.com/song1.mp3',
+					'id'    => 1,
+					'title' => 'Song One',
+					'src'   => 'http://example.com/song1.mp3',
 				),
 			)
 		);
 
 		$output = do_blocks( $markup );
-		$this->assertEmpty( trim( $output ) );
+		$this->assertStringContainsString( 'wp-block-playlist__waveform-player', $output );
 	}
 
 	/**
@@ -109,16 +107,15 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	 */
 	public function test_renders_with_interactivity_attributes() {
 		$markup = $this->build_playlist_markup(
-			array( 'currentTrack' => 'track-1' ),
+			array(),
 			array(
 				array(
-					'id'       => 1,
-					'uniqueId' => 'track-1',
-					'title'    => 'Song One',
-					'artist'   => 'Artist One',
-					'album'    => 'Album One',
-					'src'      => 'http://example.com/song1.mp3',
-					'image'    => 'http://example.com/image1.jpg',
+					'id'     => 1,
+					'title'  => 'Song One',
+					'artist' => 'Artist One',
+					'album'  => 'Album One',
+					'src'    => 'http://example.com/song1.mp3',
+					'image'  => 'http://example.com/image1.jpg',
 				),
 			)
 		);
@@ -130,9 +127,9 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 		$this->assertSame( 'core/playlist', $p->get_attribute( 'data-wp-interactive' ) );
 
 		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
-		$this->assertSame( 'track-1', $context['currentId'] );
+		$this->assertSame( 'track-0', $context['currentId'] );
 		$this->assertIsArray( $context['tracks'] );
-		$this->assertContains( 'track-1', $context['tracks'] );
+		$this->assertContains( 'track-0', $context['tracks'] );
 		$this->assertArrayHasKey( 'playlistId', $context );
 	}
 
@@ -141,13 +138,12 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	 */
 	public function test_renders_waveform_player_container() {
 		$markup = $this->build_playlist_markup(
-			array( 'currentTrack' => 'track-1' ),
+			array(),
 			array(
 				array(
-					'id'       => 1,
-					'uniqueId' => 'track-1',
-					'title'    => 'Song One',
-					'src'      => 'http://example.com/song1.mp3',
+					'id'    => 1,
+					'title' => 'Song One',
+					'src'   => 'http://example.com/song1.mp3',
 				),
 			)
 		);
@@ -160,26 +156,113 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	/**
 	 * @covers ::render_block_core_playlist
 	 */
-	public function test_track_data_in_interactivity_state() {
+	public function test_renders_waveform_player_color_attributes() {
+		$waveform_gradient            = 'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)';
+		$waveform_background_gradient = 'linear-gradient(90deg,#ffeeaa 0%,#aabbcc 100%)';
+
 		$markup = $this->build_playlist_markup(
-			array( 'currentTrack' => 'track-1' ),
+			array(
+				'waveformColor'              => '#ff0000',
+				'waveformGradient'           => $waveform_gradient,
+				'waveformBackgroundColor'    => '#ffeeaa',
+				'waveformBackgroundGradient' => $waveform_background_gradient,
+			),
 			array(
 				array(
-					'id'       => 1,
-					'uniqueId' => 'track-1',
-					'title'    => 'Song One',
-					'artist'   => 'Artist One',
-					'album'    => 'Album One',
-					'src'      => 'http://example.com/song1.mp3',
-					'image'    => 'http://example.com/image1.jpg',
+					'id'    => 1,
+					'title' => 'Song One',
+					'src'   => 'http://example.com/song1.mp3',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+		$p      = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( array( 'class_name' => 'wp-block-playlist__waveform-player' ) );
+
+		$this->assertSame( '#ff0000', $p->get_attribute( 'data-waveform-player-color' ) );
+		$this->assertSame(
+			$waveform_gradient,
+			$p->get_attribute( 'data-waveform-player-gradient' )
+		);
+		$this->assertSame( '#ffeeaa', $p->get_attribute( 'data-waveform-player-background-color' ) );
+		$this->assertSame(
+			$waveform_background_gradient,
+			$p->get_attribute( 'data-waveform-player-background-gradient' )
+		);
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 */
+	public function test_waveform_style_uses_attribute() {
+		$markup = $this->build_playlist_markup(
+			array(
+				'waveformStyle' => 'dots',
+			),
+			array(
+				array(
+					'id'    => 1,
+					'title' => 'Song One',
+					'src'   => 'http://example.com/song1.mp3',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+		$p      = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( 'figure' );
+
+		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
+		$this->assertSame( 'dots', $context['waveformStyle'] );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 */
+	public function test_waveform_style_defaults_to_bars_for_invalid_attribute() {
+		$markup = $this->build_playlist_markup(
+			array(
+				'waveformStyle' => 'thin-line',
+			),
+			array(
+				array(
+					'id'    => 1,
+					'title' => 'Song One',
+					'src'   => 'http://example.com/song1.mp3',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+		$p      = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( 'figure' );
+
+		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
+		$this->assertSame( 'bars', $context['waveformStyle'] );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 */
+	public function test_track_data_in_interactivity_state() {
+		$markup = $this->build_playlist_markup(
+			array(),
+			array(
+				array(
+					'id'     => 1,
+					'title'  => 'Song One',
+					'artist' => 'Artist One',
+					'album'  => 'Album One',
+					'src'    => 'http://example.com/song1.mp3',
+					'image'  => 'http://example.com/image1.jpg',
 				),
 				array(
-					'id'       => 2,
-					'uniqueId' => 'track-2',
-					'title'    => 'Song Two',
-					'artist'   => 'Artist Two',
-					'album'    => 'Album Two',
-					'src'      => 'http://example.com/song2.mp3',
+					'id'     => 2,
+					'title'  => 'Song Two',
+					'artist' => 'Artist Two',
+					'album'  => 'Album Two',
+					'src'    => 'http://example.com/song2.mp3',
 				),
 			)
 		);
@@ -193,33 +276,35 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 
 		$playlist = reset( $playlists );
 		$tracks   = $playlist['tracks'];
+		$this->assertArrayHasKey( 'track-0', $tracks );
 		$this->assertArrayHasKey( 'track-1', $tracks );
-		$this->assertArrayHasKey( 'track-2', $tracks );
 
-		$this->assertSame( 'http://example.com/song1.mp3', $tracks['track-1']['url'] );
-		$this->assertSame( 'Song One', $tracks['track-1']['title'] );
-		$this->assertSame( 'Artist One', $tracks['track-1']['artist'] );
-		$this->assertSame( 'Album One', $tracks['track-1']['album'] );
-		$this->assertSame( 'http://example.com/image1.jpg', $tracks['track-1']['image'] );
+		$this->assertSame( 'http://example.com/song1.mp3', $tracks['track-0']['url'] );
+		$this->assertSame( 'Song One', $tracks['track-0']['title'] );
+		$this->assertSame( 'Artist One', $tracks['track-0']['artist'] );
+		$this->assertSame( 'Album One', $tracks['track-0']['album'] );
+		$this->assertSame( 'http://example.com/image1.jpg', $tracks['track-0']['image'] );
 
-		$this->assertSame( 'http://example.com/song2.mp3', $tracks['track-2']['url'] );
-		$this->assertSame( 'Song Two', $tracks['track-2']['title'] );
+		$this->assertSame( 'http://example.com/song2.mp3', $tracks['track-1']['url'] );
+		$this->assertSame( 'Song Two', $tracks['track-1']['title'] );
 	}
 
 	/**
 	 * @covers ::render_block_core_playlist
 	 */
-	public function test_aria_label_with_title_artist_and_album() {
+	public function test_track_image_remains_in_interactivity_state_when_tracklist_images_are_disabled() {
 		$markup = $this->build_playlist_markup(
-			array( 'currentTrack' => 'track-1' ),
+			array(
+				'showImages'            => false,
+				'showPlayButtonArtwork' => false,
+			),
 			array(
 				array(
 					'id'       => 1,
-					'uniqueId' => 'track-1',
 					'title'    => 'Song One',
-					'artist'   => 'Artist One',
-					'album'    => 'Album One',
 					'src'      => 'http://example.com/song1.mp3',
+					'image'    => 'http://example.com/image1.jpg',
+					'imageAlt' => 'A bright abstract track image',
 				),
 			)
 		);
@@ -228,10 +313,131 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 
 		$state    = wp_interactivity_state( 'core/playlist' );
 		$playlist = reset( $state['playlists'] );
-		$track    = $playlist['tracks']['track-1'];
+		$track    = $playlist['tracks']['track-0'];
+
+		$this->assertSame( 'http://example.com/image1.jpg', $track['image'] );
+		$this->assertSame( 'A bright abstract track image', $track['imageAlt'] );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 */
+	public function test_track_image_is_available_for_play_button_artwork_when_images_are_disabled() {
+		$markup = $this->build_playlist_markup(
+			array(
+				'showImages'            => false,
+				'showPlayButtonArtwork' => true,
+			),
+			array(
+				array(
+					'id'       => 1,
+					'title'    => 'Song One',
+					'src'      => 'http://example.com/song1.mp3',
+					'image'    => 'http://example.com/image1.jpg',
+					'imageAlt' => 'A bright abstract track image',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+		$p      = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( 'figure' );
+		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
+
+		$state    = wp_interactivity_state( 'core/playlist' );
+		$playlist = reset( $state['playlists'] );
+		$track    = $playlist['tracks']['track-0'];
+
+		$this->assertTrue( $context['showPlayButtonArtwork'] );
+		$this->assertSame( 'http://example.com/image1.jpg', $track['image'] );
+		$this->assertSame( 'A bright abstract track image', $track['imageAlt'] );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 * @covers ::render_block_core_playlist_track
+	 */
+	public function test_tracklist_renders_track_image_when_show_images_is_enabled() {
+		$markup = $this->build_playlist_markup(
+			array( 'showImages' => true ),
+			array(
+				array(
+					'id'       => 1,
+					'title'    => 'Song One',
+					'src'      => 'http://example.com/song1.mp3',
+					'image'    => 'http://example.com/image1.jpg',
+					'imageAlt' => 'A bright abstract track image',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+
+		$this->assertStringContainsString( 'class="wp-block-playlist-track__image"', $output );
+		$this->assertStringContainsString( 'src="http://example.com/image1.jpg"', $output );
+		$this->assertStringContainsString( 'alt="A bright abstract track image"', $output );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 * @covers ::render_block_core_playlist_track
+	 */
+	public function test_tracklist_does_not_render_track_image_when_show_images_is_disabled() {
+		$markup = $this->build_playlist_markup(
+			array( 'showImages' => false ),
+			array(
+				array(
+					'id'    => 1,
+					'title' => 'Song One',
+					'src'   => 'http://example.com/song1.mp3',
+					'image' => 'http://example.com/image1.jpg',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+
+		$this->assertStringNotContainsString( 'wp-block-playlist-track__image', $output );
+		$this->assertStringNotContainsString( 'src="http://example.com/image1.jpg"', $output );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist_track
+	 */
+	public function test_playlist_track_renders_without_block_context() {
+		$output = do_blocks(
+			'<!-- wp:playlist-track {"id":1,"title":"Song One","src":"http://example.com/song1.mp3","image":"http://example.com/image1.jpg"} /-->'
+		);
+
+		$this->assertStringContainsString( 'class="wp-block-playlist-track__image"', $output );
+		$this->assertStringContainsString( 'src="http://example.com/image1.jpg"', $output );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 */
+	public function test_aria_label_with_title_artist_and_album() {
+		$markup = $this->build_playlist_markup(
+			array(),
+			array(
+				array(
+					'id'     => 1,
+					'title'  => 'Track One',
+					'artist' => 'Artist One',
+					'album'  => 'Album One',
+					'src'    => 'http://example.com/track1.mp3',
+				),
+			)
+		);
+
+		do_blocks( $markup );
+
+		$state    = wp_interactivity_state( 'core/playlist' );
+		$playlist = reset( $state['playlists'] );
+		$track    = $playlist['tracks']['track-0'];
 
 		$this->assertSame(
-			'Song One by Artist One from the album Album One',
+			'Track One by Artist One from the album Album One',
 			$track['ariaLabel']
 		);
 	}
@@ -241,13 +447,12 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	 */
 	public function test_aria_label_falls_back_to_title_when_artist_or_album_missing() {
 		$markup = $this->build_playlist_markup(
-			array( 'currentTrack' => 'track-1' ),
+			array(),
 			array(
 				array(
-					'id'       => 1,
-					'uniqueId' => 'track-1',
-					'title'    => 'Song One',
-					'src'      => 'http://example.com/song1.mp3',
+					'id'    => 1,
+					'title' => 'Song One',
+					'src'   => 'http://example.com/song1.mp3',
 				),
 			)
 		);
@@ -256,7 +461,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 
 		$state    = wp_interactivity_state( 'core/playlist' );
 		$playlist = reset( $state['playlists'] );
-		$track    = $playlist['tracks']['track-1'];
+		$track    = $playlist['tracks']['track-0'];
 
 		$this->assertSame( 'Song One', $track['ariaLabel'] );
 	}
@@ -266,12 +471,11 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	 */
 	public function test_title_defaults_to_unknown_when_not_set() {
 		$markup = $this->build_playlist_markup(
-			array( 'currentTrack' => 'track-1' ),
+			array(),
 			array(
 				array(
-					'id'       => 1,
-					'uniqueId' => 'track-1',
-					'src'      => 'http://example.com/song1.mp3',
+					'id'  => 1,
+					'src' => 'http://example.com/song1.mp3',
 				),
 			)
 		);
@@ -280,7 +484,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 
 		$state    = wp_interactivity_state( 'core/playlist' );
 		$playlist = reset( $state['playlists'] );
-		$track    = $playlist['tracks']['track-1'];
+		$track    = $playlist['tracks']['track-0'];
 
 		$this->assertSame( 'Unknown title', $track['title'] );
 	}
@@ -290,25 +494,22 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	 */
 	public function test_renders_multiple_tracks_in_context() {
 		$markup = $this->build_playlist_markup(
-			array( 'currentTrack' => 'track-1' ),
+			array(),
 			array(
 				array(
-					'id'       => 1,
-					'uniqueId' => 'track-1',
-					'title'    => 'Song One',
-					'src'      => 'http://example.com/song1.mp3',
+					'id'    => 1,
+					'title' => 'Song One',
+					'src'   => 'http://example.com/song1.mp3',
 				),
 				array(
-					'id'       => 2,
-					'uniqueId' => 'track-2',
-					'title'    => 'Song Two',
-					'src'      => 'http://example.com/song2.mp3',
+					'id'    => 2,
+					'title' => 'Song Two',
+					'src'   => 'http://example.com/song2.mp3',
 				),
 				array(
-					'id'       => 3,
-					'uniqueId' => 'track-3',
-					'title'    => 'Song Three',
-					'src'      => 'http://example.com/song3.mp3',
+					'id'    => 3,
+					'title' => 'Song Three',
+					'src'   => 'http://example.com/song3.mp3',
 				),
 			)
 		);
@@ -319,6 +520,6 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 
 		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
 		$this->assertCount( 3, $context['tracks'] );
-		$this->assertSame( array( 'track-1', 'track-2', 'track-3' ), $context['tracks'] );
+		$this->assertSame( array( 'track-0', 'track-1', 'track-2' ), $context['tracks'] );
 	}
 }

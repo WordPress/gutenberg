@@ -1,13 +1,7 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import {
 	__unstableSerializeAndClean,
+	parse,
 	type Block as WPBlock,
 } from '@wordpress/blocks';
 import {
@@ -18,10 +12,6 @@ import {
 	type SyncConfig,
 	Y,
 } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import { BaseAwareness } from '../awareness/base-awareness';
 import {
 	type Block,
@@ -157,8 +147,29 @@ export function applyPostChangesToCRDTDoc(
 
 		switch ( key ) {
 			case 'blocks': {
+				// Block changes from typing are bundled with a 'selection' update.
+				// Use the resulting cursor position for block merging.
+				const newCursorPosition = parseCursorSelection(
+					changes.selection
+				);
+
 				// Blocks are undefined when they need to be re-parsed from content.
-				if ( ! newValue ) {
+				// When new content is also part of this change (e.g. the Code
+				// Editor dispatching `{ content, blocks: undefined }` on every
+				// keystroke), derive blocks from content so the merge keeps
+				// stable YBlock identities for unchanged blocks.
+
+				const rawContent = getRawValue( changes.content );
+				if ( ! newValue && typeof rawContent === 'string' ) {
+					// We have no blocks but an updated content string.
+					mergeContentWithoutBlocks(
+						ymap,
+						rawContent,
+						newCursorPosition
+					);
+					break;
+				} else if ( ! newValue ) {
+					// We have an update containing empty blocks and content.
 					// Set to undefined instead of deleting the key. This is important
 					// since we iterate over the Y.Map keys in getPostChangesFromCRDTDoc.
 					ymap.set( key, undefined );
@@ -172,12 +183,6 @@ export function applyPostChangesToCRDTDoc(
 					currentBlocks = new Y.Array< YBlock >();
 					ymap.set( key, currentBlocks );
 				}
-
-				// Block changes from typing are bundled with a 'selection' update.
-				// Pass the resulting cursor position to the mergeCrdtBlocks function.
-				const newCursorPosition = parseCursorSelection(
-					changes.selection
-				);
 
 				// Merge blocks does not need `setValue` because it is operating on a
 				// Yjs type that is already in the Y.Doc.
@@ -276,6 +281,37 @@ export function applyPostChangesToCRDTDoc(
 }
 
 /**
+ * Derive blocks from a raw content string and merge them into the post's
+ * blocks Y.Array. Used when a caller dispatches a change with `blocks:
+ * undefined` alongside new content,  most notably the Code Editor's
+ * per-keystroke dispatch.
+ *
+ * @param ymap           The post's root Y.Map.
+ * @param rawContent     The raw HTML content to parse.
+ * @param cursorPosition Cursor position derived from the change's selection,
+ *                       used by mergeCrdtBlocks for rich-text cursor hints.
+ */
+function mergeContentWithoutBlocks(
+	ymap: YMapWrap< YPostRecord >,
+	rawContent: string,
+	cursorPosition: MergeCursorPosition
+): void {
+	let currentBlocks = ymap.get( 'blocks' );
+
+	if ( ! ( currentBlocks instanceof Y.Array ) ) {
+		currentBlocks = new Y.Array< YBlock >();
+		ymap.set( 'blocks', currentBlocks );
+	}
+
+	mergeCrdtBlocks(
+		currentBlocks,
+		parse( rawContent ) as Block[],
+		cursorPosition,
+		{ preserveClientIds: true }
+	);
+}
+
+/**
  * Only returns a selection object if it describes a selection within a block, with
  * a cursor inside a RichText field associated with one of that block’s attributes.
  *
@@ -294,12 +330,28 @@ function parseCursorSelection( selection?: WPSelection ): MergeCursorPosition {
 				attributeKey: selectionStart.attributeKey,
 				clientId: selectionStart.clientId,
 				offset: asRichTextOffset( selectionStart.offset ),
-		  }
+			}
 		: null;
 }
 
-function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
-	return getRootMap( crdtDoc, CRDT_RECORD_MAP_KEY ).toJSON();
+function defaultGetChangesFromCRDTDoc(
+	crdtDoc: CRDTDoc,
+	editedRecord: ObjectData
+): ObjectData {
+	const docRecord = getRootMap( crdtDoc, CRDT_RECORD_MAP_KEY ).toJSON();
+
+	/*
+	 * Only report properties that differ from the edited record. Reporting
+	 * unchanged properties as edits marks the record dirty: `Y.Map.toJSON()`
+	 * returns fresh object instances, so without this comparison every synced
+	 * update (e.g. from another tab) re-dispatches the entire record as edits.
+	 * See https://github.com/WordPress/gutenberg/issues/79907.
+	 */
+	return Object.fromEntries(
+		Object.entries( docRecord ).filter( ( [ key, newValue ] ) =>
+			haveValuesChanged( editedRecord?.[ key ], newValue )
+		)
+	);
 }
 
 /**
@@ -514,7 +566,7 @@ export const defaultCollectionSyncConfig: SyncConfig = {
  * @param {unknown} value The value to extract from.
  * @return {string|undefined} The raw string value, or undefined if it could not be determined.
  */
-function getRawValue( value?: unknown ): string | undefined {
+export function getRawValue( value?: unknown ): string | undefined {
 	// Value may be a string property or a nested object with a `raw` property.
 	if ( 'string' === typeof value ) {
 		return value;

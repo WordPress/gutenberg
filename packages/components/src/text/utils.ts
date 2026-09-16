@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import memoize from 'memize';
 import type { FindAllArgs } from 'highlight-words-core';
 import { findAll } from 'highlight-words-core';
-
-/**
- * WordPress dependencies
- */
 import { createElement } from '@wordpress/element';
 
 /**

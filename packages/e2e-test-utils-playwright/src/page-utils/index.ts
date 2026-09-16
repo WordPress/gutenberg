@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type {
 	Browser,
 	Page,
 	BrowserContext,
 	PlaywrightWorkerOptions,
 } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { dragFiles } from './drag-files';
 import { isCurrentURL } from './is-current-url';
 import { setClipboardData, pressKeys } from './press-keys';

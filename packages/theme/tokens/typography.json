@@ -97,13 +97,13 @@
 		},
 		"font-weight": {
 			"$type": "fontWeight",
-			"regular": {
+			"default": {
 				"$value": 400,
-				"$description": "Regular font weight for body text"
+				"$description": "Baseline text weight for body copy and UI text"
 			},
-			"medium": {
-				"$value": 500,
-				"$description": "Medium font weight for emphasis and headings"
+			"emphasis": {
+				"$value": 600,
+				"$description": "Elevated text weight for labels, controls, and headings"
 			},
 			"$extensions": {
 				"com.figma.scopes": [ "FONT_WEIGHT" ]
