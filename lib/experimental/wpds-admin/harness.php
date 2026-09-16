@@ -22,7 +22,7 @@
 /**
  * Registers the parity harness page.
  *
- * @since 23.9.0
+ * @since 24.1.0
  */
 function gutenberg_wpds_admin_register_harness() {
 	add_submenu_page(
@@ -46,7 +46,7 @@ add_action( 'admin_menu', 'gutenberg_wpds_admin_register_harness' );
  *
  * Note `.active` is a PERSISTENT selected state, not `:active`.
  *
- * @since 23.9.0
+ * @since 24.1.0
  *
  * @return array<string, string> Map of label to extra markup for the button tag.
  */
@@ -65,7 +65,7 @@ function gutenberg_wpds_admin_harness_states() {
 /**
  * Renders the harness page.
  *
- * @since 23.9.0
+ * @since 24.1.0
  */
 function gutenberg_wpds_admin_render_harness() {
 	$variants = array(

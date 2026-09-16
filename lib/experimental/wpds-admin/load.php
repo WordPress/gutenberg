@@ -57,7 +57,7 @@
  * behaviour change for the ecosystem, and the opposite of the small, explicit
  * blast radius this experiment is built around.
  *
- * @since 23.9.0
+ * @since 24.1.0
  *
  * @global bool $concatenate_scripts
  */
@@ -76,7 +76,7 @@ add_action( 'admin_init', 'gutenberg_wpds_admin_disable_concatenation' );
  * stylesheets alike — repeats this same declaration. They all agree, so
  * whichever lands first sets the order correctly.
  *
- * @since 23.9.0
+ * @since 24.1.0
  */
 const GUTENBERG_WPDS_ADMIN_LAYER_ORDER = '@layer wpds-overrides, wp-legacy, wpds;';
 
@@ -121,7 +121,7 @@ const GUTENBERG_WPDS_ADMIN_LAYER_ORDER = '@layer wpds-overrides, wp-legacy, wpds
  * order will start winning. That is a real behaviour change for the ecosystem
  * and the main thing this experiment needs to prove is safe.
  *
- * @since 23.9.0
+ * @since 24.1.0
  *
  * @return string[] Array of registered style handles.
  */
@@ -157,7 +157,7 @@ function gutenberg_wpds_admin_demoted_handles() {
  * decode HTML entities, so a URL carrying `&ver=` would break. Use the raw
  * escaper and then guard the CSS string context and the containing element.
  *
- * @since 23.9.0
+ * @since 24.1.0
  *
  * @param string $href URL to escape.
  * @return string Escaped URL, safe inside a double-quoted CSS string.
@@ -176,7 +176,7 @@ function gutenberg_wpds_admin_escape_css_url( $href ) {
  * Fires for the RTL variant as a second call with the same handle, so both
  * directions are demoted without any extra handling.
  *
- * @since 23.9.0
+ * @since 24.1.0
  *
  * @param string $tag    The `<link>` tag for the enqueued style.
  * @param string $handle The style's registered handle.
@@ -216,7 +216,7 @@ add_filter( 'style_loader_tag', 'gutenberg_wpds_admin_demote_style', 10, 4 );
  * `admin_enqueue_scripts` only fires in wp-admin, so this never touches the
  * login screen or the front end — both of which also use the `buttons` handle.
  *
- * @since 23.9.0
+ * @since 24.1.0
  */
 function gutenberg_wpds_admin_enqueue_styles() {
 	$version  = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
