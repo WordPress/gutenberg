@@ -99,7 +99,7 @@ function useEnter( clientId ) {
 							...topParentListBlock,
 							innerBlocks: after,
 						} ),
-				  ]
+					]
 				: [];
 			replaceBlocks(
 				topParentListBlock.clientId,

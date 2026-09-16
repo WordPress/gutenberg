@@ -88,10 +88,10 @@ export function ElementsEdit( {
 				setAttributes( {
 					style: setStyleForState( style, selectedState, newStyle ),
 				} );
-		  }
+			}
 		: ( newStyle ) => {
 				setAttributes( { style: cleanEmptyObject( newStyle ) } );
-		  };
+			};
 
 	// Text and background color failures are reported by the Typography and
 	// Background panels, which own those selections.
@@ -123,7 +123,7 @@ export function ElementsEdit( {
 		: getBlockSupport( name, [
 				COLOR_SUPPORT_KEY,
 				'__experimentalDefaultControls',
-		  ] );
+			] );
 
 	const Wrapper = asWrapper || ElementsInspectorControl;
 

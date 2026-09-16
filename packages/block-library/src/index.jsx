@@ -408,7 +408,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 							enabledExperiments.includes( __experimental )
 					)
 					.forEach( ( { init } ) => init() );
-		  }
+			}
 		: undefined;
 
 export { privateApis } from './private-apis';
