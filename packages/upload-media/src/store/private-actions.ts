@@ -1,26 +1,16 @@
-/**
- * External dependencies
- */
 import { v4 as uuidv4 } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
-
-/**
- * Internal dependencies
- */
 import {
 	cloneFile,
 	convertBlobToFile,
 	isAnimatedGif,
 	renameFile,
 } from '../utils';
-import { canvasConvertToJpeg } from '../canvas-utils';
+import { canvasConvertToJpeg, HeicUnsupportedError } from '../canvas-utils';
+import { getHeicUnsupportedMessage } from '../heic-support';
 import { getUnappliedExifOrientation } from '../heic-parser';
 import {
 	isClientSideMediaSupported,
@@ -893,14 +883,28 @@ export function prepareItem( id: QueueItemId ) {
 					file,
 					settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY
 				);
-			} catch {
+			} catch ( error ) {
+				/*
+				 * Only the dead end where nothing could decode the file is
+				 * about codec support. A decode that was attempted and
+				 * failed, or a canvas that could not be created, says
+				 * nothing about the browser, and sending the user off to
+				 * install a different one would not help.
+				 */
+				const unsupported = error instanceof HeicUnsupportedError;
 				dispatch.cancelItem(
 					id,
 					new UploadError( {
-						code: ErrorCode.HEIC_DECODE_ERROR,
-						message:
-							'This browser cannot decode HEIC images and the server does not support them either. Please convert to JPEG before uploading.',
+						code: unsupported
+							? ErrorCode.HEIC_DECODE_ERROR
+							: ErrorCode.IMAGE_TRANSCODING_ERROR,
+						message: unsupported
+							? getHeicUnsupportedMessage()
+							: __(
+									'This HEIC image could not be converted. Try converting it to JPEG before uploading.'
+							  ),
 						file,
+						cause: error instanceof Error ? error : undefined,
 					} )
 				);
 				return;

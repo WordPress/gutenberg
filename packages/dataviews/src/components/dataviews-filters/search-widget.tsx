@@ -1,24 +1,13 @@
-/**
- * External dependencies
- */
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 import removeAccents from 'remove-accents';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo, useDeferredValue } from '@wordpress/element';
 import { Icon as WCIcon, Composite, Spinner } from '@wordpress/components';
 import { search, check } from '@wordpress/icons';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { getCurrentValue } from './utils';
 import type { Filter, NormalizedFilter, View, Option } from '../../types';
 import useElements from '../../hooks/use-elements';

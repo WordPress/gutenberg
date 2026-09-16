@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Ref } from 'react';
-
-/**
- * Internal dependencies
- */
 import { MediaPlaceholder } from './styles/focal-point-picker-style';
 import { isVideoType } from './utils';
 import type { FocalPointPickerMediaProps } from './types';

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { UnitControlProps } from '../unit-control/types';
 import type { LABELS } from './utils';
 

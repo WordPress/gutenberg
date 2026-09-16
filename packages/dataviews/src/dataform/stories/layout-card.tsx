@@ -1,17 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
-import { privateApis } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
+import { Badge } from '@wordpress/ui';
 import DataForm from '../index';
 import type { Field, Form } from '../../types';
-import { unlock } from '../../lock-unlock';
-
-const { Badge: WCBadge } = unlock( privateApis );
 
 const LayoutCardComponent = ( {
 	withHeader,
@@ -38,6 +28,9 @@ const LayoutCardComponent = ( {
 		hasVat: boolean;
 		vat: number;
 		commission: number;
+		fileSize: number;
+		dimensions: string;
+		fileType: string;
 		dueDate: string;
 	};
 
@@ -84,9 +77,27 @@ const LayoutCardComponent = ( {
 			type: 'boolean',
 		},
 		{
+			id: 'fileSize',
+			label: 'File size',
+			type: 'integer',
+			readOnly: true,
+		},
+		{
+			id: 'dimensions',
+			label: 'Dimensions',
+			type: 'text',
+			readOnly: true,
+		},
+		{
+			// No type and no Edit: a read-only field without an edit control.
+			id: 'fileType',
+			label: 'File type',
+			readOnly: true,
+		},
+		{
+			// No type and no Edit: a read-only field rendered as its own card.
 			id: 'payments',
 			label: 'Payments',
-			type: 'text',
 			readOnly: true, // Triggers using the render method instead of Edit.
 			isVisible: ( item ) => item.displayPayments,
 			render: ( { item } ) => {
@@ -115,7 +126,7 @@ const LayoutCardComponent = ( {
 			label: 'Due date',
 			type: 'text',
 			render: ( { item } ) => {
-				return <WCBadge>Due on: { item.dueDate }</WCBadge>;
+				return <Badge>{ `Due on: ${ item.dueDate }` }</Badge>;
 			},
 		},
 		{
@@ -123,7 +134,7 @@ const LayoutCardComponent = ( {
 			type: 'text',
 			readOnly: true,
 			render: ( { item } ) => {
-				return <WCBadge>{ item.plan }</WCBadge>;
+				return <Badge>{ item.plan }</Badge>;
 			},
 		},
 	];
@@ -138,6 +149,9 @@ const LayoutCardComponent = ( {
 		displayPayments: true,
 		totalOrders: 2,
 		totalRevenue: 1430,
+		fileSize: 1024,
+		dimensions: '1920x1080',
+		fileType: 'JPEG',
 		averageOrderValue: 715,
 		hasVat: true,
 		vat: 10,
@@ -239,6 +253,17 @@ const LayoutCardComponent = ( {
 					layout: getCardLayoutFromStoryArgs( {
 						withHeader: false,
 					} ),
+				},
+				{
+					id: 'fileDetails',
+					label: 'File details',
+					layout: getCardLayoutFromStoryArgs( {
+						withHeader,
+						withSummary,
+						isCollapsible,
+						isOpened,
+					} ),
+					children: [ 'fileSize', 'dimensions', 'fileType' ],
 				},
 				{
 					id: 'taxConfiguration',

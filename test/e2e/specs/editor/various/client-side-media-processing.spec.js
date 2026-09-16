@@ -1,13 +1,9 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { randomUUID } = require( 'crypto' );
 const { createRequire } = require( 'node:module' );
 const { pathToFileURL } = require( 'node:url' );
-
 /**
  * Resolves the `wasm-vips` entry point from the `@wordpress/vips` package,
  * which declares it as a direct dependency. This works whether or not
@@ -21,11 +17,10 @@ const wasmVipsEntry = pathToFileURL(
 		'wasm-vips'
 	)
 ).href;
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	skipIfClientSideMediaInactive,
+} = require( './client-side-media-utils' );
 
 /**
  * Probes a remote JPEG for an embedded UltraHDR gain map.
@@ -49,6 +44,35 @@ async function probeUltraHdrUrl( url ) {
 		width: image.width,
 		height: image.pageHeight,
 		hasGainmap: !! image.gainmap,
+	};
+}
+
+/**
+ * Colour type 3 in a PNG header means the image is palette (indexed) encoded.
+ *
+ * @type {number}
+ */
+const PNG_COLOR_TYPE_INDEXED = 3;
+
+/**
+ * Downloads a PNG and reads its colour type straight out of the IHDR chunk.
+ *
+ * The IHDR chunk always comes first: an 8-byte signature, a 4-byte length, the
+ * 4-byte chunk type, then width (4), height (4), bit depth (1) and colour
+ * type (1). That puts the colour type at a fixed offset of 25.
+ *
+ * @param {string} url PNG URL to fetch.
+ * @return {Promise<{ colorType: number, byteLength: number }>} Probe result.
+ */
+async function probePngUrl( url ) {
+	const response = await fetch( url );
+	if ( ! response.ok ) {
+		throw new Error( `Failed to fetch ${ url }: ${ response.status }` );
+	}
+	const bytes = new Uint8Array( await response.arrayBuffer() );
+	return {
+		colorType: bytes[ 25 ],
+		byteLength: bytes.byteLength,
 	};
 }
 
@@ -113,41 +137,12 @@ class MediaProcessingUtils {
 
 	/**
 	 * Skip the test unless the client-side media processing pipeline is the
-	 * active upload path. This mirrors the gate used in the editor's
-	 * media-upload util: the global flag must be set AND the browser must
-	 * meet the feature detection requirements (cross-origin isolation,
-	 * SharedArrayBuffer, Web Workers, WebAssembly).
+	 * active upload path.
 	 *
-	 * @param {import('@playwright/test').TestInfo} testInstance The test object for skipping.
+	 * @param {import('@playwright/test').TestType} testInstance The test object for skipping.
 	 */
 	async skipIfClientSideMediaInactive( testInstance ) {
-		const isActive = await this.page.evaluate( () => {
-			if ( ! window.__clientSideMediaProcessing ) {
-				return false;
-			}
-			// Prefer the package's own detection when available so the
-			// gate stays in sync with the editor's runtime decision.
-			if (
-				window.wp?.uploadMedia &&
-				typeof window.wp.uploadMedia.isClientSideMediaSupported ===
-					'function'
-			) {
-				return window.wp.uploadMedia.isClientSideMediaSupported();
-			}
-			// Fall back to the core preconditions for CSM. These are the
-			// signals the package's feature detection inspects first.
-			return (
-				window.crossOriginIsolated === true &&
-				typeof SharedArrayBuffer !== 'undefined' &&
-				typeof WebAssembly !== 'undefined' &&
-				typeof Worker !== 'undefined'
-			);
-		} );
-
-		testInstance.skip(
-			! isActive,
-			'Client-side media processing is not active in this environment'
-		);
+		await skipIfClientSideMediaInactive( this.page, testInstance );
 	}
 
 	/**
@@ -352,6 +347,74 @@ test.describe( 'Client-side media processing', () => {
 			expect( probed.width ).toBe( size.width );
 			expect( probed.height ).toBe( size.height );
 		}
+	} );
+
+	test( 'keeps sub-sizes of an indexed PNG indexed', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		/*
+		 * Regression test for https://core.trac.wordpress.org/ticket/65922.
+		 *
+		 * libvips decodes an indexed (palette) PNG into full RGB(A) pixels.
+		 * Without asking pngsave to quantise back down, every sub-size was
+		 * written as truecolour, which for palette artwork is several times
+		 * larger than the indexed original — the "large" sub-size of this
+		 * fixture came out at roughly twice the size of the full-size file.
+		 */
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'2000x1200_e2e_test_image_indexed.png'
+		);
+
+		expect( media.mime_type ).toBe( 'image/png' );
+		expect( media.media_details.width ).toBe( 2000 );
+		expect( media.media_details.height ).toBe( 1200 );
+
+		// The uploaded original must still be indexed, so the sub-sizes below
+		// are compared against a like-for-like baseline.
+		const fullSize = await probePngUrl( media.source_url );
+		expect( fullSize.colorType ).toBe( PNG_COLOR_TYPE_INDEXED );
+
+		// Every generated sub-size must stay indexed rather than being
+		// re-encoded as truecolour RGB/RGBA. `full` is the uploaded original,
+		// already checked above.
+		const subSizes = Object.entries( media.media_details.sizes ).filter(
+			( [ sizeName ] ) => 'full' !== sizeName
+		);
+		expect( subSizes.map( ( [ sizeName ] ) => sizeName ) ).toContain(
+			'large'
+		);
+
+		let largeByteLength;
+
+		for ( const [ sizeName, size ] of subSizes ) {
+			const subSize = await probePngUrl( size.source_url );
+
+			expect(
+				subSize.colorType,
+				`sub-size "${ sizeName }" must stay indexed`
+			).toBe( PNG_COLOR_TYPE_INDEXED );
+
+			if ( 'large' === sizeName ) {
+				largeByteLength = subSize.byteLength;
+			}
+		}
+
+		/*
+		 * And the user-visible symptom from the ticket: the `large` sub-size
+		 * came out bigger than the full-size image it was generated from.
+		 *
+		 * This is checked on `large` alone rather than every sub-size. It is
+		 * not a general invariant: requantising a resized image dithers, and
+		 * the dithering noise costs bytes, so a big sub-size of an already
+		 * small indexed original can legitimately exceed it. The 1536px size
+		 * of this fixture does, at a fraction of what it weighed before the
+		 * fix.
+		 */
+		expect( largeByteLength ).toBeLessThan( fullSize.byteLength );
 	} );
 
 	test( 'scales oversized images and generates the standard sub-sizes', async ( {
@@ -570,6 +633,60 @@ test.describe( 'Client-side media processing', () => {
 		} finally {
 			await requestUtils.deactivatePlugin(
 				'gutenberg-test-plugin-image-format-conversion-jpeg-to-webp'
+			);
+		}
+	} );
+
+	test( 'registers one generated file under every image size sharing its dimensions', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-duplicate-image-sizes'
+		);
+
+		try {
+			await page.reload();
+			await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
+
+			// Sizes that share width, height and crop are generated once and
+			// sideloaded in a single request whose `image_size` is an array
+			// of names. Record how the server answers each sideload so a
+			// rejected request fails here with its status code rather than
+			// as a downstream symptom.
+			const sideloadStatuses = [];
+			page.on( 'response', ( response ) => {
+				if ( /\/wp\/v2\/media\/\d+\/sideload/.test( response.url() ) ) {
+					sideloadStatuses.push( response.status() );
+				}
+			} );
+
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				'1024x768_e2e_test_image_size.jpeg'
+			);
+
+			expect( sideloadStatuses.length ).toBeGreaterThan( 0 );
+			expect(
+				sideloadStatuses.filter( ( status ) => status >= 400 )
+			).toEqual( [] );
+
+			// Both registered names must be present in the attachment
+			// metadata and point at the same generated file.
+			const sizes = media.media_details.sizes;
+			expect( sizes[ 'duplicate-size-one' ] ).toBeDefined();
+			expect( sizes[ 'duplicate-size-two' ] ).toBeDefined();
+			expect( sizes[ 'duplicate-size-two' ].source_url ).toBe(
+				sizes[ 'duplicate-size-one' ].source_url
+			);
+			expect( sizes[ 'duplicate-size-one' ].width ).toBe( 400 );
+			expect( sizes[ 'duplicate-size-one' ].height ).toBe( 300 );
+		} finally {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-duplicate-image-sizes'
 			);
 		}
 	} );
@@ -833,6 +950,64 @@ test.describe( 'Client-side media processing', () => {
 		await page.unroute( '**/wp/v2/media**' );
 	} );
 
+	test( 'reports a server failure in plain language', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		/*
+		 * Answer the create request with a 500 carrying an HTML body, which
+		 * is what a PHP fatal or a server that cannot write its temporary
+		 * files produces. `apiFetch` cannot read that as a REST error, so it
+		 * rejects with its internal `invalid_json` code — and the editor used
+		 * to show that verbatim as "The response is not a valid JSON
+		 * response." (see gutenberg#81711).
+		 */
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			const request = route.request();
+			const isCreate =
+				request.method() === 'POST' &&
+				/\/wp\/v2\/media(\?|$)/.test( request.url() );
+			if ( isCreate ) {
+				await route.fulfill( {
+					status: 500,
+					contentType: 'text/html',
+					body: '<html><body>Fatal error: allowed memory size exhausted</body></html>',
+				} );
+				return;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		const uniqueName = await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'1024x768_e2e_test_image_size.jpeg'
+		);
+
+		const snackbars = page.locator( '.components-snackbar' );
+
+		// The message names the file and offers a way forward.
+		const errorSnackbar = snackbars.filter( {
+			hasText: /failed to upload/i,
+		} );
+		await expect( errorSnackbar ).toBeVisible( { timeout: 30_000 } );
+		await expect( errorSnackbar ).toContainText( uniqueName );
+
+		// The REST client's internals must not reach the user.
+		await expect(
+			snackbars.filter( { hasText: /valid JSON/i } )
+		).toBeHidden();
+
+		await page.unroute( '**/wp/v2/media**' );
+	} );
+
 	test( 'recovers when the image processing worker crashes mid-upload', async ( {
 		page,
 		editor,
@@ -932,5 +1107,105 @@ test.describe( 'Client-side media processing', () => {
 			'1024x768_e2e_test_image_size.jpeg'
 		);
 		expect( media.mime_type ).toBe( 'image/jpeg' );
+	} );
+
+	test( 'shows the Resolution control when a URL-keyed cache stands in front of the REST API', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		/*
+		 * Regression test for https://github.com/WordPress/gutenberg/issues/81844.
+		 *
+		 * A client-side upload creates the attachment first and writes its
+		 * sub-size metadata only in the final `finalize` request, so an
+		 * attachment GET issued in between returns `media_details.sizes: {}`.
+		 * Some hosts cache REST responses keyed on the full request URL, even
+		 * for authenticated requests WordPress marks `no-cache`, so that
+		 * mid-upload response gets cached - and any later read of the same URL
+		 * is answered with it, leaving the Image block without its Resolution
+		 * control.
+		 *
+		 * Simulate such a cache: once a response for an exact attachment URL
+		 * has been seen, every later request for that URL is served from it,
+		 * never reaching the server. The editor stays correct only by not
+		 * needing that read at all - the `finalize` response already carries
+		 * the finished record.
+		 */
+		const urlCache = new Map();
+
+		await page.route( /\/wp\/v2\/media\/\d+\?/, async ( route ) => {
+			if ( route.request().method() !== 'GET' ) {
+				await route.continue();
+				return;
+			}
+			const url = route.request().url();
+			if ( urlCache.has( url ) ) {
+				await route.fulfill( urlCache.get( url ) );
+				return;
+			}
+			const response = await route.fetch();
+			const body = await response.body();
+			urlCache.set( url, {
+				status: response.status(),
+				headers: response.headers(),
+				body,
+			} );
+			await route.fulfill( { response, body } );
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'1024x768_e2e_test_image_size.jpeg'
+		);
+
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+
+		await mediaProcessingUtils.waitForUploadQueueEmpty();
+
+		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
+		expect( imageId ).toBeDefined();
+
+		// The generated sub-sizes reach the store even though every read of
+		// the attachment URL is answered by the cache.
+		await page.waitForFunction(
+			( id ) => {
+				const record = window.wp.data
+					.select( 'core' )
+					.getEntityRecord( 'postType', 'attachment', id, {
+						context: 'view',
+					} );
+				return (
+					!! record &&
+					Object.keys( record.media_details?.sizes || {} ).length > 0
+				);
+			},
+			imageId,
+			{ timeout: 30_000 }
+		);
+
+		// The Resolution control offers the generated sizes.
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Settings' } )
+			.click();
+		await expect(
+			page.getByRole( 'combobox', { name: 'Resolution' } )
+		).toBeVisible();
+
+		await page.unroute( /\/wp\/v2\/media\/\d+\?/ );
 	} );
 } );

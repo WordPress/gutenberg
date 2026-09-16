@@ -16,6 +16,7 @@ npm install @wordpress/video-conversion --save
 
 -   **WebCodecs support**: the browser must expose `ImageDecoder` and `VideoEncoder` (available in Chromium-based browsers and Safari 16.4+).
 -   **Web Workers support**: the browser must support Web Workers.
+-   **TypeScript support**: TypeScript consumers require TypeScript 5 or newer.
 
 ## API Reference
 

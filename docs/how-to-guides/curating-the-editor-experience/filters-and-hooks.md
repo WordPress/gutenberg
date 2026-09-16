@@ -34,6 +34,7 @@ For more examples, check out the [Editor Hooks](https://developer.wordpress.org/
 -   [Disable Openverse](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#disable-openverse)
 -   [Disable the Font Library](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#disable-the-font-library)
 -   [Restrict responsive editing](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#restrict-responsive-editing)
+-   [Restrict block states editing](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#restrict-block-states-editing)
 -   [Disable block inspector tabs](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#disable-block-inspector-tabs)
 
 ## Server-side theme.json filters
@@ -82,16 +83,16 @@ The filter receives an instance of the `WP_Theme_JSON_Data class` with the data 
 
 ## Server-side view configuration filter
 
-DataViews-powered screens (such as the Pages list and its Quick Edit form) take their configuration from the server. A dynamic filter, `get_entity_view_config_{$kind}_{$name}`, lets you customize that configuration for a specific entity, where the dynamic portions are the entity kind (e.g. `postType`) and name (e.g. `page`).
+DataViews-powered screens (such as the Pages list and its Quick Edit form) take their configuration from the server. A dynamic filter, `get_entity_view_config_{$kind}_{$name}`, lets you customize that configuration for a specific entity, where the dynamic portions are the entity kind (e.g. `postType`) and name (e.g. `page`), lowercased — so the `postType`/`page` entity maps to the `get_entity_view_config_posttype_page` filter.
 
 Right now, the filter is in use by the following Site Editor screens:
 
 | Page | Filter name |
 | --- | --- |
-| Pages | `get_entity_view_config_postType_page` |
-| Templates | `get_entity_view_config_postType_wp_template` |
-| Parts | `get_entity_view_config_postType_wp_template_part` |
-| Patterns | `get_entity_view_config_postType_wp_block` |
+| Pages | `get_entity_view_config_posttype_page` |
+| Templates | `get_entity_view_config_posttype_wp_template` |
+| Parts | `get_entity_view_config_posttype_wp_template_part` |
+| Patterns | `get_entity_view_config_posttype_wp_block` |
 
 There are four aspects to configure for each entity (and screen):
 
@@ -99,6 +100,8 @@ There are four aspects to configure for each entity (and screen):
 - `default_layouts`: the default DataViews layouts (e.g., what layouts are available for the user to choose from)
 - `view_list`: the preconfigured views displayed in the sidebar (e.g. "All", "Published", "Drafts", etc.)
 - `form`: the DataForm configuration used for the Quick Edit form (e.g. which fields are displayed in the form and their order)
+
+See the [View Configuration Reference](/docs/reference-guides/view-config-reference.md) for a description of every property.
 
 Each filter callback receives a `Gutenberg_View_Config_Data` object with the config for the given entity, which it can change by calling its methods (see below) and **return the object**.
 
@@ -110,8 +113,12 @@ function example_filter_page_view_config( $data ) {
 
 	return $data;
 }
-add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
+add_filter( 'get_entity_view_config_posttype_page', 'example_filter_page_view_config' );
 ```
+
+### Filter priority
+
+Hook the callback at the default priority (`10`) or later. Priorities below `10` are reserved for WordPress Core, which uses them to build the configuration a screen starts from. A callback registered earlier than that runs before Core has finished assembling the config, so its changes are overwritten.
 
 ### Update entries with `merge`
 
@@ -121,6 +128,8 @@ Filter callbacks receive a `Gutenberg_View_Config_Data` object that encodes the 
 - `$version`, an integer, is the version of the data being merged. It should be `1` for now.
 
 For example, the following filter callback is applied to the _Pages_ screen. It makes the default view type a grid, sorts the grid by ascending title, and makes the `date` field visible (in addition to the existing fields). It also appends `my_custom_field` to the Quick Edit `form`, keeping the form's existing fields (note that registering a field from the server is not yet possible).
+
+Entries merged into a list are always appended to the end of it; choosing where a new entry lands is not supported yet.
 
 ```php
 function example_filter_page_view_config( $data ) {
@@ -141,7 +150,7 @@ function example_filter_page_view_config( $data ) {
 
 	return $data;
 }
-add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
+add_filter( 'get_entity_view_config_posttype_page', 'example_filter_page_view_config' );
 ```
 
 ### Remove entries with `remove`
@@ -167,7 +176,7 @@ function example_page_view_config_remove( $data ) {
 
 	return $data;
 }
-add_filter( 'get_entity_view_config_postType_page', 'example_page_view_config_remove' );
+add_filter( 'get_entity_view_config_posttype_page', 'example_page_view_config_remove' );
 ```
 
 ### Update entries with `replace`
@@ -190,7 +199,7 @@ function example_filter_page_view_config( $data ) {
 
 	return $data;
 }
-add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
+add_filter( 'get_entity_view_config_posttype_page', 'example_filter_page_view_config' );
 ```
 
 However, this code uses `replace` to substitute the list of visible fields with just `date`, and the Quick Edit form's entire field list with `date` and `my_custom_field`:
@@ -209,7 +218,7 @@ function example_filter_page_view_config( $data ) {
 
 	return $data;
 }
-add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
+add_filter( 'get_entity_view_config_posttype_page', 'example_filter_page_view_config' );
 ```
 
 ### Set entries with `set`
@@ -241,7 +250,7 @@ function example_filter_page_view_config( $data ) {
 
 	return $data;
 }
-add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
+add_filter( 'get_entity_view_config_posttype_page', 'example_filter_page_view_config' );
 ```
 
 ## Client-side (Editor) filters

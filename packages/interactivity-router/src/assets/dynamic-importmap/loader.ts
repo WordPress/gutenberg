@@ -12,15 +12,7 @@
  *
  * MIT License: https://opensource.org/licenses/MIT
  */
-
-/**
- * External dependencies
- */
 import * as lexer from 'es-module-lexer';
-
-/**
- * Internal dependencies
- */
 import { fetchModule } from './fetch';
 import { resolve } from './resolver';
 

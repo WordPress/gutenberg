@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
+import { afterEach, describe, expect, it } from 'vitest';
 import { didAction } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import deprecated, { logged } from '..';
 
 describe( 'deprecated', () => {

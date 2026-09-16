@@ -55,6 +55,10 @@ Both functions follow the same startup sequence:
 2. Run the page's init modules (see below).
 3. Render the application into `mountId`.
 
+Boot's internal shell is private. Consumers can style the mount element and
+their own route content. Boot does not provide stable styling hooks or
+replacement hooks for its internal layout, navigation, and surface elements.
+
 ## Init modules
 
 Init modules are script modules that run a one-time setup step at page startup, after menu items and routes are registered and before the app renders. They are useful for tasks that cannot be expressed in the page's static PHP configuration, such as assigning menu-item icons or registering core-data entities.

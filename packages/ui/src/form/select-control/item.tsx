@@ -1,13 +1,11 @@
 import { forwardRef } from '@wordpress/element';
 import { Select } from '../primitives';
-import { useSelectControlSizeContext } from './context';
 import type { SelectItemProps } from '../primitives/select/types';
 
-export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
-	function Item( { size: sizeProp, ...restProps }, ref ) {
-		const contextSize = useSelectControlSizeContext();
-		const size = sizeProp ?? contextSize;
+export type SelectControlItemProps = Omit< SelectItemProps, 'size' >;
 
-		return <Select.Item size={ size } ref={ ref } { ...restProps } />;
+export const Item = forwardRef< HTMLDivElement, SelectControlItemProps >(
+	function Item( props, ref ) {
+		return <Select.Item ref={ ref } { ...props } />;
 	}
 );

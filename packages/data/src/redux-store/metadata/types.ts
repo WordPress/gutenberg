@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { StoreDescriptor, ReduxStoreConfig } from '../../types';
 import type { StateValue as MetadataStateValue } from './reducer';
 

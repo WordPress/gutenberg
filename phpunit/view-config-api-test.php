@@ -66,9 +66,99 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	 * Tears down each test.
 	 */
 	public function tear_down() {
-		remove_all_filters( 'get_entity_view_config_postType_unregistered_cpt' );
+		remove_all_filters( 'get_entity_view_config_posttype_unregistered_cpt' );
 		remove_all_filters( 'get_entity_view_config_custom_kind_custom_name' );
 		parent::tear_down();
+	}
+
+	/**
+	 * Returns the form field with the given id from a view configuration.
+	 *
+	 * @param array  $config The view configuration.
+	 * @param string $id     The form field id.
+	 * @return array|null The form field, or null when absent.
+	 */
+	private function get_form_field( $config, $id ) {
+		foreach ( $config['form']['fields'] as $field ) {
+			if ( is_array( $field ) && isset( $field['id'] ) && $id === $field['id'] ) {
+				return $field;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * The `status` and `discussion` groups of the default post type form declare
+	 * their panel summary explicitly, for built-in and custom post types alike.
+	 *
+	 * @dataProvider data_default_form_post_types
+	 *
+	 * @param string $post_type The post type.
+	 */
+	public function test_default_form_groups_declare_summary( $post_type ) {
+		if ( ! post_type_exists( $post_type ) ) {
+			register_post_type( $post_type );
+		}
+
+		$config = gutenberg_get_entity_view_config( 'postType', $post_type );
+
+		foreach ( array( 'status', 'discussion' ) as $group ) {
+			$field = $this->get_form_field( $config, $group );
+			$this->assertNotNull( $field, "The `{$group}` group is present." );
+			$this->assertNotEmpty( $field['children'], "The `{$group}` group keeps its children." );
+			$this->assertSame(
+				array(
+					'type'    => 'panel',
+					'summary' => $group,
+				),
+				$field['layout'],
+				"The `{$group}` group summary is explicit."
+			);
+		}
+
+		if ( 'page' !== $post_type && 'post' !== $post_type ) {
+			unregister_post_type( $post_type );
+		}
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_default_form_post_types() {
+		return array(
+			'page'             => array( 'page' ),
+			'post'             => array( 'post' ),
+			'custom post type' => array( 'summaries_cpt' ),
+		);
+	}
+
+	/**
+	 * Post types with their own form do not receive the default form groups.
+	 *
+	 * @dataProvider data_post_types_with_own_form
+	 *
+	 * @param string $post_type The post type.
+	 */
+	public function test_own_form_post_types_do_not_get_default_groups( $post_type ) {
+		$config = gutenberg_get_entity_view_config( 'postType', $post_type );
+
+		$this->assertNull( $this->get_form_field( $config, 'status' ) );
+		$this->assertNull( $this->get_form_field( $config, 'discussion' ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_post_types_with_own_form() {
+		return array(
+			'wp_block'         => array( 'wp_block' ),
+			'wp_template'      => array( 'wp_template' ),
+			'wp_template_part' => array( 'wp_template_part' ),
+		);
 	}
 
 	/**
@@ -142,6 +232,28 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 				'name' => 'custom_name',
 			),
 			$received_entity
+		);
+	}
+
+	/**
+	 * The dynamic filter name lowercases the entity kind and name.
+	 */
+	public function test_filter_hook_name_is_lowercased() {
+		$called = false;
+		add_filter(
+			'get_entity_view_config_posttype_unregistered_cpt',
+			function ( $data ) use ( &$called ) {
+				$called = true;
+				return $data;
+			}
+		);
+
+		gutenberg_get_entity_view_config( 'postType', 'Unregistered_CPT' );
+
+		$this->assertTrue( $called );
+		$this->assertSame(
+			'get_entity_view_config_posttype_unregistered_cpt',
+			gutenberg_get_entity_view_config_hook_name( 'postType', 'Unregistered_CPT' )
 		);
 	}
 

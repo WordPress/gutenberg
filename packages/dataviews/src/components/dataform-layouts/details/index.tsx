@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useContext,
@@ -13,10 +10,6 @@ import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type {
 	NormalizedForm,
 	NormalizedDetailsLayout,
