@@ -139,5 +139,5 @@ jobs:
                   fi
 
                   echo "Validating:"
-                  echo "$changelogs" | sed 's/^/  /'
+                  echo "$changelogs"
                   echo "$changelogs" | xargs npm run lint:changelogs -- --pr="${PR_NUMBER}"
