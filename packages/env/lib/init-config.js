@@ -128,6 +128,10 @@ RUN touch /etc/apt/sources.list
 RUN sed -i 's|deb.debian.org/debian stretch|archive.debian.org/debian stretch|g' /etc/apt/sources.list
 RUN sed -i 's|security.debian.org/debian-security stretch|archive.debian.org/debian-security stretch|g' /etc/apt/sources.list
 RUN sed -i '/stretch-updates/d' /etc/apt/sources.list
+# archive.debian.org's own stretch-suite signing keys have since expired, and
+# stretch is fully end-of-life with no replacement key ever going to be
+# published, so apt has no way to authenticate packages from it.
+RUN if grep -q stretch /etc/apt/sources.list; then echo 'APT::Get::AllowUnauthenticated "true";' > /etc/apt/apt.conf.d/99-archived-debian-stretch-auth; fi
 
 # buster (https://lists.debian.org/debian-devel-announce/2025/06/msg00001.html)
 RUN sed -i 's|deb.debian.org/debian buster|archive.debian.org/debian buster|g' /etc/apt/sources.list
