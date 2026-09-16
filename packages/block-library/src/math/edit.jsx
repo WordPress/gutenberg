@@ -94,18 +94,23 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 									: undefined
 							}
 							onValueChange={ ( newLatex ) => {
-								// The source is read back from the MathML, so
-								// the two are always written together.
+								if ( ! latexToMathML ) {
+									// The source is read back from the MathML,
+									// so clear a stale render along with it.
+									setAttributes( {
+										latex: newLatex,
+										mathML: '',
+									} );
+									return;
+								}
 								let newMathML = '';
-								if ( latexToMathML ) {
-									try {
-										newMathML = latexToMathML( newLatex, {
-											displayMode: true,
-										} );
-										setError( null );
-									} catch ( err ) {
-										setError( err.message );
-									}
+								try {
+									newMathML = latexToMathML( newLatex, {
+										displayMode: true,
+									} );
+									setError( null );
+								} catch ( err ) {
+									setError( err.message );
 								}
 								setAttributes( {
 									mathML: newMathML,
