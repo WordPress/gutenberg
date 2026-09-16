@@ -23,10 +23,10 @@ const HtmlElementControl = ( { tagName, setAttributes } ) => {
 				tagName === 'hr'
 					? __(
 							'Only select <hr> if the separator conveys important information and should be announced by screen readers.'
-					  )
+						)
 					: __(
 							'The <div> element should only be used if the block is a design element with no semantic meaning.'
-					  )
+						)
 			}
 		/>
 	);
