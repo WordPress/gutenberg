@@ -14,7 +14,7 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
-const { useGlobalStyles } = unlock( editorPrivateApis );
+const { useGlobalStylesReset } = unlock( editorPrivateApis );
 
 const getGlobalStylesToggleWelcomeGuideCommands = () =>
 	function useGlobalStylesToggleWelcomeGuideCommands() {
@@ -65,13 +65,7 @@ const getGlobalStylesToggleWelcomeGuideCommands = () =>
 
 const getGlobalStylesResetCommands = () =>
 	function useGlobalStylesResetCommands() {
-		const { user, setUser } = useGlobalStyles();
-
-		// Check if there are user customizations that can be reset
-		const canReset =
-			!! user &&
-			( Object.keys( user?.styles ?? {} ).length > 0 ||
-				Object.keys( user?.settings ?? {} ).length > 0 );
+		const { canReset, resetGlobalStyles } = useGlobalStylesReset();
 
 		const commands = useMemo( () => {
 			if ( ! canReset ) {
@@ -85,11 +79,11 @@ const getGlobalStylesResetCommands = () =>
 					icon: isRTL() ? rotateRight : rotateLeft,
 					callback: ( { close } ) => {
 						close();
-						setUser( { styles: {}, settings: {} } );
+						resetGlobalStyles();
 					},
 				},
 			];
-		}, [ canReset, setUser ] );
+		}, [ canReset, resetGlobalStyles ] );
 
 		return {
 			isLoading: false,
