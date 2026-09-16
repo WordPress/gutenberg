@@ -6,6 +6,10 @@ import { useIsomorphicLayoutEffect } from '@wordpress/compose';
  * `document.body` to avoid a jarring flash on macOS elastic-scroll bounce.
  * Snapshots and restores the previous inline value on unmount.
  *
+ * Skipped when the rounded admin canvas is active (`.admin-content-rounded` on
+ * `body`): the dark frame color on `body` / `#wpwrap` must stay visible on
+ * overscroll instead of the layout surface color.
+ *
  * TODO: Once the two top-level `ThemeProvider` instances can be merged, this
  * hook can be replaced with a CSS rule on `<body>`.
  * See https://github.com/WordPress/gutenberg/pull/78587#discussion_r3481698286
@@ -21,6 +25,13 @@ export default function useSyncBodyBackground() {
 		}
 
 		const body = layoutRef.current.ownerDocument.body;
+
+		// Keep the admin chrome frame color when the rounded canvas owns
+		// body / #wpwrap backgrounds.
+		if ( body.classList.contains( 'admin-content-rounded' ) ) {
+			return;
+		}
+
 		const bg = getComputedStyle( layoutRef.current ).backgroundColor;
 		if ( ! bg ) {
 			return;
