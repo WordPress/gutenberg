@@ -1231,12 +1231,12 @@ export default function SuggestionStoreInterceptor() {
 								fromParentClientId:
 									existingMarker.fromParentClientId ?? null,
 								fromIndex: existingMarker.fromIndex ?? 0,
-						  }
+							}
 						: {
 								fromAnchorClientId: move.fromAnchorClientId,
 								fromParentClientId: move.fromParentClientId,
 								fromIndex: move.fromIndex,
-						  };
+							};
 				isDispatchingOwnWrite = true;
 				try {
 					// Programmatic marker write — keep it off the undo stack.
