@@ -6,6 +6,10 @@
 
 -   Add `optimizeExistingItem` action and a `FetchRemoteFile` operation (with a `fetchFile` utility) to re-process an already-uploaded attachment client-side: fetch the original, re-compress it, regenerate sub-sizes, and upload the result as a new attachment ([#79509](https://github.com/WordPress/gutenberg/pull/79509)).
 
+### Bug Fixes
+
+-   An upload step is no longer silently skipped when the same queue item is processed twice. `processItem` started the next operation without checking whether one was already running, so a re-entrant dispatch (a finishing child sideload pinging its parent, or `resumeQueue` walking the whole queue) ran the same handler a second time, and each run finished the operation, shifting two steps off the item's pipeline ([#83031](https://github.com/WordPress/gutenberg/pull/83031)).
+
 ## 0.40.0 (2026-09-10)
 
 ### Bug Fixes

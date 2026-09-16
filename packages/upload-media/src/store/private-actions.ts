@@ -109,8 +109,8 @@ type ActionCreators = {
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
-type AllSelectors = typeof import('./selectors') &
-	typeof import('./private-selectors');
+type AllSelectors = typeof import( './selectors' ) &
+	typeof import( './private-selectors' );
 type CurriedState< F > = F extends ( state: State, ...args: infer P ) => infer R
 	? ( ...args: P ) => R
 	: F;
@@ -290,6 +290,26 @@ export function processItem( id: QueueItemId ) {
 
 		const item = select.getItem( id );
 		if ( ! item ) {
+			return;
+		}
+
+		/*
+		 * The item already has an operation in flight, so leave it alone:
+		 * several callers dispatch processItem for an item that may still be
+		 * running (resumeQueue walks the whole queue, a finishing child
+		 * sideload pings its parent, a freed concurrency slot kicks the
+		 * pending items). Without this, the same handler would run twice and
+		 * both runs would finish the operation, shifting two steps off the
+		 * pipeline and silently skipping one of them. The running handler
+		 * calls finishOperation when it is done, which picks the pipeline
+		 * back up.
+		 *
+		 * Items parked in PendingRetry keep currentOperation set — it is what
+		 * keeps them out of the concurrency pools while they wait out the
+		 * backoff — but retrying clears it (see the RetryItem reducer case),
+		 * so a retry is not blocked here.
+		 */
+		if ( item.currentOperation ) {
 			return;
 		}
 
@@ -979,7 +999,7 @@ export function prepareItem( id: QueueItemId ) {
 							? getHeicUnsupportedMessage()
 							: __(
 									'This HEIC image could not be converted. Try converting it to JPEG before uploading.'
-							  ),
+								),
 						file,
 						cause: error instanceof Error ? error : undefined,
 					} )
