@@ -27,9 +27,12 @@ export function preventFocusCapture() {
 			if ( ! event.target.contains( element ) ) {
 				return;
 			}
-			// A press outside the element while text is selected may be a
-			// grab of a selection handle, which must keep the selection.
-			if ( ! defaultView.getSelection().isCollapsed ) {
+			// Only a press on a block around the element captures focus. A
+			// press on the canvas around the blocks must leave the element
+			// editable: a selection made from there, e.g. by a triple click,
+			// must be editable, and a touch on a selection handle there must
+			// keep the selection.
+			if ( ! event.target.closest( '[data-block]' ) ) {
 				return;
 			}
 			value = element.getAttribute( 'contenteditable' );
@@ -40,8 +43,15 @@ export function preventFocusCapture() {
 		function onPointerUp() {
 			if ( value !== null ) {
 				element.setAttribute( 'contenteditable', value );
-				defaultView.getSelection().removeAllRanges();
 				value = null;
+				// Safari may still have placed a caret in the element.
+				const selection = defaultView.getSelection();
+				if (
+					selection.isCollapsed &&
+					element.contains( selection.anchorNode )
+				) {
+					selection.removeAllRanges();
+				}
 			}
 		}
 
