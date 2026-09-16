@@ -82,7 +82,7 @@ function gutenberg_wpds_admin_render_harness() {
 		'.button-hero (48px)'    => ' button-hero',
 	);
 
-	echo '<div class="wrap">';
+	echo '<div class="wrap" id="wpds-parity">';
 	echo '<h1>' . esc_html__( 'WPDS Parity — admin controls', 'gutenberg' ) . '</h1>';
 	echo '<p>' . esc_html__( 'Admin control markup rendered under the real admin cascade, so each state can be compared against its design system counterpart. Pseudo-class states (:hover, :focus, :active) must be checked interactively; the class-driven equivalents admin JS toggles are shown below.', 'gutenberg' ) . '</p>';
 
@@ -228,4 +228,43 @@ function gutenberg_wpds_admin_render_harness() {
 	echo '<p><button type="button" class="button wpds-parity-plugin-override">' . esc_html__( 'Plugin-styled button', 'gutenberg' ) . '</button></p>';
 
 	echo '</div>';
+
+	/*
+	 * `aria-disabled` controls stay focusable, which is the point of the
+	 * attribute, but nothing else about them is inert: browsers still let the
+	 * specimens be typed in, toggled and opened. On a real screen the markup's
+	 * owner prevents that. Here it would let a specimen drift out of the state
+	 * it is labelled with, so pointer and keyboard activation are blocked while
+	 * Tab still moves focus and the selectors stay intact for comparison.
+	 */
+	wp_print_inline_script_tag(
+		"( function () {
+			var wrap = document.getElementById( 'wpds-parity' );
+			if ( ! wrap ) {
+				return;
+			}
+			var isInert = function ( target ) {
+				return target.closest && target.closest( '[aria-disabled=\"true\"]' );
+			};
+			var block = function ( event ) {
+				if ( isInert( event.target ) ) {
+					event.preventDefault();
+				}
+			};
+			[ 'click', 'beforeinput', 'paste', 'drop' ].forEach( function ( type ) {
+				wrap.addEventListener( type, block, true );
+			} );
+			// Only selects: blocking mousedown elsewhere would also stop a click from focusing the field.
+			wrap.addEventListener( 'mousedown', function ( event ) {
+				if ( 'SELECT' === event.target.tagName ) {
+					block( event );
+				}
+			}, true );
+			wrap.addEventListener( 'keydown', function ( event ) {
+				if ( 'Tab' !== event.key && isInert( event.target ) ) {
+					event.preventDefault();
+				}
+			}, true );
+		} )();"
+	);
 }
