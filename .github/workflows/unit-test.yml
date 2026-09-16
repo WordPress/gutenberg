@@ -114,7 +114,6 @@ jobs:
                   node --version
                   curl --version
                   git --version
-                  svn --version
                   locale -a
 
             - name: Start Docker environment
