@@ -17,8 +17,11 @@
  * stylesheet loads later. That would silently break overrides the ecosystem
  * has relied on for years. Enforced by stylelint.
  *
- * Accent colour is always var(--wp-admin-theme-color) so admin colour schemes
- * keep working. Never hardcode it.
+ * Colours come in the design system's matched background and foreground
+ * pairs, state by state, exactly as `@wordpress/ui` Button uses them. Never mix
+ * a pair's background with another pair's foreground: the pairs are what
+ * guarantee contrast. They follow the user's colour scheme through
+ * 05-scheme-tokens.css.
  */
 
 @layer wpds-overrides, wp-legacy, wpds;
@@ -131,14 +134,14 @@
 	}
 
 	/* -----------------------------------------------------------------------
-	   Default and secondary — maps to the React `is-secondary` variant
+	   Default and secondary — `@wordpress/ui` Button, brand tone, outline
 	   ----------------------------------------------------------------------- */
 
 	.wp-core-ui .button,
 	.wp-core-ui .button-secondary {
-		border-color: var(--wp-admin-theme-color);
-		color: var(--wp-admin-theme-color);
-		background: transparent;
+		border-color: var(--wpds-color-stroke-interactive-brand);
+		color: var(--wpds-color-foreground-interactive-brand);
+		background: var(--wpds-color-background-interactive-brand-weak);
 	}
 
 	@media not (prefers-reduced-motion) {
@@ -152,16 +155,16 @@
 	.wp-core-ui .button-secondary:hover,
 	.wp-core-ui .button.hover,
 	.wp-core-ui .button-secondary.hover {
-		border-color: var(--wp-admin-theme-color-darker-20);
-		color: var(--wp-admin-theme-color-darker-20);
-		background: color-mix(in srgb, var(--wp-admin-theme-color) 4%, transparent);
+		border-color: var(--wpds-color-stroke-interactive-brand-active);
+		color: var(--wpds-color-foreground-interactive-brand-active);
+		background: var(--wpds-color-background-interactive-brand-weak-active);
 	}
 
 	/* Hide the border while pressed, keeping its width so nothing shifts. */
 	.wp-core-ui .button:active,
 	.wp-core-ui .button-secondary:active {
 		border-color: transparent;
-		background: color-mix(in srgb, var(--wp-admin-theme-color) 8%, transparent);
+		background: var(--wpds-color-background-interactive-brand-weak-active);
 	}
 
 	/*
@@ -170,37 +173,35 @@
 	 */
 	.wp-core-ui .button.active,
 	.wp-core-ui .button-secondary.active {
-		border-color: var(--wp-admin-theme-color-darker-20);
-		color: var(--wp-admin-theme-color-darker-20);
-		background: color-mix(in srgb, var(--wp-admin-theme-color) 8%, transparent);
+		border-color: var(--wpds-color-stroke-interactive-brand-active);
+		color: var(--wpds-color-foreground-interactive-brand-active);
+		background: var(--wpds-color-background-interactive-brand-weak-active);
 	}
 
 	/* -----------------------------------------------------------------------
-	   Primary — maps to the React `is-primary` variant
+	   Primary — `@wordpress/ui` Button, brand tone, solid. The border takes
+	   the background colour, as it does there.
 	   ----------------------------------------------------------------------- */
 
 	.wp-core-ui .button-primary {
-		border-color: transparent;
-		background: var(--wp-admin-theme-color);
+		border-color: var(--wpds-color-background-interactive-brand-strong);
+		background: var(--wpds-color-background-interactive-brand-strong);
 		color: var(--wpds-color-foreground-interactive-brand-strong);
 	}
 
 	.wp-core-ui .button-primary:hover,
-	.wp-core-ui .button-primary.hover {
-		border-color: transparent;
-		background: var(--wp-admin-theme-color-darker-10);
-		color: var(--wpds-color-foreground-interactive-brand-strong);
-	}
-
+	.wp-core-ui .button-primary.hover,
 	.wp-core-ui .button-primary:active,
 	.wp-core-ui .button-primary.active {
-		border-color: transparent;
-		background: var(--wp-admin-theme-color-darker-20);
-		color: var(--wpds-color-foreground-interactive-brand-strong);
+		border-color: var(--wpds-color-background-interactive-brand-strong-active);
+		background: var(--wpds-color-background-interactive-brand-strong-active);
+		color: var(--wpds-color-foreground-interactive-brand-strong-active);
 	}
 
 	/* -----------------------------------------------------------------------
-	   Disabled — classic drives this from classes as well as attributes
+	   Disabled — classic drives this from classes as well as attributes.
+	   buttons.css marks most of these `!important`; 99-overrides.css repeats
+	   the same values to cancel that.
 	   ----------------------------------------------------------------------- */
 
 	.wp-core-ui .button:disabled,
@@ -212,9 +213,9 @@
 	.wp-core-ui .button-secondary.disabled,
 	.wp-core-ui .button-secondary[aria-disabled="true"],
 	.wp-core-ui .button-disabled {
-		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
-		color: var(--wpds-color-foreground-content-neutral-weak);
-		background: transparent;
+		border-color: var(--wpds-color-stroke-interactive-brand-disabled);
+		color: var(--wpds-color-foreground-interactive-brand-disabled);
+		background: var(--wpds-color-background-interactive-brand-weak-disabled);
 		transform: none;
 	}
 
@@ -223,9 +224,9 @@
 	.wp-core-ui .button-primary.disabled,
 	.wp-core-ui .button-primary[aria-disabled="true"],
 	.wp-core-ui .button-primary-disabled {
-		border-color: transparent;
-		background: var(--wp-admin-theme-color);
-		color: rgba(255, 255, 255, 0.4);
+		border-color: var(--wpds-color-background-interactive-brand-strong-disabled);
+		background: var(--wpds-color-background-interactive-brand-strong-disabled);
+		color: var(--wpds-color-foreground-interactive-brand-strong-disabled);
 	}
 
 	/* Disabled buttons keep their focus ring when focused. */
