@@ -209,7 +209,7 @@ function validateEntryLinks(
 ): string[] {
 	const errors: string[] = [];
 
-	for ( let i = 1; i < unreleased.lines.length;  ) {
+	for ( let i = 1; i < unreleased.lines.length; ) {
 		const line = unreleased.lines[ i ];
 		// Top-level list items are "- " (not "--" prose leftovers).
 		if ( ! /^-\s+/.test( line ) ) {
@@ -388,7 +388,7 @@ export function run( argv: string[] ): number {
 			? paths.map( ( filePath ) => resolveChangelogPath( filePath ) )
 			: readdirSync( join( REPO_ROOT, 'packages' ), {
 					withFileTypes: true,
-			  } )
+				} )
 					.filter( ( entry ) => entry.isDirectory() )
 					.map( ( entry ) =>
 						join(
