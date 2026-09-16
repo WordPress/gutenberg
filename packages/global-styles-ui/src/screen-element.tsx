@@ -29,6 +29,10 @@ const {
 } = unlock( blockEditorPrivateApis );
 
 const elements = {
+	text: {
+		description: __( 'Manage the fonts used on the site.' ),
+		title: __( 'Text' ),
+	},
 	link: {
 		description: __( 'Manage the appearance of links.' ),
 		title: __( 'Link' ),
@@ -40,6 +44,10 @@ const elements = {
 	cite: {
 		description: __( 'Manage the appearance of citations.' ),
 		title: __( 'Citation' ),
+	},
+	heading: {
+		description: __( 'Manage the appearance of all headings.' ),
+		title: __( 'All headings' ),
 	},
 	h1: {
 		description: __( 'Manage the appearance of level 1 headings.' ),
@@ -100,7 +108,11 @@ function ElementStylePanels( {
 	element: string;
 	label: string;
 } ) {
-	const prefix = `elements.${ element }`;
+	// "Text" is the site's base text, stored at the root of the styles rather
+	// than under `elements`. The root has its own screens for background,
+	// spacing and borders, so only typography is offered here.
+	const isRoot = element === 'text';
+	const prefix = isRoot ? '' : `elements.${ element }`;
 	const [ style ] = useStyle< GlobalStylesStyles >(
 		prefix,
 		'',
@@ -121,9 +133,9 @@ function ElementStylePanels( {
 	);
 
 	const hasTypographyPanel = useHasTypographyPanel( settings );
-	const hasBackgroundPanel = useHasBackgroundPanel( settings );
-	const hasDimensionsPanel = useHasDimensionsPanel( settings );
-	const hasBorderPanel = useHasBorderPanel( settings );
+	const hasBackgroundPanel = useHasBackgroundPanel( settings ) && ! isRoot;
+	const hasDimensionsPanel = useHasDimensionsPanel( settings ) && ! isRoot;
+	const hasBorderPanel = useHasBorderPanel( settings ) && ! isRoot;
 
 	const canEditCSS = useCanEditCSS();
 	const onChangeBorders = ( newStyle: any ) =>
@@ -167,7 +179,7 @@ function ElementStylePanels( {
 					showInheritanceLabelIndicators={ false }
 				/>
 			) }
-			{ canEditCSS && (
+			{ canEditCSS && ! isRoot && (
 				<PanelBody title={ __( 'Advanced' ) } initialOpen={ false }>
 					<StylesAdvancedPanel
 						value={ style }
