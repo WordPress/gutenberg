@@ -83,6 +83,7 @@ export function PrivateBlockToolbar( {
 			getSettings,
 			getTemplateLock,
 			getParentSectionBlock,
+			getEnabledBlockParents,
 			isZoomOut,
 			isSectionBlock,
 			isBlockHiddenAtViewport,
@@ -93,7 +94,11 @@ export function PrivateBlockToolbar( {
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const parents = getBlockParents( selectedBlockClientId );
 		const parentSection = getParentSectionBlock( selectedBlockClientId );
-		const parentClientId = parentSection ?? parents[ parents.length - 1 ];
+		// Within a section, the parent is the nearest one shown in List View
+		// and the breadcrumb, skipping the disabled blocks in between.
+		const parentClientId = parentSection
+			? getEnabledBlockParents( selectedBlockClientId, true )[ 0 ]
+			: parents[ parents.length - 1 ];
 		const parentBlockName = getBlockName( parentClientId );
 		const parentBlockType = getBlockType( parentBlockName );
 		const editingMode = getBlockEditingMode( selectedBlockClientId );
