@@ -123,6 +123,7 @@ test.describe( 'Block Switcher', () => {
 	test( 'Should show Columns block only if selected blocks are between limits (1-6)', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await editor.canvas
 			.getByRole( 'button', { name: 'Add default block' } )
@@ -131,9 +132,17 @@ test.describe( 'Block Switcher', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '## I am a header' );
-		await page.keyboard.down( 'Shift' );
-		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.up( 'Shift' );
+		// `Shift+ArrowUp` extends the text selection into a multi-block
+		// selection asynchronously; clicking the toolbar's "Multiple
+		// blocks selected" button immediately afterward can race that
+		// state update and time out waiting for the button to appear.
+		// Use the same `primary+a` (select all) double-press the
+		// neighboring "Should NOT show..." test below already relies
+		// on for a multi-block selection instead — it reliably reaches
+		// the same state. A small delay between the two presses avoids
+		// the identical `pressKeys()` race already fixed for that
+		// neighboring test.
+		await pageUtils.pressKeys( 'primary+a', { times: 2, delay: 50 } );
 
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
