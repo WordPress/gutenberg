@@ -31,6 +31,13 @@ const aTag = {
 	type: 'post_tag',
 	kind: 'taxonomy',
 };
+const aPostFormat = {
+	id: 7,
+	url: 'http://wordpress.local/type/aside/',
+	title: 'Aside',
+	type: 'post-format',
+	kind: 'taxonomy',
+};
 const anAttachment = {
 	id: 6,
 	url: 'http://wordpress.local/wp-content/uploads/photo.jpg',
@@ -42,18 +49,9 @@ const anAttachment = {
 const ids = ( suggestions ) => suggestions.map( ( { id } ) => id );
 
 describe( 'transformSuggestions', () => {
-	it( 'removes attachment results', () => {
-		const results = transformSuggestions( [ aPage, anAttachment, aPost ], {
-			type: 'page',
-			kind: 'post-type',
-		} );
-
-		expect( ids( results ) ).not.toContain( anAttachment.id );
-	} );
-
-	it( 'keeps posts, pages and terms', () => {
+	it( 'removes attachments and keeps every other entity', () => {
 		const results = transformSuggestions(
-			[ aPage, aPost, aCategory, aTag ],
+			[ aPage, anAttachment, aPost, aCategory, aTag ],
 			{ type: 'page', kind: 'post-type' }
 		);
 
@@ -92,14 +90,20 @@ describe( 'transformSuggestions', () => {
 		expect( ids( results ) ).toEqual( [ 10, 11, 12, 13 ] );
 	} );
 
-	it( 'treats the block’s tag type as the API’s post_tag subtype', () => {
-		const results = transformSuggestions( [ aPage, aCategory, aTag ], {
-			type: 'tag',
-			kind: 'taxonomy',
-		} );
+	it.each( [
+		[ 'tag', 'post_tag', aTag ],
+		[ 'post_format', 'post-format', aPostFormat ],
+	] )(
+		'matches the block’s %s type against the API’s %s subtype',
+		( type, _subtype, expected ) => {
+			const results = transformSuggestions(
+				[ aPage, aCategory, aTag, aPostFormat ],
+				{ type, kind: 'taxonomy' }
+			);
 
-		expect( ids( results )[ 0 ] ).toBe( aTag.id );
-	} );
+			expect( ids( results )[ 0 ] ).toBe( expected.id );
+		}
+	);
 
 	it( 'distinguishes a post type from a taxonomy sharing a name', () => {
 		const eventPostType = {
@@ -128,17 +132,14 @@ describe( 'transformSuggestions', () => {
 		] );
 	} );
 
-	it( 'prioritises pages when the block has no type yet', () => {
-		const results = transformSuggestions( [ aCategory, aPost, aPage ], {} );
-
-		expect( ids( results )[ 0 ] ).toBe( aPage.id );
-	} );
-
-	it( 'prioritises pages for a custom link', () => {
-		const results = transformSuggestions( [ aCategory, aPost, aPage ], {
-			type: 'custom',
-			kind: 'custom',
-		} );
+	it.each( [
+		[ 'a freshly appended item', {} ],
+		[ 'a custom link', { type: 'custom', kind: 'custom' } ],
+	] )( 'prioritises pages for %s', ( _label, attributes ) => {
+		const results = transformSuggestions(
+			[ aCategory, aPost, aPage ],
+			attributes
+		);
 
 		expect( ids( results )[ 0 ] ).toBe( aPage.id );
 	} );

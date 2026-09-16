@@ -63,7 +63,7 @@ const LinkControlSearchInput = forwardRef(
 					? transformSuggestions( results, {
 							isInitialSuggestions: !! args?.isInitialSuggestions,
 							searchTerm: val,
-					  } )
+						} )
 					: results;
 			},
 			[ baseSearchHandler, transformSuggestions ]

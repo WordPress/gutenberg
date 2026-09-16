@@ -3672,9 +3672,10 @@ describe( 'Front page and blog home labelling', () => {
 } );
 
 describe( 'Transforming suggestions', () => {
-	it( 'should pass fetched suggestions through transformSuggestions before rendering', async () => {
+	it( 'should render the suggestions returned by transformSuggestions', async () => {
 		const user = userEvent.setup();
-		const transformSuggestions = vi.fn( ( suggestions ) => suggestions );
+		const [ firstSuggestion ] = fauxEntitySuggestions;
+		const transformSuggestions = vi.fn( () => [ firstSuggestion ] );
 
 		render( <LinkControl transformSuggestions={ transformSuggestions } /> );
 
@@ -3683,7 +3684,7 @@ describe( 'Transforming suggestions', () => {
 			'Hello'
 		);
 
-		await screen.findByRole( 'listbox', {
+		const searchResults = await screen.findByRole( 'listbox', {
 			name: /Search results for.*/,
 		} );
 
@@ -3694,24 +3695,6 @@ describe( 'Transforming suggestions', () => {
 				searchTerm: 'Hello',
 			} )
 		);
-	} );
-
-	it( 'should render only the suggestions that transformSuggestions returns', async () => {
-		const user = userEvent.setup();
-		const [ firstSuggestion ] = fauxEntitySuggestions;
-
-		render(
-			<LinkControl transformSuggestions={ () => [ firstSuggestion ] } />
-		);
-
-		await user.type(
-			screen.getByRole( 'combobox', { name: 'Search or type URL' } ),
-			'Hello'
-		);
-
-		const searchResults = await screen.findByRole( 'listbox', {
-			name: /Search results for.*/,
-		} );
 
 		const options = within( searchResults ).getAllByRole( 'option' );
 
