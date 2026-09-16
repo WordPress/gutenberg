@@ -101,7 +101,7 @@ const LibraryExample = ( {
 						)
 					);
 				} )
-		  )
+			)
 		: availableIcons;
 
 	const hasResults = Object.keys( filteredIcons ).length > 0;

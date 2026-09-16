@@ -40,6 +40,7 @@ function gutenberg_get_allowed_icon_svg_tags(): array {
 				'fill-rule' => true,
 				'clip-rule' => true,
 				'd'         => true,
+				'opacity'   => true,
 				'transform' => true,
 			),
 			$stroke_attributes
@@ -52,6 +53,33 @@ function gutenberg_get_allowed_icon_svg_tags(): array {
 				'points'    => true,
 				'transform' => true,
 				'focusable' => true,
+			),
+			$stroke_attributes
+		),
+		'rect'    => array_merge(
+			array(
+				'fill'      => true,
+				'fill-rule' => true,
+				'clip-rule' => true,
+				'x'         => true,
+				'y'         => true,
+				'width'     => true,
+				'height'    => true,
+				'rx'        => true,
+				'ry'        => true,
+				'transform' => true,
+			),
+			$stroke_attributes
+		),
+		'circle'  => array_merge(
+			array(
+				'fill'      => true,
+				'fill-rule' => true,
+				'clip-rule' => true,
+				'cx'        => true,
+				'cy'        => true,
+				'r'         => true,
+				'transform' => true,
 			),
 			$stroke_attributes
 		),
@@ -260,8 +288,8 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Sanitizes the icon SVG content.
 	 *
-	 * Overrides the base class to allow stroke-related attributes and inline
-	 * styles required by stroke-based icons.
+	 * Overrides the base class to allow the `rect` and `circle` shapes, plus the
+	 * stroke-related attributes and inline styles required by stroke-based icons.
 	 *
 	 * The signature is intentionally left without type declarations to stay
 	 * compatible with the parent WP_Icons_Registry::sanitize_icon_content()

@@ -67,8 +67,7 @@ export function AiPluginCallout() {
 
 		// Reactive check: any AI provider setting has a non-empty value.
 		const siteSettings = store.getEntityRecord( 'root', 'site' ) as
-			| Record< string, string >
-			| undefined;
+			Record< string, string > | undefined;
 		const hasConnected =
 			initialHasConnectedProvider ||
 			aiProviderSettingNames.some(

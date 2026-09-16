@@ -20,8 +20,8 @@ const config = [
 	...wpPlugin.configs[ 'test-unit' ].map( ( c ) => ( {
 		...c,
 		files: [
-			'**/@(test|__tests__)/**/*.{js,jsx}',
-			'**/?(*.)test.{js,jsx}',
+			'**/@(test|__tests__)/**/*.{js,jsx,ts,tsx,mjs,cjs}',
+			'**/*.@(test|spec).{js,jsx,ts,tsx,mjs,cjs}',
 		],
 	} ) ),
 ];

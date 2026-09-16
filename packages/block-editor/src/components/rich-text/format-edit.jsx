@@ -29,7 +29,7 @@ function Edit( {
 					Object.entries( blockContext ).filter( ( [ key ] ) =>
 						usesContext.includes( key )
 					)
-			  )
+				)
 			: DEFAULT_BLOCK_CONTEXT;
 	}, [ usesContext, blockContext ] );
 
