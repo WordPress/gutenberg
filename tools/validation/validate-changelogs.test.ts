@@ -140,17 +140,44 @@ test( 'requirePr fails when Unreleased is missing', () => {
 	expect( errors[ 0 ] ).toMatch( /missing `## Unreleased`/ );
 } );
 
-test( 'parseArgs reads --require-pr and paths', () => {
+test( 'pr flags a link that sits under a published version', () => {
+	const content = `${ HEADER }## Unreleased
+
+## 1.0.0 (2026-01-01)
+
+### Bug Fixes
+
+-   Fixed something ([#99](https://github.com/WordPress/gutenberg/pull/99)).
+`;
+	expect(
+		validateChangelog( content, {
+			filePath: 'packages/data/CHANGELOG.md',
+			pr: '99',
+		} )
+	).toEqual( [
+		'packages/data/CHANGELOG.md: changelog entry for this PR must be under `## Unreleased`, not a published version: [#99](https://github.com/WordPress/gutenberg/pull/99)',
+	] );
+	expect(
+		validateChangelog( content, {
+			filePath: 'packages/data/CHANGELOG.md',
+			pr: '100',
+		} )
+	).toEqual( [] );
+} );
+
+test( 'parseArgs reads --pr, --require-pr, and paths', () => {
 	expect(
 		parseArgs( [ '--require-pr=82842', 'packages/data/CHANGELOG.md' ] )
 	).toEqual( {
+		pr: undefined,
 		requirePr: '82842',
 		paths: [ 'packages/data/CHANGELOG.md' ],
 	} );
 	expect(
-		parseArgs( [ '--require-pr', '82842', 'packages/data/CHANGELOG.md' ] )
+		parseArgs( [ '--pr', '82842', 'packages/data/CHANGELOG.md' ] )
 	).toEqual( {
-		requirePr: '82842',
+		pr: '82842',
+		requirePr: undefined,
 		paths: [ 'packages/data/CHANGELOG.md' ],
 	} );
 } );

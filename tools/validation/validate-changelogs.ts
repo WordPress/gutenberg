@@ -4,9 +4,12 @@
  *
  * Usage:
  *   node tools/validation/validate-changelogs.ts [path ...]
+ *   node tools/validation/validate-changelogs.ts --pr=12345 packages/foo/CHANGELOG.md
  *   node tools/validation/validate-changelogs.ts --require-pr=12345 packages/foo/CHANGELOG.md
  *
  * With no paths, validates every package CHANGELOG under `packages/`.
+ * `--pr` flags a link to that pull request that sits outside Unreleased.
+ * `--require-pr` also requires Unreleased to cite that pull request.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -50,12 +53,18 @@ export type ValidateOptions = {
 	filePath?: string;
 
 	/**
+	 * When set, a link to this pull request in the file must sit under Unreleased.
+	 */
+	pr?: string;
+
+	/**
 	 * When set, Unreleased must cite this pull request.
 	 */
 	requirePr?: string;
 };
 
 export type ParseArgsResult = {
+	pr: string | undefined;
 	requirePr: string | undefined;
 	paths: string[];
 };
@@ -225,6 +234,43 @@ function validateEntryLinks(
 }
 
 /**
+ * Markdown link for a Gutenberg pull request.
+ *
+ * @param pr Pull request number.
+ */
+function pullRequestLink( pr: string ): string {
+	return `[#${ pr }](https://github.com/WordPress/gutenberg/pull/${ pr })`;
+}
+
+/**
+ * If this PR's pull link appears in the file, it must be under Unreleased.
+ * Catches notes that landed in a published version after a package release.
+ *
+ * @param content    Full changelog markdown.
+ * @param unreleased Unreleased section, if present.
+ * @param filePath   Path for error messages.
+ * @param pr         Pull request number.
+ * @return Error messages.
+ */
+function validatePrLinkPlacement(
+	content: string,
+	unreleased: UnreleasedSection | undefined,
+	filePath: string,
+	pr: string
+): string[] {
+	const requiredLink = pullRequestLink( pr );
+	if ( ! content.includes( requiredLink ) ) {
+		return [];
+	}
+	if ( unreleased?.lines.join( '\n' ).includes( requiredLink ) ) {
+		return [];
+	}
+	return [
+		`${ filePath }: changelog entry for this PR must be under \`## Unreleased\`, not a published version: ${ requiredLink }`,
+	];
+}
+
+/**
  * When `--require-pr` is set, requires Unreleased to cite that pull request.
  *
  * @param unreleased Unreleased section.
@@ -237,7 +283,7 @@ function validateRequiredPrLink(
 	filePath: string,
 	requirePr: string
 ): string[] {
-	const requiredLink = `[#${ requirePr }](https://github.com/WordPress/gutenberg/pull/${ requirePr })`;
+	const requiredLink = pullRequestLink( requirePr );
 	if ( unreleased.lines.join( '\n' ).includes( requiredLink ) ) {
 		return [];
 	}
@@ -259,20 +305,26 @@ export function validateChangelog(
 ): string[] {
 	const filePath = options.filePath ?? 'CHANGELOG.md';
 	const unreleased = findUnreleasedSection( content.split( /\r?\n/ ) );
+	const pr = options.pr ?? options.requirePr;
+	const placementErrors = pr
+		? validatePrLinkPlacement( content, unreleased, filePath, pr )
+		: [];
 
 	if ( ! unreleased ) {
 		if ( options.requirePr ) {
 			return [
 				`${ filePath }: missing \`## Unreleased\` section (required when checking for PR #${ options.requirePr }).`,
+				...placementErrors,
 			];
 		}
-		return [];
+		return placementErrors;
 	}
 
 	return [
 		...validateSubsectionHeadings( unreleased, filePath ),
 		...validateSectionTitles( unreleased, filePath ),
 		...validateEntryLinks( unreleased, filePath ),
+		...placementErrors,
 		...( options.requirePr
 			? validateRequiredPrLink( unreleased, filePath, options.requirePr )
 			: [] ),
@@ -288,11 +340,13 @@ export function parseArgs( argv: string[] ): ParseArgsResult {
 		allowPositionals: true,
 		strict: true,
 		options: {
+			pr: { type: 'string' },
 			'require-pr': { type: 'string' },
 		},
 	} );
 
 	return {
+		pr: values.pr,
 		requirePr: values[ 'require-pr' ],
 		paths: positionals,
 	};
@@ -303,10 +357,11 @@ export function parseArgs( argv: string[] ): ParseArgsResult {
  * @return Exit code.
  */
 export function run( argv: string[] ): number {
+	let pr: string | undefined;
 	let requirePr: string | undefined;
 	let paths: string[];
 	try {
-		( { requirePr, paths } = parseArgs( argv ) );
+		( { pr, requirePr, paths } = parseArgs( argv ) );
 	} catch ( error ) {
 		const message =
 			error instanceof Error ? error.message : String( error );
@@ -348,6 +403,7 @@ export function run( argv: string[] ): number {
 		const relativePath = relative( REPO_ROOT, filePath );
 		const errors = validateChangelog( content, {
 			filePath: relativePath,
+			pr,
 			requirePr,
 		} );
 		for ( const error of errors ) {
