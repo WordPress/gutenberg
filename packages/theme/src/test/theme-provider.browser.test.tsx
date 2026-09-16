@@ -320,8 +320,7 @@ describe( 'ThemeProvider', () => {
 			const container = iframeDoc.createElement( 'div' );
 			iframeDoc.body.appendChild( container );
 			let unmount:
-				| Awaited< ReturnType< typeof render > >[ 'unmount' ]
-				| undefined;
+				Awaited< ReturnType< typeof render > >[ 'unmount' ] | undefined;
 
 			try {
 				( { unmount } = await render(

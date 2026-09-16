@@ -79,7 +79,7 @@ function BlockAlignmentUI( {
 						onClick: () => onChangeAlignment( controlName ),
 					};
 				} ),
-		  }
+			}
 		: {
 				toggleProps: description ? { description } : {},
 				children: ( { onClose } ) => {
@@ -139,7 +139,7 @@ function BlockAlignmentUI( {
 						</>
 					);
 				},
-		  };
+			};
 
 	return <UIComponent { ...commonProps } { ...extraProps } />;
 }
