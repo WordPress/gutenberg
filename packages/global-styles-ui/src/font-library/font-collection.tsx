@@ -31,6 +31,8 @@ import {
 	chevronRight,
 } from '@wordpress/icons';
 import { useEntityRecord } from '@wordpress/core-data';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Select, pending WordPress/gutenberg#76135.
+import { Select } from '@wordpress/ui';
 import type {
 	FontCollection as FontCollectionType,
 	FontFace,
@@ -513,31 +515,42 @@ function FontCollection( { slug }: { slug: string } ) {
 										div: <div aria-hidden />,
 										// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
 										CurrentPage: (
-											<WCSelectControl
-												aria-label={ __(
-													'Current page'
-												) }
+											<Select.Root
 												value={ page.toString() }
-												options={ [
-													...Array( totalPages ),
-												].map( ( e, i ) => {
-													return {
-														label: (
-															i + 1
-														).toString(),
-														value: (
-															i + 1
-														).toString(),
-													};
-												} ) }
-												onChange={ ( newPage ) =>
+												onValueChange={ ( newPage ) =>
 													setPage(
 														parseInt( newPage )
 													)
 												}
-												size="small"
-												variant="minimal"
-											/>
+											>
+												<Select.Trigger
+													size="small"
+													variant="minimal"
+													aria-label={ __(
+														'Current page'
+													) }
+												/>
+												<Select.Popup width="content">
+													{ [
+														...Array( totalPages ),
+													].map( ( e, i ) => {
+														const value = (
+															i + 1
+														).toString();
+														return (
+															<Select.Item
+																key={ value }
+																value={ value }
+																size="small"
+															>
+																<Select.ItemLabel>
+																	{ value }
+																</Select.ItemLabel>
+															</Select.Item>
+														);
+													} ) }
+												</Select.Popup>
+											</Select.Root>
 										),
 									}
 								) }

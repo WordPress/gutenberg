@@ -85,7 +85,7 @@ $footer-height: 90px;
 	text-transform: uppercase;
 
 	@include mixins.break-small() {
-		.components-select-control__input {
+		button {
 			font-size: 11px !important;
 			font-weight: var(--wpds-typography-font-weight-emphasis);
 		}

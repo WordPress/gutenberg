@@ -6,7 +6,7 @@
 	text-transform: uppercase;
 
 	@include break-small() {
-		.components-select-control__input {
+		button {
 			font-size: 11px !important;
 			font-weight: var(--wpds-typography-font-weight-emphasis);
 		}
