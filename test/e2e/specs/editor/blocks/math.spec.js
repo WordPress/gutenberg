@@ -89,32 +89,22 @@ test.describe( 'Math Block', () => {
 		] );
 	} );
 
-	test( 'aligns the columns of an aligned environment @webkit @firefox', async ( {
+	test( 'should align the columns of an aligned environment @webkit @firefox', async ( {
 		editor,
 		page,
 	} ) => {
-		await editor.insertBlock( {
-			name: 'core/math',
-			attributes: {
-				latex: '\\begin{aligned} A &= 1 \\\\ AB + C &= 2 \\end{aligned}',
-			},
-		} );
-		// Wait for the LaTeX to be rendered, then publish.
-		await expect(
-			editor.canvas.locator( '.wp-block-math mtd.tml-right' ).first()
-		).toBeVisible();
-		const postId = await editor.publishPost();
-		await page.goto( `/?p=${ postId }` );
-
-		// In `aligned`, cells before `&` are right-aligned and cells after it
-		// are left-aligned: the content of every cell must touch the edge
-		// its class names, so that `A` and `AB + C` both sit against `=`.
-		const misaligned = await page
-			.locator(
+		// In `aligned`, cells before `&` are right-aligned and cells after
+		// it are left-aligned, so that `A` and `AB + C` both sit against
+		// their `=`. Returns, for every aligned cell, how far its content is
+		// from the edge its class names; nothing is misaligned when all are
+		// within a pixel.
+		async function getMisalignedCells( container ) {
+			const cells = container.locator(
 				'.wp-block-math mtd.tml-right, .wp-block-math mtd.tml-left'
-			)
-			.evaluateAll( ( cells ) =>
-				cells
+			);
+			await expect( cells ).toHaveCount( 4 );
+			return cells.evaluateAll( ( elements ) =>
+				elements
 					.map( ( cell ) => {
 						const cellRect = cell.getBoundingClientRect();
 						const rects = Array.from( cell.children, ( child ) =>
@@ -131,6 +121,18 @@ test.describe( 'Math Block', () => {
 					} )
 					.filter( ( gap ) => Math.abs( gap ) > 1 )
 			);
-		expect( misaligned ).toEqual( [] );
+		}
+
+		await editor.insertBlock( {
+			name: 'core/math',
+			attributes: {
+				latex: '\\begin{aligned} A &= 1 \\\\ AB + C &= 2 \\end{aligned}',
+			},
+		} );
+		expect( await getMisalignedCells( editor.canvas ) ).toEqual( [] );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		expect( await getMisalignedCells( page ) ).toEqual( [] );
 	} );
 } );
