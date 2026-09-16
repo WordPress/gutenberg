@@ -9,6 +9,8 @@
 ### Bug Fixes
 
 -   A HEIC photo whose extension says `.jpg` or `.png` is now recognized from its own file header and converted like any other HEIC file, instead of being uploaded as undecodable bytes that leave the upload stuck without ever completing or reporting an error ([#81707](https://github.com/WordPress/gutenberg/issues/81707)).
+-   A HEIC file the operating system cannot identify, which arrives with an empty MIME type on Windows without the HEVC extension, is now recognized the same way and either converted or reported as undecodable, instead of being uploaded as-is and left spinning ([#81043](https://github.com/WordPress/gutenberg/issues/81043)).
+-   An `ImageDecoder` decode that never settles, which a browser claiming HEIC support without the platform codec can produce, is now abandoned after a timeout so the conversion moves on to the next strategy rather than hanging the upload ([#81043](https://github.com/WordPress/gutenberg/issues/81043)).
 
 ## 0.40.0 (2026-09-10)
 

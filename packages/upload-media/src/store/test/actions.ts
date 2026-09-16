@@ -415,12 +415,24 @@ describe( 'actions', () => {
 			expect( updatedItem.additionalData.convert_format ).toBe( true );
 		} );
 
-		it( 'routes a HEIC file named .jpg through the HEIC conversion path', async () => {
-			// A HEIC File Type Box under a name that makes the browser report
-			// the file as a JPEG. Taking it at its word sends undecodable
-			// bytes down the vips path, where the upload strands (#81707).
+		/**
+		 * A HEIC File Type Box, under whatever name and type the test wants.
+		 *
+		 * jsdom exposes none of the decoders canvasConvertToJpeg tries, so
+		 * reaching the HEIC path means failing to decode. The point of these
+		 * tests is that the failure is reported rather than the file uploaded.
+		 *
+		 * The box has no meta box behind it, so it fails the container parse
+		 * rather than the codec lookup, and is reported as a processing error.
+		 * `HEIC_DECODE_ERROR` is reserved for the case where no decoding
+		 * strategy exists at all (#81123).
+		 *
+		 * @param name File name.
+		 * @param type MIME type the browser would report.
+		 */
+		function heicFileTypeBox( name: string, type: string ) {
 			const ftyp = 'ftypheic\0\0\0\0mif1miaf';
-			const heicNamedJpeg = new File(
+			return new File(
 				[
 					new Uint8Array( [
 						0x00,
@@ -432,13 +444,19 @@ describe( 'actions', () => {
 						),
 					] ),
 				],
-				'example.jpg',
-				{ type: 'image/jpeg' }
+				name,
+				{ type }
 			);
+		}
+
+		it( 'routes a HEIC file the browser could not type through the HEIC conversion path', async () => {
+			// Windows without the HEVC extension reports no type at all for a
+			// .heic file. Going by the type alone uploads it as-is, to a server
+			// that cannot convert it either (#81043).
 			const onError = vi.fn();
 
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
-				file: heicNamedJpeg,
+				file: heicFileTypeBox( 'IMG_1250.HEIC', '' ),
 				onError,
 			} );
 
@@ -450,16 +468,32 @@ describe( 'actions', () => {
 				item.id
 			);
 
-			/*
-			 * jsdom exposes none of the decoders canvasConvertToJpeg tries, so
-			 * reaching the HEIC path here means failing to decode. The point is
-			 * that it reports that failure rather than uploading the file.
-			 *
-			 * The fixture is a bare File Type Box with no meta box, so it fails
-			 * the container parse rather than the codec lookup, and is reported
-			 * as a processing error. `HEIC_DECODE_ERROR` is reserved for the
-			 * case where no decoding strategy exists at all (#81123).
-			 */
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					code: ErrorCode.IMAGE_TRANSCODING_ERROR,
+				} )
+			);
+		} );
+
+		it( 'routes a HEIC file named .jpg through the HEIC conversion path', async () => {
+			// A name that makes the browser report the file as a JPEG. Taking
+			// it at its word sends undecodable bytes down the vips path, where
+			// the upload strands (#81707).
+			const onError = vi.fn();
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: heicFileTypeBox( 'example.jpg', 'image/jpeg' ),
+				onError,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
 			expect( onError ).toHaveBeenCalledWith(
 				expect.objectContaining( {
 					code: ErrorCode.IMAGE_TRANSCODING_ERROR,

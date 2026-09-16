@@ -3,14 +3,16 @@ import { parseHeic, type HeicImageData } from './heic-parser';
 import { getHeicUnsupportedMessage } from './heic-support';
 
 /**
- * Some platforms (e.g. Windows without the HEVC extension) have
- * ImageDecoder.isTypeSupported() optimistically report HEIC support based on
- * container-format detection alone. When the underlying platform codec isn't
- * actually available, decoder.decode() doesn't reject, it just never settles.
- * This timeout guards against that by force-closing the decoder, which per
- * the WebCodecs spec rejects any of its pending decode() calls.
+ * How long an `ImageDecoder` decode may run before it is abandoned.
+ *
+ * `ImageDecoder.isTypeSupported()` can report HEIC support from the container
+ * format alone. When the platform codec behind it is missing, `decode()` never
+ * settles rather than rejecting, and nothing downstream would ever run. The
+ * ceiling is generous because it applies to every decode, not only a stalled
+ * one: a large photo on slow hardware has to finish well inside it, or a file
+ * the browser was decoding fine is abandoned and reported as undecodable.
  */
-const IMAGE_DECODER_TIMEOUT = 3000;
+export const IMAGE_DECODER_TIMEOUT = 15000;
 
 /**
  * Raised when no decoding strategy could be used at all.
@@ -89,12 +91,20 @@ export async function canvasConvertToJpeg(
 				type: file.type,
 				data: file.stream(),
 			} );
+			let videoFrame: VideoFrame | undefined;
 			let timeoutId: ReturnType< typeof setTimeout > | undefined;
+			let timedOut = false;
 			try {
-				const { image: videoFrame } = await Promise.race( [
+				/*
+				 * Closing the decoder rejects its pending decode, so a decode
+				 * that never settles becomes a rejection. Which rejection
+				 * wins the race is not defined, so the flag decides below.
+				 */
+				const decoded = await Promise.race( [
 					decoder.decode(),
 					new Promise< never >( ( _resolve, reject ) => {
 						timeoutId = setTimeout( () => {
+							timedOut = true;
 							decoder.close();
 							reject(
 								new Error( 'ImageDecoder decode timed out' )
@@ -102,6 +112,26 @@ export async function canvasConvertToJpeg(
 						}, IMAGE_DECODER_TIMEOUT );
 					} ),
 				] );
+				videoFrame = decoded.image;
+			} catch ( error ) {
+				/*
+				 * A decode that rejects on its own has read the file and found
+				 * it damaged, which the caller reports as such. Only a decode
+				 * that never answered falls through: the browser claimed the
+				 * type and could not deliver, which is what a missing platform
+				 * codec looks like, and strategy 3 decides for itself.
+				 */
+				if ( ! timedOut ) {
+					throw error;
+				}
+			} finally {
+				clearTimeout( timeoutId );
+				if ( ! timedOut ) {
+					decoder.close();
+				}
+			}
+
+			if ( videoFrame ) {
 				try {
 					const canvas = new OffscreenCanvas(
 						videoFrame.displayWidth,
@@ -125,16 +155,6 @@ export async function canvasConvertToJpeg(
 					} );
 				} finally {
 					videoFrame.close();
-				}
-			} catch {
-				// decode() rejected, timed out, or the platform doesn't
-				// actually support the codec. Fall through to strategy 3.
-			} finally {
-				clearTimeout( timeoutId );
-				try {
-					decoder.close();
-				} catch {
-					// Already closed by the timeout handler above.
 				}
 			}
 		}
