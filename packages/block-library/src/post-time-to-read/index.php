@@ -102,7 +102,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$content              = get_the_content();
+	$content              = get_post_field( 'post_content', $block->context['postId'] );
 	$average_reading_rate = $attributes['averageReadingSpeed'] ?? 189;
 
 	$display_mode = $attributes['displayMode'] ?? 'time';

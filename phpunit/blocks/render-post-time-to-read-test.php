@@ -216,4 +216,34 @@ class Tests_Blocks_Render_Post_Time_To_Read extends WP_UnitTestCase {
 
 		$this->assertSame( $expected, $actual );
 	}
+
+	/**
+	 * Verifies that the block reads content from the block context postId,
+	 * not from the global $post. This is a regression test for the bug where
+	 * Time to Read showed the host page's reading time instead of the
+	 * queried post's reading time inside a Query Loop.
+	 *
+	 * @covers ::render_block_core_post_time_to_read
+	 */
+	public function test_uses_block_context_post_id_not_global_post() {
+		global $wp_query;
+
+		// Simulate being on a host page with no content (the global $post).
+		$wp_query->post  = self::$no_content_post;
+		$GLOBALS['post'] = self::$no_content_post;
+
+		// The block context provides a different post (two minutes to read).
+		$attributes    = array(
+			'displayMode' => 'time',
+		);
+		$parsed_blocks = parse_blocks( '<!-- wp:post-time-to-read /-->' );
+		$parsed_block  = $parsed_blocks[0];
+		$context       = array( 'postId' => self::$two_minutes_post->ID );
+		$block         = new WP_Block( $parsed_block, $context );
+
+		$actual   = gutenberg_render_block_core_post_time_to_read( $attributes, '', $block );
+		$expected = '<div class="wp-block-post-time-to-read">2 minutes</div>';
+
+		$this->assertSame( $expected, $actual );
+	}
 }
