@@ -75,7 +75,6 @@ export function PrivateBlockToolbar( {
 		const {
 			getBlockName,
 			getBlockMode,
-			getBlockParents,
 			getSelectedBlockClientIds,
 			isBlockValid,
 			getBlockEditingMode,
@@ -92,13 +91,13 @@ export function PrivateBlockToolbar( {
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-		const parents = getBlockParents( selectedBlockClientId );
 		const parentSection = getParentSectionBlock( selectedBlockClientId );
-		// Within a section, the parent is the nearest one shown in List View
-		// and the breadcrumb, skipping the disabled blocks in between.
-		const parentClientId = parentSection
-			? getEnabledBlockParents( selectedBlockClientId, true )[ 0 ]
-			: parents[ parents.length - 1 ];
+		// The parent is the nearest one shown in List View and the breadcrumb,
+		// skipping any disabled blocks in between.
+		const parentClientId = getEnabledBlockParents(
+			selectedBlockClientId,
+			true
+		)[ 0 ];
 		const parentBlockName = getBlockName( parentClientId );
 		const parentBlockType = getBlockType( parentBlockName );
 		const editingMode = getBlockEditingMode( selectedBlockClientId );

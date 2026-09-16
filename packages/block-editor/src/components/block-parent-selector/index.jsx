@@ -37,11 +37,13 @@ export default function BlockParentSelector() {
 				selectedBlockClientId
 			);
 			const parents = getBlockParents( selectedBlockClientId );
-			// Within a section, the parent is the nearest one shown in List
-			// View and the breadcrumb, skipping the disabled blocks in between.
-			const _parentClientId = parentSection
-				? getEnabledBlockParents( selectedBlockClientId, true )[ 0 ]
-				: parents[ parents.length - 1 ];
+			const immediateParentClientId = parents[ parents.length - 1 ];
+			// The parent is the nearest one shown in List View and the
+			// breadcrumb, skipping any disabled blocks in between.
+			const _parentClientId = getEnabledBlockParents(
+				selectedBlockClientId,
+				true
+			)[ 0 ];
 			const parentBlockType = getBlockType(
 				getBlockName( _parentClientId )
 			);
@@ -57,9 +59,11 @@ export default function BlockParentSelector() {
 				nextSiblingClientId: getNextBlockClientId(
 					selectedBlockClientId
 				),
-				// No button within a section, where the structure is locked.
+				// No button when the parent shown is not the direct parent, nor
+				// within a section, where the structure is locked.
 				showInserter:
 					!! _parentClientId &&
+					_parentClientId === immediateParentClientId &&
 					! parentSection &&
 					! isTextFlowWrapper,
 			};
