@@ -46,6 +46,7 @@
 		"spacing": {
 			"margin": true
 		},
+		"shadow": true,
 		"interactivity": {
 			"clientNavigation": true
 		}

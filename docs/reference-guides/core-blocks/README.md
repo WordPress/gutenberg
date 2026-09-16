@@ -321,7 +321,7 @@ Add a block that displays content pulled from other sites, like Twitter or YouTu
 
 -	**Name:** [core/embed](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-embed/core-block-embed/)
 -	**Category:** [embed](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-embed/)
--	**Supports:** align, anchor, interactivity (clientNavigation), spacing (margin)
+-	**Supports:** align, anchor, interactivity (clientNavigation), shadow, spacing (margin)
 -	**Attributes:** allowResponsive, caption, previewable, providerNameSlug, responsive, type, url
 
 ## File
