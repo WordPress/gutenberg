@@ -82,6 +82,12 @@ function getStyleStatePath( selectedState ) {
  * @param {Object} style         The block style object.
  * @param {Object} selectedState Selected block style state.
  * @return {Object} The style object for the selected state, if found.
+ *
+ * @example
+ * ```js
+ * const state = { viewport: '@mobile' };
+ * const stateStyle = getStyleForState( attributes.style, state ) || {};
+ * ```
  */
 export function getStyleForState( style, selectedState ) {
 	const path = getStyleStatePath( selectedState );
@@ -98,6 +104,18 @@ export function getStyleForState( style, selectedState ) {
  * @param {Object} selectedState Selected block style state.
  * @param {Object} newStyle      New style for the selected state.
  * @return {Object} The updated style object.
+ *
+ * @example
+ * ```js
+ * const state = { viewport: '@mobile' };
+ * const stateStyle = getStyleForState( attributes.style, state ) || {};
+ * setAttributes( {
+ * 	style: setStyleForState( attributes.style, state, {
+ * 		...stateStyle,
+ * 		dimensions: { ...stateStyle.dimensions, minHeight: '50vh' },
+ * 	} ),
+ * } );
+ * ```
  */
 export function setStyleForState( style, selectedState, newStyle ) {
 	const path = getStyleStatePath( selectedState );
