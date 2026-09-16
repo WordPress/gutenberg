@@ -1,5 +1,6 @@
 export * as Autocomplete from './autocomplete';
 export { Checkbox } from './checkbox';
+export { CheckboxGroup } from './checkbox-group';
 export { ControlWithError } from './control-with-error';
 export * as Combobox from './combobox';
 export * as Field from './field';

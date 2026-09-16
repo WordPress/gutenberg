@@ -67,7 +67,7 @@
 		"clsx": "^2.1.1",
 		"js-yaml": "^3.15.2",
 		"playwright": "^1.63.0",
-		"prettier": "npm:wp-prettier@^3.0.3",
+		"prettier": "npm:wp-prettier@^3.9.6-beta.2",
 		"react": "^18.3.1",
 		"react-docgen-typescript": "^2.4.0",
 		"react-dom": "^18.3.1",

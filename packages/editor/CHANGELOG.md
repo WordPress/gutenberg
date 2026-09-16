@@ -5,11 +5,23 @@
 ### Enhancements
 
 -   Remove the `react-autosize-textarea` dependency. The post editor's "Code editor" view now auto-grows with CSS `field-sizing: content`. Browsers without support use a scrollable field ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).
+-   `PostTaxonomiesFlatTermSelector`: The field renders with the `SearchableChipSelectControl` component of `@wordpress/ui` instead of `FormTokenField` ([#80967](https://github.com/WordPress/gutenberg/pull/80967)).
+-   `CollaboratorsPresence`: Show focus ring for avatar stack in header with button's outline instead of previous box-shadow override ([#82941](https://github.com/WordPress/gutenberg/pull/82941)).
 
 ### Bug Fixes
 
+-   Distraction free: Raise the top bar above the notices overlay while it is revealed by hover or keyboard focus, so its controls are visible when focused instead of operable but hidden behind a notice. Also repoint the rule that overlays notices in distraction-free mode at the class the interface renders today ([#80349](https://github.com/WordPress/gutenberg/pull/80349)).
+-   Notes: Focus the text field when editing a note ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
+-   Template panel: Hide edit and create actions from users who can't create templates. ([#82858](https://github.com/WordPress/gutenberg/pull/82858))
+-   Featured image field: Only register it for the post types a theme lists in its `post-thumbnails` support, matching the classic panel. ([#82773](https://github.com/WordPress/gutenberg/pull/82773))
 -   `MediaUpload`: Coerce `multiple` to a boolean before passing it to the experimental media modal; callers such as the playlist block and the inserter media tab pass the legacy media frame's `'add'` mode. ([#82715](https://github.com/WordPress/gutenberg/pull/82715))
 -   Document bar: Preserve the subdued template-preview icon color after the icon became stroke-based. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+-   `useGlobalStylesOutput`: Let the styles engine derive block gap support from the config it renders, instead of a separate check that treated a theme without block gap support as supporting it and so dropped the fallback gap styles the front end renders ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
+
+### Internal
+
+-   Notes: Use the public `@wordpress/ui` Menu for note actions instead of the private Components API ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
+-   Post actions: Use the public `Menu` from `@wordpress/ui` instead of the private Components API ([#81922](https://github.com/WordPress/gutenberg/pull/81922)).
 
 ## 15.0.0 (2026-09-10)
 
@@ -43,6 +55,7 @@
 
 ### Internal
 
+-   Global Styles: replace the sidebar action `DropdownMenu` from `@wordpress/components` with the public `Menu` from `@wordpress/ui`. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
 -   Stop passing the unused `editorTool` block editor setting; the selector that read it was removed with the Write/Design tool in [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
 -   Remove the template activation (`active_templates`) experiment: the post-save activation notice, the "Edit template" auto-activation, and template duplication in the actions list ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
 -   Remove unused dependencies `@wordpress/reusable-blocks`, `client-zip` and `fast-deep-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

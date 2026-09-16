@@ -122,7 +122,7 @@ function ParagraphBlock( {
 		'aria-label': RichText.isEmpty( content )
 			? __(
 					'Empty block; start writing or type forward slash to choose a block'
-			  )
+				)
 			: __( 'Block: Paragraph' ),
 	} );
 	const blockEditingMode = useBlockEditingMode();

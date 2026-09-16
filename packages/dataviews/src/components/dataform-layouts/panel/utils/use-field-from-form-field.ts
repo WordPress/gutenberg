@@ -13,8 +13,8 @@ const getFieldDefinition = < Item >(
 ) => {
 	// A combined form field is a layout container, not a field: its id is
 	// never resolved against the field definitions. Fall back to its first
-	// leaf child so the panel has a definition for the summary and
-	// `readOnly` state.
+	// leaf child so the panel has a definition for the summary and the
+	// `readOnly`/disabled state.
 	if ( !! field.children ) {
 		const simpleChildren = field.children.filter(
 			( child ) => ! child.children
