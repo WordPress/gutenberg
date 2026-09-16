@@ -13,7 +13,6 @@
 
 ### Enhancements
 
--   `SearchableChipSelect`, `SearchableChipSelectControl`, `Combobox.ChipWithRemove`: When items are selected, the chips toolbar is labelled, each chip describes Backspace or Delete removal, and the search input includes the selected count and how to move to those chips. A Field or consumer description stays in place. ([#82863](https://github.com/WordPress/gutenberg/pull/82863))
 -   `Select`, `SelectControl`: Add `ItemLabel` and `ItemDescription` subcomponents. Multiple descriptions contribute to `aria-describedby` in DOM order. `SelectControl` `items` may include an optional `description` string. ([#82369](https://github.com/WordPress/gutenberg/pull/82369))
 -   `Select`, `SelectControl`: Align the selected item with the trigger by default, and drop the popup max-height cap when that alignment is enabled ([#82043](https://github.com/WordPress/gutenberg/pull/82043)).
 -   `Select`, `Combobox`, `Autocomplete`: Allow browsing read-only controls while keeping their value unchanged ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
@@ -23,6 +22,7 @@
 
 ### Bug Fixes
 
+-   `SearchableChipSelect`, `SearchableChipSelectControl`, `Combobox.ChipWithRemove`: When items are selected, the chips toolbar is labelled, each chip describes Backspace or Delete removal, and the search input includes the selected count and how to move to those chips. A Field or consumer description stays in place. ([#82863](https://github.com/WordPress/gutenberg/pull/82863))
 -   `Autocomplete`: Use valid grid and rowgroup semantics without local accessibility overrides ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
 -   `Menu`: Center labels, descriptions, suffixes, shortcuts, and submenu chevrons within items, including items with taller prefix or suffix content. ([#82847](https://github.com/WordPress/gutenberg/pull/82847))
 -   `Menu`: vertically center single-line item labels while preserving first-line alignment for wrapped content. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
