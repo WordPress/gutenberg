@@ -7,7 +7,6 @@ import { Popover } from '@wordpress/components';
 import { ValidatedTextareaControl, Link } from '@wordpress/ui';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { getSourceOnlyMathML } from './utils';
 
 export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const { latex, mathML } = attributes;
@@ -52,7 +51,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 
 	return (
 		<div { ...blockProps }>
-			{ mathML ? (
+			{ mathML && (
 				<math
 					// We can't spread block props on the math element because
 					// it only supports a limited amount of global attributes.
@@ -60,9 +59,19 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					display="block"
 					dangerouslySetInnerHTML={ { __html: mathML } }
 				/>
-			) : (
-				'\u200B'
 			) }
+			{ ! mathML && latex && (
+				// Show the source until it renders, as the front end does.
+				<math display="block">
+					<semantics>
+						{ /* eslint-disable-next-line react/no-unknown-property -- MathML attribute. */ }
+						<annotation encoding="application/x-tex">
+							{ latex }
+						</annotation>
+					</semantics>
+				</math>
+			) }
+			{ ! mathML && ! latex && '\u200B' }
 			{ isSelected && (
 				<Popover
 					placement="bottom-start"
@@ -90,9 +99,8 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 							}
 							onValueChange={ ( newLatex ) => {
 								// The source is read back from the MathML, so
-								// the two are always written together. Until
-								// the source renders, save it on its own.
-								let newMathML = getSourceOnlyMathML( newLatex );
+								// the two are always written together.
+								let newMathML = '';
 								if ( latexToMathML ) {
 									try {
 										newMathML = latexToMathML( newLatex, {

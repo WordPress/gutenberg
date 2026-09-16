@@ -1,5 +1,4 @@
 import { useBlockProps } from '@wordpress/block-editor';
-import { getSourceOnlyMathML } from './utils';
 
 export default function save( { attributes } ) {
 	const { latex, mathML } = attributes;
@@ -10,15 +9,26 @@ export default function save( { attributes } ) {
 
 	// The LaTeX source lives in the `<annotation>` inside the MathML, where
 	// it is HTML-escaped, so `wp_kses` leaves characters such as `&` and `<`
-	// alone. When nothing has been rendered yet, save the source on its own.
+	// alone. Until the source renders, save it on its own: with the
+	// annotation as the only child of `<semantics>`, browsers display the
+	// source text.
 	return (
 		<div { ...useBlockProps.save() }>
-			<math
-				display="block"
-				dangerouslySetInnerHTML={ {
-					__html: mathML || getSourceOnlyMathML( latex ),
-				} }
-			/>
+			{ mathML ? (
+				<math
+					display="block"
+					dangerouslySetInnerHTML={ { __html: mathML } }
+				/>
+			) : (
+				<math display="block">
+					<semantics>
+						{ /* eslint-disable-next-line react/no-unknown-property -- MathML attribute. */ }
+						<annotation encoding="application/x-tex">
+							{ latex }
+						</annotation>
+					</semantics>
+				</math>
+			) }
 		</div>
 	);
 }
