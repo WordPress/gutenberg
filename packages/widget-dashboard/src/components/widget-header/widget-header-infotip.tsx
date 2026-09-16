@@ -7,12 +7,12 @@ import styles from './widget-header.module.css';
 
 export interface WidgetInfotipProps {
 	/**
-	 * Widget title; names the popup, and is shown in it when `showTitle`.
+	 * Names the popup; shown in it when `showTitle`.
 	 */
 	title: string;
 
 	/**
-	 * Show the title in the popup, for a header that clips it.
+	 * Show the title, for a header that clips it.
 	 */
 	showTitle?: boolean;
 
@@ -31,9 +31,8 @@ export interface WidgetInfotipProps {
 }
 
 /**
- * Header infotip: a hover- or click-open popover holding the widget type's
- * help note, and the full title when the header clips it. The ref reaches
- * the trigger.
+ * Header infotip: a hover- or click-open popover with the help note and, when
+ * the header clips it, the full title. The ref reaches the trigger.
  */
 export const WidgetInfotip = forwardRef<
 	HTMLButtonElement,

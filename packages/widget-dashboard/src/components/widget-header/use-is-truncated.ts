@@ -4,12 +4,11 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 // Adapted from the private hook behind `Breadcrumb.CurrentItem` in
 // packages/ui/src/breadcrumb/use-is-truncated.ts.
 
-// Floating-point noise in fractional rects; a real clip is at least a glyph.
+// Sub-pixel noise; a real clip is at least a glyph.
 const FIT_TOLERANCE = 0.05;
 
-// `scrollWidth`/`clientWidth` round to integers and can report a text that
-// the browser already ellipsizes as fitting, so measure the laid-out text
-// itself. jsdom has no `Range` geometry; there the integers have to do.
+// `scrollWidth`/`clientWidth` are integers and miss a clip under 1px that
+// the browser already ellipsizes. jsdom has no `Range` geometry.
 function measure( element: HTMLElement, slack: number ) {
 	const range = document.createRange();
 	range.selectNodeContents( element );
@@ -22,12 +21,11 @@ function measure( element: HTMLElement, slack: number ) {
 }
 
 /**
- * Whether a single-line element clips its text. Returns the ref to observe
- * and the current answer.
+ * Whether a single-line element clips its text: the ref to observe, then the
+ * answer.
  *
- * @param reclaim Width the element gets back once it is no longer truncated,
- *                so a control shown only while it is clipped cannot keep it
- *                clipped.
+ * @param reclaim Width a control shown only while clipped gives back, so it
+ *                cannot keep the text clipped.
  */
 export function useIsTruncated< T extends HTMLElement >(
 	reclaim = 0
@@ -35,7 +33,7 @@ export function useIsTruncated< T extends HTMLElement >(
 	const [ element, setElement ] = useState< T | null >( null );
 	const [ isTruncated, setIsTruncated ] = useState( false );
 
-	// Read by the observer without waiting for a render.
+	// The observer reads these between renders.
 	const isTruncatedRef = useRef( false );
 	const reclaimRef = useRef( reclaim );
 

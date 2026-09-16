@@ -131,7 +131,7 @@ describe( 'WidgetHeader title', () => {
 		const heading = screen.getByRole( 'heading', { name: LONG_TITLE } );
 		await waitFor( () => expect( infotip() ).toBeInTheDocument() );
 
-		// Container width the header keeps from the title besides the infotip.
+		// What the container spends besides the title and the infotip.
 		const trigger = infotip() as HTMLElement;
 		const chrome =
 			240 -
@@ -139,7 +139,7 @@ describe( 'WidgetHeader title', () => {
 				heading.getBoundingClientRect().left );
 		const range = document.createRange();
 		range.selectNodeContents( heading );
-		// Room for the title plus a few pixels: not enough for the infotip.
+		// Fits the title, not the title plus infotip.
 		const snug = Math.ceil(
 			range.getBoundingClientRect().width + chrome + 4
 		);

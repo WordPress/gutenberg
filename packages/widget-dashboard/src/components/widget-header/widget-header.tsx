@@ -111,10 +111,8 @@ export function WidgetHeader( {
 		[ registerReserved, unregisterReserved ]
 	);
 
-	// A clipped title is surfaced in the infotip, so the infotip renders
-	// whenever the title clips, help note or not. Without a help note it
-	// exists only while the title clips, so its footprint is what the title
-	// reclaims once it goes.
+	// A clipped title shows in the infotip, so it renders for a clip even
+	// without a help note. Then it is what the title reclaims once un-clipped.
 	const [ infotipReserve, setInfotipReserve ] = useState( 0 );
 	const infotipMeasureRef = useResizeObserver< HTMLButtonElement >(
 		( [ entry ] ) => {
