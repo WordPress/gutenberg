@@ -515,7 +515,7 @@ export function applyFormatPlan(
 				id: id!,
 				type: SUGGESTION_TYPE_FORMAT,
 				authorId,
-		  } );
+			} );
 	if ( ! attributes ) {
 		return nextValue;
 	}
