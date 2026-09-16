@@ -708,6 +708,12 @@
 		"parent": "core-blocks-media"
 	},
 	{
+		"title": "Files",
+		"slug": "core-block-files",
+		"markdown_source": "../packages/block-library/src/files/README.md",
+		"parent": "core-blocks-media"
+	},
+	{
 		"title": "Footnotes",
 		"slug": "core-block-footnotes",
 		"markdown_source": "../packages/block-library/src/footnotes/README.md",

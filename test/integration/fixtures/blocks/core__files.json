@@ -1,0 +1,38 @@
+[
+	{
+		"name": "core/files",
+		"isValid": true,
+		"attributes": {},
+		"innerBlocks": [
+			{
+				"name": "core/file",
+				"isValid": true,
+				"attributes": {
+					"href": "http://localhost:8888/wp-content/uploads/2018/05/report.pdf",
+					"fileId": "wp-block-file--media-_clientId_0",
+					"fileName": "report",
+					"textLinkHref": "http://localhost:8888/wp-content/uploads/2018/05/report.pdf",
+					"showDownloadButton": true,
+					"downloadButtonText": "Download",
+					"displayPreview": false,
+					"previewHeight": 600
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/file",
+				"isValid": true,
+				"attributes": {
+					"href": "http://localhost:8888/wp-content/uploads/2018/05/notes.txt",
+					"fileId": "wp-block-file--media-_clientId_1",
+					"fileName": "notes",
+					"textLinkHref": "http://localhost:8888/wp-content/uploads/2018/05/notes.txt",
+					"showDownloadButton": true,
+					"downloadButtonText": "Download",
+					"previewHeight": 600
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

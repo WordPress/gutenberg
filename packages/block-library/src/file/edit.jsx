@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { isBlobURL } from '@wordpress/blob';
+import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
 	ResizableBox,
@@ -22,9 +23,9 @@ import { __ } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-import { getFilename } from '@wordpress/url';
 import FileBlockInspector from './inspector';
 import { browserSupportsPdfs } from './utils';
+import { createFileBlocks, isPdf } from './utils/create-file-blocks';
 import removeAnchorTag from '../utils/remove-anchor-tag';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 
@@ -83,9 +84,25 @@ function FileEdit( {
 		} ),
 		[ id ]
 	);
+	const { canSelectMultipleFiles, isInFilesBlock } = useSelect(
+		( select ) => {
+			const { getBlockName, getBlockRootClientId } =
+				select( blockEditorStore );
+			return {
+				// Several files are grouped in a Files block, so only allow
+				// selecting them when that block is available.
+				canSelectMultipleFiles:
+					!! select( blocksStore ).getBlockType( 'core/files' ),
+				isInFilesBlock:
+					getBlockName( getBlockRootClientId( clientId ) ) ===
+					'core/files',
+			};
+		},
+		[ clientId ]
+	);
 
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { toggleSelection } = useDispatch( blockEditorStore );
+	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -114,15 +131,18 @@ function FileEdit( {
 			return;
 		}
 
-		const isPdf =
+		const isPdfFile = isPdf(
 			// Media Library and REST API use different properties for mime type.
-			( newMedia.mime || newMedia.mime_type ) === 'application/pdf' ||
-			getFilename( newMedia.url ).toLowerCase().endsWith( '.pdf' );
+			newMedia.mime || newMedia.mime_type,
+			newMedia.url
+		);
 		const pdfAttributes = {
-			displayPreview: isPdf
+			displayPreview: isPdfFile
 				? attributes.displayPreview ?? true
 				: undefined,
-			previewHeight: isPdf ? attributes.previewHeight ?? 600 : undefined,
+			previewHeight: isPdfFile
+				? attributes.previewHeight ?? 600
+				: undefined,
 		};
 
 		setAttributes( {
@@ -135,6 +155,24 @@ function FileEdit( {
 			...pdfAttributes,
 		} );
 		setTemporaryURL();
+	}
+
+	function onSelectFiles( selection ) {
+		const files = Array.from( selection );
+		if ( files.length < 2 ) {
+			onSelectFile( files[ 0 ] );
+			return;
+		}
+
+		const fileBlocks = createFileBlocks( files );
+		// Inside a Files block the other files become rows next to this one.
+		// Anywhere else, all of them are grouped in a new Files block.
+		replaceBlocks(
+			clientId,
+			isInFilesBlock
+				? fileBlocks
+				: createBlock( 'core/files', {}, fileBlocks )
+		);
 	}
 
 	function onUploadError( message ) {
@@ -201,9 +239,19 @@ function FileEdit( {
 							'Drag and drop a file, upload, or choose from your library.'
 						),
 					} }
-					onSelect={ onSelectFile }
+					onSelect={
+						canSelectMultipleFiles ? onSelectFiles : onSelectFile
+					}
 					onError={ onUploadError }
 					accept="*"
+					multiple={ canSelectMultipleFiles }
+					// A single file uploads here, as before. With several, each
+					// new File block uploads its own file.
+					handleUpload={
+						canSelectMultipleFiles
+							? ( files ) => files.length === 1
+							: true
+					}
 				/>
 			</div>
 		);

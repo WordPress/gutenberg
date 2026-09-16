@@ -333,6 +333,16 @@ Add a link to a downloadable file.
 -	**Supports:** align, anchor, color (background, gradients, link, ~~text~~), interactivity, layout (default, ~~allowInheriting~~, ~~allowOrientation~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), spacing (margin, padding)
 -	**Attributes:** blob, displayPreview, downloadButtonText, fileId, fileName, href, id, previewHeight, showDownloadButton, textLinkHref, textLinkTarget
 
+## Files
+
+Display a list of downloadable files.
+
+-	**Name:** [core/files](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-files/)
+-	**Experimental:** true
+-	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
+-	**Allowed Blocks:** core/file
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, ~~text~~), interactivity (clientNavigation), layout (~~allowEditing~~), listView, spacing (blockGap, margin, padding), ~~html~~
+
 ## Footnotes
 
 Display footnotes added to the page.

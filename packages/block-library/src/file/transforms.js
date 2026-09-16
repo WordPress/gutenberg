@@ -1,9 +1,10 @@
 import { createBlobURL } from '@wordpress/blob';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { _x } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
+import { createFileBlocks } from './utils/create-file-blocks';
 
 // Transforms bypass the default variation, so set the localized default here.
 const downloadButtonText = _x( 'Download', 'button label' );
@@ -44,6 +45,22 @@ const transforms = {
 			// ensures that the File block is only created as a fallback.
 			priority: 15,
 			transform: ( files ) => {
+				// Several non-media files dropped together are grouped in a
+				// Files block, when that block is available.
+				const isGroupOfFiles =
+					files.length > 1 &&
+					!! select( blocksStore ).getBlockType( 'core/files' ) &&
+					files.every(
+						( file ) => ! /^(image|video|audio)\//.test( file.type )
+					);
+				if ( isGroupOfFiles ) {
+					return createBlock(
+						'core/files',
+						{},
+						createFileBlocks( files )
+					);
+				}
+
 				const blocks = [];
 
 				files.forEach( ( file ) => {

@@ -4,6 +4,7 @@
 - [Audio](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-audio/) — `core/audio`: Embed a simple audio player.
 - [Cover](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-cover/) — `core/cover`: Add an image or video with a text overlay.
 - [File](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-file/) — `core/file`: Add a link to a downloadable file.
+- [Files](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-files/) — `core/files`: Display a list of downloadable files.
 - [Gallery](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-gallery/) — `core/gallery`: Display multiple images in a rich gallery.
 - [Icon](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-icon/) — `core/icon`: Insert an SVG icon.
 - [Image](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-image/) — `core/image`: Insert an image to make a visual statement.
