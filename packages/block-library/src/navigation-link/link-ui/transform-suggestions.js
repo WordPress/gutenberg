@@ -13,21 +13,22 @@ const TYPE_ALIASES = {
 
 const ENTITY_KINDS = [ 'post-type', 'taxonomy' ];
 
+const DEFAULT_PRIORITY = { type: 'page', kind: 'post-type' };
+
 /**
  * Describe an entity the way the search API spells it.
  *
- * Applies the aliases above, and falls back to pages for anything not bound to
- * an entity, so that a freshly appended item or a custom link lists pages
- * first.
+ * Returns null for anything that is not an entity, such as a custom link or the
+ * "Create page" option, so that those are never treated as a match.
  *
  * @param {Object} entity        A Navigation Link block's attributes, or a suggestion.
  * @param {string} [entity.type] The entity type.
  * @param {string} [entity.kind] The entity kind (post-type|taxonomy).
- * @return {{type: string, kind: string}} The normalized type and kind.
+ * @return {{type: string, kind: string}|null} The normalized type and kind.
  */
 function normalizeEntity( { type, kind } ) {
 	if ( ! ENTITY_KINDS.includes( kind ) ) {
-		return { type: 'page', kind: 'post-type' };
+		return null;
 	}
 
 	return { type: TYPE_ALIASES[ type ] ?? type, kind };
@@ -45,7 +46,9 @@ function normalizeEntity( { type, kind } ) {
  * @return {Array} The suggestions to display.
  */
 export function transformSuggestions( suggestions, attributes = {} ) {
-	const priority = normalizeEntity( attributes );
+	// A link with no entity of its own, such as a freshly appended item or a
+	// custom link, lists pages first.
+	const priority = normalizeEntity( attributes ) ?? DEFAULT_PRIORITY;
 
 	const prioritised = [];
 	const rest = [];
@@ -57,7 +60,7 @@ export function transformSuggestions( suggestions, attributes = {} ) {
 
 		const entity = normalizeEntity( suggestion );
 		const isPriority =
-			entity.type === priority.type && entity.kind === priority.kind;
+			entity?.type === priority.type && entity?.kind === priority.kind;
 
 		if ( isPriority ) {
 			prioritised.push( suggestion );

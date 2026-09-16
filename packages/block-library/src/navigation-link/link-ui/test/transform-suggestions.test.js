@@ -143,6 +143,19 @@ describe( 'transformSuggestions', () => {
 		expect( ids( results )[ 0 ] ).toBe( aPage.id );
 	} );
 
+	it( 'never prioritises a suggestion that is not an entity', () => {
+		// e.g. LinkControl's "Create page" option, which carries no kind.
+		const createOption = {
+			title: 'Contact',
+			url: 'Contact',
+			type: '__CREATE__',
+		};
+
+		const results = transformSuggestions( [ aPage, createOption ], {} );
+
+		expect( results[ results.length - 1 ] ).toBe( createOption );
+	} );
+
 	it( 'returns the list untouched when nothing matches the priority type', () => {
 		const results = transformSuggestions( [ aPost, aCategory, aTag ], {
 			type: 'page',

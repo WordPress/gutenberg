@@ -55,31 +55,16 @@ const LinkControlSearchInput = forwardRef(
 			: noopSearchHandler;
 
 		// Let the consumer filter and order the results before they are shown.
-		// The "CREATE" option is held back and re-appended, both so that it
-		// always remains last and so that consumers never have to account for a
-		// suggestion that does not represent a real entity.
 		const searchHandler = useCallback(
 			async ( val, args ) => {
 				const results = await baseSearchHandler( val, args );
 
-				if ( ! transformSuggestions ) {
-					return results;
-				}
-
-				const createSuggestion = results.find(
-					( { type } ) => type === CREATE_TYPE
-				);
-				const transformed = transformSuggestions(
-					results.filter( ( { type } ) => type !== CREATE_TYPE ),
-					{
-						isInitialSuggestions: !! args?.isInitialSuggestions,
-						searchTerm: val,
-					}
-				);
-
-				return createSuggestion
-					? [ ...transformed, createSuggestion ]
-					: transformed;
+				return transformSuggestions
+					? transformSuggestions( results, {
+							isInitialSuggestions: !! args?.isInitialSuggestions,
+							searchTerm: val,
+					  } )
+					: results;
 			},
 			[ baseSearchHandler, transformSuggestions ]
 		);

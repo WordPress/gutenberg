@@ -27,6 +27,7 @@ import {
 	uniqueId,
 } from './fixtures';
 import { expectValidatedInputControlDeprecationIfCalled } from '../../url-input/test/fixtures/validated-input-control-deprecation';
+import { CREATE_TYPE } from '../constants';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -3718,14 +3719,14 @@ describe( 'Transforming suggestions', () => {
 		expect( options[ 0 ] ).toHaveTextContent( firstSuggestion.title );
 	} );
 
-	it( 'should still append the create suggestion after transforming', async () => {
+	it( 'should pass the create suggestion to transformSuggestions', async () => {
 		const user = userEvent.setup();
-		const [ firstSuggestion ] = fauxEntitySuggestions;
+		const transformSuggestions = vi.fn( ( suggestions ) => suggestions );
 
 		render(
 			<LinkControl
 				createSuggestion={ vi.fn() }
-				transformSuggestions={ () => [ firstSuggestion ] }
+				transformSuggestions={ transformSuggestions }
 			/>
 		);
 
@@ -3734,14 +3735,15 @@ describe( 'Transforming suggestions', () => {
 			'Hello'
 		);
 
-		const searchResults = await screen.findByRole( 'listbox', {
+		await screen.findByRole( 'listbox', {
 			name: /Search results for.*/,
 		} );
 
-		const options = within( searchResults ).getAllByRole( 'option' );
-
-		expect( options ).toHaveLength( 2 );
-		expect( options[ 1 ] ).toHaveTextContent( /^Create:/ );
+		// The create option is a suggestion like any other, so a consumer sees
+		// it and decides where it belongs.
+		expect(
+			transformSuggestions.mock.calls[ 0 ][ 0 ].at( -1 )
+		).toMatchObject( { type: CREATE_TYPE } );
 	} );
 
 	it( 'should call transformSuggestions for initial suggestions too', async () => {
