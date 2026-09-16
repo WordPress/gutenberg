@@ -49,6 +49,10 @@ $pattern-min-width: 220px;
 	}
 }
 
+.editor-start-page-options__modal-content {
+	container-type: inline-size;
+}
+
 .editor-start-page-options__modal-content.has-pattern-categories {
 	@include break-medium() {
 		margin-left: $sidebar-width;
@@ -64,7 +68,11 @@ $pattern-min-width: 220px;
 	column-count: 2;
 	column-gap: $grid-unit-30;
 
-	@include break-medium() {
+	// The sidebar takes $sidebar-width out of the modal, so the viewport width
+	// does not say whether the previews have room: at $break-medium the sidebar
+	// appears and a single $pattern-min-width column is all that fits. Query the
+	// content area instead, and only widen the columns once two of them fit.
+	@container (min-width: #{2 * $pattern-min-width + $grid-unit-30}) {
 		columns: 4 $pattern-min-width;
 	}
 
