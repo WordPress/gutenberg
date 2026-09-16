@@ -15,7 +15,7 @@ function measure( element: HTMLElement, slack: number ) {
 	const overflow =
 		typeof range.getBoundingClientRect === 'function'
 			? range.getBoundingClientRect().width -
-			  element.getBoundingClientRect().width
+				element.getBoundingClientRect().width
 			: element.scrollWidth - element.clientWidth;
 	return overflow > slack + FIT_TOLERANCE;
 }
