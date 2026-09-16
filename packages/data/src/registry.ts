@@ -226,22 +226,9 @@ export function createRegistry(
 		// get paused, that way, when resumed we should be able to call all these
 		// pending listeners.
 		store.emitter = createEmitter();
-		const currentSubscribe = store.subscribe;
-		store.subscribe = ( listener: () => void ) => {
-			const unsubscribeFromEmitter = store.emitter.subscribe( listener );
-			const unsubscribeFromStore = currentSubscribe( () => {
-				if ( store.emitter.isPaused ) {
-					store.emitter.emit();
-					return;
-				}
-				listener();
-			} );
-
-			return () => {
-				unsubscribeFromStore?.();
-				unsubscribeFromEmitter?.();
-			};
-		};
+		store.subscribe( () => store.emitter.emit() );
+		store.subscribe = ( listener: () => void ) =>
+			store.emitter.subscribe( listener );
 		stores[ name ] = store;
 		store.subscribe( globalListener );
 

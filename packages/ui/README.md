@@ -8,8 +8,8 @@ A package that provides React UI components for the WordPress Design System, bui
 
 While similar in scope to `@wordpress/components`, there are a few key differences:
 
--   `@wordpress/components` grew organically as a collection of unrelated UI elements for WordPress screens. In contrast, this package is an implementation of a design system that guarantees user- and developer-facing cohesion between components.
--   Unlike `@wordpress/components`, this package is not bundled as a WordPress script available on the `window.wp` global and is instead distributed as an npm package that follows [semantic versioning](https://semver.org/) for release changes.
+- `@wordpress/components` grew organically as a collection of unrelated UI elements for WordPress screens. In contrast, this package is an implementation of a design system that guarantees user- and developer-facing cohesion between components.
+- Unlike `@wordpress/components`, this package is not bundled as a WordPress script available on the `window.wp` global and is instead distributed as an npm package that follows [semantic versioning](https://semver.org/) for release changes.
 
 `@wordpress/theme`, `@wordpress/ui`, and `@wordpress/icons` form the foundational layer of the Design System. Higher-level compositional packages, including `@wordpress/dataviews` and `@wordpress/admin-ui`, build common solutions from those foundations. See the version-matched [Design System introduction](../../storybook/stories/design-system/introduction.mdx) in a Gutenberg checkout, or the [latest copy on Gutenberg trunk](https://github.com/WordPress/gutenberg/blob/trunk/storybook/stories/design-system/introduction.mdx) when reading this package outside the monorepo.
 
@@ -17,8 +17,8 @@ This package includes many common UI components, but equivalent components can s
 
 This is a companion to the `@wordpress/theme` package that provides:
 
--   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more
--   **Theme System**: A flexible theming provider for consistent theming across applications
+- **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more
+- **Theme System**: A flexible theming provider for consistent theming across applications
 
 ## Installation
 
@@ -167,15 +167,15 @@ For a given state `x`, the convention is:
 
 For example, a component with an open/closed state would expose:
 
--   `defaultOpen` — initial open state (uncontrolled)
--   `open` — current open state (controlled)
--   `onOpenChange` — called when the open state changes
+- `defaultOpen` — initial open state (uncontrolled)
+- `open` — current open state (controlled)
+- `onOpenChange` — called when the open state changes
 
 And a component with a selectable value would expose:
 
--   `defaultValue` — initial value (uncontrolled)
--   `value` — current value (controlled)
--   `onValueChange` — called when the value changes
+- `defaultValue` — initial value (uncontrolled)
+- `value` — current value (controlled)
+- `onValueChange` — called when the value changes
 
 #### Uncontrolled usage
 
