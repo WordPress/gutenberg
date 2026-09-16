@@ -7,42 +7,40 @@ import { Popover } from '@wordpress/components';
 import { ValidatedTextareaControl, Link } from '@wordpress/ui';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { useEvent } from '@wordpress/compose';
 
 export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const { latex, mathML } = attributes;
 	const [ blockRef, setBlockRef ] = useState();
 	const [ error, setError ] = useState( null );
 	const [ latexToMathML, setLatexToMathML ] = useState();
-	// The converter loads asynchronously, and the user can type in the
-	// meantime, so the effect below renders the latest source rather than
-	// the one captured on mount.
-	const latestLatexRef = useRef( latex );
-	useEffect( () => {
-		latestLatexRef.current = latex;
-	} );
 	const formRef = useRef();
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
+	// Re-render once the converter loads, so MathML saved from a corrupted
+	// source is repaired and a source typed before the converter loaded is
+	// rendered. The converter loads asynchronously, and the user can type in
+	// the meantime, so read the source at that time rather than on mount.
+	const renderLatest = useEvent( ( convert ) => {
+		if ( ! latex ) {
+			return;
+		}
+		try {
+			const newMathML = convert( latex, { displayMode: true } );
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { mathML: newMathML } );
+		} catch ( err ) {
+			setError( err.message );
+		}
+	} );
+
 	useEffect( () => {
 		import( '@wordpress/latex-to-mathml' ).then( ( module ) => {
 			setLatexToMathML( () => module.default );
-			if ( ! latestLatexRef.current ) {
-				return;
-			}
-			// Re-render on mount so MathML saved from a corrupted source is
-			// repaired once the source reads correctly again.
-			try {
-				const newMathML = module.default( latestLatexRef.current, {
-					displayMode: true,
-				} );
-				__unstableMarkNextChangeAsNotPersistent();
-				setAttributes( { mathML: newMathML } );
-			} catch ( err ) {
-				setError( err.message );
-			}
+			renderLatest( module.default );
 		} );
-	}, [ setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
+	}, [ renderLatest ] );
 
 	const blockProps = useBlockProps( {
 		ref: setBlockRef,
