@@ -9,7 +9,7 @@ import { createBlock } from '@wordpress/blocks';
 import {
 	Placeholder,
 	ToggleControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -202,7 +202,7 @@ export default function TableOfContentsEdit( {
 					}
 					isShownByDefault
 				>
-					<SelectControl
+					<WCSelectControl
 						label={ __( 'Include headings down to level' ) }
 						value={ maxLevel || '' }
 						options={ [
