@@ -1,3 +1,12 @@
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+} from 'vitest';
 import deepFreeze from 'deep-freeze';
 import {
 	registerBlockType,
@@ -78,16 +87,16 @@ selectorNames.forEach( ( name ) => {
 			hasUndo() {
 				return Boolean(
 					state.editor &&
-						state.editor.past &&
-						state.editor.past.length
+					state.editor.past &&
+					state.editor.past.length
 				);
 			},
 
 			hasRedo() {
 				return Boolean(
 					state.editor &&
-						state.editor.future &&
-						state.editor.future.length
+					state.editor.future &&
+					state.editor.future.length
 				);
 			},
 

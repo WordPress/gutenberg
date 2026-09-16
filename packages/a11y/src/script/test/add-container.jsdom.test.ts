@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import addContainer from '../add-container';
 
 describe( 'addContainer', () => {

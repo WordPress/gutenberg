@@ -19,6 +19,8 @@ import {
 	collectJestInfrastructureEntries,
 	findVitestIsolationOptOuts,
 	validateRoutingScripts,
+	validateVitestCleanupConfig,
+	validateVitestShuffleScripts,
 } from '../test-infrastructure-policy.mjs';
 
 const temporaryDirectories = [];
@@ -110,7 +112,7 @@ describe( 'test infrastructure policy', () => {
 		];
 		const sources = {
 			'.github/workflows/test.yml':
-				'"run": npm run test:unit:debug -- --runInBand\n',
+				'"run": npm run test:unit:jest -- --runInBand\n',
 			'packages/example/jest.config.js': 'module.exports = {};\n',
 			'packages/example/package.json': JSON.stringify( {
 				jest: {},
@@ -122,9 +124,11 @@ describe( 'test infrastructure policy', () => {
 					'test-runner': 'npm:jest@^30.0.0',
 				},
 				scripts: {
-					test: 'wp-scripts test-unit-js --config jest.config.js',
+					test: 'wp-scripts test-unit-jest --config jest.config.js',
 					vitest: 'npm run test:unit:vitest',
-					watch: 'npm run test:unit:watch',
+					watch: 'npm run test:unit:jest -- --watch',
+					unit: 'npm run test:unit',
+					public: 'wp-scripts test-unit-js',
 				},
 			} ),
 		};
@@ -135,9 +139,9 @@ describe( 'test infrastructure policy', () => {
 				( file ) => sources[ file ] ?? null
 			)
 		).toEqual( [
-			'command:.github/workflows/test.yml=npm run test:unit:debug -- --runInBand',
-			'command:packages/example/package.json:scripts.test=wp-scripts test-unit-js --config jest.config.js',
-			'command:packages/example/package.json:scripts.watch=npm run test:unit:watch',
+			'command:.github/workflows/test.yml=npm run test:unit:jest -- --runInBand',
+			'command:packages/example/package.json:scripts.test=wp-scripts test-unit-jest --config jest.config.js',
+			'command:packages/example/package.json:scripts.watch=npm run test:unit:jest -- --watch',
 			'config:packages/example/jest.config.js',
 			'config:packages/example/package.json:jest',
 			'dependency:packages/example/package.json:devDependencies.@jest/globals',
@@ -145,6 +149,51 @@ describe( 'test infrastructure policy', () => {
 			'dependency:packages/example/package.json:devDependencies.legacy-test',
 			'dependency:packages/example/package.json:devDependencies.test-runner',
 		] );
+	} );
+
+	it( 'requires deterministic file-order shuffling', () => {
+		const validRootPackageJson = {
+			scripts: {
+				'test:unit:vitest:shuffled':
+					'npm run --workspace @wordpress/unit-tests test:unit:vitest:shuffled --',
+			},
+		};
+		const validUnitTestPackageJson = {
+			scripts: {
+				'test:unit:vitest:shuffled':
+					'npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855',
+			},
+		};
+
+		expect(
+			validateVitestShuffleScripts(
+				{
+					scripts: {
+						'test:unit:vitest:shuffled':
+							'npm run --workspace @wordpress/unit-tests test:unit:vitest:shuffled',
+					},
+				},
+				validUnitTestPackageJson
+			)
+		).toEqual( [
+			'package.json: scripts.test:unit:vitest:shuffled must be exactly `npm run --workspace @wordpress/unit-tests test:unit:vitest:shuffled --`',
+		] );
+		expect(
+			validateVitestShuffleScripts( validRootPackageJson, {
+				scripts: {
+					'test:unit:vitest:shuffled':
+						'npm run test:unit:vitest -- --sequence.shuffle --sequence.seed=80855',
+				},
+			} )
+		).toEqual( [
+			'test/unit/package.json: scripts.test:unit:vitest:shuffled must be exactly `npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855`',
+		] );
+		expect(
+			validateVitestShuffleScripts(
+				validRootPackageJson,
+				validUnitTestPackageJson
+			)
+		).toEqual( [] );
 	} );
 } );
 
@@ -194,6 +243,39 @@ export default {
 			'vitest.config.mjs:4 must set isolate to the literal value true',
 			'vitest.config.mjs:6 must set isolate to the literal value true',
 		] );
+	} );
+
+	it( 'requires every supported Vitest cleanup default', () => {
+		expect(
+			validateVitestCleanupConfig( {
+				test: { globals: true, projects: [] },
+			} )
+		).toEqual(
+			expect.arrayContaining( [
+				'test/unit/vitest.config.mjs: test.isolate must be true',
+				'test/unit/vitest.config.mjs: test.mockReset must be true',
+				'test/unit/vitest.config.mjs: test.clearMocks must remain false while test.mockReset is true',
+				'test/unit/vitest.config.mjs: test.globals must remain false',
+			] )
+		);
+	} );
+
+	it( 'requires every Vitest project to inherit the shared defaults', () => {
+		expect(
+			validateVitestCleanupConfig( {
+				test: {
+					globals: false,
+					isolate: true,
+					mockReset: true,
+					restoreMocks: true,
+					unstubEnvs: true,
+					unstubGlobals: true,
+					projects: [ { extends: false, test: { name: 'escape' } } ],
+				},
+			} )
+		).toContain(
+			'test/unit/vitest.config.mjs: escape must set extends: true to inherit the shared isolation defaults'
+		);
 	} );
 } );
 
@@ -362,12 +444,12 @@ export const beforeAll = () => {};
 		} );
 		writeJson( path.join( vitestDir, 'package.json' ), {
 			name: 'vitest',
-			version: '4.0.0',
+			version: '5.0.0',
 			types: 'index.d.ts',
 		} );
 		writeFileSync(
 			path.join( vitestDir, 'index.d.ts' ),
-			'export interface AsymmetricMatcher { asymmetricMatch(value: unknown): boolean; }\nexport interface Matchers<T = any> { toBe(value: unknown): void; }\nexport declare const vi: unknown;\nexport declare function expect<T>(value: T): Matchers<T>;\nexport declare namespace expect { function stringContaining(value: string): AsymmetricMatcher; }\n'
+			'export interface AsymmetricMatcher { asymmetricMatch(value: unknown): boolean; }\nexport interface Matchers<R extends void | Promise<void> = void | Promise<void>, T = unknown> {}\nexport interface Assertion<R extends void | Promise<void> = void, T = unknown> extends Matchers<R, T> { toBe(value: unknown): R; }\nexport declare const vi: unknown;\nexport declare function expect<T>(value: T): Assertion<void, T>;\nexport declare namespace expect { function stringContaining(value: string): AsymmetricMatcher; }\n'
 		);
 		writeJson( path.join( jestDomDir, 'package.json' ), {
 			name: '@testing-library/jest-dom',
@@ -385,7 +467,7 @@ export const beforeAll = () => {};
 		copyFileSync(
 			path.resolve(
 				import.meta.dirname,
-				'../../typings/gutenberg-vitest-test-env/index.d.ts'
+				'../../../../tools/monorepo/typings/gutenberg-vitest-test-env/index.d.ts'
 			),
 			path.join( typingsDir, 'index.d.ts' )
 		);

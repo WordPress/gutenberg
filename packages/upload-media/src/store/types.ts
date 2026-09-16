@@ -383,8 +383,7 @@ export interface ImageSizeCrop {
 	 * - `false` or undefined for soft proportional resize.
 	 */
 	crop?:
-		| boolean
-		| [ 'left' | 'center' | 'right', 'top' | 'center' | 'bottom' ];
+		boolean | [ 'left' | 'center' | 'right', 'top' | 'center' | 'bottom' ];
 	/** Size name identifier (e.g., 'thumbnail', 'medium'). */
 	name?: string;
 }
@@ -445,9 +444,7 @@ type OperationWithArgs< T extends keyof OperationArgs = keyof OperationArgs > =
  * `[ name, args ]` tuple when the step takes arguments.
  */
 export type Operation =
-	| OperationName
-	| OperationWithArgs
-	| [ OperationName, unknown ];
+	OperationName | OperationWithArgs | [ OperationName, unknown ];
 
 /**
  * Updates an operation handler can apply to its item once it finishes.
@@ -516,11 +513,7 @@ export interface OperationPlacement {
  *   removing or reordering steps for an item.
  */
 export type OperationPlanResult =
-	| OperationPlacement
-	| Operation[]
-	| false
-	| undefined
-	| void;
+	OperationPlacement | Operation[] | false | undefined | void;
 
 export interface OperationPlanContext {
 	/** The pipeline as planned so far, starting with what core decided. */

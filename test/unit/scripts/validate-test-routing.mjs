@@ -94,7 +94,8 @@ function listVitestTestsByProject() {
 	for ( const line of lines ) {
 		const match = line.match( /^\[([^\]]+)\]\s+(.+)$/ );
 		assert.ok( match, `Unexpected Vitest list output: ${ line }` );
-		const [ , projectName, testPath ] = match;
+		const [ , listedProjectName, testPath ] = match;
+		const projectName = listedProjectName.replace( / \(.+\)$/, '' );
 		assert.ok(
 			testsByProject[ projectName ],
 			`Unexpected Vitest project \`${ projectName }\`. Expected only: ${ VITEST_PROJECT_NAMES.join(
@@ -286,7 +287,7 @@ const vitestTestsByProject = existsSync( path.join( ROOT_DIR, VITEST_CONFIG ) )
 				projectName,
 				new Set(),
 			] )
-	  );
+		);
 const overlappingVitestProjectTests =
 	findOverlappingVitestProjectTests( vitestTestsByProject );
 assert.deepEqual(
@@ -344,8 +345,18 @@ const baselineJestInfrastructure = new Set(
 		readBaselineFile( baselineRef, file )
 	)
 );
+// These are the existing empty Jest partition under its explicit compatibility
+// name. The public adapter uses an optional peer instead of bundled Jest.
+// See test/unit/VITEST_MIGRATION.md. Do not allow other Jest additions.
+const retainedJestInfrastructure = new Set( [
+	'dependency:packages/scripts/package.json:peerDependencies.jest',
+	'command:package.json:scripts.test:unit:jest=npm run --workspace @wordpress/unit-tests test:unit:jest --',
+	'command:test/unit/package.json:scripts.test:unit:jest=wp-scripts test-unit-jest --config jest.config.js',
+] );
 const addedJestInfrastructure = currentJestInfrastructure.filter(
-	( entry ) => ! baselineJestInfrastructure.has( entry )
+	( entry ) =>
+		! baselineJestInfrastructure.has( entry ) &&
+		! retainedJestInfrastructure.has( entry )
 );
 assert.deepEqual(
 	addedJestInfrastructure,

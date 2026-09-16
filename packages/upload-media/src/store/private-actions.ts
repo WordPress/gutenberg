@@ -9,7 +9,7 @@ import {
 	isAnimatedGif,
 	renameFile,
 } from '../utils';
-import { canvasConvertToJpeg } from '../canvas-utils';
+import { canvasConvertToJpeg, HeicUnsupportedError } from '../canvas-utils';
 import { getHeicUnsupportedMessage } from '../heic-support';
 import { getUnappliedExifOrientation } from '../heic-parser';
 import {
@@ -138,8 +138,8 @@ export type ActionCreators = {
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
-type AllSelectors = typeof import('./selectors') &
-	typeof import('./private-selectors');
+type AllSelectors = typeof import( './selectors' ) &
+	typeof import( './private-selectors' );
 type CurriedState< F > = F extends ( state: State, ...args: infer P ) => infer R
 	? ( ...args: P ) => R
 	: F;
@@ -1058,11 +1058,26 @@ export function prepareItem( id: QueueItemId ) {
 						file,
 						settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY
 					);
-				} catch {
+				} catch ( error ) {
+					/*
+					 * Only the dead end where nothing could decode the file is
+					 * about codec support. A decode that was attempted and
+					 * failed, or a canvas that could not be created, says
+					 * nothing about the browser, and sending the user off to
+					 * install a different one would not help.
+					 */
+					const unsupported = error instanceof HeicUnsupportedError;
 					throw new UploadError( {
-						code: ErrorCode.HEIC_DECODE_ERROR,
-						message: getHeicUnsupportedMessage(),
+						code: unsupported
+							? ErrorCode.HEIC_DECODE_ERROR
+							: ErrorCode.IMAGE_TRANSCODING_ERROR,
+						message: unsupported
+							? getHeicUnsupportedMessage()
+							: __(
+									'This HEIC image could not be converted. Try converting it to JPEG before uploading.'
+								),
 						file,
+						cause: error instanceof Error ? error : undefined,
 					} );
 				}
 

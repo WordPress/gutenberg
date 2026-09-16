@@ -3,7 +3,7 @@ import path from 'node:path';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 const require = createRequire( import.meta.url );
 const os = require( 'node:os' );
-const homedir = vi.spyOn( os, 'homedir' ).mockImplementation( () => undefined );
+let homedir = vi.spyOn( os, 'homedir' ).mockImplementation( () => undefined );
 const { ValidationError } = require( '../validate-config' );
 const { parseSourceString } = require( '../parse-source-string' );
 
@@ -17,6 +17,7 @@ describe( 'parseSourceString', () => {
 	};
 
 	beforeEach( () => {
+		homedir = vi.spyOn( os, 'homedir' );
 		homedir.mockReset().mockReturnValue( '/home/test' );
 	} );
 

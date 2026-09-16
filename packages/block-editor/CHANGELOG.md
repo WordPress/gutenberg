@@ -2,22 +2,62 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove the `crossorigin` MutationObserver. Under `Document-Isolation-Policy: isolate-and-credentialless` cross-origin resources load without the attribute, and adding it broke any resource served without CORS headers ([#82614](https://github.com/WordPress/gutenberg/pull/82614)).
+
+### New Features
+
+-   Add a text shadow block support and its control in the typography panel ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+
+### Enhancements
+
+-   Remove the `react-autosize-textarea` dependency. `PlainText` and the block "Edit as HTML" field now auto-grow with CSS `field-sizing: content`. Browsers without support use scrollable fields. `PlainText` consumers should use CSS height constraints instead of `rows` ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).
+-   `BlockCard`: Migrate the block-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82503](https://github.com/WordPress/gutenberg/pull/82503)).
+-   Inspector controls in the standard block-supports panels (Typography, Dimensions, Border, Color, Background, Filters) reflect the value a block inherits from Global Styles when nothing is set on the block. The `gutenberg-global-styles-inheritance-ui` experiment now gates only the indicators for that value: the dotted underline on an inherited label, and the dot that resets a local override ([#82840](https://github.com/WordPress/gutenberg/pull/82840)).
+-   `TypographyPanel`: Setting a text color starts an unset link color tracking it whenever no link color is set on the block or inherited from Global Styles. Previously the link color was left alone ([#82840](https://github.com/WordPress/gutenberg/pull/82840)).
+
+### Bug Fixes
+
+-   `InnerBlocks`: Resolve a container's legacy layout markup (`inherit: true`, or a bare `contentSize` / `wideSize` with no `type`) to a constrained layout for its inner blocks, so they are offered the wide and full alignments. Previously only the container's styles honoured the legacy form, and the inner blocks resolved to the flow layout ([#82637](https://github.com/WordPress/gutenberg/pull/82637)).
+-   Block Patterns, Block Visibility, and Block Lock: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
+-   Layout: Treat a missing `spacing.blockGap` setting as no block gap support, as the server does. A theme that does not opt into block gap has the setting stored as `null`, which the block settings resolve to `undefined`, so per-block layout styles applied block gap values the front end never renders. An editor that never provides the setting must set it to `true` to keep rendering block gap values ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
+-   Block Toolbar: Show the parent block selector for blocks inside patterns and `contentOnly` locked blocks. It selects the nearest parent shown in List View and the breadcrumb ([#82912](https://github.com/WordPress/gutenberg/pull/82912)).
+
+### Internal
+
+-   Block bindings and variation transforms: Use the public `Menu` from `@wordpress/ui` instead of the private Components API. ([#81925](https://github.com/WordPress/gutenberg/pull/81925))
+-   Layout hooks: Use `normalizeLegacyLayout` in `useLayoutClasses`, `useLayoutStyles`, the block layout styles wrapper and `isAxialBlockGapAllowed`, replacing four inline copies of the legacy `inherit` / size check ([#82710](https://github.com/WordPress/gutenberg/pull/82710)).
+
+## 17.1.0 (2026-09-10)
+
 ### New Features
 
 -   `BackgroundImageControl`: Support setting the background image from a URL, through the URL field in the media replace popover ([#82230](https://github.com/WordPress/gutenberg/pull/82230)).
 
 ### Enhancements
 
+-   `BlockAlignmentControl`: List Wide and Full width as unavailable when a parent layout withholds them but the theme itself offers them, instead of removing them from the menu without explanation. A theme that offers neither keeps them hidden, since it is curating its own options. Blocks whose only alignments are wide and full, such as Group and Columns, now keep an alignment control in layouts that offer neither ([#82600](https://github.com/WordPress/gutenberg/pull/82600)).
 -   Borders: rename the "Border & Shadow" panel to "Borders", whichever of its controls are available, and always show the Border and Shadow controls' visible labels. A stable panel title is what lets the Border label render unconditionally, so its "Unlink sides" toggle lines up with the border radius one ([#82163](https://github.com/WordPress/gutenberg/pull/82163)).
 -   `ListView`: Updated to use `outset-ring__focus()` mixin for focus outline wherever applicable instead of the previous box-shadow implementation. ([#82129](https://github.com/WordPress/gutenberg/pull/82129))
 
+### Deprecations
+
+-   `__unstableSetEditorMode`: Deprecate the action. It only wrote the `editorTool` preference that backed the removed Write/Design tool, and nothing has read that preference since [#72193](https://github.com/WordPress/gutenberg/pull/72193). It now dispatches nothing and logs a deprecation notice ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
+
 ### Internal
 
+-   `BlockPreview`: Stop applying the private `Disabled` component class name to block previews ([#82651](https://github.com/WordPress/gutenberg/pull/82651)).
+-   Pattern Overrides Dropdown: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` ([#77492](https://github.com/WordPress/gutenberg/pull/77492)).
+-   Allowed Blocks Modal: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` ([#78119](https://github.com/WordPress/gutenberg/pull/78119)).
+-   Block Switcher: Use `Text` from `@wordpress/ui` instead of `__experimentalText` from `@wordpress/components` for the bindings hint ([#77366](https://github.com/WordPress/gutenberg/pull/77366)).
+-   Inspector Popover Header: Use `Text` from `@wordpress/ui` instead of `__experimentalHeading` and `__experimentalText` from `@wordpress/components` ([#77449](https://github.com/WordPress/gutenberg/pull/77449)).
 -   Remove unused dependencies `@wordpress/escape-html`, `@wordpress/wordcount` and `deepmerge` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
 
 ### Bug Fixes
 
+-   `NavigableToolbar`: Preserve toolbar semantics while it is hidden, so asynchronous control changes do not remount custom block toolbars ([#82574](https://github.com/WordPress/gutenberg/pull/82574)).
 -   `ListView`: Drop the block icon's variation colors while the row is selected, so the icon keeps contrast against the selection background ([#82498](https://github.com/WordPress/gutenberg/pull/82498)).
 -   Flex layout: Output `flex-direction: row` when a viewport override switches a vertical layout to horizontal, so the base `flex-direction: column` no longer keeps applying on that viewport ([#82364](https://github.com/WordPress/gutenberg/pull/82364)).
 -   `BlockManager`: Color library block icons with `color` while retaining a `fill` fallback for custom icons that do not use `currentColor`. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))

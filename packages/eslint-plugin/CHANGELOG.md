@@ -4,6 +4,12 @@
 
 ### Breaking Changes
 
+-   Switch `test-unit` from Jest to `@vitest/eslint-plugin` recommended rules with explicit imports at the 27.0.0 boundary. Jest consumers must configure `eslint-plugin-jest` directly. ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
+
+## 26.0.0 (2026-09-10)
+
+### Breaking Changes
+
 -   The `esnext` ruleset no longer configures a parser, so JavaScript and JSX files are parsed by ESLint's default parser instead of `@babel/eslint-parser` ([#82144](https://github.com/WordPress/gutenberg/pull/82144)).
 
 ### Enhancements

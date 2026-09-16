@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.40.0 (2026-09-10)
+
+### Bug Fixes
+
+-   A HEIC file that fails to convert for a reason other than a missing decoder, such as a damaged or truncated file or a canvas that could not be created, is no longer reported as the browser being unable to read HEIC. That message names a browser that would decode HEIC instead, which is no help when the codec was never the problem. It is now kept for the one case that earns it, where no decoding strategy is available at all; everything else reports a processing error ([#81123](https://github.com/WordPress/gutenberg/issues/81123)).
+
 ### Internal
 
 -   Rebuild the upload queue on an operation registry. The steps an item goes through are now looked up by name in the `core/upload-media` store instead of a closed `switch`, core registers its own steps through the same registry, and each step declares its concurrency pool. Operation handlers follow one contract: resolve with updates for the item, or throw to cancel it. This is groundwork for letting plugins add, replace and reorder steps; no public API is exposed yet. The `useSubRegistry` prop of `MediaUploadProvider` is removed so there is a single upload store per page. Image format transcoding now counts against the image processing pool alongside resizing and rotating, so the vips worker is no longer recycled while a transcode is in flight ([#82474](https://github.com/WordPress/gutenberg/pull/82474)).
