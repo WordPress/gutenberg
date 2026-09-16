@@ -197,9 +197,8 @@ export const WithCustomEmptyContent: Story = {
 
 function HiddenResultCount() {
 	const count =
-		SearchableSelectControl.useFilteredItems<
-			( typeof ITEMS )[ number ]
-		>().length;
+		SearchableSelectControl.useFilteredItems< ( typeof ITEMS )[ number ] >()
+			.length;
 
 	if ( count === 0 ) {
 		return null;
