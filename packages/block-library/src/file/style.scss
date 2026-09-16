@@ -17,9 +17,21 @@
 		text-align: right;
 	}
 
-	* + .wp-block-file__button {
-		margin-left: 0.75em;
+	// Space the file name and button as before the flex layout, whatever the theme's block gap.
+	&.is-layout-flex {
+		gap: 0.75em;
 	}
+}
+
+// Keep the alignment of File blocks added before the flex layout. Zero
+// specificity, so a justification chosen in the editor wins.
+:where(.wp-block-file.is-layout-flex.aligncenter) {
+	justify-content: center;
+}
+
+:where(.wp-block-file.is-layout-flex.alignright) {
+	// RTL rows start on the right, so flip the value to keep the block on the right.
+	justify-content: flex-end #{"/*rtl:flex-start;*/"};
 }
 
 // Lowest specificity to avoid overriding layout styles.

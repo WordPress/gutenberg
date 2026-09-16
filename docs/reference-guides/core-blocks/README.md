@@ -330,7 +330,7 @@ Add a link to a downloadable file.
 
 -	**Name:** [core/file](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-file/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
--	**Supports:** align, anchor, color (background, gradients, link, ~~text~~), interactivity, spacing (margin, padding)
+-	**Supports:** align, anchor, color (background, gradients, link, ~~text~~), interactivity, layout (default, ~~allowInheriting~~, ~~allowOrientation~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), spacing (margin, padding)
 -	**Attributes:** blob, displayPreview, downloadButtonText, fileId, fileName, href, id, previewHeight, showDownloadButton, textLinkHref, textLinkTarget
 
 ## Footnotes

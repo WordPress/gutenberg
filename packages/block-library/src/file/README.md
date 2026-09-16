@@ -41,6 +41,13 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
   - [`text`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-text): `false`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
+- [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout):
+  - [`allowSwitching`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowswitching): `false`
+  - [`allowInheriting`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowinheriting): `false`
+  - [`allowOrientation`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-alloworientation): `false`
+  - [`allowVerticalAlignment`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowverticalalignment): `false`
+  - [`allowWrap`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowwrap): `false`
+  - [`default`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex"}`
 
 ## Block Markup
 
