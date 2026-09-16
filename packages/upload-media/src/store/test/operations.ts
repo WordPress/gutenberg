@@ -14,7 +14,9 @@ import {
 } from 'vitest';
 import { createRegistry } from '@wordpress/data';
 import { store as uploadStore } from '..';
+import { vipsGetUltraHdrInfo } from '../utils';
 import {
+	ItemStatus,
 	OperationType,
 	type OperationContext,
 	type OperationDefinition,
@@ -23,7 +25,7 @@ import {
 import type { ActionCreators, Selectors } from '../private-actions';
 import { unlock } from '../../lock-unlock';
 import { ErrorCode, UploadError } from '../../upload-error';
-import { CORE_OPERATIONS } from '../operations';
+import { CORE_OPERATIONS, CORE_POOLS, UPLOAD_POOL } from '../operations';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
 type Dispatch = ActionCreators &
@@ -148,6 +150,18 @@ describe( 'operation registry', () => {
 			);
 		} );
 
+		it( 'rejects an operation joining a pool that is not registered', async () => {
+			expect(
+				await dispatch.registerOperation(
+					operation( 'my-plugin/ocr', { concurrency: 'ocr' } )
+				)
+			).toBeUndefined();
+			expect( select.getOperation( 'my-plugin/ocr' ) ).toBeUndefined();
+			expect( consoleError ).toHaveBeenCalledWith(
+				'Upload operation "my-plugin/ocr" joins the concurrency pool "ocr", which is not registered.'
+			);
+		} );
+
 		it( 'rejects a name that is already registered', async () => {
 			const replacement = operation( OperationType.Upload );
 
@@ -181,6 +195,53 @@ describe( 'operation registry', () => {
 			).toBeUndefined();
 			expect( consoleError ).toHaveBeenCalledWith(
 				'Upload operation "my-plugin/no-label" must have a "label" string.'
+			);
+		} );
+	} );
+
+	describe( 'registerConcurrencyPool', () => {
+		it( 'ships with every core pool registered', () => {
+			expect( select.getConcurrencyPools() ).toEqual( CORE_POOLS );
+			expect( select.getConcurrencyPoolLimit( UPLOAD_POOL ) ).toBe(
+				select.getSettings().maxConcurrentUploads
+			);
+		} );
+
+		it( 'registers a pool and returns its definition', async () => {
+			const pool = { name: 'ocr', limit: 2 };
+
+			expect( await dispatch.registerConcurrencyPool( pool ) ).toBe(
+				pool
+			);
+			expect( select.getConcurrencyPoolLimit( 'ocr' ) ).toBe( 2 );
+		} );
+
+		it( 'rejects a name that is already registered', async () => {
+			expect(
+				await dispatch.registerConcurrencyPool( {
+					name: UPLOAD_POOL,
+					limit: 99,
+				} )
+			).toBeUndefined();
+			expect( select.getConcurrencyPoolLimit( UPLOAD_POOL ) ).toBe(
+				select.getSettings().maxConcurrentUploads
+			);
+			expect( consoleError ).toHaveBeenCalledWith(
+				'Concurrency pool "upload" is already registered.'
+			);
+		} );
+
+		it( 'rejects a limit that would stall the pool or not limit it', async () => {
+			for ( const limit of [ 0, -1, NaN, Infinity ] ) {
+				expect(
+					await dispatch.registerConcurrencyPool( {
+						name: `ocr-${ limit }`,
+						limit,
+					} )
+				).toBeUndefined();
+			}
+			expect( consoleError ).toHaveBeenCalledWith(
+				'Concurrency pool "ocr-0" must have a "limit" that is a positive number, or a function returning one.'
 			);
 		} );
 	} );
@@ -442,47 +503,12 @@ describe( 'operation registry', () => {
 			expect( select.getAllItems() ).toHaveLength( 0 );
 		} );
 
-		it( 'keeps the files core steps hand to each other', async () => {
+		it( 'passes on the files a step hands to the next one', async () => {
 			// core/prepare converts a HEIC and keeps the original on the
 			// item so core/thumbnail-generation can sideload it as the
-			// source_original companion once the attachment exists. Those
-			// fields are not part of the contract offered to plugins, so
-			// only core operations carry them back out of a handler.
-			const heicFile = new File( [ 'foo' ], 'example.heic', {
-				type: 'image/heic',
-			} );
-			let seen: QueueItem | undefined;
-
-			await dispatch.unregisterOperation( OperationType.Prepare );
-			dispatch.registerOperation(
-				operation( OperationType.Prepare, {
-					handler: () => ( {
-						file: jpegFile,
-						sourceFile: jpegFile,
-						originalHeicFile: heicFile,
-					} ),
-				} )
-			);
-			dispatch.registerOperation(
-				operation( 'my-plugin/inspect', {
-					handler: ( item ) => {
-						seen = item;
-					},
-				} )
-			);
-
-			dispatch.addItem( {
-				file: heicFile,
-				operations: [ OperationType.Prepare, 'my-plugin/inspect' ],
-			} );
-			await flush();
-
-			expect( seen?.file ).toBe( jpegFile );
-			expect( seen?.sourceFile ).toBe( jpegFile );
-			expect( seen?.originalHeicFile ).toBe( heicFile );
-		} );
-
-		it( 'drops those same files from a third-party result', async () => {
+			// source_original companion once the attachment exists. Every
+			// field of the item that is data rather than bookkeeping
+			// travels the same way, whoever registered the step.
 			const heicFile = new File( [ 'foo' ], 'example.heic', {
 				type: 'image/heic',
 			} );
@@ -492,6 +518,7 @@ describe( 'operation registry', () => {
 				operation( 'my-plugin/convert', {
 					handler: () => ( {
 						file: jpegFile,
+						sourceFile: jpegFile,
 						originalHeicFile: heicFile,
 					} ),
 				} )
@@ -511,7 +538,54 @@ describe( 'operation registry', () => {
 			await flush();
 
 			expect( seen?.file ).toBe( jpegFile );
-			expect( seen?.originalHeicFile ).toBeUndefined();
+			expect( seen?.sourceFile ).toBe( jpegFile );
+			expect( seen?.originalHeicFile ).toBe( heicFile );
+		} );
+
+		it( 'refuses the bookkeeping fields of the item', async () => {
+			// Everything here is the queue's own record of the entry rather
+			// than anything a step produces, and letting a handler write it
+			// would have the item lie about what it is or what is left to do.
+			let seen: QueueItem | undefined;
+			const abortController = new AbortController();
+
+			dispatch.registerOperation(
+				operation( 'my-plugin/forge', {
+					// The result type rejects these fields, but a plugin
+					// written in JavaScript is not stopped by that, so the
+					// guard has to hold at runtime too.
+					handler: ( () => ( {
+						status: ItemStatus.Paused,
+						parentId: 'not-my-parent',
+						batchId: 'not-my-batch',
+						currentPool: 'upload',
+						retryCount: 99,
+						abortController,
+						onSuccess: () => {},
+					} ) ) as OperationDefinition[ 'handler' ],
+				} )
+			);
+			dispatch.registerOperation(
+				operation( 'my-plugin/inspect', {
+					handler: ( item ) => {
+						seen = item;
+					},
+				} )
+			);
+
+			dispatch.addItem( {
+				file: jpegFile,
+				operations: [ 'my-plugin/forge', 'my-plugin/inspect' ],
+			} );
+			await flush();
+
+			expect( seen?.status ).toBe( ItemStatus.Processing );
+			expect( seen?.parentId ).toBeUndefined();
+			expect( seen?.batchId ).toBeUndefined();
+			expect( seen?.currentPool ).toBeUndefined();
+			expect( seen?.retryCount ).toBeUndefined();
+			expect( seen?.abortController ).not.toBe( abortController );
+			expect( seen?.onSuccess ).toBeUndefined();
 		} );
 	} );
 
@@ -540,6 +614,47 @@ describe( 'operation registry', () => {
 		} );
 
 		it( 'gives core operations the store', async () => {
+			// core/detect-ultra-hdr reaches for the store through the
+			// context, and throws without it, so an item that runs it and
+			// comes out the other side got the privileged context.
+			dispatch.addItem( {
+				file: jpegFile,
+				operations: [ OperationType.DetectUltraHdr ],
+			} );
+			await flush();
+
+			expect( vipsGetUltraHdrInfo ).toHaveBeenCalledTimes( 1 );
+			expect( select.getAllItems() ).toHaveLength( 0 );
+		} );
+
+		it( 'withholds the store from an operation merely named like a core one', async () => {
+			// What makes an operation core is being one of the definitions
+			// the package ships, not being called `core/something`: the
+			// name is a string anyone can register under.
+			let context: OperationContext | undefined;
+			dispatch.registerOperation(
+				operation( 'core/impostor', {
+					handler: ( _item, _args, ctx ) => {
+						context = ctx;
+					},
+				} )
+			);
+
+			dispatch.addItem( {
+				file: jpegFile,
+				operations: [ 'core/impostor' ],
+			} );
+			await flush();
+
+			expect( context ).toBeDefined();
+			expect( context ).not.toHaveProperty( 'dispatch' );
+			expect( context ).not.toHaveProperty( 'select' );
+		} );
+
+		it( 'withholds the store from a replacement of a core operation', async () => {
+			// Unregistering core/finalize and registering a step of the
+			// same name puts a plugin's definition in its place; it runs
+			// where core's did, with a plugin's context.
 			let context: OperationContext | undefined;
 			dispatch.unregisterOperation( OperationType.Finalize );
 			dispatch.registerOperation(
@@ -556,8 +671,9 @@ describe( 'operation registry', () => {
 			} );
 			await flush();
 
-			expect( context ).toHaveProperty( 'dispatch' );
-			expect( context ).toHaveProperty( 'select' );
+			expect( context ).toBeDefined();
+			expect( context ).not.toHaveProperty( 'dispatch' );
+			expect( context ).not.toHaveProperty( 'select' );
 		} );
 
 		it( 'lets a handler append steps to its item', async () => {
@@ -840,11 +956,9 @@ describe( 'operation registry', () => {
 				.fn()
 				.mockImplementationOnce( () => first.promise )
 				.mockImplementation( () => ( {} ) );
+			dispatch.registerConcurrencyPool( { name: 'ocr', limit: 1 } );
 			dispatch.registerOperation(
-				operation( 'my-plugin/ocr', {
-					handler,
-					concurrency: { pool: 'ocr', limit: 1 },
-				} )
+				operation( 'my-plugin/ocr', { handler, concurrency: 'ocr' } )
 			);
 
 			dispatch.addItem( {

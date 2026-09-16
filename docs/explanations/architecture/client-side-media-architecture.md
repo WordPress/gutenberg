@@ -408,14 +408,17 @@ Other server-side filters (`image_editor_output_format`, `image_save_progressive
 
 ## Concurrency
 
-The upload store enforces two separate concurrency limits to balance performance and resource usage:
+The upload store throttles steps through named concurrency pools, to balance performance against resource usage. A pool is declared once with the limit every operation that joins it shares; an operation names the pool it counts against, and a step that names none runs unthrottled.
 
-| Limit | Default | Reason |
+| Pool | Default limit | Reason |
 | --- | --- | --- |
-| Max concurrent uploads | 5 | Uploads are network-bound and can run in parallel. |
-| Max concurrent image processing operations | 2 | WASM image processing is memory-intensive. Running too many operations simultaneously risks out-of-memory crashes. |
+| `upload` | 5 | Uploads are network-bound and can run in parallel. |
+| `image` | 2 | WASM image processing is memory-intensive. Running too many operations simultaneously risks out-of-memory crashes. |
+| `video` | 1 | WebCodecs video encoding holds a large amount of memory for as long as the encode runs. |
 
-When a concurrency limit is reached, new items wait in the queue. As operations complete, pending items are automatically dequeued and processed.
+The `upload` and `image` limits follow the `maxConcurrentUploads` and `maxConcurrentImageProcessing` settings, so a consumer can raise or lower them at runtime.
+
+When a pool is at capacity, new items wait in the queue. As operations complete, pending items are automatically dequeued and processed.
 
 Additionally, sideload uploads to the same WordPress post are serialized to prevent race conditions in attachment metadata updates. If one sideload is in progress for a post, other sideloads targeting the same post are paused until the first completes.
 

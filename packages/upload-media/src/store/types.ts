@@ -83,6 +83,15 @@ export interface State {
 	 */
 	operations: Record< OperationName, OperationDefinition >;
 	/**
+	 * Registered concurrency pools keyed by name.
+	 *
+	 * Core registers its own pools at store creation; see
+	 * `store/operations.ts`. An operation can only join a pool that is
+	 * already registered, so every pool an item is counted against has a
+	 * limit here.
+	 */
+	pools: Record< string, ConcurrencyPoolDefinition >;
+	/**
 	 * Running tally of top-level items cancelled because they failed.
 	 *
 	 * Cancelled items leave the queue exactly like successful ones, so this is
@@ -115,6 +124,7 @@ export enum Type {
 	UpdateSettings = 'UPDATE_SETTINGS',
 	RegisterOperation = 'REGISTER_OPERATION',
 	UnregisterOperation = 'UNREGISTER_OPERATION',
+	RegisterConcurrencyPool = 'REGISTER_CONCURRENCY_POOL',
 }
 
 type Action< T = Type, Payload = Record< string, unknown > > = {
@@ -190,6 +200,10 @@ export type RegisterOperationAction = Action<
 export type UnregisterOperationAction = Action<
 	Type.UnregisterOperation,
 	{ name: OperationName }
+>;
+export type RegisterConcurrencyPoolAction = Action<
+	Type.RegisterConcurrencyPool,
+	{ pool: ConcurrencyPoolDefinition }
 >;
 
 interface UploadMediaArgs {
@@ -456,29 +470,49 @@ export type Operation =
 	OperationName | OperationWithArgs | [ OperationName, unknown ];
 
 /**
+ * Fields of a queue item an operation handler may not set.
+ *
+ * These are the entry's own bookkeeping: what it is, what it still has to
+ * do, and how it is being tracked. A handler that resolves with something
+ * other than plain updates — the item it was handed, say — would otherwise
+ * put the step it just finished back on the pipeline, or point the entry
+ * at a different item.
+ *
+ * Everything else an item carries is data one step hands to the next, and
+ * a handler is free to update it. Listing what a handler may *not* touch
+ * rather than what it may is deliberate: a new field on the item is data
+ * far more often than it is bookkeeping, and forgetting to allow one would
+ * drop it silently.
+ */
+export const PROTECTED_ITEM_KEYS = [
+	'id',
+	'status',
+	'operations',
+	'currentOperation',
+	'currentPool',
+	'batchId',
+	'parentId',
+	'abortController',
+	'error',
+	'retryCount',
+	'nextRetryTimestamp',
+	'progress',
+	'subSizes',
+	'onChange',
+	'onSuccess',
+	'onError',
+	'onBatchSuccess',
+] as const satisfies readonly ( keyof QueueItem )[];
+
+export type ProtectedItemKey = ( typeof PROTECTED_ITEM_KEYS )[ number ];
+
+/**
  * Updates an operation handler can apply to its item once it finishes.
  *
  * Merged into the item by the reducer; `attachment` and `additionalData`
  * are merged shallowly with the existing values, everything else replaces.
  */
-export type OperationResult = Partial<
-	Pick< QueueItem, 'file' | 'attachment' | 'additionalData' | 'poster' >
->;
-
-/**
- * What a `core/` operation may carry back on top of the public result.
- *
- * These are the files core steps hand along the pipeline: the original a
- * later step sideloads as a companion once the attachment exists, and the
- * source file the item was prepared from. They are plumbing between core
- * steps rather than part of the contract offered to plugins, so the same
- * `core/` check that hands out the privileged context decides whether they
- * are read back out of a handler's result.
- */
-export type CoreOperationResult = OperationResult &
-	Partial<
-		Pick< QueueItem, 'sourceFile' | 'originalHeicFile' | 'animatedGifFile' >
-	>;
+export type OperationResult = Partial< Omit< QueueItem, ProtectedItemKey > >;
 
 /**
  * Arguments for spawning a child item from inside an operation handler.
@@ -547,19 +581,24 @@ export interface OperationPlanContext {
 }
 
 /**
- * Limits how many items may run an operation at the same time.
+ * A named limit on how many items may run the operations assigned to it at
+ * the same time.
  *
- * Operations sharing a pool name share the limit. The string form joins a
- * pool declared elsewhere; the object form declares the pool's limit,
- * which may derive from the settings. Operations without a pool run
- * unthrottled.
+ * A pool is declared once, with its limit, and operations join it by name.
+ * The limit may derive from the settings, in which case it is read afresh
+ * every time the pool is consulted.
+ *
+ * The limit is a finite positive number: a pool exists to throttle, so an
+ * operation that should run unthrottled joins no pool at all. A settings
+ * function returning anything else — a missing setting, a zero that would
+ * stall the pool for good — is read as 1 rather than taken literally.
  */
-export type OperationConcurrency =
-	| string
-	| {
-			pool: string;
-			limit: number | ( ( settings: Settings ) => number );
-	  };
+export interface ConcurrencyPoolDefinition {
+	/** Pool name, e.g. `upload`. */
+	name: string;
+	/** How many items may run operations of this pool at once. */
+	limit: number | ( ( settings: Settings ) => number );
+}
 
 /**
  * A step in the upload pipeline, as held in the operation registry.
@@ -593,8 +632,12 @@ export interface OperationDefinition< Args = unknown > {
 		args: Args,
 		context: OperationContext
 	) => OperationResult | void | Promise< OperationResult | void >;
-	/** Concurrency pool this step counts against, if any. */
-	concurrency?: OperationConcurrency;
+	/**
+	 * Name of the concurrency pool this step counts against, if any. The
+	 * pool must be registered before the operation is; a step without one
+	 * runs unthrottled.
+	 */
+	concurrency?: string;
 }
 
 export type AdditionalData = Record< string, unknown >;

@@ -20,6 +20,7 @@ import {
 	Type,
 	type UnknownAction,
 	type RegisterOperationAction,
+	type RegisterConcurrencyPoolAction,
 	type UnregisterOperationAction,
 	type UpdateProgressAction,
 	type UpdateSettingsAction,
@@ -29,8 +30,7 @@ import {
 	DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
 	DEFAULT_RETRY_SETTINGS,
 } from './constants';
-import { CORE_OPERATIONS } from './operations';
-import { getConcurrencyPool } from './utils/operations';
+import { CORE_OPERATIONS, CORE_POOLS } from './operations';
 
 const noop = () => {};
 
@@ -47,6 +47,9 @@ const DEFAULT_STATE: State = {
 	failureCount: 0,
 	operations: Object.fromEntries(
 		CORE_OPERATIONS.map( ( operation ) => [ operation.name, operation ] )
+	),
+	pools: Object.fromEntries(
+		CORE_POOLS.map( ( pool ) => [ pool.name, pool ] )
 	),
 };
 
@@ -69,6 +72,7 @@ type Action =
 	| UpdateProgressAction
 	| UpdateSettingsAction
 	| RegisterOperationAction
+	| RegisterConcurrencyPoolAction
 	| UnregisterOperationAction
 	| UnknownAction;
 
@@ -196,9 +200,9 @@ function reducer(
 						? {
 								...item,
 								currentOperation: action.operation,
-								currentPool: getConcurrencyPool(
+								currentPool:
 									state.operations[ action.operation ]
-								),
+										?.concurrency,
 							}
 						: item
 				),
@@ -325,6 +329,16 @@ function reducer(
 				operations: {
 					...state.operations,
 					[ action.operation.name ]: action.operation,
+				},
+			};
+		}
+
+		case Type.RegisterConcurrencyPool: {
+			return {
+				...state,
+				pools: {
+					...state.pools,
+					[ action.pool.name ]: action.pool,
 				},
 			};
 		}

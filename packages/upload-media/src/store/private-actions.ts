@@ -22,12 +22,12 @@ import { StubFile } from '../stub-file';
 import { ErrorCode, UploadError } from '../upload-error';
 import { debug, measure } from './utils/debug-logger';
 import {
-	getConcurrencyPool,
 	getOperationArgs,
 	getOperationName,
+	isValidConcurrencyLimit,
 	planOperations,
 } from './utils/operations';
-import { IMAGE_PROCESSING_POOL } from './operations';
+import { IMAGE_PROCESSING_POOL, isCoreOperation } from './operations';
 import type { PrivilegedOperationContext } from './operations';
 import {
 	vipsResizeImage,
@@ -53,7 +53,7 @@ import type {
 	Attachment,
 	BatchId,
 	CacheBlobUrlAction,
-	CoreOperationResult,
+	ConcurrencyPoolDefinition,
 	ImageFormat,
 	OnBatchSuccessHandler,
 	OnChangeHandler,
@@ -71,6 +71,7 @@ import type {
 	PauseQueueAction,
 	QueueItem,
 	QueueItemId,
+	RegisterConcurrencyPoolAction,
 	RegisterOperationAction,
 	ResumeQueueAction,
 	RevokeBlobUrlsAction,
@@ -82,7 +83,7 @@ import type {
 	UpdateProgressAction,
 	UpdateSettingsAction,
 } from './types';
-import { ItemStatus, OperationType, Type } from './types';
+import { ItemStatus, OperationType, PROTECTED_ITEM_KEYS, Type } from './types';
 import type { cancelItem, executeRetry } from './actions';
 import { clearRetryTimer } from './utils/retry';
 
@@ -132,6 +133,7 @@ type RawActionCreators = {
 	runOperation: typeof runOperation;
 	registerOperation: typeof registerOperation;
 	unregisterOperation: typeof unregisterOperation;
+	registerConcurrencyPool: typeof registerConcurrencyPool;
 };
 
 export type ActionCreators = {
@@ -372,7 +374,7 @@ export function processItem( id: QueueItemId ) {
 			 * capacity, the item remains queued and will be processed when
 			 * another operation of that pool completes.
 			 */
-			const pool = getConcurrencyPool( definition );
+			const pool = definition.concurrency;
 			if (
 				pool !== undefined &&
 				select.getActiveCountByPool( pool ) >=
@@ -552,58 +554,35 @@ function createOperationContext(
 }
 
 /**
- * The updates any operation handler may apply to its item.
- */
-const OPERATION_RESULT_KEYS = [
-	'file',
-	'attachment',
-	'additionalData',
-	'poster',
-] as const;
-
-/**
- * What a `core/` operation may apply on top of those.
- *
- * `core/prepare` hands the original HEIC or GIF forward on the item so
- * `core/thumbnail-generation` can sideload it as a companion once the
- * attachment exists. Dropping these silently loses the companion file.
- */
-const CORE_OPERATION_RESULT_KEYS = [
-	...OPERATION_RESULT_KEYS,
-	'sourceFile',
-	'originalHeicFile',
-	'animatedGifFile',
-] as const;
-
-/**
  * Narrows an operation handler's return value to the updates it may apply.
  *
  * The reducer merges the result over the queue item, so a handler that
  * resolves with something other than plain updates — the item it was
  * handed, say — could otherwise re-insert the step it just finished or
- * point the entry at a different item.
+ * point the entry at a different item. Everything the handler did not
+ * speak to is left alone, so resolving with `{ file: undefined }` does not
+ * clear the item's file.
  *
- * @param result   Whatever the handler resolved with.
- * @param [isCore] Whether the operation is a core one, which may also carry
- *                 the files core steps pass between themselves.
+ * @param result Whatever the handler resolved with.
  *
  * @return Updates to apply to the item.
  */
 function pickOperationResult(
-	result: CoreOperationResult | void,
-	isCore = false
-): CoreOperationResult {
-	const updates: CoreOperationResult = {};
+	result: OperationResult | void
+): OperationResult {
+	const updates: Record< string, unknown > = {};
 	if ( ! result ) {
 		return updates;
 	}
 
-	const keys = isCore ? CORE_OPERATION_RESULT_KEYS : OPERATION_RESULT_KEYS;
-	for ( const key of keys ) {
-		const value = result[ key ];
-		if ( value !== undefined ) {
-			( updates as Record< string, unknown > )[ key ] = value;
+	for ( const [ key, value ] of Object.entries( result ) ) {
+		if (
+			value === undefined ||
+			( PROTECTED_ITEM_KEYS as readonly string[] ).includes( key )
+		) {
+			continue;
 		}
+		updates[ key ] = value;
 	}
 	return updates;
 }
@@ -631,14 +610,13 @@ export function runOperation(
 			return;
 		}
 
-		const isCore = name.startsWith( 'core/' );
 		const context = createOperationContext(
 			item,
 			{ select, dispatch },
-			isCore
+			isCoreOperation( definition )
 		);
 
-		let result: CoreOperationResult | void;
+		let result: OperationResult | void;
 		try {
 			result = await definition.handler( item, args, context );
 		} catch ( error ) {
@@ -658,11 +636,68 @@ export function runOperation(
 			return;
 		}
 
-		dispatch.finishOperation( id, pickOperationResult( result, isCore ) );
+		dispatch.finishOperation( id, pickOperationResult( result ) );
 	};
 }
 
 const OPERATION_NAME_PATTERN = /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/;
+
+/**
+ * Registers a concurrency pool so operations can join it.
+ *
+ * A pool is declared once, with the limit every operation that joins it
+ * shares, rather than each operation carrying its own copy of the number.
+ *
+ * @param definition Pool definition.
+ *
+ * @return The registered definition, or undefined if it was rejected.
+ */
+export function registerConcurrencyPool(
+	definition: ConcurrencyPoolDefinition
+) {
+	return ( {
+		select,
+		dispatch,
+	}: ThunkArgs ): ConcurrencyPoolDefinition | void => {
+		if ( typeof definition?.name !== 'string' || ! definition.name ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				'Concurrency pool names must be non-empty strings, like "upload".'
+			);
+			return;
+		}
+
+		if ( select.getConcurrencyPool( definition.name ) ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Concurrency pool "${ definition.name }" is already registered.`
+			);
+			return;
+		}
+
+		/*
+		 * A limit read from the settings is checked when the pool is
+		 * consulted, not here: the settings it reads can change afterwards.
+		 */
+		if (
+			typeof definition.limit !== 'function' &&
+			! isValidConcurrencyLimit( definition.limit )
+		) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Concurrency pool "${ definition.name }" must have a "limit" that is a positive number, or a function returning one.`
+			);
+			return;
+		}
+
+		dispatch< RegisterConcurrencyPoolAction >( {
+			type: Type.RegisterConcurrencyPool,
+			pool: definition,
+		} );
+
+		return definition;
+	};
+}
 
 /**
  * Registers an operation so items can run it as a step of their pipeline.
@@ -708,6 +743,21 @@ export function registerOperation( definition: OperationDefinition ) {
 			// eslint-disable-next-line no-console
 			console.error(
 				`Upload operation "${ definition.name }" must have a "label" string.`
+			);
+			return;
+		}
+
+		/*
+		 * The pool holds the limit, so joining one that does not exist would
+		 * leave the step unthrottled while reading as throttled.
+		 */
+		if (
+			definition.concurrency !== undefined &&
+			! select.getConcurrencyPool( definition.concurrency )
+		) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Upload operation "${ definition.name }" joins the concurrency pool "${ definition.concurrency }", which is not registered.`
 			);
 			return;
 		}
@@ -1018,7 +1068,7 @@ export function prepareItem( id: QueueItemId ) {
 		// The pipeline core decides on, before registered operations get to
 		// adjust it, and the updates to apply to the item alongside it.
 		let operations: Operation[] | undefined;
-		let updates: CoreOperationResult = {};
+		let updates: OperationResult = {};
 
 		// Animated GIF → video. WebCodecs is required; client-side media
 		// already runs only under cross-origin isolation, so this is a

@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
 	applyOperationPlacement,
-	getConcurrencyPool,
-	getDeclaredConcurrencyLimit,
 	getOperationArgs,
 	getOperationName,
+	isValidConcurrencyLimit,
 	planOperations,
+	resolveConcurrencyLimit,
 } from '../operations';
 import {
 	OperationType,
@@ -58,49 +58,56 @@ describe( 'getOperationArgs', () => {
 	} );
 } );
 
-describe( 'getConcurrencyPool', () => {
-	it( 'reads the pool from both concurrency forms', () => {
-		expect( getConcurrencyPool( undefined ) ).toBeUndefined();
-		expect( getConcurrencyPool( operation( 'a/b' ) ) ).toBeUndefined();
-		expect(
-			getConcurrencyPool( operation( 'a/b', { concurrency: 'image' } ) )
-		).toBe( 'image' );
-		expect(
-			getConcurrencyPool(
-				operation( 'a/b', { concurrency: { pool: 'ocr', limit: 2 } } )
-			)
-		).toBe( 'ocr' );
+describe( 'isValidConcurrencyLimit', () => {
+	it( 'accepts a finite positive number and nothing else', () => {
+		expect( isValidConcurrencyLimit( 1 ) ).toBe( true );
+		expect( isValidConcurrencyLimit( 2.5 ) ).toBe( true );
+		expect( isValidConcurrencyLimit( 0 ) ).toBe( false );
+		expect( isValidConcurrencyLimit( -1 ) ).toBe( false );
+		expect( isValidConcurrencyLimit( NaN ) ).toBe( false );
+		expect( isValidConcurrencyLimit( Infinity ) ).toBe( false );
+		expect( isValidConcurrencyLimit( '2' ) ).toBe( false );
+		expect( isValidConcurrencyLimit( undefined ) ).toBe( false );
 	} );
 } );
 
-describe( 'getDeclaredConcurrencyLimit', () => {
-	it( 'returns undefined for operations that only join a pool', () => {
-		expect(
-			getDeclaredConcurrencyLimit(
-				operation( 'a/b', { concurrency: 'image' } ),
-				settings
-			)
-		).toBeUndefined();
-	} );
-
+describe( 'resolveConcurrencyLimit', () => {
 	it( 'returns a fixed limit as is and resolves one derived from settings', () => {
 		expect(
-			getDeclaredConcurrencyLimit(
-				operation( 'a/b', { concurrency: { pool: 'ocr', limit: 2 } } ),
-				settings
-			)
+			resolveConcurrencyLimit( { name: 'ocr', limit: 2 }, settings )
 		).toBe( 2 );
 		expect(
-			getDeclaredConcurrencyLimit(
-				operation( 'a/b', {
-					concurrency: {
-						pool: 'upload',
-						limit: ( s ) => s.maxConcurrentUploads,
-					},
-				} ),
+			resolveConcurrencyLimit(
+				{ name: 'upload', limit: ( s ) => s.maxConcurrentUploads },
 				settings
 			)
 		).toBe( 5 );
+	} );
+
+	it( 'falls back to one item at a time when the settings limit is unusable', () => {
+		// A pool whose limit reads 0 would never run an item and never free
+		// the slot it is waiting on; one reading NaN compares false against
+		// every count and lets the pool run unbounded. Neither is what the
+		// pool was declared for.
+		expect(
+			resolveConcurrencyLimit( { name: 'ocr', limit: () => 0 }, settings )
+		).toBe( 1 );
+		expect(
+			resolveConcurrencyLimit(
+				{ name: 'ocr', limit: () => NaN },
+				settings
+			)
+		).toBe( 1 );
+		expect(
+			resolveConcurrencyLimit(
+				{
+					name: 'ocr',
+					limit: ( s ) =>
+						( s as Settings & { missing?: number } ).missing!,
+				},
+				settings
+			)
+		).toBe( 1 );
 	} );
 } );
 

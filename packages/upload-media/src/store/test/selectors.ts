@@ -20,28 +20,31 @@ import {
 import {
 	ItemStatus,
 	OperationType,
+	type ConcurrencyPoolDefinition,
 	type OperationDefinition,
 	type QueueItem,
 	type State,
 } from '../types';
-import { getConcurrencyPool } from '../utils/operations';
 import {
 	CORE_OPERATIONS,
+	CORE_POOLS,
 	IMAGE_PROCESSING_POOL,
 	UPLOAD_POOL,
 	VIDEO_PROCESSING_POOL,
 } from '../operations';
 
 /**
- * Builds a state with the core operations registered.
+ * Builds a state with the core operations and pools registered.
  *
  * @param queue      Queue items.
  * @param operations Extra operations to register.
+ * @param pools      Extra concurrency pools to register.
  * @return State.
  */
 function createState(
 	queue: Partial< QueueItem >[],
-	operations: OperationDefinition[] = []
+	operations: OperationDefinition[] = [],
+	pools: ConcurrencyPoolDefinition[] = []
 ): State {
 	const registry = Object.fromEntries(
 		[ ...CORE_OPERATIONS, ...operations ].map( ( operation ) => [
@@ -59,9 +62,8 @@ function createState(
 			item.currentPool === undefined
 				? {
 						...item,
-						currentPool: getConcurrencyPool(
-							registry[ item.currentOperation ]
-						),
+						currentPool:
+							registry[ item.currentOperation ]?.concurrency,
 					}
 				: item
 		) as QueueItem[],
@@ -69,6 +71,9 @@ function createState(
 		failureCount: 0,
 		blobUrls: {},
 		operations: registry,
+		pools: Object.fromEntries(
+			[ ...CORE_POOLS, ...pools ].map( ( pool ) => [ pool.name, pool ] )
+		),
 		settings: {
 			mediaUpload: vi.fn(),
 			maxConcurrentUploads: 5,
@@ -86,6 +91,7 @@ describe( 'selectors', () => {
 				failureCount: 3,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -105,6 +111,7 @@ describe( 'selectors', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -134,6 +141,7 @@ describe( 'selectors', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -163,6 +171,7 @@ describe( 'selectors', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -194,6 +203,7 @@ describe( 'selectors', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -254,28 +264,27 @@ describe( 'selectors', () => {
 			).toBe( 1 );
 		} );
 
-		it( 'uses the limit declared by an operation for its own pool', () => {
-			const state = createState(
-				[],
-				[
-					{
-						name: 'my-plugin/ocr',
-						label: 'Reading text',
-						handler: () => {},
-						concurrency: { pool: 'ocr', limit: 3 },
-					},
-				]
-			);
+		it( 'uses the limit the pool was registered with', () => {
+			const state = createState( [], [], [ { name: 'ocr', limit: 3 } ] );
 
 			expect( getConcurrencyPoolLimit( state, 'ocr' ) ).toBe( 3 );
 		} );
 
-		it( 'does not limit a pool nothing declares a limit for', () => {
+		it( 'reads a pool that is not registered as unlimited', () => {
+			// An operation cannot join a pool that is not registered, so
+			// this is only reachable for a name nothing runs against.
 			const state = createState( [] );
 
 			expect( getConcurrencyPoolLimit( state, 'unknown' ) ).toBe(
 				Infinity
 			);
+		} );
+
+		it( 'falls back to one item at a time when a settings limit is unusable', () => {
+			const state = createState( [] );
+			state.settings.maxConcurrentUploads = 0;
+
+			expect( getConcurrencyPoolLimit( state, UPLOAD_POOL ) ).toBe( 1 );
 		} );
 	} );
 
@@ -521,6 +530,7 @@ describe( 'selectors', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -554,6 +564,7 @@ describe( 'selectors', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -599,6 +610,7 @@ describe( 'selectors', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -626,6 +638,7 @@ describe( 'selectors', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,

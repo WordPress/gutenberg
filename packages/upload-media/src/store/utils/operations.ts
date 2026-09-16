@@ -1,6 +1,6 @@
 import type {
+	ConcurrencyPoolDefinition,
 	Operation,
-	OperationConcurrency,
 	OperationDefinition,
 	OperationName,
 	OperationPlacement,
@@ -37,42 +37,40 @@ export function getOperationArgs( operation: Operation ): unknown {
 }
 
 /**
- * Returns the name of the concurrency pool an operation counts against.
+ * Whether a value can serve as a concurrency pool's limit.
  *
- * @param definition Operation definition.
+ * A pool exists to throttle, so its limit has to be a finite positive
+ * number: zero would stall the pool for good and `NaN` would compare
+ * false against every count, letting the pool run unbounded.
  *
- * @return Pool name, or undefined for unthrottled operations.
+ * @param limit Value to check.
+ *
+ * @return True when the value is a usable limit.
  */
-export function getConcurrencyPool(
-	definition: OperationDefinition | undefined
-): string | undefined {
-	const concurrency: OperationConcurrency | undefined =
-		definition?.concurrency;
-	if ( ! concurrency ) {
-		return undefined;
-	}
-	return typeof concurrency === 'string' ? concurrency : concurrency.pool;
+export function isValidConcurrencyLimit( limit: unknown ): limit is number {
+	return typeof limit === 'number' && Number.isFinite( limit ) && limit > 0;
 }
 
 /**
- * Returns the limit an operation declares for its pool, if it declares one.
+ * Resolves a pool's limit against the current settings.
  *
- * @param definition Operation definition.
- * @param settings   Store settings, for limits derived from settings.
+ * A settings function that returns something unusable — a setting that was
+ * never set, or a zero that would stall the pool — is read as 1, so the
+ * pool keeps making progress one item at a time instead of deadlocking or
+ * running unbounded.
  *
- * @return Declared limit, or undefined when the operation only joins a pool.
+ * @param pool     Pool definition.
+ * @param settings Store settings.
+ *
+ * @return Maximum number of items that may run operations of this pool at once.
  */
-export function getDeclaredConcurrencyLimit(
-	definition: OperationDefinition,
+export function resolveConcurrencyLimit(
+	pool: ConcurrencyPoolDefinition,
 	settings: Settings
-): number | undefined {
-	const { concurrency } = definition;
-	if ( ! concurrency || typeof concurrency === 'string' ) {
-		return undefined;
-	}
-	return typeof concurrency.limit === 'function'
-		? concurrency.limit( settings )
-		: concurrency.limit;
+): number {
+	const limit =
+		typeof pool.limit === 'function' ? pool.limit( settings ) : pool.limit;
+	return isValidConcurrencyLimit( limit ) ? limit : 1;
 }
 
 /**

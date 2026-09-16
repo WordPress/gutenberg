@@ -1,16 +1,13 @@
 import {
 	type BatchId,
+	type ConcurrencyPoolDefinition,
 	type OperationDefinition,
 	type OperationName,
 	type QueueItem,
 	type QueueItemId,
 	type State,
 } from './types';
-import {
-	getConcurrencyPool,
-	getDeclaredConcurrencyLimit,
-	getOperationName,
-} from './utils/operations';
+import { getOperationName, resolveConcurrencyLimit } from './utils/operations';
 
 /**
  * Returns all items currently being uploaded.
@@ -119,10 +116,39 @@ export function getOperation(
 }
 
 /**
+ * Returns a registered concurrency pool by name.
+ *
+ * @param state Upload state.
+ * @param name  Pool name.
+ *
+ * @return Pool definition, or undefined if not registered.
+ */
+export function getConcurrencyPool(
+	state: State,
+	name: string
+): ConcurrencyPoolDefinition | undefined {
+	return state.pools[ name ];
+}
+
+/**
+ * Returns all registered concurrency pools.
+ *
+ * @param state Upload state.
+ *
+ * @return Pool definitions.
+ */
+export function getConcurrencyPools(
+	state: State
+): ConcurrencyPoolDefinition[] {
+	return Object.values( state.pools );
+}
+
+/**
  * Returns the concurrency limit of a pool.
  *
- * The first registered operation declaring a limit for the pool wins.
- * A pool no operation declares a limit for is unlimited.
+ * An operation can only join a pool that is registered, so the lookup
+ * finds one for every pool an item is counted against; a name that is not
+ * registered is unlimited.
  *
  * @param state Upload state.
  * @param pool  Pool name.
@@ -130,16 +156,11 @@ export function getOperation(
  * @return Maximum number of items that may run operations of this pool at once.
  */
 export function getConcurrencyPoolLimit( state: State, pool: string ): number {
-	for ( const definition of Object.values( state.operations ) ) {
-		if ( getConcurrencyPool( definition ) !== pool ) {
-			continue;
-		}
-		const limit = getDeclaredConcurrencyLimit( definition, state.settings );
-		if ( limit !== undefined ) {
-			return limit;
-		}
+	const definition = state.pools[ pool ];
+	if ( ! definition ) {
+		return Infinity;
 	}
-	return Infinity;
+	return resolveConcurrencyLimit( definition, state.settings );
 }
 
 /**
@@ -174,7 +195,7 @@ export function getPendingItemsByPool(
 		}
 		const nextName = getOperationName( nextOperation );
 		return (
-			getConcurrencyPool( state.operations[ nextName ] ) === pool &&
+			state.operations[ nextName ]?.concurrency === pool &&
 			item.currentOperation !== nextName
 		);
 	} );

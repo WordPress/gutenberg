@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import type {
+	ConcurrencyPoolDefinition,
 	OperationArgs,
 	OperationContext,
 	OperationDefinition,
@@ -23,6 +24,29 @@ export const IMAGE_PROCESSING_POOL = 'image';
  * Concurrency pool for WebCodecs video encoding, limited to one at a time.
  */
 export const VIDEO_PROCESSING_POOL = 'video';
+
+/**
+ * The concurrency pools the package ships with.
+ *
+ * Each pool is declared once, here, with the limit every operation that
+ * joins it shares. The upload and image pools follow their settings so a
+ * consumer can raise or lower them at runtime; video encoding is one at a
+ * time because WebCodecs is memory-hungry.
+ */
+export const CORE_POOLS: ConcurrencyPoolDefinition[] = [
+	{
+		name: UPLOAD_POOL,
+		limit: ( settings ) => settings.maxConcurrentUploads,
+	},
+	{
+		name: IMAGE_PROCESSING_POOL,
+		limit: ( settings ) => settings.maxConcurrentImageProcessing,
+	},
+	{
+		name: VIDEO_PROCESSING_POOL,
+		limit: 1,
+	},
+];
 
 /**
  * The context core operations receive on top of the public one.
@@ -68,10 +92,7 @@ export const CORE_OPERATIONS: OperationDefinition[] = [
 	{
 		name: OperationType.Upload,
 		label: __( 'Uploading' ),
-		concurrency: {
-			pool: UPLOAD_POOL,
-			limit: ( settings ) => settings.maxConcurrentUploads,
-		},
+		concurrency: UPLOAD_POOL,
 		handler: ( item, _args, context ) =>
 			item.parentId
 				? privileged( context ).dispatch.sideloadItem( item.id )
@@ -80,10 +101,7 @@ export const CORE_OPERATIONS: OperationDefinition[] = [
 	{
 		name: OperationType.ResizeCrop,
 		label: __( 'Resizing' ),
-		concurrency: {
-			pool: IMAGE_PROCESSING_POOL,
-			limit: ( settings ) => settings.maxConcurrentImageProcessing,
-		},
+		concurrency: IMAGE_PROCESSING_POOL,
 		handler: ( item, args, context ) =>
 			privileged( context ).dispatch.resizeCropItem(
 				item.id,
@@ -93,10 +111,7 @@ export const CORE_OPERATIONS: OperationDefinition[] = [
 	{
 		name: OperationType.Rotate,
 		label: __( 'Rotating' ),
-		concurrency: {
-			pool: IMAGE_PROCESSING_POOL,
-			limit: ( settings ) => settings.maxConcurrentImageProcessing,
-		},
+		concurrency: IMAGE_PROCESSING_POOL,
 		handler: ( item, args, context ) =>
 			privileged( context ).dispatch.rotateItem(
 				item.id,
@@ -119,7 +134,7 @@ export const CORE_OPERATIONS: OperationDefinition[] = [
 	{
 		name: OperationType.TranscodeGif,
 		label: __( 'Converting GIF to video' ),
-		concurrency: { pool: VIDEO_PROCESSING_POOL, limit: 1 },
+		concurrency: VIDEO_PROCESSING_POOL,
 		handler: ( item, args, context ) =>
 			privileged( context ).dispatch.transcodeGifItem(
 				item.id,
@@ -139,3 +154,32 @@ export const CORE_OPERATIONS: OperationDefinition[] = [
 			privileged( context ).dispatch.finalizeItem( item.id ),
 	},
 ];
+
+/**
+ * The definitions above, by identity.
+ *
+ * What makes an operation a core one is being one of these objects, not
+ * being named `core/something`: a name is just a string a plugin can
+ * register too, and the privileged context and the wider result contract
+ * are not things a plugin should be able to take by naming itself right.
+ * A plugin that replaces a core step registers a definition of its own,
+ * which is deliberately not in this set.
+ */
+const CORE_OPERATION_DEFINITIONS: ReadonlySet< OperationDefinition > = new Set(
+	CORE_OPERATIONS
+);
+
+/**
+ * Whether a definition is one of the operations the package ships with.
+ *
+ * @param definition Operation definition.
+ *
+ * @return True for a core operation.
+ */
+export function isCoreOperation(
+	definition: OperationDefinition | undefined
+): boolean {
+	return (
+		definition !== undefined && CORE_OPERATION_DEFINITIONS.has( definition )
+	);
+}
