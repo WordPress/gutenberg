@@ -74,11 +74,7 @@ export default {
 		'selector-type-case': 'lower',
 		'value-keyword-case': 'lower',
 		/*
-		 * Ban @wordpress/ui's private global CSS defense prefix (--_gcd-*).
-		 * The pattern is matched against the name without the leading `--`.
-		 * Projects that already set custom-property-pattern will override this
-		 * entirely and must merge `(?!_gcd-)` into their own pattern if they
-		 * want to keep the ban.
+		 * Ban @wordpress/ui's private global CSS defense prefix (--_gcd-*). The pattern is matched against the name without the leading `--`. Projects that already set custom-property-pattern will override this entirely and must merge `(?!_gcd-)` into their own pattern if they want to keep the ban.
 		 */
 		'custom-property-pattern': [
 			'^(?!_gcd-).+',
