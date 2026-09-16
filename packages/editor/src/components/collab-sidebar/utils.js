@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { _x } from '@wordpress/i18n';
 import { create, RichTextData } from '@wordpress/rich-text';
 import { getRectangleFromRange } from '@wordpress/dom';
@@ -415,7 +412,7 @@ export function removeNoteFormat( value, noteId ) {
 	return changed
 		? RichTextData.fromHTMLString(
 				new RichTextData( { ...record, formats } ).toHTMLString()
-		  )
+			)
 		: null;
 }
 

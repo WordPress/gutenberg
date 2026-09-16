@@ -1,8 +1,6 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
-const glob = require( 'glob' ).sync;
+const { globSync } = require( 'glob' );
+const testMigration = require( './test-migration.json' );
 
 /**
  * Path to root project directory.
@@ -14,26 +12,56 @@ const ROOT_DIR = path.resolve( __dirname, '../..' );
 process.chdir( ROOT_DIR );
 
 // Finds all packages which are transpiled with Babel to force Jest to use their source code.
-const transpiledPackageNames = glob(
-	path.join( ROOT_DIR, 'packages/*/src/index.{js,ts,tsx}' )
-).map( ( fileName ) => {
-	const relative = path.relative( ROOT_DIR, fileName );
-	return relative.split( path.sep )[ 1 ];
-} );
+const transpiledPackageNames = globSync(
+	'packages/*/src/index.{js,jsx,ts,tsx}',
+	{ cwd: ROOT_DIR, absolute: true }
+)
+	.sort()
+	.map( ( fileName ) => {
+		const relative = path.relative( ROOT_DIR, fileName );
+		return relative.split( path.sep )[ 1 ];
+	} );
+
+const dependenciesToTransform = [
+	'@ariakit/utils',
+	'@preact',
+	'comctx',
+	'docker-compose',
+	'marked',
+	'parsel-js',
+	'preact',
+	'uuid',
+	'yaml',
+];
 
 // Make sure the tests run in UTC timezone, regardless of the system timezone.
 process.env.TZ = 'UTC';
 
-module.exports = {
-	rootDir: '../../',
+/*
+ * Resolved hop by hop through its dependents rather than hardcoded to
+ * `<rootDir>/node_modules`, which is empty under non-hoisting installs.
+ */
+const ariakitUtilsDir = [
+	'@ariakit/react',
+	'@ariakit/react-components',
+	'@ariakit/utils',
+].reduce(
+	( fromDir, packageName ) =>
+		path.dirname(
+			require.resolve( `${ packageName }/package.json`, {
+				paths: [ fromDir ],
+			} )
+		),
+	path.join( ROOT_DIR, 'packages/components' )
+);
+
+const commonProjectConfig = {
+	rootDir: ROOT_DIR,
 	moduleNameMapper: {
-		// Jest resolves dependencies from CommonJS and cannot select import-only
-		// package exports. Map Ariakit's ESM test helpers explicitly.
-		'^@ariakit/test$': '<rootDir>/node_modules/@ariakit/test/dist/index.js',
-		'^@ariakit/test/react$':
-			'<rootDir>/node_modules/@ariakit/test/dist/react.js',
-		'^@ariakit/utils$':
-			'<rootDir>/node_modules/@ariakit/utils/dist/index.js',
+		/**
+		 * Specific mappings first (before generic patterns)
+		 */
+		'^@ariakit/utils$': path.join( ariakitUtilsDir, 'dist/index.js' ),
 		// Mock @wordpress/vips/worker before the general pattern so it doesn't try to load the real file.
 		// The worker-code.ts file is auto-generated during full builds and is gitignored.
 		'@wordpress/vips/worker':
@@ -42,26 +70,19 @@ module.exports = {
 		// The worker-code.ts file is auto-generated during full builds and is gitignored.
 		'@wordpress/video-conversion/worker':
 			'<rootDir>/test/unit/config/video-conversion-worker-code-stub.js',
-		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
-			'packages/$1/src',
 		'@wordpress/theme/design-tokens.js':
 			'<rootDir>/packages/theme/prebuilt/js/design-tokens.mjs',
 		'@wordpress/block-library/build-module/(.*).mjs':
-			'<rootDir>/packages/block-library/src/$1.js',
+			'<rootDir>/packages/block-library/src/$1',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
+		// Map deep paths (e.g., @wordpress/block-editor/src/hooks/list-view)
+		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })\\/(.+)$` ]:
+			'packages/$1/$2',
+		// Then map exact package imports (e.g., @wordpress/compose)
+		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
+			'packages/$1/src',
 	},
 	preset: require.resolve( '@wordpress/jest-preset-default' ),
-	setupFiles: [
-		'<rootDir>/test/unit/config/global-mocks.js',
-		'<rootDir>/test/unit/config/gutenberg-env.js',
-	],
-	setupFilesAfterEnv: [
-		'<rootDir>/test/unit/config/testing-library.js',
-		'<rootDir>/test/unit/mocks/match-media.js',
-	],
-	testEnvironmentOptions: {
-		url: 'http://localhost/',
-	},
 	testLocationInResults: true,
 	testPathIgnorePatterns: [
 		'/\\.git($|/)',
@@ -74,28 +95,41 @@ module.exports = {
 		'<rootDir>/.+\\.d\\.ts$',
 	],
 	resolver: '<rootDir>/test/unit/scripts/resolver.js',
-	transform: {
-		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
-	},
 	transformIgnorePatterns: [
-		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid|marked|@ariakit/(test|utils))/)',
+		`/node_modules/(?!(${ dependenciesToTransform.join( '|' ) })/)`,
 		'\\.pnp\\.[^\\/]+$',
-	],
-	snapshotSerializers: [
-		require.resolve( '@emotion/jest/serializer' ),
-		require.resolve( 'snapshot-diff/serializer' ),
 	],
 	snapshotFormat: {
 		escapeString: false,
 		printBasicPrototype: false,
 	},
+};
+
+module.exports = {
+	rootDir: ROOT_DIR,
+	passWithNoTests: testMigration.jest.files.length === 0,
+	projects: [
+		{
+			...commonProjectConfig,
+			displayName: 'jsdom',
+			testEnvironment: require.resolve( 'jest-environment-jsdom' ),
+			testEnvironmentOptions: {
+				url: 'http://localhost/',
+			},
+			// An empty testMatch array makes Jest discover every file.
+			testMatch: testMigration.jest.files.length
+				? testMigration.jest.files.map(
+						( testPath ) => `<rootDir>/${ testPath }`
+					)
+				: [ '!**/*' ],
+		},
+	],
 	watchPlugins: [
 		require.resolve( 'jest-watch-typeahead/filename' ),
 		require.resolve( 'jest-watch-typeahead/testname' ),
 	],
 	reporters: [
 		'default',
-		'<rootDir>packages/scripts/config/jest-github-actions-reporter/index.js',
 		/*
 		 * Only interact with flakiness.io for the official WordPress/Gutenberg
 		 * repository. Forks and private mirrors should behave the same as
@@ -109,7 +143,7 @@ module.exports = {
 						flakinessProject: 'WordPress/gutenberg',
 						duplicates: 'rename',
 					},
-			  ]
+				]
 			: undefined,
 	].filter( Boolean ),
 };

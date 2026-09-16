@@ -190,7 +190,7 @@ When an external library references the global `document` or `window` and you ca
     ```
 3. Generate the patch for the library:
     ```bash
-    npx patch-package @panzoom/panzoom
+    npm exec --no -- patch-package @panzoom/panzoom
     ```
 4. Add a `postinstall` script to your `package.json` so the patch is applied automatically after every install:
     ```json

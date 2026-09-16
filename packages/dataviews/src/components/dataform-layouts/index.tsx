@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { NormalizedLayout, NormalizedRowLayout } from '../../types';
 import FormRegularField from './regular';
 import FormPanelField from './panel';

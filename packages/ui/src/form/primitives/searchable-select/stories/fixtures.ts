@@ -1,4 +1,6 @@
-export const ITEMS = [
+import type { Item } from '../types';
+
+export const ITEMS: Item[] = [
 	{ value: 'apple', label: 'Apple' },
 	{ value: 'apricot', label: 'Apricot' },
 	{ value: 'banana', label: 'Banana' },

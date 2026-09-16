@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import StyleVariationsContainer from './style-variations-container';
 import { withGlobalStylesProvider } from './with-global-styles-provider';
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import { Heading } from '../heading';
 import { space } from '../utils/space';
@@ -57,11 +50,6 @@ export const PaletteHeading = styled( Heading )`
 		font-size: 11px;
 		margin-bottom: 0;
 	}
-`;
-
-export const PaletteActionsContainer = styled( View )`
-	height: ${ space( 6 ) };
-	display: flex;
 `;
 
 export const PaletteEditContents = styled( View )`

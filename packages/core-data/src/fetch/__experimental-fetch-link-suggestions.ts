@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -116,7 +113,7 @@ export default async function fetchLinkSuggestions(
 			? {
 					...searchOptions,
 					...searchOptions.initialSuggestionsSearchOptions,
-			  }
+				}
 			: searchOptions;
 
 	const {

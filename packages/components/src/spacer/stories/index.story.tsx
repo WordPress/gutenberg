@@ -1,5 +1,4 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
 import { Spacer } from '..';
 
 const controls = [

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useId } from '@wordpress/element';
 import { CheckboxControl, Flex } from '@wordpress/components';
 import type { FontFace, FontFamily } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { getFontFaceVariantName } from './utils';
 import { FontLibraryContext } from './context';
 import FontDemo from './font-demo';
@@ -29,7 +22,7 @@ function LibraryFontVariant( {
 					face.fontStyle,
 					face.fontWeight,
 					font.source
-			  )
+				)
 			: isFontActivated( font.slug, undefined, undefined, font.source );
 
 	const handleToggleActivation = () => {

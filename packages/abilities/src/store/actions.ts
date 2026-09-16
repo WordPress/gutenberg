@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { Ability, AbilityCategory, AbilityCategoryArgs } from '../types';
 import {
 	REGISTER_ABILITY,

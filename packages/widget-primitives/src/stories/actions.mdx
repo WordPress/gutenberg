@@ -1,6 +1,13 @@
 import { Meta, Markdown } from '@storybook/addon-docs/blocks';
 import ActionsDoc from './actions.md?raw';
+import actionAxes from './assets/action-axes.svg';
+import actionSurfaces from './assets/action-surfaces.svg';
 
 <Meta title="Widget Primitives/Actions" />
 
-<Markdown>{ ActionsDoc }</Markdown>
+<Markdown>
+	{ ActionsDoc.replace( './assets/action-axes.svg', actionAxes ).replace(
+		'./assets/action-surfaces.svg',
+		actionSurfaces
+	) }
+</Markdown>

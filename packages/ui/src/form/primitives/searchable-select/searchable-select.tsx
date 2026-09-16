@@ -1,13 +1,66 @@
 import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import warning from '@wordpress/warning';
 import * as Combobox from '../combobox';
+import type { ComboboxCollectionProps } from '../combobox/types';
+import { SearchableResults } from '../searchable-results';
 import styles from './style.module.css';
-import type { SearchableSelectProps } from './types';
-import type { SelectItem } from '../../select-control/types';
+import {
+	findCreatableItems,
+	hasGroupedItems,
+	isCreatableItem,
+	isItemGroup,
+	type Item,
+	type ItemGroup,
+	type SearchableSelectProps,
+} from './types';
+
+function warnSearchableSelectProps(
+	items: Item[] | ItemGroup[] | undefined,
+	children: ComboboxCollectionProps[ 'children' ] | undefined
+): void {
+	if ( ! items?.length ) {
+		return;
+	}
+
+	const creatableItems = findCreatableItems( items );
+
+	if ( creatableItems.length > 1 ) {
+		warning(
+			'SearchableSelect: expected at most one item with `creatable: true` in `items`.'
+		);
+	}
+
+	if ( hasGroupedItems( items ) && ! children ) {
+		warning(
+			'SearchableSelect: grouped `items` require a `children` renderer. See the `Grouped` story for an example.'
+		);
+	}
+
+	let hasMixedCreatableGroup = false;
+	for ( const entry of items ) {
+		if (
+			isItemGroup( entry ) &&
+			entry.items.some( isCreatableItem ) &&
+			entry.items.some( ( item ) => ! isCreatableItem( item ) )
+		) {
+			hasMixedCreatableGroup = true;
+			break;
+		}
+	}
+
+	if ( hasMixedCreatableGroup ) {
+		warning(
+			'SearchableSelect: do not mix `creatable: true` items with regular items in the same group. Put the creatable item in its own group.'
+		);
+	}
+}
 
 /**
  * A searchable single-selection component, with support for
- * a footer item to create new items.
+ * a creatable footer action.
+ *
+ * Prefer `SearchableSelectControl` when using with a standard label and description.
  */
 export const SearchableSelect = forwardRef<
 	HTMLButtonElement,
@@ -15,11 +68,13 @@ export const SearchableSelect = forwardRef<
 >( function SearchableSelect(
 	{
 		children,
-		creatableItem,
 		emptyContent = __( 'No results found.' ),
+		statusContent,
 		items,
+		placeholder,
 		triggerContent,
 		searchPlaceholder = __( 'Search' ),
+		popupWidth,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledby,
 		'aria-describedby': ariaDescribedby,
@@ -27,15 +82,13 @@ export const SearchableSelect = forwardRef<
 	},
 	ref
 ) {
+	warnSearchableSelectProps( items, children );
+
 	return (
-		<Combobox.Root< SelectItem, false >
-			items={
-				! creatableItem ? items : [ ...( items ?? [] ), creatableItem ]
-			}
-			{ ...restProps }
-		>
+		<Combobox.Root< Item, false > items={ items } { ...restProps }>
 			<Combobox.Trigger
 				ref={ ref }
+				placeholder={ placeholder }
 				aria-label={ ariaLabel }
 				aria-labelledby={ ariaLabelledby }
 				aria-describedby={ ariaDescribedby }
@@ -43,45 +96,23 @@ export const SearchableSelect = forwardRef<
 				{ triggerContent }
 			</Combobox.Trigger>
 
-			<Combobox.Popup>
+			<Combobox.Popup
+				width={ popupWidth }
+				aria-label={ ariaLabel }
+				aria-labelledby={ ariaLabelledby }
+			>
 				<div className={ styles[ 'input-wrapper' ] }>
-					<Combobox.Input placeholder={ searchPlaceholder } />
+					<Combobox.Input
+						placeholder={ searchPlaceholder }
+						aria-label={ searchPlaceholder }
+					/>
 				</div>
-				<Combobox.Empty>{ emptyContent }</Combobox.Empty>
-				<Combobox.List>
-					<Combobox.ListBody>
-						<Combobox.Collection>
-							{ ( item: SelectItem, ...args ) => {
-								if ( item.value === creatableItem?.value ) {
-									return null;
-								}
-								if ( children ) {
-									return children( item, ...args );
-								}
-								return (
-									<Combobox.Item
-										key={ item.value }
-										value={ item }
-										disabled={ item.disabled }
-									>
-										{ item.label }
-									</Combobox.Item>
-								);
-							} }
-						</Combobox.Collection>
-					</Combobox.ListBody>
-					{ creatableItem && (
-						<Combobox.ListFooter>
-							<Combobox.Item
-								variant="creatable"
-								value={ creatableItem }
-								disabled={ creatableItem.disabled }
-							>
-								{ creatableItem.label }
-							</Combobox.Item>
-						</Combobox.ListFooter>
-					) }
-				</Combobox.List>
+				<SearchableResults
+					emptyContent={ emptyContent }
+					statusContent={ statusContent }
+				>
+					{ children }
+				</SearchableResults>
 			</Combobox.Popup>
 		</Combobox.Root>
 	);

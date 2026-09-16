@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import BorderControlDropdown from '../border-control-dropdown';
 import UnitControl from '../../unit-control';
 import RangeControl from '../../range-control';
@@ -16,7 +9,6 @@ import { VisuallyHidden } from '../../visually-hidden';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderControl } from './hook';
-
 import type { BorderControlProps, LabelProps } from '../types';
 import { Spacer } from '../../spacer';
 

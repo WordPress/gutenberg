@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useRef } from '@wordpress/element';
 import { useIsomorphicLayoutEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import useRegistry from '../registry-provider/use-registry';
 import type { DataRegistry } from '../../types';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	RawHTML,
 	useEffect,
@@ -11,10 +8,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useServerSideRender } from './hook';
 import type {
 	PlaceholderProps,

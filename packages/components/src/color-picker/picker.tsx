@@ -1,15 +1,8 @@
-/**
- * External dependencies
- */
 import type { PointerEvent } from 'react';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { HsvColorPicker, HsvaColorPicker } from 'react-colorful';
 import { colord } from 'colord';
 import type { HslaColor, HsvaColor } from 'react-colorful';
-
-/**
- * Internal dependencies
- */
 import type { PickerProps } from './types';
 
 function toHsva( hsla: PickerProps[ 'hsla' ] ): HsvaColor {

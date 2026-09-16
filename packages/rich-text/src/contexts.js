@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createContext } from '@wordpress/element';
 
 /**

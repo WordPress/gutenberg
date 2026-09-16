@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ComponentType } from 'react';
-
-/**
- * WordPress dependencies
- */
+import type { ComponentPropsWithoutRef, ComponentType } from 'react';
 // Form controls read these stylesheets, normally enqueued by WordPress.
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/components/build-style/style.css';
@@ -14,21 +7,28 @@ import '@wordpress/components/build-style/style.css';
 import '@wordpress/dataviews/build-style/style.css';
 import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { DataFormControlProps, Field, Form } from '@wordpress/dataviews';
-import { Suspense, useId, useMemo, useState } from '@wordpress/element';
+import {
+	Suspense,
+	forwardRef,
+	useEffect,
+	useId,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { globe, starFilled } from '@wordpress/icons';
 // `IconButton` is not on the recommended list yet.
 /* eslint-disable @wordpress/use-recommended-components */
-import { Card, Icon, IconButton, Link, Stack } from '@wordpress/ui';
+import { Button, Card, Icon, IconButton, Link, Stack } from '@wordpress/ui';
 /* eslint-enable @wordpress/use-recommended-components */
-
-/**
- * Internal dependencies
- */
 import { WidgetRender } from '..';
 import { registerFieldType, resolveFields } from '../../../field-types';
+import { registerIconResolver, resolveIcon } from '../../../icon-resolver';
+import { HostLink, WidgetHostProvider } from '../../../widget-host';
+import type { WidgetHost, WidgetHostLinks } from '../../../widget-host';
 import type {
 	WidgetAction,
 	WidgetAttributeField,
+	WidgetIcon,
 	WidgetRenderProps,
 	WidgetType,
 } from '../../../types';
@@ -530,7 +530,7 @@ export const WithRelevance: StoryObj = {
 		docs: {
 			description: {
 				story: `
-Each attribute may carry a \`relevance\` hint (\`'high' | 'low'\`). The widget declares importance; the host chooses the surface. When absent, treat the hint as \`'low'\`.
+Each attribute may carry a \`relevance\` hint (\`'high' | 'medium' | 'low'\`). The widget declares importance; the host chooses the surface. When absent, treat the hint as \`'low'\`.
 
 **In this demo**
 
@@ -827,7 +827,7 @@ export const WithActions: StoryObj = {
 		docs: {
 			description: {
 				story: `
-Beyond its data, a widget can declare \`actions\`: verbs a user can trigger, like opening docs or downloading a file. The widget names each action (\`id\`, \`label\`, and a link \`href\`); the host decides where to put it and materializes it.
+Beyond its data, a widget can declare \`actions\`: verbs a user can trigger, like opening docs or downloading a file. The widget names each action (\`id\`, \`label\`) and how it is fulfilled, through the key it writes (today a link \`href\`); the host mounts the primitive and decides where to put it.
 
 **In this demo**
 
@@ -836,7 +836,281 @@ Beyond its data, a widget can declare \`actions\`: verbs a user can trigger, lik
 
 **Takeaway**
 
-The widget names the intent and a link target; navigation and download are the browser's, so the widget never knows its surface.
+The widget names the intent and how it is fulfilled; the host mounts the primitive and places it, so the widget never knows its surface.
+`,
+			},
+		},
+	},
+};
+
+/*
+ * The demo application's router. The link and the capability are module
+ * constants: the provider memoizes on the value's identity, so a fresh
+ * object per render would remount every anchor below it.
+ */
+const DEMO_ROUTE_PREFIX = 'admin.php?page=demo-dashboard&p=';
+const DEMO_NAVIGATE_EVENT = 'wp-widget-primitives-demo-navigate';
+
+const RouteLink = forwardRef<
+	HTMLAnchorElement,
+	{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
+>( function RouteLink( { path, onClick, children, ...props }, ref ) {
+	return (
+		<a
+			ref={ ref }
+			href={ path }
+			{ ...props }
+			onClick={ ( event ) => {
+				onClick?.( event );
+				event.preventDefault();
+				window.dispatchEvent(
+					new CustomEvent( DEMO_NAVIGATE_EVENT, { detail: path } )
+				);
+			} }
+		>
+			{ children }
+		</a>
+	);
+} );
+
+const demoLinks: WidgetHostLinks = {
+	match: ( href ) =>
+		href.startsWith( DEMO_ROUTE_PREFIX )
+			? decodeURIComponent( href.slice( DEMO_ROUTE_PREFIX.length ) )
+			: null,
+	Link: RouteLink,
+};
+
+const DEMO_HOST: WidgetHost = { links: demoLinks };
+const NO_CAPABILITIES: WidgetHost = {};
+
+const hostLinkWidgetType: WidgetType< DemoAttributes > = {
+	...demoWidgetType,
+	actions: [
+		{
+			id: 'see-report',
+			label: 'See report',
+			href: `${ DEMO_ROUTE_PREFIX }${ encodeURIComponent(
+				'/reports?by=world'
+			) }`,
+		},
+		...( actionsWidgetType.actions ?? [] ),
+	] satisfies WidgetAction[],
+};
+
+function WidgetWithHostLink() {
+	const titleId = useId();
+	const actions = hostLinkWidgetType.actions ?? [];
+	const [ hasCapability, setHasCapability ] = useState( true );
+	const [ lastPath, setLastPath ] = useState< string | null >( null );
+	const [ attributes ] = useState< DemoAttributes >( {
+		...hostLinkWidgetType.example?.attributes,
+	} );
+
+	useEffect( () => {
+		const onNavigate = ( event: Event ) =>
+			setLastPath( ( event as CustomEvent< string > ).detail );
+
+		window.addEventListener( DEMO_NAVIGATE_EVENT, onNavigate );
+		return () =>
+			window.removeEventListener( DEMO_NAVIGATE_EVENT, onNavigate );
+	}, [] );
+
+	let status = 'Pick "See report": its target is a route this host owns.';
+	if ( ! hasCapability ) {
+		status = 'No links capability: every action is a plain anchor.';
+	} else if ( lastPath ) {
+		status = `Client-side navigation to ${ lastPath }; the document never reloaded.`;
+	}
+
+	return (
+		<WidgetHostProvider
+			value={ hasCapability ? DEMO_HOST : NO_CAPABILITIES }
+		>
+			<Stack direction="column" gap="md" style={ { maxWidth: 560 } }>
+				<Stack direction="row" align="center" gap="md" wrap="wrap">
+					<Button
+						variant="outline"
+						size="compact"
+						onClick={ () => {
+							setHasCapability( ! hasCapability );
+							setLastPath( null );
+						} }
+					>
+						{ hasCapability
+							? 'Remove the capability'
+							: 'Provide the capability' }
+					</Button>
+					<p
+						role="status"
+						style={ {
+							margin: 0,
+							color: 'var(--wpds-color-foreground-content-neutral-weak)',
+							fontSize: 'var(--wpds-typography-font-size-sm)',
+						} }
+					>
+						{ status }
+					</p>
+				</Stack>
+
+				<Card.Root render={ <section /> } aria-labelledby={ titleId }>
+					<Card.Header>
+						<Stack direction="column" gap="sm">
+							<Stack direction="row" align="center" gap="sm">
+								{ hostLinkWidgetType.icon && (
+									<span aria-hidden="true">
+										<Icon
+											icon={ hostLinkWidgetType.icon }
+										/>
+									</span>
+								) }
+								<Card.Title id={ titleId } render={ <h3 /> }>
+									{ hostLinkWidgetType.title }
+								</Card.Title>
+							</Stack>
+
+							{ /* One composition per action, whatever the target. */ }
+							<Stack
+								direction="row"
+								align="center"
+								gap="md"
+								wrap="wrap"
+							>
+								{ actions.map( ( action ) => (
+									<Link
+										key={ action.id }
+										download={ action.download }
+										openInNewTab={ action.openInNewTab }
+										render={
+											<HostLink href={ action.href } />
+										}
+									>
+										{ action.label }
+									</Link>
+								) ) }
+							</Stack>
+						</Stack>
+					</Card.Header>
+					<Card.Content>
+						<Suspense fallback={ null }>
+							<WidgetRender< DemoAttributes >
+								widgetType={ hostLinkWidgetType }
+								attributes={ attributes }
+								resolveWidgetModule={ resolveDemoModule }
+							/>
+						</Suspense>
+					</Card.Content>
+				</Card.Root>
+			</Stack>
+		</WidgetHostProvider>
+	);
+}
+
+export const WithHostLink: StoryObj = {
+	render: () => <WidgetWithHostLink />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+The widget declares where to go; the application decides how to get there. \`HostLink\` is the anchor that carries the decision: it reads the \`links\` capability, mounts the application's own link for a target \`match\` recognizes, and a plain anchor for everything else.
+
+**In this demo**
+
+- The host provides a router that owns \`admin.php?page=demo-dashboard&p=…\`. "See report" targets one of its routes, so it navigates client-side and the status line records the path; the document never reloads.
+- "Open docs" opens another origin in a new tab and "Export greeting" downloads a file. Neither routes: a new document leaves the application, so \`HostLink\` keeps the plain anchor without asking the host.
+- **Remove the capability** drops \`links\` from the host bag. The declarations do not change, and every action falls back to a plain anchor.
+
+**Takeaway**
+
+Consumers write one composition, \`render={ <HostLink href={ action.href } /> }\` on their UI link, and never branch on the capability themselves. \`Link\`, \`LinkButton\` and \`Menu.LinkItem\` take the same anchor props, so the same line serves all three.
+`,
+			},
+		},
+	},
+};
+
+/*
+ * The application's icon vocabulary: one resolver, registered once.
+ * Records reference icons by name; the resolver returns elements.
+ */
+const STORY_ICONS: Record< string, WidgetIcon > = {
+	'demo/planet': globe,
+};
+
+registerIconResolver( async ( reference ) => STORY_ICONS[ reference ] ?? null );
+
+const referencedIconWidgetType: WidgetType< DemoAttributes > = {
+	...demoWidgetType,
+	icon: undefined,
+};
+
+function WidgetWithIconReference() {
+	const titleId = useId();
+	const [ attributes ] = useState< DemoAttributes >( {
+		...referencedIconWidgetType.example?.attributes,
+	} );
+	const [ icon, setIcon ] = useState< WidgetIcon | null >( null );
+
+	// Hosts get the resolved icon through `useWidgetTypes`; the story
+	// resolves the reference itself.
+	useEffect( () => {
+		let cancelled = false;
+		void resolveIcon( 'demo/planet' ).then( ( resolved ) => {
+			if ( ! cancelled ) {
+				setIcon( resolved );
+			}
+		} );
+		return () => {
+			cancelled = true;
+		};
+	}, [] );
+
+	return (
+		<div style={ { maxWidth: 560 } }>
+			<Card.Root render={ <section /> } aria-labelledby={ titleId }>
+				<Card.Header>
+					<Stack direction="row" align="center" gap="sm">
+						{ icon && (
+							<span aria-hidden="true">
+								<Icon icon={ icon } />
+							</span>
+						) }
+						<Card.Title
+							id={ titleId }
+							render={ <h3 /> }
+							style={ { flexGrow: 1 } }
+						>
+							{ referencedIconWidgetType.title }
+						</Card.Title>
+					</Stack>
+				</Card.Header>
+				<Card.Content>
+					<Suspense fallback={ null }>
+						<WidgetRender< DemoAttributes >
+							widgetType={ referencedIconWidgetType }
+							attributes={ attributes }
+							resolveWidgetModule={ resolveDemoModule }
+						/>
+					</Suspense>
+				</Card.Content>
+			</Card.Root>
+		</div>
+	);
+}
+
+export const WithIconReference: StoryObj = {
+	render: () => <WidgetWithIconReference />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+The widget declares its icon as a **registered icon name** instead of a rendered element:
+
+1. The application registers one **icon resolver** (\`registerIconResolver\`), closing over its icon source. On WordPress that source is the \`icon\` REST entity; here, a local catalog.
+2. The widget declares \`"icon": "demo/planet"\` in \`widget.json\`. Pure data: no imports, no elements.
+3. \`useWidgetTypes\` resolves the reference while assembling each \`WidgetType\` (the story calls the resolver itself), so the host receives a renderable element and never sees the name.
+
+An unresolvable reference degrades to no icon. See the **Icons** doc for the full pipeline.
 `,
 			},
 		},

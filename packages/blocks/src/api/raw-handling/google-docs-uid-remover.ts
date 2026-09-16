@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { unwrap } from '@wordpress/dom';
 
 export default function googleDocsUIdRemover( node: Node ): void {

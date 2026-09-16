@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock, unlock } from './lock-unlock';
@@ -88,6 +81,7 @@ import {
 	isHashLink,
 	isRelativePath,
 } from './components/link-control/is-url-like';
+import { isElementVisible } from './utils/dom';
 
 const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 
@@ -166,4 +160,5 @@ lock( privateApis, {
 	InnerContent,
 	useNativeUndo,
 	usesNativeUndo,
+	isElementVisible,
 } );

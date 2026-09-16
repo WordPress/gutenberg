@@ -1,14 +1,21 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
 import { SearchableSelect } from '../';
+import {
+	GROUPED_ITEMS,
+	type FixtureGroup,
+	type FixtureItem,
+} from '../../combobox/stories/fixtures';
 import { ITEMS } from './fixtures';
 
 const meta: Meta< typeof SearchableSelect > = {
 	title: 'Design System/Components/Form/Primitives/SearchableSelect',
 	component: SearchableSelect,
 	subcomponents: {
+		'SearchableSelect.Group': SearchableSelect.Group,
+		'SearchableSelect.GroupLabel': SearchableSelect.GroupLabel,
 		'SearchableSelect.Item': SearchableSelect.Item,
+		'SearchableSelect.Collection': SearchableSelect.Collection,
 	},
 	argTypes: {
 		items: { control: false },
@@ -28,55 +35,22 @@ type Story = StoryObj< typeof SearchableSelect >;
 
 export const Default: Story = {
 	args: {
-		defaultValue: ITEMS[ 0 ],
+		'aria-label': 'Fruit',
 		items: ITEMS,
 	},
 };
 
 /**
- * The `creatableItem` prop is used to add some kind of "Create new item"
- * action item to the footer of the list.
+ * When no value is selected, the trigger shows the default placeholder text.
  *
- * In the `onValueChange` function, add some logic to handle the creation of a new item
- * whenever the `creatableItem` is selected.
+ * Use the `placeholder` prop to customize text shown.
+ * Prefer a concise label without a trailing ellipsis.
  */
-export const Creatable: Story = {
+export const WithCustomPlaceholder: Story = {
 	args: {
-		...Default.args,
-	},
-	render: function Template( args ) {
-		const [ inputValue, setInputValue ] = useState( '' );
-		const [ value, setValue ] = useState<
-			React.ComponentProps< typeof SearchableSelect >[ 'value' ]
-		>( ITEMS[ 0 ] );
-		const creatableItem = {
-			value: 'create',
-			label:
-				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
-		};
-
-		return (
-			<SearchableSelect
-				{ ...args }
-				creatableItem={ creatableItem }
-				inputValue={ inputValue }
-				onInputValueChange={ setInputValue }
-				value={ value }
-				onValueChange={ ( newValue, event ) => {
-					if ( ! newValue ) {
-						return;
-					}
-
-					if ( newValue.value === 'create' ) {
-						// eslint-disable-next-line no-alert
-						alert( `Create new item: '${ inputValue }'` );
-					} else {
-						setValue( newValue );
-					}
-					args.onValueChange?.( newValue, event );
-				} }
-			/>
-		);
+		'aria-label': 'Fruit',
+		items: ITEMS,
+		placeholder: 'Choose an item',
 	},
 };
 
@@ -110,9 +84,9 @@ const CustomFruitItem = ( { label }: { label: string } ) => (
 export const WithCustomTriggerAndItems: Story = {
 	args: {
 		...Default.args,
-		triggerContent: ( item: ( typeof ITEMS )[ 0 ] ) => (
-			<CustomFruitItem label={ item.label } />
-		),
+		defaultValue: ITEMS[ 0 ],
+		triggerContent: ( item: ( typeof ITEMS )[ 0 ] | null ) =>
+			item ? <CustomFruitItem label={ item.label } /> : null,
 		children: ( item: ( typeof ITEMS )[ 0 ] ) => (
 			<SearchableSelect.Item key={ item.value } value={ item }>
 				😋 { item.label }
@@ -129,5 +103,36 @@ export const WithCustomEmptyContent: Story = {
 	args: {
 		...Default.args,
 		emptyContent: 'No fruits found 🥺',
+	},
+};
+
+/**
+ * To render grouped items, pass an array of groups to `items` (each with
+ * `label` and `items` properties) and provide `children` that renders each
+ * group using `SearchableSelect.Group`, `SearchableSelect.GroupLabel`,
+ * and `SearchableSelect.Collection`. Grouped items have no default
+ * renderer, so `children` is required.
+ */
+export const Grouped: Story = {
+	args: {
+		...Default.args,
+		items: GROUPED_ITEMS,
+		children: ( group: FixtureGroup ) => (
+			<SearchableSelect.Group key={ group.label } items={ group.items }>
+				<SearchableSelect.GroupLabel>
+					{ group.label }
+				</SearchableSelect.GroupLabel>
+				<SearchableSelect.Collection>
+					{ ( item: FixtureItem ) => (
+						<SearchableSelect.Item
+							key={ item.value }
+							value={ item }
+						>
+							{ item.label }
+						</SearchableSelect.Item>
+					) }
+				</SearchableSelect.Collection>
+			</SearchableSelect.Group>
+		),
 	},
 };

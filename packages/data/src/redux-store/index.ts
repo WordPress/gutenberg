@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { createStore, applyMiddleware } from 'redux';
 import type { Store as ReduxStore, StoreEnhancer } from 'redux';
 import EquivalentKeyMap from 'equivalent-key-map';
-
-/**
- * WordPress dependencies
- */
 import createReduxRoutineMiddleware from '@wordpress/redux-routine';
 import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { combineReducers } from './combine-reducers';
 import { builtinControls } from '../controls';
 import { lock } from '../lock-unlock';
@@ -279,8 +268,7 @@ export default function createReduxStore< State, Actions, Selectors >(
 				),
 				...mapValues(
 					options.actions as
-						| Record< string, ActionCreator >
-						| undefined,
+						Record< string, ActionCreator > | undefined,
 					bindAction
 				),
 			};
@@ -318,7 +306,7 @@ export default function createReduxStore< State, Actions, Selectors >(
 					? mapValues(
 							options.resolvers as Record< string, any >,
 							mapResolver
-					  )
+						)
 					: {};
 
 			// Bind a selector to the store. Call the selector with the current state, correct registry,
