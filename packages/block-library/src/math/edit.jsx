@@ -51,7 +51,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 
 	return (
 		<div { ...blockProps }>
-			{ mathML && (
+			{ mathML ? (
 				<math
 					// We can't spread block props on the math element because
 					// it only supports a limited amount of global attributes.
@@ -59,19 +59,17 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					display="block"
 					dangerouslySetInnerHTML={ { __html: mathML } }
 				/>
-			) }
-			{ ! mathML && latex && (
+			) : (
 				// Show the source until it renders, as the front end does.
 				<math display="block">
 					<semantics>
 						{ /* eslint-disable-next-line react/no-unknown-property -- MathML attribute. */ }
 						<annotation encoding="application/x-tex">
-							{ latex }
+							{ latex || '\u200B' }
 						</annotation>
 					</semantics>
 				</math>
 			) }
-			{ ! mathML && ! latex && '\u200B' }
 			{ isSelected && (
 				<Popover
 					placement="bottom-start"
