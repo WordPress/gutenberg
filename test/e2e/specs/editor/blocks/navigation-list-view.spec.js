@@ -1,6 +1,9 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block - List view editing', () => {
+	const TEST_CATEGORY_NAME = 'Test Category 1';
+	let testCategory;
+
 	const navMenuBlocksFixture = {
 		title: 'Test Menu',
 		content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
@@ -23,6 +26,26 @@ test.describe( 'Navigation block - List view editing', () => {
 			title: 'Test Page 3',
 			status: 'publish',
 		} );
+		await requestUtils.createPost( {
+			title: 'Test Post 1',
+			status: 'publish',
+		} );
+		const staleTerms = await requestUtils.rest( {
+			path: '/wp/v2/categories',
+			params: { search: TEST_CATEGORY_NAME },
+		} );
+		await Promise.all(
+			staleTerms.map( ( term ) =>
+				requestUtils.rest( {
+					method: 'DELETE',
+					path: `/wp/v2/categories/${ term.id }`,
+					params: { force: true },
+				} )
+			)
+		);
+		testCategory = await requestUtils.createRecord( 'categories', {
+			name: TEST_CATEGORY_NAME,
+		} );
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -35,6 +58,11 @@ test.describe( 'Navigation block - List view editing', () => {
 			requestUtils.deleteAllPosts(),
 			requestUtils.deleteAllMenus(),
 		] );
+		await requestUtils.rest( {
+			method: 'DELETE',
+			path: `/wp/v2/categories/${ testCategory.id }`,
+			params: { force: true },
+		} );
 	} );
 
 	test.use( {
@@ -201,18 +229,38 @@ test.describe( 'Navigation block - List view editing', () => {
 		expect( secondResultType ).toBe( 'Page' );
 		expect( thirdResultType ).toBe( 'Page' );
 
-		// Grab the text from the first result so we can check (later on) that it was inserted.
-		const firstResultText =
-			await linkControl.getSearchResultText( firstResult );
+		// Searching reaches every entity type, not only pages, and pages are
+		// still listed first because the appended item is a Page Link.
+		// See https://github.com/WordPress/gutenberg/issues/77072.
+		await page.keyboard.type( 'Test', { delay: 50 } );
+
+		const searchedResults = await linkControl.getSearchResults();
+		await expect( searchedResults.first() ).toBeVisible();
+
+		expect(
+			await linkControl.getSearchResultType( searchedResults.first() )
+		).toBe( 'Page' );
+
+		const categoryResult = searchedResults.filter( {
+			hasText: TEST_CATEGORY_NAME,
+		} );
+		await expect( categoryResult ).toBeVisible();
+		expect( await linkControl.getSearchResultType( categoryResult ) ).toBe(
+			'Category'
+		);
+
+		await expect(
+			searchedResults.filter( { hasText: 'Test Post 1' } )
+		).toBeVisible();
 
 		// Create the link.
-		await firstResult.click();
+		await categoryResult.click();
 
 		// Check the new menu item was inserted at the end of the existing menu.
 		await expect(
 			listView
 				.getByRole( 'gridcell', {
-					name: firstResultText,
+					name: TEST_CATEGORY_NAME,
 				} )
 				.filter( {
 					hasText: 'Block 3 of 3, Level 1.', // proxy for filtering by description.
