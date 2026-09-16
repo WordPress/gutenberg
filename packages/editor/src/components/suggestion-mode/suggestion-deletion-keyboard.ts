@@ -123,10 +123,10 @@ export function isBufferedDeleteRepeat(
 ): boolean {
 	return Boolean(
 		run &&
-			run.id === null &&
-			run.clientId === clientId &&
-			run.attributeKey === attributeKey &&
-			run.dir === ( isBackward ? 'backward' : 'forward' )
+		run.id === null &&
+		run.clientId === clientId &&
+		run.attributeKey === attributeKey &&
+		run.dir === ( isBackward ? 'backward' : 'forward' )
 	);
 }
 
@@ -177,11 +177,11 @@ export function isContiguousDeleteRun(
 ): boolean {
 	return Boolean(
 		run &&
-			run.id !== null &&
-			run.clientId === clientId &&
-			run.attributeKey === attributeKey &&
-			run.dir === ( isBackward ? 'backward' : 'forward' ) &&
-			run.caret === pos
+		run.id !== null &&
+		run.clientId === clientId &&
+		run.attributeKey === attributeKey &&
+		run.dir === ( isBackward ? 'backward' : 'forward' ) &&
+		run.caret === pos
 	);
 }
 
