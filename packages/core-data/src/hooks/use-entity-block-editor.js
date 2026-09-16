@@ -12,24 +12,26 @@ const EMPTY_ARRAY = [];
  * Hook that returns block content getters and setters for
  * the nearest provided entity of the specified type.
  *
- * The return value has the shape `[ blocks, onInput, onChange ]`.
+ * The return value has the shape
+ * `[ blocks, onInput, onChange, { selection, onChangeSelection } ]`.
  * `onInput` is for block changes that don't create undo levels
  * or dirty the post, non-persistent changes, and `onChange` is for
  * persistent changes. They map directly to the props of a
  * `BlockEditorProvider` and are intended to be used with it,
- * or similar components or hooks.
+ * or similar components or hooks. `selection`/`onChangeSelection`
+ * read and write this entity's own selection.
  *
  * @param {string} kind         The entity kind.
  * @param {string} name         The entity name.
  * @param {Object} options
  * @param {string} [options.id] An entity ID to use instead of the context-provided one.
  *
- * @return {[unknown[], Function, Function]} The block array and setters.
+ * @return {[unknown[], Function, Function, Object]} The block array, setters, and selection state.
  */
 export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
-	const { content, editedBlocks, meta } = useSelect(
+	const { content, editedBlocks, meta, selection } = useSelect(
 		( select ) => {
 			if ( ! id ) {
 				return {};
@@ -40,6 +42,7 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 				editedBlocks: editedRecord.blocks,
 				content: editedRecord.content,
 				meta: editedRecord.meta,
+				selection: editedRecord.selection,
 			};
 		},
 		[ kind, name, id ]
@@ -80,13 +83,13 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			if ( noChange ) {
 				return __unstableCreateUndoLevel( kind, name, id );
 			}
-			const { selection, ...rest } = options;
+			const { selection: newSelection, ...rest } = options;
 
 			// We create a new function here on every persistent edit
 			// to make sure the edit makes the post dirty and creates
 			// a new undo level.
 			const edits = {
-				selection,
+				selection: newSelection,
 				content: ( { blocks: blocksForSerialization = [] } ) =>
 					__unstableSerializeAndClean( blocksForSerialization ),
 				...updateFootnotesFromMeta( newBlocks, meta ),
@@ -110,9 +113,9 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 	const onInput = useCallback(
 		( newBlocks, options ) => {
-			const { selection, ...rest } = options;
+			const { selection: newSelection, ...rest } = options;
 			const edits = {
-				selection,
+				selection: newSelection,
 				...updateFootnotesFromMeta( newBlocks, meta ),
 			};
 
@@ -124,5 +127,18 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		[ kind, name, id, meta, editEntityRecord ]
 	);
 
-	return [ blocks, onInput, onChange ];
+	const onChangeSelection = useCallback(
+		( newSelection ) => {
+			editEntityRecord(
+				kind,
+				name,
+				id,
+				{ selection: newSelection },
+				{ undoIgnore: true }
+			);
+		},
+		[ kind, name, id, editEntityRecord ]
+	);
+
+	return [ blocks, onInput, onChange, { selection, onChangeSelection } ];
 }
