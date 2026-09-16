@@ -1,13 +1,10 @@
 /**
- * Entity kinds a Navigation Link block cannot represent. The unscoped search
- * returns attachments, but `kind` on the block only models post types and
- * taxonomies, so selecting one would write an attribute the block does not
- * understand. See `updateAttributes`.
+ * Remove unsupported kinds from the search results (e.g. media)
  */
 const UNSUPPORTED_KINDS = [ 'media' ];
 
 /**
- * Types the block stores under a different name than the search API returns.
+ * Normalize types for necessary conversions. For example, 'tag' needs to be converted to 'post_tag'.
  */
 const TYPE_ALIASES = {
 	tag: 'post_tag',
@@ -16,29 +13,24 @@ const TYPE_ALIASES = {
 
 const ENTITY_KINDS = [ 'post-type', 'taxonomy' ];
 
-function normalizeType( type ) {
-	return TYPE_ALIASES[ type ] ?? type;
-}
-
 /**
- * Work out which entity type should be listed first.
+ * Describe an entity the way the search API spells it.
  *
- * A link that is already bound to an entity keeps searching within its own kind
- * of thing: a Category Link lists categories first, a Page Link lists pages
- * first. A link with nothing bound yet — a freshly appended item, or a custom
- * link — lists pages first.
+ * Applies the aliases above, and falls back to pages for anything not bound to
+ * an entity, so that a freshly appended item or a custom link lists pages
+ * first.
  *
- * @param {Object} attributes        Navigation Link block attributes.
- * @param {string} [attributes.type] The block's type attribute.
- * @param {string} [attributes.kind] The block's kind attribute.
- * @return {{type: string, kind: string|undefined}} The type and kind to prioritise.
+ * @param {Object} entity        A Navigation Link block's attributes, or a suggestion.
+ * @param {string} [entity.type] The entity type.
+ * @param {string} [entity.kind] The entity kind (post-type|taxonomy).
+ * @return {{type: string, kind: string}} The normalized type and kind.
  */
-function getPriority( { type, kind } ) {
-	if ( ENTITY_KINDS.includes( kind ) ) {
-		return { type: normalizeType( type ), kind };
+function normalizeEntity( { type, kind } ) {
+	if ( ! ENTITY_KINDS.includes( kind ) ) {
+		return { type: 'page', kind: 'post-type' };
 	}
 
-	return { type: 'page', kind: 'post-type' };
+	return { type: TYPE_ALIASES[ type ] ?? type, kind };
 }
 
 /**
@@ -53,7 +45,7 @@ function getPriority( { type, kind } ) {
  * @return {Array} The suggestions to display.
  */
 export function transformSuggestions( suggestions, attributes = {} ) {
-	const priority = getPriority( attributes );
+	const priority = normalizeEntity( attributes );
 
 	const prioritised = [];
 	const rest = [];
@@ -63,11 +55,15 @@ export function transformSuggestions( suggestions, attributes = {} ) {
 			continue;
 		}
 
+		const entity = normalizeEntity( suggestion );
 		const isPriority =
-			normalizeType( suggestion.type ) === priority.type &&
-			suggestion.kind === priority.kind;
+			entity.type === priority.type && entity.kind === priority.kind;
 
-		( isPriority ? prioritised : rest ).push( suggestion );
+		if ( isPriority ) {
+			prioritised.push( suggestion );
+		} else {
+			rest.push( suggestion );
+		}
 	}
 
 	return [ ...prioritised, ...rest ];
