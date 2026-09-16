@@ -176,12 +176,6 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 			$response->set_data( $data );
 		}
 
-		/*
-		 * Keywords are exposed so that clients filtering icons locally -- such as
-		 * the Icon block's library modal, which fetches every icon once and then
-		 * filters in the browser -- can match them without a request per keystroke.
-		 * Always send an array so consumers do not have to handle a missing field.
-		 */
 		if ( rest_is_field_included( 'keywords', $fields ) ) {
 			$data             = $response->get_data();
 			$data['keywords'] = isset( $item['keywords'] ) ? array_values( $item['keywords'] ) : array();
