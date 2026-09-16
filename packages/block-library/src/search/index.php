@@ -352,6 +352,48 @@ function apply_block_core_search_border_styles( $attributes, $property, &$wrappe
 }
 
 /**
+ * Returns the CSS width for the search block, or null when no width is set.
+ *
+ * The width lives in the `dimensions.width` block support. Content saved before
+ * that support was adopted still carries the older `width` and `widthUnit`
+ * attributes, and only moves to the new location once the post is re-opened and
+ * re-saved in the editor, so both locations are read here indefinitely.
+ *
+ * @since 7.2.0
+ *
+ * @param array $attributes The block attributes.
+ *
+ * @return string|null The CSS width, or null if none is set.
+ */
+function block_core_search_get_width( $attributes ) {
+	$width = $attributes['style']['dimensions']['width'] ?? null;
+
+	if ( is_string( $width ) && '' !== $width ) {
+		// Turn a preset reference such as `var:preset|dimension|50` into its CSS variable.
+		if ( str_starts_with( $width, 'var:preset|dimension|' ) ) {
+			$slug = _wp_to_kebab_case( substr( $width, strlen( 'var:preset|dimension|' ) ) );
+			return "var(--wp--preset--dimension--$slug)";
+		}
+
+		/*
+		 * The Width control's leftmost step is labelled "None" and writes the
+		 * string '0', meaning no width rather than a zero-width field. Either
+		 * way the block support has answered, so a block that still carries the
+		 * legacy attributes does not fall back to them and resurrect a width
+		 * the user has just cleared.
+		 */
+		return '0' === $width ? null : $width;
+	}
+
+	// Fall back to the pre-block-support attributes.
+	if ( ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] ) ) {
+		return sprintf( '%d%s', $attributes['width'], $attributes['widthUnit'] );
+	}
+
+	return null;
+}
+
+/**
  * Builds an array of inline styles for the search block.
  *
  * The result will contain one entry for shared styles such as those for the
@@ -374,14 +416,10 @@ function styles_for_block_core_search( $attributes ) {
 	$show_label       = ( isset( $attributes['showLabel'] ) ) && false !== $attributes['showLabel'];
 
 	// Add width styles.
-	$has_width = ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] );
+	$width = block_core_search_get_width( $attributes );
 
-	if ( $has_width ) {
-		$wrapper_styles[] = sprintf(
-			'width: %d%s;',
-			esc_attr( $attributes['width'] ),
-			esc_attr( $attributes['widthUnit'] )
-		);
+	if ( null !== $width ) {
+		$wrapper_styles[] = sprintf( 'width: %s;', esc_attr( $width ) );
 	}
 
 	// Add border width and color styles.
