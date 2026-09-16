@@ -410,7 +410,7 @@ const getPatternEditingContextualCommands = () =>
 					? [
 							selectedBlockClientId,
 							...getBlockParents( selectedBlockClientId, true ),
-					  ]
+						]
 					: [];
 
 			return {
@@ -609,12 +609,12 @@ const getManipulateDocumentCommands = () =>
 							/* translators: %s: template title */
 							__( 'Reset template: %s' ),
 							decodeEntities( template.title )
-					  )
+						)
 					: sprintf(
 							/* translators: %s: template part title */
 							__( 'Reset template part: %s' ),
 							decodeEntities( template.title )
-					  );
+						);
 			commands.push( {
 				name: 'core/reset-template',
 				label,

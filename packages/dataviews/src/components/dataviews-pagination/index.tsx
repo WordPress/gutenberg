@@ -1,4 +1,7 @@
-import { Button, SelectControl } from '@wordpress/components';
+import {
+	Button,
+	SelectControl as WCSelectControl,
+} from '@wordpress/components';
 import { createInterpolateElement, memo, useContext } from '@wordpress/element';
 import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
@@ -40,7 +43,7 @@ export function DataViewsPagination() {
 								__( 'Page %1$d of %2$d' ),
 								currentPage,
 								totalPages
-						  )
+							)
 						: page.toString(),
 			};
 		}
@@ -72,7 +75,7 @@ export function DataViewsPagination() {
 						div: <div aria-hidden />,
 						// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
 						CurrentPage: (
-							<SelectControl
+							<WCSelectControl
 								aria-label={ __( 'Current page' ) }
 								value={ currentPage.toString() }
 								options={ pageSelectOptions }

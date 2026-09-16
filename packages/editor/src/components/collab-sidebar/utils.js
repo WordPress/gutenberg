@@ -397,7 +397,7 @@ export function removeNoteFormat( value, noteId ) {
 	return changed
 		? RichTextData.fromHTMLString(
 				new RichTextData( { ...record, formats } ).toHTMLString()
-		  )
+			)
 		: null;
 }
 

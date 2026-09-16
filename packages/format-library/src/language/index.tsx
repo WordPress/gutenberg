@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	TextControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Button,
 	Popover,
 } from '@wordpress/components';
@@ -114,7 +114,7 @@ function InlineLanguageUI( {
 						'A valid language attribute, like "en" or "fr".'
 					) }
 				/>
-				<SelectControl
+				<WCSelectControl
 					label={ __( 'Text direction' ) }
 					value={ dir }
 					options={ [
