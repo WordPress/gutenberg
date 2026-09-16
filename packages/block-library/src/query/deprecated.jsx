@@ -82,7 +82,7 @@ const migrateColors = ( attributes, innerBlocks ) => {
 					elements: style?.elements?.link
 						? { link: style?.elements?.link }
 						: undefined,
-			  } )
+				} )
 			: undefined;
 
 		// Create a new Group block from the original.

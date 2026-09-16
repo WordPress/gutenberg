@@ -108,7 +108,7 @@ function useEditorStyles( settings ) {
 			} );
 		}
 
-		return hasThemeStyles ? settings.styles ?? [] : defaultEditorStyles;
+		return hasThemeStyles ? ( settings.styles ?? [] ) : defaultEditorStyles;
 	}, [
 		settings.defaultEditorStyles,
 		settings.disableLayoutStyles,

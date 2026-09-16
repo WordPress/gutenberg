@@ -78,7 +78,7 @@ function EditorKeyboardShortcutsRegister() {
 							modifier: 'primary',
 							character: 'y',
 						},
-				  ],
+					],
 		} );
 
 		registerShortcut( {
