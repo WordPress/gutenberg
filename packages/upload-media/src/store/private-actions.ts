@@ -847,7 +847,7 @@ export function prepareItem( id: QueueItemId ) {
 			? new File( [ file ], `${ getFileBasename( file.name ) }.heic`, {
 					type: HEIC_MIME_TYPES[ 0 ],
 					lastModified: file.lastModified,
-			  } )
+				} )
 			: file;
 
 		// Gate very large images out of client-side processing. wasm-vips is
