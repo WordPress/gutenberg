@@ -98,6 +98,20 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Invokes WP_Icons_Registry_Gutenberg::sanitize_icon_content despite it being protected
+	 *
+	 * @param string $icon_content The icon SVG content to sanitize.
+	 * @return string The sanitized icon SVG content.
+	 */
+	private function sanitize_icon_content( $icon_content ) {
+		$method = new ReflectionMethod( $this->registry, 'sanitize_icon_content' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+		return $method->invoke( $this->registry, $icon_content );
+	}
+
+	/**
 	 * Provides valid namespaced icon names, including names that contain,
 	 * start or end with digits, as well as underscores and hyphens.
 	 *
@@ -400,101 +414,53 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Provides the supported icon content sources.
+	 * Should sanitize icon content, allowing the supported SVG elements and attributes.
 	 *
-	 * @return array<string, array{0: bool}>
+	 * @dataProvider data_sanitize_icon_content
+	 *
+	 * @param string $input    The icon content to sanitize.
+	 * @param string $expected The expected sanitized output.
 	 */
-	public function data_icon_content_sources(): array {
+	public function test_sanitize_icon_content( $input, $expected ) {
+		$this->assertSame( $expected, $this->sanitize_icon_content( $input ) );
+	}
+
+	/**
+	 * Data provider for test_sanitize_icon_content.
+	 *
+	 * @return array<string, array{0: string, 1: string}> Data sets of [ $input, $expected ].
+	 */
+	public function data_sanitize_icon_content() {
 		return array(
-			'inline content' => array( false ),
-			'file path'      => array( true ),
+			'allows fill and clip rules on svg'            => array(
+				'<svg fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M0 0" /></svg>',
+				'<svg fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M0 0" /></svg>',
+			),
+			'allows stroke attributes and style on svg'    => array(
+				'<svg style="fill: none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" vector-effect="non-scaling-stroke"><path d="M0 0" /></svg>',
+				'<svg style="fill: none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" vector-effect="non-scaling-stroke"><path d="M0 0" /></svg>',
+			),
+			'allows clip rule, opacity and stroke on path' => array(
+				'<svg><path d="M0 0" fill-rule="evenodd" clip-rule="evenodd" opacity="0.4" style="fill: none" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
+				'<svg><path d="M0 0" fill-rule="evenodd" clip-rule="evenodd" opacity="0.4" style="fill: none" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
+			),
+			'allows clip rule and stroke on polygon'       => array(
+				'<svg><polygon points="0,0 1,1" clip-rule="evenodd" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
+				'<svg><polygon points="0,0 1,1" clip-rule="evenodd" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
+			),
+			'allows rect'                                  => array(
+				'<svg><rect x="4" y="5" width="16" height="14" rx="2" ry="2" fill="currentColor" stroke="currentColor" transform="rotate(45)" vector-effect="non-scaling-stroke" /></svg>',
+				'<svg><rect x="4" y="5" width="16" height="14" rx="2" ry="2" fill="currentColor" stroke="currentColor" transform="rotate(45)" vector-effect="non-scaling-stroke" /></svg>',
+			),
+			'allows circle'                                => array(
+				'<svg><circle cx="12" cy="12" r="3" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" transform="rotate(45)" vector-effect="non-scaling-stroke" /></svg>',
+				'<svg><circle cx="12" cy="12" r="3" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" transform="rotate(45)" vector-effect="non-scaling-stroke" /></svg>',
+			),
+			'strips opacity on elements other than path'   => array(
+				'<svg opacity="0.4"><rect width="1" height="1" opacity="0.4" /></svg>',
+				'<svg><rect width="1" height="1" /></svg>',
+			),
 		);
-	}
-
-	/**
-	 * Should preserve stroke attributes when sanitizing registered icons.
-	 *
-	 * @dataProvider data_icon_content_sources
-	 *
-	 * @param bool $use_file_path Whether to register the icon from a file path.
-	 */
-	public function test_stroke_attributes_survive_sanitization( bool $use_file_path ) {
-		$content  = '<svg fill="currentColor" style="fill: none" stroke="currentColor" stroke-width="1.5"><path d="M0 0" vector-effect="non-scaling-stroke"/><polygon points="0,0 1,1" stroke="currentColor" vector-effect="non-scaling-stroke"/></svg>';
-		$name     = 'test-collection/stroke-icon';
-		$settings = array(
-			'label' => 'Stroke Icon',
-		);
-
-		if ( $use_file_path ) {
-			$settings['file_path'] = $this->create_temp_icon_file( $content );
-		} else {
-			$settings['content'] = $content;
-		}
-
-		$this->assertTrue( $this->register( $name, $settings ) );
-
-		$icon = $this->registry->get_registered_icon( $name );
-		$this->assertStringContainsString( 'fill="currentColor"', $icon['content'] );
-		$this->assertStringContainsString( 'style="fill: none"', $icon['content'] );
-		$this->assertStringContainsString( 'stroke="currentColor"', $icon['content'] );
-		$this->assertStringContainsString( 'stroke-width="1.5"', $icon['content'] );
-		$this->assertStringContainsString( 'vector-effect="non-scaling-stroke"', $icon['content'] );
-		$this->assertStringContainsString( '<polygon points="0,0 1,1" stroke="currentColor" vector-effect="non-scaling-stroke"', $icon['content'] );
-	}
-
-	/**
-	 * Should preserve clip rules when sanitizing registered icons.
-	 *
-	 * @dataProvider data_icon_content_sources
-	 *
-	 * @param bool $use_file_path Whether to register the icon from a file path.
-	 */
-	public function test_clip_rule_survives_sanitization( bool $use_file_path ) {
-		$content  = '<svg><path d="M0 0" fill-rule="evenodd" clip-rule="evenodd" /></svg>';
-		$name     = 'test-collection/clip-rule-icon';
-		$settings = array(
-			'label' => 'Clip Rule Icon',
-		);
-
-		if ( $use_file_path ) {
-			$settings['file_path'] = $this->create_temp_icon_file( $content );
-		} else {
-			$settings['content'] = $content;
-		}
-
-		$this->assertTrue( $this->register( $name, $settings ) );
-
-		$icon = $this->registry->get_registered_icon( $name );
-		$this->assertStringContainsString( 'clip-rule="evenodd"', $icon['content'] );
-	}
-
-	/**
-	 * Should preserve `rect` and `circle` shapes when sanitizing registered icons.
-	 *
-	 * @dataProvider data_icon_content_sources
-	 *
-	 * @param bool $use_file_path Whether to register the icon from a file path.
-	 */
-	public function test_rect_and_circle_survive_sanitization( bool $use_file_path ) {
-		$rect     = '<rect x="4" y="5" width="16" height="14" rx="2" ry="2" fill="currentColor" stroke="currentColor" transform="rotate(45)" vector-effect="non-scaling-stroke" />';
-		$circle   = '<circle cx="12" cy="12" r="3" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" transform="rotate(45)" vector-effect="non-scaling-stroke" />';
-		$content  = '<svg viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">' . $rect . $circle . '</svg>';
-		$name     = 'test-collection/shapes-icon';
-		$settings = array(
-			'label' => 'Shapes Icon',
-		);
-
-		if ( $use_file_path ) {
-			$settings['file_path'] = $this->create_temp_icon_file( $content );
-		} else {
-			$settings['content'] = $content;
-		}
-
-		$this->assertTrue( $this->register( $name, $settings ) );
-
-		$icon = $this->registry->get_registered_icon( $name );
-		$this->assertStringContainsString( $rect, $icon['content'] );
-		$this->assertStringContainsString( $circle, $icon['content'] );
 	}
 
 	/**
