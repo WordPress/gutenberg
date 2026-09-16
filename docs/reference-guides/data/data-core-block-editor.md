@@ -836,12 +836,12 @@ Returns the selected style state for a block's style controls.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _clientId_ `string`: The block client ID.
+- _state_ `Object`: Global application state.
+- _clientId_ `string`: The block client ID.
 
 _Returns_
 
--   `Object`: The selected block style state.
+- `Object`: The selected block style state.
 
 ### getSelectionEnd
 
@@ -967,12 +967,12 @@ Returns whether a non-default style state is selected for a block.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _clientId_ `string`: The block client ID.
+- _state_ `Object`: Global application state.
+- _clientId_ `string`: The block client ID.
 
 _Returns_
 
--   `boolean`: Whether a non-default block style state is selected.
+- `boolean`: Whether a non-default block style state is selected.
 
 ### hasSelectedInnerBlock
 
