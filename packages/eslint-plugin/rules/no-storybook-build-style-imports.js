@@ -18,26 +18,29 @@ module.exports = {
 		},
 	},
 	create( context ) {
+		function reportIfLeak( node, sourceValue ) {
+			if ( typeof sourceValue !== 'string' ) {
+				return;
+			}
+
+			if ( classifyBuildStyleImport( sourceValue ).status === 'leak' ) {
+				context.report( {
+					node,
+					messageId: 'usePackageStylesMatcher',
+				} );
+			}
+		}
+
 		return {
 			ImportDeclaration( node ) {
-				if ( typeof node.source.value !== 'string' ) {
-					return;
-				}
-
 				if ( node.importKind === 'type' ) {
 					return;
 				}
 
-				const classification = classifyBuildStyleImport(
-					node.source.value
-				);
-
-				if ( classification.status === 'leak' ) {
-					context.report( {
-						node,
-						messageId: 'usePackageStylesMatcher',
-					} );
-				}
+				reportIfLeak( node, node.source.value );
+			},
+			ImportExpression( node ) {
+				reportIfLeak( node, getStaticModuleSpecifier( node.source ) );
 			},
 		};
 	},
@@ -69,15 +72,34 @@ function classifyBuildStyleImport( sourceValue ) {
 	return { status: 'leak', pathname };
 }
 
+function getStaticModuleSpecifier( sourceNode ) {
+	if ( sourceNode.type === 'Literal' ) {
+		return sourceNode.value;
+	}
+
+	if (
+		sourceNode.type === 'TemplateLiteral' &&
+		sourceNode.expressions.length === 0
+	) {
+		return sourceNode.quasis[ 0 ]?.value.cooked;
+	}
+
+	return undefined;
+}
+
 function parseImportSource( sourceValue ) {
 	const withoutHash = sourceValue.split( '#' )[ 0 ];
 	const questionIndex = withoutHash.indexOf( '?' );
+	const rawPathname =
+		questionIndex === -1
+			? withoutHash
+			: withoutHash.slice( 0, questionIndex );
+	const pathname = rawPathname.replaceAll( '\\', '/' );
 
 	if ( questionIndex === -1 ) {
-		return { pathname: withoutHash, queryKeys: [] };
+		return { pathname, queryKeys: [] };
 	}
 
-	const pathname = withoutHash.slice( 0, questionIndex );
 	const search = withoutHash.slice( questionIndex + 1 );
 	const queryKeys = search
 		.split( '&' )

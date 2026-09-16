@@ -17,6 +17,10 @@ import '@wordpress/dataviews/build-style/style.css';
 import styles from '@wordpress/components/build-style/style.css';
 ```
 
+```js
+import( '@wordpress/dataviews/build-style/style.css' );
+```
+
 Examples of **correct** code for this rule:
 
 ```js

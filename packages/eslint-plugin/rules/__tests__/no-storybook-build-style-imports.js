@@ -7,7 +7,7 @@ const RuleTester = configureRuleTester( { describe, it } );
 const ruleTester = new RuleTester( {
 	languageOptions: {
 		sourceType: 'module',
-		ecmaVersion: 6,
+		ecmaVersion: 2020,
 	},
 } );
 
@@ -31,6 +31,13 @@ ruleTester.run( 'no-storybook-build-style-imports', rule, {
 			code: "import '@wordpress/components/build-style/style.css?inline';",
 		},
 		{ code: "import local from './style.lazy.scss?inline';" },
+		{
+			code: "import( '@wordpress/components/build-style/style.css?inline' );",
+		},
+		{ code: 'import( href );' },
+		{
+			code: 'import( `@wordpress/dataviews/build-style/${ name }.css` );',
+		},
 	],
 	invalid: [
 		{
@@ -59,6 +66,18 @@ ruleTester.run( 'no-storybook-build-style-imports', rule, {
 		},
 		{
 			code: "import '../../../dataviews/build-style/style.css';",
+			errors: [ { messageId: 'usePackageStylesMatcher' } ],
+		},
+		{
+			code: "import( '@wordpress/dataviews/build-style/style.css' );",
+			errors: [ { messageId: 'usePackageStylesMatcher' } ],
+		},
+		{
+			code: 'import( `@wordpress/dataviews/build-style/style.css` );',
+			errors: [ { messageId: 'usePackageStylesMatcher' } ],
+		},
+		{
+			code: "import '..\\\\..\\\\dataviews\\\\build-style\\\\style.css';",
 			errors: [ { messageId: 'usePackageStylesMatcher' } ],
 		},
 	],
