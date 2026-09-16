@@ -74,8 +74,6 @@ import {
 	useBlockElement,
 } from './components/block-list/use-block-props/use-block-refs';
 import { LinkPicker } from './components/link-picker';
-// Same component as the public LinkControl export. Exposed privately so that
-// `transformSuggestions` can be used without becoming supported public API.
 import PrivateLinkControl from './components/link-control';
 import useRemoteUrlData from './components/link-control/use-rich-url-data';
 import { PrivateBlockContext } from './components/block-list/private-block-context';

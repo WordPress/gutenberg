@@ -28,8 +28,6 @@ import { useEntityBinding, useLinkPreview } from '../shared';
 import { unlock } from '../../lock-unlock';
 import { transformSuggestions as transformNavigationSuggestions } from './transform-suggestions';
 
-// The private LinkControl, so that `transformSuggestions` stays unsupported
-// public API. Same component as the public export in every other respect.
 const { PrivateLinkControl: LinkControl } = unlock( blockEditorPrivateApis );
 
 /**
