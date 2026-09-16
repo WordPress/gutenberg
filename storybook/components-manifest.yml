@@ -355,7 +355,6 @@
       - value
 - name: ColorPicker
   props:
-      - as
       - color
       - copyFormat
       - defaultValue
@@ -513,7 +512,6 @@
       - isDisabled
 - name: Dropdown
   props:
-      - as
       - className
       - contentClassName
       - defaultOpen
@@ -925,7 +923,6 @@
       - anchorRect
       - anchorRef
       - animate
-      - as
       - children
       - constrainTabbing
       - expandOnMobile
