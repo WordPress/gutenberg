@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../base-control';
 import { Select, StyledInputBase } from './styles/select-control-styles';
 import type { WordPressComponentProps } from '../context';
@@ -50,7 +39,6 @@ function UnforwardedSelectControl< V extends string >(
 		__nextHasNoMarginBottom: _,
 		__next40pxDefaultSize: _next40pxDefaultSize,
 		__next36pxDefaultSize: _next36pxDefaultSize,
-		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		className,
 		disabled = false,
 		help,

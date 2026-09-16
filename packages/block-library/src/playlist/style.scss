@@ -4,6 +4,9 @@
 $waveform-player-height: 100px;
 
 .wp-block-playlist {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	// Main waveform player container.
 	.wp-block-playlist__waveform-player {
 		width: 100%;
@@ -41,6 +44,14 @@ $waveform-player-height: 100px;
 		svg {
 			width: 3rem;
 			height: 3rem;
+		}
+
+		.waveform-icon-pause svg {
+			// The pause icon's two full-height bars read larger than the
+			// play triangle at the same SVG box size, so optically scale it
+			// down to match the play icon's visual weight.
+			width: 2.625rem;
+			height: 2.625rem;
 		}
 	}
 

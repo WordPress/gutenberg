@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import {
 	store as blocksStore,
@@ -10,10 +7,6 @@ import {
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { symbol } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -38,7 +31,7 @@ import { unlock } from '../../lock-unlock';
  * @param {Object} attributes Block attributes.
  * @return {string} The position type label.
  */
-function getPositionTypeLabel( attributes ) {
+export function getPositionTypeLabel( attributes ) {
 	const positionType = attributes?.style?.position?.type;
 
 	if ( positionType === 'sticky' ) {

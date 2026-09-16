@@ -1,15 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Tabs } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from './screen-header';
 import ColorPalettePanel from './color-palette-panel';
 import GradientPalettePanel from './gradients-palette-panel';
+import DuotonePalettePanel from './duotone-palette-panel';
 
 function ScreenColorPalette( { name }: { name?: string } ) {
 	return (
@@ -27,6 +21,7 @@ function ScreenColorPalette( { name }: { name?: string } ) {
 						<Tabs.Tab value="gradient">
 							{ __( 'Gradient' ) }
 						</Tabs.Tab>
+						<Tabs.Tab value="duotone">{ __( 'Duotone' ) }</Tabs.Tab>
 					</Tabs.List>
 				</div>
 				<Tabs.Panel value="color" tabIndex={ -1 }>
@@ -34,6 +29,9 @@ function ScreenColorPalette( { name }: { name?: string } ) {
 				</Tabs.Panel>
 				<Tabs.Panel value="gradient" tabIndex={ -1 }>
 					<GradientPalettePanel name={ name } />
+				</Tabs.Panel>
+				<Tabs.Panel value="duotone" tabIndex={ -1 }>
+					<DuotonePalettePanel name={ name } />
 				</Tabs.Panel>
 			</Tabs.Root>
 		</>

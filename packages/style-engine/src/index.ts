@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { paramCase as kebabCase } from 'change-case';
-
-/**
- * Internal dependencies
- */
 import type {
 	Style,
 	StyleOptions,

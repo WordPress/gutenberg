@@ -1,7 +1,6 @@
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
 import Avatar from '../collaborators-presence/avatar';
 import { AVATAR_IFRAME_STYLES } from './avatar-iframe-styles';
 import { OVERLAY_IFRAME_STYLES } from './overlay-iframe-styles';
@@ -46,15 +45,20 @@ export function Overlay( {
 	const [ overlayElement, setOverlayElement ] =
 		useState< HTMLDivElement | null >( null );
 
-	const { cursors, rerenderCursorsAfterDelay } = useRenderCursors(
-		overlayElement,
-		blockEditorDocument ?? null,
-		postId ?? null,
-		postType ?? null,
-		RERENDER_DELAY_MS
-	);
+	const { cursors, rerenderCursorsAfterDelay, rerenderCursorsOnResize } =
+		useRenderCursors(
+			overlayElement,
+			blockEditorDocument ?? null,
+			postId ?? null,
+			postType ?? null,
+			RERENDER_DELAY_MS
+		);
 
-	const { highlights, rerenderHighlightsAfterDelay } = useBlockHighlighting(
+	const {
+		highlights,
+		rerenderHighlightsAfterDelay,
+		rerenderHighlightsOnResize,
+	} = useBlockHighlighting(
 		overlayElement,
 		blockEditorDocument ?? null,
 		postId ?? null,
@@ -64,10 +68,12 @@ export function Overlay( {
 
 	// Detect layout changes on overlay (e.g. turning on "Show Template") and window
 	// resizes, and re-render the cursors and block highlights.
+	// Use the RAF-based callback so positions are measured after the browser
+	// has finished layout, without an arbitrary fixed delay.
 	const onResize = useCallback( () => {
-		rerenderCursorsAfterDelay();
-		rerenderHighlightsAfterDelay();
-	}, [ rerenderCursorsAfterDelay, rerenderHighlightsAfterDelay ] );
+		rerenderCursorsOnResize();
+		rerenderHighlightsOnResize();
+	}, [ rerenderCursorsOnResize, rerenderHighlightsOnResize ] );
 	const resizeObserverRef = useResizeObserver( onResize );
 
 	// Trigger the initial position computation on mount.
@@ -97,18 +103,21 @@ export function Overlay( {
 		resizeObserverRef,
 	] );
 
-	// Track cursor element refs for registry registration.
+	// Track cursor and highlight avatar element refs for registry registration.
 	const cursorRefsMap = useRef< Map< number, HTMLElement > >( new Map() );
 
-	// Keep the registry in sync whenever the rendered cursors change.
+	// Keep the registry in sync whenever cursors or highlights change.
 	useEffect( () => {
 		if ( ! cursorRegistry ) {
 			return;
 		}
 		const refs = cursorRefsMap.current;
-		const currentIds = new Set( cursors.map( ( c ) => c.clientId ) );
+		const currentIds = new Set( [
+			...cursors.map( ( c ) => c.clientId ),
+			...highlights.map( ( h ) => h.clientId ),
+		] );
 
-		// Unregister cursors that are no longer rendered.
+		// Unregister elements that are no longer rendered.
 		for ( const id of refs.keys() ) {
 			if ( ! currentIds.has( id ) ) {
 				cursorRegistry.unregisterCursor( id );
@@ -116,13 +125,13 @@ export function Overlay( {
 			}
 		}
 
-		// Register or update cursors that are currently rendered.
+		// Register or update elements that are currently rendered.
 		for ( const [ id, el ] of refs.entries() ) {
 			cursorRegistry.registerCursor( id, el );
 		}
 
 		return () => cursorRegistry.removeAll();
-	}, [ cursors, cursorRegistry ] );
+	}, [ cursors, highlights, cursorRegistry ] );
 
 	// Callback ref factory to capture each cursor's DOM element.
 	const setCursorRef = useCallback(
@@ -157,49 +166,56 @@ export function Overlay( {
 								} }
 							/>
 						) ) }
-					<div
-						ref={ setCursorRef( cursor.clientId ) }
-						className="collaborators-overlay-user"
-						style={ {
-							left: `${ cursor.x }px`,
-							top: `${ cursor.y }px`,
-						} }
-					>
-						{ ! cursor.isMe && (
-							<div
-								className="collaborators-overlay-user-cursor"
-								style={ {
-									backgroundColor: cursor.color,
-									height: `${ cursor.height }px`,
-								} }
+					{ cursor.x !== undefined && (
+						<div
+							ref={ setCursorRef( cursor.clientId ) }
+							className="collaborators-overlay-user"
+							style={ {
+								left: `${ cursor.x }px`,
+								top: `${ cursor.y }px`,
+							} }
+						>
+							{ ! cursor.isMe && (
+								<div
+									className="collaborators-overlay-user-cursor"
+									style={ {
+										backgroundColor: cursor.color,
+										height: `${ cursor.height }px`,
+									} }
+								/>
+							) }
+							<Avatar
+								className="collaborators-overlay-user-label"
+								variant="badge"
+								size="small"
+								src={ cursor.avatarUrl }
+								name={ cursor.userName }
+								label={ cursor.isMe ? __( 'You' ) : undefined }
+								borderColor={ cursor.color }
 							/>
-						) }
-						<Avatar
-							className="collaborators-overlay-user-label"
-							variant="badge"
-							size="small"
-							src={ cursor.avatarUrl }
-							name={ cursor.userName }
-							label={ cursor.isMe ? __( 'You' ) : undefined }
-							borderColor={ cursor.color }
-						/>
-					</div>
+						</div>
+					) }
 				</div>
 			) ) }
 			{ highlights.map( ( highlight ) => (
-				<Avatar
+				<div
 					key={ highlight.blockId }
-					className="collaborators-overlay-block-label"
-					variant="badge"
-					size="small"
-					src={ highlight.avatarUrl }
-					name={ highlight.userName }
-					borderColor={ highlight.color }
+					ref={ setCursorRef( highlight.clientId ) }
 					style={ {
+						position: 'absolute',
 						left: `${ highlight.x }px`,
 						top: `${ highlight.y }px`,
 					} }
-				/>
+				>
+					<Avatar
+						className="collaborators-overlay-block-label"
+						variant="badge"
+						size="small"
+						src={ highlight.avatarUrl }
+						name={ highlight.userName }
+						borderColor={ highlight.color }
+					/>
+				</div>
 			) ) }
 		</div>
 	);

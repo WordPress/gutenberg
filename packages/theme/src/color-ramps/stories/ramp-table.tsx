@@ -1,4 +1,10 @@
 import { forwardRef } from '@wordpress/element';
+import type {
+	ThemeProviderColorRampName,
+	ThemeProviderColorWarning,
+} from '../../theme-provider-color-warnings';
+import colorTokenAliases from '../../prebuilt/ts/color-tokens';
+import { getColorString } from '../lib/color-utils';
 import type { Ramp } from '../lib/types';
 
 // TODO: show token groups better
@@ -29,21 +35,105 @@ const RAMP_TOKENS_ORDER: { tokenName: keyof Ramp; abbr: string }[] = [
 
 type RampTableProps = {
 	ramps: {
+		name: ThemeProviderColorRampName;
 		seed: {
 			name: keyof Ramp;
 			value: string;
 		};
 		ramp: Record< keyof Ramp, string >;
-		warnings?: string[];
 	}[];
+	warnings?: readonly ThemeProviderColorWarning[];
 };
+
+function hasRampWarning(
+	warnings: readonly ThemeProviderColorWarning[],
+	ramp: ThemeProviderColorRampName,
+	step: keyof Ramp
+) {
+	return warnings.some(
+		( warning ) =>
+			warning.type === 'ramp' &&
+			warning.ramp === ramp &&
+			warning.step === step
+	);
+}
+
+function getSemanticTokenAliases(
+	ramp: ThemeProviderColorRampName,
+	step: keyof Ramp
+): readonly string[] {
+	const rampPrefix = ramp === 'background' ? 'bg' : ramp;
+	const primitiveToken = `${ rampPrefix }-${ step }`;
+
+	return (
+		colorTokenAliases[ primitiveToken as keyof typeof colorTokenAliases ] ??
+		[]
+	);
+}
+
+function hasContrastWarning(
+	warnings: readonly ThemeProviderColorWarning[],
+	ramp: ThemeProviderColorRampName,
+	step: keyof Ramp
+) {
+	const semanticTokenAliases = getSemanticTokenAliases( ramp, step );
+
+	return warnings.some(
+		( warning ) =>
+			warning.type === 'contrast' &&
+			( semanticTokenAliases.includes(
+				warning.foregroundToken.replaceAll( '.', '-' )
+			) ||
+				semanticTokenAliases.includes(
+					warning.backgroundToken.replaceAll( '.', '-' )
+				) )
+	);
+}
+
+function hasColorWarningForStep(
+	warnings: readonly ThemeProviderColorWarning[],
+	ramp: ThemeProviderColorRampName,
+	step: keyof Ramp
+) {
+	return (
+		hasRampWarning( warnings, ramp, step ) ||
+		hasContrastWarning( warnings, ramp, step )
+	);
+}
+
+export function hasColorWarningForRamp(
+	warnings: readonly ThemeProviderColorWarning[],
+	ramp: ThemeProviderColorRampName
+) {
+	return RAMP_TOKENS_ORDER.some( ( { tokenName } ) =>
+		hasColorWarningForStep( warnings, ramp, tokenName )
+	);
+}
+
+function isSeedAdjusted( seed: string, generatedAnchor: string ) {
+	return getColorString( seed ) !== getColorString( generatedAnchor );
+}
+
 export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
-	function RampTable( { ramps }, forwardedRef ) {
+	function RampTable( { ramps, warnings = [] }, forwardedRef ) {
+		const hasAdjustedSeed = ramps.some( ( { seed, ramp } ) =>
+			isSeedAdjusted( seed.value, ramp[ seed.name ] )
+		);
+		const hasAnyColorWarning = warnings.length > 0;
+
 		return (
 			<div
 				style={ { width: '100%', overflowX: 'scroll' } }
 				ref={ forwardedRef }
 			>
+				{ hasAdjustedSeed || hasAnyColorWarning ? (
+					<p style={ { marginBlock: '0 0.5rem' } }>
+						<strong>Markers:</strong>{ ' ' }
+						{ hasAnyColorWarning ? '! color warning' : null }
+						{ hasAnyColorWarning && hasAdjustedSeed ? ' · ' : null }
+						{ hasAdjustedSeed ? 'SEED ≠ generated anchor' : null }
+					</p>
+				) : null }
 				<div
 					style={ {
 						display: 'grid',
@@ -67,10 +157,19 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 							{ abbr }
 						</div>
 					) ) }
-					{ ramps.map( ( { seed, ramp, warnings = [] }, i ) =>
+					{ ramps.map( ( { name, seed, ramp }, i ) =>
 						RAMP_TOKENS_ORDER.map( ( { tokenName } ) => (
 							<div
-								key={ `${ seed }-${ i }-${ tokenName }` }
+								key={ `${ name }-${ tokenName }` }
+								title={
+									hasColorWarningForStep(
+										warnings,
+										name,
+										tokenName
+									)
+										? `${ name } ramp, ${ tokenName } step: color warning`
+										: undefined
+								}
 								style={ {
 									marginBlockStart: i !== 0 ? 4 : 0,
 									backgroundColor: ramp[ tokenName ],
@@ -80,14 +179,55 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 									height: tokenName === seed.name ? 60 : 40,
 									minWidth: 32,
 									fontSize: 14,
-									outline: warnings.includes( tokenName )
-										? '2px solid red'
+									outline: hasColorWarningForStep(
+										warnings,
+										name,
+										tokenName
+									)
+										? '3px solid #d63638'
 										: '',
-									outlineOffset: '-2px',
+									outlineOffset: '-3px',
+									boxShadow: hasColorWarningForStep(
+										warnings,
+										name,
+										tokenName
+									)
+										? 'inset 0 0 0 6px #fff'
+										: '',
+									position: 'relative',
 								} }
 							>
+								{ hasColorWarningForStep(
+									warnings,
+									name,
+									tokenName
+								) ? (
+									<strong
+										aria-hidden="true"
+										style={ {
+											background: '#d63638',
+											color: '#fff',
+											fontSize: 10,
+											insetBlockStart: 0,
+											insetInlineEnd: 0,
+											lineHeight: 1,
+											padding: 2,
+											position: 'absolute',
+										} }
+									>
+										!
+									</strong>
+								) : null }
 								{ tokenName === seed.name ? (
 									<div
+										title={
+											isSeedAdjusted(
+												seed.value,
+												ramp[ tokenName ]
+											)
+												? `${ name } input seed ${ seed.value }; generated ${ tokenName } anchor ${ ramp[ tokenName ] }`
+												: undefined
+										}
 										style={ {
 											backgroundColor: seed.value,
 											height: 20,
@@ -99,13 +239,25 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 											fontSize: 8,
 											fontWeight:
 												'var(--wpds-typography-font-weight-emphasis)',
+											outline: isSeedAdjusted(
+												seed.value,
+												ramp[ tokenName ]
+											)
+												? '3px dashed currentColor'
+												: '',
+											outlineOffset: '-3px',
 											color:
 												tokenName === 'surface2'
 													? ramp.fgSurface4
 													: ramp.fgFill,
 										} }
 									>
-										SEED
+										{ isSeedAdjusted(
+											seed.value,
+											ramp[ tokenName ]
+										)
+											? 'SEED ≠'
+											: 'SEED' }
 									</div>
 								) : null }
 								{ [

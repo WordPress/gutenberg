@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { View } from '../types';
 
 /**

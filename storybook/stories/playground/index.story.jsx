@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import EditorFullPage from './fullpage';
 import EditorBox from './box';
 import EditorWithUndoRedo from './with-undo-redo';

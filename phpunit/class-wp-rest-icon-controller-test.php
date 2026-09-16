@@ -2,7 +2,7 @@
 /**
  * Unit tests covering WP_REST_Icons_Controller functionality.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 	protected static $admin_id;
@@ -22,6 +22,21 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 		self::delete_user( self::$editor_id );
 		self::delete_user( self::$contributor_id );
 		self::delete_user( self::$subscriber_id );
+	}
+
+	public function set_up() {
+		parent::set_up();
+
+		/*
+		 * Other suites reset the `WP_Icons_Registry` singleton, wiping the core icons that
+		 * `init` only registers once. Re-register them when empty so order-dependent tests pass.
+		 */
+		if ( ! WP_Icon_Collections_Registry::get_instance()->is_registered( 'core' ) ) {
+			gutenberg_register_default_icon_collections();
+		}
+		if ( empty( WP_Icons_Registry_Gutenberg::get_instance()->get_registered_icons() ) ) {
+			gutenberg_register_default_icons();
+		}
 	}
 
 	/**
@@ -274,5 +289,33 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_cannot_view', $response, 401 );
+	}
+
+	/**
+	 * Test that icons registered as non-public are omitted from the collection.
+	 */
+	public function test_get_items_omits_non_public_icons() {
+		wp_set_current_user( self::$editor_id );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$names = wp_list_pluck( $response->get_data(), 'name' );
+		$this->assertContains( 'core/plus', $names );
+		$this->assertNotContains( 'core/wordpress', $names );
+	}
+
+	/**
+	 * Test that an icon registered as non-public is not readable by name.
+	 */
+	public function test_get_item_returns_404_for_non_public_icon() {
+		wp_set_current_user( self::$editor_id );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/icons/core/wordpress' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_icon_not_found', $response, 404 );
 	}
 }

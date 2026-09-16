@@ -2,21 +2,18 @@
 /**
  * Extensible Site Editor experiment integration.
  *
+ * Only loaded while the `gutenberg-extensible-site-editor` experiment is
+ * enabled (see lib/load.php).
+ *
  * @package gutenberg
  */
 
 /**
- * Redirect the Appearance > Design menu to the extensible site editor
- * when the experiment is enabled.
+ * Redirect the Appearance > Design menu to the extensible site editor.
  *
  * @global array $submenu WordPress admin submenu array.
  */
 function gutenberg_redirect_to_extensible_site_editor() {
-	// Only proceed if the experiment is enabled.
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
-		return;
-	}
-
 	// Update the Design submenu item to point to the extensible site editor.
 	global $submenu;
 	if ( $submenu && isset( $submenu['themes.php'] ) ) {

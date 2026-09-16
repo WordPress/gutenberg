@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as routePrivateApis } from '@wordpress/route';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 const { createMemoryHistory, createRootRoute, createRouter, RouterProvider } =

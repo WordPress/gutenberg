@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { ColorSpace, OKLCH } from 'colorjs.io/fn';
 import { buildBgRamp, buildAccentRamp } from '../index';
 import { buildRamp } from '../lib';
@@ -37,7 +38,7 @@ function testSeedColorContract( build: ( seed: string ) => unknown ) {
 		expect( () => build( seed ) ).toThrow();
 	} );
 
-	it( 'rejects oklch() even when the OKLCH color space is registered', () => {
+	it( 'rejects non-sRGB color spaces even when the color space is registered', () => {
 		// Registering OKLCH would otherwise make `oklch(...)` strings parse.
 		ColorSpace.register( OKLCH );
 		expect( () => build( 'oklch(0.7 0.15 250)' ) ).toThrow();

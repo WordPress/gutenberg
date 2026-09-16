@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import CustomSelect from '../custom-select-control-v2/custom-select';
 import CustomSelectItem from '../custom-select-control-v2/item';
 import * as Styled from '../custom-select-control-v2/styles';
@@ -62,7 +51,6 @@ function CustomSelectControl< T extends CustomSelectOption >(
 	const {
 		// Prevent passing legacy props to internal component.
 		__next40pxDefaultSize: _next40pxDefaultSize,
-		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		describedBy,
 		options,
 		onChange,
@@ -177,7 +165,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 			<CustomSelect
 				aria-describedby={ descriptionId }
 				renderSelectedValue={ renderSelectedValue }
-				size={ size === '__unstable-large' ? 'default' : size }
+				size={ size }
 				store={ store }
 				className={ clsx(
 					// Keeping the classname for legacy reasons
