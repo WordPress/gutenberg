@@ -22,6 +22,7 @@
 
 ### Bug Fixes
 
+-   `CollapsibleCard.Header`: Render the trigger as a native `<button>` by default and add a focus-visible ring, following the W3C APG accordion pattern (heading wraps button) when a heading is passed via `render`. Pass `nativeButton={ false }` to keep the non-native `role="button"` element. ([#83010](https://github.com/WordPress/gutenberg/pull/83010))
 -   `Autocomplete`: Use valid grid and rowgroup semantics without local accessibility overrides ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
 -   `Menu`: Center labels, descriptions, suffixes, shortcuts, and submenu chevrons within items, including items with taller prefix or suffix content. ([#82847](https://github.com/WordPress/gutenberg/pull/82847))
 -   `Menu`: vertically center single-line item labels while preserving first-line alignment for wrapped content. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))

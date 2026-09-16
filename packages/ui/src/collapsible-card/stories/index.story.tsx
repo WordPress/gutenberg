@@ -136,11 +136,11 @@ export const Stacked: Story = {
 };
 
 /**
- * `CollapsibleCard.Header` renders a `<div>` wrapper by default. Pass an
- * `<h1>`–`<h6>` React element to the `render` prop to wrap the trigger in
- * a heading and contribute to the document outline. The right level
- * depends on the surrounding outline, so the consumer is expected to opt
- * in.
+ * `CollapsibleCard.Header` trigger renders as a native `<button>` by default.
+ * Pass an `<h1>`–`<h6>` React element to the `render` prop to wrap the
+ * trigger in a heading and contribute to the document outline, following the
+ * W3C APG accordion pattern (heading wraps button). The right heading level
+ * depends on the surrounding outline, so the consumer is expected to opt in.
  */
 export const WithHeadingElement: Story = {
 	parameters: { controls: { disable: true } },

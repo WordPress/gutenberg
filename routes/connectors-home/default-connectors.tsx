@@ -124,6 +124,7 @@ interface ConnectorActionAreaProps {
 	isExpanded: boolean;
 	isBusy: boolean;
 	pluginStatus: PluginStatus;
+	isToggle: boolean;
 	actionButtonRef: {
 		current: HTMLButtonElement | null;
 	};
@@ -138,6 +139,7 @@ function ConnectorActionArea( {
 	isExpanded,
 	isBusy,
 	pluginStatus,
+	isToggle,
 	actionButtonRef,
 	handleButtonClick,
 	getButtonLabel,
@@ -162,6 +164,7 @@ function ConnectorActionArea( {
 					disabled={ pluginStatus === 'checking' || isBusy }
 					isBusy={ isBusy }
 					accessibleWhenDisabled
+					aria-expanded={ isToggle ? isExpanded : undefined }
 				>
 					{ getButtonLabel() }
 				</Button>
@@ -238,6 +241,7 @@ function ApiKeyConnector( {
 					isExpanded={ isExpanded }
 					isBusy={ isBusy }
 					pluginStatus={ pluginStatus }
+					isToggle={ pluginStatus === 'active' }
 					actionButtonRef={ actionButtonRef }
 					handleButtonClick={ handleButtonClick }
 					getButtonLabel={ getButtonLabel }
@@ -339,6 +343,7 @@ function ApplicationPasswordConnector( {
 					isExpanded={ isExpanded }
 					isBusy={ isBusy }
 					pluginStatus={ pluginStatus }
+					isToggle={ pluginStatus === 'active' }
 					actionButtonRef={ actionButtonRef }
 					handleButtonClick={ handleButtonClick }
 					getButtonLabel={ getButtonLabel }

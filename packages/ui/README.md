@@ -214,7 +214,9 @@ function MyCard() {
 
 	return (
 		<CollapsibleCard.Root open={ isOpen } onOpenChange={ setIsOpen }>
-			<CollapsibleCard.Header>Details</CollapsibleCard.Header>
+			<CollapsibleCard.Header render={ <h2 /> }>
+				Details
+			</CollapsibleCard.Header>
 			<CollapsibleCard.Content>
 				Collapsible content here.
 			</CollapsibleCard.Content>
