@@ -19,7 +19,7 @@
 	}
 
 	&[role="button"] {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 
 		&:hover .block-editor-block-preview__container::after {
 			outline-color: rgba($black, 0.3);

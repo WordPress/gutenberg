@@ -10,9 +10,15 @@
 	const { __ } = wp.i18n;
 	const { registerPlugin } = wp.plugins;
 
+	const { unlock } =
+		wp.privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+			'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
+			'@wordpress/core-data'
+		);
+
 	function CustomConnectionLimitModal() {
 		const connectionStatus = useSelect( function ( select ) {
-			return select( 'core' ).getSyncConnectionStatus() || null;
+			return unlock( select( 'core' ) ).getSyncConnectionStatus() || null;
 		}, [] );
 
 		const error =

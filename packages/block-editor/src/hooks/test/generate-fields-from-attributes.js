@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { generateFieldsFromAttributes } from '../generate-fields-from-attributes';
 
 /**

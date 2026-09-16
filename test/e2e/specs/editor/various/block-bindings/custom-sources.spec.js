@@ -1,11 +1,9 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Registered sources', () => {
 	let imagePlaceholderSrc;
 	let testingImgSrc;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 		await requestUtils.deleteAllMedia();
@@ -58,6 +56,7 @@ test.describe( 'Registered sources', () => {
 				page.getByLabel( 'Attributes options' )
 			).toBeHidden();
 		} );
+
 		test( 'It should show the attributes panel, no sources registered, readOnlyAttributes.', async ( {
 			editor,
 			page,
@@ -126,6 +125,7 @@ test.describe( 'Registered sources', () => {
 				previewPage.locator( '#connected-paragraph' )
 			).toHaveText( 'Text Field Value' );
 		} );
+
 		test( 'should show the returned value in heading content', async ( {
 			editor,
 		} ) => {
@@ -155,6 +155,7 @@ test.describe( 'Registered sources', () => {
 				previewPage.locator( '#connected-heading' )
 			).toHaveText( 'Text Field Value' );
 		} );
+
 		test( 'should show the returned values in button attributes', async ( {
 			editor,
 		} ) => {
@@ -190,6 +191,7 @@ test.describe( 'Registered sources', () => {
 			await expect( buttonDom ).toHaveText( 'Text Field Value' );
 			await expect( buttonDom ).toHaveAttribute( 'href', testingImgSrc );
 		} );
+
 		test( 'should show the returned values in image attributes', async ( {
 			editor,
 			page,
@@ -267,6 +269,7 @@ test.describe( 'Registered sources', () => {
 				'default title value'
 			);
 		} );
+
 		test( 'should fall back to source label when `getValues` is undefined', async ( {
 			editor,
 		} ) => {
@@ -289,6 +292,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await expect( paragraphBlock ).toHaveText( 'Server Source' );
 		} );
+
 		test( 'should fall back to null when `getValues` is undefined in URL attributes', async ( {
 			editor,
 		} ) => {
@@ -362,6 +366,7 @@ test.describe( 'Registered sources', () => {
 				'false'
 			);
 		}
+
 		test.describe( 'canUserEditValue returns false', () => {
 			test( 'paragraph', async ( { editor, page } ) => {
 				await testParagraphControlsAreLocked( {
@@ -370,6 +375,7 @@ test.describe( 'Registered sources', () => {
 					page,
 				} );
 			} );
+
 			test( 'heading', async ( { editor, page } ) => {
 				await editor.insertBlock( {
 					name: 'core/heading',
@@ -412,6 +418,7 @@ test.describe( 'Registered sources', () => {
 					'false'
 				);
 			} );
+
 			test( 'button', async ( { editor, page } ) => {
 				await editor.insertBlock( {
 					name: 'core/buttons',
@@ -479,6 +486,7 @@ test.describe( 'Registered sources', () => {
 						.getByRole( 'button', { name: 'Unlink' } )
 				).toBeHidden();
 			} );
+
 			test( 'image', async ( { editor, page } ) => {
 				await editor.insertBlock( {
 					name: 'core/image',
@@ -547,7 +555,56 @@ test.describe( 'Registered sources', () => {
 						.getByLabel( 'Title attribute' )
 				).toHaveValue( 'Text Field Value' );
 			} );
+
+			test( 'list item', async ( { editor, page } ) => {
+				await editor.insertBlock( {
+					name: 'core/list',
+					innerBlocks: [
+						{
+							name: 'core/list-item',
+							attributes: {
+								content: 'list item default content',
+								metadata: {
+									bindings: {
+										content: {
+											source: 'testing/can-user-edit-false',
+											args: { key: 'text_field' },
+										},
+									},
+								},
+							},
+						},
+					],
+				} );
+				const listItemText = editor.canvas.getByRole( 'textbox', {
+					name: 'List text',
+				} );
+				await listItemText.click();
+
+				const blockToolbar = page.getByRole( 'toolbar', {
+					name: 'Block tools',
+				} );
+
+				// Format controls don't exist. `contenteditable=false` makes the
+				// whole rich text non-editable, so checking the always-visible
+				// Bold and Link controls is a proxy for every inline format
+				// (footnote, highlight, inline code, strikethrough, etc.).
+				await expect(
+					blockToolbar.getByRole( 'button', { name: 'Bold' } )
+				).toBeHidden();
+				await expect(
+					blockToolbar.getByRole( 'button', { name: 'Link' } )
+				).toBeHidden();
+
+				// List item content is not editable.
+				await expect( listItemText ).toHaveText( 'Text Field Value' );
+				await expect( listItemText ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
+			} );
 		} );
+
 		// The following tests just check the paragraph and assume is the case for the rest of the blocks.
 		test( 'canUserEditValue is not defined', async ( { editor, page } ) => {
 			await testParagraphControlsAreLocked( {
@@ -556,6 +613,7 @@ test.describe( 'Registered sources', () => {
 				page,
 			} );
 		} );
+
 		test( 'setValues is not defined', async ( { editor, page } ) => {
 			await testParagraphControlsAreLocked( {
 				source: 'testing/complete-source-undefined',
@@ -563,12 +621,64 @@ test.describe( 'Registered sources', () => {
 				page,
 			} );
 		} );
+
 		test( 'source is not defined', async ( { editor, page } ) => {
 			await testParagraphControlsAreLocked( {
 				source: 'testing/undefined-source',
 				editor,
 				page,
 			} );
+		} );
+
+		test( 'source is not defined - list item', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: {
+							content: 'list item default content',
+							metadata: {
+								bindings: {
+									content: {
+										source: 'testing/undefined-source',
+										args: { key: 'text_field' },
+									},
+								},
+							},
+						},
+					},
+				],
+			} );
+			const listItemText = editor.canvas.getByRole( 'textbox', {
+				name: 'List text',
+			} );
+			await listItemText.click();
+
+			const blockToolbar = page.getByRole( 'toolbar', {
+				name: 'Block tools',
+			} );
+
+			// Unregistered source locks editing: no `canUserEditValue`, so the
+			// content is not editable and inline formats are unavailable.
+			await expect(
+				blockToolbar.getByRole( 'button', { name: 'Bold' } )
+			).toBeHidden();
+			await expect(
+				blockToolbar.getByRole( 'button', { name: 'Link' } )
+			).toBeHidden();
+			await expect( listItemText ).toHaveAttribute(
+				'contenteditable',
+				'false'
+			);
+
+			// The unregistered source surfaces a warning on the binding.
+			await expect(
+				page.getByRole( 'button', { name: 'content' } )
+			).toContainText( 'Source not registered' );
 		} );
 	} );
 
@@ -613,6 +723,113 @@ test.describe( 'Registered sources', () => {
 				previewPage.locator( '#connected-paragraph' )
 			).toHaveText( 'new value' );
 		} );
+
+		test( 'should be possible to edit the value from list item content', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: {
+							anchor: 'connected-list-item',
+							content: 'list item default content',
+							metadata: {
+								bindings: {
+									content: {
+										source: 'core/post-meta',
+										args: { key: 'text_custom_field' },
+									},
+								},
+							},
+						},
+					},
+				],
+			} );
+			const listItemText = editor.canvas.getByRole( 'textbox', {
+				name: 'List text',
+			} );
+
+			await expect( listItemText ).toHaveAttribute(
+				'contenteditable',
+				'true'
+			);
+			await listItemText.fill( 'new list item value' );
+			// Check that the list item content attribute didn't change.
+			const [ listBlockObject ] = await editor.getBlocks();
+			expect( listBlockObject.innerBlocks[ 0 ].attributes.content ).toBe(
+				'list item default content'
+			);
+			// Check the value of the custom field is being updated by visiting the frontend.
+			const previewPage = await editor.openPreviewPage();
+			await expect(
+				previewPage.locator( '#connected-list-item' )
+			).toHaveText( 'new list item value' );
+		} );
+
+		test( 'should preserve nested list inner blocks when list item content is bound', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: {
+							anchor: 'connected-list-item-with-nested-list',
+							content: 'list item default content',
+							metadata: {
+								bindings: {
+									content: {
+										source: 'core/post-meta',
+										args: { key: 'text_custom_field' },
+									},
+								},
+							},
+						},
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: {
+											content: 'Nested child',
+										},
+									},
+								],
+							},
+						],
+					},
+				],
+			} );
+
+			// The editor canvas shows the bound value and keeps the nested list.
+			// The anchor only renders on the front end, so locate the two list
+			// item rich-text areas by role: the bound item first, its nested
+			// child second.
+			const listItemTexts = editor.canvas.getByRole( 'textbox', {
+				name: 'List text',
+			} );
+			await expect( listItemTexts.first() ).toHaveText(
+				'Value of the text custom field'
+			);
+			await expect( listItemTexts.nth( 1 ) ).toHaveText( 'Nested child' );
+
+			// The front end renders the bound value without dropping the nested list.
+			const previewPage = await editor.openPreviewPage();
+			const frontendListItem = previewPage.locator(
+				'#connected-list-item-with-nested-list'
+			);
+			await expect( frontendListItem ).toContainText(
+				'Value of the text custom field'
+			);
+			await expect( frontendListItem.locator( 'li' ) ).toHaveText(
+				'Nested child'
+			);
+		} );
+
 		// Related issue: https://github.com/WordPress/gutenberg/issues/62347
 		test( 'should be possible to use symbols and numbers as the custom field value', async ( {
 			editor,
@@ -647,6 +864,7 @@ test.describe( 'Registered sources', () => {
 				previewPage.locator( '#paragraph-binding' )
 			).toHaveText( '$10.00' );
 		} );
+
 		test( 'should be possible to edit the value of the url custom field from the button', async ( {
 			editor,
 			page,
@@ -701,6 +919,7 @@ test.describe( 'Registered sources', () => {
 				previewPage.locator( '#button-url-binding a' )
 			).toHaveAttribute( 'href', '#url-custom-field-modified' );
 		} );
+
 		test( 'should be possible to edit the value of the url custom field from the image', async ( {
 			editor,
 			page,
@@ -757,6 +976,7 @@ test.describe( 'Registered sources', () => {
 				previewPage.locator( '#image-url-binding img' )
 			).toHaveAttribute( 'src', testingImgSrc );
 		} );
+
 		test( 'should be possible to edit the value of the text custom field from the image alt', async ( {
 			editor,
 			page,
@@ -836,6 +1056,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await expect( paragraphBlock ).toHaveText( 'Text Field Value' );
 		} );
+
 		test( 'should be possible to connect the paragraph content', async ( {
 			editor,
 			page,
@@ -849,6 +1070,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await expect( contentAttribute ).toBeVisible();
 		} );
+
 		test( 'should be possible to connect the heading content', async ( {
 			editor,
 			page,
@@ -862,6 +1084,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await expect( contentAttribute ).toBeVisible();
 		} );
+
 		test( 'should be possible to connect the button supported attributes', async ( {
 			editor,
 			page,
@@ -904,6 +1127,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await expect( tagNameAttribute ).toBeHidden();
 		} );
+
 		test( 'should be possible to connect the image supported attributes', async ( {
 			editor,
 			page,
@@ -940,6 +1164,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await expect( linkClassAttribute ).toBeHidden();
 		} );
+
 		test( 'should show all the available fields in the dropdown UI', async ( {
 			editor,
 			page,
@@ -975,6 +1200,7 @@ test.describe( 'Registered sources', () => {
 			await expect( urlField ).toBeVisible();
 			await expect( urlField ).not.toBeChecked();
 		} );
+
 		test( 'should show the connected fields in the attributes panel', async ( {
 			editor,
 			page,
@@ -1033,6 +1259,7 @@ test.describe( 'Registered sources', () => {
 			await expect( newEmptyParagraph ).toHaveText( '' );
 			await expect( newEmptyParagraph ).toBeEditable();
 		} );
+
 		test( 'should add empty paragraph block when pressing enter in heading', async ( {
 			editor,
 			page,
@@ -1078,6 +1305,7 @@ test.describe( 'Registered sources', () => {
 			await expect( newEmptyParagraph ).toHaveText( '' );
 			await expect( newEmptyParagraph ).toBeEditable();
 		} );
+
 		test( 'should add empty button block when pressing enter in button', async ( {
 			editor,
 			page,
@@ -1123,6 +1351,7 @@ test.describe( 'Registered sources', () => {
 				newEmptyButton.getByRole( 'textbox' )
 			).toBeEditable();
 		} );
+
 		test( 'should show placeholder prompt when value is empty and can edit', async ( {
 			editor,
 		} ) => {
@@ -1154,6 +1383,7 @@ test.describe( 'Registered sources', () => {
 				'Add Empty Field Label'
 			);
 		} );
+
 		test( 'should show source label when value is empty, cannot edit, and `getFieldsList` is undefined', async ( {
 			editor,
 		} ) => {
@@ -1182,6 +1412,7 @@ test.describe( 'Registered sources', () => {
 				'Can User Edit: False'
 			);
 		} );
+
 		test( 'should show placeholder attribute over bindings placeholder', async ( {
 			editor,
 		} ) => {
@@ -1237,6 +1468,7 @@ test.describe( 'Registered sources', () => {
 		} );
 		await expect( contentButton ).toContainText( 'Server Source' );
 	} );
+
 	test( 'should show an "Source not registered" warning for not registered sources', async ( {
 		editor,
 		page,

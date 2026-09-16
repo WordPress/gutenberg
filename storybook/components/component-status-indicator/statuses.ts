@@ -1,8 +1,5 @@
 export type ComponentStatus =
-	| 'stable'
-	| 'use-with-caution'
-	| 'not-recommended'
-	| 'unaudited';
+	'recommended' | 'use-with-caution' | 'not-recommended' | 'unaudited';
 
 export const statuses: Record<
 	ComponentStatus,
@@ -11,8 +8,8 @@ export const statuses: Record<
 		icon: string;
 	}
 > = {
-	stable: {
-		label: 'Stable',
+	recommended: {
+		label: 'Recommended',
 		icon: '✅',
 	},
 	'use-with-caution': {

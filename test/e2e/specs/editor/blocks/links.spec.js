@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Links', () => {
@@ -604,7 +601,7 @@ test.describe( 'Links', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content:
-						'This is <a href="https://wordpress.org/gutenberg" target="_blank" rel="noreferrer noopener">Gutenberg</a>',
+						'This is <a href="https://wordpress.org/gutenberg" target="_blank" rel="noopener">Gutenberg</a>',
 				},
 			},
 		] );
@@ -871,7 +868,7 @@ test.describe( 'Links', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: `<a href="https://wordpress.org/gutenberg" target="_blank" rel="noreferrer noopener nofollow">Gutenberg</a>`,
+					content: `<a href="https://wordpress.org/gutenberg" target="_blank" rel="noopener nofollow">Gutenberg</a>`,
 				},
 			},
 		] );
@@ -969,12 +966,16 @@ test.describe( 'Links', () => {
 
 			await richTextLink.click();
 
-			// Check focus remains in the RichText.
-			await expect(
-				editor.canvas.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-			).toBeFocused();
+			// Check the selection remains in the RichText.
+			await expect
+				.poll( () =>
+					editor.ownsSelection(
+						editor.canvas.getByRole( 'document', {
+							name: 'Block: Paragraph',
+						} )
+					)
+				)
+				.toBe( true );
 
 			// Type to modify the link text.
 			await page.keyboard.type( ' is awesome' );
@@ -1158,11 +1159,9 @@ test.describe( 'Links', () => {
 			await optionsButton.click();
 
 			await expect( linkPopover ).toBeHidden();
-			// Expect focus on Top toolbar button within dropdown
+			// Expect focus to have moved into the dropdown
 			await expect(
-				page.getByRole( 'menuitemcheckbox', {
-					name: 'Top toolbar Access all block and document tools in a single place',
-				} )
+				page.getByRole( 'menu', { name: 'Options' } )
 			).toBeFocused();
 			// Press Escape
 			await pageUtils.pressKeys( 'Escape' );
@@ -1244,7 +1243,7 @@ test.describe( 'Links', () => {
 	} ) => {
 		// Create a paragraph with text and select it
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Link text' );
 
@@ -1266,7 +1265,7 @@ test.describe( 'Links', () => {
 
 		// Verify validation error is shown
 		await expect(
-			page.locator( '.components-validated-control__indicator' )
+			page.getByText( 'Please enter a valid URL.' )
 		).toBeVisible();
 
 		// Verify focus is still on the input
@@ -1280,6 +1279,78 @@ test.describe( 'Links', () => {
 
 		// Verify focus is still on the input
 		await expect( urlInput ).toBeFocused();
+	} );
+
+	test( 'does not fire search requests while an IME composition is in progress', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Create a block with some text and select some of it.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'This is Gutenberg' );
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Open the Link UI.
+		await pageUtils.pressKeys( 'primary+k' );
+
+		const urlInput = page.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+		await expect( urlInput ).toBeFocused();
+
+		// Track link search requests that carry a search term. The initial
+		// suggestions request has an empty search term and is ignored.
+		const searchedTerms = [];
+		page.on( 'request', ( request ) => {
+			const url = request.url();
+			if (
+				! url.includes( 'wp/v2/search' ) &&
+				! url.includes( 'wp%2Fv2%2Fsearch' )
+			) {
+				return;
+			}
+			const searchTerm = new URL( url ).searchParams.get( 'search' );
+			if ( searchTerm ) {
+				searchedTerms.push( searchTerm );
+			}
+		} );
+
+		// Compose text with an IME. CDP is only available in Chromium, which
+		// is the only project this untagged test runs in.
+		const cdpSession = await page.context().newCDPSession( page );
+		await cdpSession.send( 'Input.imeSetComposition', {
+			text: 'ほ',
+			selectionStart: 1,
+			selectionEnd: 1,
+		} );
+		await cdpSession.send( 'Input.imeSetComposition', {
+			text: 'ほん',
+			selectionStart: 2,
+			selectionEnd: 2,
+		} );
+
+		// The composed text is visible in the input.
+		await expect( urlInput ).toHaveValue( 'ほん' );
+
+		// Wait past the suggestions debounce to verify that no search request
+		// fires for the intermediate composition value. A fixed wait is
+		// required because the expected outcome is that nothing happens.
+		// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+		await page.waitForTimeout( 500 );
+		expect( searchedTerms ).toHaveLength( 0 );
+
+		// Confirm the composition: search requests fire for the confirmed
+		// value only. A single suggestions update fans out to one request
+		// per search type, so assert on the searched terms, not the count.
+		await cdpSession.send( 'Input.insertText', { text: 'ほんだ' } );
+		await expect( urlInput ).toHaveValue( 'ほんだ' );
+		await expect.poll( () => searchedTerms.length ).toBeGreaterThan( 0 );
+		expect( searchedTerms.every( ( term ) => term === 'ほんだ' ) ).toBe(
+			true
+		);
 	} );
 } );
 

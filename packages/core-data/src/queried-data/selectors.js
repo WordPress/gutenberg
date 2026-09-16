@@ -1,16 +1,4 @@
-/**
- * External dependencies
- */
 import EquivalentKeyMap from 'equivalent-key-map';
-
-/**
- * WordPress dependencies
- */
-import { createSelector } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import getQueryParts from './get-query-parts';
 import { setNestedValue } from '../utils';
 
@@ -51,7 +39,9 @@ function getQueriedItemsUncached( state, query, options = {} ) {
 	}
 
 	const isPaginated = supportsPagination && perPage !== -1;
-	const startOffset = isPaginated ? queryOffset ?? ( page - 1 ) * perPage : 0;
+	const startOffset = isPaginated
+		? ( queryOffset ?? ( page - 1 ) * perPage )
+		: 0;
 	const endOffset = isPaginated
 		? Math.min( startOffset + perPage, itemIds.length )
 		: itemIds.length;
@@ -114,11 +104,9 @@ function getQueriedItemsUncached( state, query, options = {} ) {
 
 /**
  * Returns items for a given query, or null if the items are not known. Caches
- * result both per state (by reference) and per query (by deep equality).
- * The caching approach is intended to be durable to query objects which are
- * deeply but not referentially equal, since otherwise:
+ * result per state (by reference) and per query (by deep equality), so that:
  *
- * `getQueriedItems( state, {} ) !== getQueriedItems( state, {} )`
+ * `getQueriedItems( state, {} ) === getQueriedItems( state, {} )`
  *
  * @param {Object}  state                      State object.
  * @param {?Object} query                      Optional query.
@@ -127,24 +115,22 @@ function getQueriedItemsUncached( state, query, options = {} ) {
  *
  * @return {?Array} Query items.
  */
-export const getQueriedItems = createSelector(
-	( state, query = {}, options = {} ) => {
-		let queriedItemsCache = queriedItemsCacheByState.get( state );
-		if ( queriedItemsCache ) {
-			const queriedItems = queriedItemsCache.get( query );
-			if ( queriedItems !== undefined ) {
-				return queriedItems;
-			}
-		} else {
-			queriedItemsCache = new EquivalentKeyMap();
-			queriedItemsCacheByState.set( state, queriedItemsCache );
+export function getQueriedItems( state, query = {}, options = {} ) {
+	let queriedItemsCache = queriedItemsCacheByState.get( state );
+	if ( queriedItemsCache ) {
+		const queriedItems = queriedItemsCache.get( query );
+		if ( queriedItems !== undefined ) {
+			return queriedItems;
 		}
-
-		const items = getQueriedItemsUncached( state, query, options );
-		queriedItemsCache.set( query, items );
-		return items;
+	} else {
+		queriedItemsCache = new EquivalentKeyMap();
+		queriedItemsCacheByState.set( state, queriedItemsCache );
 	}
-);
+
+	const items = getQueriedItemsUncached( state, query, options );
+	queriedItemsCache.set( query, items );
+	return items;
+}
 
 export function getQueriedTotalItems( state, query = {} ) {
 	const { stableKey, context } = getQueryParts( query );

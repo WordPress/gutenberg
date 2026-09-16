@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * Internal dependencies
- */
 import Dropdown from '..';
 import Button from '../../button';
 import MenuGroup from '../../menu-group';
@@ -14,6 +7,7 @@ import MenuItem from '../../menu-item';
 import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 
 const meta: Meta< typeof Dropdown > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Overlays/Dropdown',
 	id: 'components-dropdown',
 	component: Dropdown,
@@ -42,7 +36,7 @@ const meta: Meta< typeof Dropdown > = {
 			expanded: true,
 		},
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

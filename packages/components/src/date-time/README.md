@@ -70,7 +70,7 @@ A callback function which receives a Date object representing a day as an argume
 
 -   Required: No
 
-### `onMonthPreviewed`: `( date: Date ) => void`
+### `onMonthPreviewed`: `( date: string ) => void`
 
 A callback invoked when selecting the previous/next month in the date picker. The callback receives the new month date in the ISO format as an argument.
 
@@ -87,5 +87,5 @@ List of events to show in the date picker. Each event will appear as a dot on th
 
 The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
 
-- Required: No
-- Default: 0
+-   Required: No
+-   Default: 0

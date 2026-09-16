@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { colord } from 'colord';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type {
 	DataViewRenderFieldProps,
 	NormalizedField,

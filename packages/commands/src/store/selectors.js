@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createSelector } from '@wordpress/data';
 
 /**

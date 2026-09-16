@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	createPortal,
 	useState,
@@ -14,21 +7,23 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
-import { __, sprintf, _n } from '@wordpress/i18n';
+import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import {
 	privateApis as coreDataPrivateApis,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { resolveSelect, useDispatch } from '@wordpress/data';
+import { resolveSelect, useDispatch, useSelect } from '@wordpress/data';
 import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
 import type {
-	View,
 	Field,
 	ActionButton,
+	Filter,
 	SupportedLayouts,
+	View,
 } from '@wordpress/dataviews';
+import { useView } from '@wordpress/views';
 import { Stack } from '@wordpress/ui';
 import {
 	altTextField,
@@ -45,10 +40,6 @@ import {
 	mimeTypeField,
 } from '@wordpress/media-fields';
 import { store as noticesStore, SnackbarNotices } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import type { Attachment, RestAttachment } from '../../utils/types';
 import { transformAttachment } from '../../utils/transform-attachment';
 import { uploadMedia } from '../../utils/upload-media';
@@ -69,6 +60,80 @@ const NOTICES_CONTEXT = 'media-modal';
 // Notice ID - reused for all upload-related notices to prevent flooding
 const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
 
+// The one filter the modal keeps out of the persisted view.
+const ATTACHED_TO_FIELD = 'attached_to';
+
+type ViewQueryParams = Pick< View, 'page' | 'search' >;
+
+const defaultQueryParams: ViewQueryParams = {
+	page: 1,
+	search: '',
+};
+
+/**
+ * Derives the selection (attachment IDs as strings) from the `value` prop, which
+ * may be a single id, an array of ids, or undefined.
+ *
+ * @param value The currently selected media item(s).
+ */
+function getSelectionFromValue(
+	value: number | number[] | undefined
+): string[] {
+	if ( ! value ) {
+		return [];
+	}
+	return Array.isArray( value ) ? value.map( String ) : [ String( value ) ];
+}
+
+const defaultView: View = {
+	type: LAYOUT_PICKER_GRID,
+	fields: [],
+	showTitle: false,
+	titleField: 'title',
+	mediaField: 'media_thumbnail',
+	perPage: 50,
+	filters: [],
+	layout: {
+		previewSize: 170,
+		density: 'compact',
+		// Fit each thumbnail inside its square cell rather than cropping it,
+		// so the media's own orientation is visible before it's inserted.
+		// Users can switch back to cropped in the view options.
+		mediaFit: 'contain',
+	},
+};
+
+const defaultLayouts: SupportedLayouts = {
+	[ LAYOUT_PICKER_GRID ]: {
+		fields: [],
+		showTitle: false,
+		layout: {
+			previewSize: 170,
+			density: 'compact',
+			mediaFit: 'contain',
+		},
+	},
+	[ LAYOUT_PICKER_TABLE ]: {
+		fields: [
+			'filename',
+			'filesize',
+			'media_dimensions',
+			'author',
+			'date',
+		],
+		showTitle: true,
+	},
+};
+
+const dataViewsConfig = {
+	// Repeats `DataViewsPicker`'s own default, which passing `config` at all
+	// would otherwise replace.
+	perPageSizes: [ 10, 20, 50, 100 ],
+	// Seeing whether a media item is portrait or landscape before inserting
+	// it matters here, so offer the crop/fit switch in the view options.
+	mediaFitControl: true,
+};
+
 interface MediaUploadModalProps {
 	/**
 	 * Array of allowed media types.
@@ -82,8 +147,9 @@ interface MediaUploadModalProps {
 	multiple?: boolean;
 
 	/**
-	 * The currently selected media item(s).
-	 * Can be a single ID number or array of IDs for multiple selection.
+	 * Media item(s) to pre-select — a single ID or an array of IDs. Seeds the
+	 * selection each time the modal opens (so an external change is picked up on
+	 * the next open); changes while the modal is open are not tracked.
 	 */
 	value?: number | number[];
 
@@ -142,6 +208,20 @@ interface MediaUploadModalProps {
 	 * Label for the search input.
 	 */
 	searchLabel?: string;
+
+	/**
+	 * ID of the post the modal was opened from. When set, the "Attached to"
+	 * filter offers an option for media uploaded to that post. Omit outside of
+	 * a post context, and for a post media can't be uploaded to.
+	 */
+	postId?: number;
+
+	/**
+	 * Slug of the post type `postId` belongs to. Labels that option with the
+	 * post type's own wording — "Uploaded to this page", "Uploaded to this
+	 * template" — falling back to a generic label when it is absent.
+	 */
+	postType?: string;
 }
 
 /**
@@ -163,6 +243,8 @@ interface MediaUploadModalProps {
  * @param props.modalClass    Additional CSS class for modal
  * @param props.search        Whether to show search input
  * @param props.searchLabel   Label for search input
+ * @param props.postId        ID of the post the modal was opened from
+ * @param props.postType      Slug of that post's type
  * @return JSX element or null
  */
 export function MediaUploadModal( {
@@ -178,37 +260,101 @@ export function MediaUploadModal( {
 	modalClass,
 	search = true,
 	searchLabel = __( 'Search media' ),
+	postId,
+	postType,
 }: MediaUploadModalProps ) {
-	const [ selection, setSelection ] = useState< string[] >( () => {
-		if ( ! value ) {
-			return [];
-		}
-		return Array.isArray( value )
-			? value.map( String )
-			: [ String( value ) ];
-	} );
+	// The "uploaded to this post" option resolves to this ID, and the media query
+	// has no use for anything else — a template's entity ID, for instance, is a
+	// slug.
+	const attachedToPostId = Number.isInteger( postId ) ? postId : undefined;
+
+	// Every post type carries its own wording for this — "Uploaded to this
+	// page", "Uploaded to this template" — and core's own media frame labels the
+	// same filter with it. Only looked up when the option is on offer, so that a
+	// caller passing no post type never triggers the resolver.
+	const uploadedToLabel = useSelect(
+		( select ) =>
+			attachedToPostId && postType
+				? select( coreStore ).getPostType( postType )?.labels
+						?.uploaded_to_this_item
+				: undefined,
+		[ attachedToPostId, postType ]
+	);
+
+	const [ selection, setSelection ] = useState< string[] >( () =>
+		getSelectionFromValue( value )
+	);
 
 	const { createSuccessNotice, removeAllNotices } =
 		useDispatch( noticesStore );
 	const invalidateAttachmentResolutions =
 		useInvalidateAttachmentResolutions();
+	const [ queryParams, setQueryParams ] = useState< ViewQueryParams >(
+		() => defaultQueryParams
+	);
 
-	// DataViews configuration - allow view updates
-	const [ view, setView ] = useState< View >( () => ( {
-		type: LAYOUT_PICKER_GRID,
-		fields: [],
-		showTitle: false,
-		titleField: 'title',
-		mediaField: 'media_thumbnail',
-		search: '',
-		page: 1,
-		perPage: 50,
-		filters: [],
-		layout: {
-			previewSize: 170,
-			density: 'compact',
+	// Persist view configuration across sessions via the preferences store.
+	const {
+		view: persistedView,
+		updateView,
+		isModified,
+		resetToDefault,
+	} = useView( {
+		kind: 'postType',
+		name: 'attachment',
+		slug: 'media-modal',
+		defaultView,
+		queryParams,
+		onChangeQueryParams: setQueryParams,
+	} );
+
+	// The "Attached to" filter is deliberately not persisted. A standing
+	// preference like author or mime type is worth carrying between posts, but
+	// scoping the library to the post being edited, or to unattached media, is a
+	// choice about the task at hand — one that is easy to set, easy to forget,
+	// and hides most of the library once it follows the user somewhere else.
+	const [ attachedToFilter, setAttachedToFilter ] = useState<
+		Filter | undefined
+	>();
+
+	const view = useMemo( () => {
+		const filters = ( persistedView.filters ?? [] ).filter(
+			( { field } ) => field !== ATTACHED_TO_FIELD
+		);
+		return {
+			...persistedView,
+			filters: attachedToFilter
+				? [ ...filters, attachedToFilter ]
+				: filters,
+		};
+	}, [ persistedView, attachedToFilter ] );
+
+	// Normalize undefined transient DataViews values so they do not persist as modified modal preferences.
+	const handleChangeView = useCallback(
+		( nextView: View ) => {
+			const normalizedView = { ...nextView };
+			if ( normalizedView.startPosition === undefined ) {
+				delete normalizedView.startPosition;
+			}
+			setAttachedToFilter(
+				normalizedView.filters?.find(
+					( { field } ) => field === ATTACHED_TO_FIELD
+				)
+			);
+			updateView( {
+				...normalizedView,
+				filters: normalizedView.filters?.filter(
+					( { field } ) => field !== ATTACHED_TO_FIELD
+				),
+			} );
 		},
-	} ) );
+		[ updateView ]
+	);
+
+	const handleReset = useCallback( () => {
+		setAttachedToFilter( undefined );
+		resetToDefault();
+	}, [ resetToDefault ] );
 
 	// Build query args based on view properties, similar to PostList
 	const queryArgs = useMemo( () => {
@@ -239,13 +385,62 @@ export function MediaUploadModal( {
 			if ( filter.field === 'mime_type' ) {
 				filters.mime_type = filter.value;
 			}
+			// Handle attachment parent filters. The filter's values name the
+			// option the user picked rather than a post ID, so a stored choice
+			// can't end up pointing at a post the modal is no longer looking at.
+			if (
+				filter.field === ATTACHED_TO_FIELD &&
+				filter.operator === 'isAny'
+			) {
+				const parents = (
+					Array.isArray( filter.value ) ? filter.value : []
+				)
+					.map( ( optionValue ) => {
+						if ( optionValue === 'unattached' ) {
+							return 0;
+						}
+						return optionValue === 'current'
+							? attachedToPostId
+							: undefined;
+					} )
+					.filter( ( parent ) => parent !== undefined );
+
+				// A newly added filter has no value yet, and deselecting every
+				// option leaves an empty one: both mean "no constraint".
+				if ( parents.length ) {
+					filters.parent = parents;
+				}
+			}
 		} );
 
-		// Base media type on allowedTypes if no filter is set
-		if ( ! filters.media_type ) {
-			filters.media_type = allowedTypes?.includes( '*' )
-				? undefined
-				: allowedTypes;
+		// Base media and mime type on allowedTypes if no filter is set
+		if (
+			! filters.media_type &&
+			! filters.mime_type &&
+			allowedTypes &&
+			! allowedTypes.includes( '*' )
+		) {
+			const { mediaTypes, mimeTypes } = allowedTypes.reduce(
+				( acc, type ) => {
+					if ( type.endsWith( '/*' ) ) {
+						acc.mediaTypes.push( type.replace( '/*', '' ) );
+					} else if ( type.includes( '/' ) ) {
+						acc.mimeTypes.push( type );
+					} else {
+						acc.mediaTypes.push( type );
+					}
+
+					return acc;
+				},
+				{ mediaTypes: [] as string[], mimeTypes: [] as string[] }
+			);
+
+			if ( mediaTypes.length ) {
+				filters.media_type = mediaTypes;
+			}
+			if ( mimeTypes.length ) {
+				filters.mime_type = mimeTypes;
+			}
 		}
 
 		return {
@@ -258,7 +453,7 @@ export function MediaUploadModal( {
 			_embed: 'author,wp:attached-to',
 			...filters,
 		};
-	}, [ view, allowedTypes ] );
+	}, [ view, allowedTypes, attachedToPostId ] );
 
 	// Per-batch completion handler: auto-select uploaded items and refresh the grid.
 	const handleBatchComplete = useCallback(
@@ -340,9 +535,32 @@ export function MediaUploadModal( {
 			filesizeField as Field< RestAttachment >,
 			mediaDimensionsField as Field< RestAttachment >,
 			mimeTypeField as Field< RestAttachment >,
-			attachedToField as Field< RestAttachment >,
+			{
+				...( attachedToField as Field< RestAttachment > ),
+				// The shared field definition is not filterable, because the
+				// "Uploaded to this post" option only makes sense with the modal's
+				// post context. Values name options, and `queryArgs` above
+				// translates them to `parent`.
+				elements: [
+					...( attachedToPostId
+						? [
+								{
+									value: 'current',
+									label:
+										uploadedToLabel ??
+										__( 'Uploaded to this item' ),
+								},
+							]
+						: [] ),
+					{
+						value: 'unattached',
+						label: _x( 'Unattached', 'media items' ),
+					},
+				],
+				filterBy: { operators: [ 'isAny' ] },
+			},
 		],
-		[]
+		[ attachedToPostId, uploadedToLabel ]
 	);
 
 	const actions: ActionButton< RestAttachment >[] = useMemo(
@@ -391,6 +609,28 @@ export function MediaUploadModal( {
 		removeAllNotices( 'snackbar', NOTICES_CONTEXT );
 		onClose?.();
 	}, [ removeAllNotices, onClose ] );
+
+	// Keep the latest `value` in a ref so the open effect can read it without
+	// depending on it. Not depending on `value` means a change while the modal is
+	// open won't discard the user's in-progress selection, and an unstable array
+	// prop can't retrigger the effect.
+	const valueRef = useRef( value );
+	useEffect( () => {
+		valueRef.current = value;
+	}, [ value ] );
+
+	useEffect( () => {
+		if ( isOpen ) {
+			// The modal instance stays mounted between opens, so re-seed the
+			// selection from the current `value` each time it opens. This clears
+			// a previous session's selection and picks up any change to `value`
+			// made while the modal was closed.
+			setSelection( getSelectionFromValue( valueRef.current ) );
+		} else {
+			// Reset the view (page/search) on close, as before.
+			setQueryParams( defaultQueryParams );
+		}
+	}, [ isOpen ] );
 
 	// Use onUpload if provided, otherwise fall back to uploadMedia
 	const handleUpload = onUpload || uploadMedia;
@@ -456,30 +696,6 @@ export function MediaUploadModal( {
 		[ totalItems, totalPages ]
 	);
 
-	const defaultLayouts: SupportedLayouts = useMemo(
-		() => ( {
-			[ LAYOUT_PICKER_GRID ]: {
-				fields: [],
-				showTitle: false,
-				layout: {
-					previewSize: 170,
-					density: 'compact',
-				},
-			},
-			[ LAYOUT_PICKER_TABLE ]: {
-				fields: [
-					'filename',
-					'filesize',
-					'media_dimensions',
-					'author',
-					'date',
-				],
-				showTitle: true,
-			},
-		} ),
-		[]
-	);
-
 	// Build accept attribute from allowedTypes
 	const acceptTypes = useMemo( () => {
 		if ( allowedTypes?.includes( '*' ) ) {
@@ -505,7 +721,6 @@ export function MediaUploadModal( {
 					accept={ acceptTypes }
 					multiple
 					onChange={ handleFileSelect }
-					__next40pxDefaultSize
 					render={ ( { openFileDialog } ) => (
 						<Button
 							onClick={ openFileDialog }
@@ -553,15 +768,17 @@ export function MediaUploadModal( {
 				data={ mediaRecords || [] }
 				fields={ fields }
 				view={ view }
-				onChangeView={ setView }
+				onChangeView={ handleChangeView }
 				actions={ actions }
 				selection={ selection }
 				onChangeSelection={ setSelection }
 				isLoading={ isLoading }
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
+				config={ dataViewsConfig }
 				getItemId={ ( item: RestAttachment ) => String( item.id ) }
 				itemListLabel={ __( 'Media items' ) }
+				onReset={ isModified || attachedToFilter ? handleReset : false }
 			>
 				<Stack
 					direction="row"
@@ -598,7 +815,7 @@ export function MediaUploadModal( {
 						onDismissError={ dismissError }
 						onOpenChange={ handlePopoverOpenChange }
 					/>
-					<DataViewsPicker.BulkActionToolbar />
+					<DataViewsPicker.Footer />
 				</div>
 			</DataViewsPicker>
 			{ createPortal(

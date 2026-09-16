@@ -1,20 +1,10 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Icon from '../../icon';
 import Snackbar from '..';
 
 const meta: Meta< typeof Snackbar > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Feedback/Snackbar',
 	id: 'components-snackbar',
 	component: Snackbar,
@@ -38,7 +28,7 @@ const meta: Meta< typeof Snackbar > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},
@@ -69,6 +59,11 @@ WithActions.args = {
 		},
 	],
 	children: 'Use Snackbars with an action link to an external page.',
+};
+WithActions.parameters = {
+	// FIXME: Action control nested inside the snackbar creates nested interactive elements (nested-interactive).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
 };
 
 export const WithIcon: StoryFn< typeof Snackbar > = DefaultTemplate.bind( {} );

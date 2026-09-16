@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { css, type SerializedStyles } from '@emotion/react';
-
-/**
- * Internal dependencies
- */
 import type { Props, SizeToken } from './types';
 import { space } from '../utils/space';
 

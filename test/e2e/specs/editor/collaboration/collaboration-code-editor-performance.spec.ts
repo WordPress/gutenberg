@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { readFileSync } from 'fs';
 import { join } from 'path';
-
-/**
- * WordPress dependencies
- */
 import { test as base, expect } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * Internal dependencies
- */
 import { setCollaboration } from './fixtures/collaboration-utils';
 
 const STEP1_CONTENT = readFileSync(
@@ -38,8 +27,11 @@ const test = base.extend< Fixtures >( {
 	collaborationEnabled: [
 		async ( { requestUtils }, use ) => {
 			await setCollaboration( requestUtils, true );
-			await use( true );
-			await setCollaboration( requestUtils, false );
+			try {
+				await use( true );
+			} finally {
+				await setCollaboration( requestUtils, false );
+			}
 		},
 		{ auto: true },
 	],

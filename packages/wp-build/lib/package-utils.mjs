@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { readFileSync, existsSync } from 'fs';
 import { createRequire } from 'module';
 import path from 'path';
@@ -22,7 +19,6 @@ const packagePathCache = new Map();
  * @property {string}                 [license]               Package license.
  * @property {string}                 [main]                  Main entry point.
  * @property {string}                 [module]                ES module entry point.
- * @property {string}                 [react-native]          React Native entry point.
  * @property {Record<string, string>} [dependencies]          Runtime dependencies.
  * @property {Record<string, string>} [devDependencies]       Development dependencies.
  * @property {Record<string, string>} [peerDependencies]      Peer dependencies.
@@ -87,7 +83,26 @@ export function getPackageInfo( fullPackageName, resolveDir = null ) {
 	// Resolve from the package root context to get correct versions
 	const contextPath = path.join( packageRoot, 'package.json' );
 	const require = createRequire( contextPath );
-	const resolved = require.resolve( `${ fullPackageName }/package.json` );
+
+	let resolved;
+	try {
+		resolved = require.resolve( `${ fullPackageName }/package.json` );
+	} catch ( error ) {
+		// Treat a genuine resolution miss (package not installed, or it doesn't
+		// expose its package.json) as `null` so callers can fall through to
+		// esbuild's own resolution. Rethrow anything unexpected so real errors
+		// (invalid specifiers, resolver bugs) aren't silently swallowed.
+		const code = /** @type {NodeJS.ErrnoException} */ ( error ).code;
+		if (
+			code === 'MODULE_NOT_FOUND' ||
+			code === 'ERR_PACKAGE_PATH_NOT_EXPORTED'
+		) {
+			packageJsonCache.set( cacheKey, null );
+			return null;
+		}
+		throw error;
+	}
+
 	const result = getPackageInfoFromFile( resolved );
 	packageJsonCache.set( cacheKey, result );
 

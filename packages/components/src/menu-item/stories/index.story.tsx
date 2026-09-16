@@ -1,21 +1,12 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { link, more, check } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import MenuGroup from '../../menu-group';
 import MenuItem from '..';
 import Shortcut from '../../shortcut';
+import { NavigableMenu } from '../../navigable-container';
 
 const meta: Meta< typeof MenuItem > = {
+	tags: [ 'manifest' ],
 	component: MenuItem,
 	title: 'Components/Actions/MenuItem',
 	id: 'components-menuitem',
@@ -37,7 +28,7 @@ const meta: Meta< typeof MenuItem > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Subcomponent of `DropdownMenu`.',
 		},
@@ -47,9 +38,11 @@ export default meta;
 
 const Template: StoryFn< typeof MenuItem > = ( props ) => {
 	return (
-		<MenuGroup>
-			<MenuItem { ...props }>Menu Item 1</MenuItem>
-		</MenuGroup>
+		<NavigableMenu>
+			<MenuGroup>
+				<MenuItem { ...props }>Menu Item 1</MenuItem>
+			</MenuGroup>
+		</NavigableMenu>
 	);
 };
 

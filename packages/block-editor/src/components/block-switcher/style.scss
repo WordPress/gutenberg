@@ -48,7 +48,7 @@
 		margin-top: $grid-unit-20;
 
 		.block-editor-block-preview__container {
-			cursor: pointer;
+			cursor: var(--wpds-cursor-control);
 		}
 
 		.block-editor-block-switcher__preview-patterns-container-list__item {
@@ -76,7 +76,7 @@
 				padding: $grid-unit-05;
 				font-size: 12px;
 				text-align: center;
-				cursor: pointer;
+				cursor: var(--wpds-cursor-control);
 			}
 		}
 	}

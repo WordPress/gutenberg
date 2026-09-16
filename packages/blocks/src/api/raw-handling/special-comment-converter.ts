@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { remove, replace } from '@wordpress/dom';
 
 /**

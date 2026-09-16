@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import 'requestidlecallback';
-
-/**
- * Internal dependencies
- */
 import type { RequestIdleCallbackCallback } from './types';
 
 /**

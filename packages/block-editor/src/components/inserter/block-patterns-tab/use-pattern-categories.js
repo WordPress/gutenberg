@@ -1,14 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { _x, _n, sprintf } from '@wordpress/i18n';
-
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import usePatternsState from '../hooks/use-patterns-state';
 import {
 	isPatternFiltered,
@@ -41,7 +33,7 @@ export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 				: patterns.filter(
 						( pattern ) =>
 							! isPatternFiltered( pattern, sourceFilter )
-				  ),
+					),
 		[ sourceFilter, patterns ]
 	);
 

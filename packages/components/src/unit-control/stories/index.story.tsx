@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { UnitControl } from '../';
 import { CSS_UNITS } from '../utils';
 
@@ -27,7 +16,7 @@ const meta: Meta< typeof UnitControl > = {
 		prefix: { control: { type: 'text' } },
 		value: { control: false },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	args: {
 		onChange: fn(),
 		onUnitChange: fn(),
@@ -40,7 +29,7 @@ const meta: Meta< typeof UnitControl > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},
@@ -55,7 +44,6 @@ const DefaultTemplate: StoryFn< typeof UnitControl > = ( {
 
 	return (
 		<UnitControl
-			__next40pxDefaultSize
 			{ ...args }
 			value={ value }
 			onChange={ ( v, extra ) => {
@@ -71,7 +59,6 @@ export const Default: StoryFn< typeof UnitControl > = DefaultTemplate.bind(
 );
 Default.args = {
 	label: 'Label',
-	__next40pxDefaultSize: true,
 };
 
 /**
@@ -123,7 +110,6 @@ export const WithCustomUnits: StoryFn< typeof UnitControl > = ( {
 
 	return (
 		<UnitControl
-			__next40pxDefaultSize
 			{ ...args }
 			value={ value }
 			onChange={ ( v, extra ) => {

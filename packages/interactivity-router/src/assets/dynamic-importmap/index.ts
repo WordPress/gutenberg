@@ -12,10 +12,6 @@
  *
  * MIT License: https://opensource.org/licenses/MIT
  */
-
-/**
- * Internal dependencies
- */
 import { addImportMap, resolve } from './resolver';
 import { initPromise, topLevelLoad, preloadModule } from './loader';
 
