@@ -5,13 +5,16 @@ import {
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
-import { HorizontalRule, SelectControl } from '@wordpress/components';
+import {
+	HorizontalRule,
+	SelectControl as WCSelectControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import useDeprecatedOpacity from './use-deprecated-opacity';
 
 const HtmlElementControl = ( { tagName, setAttributes } ) => {
 	return (
-		<SelectControl
+		<WCSelectControl
 			label={ __( 'HTML element' ) }
 			value={ tagName }
 			onChange={ ( newValue ) => setAttributes( { tagName: newValue } ) }

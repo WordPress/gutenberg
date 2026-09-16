@@ -982,6 +982,43 @@ describe( 'operation registry', () => {
 			expect( select.getAllItems() ).toHaveLength( 0 );
 		} );
 
+		it( 'frees the slot of an item that is being retried', async () => {
+			// The failed operation stays recorded on the item while it
+			// waits out the backoff, but the retry runs it again: an item
+			// still counted against its own pool would be waiting for
+			// capacity it is itself holding, and a pool of one would never
+			// let it through.
+			dispatch.updateSettings( {
+				retry: {
+					maxRetryAttempts: 2,
+					initialRetryDelayMs: 0,
+					maxRetryDelayMs: 0,
+					backoffMultiplier: 1,
+					retryJitter: 0,
+				},
+			} );
+			dispatch.registerConcurrencyPool( { name: 'ocr', limit: 1 } );
+			const handler = vi
+				.fn()
+				.mockImplementationOnce( () => {
+					throw new Error( 'Network request failed' );
+				} )
+				.mockImplementation( () => ( {} ) );
+			dispatch.registerOperation(
+				operation( 'my-plugin/ocr', { handler, concurrency: 'ocr' } )
+			);
+
+			dispatch.addItem( {
+				file: jpegFile,
+				operations: [ 'my-plugin/ocr' ],
+			} );
+			await flush();
+
+			expect( handler ).toHaveBeenCalledTimes( 2 );
+			expect( select.getActiveCountByPool( 'ocr' ) ).toBe( 0 );
+			expect( select.getAllItems() ).toHaveLength( 0 );
+		} );
+
 		it( 'lets an operation join a core pool by name', async () => {
 			dispatch.updateSettings( { maxConcurrentImageProcessing: 1 } );
 			const first = createDeferred< object >();

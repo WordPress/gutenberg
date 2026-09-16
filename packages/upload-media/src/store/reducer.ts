@@ -165,6 +165,24 @@ function reducer(
 								error: undefined,
 								retryCount: ( item.retryCount ?? 0 ) + 1,
 								abortController: new AbortController(),
+								/*
+								 * The failed operation is still recorded on
+								 * the item: nothing finishes it when it
+								 * fails, and while the item waits out the
+								 * backoff that is what keeps it out of the
+								 * concurrency pools. Clear it now that the
+								 * item is about to run again, so processItem
+								 * does not mistake it for an operation still
+								 * in flight and skip the retry.
+								 *
+								 * The slot it took goes with it: an item
+								 * still counted against its pool would be
+								 * competing with itself for the capacity it
+								 * needs to run, and a pool of one would
+								 * never let it through again.
+								 */
+								currentOperation: undefined,
+								currentPool: undefined,
 							}
 						: item
 				),

@@ -18,6 +18,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -43,6 +44,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
 					maxConcurrentUploads: 5,
@@ -69,6 +71,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -96,6 +99,7 @@ describe( 'reducer', () => {
 				failureCount: 1,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
 					maxConcurrentUploads: 5,
@@ -121,6 +125,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -153,6 +158,7 @@ describe( 'reducer', () => {
 				failureCount: 2,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -177,6 +183,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -203,6 +210,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
 					maxConcurrentUploads: 5,
@@ -225,6 +233,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -249,6 +258,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
 					maxConcurrentUploads: 5,
@@ -275,6 +285,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -304,6 +315,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
 					maxConcurrentUploads: 5,
@@ -333,6 +345,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -360,6 +373,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
 					maxConcurrentUploads: 5,
@@ -386,6 +400,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -419,6 +434,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -447,6 +463,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -477,6 +494,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -507,6 +525,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -546,6 +565,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -575,6 +595,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -605,6 +626,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -642,6 +664,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -662,6 +685,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -682,6 +706,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: { '1': [ 'blob:foo' ] },
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -710,6 +735,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -730,6 +756,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -750,6 +777,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -782,6 +810,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -827,6 +856,7 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -864,6 +894,7 @@ describe( 'reducer', () => {
 						handler: () => {},
 					},
 				},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
