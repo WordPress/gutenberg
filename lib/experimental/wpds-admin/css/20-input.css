@@ -40,15 +40,7 @@
 		box-sizing: border-box;
 		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
 		border-radius: var(--wpds-border-radius-sm);
-		/*
-		 * DEVIATION from the design system, deliberate.
-		 * The DS field is transparent (`--wpds-color-background-interactive-neutral-weak`
-		 * is `#0000`) because it always sits on a defined surface. Classic admin
-		 * has no such guarantee — fields sit directly on the grey `#f0f0f0` page
-		 * background as often as on white cards — so a transparent field would
-		 * read as grey on many screens. White keeps the field legible as a field.
-		 */
-		background-color: var(--wpds-color-background-surface-neutral-strong);
+		background-color: var(--wpds-color-background-interactive-neutral);
 		color: var(--wpds-color-foreground-interactive-neutral);
 		box-shadow: none;
 		font-family: var(--wpds-typography-font-family-body);
@@ -133,15 +125,9 @@
 	   Placeholder
 	   ----------------------------------------------------------------------- */
 
-	/*
-	 * Uses the design system token even though it fails contrast on white
-	 * (#8d8d8d is about 3.3:1; WCAG AA wants 4.5:1 for text). Matching the token
-	 * is deliberate: diverging here would hide the problem and report a false
-	 * difference against the component. The fix belongs in the design system.
-	 */
 	input::placeholder,
 	textarea::placeholder {
-		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		color: var(--wpds-color-foreground-interactive-neutral-weak);
 		opacity: 1;
 	}
 
@@ -238,13 +224,7 @@
 	textarea:disabled,
 	textarea.disabled,
 	textarea[aria-disabled="true"] {
-		/*
-		 * DS border and text, but a tinted background rather than the DS's
-		 * transparent one. Classic forms are dense, and border-plus-text alone is
-		 * a weak disabled signal at a glance; the tint is what classic readers
-		 * already recognise. Same reasoning as the base background above.
-		 */
-		background-color: var(--wpds-color-background-surface-neutral-weak);
+		background-color: var(--wpds-color-background-interactive-neutral-disabled);
 		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 		box-shadow: none;
