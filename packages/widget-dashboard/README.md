@@ -271,11 +271,11 @@ The exported kit for handling them:
 
 ## Tile spacing
 
-The tile chrome is a `Card` at the Card's default density. Hosts can tighten or relax it by setting two custom properties at `:root`:
+The tile chrome is a `Card` whose padding defaults to `--wpds-dimension-padding-lg`. Hosts can tighten or relax it by setting two custom properties at `:root`:
 
 ```css
 :root {
-	--wp-widget-dashboard-tile-padding: var( --wpds-dimension-padding-lg );
+	--wp-widget-dashboard-tile-padding: var( --wpds-dimension-padding-2xl );
 }
 ```
 

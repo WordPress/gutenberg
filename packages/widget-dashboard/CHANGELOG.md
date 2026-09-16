@@ -4,11 +4,18 @@
 
 ### Enhancements
 
+-   Tile padding defaults to `--wpds-dimension-padding-lg` instead of the
+    Card's `--wpds-dimension-padding-2xl`, and the header/body gap follows it;
+    `--wp-widget-dashboard-tile-padding` still overrides both
+    ([#82961](https://github.com/WordPress/gutenberg/pull/82961)).
 -   Show the selected widget width in its options menu and add an ellipsis to
     the reset action that opens a confirmation dialog ([#81929](https://github.com/WordPress/gutenberg/pull/81929)).
 
 ### Internal
 
+-   Route link actions through `HostLink` from `@wordpress/widget-primitives`,
+    replacing the per-surface host link gating and `getActionRoute`
+    ([#82952](https://github.com/WordPress/gutenberg/pull/82952)).
 -   Use UI Spinner and remove the direct Components dependency ([#82837](https://github.com/WordPress/gutenberg/pull/82837)).
 -   Migrate dashboard menus from the private Components API to the public
     `@wordpress/ui` Menu ([#81929](https://github.com/WordPress/gutenberg/pull/81929)).
