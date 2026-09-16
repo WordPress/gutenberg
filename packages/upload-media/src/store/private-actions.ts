@@ -816,7 +816,7 @@ export function fetchRemoteFile(
 								'File could not be downloaded for processing',
 							file: item.file,
 							cause: error instanceof Error ? error : undefined,
-					  } )
+						} )
 			);
 		}
 	};

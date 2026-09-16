@@ -23,7 +23,7 @@ vi.mock(
 			createBlobURL: vi.fn( () => 'blob:foo' ),
 			isBlobURL: vi.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
 			revokeBlobURL: vi.fn(),
-		} ) as unknown as typeof import('@wordpress/blob')
+		} ) as unknown as typeof import( '@wordpress/blob' )
 );
 
 vi.mock(
@@ -38,7 +38,7 @@ vi.mock(
 			vipsGetUltraHdrInfo: vi.fn(),
 			terminateVipsWorker: vi.fn(),
 			maybeRecycleVipsWorker: vi.fn(),
-		} ) as unknown as typeof import('../utils')
+		} ) as unknown as typeof import( '../utils' )
 );
 
 vi.mock(
@@ -47,7 +47,7 @@ vi.mock(
 		( {
 			isClientSideMediaSupported: vi.fn( () => true ),
 			exceedsClientProcessingMemory: vi.fn( () => false ),
-		} ) as unknown as typeof import('../../feature-detection')
+		} ) as unknown as typeof import( '../../feature-detection' )
 );
 
 function createRegistryWithStores() {

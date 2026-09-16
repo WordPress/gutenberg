@@ -87,7 +87,7 @@ function OptimizeControl( {
 			media: attachmentId
 				? select( coreStore ).getMedia( attachmentId, {
 						context: 'view',
-				  } )
+					} )
 				: undefined,
 			isOptimizing: attachmentId
 				? select( uploadStore ).isUploadingById( attachmentId )
