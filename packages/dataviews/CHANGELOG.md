@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   DataViews: Use `Select` from `@wordpress/ui` for the pagination page selector and filter operator selector.
+-   DataViews: Use `Select` from `@wordpress/ui` for the pagination page selector and filter operator selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
 
 ### Bug Fixes
 

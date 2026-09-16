@@ -5,7 +5,7 @@
 ### Enhancements
 
 -   Add a text shadow presets screen under Typography ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
--   Font Library: Use `Select` from `@wordpress/ui` for the pagination page selector.
+-   Font Library: Use `Select` from `@wordpress/ui` for the pagination page selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
 
 ### Bug Fixes
 
