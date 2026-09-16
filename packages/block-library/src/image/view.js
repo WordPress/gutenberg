@@ -430,7 +430,7 @@ const { state, actions, callbacks } = store(
 				// Natural ratio of the image clicked to open the lightbox.
 				const naturalRatio = naturalWidth / naturalHeight;
 				// Original ratio of the image clicked to open the lightbox.
-				let originalRatio = originalWidth / originalHeight;
+				const originalRatio = originalWidth / originalHeight;
 
 				// If it has object-fit: contain, recalculates the original sizes
 				// and the screen position without the blank spaces.
@@ -448,19 +448,18 @@ const { state, actions, callbacks } = store(
 						originalWidth = widthWithoutSpace;
 					}
 				}
-				originalRatio = originalWidth / originalHeight;
 
 				// Typically, it uses the image's full-sized dimensions. If those
 				// dimensions have not been set (i.e. an external image with only one
 				// size), the image's dimensions in the lightbox are the same
 				// as those of the image in the content.
-				let imgMaxWidth = parseFloat(
+				const imgMaxWidth = parseFloat(
 					state.selectedImage.targetWidth &&
 						state.selectedImage.targetWidth !== 'none'
 						? state.selectedImage.targetWidth
 						: naturalWidth
 				);
-				let imgMaxHeight = parseFloat(
+				const imgMaxHeight = parseFloat(
 					state.selectedImage.targetHeight &&
 						state.selectedImage.targetHeight !== 'none'
 						? state.selectedImage.targetHeight
@@ -468,54 +467,9 @@ const { state, actions, callbacks } = store(
 				);
 
 				// Ratio of the biggest image stored in the database.
-				let imgRatio = imgMaxWidth / imgMaxHeight;
-				const fullSizeRatio = imgRatio;
-				let containerMaxWidth = imgMaxWidth;
-				let containerMaxHeight = imgMaxHeight;
+				const fullSizeRatio = imgMaxWidth / imgMaxHeight;
 				let containerWidth = imgMaxWidth;
 				let containerHeight = imgMaxHeight;
-
-				// Checks if the target image has a different ratio than the original
-				// one (thumbnail). Recalculates the width and height.
-				if ( naturalRatio.toFixed( 2 ) !== imgRatio.toFixed( 2 ) ) {
-					if ( naturalRatio > imgRatio ) {
-						// If the width is reached before the height, it keeps the maxWidth
-						// and recalculates the height unless the difference between the
-						// maxHeight and the reducedHeight is higher than the maxWidth,
-						// where it keeps the reducedHeight and recalculate the width.
-						const reducedHeight = imgMaxWidth / naturalRatio;
-						if ( imgMaxHeight - reducedHeight > imgMaxWidth ) {
-							imgMaxHeight = reducedHeight;
-							imgMaxWidth = reducedHeight * naturalRatio;
-						} else {
-							imgMaxHeight = imgMaxWidth / naturalRatio;
-						}
-					} else {
-						// If the height is reached before the width, it keeps the maxHeight
-						// and recalculate the width unlesss the difference between the
-						// maxWidth and the reducedWidth is higher than the maxHeight, where
-						// it keeps the reducedWidth and recalculate the height.
-						const reducedWidth = imgMaxHeight * naturalRatio;
-						if ( imgMaxWidth - reducedWidth > imgMaxHeight ) {
-							imgMaxWidth = reducedWidth;
-							imgMaxHeight = reducedWidth / naturalRatio;
-						} else {
-							imgMaxWidth = imgMaxHeight * naturalRatio;
-						}
-					}
-					containerWidth = imgMaxWidth;
-					containerHeight = imgMaxHeight;
-					imgRatio = imgMaxWidth / imgMaxHeight;
-
-					// Calculates the max size of the container.
-					if ( originalRatio > imgRatio ) {
-						containerMaxWidth = imgMaxWidth;
-						containerMaxHeight = containerMaxWidth / originalRatio;
-					} else {
-						containerMaxHeight = imgMaxHeight;
-						containerMaxWidth = containerMaxHeight * originalRatio;
-					}
-				}
 
 				// If the image has been pixelated on purpose, it keeps that size.
 				if (
@@ -564,11 +518,19 @@ const { state, actions, callbacks } = store(
 					containerWidth = containerHeight * fullSizeRatio;
 				}
 
-				const containerScale = originalWidth / containerWidth;
-				const lightboxImgWidth =
-					imgMaxWidth * ( containerWidth / containerMaxWidth );
-				const lightboxImgHeight =
-					imgMaxHeight * ( containerHeight / containerMaxHeight );
+				const containerScale = Math.max(
+					originalWidth / containerWidth,
+					originalHeight / containerHeight
+				);
+				const thumbnailWidth = originalWidth / containerScale;
+				const thumbnailHeight = originalHeight / containerScale;
+				const cropX = ( containerWidth - thumbnailWidth ) / 2;
+				const cropY = ( containerHeight - thumbnailHeight ) / 2;
+				screenPosX -= cropX * containerScale;
+				screenPosY -= cropY * containerScale;
+
+				const hasCroppedSource =
+					naturalRatio.toFixed( 2 ) !== fullSizeRatio.toFixed( 2 );
 
 				// As of this writing, using the calculations above will render the
 				// lightbox with a small, erroneous whitespace on the left side of the
@@ -581,8 +543,15 @@ const { state, actions, callbacks } = store(
 					--wp--lightbox-initial-left-position: ${ screenPosX }px;
 					--wp--lightbox-container-width: ${ containerWidth + 1 }px;
 					--wp--lightbox-container-height: ${ containerHeight + 1 }px;
-					--wp--lightbox-image-width: ${ lightboxImgWidth }px;
-					--wp--lightbox-image-height: ${ lightboxImgHeight }px;
+					--wp--lightbox-image-width: ${ containerWidth }px;
+					--wp--lightbox-image-height: ${ containerHeight }px;
+					--wp--lightbox-initial-clip: inset(${ cropY }px ${ cropX }px);
+					--wp--lightbox-thumbnail-width: ${
+						hasCroppedSource ? thumbnailWidth : containerWidth
+					}px;
+					--wp--lightbox-thumbnail-height: ${
+						hasCroppedSource ? thumbnailHeight : containerHeight
+					}px;
 					--wp--lightbox-scale: ${ containerScale };
 					--wp--lightbox-scrollbar-width: ${
 						window.innerWidth - document.documentElement.clientWidth
