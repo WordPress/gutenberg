@@ -53,6 +53,7 @@ import type {
 	Attachment,
 	BatchId,
 	CacheBlobUrlAction,
+	CoreOperationResult,
 	ImageFormat,
 	OnBatchSuccessHandler,
 	OnChangeHandler,
@@ -551,6 +552,30 @@ function createOperationContext(
 }
 
 /**
+ * The updates any operation handler may apply to its item.
+ */
+const OPERATION_RESULT_KEYS = [
+	'file',
+	'attachment',
+	'additionalData',
+	'poster',
+] as const;
+
+/**
+ * What a `core/` operation may apply on top of those.
+ *
+ * `core/prepare` hands the original HEIC or GIF forward on the item so
+ * `core/thumbnail-generation` can sideload it as a companion once the
+ * attachment exists. Dropping these silently loses the companion file.
+ */
+const CORE_OPERATION_RESULT_KEYS = [
+	...OPERATION_RESULT_KEYS,
+	'sourceFile',
+	'originalHeicFile',
+	'animatedGifFile',
+] as const;
+
+/**
  * Narrows an operation handler's return value to the updates it may apply.
  *
  * The reducer merges the result over the queue item, so a handler that
@@ -558,30 +583,27 @@ function createOperationContext(
  * handed, say — could otherwise re-insert the step it just finished or
  * point the entry at a different item.
  *
- * @param result Whatever the handler resolved with.
+ * @param result   Whatever the handler resolved with.
+ * @param [isCore] Whether the operation is a core one, which may also carry
+ *                 the files core steps pass between themselves.
  *
  * @return Updates to apply to the item.
  */
 function pickOperationResult(
-	result: OperationResult | void
-): OperationResult {
-	const updates: OperationResult = {};
+	result: CoreOperationResult | void,
+	isCore = false
+): CoreOperationResult {
+	const updates: CoreOperationResult = {};
 	if ( ! result ) {
 		return updates;
 	}
 
-	const { file, attachment, additionalData, poster } = result;
-	if ( file !== undefined ) {
-		updates.file = file;
-	}
-	if ( attachment !== undefined ) {
-		updates.attachment = attachment;
-	}
-	if ( additionalData !== undefined ) {
-		updates.additionalData = additionalData;
-	}
-	if ( poster !== undefined ) {
-		updates.poster = poster;
+	const keys = isCore ? CORE_OPERATION_RESULT_KEYS : OPERATION_RESULT_KEYS;
+	for ( const key of keys ) {
+		const value = result[ key ];
+		if ( value !== undefined ) {
+			( updates as Record< string, unknown > )[ key ] = value;
+		}
 	}
 	return updates;
 }
@@ -609,13 +631,14 @@ export function runOperation(
 			return;
 		}
 
+		const isCore = name.startsWith( 'core/' );
 		const context = createOperationContext(
 			item,
 			{ select, dispatch },
-			name.startsWith( 'core/' )
+			isCore
 		);
 
-		let result: OperationResult | void;
+		let result: CoreOperationResult | void;
 		try {
 			result = await definition.handler( item, args, context );
 		} catch ( error ) {
@@ -635,7 +658,7 @@ export function runOperation(
 			return;
 		}
 
-		dispatch.finishOperation( id, pickOperationResult( result ) );
+		dispatch.finishOperation( id, pickOperationResult( result, isCore ) );
 	};
 }
 
@@ -995,7 +1018,7 @@ export function prepareItem( id: QueueItemId ) {
 		// The pipeline core decides on, before registered operations get to
 		// adjust it, and the updates to apply to the item alongside it.
 		let operations: Operation[] | undefined;
-		let updates: Partial< QueueItem > = {};
+		let updates: CoreOperationResult = {};
 
 		// Animated GIF → video. WebCodecs is required; client-side media
 		// already runs only under cross-origin isolation, so this is a

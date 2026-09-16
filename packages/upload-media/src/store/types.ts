@@ -466,6 +466,21 @@ export type OperationResult = Partial<
 >;
 
 /**
+ * What a `core/` operation may carry back on top of the public result.
+ *
+ * These are the files core steps hand along the pipeline: the original a
+ * later step sideloads as a companion once the attachment exists, and the
+ * source file the item was prepared from. They are plumbing between core
+ * steps rather than part of the contract offered to plugins, so the same
+ * `core/` check that hands out the privileged context decides whether they
+ * are read back out of a handler's result.
+ */
+export type CoreOperationResult = OperationResult &
+	Partial<
+		Pick< QueueItem, 'sourceFile' | 'originalHeicFile' | 'animatedGifFile' >
+	>;
+
+/**
  * Arguments for spawning a child item from inside an operation handler.
  *
  * The child is parented to the handler's item and is uploaded through the

@@ -441,6 +441,78 @@ describe( 'operation registry', () => {
 			expect( select.getItem( 'hijacked' ) ).toBeUndefined();
 			expect( select.getAllItems() ).toHaveLength( 0 );
 		} );
+
+		it( 'keeps the files core steps hand to each other', async () => {
+			// core/prepare converts a HEIC and keeps the original on the
+			// item so core/thumbnail-generation can sideload it as the
+			// source_original companion once the attachment exists. Those
+			// fields are not part of the contract offered to plugins, so
+			// only core operations carry them back out of a handler.
+			const heicFile = new File( [ 'foo' ], 'example.heic', {
+				type: 'image/heic',
+			} );
+			let seen: QueueItem | undefined;
+
+			await dispatch.unregisterOperation( OperationType.Prepare );
+			dispatch.registerOperation(
+				operation( OperationType.Prepare, {
+					handler: () => ( {
+						file: jpegFile,
+						sourceFile: jpegFile,
+						originalHeicFile: heicFile,
+					} ),
+				} )
+			);
+			dispatch.registerOperation(
+				operation( 'my-plugin/inspect', {
+					handler: ( item ) => {
+						seen = item;
+					},
+				} )
+			);
+
+			dispatch.addItem( {
+				file: heicFile,
+				operations: [ OperationType.Prepare, 'my-plugin/inspect' ],
+			} );
+			await flush();
+
+			expect( seen?.file ).toBe( jpegFile );
+			expect( seen?.sourceFile ).toBe( jpegFile );
+			expect( seen?.originalHeicFile ).toBe( heicFile );
+		} );
+
+		it( 'drops those same files from a third-party result', async () => {
+			const heicFile = new File( [ 'foo' ], 'example.heic', {
+				type: 'image/heic',
+			} );
+			let seen: QueueItem | undefined;
+
+			dispatch.registerOperation(
+				operation( 'my-plugin/convert', {
+					handler: () => ( {
+						file: jpegFile,
+						originalHeicFile: heicFile,
+					} ),
+				} )
+			);
+			dispatch.registerOperation(
+				operation( 'my-plugin/inspect', {
+					handler: ( item ) => {
+						seen = item;
+					},
+				} )
+			);
+
+			dispatch.addItem( {
+				file: heicFile,
+				operations: [ 'my-plugin/convert', 'my-plugin/inspect' ],
+			} );
+			await flush();
+
+			expect( seen?.file ).toBe( jpegFile );
+			expect( seen?.originalHeicFile ).toBeUndefined();
+		} );
 	} );
 
 	describe( 'handler context', () => {
