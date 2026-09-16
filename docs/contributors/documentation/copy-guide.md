@@ -314,3 +314,17 @@ Consistency with existing UI language is great, but not when it gets in the way 
 It might seem obvious to us that the user got this message when they tried to publish something or change a setting that they don’t have permission for. It might not be so obvious to the user: people click around a lot, especially when we’re unsure how to do something, and we don’t always remember what page or setting we were just looking at (or why!).
 
 A good error message also includes some context that orients the user. “Your account does not have permission to publish posts” reminds them that they were trying to publish a post, and that that’s the particular stumbling block that caused the error.
+
+#### FIVE: Remember that a message can disappear before it’s been read.
+
+By default a snackbar clears itself about six seconds after it appears, whether or not anyone has finished reading. That’s the budget for the whole message, and it doesn’t stretch to fit a longer one.
+
+So keep a snackbar short enough to take in at a glance—one line is a good target. Counting characters isn’t much help here, because translations often run longer than the English original: a message that sits on one line for you can wrap to three somewhere else.
+
+> Failed to process the uploaded file because its format could not be determined. Please convert it to a supported format and try uploading it again.
+
+vs.
+
+> That file couldn’t be read. Try converting it to JPEG or PNG.
+
+And when someone really does need to read a message and act on it, don’t leave it on that six second timer. Either keep the snackbar up until it’s dismissed, or use a notice that stays put by design.

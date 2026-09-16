@@ -180,7 +180,7 @@ const UnforwardedFontSizePicker = (
 									hasUnits
 										? `${ valueQuantity ?? '' }${
 												valueUnit ?? ''
-										  }`
+											}`
 										: resolvedValueForControls
 								}
 								onChange={ ( newValue ) => {

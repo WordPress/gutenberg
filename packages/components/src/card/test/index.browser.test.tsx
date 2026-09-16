@@ -69,6 +69,18 @@ function readElevationShadow( card: HTMLElement ) {
 	return getComputedStyle( layers[ layers.length - 1 ] ).boxShadow;
 }
 
+function readElevationRadii( card: HTMLElement ) {
+	// The elevation layers are intentionally hidden presentation elements.
+	// eslint-disable-next-line testing-library/no-node-access
+	const layers = card.querySelectorAll< HTMLElement >(
+		'.components-elevation'
+	);
+	return Array.from(
+		layers,
+		( shadow ) => getComputedStyle( shadow ).borderRadius
+	);
+}
+
 describe( 'Card', () => {
 	it( 'renders its regions and media', async () => {
 		await render(
@@ -397,5 +409,65 @@ describe( 'Card', () => {
 		expect(
 			getComputedStyle( screen.getByTestId( 'scrollable' ) ).overflowY
 		).toBe( 'auto' );
+	} );
+
+	it.each( [
+		{
+			order: 'rounded first',
+			rounded: [ true, false ],
+		},
+		{
+			order: 'square first',
+			rounded: [ false, true ],
+		},
+	] )(
+		'keeps both shadows aligned with the default Card radius with $order',
+		async ( { rounded } ) => {
+			await render(
+				<>
+					{ rounded.map( ( isRounded ) => (
+						<Card
+							key={ String( isRounded ) }
+							isRounded={ isRounded }
+							elevation={ 5 }
+							data-testid={
+								isRounded ? 'rounded-card' : 'square-card'
+							}
+						>
+							Card content
+						</Card>
+					) ) }
+				</>
+			);
+
+			for ( const isRounded of rounded ) {
+				const card = screen.getByTestId(
+					isRounded ? 'rounded-card' : 'square-card'
+				);
+				const radius = getComputedStyle( card ).borderRadius;
+				await expect
+					.poll( () => readElevationRadii( card ) )
+					.toEqual( [ radius, radius ] );
+			}
+		}
+	);
+
+	it( 'keeps both shadows aligned with a custom Card radius', async () => {
+		await render(
+			<Card
+				isRounded={ false }
+				elevation={ 5 }
+				style={ { borderRadius: 23 } }
+				data-testid="card"
+			>
+				Card content
+			</Card>
+		);
+
+		const card = screen.getByTestId( 'card' );
+		const radius = getComputedStyle( card ).borderRadius;
+		await expect
+			.poll( () => readElevationRadii( card ) )
+			.toEqual( [ radius, radius ] );
 	} );
 } );

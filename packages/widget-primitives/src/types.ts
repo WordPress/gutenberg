@@ -294,8 +294,9 @@ export interface WidgetTypeMetadata< Item = unknown > {
  * (`WidgetModuleRecord`); `useWidgetTypes` is the single boundary that
  * resolves them into this camelCase shape.
  */
-export interface WidgetType< Item = unknown >
-	extends WidgetTypeMetadata< Item > {
+export interface WidgetType<
+	Item = unknown,
+> extends WidgetTypeMetadata< Item > {
 	/**
 	 * Script-module identifier resolved to a React component at render
 	 * time, produced from the conventional `render.*` entry point.
@@ -344,15 +345,17 @@ export type ResolveWidgetModule = (
  * stands.
  */
 type WidgetModuleRecordOverrides = {
-	[ K in keyof Pick<
-		WidgetTypeMetadata,
-		| 'title'
-		| 'description'
-		| 'help'
-		| 'category'
-		| 'presentation'
-		| 'keywords'
-	> ]?: WidgetTypeMetadata[ K ] | null;
+	[
+		K in keyof Pick<
+			WidgetTypeMetadata,
+			| 'title'
+			| 'description'
+			| 'help'
+			| 'category'
+			| 'presentation'
+			| 'keywords'
+		>
+	]?: WidgetTypeMetadata[ K ] | null;
 };
 
 /**
