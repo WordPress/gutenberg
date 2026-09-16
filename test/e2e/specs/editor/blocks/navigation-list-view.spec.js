@@ -189,17 +189,17 @@ test.describe( 'Navigation block - List view editing', () => {
 		const thirdResult = await linkControl.getNthSearchResult( 2 );
 
 		const firstResultType =
-			await linkControl.getSearchResultText( firstResult );
+			await linkControl.getSearchResultType( firstResult );
 
 		const secondResultType =
-			await linkControl.getSearchResultText( secondResult );
+			await linkControl.getSearchResultType( secondResult );
 
 		const thirdResultType =
-			await linkControl.getSearchResultText( thirdResult );
+			await linkControl.getSearchResultType( thirdResult );
 
-		expect( firstResultType ).toContain( 'Page' );
-		expect( secondResultType ).toContain( 'Page' );
-		expect( thirdResultType ).toContain( 'Page' );
+		expect( firstResultType ).toBe( 'Page' );
+		expect( secondResultType ).toBe( 'Page' );
+		expect( thirdResultType ).toBe( 'Page' );
 
 		// Grab the text from the first result so we can check (later on) that it was inserted.
 		const firstResultText =
@@ -646,5 +646,13 @@ class LinkControl {
 			.locator( '.components-menu-item__item' ) // this is the only way to get the label text without the URL.
 			.last()
 			.innerText();
+	}
+
+	async getSearchResultType( result ) {
+		await expect( result ).toBeVisible();
+
+		// The entity type renders as a sibling of the label, so it is not part
+		// of the text returned by getSearchResultText.
+		return result.locator( '.components-menu-item__shortcut' ).innerText();
 	}
 }
