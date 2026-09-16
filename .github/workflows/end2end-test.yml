@@ -22,7 +22,7 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -41,7 +41,7 @@ jobs:
                   npx wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache"
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)
-              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               if: always()
               with:
                   name: failures-artifacts
@@ -49,7 +49,7 @@ jobs:
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               if: always()
               with:
                   name: flaky-tests-report
@@ -67,7 +67,7 @@ jobs:
                 totalParts: [8]
 
         steps:
-            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -92,7 +92,7 @@ jobs:
                   xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:playwright -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
 
             - name: Archive debug artifacts (screenshots, traces)
-              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               if: always()
               with:
                   name: failures-artifacts
@@ -100,7 +100,7 @@ jobs:
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               if: always()
               with:
                   name: flaky-tests-report
@@ -115,12 +115,12 @@ jobs:
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).
-            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   ref: trunk
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            - uses: actions/download-artifact@v4.1.2
+            - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               id: download_artifact
               # Don't fail the job if there isn't any flaky tests report.
               continue-on-error: true
