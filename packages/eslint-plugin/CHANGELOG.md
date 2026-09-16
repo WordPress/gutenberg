@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Update `use-recommended-components` rule to mark `Select` and `SelectControl` from `@wordpress/ui` as recommended.
+
 ### Breaking Changes
 
 -   Switch `test-unit` from Jest to `@vitest/eslint-plugin` recommended rules with explicit imports at the 27.0.0 boundary. Jest consumers must configure `eslint-plugin-jest` directly. ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
