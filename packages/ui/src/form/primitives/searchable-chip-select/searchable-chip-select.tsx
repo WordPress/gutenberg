@@ -130,7 +130,7 @@ export const SearchableChipSelect = forwardRef<
 															>
 																{ item.label }
 															</Combobox.ChipWithRemove>
-													  ) ) }
+														) ) }
 											</Stack>
 											{ showClearButton && (
 												<Combobox.Clear

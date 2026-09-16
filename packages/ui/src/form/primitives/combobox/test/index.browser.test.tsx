@@ -193,28 +193,30 @@ describe( 'Combobox', () => {
 		const user = userEvent;
 
 		await render(
-			<Combobox.Root< Item, true >
-				items={ ITEMS }
-				multiple
-				defaultValue={ [ ITEMS[ 0 ] ] }
-			>
-				<Combobox.Chips>
-					<Combobox.Value>
-						{ ( value: Item[] ) => (
-							<>
-								{ value.map( ( item ) => (
-									<Combobox.ChipWithRemove
-										key={ item.id }
-										removeLabel={ `Remove ${ item.value }` }
-									>
-										{ item.value }
-									</Combobox.ChipWithRemove>
-								) ) }
-							</>
-						) }
-					</Combobox.Value>
-				</Combobox.Chips>
-			</Combobox.Root>
+			<Tooltip.Provider delay={ 0 }>
+				<Combobox.Root< Item, true >
+					items={ ITEMS }
+					multiple
+					defaultValue={ [ ITEMS[ 0 ] ] }
+				>
+					<Combobox.Chips>
+						<Combobox.Value>
+							{ ( value: Item[] ) => (
+								<>
+									{ value.map( ( item ) => (
+										<Combobox.ChipWithRemove
+											key={ item.id }
+											removeLabel={ `Remove ${ item.value }` }
+										>
+											{ item.value }
+										</Combobox.ChipWithRemove>
+									) ) }
+								</>
+							) }
+						</Combobox.Value>
+					</Combobox.Chips>
+				</Combobox.Root>
+			</Tooltip.Provider>
 		);
 
 		await user.hover(
