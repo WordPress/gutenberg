@@ -388,7 +388,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		}
 
 		if ( function_exists( 'mb_stripos' ) ) {
-			return false !== mb_stripos( $haystack, $needle, 0, 'UTF-8' );
+			return false !== mb_stripos( $haystack, $needle, 0 );
 		}
 
 		return false !== stripos( $haystack, $needle );
