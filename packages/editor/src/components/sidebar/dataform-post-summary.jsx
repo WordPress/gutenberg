@@ -191,7 +191,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 		const _availableTemplates = select( coreDataStore ).getCurrentTheme()
 			?.is_block_theme
 			? null
-			: getEditorSettings().availableTemplates ?? null;
+			: ( getEditorSettings().availableTemplates ?? null );
 		return {
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),

@@ -13,7 +13,7 @@ import {
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -178,7 +178,7 @@ export function SocialLinksEdit( props ) {
 							setAttributes( { size: undefined } )
 						}
 					>
-						<SelectControl
+						<WCSelectControl
 							label={ __( 'Icon size' ) }
 							onChange={ ( newSize ) => {
 								setAttributes( {

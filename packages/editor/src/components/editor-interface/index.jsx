@@ -382,7 +382,7 @@ export default function EditorInterface( {
 								}
 								forceIsDirtyPublishPanel={ forceIsDirty }
 							/>
-					  )
+						)
 					: undefined
 			}
 		/>

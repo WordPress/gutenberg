@@ -108,8 +108,8 @@ type ConvertGeneratorsToPromises< T > = {
 			? T[ K ]
 			: ConvertGeneratorToPromise< T[ K ] >
 		: T[ K ] extends object
-		? Prettify< ConvertGeneratorsToPromises< T[ K ] > >
-		: T[ K ];
+			? Prettify< ConvertGeneratorsToPromises< T[ K ] > >
+			: T[ K ];
 };
 type ConvertPromiseToGenerator< T > = T extends (
 	...args: infer A
@@ -122,8 +122,8 @@ type ConvertPromisesToGenerators< T > = {
 			? T[ K ]
 			: ConvertPromiseToGenerator< T[ K ] >
 		: T[ K ] extends object
-		? Prettify< ConvertPromisesToGenerators< T[ K ] > >
-		: T[ K ];
+			? Prettify< ConvertPromisesToGenerators< T[ K ] > >
+			: T[ K ];
 };
 
 export const universalUnlock =

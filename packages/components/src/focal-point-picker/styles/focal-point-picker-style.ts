@@ -80,7 +80,7 @@ const extraHelpTextMargin = ( {
 	return hasHelpText
 		? css`
 				padding-bottom: 1em;
-		  `
+			`
 		: undefined;
 };
 
