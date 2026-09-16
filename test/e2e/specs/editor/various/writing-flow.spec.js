@@ -1411,15 +1411,14 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Hello world' },
 		} );
-
-		// Deselect the block.
-		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
-		);
-
-		const paragraphBlock = editor.canvas.getByRole( 'document', {
-			name: 'Block: Paragraph',
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
 		} );
+
+		const paragraphBlock = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
 		const box = await paragraphBlock.boundingBox();
 
 		// Start the drag from just before the left edge of the paragraph
