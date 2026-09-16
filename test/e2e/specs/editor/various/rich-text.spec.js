@@ -943,6 +943,14 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			)
 			.toBe( 'core/group' );
 
+		// Click the padding again while the group already has focus but is
+		// no longer selected, so the click does not move focus.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
+		await page.mouse.click( box.x + box.width / 2, box.y + 20 );
+		await expect( group ).toBeFocused();
+
 		// The paragraph must not have received the caret.
 		await page.keyboard.type( 'x' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
