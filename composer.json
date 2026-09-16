@@ -17,12 +17,17 @@
 	},
 	"config": {
 		"process-timeout": 0,
-		"platform": {
-			"php": "7.4"
-		},
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true,
 			"composer/installers": true
+		},
+		"policy": {
+			"advisories": {
+				"ignore-id": {
+					"PKSA-z3gr-8qht-p93v": "CVE-2026-24765: unsafe deserialization in PHPUnit's PHPT-format code-coverage handling. This repository has no .phpt-format tests, and unit-test.yml explicitly disables code coverage instrumentation (coverage: none), so the vulnerable code path is never reached. Ignored to allow a PHP-7.0/7.1-compatible phpunit/phpunit release to resolve.",
+					"PKSA-mh9b-91zm-m1gy": "CVE-2026-45293: only affects the WordPress and WordPress-Extra rulesets' WordPress.WP.EnqueuedResourceParameters sniff, which this repository's phpcs.xml.dist does not use (it uses WordPress-Core and WordPress-Docs). Ignored to allow a PHP-7.0/7.1-compatible wp-coding-standards/wpcs release to resolve."
+				}
+			}
 		}
 	},
 	"require-dev": {
@@ -43,6 +48,7 @@
 		}
 	],
 	"require": {
+		"php": ">=7.0.33",
 		"composer/installers": "~1.0"
 	},
 	"scripts": {
