@@ -1899,27 +1899,17 @@ test.describe( 'Navigation block', () => {
 	} );
 
 	test.describe( 'Navigation Link Inspector Link Editing', () => {
-		const TEST_CATEGORY_NAME = 'Test Category 1';
+		// WordPress always has this category, so nothing needs creating or
+		// removing.
+		const DEFAULT_CATEGORY_NAME = 'Uncategorized';
 		let testPage1;
 
 		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
-			// Terms are not covered by the deleteAll* helpers, so clear any
-			// left behind by an interrupted run before creating a new one.
-			const staleTerms = await requestUtils.rest( {
-				path: '/wp/v2/categories',
-				params: { search: TEST_CATEGORY_NAME },
-			} );
-			await Promise.all(
-				staleTerms.map( ( term ) =>
-					requestUtils.rest( {
-						method: 'DELETE',
-						path: `/wp/v2/categories/${ term.id }`,
-						params: { force: true },
-					} )
-				)
-			);
-			await requestUtils.createRecord( 'categories', {
-				name: TEST_CATEGORY_NAME,
+			// Shares a word with the default category, so one search returns
+			// both a page and a term and their order can be asserted.
+			await requestUtils.createPage( {
+				title: `${ DEFAULT_CATEGORY_NAME } Notes`,
+				status: 'publish',
 			} );
 
 			// Create test pages
@@ -1954,19 +1944,6 @@ test.describe( 'Navigation block', () => {
 
 		test.afterEach( async ( { requestUtils } ) => {
 			await requestUtils.deleteAllPages();
-			const terms = await requestUtils.rest( {
-				path: '/wp/v2/categories',
-				params: { search: TEST_CATEGORY_NAME },
-			} );
-			await Promise.all(
-				terms.map( ( term ) =>
-					requestUtils.rest( {
-						method: 'DELETE',
-						path: `/wp/v2/categories/${ term.id }`,
-						params: { force: true },
-					} )
-				)
-			);
 		} );
 
 		test( 'can update page link to a new page link', async ( {
@@ -2066,7 +2043,9 @@ test.describe( 'Navigation block', () => {
 
 				await expect( navigation.getLinkControlSearch() ).toBeFocused();
 
-				await page.keyboard.type( TEST_CATEGORY_NAME, { delay: 50 } );
+				await page.keyboard.type( DEFAULT_CATEGORY_NAME, {
+					delay: 50,
+				} );
 
 				const searchResults = page.getByRole( 'listbox', {
 					name: /Search results/,
@@ -2074,7 +2053,8 @@ test.describe( 'Navigation block', () => {
 				await expect( searchResults ).toBeVisible();
 
 				await searchResults
-					.getByRole( 'option', { name: /Test Category 1/ } )
+					// The page sharing the word sorts first, so match the term's URL.
+					.getByRole( 'option', { name: /\/category\// } )
 					.click();
 
 				await expect( navigation.getLinkPopover() ).toBeHidden();
@@ -2102,7 +2082,9 @@ test.describe( 'Navigation block', () => {
 
 				await expect( navigation.getLinkControlSearch() ).toBeFocused();
 
-				await page.keyboard.type( 'Test', { delay: 50 } );
+				await page.keyboard.type( DEFAULT_CATEGORY_NAME, {
+					delay: 50,
+				} );
 
 				const searchResults = page.getByRole( 'listbox', {
 					name: /Search results/,
@@ -2111,7 +2093,7 @@ test.describe( 'Navigation block', () => {
 
 				await expect(
 					searchResults.getByRole( 'option' ).first()
-				).toContainText( TEST_CATEGORY_NAME );
+				).toContainText( DEFAULT_CATEGORY_NAME );
 			} );
 		} );
 

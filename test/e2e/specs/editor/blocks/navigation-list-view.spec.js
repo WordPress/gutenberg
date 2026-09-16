@@ -1,8 +1,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block - List view editing', () => {
-	const TEST_CATEGORY_NAME = 'Test Category 1';
-	let testCategory;
+	// WordPress always has this category, so nothing needs creating or removing.
+	const DEFAULT_CATEGORY_NAME = 'Uncategorized';
 
 	const navMenuBlocksFixture = {
 		title: 'Test Menu',
@@ -30,22 +30,6 @@ test.describe( 'Navigation block - List view editing', () => {
 			title: 'Test Post 1',
 			status: 'publish',
 		} );
-		const staleTerms = await requestUtils.rest( {
-			path: '/wp/v2/categories',
-			params: { search: TEST_CATEGORY_NAME },
-		} );
-		await Promise.all(
-			staleTerms.map( ( term ) =>
-				requestUtils.rest( {
-					method: 'DELETE',
-					path: `/wp/v2/categories/${ term.id }`,
-					params: { force: true },
-				} )
-			)
-		);
-		testCategory = await requestUtils.createRecord( 'categories', {
-			name: TEST_CATEGORY_NAME,
-		} );
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -58,11 +42,6 @@ test.describe( 'Navigation block - List view editing', () => {
 			requestUtils.deleteAllPosts(),
 			requestUtils.deleteAllMenus(),
 		] );
-		await requestUtils.rest( {
-			method: 'DELETE',
-			path: `/wp/v2/categories/${ testCategory.id }`,
-			params: { force: true },
-		} );
 	} );
 
 	test.use( {
@@ -229,8 +208,8 @@ test.describe( 'Navigation block - List view editing', () => {
 		expect( secondResultType ).toBe( 'Page' );
 		expect( thirdResultType ).toBe( 'Page' );
 
-		// Searching reaches every entity type, not only pages, and pages are
-		// still listed first because the appended item is a Page Link.
+		// Searching reaches more than pages, and pages are still listed first
+		// because the appended item is a Page Link.
 		// See https://github.com/WordPress/gutenberg/issues/77072.
 		await page.keyboard.type( 'Test', { delay: 50 } );
 
@@ -241,17 +220,21 @@ test.describe( 'Navigation block - List view editing', () => {
 			await linkControl.getSearchResultType( searchedResults.first() )
 		).toBe( 'Page' );
 
-		const categoryResult = searchedResults.filter( {
-			hasText: TEST_CATEGORY_NAME,
-		} );
+		await expect(
+			searchedResults.filter( { hasText: 'Test Post 1' } )
+		).toBeVisible();
+
+		// Taxonomy terms are reachable from the same search field.
+		await linkUIInput.fill( '' );
+		await page.keyboard.type( DEFAULT_CATEGORY_NAME, { delay: 50 } );
+
+		const categoryResult = ( await linkControl.getSearchResults() ).filter(
+			{ hasText: DEFAULT_CATEGORY_NAME }
+		);
 		await expect( categoryResult ).toBeVisible();
 		expect( await linkControl.getSearchResultType( categoryResult ) ).toBe(
 			'Category'
 		);
-
-		await expect(
-			searchedResults.filter( { hasText: 'Test Post 1' } )
-		).toBeVisible();
 
 		// Create the link.
 		await categoryResult.click();
@@ -260,7 +243,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect(
 			listView
 				.getByRole( 'gridcell', {
-					name: TEST_CATEGORY_NAME,
+					name: DEFAULT_CATEGORY_NAME,
 				} )
 				.filter( {
 					hasText: 'Block 3 of 3, Level 1.', // proxy for filtering by description.

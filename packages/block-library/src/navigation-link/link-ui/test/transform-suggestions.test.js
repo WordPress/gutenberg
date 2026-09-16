@@ -145,16 +145,18 @@ describe( 'transformSuggestions', () => {
 	} );
 
 	it( 'never prioritises a suggestion that is not an entity', () => {
-		// e.g. LinkControl's "Create page" option, which carries no kind.
+		// e.g. LinkControl's "Create page" option, which carries no kind. Were
+		// it treated as an entity it would take the page fallback and sort
+		// above the category.
 		const createOption = {
 			title: 'Contact',
 			url: 'Contact',
 			type: '__CREATE__',
 		};
 
-		const results = transformSuggestions( [ aPage, createOption ], {} );
+		const results = transformSuggestions( [ aCategory, createOption ], {} );
 
-		expect( results[ results.length - 1 ] ).toBe( createOption );
+		expect( results ).toEqual( [ aCategory, createOption ] );
 	} );
 
 	it( 'returns the list untouched when nothing matches the priority type', () => {
