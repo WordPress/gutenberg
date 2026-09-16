@@ -348,6 +348,7 @@ class MediaUpload extends Component {
 			multiple,
 			selection,
 			editing: !! value?.length,
+			...( allowedTypes && { library: { type: allowedTypes } } ),
 		} );
 		wp.media.frame = this.frame;
 		this.initializeListeners();
