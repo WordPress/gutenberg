@@ -25,7 +25,7 @@ function IconAction( { action }: IconActionProps ): React.ReactNode {
 				/* translators: %s: action label. */
 				__( '%s (opens in a new tab)' ),
 				action.label
-			)
+		  )
 		: action.label;
 
 	return (
@@ -46,7 +46,7 @@ function IconAction( { action }: IconActionProps ): React.ReactNode {
 									? {
 											target: '_blank',
 											rel: 'noopener noreferrer',
-										}
+									  }
 									: {} ) }
 							/>
 						}
