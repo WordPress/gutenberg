@@ -25,11 +25,10 @@ export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 				<span className={ itemPopupStyles[ 'item-icon' ] }>
 					<Icon
 						icon={ variant === 'creatable' ? plus : check }
-						className={
-							variant !== 'creatable'
-								? itemPopupStyles[ 'item-indicator-icon' ]
-								: undefined
-						}
+						className={ clsx(
+							variant !== 'creatable' &&
+								itemPopupStyles[ 'item-indicator-icon' ]
+						) }
 						size={ 24 }
 					/>
 				</span>
