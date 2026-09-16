@@ -1,155 +1,168 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
 import { describe, expect, it } from 'vitest';
-import { Tooltip } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetHeader } from '../components/widget-header';
 
 const LONG_TITLE = 'Traffic Snapshot Against the Quarterly Revenue Target';
 const SHORT_TITLE = 'Traffic';
+const HELP = 'Visits over the last week.';
 
-function widgetTypeWith( title: string ): WidgetType {
+function widgetTypeWith(
+	title: string,
+	help?: WidgetType[ 'help' ]
+): WidgetType {
 	return {
 		apiVersion: 1,
 		name: 'test/traffic',
 		title,
 		renderModule: 'test-traffic',
+		...( help ? { help } : {} ),
 	} as WidgetType;
 }
 
-function Header( { title, width }: { title: string; width: number } ) {
+function Header( {
+	title,
+	width,
+	help,
+}: {
+	title: string;
+	width: number;
+	help?: WidgetType[ 'help' ];
+} ) {
 	return (
-		<Tooltip.Provider delay={ 0 }>
-			<div style={ { width } }>
-				<WidgetHeader
-					widgetType={ widgetTypeWith( title ) }
-					titleId="tile-title"
-					showIdentity
-				/>
-			</div>
-			{ /* Far enough down that an open popup cannot cover it. */ }
-			<div
-				data-testid="outside"
-				style={ { height: 40, marginBlockStart: 160 } }
+		<div style={ { width } }>
+			<WidgetHeader
+				widgetType={ widgetTypeWith( title, help ) }
+				titleId="tile-title"
+				showIdentity
 			/>
-		</Tooltip.Provider>
+		</div>
 	);
 }
 
-// The tooltip opens on `mouseenter`, so the pointer has to arrive from
-// outside the heading; where the previous test left it is not guaranteed.
-async function hoverFromOutside( element: HTMLElement ) {
-	await userEvent.hover( screen.getByTestId( 'outside' ) );
-	await userEvent.hover( element );
+function infotip() {
+	return screen.queryByRole( 'button', { name: 'More information' } );
+}
+
+async function openInfotip() {
+	await userEvent.click(
+		await screen.findByRole( 'button', { name: 'More information' } )
+	);
+	return screen.findByRole( 'dialog' );
 }
 
 describe( 'WidgetHeader title', () => {
-	it( 'shows the full title in a tooltip on hover when the row clips it', async () => {
+	it( 'shows the full title in the infotip when the row clips it', async () => {
 		await render( <Header title={ LONG_TITLE } width={ 240 } /> );
 
 		const heading = screen.getByRole( 'heading', { name: LONG_TITLE } );
 		expect( heading.scrollWidth ).toBeGreaterThan( heading.clientWidth );
-		await waitFor( () =>
-			expect( heading ).toHaveAttribute( 'tabindex', '0' )
-		);
 
-		await hoverFromOutside( heading );
-
-		await waitFor( () =>
-			expect( screen.getAllByText( LONG_TITLE ) ).toHaveLength( 2 )
-		);
+		const dialog = await openInfotip();
+		expect( dialog ).toHaveAccessibleName( LONG_TITLE );
+		expect(
+			within( dialog ).getByRole( 'heading', { name: LONG_TITLE } )
+		).not.toHaveAttribute( 'data-visually-hidden' );
 	} );
 
-	it( 'makes a clipped title focusable and shows the tooltip on focus', async () => {
-		await render( <Header title={ LONG_TITLE } width={ 240 } /> );
-
-		const heading = screen.getByRole( 'heading', { name: LONG_TITLE } );
-		await waitFor( () =>
-			expect( heading ).toHaveAttribute( 'tabindex', '0' )
+	it( 'puts the title above the help note when both apply', async () => {
+		await render(
+			<Header
+				title={ LONG_TITLE }
+				width={ 240 }
+				help={ { content: HELP } }
+			/>
 		);
 
-		await userEvent.keyboard( '{Tab}' );
-
-		expect( heading ).toHaveFocus();
-		await waitFor( () =>
-			expect( screen.getAllByText( LONG_TITLE ) ).toHaveLength( 2 )
-		);
+		const dialog = await openInfotip();
+		expect(
+			within( dialog ).getByRole( 'heading', { name: LONG_TITLE } )
+		).not.toHaveAttribute( 'data-visually-hidden' );
+		expect( within( dialog ).getByText( HELP ) ).toBeVisible();
 	} );
 
-	it( 'keeps focus on the title when a resize un-clips it', async () => {
-		const view = await render(
-			<Header title={ LONG_TITLE } width={ 240 } />
+	it( 'keeps the title out of sight in the infotip when it fits', async () => {
+		await render(
+			<Header
+				title={ SHORT_TITLE }
+				width={ 480 }
+				help={ { content: HELP } }
+			/>
 		);
 
-		const heading = screen.getByRole( 'heading', { name: LONG_TITLE } );
-		await waitFor( () =>
-			expect( heading ).toHaveAttribute( 'tabindex', '0' )
-		);
-		await userEvent.keyboard( '{Tab}' );
-		expect( heading ).toHaveFocus();
-
-		await view.rerender( <Header title={ LONG_TITLE } width={ 640 } /> );
-
-		await waitFor( () =>
-			expect( heading.scrollWidth ).toBeLessThanOrEqual(
-				heading.clientWidth
-			)
-		);
-		expect( heading ).toHaveFocus();
-		expect( heading ).toHaveAttribute( 'tabindex', '0' );
-
-		await userEvent.keyboard( '{Tab}' );
-		expect( heading ).not.toHaveFocus();
-		await waitFor( () =>
-			expect( heading ).not.toHaveAttribute( 'tabindex' )
-		);
+		const dialog = await openInfotip();
+		expect( dialog ).toHaveAccessibleName( SHORT_TITLE );
+		// VisuallyHidden clips rather than hides, so `toBeVisible` cannot tell.
+		expect(
+			within( dialog ).getByRole( 'heading', { name: SHORT_TITLE } )
+		).toHaveAttribute( 'data-visually-hidden' );
+		expect( within( dialog ).getByText( HELP ) ).toBeVisible();
 	} );
 
-	it( 'does not reopen the tooltip on its own after the title is clipped again', async () => {
-		const view = await render(
-			<Header title={ LONG_TITLE } width={ 240 } />
-		);
-
-		const heading = screen.getByRole( 'heading', { name: LONG_TITLE } );
-		await waitFor( () =>
-			expect( heading ).toHaveAttribute( 'tabindex', '0' )
-		);
-		await hoverFromOutside( heading );
-		await waitFor( () =>
-			expect( screen.getAllByText( LONG_TITLE ) ).toHaveLength( 2 )
-		);
-
-		// Un-clip while the tooltip is open, then leave and clip again.
-		await view.rerender( <Header title={ LONG_TITLE } width={ 640 } /> );
-		await waitFor( () =>
-			expect( screen.getAllByText( LONG_TITLE ) ).toHaveLength( 1 )
-		);
-		await userEvent.hover( screen.getByTestId( 'outside' ) );
-		await view.rerender( <Header title={ LONG_TITLE } width={ 240 } /> );
-		await waitFor( () =>
-			expect( heading ).toHaveAttribute( 'tabindex', '0' )
-		);
-
-		await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
-		expect( screen.getAllByText( LONG_TITLE ) ).toHaveLength( 1 );
-	} );
-
-	it( 'leaves a title that fits alone: no tooltip, not focusable', async () => {
+	it( 'renders no infotip for a title that fits and has no help note', async () => {
 		await render( <Header title={ SHORT_TITLE } width={ 480 } /> );
 
 		const heading = screen.getByRole( 'heading', { name: SHORT_TITLE } );
 		expect( heading.scrollWidth ).toBeLessThanOrEqual(
 			heading.clientWidth
 		);
-		expect( heading ).not.toHaveAttribute( 'tabindex' );
+		expect( infotip() ).not.toBeInTheDocument();
+	} );
 
-		await hoverFromOutside( heading );
+	it( 'adds and removes the infotip as a resize clips and un-clips the title', async () => {
+		const view = await render(
+			<Header title={ LONG_TITLE } width={ 240 } />
+		);
+		await waitFor( () => expect( infotip() ).toBeInTheDocument() );
 
-		// The popup mounts asynchronously, so give a wrongly enabled tooltip a
-		// chance to appear before asserting it never did.
-		await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
-		expect( screen.getAllByText( SHORT_TITLE ) ).toHaveLength( 1 );
+		await view.rerender( <Header title={ LONG_TITLE } width={ 640 } /> );
+		await waitFor( () => expect( infotip() ).not.toBeInTheDocument() );
+
+		await view.rerender( <Header title={ LONG_TITLE } width={ 240 } /> );
+		await waitFor( () => expect( infotip() ).toBeInTheDocument() );
+	} );
+
+	it( 'drops the infotip again at the width that first clipped the title', async () => {
+		const view = await render(
+			<Header title={ LONG_TITLE } width={ 240 } />
+		);
+		const heading = screen.getByRole( 'heading', { name: LONG_TITLE } );
+		await waitFor( () => expect( infotip() ).toBeInTheDocument() );
+
+		// Container width the header keeps from the title besides the infotip.
+		const trigger = infotip() as HTMLElement;
+		const chrome =
+			240 -
+			( trigger.getBoundingClientRect().right -
+				heading.getBoundingClientRect().left );
+		const range = document.createRange();
+		range.selectNodeContents( heading );
+		// Room for the title plus a few pixels: not enough for the infotip.
+		const snug = Math.ceil(
+			range.getBoundingClientRect().width + chrome + 4
+		);
+
+		await view.rerender( <Header title={ LONG_TITLE } width={ snug } /> );
+		await waitFor( () => expect( infotip() ).not.toBeInTheDocument() );
+
+		await view.rerender( <Header title={ LONG_TITLE } width={ 240 } /> );
+		await waitFor( () => expect( infotip() ).toBeInTheDocument() );
+
+		await view.rerender( <Header title={ LONG_TITLE } width={ snug } /> );
+		await waitFor( () => expect( infotip() ).not.toBeInTheDocument() );
+	} );
+
+	it( 'opens the infotip on hover', async () => {
+		await render( <Header title={ LONG_TITLE } width={ 240 } /> );
+
+		await userEvent.hover(
+			await screen.findByRole( 'button', { name: 'More information' } )
+		);
+
+		const dialog = await screen.findByRole( 'dialog' );
+		expect( dialog ).toHaveAccessibleName( LONG_TITLE );
 	} );
 
 	it( "keeps the title id so the tile's labelled region still resolves", async () => {

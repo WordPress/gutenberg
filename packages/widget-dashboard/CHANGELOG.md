@@ -10,8 +10,9 @@
     ([#82961](https://github.com/WordPress/gutenberg/pull/82961)).
 -   Show the selected widget width in its options menu and add an ellipsis to
     the reset action that opens a confirmation dialog ([#81929](https://github.com/WordPress/gutenberg/pull/81929)).
--   Widget header: a title the row clips shows the full text in a tooltip
-    on hover, and becomes focusable so keyboard users can open it too
+-   Widget header: a title the row clips is shown in full in the header
+    infotip, which now also opens on hover and appears for a clipped title
+    even when the widget declares no help note
     ([#82226](https://github.com/WordPress/gutenberg/pull/82226)).
 
 ### Internal

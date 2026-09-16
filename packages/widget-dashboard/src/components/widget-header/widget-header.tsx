@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { useResizeObserver } from '@wordpress/compose';
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { Card, Icon, Stack, Tooltip } from '@wordpress/ui';
+import { Card, Icon, Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetInfotip } from './widget-header-infotip';
 import { useIsTruncated } from './use-is-truncated';
@@ -111,13 +111,26 @@ export function WidgetHeader( {
 		[ registerReserved, unregisterReserved ]
 	);
 
-	// A clipped title gets a tooltip and a tab stop, so keyboard users can
-	// open it too. The tab stop outlives the clipping while focused, so a
-	// resize does not drop focus to the body.
+	// A clipped title is surfaced in the infotip, so the infotip renders
+	// whenever the title clips, help note or not. Without a help note it
+	// exists only while the title clips, so its footprint is what the title
+	// reclaims once it goes.
+	const [ infotipReserve, setInfotipReserve ] = useState( 0 );
+	const infotipMeasureRef = useResizeObserver< HTMLButtonElement >(
+		( [ entry ] ) => {
+			const { columnGap } = getComputedStyle(
+				entry.target.parentElement as HTMLElement
+			);
+			setInfotipReserve(
+				entry.borderBoxSize[ 0 ].inlineSize +
+					( parseFloat( columnGap ) || 0 )
+			);
+		}
+	);
 	const [ titleMeasureRef, isTitleTruncated ] =
-		useIsTruncated< HTMLElement >();
-	const [ isTitleFocusPinned, setIsTitleFocusPinned ] = useState( false );
-	const isTitleFocusable = isTitleTruncated || isTitleFocusPinned;
+		useIsTruncated< HTMLHeadingElement >(
+			widgetType?.help ? 0 : infotipReserve
+		);
 
 	const hasIdentity = showIdentity && !! widgetType?.title;
 	const totalReserved = Object.values( reserved ).reduce(
@@ -155,30 +168,22 @@ export function WidgetHeader( {
 						</span>
 					) }
 
-					<Tooltip.Root disabled={ ! isTitleTruncated }>
-						<Tooltip.Trigger
-							ref={ titleMeasureRef }
-							id={ titleId }
-							tabIndex={ isTitleFocusable ? 0 : undefined }
-							onFocus={ () =>
-								setIsTitleFocusPinned( isTitleTruncated )
-							}
-							onBlur={ () => setIsTitleFocusPinned( false ) }
-							className={ styles.title }
-							render={ <Card.Title render={ <h2 /> } /> }
-						>
-							{ widgetType.title }
-						</Tooltip.Trigger>
+					<Card.Title
+						ref={ titleMeasureRef }
+						id={ titleId }
+						render={ <h2 /> }
+						className={ styles.title }
+					>
+						{ widgetType.title }
+					</Card.Title>
 
-						{ /* Always mounted: Base UI closes through the popup's
-						   ref, so unmounting it mid-close leaves it stuck open. */ }
-						<Tooltip.Popup>{ widgetType.title }</Tooltip.Popup>
-					</Tooltip.Root>
-
-					{ widgetType.help && (
+					{ ( widgetType.help || isTitleTruncated ) && (
 						<WidgetInfotip
-							content={ widgetType.help.content }
-							links={ widgetType.help.links }
+							ref={ infotipMeasureRef }
+							title={ widgetType.title }
+							showTitle={ isTitleTruncated }
+							content={ widgetType.help?.content }
+							links={ widgetType.help?.links }
 						/>
 					) }
 				</Stack>
