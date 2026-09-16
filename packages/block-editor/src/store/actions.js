@@ -1197,18 +1197,14 @@ export const __unstableSplitSelection =
 				// Select the start of the tail field in the same batch, like
 				// the branches below, so the field places the caret as it
 				// mounts rather than being focused later. Only for blocks
-				// that opt into the editable root, and not when the tail
-				// changed block type and lost the attribute.
-				if (
-					getBlockType( tail.name )?.[ editableRootKey ] &&
-					Object.hasOwn( tail.attributes, attributeKeyB )
-				) {
-					dispatch.selectionChange(
-						tail.clientId,
-						attributeKeyB,
-						0,
-						0
-					);
+				// that opt into the editable root. The tail may have changed
+				// block type, so read the key from its type.
+				const tailType = getBlockType( tail.name );
+				const tailKey =
+					tailType?.[ editableRootKey ] &&
+					findRichTextAttributeKey( tailType );
+				if ( tailKey ) {
+					dispatch.selectionChange( tail.clientId, tailKey, 0, 0 );
 				}
 			} );
 			return;
