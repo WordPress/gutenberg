@@ -27,11 +27,7 @@ export function preventFocusCapture() {
 			if ( ! event.target.contains( element ) ) {
 				return;
 			}
-			// Only a press on a block around the element captures focus. A
-			// press on the canvas around the blocks must leave the element
-			// editable: a selection made from there, e.g. by a triple click,
-			// must be editable, and a touch on a selection handle there must
-			// keep the selection.
+			// Only relevant when a parent block is pressed.
 			if ( ! event.target.closest( '[data-block]' ) ) {
 				return;
 			}

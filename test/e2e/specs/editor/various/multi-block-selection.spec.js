@@ -1048,14 +1048,14 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Second' },
 		} );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
 
-		const paragraph = editor.canvas
+		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.first();
-		// Select the paragraph so the canvas is the editing host and the
-		// selection observer, not the rich text, dispatches the selection.
-		await editor.selectBlocks( paragraph );
-		await paragraph.click( { clickCount: 3 } );
+			.first()
+			.click( { clickCount: 3 } );
 
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedBlocks )
