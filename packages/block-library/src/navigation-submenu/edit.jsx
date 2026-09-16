@@ -256,7 +256,7 @@ export default function NavigationSubmenuEdit( {
 		parentCount >= maxNestingLevel
 			? ALLOWED_BLOCKS.filter(
 					( blockName ) => blockName !== 'core/navigation-submenu'
-			  )
+				)
 			: ALLOWED_BLOCKS;
 
 	const navigationChildBlockProps =

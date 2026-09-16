@@ -4,6 +4,8 @@ import blockLibraryLtr from '../package-styles/block-library-ltr.lazy.scss?inlin
 import blockLibraryRtl from '../package-styles/block-library-rtl.lazy.scss?inline';
 import componentsLtr from '../package-styles/components-ltr.lazy.scss?inline';
 import componentsRtl from '../package-styles/components-rtl.lazy.scss?inline';
+import commandsLtr from '../package-styles/commands-ltr.lazy.scss?inline';
+import commandsRtl from '../package-styles/commands-rtl.lazy.scss?inline';
 import editorLtr from '../package-styles/editor-ltr.lazy.scss?inline';
 import editorRtl from '../package-styles/editor-rtl.lazy.scss?inline';
 import formatLibraryLtr from '../package-styles/format-library-ltr.lazy.scss?inline';
@@ -12,8 +14,6 @@ import editSiteLtr from '../package-styles/edit-site-ltr.lazy.scss?inline';
 import editSiteRtl from '../package-styles/edit-site-rtl.lazy.scss?inline';
 import dataviewsLtr from '../package-styles/dataviews-ltr.lazy.scss?inline';
 import dataviewsRtl from '../package-styles/dataviews-rtl.lazy.scss?inline';
-import commandsLtr from '../package-styles/commands-ltr.lazy.scss?inline';
-import commandsRtl from '../package-styles/commands-rtl.lazy.scss?inline';
 import fieldsLtr from '../package-styles/fields-ltr.lazy.scss?inline';
 import fieldsRtl from '../package-styles/fields-rtl.lazy.scss?inline';
 import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss?inline';
@@ -90,6 +90,12 @@ const CONFIG = [
 		rtl: [ designTokens ],
 	},
 	{
+		// Dashboard stories include form controls and the command palette.
+		componentIdMatcher: /^widget-dashboard-/,
+		ltr: [ componentsLtr, commandsLtr, dataviewsLtr ],
+		rtl: [ componentsRtl, commandsRtl, dataviewsRtl ],
+	},
+	{
 		componentIdMatcher: /^tokens-/,
 		ltr: [ designTokens ],
 		rtl: [ designTokens ],
@@ -108,11 +114,6 @@ const CONFIG = [
 		componentIdMatcher: /^design-system-patterns-/,
 		ltr: [ componentsLtr, dataviewsLtr ],
 		rtl: [ componentsRtl, dataviewsRtl ],
-	},
-	{
-		componentIdMatcher: /^widget-dashboard-/,
-		ltr: [ componentsLtr, dataviewsLtr, commandsLtr ],
-		rtl: [ componentsRtl, dataviewsRtl, commandsRtl ],
 	},
 	{
 		componentIdMatcher: /^widget-primitives-/,
