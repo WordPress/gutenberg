@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import {
 	useRef,
-	useState,
 	useCallback,
 	useEffect,
 	useLayoutEffect,
@@ -58,6 +57,8 @@ function RichTextWrapper(
 		onChange: adjustedOnChange,
 		isSelected: originalIsSelected,
 		multiline,
+		// No longer has any effect: format controls always render in the
+		// block toolbar. Still destructured so it isn't passed to the DOM.
 		inlineToolbar,
 		wrapperClassName,
 		autocompleters,
@@ -92,7 +93,6 @@ function RichTextWrapper(
 	const { supportsSplitting } = useContext( PrivateBlockContext );
 	const instanceId = useInstanceId( RichTextWrapper );
 	const anchorRef = useRef();
-	const [ anchorElement, setAnchorElement ] = useState( null );
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
@@ -499,12 +499,7 @@ function RichTextWrapper(
 					</InputEventContext.Provider>
 				</KeyboardShortcutContext.Provider>
 			) }
-			{ isSelected && hasFormats && (
-				<FormatToolbarContainer
-					inline={ inlineToolbar }
-					editableContentElement={ anchorElement }
-				/>
-			) }
+			{ isSelected && hasFormats && <FormatToolbarContainer /> }
 			<TagName
 				// Overridable props.
 				role="textbox"
@@ -553,7 +548,6 @@ function RichTextWrapper(
 						supportsSplitting,
 					} ),
 					anchorRef,
-					setAnchorElement,
 				] ) }
 				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning

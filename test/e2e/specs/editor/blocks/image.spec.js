@@ -152,14 +152,32 @@ test.describe( 'Image', () => {
 			timeout: 30_000,
 		} );
 
-		// Add caption and navigate to inline toolbar.
+		// Add caption and navigate to the block toolbar.
 		await editor.clickBlockToolbarButton( 'Add caption' );
-		await pageUtils.pressKeys( 'shift+Tab' );
-		expect(
-			await page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			)
-		).toBe( 'Bold' );
+
+		// Format tools are part of the block toolbar, not a separate
+		// floating toolbar.
+		await expect(
+			page.getByRole( 'toolbar', { name: 'Format tools' } )
+		).toHaveCount( 0 );
+		const boldButton = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Bold' } );
+		await expect( boldButton ).toBeVisible();
+
+		await pageUtils.pressKeys( 'alt+F10' );
+		// Move through the block toolbar until the format tools are reached.
+		for ( let i = 0; i < 20; i++ ) {
+			if (
+				await boldButton.evaluate(
+					( element ) => element === document.activeElement
+				)
+			) {
+				break;
+			}
+			await page.keyboard.press( 'ArrowRight' );
+		}
+		await expect( boldButton ).toBeFocused();
 
 		// Bold to italic,
 		await page.keyboard.press( 'ArrowRight' );
@@ -169,11 +187,7 @@ test.describe( 'Image', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		// Italic to bold.
 		await page.keyboard.press( 'ArrowLeft' );
-		expect(
-			await page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			)
-		).toBe( 'Bold' );
+		await expect( boldButton ).toBeFocused();
 
 		await page.keyboard.press( 'Space' );
 		await page.keyboard.press( 'a' );

@@ -39,21 +39,19 @@ function selector( select ) {
 
 	return {
 		clientId,
-		hasFixedToolbar: getSettings().hasFixedToolbar,
 		isTyping: isTyping(),
 		isZoomOutMode: isZoomOut(),
 		isDragging: isDragging(),
 		viewportModalClientIds: getViewportModalClientIds(),
 		blockVisibilitySetting:
-			select( blockEditorStore ).getSettings().__experimentalFeatures
-				?.blockVisibility?.allowEditing,
+			getSettings().__experimentalFeatures?.blockVisibility?.allowEditing,
 	};
 }
 
 /**
- * Renders block tools (the block toolbar, select/navigation mode toolbar, the
- * insertion point and a slot for the inline rich text toolbar). Must be wrapped
- * around the block content and editor styles wrapper or iframe.
+ * Renders block tools (the block toolbar, select/navigation mode toolbar and
+ * the insertion point). Must be wrapped around the block content and editor
+ * styles wrapper or iframe.
  *
  * @param {Object} $0                      Props.
  * @param {Object} $0.children             The block content and style container.
@@ -66,7 +64,6 @@ export default function BlockTools( {
 } ) {
 	const {
 		clientId,
-		hasFixedToolbar,
 		isTyping,
 		isZoomOutMode,
 		isDragging,
@@ -275,7 +272,6 @@ export default function BlockTools( {
 			}
 		}
 	}
-	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
 
 	return (
@@ -311,13 +307,6 @@ export default function BlockTools( {
 					/>
 				) }
 
-				{ /* Used for the inline rich text toolbar. Until this toolbar is combined into BlockToolbar, someone implementing their own BlockToolbar will also need to use this to see the image caption toolbar. */ }
-				{ ! isZoomOutMode && ! hasFixedToolbar && (
-					<Popover.Slot
-						name="block-toolbar"
-						ref={ blockToolbarRef }
-					/>
-				) }
 				{ children }
 				{ /* Used for inline rich text popovers. */ }
 				<Popover.Slot
