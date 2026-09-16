@@ -649,49 +649,50 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 
 	// See: https://github.com/WordPress/gutenberg/issues/77007.
 	// TODO: Fixing this requires tracking multiple completions or a fresh-trigger model.
-	test.fixme(
-		'should not re-trigger autocomplete after accepting a mention and changing text near it',
-		async ( { editor, page, pageUtils } ) => {
-			await editor.canvas
-				.getByRole( 'document', { name: 'Add default block' } )
-				.click();
+	test.fixme( 'should not re-trigger autocomplete after accepting a mention and changing text near it', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
 
-			await page.keyboard.type( '@bi' );
-			await expect(
-				page.getByRole( 'option', {
-					name: 'Bilbo Baggins thebetterhobbit',
-					selected: true,
-				} )
-			).toBeVisible();
-			await page.keyboard.press( 'Enter' );
-			await page.keyboard.type( '  ' );
-			await page.keyboard.type( '@ad' );
-			await expect(
-				page.getByRole( 'option', {
-					name: 'admin',
-					selected: true,
-				} )
-			).toBeVisible();
-			await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '@bi' );
+		await expect(
+			page.getByRole( 'option', {
+				name: 'Bilbo Baggins thebetterhobbit',
+				selected: true,
+			} )
+		).toBeVisible();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '  ' );
+		await page.keyboard.type( '@ad' );
+		await expect(
+			page.getByRole( 'option', {
+				name: 'admin',
+				selected: true,
+			} )
+		).toBeVisible();
+		await page.keyboard.press( 'Enter' );
 
-			// Verify the completion was inserted.
-			await expect.poll( editor.getEditedPostContent ).toBe(
-				`<!-- wp:paragraph -->
+		// Verify the completion was inserted.
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
 <p>@thebetterhobbit  @admin</p>
 <!-- /wp:paragraph -->`
-			);
+		);
 
-			// Move cursor after second mention and make an edit to trigger selection change effects.
-			await pageUtils.pressKeys( 'alt+ArrowLeft' );
-			await page.keyboard.press( 'ArrowLeft' );
-			await page.keyboard.press( 'Backspace' );
+		// Move cursor after second mention and make an edit to trigger selection change effects.
+		await pageUtils.pressKeys( 'alt+ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Backspace' );
 
-			// Allow time for autocomplete re-trigger effects to settle.
-			// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
-			await page.waitForTimeout( 100 );
-			await expect( page.getByRole( 'listbox' ) ).toBeHidden();
-		}
-	);
+		// Allow time for autocomplete re-trigger effects to settle.
+		// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+		await page.waitForTimeout( 100 );
+		await expect( page.getByRole( 'listbox' ) ).toBeHidden();
+	} );
 
 	test( 'should re-trigger autocomplete for a new mention after completing one', async ( {
 		editor,

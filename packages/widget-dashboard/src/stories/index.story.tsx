@@ -907,7 +907,7 @@ function GridSettingsStory( {
 						model,
 						columns,
 						rowHeight: ROW_HEIGHT_PRESETS[ rowHeight ],
-				  },
+					},
 		[ model, columns, flowTolerance, rowHeight ]
 	);
 
