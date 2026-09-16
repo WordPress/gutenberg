@@ -173,7 +173,7 @@ export default function CoverInspectorControls( {
 						'attachment',
 						id,
 						{ context: 'view' }
-				  )
+					)
 				: null,
 		[ id, isImageBackground ]
 	);
@@ -242,7 +242,7 @@ export default function CoverInspectorControls( {
 								? undefined
 								: `${ nextMinHeight }${
 										nextUnit || activeMinHeightUnit || 'px'
-								  }`,
+									}`,
 						aspectRatio: undefined,
 					},
 				} )

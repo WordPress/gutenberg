@@ -852,7 +852,7 @@ export const getCurrentThemeGlobalStylesRevisions =
 					'root',
 					'globalStyles',
 					globalStylesId
-			  )
+				)
 			: undefined;
 		const revisionsURL = record?._links?.[ 'version-history' ]?.[ 0 ]?.href;
 
