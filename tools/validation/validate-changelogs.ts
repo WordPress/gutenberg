@@ -20,6 +20,20 @@ const __dirname = dirname( fileURLToPath( import.meta.url ) );
 const REPO_ROOT = resolve( __dirname, '../..' );
 
 /**
+ * `npm run --workspace` sets cwd to this package. Prefer the directory
+ * where npm was invoked; otherwise treat paths as repo-root-relative.
+ *
+ * @param inputPath     Changelog path from the CLI.
+ * @param fromDirectory Directory to resolve relative paths from.
+ */
+export function resolveChangelogPath(
+	inputPath: string,
+	fromDirectory: string = process.env.INIT_CWD || REPO_ROOT
+): string {
+	return resolve( fromDirectory, inputPath );
+}
+
+/**
  * Section titles allowed under ## Unreleased, in the preferred order for docs.
  * Exact match is required by the validator.
  */
@@ -371,7 +385,7 @@ export function run( argv: string[] ): number {
 
 	const files =
 		paths.length > 0
-			? paths.map( ( path ) => resolve( path ) )
+			? paths.map( ( filePath ) => resolveChangelogPath( filePath ) )
 			: readdirSync( join( REPO_ROOT, 'packages' ), {
 					withFileTypes: true,
 			  } )

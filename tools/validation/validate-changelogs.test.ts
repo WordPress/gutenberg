@@ -1,5 +1,16 @@
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { expect, test } from 'vitest';
-import { parseArgs, validateChangelog } from './validate-changelogs.ts';
+import {
+	parseArgs,
+	resolveChangelogPath,
+	validateChangelog,
+} from './validate-changelogs.ts';
+
+const REPO_ROOT = resolve(
+	dirname( fileURLToPath( import.meta.url ) ),
+	'../..'
+);
 
 const HEADER =
 	'<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->\n\n';
@@ -163,6 +174,15 @@ test( 'pr flags a link that sits under a published version', () => {
 			pr: '100',
 		} )
 	).toEqual( [] );
+} );
+
+test( 'resolveChangelogPath treats inputs as relative to the invocation directory', () => {
+	expect( resolveChangelogPath( 'packages/ui/CHANGELOG.md', '/repo' ) ).toBe(
+		resolve( '/repo', 'packages/ui/CHANGELOG.md' )
+	);
+	expect(
+		resolveChangelogPath( 'packages/ui/CHANGELOG.md', REPO_ROOT )
+	).toBe( resolve( REPO_ROOT, 'packages/ui/CHANGELOG.md' ) );
 } );
 
 test( 'parseArgs reads --pr, --require-pr, and paths', () => {
