@@ -123,6 +123,22 @@ $navigation-icon-size: 24px;
 		--navigation-layout-direction: column;
 		--navigation-layout-justify: initial;
 		--navigation-layout-align: flex-start;
+
+		// Align wrapped label text with the item justification. Only vertical
+		// menus need it: a horizontal item is only ever as wide as its own text.
+		text-align: var(--navigation-layout-text-align, inherit);
+
+		// Buttons declare their own text-align, and a directly declared value
+		// beats an inherited one, so opt submenu toggles back in.
+		.wp-block-navigation-item__content {
+			text-align: inherit;
+		}
+
+		// Flyout submenus are separate panels, so they keep their own
+		// alignment rather than following the parent menu's justification.
+		.wp-block-navigation__submenu-container {
+			text-align: initial;
+		}
 	}
 
 	&.no-wrap {
@@ -142,7 +158,7 @@ $navigation-icon-size: 24px;
 	&.items-justified-right {
 		--navigation-layout-justification-setting: flex-end;
 		--navigation-layout-justify: flex-end;
-		--navigation-layout-text-align: right;
+		--navigation-layout-text-align: end;
 
 		&.is-vertical {
 			--navigation-layout-align: flex-end;
@@ -648,11 +664,18 @@ button.wp-block-navigation-item__content {
 				// Apply top padding to nested submenus.
 				.wp-block-navigation__submenu-container {
 					padding-top: var(--wp--style--block-gap, 2em);
+
+					// Unfolded inline here, not shown as a panel, so submenus
+					// follow the menu's justification.
+					text-align: inherit;
 				}
 
 				// A default padding is added to submenu items. It's not appropriate inside the modal.
 				.wp-block-navigation-item__content {
 					padding: 0;
+
+					// See the note on submenu toggles above.
+					text-align: inherit;
 				}
 
 				// Default column display for overlay menu contents.
