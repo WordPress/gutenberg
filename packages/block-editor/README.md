@@ -622,6 +622,13 @@ _Returns_
 
 Returns the style object for the selected block style state.
 
+_Usage_
+
+```js
+const state = { viewport: '@mobile' };
+const stateStyle = getStyleForState( attributes.style, state ) || {};
+```
+
 _Parameters_
 
 -   _style_ `Object`: The block style object.
@@ -900,6 +907,19 @@ Undocumented declaration.
 ### setStyleForState
 
 Returns a style object with the selected block style state updated.
+
+_Usage_
+
+```js
+const state = { viewport: '@mobile' };
+const stateStyle = getStyleForState( attributes.style, state ) || {};
+setAttributes( {
+	style: setStyleForState( attributes.style, state, {
+		...stateStyle,
+		dimensions: { ...stateStyle.dimensions, minHeight: '50vh' },
+	} ),
+} );
+```
 
 _Parameters_
 
