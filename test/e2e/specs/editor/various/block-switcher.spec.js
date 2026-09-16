@@ -169,7 +169,8 @@ test.describe( 'Block Switcher', () => {
 		await page.keyboard.type( 'Fourth paragraph' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Fifth paragraph' );
-		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
+		// Without a delay, the second press can land before the first one's selection applies.
+		await pageUtils.pressKeys( 'primary+a', { times: 2, delay: 50 } );
 
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
