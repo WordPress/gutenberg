@@ -10,12 +10,12 @@ This package is new as of WordPress 6.1 and therefore in its infancy.
 
 Upcoming tasks on the roadmap include, but are not limited to, the following:
 
--   Consolidate global and block style rendering and enqueuing (ongoing)
--   Explore pre-render CSS rule processing with the intention of deduplicating other common and/or repetitive block styles. (ongoing)
--   Extend the scope of semantic class names and/or design token expression, and encapsulate rules into stable utility classes.
--   Explore pre-render CSS rule processing with the intention of deduplicating other common and/or repetitive block styles.
--   Propose a way to control hierarchy and specificity, and make the style hierarchy cascade accessible and predictable. This might include preparing for CSS cascade layers until they become more widely supported, and allowing for opt-in support in Gutenberg via theme.json.
--   Refactor all blocks to consistently use the "style" attribute for all customizations, that is, deprecate preset-specific attributes such as `attributes.fontSize`.
+- Consolidate global and block style rendering and enqueuing (ongoing)
+- Explore pre-render CSS rule processing with the intention of deduplicating other common and/or repetitive block styles. (ongoing)
+- Extend the scope of semantic class names and/or design token expression, and encapsulate rules into stable utility classes.
+- Explore pre-render CSS rule processing with the intention of deduplicating other common and/or repetitive block styles.
+- Propose a way to control hierarchy and specificity, and make the style hierarchy cascade accessible and predictable. This might include preparing for CSS cascade layers until they become more widely supported, and allowing for opt-in support in Gutenberg via theme.json.
+- Refactor all blocks to consistently use the "style" attribute for all customizations, that is, deprecate preset-specific attributes such as `attributes.fontSize`.
 
 For more information about the roadmap, please refer to [Block editor styles: initiatives and goals](https://make.wordpress.org/core/2022/06/24/block-editor-styles-initiatives-and-goals/) and the [GitHub project board](https://github.com/orgs/WordPress/projects/19).
 
@@ -31,11 +31,11 @@ See also [Using the Style Engine to generate block supports styles](https://gith
 
 _Parameters_
 
--   _$block_styles_ `array` A block's `attributes.style` object or the top level styles in theme.json
--   _$options_ `array<string|boolean>` An array of options to determine the output.
-    -   _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'. When both `context` and `selector` are set, the Style Engine will store the CSS rules using the `context` as a key.
-    -   _convert_vars_to_classnames_ `boolean` Whether to skip converting CSS var:? values to var( --wp--preset--\* ) values. Default is `false`.
-    -   _selector_ `string` When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+- _$block_styles_ `array` A block's `attributes.style` object or the top level styles in theme.json
+- _$options_ `array<string|boolean>` An array of options to determine the output.
+    - _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'. When both `context` and `selector` are set, the Style Engine will store the CSS rules using the `context` as a key.
+    - _convert_vars_to_classnames_ `boolean` Whether to skip converting CSS var:? values to var( --wp--preset--\* ) values. Default is `false`.
+    - _selector_ `string` When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 
 _Returns_
 `array<string|array>|null`
@@ -95,11 +95,11 @@ This function acts as a CSS compiler, but will also register the styles in a sto
 
 _Parameters_
 
--   _$css_rules_ `array<array>`
--   _$options_ `array<string|bool>` An array of options to determine the output.
-    -   _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'. When set, the Style Engine will attempt to store the CSS rules.
-    -   _prettify_ `bool` Whether to add new lines and indents to output. Default is to inherit the value of the global constant `SCRIPT_DEBUG`, if it is defined.
-    -   _optimize_ `bool` Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
+- _$css_rules_ `array<array>`
+- _$options_ `array<string|bool>` An array of options to determine the output.
+    - _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'. When set, the Style Engine will attempt to store the CSS rules.
+    - _prettify_ `bool` Whether to add new lines and indents to output. Default is to inherit the value of the global constant `SCRIPT_DEBUG`, if it is defined.
+    - _optimize_ `bool` Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
 
 _Returns_
 `string` A compiled CSS string based on `$css_rules`.
@@ -168,10 +168,10 @@ Returns compiled CSS from a stored context, if found.
 
 _Parameters_
 
--   _$store_name_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or ' global-styles'. Default is 'block-supports'.
--   _$options_ `array<bool>` An array of options to determine the output.
-    -   _prettify_ `bool` Whether to add new lines and indents to output. Default is to inherit the value of the global constant `SCRIPT_DEBUG`, if it is defined.
-    -   _optimize_ `bool` Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
+- _$store_name_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or ' global-styles'. Default is 'block-supports'.
+- _$options_ `array<bool>` An array of options to determine the output.
+    - _prettify_ `bool` Whether to add new lines and indents to output. Default is to inherit the value of the global constant `SCRIPT_DEBUG`, if it is defined.
+    - _optimize_ `bool` Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
 
 _Returns_
 `string` A compiled CSS string from the stored CSS rules.
@@ -247,12 +247,12 @@ compileCSS( { spacing: { padding: '10px', margin: '12px' } } );
 
 _Parameters_
 
--   _style_ `Style`: Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
--   _options_ `StyleOptions`: Options object with settings to adjust how the styles are generated.
+- _style_ `Style`: Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
+- _options_ `StyleOptions`: Options object with settings to adjust how the styles are generated.
 
 _Returns_
 
--   `string`: A generated stylesheet or inline style declarations.
+- `string`: A generated stylesheet or inline style declarations.
 
 _Changelog_
 
@@ -283,12 +283,12 @@ getCSSRules(
 
 _Parameters_
 
--   _style_ `Style`: Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
--   _options_ `StyleOptions`: Options object with settings to adjust how the styles are generated.
+- _style_ `Style`: Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
+- _options_ `StyleOptions`: Options object with settings to adjust how the styles are generated.
 
 _Returns_
 
--   `GeneratedCSSRule[]`: A collection of objects containing the selector, if any, the CSS property key (camelcase) and parsed CSS value.
+- `GeneratedCSSRule[]`: A collection of objects containing the selector, if any, the CSS property key (camelcase) and parsed CSS value.
 
 _Changelog_
 
@@ -306,11 +306,11 @@ Example:
 
 _Parameters_
 
--   _styleValue_ `StyleValue`: A string representing a raw CSS value. Non-strings won't be processed.
+- _styleValue_ `StyleValue`: A string representing a raw CSS value. Non-strings won't be processed.
 
 _Returns_
 
--   `StyleValue`: A CSS custom var value if the incoming style value is a preset value.
+- `StyleValue`: A CSS custom var value if the incoming style value is a preset value.
 
 ### Style
 
