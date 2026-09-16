@@ -21,15 +21,15 @@ import {
 	hasUndo,
 	hasRedo,
 } from '../selectors';
-import { getSyncManager } from '../sync';
+import { getEntitySyncManager } from '../entity-sync';
 
-vi.mock( '../sync', () => ( {
-	getSyncManager: vi.fn(),
+vi.mock( '../entity-sync', () => ( {
+	getEntitySyncManager: vi.fn(),
 } ) );
 
 describe( 'hasUndo/hasRedo', () => {
 	afterEach( () => {
-		getSyncManager.mockReset();
+		getEntitySyncManager.mockReset();
 	} );
 
 	it( 'reads undo availability from core-data state when a sync undo manager is available', () => {
@@ -37,7 +37,7 @@ describe( 'hasUndo/hasRedo', () => {
 			hasUndo: vi.fn( () => false ),
 			hasRedo: vi.fn( () => false ),
 		};
-		getSyncManager.mockReturnValue( { undoManager } );
+		getEntitySyncManager.mockReturnValue( { undoManager } );
 
 		const state = deepFreeze( {
 			syncUndoManagerState: {
@@ -57,7 +57,7 @@ describe( 'hasUndo/hasRedo', () => {
 			hasUndo: vi.fn( () => true ),
 			hasRedo: vi.fn( () => false ),
 		};
-		getSyncManager.mockReturnValue( undefined );
+		getEntitySyncManager.mockReturnValue( undefined );
 
 		const state = { undoManager };
 

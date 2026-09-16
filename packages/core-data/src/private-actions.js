@@ -4,7 +4,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from './name';
-import { getSyncManager, hasSyncManager } from './sync';
+import { getEntitySyncManager } from './entity-sync';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -171,8 +171,9 @@ export const setCollaborationSupported =
 	( supported ) =>
 	( { dispatch } ) => {
 		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
-		if ( ! supported && hasSyncManager() ) {
-			getSyncManager().unloadAll();
+		const syncManager = getEntitySyncManager();
+		if ( ! supported && syncManager ) {
+			syncManager.unloadAll();
 			dispatch.__unstableNotifySyncUndoManagerChange( {
 				hasUndo: false,
 				hasRedo: false,

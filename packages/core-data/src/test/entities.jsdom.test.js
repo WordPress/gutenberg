@@ -6,16 +6,8 @@ import {
 	prePersistPostType,
 	additionalEntityConfigLoaders,
 } from '../entities';
-import { getSyncManager } from '../sync';
-import {
-	applyPostChangesToCRDTDoc,
-	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-} from '../utils/crdt';
+import { applyPostChangesToCRDTDoc } from '../utils/crdt';
 vi.mock( '@wordpress/api-fetch' );
-vi.mock( import( '../sync' ), async ( importOriginal ) => ( {
-	...( await importOriginal() ),
-	getSyncManager: vi.fn(),
-} ) );
 vi.mock( import( '../utils/crdt' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
 	applyPostChangesToCRDTDoc: vi.fn(),
@@ -71,7 +63,6 @@ describe( 'prePersistPostType', () => {
 	afterEach( () => {
 		window.__experimentalEnableRealTimeCollaboration =
 			originalCollaborationEnabled;
-		getSyncManager.mockReset();
 	} );
 
 	it( 'set the status to draft and empty the title when saving auto-draft posts', async () => {
@@ -122,40 +113,6 @@ describe( 'prePersistPostType', () => {
 		expect(
 			await prePersistPostType( record, edits, 'post', true )
 		).toEqual( {} );
-	} );
-
-	it( 'adds meta with serialized CRDT doc when createPersistedCRDTDoc returns a value', async () => {
-		window.__experimentalEnableRealTimeCollaboration = true;
-		const mockSerializedDoc = 'serialized-crdt-doc-data';
-		getSyncManager.mockReturnValue( {
-			createPersistedCRDTDoc: vi
-				.fn()
-				.mockReturnValue( mockSerializedDoc ),
-		} );
-
-		const record = { id: 123, status: 'publish' };
-		const edits = {};
-		const result = await prePersistPostType( record, edits, 'post', false );
-
-		expect( result.meta ).toEqual( {
-			[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: mockSerializedDoc,
-		} );
-
-		expect( getSyncManager ).toHaveBeenCalled();
-		expect( getSyncManager().createPersistedCRDTDoc ).toHaveBeenCalledWith(
-			'postType/post',
-			123
-		);
-	} );
-
-	it( 'does not create a persisted CRDT document when collaboration is disabled', async () => {
-		window.__experimentalEnableRealTimeCollaboration = false;
-		const record = { id: 123, status: 'publish' };
-
-		expect( await prePersistPostType( record, {}, 'post', false ) ).toEqual(
-			{}
-		);
-		expect( getSyncManager ).not.toHaveBeenCalled();
 	} );
 } );
 
