@@ -36,6 +36,7 @@ const PLUGIN_NAMESPACE_TO_ESLINTRC_NAME = {
 	jsdoc: 'jsdoc',
 	'jsx-a11y': 'jsx-a11y',
 	jest: 'jest',
+	vitest: '@vitest',
 	'jest-dom': 'jest-dom',
 	'testing-library': 'testing-library',
 	prettier: 'prettier',
@@ -68,6 +69,20 @@ function flatToEslintrc( flatConfigs ) {
 	let parser;
 
 	for ( const config of flatConfigs ) {
+		// Use the same plugin namespaces for rule names and plugin registration.
+		const configRules = Object.fromEntries(
+			Object.entries( config.rules ?? {} ).map( ( [ name, value ] ) => [
+				name.replace(
+					/^(.+)\//,
+					( _, namespace ) =>
+						`${
+							PLUGIN_NAMESPACE_TO_ESLINTRC_NAME[ namespace ] ??
+							namespace
+						}/`
+				),
+				value,
+			] )
+		);
 		// Collect plugin names.
 		if ( config.plugins ) {
 			for ( const name of Object.keys( config.plugins ) ) {
@@ -86,7 +101,7 @@ function flatToEslintrc( flatConfigs ) {
 					: [ config.files ],
 			};
 			if ( config.rules ) {
-				override.rules = { ...config.rules };
+				override.rules = { ...configRules };
 			}
 			if ( config.settings ) {
 				override.settings = { ...config.settings };
@@ -108,7 +123,7 @@ function flatToEslintrc( flatConfigs ) {
 		} else {
 			// Global config: merge into base.
 			if ( config.rules ) {
-				Object.assign( rules, config.rules );
+				Object.assign( rules, configRules );
 			}
 			if ( config.settings ) {
 				Object.assign( settings, config.settings );

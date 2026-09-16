@@ -255,7 +255,7 @@ export function useAutocomplete( {
 							undefined,
 							getTextContent( record ).length
 						)
-				  )
+					)
 				: '';
 		}
 

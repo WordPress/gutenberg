@@ -235,14 +235,14 @@ export function useThemeProviderStyles( {
 	// - otherwise, if a parent instance exists, use its inherited value or default;
 	// - otherwise, omit.
 	const primary = hasColor
-		? color.primary ??
-		  inheritedSettings.color?.primary ??
-		  DEFAULT_SEED_COLORS.primary
+		? ( color.primary ??
+			inheritedSettings.color?.primary ??
+			DEFAULT_SEED_COLORS.primary )
 		: undefined;
 	const background = hasColor
-		? color.background ??
-		  inheritedSettings.color?.background ??
-		  DEFAULT_SEED_COLORS.background
+		? ( color.background ??
+			inheritedSettings.color?.background ??
+			DEFAULT_SEED_COLORS.background )
 		: undefined;
 	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
 	const cornerRadiusPreset =
