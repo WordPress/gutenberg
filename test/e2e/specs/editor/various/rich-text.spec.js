@@ -893,4 +893,66 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			},
 		] );
 	} );
+
+	test( 'should not focus the text when clicking the padding of a flex group', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {
+				layout: { type: 'flex', orientation: 'vertical' },
+				style: {
+					spacing: {
+						padding: {
+							top: '60px',
+							right: '40px',
+							bottom: '60px',
+							left: '40px',
+						},
+					},
+				},
+			},
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inside a flex group' },
+				},
+			],
+		} );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [ { name: 'core/paragraph' } ],
+			},
+		] );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
+
+		const group = editor.canvas.locator( '[data-type="core/group"]' );
+		const box = await group.boundingBox();
+		// Click inside the group's top padding, above the paragraph.
+		await page.mouse.click( box.x + box.width / 2, box.y + 20 );
+
+		await expect( group ).toBeFocused();
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		).not.toBeFocused();
+		await expect
+			.poll( () =>
+				editor.canvas.locator( ':root' ).evaluate( ( root ) => {
+					const { anchorNode } = root.ownerDocument.getSelection();
+					if ( ! anchorNode ) {
+						return false;
+					}
+					const element =
+						anchorNode.nodeType === anchorNode.TEXT_NODE
+							? anchorNode.parentElement
+							: anchorNode;
+					return !! element.closest( '[data-type="core/paragraph"]' );
+				} )
+			)
+			.toBe( false );
+	} );
 } );
