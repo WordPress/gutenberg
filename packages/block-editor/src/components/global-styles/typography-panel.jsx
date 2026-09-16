@@ -178,7 +178,7 @@ function getMergedFontSizes( settings ) {
 	return [
 		...( fontSizes?.custom ?? [] ),
 		...( fontSizes?.theme ?? [] ),
-		...( defaultFontSizesEnabled ? fontSizes?.default ?? [] : [] ),
+		...( defaultFontSizesEnabled ? ( fontSizes?.default ?? [] ) : [] ),
 	];
 }
 
@@ -964,7 +964,7 @@ export default function TypographyPanel( {
 										getNumericPlaceholder(
 											inheritedLineHeight
 										),
-							  }
+								}
 							: {} ) }
 					/>
 				</InheritanceToolsPanelItem>
@@ -998,7 +998,7 @@ export default function TypographyPanel( {
 							isLetterSpacingPlaceholder
 								? getNumericPlaceholder(
 										inheritedLetterSpacing
-								  )
+									)
 								: undefined
 						}
 					/>
