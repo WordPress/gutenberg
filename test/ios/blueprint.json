@@ -1,0 +1,14 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"login": true,
+	"steps": [
+		{
+			"step": "runPHP",
+			"code": "<?php require '/wordpress/wp-load.php'; update_user_meta( 1, 'wp_persisted_preferences', array( 'core/edit-post' => array( 'welcomeGuide' => false, 'fullscreenMode' => false ), '_modified' => gmdate( 'c' ) ) );"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require '/wordpress/wp-load.php'; $source = glob( WP_PLUGIN_DIR . '/*/test/ios/diagnostics/title-input-log.js' ); if ( ! $source ) { throw new Exception( 'title-input-log.js not found under ' . WP_PLUGIN_DIR ); } if ( ! is_dir( WP_CONTENT_DIR . '/mu-plugins' ) ) { mkdir( WP_CONTENT_DIR . '/mu-plugins' ); } copy( $source[0], WP_CONTENT_DIR . '/mu-plugins/title-input-log.js' ); file_put_contents( WP_CONTENT_DIR . '/mu-plugins/title-input-log.php', \"<?php add_action( 'admin_enqueue_scripts', function () { wp_enqueue_script( 'title-input-log', content_url( 'mu-plugins/title-input-log.js' ), array(), null, true ); } );\" );"
+		}
+	]
+}
