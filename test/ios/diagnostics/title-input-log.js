@@ -92,16 +92,14 @@
 					? active.nodeName + ( active === title ? '(title)' : '' )
 					: '-' )
 		);
-		// Everything from just before the first key onward.
-		const first = entries.findIndex( ( entry ) =>
-			entry.includes( 'keydown<' )
-		);
-		const from =
-			first === -1
-				? Math.max( 0, entries.length - 12 )
-				: Math.max( 0, first - 8 );
-		log.textContent =
-			'TLOG ' + entries.slice( from, from + 70 ).join( ' | ' );
+		// Everything, so that what happens between the field attaching and
+		// the first key is visible; the oldest entries go first when the
+		// log grows past what accessibility reads back.
+		const shown =
+			entries.length > 90
+				? entries.slice( 0, 30 ).concat( entries.slice( -60 ) )
+				: entries;
+		log.textContent = 'TLOG ' + shown.join( ' | ' );
 	}
 
 	// Which script mutates the title's tree, and during which event: DOM
@@ -209,6 +207,71 @@
 			} );
 		}
 	}
+
+	// The top document sees a key the canvas never gets: log its key, input
+	// and focus events, with the target, prefixed to tell them apart.
+	function watchTopDocument() {
+		const topTitle = { textContent: '', childNodes: [] };
+		for ( const type of [
+			'keydown',
+			'beforeinput',
+			'input',
+			'keyup',
+			'focusin',
+			'focusout',
+		] ) {
+			document.addEventListener(
+				type,
+				( event ) =>
+					record(
+						document,
+						topTitle,
+						'TOP ' +
+							type +
+							' ' +
+							( event.inputType || event.key || '' ) +
+							' target=' +
+							event.target.nodeName +
+							( event.target.name
+								? '[' + event.target.name + ']'
+								: '' )
+					),
+				true
+			);
+		}
+		window.addEventListener( 'load', () =>
+			record( document, topTitle, 'TOP load' )
+		);
+		document.addEventListener( 'readystatechange', () =>
+			record( document, topTitle, 'TOP readyState=' + document.readyState )
+		);
+		if ( window.visualViewport ) {
+			window.visualViewport.addEventListener( 'resize', () =>
+				record(
+					document,
+					topTitle,
+					'TOP viewport h=' + Math.round( window.visualViewport.height )
+				)
+			);
+		}
+		// A timer that fires late means the main thread was busy: record
+		// stretches over 150 ms with when they started.
+		let expected = Date.now() + 50;
+		( function tick() {
+			const now = Date.now();
+			const late = now - expected;
+			if ( late > 150 ) {
+				record(
+					document,
+					topTitle,
+					'TOP busy ' + late + 'ms from ' + ( expected - started )
+				);
+			}
+			expected = now + 50;
+			setTimeout( tick, 50 );
+		} )();
+	}
+	watchTopDocument();
 
 	function attach() {
 		const frame = document.querySelector( 'iframe[name="editor-canvas"]' );
