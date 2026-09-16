@@ -78,6 +78,36 @@
 	}
 
 	/* -----------------------------------------------------------------------
+	   Button groups
+
+	   The base rule's `margin` and `border-radius` apply to every button, and
+	   from this layer they outrank buttons.css's `.button-group` rules, which
+	   join grouped buttons into one control: square inner corners, and a -1px
+	   margin so neighbouring borders overlap instead of doubling. That joining
+	   is geometry, so it is repeated here from buttons.css with only the radius
+	   value taken from the scale.
+	   ----------------------------------------------------------------------- */
+
+	.wp-core-ui .button-group > .button {
+		border-radius: 0;
+		margin-inline-end: -1px;
+	}
+
+	.wp-core-ui .button-group > .button:first-child {
+		border-start-start-radius: var(--wpds-border-radius-sm);
+		border-end-start-radius: var(--wpds-border-radius-sm);
+	}
+
+	.wp-core-ui .button-group > .button:last-child {
+		border-start-end-radius: var(--wpds-border-radius-sm);
+		border-end-end-radius: var(--wpds-border-radius-sm);
+	}
+
+	.wp-core-ui .button-group > .button-primary + .button {
+		border-inline-start: 0;
+	}
+
+	/* -----------------------------------------------------------------------
 	   Focus — outline/outline-offset, never box-shadow.
 	   Core's legacy ring is a box-shadow; the base rule above clears it.
 	   ----------------------------------------------------------------------- */

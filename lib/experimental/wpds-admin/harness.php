@@ -121,6 +121,28 @@ function gutenberg_wpds_admin_render_harness() {
 	}
 	echo '</p>';
 
+	echo '<h2>' . esc_html__( 'Button groups', 'gutenberg' ) . '</h2>';
+	echo '<p>' . esc_html__( 'Grouped buttons join into one control: square inner corners, and borders that overlap rather than double.', 'gutenberg' ) . '</p>';
+	$groups = array(
+		array( '', array( 'button', 'button', 'button' ) ),
+		array( '', array( 'button button-primary', 'button', 'button' ) ),
+		array( ' button-compact', array( 'button', 'button', 'button' ) ),
+	);
+	echo '<p style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">';
+	foreach ( $groups as $group ) {
+		list( $group_class, $buttons ) = $group;
+		printf( '<span class="button-group%s">', esc_attr( $group_class ) );
+		foreach ( $buttons as $button_class ) {
+			printf(
+				'<button type="button" class="%s">%s</button>',
+				esc_attr( $button_class ),
+				esc_html__( 'Button', 'gutenberg' )
+			);
+		}
+		echo '</span>';
+	}
+	echo '</p>';
+
 	echo '<h2>' . esc_html__( 'Fields — states', 'gutenberg' ) . '</h2>';
 	echo '<table class="widefat striped" style="max-width:1100px"><thead><tr><th>' . esc_html__( 'State', 'gutenberg' ) . '</th><th>' . esc_html__( 'Text input', 'gutenberg' ) . '</th><th>' . esc_html__( 'Select', 'gutenberg' ) . '</th><th>' . esc_html__( 'Textarea', 'gutenberg' ) . '</th></tr></thead><tbody>';
 
