@@ -88,4 +88,51 @@ test.describe( 'Math Block', () => {
 			},
 		] );
 	} );
+
+	test( 'should align the columns of an aligned environment @webkit @firefox', async ( {
+		editor,
+		page,
+	} ) => {
+		// In `aligned`, cells before `&` are right-aligned and cells after
+		// it are left-aligned, so that `A` and `AB + C` both sit against
+		// their `=`. Returns, for every aligned cell, how far its content is
+		// from the edge its class names; nothing is misaligned when all are
+		// within a pixel.
+		async function getMisalignedCells( container ) {
+			const cells = container.locator(
+				'.wp-block-math mtd.tml-right, .wp-block-math mtd.tml-left'
+			);
+			await expect( cells ).toHaveCount( 4 );
+			return cells.evaluateAll( ( elements ) =>
+				elements
+					.map( ( cell ) => {
+						const cellRect = cell.getBoundingClientRect();
+						const rects = Array.from( cell.children, ( child ) =>
+							child.getBoundingClientRect()
+						);
+						const style = window.getComputedStyle( cell );
+						return cell.classList.contains( 'tml-right' )
+							? cellRect.right -
+									parseFloat( style.paddingRight ) -
+									Math.max( ...rects.map( ( r ) => r.right ) )
+							: Math.min( ...rects.map( ( r ) => r.left ) ) -
+									cellRect.left -
+									parseFloat( style.paddingLeft );
+					} )
+					.filter( ( gap ) => Math.abs( gap ) > 1 )
+			);
+		}
+
+		await editor.insertBlock( {
+			name: 'core/math',
+			attributes: {
+				latex: '\\begin{aligned} A &= 1 \\\\ AB + C &= 2 \\end{aligned}',
+			},
+		} );
+		expect( await getMisalignedCells( editor.canvas ) ).toEqual( [] );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		expect( await getMisalignedCells( page ) ).toEqual( [] );
+	} );
 } );
