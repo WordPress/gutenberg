@@ -16,12 +16,6 @@
 		/*rtl:ignore*/
 		text-align: right;
 	}
-
-	// Row gap keeps the space under a PDF preview, column gap the space between
-	// the file name and the button, as before the flex layout.
-	&.is-layout-flex {
-		gap: 1.25em 0.75em;
-	}
 }
 
 // Keep the alignment of File blocks added before the flex layout. Zero
