@@ -290,7 +290,7 @@ export default function PostFeaturedImageEdit( {
 											// translators: %s: Name of the post type e.g: "post".
 											__( 'Link to %s' ),
 											postType.labels.singular_name
-									  )
+										)
 									: __( 'Link to post' )
 							}
 							isShownByDefault
@@ -472,7 +472,7 @@ export default function PostFeaturedImageEdit( {
 										// translators: %s: The image's alt text.
 										__( 'Featured image: %s' ),
 										media.alt_text
-								  )
+									)
 								: __( 'Featured image' )
 						}
 						style={ imageStyles }
