@@ -235,11 +235,26 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Unregisters an icon.
 	 *
+	 * Icons in the built-in collection cannot be unregistered.
+	 *
 	 * @param string $icon_name Namespaced icon name in the form "collection/icon-name"
 	 *                          (e.g. "core/arrow-left").
 	 * @return bool True if the icon was unregistered successfully, else false.
 	 */
 	public function unregister( $icon_name ) {
+		if ( is_string( $icon_name ) && str_starts_with( $icon_name, '_builtin/' ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					/* translators: %s: Icon name. */
+					__( 'The "%s" icon is used by WordPress and cannot be unregistered.', 'gutenberg' ),
+					$icon_name
+				),
+				'7.2.0'
+			);
+			return false;
+		}
+
 		if ( ! $this->is_registered( $icon_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
@@ -344,8 +359,8 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 *
 	 * The base `$instance` slot is intentionally not redefined, so both
 	 * `WP_Icons_Registry::get_instance()` (used by core) and this method share
-	 * one instance. An existing base registry is upgraded, replaying any
-	 * non-`core/` icons so they are not lost.
+	 * one instance. An existing base registry is upgraded, replaying any icons
+	 * outside the `core` and `_builtin` collections so they are not lost.
 	 */
 	public static function get_instance() {
 		if ( ! self::$instance instanceof self ) {
@@ -354,7 +369,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 
 			if ( null !== $original_registry ) {
 				foreach ( $original_registry->get_registered_icons() as $icon ) {
-					if ( str_starts_with( $icon['name'], 'core/' ) ) {
+					if ( str_starts_with( $icon['name'], 'core/' ) || str_starts_with( $icon['name'], '_builtin/' ) ) {
 						continue;
 					}
 					$icon_properties = array( 'label' => $icon['label'] );

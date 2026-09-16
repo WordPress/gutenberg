@@ -195,4 +195,21 @@ class WP_Test_Icon_Collections_Registry extends WP_UnitTestCase {
 	public function test_unregister_unknown_collection() {
 		$this->assertFalse( $this->collections->unregister( 'ghost' ) );
 	}
+
+	/**
+	 * The reserved built-in collection should be registered by default.
+	 */
+	public function test_builtin_collection_is_registered() {
+		$this->assertTrue( $this->collections->is_registered( '_builtin' ) );
+	}
+
+	/**
+	 * Should fail to unregister the built-in collection, and leave it intact.
+	 *
+	 * @expectedIncorrectUsage WP_Icon_Collections_Registry_Gutenberg::unregister
+	 */
+	public function test_unregister_builtin_collection_fails() {
+		$this->assertFalse( $this->collections->unregister( '_builtin' ) );
+		$this->assertTrue( $this->collections->is_registered( '_builtin' ) );
+	}
 }

@@ -93,6 +93,8 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 	/**
 	 * Retrieves all icons, optionally scoped to a collection via URL segment.
 	 *
+	 * Non-public icons and icons in the built-in collection are omitted.
+	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
@@ -119,6 +121,9 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 			if ( false === ( $icon['public'] ?? true ) ) {
 				continue;
 			}
+			if ( '_builtin' === ( $icon['collection'] ?? '' ) ) {
+				continue;
+			}
 			if ( null !== $collection && ( ! isset( $icon['collection'] ) || $icon['collection'] !== $collection ) ) {
 				continue;
 			}
@@ -132,8 +137,9 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 	/**
 	 * Retrieves a specific icon from the registry.
 	 *
-	 * Icons registered as non-public are reported as not found. Icons registered
-	 * without an explicit `public` property are public.
+	 * Icons registered as non-public, and icons in the built-in collection, are
+	 * reported as not found. Icons registered without an explicit `public`
+	 * property are public.
 	 *
 	 * @param string $name Icon name.
 	 * @return array|WP_Error Icon data on success, or WP_Error object on failure.
@@ -141,7 +147,7 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 	public function get_icon( $name ) {
 		$icon = parent::get_icon( $name );
 
-		if ( ! is_wp_error( $icon ) && false === ( $icon['public'] ?? true ) ) {
+		if ( ! is_wp_error( $icon ) && ( false === ( $icon['public'] ?? true ) || '_builtin' === ( $icon['collection'] ?? '' ) ) ) {
 			return new WP_Error(
 				'rest_icon_not_found',
 				sprintf(

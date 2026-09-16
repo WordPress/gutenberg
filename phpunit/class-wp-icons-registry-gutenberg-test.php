@@ -520,4 +520,23 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 		$this->assertFalse( $result );
 		$this->assertFalse( $this->registry->is_registered( 'test-collection/invalid-visibility' ) );
 	}
+
+	/**
+	 * Should fail to unregister an icon in the built-in collection, and leave
+	 * it registered.
+	 *
+	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::unregister
+	 */
+	public function test_unregister_builtin_icon_fails() {
+		$this->register(
+			'_builtin/alpha',
+			array(
+				'label'   => 'Alpha',
+				'content' => '<svg></svg>',
+			)
+		);
+
+		$this->assertFalse( $this->registry->unregister( '_builtin/alpha' ) );
+		$this->assertTrue( $this->registry->is_registered( '_builtin/alpha' ) );
+	}
 }

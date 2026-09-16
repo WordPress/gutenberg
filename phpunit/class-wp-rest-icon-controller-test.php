@@ -318,4 +318,51 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 
 		$this->assertErrorResponse( 'rest_icon_not_found', $response, 404 );
 	}
+
+	/**
+	 * Test that icons in the built-in collection are omitted from the collection,
+	 * while their public counterparts in the core collection are returned.
+	 */
+	public function test_get_items_omits_builtin_icons() {
+		wp_set_current_user( self::$editor_id );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$names = wp_list_pluck( $response->get_data(), 'name' );
+		$this->assertContains( 'core/menu', $names );
+		$this->assertNotContains( '_builtin/menu', $names );
+		$this->assertNotContains( '_builtin/wordpress', $names );
+	}
+
+	/**
+	 * Test that an icon in the built-in collection is not readable by name.
+	 */
+	public function test_get_item_returns_404_for_builtin_icon() {
+		wp_set_current_user( self::$editor_id );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/icons/_builtin/wordpress' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 404, $response->get_status() );
+	}
+
+	/**
+	 * Test that the built-in collection is not exposed by the icon collections
+	 * endpoint.
+	 */
+	public function test_get_items_omits_the_builtin_collection() {
+		wp_set_current_user( self::$editor_id );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/icon-collections' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$slugs = wp_list_pluck( $response->get_data(), 'slug' );
+		$this->assertContains( 'core', $slugs );
+		$this->assertNotContains( '_builtin', $slugs );
+	}
 }
