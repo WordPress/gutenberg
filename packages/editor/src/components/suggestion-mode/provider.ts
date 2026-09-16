@@ -446,7 +446,7 @@ export function useSuggestionsProvider() {
 						'postType',
 						postType,
 						id
-				  )
+					)
 				: null;
 		return {
 			postId: id,

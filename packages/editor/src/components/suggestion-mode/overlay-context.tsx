@@ -689,8 +689,9 @@ export function SuggestionOverlayProvider( {
 		if ( ! hasEntries ) {
 			return;
 		}
-		const getLive = registry.select( BLOCK_EDITOR_STORE_NAME )
-			?.getClientIdsWithDescendants;
+		const getLive = registry.select(
+			BLOCK_EDITOR_STORE_NAME
+		)?.getClientIdsWithDescendants;
 		if ( ! getLive ) {
 			return;
 		}
