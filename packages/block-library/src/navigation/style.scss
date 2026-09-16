@@ -686,7 +686,6 @@ button.wp-block-navigation-item__content {
 					flex-direction: column;
 					// Inherit alignment settings from container.
 					align-items: var(--navigation-layout-justification-setting, initial);
-					text-align: var(--navigation-layout-text-align, inherit);
 				}
 			}
 
