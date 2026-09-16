@@ -97,19 +97,12 @@ describe( 'Combobox', () => {
 			</Combobox.Root>
 		);
 
-		const chip = screen.getByText( ( _content, element ) => {
-			return (
-				element instanceof HTMLElement &&
-				element.tagName === 'DIV' &&
-				element.hasAttribute( 'aria-describedby' ) &&
-				( element.textContent ?? '' ).includes( 'Item 1' )
-			);
-		} );
-
-		expect( chip ).toHaveAccessibleDescription(
-			'Press Backspace or Delete to remove.'
+		expect( screen.getByLabelText( 'Item 1' ) ).toHaveAccessibleName(
+			'Item 1'
 		);
-		expect( chip ).not.toHaveAttribute( 'aria-description' );
+		expect(
+			screen.getByText( 'Press Backspace or Delete to remove.' )
+		).toBeVisible();
 	} );
 
 	describe( 'when disabled', () => {

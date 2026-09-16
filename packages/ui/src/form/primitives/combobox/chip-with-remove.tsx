@@ -28,16 +28,15 @@ export const ChipWithRemove = forwardRef<
 		children,
 		prefix,
 		removeLabel = __( 'Remove' ),
-		'aria-description': descriptionText = __(
-			'Press Backspace or Delete to remove.'
-		),
 		'aria-describedby': ariaDescribedby,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledby,
 		...restProps
 	},
 	ref
 ) {
 	const hintId = useId();
-	const hasDescription = descriptionText !== '';
+	const contentId = useId();
 
 	return (
 		<>
@@ -45,17 +44,22 @@ export const ChipWithRemove = forwardRef<
 				ref={ ref }
 				className={ clsx( styles.chip, className ) }
 				{ ...restProps }
-				aria-describedby={ mergeDescribedBy(
-					ariaDescribedby,
-					hasDescription ? hintId : undefined
-				) }
+				aria-label={ ariaLabel }
+				aria-labelledby={
+					ariaLabel
+						? ariaLabelledby
+						: mergeDescribedBy( ariaLabelledby, contentId )
+				}
+				aria-describedby={ mergeDescribedBy( ariaDescribedby, hintId ) }
 			>
 				{ prefix && (
 					<span className={ styles[ 'chip-prefix' ] }>
 						{ prefix }
 					</span>
 				) }
-				<span className={ styles[ 'chip-content' ] }>{ children }</span>
+				<span id={ contentId } className={ styles[ 'chip-content' ] }>
+					{ children }
+				</span>
 
 				<_Combobox.ChipRemove
 					className={ styles[ 'chip-remove' ] }
@@ -74,11 +78,9 @@ export const ChipWithRemove = forwardRef<
 					) }
 				/>
 			</_Combobox.Chip>
-			{ hasDescription && (
-				<VisuallyHidden id={ hintId } render={ <span /> }>
-					{ descriptionText }
-				</VisuallyHidden>
-			) }
+			<VisuallyHidden id={ hintId } render={ <span /> }>
+				{ __( 'Press Backspace or Delete to remove.' ) }
+			</VisuallyHidden>
 		</>
 	);
 } );

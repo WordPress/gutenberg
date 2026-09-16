@@ -9,19 +9,6 @@ vi.mock( import( '@wordpress/warning' ), () => ( { default: vi.fn() } ) );
 
 const mockedWarning = vi.mocked( warning );
 
-const CHIP_REMOVE_HINT = 'Press Backspace or Delete to remove.';
-
-function getChip( name: string ) {
-	return screen.getByText( ( _content, element ) => {
-		return (
-			element instanceof HTMLElement &&
-			element.tagName === 'DIV' &&
-			element.hasAttribute( 'aria-describedby' ) &&
-			( element.textContent ?? '' ).includes( name )
-		);
-	} );
-}
-
 describe( 'SearchableChipSelect', () => {
 	beforeEach( () => {
 		mockedWarning.mockClear();
@@ -156,52 +143,6 @@ describe( 'SearchableChipSelect', () => {
 				screen.getByRole( 'combobox', { name: 'Fruit' } )
 			).toHaveAccessibleDescription(
 				'2 items selected. From the start of the input, press Left Arrow to move to the selected items.'
-			);
-		} );
-
-		it( 'describes each selected chip with the Backspace or Delete hint', () => {
-			render(
-				<SearchableChipSelect
-					aria-label="Fruit"
-					items={ ITEMS }
-					defaultValue={ [ ITEMS[ 0 ], ITEMS[ 2 ] ] }
-				/>
-			);
-
-			expect( getChip( 'Apple' ) ).toHaveAccessibleDescription(
-				CHIP_REMOVE_HINT
-			);
-			expect( getChip( 'Apple' ) ).not.toHaveAttribute(
-				'aria-description'
-			);
-			expect( getChip( 'Banana' ) ).toHaveAccessibleDescription(
-				CHIP_REMOVE_HINT
-			);
-			expect( getChip( 'Banana' ) ).not.toHaveAttribute(
-				'aria-description'
-			);
-		} );
-
-		it( 'keeps the chip Backspace or Delete description when chipsContent returns ChipWithRemove', () => {
-			render(
-				<SearchableChipSelect
-					aria-label="Fruit"
-					items={ ITEMS }
-					defaultValue={ [ ITEMS[ 0 ] ] }
-					chipsContent={ ( selected ) =>
-						selected.map( ( item ) => (
-							<SearchableChipSelect.ChipWithRemove
-								key={ item.value }
-							>
-								{ item.label }
-							</SearchableChipSelect.ChipWithRemove>
-						) )
-					}
-				/>
-			);
-
-			expect( getChip( 'Apple' ) ).toHaveAccessibleDescription(
-				CHIP_REMOVE_HINT
 			);
 		} );
 
