@@ -4,7 +4,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from './name';
-import { getEntitySyncManager } from './entity-sync';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -160,28 +159,6 @@ export function receiveEditorAssets( assets ) {
 }
 
 /**
- * Returns an action object used to set whether collaboration is supported.
- * When set to false, also disconnects all sync entities.
- *
- * @param {boolean} supported Whether collaboration is supported.
- *
- * @return {Object} Action object.
- */
-export const setCollaborationSupported =
-	( supported ) =>
-	( { dispatch } ) => {
-		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
-		const syncManager = getEntitySyncManager();
-		if ( ! supported && syncManager ) {
-			syncManager.unloadAll();
-			dispatch.__unstableNotifySyncUndoManagerChange( {
-				hasUndo: false,
-				hasRedo: false,
-			} );
-		}
-	};
-
-/**
  * Returns an action object used to receive view config.
  *
  * @param {string} kind   Entity kind.
@@ -214,35 +191,6 @@ export function __unstableNotifySyncUndoManagerChange( state ) {
 	return {
 		type: 'SYNC_UNDO_MANAGER_CHANGE',
 		...state,
-	};
-}
-
-/**
- * Returns an action object used to set the sync connection status for an entity or collection.
- *
- * @param {string}             kind   Kind of the entity.
- * @param {string}             name   Name of the entity.
- * @param {number|string|null} key    The entity key, or null for collections.
- * @param {Object|null}        status The connection state object or null on unload.
- *
- * @return {Object} Action object.
- */
-export function setSyncConnectionStatus( kind, name, key, status ) {
-	if ( ! status ) {
-		return {
-			type: 'CLEAR_SYNC_CONNECTION_STATUS',
-			kind,
-			name,
-			key,
-		};
-	}
-
-	return {
-		type: 'SET_SYNC_CONNECTION_STATUS',
-		kind,
-		name,
-		key,
-		status,
 	};
 }
 

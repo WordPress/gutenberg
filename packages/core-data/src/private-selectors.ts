@@ -1,5 +1,4 @@
 import { createSelector, createRegistrySelector } from '@wordpress/data';
-import type { ConnectionStatus } from '@wordpress/sync';
 import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
@@ -299,16 +298,6 @@ export function getEditorAssets( state: State ): Record< string, any > | null {
 }
 
 /**
- * Returns whether collaboration is supported.
- *
- * @param state Data state.
- * @return Whether collaboration is supported.
- */
-export function isCollaborationSupported( state: State ): boolean {
-	return state.collaborationSupported;
-}
-
-/**
  * Returns the view configuration for the given entity type.
  *
  * An optional fourth argument (e.g. `{ fields }`) may be passed when selecting;
@@ -336,58 +325,4 @@ export function getViewConfig(
 			form: undefined,
 		}
 	);
-}
-
-/**
- * Returns the current sync connection status across all entities. Prioritizes
- * disconnected states, then connecting, then connected.
- *
- * @param state Data state.
- *
- * @return The current sync connection state, prioritized by importance.
- */
-export function getSyncConnectionStatus(
-	state: State
-): ConnectionStatus | undefined {
-	if ( ! state.syncConnectionStatuses ) {
-		return undefined;
-	}
-
-	const PRIORITIZED_STATUSES = [ 'disconnected', 'connecting', 'connected' ];
-
-	let coalesced: ConnectionStatus | undefined;
-
-	for ( const status of Object.values( state.syncConnectionStatuses ) ) {
-		if (
-			! coalesced ||
-			PRIORITIZED_STATUSES.indexOf( status.status ) <
-				PRIORITIZED_STATUSES.indexOf( coalesced.status )
-		) {
-			coalesced = status;
-		}
-	}
-
-	return coalesced;
-}
-
-/**
- * Returns the sync connection status for a single entity, or undefined if
- * the entity is not being synced or no provider has reported a status yet.
- *
- * @param state    Data state.
- * @param kind     Entity kind.
- * @param name     Entity name.
- * @param recordId Record ID.
- *
- * @return The sync connection status for the entity.
- */
-export function getEntitySyncConnectionStatus(
-	state: State,
-	kind: string,
-	name: string,
-	recordId: EntityRecordKey
-): ConnectionStatus | undefined {
-	return state.syncConnectionStatuses?.[
-		`${ kind }/${ name }:${ recordId }`
-	];
 }

@@ -68,11 +68,10 @@ function _gutenberg_migrate_remove_fse_drafts() {
 }
 
 /**
- * Removes collaboration options replaced by the Real-Time Collaboration experiment.
+ * Removes the options of the retired real-time collaboration experiment.
  *
- * The previous values are intentionally not migrated to the experiment. Real-time
- * collaboration is now opt-in, so existing sites must explicitly enable the
- * experiment instead of being opted in by a legacy setting.
+ * The values are intentionally not migrated anywhere: real-time collaboration
+ * is no longer part of Gutenberg, so the settings have nothing to feed.
  *
  * @since 23.8.0
  */

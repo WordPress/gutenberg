@@ -1,18 +1,13 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '..';
-import { editMediaEntity, setCollaborationSupported } from '../private-actions';
-import { getEntitySyncManager } from '../entity-sync';
+import { editMediaEntity } from '../private-actions';
 import { unlock } from '../lock-unlock';
 
 vi.mock( '@wordpress/api-fetch' );
-vi.mock( import( '../entity-sync' ), async ( importOriginal ) => ( {
-	...( await importOriginal() ),
-	getEntitySyncManager: vi.fn(),
-} ) );
 
 describe( 'editMediaEntity', () => {
 	let dispatch;
@@ -213,36 +208,6 @@ describe( 'editMediaEntity', () => {
 
 		expect( dispatch.receiveEntityRecords ).not.toHaveBeenCalled();
 		expect( result ).toBeUndefined();
-	} );
-} );
-
-describe( 'setCollaborationSupported', () => {
-	afterEach( () => {
-		getEntitySyncManager.mockReset();
-	} );
-
-	it( 'unloads sync and resets sync undo state when disabling collaboration', () => {
-		const syncManager = {
-			unloadAll: vi.fn(),
-		};
-		const dispatch = Object.assign( vi.fn(), {
-			__unstableNotifySyncUndoManagerChange: vi.fn(),
-		} );
-		getEntitySyncManager.mockReturnValue( syncManager );
-
-		setCollaborationSupported( false )( { dispatch } );
-
-		expect( dispatch ).toHaveBeenCalledWith( {
-			type: 'SET_COLLABORATION_SUPPORTED',
-			supported: false,
-		} );
-		expect( syncManager.unloadAll ).toHaveBeenCalledTimes( 1 );
-		expect(
-			dispatch.__unstableNotifySyncUndoManagerChange
-		).toHaveBeenCalledWith( {
-			hasUndo: false,
-			hasRedo: false,
-		} );
 	} );
 } );
 

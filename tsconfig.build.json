@@ -77,7 +77,6 @@
 		{ "path": "packages/shortcode/tsconfig.build.json" },
 		{ "path": "packages/style-engine" },
 		{ "path": "packages/style-runtime/tsconfig.build.json" },
-		{ "path": "packages/sync/tsconfig.build.json" },
 		{ "path": "packages/theme/tsconfig.build.json" },
 		{ "path": "packages/theme/tsconfig.plugins.json" },
 		{ "path": "packages/token-list/tsconfig.build.json" },

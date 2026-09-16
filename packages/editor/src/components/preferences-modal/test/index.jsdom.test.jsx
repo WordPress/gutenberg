@@ -36,7 +36,6 @@ function setupActiveModal( preferences = {} ) {
 		getEditorSettings: () => ( {
 			richEditingEnabled: true,
 		} ),
-		isCollaborationEnabledForCurrentPost: () => true,
 	} );
 
 	useViewportMatch.mockReturnValue( true );
@@ -88,23 +87,16 @@ describe( 'EditPostPreferencesModal', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'shows collaboration notification controls', async () => {
+	it( 'renders the preferences when the modal is active', async () => {
 		const user = setupActiveModal();
 		await user.click( screen.getByRole( 'tab', { name: 'General' } ) );
 
 		expect(
+			screen.getByRole( 'dialog', { name: 'Preferences' } )
+		).toBeInTheDocument();
+		expect(
 			await screen.findByRole( 'checkbox', {
-				name: 'Collaborator joined',
-			} )
-		).toBeInTheDocument();
-		expect(
-			screen.getByRole( 'checkbox', {
-				name: 'Collaborator left',
-			} )
-		).toBeInTheDocument();
-		expect(
-			screen.getByRole( 'checkbox', {
-				name: 'Post updated',
+				name: 'Show starter patterns',
 			} )
 		).toBeInTheDocument();
 	} );

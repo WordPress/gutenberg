@@ -136,10 +136,7 @@ export const getEntityRecord =
 
 			// A registered entity sync manager hears about numeric-id records
 			// fetched without a query; it decides whether to sync them.
-			const syncManager =
-				select?.isCollaborationSupported?.() === false
-					? undefined
-					: getEntitySyncManager();
+			const syncManager = getEntitySyncManager();
 
 			if (
 				syncManager &&

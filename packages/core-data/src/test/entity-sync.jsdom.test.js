@@ -10,7 +10,6 @@ import {
 	getEntitySyncManager,
 	registerEntitySyncManager,
 } from '../entity-sync';
-import { setCollaborationSupported } from '../private-actions';
 import { getUndoManager } from '../private-selectors';
 import { getEntityRecord, getEntityRecords } from '../resolvers';
 import { hasRedo, hasUndo } from '../selectors';
@@ -536,17 +535,6 @@ describe( 'the entity sync seam', () => {
 			expect( getUndoManager( state ) ).toBe( manager.undoManager );
 			expect( hasUndo( state ) ).toBe( true );
 			expect( hasRedo( state ) ).toBe( true );
-		} );
-	} );
-
-	describe( 'setCollaborationSupported', () => {
-		it( 'unloads everything and resets the undo state when support is withdrawn', () => {
-			setCollaborationSupported( false )( { dispatch } );
-
-			expect( manager.unloadAll ).toHaveBeenCalledTimes( 1 );
-			expect(
-				dispatch.__unstableNotifySyncUndoManagerChange
-			).toHaveBeenCalledWith( { hasUndo: false, hasRedo: false } );
 		} );
 	} );
 } );

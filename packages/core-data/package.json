@@ -64,7 +64,6 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/rich-text": "file:../rich-text",
-		"@wordpress/sync": "file:../sync",
 		"@wordpress/undo-manager": "file:../undo-manager",
 		"@wordpress/url": "file:../url",
 		"@wordpress/warning": "file:../warning",

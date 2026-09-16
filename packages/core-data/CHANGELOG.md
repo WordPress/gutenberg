@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Removed the real-time collaboration experiment from the package: the Yjs document utilities, awareness, the collaboration hooks and the `@wordpress/sync` dependency are gone. Collaboration now plugs in through the entity sync seam below.
+
 ### Internal
 
 -   Added a private entity sync seam: `registerEntitySyncManager` and `getEntitySyncManager` let one manager plug into the entity lifecycle (record loads, edits, saves, deletes, and undo). The real-time collaboration experiment now runs through it instead of being called directly by the store.

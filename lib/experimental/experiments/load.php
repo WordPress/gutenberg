@@ -75,17 +75,6 @@ function gutenberg_initialize_experiments_settings() {
 			),
 		),
 		array(
-			'slug'  => 'real-time-collaboration',
-			'label' => _x( 'Real-Time Collaboration', 'experiments group name', 'gutenberg' ),
-			'items' => array(
-				array(
-					'id'          => 'gutenberg-real-time-collaboration',
-					'label'       => __( 'Enable real-time collaboration', 'gutenberg' ),
-					'description' => __( 'Allows multiple people to edit the same post at the same time.', 'gutenberg' ),
-				),
-			),
-		),
-		array(
 			'slug'  => 'other',
 			'label' => _x( 'Other', 'experiments group name', 'gutenberg' ),
 			'items' => array(

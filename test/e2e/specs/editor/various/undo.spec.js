@@ -175,9 +175,7 @@ test.describe( 'undo', () => {
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
 
-		// Real-time collaboration causes block CRDT content to be updated
-		// asynchronously, and the RTC undo manager relies on up-to-date CRDT
-		// content. Ensure the bold has been applied before trying to undo.
+		// Ensure the bold has been applied before trying to undo.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
@@ -547,25 +545,12 @@ test.describe( 'undo', () => {
 		// Undo new block and content addition.
 		await pageUtils.pressKeys( 'primary+z', { times: 2 } );
 
-		// This cleanup runs through `withMultiEntityRecordEdits`, which
-		// real-time collaboration bypasses in favor of its own undo manager.
-		const isCollaborationEnabled = await page.evaluate(
-			() => window.__experimentalEnableRealTimeCollaboration === true
-		);
-
 		// The entity is no longer dirty, so the "Save" button is disabled.
-		// Under real-time collaboration the undo runs through the RTC undo
-		// manager, which doesn't yet clear the dirty state, so the button
-		// stays enabled for now. That path is fixed separately.
-		// See: https://github.com/WordPress/gutenberg/pull/77100.
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Save' } )
-		).toHaveAttribute(
-			'aria-disabled',
-			isCollaborationEnabled ? 'false' : 'true'
-		);
+		).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
 	test( 'should leave undo to the browser inside the link dialog', async ( {

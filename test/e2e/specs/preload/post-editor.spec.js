@@ -3,9 +3,6 @@ const {
 	recordRequests,
 	waitForRequestsToSettle,
 } = require( './record-requests' );
-const {
-	setCollaboration,
-} = require( '../editor/collaboration/fixtures/collaboration-utils' );
 
 test.describe( 'Preload', () => {
 	let postId;
@@ -13,7 +10,6 @@ test.describe( 'Preload', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		// Panel open state is persisted, and open panels fetch.
 		await requestUtils.resetPreferences();
-		await setCollaboration( requestUtils, true );
 		const post = await requestUtils.createPost( {
 			content:
 				'<!-- wp:heading -->\n<h2 class="wp-block-heading">Hello</h2>\n<!-- /wp:heading -->',
@@ -23,11 +19,7 @@ test.describe( 'Preload', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		try {
-			await requestUtils.deleteAllPosts();
-		} finally {
-			await setCollaboration( requestUtils, false );
-		}
+		await requestUtils.deleteAllPosts();
 	} );
 
 	test( 'Should fetch a known set of routes during startup', async ( {
@@ -68,12 +60,8 @@ test.describe( 'Preload', () => {
 		await waitForRequestsToSettle( requests );
 		stop();
 
-		// Only collab side effects (CRDT persist + first wp-sync poll)
-		// should escape before mount — they're detached promise chains
-		// off `receiveEntityRecords`.
-		expect( Array.from( new Set( requestsUntilMount ) ).sort() ).toEqual(
-			[ 'POST /wp-sync/v1/save', 'POST /wp-sync/v1/updates' ].sort()
-		);
+		// Nothing should escape before mount.
+		expect( Array.from( new Set( requestsUntilMount ) ) ).toEqual( [] );
 		// Every preloaded path should be consumed by the kickoff.
 		expect( preloadStatus ).toBe(
 			'[api-fetch][preload] All preloads consumed.'
@@ -85,8 +73,6 @@ test.describe( 'Preload', () => {
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
 				`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
-				'POST /wp-sync/v1/save',
-				'POST /wp-sync/v1/updates',
 				'POST /wp/v2/users/me',
 			].sort()
 		);

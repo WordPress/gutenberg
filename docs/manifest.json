@@ -2802,12 +2802,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/sync",
-		"slug": "packages-sync",
-		"markdown_source": "../packages/sync/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/theme",
 		"slug": "packages-theme",
 		"markdown_source": "../packages/theme/README.md",

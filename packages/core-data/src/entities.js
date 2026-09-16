@@ -2,14 +2,6 @@ import { capitalCase, pascalCase } from 'change-case';
 import apiFetch from '@wordpress/api-fetch';
 import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { PostEditorAwareness } from './awareness/post-editor-awareness';
-import {
-	applyPostChangesToCRDTDoc,
-	defaultCollectionSyncConfig,
-	defaultSyncConfig,
-	getPostChangesFromCRDTDoc,
-	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-} from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
@@ -134,9 +126,6 @@ export const rootEntitiesConfig = [
 		plural: 'comments',
 		label: __( 'Comment' ),
 		supportsPagination: true,
-		...( globalThis.window?.__experimentalEnableRealTimeCollaboration
-			? { syncConfig: defaultCollectionSyncConfig }
-			: {} ),
 	},
 	{
 		name: 'menu',
@@ -309,41 +298,13 @@ export const prePersistPostType = async (
  * @return {Promise} Entities promise
  */
 async function loadPostTypeEntities() {
-	const postTypesPromise = apiFetch( { path: '/wp/v2/types?context=view' } );
-	const taxonomiesPromise = window.__experimentalEnableRealTimeCollaboration
-		? apiFetch( { path: '/wp/v2/taxonomies?context=view' } )
-		: Promise.resolve( {} );
-	const [ postTypes, taxonomies ] = await Promise.all( [
-		postTypesPromise,
-		taxonomiesPromise,
-	] );
+	const postTypes = await apiFetch( { path: '/wp/v2/types?context=view' } );
 
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
 		const namespace = postType?.rest_namespace ?? 'wp/v2';
-
-		const syncedProperties = new Set( [
-			'author',
-			'blocks',
-			'content',
-			'comment_status',
-			'date',
-			'excerpt',
-			'featured_media',
-			'format',
-			'meta',
-			'ping_status',
-			'slug',
-			'status',
-			'sticky',
-			'template',
-			'title',
-			...( postType.taxonomies
-				?.map( ( taxonomy ) => taxonomies?.[ taxonomy ]?.rest_base )
-				?.filter( Boolean ) ?? [] ),
-		] );
 
 		const entity = {
 			kind: 'postType',
@@ -378,76 +339,6 @@ async function loadPostTypeEntities() {
 			revisionKey: isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 		};
 
-		if ( ! window.__experimentalEnableRealTimeCollaboration ) {
-			return entity;
-		}
-
-		/**
-		 * @type {import('@wordpress/sync').SyncConfig}
-		 */
-		entity.syncConfig = {
-			// Save a CRDT document with this entity
-			supportsPersistence: true,
-
-			/**
-			 * Apply changes from the local editor to the local CRDT document so
-			 * that those changes can be synced to other peers (via the provider).
-			 *
-			 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
-			 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
-			 * @return {void}
-			 */
-			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
-				applyPostChangesToCRDTDoc( crdtDoc, changes, syncedProperties ),
-
-			/**
-			 * Create the awareness instance for the entity's CRDT document.
-			 *
-			 * @param {import('@wordpress/sync').CRDTDoc}  ydoc
-			 * @param {import('@wordpress/sync').ObjectID} objectId
-			 * @return {import('@wordpress/sync').Awareness} Awareness instance
-			 */
-			createAwareness: ( ydoc, objectId ) => {
-				const kind = 'postType';
-				const id = parseInt( objectId, 10 );
-				return new PostEditorAwareness( ydoc, kind, name, id );
-			},
-
-			/**
-			 * Extract changes from a CRDT document that can be used to update the
-			 * local editor state.
-			 *
-			 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
-			 * @param {import('@wordpress/sync').ObjectData} editedRecord
-			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
-			 */
-			getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
-				getPostChangesFromCRDTDoc(
-					crdtDoc,
-					editedRecord,
-					syncedProperties
-				),
-
-			/**
-			 * Extract changes from a CRDT document that can be used to update the
-			 * local editor state.
-			 *
-			 * @param {import('@wordpress/sync').ObjectData} record
-			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
-			 */
-			getPersistedCRDTDoc: ( record ) => {
-				return (
-					record?.meta?.[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ] ||
-					null
-				);
-			},
-			shouldSync: () =>
-				! (
-					Array.isArray( window._wpCollaborationDisabledPostTypes ) &&
-					window._wpCollaborationDisabledPostTypes.includes( name )
-				),
-		};
-
 		return entity;
 	} );
 }
@@ -472,10 +363,6 @@ async function loadTaxonomyEntities() {
 			getTitle: ( record ) => record?.name,
 			supportsPagination: true,
 		};
-
-		if ( window.__experimentalEnableRealTimeCollaboration ) {
-			entity.syncConfig = defaultSyncConfig;
-		}
 
 		return entity;
 	} );

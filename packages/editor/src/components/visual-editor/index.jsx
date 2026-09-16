@@ -32,7 +32,6 @@ import {
 import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
 import { usePaddingAppender } from './use-padding-appender';
 import { useEditContentOnlySectionExit } from './use-edit-content-only-section-exit';
-import { SyncConnectionErrorModal } from '../sync-connection-error-modal';
 
 const {
 	LayoutStyle,
@@ -473,7 +472,6 @@ function VisualEditor( {
 				}
 			) }
 		>
-			<SyncConnectionErrorModal />
 			<ResizableEditor
 				enableResizing={ enableResizing }
 				width={

@@ -2,7 +2,6 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import type { UndoManager } from '@wordpress/undo-manager';
 import deprecated from '@wordpress/deprecated';
-import type { ConnectionStatus } from '@wordpress/sync';
 import { STORE_NAME } from './name';
 import {
 	getQueriedItems,
@@ -50,8 +49,6 @@ export interface State {
 	registeredPostMeta: Record< string, Object >;
 	editorSettings: Record< string, any > | null;
 	editorAssets: Record< string, any > | null;
-	syncConnectionStatuses?: Record< string, ConnectionStatus >;
-	collaborationSupported: boolean;
 	viewConfigs: Record< string, Record< string, any > >;
 }
 

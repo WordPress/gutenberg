@@ -244,10 +244,6 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/style-engine/**'
 
-'[Package] Sync':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/sync/**'
-
 '[Package] Theme':
     - changed-files:
           - any-glob-to-any-file: 'packages/theme/**'

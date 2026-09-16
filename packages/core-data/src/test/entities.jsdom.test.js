@@ -6,12 +6,7 @@ import {
 	prePersistPostType,
 	additionalEntityConfigLoaders,
 } from '../entities';
-import { applyPostChangesToCRDTDoc } from '../utils/crdt';
 vi.mock( '@wordpress/api-fetch' );
-vi.mock( import( '../utils/crdt' ), async ( importOriginal ) => ( {
-	...( await importOriginal() ),
-	applyPostChangesToCRDTDoc: vi.fn(),
-} ) );
 
 describe( 'getMethodName', () => {
 	it( 'should return the right method name for an entity with the root kind', () => {
@@ -39,16 +34,6 @@ describe( 'getMethodName', () => {
 		delete rootEntitiesConfig[ id ];
 
 		expect( methodName ).toEqual( 'getPostTypeBook' );
-	} );
-} );
-
-describe( 'rootEntitiesConfig', () => {
-	it( 'does not define sync configuration when collaboration is disabled', () => {
-		const commentEntity = rootEntitiesConfig.find(
-			( entity ) => entity.name === 'comment'
-		);
-
-		expect( commentEntity.syncConfig ).toBeUndefined();
 	} );
 } );
 
@@ -116,244 +101,12 @@ describe( 'prePersistPostType', () => {
 	} );
 } );
 
-describe( 'loadPostTypeEntities', () => {
-	let originalCollaborationEnabled;
-	let originalCollaborationDisabledPostTypes;
-
-	beforeEach( () => {
-		apiFetch.mockReset();
-		applyPostChangesToCRDTDoc.mockReset();
-		originalCollaborationEnabled =
-			window.__experimentalEnableRealTimeCollaboration;
-		originalCollaborationDisabledPostTypes =
-			window._wpCollaborationDisabledPostTypes;
-	} );
-
-	afterEach( () => {
-		window.__experimentalEnableRealTimeCollaboration =
-			originalCollaborationEnabled;
-		window._wpCollaborationDisabledPostTypes =
-			originalCollaborationDisabledPostTypes;
-	} );
-
-	it( 'should include custom taxonomy rest_bases in synced properties when collaboration is enabled', async () => {
-		window.__experimentalEnableRealTimeCollaboration = true;
-
-		const mockPostTypes = {
-			book: {
-				name: 'Books',
-				rest_base: 'books',
-				rest_namespace: 'wp/v2',
-				taxonomies: [ 'genre', 'audience' ],
-			},
-		};
-		const mockTaxonomies = {
-			genre: {
-				name: 'Genres',
-				rest_base: 'genres',
-				rest_namespace: 'wp/v2',
-			},
-			audience: {
-				name: 'Audiences',
-				rest_base: 'audiences',
-				rest_namespace: 'wp/v2',
-			},
-		};
-
-		apiFetch
-			.mockResolvedValueOnce( mockPostTypes )
-			.mockResolvedValueOnce( mockTaxonomies );
-
-		const postTypeLoader = additionalEntityConfigLoaders.find(
-			( loader ) => loader.kind === 'postType'
-		);
-		const entities = await postTypeLoader.loadEntities();
-		const bookEntity = entities.find( ( e ) => e.name === 'book' );
-
-		bookEntity.syncConfig.applyChangesToCRDTDoc( {}, {} );
-
-		expect( applyPostChangesToCRDTDoc ).toHaveBeenCalledWith(
-			{},
-			{},
-			expect.any( Set )
-		);
-
-		const syncedProperties = applyPostChangesToCRDTDoc.mock.calls[ 0 ][ 2 ];
-		expect( syncedProperties ).toContain( 'genres' );
-		expect( syncedProperties ).toContain( 'audiences' );
-	} );
-
-	it( 'should not fetch taxonomies when collaboration is disabled', async () => {
-		window.__experimentalEnableRealTimeCollaboration = false;
-
-		const mockPostTypes = {
-			post: {
-				name: 'Posts',
-				rest_base: 'posts',
-				rest_namespace: 'wp/v2',
-				taxonomies: [ 'category', 'post_tag' ],
-			},
-		};
-
-		apiFetch.mockResolvedValueOnce( mockPostTypes );
-
-		const postTypeLoader = additionalEntityConfigLoaders.find(
-			( loader ) => loader.kind === 'postType'
-		);
-		await postTypeLoader.loadEntities();
-
-		// Only one apiFetch call (post types), no taxonomy fetch.
-		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
-	} );
-
-	it( 'does not define sync configuration when collaboration is disabled', async () => {
-		window.__experimentalEnableRealTimeCollaboration = false;
-
-		const mockPostTypes = {
-			post: {
-				name: 'Posts',
-				rest_base: 'posts',
-				rest_namespace: 'wp/v2',
-			},
-		};
-
-		apiFetch.mockResolvedValueOnce( mockPostTypes );
-
-		const postTypeLoader = additionalEntityConfigLoaders.find(
-			( loader ) => loader.kind === 'postType'
-		);
-		const entities = await postTypeLoader.loadEntities();
-		const postEntity = entities.find( ( e ) => e.name === 'post' );
-
-		expect( postEntity.syncConfig ).toBeUndefined();
-	} );
-
-	it( 'should not sync post type entities disabled for collaboration', async () => {
-		window.__experimentalEnableRealTimeCollaboration = true;
-		window._wpCollaborationDisabledPostTypes = [ 'book' ];
-
-		const mockPostTypes = {
-			book: {
-				name: 'Books',
-				rest_base: 'books',
-				rest_namespace: 'wp/v2',
-			},
-		};
-
-		apiFetch.mockResolvedValueOnce( mockPostTypes );
-
-		const postTypeLoader = additionalEntityConfigLoaders.find(
-			( loader ) => loader.kind === 'postType'
-		);
-		const entities = await postTypeLoader.loadEntities();
-		const bookEntity = entities.find( ( e ) => e.name === 'book' );
-
-		expect( bookEntity.syncConfig.shouldSync() ).toBe( false );
-	} );
-
-	it( 'should skip taxonomy rest_base when taxonomy is not found in fetched taxonomies', async () => {
-		window.__experimentalEnableRealTimeCollaboration = true;
-
-		const mockPostTypes = {
-			book: {
-				name: 'Books',
-				rest_base: 'books',
-				rest_namespace: 'wp/v2',
-				taxonomies: [ 'genre', 'missing_taxonomy' ],
-			},
-		};
-		const mockTaxonomies = {
-			genre: {
-				name: 'Genres',
-				rest_base: 'genres',
-				rest_namespace: 'wp/v2',
-			},
-			// 'missing_taxonomy' is intentionally absent.
-		};
-
-		apiFetch
-			.mockResolvedValueOnce( mockPostTypes )
-			.mockResolvedValueOnce( mockTaxonomies );
-
-		const postTypeLoader = additionalEntityConfigLoaders.find(
-			( loader ) => loader.kind === 'postType'
-		);
-		const entities = await postTypeLoader.loadEntities();
-		const bookEntity = entities.find( ( e ) => e.name === 'book' );
-
-		bookEntity.syncConfig.applyChangesToCRDTDoc( {}, {} );
-
-		const syncedProperties = applyPostChangesToCRDTDoc.mock.calls[ 0 ][ 2 ];
-		expect( syncedProperties ).toContain( 'genres' );
-		// missing_taxonomy has no rest_base entry, so nothing should be added for it.
-		expect( syncedProperties.size ).toBe( 16 ); // 15 base + 1 taxonomy (genres)
-	} );
-
-	it( 'should include base synced properties regardless of taxonomies', async () => {
-		window.__experimentalEnableRealTimeCollaboration = true;
-
-		const mockPostTypes = {
-			page: {
-				name: 'Pages',
-				rest_base: 'pages',
-				rest_namespace: 'wp/v2',
-				taxonomies: [],
-			},
-		};
-
-		apiFetch
-			.mockResolvedValueOnce( mockPostTypes )
-			.mockResolvedValueOnce( {} );
-
-		const postTypeLoader = additionalEntityConfigLoaders.find(
-			( loader ) => loader.kind === 'postType'
-		);
-		const entities = await postTypeLoader.loadEntities();
-		const pageEntity = entities.find( ( e ) => e.name === 'page' );
-
-		pageEntity.syncConfig.applyChangesToCRDTDoc( {}, {} );
-
-		const syncedProperties = applyPostChangesToCRDTDoc.mock.calls[ 0 ][ 2 ];
-		const expectedBase = [
-			'author',
-			'blocks',
-			'content',
-			'comment_status',
-			'date',
-			'excerpt',
-			'featured_media',
-			'format',
-			'meta',
-			'ping_status',
-			'slug',
-			'status',
-			'sticky',
-			'template',
-			'title',
-		];
-		for ( const prop of expectedBase ) {
-			expect( syncedProperties ).toContain( prop );
-		}
-		expect( syncedProperties.size ).toBe( 15 );
-	} );
-} );
-
 describe( 'loadTaxonomyEntities', () => {
-	let originalCollaborationEnabled;
-
 	beforeEach( () => {
 		apiFetch.mockReset();
-		originalCollaborationEnabled =
-			window.__experimentalEnableRealTimeCollaboration;
-	} );
-
-	afterEach( () => {
-		window.__experimentalEnableRealTimeCollaboration =
-			originalCollaborationEnabled;
 	} );
 
 	it( 'should add supportsPagination: true to taxonomy entities', async () => {
-		window.__experimentalEnableRealTimeCollaboration = true;
 		const mockTaxonomies = {
 			category: {
 				name: 'Categories',
@@ -369,23 +122,5 @@ describe( 'loadTaxonomyEntities', () => {
 		const entities = await taxonomyLoader.loadEntities();
 
 		expect( entities[ 0 ].supportsPagination ).toBe( true );
-		expect( entities[ 0 ].syncConfig ).toBeDefined();
-	} );
-
-	it( 'does not define sync configuration when collaboration is disabled', async () => {
-		window.__experimentalEnableRealTimeCollaboration = false;
-		apiFetch.mockResolvedValueOnce( {
-			category: {
-				name: 'Categories',
-				rest_base: 'categories',
-			},
-		} );
-
-		const taxonomyLoader = additionalEntityConfigLoaders.find(
-			( loader ) => loader.kind === 'taxonomy'
-		);
-		const entities = await taxonomyLoader.loadEntities();
-
-		expect( entities[ 0 ].syncConfig ).toBeUndefined();
 	} );
 } );

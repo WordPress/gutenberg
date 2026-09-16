@@ -49,7 +49,6 @@
 		{ "path": "packages/server-side-render" },
 		{ "path": "packages/shortcode" },
 		{ "path": "packages/style-runtime" },
-		{ "path": "packages/sync" },
 		{ "path": "packages/theme" },
 		{ "path": "packages/theme/tsconfig.bin.json" },
 		{ "path": "packages/token-list" },
