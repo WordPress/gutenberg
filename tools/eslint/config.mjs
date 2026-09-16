@@ -374,6 +374,7 @@ export default dedupePlugins( [
 						Badge: 'WCBadge',
 						Icon: 'WCIcon',
 						__experimentalInputControl: 'WCInputControl',
+						SelectControl: 'WCSelectControl',
 						TextareaControl: 'WCTextareaControl',
 						Tooltip: 'WCTooltip',
 					},
