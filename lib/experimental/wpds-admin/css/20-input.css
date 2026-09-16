@@ -159,9 +159,9 @@
 	}
 
 	/* Disabled fields keep the disabled border on hover. */
-	input:disabled:hover,
-	input.disabled:hover,
-	input[aria-disabled="true"]:hover,
+	input:is([type="text"], [type="password"], [type="color"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]):disabled:hover,
+	input:is([type="text"], [type="password"], [type="color"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]).disabled:hover,
+	input:is([type="text"], [type="password"], [type="color"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"])[aria-disabled="true"]:hover,
 	select:disabled:hover,
 	select.disabled:hover,
 	select[aria-disabled="true"]:hover,
@@ -213,11 +213,21 @@
 
 	/* -----------------------------------------------------------------------
 	   Disabled and readonly
+
+	   Inputs are scoped to the text-like types this file styles. A bare
+	   `input:disabled` also matches file, range and button inputs, and from
+	   this layer it would override the transparent background forms.css gives
+	   file and range controls on purpose.
+
+	   The type list also carries the specificity these rules need. A focused
+	   `aria-disabled` field is still focusable, and without the attribute
+	   selectors here `input[type="text"]:focus` would outrank the disabled
+	   rule and hand the field back its enabled border.
 	   ----------------------------------------------------------------------- */
 
-	input:disabled,
-	input.disabled,
-	input[aria-disabled="true"],
+	input:is([type="text"], [type="password"], [type="color"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]):disabled,
+	input:is([type="text"], [type="password"], [type="color"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]).disabled,
+	input:is([type="text"], [type="password"], [type="color"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"])[aria-disabled="true"],
 	select:disabled,
 	select.disabled,
 	select[aria-disabled="true"],
