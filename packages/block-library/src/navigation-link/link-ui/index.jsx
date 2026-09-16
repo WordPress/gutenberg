@@ -25,32 +25,31 @@ import { useEntityBinding, useLinkPreview } from '../shared';
 import { transformSuggestions as transformNavigationSuggestions } from './transform-suggestions';
 
 /**
- * Given the Link block's type attribute, return the query params that describe
- * that one entity type for /wp/v2/search, or undefined when the block is not
- * bound to an entity type.
+ * Given the Link block's type attribute, return the search query params that
+ * describe that one entity type, or undefined when the block is not bound to
+ * an entity type.
  *
- * @param {string} type    Link block's type attribute.
- * @param {string} kind    Link block's entity of kind (post-type|taxonomy)
- * @param {number} perPage How many results to request.
- * @return {{ type?: string, subtype?: string, perPage: number }|undefined} Search query params.
+ * @param {string} type Link block's type attribute.
+ * @param {string} kind Link block's entity of kind (post-type|taxonomy)
+ * @return {{ type: string, subtype?: string }|undefined} Entity search params.
  */
-function getEntitySearchOptions( type, kind, perPage ) {
+function getEntitySearchOptions( type, kind ) {
 	switch ( type ) {
 		case 'post':
 		case 'page':
-			return { type: 'post', subtype: type, perPage };
+			return { type: 'post', subtype: type };
 		case 'category':
-			return { type: 'term', subtype: 'category', perPage };
+			return { type: 'term', subtype: 'category' };
 		case 'tag':
-			return { type: 'term', subtype: 'post_tag', perPage };
+			return { type: 'term', subtype: 'post_tag' };
 		case 'post_format':
-			return { type: 'post-format', perPage };
+			return { type: 'post-format' };
 		default:
 			if ( kind === 'taxonomy' ) {
-				return { type: 'term', subtype: type, perPage };
+				return { type: 'term', subtype: type };
 			}
 			if ( kind === 'post-type' ) {
-				return { type: 'post', subtype: type, perPage };
+				return { type: 'post', subtype: type };
 			}
 			return undefined;
 	}
@@ -75,12 +74,14 @@ export function getSuggestionsQuery( type, kind ) {
 
 	return {
 		perPage,
-		// Without an entity type of its own, always show pages first.
-		initialSuggestionsSearchOptions: getEntitySearchOptions(
-			type,
-			kind,
-			perPage
-		) ?? { type: 'post', subtype: 'page', perPage },
+		initialSuggestionsSearchOptions: {
+			// Without an entity type of its own, always show pages first.
+			...( getEntitySearchOptions( type, kind ) ?? {
+				type: 'post',
+				subtype: 'page',
+			} ),
+			perPage,
+		},
 	};
 }
 
