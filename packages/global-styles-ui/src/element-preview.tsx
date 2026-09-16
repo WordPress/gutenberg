@@ -128,8 +128,13 @@ export default function ElementPreview( { element }: ElementPreviewProps ) {
 		case 'link':
 			sample = <a href="#anchor">{ __( 'A link' ) }</a>;
 			break;
+		case 'heading':
+			// The shared heading entry has no tag of its own; any level shows
+			// what it sets, and h2 is the most common in content.
+			sample = <h2>{ __( 'Aa' ) }</h2>;
+			break;
 		default: {
-			// The heading elements are named after their tag.
+			// The heading level elements are named after their tag.
 			const Tag = ( /^h[1-6]$/.test( element ) ? element : 'p' ) as
 				| 'h1'
 				| 'h2'

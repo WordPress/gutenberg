@@ -4,9 +4,9 @@
 
 ### Enhancements
 
--   List elements alongside blocks in one Blocks & Elements screen, grouped under Elements, Headings and Form controls, instead of splitting them between Typography and Colors.
--   Offer every element the background, dimensions, border, shadow and custom CSS controls that `theme.json` already accepts, instead of typography and color alone.
--   Preview an element as a sample of the markup it applies to, rendered with the site's own styles, so the preview reflects every panel rather than typography and color alone.
+-   List elements alongside blocks in one Blocks & Elements screen, grouped under Elements, Headings and Form controls, instead of splitting them between Typography and Colors ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
+-   Offer every element the background, dimensions, border, shadow and custom CSS controls that `theme.json` already accepts, instead of typography and color alone ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
+-   Preview an element as a sample of the markup it applies to, rendered with the site's own styles, so the preview reflects every panel rather than typography and color alone ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
 -   Add a text shadow presets screen under Typography ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
 
 ### Bug Fixes

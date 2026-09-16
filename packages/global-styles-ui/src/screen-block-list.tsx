@@ -34,6 +34,7 @@ import {
 	chevronUpDown,
 	formInput,
 	funnel,
+	heading,
 	headingLevel1,
 	headingLevel2,
 	headingLevel3,
@@ -84,6 +85,9 @@ const ELEMENT_GROUPS: { title: string; elements: ElementItem[] }[] = [
 	{
 		title: __( 'Headings' ),
 		elements: [
+			// `heading` styles every level at once; each level can then
+			// override it. Themes set most of their heading styles here.
+			{ name: 'heading', icon: heading, label: __( 'All headings' ) },
 			{ name: 'h1', icon: headingLevel1, label: __( 'Heading 1' ) },
 			{ name: 'h2', icon: headingLevel2, label: __( 'Heading 2' ) },
 			{ name: 'h3', icon: headingLevel3, label: __( 'Heading 3' ) },

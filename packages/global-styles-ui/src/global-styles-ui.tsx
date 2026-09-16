@@ -206,6 +206,9 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/typography">
 						<ScreenTypography />
 					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/text">
+						<ScreenElement element="text" />
+					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/typography/font-sizes">
 						<FontSizes />
 					</GlobalStylesNavigationScreen>
@@ -253,6 +256,9 @@ export function GlobalStylesUI( {
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks/elements/cite">
 						<ScreenElement element="cite" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/heading">
+						<ScreenElement element="heading" />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks/elements/h1">
 						<ScreenElement element="h1" />
