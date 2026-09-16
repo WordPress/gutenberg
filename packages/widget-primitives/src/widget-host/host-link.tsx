@@ -2,8 +2,10 @@ import { forwardRef } from '@wordpress/element';
 import type { ComponentPropsWithoutRef } from 'react';
 import { useWidgetHost } from './widget-host';
 
-interface HostLinkProps
-	extends Omit< ComponentPropsWithoutRef< 'a' >, 'href' > {
+interface HostLinkProps extends Omit<
+	ComponentPropsWithoutRef< 'a' >,
+	'href'
+> {
 	/**
 	 * The link target. The host's `match` decides whether it names one of
 	 * its own routes.
