@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Point the apt sources of the buster- and bullseye-based `wordpress`/`tests-wordpress` Docker images at `archive.debian.org`, so building them no longer fails now that Debian 10 and 11 have reached end-of-life and left the regular mirrors.
+-   Allow unauthenticated apt packages when building the stretch-based `wordpress`/`tests-wordpress` Docker images, since `archive.debian.org`'s own signing keys for the long-archived stretch suite have since expired.
+
 ## 9.3.0 (2024-02-09)
 
 ## 9.2.0 (2024-01-24)
