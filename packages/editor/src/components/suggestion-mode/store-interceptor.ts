@@ -1247,8 +1247,8 @@ export default function SuggestionStoreInterceptor() {
 						 * so the summary can say where.
 						 */
 						parentBlockName: parentClientId
-							? blockEditor.getBlockName?.( parentClientId ) ??
-							  null
+							? ( blockEditor.getBlockName?.( parentClientId ) ??
+								null )
 							: null,
 						block,
 					};
@@ -1489,13 +1489,13 @@ export default function SuggestionStoreInterceptor() {
 								crossedParents:
 									existingMarker.crossedParents === true ||
 									move.crossedParents,
-						  }
+							}
 						: {
 								fromAnchorClientId: move.fromAnchorClientId,
 								fromParentClientId: move.fromParentClientId,
 								fromIndex: move.fromIndex,
 								crossedParents: move.crossedParents,
-						  };
+							};
 				isDispatchingOwnWrite = true;
 				try {
 					// Programmatic marker write — keep it off the undo stack.
@@ -1662,8 +1662,9 @@ export default function SuggestionStoreInterceptor() {
 						clientId,
 						blockName: block?.name ?? '',
 						parentBlockName: removedParentClientId
-							? tree.blocksByClientId.get( removedParentClientId )
-									?.name ?? null
+							? ( tree.blocksByClientId.get(
+									removedParentClientId
+								)?.name ?? null )
 							: null,
 						...( groupId ? { groupId } : {} ),
 						block,
