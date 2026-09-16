@@ -4,7 +4,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -174,7 +174,7 @@ export default function PostNavigationLinkEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<SelectControl
+				<WCSelectControl
 					label={ __( 'Filter by taxonomy' ) }
 					value={ taxonomy }
 					options={ getTaxonomyOptions() }
