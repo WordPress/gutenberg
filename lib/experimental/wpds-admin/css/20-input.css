@@ -211,6 +211,18 @@
 		box-shadow: none;
 	}
 
+	/*
+	 * Invalid required fields take an error-coloured ring, so the ring and the
+	 * border agree. The border itself is set in 99-overrides.css, because
+	 * forms.css marks it `!important`. Selectors follow forms.css's own
+	 * `.form-invalid` rules.
+	 */
+	.form-invalid .form-required:focus,
+	.form-invalid.form-required input:focus,
+	.form-invalid.form-required select:focus {
+		outline-color: var(--wpds-color-stroke-interactive-error);
+	}
+
 	/* -----------------------------------------------------------------------
 	   Disabled and readonly
 
