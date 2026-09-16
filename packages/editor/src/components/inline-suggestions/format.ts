@@ -185,7 +185,7 @@ export function addSuggestionRoleFormats( formats: any[] | undefined ): any {
 		const markerIndex = Array.isArray( stack )
 			? stack.findLastIndex(
 					( f: any ) => f.type === SUGGESTION_FORMAT_NAME
-			  )
+				)
 			: -1;
 		if ( markerIndex === -1 ) {
 			lastSuggestion = null;
