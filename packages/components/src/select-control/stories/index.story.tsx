@@ -24,7 +24,7 @@ const meta: Meta< typeof SelectControl > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) from `@wordpress/ui` instead.',
+			notes: 'Use [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) from `@wordpress/ui` instead. For the `minimal` variant, use the [`Select`](?path=/docs/design-system-components-form-primitives-select--docs) primitive rather than `SelectControl`.',
 		},
 	},
 };
