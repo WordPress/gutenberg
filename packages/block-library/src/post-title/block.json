@@ -65,6 +65,7 @@
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
+			"fitText": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
@@ -85,5 +86,6 @@
 			}
 		}
 	},
+	"editorStyle": "wp-block-post-title-editor",
 	"style": "wp-block-post-title"
 }
