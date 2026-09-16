@@ -35,13 +35,6 @@ function getInputSelectionHint( selectedCount: number ): string | undefined {
 	);
 }
 
-function mergeDescribedBy(
-	...ids: Array< string | undefined >
-): string | undefined {
-	const merged = ids.filter( Boolean ).join( ' ' );
-	return merged === '' ? undefined : merged;
-}
-
 /**
  * A low-level primitive for a searchable multi-selection field with chips, with
  * support for a creatable footer action.
@@ -156,18 +149,18 @@ export const SearchableChipSelect = forwardRef<
 										placeholder={ searchPlaceholder }
 										aria-label={ ariaLabel }
 										aria-labelledby={ ariaLabelledby }
-										aria-describedby={ mergeDescribedBy(
-											ariaDescribedby,
-											selectedCount > 0
-												? inputHintId
-												: undefined
-										) }
+										aria-describedby={
+											clsx(
+												ariaDescribedby,
+												selectionHint && inputHintId
+											) || undefined
+										}
 									/>
 								</Combobox.Chips>
 								{ selectionHint && (
 									<VisuallyHidden
 										id={ inputHintId }
-										render={ <span /> }
+										aria-hidden="true"
 									>
 										{ selectionHint }
 									</VisuallyHidden>
