@@ -48,14 +48,6 @@ export const WithPrefix: Story = {
 	},
 };
 
-export const WithSchemePrefix: Story = {
-	args: {
-		placeholder: 'example.com',
-		'aria-label': 'Website',
-		prefix: <InputLayout.Slot>https://</InputLayout.Slot>,
-	},
-};
-
 export const WithSuffixControl: Story = {
 	args: {
 		'aria-label': 'Value',
