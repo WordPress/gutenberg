@@ -37,7 +37,7 @@ export function GridOverlay( {
 		...( showRows
 			? ( {
 					'--wp-grid-overlay-row-height': `${ rowHeight }px`,
-			  } as React.CSSProperties )
+				} as React.CSSProperties )
 			: {} ),
 	};
 

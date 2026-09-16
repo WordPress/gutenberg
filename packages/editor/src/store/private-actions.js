@@ -79,7 +79,7 @@ export const createTemplate =
 											defaultRenderingMode
 										),
 								},
-						  ],
+							],
 				}
 			);
 		return savedTemplate;
@@ -311,12 +311,12 @@ export const removeTemplates =
 							/* translators: %s: The template/part's name. */
 							__( '"%s" reset.' ),
 							decodeEntities( title )
-					  )
+						)
 					: sprintf(
 							/* translators: %s: The template/part's name. */
 							_x( '"%s" deleted.', 'template part' ),
 							decodeEntities( title )
-					  );
+						);
 			} else {
 				successMessage = isResetting
 					? __( 'Items reset.' )
@@ -364,14 +364,14 @@ export const removeTemplates =
 									'An error occurred while reverting the items: %s'
 								),
 								[ ...errorMessages ][ 0 ]
-						  )
+							)
 						: sprintf(
 								/* translators: %s: an error message */
 								__(
 									'An error occurred while deleting the items: %s'
 								),
 								[ ...errorMessages ][ 0 ]
-						  );
+							);
 				} else {
 					errorMessage = isResetting
 						? sprintf(
@@ -380,14 +380,14 @@ export const removeTemplates =
 									'Some errors occurred while reverting the items: %s'
 								),
 								[ ...errorMessages ].join( ',' )
-						  )
+							)
 						: sprintf(
 								/* translators: %s: a list of comma separated error messages */
 								__(
 									'Some errors occurred while deleting the items: %s'
 								),
 								[ ...errorMessages ].join( ',' )
-						  );
+							);
 				}
 			}
 			registry

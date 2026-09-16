@@ -120,7 +120,7 @@ module.exports = {
 			testMatch: testMigration.jest.files.length
 				? testMigration.jest.files.map(
 						( testPath ) => `<rootDir>/${ testPath }`
-				  )
+					)
 				: [ '!**/*' ],
 		},
 	],
@@ -143,7 +143,7 @@ module.exports = {
 						flakinessProject: 'WordPress/gutenberg',
 						duplicates: 'rename',
 					},
-			  ]
+				]
 			: undefined,
 	].filter( Boolean ),
 };
