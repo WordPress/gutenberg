@@ -1,4 +1,4 @@
-import { forwardRef, useState } from '@wordpress/element';
+import { forwardRef, useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import deprecated from '@wordpress/deprecated';
 import { URLInput } from '../';
@@ -47,13 +47,42 @@ const LinkControlSearchInput = forwardRef(
 			suggestionsQuery,
 			allowDirectEntry,
 			withCreateSuggestion,
-			withURLSuggestion,
-			transformSuggestions
+			withURLSuggestion
 		);
 
-		const searchHandler = showSuggestions
+		const baseSearchHandler = showSuggestions
 			? fetchSuggestions || genericSearchHandler
 			: noopSearchHandler;
+
+		// Let the consumer filter and order the results before they are shown.
+		// The "CREATE" option is held back and re-appended, both so that it
+		// always remains last and so that consumers never have to account for a
+		// suggestion that does not represent a real entity.
+		const searchHandler = useCallback(
+			async ( val, args ) => {
+				const results = await baseSearchHandler( val, args );
+
+				if ( ! transformSuggestions ) {
+					return results;
+				}
+
+				const createSuggestion = results.find(
+					( { type } ) => type === CREATE_TYPE
+				);
+				const transformed = transformSuggestions(
+					results.filter( ( { type } ) => type !== CREATE_TYPE ),
+					{
+						isInitialSuggestions: !! args?.isInitialSuggestions,
+						searchTerm: val,
+					}
+				);
+
+				return createSuggestion
+					? [ ...transformed, createSuggestion ]
+					: transformed;
+			},
+			[ baseSearchHandler, transformSuggestions ]
+		);
 
 		const [ focusedSuggestion, setFocusedSuggestion ] = useState();
 
