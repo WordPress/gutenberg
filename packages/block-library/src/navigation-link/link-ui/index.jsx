@@ -22,8 +22,67 @@ import { isURL } from '@wordpress/url';
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
 import { useEntityBinding, useLinkPreview } from '../shared';
-import { getSuggestionsQuery } from './get-suggestions-query';
 import { transformSuggestions as transformNavigationSuggestions } from './transform-suggestions';
+
+/**
+ * Given the Link block's type attribute, return the query params that describe
+ * that one entity type for /wp/v2/search, or undefined when the block is not
+ * bound to an entity type.
+ *
+ * @param {string} type    Link block's type attribute.
+ * @param {string} kind    Link block's entity of kind (post-type|taxonomy)
+ * @param {number} perPage How many results to request.
+ * @return {{ type?: string, subtype?: string, perPage: number }|undefined} Search query params.
+ */
+function getEntitySearchOptions( type, kind, perPage ) {
+	switch ( type ) {
+		case 'post':
+		case 'page':
+			return { type: 'post', subtype: type, perPage };
+		case 'category':
+			return { type: 'term', subtype: 'category', perPage };
+		case 'tag':
+			return { type: 'term', subtype: 'post_tag', perPage };
+		case 'post_format':
+			return { type: 'post-format', perPage };
+		default:
+			if ( kind === 'taxonomy' ) {
+				return { type: 'term', subtype: type, perPage };
+			}
+			if ( kind === 'post-type' ) {
+				return { type: 'post', subtype: type, perPage };
+			}
+			return undefined;
+	}
+}
+
+/**
+ * Given the Link block's type attribute, return the query params to give to
+ * /wp/v2/search.
+ *
+ * The search is deliberately unscoped so that every entity type is reachable
+ * from one search, matching the link UI used by RichText. The block's own type
+ * only decides which suggestions are shown before anything is typed; ordering
+ * of typed results is handled by `transformSuggestions`.
+ *
+ * @param {string} type Link block's type attribute.
+ * @param {string} kind Link block's entity of kind (post-type|taxonomy)
+ * @return {Object} Search query params.
+ */
+export function getSuggestionsQuery( type, kind ) {
+	// How many results to show initially and per search.
+	const perPage = 20;
+
+	return {
+		perPage,
+		// Without an entity type of its own, always show pages first.
+		initialSuggestionsSearchOptions: getEntitySearchOptions(
+			type,
+			kind,
+			perPage
+		) ?? { type: 'post', subtype: 'page', perPage },
+	};
+}
 
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind, id } = props.link;
@@ -260,8 +319,6 @@ function UnforwardedLinkUI( props, ref ) {
 }
 
 export const LinkUI = forwardRef( UnforwardedLinkUI );
-
-export { getSuggestionsQuery };
 
 const LinkUITools = ( {
 	addPageButtonRef,

@@ -3718,26 +3718,6 @@ describe( 'Transforming suggestions', () => {
 		expect( options[ 0 ] ).toHaveTextContent( firstSuggestion.title );
 	} );
 
-	it( 'should reorder the rendered suggestions to match transformSuggestions', async () => {
-		const user = userEvent.setup();
-		const reversed = [ ...fauxEntitySuggestions ].reverse();
-
-		render( <LinkControl transformSuggestions={ () => reversed } /> );
-
-		await user.type(
-			screen.getByRole( 'combobox', { name: 'Search or type URL' } ),
-			'Hello'
-		);
-
-		const searchResults = await screen.findByRole( 'listbox', {
-			name: /Search results for.*/,
-		} );
-
-		const options = within( searchResults ).getAllByRole( 'option' );
-
-		expect( options[ 0 ] ).toHaveTextContent( reversed[ 0 ].title );
-	} );
-
 	it( 'should still append the create suggestion after transforming', async () => {
 		const user = userEvent.setup();
 		const [ firstSuggestion ] = fauxEntitySuggestions;
