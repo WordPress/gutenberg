@@ -424,6 +424,78 @@ test.describe( 'Image', () => {
 		page,
 		editor,
 	} ) => {
+		// The Openverse media category fetches its results from the real,
+		// external Openverse API (`https://api.openverse.engineering`).
+		// Depending on that live network call made this drag-and-drop test
+		// unreliable, so mock both the search request and the two images
+		// it "returns", the same way the block directory API is mocked via
+		// `page.route()` in
+		// `test/e2e/specs/editor/plugins/block-directory.spec.js`.
+		const MOCK_OPENVERSE_IMAGE_1 = {
+			id: 'mock-openverse-e2e-image-1',
+			title: 'Mock Openverse image 1',
+			foreign_landing_url: 'https://example.com/mock-openverse-image-1',
+			creator: 'Test Creator',
+			creator_url: 'https://example.com/creator',
+			license: 'cc0',
+			license_version: '1.0',
+			license_url: 'https://creativecommons.org/publicdomain/zero/1.0/',
+			url: 'https://fake_url.com/mock-openverse-image-1.png',
+			thumbnail: 'https://fake_url.com/mock-openverse-image-1.png',
+		};
+		const MOCK_OPENVERSE_IMAGE_2 = {
+			...MOCK_OPENVERSE_IMAGE_1,
+			id: 'mock-openverse-e2e-image-2',
+			title: 'Mock Openverse image 2',
+			foreign_landing_url: 'https://example.com/mock-openverse-image-2',
+			url: 'https://fake_url.com/mock-openverse-image-2.png',
+			thumbnail: 'https://fake_url.com/mock-openverse-image-2.png',
+		};
+
+		// Mock the Openverse search request.
+		await page.route(
+			( url ) => url.href.includes( 'api.openverse.engineering' ),
+			async ( route, request ) => {
+				if ( request.method() === 'GET' ) {
+					await route.fulfill( {
+						headers: { 'Access-Control-Allow-Origin': '*' },
+						json: {
+							results: [
+								MOCK_OPENVERSE_IMAGE_1,
+								MOCK_OPENVERSE_IMAGE_2,
+							],
+						},
+					} );
+				} else {
+					await route.continue();
+				}
+			}
+		);
+
+		// Mock the actual image assets the search results "return" above,
+		// so that no request ever leaves the browser for either the
+		// thumbnail previews or the full-size images fetched once an
+		// image is inserted.
+		await page.route(
+			( url ) => url.href.includes( 'fake_url.com' ),
+			async ( route ) => {
+				await route.fulfill( {
+					headers: { 'Access-Control-Allow-Origin': '*' },
+					contentType: 'image/png',
+					body: await fs.readFile(
+						path.join(
+							__dirname,
+							'..',
+							'..',
+							'..',
+							'assets',
+							'10x10_e2e_test_image_z9T8jK.png'
+						)
+					),
+				} );
+			}
+		);
+
 		await editor.insertBlock( { name: 'core/image' } );
 		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
