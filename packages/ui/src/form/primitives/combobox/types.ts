@@ -12,9 +12,8 @@ export type ComboboxChipsProps = ComponentProps< typeof _Combobox.Chips > & {
 
 export type ComboboxChipWithRemoveProps = Omit<
 	ComponentProps< typeof _Combobox.Chip >,
-	// Replace the native HTML `prefix` attribute. The remove hint is always
-	// exposed through `aria-describedby`, not `aria-description`.
-	'prefix' | 'aria-description'
+	// Replace the native HTML `prefix` attribute.
+	'prefix'
 > & {
 	children?: React.ReactNode;
 	/**
@@ -22,7 +21,8 @@ export type ComboboxChipWithRemoveProps = Omit<
 	 */
 	prefix?: React.ReactNode;
 	/**
-	 * Accessible label for the remove button.
+	 * Tooltip label for the remove button. The button is pointer-only;
+	 * screen readers use the chip's Backspace or Delete hint instead.
 	 *
 	 * @default __( 'Remove' )
 	 */

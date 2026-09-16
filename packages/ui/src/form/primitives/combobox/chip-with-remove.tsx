@@ -8,13 +8,6 @@ import { VisuallyHidden } from '../../../visually-hidden';
 import type { ComboboxChipWithRemoveProps } from './types';
 import styles from './style.module.css';
 
-function mergeDescribedBy(
-	...ids: Array< string | undefined >
-): string | undefined {
-	const merged = ids.filter( Boolean ).join( ' ' );
-	return merged === '' ? undefined : merged;
-}
-
 /**
  * A utility component that combines a chip and a remove button,
  * with standard styling.
@@ -29,58 +22,42 @@ export const ChipWithRemove = forwardRef<
 		prefix,
 		removeLabel = __( 'Remove' ),
 		'aria-describedby': ariaDescribedby,
-		'aria-label': ariaLabel,
-		'aria-labelledby': ariaLabelledby,
 		...restProps
 	},
 	ref
 ) {
 	const hintId = useId();
-	const contentId = useId();
 
 	return (
-		<>
-			<_Combobox.Chip
-				ref={ ref }
-				className={ clsx( styles.chip, className ) }
-				{ ...restProps }
-				aria-label={ ariaLabel }
-				aria-labelledby={
-					ariaLabel
-						? ariaLabelledby
-						: mergeDescribedBy( ariaLabelledby, contentId )
-				}
-				aria-describedby={ mergeDescribedBy( ariaDescribedby, hintId ) }
-			>
-				{ prefix && (
-					<span className={ styles[ 'chip-prefix' ] }>
-						{ prefix }
-					</span>
-				) }
-				<span id={ contentId } className={ styles[ 'chip-content' ] }>
-					{ children }
-				</span>
-
-				<_Combobox.ChipRemove
-					className={ styles[ 'chip-remove' ] }
-					render={ ( props, { disabled } ) => (
-						<IconButton
-							icon={ closeSmall }
-							label={ removeLabel }
-							size="small"
-							variant="minimal"
-							tone="neutral"
-							focusableWhenDisabled={ false }
-							disabled={ disabled }
-							aria-hidden={ disabled || undefined }
-							{ ...props }
-						/>
-					) }
-				/>
-			</_Combobox.Chip>
-			<VisuallyHidden id={ hintId } render={ <span /> }>
+		<_Combobox.Chip
+			ref={ ref }
+			className={ clsx( styles.chip, className ) }
+			{ ...restProps }
+			aria-describedby={ clsx( ariaDescribedby, hintId ) || undefined }
+		>
+			{ prefix && (
+				<span className={ styles[ 'chip-prefix' ] }>{ prefix }</span>
+			) }
+			<span className={ styles[ 'chip-content' ] }>{ children }</span>
+			<VisuallyHidden id={ hintId } aria-hidden="true">
 				{ __( 'Press Backspace or Delete to remove.' ) }
 			</VisuallyHidden>
-		</>
+			<_Combobox.ChipRemove
+				className={ styles[ 'chip-remove' ] }
+				render={ ( props, { disabled } ) => (
+					<IconButton
+						icon={ closeSmall }
+						label={ removeLabel }
+						size="small"
+						variant="minimal"
+						tone="neutral"
+						focusableWhenDisabled={ false }
+						disabled={ disabled }
+						{ ...props }
+						aria-hidden
+					/>
+				) }
+			/>
+		</_Combobox.Chip>
 	);
 } );

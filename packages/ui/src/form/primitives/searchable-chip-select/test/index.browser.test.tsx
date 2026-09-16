@@ -182,7 +182,7 @@ describe( 'SearchableChipSelect', () => {
 			expect.anything()
 		);
 		await expect
-			.element( screen.getByRole( 'button', { name: 'Remove' } ) )
+			.element( screen.getByRole( 'toolbar', { name: 'Selected item' } ) )
 			.toBeVisible();
 	} );
 

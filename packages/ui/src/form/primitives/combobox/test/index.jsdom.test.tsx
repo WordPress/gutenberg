@@ -97,12 +97,12 @@ describe( 'Combobox', () => {
 			</Combobox.Root>
 		);
 
-		expect( screen.getByLabelText( 'Item 1' ) ).toHaveAccessibleName(
-			'Item 1'
-		);
+		expect(
+			screen.queryByRole( 'button', { name: 'Remove' } )
+		).not.toBeInTheDocument();
 		expect(
 			screen.getByText( 'Press Backspace or Delete to remove.' )
-		).toBeVisible();
+		).toBeInTheDocument();
 	} );
 
 	describe( 'when disabled', () => {

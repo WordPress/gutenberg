@@ -189,7 +189,9 @@ describe( 'Combobox', () => {
 		);
 	} );
 
-	it( 'uses a custom accessible label for chip remove buttons', async () => {
+	it( 'uses a custom tooltip label for chip remove buttons', async () => {
+		const user = userEvent;
+
 		await render(
 			<Combobox.Root< Item, true >
 				items={ ITEMS }
@@ -215,8 +217,15 @@ describe( 'Combobox', () => {
 			</Combobox.Root>
 		);
 
+		await user.hover(
+			screen.getByLabelText( 'Remove Item 1', {
+				selector: 'button',
+				hidden: true,
+			} )
+		);
+
 		await expect
-			.element( screen.getByRole( 'button', { name: 'Remove Item 1' } ) )
+			.element( screen.getByText( 'Remove Item 1' ) )
 			.toBeVisible();
 	} );
 
@@ -580,6 +589,7 @@ describe( 'Combobox', () => {
 
 				const removeButton = screen.getByLabelText( 'Remove', {
 					selector: 'button',
+					hidden: true,
 				} );
 				await user.hover( removeButton );
 
