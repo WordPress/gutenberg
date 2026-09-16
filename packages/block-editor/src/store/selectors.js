@@ -3541,8 +3541,8 @@ export const getSelectedBlockStyleState = createSelector(
 	( state, clientId ) => {
 		const perBlockState =
 			state.selectedBlockStyleState?.clientId === clientId
-				? state.selectedBlockStyleState.value ??
-				  DEFAULT_BLOCK_STYLE_STATE
+				? ( state.selectedBlockStyleState.value ??
+					DEFAULT_BLOCK_STYLE_STATE )
 				: DEFAULT_BLOCK_STYLE_STATE;
 
 		return {

@@ -631,12 +631,12 @@ const stateStyle = getStyleForState( attributes.style, state ) || {};
 
 _Parameters_
 
--   _style_ `Object`: The block style object.
--   _selectedState_ `Object`: Selected block style state.
+- _style_ `Object`: The block style object.
+- _selectedState_ `Object`: Selected block style state.
 
 _Returns_
 
--   `Object`: The style object for the selected state, if found.
+- `Object`: The style object for the selected state, if found.
 
 ### getTypographyClassesAndStyles
 
@@ -923,13 +923,13 @@ setAttributes( {
 
 _Parameters_
 
--   _style_ `Object`: The block style object.
--   _selectedState_ `Object`: Selected block style state.
--   _newStyle_ `Object`: New style for the selected state.
+- _style_ `Object`: The block style object.
+- _selectedState_ `Object`: Selected block style state.
+- _newStyle_ `Object`: New style for the selected state.
 
 _Returns_
 
--   `Object`: The updated style object.
+- `Object`: The updated style object.
 
 ### SETTINGS_DEFAULTS
 
