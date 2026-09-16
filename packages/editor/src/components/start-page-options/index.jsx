@@ -174,7 +174,7 @@ function StartPageOptionsModal( { onClose } ) {
 							patternCategories.some(
 								( { name } ) => name === patternCategory
 							)
-					  )
+						)
 					: pattern.categories?.includes( activeCategory )
 			);
 		}
