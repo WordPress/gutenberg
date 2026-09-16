@@ -129,7 +129,7 @@ describe( 'findNewestPendingSuggestion', () => {
 							metadata: {
 								suggestion: { type: 'pending-insert' },
 							},
-					  }
+						}
 					: { metadata: {} },
 		};
 		expect(
