@@ -27,14 +27,20 @@ export function preventFocusCapture() {
 			if ( ! event.target.contains( element ) ) {
 				return;
 			}
+			// A press outside the element while text is selected may be a
+			// grab of a selection handle, which must keep the selection.
+			if ( ! defaultView.getSelection().isCollapsed ) {
+				return;
+			}
 			value = element.getAttribute( 'contenteditable' );
-			element.setAttribute( 'contenteditable', 'false' );
 			defaultView.getSelection().removeAllRanges();
+			element.setAttribute( 'contenteditable', 'false' );
 		}
 
 		function onPointerUp() {
 			if ( value !== null ) {
 				element.setAttribute( 'contenteditable', value );
+				defaultView.getSelection().removeAllRanges();
 				value = null;
 			}
 		}
