@@ -28,7 +28,7 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 
 type Dispatch = ActionCreators &
 	Pick<
-		typeof import('../private-actions'),
+		typeof import( '../private-actions' ),
 		'updateSettings' | 'pauseQueue' | 'resumeQueue'
 	>;
 
@@ -39,7 +39,7 @@ vi.mock(
 			createBlobURL: vi.fn( () => 'blob:foo' ),
 			isBlobURL: vi.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
 			revokeBlobURL: vi.fn(),
-		} ) as unknown as typeof import('@wordpress/blob')
+		} ) as unknown as typeof import( '@wordpress/blob' )
 );
 
 vi.mock(
@@ -54,7 +54,7 @@ vi.mock(
 			vipsGetUltraHdrInfo: vi.fn( () => Promise.resolve( null ) ),
 			terminateVipsWorker: vi.fn(),
 			maybeRecycleVipsWorker: vi.fn(),
-		} ) as unknown as typeof import('../utils')
+		} ) as unknown as typeof import( '../utils' )
 );
 
 vi.mock( import( '../utils/video-conversion' ), async ( importOriginal ) => {
@@ -206,6 +206,34 @@ describe( 'operation registry', () => {
 			expect( consoleError ).toHaveBeenCalledWith(
 				'Upload operation "my-plugin/missing" is not registered.'
 			);
+		} );
+
+		it( 'refuses to unregister an operation the queue still uses', async () => {
+			const pending = createDeferred< object >();
+			dispatch.registerOperation(
+				operation( 'my-plugin/ocr', {
+					handler: () => pending.promise,
+				} )
+			);
+			dispatch.addItem( {
+				file: jpegFile,
+				operations: [ 'my-plugin/ocr', OperationType.Upload ],
+			} );
+			await flush();
+
+			expect(
+				await dispatch.unregisterOperation( OperationType.Upload )
+			).toBeUndefined();
+			expect(
+				await dispatch.unregisterOperation( 'my-plugin/ocr' )
+			).toBeUndefined();
+			expect( consoleError ).toHaveBeenCalledWith(
+				'Upload operation "my-plugin/ocr" cannot be unregistered while items in the queue still use it.'
+			);
+			expect( select.getOperation( 'my-plugin/ocr' ) ).toBeDefined();
+			expect( select.getOperation( OperationType.Upload ) ).toBeDefined();
+
+			pending.resolve( {} );
 		} );
 
 		it( 'lets a core operation be replaced under the same name', async () => {
@@ -381,6 +409,36 @@ describe( 'operation registry', () => {
 					message: 'Unknown upload operation "my-plugin/ghost".',
 				} )
 			);
+			expect( select.getAllItems() ).toHaveLength( 0 );
+		} );
+	} );
+
+	describe( 'handler result', () => {
+		it( 'reads only the documented updates out of what a handler resolves with', async () => {
+			// A handler that resolves with the item it was handed would
+			// otherwise put the step it just finished back on the pipeline
+			// and run forever, and could point the entry at another item.
+			const first = vi.fn( ( item: QueueItem ) => ( {
+				...item,
+				id: 'hijacked',
+			} ) );
+			const second = vi.fn( () => ( {} ) );
+			dispatch.registerOperation(
+				operation( 'my-plugin/first', { handler: first } )
+			);
+			dispatch.registerOperation(
+				operation( 'my-plugin/second', { handler: second } )
+			);
+
+			dispatch.addItem( {
+				file: jpegFile,
+				operations: [ 'my-plugin/first', 'my-plugin/second' ],
+			} );
+			await flush();
+
+			expect( first ).toHaveBeenCalledTimes( 1 );
+			expect( second ).toHaveBeenCalledTimes( 1 );
+			expect( select.getItem( 'hijacked' ) ).toBeUndefined();
 			expect( select.getAllItems() ).toHaveLength( 0 );
 		} );
 	} );
@@ -570,7 +628,7 @@ describe( 'operation registry', () => {
 							? {
 									after: OperationType.Upload,
 									args: { language: 'en' },
-							  }
+								}
 							: undefined,
 				} )
 			);
@@ -579,6 +637,25 @@ describe( 'operation registry', () => {
 				OperationType.Upload,
 				[ 'my-plugin/subtitles', { language: 'en' } ],
 			] );
+		} );
+
+		it( 'plans against the item as prepare leaves it', async () => {
+			// prepare decides `generate_sub_sizes` while it builds the
+			// pipeline. A plan plotting around that decision has to see it.
+			let planned: QueueItem | undefined;
+			dispatch.registerOperation(
+				operation( 'my-plugin/inspector', {
+					plan: ( item ) => {
+						planned = item;
+					},
+				} )
+			);
+
+			await plan( jpegFile );
+
+			expect( planned?.additionalData ).toHaveProperty(
+				'generate_sub_sizes'
+			);
 		} );
 
 		it( 'leaves items alone when the plan returns nothing', async () => {
@@ -661,7 +738,7 @@ describe( 'operation registry', () => {
 			expect( onError ).toHaveBeenCalledWith(
 				expect.objectContaining( {
 					code: ErrorCode.UNKNOWN_OPERATION,
-					message: 'Unknown upload operation "my-plugin/ghost".',
+					message: 'Unknown upload operation: my-plugin/ghost.',
 				} )
 			);
 			expect( select.getItem( item.id ) ).toBeUndefined();

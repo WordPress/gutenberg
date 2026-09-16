@@ -174,25 +174,3 @@ export async function planOperations(
 
 	return planned;
 }
-
-/**
- * Returns the names in a pipeline that have no registered operation.
- *
- * @param operations Pipeline to check.
- * @param registry   Registered operations keyed by name.
- *
- * @return Unregistered operation names, without duplicates.
- */
-export function getUnregisteredOperations(
-	operations: Operation[],
-	registry: Record< OperationName, OperationDefinition >
-): OperationName[] {
-	const missing = new Set< OperationName >();
-	for ( const operation of operations ) {
-		const name = getOperationName( operation );
-		if ( ! registry[ name ] ) {
-			missing.add( name );
-		}
-	}
-	return Array.from( missing );
-}

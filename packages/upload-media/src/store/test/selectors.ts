@@ -24,6 +24,7 @@ import {
 	type QueueItem,
 	type State,
 } from '../types';
+import { getConcurrencyPool } from '../utils/operations';
 import {
 	CORE_OPERATIONS,
 	IMAGE_PROCESSING_POOL,
@@ -42,17 +43,32 @@ function createState(
 	queue: Partial< QueueItem >[],
 	operations: OperationDefinition[] = []
 ): State {
+	const registry = Object.fromEntries(
+		[ ...CORE_OPERATIONS, ...operations ].map( ( operation ) => [
+			operation.name,
+			operation,
+		] )
+	);
+
 	return {
-		queue: queue as QueueItem[],
+		// Mirror the reducer: an item records the pool of the operation it
+		// starts. A fixture can still set `currentPool` itself to describe
+		// an item whose definition changed while the operation ran.
+		queue: queue.map( ( item ) =>
+			item.currentOperation !== undefined &&
+			item.currentPool === undefined
+				? {
+						...item,
+						currentPool: getConcurrencyPool(
+							registry[ item.currentOperation ]
+						),
+					}
+				: item
+		) as QueueItem[],
 		queueStatus: 'active',
 		failureCount: 0,
 		blobUrls: {},
-		operations: Object.fromEntries(
-			[ ...CORE_OPERATIONS, ...operations ].map( ( operation ) => [
-				operation.name,
-				operation,
-			] )
-		),
+		operations: registry,
 		settings: {
 			mediaUpload: vi.fn(),
 			maxConcurrentUploads: 5,
@@ -313,6 +329,25 @@ describe( 'selectors', () => {
 			expect( getActiveCountByPool( state, IMAGE_PROCESSING_POOL ) ).toBe(
 				2
 			);
+		} );
+
+		it( 'reads the pool the item recorded, not the current registry', () => {
+			// The slot has to go back to the pool it was taken from, even
+			// if the operation's definition says something else by the
+			// time it ends.
+			const state = createState( [
+				{
+					id: '1',
+					status: ItemStatus.Processing,
+					currentOperation: OperationType.Upload,
+					currentPool: IMAGE_PROCESSING_POOL,
+				},
+			] );
+
+			expect( getActiveCountByPool( state, IMAGE_PROCESSING_POOL ) ).toBe(
+				1
+			);
+			expect( getActiveCountByPool( state, UPLOAD_POOL ) ).toBe( 0 );
 		} );
 
 		it( 'returns 0 when nothing in the pool is active', () => {

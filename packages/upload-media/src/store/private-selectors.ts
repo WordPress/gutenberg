@@ -151,12 +151,7 @@ export function getConcurrencyPoolLimit( state: State, pool: string ): number {
  * @return Number of active items in the pool.
  */
 export function getActiveCountByPool( state: State, pool: string ): number {
-	return state.queue.filter(
-		( item ) =>
-			item.currentOperation !== undefined &&
-			getConcurrencyPool( state.operations[ item.currentOperation ] ) ===
-				pool
-	).length;
+	return state.queue.filter( ( item ) => item.currentPool === pool ).length;
 }
 
 /**

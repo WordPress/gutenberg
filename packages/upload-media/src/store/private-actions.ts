@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 import {
 	cloneFile,
@@ -116,6 +116,7 @@ type RawActionCreators = {
 	prepareItem: typeof prepareItem;
 	processItem: typeof processItem;
 	finishOperation: typeof finishOperation;
+	releaseConcurrencyPool: typeof releaseConcurrencyPool;
 	uploadItem: typeof uploadItem;
 	sideloadItem: typeof sideloadItem;
 	resizeCropItem: typeof resizeCropItem;
@@ -550,6 +551,42 @@ function createOperationContext(
 }
 
 /**
+ * Narrows an operation handler's return value to the updates it may apply.
+ *
+ * The reducer merges the result over the queue item, so a handler that
+ * resolves with something other than plain updates — the item it was
+ * handed, say — could otherwise re-insert the step it just finished or
+ * point the entry at a different item.
+ *
+ * @param result Whatever the handler resolved with.
+ *
+ * @return Updates to apply to the item.
+ */
+function pickOperationResult(
+	result: OperationResult | void
+): OperationResult {
+	const updates: OperationResult = {};
+	if ( ! result ) {
+		return updates;
+	}
+
+	const { file, attachment, additionalData, poster } = result;
+	if ( file !== undefined ) {
+		updates.file = file;
+	}
+	if ( attachment !== undefined ) {
+		updates.attachment = attachment;
+	}
+	if ( additionalData !== undefined ) {
+		updates.additionalData = additionalData;
+	}
+	if ( poster !== undefined ) {
+		updates.poster = poster;
+	}
+	return updates;
+}
+
+/**
  * Runs an operation's handler for an item and settles the item afterwards.
  *
  * This is the single dispatch path for core and third-party operations:
@@ -598,7 +635,7 @@ export function runOperation(
 			return;
 		}
 
-		dispatch.finishOperation( id, result ?? {} );
+		dispatch.finishOperation( id, pickOperationResult( result ) );
 	};
 }
 
@@ -664,12 +701,12 @@ export function registerOperation( definition: OperationDefinition ) {
 /**
  * Unregisters an operation.
  *
- * Items that still list the operation in their pipeline will fail with an
- * `UNKNOWN_OPERATION` error when they reach it.
+ * Refused while any item in the queue still lists the operation in its
+ * pipeline, so nothing is left holding a pipeline it cannot finish.
  *
  * @param name Operation name.
  *
- * @return The removed definition, or undefined if it was not registered.
+ * @return The removed definition, or undefined if it was refused.
  */
 export function unregisterOperation( name: OperationName ) {
 	return ( { select, dispatch }: ThunkArgs ): OperationDefinition | void => {
@@ -677,6 +714,29 @@ export function unregisterOperation( name: OperationName ) {
 		if ( ! definition ) {
 			// eslint-disable-next-line no-console
 			console.error( `Upload operation "${ name }" is not registered.` );
+			return;
+		}
+
+		/*
+		 * Queued items carry their pipeline as a list of names. Removing one
+		 * out from under them fails every item that reaches the missing step,
+		 * and a sideload failing that way takes its parent's already uploaded
+		 * attachment with it. Wait for the queue to drain instead.
+		 */
+		const isInUse = select
+			.getAllItems()
+			.some(
+				( item ) =>
+					item.currentOperation === name ||
+					item.operations?.some(
+						( operation ) => getOperationName( operation ) === name
+					)
+			);
+		if ( isInUse ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Upload operation "${ name }" cannot be unregistered while items in the queue still use it.`
+			);
 			return;
 		}
 
@@ -789,8 +849,8 @@ export function finishOperation(
 	updates: Partial< QueueItem >
 ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getItem( id );
-		const previousOperation = item?.currentOperation;
+		// Read the pool before the item is updated: finishing clears it.
+		const previousPool = select.getItem( id )?.currentPool;
 
 		dispatch< OperationFinishAction >( {
 			type: Type.OperationFinish,
@@ -800,26 +860,34 @@ export function finishOperation(
 
 		dispatch.processItem( id );
 
-		/*
-		 * If an operation with a concurrency limit just finished, a slot in
-		 * its pool freed up. Trigger processing for items waiting on it.
-		 */
-		const previousPool =
-			previousOperation !== undefined
-				? getConcurrencyPool( select.getOperation( previousOperation ) )
-				: undefined;
-		if ( previousPool !== undefined ) {
-			for ( const pendingItem of select.getPendingItemsByPool(
-				previousPool
-			) ) {
-				dispatch.processItem( pendingItem.id );
-			}
+		dispatch.releaseConcurrencyPool( previousPool );
+	};
+}
+
+/**
+ * Releases a concurrency slot and starts whatever was waiting on it.
+ *
+ * Called once an operation settles, from the success and the failure path
+ * alike, with the pool the item recorded when the operation started.
+ *
+ * @param pool Pool the settled operation counted against, if any.
+ */
+export function releaseConcurrencyPool( pool: string | undefined ) {
+	return ( { select, dispatch }: ThunkArgs ) => {
+		if ( pool === undefined ) {
+			return;
 		}
 
-		// Track vips operations across success and failure paths so a
-		// burst of failures can't bypass the recycle budget; the cancel
-		// path calls the same helper.
-		if ( previousPool === IMAGE_PROCESSING_POOL ) {
+		for ( const pendingItem of select.getPendingItemsByPool( pool ) ) {
+			dispatch.processItem( pendingItem.id );
+		}
+
+		/*
+		 * Track vips operations across the success and failure paths alike:
+		 * failed ones leak WASM memory too, so a long burst of failures
+		 * must not bypass the recycle budget.
+		 */
+		if ( pool === IMAGE_PROCESSING_POOL ) {
 			maybeRecycleVipsWorker(
 				select.getActiveCountByPool( IMAGE_PROCESSING_POOL )
 			);
@@ -1136,7 +1204,7 @@ export function prepareItem( id: QueueItemId ) {
 		// Let registered operations insert themselves into, or reshape, the
 		// pipeline core decided on.
 		operations = await planOperations(
-			item,
+			{ ...item, ...updates },
 			operations,
 			select.getOperations(),
 			settings
@@ -1156,8 +1224,12 @@ export function prepareItem( id: QueueItemId ) {
 				code: ErrorCode.UNKNOWN_OPERATION,
 				message: sprintf(
 					/* translators: %s: comma-separated list of upload operation names */
-					__( 'Unknown upload operation "%s".' ),
-					unknownOperations.join( '", "' )
+					_n(
+						'Unknown upload operation: %s.',
+						'Unknown upload operations: %s.',
+						unknownOperations.length
+					),
+					unknownOperations.join( ', ' )
 				),
 				file,
 			} );

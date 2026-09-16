@@ -6,7 +6,6 @@
 	},
 	"references": [
 		{ "path": "../blob/tsconfig.build.json" },
-		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },

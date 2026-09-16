@@ -46,6 +46,15 @@ export interface QueueItem {
 	onError?: OnErrorHandler;
 	onBatchSuccess?: OnBatchSuccessHandler;
 	currentOperation?: OperationName;
+	/**
+	 * Concurrency pool the operation in flight counts against.
+	 *
+	 * Recorded when the operation starts rather than looked up when it
+	 * ends: an operation can be unregistered, or replaced by a definition
+	 * declaring a different pool, while it runs, and the slot still has to
+	 * be released into the pool it was taken from.
+	 */
+	currentPool?: string;
 	operations?: Operation[];
 	error?: Error;
 	retryCount?: number;

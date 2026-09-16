@@ -311,7 +311,7 @@ Conversion lives in a dedicated package that mirrors the `@wordpress/vips` worke
 3.  **Encode.** Each decoded `VideoFrame` is fed to mediabunny's `VideoSampleSource` and encoded via the WebCodecs `VideoEncoder` — `avc` (H.264) into an `Mp4OutputFormat`, or `vp9` into a `WebMOutputFormat`. Output dimensions are forced even, as the codecs require.
 4.  **Store as companion files.** The converted video and a static first-frame poster are sideloaded as **companion files** of the original GIF attachment (the same model as the HEIC original), recorded in `media_details.animated_video` and `media_details.animated_video_poster`. The GIF remains a single `image/gif` attachment — the video and poster are never separate attachments.
 
-The operation is wired into the upload store as `OperationType.TranscodeGif` with its own `transcodeGifItem()` action, chained from `prepareItem()`. It runs with a **video processing concurrency limit of 1** (tracked by `getActiveVideoProcessingCount()`), independent of the image-processing limit, because the encode is memory-intensive.
+The operation is wired into the upload store as `OperationType.TranscodeGif` with its own `transcodeGifItem()` action, chained from `prepareItem()`. It runs with a **video processing concurrency limit of 1** (tracked by `getActiveCountByPool()` for the `video` pool), independent of the image-processing limit, because the encode is memory-intensive.
 
 ### Editor block switch
 

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { calculateRetryDelay, shouldRetryError } from '../utils/retry';
-import { UploadError } from '../../upload-error';
+import { ErrorCode, UploadError } from '../../upload-error';
 
 describe( 'calculateRetryDelay', () => {
 	const originalRandom = Math.random;
@@ -284,6 +284,47 @@ describe( 'shouldRetryError', () => {
 		it( 'should handle max retries of 1', () => {
 			expect( shouldRetryError( retryableError(), 0, 1 ) ).toBe( true );
 			expect( shouldRetryError( retryableError(), 1, 1 ) ).toBe( false );
+		} );
+
+		describe( 'errors classified by code', () => {
+			it( 'does not retry a pipeline naming an unregistered operation', () => {
+				// The message carries the operation name, and a plugin is
+				// free to call one `acme/network-scan`. Matching the text
+				// would re-run the whole pipeline to fail the same way.
+				const error = new UploadError( {
+					code: ErrorCode.UNKNOWN_OPERATION,
+					message: 'Unknown upload operation: acme/network-scan.',
+					file: new File( [ 'foo' ], 'example.jpg', {
+						type: 'image/jpeg',
+					} ),
+				} );
+
+				expect( shouldRetryError( error, 0, 3 ) ).toBe( false );
+			} );
+
+			it( 'does not retry a failure the same file would hit again', () => {
+				const error = new UploadError( {
+					code: ErrorCode.IMAGE_TRANSCODING_ERROR,
+					message: 'Lost connection to the vips worker',
+					file: new File( [ 'foo' ], 'example.jpg', {
+						type: 'image/jpeg',
+					} ),
+				} );
+
+				expect( shouldRetryError( error, 0, 3 ) ).toBe( false );
+			} );
+
+			it( 'still retries a transient failure that carries a code', () => {
+				const error = new UploadError( {
+					code: ErrorCode.MEDIA_FINALIZE_ERROR,
+					message: 'Failed to fetch',
+					file: new File( [ 'foo' ], 'example.jpg', {
+						type: 'image/jpeg',
+					} ),
+				} );
+
+				expect( shouldRetryError( error, 0, 3 ) ).toBe( true );
+			} );
 		} );
 	} );
 } );

@@ -30,6 +30,7 @@ import {
 	DEFAULT_RETRY_SETTINGS,
 } from './constants';
 import { CORE_OPERATIONS } from './operations';
+import { getConcurrencyPool } from './utils/operations';
 
 const noop = () => {};
 
@@ -195,6 +196,9 @@ function reducer(
 						? {
 								...item,
 								currentOperation: action.operation,
+								currentPool: getConcurrencyPool(
+									state.operations[ action.operation ]
+								),
 							}
 						: item
 				),
@@ -243,6 +247,7 @@ function reducer(
 					return {
 						...item,
 						currentOperation: undefined,
+						currentPool: undefined,
 						operations,
 						...action.item,
 						attachment,

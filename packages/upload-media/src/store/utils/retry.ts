@@ -5,6 +5,7 @@
  * for determining whether failed uploads should be retried.
  */
 import type { QueueItemId } from '../types';
+import { ErrorCode } from '../../upload-error';
 
 export interface RetryDelayOptions {
 	/** The current retry attempt number (1-based). */
@@ -76,6 +77,29 @@ const RETRYABLE_MESSAGE_PATTERNS = [
 ];
 
 /**
+ * Error codes that classify a permanent failure.
+ *
+ * These say something about the file or the pipeline rather than about the
+ * network, so a retry runs everything again only to reach the same outcome.
+ * They are checked before the message patterns, because a message can carry
+ * one of those words by coincidence: an item whose pipeline names an
+ * unregistered `acme/network-scan`, say, reports the operation name in its
+ * message and would otherwise look like a network failure.
+ */
+const NON_RETRYABLE_ERROR_CODES: readonly string[] = [
+	ErrorCode.EMPTY_FILE,
+	ErrorCode.SIZE_ABOVE_LIMIT,
+	ErrorCode.MIME_TYPE_NOT_SUPPORTED,
+	ErrorCode.MIME_TYPE_NOT_ALLOWED_FOR_USER,
+	ErrorCode.HEIC_DECODE_ERROR,
+	ErrorCode.IMAGE_TRANSCODING_ERROR,
+	ErrorCode.IMAGE_ROTATION_ERROR,
+	ErrorCode.MEDIA_TRANSCODING_ERROR,
+	ErrorCode.GIF_TRANSCODING_ERROR,
+	ErrorCode.UNKNOWN_OPERATION,
+];
+
+/**
  * Determines whether an upload error should trigger an automatic retry.
  *
  * Returns `false` once the retry budget is exhausted, otherwise returns
@@ -96,6 +120,17 @@ export function shouldRetryError(
 	maxRetries: number
 ): boolean {
 	if ( retryCount >= maxRetries ) {
+		return false;
+	}
+
+	const code =
+		typeof error === 'object' && error !== null
+			? ( error as { code?: unknown } ).code
+			: undefined;
+	if (
+		typeof code === 'string' &&
+		NON_RETRYABLE_ERROR_CODES.includes( code )
+	) {
 		return false;
 	}
 
