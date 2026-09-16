@@ -110,7 +110,16 @@
 			flex-direction: row;
 			align-items: stretch;
 			gap: var(--wpds-dimension-gap-sm);
-			outline: none;
+			background: none;
+			border: 0;
+			padding: var(--wp-ui-card-padding);
+			color: inherit;
+			font: inherit;
+			text-align: start;
+
+			&:focus-visible {
+				outline-offset: calc(-1 * var(--wpds-border-width-focus));
+			}
 
 			&:not([data-disabled]) {
 				cursor: var(--wpds-cursor-control);

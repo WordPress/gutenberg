@@ -314,7 +314,7 @@ export default function FormCardField< Item >( {
 				onOpenChange={ handleOpenChange }
 				{ ...focusOutsideProps }
 			>
-				<CollapsibleCard.Header>
+				<CollapsibleCard.Header render={ <h2 /> }>
 					{ headerContent }
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content

@@ -4,6 +4,7 @@ import { userEvent } from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import * as Card from '../../card';
 import * as CollapsibleCard from '../index';
+import focusStyles from '../../utils/css/focus.module.scss';
 
 describe( 'CollapsibleCard', () => {
 	describe( 'basic behaviour', () => {
@@ -177,6 +178,47 @@ describe( 'CollapsibleCard', () => {
 					expanded: false,
 				} )
 			).toBeVisible();
+		} );
+
+		it( 'renders the trigger as a native <button> by default', () => {
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header>
+						<Card.Title>Title</Card.Title>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			const button = screen.getByRole( 'button', { name: 'Title' } );
+			expect( button.tagName ).toBe( 'BUTTON' );
+		} );
+
+		it( 'applies a visible focus ring class to the header', () => {
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header>
+						<Card.Title>Title</Card.Title>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			const button = screen.getByRole( 'button', { name: 'Title' } );
+			expect( button ).toHaveClass(
+				focusStyles[ 'outset-ring--focus-visible' ]
+			);
+		} );
+
+		it( 'renders a div with role=button when nativeButton is false', () => {
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header nativeButton={ false }>
+						<Card.Title>Title</Card.Title>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			const trigger = screen.getByRole( 'button', { name: 'Title' } );
+			expect( trigger.tagName ).not.toBe( 'BUTTON' );
 		} );
 	} );
 
