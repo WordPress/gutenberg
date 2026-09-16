@@ -79,12 +79,15 @@
 	   ======================================================================= */
 
 	/*
-	 * 5px -> 4px. Comment count bubbles in the posts and comments list tables.
-	 * These sit next to controls already on the scale, so the odd radius reads
-	 * as a mismatch at small sizes.
+	 * 5px -> 4px. Comment count bubbles: the Response column on the Comments
+	 * screen and the Comments column on Posts and Pages, which list-tables.css
+	 * styles in one rule. These sit next to controls already on the scale, so
+	 * the odd radius reads as a mismatch at small sizes.
 	 */
 	.column-response .comment-count-no-comments,
 	.column-response .comment-count-approved,
+	.column-comments .comment-count-no-comments,
+	.column-comments .comment-count-approved,
 	.media .row-actions .copy-to-clipboard-container .success {
 		border-radius: var(--wpds-border-radius-md);
 	}
