@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Update `use-recommended-components` rule to mark `Select` and `SelectControl` from `@wordpress/ui` as recommended.
+-   Update `use-recommended-components` rule to mark `Select` and `SelectControl` from `@wordpress/ui` as recommended ([#83030](https://github.com/WordPress/gutenberg/pull/83030)).
 
 ### Breaking Changes
 
