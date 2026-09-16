@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Add a private `PrivateLinkControl`, the same component as `LinkControl` but accepting a `transformSuggestions` prop, so a consumer can filter and order search suggestions before they are shown ([#82985](https://github.com/WordPress/gutenberg/pull/82985)).
+-   `LinkControl`: Add an undocumented `transformSuggestions` prop, so a consumer can filter and order search suggestions before they are shown ([#82985](https://github.com/WordPress/gutenberg/pull/82985)).
 
 ### New Features
 

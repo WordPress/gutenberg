@@ -5,10 +5,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	useBlockEditingMode,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { LinkControl, useBlockEditingMode } from '@wordpress/block-editor';
 import {
 	useCallback,
 	useMemo,
@@ -25,10 +22,7 @@ import { isURL } from '@wordpress/url';
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
 import { useEntityBinding, useLinkPreview } from '../shared';
-import { unlock } from '../../lock-unlock';
 import { transformSuggestions as transformNavigationSuggestions } from './transform-suggestions';
-
-const { PrivateLinkControl: LinkControl } = unlock( blockEditorPrivateApis );
 
 /**
  * Given the Link block's type attribute, return the query params that describe
