@@ -57,4 +57,19 @@
 			}
 		}
 	}
+
+	@layer compositions {
+		/*
+		 * Input always hosts a native field. Size prefix/suffix with that
+		 * field. Select and combobox triggers go through InputLayout
+		 * directly and stay at md.
+		 */
+		.layout {
+			font-size: max(var(--wpds-typography-font-size-md), 16px);
+
+			@media (min-width: 600px) {
+				font-size: var(--wpds-typography-font-size-md);
+			}
+		}
+	}
 }

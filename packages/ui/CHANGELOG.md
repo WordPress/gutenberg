@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `InputLayout`: Prefix, suffix, and select or combobox trigger text stay at the `md` font size on small viewports. Native text inputs and textareas still use at least 16px below 600px to avoid iOS Safari zoom. ([#82764](https://github.com/WordPress/gutenberg/pull/82764))
+-   Native text inputs and textareas use at least 16px below 600px to avoid iOS Safari zoom. Prefix and suffix text on `Input` match that size. Select and combobox trigger text stay at the `md` font size. ([#82764](https://github.com/WordPress/gutenberg/pull/82764))
 -   `Checkbox`: Enlarge the hit target to 24px without changing the visual size. ([#82597](https://github.com/WordPress/gutenberg/pull/82597))
 
 ### Internal
