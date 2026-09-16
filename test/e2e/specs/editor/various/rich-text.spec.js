@@ -916,19 +916,15 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			innerBlocks: [
 				{
 					name: 'core/paragraph',
-					attributes: { content: 'Inside a flex group' },
+					attributes: { content: 'Inside' },
 				},
 			],
 		} );
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/group',
-				innerBlocks: [ { name: 'core/paragraph' } ],
-			},
-		] );
-		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
-		);
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Outside' },
+		} );
+		await editor.canvas.getByText( 'Outside' ).click();
 
 		const group = editor.canvas.locator( '[data-type="core/group"]' );
 		const box = await group.boundingBox();
@@ -936,23 +932,30 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.mouse.click( box.x + box.width / 2, box.y + 20 );
 
 		await expect( group ).toBeFocused();
-		await expect(
-			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
-		).not.toBeFocused();
 		await expect
 			.poll( () =>
-				editor.canvas.locator( ':root' ).evaluate( ( root ) => {
-					const { anchorNode } = root.ownerDocument.getSelection();
-					if ( ! anchorNode ) {
-						return false;
-					}
-					const element =
-						anchorNode.nodeType === anchorNode.TEXT_NODE
-							? anchorNode.parentElement
-							: anchorNode;
-					return !! element.closest( '[data-type="core/paragraph"]' );
-				} )
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlock()?.name
+				)
 			)
-			.toBe( false );
+			.toBe( 'core/group' );
+
+		// The paragraph must not have received the caret.
+		await page.keyboard.type( 'x' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Inside' },
+					},
+				],
+			},
+			{ name: 'core/paragraph', attributes: { content: 'Outside' } },
+		] );
 	} );
 } );
