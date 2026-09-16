@@ -341,7 +341,7 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 							...props.wrapperProps?.style,
 							'--suggestion-author-color':
 								getAvatarBorderColor( authorId ),
-					  }
+						}
 					: props.wrapperProps?.style;
 
 			const blockClassName =
@@ -350,7 +350,7 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 							props.className,
 							showOverlayBracket && 'is-suggestion-pending',
 							structuralClass
-					  )
+						)
 					: props.className;
 
 			return (
