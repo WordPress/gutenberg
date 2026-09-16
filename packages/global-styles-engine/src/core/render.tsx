@@ -127,8 +127,7 @@ export type BlockSelectors = Record<
 		fallbackGapValue?: string;
 		hasLayoutSupport?: boolean;
 		featureSelectors?:
-			| string
-			| Record< string, string | Record< string, string > >;
+			string | Record< string, string | Record< string, string > >;
 		name?: string;
 		styleVariationSelectors?: Record< string, string >;
 	}
@@ -162,8 +161,7 @@ interface StylesNode {
 	skipSelectorWrapper?: boolean;
 	duotoneSelector?: string;
 	featureSelectors?:
-		| string
-		| Record< string, string | Record< string, string > >;
+		string | Record< string, string | Record< string, string > >;
 	fallbackGapValue?: string;
 	hasLayoutSupport?: boolean;
 	isStyleVariation?: boolean;
@@ -826,19 +824,19 @@ export function getLayoutStyles( {
 									selector === ROOT_BLOCK_SELECTOR
 										? `:where(.${ className }${
 												spacingStyle?.selector || ''
-										  })`
+											})`
 										: `:where(${ selector }.${ className }${
 												spacingStyle?.selector || ''
-										  })`;
+											})`;
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
 										? `:root :where(.${ className })${
 												spacingStyle?.selector || ''
-										  }`
+											}`
 										: `:root :where(${ selector }-${ className })${
 												spacingStyle?.selector || ''
-										  }`;
+											}`;
 							}
 							ruleset += `${ combinedSelector } { ${ declarations.join(
 								'; '
@@ -930,7 +928,7 @@ function pickStyleAndPseudoKeys(
 	}
 	const entries = Object.entries( treeToPickFrom );
 	const allowedPseudoSelectors = blockName
-		? VALID_BLOCK_PSEUDO_SELECTORS[ blockName ] ?? []
+		? ( VALID_BLOCK_PSEUDO_SELECTORS[ blockName ] ?? [] )
 		: [];
 
 	const pickedEntries = entries.filter(
@@ -968,8 +966,8 @@ function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 		variationName,
 	} = node;
 	const pseudoSelectors = name
-		? VALID_BLOCK_PSEUDO_SELECTORS[ name ] ?? []
-		: VALID_ELEMENT_PSEUDO_SELECTORS[ elementName ?? '' ] ?? [];
+		? ( VALID_BLOCK_PSEUDO_SELECTORS[ name ] ?? [] )
+		: ( VALID_ELEMENT_PSEUDO_SELECTORS[ elementName ?? '' ] ?? [] );
 
 	if ( ! pseudoSelectors.length ) {
 		return [];
@@ -1160,7 +1158,7 @@ export const getNodesWithStyles = (
 								? blockSelectors[ blockName ]
 										?.styleVariationSelectors?.[
 										variationName
-								  ]
+									]
 								: undefined;
 						if (
 							variationSelector &&
@@ -1224,7 +1222,7 @@ export const getNodesWithStyles = (
 												blockSelectors[
 													variationBlockName
 												]?.selector
-										  )
+											)
 										: undefined;
 								const variationDuotoneSelector =
 									typeof blockSelectors !== 'string'
@@ -1233,7 +1231,7 @@ export const getNodesWithStyles = (
 												blockSelectors[
 													variationBlockName
 												]?.duotoneSelector as string
-										  )
+											)
 										: undefined;
 								const variationFeatureSelectors =
 									typeof blockSelectors !== 'string'
@@ -1242,7 +1240,7 @@ export const getNodesWithStyles = (
 												blockSelectors[
 													variationBlockName
 												]?.featureSelectors ?? {}
-										  )
+											)
 										: undefined;
 
 								const variationBlockStyleNodes =
@@ -1389,8 +1387,7 @@ export const getNodesWithSettings = (
 		fallbackGapValue?: string;
 		hasLayoutSupport?: boolean;
 		featureSelectors?:
-			| string
-			| Record< string, string | Record< string, string > >;
+			string | Record< string, string | Record< string, string > >;
 		styleVariationSelectors?: Record< string, string >;
 	}[] = [];
 
@@ -1667,7 +1664,7 @@ function renderStylesNode(
 						? getBlockStyleVariationFeatureSelector(
 								variationName,
 								featureSelector
-						  )
+							)
 						: featureSelector;
 					selectorForRule = selectorSuffix
 						? appendToSelector( selectorForRule, selectorSuffix )

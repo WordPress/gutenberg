@@ -119,8 +119,7 @@ function FontCollection( { slug }: { slug: string } ) {
 	const collectionFonts = useMemo(
 		() =>
 			( selectedCollection?.font_families as
-				| CollectionFontFamily[]
-				| undefined ) ?? [],
+				CollectionFontFamily[] | undefined ) ?? [],
 		[ selectedCollection ]
 	);
 	const collectionCategories = selectedCollection?.categories ?? [];
@@ -170,7 +169,7 @@ function FontCollection( { slug }: { slug: string } ) {
 
 	const selectFontCount =
 		fontsToInstall.length > 0
-			? fontsToInstall[ 0 ]?.fontFace?.length ?? 0
+			? ( fontsToInstall[ 0 ]?.fontFace?.length ?? 0 )
 			: 0;
 
 	// Check if any fonts are selected.

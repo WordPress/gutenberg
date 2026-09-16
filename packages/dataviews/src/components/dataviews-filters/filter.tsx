@@ -134,7 +134,7 @@ function OperatorSelector( {
 											return _filter;
 										}
 									),
-							  ]
+								]
 							: [
 									...( view.filters ?? [] ),
 									{
@@ -142,7 +142,7 @@ function OperatorSelector( {
 										operator: newOperator,
 										value: undefined,
 									},
-							  ];
+								];
 						onChangeView( {
 							...view,
 							page: 1,
@@ -236,7 +236,7 @@ export default function Filter( {
 				? field.getValueFormatted( {
 						item: { [ field.id ]: filterInView.value },
 						field,
-				  } )
+					} )
 				: String( filterInView.value );
 
 		activeElements = [

@@ -237,10 +237,10 @@ export default function QueryInspectorControls( props ) {
 										inherit
 											? __(
 													'Display a list of posts or custom post types based on the current template.'
-											  )
+												)
 											: __(
 													'Display a list of posts or custom post types based on specific criteria.'
-											  )
+												)
 									}
 									value={ !! inherit ? 'default' : 'custom' }
 								>
