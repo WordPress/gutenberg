@@ -159,7 +159,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 													return _filter;
 												}
 											),
-									  ]
+										]
 									: [
 											...( view.filters ?? [] ),
 											{
@@ -171,7 +171,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 													element.value
 												),
 											},
-									  ];
+										];
 								onChangeView( {
 									...view,
 									page: 1,
@@ -234,7 +234,7 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 								}
 								return _filter;
 							} ),
-					  ]
+						]
 					: [
 							...( view.filters ?? [] ),
 							{
@@ -242,7 +242,7 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 								operator: filter.operators[ 0 ],
 								value,
 							},
-					  ];
+						];
 				onChangeView( {
 					...view,
 					page: 1,

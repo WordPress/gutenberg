@@ -119,8 +119,8 @@ export function WidgetHeader( {
 	const availableSize =
 		headerWidth > 0
 			? headerWidth -
-			  ( hasIdentity ? identityReserve : 0 ) -
-			  totalReserved
+				( hasIdentity ? identityReserve : 0 ) -
+				totalReserved
 			: null;
 
 	return (
