@@ -53,27 +53,14 @@
 	}
 
 	/* -----------------------------------------------------------------------
-	   Checked
-
-	   Accent comes from `--wp-admin-theme-color`, not from the design system's
-	   `--wpds-color-background-interactive-brand-strong`.
-
-	   React admin UI does follow the user's colour scheme: `getAdminThemeColors()`
-	   reads the `admin-color-*` body class and `ThemeProvider` derives `--wpds-*`
-	   values from it. But the prebuilt token stylesheet emits a flat `#3858e9`,
-	   and classic admin has no provider — so a CSS-only consumer is pinned to
-	   that literal with no way to accept a spot colour.
-
-	   `@wordpress/components` solves this with a fallback chain
-	   (`var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))`).
-	   Until the prebuilt brand tokens carry the same chain, classic uses the
-	   scheme variable directly.
+	   Checked — the brand strong pair, as the `@wordpress/ui` checkbox uses it.
+	   The tick and dot take the pair's foreground through `currentColor`.
 	   ----------------------------------------------------------------------- */
 
 	input[type="checkbox"]:checked,
 	input[type="radio"]:checked {
-		border-color: var(--wp-admin-theme-color);
-		background: var(--wp-admin-theme-color);
+		border-color: transparent;
+		background: var(--wpds-color-background-interactive-brand-strong);
 	}
 
 	/* The tick, masked so its colour follows `currentColor`. */
