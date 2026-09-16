@@ -644,30 +644,6 @@ _Returns_
 
 - `Object`: Typography block support derived CSS classes & styles.
 
-### hasPseudoBlockStyleState
-
-Returns true when a pseudo style state is selected.
-
-_Parameters_
-
--   _selectedState_ `Object`: Selected block style state.
-
-_Returns_
-
--   `boolean`: Whether a pseudo state is selected.
-
-### hasViewportBlockStyleState
-
-Returns true when a viewport style state is selected.
-
-_Parameters_
-
--   _selectedState_ `Object`: Selected block style state.
-
-_Returns_
-
--   `boolean`: Whether a viewport state is selected.
-
 ### HeadingLevelDropdown
 
 Dropdown for selecting a heading level (1 through 6) or paragraph (0).
@@ -720,18 +696,6 @@ Undocumented declaration.
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md>
-
-### isDefaultBlockStyleState
-
-Returns true when the default style state is selected.
-
-_Parameters_
-
--   _selectedState_ `Object`: Selected block style state.
-
-_Returns_
-
--   `boolean`: Whether the default style state is selected.
 
 ### isValueSpacingPreset
 
@@ -1192,14 +1156,6 @@ _Parameters_
 _Returns_
 
 - `Object`: Props to pass to the element to mark as a block.
-
-### useBlockStyleState
-
-Returns the current block style state.
-
-_Returns_
-
--   `Object`: The current block style state.
 
 ### useCachedTruthy
 
