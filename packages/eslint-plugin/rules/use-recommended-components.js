@@ -67,7 +67,8 @@ const DENYLIST = {
 	'@wordpress/components': {
 		ExternalLink:
 			'Use `Link` from `@wordpress/ui` with the `openInNewTab` prop instead.',
-		__experimentalDivider: '{{ name }} is planned for deprecation.',
+		__experimentalDivider:
+			'Write your own CSS instead, preferably using the design tokens available in `@wordpress/theme`.',
 		__experimentalElevation:
 			'Use elevation tokens from `@wordpress/base-styles` instead.',
 		__experimentalGrid:

@@ -76,7 +76,8 @@ export { default as Dashicon } from './dashicon';
 export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as Disabled } from './disabled';
 export { DisclosureContent as __unstableDisclosureContent } from './disclosure';
-export { Divider as __experimentalDivider } from './divider';
+/** @deprecated This component will be removed in WordPress 7.4. Write your own CSS instead. */
+export { default as __experimentalDivider } from './divider/deprecated';
 export { default as Draggable } from './draggable';
 export { default as DropZone } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';

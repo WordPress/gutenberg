@@ -25,6 +25,10 @@
 -   `BorderBoxControl`: Restore the split borders layout. The top and bottom controls are centred across the row and the right control sits at the end of its column again, after `BorderControl`'s own `margin: 0` began overriding both ([#82939](https://github.com/WordPress/gutenberg/pull/82939)).
 -   `PaletteEdit`: Separate adjacent header action buttons so their focus rings do not overlap ([#82768](https://github.com/WordPress/gutenberg/pull/82768)).
 
+### Deprecations
+
+-   `Divider`: Deprecate the component, planned for removal in WordPress 7.4.
+
 ### Internal
 
 -   Remove the obsolete Jest console test dependency and matcher types ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
