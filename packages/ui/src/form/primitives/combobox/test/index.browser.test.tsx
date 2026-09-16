@@ -222,7 +222,6 @@ describe( 'Combobox', () => {
 		await user.hover(
 			screen.getByLabelText( 'Remove Item 1', {
 				selector: 'button',
-				hidden: true,
 			} )
 		);
 
@@ -591,7 +590,6 @@ describe( 'Combobox', () => {
 
 				const removeButton = screen.getByLabelText( 'Remove', {
 					selector: 'button',
-					hidden: true,
 				} );
 				await user.hover( removeButton );
 
