@@ -7,13 +7,20 @@ import { Popover } from '@wordpress/components';
 import { ValidatedTextareaControl, Link } from '@wordpress/ui';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { getSourceOnlyMathML } from './utils';
 
 export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const { latex, mathML } = attributes;
 	const [ blockRef, setBlockRef ] = useState();
 	const [ error, setError ] = useState( null );
 	const [ latexToMathML, setLatexToMathML ] = useState();
-	const initialLatex = useRef( latex );
+	// The converter loads asynchronously, and the user can type in the
+	// meantime, so the effect below renders the latest source rather than
+	// the one captured on mount.
+	const latestLatexRef = useRef( latex );
+	useEffect( () => {
+		latestLatexRef.current = latex;
+	} );
 	const formRef = useRef();
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -21,20 +28,22 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	useEffect( () => {
 		import( '@wordpress/latex-to-mathml' ).then( ( module ) => {
 			setLatexToMathML( () => module.default );
-			if ( initialLatex.current ) {
-				__unstableMarkNextChangeAsNotPersistent();
-				setAttributes( {
-					mathML: module.default( initialLatex.current, {
-						displayMode: true,
-					} ),
+			if ( ! latestLatexRef.current ) {
+				return;
+			}
+			// Re-render on mount so MathML saved from a corrupted source is
+			// repaired once the source reads correctly again.
+			try {
+				const newMathML = module.default( latestLatexRef.current, {
+					displayMode: true,
 				} );
+				__unstableMarkNextChangeAsNotPersistent();
+				setAttributes( { mathML: newMathML } );
+			} catch ( err ) {
+				setError( err.message );
 			}
 		} );
-	}, [
-		initialLatex,
-		setAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
-	] );
+	}, [ setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 
 	const blockProps = useBlockProps( {
 		ref: setBlockRef,
@@ -80,18 +89,19 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 									: undefined
 							}
 							onValueChange={ ( newLatex ) => {
-								if ( ! latexToMathML ) {
-									setAttributes( { latex: newLatex } );
-									return;
-								}
-								let newMathML = '';
-								try {
-									newMathML = latexToMathML( newLatex, {
-										displayMode: true,
-									} );
-									setError( null );
-								} catch ( err ) {
-									setError( err.message );
+								// The source is read back from the MathML, so
+								// the two are always written together. Until
+								// the source renders, save it on its own.
+								let newMathML = getSourceOnlyMathML( newLatex );
+								if ( latexToMathML ) {
+									try {
+										newMathML = latexToMathML( newLatex, {
+											displayMode: true,
+										} );
+										setError( null );
+									} catch ( err ) {
+										setError( err.message );
+									}
 								}
 								setAttributes( {
 									mathML: newMathML,
