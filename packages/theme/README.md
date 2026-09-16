@@ -2,8 +2,8 @@
 
 A theming package that's part of the WordPress Design System. It has two parts:
 
--   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more.
--   **Theme System**: A flexible theming provider for consistent theming across applications.
+- **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more.
+- **Theme System**: A flexible theming provider for consistent theming across applications.
 
 This package is not a WordPress block theme, site theme, or `theme.json` API. It provides the WordPress Design System's design tokens and React theming primitives for JavaScript packages and applications.
 
@@ -11,9 +11,9 @@ This package is not a WordPress block theme, site theme, or `theme.json` API. It
 
 This README is the entry point for package consumers. It covers how to load design tokens, use `ThemeProvider`, and configure the package's development tooling.
 
--   To use design tokens and `ThemeProvider`, start here.
--   To pick the right design token or browse every available token, see the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
--   To edit token source files, see the [Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
+- To use design tokens and `ThemeProvider`, start here.
+- To pick the right design token or browse every available token, see the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
+- To edit token source files, see the [Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
 
 ## Design Tokens
 
@@ -31,8 +31,8 @@ The [`ThemeProvider`](#theme-provider) component can be used to customize token 
 
 The design system splits token delivery into two complementary layers:
 
--   **Static stylesheet (`design-tokens.css`)** — defines the default value for every `--wpds-*` custom property at the document `:root`. Loaded once per document (the main page, _and_ each iframe you render React into). Provides a working baseline even before any JavaScript runs.
--   **Runtime `<ThemeProvider>`** — applies per-instance overrides for a subtree, on top of the static defaults. Use it to override individual settings (e.g. `color.primary`, `cursor.control`).
+- **Static stylesheet (`design-tokens.css`)** — defines the default value for every `--wpds-*` custom property at the document `:root`. Loaded once per document (the main page, _and_ each iframe you render React into). Provides a working baseline even before any JavaScript runs.
+- **Runtime `<ThemeProvider>`** — applies per-instance overrides for a subtree, on top of the static defaults. Use it to override individual settings (e.g. `color.primary`, `cursor.control`).
 
 #### Within WordPress
 
@@ -70,8 +70,8 @@ The semantic color tokens are designed so the default foreground/background pair
 
 Design tokens do not replace component-level accessibility handling:
 
--   **Forced colors:** components are still responsible for `forced-colors` overrides where native high-contrast rendering would otherwise hide borders, icons, focus rings, or state indicators.
--   **Reduced motion:** motion tokens provide shared durations and easing curves, but consuming components are still responsible for respecting `prefers-reduced-motion` for non-essential animations.
+- **Forced colors:** components are still responsible for `forced-colors` overrides where native high-contrast rendering would otherwise hide borders, icons, focus rings, or state indicators.
+- **Reduced motion:** motion tokens provide shared durations and easing curves, but consuming components are still responsible for respecting `prefers-reduced-motion` for non-essential animations.
 
 For example, define non-essential transitions only when the user has not requested reduced motion:
 
@@ -103,8 +103,8 @@ function App() {
 
 The `color` prop accepts an object with the following optional properties:
 
--   `primary`: The primary/accent seed color (default: `'#3858e9'`).
--   `background`: The background seed color (default: `'#fcfcfc'`).
+- `primary`: The primary/accent seed color (default: `'#3858e9'`).
+- `background`: The background seed color (default: `'#fcfcfc'`).
 
 Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error.
 
@@ -130,7 +130,7 @@ The callback reports failures from the generated ramp checks and a defined set o
 
 The `cursor` prop accepts an object with the following optional properties:
 
--   `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
+- `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
 
 The `cornerRadius` prop sets the overall roundness preset for the theme subtree. Accepts `'none'` (square corners), `'subtle'`, `'moderate'`, or `'pronounced'` (most rounded) (default: `'subtle'`). This scales the primitive `--wpds-border-radius-*` tokens for the provider subtree. The preset sets the overall amount of roundness, not an individual border-radius token size.
 

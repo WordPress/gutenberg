@@ -91,7 +91,7 @@ const LibraryExample = ( {
 						keyword.toLowerCase().includes( normalizedFilter )
 					);
 				} )
-		  )
+			)
 		: availableIcons;
 
 	const hasResults = Object.keys( filteredIcons ).length > 0;
