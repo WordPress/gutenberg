@@ -159,7 +159,7 @@ function ActionTrigger< Item >( {
 			className={
 				isDefaultUI ? 'dataviews-bulk-actions__action' : undefined
 			}
-			disabled={ isBusy }
+			disabled={ !! action.disabled || isBusy }
 			accessibleWhenDisabled
 			label={ isMobile ? label : undefined }
 			icon={ isMobile ? action.icon : undefined }
@@ -195,7 +195,10 @@ function ActionButton< Item >( {
 	const isBusy = actionInProgress === action.id;
 	if ( onClose ) {
 		return (
-			<MenuItem onClick={ onClick } disabled={ isBusy }>
+			<MenuItem
+				onClick={ onClick }
+				disabled={ !! action.disabled || isBusy }
+			>
 				{ typeof action.label === 'string'
 					? action.label
 					: action.label( selectedEligibleItems ) }

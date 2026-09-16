@@ -157,7 +157,7 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => {
 			setTimeout( () => {
 				callback( [
 					{
-						borderBoxSize: [ { inlineSize: 500 } ],
+						borderBoxSize: [ { inlineSize: 500, blockSize: 50.5 } ],
 					},
 				] );
 			}, 0 );
@@ -197,6 +197,51 @@ describe( 'DataViews component', () => {
 			expect( screen.getByText( 'Modal Content' ) ).toBeInTheDocument();
 		}
 	);
+
+	it( 'disabled desktop bulk action cannot run', async () => {
+		const callback = vi.fn();
+		render(
+			<DataViewWrapper
+				selection={ [ '1' ] }
+				onChangeSelection={ vi.fn() }
+				actions={ [
+					{
+						id: 'edit',
+						label: 'Edit',
+						supportsBulk: true,
+						disabled: true,
+						callback,
+					},
+				] }
+			/>
+		);
+		const action = screen.getByRole( 'button', { name: 'Edit' } );
+		expect( action ).toHaveAttribute( 'aria-disabled', 'true' );
+		const user = userEvent.setup();
+		await user.click( action );
+		expect( callback ).not.toHaveBeenCalled();
+	} );
+
+	it( 'matches the bulk-action overlay to the rendered table header', async () => {
+		const { container } = render(
+			<DataViewWrapper
+				selection={ [ '1' ] }
+				onChangeSelection={ vi.fn() }
+				actions={ actions }
+			/>
+		);
+		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+		const overlay = container.querySelector(
+			'.dataviews-view-table__bulk-actions-overlay'
+		) as HTMLDivElement;
+		await waitFor( () => {
+			expect(
+				overlay.style.getPropertyValue(
+					'--wp-dataviews-table-header-height'
+				)
+			).toBe( '50.5px' );
+		} );
+	} );
 
 	it.each( [ LAYOUT_TABLE, LAYOUT_GRID ] as const )(
 		'preserves bulk actions in the footer of a custom %s composition',
@@ -1441,6 +1486,33 @@ describe( 'DataViews component', () => {
 
 		afterEach( () => {
 			mockUseViewportMatch.mockImplementation( () => false );
+		} );
+
+		it( 'disabled mobile-menu bulk action cannot run', async () => {
+			const callback = vi.fn();
+			render(
+				<DataViewWrapper
+					selection={ [ '1' ] }
+					onChangeSelection={ vi.fn() }
+					actions={ [
+						{
+							id: 'edit',
+							label: 'Edit',
+							supportsBulk: true,
+							disabled: true,
+							callback,
+						},
+					] }
+				/>
+			);
+			const user = userEvent.setup();
+			await user.click(
+				screen.getAllByRole( 'button', { name: 'Actions' } )[ 0 ]
+			);
+			const action = screen.getByRole( 'menuitem', { name: 'Edit' } );
+			expect( action ).toHaveAttribute( 'aria-disabled', 'true' );
+			await user.click( action );
+			expect( callback ).not.toHaveBeenCalled();
 		} );
 
 		it.each( [ LAYOUT_TABLE, LAYOUT_GRID ] as const )(

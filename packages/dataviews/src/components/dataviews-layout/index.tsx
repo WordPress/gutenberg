@@ -1,5 +1,6 @@
-import type { ComponentType } from 'react';
-import { useContext, useEffect, useRef } from '@wordpress/element';
+import type { ComponentType, CSSProperties } from 'react';
+import { useContext, useEffect, useRef, useState } from '@wordpress/element';
+import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import DataViewsContext from '../dataviews-context';
@@ -48,6 +49,21 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 	const tableSelectionRef = useRef< HTMLInputElement >( null );
 	const bulkSelectionRef = useRef< HTMLInputElement >( null );
 	const bulkActionsRef = useRef< HTMLDivElement >( null );
+	const [ tableHeaderHeight, setTableHeaderHeight ] = useState< number >();
+	const tableHeaderResizeObserverRef =
+		useResizeObserver< HTMLTableSectionElement >(
+			( [ entry ] ) => {
+				if ( ! isDefaultUI || view.type !== LAYOUT_TABLE ) {
+					return;
+				}
+				setTableHeaderHeight( entry.borderBoxSize[ 0 ].blockSize );
+			},
+			{ box: 'border-box' }
+		);
+	const mergedTableHeaderRef = useMergeRefs( [
+		tableHeaderRef,
+		tableHeaderResizeObserverRef,
+	] );
 	const hadSelectionRef = useRef( false );
 	useEffect( () => {
 		if ( ! isDefaultUI || view.type !== LAYOUT_TABLE ) {
@@ -103,7 +119,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 			value={
 				isDefaultUI && view.type === LAYOUT_TABLE
 					? {
-							headerRef: tableHeaderRef,
+							headerRef: mergedTableHeaderRef,
 							selectionRef: tableSelectionRef,
 					  }
 					: null
@@ -119,6 +135,13 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 					}
 					hidden={ view.type === LAYOUT_TABLE && ! selection.length }
 					ref={ bulkActionsRef }
+					style={
+						view.type === LAYOUT_TABLE && tableHeaderHeight
+							? ( {
+									'--wp-dataviews-table-header-height': `${ tableHeaderHeight }px`,
+							  } as CSSProperties )
+							: undefined
+					}
 					// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 					inert={ isLoading ? 'true' : undefined }
 				>

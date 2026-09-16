@@ -359,5 +359,6 @@
 		position: absolute;
 		inset-inline: 0;
 		top: 0;
+		min-height: var(--wp-dataviews-table-header-height, 52px);
 	}
 }
