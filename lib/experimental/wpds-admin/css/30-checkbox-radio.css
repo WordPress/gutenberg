@@ -33,13 +33,7 @@
 		box-sizing: border-box;
 		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
 		border-radius: var(--wpds-border-radius-sm);
-		/*
-		 * White rather than the design system's transparent field background,
-		 * for the same reason as 20-input.css: classic controls sit on the grey page
-		 * background as often as on white, and a transparent control would read as
-		 * grey.
-		 */
-		background: var(--wpds-color-background-surface-neutral-strong);
+		background: var(--wpds-color-background-interactive-neutral);
 		color: var(--wpds-color-foreground-interactive-brand-strong);
 		box-shadow: none;
 		cursor: var(--wpds-cursor-control);
@@ -124,7 +118,7 @@
 	input[type="radio"].disabled,
 	input[type="radio"][aria-disabled="true"] {
 		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
-		background: var(--wpds-color-background-surface-neutral-weak);
+		background: var(--wpds-color-background-interactive-neutral-disabled);
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 		cursor: default;
 		opacity: 1;
@@ -141,9 +135,10 @@
 	}
 
 	/*
-	 * Disabled AND checked: the box stays muted and the mark greys out with it,
-	 * which is only legible because the mark is masked rather than a baked-white
-	 * SVG. Core instead fades the whole control with `opacity: 0.7`.
+	 * Disabled AND checked: the box drops its accent fill for the disabled
+	 * surface and the mark greys out, which is only legible because the mark is
+	 * masked rather than a baked-white SVG. Core instead fades the whole control
+	 * with `opacity: 0.7`.
 	 */
 	input[type="checkbox"]:disabled:checked,
 	input[type="checkbox"].disabled:checked,
@@ -152,7 +147,7 @@
 	input[type="radio"].disabled:checked,
 	input[type="radio"][aria-disabled="true"]:checked {
 		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
-		background: var(--wpds-color-background-interactive-neutral-strong-disabled);
+		background: var(--wpds-color-background-interactive-neutral-disabled);
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 
