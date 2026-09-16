@@ -216,7 +216,7 @@ add_filter( 'style_loader_tag', 'gutenberg_wpds_admin_demote_style', 10, 4 );
 /**
  * Returns the version string used for the restyle's stylesheets.
  *
- * @since 23.9.0
+ * @since 24.1.0
  *
  * @return string Version string.
  */
@@ -231,7 +231,7 @@ function gutenberg_wpds_admin_style_version() {
  * the `wp-theme` handle itself (see lib/client-assets.php), so no wordpress-develop
  * change is needed. Falls back to the package's prebuilt copy if that stops being true.
  *
- * @since 23.9.0
+ * @since 24.1.0
  *
  * @return string[] Handles the first stylesheet should depend on.
  */
@@ -262,7 +262,7 @@ function gutenberg_wpds_admin_token_dependencies() {
  * Each sheet depends on the one before it, which keeps the generated HTML in the
  * same order as the cascade.
  *
- * @since 23.9.0
+ * @since 24.1.0
  *
  * @param string   $directory  Absolute path to the directory to read.
  * @param string   $url_path   Path of that directory relative to the plugin root.
@@ -333,7 +333,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_wpds_admin_enqueue_styles' );
  * And front-end CSS competes with the active theme, so it stays as small as the
  * job allows rather than carrying rules meant for wp-admin.
  *
- * @since 23.9.0
+ * @since 24.1.0
  */
 function gutenberg_wpds_admin_enqueue_front_styles() {
 	if ( ! is_admin_bar_showing() ) {
