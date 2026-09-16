@@ -236,7 +236,7 @@ export default function SearchEdit( {
 							borderProps.style?.borderBottomLeftRadius,
 						borderBottomRightRadius:
 							borderProps.style?.borderBottomRightRadius,
-				  }
+					}
 				: borderProps.style ),
 			...typographyProps.style,
 			textDecoration: undefined,
@@ -287,7 +287,7 @@ export default function SearchEdit( {
 							borderProps.style?.borderBottomLeftRadius,
 						borderBottomRightRadius:
 							borderProps.style?.borderBottomRightRadius,
-				  }
+					}
 				: borderProps.style ),
 		};
 		return (
@@ -536,7 +536,7 @@ export default function SearchEdit( {
 						borderProps.style?.borderBottomLeftRadius,
 					borderBottomRightRadius:
 						borderProps.style?.borderBottomRightRadius,
-			  };
+				};
 
 		if ( isButtonPositionInside ) {
 			// We have button inside wrapper and a border radius value to apply.

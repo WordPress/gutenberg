@@ -58,7 +58,7 @@ export const SelectControl = forwardRef<
 										</Select.ItemDescription>
 									) : null }
 								</Item>
-						  ) ) }
+							) ) }
 				</Select.Popup>
 			</Select.Root>
 			{ description && (

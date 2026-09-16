@@ -57,7 +57,7 @@ export default function FileBlockInspector( {
 									displayPreview
 										? __(
 												"Note: Most phone and tablet browsers won't display embedded PDFs."
-										  )
+											)
 										: null
 								}
 								checked={ !! displayPreview }
