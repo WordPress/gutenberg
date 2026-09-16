@@ -62,7 +62,7 @@ function Editor( {
 						kind: 'root',
 						name: 'globalStyles',
 						id: globalStylesId,
-				  } )
+					} )
 				: false;
 
 			return {
@@ -72,7 +72,7 @@ function Editor( {
 							'postType',
 							TEMPLATE_POST_TYPE,
 							templateId
-					  )
+						)
 					: undefined,
 				hasLoadedPost: hasFinishedResolution(
 					'getEntityRecord',
@@ -101,7 +101,7 @@ function Editor( {
 					{ ! error
 						? __(
 								"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-						  )
+							)
 						: error }
 				</Notice>
 			) }

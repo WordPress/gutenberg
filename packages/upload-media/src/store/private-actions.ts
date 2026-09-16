@@ -108,8 +108,8 @@ type ActionCreators = {
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
-type AllSelectors = typeof import('./selectors') &
-	typeof import('./private-selectors');
+type AllSelectors = typeof import( './selectors' ) &
+	typeof import( './private-selectors' );
 type CurriedState< F > = F extends ( state: State, ...args: infer P ) => infer R
 	? ( ...args: P ) => R
 	: F;
@@ -923,7 +923,7 @@ export function prepareItem( id: QueueItemId ) {
 							? getHeicUnsupportedMessage()
 							: __(
 									'This HEIC image could not be converted. Try converting it to JPEG before uploading.'
-							  ),
+								),
 						file,
 						cause: error instanceof Error ? error : undefined,
 					} )
