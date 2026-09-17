@@ -5359,7 +5359,7 @@
 	},
 	"packages/edit-site/src/components/add-new-template/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -8036,7 +8036,7 @@
 	},
 	"routes/template-list/add-new-template/index.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 3
 		}
 	},
 	"routes/template-list/stage.tsx": {
