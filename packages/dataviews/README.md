@@ -1112,6 +1112,7 @@ Function that determines whether the action can be performed for a given record.
 
 -   Type: `function`
 -   Optional. If not present, action is considered eligible for all items.
+-   In `DataViewsPicker`, the action's footer button is disabled while no selected item is eligible; the callback receives only the eligible items, while a `label` function receives the whole selection.
 -   Example:
 
 ```js
