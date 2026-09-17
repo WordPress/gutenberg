@@ -3,7 +3,7 @@ import type { RefObject } from 'react';
 import {
 	Dropdown,
 	FlexItem,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Icon as WCIcon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -91,7 +91,7 @@ function OperatorSelector( {
 					{ filter.name }
 				</FlexItem>
 
-				<SelectControl
+				<WCSelectControl
 					className="dataviews-filters__summary-operators-filter-select"
 					label={ __( 'Conditions' ) }
 					value={ value }

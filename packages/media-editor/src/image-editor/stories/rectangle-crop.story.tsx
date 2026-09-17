@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useCallback, useEffect, useRef } from '@wordpress/element';
 import {
 	Button,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	RangeControl,
 	ToggleControl,
 	Flex,
@@ -388,7 +388,7 @@ const WithControlsComponent = () => {
 						/>
 					</FlexItem>
 					<FlexItem>
-						<SelectControl
+						<WCSelectControl
 							label="Aspect ratio"
 							hideLabelFromVision
 							value={ aspectRatioValue }
@@ -409,7 +409,7 @@ const WithControlsComponent = () => {
 						/>
 					</FlexItem>
 					<FlexItem>
-						<SelectControl
+						<WCSelectControl
 							label="Grid"
 							hideLabelFromVision
 							value={ gridMode }
@@ -825,7 +825,7 @@ const DebugComponent = () => {
 						</Button>
 					</FlexItem>
 					<FlexItem>
-						<SelectControl
+						<WCSelectControl
 							label="Format"
 							hideLabelFromVision
 							value={ exportFormat as 'image/jpeg' }

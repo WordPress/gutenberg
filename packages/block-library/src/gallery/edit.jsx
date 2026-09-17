@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import {
-	SelectControl,
+	SelectControl as WCSelectControl,
 	ToggleControl,
 	RangeControl,
 	MenuGroup,
@@ -943,7 +943,7 @@ export default function GalleryEdit( props ) {
 									updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG )
 								}
 							>
-								<SelectControl
+								<WCSelectControl
 									label={ __( 'Resolution' ) }
 									help={ __(
 										'Select the size of the source images.'
@@ -1027,7 +1027,7 @@ export default function GalleryEdit( props ) {
 							}
 							isShownByDefault
 						>
-							<SelectControl
+							<WCSelectControl
 								label={ __( 'Aspect ratio' ) }
 								help={ __(
 									'Set a consistent aspect ratio for all images in the gallery.'

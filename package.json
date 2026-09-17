@@ -194,7 +194,7 @@
 		"test:unit:vitest:update": "npm run --workspace @wordpress/unit-tests test:unit:vitest:update --",
 		"test:unit:vitest:watch": "npm run --workspace @wordpress/unit-tests test:unit:vitest:watch --",
 		"test:unit:routing": "npm run --workspace @wordpress/unit-tests test:unit:routing --",
-		"test:unit:date": "bash ./bin/unit-test-date.sh",
+		"test:unit:date": "npm run --workspace @wordpress/unit-tests test:unit:date",
 		"test:unit:debug": "npm run --workspace @wordpress/unit-tests test:unit:debug --",
 		"test:unit:profile": "npm run --workspace @wordpress/unit-tests test:unit:profile --",
 		"test:unit:php:setup": "wp-env --config .wp-env.test.json start",
@@ -212,7 +212,6 @@
 		"typecheck": "npm run --workspace @wordpress/build-scripts typecheck --",
 		"wp-env": "wp-env",
 		"wp-env-test": "wp-env --config .wp-env.test.json",
-		"test:unit:jest": "npm run --workspace @wordpress/unit-tests test:unit:jest --",
 		"test:unit:consumers": "npm run --workspace @wordpress/validation-tools test-vitest-consumers --"
 	},
 	"workspaces": [
