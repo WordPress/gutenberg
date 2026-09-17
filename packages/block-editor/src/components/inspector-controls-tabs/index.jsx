@@ -30,18 +30,6 @@ export default function InspectorControlsTabs( {
 		return select( preferencesStore ).get( 'core', 'showIconLabels' );
 	}, [] );
 
-	// Get any requested inspector tab (used for initial state when programmatically switching)
-	const { requestedTab } = useSelect( ( select ) => ( {
-		requestedTab: unlock(
-			select( blockEditorStore )
-		).getRequestedInspectorTab(),
-	} ) );
-
-	const [ selectedTabId, setSelectedTabId ] = useState(
-		() => requestedTab?.tabName ?? tabs[ 0 ]?.name
-	);
-	const hasUserSelectionRef = useRef( false );
-	const isProgrammaticSwitchRef = useRef( false );
 	const {
 		__unstableSetOpenListViewPanel: setOpenListViewPanel,
 		__unstableIncrementListViewExpandRevision:
@@ -52,94 +40,92 @@ export default function InspectorControlsTabs( {
 		useDispatch( blockEditorStore )
 	);
 
-	// Reset when switching blocks
-	useEffect( () => {
-		hasUserSelectionRef.current = false;
-	}, [ clientId ] );
-
-	// The effects below run in declaration order within a commit, and two of
-	// them rely on it:
-	//
-	// 1. `selectedTabIdRef` is updated first, so the content-reset effect
-	//    reads the tab as of this commit rather than the previous one. That
-	//    matters when a selection change and a tab switch are batched
-	//    together, which is the case the reset effect has to recognise.
-	// 2. The content-reset effect runs before the `requestedTab` effect, so a
-	//    tab the request asks for is applied after any reset, not before it.
-	//
-	// Reordering them changes behaviour. Cover it with the component tests in
-	// ./test/index.jsdom.test.jsx before moving anything.
-	const selectedTabIdRef = useRef( selectedTabId );
-	useEffect( () => {
-		selectedTabIdRef.current = selectedTabId;
-	}, [ selectedTabId ] );
-
 	const hasListViewTab = tabs.some(
 		( tab ) => tab.name === TAB_LIST_VIEW.name
 	);
 
-	// Track the selection to auto-switch between the Content and List View
-	// tabs:
-	//   - selectedContentBlockId: the selected block when it is a direct
-	//     content item (may reset back to the Content tab).
-	//   - listChildClientId / listChildParentId: the selected block and its
-	//     list-view-enabled content ancestor when the selection sits inside
-	//     one (switches to the List View tab).
-	const { selectedContentBlockId, listChildClientId, listChildParentId } =
-		useSelect(
-			( select ) => {
-				if ( ! isSectionBlock ) {
-					return {
-						selectedContentBlockId: null,
-						listChildClientId: null,
-						listChildParentId: null,
-					};
-				}
-				const store = select( blockEditorStore );
-				const selectedId = store.getSelectedBlockClientId();
-				const childParentId =
-					unlock( store ).getListViewChildParentId(
-						contentClientIds
-					);
-				return {
-					selectedContentBlockId:
-						selectedId && contentClientIds?.includes( selectedId )
-							? selectedId
-							: null,
-					listChildClientId: childParentId ? selectedId : null,
-					listChildParentId: childParentId,
-				};
-			},
-			[ isSectionBlock, contentClientIds ]
-		);
+	// Everything the tab choice depends on, read in one pass:
+	//   - selectedBlockClientId: identifies the current selection, and so how
+	//     long an override below stays valid.
+	//   - selectedContentBlockId: set when the selection is a direct content
+	//     item, which suggests the Content tab.
+	//   - listChildParentId: the list-view-enabled content ancestor when the
+	//     selection sits inside one, which suggests the List View tab.
+	//   - requestedTab: an explicit request from elsewhere in the editor.
+	const {
+		selectedBlockClientId,
+		selectedContentBlockId,
+		listChildParentId,
+		requestedTab,
+	} = useSelect(
+		( select ) => {
+			const store = select( blockEditorStore );
+			const selectedId = store.getSelectedBlockClientId();
+			const privateStore = unlock( store );
+			return {
+				selectedBlockClientId: selectedId,
+				requestedTab: privateStore.getRequestedInspectorTab(),
+				selectedContentBlockId:
+					isSectionBlock &&
+					selectedId &&
+					contentClientIds?.includes( selectedId )
+						? selectedId
+						: null,
+				listChildParentId: isSectionBlock
+					? privateStore.getListViewChildParentId( contentClientIds )
+					: null,
+			};
+		},
+		[ isSectionBlock, contentClientIds ]
+	);
 
-	// When a content block is selected while on List View, reset to the
-	// Content tab — unless the List View was opened programmatically for that
-	// same block (switchToListView or requestInspectorTab record the block
-	// they opened it for below). The marker only lives until the next
-	// selection change, so it cannot suppress a reset for any other block.
-	const programmaticListViewClientIdRef = useRef( null );
-	useEffect( () => {
-		const programmaticClientId = programmaticListViewClientIdRef.current;
-		programmaticListViewClientIdRef.current = null;
-		if (
-			selectedContentBlockId &&
-			selectedContentBlockId !== programmaticClientId &&
-			selectedTabIdRef.current === TAB_LIST_VIEW.name
-		) {
-			setSelectedTabId( TAB_CONTENT.name );
-			hasUserSelectionRef.current = false;
+	// A tab the user picked, or that something else asked for, along with the
+	// block it was chosen for. It outranks the suggestion below until the
+	// selection moves to a different block.
+	//
+	// `forClientId` is the block the choice belongs to rather than the block
+	// selected when it was made, so a request that arrives just before its
+	// selection (as "Edit navigation" does) survives that selection landing.
+	const [ override, setOverride ] = useState( null );
+
+	// Drop a stale override during render rather than in an effect, so the
+	// tab never renders once with the outgoing value.
+	const [ lastSelection, setLastSelection ] = useState(
+		selectedBlockClientId
+	);
+	if ( lastSelection !== selectedBlockClientId ) {
+		setLastSelection( selectedBlockClientId );
+		if ( override && override.forClientId !== selectedBlockClientId ) {
+			setOverride( null );
 		}
-	}, [ selectedContentBlockId ] );
+	}
 
+	// What the selection alone implies. Selecting inside a list-view content
+	// block shows that block's List View; selecting a content item directly
+	// shows the content list.
+	let suggestedTabId = null;
+	if ( listChildParentId && hasListViewTab ) {
+		suggestedTabId = TAB_LIST_VIEW.name;
+	} else if ( selectedContentBlockId ) {
+		suggestedTabId = TAB_CONTENT.name;
+	}
+
+	const preferredTabId = override?.tabId ?? suggestedTabId ?? tabs[ 0 ]?.name;
+	// Fall back whenever the preferred tab is not on offer, which also covers
+	// the tab list changing underneath a choice.
+	const selectedTabId = tabs.some( ( tab ) => tab.name === preferredTabId )
+		? preferredTabId
+		: tabs[ 0 ]?.name;
+
+	// Open the ancestor's panel when the selection moves inside it. Skipped
+	// when that panel is already open, because reopening closes every other
+	// panel and remounts the ListView, dropping focus when the selection came
+	// from within it.
 	const registry = useRegistry();
 	useEffect( () => {
-		if ( ! listChildClientId || ! hasListViewTab ) {
+		if ( ! listChildParentId || ! hasListViewTab ) {
 			return;
 		}
-		// Leave panel state alone when the ancestor's panel is already open:
-		// re-opening would close every other panel and remount the ListView,
-		// dropping focus when the selection came from within it.
 		if (
 			! unlock(
 				registry.select( blockEditorStore )
@@ -148,13 +134,8 @@ export default function InspectorControlsTabs( {
 			setOpenListViewPanel( listChildParentId );
 			incrementListViewExpandRevision();
 		}
-		setSelectedTabId( TAB_LIST_VIEW.name );
-		// Keep the auto-selected tab sticky: without this the auto-select
-		// effect below would treat the tab as unset and jump back to the
-		// first tab.
-		hasUserSelectionRef.current = true;
 	}, [
-		listChildClientId,
+		selectedBlockClientId,
 		listChildParentId,
 		hasListViewTab,
 		registry,
@@ -162,105 +143,67 @@ export default function InspectorControlsTabs( {
 		incrementListViewExpandRevision,
 	] );
 
-	// Handle explicit inspector tab requests (panel opening, refs, clear).
-	// Tab state is initialized from requestedTab above.
+	// Apply an explicit request, then clear it.
 	useEffect( () => {
 		if ( ! requestedTab ) {
 			return;
 		}
 
-		// Switch to the requested tab
-		setSelectedTabId( requestedTab.tabName );
-
-		// Handle tab-specific options
-		if ( requestedTab.tabName === TAB_LIST_VIEW.name ) {
-			if ( requestedTab.options?.openPanel ) {
-				// Open the specific panel for List View
-				setOpenListViewPanel( requestedTab.options.openPanel );
-				incrementListViewExpandRevision();
-			}
-			// Record which block's List View was opened on purpose so the
-			// content-reset effect does not undo this switch.
-			programmaticListViewClientIdRef.current =
-				requestedTab.options?.openPanel ?? selectedContentBlockId;
+		const openPanel = requestedTab.options?.openPanel;
+		if ( requestedTab.tabName === TAB_LIST_VIEW.name && openPanel ) {
+			setOpenListViewPanel( openPanel );
+			incrementListViewExpandRevision();
 		}
 
-		// Flag as programmatic so handleTabSelect skips the setAllListViewPanelsOpen
-		// call — requestedTab already specified the exact panel to open.
-		isProgrammaticSwitchRef.current = true;
-		hasUserSelectionRef.current = true;
+		setOverride( {
+			tabId: requestedTab.tabName,
+			forClientId: openPanel ?? selectedBlockClientId,
+			// The request named the panel to open, so the List View tab must
+			// not also expand everything below.
+			panelChosen: !! openPanel,
+		} );
 
-		// Clear the request
 		clearRequestedInspectorTab();
 	}, [
 		requestedTab,
-		selectedContentBlockId,
+		selectedBlockClientId,
 		setOpenListViewPanel,
 		incrementListViewExpandRevision,
 		clearRequestedInspectorTab,
 	] );
 
-	// Initialize List View panels when the tab is selected and clientId changes
+	// Entering List View without a particular panel in mind expands them all.
+	const showingWholeListView =
+		selectedTabId === TAB_LIST_VIEW.name &&
+		! override?.panelChosen &&
+		! listChildParentId;
 	useEffect( () => {
-		if (
-			selectedTabId === TAB_LIST_VIEW.name &&
-			! hasUserSelectionRef.current
-		) {
+		if ( showingWholeListView ) {
 			setAllListViewPanelsOpen();
 			incrementListViewExpandRevision();
 		}
 	}, [
 		clientId,
-		selectedTabId,
+		showingWholeListView,
 		setAllListViewPanelsOpen,
 		incrementListViewExpandRevision,
 	] );
 
-	// Auto-select first available tab unless user has made a selection
-	useEffect( () => {
-		if (
-			! tabs?.length ||
-			( hasUserSelectionRef.current &&
-				tabs.some( ( tab ) => tab.name === selectedTabId ) )
-		) {
-			return;
-		}
-
-		const firstTabName = tabs[ 0 ]?.name;
-		if ( selectedTabId !== firstTabName ) {
-			setSelectedTabId( firstTabName );
-		}
-	}, [ tabs, selectedTabId ] );
-
 	const handleTabSelect = ( tabId ) => {
-		setSelectedTabId( tabId );
-		hasUserSelectionRef.current = true;
-
-		// If manually switching to List View tab (not via click-through), open all panels
-		if (
-			tabId === TAB_LIST_VIEW.name &&
-			! isProgrammaticSwitchRef.current
-		) {
-			setAllListViewPanelsOpen();
-			incrementListViewExpandRevision();
-		}
-
-		// Reset the flag
-		isProgrammaticSwitchRef.current = false;
+		setOverride( { tabId, forClientId: selectedBlockClientId } );
 	};
 
 	const switchToListView = ( targetClientId ) => {
-		if ( hasListViewTab ) {
-			// Open only the target panel
-			setOpenListViewPanel( targetClientId );
-			incrementListViewExpandRevision();
-			// Mark this as a programmatic switch
-			isProgrammaticSwitchRef.current = true;
-			// Record which block's List View was opened on purpose so the
-			// content-reset effect does not immediately undo this.
-			programmaticListViewClientIdRef.current = targetClientId;
-			handleTabSelect( TAB_LIST_VIEW.name );
+		if ( ! hasListViewTab ) {
+			return;
 		}
+		setOpenListViewPanel( targetClientId );
+		incrementListViewExpandRevision();
+		setOverride( {
+			tabId: TAB_LIST_VIEW.name,
+			forClientId: targetClientId,
+			panelChosen: true,
+		} );
 	};
 
 	return (
