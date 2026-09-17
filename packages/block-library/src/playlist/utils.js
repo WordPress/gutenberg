@@ -67,6 +67,10 @@ export function getTrackAttributes( media ) {
 			media?.media_details?.album ||
 			__( 'Unknown album' ),
 		length: media?.fileLength || media?.media_details?.length_formatted,
+		// Cleared explicitly. Callers spread this over the existing attributes,
+		// so a key that is absent here keeps its previous value — which would
+		// leave the outgoing track's waveform drawn over the incoming audio.
+		waveform: undefined,
 		...getTrackImageAttributes( media?.image ),
 	};
 }

@@ -5,6 +5,7 @@ import {
 	setupPlayButtonArtwork,
 	updateSeekControlLabel,
 } from '../utils/waveform-utils';
+import { decodePeaks } from '../utils/waveform-peaks';
 
 /**
  * Store player state for each element.
@@ -97,6 +98,11 @@ const { state } = store(
  */
 function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const existing = playerState.get( ref );
+	// Peaks stored when the track was added. Supplying them means the player
+	// never fetches the audio to analyse it, which is the only way to draw a
+	// real waveform for media hosted on an origin that blocks cross-origin
+	// reads. Null when absent or unusable, and the player analyses as before.
+	const waveform = decodePeaks( track.waveform );
 	const showPlayButtonArtwork = context.showPlayButtonArtwork === true;
 	const playerArtwork = showPlayButtonArtwork ? '' : track.image;
 
@@ -114,6 +120,9 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 				.loadTrack( track.url, track.title, track.artist, {
 					artwork: playerArtwork,
 					artworkAlt: playerArtwork ? track.imageAlt : '',
+					// Only sent when there are peaks to send: loadTrack()
+					// clears any previous waveform either way.
+					...( waveform ? { waveform } : {} ),
 				} )
 				.then( () => {
 					existing.url = track.url;
@@ -162,6 +171,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		autoPlay: shouldAutoPlay,
 		labels,
 		waveformStyle: context.waveformStyle,
+		waveform,
 		showPlayButtonArtwork,
 		onEnded: () => {
 			// Advance to next track (autoPlay handles playback).
