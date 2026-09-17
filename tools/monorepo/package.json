@@ -27,10 +27,15 @@
 	"devDependencies": {
 		"@testing-library/jest-dom": "^7.0.1",
 		"@types/react": "^18.3.27",
+		"@wordpress/admin-ui": "file:../../packages/admin-ui",
 		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/theme": "file:../../packages/theme",
 		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"wpds:admin-scheme-tokens": "node wpds/generate-admin-scheme-tokens.mjs"
 	}
 }
