@@ -11,7 +11,7 @@ import {
 	useContext,
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { useMergeRefs, useInstanceId } from '@wordpress/compose';
+import { useMergeRefs, useInstanceId, useRefEffect } from '@wordpress/compose';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
@@ -479,6 +479,44 @@ function RichTextWrapper(
 		anchorRef.current?.focus();
 	}
 
+	// Under the editing host the element is not a focus target (no tabindex
+	// and no contenteditable attribute of its own, see below), so a
+	// `focus()` call on it would do nothing. Keep it working for existing
+	// callers: place the caret in the element and focus the host instead.
+	const focusUnderHostRef = useRefEffect(
+		( element ) => {
+			if ( ! isEditingHost ) {
+				return;
+			}
+
+			const { ownerDocument } = element;
+
+			element.focus = ( options ) => {
+				const host = element.parentElement?.closest(
+					'[contenteditable="true"]'
+				);
+				const selection = ownerDocument.defaultView.getSelection();
+
+				if ( ! element.contains( selection.anchorNode ) ) {
+					selection.collapse( element, 0 );
+				}
+
+				if (
+					host &&
+					( ownerDocument.activeElement !== host ||
+						! ownerDocument.hasFocus() )
+				) {
+					host.focus( { preventScroll: true, ...options } );
+				}
+			};
+
+			return () => {
+				delete element.focus;
+			};
+		},
+		[ isEditingHost ]
+	);
+
 	// Setting tabIndex to 0 is unnecessary, the element is already focusable
 	// because it's contentEditable. This also fixes a Safari bug where it's
 	// not possible to Shift+Click multi select blocks when Shift Clicking
@@ -578,6 +616,7 @@ function RichTextWrapper(
 					} ),
 					anchorRef,
 					setAnchorElement,
+					focusUnderHostRef,
 				] ) }
 				contentEditable={
 					// Under the editing host the child is editable by
