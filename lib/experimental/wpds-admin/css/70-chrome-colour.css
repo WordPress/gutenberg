@@ -1,5 +1,5 @@
 /**
- * Classic admin chrome — the admin menu and the admin bar — coloured from
+ * Admin chrome — the admin menu and the admin bar — coloured from
  * WordPress Design System tokens.
  *
  * SCOPE: the default colour scheme only, and chrome only. The other seven
@@ -24,13 +24,13 @@
  *
  * TWO DELIBERATE CHANGES, both consequences of using only tokens that exist:
  *
- * 1. Submenus get LIGHTER, not darker. Core recesses them to #0c0c0c; the
+ * 1. Submenus get LIGHTER, not darker. WordPress recesses them to #0c0c0c; the
  *    nearest thing the system has is #2d2d2d, which is lighter than the menu.
  *    Treating a submenu as raised rather than sunk is the usual convention for
  *    dark interfaces, so this follows it deliberately instead of picking an
  *    untokenised value.
  *
- * 2. Submenu text stops being dimmer. Core carries the menu/submenu hierarchy
+ * 2. Submenu text stops being dimmer. WordPress carries the menu/submenu hierarchy
  *    in text colour (#bbb against #fff); there is no dimmer light foreground in
  *    the system that keeps 4.5:1 on these surfaces. So hierarchy moves from the
  *    text to the surface, which is what the surface change above is for. This
@@ -77,7 +77,7 @@
 	/* -----------------------------------------------------------------------
 	   Admin menu — text and icons
 
-	   Core gives icons `hsl(<hue of the scheme base>, 7%, 95%)`, which lands on
+	   WordPress gives icons `hsl(<hue of the scheme base>, 7%, 95%)`, which lands on
 	   a faintly warm off-white that no one chose — it falls out of the formula.
 	   Icons and labels take the same neutral foreground here.
 	   ----------------------------------------------------------------------- */
@@ -193,7 +193,7 @@
 	/* -----------------------------------------------------------------------
 	   Admin bar — hover
 
-	   Only the surface moves. The hover text colour is Core's `#7b90ff`, left
+	   Only the surface moves. The hover text colour is WordPress's `#7b90ff`, left
 	   alone for the reason given in the file header.
 	   ----------------------------------------------------------------------- */
 
