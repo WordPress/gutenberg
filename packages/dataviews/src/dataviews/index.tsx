@@ -20,7 +20,7 @@ import DataViewsLayout from '../components/dataviews-layout';
 import DataViewsFooter from '../components/dataviews-footer';
 import DataViewsSearch from '../components/dataviews-search';
 import { BulkActions } from '../components/dataviews-bulk-actions';
-import DataViewsBulkActionsHeader from '../components/dataviews-bulk-actions/header';
+import DefaultBulkActionsHeader from '../components/dataviews-bulk-actions/default-header';
 import { DataViewsPagination } from '../components/dataviews-pagination';
 import DataViewsViewConfig, {
 	DataviewsViewConfigDropdown,
@@ -81,9 +81,9 @@ function DefaultUI( {
 				</Stack>
 			</Stack>
 			<FiltersToggled className="dataviews-filters__container" />
-			<DataViewsBulkActionsHeader>
+			<DefaultBulkActionsHeader>
 				<DataViewsLayout />
-			</DataViewsBulkActionsHeader>
+			</DefaultBulkActionsHeader>
 			<DataViewsFooter />
 		</>
 	);
