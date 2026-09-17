@@ -64,7 +64,7 @@ Run `npm run lint` independently for code style checks. [ESLint](https://eslint.
 
 `npm run test:unit:routing` compares live Vitest discovery with the repository's test-file patterns. Each discovered test must belong to exactly one project, selected by its filename. The check rejects missing tests, duplicate ownership, per-file environment overrides, and obsolete Jest runner infrastructure. It does not depend on a fixed test count or migration metadata. The required `All` CI check runs it.
 
-`npm run test:unit:conventions` checks explicit Vitest imports, workspace dependencies, the TypeScript test graph, environment conventions, and isolation defaults. Keep the existing Node 24/26 matrix, four Node/jsdom shards per runtime, one Chromium job on Node 24, timezone checks, and Storybook smoke coverage when changing test infrastructure. `npm run test:unit:vitest:shuffled` shuffles files with the fixed seed `80855`. It does not shuffle tests inside each file.
+`npm run test:unit:conventions` checks explicit Vitest imports, workspace dependencies, the TypeScript test graph, environment conventions, and isolation defaults. Keep the existing Node 24/26 matrix, four Node/jsdom shards per runtime, one Chromium job on Node 24, timezone checks, and Storybook smoke coverage when changing test infrastructure. `npm run test:unit:vitest:shuffled` shuffles files and tests inside each file with the fixed seed `80855`.
 
 #### Public tooling consumers
 
