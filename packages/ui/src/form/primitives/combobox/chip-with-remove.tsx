@@ -21,24 +21,31 @@ export const ChipWithRemove = forwardRef<
 		children,
 		prefix,
 		removeLabel = __( 'Remove' ),
+		'aria-label': ariaLabel,
 		'aria-describedby': ariaDescribedby,
 		...restProps
 	},
 	ref
 ) {
+	const labelId = useId();
 	const hintId = useId();
+	const chipAriaLabel =
+		ariaLabel ?? ( typeof children === 'string' ? children : undefined );
 
 	return (
 		<_Combobox.Chip
 			ref={ ref }
 			className={ clsx( styles.chip, className ) }
 			{ ...restProps }
+			aria-label={ chipAriaLabel }
 			aria-describedby={ clsx( ariaDescribedby, hintId ) || undefined }
 		>
 			{ prefix && (
 				<span className={ styles[ 'chip-prefix' ] }>{ prefix }</span>
 			) }
-			<span className={ styles[ 'chip-content' ] }>{ children }</span>
+			<span id={ labelId } className={ styles[ 'chip-content' ] }>
+				{ children }
+			</span>
 			<VisuallyHidden id={ hintId } aria-hidden="true">
 				{ __( 'Press Backspace or Delete to remove.' ) }
 			</VisuallyHidden>
@@ -54,7 +61,11 @@ export const ChipWithRemove = forwardRef<
 						focusableWhenDisabled={ false }
 						disabled={ disabled }
 						{ ...props }
-						aria-hidden
+						aria-describedby={
+							clsx( props[ 'aria-describedby' ], labelId ) ||
+							undefined
+						}
+						aria-hidden={ disabled || undefined }
 					/>
 				) }
 			/>

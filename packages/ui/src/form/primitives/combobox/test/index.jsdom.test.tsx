@@ -74,6 +74,44 @@ describe( 'Combobox', () => {
 		expect( trigger ).toHaveTextContent( 'Choose an item' );
 	} );
 
+	it( 'names chips from string children and describes shared Remove buttons with that label', () => {
+		render(
+			<Combobox.Root< Item, true >
+				items={ ITEMS }
+				multiple
+				defaultValue={ [ ITEMS[ 0 ], ITEMS[ 1 ] ] }
+			>
+				<Combobox.Chips>
+					<Combobox.Value>
+						{ ( value: Item[] ) => (
+							<>
+								{ value.map( ( item ) => (
+									<Combobox.ChipWithRemove key={ item.id }>
+										{ item.value }
+									</Combobox.ChipWithRemove>
+								) ) }
+							</>
+						) }
+					</Combobox.Value>
+				</Combobox.Chips>
+			</Combobox.Root>
+		);
+
+		expect( screen.getByLabelText( 'Item 1' ) ).toHaveAccessibleName(
+			'Item 1'
+		);
+		expect( screen.getByLabelText( 'Item 2' ) ).toHaveAccessibleName(
+			'Item 2'
+		);
+
+		const removeButtons = screen.getAllByRole( 'button', {
+			name: 'Remove',
+		} );
+		expect( removeButtons ).toHaveLength( 2 );
+		expect( removeButtons[ 0 ] ).toHaveAccessibleDescription( 'Item 1' );
+		expect( removeButtons[ 1 ] ).toHaveAccessibleDescription( 'Item 2' );
+	} );
+
 	it( 'describes ChipWithRemove with the Backspace or Delete hint by default', () => {
 		render(
 			<Combobox.Root< Item, true >
@@ -97,12 +135,9 @@ describe( 'Combobox', () => {
 			</Combobox.Root>
 		);
 
-		expect(
-			screen.queryByRole( 'button', { name: 'Remove' } )
-		).not.toBeInTheDocument();
-		expect(
-			screen.getByText( 'Press Backspace or Delete to remove.' )
-		).toBeInTheDocument();
+		expect( screen.getByLabelText( 'Item 1' ) ).toHaveAccessibleDescription(
+			'Press Backspace or Delete to remove.'
+		);
 	} );
 
 	describe( 'when disabled', () => {
