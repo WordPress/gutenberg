@@ -100,7 +100,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				config.env.tests,
 				hostUser.name,
 				'tests-wordpress'
-		  )
+			)
 		: [];
 
 	// We use a custom Dockerfile in order to make sure that

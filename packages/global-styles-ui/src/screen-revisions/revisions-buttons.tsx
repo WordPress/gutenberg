@@ -73,13 +73,13 @@ function getRevisionLabel(
 				),
 				authorDisplayName,
 				formattedModifiedDate
-		  )
+			)
 		: sprintf(
 				// translators: 1: author display name. 2: revision creation date.
 				__( 'Changes saved by %1$s on %2$s' ),
 				authorDisplayName,
 				formattedModifiedDate
-		  );
+			);
 }
 
 interface RevisionButtonsProps {
@@ -151,7 +151,7 @@ function RevisionsButtons( {
 						: humanTimeDiff(
 								modifiedString ?? modifiedDate,
 								undefined
-						  );
+							);
 				const revisionLabel = getRevisionLabel(
 					id,
 					authorDisplayName,

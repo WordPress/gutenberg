@@ -267,7 +267,7 @@ function ApiKeyConnector( {
 								: async () => {
 										await removeApiKey();
 										actionButtonRef.current?.focus();
-								  }
+									}
 						}
 						onSave={ async ( apiKey: string ) => {
 							await saveApiKey( apiKey );
@@ -369,7 +369,7 @@ function ApplicationPasswordConnector( {
 								: async () => {
 										await removeCredentials();
 										actionButtonRef.current?.focus();
-								  }
+									}
 						}
 						onSave={ async ( credentials ) => {
 							await saveCredentials( credentials );
