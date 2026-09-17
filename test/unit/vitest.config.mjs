@@ -5,6 +5,7 @@ import { playwright } from '@vitest/browser-playwright';
 import { globSync } from 'glob';
 import { defineConfig } from 'vitest/config';
 import { createVitePlugins } from './config/vite-plugins.mjs';
+import { createPostcssBrowserPlugin } from './config/postcss-browser-plugin.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -195,6 +196,9 @@ export default defineConfig( {
 				 */
 				root: CONFIG_DIR,
 				optimizeDeps: {
+					rolldownOptions: {
+						plugins: [ createPostcssBrowserPlugin( ROOT_DIR ) ],
+					},
 					entries: vitestTests.browser.map( ( testPath ) =>
 						path.join( ROOT_DIR, testPath )
 					),
