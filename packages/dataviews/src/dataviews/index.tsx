@@ -19,8 +19,8 @@ import {
 import DataViewsLayout from '../components/dataviews-layout';
 import DataViewsFooter from '../components/dataviews-footer';
 import DataViewsSearch from '../components/dataviews-search';
-import { BulkActions } from '../components/dataviews-bulk-actions';
-import DefaultBulkActionsHeader from '../components/dataviews-bulk-actions/default-header';
+import { BulkActionToolbar } from '../components/dataviews-bulk-actions';
+import { BulkActionToolbarProvider } from '../components/dataviews-bulk-actions/toolbar-context';
 import { DataViewsPagination } from '../components/dataviews-pagination';
 import DataViewsViewConfig, {
 	DataviewsViewConfigDropdown,
@@ -81,9 +81,8 @@ function DefaultUI( {
 				</Stack>
 			</Stack>
 			<FiltersToggled className="dataviews-filters__container" />
-			<DefaultBulkActionsHeader>
-				<DataViewsLayout />
-			</DefaultBulkActionsHeader>
+			<BulkActionToolbar />
+			<DataViewsLayout />
 			<DataViewsFooter />
 		</>
 	);
@@ -263,11 +262,13 @@ function DataViews< Item >( {
 		>
 			<div className="dataviews-wrapper">
 				{ children ?? (
-					<DefaultUI
-						header={ header }
-						search={ search }
-						searchLabel={ searchLabel }
-					/>
+					<BulkActionToolbarProvider>
+						<DefaultUI
+							header={ header }
+							search={ search }
+							searchLabel={ searchLabel }
+						/>
+					</BulkActionToolbarProvider>
 				) }
 			</div>
 		</DataViewsContext.Provider>
@@ -281,7 +282,7 @@ function DataViews< Item >( {
  */
 // Populate the DataViews sub components
 const DataViewsSubComponents = DataViews as typeof DataViews & {
-	BulkActionToolbar: () => React.JSX.Element;
+	BulkActionToolbar: typeof BulkActionToolbar;
 	Filters: typeof Filters;
 	FiltersToggle: typeof FiltersToggle;
 	FiltersToggled: typeof FiltersToggled;
@@ -293,7 +294,7 @@ const DataViewsSubComponents = DataViews as typeof DataViews & {
 	Footer: typeof DataViewsFooter;
 };
 
-DataViewsSubComponents.BulkActionToolbar = BulkActions;
+DataViewsSubComponents.BulkActionToolbar = BulkActionToolbar;
 DataViewsSubComponents.Filters = Filters;
 DataViewsSubComponents.FiltersToggled = FiltersToggled;
 DataViewsSubComponents.FiltersToggle = FiltersToggle;

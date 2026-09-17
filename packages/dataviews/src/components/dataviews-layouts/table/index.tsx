@@ -11,7 +11,7 @@ import {
 } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
 import DataViewsContext from '../../dataviews-context';
-import TableSelectionContext from '../../dataviews-bulk-actions/table-selection-context';
+import BulkActionToolbarContext from '../../dataviews-bulk-actions/toolbar-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import ItemActions from '../../dataviews-item-actions';
 import { MEDIA_ASPECT_RATIOS, sortValues } from '../../../constants';
@@ -274,7 +274,7 @@ function ViewTable< Item >( {
 	empty,
 }: ViewTableProps< Item > ) {
 	const { containerRef, isDefaultUI } = useContext( DataViewsContext );
-	const tableSelection = useContext( TableSelectionContext );
+	const tableSelection = useContext( BulkActionToolbarContext );
 	const isDelayedLoading = useDelayedLoading( isLoading );
 	const groupField = view.groupBy?.field
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
