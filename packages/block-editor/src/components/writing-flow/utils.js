@@ -11,6 +11,7 @@ import {
 import { getPasteEventData } from '../../utils/pasting';
 import { store as blockEditorStore } from '../../store';
 
+export { getEventTarget } from './get-event-target';
 export const requiresWrapperOnCopy = Symbol( 'requiresWrapperOnCopy' );
 
 /**

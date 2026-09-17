@@ -8,6 +8,7 @@ import {
 	getBlockClientId,
 	getSelectionEditableElement,
 } from '../../utils/dom';
+import { getEventTarget } from './get-event-target';
 
 export default function useSelectAll() {
 	const { getBlockOrder, getSelectedBlockClientIds, getBlockRootClientId } =
@@ -27,10 +28,13 @@ export default function useSelectAll() {
 			// When the wrapper is contentEditable and holds focus (the
 			// selected block supports `editableRoot`), the event targets the
 			// wrapper; resolve the editable element containing the selection.
+			// Prefer the composed path so open shadow-root fields are not
+			// treated as the host.
+			const eventTarget = getEventTarget( event );
 			const editable =
 				( event.target === node &&
 					getSelectionEditableElement( selection, node ) ) ||
-				event.target;
+				eventTarget;
 
 			if (
 				selectedClientIds.length < 2 &&
