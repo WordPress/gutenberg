@@ -13,7 +13,7 @@ const LOCALES = [ 'en_US', 'ja_JP' ];
 
 const vitestBin = resolvePackageBin( 'vitest' );
 
-function runDateTests( timezone, locale ) {
+function runDateTests( timezone: string, locale: string ): Promise< boolean > {
 	const child = spawn(
 		process.execPath,
 		[ vitestBin, 'run', '--config', VITEST_CONFIG, 'packages/date' ],
