@@ -136,7 +136,9 @@ $navigation-icon-size: 24px;
 
 		// Flyout submenus are separate panels, so they keep their own
 		// alignment rather than following the parent menu's justification.
-		.wp-block-navigation__submenu-container {
+		// open-always submenus render inline as part of the same vertical
+		// stack instead, so they should keep following it.
+		.wp-block-navigation-item:not(.open-always) > .wp-block-navigation__submenu-container {
 			text-align: initial;
 		}
 	}
