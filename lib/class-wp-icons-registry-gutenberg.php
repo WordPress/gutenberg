@@ -208,7 +208,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				_doing_it_wrong(
 					__METHOD__,
 					__( 'Icon keywords must be an array of strings.', 'gutenberg' ),
-					'7.1.0'
+					'7.2.0'
 				);
 				return false;
 			}
