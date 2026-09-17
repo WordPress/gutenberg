@@ -10,7 +10,7 @@
 
 -   `recommended`: Apply the TypeScript rules and parser to `.mts` and `.cts` files ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
 -   `recommended`: Resolve imports through `.mjs`, `.cjs`, `.mts` and `.cts`, and exempt `.d.mts` and `.d.cts` from the TypeScript resolver settings alongside `.d.ts` ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
--   `no-i18n-in-save`: Recognise `save.mts`, `save.cts`, `deprecated.mts` and `deprecated.cts` ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   `no-i18n-in-save`: Recognise the `.mjs`, `.cjs`, `.mts` and `.cts` spellings of `save` and `deprecated` ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
 
 ## 26.0.0 (2026-09-10)
 
