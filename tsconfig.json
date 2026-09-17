@@ -95,6 +95,7 @@
 		{ "path": "test/e2e" },
 		{ "path": "test/performance" },
 		{ "path": "test/storybook-playwright" },
+		{ "path": "test/unit" },
 		{ "path": "widgets" }
 	],
 	"files": []

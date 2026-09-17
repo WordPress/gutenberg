@@ -56,7 +56,7 @@ const vitestInfrastructure = [
 			nodir: true,
 		}
 	),
-	...globSync( 'test/unit/scripts/*.mjs', {
+	...globSync( 'test/unit/scripts/*.{mjs,mts}', {
 		cwd: ROOT_DIR,
 		nodir: true,
 	} ),
