@@ -3,7 +3,9 @@ import { useRegistry } from '@wordpress/data';
 import { useContext, useMemo, useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
-import DataViewsPagination from '../dataviews-pagination';
+import DataViewsPagination, {
+	hasPaginationControls,
+} from '../dataviews-pagination';
 import DataViewsContext from '../dataviews-context';
 import type { SetSelection } from '../../types/private';
 import type { Action } from '../../types';
@@ -248,7 +250,8 @@ export function DataViewsPickerBulkActionToolbar() {
 }
 
 // The full picker footer: bulk-selection info, pagination, and actions — the
-// picker counterpart to `DataViews.Footer`.
+// picker counterpart to `DataViews.Footer`, and structured like it so that the
+// footer stacks its rows in narrow containers, such as a sidebar.
 export function DataViewsPickerFooter() {
 	const {
 		actions = EMPTY_ARRAY,
@@ -256,26 +259,23 @@ export function DataViewsPickerFooter() {
 		view,
 	} = useContext( DataViewsContext );
 
-	const hasPagination =
-		! view.infiniteScrollEnabled &&
-		!! paginationInfo.totalItems &&
-		paginationInfo.totalPages > 1;
-
-	if ( ! actions.length && ! hasPagination ) {
+	if ( ! actions.length && ! hasPaginationControls( view, paginationInfo ) ) {
 		return null;
 	}
 
 	return (
-		<Stack
-			direction="row"
-			justify="space-between"
-			align="center"
-			className="dataviews-footer"
-			gap="sm"
-		>
-			<PickerBulkSelectionInfo />
-			<DataViewsPagination />
-			<PickerActions />
-		</Stack>
+		<div className="dataviews-footer">
+			<Stack
+				direction="row"
+				justify="space-between"
+				align="center"
+				className="dataviews-footer__content"
+				gap="sm"
+			>
+				<PickerBulkSelectionInfo />
+				<DataViewsPagination />
+				<PickerActions />
+			</Stack>
+		</div>
 	);
 }
