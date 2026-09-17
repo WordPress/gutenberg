@@ -348,6 +348,38 @@ describe( 'ScreenRevisions', () => {
 		);
 	} );
 
+	it( 'closes the confirmation without applying when the selected revision is gone', async () => {
+		useNavigator.mockReturnValue( { params: { revisionId: '9' }, goTo } );
+		useGlobalStylesRevisions.mockImplementation( ( { query } ) => ( {
+			revisions: query.page === 1 ? REVISIONS : OLDER_REVISIONS,
+			isLoading: false,
+			hasUnsavedChanges: true,
+			revisionsCount: 12,
+		} ) );
+
+		const { onChange } = renderScreen( {
+			userConfig: { styles: STYLES_B, settings: {} },
+		} );
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Apply' } )
+		);
+		const dialog = screen.getByRole( 'dialog' );
+
+		// The page changes underneath the open dialog and no longer carries
+		// revision 9. The dialog hides the rest of the screen from the
+		// accessibility tree, hence the hidden option.
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Next page', hidden: true } )
+		);
+
+		await userEvent.click(
+			within( dialog ).getByRole( 'button', { name: 'Apply' } )
+		);
+		expect( onChange ).not.toHaveBeenCalled();
+		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+	} );
+
 	it( 'navigates to the clicked revision and ignores empty selections', async () => {
 		renderScreen();
 

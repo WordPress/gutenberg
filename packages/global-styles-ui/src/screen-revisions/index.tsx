@@ -95,13 +95,14 @@ function ScreenRevisions() {
 
 	const restoreRevision = useCallback(
 		( revision?: Revision ) => {
-			// The current page holds no selected revision once the user
-			// paginates away from it. There is nothing to apply then.
+			// The confirmation dialog can outlive its revision: the page
+			// reloads or changes underneath it, and the selection is gone by
+			// the time the user confirms. Close the dialog and apply nothing.
+			setIsLoadingRevisionWithUnsavedChanges( false );
 			if ( ! revision ) {
 				return;
 			}
 			setUserConfig( revision );
-			setIsLoadingRevisionWithUnsavedChanges( false );
 			closeRevisions();
 		},
 		[ setUserConfig, closeRevisions ]
