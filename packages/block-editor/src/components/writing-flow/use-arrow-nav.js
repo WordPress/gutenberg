@@ -106,18 +106,16 @@ export function getClosestTabbable(
 	if ( targetIndex !== -1 ) {
 		focusableNodes = focusableNodes.slice( targetIndex + 1 );
 	} else {
-		// The target is not focusable itself (e.g. an editable that is an
-		// inert part of the editing host): consider the focusables on the
-		// navigation side of it in document order. Without this, the slice
-		// would start from the beginning and navigation could jump to an
-		// unrelated focusable, e.g. the post title above the block.
+		// The target is not focusable (the selected block's editable under
+		// the editing host has no tabindex): take the focusables on the
+		// navigation side of it in document order, not its descendants.
 		focusableNodes = focusableNodes.filter( ( focusableNode ) => {
 			const position = target.compareDocumentPosition( focusableNode );
 			const mask = isReverse
 				? target.DOCUMENT_POSITION_PRECEDING
 				: target.DOCUMENT_POSITION_FOLLOWING;
 			// eslint-disable-next-line no-bitwise
-			return !! ( position & mask );
+			return !! ( position & mask ) && ! target.contains( focusableNode );
 		} );
 	}
 
@@ -163,15 +161,15 @@ export function getClosestTabbable(
 			return false;
 		}
 
-		// Skip elements that are not really tabbable: an element that is
-		// only focusable through inherited editability, without being made
-		// tabbable explicitly, is not in the browser's tab order within the
-		// editable, e.g. a link within editable text. The tabbable utility
-		// does not account for that.
+		// Skip focusable elements such as links within content editable
+		// nodes: nodes whose closest editable host is an editable element
+		// within a block. When an editable root (e.g. the canvas wrapper)
+		// is the editing host, everything within it is content editable,
+		// but focusables like block wrappers are not text content.
 		if (
 			node.isContentEditable &&
 			node.contentEditable !== 'true' &&
-			! node.hasAttribute( 'tabindex' )
+			getBlockClientId( node.closest( '[contenteditable="true"]' ) )
 		) {
 			return false;
 		}
@@ -197,8 +195,6 @@ export default function useArrowNav() {
 	const {
 		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
-		getBlockOrder,
-		getBlockRootClientId,
 		getNextBlockClientId,
 		getPreviousBlockClientId,
 		getSelectedBlockClientId,
@@ -218,34 +214,13 @@ export default function useArrowNav() {
 			verticalRect = null;
 		}
 
-		function getAdjacentBlockInAnyLevel( clientId, isReverse ) {
-			// In document order, a block's own content is followed by its
-			// inner blocks and preceded by its ancestor's content.
-			if ( ! isReverse && getBlockOrder( clientId ).length ) {
-				return getBlockOrder( clientId )[ 0 ];
-			}
-
-			let current = clientId;
-
-			while ( current ) {
-				const adjacent = isReverse
-					? getPreviousBlockClientId( current )
-					: getNextBlockClientId( current );
-
-				if ( adjacent ) {
-					return adjacent;
-				}
-
-				const parent = getBlockRootClientId( current );
-
-				if ( isReverse && parent ) {
-					return parent;
-				}
-
-				current = parent;
-			}
-
-			return null;
+		function isClosestTabbableABlock( target, isReverse ) {
+			const closestTabbable = getClosestTabbable(
+				target,
+				isReverse,
+				node
+			);
+			return closestTabbable && getBlockClientId( closestTabbable );
 		}
 
 		function onKeyDown( event ) {
@@ -384,16 +359,7 @@ export default function useArrowNav() {
 
 			if ( shiftKey ) {
 				if ( isNavEdge( target, isReverse ) ) {
-					// Whether there is a block to extend the selection
-					// into is a question of document order: the adjacent
-					// block at this level, or, at the edge of a container,
-					// the block adjacent to an ancestor.
-					const hasBlockToExtendInto = !! getAdjacentBlockInAnyLevel(
-						getSelectedBlockClientId(),
-						isReverse
-					);
-
-					if ( hasBlockToExtendInto ) {
+					if ( isClosestTabbableABlock( target, isReverse ) ) {
 						setContentEditableWrapper( node, true );
 					} else if ( node.contentEditable === 'true' ) {
 						// There is no block to extend the selection into.

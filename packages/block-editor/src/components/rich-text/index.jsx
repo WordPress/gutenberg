@@ -380,8 +380,10 @@ function RichTextWrapper(
 
 		// A pointer press outside the field makes it non editable until the
 		// release (see rich text's preventFocusCapture). Focusing it then
-		// makes the block focus handler drop the text selection.
-		if ( ! isSelected || element?.contentEditable !== 'true' ) {
+		// makes the block focus handler drop the text selection. Under the
+		// editing host the field is editable by inheritance and the host is
+		// focused below.
+		if ( ! isSelected || element?.contentEditable === 'false' ) {
 			return;
 		}
 
@@ -488,11 +490,20 @@ function RichTextWrapper(
 			}
 
 			const { ownerDocument } = element;
+			const { focus: nativeFocus } = element;
 
 			element.focus = ( options ) => {
 				const host = element.parentElement?.closest(
 					'[contenteditable="true"]'
 				);
+
+				// The host disengaged in this commit, ahead of this
+				// override's removal: the element is a focus target again.
+				if ( ! host ) {
+					nativeFocus.call( element, options );
+					return;
+				}
+
 				const selection = ownerDocument.defaultView.getSelection();
 
 				if ( ! element.contains( selection.anchorNode ) ) {
@@ -500,11 +511,17 @@ function RichTextWrapper(
 				}
 
 				if (
-					host &&
-					( ownerDocument.activeElement !== host ||
-						! ownerDocument.hasFocus() )
+					ownerDocument.activeElement !== host ||
+					! ownerDocument.hasFocus()
 				) {
+					const range = selection.getRangeAt( 0 ).cloneRange();
 					host.focus( { preventScroll: true, ...options } );
+					// Gecko moves the selection when an editing host takes
+					// focus instead of adopting the one within it.
+					if ( ! element.contains( selection.anchorNode ) ) {
+						selection.removeAllRanges();
+						selection.addRange( range );
+					}
 				}
 			};
 
