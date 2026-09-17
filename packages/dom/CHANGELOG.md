@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `safeHTML`: Harden with URI scheme validation and dangerous tag blocklist ([#82277](https://github.com/WordPress/gutenberg/pull/82277)).
+
 ### Bug Fixes
 
 -   `getRectangleFromRange`: Measure a collapsed range on an element at the text position next to it instead of inserting a temporary text node under the caret ([#82977](https://github.com/WordPress/gutenberg/pull/82977)).
