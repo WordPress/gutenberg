@@ -16,10 +16,18 @@
 	}
 }
 
-// Supply a min-width when inside a cover block, to prevent it from collapsing.
+// Supply a minimum size when inside a cover block, to prevent it from collapsing.
+// The width is capped at the space available, so an embed inside a cover narrower
+// than that, one in a column say, stays within it instead of overflowing.
 .wp-block-cover .wp-block-embed {
-	min-width: 320px;
+	min-width: min(320px, 100%);
 	min-height: 240px;
+}
+
+// Responsive embeds take their height from their aspect ratio, so the fallback
+// minimum height would only leave dead space beneath them.
+.wp-embed-responsive .wp-block-cover .wp-block-embed.wp-has-aspect-ratio {
+	min-height: 0;
 }
 
 // Allow embeds to grow and shrink inside flex group blocks (Stack/Row), preventing collapse while fitting available space.
