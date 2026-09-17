@@ -260,6 +260,30 @@ describe( 'ScreenRevisions', () => {
 		).toBeDisabled();
 	} );
 
+	it( 'marks the latest revision as active by id when nothing is unsaved', () => {
+		// Saved revisions only, and the latest one carries a payload the editor
+		// styles do not compare equal to, as happens when the revisions and the
+		// global styles endpoints serialize the same styles differently.
+		useGlobalStylesRevisions.mockReturnValue( {
+			revisions: REVISIONS.slice( 1 ),
+			isLoading: false,
+			hasUnsavedChanges: false,
+			revisionsCount: 12,
+		} );
+
+		renderScreen( { userConfig: { styles: STYLES_A, settings: {} } } );
+
+		const latest = screen.getAllByRole( 'option' )[ 0 ];
+		expect( latest ).toHaveAttribute( 'aria-selected', 'true' );
+		expect( latest ).toHaveAccessibleName(
+			/This revision matches current editor styles\.$/
+		);
+		expect( within( latest ).getByText( 'Active' ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'button', { name: 'Apply' } )
+		).toBeDisabled();
+	} );
+
 	it( 'appends the matching-styles hint to the selected revision label', () => {
 		useNavigator.mockReturnValue( { params: { revisionId: '10' }, goTo } );
 
