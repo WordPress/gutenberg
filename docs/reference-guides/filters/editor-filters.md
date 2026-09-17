@@ -250,6 +250,33 @@ function example_filter_block_editor_rest_api_preload_paths_when_post_provided( 
 }
 ```
 
+## Post-specific block template choices
+
+In the Gutenberg plugin, `GET /wp/v2/templates?post_id=123` returns the complete list of block templates available to the edited post. The endpoint derives the post type from the post ID and checks that the current user can edit that post. Requests without `post_id`, including the Site Editor's full template list, retain their existing behavior.
+
+The first template is the default, followed by the custom templates available for the post type. A static homepage with a `front-page` template returns only that template. The designated posts page returns only `home`, falling back to `index`. A homepage without a `front-page` template retains ordinary page template choices.
+
+Use the existing `get_block_templates` filter with `$query['post_id']` to customize the complete list. Gutenberg resolves the default and homepage rules through `gutenberg_filter_post_templates` at priority 9, so callbacks at the usual priority 10 receive the complete list. The query also includes the post type derived from that post ID. Returning one template makes it the effective template in the editor, even when the post has a different saved assignment, and disables switching, reset, and creation controls. Template editing remains subject to the user's permissions. With multiple results, the editor uses a matching saved assignment or the first result as the default. An empty list leaves template resolution unavailable; the editor does not add a filtered-out default back to the choices.
+
+```php
+add_filter( 'get_block_templates', 'example_catalog_templates', 10, 3 );
+
+function example_catalog_templates( $templates, $query, $template_type ) {
+	if ( 'wp_template' !== $template_type || empty( $query['post_id'] ) || $query['post_id'] !== (int) get_option( 'my_plugin_catalog_page_id' ) ) {
+		return $templates;
+	}
+
+	$template = get_block_template( get_stylesheet() . '//catalog' );
+	return $template instanceof WP_Block_Template ? array( $template ) : $templates;
+}
+```
+
+Each result is an existing `WP_Block_Template`, identified by its full ID, such as `my-theme//catalog`. Alternate assignments use the short template slug and must support the post type so WordPress can validate them on save. The default choice saves an empty template assignment, preserving the usual template hierarchy behavior. Restricting the list does not rewrite the post's saved assignment.
+
+For queries with `post_id`, this filter describes editor choices and resolution; it does not change frontend template routing or enforce assignments submitted directly through REST. Plugins must keep their frontend rendering rules consistent with the returned list and its default. When a plugin changes its designated-page settings, invalidate the corresponding `getEntityRecords( 'postType', 'wp_template', { per_page: -1, post_type: postType, post_id: postId } )` resolution. Template saves, reading settings, and theme changes invalidate post-specific resolutions automatically.
+
+Block template consumers use this post-specific collection directly, including for the homepage and posts page. These JavaScript changes require the PHP endpoint changes to ship alongside them. The response body remains an array of template records; no template policy header or separate policy selector is needed.
+
 ## Client-side media processing
 
 Client-side media processing handles image compression, resizing, format conversion, rotation, and thumbnail generation in the browser using WebAssembly. The following filters and parameters control its behavior.

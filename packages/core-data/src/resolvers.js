@@ -576,7 +576,22 @@ export const getEntityRecords =
 		}
 	};
 
-getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
+getEntityRecords.shouldInvalidate = ( action, kind, name, query = {} ) => {
+	if (
+		kind === 'postType' &&
+		name === 'wp_template' &&
+		query.post_id &&
+		( action.type === 'RECEIVE_CURRENT_THEME' ||
+			( action.type === 'RECEIVE_ITEMS' &&
+				action.persistedEdits &&
+				( action.kind === 'postType' ||
+					( action.kind === 'root' &&
+						[ 'site', '__unstableBase', 'theme' ].includes(
+							action.name
+						) ) ) ) )
+	) {
+		return true;
+	}
 	return (
 		( action.type === 'RECEIVE_ITEMS' || action.type === 'REMOVE_ITEMS' ) &&
 		action.invalidateCache &&

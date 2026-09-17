@@ -15,6 +15,88 @@
  */
 class Gutenberg_REST_Templates_Controller_7_2 extends WP_REST_Templates_Controller {
 	/**
+	 * Retrieves the query parameters for the templates collection.
+	 *
+	 * @return array Collection parameters.
+	 */
+	public function get_collection_params() {
+		$params = parent::get_collection_params();
+		if ( 'wp_template' === $this->post_type ) {
+			$params['post_id'] = array(
+				'description' => __( 'Post to get the available templates for.', 'gutenberg' ),
+				'type'        => 'integer',
+				'minimum'     => 1,
+			);
+		}
+		return $params;
+	}
+
+	/**
+	 * Checks access to the post whose templates are requested.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if access is allowed, or an error otherwise.
+	 */
+	public function get_items_permissions_check( $request ) {
+		$permission = parent::get_items_permissions_check( $request );
+		if ( is_wp_error( $permission ) || 'wp_template' !== $this->post_type || ! isset( $request['post_id'] ) ) {
+			return $permission;
+		}
+
+		$post = get_post( $request['post_id'] );
+		if ( ! $post ) {
+			return new WP_Error( 'rest_post_invalid_id', __( 'Invalid post ID.' ), array( 'status' => 404 ) );
+		}
+		if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+			return new WP_Error(
+				'rest_cannot_edit',
+				__( 'Sorry, you are not allowed to edit this post.' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+		return true;
+	}
+
+	/**
+	 * Returns the complete, ordered list of templates available to a post.
+	 *
+	 * The first template is the default. A single result determines the effective
+	 * template, independently of the post's saved assignment.
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 * @return WP_REST_Response Response object.
+	 */
+	public function get_items( $request ) {
+		if ( 'wp_template' !== $this->post_type || ! isset( $request['post_id'] ) || $request->is_method( 'HEAD' ) ) {
+			return parent::get_items( $request );
+		}
+
+		$post  = get_post( $request['post_id'] );
+		$query = array(
+			'post_type' => $post->post_type,
+			'post_id'   => $post->ID,
+		);
+		if ( isset( $request['wp_id'] ) ) {
+			$query['wp_id'] = $request['wp_id'];
+		}
+		$items = get_block_templates( $query, $this->post_type );
+
+		if ( ! is_array( $items ) ) {
+			$items = array();
+		}
+
+		$templates = array();
+		foreach ( $items as $template ) {
+			if ( ! $template instanceof WP_Block_Template || ! is_string( $template->id ) || '' === $template->id || ( isset( $request['wp_id'] ) && (int) $template->wp_id !== $request['wp_id'] ) ) {
+				continue;
+			}
+			$data                       = $this->prepare_item_for_response( $template, $request );
+			$templates[ $template->id ] = $this->prepare_response_for_collection( $data );
+		}
+		return rest_ensure_response( array_values( $templates ) );
+	}
+
+	/**
 	 * Prepares a single template output for response.
 	 *
 	 * @since 5.8.0

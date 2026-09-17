@@ -2,7 +2,6 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 import type { ConnectionStatus } from '@wordpress/sync';
 import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
-import { unlock } from './lock-unlock';
 import { getSyncManager } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
@@ -191,87 +190,26 @@ export const getPostsPageId = createRegistrySelector( ( select ) => () => {
 
 export const getTemplateId = createRegistrySelector(
 	( select ) => ( state, postType, postId ) => {
-		const homepage = unlock( select( STORE_NAME ) ).getHomePage();
-
-		if ( ! homepage ) {
-			return;
-		}
-
-		// For the front page, we always use the front page template if existing.
-		if (
-			postType === 'page' &&
-			postType === homepage?.postType &&
-			postId.toString() === homepage?.postId
-		) {
-			// The /lookup endpoint cannot currently handle a lookup
-			// when a page is set as the front page, so specifically in
-			// that case, we want to check if there is a front page
-			// template, and instead of falling back to the home
-			// template, we want to fall back to the page template.
-			const templates = select( STORE_NAME ).getEntityRecords(
-				'postType',
-				'wp_template',
-				{
-					per_page: -1,
-				}
-			);
-			if ( ! templates ) {
-				return;
-			}
-			const id = templates.find(
-				( { slug } ) => slug === 'front-page'
-			)?.id;
-			if ( id ) {
-				return id;
-			}
-			// If no front page template is found, continue with the
-			// logic below (fetching the page template).
-		}
-
-		const editedEntity = select( STORE_NAME ).getEditedEntityRecord(
-			'postType',
-			postType,
-			postId
-		);
-		if ( ! editedEntity ) {
-			return;
-		}
-		const postsPageId = unlock( select( STORE_NAME ) ).getPostsPageId();
-		// Check if the current page is the posts page.
-		if ( postType === 'page' && postsPageId === postId.toString() ) {
-			return select( STORE_NAME ).getDefaultTemplateId( {
-				slug: 'home',
-			} );
-		}
-		// First see if the post/page has an assigned template and fetch it.
-		const currentTemplateSlug = editedEntity.template;
-		if ( currentTemplateSlug ) {
-			const currentTemplate = select( STORE_NAME )
-				.getEntityRecords( 'postType', 'wp_template', {
-					per_page: -1,
-				} )
-				?.find( ( { slug } ) => slug === currentTemplateSlug );
-			if ( currentTemplate ) {
-				return currentTemplate.id;
-			}
-		}
-		// If no template is assigned, use the default template.
-		let slugToCheck;
-		// In `draft` status we might not have a slug available, so we use the `single`
-		// post type templates slug(ex page, single-post, single-product etc..).
-		// Pages do not need the `single` prefix in the slug to be prioritized
-		// through template hierarchy.
-		if ( editedEntity.slug ) {
-			slugToCheck =
-				postType === 'page'
-					? `${ postType }-${ editedEntity.slug }`
-					: `single-${ postType }-${ editedEntity.slug }`;
-		} else {
-			slugToCheck = postType === 'page' ? 'page' : `single-${ postType }`;
-		}
-		return select( STORE_NAME ).getDefaultTemplateId( {
-			slug: slugToCheck,
+		const core = select( STORE_NAME );
+		const templates = core.getEntityRecords( 'postType', 'wp_template', {
+			per_page: -1,
+			post_type: postType,
+			post_id: Number( postId ),
 		} );
+		if ( ! templates?.length ) {
+			return;
+		}
+		if ( templates.length === 1 ) {
+			return templates[ 0 ].id;
+		}
+		const post = core.getEditedEntityRecord( 'postType', postType, postId );
+		if ( ! post ) {
+			return;
+		}
+		return (
+			templates.find( ( { slug } ) => slug === post.template )?.id ??
+			templates[ 0 ].id
+		);
 	}
 );
 

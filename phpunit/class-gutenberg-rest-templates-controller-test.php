@@ -181,6 +181,156 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$this->assertNull( $data['modified'], 'The modified date should be null for a file-backed template.' );
 	}
 
+	public function test_post_templates_include_the_default_before_filtering() {
+		wp_set_current_user( self::$admin_id );
+		switch_theme( 'block-theme' );
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$seen    = null;
+		add_filter(
+			'get_block_templates',
+			static function ( $templates, $query ) use ( &$seen, $page_id ) {
+				if ( $page_id === ( $query['post_id'] ?? null ) ) {
+					$seen = $templates;
+				}
+				return $templates;
+			},
+			10,
+			2
+		);
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
+		$request->set_param( 'post_id', $page_id );
+		$request->set_param( 'post_type', 'post' );
+		$response = rest_get_server()->dispatch( $request );
+		$ids      = wp_list_pluck( $response->get_data(), 'id' );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'block-theme//page', $ids[0] );
+		$this->assertSame( 'block-theme//page', $seen[0]->id );
+		$this->assertContains( 'block-theme//custom-hero-template', $ids );
+		$this->assertSame( $ids, array_values( array_unique( $ids ) ) );
+	}
+
+	public function test_filter_can_return_one_non_custom_template_for_one_page() {
+		wp_set_current_user( self::$admin_id );
+		switch_theme( 'block-theme' );
+		$page_id       = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$other_page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$template_id   = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_template',
+				'post_name'    => 'archive-product',
+				'post_content' => '<!-- wp:post-content /-->',
+			)
+		);
+		wp_set_post_terms( $template_id, 'block-theme', 'wp_theme' );
+		update_post_meta( $template_id, 'is_wp_suggestion', true );
+		$catalog = get_block_template( 'block-theme//archive-product' );
+		$this->assertFalse( $catalog->is_custom );
+		$request   = new WP_REST_Request( 'GET', '/wp/v2/templates' );
+		$full_list = rest_get_server()->dispatch( $request )->get_data();
+		add_filter(
+			'get_block_templates',
+			static function ( $templates, $query ) use ( $page_id, $catalog ) {
+				return $page_id === ( $query['post_id'] ?? null ) ? array( $catalog ) : $templates;
+			},
+			10,
+			2
+		);
+
+		$request->set_param( 'post_id', $page_id );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( array( $catalog->id ), wp_list_pluck( $response->get_data(), 'id' ) );
+		$request->set_param( 'post_id', $other_page_id );
+		$this->assertSame( 'block-theme//page', rest_get_server()->dispatch( $request )->get_data()[0]['id'] );
+		$this->assertSame( $full_list, rest_get_server()->dispatch( new WP_REST_Request( 'GET', '/wp/v2/templates' ) )->get_data() );
+		$this->assertArrayNotHasKey( 'X-WP-Template-Policy', $response->get_headers() );
+	}
+
+	public function test_homepage_returns_only_front_page_when_available() {
+		wp_set_current_user( self::$admin_id );
+		switch_theme( 'block-theme' );
+		$page_id     = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$template_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_template',
+				'post_name'    => 'front-page',
+				'post_content' => '<!-- wp:post-content /-->',
+			)
+		);
+		wp_set_post_terms( $template_id, 'block-theme', 'wp_theme' );
+		update_option( 'show_on_front', 'page' );
+		update_option( 'page_on_front', $page_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
+		$request->set_param( 'post_id', $page_id );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( array( 'block-theme//front-page' ), wp_list_pluck( $response->get_data(), 'id' ) );
+	}
+
+	public function test_homepage_without_front_page_retains_normal_choices() {
+		wp_set_current_user( self::$admin_id );
+		switch_theme( 'block-theme' );
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		update_option( 'show_on_front', 'page' );
+		update_option( 'page_on_front', $page_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
+		$request->set_param( 'post_id', $page_id );
+		$ids = wp_list_pluck( rest_get_server()->dispatch( $request )->get_data(), 'id' );
+		$this->assertSame( 'block-theme//page', $ids[0] );
+		$this->assertContains( 'block-theme//custom-hero-template', $ids );
+	}
+
+	public function test_posts_page_uses_home_and_falls_back_to_index() {
+		wp_set_current_user( self::$admin_id );
+		switch_theme( 'block-theme' );
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		update_option( 'show_on_front', 'page' );
+		update_option( 'page_for_posts', $page_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
+		$request->set_param( 'post_id', $page_id );
+		$this->assertSame( array( 'block-theme//index' ), wp_list_pluck( rest_get_server()->dispatch( $request )->get_data(), 'id' ) );
+		$template_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_template',
+				'post_name'    => 'home',
+				'post_content' => '<!-- wp:post-content /-->',
+			)
+		);
+		wp_set_post_terms( $template_id, 'block-theme', 'wp_theme' );
+		$this->assertSame( array( 'block-theme//home' ), wp_list_pluck( rest_get_server()->dispatch( $request )->get_data(), 'id' ) );
+	}
+
+	public function test_post_context_requires_permission_to_edit_that_post() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
+		$request->set_param( 'post_id', 999999 );
+		$this->assertSame( 404, rest_get_server()->dispatch( $request )->get_status() );
+		$author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		$page_id   = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		wp_set_current_user( $author_id );
+		$request->set_param( 'post_id', $page_id );
+		$this->assertSame( 403, rest_get_server()->dispatch( $request )->get_status() );
+		$post_id = self::factory()->post->create( array( 'post_author' => $author_id ) );
+		$request->set_param( 'post_id', $post_id );
+		$this->assertSame( 200, rest_get_server()->dispatch( $request )->get_status() );
+	}
+
+	public function test_filter_can_remove_all_choices_without_restoring_the_default() {
+		wp_set_current_user( self::$admin_id );
+		switch_theme( 'block-theme' );
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		add_filter(
+			'get_block_templates',
+			static function ( $templates, $query ) use ( $page_id ) {
+				return $page_id === ( $query['post_id'] ?? null ) ? array() : $templates;
+			},
+			10,
+			2
+		);
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
+		$request->set_param( 'post_id', $page_id );
+		$this->assertSame( array(), rest_get_server()->dispatch( $request )->get_data() );
+	}
+
 	/**
 	 * @doesNotPerformAssertions
 	 */
