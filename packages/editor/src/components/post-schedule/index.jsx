@@ -55,7 +55,7 @@ export function PrivatePostSchedule( {
 						// translators: %s: The new publish date and time, e.g. "June 3, 2025 12:00 pm UTC+0".
 						__( 'Publish date set to %s.' ),
 						getFullPostScheduleLabel( date )
-				  )
+					)
 				: __( 'Publish date set to now.' ),
 			'assertive'
 		);

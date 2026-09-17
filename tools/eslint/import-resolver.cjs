@@ -30,7 +30,7 @@ exports.interfaceVersion = 2;
 function getResolvedExportPath( exportEntry ) {
 	return typeof exportEntry === 'string'
 		? exportEntry
-		: exportEntry?.import ?? exportEntry?.default;
+		: ( exportEntry?.import ?? exportEntry?.default );
 }
 
 /**
