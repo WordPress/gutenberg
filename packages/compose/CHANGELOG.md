@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.8.1-next.0 (2026-09-17)
+
 ### Bug Fixes
 
 -   `useFocusOutside`: Cancel the previous pending blur check so repeated blur events from portaled content do not report focus leaving after it returns ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).

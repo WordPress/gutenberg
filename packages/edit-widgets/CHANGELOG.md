@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.55.1-next.0 (2026-09-17)
+
 ### Bug Fixes
 
 -   Open the Welcome Guide from a plain menu item instead of a preference toggle, so the Options menu no longer announces "Preference activated - Welcome Guide" ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).

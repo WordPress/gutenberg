@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 15.1.0-next.0 (2026-09-17)
+
 ### Enhancements
 
 -   Remove the `react-autosize-textarea` dependency. The post editor's "Code editor" view now auto-grows with CSS `field-sizing: content`. Browsers without support use a scrollable field ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).

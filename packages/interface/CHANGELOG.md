@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.2.0-next.0 (2026-09-17)
+
 ### Enhancements
 
 -   The package now bundles TypeScript types ([#82753](https://github.com/WordPress/gutenberg/pull/82753)).

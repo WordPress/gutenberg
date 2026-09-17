@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.0.1-next.0 (2026-09-17)
+
 ### Bug Fixes
 
 -   The `save<Entity>` and `delete<Entity>` shortcut actions resolve with their saved or deleted record types instead of `void` ([#77162](https://github.com/WordPress/gutenberg/pull/77162)).

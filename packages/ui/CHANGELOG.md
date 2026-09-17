@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.23.0-next.0 (2026-09-17)
+
 ### Breaking Changes
 
 -   `Combobox.Root`: `filteredItems` now uses the selected value type instead of `any`. Consumers that pass object items with primitive selected values must use matching item and value types. ([#82835](https://github.com/WordPress/gutenberg/pull/82835))

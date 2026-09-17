@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.1.1-next.0 (2026-09-17)
+
 ### Internal
 
 -   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).

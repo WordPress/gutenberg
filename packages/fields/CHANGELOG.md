@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.47.1-next.0 (2026-09-17)
+
 ### Bug Fixes
 
 -   Hide the date, author and password fields when the post's `_links` lack the `wp:action-publish` / `wp:action-assign-author` relations, matching the classic sidebar. ([#82844](https://github.com/WordPress/gutenberg/pull/82844))
