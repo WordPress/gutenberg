@@ -1,11 +1,17 @@
 import clsx from 'clsx';
 import { Spinner } from '@wordpress/components';
+import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
+import DataViewsContext from '../../dataviews-context';
 import type { ViewGridProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
 import useSelectionProps from '../utils/use-selection-props';
-import { hasAPossibleBulkAction } from '../../dataviews-bulk-actions';
+import {
+	BulkActionToolbar,
+	hasAPossibleBulkAction,
+	useSomeItemHasAPossibleBulkAction,
+} from '../../dataviews-bulk-actions';
 import CompositeGrid from './composite-grid';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
@@ -24,6 +30,7 @@ function ViewGrid< Item >( {
 	className,
 	empty,
 }: ViewGridProps< Item > ) {
+	const { isDefaultUI } = useContext( DataViewsContext );
 	const isDelayedLoading = useDelayedLoading( !! isLoading );
 	const hasData = !! data?.length;
 	const groupField = view.groupBy?.field
@@ -47,6 +54,7 @@ function ViewGrid< Item >( {
 		selectionMode: 'multi',
 		shouldSelectOnClick: false,
 	} );
+	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	if ( ! hasData ) {
 		return (
 			<div
@@ -77,6 +85,15 @@ function ViewGrid< Item >( {
 	};
 	return (
 		<>
+			{ isDefaultUI && hasBulkActions && (
+				<div
+					className="dataviews-view-grid__bulk-actions-header"
+					// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+					inert={ isLoading ? 'true' : undefined }
+				>
+					<BulkActionToolbar />
+				</div>
+			) }
 			{
 				// Render multiple groups.
 				hasData && groupField && dataByGroup && (
