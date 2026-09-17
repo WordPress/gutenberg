@@ -14,15 +14,20 @@
 
 -   Remove the `react-autosize-textarea` dependency. `PlainText` and the block "Edit as HTML" field now auto-grow with CSS `field-sizing: content`. Browsers without support use scrollable fields. `PlainText` consumers should use CSS height constraints instead of `rows` ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).
 -   `BlockCard`: Migrate the block-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82503](https://github.com/WordPress/gutenberg/pull/82503)).
+-   Inspector controls in the standard block-supports panels (Typography, Dimensions, Border, Color, Background, Filters) reflect the value a block inherits from Global Styles when nothing is set on the block. The `gutenberg-global-styles-inheritance-ui` experiment now gates only the indicators for that value: the dotted underline on an inherited label, and the dot that resets a local override ([#82840](https://github.com/WordPress/gutenberg/pull/82840)).
+-   `TypographyPanel`: Setting a text color starts an unset link color tracking it whenever no link color is set on the block or inherited from Global Styles. Previously the link color was left alone ([#82840](https://github.com/WordPress/gutenberg/pull/82840)).
 -   `ViewportVisibilityInfo`: Migrate the block visibility badge from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Notice` component ([#82670](https://github.com/WordPress/gutenberg/pull/82670)).
 
 ### Bug Fixes
 
 -   `InnerBlocks`: Resolve a container's legacy layout markup (`inherit: true`, or a bare `contentSize` / `wideSize` with no `type`) to a constrained layout for its inner blocks, so they are offered the wide and full alignments. Previously only the container's styles honoured the legacy form, and the inner blocks resolved to the flow layout ([#82637](https://github.com/WordPress/gutenberg/pull/82637)).
--   Block Patterns and Block Visibility: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+-   Block Patterns, Block Visibility, and Block Lock: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
+-   Layout: Treat a missing `spacing.blockGap` setting as no block gap support, as the server does. A theme that does not opt into block gap has the setting stored as `null`, which the block settings resolve to `undefined`, so per-block layout styles applied block gap values the front end never renders. An editor that never provides the setting must set it to `true` to keep rendering block gap values ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
+-   Block Toolbar: Show the parent block selector for blocks inside patterns and `contentOnly` locked blocks. It selects the nearest parent shown in List View and the breadcrumb ([#82912](https://github.com/WordPress/gutenberg/pull/82912)).
 
 ### Internal
 
+-   Block bindings and variation transforms: Use the public `Menu` from `@wordpress/ui` instead of the private Components API. ([#81925](https://github.com/WordPress/gutenberg/pull/81925))
 -   Layout hooks: Use `normalizeLegacyLayout` in `useLayoutClasses`, `useLayoutStyles`, the block layout styles wrapper and `isAxialBlockGapAllowed`, replacing four inline copies of the legacy `inherit` / size check ([#82710](https://github.com/WordPress/gutenberg/pull/82710)).
 
 ## 17.1.0 (2026-09-10)

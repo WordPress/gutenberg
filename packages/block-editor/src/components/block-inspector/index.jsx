@@ -195,7 +195,7 @@ function BlockInspector() {
 		const _renderedBlockClientId = isWithinEditedSection
 			? _selectedBlockClientId
 			: getParentSectionBlock( _selectedBlockClientId ) ||
-			  _selectedBlockClientId;
+				_selectedBlockClientId;
 		const _renderedBlockName =
 			_renderedBlockClientId && getBlockName( _renderedBlockClientId );
 		const _blockType =
