@@ -68,7 +68,7 @@ const DENYLIST = {
 		ExternalLink:
 			'Use `Link` from `@wordpress/ui` with the `openInNewTab` prop instead.',
 		__experimentalDivider:
-			'Use a family Separator such as `Menu.Separator` from `@wordpress/ui` when one exists. Otherwise write your own CSS, preferably using the design tokens available in `@wordpress/theme`.',
+			'Use a Separator subcomponent such as `Menu.Separator` from `@wordpress/ui` when one exists. Otherwise write your own CSS, preferably using the design tokens available in `@wordpress/theme`.',
 		__experimentalElevation:
 			'Use elevation tokens from `@wordpress/base-styles` instead.',
 		__experimentalGrid:

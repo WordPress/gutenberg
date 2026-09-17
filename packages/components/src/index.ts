@@ -76,7 +76,7 @@ export { default as Dashicon } from './dashicon';
 export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as Disabled } from './disabled';
 export { DisclosureContent as __unstableDisclosureContent } from './disclosure';
-/** @deprecated Prefer a family Separator such as Menu.Separator, or write your own CSS. */
+/** @deprecated Prefer a Separator subcomponent such as Menu.Separator, or write your own CSS. */
 export { default as __experimentalDivider } from './divider/deprecated';
 export { default as Draggable } from './draggable';
 export { default as DropZone } from './drop-zone';
