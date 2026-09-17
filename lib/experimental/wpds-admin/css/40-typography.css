@@ -1,5 +1,5 @@
 /**
- * Classic admin typography, from WordPress Design System tokens.
+ * Admin typography, from WordPress Design System tokens.
  *
  * The scale is not the raw tokens. `@wordpress/ui`'s `Text` component defines
  * the roles, and its pairings are not index-aligned — `font-size-md` (13px)
@@ -15,10 +15,10 @@
  * height. A plain number is declared first as a fallback for engines that will
  * not divide two lengths in `calc()`.
  *
- * Scope is deliberately small. Bare `h1`, `h2` and `h3` are left alone: Core
+ * Scope is deliberately small. Bare `h1`, `h2` and `h3` are left alone: WordPress
  * makes 43 contextual heading rules, and a rule here would outrank all of them
  * regardless of their specificity. Only the admin page title is touched, which
- * Core already scopes to `.wrap h1`.
+ * WordPress already scopes to `.wrap h1`.
  *
  * NO `!important` IN THIS FILE. See overrides.css for the one exception.
  */
@@ -31,7 +31,7 @@
 	   Base
 
 	   Both properties are inherited, so they set the floor without competing
-	   with anything Core sizes explicitly. Core's own body font-size is already
+	   with anything WordPress sizes explicitly. WordPress's own body font-size is already
 	   13px, which is exactly `font-size-md`, so only the family and the rhythm
 	   actually change here.
 	   ----------------------------------------------------------------------- */
@@ -46,13 +46,13 @@
 	/* -----------------------------------------------------------------------
 	   Page title — the `heading-xl` role
 
-	   Core sets 23px at weight 400, which is between `xl` (20px) and `2xl`
+	   WordPress sets 23px at weight 400, which is between `xl` (20px) and `2xl`
 	   (32px) and on neither. Taking the role means the title becomes both
 	   smaller and heavier; adopting half a role would leave it matching nothing.
 	   ----------------------------------------------------------------------- */
 
 	.wrap h1 {
-		/* Core gives the page title no margin: it shares a header row with the
+		/* WordPress gives the page title no margin: it shares a header row with the
 		   page action beside it. */
 		margin-block: 0;
 		font-family: var(--wpds-typography-font-family-heading);
@@ -65,7 +65,7 @@
 	/* -----------------------------------------------------------------------
 	   Headings
 
-	   Core's heading sizes are the browser defaults with a single edit: 2em,
+	   WordPress's heading sizes are the browser defaults with a single edit: 2em,
 	   1.3em, 1em, 0.83em, 0.67em, with h2 and h3 both pushed to 1.3em. That is
 	   not a scale anyone designed, and it has two real problems.
 
@@ -77,11 +77,11 @@
 
 	   And h6 computes to 8.7px at the 13px base, well below a readable size.
 	   Neither h5 nor h6 is emitted anywhere in wp-admin, so this is latent in
-	   Core, but plugins can and do use them.
+	   WordPress, but plugins can and do use them.
 
-	   These are bare element rules on purpose. Scoping them to avoid Core's
+	   These are bare element rules on purpose. Scoping them to avoid WordPress's
 	   contextual heading rules would hide where the design system's scale and
-	   classic admin disagree, and finding those disagreements is the point.
+	   the admin disagree, and finding those disagreements is the point.
 
 	   h5 and h6 share `heading-sm`. The scale has five heading roles and HTML has
 	   six levels, so one pair must share until the design system grows a sixth
@@ -96,11 +96,11 @@
 	h5,
 	h6 {
 		font-family: var(--wpds-typography-font-family-heading);
-		/* Already Core's value; expressed here as the token it always was. */
+		/* Already WordPress's value; expressed here as the token it always was. */
 		font-weight: var(--wpds-typography-font-weight-emphasis);
 		/*
-		 * Core's heading margins are the browser defaults — .67em, 1em, 1.33em,
-		 * 1.67em, 2.33em — and those multipliers were tuned against Core's own
+		 * WordPress's heading margins are the browser defaults — .67em, 1em, 1.33em,
+		 * 1.67em, 2.33em — and those multipliers were tuned against WordPress's own
 		 * sizes so every level landed on roughly the same 17 to 20px. Changing
 		 * the sizes leaves the multipliers behind: h3 ends up with less space
 		 * than h4, and h6 with the most of any heading.
@@ -108,11 +108,11 @@
 		 * One rhythm for every level replaces them, from the gap scale, with more
 		 * space above than below so a heading binds to what it introduces rather
 		 * than floating between blocks. The combined space between blocks stays
-		 * close to what Core produced; it is distributed differently.
+		 * close to what WordPress produced; it is distributed differently.
 		 *
 		 * There is nothing to copy from the design system here. `Text` sets
 		 * `margin: 0` and spacing comes from `gap` on a flex container, so this
-		 * is classic's own rhythm expressed in tokens rather than a rhythm
+		 * is the admin's own rhythm expressed in tokens rather than a rhythm
 		 * adopted from the system.
 		 */
 		margin-block: var(--wpds-dimension-gap-xl) var(--wpds-dimension-gap-sm);
@@ -152,7 +152,7 @@
 	/* -----------------------------------------------------------------------
 	   Reading prose — the `body-lg` role
 
-	   Core sets these at 14px, which has no place on the scale and is the most
+	   WordPress sets these at 14px, which has no place on the scale and is the most
 	   used size in wp-admin. It is doing a different job from the 13px used for
 	   chrome: labels, field descriptions and row titles are the longest
 	   continuous text in the admin, and a single pixel of difference reads as an
@@ -168,7 +168,7 @@
 	 * The controls inside a settings form inherit from it, so the field, its
 	 * label and its help text are one size.
 	 *
-	 * Core declares exactly this — `input, select, textarea, button { font-size:
+	 * WordPress declares exactly this — `input, select, textarea, button { font-size:
 	 * inherit }` — and then overrides it for every control type: `textarea,
 	 * input` at 14px, `.wp-core-ui select` at 14px, `.wp-core-ui .button` at
 	 * 13px. The declaration is dead as written. This restores it, scoped to the
@@ -181,7 +181,7 @@
 	 *
 	 * This is scoped rather than applied to `.button` generally. Letting every
 	 * button in wp-admin follow its container would be defensible — it is what
-	 * Core's own declaration asks for — but it is a far larger change, and the
+	 * WordPress's own declaration asks for — but it is a far larger change, and the
 	 * React `Button` pins 13px too, so it is a question for the design system
 	 * rather than something to settle here.
 	 */
@@ -212,14 +212,14 @@
 	}
 
 	/* -----------------------------------------------------------------------
-	   Defer to Core on the About screens
+	   Leave the About screens to their own styles
 
-	   SCAFFOLDING. This exists because of how the restyle reaches Core, not
+	   SCAFFOLDING. This exists because of how the restyle reaches WordPress's stylesheets, not
 	   because of anything it decides, and it is deleted when the restyle is
-	   ported into Core.
+	   moved into WordPress's own stylesheets.
 
 	   About is art-directed per release and is exempt from this work, the same
-	   way it is excluded from the radius consolidation. Core protects it with
+	   way it is excluded from the radius consolidation. WordPress protects it with
 	   specificity — `.about-php .about__header-title h1` is (0,2,1) against a
 	   bare `h1` at (0,0,1), which wins comfortably in a normal cascade.
 
@@ -228,8 +228,8 @@
 	   and the 64px hero heading collapsed to 20px.
 
 	   `revert-layer` hands those elements back to the layer below rather than
-	   restating any of Core's values, so About keeps whatever it is designed to
-	   have, now and after it is redesigned. Once this styling lives in Core there
+	   restating any of WordPress's values, so About keeps whatever it is designed to
+	   have, now and after it is redesigned. Once this styling lives in WordPress's own stylesheets there
 	   are no layers, About's specificity works again, and this block goes.
 	   ----------------------------------------------------------------------- */
 
