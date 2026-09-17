@@ -249,6 +249,8 @@ html :where(.is-position-sticky) {
 // LaTeX of the Math block and the inline math format, marks cells of `aligned`,
 // `cases` and tagged equations with these classes and relies on CSS. The
 // alignment is a property of the notation, so it is not flipped for RTL.
+// Mirrors temml's own stylesheet, scoped to `math`:
+// https://github.com/ronkok/Temml/blob/v0.10.34/dist/Temml-Local.css#L56-L61
 math .tml-right {
 	/*rtl:ignore*/
 	text-align: right;
@@ -261,7 +263,9 @@ math .tml-left {
 
 // Chromium only: `text-align: right` does not move the cell's block content,
 // the `-webkit-` value does. Safari parses that value but renders it wrong, so
-// the feature query, taken from temml's own stylesheet, excludes it.
+// the feature query, taken from temml's own stylesheet, excludes it:
+// https://github.com/ronkok/Temml/blob/v0.10.34/dist/Temml-Local.css#L64-L65
+// https://github.com/ronkok/Temml/blob/v0.10.34/dist/Temml-Local.css#L190-L196
 @supports (not (-webkit-backdrop-filter: blur(1px))) and (not (-moz-appearance: none)) {
 	math .tml-right {
 		/*rtl:ignore*/
