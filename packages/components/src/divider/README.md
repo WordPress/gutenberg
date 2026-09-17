@@ -1,6 +1,6 @@
 # Divider
 
-<p class="callout callout-alert">This component is deprecated. Write your own CSS instead, preferably using the <a href="https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-introduction--docs">design tokens</a> available in <code>@wordpress/theme</code>.</p>
+<p class="callout callout-alert">This component is deprecated. Prefer a family <code>Separator</code> such as <code>Menu.Separator</code> when the surrounding component provides one. Otherwise write your own CSS, preferably using the <a href="https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-introduction--docs">design tokens</a> available in <code>@wordpress/theme</code>.</p>
 
 `Divider` is a layout component that separates groups of related content.
 

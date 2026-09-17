@@ -21,8 +21,9 @@ function UnconnectedDeprecatedDivider(
 /**
  * `Divider` is a layout component that separates groups of related content.
  *
- * This component is deprecated. Write your own CSS instead,
- * preferably using the [design tokens](https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-introduction--docs)
+ * This component is deprecated. Prefer a family `Separator` such as
+ * `Menu.Separator` when the surrounding component provides one. Otherwise
+ * write your own CSS, preferably using the [design tokens](https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-introduction--docs)
  * available in `@wordpress/theme`.
  *
  * @deprecated

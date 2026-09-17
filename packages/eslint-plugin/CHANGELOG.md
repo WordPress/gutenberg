@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Update `use-recommended-components` deprecation message for `__experimentalDivider` to point to design tokens ([#83040](https://github.com/WordPress/gutenberg/pull/83040)).
+-   Update `use-recommended-components` deprecation message for `__experimentalDivider` to point to family `Separator` components and design tokens ([#83040](https://github.com/WordPress/gutenberg/pull/83040)).
 
 ## 26.0.0 (2026-09-10)
 
