@@ -32,7 +32,7 @@ describe( 'flags warnings with invalid custom-property-pattern css', () => {
 
 	it( 'flags correct number of warnings', () => {
 		return result.then( ( data ) =>
-			expect( data.results[ 0 ].warnings ).toHaveLength( 2 )
+			expect( data.results[ 0 ].warnings ).toHaveLength( 4 )
 		);
 	} );
 
