@@ -157,7 +157,7 @@ describe( 'Cover block', () => {
 			);
 			expect( cover ).not.toHaveClass( 'has-custom-content-position' );
 
-			await userEvent.click(
+			await activateWithKeyboard(
 				within( screen.getByRole( 'grid' ) ).getByRole( 'gridcell', {
 					name: 'top left',
 				} )
