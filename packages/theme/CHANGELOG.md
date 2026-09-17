@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add `--wpds-color-background-thumb-neutral` for neutral progress indicators. ([#83781](https://github.com/WordPress/gutenberg/pull/83781))
+-   Add `generateColorTokens`, which derives color token values from seed colors outside React. Also available as `@wordpress/theme/colors` for consumers that cannot load React ([#82425](https://github.com/WordPress/gutenberg/pull/82425)).
 
 ### Bug Fixes
 
