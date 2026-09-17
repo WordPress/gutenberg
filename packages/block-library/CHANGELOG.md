@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Navigation Link: Show a help text in the Inspector when a custom (URL-only) link points at a page on this site, since it has no entity ID and will never receive `current-menu-item` highlighting ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ### Bug Fixes
 
 -   Math: Read the LaTeX source from the `<annotation>` inside the saved `<math>` instead of the block comment, so `&` and `<` survive `wp_kses` for users without `unfiltered_html`. Input that cannot be rendered is saved as an annotation-only `<semantics>`, which browsers display as the source text ([#82987](https://github.com/WordPress/gutenberg/pull/82987)).
