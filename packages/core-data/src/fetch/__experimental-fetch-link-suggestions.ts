@@ -20,6 +20,7 @@ export type SearchOptions = {
 	/**
 	 * Filters by search type. Pass an array to search several types at once;
 	 * `subtype` is then ignored, since it belongs to a single type.
+	 * An array of one behaves exactly like that type on its own.
 	 */
 	type?: SearchType | SearchType[];
 	/**
@@ -137,9 +138,11 @@ export default async function fetchLinkSuggestions(
 	// slug for `term`. Validation accepts any registered post type or taxonomy
 	// name, so passing one to the handlers it does not belong to is not
 	// rejected, it just returns nonsense: `type=term&subtype=page` leaks the
-	// private `wp_template_part_area` taxonomy. Ignore it rather than send it
-	// to handlers that cannot use it.
-	const subtypeToUse = Array.isArray( type ) ? undefined : subtype;
+	// private `wp_template_part_area` taxonomy. Ignore it once more than one
+	// handler runs, where there is no single type it could belong to. One type
+	// is unambiguous however it is spelled, so `[ 'post' ]` keeps it.
+	const subtypeToUse =
+		requestedTypes && requestedTypes.length > 1 ? undefined : subtype;
 
 	const queries: Promise< SearchResult[] >[] = [];
 

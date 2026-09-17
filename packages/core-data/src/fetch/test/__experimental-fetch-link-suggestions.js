@@ -278,6 +278,84 @@ describe( 'fetchLinkSuggestions', () => {
 		} );
 	} );
 
+	it( 'treats an array of one exactly like that type on its own', () => {
+		return Promise.all( [
+			fetchLinkSuggestions( '', { type: 'post', perPage: 20 } ),
+			fetchLinkSuggestions( '', { type: [ 'post' ], perPage: 20 } ),
+		] ).then( ( [ asString, asArray ] ) => {
+			expect( asArray ).toEqual( asString );
+		} );
+	} );
+
+	it( 'keeps subtype for an array of one, where it is unambiguous', () => {
+		return fetchLinkSuggestions( 'Contact', {
+			type: [ 'post' ],
+			subtype: 'page',
+			perPage: 20,
+		} ).then( ( suggestions ) => {
+			expect( suggestions ).toEqual( [
+				{
+					id: 37,
+					title: 'Contact Page',
+					type: 'page',
+					url: 'http://wordpress.local/contact-page/',
+					kind: 'post-type',
+				},
+			] );
+		} );
+	} );
+
+	it( 'does not search the types it was not given', () => {
+		return fetchLinkSuggestions( '', {
+			type: [ 'post', 'term' ],
+			perPage: 20,
+		} ).then( ( suggestions ) => {
+			const kinds = suggestions.map( ( { kind } ) => kind );
+
+			expect( kinds ).not.toContain( 'media' );
+			expect( suggestions.map( ( { type } ) => type ) ).not.toContain(
+				'post-format'
+			);
+		} );
+	} );
+
+	it( 'searches attachments when the array asks for them', () => {
+		return fetchLinkSuggestions( '', {
+			type: [ 'attachment' ],
+			perPage: 20,
+		} ).then( ( suggestions ) => {
+			expect( suggestions ).toEqual( [
+				{
+					id: 54,
+					title: 'Some Test Media Title',
+					type: 'attachment',
+					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
+					kind: 'media',
+				},
+			] );
+		} );
+	} );
+
+	it( 'does not return post formats in an array when formats are unsupported', () => {
+		return fetchLinkSuggestions(
+			'',
+			{ type: [ 'post-format', 'term' ], perPage: 20 },
+			{ disablePostFormats: true }
+		).then( ( suggestions ) => {
+			expect( suggestions.map( ( { type } ) => type ) ).not.toContain(
+				'post-format'
+			);
+		} );
+	} );
+
+	it( 'searches nothing when given an empty array', () => {
+		return fetchLinkSuggestions( '', { type: [], perPage: 20 } ).then(
+			( suggestions ) => {
+				expect( suggestions ).toEqual( [] );
+			}
+		);
+	} );
+
 	describe( 'Initial search suggestions', () => {
 		it( 'initial search suggestions limits results', () => {
 			return fetchLinkSuggestions( '', {
