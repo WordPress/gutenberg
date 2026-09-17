@@ -189,7 +189,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		add_filter(
 			'get_block_templates',
 			static function ( $templates, $query ) use ( &$seen, $page_id ) {
-				if ( $page_id === ( $query['post_id'] ?? null ) ) {
+				if ( ( $query['post_id'] ?? null ) === $page_id ) {
 					$seen = $templates;
 				}
 				return $templates;
@@ -231,7 +231,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		add_filter(
 			'get_block_templates',
 			static function ( $templates, $query ) use ( $page_id, $catalog ) {
-				return $page_id === ( $query['post_id'] ?? null ) ? array( $catalog ) : $templates;
+				return ( $query['post_id'] ?? null ) === $page_id ? array( $catalog ) : $templates;
 			},
 			10,
 			2
@@ -321,7 +321,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		add_filter(
 			'get_block_templates',
 			static function ( $templates, $query ) use ( $page_id ) {
-				return $page_id === ( $query['post_id'] ?? null ) ? array() : $templates;
+				return ( $query['post_id'] ?? null ) === $page_id ? array() : $templates;
 			},
 			10,
 			2
