@@ -206,7 +206,7 @@ describe( 'Combobox', () => {
 									{ value.map( ( item ) => (
 										<Combobox.ChipWithRemove
 											key={ item.id }
-											removeLabel={ `Remove ${ item.value }` }
+											removeLabel="Delete"
 										>
 											{ item.value }
 										</Combobox.ChipWithRemove>
@@ -220,14 +220,12 @@ describe( 'Combobox', () => {
 		);
 
 		await user.hover(
-			screen.getByLabelText( 'Remove Item 1', {
+			screen.getByLabelText( 'Delete', {
 				selector: 'button',
 			} )
 		);
 
-		await expect
-			.element( screen.getByText( 'Remove Item 1' ) )
-			.toBeVisible();
+		await expect.element( screen.getByText( 'Delete' ) ).toBeVisible();
 	} );
 
 	it( 'allows selecting items when Empty is rendered after List', async () => {
