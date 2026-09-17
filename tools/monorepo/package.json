@@ -24,9 +24,6 @@
 	"exports": {
 		"./tsconfig/*": "./tsconfig/*"
 	},
-	"scripts": {
-		"wpds:admin-scheme-tokens": "node wpds/generate-admin-scheme-tokens.mjs"
-	},
 	"devDependencies": {
 		"@testing-library/jest-dom": "^7.0.1",
 		"@types/react": "^18.3.27",
@@ -35,5 +32,8 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"wpds:admin-scheme-tokens": "node wpds/generate-admin-scheme-tokens.mjs"
 	}
 }
