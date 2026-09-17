@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { shortcutAriaLabel } from '@wordpress/keycodes';
 import Modal from '../../modal';
@@ -326,14 +326,25 @@ describe( 'Tooltip', () => {
 			const HOVER_OUTSIDE_ANTICIPATION = 200;
 
 			await render(
-				<Tooltip { ...props }>
+				<>
 					<button
-						onMouseEnter={ onMouseEnterMock }
-						onMouseLeave={ onMouseLeaveMock }
+						style={ {
+							position: 'fixed',
+							right: 0,
+							bottom: 0,
+						} }
 					>
-						Tooltip anchor
+						Pointer parking target
 					</button>
-				</Tooltip>
+					<Tooltip { ...props }>
+						<button
+							onMouseEnter={ onMouseEnterMock }
+							onMouseLeave={ onMouseLeaveMock }
+						>
+							Tooltip anchor
+						</button>
+					</Tooltip>
+				</>
 			);
 
 			const anchor = screen.getByRole( 'button', {
@@ -341,8 +352,15 @@ describe( 'Tooltip', () => {
 			} );
 			expect( anchor ).toBeVisible();
 
+			await userEvent.hover(
+				screen.getByRole( 'button', {
+					name: 'Pointer parking target',
+				} )
+			);
+			onMouseEnterMock.mockClear();
+			onMouseLeaveMock.mockClear();
 			// Hover over the anchor, tooltip hasn't appeared yet
-			fireEvent.mouseEnter( anchor );
+			await userEvent.hover( anchor );
 			expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
 			expectTooltipToBeHidden();
 
@@ -352,7 +370,7 @@ describe( 'Tooltip', () => {
 			expectTooltipToBeHidden();
 
 			// Hover outside of the anchor, tooltip still hasn't appeared yet
-			fireEvent.mouseLeave( anchor );
+			await hoverOutside();
 			expectTooltipToBeHidden();
 
 			expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
