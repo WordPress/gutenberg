@@ -56,10 +56,13 @@ const jsdomTests = new Set( vitestTestsByProject.jsdom );
 const browserTests = new Set( vitestTestsByProject.browser );
 const vitestInfrastructure = [
 	'test/unit/vitest.config.mjs',
-	...globSync( 'test/unit/config/**/*.vitest*.{js,jsx,mjs,ts,tsx}', {
-		cwd: ROOT_DIR,
-		nodir: true,
-	} ),
+	...globSync(
+		'test/unit/config/**/*.vitest*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}',
+		{
+			cwd: ROOT_DIR,
+			nodir: true,
+		}
+	),
 	...globSync( 'test/unit/scripts/*.mjs', {
 		cwd: ROOT_DIR,
 		nodir: true,
@@ -229,7 +232,7 @@ let typescriptTestCount = 0;
 
 for ( const projectName of VITEST_PROJECT_NAMES ) {
 	const projectTypescriptTests = vitestTestsByProject[ projectName ].filter(
-		( file ) => /\.tsx?$/.test( file )
+		( file ) => /\.[cm]?tsx?$/.test( file )
 	);
 	if ( ! projectTypescriptTests.length ) {
 		continue;
