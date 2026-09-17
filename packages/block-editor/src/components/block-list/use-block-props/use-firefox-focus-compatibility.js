@@ -4,7 +4,8 @@ import { useRefEffect } from '@wordpress/compose';
  * In Firefox, a click on an editable element that cannot hold focus itself (an
  * inert part of the editing host around it) focuses the nearest focusable
  * ancestor, e.g. the wrapper of a parent block, whose focus handler would then
- * select that block. Chromium focuses the editing host. Move focus to the host
+ * select that block. Chromium focuses the editing host. The caret says where
+ * the click landed: when it sits in a descendant block, move focus to the host
  * before the focus handler runs.
  *
  * @return {Function} Ref callback.
@@ -12,27 +13,27 @@ import { useRefEffect } from '@wordpress/compose';
 export function useFirefoxFocusCompatibility() {
 	return useRefEffect( ( node ) => {
 		const { ownerDocument } = node;
-		let pressTarget;
-
-		function onMouseUp() {
-			pressTarget = null;
-		}
-
-		function onMouseDown( event ) {
-			pressTarget = event.target;
-			ownerDocument.addEventListener( 'mouseup', onMouseUp, {
-				once: true,
-			} );
-		}
 
 		function onFocusIn( event ) {
 			if (
 				event.target !== node ||
-				! pressTarget ||
-				pressTarget.closest( '[data-block]' ) === node ||
 				// Only editable by inheritance from an editing host.
 				! node.isContentEditable ||
 				node.contentEditable === 'true'
+			) {
+				return;
+			}
+
+			const { anchorNode } = ownerDocument.defaultView.getSelection();
+			const element =
+				anchorNode?.nodeType === anchorNode?.ELEMENT_NODE
+					? anchorNode
+					: anchorNode?.parentElement;
+
+			if (
+				! element ||
+				! node.contains( element ) ||
+				element.closest( '[data-block]' ) === node
 			) {
 				return;
 			}
@@ -42,13 +43,10 @@ export function useFirefoxFocusCompatibility() {
 				?.focus( { preventScroll: true } );
 		}
 
-		node.addEventListener( 'mousedown', onMouseDown );
 		node.addEventListener( 'focusin', onFocusIn, true );
 
 		return () => {
-			node.removeEventListener( 'mousedown', onMouseDown );
 			node.removeEventListener( 'focusin', onFocusIn, true );
-			ownerDocument.removeEventListener( 'mouseup', onMouseUp );
 		};
 	}, [] );
 }
