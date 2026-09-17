@@ -6,7 +6,7 @@ import DataViewsPagination, {
 	hasPaginationControls,
 } from '../dataviews-pagination';
 import {
-	BulkActions,
+	BulkActionToolbar,
 	useSomeItemHasAPossibleBulkAction,
 } from '../dataviews-bulk-actions';
 import { LAYOUT_GRID, LAYOUT_TABLE } from '../../constants';
@@ -59,7 +59,11 @@ export default function DataViewsFooter() {
 				gap="sm"
 			>
 				{ hasBulkActions &&
-					( isDefaultUI ? <DataViewsItemCount /> : <BulkActions /> ) }
+					( isDefaultUI ? (
+						<DataViewsItemCount />
+					) : (
+						<BulkActionToolbar />
+					) ) }
 				<DataViewsPagination />
 			</Stack>
 		</div>
