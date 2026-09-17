@@ -97,6 +97,7 @@ const ROUTE_EXTENSIONS = [
  * @return {RouteFiles} Object with flags and file names for route files.
  */
 export function getRouteFiles( routeDirectory ) {
+	/** @type {RouteFiles} */
 	const files = {
 		hasRoute: false,
 		hasStage: false,
@@ -110,18 +111,22 @@ export function getRouteFiles( routeDirectory ) {
 
 	const entries = readdirSync( routeDirectory );
 
+	// The extension list is ordered, so the first match wins.
 	for ( const ext of ROUTE_EXTENSIONS ) {
 		if ( entries.includes( `route.${ ext }` ) ) {
 			files.hasRoute = true;
 		}
-		for ( const name of [ 'stage', 'inspector', 'canvas' ] ) {
-			const fileName = `${ name }.${ ext }`;
-			// The extension list is ordered, so the first match wins.
-			if ( ! files[ name ] && entries.includes( fileName ) ) {
-				files[ name ] = fileName;
-				files[ `has${ name[ 0 ].toUpperCase() }${ name.slice( 1 ) }` ] =
-					true;
-			}
+		if ( ! files.stage && entries.includes( `stage.${ ext }` ) ) {
+			files.stage = `stage.${ ext }`;
+			files.hasStage = true;
+		}
+		if ( ! files.inspector && entries.includes( `inspector.${ ext }` ) ) {
+			files.inspector = `inspector.${ ext }`;
+			files.hasInspector = true;
+		}
+		if ( ! files.canvas && entries.includes( `canvas.${ ext }` ) ) {
+			files.canvas = `canvas.${ ext }`;
+			files.hasCanvas = true;
 		}
 	}
 
@@ -146,10 +151,16 @@ export function generateContentEntryPoint( files ) {
 	 * Import the full file name rather than relying on esbuild extending an
 	 * extensionless path: that resolution never tries `.mts` or `.cts`.
 	 */
-	for ( const name of [ 'stage', 'inspector', 'canvas' ] ) {
-		if ( files[ name ] ) {
-			lines.push( `export { ${ name } } from './${ files[ name ] }';` );
-		}
+	if ( files.stage ) {
+		lines.push( `export { stage } from './${ files.stage }';` );
+	}
+
+	if ( files.inspector ) {
+		lines.push( `export { inspector } from './${ files.inspector }';` );
+	}
+
+	if ( files.canvas ) {
+		lines.push( `export { canvas } from './${ files.canvas }';` );
 	}
 
 	// If no components exist, export empty object
