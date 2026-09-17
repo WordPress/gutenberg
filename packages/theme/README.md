@@ -234,6 +234,34 @@ The files generated in this step will all be committed to the repo.
 
 After the prebuild step, the package will be built into its final form via the repo's standard package build script.
 
+## Generating Colors Outside React
+
+`ThemeProvider` derives color token values from seed colors and applies them to its subtree. Where a provider cannot run, `generateColorTokens` performs the same derivation and returns the values as plain data:
+
+```js
+import { generateColorTokens } from '@wordpress/theme';
+
+const { tokens, compatibility, warnings } = generateColorTokens( {
+	primary: '#d63638',
+} );
+```
+
+Use it in a build step that emits a stylesheet, or on a screen that renders without React. Seeds accept the same values as the `ThemeProvider` `color` prop, and an omitted seed uses the design system's default.
+
+The result has three parts:
+
+- `tokens`: design token values, keyed by custom property name (for example `--wpds-color-background-surface-neutral`).
+- `compatibility`: the transitional [legacy compatibility](#legacy-compatibility) values, keyed the same way. These are not design tokens. Apply them only where older styles are in play, and only where nothing else already defines them.
+- `warnings`: the same contrast warnings that `onColorWarnings` reports.
+
+The result describes custom property names and values only. Where they apply, whether that is a selector, a cascade layer, or an inline style, is left to you. To apply both groups, as `ThemeProvider` does, merge them:
+
+```js
+const styles = { ...tokens, ...compatibility };
+```
+
+Consumers that cannot load React can import the same function from `@wordpress/theme/colors`, which pulls in no React dependency.
+
 ## Stylelint Plugins
 
 These rules validate design token usage in CSS. Enable them in your Stylelint configuration:
