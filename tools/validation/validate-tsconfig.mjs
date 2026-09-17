@@ -184,11 +184,11 @@ function srcProjectReferences( srcProject, packageName ) {
  */
 function hasDevFiles( packageName ) {
 	return (
-		globSync( '**/{test,tests,__tests__,stories}/**/*.{ts,tsx}', {
+		globSync( '**/{test,tests,__tests__,stories}/**/*.{ts,tsx,mts,cts}', {
 			cwd: resolve( repoRoot, 'packages', packageName ),
 			ignore: [ 'node_modules/**', 'build/**', 'build-*/**' ],
 		} ).length > 0 ||
-		globSync( '**/*.story.{ts,tsx}', {
+		globSync( '**/*.story.{ts,tsx,mts,cts}', {
 			cwd: resolve( repoRoot, 'packages', packageName ),
 			ignore: [ 'node_modules/**', 'build/**', 'build-*/**' ],
 		} ).length > 0
@@ -364,7 +364,7 @@ for ( const routeName of routeNames ) {
 		continue;
 	}
 	const hasTypeScriptFiles =
-		globSync( '**/*.{ts,tsx}', {
+		globSync( '**/*.{ts,tsx,mts,cts}', {
 			cwd: resolve( repoRoot, 'routes', routeName ),
 			ignore: [ 'node_modules/**', 'build/**' ],
 		} ).length > 0;
@@ -391,7 +391,7 @@ for ( const routeName of routesWithTypes ) {
 	 * are only checked when a registered test project covers them.
 	 */
 	const hasTestFiles =
-		globSync( '**/{test,tests,__tests__}/**/*.{ts,tsx}', {
+		globSync( '**/{test,tests,__tests__}/**/*.{ts,tsx,mts,cts}', {
 			cwd: routeDir,
 			ignore: [ 'node_modules/**', 'build/**' ],
 		} ).length > 0;
