@@ -136,6 +136,7 @@ export const SearchableChipSelect = forwardRef<
 									) }
 
 									<Combobox.Input
+										key="searchable-chip-select-input"
 										ref={ ref }
 										render={
 											<input
