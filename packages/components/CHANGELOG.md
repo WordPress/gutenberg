@@ -72,7 +72,6 @@
 
 ### Enhancements
 
--   `CheckboxControl`: Forward refs to the checkbox input for programmatic focus. ([#82730](https://github.com/WordPress/gutenberg/pull/82730))
 -   `CheckboxControl`: Match the `@wordpress/ui` default border, hover, and disabled icon colors ([#83271](https://github.com/WordPress/gutenberg/pull/83271)).
 -   `SelectControl`: Mark as not recommended for use in a WordPress environment, in favour of `SelectControl` from `@wordpress/ui` ([#83030](https://github.com/WordPress/gutenberg/pull/83030)).
 -   `PaletteEdit`: Use standard menu semantics and keyboard navigation for palette option actions through `Menu` from `@wordpress/ui` ([#82768](https://github.com/WordPress/gutenberg/pull/82768)).
