@@ -1,7 +1,6 @@
 import clsx from 'clsx';
 import {
 	__experimentalHStack as HStack,
-	__experimentalZStack as ZStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	ColorIndicator,
 	Flex,
@@ -105,13 +104,13 @@ const popoverProps = {
 
 const LabeledColorIndicators = ( { indicators, label } ) => (
 	<HStack justify="flex-start">
-		<ZStack isLayered={ false } offset={ -8 }>
+		<div className="block-editor-panel-color-gradient-settings__color-indicators">
 			{ indicators.map( ( indicator, index ) => (
 				<Flex key={ index } expanded={ false }>
 					<ColorIndicator colorValue={ indicator } />
 				</Flex>
 			) ) }
-		</ZStack>
+		</div>
 		<FlexItem className="block-editor-panel-color-gradient-settings__color-name">
 			{ label }
 		</FlexItem>
