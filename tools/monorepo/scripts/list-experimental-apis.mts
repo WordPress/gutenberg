@@ -24,7 +24,7 @@ const EXPERIMENTAL_API = /__experimental\w+/g;
 
 /**
  * Lists the tracked sources to scan. Git is the only binary this script needs:
- * it already knows which files are ours, ignored build output included.
+ * it already knows which files are ours, ignored build output left out.
  *
  * @return Repository-relative paths.
  */
@@ -56,33 +56,48 @@ function namespaceOf( file: string ): string {
 }
 
 /**
+ * Orders strings by code unit, which is what `sort` does under `LC_ALL=C`. The
+ * shell script this replaces used the caller's locale instead, so its output
+ * varied by environment.
+ *
+ * @param a First string.
+ * @param b Second string.
+ * @return Negative when `a` sorts first, positive when `b` does, else zero.
+ */
+function byCodeUnit( a: string, b: string ): number {
+	if ( a === b ) {
+		return 0;
+	}
+	return a < b ? -1 : 1;
+}
+
+/**
  * Collects every experimental API with the package it was found in. An API
  * exported by one package and consumed by another is reported once, under
  * whichever package sorts first.
  *
- * @return `[ namespace, api ]` pairs, sorted and deduplicated.
+ * @return `[ namespace, api ]` pairs, sorted by package and then by API.
  */
 function experimentalApis(): [ string, string ][] {
-	const found = new Set< string >();
+	const owners = new Map< string, string >();
 
 	for ( const file of sourceFiles() ) {
+		const namespace = namespaceOf( file );
 		const source = readFileSync( path.join( REPO_ROOT, file ), 'utf8' );
 		for ( const [ api ] of source.matchAll( EXPERIMENTAL_API ) ) {
-			found.add( `${ namespaceOf( file ) } ${ api }` );
+			const owner = owners.get( api );
+			if ( owner === undefined || namespace < owner ) {
+				owners.set( api, namespace );
+			}
 		}
 	}
 
-	const known = new Set< string >();
-	return [ ...found ]
-		.sort()
-		.map( ( entry ) => entry.split( ' ' ) as [ string, string ] )
-		.filter( ( [ , api ] ) => {
-			if ( known.has( api ) ) {
-				return false;
-			}
-			known.add( api );
-			return true;
-		} );
+	return [ ...owners ]
+		.map( ( [ api, namespace ] ): [ string, string ] => [ namespace, api ] )
+		.sort(
+			( [ aNamespace, aApi ], [ bNamespace, bApi ] ) =>
+				byCodeUnit( aNamespace, bNamespace ) || byCodeUnit( aApi, bApi )
+		);
 }
 
 let previousNamespace: string | undefined;
