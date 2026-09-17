@@ -380,10 +380,8 @@ function RichTextWrapper(
 
 		// A pointer press outside the field makes it non editable until the
 		// release (see rich text's preventFocusCapture). Focusing it then
-		// makes the block focus handler drop the text selection. Under the
-		// editing host the field is editable by inheritance and the host is
-		// focused instead.
-		if ( ! isSelected || ! element?.isContentEditable ) {
+		// makes the block focus handler drop the text selection.
+		if ( ! isSelected || element?.contentEditable !== 'true' ) {
 			return;
 		}
 
