@@ -162,17 +162,10 @@ $swatch-gap: 12px;
 }
 
 .block-editor-panel-color-gradient-settings__color-indicators {
-	display: inline-grid;
-	grid-auto-flow: column;
-	position: relative;
+	display: flex;
 
-	> * {
-		position: relative;
-		justify-self: start;
-
-		&:not(:first-of-type) {
-			margin-inline-start: -$grid-unit;
-		}
+	> * + * {
+		margin-inline-start: -$grid-unit;
 	}
 }
 
