@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Resolve post-specific template choices from PHP, including front-page and posts-page decisions, using a single result as the effective template and the first result as the default. PR reference pending.
+-   Resolve post-specific template choices from PHP, including front-page and posts-page decisions, using a single result as the effective template and the first result as the default. ([#83083](https://github.com/WordPress/gutenberg/pull/83083))
 
 ### Bug Fixes
 
