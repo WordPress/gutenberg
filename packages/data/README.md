@@ -1219,7 +1219,7 @@ However, it is possible that the `id` parameter will be passed as a `String`. In
 getItemsSelector.__unstableNormalizeArgs = ( args ) {
 	// "id" argument at the 2nd index
 	if (args[2] && typeof args[2] === 'string' ) {
-		args[2] === Number(args[2]);
+		args[2] = Number(args[2]);
 	}
 
 	return args;
