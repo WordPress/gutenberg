@@ -207,6 +207,22 @@ const noStringLiteralIds = {
 	message: 'Do not use string literals for IDs; use useId hook instead.',
 };
 
+const componentsColorRestrictedSyntax = [
+	{
+		selector:
+			':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
+		message:
+			'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+	},
+	{
+		selector:
+			// Allow overriding definitions, but not access with var()
+			':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
+		message:
+			'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+	},
+];
+
 const restrictedSyntax = [
 	{
 		selector:
@@ -278,6 +294,10 @@ const restrictedSyntax = [
 			"Avoid using the word 'sidebar' in translatable strings. Consider using 'panel' instead.",
 	},
 ];
+
+const restrictedSyntaxWithoutStringLiteralIds = restrictedSyntax.filter(
+	( rule ) => rule !== noStringLiteralIds
+);
 
 export default dedupePlugins( [
 	// Global ignores (replaces .eslintignore).
@@ -748,19 +768,7 @@ export default dedupePlugins( [
 			'no-restricted-syntax': [
 				'error',
 				...restrictedSyntax,
-				{
-					selector:
-						':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
-					message:
-						'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
-				},
-				{
-					selector:
-						// Allow overriding definitions, but not access with var()
-						':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
-					message:
-						'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
-				},
+				...componentsColorRestrictedSyntax,
 			],
 		},
 	},
@@ -772,14 +780,31 @@ export default dedupePlugins( [
 		files: [
 			`**/@(__mocks__|__tests__|test)/**/*.${ SCRIPT_EXT }`,
 			`**/@(storybook|stories)/**/*.${ SCRIPT_EXT }`,
+			...vitestTestPatterns,
 		],
 		ignores: [ 'test/e2e/**', 'test/performance/**' ],
 		rules: {
 			'no-restricted-syntax': [
 				'error',
-				...restrictedSyntax.filter(
-					( rule ) => rule !== noStringLiteralIds
-				),
+				...restrictedSyntaxWithoutStringLiteralIds,
+			],
+		},
+	},
+
+	// Override: Components tests and stories — keep color-variable
+	// restrictions after the ID exemption replaces `no-restricted-syntax`.
+	{
+		files: [
+			`packages/components/src/**/@(test|stories)/**/*.${ SCRIPT_EXT }`,
+			...vitestTestPatterns.filter( ( file ) =>
+				file.startsWith( 'packages/components/src/' )
+			),
+		],
+		rules: {
+			'no-restricted-syntax': [
+				'error',
+				...restrictedSyntaxWithoutStringLiteralIds,
+				...componentsColorRestrictedSyntax,
 			],
 		},
 	},
