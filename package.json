@@ -228,9 +228,8 @@
 		"core-js-pure": false,
 		"esbuild": false,
 		"file:packages/icons": true,
-		"fs-ext@2.1.1": true,
+		"fs-ext-extra-prebuilt": false,
 		"fsevents": false,
-		"leveldown@5.6.0": true,
 		"nx": false,
 		"unrs-resolver": false
 	},
