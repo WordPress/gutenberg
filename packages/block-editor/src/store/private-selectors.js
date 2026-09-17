@@ -1416,51 +1416,6 @@ export function isResponsiveEditing( state ) {
 }
 
 /**
- * Returns the selected style state for a block's style controls.
- *
- * @param {Object} state    Global application state.
- * @param {string} clientId The block client ID.
- *
- * @return {Object} The selected block style state.
- */
-export const getSelectedBlockStyleState = createSelector(
-	( state, clientId ) => {
-		const perBlockState =
-			state.selectedBlockStyleState?.clientId === clientId
-				? ( state.selectedBlockStyleState.value ??
-					DEFAULT_BLOCK_STYLE_STATE )
-				: DEFAULT_BLOCK_STYLE_STATE;
-
-		return {
-			...perBlockState,
-			// The viewport is tracked globally, so inject it here. This way
-			// consumers receive a single combined state object instead of
-			// merging the global viewport themselves, and selectors derived
-			// from this stay consistent.
-			viewport: getStyleStateViewport( state ),
-		};
-	},
-	( state ) => [ state.styleStateViewport, state.selectedBlockStyleState ]
-);
-
-/**
- * Returns whether a non-default style state is selected for a block.
- *
- * @param {Object} state    Global application state.
- * @param {string} clientId The block client ID.
- *
- * @return {boolean} Whether a non-default block style state is selected.
- */
-export function hasSelectedStyleState( state, clientId ) {
-	const selectedState = getSelectedBlockStyleState( state, clientId );
-
-	return (
-		selectedState.viewport !== DEFAULT_BLOCK_STYLE_STATE.viewport ||
-		selectedState.pseudo !== DEFAULT_BLOCK_STYLE_STATE.pseudo
-	);
-}
-
-/**
  * Returns whether the selected style state is shown on the canvas.
  *
  * @param {Object} state    Global application state.
