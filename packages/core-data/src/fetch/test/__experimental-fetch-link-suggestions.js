@@ -8,8 +8,11 @@ import {
 vi.mock( '@wordpress/api-fetch', () => ( {
 	default: vi.fn( ( { path } ) => {
 		switch ( path ) {
+			// addQueryArgs indexes array values, so several subtypes arrive as
+			// subtype[0], subtype[1] and so on.
 			case '/wp/v2/search?search=&per_page=20&type=post':
 			case '/wp/v2/search?search=Contact&per_page=20&type=post&subtype=page':
+			case '/wp/v2/search?search=Contact&per_page=20&type=post&subtype%5B0%5D=page':
 				return Promise.resolve( [
 					{
 						id: 37,
@@ -252,9 +255,9 @@ describe( 'fetchLinkSuggestions', () => {
 			] )
 		);
 	} );
-	it( 'searches several types when given an array', () => {
+	it( 'searches several types when given entries for each', () => {
 		return fetchLinkSuggestions( '', {
-			type: [ 'post', 'term' ],
+			type: [ { type: 'post' }, { type: 'term' } ],
 			perPage: 20,
 		} ).then( ( suggestions ) => {
 			// One result from the post search and two from the term search.
@@ -300,7 +303,7 @@ describe( 'fetchLinkSuggestions', () => {
 		} );
 	} );
 
-	it( 'does not send a top level subtype to types in the array form', () => {
+	it( 'does not send a top level subtype to entries', () => {
 		// Each entry carries its own subtype, so a leftover top level one must
 		// not reach the term search, where a post type slug returns nonsense.
 		return fetchLinkSuggestions( '', {
@@ -314,10 +317,25 @@ describe( 'fetchLinkSuggestions', () => {
 		} );
 	} );
 
-	it( 'treats an array of one exactly like that type on its own', () => {
+	it( 'accepts several subtypes for one type', () => {
+		return fetchLinkSuggestions( 'Contact', {
+			type: 'post',
+			subtype: [ 'page' ],
+			perPage: 20,
+		} ).then( ( suggestions ) => {
+			expect( suggestions.map( ( { title } ) => title ) ).toEqual( [
+				'Contact Page',
+			] );
+		} );
+	} );
+
+	it( 'treats an entry for one type like that type on its own', () => {
 		return Promise.all( [
 			fetchLinkSuggestions( '', { type: 'post', perPage: 20 } ),
-			fetchLinkSuggestions( '', { type: [ 'post' ], perPage: 20 } ),
+			fetchLinkSuggestions( '', {
+				type: [ { type: 'post' } ],
+				perPage: 20,
+			} ),
 		] ).then( ( [ asString, asArray ] ) => {
 			expect( asArray ).toEqual( asString );
 		} );
@@ -325,7 +343,7 @@ describe( 'fetchLinkSuggestions', () => {
 
 	it( 'does not search the types it was not given', () => {
 		return fetchLinkSuggestions( '', {
-			type: [ 'post', 'term' ],
+			type: [ { type: 'post' }, { type: 'term' } ],
 			perPage: 20,
 		} ).then( ( suggestions ) => {
 			expect( suggestions.map( ( { kind } ) => kind ) ).not.toContain(
@@ -337,9 +355,9 @@ describe( 'fetchLinkSuggestions', () => {
 		} );
 	} );
 
-	it( 'searches attachments when the array asks for them', () => {
+	it( 'searches attachments when asked for them', () => {
 		return fetchLinkSuggestions( '', {
-			type: [ 'attachment' ],
+			type: [ { type: 'attachment' } ],
 			perPage: 20,
 		} ).then( ( suggestions ) => {
 			expect( suggestions ).toEqual( [
@@ -354,10 +372,13 @@ describe( 'fetchLinkSuggestions', () => {
 		} );
 	} );
 
-	it( 'does not return post formats in an array when formats are unsupported', () => {
+	it( 'does not return post formats when formats are unsupported', () => {
 		return fetchLinkSuggestions(
 			'',
-			{ type: [ 'post-format', 'term' ], perPage: 20 },
+			{
+				type: [ { type: 'post-format' }, { type: 'term' } ],
+				perPage: 20,
+			},
 			{ disablePostFormats: true }
 		).then( ( suggestions ) => {
 			expect( suggestions.map( ( { type } ) => type ) ).not.toContain(

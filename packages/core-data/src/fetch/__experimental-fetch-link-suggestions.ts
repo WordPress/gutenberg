@@ -8,12 +8,10 @@ export type SearchType = 'attachment' | 'post' | 'term' | 'post-format';
 /**
  * One type to search, optionally narrowed to some of its subtypes.
  */
-export type SearchTypeOption =
-	| SearchType
-	| {
-			type: SearchType;
-			subtype?: string | string[];
-	  };
+export type SearchTypeEntry = {
+	type: SearchType;
+	subtype?: string | string[];
+};
 
 export type SearchOptions = {
 	/**
@@ -28,15 +26,14 @@ export type SearchOptions = {
 		'isInitialSuggestions' | 'initialSuggestionsSearchOptions'
 	>;
 	/**
-	 * Filters by search type. Pass an array to search several types at once,
-	 * giving each its own `subtype` where it needs one:
+	 * Filters by search type. Either one type on its own, narrowed by the top
+	 * level `subtype` below, or several as entries that each carry their own:
 	 *
 	 *     type: [ { type: 'post', subtype: 'page' }, { type: 'term' } ]
 	 *
-	 * A subtype belongs to one type, so it has to travel with it. The top
-	 * level `subtype` below applies only to a single type given on its own.
+	 * A subtype belongs to one type, so it has to travel with it.
 	 */
-	type?: SearchTypeOption | SearchTypeOption[];
+	type?: SearchType | SearchTypeEntry[];
 	/**
 	 * Slug of the post-type or taxonomy. Applies only when `type` is a single
 	 * type given on its own; in the array form each entry carries its own.
@@ -144,25 +141,15 @@ export default async function fetchLinkSuggestions(
 
 	const { disablePostFormats = false } = editorSettings;
 
-	// `type` accepts one type or several, and each may narrow itself to some
-	// of its subtypes. A subtype only means something to the handler it
-	// belongs to: sending a post type slug to the term handler does not fail,
-	// it returns nonsense, leaking private taxonomies such as
-	// `wp_template_part_area`. So a subtype is only ever sent with the type it
-	// was attached to. Undefined means every type, with no subtype.
-	const requestedTypes =
-		type === undefined
-			? undefined
-			: ( Array.isArray( type ) ? type : [ type ] ).map( ( entry ) =>
-					typeof entry === 'string'
-						? {
-								type: entry,
-								subtype: Array.isArray( type )
-									? undefined
-									: subtype,
-							}
-						: entry
-				);
+	// `type` is either one type, narrowed by the top level `subtype`, or a list
+	// of entries that each carry their own. A subtype only means something to
+	// the handler it belongs to: sending a post type slug to the term handler
+	// does not fail, it returns nonsense, leaking private taxonomies such as
+	// `wp_template_part_area`. Keeping each subtype with its type is what stops
+	// that. Undefined means every type, with no subtype.
+	const toEntries = ( value: SearchType | SearchTypeEntry[] ) =>
+		Array.isArray( value ) ? value : [ { type: value, subtype } ];
+	const requestedTypes = type === undefined ? undefined : toEntries( type );
 
 	// Returns the request to make for a type, or undefined to skip it.
 	const requestFor = ( searchType: SearchType ) => {
