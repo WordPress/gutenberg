@@ -218,7 +218,7 @@ function getTypecheckConfigPath( testFile ) {
 		directory = path.dirname( directory );
 	}
 
-	return path.join( ROOT_DIR, 'tools/monorepo/tsconfig/base.json' );
+	return path.join( ROOT_DIR, 'tools/monorepo/tsconfig/tsconfig.base.json' );
 }
 
 let typescriptTestCount = 0;
