@@ -1,7 +1,8 @@
 <?php
 /**
- * Icons API: registration of the core icon collection and its icons from the
- * plugin's own `packages/icons` manifest, replacing the core registration.
+ * Icons API: registration of the built-in and core icon collections and their
+ * icons from the plugin's own `packages/icons` manifest, replacing the core
+ * registration.
  *
  * @package gutenberg
  */
@@ -10,6 +11,13 @@
  * Registers the default icon collections for Gutenberg.
  */
 function gutenberg_register_default_icon_collections() {
+	wp_register_icon_collection(
+		'_builtin',
+		array(
+			'label'       => __( 'WordPress Built-in', 'gutenberg' ),
+			'description' => __( 'Built-in icon collection.', 'gutenberg' ),
+		)
+	);
 	wp_register_icon_collection(
 		'core',
 		array(
@@ -26,7 +34,7 @@ if ( false !== $default_icon_collections_priority ) {
 add_action( 'init', 'gutenberg_register_default_icon_collections', 0 );
 
 /**
- * Registers the default core icons from the Gutenberg manifest.
+ * Registers the default built-in and core icons from the Gutenberg manifest.
  */
 function gutenberg_register_default_icons() {
 	$icons_directory = gutenberg_dir_path() . 'packages/icons/src';
@@ -71,6 +79,10 @@ function gutenberg_register_default_icons() {
 
 		if ( isset( $icon_data['public'] ) ) {
 			$icon_args['public'] = $icon_data['public'];
+		}
+
+		if ( ! empty( $icon_data['_builtin'] ) ) {
+			wp_register_icon( '_builtin/' . $icon_name, $icon_args );
 		}
 
 		wp_register_icon( 'core/' . $icon_name, $icon_args );

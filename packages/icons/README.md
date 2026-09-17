@@ -54,6 +54,7 @@ To add a new icon to the library, follow these steps:
      - Omit the field to keep the icon in the JS library only. It is not shipped to core.
      - `true` ships the icon to core and exposes it through the SVG Icons API, which makes it selectable in the Icon block.
      - `false` ships the icon to core and registers it for server-side use through `wp_get_icon()`, but hides it from the REST API and the Icon block. Use this for icons that belong to the admin UI rather than to post content, such as admin menu icons.
+   - `_builtin` (optional): Set to `true` for an icon WordPress itself renders, such as an admin menu or admin bar icon. It additionally registers the icon in the reserved `_builtin` collection, which is hidden from the REST API and, unlike `core`, cannot be unregistered. Independent of `public`.
 4. **Do not edit `manifest.php`**: The `manifest.php` file is automatically generated from `manifest.json` by the build script. Do not edit it manually, as your changes will be overwritten when the build runs.
 
 After adding your icon, run `npm run build` to generate the TypeScript files and update `manifest.php`.
