@@ -1,4 +1,30 @@
 const BLOCK_SELECTOR = '.block-editor-block-list__block';
+
+/**
+ * The elements of the mounted RichText components. Under an editing host the
+ * selected block's field carries no contenteditable attribute of its own, so
+ * it cannot be found by attribute; the RichText component registers it here.
+ */
+export const richTextElements = new WeakSet< Element >();
+
+/**
+ * Returns the closest editable element: the element itself or an ancestor
+ * that is an editing host, or a rich text field editable through one.
+ *
+ * @param element Element to start from.
+ *
+ * @return The closest editable element, if any.
+ */
+export function getClosestEditableElement( element: Element | null ) {
+	for ( let node = element; node; node = node.parentElement ) {
+		if (
+			node.hasAttribute( 'contenteditable' ) ||
+			richTextElements.has( node )
+		) {
+			return node;
+		}
+	}
+}
 const APPENDER_SELECTOR = '.block-list-appender';
 const BLOCK_APPENDER_CLASS = '.block-editor-button-block-appender';
 
@@ -55,11 +81,7 @@ export function getSelectionEditableElement(
 		anchorNode.nodeType === anchorNode.ELEMENT_NODE
 			? ( anchorNode as Element )
 			: anchorNode.parentElement;
-	// While the wrapper is the editing host, the selected block's editable
-	// is editable by inheritance without a contenteditable attribute of its
-	// own (Gecko treats any explicit value other than true/false as
-	// non-editable), so rich text elements are matched by class.
-	const editable = element?.closest( '[contenteditable], .rich-text' );
+	const editable = getClosestEditableElement( element );
 
 	if (
 		! editable ||
