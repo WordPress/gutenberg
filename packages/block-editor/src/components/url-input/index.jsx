@@ -75,6 +75,9 @@ export default function URLInput( props ) {
 	const [ selectedSuggestion, setSelectedSuggestion ] = useState( null );
 	const [ isSuggestionsListOpen, setIsSuggestionsListOpen ] =
 		useState( false );
+	// Distinguishes "a real search came back empty" (worth telling the user
+	// about) from "nothing has been searched for yet" (nothing to report).
+	const [ hasNoResults, setHasNoResults ] = useState( false );
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ isComposing, setIsComposing ] = useState( false );
 
@@ -128,6 +131,7 @@ export default function URLInput( props ) {
 
 			setSuggestions( [] );
 			setIsSuggestionsListOpen( false );
+			setHasNoResults( false );
 			setSuggestionsValue( search );
 			setSelectedSuggestion( null );
 			setIsLoading( false );
@@ -149,10 +153,18 @@ export default function URLInput( props ) {
 					return;
 				}
 
+				// Initial suggestions (no search term yet) having nothing to
+				// show isn't a "no results" state worth surfacing to the user.
+				const noResultsForSearch =
+					! isInitialSuggestions && ! nextSuggestions.length;
+
 				setSuggestions( nextSuggestions );
 				setSuggestionsValue( search );
 				setIsLoading( false );
-				setIsSuggestionsListOpen( !! nextSuggestions.length );
+				setHasNoResults( noResultsForSearch );
+				setIsSuggestionsListOpen(
+					!! nextSuggestions.length || noResultsForSearch
+				);
 
 				if ( nextSuggestions.length ) {
 					debouncedSpeak(
@@ -212,6 +224,7 @@ export default function URLInput( props ) {
 	useEffect( () => {
 		if ( ! showSuggestions ) {
 			setIsSuggestionsListOpen( false );
+			setHasNoResults( false );
 		}
 	}, [ showSuggestions ] );
 
@@ -393,12 +406,13 @@ export default function URLInput( props ) {
 				markWhenOptional={ markWhenOptional }
 				renderControl={ renderControl }
 			/>
-			{ showSuggestions && suggestions.length > 0 && (
+			{ showSuggestions && ( suggestions.length > 0 || hasNoResults ) && (
 				<Suggestions
 					autocompleteRef={ autocompleteRef }
 					className={ className }
 					handleSuggestionClick={ handleSuggestionClick }
 					isLoading={ isLoading }
+					hasNoResults={ hasNoResults }
 					renderSuggestions={ renderSuggestions }
 					selectedSuggestion={ selectedSuggestion }
 					suggestionNodesRef={ suggestionNodesRef }
@@ -462,6 +476,7 @@ function Suggestions( {
 	className,
 	handleSuggestionClick,
 	isLoading,
+	hasNoResults,
 	renderSuggestions,
 	selectedSuggestion,
 	suggestionNodesRef,
@@ -495,6 +510,7 @@ function Suggestions( {
 			suggestionsListProps,
 			buildSuggestionItemProps,
 			isLoading,
+			hasNoResults,
 			handleSuggestionClick,
 			isInitialSuggestions: ! suggestionsValue?.length,
 			currentInputValue: suggestionsValue,
@@ -509,6 +525,15 @@ function Suggestions( {
 					[ `${ className }__suggestions` ]: className,
 				} ) }
 			>
+				{ hasNoResults && (
+					<span className="block-editor-url-input__suggestions-no-results">
+						{ sprintf(
+							/* translators: %s: search term. */
+							__( 'No results found for "%s"' ),
+							suggestionsValue
+						) }
+					</span>
+				) }
 				{ suggestions.map( ( suggestion, index ) => (
 					<Button
 						__next40pxDefaultSize
