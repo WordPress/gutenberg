@@ -97,7 +97,14 @@
 		margin-block-start: 0;
 	}
 
+	/*
+	 * In a dismissible notice the dismiss button is appended after the last
+	 * paragraph, so that paragraph is no longer `:last-child` and would keep
+	 * its bottom margin, leaving the notice taller than its padding asks for
+	 * and the text off-centre.
+	 */
 	.notice > p:last-child,
+	.notice > p:has(+ .notice-dismiss:last-child),
 	div.updated > p:last-child,
 	div.error > p:last-child {
 		margin-block-end: 0;
@@ -111,7 +118,27 @@
 	   needed, unlike the checkbox tick.
 	   ----------------------------------------------------------------------- */
 
+	/*
+	 * common.css reserves room for the button with `padding-right: 48px` on
+	 * `.notice.is-dismissible`, which the padding above would otherwise
+	 * flatten, letting long text run under the button. The same room, from the
+	 * notice's own padding: a padding either side of common.css's 24px button.
+	 */
+	.notice.is-dismissible {
+		padding-inline-end: calc(var(--wpds-dimension-padding-md) * 2 + 24px);
+	}
+
 	.notice-dismiss {
+		/*
+		 * Centre the button on the first line of text. Centring rather than
+		 * offsetting keeps it aligned whatever size the button is: common.css
+		 * enlarges it below 782px. The inline inset puts the 20px glyph, inside
+		 * the 24px button, the notice's padding away from the edge, matching the
+		 * space left of the text.
+		 */
+		top: calc(var(--wpds-dimension-padding-md) + var(--wpds-typography-line-height-sm) / 2);
+		translate: 0 -50%;
+		inset-inline-end: calc(var(--wpds-dimension-padding-md) - 2px);
 		color: inherit;
 
 		/* Already exactly 2px in common.css; named here so the notice owns every
