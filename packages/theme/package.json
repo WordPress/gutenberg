@@ -42,6 +42,10 @@
 			"types": "./build-types/index.d.ts",
 			"default": "./build-module/index.mjs"
 		},
+		"./colors": {
+			"types": "./build-types/generate-color-tokens.d.ts",
+			"default": "./build-module/generate-color-tokens.mjs"
+		},
 		"./design-tokens.css": "./prebuilt/css/design-tokens.css",
 		"./design-tokens.js": {
 			"types": "./build-types/prebuilt/js/design-tokens.d.mts",
