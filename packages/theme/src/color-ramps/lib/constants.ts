@@ -47,12 +47,12 @@ export const CONTRAST_COMBINATIONS: {
 }[] = [
 	{
 		bgs: [ 'surface1', 'surface2', 'surface3' ],
-		fgs: [ 'fgSurface3', 'fgSurface4' ],
+		fgs: [ 'fgSurface3', 'fgSurface4', 'fgSurface5' ],
 		target: 4.5,
 	},
 	{
 		bgs: [ 'surface4', 'surface5' ],
-		fgs: [ 'fgSurface4' ],
+		fgs: [ 'fgSurface4', 'fgSurface5' ],
 		target: 4.5,
 	},
 	{
