@@ -27,6 +27,7 @@ function isColorTransparent( color ) {
  * @param {string} clientId Block client ID.
  */
 export function useEventHandlers( { clientId, isSelected } ) {
+	// Adding a line to trigger build.
 	const shouldEditOnClickRef = useRef( false );
 	const {
 		getBlockRootClientId,
