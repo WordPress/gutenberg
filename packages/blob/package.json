@@ -43,7 +43,6 @@
 	"sideEffects": false,
 	"devDependencies": {
 		"@testing-library/jest-dom": "^7.0.1",
-		"@types/jest": "^30.0.0",
 		"@types/node": "^24.13.3",
 		"vitest": "^5.0.0"
 	},
