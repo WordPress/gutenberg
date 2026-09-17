@@ -1,24 +1,25 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import SandBox from '..';
 
 const meta: Meta< typeof SandBox > = {
+	tags: [ 'manifest' ],
 	component: SandBox,
 	title: 'Components/Utilities/SandBox',
 	id: 'components-sandbox',
 	argTypes: {
 		onFocus: { control: false },
 	},
+	args: {
+		onFocus: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -27,5 +28,14 @@ const Template: StoryFn< typeof SandBox > = ( args ) => <SandBox { ...args } />;
 
 export const Default = Template.bind( {} );
 Default.args = {
+	title: 'Sandbox preview',
 	html: '<p>Arbitrary HTML content</p>',
+	allowForms: false,
+};
+
+export const WithForm = Template.bind( {} );
+WithForm.args = {
+	title: 'Sandbox preview with form',
+	html: '<form action="#"><label for="name">Name</label><input id="name" type="text" /><button type="submit">Submit</button></form>',
+	allowForms: true,
 };

@@ -66,6 +66,9 @@
 		'emptyString' => '{ "value": "" }',
 		'anyString'   => '{ "value": "any" }',
 		'number'      => '{ "value": 10 }',
+		'auto'        => '{ "value": "auto" }',
+		'manual'      => '{ "value": "manual" }',
+		'hint'        => '{ "value": "hint" }',
 	);
 	?>
 
@@ -90,6 +93,10 @@
 			data-wp-bind--disabled="context.value"
 			data-wp-bind--aria-disabled="context.value"
 		>
+		<div
+			data-testid="popover"
+			data-wp-bind--popover="context.value"
+		></div>
 		<button
 			data-testid="toggle value"
 			data-wp-on--click="actions.toggleValue"
@@ -97,4 +104,15 @@
 		>Toggle</button>
 	</div>
 	<?php endforeach; ?>
+
+	<div data-wp-context='{"test": true}'>
+		<div
+			data-testid="without-unique-id"
+			data-wp-bind--data-test="context.test"
+		></div>
+		<div
+			data-testid="with-unique-id"
+			data-wp-bind--data-test---unique-id="context.test"
+		></div>
+	</div>
 </div>

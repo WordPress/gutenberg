@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Templates', () => {
@@ -11,12 +8,12 @@ test.describe( 'Templates', () => {
 		] );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'Sorting', async ( { admin, page } ) => {
@@ -40,13 +37,10 @@ test.describe( 'Templates', () => {
 	} );
 
 	test( 'Filtering', async ( { requestUtils, admin, page } ) => {
-		const template = await requestUtils.createTemplate( 'wp_template', {
+		await requestUtils.createTemplate( 'wp_template', {
 			slug: 'date',
 			title: 'Date Archives',
 			content: 'hi',
-		} );
-		await requestUtils.updateSiteSettings( {
-			active_templates: { date: template.wp_id },
 		} );
 		await admin.visitSiteEditor( { postType: 'wp_template' } );
 		// Global search.
@@ -57,7 +51,7 @@ test.describe( 'Templates', () => {
 		await page
 			.getByRole( 'button', { name: 'Reset search', exact: true } )
 			.click();
-		await expect( titles ).toHaveCount( 5 );
+		await expect( titles ).toHaveCount( 6 );
 
 		// Filter by author.
 		await page.getByRole( 'button', { name: 'Add filter' } ).click();

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	createElement,
 	cloneElement,
@@ -8,6 +5,11 @@ import {
 	isValidElement,
 	type Element as ReactElement,
 } from './react';
+import type {
+	ConversionMap,
+	InterpolationInput,
+	InterpolationString,
+} from './types';
 
 let indoc: string;
 let offset: number;
@@ -126,10 +128,10 @@ function createFrame(
  * @throws {TypeError}
  * @return A wp element.
  */
-const createInterpolateElement = (
-	interpolatedString: string,
-	conversionMap: Record< string, ReactElement >
-): ReactElement => {
+function createInterpolateElement< Input extends InterpolationInput >(
+	interpolatedString: Input,
+	conversionMap: ConversionMap< InterpolationString< Input > >
+): ReactElement {
 	indoc = interpolatedString;
 	offset = 0;
 	output = [];
@@ -146,7 +148,7 @@ const createInterpolateElement = (
 		// twiddle our thumbs
 	} while ( proceed( conversionMap ) );
 	return createElement( Fragment, null, ...output );
-};
+}
 
 /**
  * Validate conversion map.
@@ -247,6 +249,19 @@ function proceed( conversionMap: Record< string, ReactElement > ): boolean {
 			return true;
 
 		case 'closer':
+			// A closing tag with no matching opening tag on the stack is
+			// invalid. Warn and bail, keeping anything interpolated so far.
+			if ( 0 === stackDepth ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					// eslint-disable-next-line no-console
+					console.warn(
+						`Unmatched closing tag '</${ name }>' in createInterpolateElement. The rest of the string was not interpolated.`
+					);
+				}
+				addText();
+				return false;
+			}
+
 			// If we're not nesting then this is easy - close the block.
 			if ( 1 === stackDepth ) {
 				closeOuterElement( startOffset );

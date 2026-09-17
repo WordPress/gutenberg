@@ -1,0 +1,20 @@
+{
+	"name": "@wordpress/events-widget",
+	"version": "1.0.0",
+	"private": true,
+	"dependencies": {
+		"@wordpress/components": "file:../../packages/components",
+		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/dataviews": "file:../../packages/dataviews",
+		"@wordpress/date": "file:../../packages/date",
+		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/ui": "file:../../packages/ui",
+		"@wordpress/widget-primitives": "file:../../packages/widget-primitives"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.27"
+	}
+}

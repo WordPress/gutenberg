@@ -18,7 +18,7 @@ $ npm start
 
 The `slug` provided (`todo-list` in the example) defines the folder name for the scaffolded plugin and the internal block name. The WordPress plugin generated must [be installed manually](https://wordpress.org/documentation/article/manage-plugins/#manual-plugin-installation-1).
 
-_(requires `node` version `20.10.0` or above, and `npm` version `10.2.3` or above)_
+_(requires `node` version `20.10.0` or above)_
 
 > [Watch a video introduction to create-block on Learn.wordpress.org](https://learn.wordpress.org/tutorial/using-the-create-block-tool/)
 
@@ -69,7 +69,7 @@ The rest of the configuration is set to all default values unless overridden wit
 
 ```bash
 -V, --version                output the version number
--t, --template <name>        project template type name; allowed values: "static" (default), "es5", the name of an external npm package, or the path to a local directory
+-t, --template <name>        project template type name; allowed values: "standard" (default), "es5", the name of an external npm package, or the path to a local directory
 --variant                    choose a block variant as defined by the template
 --no-plugin                  scaffold block files only
 --target-dir <directory>     the directory where the files will be scaffolded, defaults to the slug

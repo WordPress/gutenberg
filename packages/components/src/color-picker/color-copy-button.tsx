@@ -1,25 +1,15 @@
-/**
- * WordPress dependencies
- */
 import { useCopyToClipboard } from '@wordpress/compose';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { copy, check } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { Button } from '../button';
 import Tooltip from '../tooltip';
-
 import type { ColorCopyButtonProps } from './types';
 
 export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
 	const { color, colorType } = props;
 	const [ copiedColor, setCopiedColor ] = useState< string | null >( null );
-	const copyTimerRef = useRef<
-		ReturnType< typeof setTimeout > | undefined
-	>();
+	const copyTimerRef = useRef< ReturnType< typeof setTimeout > >( undefined );
 	const copyRef = useCopyToClipboard< HTMLDivElement >(
 		() => {
 			switch ( colorType ) {

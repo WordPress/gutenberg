@@ -6,12 +6,9 @@
 	"category": "theme",
 	"description": "Display the description of categories, tags and custom taxonomies when viewing an archive.",
 	"textdomain": "default",
-	"attributes": {
-		"textAlign": {
-			"type": "string"
-		}
-	},
+	"usesContext": [ "termId", "taxonomy" ],
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
@@ -28,6 +25,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

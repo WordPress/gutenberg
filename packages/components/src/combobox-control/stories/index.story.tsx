@@ -1,16 +1,6 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import ComboboxControl from '..';
 import type { ComboboxControlProps } from '../types';
 
@@ -34,16 +24,25 @@ const countries = [
 ];
 
 const meta: Meta< typeof ComboboxControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Common/ComboboxControl',
 	id: 'components-comboboxcontrol',
 	component: ComboboxControl,
 	argTypes: {
 		value: { control: false },
 	},
+	args: {
+		onChange: fn(),
+		onFilterValueChange: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `SearchableSelectControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -77,11 +76,9 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
 };
 export const Default = Template.bind( {} );
 Default.args = {
-	__next40pxDefaultSize: true,
-	__nextHasNoMarginBottom: true,
-	allowReset: false,
-	label: 'Select a country',
+	label: 'Country',
 	options: countryOptions,
+	help: 'Help text to describe the control.',
 };
 
 /**
@@ -92,7 +89,7 @@ Default.args = {
 export const WithCustomRenderItem = Template.bind( {} );
 WithCustomRenderItem.args = {
 	...Default.args,
-	label: 'Select an author',
+	label: 'Author',
 	options: [
 		{
 			value: 'parsley',

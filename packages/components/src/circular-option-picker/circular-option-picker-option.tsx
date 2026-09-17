@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef, useContext, useEffect } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { CircularOptionPickerContext } from './circular-option-picker-context';
 import Button from '../button';
 import { Composite } from '../composite';
@@ -31,6 +20,7 @@ function UnforwardedOptionAsButton(
 	const { isPressed, label, ...additionalProps } = props;
 	return (
 		<Button
+			__next40pxDefaultSize
 			{ ...additionalProps }
 			aria-pressed={ isPressed }
 			ref={ forwardedRef }
@@ -67,6 +57,7 @@ function UnforwardedOptionAsOption(
 		<Composite.Item
 			render={
 				<Button
+					__next40pxDefaultSize
 					{ ...additionalProps }
 					role="option"
 					aria-selected={ !! isSelected }
@@ -88,7 +79,11 @@ export function Option( {
 	tooltipText,
 	...additionalProps
 }: OptionProps ) {
-	const { baseId, setActiveId } = useContext( CircularOptionPickerContext );
+	// Preserve the historical toggle-button fallback when this public
+	// subcomponent is rendered without a parent picker.
+	const { baseId, presentation = 'toggle-buttons' } = useContext(
+		CircularOptionPickerContext
+	);
 	const id = useInstanceId(
 		Option,
 		baseId || 'components-circular-option-picker__option'
@@ -97,24 +92,27 @@ export function Option( {
 	const commonProps = {
 		id,
 		className: 'components-circular-option-picker__option',
-		__next40pxDefaultSize: true,
 		...additionalProps,
 	};
 
-	const isListbox = setActiveId !== undefined;
-	const optionControl = isListbox ? (
-		<OptionAsOption
-			{ ...commonProps }
-			label={ tooltipText }
-			isSelected={ isSelected }
-		/>
-	) : (
-		<OptionAsButton
-			{ ...commonProps }
-			label={ tooltipText }
-			isPressed={ isSelected }
-		/>
-	);
+	const optionControl =
+		presentation === 'listbox' ? (
+			<OptionAsOption
+				{ ...commonProps }
+				label={ tooltipText }
+				isSelected={ isSelected }
+			/>
+		) : (
+			<OptionAsButton
+				{ ...commonProps }
+				label={ tooltipText }
+				isPressed={
+					presentation === 'toggle-buttons'
+						? !! isSelected
+						: undefined
+				}
+			/>
+		);
 
 	return (
 		<div
@@ -124,7 +122,9 @@ export function Option( {
 			) }
 		>
 			{ optionControl }
-			{ isSelected && <Icon icon={ check } { ...selectedIconProps } /> }
+			{ presentation !== 'command-buttons' && isSelected && (
+				<Icon icon={ check } { ...selectedIconProps } />
+			) }
 		</div>
 	);
 }

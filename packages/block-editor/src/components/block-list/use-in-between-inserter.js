@@ -1,26 +1,21 @@
-/**
- * WordPress dependencies
- */
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { InsertionPointOpenRef } from '../block-tools/insertion-point';
 import { unlock } from '../../lock-unlock';
 
 export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
-	const isInBetweenInserterDisabled = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().isDistractionFree ||
-			unlock( select( blockEditorStore ) ).isZoomOut(),
-		[]
-	);
+	const isInBetweenInserterDisabled = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return (
+			settings.isDistractionFree ||
+			settings.isPreviewMode ||
+			unlock( select( blockEditorStore ) ).isZoomOut()
+		);
+	}, [] );
 	const {
 		getBlockListSettings,
 		getBlockIndex,

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { LocaleSpecification as MomentLocaleSpecification } from 'moment';
 
 export type MeridiemConfig = {
@@ -51,7 +48,7 @@ export type TimezoneConfig = {
 	/**
 	 * Offset setting.
 	 */
-	offset: string;
+	offset: number;
 
 	/**
 	 * Offset setting with decimals formatted to minutes.

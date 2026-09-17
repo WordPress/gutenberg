@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Site Editor Templates Export', () => {
@@ -22,7 +19,7 @@ test.describe( 'Site Editor Templates Export', () => {
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
-			postType: 'wp_registered_template',
+			postType: 'wp_template',
 			canvas: 'edit',
 		} );
 		await page

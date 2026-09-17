@@ -1,0 +1,44 @@
+[
+	{
+		"name": "core/heading",
+		"isValid": true,
+		"attributes": {
+			"content": "Heading",
+			"level": 2,
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/heading",
+		"isValid": true,
+		"attributes": {
+			"content": "Heading",
+			"level": 2,
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/heading",
+		"isValid": true,
+		"attributes": {
+			"content": "Heading",
+			"level": 2,
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

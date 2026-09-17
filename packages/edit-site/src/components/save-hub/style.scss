@@ -1,9 +1,11 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .edit-site-save-hub {
-	color: $gray-600;
-	border-top: 1px solid $gray-800;
+	color: var(--wpds-color-foreground-content-neutral);
+	border-top: 1px solid var(--wpds-color-stroke-surface-neutral);
 	flex-shrink: 0;
 	margin: 0;
-	padding: $grid-unit-20 $canvas-padding;
+	padding: $grid-unit-20;
 }
 
 .edit-site-save-hub__button {
@@ -15,6 +17,7 @@
 		opacity: 1;
 	}
 
+	&[aria-disabled="true"],
 	&[aria-disabled="true"]:hover {
 		color: inherit;
 	}
@@ -22,7 +25,7 @@
 	&:not(.is-primary) {
 		&.is-busy,
 		&.is-busy[aria-disabled="true"]:hover {
-			color: $gray-900;
+			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 	}
 }

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Site Editor - Multi-entity save flow', () => {
@@ -11,19 +8,19 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 		] );
 	} );
 
+	test.beforeEach( async ( { admin } ) => {
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
 			requestUtils.deleteAllTemplates( 'wp_template' ),
 		] );
-	} );
-
-	test.beforeEach( async ( { admin } ) => {
-		await admin.visitSiteEditor( {
-			postId: 'emptytheme//index',
-			postType: 'wp_registered_template',
-			canvas: 'edit',
-		} );
 	} );
 
 	test( 'save flow should work as expected', async ( { editor, page } ) => {
@@ -45,7 +42,9 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 				.getByRole( 'button', { name: 'Open save panel' } )
 		).toBeVisible();
 
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 		const saveButton = page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Save' } );
@@ -74,7 +73,9 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 		// Change font size.
 		await fontSizePicker.getByRole( 'radio', { name: 'Small' } ).click();
 
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 
 		// Change font size again.
 		await fontSizePicker.getByRole( 'radio', { name: 'Medium' } ).click();

@@ -5,6 +5,7 @@
 		"attributes": {
 			"images": [],
 			"ids": [],
+			"navigationButtonType": "icon",
 			"shortCodeTransforms": [],
 			"caption": "",
 			"imageCrop": true,
@@ -12,7 +13,8 @@
 			"fixedHeight": true,
 			"linkTo": "media",
 			"sizeSlug": "large",
-			"allowResize": false
+			"allowResize": false,
+			"aspectRatio": "auto"
 		},
 		"innerBlocks": [
 			{
@@ -25,7 +27,8 @@
 					"href": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-682x1024.jpg",
 					"id": 705,
 					"sizeSlug": "large",
-					"linkDestination": "media"
+					"linkDestination": "media",
+					"isDecorative": false
 				},
 				"innerBlocks": []
 			},
@@ -39,7 +42,8 @@
 					"href": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg",
 					"id": 704,
 					"sizeSlug": "large",
-					"linkDestination": "media"
+					"linkDestination": "media",
+					"isDecorative": false
 				},
 				"innerBlocks": []
 			},
@@ -53,7 +57,8 @@
 					"href": "http://wptest.local/wp-content/uploads/2020/04/test-image-1024x683.jpg",
 					"id": 703,
 					"sizeSlug": "large",
-					"linkDestination": "media"
+					"linkDestination": "media",
+					"isDecorative": false
 				},
 				"innerBlocks": []
 			}
@@ -84,7 +89,8 @@
 					"href": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-682x1024.jpg",
 					"id": 705,
 					"sizeSlug": "large",
-					"linkDestination": "media"
+					"linkDestination": "media",
+					"isDecorative": false
 				},
 				"innerBlocks": []
 			},
@@ -98,7 +104,8 @@
 					"href": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg",
 					"id": 704,
 					"sizeSlug": "large",
-					"linkDestination": "media"
+					"linkDestination": "media",
+					"isDecorative": false
 				},
 				"innerBlocks": []
 			},
@@ -112,7 +119,8 @@
 					"href": "http://wptest.local/wp-content/uploads/2020/04/test-image-1024x683.jpg",
 					"id": 703,
 					"sizeSlug": "large",
-					"linkDestination": "media"
+					"linkDestination": "media",
+					"isDecorative": false
 				},
 				"innerBlocks": []
 			}

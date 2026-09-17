@@ -29,3 +29,11 @@
 		opacity: 0;
 	}
 }
+
+// This is the equivalent of the `body.rtl` style.scss rule for RTL,
+// but it's applied to the html element instead of the body element
+// since the `body.rtl` style is not applied to the iframe in the editor.
+html[dir="rtl"] .has-drop-cap:not(:focus)::first-letter {
+	float: initial;
+	margin-left: 0.1em;
+}

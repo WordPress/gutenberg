@@ -1,0 +1,175 @@
+const path = require( 'path' );
+const { readdir, stat, readFile } = require( 'fs/promises' );
+
+const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
+const ICON_VIEW_BOX = '0 0 24 24';
+
+function isStrokeBasedSvg( svgContent ) {
+	const svgTag = svgContent.match( /<svg\b[^>]*>/ )?.[ 0 ];
+	return /\sstyle=(["'])fill\s*:\s*none\s*;?\s*\1/.test( svgTag ?? '' );
+}
+
+/*
+ * Validating the icons collection checks that:
+ *
+ * - Each manifest entry has a matching SVG in library/, and vice versa.
+ * - Each manifest entry's `public` property, if present, is a boolean.
+ * - Each SVG uses currentColor so icons inherit text color.
+ * - Each SVG uses viewBox="0 0 24 24".
+ * - Each stroke-based SVG contains at least one stroked graphical element.
+ * - Each stroked graphical element uses a non-scaling stroke.
+ */
+async function validateCollection() {
+	const manifestPath = path.join( ICON_LIBRARY_DIR, '..', 'manifest.json' );
+
+	try {
+		await stat( manifestPath );
+	} catch {
+		throw new Error(
+			`Could not find icons manifest at '${ manifestPath }'`
+		);
+	}
+
+	const manifestContent = await readFile( manifestPath, 'utf8' );
+	const manifest = JSON.parse( manifestContent );
+
+	/*
+	 * Collect policy violations as strings.
+	 */
+	const problems = [];
+
+	/*
+	 * Scan manifest.json for the slugs and `filePath` property (paths)
+	 * of every icon, ensuring that for each icon the path matches the slug.
+	 *
+	 * Later we will reuse manifestPaths to compare these with the SVG files
+	 * found in the file system.
+	 */
+	const manifestPaths = [];
+	for ( const icon of manifest ) {
+		const expected = `library/${ icon.slug }.svg`;
+
+		/*
+		 * This is an unexpected failure and should thus throw an error
+		 * immediately, not be added to `problems`.
+		 */
+		if ( icon.filePath !== expected ) {
+			throw new Error(
+				`Invalid icon definition for icon '${ icon.slug }': expected 'filePath' to be '${ expected }', saw '${ icon.filePath }'`
+			);
+		}
+
+		manifestPaths.push( icon.filePath );
+
+		/*
+		 * Verify that `public`, if present, is a boolean.
+		 */
+		if ( 'public' in icon && typeof icon.public !== 'boolean' ) {
+			problems.push(
+				`- Invalid icon definition for icon '${
+					icon.slug
+				}': expected 'public' to be true or false, saw ${ JSON.stringify(
+					icon.public
+				) }`
+			);
+		}
+
+		/*
+		 * Verify that the corresponding SVG file is found.
+		 */
+		if (
+			! ( await stat(
+				path.join( ICON_LIBRARY_DIR, '..', expected )
+			).catch( () => false ) )
+		) {
+			problems.push(
+				`- Icon file ${ path.join(
+					ICON_LIBRARY_DIR,
+					'..',
+					expected
+				) } not found`
+			);
+		}
+	}
+
+	/*
+	 * Conversely, check that all the SVG files under library/ are listed in
+	 * the manifest.
+	 */
+	const svgFiles = ( await readdir( ICON_LIBRARY_DIR ) )
+		.filter( ( file ) => file.match( /^[a-z0-9--]+\.svg$/ ) )
+		.map( ( file ) => path.join( 'library', file ) )
+
+		// Enforce "/" as path separator, even on Windows
+		.map( ( file ) => file.replaceAll( path.sep, '/' ) );
+
+	for ( const file of svgFiles ) {
+		const svgPath = path.join( ICON_LIBRARY_DIR, path.basename( file ) );
+
+		if ( ! manifestPaths.includes( file ) ) {
+			problems.push( `- Missing entry for icon ${ svgPath }` );
+		}
+
+		const svgContent = await readFile( svgPath, 'utf8' );
+		if ( ! svgContent.includes( 'currentColor' ) ) {
+			problems.push(
+				`- Icon ${ svgPath } must set fill="currentColor" or stroke="currentColor" so the icon inherits text color`
+			);
+		}
+
+		if ( ! svgContent.includes( 'viewBox=' ) ) {
+			problems.push(
+				`- Icon ${ svgPath } must set a viewBox attribute instead of width and height attributes`
+			);
+		} else if ( ! svgContent.includes( `viewBox="${ ICON_VIEW_BOX }"` ) ) {
+			problems.push(
+				`- Icon ${ svgPath } must set viewBox="${ ICON_VIEW_BOX }"`
+			);
+		}
+
+		if ( isStrokeBasedSvg( svgContent ) ) {
+			const graphicalElements = svgContent.match(
+				/<(?:circle|ellipse|line|path|polygon|polyline|rect)\b[^>]*>/g
+			);
+			const strokedElements = graphicalElements?.filter(
+				( element ) => ! element.includes( 'stroke="none"' )
+			);
+
+			if ( ! strokedElements?.length ) {
+				problems.push(
+					`- Stroke-based icon ${ svgPath } must contain a graphical element that does not set stroke="none"`
+				);
+			}
+
+			if (
+				strokedElements?.some(
+					( element ) =>
+						! element.includes(
+							'vector-effect="non-scaling-stroke"'
+						)
+				)
+			) {
+				problems.push(
+					`- Stroked elements in ${ svgPath } must set vector-effect="non-scaling-stroke"`
+				);
+			}
+		}
+	}
+
+	if ( problems.length ) {
+		throw new Error(
+			`Icons manifest could not be validated. Please check ${ manifestPath }:\n${ problems.join(
+				'\n'
+			) }`
+		);
+	}
+}
+
+if ( module === require.main ) {
+	validateCollection();
+}
+
+module.exports = {
+	isStrokeBasedSvg,
+	validateCollection,
+};

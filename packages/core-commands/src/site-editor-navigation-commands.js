@@ -1,29 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { useCommandLoader } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	post,
-	page,
-	layout,
-	symbol,
-	symbolFilled,
-	styles,
-	navigation,
-	brush,
-} from '@wordpress/icons';
+import { post, page, layout, symbolFilled } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { addQueryArgs, getPath } from '@wordpress/url';
 import { useDebounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { unlock } from './lock-unlock';
 import { orderEntityRecordsBySearch } from './utils/order-entity-records-by-search';
 
@@ -33,7 +17,6 @@ const icons = {
 	post,
 	page,
 	wp_template: layout,
-	wp_registered_template: layout,
 	wp_template_part: symbolFilled,
 };
 
@@ -47,6 +30,49 @@ function useDebouncedValue( value ) {
 	}, [ debounced, value ] );
 
 	return debouncedValue;
+}
+
+// Route mapping for experimental site editor
+const ROUTE_MAPPING = {
+	'/template': '/templates',
+	'/pattern': '/patterns',
+};
+
+// Helper to determine the site editor page URL
+function getSiteEditorPage() {
+	return window.__experimentalExtensibleSiteEditor
+		? 'admin.php?page=site-editor-v2'
+		: 'site-editor.php';
+}
+
+// Helper to map routes for experimental site editor
+function mapRoute( path ) {
+	if ( ! window.__experimentalExtensibleSiteEditor ) {
+		return path;
+	}
+
+	// Check if path needs mapping
+	for ( const [ oldPath, newPath ] of Object.entries( ROUTE_MAPPING ) ) {
+		if ( path === oldPath || path.startsWith( oldPath + '?' ) ) {
+			// Handle template parts special case
+			if ( path.includes( 'postType=wp_template_part' ) ) {
+				return '/template-parts';
+			}
+			// Replace the base path
+			return path.replace( oldPath, newPath );
+		}
+	}
+
+	return path;
+}
+
+// Helper to check if currently in site editor
+function isInSiteEditor() {
+	const path = getPath( window.location.href );
+	return (
+		path?.includes( 'site-editor.php' ) ||
+		path?.includes( 'page=site-editor-v2' )
+	);
 }
 
 const getNavigationCommandLoaderPerPostType = ( postType ) =>
@@ -110,6 +136,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 						? decodeEntities( record.title?.rendered )
 						: __( '(no title)' ),
 					icon: icons[ postType ],
+					category: 'edit',
 				};
 
 				if (
@@ -131,9 +158,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					};
 				}
 
-				const isSiteEditor = getPath( window.location.href )?.includes(
-					'site-editor.php'
-				);
+				const isSiteEditor = isInSiteEditor();
 
 				return {
 					...command,
@@ -144,7 +169,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 							);
 						} else {
 							document.location = addQueryArgs(
-								'site-editor.php',
+								getSiteEditorPage(),
 								{
 									p: `/${ postType }/${ record.id }`,
 									canvas: 'edit',
@@ -171,7 +196,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 				return {
 					isBlockBasedTheme:
 						select( coreStore ).getCurrentTheme()?.is_block_theme,
-					canCreateTemplate: select( coreStore ).canUser( 'read', {
+					canCreateTemplate: select( coreStore ).canUser( 'create', {
 						kind: 'postType',
 						name: templateType,
 					} ),
@@ -220,6 +245,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 							? record.title?.rendered
 							: __( '(no title)' ),
 						icon: icons[ templateType ],
+						category: 'edit',
 						callback: ( { close } ) => {
 							if ( isSiteEditor ) {
 								history.navigate(
@@ -227,7 +253,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 								);
 							} else {
 								document.location = addQueryArgs(
-									'site-editor.php',
+									getSiteEditorPage(),
 									{
 										p: `/${ templateType }/${ record.id }`,
 										canvas: 'edit',
@@ -247,17 +273,19 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 				result.push( {
 					name: 'core/edit-site/open-template-parts',
 					label: __( 'Go to: Template parts' ),
-					icon: symbolFilled,
+					category: 'view',
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
 							history.navigate(
-								'/pattern?postType=wp_template_part&categoryId=all-parts'
+								mapRoute(
+									'/pattern?postType=wp_template_part&categoryId=all-parts'
+								)
 							);
 						} else {
 							document.location = addQueryArgs(
-								'site-editor.php',
+								getSiteEditorPage(),
 								{
-									p: '/pattern',
+									p: mapRoute( '/pattern' ),
 									postType: 'wp_template_part',
 									categoryId: 'all-parts',
 								}
@@ -279,9 +307,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 const getSiteEditorBasicNavigationCommands = () =>
 	function useSiteEditorBasicNavigationCommands() {
 		const history = useHistory();
-		const isSiteEditor = getPath( window.location.href )?.includes(
-			'site-editor.php'
-		);
+		const isSiteEditor = isInSiteEditor();
 		const { isBlockBasedTheme, canCreateTemplate, canCreatePatterns } =
 			useSelect( ( select ) => {
 				return {
@@ -305,13 +331,13 @@ const getSiteEditorBasicNavigationCommands = () =>
 				result.push( {
 					name: 'core/edit-site/open-styles',
 					label: __( 'Go to: Styles' ),
-					icon: styles,
+					category: 'view',
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
 							history.navigate( '/styles' );
 						} else {
 							document.location = addQueryArgs(
-								'site-editor.php',
+								getSiteEditorPage(),
 								{
 									p: '/styles',
 								}
@@ -324,13 +350,13 @@ const getSiteEditorBasicNavigationCommands = () =>
 				result.push( {
 					name: 'core/edit-site/open-navigation',
 					label: __( 'Go to: Navigation' ),
-					icon: navigation,
+					category: 'view',
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
 							history.navigate( '/navigation' );
 						} else {
 							document.location = addQueryArgs(
-								'site-editor.php',
+								getSiteEditorPage(),
 								{
 									p: '/navigation',
 								}
@@ -343,15 +369,15 @@ const getSiteEditorBasicNavigationCommands = () =>
 				result.push( {
 					name: 'core/edit-site/open-templates',
 					label: __( 'Go to: Templates' ),
-					icon: layout,
+					category: 'view',
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
-							history.navigate( '/template' );
+							history.navigate( mapRoute( '/template' ) );
 						} else {
 							document.location = addQueryArgs(
-								'site-editor.php',
+								getSiteEditorPage(),
 								{
-									p: '/template',
+									p: mapRoute( '/template' ),
 								}
 							);
 						}
@@ -364,16 +390,16 @@ const getSiteEditorBasicNavigationCommands = () =>
 				result.push( {
 					name: 'core/edit-site/open-patterns',
 					label: __( 'Go to: Patterns' ),
-					icon: symbol,
+					category: 'view',
 					callback: ( { close } ) => {
 						if ( canCreateTemplate ) {
 							if ( isSiteEditor ) {
-								history.navigate( '/pattern' );
+								history.navigate( mapRoute( '/pattern' ) );
 							} else {
 								document.location = addQueryArgs(
-									'site-editor.php',
+									getSiteEditorPage(),
 									{
-										p: '/pattern',
+										p: mapRoute( '/pattern' ),
 									}
 								);
 							}
@@ -405,12 +431,13 @@ const getSiteEditorBasicNavigationCommands = () =>
 const getGlobalStylesOpenCssCommands = () =>
 	function useGlobalStylesOpenCssCommands() {
 		const history = useHistory();
-		const isSiteEditor = getPath( window.location.href )?.includes(
-			'site-editor.php'
-		);
-		const { canEditCSS } = useSelect( ( select ) => {
-			const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-				select( coreStore );
+		const isSiteEditor = isInSiteEditor();
+		const { canEditCSS, isBlockBasedTheme } = useSelect( ( select ) => {
+			const {
+				getEntityRecord,
+				__experimentalGetCurrentGlobalStylesId,
+				getCurrentTheme,
+			} = select( coreStore );
 
 			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
 			const globalStyles = globalStylesId
@@ -419,11 +446,12 @@ const getGlobalStylesOpenCssCommands = () =>
 
 			return {
 				canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
+				isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
 			};
 		}, [] );
 
 		const commands = useMemo( () => {
-			if ( ! canEditCSS ) {
+			if ( ! canEditCSS || ! isBlockBasedTheme ) {
 				return [];
 			}
 
@@ -431,7 +459,7 @@ const getGlobalStylesOpenCssCommands = () =>
 				{
 					name: 'core/open-styles-css',
 					label: __( 'Open custom CSS' ),
-					icon: brush,
+					category: 'view',
 					callback: ( { close } ) => {
 						close();
 
@@ -439,7 +467,7 @@ const getGlobalStylesOpenCssCommands = () =>
 							history.navigate( '/styles?section=/css' );
 						} else {
 							document.location = addQueryArgs(
-								'site-editor.php',
+								getSiteEditorPage(),
 								{
 									p: '/styles',
 									section: '/css',
@@ -449,7 +477,7 @@ const getGlobalStylesOpenCssCommands = () =>
 					},
 				},
 			];
-		}, [ history, canEditCSS, isSiteEditor ] );
+		}, [ history, canEditCSS, isSiteEditor, isBlockBasedTheme ] );
 
 		return {
 			isLoading: false,
@@ -457,34 +485,36 @@ const getGlobalStylesOpenCssCommands = () =>
 		};
 	};
 
-export function useSiteEditorNavigationCommands() {
+export function useSiteEditorNavigationCommands( isNetworkAdmin ) {
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-pages',
 		hook: getNavigationCommandLoaderPerPostType( 'page' ),
+		disabled: isNetworkAdmin,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-posts',
 		hook: getNavigationCommandLoaderPerPostType( 'post' ),
+		disabled: isNetworkAdmin,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-templates',
 		hook: getNavigationCommandLoaderPerTemplate( 'wp_template' ),
-	} );
-	useCommandLoader( {
-		name: 'core/edit-site/navigate-templates',
-		hook: getNavigationCommandLoaderPerTemplate( 'wp_registered_template' ),
+		disabled: isNetworkAdmin,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-template-parts',
 		hook: getNavigationCommandLoaderPerTemplate( 'wp_template_part' ),
+		disabled: isNetworkAdmin,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/basic-navigation',
 		hook: getSiteEditorBasicNavigationCommands(),
 		context: 'site-editor',
+		disabled: isNetworkAdmin,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/global-styles-css',
 		hook: getGlobalStylesOpenCssCommands(),
+		disabled: isNetworkAdmin,
 	} );
 }

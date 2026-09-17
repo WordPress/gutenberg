@@ -1,19 +1,10 @@
-/**
- * External dependencies
- */
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { isValidElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { getValidChildren } from '../utils/get-valid-children';
 import { contextConnect, useContextSystem } from '../context';
-import { ZStackView, ZStackChildView } from './styles';
+import { PolymorphicElement } from '../utils/polymorphic-element';
+import styles from './style.module.scss';
 import type { ZStackProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -42,25 +33,31 @@ function UnconnectedZStack(
 		const key = isValidElement( child ) ? child.key : index;
 
 		return (
-			<ZStackChildView
-				offsetAmount={ offsetAmount }
-				zIndex={ zIndex }
+			<div
+				className={ styles.child }
+				style={ {
+					'--z-stack-offset': `${ offsetAmount }px`,
+					'--z-stack-z-index': zIndex,
+				} }
 				key={ key }
 			>
 				{ child }
-			</ZStackChildView>
+			</div>
 		);
 	} );
 
 	return (
-		<ZStackView
+		<PolymorphicElement
 			{ ...otherProps }
-			className={ className }
-			isLayered={ isLayered }
+			className={ clsx(
+				styles[ 'z-stack' ],
+				isLayered && styles.layered,
+				className
+			) }
 			ref={ forwardedRef }
 		>
 			{ clonedChildren }
-		</ZStackView>
+		</PolymorphicElement>
 	);
 }
 

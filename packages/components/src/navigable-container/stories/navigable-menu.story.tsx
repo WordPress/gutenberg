@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { NavigableMenu } from '..';
 
 const meta: Meta< typeof NavigableMenu > = {
@@ -15,12 +9,19 @@ const meta: Meta< typeof NavigableMenu > = {
 	argTypes: {
 		children: { control: false },
 	},
+	args: {
+		onKeyDown: fn(),
+		onNavigate: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'unaudited',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

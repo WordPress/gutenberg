@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Site editor iframe rendering mode', () => {
@@ -18,7 +15,7 @@ test.describe( 'Site editor iframe rendering mode', () => {
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
-			postType: 'wp_registered_template',
+			postType: 'wp_template',
 			canvas: 'edit',
 		} );
 		const compatMode = await editor.canvas

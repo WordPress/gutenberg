@@ -1,19 +1,9 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { DragEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
+import { fn } from 'storybook/test';
 import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { Icon, more } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Draggable from '..';
 
 const meta: Meta< typeof Draggable > = {
@@ -24,10 +14,25 @@ const meta: Meta< typeof Draggable > = {
 		elementId: { control: false },
 		__experimentalDragComponent: { control: false },
 	},
+	args: {
+		onDragStart: fn(),
+		onDragEnd: fn(),
+		onDragOver: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
-		docs: { source: { code: '' } },
+		docs: {
+			source: { code: '' },
+			// Render in its own iframe — Storybook's docs-page wrappers
+			// create transform-based containing blocks that break the
+			// clone's `position: fixed` resolution.
+			story: { inline: false, height: '250px' },
+		},
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'May be deprecated.',
+		},
 	},
 };
 export default meta;
@@ -105,11 +110,10 @@ export const Default: StoryFn< typeof Draggable > = DefaultTemplate.bind( {} );
 Default.args = {};
 
 /**
- * `appendToOwnerDocument` is used to append the element being dragged to the body of the owner document.
- *
- * This is useful when the element being dragged should not receive styles from its parent.
- * For example, when the element's parent sets a `z-index` value that would cause the dragged
- * element to be rendered behind other elements.
+ * `appendToOwnerDocument` appends the dragged element's clone to the owner
+ * document's body instead of the element's parent, which is useful when an
+ * ancestor's stacking context (e.g. its `z-index`) would otherwise place the
+ * clone behind other content.
  */
 export const AppendElementToOwnerDocument: StoryFn< typeof Draggable > =
 	DefaultTemplate.bind( {} );

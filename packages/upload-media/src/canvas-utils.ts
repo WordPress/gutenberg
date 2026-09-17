@@ -1,0 +1,346 @@
+import { getFileBasename } from './utils';
+import { parseHeic, type HeicImageData } from './heic-parser';
+import { getHeicUnsupportedMessage } from './heic-support';
+
+/**
+ * Raised when no decoding strategy could be used at all.
+ *
+ * Separates "nothing here can decode HEIC" from a file that is damaged: only
+ * the former says anything about the browser's codecs, and the caller words
+ * the two differently. Any other error thrown by `canvasConvertToJpeg()`
+ * means the file itself could not be decoded.
+ */
+export class HeicUnsupportedError extends Error {}
+
+/**
+ * Converts an image file to JPEG using the browser's native decoder and canvas.
+ *
+ * Tries three decoding strategies:
+ * 1. createImageBitmap() + OffscreenCanvas (works in Safari, future Chrome).
+ * 2. WebCodecs ImageDecoder API (uses platform codecs; may work in future
+ *    Chrome if HEIC is added to its image decoder pipeline).
+ * 3. HEIC container parsing + WebCodecs VideoDecoder (Chrome 107+ on macOS).
+ *    Parses the HEIC/ISOBMFF container to extract the HEVC bitstream, then
+ *    decodes it using Chrome's platform HEVC video decoder (hardware-
+ *    accelerated via macOS VideoToolbox).
+ *
+ * This avoids shipping our own HEVC decoder, sidestepping patent/licensing concerns.
+ *
+ * @param file    Source image file (e.g., HEIC/HEIF).
+ * @param quality JPEG quality (0-1). Default 0.82.
+ * @return JPEG File object.
+ */
+export async function canvasConvertToJpeg(
+	file: File,
+	quality = 0.82
+): Promise< File > {
+	const baseName = getFileBasename( file.name );
+
+	// Strategy 1: createImageBitmap + OffscreenCanvas.
+	try {
+		const bitmap = await createImageBitmap( file );
+		try {
+			const canvas = new OffscreenCanvas( bitmap.width, bitmap.height );
+			const ctx = canvas.getContext( '2d' );
+
+			if ( ! ctx ) {
+				throw new Error( 'Could not get canvas 2d context' );
+			}
+
+			ctx.drawImage( bitmap, 0, 0 );
+
+			const jpegBlob = await canvas.convertToBlob( {
+				type: 'image/jpeg',
+				quality,
+			} );
+
+			return new File( [ jpegBlob ], `${ baseName }.jpg`, {
+				type: 'image/jpeg',
+			} );
+		} finally {
+			bitmap.close();
+		}
+	} catch {
+		/*
+		 * Either this browser cannot decode HEIC through createImageBitmap,
+		 * or it can and the file is damaged. The rejection looks the same
+		 * both ways, so fall through: the container parse below tells a
+		 * damaged file apart from a missing codec.
+		 */
+	}
+
+	// Strategy 2: WebCodecs ImageDecoder API.
+	// Uses platform codecs (e.g., macOS HEIC support) that may not be
+	// exposed through createImageBitmap or <img> elements.
+	if ( typeof ImageDecoder !== 'undefined' ) {
+		const supported = await ImageDecoder.isTypeSupported( file.type );
+		if ( supported ) {
+			const decoder = new ImageDecoder( {
+				type: file.type,
+				data: file.stream(),
+			} );
+			try {
+				const { image: videoFrame } = await decoder.decode();
+				try {
+					const canvas = new OffscreenCanvas(
+						videoFrame.displayWidth,
+						videoFrame.displayHeight
+					);
+					const ctx = canvas.getContext( '2d' );
+
+					if ( ! ctx ) {
+						throw new Error( 'Could not get canvas 2d context' );
+					}
+
+					ctx.drawImage( videoFrame, 0, 0 );
+
+					const jpegBlob = await canvas.convertToBlob( {
+						type: 'image/jpeg',
+						quality,
+					} );
+
+					return new File( [ jpegBlob ], `${ baseName }.jpg`, {
+						type: 'image/jpeg',
+					} );
+				} finally {
+					videoFrame.close();
+				}
+			} finally {
+				decoder.close();
+			}
+		}
+	}
+
+	/*
+	 * Parse the container before trying the last strategy. Parsing needs no
+	 * codec, so a file that fails here is damaged, truncated or not a HEIC
+	 * at all, whatever the browser: report that rather than blaming the
+	 * codecs. This is the only signal Safari offers, since it decodes HEIC
+	 * through createImageBitmap alone and that rejection is opaque.
+	 */
+	let heicData: HeicImageData;
+	try {
+		heicData = parseHeic( await file.arrayBuffer() );
+	} catch ( error ) {
+		throw new Error( 'The HEIC file could not be parsed', {
+			cause: error,
+		} );
+	}
+
+	// Strategy 3: HEIC container parsing + WebCodecs VideoDecoder.
+	// Chrome 107+ on macOS supports HEVC *video* decoding via platform codecs
+	// (macOS VideoToolbox), even though it doesn't support HEIC through image
+	// APIs.  A HEIC file is an ISOBMFF container with HEVC-encoded tiles —
+	// we parse the container and decode each tile via VideoDecoder.
+	if ( typeof VideoDecoder !== 'undefined' ) {
+		let supported = false;
+		try {
+			const support = await VideoDecoder.isConfigSupported( {
+				codec: heicData.codecString,
+			} );
+			supported = support.supported === true;
+		} catch {
+			// A codec string the browser cannot even parse: not supported.
+		}
+
+		/*
+		 * From here on the browser has said it decodes this codec, so a
+		 * failure is the file's, not the browser's. Let it propagate.
+		 */
+		if ( supported ) {
+			const canvas = new OffscreenCanvas(
+				heicData.outputWidth,
+				heicData.outputHeight
+			);
+			const ctx = canvas.getContext( '2d' );
+
+			if ( ! ctx ) {
+				throw new Error( 'Could not get canvas 2d context' );
+			}
+
+			// Decode each tile and draw it at its grid position.
+			for ( const tile of heicData.tiles ) {
+				const frame = await decodeHevcFrame(
+					heicData.codecString,
+					heicData.description,
+					heicData.tileWidth,
+					heicData.tileHeight,
+					tile.data
+				);
+				try {
+					ctx.drawImage( frame, tile.x, tile.y );
+				} finally {
+					frame.close();
+				}
+			}
+
+			// Apply orientation: the native ISOBMFF `irot` transform when
+			// present, otherwise the EXIF orientation tag (libheif applies
+			// the former but ignores the latter for HEIF-family inputs).
+			const outputCanvas =
+				heicData.rotation !== 0
+					? applyRotation( canvas, heicData.rotation )
+					: applyExifOrientation( canvas, heicData.exifOrientation );
+
+			const jpegBlob = await outputCanvas.convertToBlob( {
+				type: 'image/jpeg',
+				quality,
+			} );
+
+			return new File( [ jpegBlob ], `${ baseName }.jpg`, {
+				type: 'image/jpeg',
+			} );
+		}
+	}
+
+	throw new HeicUnsupportedError( getHeicUnsupportedMessage() );
+}
+
+/**
+ * Apply ISOBMFF irot rotation to a canvas.
+ *
+ * Returns the original canvas if no rotation is needed, or a new
+ * OffscreenCanvas with the rotation applied.
+ *
+ * @param source   Source canvas with the decoded image.
+ * @param rotation Rotation angle in degrees counter-clockwise (0, 90, 180, 270).
+ * @return Canvas with rotation applied.
+ */
+function applyRotation(
+	source: OffscreenCanvas,
+	rotation: number
+): OffscreenCanvas {
+	if ( rotation === 0 ) {
+		return source;
+	}
+
+	const swap = rotation === 90 || rotation === 270;
+	const w = swap ? source.height : source.width;
+	const h = swap ? source.width : source.height;
+
+	const rotated = new OffscreenCanvas( w, h );
+	const ctx = rotated.getContext( '2d' );
+
+	if ( ! ctx ) {
+		return source;
+	}
+
+	ctx.translate( w / 2, h / 2 );
+	// irot angle is CCW; canvas rotate() is CW, so negate.
+	ctx.rotate( ( -rotation * Math.PI ) / 180 );
+	ctx.drawImage( source, -source.width / 2, -source.height / 2 );
+
+	return rotated;
+}
+
+/**
+ * Apply an EXIF orientation (1-8) to a canvas.
+ *
+ * Returns the original canvas for orientation 1, or a new OffscreenCanvas with
+ * the rotation/flip applied. Orientations 5-8 swap width and height.
+ *
+ * @param source      Source canvas with the decoded image.
+ * @param orientation EXIF orientation value (1-8).
+ * @return Canvas with the orientation applied.
+ */
+function applyExifOrientation(
+	source: OffscreenCanvas,
+	orientation: number
+): OffscreenCanvas {
+	if ( orientation <= 1 || orientation > 8 ) {
+		return source;
+	}
+
+	const { width: sw, height: sh } = source;
+	const swap = orientation >= 5;
+	const out = new OffscreenCanvas( swap ? sh : sw, swap ? sw : sh );
+	const ctx = out.getContext( '2d' );
+	if ( ! ctx ) {
+		return source;
+	}
+
+	// Affine transforms map EXIF orientation to the upright image. The e/f
+	// translation terms use the source width/height. See the EXIF spec tag
+	// 0x0112 and the standard orientation matrix.
+	switch ( orientation ) {
+		case 2: // Flip horizontal.
+			ctx.transform( -1, 0, 0, 1, sw, 0 );
+			break;
+		case 3: // Rotate 180°.
+			ctx.transform( -1, 0, 0, -1, sw, sh );
+			break;
+		case 4: // Flip vertical.
+			ctx.transform( 1, 0, 0, -1, 0, sh );
+			break;
+		case 5: // Transpose.
+			ctx.transform( 0, 1, 1, 0, 0, 0 );
+			break;
+		case 6: // Rotate 90° CW.
+			ctx.transform( 0, 1, -1, 0, sh, 0 );
+			break;
+		case 7: // Transverse.
+			ctx.transform( 0, -1, -1, 0, sh, sw );
+			break;
+		case 8: // Rotate 90° CCW.
+			ctx.transform( 0, -1, 1, 0, 0, sw );
+			break;
+	}
+
+	ctx.drawImage( source, 0, 0 );
+	return out;
+}
+
+/**
+ * Decode a single HEVC key frame using the WebCodecs VideoDecoder API.
+ *
+ * @param codec       HEVC codec string (e.g. 'hvc1.1.6.L93.B0').
+ * @param description HEVCDecoderConfigurationRecord bytes.
+ * @param width       Coded width of the frame.
+ * @param height      Coded height of the frame.
+ * @param data        Raw HEVC bitstream (IDR frame).
+ * @return Decoded VideoFrame. Caller must call frame.close().
+ */
+function decodeHevcFrame(
+	codec: string,
+	description: Uint8Array,
+	width: number,
+	height: number,
+	data: Uint8Array
+): Promise< VideoFrame > {
+	return new Promise< VideoFrame >( ( resolve, reject ) => {
+		const decoder = new VideoDecoder( {
+			output: ( frame ) => {
+				decoder.close();
+				resolve( frame );
+			},
+			error: ( e ) => {
+				if ( decoder.state !== 'closed' ) {
+					decoder.close();
+				}
+				reject( e );
+			},
+		} );
+
+		decoder.configure( {
+			codec,
+			codedWidth: width,
+			codedHeight: height,
+			description,
+		} );
+
+		decoder.decode(
+			new EncodedVideoChunk( {
+				type: 'key',
+				timestamp: 0,
+				data,
+			} )
+		);
+
+		decoder.flush().catch( ( e ) => {
+			if ( decoder.state !== 'closed' ) {
+				decoder.close();
+			}
+			reject( e );
+		} );
+	} );
+}

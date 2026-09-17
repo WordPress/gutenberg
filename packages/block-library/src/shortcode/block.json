@@ -16,7 +16,9 @@
 	"supports": {
 		"className": false,
 		"customClassName": false,
-		"html": false
+		"html": false,
+		"customCSS": false,
+		"visibility": false
 	},
 	"editorStyle": "wp-block-shortcode-editor"
 }

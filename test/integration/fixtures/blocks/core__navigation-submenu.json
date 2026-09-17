@@ -5,7 +5,8 @@
 		"attributes": {
 			"label": "A fine submenu",
 			"opensInNewTab": false,
-			"isTopLevelItem": true
+			"isTopLevelItem": true,
+			"isParentSubmenu": true
 		},
 		"innerBlocks": [
 			{

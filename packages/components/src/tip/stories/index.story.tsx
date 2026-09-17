@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import Tip from '..';
 
 const meta: Meta< typeof Tip > = {
@@ -20,6 +13,10 @@ const meta: Meta< typeof Tip > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'unaudited',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

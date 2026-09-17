@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import PanelHeader from './header';
 import type { PanelProps } from './types';
 
@@ -44,5 +33,6 @@ function UnforwardedPanel(
  * ```
  */
 export const Panel = forwardRef( UnforwardedPanel );
+Panel.displayName = 'Panel';
 
 export default Panel;
