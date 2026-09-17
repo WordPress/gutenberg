@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Playlist: Store each track's waveform peaks on the block when it is added, so the front end draws the real waveform without fetching and decoding the audio. Analysis needs to read the raw bytes, which is not possible for media served from another origin without CORS headers; a file that is still uploading is local, so uploads now produce a waveform wherever the file is stored afterwards ([#83086](https://github.com/WordPress/gutenberg/pull/83086)).
+
 ### Bug Fixes
 
 -   Math: Read the LaTeX source from the `<annotation>` inside the saved `<math>` instead of the block comment, so `&` and `<` survive `wp_kses` for users without `unfiltered_html`. Input that cannot be rendered is saved as an annotation-only `<semantics>`, which browsers display as the source text ([#82987](https://github.com/WordPress/gutenberg/pull/82987)).
