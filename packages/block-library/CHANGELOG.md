@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Navigation: Prioritize the Category Link and Tag Link variations in the block appender's quick inserter, so they're reachable without opening "Browse all" ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+-   Navigation: Prioritize the Category Link and Tag Link variations in the block appender's quick inserter, so they're reachable without opening "Browse all" ([#83108](https://github.com/WordPress/gutenberg/pull/83108)).
 
 ### Bug Fixes
 
