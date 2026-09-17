@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `__experimentalFetchLinkSuggestions`: Accept an array of types, so a caller can search several entity types without also getting the ones it cannot use ([#83085](https://github.com/WordPress/gutenberg/pull/83085)).
+
 ### Bug Fixes
 
 -   The `save<Entity>` and `delete<Entity>` shortcut actions resolve with their saved or deleted record types instead of `void` ([#77162](https://github.com/WordPress/gutenberg/pull/77162)).

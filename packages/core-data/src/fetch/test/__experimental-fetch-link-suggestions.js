@@ -233,6 +233,51 @@ describe( 'fetchLinkSuggestions', () => {
 			] )
 		);
 	} );
+	it( 'searches several types when given an array', () => {
+		return fetchLinkSuggestions( '', {
+			type: [ 'post', 'term' ],
+			perPage: 20,
+		} ).then( ( suggestions ) => {
+			expect( suggestions ).toEqual( [
+				{
+					id: 37,
+					title: 'Contact Page',
+					type: 'page',
+					url: 'http://wordpress.local/contact-page/',
+					kind: 'post-type',
+				},
+				{
+					id: 9,
+					title: 'Cats',
+					type: 'category',
+					url: 'http://wordpress.local/category/cats/',
+					kind: 'taxonomy',
+				},
+				{
+					id: 1,
+					title: 'Uncategorized',
+					type: 'category',
+					url: 'http://wordpress.local/category/uncategorized/',
+					kind: 'taxonomy',
+				},
+			] );
+		} );
+	} );
+
+	it( 'ignores subtype when searching several types', () => {
+		// A subtype belongs to one type, so it cannot be applied to all of them.
+		return fetchLinkSuggestions( '', {
+			type: [ 'post', 'term' ],
+			subtype: 'page',
+			perPage: 20,
+		} ).then( ( suggestions ) => {
+			expect( suggestions.map( ( { type } ) => type ) ).not.toContain(
+				'missing case or failed'
+			);
+			expect( suggestions ).toHaveLength( 3 );
+		} );
+	} );
+
 	describe( 'Initial search suggestions', () => {
 		it( 'initial search suggestions limits results', () => {
 			return fetchLinkSuggestions( '', {

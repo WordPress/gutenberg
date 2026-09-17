@@ -3,6 +3,8 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 
+export type SearchType = 'attachment' | 'post' | 'term' | 'post-format';
+
 export type SearchOptions = {
 	/**
 	 * Displays initial search suggestions, when true.
@@ -16,9 +18,10 @@ export type SearchOptions = {
 		'isInitialSuggestions' | 'initialSuggestionsSearchOptions'
 	>;
 	/**
-	 * Filters by search type.
+	 * Filters by search type. Pass an array to search several types at once;
+	 * `subtype` then does not apply, since it belongs to a single type.
 	 */
-	type?: 'attachment' | 'post' | 'term' | 'post-format';
+	type?: SearchType | SearchType[];
 	/**
 	 * Slug of the post-type or taxonomy.
 	 */
@@ -125,9 +128,18 @@ export default async function fetchLinkSuggestions(
 
 	const { disablePostFormats = false } = editorSettings;
 
+	// `type` accepts one type or several. Undefined means every type.
+	const requestedTypes =
+		type === undefined ? undefined : ( [] as SearchType[] ).concat( type );
+	const isRequested = ( searchType: SearchType ) =>
+		! requestedTypes || requestedTypes.includes( searchType );
+	// A subtype belongs to a single type, so it is ignored for a multi-type
+	// search where it could not be applied unambiguously.
+	const subtypeToUse = Array.isArray( type ) ? undefined : subtype;
+
 	const queries: Promise< SearchResult[] >[] = [];
 
-	if ( ! type || type === 'post' ) {
+	if ( isRequested( 'post' ) ) {
 		queries.push(
 			apiFetch< SearchAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -135,7 +147,7 @@ export default async function fetchLinkSuggestions(
 					page,
 					per_page: perPage,
 					type: 'post',
-					subtype,
+					subtype: subtypeToUse,
 				} ),
 			} )
 				.then( ( results ) => {
@@ -155,7 +167,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	if ( ! type || type === 'term' ) {
+	if ( isRequested( 'term' ) ) {
 		queries.push(
 			apiFetch< SearchAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -163,7 +175,7 @@ export default async function fetchLinkSuggestions(
 					page,
 					per_page: perPage,
 					type: 'term',
-					subtype,
+					subtype: subtypeToUse,
 				} ),
 			} )
 				.then( ( results ) => {
@@ -183,7 +195,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	if ( ! disablePostFormats && ( ! type || type === 'post-format' ) ) {
+	if ( ! disablePostFormats && isRequested( 'post-format' ) ) {
 		queries.push(
 			apiFetch< SearchAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -191,7 +203,7 @@ export default async function fetchLinkSuggestions(
 					page,
 					per_page: perPage,
 					type: 'post-format',
-					subtype,
+					subtype: subtypeToUse,
 				} ),
 			} )
 				.then( ( results ) => {
@@ -211,7 +223,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	if ( ! type || type === 'attachment' ) {
+	if ( isRequested( 'attachment' ) ) {
 		queries.push(
 			apiFetch< MediaAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/media', {
