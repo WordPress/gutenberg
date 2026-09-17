@@ -561,10 +561,10 @@ test.describe( 'Style Revisions', () => {
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
 		// The page select is the screen's only pagination control: the
 		// sidebar has no room for the previous/next buttons next to Apply.
-		const pageSelect = page.getByLabel( 'Current page' );
-		await expect( pageSelect ).toHaveValue( '1' );
-		await pageSelect.selectOption( '2' );
-		await expect( pageSelect ).toHaveValue( '2' );
+		const currentPageSelect = page.getByLabel( 'Current page' );
+		await expect( currentPageSelect ).toHaveValue( '1' );
+		await currentPageSelect.selectOption( '2' );
+		await expect( currentPageSelect ).toHaveValue( '2' );
 		// The theme defaults entry closes the last page.
 		await expect(
 			page.getByRole( 'option', {
