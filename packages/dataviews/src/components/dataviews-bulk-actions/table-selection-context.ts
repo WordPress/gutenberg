@@ -1,7 +1,7 @@
 import type { Ref, RefObject } from 'react';
 import { createContext } from '@wordpress/element';
 
-// Gives the layout access to the table header for selection focus management.
+// Gives the table layout access to the header for selection focus management.
 const TableSelectionContext = createContext< {
 	headerRef: Ref< HTMLTableSectionElement >;
 	selectionRef: RefObject< HTMLInputElement >;
