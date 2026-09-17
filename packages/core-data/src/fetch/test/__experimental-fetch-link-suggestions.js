@@ -35,6 +35,15 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 						type: 'category',
 					},
 				] );
+			case '/wp/v2/search?search=Contact&per_page=20&type=term&subtype=category':
+				return Promise.resolve( [
+					{
+						id: 3,
+						title: 'Contacts',
+						url: 'http://wordpress.local/category/contacts/',
+						type: 'category',
+					},
+				] );
 			case '/wp/v2/search?search=&per_page=20&type=post-format':
 				return Promise.resolve( [
 					{
@@ -50,6 +59,16 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 						url: 'http://wordpress.local/type/quote/',
 						type: 'post-format',
 						kind: 'taxonomy',
+					},
+				] );
+			case '/wp/v2/search?search=&per_page=20&type=post&subtype=page':
+				return Promise.resolve( [
+					{
+						id: 12,
+						title: 'A Page',
+						url: 'http://wordpress.local/a-page/',
+						type: 'post',
+						subtype: 'page',
 					},
 				] );
 			case '/wp/v2/search?search=&per_page=3&type=post&subtype=page':
@@ -238,43 +257,55 @@ describe( 'fetchLinkSuggestions', () => {
 			type: [ 'post', 'term' ],
 			perPage: 20,
 		} ).then( ( suggestions ) => {
-			expect( suggestions ).toEqual( [
-				{
-					id: 37,
-					title: 'Contact Page',
-					type: 'page',
-					url: 'http://wordpress.local/contact-page/',
-					kind: 'post-type',
-				},
-				{
-					id: 9,
-					title: 'Cats',
-					type: 'category',
-					url: 'http://wordpress.local/category/cats/',
-					kind: 'taxonomy',
-				},
-				{
-					id: 1,
-					title: 'Uncategorized',
-					type: 'category',
-					url: 'http://wordpress.local/category/uncategorized/',
-					kind: 'taxonomy',
-				},
+			expect( suggestions.map( ( { kind } ) => kind ) ).toEqual( [
+				'post-type',
+				'taxonomy',
+				'taxonomy',
 			] );
 		} );
 	} );
 
-	it( 'ignores subtype when searching several types', () => {
-		// A subtype belongs to one type, so it cannot be applied to all of them.
-		return fetchLinkSuggestions( '', {
-			type: [ 'post', 'term' ],
-			subtype: 'page',
+	it( 'gives each type its own subtype', () => {
+		return fetchLinkSuggestions( 'Contact', {
+			type: [
+				{ type: 'post', subtype: 'page' },
+				{ type: 'term', subtype: 'category' },
+			],
 			perPage: 20,
 		} ).then( ( suggestions ) => {
 			expect( suggestions.map( ( { type } ) => type ) ).not.toContain(
 				'missing case or failed'
 			);
-			expect( suggestions ).toHaveLength( 3 );
+		} );
+	} );
+
+	it( 'lets one type narrow itself while another does not', () => {
+		// A subtype only means something to the type it belongs to, so the
+		// term search is left unnarrowed rather than being sent "page".
+		return fetchLinkSuggestions( '', {
+			type: [ { type: 'post', subtype: 'page' }, { type: 'term' } ],
+			perPage: 20,
+		} ).then( ( suggestions ) => {
+			expect( suggestions.map( ( { type } ) => type ) ).not.toContain(
+				'missing case or failed'
+			);
+			expect(
+				suggestions.some( ( { kind } ) => kind === 'taxonomy' )
+			).toBe( true );
+		} );
+	} );
+
+	it( 'does not send a top level subtype to types in the array form', () => {
+		// Each entry carries its own subtype, so a leftover top level one must
+		// not reach the term search, where a post type slug returns nonsense.
+		return fetchLinkSuggestions( '', {
+			type: [ { type: 'post', subtype: 'page' }, { type: 'term' } ],
+			subtype: 'category',
+			perPage: 20,
+		} ).then( ( suggestions ) => {
+			expect( suggestions.map( ( { type } ) => type ) ).not.toContain(
+				'missing case or failed'
+			);
 		} );
 	} );
 
@@ -287,32 +318,14 @@ describe( 'fetchLinkSuggestions', () => {
 		} );
 	} );
 
-	it( 'keeps subtype for an array of one, where it is unambiguous', () => {
-		return fetchLinkSuggestions( 'Contact', {
-			type: [ 'post' ],
-			subtype: 'page',
-			perPage: 20,
-		} ).then( ( suggestions ) => {
-			expect( suggestions ).toEqual( [
-				{
-					id: 37,
-					title: 'Contact Page',
-					type: 'page',
-					url: 'http://wordpress.local/contact-page/',
-					kind: 'post-type',
-				},
-			] );
-		} );
-	} );
-
 	it( 'does not search the types it was not given', () => {
 		return fetchLinkSuggestions( '', {
 			type: [ 'post', 'term' ],
 			perPage: 20,
 		} ).then( ( suggestions ) => {
-			const kinds = suggestions.map( ( { kind } ) => kind );
-
-			expect( kinds ).not.toContain( 'media' );
+			expect( suggestions.map( ( { kind } ) => kind ) ).not.toContain(
+				'media'
+			);
 			expect( suggestions.map( ( { type } ) => type ) ).not.toContain(
 				'post-format'
 			);

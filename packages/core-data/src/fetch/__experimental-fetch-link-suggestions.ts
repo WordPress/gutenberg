@@ -5,6 +5,16 @@ import { __ } from '@wordpress/i18n';
 
 export type SearchType = 'attachment' | 'post' | 'term' | 'post-format';
 
+/**
+ * One type to search, optionally narrowed to some of its subtypes.
+ */
+export type SearchTypeOption =
+	| SearchType
+	| {
+			type: SearchType;
+			subtype?: string | string[];
+	  };
+
 export type SearchOptions = {
 	/**
 	 * Displays initial search suggestions, when true.
@@ -18,15 +28,20 @@ export type SearchOptions = {
 		'isInitialSuggestions' | 'initialSuggestionsSearchOptions'
 	>;
 	/**
-	 * Filters by search type. Pass an array to search several types at once;
-	 * `subtype` is then ignored, since it belongs to a single type.
-	 * An array of one behaves exactly like that type on its own.
+	 * Filters by search type. Pass an array to search several types at once,
+	 * giving each its own `subtype` where it needs one:
+	 *
+	 *     type: [ { type: 'post', subtype: 'page' }, { type: 'term' } ]
+	 *
+	 * A subtype belongs to one type, so it has to travel with it. The top
+	 * level `subtype` below applies only to a single type given on its own.
 	 */
-	type?: SearchType | SearchType[];
+	type?: SearchTypeOption | SearchTypeOption[];
 	/**
-	 * Slug of the post-type or taxonomy.
+	 * Slug of the post-type or taxonomy. Applies only when `type` is a single
+	 * type given on its own; in the array form each entry carries its own.
 	 */
-	subtype?: string;
+	subtype?: string | string[];
 	/**
 	 * Which page of results to return.
 	 */
@@ -129,24 +144,43 @@ export default async function fetchLinkSuggestions(
 
 	const { disablePostFormats = false } = editorSettings;
 
-	// `type` accepts one type or several. Undefined means every type.
+	// `type` accepts one type or several, and each may narrow itself to some
+	// of its subtypes. A subtype only means something to the handler it
+	// belongs to: sending a post type slug to the term handler does not fail,
+	// it returns nonsense, leaking private taxonomies such as
+	// `wp_template_part_area`. So a subtype is only ever sent with the type it
+	// was attached to. Undefined means every type, with no subtype.
 	const requestedTypes =
-		type === undefined ? undefined : ( [] as SearchType[] ).concat( type );
-	const isRequested = ( searchType: SearchType ) =>
-		! requestedTypes || requestedTypes.includes( searchType );
-	// A subtype belongs to one handler: a post type slug for `post`, a taxonomy
-	// slug for `term`. Validation accepts any registered post type or taxonomy
-	// name, so passing one to the handlers it does not belong to is not
-	// rejected, it just returns nonsense: `type=term&subtype=page` leaks the
-	// private `wp_template_part_area` taxonomy. Ignore it once more than one
-	// handler runs, where there is no single type it could belong to. One type
-	// is unambiguous however it is spelled, so `[ 'post' ]` keeps it.
-	const subtypeToUse =
-		requestedTypes && requestedTypes.length > 1 ? undefined : subtype;
+		type === undefined
+			? undefined
+			: ( Array.isArray( type ) ? type : [ type ] ).map( ( entry ) =>
+					typeof entry === 'string'
+						? {
+								type: entry,
+								subtype: Array.isArray( type )
+									? undefined
+									: subtype,
+							}
+						: entry
+				);
+
+	// Returns the request to make for a type, or undefined to skip it.
+	const requestFor = ( searchType: SearchType ) => {
+		if ( ! requestedTypes ) {
+			return { type: searchType, subtype: undefined };
+		}
+
+		return requestedTypes.find( ( entry ) => entry.type === searchType );
+	};
+
+	const postRequest = requestFor( 'post' );
+	const termRequest = requestFor( 'term' );
+	const postFormatRequest = requestFor( 'post-format' );
+	const attachmentRequest = requestFor( 'attachment' );
 
 	const queries: Promise< SearchResult[] >[] = [];
 
-	if ( isRequested( 'post' ) ) {
+	if ( postRequest ) {
 		queries.push(
 			apiFetch< SearchAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -154,7 +188,7 @@ export default async function fetchLinkSuggestions(
 					page,
 					per_page: perPage,
 					type: 'post',
-					subtype: subtypeToUse,
+					subtype: postRequest.subtype,
 				} ),
 			} )
 				.then( ( results ) => {
@@ -174,7 +208,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	if ( isRequested( 'term' ) ) {
+	if ( termRequest ) {
 		queries.push(
 			apiFetch< SearchAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -182,7 +216,7 @@ export default async function fetchLinkSuggestions(
 					page,
 					per_page: perPage,
 					type: 'term',
-					subtype: subtypeToUse,
+					subtype: termRequest.subtype,
 				} ),
 			} )
 				.then( ( results ) => {
@@ -202,7 +236,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	if ( ! disablePostFormats && isRequested( 'post-format' ) ) {
+	if ( ! disablePostFormats && postFormatRequest ) {
 		queries.push(
 			apiFetch< SearchAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -210,7 +244,7 @@ export default async function fetchLinkSuggestions(
 					page,
 					per_page: perPage,
 					type: 'post-format',
-					subtype: subtypeToUse,
+					subtype: postFormatRequest.subtype,
 				} ),
 			} )
 				.then( ( results ) => {
@@ -230,7 +264,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	if ( isRequested( 'attachment' ) ) {
+	if ( attachmentRequest ) {
 		queries.push(
 			apiFetch< MediaAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/media', {
