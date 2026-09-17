@@ -10,13 +10,20 @@
  * the same derivation at build time instead, and writes the result as CSS
  * scoped to each scheme's body class.
  *
- * Nothing is duplicated: scheme colours come from `@wordpress/admin-ui` and
- * the ramps from `@wordpress/theme`. Only tokens that differ from the default
- * scheme are written, and schemes that derive identical values share a rule.
+ * Nothing is duplicated: the derivation is `@wordpress/theme`'s own
+ * `generateColorTokens`, the same one `ThemeProvider` applies, and the scheme
+ * colours come from `@wordpress/admin-ui`. Only tokens that differ from the
+ * default scheme are written, and schemes that derive identical values share a
+ * rule.
  *
- * Both are imported from package source because neither package exports these
- * as a plain function yet. Once `@wordpress/theme` does, this script and its
- * output are meant to be replaced by that.
+ * Only the `tokens` group is written. The `compatibility` group is deliberately
+ * left out: `wp-base-styles` already defines `--wp-admin-theme-color` per
+ * scheme on the same `body.admin-color-*` selector, and a second definition of
+ * the same property would leave source order to decide between them.
+ *
+ * The scheme list is still imported from `@wordpress/admin-ui` package source,
+ * because reading it needs no DOM but the package exports only the DOM-reading
+ * `getAdminThemeColors`.
  *
  * Usage: npm run wpds:admin-scheme-tokens --workspace @wordpress/monorepo-tools
  */
@@ -24,12 +31,7 @@
 import { writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-	buildBgRamp,
-	buildAccentRamp,
-	DEFAULT_SEED_COLORS,
-} from '../../../packages/theme/src/color-ramps/index.ts';
-import colorTokens from '../../../packages/theme/src/prebuilt/ts/color-tokens.ts';
+import { generateColorTokens } from '@wordpress/theme/colors';
 import {
 	ADMIN_THEME_COLORS,
 	getAdminThemeColors,
@@ -52,45 +54,15 @@ function getDefaultPrimary() {
 	return getAdminThemeColors().primary;
 }
 
-/**
- * Derives every colour token for a primary colour, the way `ThemeProvider`
- * does, with the default background.
- *
- * @param {string} primary Primary colour.
- * @return {Map<string, string>} Token name to value.
- */
-function deriveTokens( primary ) {
-	const seeds = { ...DEFAULT_SEED_COLORS, primary };
-	const bgRamp = buildBgRamp( seeds.background );
-	const tokens = new Map();
-
-	for ( const [ rampName, seed ] of Object.entries( seeds ) ) {
-		const { ramp } =
-			rampName === 'background'
-				? bgRamp
-				: buildAccentRamp( seed, bgRamp );
-		const primitive = rampName === 'background' ? 'bg' : rampName;
-
-		for ( const [ step, value ] of Object.entries( ramp ) ) {
-			for ( const id of colorTokens[ `${ primitive }-${ step }` ] ??
-				[] ) {
-				// eslint-disable-next-line @wordpress/no-unknown-ds-tokens -- Names come from the theme's own generated alias map.
-				tokens.set( `--wpds-color-${ id }`, String( value ) );
-			}
-		}
-	}
-
-	return tokens;
-}
-
-const defaults = deriveTokens( getDefaultPrimary() );
+const defaults = generateColorTokens( { primary: getDefaultPrimary() } ).tokens;
 const rules = new Map();
 
 // Every scheme `@wordpress/admin-ui` knows about, so an added scheme is
 // picked up without editing this script.
 for ( const [ scheme, { primary } ] of ADMIN_THEME_COLORS ) {
-	const declarations = [ ...deriveTokens( primary ) ]
-		.filter( ( [ name, value ] ) => defaults.get( name ) !== value )
+	const { tokens } = generateColorTokens( { primary } );
+	const declarations = Object.entries( tokens )
+		.filter( ( [ name, value ] ) => defaults[ name ] !== value )
 		.sort( ( [ a ], [ b ] ) => a.localeCompare( b ) )
 		.map( ( [ name, value ] ) => `\t\t${ name }: ${ value };` )
 		.join( '\n' );
@@ -120,8 +92,8 @@ const css = `/**
  *
  * Setting \`--wpds-*\` properties is reserved for the theme package.
  *
- * DELETE WHEN: \`@wordpress/theme\` can generate these tokens outside React and
- * wp-admin loads them for the active colour scheme, which will also need to
+ * DELETE WHEN: wp-admin generates these tokens for the active colour scheme
+ * with \`generateColorTokens\` from \`@wordpress/theme\`, which will also need to
  * cover custom colour seeds (Core-66026, Core-65776).
  */
 
