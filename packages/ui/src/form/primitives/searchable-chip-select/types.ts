@@ -65,7 +65,7 @@ export function hasGroupedItems(
 
 export type SearchableChipSelectProps = Omit<
 	ComboboxRootProps< Item, true >,
-	'children' | 'items' | 'multiple'
+	'children' | 'items' | 'multiple' | 'readOnly'
 > &
 	Partial<
 		Pick<

@@ -60,7 +60,6 @@ export const SearchableChipSelect = forwardRef<
 	{
 		children,
 		disabled,
-		readOnly,
 		emptyContent = __( 'No results found.' ),
 		statusContent,
 		items,
@@ -85,7 +84,6 @@ export const SearchableChipSelect = forwardRef<
 			items={ items }
 			multiple
 			disabled={ disabled }
-			readOnly={ readOnly }
 			{ ...restProps }
 		>
 			<Combobox.InputGroup>
@@ -94,7 +92,7 @@ export const SearchableChipSelect = forwardRef<
 						const selectedCount = value.length;
 						const selectionHint = getInputSelectionHint(
 							selectedCount,
-							! disabled && ! readOnly
+							! disabled
 						);
 
 						return (
