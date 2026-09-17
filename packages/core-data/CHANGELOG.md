@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `__experimentalFetchLinkSuggestions`: Accept an array of types, so a caller can search several entity types without also getting the ones it cannot use ([#83085](https://github.com/WordPress/gutenberg/pull/83085)).
+-   `__experimentalFetchLinkSuggestions`: Accept an array of types, so a caller can search several entity types without also getting the ones it cannot use ([#83084](https://github.com/WordPress/gutenberg/pull/83084)).
 
 ### Bug Fixes
 
