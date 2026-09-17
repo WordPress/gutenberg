@@ -153,7 +153,7 @@ describe( 'test infrastructure policy', () => {
 		] );
 	} );
 
-	it( 'requires deterministic file-order shuffling', () => {
+	it( 'requires deterministic file and test-order shuffling', () => {
 		const validRootPackageJson = {
 			scripts: {
 				'test:unit:vitest:shuffled':
@@ -163,7 +163,7 @@ describe( 'test infrastructure policy', () => {
 		const validUnitTestPackageJson = {
 			scripts: {
 				'test:unit:vitest:shuffled':
-					'npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855',
+					'npm run test:unit:vitest -- --sequence.shuffle.files --sequence.shuffle.tests --sequence.seed=80855',
 			},
 		};
 
@@ -188,7 +188,7 @@ describe( 'test infrastructure policy', () => {
 				},
 			} )
 		).toEqual( [
-			'test/unit/package.json: scripts.test:unit:vitest:shuffled must be exactly `npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855`',
+			'test/unit/package.json: scripts.test:unit:vitest:shuffled must be exactly `npm run test:unit:vitest -- --sequence.shuffle.files --sequence.shuffle.tests --sequence.seed=80855`',
 		] );
 		expect(
 			validateVitestShuffleScripts(
