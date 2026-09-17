@@ -56,7 +56,7 @@ export default function BreadcrumbEdit( {
 						kind: 'postType',
 						name: postType,
 						id: postId,
-				  } )
+					} )
 				: undefined;
 			const _canEditPost = canUserEditPostContext(
 				select,
