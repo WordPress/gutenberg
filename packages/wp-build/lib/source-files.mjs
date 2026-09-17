@@ -1,4 +1,13 @@
-const SOURCE_EXTENSIONS = [ 'js', 'jsx', 'mjs', 'ts', 'tsx' ];
+const SOURCE_EXTENSIONS = [
+	'js',
+	'jsx',
+	'mjs',
+	'cjs',
+	'ts',
+	'tsx',
+	'mts',
+	'cts',
+];
 const TEST_FILE_PATTERNS = [
 	/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
 	new RegExp( `\\.(spec|test)\\.(${ SOURCE_EXTENSIONS.join( '|' ) })$` ),
