@@ -61,18 +61,21 @@ vi.mock( import( '@wordpress/dataviews' ), async () => {
 		itemListLabel,
 		actions = [],
 	} ) => {
+		// DataViews hands the fields and the actions shallow clones of the
+		// items, never the originals.
+		const items = data.map( ( item ) => ( { ...item } ) );
 		const titleField = fields.find( ( f ) => f.id === view.titleField );
 		const descriptionField = fields.find(
 			( f ) => f.id === view.descriptionField
 		);
-		const selectedItems = data.filter( ( item ) =>
+		const selectedItems = items.filter( ( item ) =>
 			selection.includes( getItemId( item ) )
 		);
 
 		return h(
 			'div',
 			{ role: 'listbox', 'aria-label': itemListLabel },
-			data.map( ( item ) =>
+			items.map( ( item ) =>
 				h(
 					'div',
 					{
