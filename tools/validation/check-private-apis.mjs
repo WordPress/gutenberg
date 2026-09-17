@@ -246,7 +246,7 @@ async function checkPackage( name, exclude = new Set() ) {
 						first.location
 							? ` (${ first.location.file }:${ first.location.line })`
 							: ''
-				  }`
+					}`
 				: error.message.split( '\n' )[ 0 ],
 		};
 	}
@@ -276,7 +276,7 @@ async function checkPackage( name, exclude = new Set() ) {
 							! dep.external &&
 							dep.path.startsWith( PRIVATE_APIS_DIR )
 					)
-		  )
+			)
 		: [];
 	// A culprit can survive with no live import edge among kept files: its
 	// importer was shaken but its module-level side effects kept it. Fall back

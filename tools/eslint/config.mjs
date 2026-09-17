@@ -27,6 +27,7 @@ const vitestTestsByProject = getVitestTestsByProject(
 );
 const vitestTestPatterns = Object.values( vitestTestsByProject ).flat();
 const vitestJsdomTestPatterns = vitestTestsByProject.jsdom;
+const vitestBrowserTestPatterns = vitestTestsByProject.browser;
 // Prefer the installed React version for linting, but fall back to the detected version.
 let reactVersion = 'detect';
 try {
@@ -63,6 +64,14 @@ function dedupePlugins( configs ) {
 	} );
 }
 
+/*
+ * Extension globs. Node runs `.mts` and `.cts` through type stripping, so they
+ * are linted wherever `.ts` is.
+ */
+const SCRIPT_EXT = '@([cm]js|[cm]ts|js|jsx|ts|tsx)';
+const TS_EXT = '@([cm]ts|ts|tsx)';
+const SCRIPT_EXT_NO_JSX = '@([cm]js|[cm]ts|js|ts)';
+
 /**
  * The list of patterns matching files used only for development purposes.
  *
@@ -70,10 +79,10 @@ function dedupePlugins( configs ) {
  */
 const developmentFiles = [
 	'**/benchmark/**/*.js',
-	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
-	'**/@(storybook|stories)/**/*.[tj]s?(x)',
+	`**/@(__mocks__|__tests__|test)/**/*.${ SCRIPT_EXT }`,
+	`**/@(storybook|stories)/**/*.${ SCRIPT_EXT }`,
 	'packages/babel-preset-default/bin/**/*.js',
-	'packages/theme/bin/**/*.[tj]s?(x)',
+	`packages/theme/bin/**/*.${ SCRIPT_EXT }`,
 	'packages/theme/terrazzo.config.ts',
 ];
 
@@ -293,8 +302,11 @@ export default dedupePlugins( [
 			'example-*/',
 		],
 	},
-	// ESLint's default file discovery does not include JSX files.
-	{ files: [ '**/*.jsx' ] },
+	/*
+	 * ESLint's default file discovery covers only `.js`, `.mjs` and `.cjs`.
+	 * Every other extension has to be named before any config below applies.
+	 */
+	{ files: [ '**/*.jsx', '**/*.mts', '**/*.cts' ] },
 
 	// Base recommended config from @wordpress/eslint-plugin.
 	...wpPlugin.configs.recommended,
@@ -373,6 +385,7 @@ export default dedupePlugins( [
 						Badge: 'WCBadge',
 						Icon: 'WCIcon',
 						__experimentalInputControl: 'WCInputControl',
+						SelectControl: 'WCSelectControl',
 						TextareaControl: 'WCTextareaControl',
 						Tooltip: 'WCTooltip',
 					},
@@ -432,7 +445,7 @@ export default dedupePlugins( [
 
 	// TypeScript-specific rules (require TS parser / type information).
 	{
-		files: [ '**/*.ts', '**/*.tsx' ],
+		files: [ `**/*.${ TS_EXT }` ],
 		rules: {
 			'@typescript-eslint/no-restricted-imports': [
 				'error',
@@ -507,10 +520,10 @@ export default dedupePlugins( [
 	// Override: React src + storybook — stylesheet and component rules.
 	{
 		files: [
-			'packages/*/src/**/*.[tj]s?(x)',
-			'routes/**/*.[tj]s?(x)',
-			'widgets/**/*.[tj]s?(x)',
-			'storybook/stories/**/*.[tj]s?(x)',
+			`packages/*/src/**/*.${ SCRIPT_EXT }`,
+			`routes/**/*.${ SCRIPT_EXT }`,
+			`widgets/**/*.${ SCRIPT_EXT }`,
+			`storybook/stories/**/*.${ SCRIPT_EXT }`,
 		],
 		rules: {
 			'@wordpress/no-non-module-stylesheet-imports': 'error',
@@ -528,6 +541,27 @@ export default dedupePlugins( [
 		...testingLibraryPlugin.configs[ 'flat/react' ],
 		files: vitestJsdomTestPatterns,
 	},
+	{
+		...jestDomPlugin.configs[ 'flat/recommended' ],
+		files: vitestBrowserTestPatterns,
+	},
+	{
+		...testingLibraryPlugin.configs[ 'flat/react' ],
+		files: vitestBrowserTestPatterns,
+		settings: {
+			'testing-library/utils-module': 'off',
+			'testing-library/custom-renders': 'off',
+			'testing-library/custom-queries': 'off',
+		},
+		rules: {
+			...testingLibraryPlugin.configs[ 'flat/react' ].rules,
+			// Browser Mode locators are the browser-native alternative to
+			// Testing Library's screen queries.
+			'testing-library/prefer-screen-queries': 'off',
+		},
+	},
+	// Keep the repository's existing rule set during the runner migration.
+	// Adopting the public Vitest rules requires a separate suite-wide lint migration.
 	{
 		plugins: jestPlugin.configs[ 'flat/recommended' ].plugins,
 		files: vitestTestPatterns,
@@ -548,8 +582,8 @@ export default dedupePlugins( [
 	},
 
 	// Override: Jest test files (unit tests).
-	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
-		...config,
+	{
+		...jestPlugin.configs[ 'flat/recommended' ],
 		files: [
 			'packages/jest*/**/*.js',
 			'**/test/**/*.{js,jsx}',
@@ -560,36 +594,45 @@ export default dedupePlugins( [
 			'test/performance/**/*.js',
 			...vitestTestPatterns,
 		],
-	} ) ),
+	},
 
 	// Override: Test files — jest-dom, testing-library, jest recommended.
 	{
 		...jestDomPlugin.configs[ 'flat/recommended' ],
-		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
+		files: [
+			`**/test/**/*.${ SCRIPT_EXT }`,
+			`**/__tests__/**/*.${ SCRIPT_EXT }`,
+		],
 		ignores: [
-			'test/e2e/**/*.[tj]s?(x)',
-			'test/performance/**/*.[tj]s?(x)',
-			'test/storybook-playwright/**/*.[tj]s?(x)',
+			`test/e2e/**/*.${ SCRIPT_EXT }`,
+			`test/performance/**/*.${ SCRIPT_EXT }`,
+			`test/storybook-playwright/**/*.${ SCRIPT_EXT }`,
 			...vitestTestPatterns,
 		],
 	},
 	{
 		...testingLibraryPlugin.configs[ 'flat/react' ],
-		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
+		files: [
+			`**/test/**/*.${ SCRIPT_EXT }`,
+			`**/__tests__/**/*.${ SCRIPT_EXT }`,
+		],
 		ignores: [
-			'test/e2e/**/*.[tj]s?(x)',
-			'test/performance/**/*.[tj]s?(x)',
-			'test/storybook-playwright/**/*.[tj]s?(x)',
+			`test/e2e/**/*.${ SCRIPT_EXT }`,
+			`test/performance/**/*.${ SCRIPT_EXT }`,
+			`test/storybook-playwright/**/*.${ SCRIPT_EXT }`,
 			...vitestTestPatterns,
 		],
 	},
 	{
 		...jestPlugin.configs[ 'flat/recommended' ],
-		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
+		files: [
+			`**/test/**/*.${ SCRIPT_EXT }`,
+			`**/__tests__/**/*.${ SCRIPT_EXT }`,
+		],
 		ignores: [
-			'test/e2e/**/*.[tj]s?(x)',
-			'test/performance/**/*.[tj]s?(x)',
-			'test/storybook-playwright/**/*.[tj]s?(x)',
+			`test/e2e/**/*.${ SCRIPT_EXT }`,
+			`test/performance/**/*.${ SCRIPT_EXT }`,
+			`test/storybook-playwright/**/*.${ SCRIPT_EXT }`,
 			...vitestTestPatterns,
 		],
 		rules: {
@@ -626,24 +669,24 @@ export default dedupePlugins( [
 	...wpPlugin.configs[ 'test-playwright' ].map( ( config ) => ( {
 		...config,
 		files: [
-			'test/e2e/**/*.[tj]s',
-			'test/performance/**/*.[tj]s',
-			'packages/e2e-test-utils-playwright/**/*.[tj]s',
+			`test/e2e/**/*.${ SCRIPT_EXT_NO_JSX }`,
+			`test/performance/**/*.${ SCRIPT_EXT_NO_JSX }`,
+			`packages/e2e-test-utils-playwright/**/*.${ SCRIPT_EXT_NO_JSX }`,
 		],
 	} ) ),
 	{
 		...tseslint.configs.base,
 		files: [
-			'test/e2e/**/*.[tj]s',
-			'test/performance/**/*.[tj]s',
-			'packages/e2e-test-utils-playwright/**/*.[tj]s',
+			`test/e2e/**/*.${ SCRIPT_EXT_NO_JSX }`,
+			`test/performance/**/*.${ SCRIPT_EXT_NO_JSX }`,
+			`packages/e2e-test-utils-playwright/**/*.${ SCRIPT_EXT_NO_JSX }`,
 		],
 	},
 	{
 		files: [
-			'test/e2e/**/*.[tj]s',
-			'test/performance/**/*.[tj]s',
-			'packages/e2e-test-utils-playwright/**/*.[tj]s',
+			`test/e2e/**/*.${ SCRIPT_EXT_NO_JSX }`,
+			`test/performance/**/*.${ SCRIPT_EXT_NO_JSX }`,
+			`packages/e2e-test-utils-playwright/**/*.${ SCRIPT_EXT_NO_JSX }`,
 		],
 		languageOptions: {
 			parserOptions: {
@@ -725,7 +768,7 @@ export default dedupePlugins( [
 	// `render` method pattern (hooks in a lowercase function) and
 	// static-components for inline factories used in story setup.
 	{
-		files: [ '**/@(storybook|stories)/**/*.[tj]s?(x)' ],
+		files: [ `**/@(storybook|stories)/**/*.${ SCRIPT_EXT }` ],
 		rules: {
 			'react-hooks/rules-of-hooks': 'off',
 			'react-hooks/static-components': 'off',
@@ -878,7 +921,7 @@ export default dedupePlugins( [
 	//
 	// See: https://github.com/storybookjs/storybook/issues/32839
 	{
-		files: [ 'packages/ui/src/**/stories/*.story.@(ts|tsx)' ],
+		files: [ `packages/ui/src/**/stories/*.story.${ TS_EXT }` ],
 		rules: {
 			'no-restricted-imports': [
 				'error',
@@ -972,7 +1015,7 @@ export default dedupePlugins( [
 
 	// Override: block-library save files — no i18n in save.
 	{
-		files: [ 'packages/block-library/src/*/save.[tj]s?(x)' ],
+		files: [ `packages/block-library/src/*/save.${ SCRIPT_EXT }` ],
 		rules: {
 			'@wordpress/no-i18n-in-save': 'error',
 		},
@@ -1016,10 +1059,10 @@ export default dedupePlugins( [
 
 	// From packages/block-serialization-spec-parser/.eslintrc.json:
 	// Add test-unit config for shared-tests.js with jest/no-export off.
-	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
-		...config,
+	{
+		...jestPlugin.configs[ 'flat/recommended' ],
 		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
-	} ) ),
+	},
 	{
 		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
 		rules: {
@@ -1068,7 +1111,7 @@ export default dedupePlugins( [
 	// Override: typings — global type declarations require `var` and define
 	// the globals that wp-global-usage warns about.
 	{
-		files: [ 'typings/**/*.d.ts' ],
+		files: [ 'tools/monorepo/typings/**/*.d.ts' ],
 		rules: {
 			'no-var': 'off',
 			'@wordpress/wp-global-usage': 'off',

@@ -1,0 +1,7 @@
+.override {
+	--_gcd-heading-font-weight: 600;
+}
+
+.usage {
+	font-weight: var(--_gcd-heading-font-weight);
+}

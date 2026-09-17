@@ -48,7 +48,6 @@
 	],
 	"dependencies": {
 		"@wordpress/commands": "file:../commands",
-		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/dataviews": "file:../dataviews",
@@ -74,7 +73,8 @@
 		"@testing-library/user-event": "^14.6.1",
 		"@wordpress/admin-ui": "file:../admin-ui",
 		"storybook": "^10.5.3",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.0",
+		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

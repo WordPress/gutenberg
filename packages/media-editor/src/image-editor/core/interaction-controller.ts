@@ -696,13 +696,13 @@ export class InteractionController {
 					panSize.width > 0
 						? ( moveEvent.touches[ 0 ].clientX -
 								touch.lastTouchX ) /
-						  panSize.width
+							panSize.width
 						: 0;
 				const deltaY =
 					panSize.height > 0
 						? ( moveEvent.touches[ 0 ].clientY -
 								touch.lastTouchY ) /
-						  panSize.height
+							panSize.height
 						: 0;
 
 				const { pan: newCrop } = restrictPanZoom(

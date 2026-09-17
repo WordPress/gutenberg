@@ -18,6 +18,9 @@ export const route = {
 	async canvas() {
 		return {
 			isPreview: true,
+			// This route shows the site, so it shows the template around
+			// whatever the canvas resolves to, including a static front page.
+			renderingMode: 'template-locked' as const,
 		};
 	},
 	loader: async () => {

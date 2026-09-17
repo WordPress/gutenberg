@@ -868,10 +868,13 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 				cancelled: window.__enterCancelled,
 			} ) );
 		// Nothing happens on keydown: the beforeinput fires, is cancelled,
-		// and focus only moves while it is being handled.
+		// and focus only moves while it is being handled. Focus moves into
+		// the new field, then to the editing host that engages once the
+		// block has a sibling.
 		expect( events ).toEqual( [
 			'keydown',
 			'beforeinput:insertParagraph',
+			'focusin',
 			'focusin',
 		] );
 		expect( cancelled ).toBe( true );

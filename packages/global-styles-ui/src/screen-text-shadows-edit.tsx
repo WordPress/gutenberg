@@ -75,7 +75,7 @@ export default function ScreenTextShadowsEdit() {
 						label: __( 'Delete' ),
 						onClick: () => setIsDeleteOpen( true ),
 					},
-			  ]
+				]
 			: [
 					{
 						label: __( 'Reset' ),
@@ -93,7 +93,7 @@ export default function ScreenTextShadowsEdit() {
 							textShadow.textShadow ===
 							baseTextShadow?.textShadow,
 					},
-			  ];
+				];
 
 	return (
 		<>

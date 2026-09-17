@@ -20,15 +20,18 @@ exports[`MenuItem > should match snapshot when all props provided 1`] = `
   <svg
     aria-hidden="true"
     class="components-menu-items__item-icon has-icon-right"
-    fill="currentColor"
     focusable="false"
     height="24"
+    stroke="currentColor"
+    stroke-width="1.5"
+    style="fill: none;"
     viewBox="0 0 24 24"
     width="24"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
-      d="M4 9v1.5h16V9H4zm12 5.5h4V13h-4v1.5zm-6 0h4V13h-4v1.5zm-6 0h4V13H4v1.5z"
+      d="M4 10H20M4 14H8M10 14H14M16 14H20"
+      vector-effect="non-scaling-stroke"
     />
   </svg>
 </button>
@@ -80,15 +83,18 @@ exports[`MenuItem > should match snapshot when isSelected and role are optionall
   <svg
     aria-hidden="true"
     class="components-menu-items__item-icon has-icon-right"
-    fill="currentColor"
     focusable="false"
     height="24"
+    stroke="currentColor"
+    stroke-width="1.5"
+    style="fill: none;"
     viewBox="0 0 24 24"
     width="24"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
-      d="M4 9v1.5h16V9H4zm12 5.5h4V13h-4v1.5zm-6 0h4V13h-4v1.5zm-6 0h4V13H4v1.5z"
+      d="M4 10H20M4 14H8M10 14H14M16 14H20"
+      vector-effect="non-scaling-stroke"
     />
   </svg>
 </button>
