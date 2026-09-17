@@ -52,6 +52,7 @@
 	"scripts": {
 		"test:unit": "vitest run --config vitest.config.mjs",
 		"test:unit:conventions": "node scripts/validate-vitest-conventions.mjs",
+		"test:unit:date": "node scripts/run-date-tests.mjs",
 		"test:unit:vitest": "vitest run --config vitest.config.mjs",
 		"test:unit:vitest:shuffled": "npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855",
 		"test:unit:vitest:update": "vitest run --config vitest.config.mjs --update=true",
