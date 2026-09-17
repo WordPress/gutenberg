@@ -559,10 +559,11 @@ test.describe( 'Style Revisions', () => {
 		}
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
-		// The picker footer replaces the screen's own pagination component.
+		// The page select is the screen's only pagination control: the
+		// sidebar has no room for the previous/next buttons next to Apply.
 		const currentPage = page.getByLabel( 'Current page' );
 		await expect( currentPage ).toHaveValue( '1' );
-		await page.getByRole( 'button', { name: 'Next page' } ).click();
+		await currentPage.selectOption( '2' );
 		await expect( currentPage ).toHaveValue( '2' );
 		// The theme defaults entry closes the last page.
 		await expect(
