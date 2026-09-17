@@ -56,21 +56,34 @@ function ScreenRevisions() {
 		setIsLoadingRevisionWithUnsavedChanges,
 	] = useState( false );
 
-	// Derive the currently selected revision from the path parameter
+	// The screen holds a single page of revisions, so the revision the path
+	// names is selected only while this page carries it. Paginating away from
+	// it selects nothing, rather than a stand-in the user never picked.
 	const currentlySelectedRevision = useMemo( () => {
-		if ( ! revisionId ) {
-			return currentEditorGlobalStyles;
+		if ( revisionId ) {
+			return revisions.find(
+				( revision ) => String( revision.id ) === String( revisionId )
+			);
 		}
-		const revision = revisions.find(
-			( rev ) => String( rev.id ) === String( revisionId )
-		);
-		return revision || currentEditorGlobalStyles;
-	}, [ revisionId, revisions, currentEditorGlobalStyles ] );
+		// With no revision in the path the editor shows its own styles, and
+		// only the first page carries an entry for those: the unsaved changes,
+		// or else the latest revision.
+		return query.page === 1 ? revisions[ 0 ] : undefined;
+	}, [ revisionId, revisions, query.page ] );
 
-	const selectedRevisionMatchesEditorStyles = areGlobalStylesEqual(
-		currentlySelectedRevision,
-		currentEditorGlobalStyles
+	// A revision is applicable when it isn't the styles the editor already
+	// shows. The footer action's eligibility and the list's Active badge both
+	// read this, so the button and the badge can't contradict each other.
+	const isRevisionApplicable = useCallback(
+		( revision: Revision ) =>
+			'unsaved' !== revision.id &&
+			! areGlobalStylesEqual( revision, currentEditorGlobalStyles ),
+		[ currentEditorGlobalStyles ]
 	);
+
+	const isSelectedRevisionApplicable =
+		!! currentlySelectedRevision &&
+		isRevisionApplicable( currentlySelectedRevision );
 
 	// Both the back arrow and Apply leave the revisions screen. Selecting a
 	// revision appends its id to the path (`/revisions/12`), so the navigator's
@@ -81,7 +94,12 @@ function ScreenRevisions() {
 	}, [ goTo ] );
 
 	const restoreRevision = useCallback(
-		( revision: any ) => {
+		( revision?: Revision ) => {
+			// The current page holds no selected revision once the user
+			// paginates away from it. There is nothing to apply then.
+			if ( ! revision ) {
+				return;
+			}
 			setUserConfig( revision );
 			setIsLoadingRevisionWithUnsavedChanges( false );
 			closeRevisions();
@@ -89,9 +107,7 @@ function ScreenRevisions() {
 		[ setUserConfig, closeRevisions ]
 	);
 
-	const currentlySelectedRevisionId =
-		// @ts-expect-error: revision id is not present in the fallback (default object).
-		currentlySelectedRevision?.id ?? revisions[ 0 ]?.id;
+	const currentlySelectedRevisionId = currentlySelectedRevision?.id;
 
 	const selection = useMemo(
 		() =>
@@ -115,14 +131,6 @@ function ScreenRevisions() {
 		[ goTo ]
 	);
 
-	// The selected revision is applicable when it exists and differs from
-	// the current editor styles. Drives both the Active badge in the list
-	// and the footer action's eligibility.
-	const isLoadButtonEnabled =
-		!! currentlySelectedRevisionId &&
-		currentlySelectedRevisionId !== 'unsaved' &&
-		! selectedRevisionMatchesEditorStyles;
-
 	const onApplyRevision = useCallback( () => {
 		if ( hasUnsavedChanges ) {
 			setIsLoadingRevisionWithUnsavedChanges( true );
@@ -140,13 +148,11 @@ function ScreenRevisions() {
 				label: ( items: Revision[] ) =>
 					items[ 0 ]?.id === 'parent' ? __( 'Reset' ) : __( 'Apply' ),
 				isPrimary: true,
-				isEligible: ( item: Revision ) =>
-					'unsaved' !== item.id &&
-					! areGlobalStylesEqual( item, currentEditorGlobalStyles ),
+				isEligible: isRevisionApplicable,
 				callback: onApplyRevision,
 			},
 		],
-		[ currentEditorGlobalStyles, onApplyRevision ]
+		[ isRevisionApplicable, onApplyRevision ]
 	);
 
 	return (
@@ -174,7 +180,7 @@ function ScreenRevisions() {
 				onChangeSelection={ onChangeSelection }
 				isLoading={ isLoading }
 				paginationInfo={ paginationInfo }
-				canApplyRevision={ isLoadButtonEnabled }
+				canApplyRevision={ isSelectedRevisionApplicable }
 				actions={ actions }
 			/>
 			{ isLoadingRevisionWithUnsavedChanges && (

@@ -165,6 +165,19 @@ const REVISIONS = [
 	{ id: 'parent', styles: {}, settings: {} },
 ];
 
+// The second page of an older set: it carries neither the unsaved entry nor
+// revision 10.
+const OLDER_REVISIONS = [
+	{
+		id: 8,
+		styles: STYLES_C,
+		settings: {},
+		author: { name: 'Bob', avatar_urls: { 48: 'http://bob.avatar' } },
+		modified: '2026-07-06T11:00:00',
+	},
+	{ id: 'parent', styles: {}, settings: {} },
+];
+
 function renderScreen( {
 	userConfig = { styles: STYLES_A, settings: {} },
 } = {} ) {
@@ -349,6 +362,38 @@ describe( 'ScreenRevisions', () => {
 			screen.getByRole( 'button', { name: 'Clear selection' } )
 		);
 		expect( goTo ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'selects nothing when the revision in the path is on another page', async () => {
+		useNavigator.mockReturnValue( { params: { revisionId: '10' }, goTo } );
+		useGlobalStylesRevisions.mockImplementation( ( { query } ) => ( {
+			revisions: query.page === 1 ? REVISIONS : OLDER_REVISIONS,
+			isLoading: false,
+			hasUnsavedChanges: false,
+			revisionsCount: 12,
+		} ) );
+
+		renderScreen( { userConfig: { styles: STYLES_A, settings: {} } } );
+
+		expect( screen.getAllByRole( 'option' )[ 1 ] ).toHaveAttribute(
+			'aria-selected',
+			'true'
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Next page' } )
+		);
+
+		// Revision 10 is not on this page, so nothing here is selected, no
+		// option claims to hold the editor styles, and there is nothing to
+		// apply from it.
+		screen.getAllByRole( 'option' ).forEach( ( option ) => {
+			expect( option ).toHaveAttribute( 'aria-selected', 'false' );
+		} );
+		expect( screen.queryByText( 'Active' ) ).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Apply' } )
+		).toBeDisabled();
 	} );
 
 	it( 'queries the revisions page driven by the view', async () => {
