@@ -257,10 +257,15 @@ describe( 'fetchLinkSuggestions', () => {
 			type: [ 'post', 'term' ],
 			perPage: 20,
 		} ).then( ( suggestions ) => {
-			expect( suggestions.map( ( { kind } ) => kind ) ).toEqual( [
-				'post-type',
-				'taxonomy',
-				'taxonomy',
+			// One result from the post search and two from the term search.
+			expect(
+				suggestions.map(
+					( { title, kind } ) => `${ kind }: ${ title }`
+				)
+			).toEqual( [
+				'post-type: Contact Page',
+				'taxonomy: Cats',
+				'taxonomy: Uncategorized',
 			] );
 		} );
 	} );
