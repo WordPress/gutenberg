@@ -3,14 +3,32 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { notFound } from '@wordpress/route';
 import { loadNavigationViewConfig } from './view-utils';
+import { getNavigationMenuCanvas } from '../navigation/route-canvas';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
+const TEMPLATE_PART_POST_TYPE = 'wp_template_part';
 
 const PRELOADED_NAVIGATION_MENUS_QUERY = {
 	per_page: -1,
 	status: [ 'publish', 'draft' ],
 	order: 'desc',
 	orderby: 'date',
+};
+
+const PRELOADED_TEMPLATE_PARTS_QUERY = {
+	per_page: -1,
+};
+
+const PRELOADED_FALLBACK_NAVIGATION_QUERY = {
+	per_page: 1,
+	orderby: 'date',
+	order: 'desc',
+	status: 'publish',
+	_fields: 'id',
+};
+
+type NavigationRecord = {
+	id: number;
 };
 
 export const route = {
@@ -32,26 +50,27 @@ export const route = {
 			search?: string;
 		};
 	} ) => {
-		const navigations = ( await resolveSelect( coreStore ).getEntityRecords(
+		const navigationMenus = ( await resolveSelect(
+			coreStore
+		).getEntityRecords(
 			'postType',
 			NAVIGATION_POST_TYPE,
 			PRELOADED_NAVIGATION_MENUS_QUERY
-		) ) as { id: number }[] | null;
-		const firstNavigation = navigations?.[ 0 ];
+		) ) as NavigationRecord[] | undefined;
+		const navigationId = search.ids?.[ 0 ]
+			? Number( search.ids[ 0 ] )
+			: navigationMenus?.[ 0 ]?.id;
 
-		if ( ! firstNavigation ) {
-			return { postType: NAVIGATION_POST_TYPE, isPreview: true };
+		if ( ! navigationId ) {
+			return {
+				postType: NAVIGATION_POST_TYPE,
+				postId: '',
+				isPreview: true,
+				customCanvas: true,
+			};
 		}
 
-		const postId = search.ids
-			? parseInt( search.ids[ 0 ] )
-			: firstNavigation.id;
-
-		return {
-			postType: NAVIGATION_POST_TYPE,
-			postId,
-			isPreview: true,
-		};
+		return getNavigationMenuCanvas( navigationId );
 	},
 	loader: async () => {
 		await Promise.all( [
@@ -73,6 +92,18 @@ export const route = {
 			resolveSelect( coreStore ).getEntityRecords( 'root', 'user', {
 				per_page: -1,
 			} ),
+			// Preload template parts and fallback navigation data used to show
+			// whether each navigation menu is active on the site.
+			resolveSelect( coreStore ).getEntityRecords(
+				'postType',
+				TEMPLATE_PART_POST_TYPE,
+				PRELOADED_TEMPLATE_PARTS_QUERY
+			),
+			resolveSelect( coreStore ).getEntityRecords(
+				'postType',
+				NAVIGATION_POST_TYPE,
+				PRELOADED_FALLBACK_NAVIGATION_QUERY
+			),
 		] );
 	},
 };

@@ -47,7 +47,7 @@ export default function useEntityBlockEditor(
 				return {};
 			}
 			// The store is selected by name, which carries no store types.
-			const { getEditedEntityRecord } = select(
+			const { getEditedEntityRecord, getEntityRecord } = select(
 				STORE_NAME as unknown as typeof coreStore
 			);
 			// A missing record is `false`, whose fields read as `undefined`.
@@ -56,9 +56,19 @@ export default function useEntityBlockEditor(
 				name,
 				id
 			) as EntityBlockEditorRecord;
+			let recordContent = editedRecord.content;
+
+			if ( kind === 'postType' && typeof recordContent !== 'string' ) {
+				recordContent = (
+					getEntityRecord( kind, name, id, {
+						context: 'edit',
+					} ) as { content?: { raw?: string } } | undefined
+				 )?.content?.raw;
+			}
+
 			return {
 				editedBlocks: editedRecord.blocks,
-				content: editedRecord.content,
+				content: recordContent,
 				meta: editedRecord.meta,
 			};
 		},

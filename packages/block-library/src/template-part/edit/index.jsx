@@ -9,14 +9,12 @@ import {
 	useHasRecursion,
 	InspectorControls,
 	__experimentalBlockPatternsList as BlockPatternsList,
-	BlockControls,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
 	Spinner as WCSpinner,
 	Modal,
 	MenuItem,
-	ToolbarButton,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -119,15 +117,15 @@ export default function TemplatePartEdit( {
 		hasInnerBlocks,
 		isMissing,
 		area,
-		onNavigateToEntityRecord,
 		title,
 		canUserEdit,
 		canUserEditBlock,
+		isUniversalCanvas,
 	} = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const { getBlockCount, getSettings, canEditBlock } =
+			const { getBlockCount, canEditBlock, getSettings } =
 				select( blockEditorStore );
 
 			const getEntityArgs = [
@@ -162,15 +160,21 @@ export default function TemplatePartEdit( {
 					( ! entityRecord ||
 						Object.keys( entityRecord ).length === 0 ),
 				area: _area,
-				onNavigateToEntityRecord:
-					getSettings().onNavigateToEntityRecord,
 				title: entityRecord?.title,
 				canUserEdit: !! _canUserEdit,
 				canUserEditBlock: canEditBlock( clientId ),
+				isUniversalCanvas:
+					!! getSettings().__experimentalUniversalCanvas,
 			};
 		},
 		[ templatePartId, attributes.area, clientId ]
 	);
+	// The universal canvas edits template parts inline, except navigation
+	// overlays, which still open in their own editor.
+	const isEditedInUniversalCanvas =
+		isUniversalCanvas &&
+		attributes.area !== 'navigation-overlay' &&
+		! slug?.includes( 'overlay' );
 
 	const areaObject = useTemplatePartArea( area );
 	const blockProps = useBlockProps();
@@ -234,27 +238,13 @@ export default function TemplatePartEdit( {
 	return (
 		<>
 			<RecursionProvider uniqueId={ templatePartId }>
-				<EditOriginalInspectorButton
-					clientId={ clientId }
-					postType="wp_template_part"
-					postId={ templatePartId }
-				/>
-				{ isEntityAvailable &&
-					onNavigateToEntityRecord &&
-					canUserEdit && (
-						<BlockControls group="other">
-							<ToolbarButton
-								onClick={ () => {
-									onNavigateToEntityRecord( {
-										postId: templatePartId,
-										postType: 'wp_template_part',
-									} );
-								} }
-							>
-								{ __( 'Edit original' ) }
-							</ToolbarButton>
-						</BlockControls>
-					) }
+				{ ! isEditedInUniversalCanvas && (
+					<EditOriginalInspectorButton
+						clientId={ clientId }
+						postType="wp_template_part"
+						postId={ templatePartId }
+					/>
+				) }
 				{ canUserEdit && (
 					<InspectorControls group="advanced">
 						<TemplatePartAdvancedControls

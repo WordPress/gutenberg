@@ -17,18 +17,23 @@ export function useEditorSettings( {
 	stylesId,
 }: {
 	stylesId?: string | number;
-} ) {
-	const { editorSettings, blockTypes } = useSelect(
-		( select ) => ( {
-			editorSettings: unlock(
-				select( coreDataStore )
-			).getEditorSettings(),
-			blockTypes: select( blocksStore ).getBlockTypes(),
-		} ),
+} = {} ) {
+	const { editorSettings, blockTypes, globalStylesId } = useSelect(
+		( select ) => {
+			const coreDataSelect = unlock( select( coreDataStore ) );
+			return {
+				editorSettings: coreDataSelect.getEditorSettings(),
+				blockTypes: select( blocksStore ).getBlockTypes(),
+				globalStylesId:
+					coreDataSelect.__experimentalGetCurrentGlobalStylesId(),
+			};
+		},
 		[]
 	);
 
-	const { user: globalStyles } = useUserGlobalStyles( stylesId );
+	const { user: globalStyles } = useUserGlobalStyles(
+		stylesId || globalStylesId
+	);
 	/*
 	 * Building the stylesheet walks every registered block, so it is memoized
 	 * rather than repeated on each render. The blocks are read from the store
@@ -36,7 +41,7 @@ export function useEditorSettings( {
 	 * registering after this first runs invalidate the result: nothing else
 	 * here changes when they arrive.
 	 */
-	const [ globalStylesCSS ] = useMemo(
+	const [ globalStylesCSS = [] ] = useMemo(
 		() => generateGlobalStyles( globalStyles, blockTypes ),
 		[ globalStyles, blockTypes ]
 	);

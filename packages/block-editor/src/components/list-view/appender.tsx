@@ -13,7 +13,10 @@ import { unlock } from '../../lock-unlock';
 import type { ListViewAppenderProps } from './types';
 
 export const Appender = forwardRef< HTMLElement, ListViewAppenderProps >(
-	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
+	(
+		{ nestingLevel, blockCount, clientId, renderAppender, ...props },
+		ref
+	) => {
 		const { setInsertedBlockClientId } = useListViewContext();
 		const insertedBlockClientId = useInsertedBlockClientId();
 
@@ -66,7 +69,10 @@ export const Appender = forwardRef< HTMLElement, ListViewAppenderProps >(
 			);
 		}, [ insertedBlockTitle ] );
 
-		if ( hideInserter ) {
+		// The generic inserter must respect template locks and zoom-out mode,
+		// but private List View consumers can provide a custom appender that
+		// handles its own insertion rules. Do not suppress that escape hatch.
+		if ( hideInserter && ! renderAppender ) {
 			return null;
 		}
 
@@ -82,24 +88,38 @@ export const Appender = forwardRef< HTMLElement, ListViewAppenderProps >(
 
 		return (
 			<div className="list-view-appender">
-				<Inserter
-					ref={ ref }
-					rootClientId={ clientId }
-					position="bottom right"
-					isAppender
-					selectBlockOnInsert={ false }
-					shouldDirectInsert={ directInsert }
-					__experimentalIsQuick
-					{ ...props }
-					toggleProps={ { 'aria-describedby': descriptionId } }
-					onSelectOrClose={ ( maybeInsertedBlock?: Block ) => {
-						if ( maybeInsertedBlock?.clientId ) {
-							setInsertedBlockClientId(
-								maybeInsertedBlock.clientId
-							);
-						}
-					} }
-				/>
+				{ renderAppender ? (
+					// Private escape hatch for specialized list views that need
+					// the appender row/focus semantics without the generic Inserter UI.
+					renderAppender( {
+						clientId,
+						nestingLevel,
+						blockCount,
+						descriptionId,
+						ref,
+						setInsertedBlockClientId,
+						...props,
+					} )
+				) : (
+					<Inserter
+						ref={ ref }
+						rootClientId={ clientId }
+						position="bottom right"
+						isAppender
+						selectBlockOnInsert={ false }
+						shouldDirectInsert={ directInsert }
+						__experimentalIsQuick
+						{ ...props }
+						toggleProps={ { 'aria-describedby': descriptionId } }
+						onSelectOrClose={ ( maybeInsertedBlock?: Block ) => {
+							if ( maybeInsertedBlock?.clientId ) {
+								setInsertedBlockClientId(
+									maybeInsertedBlock.clientId
+								);
+							}
+						} }
+					/>
+				) }
 				<AriaReferencedText id={ descriptionId }>
 					{ description }
 				</AriaReferencedText>

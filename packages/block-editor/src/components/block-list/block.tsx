@@ -715,6 +715,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				getParentSectionBlock,
 				getBlockWithoutAttributes,
 				getBlockAttributes,
+				getBlockListSettings,
 				canRemoveBlock,
 				canMoveBlock,
 
@@ -778,6 +779,9 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				( blockType?.apiVersion as number ) > 1;
 			const isMultiSelected = isBlockMultiSelected( clientId );
 			const blockEditingMode = getBlockEditingMode( clientId );
+			const isUniversalCanvasTemplateSection =
+				getBlockListSettings( clientId )?.templateLock ===
+				'contentOnly';
 			const previewContext = {
 				isPreviewMode,
 				blockWithoutAttributes,
@@ -787,6 +791,11 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				themeSupportsLayout: supportsLayout,
 				index: getBlockIndex( clientId ),
 				isReusable: isReusableBlock( blockType ),
+				isUniversalCanvasGlobalSection:
+					settings.__experimentalUniversalCanvas &&
+					( isUniversalCanvasTemplateSection ||
+						blockName === 'core/template-part' ) &&
+					blockName !== 'core/post-content',
 				className: hasLightBlockWrapper
 					? attributes.className
 					: undefined,
@@ -953,6 +962,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		isMultiSelected,
 		isPartiallySelected,
 		isReusable,
+		isUniversalCanvasGlobalSection,
 		isDragging,
 		hasChildSelected,
 		isSectionBlock,
@@ -994,6 +1004,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		isMultiSelected,
 		isPartiallySelected,
 		isReusable,
+		isUniversalCanvasGlobalSection,
 		isDragging,
 		hasChildSelected,
 		isSectionBlock,

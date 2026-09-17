@@ -191,6 +191,10 @@ export type PrivateListViewProps = ListViewProps & {
 	additionalBlockContent?: ComponentType< AdditionalBlockContentProps > | null;
 	/** Flag to render the selected block's content controls in a popover anchored to its row. Defaults to `false`. */
 	showContentPopover?: boolean;
+	/** Optional private appender substitution for specialized list views. */
+	renderAppender?: ListViewRenderAppender;
+	/** Optional private target for showing the appender on a nested branch. */
+	appenderParentClientId?: string | null;
 };
 
 /**
@@ -214,6 +218,8 @@ export type ListViewBranchProps = {
 	parentId?: string | null;
 	isSyncedBranch?: boolean;
 	showAppender?: boolean;
+	renderAppender?: ListViewRenderAppender;
+	appenderParentClientId?: string | null;
 };
 
 export type ListViewBlockProps = {
@@ -290,7 +296,27 @@ export type ListViewAppenderProps = {
 	clientId?: string | null;
 	tabIndex?: number;
 	onFocus?: FocusEventHandler;
+	renderAppender?: ListViewRenderAppender;
 };
+
+/**
+ * Props passed to a private `renderAppender` that replaces the List View
+ * appender's generic Inserter.
+ */
+export type ListViewRenderAppenderProps = {
+	clientId?: string | null;
+	nestingLevel: number;
+	blockCount: number;
+	descriptionId: string;
+	ref: ForwardedRef< HTMLElement >;
+	setInsertedBlockClientId: Dispatch< SetStateAction< string | null > >;
+	tabIndex?: number;
+	onFocus?: FocusEventHandler;
+};
+
+export type ListViewRenderAppender = (
+	props: ListViewRenderAppenderProps
+) => ReactNode;
 
 /**
  * Props that a tree grid item passes to the control it renders.

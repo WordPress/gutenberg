@@ -43,3 +43,36 @@
 .item.is-compact {
 	min-height: variables.$grid-unit-30;
 }
+
+.container {
+	position: relative;
+
+	.item {
+		padding-inline-end: variables.$grid-unit-40;
+	}
+}
+
+.action {
+	align-items: center;
+	display: flex;
+	inset-block: 0;
+	inset-inline-end: variables.$grid-unit-15;
+	opacity: 0;
+	pointer-events: none;
+	position: absolute;
+	transition: opacity 0.12s ease;
+
+	.container:hover &,
+	.container:focus-within & {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	:global(.components-button) {
+		color: var(--wpds-color-foreground-interactive-neutral);
+
+		&:hover:not(:disabled) {
+			color: var(--wpds-color-foreground-interactive-brand-active);
+		}
+	}
+}
