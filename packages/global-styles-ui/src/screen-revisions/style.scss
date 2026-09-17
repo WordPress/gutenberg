@@ -19,6 +19,12 @@
 	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
+// The select's wrapper may shrink, so a long page label never pushes the
+// action out of the row.
+.global-styles-ui-screen-revisions__pagination {
+	min-width: 0;
+}
+
 .global-styles-ui-screen-revisions__date {
 	text-transform: uppercase;
 	font-weight: var(--wpds-typography-font-weight-emphasis);

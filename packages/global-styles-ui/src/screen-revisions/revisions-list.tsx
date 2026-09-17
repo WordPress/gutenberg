@@ -310,6 +310,7 @@ function RevisionsList( {
 					direction="row"
 					justify="space-between"
 					align="center"
+					gap="sm"
 					className="global-styles-ui-screen-revisions__footer"
 				>
 					{ /* Kept even on a single page, when the select renders
