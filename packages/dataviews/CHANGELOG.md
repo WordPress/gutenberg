@@ -4,7 +4,7 @@
 
 ### New Features
 
--   DataViewsPicker: Add the `DataViewsPicker.Actions` sub-component, and render the children given to `DataViewsPicker.Footer` in place of its default contents, so a picker can compose its footer from the pagination and the actions alone ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
+-   DataViewsPicker: Add the `DataViewsPicker.Actions` sub-component, so a picker can compose a footer from the pagination and the actions alone ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
 
 ### Enhancements
 

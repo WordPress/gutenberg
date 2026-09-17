@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { Button, CheckboxControl } from '@wordpress/components';
 import { useRegistry } from '@wordpress/data';
 import { useContext, useMemo, useState } from '@wordpress/element';
@@ -251,26 +250,17 @@ export function DataViewsPickerBulkActionToolbar() {
 
 // The full picker footer: bulk-selection info, pagination, and actions — the
 // picker counterpart to `DataViews.Footer`, and structured like it so that the
-// footer stacks its rows in narrow containers, such as a sidebar. Given
-// children, it renders those in place of the default contents, so a picker
-// can compose its footer from `DataViewsPicker.Pagination` and
-// `DataViewsPicker.Actions` alone, for instance.
-export function DataViewsPickerFooter( {
-	children,
-}: {
-	children?: ReactNode;
-} ) {
+// footer stacks its rows in narrow containers, such as a sidebar. A picker
+// that wants a different footer composes one from `DataViewsPicker.Pagination`
+// and `DataViewsPicker.Actions` in a container of its own.
+export function DataViewsPickerFooter() {
 	const {
 		actions = EMPTY_ARRAY,
 		paginationInfo,
 		view,
 	} = useContext( DataViewsContext );
 
-	if (
-		! children &&
-		! actions.length &&
-		! hasPaginationControls( view, paginationInfo )
-	) {
+	if ( ! actions.length && ! hasPaginationControls( view, paginationInfo ) ) {
 		return null;
 	}
 
@@ -283,13 +273,9 @@ export function DataViewsPickerFooter( {
 				className="dataviews-footer__content"
 				gap="sm"
 			>
-				{ children || (
-					<>
-						<PickerBulkSelectionInfo />
-						<DataViewsPagination />
-						<DataViewsPickerActions />
-					</>
-				) }
+				<PickerBulkSelectionInfo />
+				<DataViewsPagination />
+				<DataViewsPickerActions />
 			</Stack>
 		</div>
 	);
