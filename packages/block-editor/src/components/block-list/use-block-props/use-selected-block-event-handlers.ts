@@ -3,6 +3,7 @@ import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -36,6 +37,7 @@ export function useEventHandlers( {
 	isSelected?: boolean;
 	isMultiSelected?: boolean;
 } ) {
+	const shouldEditOnClickRef = useRef( false );
 	const {
 		getBlockRootClientId,
 		getSelectedBlockClientIds,
@@ -46,6 +48,8 @@ export function useEventHandlers( {
 		isSectionBlock,
 		editedContentOnlySection,
 		getBlock,
+		getBlockListSettings,
+		getSettings,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		removeBlock,
@@ -555,37 +559,115 @@ export function useEventHandlers( {
 
 			node.addEventListener( 'keydown', onKeyDown );
 
-			/**
-			 * Handles double-click events on section blocks to edit content only section.
-			 *
-			 * @param event Double-click event.
-			 */
-			function onDoubleClick( event: MouseEvent ) {
+			function shouldEditContentOnlySection( {
+				excludeUniversalCanvasGlobalSection = false,
+				requireUniversalCanvasGlobalSection = false,
+			}: {
+				excludeUniversalCanvasGlobalSection?: boolean;
+				requireUniversalCanvasGlobalSection?: boolean;
+			} = {} ) {
 				const isSection = isSectionBlock( clientId );
 				const block = getBlock( clientId );
 				const isSyncedPattern = isReusableBlock( block );
 				const isTemplatePartBlock = isTemplatePart( block );
 				const isAlreadyEditing = editedContentOnlySection === clientId;
+				const settings = getSettings();
+				const isNavigationOverlayTemplatePart =
+					block?.attributes?.area === 'navigation-overlay' ||
+					block?.attributes?.slug === 'overlay' ||
+					block?.attributes?.slug?.includes( 'overlay' );
+				const isUniversalCanvasTemplateSection =
+					settings.__experimentalUniversalCanvas &&
+					getBlockListSettings( clientId )?.templateLock ===
+						'contentOnly';
+				const isUniversalCanvasTemplatePart =
+					settings.__experimentalUniversalCanvas &&
+					isTemplatePartBlock &&
+					! isNavigationOverlayTemplatePart;
+				const isUniversalCanvasGlobalSection =
+					isUniversalCanvasTemplatePart ||
+					isUniversalCanvasTemplateSection;
 
 				if (
 					! isSection ||
 					isAlreadyEditing ||
 					isSyncedPattern ||
-					isTemplatePartBlock
+					( isTemplatePartBlock &&
+						! isUniversalCanvasTemplatePart ) ||
+					( excludeUniversalCanvasGlobalSection &&
+						isUniversalCanvasGlobalSection ) ||
+					( requireUniversalCanvasGlobalSection &&
+						! isUniversalCanvasGlobalSection )
 				) {
+					return false;
+				}
+
+				return (
+					! isTemplatePartBlock ||
+					isUniversalCanvasTemplatePart ||
+					isUniversalCanvasTemplateSection
+				);
+			}
+
+			function onClick( event: MouseEvent ) {
+				// Universal canvas global sections require two deliberate
+				// single clicks: first to select, second to edit. Selection can
+				// happen during focusin before click fires, so only edit if the
+				// pointer interaction began while this section was already
+				// selected. Ignore the second click from a browser double-click
+				// sequence.
+				if ( event.detail !== 1 ) {
+					shouldEditOnClickRef.current = false;
 					return;
 				}
 
+				const shouldEditOnClick = shouldEditOnClickRef.current;
+				shouldEditOnClickRef.current = false;
+				if ( ! shouldEditOnClick ) {
+					return;
+				}
+
+				if (
+					! shouldEditContentOnlySection( {
+						requireUniversalCanvasGlobalSection: true,
+					} )
+				) {
+					return;
+				}
 				event.preventDefault();
 				editContentOnlySection( clientId );
 			}
 
+			function onPointerDown( event: PointerEvent ) {
+				shouldEditOnClickRef.current =
+					event.button === 0 &&
+					shouldEditContentOnlySection( {
+						requireUniversalCanvasGlobalSection: true,
+					} );
+			}
+
+			function onDoubleClick( event: MouseEvent ) {
+				if (
+					! shouldEditContentOnlySection( {
+						excludeUniversalCanvasGlobalSection: true,
+					} )
+				) {
+					return;
+				}
+				event.preventDefault();
+				editContentOnlySection( clientId );
+			}
+
+			node.addEventListener( 'pointerdown', onPointerDown );
+			node.addEventListener( 'click', onClick );
 			node.addEventListener( 'dblclick', onDoubleClick );
 
 			return () => {
 				node.removeEventListener( 'keydown', onKeyDown );
 				node.removeEventListener( 'dragstart', onDragStart );
 				node.removeEventListener( 'mousedown', onMouseDown );
+				node.removeEventListener( 'pointerdown', onPointerDown );
+				node.removeEventListener( 'click', onClick );
 				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
@@ -596,6 +678,8 @@ export function useEventHandlers( {
 			getBlockRootClientId,
 			getSelectedBlockClientIds,
 			getBlock,
+			getBlockListSettings,
+			getSettings,
 			isReusableBlock,
 			isTemplatePart,
 			removeBlock,

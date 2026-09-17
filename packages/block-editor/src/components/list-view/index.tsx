@@ -97,6 +97,8 @@ const expansion = (
  * @param props.onSelect               Optional callback to be invoked when a block is selected. Receives the block object that was selected.
  * @param props.additionalBlockContent Component that renders additional block content UI.
  * @param props.showContentPopover     Flag to render the selected block's content controls in a popover anchored to its row. Defaults to `false`.
+ * @param props.renderAppender         Optional private appender substitution for specialized list views. This is intentionally private because custom appenders need to preserve List View tree semantics while replacing Inserter UI.
+ * @param props.appenderParentClientId Optional private target for showing the appender on a nested branch.
  * @param ref                          Forwarded ref
  */
 function ListViewComponent(
@@ -114,6 +116,8 @@ function ListViewComponent(
 		onSelect,
 		additionalBlockContent: AdditionalBlockContent,
 		showContentPopover = false,
+		renderAppender,
+		appenderParentClientId,
 	}: PrivateListViewProps,
 	ref: ForwardedRef< HTMLElement >
 ) {
@@ -445,6 +449,10 @@ function ListViewComponent(
 								selectedClientIds={ selectedClientIds }
 								isExpanded={ isExpanded }
 								showAppender={ showAppender }
+								renderAppender={ renderAppender }
+								appenderParentClientId={
+									appenderParentClientId
+								}
 							/>
 						</ListViewTreeStateContext.Provider>
 					</ListViewInsertedBlockContext.Provider>

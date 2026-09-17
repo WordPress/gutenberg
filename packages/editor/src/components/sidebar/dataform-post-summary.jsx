@@ -169,7 +169,11 @@ function bindFieldToNamespace( field, namespace, isVisible = () => true ) {
 	};
 }
 
-export default function DataFormPostSummary( { onActionPerformed } ) {
+export default function DataFormPostSummary( {
+	onActionPerformed,
+	hidePostCard = false,
+	excludedFieldIds = [],
+} ) {
 	const { postType, postId, isPostStatusRemoved, availableTemplates } =
 		useSelect( ( select ) => {
 			const {
@@ -287,6 +291,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 	const fields = useMemo(
 		() =>
 			_fields
+				?.filter( ( field ) => ! excludedFieldIds.includes( field.id ) )
 				?.map( ( field ) => {
 					const namespace = fieldNamespaces[ field.id ];
 					if ( namespace ) {
@@ -344,6 +349,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 			_fields,
 			templatePanelMode,
 			availableTemplates,
+			excludedFieldIds,
 			fieldNamespaces,
 			postType,
 		]
@@ -394,11 +400,13 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 	return (
 		<PostPanelSection className="editor-post-summary">
 			<Stack direction="column" gap="lg">
-				<PostCardPanel
-					postType={ postType }
-					postId={ postId }
-					onActionPerformed={ onActionPerformed }
-				/>
+				{ ! hidePostCard && (
+					<PostCardPanel
+						postType={ postType }
+						postId={ postId }
+						onActionPerformed={ onActionPerformed }
+					/>
+				) }
 				{ fieldsError && (
 					<Notice.Root intent="error" role="alert">
 						<Notice.Description>

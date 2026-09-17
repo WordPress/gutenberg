@@ -6,7 +6,9 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { sidebars } from './constants';
 
-export default function SidebarHeader() {
+export default function SidebarHeader( {
+	documentLabel: documentLabelOverride,
+} ) {
 	const { postTypeLabel, isRevisionsMode } = useSelect( ( select ) => {
 		const { getPostTypeLabel } = select( editorStore );
 		const { isRevisionsMode: _isRevisionsMode } = unlock(
@@ -21,6 +23,8 @@ export default function SidebarHeader() {
 	let documentLabel;
 	if ( isRevisionsMode ) {
 		documentLabel = __( 'Revision' );
+	} else if ( documentLabelOverride ) {
+		documentLabel = documentLabelOverride;
 	} else if ( postTypeLabel ) {
 		documentLabel = decodeEntities( postTypeLabel );
 	} else {

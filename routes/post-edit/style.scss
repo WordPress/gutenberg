@@ -1,0 +1,33 @@
+.routes-post-edit-admin-bridge {
+	background: #fff;
+	block-size: 100%;
+	display: flex;
+	flex-direction: column;
+	inline-size: 100%;
+	min-block-size: 0;
+}
+
+.routes-post-edit-admin-bridge__toolbar {
+	align-items: center;
+	border-block-end: 1px solid #e0e0e0;
+	box-sizing: border-box;
+	display: flex;
+	flex: 0 0 auto;
+	gap: 12px;
+	min-block-size: 60px;
+	padding: 8px 16px;
+}
+
+.routes-post-edit-admin-bridge__title {
+	font-size: 16px;
+	font-weight: 500;
+	line-height: 1.4;
+	margin: 0;
+}
+
+.routes-post-edit-admin-bridge__frame {
+	border: 0;
+	flex: 1 1 auto;
+	inline-size: 100%;
+	min-block-size: 0;
+}
