@@ -4,6 +4,10 @@ import { normalizePath } from 'vite';
 
 const EMPTY_MODULE_ID = '\0postcss-browser-empty';
 
+// Temporary workaround for https://github.com/vitejs/vite/issues/23512.
+// Remove this plugin and its optimizer registration once the installed Vite
+// version handles browser:false imports without warnings. Keep the Browser
+// regression test to verify removal.
 export function createPostcssBrowserPlugin( rootDir ) {
 	const require = createRequire(
 		path.join( rootDir, 'packages/block-editor/package.json' )
