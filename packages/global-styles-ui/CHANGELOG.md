@@ -12,6 +12,7 @@
 
 ### Internal
 
+-   Palette preview: overlapping color dots no longer use `__experimentalZStack`. ([#83060](https://github.com/WordPress/gutenberg/pull/83060))
 -   Global Styles UI: replace the private `Menu` from `@wordpress/components` with the public `Menu` from `@wordpress/ui` for preset actions and the block filter. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
 
 ## 1.22.0 (2026-09-10)
