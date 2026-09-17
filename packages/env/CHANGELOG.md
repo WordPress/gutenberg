@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use the versioned WordPress.org zip file for the default core source to speed up fresh environment creation while preserving version-based cache invalidation. ([#78942](https://github.com/WordPress/gutenberg/pull/78942))
+
 ### Bug Fixes
 
 -   Wait for lifecycle script output streams to close before reporting command failures, so their error output is not lost ([#82735](https://github.com/WordPress/gutenberg/pull/82735)).
