@@ -71,16 +71,13 @@ When creating a new package, you need to provide at least the following. Package
     	"wpScriptModuleExports": "./build-module/index.js",
     	"types": "build-types",
     	"sideEffects": false,
-    	"dependencies": {
-    		"@babel/runtime": "7.25.7"
-    	},
     	"publishConfig": {
     		"access": "public"
     	}
     }
     ```
 
-    This assumes that your code is located in the `src` folder and will be transpiled with `Babel`.
+    This assumes that your code is located in the `src` folder and will be transpiled by the build system.
 
     For production packages that will ship as a WordPress script, include `wpScript: true` in the `package.json` file. This tells the build system to bundle the package for use as a WordPress script.
 
@@ -253,6 +250,22 @@ Content within the HTML comment will be replaced by the generated documentation.
 
 It's very important to have a good plan for what a new package will include. All constants, methods, and components exposed from the package will ultimately become part of the public API in WordPress core (exposed via the `wp` global - eg: `wp.blockEditor`) and as such will need to be supported indefinitely. You should be very selective in what is exposed by your package and [ensure it is well documented](#maintaining-api-documentation).
 
+## Maintaining cross-version compatibility
+
+A plugin can bundle one `@wordpress/*` package while loading its dependencies from WordPress. The bundled package and its WordPress dependencies can then come from different releases.
+
+For example, a plugin might bundle a newer `@wordpress/dataviews` package but run on a WordPress version that provides an older `@wordpress/components` package. The reverse can also happen: an older plugin bundle can run on a newer WordPress version.
+
+Before changing an API or dependency in this setup:
+
+-   Confirm which packages the application bundles and which ones WordPress supplies.
+-   Test both mixed-version combinations: the new bundle with each supported WordPress version, and older supported bundles with the new WordPress package.
+-   Keep production public APIs compatible. Follow the [backward compatibility policy](/docs/contributors/code/backward-compatibility.md) if a break is unavoidable.
+-   Do not use private APIs in bundled packages. Private APIs can be removed, but first check that supported bundles no longer depend on them.
+-   Test the built package, not only its source. The built result can load dependencies and shared state differently.
+
+See [Testing published packages across WordPress versions](/docs/contributors/code/package-runtime-compatibility.md) for the test matrix and release procedure.
+
 ## Maintaining Changelogs
 
 When maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Unreleased") changes, if any exist.
@@ -337,7 +350,7 @@ Both extend shared base configurations (comments are not necessary):
 // tsconfig.build.json
 {
 	// Extends a base configuration common to most packages.
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 
 	// Dependencies that have opted in to TypeScript are referenced here: a
 	// split one by its build project, one on a single config by its
@@ -354,7 +367,7 @@ Both extend shared base configurations (comments are not necessary):
 {
 	// Extends the shared dev project configuration (noEmit, jest types,
 	// test and story includes).
-	"extends": "../../tsconfig.dev.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 
 	// The dev project checks against the build project's declarations.
 	"references": [ { "path": "./tsconfig.build.json" } ]
@@ -370,7 +383,7 @@ Two rules keep the projects consistent, and `npm run lint:tsconfig` enforces bot
 -   The build project excludes every dev file (`**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/stories/**`, `**/*.story.*`) and never lists a test type such as `jest` or `gutenberg-test-env` in `types`, so `src` cannot use test globals and no dev declaration is published. A package `exclude` replaces the inherited one, so list all of them.
 -   The dev project's `types` starts from the build project's list and adds `jest`, so tests see every ambient type the sources see. Ambient types only dev files need (`@types/jest`, `@types/node`, `@testing-library/jest-dom`) belong in the package's own `devDependencies`.
 
-A few packages emit declarations through a different layout and keep only the parts of the split that apply. `jest-console` compiles nothing: a dev project checks its TypeScript sources and tests, and the package ships a handwritten `declarations.d.ts` instead of `build-types`. `interactivity-router` pairs its dev project with two specialized build projects (`tsconfig.main.json` and `tsconfig.full-page.json`), which take the standard build project's place in the root `tsconfig.build.json` references. The rules above still apply to whichever projects such a package has.
+A few packages emit declarations through a different layout and keep only the parts of the split that apply. `interactivity-router` pairs its dev project with two specialized build projects (`tsconfig.main.json` and `tsconfig.full-page.json`), which take the standard build project's place in the root `tsconfig.build.json` references. The rules above still apply to whichever projects such a package has.
 
 The build project inherits `rootDir`, `declarationDir`, and `include` from the base configuration, so a package only sets what differs. Test files that do not type check yet are listed in the dev project's `exclude` with a comment, so the debt stays visible per file.
 

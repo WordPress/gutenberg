@@ -54,15 +54,6 @@ const MyGradientPicker = () => {
 
 Whether this is rendered in the sidebar.
 
-### `asButtons`
-
- - Type: `boolean`
- - Required: No
- - Default: `false`
-
-Whether the control should present as a set of buttons,
-each with its own tab stop.
-
 ### `aria-label`
 
  - Type: `string`
@@ -137,7 +128,7 @@ contains two or more items).
  - Default: `true`
 
 Prevents keyboard interaction from wrapping around.
-Only used when `asButtons` is not true.
+Only used with the `listbox` presentation.
 
 ### `onChange`
 
@@ -148,6 +139,24 @@ The function called when a new gradient has been defined. It is passed
 the `currentGradient` as an argument. When a predefined gradient is
 selected, the second argument is its index (or, for multiple-origin
 gradients, the origin index) and the third argument is its slug.
+
+### `presentation`
+
+ - Type: `"listbox" | "toggle-buttons" | "command-buttons"`
+ - Required: No
+ - Default: `'listbox'`
+
+How predefined gradient swatches behave and are exposed to assistive
+technology.
+
+- `listbox` uses one tab stop and arrow-key navigation, and exposes
+  selection with `aria-selected`.
+- `toggle-buttons` gives each swatch a tab stop and exposes selection with
+  `aria-pressed`.
+- `command-buttons` gives each swatch a tab stop and exposes no selection
+  state. `value` and `selectedSlug` do not mark predefined swatches as
+  selected, and activating a swatch always calls `onChange` with that
+  swatch. `value` still controls the custom gradient picker.
 
 ### `selectedSlug`
 

@@ -21,61 +21,20 @@
 	min-height: 0;
 }
 
-// Footer chrome — two layouts driven by `is-wide` / `is-narrow` modifier
-// classes set from the media editor at the sidebar-collapse breakpoint.
-// Wide is a single flex row (History | Cancel/Save); narrow stacks via
-// `flex-direction: column` (image controls above the History |
-// Cancel/Save row). Each layout has its own JSX tree (not `order`
-// reshuffling, which the project's stylelint rule treats as an a11y red
-// flag), so DOM order always matches visual order.
+// Footer chrome. The image controls live under the canvas at every viewport,
+// so the footer has a single layout at every width: History on the left,
+// Cancel/Save on the right.
 .media-editor-modal.components-modal__frame .media-editor-modal__footer {
 	flex-shrink: 0;
 	display: flex;
-	gap: $grid-unit-20;
-	// Borderless: sections are demarcated by the inset canvas panel and
-	// spacing, not divider lines. 16px top / 32px sides / 24px bottom.
-	padding: $grid-unit-20 $grid-unit-40 $grid-unit-30;
-	background: $white;
-	// Above the `.interface-interface-skeleton__sidebar` which has a z-index of 100000.
-	z-index: z-index(".media-editor-modal__footer");
-
-	&.is-wide {
-		flex-direction: row;
-		align-items: center;
-
-		// Panel mode: the footer holds only History (left) and
-		// Cancel/Save (right). `margin-left: auto` pins the actions to the
-		// right edge whether or not History renders (e.g. non-image
-		// attachments show only `SaveActions`).
-		.media-editor__save-actions {
-			margin-left: auto;
-		}
-	}
-
-	&.is-narrow {
-		flex-direction: column;
-	}
-
-	// Narrow only: image controls sit on their own row, centered.
-	&.is-narrow > .media-editor-image-controls {
-		align-self: center;
-	}
-}
-
-// Secondary row used by medium (History + Image controls + Cancel/Save) and
-// narrow (History + Cancel/Save). `margin-left: auto` on the image controls
-// cluster and on Cancel/Save splits any free space — History gets the
-// left edge, Cancel/Save the right edge, and the image controls (when
-// present, i.e. medium only) approximately centers. Exact centering only
-// holds when History and Cancel/Save have matching widths; in practice
-// they're close enough that the offset is imperceptible.
-.media-editor-modal__footer-row {
-	display: flex;
-	flex-wrap: wrap;
+	flex-direction: row;
 	align-items: center;
 	gap: $grid-unit-20;
+	padding: $grid-unit-30;
+	background: $white;
 
-	.media-editor-image-controls,
+	// `margin-left: auto` pins the actions to the right edge whether or not
+	// History renders (e.g. non-image attachments show only `SaveActions`).
 	.media-editor__save-actions {
 		margin-left: auto;
 	}

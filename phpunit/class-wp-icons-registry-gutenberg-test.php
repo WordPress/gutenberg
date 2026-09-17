@@ -400,6 +400,104 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Provides the supported icon content sources.
+	 *
+	 * @return array<string, array{0: bool}>
+	 */
+	public function data_icon_content_sources(): array {
+		return array(
+			'inline content' => array( false ),
+			'file path'      => array( true ),
+		);
+	}
+
+	/**
+	 * Should preserve stroke attributes when sanitizing registered icons.
+	 *
+	 * @dataProvider data_icon_content_sources
+	 *
+	 * @param bool $use_file_path Whether to register the icon from a file path.
+	 */
+	public function test_stroke_attributes_survive_sanitization( bool $use_file_path ) {
+		$content  = '<svg fill="currentColor" style="fill: none" stroke="currentColor" stroke-width="1.5"><path d="M0 0" vector-effect="non-scaling-stroke"/><polygon points="0,0 1,1" stroke="currentColor" vector-effect="non-scaling-stroke"/></svg>';
+		$name     = 'test-collection/stroke-icon';
+		$settings = array(
+			'label' => 'Stroke Icon',
+		);
+
+		if ( $use_file_path ) {
+			$settings['file_path'] = $this->create_temp_icon_file( $content );
+		} else {
+			$settings['content'] = $content;
+		}
+
+		$this->assertTrue( $this->register( $name, $settings ) );
+
+		$icon = $this->registry->get_registered_icon( $name );
+		$this->assertStringContainsString( 'fill="currentColor"', $icon['content'] );
+		$this->assertStringContainsString( 'style="fill: none"', $icon['content'] );
+		$this->assertStringContainsString( 'stroke="currentColor"', $icon['content'] );
+		$this->assertStringContainsString( 'stroke-width="1.5"', $icon['content'] );
+		$this->assertStringContainsString( 'vector-effect="non-scaling-stroke"', $icon['content'] );
+		$this->assertStringContainsString( '<polygon points="0,0 1,1" stroke="currentColor" vector-effect="non-scaling-stroke"', $icon['content'] );
+	}
+
+	/**
+	 * Should preserve clip rules when sanitizing registered icons.
+	 *
+	 * @dataProvider data_icon_content_sources
+	 *
+	 * @param bool $use_file_path Whether to register the icon from a file path.
+	 */
+	public function test_clip_rule_survives_sanitization( bool $use_file_path ) {
+		$content  = '<svg><path d="M0 0" fill-rule="evenodd" clip-rule="evenodd" /></svg>';
+		$name     = 'test-collection/clip-rule-icon';
+		$settings = array(
+			'label' => 'Clip Rule Icon',
+		);
+
+		if ( $use_file_path ) {
+			$settings['file_path'] = $this->create_temp_icon_file( $content );
+		} else {
+			$settings['content'] = $content;
+		}
+
+		$this->assertTrue( $this->register( $name, $settings ) );
+
+		$icon = $this->registry->get_registered_icon( $name );
+		$this->assertStringContainsString( 'clip-rule="evenodd"', $icon['content'] );
+	}
+
+	/**
+	 * Should preserve `rect` and `circle` shapes when sanitizing registered icons.
+	 *
+	 * @dataProvider data_icon_content_sources
+	 *
+	 * @param bool $use_file_path Whether to register the icon from a file path.
+	 */
+	public function test_rect_and_circle_survive_sanitization( bool $use_file_path ) {
+		$rect     = '<rect x="4" y="5" width="16" height="14" rx="2" ry="2" fill="currentColor" stroke="currentColor" transform="rotate(45)" vector-effect="non-scaling-stroke" />';
+		$circle   = '<circle cx="12" cy="12" r="3" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" transform="rotate(45)" vector-effect="non-scaling-stroke" />';
+		$content  = '<svg viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">' . $rect . $circle . '</svg>';
+		$name     = 'test-collection/shapes-icon';
+		$settings = array(
+			'label' => 'Shapes Icon',
+		);
+
+		if ( $use_file_path ) {
+			$settings['file_path'] = $this->create_temp_icon_file( $content );
+		} else {
+			$settings['content'] = $content;
+		}
+
+		$this->assertTrue( $this->register( $name, $settings ) );
+
+		$icon = $this->registry->get_registered_icon( $name );
+		$this->assertStringContainsString( $rect, $icon['content'] );
+		$this->assertStringContainsString( $circle, $icon['content'] );
+	}
+
+	/**
 	 * Should fail to register an icon that provides both `content` and `file_path`.
 	 *
 	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
@@ -431,5 +529,24 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 		$result = $this->register( $name, $settings );
 		$this->assertFalse( $result );
 		$this->assertFalse( $this->registry->is_registered( $name ) );
+	}
+
+	/**
+	 * Should fail to register an icon whose `public` property is not a boolean.
+	 *
+	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
+	 */
+	public function test_register_icon_rejects_non_boolean_public_property() {
+		$result = $this->registry->register(
+			'test-collection/invalid-visibility',
+			array(
+				'label'   => 'Icon',
+				'content' => '<svg></svg>',
+				'public'  => 'yes',
+			)
+		);
+
+		$this->assertFalse( $result );
+		$this->assertFalse( $this->registry->is_registered( 'test-collection/invalid-visibility' ) );
 	}
 }

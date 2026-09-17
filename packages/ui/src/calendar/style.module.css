@@ -5,8 +5,6 @@
 		.root {
 			/* Internal variables */
 			--wp-ui-calendar-cell-size: var(--wpds-dimension-size-md);
-			--wp-ui-calendar-range-middle-background-color: color-mix(in srgb, var(--wpds-color-background-interactive-brand-strong) 4%, transparent);
-			--wp-ui-calendar-preview-border-color: color-mix(in srgb, var(--wpds-color-background-interactive-brand-strong) 16%, transparent);
 
 			position: relative; /* Required to position the navigation toolbar. */
 			display: inline flow-root;
@@ -21,6 +19,7 @@
 		.day {
 			padding: 0;
 			position: relative;
+			color: var(--wpds-color-foreground-interactive-neutral);
 
 			/*
 			 * Setting text color on the day container instead of directly on the
@@ -34,7 +33,7 @@
 
 			&:has(.day-button:hover:not(:disabled)),
 			&:has(.day-button:focus-visible) {
-				color: var(--wpds-color-foreground-interactive-brand);
+				color: var(--wpds-color-foreground-interactive-neutral-active);
 			}
 		}
 
@@ -71,6 +70,7 @@
 				inset: 0;
 				border: none; /* No default border to avoid polluting high-contrast mode. */
 				border-radius: var(--wpds-border-radius-sm);
+				background-color: var(--wpds-color-background-interactive-neutral-weak);
 			}
 
 			/* Use the button's ::after to show the selection preview. */
@@ -85,6 +85,10 @@
 			&:disabled {
 				cursor: revert;
 
+				&::before {
+					background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
+				}
+
 				@media (forced-colors: active) {
 					/*
 					 * As an extra visual cue, show a line-through on disabled days
@@ -92,6 +96,11 @@
 					 */
 					text-decoration: line-through;
 				}
+			}
+
+			&:hover:not(:disabled)::before,
+			&:focus-visible::before {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 			}
 		}
 
@@ -208,7 +217,7 @@
 
 		/* Outside month days (visible when showOutsideDays is true): use a lighter text color. */
 		.outside {
-			color: var(--wpds-color-foreground-content-neutral-weak);
+			color: var(--wpds-color-foreground-interactive-neutral-weak);
 		}
 
 		/* Hidden button (ie. outside current month but still rendered) */
@@ -232,7 +241,7 @@
 		/* Middle of date range */
 		.range-middle .day-button {
 			&::before {
-				background-color: var(--wp-ui-calendar-range-middle-background-color);
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 				border-radius: 0;
 
 				/*
@@ -275,11 +284,16 @@
 			position: absolute;
 			inset: 0;
 			pointer-events: none;
-			color: var(--wp-ui-calendar-preview-border-color);
+			color: var(--wpds-color-stroke-interactive-neutral);
 
 			@media (forced-colors: active) {
 				color: inherit;
 			}
+		}
+
+		/* Do not render the preview outline over selected range endpoints. */
+		.preview.selected:not(.range-middle) svg {
+			display: none;
 		}
 
 		.root[dir="rtl"] .preview svg {

@@ -15,6 +15,7 @@
 		"@wordpress/dom": "file:../../packages/dom",
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/ui": "file:../../packages/ui"
 	}
 }

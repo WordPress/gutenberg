@@ -19,7 +19,10 @@ const config = [
 	// Unit test overrides.
 	...wpPlugin.configs[ 'test-unit' ].map( ( c ) => ( {
 		...c,
-		files: [ '**/@(test|__tests__)/**/*.js', '**/?(*.)test.js' ],
+		files: [
+			'**/@(test|__tests__)/**/*.{js,jsx,ts,tsx,mjs,cjs}',
+			'**/*.@(test|spec).{js,jsx,ts,tsx,mjs,cjs}',
+		],
 	} ) ),
 ];
 

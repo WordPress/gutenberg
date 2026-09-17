@@ -98,7 +98,8 @@ function InstalledFonts() {
 	const globalStyles = useEntityRecord< GlobalStylesConfig >(
 		'root',
 		'globalStyles',
-		globalStylesId
+		globalStylesId ?? 0,
+		{ enabled: globalStylesId !== undefined }
 	);
 	const editedFontFamilies =
 		globalStyles?.edits?.settings?.typography?.fontFamilies;
@@ -126,7 +127,7 @@ function InstalledFonts() {
 					.filter( ( f ) => ! themeFontsSlugs.has( f.slug ) )
 					.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
 					.sort( ( a, b ) => a.name.localeCompare( b.name ) )
-		  )
+			)
 		: [];
 
 	const customFontFamilyId =
@@ -218,7 +219,7 @@ function InstalledFonts() {
 		? getFontFacesActivated(
 				libraryFontSelected.slug,
 				libraryFontSelected.source
-		  ).length
+			).length
 		: 0;
 
 	const selectedFontsCount =

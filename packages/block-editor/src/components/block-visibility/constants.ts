@@ -10,7 +10,7 @@ export type BlockVisibilityViewport = 'desktop' | 'tablet' | 'mobile';
 /**
  * The choices for the block visibility.
  *
- * Duplicated in packages/editor/src/components/preview-dropdown/index.js (choices
+ * Duplicated in packages/editor/src/components/preview-dropdown/index.jsx (choices
  * array), packages/edit-site/src/components/block-editor/viewport.js and
  * packages/boot/src/components/canvas/viewport.ts (VALID_VIEWPORTS). Update all
  * four when adding new viewport types.

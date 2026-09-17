@@ -4,6 +4,7 @@
 	@layer components {
 		.text {
 			margin: 0;
+			text-wrap: pretty;
 		}
 
 		/* Text variants can render as either paragraphs or headings, so each variant

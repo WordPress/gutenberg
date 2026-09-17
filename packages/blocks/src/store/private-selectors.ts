@@ -51,6 +51,7 @@ const ROOT_BLOCK_SUPPORTS: string[] = [
 	'textDecoration',
 	'textIndent',
 	'textTransform',
+	'textShadow',
 	'letterSpacing',
 ];
 
@@ -152,8 +153,7 @@ export const getSupportedStyles = createSelector(
 		// Check for blockGap support.
 		// Block spacing support doesn't map directly to a single style property, so needs to be handled separately.
 		const supports = blockType?.supports as
-			| Record< string, unknown >
-			| undefined;
+			Record< string, unknown > | undefined;
 		if (
 			( supports?.spacing as Record< string, unknown > | undefined )
 				?.blockGap
@@ -342,10 +342,13 @@ export const getBlockKeyboardShortcuts = createSelector(
 			const transforms = state.blockTypes[ blockName ]?.transforms;
 
 			for ( const transform of transforms?.to ?? [] ) {
+				if ( transform.type !== 'block' ) {
+					continue;
+				}
 				// A `to` transform can list several target blocks, but a shortcut
 				// can only produce one of them. The first is used.
 				const targetBlockName = transform.blocks?.[ 0 ];
-				if ( transform.type !== 'block' || ! targetBlockName ) {
+				if ( ! targetBlockName ) {
 					continue;
 				}
 				for ( const shortcut of transform.shortcuts ?? [] ) {

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import moveInterfaceEnableItems from '../move-interface-enable-items';
 
 describe( 'moveInterfaceEnableItems', () => {
