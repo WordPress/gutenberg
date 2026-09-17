@@ -13,6 +13,7 @@
 -   `lint-md-docs`: Detect `.markdownlint.jsonc` so the bundled default config is not used when one is present ([#81917](https://github.com/WordPress/gutenberg/pull/81917)).
 -   `format`: Format `.cjs` and `.mjs` files when expanding a directory ([#82731](https://github.com/WordPress/gutenberg/pull/82731)).
 -   `format`: Format `.cts` and `.mts` files when expanding a directory ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   The default ESLint config now lints `.jsx`, `.ts`, `.tsx`, `.mts` and `.cts` files, which ESLint's own file discovery skips ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
 -   The bundled `wp-prettier` dependency has been upgraded from `3.0.3` to `3.9.6` ([#82731](https://github.com/WordPress/gutenberg/pull/82731)).
 
 ### Bug Fixes

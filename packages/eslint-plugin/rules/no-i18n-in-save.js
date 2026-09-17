@@ -26,6 +26,8 @@ module.exports = {
 		const isDeprecatedFile =
 			normalizedFilename.includes( '/deprecated.js' ) ||
 			normalizedFilename.includes( '/deprecated.ts' ) ||
+			normalizedFilename.includes( '/deprecated.mts' ) ||
+			normalizedFilename.includes( '/deprecated.cts' ) ||
 			normalizedFilename.includes( '/deprecated.jsx' ) ||
 			normalizedFilename.includes( '/deprecated.tsx' );
 
@@ -36,6 +38,8 @@ module.exports = {
 		const isSaveFile =
 			normalizedFilename.endsWith( '/save.js' ) ||
 			normalizedFilename.endsWith( '/save.ts' ) ||
+			normalizedFilename.endsWith( '/save.mts' ) ||
+			normalizedFilename.endsWith( '/save.cts' ) ||
 			normalizedFilename.endsWith( '/save.jsx' ) ||
 			normalizedFilename.endsWith( '/save.tsx' );
 
