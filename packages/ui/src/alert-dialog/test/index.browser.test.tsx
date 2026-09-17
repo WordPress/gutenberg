@@ -526,9 +526,6 @@ describe( 'AlertDialog', () => {
 
 		it( 're-enables buttons when async confirm rejects (task failure)', async () => {
 			const deferred = createDeferred();
-			const consoleSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
 
 			await render(
 				<AlertDialog.Root
@@ -564,7 +561,7 @@ describe( 'AlertDialog', () => {
 
 			// The error is caught and logged via console.error in Root.
 			await waitFor( () => {
-				expect( consoleSpy ).toHaveBeenCalledWith(
+				expect( console ).toHaveErroredWith(
 					expect.objectContaining( { message: 'Task failed' } )
 				);
 			} );
@@ -587,8 +584,6 @@ describe( 'AlertDialog', () => {
 			expect(
 				screen.queryByText( 'Task failed' )
 			).not.toBeInTheDocument();
-
-			consoleSpy.mockRestore();
 		} );
 
 		it( 'keeps dialog open when confirm returns { close: false }', async () => {
@@ -974,9 +969,6 @@ describe( 'AlertDialog', () => {
 				throw new Error( 'Sync error' );
 			} );
 			const onOpenChange = vi.fn();
-			const consoleSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
 
 			await render(
 				<AlertDialog.Root
@@ -1002,7 +994,7 @@ describe( 'AlertDialog', () => {
 
 			// The error is caught and logged via console.error in Root.
 			await waitFor( () => {
-				expect( consoleSpy ).toHaveBeenCalledWith(
+				expect( console ).toHaveErroredWith(
 					expect.objectContaining( { message: 'Sync error' } )
 				);
 			} );
@@ -1026,8 +1018,6 @@ describe( 'AlertDialog', () => {
 			expect(
 				screen.queryByText( 'Sync error' )
 			).not.toBeInTheDocument();
-
-			consoleSpy.mockRestore();
 		} );
 
 		it( 'sets aria-describedby when description is provided', async () => {
@@ -1430,10 +1420,6 @@ describe( 'AlertDialog', () => {
 		} );
 
 		it( 'does not show error message when onConfirm throws', async () => {
-			const consoleSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-
 			await render(
 				<AlertDialog.Root
 					open
@@ -1459,7 +1445,7 @@ describe( 'AlertDialog', () => {
 			);
 
 			await waitFor( () => {
-				expect( consoleSpy ).toHaveBeenCalledWith(
+				expect( console ).toHaveErroredWith(
 					expect.objectContaining( { message: 'Unhandled throw' } )
 				);
 			} );
@@ -1469,8 +1455,6 @@ describe( 'AlertDialog', () => {
 				screen.queryByText( 'Unhandled throw' )
 			).not.toBeInTheDocument();
 			expect( speak ).not.toHaveBeenCalled();
-
-			consoleSpy.mockRestore();
 		} );
 	} );
 

@@ -2,7 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"compilerOptions": {
-		"types": [ "node" ]
+		"types": [ "node", "gutenberg-vitest-test-env" ]
 	},
 	"references": [
 		{ "path": "./tsconfig.build.json" },
