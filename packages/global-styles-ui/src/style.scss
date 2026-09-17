@@ -126,6 +126,21 @@
 	flex-shrink: 0;
 }
 
+.global-styles-ui__palette-preview {
+	display: inline-grid;
+	grid-auto-flow: column;
+	position: relative;
+
+	> .global-styles-ui__color-indicator-wrapper {
+		position: relative;
+		justify-self: start;
+
+		&:not(:first-of-type) {
+			margin-inline-start: calc(-1 * variables.$grid-unit);
+		}
+	}
+}
+
 .global-styles-ui__shadows-panel__options-container,
 .global-styles-ui__typography-panel__options-container {
 	height: variables.$grid-unit * 3;

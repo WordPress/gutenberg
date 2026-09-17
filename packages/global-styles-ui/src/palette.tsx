@@ -2,7 +2,6 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	FlexItem,
 	__experimentalHStack as HStack,
-	__experimentalZStack as ZStack,
 	__experimentalVStack as VStack,
 	ColorIndicator,
 } from '@wordpress/components';
@@ -63,7 +62,7 @@ function Palette( { name }: PaletteProps ) {
 					<HStack direction="row">
 						{ colors.length > 0 ? (
 							<>
-								<ZStack isLayered={ false } offset={ -8 }>
+								<div className="global-styles-ui__palette-preview">
 									{ colors
 										.slice( 0, 5 )
 										.map( ( { color }, index ) => (
@@ -75,7 +74,7 @@ function Palette( { name }: PaletteProps ) {
 												/>
 											</ColorIndicatorWrapper>
 										) ) }
-								</ZStack>
+								</div>
 								<FlexItem isBlock>
 									{ __( 'Edit palette' ) }
 								</FlexItem>
