@@ -62,7 +62,10 @@ if ( ! rootSolutionReferences.has( buildSolutionPath ) ) {
 	);
 }
 
-/* Ambient types only test files may use. */
+/*
+ * Ambient types only test files may use. Keep the retired Jest names here so
+ * build projects cannot reintroduce them.
+ */
 const TEST_TYPES = new Set( [
 	'jest',
 	'gutenberg-test-env',

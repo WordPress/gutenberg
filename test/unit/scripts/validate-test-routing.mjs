@@ -19,6 +19,18 @@ const ROOT_DIR = path.resolve(
 	'../../..'
 );
 const VITEST_CONFIG = 'test/unit/vitest.config.mjs';
+
+function readInfrastructureSource( file ) {
+	try {
+		return readFileSync( path.join( ROOT_DIR, file ), 'utf8' );
+	} catch ( error ) {
+		if ( error.code === 'ENOENT' ) {
+			return null;
+		}
+		throw error;
+	}
+}
+
 function normalizeTestPath( testPath ) {
 	return path
 		.relative( ROOT_DIR, path.resolve( ROOT_DIR, testPath ) )
@@ -141,6 +153,7 @@ const retainedJestInfrastructure = [
 	'dependency:packages/report-flaky-tests/package.json:dependencies.jest-message-util',
 	'dependency:packages/scripts/package.json:peerDependencies.jest',
 	'dependency:tools/eslint/package.json:dependencies.eslint-plugin-jest',
+	'dependency:tools/eslint/package.json:dependencies.eslint-plugin-jest-dom',
 ];
 const infrastructureFiles = globSync(
 	[
@@ -156,7 +169,9 @@ const infrastructureFiles = globSync(
 			'**/node_modules/**',
 			'**/build/**',
 			'**/build-module/**',
+			'**/build-style/**',
 			'**/build-types/**',
+			'**/build-wp/**',
 			'vendor/**',
 			'**/.git/**',
 		],
@@ -164,12 +179,12 @@ const infrastructureFiles = globSync(
 );
 const jestInfrastructure = collectJestInfrastructureEntries(
 	infrastructureFiles,
-	( file ) => readFileSync( path.join( ROOT_DIR, file ), 'utf8' )
+	readInfrastructureSource
 );
 assert.deepEqual(
 	jestInfrastructure,
 	retainedJestInfrastructure,
-	'Jest infrastructure must be limited to the retained public tooling and active lint rules.'
+	'Jest infrastructure must exactly match the retained public tooling and active lint rules.'
 );
 assert.deepEqual(
 	[ ...vitestTests ].sort(),

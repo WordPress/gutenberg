@@ -80,7 +80,10 @@ Use the smallest selector change that preserves the required winner. Do not put 
 Removing an Emotion wrapper can expose source-order dependencies in callers that still use `useCx`. Where fragments overlap on a property, shorthand/longhand pair, or nested selector, compose them in one `css()` call before passing them to `cx()`:
 
 ```js
-const classes = cx( css( baseStyles, condition && overrideStyles ), className );
+const classes = cx(
+	css( baseStyles, condition && overrideStyles ),
+	className
+);
 ```
 
 This is an interim compatibility fix for existing Emotion consumers, not a pattern for newly migrated styles. Do not mechanically combine unrelated fragments. Audit callers outside the migrated directory: [#79443](https://github.com/WordPress/gutenberg/pull/79443) updated several consumers but missed the BorderBoxControl gutter regression fixed in [#79967](https://github.com/WordPress/gutenberg/pull/79967).
@@ -97,11 +100,11 @@ For SlotFill or portals, use an attached iframe with a real `contentDocument` an
 
 Match the evidence to the behavior at risk:
 
-| What needs proof                                                                           | Suitable evidence                                                                                                                                                                                              |
-| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DOM, public classes, refs, props, variants, and interactions                               | Existing component tests; extend them only for an uncovered integration risk. Assert the actual styled node, including the outer Grid child when an inner wrapper has the same class.                          |
-| Real SCSS declarations, specificity, custom-property resolution, dimensions, and animation | Storybook or editor comparison using production styles, computed styles, and relevant interactions. Include a consumer override and the affected document/RTL states.                                          |
-| Cross-document registration or a particular mixed-style composition mechanism              | Reuse shared registration coverage. Add a component-specific test only for an uncovered registration or composition risk. A small fixture stylesheet can test that mechanism; pair it with a real-style check. |
+| What needs proof | Suitable evidence |
+| --- | --- |
+| DOM, public classes, refs, props, variants, and interactions | Existing component tests; extend them only for an uncovered integration risk. Assert the actual styled node, including the outer Grid child when an inner wrapper has the same class. |
+| Real SCSS declarations, specificity, custom-property resolution, dimensions, and animation | Storybook or editor comparison using production styles, computed styles, and relevant interactions. Include a consumer override and the affected document/RTL states. |
+| Cross-document registration or a particular mixed-style composition mechanism | Reuse shared registration coverage. Add a component-specific test only for an uncovered registration or composition risk. A small fixture stylesheet can test that mechanism; pair it with a real-style check. |
 
 The Node and jsdom projects mock stylesheet imports; Browser Mode loads the real styles. Public-class assertions can protect a compatibility contract; private module-class assertions establish wiring only. Neither proves that the real CSS loads or wins. Do not add class assertions or snapshots solely to mirror the implementation. Do not inject the desired production selector into a test and claim it protects that selector: the test would still pass if the SCSS rule were deleted. This distinction led to removing tests in [#81792](https://github.com/WordPress/gutenberg/pull/81792#discussion_r3811746653).
 
@@ -135,10 +138,10 @@ Follow [package changelog guidance](/docs/contributors/code/managing-packages.md
 
 Choose an example for the risk in the current migration, then check it against current source. The full migration history is maintained in [#66806](https://github.com/WordPress/gutenberg/issues/66806).
 
-| Migration risk            | Merged example                                                                                                                        | What to inspect                                                               |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Polymorphic wrappers      | View, [#79443](https://github.com/WordPress/gutenberg/pull/79443)                                                                     | Shared polymorphic replacement, legacy `css` no-op, and downstream consumers. |
-| Dynamic spacing           | Spacer, [#79449](https://github.com/WordPress/gutenberg/pull/79449)                                                                   | Nested custom-property resets and shorthand/longhand fallback.                |
-| Selector specificity      | Divider, [#79444](https://github.com/WordPress/gutenberg/pull/79444), and [#79534](https://github.com/WordPress/gutenberg/pull/79534) | Orientation selectors and the correction that restored consumer overrides.    |
-| Mixed Emotion composition | Border controls, [#80437](https://github.com/WordPress/gutenberg/pull/80437)                                                          | Overrides, CSS-wide values, and the linked-control gutter.                    |
-| Root and iframe delivery  | Scrollable, [#80694](https://github.com/WordPress/gutenberg/pull/80694)                                                               | CardBody height and stylesheet insertion order in each document.              |
+| Migration risk | Merged example | What to inspect |
+| --- | --- | --- |
+| Polymorphic wrappers | View, [#79443](https://github.com/WordPress/gutenberg/pull/79443) | Shared polymorphic replacement, legacy `css` no-op, and downstream consumers. |
+| Dynamic spacing | Spacer, [#79449](https://github.com/WordPress/gutenberg/pull/79449) | Nested custom-property resets and shorthand/longhand fallback. |
+| Selector specificity | Divider, [#79444](https://github.com/WordPress/gutenberg/pull/79444), and [#79534](https://github.com/WordPress/gutenberg/pull/79534) | Orientation selectors and the correction that restored consumer overrides. |
+| Mixed Emotion composition | Border controls, [#80437](https://github.com/WordPress/gutenberg/pull/80437) | Overrides, CSS-wide values, and the linked-control gutter. |
+| Root and iframe delivery | Scrollable, [#80694](https://github.com/WordPress/gutenberg/pull/80694) | CardBody height and stylesheet insertion order in each document. |
