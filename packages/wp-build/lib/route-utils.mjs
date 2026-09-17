@@ -64,44 +64,64 @@ export function getRouteMetadata( rootDir, routeName ) {
 }
 
 /**
+ * Source extensions for route entry files, in priority order.
+ * Must stay aligned with SOURCE_EXTENSIONS in source-files.mjs.
+ */
+const ROUTE_EXTENSIONS = [
+	'tsx',
+	'ts',
+	'mts',
+	'cts',
+	'jsx',
+	'js',
+	'mjs',
+	'cjs',
+];
+
+/**
  * @typedef {Object} RouteFiles
- * @property {boolean} hasRoute     Whether route file exists.
- * @property {boolean} hasStage     Whether stage file exists.
- * @property {boolean} hasInspector Whether inspector file exists.
- * @property {boolean} hasCanvas    Whether canvas file exists.
- * @property {boolean} hasStyle     Whether style file exists.
+ * @property {boolean}     hasRoute     Whether route file exists.
+ * @property {boolean}     hasStage     Whether stage file exists.
+ * @property {boolean}     hasInspector Whether inspector file exists.
+ * @property {boolean}     hasCanvas    Whether canvas file exists.
+ * @property {boolean}     hasStyle     Whether style file exists.
+ * @property {string|null} stage        Stage file name, extension included.
+ * @property {string|null} inspector    Inspector file name, extension included.
+ * @property {string|null} canvas       Canvas file name, extension included.
  */
 
 /**
  * Check if a route has specific files.
  *
  * @param {string} routeDirectory Route directory path.
- * @return {RouteFiles} Object with boolean flags for route files.
+ * @return {RouteFiles} Object with flags and file names for route files.
  */
 export function getRouteFiles( routeDirectory ) {
-	const extensions = [ 'tsx', 'ts', 'mts', 'cts', 'jsx', 'js' ];
 	const files = {
 		hasRoute: false,
 		hasStage: false,
 		hasInspector: false,
 		hasCanvas: false,
 		hasStyle: false,
+		stage: null,
+		inspector: null,
+		canvas: null,
 	};
 
 	const entries = readdirSync( routeDirectory );
 
-	for ( const ext of extensions ) {
+	for ( const ext of ROUTE_EXTENSIONS ) {
 		if ( entries.includes( `route.${ ext }` ) ) {
 			files.hasRoute = true;
 		}
-		if ( entries.includes( `stage.${ ext }` ) ) {
-			files.hasStage = true;
-		}
-		if ( entries.includes( `inspector.${ ext }` ) ) {
-			files.hasInspector = true;
-		}
-		if ( entries.includes( `canvas.${ ext }` ) ) {
-			files.hasCanvas = true;
+		for ( const name of [ 'stage', 'inspector', 'canvas' ] ) {
+			const fileName = `${ name }.${ ext }`;
+			// The extension list is ordered, so the first match wins.
+			if ( ! files[ name ] && entries.includes( fileName ) ) {
+				files[ name ] = fileName;
+				files[ `has${ name[ 0 ].toUpperCase() }${ name.slice( 1 ) }` ] =
+					true;
+			}
 		}
 	}
 
@@ -122,16 +142,14 @@ export function getRouteFiles( routeDirectory ) {
 export function generateContentEntryPoint( files ) {
 	const lines = [];
 
-	if ( files.hasStage ) {
-		lines.push( "export { stage } from './stage';" );
-	}
-
-	if ( files.hasInspector ) {
-		lines.push( "export { inspector } from './inspector';" );
-	}
-
-	if ( files.hasCanvas ) {
-		lines.push( "export { canvas } from './canvas';" );
+	/*
+	 * Import the full file name rather than relying on esbuild extending an
+	 * extensionless path: that resolution never tries `.mts` or `.cts`.
+	 */
+	for ( const name of [ 'stage', 'inspector', 'canvas' ] ) {
+		if ( files[ name ] ) {
+			lines.push( `export { ${ name } } from './${ files[ name ] }';` );
+		}
 	}
 
 	// If no components exist, export empty object

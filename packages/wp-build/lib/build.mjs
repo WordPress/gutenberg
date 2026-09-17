@@ -27,11 +27,7 @@ import {
 } from './php-generator.mjs';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
 import { getBrowserslistQueries } from './browserslist.mjs';
-import {
-	getSourceFileGlob,
-	isTestSourceFile,
-	RESOLVE_EXTENSIONS,
-} from './source-files.mjs';
+import { getSourceFileGlob, isTestSourceFile } from './source-files.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
 import {
 	getAllRoutes,
@@ -557,7 +553,6 @@ async function bundlePackage( packageName, options = {} ) {
 		const baseConfig = {
 			entryPoints: [ entryPoint ],
 			bundle: true,
-			resolveExtensions: RESOLVE_EXTENSIONS,
 			sourcemap: true,
 			format: 'iife',
 			target,
@@ -676,7 +671,6 @@ async function bundlePackage( packageName, options = {} ) {
 						`${ fileName }.min.js`
 					),
 					bundle: true,
-					resolveExtensions: RESOLVE_EXTENSIONS,
 					// Emit UTF-8 so binary-encoded inlined WASM (e.g. the vips
 					// worker) stays compact; ASCII output would escape high
 					// bytes as \uXXXX and defeat the compression.
@@ -708,7 +702,6 @@ async function bundlePackage( packageName, options = {} ) {
 							`${ fileName }.js`
 						),
 						bundle: true,
-						resolveExtensions: RESOLVE_EXTENSIONS,
 						charset: 'utf8',
 						sourcemap: true,
 						format: 'esm',
@@ -1432,7 +1425,6 @@ async function transpilePackage( packageName ) {
 				outbase: srcDir,
 				outExtension: { '.js': '.cjs' },
 				bundle: true,
-				resolveExtensions: RESOLVE_EXTENSIONS,
 				// Emit UTF-8 so binary-encoded inlined WASM stays compact
 				// (ASCII output would escape high bytes as \uXXXX).
 				charset: 'utf8',
@@ -1466,7 +1458,6 @@ async function transpilePackage( packageName ) {
 				outbase: srcDir,
 				outExtension: { '.js': '.mjs' },
 				bundle: true,
-				resolveExtensions: RESOLVE_EXTENSIONS,
 				// Emit UTF-8 so binary-encoded inlined WASM stays compact
 				// (ASCII output would escape high bytes as \uXXXX).
 				charset: 'utf8',
@@ -1572,7 +1563,6 @@ async function compileStyles( packageName ) {
 				entryPoints: [ styleEntryPath ],
 				outdir: outputDir,
 				bundle: true,
-				resolveExtensions: RESOLVE_EXTENSIONS,
 				write: false,
 				loader: {
 					'.scss': 'css',
@@ -1709,7 +1699,6 @@ async function buildRoute( routeName ) {
 					entryPoints: routeEntryPoints,
 					outfile: path.join( outputDir, 'route.min.js' ),
 					bundle: true,
-					resolveExtensions: RESOLVE_EXTENSIONS,
 					format: 'esm',
 					target: getEsbuildTarget(),
 					minify: true,
@@ -1728,7 +1717,6 @@ async function buildRoute( routeName ) {
 					entryPoints: routeEntryPoints,
 					outfile: path.join( outputDir, 'route.js' ),
 					bundle: true,
-					resolveExtensions: RESOLVE_EXTENSIONS,
 					format: 'esm',
 					target: getEsbuildTarget(),
 					minify: false,
@@ -1762,7 +1750,6 @@ async function buildRoute( routeName ) {
 				entryPoints: [ tempEntryPath ],
 				outfile: path.join( outputDir, 'content.min.js' ),
 				bundle: true,
-				resolveExtensions: RESOLVE_EXTENSIONS,
 				format: 'esm',
 				target: getEsbuildTarget(),
 				minify: true,
@@ -1781,7 +1768,6 @@ async function buildRoute( routeName ) {
 				entryPoints: [ tempEntryPath ],
 				outfile: path.join( outputDir, 'content.js' ),
 				bundle: true,
-				resolveExtensions: RESOLVE_EXTENSIONS,
 				format: 'esm',
 				target: getEsbuildTarget(),
 				minify: false,
@@ -1874,7 +1860,6 @@ async function buildWidget( widgetName ) {
 					entryPoints: renderEntryPoints,
 					outfile: path.join( outputDir, 'render.min.js' ),
 					bundle: true,
-					resolveExtensions: RESOLVE_EXTENSIONS,
 					format: 'esm',
 					target: getEsbuildTarget(),
 					minify: true,
@@ -1893,7 +1878,6 @@ async function buildWidget( widgetName ) {
 					entryPoints: renderEntryPoints,
 					outfile: path.join( outputDir, 'render.js' ),
 					bundle: true,
-					resolveExtensions: RESOLVE_EXTENSIONS,
 					format: 'esm',
 					target: getEsbuildTarget(),
 					minify: false,
@@ -1926,7 +1910,6 @@ async function buildWidget( widgetName ) {
 					entryPoints: widgetEntryPoints,
 					outfile: path.join( outputDir, 'widget.min.js' ),
 					bundle: true,
-					resolveExtensions: RESOLVE_EXTENSIONS,
 					format: 'esm',
 					target: getEsbuildTarget(),
 					minify: true,
@@ -1945,7 +1928,6 @@ async function buildWidget( widgetName ) {
 					entryPoints: widgetEntryPoints,
 					outfile: path.join( outputDir, 'widget.js' ),
 					bundle: true,
-					resolveExtensions: RESOLVE_EXTENSIONS,
 					format: 'esm',
 					target: getEsbuildTarget(),
 					minify: false,
