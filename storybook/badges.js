@@ -3,10 +3,10 @@
  *
  * Tags live in two namespaces, because they answer two different questions.
  * The `status-*` tags describe the API lifecycle, how a component can be
- * imported, and are declared by hand in a story's `tags` array. The bare tags
- * describe the design system's recommendation, whether a component should be
- * used for new UI, and are added at index time from `parameters.componentStatus`.
- * A component can carry one of each.
+ * imported, and are declared by hand in a story's `tags` array. The `use-*`
+ * tags describe the design system's recommendation, whether a component should
+ * be used for new UI, and are added at index time from
+ * `parameters.componentStatus`. A component can carry one of each.
  *
  * @see https://github.com/Sidnioulz/storybook-addon-tag-badges
  */
@@ -15,8 +15,8 @@ import { statuses } from './components/component-status-indicator/statuses';
 
 /**
  * Recommendation statuses, declared per story as
- * `parameters.componentStatus`. The status indexer turns them into tags at
- * index time, using the status as the tag, so they need no `tags` entry.
+ * `parameters.componentStatus`. The status indexer turns each one into its
+ * `use-*` tag at index time, so they need no `tags` entry.
  */
 const statusDescriptions = {
 	recommended: 'Use this component for new UI.',
@@ -27,8 +27,8 @@ const statusDescriptions = {
 };
 
 const statusBadges = Object.fromEntries(
-	Object.entries( statuses ).map( ( [ key, { label, icon } ] ) => [
-		key,
+	Object.entries( statuses ).map( ( [ key, { label, icon, tag } ] ) => [
+		tag,
 		{
 			icon,
 			title: `${ icon } ${ label }`,

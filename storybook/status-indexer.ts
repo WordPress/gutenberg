@@ -2,6 +2,8 @@ import { readFile } from 'node:fs/promises';
 import type { Node } from '@babel/types';
 import { loadCsf } from 'storybook/internal/csf-tools';
 import type { Indexer } from 'storybook/internal/types';
+import { statuses } from './components/component-status-indicator/statuses.js';
+import type { ComponentStatus } from './components/component-status-indicator/statuses.js';
 
 /**
  * Reads `parameters.componentStatus.status` out of a story file's meta.
@@ -37,12 +39,15 @@ function getProperty( node: Node | undefined, name: string ): Node | undefined {
 
 /**
  * Indexes CSF files like Storybook's own indexer, and additionally tags every
- * entry with the status declared in `parameters.componentStatus`, so the
- * sidebar and its tag filter can show the design system's recommendation.
+ * entry with the `use-*` tag of the status declared in
+ * `parameters.componentStatus`, so the sidebar and its tag filter can show the
+ * design system's recommendation.
  *
- * The status is the tag verbatim, with no prefix: the `status-*` namespace
- * belongs to the API lifecycle tags, which answer a different question, and a
- * component can carry one tag from each namespace.
+ * Recommendation has its own namespace: the `status-*` tags describe the API
+ * lifecycle, which is a different question, and a component can carry one tag
+ * from each. Sharing a prefix would list the two as a single enum in the tag
+ * filter, and since that filter sorts alphabetically, an unprefixed tag would
+ * scatter the four statuses around the `status-*` block.
  */
 export const statusIndexer: Indexer = {
 	test: /\.story\.(m?js|ts)x?$/,
@@ -58,9 +63,14 @@ export const statusIndexer: Indexer = {
 			return csf.indexInputs;
 		}
 
+		const { tag } = statuses[ status as ComponentStatus ] ?? {};
+		if ( ! tag ) {
+			return csf.indexInputs;
+		}
+
 		return csf.indexInputs.map( ( input ) => ( {
 			...input,
-			tags: [ ...( input.tags ?? [] ), status ],
+			tags: [ ...( input.tags ?? [] ), tag ],
 		} ) );
 	},
 };
