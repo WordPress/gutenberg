@@ -53,6 +53,9 @@ describe( 'blocks', () => {
 			unlock( select( blocksStore ) ).getUnprocessedBlockTypes()
 		);
 		dispatch( blocksStore ).removeBlockTypes( registeredNames );
+		Object.keys( select( blocksStore ).getCollections() ).forEach(
+			unregisterBlockCollection
+		);
 		setFreeformContentHandlerName( undefined );
 		setUnregisteredTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
