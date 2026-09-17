@@ -1,5 +1,38 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// `\\begin{aligned} A &= 1 \\\\ AB + C &= 2 \\end{aligned}` as the inline math
+// format stores it: temml's output, without the block wrapper.
+const INLINE_ALIGNED =
+	'<math><semantics><mtable displaystyle="true" columnalign="right left" class="tml-jot"><mtr><mtd class="tml-right" style="padding-left:0em;padding-right:0em;"><mi>A</mi></mtd><mtd class="tml-left" style="padding-left:0em;padding-right:0em;"><mrow><mo>=</mo><mn>1</mn></mrow></mtd></mtr><mtr><mtd class="tml-right" style="padding-left:0em;padding-right:0em;"><mrow><mi>A</mi><mi>B</mi><mo>+</mo><mi>C</mi></mrow></mtd><mtd class="tml-left" style="padding-left:0em;padding-right:0em;"><mrow><mo>=</mo><mn>2</mn></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">\\begin{aligned} A &amp;= 1 \\\\ AB + C &amp;= 2 \\end{aligned}</annotation></semantics></math>';
+
+// In `aligned`, cells before `&` are right-aligned and cells after
+// it are left-aligned, so that `A` and `AB + C` both sit against
+// their `=`. Returns, for every aligned cell, how far its content is
+// from the edge its class names; nothing is misaligned when all are
+// within a pixel.
+async function getMisalignedCells( container ) {
+	const cells = container.locator( 'math mtd.tml-right, math mtd.tml-left' );
+	await expect( cells ).toHaveCount( 4 );
+	return cells.evaluateAll( ( elements ) =>
+		elements
+			.map( ( cell ) => {
+				const cellRect = cell.getBoundingClientRect();
+				const rects = Array.from( cell.children, ( child ) =>
+					child.getBoundingClientRect()
+				);
+				const style = window.getComputedStyle( cell );
+				return cell.classList.contains( 'tml-right' )
+					? cellRect.right -
+							parseFloat( style.paddingRight ) -
+							Math.max( ...rects.map( ( r ) => r.right ) )
+					: Math.min( ...rects.map( ( r ) => r.left ) ) -
+							cellRect.left -
+							parseFloat( style.paddingLeft );
+			} )
+			.filter( ( gap ) => Math.abs( gap ) > 1 )
+	);
+}
+
 test.describe( 'Math Block', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -93,41 +126,28 @@ test.describe( 'Math Block', () => {
 		editor,
 		page,
 	} ) => {
-		// In `aligned`, cells before `&` are right-aligned and cells after
-		// it are left-aligned, so that `A` and `AB + C` both sit against
-		// their `=`. Returns, for every aligned cell, how far its content is
-		// from the edge its class names; nothing is misaligned when all are
-		// within a pixel.
-		async function getMisalignedCells( container ) {
-			const cells = container.locator(
-				'.wp-block-math mtd.tml-right, .wp-block-math mtd.tml-left'
-			);
-			await expect( cells ).toHaveCount( 4 );
-			return cells.evaluateAll( ( elements ) =>
-				elements
-					.map( ( cell ) => {
-						const cellRect = cell.getBoundingClientRect();
-						const rects = Array.from( cell.children, ( child ) =>
-							child.getBoundingClientRect()
-						);
-						const style = window.getComputedStyle( cell );
-						return cell.classList.contains( 'tml-right' )
-							? cellRect.right -
-									parseFloat( style.paddingRight ) -
-									Math.max( ...rects.map( ( r ) => r.right ) )
-							: Math.min( ...rects.map( ( r ) => r.left ) ) -
-									cellRect.left -
-									parseFloat( style.paddingLeft );
-					} )
-					.filter( ( gap ) => Math.abs( gap ) > 1 )
-			);
-		}
-
 		await editor.insertBlock( {
 			name: 'core/math',
 			attributes: {
 				latex: '\\begin{aligned} A &= 1 \\\\ AB + C &= 2 \\end{aligned}',
 			},
+		} );
+		expect( await getMisalignedCells( editor.canvas ) ).toEqual( [] );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		expect( await getMisalignedCells( page ) ).toEqual( [] );
+	} );
+
+	test( 'should align inline math on a page without a Math block @webkit @firefox', async ( {
+		editor,
+		page,
+	} ) => {
+		// The rules live in the always-loaded block library stylesheet, not
+		// the Math block's own, so inline math gets them too.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: `Inline ${ INLINE_ALIGNED } math.` },
 		} );
 		expect( await getMisalignedCells( editor.canvas ) ).toEqual( [] );
 
