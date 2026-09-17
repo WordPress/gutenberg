@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `__experimentalFetchLinkSuggestions`: Score each result separately when a post, term or attachment share an id, so an unmatched result can no longer inherit another's relevance and sort above a real match ([#83093](https://github.com/WordPress/gutenberg/pull/83093)).
 -   The `save<Entity>` and `delete<Entity>` shortcut actions resolve with their saved or deleted record types instead of `void` ([#77162](https://github.com/WordPress/gutenberg/pull/77162)).
 -   `canUser`: `resolveSelect` no longer returns `undefined` when another action on the same resource is already resolving. The four actions now share one resolution instead of the resolver marking siblings as resolved before the request completes ([#82638](https://github.com/WordPress/gutenberg/pull/82638)).
 

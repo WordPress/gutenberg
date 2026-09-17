@@ -263,6 +263,12 @@ export default async function fetchLinkSuggestions(
 export function sortResults( results: SearchResult[], search: string ) {
 	const searchTokens = tokenize( search );
 
+	// Posts, terms and media are separate tables with separate sequences, so an
+	// id is only unique within its own kind and type. Scoring by id alone lets
+	// one result overwrite another's score.
+	const scoreKey = ( result: SearchResult ) =>
+		`${ result.kind }:${ result.type }:${ result.id }`;
+
 	const scores = {};
 	for ( const result of results ) {
 		if ( result.title ) {
@@ -289,13 +295,15 @@ export function sortResults( results: SearchResult[], search: string ) {
 
 			const subMatchScore = subMatchingTokens.length / titleTokens.length;
 
-			scores[ result.id ] = exactMatchScore + subMatchScore;
+			scores[ scoreKey( result ) ] = exactMatchScore + subMatchScore;
 		} else {
-			scores[ result.id ] = 0;
+			scores[ scoreKey( result ) ] = 0;
 		}
 	}
 
-	return results.sort( ( a, b ) => scores[ b.id ] - scores[ a.id ] );
+	return results.sort(
+		( a, b ) => scores[ scoreKey( b ) ] - scores[ scoreKey( a ) ]
+	);
 }
 
 /**
