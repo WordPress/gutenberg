@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   DataViewsPicker: Add the `DataViewsPicker.Actions` sub-component, and render the children given to `DataViewsPicker.Footer` in place of its default contents, so a picker can compose its footer from the pagination and the actions alone ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
+
 ### Enhancements
 
 -   DataViewsPicker: Footer action buttons now honor an action's `isEligible`, disabling the button when no selected item is eligible and passing only the eligible items to the callback. A `label` function still receives the whole selection ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).

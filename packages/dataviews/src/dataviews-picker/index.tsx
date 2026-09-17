@@ -19,6 +19,7 @@ import {
 } from '../components/dataviews-filters';
 import DataViewsLayout from '../components/dataviews-layout';
 import {
+	DataViewsPickerActions,
 	DataViewsPickerFooter,
 	DataViewsPickerBulkActionToolbar,
 } from '../components/dataviews-picker-footer';
@@ -379,6 +380,7 @@ function DataViewsPicker< Item >( {
 // Populate the DataViews sub components
 const DataViewsPickerSubComponents =
 	DataViewsPicker as typeof DataViewsPicker & {
+		Actions: typeof DataViewsPickerActions;
 		BulkActionToolbar: typeof DataViewsPickerBulkActionToolbar;
 		Footer: typeof DataViewsPickerFooter;
 		Filters: typeof Filters;
@@ -391,6 +393,7 @@ const DataViewsPickerSubComponents =
 		ViewConfig: typeof DataviewsViewConfigDropdown;
 	};
 
+DataViewsPickerSubComponents.Actions = DataViewsPickerActions;
 DataViewsPickerSubComponents.BulkActionToolbar =
 	DataViewsPickerBulkActionToolbar;
 DataViewsPickerSubComponents.Footer = DataViewsPickerFooter;
