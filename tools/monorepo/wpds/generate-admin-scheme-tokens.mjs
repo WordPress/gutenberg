@@ -30,7 +30,10 @@ import {
 	DEFAULT_SEED_COLORS,
 } from '../../../packages/theme/src/color-ramps/index.ts';
 import colorTokens from '../../../packages/theme/src/prebuilt/ts/color-tokens.ts';
-import { getAdminThemeColors } from '../../../packages/admin-ui/src/admin-theme-colors/index.ts';
+import {
+	ADMIN_THEME_COLORS,
+	getAdminThemeColors,
+} from '../../../packages/admin-ui/src/admin-theme-colors/index.ts';
 
 const ROOT = join( dirname( fileURLToPath( import.meta.url ) ), '../../..' );
 const OUTPUT = join(
@@ -38,28 +41,14 @@ const OUTPUT = join(
 	'lib/experimental/wpds-admin/css/05-scheme-tokens.css'
 );
 
-// The colour schemes bundled with WordPress. `modern` is the default.
-const DEFAULT_SCHEME = 'modern';
-const SCHEMES = [
-	'modern',
-	'fresh',
-	'light',
-	'blue',
-	'coffee',
-	'ectoplasm',
-	'midnight',
-	'ocean',
-	'sunrise',
-];
-
 /**
- * Returns a scheme's primary colour, as `getAdminThemeColors()` reports it.
+ * Returns the default scheme's primary colour, as `getAdminThemeColors()`
+ * resolves it when no scheme class is present.
  *
- * @param {string} scheme Colour scheme name.
  * @return {string} Primary colour.
  */
-function getSchemePrimary( scheme ) {
-	globalThis.document = { body: { className: `admin-color-${ scheme }` } };
+function getDefaultPrimary() {
+	globalThis.document = { body: { className: '' } };
 	return getAdminThemeColors().primary;
 }
 
@@ -94,25 +83,22 @@ function deriveTokens( primary ) {
 	return tokens;
 }
 
-const defaultPrimary = getSchemePrimary( DEFAULT_SCHEME );
-const defaults = deriveTokens( defaultPrimary );
+const defaults = deriveTokens( getDefaultPrimary() );
 const rules = new Map();
 
-for ( const scheme of SCHEMES.filter( ( name ) => name !== DEFAULT_SCHEME ) ) {
-	const primary = getSchemePrimary( scheme );
-
-	// An unknown scheme silently falls back to the default; fail instead.
-	if ( primary === defaultPrimary ) {
-		throw new Error(
-			`No colours found for the "${ scheme }" admin colour scheme.`
-		);
-	}
-
+// Every scheme `@wordpress/admin-ui` knows about, so an added scheme is
+// picked up without editing this script.
+for ( const [ scheme, { primary } ] of ADMIN_THEME_COLORS ) {
 	const declarations = [ ...deriveTokens( primary ) ]
 		.filter( ( [ name, value ] ) => defaults.get( name ) !== value )
 		.sort( ( [ a ], [ b ] ) => a.localeCompare( b ) )
 		.map( ( [ name, value ] ) => `\t\t${ name }: ${ value };` )
 		.join( '\n' );
+
+	// The default scheme, or any scheme deriving identical tokens.
+	if ( ! declarations ) {
+		continue;
+	}
 
 	const selectors = rules.get( declarations ) ?? [];
 	selectors.push( `\tbody.admin-color-${ scheme }` );
@@ -155,5 +141,5 @@ ${ [ ...rules ]
 
 writeFileSync( OUTPUT, css );
 console.log(
-	`Wrote ${ rules.size } rules for ${ SCHEMES.length - 1 } schemes.`
+	`Wrote ${ rules.size } rules for ${ ADMIN_THEME_COLORS.size } schemes.`
 );
