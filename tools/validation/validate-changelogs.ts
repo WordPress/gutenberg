@@ -40,11 +40,9 @@ export function resolveChangelogPath(
 export const ALLOWED_SECTIONS = [
 	'Breaking Changes',
 	'New Features',
-	'New APIs',
 	'Enhancements',
 	'Deprecations',
 	'Bug Fixes',
-	'Code Quality',
 	'Documentation',
 	'Internal',
 	'Stable Release',
