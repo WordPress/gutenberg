@@ -8,10 +8,10 @@
  * colour — table borders, secondary text, semantic reds and greens — is a
  * separate concern and is not touched here.
  *
- * The accent stays `var(--wp-admin-theme-color)` rather than the brand token.
- * The token resolves to a flat literal outside a ThemeProvider, so using it
- * would pin every scheme to the default's blue. The variable already carries
- * the user's scheme, and follows it for free.
+ * The accent uses the brand strong pair — the background token together with
+ * its own foreground — which follows the user's colour scheme through
+ * 05-scheme-tokens.css. Never pair a scheme-coloured background with another
+ * pair's foreground: the pairs are what guarantee contrast.
  *
  * WHY THE "STRONG" FAMILY. The system has no dark surface token: every surface
  * token is light. Dark exists only as `…-interactive-neutral-strong` (#2d2d2d)
@@ -107,7 +107,7 @@
 	#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
 	#adminmenu li.wp-has-current-submenu .wp-submenu .wp-submenu-head,
 	.folded #adminmenu li.current.menu-top {
-		background: var(--wp-admin-theme-color);
+		background: var(--wpds-color-background-interactive-brand-strong);
 		color: var(--wpds-color-foreground-interactive-brand-strong);
 	}
 
@@ -134,7 +134,7 @@
 	#adminmenu .menu-counter,
 	#adminmenu .awaiting-mod,
 	#adminmenu .update-plugins {
-		background: var(--wp-admin-theme-color);
+		background: var(--wpds-color-background-interactive-brand-strong);
 		color: var(--wpds-color-foreground-interactive-brand-strong);
 	}
 
