@@ -75,20 +75,21 @@ export function useFocusHandler( clientId ) {
 				// mousedown, so this dispatch overwriting the store anchor
 				// is harmless.
 				// A block wrapper can receive focus incidentally: a click on
-				// an editable that is an inert part of the editing host (not
-				// focusable itself) moves focus to the nearest focusable
-				// ancestor. The caret, not the wrapper, says which block the
-				// user is in: leave the selection alone when, within an
-				// engaged editing host (the wrapper is editable by
-				// inheritance), the selection anchor sits within this block
-				// but belongs to a descendant block.
+				// the selected block's editable, an inert part of the editing
+				// host (not focusable itself), moves focus to the nearest
+				// focusable ancestor. Leave the selection alone when, within
+				// an engaged editing host (the wrapper is editable by
+				// inheritance), the caret sits in the selected block within
+				// this one. A caret in a deselected descendant is incidental
+				// too (a click on this block's padding), and the click
+				// selects this block.
 				const { anchorNode } =
 					node.ownerDocument.defaultView.getSelection();
 				if (
 					node.isContentEditable &&
 					anchorNode &&
 					node.contains( anchorNode ) &&
-					getBlockClientId( anchorNode ) !== clientId
+					isBlockSelected( getBlockClientId( anchorNode ) )
 				) {
 					return;
 				}
