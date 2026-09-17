@@ -8,11 +8,8 @@ import {
 vi.mock( '@wordpress/api-fetch', () => ( {
 	default: vi.fn( ( { path } ) => {
 		switch ( path ) {
-			// addQueryArgs indexes array values, so several subtypes arrive as
-			// subtype[0], subtype[1] and so on.
 			case '/wp/v2/search?search=&per_page=20&type=post':
 			case '/wp/v2/search?search=Contact&per_page=20&type=post&subtype=page':
-			case '/wp/v2/search?search=Contact&per_page=20&type=post&subtype%5B0%5D=page':
 				return Promise.resolve( [
 					{
 						id: 37,
@@ -38,15 +35,6 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 						type: 'category',
 					},
 				] );
-			case '/wp/v2/search?search=Contact&per_page=20&type=term&subtype=category':
-				return Promise.resolve( [
-					{
-						id: 3,
-						title: 'Contacts',
-						url: 'http://wordpress.local/category/contacts/',
-						type: 'category',
-					},
-				] );
 			case '/wp/v2/search?search=&per_page=20&type=post-format':
 				return Promise.resolve( [
 					{
@@ -62,16 +50,6 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 						url: 'http://wordpress.local/type/quote/',
 						type: 'post-format',
 						kind: 'taxonomy',
-					},
-				] );
-			case '/wp/v2/search?search=&per_page=20&type=post&subtype=page':
-				return Promise.resolve( [
-					{
-						id: 12,
-						title: 'A Page',
-						url: 'http://wordpress.local/a-page/',
-						type: 'post',
-						subtype: 'page',
 					},
 				] );
 			case '/wp/v2/search?search=&per_page=3&type=post&subtype=page':
@@ -255,144 +233,61 @@ describe( 'fetchLinkSuggestions', () => {
 			] )
 		);
 	} );
-	it( 'searches several types when given entries for each', () => {
+	it( 'excludes a type from an unscoped search', () => {
 		return fetchLinkSuggestions( '', {
-			type: [ { type: 'post' }, { type: 'term' } ],
-			perPage: 20,
-		} ).then( ( suggestions ) => {
-			// One result from the post search and two from the term search.
-			expect(
-				suggestions.map(
-					( { title, kind } ) => `${ kind }: ${ title }`
-				)
-			).toEqual( [
-				'post-type: Contact Page',
-				'taxonomy: Cats',
-				'taxonomy: Uncategorized',
-			] );
-		} );
-	} );
-
-	it( 'gives each type its own subtype', () => {
-		return fetchLinkSuggestions( 'Contact', {
-			type: [
-				{ type: 'post', subtype: 'page' },
-				{ type: 'term', subtype: 'category' },
-			],
-			perPage: 20,
-		} ).then( ( suggestions ) => {
-			expect( suggestions.map( ( { type } ) => type ) ).not.toContain(
-				'missing case or failed'
-			);
-		} );
-	} );
-
-	it( 'lets one type narrow itself while another does not', () => {
-		// A subtype only means something to the type it belongs to, so the
-		// term search is left unnarrowed rather than being sent "page".
-		return fetchLinkSuggestions( '', {
-			type: [ { type: 'post', subtype: 'page' }, { type: 'term' } ],
-			perPage: 20,
-		} ).then( ( suggestions ) => {
-			expect( suggestions.map( ( { type } ) => type ) ).not.toContain(
-				'missing case or failed'
-			);
-			expect(
-				suggestions.some( ( { kind } ) => kind === 'taxonomy' )
-			).toBe( true );
-		} );
-	} );
-
-	it( 'does not send a top level subtype to entries', () => {
-		// Each entry carries its own subtype, so a leftover top level one must
-		// not reach the term search, where a post type slug returns nonsense.
-		return fetchLinkSuggestions( '', {
-			type: [ { type: 'post', subtype: 'page' }, { type: 'term' } ],
-			subtype: 'category',
-			perPage: 20,
-		} ).then( ( suggestions ) => {
-			expect( suggestions.map( ( { type } ) => type ) ).not.toContain(
-				'missing case or failed'
-			);
-		} );
-	} );
-
-	it( 'accepts several subtypes for one type', () => {
-		return fetchLinkSuggestions( 'Contact', {
-			type: 'post',
-			subtype: [ 'page' ],
-			perPage: 20,
-		} ).then( ( suggestions ) => {
-			expect( suggestions.map( ( { title } ) => title ) ).toEqual( [
-				'Contact Page',
-			] );
-		} );
-	} );
-
-	it( 'treats an entry for one type like that type on its own', () => {
-		return Promise.all( [
-			fetchLinkSuggestions( '', { type: 'post', perPage: 20 } ),
-			fetchLinkSuggestions( '', {
-				type: [ { type: 'post' } ],
-				perPage: 20,
-			} ),
-		] ).then( ( [ asString, asArray ] ) => {
-			expect( asArray ).toEqual( asString );
-		} );
-	} );
-
-	it( 'does not search the types it was not given', () => {
-		return fetchLinkSuggestions( '', {
-			type: [ { type: 'post' }, { type: 'term' } ],
+			exclude: [ 'attachment' ],
 			perPage: 20,
 		} ).then( ( suggestions ) => {
 			expect( suggestions.map( ( { kind } ) => kind ) ).not.toContain(
 				'media'
 			);
-			expect( suggestions.map( ( { type } ) => type ) ).not.toContain(
-				'post-format'
-			);
-		} );
-	} );
-
-	it( 'searches attachments when asked for them', () => {
-		return fetchLinkSuggestions( '', {
-			type: [ { type: 'attachment' } ],
-			perPage: 20,
-		} ).then( ( suggestions ) => {
-			expect( suggestions ).toEqual( [
-				{
-					id: 54,
-					title: 'Some Test Media Title',
-					type: 'attachment',
-					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
-					kind: 'media',
-				},
+			// Everything else is still searched.
+			expect( suggestions.map( ( { title } ) => title ) ).toEqual( [
+				'Contact Page',
+				'Cats',
+				'Uncategorized',
+				'Gallery',
+				'Quote',
 			] );
 		} );
 	} );
 
-	it( 'does not return post formats when formats are unsupported', () => {
-		return fetchLinkSuggestions(
-			'',
-			{
-				type: [ { type: 'post-format' }, { type: 'term' } ],
-				perPage: 20,
-			},
-			{ disablePostFormats: true }
-		).then( ( suggestions ) => {
+	it( 'excludes several types at once', () => {
+		return fetchLinkSuggestions( '', {
+			exclude: [ 'attachment', 'post-format' ],
+			perPage: 20,
+		} ).then( ( suggestions ) => {
+			const kinds = suggestions.map( ( { kind } ) => kind );
+
+			expect( kinds ).not.toContain( 'media' );
 			expect( suggestions.map( ( { type } ) => type ) ).not.toContain(
 				'post-format'
 			);
 		} );
 	} );
 
-	it( 'searches nothing when given an empty array', () => {
-		return fetchLinkSuggestions( '', { type: [], perPage: 20 } ).then(
-			( suggestions ) => {
-				expect( suggestions ).toEqual( [] );
-			}
-		);
+	it( 'leaves a narrowed search alone when the exclusion does not apply', () => {
+		return Promise.all( [
+			fetchLinkSuggestions( '', { type: 'term', perPage: 20 } ),
+			fetchLinkSuggestions( '', {
+				type: 'term',
+				exclude: [ 'attachment' ],
+				perPage: 20,
+			} ),
+		] ).then( ( [ without, with_ ] ) => {
+			expect( with_ ).toEqual( without );
+		} );
+	} );
+
+	it( 'excludes a type that was explicitly asked for', () => {
+		// Contradictory, but the exclusion is the more specific instruction.
+		return fetchLinkSuggestions( '', {
+			type: 'attachment',
+			exclude: [ 'attachment' ],
+			perPage: 20,
+		} ).then( ( suggestions ) => {
+			expect( suggestions ).toEqual( [] );
+		} );
 	} );
 
 	describe( 'Initial search suggestions', () => {

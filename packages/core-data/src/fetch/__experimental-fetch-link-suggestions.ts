@@ -5,14 +5,6 @@ import { __ } from '@wordpress/i18n';
 
 export type SearchType = 'attachment' | 'post' | 'term' | 'post-format';
 
-/**
- * One type to search, optionally narrowed to some of its subtypes.
- */
-export type SearchTypeEntry = {
-	type: SearchType;
-	subtype?: string | string[];
-};
-
 export type SearchOptions = {
 	/**
 	 * Displays initial search suggestions, when true.
@@ -26,19 +18,20 @@ export type SearchOptions = {
 		'isInitialSuggestions' | 'initialSuggestionsSearchOptions'
 	>;
 	/**
-	 * Filters by search type. Either one type on its own, narrowed by the top
-	 * level `subtype` below, or several as entries that each carry their own:
-	 *
-	 *     type: [ { type: 'post', subtype: 'page' }, { type: 'term' } ]
-	 *
-	 * A subtype belongs to one type, so it has to travel with it.
+	 * Filters by search type.
 	 */
-	type?: SearchType | SearchTypeEntry[];
+	type?: SearchType;
 	/**
-	 * Slug of the post-type or taxonomy. Applies only when `type` is a single
-	 * type given on its own; in the array form each entry carries its own.
+	 * Slug of the post-type or taxonomy.
 	 */
 	subtype?: string | string[];
+	/**
+	 * Types to leave out. Only meaningful for a search that is not already
+	 * narrowed by `type`, to drop results the caller cannot use:
+	 *
+	 *     exclude: [ 'attachment' ]
+	 */
+	exclude?: SearchType[];
 	/**
 	 * Which page of results to return.
 	 */
@@ -135,39 +128,22 @@ export default async function fetchLinkSuggestions(
 	const {
 		type,
 		subtype,
+		exclude,
 		page,
 		perPage = searchOptions.isInitialSuggestions ? 3 : 20,
 	} = searchOptionsToUse;
 
 	const { disablePostFormats = false } = editorSettings;
 
-	// `type` is either one type, narrowed by the top level `subtype`, or a list
-	// of entries that each carry their own. A subtype only means something to
-	// the handler it belongs to: sending a post type slug to the term handler
-	// does not fail, it returns nonsense, leaking private taxonomies such as
-	// `wp_template_part_area`. Keeping each subtype with its type is what stops
-	// that. Undefined means every type, with no subtype.
-	const toEntries = ( value: SearchType | SearchTypeEntry[] ) =>
-		Array.isArray( value ) ? value : [ { type: value, subtype } ];
-	const requestedTypes = type === undefined ? undefined : toEntries( type );
-
-	// Returns the request to make for a type, or undefined to skip it.
-	const requestFor = ( searchType: SearchType ) => {
-		if ( ! requestedTypes ) {
-			return { type: searchType, subtype: undefined };
-		}
-
-		return requestedTypes.find( ( entry ) => entry.type === searchType );
-	};
-
-	const postRequest = requestFor( 'post' );
-	const termRequest = requestFor( 'term' );
-	const postFormatRequest = requestFor( 'post-format' );
-	const attachmentRequest = requestFor( 'attachment' );
+	// An unscoped search covers every type. `exclude` drops the ones the caller
+	// cannot use, so that they neither reach the caller nor take up room in the
+	// results, which are merged and cut to `perPage` before being returned.
+	const isSearched = ( searchType: SearchType ) =>
+		( ! type || type === searchType ) && ! exclude?.includes( searchType );
 
 	const queries: Promise< SearchResult[] >[] = [];
 
-	if ( postRequest ) {
+	if ( isSearched( 'post' ) ) {
 		queries.push(
 			apiFetch< SearchAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -175,7 +151,7 @@ export default async function fetchLinkSuggestions(
 					page,
 					per_page: perPage,
 					type: 'post',
-					subtype: postRequest.subtype,
+					subtype,
 				} ),
 			} )
 				.then( ( results ) => {
@@ -195,7 +171,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	if ( termRequest ) {
+	if ( isSearched( 'term' ) ) {
 		queries.push(
 			apiFetch< SearchAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -203,7 +179,7 @@ export default async function fetchLinkSuggestions(
 					page,
 					per_page: perPage,
 					type: 'term',
-					subtype: termRequest.subtype,
+					subtype,
 				} ),
 			} )
 				.then( ( results ) => {
@@ -223,7 +199,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	if ( ! disablePostFormats && postFormatRequest ) {
+	if ( ! disablePostFormats && isSearched( 'post-format' ) ) {
 		queries.push(
 			apiFetch< SearchAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -231,7 +207,7 @@ export default async function fetchLinkSuggestions(
 					page,
 					per_page: perPage,
 					type: 'post-format',
-					subtype: postFormatRequest.subtype,
+					subtype,
 				} ),
 			} )
 				.then( ( results ) => {
@@ -251,7 +227,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	if ( attachmentRequest ) {
+	if ( isSearched( 'attachment' ) ) {
 		queries.push(
 			apiFetch< MediaAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/media', {
