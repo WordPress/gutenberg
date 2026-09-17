@@ -26,11 +26,12 @@ class Gutenberg_REST_Block_Patterns_Controller_Test extends WP_Test_REST_Control
 		self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
 
 		// Setup an empty testing instance of `WP_Block_Patterns_Registry` and save the original.
-		$reflection = new ReflectionClass( 'WP_Block_Patterns_Registry' );
-		$reflection->getProperty( 'instance' )->setAccessible( true );
-		self::$orig_registry = $reflection->getStaticPropertyValue( 'instance' );
+		$reflection        = new ReflectionClass( 'WP_Block_Patterns_Registry' );
+		$instance_property = $reflection->getProperty( 'instance' );
+		$instance_property->setAccessible( true );
+		self::$orig_registry = $instance_property->getValue();
 		$test_registry       = new WP_Block_Patterns_Registry();
-		$reflection->setStaticPropertyValue( 'instance', $test_registry );
+		$instance_property->setValue( $test_registry );
 
 		// Register some patterns in the test registry.
 		$test_registry->register(
@@ -58,8 +59,10 @@ class Gutenberg_REST_Block_Patterns_Controller_Test extends WP_Test_REST_Control
 		self::delete_user( self::$admin_id );
 
 		// Restore the original registry instance.
-		$reflection = new ReflectionClass( 'WP_Block_Patterns_Registry' );
-		$reflection->setStaticPropertyValue( 'instance', self::$orig_registry );
+		$reflection        = new ReflectionClass( 'WP_Block_Patterns_Registry' );
+		$instance_property = $reflection->getProperty( 'instance' );
+		$instance_property->setAccessible( true );
+		$instance_property->setValue( self::$orig_registry );
 	}
 
 	public function test_register_routes() {
