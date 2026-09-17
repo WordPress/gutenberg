@@ -24,7 +24,10 @@ import {
 	DataViewsPickerBulkActionToolbar,
 } from '../components/dataviews-picker-footer';
 import DataViewsSearch from '../components/dataviews-search';
-import { DataViewsPagination } from '../components/dataviews-pagination';
+import {
+	DataViewsPageSelect,
+	DataViewsPagination,
+} from '../components/dataviews-pagination';
 import DataViewsViewConfig, {
 	DataviewsViewConfigDropdown,
 	ViewTypeMenu,
@@ -388,6 +391,7 @@ const DataViewsPickerSubComponents =
 		FiltersToggle: typeof FiltersToggle;
 		Layout: typeof DataViewsLayout;
 		LayoutSwitcher: typeof ViewTypeMenu;
+		PageSelect: typeof DataViewsPageSelect;
 		Pagination: typeof DataViewsPagination;
 		Search: typeof DataViewsSearch;
 		ViewConfig: typeof DataviewsViewConfigDropdown;
@@ -402,6 +406,7 @@ DataViewsPickerSubComponents.FiltersToggled = FiltersToggled;
 DataViewsPickerSubComponents.FiltersToggle = FiltersToggle;
 DataViewsPickerSubComponents.Layout = DataViewsLayout;
 DataViewsPickerSubComponents.LayoutSwitcher = ViewTypeMenu;
+DataViewsPickerSubComponents.PageSelect = DataViewsPageSelect;
 DataViewsPickerSubComponents.Pagination = DataViewsPagination;
 DataViewsPickerSubComponents.Search = DataViewsSearch;
 DataViewsPickerSubComponents.ViewConfig = DataviewsViewConfigDropdown;

@@ -20,7 +20,10 @@ export function hasPaginationControls(
 	);
 }
 
-export function DataViewsPagination() {
+// The "Page N of M" select, which paginates on its own. It is exposed as
+// `DataViews.PageSelect` for a footer with room for one pagination control
+// next to its actions.
+export function DataViewsPageSelect() {
 	const { view, onChangeView, paginationInfo } =
 		useContext( DataViewsContext );
 
@@ -52,46 +55,62 @@ export function DataViewsPagination() {
 	return (
 		<Stack
 			direction="row"
+			justify="flex-start"
+			align="center"
+			gap="xs"
+			className="dataviews-pagination__page-select"
+		>
+			{ createInterpolateElement(
+				sprintf(
+					// translators: 1: Current page number, 2: Total number of pages.
+					_x( '<div>Page</div>%1$s<div>of %2$d</div>', 'paging' ),
+					'<CurrentPage />',
+					totalPages
+				),
+				{
+					div: <div aria-hidden />,
+					// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
+					CurrentPage: (
+						<WCSelectControl
+							aria-label={ __( 'Current page' ) }
+							value={ currentPage.toString() }
+							options={ pageSelectOptions }
+							onChange={ ( newValue ) => {
+								onChangeView( {
+									...view,
+									page: +newValue,
+								} );
+							} }
+							size="small"
+							variant="minimal"
+						/>
+					),
+				}
+			) }
+		</Stack>
+	);
+}
+
+export function DataViewsPagination() {
+	const { view, onChangeView, paginationInfo } =
+		useContext( DataViewsContext );
+
+	if ( ! hasPaginationControls( view, paginationInfo ) ) {
+		return null;
+	}
+
+	const { totalPages } = paginationInfo;
+	const currentPage = view.page ?? 1;
+
+	return (
+		<Stack
+			direction="row"
 			className="dataviews-pagination"
 			justify="end"
 			align="center"
 			gap="xl"
 		>
-			<Stack
-				direction="row"
-				justify="flex-start"
-				align="center"
-				gap="xs"
-				className="dataviews-pagination__page-select"
-			>
-				{ createInterpolateElement(
-					sprintf(
-						// translators: 1: Current page number, 2: Total number of pages.
-						_x( '<div>Page</div>%1$s<div>of %2$d</div>', 'paging' ),
-						'<CurrentPage />',
-						totalPages
-					),
-					{
-						div: <div aria-hidden />,
-						// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
-						CurrentPage: (
-							<WCSelectControl
-								aria-label={ __( 'Current page' ) }
-								value={ currentPage.toString() }
-								options={ pageSelectOptions }
-								onChange={ ( newValue ) => {
-									onChangeView( {
-										...view,
-										page: +newValue,
-									} );
-								} }
-								size="small"
-								variant="minimal"
-							/>
-						),
-					}
-				) }
-			</Stack>
+			<DataViewsPageSelect />
 			<Stack direction="row" gap="xs" align="center">
 				<Button
 					onClick={ () =>
