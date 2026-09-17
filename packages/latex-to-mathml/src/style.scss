@@ -116,8 +116,8 @@ menclose {
 	.sout {
 		clip-path: polygon(0 calc(55% + 0.0333em), 0 calc(55% - 0.0333em), 100% calc(55% - 0.0333em), 100% calc(55% + 0.0333em));
 	}
-	// @wordpress Deviation: `currentColor` and `transparent` instead of black, so the
-	// strokes follow the text color.
+	// @wordpress Deviation: `currentColor` and `transparent` instead of
+	// black, so the strokes follow the text color.
 	.tml-xcancel {
 		background:
 			linear-gradient(to top left, transparent 0%, transparent calc(50% - 0.06em), currentColor 50%, transparent calc(50% + 0.06em), transparent 100%),
