@@ -13,7 +13,7 @@ process.chdir( ROOT_DIR );
 
 // Finds all packages which are transpiled with Babel to force Jest to use their source code.
 const transpiledPackageNames = globSync(
-	'packages/*/src/index.{js,jsx,ts,tsx}',
+	'packages/*/src/index.{js,jsx,ts,tsx,mts,cts}',
 	{ cwd: ROOT_DIR, absolute: true }
 )
 	.sort()
