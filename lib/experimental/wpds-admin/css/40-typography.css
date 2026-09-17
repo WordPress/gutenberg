@@ -20,7 +20,7 @@
  * regardless of their specificity. Only the admin page title is touched, which
  * WordPress already scopes to `.wrap h1`.
  *
- * NO `!important` IN THIS FILE. See overrides.css for the one exception.
+ * NO `!important` IN THIS FILE. See 99-overrides.css for the one exception.
  */
 
 @layer wpds-overrides, wp-legacy, wpds;
