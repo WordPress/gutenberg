@@ -22,6 +22,7 @@ import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
+import { useFirefoxFocusCompatibility } from './use-firefox-focus-compatibility';
 import { useBlockVisibility } from '../../block-visibility/';
 
 /**
@@ -162,6 +163,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const ffDragRef = useFirefoxDraggableCompatibility();
+	const ffFocusRef = useFirefoxFocusCompatibility();
 	const isHoverEnabled = ! isWithinSectionBlock;
 	const mergedRefs = useMergeRefs( [
 		props.ref,
@@ -181,6 +183,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		} ),
 		useScrollIntoView( { isSelected } ),
 		canMove ? ffDragRef : undefined,
+		ffFocusRef,
 	] );
 
 	const blockEditContext = useBlockEditContext();
