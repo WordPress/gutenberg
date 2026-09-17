@@ -13,8 +13,8 @@
  *
  * Setting `--wpds-*` properties is reserved for the theme package.
  *
- * DELETE WHEN: `@wordpress/theme` can generate these tokens outside React and
- * wp-admin loads them for the active colour scheme, which will also need to
+ * DELETE WHEN: wp-admin generates these tokens for the active colour scheme
+ * with `generateColorTokens` from `@wordpress/theme`, which will also need to
  * cover custom colour seeds (Core-66026, Core-65776).
  */
 
