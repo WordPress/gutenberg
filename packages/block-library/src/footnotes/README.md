@@ -28,6 +28,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`multiple`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#multiple): `false`
 - [`reusable`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
 - [`inserter`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#inserter): `false`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`
