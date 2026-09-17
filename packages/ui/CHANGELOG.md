@@ -32,6 +32,7 @@
 
 ### Internal
 
+-   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
 -   Remove the obsolete Jest console test dependency and matcher types ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
 -   Update `@base-ui/react` from 1.7.0 to 1.8.0 ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
 -   Run UI interaction tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
