@@ -61,6 +61,7 @@ export { useState, useRef } from 'preact/hooks';
  * ```
  */
 export const watch = effect;
+export { renderHTML } from './render';
 
 const requiredConsent =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';

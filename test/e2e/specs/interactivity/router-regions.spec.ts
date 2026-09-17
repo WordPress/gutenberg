@@ -77,6 +77,37 @@ test.describe( 'Router regions', () => {
 			alias: 'router regions - main - attachTo',
 			attributes: { page: 1, next: pageAttachTo1 },
 		} );
+
+		// Pages for testing an attachTo region whose target CHANGES across
+		// navigations: region3 attaches to `body` on page 1 and to
+		// `#regions-with-attach-to` on page 2. The region must appear exactly
+		// once, in the new target.
+		const region3Body = {
+			type: 'div',
+			data: { id: 'region3', attachTo: 'body' },
+		};
+		const region3Container = {
+			type: 'div',
+			data: { id: 'region3', attachTo: '#regions-with-attach-to' },
+		};
+		const pageR1Target2 = await utils.addPostWithBlock(
+			'test/router-regions',
+			{
+				alias: 'router regions - r1 - page 2',
+				attributes: {
+					page: 'r1page2',
+					regionsWithAttachTo: [ region3Container ],
+				},
+			}
+		);
+		await utils.addPostWithBlock( 'test/router-regions', {
+			alias: 'router regions - r1 - page 1',
+			attributes: {
+				page: 'r1page1',
+				next: pageR1Target2,
+				regionsWithAttachTo: [ region3Body ],
+			},
+		} );
 	} );
 
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
@@ -701,6 +732,43 @@ test.describe( 'Router regions', () => {
 			await clientCounter.click( { clickCount: 3, delay: 50 } );
 			await expect( clientCounter ).toHaveText( '13' );
 		}
+	} );
+
+	// An attachTo region whose target CHANGES between pages — when the region
+	// already HAS attachTo from the initial page. The router treats it as an
+	// already-attached region (in `initialRegionsToAttach`), so it re-points
+	// it correctly (this is a GUARD — the router handles this case; the
+	// double-render bug is only hit when a region GAINS attachTo later, which
+	// the unit R1/R6 probes cover).
+	test( 'should render an attachTo region only in its new target when the target changes between pages', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		await page.goto( utils.getLink( 'router regions - r1 - page 1' ) );
+
+		const region3 = page.getByTestId( 'region3' );
+
+		// Page 1: region3 attaches to `body` — visible exactly once.
+		await expect( region3 ).toBeVisible();
+		await expect( region3 ).toHaveCount( 1 );
+		await expect( region3.getByTestId( 'text' ) ).toHaveText( 'region3' );
+
+		// Navigate to page 2, where region3 attaches to
+		// `#regions-with-attach-to` instead.
+		await page.getByTestId( 'next' ).click();
+
+		// Correct: exactly one region3, inside the new target container.
+		await expect( region3 ).toHaveCount( 1 );
+		await expect(
+			page
+				.getByTestId( 'regions-with-attach-to' )
+				.getByTestId( 'region3' )
+		).toBeVisible();
+		// And the old `body`-attached element is gone (region3 is not a direct
+		// body child anymore).
+		await expect(
+			page.locator( 'body > [data-testid="region3"]' )
+		).toHaveCount( 0 );
 	} );
 
 	// Regression test for https://github.com/WordPress/gutenberg/issues/76447.

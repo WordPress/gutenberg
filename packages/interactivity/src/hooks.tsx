@@ -296,7 +296,9 @@ const getPriorityLevels: GetPriorityLevels = ( directives ) => {
 };
 
 // Component that wraps each priority level of directives of an element.
-const Directives = ( {
+// Exported so `render.ts` can rebuild it on the splice path (it re-renders
+// its `element` prop through the directive chain when that vnode is replaced).
+export const Directives = ( {
 	directives,
 	priorityLevels: [ currentPriorityLevel, ...nextPriorityLevels ],
 	element,
@@ -381,5 +383,29 @@ options.vnode = ( vnode: VNode< any > ) => {
 
 	if ( old ) {
 		old( vnode );
+	}
+};
+
+/**
+ * Maps each rendered DOM element to its vnode, populated by the
+ * `options.diffed` hook below (the vnode's `__e` IS the element).
+ * `renderHTML` uses it for the O(1) container lookup, then walks `_parent`
+ * pointers to the island root. Removed elements keep their entry until GC;
+ * the walk in `render.ts` rejects stale entries (they no longer connect to
+ * the current root).
+ */
+export const elementToVnode = new WeakMap< Element, VNode< any > >();
+
+// Preact Options Hook called after each vnode is diffed into the DOM.
+// Chained so previously registered hooks keep running.
+const oldDiffed = options.diffed;
+options.diffed = ( vnode: any ) => {
+	const dom = vnode?.__e;
+	if ( typeof vnode?.type === 'string' && dom ) {
+		elementToVnode.set( dom, vnode );
+	}
+
+	if ( oldDiffed ) {
+		oldDiffed( vnode );
 	}
 };
