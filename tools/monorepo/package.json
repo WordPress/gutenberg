@@ -22,7 +22,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"exports": {
-		"./tsconfig/*": "./tsconfig/*"
+		"./tsconfig/*": "./tsconfig/tsconfig.*"
 	},
 	"devDependencies": {
 		"@testing-library/jest-dom": "^7.0.1",
