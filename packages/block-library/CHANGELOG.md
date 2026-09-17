@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Query: Add a "With Results" block, the inverse of Query No Results — it holds the blocks that should only appear when the query has matching posts, so content like a heading or Post Template can be hidden as a group when a Query Loop has nothing to show ([#TODO](https://github.com/WordPress/gutenberg/pull/TODO)).
+
 ### Bug Fixes
 
 -   Math: Read the LaTeX source from the `<annotation>` inside the saved `<math>` instead of the block comment, so `&` and `<` survive `wp_kses` for users without `unfiltered_html`. Input that cannot be rendered is saved as an annotation-only `<semantics>`, which browsers display as the source text ([#82987](https://github.com/WordPress/gutenberg/pull/82987)).
