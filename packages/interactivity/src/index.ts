@@ -31,6 +31,7 @@ export {
 	type TypeYield,
 } from './store';
 export { getContext, getServerContext, getElement } from './scopes';
+export { asDangerousHTML, type DangerousHTML } from './html';
 export {
 	withScope,
 	useWatch,
