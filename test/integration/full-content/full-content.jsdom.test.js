@@ -1,5 +1,7 @@
-import { format } from 'util';
+import { readFileSync } from 'node:fs';
+import { format } from 'node:util';
 import glob from 'fast-glob';
+import { beforeAll, describe, expect, it } from 'vitest';
 import prettierConfig from '@wordpress/prettier-config';
 import {
 	getBlockTypes,
@@ -48,14 +50,13 @@ describe( 'full post content fixture', () => {
 		);
 		const blockDefinitions = Object.fromEntries(
 			blockMetadataFiles.map( ( file ) => {
-				const { name, ...metadata } = require( file );
+				const { name, ...metadata } = JSON.parse(
+					readFileSync( file, 'utf8' )
+				);
 				return [ name, metadata ];
 			} )
 		);
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
-		// Form-related blocks will not be registered unless they are opted
-		// in on the experimental settings page.
-		window.__experimentalEnableFormBlocks = true;
 		registerCoreBlocks();
 
 		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
@@ -73,7 +74,6 @@ describe( 'full post content fixture', () => {
 	}
 
 	blockBasenames.forEach( ( basename ) => {
-		// eslint-disable-next-line jest/valid-title
 		it( basename, () => {
 			const { filename: htmlFixtureFileName, file: htmlFixtureContent } =
 				getBlockFixtureHTML( basename );
@@ -127,6 +127,7 @@ describe( 'full post content fixture', () => {
 			const isDeprecated = /__deprecated([-_]|$)/.test( basename );
 			if ( isDeprecated ) {
 				/* eslint-disable no-console */
+				console.log.mockReset();
 				console.warn.mockReset();
 				console.error.mockReset();
 				console.info.mockReset();

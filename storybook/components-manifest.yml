@@ -792,6 +792,7 @@
       - openInNewTab
       - render
       - style
+      - target
       - tone
       - variant
 - name: MenuGroup
@@ -983,6 +984,7 @@
       - onValueChange
       - render
       - required
+      - resetOnSelect
       - role
       - showOutsideDays
       - startMonth
@@ -1122,6 +1124,7 @@
       - required
       - searchPlaceholder
       - showClearButton
+      - statusContent
       - value
       - virtualized
   subcomponents:
@@ -1214,6 +1217,7 @@
       - required
       - searchPlaceholder
       - showClearButton
+      - statusContent
       - value
       - virtualized
   subcomponents:
@@ -1268,26 +1272,182 @@
       - placeholder
       - size
       - value
+- name: Select.Root
+  props:
+      - actionsRef
+      - autoComplete
+      - children
+      - defaultOpen
+      - defaultValue
+      - disabled
+      - form
+      - highlightItemOnHover
+      - id
+      - inputRef
+      - isItemEqualToValue
+      - items
+      - itemToStringLabel
+      - itemToStringValue
+      - modal
+      - name
+      - onOpenChange
+      - onOpenChangeComplete
+      - onValueChange
+      - open
+      - readOnly
+      - required
+      - value
+  subcomponents:
+      - name: Select.Group
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Select.GroupLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Select.Item
+        props:
+            - children
+            - className
+            - disabled
+            - label
+            - nativeButton
+            - render
+            - size
+            - style
+            - value
+      - name: Select.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Select.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Select.Popup
+        props:
+            - children
+            - className
+            - finalFocus
+            - portal
+            - positioner
+            - render
+            - style
+            - width
+      - name: Select.Portal
+        props:
+            - className
+            - container
+            - render
+            - style
+      - name: Select.Positioner
+        props:
+            - align
+            - alignItemWithTrigger
+            - alignOffset
+            - anchor
+            - arrowPadding
+            - className
+            - collisionAvoidance
+            - collisionBoundary
+            - collisionPadding
+            - disableAnchorTracking
+            - positionMethod
+            - render
+            - side
+            - sideOffset
+            - sticky
+            - style
+      - name: Select.Trigger
+        props:
+            - children
+            - className
+            - disabled
+            - nativeButton
+            - placeholder
+            - render
+            - size
+            - style
+            - variant
 - name: SelectControl
   props:
-      - __next36pxDefaultSize
-      - __next40pxDefaultSize
-      - __nextHasNoMarginBottom
+      - actionsRef
+      - autoComplete
       - children
+      - className
+      - defaultOpen
+      - defaultValue
+      - description
+      - details
       - disabled
-      - help
+      - form
       - hideLabelFromVision
+      - highlightItemOnHover
+      - id
+      - isItemEqualToValue
+      - items
+      - itemToStringLabel
+      - itemToStringValue
+      - key
       - label
-      - labelPosition
-      - multiple
-      - onChange
-      - options
-      - prefix
+      - modal
+      - name
+      - onOpenChange
+      - onOpenChangeComplete
+      - onValueChange
+      - open
+      - placeholder
+      - popupWidth
+      - readOnly
       - ref
+      - required
       - size
-      - suffix
+      - triggerContent
       - value
-      - variant
+  subcomponents:
+      - name: SelectControl.Group
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SelectControl.GroupLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SelectControl.Item
+        props:
+            - children
+            - className
+            - disabled
+            - label
+            - nativeButton
+            - render
+            - style
+            - value
+      - name: SelectControl.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SelectControl.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
 - name: Shortcut
   props:
       - className
@@ -1440,11 +1600,13 @@
   subcomponents:
       - name: ToggleGroupControlOption
         props:
+            - disabled
             - label
             - showTooltip
             - value
       - name: ToggleGroupControlOptionIcon
         props:
+            - disabled
             - icon
             - label
             - value

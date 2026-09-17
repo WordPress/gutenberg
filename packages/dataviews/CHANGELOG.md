@@ -2,7 +2,24 @@
 
 ## Unreleased
 
-## 19.0.0-next.0 (2026-09-03)
+### Bug Fixes
+
+-   Grid layout: when the title is hidden (`showTitle: false`) and items are clickable, label each item's clickable media area with its title instead of the generic "Navigate to item" ([#82639](https://github.com/WordPress/gutenberg/pull/82639)).
+-   DataForm: Hide the edit button of disabled fields in the panel layout, as it already is for read-only fields ([#82957](https://github.com/WordPress/gutenberg/pull/82957)).
+
+### Docs
+
+- Add entry for `isDisabled` in README and clarify difference from `readOnly` fields. [#82956](https://github.com/WordPress/gutenberg/pull/82956)
+
+### Internal
+
+-   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
+-   Update `@base-ui/react` to 1.8.0 for the bundled UI components in the `/wp` entrypoint ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
+-   Update Ariakit to 0.4.39 and wait for scheduled composite item registration in jsdom tests ([#82831](https://github.com/WordPress/gutenberg/pull/82831)).
+-   Run rendered DataViews tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+-   DataForm panel layout: Replace deprecated `word-break: break-word` with `word-break: normal` and `overflow-wrap: anywhere` on field summary controls. ([#82776](https://github.com/WordPress/gutenberg/pull/82776)).
+
+## 19.0.0 (2026-09-10)
 
 ### Breaking Changes
 
@@ -38,12 +55,20 @@
 
 ### Enhancements
 
+-   DataForm: Add a `showPlaceholderIfEmpty` option to the `panel` layout, which shows the field's `placeholder` in the summary when the value is empty ([#82527](https://github.com/WordPress/gutenberg/pull/82527)).
+-   Give unselected multi-selection filter indicators solid, themed backgrounds. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
+-   Validated form controls: Use `--wpds-color-stroke-interactive-error` for the invalid-state focus ring and border ([#82410](https://github.com/WordPress/gutenberg/pull/82410)).
 -   DataForm: Communicate the timezone a `datetime` value is edited in. When the site timezone differs from the visitor's, the control renders help text under the input naming the site timezone: the zone name (e.g. `(CEST) Europe/Madrid`) or the UTC offset for sites pinned to one ([#82291](https://github.com/WordPress/gutenberg/pull/82291)).
 -   Export the `DataViewsProps` and `ItemWithId` types ([#82326](https://github.com/WordPress/gutenberg/pull/82326)).
 -   Export the `DataViewsProps` and `ItemWithId` types and document every type property ([#82326](https://github.com/WordPress/gutenberg/pull/82326)).
 
 ### Bug Fixes
 
+-   `DataViews` and `DataViewsPicker`: the `table` and `pickerTable` layouts no longer render an empty column for an id in `view.fields` that has no matching field definition, matching what the other layouts already did. The column header menu moves, inserts and hides columns relative to the rendered columns, so a skipped id no longer offsets those operations; such ids are dropped from `view.fields` the next time the menu changes the view ([#82601](https://github.com/WordPress/gutenberg/pull/82601)).
+-   Fix `Field.sort` TypeScript type definition to reflect that `sort` receives extracted field values rather than `Item` objects ([#82162](https://github.com/WordPress/gutenberg/pull/82162)).
+-   DataForm: Render read-only fields without requiring an edit control ([#82514](https://github.com/WordPress/gutenberg/pull/82514)).
+-   Operators: Support the `isAny` and `isNone` filter operators for numeric field values, which previously matched nothing ([#77942](https://github.com/WordPress/gutenberg/pull/77942)).
+-   Field types: Drop `isAll` from the valid operators of the `number`, `integer`, `text`, `email`, `url` and `telephone` types. Their values are scalars, so "includes all of" can never hold for more than one selected value ([#82463](https://github.com/WordPress/gutenberg/pull/82463)).
 -   `DataViews` and `DataViewsPicker`: move the view back to the last available page when it points past the end of the collection, for instance after deleting the only item of the last page ([#82244](https://github.com/WordPress/gutenberg/pull/82244)).
 
 ### Documentation
@@ -52,11 +77,14 @@
 
 ### Internal
 
+-   Declare the dependencies imported by the `./wp` bundle (`build-wp/index.js`) so they resolve without relying on hoisting. ([#81843](https://github.com/WordPress/gutenberg/pull/81843))
+-   DataViews: Use `Menu.PrefixIcon` for table column menu icons. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
 -   DataForm date control: Space `ValidityIndicator` with `Stack` now that the indicator has no outer margin. ([#82267](https://github.com/WordPress/gutenberg/pull/82267))
 -   Add a `HierarchicalLevels` story that demonstrates `getItemLevel` and `view.showLevels` in the table layout ([#82344](https://github.com/WordPress/gutenberg/pull/82344)).
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
 -   Note in the `/wp` bundle build script that its singleton externals list must stay in sync with the transitive private API usage check ([#82027](https://github.com/WordPress/gutenberg/pull/82027)).
+-   Update the `@types/node` development dependency to v24, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
 
 ### Bug Fix
 
@@ -210,7 +238,6 @@
 -   DataForm panel layout: remove button/dropdown-specific overrides from `.dataforms-layouts-panel__field-control`; those overrides are no longer needed. [#79275](https://github.com/WordPress/gutenberg/pull/79275)
 -   DataForm panel layout: align `label-side` gap with the regular layout by using `--wpds-dimension-gap-sm` (8px). [#79311](https://github.com/WordPress/gutenberg/pull/79311)
 
-
 ### Documentation
 
 -   Fix `overriden` typo to `overridden` in README. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
@@ -236,7 +263,6 @@
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
-
 
 ### Documentation
 

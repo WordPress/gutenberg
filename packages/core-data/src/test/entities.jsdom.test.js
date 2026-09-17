@@ -1,13 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
-jest.mock( '@wordpress/api-fetch' );
-jest.mock( '../sync', () => ( {
-	...jest.requireActual( '../sync' ),
-	getSyncManager: jest.fn(),
-} ) );
-jest.mock( '../utils/crdt', () => ( {
-	...jest.requireActual( '../utils/crdt' ),
-	applyPostChangesToCRDTDoc: jest.fn(),
-} ) );
 import {
 	getMethodName,
 	rootEntitiesConfig,
@@ -19,6 +11,15 @@ import {
 	applyPostChangesToCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from '../utils/crdt';
+vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '../sync' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	getSyncManager: vi.fn(),
+} ) );
+vi.mock( import( '../utils/crdt' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	applyPostChangesToCRDTDoc: vi.fn(),
+} ) );
 
 describe( 'getMethodName', () => {
 	it( 'should return the right method name for an entity with the root kind', () => {
@@ -127,7 +128,7 @@ describe( 'prePersistPostType', () => {
 		window.__experimentalEnableRealTimeCollaboration = true;
 		const mockSerializedDoc = 'serialized-crdt-doc-data';
 		getSyncManager.mockReturnValue( {
-			createPersistedCRDTDoc: jest
+			createPersistedCRDTDoc: vi
 				.fn()
 				.mockReturnValue( mockSerializedDoc ),
 		} );

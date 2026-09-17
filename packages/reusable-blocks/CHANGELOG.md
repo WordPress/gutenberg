@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 6.0.0-next.0 (2026-09-03)
+## 6.0.0 (2026-09-10)
 
 ### Breaking Changes
 

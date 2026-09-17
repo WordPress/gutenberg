@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import filter from '../html-formatting-remover';
 import { deepFilterHTML, deepFilterNodeList } from '../utils';
 

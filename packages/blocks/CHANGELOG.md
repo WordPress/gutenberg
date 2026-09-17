@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-## 16.0.0-next.0 (2026-09-03)
+### New Features
+
+-   Add support for the text shadow style property ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+
+## 16.0.0 (2026-09-10)
 
 ### Breaking Changes
 

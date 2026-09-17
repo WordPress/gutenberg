@@ -2,7 +2,27 @@
 
 ## Unreleased
 
-## 16.0.0-next.0 (2026-09-03)
+### Breaking Changes
+
+-   A further 236 icons are now stroke-based. Use CSS `color` rather than `fill` to recolor them. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
+
+### Enhancements
+
+-   Redraw a further 236 icons as stroke-based for variable stroke-width support, following the convention introduced in [#78808](https://github.com/WordPress/gutenberg/pull/78808), and refine the already stroke-based `image` and `commentAuthorAvatar` drawings. Most retain their original footprint; the table icons, `capturePhoto`, and `image` are slightly smaller, and several drawings in the final batch change by design. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
+-   `manifest.json`: The `public` property is now a tri-state. Omitting it keeps an icon in the JS library only; `true` ships it to WordPress Core and exposes it through the icons REST API, making it selectable in the Icon block; `false` ships it and registers it in the `core` collection for server-side use via `wp_get_icon()`, while hiding it from the REST API and the Icon block. ([#82634](https://github.com/WordPress/gutenberg/pull/82634))
+-   The `brush`, `dashboard`, `link`, `media`, `page`, `pin`, `plugins`, `sites`, `tool`, `update` and `wordpress` icons now ship to WordPress Core as non-public icons: they are registered in the `core` collection and stay available to server-side code via `wp_get_icon()`, but are not exposed through the icons REST API and are not selectable in the Icon block. ([#82634](https://github.com/WordPress/gutenberg/pull/82634), [#79451](https://github.com/WordPress/gutenberg/pull/79451))
+
+### Bug Fixes
+
+-   `cornerBottomLeft`, `cornerBottomRight`, `cornerTopLeft`, `cornerTopRight`, `sidesBottom`, `sidesHorizontal`, `sidesLeft`, `sidesRight`, `sidesTop` and `sidesVertical`: dim the rest of the box again, so each variant reads as one highlighted side or corner rather than a plain box. The dimming was dropped when these were redrawn as stroke icons. ([#82940](https://github.com/WordPress/gutenberg/pull/82940))
+-   Correct malformed drawings for `formatIndent`, `formatIndentRTL`, `formatOutdent`, `formatOutdentRTL`, `lock`, and `post`, and restore the missing second bar in `pause`. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
+
+### Internal
+
+-   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
+-   Run rendered icon tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
+## 16.0.0 (2026-09-10)
 
 ### Breaking Changes
 

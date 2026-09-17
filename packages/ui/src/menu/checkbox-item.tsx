@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import { Icon } from '../icon';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
 import { MenuItemContentContext } from './context';
@@ -46,6 +47,7 @@ const CheckboxItem = forwardRef< HTMLDivElement, CheckboxItemProps >(
 				ref={ ref }
 				{ ...itemAriaProps }
 				className={ clsx(
+					defenseStyles.div,
 					resetStyles[ 'box-sizing' ],
 					styles.item,
 					className
@@ -56,7 +58,12 @@ const CheckboxItem = forwardRef< HTMLDivElement, CheckboxItemProps >(
 					keepMounted
 					className={ styles[ 'item-selection-indicator' ] }
 				>
-					<Icon icon={ check } size={ 24 } aria-hidden="true" />
+					<Icon
+						icon={ check }
+						size={ 24 }
+						className={ styles[ 'checkbox-selection-icon' ] }
+						aria-hidden="true"
+					/>
 				</_Menu.CheckboxItemIndicator>
 				<MenuItemContentContext.Provider value={ contentContextValue }>
 					<ItemContent

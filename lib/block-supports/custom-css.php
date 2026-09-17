@@ -91,7 +91,7 @@ function gutenberg_enqueue_block_custom_css() {
  *
  * @param string $block_content Rendered block content.
  * @param array  $block         Block object.
- * @return string               Filtered block content.
+ * @return string Filtered block content.
  *
  * @phpstan-param array{
  *     attrs: array{

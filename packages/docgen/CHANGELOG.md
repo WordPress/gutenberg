@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-## 2.55.0-next.0 (2026-09-03)
+### Enhancements
+
+-   Resolve relative imports through `.mjs`, `.cjs`, `.mts` and `.cts` ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+
+## 2.55.0 (2026-09-10)
 
 ### Enhancements
 

@@ -1009,3 +1009,80 @@ test.describe( 'Post autosave shareable URLs with revisions disabled', () => {
 			.toBe( String( autosave.id ) );
 	} );
 } );
+
+test.describe( 'Post revisions with nested entities', () => {
+	// The Query Loop lists every published post, so start from a clean slate.
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
+	// A Query Loop lists the revised post next to other posts. The revision
+	// applies to the revised post only, and blocks are read only there, so
+	// they render its `rendered` fields.
+	test( 'should apply the revision only to the revised post in a Query Loop', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: { title: 'Other post', status: 'publish' },
+		} );
+
+		const content =
+			'<!-- wp:query {"query":{"perPage":3,"postType":"post"}} --><div class="wp-block-query"><!-- wp:post-template --><!-- wp:post-title /--><!-- /wp:post-template --></div><!-- /wp:query -->';
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: { title: 'First title', content, status: 'publish' },
+		} );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/posts/${ post.id }`,
+			data: { title: 'Second title', content },
+		} );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/posts/${ post.id }`,
+			data: { title: 'Third title', content },
+		} );
+
+		await admin.editPost( post.id );
+		await editor.openDocumentSettingsSidebar();
+		const settingsSidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
+		await settingsSidebar
+			.getByRole( 'button', { name: /Open revisions screen/ } )
+			.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+
+		// The loop is ordered by date, so the revised post comes first.
+		const loopTitles = editor.canvas.getByRole( 'document', {
+			name: 'Block: Title',
+		} );
+		await expect( loopTitles ).toHaveText( [
+			'Third title',
+			'Other post',
+		] );
+
+		const slider = page.getByRole( 'slider', { name: 'Revision' } );
+		await slider.focus();
+		await page.keyboard.press( 'Home' );
+
+		// The revised post follows the revision, the other post does not.
+		await expect( loopTitles ).toHaveText( [
+			'Second title',
+			'Other post',
+		] );
+	} );
+} );
