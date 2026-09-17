@@ -2,16 +2,19 @@
  * Admin chrome — the admin menu and the admin bar — coloured from
  * WordPress Design System tokens.
  *
- * SCOPE: the default colour scheme only, and chrome only. The other seven
- * schemes are deliberately untouched; they each need their own rewrite, and
- * they may not survive a move to a single accent-colour control. Content
+ * SCOPE: the default colour scheme only, and chrome only. Every rule is
+ * scoped to `body.admin-color-modern`, the class wp-admin gives the default
+ * scheme, so the other schemes keep their own chrome untouched. Without it the
+ * dark default surfaces below would also replace, for example, the light
+ * sidebar of the Light scheme. The other schemes each need their own rewrite,
+ * and they may not survive a move to a single accent-colour control. Content
  * colour — table borders, secondary text, semantic reds and greens — is a
  * separate concern and is not touched here.
  *
  * The accent uses the brand strong pair — the background token together with
- * its own foreground — which follows the user's colour scheme through
- * 05-scheme-tokens.css. Never pair a scheme-coloured background with another
- * pair's foreground: the pairs are what guarantee contrast.
+ * its own foreground — rather than mixing the scheme's accent with a
+ * foreground chosen for another background. Never pair a background with
+ * another pair's foreground: the pairs are what guarantee contrast.
  *
  * WHY THE "STRONG" FAMILY. The system has no dark surface token: every surface
  * token is light. Dark exists only as `…-interactive-neutral-strong` (#2d2d2d)
@@ -51,9 +54,9 @@
 	   Admin menu — surface
 	   ----------------------------------------------------------------------- */
 
-	#adminmenuback,
-	#adminmenuwrap,
-	#adminmenu {
+	body.admin-color-modern #adminmenuback,
+	body.admin-color-modern #adminmenuwrap,
+	body.admin-color-modern #adminmenu {
 		background: var(--wpds-color-background-interactive-neutral-strong-active);
 	}
 
@@ -61,16 +64,16 @@
 	 * Raised rather than sunk; see note 1 in the file header. The same token
 	 * covers the admin bar's dropdowns, so the two read as one system.
 	 */
-	#adminmenu .wp-submenu,
-	#adminmenu .wp-has-current-submenu .wp-submenu,
-	#adminmenu .wp-has-current-submenu.opensub .wp-submenu,
-	#adminmenu a.wp-has-current-submenu:focus + .wp-submenu {
+	body.admin-color-modern #adminmenu .wp-submenu,
+	body.admin-color-modern #adminmenu .wp-has-current-submenu .wp-submenu,
+	body.admin-color-modern #adminmenu .wp-has-current-submenu.opensub .wp-submenu,
+	body.admin-color-modern #adminmenu a.wp-has-current-submenu:focus + .wp-submenu {
 		background: var(--wpds-color-background-interactive-neutral-strong);
 	}
 
 	/* The arrow joining an open flyout to the menu tracks the flyout. */
-	#adminmenu li.wp-has-submenu.wp-not-current-submenu.opensub:hover::after,
-	#adminmenu li.wp-has-submenu.wp-not-current-submenu:focus-within::after {
+	body.admin-color-modern #adminmenu li.wp-has-submenu.wp-not-current-submenu.opensub:hover::after,
+	body.admin-color-modern #adminmenu li.wp-has-submenu.wp-not-current-submenu:focus-within::after {
 		border-right-color: var(--wpds-color-background-interactive-neutral-strong);
 	}
 
@@ -82,14 +85,14 @@
 	   Icons and labels take the same neutral foreground here.
 	   ----------------------------------------------------------------------- */
 
-	#adminmenu a,
-	#adminmenu div.wp-menu-image::before,
-	#adminmenu .wp-submenu .wp-submenu-head,
-	#adminmenu .wp-submenu a,
-	#adminmenu .wp-has-current-submenu .wp-submenu a,
-	#adminmenu a.wp-has-current-submenu:focus + .wp-submenu a,
-	#adminmenu .wp-has-current-submenu.opensub .wp-submenu a,
-	#collapse-button {
+	body.admin-color-modern #adminmenu a,
+	body.admin-color-modern #adminmenu div.wp-menu-image::before,
+	body.admin-color-modern #adminmenu .wp-submenu .wp-submenu-head,
+	body.admin-color-modern #adminmenu .wp-submenu a,
+	body.admin-color-modern #adminmenu .wp-has-current-submenu .wp-submenu a,
+	body.admin-color-modern #adminmenu a.wp-has-current-submenu:focus + .wp-submenu a,
+	body.admin-color-modern #adminmenu .wp-has-current-submenu.opensub .wp-submenu a,
+	body.admin-color-modern #collapse-button {
 		color: var(--wpds-color-foreground-interactive-neutral-strong);
 	}
 
@@ -99,31 +102,31 @@
 	   Both are the accent, so both follow the user's colour scheme.
 	   ----------------------------------------------------------------------- */
 
-	#adminmenu a:hover,
-	#adminmenu li.menu-top:hover,
-	#adminmenu li.opensub > a.menu-top,
-	#adminmenu li > a.menu-top:focus,
-	#adminmenu li.current a.menu-top,
-	#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
-	#adminmenu li.wp-has-current-submenu .wp-submenu .wp-submenu-head,
-	.folded #adminmenu li.current.menu-top {
+	body.admin-color-modern #adminmenu a:hover,
+	body.admin-color-modern #adminmenu li.menu-top:hover,
+	body.admin-color-modern #adminmenu li.opensub > a.menu-top,
+	body.admin-color-modern #adminmenu li > a.menu-top:focus,
+	body.admin-color-modern #adminmenu li.current a.menu-top,
+	body.admin-color-modern #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
+	body.admin-color-modern #adminmenu li.wp-has-current-submenu .wp-submenu .wp-submenu-head,
+	body.admin-color-modern.folded #adminmenu li.current.menu-top {
 		background: var(--wpds-color-background-interactive-brand-strong);
 		color: var(--wpds-color-foreground-interactive-brand-strong);
 	}
 
-	#adminmenu li.menu-top:hover div.wp-menu-image::before,
-	#adminmenu li.opensub > a.menu-top div.wp-menu-image::before,
-	#adminmenu li.wp-has-current-submenu div.wp-menu-image::before,
-	#adminmenu li.current div.wp-menu-image::before,
-	#adminmenu li:hover div.wp-menu-image::before,
-	#adminmenu li a:focus div.wp-menu-image::before,
-	#adminmenu li.opensub div.wp-menu-image::before {
+	body.admin-color-modern #adminmenu li.menu-top:hover div.wp-menu-image::before,
+	body.admin-color-modern #adminmenu li.opensub > a.menu-top div.wp-menu-image::before,
+	body.admin-color-modern #adminmenu li.wp-has-current-submenu div.wp-menu-image::before,
+	body.admin-color-modern #adminmenu li.current div.wp-menu-image::before,
+	body.admin-color-modern #adminmenu li:hover div.wp-menu-image::before,
+	body.admin-color-modern #adminmenu li a:focus div.wp-menu-image::before,
+	body.admin-color-modern #adminmenu li.opensub div.wp-menu-image::before {
 		color: var(--wpds-color-foreground-interactive-brand-strong);
 	}
 
 	/* The pointer joining the current item to the page it opened. */
-	ul#adminmenu a.wp-has-current-submenu::after,
-	ul#adminmenu > li.current > a.current::after {
+	body.admin-color-modern ul#adminmenu a.wp-has-current-submenu::after,
+	body.admin-color-modern ul#adminmenu > li.current > a.current::after {
 		border-right-color: var(--wpds-color-background-track-neutral-weak);
 	}
 
@@ -131,9 +134,9 @@
 	   Admin menu — update and moderation bubbles
 	   ----------------------------------------------------------------------- */
 
-	#adminmenu .menu-counter,
-	#adminmenu .awaiting-mod,
-	#adminmenu .update-plugins {
+	body.admin-color-modern #adminmenu .menu-counter,
+	body.admin-color-modern #adminmenu .awaiting-mod,
+	body.admin-color-modern #adminmenu .update-plugins {
 		background: var(--wpds-color-background-interactive-brand-strong);
 		color: var(--wpds-color-foreground-interactive-brand-strong);
 	}
@@ -147,12 +150,12 @@
 	   front end needs the scheme delivered to it as well, which is PHP.
 	   ----------------------------------------------------------------------- */
 
-	#wpadminbar {
+	body.admin-color-modern #wpadminbar {
 		background: var(--wpds-color-background-interactive-neutral-strong-active);
 		color: var(--wpds-color-foreground-interactive-neutral-strong);
 	}
 
-	#wpadminbar .menupop .ab-sub-wrapper {
+	body.admin-color-modern #wpadminbar .menupop .ab-sub-wrapper {
 		background: var(--wpds-color-background-interactive-neutral-strong);
 	}
 
@@ -161,8 +164,8 @@
 	 * the two sections stay distinguishable now that both submenu levels would
 	 * otherwise share one token.
 	 */
-	#wpadminbar .quicklinks .menupop ul.ab-sub-secondary,
-	#wpadminbar .quicklinks .menupop ul.ab-sub-secondary .ab-submenu {
+	body.admin-color-modern #wpadminbar .quicklinks .menupop ul.ab-sub-secondary,
+	body.admin-color-modern #wpadminbar .quicklinks .menupop ul.ab-sub-secondary .ab-submenu {
 		background: var(--wpds-color-background-interactive-neutral-strong-active);
 	}
 
@@ -170,23 +173,23 @@
 	   Admin bar — text and icons
 	   ----------------------------------------------------------------------- */
 
-	#wpadminbar .ab-item,
-	#wpadminbar a.ab-item,
-	#wpadminbar > #wp-toolbar span.ab-label,
-	#wpadminbar > #wp-toolbar span.noticon,
-	#wpadminbar .ab-icon,
-	#wpadminbar .ab-icon::before,
-	#wpadminbar .ab-item::before,
-	#wpadminbar .ab-item::after,
-	#wpadminbar .ab-submenu .ab-item,
-	#wpadminbar .quicklinks .menupop ul li a,
-	#wpadminbar .quicklinks .menupop.hover ul li a,
-	#wpadminbar.nojs .quicklinks .menupop:hover ul li a,
-	#wpadminbar .quicklinks li .blavatar,
-	#wpadminbar .menupop .menupop > .ab-item::before,
-	#wpadminbar #adminbarsearch::before,
-	#wpadminbar.mobile .quicklinks .ab-icon::before,
-	#wpadminbar.mobile .quicklinks .ab-item::before {
+	body.admin-color-modern #wpadminbar .ab-item,
+	body.admin-color-modern #wpadminbar a.ab-item,
+	body.admin-color-modern #wpadminbar > #wp-toolbar span.ab-label,
+	body.admin-color-modern #wpadminbar > #wp-toolbar span.noticon,
+	body.admin-color-modern #wpadminbar .ab-icon,
+	body.admin-color-modern #wpadminbar .ab-icon::before,
+	body.admin-color-modern #wpadminbar .ab-item::before,
+	body.admin-color-modern #wpadminbar .ab-item::after,
+	body.admin-color-modern #wpadminbar .ab-submenu .ab-item,
+	body.admin-color-modern #wpadminbar .quicklinks .menupop ul li a,
+	body.admin-color-modern #wpadminbar .quicklinks .menupop.hover ul li a,
+	body.admin-color-modern #wpadminbar.nojs .quicklinks .menupop:hover ul li a,
+	body.admin-color-modern #wpadminbar .quicklinks li .blavatar,
+	body.admin-color-modern #wpadminbar .menupop .menupop > .ab-item::before,
+	body.admin-color-modern #wpadminbar #adminbarsearch::before,
+	body.admin-color-modern #wpadminbar.mobile .quicklinks .ab-icon::before,
+	body.admin-color-modern #wpadminbar.mobile .quicklinks .ab-item::before {
 		color: var(--wpds-color-foreground-interactive-neutral-strong);
 	}
 
@@ -197,11 +200,11 @@
 	   alone for the reason given in the file header.
 	   ----------------------------------------------------------------------- */
 
-	#wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
-	#wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus,
-	#wpadminbar.nojq .quicklinks .ab-top-menu > li > .ab-item:focus,
-	#wpadminbar.nojs .ab-top-menu > li.menupop:hover > .ab-item,
-	#wpadminbar .ab-top-menu > li.menupop.hover > .ab-item {
+	body.admin-color-modern #wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
+	body.admin-color-modern #wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus,
+	body.admin-color-modern #wpadminbar.nojq .quicklinks .ab-top-menu > li > .ab-item:focus,
+	body.admin-color-modern #wpadminbar.nojs .ab-top-menu > li.menupop:hover > .ab-item,
+	body.admin-color-modern #wpadminbar .ab-top-menu > li.menupop.hover > .ab-item {
 		background: var(--wpds-color-background-interactive-neutral-strong);
 	}
 }
