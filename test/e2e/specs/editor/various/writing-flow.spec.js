@@ -1447,6 +1447,23 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 				.getByRole( 'toolbar', { name: 'Block tools' } )
 				.getByRole( 'button', { name: 'Bold' } )
 		).toBeVisible();
+
+		// The selection is editable: typing replaces it. A selection made
+		// while the text was non-editable would show the toolbar but not
+		// take input. The engines differ in where the selection starts.
+		const selected = await editor.canvas
+			.locator( ':root' )
+			.evaluate( ( root ) =>
+				root.ownerDocument.getSelection().toString()
+			);
+		expect( selected ).not.toBe( '' );
+		await page.keyboard.type( 'x' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Hello world'.replace( selected, 'x' ) },
+			},
+		] );
 	} );
 
 	// Regression test: ArrowDown should not skip over a paragraph that contains
