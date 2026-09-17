@@ -43,7 +43,7 @@
 		"wp-coding-standards/wpcs": "^2.2",
 		"sirbrillig/phpcs-variable-analysis": "^2.8",
 		"wp-phpunit/wp-phpunit": "~6.0.0",
-		"phpunit/phpunit": "^8.5",
+		"phpunit/phpunit": "^5.7",
 		"yoast/phpunit-polyfills": "^1.0"
 	},
 	"require": {
