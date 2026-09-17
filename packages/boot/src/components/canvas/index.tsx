@@ -1169,7 +1169,7 @@ function FrontendPreviewCanvas( { canvas }: CanvasProps ) {
 				{ frameSrc && (
 					<iframe
 						key={ frameRefreshKey }
-						title={ __( 'Site preview' ) }
+						title={ __( 'Site Preview' ) }
 						src={ frameSrc }
 						onLoad={ handleLoad }
 					/>
