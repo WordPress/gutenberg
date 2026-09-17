@@ -1,7 +1,7 @@
 import clsx from 'clsx';
-import type { ChangeEvent, ForwardedRef } from 'react';
-import { forwardRef, useState } from '@wordpress/element';
-import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
+import type { ChangeEvent } from 'react';
+import { useState } from '@wordpress/element';
+import { useInstanceId, useRefEffect } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 import { Icon, check, reset } from '@wordpress/icons';
 import BaseControl from '../base-control';
@@ -9,9 +9,28 @@ import { HStack } from '../h-stack';
 import type { CheckboxControlProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
-function UnforwardedCheckboxControl(
-	props: WordPressComponentProps< CheckboxControlProps, 'input', false >,
-	forwardedRef: ForwardedRef< HTMLInputElement >
+/**
+ * Checkboxes allow the user to select one or more items from a set.
+ *
+ * ```jsx
+ * import { CheckboxControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyCheckboxControl = () => {
+ *   const [ isChecked, setChecked ] = useState( true );
+ *   return (
+ *     <CheckboxControl
+ *       label="Is author"
+ *       help="Is the user a author or not?"
+ *       checked={ isChecked }
+ *       onChange={ setChecked }
+ *     />
+ *   );
+ * };
+ * ```
+ */
+export function CheckboxControl(
+	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
 ) {
 	const {
 		// Prevent passing this to `input`.
@@ -55,7 +74,6 @@ function UnforwardedCheckboxControl(
 		},
 		[ checked, indeterminate ]
 	);
-	const mergedRef = useMergeRefs( [ ref, forwardedRef ] );
 	const id = useInstanceId(
 		CheckboxControl,
 		'inspector-checkbox-control',
@@ -80,7 +98,7 @@ function UnforwardedCheckboxControl(
 			<HStack spacing={ 0 } justify="start" alignment="top">
 				<span className="components-checkbox-control__input-container">
 					<input
-						ref={ mergedRef }
+						ref={ ref }
 						id={ id }
 						className="components-checkbox-control__input"
 						type="checkbox"
@@ -127,28 +145,5 @@ function UnforwardedCheckboxControl(
 		</BaseControl>
 	);
 }
-
-/**
- * Checkboxes allow the user to select one or more items from a set.
- *
- * ```jsx
- * import { CheckboxControl } from '@wordpress/components';
- * import { useState } from '@wordpress/element';
- *
- * const MyCheckboxControl = () => {
- *   const [ isChecked, setChecked ] = useState( true );
- *   return (
- *     <CheckboxControl
- *       label="Is author"
- *       help="Is the user a author or not?"
- *       checked={ isChecked }
- *       onChange={ setChecked }
- *     />
- *   );
- * };
- * ```
- */
-export const CheckboxControl = forwardRef( UnforwardedCheckboxControl );
-CheckboxControl.displayName = 'CheckboxControl';
 
 export default CheckboxControl;

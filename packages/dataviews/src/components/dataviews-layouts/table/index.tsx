@@ -312,8 +312,8 @@ function ViewTable< Item >( {
 
 	const tableNoticeId = useId();
 	const tableHeaderRef = useRef< HTMLTableSectionElement >( null );
-	const tableSelectionRef = useRef< HTMLInputElement >( null );
-	const bulkSelectionRef = useRef< HTMLInputElement >( null );
+	const tableSelectionRef = useRef< HTMLSpanElement >( null );
+	const bulkSelectionRef = useRef< HTMLSpanElement >( null );
 	const bulkActionsRef = useRef< HTMLDivElement >( null );
 	const hadSelectionRef = useRef( false );
 	useEffect( () => {
@@ -525,7 +525,7 @@ function ViewTable< Item >( {
 									}
 								>
 									<BulkSelectionCheckbox
-										inputRef={
+										checkboxRef={
 											isDefaultUI
 												? tableSelectionRef
 												: undefined
