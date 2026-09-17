@@ -36,6 +36,7 @@
 		"access": "public"
 	},
 	"scripts": {
-		"list-experimental-apis": "node scripts/list-experimental-apis.mts"
+		"list-experimental-apis": "node scripts/list-experimental-apis.mts",
+		"wpds:admin-scheme-tokens": "node wpds/generate-admin-scheme-tokens.mjs"
 	}
 }
