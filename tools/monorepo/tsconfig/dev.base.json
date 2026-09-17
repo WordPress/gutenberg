@@ -5,7 +5,7 @@
 		"noEmit": true,
 		"emitDeclarationOnly": false,
 		"checkJs": false,
-		"types": [ "jest" ]
+		"types": [ "gutenberg-vitest-test-env" ]
 	},
 	/*
 	 * JavaScript dev files stay unchecked: `checkJs` would report errors in

@@ -17,13 +17,8 @@ import {
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
-const testMigration = require(
-	join( rootDir, 'test/unit/test-migration.json' )
-);
-
 const vitestTestsByProject = getVitestTestsByProject(
-	discoverTestFiles( rootDir ),
-	testMigration
+	discoverTestFiles( rootDir )
 );
 const vitestTestPatterns = Object.values( vitestTestsByProject ).flat();
 const vitestJsdomTestPatterns = vitestTestsByProject.jsdom;
@@ -417,12 +412,6 @@ export default dedupePlugins( [
 			// @typescript-eslint/consistent-type-imports are scoped to
 			// TS files below since they require the TypeScript parser.
 			'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
-			'jsdoc/check-tag-names': [
-				'error',
-				{
-					definedTags: [ 'jest-environment' ],
-				},
-			],
 			'react/jsx-filename-extension': [
 				'error',
 				{ extensions: [ '.tsx' ] },
@@ -560,8 +549,25 @@ export default dedupePlugins( [
 			'testing-library/prefer-screen-queries': 'off',
 		},
 	},
-	// Keep the repository's existing rule set during the runner migration.
-	// Adopting the public Vitest rules requires a separate suite-wide lint migration.
+	// Preserve runner-neutral rules for test helpers and compilation fixtures.
+	...[
+		jestDomPlugin.configs[ 'flat/recommended' ],
+		testingLibraryPlugin.configs[ 'flat/react' ],
+	].map( ( config ) => ( {
+		...config,
+		files: [
+			`**/test/**/*.${ SCRIPT_EXT }`,
+			`**/__tests__/**/*.${ SCRIPT_EXT }`,
+		],
+		ignores: [
+			`test/e2e/**/*.${ SCRIPT_EXT }`,
+			`test/performance/**/*.${ SCRIPT_EXT }`,
+			`test/storybook-playwright/**/*.${ SCRIPT_EXT }`,
+			...vitestTestPatterns,
+		],
+	} ) ),
+	// The Jest plugin also supports Vitest. Keep these active rules until the
+	// separate suite-wide migration to the public Vitest lint configuration.
 	{
 		plugins: jestPlugin.configs[ 'flat/recommended' ].plugins,
 		files: vitestTestPatterns,
@@ -575,79 +581,23 @@ export default dedupePlugins( [
 			// Preserve existing test patterns while changing runners. These rules
 			// newly flag valid patterns once the globals are imported from Vitest.
 			'jest/no-conditional-expect': 'off',
+			// Jest release deprecations do not apply to Vitest.
+			'jest/no-deprecated-functions': 'off',
 			'jest/valid-describe-callback': 'off',
 			'jest/valid-expect-in-promise': 'off',
 			'jest/valid-title': 'off',
 		},
 	},
 
-	// Override: Jest test files (unit tests).
+	// This compilation fixture is transformed as source, not run as a test.
 	{
-		...jestPlugin.configs[ 'flat/recommended' ],
-		files: [
-			'packages/jest*/**/*.js',
-			'**/test/**/*.{js,jsx}',
-			'**/__tests__/**/*.{js,jsx}',
-		],
-		ignores: [
-			'test/e2e/**/*.js',
-			'test/performance/**/*.js',
-			...vitestTestPatterns,
-		],
-	},
-
-	// Override: Test files — jest-dom, testing-library, jest recommended.
-	{
-		...jestDomPlugin.configs[ 'flat/recommended' ],
-		files: [
-			`**/test/**/*.${ SCRIPT_EXT }`,
-			`**/__tests__/**/*.${ SCRIPT_EXT }`,
-		],
-		ignores: [
-			`test/e2e/**/*.${ SCRIPT_EXT }`,
-			`test/performance/**/*.${ SCRIPT_EXT }`,
-			`test/storybook-playwright/**/*.${ SCRIPT_EXT }`,
-			...vitestTestPatterns,
-		],
-	},
-	{
-		...testingLibraryPlugin.configs[ 'flat/react' ],
-		files: [
-			`**/test/**/*.${ SCRIPT_EXT }`,
-			`**/__tests__/**/*.${ SCRIPT_EXT }`,
-		],
-		ignores: [
-			`test/e2e/**/*.${ SCRIPT_EXT }`,
-			`test/performance/**/*.${ SCRIPT_EXT }`,
-			`test/storybook-playwright/**/*.${ SCRIPT_EXT }`,
-			...vitestTestPatterns,
-		],
-	},
-	{
-		...jestPlugin.configs[ 'flat/recommended' ],
-		files: [
-			`**/test/**/*.${ SCRIPT_EXT }`,
-			`**/__tests__/**/*.${ SCRIPT_EXT }`,
-		],
-		ignores: [
-			`test/e2e/**/*.${ SCRIPT_EXT }`,
-			`test/performance/**/*.${ SCRIPT_EXT }`,
-			`test/storybook-playwright/**/*.${ SCRIPT_EXT }`,
-			...vitestTestPatterns,
-		],
-		rules: {
-			...jestPlugin.configs[ 'flat/recommended' ].rules,
-			/*
-			 * `jsdom` is already the default test environment in `@wordpress/jest-preset-default`,
-			 * so the docblock pragma is redundant.
-			 */
-			'no-warning-comments': [
-				'error',
-				{
-					terms: [ '@jest-environment jsdom' ],
-					location: 'anywhere',
-				},
-			],
+		files: [ 'packages/babel-preset-default/test/fixtures/input.js' ],
+		languageOptions: {
+			globals: {
+				describe: 'readonly',
+				test: 'readonly',
+				expect: 'readonly',
+			},
 		},
 	},
 
@@ -660,6 +610,9 @@ export default dedupePlugins( [
 	{
 		files: [ 'packages/e2e-test*/**/*.js' ],
 		ignores: [ 'packages/e2e-test-utils-playwright/**/*.js' ],
+		// Preserve the previous Jest 30 lint baseline for legacy E2E code.
+		// The repository no longer installs a Jest runner to detect it from.
+		settings: { jest: { version: 30 } },
 		rules: {
 			'jest/expect-expect': 'off',
 		},
@@ -1066,6 +1019,7 @@ export default dedupePlugins( [
 	{
 		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
 		rules: {
+			'jest/no-deprecated-functions': 'off',
 			'jest/no-export': 'off',
 		},
 	},

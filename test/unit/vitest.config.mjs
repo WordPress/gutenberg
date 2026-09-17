@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,16 +21,7 @@ const isolationSetupFile = path.join(
 	ROOT_DIR,
 	'test/unit/config/isolation.vitest.js'
 );
-const testMigration = JSON.parse(
-	readFileSync(
-		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
-		'utf8'
-	)
-);
-const vitestTests = getVitestTestsByProject(
-	discoverTestFiles( ROOT_DIR ),
-	testMigration
-);
+const vitestTests = getVitestTestsByProject( discoverTestFiles( ROOT_DIR ) );
 const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,
 	replacement: path.join( ROOT_DIR, 'test/unit/config/style-mock.vitest.js' ),
