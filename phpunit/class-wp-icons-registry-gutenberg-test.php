@@ -98,12 +98,12 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Invokes WP_Icons_Registry_Gutenberg::sanitize_icon_content despite it being protected
+	 * Invokes the WP_Icons_Registry_Gutenberg::sanitize_icon_content method on the registry instance.
 	 *
 	 * @param string $icon_content The icon SVG content to sanitize.
 	 * @return string The sanitized icon SVG content.
 	 */
-	private function sanitize_icon_content( $icon_content ) {
+	private function sanitize_icon_content( string $icon_content ): string {
 		$method = new ReflectionMethod( $this->registry, 'sanitize_icon_content' );
 		if ( PHP_VERSION_ID < 80100 ) {
 			$method->setAccessible( true );
@@ -418,47 +418,47 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_sanitize_icon_content
 	 *
-	 * @param string $input    The icon content to sanitize.
-	 * @param string $expected The expected sanitized output.
+	 * @param non-falsy-string $input    The icon content to sanitize.
+	 * @param non-falsy-string $expected The expected sanitized output.
 	 */
 	public function test_sanitize_icon_content( $input, $expected ) {
 		$this->assertSame( $expected, $this->sanitize_icon_content( $input ) );
 	}
 
 	/**
-	 * Data provider for test_sanitize_icon_content.
+	 * Provides data for {@see self::test_sanitize_icon_content()}.
 	 *
-	 * @return array<string, array{0: string, 1: string}> Data sets of [ $input, $expected ].
+	 * @return array<non-falsy-string, array{ input: non-falsy-string, expected: non-falsy-string }>
 	 */
-	public function data_sanitize_icon_content() {
+	public function data_sanitize_icon_content(): array {
 		return array(
 			'allows fill and clip rules on svg'            => array(
-				'<svg fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M0 0" /></svg>',
-				'<svg fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M0 0" /></svg>',
+				'input'    => '<svg fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M0 0" /></svg>',
+				'expected' => '<svg fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M0 0" /></svg>',
 			),
 			'allows stroke attributes and style on svg'    => array(
-				'<svg style="fill: none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" vector-effect="non-scaling-stroke"><path d="M0 0" /></svg>',
-				'<svg style="fill: none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" vector-effect="non-scaling-stroke"><path d="M0 0" /></svg>',
+				'input'    => '<svg style="fill: none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" vector-effect="non-scaling-stroke"><path d="M0 0" /></svg>',
+				'expected' => '<svg style="fill: none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" vector-effect="non-scaling-stroke"><path d="M0 0" /></svg>',
 			),
 			'allows clip rule, opacity and stroke on path' => array(
-				'<svg><path d="M0 0" fill-rule="evenodd" clip-rule="evenodd" opacity="0.4" style="fill: none" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
-				'<svg><path d="M0 0" fill-rule="evenodd" clip-rule="evenodd" opacity="0.4" style="fill: none" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
+				'input'    => '<svg><path d="M0 0" fill-rule="evenodd" clip-rule="evenodd" opacity="0.4" style="fill: none" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
+				'expected' => '<svg><path d="M0 0" fill-rule="evenodd" clip-rule="evenodd" opacity="0.4" style="fill: none" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
 			),
 			'allows clip rule and stroke on polygon'       => array(
-				'<svg><polygon points="0,0 1,1" clip-rule="evenodd" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
-				'<svg><polygon points="0,0 1,1" clip-rule="evenodd" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
+				'input'    => '<svg><polygon points="0,0 1,1" clip-rule="evenodd" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
+				'expected' => '<svg><polygon points="0,0 1,1" clip-rule="evenodd" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
 			),
 			'allows rect'                                  => array(
-				'<svg><rect x="4" y="5" width="16" height="14" rx="2" ry="2" fill="currentColor" stroke="currentColor" transform="rotate(45)" vector-effect="non-scaling-stroke" /></svg>',
-				'<svg><rect x="4" y="5" width="16" height="14" rx="2" ry="2" fill="currentColor" stroke="currentColor" transform="rotate(45)" vector-effect="non-scaling-stroke" /></svg>',
+				'input'    => '<svg><rect x="4" y="5" width="16" height="14" rx="2" ry="2" fill="currentColor" stroke="currentColor" transform="rotate(45)" vector-effect="non-scaling-stroke" /></svg>',
+				'expected' => '<svg><rect x="4" y="5" width="16" height="14" rx="2" ry="2" fill="currentColor" stroke="currentColor" transform="rotate(45)" vector-effect="non-scaling-stroke" /></svg>',
 			),
 			'allows circle'                                => array(
-				'<svg><circle cx="12" cy="12" r="3" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" transform="rotate(45)" vector-effect="non-scaling-stroke" /></svg>',
-				'<svg><circle cx="12" cy="12" r="3" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" transform="rotate(45)" vector-effect="non-scaling-stroke" /></svg>',
+				'input'    => '<svg><circle cx="12" cy="12" r="3" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" transform="rotate(45)" vector-effect="non-scaling-stroke" /></svg>',
+				'expected' => '<svg><circle cx="12" cy="12" r="3" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" transform="rotate(45)" vector-effect="non-scaling-stroke" /></svg>',
 			),
 			'strips opacity on elements other than path'   => array(
-				'<svg opacity="0.4"><rect width="1" height="1" opacity="0.4" /></svg>',
-				'<svg><rect width="1" height="1" /></svg>',
+				'input'    => '<svg opacity="0.4"><rect width="1" height="1" opacity="0.4" /></svg>',
+				'expected' => '<svg><rect width="1" height="1" /></svg>',
 			),
 		);
 	}
