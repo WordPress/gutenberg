@@ -156,5 +156,46 @@ describe( 'Combobox', () => {
 				screen.queryByRole( 'button', { name: 'Clear' } )
 			).not.toBeInTheDocument();
 		} );
+
+		it( 'does not describe ChipWithRemove with the Backspace or Delete hint', () => {
+			renderDisabledMultiSelect();
+
+			expect(
+				screen.getByLabelText( 'Item 1' )
+			).not.toHaveAccessibleDescription();
+		} );
+	} );
+
+	describe( 'when read-only', () => {
+		it( 'does not describe ChipWithRemove with the Backspace or Delete hint', () => {
+			render(
+				<Combobox.Root< Item, true >
+					items={ ITEMS }
+					multiple
+					readOnly
+					defaultValue={ [ ITEMS[ 0 ] ] }
+				>
+					<Combobox.Chips>
+						<Combobox.Value>
+							{ ( value: Item[] ) => (
+								<>
+									{ value.map( ( item ) => (
+										<Combobox.ChipWithRemove
+											key={ item.id }
+										>
+											{ item.value }
+										</Combobox.ChipWithRemove>
+									) ) }
+								</>
+							) }
+						</Combobox.Value>
+					</Combobox.Chips>
+				</Combobox.Root>
+			);
+
+			expect(
+				screen.getByLabelText( 'Item 1' )
+			).not.toHaveAccessibleDescription();
+		} );
 	} );
 } );

@@ -146,6 +146,36 @@ describe( 'SearchableChipSelect', () => {
 			);
 		} );
 
+		it( 'describes the combobox with the selected count only when the field is read-only', () => {
+			render(
+				<SearchableChipSelect
+					aria-label="Fruit"
+					items={ ITEMS }
+					defaultValue={ [ ITEMS[ 0 ], ITEMS[ 2 ] ] }
+					readOnly
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Fruit' } )
+			).toHaveAccessibleDescription( '2 items selected.' );
+		} );
+
+		it( 'describes the combobox with the selected count only when the field is disabled', () => {
+			render(
+				<SearchableChipSelect
+					aria-label="Fruit"
+					items={ ITEMS }
+					defaultValue={ [ ITEMS[ 0 ], ITEMS[ 2 ] ] }
+					disabled
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Fruit' } )
+			).toHaveAccessibleDescription( '2 items selected.' );
+		} );
+
 		it( 'keeps a consumer aria-describedby when items are selected', () => {
 			render(
 				<>
