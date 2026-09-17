@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { shortcutAriaLabel } from '@wordpress/keycodes';
 import Modal from '../../modal';
@@ -342,7 +342,7 @@ describe( 'Tooltip', () => {
 			expect( anchor ).toBeVisible();
 
 			// Hover over the anchor, tooltip hasn't appeared yet
-			await userEvent.hover( anchor );
+			fireEvent.mouseEnter( anchor );
 			expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
 			expectTooltipToBeHidden();
 
@@ -352,7 +352,7 @@ describe( 'Tooltip', () => {
 			expectTooltipToBeHidden();
 
 			// Hover outside of the anchor, tooltip still hasn't appeared yet
-			await hoverOutside();
+			fireEvent.mouseLeave( anchor );
 			expectTooltipToBeHidden();
 
 			expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
