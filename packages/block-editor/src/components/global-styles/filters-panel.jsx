@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalHStack as HStack, // eslint-disable-line @wordpress/use-recommended-components
-	__experimentalZStack as ZStack, // eslint-disable-line @wordpress/use-recommended-components
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	MenuGroup,
 	ColorIndicator,
@@ -102,15 +101,13 @@ const popoverProps = {
 
 const LabeledColorIndicator = ( { indicator, label } ) => (
 	<HStack justify="flex-start">
-		<ZStack isLayered={ false } offset={ -8 }>
-			<Flex expanded={ false }>
-				{ indicator === 'unset' || ! indicator ? (
-					<ColorIndicator className="block-editor-duotone-control__unset-indicator" />
-				) : (
-					<DuotoneSwatch values={ indicator } />
-				) }
-			</Flex>
-		</ZStack>
+		<Flex expanded={ false }>
+			{ indicator === 'unset' || ! indicator ? (
+				<ColorIndicator className="block-editor-duotone-control__unset-indicator" />
+			) : (
+				<DuotoneSwatch values={ indicator } />
+			) }
+		</Flex>
 		<FlexItem
 			className="block-editor-panel-duotone-settings__label"
 			title={ label }
