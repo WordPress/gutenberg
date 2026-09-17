@@ -31,7 +31,7 @@ export function useFocusHandler( clientId ) {
 			 */
 			function onFocus( event ) {
 				// A capture listener may have moved focus on already (see
-				// the writing flow's click selection).
+				// useFirefoxFocusCompatibility).
 				if ( ! node.contains( node.ownerDocument.activeElement ) ) {
 					return;
 				}
