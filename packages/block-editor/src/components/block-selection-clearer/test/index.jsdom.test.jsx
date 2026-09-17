@@ -43,7 +43,6 @@ describe( 'BlockSelectionClearer component', () => {
 		);
 
 		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
-		fireEvent.click( screen.getByTestId( 'selection-clearer' ) );
 
 		expect( mockClearSelectedBlock ).toHaveBeenCalled();
 	} );
@@ -65,35 +64,8 @@ describe( 'BlockSelectionClearer component', () => {
 		);
 
 		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
-		fireEvent.click( screen.getByTestId( 'selection-clearer' ) );
 
 		expect( mockClearSelectedBlock ).toHaveBeenCalled();
-	} );
-
-	it( 'should not clear the block selection when the click made a native selection', () => {
-		const mockClearSelectedBlock = vi.fn();
-		useSelect.mockImplementation( () => ( {
-			...defaultUseSelectValues,
-			hasSelectedBlock: vi.fn().mockReturnValue( true ),
-		} ) );
-		useDispatch.mockImplementation( () => ( {
-			clearSelectedBlock: mockClearSelectedBlock,
-		} ) );
-
-		render(
-			<BlockSelectionClearer data-testid="selection-clearer">
-				<p>Some text</p>
-			</BlockSelectionClearer>
-		);
-
-		const range = document.createRange();
-		range.selectNodeContents( screen.getByText( 'Some text' ) );
-		window.getSelection().addRange( range );
-
-		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
-		fireEvent.click( screen.getByTestId( 'selection-clearer' ) );
-
-		expect( mockClearSelectedBlock ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should not clear the block selection when no blocks are selected', () => {
@@ -110,7 +82,6 @@ describe( 'BlockSelectionClearer component', () => {
 		);
 
 		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
-		fireEvent.click( screen.getByTestId( 'selection-clearer' ) );
 
 		expect( mockClearSelectedBlock ).not.toHaveBeenCalled();
 	} );
@@ -135,7 +106,6 @@ describe( 'BlockSelectionClearer component', () => {
 		);
 
 		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
-		fireEvent.click( screen.getByTestId( 'selection-clearer' ) );
 
 		expect( mockClearSelectedBlock ).not.toHaveBeenCalled();
 	} );

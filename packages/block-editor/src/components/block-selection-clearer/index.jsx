@@ -21,28 +21,13 @@ export function useBlockSelectionClearer() {
 				return;
 			}
 
-			let isPressOnNode = false;
-
 			function onMouseDown( event ) {
-				isPressOnNode = event.target === node;
-			}
-
-			// Clear on click rather than on mouse down: a press on the
-			// element may start a native selection that ends in a block,
-			// which must be kept.
-			function onClick( event ) {
 				if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
 					return;
 				}
 
-				// Only handle clicks on the element, not the children. A drag
-				// between children also ends with a click on the element.
-				if ( event.target !== node || ! isPressOnNode ) {
-					return;
-				}
-
-				const { ownerDocument } = node;
-				if ( ! ownerDocument.defaultView.getSelection().isCollapsed ) {
+				// Only handle clicks on the element, not the children.
+				if ( event.target !== node ) {
 					return;
 				}
 
@@ -50,11 +35,9 @@ export function useBlockSelectionClearer() {
 			}
 
 			node.addEventListener( 'mousedown', onMouseDown );
-			node.addEventListener( 'click', onClick );
 
 			return () => {
 				node.removeEventListener( 'mousedown', onMouseDown );
-				node.removeEventListener( 'click', onClick );
 			};
 		},
 		[ hasSelectedBlock, hasMultiSelection, clearSelectedBlock, isEnabled ]
