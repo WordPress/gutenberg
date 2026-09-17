@@ -19,6 +19,7 @@ import {
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
+import { logged } from '@wordpress/deprecated';
 import { select, dispatch } from '@wordpress/data';
 import * as selectors from '../selectors';
 import { store } from '../';
@@ -5340,6 +5341,10 @@ describe( '__unstableGetClientIdWithClientIdsTree', () => {
 	} );
 } );
 describe( '__unstableGetClientIdsTree', () => {
+	afterEach( () => {
+		Object.keys( logged ).forEach( ( key ) => delete logged[ key ] );
+	} );
+
 	it( "should return the full content tree starting from the given root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
 		const state = {
 			blocks: {
@@ -5388,6 +5393,7 @@ describe( '__unstableGetClientIdsTree', () => {
 				],
 			},
 		] );
+		expect( console ).toHaveWarned();
 	} );
 } );
 
