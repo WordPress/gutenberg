@@ -1,0 +1,296 @@
+.wp-block-math {
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+// temml's stylesheet, which styles the MathML this package produces for the
+// Math block and the inline math format. Copied from
+// https://github.com/ronkok/Temml/blob/v0.10.34/dist/Temml-Local.css in
+// upstream order, so it can be diffed against upstream when temml is updated.
+// `/* */` comments are upstream's; `//` comments are ours and never reach the
+// output. Formatting and a few equivalent property spellings differ where the
+// linter requires it. Any change to a rule is marked as a deviation.
+//
+// The parts we do not use stay in place, verbatim, behind these flags.
+
+// The Temml font would have to be shipped with the package, and the system
+// math font already covers the script capitals and primes it is used for.
+$temml-font: false;
+
+// Line breaking turns every `math` element into an inline flex container,
+// including the display math the Math block renders, and adds vertical
+// padding. It needs its own evaluation.
+$temml-line-breaking: false;
+
+// The notation is written left to right in every language, so none of it is
+// flipped for RTL.
+/*!rtl:begin:ignore*/
+
+/*
+Temml.woff2 is a clone of KaTeX_Script-Regular, except that the code points
+have been changed from ASCII to Unicode Mathematical Alphanumeric Symbols Script capitals,
+Unicode range 1D49C to 1D4B5.
+*/
+
+@if $temml-font {
+	@font-face {
+		font-family: Temml;
+		src: url(Temml.woff2) format("woff2");
+		font-weight: 400;
+		font-style: normal;
+	}
+}
+
+math {
+	font-family: "Cambria Math", STIXTwoMath-Regular, math;
+	font-style: normal;
+	font-weight: 400;
+	line-height: normal;
+	font-size-adjust: none;
+	text-indent: 0;
+	text-transform: none;
+	letter-spacing: normal;
+	overflow-wrap: normal;
+	direction: ltr;
+	/* Prevent Firefox from omitting the dot on i or j. */
+	font-feature-settings: "dtls" off;
+}
+
+math * {
+	border-color: currentColor;
+}
+
+/* Next line is active in Firefox and Safari.
+ * Not in Chromium, which recognizes display: "block math" written inline. */
+math.tml-display {
+	display: block;
+}
+
+@if $temml-font {
+	// stylelint-disable font-family-no-missing-generic-family-keyword -- Upstream rule, kept verbatim.
+	math .mathscr {
+		font-family: Temml;
+	}
+
+	mo.tml-prime {
+		font-family: Temml;
+	}
+	// stylelint-enable font-family-no-missing-generic-family-keyword
+}
+
+/* Prevent f' from overlapping in Chromium */
+mo.prime-pad {
+	padding-left: 0.08em;
+}
+
+/* \cancel & \phase use background images. Get them to print. */
+menclose {
+	-webkit-print-color-adjust: exact; /* Chrome & Edge */
+	print-color-adjust: exact;
+}
+
+/* Array cell justification in Firefox & WebKit */
+.tml-right {
+	text-align: right;
+}
+.tml-left {
+	text-align: left;
+}
+
+/* Styles for Chromium only */
+@supports (not (-webkit-backdrop-filter: blur(1px))) and (not (-moz-appearance: none)) {
+	/* MathML Core & Chromium do not support the MathML 3.0 element <menclose> attributes. */
+	/* So use styles. */
+	menclose {
+		position: relative;
+		padding: 0.5ex 0;
+	}
+
+	.tml-overline {
+		padding: 0.1em 0 0 0;
+		border-top: 0.065em solid;
+	}
+
+	.tml-underline {
+		padding: 0 0 0.1em 0;
+		border-bottom: 0.065em solid;
+	}
+
+	.tml-cancel {
+		display: inline-block;
+		position: absolute;
+		left: 0.5px;
+		bottom: 0;
+		width: 100%;
+		height: 100%;
+		background-color: currentColor;
+	}
+	.upstrike {
+		clip-path: polygon(0.05em 100%, 0 calc(100% - 0.05em), calc(100% - 0.05em) 0, 100% 0.05em);
+	}
+	.downstrike {
+		clip-path: polygon(0 0.05em, 0.05em 0, 100% calc(100% - 0.05em), calc(100% - 0.05em) 100%);
+	}
+	.sout {
+		clip-path: polygon(0 calc(55% + 0.0333em), 0 calc(55% - 0.0333em), 100% calc(55% - 0.0333em), 100% calc(55% + 0.0333em));
+	}
+	// Deviation: `currentColor` and `transparent` instead of black, so the
+	// strokes follow the text color.
+	.tml-xcancel {
+		background:
+			linear-gradient(to top left, transparent 0%, transparent calc(50% - 0.06em), currentColor 50%, transparent calc(50% + 0.06em), transparent 100%),
+			linear-gradient(to top right, transparent 0%, transparent calc(50% - 0.06em), currentColor 50%, transparent calc(50% + 0.06em), transparent 100%);
+	}
+
+	.longdiv-top {
+		border-top: 0.067em solid;
+		padding: 0.1em 0.2em 0.2em 0.433em;
+	}
+	.longdiv-arc {
+		position: absolute;
+		top: 0;
+		bottom: 0.1em;
+		left: -0.4em;
+		width: 0.7em;
+		border: 0.067em solid;
+		transform: translateY(-0.067em);
+		border-radius: 70%;
+		clip-path: inset(0 0 0 0.4em);
+		box-sizing: border-box;
+	}
+	.menclose {
+		display: inline-block;
+		text-align: left;
+		position: relative;
+	}
+
+	.phasor-bottom {
+		border-bottom: 0.067em solid;
+		padding: 0.2em 0.2em 0.1em 0.6em;
+	}
+	.phasor-angle {
+		display: inline-block;
+		position: absolute;
+		left: 0.5px;
+		bottom: -0.04em;
+		height: 100%;
+		aspect-ratio: 0.5;
+		background-color: currentColor;
+		clip-path: polygon(0.05em 100%, 0 calc(100% - 0.05em), calc(100% - 0.05em) 0, 100% 0.05em);
+	}
+
+	.tml-box {
+		padding: 3pt 0 3pt 0;
+		border: 1px solid;
+	}
+	.tml-fbox {
+		padding: 3pt;
+		border: 1px solid;
+	}
+
+	.circle-pad {
+		padding: 0.267em;
+	}
+	.textcircle {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		right: 0;
+		left: 0;
+		border: 0.067em solid;
+		border-radius: 50%;
+	}
+
+	.actuarial {
+		padding: 0.03889em 0.03889em 0 0.03889em;
+		border-width: 0.08em 0.08em 0 0;
+		border-style: solid;
+		margin-right: 0.03889em;
+	}
+
+	/* Stretch \widetilde */
+	.tml-crooked-2 {
+		transform: scale(2, 1.1);
+	}
+	.tml-crooked-3 {
+		transform: scale(3, 1.3);
+	}
+	.tml-crooked-4 {
+		transform: scale(4, 1.4);
+	}
+	/* set array cell justification */
+	.tml-right {
+		text-align: -webkit-right;
+	}
+	.tml-left {
+		text-align: -webkit-left;
+	}
+}
+
+/* Adjust WebKit accents */
+@supports (-webkit-backdrop-filter: blur(1px)) {
+	.tml-xshift {
+		transform: translate(0, 0.45em);
+	}
+	.tml-capshift {
+		transform: translate(0, 0.35em);
+	}
+}
+
+@if $temml-line-breaking {
+	/* flex-wrap for line-breaking in Chromium */
+	math {
+		display: inline-flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+	}
+	math > mrow {
+		padding: 0.5ex 0;
+	}
+}
+
+/* Default mtd top padding is 0.5ex per MathML-Core and user-agent CSS */
+/* We adjust for jot and small */
+mtable.tml-jot mtd {
+	padding-top: 0.7ex;
+	padding-bottom: 0.7ex;
+}
+mtable.tml-small mtd {
+	padding-top: 0.35ex;
+	padding-bottom: 0.35ex;
+}
+
+/* Firefox */
+@-moz-document url-prefix() {
+	@if $temml-line-breaking {
+		/* Avoid flex-wrap */
+		math {
+			display: inline;
+		}
+		math > mrow {
+			padding: 0;
+		}
+	}
+	/* Adjust Firefox spacing between array rows */
+	mtd,
+	mtable.tml-small mtd {
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+	mtable.tml-jot mtd {
+		padding-top: 0.2ex;
+		padding-bottom: 0;
+	}
+}
+
+/* AMS environment auto-numbering via CSS counter. */
+.tml-eqn::before {
+	counter-increment: tmlEqnNo;
+	content: "(" counter(tmlEqnNo) ")";
+}
+
+body {
+	counter-reset: tmlEqnNo;
+}
+
+/*!rtl:end:ignore*/

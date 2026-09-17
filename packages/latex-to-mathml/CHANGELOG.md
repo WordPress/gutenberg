@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Ship temml's stylesheet as `style.scss`, registered as `wp-latex-to-mathml` and loaded whenever a rendered block contains MathML, so `\overline`, `\boxed`, `\cancel`, aligned columns and equation numbers render in Chromium, in the Math block and in inline math ([#83096](https://github.com/WordPress/gutenberg/pull/83096)).
+
 ## 1.23.0 (2026-09-10)
 
 ## 1.22.0 (2026-08-26)
