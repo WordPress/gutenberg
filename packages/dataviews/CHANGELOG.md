@@ -4,8 +4,8 @@
 
 ### Enhancements
 
--   DataViewsPicker: Footer action buttons now honor an action's `isEligible`, disabling the button when no selected item is eligible and passing only the eligible items to the callback ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
--   DataViewsPicker: Render the footer selection count only for multiselect pickers. A single-select picker always holds exactly one selection, so the count carried no information ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
+-   DataViewsPicker: Footer action buttons now honor an action's `isEligible`, disabling the button when no selected item is eligible and passing only the eligible items to the callback. A `label` function still receives the whole selection ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
+-   DataViewsPicker: Render the footer selection info (the checkbox and the item count) only for multiselect pickers, as `DataViews` renders its bulk selection footer only with bulk actions. Single-select pickers no longer show the item count next to their actions ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
 
 ### Bug Fixes
 
