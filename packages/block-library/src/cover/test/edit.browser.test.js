@@ -152,7 +152,7 @@ describe( 'Cover block', () => {
 
 			expect( cover ).not.toHaveClass( 'has-custom-content-position' );
 
-			await userEvent.click(
+			await activateWithKeyboard(
 				screen.getByLabelText( 'Change content position' )
 			);
 			expect( cover ).not.toHaveClass( 'has-custom-content-position' );
