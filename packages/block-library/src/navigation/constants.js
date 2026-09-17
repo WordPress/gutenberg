@@ -1,9 +1,12 @@
+// No `kind`/`type` set: the newly-inserted link's LinkControl search isn't
+// scoped to any one entity type (matching the existing "Custom Link"
+// variation's own search behavior), so a user looking for a category or tag
+// isn't limited to page results. `updateAttributes()` sets the appropriate
+// `kind`/`type` reactively once a suggestion is picked, at which point the
+// block's displayed variation (icon, title) updates to match automatically.
 export const DEFAULT_BLOCK = {
 	name: 'core/navigation-link',
-	attributes: {
-		kind: 'post-type',
-		type: 'page',
-	},
+	attributes: {},
 };
 
 export const PRIORITIZED_INSERTER_BLOCKS = [
