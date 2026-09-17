@@ -203,4 +203,8 @@ function gutenberg_register_block_patterns_page_types_controller() {
 	$controller = new Gutenberg_REST_Block_Patterns_Page_Types_Controller();
 	$controller->register_routes();
 }
-add_action( 'rest_api_init', 'gutenberg_register_block_patterns_page_types_controller' );
+// Prototype-only data, so the block patterns endpoint is only overridden while
+// the Extensible Site Editor experiment is on.
+if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
+	add_action( 'rest_api_init', 'gutenberg_register_block_patterns_page_types_controller' );
+}

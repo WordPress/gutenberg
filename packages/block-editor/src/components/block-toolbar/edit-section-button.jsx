@@ -26,7 +26,7 @@ export default function EditSectionButton( { clientId } ) {
 	const sectionClientId = editedContentOnlySection || clientId;
 
 	const {
-		blockType,
+		blockName,
 		isGlobalSection,
 		isTemplatePartBlock,
 		warningKey,
@@ -43,9 +43,9 @@ export default function EditSectionButton( { clientId } ) {
 				getSettings,
 			} = select( blockEditorStore );
 			const settings = getSettings();
-			const blockName = getBlockName( sectionClientId );
+			const _blockName = getBlockName( sectionClientId );
 			const attributes = getBlockAttributes( sectionClientId );
-			const _blockType = blockName ? { name: blockName } : null;
+			const _blockType = _blockName ? { name: _blockName } : null;
 			const _isTemplatePartBlock = isTemplatePart( _blockType );
 			const isNavigationOverlayTemplatePart =
 				attributes?.area === 'navigation-overlay' ||
@@ -65,7 +65,10 @@ export default function EditSectionButton( { clientId } ) {
 				: 'universalCanvasTemplateWarning';
 
 			return {
-				blockType: _blockType,
+				// Returned as a name rather than a block type object: the
+				// selector's result is shallow-compared, so a fresh object
+				// here would read as a new value on every call.
+				blockName: _blockName ?? null,
 				isGlobalSection: _isGlobalSection,
 				isTemplatePartBlock: _isTemplatePartBlock,
 				warningKey: _warningKey,
@@ -78,6 +81,7 @@ export default function EditSectionButton( { clientId } ) {
 		[ sectionClientId ]
 	);
 	const { set: setPreference } = useDispatch( preferencesStore );
+	const blockType = blockName ? { name: blockName } : null;
 
 	// Synced patterns and normal template parts already have their own
 	// isolated-editor toolbar buttons ("Edit original"). Universal canvas

@@ -1323,7 +1323,12 @@ function gutenberg_site_editor_register_template_context_rest_field() {
 		)
 	);
 }
-add_action( 'rest_api_init', 'gutenberg_site_editor_register_template_context_rest_field' );
+// Prototype-only data: registering it unconditionally would add a field to
+// every `wp_template` REST response, including for sites not running the
+// Extensible Site Editor.
+if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
+	add_action( 'rest_api_init', 'gutenberg_site_editor_register_template_context_rest_field' );
+}
 
 /**
  * Register default menu items for the site editor page.

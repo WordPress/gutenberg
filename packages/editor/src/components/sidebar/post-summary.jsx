@@ -35,16 +35,7 @@ export default function PostSummary( {
 	hidePostCard = false,
 	excludedFieldIds = [],
 } ) {
-	const postType = useSelect(
-		( select ) => select( editorStore ).getCurrentPostType(),
-		[]
-	);
-	if (
-		window?.__experimentalDataFormInspector &&
-		[ 'page', 'post', 'wp_template', 'wp_template_part' ].includes(
-			postType
-		)
-	) {
+	if ( window?.__experimentalDataFormInspector ) {
 		return (
 			<DataFormPostSummary
 				onActionPerformed={ onActionPerformed }
