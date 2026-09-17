@@ -73,8 +73,7 @@ function gutenberg_register_default_icons() {
 			$icon_args['public'] = $icon_data['public'];
 		}
 
-		// Keywords are optional, so only pass them through when present.
-		if ( ! empty( $icon_data['keywords'] ) && is_array( $icon_data['keywords'] ) ) {
+		if ( isset( $icon_data['keywords'] ) ) {
 			$icon_args['keywords'] = $icon_data['keywords'];
 		}
 
