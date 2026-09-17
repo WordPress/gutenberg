@@ -380,14 +380,6 @@
 				top: -$grid-unit-05;
 			}
 		}
-
-		// Tweak size and position of focus ring.
-		&::before {
-			height: 16px;
-			min-width: 100%;
-			left: 0;
-			right: 0;
-		}
 	}
 
 	.block-editor-inserter__toggle {
