@@ -292,6 +292,8 @@ You can verify the structure locally by running `npm run lint:changelogs`.
 
 ### Promoting a Pre-Release Package to Stable (1.0.0)
 
+The automated package publishing workflow will at most bump the minor version of a pre-release package (those having a version like `0.x.x`), even if it includes breaking changes. This is consistent with semantic versioning, where `0.x` versions are intended for initial development where the API may change frequently.
+
 A `0.x` package is promoted to `1.0.0` by adding a **Stable Release** section.
 
 ```md
