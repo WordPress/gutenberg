@@ -2,12 +2,12 @@
 /**
  * Parity harness for the admin design tokens experiment.
  *
- * Renders classic control markup — buttons, fields, checkboxes and radios —
+ * Renders admin control markup — buttons, fields, checkboxes and radios —
  * across every variant, size and state on a real wp-admin screen, so the
  * restyled result can be compared against the equivalent React components.
  *
  * It is a real admin page rather than a static fixture so that the full cascade
- * applies: the demoted Core stylesheets, the active admin colour scheme, and any
+ * applies: the demoted WordPress stylesheets, the active admin colour scheme, and any
  * CSS added by other active plugins. Differences that only exist in computed
  * styles are visible here, where reading the stylesheets would miss them.
  *
@@ -39,7 +39,7 @@ add_action( 'admin_menu', 'gutenberg_wpds_admin_register_harness' );
 /**
  * Returns the button state matrix.
  *
- * Classic drives state from CLASSES as well as pseudo-classes — legacy admin JS
+ * The admin drives state from CLASSES as well as pseudo-classes — legacy admin JS
  * toggles `.hover` / `.focus` / `.disabled`. Only the class forms can be
  * rendered statically, so those are what the harness shows; the pseudo-class
  * forms have to be checked interactively.
@@ -188,7 +188,7 @@ function gutenberg_wpds_admin_render_harness() {
 	echo '</p>';
 
 	echo '<h2>' . esc_html__( 'Fields — invalid', 'gutenberg' ) . '</h2>';
-	echo '<p>' . esc_html__( 'Core marks the invalid border with !important, so this is driven from the wpds-overrides layer rather than 20-input.css.', 'gutenberg' ) . '</p>';
+	echo '<p>' . esc_html__( 'The invalid border is marked !important in forms.css, so it is driven from the wpds-overrides layer rather than 20-input.css.', 'gutenberg' ) . '</p>';
 	echo '<p class="form-invalid form-required"><input type="text" value="" placeholder="' . esc_attr__( 'Invalid field', 'gutenberg' ) . '"></p>';
 
 	echo '<h2>' . esc_html__( 'Checkboxes and radios', 'gutenberg' ) . '</h2>';

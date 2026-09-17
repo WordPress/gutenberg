@@ -5,9 +5,9 @@
  * Target: visual parity with the `@wordpress/ui` input primitive
  * (packages/ui/src/form/primitives/input-layout/style.module.css), which is the
  * purest token expression of a field in the design system. Values come from
- * there; the selectors below are hand-authored against classic markup.
+ * there; the selectors below are hand-authored against the admin's markup.
  *
- * Selector list mirrors Core's own in wp-admin/css/forms.css so the same set of
+ * Selector list mirrors the one in wp-admin/css/forms.css so the same set of
  * controls is covered — no more, no less.
  *
  * NO `!important` IN THIS FILE. See 99-overrides.css for the one exception and why.
@@ -45,14 +45,14 @@
 		box-shadow: none;
 		font-family: var(--wpds-typography-font-family-body);
 		/*
-		 * NO font-size. Core sets `input, select, textarea, button { font-size:
+		 * NO font-size. WordPress sets `input, select, textarea, button { font-size:
 		 * inherit }`, so a control takes the size of whatever contains it — which
 		 * is why a settings form reads coherently, with label, field and help text
 		 * all at one size. Pinning a size here broke that: the label stayed at the
 		 * container's size while the field it belongs to shrank to 13px.
 		 *
 		 * Inheriting keeps a control correct in every context without us having to
-		 * know what those contexts are. Core also handles the mobile case, raising
+		 * know what those contexts are. WordPress also handles the mobile case, raising
 		 * inputs to 16px below 782px so iOS does not zoom on focus.
 		 */
 		line-height: 1;
@@ -75,16 +75,16 @@
 	input[type="time"],
 	input[type="url"],
 	input[type="week"] {
-		/* No height — see the note in 10-button.css. Core's default is already 40px
+		/* No height — see the note in 10-button.css. WordPress's default is already 40px
 		   and its contextual rules must keep winning. */
 		padding: 0 var(--wpds-dimension-padding-md);
 	}
 
 	/*
-	 * Select needs asymmetric padding, because Core draws the dropdown arrow as a
+	 * Select needs asymmetric padding, because WordPress draws the dropdown arrow as a
 	 * background image at the trailing edge and the text has to clear it.
 	 *
-	 * Core reserves exactly the arrow's own width (24px for a 16px arrow inset
+	 * WordPress reserves exactly the arrow's own width (24px for a 16px arrow inset
 	 * 8px), so the text ends precisely where the arrow begins and there is no
 	 * gutter at all. React's SelectControl reserves the icon PLUS a trailing
 	 * gutter mirroring the leading one:
@@ -97,18 +97,18 @@
 	 *
 	 * The 18px is deliberately not a token. The icon set is drawn and hinted at
 	 * 24x24 and, being fill-based, scales badly to arbitrary sizes; 18 is 75% of
-	 * 24, picked to interpolate cleanly. Mirroring it keeps classic and the
+	 * 24, picked to interpolate cleanly. Mirroring it keeps the admin and the
 	 * component in step.
 	 *
-	 * Logical properties, so this follows the arrow when Core's RTL stylesheet
+	 * Logical properties, so this follows the arrow when WordPress's RTL stylesheet
 	 * flips it to the leading edge.
 	 */
 	select {
 		/*
-		 * Only the TRAILING padding, not the shorthand. Core narrows the leading
+		 * Only the TRAILING padding, not the shorthand. WordPress narrows the leading
 		 * padding contextually (`.wp-core-ui .tablenav select` uses 8px), and a
 		 * shorthand here would flatten that along with everything else. Setting
-		 * one side leaves Core's contextual value on the other intact, and the
+		 * one side leaves WordPress's contextual value on the other intact, and the
 		 * arrow still gets its gutter in every context.
 		 *
 		 * No height, for the reason given in 10-button.css.
@@ -132,7 +132,7 @@
 	}
 
 	/* -----------------------------------------------------------------------
-	   Hover — classic has no hover state; the design system darkens the border.
+	   Hover — the admin has no hover state; the design system darkens the border.
 
 	   Excluded from disabled and readonly fields. Without the :not() the hover
 	   rule outranks the disabled rule: an attribute selector plus a pseudo-class
@@ -186,7 +186,7 @@
 
 	/* -----------------------------------------------------------------------
 	   Focus — outline/outline-offset, never box-shadow.
-	   Core's ring is a box-shadow plus an accent border; both are replaced.
+	   WordPress's ring is a box-shadow plus an accent border; both are replaced.
 	   ----------------------------------------------------------------------- */
 
 	input[type="text"]:focus,
@@ -254,15 +254,15 @@
 
 	/*
 	 * The dropdown arrow is a background image with its colour baked into the
-	 * data URI, so it cannot follow a token or `currentColor`. Core swaps in a
+	 * data URI, so it cannot follow a token or `currentColor`. WordPress swaps in a
 	 * grey arrow for `select.disabled` and `select:disabled`, but leaves
 	 * `select[aria-disabled="true"]` with only `cursor: default` — no visual
 	 * disabled treatment at all.
 	 *
 	 * Since the rules above do give an aria-disabled field the disabled box, the
 	 * arrow has to follow, or it stays black against a greyed control. This
-	 * repeats Core's own grey arrow verbatim so all three disabled forms render
-	 * identically; the colour is Core's #a0a5aa rather than the disabled token,
+	 * repeats WordPress's own grey arrow verbatim so all three disabled forms render
+	 * identically; the colour is WordPress's #a0a5aa rather than the disabled token,
 	 * because matching the other two matters more than matching the palette
 	 * while the value is trapped inside a data URI.
 	 *
