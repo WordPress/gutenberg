@@ -7,6 +7,8 @@ import { MediaEditorStateProvider, useMediaEditor } from '../../../state';
 import type { CropperState } from '../../../image-editor';
 import { MAX_ZOOM } from '../../../image-editor/core/constants';
 
+globalThis.wpVitest.mockMatchMedia();
+
 function setup(
 	props: MediaEditorImageControlsProps = {},
 	initialCropperState?: Partial< CropperState >
@@ -113,16 +115,14 @@ describe( 'MediaEditorImageControls', () => {
 		).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
-	it( 'renders an aspect ratio dropdown in the flat toolbar when enabled', async () => {
+	it( 'renders an aspect ratio select in the flat toolbar when enabled', async () => {
 		setup( {
 			showAspectRatioControl: true,
 		} );
 
-		fireEvent.click(
-			screen.getByRole( 'button', { name: 'Aspect ratio' } )
-		);
-		fireEvent.click(
-			screen.getByRole( 'menuitemradio', { name: 'Square (1:1)' } )
+		fireEvent.change(
+			screen.getByRole( 'combobox', { name: 'Aspect ratio' } ),
+			{ target: { value: '1' } }
 		);
 
 		await waitFor( () =>
@@ -132,7 +132,7 @@ describe( 'MediaEditorImageControls', () => {
 		);
 	} );
 
-	it( 'ignores an aspect ratio chosen from a menu left open when disabled', async () => {
+	it( 'ignores aspect ratio changes after the control becomes disabled', async () => {
 		function Harness() {
 			const [ locked, setLocked ] = useState( false );
 			return (
@@ -148,17 +148,12 @@ describe( 'MediaEditorImageControls', () => {
 		}
 		render( <Harness /> );
 
-		fireEvent.click(
-			screen.getByRole( 'button', { name: 'Aspect ratio' } )
-		);
+		const select = screen.getByRole( 'combobox', { name: 'Aspect ratio' } );
 		const before = screen.getByTestId( 'current-aspect-ratio' ).textContent;
 
-		// The popover stays mounted when the toggle becomes disabled, so
-		// the items have to refuse the change themselves.
 		fireEvent.click( screen.getByRole( 'button', { name: 'lock' } ) );
-		fireEvent.click(
-			screen.getByRole( 'menuitemradio', { name: 'Square (1:1)' } )
-		);
+		expect( select ).toBeDisabled();
+		fireEvent.change( select, { target: { value: '1' } } );
 
 		await waitFor( () =>
 			expect(
@@ -167,14 +162,14 @@ describe( 'MediaEditorImageControls', () => {
 		);
 	} );
 
-	it( 'omits the aspect ratio dropdown from the labelled panel layout', () => {
+	it( 'omits the aspect ratio select from the labelled panel layout', () => {
 		setup( {
 			withLabels: true,
 			showAspectRatioControl: true,
 		} );
 
 		expect(
-			screen.queryByRole( 'button', { name: 'Aspect ratio' } )
+			screen.queryByRole( 'combobox', { name: 'Aspect ratio' } )
 		).not.toBeInTheDocument();
 	} );
 } );

@@ -3,9 +3,14 @@
 
 .media-editor-image-controls {
 	display: flex;
-	flex-wrap: nowrap;
+	flex-wrap: wrap;
+	justify-content: center;
 	align-items: center;
 	gap: $grid-unit-10;
+
+	&__aspect-ratio {
+		max-width: 100%;
+	}
 
 	// Stacked layout used inside the Crop panel on wide viewports: the Rotate
 	// and Flip groups sit side by side (rotate left, flip right) in a row, with
