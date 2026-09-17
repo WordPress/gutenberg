@@ -312,7 +312,7 @@ Hide and show additional content.
 
 -	**Name:** [core/details](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-details/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** align (full, wide), allowedBlocks, anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), allowedBlocks, anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout (~~allowEditing~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** name, placeholder, showContent, summary
 
 ## Embed
