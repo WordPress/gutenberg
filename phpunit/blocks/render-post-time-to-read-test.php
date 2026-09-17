@@ -216,4 +216,27 @@ class Tests_Blocks_Render_Post_Time_To_Read extends WP_UnitTestCase {
 
 		$this->assertSame( $expected, $actual );
 	}
+
+	/**
+	 * @covers ::render_block_core_post_time_to_read
+	 */
+	public function test_uses_block_context_post_id_not_global_post() {
+		global $wp_query;
+
+		$wp_query->post  = self::$no_content_post;
+		$GLOBALS['post'] = self::$no_content_post;
+
+		$attributes    = array(
+			'displayMode' => 'time',
+		);
+		$parsed_blocks = parse_blocks( '<!-- wp:post-time-to-read /-->' );
+		$parsed_block  = $parsed_blocks[0];
+		$context       = array( 'postId' => self::$two_minutes_post->ID );
+		$block         = new WP_Block( $parsed_block, $context );
+
+		$actual   = gutenberg_render_block_core_post_time_to_read( $attributes, '', $block );
+		$expected = '<div class="wp-block-post-time-to-read">2 minutes</div>';
+
+		$this->assertSame( $expected, $actual );
+	}
 }

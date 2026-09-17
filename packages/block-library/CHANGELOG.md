@@ -9,6 +9,7 @@
 -   Cover: Grow the block with its content in Safari when an aspect ratio is set, instead of clipping the overflow. WebKit locks the box to the ratio where other engines let content expand it ([#70152](https://github.com/WordPress/gutenberg/pull/70152)).
 -   Query Pagination: Remove the editor-only `margin: 0` override on the block wrapper so the parent layout's block gap applies in the canvas as it does on the front end ([#82399](https://github.com/WordPress/gutenberg/pull/82399)).
 -   Navigation: Reset the submenu detection for each rendered block. Once a Navigation with a submenu rendered, every Navigation rendered afterwards in the same request was treated as having one and loaded the navigation view module it does not need ([#82366](https://github.com/WordPress/gutenberg/pull/82366)).
+-   Time to Read: Use the post from block context instead of the global post when calculating reading time, so the block accurately reflects the full content of the post inside Query Loops ([#83022](https://github.com/WordPress/gutenberg/pull/83022)).
 
 ### Internal
 
