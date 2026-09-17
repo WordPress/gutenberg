@@ -67,7 +67,7 @@
 	 *          Without this the row title keeps 14px while the rest of the
 	 *          reading prose moves to the design system's 15px, and it is the
 	 *          most prominent text in a list table.
-	 * DELETE WHEN: that `!important` is removed from Core.
+	 * DELETE WHEN: that `!important` is removed from WordPress.
 	 */
 	.row-title {
 		font-size: var(--wpds-typography-font-size-lg) !important;
