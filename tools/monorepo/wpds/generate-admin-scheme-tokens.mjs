@@ -14,7 +14,11 @@
  * the ramps from `@wordpress/theme`. Only tokens that differ from the default
  * scheme are written, and schemes that derive identical values share a rule.
  *
- * Usage: node bin/generate-wpds-admin-scheme-tokens.mjs
+ * Both are imported from package source because neither package exports these
+ * as a plain function yet. Once `@wordpress/theme` does, this script and its
+ * output are meant to be replaced by that.
+ *
+ * Usage: npm run wpds:admin-scheme-tokens --workspace @wordpress/monorepo-tools
  */
 
 import { writeFileSync } from 'node:fs';
@@ -24,11 +28,11 @@ import {
 	buildBgRamp,
 	buildAccentRamp,
 	DEFAULT_SEED_COLORS,
-} from '../packages/theme/src/color-ramps/index.ts';
-import colorTokens from '../packages/theme/src/prebuilt/ts/color-tokens.ts';
-import { getAdminThemeColors } from '../packages/admin-ui/src/admin-theme-colors/index.ts';
+} from '../../../packages/theme/src/color-ramps/index.ts';
+import colorTokens from '../../../packages/theme/src/prebuilt/ts/color-tokens.ts';
+import { getAdminThemeColors } from '../../../packages/admin-ui/src/admin-theme-colors/index.ts';
 
-const ROOT = join( dirname( fileURLToPath( import.meta.url ) ), '..' );
+const ROOT = join( dirname( fileURLToPath( import.meta.url ) ), '../../..' );
 const OUTPUT = join(
 	ROOT,
 	'lib/experimental/wpds-admin/css/05-scheme-tokens.css'
@@ -120,7 +124,7 @@ const css = `/**
  *
  * GENERATED FILE. Do not edit. Regenerate with:
  *
- *     node bin/generate-wpds-admin-scheme-tokens.mjs
+ *     npm run wpds:admin-scheme-tokens --workspace @wordpress/monorepo-tools
  *
  * React admin screens derive these values at runtime through ThemeProvider.
  * PHP-rendered screens have no provider, so without this file every token
@@ -128,8 +132,11 @@ const css = `/**
  * pair the scheme's background with text chosen for the default blue. Only
  * tokens that differ from the default scheme are listed.
  *
- * Setting \`--wpds-*\` properties is reserved for the theme package, which is
- * where this output belongs once the experiment graduates.
+ * Setting \`--wpds-*\` properties is reserved for the theme package.
+ *
+ * DELETE WHEN: \`@wordpress/theme\` can generate these tokens outside React and
+ * wp-admin loads them for the active colour scheme, which will also need to
+ * cover custom colour seeds (Core-66026, Core-65776).
  */
 
 /* stylelint-disable plugin-wpds/no-setting-wpds-custom-properties -- Generated equivalent of ThemeProvider's runtime output. */

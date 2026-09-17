@@ -3,7 +3,7 @@
  *
  * GENERATED FILE. Do not edit. Regenerate with:
  *
- *     node bin/generate-wpds-admin-scheme-tokens.mjs
+ *     npm run wpds:admin-scheme-tokens --workspace @wordpress/monorepo-tools
  *
  * React admin screens derive these values at runtime through ThemeProvider.
  * PHP-rendered screens have no provider, so without this file every token
@@ -11,8 +11,11 @@
  * pair the scheme's background with text chosen for the default blue. Only
  * tokens that differ from the default scheme are listed.
  *
- * Setting `--wpds-*` properties is reserved for the theme package, which is
- * where this output belongs once the experiment graduates.
+ * Setting `--wpds-*` properties is reserved for the theme package.
+ *
+ * DELETE WHEN: `@wordpress/theme` can generate these tokens outside React and
+ * wp-admin loads them for the active colour scheme, which will also need to
+ * cover custom colour seeds (Core-66026, Core-65776).
  */
 
 /* stylelint-disable plugin-wpds/no-setting-wpds-custom-properties -- Generated equivalent of ThemeProvider's runtime output. */
