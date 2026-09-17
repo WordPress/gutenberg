@@ -1,3 +1,5 @@
+@use "../../../utils/css/mixins";
+
 @layer wp-ui {
 	@layer utilities, components, compositions, overrides;
 
@@ -18,6 +20,10 @@
 
 			&:not([data-disabled]) {
 				cursor: var(--wpds-cursor-control);
+			}
+
+			&:focus {
+				@include mixins.focus-ring();
 			}
 
 			@media not (prefers-reduced-motion) {
@@ -96,6 +102,14 @@
 
 				&:dir(rtl) {
 					transform: translateX(calc(-1 * var(--_wp-ui-switch-height)));
+				}
+
+				&[data-disabled] {
+					background-color: var(--wpds-color-foreground-interactive-brand-strong-disabled);
+
+					@media (forced-colors: active) {
+						background-color: GrayText;
+					}
 				}
 			}
 

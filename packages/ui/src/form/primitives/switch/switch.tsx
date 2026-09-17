@@ -2,8 +2,7 @@ import { Switch as _Switch } from '@base-ui/react/switch';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import resetStyles from '../../../utils/css/resets.module.css';
-import focusStyles from '../../../utils/css/focus.module.scss';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { SwitchProps } from './types';
 
 /**
@@ -18,7 +17,6 @@ export const Switch = forwardRef< HTMLSpanElement, SwitchProps >(
 				ref={ ref }
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
-					focusStyles[ 'outset-ring--focus' ],
 					styles.root,
 					className
 				) }
