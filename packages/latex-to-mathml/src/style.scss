@@ -1,24 +1,24 @@
-// temml's stylesheet, which styles the MathML this package produces for the
-// Math block and the inline math format. Copied from
+// @wordpress temml's stylesheet, which styles the MathML this package
+// produces for the Math block and the inline math format. Copied from
 // https://github.com/ronkok/Temml/blob/v0.10.34/dist/Temml-Local.css in
 // upstream order, so it can be diffed against upstream when temml is updated.
-// `/* */` comments are upstream's; `//` comments are ours and never reach the
-// output. Rules we do not use are commented out in place, with the reason
-// above them. Formatting and a few equivalent property spellings differ where
-// the linter requires it. Any change to a rule is marked as a deviation.
-
-// The notation is written left to right in every language, so none of it is
-// flipped for RTL.
+// Every comment is a `//` comment; the ones WordPress added start with
+// `@wordpress`, the rest are temml's. Rules we do not use are commented out in
+// place, with the reason above them. Formatting and a few equivalent property
+// spellings differ where the linter requires it. Any change to a rule is
+// marked as a deviation.
+//
+// @wordpress The notation is written left to right in every language, so
+// none of it is flipped for RTL.
 /*!rtl:begin:ignore*/
 
-/*
-Temml.woff2 is a clone of KaTeX_Script-Regular, except that the code points
-have been changed from ASCII to Unicode Mathematical Alphanumeric Symbols Script capitals,
-Unicode range 1D49C to 1D4B5.
-*/
+// Temml.woff2 is a clone of KaTeX_Script-Regular, except that the code points
+// have been changed from ASCII to Unicode Mathematical Alphanumeric Symbols Script capitals,
+// Unicode range 1D49C to 1D4B5.
 
-// Not used: the font would have to be shipped with the package, and the
-// system math font already covers the script capitals and primes it is for.
+// @wordpress Not used: the font would have to be shipped with the package,
+// and the system math font already covers the script capitals and primes it
+// is for.
 // @font-face {
 // 	font-family: Temml;
 // 	src: url(Temml.woff2) format("woff2");
@@ -37,7 +37,7 @@ math {
 	letter-spacing: normal;
 	overflow-wrap: normal;
 	direction: ltr;
-	/* Prevent Firefox from omitting the dot on i or j. */
+	// Prevent Firefox from omitting the dot on i or j.
 	font-feature-settings: "dtls" off;
 }
 
@@ -45,13 +45,13 @@ math * {
 	border-color: currentColor;
 }
 
-/* Next line is active in Firefox and Safari.
- * Not in Chromium, which recognizes display: "block math" written inline. */
+// Next line is active in Firefox and Safari.
+// Not in Chromium, which recognizes display: "block math" written inline.
 math.tml-display {
 	display: block;
 }
 
-// Not used: see the font above.
+// @wordpress Not used: see the font above.
 // math .mathscr {
 // 	font-family: Temml;
 // }
@@ -60,18 +60,18 @@ math.tml-display {
 // 	font-family: Temml;
 // }
 
-/* Prevent f' from overlapping in Chromium */
+// Prevent f' from overlapping in Chromium
 mo.prime-pad {
 	padding-left: 0.08em;
 }
 
-/* \cancel & \phase use background images. Get them to print. */
+// \cancel & \phase use background images. Get them to print.
 menclose {
-	-webkit-print-color-adjust: exact; /* Chrome & Edge */
+	-webkit-print-color-adjust: exact; // Chrome & Edge
 	print-color-adjust: exact;
 }
 
-/* Array cell justification in Firefox & WebKit */
+// Array cell justification in Firefox & WebKit
 .tml-right {
 	text-align: right;
 }
@@ -79,10 +79,10 @@ menclose {
 	text-align: left;
 }
 
-/* Styles for Chromium only */
+// Styles for Chromium only
 @supports (not (-webkit-backdrop-filter: blur(1px))) and (not (-moz-appearance: none)) {
-	/* MathML Core & Chromium do not support the MathML 3.0 element <menclose> attributes. */
-	/* So use styles. */
+	// MathML Core & Chromium do not support the MathML 3.0 element <menclose> attributes.
+	// So use styles.
 	menclose {
 		position: relative;
 		padding: 0.5ex 0;
@@ -116,7 +116,7 @@ menclose {
 	.sout {
 		clip-path: polygon(0 calc(55% + 0.0333em), 0 calc(55% - 0.0333em), 100% calc(55% - 0.0333em), 100% calc(55% + 0.0333em));
 	}
-	// Deviation: `currentColor` and `transparent` instead of black, so the
+	// @wordpress Deviation: `currentColor` and `transparent` instead of black, so the
 	// strokes follow the text color.
 	.tml-xcancel {
 		background:
@@ -190,7 +190,7 @@ menclose {
 		margin-right: 0.03889em;
 	}
 
-	/* Stretch \widetilde */
+	// Stretch \widetilde
 	.tml-crooked-2 {
 		transform: scale(2, 1.1);
 	}
@@ -200,7 +200,7 @@ menclose {
 	.tml-crooked-4 {
 		transform: scale(4, 1.4);
 	}
-	/* set array cell justification */
+	// set array cell justification
 	.tml-right {
 		text-align: -webkit-right;
 	}
@@ -209,7 +209,7 @@ menclose {
 	}
 }
 
-/* Adjust WebKit accents */
+// Adjust WebKit accents
 @supports (-webkit-backdrop-filter: blur(1px)) {
 	.tml-xshift {
 		transform: translate(0, 0.45em);
@@ -219,10 +219,11 @@ menclose {
 	}
 }
 
-// Not used: this turns every `math` element into an inline flex container,
-// including the display math the Math block renders, and adds vertical
-// padding. Line breaking of long inline formulas needs its own evaluation.
-// /* flex-wrap for line-breaking in Chromium */
+// @wordpress Not used: this turns every `math` element into an inline flex
+// container, including the display math the Math block renders, and adds
+// vertical padding. Line breaking of long inline formulas needs its own
+// evaluation.
+// flex-wrap for line-breaking in Chromium
 // math {
 // 	display: inline-flex;
 // 	flex-wrap: wrap;
@@ -232,8 +233,8 @@ menclose {
 // 	padding: 0.5ex 0;
 // }
 
-/* Default mtd top padding is 0.5ex per MathML-Core and user-agent CSS */
-/* We adjust for jot and small */
+// Default mtd top padding is 0.5ex per MathML-Core and user-agent CSS
+// We adjust for jot and small
 mtable.tml-jot mtd {
 	padding-top: 0.7ex;
 	padding-bottom: 0.7ex;
@@ -243,17 +244,17 @@ mtable.tml-small mtd {
 	padding-bottom: 0.35ex;
 }
 
-/* Firefox */
+// Firefox
 @-moz-document url-prefix() {
-	// Not used: the Firefox side of the line breaking rules above.
-	// /* Avoid flex-wrap */
+	// @wordpress Not used: the Firefox side of the line breaking rules above.
+	// Avoid flex-wrap
 	// math {
 	// 	display: inline;
 	// }
 	// math > mrow {
 	// 	padding: 0;
 	// }
-	/* Adjust Firefox spacing between array rows */
+	// Adjust Firefox spacing between array rows
 	mtd,
 	mtable.tml-small mtd {
 		padding-top: 0;
@@ -265,7 +266,7 @@ mtable.tml-small mtd {
 	}
 }
 
-/* AMS environment auto-numbering via CSS counter. */
+// AMS environment auto-numbering via CSS counter.
 .tml-eqn::before {
 	counter-increment: tmlEqnNo;
 	content: "(" counter(tmlEqnNo) ")";
