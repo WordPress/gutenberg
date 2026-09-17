@@ -570,6 +570,14 @@ test.describe( 'Style Revisions', () => {
 				name: 'Reset the styles to the theme defaults',
 			} )
 		).toBeVisible();
+		// The selected revision is on the first page, so this page holds no
+		// selection and there is nothing to apply from it.
+		await expect(
+			page.getByRole( 'option', { selected: true } )
+		).toBeHidden();
+		await expect(
+			page.getByRole( 'button', { name: 'Apply' } )
+		).toBeDisabled();
 	} );
 } );
 
