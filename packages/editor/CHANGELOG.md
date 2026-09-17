@@ -10,7 +10,6 @@
 -   Add category filtering and search to the "Choose a pattern" modal shown when creating a new page or post. Only the categories containing start patterns for the current post type are listed, with labels pulled from the registered pattern categories ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
 -   `PostLastRevisionPanel`: Show the revisions button's focus ring with the design system's outline instead of a legacy box-shadow that doubled up with `Button`'s own ring ([#82955](https://github.com/WordPress/gutenberg/pull/82955)).
 
-
 ### Bug Fixes
 
 -   Distraction free: Raise the top bar above the notices overlay while it is revealed by hover or keyboard focus, so its controls are visible when focused instead of operable but hidden behind a notice. Also repoint the rule that overlays notices in distraction-free mode at the class the interface renders today ([#80349](https://github.com/WordPress/gutenberg/pull/80349)).
