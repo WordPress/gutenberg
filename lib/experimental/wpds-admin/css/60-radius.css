@@ -1,7 +1,7 @@
 /**
  * wp-admin corner radii, consolidated onto the design system scale.
  *
- * This is consolidation rather than restyling. Core's admin CSS carries 120
+ * This is consolidation rather than restyling. WordPress's admin CSS carries 120
  * border-radius declarations across 26 distinct values, including 3px, 5px, 9px
  * and 11px — values nobody chose as a system. The design system has five steps:
  *
