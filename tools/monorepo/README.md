@@ -21,6 +21,10 @@ Paths inside these presets fall into two groups, and the difference matters when
 
 ## Typings
 
-`typings/` holds the ambient type declarations the whole repo relies on: the `gutenberg-env`, `gutenberg-test-env` and `gutenberg-vitest-test-env` globals, the CSS and style-import module shims, and the stubs that stand in for packages that ship no types yet. They live here so `tsconfig/base.json` can point at them without walking out of the workspace, which is why it needs a single type root rather than one per consumer.
+`typings/` holds the ambient type declarations the whole repo relies on: the `gutenberg-env` and `gutenberg-vitest-test-env` declarations, the CSS and style-import module shims, and the stubs that stand in for packages that ship no types yet. They live here so `tsconfig/base.json` can point at them without walking out of the workspace, which is why it needs a single type root rather than one per consumer.
 
 See the TypeScript section of [`packages/README.md`](../../packages/README.md) for how a package lays its projects out.
+
+## Experimental API audit
+
+`npm run --workspace @wordpress/monorepo-tools list-experimental-apis` prints a Markdown list of every `__experimental` API in `packages/` and `lib/`, each linked to a GitHub search for it. Release leads run it to audit experimental APIs ahead of a major WordPress release, as in [the WordPress 6.2 audit](https://github.com/WordPress/gutenberg/issues/47196).
