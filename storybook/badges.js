@@ -1,9 +1,12 @@
 /**
- * Provides badge configuration options.
+ * Provides badge configuration options, keyed by the tag that triggers them.
  *
- * To apply a badge to a story, add a badge identifier prefixed by "status-" to
- * the `tags` array in the story's metadata. For example, to apply the "private"
- * badge, add "status-private" to the `tags` array.
+ * Tags live in two namespaces, because they answer two different questions.
+ * The `status-*` tags describe the API lifecycle, how a component can be
+ * imported, and are declared by hand in a story's `tags` array. The bare tags
+ * describe the design system's recommendation, whether a component should be
+ * used for new UI, and are added at index time from `parameters.componentStatus`.
+ * A component can carry one of each.
  *
  * @see https://github.com/Sidnioulz/storybook-addon-tag-badges
  */
@@ -12,8 +15,8 @@ import { statuses } from './components/component-status-indicator/statuses';
 
 /**
  * Recommendation statuses, declared per story as
- * `parameters.componentStatus`. The status indexer turns them into
- * `status-<value>` tags at index time, so they need no `tags` entry.
+ * `parameters.componentStatus`. The status indexer turns them into tags at
+ * index time, using the status as the tag, so they need no `tags` entry.
  */
 const statusDescriptions = {
 	recommended: 'Use this component for new UI.',
@@ -42,7 +45,7 @@ const statusBadges = Object.fromEntries(
  */
 const badges = {
 	...statusBadges,
-	private: {
+	'status-private': {
 		icon: '🔒',
 		title: '🔒 Private',
 		tooltip: {
@@ -56,7 +59,7 @@ const badges = {
 			],
 		},
 	},
-	wip: {
+	'status-wip': {
 		icon: '🚧',
 		title: '🚧 WIP',
 		styles: { backgroundColor: '#FFF0BD' },
@@ -65,7 +68,7 @@ const badges = {
 			desc: 'This component is not ready for use in production, including the Gutenberg codebase. DO NOT export outside of @wordpress/components.',
 		},
 	},
-	experimental: {
+	'status-experimental': {
 		icon: '🧪',
 		title: '🧪 Experimental',
 		tooltip: {

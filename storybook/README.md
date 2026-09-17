@@ -10,7 +10,7 @@ Run locally in your development environment running: `npm run storybook:dev` fro
 
 ## Component status in the sidebar
 
-Component pages declare their recommendation status with `parameters.componentStatus` (`recommended`, `use-with-caution`, `not-recommended` or `unaudited`). Parameters never reach the story index, so `status-indexer.ts` reads that value from the source at index time and tags every entry of the file with `status-<value>`. The sidebar shows the matching icon next to the component name, and the tag filter next to the search box can include or exclude any status. The `status-private`, `status-experimental` and `status-wip` tags are still declared by hand in each story's `tags` array; all badge definitions live in `badges.js`.
+Component pages declare their recommendation status with `parameters.componentStatus` (`recommended`, `use-with-caution`, `not-recommended` or `unaudited`). Parameters never reach the story index, so `status-indexer.ts` reads that value from the source at index time and tags every entry of the file with the status verbatim. The sidebar shows the matching icon next to the component name, and the tag filter next to the search box can include or exclude any status. These tags carry no prefix on purpose: `status-private`, `status-experimental` and `status-wip` describe the API lifecycle, how a component can be imported, and are still declared by hand in each story's `tags` array. Recommendation is a separate axis, so a component can carry one tag from each namespace, and the tag filter lists them as two groups rather than one enum. All badge definitions live in `badges.js`, keyed by the tag that triggers them.
 
 ## Manifest snapshot regression testing
 
