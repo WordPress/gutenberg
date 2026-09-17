@@ -3,19 +3,9 @@
 // https://github.com/ronkok/Temml/blob/v0.10.34/dist/Temml-Local.css in
 // upstream order, so it can be diffed against upstream when temml is updated.
 // `/* */` comments are upstream's; `//` comments are ours and never reach the
-// output. Formatting and a few equivalent property spellings differ where the
-// linter requires it. Any change to a rule is marked as a deviation.
-//
-// The parts we do not use stay in place, verbatim, behind these flags.
-
-// The Temml font would have to be shipped with the package, and the system
-// math font already covers the script capitals and primes it is used for.
-$temml-font: false;
-
-// Line breaking turns every `math` element into an inline flex container,
-// including the display math the Math block renders, and adds vertical
-// padding. It needs its own evaluation.
-$temml-line-breaking: false;
+// output. Rules we do not use are commented out in place, with the reason
+// above them. Formatting and a few equivalent property spellings differ where
+// the linter requires it. Any change to a rule is marked as a deviation.
 
 // The notation is written left to right in every language, so none of it is
 // flipped for RTL.
@@ -27,14 +17,14 @@ have been changed from ASCII to Unicode Mathematical Alphanumeric Symbols Script
 Unicode range 1D49C to 1D4B5.
 */
 
-@if $temml-font {
-	@font-face {
-		font-family: Temml;
-		src: url(Temml.woff2) format("woff2");
-		font-weight: 400;
-		font-style: normal;
-	}
-}
+// Not used: the font would have to be shipped with the package, and the
+// system math font already covers the script capitals and primes it is for.
+// @font-face {
+// 	font-family: Temml;
+// 	src: url(Temml.woff2) format("woff2");
+// 	font-weight: 400;
+// 	font-style: normal;
+// }
 
 math {
 	font-family: "Cambria Math", STIXTwoMath-Regular, math;
@@ -61,17 +51,14 @@ math.tml-display {
 	display: block;
 }
 
-@if $temml-font {
-	// stylelint-disable font-family-no-missing-generic-family-keyword -- Upstream rule, kept verbatim.
-	math .mathscr {
-		font-family: Temml;
-	}
-
-	mo.tml-prime {
-		font-family: Temml;
-	}
-	// stylelint-enable font-family-no-missing-generic-family-keyword
-}
+// Not used: see the font above.
+// math .mathscr {
+// 	font-family: Temml;
+// }
+//
+// mo.tml-prime {
+// 	font-family: Temml;
+// }
 
 /* Prevent f' from overlapping in Chromium */
 mo.prime-pad {
@@ -232,17 +219,18 @@ menclose {
 	}
 }
 
-@if $temml-line-breaking {
-	/* flex-wrap for line-breaking in Chromium */
-	math {
-		display: inline-flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-	}
-	math > mrow {
-		padding: 0.5ex 0;
-	}
-}
+// Not used: this turns every `math` element into an inline flex container,
+// including the display math the Math block renders, and adds vertical
+// padding. Line breaking of long inline formulas needs its own evaluation.
+// /* flex-wrap for line-breaking in Chromium */
+// math {
+// 	display: inline-flex;
+// 	flex-wrap: wrap;
+// 	align-items: baseline;
+// }
+// math > mrow {
+// 	padding: 0.5ex 0;
+// }
 
 /* Default mtd top padding is 0.5ex per MathML-Core and user-agent CSS */
 /* We adjust for jot and small */
@@ -257,15 +245,14 @@ mtable.tml-small mtd {
 
 /* Firefox */
 @-moz-document url-prefix() {
-	@if $temml-line-breaking {
-		/* Avoid flex-wrap */
-		math {
-			display: inline;
-		}
-		math > mrow {
-			padding: 0;
-		}
-	}
+	// Not used: the Firefox side of the line breaking rules above.
+	// /* Avoid flex-wrap */
+	// math {
+	// 	display: inline;
+	// }
+	// math > mrow {
+	// 	padding: 0;
+	// }
 	/* Adjust Firefox spacing between array rows */
 	mtd,
 	mtable.tml-small mtd {
