@@ -38,7 +38,17 @@ export const ChipWithRemove = forwardRef<
 			className={ clsx( styles.chip, className ) }
 			{ ...restProps }
 			aria-label={ chipAriaLabel }
-			aria-describedby={ clsx( ariaDescribedby, hintId ) || undefined }
+			render={ ( props, { disabled } ) => (
+				<div
+					{ ...props }
+					aria-describedby={
+						clsx(
+							ariaDescribedby,
+							! disabled && ! props[ 'aria-readonly' ] && hintId
+						) || undefined
+					}
+				/>
+			) }
 		>
 			{ prefix && (
 				<span className={ styles[ 'chip-prefix' ] }>{ prefix }</span>

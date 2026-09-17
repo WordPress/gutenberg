@@ -19,10 +19,22 @@ function getChipsToolbarLabel( selectedCount: number ): string | undefined {
 	return _n( 'Selected item', 'Selected items', selectedCount );
 }
 
-function getInputSelectionHint( selectedCount: number ): string | undefined {
+function getInputSelectionHint(
+	selectedCount: number,
+	canMoveToSelectedItems: boolean
+): string | undefined {
 	if ( selectedCount === 0 ) {
 		return undefined;
 	}
+
+	if ( ! canMoveToSelectedItems ) {
+		return sprintf(
+			/* translators: %d: number of selected items. */
+			_n( '%d item selected.', '%d items selected.', selectedCount ),
+			selectedCount
+		);
+	}
+
 	return sprintf(
 		/* translators: 1: number of selected items. 2: arrow key name ("Left Arrow" or "Right Arrow"). */
 		_n(
@@ -48,6 +60,7 @@ export const SearchableChipSelect = forwardRef<
 	{
 		children,
 		disabled,
+		readOnly,
 		emptyContent = __( 'No results found.' ),
 		statusContent,
 		items,
@@ -72,14 +85,17 @@ export const SearchableChipSelect = forwardRef<
 			items={ items }
 			multiple
 			disabled={ disabled }
+			readOnly={ readOnly }
 			{ ...restProps }
 		>
 			<Combobox.InputGroup>
 				<Combobox.Value>
 					{ ( value: Item[] ) => {
 						const selectedCount = value.length;
-						const selectionHint =
-							getInputSelectionHint( selectedCount );
+						const selectionHint = getInputSelectionHint(
+							selectedCount,
+							! disabled && ! readOnly
+						);
 
 						return (
 							<>
