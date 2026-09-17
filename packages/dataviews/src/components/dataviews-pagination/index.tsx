@@ -20,7 +20,18 @@ export function hasPaginationControls(
 	);
 }
 
-export function DataViewsPagination() {
+export interface DataViewsPaginationProps {
+	/**
+	 * The controls to render: the page select, the previous and next buttons,
+	 * or both. Each paginates on its own, so a narrow footer can render one
+	 * of them next to its actions.
+	 */
+	controls?: 'all' | 'page-select' | 'previous-next';
+}
+
+export function DataViewsPagination( {
+	controls = 'all',
+}: DataViewsPaginationProps ) {
 	const { view, onChangeView, paginationInfo } =
 		useContext( DataViewsContext );
 
@@ -57,70 +68,77 @@ export function DataViewsPagination() {
 			align="center"
 			gap="xl"
 		>
-			<Stack
-				direction="row"
-				justify="flex-start"
-				align="center"
-				gap="xs"
-				className="dataviews-pagination__page-select"
-			>
-				{ createInterpolateElement(
-					sprintf(
-						// translators: 1: Current page number, 2: Total number of pages.
-						_x( '<div>Page</div>%1$s<div>of %2$d</div>', 'paging' ),
-						'<CurrentPage />',
-						totalPages
-					),
-					{
-						div: <div aria-hidden />,
-						// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
-						CurrentPage: (
-							<WCSelectControl
-								aria-label={ __( 'Current page' ) }
-								value={ currentPage.toString() }
-								options={ pageSelectOptions }
-								onChange={ ( newValue ) => {
-									onChangeView( {
-										...view,
-										page: +newValue,
-									} );
-								} }
-								size="small"
-								variant="minimal"
-							/>
+			{ controls !== 'previous-next' && (
+				<Stack
+					direction="row"
+					justify="flex-start"
+					align="center"
+					gap="xs"
+					className="dataviews-pagination__page-select"
+				>
+					{ createInterpolateElement(
+						sprintf(
+							// translators: 1: Current page number, 2: Total number of pages.
+							_x(
+								'<div>Page</div>%1$s<div>of %2$d</div>',
+								'paging'
+							),
+							'<CurrentPage />',
+							totalPages
 						),
-					}
-				) }
-			</Stack>
-			<Stack direction="row" gap="xs" align="center">
-				<Button
-					onClick={ () =>
-						onChangeView( {
-							...view,
-							page: currentPage - 1,
-						} )
-					}
-					disabled={ currentPage === 1 }
-					accessibleWhenDisabled
-					label={ __( 'Previous page' ) }
-					icon={ isRTL() ? next : previous }
-					showTooltip
-					size="compact"
-					tooltipPosition="top"
-				/>
-				<Button
-					onClick={ () =>
-						onChangeView( { ...view, page: currentPage + 1 } )
-					}
-					disabled={ currentPage >= totalPages }
-					accessibleWhenDisabled
-					label={ __( 'Next page' ) }
-					icon={ isRTL() ? previous : next }
-					showTooltip
-					size="compact"
-					tooltipPosition="top"
-				/>
-			</Stack>
+						{
+							div: <div aria-hidden />,
+							// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
+							CurrentPage: (
+								<WCSelectControl
+									aria-label={ __( 'Current page' ) }
+									value={ currentPage.toString() }
+									options={ pageSelectOptions }
+									onChange={ ( newValue ) => {
+										onChangeView( {
+											...view,
+											page: +newValue,
+										} );
+									} }
+									size="small"
+									variant="minimal"
+								/>
+							),
+						}
+					) }
+				</Stack>
+			) }
+			{ controls !== 'page-select' && (
+				<Stack direction="row" gap="xs" align="center">
+					<Button
+						onClick={ () =>
+							onChangeView( {
+								...view,
+								page: currentPage - 1,
+							} )
+						}
+						disabled={ currentPage === 1 }
+						accessibleWhenDisabled
+						label={ __( 'Previous page' ) }
+						icon={ isRTL() ? next : previous }
+						showTooltip
+						size="compact"
+						tooltipPosition="top"
+					/>
+					<Button
+						onClick={ () =>
+							onChangeView( { ...view, page: currentPage + 1 } )
+						}
+						disabled={ currentPage >= totalPages }
+						accessibleWhenDisabled
+						label={ __( 'Next page' ) }
+						icon={ isRTL() ? previous : next }
+						showTooltip
+						size="compact"
+						tooltipPosition="top"
+					/>
+				</Stack>
+			) }
 		</Stack>
 	);
 }

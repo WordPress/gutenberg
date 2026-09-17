@@ -560,7 +560,7 @@ The following components are available directly under `DataViews`:
 -   `DataViews.Filters`
 -   `DataViews.Layout`
 -   `DataViews.LayoutSwitcher`
--   `DataViews.Pagination`
+-   `DataViews.Pagination`: the page select and the previous/next buttons. Pass `controls="page-select"` or `controls="previous-next"` to render only one of them, for instance in a footer too narrow for both next to its actions.
 -   `DataViews.BulkActionToolbar`
 -   `DataViews.ViewConfig`
 
