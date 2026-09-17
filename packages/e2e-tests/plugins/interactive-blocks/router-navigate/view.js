@@ -43,6 +43,20 @@ const { state } = store( 'router', {
 		toggleTimeout() {
 			state.timeout = state.timeout === 10000 ? 0 : 10000;
 		},
+		navigateWithExplicitInitiator: withSyncEvent( function* ( e ) {
+			e.preventDefault();
+			const { actions } =
+				yield import( '@wordpress/interactivity-router' );
+			yield actions.navigate( e.target.href, {
+				initiator: 'explicit-initiator',
+			} );
+		} ),
+		navigateWithNullInitiator: withSyncEvent( function* ( e ) {
+			e.preventDefault();
+			const { actions } =
+				yield import( '@wordpress/interactivity-router' );
+			yield actions.navigate( e.target.href, { initiator: null } );
+		} ),
 	},
 } );
 

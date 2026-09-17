@@ -769,6 +769,44 @@ store( 'myPlugin', {
 The `core/router` store and `state.url` are available and populated on page load, so there's no need to import the `@wordpress/interactivity-router` package to access them.
 </div>
 
+### Observing the navigation lifecycle
+
+The `core/router` store also exposes two reactive keys for observing the navigation lifecycle itself, independently of `state.url`:
+
+-   **`state.navigating`** — a boolean, `true` while a client-side navigation is in flight, from the moment it starts until the new content has been committed to the DOM. Every navigation is observable this way, including one that completes within a single frame (a cached or prefetched page) and one restored via the browser's back/forward buttons. Always read it by truthiness (`state.navigating`), never `=== false`, since a page where the router never loads simply doesn't have the key.
+-   **`state.initiator`** — a string identifying the `data-wp-router-region` that started the most recent navigation, or `null` when none was detected or declared. A navigation with no directive scope — the full-page popstate listener, a back/forward restore, a programmatic call outside any directive — always reads `null`.
+
+Unlike the deprecated `state.navigation.hasStarted` / `hasFinished` pair, `state.navigating` is not gated behind the 400ms loading-animation delay, is not affected by the `loadingAnimation` option, and correctly reflects overlapping navigations: if a second navigation starts before the first one finishes, `state.navigating` stays `true` continuously and `state.initiator` always reflects the most recently started one, with no gap even when the first navigation is the one that ends up superseded.
+
+The initiator is detected automatically by default: when `navigate()` is called from a directive scope (a click handler on a link inside a Query block, for example), the router derives the id of the innermost `data-wp-router-region` containing the element that triggered it. This means two instances of the same block on one page are already distinguishable, with no changes to the block itself. Pass an explicit `initiator` string to `navigate()` to override detection, or `null` to opt out of it entirely:
+
+```js
+// Declares an explicit identity, which always wins over detection.
+yield actions.navigate( '/page/', { initiator: 'my-widget' } );
+
+// Opts out of both detection and declaration.
+yield actions.navigate( '/page/', { initiator: null } );
+```
+
+Combining the two keys answers "is this specific region the origin of an in-flight navigation?":
+
+```js
+import { store, getContext } from '@wordpress/interactivity';
+
+const { state: routerState } = store( 'core/router' );
+
+store( 'my-plugin/query-loader', {
+	state: {
+		get isLoading() {
+			const { regionId } = getContext();
+			return !! routerState.navigating && routerState.initiator === regionId;
+		},
+	},
+} );
+```
+
+Bind that to `data-wp-class--is-active="state.isLoading"` on a loading overlay, and only the region that's actually navigating shows it — a second Query block on the same page, or a back/forward restore, correctly leaves it hidden.
+
 ## The Interactivity Router in depth
 
 This section provides a detailed technical explanation of how client-side navigation works internally. Understanding these internals can help you debug issues, optimize performance, and make informed decisions about how to structure your code.
