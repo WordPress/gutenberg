@@ -56,10 +56,13 @@ export async function getFocusOwnerLabel( this: Editor ) {
 			let editable = element?.closest< HTMLElement >(
 				'[contenteditable="true"]'
 			);
-			// While the active element is the editing host, the selected
-			// block's field has no contenteditable attribute of its own: the
-			// block element is the editable element.
-			if ( editable === activeElement ) {
+			// While the active element is the editing host of the canvas,
+			// the selected block's field has no contenteditable attribute of
+			// its own: the block element is the editable element.
+			if (
+				editable === activeElement &&
+				! activeElement.closest( '.block-editor-block-list__block' )
+			) {
 				editable = element?.closest< HTMLElement >(
 					'.block-editor-block-list__block'
 				);
