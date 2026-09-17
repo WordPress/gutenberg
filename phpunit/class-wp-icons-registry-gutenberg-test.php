@@ -515,4 +515,32 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 		$this->assertFalse( $result );
 		$this->assertFalse( $this->registry->is_registered( 'test-collection/invalid-visibility' ) );
 	}
+
+	/**
+	 * Provides every SVG file shipped in the `@wordpress/icons` library.
+	 *
+	 * @return array<string, array{0: string}> Data sets of [ $file_path ], keyed by icon slug.
+	 */
+	public function data_library_icons(): array {
+		$data = array();
+		foreach ( glob( gutenberg_dir_path() . 'packages/icons/src/library/*.svg' ) as $file_path ) {
+			$data[ basename( $file_path, '.svg' ) ] = array( $file_path );
+		}
+		return $data;
+	}
+
+	/**
+	 * Should preserve every element and attribute of a library icon.
+	 *
+	 * @dataProvider data_library_icons
+	 * @covers WP_Icons_Registry_Gutenberg::sanitize_icon_content
+	 *
+	 * @param string $file_path Absolute path to the library SVG file.
+	 */
+	public function test_sanitize_icon_content_preserves_library_icons( string $file_path ) {
+		$content = file_get_contents( $file_path );
+		// `wp_kses()` lowercases attribute names, so `viewBox` comes back as `viewbox`.
+		$expected = str_replace( 'viewBox=', 'viewbox=', $content );
+		$this->assertSame( $expected, $this->sanitize_icon_content( $content ) );
+	}
 }
