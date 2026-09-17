@@ -106,6 +106,9 @@
 		"lerna": {
 			"js-yaml": "4.3.2",
 			"pacote": "21.5.1"
+		},
+		"@y/websocket-server": {
+			"yjs": "npm:@y/y@^14.0.0-rc.7"
 		}
 	},
 	"scripts": {
