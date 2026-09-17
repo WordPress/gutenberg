@@ -127,17 +127,10 @@
 }
 
 .global-styles-ui__palette-preview {
-	display: inline-grid;
-	grid-auto-flow: column;
-	position: relative;
+	display: flex;
 
-	> .global-styles-ui__color-indicator-wrapper {
-		position: relative;
-		justify-self: start;
-
-		&:not(:first-of-type) {
-			margin-inline-start: calc(-1 * variables.$grid-unit);
-		}
+	> * + * {
+		margin-inline-start: calc(-1 * variables.$grid-unit);
 	}
 }
 

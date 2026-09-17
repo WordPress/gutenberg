@@ -18,6 +18,7 @@ function ColorIndicatorWrapper( {
 				className
 			) }
 			{ ...props }
+			expanded={ false }
 		>
 			{ children }
 		</Flex>
