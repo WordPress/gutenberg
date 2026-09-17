@@ -49,17 +49,23 @@ export async function getFocusOwnerLabel( this: Editor ) {
 			anchorNode &&
 			activeElement.contains( anchorNode )
 		) {
-			// The editable element within the block may be editable by
-			// inheritance from the editing host (contenteditable="inherit"),
-			// so accept any explicit editable marker except an opt-out.
-			const editable = (
+			const element =
 				anchorNode.nodeType === anchorNode.ELEMENT_NODE
 					? ( anchorNode as HTMLElement )
-					: anchorNode.parentElement
-			)?.closest< HTMLElement >( '[contenteditable], .rich-text' );
+					: anchorNode.parentElement;
+			let editable = element?.closest< HTMLElement >(
+				'[contenteditable="true"]'
+			);
+			// While the active element is the editing host, the selected
+			// block's field has no contenteditable attribute of its own: the
+			// block element is the editable element.
+			if ( editable === activeElement ) {
+				editable = element?.closest< HTMLElement >(
+					'.block-editor-block-list__block'
+				);
+			}
 			if (
 				editable &&
-				editable.isContentEditable &&
 				editable !== activeElement &&
 				focusNode &&
 				editable.contains( focusNode )
