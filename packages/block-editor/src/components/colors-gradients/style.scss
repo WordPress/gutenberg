@@ -161,7 +161,6 @@ $swatch-gap: 12px;
 	}
 }
 
-// Overlapping swatches (e.g. Link default + hover). Later siblings paint on top.
 .block-editor-panel-color-gradient-settings__color-indicators {
 	display: inline-grid;
 	grid-auto-flow: column;
