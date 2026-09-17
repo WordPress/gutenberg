@@ -165,7 +165,8 @@ test.describe( 'Site editor revisions shareable URLs', () => {
 		);
 	} );
 
-	test( 'should open the newest revision from the pages list action', async ( {
+	// The extensible site editor's lists do not offer the View revisions action.
+	test( 'should open the newest revision from the pages list action @site-editor-v1-only', async ( {
 		admin,
 		editor,
 		page,
