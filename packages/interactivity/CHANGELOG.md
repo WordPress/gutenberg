@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add the `data-wp-html` directive and `asDangerousHTML()` for rendering explicitly trusted HTML from reactive state. ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD))
+-   Add the `data-wp-html` directive and `asDangerousHTML()` for rendering explicitly trusted HTML from reactive state. ([#83092](https://github.com/WordPress/gutenberg/pull/83092))
 
 ## 6.55.0 (2026-09-10)
 
