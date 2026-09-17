@@ -56,6 +56,24 @@ function namespaceOf( file: string ): string {
 }
 
 /**
+ * Reads a file the index still lists. A path deleted from the working tree but
+ * not yet staged is reported and skipped, as `grep` skipped it in the shell
+ * script this replaces, so a dirty checkout still gets the full list.
+ *
+ * @param file Repository-relative path.
+ * @return File contents, or `undefined` when it could not be read.
+ */
+function readSource( file: string ): string | undefined {
+	try {
+		return readFileSync( path.join( REPO_ROOT, file ), 'utf8' );
+	} catch ( error ) {
+		const reason = error instanceof Error ? error.message : String( error );
+		process.stderr.write( `Skipped ${ file }: ${ reason }\n` );
+		return undefined;
+	}
+}
+
+/**
  * Orders strings by code unit, which is what `sort` does under `LC_ALL=C`. The
  * shell script this replaces used the caller's locale instead, so its output
  * varied by environment.
@@ -82,8 +100,12 @@ function experimentalApis(): [ string, string ][] {
 	const owners = new Map< string, string >();
 
 	for ( const file of sourceFiles() ) {
+		const source = readSource( file );
+		if ( source === undefined ) {
+			continue;
+		}
+
 		const namespace = namespaceOf( file );
-		const source = readFileSync( path.join( REPO_ROOT, file ), 'utf8' );
 		for ( const [ api ] of source.matchAll( EXPERIMENTAL_API ) ) {
 			const owner = owners.get( api );
 			if ( owner === undefined || namespace < owner ) {
