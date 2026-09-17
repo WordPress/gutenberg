@@ -604,7 +604,7 @@ Playlist track.
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Parent:** core/playlist
 -	**Supports:** interactivity (clientNavigation), ~~html~~, ~~reusable~~
--	**Attributes:** album, artist, blob, id, image, imageAlt, length, src, title, type
+-	**Attributes:** album, artist, blob, id, image, imageAlt, length, src, title, type, waveform
 
 ## Author (deprecated)
 
