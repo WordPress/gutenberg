@@ -11,7 +11,7 @@ import type {
 	SupportedLayouts,
 	View,
 } from '@wordpress/dataviews';
-import { Badge } from '@wordpress/ui';
+import { Badge, Stack } from '@wordpress/ui';
 import type { Revision } from './types';
 
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
@@ -304,11 +304,17 @@ function RevisionsList( {
 				actions={ actions }
 			>
 				<DataViewsPicker.Layout />
-				{ /* A single selection needs no count next to Apply. */ }
-				<DataViewsPicker.Footer>
-					<DataViewsPicker.Pagination />
+				{ /* One pagination control fits next to the action in the
+				     sidebar, and a single selection needs no count. */ }
+				<Stack
+					direction="row"
+					justify="space-between"
+					align="center"
+					className="global-styles-ui-screen-revisions__footer"
+				>
+					<DataViewsPicker.Pagination controls="page-select" />
 					<DataViewsPicker.Actions />
-				</DataViewsPicker.Footer>
+				</Stack>
 			</DataViewsPicker>
 		</div>
 	);
