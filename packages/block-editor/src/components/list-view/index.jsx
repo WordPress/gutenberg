@@ -87,6 +87,10 @@ const expansion = ( state, action ) => {
  * @param {string}         props.description            Optional accessible description for the tree grid component.
  * @param {?Function}      props.onSelect               Optional callback to be invoked when a block is selected. Receives the block object that was selected.
  * @param {?ComponentType} props.additionalBlockContent Component that renders additional block content UI.
+ * @param {?Function}      props.renderAppender         Optional private appender substitution for specialized list views.
+ *                                                      This is intentionally private because custom appenders need to
+ *                                                      preserve List View tree semantics while replacing Inserter UI.
+ * @param {?string}        props.appenderParentClientId Optional private target for showing the appender on a nested branch.
  * @param {Ref}            ref                          Forwarded ref
  */
 function ListViewComponent(
@@ -103,6 +107,8 @@ function ListViewComponent(
 		description,
 		onSelect,
 		additionalBlockContent: AdditionalBlockContent,
+		renderAppender,
+		appenderParentClientId,
 	},
 	ref
 ) {
@@ -421,6 +427,10 @@ function ListViewComponent(
 								selectedClientIds={ selectedClientIds }
 								isExpanded={ isExpanded }
 								showAppender={ showAppender }
+								renderAppender={ renderAppender }
+								appenderParentClientId={
+									appenderParentClientId
+								}
 							/>
 						</ListViewTreeStateContext.Provider>
 					</ListViewInsertedBlockContext.Provider>

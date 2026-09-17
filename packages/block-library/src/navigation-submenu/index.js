@@ -1,4 +1,4 @@
-import { page, addSubmenu } from '@wordpress/icons';
+import { addSubmenu } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
@@ -11,12 +11,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	icon: ( { context } ) => {
-		if ( context === 'list-view' ) {
-			return page;
-		}
-		return addSubmenu;
-	},
+	icon: addSubmenu,
 	__experimentalLabel( attributes, { context } ) {
 		const { label } = attributes;
 

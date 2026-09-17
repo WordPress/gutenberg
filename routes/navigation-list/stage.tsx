@@ -10,9 +10,14 @@ import { DataViews } from '@wordpress/dataviews';
 import { Button } from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
+import { navigation as navigationIcon } from '@wordpress/icons';
+import { EmptyState } from '@wordpress/ui';
 import { getActiveViewOverrides, type ViewOverrides } from './view-utils';
 import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
+import useNavigationLocations from '../navigation/use-navigation-locations';
+import { createLocationsField, NAVIGATION_USAGE_FIELD } from './fields/usage';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import './style.scss';
 
 // Unlock WordPress private APIs
@@ -37,7 +42,7 @@ function NavigationList() {
 	const searchParams = useSearch( { from: '/navigation/list' } );
 
 	const {
-		default_view: defaultView,
+		default_view: serverDefaultView,
 		default_layouts: defaultLayouts,
 		view_list: viewList,
 	} = useViewConfig( {
@@ -48,6 +53,21 @@ function NavigationList() {
 		() => getActiveViewOverrides( viewList, 'all' ),
 		[ viewList ]
 	);
+	// The site editor's navigation list shows where each menu is used, which
+	// the generic server-side view configuration knows nothing about.
+	const defaultView = useMemo( () => {
+		if ( ! serverDefaultView ) {
+			return serverDefaultView;
+		}
+
+		return {
+			...serverDefaultView,
+			fields: [
+				...( serverDefaultView.fields ?? [] ),
+				NAVIGATION_USAGE_FIELD,
+			],
+		};
+	}, [ serverDefaultView ] );
 
 	if ( ! defaultView ) {
 		// The route loader resolves the view configuration before the stage
@@ -116,6 +136,20 @@ function NavigationListView( {
 	const fields = usePostFields( {
 		postType: NAVIGATION_POST_TYPE,
 	} );
+	const { locationsMap, isResolving: isResolvingLocations } =
+		useNavigationLocations();
+	const locationsField = useMemo(
+		() =>
+			createLocationsField( {
+				locationsMap,
+				isResolving: isResolvingLocations,
+			} ),
+		[ locationsMap, isResolvingLocations ]
+	);
+	const navigationFields = useMemo(
+		() => ( fields ? [ ...fields, locationsField ] : fields ),
+		[ fields, locationsField ]
+	);
 	const [ showAddModal, setShowAddModal ] = useState( false );
 
 	const editAction = useEditNavigationAction();
@@ -140,6 +174,29 @@ function NavigationListView( {
 
 	const selection =
 		( searchParams.ids ?? [] ).map( ( id: number ) => id.toString() ) ?? [];
+	const emptyState =
+		! isResolving && totalItems === 0 ? (
+			<EmptyState.Root>
+				<EmptyState.Icon icon={ navigationIcon } />
+				<EmptyState.Title>
+					{ __( 'No navigation menus yet' ) }
+				</EmptyState.Title>
+				<EmptyState.Description>
+					{ __(
+						'Create your first menu to start adding links to your site navigation.'
+					) }
+				</EmptyState.Description>
+				<EmptyState.Actions>
+					<Button
+						variant="primary"
+						onClick={ () => setShowAddModal( true ) }
+						__next40pxDefaultSize
+					>
+						{ __( 'Add your first menu' ) }
+					</Button>
+				</EmptyState.Actions>
+			</EmptyState.Root>
+		) : undefined;
 
 	// Get the first navigation from the canvas loader if no selection
 	const firstNavigationId = useMemo( () => {
@@ -176,16 +233,17 @@ function NavigationListView( {
 			>
 				<DataViews
 					data={ navigationMenus }
-					fields={ fields }
+					fields={ navigationFields }
 					view={ view }
 					onChangeView={ updateView }
-					isLoading={ isResolving || ! fields }
+					isLoading={ isResolving || ! navigationFields }
 					actions={ actions }
 					paginationInfo={ {
 						totalItems,
 						totalPages,
 					} }
 					defaultLayouts={ defaultLayouts }
+					empty={ emptyState }
 					getItemId={ getItemId }
 					selection={ selection }
 					onReset={ isModified ? resetToDefault : false }

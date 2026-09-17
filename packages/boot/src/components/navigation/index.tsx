@@ -1,30 +1,51 @@
-import { useState, useMemo, useRef } from '@wordpress/element';
+import type { MouseEvent } from 'react';
+import { useEffect, useState, useMemo, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { Button } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { cog } from '@wordpress/icons';
+import { useNavigate } from '@wordpress/route';
 import { STORE_NAME } from '../../store';
 import NavigationItem from './navigation-item';
 import DrilldownItem from './drilldown-item';
 import DropdownItem from './dropdown-item';
 import NavigationScreen from './navigation-screen';
 import { useSidebarParent } from './use-sidebar-parent';
+import { useSidebarNavigationLayout } from './use-sidebar-navigation-layout';
+import { useActiveWorkspace } from '../workspaces';
 import type { MenuItem } from '../../store/types';
+import styles from './style.module.scss';
 
-function Navigation() {
+function Navigation( {
+	onRootChange,
+}: {
+	onRootChange?: ( isRoot: boolean ) => void;
+} ) {
+	const navigate = useNavigate();
 	const backButtonRef = useRef< HTMLButtonElement >( null );
 	const [ animationDirection, setAnimationDirection ] = useState<
 		'forward' | 'backward' | null
 	>( null );
-	const [ parentId, setParentId, parentDropdownId, setParentDropdownId ] =
-		useSidebarParent();
 	const menuItems = useSelect(
 		( select ) =>
 			// @ts-expect-error Store types are not available when selecting by store name.
 			select( STORE_NAME ).getMenuItems() as MenuItem[],
 		[]
 	);
+	const { activeWorkspace } = useActiveWorkspace();
+	const layout = useSidebarNavigationLayout( menuItems, activeWorkspace );
+	const [ parentId, setParentId, parentDropdownId, setParentDropdownId ] =
+		useSidebarParent( layout.getNavigationParentId );
 	const parent = useMemo(
-		() => menuItems.find( ( item ) => item.id === parentId ),
-		[ menuItems, parentId ]
+		() => layout.getItemById( parentId ),
+		[ layout, parentId ]
 	);
+	const isRoot = ! parent;
+
+	useEffect( () => {
+		onRootChange?.( isRoot );
+	}, [ isRoot, onRootChange ] );
+
 	// Create a unique key for the current navigation state
 	// The sidebar will animate when the key changes.
 	const navigationKey = parent ? `drilldown-${ parent.id }` : 'root';
@@ -48,16 +69,99 @@ function Navigation() {
 		);
 	};
 
-	const items = useMemo(
-		() => menuItems.filter( ( item ) => item.parent === parentId ),
-		[ menuItems, parentId ]
+	const items = useMemo( () => {
+		if ( ! parentId ) {
+			return layout.rootItems;
+		}
+
+		return layout.getItemsForParent( parentId );
+	}, [ layout, parentId ] );
+	const pinnedItems = parentId ? [] : layout.pinnedRootItems;
+
+	const hasRealIcons = [ ...items, ...pinnedItems ].some(
+		( item ) => !! item.icon
 	);
 
-	const hasRealIcons = items.some( ( item ) => !! item.icon );
+	const renderItem = ( item: MenuItem ) => {
+		const onClick =
+			item.id === 'home'
+				? ( event: MouseEvent< HTMLAnchorElement > ) => {
+						event.preventDefault();
+						navigate( {
+							to: '/',
+							search: () => ( {
+								homepagePreviewReset: Date.now().toString(),
+							} ),
+						} as never );
+					}
+				: undefined;
+
+		const action =
+			item.id === 'home' ? (
+				<Button
+					icon={ cog }
+					label={ __( 'Configure homepage' ) }
+					size="compact"
+					variant="tertiary"
+					onClick={ ( event: MouseEvent ) => {
+						event.preventDefault();
+						event.stopPropagation();
+						navigate( {
+							to: '/',
+							search: () => ( {
+								configureHomepage: '1',
+							} ),
+						} as never );
+					} }
+				/>
+			) : undefined;
+
+		if ( item.parent_type === 'dropdown' ) {
+			return (
+				<DropdownItem
+					key={ item.id }
+					id={ item.id }
+					icon={ item.icon }
+					shouldShowPlaceholder={ hasRealIcons }
+					isExpanded={ parentDropdownId === item.id }
+					onToggle={ () => handleDropdownToggle( item.id ) }
+				>
+					{ item.label }
+				</DropdownItem>
+			);
+		}
+
+		if ( item.parent_type === 'drilldown' ) {
+			return (
+				<DrilldownItem
+					key={ item.id }
+					id={ item.id }
+					icon={ item.icon }
+					shouldShowPlaceholder={ hasRealIcons }
+					onNavigate={ handleNavigate }
+				>
+					{ item.label }
+				</DrilldownItem>
+			);
+		}
+
+		return (
+			<NavigationItem
+				key={ item.id }
+				to={ item.to }
+				icon={ item.icon }
+				shouldShowPlaceholder={ hasRealIcons }
+				action={ action }
+				onClick={ onClick }
+			>
+				{ item.label }
+			</NavigationItem>
+		);
+	};
 
 	return (
 		<NavigationScreen
-			isRoot={ ! parent }
+			isRoot={ isRoot }
 			title={ parent ? parent.label : '' }
 			backMenuItem={ parent?.parent }
 			backButtonRef={ backButtonRef }
@@ -65,50 +169,16 @@ function Navigation() {
 			navigationKey={ navigationKey }
 			onNavigate={ handleNavigate }
 			content={
-				<div role="list">
-					{ items.map( ( item: MenuItem ) => {
-						if ( item.parent_type === 'dropdown' ) {
-							return (
-								<DropdownItem
-									key={ item.id }
-									id={ item.id }
-									icon={ item.icon }
-									shouldShowPlaceholder={ hasRealIcons }
-									isExpanded={ parentDropdownId === item.id }
-									onToggle={ () =>
-										handleDropdownToggle( item.id )
-									}
-								>
-									{ item.label }
-								</DropdownItem>
-							);
-						}
-
-						if ( item.parent_type === 'drilldown' ) {
-							return (
-								<DrilldownItem
-									key={ item.id }
-									id={ item.id }
-									icon={ item.icon }
-									shouldShowPlaceholder={ hasRealIcons }
-									onNavigate={ handleNavigate }
-								>
-									{ item.label }
-								</DrilldownItem>
-							);
-						}
-
-						return (
-							<NavigationItem
-								key={ item.id }
-								to={ item.to }
-								icon={ item.icon }
-								shouldShowPlaceholder={ hasRealIcons }
-							>
-								{ item.label }
-							</NavigationItem>
-						);
-					} ) }
+				<div
+					role="list"
+					className={ parent ? undefined : styles[ 'root-list' ] }
+				>
+					<div>{ items.map( renderItem ) }</div>
+					{ isRoot && pinnedItems.length > 0 && (
+						<div className={ styles[ 'pinned-root-items' ] }>
+							{ pinnedItems.map( renderItem ) }
+						</div>
+					) }
 				</div>
 			}
 		/>

@@ -4529,6 +4529,14 @@
 			"count": 1
 		}
 	},
+	"packages/boot/src/components/configure-homepage-modal/index.tsx": {
+		"@wordpress/use-import-as": {
+			"count": 1
+		},
+		"no-restricted-syntax": {
+			"count": 2
+		}
+	},
 	"packages/boot/src/components/navigation/drilldown-item/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -4547,6 +4555,32 @@
 	"packages/boot/src/components/navigation/navigation-screen/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		}
+	},
+	"packages/boot/src/components/navigation/use-sidebar-navigation-layout.ts": {
+		"@typescript-eslint/ban-ts-comment": {
+			"count": 1
+		}
+	},
+	"packages/boot/src/components/sidebar/customize-navigation.tsx": {
+		"@typescript-eslint/ban-ts-comment": {
+			"count": 1
+		},
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"no-restricted-syntax": {
+			"count": 1
+		}
+	},
+	"packages/boot/src/components/sidebar/index.tsx": {
+		"@typescript-eslint/ban-ts-comment": {
+			"count": 1
+		}
+	},
+	"packages/boot/src/components/workspaces/index.ts": {
+		"@typescript-eslint/ban-ts-comment": {
+			"count": 1
 		}
 	},
 	"packages/commands/src/components/command-menu.jsx": {
@@ -6119,6 +6153,11 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/header/inline-global-entity-save-button.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/inserter-sidebar/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -6722,6 +6761,11 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/post-template/page-layout-panel.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/post-template/panel.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -6899,6 +6943,11 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/sidebar/inline-template-part-summary.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/sidebar/post-revision-summary.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -6972,6 +7021,9 @@
 		}
 	},
 	"packages/editor/src/components/sync-connection-error-modal/index.tsx": {
+		"@typescript-eslint/ban-ts-comment": {
+			"count": 1
+		},
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
@@ -7636,6 +7688,9 @@
 		}
 	},
 	"packages/lazy-editor/src/components/preview/index.tsx": {
+		"@typescript-eslint/ban-ts-comment": {
+			"count": 1
+		},
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		}
@@ -7980,8 +8035,35 @@
 			"count": 1
 		}
 	},
+	"routes/navigation-edit/add-menu-items-modal.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"no-restricted-syntax": {
+			"count": 2
+		}
+	},
+	"routes/navigation-edit/editor/content.tsx": {
+		"@typescript-eslint/ban-ts-comment": {
+			"count": 1
+		},
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"no-restricted-syntax": {
+			"count": 1
+		}
+	},
 	"routes/navigation-edit/editor/index.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
+			"count": 1
+		}
+	},
+	"routes/navigation-edit/stage.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"no-restricted-syntax": {
 			"count": 1
 		}
 	},
@@ -7995,8 +8077,43 @@
 			"count": 1
 		}
 	},
+	"routes/navigation/locations-canvas.tsx": {
+		"@wordpress/use-import-as": {
+			"count": 1
+		},
+		"no-restricted-syntax": {
+			"count": 1
+		}
+	},
 	"routes/pattern-list/stage.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
+			"count": 1
+		},
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"routes/post-list/add-page-flow.tsx": {
+		"@wordpress/use-import-as": {
+			"count": 1
+		},
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"no-restricted-syntax": {
+			"count": 2
+		}
+	},
+	"routes/post-list/configure-homepage-modal.tsx": {
+		"@wordpress/use-import-as": {
+			"count": 1
+		},
+		"no-restricted-syntax": {
+			"count": 2
+		}
+	},
+	"routes/post-list/post-type-templates-tab.tsx": {
+		"@typescript-eslint/ban-ts-comment": {
 			"count": 1
 		},
 		"@wordpress/use-recommended-components": {
@@ -8009,6 +8126,9 @@
 		}
 	},
 	"routes/post-list/stage.tsx": {
+		"@typescript-eslint/ban-ts-comment": {
+			"count": 1
+		},
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		},

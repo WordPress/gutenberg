@@ -83,6 +83,13 @@
 	}
 }
 
+.block-editor-edit-section-button__modal-actions {
+	display: flex;
+	gap: $grid-unit-10;
+	justify-content: flex-end;
+	margin-top: $grid-unit-30;
+}
+
 .block-editor-block-contextual-toolbar {
 	position: sticky;
 	top: 0;

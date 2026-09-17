@@ -130,6 +130,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isMultiSelected,
 		isPartiallySelected,
 		isReusable,
+		isUniversalCanvasGlobalSection,
 		isDragging,
 		hasChildSelected,
 		isEditingDisabled,
@@ -248,6 +249,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-multi-selected': isMultiSelected,
 				'is-partially-selected': isPartiallySelected,
 				'is-reusable': isReusable,
+				'is-universal-canvas-global-section':
+					isUniversalCanvasGlobalSection,
 				'is-dragging': isDragging,
 				'has-child-selected': hasChildSelected,
 				'is-editing-disabled': isEditingDisabled,

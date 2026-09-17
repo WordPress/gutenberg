@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { Spinner } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { useStylesId } from '../../hooks/use-styles-id';
 import { useEditorSettings } from '../../hooks/use-editor-settings';
 import { useEditorAssets } from '../../hooks/use-editor-assets';
@@ -15,7 +15,11 @@ const {
 	PreferencesModal,
 	ToolsMoreMenuGroup,
 	SiteExport,
+	interfaceStore,
 } = unlock( editorPrivateApis );
+
+const ISOLATED_POST_TYPES = [ 'wp_template_part', 'wp_block', 'wp_navigation' ];
+const PAGE_DOCUMENT_SIDEBAR = 'edit-post/document';
 
 interface EditorProps {
 	postType?: string;
@@ -75,6 +79,9 @@ export function Editor( {
 			if ( resolvedPostType === 'wp_template' ) {
 				return resolvedPostId;
 			}
+			if ( ISOLATED_POST_TYPES.includes( resolvedPostType ) ) {
+				return undefined;
+			}
 			// Use private API to get template ID for this post
 			return unlock( select( coreDataStore ) ).getTemplateId(
 				resolvedPostType,
@@ -109,6 +116,37 @@ export function Editor( {
 		} ),
 		[ editorSettings, settings ]
 	);
+	const editorKey = [
+		resolvedPostType,
+		resolvedPostId,
+		templateId,
+		finalSettings.isPreviewMode ? 'preview' : 'edit',
+	].join( ':' );
+	const openedPageSidebarForRef = useRef< string | undefined >();
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const shouldOpenPageSidebar =
+		resolvedPostType === 'page' &&
+		!! resolvedPostId &&
+		! finalSettings.isPreviewMode;
+	const pageSidebarKey = shouldOpenPageSidebar
+		? `${ resolvedPostType }:${ resolvedPostId }`
+		: undefined;
+
+	useEffect( () => {
+		if ( ! settingsReady || ! assetsReady || ! pageSidebarKey ) {
+			return;
+		}
+		if ( openedPageSidebarForRef.current === pageSidebarKey ) {
+			return;
+		}
+		openedPageSidebarForRef.current = pageSidebarKey;
+		enableComplementaryArea( 'core', PAGE_DOCUMENT_SIDEBAR );
+	}, [
+		assetsReady,
+		enableComplementaryArea,
+		pageSidebarKey,
+		settingsReady,
+	] );
 
 	// Show loading spinner while assets or settings are loading
 	if ( ! settingsReady || ! assetsReady ) {
@@ -129,6 +167,7 @@ export function Editor( {
 	// Render the editor when ready
 	return (
 		<PrivateEditor
+			key={ editorKey }
 			postType={ resolvedPostType }
 			postId={ resolvedPostId }
 			templateId={ templateId }

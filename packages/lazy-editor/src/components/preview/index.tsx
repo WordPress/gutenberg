@@ -1,6 +1,7 @@
+import type { ReactNode } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useId, useMemo } from '@wordpress/element';
-// @ts-expect-error Block Editor not fully typed yet.
+// @ts-ignore No exported types.
 import { BlockPreview, BlockEditorProvider } from '@wordpress/block-editor';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { parse } from '@wordpress/blocks';
@@ -11,15 +12,21 @@ import { useEditorSettings } from '../../hooks/use-editor-settings';
 import { useStylesId } from '../../hooks/use-styles-id';
 
 const { useStyle } = unlock( editorPrivateApis );
+const UntypedBlockPreview = BlockPreview as any;
+const AsyncBlockPreview = UntypedBlockPreview.Async;
 
 function PreviewContent( {
 	blocks,
 	content,
 	description,
+	placeholder,
+	viewportWidth,
 }: {
 	blocks?: any[];
 	content?: string;
 	description: string;
+	placeholder?: ReactNode;
+	viewportWidth?: number;
 } ) {
 	const descriptionId = useId();
 	const backgroundColor = useStyle( 'color.background' );
@@ -41,9 +48,12 @@ function PreviewContent( {
 		>
 			{ isEmpty && __( 'Empty.' ) }
 			{ ! isEmpty && (
-				<BlockPreview.Async>
-					<BlockPreview blocks={ actualBlocks } />
-				</BlockPreview.Async>
+				<AsyncBlockPreview placeholder={ placeholder }>
+					<UntypedBlockPreview
+						blocks={ actualBlocks }
+						viewportWidth={ viewportWidth }
+					/>
+				</AsyncBlockPreview>
 			) }
 			{ !! description && (
 				<div hidden id={ descriptionId }>
@@ -58,10 +68,14 @@ export function Preview( {
 	blocks,
 	content,
 	description,
+	placeholder,
+	viewportWidth,
 }: {
 	blocks?: any[];
 	content?: string;
 	description: string;
+	placeholder?: ReactNode;
+	viewportWidth?: number;
 } ) {
 	// Resolve styles ID from template
 	const stylesId = useStylesId();
@@ -79,14 +93,16 @@ export function Preview( {
 		[ editorSettings ]
 	);
 	if ( ! settingsReady || ! assetsReady ) {
-		return null;
+		return placeholder ?? null;
 	}
 	return (
-		<BlockEditorProvider settings={ finalSettings }>
+		<BlockEditorProvider key="assets-ready" settings={ finalSettings }>
 			<PreviewContent
 				blocks={ blocks }
 				content={ content }
 				description={ description }
+				placeholder={ placeholder }
+				viewportWidth={ viewportWidth }
 			/>
 		</BlockEditorProvider>
 	);

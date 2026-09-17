@@ -10,8 +10,13 @@
 		"types": []
 	},
 	"references": [
+		{ "path": "../../packages/components/tsconfig.build.json" },
 		{ "path": "../../packages/core-data/tsconfig.build.json" },
-		{ "path": "../../packages/data" }
+		{ "path": "../../packages/data" },
+		{ "path": "../../packages/i18n/tsconfig.build.json" },
+		{ "path": "../../packages/icons/tsconfig.build.json" },
+		{ "path": "../../packages/route/tsconfig.json" },
+		{ "path": "../../packages/url/tsconfig.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],
 	"exclude": [ "build", "node_modules" ]
