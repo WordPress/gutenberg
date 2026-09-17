@@ -71,14 +71,23 @@ function ScreenRevisions() {
 		return query.page === 1 ? revisions[ 0 ] : undefined;
 	}, [ revisionId, revisions, query.page ] );
 
+	// The entry for the styles the editor shows is the first one of page one:
+	// the unsaved changes when there are any, else the latest revision.
+	const activeRevisionId = query.page === 1 ? revisions[ 0 ]?.id : undefined;
+
 	// A revision is applicable when it isn't the styles the editor already
 	// shows. The footer action's eligibility and the list's Active badge both
-	// read this, so the button and the badge can't contradict each other.
+	// read this, so the button and the badge can't contradict each other. The
+	// active entry is recognised by id as well as by payload: the revisions
+	// endpoint and the global styles endpoint need not serialize the same
+	// styles identically, and a payload comparison alone could then report a
+	// difference for the very revision the editor is showing.
 	const isRevisionApplicable = useCallback(
 		( revision: Revision ) =>
 			'unsaved' !== revision.id &&
+			revision.id !== activeRevisionId &&
 			! areGlobalStylesEqual( revision, currentEditorGlobalStyles ),
-		[ currentEditorGlobalStyles ]
+		[ activeRevisionId, currentEditorGlobalStyles ]
 	);
 
 	const isSelectedRevisionApplicable =
