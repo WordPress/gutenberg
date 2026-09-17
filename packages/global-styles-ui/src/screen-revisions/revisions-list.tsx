@@ -268,10 +268,7 @@ function RevisionsList( {
 								/>
 							) }
 							{ ! canApplyRevision && (
-								<Badge
-									className="global-styles-ui-screen-revisions__active-badge"
-									intent="informational"
-								>
+								<Badge intent="informational">
 									{ __( 'Active' ) }
 								</Badge>
 							) }
