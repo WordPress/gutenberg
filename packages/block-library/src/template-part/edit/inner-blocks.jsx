@@ -103,16 +103,15 @@ function EditableTemplatePartInnerBlocks( {
 		[]
 	);
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		'postType',
-		'wp_template_part',
-		{ id }
-	);
+	const [ blocks, onInput, onChange, { selection, onChangeSelection } ] =
+		useEntityBlockEditor( 'postType', 'wp_template_part', { id } );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		value: blocks,
 		onInput,
 		onChange,
+		selection,
+		onChangeSelection,
 		renderAppender: useRenderAppender( hasInnerBlocks ),
 		layout: useLayout( layout ),
 	} );

@@ -116,30 +116,37 @@ function restoreSelectionIds( selectionState, mapping ) {
  *   controllers.
  * - Passes selection state from the block-editor store to the controlling entity.
  *
- * @param {Object}        props          Props for the block sync hook
- * @param {string}        props.clientId The client ID of the inner block controller.
- *                                       If none is passed, then it is assumed to be a
- *                                       root controller rather than an inner block
- *                                       controller.
- * @param {Object[]}      props.value    The control value for the blocks. This value
- *                                       is used to initialize the block-editor store
- *                                       and for resetting the blocks to incoming
- *                                       changes like undo.
- * @param {onBlockUpdate} props.onChange Function to call when a persistent
- *                                       change has been made in the block-editor blocks
- *                                       for the given clientId. For example, after
- *                                       this function is called, an entity is marked
- *                                       dirty because it has changes to save.
- * @param {onBlockUpdate} props.onInput  Function to call when a non-persistent
- *                                       change has been made in the block-editor blocks
- *                                       for the given clientId. When this is called,
- *                                       controlling sources do not become dirty.
+ * @param {Object}        props                     Props for the block sync hook
+ * @param {string}        props.clientId            The client ID of the inner block controller.
+ *                                                  If none is passed, then it is assumed to be a
+ *                                                  root controller rather than an inner block
+ *                                                  controller.
+ * @param {Object[]}      props.value               The control value for the blocks. This value
+ *                                                  is used to initialize the block-editor store
+ *                                                  and for resetting the blocks to incoming
+ *                                                  changes like undo.
+ * @param {onBlockUpdate} props.onChange            Function to call when a persistent
+ *                                                  change has been made in the block-editor blocks
+ *                                                  for the given clientId. For example, after
+ *                                                  this function is called, an entity is marked
+ *                                                  dirty because it has changes to save.
+ * @param {onBlockUpdate} props.onInput             Function to call when a non-persistent
+ *                                                  change has been made in the block-editor blocks
+ *                                                  for the given clientId. When this is called,
+ *                                                  controlling sources do not become dirty.
+ * @param {Object}        [props.selection]         The controlling entity's own selection
+ *                                                  (e.g. from `useEntityBlockEditor`), applied
+ *                                                  directly on undo/redo of that entity.
+ * @param {Function}      [props.onChangeSelection] Persists a selection change onto the
+ *                                                  controlling entity itself.
  */
 export default function useBlockSync( {
 	clientId = null,
 	value: controlledBlocks,
 	onChange = noop,
 	onInput = noop,
+	selection: entitySelection,
+	onChangeSelection: onEntityChangeSelection,
 } ) {
 	const registry = useRegistry();
 	const { getSelection, onChangeSelection } = useContext( SelectionContext );
@@ -167,14 +174,65 @@ export default function useBlockSync( {
 	// Tracks which context selection has already been applied, to avoid
 	// duplicate restoration.
 	const appliedSelectionRef = useRef( null );
+	// Same, for props.selection.
+	const appliedEntitySelectionRef = useRef( null );
 	// Flag to prevent the subscription from re-reporting a selection
 	// change that was just restored from context (which would loop).
 	const isRestoringSelectionRef = useRef( false );
+
+	// Applies a selection already scoped to this controller.
+	const applySelection = ( selection ) => {
+		// Inner block controllers need to convert external→internal
+		// IDs via the clone mapping; the root controller uses
+		// external IDs directly (no mapping needed).
+		const convert = ( sel ) => {
+			if ( ! sel?.clientId || ! clientId ) {
+				return sel;
+			}
+			return {
+				...sel,
+				clientId:
+					idMappingRef.current.externalToInternal.get(
+						sel.clientId
+					) ?? sel.clientId,
+			};
+		};
+		// Flag prevents the subscription from re-reporting this
+		// selection change back to the entity (which would cause
+		// an infinite update loop).
+		isRestoringSelectionRef.current = true;
+		resetSelection(
+			convert( selection.selectionStart ),
+			convert( selection.selectionEnd ),
+			selection.initialPosition
+		);
+		isRestoringSelectionRef.current = false;
+	};
+
+	// Restores selection from this controller's own entity. No ownership
+	// check needed: this can only ever reference this entity's own blocks.
+	// Returns true if a restoration was applied.
+	const restoreEntitySelection = () => {
+		if (
+			! entitySelection?.selectionStart?.clientId ||
+			entitySelection === appliedEntitySelectionRef.current
+		) {
+			return false;
+		}
+		appliedEntitySelectionRef.current = entitySelection;
+		applySelection( entitySelection );
+		return true;
+	};
 
 	// Restores selection from the SelectionContext using the current
 	// idMapping.  Called after blocks are (re-)cloned so that the
 	// mapping is guaranteed to be fresh.
 	const restoreSelection = () => {
+		// The entity's own selection takes priority over the shared context.
+		if ( restoreEntitySelection() ) {
+			return;
+		}
+
 		const selection = getSelection();
 		if (
 			! selection?.selectionStart?.clientId ||
@@ -196,31 +254,7 @@ export default function useBlockSync( {
 
 		if ( isOurs ) {
 			appliedSelectionRef.current = selection;
-			// Inner block controllers need to convert external→internal
-			// IDs via the clone mapping; the root controller uses
-			// external IDs directly (no mapping needed).
-			const convert = ( sel ) => {
-				if ( ! sel?.clientId || ! clientId ) {
-					return sel;
-				}
-				return {
-					...sel,
-					clientId:
-						idMappingRef.current.externalToInternal.get(
-							sel.clientId
-						) ?? sel.clientId,
-				};
-			};
-			// Flag prevents the subscription from re-reporting this
-			// selection change back to the entity (which would cause
-			// an infinite update loop).
-			isRestoringSelectionRef.current = true;
-			resetSelection(
-				convert( selection.selectionStart ),
-				convert( selection.selectionEnd ),
-				selection.initialPosition
-			);
-			isRestoringSelectionRef.current = false;
+			applySelection( selection );
 		}
 	};
 
@@ -258,11 +292,10 @@ export default function useBlockSync( {
 				} );
 				replaceInnerBlocks( clientId, storeBlocks );
 
-				// Invalidate the applied-selection ref so that
-				// restoreSelection() at the end of the
-				// controlledBlocks effect re-applies with the
-				// freshly-built mapping (new internal IDs).
+				// Invalidate applied-selection refs so restoreSelection()
+				// re-applies with the freshly-built mapping.
 				appliedSelectionRef.current = null;
+				appliedEntitySelectionRef.current = null;
 			} );
 		} else {
 			if ( subscribedRef.current ) {
@@ -490,14 +523,15 @@ export default function useBlockSync( {
 								initialPosition:
 									getSelectedBlocksInitialCaretPosition(),
 							};
-							onChangeSelection(
-								clientId
-									? restoreSelectionIds(
-											selectionInfo,
-											idMappingRef.current
-										)
-									: selectionInfo
-							);
+							const externalSelectionInfo = clientId
+								? restoreSelectionIds(
+										selectionInfo,
+										idMappingRef.current
+									)
+								: selectionInfo;
+							onChangeSelection( externalSelectionInfo );
+							// Also persist onto this controller's own entity.
+							onEntityChangeSelection?.( externalSelectionInfo );
 						}
 					}
 				} );

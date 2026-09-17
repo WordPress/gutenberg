@@ -5,10 +5,8 @@ import { useRef } from '@wordpress/element';
 import useIsDraggingWithin from './use-is-dragging-within';
 
 export default function WidgetAreaInnerBlocks( { id } ) {
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		'root',
-		'postType'
-	);
+	const [ blocks, onInput, onChange, { selection, onChangeSelection } ] =
+		useEntityBlockEditor( 'root', 'postType' );
 	const innerBlocksRef = useRef();
 	const isDraggingWithinInnerBlocks = useIsDraggingWithin( innerBlocksRef );
 	const shouldHighlightDropZone = isDraggingWithinInnerBlocks;
@@ -19,6 +17,8 @@ export default function WidgetAreaInnerBlocks( { id } ) {
 			value: blocks,
 			onInput,
 			onChange,
+			selection,
+			onChangeSelection,
 			templateLock: false,
 			renderAppender: InnerBlocks.ButtonBlockAppender,
 		}

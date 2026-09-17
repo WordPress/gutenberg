@@ -75,12 +75,16 @@ function EditableContentLoaded( {
 	blocks,
 	onInput,
 	onChange,
+	selection,
+	onChangeSelection,
 	tagName: TagName = 'div',
 } ) {
 	const props = useInnerBlocksProps( blockProps, {
 		value: blocks,
 		onInput,
 		onChange,
+		selection,
+		onChangeSelection,
 	} );
 	return <TagName { ...props } />;
 }
@@ -88,11 +92,8 @@ function EditableContentLoaded( {
 function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 	const { postType, postId } = context;
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		'postType',
-		postType,
-		{ id: postId }
-	);
+	const [ blocks, onInput, onChange, { selection, onChangeSelection } ] =
+		useEntityBlockEditor( 'postType', postType, { id: postId } );
 
 	// Wait for the entity record before mounting the inner blocks area, so
 	// that an empty `blocks` value means an empty post rather than one that
@@ -124,6 +125,8 @@ function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 			blocks={ blocks }
 			onInput={ onInput }
 			onChange={ onChange }
+			selection={ selection }
+			onChangeSelection={ onChangeSelection }
 			tagName={ TagName }
 		/>
 	);
