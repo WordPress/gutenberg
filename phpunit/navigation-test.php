@@ -9,11 +9,11 @@ class WP_Navigation_Test extends WP_UnitTestCase {
 	const NAVIGATION_POST_TYPE     = 'wp_navigation';
 	const NON_NAVIGATION_POST_TYPE = 'wp_non_navigation';
 
-	public function setUp() {
+	public function set_up() {
 		$this->enable_editor_support();
 	}
 
-	public function tearDown() {
+	public function tear_down() {
 		$this->enable_editor_support();
 	}
 
