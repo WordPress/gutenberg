@@ -12,7 +12,7 @@ import {
 import { isAppleOS } from '@wordpress/keycodes';
 import { inertValue } from '@wordpress/react-inert-value';
 import DataViewsContext from '../../dataviews-context';
-import TableSelectionContext from '../../dataviews-layout/table-selection-context';
+import TableSelectionContext from '../../dataviews-bulk-actions/table-selection-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import ItemActions from '../../dataviews-item-actions';
 import { MEDIA_ASPECT_RATIOS, sortValues } from '../../../constants';
