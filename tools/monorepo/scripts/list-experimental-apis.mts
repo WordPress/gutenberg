@@ -1,0 +1,99 @@
+/**
+ * Generate a Markdown-formatted list of experimental APIs found across our
+ * packages and lib, providing GitHub search links for each match.
+ *
+ * Experimental APIs must be regularly audited, particularly in the context of
+ * major WordPress releases. This script allows release leads to generate a list
+ * to share in release issues.
+ *
+ * @see example audit issue for WordPress 6.2:
+ * https://github.com/WordPress/gutenberg/issues/47196
+ */
+
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const REPO_ROOT = path.resolve(
+	path.dirname( fileURLToPath( import.meta.url ) ),
+	'../../..'
+);
+const SOURCE_EXTENSIONS = new Set( [ '.js', '.ts', '.jsx', '.tsx', '.php' ] );
+const EXPERIMENTAL_API = /__experimental\w+/g;
+
+/**
+ * Lists the tracked sources to scan. Git is the only binary this script needs:
+ * it already knows which files are ours, ignored build output included.
+ *
+ * @return Repository-relative paths.
+ */
+function sourceFiles(): string[] {
+	const output = execFileSync(
+		'git',
+		[ 'ls-files', '-z', 'packages', 'lib' ],
+		{ cwd: REPO_ROOT, encoding: 'utf8', maxBuffer: Infinity }
+	);
+
+	return output
+		.split( '\0' )
+		.filter(
+			( file ) =>
+				SOURCE_EXTENSIONS.has( path.extname( file ) ) &&
+				! file.includes( '__tests__' )
+		);
+}
+
+/**
+ * Attributes a file to the package that owns it.
+ *
+ * @param file Repository-relative path.
+ * @return Package directory, or `lib` for the plugin's PHP.
+ */
+function namespaceOf( file: string ): string {
+	const [ first, second ] = file.split( '/' );
+	return first === 'lib' ? 'lib' : `${ first }/${ second }`;
+}
+
+/**
+ * Collects every experimental API with the package it was found in. An API
+ * exported by one package and consumed by another is reported once, under
+ * whichever package sorts first.
+ *
+ * @return `[ namespace, api ]` pairs, sorted and deduplicated.
+ */
+function experimentalApis(): [ string, string ][] {
+	const found = new Set< string >();
+
+	for ( const file of sourceFiles() ) {
+		const source = readFileSync( path.join( REPO_ROOT, file ), 'utf8' );
+		for ( const [ api ] of source.matchAll( EXPERIMENTAL_API ) ) {
+			found.add( `${ namespaceOf( file ) } ${ api }` );
+		}
+	}
+
+	const known = new Set< string >();
+	return [ ...found ]
+		.sort()
+		.map( ( entry ) => entry.split( ' ' ) as [ string, string ] )
+		.filter( ( [ , api ] ) => {
+			if ( known.has( api ) ) {
+				return false;
+			}
+			known.add( api );
+			return true;
+		} );
+}
+
+let previousNamespace: string | undefined;
+let output = '';
+
+for ( const [ namespace, api ] of experimentalApis() ) {
+	if ( previousNamespace !== namespace ) {
+		output += `${ previousNamespace ? '\n' : '' }## \`${ namespace }\`\n`;
+		previousNamespace = namespace;
+	}
+	output += `[\`${ api }\`](/WordPress/gutenberg/search?q=${ api })\n`;
+}
+
+process.stdout.write( output );

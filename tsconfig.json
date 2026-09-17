@@ -91,6 +91,7 @@
 		{ "path": "routes/template-part" },
 		{ "path": "routes/template-part-list" },
 		{ "path": "storybook" },
+		{ "path": "tools/monorepo" },
 		{ "path": "tools/pr-meta" },
 		{ "path": "test/e2e" },
 		{ "path": "test/performance" },
