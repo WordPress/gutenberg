@@ -304,7 +304,11 @@ function RevisionsList( {
 				actions={ actions }
 			>
 				<DataViewsPicker.Layout />
-				<DataViewsPicker.Footer />
+				{ /* A single selection needs no count next to Apply. */ }
+				<DataViewsPicker.Footer>
+					<DataViewsPicker.Pagination />
+					<DataViewsPicker.Actions />
+				</DataViewsPicker.Footer>
 			</DataViewsPicker>
 		</div>
 	);
