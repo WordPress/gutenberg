@@ -109,7 +109,16 @@ const baseConfig = {
 		alias: {
 			'lodash-es': 'lodash',
 		},
-		extensions: [ '.jsx', '.ts', '.tsx', '.mts', '.cts', '...' ],
+		extensions: [
+			'.jsx',
+			'.mjs',
+			'.cjs',
+			'.ts',
+			'.tsx',
+			'.mts',
+			'.cts',
+			'...',
+		],
 	},
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.

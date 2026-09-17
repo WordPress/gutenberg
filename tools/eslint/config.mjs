@@ -68,9 +68,9 @@ function dedupePlugins( configs ) {
  * Extension globs. Node runs `.mts` and `.cts` through type stripping, so they
  * are linted wherever `.ts` is.
  */
-const SCRIPT_EXT = '@([cm]ts|js|jsx|ts|tsx)';
+const SCRIPT_EXT = '@([cm]js|[cm]ts|js|jsx|ts|tsx)';
 const TS_EXT = '@([cm]ts|ts|tsx)';
-const SCRIPT_EXT_NO_JSX = '@([cm]ts|js|ts)';
+const SCRIPT_EXT_NO_JSX = '@([cm]js|[cm]ts|js|ts)';
 
 /**
  * The list of patterns matching files used only for development purposes.

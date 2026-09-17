@@ -5,7 +5,7 @@ import { globSync } from 'glob';
  * Extension glob shared by every pattern below. Node runs `.mts` and `.cts`
  * through type stripping, so they are discovered wherever `.ts` is.
  */
-const TEST_EXT = '@([cm]ts|js|jsx|ts|tsx)';
+const TEST_EXT = '@([cm]js|[cm]ts|js|jsx|ts|tsx)';
 
 export const TEST_PATTERNS = [
 	`**/__tests__/**/*.${ TEST_EXT }`,
@@ -18,6 +18,8 @@ export const TEST_IGNORES = [
 	'**/node_modules/**',
 	'packages/e2e-tests/**',
 	'packages/e2e-test-utils-playwright/src/test.ts',
+	// Runs under `node --test`, not Vitest.
+	'test/ai-development/**',
 	'**/build/**',
 	'**/build-module/**',
 	'**/build-types/**',
@@ -29,7 +31,7 @@ export const TEST_IGNORES = [
 
 export const VITEST_PROJECT_NAMES = [ 'node', 'jsdom', 'browser' ];
 
-const TEST_EXT_PATTERN = '(?:[cm]ts|js|jsx|ts|tsx)';
+const TEST_EXT_PATTERN = '(?:[cm]js|[cm]ts|js|jsx|ts|tsx)';
 const JSDOM_TEST_PATH_PATTERN = new RegExp(
 	`\\.jsdom\\.test\\.${ TEST_EXT_PATTERN }$`
 );

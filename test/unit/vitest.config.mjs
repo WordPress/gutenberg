@@ -64,7 +64,7 @@ process.chdir( ROOT_DIR );
 process.env.TZ ||= 'UTC';
 
 const transpiledPackageNames = globSync(
-	'packages/*/src/index.{js,jsx,ts,tsx,mts,cts}',
+	'packages/*/src/index.{js,jsx,mjs,cjs,ts,tsx,mts,cts}',
 	{ cwd: ROOT_DIR, absolute: true }
 )
 	.sort()

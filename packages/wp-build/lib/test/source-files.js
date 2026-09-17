@@ -26,6 +26,7 @@ describe( 'source file discovery', () => {
 			'js',
 			'jsx',
 			'mjs',
+			'cjs',
 			'ts',
 			'tsx',
 			'mts',
@@ -43,6 +44,7 @@ describe( 'source file discovery', () => {
 		} );
 
 		expect( sourceFiles.sort() ).toEqual( [
+			'src/index.cjs',
 			'src/index.cts',
 			'src/index.js',
 			'src/index.jsx',
