@@ -18,7 +18,6 @@ import {
 	getClientIdsWithDescendants,
 	getBlockRootClientId,
 	getBlockAttributes,
-	getSelectedBlockClientId,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -1478,32 +1477,22 @@ export function isSelectedBlockStyleStateShownOnCanvas( state, clientId ) {
 }
 
 /**
- * Returns the clientId of the top-level content-list ancestor that has
- * list-view support, if the currently selected block is a descendant of one.
+ * Returns the ancestor whose List View panel in the block inspector lists the
+ * given block, if any. When supported blocks are nested, only the outermost
+ * has a panel, as in `ListViewPanel`.
  *
- * "Top-level" matches the behaviour introduced in #75166: when blocks with
- * list-view support are nested, the outermost one (the direct content item)
- * owns the List View panel, not the nearest ancestor.
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Block client ID.
  *
- * Used to auto-switch the inspector to List View when a child of a list-view-
- * enabled content block (e.g. a Button inside Buttons) is selected in the canvas.
- *
- * @param {Object}   state            Global application state.
- * @param {string[]} contentClientIds Client IDs of direct content items.
- *
- * @return {?string} The clientId of the list-view-enabled ancestor, or null.
+ * @return {?string} Client ID of the ancestor, or null.
  */
-export function getListViewChildParentId( state, contentClientIds ) {
-	const selectedId = getSelectedBlockClientId( state );
-	if ( ! selectedId || contentClientIds?.includes( selectedId ) ) {
+export function getListViewSupportAncestor( state, clientId ) {
+	if ( ! clientId ) {
 		return null;
 	}
-	const parents = getBlockParents( state, selectedId );
 	return (
-		parents.find(
-			( parentId ) =>
-				contentClientIds?.includes( parentId ) &&
-				shouldRenderBlockListView( state, parentId )
+		getBlockParents( state, clientId ).find( ( parentId ) =>
+			shouldRenderBlockListView( state, parentId )
 		) ?? null
 	);
 }

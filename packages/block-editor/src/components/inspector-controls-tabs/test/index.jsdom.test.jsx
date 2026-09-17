@@ -220,6 +220,31 @@ describe( 'InspectorControlsTabs', () => {
 		expect( getSelectedTabName() ).toBe( 'List View' );
 	} );
 
+	// "Edit navigation" selects a block and requests its List View in one
+	// batch. Selecting a different content item afterwards must still return
+	// to the Content tab.
+	it( 'resets to Content when a different content item is selected after a tab request', async () => {
+		await setup();
+
+		await act( async () => {
+			registry.batch( () => {
+				registry
+					.dispatch( blockEditorStore )
+					.selectBlock( blocks.listParent );
+				unlock(
+					registry.dispatch( blockEditorStore )
+				).requestInspectorTab( TAB_LIST_VIEW.name, {
+					openPanel: blocks.listParent,
+				} );
+			} );
+		} );
+		expect( getSelectedTabName() ).toBe( 'List View' );
+
+		await selectBlock( blocks.plain );
+
+		expect( getSelectedTabName() ).toBe( 'Content' );
+	} );
+
 	it( 'opens the ancestor panel when a list child is selected', async () => {
 		await setup();
 

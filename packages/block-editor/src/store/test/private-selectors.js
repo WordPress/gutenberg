@@ -39,7 +39,7 @@ import {
 	shouldRenderBlockListView,
 	getStyleOverrides,
 	canHostEditableRoot,
-	getListViewChildParentId,
+	getListViewSupportAncestor,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -2837,8 +2837,7 @@ describe( 'private selectors', () => {
 		} );
 	} );
 
-	describe( 'getListViewChildParentId', () => {
-		// Block name constants used across tests.
+	describe( 'getListViewSupportAncestor', () => {
 		const BLOCK_WITH_LIST_VIEW = 'test/block-with-list-view';
 		const BLOCK_WITHOUT_LIST_VIEW = 'test/block-without-list-view';
 		const BLOCK_CHILD = 'test/block-child';
@@ -2873,133 +2872,91 @@ describe( 'private selectors', () => {
 			unregisterBlockType( BLOCK_CHILD );
 		} );
 
-		// Base block tree (IDs map to block names above):
-		//   list-view-parent  (BLOCK_WITH_LIST_VIEW, content item)
-		//     └─ child-of-list-view  (BLOCK_CHILD)
-		//   no-list-view-parent  (BLOCK_WITHOUT_LIST_VIEW, content item)
-		//     └─ child-of-no-list-view  (BLOCK_CHILD)
-		//   nav-parent  (core/navigation, content item — hardcoded special case)
-		//     └─ child-of-nav  (BLOCK_CHILD)
-		//   orphan  (BLOCK_CHILD, NOT a content item, no content ancestor)
-		const baseBlocks = {
-			byClientId: new Map( [
-				[ 'list-view-parent', { name: BLOCK_WITH_LIST_VIEW } ],
-				[ 'child-of-list-view', { name: BLOCK_CHILD } ],
-				[ 'no-list-view-parent', { name: BLOCK_WITHOUT_LIST_VIEW } ],
-				[ 'child-of-no-list-view', { name: BLOCK_CHILD } ],
-				[ 'nav-parent', { name: 'core/navigation' } ],
-				[ 'child-of-nav', { name: BLOCK_CHILD } ],
-				[ 'orphan', { name: BLOCK_CHILD } ],
-			] ),
-			parents: new Map( [
-				[ 'list-view-parent', '' ],
-				[ 'child-of-list-view', 'list-view-parent' ],
-				[ 'no-list-view-parent', '' ],
-				[ 'child-of-no-list-view', 'no-list-view-parent' ],
-				[ 'nav-parent', '' ],
-				[ 'child-of-nav', 'nav-parent' ],
-				[ 'orphan', '' ],
-			] ),
-			order: new Map( [] ),
-			attributes: new Map( [] ),
-		};
-
-		const contentClientIds = [
-			'list-view-parent',
-			'no-list-view-parent',
-			'nav-parent',
-		];
-
-		const makeState = ( clientId ) => ( {
-			blocks: baseBlocks,
-			blockListSettings: new Map(),
-			selection: {
-				selectionStart: clientId ? { clientId } : {},
-				selectionEnd: clientId ? { clientId } : {},
-			},
-		} );
-
-		it( 'returns null when no block is selected', () => {
-			expect(
-				getListViewChildParentId( makeState( null ), contentClientIds )
-			).toBeNull();
-		} );
-
-		it( 'returns null when the selected block is itself a direct content item', () => {
-			expect(
-				getListViewChildParentId(
-					makeState( 'list-view-parent' ),
-					contentClientIds
-				)
-			).toBeNull();
-		} );
-
-		it( 'returns null when the selected block has no content-item ancestor', () => {
-			expect(
-				getListViewChildParentId(
-					makeState( 'orphan' ),
-					contentClientIds
-				)
-			).toBeNull();
-		} );
-
-		it( 'returns the parent clientId when a child of a listView-supporting block is selected', () => {
-			expect(
-				getListViewChildParentId(
-					makeState( 'child-of-list-view' ),
-					contentClientIds
-				)
-			).toBe( 'list-view-parent' );
-		} );
-
-		it( 'returns null when the ancestor content block does not have listView support', () => {
-			expect(
-				getListViewChildParentId(
-					makeState( 'child-of-no-list-view' ),
-					contentClientIds
-				)
-			).toBeNull();
-		} );
-
-		it( 'returns the parent clientId when a child of core/navigation is selected (hardcoded special case)', () => {
-			expect(
-				getListViewChildParentId(
-					makeState( 'child-of-nav' ),
-					contentClientIds
-				)
-			).toBe( 'nav-parent' );
-		} );
-
-		it( 'returns the outermost (top-level) content ancestor, not the nearest, matching #75166 behaviour', () => {
-			// Tree: outer-list-view (content item) → inner-list-view (also a content item) → deep-child (selected)
-			// Both ancestors have list-view support; the outermost should win.
-			const nestedBlocks = {
+		// list-view-parent        (has List View support)
+		//   └─ child-of-list-view
+		// no-list-view-parent     (no support)
+		//   └─ child-of-no-list-view
+		// nav-parent              (core/navigation, always supported)
+		//   └─ child-of-nav
+		// outer-list-view         (has support)
+		//   └─ inner-list-view    (has support)
+		//        └─ deep-child
+		const state = {
+			blocks: {
 				byClientId: new Map( [
+					[ 'list-view-parent', { name: BLOCK_WITH_LIST_VIEW } ],
+					[ 'child-of-list-view', { name: BLOCK_CHILD } ],
+					[
+						'no-list-view-parent',
+						{ name: BLOCK_WITHOUT_LIST_VIEW },
+					],
+					[ 'child-of-no-list-view', { name: BLOCK_CHILD } ],
+					[ 'nav-parent', { name: 'core/navigation' } ],
+					[ 'child-of-nav', { name: BLOCK_CHILD } ],
 					[ 'outer-list-view', { name: BLOCK_WITH_LIST_VIEW } ],
 					[ 'inner-list-view', { name: BLOCK_WITH_LIST_VIEW } ],
 					[ 'deep-child', { name: BLOCK_CHILD } ],
 				] ),
 				parents: new Map( [
+					[ 'list-view-parent', '' ],
+					[ 'child-of-list-view', 'list-view-parent' ],
+					[ 'no-list-view-parent', '' ],
+					[ 'child-of-no-list-view', 'no-list-view-parent' ],
+					[ 'nav-parent', '' ],
+					[ 'child-of-nav', 'nav-parent' ],
 					[ 'outer-list-view', '' ],
 					[ 'inner-list-view', 'outer-list-view' ],
 					[ 'deep-child', 'inner-list-view' ],
 				] ),
-				order: new Map( [] ),
-				attributes: new Map( [] ),
-			};
-			const nestedContentIds = [ 'outer-list-view', 'inner-list-view' ];
-			const nestedState = {
-				blocks: nestedBlocks,
-				blockListSettings: new Map(),
-				selection: {
-					selectionStart: { clientId: 'deep-child' },
-					selectionEnd: { clientId: 'deep-child' },
-				},
-			};
+				order: new Map(),
+				attributes: new Map(),
+			},
+			blockListSettings: new Map(),
+			selection: {
+				selectionStart: { clientId: 'child-of-nav' },
+				selectionEnd: { clientId: 'child-of-nav' },
+			},
+		};
 
+		it( 'returns null without a client ID', () => {
+			expect( getListViewSupportAncestor( state, undefined ) ).toBeNull();
+		} );
+
+		it( 'returns null for a top-level block', () => {
 			expect(
-				getListViewChildParentId( nestedState, nestedContentIds )
-			).toBe( 'outer-list-view' );
+				getListViewSupportAncestor( state, 'list-view-parent' )
+			).toBeNull();
+		} );
+
+		it( 'returns the parent when it has List View support', () => {
+			expect(
+				getListViewSupportAncestor( state, 'child-of-list-view' )
+			).toBe( 'list-view-parent' );
+		} );
+
+		it( 'returns null when no ancestor has List View support', () => {
+			expect(
+				getListViewSupportAncestor( state, 'child-of-no-list-view' )
+			).toBeNull();
+		} );
+
+		it( 'treats the Navigation block as always supported', () => {
+			expect( getListViewSupportAncestor( state, 'child-of-nav' ) ).toBe(
+				'nav-parent'
+			);
+		} );
+
+		it( 'returns the outermost ancestor when supported blocks are nested', () => {
+			expect( getListViewSupportAncestor( state, 'deep-child' ) ).toBe(
+				'outer-list-view'
+			);
+		} );
+
+		it( 'looks up the given block rather than the selected one', () => {
+			// The selection is on `child-of-nav`.
+			expect(
+				getListViewSupportAncestor( state, 'child-of-list-view' )
+			).toBe( 'list-view-parent' );
 		} );
 	} );
 } );

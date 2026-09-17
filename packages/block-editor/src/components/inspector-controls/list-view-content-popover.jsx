@@ -55,8 +55,7 @@ export function ListViewContentPopover( { listViewRef } ) {
 			return {
 				selectedClientId: getSelectedBlockClientId(),
 				isOpen: privateSelectors.isListViewContentPanelOpen(),
-				// Track the expand revision so the anchor is re-queried after
-				// PrivateListView remounts (which replaces the block row DOM nodes).
+				// Re-query the anchor after the list remounts and replaces its rows.
 				expandRevision: privateSelectors.getListViewExpandRevision(),
 			};
 		},
