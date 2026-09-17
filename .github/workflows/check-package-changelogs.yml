@@ -6,7 +6,23 @@ on:
         branches:
             - trunk
         paths:
-            - 'packages/**'
+            - 'packages/admin-ui/**'
+            - 'packages/components/**'
+            - 'packages/dataviews/**'
+            - 'packages/fields/**'
+            - 'packages/grid/**'
+            - 'packages/icons/**'
+            - 'packages/interface/**'
+            - 'packages/private-apis/**'
+            - 'packages/style-runtime/**'
+            - 'packages/theme/**'
+            - 'packages/ui/**'
+            - 'packages/undo-manager/**'
+            - 'packages/views/**'
+            - 'packages/widget-dashboard/**'
+            - 'packages/widget-primitives/**'
+            - 'packages/wp-build/**'
+            - 'packages/*/CHANGELOG.md'
             - 'tools/validation/validate-changelogs.ts'
             - '.github/workflows/check-package-changelogs.yml'
             - '!packages/*/src/**/stories/**'
@@ -68,8 +84,9 @@ jobs:
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}
                   PACKAGE_PATH: packages/${{ matrix.package }}
               run: |
-                  # The workflow's `paths:` filter is broad, so this matrix entry may
-                  # run on a PR that doesn't touch its package. Short-circuit if so.
+                  # The workflow's `paths:` filter triggers on the union of all
+                  # tracked packages, so this matrix entry may run on a PR that
+                  # doesn't touch its package. Short-circuit if that's the case.
                   relevant_changes=$(git diff --name-only "$BASE_SHA"...HEAD -- "${PACKAGE_PATH}/" \
                       | grep -Ev "^${PACKAGE_PATH}/(src/(.+/)?(stories|test)/|CHANGELOG\.md$)" || true)
 
