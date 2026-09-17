@@ -1,12 +1,16 @@
 import { useRefEffect } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import { computeCaretRect, getScrollContainer } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import { store as blockEditorStore } from '../../store';
 
 const isIE = window.navigator.userAgent.indexOf( 'Trident' ) !== -1;
 const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
 const initialTriggerPercentage = 0.75;
 
 export function useTypewriter() {
+	const { getSelectedBlockClientId, getBlockOrder, getBlockParents } =
+		useSelect( blockEditorStore );
 	return useRefEffect( ( node ) => {
 		const { ownerDocument } = node;
 		const { defaultView } = ownerDocument;
@@ -100,16 +104,16 @@ export function useTypewriter() {
 				: ( caretRect.top - scrollContainerY ) /
 					( defaultView.innerHeight - scrollContainerY );
 
-			// If the scroll position is at the start, the active editable element
-			// is the last one, and the caret is positioned within the initial
-			// trigger percentage of the page, do not scroll the page.
+			// If the scroll position is at the start, the caret is in the last
+			// block, and it is positioned within the initial trigger percentage
+			// of the page, do not scroll the page.
 			// The typewriter effect should not kick in until an empty page has been
 			// filled with the initial trigger percentage or the user scrolls
 			// intentionally down.
 			if (
 				scrollY === 0 &&
 				relativeScrollPosition < initialTriggerPercentage &&
-				isLastEditableNode()
+				isInLastBlock()
 			) {
 				// Reset the caret position to maintain.
 				caretRect = currentCaretRect;
@@ -192,13 +196,19 @@ export function useTypewriter() {
 			return !! element?.isContentEditable;
 		}
 
-		function isLastEditableNode() {
-			const editableNodes = Array.from(
-				node.querySelectorAll( '[contenteditable], .rich-text' )
-			).filter( ( editable ) => editable.isContentEditable );
-			const lastEditableNode = editableNodes[ editableNodes.length - 1 ];
-			const { anchorNode } = defaultView.getSelection();
-			return !! lastEditableNode?.contains( anchorNode );
+		/**
+		 * Whether the selected block is, or is inside, the last root block.
+		 */
+		function isInLastBlock() {
+			const clientId = getSelectedBlockClientId();
+
+			if ( ! clientId ) {
+				return false;
+			}
+
+			const [ topLevelClientId = clientId ] = getBlockParents( clientId );
+			const order = getBlockOrder();
+			return order[ order.length - 1 ] === topLevelClientId;
 		}
 
 		// When the user scrolls or resizes, the scroll position should be
