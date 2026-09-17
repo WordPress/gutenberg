@@ -1,0 +1,128 @@
+import { __, sprintf } from '@wordpress/i18n';
+import { Notice } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
+import { useSelect } from '@wordpress/data';
+import { decodeEntities } from '@wordpress/html-entities';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
+import { store as editorStore } from '../../store';
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
+import { unlock } from '../../lock-unlock';
+
+const { getTemplateInfo } = unlock( coreDataPrivateApis );
+
+/**
+ * Says that what is being described is defined by the template rather than by
+ * the post, and offers to go and edit it.
+ *
+ * Renders nothing when there is no template to point at, or when the user
+ * cannot edit it: there is nothing useful to say in either case.
+ *
+ * @return The rendered notice.
+ */
+export default function TemplateScopeNotice() {
+	const { templateId, templateTitle, onNavigateToEntityRecord, canEdit } =
+		useSelect( ( select ) => {
+			const { getCurrentTemplateId, getEditorSettings } = select(
+				editorStore
+			) as {
+				getCurrentTemplateId: () => string | undefined;
+				getEditorSettings: () => {
+					onNavigateToEntityRecord?: ( args: {
+						postId: string;
+						postType: string;
+					} ) => void;
+				};
+			};
+			const { canUser, getEntityRecord, getCurrentTheme } =
+				select( coreStore );
+			const currentTemplateId = getCurrentTemplateId();
+
+			/*
+			 * A template's own title is empty, or just its slug, until someone
+			 * renames it. `getTemplateInfo` falls back to the name the theme
+			 * gives it — "Pages", "Single Posts" — which is what the rest of
+			 * the editor shows.
+			 */
+			const templateInfo = currentTemplateId
+				? getTemplateInfo( {
+						templateTypes:
+							(
+								getCurrentTheme() as
+									| { default_template_types?: unknown[] }
+									| undefined
+							 )?.default_template_types ?? [],
+						template: getEntityRecord(
+							'postType',
+							TEMPLATE_POST_TYPE,
+							currentTemplateId
+						),
+				  } )
+				: undefined;
+
+			return {
+				templateId: currentTemplateId,
+				templateTitle: templateInfo?.title as string | undefined,
+				onNavigateToEntityRecord:
+					getEditorSettings().onNavigateToEntityRecord,
+				canEdit: !! canUser( 'create', {
+					kind: 'postType',
+					name: TEMPLATE_POST_TYPE,
+				} ),
+			};
+		}, [] );
+
+	if ( ! templateId || ! canEdit ) {
+		return null;
+	}
+
+	const title = templateTitle ? decodeEntities( templateTitle ) : undefined;
+
+	return (
+		<Notice
+			status="info"
+			isDismissible={ false }
+			className="editor-template-scope-notice"
+			actions={
+				onNavigateToEntityRecord
+					? [
+							{
+								/*
+								 * A template that cannot be named is no reason
+								 * to withhold the route to it.
+								 */
+								label: title
+									? sprintf(
+											// translators: %s: name of the template, e.g. "Pages".
+											__( 'Edit %s template' ),
+											title
+									  )
+									: __( 'Edit template' ),
+								onClick: () =>
+									onNavigateToEntityRecord( {
+										postId: templateId,
+										postType: TEMPLATE_POST_TYPE,
+									} ),
+								variant: 'secondary',
+							},
+					  ]
+					: []
+			}
+		>
+			<Stack direction="column" gap="sm">
+				<Text render={ <p /> }>
+					<strong>
+						{ __( 'This block comes from the template' ) }
+					</strong>
+				</Text>
+				<Text render={ <p /> }>
+					{ __(
+						'Changes to its settings affect all posts and pages that use the template.'
+					) }
+				</Text>
+			</Stack>
+		</Notice>
+	);
+}
