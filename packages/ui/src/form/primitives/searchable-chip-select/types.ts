@@ -114,10 +114,7 @@ export type SearchableChipSelectProps = Omit<
 		 * ```jsx
 		 * chipsContent={ ( value ) =>
 		 *   value.map( ( item ) => (
-		 *     <SearchableChipSelect.ChipWithRemove
-		 *       key={ item.value }
-		 *       aria-label={ item.label }
-		 *     >
+		 *     <SearchableChipSelect.ChipWithRemove key={ item.value }>
 		 *       <Icon icon={ wordpress } />
 		 *       { item.label }
 		 *     </SearchableChipSelect.ChipWithRemove>

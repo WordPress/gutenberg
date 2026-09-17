@@ -21,8 +21,8 @@ export type ComboboxChipWithRemoveProps = Omit<
 	 */
 	prefix?: React.ReactNode;
 	/**
-	 * Accessible name and tooltip label for the remove button. The button is
-	 * described by the chip label.
+	 * Accessible label for the remove button.
+	 * The button is described by the chip label.
 	 *
 	 * @default __( 'Remove' )
 	 */
