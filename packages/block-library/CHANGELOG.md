@@ -26,6 +26,7 @@
 -   Paragraph, List, Heading, Preformatted, Columns, Group, Template Part: Read the default padding these blocks add when they have a background color from the `--wp--style--block-background-padding` custom property, so themes can change or remove it ([#82024](https://github.com/WordPress/gutenberg/pull/82024)).
 -   Query: Show a snackbar notice instead of a blocking modal when "Reload full page" is turned on automatically because a block inside the Query block doesn't support client-side navigation ([#82246](https://github.com/WordPress/gutenberg/pull/82246)).
 -   Gallery: Support viewport-specific aspect ratios, in every Gallery layout and in dynamic galleries. ([#82233](https://github.com/WordPress/gutenberg/pull/82233))
+-   Icon: Match an icon's keywords as well as its name and label when searching the icon library. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
 
 ### Bug Fixes
 
@@ -63,7 +64,6 @@
 ### Enhancements
 
 -   Columns: Add transforms between Columns and the Row variation that preserve column widths through flex child sizing controls.
--   Icon: Match an icon's keywords as well as its name and label when searching the icon library. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
 -   Gallery: Add an opt-in Grid layout while preserving the existing Flex layout for current galleries.([#81909](https://github.com/WordPress/gutenberg/pull/81909)).
 
 ### Bug Fixes
