@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import BaseCheckboxControl from '..';
@@ -66,16 +66,16 @@ describe( 'CheckboxControl', () => {
 
 		it( 'should render the indeterminate icon when in the indeterminate state', () => {
 			const { asFragment, rerender } = render( <CheckboxControl /> );
-			const checkboxDefault = asFragment();
-			within( checkboxDefault )
+			screen
 				.getByRole( 'checkbox' )
 				.setAttribute( 'id', 'checkbox-control' );
+			const checkboxDefault = asFragment();
 
 			rerender( <CheckboxControl indeterminate /> );
-			const checkboxIndeterminate = asFragment();
-			within( checkboxIndeterminate )
+			screen
 				.getByRole( 'checkbox' )
 				.setAttribute( 'id', 'checkbox-control' );
+			const checkboxIndeterminate = asFragment();
 
 			// Expect the diff snapshot to be mostly about the indeterminate icon
 			expect( checkboxDefault ).toMatchDiffSnapshot(
