@@ -12,7 +12,7 @@ import type { Props } from '../types';
 
 const meta: Meta< typeof Menu > = {
 	id: 'components-menu',
-	title: 'Components/Actions/Menu',
+	title: 'Components/Deprecated/Menu',
 	component: Menu,
 	subcomponents: {
 		Item: Menu.Item,
@@ -43,9 +43,9 @@ const meta: Meta< typeof Menu > = {
 			source: { excludeDecorators: true },
 		},
 		componentStatus: {
-			status: 'recommended',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'When building for the Gutenberg repo, use this component instead of `DropdownMenu`. Otherwise, continue using `DropdownMenu` for now.',
+			notes: 'Deprecated. Continue using `DropdownMenu` for now. You can try [`Menu`](?path=/docs/design-system-components-menu--docs) from `@wordpress/ui`, but it is not yet recommended.',
 		},
 	},
 };

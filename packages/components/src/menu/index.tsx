@@ -86,6 +86,11 @@ const UnconnectedMenu = ( props: Props ) => {
  * It is responsible for managing the state of the menu and its items, and for
  * rendering the `Menu.TriggerButton` (or the `Menu.SubmenuTriggerItem`)
  * component, and the `Menu.Popover` component.
+ *
+ * This component is deprecated. Continue using `DropdownMenu` for now.
+ * You can try `Menu` from `@wordpress/ui`, but it is not yet recommended.
+ *
+ * @deprecated
  */
 export const Menu = Object.assign(
 	contextConnectWithoutRef( UnconnectedMenu, 'Menu' ),
