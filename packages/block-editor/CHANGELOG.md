@@ -4,6 +4,7 @@
 
 ### Internal
 
+-   Replace experimental `ZStack` in the overlapping color indicators of the color/gradient dropdown ([#83062](https://github.com/WordPress/gutenberg/pull/83062)).
 -   Remove the `crossorigin` MutationObserver. Under `Document-Isolation-Policy: isolate-and-credentialless` cross-origin resources load without the attribute, and adding it broke any resource served without CORS headers ([#82614](https://github.com/WordPress/gutenberg/pull/82614)).
 
 ### New Features
