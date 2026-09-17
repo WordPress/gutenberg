@@ -6,13 +6,13 @@ import DataViewsContext from '../dataviews-context';
 import { BulkActions, useSomeItemHasAPossibleBulkAction } from '.';
 import TableSelectionContext from './table-selection-context';
 
-type DataViewsBulkActionsHeaderProps = {
+type DefaultBulkActionsHeaderProps = {
 	children: ReactNode;
 };
 
-export default function DataViewsBulkActionsHeader( {
+export default function DefaultBulkActionsHeader( {
 	children,
-}: DataViewsBulkActionsHeaderProps ) {
+}: DefaultBulkActionsHeaderProps ) {
 	const {
 		actions = [],
 		data,
