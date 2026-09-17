@@ -106,7 +106,7 @@ function gutenberg_site_editor_ensure_static_home_page() {
 		update_option( 'show_on_front', 'page' );
 	}
 
-	if ( $home_page_id !== (int) get_option( 'page_on_front' ) ) {
+	if ( (int) get_option( 'page_on_front' ) !== $home_page_id ) {
 		update_option( 'page_on_front', $home_page_id );
 	}
 }
