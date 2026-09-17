@@ -222,7 +222,7 @@ describe( 'DataViews component', () => {
 		expect( callback ).not.toHaveBeenCalled();
 	} );
 
-	it( 'renders the bulk-action overlay inside the table layout and matches the header height', async () => {
+	it( 'renders the bulk-action overlay inside the table header without replacing column headers', () => {
 		const { container } = render(
 			<DataViewWrapper
 				selection={ [ '1' ] }
@@ -231,21 +231,21 @@ describe( 'DataViews component', () => {
 			/>
 		);
 		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-		const layoutContainer = container.querySelector(
-			'.dataviews-layout__container'
-		) as HTMLDivElement;
+		const tableHeader = container.querySelector(
+			'thead'
+		) as HTMLTableSectionElement;
 		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
 		const overlay = container.querySelector(
 			'.dataviews-view-table__bulk-actions-overlay'
 		) as HTMLDivElement;
-		expect( layoutContainer ).toContainElement( overlay );
-		await waitFor( () => {
-			expect(
-				overlay.style.getPropertyValue(
-					'--wp-dataviews-table-header-height'
-				)
-			).toBe( '50.5px' );
-		} );
+		expect(
+			within( tableHeader ).getByRole( 'cell', {
+				name: /1 Item selected/,
+			} )
+		).toContainElement( overlay );
+		expect(
+			within( tableHeader ).getByRole( 'columnheader', { name: 'Title' } )
+		).toBeInTheDocument();
 	} );
 
 	it.each( [ LAYOUT_TABLE, LAYOUT_GRID ] as const )(
@@ -352,7 +352,9 @@ describe( 'DataViews component', () => {
 		).not.toHaveAttribute( 'inert' );
 		expect( within( titleHeader ).getByRole( 'button' ) ).toBeDisabled();
 		expect(
-			screen.getAllByRole( 'checkbox', { name: 'Deselect all' } )[ 0 ]
+			screen
+				.getAllByRole( 'checkbox', { name: 'Deselect all' } )
+				.at( -1 )!
 		).toHaveFocus();
 		await user.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
 		expect( within( titleHeader ).getByRole( 'button' ) ).toBeEnabled();
