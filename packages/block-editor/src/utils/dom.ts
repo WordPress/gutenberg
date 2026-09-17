@@ -1,33 +1,6 @@
 const BLOCK_SELECTOR = '.block-editor-block-list__block';
-
 const APPENDER_SELECTOR = '.block-list-appender';
 const BLOCK_APPENDER_CLASS = '.block-editor-button-block-appender';
-
-/**
- * The elements of the mounted RichText components. Under an editing host the
- * selected block's field carries no contenteditable attribute of its own, so
- * it cannot be found by attribute; the RichText component registers it here.
- */
-export const richTextElements = new WeakSet< Element >();
-
-/**
- * Returns the closest editable element: the element itself or an ancestor
- * that is an editing host, or a rich text field editable through one.
- *
- * @param element Element to start from.
- *
- * @return The closest editable element, if any.
- */
-export function getClosestEditableElement( element: Element | null ) {
-	for ( let node = element; node; node = node.parentElement ) {
-		if (
-			node.hasAttribute( 'contenteditable' ) ||
-			richTextElements.has( node )
-		) {
-			return node;
-		}
-	}
-}
 
 /**
  * Returns true if two elements are contained within the same block.
@@ -82,7 +55,14 @@ export function getSelectionEditableElement(
 		anchorNode.nodeType === anchorNode.ELEMENT_NODE
 			? ( anchorNode as Element )
 			: anchorNode.parentElement;
-	const editable = getClosestEditableElement( element );
+	let editable = element?.closest( '[contenteditable="true"]' );
+
+	// While the root is the editing host, the selected block's field is
+	// editable through it and has no contenteditable attribute of its own:
+	// the block element is the editable element.
+	if ( editable === root ) {
+		editable = element?.closest( BLOCK_SELECTOR );
+	}
 
 	if (
 		! editable ||

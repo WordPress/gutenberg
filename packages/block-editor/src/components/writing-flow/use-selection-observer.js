@@ -6,7 +6,7 @@ import {
 } from '@wordpress/rich-text';
 import { isSelectionForward } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
-import { getBlockClientId, getClosestEditableElement } from '../../utils/dom';
+import { getBlockClientId } from '../../utils/dom';
 import { setContentEditableWrapper } from './utils';
 import { unlock } from '../../lock-unlock';
 
@@ -271,11 +271,11 @@ export default function useSelectionObserver() {
 							ownerDocument.activeElement === node &&
 							ownerDocument.hasFocus()
 						) {
-							const element = getClosestEditableElement(
+							let element =
 								startNode.nodeType === startNode.ELEMENT_NODE
 									? startNode
-									: startNode.parentElement
-							);
+									: startNode.parentElement;
+							element = element?.closest( '[contenteditable]' );
 							// Only move focus into the editable when it belongs
 							// to the selected block. The collapsed selection can
 							// be a stale caret from before the block selection
