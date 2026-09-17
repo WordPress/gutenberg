@@ -314,7 +314,7 @@ function renderBulkActionsContent< Item >(
 							>
 								{ ( { onClose } ) => renderActions( onClose ) }
 							</DropdownMenu>
-					  )
+						)
 					: renderActions() }
 				{ ! isDefaultUI && clearSelection }
 			</Stack>
