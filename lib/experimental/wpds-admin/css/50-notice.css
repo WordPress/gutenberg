@@ -20,7 +20,7 @@
  * set here because it is part of the notice's appearance, and the few contextual
  * overrides that exist are repeated at the end so they survive.
  *
- * NO `!important` IN THIS FILE. See overrides.css for the one exception.
+ * NO `!important` IN THIS FILE. See 99-overrides.css for the one exception.
  */
 
 @layer wpds-overrides, wp-legacy, wpds;
