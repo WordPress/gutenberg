@@ -5,16 +5,16 @@
  * Parity target is the `@wordpress/ui` checkbox primitive
  * (packages/ui/src/form/primitives/checkbox/style.module.css) for VALUES. Its
  * STRUCTURE cannot be copied: it renders the tick as a separate icon element,
- * and classic ships a bare `<input type="checkbox">` with no markup to hook. So
- * the indicator stays a `::before`, as Core does it, and only the values move.
+ * and the admin ships a bare `<input type="checkbox">` with no markup to hook. So
+ * the indicator stays a `::before`, as WordPress does it, and only the values move.
  * That is the "specs are shared, selectors never are" split in practice.
  *
  * The tick is drawn with `mask-image` rather than an SVG `url()` with a baked
- * fill, so its colour comes from `currentColor` and can respond to state. Core's
+ * fill, so its colour comes from `currentColor` and can respond to state. WordPress's
  * version hardcodes `#ffffff` inside the data URI, which makes a disabled tick
  * invisible against a muted box. Same technique the dashicons swap will need.
  *
- * Geometry (size, margins) is deliberately left to Core: it is layout, not
+ * Geometry (size, margins) is deliberately left to forms.css: it is layout, not
  * style, and touching it would shift every checkbox on every screen.
  *
  * NO `!important` IN THIS FILE. See 99-overrides.css for the one exception.
@@ -78,13 +78,13 @@
 		mask-repeat: no-repeat;
 	}
 
-	/* The dot. Geometry is Core's; only the colour changes. */
+	/* The dot. Geometry stays with forms.css; only the colour changes. */
 	input[type="radio"]:checked::before {
 		background-color: currentColor;
 	}
 
 	/* -----------------------------------------------------------------------
-	   Focus — outline, never box-shadow. Core uses a two-ring box-shadow here.
+	   Focus — outline, never box-shadow. WordPress uses a two-ring box-shadow here.
 	   ----------------------------------------------------------------------- */
 
 	input[type="checkbox"]:focus,
@@ -124,7 +124,7 @@
 	/*
 	 * Disabled AND checked: the box drops its accent fill for the disabled
 	 * surface and the mark greys out, which is only legible because the mark is
-	 * masked rather than a baked-white SVG. Core instead fades the whole control
+	 * masked rather than a baked-white SVG. forms.css instead fades the whole control
 	 * with `opacity: 0.7`.
 	 */
 	input[type="checkbox"]:disabled:checked,

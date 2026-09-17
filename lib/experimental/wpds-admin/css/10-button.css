@@ -4,12 +4,12 @@
  * Target: visual parity with the React `Button`
  * (packages/components/src/button/style.scss). The React component is the
  * source of truth for *values*. The selectors here are hand-authored against
- * classic markup and are deliberately NOT derived from it — deriving selectors
+ * the admin's markup and are deliberately NOT derived from it — deriving selectors
  * is what sank the earlier generation POC.
  *
  * Cascade: everything lives in the `wpds` layer, which sits above `wp-legacy`,
- * where load.php demotes Core's own buttons.css. Layer order means the plain
- * selectors below beat Core's more specific ones with no specificity
+ * where load.php demotes WordPress's own buttons.css. Layer order means the plain
+ * selectors below beat WordPress's more specific ones with no specificity
  * escalation — and unlayered plugin CSS still beats us, which is the point.
  *
  * NO `!important` IN THIS FILE. Measured: a layered `!important` outranks a
@@ -40,16 +40,16 @@
 		justify-content: center;
 		box-sizing: border-box;
 		/*
-		 * NO height here, deliberately. Core's default is already 40px, which is
+		 * NO height here, deliberately. WordPress's default is already 40px, which is
 		 * exactly --wpds-dimension-size-lg, so asserting it gains nothing — and it
 		 * costs a great deal, because a height declared in this layer outranks
-		 * Core's CONTEXTUAL overrides regardless of their specificity. Core makes
+		 * WordPress's CONTEXTUAL overrides regardless of their specificity. WordPress makes
 		 * 67 such rules (`.wp-core-ui .tablenav .button` and friends) to make
 		 * toolbars compact; declaring a height here silently flattened all of
 		 * them, and the list-table toolbar rendered as a mix of 32px and 40px
 		 * controls that no longer shared a midline.
 		 *
-		 * Height is Core's. Appearance is ours.
+		 * Height belongs to buttons.css. Appearance is ours.
 		 */
 		margin: 0;
 		padding: 4px 12px;
@@ -60,7 +60,7 @@
 		text-decoration: none;
 		white-space: nowrap;
 		/*
-		 * NO vertical-align either. Core varies it by context — `top` for the
+		 * NO vertical-align either. WordPress varies it by context — `top` for the
 		 * base, `baseline` for `p .button`, `middle` for `.button-group` — and a
 		 * blanket value here flattens those the same way a height would. It is how
 		 * the control sits in a line of other content, which is layout, not
@@ -112,7 +112,7 @@
 
 	/* -----------------------------------------------------------------------
 	   Focus — outline/outline-offset, never box-shadow.
-	   Core's legacy ring is a box-shadow; the base rule above clears it.
+	   WordPress's legacy ring is a box-shadow; the base rule above clears it.
 	   ----------------------------------------------------------------------- */
 
 	.wp-core-ui .button:focus,
@@ -168,7 +168,7 @@
 	}
 
 	/*
-	 * `.active` is a PERSISTENT selected state in classic admin, toggled by
+	 * `.active` is a PERSISTENT selected state in the admin, toggled by
 	 * legacy admin JS. It is not `:active`. Never conflate the two.
 	 */
 	.wp-core-ui .button.active,
@@ -199,7 +199,7 @@
 	}
 
 	/* -----------------------------------------------------------------------
-	   Disabled — classic drives this from classes as well as attributes.
+	   Disabled — the admin drives this from classes as well as attributes.
 	   buttons.css marks most of these `!important`; 99-overrides.css repeats
 	   the same values to cancel that.
 	   ----------------------------------------------------------------------- */
