@@ -83,11 +83,13 @@ jobs:
                   node-version-file: 'cli/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
+                  package-manager-cache: false
 
             - name: Set up npm
               uses: ./cli/.github/setup-npm
               with:
                   working-directory: cli
+                  cache: false
 
             - name: Publish development packages to npm ("next" dist-tag)
               if: ${{ github.event.inputs.release_type == 'development' }}

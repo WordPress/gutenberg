@@ -180,7 +180,7 @@ function UnforwardedNumberControl(
 			nextState.value = applyEmptyValue
 				? currentValue
 				: // @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
-				  constrainValue( currentValue );
+					constrainValue( currentValue );
 		}
 
 		return stateReducerProp?.( nextState, action ) ?? nextState;
