@@ -312,7 +312,11 @@ function RevisionsList( {
 					align="center"
 					className="global-styles-ui-screen-revisions__footer"
 				>
-					<DataViewsPicker.Pagination controls="page-select" />
+					{ /* Kept even on a single page, when the select renders
+					     nothing, so the action stays at the end of the row. */ }
+					<div className="global-styles-ui-screen-revisions__pagination">
+						<DataViewsPicker.PageSelect />
+					</div>
 					<DataViewsPicker.Actions />
 				</Stack>
 			</DataViewsPicker>
