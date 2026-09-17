@@ -222,7 +222,7 @@ describe( 'DataViews component', () => {
 		expect( callback ).not.toHaveBeenCalled();
 	} );
 
-	it( 'matches the bulk-action overlay to the rendered table header', async () => {
+	it( 'renders the bulk-action overlay inside the table layout and matches the header height', async () => {
 		const { container } = render(
 			<DataViewWrapper
 				selection={ [ '1' ] }
@@ -231,9 +231,14 @@ describe( 'DataViews component', () => {
 			/>
 		);
 		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+		const layoutContainer = container.querySelector(
+			'.dataviews-layout__container'
+		) as HTMLDivElement;
+		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
 		const overlay = container.querySelector(
 			'.dataviews-view-table__bulk-actions-overlay'
 		) as HTMLDivElement;
+		expect( layoutContainer ).toContainElement( overlay );
 		await waitFor( () => {
 			expect(
 				overlay.style.getPropertyValue(

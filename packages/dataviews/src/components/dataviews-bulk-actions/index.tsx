@@ -1,4 +1,3 @@
-import type { CSSProperties } from 'react';
 import {
 	Button,
 	CheckboxControl,
@@ -13,12 +12,10 @@ import { useViewportMatch } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
 import DataViewsContext from '../dataviews-context';
 import { ActionModal } from '../dataviews-item-actions';
-import { LAYOUT_GRID, LAYOUT_TABLE } from '../../constants';
 import type { Action, ActionModal as ActionModalType } from '../../types';
 import type { SetSelection } from '../../types/private';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 import getFooterMessage from '../../utils/get-footer-message';
-import BulkActionToolbarContext from './toolbar-context';
 
 export function hasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
@@ -423,7 +420,13 @@ function BulkActionsContent< Item >( {
 	);
 }
 
-export function BulkActionToolbar() {
+interface BulkActionToolbarProps {
+	selectionCheckboxRef?: React.Ref< HTMLInputElement >;
+}
+
+export function BulkActionToolbar( {
+	selectionCheckboxRef,
+}: BulkActionToolbarProps = {} ) {
 	const {
 		data,
 		selection,
@@ -431,23 +434,10 @@ export function BulkActionToolbar() {
 		onChangeSelection,
 		getItemId,
 		view,
-		hasInitiallyLoaded,
-		isLoading,
-		isDefaultUI,
 	} = useContext( DataViewsContext );
-	const toolbarContext = useContext( BulkActionToolbarContext );
-	const isTable = view.type === LAYOUT_TABLE;
-	// Default bulk-action toolbars are supported by table and grid only.
-	const hasBulkActionToolbar =
-		useSomeItemHasAPossibleBulkAction( actions, data ) &&
-		[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type );
-	const toolbar = (
+	return (
 		<BulkActionsContent
-			selectionCheckboxRef={
-				isDefaultUI && isTable
-					? toolbarContext?.bulkSelectionRef
-					: undefined
-			}
+			selectionCheckboxRef={ selectionCheckboxRef }
 			selection={ selection }
 			onChangeSelection={ onChangeSelection }
 			data={ data }
@@ -455,38 +445,6 @@ export function BulkActionToolbar() {
 			getItemId={ getItemId }
 			isInfiniteScroll={ !! view.infiniteScrollEnabled }
 		/>
-	);
-
-	if ( ! isDefaultUI ) {
-		return toolbar;
-	}
-
-	if ( ! hasInitiallyLoaded || ! hasBulkActionToolbar ) {
-		return <></>;
-	}
-
-	// Stay outside the scroll container so auto-height layouts stick to the page.
-	return (
-		<div
-			className={
-				isTable
-					? 'dataviews-view-table__bulk-actions-overlay'
-					: 'dataviews-view-grid__bulk-actions-header'
-			}
-			hidden={ isTable && ! selection.length }
-			ref={ toolbarContext?.bulkActionsRef }
-			style={
-				isTable && toolbarContext?.tableHeaderHeight
-					? ( {
-							'--wp-dataviews-table-header-height': `${ toolbarContext.tableHeaderHeight }px`,
-					  } as CSSProperties )
-					: undefined
-			}
-			// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-			inert={ isLoading ? 'true' : undefined }
-		>
-			{ toolbar }
-		</div>
 	);
 }
 

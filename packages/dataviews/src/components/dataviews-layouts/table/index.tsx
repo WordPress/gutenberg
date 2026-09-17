@@ -10,8 +10,8 @@ import {
 	useState,
 } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
+import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
 import DataViewsContext from '../../dataviews-context';
-import BulkActionToolbarContext from '../../dataviews-bulk-actions/toolbar-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import ItemActions from '../../dataviews-item-actions';
 import { MEDIA_ASPECT_RATIOS, sortValues } from '../../../constants';
@@ -20,6 +20,7 @@ import {
 	useHasAPossibleBulkAction,
 	hasAPossibleBulkAction,
 	BulkSelectionCheckbox,
+	BulkActionToolbar,
 } from '../../dataviews-bulk-actions';
 import type {
 	Action,
@@ -274,7 +275,6 @@ function ViewTable< Item >( {
 	empty,
 }: ViewTableProps< Item > ) {
 	const { containerRef, isDefaultUI } = useContext( DataViewsContext );
-	const tableSelection = useContext( BulkActionToolbarContext );
 	const isDelayedLoading = useDelayedLoading( isLoading );
 	const groupField = view.groupBy?.field
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
@@ -312,6 +312,46 @@ function ViewTable< Item >( {
 	} );
 
 	const tableNoticeId = useId();
+	const tableHeaderRef = useRef< HTMLTableSectionElement >( null );
+	const tableSelectionRef = useRef< HTMLInputElement >( null );
+	const bulkSelectionRef = useRef< HTMLInputElement >( null );
+	const bulkActionsRef = useRef< HTMLDivElement >( null );
+	const [ tableHeaderHeight, setTableHeaderHeight ] = useState< number >();
+	const tableHeaderResizeObserverRef =
+		useResizeObserver< HTMLTableSectionElement >(
+			( [ entry ] ) => {
+				setTableHeaderHeight( entry.borderBoxSize[ 0 ].blockSize );
+			},
+			{ box: 'border-box' }
+		);
+	const mergedTableHeaderRef = useMergeRefs( [
+		tableHeaderRef,
+		tableHeaderResizeObserverRef,
+	] );
+	const hadSelectionRef = useRef( false );
+	useEffect( () => {
+		if ( ! isDefaultUI ) {
+			return;
+		}
+		const tableHead = tableHeaderRef.current;
+		const ownerDocument = tableHead?.ownerDocument;
+		if (
+			selection.length &&
+			tableHead?.contains( ownerDocument?.activeElement ?? null )
+		) {
+			bulkSelectionRef.current?.focus();
+		} else if (
+			hadSelectionRef.current &&
+			! selection.length &&
+			( ownerDocument?.activeElement === ownerDocument?.body ||
+				bulkActionsRef.current?.contains(
+					ownerDocument?.activeElement ?? null
+				) )
+		) {
+			tableSelectionRef.current?.focus();
+		}
+		hadSelectionRef.current = selection.length > 0;
+	}, [ selection.length, isDefaultUI ] );
 
 	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
 		scrollContainerRef: containerRef,
@@ -418,6 +458,26 @@ function ViewTable< Item >( {
 
 	return (
 		<>
+			{ isDefaultUI && hasBulkActions && (
+				<div
+					className="dataviews-view-table__bulk-actions-overlay"
+					hidden={ ! selection.length }
+					ref={ bulkActionsRef }
+					style={
+						tableHeaderHeight
+							? ( {
+									'--wp-dataviews-table-header-height': `${ tableHeaderHeight }px`,
+							  } as CSSProperties )
+							: undefined
+					}
+					// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+					inert={ isLoading ? 'true' : undefined }
+				>
+					<BulkActionToolbar
+						selectionCheckboxRef={ bulkSelectionRef }
+					/>
+				</div>
+			) }
 			<table
 				className={ clsx( 'dataviews-view-table', className, {
 					[ `has-${ view.layout?.density }-density` ]:
@@ -470,7 +530,7 @@ function ViewTable< Item >( {
 					</Popover>
 				) }
 				<thead
-					ref={ tableSelection?.headerRef }
+					ref={ isDefaultUI ? mergedTableHeaderRef : undefined }
 					className={ clsx( {
 						'dataviews-view-table__thead--stuck':
 							isVerticallyScrolled,
@@ -494,7 +554,9 @@ function ViewTable< Item >( {
 								>
 									<BulkSelectionCheckbox
 										inputRef={
-											tableSelection?.selectionRef
+											isDefaultUI
+												? tableSelectionRef
+												: undefined
 										}
 										selection={ selection }
 										onChangeSelection={ onChangeSelection }
