@@ -263,9 +263,8 @@ export default async function fetchLinkSuggestions(
 export function sortResults( results: SearchResult[], search: string ) {
 	const searchTokens = tokenize( search );
 
-	// Posts, terms and media are separate tables with separate sequences, so an
-	// id is only unique within its own kind and type. Scoring by id alone lets
-	// one result overwrite another's score.
+	// Give each result a unique key to avoid duplicate ids from different tables
+	// overwriting another's score.
 	const scoreKey = ( result: SearchResult ) =>
 		`${ result.kind }:${ result.type }:${ result.id }`;
 
