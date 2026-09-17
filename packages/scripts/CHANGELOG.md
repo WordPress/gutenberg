@@ -14,6 +14,7 @@
 -   `format`: Format `.cjs` and `.mjs` files when expanding a directory ([#82731](https://github.com/WordPress/gutenberg/pull/82731)).
 -   `format`: Format `.cts` and `.mts` files when expanding a directory ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
 -   The default ESLint config now lints `.jsx`, `.ts`, `.tsx`, `.mts` and `.cts` files, which ESLint's own file discovery skips ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   `build` and `start`: Discover `.cts` and `.mts` entry points, and transpile `.cjs` and `.cts` modules ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
 -   The bundled `wp-prettier` dependency has been upgraded from `3.0.3` to `3.9.6` ([#82731](https://github.com/WordPress/gutenberg/pull/82731)).
 
 ### Bug Fixes

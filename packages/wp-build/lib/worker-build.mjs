@@ -9,6 +9,7 @@
 import { readFile, writeFile, access } from 'fs/promises';
 import path from 'path';
 import esbuild from 'esbuild';
+import { RESOLVE_EXTENSIONS } from './source-files.mjs';
 
 /**
  * Creates an esbuild plugin that redirects module loads based on filename patterns.
@@ -176,6 +177,7 @@ export async function buildWorkers(
 						`${ workerOutputName }.mjs`
 					),
 					bundle: true,
+					resolveExtensions: RESOLVE_EXTENSIONS,
 					// Emit UTF-8 so binary-encoded inlined WASM stays compact
 					// (ASCII output would escape high bytes as \uXXXX).
 					charset: 'utf8',
@@ -215,6 +217,7 @@ export async function buildWorkers(
 					entryPoints: [ workerEntryPoint ],
 					outfile: path.join( buildDir, `${ workerOutputName }.cjs` ),
 					bundle: true,
+					resolveExtensions: RESOLVE_EXTENSIONS,
 					// Emit UTF-8 so binary-encoded inlined WASM stays compact
 					// (ASCII output would escape high bytes as \uXXXX).
 					charset: 'utf8',
@@ -324,6 +327,7 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 				outbase: srcDir,
 				outExtension: { '.js': '.mjs' },
 				bundle: true,
+				resolveExtensions: RESOLVE_EXTENSIONS,
 				// Emit UTF-8 so binary-encoded inlined WASM stays compact
 				// (ASCII output would escape high bytes as \uXXXX).
 				charset: 'utf8',
@@ -346,6 +350,7 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 				outbase: srcDir,
 				outExtension: { '.js': '.cjs' },
 				bundle: true,
+				resolveExtensions: RESOLVE_EXTENSIONS,
 				// Emit UTF-8 so binary-encoded inlined WASM stays compact
 				// (ASCII output would escape high bytes as \uXXXX).
 				charset: 'utf8',

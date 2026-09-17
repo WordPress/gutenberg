@@ -79,7 +79,7 @@ export function getRouteMetadata( rootDir, routeName ) {
  * @return {RouteFiles} Object with boolean flags for route files.
  */
 export function getRouteFiles( routeDirectory ) {
-	const extensions = [ 'tsx', 'ts', 'jsx', 'js' ];
+	const extensions = [ 'tsx', 'ts', 'mts', 'cts', 'jsx', 'js' ];
 	const files = {
 		hasRoute: false,
 		hasStage: false,
