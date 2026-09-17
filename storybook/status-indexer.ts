@@ -37,8 +37,12 @@ function getProperty( node: Node | undefined, name: string ): Node | undefined {
 
 /**
  * Indexes CSF files like Storybook's own indexer, and additionally tags every
- * entry with `status-<componentStatus>` so the sidebar and its tag filter can
- * show the recommendation status declared in `parameters.componentStatus`.
+ * entry with the status declared in `parameters.componentStatus`, so the
+ * sidebar and its tag filter can show the design system's recommendation.
+ *
+ * The status is the tag verbatim, with no prefix: the `status-*` namespace
+ * belongs to the API lifecycle tags, which answer a different question, and a
+ * component can carry one tag from each namespace.
  */
 export const statusIndexer: Indexer = {
 	test: /\.story\.(m?js|ts)x?$/,
@@ -54,10 +58,9 @@ export const statusIndexer: Indexer = {
 			return csf.indexInputs;
 		}
 
-		const tag = `status-${ status }`;
 		return csf.indexInputs.map( ( input ) => ( {
 			...input,
-			tags: [ ...( input.tags ?? [] ), tag ],
+			tags: [ ...( input.tags ?? [] ), status ],
 		} ) );
 	},
 };
