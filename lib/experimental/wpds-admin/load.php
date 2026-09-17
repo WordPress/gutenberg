@@ -214,6 +214,89 @@ function gutenberg_wpds_admin_demote_style( $tag, $handle, $href, $media ) {
 add_filter( 'style_loader_tag', 'gutenberg_wpds_admin_demote_style', 10, 4 );
 
 /**
+ * Returns the version string used for the restyle's stylesheets.
+ *
+ * @since 24.1.0
+ *
+ * @return string Version string.
+ */
+function gutenberg_wpds_admin_style_version() {
+	return defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : (string) time();
+}
+
+/**
+ * Enqueues the design tokens and returns them as a dependency array.
+ *
+ * Makes `--wpds-*` resolvable wherever the restyle renders. Gutenberg registers
+ * the `wp-theme` handle itself (see lib/client-assets.php), so no wordpress-develop
+ * change is needed. Falls back to the package's prebuilt copy if that stops being true.
+ *
+ * @since 24.1.0
+ *
+ * @return string[] Handles the first stylesheet should depend on.
+ */
+function gutenberg_wpds_admin_token_dependencies() {
+	if ( wp_style_is( 'wp-theme', 'registered' ) ) {
+		wp_enqueue_style( 'wp-theme' );
+
+		return array( 'wp-theme' );
+	}
+
+	wp_enqueue_style(
+		'gutenberg-wpds-admin-tokens',
+		gutenberg_url( 'packages/theme/prebuilt/css/design-tokens.css' ),
+		array(),
+		gutenberg_wpds_admin_style_version()
+	);
+
+	return array( 'gutenberg-wpds-admin-tokens' );
+}
+
+/**
+ * Enqueues every stylesheet in a directory, in filename order.
+ *
+ * Stylesheets load in filename order, which is what their numeric prefixes are
+ * for. Each area of the restyle owns one file and registers itself by being
+ * present, so adding one is a single new file and no edit here.
+ *
+ * Each sheet depends on the one before it, which keeps the generated HTML in the
+ * same order as the cascade.
+ *
+ * @since 24.1.0
+ *
+ * @param string   $directory  Absolute path to the directory to read.
+ * @param string   $url_path   Path of that directory relative to the plugin root.
+ * @param string   $prefix     Handle prefix for the stylesheets found there.
+ * @param string[] $first_deps Handles the first stylesheet depends on.
+ */
+function gutenberg_wpds_admin_enqueue_directory( $directory, $url_path, $prefix, $first_deps ) {
+	$files = glob( $directory . '/*.css' );
+
+	if ( empty( $files ) ) {
+		return;
+	}
+
+	sort( $files );
+
+	$version  = gutenberg_wpds_admin_style_version();
+	$base_url = gutenberg_url( $url_path );
+	$previous = null;
+
+	foreach ( $files as $file ) {
+		$handle = $prefix . basename( $file, '.css' );
+
+		wp_enqueue_style(
+			$handle,
+			$base_url . basename( $file ),
+			null === $previous ? $first_deps : array( $previous ),
+			$version
+		);
+
+		$previous = $handle;
+	}
+}
+
+/**
  * Enqueues design tokens and the restyle stylesheets on admin screens.
  *
  * `admin_enqueue_scripts` only fires in wp-admin, so this never touches the
@@ -222,62 +305,52 @@ add_filter( 'style_loader_tag', 'gutenberg_wpds_admin_demote_style', 10, 4 );
  * @since 24.1.0
  */
 function gutenberg_wpds_admin_enqueue_styles() {
-	$version  = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
-	$base_url = gutenberg_url( 'lib/experimental/wpds-admin/css/' );
-
 	/*
-	 * Make `--wpds-*` resolvable in wp-admin. Gutenberg registers the
-	 * `wp-theme` handle itself (see lib/client-assets.php), so no wordpress-develop change
-	 * is needed here. Fall back to the package's prebuilt copy if that ever
-	 * stops being true.
-	 */
-	if ( wp_style_is( 'wp-theme', 'registered' ) ) {
-		wp_enqueue_style( 'wp-theme' );
-		$token_deps = array( 'wp-theme' );
-	} else {
-		wp_enqueue_style(
-			'gutenberg-wpds-admin-tokens',
-			gutenberg_url( 'packages/theme/prebuilt/css/design-tokens.css' ),
-			array(),
-			$version
-		);
-		$token_deps = array( 'gutenberg-wpds-admin-tokens' );
-	}
-
-	/*
-	 * Stylesheets load in filename order, which is what the numeric prefixes are
-	 * for. Each area of the restyle owns one file and registers itself by being
-	 * present, so adding one is a single new file and no edit here.
-	 *
 	 * The first sheet depends on `buttons` so ours prints after the demoted WordPress
 	 * sheet and the generated HTML reads in order; the cascade itself no longer
-	 * relies on that, since layer order decides. Each subsequent sheet depends on
-	 * the one before it to keep that document order.
+	 * relies on that, since layer order decides.
 	 */
-	$files = glob( __DIR__ . '/css/*.css' );
+	gutenberg_wpds_admin_enqueue_directory(
+		__DIR__ . '/css',
+		'lib/experimental/wpds-admin/css/',
+		'gutenberg-wpds-admin-',
+		array_merge( gutenberg_wpds_admin_token_dependencies(), array( 'buttons' ) )
+	);
+}
+add_action( 'admin_enqueue_scripts', 'gutenberg_wpds_admin_enqueue_styles' );
 
-	if ( empty( $files ) ) {
+/**
+ * Enqueues the front-end stylesheets on pages that render the admin bar.
+ *
+ * The admin bar is the only piece of the admin that renders outside
+ * wp-admin, so this loads nothing at all for logged-out visitors.
+ *
+ * Two things make this a separate directory rather than a flag on the admin
+ * one. The stylesheets in `css/front/` are NOT layered, and must not be: on the
+ * front end WordPress's `admin-bar.css` is unlayered, and an unlayered declaration
+ * beats a layered one whatever the source order or specificity. Measured — a
+ * layered `#wpadminbar` rule loaded after `admin-bar.css` loses to it outright.
+ * And front-end CSS competes with the active theme, so it stays as small as the
+ * job allows rather than carrying rules meant for wp-admin.
+ *
+ * @since 24.1.0
+ */
+function gutenberg_wpds_admin_enqueue_front_styles() {
+	if ( ! is_admin_bar_showing() ) {
 		return;
 	}
 
-	sort( $files );
-
-	$previous = null;
-
-	foreach ( $files as $file ) {
-		$name   = basename( $file, '.css' );
-		$handle = 'gutenberg-wpds-admin-' . $name;
-
-		wp_enqueue_style(
-			$handle,
-			$base_url . basename( $file ),
-			null === $previous ? array_merge( $token_deps, array( 'buttons' ) ) : array( $previous ),
-			$version
-		);
-
-		$previous = $handle;
-	}
+	/*
+	 * Depending on `admin-bar` puts ours after it in document order, which is
+	 * what decides the winner between two unlayered sheets of equal specificity.
+	 */
+	gutenberg_wpds_admin_enqueue_directory(
+		__DIR__ . '/css/front',
+		'lib/experimental/wpds-admin/css/front/',
+		'gutenberg-wpds-admin-front-',
+		array_merge( gutenberg_wpds_admin_token_dependencies(), array( 'admin-bar' ) )
+	);
 }
-add_action( 'admin_enqueue_scripts', 'gutenberg_wpds_admin_enqueue_styles' );
+add_action( 'wp_enqueue_scripts', 'gutenberg_wpds_admin_enqueue_front_styles' );
 
 require_once __DIR__ . '/harness.php';
