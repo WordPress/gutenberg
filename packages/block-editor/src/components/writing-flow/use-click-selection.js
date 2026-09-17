@@ -16,12 +16,42 @@ export default function useClickSelection() {
 	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect(
 		( node ) => {
+			const { defaultView } = node.ownerDocument;
+			let pressTarget;
+
+			function onMouseUp() {
+				pressTarget = null;
+			}
+
+			// A click on an editable that cannot hold focus itself (an inert
+			// part of the editing host) focuses the host in Chromium, but the
+			// nearest focusable ancestor in Firefox: a block wrapper around
+			// the clicked block, whose focus handler would select that block.
+			// Move focus to the host before that handler runs.
+			function onFocusIn( event ) {
+				if (
+					node.contentEditable === 'true' &&
+					pressTarget &&
+					event.target !== node &&
+					event.target.contains( pressTarget ) &&
+					getBlockClientId( event.target ) !==
+						getBlockClientId( pressTarget )
+				) {
+					node.focus( { preventScroll: true } );
+				}
+			}
+
 			function onMouseDown( event ) {
 				// The main button.
 				// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 				if ( ! isSelectionEnabled() || event.button !== 0 ) {
 					return;
 				}
+
+				pressTarget = event.target;
+				defaultView.addEventListener( 'mouseup', onMouseUp, {
+					once: true,
+				} );
 
 				const startClientId = getBlockSelectionStart();
 				const clickedClientId = getBlockClientId( event.target );
@@ -119,9 +149,12 @@ export default function useClickSelection() {
 			}
 
 			node.addEventListener( 'mousedown', onMouseDown );
+			node.addEventListener( 'focusin', onFocusIn, true );
 
 			return () => {
 				node.removeEventListener( 'mousedown', onMouseDown );
+				node.removeEventListener( 'focusin', onFocusIn, true );
+				defaultView.removeEventListener( 'mouseup', onMouseUp );
 			};
 		},
 		[

@@ -56,9 +56,9 @@ export default function useEditableRoot() {
 
 			// While the wrapper is the editing host it must hold focus. Take
 			// it only when the caret is in the selected block and the current
-			// focus state is one the host may take over: an editable within
-			// the wrapper containing the caret (the editing context moves up
-			// to the host), or the document's default target reading as
+			// focus state is one the host may take over: the selected block's
+			// editable containing the caret (the editing context moves up to
+			// the host), or the document's default target reading as
 			// active without being focused (the selected block's editable
 			// turned inert while focused and the browser dropped focus; the
 			// default target is the wrapper itself in an iframed editor and
@@ -71,6 +71,8 @@ export default function useEditableRoot() {
 				activeElement !== node &&
 				activeElement?.isContentEditable &&
 				node.contains( activeElement ) &&
+				getBlockClientId( activeElement ) ===
+					getSelectedBlockClientId() &&
 				activeElement.contains( selection.anchorNode );
 			const isDroppedFocus =
 				( activeElement === node ||
