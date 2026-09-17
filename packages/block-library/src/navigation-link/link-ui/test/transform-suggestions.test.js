@@ -58,6 +58,15 @@ const anAttachment = {
 const ids = ( suggestions ) => suggestions.map( ( { id } ) => id );
 
 describe( 'transformSuggestions', () => {
+	it( 'keeps attachments for a custom link, which can point at a file', () => {
+		const results = transformSuggestions(
+			[ aPage, anAttachment, aCategory ],
+			{ type: 'custom', kind: 'custom' }
+		);
+
+		expect( ids( results ) ).toContain( anAttachment.id );
+	} );
+
 	it( 'removes attachments and keeps every other entity', () => {
 		const results = transformSuggestions(
 			[ aPage, anAttachment, aPost, aCategory, aTag ],

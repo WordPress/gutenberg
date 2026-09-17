@@ -1,7 +1,11 @@
 /**
- * Remove unsupported kinds from the search results (e.g. media)
+ * Attachments arrive from the unscoped search but are only offered to a Custom
+ * Link, which is an arbitrary URL and can point at a file. Every other link is
+ * bound to an entity, and `media` is not a kind `navigation-link` models, so
+ * selecting one there would write an attribute the block does not understand.
  */
-const UNSUPPORTED_KINDS = [ 'media' ];
+const ATTACHMENT_KIND = 'media';
+const CUSTOM_KIND = 'custom';
 
 /**
  * The Tag Link variation is named after the block, not the taxonomy, so it is
@@ -80,8 +84,8 @@ function getMatchTier( title, searchTerm ) {
 /**
  * Shapes link suggestions for use within a Navigation.
  *
- * Drops the suggestions a Navigation Link cannot represent, removes duplicates,
- * and orders what is left as:
+ * Drops the suggestions this Navigation Link cannot represent, removes
+ * duplicates, and orders what is left as:
  *
  * 1. One result of another type, but only when nothing of the link's own type
  *    matches what was typed at all. Searching "uncategorized" from a Page Link
@@ -106,6 +110,7 @@ export function transformSuggestions(
 	// A link with no entity of its own, such as a freshly appended item or a
 	// custom link, prefers pages.
 	const priority = normalizeEntity( attributes ) ?? DEFAULT_PRIORITY;
+	const offersAttachments = attributes.kind === CUSTOM_KIND;
 
 	// The same entity can arrive from more than one request, and ids repeat
 	// across post types and taxonomies, so identity needs all three parts.
@@ -113,7 +118,7 @@ export function transformSuggestions(
 	const supported = [];
 
 	for ( const suggestion of suggestions ) {
-		if ( UNSUPPORTED_KINDS.includes( suggestion.kind ) ) {
+		if ( ! offersAttachments && suggestion.kind === ATTACHMENT_KIND ) {
 			continue;
 		}
 
