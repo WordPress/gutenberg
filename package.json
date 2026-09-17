@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "24.0.0-rc.1",
+	"version": "24.0.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -88,6 +88,7 @@
 		"@typescript/native": "npm:typescript@^7.0.2",
 		"@wordpress/env": "file:./packages/env",
 		"@wordpress/eslint-tools": "file:./tools/eslint",
+		"@wordpress/monorepo-tools": "file:./tools/monorepo",
 		"@wordpress/release-tools": "file:./tools/release",
 		"@wordpress/scripts": "file:./packages/scripts",
 		"@wordpress/stylelint-tools": "file:./tools/stylelint",
@@ -172,7 +173,7 @@
 		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook-playwright storybook:dev\"",
 		"storybook:e2e:build": "npm run --workspace @wordpress/storybook-playwright storybook:build",
 		"storybook:manifest-snapshot": "npm run --workspace @wordpress/storybook manifest-snapshot",
-		"test": "npm run lint && npm run test:unit && npm run test:unit:vitest",
+		"test": "npm run lint && npm run test:unit",
 		"test:create-block": "npm run --workspace @wordpress/validation-tools test-create-block --",
 		"test:e2e": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.config.ts",
 		"test:e2e:debug": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.config.ts --ui",
@@ -204,13 +205,15 @@
 		"test:unit:php:multisite:base": "wp-env --config .wp-env.test.json run --env-cwd='wp-content/plugins/gutenberg' wordpress vendor/bin/phpunit -c phpunit/multisite.xml --verbose",
 		"test:unit:php:multisite": "npm run test:unit:php:setup && npm run test:unit:php:multisite:base",
 		"test:unit:php:multisite:debug": "npm run test:unit:php:setup:debug && npm run test:unit:php:multisite:base",
-		"test:unit:update": "npm run --workspace @wordpress/unit-tests test:unit -- --updateSnapshot",
+		"test:unit:update": "npm run --workspace @wordpress/unit-tests test:unit:vitest:update --",
 		"test:unit:watch": "npm run --workspace @wordpress/unit-tests test:unit:watch --",
 		"test:agent-evals": "npm --prefix test/ai-development run eval --",
 		"pretypecheck": "npm run --workspace @wordpress/build-scripts generate-worker-placeholders --",
 		"typecheck": "npm run --workspace @wordpress/build-scripts typecheck --",
 		"wp-env": "wp-env",
-		"wp-env-test": "wp-env --config .wp-env.test.json"
+		"wp-env-test": "wp-env --config .wp-env.test.json",
+		"test:unit:jest": "npm run --workspace @wordpress/unit-tests test:unit:jest --",
+		"test:unit:consumers": "npm run --workspace @wordpress/validation-tools test-vitest-consumers --"
 	},
 	"workspaces": [
 		"packages/*",

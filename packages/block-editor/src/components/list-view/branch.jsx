@@ -163,7 +163,7 @@ function ListViewBranch( props ) {
 		const hasNestedBlocks = !! innerBlocks?.length;
 
 		const shouldExpand = hasNestedBlocks
-			? expansionState[ clientId ] ?? isExpanded
+			? ( expansionState[ clientId ] ?? isExpanded )
 			: undefined;
 
 		// Make updates to the selected or dragged blocks synchronous,
