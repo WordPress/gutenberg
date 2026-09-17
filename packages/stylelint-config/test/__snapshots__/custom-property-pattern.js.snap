@@ -9,7 +9,7 @@ exports[`flags warnings with invalid custom-property-pattern css > snapshot matc
     "line": 2,
     "rule": "custom-property-pattern",
     "severity": "error",
-    "text": "Do not use "--_gcd-heading-font-weight". \`--_gcd-*\` and \`--_wp-*\` variables are private to @wordpress/ui and will break at any time. (custom-property-pattern)",
+    "text": "Do not use "--_gcd-heading-font-weight". \`--_gcd-*\` and \`--_wp-*\` variables are private and will break at any time. (custom-property-pattern)",
   },
   {
     "column": 2,
@@ -18,7 +18,7 @@ exports[`flags warnings with invalid custom-property-pattern css > snapshot matc
     "line": 3,
     "rule": "custom-property-pattern",
     "severity": "error",
-    "text": "Do not use "--_wp-ui-elevation-sm". \`--_gcd-*\` and \`--_wp-*\` variables are private to @wordpress/ui and will break at any time. (custom-property-pattern)",
+    "text": "Do not use "--_wp-ui-elevation-sm". \`--_gcd-*\` and \`--_wp-*\` variables are private and will break at any time. (custom-property-pattern)",
   },
   {
     "column": 19,
@@ -27,7 +27,7 @@ exports[`flags warnings with invalid custom-property-pattern css > snapshot matc
     "line": 7,
     "rule": "custom-property-pattern",
     "severity": "error",
-    "text": "Do not use "--_gcd-heading-font-weight". \`--_gcd-*\` and \`--_wp-*\` variables are private to @wordpress/ui and will break at any time. (custom-property-pattern)",
+    "text": "Do not use "--_gcd-heading-font-weight". \`--_gcd-*\` and \`--_wp-*\` variables are private and will break at any time. (custom-property-pattern)",
   },
   {
     "column": 18,
@@ -36,7 +36,7 @@ exports[`flags warnings with invalid custom-property-pattern css > snapshot matc
     "line": 8,
     "rule": "custom-property-pattern",
     "severity": "error",
-    "text": "Do not use "--_wp-ui-elevation-sm". \`--_gcd-*\` and \`--_wp-*\` variables are private to @wordpress/ui and will break at any time. (custom-property-pattern)",
+    "text": "Do not use "--_wp-ui-elevation-sm". \`--_gcd-*\` and \`--_wp-*\` variables are private and will break at any time. (custom-property-pattern)",
   },
 ]
 `;
