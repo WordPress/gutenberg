@@ -49,6 +49,7 @@ import { unlock } from '@wordpress/routes-lock-unlock';
 import { EmptyState, Tabs } from '@wordpress/ui';
 import { addQueryArgs } from '@wordpress/url';
 import {
+	getActiveViewOverrides,
 	getPostTypeViewSlug,
 	getTemplatePageItemId,
 	viewToQuery,
