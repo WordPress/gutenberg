@@ -83,10 +83,12 @@ function getMatchTier( title, searchTerm ) {
  * Drops the suggestions a Navigation Link cannot represent, removes duplicates,
  * and orders what is left as:
  *
- * 1. One result of another type, but only when it matches what was typed better
- *    than anything of the link's own type does. Searching "uncategorized" from a
- *    Page Link leads with that category; searching "contact" when a page is
- *    called "Contact" does not, because the page already answers it.
+ * 1. One result of another type, but only when nothing of the link's own type
+ *    matches what was typed at all. Searching "uncategorized" from a Page Link
+ *    leads with that category because no page answers it. Searching "coffee"
+ *    does not lead with a category called "Coffee" when a page is called
+ *    "Coffee Guide", because that page matches everything that was typed; it is
+ *    only longer.
  * 2. Up to `PREFERRED_COUNT` of the link's own type.
  * 3. Everything else, by how well it matches, keeping the order the results
  *    arrived in within each tier.
@@ -158,7 +160,10 @@ export function transformSuggestions(
 		( searchTerm ?? '' ).trim().length >= MIN_LENGTH_TO_ELEVATE;
 	const bestOtherTier = bestTier( others );
 
-	if ( canElevate && bestOtherTier > bestTier( preferred ) ) {
+	// A shorter title is not a better answer. The link's own type keeps the top
+	// spot whenever it matches at all, and another type only leads when nothing
+	// of the link's own type matches.
+	if ( canElevate && bestOtherTier > 0 && bestTier( preferred ) === 0 ) {
 		ordered.push( byTier( others )[ 0 ] );
 	}
 

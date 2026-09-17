@@ -175,6 +175,24 @@ describe( 'transformSuggestions', () => {
 		const contactCategory = { ...aCategory, id: 32, title: 'Contact' };
 		const pageAttributes = { type: 'page', kind: 'post-type' };
 
+		it( 'keeps the preferred type first when another type matches only the whole title', () => {
+			// "Coffee Guide" matches everything that was typed. The category
+			// is not a better answer just because its title stops there.
+			const coffeeGuidePage = { ...aPage, id: 33, title: 'Coffee Guide' };
+			const coffeeCategory = { ...aCategory, id: 34, title: 'Coffee' };
+
+			const results = transformSuggestions(
+				[ coffeeCategory, coffeeGuidePage ],
+				pageAttributes,
+				'coffee'
+			);
+
+			expect( ids( results ) ).toEqual( [
+				coffeeGuidePage.id,
+				coffeeCategory.id,
+			] );
+		} );
+
 		it( 'keeps the preferred type first when it matches as well as another type', () => {
 			const results = transformSuggestions(
 				[ contactCategory, contactPage, contactUsPage ],
