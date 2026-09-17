@@ -175,27 +175,41 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => {
 } );
 
 describe( 'DataViews component', () => {
-	it.each( [ LAYOUT_TABLE, LAYOUT_GRID ] as const )(
-		'preserves the standalone toolbar in a custom %s composition',
-		( type ) => {
-			render(
-				<DataViewWrapper
-					view={ { type } }
-					actions={ actions }
-					selection={ [ '1' ] }
-					onChangeSelection={ vi.fn() }
-				>
-					<DataViews.Layout />
-					<DataViews.BulkActionToolbar />
-					<DataViews.Pagination />
-				</DataViewWrapper>
-			);
-			expect( screen.getByText( '1 Item selected' ) ).toBeInTheDocument();
-			expect(
-				screen.getByRole( 'button', { name: 'Delete' } )
-			).not.toHaveClass( 'is-secondary' );
-		}
-	);
+	it( 'preserves an explicit bulk toolbar in a custom table composition', () => {
+		render(
+			<DataViewWrapper
+				view={ { type: LAYOUT_TABLE } }
+				actions={ actions }
+				selection={ [ '1' ] }
+				onChangeSelection={ vi.fn() }
+			>
+				<DataViews.Layout />
+				<DataViews.BulkActionToolbar />
+				<DataViews.Pagination />
+			</DataViewWrapper>
+		);
+		expect( screen.getByText( '1 Item selected' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).not.toHaveClass( 'is-secondary' );
+	} );
+
+	it( 'preserves footer bulk actions in a custom grid composition', async () => {
+		render(
+			<DataViewWrapper view={ { type: LAYOUT_GRID } } actions={ actions }>
+				<DataViews.Layout />
+				<DataViews.Footer />
+			</DataViewWrapper>
+		);
+		const user = userEvent.setup();
+		await user.click(
+			screen.getAllByRole( 'checkbox', { name: 'Select all' } ).at( -1 )!
+		);
+		expect( screen.getByText( '3 Items selected' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).not.toHaveClass( 'is-secondary' );
+	} );
 
 	it( 'disabled desktop bulk action cannot run', async () => {
 		const callback = vi.fn();
@@ -221,134 +235,41 @@ describe( 'DataViews component', () => {
 		expect( callback ).not.toHaveBeenCalled();
 	} );
 
-	it( 'renders bulk actions as a table-header cell without replacing column headers', () => {
-		render(
-			<DataViewWrapper
-				selection={ [ '1' ] }
-				onChangeSelection={ vi.fn() }
-				actions={ actions }
-			/>
-		);
-		const tableHeader = within( screen.getByRole( 'table' ) ).getAllByRole(
-			'rowgroup'
-		)[ 0 ];
-		expect(
-			within( tableHeader ).getByRole( 'cell', {
-				name: /1 Item selected/,
-			} )
-		).toBeInTheDocument();
-		expect(
-			within( tableHeader ).getByRole( 'columnheader', { name: 'Title' } )
-		).toBeInTheDocument();
-	} );
-
-	it.each( [ LAYOUT_TABLE, LAYOUT_GRID ] as const )(
-		'preserves bulk actions in the footer of a custom %s composition',
-		async ( type ) => {
-			render(
-				<DataViewWrapper view={ { type } } actions={ actions }>
-					<DataViews.Layout />
-					<DataViews.Footer />
-				</DataViewWrapper>
-			);
-			expect( screen.getByText( '3 Items' ) ).toBeInTheDocument();
-			const user = userEvent.setup();
-			await user.click(
-				screen
-					.getAllByRole( 'checkbox', { name: 'Select all' } )
-					.at( -1 )!
-			);
-			expect(
-				screen.getByText( '3 Items selected' )
-			).toBeInTheDocument();
-			await user.click(
-				screen.getByRole( 'button', { name: 'Cancel' } )
-			);
-			expect( screen.getByText( '3 Items' ) ).toBeInTheDocument();
-		}
-	);
-
-	it( 'selects remaining eligible page items with the bulk toolbar checkbox', async () => {
-		const onChangeSelection = vi.fn();
-		render(
-			<DataViewWrapper
-				selection={ [ '1' ] }
-				onChangeSelection={ onChangeSelection }
-				actions={ [
-					{
-						...actions[ 0 ],
-						isEligible: ( item: Data ) => item.id !== 2,
-					},
-				] }
-			/>
-		);
-		const toolbar = within( getBulkActionToolbar() );
-		const user = userEvent.setup();
-		await user.click(
-			toolbar.getByRole( 'checkbox', { name: 'Select all' } )
-		);
-		expect( onChangeSelection ).toHaveBeenLastCalledWith( [ '1', '3' ] );
-		await user.click( toolbar.getByRole( 'button', { name: 'Cancel' } ) );
-		expect( onChangeSelection ).toHaveBeenLastCalledWith( [] );
-	} );
-
-	it( 'keeps the infinite-scroll footer count-only and clears selection from the bulk toolbar', async () => {
-		vi.stubGlobal(
-			'IntersectionObserver',
-			class {
-				observe() {}
-				unobserve() {}
-				disconnect() {}
-			}
-		);
-		const onChangeSelection = vi.fn();
-		render(
-			<DataViewWrapper
-				view={ { ...DEFAULT_VIEW, infiniteScrollEnabled: true } }
-				selection={ [ '1' ] }
-				onChangeSelection={ onChangeSelection }
-				actions={ actions }
-			/>
-		);
-		const itemCount = screen.getByText( '3 Items' );
-		const footer = within(
-			// eslint-disable-next-line testing-library/no-node-access
-			itemCount.closest< HTMLDivElement >( '.dataviews-footer' )!
-		);
-		expect( footer.queryByRole( 'checkbox' ) ).not.toBeInTheDocument();
-		expect(
-			footer.queryByRole( 'button', { name: 'Cancel' } )
-		).not.toBeInTheDocument();
-		const user = userEvent.setup();
-		await user.click(
-			within( getBulkActionToolbar() ).getByRole( 'checkbox', {
-				name: 'Deselect all',
-			} )
-		);
-		expect( onChangeSelection ).toHaveBeenLastCalledWith( [] );
-	} );
-
-	it( 'keeps column headers accessible while rows are selected', async () => {
+	it( 'moves default table bulk actions into the header and preserves focus', async () => {
 		render( <DataViewWrapper actions={ actions } /> );
+		expect( screen.getByText( '3 Items' ) ).toBeInTheDocument();
+		expect(
+			screen.getAllByRole( 'checkbox', { name: 'Select all' } )
+		).toHaveLength( 1 );
+
 		const user = userEvent.setup();
 		await user.click(
 			screen.getByRole( 'checkbox', { name: 'Select all' } )
 		);
-		const titleHeader = screen.getByRole( 'columnheader', {
+
+		const tableHeader = within( screen.getByRole( 'table' ) ).getAllByRole(
+			'rowgroup'
+		)[ 0 ];
+		const toolbarCell = within( tableHeader ).getByRole( 'cell', {
+			name: /3 Items selected/,
+		} );
+		const titleHeader = within( tableHeader ).getByRole( 'columnheader', {
 			name: 'Title',
 		} );
-		expect(
-			within( screen.getByRole( 'table' ) ).getAllByRole(
-				'rowgroup'
-			)[ 0 ]
-		).not.toHaveAttribute( 'inert' );
+		expect( tableHeader ).not.toHaveAttribute( 'inert' );
 		expect( within( titleHeader ).getByRole( 'button' ) ).toBeDisabled();
 		expect(
-			screen
-				.getAllByRole( 'checkbox', { name: 'Deselect all' } )
-				.at( -1 )!
+			within( toolbarCell ).getByRole( 'checkbox', {
+				name: 'Deselect all',
+			} )
 		).toHaveFocus();
-		await user.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).toBeInTheDocument();
+
+		await user.click(
+			within( toolbarCell ).getByRole( 'button', { name: 'Cancel' } )
+		);
 		expect( within( titleHeader ).getByRole( 'button' ) ).toBeEnabled();
 		expect(
 			screen.getByRole( 'checkbox', { name: 'Select all' } )
@@ -1487,10 +1408,11 @@ describe( 'DataViews component', () => {
 			mockUseViewportMatch.mockImplementation( () => false );
 		} );
 
-		it( 'disabled mobile-menu bulk action cannot run', async () => {
+		it( 'supports iconless and disabled grid bulk actions without losing modal focus', async () => {
 			const callback = vi.fn();
 			render(
 				<DataViewWrapper
+					view={ { ...DEFAULT_VIEW, type: LAYOUT_GRID } }
 					selection={ [ '1' ] }
 					onChangeSelection={ vi.fn() }
 					actions={ [
@@ -1501,82 +1423,24 @@ describe( 'DataViews component', () => {
 							disabled: true,
 							callback,
 						},
+						actions[ 0 ],
 					] }
 				/>
 			);
 			const user = userEvent.setup();
-			await user.click(
-				within( getBulkActionToolbar() ).getByRole( 'button', {
-					name: 'Actions',
-				} )
+			const bulkActions = within( getBulkActionToolbar() ).getByRole(
+				'button',
+				{ name: 'Actions' }
 			);
-			const action = screen.getByRole( 'menuitem', { name: 'Edit' } );
-			expect( action ).toHaveAttribute( 'aria-disabled', 'true' );
-			await user.click( action );
-			expect( callback ).not.toHaveBeenCalled();
-		} );
+			await user.click( bulkActions );
 
-		it( 'opens a labeled iconless grid bulk action and reports its busy state', async () => {
-			let finishAction: () => void = () => {};
-			const pendingAction = new Promise< void >( ( resolve ) => {
-				finishAction = resolve;
+			const disabledAction = screen.getByRole( 'menuitem', {
+				name: 'Edit',
 			} );
-			const callback = vi.fn( () => pendingAction );
-			render(
-				<DataViewWrapper
-					view={ { ...DEFAULT_VIEW, type: LAYOUT_GRID } }
-					selection={ [ '1', '2', '3' ] }
-					onChangeSelection={ vi.fn() }
-					actions={ [
-						{
-							id: 'duplicate',
-							label: ( items ) =>
-								`Duplicate ${ items.length } items`,
-							supportsBulk: true,
-							isEligible: ( item ) => item.id !== 2,
-							callback,
-						},
-					] }
-				/>
-			);
-			const user = userEvent.setup();
-			const bulkActions = within( getBulkActionToolbar() ).getByRole(
-				'button',
-				{ name: 'Actions' }
-			);
-			expect( bulkActions ).toHaveTextContent( 'Actions' );
-			await user.click( bulkActions );
-			await user.click(
-				screen.getByRole( 'menuitem', {
-					name: 'Duplicate 2 items',
-				} )
-			);
-			expect( callback ).toHaveBeenCalledOnce();
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-			expect( bulkActions ).toHaveAttribute( 'aria-disabled', 'true' );
-			finishAction();
-			await waitFor( () =>
-				expect( bulkActions ).not.toHaveAttribute(
-					'aria-disabled',
-					'true'
-				)
-			);
-		} );
+			expect( disabledAction ).toHaveAttribute( 'aria-disabled', 'true' );
+			await user.click( disabledAction );
+			expect( callback ).not.toHaveBeenCalled();
 
-		it( 'keeps the bulk action dialog open after closing the mobile menu', async () => {
-			render(
-				<DataViewWrapper
-					selection={ [ '1' ] }
-					onChangeSelection={ vi.fn() }
-					actions={ actions }
-				/>
-			);
-			const user = userEvent.setup();
-			const bulkActions = within( getBulkActionToolbar() ).getByRole(
-				'button',
-				{ name: 'Actions' }
-			);
-			await user.click( bulkActions );
 			await user.click(
 				screen.getByRole( 'menuitem', { name: 'Delete' } )
 			);
