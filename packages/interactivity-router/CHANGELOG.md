@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `state.navigating` and `state.initiator` to the `core/router` store, plus an `initiator` option for `navigate()`, giving extenders a supported, reactive way to observe client-side navigations and know what started them. ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD))
+-   Add `state.navigating` and `state.initiator` to the `core/router` store, plus an `initiator` option for `navigate()`, giving extenders a supported, reactive way to observe client-side navigations and know what started them. ([#83100](https://github.com/WordPress/gutenberg/pull/83100))
 
 ## 2.55.0 (2026-09-10)
 
