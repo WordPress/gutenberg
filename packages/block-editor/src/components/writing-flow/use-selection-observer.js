@@ -6,7 +6,7 @@ import {
 } from '@wordpress/rich-text';
 import { isSelectionForward } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
-import { getBlockClientId } from '../../utils/dom';
+import { getBlockClientId, getClosestEditableElement } from '../../utils/dom';
 import { setContentEditableWrapper } from './utils';
 import { unlock } from '../../lock-unlock';
 
@@ -271,15 +271,10 @@ export default function useSelectionObserver() {
 							ownerDocument.activeElement === node &&
 							ownerDocument.hasFocus()
 						) {
-							let element =
+							const element = getClosestEditableElement(
 								startNode.nodeType === startNode.ELEMENT_NODE
 									? startNode
-									: startNode.parentElement;
-							// The editable may be editable by inheritance,
-							// without a contenteditable attribute of its own;
-							// rich text elements are matched by class.
-							element = element?.closest(
-								'[contenteditable], .rich-text'
+									: startNode.parentElement
 							);
 							// Only move focus into the editable when it belongs
 							// to the selected block. The collapsed selection can

@@ -26,6 +26,7 @@ import {
 } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
+import { richTextElements } from '../../utils/dom';
 import { useMarkPersistent } from './use-mark-persistent';
 import { useEventListeners } from './event-listeners';
 import FormatEdit from './format-edit';
@@ -477,6 +478,13 @@ function RichTextWrapper(
 		anchorRef.current?.focus();
 	}
 
+	const registerElementRef = useRefEffect( ( element ) => {
+		richTextElements.add( element );
+		return () => {
+			richTextElements.delete( element );
+		};
+	}, [] );
+
 	// Under the editing host the element is not a focus target (no tabindex
 	// and no contenteditable attribute of its own, see below), so a
 	// `focus()` call on it would do nothing. Keep it working for existing
@@ -615,6 +623,7 @@ function RichTextWrapper(
 					anchorRef,
 					setAnchorElement,
 					focusUnderHostRef,
+					registerElementRef,
 				] ) }
 				contentEditable={
 					// Under the editing host the child is editable by
