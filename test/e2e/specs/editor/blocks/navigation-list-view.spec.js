@@ -211,7 +211,15 @@ test.describe( 'Navigation block - List view editing', () => {
 		// Searching reaches more than pages, and pages are still listed first
 		// because the appended item is a Page Link.
 		// See https://github.com/WordPress/gutenberg/issues/77072.
+		//
+		// A second request scoped to the link's own type runs alongside the
+		// unscoped one, so that pages appear even when other types would fill
+		// the results on their own.
+		const scopedRequest = page.waitForRequest( ( request ) =>
+			request.url().includes( 'subtype=page' )
+		);
 		await page.keyboard.type( 'Test', { delay: 50 } );
+		await scopedRequest;
 
 		const searchedResults = await linkControl.getSearchResults();
 

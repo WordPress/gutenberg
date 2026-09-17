@@ -7,7 +7,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { LinkControl, useBlockEditingMode } from '@wordpress/block-editor';
 import {
-	useCallback,
 	useMemo,
 	useState,
 	useRef,
@@ -22,7 +21,7 @@ import { isURL } from '@wordpress/url';
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
 import { useEntityBinding, useLinkPreview } from '../shared';
-import { transformSuggestions as transformNavigationSuggestions } from './transform-suggestions';
+import { useTransformSuggestions } from './use-transform-suggestions';
 
 /**
  * Given the Link block's type attribute, return the search query params that
@@ -202,13 +201,19 @@ function UnforwardedLinkUI( props, ref ) {
 
 	const blockEditingMode = useBlockEditingMode();
 
-	// The search is unscoped, so results are filtered and ordered for the
-	// Navigation once they arrive.
-	const transformSuggestions = useCallback(
-		( suggestions ) =>
-			transformNavigationSuggestions( suggestions, { type, kind } ),
+	const suggestionsQuery = useMemo(
+		() => getSuggestionsQuery( type, kind ),
 		[ type, kind ]
 	);
+
+	// The search is unscoped, so results are balanced, filtered and ordered for
+	// the Navigation once they arrive.
+	const transformSuggestions = useTransformSuggestions( {
+		type,
+		kind,
+		preferredSearchOptions:
+			suggestionsQuery.initialSuggestionsSearchOptions,
+	} );
 
 	return (
 		<Popover
@@ -242,7 +247,7 @@ function UnforwardedLinkUI( props, ref ) {
 						withCreateSuggestion={ false }
 						noDirectEntry={ !! type }
 						noURLSuggestion={ !! type }
-						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
+						suggestionsQuery={ suggestionsQuery }
 						transformSuggestions={ transformSuggestions }
 						onChange={ props.onChange }
 						onInputChange={ ( value ) => {

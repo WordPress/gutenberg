@@ -169,6 +169,85 @@ describe( 'transformSuggestions', () => {
 		expect( results ).toEqual( [ aCategory, createOption ] );
 	} );
 
+	describe( 'ordering', () => {
+		const contactPage = { ...aPage, id: 30, title: 'Contact' };
+		const contactUsPage = { ...aPage, id: 31, title: 'Contact us' };
+		const contactCategory = { ...aCategory, id: 32, title: 'Contact' };
+		const pageAttributes = { type: 'page', kind: 'post-type' };
+
+		it( 'keeps the preferred type first when it matches as well as another type', () => {
+			const results = transformSuggestions(
+				[ contactCategory, contactPage, contactUsPage ],
+				pageAttributes,
+				'contact'
+			);
+
+			expect( ids( results ) ).toEqual( [
+				contactPage.id,
+				contactUsPage.id,
+				contactCategory.id,
+			] );
+		} );
+
+		it( 'leads with another type when only it matches what was typed', () => {
+			const results = transformSuggestions(
+				[ aPage, aPost, aCategory ],
+				pageAttributes,
+				'favorites'
+			);
+
+			// aCategory is titled "Favorites"; no page matches at all.
+			expect( ids( results )[ 0 ] ).toBe( aCategory.id );
+		} );
+
+		it( 'shows no more than three of the preferred type before the rest', () => {
+			const pages = [ 1, 2, 3, 4 ].map( ( n ) => ( {
+				...aPage,
+				id: 40 + n,
+				title: `Page ${ n }`,
+			} ) );
+
+			// The category is less relevant than the fourth page, but only
+			// three pages come first, so it is no longer last.
+			const results = transformSuggestions(
+				[ ...pages.slice( 0, 3 ), aCategory, pages[ 3 ] ],
+				pageAttributes,
+				'zzz'
+			);
+
+			expect( ids( results ) ).toEqual( [
+				41,
+				42,
+				43,
+				aCategory.id,
+				44,
+			] );
+		} );
+
+		it( 'does not elevate on a short search', () => {
+			const results = transformSuggestions(
+				[ aPage, contactCategory ],
+				pageAttributes,
+				'con'
+			);
+
+			expect( ids( results )[ 0 ] ).toBe( aPage.id );
+		} );
+
+		it( 'removes an entity returned by more than one search', () => {
+			const results = transformSuggestions(
+				[ contactPage, contactPage, contactCategory ],
+				pageAttributes,
+				'contact'
+			);
+
+			expect( ids( results ) ).toEqual( [
+				contactPage.id,
+				contactCategory.id,
+			] );
+		} );
+	} );
+
 	it( 'returns the list untouched when nothing matches the priority type', () => {
 		const results = transformSuggestions( [ aPost, aCategory, aTag ], {
 			type: 'page',
