@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import BaseCheckboxControl from '..';
 import type { CheckboxControlProps } from '../types';
 
@@ -82,14 +82,6 @@ describe( 'CheckboxControl', () => {
 		it( 'should associate the `help` text accessibly', () => {
 			render( <CheckboxControl help="Help text" /> );
 			expect( getInput() ).toHaveAccessibleDescription( 'Help text' );
-		} );
-
-		it( 'should focus the checkbox through its ref', () => {
-			const ref = createRef< HTMLInputElement >();
-			render( <BaseCheckboxControl ref={ ref } onChange={ noop } /> );
-
-			ref.current?.focus();
-			expect( getInput() ).toHaveFocus();
 		} );
 	} );
 

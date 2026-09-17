@@ -1,15 +1,11 @@
-import {
-	Button,
-	CheckboxControl,
-	DropdownMenu,
-	MenuItem,
-} from '@wordpress/components';
+import { Button, DropdownMenu, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { closeSmall, chevronDown } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
-import { Stack } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Checkbox, pending WordPress/gutenberg#76135.
+import { Checkbox, Stack } from '@wordpress/ui';
 import DataViewsContext from '../dataviews-context';
 import { ActionModal } from '../dataviews-item-actions';
 import type { Action, ActionModal as ActionModalType } from '../../types';
@@ -55,7 +51,7 @@ interface BulkSelectionCheckboxProps< Item > {
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
 	disableSelectAll?: boolean;
-	inputRef?: React.Ref< HTMLInputElement >;
+	checkboxRef?: React.Ref< HTMLSpanElement >;
 }
 
 export function BulkSelectionCheckbox< Item >( {
@@ -65,7 +61,7 @@ export function BulkSelectionCheckbox< Item >( {
 	actions,
 	getItemId,
 	disableSelectAll = false,
-	inputRef,
+	checkboxRef,
 }: BulkSelectionCheckboxProps< Item > ) {
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
@@ -86,26 +82,22 @@ export function BulkSelectionCheckbox< Item >( {
 
 	if ( disableSelectAll ) {
 		return (
-			<CheckboxControl
-				ref={ inputRef }
-				className="dataviews-view-table-selection-checkbox"
+			<Checkbox
+				ref={ checkboxRef }
 				checked={ hasSelection }
 				disabled={ ! hasSelection }
-				onChange={ () => {
-					onChangeSelection( [] );
-				} }
+				onCheckedChange={ () => onChangeSelection( [] ) }
 				aria-label={ __( 'Deselect all' ) }
 			/>
 		);
 	}
 
 	return (
-		<CheckboxControl
-			ref={ inputRef }
-			className="dataviews-view-table-selection-checkbox"
+		<Checkbox
+			ref={ checkboxRef }
 			checked={ areAllSelected }
 			indeterminate={ ! areAllSelected && !! selectedItems.length }
-			onChange={ () => {
+			onCheckedChange={ () => {
 				if ( areAllSelected ) {
 					onChangeSelection( [] );
 				} else {
@@ -136,7 +128,7 @@ interface ToolbarContentProps< Item > {
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
 	isInfiniteScroll: boolean;
-	selectionCheckboxRef?: React.Ref< HTMLInputElement >;
+	selectionCheckboxRef?: React.Ref< HTMLSpanElement >;
 }
 
 function ActionTrigger< Item >( {
@@ -226,7 +218,7 @@ function renderBulkActionsContent< Item >(
 	isDefaultUI: boolean,
 	totalItems: number,
 	isMobile: boolean,
-	selectionCheckboxRef?: React.Ref< HTMLInputElement >
+	selectionCheckboxRef?: React.Ref< HTMLSpanElement >
 ) {
 	const clearSelection = selectedItems.length > 0 && (
 		<Button
@@ -267,7 +259,7 @@ function renderBulkActionsContent< Item >(
 			justify="start"
 		>
 			<BulkSelectionCheckbox
-				inputRef={ selectionCheckboxRef }
+				checkboxRef={ selectionCheckboxRef }
 				selection={ selection }
 				onChangeSelection={ onChangeSelection }
 				data={ data }
@@ -421,7 +413,7 @@ function BulkActionsContent< Item >( {
 }
 
 interface BulkActionToolbarProps {
-	selectionCheckboxRef?: React.Ref< HTMLInputElement >;
+	selectionCheckboxRef?: React.Ref< HTMLSpanElement >;
 }
 
 export function BulkActionToolbar( {
