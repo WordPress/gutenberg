@@ -192,16 +192,14 @@ function PickerBulkSelectionInfo() {
 			gap="md"
 			align="center"
 		>
-			{ isMultiselect && (
-				<BulkSelectionCheckbox
-					selection={ selection }
-					selectedItems={ selectedItems }
-					onChangeSelection={ onChangeSelection }
-					data={ data }
-					getItemId={ getItemId }
-					disableSelectAll={ !! view.infiniteScrollEnabled }
-				/>
-			) }
+			<BulkSelectionCheckbox
+				selection={ selection }
+				selectedItems={ selectedItems }
+				onChangeSelection={ onChangeSelection }
+				data={ data }
+				getItemId={ getItemId }
+				disableSelectAll={ !! view.infiniteScrollEnabled }
+			/>
 			<span className="dataviews-bulk-actions-footer__item-count">
 				{ message }
 			</span>
