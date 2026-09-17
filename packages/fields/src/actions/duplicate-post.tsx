@@ -21,6 +21,7 @@ interface RenderModalProps< Item > {
 interface Action< Item > {
 	id: string;
 	label: string;
+	modalHeader?: string;
 	isEligible?: ( item: Item ) => boolean;
 	modalFocusOnMount?: string;
 	RenderModal: ( props: RenderModalProps< Item > ) => React.JSX.Element;
@@ -28,7 +29,8 @@ interface Action< Item > {
 
 const duplicatePost: Action< BasePost > = {
 	id: 'duplicate-post',
-	label: _x( 'Duplicate', 'action label' ),
+	label: _x( 'Duplicate…', 'action label' ),
+	modalHeader: _x( 'Duplicate', 'action label' ),
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},

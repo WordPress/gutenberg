@@ -3,23 +3,24 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { playwright } from '@vitest/browser-playwright';
-import react from '@vitejs/plugin-react-swc';
 import { globSync } from 'glob';
 import { defineConfig } from 'vitest/config';
+import { createVitePlugins } from './config/vite-plugins.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
 } from './scripts/discover-test-files.mjs';
 
-const ROOT_DIR = path.resolve(
-	path.dirname( fileURLToPath( import.meta.url ) ),
-	'../..'
-);
+const CONFIG_DIR = path.dirname( fileURLToPath( import.meta.url ) );
+const ROOT_DIR = path.resolve( CONFIG_DIR, '../..' );
 const nodeRequire = createRequire( import.meta.url );
-const emotionPlugin = nodeRequire.resolve( '@swc/plugin-emotion' );
 const gutenbergEnvSetupFile = path.join(
 	ROOT_DIR,
 	'test/unit/config/gutenberg-env.js'
+);
+const isolationSetupFile = path.join(
+	ROOT_DIR,
+	'test/unit/config/isolation.vitest.js'
 );
 const testMigration = JSON.parse(
 	readFileSync(
@@ -79,19 +80,7 @@ export default defineConfig( {
 			runtime: 'automatic',
 		},
 	},
-	plugins: [
-		react( {
-			plugins: [
-				[
-					emotionPlugin,
-					{
-						autoLabel: 'always',
-						labelFormat: '[local]',
-					},
-				],
-			],
-		} ),
-	],
+	plugins: await createVitePlugins( ROOT_DIR ),
 	resolve: {
 		alias: [
 			{
@@ -166,6 +155,7 @@ export default defineConfig( {
 							ROOT_DIR,
 							'test/unit/config/console.vitest.js'
 						),
+						isolationSetupFile,
 					],
 				},
 			},
@@ -202,31 +192,67 @@ export default defineConfig( {
 							ROOT_DIR,
 							'test/unit/config/testing-library.vitest.js'
 						),
+						isolationSetupFile,
 					],
 				},
 			},
 			{
 				extends: true,
+				/*
+				 * Browser mode pre-bundles the Vitest runtime, which Vite resolves
+				 * from the project root. Root the project where the test
+				 * dependencies are declared so resolution stays layout agnostic.
+				 */
+				root: CONFIG_DIR,
+				optimizeDeps: {
+					entries: vitestTests.browser.map( ( testPath ) =>
+						path.join( ROOT_DIR, testPath )
+					),
+				},
 				test: {
 					name: 'browser',
+					dir: ROOT_DIR,
+					attachmentsDir: path.join(
+						ROOT_DIR,
+						'test-results/vitest-browser-attachments'
+					),
 					include: vitestTests.browser,
 					setupFiles: [
 						path.join(
 							ROOT_DIR,
+							'test/unit/config/browser.vitest.js'
+						),
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/gutenberg-env.js'
+						),
+						path.join(
+							ROOT_DIR,
 							'test/unit/config/console.vitest.js'
 						),
+						isolationSetupFile,
 					],
 					browser: {
 						enabled: true,
 						headless: true,
 						instances: [ { browser: 'chromium' } ],
 						provider: playwright(),
+						screenshotDirectory: path.join(
+							ROOT_DIR,
+							'test-results/vitest-browser-screenshots'
+						),
+						screenshotFailures: true,
 					},
 				},
 			},
 		],
+		// mockReset already clears every mock. Keep clearMocks disabled to make
+		// that overlap explicit and avoid a redundant cleanup pass.
+		clearMocks: false,
 		globals: false,
 		includeTaskLocation: true,
+		isolate: true,
+		mockReset: true,
 		passWithNoTests: false,
 		reporters,
 		sequence: {
@@ -237,5 +263,8 @@ export default defineConfig( {
 			escapeString: false,
 			printBasicPrototype: false,
 		},
+		restoreMocks: true,
+		unstubEnvs: true,
+		unstubGlobals: true,
 	},
 } );

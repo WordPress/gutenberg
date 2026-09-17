@@ -1,8 +1,8 @@
-import '@testing-library/jest-dom';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import type {
 	ResolveWidgetModule,
 	WidgetRenderProps,
@@ -19,11 +19,14 @@ import type {
 	DashboardWidget,
 } from '../types';
 
-jest.mock( '../components/widget-attributes/use-inline-fit', () => ( {
-	useInlineFit: jest.fn(),
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockResizeObserver();
+
+vi.mock( import( '../components/widget-attributes/use-inline-fit' ), () => ( {
+	useInlineFit: vi.fn(),
 } ) );
 
-const mockedUseInlineFit = jest.mocked( useInlineFit );
+const mockedUseInlineFit = vi.mocked( useInlineFit );
 
 function TestWidget( {
 	attributes,
@@ -108,10 +111,41 @@ function OpenSettings() {
 	);
 }
 
+/* Reaches the engine's staging and commit paths directly. */
+interface EngineApi {
+	layout: DashboardWidget[];
+	mutate: ( next: DashboardWidget[] ) => void;
+	commit: () => void;
+	scheduleAutoSave: () => void;
+}
+
+const engineRef: { current: EngineApi | null } = { current: null };
+
+function EngineProbe() {
+	const ctx = useDashboardInternalContext();
+	useEffect( () => {
+		engineRef.current = {
+			layout: ctx.layout,
+			mutate: ctx.onLayoutChange,
+			commit: ctx.commit,
+			scheduleAutoSave: ctx.scheduleAutoSave,
+		};
+	} );
+	return null;
+}
+
+function readEngine(): EngineApi {
+	if ( ! engineRef.current ) {
+		throw new Error( 'EngineProbe not mounted yet' );
+	}
+	return engineRef.current;
+}
+
 interface HarnessProps {
 	canPerform?: CanPerformDashboardOperation;
 	editMode?: boolean;
 	layout?: DashboardWidget[];
+	onLayoutChange?: ( next: DashboardWidget[] ) => void;
 	children?: React.ReactNode;
 }
 
@@ -119,6 +153,7 @@ function Harness( {
 	canPerform,
 	editMode = false,
 	layout: seed = initialLayout,
+	onLayoutChange,
 	children,
 }: HarnessProps ) {
 	const [ layout, setLayout ] = useState< DashboardWidget[] >( seed );
@@ -126,7 +161,10 @@ function Harness( {
 	const dashboard = (
 		<WidgetDashboard
 			layout={ layout }
-			onLayoutChange={ setLayout }
+			onLayoutChange={ ( next ) => {
+				onLayoutChange?.( next );
+				setLayout( next );
+			} }
 			widgetTypes={ widgetTypes }
 			editMode={ editMode }
 			onEditChange={ () => {} }
@@ -190,7 +228,7 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 	} );
 
 	it( 'asks with the placed widget and its type', async () => {
-		const canPerform = jest.fn< boolean, [ unknown ] >( () => true );
+		const canPerform = vi.fn< CanPerformDashboardOperation >( () => true );
 		render( <Harness canPerform={ canPerform } editMode /> );
 		await screen.findByTestId( 'label' );
 
@@ -406,5 +444,200 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 		await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
 
 		expect( screen.queryByTestId( 'label' ) ).not.toBeInTheDocument();
+	} );
+
+	describe( 'staging enforcement', () => {
+		const secondWidget: DashboardWidget = {
+			uuid: 'w2',
+			type: 'test/snapshot',
+			attributes: { metric: 'sales', label: 'Revenue' },
+			placement: { width: 1, height: 1 },
+		};
+
+		it( 'holds a move-denied instance and publishes nothing on Done', async () => {
+			const onLayoutChange = vi.fn();
+			const pinFirst: CanPerformDashboardOperation = ( request ) =>
+				! (
+					request.operation === 'move' && request.widget.uuid === 'w1'
+				);
+			render(
+				<Harness
+					canPerform={ pinFirst }
+					layout={ [ initialLayout[ 0 ], secondWidget ] }
+					onLayoutChange={ onLayoutChange }
+					editMode
+				>
+					<EngineProbe />
+				</Harness>
+			);
+			await screen.findAllByTestId( 'label' );
+
+			act( () => {
+				const [ first, second ] = readEngine().layout;
+				readEngine().mutate( [ second, first ] );
+			} );
+
+			expect(
+				screen
+					.getAllByTestId( 'label' )
+					.map( ( node ) => node.textContent )
+			).toEqual( [ 'Traffic', 'Revenue' ] );
+
+			act( () => {
+				readEngine().commit();
+			} );
+
+			expect( onLayoutChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'publishes only the allowed changes on Done', async () => {
+			const onLayoutChange = vi.fn();
+			const lockFirstEdit: CanPerformDashboardOperation = ( request ) =>
+				! (
+					request.operation === 'edit' && request.widget.uuid === 'w1'
+				);
+			render(
+				<Harness
+					canPerform={ lockFirstEdit }
+					layout={ [ initialLayout[ 0 ], secondWidget ] }
+					onLayoutChange={ onLayoutChange }
+					editMode
+				>
+					<EngineProbe />
+				</Harness>
+			);
+			await screen.findAllByTestId( 'label' );
+
+			act( () => {
+				const [ first, second ] = readEngine().layout;
+				readEngine().mutate( [
+					{
+						...first,
+						attributes: { metric: 'views', label: 'Hijacked' },
+					},
+					{
+						...second,
+						attributes: { metric: 'sales', label: 'Edited' },
+					},
+				] );
+			} );
+
+			act( () => {
+				readEngine().commit();
+			} );
+
+			expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
+			expect(
+				onLayoutChange.mock.calls[ 0 ][ 0 ].map(
+					( w: DashboardWidget< { label?: string } > ) =>
+						w.attributes?.label
+				)
+			).toEqual( [ 'Traffic', 'Edited' ] );
+		} );
+
+		it( 'publishes nothing through the inline auto-save when every staged change was denied', async () => {
+			const onLayoutChange = vi.fn();
+			render(
+				<Harness
+					canPerform={ deny( 'edit' ) }
+					onLayoutChange={ onLayoutChange }
+				>
+					<EngineProbe />
+				</Harness>
+			);
+			await screen.findByTestId( 'label' );
+
+			vi.useFakeTimers();
+			try {
+				act( () => {
+					const [ first ] = readEngine().layout;
+					readEngine().mutate( [
+						{
+							...first,
+							attributes: {
+								metric: 'views',
+								label: 'Hijacked',
+							},
+						},
+					] );
+					readEngine().scheduleAutoSave();
+				} );
+
+				act( () => {
+					vi.runOnlyPendingTimers();
+				} );
+
+				expect( onLayoutChange ).not.toHaveBeenCalled();
+			} finally {
+				vi.useRealTimers();
+			}
+		} );
+
+		it( 'drops an insertion of a rejected type before it reaches a commit', async () => {
+			const onLayoutChange = vi.fn();
+			const rejectInserts: CanPerformDashboardOperation = ( request ) =>
+				request.operation !== 'insert';
+			render(
+				<Harness
+					canPerform={ rejectInserts }
+					onLayoutChange={ onLayoutChange }
+					editMode
+				>
+					<EngineProbe />
+				</Harness>
+			);
+			await screen.findByTestId( 'label' );
+
+			act( () => {
+				readEngine().mutate( [
+					...readEngine().layout,
+					{
+						uuid: 'w-new',
+						type: 'test/snapshot',
+						placement: { width: 1, height: 1 },
+					},
+				] );
+			} );
+
+			expect( screen.getAllByTestId( 'label' ) ).toHaveLength( 1 );
+
+			act( () => {
+				readEngine().commit();
+			} );
+
+			expect( onLayoutChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 're-asserts the spans of a resize-denied instance in staging', async () => {
+			const onLayoutChange = vi.fn();
+			render(
+				<Harness
+					canPerform={ deny( 'resize' ) }
+					onLayoutChange={ onLayoutChange }
+					editMode
+				>
+					<EngineProbe />
+				</Harness>
+			);
+			await screen.findByTestId( 'label' );
+
+			act( () => {
+				const [ first ] = readEngine().layout;
+				readEngine().mutate( [
+					{ ...first, placement: { width: 4, height: 2 } },
+				] );
+			} );
+
+			expect( readEngine().layout[ 0 ].placement ).toEqual( {
+				width: 1,
+				height: 1,
+			} );
+
+			act( () => {
+				readEngine().commit();
+			} );
+
+			expect( onLayoutChange ).not.toHaveBeenCalled();
+		} );
 	} );
 } );

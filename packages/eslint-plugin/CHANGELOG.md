@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Switch `test-unit` from Jest to `@vitest/eslint-plugin` recommended rules with explicit imports at the 27.0.0 boundary. Jest consumers must configure `eslint-plugin-jest` directly. ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
+
+## 26.0.0 (2026-09-10)
+
+### Breaking Changes
+
+-   The `esnext` ruleset no longer configures a parser, so JavaScript and JSX files are parsed by ESLint's default parser instead of `@babel/eslint-parser` ([#82144](https://github.com/WordPress/gutenberg/pull/82144)).
+
 ### Enhancements
 
 -   Update `use-recommended-components` rule to prefer `@wordpress/ui` `Field` and `Fieldset` over legacy `@wordpress/components` `BaseControl` ([#82095](https://github.com/WordPress/gutenberg/pull/82095)).
@@ -9,6 +19,7 @@
 ### Bug Fixes
 
 -   Apply test-only DOM global exceptions to both JavaScript and JSX test files ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Fix `no-unused-vars-before-return` false positive on variables used only in JSX ([#82144](https://github.com/WordPress/gutenberg/pull/82144)).
 
 ### Internal
 

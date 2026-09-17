@@ -17,7 +17,7 @@ class Tests_Icons_WpGetIcon extends WP_UnitTestCase {
 		if ( ! WP_Icon_Collections_Registry::get_instance()->is_registered( 'core' ) ) {
 			gutenberg_register_default_icon_collections();
 		}
-		if ( empty( WP_Icons_Registry::get_instance()->get_registered_icons() ) ) {
+		if ( empty( WP_Icons_Registry_Gutenberg::get_instance()->get_registered_icons() ) ) {
 			gutenberg_register_default_icons();
 		}
 	}
@@ -51,9 +51,11 @@ class Tests_Icons_WpGetIcon extends WP_UnitTestCase {
 	}
 
 	public function test_wp_get_icon_size_null_leaves_dimensions_untouched() {
-		$output = wp_get_icon( 'core/plus', array( 'size' => null ) );
-		$this->assertStringNotContainsString( 'width=', $output );
-		$this->assertStringNotContainsString( 'height=', $output );
+		$output    = wp_get_icon( 'core/plus', array( 'size' => null ) );
+		$processor = new WP_HTML_Tag_Processor( $output );
+		$this->assertTrue( $processor->next_tag( 'svg' ) );
+		$this->assertNull( $processor->get_attribute( 'width' ) );
+		$this->assertNull( $processor->get_attribute( 'height' ) );
 	}
 
 	public function test_wp_get_icon_size_zero_outputs_zero_dimensions() {

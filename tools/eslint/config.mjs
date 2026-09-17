@@ -12,7 +12,7 @@ import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
 import {
 	discoverTestFiles,
-	getTestEnvironmentName,
+	getVitestTestsByProject,
 } from '../../test/unit/scripts/discover-test-files.mjs';
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
@@ -21,25 +21,13 @@ const testMigration = require(
 	join( rootDir, 'test/unit/test-migration.json' )
 );
 
-const vitestTestPatterns = [
-	...discoverTestFiles( rootDir ).filter(
-		( testPath ) => getTestEnvironmentName( testPath ) === 'node'
-	),
-	...testMigration.vitest.files,
-	...testMigration.vitest.directories.flatMap( ( directory ) => [
-		`${ directory }/**/__tests__/**/*.[jt]s?(x)`,
-		`${ directory }/**/test/*.[jt]s?(x)`,
-		`${ directory }/**/?(*.)test.[jt]s?(x)`,
-	] ),
-];
-const vitestJsdomTestPatterns = [
-	...testMigration.vitest.files.filter( ( file ) =>
-		/\.jsdom\.test\.[cm]?[jt]sx?$/.test( file )
-	),
-	...testMigration.vitest.directories.map(
-		( directory ) => `${ directory }/**/*.jsdom.test.[cm]?[jt]s?(x)`
-	),
-];
+const vitestTestsByProject = getVitestTestsByProject(
+	discoverTestFiles( rootDir ),
+	testMigration
+);
+const vitestTestPatterns = Object.values( vitestTestsByProject ).flat();
+const vitestJsdomTestPatterns = vitestTestsByProject.jsdom;
+const vitestBrowserTestPatterns = vitestTestsByProject.browser;
 // Prefer the installed React version for linting, but fall back to the detected version.
 let reactVersion = 'detect';
 try {
@@ -386,6 +374,7 @@ export default dedupePlugins( [
 						Badge: 'WCBadge',
 						Icon: 'WCIcon',
 						__experimentalInputControl: 'WCInputControl',
+						SelectControl: 'WCSelectControl',
 						TextareaControl: 'WCTextareaControl',
 						Tooltip: 'WCTooltip',
 					},
@@ -542,6 +531,27 @@ export default dedupePlugins( [
 		files: vitestJsdomTestPatterns,
 	},
 	{
+		...jestDomPlugin.configs[ 'flat/recommended' ],
+		files: vitestBrowserTestPatterns,
+	},
+	{
+		...testingLibraryPlugin.configs[ 'flat/react' ],
+		files: vitestBrowserTestPatterns,
+		settings: {
+			'testing-library/utils-module': 'off',
+			'testing-library/custom-renders': 'off',
+			'testing-library/custom-queries': 'off',
+		},
+		rules: {
+			...testingLibraryPlugin.configs[ 'flat/react' ].rules,
+			// Browser Mode locators are the browser-native alternative to
+			// Testing Library's screen queries.
+			'testing-library/prefer-screen-queries': 'off',
+		},
+	},
+	// Keep the repository's existing rule set during the runner migration.
+	// Adopting the public Vitest rules requires a separate suite-wide lint migration.
+	{
 		plugins: jestPlugin.configs[ 'flat/recommended' ].plugins,
 		files: vitestTestPatterns,
 		settings: {
@@ -561,8 +571,8 @@ export default dedupePlugins( [
 	},
 
 	// Override: Jest test files (unit tests).
-	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
-		...config,
+	{
+		...jestPlugin.configs[ 'flat/recommended' ],
 		files: [
 			'packages/jest*/**/*.js',
 			'**/test/**/*.{js,jsx}',
@@ -573,7 +583,7 @@ export default dedupePlugins( [
 			'test/performance/**/*.js',
 			...vitestTestPatterns,
 		],
-	} ) ),
+	},
 
 	// Override: Test files — jest-dom, testing-library, jest recommended.
 	{
@@ -1029,10 +1039,10 @@ export default dedupePlugins( [
 
 	// From packages/block-serialization-spec-parser/.eslintrc.json:
 	// Add test-unit config for shared-tests.js with jest/no-export off.
-	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
-		...config,
+	{
+		...jestPlugin.configs[ 'flat/recommended' ],
 		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
-	} ) ),
+	},
 	{
 		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
 		rules: {
@@ -1081,7 +1091,7 @@ export default dedupePlugins( [
 	// Override: typings — global type declarations require `var` and define
 	// the globals that wp-global-usage warns about.
 	{
-		files: [ 'typings/**/*.d.ts' ],
+		files: [ 'tools/monorepo/typings/**/*.d.ts' ],
 		rules: {
 			'no-var': 'off',
 			'@wordpress/wp-global-usage': 'off',

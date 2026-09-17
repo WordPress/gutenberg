@@ -332,7 +332,7 @@ const hasPHP =
 				} );
 
 				return phpProcess.status === 0 && phpProcess.stdout === '1';
-		  } )()
+			} )()
 		: false;
 
 // Skipping if `php` isn't available to us, such as in local dev without it
@@ -380,7 +380,7 @@ export const phpTester = ( name, filename, testRunner = globalThis ) => {
 							'failed to parse JSON:\n' + phpProcess.stdout
 						);
 					}
-			  }, testRunner )
+				}, testRunner )
 			: () => {}
 	);
 };

@@ -2,7 +2,7 @@ import { createRequire } from 'node:module';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 const require = createRequire( import.meta.url );
 const fs = require( 'node:fs' );
-const readFile = vi
+let readFile = vi
 	.spyOn( fs.promises, 'readFile' )
 	.mockImplementation( () => undefined );
 const readRawConfigFile = require( '../read-raw-config-file' );
@@ -14,6 +14,7 @@ afterAll( () => {
 
 describe( 'readRawConfigFile', () => {
 	beforeEach( () => {
+		readFile = vi.spyOn( fs.promises, 'readFile' );
 		readFile.mockReset().mockImplementation( () => undefined );
 	} );
 

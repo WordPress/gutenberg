@@ -1,4 +1,3 @@
-import { ENTER } from '@wordpress/keycodes';
 import {
 	insert,
 	remove,
@@ -11,8 +10,15 @@ const { subscribeOwnedListener, ownsSelection } = unlock( richTextPrivateApis );
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
-	function onKeyDown( event ) {
-		if ( event.keyCode !== ENTER ) {
+	// Enter is handled on beforeinput: the input type tells a paragraph
+	// break from a line break. The iOS keyboard sends Return with the
+	// shift key down while it shows capitals, so the key event cannot.
+	function onBeforeInput( event ) {
+		const { inputType } = event;
+		if (
+			inputType !== 'insertParagraph' &&
+			inputType !== 'insertLineBreak'
+		) {
 			return;
 		}
 
@@ -33,7 +39,12 @@ export default ( props ) => ( element ) => {
 		const value = getValue();
 		const { text, start, end } = value;
 
-		if ( event.shiftKey ) {
+		// Flagged for the writing flow, which handles the event otherwise.
+		if ( inputType === 'insertParagraph' && onReplace && onSplit ) {
+			event.__deprecatedOnSplit = true;
+		}
+
+		if ( inputType === 'insertLineBreak' ) {
 			if ( ! disableLineBreaks ) {
 				event.preventDefault();
 				onChange( insert( value, '\n' ) );
@@ -41,10 +52,9 @@ export default ( props ) => ( element ) => {
 		} else if ( onSplitAtEnd && start === end && end === text.length ) {
 			event.preventDefault();
 			onSplitAtEnd();
-		} else if ( onReplace && onSplit ) {
-			event.__deprecatedOnSplit = true;
 		} else if (
 			! supportsSplitting &&
+			! ( onReplace && onSplit ) &&
 			! disableLineBreaks &&
 			! event.defaultPrevented
 		) {
@@ -70,8 +80,12 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	function onDefaultKeyDown( event ) {
-		if ( event.defaultPrevented ) {
+	function onDefaultBeforeInput( event ) {
+		if (
+			event.defaultPrevented ||
+			( event.inputType !== 'insertParagraph' &&
+				event.inputType !== 'insertLineBreak' )
+		) {
 			return;
 		}
 
@@ -82,12 +96,6 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		if ( event.keyCode !== ENTER ) {
-			return;
-		}
-
-		// On ENTER, we ALWAYS want to prevent the default browser behaviour
-		// at this last interception point.
 		event.preventDefault();
 	}
 
@@ -95,21 +103,21 @@ export default ( props ) => ( element ) => {
 
 	// Attach the listener to the window so parent elements have the chance to
 	// prevent the default behavior.
-	const unsubscribeDefaultKeyDown = subscribeDelegatedListener(
+	const unsubscribeDefaultBeforeInput = subscribeDelegatedListener(
 		defaultView,
-		'keydown',
-		onDefaultKeyDown
+		'beforeinput',
+		onDefaultBeforeInput
 	);
 	// Capture phase so this runs before ancestor (writing flow) bubble
-	// handlers, matching the timing of the previous raw element listener.
-	const unsubscribeKeyDown = subscribeOwnedListener(
+	// handlers.
+	const unsubscribeBeforeInput = subscribeOwnedListener(
 		element,
-		'keydown',
-		onKeyDown,
+		'beforeinput',
+		onBeforeInput,
 		true
 	);
 	return () => {
-		unsubscribeDefaultKeyDown();
-		unsubscribeKeyDown();
+		unsubscribeDefaultBeforeInput();
+		unsubscribeBeforeInput();
 	};
 };

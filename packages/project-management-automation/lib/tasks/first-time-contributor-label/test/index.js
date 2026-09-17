@@ -1,21 +1,13 @@
-import { createRequire } from 'node:module';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-const require = createRequire( import.meta.url );
-const actionsCorePath = require.resolve( '@actions/core' );
-const originalActionsCore = require( actionsCorePath );
-const setOutput = vi.fn();
-const taskPath = require.resolve( '../' );
-let firstTimeContributorLabel;
-try {
-	require.cache[ actionsCorePath ].exports = {
-		...originalActionsCore,
-		setOutput,
-	};
-	firstTimeContributorLabel = require( taskPath );
-} finally {
-	require.cache[ actionsCorePath ].exports = originalActionsCore;
-	delete require.cache[ taskPath ];
-}
+import * as core from '@actions/core';
+import firstTimeContributorLabel from '../index.js';
+
+vi.mock( import( '@actions/core' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	setOutput: vi.fn(),
+} ) );
+
+const setOutput = vi.mocked( core.setOutput );
 
 describe( 'firstTimeContributorLabel', () => {
 	beforeEach( () => {

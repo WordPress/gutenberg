@@ -1,6 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
 import { applyFilters } from '@wordpress/hooks';
 import '../default-autocompleters';
 import { linkAutocompleter, userAutocompleter } from '../../components';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'default-autocompleters', () => {
 	const BLOCK_NAME = 'core/foo';
