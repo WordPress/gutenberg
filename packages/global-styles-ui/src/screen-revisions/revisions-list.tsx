@@ -99,13 +99,13 @@ function getRevisionLabel(
 				),
 				authorDisplayName,
 				formattedModifiedDate
-		  )
+			)
 		: sprintf(
 				// translators: 1: author display name. 2: revision creation date.
 				__( 'Changes saved by %1$s on %2$s' ),
 				authorDisplayName,
 				formattedModifiedDate
-		  );
+			);
 }
 
 interface RevisionsListProps {
@@ -180,7 +180,7 @@ function RevisionsList( {
 										normalizeModified( item.modified ) ??
 											null
 									)
-							  );
+								);
 					return getRevisionLabel(
 						item.id,
 						getAuthorDisplayName( item ),
