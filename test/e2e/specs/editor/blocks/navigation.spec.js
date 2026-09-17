@@ -2091,9 +2091,11 @@ test.describe( 'Navigation block', () => {
 				} );
 				await expect( searchResults ).toBeVisible();
 
+				// The page fixture shares the word, so assert on the type
+				// rather than the label.
 				await expect(
 					searchResults.getByRole( 'option' ).first()
-				).toContainText( DEFAULT_CATEGORY_NAME );
+				).toContainText( 'Category' );
 			} );
 		} );
 

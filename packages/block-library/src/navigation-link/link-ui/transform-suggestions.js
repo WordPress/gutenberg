@@ -4,11 +4,11 @@
 const UNSUPPORTED_KINDS = [ 'media' ];
 
 /**
- * Normalize types for necessary conversions. For example, 'tag' needs to be converted to 'post_tag'.
+ * The Tag Link variation is named after the block, not the taxonomy, so it is
+ * the one type the block and the search API disagree on beyond punctuation.
  */
 const TYPE_ALIASES = {
 	tag: 'post_tag',
-	post_format: 'post-format',
 };
 
 const ENTITY_KINDS = [ 'post-type', 'taxonomy' ];
@@ -21,6 +21,11 @@ const DEFAULT_PRIORITY = { type: 'page', kind: 'post-type' };
  * Returns null for anything that is not an entity, such as a custom link or the
  * "Create page" option, so that those are never treated as a match.
  *
+ * The search API spells some types with a hyphen where the block stores an
+ * underscore: `post-format` against `post_format`, and any custom type with a
+ * hyphen in its slug. `updateAttributes` writes the underscored form, so match
+ * on that, replacing only the first hyphen exactly as it does.
+ *
  * @param {Object} entity        A Navigation Link block's attributes, or a suggestion.
  * @param {string} [entity.type] The entity type.
  * @param {string} [entity.kind] The entity kind (post-type|taxonomy).
@@ -31,7 +36,9 @@ function normalizeEntity( { type, kind } ) {
 		return null;
 	}
 
-	return { type: TYPE_ALIASES[ type ] ?? type, kind };
+	const aliased = TYPE_ALIASES[ type ] ?? type;
+
+	return { type: aliased.replace( '-', '_' ), kind };
 }
 
 /**

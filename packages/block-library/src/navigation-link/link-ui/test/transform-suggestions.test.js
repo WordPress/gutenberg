@@ -38,6 +38,15 @@ const aPostFormat = {
 	type: 'post-format',
 	kind: 'taxonomy',
 };
+// A custom post type whose slug contains a hyphen, which updateAttributes
+// stores with an underscore.
+const aCustomPostType = {
+	id: 8,
+	url: 'http://wordpress.local/event-series/summer/',
+	title: 'Summer Series',
+	type: 'event-series',
+	kind: 'post-type',
+};
 const anAttachment = {
 	id: 6,
 	url: 'http://wordpress.local/wp-content/uploads/photo.jpg',
@@ -93,12 +102,13 @@ describe( 'transformSuggestions', () => {
 	it.each( [
 		[ 'tag', 'post_tag', aTag ],
 		[ 'post_format', 'post-format', aPostFormat ],
+		[ 'event_series', 'event-series', aCustomPostType ],
 	] )(
 		'matches the block’s %s type against the API’s %s subtype',
 		( type, _subtype, expected ) => {
 			const results = transformSuggestions(
-				[ aPage, aCategory, aTag, aPostFormat ],
-				{ type, kind: 'taxonomy' }
+				[ aPage, aCategory, aTag, aPostFormat, aCustomPostType ],
+				{ type, kind: expected.kind }
 			);
 
 			expect( ids( results )[ 0 ] ).toBe( expected.id );

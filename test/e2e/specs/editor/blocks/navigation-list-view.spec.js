@@ -214,15 +214,16 @@ test.describe( 'Navigation block - List view editing', () => {
 		await page.keyboard.type( 'Test', { delay: 50 } );
 
 		const searchedResults = await linkControl.getSearchResults();
-		await expect( searchedResults.first() ).toBeVisible();
+
+		// The initial suggestions are pages, so wait for a result that can only
+		// come from the typed search before asserting on the order.
+		await expect(
+			searchedResults.filter( { hasText: 'Test Post 1' } )
+		).toBeVisible();
 
 		expect(
 			await linkControl.getSearchResultType( searchedResults.first() )
 		).toBe( 'Page' );
-
-		await expect(
-			searchedResults.filter( { hasText: 'Test Post 1' } )
-		).toBeVisible();
 
 		// Taxonomy terms are reachable from the same search field.
 		await linkUIInput.fill( '' );
