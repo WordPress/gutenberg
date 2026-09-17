@@ -11,6 +11,11 @@ on:
             - wp/next
     # Allow manually triggering the workflow.
     workflow_dispatch:
+        inputs:
+            browser-trace-file:
+                description: 'Optional repository-relative Browser test file to run with a failure trace'
+                type: string
+                default: ''
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -164,7 +169,29 @@ jobs:
             - name: Run the Vitest Browser project
               env:
                   FK_ENV_NODEJS: '24'
-              run: npm run test:unit:vitest:shuffled -- --project=browser
+                  BROWSER_TRACE_FILE: ${{ inputs.browser-trace-file }}
+              run: |
+                  if [[ -n "$BROWSER_TRACE_FILE" ]]; then
+                    if [[ ! -f "$BROWSER_TRACE_FILE" ]] || [[ "$BROWSER_TRACE_FILE" != packages/*.browser.test.* && "$BROWSER_TRACE_FILE" != test/*.browser.test.* ]]; then
+                      echo "browser-trace-file must name an existing *.browser.test.* file under packages/ or test/."
+                      exit 1
+                    fi
+                    WP_VITEST_BROWSER_TRACE=1 npm run test:unit:vitest:shuffled -- --project=browser "$BROWSER_TRACE_FILE"
+                  else
+                    npm run test:unit:vitest:shuffled -- --project=browser
+                  fi
+
+            - name: Upload Browser Mode failure artifacts
+              if: ${{ failure() }}
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: vitest-browser-failures
+                  path: |
+                      test-results/vitest-attachments/failure-screenshots/
+                      test-results/vitest-browser-screenshots/
+                      test-results/vitest-browser-traces/**/*.trace.zip
+                  retention-days: 3
+                  if-no-files-found: ignore
 
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})

@@ -555,6 +555,34 @@ npm run test:unit:watch -- path/to/example.browser.test.jsx --browser.headless=f
 
 Use the browser's debugger for browser code; the Node inspector command targets Node workers.
 
+### Browser Mode failure artifacts
+
+The **JavaScript Browser (Chromium, Node.js 24)** job in the **Unit Tests** workflow uploads failure screenshots. Download the `vitest-browser-failures` artifact from the workflow run's summary page within three days of the run. The artifact is only uploaded when the job fails and files exist; a failure before browser tests start might have no artifact.
+
+Tracing is off by default. For a focused diagnostic run, select **Run workflow**, choose the failing branch, and enter one repository-relative `*.browser.test.*` file in **browser-trace-file**. The Browser job runs that file with Playwright tracing and retains its trace only if the file fails. Other jobs keep their usual scope. This is a separate diagnostic run, so its result does not establish that the full Browser suite passes.
+
+The artifact preserves these directories relative to the local `test-results/` directory:
+
+- `vitest-attachments/failure-screenshots/`: automatic failure screenshots.
+- `vitest-browser-screenshots/`: screenshots taken with Browser Mode's screenshot API, if present.
+- `vitest-browser-traces/`: `.trace.zip` archives for failed files, preserving their repository-relative paths.
+
+Test output identifies the files for each failure. Open PNG screenshots with an image viewer. To inspect a trace, use an absolute path to the extracted ZIP:
+
+```sh
+npm exec --no --workspace @wordpress/unit-tests -- playwright show-trace /absolute/path/to/example.trace.zip
+```
+
+The [Playwright Trace Viewer](https://playwright.dev/docs/trace-viewer) shows recorded Playwright actions, DOM snapshots, screenshots, and network activity. Each archive covers one test file, including its setup and teardown. Use the test failure output to identify the relevant actions; JavaScript assertions are not recorded as Playwright actions.
+
+To record the same diagnostics locally:
+
+```sh
+WP_VITEST_BROWSER_TRACE=1 npm run test:unit -- --project=browser path/to/example.browser.test.jsx
+```
+
+Omit `WP_VITEST_BROWSER_TRACE` to measure the same run without tracing. Tracing adds runtime and temporary disk usage even for passing files. Passing recordings are discarded without exporting a ZIP. Each traced run clears the previous trace output; screenshots from earlier local failures can remain. Tracing uses each file's existing isolated browser context and does not add retries. Do not combine it with Vitest's `--browser.trace` option, which controls a separate tracing implementation.
+
 ## End-to-end testing
 
 End-to-end tests use [Playwright](https://playwright.dev/) as the testing framework. See the dedicated [End-to-End Testing guide](/docs/contributors/code/e2e/README.md) for best practices and detailed instructions.
