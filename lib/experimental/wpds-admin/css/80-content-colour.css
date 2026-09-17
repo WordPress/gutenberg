@@ -1,10 +1,10 @@
 /**
- * Classic admin content — the page canvas, list tables and metaboxes —
+ * Admin content — the page canvas, list tables and metaboxes —
  * coloured from WordPress Design System tokens.
  *
  * The roles are not guessed. `@wordpress/admin-ui`'s Page component and the
  * extensible site editor's own shell already answer what each token is for, and
- * this follows them so a classic screen and a React screen read as the same
+ * this follows them so a PHP-rendered screen and a React screen read as the same
  * product:
  *
  *   shell / page ground   background-surface-neutral-weak
@@ -14,10 +14,10 @@
  *   secondary text         foreground-content-neutral-weak
  *
  * Mapping by role rather than by nearest colour is the whole method here.
- * Several of classic's greys have no near neighbour in the system at all; the
+ * Several of the admin's greys have no near neighbour in the system at all; the
  * question each one has to answer is what it is FOR, not what it looks like.
  *
- * CONTRAST RISES, in the place it matters most. Core sets body text as `#3c434a`
+ * CONTRAST RISES, in the place it matters most. WordPress sets body text as `#3c434a`
  * on an `#f0f0f1` ground, which is 8.8:1. The tokens give `#1e1e1e` on `#f4f4f4`,
  * which is 15.4:1 — nearly double, on the most-read text in the admin. Secondary
  * text moves from `#646970` (5.7:1 on white) to `#707070` (5.0:1), lower but
@@ -53,10 +53,10 @@
 	/* -----------------------------------------------------------------------
 	   Container surfaces and their borders
 
-	   Core sets these in one shared block in `common.css`, with a note calling
+	   WordPress sets these in one shared block in `common.css`, with a note calling
 	   it "large chunks of shared color, from the colors.css merge". The
 	   selector list is repeated as-is rather than narrowed, so the restyle
-	   covers exactly what Core covers and no more.
+	   covers exactly what common.css covers and no more.
 	   ----------------------------------------------------------------------- */
 
 	.widget-top,
@@ -92,7 +92,7 @@
 	/* -----------------------------------------------------------------------
 	   List tables
 
-	   Row dividers are the one border that barely moves: Core's `#dcdcde` and
+	   Row dividers are the one border that barely moves: WordPress's `#dcdcde` and
 	   the token's `#dbdbdb` are the same colour to the eye.
 	   ----------------------------------------------------------------------- */
 
@@ -110,25 +110,25 @@
 	}
 
 	/*
-	 * NO STRIPING RULE HERE, deliberately. Core's `#f6f7f7` stays.
+	 * NO STRIPING RULE HERE, deliberately. WordPress's `#f6f7f7` stays.
 	 *
 	 * The surface ladder has two neutrals below white: `…-neutral` (#fcfcfc)
 	 * and `…-neutral-weak` (#f4f4f4). The first is the correct role for a row
 	 * that recedes one step, and at 2.66% below white it is too faint to
-	 * separate rows on its own — classic gives list-table rows no border, so
+	 * separate rows on its own — the admin gives list-table rows no border, so
 	 * the stripe is the only separator there is. The second is the page ground,
 	 * and a stripe set from it would match the page behind the table.
 	 *
 	 * The tokens were not designed to express zebra striping; the rest of the
 	 * product separates rows with borders instead. Rather than pick a grey or
-	 * bend a token off its role, this leaves Core's value in place, unchanged
+	 * bend a token off its role, this leaves WordPress's value in place, unchanged
 	 * and at its current contrast, until the list-table design work decides
-	 * whether classic keeps striping at all. Same treatment as the admin bar's
+	 * whether the admin keeps striping at all. Same treatment as the admin bar's
 	 * hover text: where the system has no answer, mirror rather than invent.
 	 */
 
 	/* -----------------------------------------------------------------------
-	   Primary text that Core sets explicitly
+	   Primary text that WordPress sets explicitly
 
 	   These do not inherit from `body`, so they need naming. Same role, same
 	   token: `#1d2327` was never a different colour from the body text, only a

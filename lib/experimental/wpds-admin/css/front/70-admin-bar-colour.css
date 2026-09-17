@@ -3,7 +3,7 @@
  * tokens.
  *
  * NOT LAYERED, deliberately, and this file must stay that way. On the front end
- * Core's `admin-bar.css` is unlayered, and an unlayered declaration beats a
+ * WordPress's `admin-bar.css` is unlayered, and an unlayered declaration beats a
  * layered one whatever the source order or specificity. Measured: a
  * `@layer wpds` rule for `#wpadminbar`, loaded after `admin-bar.css`, loses to
  * it outright. Two unlayered sheets of equal specificity are decided by source
@@ -20,8 +20,8 @@
  *
  * The values duplicate the admin bar half of `../70-chrome-colour.css`, which
  * cannot be shared: that file has to be layered to sit correctly against
- * demoted Core CSS in wp-admin, and this one must not be layered at all. The
- * duplication is a symptom of reaching Core from outside and disappears with
+ * demoted WordPress CSS in wp-admin, and this one must not be layered at all. The
+ * duplication is a symptom of reaching WordPress's stylesheets from outside and disappears with
  * the rest of the layer machinery.
  *
  * SCOPE: colour only, and only the bar. No geometry, and nothing that could
@@ -56,7 +56,7 @@
 /* -----------------------------------------------------------------------
    Text and icons
 
-   Core derives icon colour from the scheme base colour's hue, which lands on a
+   WordPress derives icon colour from the scheme base colour's hue, which lands on a
    faintly warm off-white. Icons and labels take the same neutral foreground.
    ----------------------------------------------------------------------- */
 
@@ -82,7 +82,7 @@
 /* -----------------------------------------------------------------------
    Hover
 
-   Only the surface moves. Core's hover text is a lightened accent that the
+   Only the surface moves. WordPress's hover text is a lightened accent that the
    design system has no equivalent for, so it is left alone.
    ----------------------------------------------------------------------- */
 
