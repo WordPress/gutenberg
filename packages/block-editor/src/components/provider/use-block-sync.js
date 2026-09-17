@@ -156,7 +156,6 @@ export default function useBlockSync( {
 
 	const pendingChangesRef = useRef( { incoming: null, outgoing: [] } );
 	const subscribedRef = useRef( false );
-	const lastControlledBlocksRef = useRef( undefined );
 
 	// Mapping between external (original) and internal (cloned) client IDs.
 	// This allows stable external IDs while using unique internal IDs.
@@ -257,7 +256,6 @@ export default function useBlockSync( {
 				__unstableMarkNextChangeAsNotPersistent( {
 					history: 'ignore',
 				} );
-				lastControlledBlocksRef.current = storeBlocks;
 				replaceInnerBlocks( clientId, storeBlocks );
 
 				// Invalidate the applied-selection ref so that
@@ -273,7 +271,6 @@ export default function useBlockSync( {
 			__unstableMarkNextChangeAsNotPersistent( {
 				history: 'ignore',
 			} );
-			lastControlledBlocksRef.current = controlledBlocks;
 			resetBlocks( controlledBlocks );
 		}
 	};
@@ -282,9 +279,6 @@ export default function useBlockSync( {
 	// containing useBlockSync() unmounts.
 	const unsetControlledBlocks = () => {
 		if ( clientId ) {
-			if ( getBlocks( clientId ) !== lastControlledBlocksRef.current ) {
-				return;
-			}
 			__unstableMarkNextChangeAsNotPersistent( {
 				history: 'ignore',
 			} );
@@ -294,9 +288,6 @@ export default function useBlockSync( {
 			} );
 			replaceInnerBlocks( clientId, [] );
 		} else {
-			if ( getBlocks() !== lastControlledBlocksRef.current ) {
-				return;
-			}
 			__unstableMarkNextChangeAsNotPersistent( {
 				history: 'ignore',
 			} );
