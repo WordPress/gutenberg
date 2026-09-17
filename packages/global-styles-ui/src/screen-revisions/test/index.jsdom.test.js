@@ -132,7 +132,7 @@ vi.mock( import( '@wordpress/dataviews' ), async () => {
 		);
 	};
 	DataViewsPicker.Layout = () => null;
-	DataViewsPicker.Pagination = () => null;
+	DataViewsPicker.PageSelect = () => null;
 	DataViewsPicker.Actions = () => null;
 
 	return { DataViewsPicker };
