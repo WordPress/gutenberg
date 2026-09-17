@@ -3,7 +3,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 
-export type SearchType = 'attachment' | 'post' | 'term' | 'post-format';
+type SearchType = 'attachment' | 'post' | 'term' | 'post-format';
 
 export type SearchOptions = {
 	/**
@@ -24,7 +24,7 @@ export type SearchOptions = {
 	/**
 	 * Slug of the post-type or taxonomy.
 	 */
-	subtype?: string | string[];
+	subtype?: string;
 	/**
 	 * Types to leave out. Only meaningful for a search that is not already
 	 * narrowed by `type`, to drop results the caller cannot use:
