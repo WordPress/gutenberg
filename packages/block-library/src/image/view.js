@@ -518,9 +518,18 @@ const { state, actions, callbacks } = store(
 					containerWidth = containerHeight * fullSizeRatio;
 				}
 
+				const hasCroppedSource =
+					naturalRatio.toFixed( 2 ) !== fullSizeRatio.toFixed( 2 );
+				const sourceRatio = hasCroppedSource
+					? naturalRatio
+					: fullSizeRatio;
+
+				// Include any crop already applied to the thumbnail file.
 				const containerScale = Math.max(
 					originalWidth / containerWidth,
-					originalHeight / containerHeight
+					originalHeight / containerHeight,
+					originalWidth / ( containerHeight * sourceRatio ),
+					( originalHeight * sourceRatio ) / containerWidth
 				);
 				const thumbnailWidth = originalWidth / containerScale;
 				const thumbnailHeight = originalHeight / containerScale;
@@ -528,9 +537,6 @@ const { state, actions, callbacks } = store(
 				const cropY = ( containerHeight - thumbnailHeight ) / 2;
 				screenPosX -= cropX * containerScale;
 				screenPosY -= cropY * containerScale;
-
-				const hasCroppedSource =
-					naturalRatio.toFixed( 2 ) !== fullSizeRatio.toFixed( 2 );
 
 				// As of this writing, using the calculations above will render the
 				// lightbox with a small, erroneous whitespace on the left side of the
