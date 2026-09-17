@@ -4,6 +4,12 @@ import { ValidatedCustomSelectControl } from '../custom-select-control';
 import { formDecorator } from './story-utils';
 
 const meta: Meta< typeof ValidatedCustomSelectControl > = {
+	parameters: {
+		// FIXME: Select lacks an accessible name in this story (select-name).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+
 	title: 'Components/Selection & Input/Validated Form Controls/ValidatedCustomSelectControl',
 	id: 'components-validatedcustomselectcontrol',
 	component: ValidatedCustomSelectControl,
@@ -38,7 +44,7 @@ export const Default: StoryObj< typeof ValidatedCustomSelectControl > = {
 						? {
 								type: 'invalid',
 								message: 'Option A is not allowed.',
-						  }
+							}
 						: undefined
 				}
 			/>

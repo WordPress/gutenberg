@@ -1,5 +1,5 @@
-const utils = require( './utils' );
-const getStylelintResult = utils.getStylelintResult;
+import { beforeEach, describe, expect, it } from 'vitest';
+import { getStylelintResult } from './utils';
 
 describe( 'flags no warnings with valid values css', () => {
 	let result;
@@ -32,7 +32,7 @@ describe( 'flags warnings with invalid values css', () => {
 
 	it( 'flags correct number of warnings', () => {
 		return result.then( ( data ) =>
-			expect( data.results[ 0 ].warnings ).toHaveLength( 9 )
+			expect( data.results[ 0 ].warnings ).toHaveLength( 10 )
 		);
 	} );
 

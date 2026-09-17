@@ -1,7 +1,7 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { ToggleControl } from '@wordpress/components';
-import { ControlWithError } from './control-with-error';
+import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 
 type ToggleControlProps = React.ComponentProps< typeof ToggleControl >;
@@ -24,6 +24,7 @@ const UnforwardedValidatedToggleControl = (
 
 	return (
 		<ControlWithError
+			className="dataviews-validated-control"
 			required={ required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ customValidity }

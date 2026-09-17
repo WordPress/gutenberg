@@ -1,11 +1,11 @@
 import { differenceInCalendarDays } from 'date-fns';
 import { DayPicker, rangeContainsModifiers } from '@daypicker/react';
-import { enUS } from '@daypicker/react/locale';
 import { forwardRef, useMemo, useState, useCallback } from '@wordpress/element';
 import { COMMON_PROPS, MODIFIER_CLASSNAMES } from './utils/constants';
 import { clampNumberOfMonths } from './utils/misc';
 import { useControlledValue } from './utils/use-controlled-value';
 import { useLocalizationProps } from './utils/use-localization-props';
+import { usePreserveDayFocus } from './utils/use-preserve-day-focus';
 import { RootContext } from './utils/root-context';
 import type {
 	RangeCalendarProps,
@@ -17,18 +17,25 @@ export function usePreviewRange( {
 	value,
 	hoveredDate,
 	excludeDisabled,
+	resetOnSelect,
 	min,
 	max,
 	disabled,
 }: Pick<
 	RangeCalendarProps,
-	'value' | 'excludeDisabled' | 'min' | 'max' | 'disabled'
+	'value' | 'excludeDisabled' | 'resetOnSelect' | 'min' | 'max' | 'disabled'
 > & {
 	hoveredDate: Date | undefined;
 } ) {
 	return useMemo( () => {
 		if ( ! hoveredDate || ! value?.from ) {
 			return;
+		}
+		if ( resetOnSelect && value.to ) {
+			return {
+				from: hoveredDate,
+				to: hoveredDate,
+			};
 		}
 
 		let previewHighlight: DateRange | undefined;
@@ -117,7 +124,15 @@ export function usePreviewRange( {
 		}
 
 		return previewHighlight;
-	}, [ value, hoveredDate, excludeDisabled, min, max, disabled ] );
+	}, [
+		value,
+		hoveredDate,
+		excludeDisabled,
+		resetOnSelect,
+		min,
+		max,
+		disabled,
+	] );
 }
 
 /**
@@ -136,22 +151,27 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 			onValueChange,
 			numberOfMonths = 1,
 			excludeDisabled,
+			resetOnSelect = true,
 			min,
 			max,
 			disabled,
-			locale = enUS,
+			locale,
 			timeZone,
+			month,
 			render,
+			role = 'application',
+			'aria-label': ariaLabel,
 			labels: customLabels,
 			...props
 		},
 		ref
 	) {
-		const localizationProps = useLocalizationProps( {
-			locale,
-			timeZone,
-			mode: 'range',
-		} );
+		const { 'aria-label': defaultAriaLabel, ...localizationProps } =
+			useLocalizationProps( {
+				locale,
+				timeZone,
+				mode: 'range',
+			} );
 
 		const labels = useMemo(
 			() =>
@@ -160,7 +180,6 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 					: localizationProps.labels,
 			[ localizationProps.labels, customLabels ]
 		);
-
 		const onChange: OnValueChangeHandler< DateRange | null | undefined > =
 			useCallback(
 				( selected, triggerDate, modifiers, e ) => {
@@ -181,6 +200,7 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 			value: valueProp,
 			onChange,
 		} );
+		const dayFocusProps = usePreserveDayFocus( ref, month );
 
 		const [ hoveredDate, setHoveredDate ] = useState< Date | undefined >(
 			undefined
@@ -191,6 +211,7 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 			value: selected,
 			hoveredDate,
 			excludeDisabled,
+			resetOnSelect,
 			min,
 			max,
 			disabled,
@@ -205,8 +226,13 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 		}, [ previewRange ] );
 
 		const rootContextValue = useMemo(
-			() => ( { render, ref } ),
-			[ render, ref ]
+			() => ( {
+				render,
+				ref: dayFocusProps.ref,
+				role,
+				defaultAriaLabel,
+			} ),
+			[ render, dayFocusProps.ref, role, defaultAriaLabel ]
 		);
 
 		return (
@@ -215,16 +241,20 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 					{ ...COMMON_PROPS }
 					{ ...localizationProps }
 					{ ...props }
-					role="application"
+					aria-label={ ariaLabel }
 					mode="range"
+					month={ month }
 					numberOfMonths={ clampNumberOfMonths( numberOfMonths ) }
 					disabled={ disabled }
 					excludeDisabled={ excludeDisabled }
+					resetOnSelect={ resetOnSelect }
 					min={ min }
 					max={ max }
 					labels={ labels }
 					selected={ selected ?? undefined }
 					onSelect={ setSelected }
+					onDayFocus={ dayFocusProps.onDayFocus }
+					onDayBlur={ dayFocusProps.onDayBlur }
 					onDayMouseEnter={ ( date ) => setHoveredDate( date ) }
 					onDayMouseLeave={ () => setHoveredDate( undefined ) }
 					modifiers={ modifiers }

@@ -333,7 +333,6 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -356,7 +355,6 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);

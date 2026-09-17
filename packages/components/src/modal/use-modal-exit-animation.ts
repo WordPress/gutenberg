@@ -43,8 +43,7 @@ export function useModalExitAnimation() {
 				}
 
 				let handleAnimationEnd:
-					| undefined
-					| ( ( e: AnimationEvent ) => void );
+					undefined | ( ( e: AnimationEvent ) => void );
 
 				const startAnimation = () =>
 					new Promise< void >( ( animationResolve ) => {

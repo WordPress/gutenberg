@@ -12,25 +12,43 @@ function findNearest( input: number, numbers: number[] ) {
 	return numbers[ 0 ];
 }
 
-function extractFontWeights( fontFaces: FontFace[] ): number[] {
-	const result: number[] = [];
+const FONT_WEIGHT_KEYWORDS: Record< string, number | undefined > = {
+	normal: 400,
+	bold: 700,
+};
 
-	fontFaces.forEach( ( face ) => {
-		const weights = String( face.fontWeight ).split( ' ' );
+function isValidWeight( weight: number | undefined ): weight is number {
+	return (
+		weight !== undefined &&
+		Number.isFinite( weight ) &&
+		weight >= 1 &&
+		weight <= 1000
+	);
+}
 
-		if ( weights.length === 2 ) {
-			const start = parseInt( weights[ 0 ] );
-			const end = parseInt( weights[ 1 ] );
+/*
+ * Resolve a font-weight range (e.g. "200 900") to a single value.
+ * Ranges that cover 400 resolve to 400; otherwise to the closest end.
+ */
+function resolveFontWeight( fontWeight: FontFace[ 'fontWeight' ] ): string {
+	const weights = String( fontWeight ?? '' )
+		.trim()
+		.toLowerCase()
+		.split( /\s+/ )
+		.filter( Boolean )
+		.map( ( value ) => FONT_WEIGHT_KEYWORDS[ value ] ?? Number( value ) );
 
-			for ( let i = start; i <= end; i += 100 ) {
-				result.push( i );
-			}
-		} else if ( weights.length === 1 ) {
-			result.push( parseInt( weights[ 0 ] ) );
-		}
-	} );
+	const [ start, end ] = weights;
 
-	return result;
+	if ( ! isValidWeight( start ) ) {
+		return '400';
+	}
+
+	if ( weights.length !== 2 || ! isValidWeight( end ) ) {
+		return String( start );
+	}
+
+	return String( Math.min( Math.max( 400, start ), end ) );
 }
 
 /*
@@ -45,13 +63,21 @@ function extractFontWeights( fontFaces: FontFace[] ): number[] {
  *
  * Example:
  * formatFontFamily( "Open Sans, Font+Name, sans-serif" ) => '"Open Sans", "Font+Name", sans-serif'
- * formatFontFamily( "'Open Sans', generic(kai), sans-serif" ) => '"Open Sans", sans-serif'
- * formatFontFamily( "DotGothic16, Slabo 27px, serif" ) => '"DotGothic16","Slabo 27px",serif'
- * formatFontFamily( "Mine's, Moe's Typography" ) => `"mine's","Moe's Typography"`
+ * formatFontFamily( "'Open Sans', generic(kai), sans-serif" ) => '"Open Sans", generic(kai), sans-serif'
+ * formatFontFamily( "DotGothic16, Slabo 27px, serif" ) => '"DotGothic16", "Slabo 27px", serif'
+ * formatFontFamily( "Mine's, Moe's Typography" ) => `"Mine's", "Moe's Typography"`
+ * formatFontFamily( "var(--my-font), sans-serif" ) => 'var(--my-font), sans-serif'
  */
 export function formatFontFamily( input: string ) {
-	// Matches strings that are not exclusively alphabetic characters or hyphens, and do not exactly follow the pattern generic(alphabetic characters or hyphens).
-	const regex = /^(?!generic\([ a-zA-Z\-]+\)$)(?!^[a-zA-Z\-]+$).+/;
+	// Matches anything that has to be quoted to be a valid font family name.
+	// Left alone: a bare run of letters and hyphens, which covers the generic
+	// keywords such as `sans-serif`; `generic(kai)`; and a reference to a
+	// custom property such as `var(--wp--preset--font-family--body)`. The last
+	// two are CSS function calls rather than names, so quoting either one
+	// would stop it resolving.
+	// TODO: The regex was scoped to `var(--name )` and not things like `var(--name, fallback)`. That'll require more string parsing.
+	const regex =
+		/^(?!generic\([ a-zA-Z\-]+\)$)(?!var\(\s*--[\w-]+\s*\)$)(?!^[a-zA-Z\-]+$).+/;
 	const output = input.trim();
 
 	const formatItem = ( item: string ) => {
@@ -134,16 +160,19 @@ export function getFamilyPreviewStyle(
 		);
 		if ( normalFaces.length > 0 ) {
 			style.fontStyle = 'normal';
-			const normalWeights = extractFontWeights( normalFaces );
-			const nearestWeight = findNearest( 400, normalWeights );
-			style.fontWeight = String( nearestWeight ) || '400';
+			const normalWeights = normalFaces.map( ( face ) =>
+				Number( resolveFontWeight( face.fontWeight ) )
+			);
+			style.fontWeight = String(
+				findNearest( 400, normalWeights ) ?? 400
+			);
 		} else {
 			style.fontStyle =
 				( family.fontFace.length && family.fontFace[ 0 ].fontStyle ) ||
 				'normal';
 			style.fontWeight =
 				( family.fontFace.length &&
-					String( family.fontFace[ 0 ].fontWeight ) ) ||
+					resolveFontWeight( family.fontFace[ 0 ].fontWeight ) ) ||
 				'400';
 		}
 	}
@@ -155,6 +184,6 @@ export function getFacePreviewStyle( face: FontFace ): CSSProperties {
 	return {
 		fontFamily: formatFontFamily( face.fontFamily ),
 		fontStyle: face.fontStyle || 'normal',
-		fontWeight: face.fontWeight || '400',
+		fontWeight: resolveFontWeight( face.fontWeight ),
 	};
 }

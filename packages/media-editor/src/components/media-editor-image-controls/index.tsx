@@ -54,6 +54,11 @@ export interface MediaEditorImageControlsProps {
 	 * `DEFAULT_ZOOM_FACTOR` (1.2).
 	 */
 	zoomFactor?: number;
+	/**
+	 * Disable every control. Set while the edit is saving, so the crop the
+	 * request was built from cannot change under it.
+	 */
+	disabled?: boolean;
 }
 
 /**
@@ -67,12 +72,14 @@ export interface MediaEditorImageControlsProps {
  * @param props.showAspectRatioControl
  * @param props.aspectRatioPresets
  * @param props.zoomFactor
+ * @param props.disabled
  */
 export default function MediaEditorImageControls( {
 	withLabels = false,
 	showAspectRatioControl = false,
 	aspectRatioPresets,
 	zoomFactor = DEFAULT_ZOOM_FACTOR,
+	disabled = false,
 }: MediaEditorImageControlsProps ) {
 	const { state, setFlip, snapRotate90, setZoom } = useMediaEditor();
 	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
@@ -92,6 +99,8 @@ export default function MediaEditorImageControls( {
 				icon={ rotateLeft }
 				label={ __( 'Rotate 90° counter-clockwise' ) }
 				showTooltip
+				disabled={ disabled }
+				accessibleWhenDisabled
 				onClick={ () => snapRotate90( -1 ) }
 			/>
 			<Button
@@ -99,6 +108,8 @@ export default function MediaEditorImageControls( {
 				icon={ rotateRight }
 				label={ __( 'Rotate 90° clockwise' ) }
 				showTooltip
+				disabled={ disabled }
+				accessibleWhenDisabled
 				onClick={ () => snapRotate90( 1 ) }
 			/>
 		</>
@@ -112,6 +123,8 @@ export default function MediaEditorImageControls( {
 				label={ __( 'Flip horizontal' ) }
 				showTooltip
 				isPressed={ state.flip.horizontal }
+				disabled={ disabled }
+				accessibleWhenDisabled
 				onClick={ () =>
 					setFlip( {
 						horizontal: ! state.flip.horizontal,
@@ -125,6 +138,8 @@ export default function MediaEditorImageControls( {
 				label={ __( 'Flip vertical' ) }
 				showTooltip
 				isPressed={ state.flip.vertical }
+				disabled={ disabled }
+				accessibleWhenDisabled
 				onClick={ () =>
 					setFlip( {
 						horizontal: state.flip.horizontal,
@@ -142,7 +157,7 @@ export default function MediaEditorImageControls( {
 				icon={ plus }
 				label={ __( 'Zoom in' ) }
 				showTooltip
-				disabled={ state.zoom >= MAX_ZOOM }
+				disabled={ disabled || state.zoom >= MAX_ZOOM }
 				accessibleWhenDisabled
 				onClick={ () => zoomByFactor( zoomFactor ) }
 			/>
@@ -151,7 +166,7 @@ export default function MediaEditorImageControls( {
 				icon={ lineSolid }
 				label={ __( 'Zoom out' ) }
 				showTooltip
-				disabled={ state.zoom <= minZoom }
+				disabled={ disabled || state.zoom <= minZoom }
 				accessibleWhenDisabled
 				onClick={ () => zoomByFactor( 1 / zoomFactor ) }
 			/>
@@ -163,7 +178,7 @@ export default function MediaEditorImageControls( {
 			icon={ aspectRatioIcon }
 			label={ __( 'Aspect ratio' ) }
 			popoverProps={ { placement: 'top' } }
-			toggleProps={ { size: 'compact' } }
+			toggleProps={ { size: 'compact', disabled } }
 		>
 			{ ( { onClose } ) => (
 				<MenuGroup label={ __( 'Aspect ratio' ) }>
@@ -176,7 +191,11 @@ export default function MediaEditorImageControls( {
 								role="menuitemradio"
 								isSelected={ isSelected }
 								icon={ isSelected ? check : undefined }
+								disabled={ disabled }
 								onClick={ () => {
+									if ( disabled ) {
+										return;
+									}
 									setAspectRatioValue( value );
 									onClose();
 								} }

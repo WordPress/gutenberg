@@ -81,13 +81,13 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 				syncStatus === 'unsynced'
 					? parse( content, {
 							__unstableSkipMigrationLogs: true,
-					  } )
+						} )
 					: createBlock(
 							name,
 							initialAttributes,
 							createBlocksFromInnerBlocksTemplate( innerBlocks ),
 							innerContent
-					  );
+						);
 			onInsert(
 				insertedBlock,
 				undefined,

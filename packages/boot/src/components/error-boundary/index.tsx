@@ -5,7 +5,7 @@ import { Button } from '@wordpress/components';
 import { EmptyState } from '@wordpress/ui';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { caution } from '@wordpress/icons';
-import './style.scss';
+import styles from './style.module.scss';
 
 interface Props {
 	children: ReactNode;
@@ -50,7 +50,7 @@ export default class ErrorBoundary extends Component< Props, State > {
 		}
 
 		return (
-			<div className="boot-error-boundary">
+			<div className={ styles[ 'error-boundary' ] }>
 				<EmptyState.Root>
 					<EmptyState.Icon icon={ caution } />
 					<EmptyState.Title>

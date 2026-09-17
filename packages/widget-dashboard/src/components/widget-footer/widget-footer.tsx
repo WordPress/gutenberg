@@ -1,6 +1,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Icon, Link, LinkButton, Stack, Tooltip } from '@wordpress/ui';
+import { HostLink } from '@wordpress/widget-primitives';
 import type { WidgetAction, WidgetIcon } from '@wordpress/widget-primitives';
 import styles from './widget-footer.module.css';
 
@@ -24,7 +25,7 @@ function IconAction( { action }: IconActionProps ): React.ReactNode {
 				/* translators: %s: action label. */
 				__( '%s (opens in a new tab)' ),
 				action.label
-		  )
+			)
 		: action.label;
 
 	return (
@@ -37,14 +38,17 @@ function IconAction( { action }: IconActionProps ): React.ReactNode {
 						size="compact"
 						className={ styles[ 'icon-action' ] }
 						aria-label={ label }
-						href={ action.href }
-						download={ action.download }
 						render={
-							action.openInNewTab ? (
-								/* href and content merge in at runtime. */
-								// eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid
-								<a target="_blank" rel="noopener noreferrer" />
-							) : undefined
+							<HostLink
+								href={ action.href }
+								download={ action.download }
+								{ ...( action.openInNewTab
+									? {
+											target: '_blank',
+											rel: 'noopener noreferrer',
+										}
+									: {} ) }
+							/>
 						}
 					/>
 				}
@@ -73,6 +77,9 @@ type WidgetFooterProps = {
  * text links, a declared icon riding as prefix; `'medium'` actions as
  * trailing compact affordances, icon-only when they declare an icon. Every
  * affordance is a real anchor.
+ *
+ * A target the host recognizes as one of its own routes mounts the host
+ * router's link through `HostLink`, so it navigates client-side.
  *
  * @param {WidgetFooterProps} props Component props.
  */
@@ -104,14 +111,14 @@ export function WidgetFooter( {
 					{ highActions.map( ( action ) => (
 						<Link
 							key={ action.id }
-							href={ action.href }
-							download={ action.download }
-							openInNewTab={ action.openInNewTab }
 							className={
 								action.icon
 									? styles[ 'prefixed-action' ]
 									: undefined
 							}
+							download={ action.download }
+							openInNewTab={ action.openInNewTab }
+							render={ <HostLink href={ action.href } /> }
 						>
 							{ action.icon && <Icon icon={ action.icon } /> }
 							{ action.label }
@@ -132,17 +139,14 @@ export function WidgetFooter( {
 							action.icon ? (
 								<IconAction
 									key={ action.id }
-									action={ {
-										...action,
-										icon: action.icon,
-									} }
+									action={ { ...action, icon: action.icon } }
 								/>
 							) : (
 								<Link
 									key={ action.id }
-									href={ action.href }
 									download={ action.download }
 									openInNewTab={ action.openInNewTab }
+									render={ <HostLink href={ action.href } /> }
 								>
 									{ action.label }
 								</Link>

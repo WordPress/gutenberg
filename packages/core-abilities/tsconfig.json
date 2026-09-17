@@ -1,11 +1,11 @@
 {
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"compilerOptions": {
 		"declarationDir": "build-types",
 		"rootDir": "src"
 	},
 	"references": [
-		{ "path": "../abilities" },
+		{ "path": "../abilities/tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../url" }
 	],
