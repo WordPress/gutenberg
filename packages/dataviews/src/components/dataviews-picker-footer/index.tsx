@@ -173,11 +173,8 @@ function PickerBulkSelectionInfo() {
 		[ selection, getItemId, data ]
 	);
 
-	// The count and the selection checkbox belong with the actions, mirroring
-	// `DataViews`. Single-select pickers always hold exactly one selection, so
-	// the count carries no information and only the multiselect variant
-	// renders it.
-	if ( ! actions.length || ! isMultiselect ) {
+	// The count and the selection checkbox belong with the actions, mirroring `DataViews`.
+	if ( ! actions.length ) {
 		return null;
 	}
 
@@ -195,14 +192,16 @@ function PickerBulkSelectionInfo() {
 			gap="md"
 			align="center"
 		>
-			<BulkSelectionCheckbox
-				selection={ selection }
-				selectedItems={ selectedItems }
-				onChangeSelection={ onChangeSelection }
-				data={ data }
-				getItemId={ getItemId }
-				disableSelectAll={ !! view.infiniteScrollEnabled }
-			/>
+			{ isMultiselect && (
+				<BulkSelectionCheckbox
+					selection={ selection }
+					selectedItems={ selectedItems }
+					onChangeSelection={ onChangeSelection }
+					data={ data }
+					getItemId={ getItemId }
+					disableSelectAll={ !! view.infiniteScrollEnabled }
+				/>
+			) }
 			<span className="dataviews-bulk-actions-footer__item-count">
 				{ message }
 			</span>
