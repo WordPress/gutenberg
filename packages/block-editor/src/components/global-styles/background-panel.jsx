@@ -231,11 +231,12 @@ export default function BackgroundImagePanel( {
 		( clipValue ) => clipValue !== 'text'
 	);
 	/*
-	 * A viewport state's styles sit in a media query, but the clip is not
-	 * emitted in one, so it applies at every width whichever state set it.
-	 * It belongs to the Default state, and only that state can change it. A
-	 * pseudo state is different: its styles are scoped to the selector, so a
-	 * clip set there genuinely applies on hover alone.
+	 * Clipping is treated as a property of the block rather than of a width.
+	 * The Default state's clip carries into every breakpoint, and splitting it
+	 * by width produced controls that could not do what they offered, so a
+	 * viewport state does not get to change it. A pseudo state does: its
+	 * styles are scoped to the selector, so a clip set there applies on hover
+	 * alone rather than fighting the Default state everywhere else.
 	 */
 	const isViewportState = hasViewportBlockStyleState( styleState );
 	const showBackgroundClipControl = hasBoxClipValue && ! isViewportState;
