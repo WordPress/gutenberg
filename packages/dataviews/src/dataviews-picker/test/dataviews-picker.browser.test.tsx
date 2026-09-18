@@ -518,6 +518,11 @@ describe( 'DataViews Picker', () => {
 				} );
 				await user.click( nextButton );
 
+				// The selection lives on page 1; the action stays available.
+				expect(
+					screen.getByRole( 'button', { name: 'Confirm' } )
+				).not.toHaveAttribute( 'aria-disabled', 'true' );
+
 				// Page 2: Select another item
 				options = within( listbox ).getAllByRole( 'option' );
 				expect( options ).toHaveLength( 1 ); // Page 2 should have 1 item (item 3)

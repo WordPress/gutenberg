@@ -115,7 +115,9 @@ function ActionButtons< Item >( {
 					action;
 
 				// The label reflects the selection; eligibility only
-				// controls whether the action can run on it.
+				// controls whether the action can run on it. `items` holds
+				// the current page only, so an action without `isEligible`
+				// stays enabled for a selection made on other pages.
 				const eligibleItems = isEligible
 					? items.filter( ( item ) => isEligible( item ) )
 					: items;
@@ -132,7 +134,7 @@ function ActionButtons< Item >( {
 						disabled={
 							isInProgress ||
 							! selection?.length ||
-							! eligibleItems.length
+							( !! isEligible && ! eligibleItems.length )
 						}
 						isBusy={ isInProgress }
 						onClick={ async () => {
