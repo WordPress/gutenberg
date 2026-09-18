@@ -37,11 +37,14 @@ describe( 'RadioGroupControl', () => {
 		);
 
 		expect(
-			screen.getByRole( 'group', {
+			screen.getByRole( 'radiogroup', {
 				name: 'Choose an option',
 				description: 'Select one of the available options',
 			} )
 		).toBeVisible();
+		expect(
+			screen.queryByRole( 'group', { name: 'Choose an option' } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'renders item descriptions when provided', () => {
@@ -76,7 +79,7 @@ describe( 'RadioGroupControl', () => {
 		);
 
 		expect(
-			screen.getByRole( 'group', { name: 'Choose an option' } )
+			screen.getByRole( 'radiogroup', { name: 'Choose an option' } )
 		).toBeVisible();
 	} );
 

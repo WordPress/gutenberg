@@ -5,7 +5,6 @@ import { Stack } from '../../stack';
 import type { RadioGroupControlProps } from './types';
 import styles from './style.module.css';
 
-const DEFAULT_FIELDSET = <Fieldset.Root />;
 const ITEM_RENDER = <Stack gap="sm" align="start" className={ styles.item } />;
 
 const TextContainer = ( {
@@ -43,7 +42,11 @@ export const RadioGroupControl = forwardRef<
 		<Field.Root
 			name={ name }
 			className={ clsx( styles.root, className ) }
-			render={ DEFAULT_FIELDSET }
+			render={
+				<Fieldset.Root
+					render={ <RadioGroup ref={ ref } { ...restProps } /> }
+				/>
+			}
 		>
 			<Fieldset.Legend hideFromVision={ hideLabelFromVision }>
 				{ label }
@@ -52,32 +55,27 @@ export const RadioGroupControl = forwardRef<
 				<Fieldset.Description>{ description }</Fieldset.Description>
 			) }
 			{ details && <Fieldset.Details>{ details }</Fieldset.Details> }
-			<RadioGroup ref={ ref } { ...restProps }>
-				{ items.map( ( item ) => (
-					<Field.Item key={ item.value } render={ ITEM_RENDER }>
-						<div className={ styles[ 'radio-wrapper' ] }>
-							<Radio
-								value={ item.value }
-								disabled={ item.disabled }
-								className={ styles.radio }
-							/>
-						</div>
-						<TextContainer isStack={ !! item.description }>
-							<Field.Label
-								variant="plain"
-								className={ styles.label }
-							>
-								{ item.label }
-							</Field.Label>
-							{ item.description && (
-								<Field.Description>
-									{ item.description }
-								</Field.Description>
-							) }
-						</TextContainer>
-					</Field.Item>
-				) ) }
-			</RadioGroup>
+			{ items.map( ( item ) => (
+				<Field.Item key={ item.value } render={ ITEM_RENDER }>
+					<div className={ styles[ 'radio-wrapper' ] }>
+						<Radio
+							value={ item.value }
+							disabled={ item.disabled }
+							className={ styles.radio }
+						/>
+					</div>
+					<TextContainer isStack={ !! item.description }>
+						<Field.Label variant="plain" className={ styles.label }>
+							{ item.label }
+						</Field.Label>
+						{ item.description && (
+							<Field.Description>
+								{ item.description }
+							</Field.Description>
+						) }
+					</TextContainer>
+				</Field.Item>
+			) ) }
 		</Field.Root>
 	);
 } );
