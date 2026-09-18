@@ -4,8 +4,7 @@
 
 ### New Features
 
--   Add `DataViews.PageSelect` and `DataViewsPicker.PageSelect`, the pagination's page select on its own, so a footer with room for one pagination control can compose it next to its actions ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
--   DataViewsPicker: Add the `DataViewsPicker.Actions` sub-component, so a picker can compose a footer from the pagination and the actions alone ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
+-   Add the `DataViews.PageSelect`, `DataViewsPicker.PageSelect` and `DataViewsPicker.Actions` sub-components, so a picker can compose a footer from the page select and its actions ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
 
 ### Enhancements
 

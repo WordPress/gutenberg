@@ -774,7 +774,7 @@ Same as `DataViews`. An element to display when the `data` prop is empty.
 
 #### `children`: React node
 
-Optional. Custom UI to render instead of the default picker layout. When provided, you can use the same subcomponents as `DataViews` for free composition, plus the picker's own `DataViewsPicker.Footer` (the bulk selection info, the pagination and the actions), `DataViewsPicker.BulkActionToolbar` and `DataViewsPicker.Actions`, so a picker can compose a footer from `DataViewsPicker.PageSelect` and `DataViewsPicker.Actions` alone, for instance.
+Optional. Custom UI to render instead of the default picker layout. When provided, you can use the same subcomponents as `DataViews` for free composition, plus the picker's own `DataViewsPicker.Footer` (the bulk selection info, the pagination and the actions), `DataViewsPicker.BulkActionToolbar` and `DataViewsPicker.Actions`.
 
 **Unsupported properties:**
 
@@ -1112,7 +1112,6 @@ Function that determines whether the action can be performed for a given record.
 
 -   Type: `function`
 -   Optional. If not present, action is considered eligible for all items.
--   In `DataViewsPicker`, the action's footer button is disabled while no selected item is eligible; the callback receives only the eligible items, while a `label` function receives the whole selection.
 -   Example:
 
 ```js
