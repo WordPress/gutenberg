@@ -577,7 +577,7 @@ function BlockListBlockProvider( props ) {
 						clientId: ghostBlock.clientId,
 						name: ghostBlock.name,
 						isValid: true,
-				  }
+					}
 				: undefined,
 		[ ghostBlock ]
 	);

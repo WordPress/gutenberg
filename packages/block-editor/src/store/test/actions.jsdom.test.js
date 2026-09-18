@@ -6,11 +6,15 @@ import {
 	unregisterBlockType,
 	registerBlockType,
 	createBlock,
+	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import * as selectors from '../selectors';
 import reducer from '../reducer';
 import * as actions from '../actions';
 import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
+import { unlock } from '../../lock-unlock';
+
+const { editableRootKey } = unlock( blocksPrivateApis );
 
 const noop = () => {};
 
@@ -460,10 +464,12 @@ describe( 'actions', () => {
 				getSettings: () => null,
 				// The insertion selects the inserted block.
 				getSelectedBlockClientId: () => containerBlock.clientId,
+				getBlockName: () => 'core/test-container',
 				canInsertBlockType: () => true,
 			};
 			const dispatch = vi.fn();
 			dispatch.selectBlock = vi.fn();
+			dispatch.selectionChange = vi.fn();
 
 			insertBlocks(
 				[ containerBlock ],
@@ -482,6 +488,60 @@ describe( 'actions', () => {
 				insertedBlocks[ 0 ].innerBlocks[ 0 ].clientId,
 				0
 			);
+		} );
+
+		it( 'selects the start of an inserted editable root block text', () => {
+			registerBlockType( 'core/test-host', {
+				...defaultBlockSettings,
+				attributes: { content: { source: 'rich-text' } },
+				[ editableRootKey ]: true,
+			} );
+
+			const block = createBlock( 'core/test-host' );
+			const select = {
+				getSettings: () => null,
+				getSelectedBlockClientId: () => block.clientId,
+				getBlockName: () => 'core/test-host',
+				canInsertBlockType: () => true,
+			};
+			const dispatch = vi.fn();
+			dispatch.selectionChange = vi.fn();
+
+			insertBlocks(
+				[ block ],
+				0,
+				undefined,
+				true,
+				0
+			)( {
+				select,
+				dispatch,
+				registry: { batch: ( fn ) => fn() },
+			} );
+
+			expect( dispatch.selectionChange ).toHaveBeenCalledWith(
+				block.clientId,
+				'content',
+				0,
+				0
+			);
+
+			// A block that does not opt in is left to place its own caret,
+			// since the store cannot know which field it focuses.
+			dispatch.selectionChange.mockClear();
+			select.getBlockName = () => 'core/test-item';
+			registerBlockType( 'core/test-item', {
+				...defaultBlockSettings,
+				attributes: { content: { source: 'rich-text' } },
+			} );
+			insertBlocks(
+				[ createBlock( 'core/test-item' ) ],
+				0,
+				undefined,
+				true,
+				0
+			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should not apply block type templates to blocks with inner blocks', () => {

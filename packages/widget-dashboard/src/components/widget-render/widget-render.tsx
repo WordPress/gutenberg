@@ -34,7 +34,7 @@ export function WidgetRender( { widget, widgetType }: WidgetRenderProps ) {
 									...( w.attributes as object ),
 									...( next as object ),
 								},
-						  }
+							}
 						: w
 				)
 			);
