@@ -8,6 +8,9 @@
 -   `PostTaxonomiesFlatTermSelector`: The field renders with the `SearchableChipSelectControl` component of `@wordpress/ui` instead of `FormTokenField` ([#80967](https://github.com/WordPress/gutenberg/pull/80967)).
 -   `CollaboratorsPresence`: Show focus ring for avatar stack in header with button's outline instead of previous box-shadow override ([#82941](https://github.com/WordPress/gutenberg/pull/82941)).
 -   Add category filtering and search to the "Choose a pattern" modal shown when creating a new page or post. Only the categories containing start patterns for the current post type are listed, with labels pulled from the registered pattern categories ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
+-   Notes Sidebar: Promote the "Add note" action from the block-toolbar overflow menu to a dedicated toolbar button placed before the ellipsis. Blocks that already have a thread continue to show the avatar indicator alongside the button ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
+-   Notes Sidebar: The "Add note" toolbar button now toggles the form it opened and exposes `aria-expanded`, so clicking it again closes the form instead of silently doing nothing ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
+-   Notes Sidebar: Fade the floating note card in once its anchor has been measured, rather than cutting it to full opacity in a single frame ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
 
 ### Bug Fixes
 
@@ -73,9 +76,6 @@
 
 -   Commands: Add a command palette entry that opens the current post on the front end once it is published, labelled with the post type's `view_item` label ([#66720](https://github.com/WordPress/gutenberg/pull/66720)).
 -   Pre-publish panel: Remove the "Visibility" and "Publish" headings that repeated the title of the panel containing them. The publish date's reset action, which lived in the removed header, becomes a "Reset" button below the date picker, disabled but still focusable while the post is set to publish immediately ([#81806](https://github.com/WordPress/gutenberg/pull/81806)).
--   Notes Sidebar: Promote the "Add note" action from the block-toolbar overflow menu to a dedicated toolbar button placed before the ellipsis. Blocks that already have a thread continue to show the avatar indicator alongside the button ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
--   Notes Sidebar: The "Add note" toolbar button now toggles the form it opened and exposes `aria-expanded`, so clicking it again closes the form instead of silently doing nothing ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
--   Notes Sidebar: Fade the floating note card in once its anchor has been measured, rather than cutting it to full opacity in a single frame ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
 
 ### Bug Fixes
 
