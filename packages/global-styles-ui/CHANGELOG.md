@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Add a text shadow presets screen under Typography ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+-   Font Library: list the fonts that registered font providers supply, read-only, under each provider's name ([#83127](https://github.com/WordPress/gutenberg/pull/83127)).
 
 ### Bug Fixes
 
