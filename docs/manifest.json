@@ -816,7 +816,7 @@
 		"parent": "core-blocks-design"
 	},
 	{
-		"title": "Custom Link",
+		"title": "Navigation Link",
 		"slug": "core-block-navigation-link",
 		"markdown_source": "../packages/block-library/src/navigation-link/README.md",
 		"parent": "core-blocks-design"
@@ -2571,18 +2571,6 @@
 		"title": "@wordpress/is-shallow-equal",
 		"slug": "packages-is-shallow-equal",
 		"markdown_source": "../packages/is-shallow-equal/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/jest-console",
-		"slug": "packages-jest-console",
-		"markdown_source": "../packages/jest-console/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/jest-preset-default",
-		"slug": "packages-jest-preset-default",
-		"markdown_source": "../packages/jest-preset-default/README.md",
 		"parent": "packages"
 	},
 	{

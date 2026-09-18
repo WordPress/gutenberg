@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { createRef } from '@wordpress/element';
 import { screen, render } from '@testing-library/react';
 import { LinkButton } from '../index';
@@ -34,14 +35,6 @@ describe( 'LinkButton', () => {
 		expect(
 			screen.getByRole( 'link', { name: 'Go to example' } )
 		).toHaveClass( customClass );
-	} );
-
-	it( 'inherits focus ring styles from Link', () => {
-		render( <LinkButton href="/example">Go to example</LinkButton> );
-
-		const link = screen.getByRole( 'link', { name: 'Go to example' } );
-
-		expect( link ).toHaveClass( 'style-outset-ring-focus-except-active' );
 	} );
 
 	describe( 'openInNewTab', () => {

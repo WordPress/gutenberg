@@ -3,14 +3,13 @@ import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
 import * as Combobox from '../combobox';
 import type { ComboboxCollectionProps } from '../combobox/types';
+import { SearchableResults } from '../searchable-results';
 import styles from './style.module.css';
 import {
-	findCreatableItem,
 	findCreatableItems,
 	hasGroupedItems,
-	isItem,
-	normalizeRootItems,
-	shouldSkipCollectionEntry,
+	isCreatableItem,
+	isItemGroup,
 	type Item,
 	type ItemGroup,
 	type SearchableSelectProps,
@@ -37,11 +36,29 @@ function warnSearchableSelectProps(
 			'SearchableSelect: grouped `items` require a `children` renderer. See the `Grouped` story for an example.'
 		);
 	}
+
+	let hasMixedCreatableGroup = false;
+	for ( const entry of items ) {
+		if (
+			isItemGroup( entry ) &&
+			entry.items.some( isCreatableItem ) &&
+			entry.items.some( ( item ) => ! isCreatableItem( item ) )
+		) {
+			hasMixedCreatableGroup = true;
+			break;
+		}
+	}
+
+	if ( hasMixedCreatableGroup ) {
+		warning(
+			'SearchableSelect: do not mix `creatable: true` items with regular items in the same group. Put the creatable item in its own group.'
+		);
+	}
 }
 
 /**
  * A searchable single-selection component, with support for
- * a footer item to create new items.
+ * a creatable footer action.
  */
 export const SearchableSelect = forwardRef<
 	HTMLButtonElement,
@@ -50,6 +67,7 @@ export const SearchableSelect = forwardRef<
 	{
 		children,
 		emptyContent = __( 'No results found.' ),
+		statusContent,
 		items,
 		placeholder,
 		triggerContent,
@@ -64,11 +82,8 @@ export const SearchableSelect = forwardRef<
 ) {
 	warnSearchableSelectProps( items, children );
 
-	const creatableItem = findCreatableItem( items );
-	const comboboxItems = normalizeRootItems( items );
-
 	return (
-		<Combobox.Root< Item, false > items={ comboboxItems } { ...restProps }>
+		<Combobox.Root< Item, false > items={ items } { ...restProps }>
 			<Combobox.Trigger
 				ref={ ref }
 				placeholder={ placeholder }
@@ -90,52 +105,12 @@ export const SearchableSelect = forwardRef<
 						aria-label={ searchPlaceholder }
 					/>
 				</div>
-				<Combobox.Empty>{ emptyContent }</Combobox.Empty>
-				<Combobox.List>
-					<Combobox.ListBody>
-						<Combobox.Collection>
-							{ ( entry: Item | ItemGroup, ...args ) => {
-								if (
-									shouldSkipCollectionEntry(
-										entry,
-										creatableItem
-									)
-								) {
-									return null;
-								}
-
-								if ( children ) {
-									return children( entry, ...args );
-								}
-
-								if ( ! isItem( entry ) ) {
-									return null;
-								}
-
-								return (
-									<Combobox.Item
-										key={ entry.value }
-										value={ entry }
-										disabled={ entry.disabled }
-									>
-										{ entry.label }
-									</Combobox.Item>
-								);
-							} }
-						</Combobox.Collection>
-					</Combobox.ListBody>
-					{ creatableItem && (
-						<Combobox.ListFooter>
-							<Combobox.Item
-								variant="creatable"
-								value={ creatableItem }
-								disabled={ creatableItem.disabled }
-							>
-								{ creatableItem.label }
-							</Combobox.Item>
-						</Combobox.ListFooter>
-					) }
-				</Combobox.List>
+				<SearchableResults
+					emptyContent={ emptyContent }
+					statusContent={ statusContent }
+				>
+					{ children }
+				</SearchableResults>
 			</Combobox.Popup>
 		</Combobox.Root>
 	);

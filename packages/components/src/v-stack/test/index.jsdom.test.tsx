@@ -1,6 +1,9 @@
+import { describe, expect, test } from 'vitest';
 import { render } from '@testing-library/react';
 import { View } from '../../view';
 import { VStack } from '..';
+
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {

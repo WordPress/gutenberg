@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
+import { Spinner } from '../../../spinner';
+import { Stack } from '../../../stack';
+import { VisuallyHidden } from '../../../visually-hidden';
 import { SearchableChipSelectControl } from '../';
 import {
 	GROUPED_ITEMS,
@@ -116,8 +119,8 @@ export const WithDisabledOption: Story = {
 
 /**
  * Mark a creatable action with `creatable: true` on an item in `items`.
- * It renders in the list footer and is excluded from the main list
- * automatically. Handle creation in `onValueChange`.
+ * It renders in the list footer, not the main list, when it is in the
+ * filtered items. Handle the creation of the item in `onValueChange`.
  */
 export const Creatable: Story = {
 	args: {
@@ -186,6 +189,71 @@ export const WithCustomEmptyContent: Story = {
 	},
 };
 
+function HiddenResultCount() {
+	const count =
+		SearchableChipSelectControl.useFilteredItems<
+			( typeof ITEMS )[ number ]
+		>().length;
+
+	if ( count === 0 ) {
+		return null;
+	}
+
+	return (
+		<VisuallyHidden>
+			{ count === 1 ? '1 result found.' : `${ count } results found.` }
+		</VisuallyHidden>
+	);
+}
+
+/**
+ * Loads the item list asynchronously. `statusContent` shows loading, then
+ * a visually hidden result count. Pass `emptyContent={ null }` while
+ * loading so Empty does not claim there are no results.
+ */
+export const AsyncItems: Story = {
+	args: {
+		label: 'Label',
+		description: 'This is a description.',
+	},
+	render: function Template( args ) {
+		const [ loading, setLoading ] = useState( false );
+		const [ items, setItems ] = useState< typeof ITEMS >( [] );
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+
+		return (
+			<SearchableChipSelectControl
+				{ ...args }
+				items={ items }
+				statusContent={
+					loading ? (
+						<Stack direction="row" gap="sm" align="center">
+							<Spinner />
+							Loading…
+						</Stack>
+					) : (
+						<HiddenResultCount />
+					)
+				}
+				emptyContent={ loading ? null : undefined }
+				onOpenChange={ ( open ) => {
+					if ( ! open ) {
+						clearTimeout( timeoutRef.current );
+						return;
+					}
+					setLoading( true );
+					setItems( [] );
+					clearTimeout( timeoutRef.current );
+					timeoutRef.current = setTimeout( () => {
+						setItems( ITEMS );
+						setLoading( false );
+					}, 500 );
+				} }
+			/>
+		);
+	},
+};
+
 export const WithoutClearButton: Story = {
 	...SearchableChipSelectStories.WithoutClearButton,
 	args: {
@@ -216,7 +284,8 @@ export const Grouped: Story = {
 
 /**
  * Grouped items with a creatable footer item. Include the creatable item in
- * `items` as a creatable-only group and handle creation in `onValueChange`.
+ * `items` as a creatable-only group. Handle the creation of the item in
+ * `onValueChange`.
  */
 export const GroupedCreatable: Story = {
 	args: {

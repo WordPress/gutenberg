@@ -31,6 +31,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 		isViewable,
 		showIconLabels,
 		isTemplateHidden,
+		hasRenderingMode,
 		templateId,
 		isResponsiveEditing,
 		isResponsiveEditingEnabled,
@@ -64,6 +65,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 			isViewable: getPostType( _currentPostType )?.viewable ?? false,
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isTemplateHidden: getRenderingMode() === 'post-only',
+			hasRenderingMode: !! getEditorSettings().renderingMode,
 			templateId: getCurrentTemplateId(),
 			isResponsiveEditing: _isResponsiveEditing(),
 			isResponsiveEditingEnabled:
@@ -89,7 +91,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 		setResponsiveEditing( newIsResponsiveEditing );
 		setStyleStateViewport(
 			newIsResponsiveEditing
-				? VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
+				? ( VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default' )
 				: 'default'
 		);
 		// Only auto-open the block inspector when enabling responsive styles
@@ -133,7 +135,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 							? __( 'Style tablet only.' )
 							: __( 'Preview tablet viewport.' ),
 					},
-			  ]
+				]
 			: [] ),
 		...( hasMobileViewport
 			? [
@@ -144,7 +146,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 							? __( 'Style mobile only.' )
 							: __( 'Preview mobile viewport.' ),
 					},
-			  ]
+				]
 			: [] ),
 	];
 
@@ -229,7 +231,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 						</Menu.Group>
 					</>
 				) }
-				{ ! isTemplate && !! templateId && (
+				{ ! isTemplate && !! templateId && ! hasRenderingMode && (
 					<>
 						<Menu.Separator />
 						<Menu.Group>

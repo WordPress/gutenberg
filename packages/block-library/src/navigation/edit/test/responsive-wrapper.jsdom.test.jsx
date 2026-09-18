@@ -1,37 +1,38 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSelect } from '@wordpress/data';
 import ResponsiveWrapper from '../responsive-wrapper';
 
 // Mock block-editor to avoid private API issues
-jest.mock( '@wordpress/block-editor', () => ( {
-	getColorClassName: jest.fn( () => '' ),
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
+	getColorClassName: vi.fn( () => '' ),
 } ) );
 
 // Mock core-data store
-jest.mock( '@wordpress/core-data', () => ( {
+vi.mock( import( '@wordpress/core-data' ), () => ( {
 	store: {},
 } ) );
 
 // Mock useSelect
-jest.mock( '@wordpress/data', () => ( {
-	useSelect: jest.fn(),
-	createSelector: jest.fn( ( fn ) => fn ),
-	createRegistrySelector: jest.fn( ( fn ) => fn ),
-	createReduxStore: jest.fn( () => ( {} ) ),
-	combineReducers: jest.fn( ( reducers ) => ( state = {}, action ) => {
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useSelect: vi.fn(),
+	createSelector: vi.fn( ( fn ) => fn ),
+	createRegistrySelector: vi.fn( ( fn ) => fn ),
+	createReduxStore: vi.fn( () => ( {} ) ),
+	combineReducers: vi.fn( ( reducers ) => ( state = {}, action ) => {
 		const newState = {};
 		Object.keys( reducers ).forEach( ( key ) => {
 			newState[ key ] = reducers[ key ]( state[ key ], action );
 		} );
 		return newState;
 	} ),
-	register: jest.fn(),
+	register: vi.fn(),
 } ) );
 
 describe( 'ResponsiveWrapper', () => {
-	const mockOnToggle = jest.fn();
-	const mockOnNavigateToEntityRecord = jest.fn();
+	const mockOnToggle = vi.fn();
+	const mockOnNavigateToEntityRecord = vi.fn();
 
 	const defaultProps = {
 		id: 'test-navigation',
@@ -49,7 +50,7 @@ describe( 'ResponsiveWrapper', () => {
 	};
 
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		// Mock useSelect - component calls: select( coreStore ).getCurrentTheme()?.stylesheet
 		useSelect.mockImplementation( ( selector ) => {
 			if ( typeof selector === 'function' ) {
