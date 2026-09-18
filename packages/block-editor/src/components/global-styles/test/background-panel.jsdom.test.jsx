@@ -517,6 +517,14 @@ describe( 'BackgroundPanel background clip', () => {
 		).not.toBeInTheDocument();
 	} );
 
+	it( 'hides the clip control when the setting names nothing it recognises', () => {
+		renderPanel( withClipSetting( [ 'padding_box' ] ) );
+
+		expect(
+			screen.queryByRole( 'combobox', { name: /clip/i } )
+		).not.toBeInTheDocument();
+	} );
+
 	it( 'shows the clip control when the setting names values', async () => {
 		renderPanel( withClipSetting( [ 'border-box', 'text' ] ) );
 
