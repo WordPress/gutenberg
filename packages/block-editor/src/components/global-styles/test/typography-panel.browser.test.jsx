@@ -1289,7 +1289,7 @@ describe( 'TypographyPanel text gradient', () => {
 			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
-		it( 'disables the gradient control, which only the default viewport can change', async () => {
+		it( 'hides the gradient control, which belongs to the Default state', async () => {
 			await renderPanel( {
 				settings: gradientSettings,
 				blockName: TEST_BLOCK,
@@ -1299,11 +1299,11 @@ describe( 'TypographyPanel text gradient', () => {
 			} );
 
 			expect(
-				screen.getByRole( 'button', { name: /Gradient/ } )
-			).toHaveAttribute( 'aria-disabled', 'true' );
+				screen.queryByRole( 'button', { name: /Gradient/ } )
+			).not.toBeInTheDocument();
 		} );
 
-		it( 'leaves both controls usable when the breakpoint overrides the clip', async () => {
+		it( 'leaves the text color usable when the breakpoint overrides the clip', async () => {
 			await renderPanel( {
 				settings: gradientSettings,
 				blockName: TEST_BLOCK,
@@ -1314,9 +1314,6 @@ describe( 'TypographyPanel text gradient', () => {
 
 			expect(
 				screen.getByRole( 'button', { name: /Color/ } )
-			).not.toHaveAttribute( 'aria-disabled', 'true' );
-			expect(
-				screen.getByRole( 'button', { name: /Gradient/ } )
 			).not.toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 	} );
