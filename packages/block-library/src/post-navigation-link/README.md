@@ -46,6 +46,12 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 - `postType`
 
+## CSS Selectors
+
+_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
+
+- **shadow**: `.wp-block-post-navigation-link:not(:empty)`
+
 ## Block Markup
 
 This is a [**dynamic block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It is rendered on the server and does not save HTML in post content.
