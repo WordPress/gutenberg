@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Query Pagination: Say in the "Show label text" help that a hidden label is still announced to screen reader users, so editors know the text stays available to assistive technology ([#83160](https://github.com/WordPress/gutenberg/pull/83160)).
+-   Query Pagination: Explain in the "Show label text" help that screen readers still announce a hidden label on the site ([#83160](https://github.com/WordPress/gutenberg/pull/83160)).
 -   Math: Read the LaTeX source from the `<annotation>` inside the saved `<math>` instead of the block comment, so `&` and `<` survive `wp_kses` for users without `unfiltered_html`. Input that cannot be rendered is saved as an annotation-only `<semantics>`, which browsers display as the source text ([#82987](https://github.com/WordPress/gutenberg/pull/82987)).
 -   Image: Inject the lightbox trigger with a literal string replacement instead of `preg_replace`, so `$` and `\` sequences in author-controlled image attributes (such as a price in the alt text) are no longer interpreted as regex backreferences and silently removed ([#79369](https://github.com/WordPress/gutenberg/pull/79369)).
 -   Cover: Grow the block with its content in Safari when an aspect ratio is set, instead of clipping the overflow. WebKit locks the box to the ratio where other engines let content expand it ([#70152](https://github.com/WordPress/gutenberg/pull/70152)).
