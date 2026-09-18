@@ -6,7 +6,7 @@ import {
 	Spinner,
 	TextareaControl as WCTextareaControl,
 	TextControl,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
@@ -1144,7 +1144,7 @@ export default function Image( {
 									setAttributes( { isDecorative: false } )
 								}
 							>
-								<CheckboxControl
+								<WCCheckboxControl
 									label={ __( 'Mark as decorative' ) }
 									checked={ !! isDecorative }
 									onChange={ updateIsDecorative }
