@@ -170,7 +170,6 @@ describe( 'RadioGroupControl', () => {
 
 			render(
 				<form onSubmit={ handleSubmit }>
-					{ /* Native radio group for comparison */ }
 					<fieldset>
 						<legend>Native Choice</legend>
 						<input
