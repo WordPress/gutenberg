@@ -10,7 +10,6 @@ import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
-import storybookEslintConfig from '../../storybook/eslint-overrides.cjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -18,6 +17,11 @@ import {
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
+const gutenbergStorybookPlugin = {
+	rules: {
+		'no-build-style-imports': require( '../../storybook/eslint/no-build-style-imports.js' ),
+	},
+};
 const vitestTestsByProject = getVitestTestsByProject(
 	discoverTestFiles( rootDir )
 );
@@ -731,6 +735,18 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: Storybook story files — flag side-effect imports of package
+	// build-style stylesheets so they load through package-styles/config.js.
+	{
+		files: [ `**/@(storybook|stories)/**/*.${ SCRIPT_EXT }` ],
+		plugins: {
+			'gutenberg-storybook': gutenbergStorybookPlugin,
+		},
+		rules: {
+			'gutenberg-storybook/no-build-style-imports': 'error',
+		},
+	},
+
 	// Override: Relax JSDoc parameter rules for TypeScript components. A
 	// component always receives props and returns a React element, and its
 	// props should be documented through its TypeScript props types.
@@ -1105,7 +1121,6 @@ export default dedupePlugins( [
 
 	// Package-level configs (kept alongside the code they apply to).
 	...wpBuildConfig,
-	...storybookEslintConfig,
 
 	{
 		settings: { react: { version: reactVersion } },
