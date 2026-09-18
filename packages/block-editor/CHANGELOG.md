@@ -21,6 +21,7 @@
 -   Block Patterns, Block Visibility, and Block Lock: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
 -   Layout: Treat a missing `spacing.blockGap` setting as no block gap support, as the server does. A theme that does not opt into block gap has the setting stored as `null`, which the block settings resolve to `undefined`, so per-block layout styles applied block gap values the front end never renders. An editor that never provides the setting must set it to `true` to keep rendering block gap values ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
 -   Block Toolbar: Show the parent block selector for blocks inside patterns and `contentOnly` locked blocks. It selects the nearest parent shown in List View and the breadcrumb ([#82912](https://github.com/WordPress/gutenberg/pull/82912)).
+-   In HEIC-only upload mode, route files to the HEIC conversion by what they contain rather than by the MIME type the browser infers from their name, so a HEIC photo saved as `.jpg` or `.png` is no longer handed to a server-side path that cannot convert it either ([#81737](https://github.com/WordPress/gutenberg/pull/81737)).
 
 ### Internal
 
@@ -95,7 +96,6 @@
 -   Retain focus and caret position when undoing a prefix transform (e.g. `## `, `- `, `> `) with Backspace or Escape ([#82116](https://github.com/WordPress/gutenberg/pull/82116)).
 -   Hide the Layout panel when a block has layout editing enabled but all controls for its layout type are disabled ([#81968](https://github.com/WordPress/gutenberg/pull/81968)).
 -   `DuotoneControl`: Keep the picked preset's identity when applying a duotone to a block. Two presets can hold the same pair of colors, and the applied preset was resolved by matching colors, so the first of any duplicate pair was saved and both appeared selected ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
--   In HEIC-only upload mode, route files to the HEIC conversion by what they contain rather than by the MIME type the browser infers from their name, so a HEIC photo saved as `.jpg` or `.png` is no longer handed to a server-side path that cannot convert it either ([#81707](https://github.com/WordPress/gutenberg/issues/81707)).
 -   `InnerBlocks`: Resolve the `default` of a block's `layout` support before providing it to inner blocks. A block that declared its layout only as a support default, such as the Gallery, previously handed its children the raw support config, which has no `type`, so the children resolved to the flow layout instead. As a result an Image nested in a Gallery offered left/center/right alignment, which the flex layout does not permit ([#81606](https://github.com/WordPress/gutenberg/pull/81606)).
 -   Never apply Spotlight mode in a preview canvas, which cannot be edited and so rendered most of its content faded ([#81615](https://github.com/WordPress/gutenberg/pull/81615)).
 -   Grid: Keep child layout changes made with the resizer scoped to the selected viewport.
