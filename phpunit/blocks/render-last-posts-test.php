@@ -25,6 +25,27 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 	 */
 	protected static $attachment_ids;
 
+	/**
+	 * @var array|null
+	 */
+	private $original_block_supports;
+
+	public function set_up() {
+		parent::set_up();
+
+		$this->original_block_supports      = WP_Block_Supports::$block_to_render;
+		WP_Block_Supports::$block_to_render = array(
+			'attrs'     => array(),
+			'blockName' => '',
+		);
+	}
+
+	public function tear_down() {
+		WP_Block_Supports::$block_to_render = $this->original_block_supports;
+
+		parent::tear_down();
+	}
+
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$sticky_post = $factory->post->create_and_get(
 			array(
