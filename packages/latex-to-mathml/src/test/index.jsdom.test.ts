@@ -15,6 +15,12 @@ describe( 'latexToMathML', () => {
 		).toEqual( [ 'right', 'left', 'right', 'left' ] );
 	} );
 
+	it( 'strips the classes temml adds for its stylesheet', () => {
+		expect(
+			latexToMathML( '\\overline{ab} \\begin{cases} a & b \\end{cases}' )
+		).not.toContain( 'class=' );
+	} );
+
 	it( 'leaves centered cells alone', () => {
 		const doc = document.implementation.createHTMLDocument( '' );
 		doc.body.innerHTML = `<math>${ latexToMathML(
