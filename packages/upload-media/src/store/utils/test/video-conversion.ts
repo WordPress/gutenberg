@@ -116,6 +116,7 @@ describe( 'convertGifToVideo', () => {
 			gif,
 			'video/mp4',
 			720,
+			undefined,
 			undefined
 		);
 		expect( result ).toBeInstanceOf( File );
@@ -140,6 +141,7 @@ describe( 'convertGifToVideo', () => {
 			'item-2',
 			gif,
 			'video/webm',
+			undefined,
 			undefined,
 			undefined
 		);
