@@ -218,28 +218,27 @@ export function TypographyPanel( {
 		selectedState
 	);
 
-	const value = useMemo( () => {
-		if ( isStateSelected ) {
-			return getStyleForState( style, selectedState );
-		}
-		return attributesToStyle( {
-			style,
-			fontFamily,
-			fontSize,
-			textColor,
-			textShadow,
-			backgroundColor,
-		} );
-	}, [
-		isStateSelected,
-		selectedState,
-		style,
-		fontSize,
-		fontFamily,
-		textColor,
-		textShadow,
-		backgroundColor,
-	] );
+	// The block's Default state, which every other state layers over.
+	const baseValue = useMemo(
+		() =>
+			attributesToStyle( {
+				style,
+				fontFamily,
+				fontSize,
+				textColor,
+				textShadow,
+				backgroundColor,
+			} ),
+		[ style, fontSize, fontFamily, textColor, textShadow, backgroundColor ]
+	);
+
+	const value = useMemo(
+		() =>
+			isStateSelected
+				? getStyleForState( style, selectedState )
+				: baseValue,
+		[ isStateSelected, selectedState, style, baseValue ]
+	);
 
 	const onChange = isStateSelected
 		? ( newStyle ) => {
@@ -305,6 +304,9 @@ export function TypographyPanel( {
 			settings={ settings }
 			blockName={ name }
 			value={ value }
+			// The selected state layers over the block's Default state, so
+			// the panel needs that value to know what still applies here.
+			baseValue={ isStateSelected ? baseValue : undefined }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
 			contrastWarning={ contrastWarning }

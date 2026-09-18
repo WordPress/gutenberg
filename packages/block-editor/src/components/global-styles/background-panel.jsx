@@ -162,6 +162,10 @@ export default function BackgroundImagePanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	// The block's own style for the Default state, passed only while another
+	// state is selected. That state layers over it, so a clip set there still
+	// governs what this one can paint.
+	baseValue,
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -219,6 +223,7 @@ export default function BackgroundImagePanel( {
 	const showBackgroundClipControl = allowedClipValues.length > 0;
 
 	const localClip = value?.background?.backgroundClip;
+	const baseClip = baseValue?.background?.backgroundClip;
 	const inheritedClip = inheritedValue?.background?.backgroundClip;
 	// A gradient clipped to text is a text gradient, which the Typography
 	// panel owns. This panel only treats it as its own when the clip control
@@ -228,7 +233,9 @@ export default function BackgroundImagePanel( {
 	// color, so a block paints its own background or a text gradient, never
 	// both. While it clips to the text the Typography panel owns that value
 	// and holds it in an editable control, so this panel shows neither.
-	const clipsToText = ( localClip ?? inheritedClip ) === 'text';
+	// The block's own clip outranks an inherited one, whichever state it was
+	// set in, so the Default state's value sits between the two.
+	const clipsToText = ( localClip ?? baseClip ?? inheritedClip ) === 'text';
 
 	const resetAllFilter = useCallback(
 		( previousValue ) => {
@@ -447,7 +454,7 @@ export default function BackgroundImagePanel( {
 					resetValue={ resetBackgroundColor }
 					disabled={ clipsToText }
 					disabledHint={ __(
-						"A background color can't be set while the block has a text gradient, which is set in the Typography panel."
+						"A background color can't be set while the block has a text gradient."
 					) }
 					isShownByDefault={ defaultControls.backgroundColor }
 					indicators={ [ userBackgroundColor ?? backgroundColor ] }
@@ -500,7 +507,7 @@ export default function BackgroundImagePanel( {
 					resetValue={ resetGradient }
 					disabled={ clipsToText }
 					disabledHint={ __(
-						"A background gradient can't be set while the block has a text gradient, which is set in the Typography panel."
+						"A background gradient can't be set while the block has a text gradient."
 					) }
 					isShownByDefault={ defaultControls.gradient }
 					indicators={ [ currentGradient ?? inheritedGradient ] }
