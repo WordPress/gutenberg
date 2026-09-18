@@ -1451,6 +1451,21 @@
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }
 							]
+						},
+						"backgroundClip": {
+							"description": "Sets the `background-clip` CSS property. One of `border-box`, `padding-box`, `content-box` or `text`.",
+							"oneOf": [
+								{
+									"type": "string",
+									"enum": [
+										"border-box",
+										"padding-box",
+										"content-box",
+										"text"
+									]
+								},
+								{ "$ref": "#/definitions/refComplete" }
+							]
 						}
 					},
 					"additionalProperties": false
