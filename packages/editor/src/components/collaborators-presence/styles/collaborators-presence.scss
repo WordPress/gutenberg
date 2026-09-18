@@ -19,15 +19,9 @@
 	margin-right: $grid-unit-10;
 }
 
-.editor-collaborators-presence__button.editor-collaborators-presence__button.components-button {
-	display: flex;
-	align-items: center;
-	cursor: var(--wpds-cursor-control);
+.editor-collaborators-presence__button.editor-collaborators-presence__button {
 	position: relative;
 	padding: $grid-unit-05;
-	border-radius: $grid-unit-05;
-	height: 100%;
-	box-sizing: border-box;
 
 	// Override button's default rest, hover & pressed state - let the container handle the background
 	&,

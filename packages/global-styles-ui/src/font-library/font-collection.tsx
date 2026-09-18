@@ -13,7 +13,7 @@ import {
 	Navigator,
 	__experimentalHeading as Heading,
 	Notice,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Flex,
 	Button,
 	DropdownMenu,
@@ -309,7 +309,7 @@ function FontCollection( { slug }: { slug: string } ) {
 									onChange={ debouncedUpdateSearchInput }
 									hideLabelFromVision={ false }
 								/>
-								<SelectControl
+								<WCSelectControl
 									label={ __( 'Category' ) }
 									value={ filters.category }
 									onChange={ handleCategoryFilter }
@@ -323,7 +323,7 @@ function FontCollection( { slug }: { slug: string } ) {
 												{ category.name }
 											</option>
 										) ) }
-								</SelectControl>
+								</WCSelectControl>
 							</HStack>
 
 							<Spacer margin={ 4 } />
@@ -513,7 +513,7 @@ function FontCollection( { slug }: { slug: string } ) {
 										div: <div aria-hidden />,
 										// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
 										CurrentPage: (
-											<SelectControl
+											<WCSelectControl
 												aria-label={ __(
 													'Current page'
 												) }
