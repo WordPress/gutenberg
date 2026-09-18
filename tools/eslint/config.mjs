@@ -202,6 +202,11 @@ const UI_RESTRICTED_IMPORTS = {
 	patterns: [ lockUnlockRestrictedPattern ],
 };
 
+const noStringLiteralIds = {
+	selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
+	message: 'Do not use string literals for IDs; use useId hook instead.',
+};
+
 const restrictedSyntax = [
 	{
 		selector:
@@ -214,10 +219,7 @@ const restrictedSyntax = [
 			'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
 		message: 'Prefer page.waitForSelector instead.',
 	},
-	{
-		selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
-		message: 'Do not use string literals for IDs; use useId hook instead.',
-	},
+	noStringLiteralIds,
 	{
 		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
 		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
@@ -759,6 +761,25 @@ export default dedupePlugins( [
 					message:
 						'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
 				},
+			],
+		},
+	},
+
+	// Override: Tests and Storybook — allow literal `id` attributes.
+	// Later than the components re-spread of `restrictedSyntax`. Ignore
+	// Playwright specs; `**/test/**` would replace their `$`/`$$` list.
+	{
+		files: [
+			`**/@(__mocks__|__tests__|test)/**/*.${ SCRIPT_EXT }`,
+			`**/@(storybook|stories)/**/*.${ SCRIPT_EXT }`,
+		],
+		ignores: [ 'test/e2e/**', 'test/performance/**' ],
+		rules: {
+			'no-restricted-syntax': [
+				'error',
+				...restrictedSyntax.filter(
+					( rule ) => rule !== noStringLiteralIds
+				),
 			],
 		},
 	},
