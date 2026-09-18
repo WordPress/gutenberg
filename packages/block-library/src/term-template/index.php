@@ -23,11 +23,15 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 
 	$query = $block->context['termQuery'];
 
-	$query_args = array(
-		'number'     => $query['perPage'],
-		'order'      => $query['order'],
-		'orderby'    => $query['orderBy'],
-		'hide_empty' => $query['hideEmpty'],
+	// Markup written by hand or shipped in a pattern can leave out keys that the
+	// Terms Query block fills in by default. Fall back to the same defaults so the
+	// front end renders the terms the editor shows, without undefined key warnings.
+	$query_taxonomy = $query['taxonomy'] ?? 'category';
+	$query_args     = array(
+		'number'     => $query['perPage'] ?? 10,
+		'order'      => $query['order'] ?? 'asc',
+		'orderby'    => $query['orderBy'] ?? 'name',
+		'hide_empty' => $query['hideEmpty'] ?? true,
 	);
 
 	$inherit_query = isset( $query['inherit'] )
@@ -52,14 +56,14 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 		$query_args['taxonomy'] = $queried_object->taxonomy;
 	} else {
 		// If not inheriting set `taxonomy` from the block attribute.
-		$query_args['taxonomy'] = $query['taxonomy'];
+		$query_args['taxonomy'] = $query_taxonomy;
 
 		// If we are including specific terms we ignore `showNested` argument.
 		if ( ! empty( $query['include'] ) ) {
 			$query_args['include'] = array_unique( array_map( 'intval', $query['include'] ) );
 			$query_args['orderby'] = 'include';
 			$query_args['order']   = 'asc';
-		} elseif ( is_taxonomy_hierarchical( $query['taxonomy'] ) && empty( $query['showNested'] ) ) {
+		} elseif ( is_taxonomy_hierarchical( $query_taxonomy ) && empty( $query['showNested'] ) ) {
 			// We set parent only when inheriting from the taxonomy archive context or not
 			// showing nested terms, otherwise nested terms are not displayed.
 			$query_args['parent'] = 0;
