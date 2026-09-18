@@ -1,27 +1,24 @@
 import clsx from 'clsx';
-import { Flex } from '@wordpress/components';
+import type { ReactNode } from 'react';
 
 interface ColorIndicatorWrapperProps {
 	className?: string;
-	[ key: string ]: any;
+	children?: ReactNode;
 }
 
 function ColorIndicatorWrapper( {
 	className,
 	children,
-	...props
 }: ColorIndicatorWrapperProps ) {
 	return (
-		<Flex
+		<div
 			className={ clsx(
 				'global-styles-ui__color-indicator-wrapper',
 				className
 			) }
-			{ ...props }
-			expanded={ false }
 		>
 			{ children }
-		</Flex>
+		</div>
 	);
 }
 
