@@ -218,10 +218,6 @@ function RevisionsList( {
 			{
 				id: 'details',
 				label: __( 'Details' ),
-				getValue: ( { item } ) =>
-					'parent' === item.id
-						? currentThemeName
-						: getAuthorDisplayName( item ),
 				render: ( { item } ) => {
 					const authorDisplayName = getAuthorDisplayName( item );
 					const isReset = 'parent' === item.id;
