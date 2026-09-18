@@ -314,17 +314,28 @@ export default function TypographyPanel( {
 	};
 	const resetTextColor = () => setTextColor( undefined );
 
-	// Text gradient. Stored as `background.gradient` clipped to the text with
-	// `background.backgroundClip`, because CSS has no gradient text colour.
-	// Exposed when the block opts into clipping, or when a theme allows the
-	// `text` clip value, and only if a gradient can actually be chosen.
+	/*
+	 * Text gradient. Stored as `background.gradient` clipped to the text with
+	 * `background.backgroundClip`, because CSS has no gradient text colour.
+	 *
+	 * The setting decides, as it does for every other support.
+	 * `useSettingsForBlockElement` has already folded block support into it, so
+	 * `false` means either the theme or the block said no. It is only undefined
+	 * when the block supports clipping and the theme has not spoken, and there
+	 * `backgroundClip` has no default to fall back on, so block support stands
+	 * in. A theme naming box values without `text` has spoken, and gets no text
+	 * gradient control.
+	 */
 	const clipSetting = settings?.background?.backgroundClip;
-	const settingAllowsTextClip =
-		true === clipSetting ||
-		( Array.isArray( clipSetting ) && clipSetting.includes( 'text' ) );
 	const blockSupportsBackgroundClip = blockName
 		? !! getBlockSupport( blockName, [ 'background', 'backgroundClip' ] )
 		: false;
+	const settingAllowsTextClip =
+		undefined === clipSetting
+			? blockSupportsBackgroundClip
+			: true === clipSetting ||
+				( Array.isArray( clipSetting ) &&
+					clipSetting.includes( 'text' ) );
 	/*
 	 * A text gradient is a clip, which is not emitted in a media query, so it
 	 * applies at every width. It belongs to the block's Default state, and only
@@ -334,7 +345,7 @@ export default function TypographyPanel( {
 	 */
 	const isViewportState = hasViewportBlockStyleState( styleState );
 	const hasTextGradientEnabled =
-		( settingAllowsTextClip || blockSupportsBackgroundClip ) &&
+		settingAllowsTextClip &&
 		!! settings?.background?.gradient &&
 		hasGradientColors &&
 		! isViewportState;

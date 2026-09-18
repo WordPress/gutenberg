@@ -1047,6 +1047,30 @@ describe( 'TypographyPanel text gradient', () => {
 		).toBeInTheDocument();
 	} );
 
+	it( 'hides the gradient control when the theme turns the clip off', async () => {
+		await renderPanel( {
+			settings: withClip( false ),
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+		} );
+
+		expect(
+			screen.queryByRole( 'button', { name: /Gradient/ } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'hides the gradient control when the theme allows only box values', async () => {
+		await renderPanel( {
+			settings: withClip( [ 'border-box', 'padding-box' ] ),
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+		} );
+
+		expect(
+			screen.queryByRole( 'button', { name: /Gradient/ } )
+		).not.toBeInTheDocument();
+	} );
+
 	it( 'shows the gradient control when the block declares clip support', async () => {
 		await renderPanel( {
 			settings: gradientSettings,
