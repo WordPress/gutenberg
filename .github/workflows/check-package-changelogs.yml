@@ -128,11 +128,7 @@ jobs:
                   fi
 
                   # Confirm that the CHANGELOG has a valid entry for the current PR
-                  if ! npm run lint:changelogs -- --require-pr="${PR_NUMBER}" "${changelog_path}"; then
-                      echo
-                      echo "${optional_check_notice}"
-                      exit 1
-                  fi
+                  npm run lint:changelogs -- --require-pr="${PR_NUMBER}" "${changelog_path}"
 
     # Structure: For any revisions to CHANGELOGs (regardless of package),
     # validate that the contents follow the expected format.
