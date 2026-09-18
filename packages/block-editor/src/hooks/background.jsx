@@ -393,6 +393,7 @@ export function BackgroundImagePanel( {
 			// The selected state layers over the block's Default state, so
 			// the panel needs that value to know what still applies here.
 			baseValue={ isStateSelected ? styleValue : undefined }
+			styleState={ selectedState }
 			contrastWarning={ contrastWarning }
 			inheritedValue={ inheritedValue }
 		/>
