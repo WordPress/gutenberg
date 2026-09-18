@@ -19,6 +19,12 @@ function render_block_core_icon( $attributes ) {
 		return;
 	}
 
+	// Non-public icons are not available in the editor, so do not render them either.
+	$registered_icon = WP_Icons_Registry::get_instance()->get_registered_icon( $attributes['icon'] );
+	if ( false === ( $registered_icon['public'] ?? true ) ) {
+		return;
+	}
+
 	// Text color and background color.
 	$color_styles = array();
 
