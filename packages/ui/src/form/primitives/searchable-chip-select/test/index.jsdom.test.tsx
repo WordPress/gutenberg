@@ -155,7 +155,6 @@ describe( 'SearchableChipSelect', () => {
 						defaultValue={ [ ITEMS[ 0 ] ] }
 						aria-describedby="searchable-chip-select-description"
 					/>
-					{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
 					<p id="searchable-chip-select-description">
 						My description
 					</p>
