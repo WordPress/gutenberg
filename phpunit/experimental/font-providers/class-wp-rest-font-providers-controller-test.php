@@ -33,7 +33,10 @@ class WP_Test_REST_Font_Providers_Controller extends WP_Test_REST_TestCase {
 						'slug'       => 'example-color-emoji',
 						'fontFamily' => '"Example Color Emoji"',
 						'fontFace'   => array(
-							array( 'src' => 'https://example.org/fonts/emoji.woff2' ),
+							array(
+								'fontFamily' => 'Example Color Emoji',
+								'src'        => 'https://example.org/fonts/emoji.woff2',
+							),
 						),
 					),
 				),

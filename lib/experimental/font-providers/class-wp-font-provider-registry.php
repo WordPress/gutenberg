@@ -48,8 +48,9 @@ if ( ! class_exists( 'WP_Font_Provider_Registry' ) ) {
 		 *     @type array[] $fontFamilies Required. Font family definitions in the
 		 *                                 `settings.typography.fontFamilies` format of
 		 *                                 theme.json. Each family needs `name`, `slug`,
-		 *                                 `fontFamily` and a non-empty `fontFace` list.
-		 *                                 Face `src` values must be URLs.
+		 *                                 `fontFamily` and a non-empty `fontFace` list,
+		 *                                 and each face needs `fontFamily` and `src`, as
+		 *                                 in theme.json. Face `src` values must be URLs.
 		 * }
 		 * @return bool True if the provider was registered, false otherwise.
 		 */
@@ -133,7 +134,7 @@ if ( ! class_exists( 'WP_Font_Provider_Registry' ) ) {
 				if ( ! $this->is_valid_font_family( $family ) ) {
 					_doing_it_wrong(
 						__METHOD__,
-						__( 'Each font provider family needs a string name, slug and fontFamily, and a non-empty fontFace list whose faces each have a src.', 'gutenberg' ),
+						__( 'Each font provider family needs a string name, slug and fontFamily, and a non-empty fontFace list whose faces each have a fontFamily and a src.', 'gutenberg' ),
 						'7.2.0'
 					);
 					return false;
@@ -193,6 +194,9 @@ if ( ! class_exists( 'WP_Font_Provider_Registry' ) ) {
 				if ( ! is_array( $face ) || empty( $face['src'] ) ) {
 					return false;
 				}
+				if ( empty( $face['fontFamily'] ) || ! is_string( $face['fontFamily'] ) ) {
+					return false;
+				}
 				if ( ! is_string( $face['src'] ) && ! wp_is_numeric_array( $face['src'] ) ) {
 					return false;
 				}
@@ -202,24 +206,18 @@ if ( ! class_exists( 'WP_Font_Provider_Registry' ) ) {
 		}
 
 		/**
-		 * Fills the face properties that the Font Library and the printed CSS rely on.
+		 * Fills the face properties that have a CSS default.
 		 *
-		 * Every face gets a `fontFamily`, as theme.json requires: a face that names its
-		 * own family keeps it, so a provider can list a face under a family whose name
-		 * differs, and other faces take the first name in the family's `fontFamily`
-		 * stack. A missing `fontStyle` or `fontWeight` takes the value WP_Font_Face
-		 * prints by default, so the listed face matches the printed rule.
+		 * A missing `fontStyle` or `fontWeight` takes the value WP_Font_Face prints by
+		 * default, so the face listed in the Font Library matches the printed rule. The
+		 * face `fontFamily` is required rather than derived from the family stack: a
+		 * family name may itself contain a comma.
 		 *
 		 * @param array $family Valid font family definition.
 		 * @return array Font family definition with complete faces.
 		 */
 		protected function normalize_font_family( $family ) {
-			$default_name = trim( explode( ',', $family['fontFamily'] )[0], " \"'" );
-
 			foreach ( $family['fontFace'] as $index => $face ) {
-				if ( empty( $face['fontFamily'] ) || ! is_string( $face['fontFamily'] ) ) {
-					$face['fontFamily'] = $default_name;
-				}
 				if ( empty( $face['fontStyle'] ) ) {
 					$face['fontStyle'] = 'normal';
 				}

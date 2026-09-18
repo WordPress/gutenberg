@@ -27,7 +27,7 @@ import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import LibraryFontVariant from './library-font-variant';
 import ProviderFontDetails from './provider-font-details';
-import { useFontProviders } from './font-providers';
+import { getFontCardKey, useFontProviders } from './font-providers';
 import { sortFontFaces } from './utils/sort-font-faces';
 import {
 	setUIValuesNeeded,
@@ -80,11 +80,11 @@ function InstalledFonts() {
 	const [ fontFamilies, setFontFamilies ] = useSetting<
 		Record< string, FontFamilyPreset[] > | undefined
 	>( 'typography.fontFamilies' );
-	const [ lastSelectedFontSlug, setLastSelectedFontSlug ] = useState<
+	const [ lastSelectedFontKey, setLastSelectedFontKey ] = useState<
 		string | undefined
 	>( undefined );
 
-	const providers = useFontProviders();
+	const { providers, hasResolved: hasResolvedProviders } = useFontProviders();
 	const [ selectedProviderSlug, setSelectedProviderSlug ] = useState<
 		string | undefined
 	>( undefined );
@@ -306,7 +306,7 @@ function InstalledFonts() {
 										{ notice.message }
 									</Notice>
 								) }
-								{ ! hasFonts && (
+								{ ! hasFonts && hasResolvedProviders && (
 									<WCText as="p">
 										{ __( 'No fonts installed.' ) }
 									</WCText>
@@ -340,8 +340,10 @@ function InstalledFonts() {
 															font
 														) }
 														shouldFocus={
-															font.slug ===
-															lastSelectedFontSlug
+															getFontCardKey(
+																font
+															) ===
+															lastSelectedFontKey
 														}
 														onClick={ () => {
 															setNotice( null );
@@ -380,8 +382,11 @@ function InstalledFonts() {
 															font={ font }
 															navigatorPath="/fontFamily"
 															shouldFocus={
-																font.slug ===
-																lastSelectedFontSlug
+																getFontCardKey(
+																	font,
+																	provider.slug
+																) ===
+																lastSelectedFontKey
 															}
 															onClick={ () => {
 																setNotice(
@@ -431,8 +436,10 @@ function InstalledFonts() {
 															font
 														) }
 														shouldFocus={
-															font.slug ===
-															lastSelectedFontSlug
+															getFontCardKey(
+																font
+															) ===
+															lastSelectedFontKey
 														}
 														onClick={ () => {
 															setNotice( null );
@@ -471,8 +478,14 @@ function InstalledFonts() {
 									}
 									size="small"
 									onClick={ () => {
-										setLastSelectedFontSlug(
-											libraryFontSelected?.slug
+										setLastSelectedFontKey(
+											libraryFontSelected &&
+												getFontCardKey(
+													libraryFontSelected,
+													isProviderFont
+														? selectedProviderSlug
+														: undefined
+												)
 										);
 										handleSetLibraryFontSelected(
 											undefined

@@ -46,6 +46,7 @@ class WP_Test_Font_Provider_Registry extends WP_UnitTestCase {
 							'src'          => 'https://example.org/fonts/hangul.woff2',
 						),
 						array(
+							'fontFamily' => 'Noto Sans KR',
 							'fontWeight' => '400',
 							'src'        => array( 'https://example.org/fonts/noto-sans-kr.woff2' ),
 						),
@@ -93,8 +94,7 @@ class WP_Test_Font_Provider_Registry extends WP_UnitTestCase {
 		$this->assertSame( 'example-kr', $provider['slug'] );
 		$this->assertSame( 'Example Korean Fallback', $provider['label'] );
 		$this->assertCount( 1, $provider['fontFamilies'] );
-		$this->assertSame( 'Example Hangul', $provider['fontFamilies'][0]['fontFace'][0]['fontFamily'], 'A face that names its family keeps that name.' );
-		$this->assertSame( 'Noto Sans KR', $provider['fontFamilies'][0]['fontFace'][1]['fontFamily'], 'A face without a family name takes the first name of the family stack, as theme.json faces must have one.' );
+		$this->assertSame( 'Example Hangul', $provider['fontFamilies'][0]['fontFace'][0]['fontFamily'], 'A face keeps its own family name.' );
 		$this->assertSame( 'normal', $provider['fontFamilies'][0]['fontFace'][1]['fontStyle'], 'A missing fontStyle takes the printed default.' );
 		$this->assertSame( '400', $provider['fontFamilies'][0]['fontFace'][1]['fontWeight'], 'The given fontWeight is kept.' );
 	}
@@ -122,6 +122,8 @@ class WP_Test_Font_Provider_Registry extends WP_UnitTestCase {
 		$valid  = self::get_provider_args();
 		$family = $valid['fontFamilies'][0];
 
+		$no_face_family = $family;
+		unset( $no_face_family['fontFace'][1]['fontFamily'] );
 		$no_src                         = $family;
 		$no_src['fontFace'][0]['src']   = '';
 		$no_faces                       = $family;
@@ -140,16 +142,17 @@ class WP_Test_Font_Provider_Registry extends WP_UnitTestCase {
 		$keyed_families['fontFamilies'] = array( 'kr' => $family );
 
 		return array(
-			'uppercase slug'         => array( 'Example-KR', $valid ),
-			'args not an array'      => array( 'example-kr', 'Example' ),
-			'unknown property'       => array( 'example-kr', $unknown ),
-			'empty label'            => array( 'example-kr', $no_label ),
-			'no families'            => array( 'example-kr', $empty_families ),
-			'families not a list'    => array( 'example-kr', $keyed_families ),
-			'face without src'       => array( 'example-kr', array_merge( $valid, array( 'fontFamilies' => array( $no_src ) ) ) ),
-			'family without faces'   => array( 'example-kr', array_merge( $valid, array( 'fontFamilies' => array( $no_faces ) ) ) ),
-			'name not a string'      => array( 'example-kr', array_merge( $valid, array( 'fontFamilies' => array( $bad_name ) ) ) ),
-			'family slug used twice' => array( 'example-kr', $twice ),
+			'uppercase slug'          => array( 'Example-KR', $valid ),
+			'args not an array'       => array( 'example-kr', 'Example' ),
+			'unknown property'        => array( 'example-kr', $unknown ),
+			'empty label'             => array( 'example-kr', $no_label ),
+			'no families'             => array( 'example-kr', $empty_families ),
+			'families not a list'     => array( 'example-kr', $keyed_families ),
+			'face without fontFamily' => array( 'example-kr', array_merge( $valid, array( 'fontFamilies' => array( $no_face_family ) ) ) ),
+			'face without src'        => array( 'example-kr', array_merge( $valid, array( 'fontFamilies' => array( $no_src ) ) ) ),
+			'family without faces'    => array( 'example-kr', array_merge( $valid, array( 'fontFamilies' => array( $no_faces ) ) ) ),
+			'name not a string'       => array( 'example-kr', array_merge( $valid, array( 'fontFamilies' => array( $bad_name ) ) ) ),
+			'family slug used twice'  => array( 'example-kr', $twice ),
 		);
 	}
 
@@ -176,7 +179,24 @@ class WP_Test_Font_Provider_Registry extends WP_UnitTestCase {
 		$this->assertCount( 1, $fonts );
 		$this->assertSame( 'Example Hangul', $fonts[0][0]['font-family'], 'A face that names its family keeps that name.' );
 		$this->assertSame( 'U+AC00-D7A3', $fonts[0][0]['unicode-range'], 'Properties are converted to kebab-case.' );
-		$this->assertSame( 'Noto Sans KR', $fonts[0][1]['font-family'], 'A face without a family name takes the first name of the family stack.' );
+		$this->assertSame( 'Noto Sans KR', $fonts[0][1]['font-family'] );
+	}
+
+	public function test_family_name_with_a_comma_is_kept_whole() {
+		$args                                  = self::get_provider_args();
+		$args['fontFamilies'][0]['fontFamily'] = '"ACME, Inc.", sans-serif';
+		$args['fontFamilies'][0]['fontFace']   = array(
+			array(
+				'fontFamily' => 'ACME, Inc.',
+				'src'        => 'https://example.org/fonts/acme.woff2',
+			),
+		);
+		$this->registry->register( 'example-acme', $args );
+
+		$fonts = $this->registry->get_font_faces();
+
+		$this->assertSame( 'ACME, Inc.', $fonts[0][0]['font-family'] );
+		$this->assertStringContainsString( 'font-family:"ACME, Inc."', get_echo( 'gutenberg_print_font_provider_font_faces' ) );
 	}
 
 	public function test_print_does_nothing_without_providers() {
