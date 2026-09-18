@@ -68,9 +68,9 @@ type Action =
 	| UnknownAction;
 
 function reducer(
-	state = DEFAULT_STATE,
+	state: State = DEFAULT_STATE,
 	action: Action = { type: Type.Unknown }
-) {
+): State {
 	switch ( action.type ) {
 		case Type.PauseQueue: {
 			return {
