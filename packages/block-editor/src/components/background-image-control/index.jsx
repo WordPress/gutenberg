@@ -17,7 +17,7 @@ import {
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
 } from '@wordpress/components';
-import { VisuallyHidden } from '@wordpress/ui';
+import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 import { reset as resetIcon } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -187,6 +187,7 @@ function BackgroundControlsPanel( {
 	onReset,
 	hasLocalOverride,
 	containerRef,
+	disabled = false,
 } ) {
 	if ( ! hasImageValue ) {
 		return;
@@ -207,6 +208,8 @@ function BackgroundControlsPanel( {
 						'Background size, position and repeat options.'
 					),
 					isOpen,
+					disabled,
+					accessibleWhenDisabled: true,
 				};
 				return (
 					<>
@@ -282,6 +285,8 @@ function BackgroundImageControls( {
 	displayInPanel,
 	defaultValues,
 	containerRef,
+	disabled = false,
+	disabledHint,
 } ) {
 	const [ isUploading, setIsUploading ] = useState( false );
 	const { getSettings } = useSelect( blockEditorStore );
@@ -437,9 +442,27 @@ function BackgroundImageControls( {
 						label={ imgLabel }
 					/>
 				}
-				renderToggle={ ( props ) => (
-					<Button { ...props } __next40pxDefaultSize />
-				) }
+				renderToggle={ ( props ) => {
+					const toggle = (
+						<Button
+							{ ...props }
+							__next40pxDefaultSize
+							disabled={ disabled }
+							accessibleWhenDisabled
+						/>
+					);
+					// Wrapping rather than naming the button after the hint
+					// keeps the control's own name, with the reason as a
+					// description. Mirrors `ColorGradientDropdownItem`.
+					return disabled && disabledHint ? (
+						<Tooltip.Root>
+							<Tooltip.Trigger render={ toggle } />
+							<Tooltip.Popup>{ disabledHint }</Tooltip.Popup>
+						</Tooltip.Root>
+					) : (
+						toggle
+					);
+				} }
 				onError={ onUploadError }
 				onReset={ () => {
 					focusToggleButton( containerRef );
@@ -458,10 +481,12 @@ function BackgroundImageControls( {
 					</MenuItem>
 				) }
 			</MediaReplaceFlow>
-			<DropZone
-				onFilesDrop={ onFilesDrop }
-				label={ __( 'Drop to upload' ) }
-			/>
+			{ ! disabled && (
+				<DropZone
+					onFilesDrop={ onFilesDrop }
+					label={ __( 'Drop to upload' ) }
+				/>
+			) }
 		</div>
 	);
 }
@@ -688,6 +713,10 @@ export default function BackgroundImagePanel( {
 	settings,
 	defaultValues = {},
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
+	// Rendered inert when another control has taken over what it would paint,
+	// with `disabledHint` as the toggle's tooltip.
+	disabled = false,
+	disabledHint,
 } ) {
 	/*
 	 * Resolve inherited `ref` pointers for background controls.
@@ -774,6 +803,7 @@ export default function BackgroundImagePanel( {
 					label={ title }
 					filename={ title }
 					url={ url }
+					disabled={ disabled }
 					onToggle={ setIsDropDownOpen }
 					hasImageValue={ hasImageValue }
 					hasLocalOverride={ hasLocalOverride }
@@ -785,6 +815,8 @@ export default function BackgroundImagePanel( {
 							onChange={ onChange }
 							style={ value }
 							inheritedValue={ resolvedInheritedValue }
+							disabled={ disabled }
+							disabledHint={ disabledHint }
 							displayInPanel
 							onResetImage={ () => {
 								setIsDropDownOpen( false );
@@ -807,6 +839,8 @@ export default function BackgroundImagePanel( {
 					onChange={ onChange }
 					style={ value }
 					inheritedValue={ resolvedInheritedValue }
+					disabled={ disabled }
+					disabledHint={ disabledHint }
 					defaultValues={ defaultValues }
 					onResetImage={ () => {
 						setIsDropDownOpen( false );
