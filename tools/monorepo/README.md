@@ -4,7 +4,7 @@ Internal tooling for maintaining this monorepo. The workspace is private: it giv
 
 ## TypeScript
 
-`tsconfig/base.json` holds the compiler options every TypeScript project in the repo inherits, and `tsconfig/dev.base.json` extends it for the test and story files that never emit declarations.
+`tsconfig/base.json` holds the compiler options every TypeScript project in the repo inherits, and `tsconfig/dev.base.json` extends it for the test and story files that never emit declarations. The files are named `tsconfig.base.json` and `tsconfig.dev.base.json` on disk so editors match them against their `tsconfig.*.json` pattern and allow comments; the [subpath export](package.json) maps the shorter specifier onto them.
 
 ```json
 {
