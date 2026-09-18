@@ -1,6 +1,7 @@
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Icon, caution as cautionIcon } from '@wordpress/icons';
 import BackgroundClipControl, {
 	ALL_BACKGROUND_CLIP_VALUES,
 } from '../background-clip-control';
@@ -244,6 +245,13 @@ export default function BackgroundImagePanel( {
 	// so say so when this one cannot reach it.
 	const clipIsFromBase =
 		clipsToText && localClip === undefined && !! baseClip;
+	const backgroundImageDisabledHint = clipIsFromBase
+		? __(
+				"A background image can't be set while the block has a text gradient, which is set in the Default state."
+			)
+		: __(
+				"A background image can't be set while the block has a text gradient."
+			);
 
 	const resetAllFilter = useCallback(
 		( previousValue ) => {
@@ -449,10 +457,21 @@ export default function BackgroundImagePanel( {
 						inheritedValue={ inheritedValue }
 						defaultControls={ defaultControls }
 						defaultValues={ defaultValues }
+						disabled={ clipsToText }
+						disabledHint={ backgroundImageDisabledHint }
 						showInheritanceLabelIndicators={
 							showInheritanceLabelIndicators
 						}
 					/>
+					{ clipsToText && (
+						// Matches the colour rows: the dimmed toggle alone
+						// reads as too subtle. Hover falls through to the
+						// toggle, which owns the tooltip.
+						<Icon
+							icon={ cautionIcon }
+							className="block-editor-panel-color-gradient-settings__disabled-hint"
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
 			{ showBackgroundColorControl && (

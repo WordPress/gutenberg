@@ -669,6 +669,28 @@ describe( 'BackgroundPanel text gradient ownership', () => {
 		).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
+	it( 'disables the image control while a text gradient is set', () => {
+		render(
+			<BackgroundPanel
+				value={ {
+					background: {
+						gradient: TEXT_GRADIENT,
+						backgroundClip: 'text',
+					},
+				} }
+				settings={ baseSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: /No background image selected/,
+			} )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
 	it( 'disables the color control with the clip control shown too', () => {
 		render(
 			<BackgroundPanel
@@ -911,6 +933,24 @@ describe( 'BackgroundPanel at a non-default viewport', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Gradient' } )
 		).not.toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'disables the image control while the default viewport clips to text', () => {
+		render(
+			<BackgroundPanel
+				value={ {} }
+				baseValue={ baseValue }
+				settings={ colorSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: /No background image selected/,
+			} )
+		).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
 	it( 'hides the clip control, which belongs to the Default state', () => {
