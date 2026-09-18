@@ -111,7 +111,7 @@ function PostAuthorNameEdit( props ) {
 								'This post type (%s) does not support the author.'
 							),
 							postType
-					  )
+						)
 					: displayAuthor }
 			</div>
 		</>

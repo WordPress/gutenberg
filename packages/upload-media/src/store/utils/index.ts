@@ -69,21 +69,22 @@ interface VipsResizeOptions {
  * The promise is cached so the module is only resolved once.
  */
 let vipsModulePromise:
-	| Promise< typeof import('@wordpress/vips/worker') >
-	| undefined;
+	Promise< typeof import( '@wordpress/vips/worker' ) > | undefined;
 
 /**
  * The resolved module reference, available synchronously after the first
  * load completes. Used by terminateVipsWorker() and vipsCancelOperations().
  */
-let vipsModule: typeof import('@wordpress/vips/worker') | undefined;
+let vipsModule: typeof import( '@wordpress/vips/worker' ) | undefined;
 
 /**
  * Lazily loads and caches the @wordpress/vips/worker module.
  *
  * @return The vips worker module.
  */
-function loadVipsModule(): Promise< typeof import('@wordpress/vips/worker') > {
+function loadVipsModule(): Promise<
+	typeof import( '@wordpress/vips/worker' )
+> {
 	if ( ! vipsModulePromise ) {
 		vipsModulePromise = import( '@wordpress/vips/worker' ).then(
 			( mod ) => {

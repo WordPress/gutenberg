@@ -28,7 +28,7 @@ vi.mock(
 			createBlobURL: vi.fn( () => 'blob:foo' ),
 			isBlobURL: vi.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
 			revokeBlobURL: vi.fn(),
-		} ) as unknown as typeof import('@wordpress/blob')
+		} ) as unknown as typeof import( '@wordpress/blob' )
 );
 
 vi.mock(
@@ -49,7 +49,7 @@ vi.mock(
 			vipsEnsureJxlSupport: vi.fn( () => Promise.resolve() ),
 			terminateVipsWorker: vi.fn(),
 			maybeRecycleVipsWorker: vi.fn(),
-		} ) as unknown as typeof import('../utils')
+		} ) as unknown as typeof import( '../utils' )
 );
 
 /*
@@ -672,8 +672,7 @@ describe( 'actions', () => {
 
 		it( 'starts pending sideloads after one finishes', async () => {
 			let onSuccessCallback:
-				| ( ( subSize: Record< string, unknown > ) => void )
-				| undefined;
+				( ( subSize: Record< string, unknown > ) => void ) | undefined;
 			const mediaSideload = vi.fn( ( { onSuccess } ) => {
 				// Capture the first callback to simulate completion later.
 				if ( ! onSuccessCallback ) {
