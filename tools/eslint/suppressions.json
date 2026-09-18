@@ -5176,11 +5176,6 @@
 			"count": 2
 		}
 	},
-	"packages/dataviews/src/dataviews/stories/index.story.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"packages/dataviews/src/dataviews/stories/layout-activity.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -7333,11 +7328,6 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/color-indicator-wrapper.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/color-palette-panel.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -7444,11 +7434,6 @@
 	"packages/global-styles-ui/src/pagination/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		}
-	},
-	"packages/global-styles-ui/src/palette.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 4
 		}
 	},
 	"packages/global-styles-ui/src/presets/dialogs/rename-dialog.tsx": {
@@ -7620,9 +7605,6 @@
 		}
 	},
 	"packages/image-cropper/src/stories/index.story.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		}
@@ -7642,11 +7624,6 @@
 			"count": 1
 		}
 	},
-	"packages/media-editor/src/components/rotation-ruler/stories/index.story.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"packages/media-editor/src/image-editor/react/components/stencils/rectangle-stencil.tsx": {
 		"react-hooks/refs": {
 			"count": 1
@@ -7658,9 +7635,6 @@
 		}
 	},
 	"packages/media-editor/src/image-editor/stories/rectangle-crop.story.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
@@ -8083,9 +8057,6 @@
 		}
 	},
 	"storybook/stories/playground/box/index.jsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -8111,9 +8082,6 @@
 		}
 	},
 	"storybook/stories/playground/with-undo-redo/index.jsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
