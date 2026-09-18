@@ -54,8 +54,6 @@ function gutenberg_get_position_support_styles( $selector, $position, $allowed_p
 			/*
 			 * For fixed or sticky top positions,
 			 * ensure the value includes an offset for the logged in admin bar.
-			 * Only sticky and fixed position types reach this point, as they are
-			 * the only types a theme can allow.
 			 */
 			if ( 'top' === $side ) {
 				// Ensure 0 values can be used in `calc()` calculations.
@@ -91,12 +89,9 @@ function gutenberg_get_position_support_styles( $selector, $position, $allowed_p
 
 /**
  * Renders position styles to the block wrapper.
- *
- * Position styles can be set for the default state (`style.position`) and for
- * responsive viewport states (`style['@mobile'].position`,
- * `style['@tablet'].position`). Viewport state styles are wrapped in the
- * matching breakpoint media query and inherit any values not overridden from
- * the default state.
+ * 
+ * @since 6.2.0
+ * @since 7.2.0 Added support for viewport states.
  *
  * @param string $block_content Rendered block content.
  * @param array  $block         Block object.
@@ -113,18 +108,16 @@ function gutenberg_render_position_support( $block_content, $block ) {
 	}
 
 	/*
-	 * Every rule this filter can produce requires a position style, in either
-	 * the default state or a viewport state. Bail before resolving global
-	 * settings so blocks with other style attributes stay cheap to render.
+	 * Position styles can exist in either the default state or a viewport state.
 	 */
 	$has_position_style = ! empty( $style_attribute['position'] );
 	if ( ! $has_position_style ) {
-		foreach ( $style_attribute as $key => $state_style ) {
+		foreach ( $style_attribute as $key => $style ) {
 			if (
 				is_string( $key ) &&
 				str_starts_with( $key, '@' ) &&
-				is_array( $state_style ) &&
-				! empty( $state_style['position'] )
+				is_array( $style ) &&
+				! empty( $style['position'] )
 			) {
 				$has_position_style = true;
 				break;
@@ -196,10 +189,8 @@ function gutenberg_render_position_support( $block_content, $block ) {
 			$wrapper_classes[] = 'is-position-' . $viewport_position['type'];
 		} elseif ( ! empty( $base_styles ) ) {
 			/*
-			 * The viewport state clears the position type inherited from the
-			 * default state. The default state's `position` declaration isn't
-			 * itself wrapped in a media query, so without an explicit reset it
-			 * would still apply at this breakpoint.
+			 * The viewport state can explicitly clear the position type inherited from the
+			 * default state.
 			 */
 			$viewport_styles = array(
 				array(
