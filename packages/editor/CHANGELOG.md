@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add an "Optimize" inspector control to image-bearing blocks (image, cover, media-text, post-featured-image, site-logo) that re-processes a previously uploaded image client-side and repoints the block at the optimized attachment. Gated behind the "Optimize existing media" experiment and shown only when client-side media processing is active ([#79509](https://github.com/WordPress/gutenberg/pull/79509)).
+
 ### Enhancements
 
 -   Remove the `react-autosize-textarea` dependency. The post editor's "Code editor" view now auto-grows with CSS `field-sizing: content`. Browsers without support use a scrollable field ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).
