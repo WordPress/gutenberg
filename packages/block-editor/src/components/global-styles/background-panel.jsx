@@ -220,7 +220,11 @@ export default function BackgroundImagePanel( {
 	} else if ( Array.isArray( clipSetting ) ) {
 		allowedClipValues = clipSetting;
 	}
-	const showBackgroundClipControl = allowedClipValues.length > 0;
+	// Clipping belongs to the block's Default state: it is emitted without a
+	// media query, so it applies at every width whichever state sets it.
+	const isNonDefaultState = baseValue !== undefined;
+	const showBackgroundClipControl =
+		allowedClipValues.length > 0 && ! isNonDefaultState;
 
 	const localClip = value?.background?.backgroundClip;
 	const baseClip = baseValue?.background?.backgroundClip;
@@ -236,6 +240,10 @@ export default function BackgroundImagePanel( {
 	// The block's own clip outranks an inherited one, whichever state it was
 	// set in, so the Default state's value sits between the two.
 	const clipsToText = ( localClip ?? baseClip ?? inheritedClip ) === 'text';
+	// The Typography panel holds the gradient, but only in the Default state,
+	// so say so when this one cannot reach it.
+	const clipIsFromBase =
+		clipsToText && localClip === undefined && !! baseClip;
 
 	const resetAllFilter = useCallback(
 		( previousValue ) => {
@@ -453,9 +461,15 @@ export default function BackgroundImagePanel( {
 					hasValue={ () => hasBackgroundColorValue( value ) }
 					resetValue={ resetBackgroundColor }
 					disabled={ clipsToText }
-					disabledHint={ __(
-						"A background color can't be set while the block has a text gradient."
-					) }
+					disabledHint={
+						clipIsFromBase
+							? __(
+									"A background color can't be set while the block has a text gradient, which is set in the Default state."
+								)
+							: __(
+									"A background color can't be set while the block has a text gradient."
+								)
+					}
 					isShownByDefault={ defaultControls.backgroundColor }
 					indicators={ [ userBackgroundColor ?? backgroundColor ] }
 					contrastWarning={ contrastWarning }
@@ -506,9 +520,15 @@ export default function BackgroundImagePanel( {
 					}
 					resetValue={ resetGradient }
 					disabled={ clipsToText }
-					disabledHint={ __(
-						"A background gradient can't be set while the block has a text gradient."
-					) }
+					disabledHint={
+						clipIsFromBase
+							? __(
+									"A background gradient can't be set while the block has a text gradient, which is set in the Default state."
+								)
+							: __(
+									"A background gradient can't be set while the block has a text gradient."
+								)
+					}
 					isShownByDefault={ defaultControls.gradient }
 					indicators={ [ currentGradient ?? inheritedGradient ] }
 					showInheritanceLabelIndicators={
