@@ -5,6 +5,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { toApiType } from './link-types';
 
 /**
  * Builds entity binding configuration for navigation link URLs.
@@ -95,9 +96,7 @@ export function useEntityBinding( { clientId, attributes } ) {
 
 			// Use the correct entity type based on kind.
 			const entityType = isTaxonomy ? 'taxonomy' : 'postType';
-			// Convert 'tag' back to 'post_tag' for the API call
-			// (it was converted from 'post_tag' to 'tag' for storage in updateAttributes)
-			const typeForAPI = type === 'tag' ? 'post_tag' : type;
+			const typeForAPI = toApiType( type );
 			const record = getEntityRecord( entityType, typeForAPI, id );
 			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
 				entityType,

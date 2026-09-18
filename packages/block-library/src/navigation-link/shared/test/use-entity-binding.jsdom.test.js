@@ -278,6 +278,50 @@ describe( 'useEntityBinding', () => {
 		} );
 	} );
 
+	it.each( [
+		[ 'post-type', 'event-series', 'postType', 'event-series' ],
+		[ 'taxonomy', 'tag', 'taxonomy', 'post_tag' ],
+	] )(
+		'looks up a bound %s link of type %s by its API name',
+		( kind, type, entityKind, entityName ) => {
+			const getEntityRecord = vi.fn( () => ( { id: 42 } ) );
+			useSelect.mockImplementation( ( selector ) =>
+				selector( () => ( {
+					getEntityRecord,
+					hasFinishedResolution: () => true,
+				} ) )
+			);
+
+			renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes: {
+						id: 42,
+						kind,
+						type,
+						metadata: {
+							bindings: {
+								url: {
+									source:
+										kind === 'post-type'
+											? 'core/post-data'
+											: 'core/term-data',
+									args: { field: 'link' },
+								},
+							},
+						},
+					},
+				} )
+			);
+
+			expect( getEntityRecord ).toHaveBeenCalledWith(
+				entityKind,
+				entityName,
+				42
+			);
+		}
+	);
+
 	describe( 'buildNavigationLinkEntityBinding', () => {
 		it( 'returns correct binding for post-type', () => {
 			const binding = buildNavigationLinkEntityBinding( 'post-type' );

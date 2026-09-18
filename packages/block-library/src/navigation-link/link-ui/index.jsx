@@ -21,6 +21,7 @@ import { isURL } from '@wordpress/url';
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
 import { useEntityBinding, useLinkPreview } from '../shared';
+import { getLinkKind, toApiType } from '../shared/link-types';
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -34,23 +35,17 @@ export function getSuggestionsQuery( type, kind ) {
 	// How many results to show initially and per search.
 	const perPage = 20;
 
-	switch ( type ) {
-		case 'post':
-		case 'page':
+	// Post formats have a search type of their own rather than being terms.
+	if ( type === 'post_format' ) {
+		return { type: 'post-format', perPage };
+	}
+
+	switch ( getLinkKind( { type, kind } ) ) {
+		case 'taxonomy':
+			return { type: 'term', subtype: toApiType( type ), perPage };
+		case 'post-type':
 			return { type: 'post', subtype: type, perPage };
-		case 'category':
-			return { type: 'term', subtype: 'category', perPage };
-		case 'tag':
-			return { type: 'term', subtype: 'post_tag', perPage };
-		case 'post_format':
-			return { type: 'post-format', perPage };
 		default:
-			if ( kind === 'taxonomy' ) {
-				return { type: 'term', subtype: type, perPage };
-			}
-			if ( kind === 'post-type' ) {
-				return { type: 'post', subtype: type, perPage };
-			}
 			return {
 				// for custom link which has no type
 				// always show pages as initial suggestions
