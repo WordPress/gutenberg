@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Limit pattern management actions to synced patterns; unsynced pattern layouts can be unlocked through the block locking modal ([#78608](https://github.com/WordPress/gutenberg/pull/78608)).
+
 ## 2.55.0 (2026-09-10)
 
 ### Internal
