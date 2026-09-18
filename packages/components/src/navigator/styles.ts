@@ -84,22 +84,26 @@ export const ANIMATION_END_NAMES = {
 const ANIMATION = {
 	end: {
 		in: css`
-			${ FADE.DURATION }ms ${ FADE.EASING } ${ FADE.DELAY
-				.IN }ms both ${ fadeIn }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideFromRight }
+			${ FADE.DURATION }ms ${ FADE.EASING } ${
+				FADE.DELAY.IN
+			}ms both ${ fadeIn }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideFromRight }
 		`,
 		out: css`
-			${ FADE.DURATION }ms ${ FADE.EASING } ${ FADE.DELAY
-				.OUT }ms both ${ fadeOut }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideToLeft }
+			${ FADE.DURATION }ms ${ FADE.EASING } ${
+				FADE.DELAY.OUT
+			}ms both ${ fadeOut }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideToLeft }
 		`,
 	},
 	start: {
 		in: css`
-			${ FADE.DURATION }ms ${ FADE.EASING } ${ FADE.DELAY
-				.IN }ms both ${ fadeIn }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideFromLeft }
+			${ FADE.DURATION }ms ${ FADE.EASING } ${
+				FADE.DELAY.IN
+			}ms both ${ fadeIn }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideFromLeft }
 		`,
 		out: css`
-			${ FADE.DURATION }ms ${ FADE.EASING } ${ FADE.DELAY
-				.OUT }ms both ${ fadeOut }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideToRight }
+			${ FADE.DURATION }ms ${ FADE.EASING } ${
+				FADE.DELAY.OUT
+			}ms both ${ fadeOut }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideToRight }
 		`,
 	},
 } as const;

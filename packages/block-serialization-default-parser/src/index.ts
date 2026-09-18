@@ -22,10 +22,7 @@ type ParsedFrame = {
 };
 
 type TokenType =
-	| 'no-more-tokens'
-	| 'void-block'
-	| 'block-opener'
-	| 'block-closer';
+	'no-more-tokens' | 'void-block' | 'block-opener' | 'block-closer';
 
 type Token = [ TokenType, string, Attributes, number, number ];
 

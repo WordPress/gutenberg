@@ -225,7 +225,7 @@ function MediaTextEdit( {
 								{
 									context: 'view',
 								}
-						  )
+							)
 						: undefined,
 			};
 		},
@@ -244,7 +244,7 @@ function MediaTextEdit( {
 								{
 									context: 'view',
 								}
-						  )
+							)
 						: null,
 			};
 		},
