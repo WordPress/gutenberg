@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 import { useState, forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { Button } from '../button';
 import RangeControl from '../range-control';
 import { Flex, FlexItem } from '../flex';
@@ -191,7 +180,7 @@ const UnforwardedFontSizePicker = (
 									hasUnits
 										? `${ valueQuantity ?? '' }${
 												valueUnit ?? ''
-										  }`
+											}`
 										: resolvedValueForControls
 								}
 								onChange={ ( newValue ) => {

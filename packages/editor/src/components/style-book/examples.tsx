@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import type { Block } from '@wordpress/blocks';
 import {
@@ -9,10 +6,6 @@ import {
 	getBlockFromExample,
 	createBlock,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import type { BlockExample, ColorOrigin, MultiOriginPalettes } from './types';
 import ColorExamples from './color-examples';
 import DuotoneExamples from './duotone-examples';
@@ -37,7 +30,7 @@ function getColorExamples( colors: MultiOriginPalettes ): BlockExample[] {
 		const paletteFiltered = Array.isArray( palette )
 			? palette.find(
 					( origin: ColorOrigin ) => origin.slug === group.origin
-			  )
+				)
 			: undefined;
 
 		if ( paletteFiltered?.[ group.type ] ) {
@@ -83,7 +76,7 @@ function getOverviewBlockExamples(
 	const themePalette = Array.isArray( colors?.colors )
 		? colors.colors.find(
 				( origin: ColorOrigin ) => origin.slug === 'theme'
-		  )
+			)
 		: undefined;
 
 	if ( themePalette ) {

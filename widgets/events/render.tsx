@@ -1,22 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { mapMarker } from '@wordpress/icons';
-import { Icon, Link, Stack, EmptyState } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
-import {
-	EventsList,
-	type EventsWidgetAttributes,
-	type WPEvent,
-} from './components';
+import { Icon, Stack, EmptyState } from '@wordpress/ui';
+import { EventsList, type WPEvent } from './components';
+import type { EventsWidgetAttributes } from './types';
 import styles from './style.module.css';
 
 interface WPEventsResponse {
@@ -43,7 +33,7 @@ function EventsListSection( {
 } ) {
 	if ( error ) {
 		return (
-			<p className={ styles.statusText }>
+			<p className={ styles[ 'status-text' ] }>
 				{ __( 'An error occurred. Please try again.' ) }
 			</p>
 		);
@@ -127,16 +117,12 @@ export default function WordPressEvents( {
 	}, [ activeLocation, hasSelectedLocation, userLocale ] );
 
 	return (
-		<Stack
-			direction="column"
-			justify="space-between"
-			className={ styles.container }
-		>
+		<Stack direction="column" className={ styles.container }>
 			{ ! hasSelectedLocation && (
 				<Stack
 					align="center"
 					justify="center"
-					className={ styles.noLocationSelected }
+					className={ styles[ 'no-location-selected' ] }
 				>
 					<EmptyState.Root>
 						<EmptyState.Visual>
@@ -153,7 +139,7 @@ export default function WordPressEvents( {
 			) }
 			{ hasSelectedLocation && eventsLoading && (
 				<Stack
-					className={ styles.locationPickerInWidget }
+					className={ styles[ 'location-picker-in-widget' ] }
 					direction="column"
 					align="center"
 					justify="center"
@@ -170,22 +156,6 @@ export default function WordPressEvents( {
 					location={ locationLabel || activeLocation }
 				/>
 			) }
-			<div className={ styles.footer }>
-				<Stack direction="row" align="center" gap="sm" wrap="wrap">
-					<Link
-						href="https://make.wordpress.org/community/meetups-landing-page"
-						openInNewTab
-					>
-						{ __( 'Meetups' ) }
-					</Link>
-					<Link
-						href="https://central.wordcamp.org/schedule/"
-						openInNewTab
-					>
-						{ __( 'WordCamps' ) }
-					</Link>
-				</Stack>
-			</div>
 		</Stack>
 	);
 }

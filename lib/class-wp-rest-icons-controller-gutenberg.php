@@ -58,7 +58,7 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<namespace>[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?)',
+			'/' . $this->rest_base . '/(?P<collection>[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?)',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
@@ -74,15 +74,15 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 	/**
 	 * Retrieves the query params for the icons collection.
 	 *
-	 * Extends the base params with a `namespace` parameter that corresponds
+	 * Extends the base params with a `collection` parameter that corresponds
 	 * to an icon collection slug. The same parameter is also captured as a
 	 * URL segment by the collection-scoped route.
 	 *
 	 * @return array Collection parameters.
 	 */
 	public function get_collection_params() {
-		$query_params              = parent::get_collection_params();
-		$query_params['namespace'] = array(
+		$query_params               = parent::get_collection_params();
+		$query_params['collection'] = array(
 			'description' => __( 'Limit results to icons belonging to the given collection slug.', 'gutenberg' ),
 			'type'        => 'string',
 			'pattern'     => '^[a-z0-9]([a-z0-9_-]*[a-z0-9])?$',
@@ -97,7 +97,7 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		$collection = $request->get_param( 'namespace' );
+		$collection = $request->get_param( 'collection' );
 
 		if ( null !== $collection && ! WP_Icon_Collections_Registry::get_instance()->is_registered( $collection ) ) {
 			return new WP_Error(
@@ -116,6 +116,9 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 		$icons    = WP_Icons_Registry::get_instance()->get_registered_icons( $search );
 
 		foreach ( $icons as $icon ) {
+			if ( false === ( $icon['public'] ?? true ) ) {
+				continue;
+			}
 			if ( null !== $collection && ( ! isset( $icon['collection'] ) || $icon['collection'] !== $collection ) ) {
 				continue;
 			}
@@ -124,6 +127,33 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 		}
 
 		return rest_ensure_response( $response );
+	}
+
+	/**
+	 * Retrieves a specific icon from the registry.
+	 *
+	 * Icons registered as non-public are reported as not found. Icons registered
+	 * without an explicit `public` property are public.
+	 *
+	 * @param string $name Icon name.
+	 * @return array|WP_Error Icon data on success, or WP_Error object on failure.
+	 */
+	public function get_icon( $name ) {
+		$icon = parent::get_icon( $name );
+
+		if ( ! is_wp_error( $icon ) && false === ( $icon['public'] ?? true ) ) {
+			return new WP_Error(
+				'rest_icon_not_found',
+				sprintf(
+					// translators: %s is the name of any user-provided name
+					__( 'Icon not found: "%s".', 'gutenberg' ),
+					$name
+				),
+				array( 'status' => 404 )
+			);
+		}
+
+		return $icon;
 	}
 
 	/**

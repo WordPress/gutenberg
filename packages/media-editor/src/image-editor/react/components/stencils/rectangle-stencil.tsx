@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useEffect,
@@ -9,10 +6,6 @@ import {
 	useRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { StencilProps, NormalizedRect } from '../../../core/types';
 import {
 	DEFAULT_KEYBOARD_STEP,
@@ -59,21 +52,21 @@ const ALL_POSITIONS: HandlePosition[] = [
 function getHandleLabel( pos: HandlePosition ): string {
 	switch ( pos ) {
 		case 'n':
-			return __( 'Resize top edge' );
+			return __( 'Resize from top edge' );
 		case 's':
-			return __( 'Resize bottom edge' );
+			return __( 'Resize from bottom edge' );
 		case 'e':
-			return __( 'Resize right edge' );
+			return __( 'Resize from right edge' );
 		case 'w':
-			return __( 'Resize left edge' );
+			return __( 'Resize from left edge' );
 		case 'nw':
-			return __( 'Resize top-left corner' );
+			return __( 'Resize from top-left corner' );
 		case 'ne':
-			return __( 'Resize top-right corner' );
+			return __( 'Resize from top-right corner' );
 		case 'sw':
-			return __( 'Resize bottom-left corner' );
+			return __( 'Resize from bottom-left corner' );
 		case 'se':
-			return __( 'Resize bottom-right corner' );
+			return __( 'Resize from bottom-right corner' );
 	}
 }
 
@@ -158,12 +151,6 @@ export function RectangleStencil( {
 			activePointerResizeRef.current?.cancel( false );
 		};
 	}, [] );
-
-	useEffect( () => {
-		if ( isResizeDisabled ) {
-			activePointerResizeRef.current?.cancel();
-		}
-	}, [ isResizeDisabled ] );
 
 	// Latest callbacks for the drag listeners. The drag closure in
 	// handlePointerDown reads from this ref so it always sees current
@@ -420,6 +407,24 @@ export function RectangleStencil( {
 		snapCropRect,
 	};
 
+	// Cancel an in-flight resize when the handles are disabled. Reads
+	// `onResizeEnd` from the ref above so a new callback identity does
+	// not re-run this and close the gesture twice.
+	useEffect( () => {
+		if ( ! isResizeDisabled ) {
+			return;
+		}
+		activePointerResizeRef.current?.cancel();
+		// A keyboard resize settles on a timer rather than a pointer
+		// release, so close it here too: otherwise the pending timer
+		// fires `onResizeEnd` after the resize was already cancelled.
+		if ( keyboardResizeActiveRef.current ) {
+			clearTimeout( keyboardSettleTimerRef.current );
+			keyboardResizeActiveRef.current = false;
+			latestHandlersRef.current?.onResizeEnd?.();
+		}
+	}, [ isResizeDisabled ] );
+
 	/**
 	 * Handle keyboard events on a resize handle.
 	 * Arrow keys resize; Escape returns focus to the canvas.
@@ -603,6 +608,10 @@ export function RectangleStencil( {
 							}
 						} }
 						onKeyDown={ ( event ) => handleKeyDown( pos, event ) }
+						// The handlers already refuse input, but the
+						// button must say so too, or assistive technology
+						// announces a control that does nothing.
+						disabled={ isResizeDisabled }
 						aria-label={ getHandleLabel( pos ) }
 						aria-describedby={ resizeHandleDescriptionId }
 					/>

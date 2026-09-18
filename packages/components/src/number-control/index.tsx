@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useRef, forwardRef } from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
 import { plus as plusIcon, reset as resetIcon } from '@wordpress/icons';
 import { useMergeRefs } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { Input, SpinButton, styles } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import type { StateReducer } from '../input-control/reducer/state';
@@ -191,7 +180,7 @@ function UnforwardedNumberControl(
 			nextState.value = applyEmptyValue
 				? currentValue
 				: // @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
-				  constrainValue( currentValue );
+					constrainValue( currentValue );
 		}
 
 		return stateReducerProp?.( nextState, action ) ?? nextState;
@@ -229,7 +218,6 @@ function UnforwardedNumberControl(
 			value={ valueProp }
 			__unstableStateReducer={ numberControlStateReducer }
 			size={ size }
-			__next40pxDefaultSize
 			suffix={
 				spinControls === 'custom' ? (
 					<>

@@ -24,11 +24,26 @@ module.exports = {
 		],
 		'declaration-property-value-disallowed-list': [
 			{
-				'/.*/': [ '/--wp-components-color-/' ],
+				'/.*/': [
+					'/--wp-components-color-/',
+					'/\\$font-weight-regular/',
+					'/\\$font-weight-medium/',
+				],
 				cursor: [ 'pointer' ],
 			},
 			{
 				message: ( property, value ) => {
+					if (
+						value.includes( '$font-weight-regular' ) ||
+						value.includes( '$font-weight-medium' )
+					) {
+						const variable = value.includes(
+							'$font-weight-regular'
+						)
+							? '$font-weight-regular'
+							: '$font-weight-medium';
+						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
+					}
 					if ( property === 'cursor' ) {
 						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
 					}
@@ -36,7 +51,7 @@ module.exports = {
 				},
 			},
 		],
-		'font-weight-notation': null,
+		'font-weight-notation': 'numeric',
 		'@stylistic/max-line-length': null,
 		'no-descending-specificity': null,
 		'property-disallowed-list': [
@@ -90,7 +105,8 @@ module.exports = {
 					'border-radius': 3,
 					inset: 3,
 				},
-				'plugin/use-logical-properties-and-values': [
+				'logical-css/require-logical-keywords': [ true ],
+				'logical-css/require-logical-properties': [
 					true,
 					{
 						ignore: [
@@ -151,6 +167,13 @@ module.exports = {
 						],
 					},
 				],
+			},
+		},
+		{
+			files: [ '**/*.css' ],
+			rules: {
+				// Re-add no-duplicate-selectors rule for CSS because it is disabled by stylelint-config-recommended-scss v17
+				'no-duplicate-selectors': true,
 			},
 		},
 	],

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import {
 	__unstableSerializeAndClean,
 	parse,
@@ -19,10 +12,6 @@ import {
 	type SyncConfig,
 	Y,
 } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import { BaseAwareness } from '../awareness/base-awareness';
 import {
 	type Block,
@@ -341,7 +330,7 @@ function parseCursorSelection( selection?: WPSelection ): MergeCursorPosition {
 				attributeKey: selectionStart.attributeKey,
 				clientId: selectionStart.clientId,
 				offset: asRichTextOffset( selectionStart.offset ),
-		  }
+			}
 		: null;
 }
 
@@ -577,7 +566,7 @@ export const defaultCollectionSyncConfig: SyncConfig = {
  * @param {unknown} value The value to extract from.
  * @return {string|undefined} The raw string value, or undefined if it could not be determined.
  */
-function getRawValue( value?: unknown ): string | undefined {
+export function getRawValue( value?: unknown ): string | undefined {
 	// Value may be a string property or a nested object with a `raw` property.
 	if ( 'string' === typeof value ) {
 		return value;

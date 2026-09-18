@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Card,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -10,13 +7,9 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import './guideline-actions-section.scss';
 import { exportGuidelines, importGuidelines } from '../import-export';
-import ActionItem from './action-item';
+import ActionItem, { type ActionProps } from './action-item';
 import type {
 	Scope,
 	GuidelineRow,
@@ -103,13 +96,13 @@ export default function GuidelineActionsSection( {
 		}
 	}
 
-	const ACTIONS = [
+	const ACTIONS: ActionProps[] = [
 		{
 			slug: 'import',
 			title: __( 'Import' ),
 			description: __( 'Upload a JSON file to import your guidelines.' ),
 			buttonLabel: __( 'Upload' ),
-			ariaLabel: __( 'Import guidelines' ),
+			ariaLabel: __( 'Upload guidelines' ),
 			onClick: handleImportClick,
 			isBusy: isImporting,
 			disabled: isImporting || !! pendingImport,
@@ -119,14 +112,14 @@ export default function GuidelineActionsSection( {
 			title: __( 'Export' ),
 			description: __( 'Export your guidelines to a JSON file.' ),
 			buttonLabel: __( 'Download' ),
-			ariaLabel: __( 'Export guidelines' ),
+			ariaLabel: __( 'Download guidelines' ),
 			onClick: handleExportClick,
 		},
 	];
 
 	return (
 		<VStack spacing={ 4 } className="guidelines__actions">
-			<Heading level={ 3 } size={ 15 } weight={ 500 }>
+			<Heading level={ 2 } size={ 15 }>
 				{ __( 'Actions' ) }
 			</Heading>
 			<input

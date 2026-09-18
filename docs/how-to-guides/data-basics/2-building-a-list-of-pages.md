@@ -45,7 +45,7 @@ If it doesn’t, go ahead and create a few pages – you can use the same titles
 
 Now that we have the data to work with, let’s dive into the code. We will take advantage of the [`@wordpress/core-data`](https://github.com/WordPress/gutenberg/tree/trunk/packages/core-data) package which provides resolvers, selectors, and actions to work with the WordPress core API. `@wordpress/core-data` builds on top of the [`@wordpress/data`](https://github.com/WordPress/gutenberg/tree/trunk/packages/data) package.
 
-To fetch the list of pages, we will use the [`getEntityRecords`](/docs/reference-guides/data/data-core/#getentityrecords) selector. In broad strokes, it will issue the correct API request, cache the results, and return the list of the records we need. Here’s how to use it:
+To fetch the list of pages, we will use the [`getEntityRecords`](/docs/reference-guides/data/data-core.md#getentityrecords) selector. In broad strokes, it will issue the correct API request, cache the results, and return the list of the records we need. Here’s how to use it:
 
 ```js
 wp.data.select( 'core' ).getEntityRecords( 'postType', 'page' )

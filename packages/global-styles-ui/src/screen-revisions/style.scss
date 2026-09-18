@@ -80,7 +80,7 @@
 		left: $grid-unit-20;
 		top: 0;
 		width: 0;
-		border: 0.5px solid $gray-300;
+		border: 0.5px solid var(--wpds-color-stroke-surface-neutral);
 	}
 
 	&:first-child::after {
@@ -116,7 +116,7 @@
 	gap: $grid-unit-10;
 	.global-styles-ui-screen-revisions__date {
 		text-transform: uppercase;
-		font-weight: 600;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		font-size: 12px;
 	}
 }
@@ -188,6 +188,6 @@
 	bottom: 0;
 	background: $white;
 	padding: $grid-unit-15;
-	border-top: $border-width solid $gray-300;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 	box-sizing: border-box;
 }

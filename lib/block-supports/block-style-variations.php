@@ -225,13 +225,18 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
  *
  * @see gutenberg_render_block_style_variation_support_styles
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
  *
- * @return string                Filtered block content.
+ * @return string Filtered block content.
  */
 function gutenberg_render_block_style_variation_class_name( $block_content, $block ) {
 	if ( ! $block_content || empty( $block['attrs']['className'] ) ) {
+		return $block_content;
+	}
+
+	$block_class_name = $block['attrs']['className'];
+	if ( ! is_string( $block_class_name ) ) {
 		return $block_content;
 	}
 
@@ -239,7 +244,7 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
 	 * Matches a class prefixed by `is-style`, followed by the
 	 * variation slug, then `--`, and finally an instance number.
 	 */
-	preg_match( '/\bis-style-(\S+?--\d+)\b/', $block['attrs']['className'], $matches );
+	preg_match( '/\bis-style-(\S+?--\d+)\b/', $block_class_name, $matches );
 
 	if ( empty( $matches ) ) {
 		return $block_content;

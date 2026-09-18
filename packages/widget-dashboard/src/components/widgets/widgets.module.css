@@ -17,11 +17,17 @@
 }
 
 /*
- * Edit-mode tiles stay at resting elevation (`xs`) on hover; only the
- * drag preview (`.drag-preview-frame` on `@wordpress/grid`) lifts to `md`.
+ * Edit-mode tiles keep their resting shadow on hover; only the drag preview
+ * (`.drag-preview-frame` on `@wordpress/grid`) uses a stronger shadow.
  */
 .tile-edit-mode {
-	box-shadow: var(--wpds-elevation-xs);
+	--_wp-widget-dashboard-elevation-xs:
+		0 1px 1px rgba(0, 0, 0, 0.03),
+		0 1px 2px rgba(0, 0, 0, 0.02),
+		0 3px 3px rgba(0, 0, 0, 0.02),
+		0 4px 4px rgba(0, 0, 0, 0.01);
+
+	box-shadow: var(--_wp-widget-dashboard-elevation-xs);
 }
 
 .tile-edit-mode:focus-visible {
@@ -34,8 +40,8 @@
  * `height: 100%` keeps the inner `.tile` height: 100% chain alive
  * (without it, the wrapper auto-sizes and the cloned tile collapses
  * to content height). Drag elevation is owned by the grid
- * `.drag-preview-frame` (`md` while dragging); strip the cloned tile shadow so it
- * does not stack on the frame.
+ * `.drag-preview-frame`; strip the cloned tile shadow so it does not stack on
+ * the frame.
  */
 .drag-preview {
 	height: 100%;

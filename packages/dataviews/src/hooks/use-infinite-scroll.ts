@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useEffect,
@@ -8,10 +5,6 @@ import {
 	useRef,
 } from '@wordpress/element';
 import { throttle } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { View } from '../types';
 
 /**

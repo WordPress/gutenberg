@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Invalid blocks', () => {
@@ -14,7 +11,7 @@ test.describe( 'Invalid blocks', () => {
 	} ) => {
 		// Create an empty paragraph with the focus in the block.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'hello' );
 

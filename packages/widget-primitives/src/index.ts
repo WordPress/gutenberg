@@ -9,14 +9,37 @@ export { WidgetRender } from './components/widget-render';
 export { useWidgetTypes } from './hooks';
 
 /**
+ * Field types
+ */
+export { registerFieldType } from './field-types';
+
+/**
+ * Icon resolution
+ */
+export { registerIconResolver } from './icon-resolver';
+
+/**
+ * Host capabilities
+ */
+export { WidgetHostProvider, useWidgetHost, HostLink } from './widget-host';
+export type { WidgetHost, WidgetHostLinks } from './widget-host';
+
+/**
  * Types
  */
 export type {
 	WidgetName,
 	WidgetIcon,
+	WidgetIconReference,
+	WidgetRelevance,
 	WidgetType,
+	WidgetAction,
+	WidgetActionRecord,
 	WidgetAttributeField,
+	WidgetAttributeRecord,
 	WidgetRenderProps,
 	ResolveWidgetModule,
 	WidgetModuleRecord,
 } from './types';
+
+export type { FieldTypeDefinition } from './field-types';

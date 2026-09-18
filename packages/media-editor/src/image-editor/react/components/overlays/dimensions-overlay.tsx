@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useLayoutEffect, useRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { HandlePosition, NormalizedRect, Size } from '../../../core/types';
 
 const HANDLE_GAP_PX = 12;
@@ -244,7 +237,7 @@ export function DimensionsOverlay( {
 					tooltipSize.height,
 					containerSize.height
 				),
-		  }
+			}
 		: preferred;
 
 	return (

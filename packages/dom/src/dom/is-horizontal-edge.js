@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isEdge from './is-edge';
 
 /**

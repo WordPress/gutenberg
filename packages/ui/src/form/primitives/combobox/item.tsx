@@ -3,27 +3,22 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { check, plus } from '@wordpress/icons';
 import { Icon } from '../../../icon';
+import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
 import type { ComboboxItemProps } from './types';
 
 export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 	function Item(
-		{
-			className,
-			children,
-			size = 'default',
-			variant = 'default',
-			...restProps
-		},
+		{ className, children, variant = 'default', ...restProps },
 		ref
 	) {
 		return (
 			<_Combobox.Item
 				className={ clsx(
+					defenseStyles.div,
 					resetStyles[ 'box-sizing' ],
 					itemPopupStyles.item,
-					itemPopupStyles[ `is-size-${ size }` ],
 					className
 				) }
 				ref={ ref }

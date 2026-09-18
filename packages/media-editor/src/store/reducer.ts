@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { MediaEditorModalUpdate } from './actions';
 
 type OnUpdateCallback = ( updated: MediaEditorModalUpdate ) => void;

@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import { COLORS, rtl, CONFIG } from '../../utils';
 import { space } from '../../utils/space';
 import type { SelectControlProps } from '../types';
@@ -14,8 +7,10 @@ import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper'
 import { fontSizeStyles } from '../../input-control/styles/input-control-styles';
 import InputBase from '../../input-control/input-base';
 
-interface SelectProps
-	extends Pick< SelectControlProps, 'disabled' | 'multiple' | 'variant' > {
+interface SelectProps extends Pick<
+	SelectControlProps,
+	'disabled' | 'multiple' | 'variant'
+> {
 	// Using `selectSize` instead of `size` to avoid a type conflict with the
 	// `size` HTML attribute of the `select` element.
 	selectSize?: SelectControlProps[ 'size' ];
@@ -76,12 +71,6 @@ const sizeStyles = ( { multiple, selectSize = 'default' }: SelectProps ) => {
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
-		'__unstable-large': {
-			height: 40,
-			minHeight: 40,
-			paddingTop: 0,
-			paddingBottom: 0,
-		},
 	};
 
 	const style = sizes[ selectSize ] || sizes.default;
@@ -96,7 +85,6 @@ const sizePaddings = ( { multiple, selectSize = 'default' }: SelectProps ) => {
 		default: CONFIG.controlPaddingX,
 		small: CONFIG.controlPaddingXSmall,
 		compact: CONFIG.controlPaddingXSmall,
-		'__unstable-large': CONFIG.controlPaddingX,
 	};
 
 	const selectedPadding = padding[ selectSize ] || padding.default;
@@ -108,7 +96,7 @@ const sizePaddings = ( { multiple, selectSize = 'default' }: SelectProps ) => {
 			? {
 					paddingTop: selectedPadding,
 					paddingBottom: selectedPadding,
-			  }
+				}
 			: {} ),
 	} );
 };
@@ -161,10 +149,6 @@ export const Select = styled.select< SelectProps >`
 export const DownArrowWrapper = styled.div`
 	margin-inline-end: ${ space( -1 ) }; // optically adjust the icon
 	line-height: 0;
-
-	path {
-		fill: currentColor;
-	}
 `;
 
 export const InputControlSuffixWrapperWithClickThrough = styled(
