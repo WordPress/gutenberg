@@ -148,6 +148,7 @@
 		"lint:lockfile": "npm run --workspace @wordpress/validation-tools validate-package-lock --",
 		"lint:package-contents": "npm run --if-present --workspaces lint:package-contents",
 		"lint:tsconfig": "npm run --workspace @wordpress/validation-tools validate-tsconfig --",
+		"lint:changelogs": "npm run --workspace @wordpress/validation-tools validate-changelogs --",
 		"lint:md:docs": "wp-scripts lint-md-docs",
 		"prelint:php": "npm run other:update-packages:php",
 		"lint:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script lint",
