@@ -118,27 +118,38 @@ function BlockPopoverInbetween( {
 							? ( previousRect.left + nextRect.left ) / 2
 							: ( previousRect || nextRect ).left;
 
-					// Title-gap inserter only: lift the popover into the gap
-					// above the first block so the "+" does not overlap it.
+					// Title-gap inserter only: occupy the gap above the first
+					// block, never the block itself. A minimum height that
+					// overlaps the first block steals WebKit shift+click
+					// (e.g. nested multi-selection inside a Group).
 					if (
 						placeBeforeFirstBlock &&
 						! previousRect &&
 						nextRect &&
 						nextElement
 					) {
-						const { defaultView } = nextElement.ownerDocument;
-						const marginTop = defaultView
-							? parseFloat(
-									defaultView.getComputedStyle( nextElement )
-										.marginTop
-							  ) || 0
-							: 0;
-						// Match $button-size-small so a centered "+" sits fully
-						// above the block when margin is 0.
-						const minInserterGap = 24;
-						const gapHeight = Math.max( marginTop, minInserterGap );
-						top = nextRect.top - gapHeight;
-						height = gapHeight;
+						const layout = nextElement.parentElement;
+						const titleBottom =
+							layout?.previousElementSibling?.getBoundingClientRect()
+								.bottom;
+						if (
+							typeof titleBottom === 'number' &&
+							titleBottom < nextRect.top
+						) {
+							top = titleBottom;
+							height = nextRect.top - titleBottom;
+						} else {
+							const { defaultView } = nextElement.ownerDocument;
+							const marginTop = defaultView
+								? parseFloat(
+										defaultView.getComputedStyle(
+											nextElement
+										).marginTop
+									) || 0
+								: 0;
+							top = nextRect.top - marginTop;
+							height = marginTop;
+						}
 					}
 				} else {
 					top = previousRect ? previousRect.top : nextRect.top;
