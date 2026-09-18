@@ -51,6 +51,7 @@ export const RadioGroupControl = forwardRef<
 			{ description && (
 				<Fieldset.Description>{ description }</Fieldset.Description>
 			) }
+			{ details && <Fieldset.Details>{ details }</Fieldset.Details> }
 			<RadioGroup ref={ ref } { ...restProps }>
 				{ items.map( ( item ) => (
 					<Field.Item key={ item.value } render={ ITEM_RENDER }>
@@ -77,7 +78,6 @@ export const RadioGroupControl = forwardRef<
 					</Field.Item>
 				) ) }
 			</RadioGroup>
-			{ details && <Fieldset.Details>{ details }</Fieldset.Details> }
 		</Field.Root>
 	);
 } );
