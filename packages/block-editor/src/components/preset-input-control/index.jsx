@@ -91,7 +91,7 @@ export default function PresetInputControl( {
 	const hasPresets = marks.length > 0;
 	const showRangeControl = presets.length <= RANGE_CONTROL_MAX_SIZE;
 
-	const allPlaceholder = isMixed ? __( 'Mixed' ) : placeholder ?? null;
+	const allPlaceholder = isMixed ? __( 'Mixed' ) : ( placeholder ?? null );
 
 	const [ minValue, setMinValue ] = useState( minimumCustomValue );
 	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
@@ -129,7 +129,7 @@ export default function PresetInputControl( {
 			{
 				name: ! isMixed
 					? // translators: %s: A custom measurement, e.g. a number followed by a unit like 12px.
-					  sprintf( __( 'Custom (%s)' ), value )
+						sprintf( __( 'Custom (%s)' ), value )
 					: __( 'Mixed' ),
 				slug: 'custom',
 				size: value,

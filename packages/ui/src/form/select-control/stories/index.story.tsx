@@ -8,15 +8,29 @@ import {
 } from '../../stories/shared';
 
 const meta: Meta< typeof SelectControl > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/SelectControl',
 	component: SelectControl,
+	// Temporary: Due to an upstream bug, render the root explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <SelectControl { ...args } />,
 	subcomponents: {
 		'SelectControl.Group': SelectControl.Group,
 		'SelectControl.GroupLabel': SelectControl.GroupLabel,
 		'SelectControl.Item': SelectControl.Item,
+		'SelectControl.ItemLabel': SelectControl.ItemLabel,
+		'SelectControl.ItemDescription': SelectControl.ItemDescription,
 	},
 	argTypes: {
 		onValueChange: { action: 'onValueChange' },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 
@@ -176,7 +190,9 @@ export const Grouped: Story = {
 							value={ item }
 							label={ item.label }
 						>
-							{ item.label }
+							<SelectControl.ItemLabel>
+								{ item.label }
+							</SelectControl.ItemLabel>
 						</SelectControl.Item>
 					) ) }
 				</SelectControl.Group>
@@ -245,7 +261,9 @@ export const WithCustomTriggerAndItems: Story = {
 					value={ item }
 					label={ item.label }
 				>
-					<User user={ item } />
+					<SelectControl.ItemLabel>
+						<User user={ item } />
+					</SelectControl.ItemLabel>
 				</SelectControl.Item>
 			) ),
 		],
@@ -272,9 +290,36 @@ export const WithItemsArrayAndPartialCustomization: Story = {
 					label={ item.label }
 					disabled={ item.disabled }
 				>
-					✨ { item.label }
+					<SelectControl.ItemLabel>
+						✨ { item.label }
+					</SelectControl.ItemLabel>
 				</SelectControl.Item>
 			) ),
+		],
+	},
+};
+
+/**
+ * Pass `description` on an `items` entry for supplementary text.
+ * It is announced as a description rather than part of the item name.
+ * Compose `SelectControl.Item` children when you need multiple
+ * descriptions or custom markup.
+ */
+export const WithItemDescription: Story = {
+	args: {
+		label: 'Fruit',
+		items: [
+			{
+				value: 'apple',
+				label: 'Apple',
+				description:
+					'99 in stock. Ships in two to three business days.',
+			},
+			{
+				value: 'banana',
+				label: 'Banana',
+				description: '12 in stock. Restock expected next week.',
+			},
 		],
 	},
 };

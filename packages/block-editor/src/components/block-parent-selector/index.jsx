@@ -25,6 +25,7 @@ export default function BlockParentSelector() {
 				getBlockParents,
 				getSelectedBlockClientIds,
 				getParentSectionBlock,
+				getEnabledBlockParents,
 				getBlockName,
 				getNextBlockClientId,
 			} = unlock( select( blockEditorStore ) );
@@ -37,7 +38,12 @@ export default function BlockParentSelector() {
 			);
 			const parents = getBlockParents( selectedBlockClientId );
 			const immediateParentClientId = parents[ parents.length - 1 ];
-			const _parentClientId = parentSection ?? immediateParentClientId;
+			// The parent is the nearest one shown in List View and the
+			// breadcrumb, skipping any disabled blocks in between.
+			const _parentClientId = getEnabledBlockParents(
+				selectedBlockClientId,
+				true
+			)[ 0 ];
 			const parentBlockType = getBlockType(
 				getBlockName( _parentClientId )
 			);
@@ -53,12 +59,12 @@ export default function BlockParentSelector() {
 				nextSiblingClientId: getNextBlockClientId(
 					selectedBlockClientId
 				),
-				// When the shown parent is a section further up the tree
-				// rather than the direct parent, its content is locked and
-				// nothing can be inserted, so no button.
+				// No button when the parent shown is not the direct parent, nor
+				// within a section, where the structure is locked.
 				showInserter:
 					!! _parentClientId &&
 					_parentClientId === immediateParentClientId &&
+					! parentSection &&
 					! isTextFlowWrapper,
 			};
 		},
@@ -129,11 +135,11 @@ export default function BlockParentSelector() {
 													'directly add the only allowed block'
 												),
 												blockTitle.toLowerCase()
-										  )
+											)
 										: _x(
 												'Add block',
 												'Generic label for block inserter button'
-										  )
+											)
 								}
 								showTooltip
 								icon={ plus }

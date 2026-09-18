@@ -1,4 +1,3 @@
-import { css } from '@emotion/react';
 import type { ForwardedRef } from 'react';
 import { useMemo } from '@wordpress/element';
 import type { WordPressComponentProps } from '../../context';
@@ -7,7 +6,6 @@ import { Elevation } from '../../elevation';
 import { View } from '../../view';
 import * as styles from '../styles';
 import { useCard } from './hook';
-import CONFIG from '../../utils/config-values';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { Props } from '../types';
 
@@ -23,14 +21,8 @@ function UnconnectedCard(
 		size,
 		...otherProps
 	} = useCard( props );
-	const elevationBorderRadius = isRounded ? CONFIG.radiusLarge : 0;
 
 	const cx = useCx();
-
-	const elevationClassName = useMemo(
-		() => cx( css( { borderRadius: elevationBorderRadius } ) ),
-		[ cx, elevationBorderRadius ]
-	);
 
 	const contextProviderValue = useMemo( () => {
 		const contextProps = {
@@ -49,15 +41,10 @@ function UnconnectedCard(
 			<View { ...otherProps } ref={ forwardedRef }>
 				<View className={ cx( styles.Content ) }>{ children }</View>
 				<Elevation
-					className={ elevationClassName }
 					isInteractive={ false }
 					value={ elevation ? 1 : 0 }
 				/>
-				<Elevation
-					className={ elevationClassName }
-					isInteractive={ false }
-					value={ elevation }
-				/>
+				<Elevation isInteractive={ false } value={ elevation } />
 			</View>
 		</ContextSystemProvider>
 	);

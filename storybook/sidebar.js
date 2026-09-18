@@ -49,7 +49,7 @@ function useIcons( item ) {
 							Icon,
 							{ title: tooltip?.title ?? title },
 							icon
-					  )
+						)
 					: null
 			);
 	}, [ api, item.children, item.type ] );

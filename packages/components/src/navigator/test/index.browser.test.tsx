@@ -279,7 +279,6 @@ const MyNavigation = ( {
 					<label htmlFor="test-input-inner">Inner input</label>
 					<input
 						name="test-input-inner"
-						// eslint-disable-next-line no-restricted-syntax
 						id="test-input-inner"
 						onChange={ ( e ) => {
 							setInnerInputValue( e.target.value );
@@ -314,7 +313,6 @@ const MyNavigation = ( {
 			<label htmlFor="test-input-outer">Outer input</label>
 			<input
 				name="test-input-outer"
-				// eslint-disable-next-line no-restricted-syntax
 				id="test-input-outer"
 				onChange={ ( e ) => {
 					setOuterInputValue( e.target.value );
