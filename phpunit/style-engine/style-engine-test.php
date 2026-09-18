@@ -215,7 +215,10 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'typography' => array(
 						'fontVariationSettings' => array(
 							'GRAD' => 50,
-							'opsz' => '24',
+							'opsz' => 24,
+							'YOPQ' => '24',
+							'YTLC' => false,
+							'YTUC' => array(),
 							'wght' => 700,
 							'ital' => 1,
 							'XT;A' => 1,

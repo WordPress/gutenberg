@@ -100,7 +100,11 @@ describe( 'generate', () => {
 				typography: {
 					fontVariationSettings: {
 						GRAD: 50,
-						opsz: '24',
+						opsz: 24,
+						YOPQ: '24',
+						YTLC: false,
+						YTUC: [],
+						YTAS: Infinity,
 						wght: 700,
 						ital: 1,
 						'XT;A': 1,

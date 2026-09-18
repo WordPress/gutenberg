@@ -5153,7 +5153,8 @@ class WP_Theme_JSON_Gutenberg {
 							return is_string( $tag ) &&
 								preg_match( '/^[A-Za-z0-9]{4}$/', $tag ) &&
 								! in_array( $tag, array( 'wght', 'wdth', 'slnt', 'ital' ), true ) &&
-								is_numeric( $axis_value );
+								( is_int( $axis_value ) || is_float( $axis_value ) ) &&
+								is_finite( $axis_value );
 						},
 						ARRAY_FILTER_USE_BOTH
 					);

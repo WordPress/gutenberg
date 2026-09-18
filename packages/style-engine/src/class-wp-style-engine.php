@@ -740,10 +740,11 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				if ( ! preg_match( '/^[A-Za-z0-9]{4}$/', $tag ) || in_array( $tag, $registered_axes, true ) ) {
 					continue;
 				}
-				if ( ! is_numeric( $value ) ) {
+				// Numbers only, as in the JS style engine: a numeric string is not an axis value.
+				if ( ! ( is_int( $value ) || is_float( $value ) ) || ! is_finite( $value ) ) {
 					continue;
 				}
-				$settings[] = sprintf( '"%s" %s', $tag, 0 + $value );
+				$settings[] = sprintf( '"%s" %s', $tag, $value );
 			}
 
 			if ( empty( $settings ) ) {

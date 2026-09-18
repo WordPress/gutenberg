@@ -103,3 +103,101 @@ describe( 'getFontVariationAxes', () => {
 		).toEqual( [] );
 	} );
 } );
+
+describe( 'getFontVariationAxes with several faces', () => {
+	const family = {
+		slug: 'split',
+		fontFamily: 'Split',
+		fontFace: [
+			{
+				fontStyle: 'normal',
+				fontWeight: '100 900',
+				axes: [
+					{ tag: 'opsz', min: 8, default: 14, max: 144 },
+					{ tag: 'GRAD', min: -200, default: 0, max: 150 },
+				],
+			},
+			{
+				fontStyle: 'italic',
+				fontWeight: '100 900',
+				axes: [ { tag: 'opsz', min: 8, default: 14, max: 36 } ],
+			},
+		],
+	};
+	const settings = {
+		typography: {
+			fontFamilies: { theme: [ family ] },
+			fontVariations: { split: [ { tag: 'opsz' }, { tag: 'GRAD' } ] },
+		},
+	};
+	const tags = ( axes ) =>
+		axes.map( ( { tag, min, max } ) => `${ tag } ${ min }-${ max }` );
+
+	it( 'uses the face that matches the font style', () => {
+		expect(
+			tags(
+				getFontVariationAxes( settings, 'Split', {
+					fontStyle: 'normal',
+				} )
+			)
+		).toEqual( [ 'opsz 8-144', 'GRAD -200-150' ] );
+		expect(
+			tags(
+				getFontVariationAxes( settings, 'Split', {
+					fontStyle: 'italic',
+					fontWeight: '700',
+				} )
+			)
+		).toEqual( [ 'opsz 8-36' ] );
+	} );
+
+	it( 'intersects the faces when none matches', () => {
+		expect(
+			tags(
+				getFontVariationAxes( settings, 'Split', {
+					fontStyle: 'oblique',
+				} )
+			)
+		).toEqual( [ 'opsz 8-36' ] );
+	} );
+
+	it( 'matches weight ranges and single weights', () => {
+		const weights = {
+			typography: {
+				...settings.typography,
+				fontFamilies: {
+					theme: [
+						{
+							...family,
+							fontFace: [
+								{
+									fontWeight: 400,
+									axes: [
+										{ tag: 'GRAD', min: -50, max: 50 },
+									],
+								},
+								{
+									fontWeight: '700',
+									axes: [ { tag: 'GRAD', min: 0, max: 150 } ],
+								},
+							],
+						},
+					],
+				},
+			},
+		};
+		expect( tags( getFontVariationAxes( weights, 'Split', {} ) ) ).toEqual(
+			[ 'GRAD -50-50' ]
+		);
+		expect(
+			tags(
+				getFontVariationAxes( weights, 'Split', { fontWeight: 'bold' } )
+			)
+		).toEqual( [ 'GRAD 0-150' ] );
+		expect(
+			tags(
+				getFontVariationAxes( weights, 'Split', { fontWeight: '550' } )
+			)
+		).toEqual( [ 'GRAD 0-50' ] );
+	} );
+} );

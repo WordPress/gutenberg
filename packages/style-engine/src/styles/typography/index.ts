@@ -44,7 +44,8 @@ const REGISTERED_AXES_WITH_PROPERTIES = [ 'wght', 'wdth', 'slnt', 'ital' ];
 
 /**
  * Serializes font variation settings stored as an object keyed by axis tag.
- * Only four-character letter-or-digit tags with numeric values are kept, and
+ * Only four-character letter-or-digit tags with finite number values are kept,
+ * matching the PHP style engine, and
  * the axes above are skipped; `opsz` stays, as `font-optical-sizing` only
  * switches it on or off.
  *
@@ -62,11 +63,10 @@ export function serializeFontVariationSettings(
 			( [ tag, axisValue ] ) =>
 				/^[A-Za-z0-9]{4}$/.test( tag ) &&
 				! REGISTERED_AXES_WITH_PROPERTIES.includes( tag ) &&
-				axisValue !== '' &&
-				axisValue !== null &&
-				! Number.isNaN( Number( axisValue ) )
+				typeof axisValue === 'number' &&
+				Number.isFinite( axisValue )
 		)
-		.map( ( [ tag, axisValue ] ) => `"${ tag }" ${ Number( axisValue ) }` );
+		.map( ( [ tag, axisValue ] ) => `"${ tag }" ${ axisValue }` );
 	return settings.length ? settings.join( ', ' ) : undefined;
 }
 

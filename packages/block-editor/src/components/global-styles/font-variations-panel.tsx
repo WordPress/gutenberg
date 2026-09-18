@@ -38,7 +38,18 @@ type FontVariationPolicy = {
 type FontFamily = {
 	slug: string;
 	fontFamily: string;
-	fontFace?: Array< { axes?: FontFaceAxis[] } >;
+	fontFace?: FontFace[];
+};
+
+type FontFace = {
+	fontStyle?: string;
+	fontWeight?: string | number;
+	axes?: FontFaceAxis[];
+};
+
+export type FontAppearance = {
+	fontStyle?: unknown;
+	fontWeight?: unknown;
 };
 
 type Settings = {
@@ -97,17 +108,64 @@ function getFontFamilySlug(
 }
 
 /**
+ * Parses a font weight value into a number, `400` when it can't be read.
+ *
+ * @param value A font weight, e.g. `700`, `"700"` or `"bold"`.
+ * @return The numeric weight.
+ */
+function parseFontWeight( value: unknown ): number {
+	if ( value === 'bold' ) {
+		return 700;
+	}
+	const weight = parseFloat( String( value ) );
+	return Number.isFinite( weight ) ? weight : 400;
+}
+
+/**
+ * Returns the faces the browser can use for a font style and weight: those
+ * with the same style whose weight, or weight range, includes it. When none
+ * match, the browser picks the nearest face, so all faces are returned.
+ *
+ * @param faces      The family's faces.
+ * @param appearance The font style and weight in use.
+ * @return The candidate faces.
+ */
+function getCandidateFaces(
+	faces: FontFace[],
+	appearance: FontAppearance | undefined
+): FontFace[] {
+	const style =
+		typeof appearance?.fontStyle === 'string' && appearance.fontStyle
+			? appearance.fontStyle
+			: 'normal';
+	const weight = parseFontWeight( appearance?.fontWeight ?? 400 );
+	const matching = faces.filter( ( face ) => {
+		if ( ( face.fontStyle || 'normal' ) !== style ) {
+			return false;
+		}
+		const [ min, max = min ] = String( face.fontWeight ?? 400 )
+			.trim()
+			.split( /\s+/ )
+			.map( parseFontWeight );
+		return weight >= min && weight <= max;
+	} );
+	return matching.length ? matching : faces;
+}
+
+/**
  * Returns the axes a user can set for a font family: the axes the theme
  * exposes in `settings.typography.fontVariations`, limited to the axes the
- * family's faces declare, with the range both allow.
+ * faces in use declare, with the range all of them allow.
  *
  * @param settings        Block or Global Styles settings.
  * @param fontFamilyValue Font family from block attributes or Global Styles.
+ * @param appearance      Font style and weight, which select the faces.
  * @return The axes to show, in policy order.
  */
 export function getFontVariationAxes(
 	settings: Settings | undefined,
-	fontFamilyValue: unknown
+	fontFamilyValue: unknown,
+	appearance?: FontAppearance
 ): FontVariationAxis[] {
 	const fontFamiliesByOrigin = settings?.typography?.fontFamilies;
 	const fontFamilies = [ 'default', 'theme', 'custom' ].flatMap(
@@ -122,24 +180,32 @@ export function getFontVariationAxes(
 		return EMPTY_AXES;
 	}
 
-	// Several faces can declare the same axis: take the widest range.
-	const capabilities = new Map< string, FontFaceAxis >();
+	// An axis is offered only if every face that may render the text has it,
+	// and only within the range all of them support.
 	const family = fontFamilies.find( ( { slug: s } ) => s === slug );
-	for ( const face of family?.fontFace ?? [] ) {
-		for ( const axis of face?.axes ?? [] ) {
-			const known = capabilities.get( axis.tag );
-			capabilities.set(
-				axis.tag,
-				known
-					? {
-							...known,
-							min: Math.min( known.min, axis.min ),
-							max: Math.max( known.max, axis.max ),
-						}
-					: axis
-			);
+	const faces = getCandidateFaces( family?.fontFace ?? [], appearance );
+	const capabilities = new Map< string, FontFaceAxis >();
+	faces.forEach( ( face, index ) => {
+		const faceAxes = new Map(
+			( face?.axes ?? [] ).map( ( axis ) => [ axis.tag, axis ] )
+		);
+		if ( index === 0 ) {
+			faceAxes.forEach( ( axis, tag ) => capabilities.set( tag, axis ) );
+			return;
 		}
-	}
+		capabilities.forEach( ( known, tag ) => {
+			const axis = faceAxes.get( tag );
+			if ( ! axis ) {
+				capabilities.delete( tag );
+				return;
+			}
+			capabilities.set( tag, {
+				...known,
+				min: Math.max( known.min, axis.min ),
+				max: Math.min( known.max, axis.max ),
+			} );
+		} );
+	} );
 
 	return policy.flatMap( ( entry ) => {
 		const axis = capabilities.get( entry?.tag );
@@ -254,9 +320,17 @@ export default function FontVariationsPanel( {
 }: FontVariationsPanelProps ) {
 	const fontFamily =
 		value?.typography?.fontFamily ?? inheritedValue?.typography?.fontFamily;
+	const fontStyle =
+		value?.typography?.fontStyle ?? inheritedValue?.typography?.fontStyle;
+	const fontWeight =
+		value?.typography?.fontWeight ?? inheritedValue?.typography?.fontWeight;
 	const axes = useMemo(
-		() => getFontVariationAxes( settings, fontFamily ),
-		[ settings, fontFamily ]
+		() =>
+			getFontVariationAxes( settings, fontFamily, {
+				fontStyle,
+				fontWeight,
+			} ),
+		[ settings, fontFamily, fontStyle, fontWeight ]
 	);
 
 	const resetAllFilter = useCallback(
