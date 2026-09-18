@@ -224,6 +224,12 @@ export default function BackgroundImagePanel( {
 	} else if ( Array.isArray( clipSetting ) ) {
 		allowedClipValues = clipSetting;
 	}
+	// The Typography panel's gradient control already expresses the text
+	// value, so this control needs a box to choose between to be worth
+	// showing at all.
+	const hasBoxClipValue = allowedClipValues.some(
+		( clipValue ) => clipValue !== 'text'
+	);
 	/*
 	 * A viewport state's styles sit in a media query, but the clip is not
 	 * emitted in one, so it applies at every width whichever state set it.
@@ -232,8 +238,7 @@ export default function BackgroundImagePanel( {
 	 * clip set there genuinely applies on hover alone.
 	 */
 	const isViewportState = hasViewportBlockStyleState( styleState );
-	const showBackgroundClipControl =
-		allowedClipValues.length > 0 && ! isViewportState;
+	const showBackgroundClipControl = hasBoxClipValue && ! isViewportState;
 
 	const localClip = value?.background?.backgroundClip;
 	const baseClip = baseValue?.background?.backgroundClip;
