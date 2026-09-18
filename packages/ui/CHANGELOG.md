@@ -9,10 +9,12 @@
 
 ### New Features
 
+-   Add `RadioGroup` form primitive ([#83038](https://github.com/WordPress/gutenberg/pull/83038)).
 -   Add `CheckboxGroup` form primitive ([#82556](https://github.com/WordPress/gutenberg/pull/82556)).
 
 ### Enhancements
 
+-   `Fieldset`: Use a tighter gap between the legend and an immediately following description or details ([#82729](https://github.com/WordPress/gutenberg/pull/82729)).
 -   `Select`, `SelectControl`: Mark as recommended for use in a WordPress environment ([#83030](https://github.com/WordPress/gutenberg/pull/83030)).
 -   `Select`, `SelectControl`: Add `ItemLabel` and `ItemDescription` subcomponents. Multiple descriptions contribute to `aria-describedby` in DOM order. `SelectControl` `items` may include an optional `description` string. ([#82369](https://github.com/WordPress/gutenberg/pull/82369))
 -   `Select`, `SelectControl`: Align the selected item with the trigger by default, and drop the popup max-height cap when that alignment is enabled ([#82043](https://github.com/WordPress/gutenberg/pull/82043)).
