@@ -173,7 +173,46 @@ describe( 'Combobox', () => {
 		expect( screen.getByLabelText( 'Apple' ) ).toHaveAccessibleName(
 			'Apple'
 		);
-		expect( screen.queryByLabelText( 'Item 1' ) ).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Remove' } )
+		).toHaveAccessibleDescription( 'Apple' );
+	} );
+
+	it( 'describes the remove button with a consumer aria-labelledby', () => {
+		render(
+			<>
+				<span id="chip-name">Apple</span>
+				<Combobox.Root< Item, true >
+					items={ ITEMS }
+					multiple
+					defaultValue={ [ ITEMS[ 0 ] ] }
+				>
+					<Combobox.Chips>
+						<Combobox.Value>
+							{ ( value: Item[] ) => (
+								<>
+									{ value.map( ( item ) => (
+										<Combobox.ChipWithRemove
+											key={ item.id }
+											aria-labelledby="chip-name"
+										>
+											{ item.value }
+										</Combobox.ChipWithRemove>
+									) ) }
+								</>
+							) }
+						</Combobox.Value>
+					</Combobox.Chips>
+				</Combobox.Root>
+			</>
+		);
+
+		expect( screen.getByLabelText( 'Apple' ) ).toHaveAccessibleName(
+			'Apple'
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Remove' } )
+		).toHaveAccessibleDescription( 'Apple' );
 	} );
 
 	it( 'describes ChipWithRemove with the Backspace or Delete hint by default', () => {

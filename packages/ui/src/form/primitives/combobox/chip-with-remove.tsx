@@ -30,22 +30,35 @@ export const ChipWithRemove = forwardRef<
 ) {
 	const labelId = useId();
 	const hintId = useId();
+	const chipNameFrom = ariaLabelledby || labelId;
+	const nameFromAriaLabel = Boolean( ariaLabel && ! ariaLabelledby );
 
 	return (
 		<_Combobox.Chip
 			ref={ ref }
 			className={ clsx( styles.chip, className ) }
 			{ ...restProps }
-			aria-label={ ariaLabel }
-			aria-labelledby={
-				ariaLabelledby || ( ariaLabel ? undefined : labelId )
-			}
+			aria-labelledby={ chipNameFrom }
 			aria-describedby={ clsx( ariaDescribedby, hintId ) || undefined }
 		>
 			{ prefix && (
-				<span className={ styles[ 'chip-prefix' ] }>{ prefix }</span>
+				<span
+					className={ styles[ 'chip-prefix' ] }
+					aria-hidden={ nameFromAriaLabel ? true : undefined }
+				>
+					{ prefix }
+				</span>
 			) }
-			<span id={ labelId } className={ styles[ 'chip-content' ] }>
+			{ nameFromAriaLabel && (
+				<VisuallyHidden id={ labelId } aria-hidden="true">
+					{ ariaLabel }
+				</VisuallyHidden>
+			) }
+			<span
+				id={ nameFromAriaLabel ? undefined : labelId }
+				className={ styles[ 'chip-content' ] }
+				aria-hidden={ nameFromAriaLabel ? true : undefined }
+			>
 				{ children }
 			</span>
 			<VisuallyHidden id={ hintId } aria-hidden="true">
@@ -64,7 +77,7 @@ export const ChipWithRemove = forwardRef<
 						disabled={ disabled }
 						{ ...props }
 						aria-describedby={
-							clsx( props[ 'aria-describedby' ], labelId ) ||
+							clsx( props[ 'aria-describedby' ], chipNameFrom ) ||
 							undefined
 						}
 					/>
