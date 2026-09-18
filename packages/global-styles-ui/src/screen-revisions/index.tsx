@@ -19,7 +19,6 @@ const DEFAULT_VIEW: View = {
 	type: 'pickerActivity',
 	titleField: 'date',
 	descriptionField: 'details',
-	fields: [],
 	layout: { density: 'compact' },
 	page: 1,
 	perPage: PAGE_SIZE,
@@ -44,11 +43,9 @@ function ScreenRevisions() {
 	const paginationInfo = useMemo(
 		() => ( {
 			totalItems: revisionsCount,
-			totalPages: Math.ceil(
-				revisionsCount / ( view.perPage ?? PAGE_SIZE )
-			),
+			totalPages: Math.ceil( revisionsCount / query.per_page ),
 		} ),
-		[ revisionsCount, view.perPage ]
+		[ revisionsCount, query.per_page ]
 	);
 
 	const [
