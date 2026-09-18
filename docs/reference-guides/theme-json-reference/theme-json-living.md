@@ -255,6 +255,7 @@ Background styles.
 | backgroundRepeat | Sets the `background-repeat` CSS property. | `string`, `{ ref }` |
 | backgroundSize | Sets the `background-size` CSS property. | `string`, `{ ref }` |
 | backgroundAttachment | Sets the `background-attachment` CSS property. | `string`, `{ ref }` |
+| backgroundClip | Sets the `background-clip` CSS property. One of `border-box`, `padding-box`, `content-box` or `text`. | `string`, `{ ref }` |
 
 ---
 
