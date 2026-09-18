@@ -1,4 +1,9 @@
-import { store, getContext, getElement } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	getElement,
+	withSyncEvent,
+} from '@wordpress/interactivity';
 import {
 	initWaveformPlayer,
 	logPlayError,
@@ -31,10 +36,75 @@ const { state } = store(
 					? labelPauseTrack
 					: labelSelectTrack;
 			},
+			/**
+			 * The value of the tabindex attribute for track buttons. The
+			 * tracklist is a single tab stop, so only one track at a time is
+			 * in the tab sequence.
+			 *
+			 * @type {number}
+			 */
+			get trackTabIndex() {
+				const { focusedId, trackId } = getContext();
+				return focusedId === trackId ? 0 : -1;
+			},
 		},
 		actions: {
+			/**
+			 * Handles the keydown event for the track buttons, moving focus
+			 * between tracks without selecting them.
+			 *
+			 * @param {KeyboardEvent} event The keydown event.
+			 */
+			moveFocusToTrack: withSyncEvent( ( event ) => {
+				const context = getContext();
+				const { tracks, trackId } = context;
+				const currentIndex = tracks.indexOf( trackId );
+
+				if ( currentIndex === -1 ) {
+					return;
+				}
+
+				let nextIndex;
+				switch ( event.key ) {
+					case 'ArrowUp':
+						nextIndex = currentIndex - 1;
+						break;
+					case 'ArrowDown':
+						nextIndex = currentIndex + 1;
+						break;
+					case 'Home':
+						nextIndex = 0;
+						break;
+					case 'End':
+						nextIndex = tracks.length - 1;
+						break;
+					default:
+						return;
+				}
+
+				// Don't scroll the page while navigating the tracklist.
+				event.preventDefault();
+
+				// Wrap around, matching the Tabs block.
+				if ( nextIndex < 0 ) {
+					nextIndex = tracks.length - 1;
+				} else if ( nextIndex >= tracks.length ) {
+					nextIndex = 0;
+				}
+
+				const { ref } = getElement();
+				const buttons = ref
+					.closest( '.wp-block-playlist__tracklist' )
+					?.querySelectorAll( '.wp-block-playlist-track__button' );
+
+				// Move the tab stop along with focus, so that leaving and
+				// re-entering the tracklist returns to the same track.
+				context.focusedId = tracks[ nextIndex ];
+				buttons?.[ nextIndex ]?.focus();
+			} ),
 			changeTrack() {
 				const context = getContext();
+				context.focusedId = context.trackId;
 				if ( context.currentId === context.trackId ) {
 					const player = playlistPlayerState.get(
 						context.playlistId
