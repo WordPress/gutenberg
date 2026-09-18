@@ -44,7 +44,7 @@ export const WithMultipleControls: Story = {
 							? {
 									type: 'invalid',
 									message: 'The word "error" is not allowed.',
-							  }
+								}
 							: undefined
 					}
 				/>
@@ -59,7 +59,7 @@ export const WithMultipleControls: Story = {
 							? {
 									type: 'invalid',
 									message: 'The word "error" is not allowed.',
-							  }
+								}
 							: undefined
 					}
 				/>
@@ -241,7 +241,7 @@ export const CustomErrorsOnSubmit: StoryObj< typeof ValidatedInputControl > = {
 						? {
 								type: 'invalid',
 								message: 'The word "error" is not allowed.',
-						  }
+							}
 						: undefined
 				}
 			/>
@@ -281,7 +281,7 @@ export const ShowingErrorsAtArbitraryTimes: StoryObj<
 							? {
 									type: 'invalid',
 									message: 'The word "error" is not allowed.',
-							  }
+								}
 							: undefined
 					}
 				/>
@@ -325,7 +325,7 @@ export const ShowingErrorsWithoutMovingFocus: StoryObj<
 							? {
 									type: 'invalid',
 									message: 'The word "error" is not allowed.',
-							  }
+								}
 							: undefined
 					}
 				/>
@@ -405,7 +405,7 @@ export const ValidateInModal: StoryObj< typeof ValidatedInputControl > = {
 														type: 'invalid',
 														message:
 															'The word "error" is not allowed.',
-												  }
+													}
 												: undefined
 										}
 									/>
@@ -489,7 +489,7 @@ export const ValidateOnPopoverClose: StoryObj< typeof ValidatedInputControl > =
 												type: 'invalid',
 												message:
 													'The word "error" is not allowed.',
-										  }
+											}
 										: undefined
 								}
 							/>

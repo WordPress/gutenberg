@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import { Component, Suspense } from '@wordpress/element';
 import {
 	createRegistry,
@@ -187,7 +188,7 @@ describe( 'useSuspenseSelect', () => {
 		const registry = createRegistry();
 		registry.register( store );
 
-		const FastUI = jest.fn( () => {
+		const FastUI = vi.fn( () => {
 			const data = useSuspenseSelect(
 				( select ) => select( store ).getData( 'fast' ),
 				[]
@@ -195,7 +196,7 @@ describe( 'useSuspenseSelect', () => {
 			return <div aria-label="fast loaded">{ data }</div>;
 		} );
 
-		const SlowUI = jest.fn( () => {
+		const SlowUI = vi.fn( () => {
 			const data = useSuspenseSelect(
 				( select ) => select( store ).getData( 'slow' ),
 				[]

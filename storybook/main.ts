@@ -21,14 +21,14 @@ const { NODE_ENV = 'development' } = process.env;
 const stories = [
 	'./stories/playground/**/*.story.@(jsx|tsx)',
 	'./stories/**/*.mdx',
-	'./stories/design-system/**/*.story.@(ts|tsx)',
+	'./stories/design-system/**/*.story.@(ts|tsx|mts|cts)',
 	'../packages/block-editor/src/**/stories/*.story.@(jsx|tsx|mdx)',
 	'../packages/editor/src/**/stories/*.story.@(jsx|tsx|mdx)',
 	'../packages/global-styles-ui/src/**/stories/*.story.@(jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
 	'../packages/icons/src/**/stories/*.story.@(tsx|mdx)',
-	'./stories/icons/**/*.story.@(ts|tsx)',
+	'./stories/icons/**/*.story.@(ts|tsx|mts|cts)',
 	'../packages/dataviews/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/fields/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/image-cropper/src/**/stories/*.story.@(tsx|mdx)',
@@ -36,14 +36,14 @@ const stories = [
 	'../packages/media-fields/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/theme/src/**/stories/*.mdx',
 	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
-	'../packages/grid/src/**/stories/*.story.@(ts|tsx)',
+	'../packages/grid/src/**/stories/*.story.@(ts|tsx|mts|cts)',
 	'../packages/widget-primitives/src/**/stories/*.mdx',
-	'../packages/widget-primitives/src/**/stories/*.story.@(ts|tsx)',
+	'../packages/widget-primitives/src/**/stories/*.story.@(ts|tsx|mts|cts)',
 	'../packages/widget-dashboard/src/**/stories/*.mdx',
-	'../packages/widget-dashboard/src/**/stories/*.story.@(ts|tsx)',
+	'../packages/widget-dashboard/src/**/stories/*.story.@(ts|tsx|mts|cts)',
 	'../packages/ui/src/**/stories/*.mdx',
-	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
-	'../packages/admin-ui/src/**/stories/*.story.@(ts|tsx)',
+	'../packages/ui/src/**/stories/*.story.@(ts|tsx|mts|cts)',
+	'../packages/admin-ui/src/**/stories/*.story.@(ts|tsx|mts|cts)',
 ];
 
 const config: StorybookConfig = {
@@ -94,7 +94,7 @@ const config: StorybookConfig = {
 			// `__docgenInfo` block per component (one from source, one from the
 			// declaration file) that clobbers source-derived descriptions.
 			// Separate `tsconfig.json` is used instead of `compilerOptions` to
-			// allow the rest of the base `tsconfig.base.json` to be inherited.
+			// allow the rest of the shared base config to be inherited.
 			tsconfigPath: path.join(
 				import.meta.dirname,
 				'tsconfig.docgen.json'

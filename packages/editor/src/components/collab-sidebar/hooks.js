@@ -92,7 +92,7 @@ export function useNoteThreads( postId ) {
 				reply: [],
 				blockClientId:
 					item.parent === 0
-						? clientIdByNoteId.get( item.id ) ?? null
+						? ( clientIdByNoteId.get( item.id ) ?? null )
 						: null,
 			};
 			threadsById.set( item.id, thread );
@@ -530,7 +530,7 @@ export function useEnableFloatingSidebar( enabled = false ) {
 			if (
 				getActiveComplementaryArea( 'core' ) === FLOATING_NOTES_SIDEBAR
 			) {
-				disableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
+				disableComplementaryArea( 'core' );
 			}
 		};
 	}, [ enabled, registry ] );

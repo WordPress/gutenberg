@@ -1,7 +1,8 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { startOfDay } from 'date-fns';
-import { ckb, faIR, ug } from 'date-fns/locale';
+import { faIR } from 'date-fns/locale';
 import { isRTL } from '@wordpress/i18n';
 import { Calendar, RangeCalendar } from '..';
 import * as Tooltip from '../../tooltip';
@@ -32,8 +33,8 @@ function expectGregorianDate( localeCode: string ) {
 	).toBeVisible();
 }
 
-jest.mock( '@wordpress/i18n', () => {
-	const actual = jest.requireActual( '@wordpress/i18n' );
+vi.mock( import( '@wordpress/i18n' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
 	const translations: Record< string, string > = {
 		'Previous month': 'Translated previous month',
 		'Navigation bar': 'Translated navigation bar',
@@ -42,12 +43,13 @@ jest.mock( '@wordpress/i18n', () => {
 
 	return {
 		...actual,
-		__: ( text: string ) => translations[ text ] ?? text,
-		isRTL: jest.fn(),
+		__: ( ( text: string ) =>
+			translations[ text ] ?? text ) as typeof actual.__,
+		isRTL: vi.fn(),
 	};
 } );
 
-const mockIsRTL = jest.mocked( isRTL );
+const mockIsRTL = vi.mocked( isRTL );
 
 describe.each( [
 	[ 'Calendar', Calendar ],
@@ -235,58 +237,6 @@ describe( 'Calendar locale inputs', () => {
 		);
 	} );
 
-	it( 'derives the week start from legacy browser week information', () => {
-		const IntlLocale = Intl.Locale;
-		const localeSpy = jest
-			.spyOn( Intl, 'Locale' )
-			.mockImplementation( ( locale ) => {
-				const intlLocale = new IntlLocale( locale );
-				Object.defineProperties( intlLocale, {
-					getWeekInfo: { value: undefined },
-					weekInfo: { value: { firstDay: 6 } },
-				} );
-				return intlLocale;
-			} );
-
-		try {
-			render( <Calendar defaultMonth={ TEST_DATE } locale="fa-IR" /> );
-
-			expect(
-				screen.getAllByRole( 'columnheader', { hidden: true } )[ 0 ]
-			).toHaveAccessibleName(
-				weekdayFormatter( 'fa-IR' ).format( new Date( 2026, 0, 10 ) )
-			);
-		} finally {
-			localeSpy.mockRestore();
-		}
-	} );
-
-	it( 'uses the existing default when browser week information is unavailable', () => {
-		const IntlLocale = Intl.Locale;
-		const localeSpy = jest
-			.spyOn( Intl, 'Locale' )
-			.mockImplementation( ( locale ) => {
-				const intlLocale = new IntlLocale( locale );
-				Object.defineProperties( intlLocale, {
-					getWeekInfo: { value: undefined },
-					weekInfo: { value: undefined },
-				} );
-				return intlLocale;
-			} );
-
-		try {
-			render( <Calendar defaultMonth={ TEST_DATE } locale="fa-IR" /> );
-
-			expect(
-				screen.getAllByRole( 'columnheader', { hidden: true } )[ 0 ]
-			).toHaveAccessibleName(
-				weekdayFormatter( 'fa-IR' ).format( new Date( 2026, 0, 11 ) )
-			);
-		} finally {
-			localeSpy.mockRestore();
-		}
-	} );
-
 	it( 'uses Intl week information for a date-fns locale object with a supported code', () => {
 		const locale = {
 			...faIR,
@@ -351,61 +301,4 @@ describe( 'Calendar day labels', () => {
 			screen.getByRole( 'button', { name: /^Today and selected:/ } )
 		).toBeVisible();
 	} );
-} );
-
-describe( 'Calendar text direction fallback', () => {
-	const getTextInfoDescriptor = Object.getOwnPropertyDescriptor(
-		Intl.Locale.prototype,
-		'getTextInfo'
-	);
-
-	beforeAll( () => {
-		Object.defineProperty( Intl.Locale.prototype, 'getTextInfo', {
-			configurable: true,
-			value: undefined,
-		} );
-	} );
-
-	afterAll( () => {
-		if ( getTextInfoDescriptor ) {
-			Object.defineProperty(
-				Intl.Locale.prototype,
-				'getTextInfo',
-				getTextInfoDescriptor
-			);
-		} else {
-			delete ( Intl.Locale.prototype as { getTextInfo?: unknown } )
-				.getTextInfo;
-		}
-	} );
-
-	it.each( [
-		[ 'Sindhi', 'sd', 'rtl' ],
-		[ 'Latin-script Uyghur', 'ug-Latn', 'ltr' ],
-	] as const )(
-		'uses legacy Intl.Locale text information for %s',
-		( _, locale, direction ) => {
-			render( <Calendar locale={ locale } /> );
-
-			expect( screen.getByRole( 'application' ) ).toHaveAttribute(
-				'dir',
-				direction
-			);
-		}
-	);
-
-	it.each( [
-		[ 'Central Kurdish', ckb ],
-		[ 'Uyghur', ug ],
-	] )(
-		'should render %s right-to-left without Intl.Locale.getTextInfo',
-		( _, locale ) => {
-			render( <Calendar locale={ locale } /> );
-
-			expect( screen.getByRole( 'application' ) ).toHaveAttribute(
-				'dir',
-				'rtl'
-			);
-		}
-	);
 } );

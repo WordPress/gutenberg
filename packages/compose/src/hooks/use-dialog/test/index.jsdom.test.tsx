@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createPortal } from 'react-dom';
@@ -20,7 +21,7 @@ function Dialog( { onClose }: { onClose?: () => void } ) {
 describe( 'useDialog', () => {
 	it( 'should call onClose when Escape is pressed', async () => {
 		const user = userEvent.setup();
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 
 		render( <Dialog onClose={ onClose } /> );
 
@@ -32,7 +33,7 @@ describe( 'useDialog', () => {
 
 	it( 'should not call onClose when Escape is pressed if defaultPrevented', async () => {
 		const user = userEvent.setup();
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 
 		function DialogWithChild() {
 			const [ ref, props ] = useDialog( {
@@ -69,8 +70,8 @@ describe( 'useDialog', () => {
 
 	it( 'should stop Escape event from propagating to parent elements', async () => {
 		const user = userEvent.setup();
-		const onClose = jest.fn();
-		const parentKeyDownHandler = jest.fn();
+		const onClose = vi.fn();
+		const parentKeyDownHandler = vi.fn();
 
 		render(
 			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -88,7 +89,7 @@ describe( 'useDialog', () => {
 
 	it( 'should let Escape propagate when there is no onClose handler', async () => {
 		const user = userEvent.setup();
-		const parentKeyDownHandler = jest.fn();
+		const parentKeyDownHandler = vi.fn();
 
 		render(
 			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -105,8 +106,8 @@ describe( 'useDialog', () => {
 
 	it( 'should not close when a portaled descendant handles Escape and stops propagation', async () => {
 		const user = userEvent.setup();
-		const onClose = jest.fn();
-		const descendantHandled = jest.fn();
+		const onClose = vi.fn();
+		const descendantHandled = vi.fn();
 
 		const portalTarget = document.createElement( 'div' );
 		document.body.appendChild( portalTarget );
@@ -153,8 +154,8 @@ describe( 'useDialog', () => {
 
 	it( 'should close only the innermost dialog when nested', async () => {
 		const user = userEvent.setup();
-		const outerOnClose = jest.fn();
-		const innerOnClose = jest.fn();
+		const outerOnClose = vi.fn();
+		const innerOnClose = vi.fn();
 
 		function NestedDialogs() {
 			const [ outerRef, outerProps ] = useDialog( {
@@ -196,8 +197,8 @@ describe( 'useDialog', () => {
 
 	it( 'should call the consumer-provided onKeyDown alongside close-on-Escape', async () => {
 		const user = userEvent.setup();
-		const onClose = jest.fn();
-		const consumerOnKeyDown = jest.fn();
+		const onClose = vi.fn();
+		const consumerOnKeyDown = vi.fn();
 
 		function DialogWithConsumerOnKeyDown() {
 			const [ ref, props ] = useDialog( {
@@ -227,7 +228,7 @@ describe( 'useDialog', () => {
 
 	it( 'should let the consumer-provided onKeyDown opt out of close-on-Escape via preventDefault', async () => {
 		const user = userEvent.setup();
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 
 		function DialogOptingOut() {
 			const [ ref, props ] = useDialog( {
@@ -255,7 +256,7 @@ describe( 'useDialog', () => {
 
 	it( 'should not call onClose for non-Escape keys', async () => {
 		const user = userEvent.setup();
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 
 		render( <Dialog onClose={ onClose } /> );
 
