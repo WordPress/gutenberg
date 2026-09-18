@@ -8,6 +8,7 @@ export * as Fieldset from './fieldset';
 export { Input } from './input';
 export { InputLayout } from './input-layout';
 export { Radio } from './radio';
+export { RadioGroup } from './radio-group';
 export * as Select from './select';
 export { SearchableChipSelect } from './searchable-chip-select';
 export { SearchableSelect } from './searchable-select';
