@@ -913,6 +913,29 @@ describe( 'BackgroundPanel at a non-default viewport', () => {
 		).not.toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
+	it( 'hides the clip control, which belongs to the Default state', () => {
+		render(
+			<BackgroundPanel
+				value={ {} }
+				baseValue={ baseValue }
+				settings={ {
+					...colorSettings,
+					background: {
+						...colorSettings.background,
+						backgroundClip: true,
+					},
+				} }
+				defaultControls={ { backgroundClip: true } }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.queryByRole( 'button', { name: /Clip/ } )
+		).not.toBeInTheDocument();
+	} );
+
 	it( "leaves the controls alone when the default viewport doesn't clip to text", () => {
 		render(
 			<BackgroundPanel
