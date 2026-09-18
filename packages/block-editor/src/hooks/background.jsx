@@ -112,18 +112,17 @@ function useBlockProps( { name, style } ) {
  * @return {string} CSS class name.
  */
 export function getBackgroundImageClasses( style ) {
-	// A gradient clipped to text paints the text, not the block background,
-	// so the block has no background to announce.
-	if (
-		'text' === style?.background?.backgroundClip &&
-		hasBackgroundGradientValue( style )
-	) {
+	const hasBackground =
+		hasBackgroundImageValue( style ) || hasBackgroundGradientValue( style );
+
+	// A background clipped to the text paints the glyphs, not the block's box,
+	// so there is no block background to announce. Mirror of the check in
+	// `gutenberg_render_background_support()`.
+	if ( ! hasBackground || 'text' === style?.background?.backgroundClip ) {
 		return '';
 	}
-	return hasBackgroundImageValue( style ) ||
-		hasBackgroundGradientValue( style )
-		? 'has-background'
-		: '';
+
+	return 'has-background';
 }
 
 // Clears every control the Background panel owns: the background image,
