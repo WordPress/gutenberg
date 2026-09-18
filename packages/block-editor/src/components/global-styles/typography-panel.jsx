@@ -100,33 +100,6 @@ export function useHasTypographyPanel( settings ) {
 	);
 }
 
-/**
- * Explains why the text gradient control is unavailable.
- *
- * @param {Object}  props                        Reasons the control is off.
- * @param {boolean} props.textGradientIsFromBase Whether the gradient belongs to the Default state.
- * @param {string}  props.backgroundGradient     The block's own background gradient, if any.
- * @return {string} Text for the control's tooltip.
- */
-function getTextGradientDisabledHint( {
-	textGradientIsFromBase,
-	backgroundGradient,
-} ) {
-	if ( textGradientIsFromBase ) {
-		return __(
-			'A text gradient can only be changed in the Default state.'
-		);
-	}
-
-	return backgroundGradient
-		? __(
-				"A text gradient can't be set while the block has a background gradient."
-			)
-		: __(
-				"A text gradient can't be set while the block has a background color."
-			);
-}
-
 function useHasFontSizeControl( settings ) {
 	return (
 		( settings?.typography?.defaultFontSizes !== false &&
@@ -349,10 +322,15 @@ export default function TypographyPanel( {
 	const blockSupportsBackgroundClip = blockName
 		? !! getBlockSupport( blockName, [ 'background', 'backgroundClip' ] )
 		: false;
+	// A text gradient is a clip, which is emitted without a media query and so
+	// applies at every width. It belongs to the block's Default state, and only
+	// that state can set or clear it.
+	const isNonDefaultState = baseValue !== undefined;
 	const hasTextGradientEnabled =
 		( settingAllowsTextClip || blockSupportsBackgroundClip ) &&
 		!! settings?.background?.gradient &&
-		hasGradientColors;
+		hasGradientColors &&
+		! isNonDefaultState;
 
 	const isTextGradient = value?.background?.backgroundClip === 'text';
 	const baseClip = baseValue?.background?.backgroundClip;
@@ -362,6 +340,11 @@ export default function TypographyPanel( {
 		( value?.background?.backgroundClip ?? baseClip ) === 'text';
 	// Only the Default state holds the gradient, so this one cannot change it.
 	const textGradientIsFromBase = clipsToTextHere && ! isTextGradient;
+	const textColorDisabledHint = textGradientIsFromBase
+		? __(
+				'The text gradient set in the Default state replaces the text color.'
+			)
+		: __( 'The text gradient replaces the text color.' );
 	const inheritedIsTextGradient =
 		inheritedValue?.background?.backgroundClip === 'text';
 	// `background-clip` clips every background layer at once, including the
@@ -962,9 +945,7 @@ export default function TypographyPanel( {
 					// A text gradient paints the text itself, so a text
 					// colour set here would never show.
 					disabled={ clipsToTextHere }
-					disabledHint={ __(
-						'The text gradient replaces the text color.'
-					) }
+					disabledHint={ textColorDisabledHint }
 					isShownByDefault={ defaultControls.textColor }
 					indicators={ [ userTextColor ?? textColor ] }
 					contrastWarning={ contrastWarning }
@@ -1007,11 +988,16 @@ export default function TypographyPanel( {
 					label={ __( 'Gradient' ) }
 					hasValue={ hasTextGradientValue }
 					resetValue={ resetTextGradient }
-					disabled={ hasBlockBackground || textGradientIsFromBase }
-					disabledHint={ getTextGradientDisabledHint( {
-						textGradientIsFromBase,
-						backgroundGradient,
-					} ) }
+					disabled={ hasBlockBackground }
+					disabledHint={
+						backgroundGradient
+							? __(
+									"A text gradient can't be set while the block has a background gradient."
+								)
+							: __(
+									"A text gradient can't be set while the block has a background color."
+								)
+					}
 					isShownByDefault={ defaultControls.textGradient }
 					indicators={ [ userTextGradient ?? textGradient ] }
 					showInheritanceLabelIndicators={
