@@ -41,6 +41,73 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
 }
 
 /**
+ * Gets a unique `wp_navigation` slug.
+ *
+ * @since 7.1.0
+ *
+ * @param string $slug    Desired slug.
+ * @param int    $post_id Optional post ID to exclude when updating an existing post.
+ * @return string Unique slug.
+ */
+function block_core_navigation_get_unique_navigation_slug( $slug, $post_id = 0 ) {
+	global $wpdb;
+
+	$base_slug = $slug;
+	$suffix    = 2;
+
+	while (
+		$wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT ID FROM $wpdb->posts WHERE post_name = %s AND post_type = 'wp_navigation' AND ID != %d LIMIT 1",
+				$slug,
+				$post_id
+			)
+		)
+	) {
+		$slug = $base_slug . '-' . $suffix;
+		++$suffix;
+	}
+
+	return $slug;
+}
+
+/**
+ * Ensures Navigation Menu slugs are unique before they are stored.
+ *
+ * Draft posts can otherwise share a `post_name` and only receive a unique slug
+ * once published. Navigation blocks reference menus by the slug they are
+ * created with, so that slug has to be stable immediately.
+ *
+ * @since 7.1.0
+ *
+ * @param array $data    An array of slashed, sanitized, and processed post data.
+ * @param array $postarr An array of sanitized but otherwise unmodified post data.
+ * @return array Filtered post data.
+ */
+function block_core_navigation_ensure_unique_navigation_slug( $data, $postarr ) {
+	if ( 'wp_navigation' !== ( $data['post_type'] ?? null ) || empty( $data['post_name'] ) ) {
+		return $data;
+	}
+
+	if ( 'auto-draft' === ( $data['post_status'] ?? null ) ) {
+		return $data;
+	}
+
+	$slug = sanitize_title( $data['post_name'] );
+
+	if ( empty( $slug ) ) {
+		return $data;
+	}
+
+	$post_id = isset( $postarr['ID'] ) ? (int) $postarr['ID'] : 0;
+
+	$data['post_name'] = block_core_navigation_get_unique_navigation_slug( $slug, $post_id );
+
+	return $data;
+}
+add_filter( 'wp_insert_post_data', 'block_core_navigation_ensure_unique_navigation_slug', 10, 2 );
+
+/**
  * Returns the custom properties used by the Navigation block for a layout.
  *
  * @since 7.1.0
@@ -326,7 +393,7 @@ class WP_Navigation_Block_Renderer {
 	 * @return WP_Block_List Returns the inner blocks for the navigation block.
 	 */
 	private static function get_inner_blocks_from_navigation_post( $attributes ) {
-		$navigation_post = get_post( $attributes['ref'] );
+		$navigation_post = static::get_navigation_post( $attributes );
 		if ( ! isset( $navigation_post ) ) {
 			return new WP_Block_List( array(), $attributes );
 		}
@@ -351,6 +418,99 @@ class WP_Navigation_Block_Renderer {
 			// context which could be refined.
 			return new WP_Block_List( $blocks, $attributes );
 		}
+	}
+
+	/**
+	 * Gets the navigation post referenced by the navigation block attributes.
+	 *
+	 * A `slug` reference is portable across sites, so it takes precedence over
+	 * the site specific `ref` post ID when both are present.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param array $attributes The block attributes.
+	 * @return WP_Post|null The referenced navigation post.
+	 */
+	private static function get_navigation_post( $attributes ) {
+		if ( ! empty( $attributes['slug'] ) ) {
+			return static::get_navigation_post_by_slug( $attributes['slug'], $attributes );
+		}
+
+		if ( array_key_exists( 'ref', $attributes ) ) {
+			return get_post( $attributes['ref'] );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Gets a navigation post by slug.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string $slug       The requested navigation menu slug.
+	 * @param array  $attributes The navigation block attributes.
+	 * @return WP_Post|null The resolved navigation post.
+	 */
+	private static function get_navigation_post_by_slug( $slug, $attributes ) {
+		$slug = sanitize_title( $slug );
+
+		if ( empty( $slug ) ) {
+			return null;
+		}
+
+		$navigation_post = static::query_navigation_post_by_slug( $slug );
+
+		/**
+		 * Filters the navigation post resolved from a navigation block slug.
+		 *
+		 * The saved slug is a portability contract. Filters may resolve the
+		 * requested slug to a different menu, for multilingual or other custom
+		 * setups, but should respect that contract where possible.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param WP_Post|null $navigation_post The resolved navigation post.
+		 * @param string       $slug            The requested navigation menu slug.
+		 * @param array        $attributes      The navigation block attributes.
+		 */
+		return apply_filters(
+			'block_core_navigation_resolve_menu_by_slug',
+			$navigation_post,
+			$slug,
+			$attributes
+		);
+	}
+
+	/**
+	 * Queries a published navigation post by exact slug.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string $slug The navigation menu slug.
+	 * @return WP_Post|null The matching navigation post.
+	 */
+	private static function query_navigation_post_by_slug( $slug ) {
+		$query = new WP_Query(
+			array(
+				'post_type'              => 'wp_navigation',
+				'post_status'            => 'publish',
+				'name'                   => $slug,
+				'posts_per_page'         => 1,
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		$navigation_post = $query->have_posts() ? $query->next_post() : null;
+
+		// `name` matching is fuzzy enough that an exact check is still needed.
+		if ( ! $navigation_post || sanitize_title( $navigation_post->post_name ) !== $slug ) {
+			return null;
+		}
+
+		return $navigation_post;
 	}
 
 	/**
@@ -539,13 +699,14 @@ class WP_Navigation_Block_Renderer {
 			defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN &&
 			array_key_exists( '__unstableLocation', $attributes ) &&
 			! array_key_exists( 'ref', $attributes ) &&
+			empty( $attributes['slug'] ) &&
 			! empty( block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] ) )
 		) {
 			$inner_blocks = block_core_navigation_get_inner_blocks_from_unstable_location( $attributes );
 		}
 
 		// Load inner blocks from the navigation post.
-		if ( array_key_exists( 'ref', $attributes ) ) {
+		if ( ! empty( $attributes['slug'] ) || array_key_exists( 'ref', $attributes ) ) {
 			$inner_blocks = static::get_inner_blocks_from_navigation_post( $attributes );
 		}
 
@@ -589,8 +750,8 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		// Load the navigation post.
-		if ( array_key_exists( 'ref', $attributes ) ) {
-			$navigation_post = get_post( $attributes['ref'] );
+		if ( ! empty( $attributes['slug'] ) || array_key_exists( 'ref', $attributes ) ) {
+			$navigation_post = static::get_navigation_post( $attributes );
 			if ( ! isset( $navigation_post ) ) {
 				return $navigation_name;
 			}
