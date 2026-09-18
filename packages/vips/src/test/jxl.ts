@@ -66,7 +66,7 @@ function initCalls(): string[][] {
  *
  * @param vips The module under test.
  */
-async function runOperation( vips: typeof import('../') ) {
+async function runOperation( vips: typeof import( '../' ) ) {
 	const buffer = await new File( [ 'x' ], 'x.jpg', {
 		type: 'image/jpeg',
 	} ).arrayBuffer();
