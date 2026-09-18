@@ -8,6 +8,7 @@ import {
 } from '../../stories/shared';
 
 const meta: Meta< typeof SelectControl > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/SelectControl',
 	component: SelectControl,
 	subcomponents: {
@@ -19,6 +20,12 @@ const meta: Meta< typeof SelectControl > = {
 	},
 	argTypes: {
 		onValueChange: { action: 'onValueChange' },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 
