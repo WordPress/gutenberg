@@ -38,5 +38,24 @@ export default function latexToMathML(
 	} );
 	const doc = document.implementation.createHTMLDocument( '' );
 	doc.body.innerHTML = mathML;
-	return doc.body.querySelector( 'math' )?.innerHTML ?? '';
+	const math = doc.body.querySelector( 'math' );
+	if ( ! math ) {
+		return '';
+	}
+
+	// temml marks the cells of `aligned`, `cases` and tagged equations with
+	// classes for its own stylesheet. Write the MathML `columnalign`
+	// attribute on the cell as well, so the alignment is part of the content:
+	// Firefox and Safari honor it natively, and the polyfill in `style.scss`
+	// covers Chromium, which implements MathML Core only.
+	for ( const cell of math.querySelectorAll(
+		'mtd.tml-right, mtd.tml-left'
+	) ) {
+		cell.setAttribute(
+			'columnalign',
+			cell.classList.contains( 'tml-right' ) ? 'right' : 'left'
+		);
+	}
+
+	return math.innerHTML;
 }
