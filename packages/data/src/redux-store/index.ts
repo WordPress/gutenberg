@@ -333,9 +333,6 @@ export default function createReduxStore< State, Actions, Selectors >(
 				// in order that it can be called when fulfilling
 				// the resolver.
 				boundSelector.normalizeArgs = getNormalizeArgs( selector );
-				// Legacy name, for code that reads it off the bound selector.
-				boundSelector.__unstableNormalizeArgs =
-					boundSelector.normalizeArgs;
 
 				const resolver = resolvers[ selectorName ];
 
@@ -851,7 +848,6 @@ function mapSelectorWithResolver(
 	// Forward the normalization method so `resolveSelect` can map its own
 	// arguments the same way.
 	selectorResolver.normalizeArgs = selector.normalizeArgs;
-	selectorResolver.__unstableNormalizeArgs = selector.__unstableNormalizeArgs;
 	return selectorResolver;
 }
 

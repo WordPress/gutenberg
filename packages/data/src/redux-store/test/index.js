@@ -504,29 +504,6 @@ describe( 'normalizing args', () => {
 			'bar',
 		] );
 	} );
-
-	it( 'should expose the normalizeArgs method on the bound selector under both names', async () => {
-		const registry = createRegistry();
-		const selector = () => {};
-
-		selector.normalizeArgs = ( args ) => args;
-
-		registry.registerStore( 'store', {
-			reducer: () => {},
-			selectors: {
-				getItems: selector,
-			},
-			resolvers: {
-				getItems: () => 'items',
-			},
-		} );
-
-		const { getItems } = registry.select( 'store' );
-		expect( getItems.normalizeArgs ).toBe( selector.normalizeArgs );
-		expect( getItems.__unstableNormalizeArgs ).toBe(
-			selector.normalizeArgs
-		);
-	} );
 } );
 
 describe( 'resolution args', () => {

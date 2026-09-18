@@ -320,12 +320,6 @@ export interface BoundSelector {
 	 */
 	normalizeArgs?: ( args: any[] ) => any[];
 	/**
-	 * Optional function to normalize the arguments.
-	 *
-	 * @deprecated Use `normalizeArgs` instead.
-	 */
-	__unstableNormalizeArgs?: ( args: any[] ) => any[];
-	/**
 	 * Whether this selector is a registry selector.
 	 */
 	isRegistrySelector?: boolean;
