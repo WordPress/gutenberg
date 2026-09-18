@@ -47,15 +47,20 @@ export function ListViewContentPopover( { listViewRef } ) {
 	const hasFills = Boolean( fills && fills.length );
 
 	// Get both the selected client ID and the popover open state.
-	const { selectedClientId, isOpen } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId } = select( blockEditorStore );
-		const privateSelectors = unlock( select( blockEditorStore ) );
+	const { selectedClientId, isOpen, expandRevision } = useSelect(
+		( select ) => {
+			const { getSelectedBlockClientId } = select( blockEditorStore );
+			const privateSelectors = unlock( select( blockEditorStore ) );
 
-		return {
-			selectedClientId: getSelectedBlockClientId(),
-			isOpen: privateSelectors.isListViewContentPanelOpen(),
-		};
-	}, [] );
+			return {
+				selectedClientId: getSelectedBlockClientId(),
+				isOpen: privateSelectors.isListViewContentPanelOpen(),
+				// Re-query the anchor after the list remounts and replaces its rows.
+				expandRevision: privateSelectors.getListViewExpandRevision(),
+			};
+		},
+		[]
+	);
 
 	// Query DOM for the selected block row element in List View.
 	const [ anchorElement, setAnchorElement ] = useState( null );
@@ -74,7 +79,7 @@ export function ListViewContentPopover( { listViewRef } ) {
 		);
 
 		setAnchorElement( element );
-	}, [ selectedClientId, listViewRef ] );
+	}, [ selectedClientId, listViewRef, expandRevision ] );
 
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 	const { closeListViewContentPanel } = unlock(
