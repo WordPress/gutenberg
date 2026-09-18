@@ -89,7 +89,7 @@ For more details on when to omit or set this to `false`, see the [package guidel
 
 ### `wpScriptModuleExports`
 
-Define script module entry points. A package with script module exports can ship a `src/style.scss` like a script package; the built stylesheet is copied to `build/styles/<package>/style.css` and registered as `wp-<package>`, without dependencies.
+Define script module entry points:
 
 ```json
 {
