@@ -107,7 +107,7 @@ export function usePostTemplatePanelMode() {
 
 export function useCurrentTemplateSlug() {
 	const { postType, postId } = useEditedPostContext();
-	const templates = useTemplates( postType, postId );
+	const templates = useTemplates( postId );
 	const entityTemplate = useSelect(
 		( select ) => {
 			if ( templates?.length === 1 ) {
