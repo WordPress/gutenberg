@@ -129,8 +129,13 @@ $swatch-gap: 12px;
 * do the same, because its other controls rely on the panel's row gap, so close
 * the gap between adjacent items here instead. Grid rows are sized from the
 * item's margin box, so this pulls the item up without adding space below it.
+*
+* Two selectors because the panel is named by its group in the block inspector
+* and carries its own class in Global Styles. The inspector class also owns a
+* grid rule, so Global Styles must not borrow it.
 */
-.typography-block-support-panel {
+.typography-block-support-panel,
+.block-editor-typography-panel--flush-color-items {
 	.block-editor-color-gradient-item + .block-editor-color-gradient-item {
 		margin-top: -$grid-unit-20;
 	}

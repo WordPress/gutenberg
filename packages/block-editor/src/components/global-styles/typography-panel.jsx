@@ -202,7 +202,7 @@ export function TypographyToolsPanel( {
 			label={ __( 'Typography' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
-			className="typography-block-support-panel"
+			className="block-editor-typography-panel--flush-color-items"
 			__experimentalFirstVisibleItemClass="first"
 			dropdownMenuProps={ dropdownMenuProps }
 		>
@@ -337,11 +337,11 @@ export default function TypographyPanel( {
 				( Array.isArray( clipSetting ) &&
 					clipSetting.includes( 'text' ) );
 	/*
-	 * A text gradient is a clip, which is not emitted in a media query, so it
-	 * applies at every width. It belongs to the block's Default state, and only
-	 * that state can set or clear it. A pseudo state is different: its styles
-	 * are scoped to the selector, so a text gradient set there genuinely
-	 * applies on hover alone.
+	 * A text gradient is a clip, and clipping is treated as a property of the
+	 * block rather than of a width: the Default state's clip carries into
+	 * every breakpoint, so only that state sets or clears it. A pseudo state
+	 * does get its own, since its styles are scoped to the selector and apply
+	 * on hover alone.
 	 */
 	const isViewportState = hasViewportBlockStyleState( styleState );
 	const hasTextGradientEnabled =
