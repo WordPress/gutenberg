@@ -280,8 +280,14 @@ export function autop( text: string, br: boolean = true ): string {
 	// Optionally insert line breaks.
 	if ( br ) {
 		// Replace newlines that shouldn't be touched with a placeholder.
-		text = text.replace( /<(script|style).*?<\/\\1>/g, ( match ) =>
-			match[ 0 ].replace( /\n/g, '<WPPreserveNewline />' )
+		// Note: `[\s\S]*?` is used (instead of `.*?`) so the match can span
+		// newlines, and the backreference `\1` (not `\\1`, which would be a
+		// literal backslash followed by `1` in a regex literal) ensures the
+		// opening and closing tag names match. This mirrors the PHP
+		// `wpautop()` behavior and also protects `svg` and `math` tags.
+		text = text.replace(
+			/<(script|style|svg|math)[\s\S]*?<\/\1>/g,
+			( match ) => match.replace( /\n/g, '<WPPreserveNewline />' )
 		);
 
 		// Normalize <br>

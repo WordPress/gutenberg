@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
 import { getBlockInnerHTML } from '../serializer';
@@ -28,6 +21,7 @@ import markdownConverter from './markdown-converter';
 import iframeRemover from './iframe-remover';
 import googleDocsUIDRemover from './google-docs-uid-remover';
 import htmlFormattingRemover from './html-formatting-remover';
+import formatSpaceCorrector from './format-space-corrector';
 import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
@@ -35,7 +29,7 @@ import slackParagraphCorrector from './slack-paragraph-corrector';
 import isLatexMathMode from './latex-to-math';
 import { createBlock } from '../factory';
 import headingTransformer from './heading-transformer';
-import type { Block } from '../../types';
+import type { Block, RawHandlerOptions } from '../../types';
 
 const log = ( ...args: unknown[] ): void => window?.console?.log?.( ...args );
 
@@ -62,7 +56,11 @@ function filterInlineHTML( HTML: string ): string {
 		true
 	);
 
-	HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
+	HTML = deepFilterHTML( HTML, [
+		htmlFormattingRemover,
+		formatSpaceCorrector,
+		brRemover,
+	] );
 
 	// Allows us to ask for this information when we get a report.
 	log( 'Processed inline HTML:\n\n', HTML );
@@ -89,12 +87,7 @@ export function pasteHandler( {
 	plainText = '',
 	mode = 'AUTO',
 	tagName,
-}: {
-	HTML?: string;
-	plainText?: string;
-	mode?: 'AUTO' | 'INLINE' | 'BLOCKS';
-	tagName?: string;
-} ): Block[] | string {
+}: RawHandlerOptions ): Block[] | string {
 	// Allows us to ask for this information when we get a report.
 	log( 'Received HTML (pasteHandler):\n\n', HTML );
 	log( 'Received plain text (pasteHandler):\n\n', plainText );
@@ -231,7 +224,12 @@ export function pasteHandler( {
 			piece = normaliseBlocks( piece );
 			piece = deepFilterHTML(
 				piece,
-				[ htmlFormattingRemover, brRemover, emptyParagraphRemover ],
+				[
+					htmlFormattingRemover,
+					formatSpaceCorrector,
+					brRemover,
+					emptyParagraphRemover,
+				],
 				blockContentSchema
 			);
 

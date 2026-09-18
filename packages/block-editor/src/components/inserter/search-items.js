@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import removeAccents from 'remove-accents';
 import { noCase } from 'change-case';
 

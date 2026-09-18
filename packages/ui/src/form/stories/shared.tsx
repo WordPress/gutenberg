@@ -1,4 +1,37 @@
+import type { Decorator } from '@storybook/react-vite';
 import { Link } from '../..';
+import { Button } from '../../button';
+
+export const formDecorator: Decorator = ( Story ) => (
+	<form
+		style={ {
+			fontFamily: 'sans-serif',
+			display: 'flex',
+			flexDirection: 'column',
+			alignItems: 'flex-start',
+			gap: 16,
+		} }
+		onSubmit={ ( event ) => {
+			event.preventDefault();
+			// eslint-disable-next-line no-alert
+			alert( 'Form submitted!' );
+		} }
+	>
+		<div
+			style={ {
+				display: 'flex',
+				flexDirection: 'column',
+				gap: 16,
+				alignItems: 'stretch',
+				width: 300,
+			} }
+		>
+			<Story />
+		</div>
+
+		<Button type="submit">Submit</Button>
+	</form>
+);
 
 export const WITH_DETAILS_DESCRIPTION = `\
 To add rich content (such as links) to the description, use the \`details\` prop.
@@ -19,3 +52,22 @@ export const DETAILS_EXAMPLE = (
 		and other semantic elements.
 	</>
 );
+
+export const POPUP_WIDTH_STORY_CONTAINER_WIDTH = 248;
+
+export const narrowContainerDecorator: Decorator = ( Story ) => (
+	<div style={ { width: POPUP_WIDTH_STORY_CONTAINER_WIDTH } }>
+		<Story />
+	</div>
+);
+
+export const longLabelPopupItems = [
+	{
+		value: 'short',
+		label: 'Short label',
+	},
+	{
+		value: 'long',
+		label: 'Hippopotomonstrosesquipedaliophobia',
+	},
+];

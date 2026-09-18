@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	DndContext,
 	DragOverlay,
@@ -10,16 +7,11 @@ import {
 	useSensors,
 } from '@dnd-kit/core';
 import {
-	arrayMove,
 	SortableContext,
 	sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import type { DragMoveEvent, DragStartEvent } from '@dnd-kit/core';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useResizeObserver, useEvent, useMergeRefs } from '@wordpress/compose';
 import {
 	forwardRef,
@@ -31,23 +23,29 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { GridItem } from './grid-item';
+import { arrayMoveWithPinned } from '../shared/array-move-with-pinned';
 import { GridOverlay } from '../shared/grid-overlay';
-import { gridSpanToPixelSize } from '../shared/resize-snap';
+import { clampSpan, gridSpanToPixelSize } from '../shared/resize-snap';
+import { useResizePixelLimits, useSpanBounds } from '../shared/use-span-bounds';
 import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
+import { ItemExitOverlay } from '../shared/item-exit-overlay';
 import {
 	getLayoutFingerprint,
 	useLayoutShiftAnimation,
 } from '../shared/use-layout-shift-animation';
+import { useItemExitAnimation } from '../shared/use-item-exit-animation';
 import { resolveFillWidths } from './resolve-fill-widths';
 import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
 import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
+import { createDashboardDragDropAnimation } from '../shared/drag-overlay-drop-animation';
 import styles from './grid.module.css';
+
+const dashboardDragDropAnimation = createDashboardDragDropAnimation(
+	styles[ 'drag-preview-frame' ],
+	styles[ 'is-exiting' ]
+);
 
 // Fallback gap in pixels for math that runs before the computed gap
 // can be read from the DOM. Matches the `'xl'` step the surface
@@ -110,6 +108,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			style,
 			rowHeight = 'auto',
 			minColumnWidth,
+			itemLimits,
 			editMode = false,
 			onChangeLayout,
 			onPreviewLayout,
@@ -156,7 +155,9 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			height: number;
 		} | null >( null );
 		const captureLayoutSnapshotRef = useRef< () => void >( () => {} );
-		const activeLayout = temporaryLayout ?? layout;
+		const childrenCacheRef = useRef< Map< string, React.ReactElement > >(
+			new Map()
+		);
 
 		const [ gridRoot, setGridRoot ] = useState< HTMLDivElement | null >(
 			null
@@ -224,8 +225,60 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const minResizeHeightPx =
 			rowHeightPx === null
 				? undefined
-				: gridSpanToPixelSize( 1, 1, columnWidth, gapPx, rowHeightPx )
-						.heightPx ?? undefined;
+				: ( gridSpanToPixelSize( 1, 1, columnWidth, gapPx, rowHeightPx )
+						.heightPx ?? undefined );
+
+		const spanBoundsByKey = useSpanBounds(
+			itemLimits,
+			columnWidth,
+			gapPx,
+			rowHeightPx,
+			effectiveColumns
+		);
+		const resizeLimitsByKey = useResizePixelLimits(
+			spanBoundsByKey,
+			columnWidth,
+			gapPx,
+			rowHeightPx
+		);
+
+		// Stored and in-gesture layouts may sit outside an item's limits;
+		// render them bounded while the data stays untouched. Gestures
+		// commit from the stored `layout`, never from this bounded view,
+		// so a bounded span cannot reach `onChangeLayout`. Keeps the
+		// source identity when no item needs bounding.
+		const sourceLayout = temporaryLayout ?? layout;
+		const activeLayout = useMemo( () => {
+			if ( spanBoundsByKey.size === 0 ) {
+				return sourceLayout;
+			}
+			let changed = false;
+			const bounded = sourceLayout.map( ( item ) => {
+				const bounds = spanBoundsByKey.get( item.key );
+				if ( ! bounds ) {
+					return item;
+				}
+				const width =
+					typeof item.width === 'number'
+						? clampSpan(
+								item.width,
+								bounds.minWidth,
+								bounds.maxWidth
+							)
+						: item.width;
+				const height = clampSpan(
+					item.height ?? 1,
+					bounds.minHeight,
+					bounds.maxHeight
+				);
+				if ( width === item.width && height === ( item.height ?? 1 ) ) {
+					return item;
+				}
+				changed = true;
+				return { ...item, width, height };
+			} );
+			return changed ? bounded : sourceLayout;
+		}, [ sourceLayout, spanBoundsByKey ] );
 
 		const layoutMap = useMemo( () => {
 			const map = new Map< string, DashboardGridLayoutItem >();
@@ -262,12 +315,14 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		);
 		const items = sortedItems;
 
-		// Resolve `width: 'fill'` items to concrete column spans.
+		// Resolve `width: 'fill'` items to concrete column spans; the
+		// resolver plans the row around each fill's span bounds.
 		const resolvedItemMap = useMemo( () => {
 			const fillWidths = resolveFillWidths(
 				items,
 				layoutMap,
-				effectiveColumns
+				effectiveColumns,
+				spanBoundsByKey
 			);
 			if ( fillWidths.size === 0 ) {
 				return layoutMap;
@@ -281,40 +336,60 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				);
 			}
 			return map;
-		}, [ items, layoutMap, effectiveColumns ] );
+		}, [ items, layoutMap, effectiveColumns, spanBoundsByKey ] );
 
-		const [ childrenMap, actionableAreaMap, remaining ] = useMemo( () => {
-			const childMap = new Map< string, React.ReactElement >();
-			const actionableMap = new Map< string, React.ReactNode >();
-			const rest: React.ReactNode[] = [];
+		const [ childrenMap, actionableAreaMap, remaining, renderedByKey ] =
+			useMemo( () => {
+				const childMap = new Map< string, React.ReactElement >();
+				const actionableMap = new Map< string, React.ReactNode >();
+				const rest: React.ReactNode[] = [];
+				const byKey = new Map< string, React.ReactElement >();
 
-			Children.forEach( children, ( child ) => {
-				if ( ! isValidElement( child ) ) {
-					rest.push( child );
-					return;
-				}
-
-				const key = child.key?.toString();
-				if ( key && layoutKeys.has( key ) ) {
-					// Lift `actionableArea` to a grid slot; strip it
-					// from the child so it does not leak to the DOM.
-					const { actionableArea } = child.props;
-					if ( actionableArea !== undefined ) {
-						actionableMap.set( key, actionableArea );
-						childMap.set(
-							key,
-							cloneElement( child, { actionableArea: undefined } )
-						);
-					} else {
-						childMap.set( key, child );
+				Children.forEach( children, ( child ) => {
+					if ( ! isValidElement( child ) ) {
+						rest.push( child );
+						return;
 					}
-				} else {
-					rest.push( child );
-				}
-			} );
 
-			return [ childMap, actionableMap, rest ];
-		}, [ children, layoutKeys ] );
+					const key = child.key?.toString();
+					if ( ! key ) {
+						rest.push( child );
+						return;
+					}
+
+					// Strip `actionableArea` so it does not leak to the DOM;
+					// the grid lifts it to a slot separately.
+					const { actionableArea } = child.props;
+					const stripped =
+						actionableArea !== undefined
+							? cloneElement( child, {
+									actionableArea: undefined,
+								} )
+							: child;
+
+					byKey.set( key, stripped );
+
+					if ( layoutKeys.has( key ) ) {
+						if ( actionableArea !== undefined ) {
+							actionableMap.set( key, actionableArea );
+						}
+						childMap.set( key, stripped );
+					} else {
+						rest.push( child );
+					}
+				} );
+
+				return [ childMap, actionableMap, rest, byKey ];
+			}, [ children, layoutKeys ] );
+
+		// Persist the latest rendered children so a removed tile's content
+		// is still available for its exit overlay. Filled from an effect so a
+		// discarded render never writes to the cache.
+		useLayoutEffect( () => {
+			for ( const [ key, child ] of renderedByKey ) {
+				childrenCacheRef.current.set( key, child );
+			}
+		}, [ renderedByKey ] );
 
 		const sensors = useSensors(
 			useSensor( PointerSensor ),
@@ -383,11 +458,27 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				return;
 			}
 
-			const updatedItems = arrayMove( items, currentIndex, newIndex );
-			const updatedLayout = activeLayout.map( ( item ) => ( {
-				...item,
-				order: updatedItems.indexOf( item.key ),
-			} ) );
+			// Non-draggable items are pinned: they hold their index while
+			// the others reorder around them.
+			const updatedItems = arrayMoveWithPinned(
+				items,
+				currentIndex,
+				newIndex,
+				( key ) => layoutMap.get( key )?.draggable === false
+			);
+			if (
+				updatedItems.every( ( key, index ) => key === items[ index ] )
+			) {
+				return;
+			}
+			// Commit from the stored layout (or the pending commit), not
+			// the bounded view, so untouched tiles keep their stored spans.
+			const updatedLayout = ( latestLayoutRef.current ?? layout ).map(
+				( item ) => ( {
+					...item,
+					order: updatedItems.indexOf( item.key ),
+				} )
+			);
 
 			lastReorderCursorRef.current = {
 				x: activeCenterX,
@@ -438,16 +529,15 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			// with the live (already mutated) `activeLayout` width would
 			// compound and oscillate — and stepping back through the
 			// zero-delta zone would never restore the original size.
+			const bounds = spanBoundsByKey.get( id );
 			if ( ! resizeBaselineRef.current ) {
-				const baseItem = activeLayout.find(
-					( item ) => item.key === id
-				);
+				const baseItem = layoutMap.get( id );
 				const resolvedItem = resolvedItemMap.get( id );
 				// `'fill'`/`'full'` resize from the rendered span
 				// and convert to a numeric width.
 				let baseWidth: number;
 				if ( baseItem?.width === 'full' ) {
-					baseWidth = effectiveColumns;
+					baseWidth = bounds?.maxWidth ?? effectiveColumns;
 				} else if ( baseItem?.width === 'fill' ) {
 					baseWidth =
 						typeof resolvedItem?.width === 'number'
@@ -462,16 +552,15 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				};
 			}
 			const baseline = resizeBaselineRef.current;
-			const newWidth = Math.max(
-				1,
-				Math.min(
-					baseline.width + relativeDelta.width,
-					effectiveColumns
-				)
+			const newWidth = clampSpan(
+				baseline.width + relativeDelta.width,
+				bounds?.minWidth ?? 1,
+				bounds?.maxWidth ?? effectiveColumns
 			);
-			const newHeight = Math.max(
-				1,
-				baseline.height + relativeDelta.height
+			const newHeight = clampSpan(
+				baseline.height + relativeDelta.height,
+				bounds?.minHeight ?? 1,
+				bounds?.maxHeight ?? Infinity
 			);
 
 			setResizeSnapPreview( {
@@ -492,8 +581,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			const pendingItem = latestLayoutRef.current?.find(
 				( item ) => item.key === id
 			);
-			const currentItem =
-				pendingItem ?? activeLayout.find( ( item ) => item.key === id );
+			const currentItem = pendingItem ?? layoutMap.get( id );
 			if (
 				currentItem &&
 				currentItem.width === newWidth &&
@@ -502,10 +590,14 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				return;
 			}
 
-			const updatedLayout = activeLayout.map( ( item ) =>
-				item.key === id
-					? { ...item, width: newWidth, height: newHeight }
-					: item
+			// Commit from the stored layout (or the pending commit), not
+			// the bounded view: the resized tile takes its new span and
+			// every other tile keeps its stored one.
+			const updatedLayout = ( latestLayoutRef.current ?? layout ).map(
+				( item ) =>
+					item.key === id
+						? { ...item, width: newWidth, height: newHeight }
+						: item
 			);
 
 			latestLayoutRef.current = updatedLayout;
@@ -525,25 +617,23 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const dragOverlayContent =
 			activeId && activeClone ? (
 				<div className={ styles[ 'drag-preview-frame' ] }>
-					{ DragPreview ? (
-						<DragPreview itemId={ activeId }>
-							{ activeClone }
-						</DragPreview>
-					) : (
-						activeClone
-					) }
+					<div className={ styles[ 'drag-preview-frame__lift' ] }>
+						{ DragPreview ? (
+							<DragPreview itemId={ activeId }>
+								{ activeClone }
+							</DragPreview>
+						) : (
+							activeClone
+						) }
+					</div>
 				</div>
 			) : null;
 
-		// Edit-mode background visual. Default paints row-marker tiles
-		// per column; a consumer can replace it via `renderGridOverlay`
-		// while reusing the resolved column count, row height, and row
-		// count. `'auto'` collapses to `undefined` for the overlay so
-		// row markers are omitted when the row height is content-driven.
-		// Rendered unconditionally so the overlay can cross-fade on
-		// edit-mode toggles; `isActive` drives the opacity transition
-		// inside the overlay. Memoized so drag/resize re-renders skip
-		// reconciliation while inputs are stable.
+		// Edit-mode background. Rendered unconditionally so it can
+		// cross-fade on edit-mode toggles (`isActive` drives the
+		// transition); memoized so drag/resize re-renders skip it while
+		// inputs are stable. A numeric `rowHeight` adds row markers;
+		// `'auto'` collapses to `undefined` and omits them.
 		const Overlay = renderGridOverlay ?? GridOverlay;
 		const overlayRowHeight =
 			typeof rowHeight === 'number' ? rowHeight : undefined;
@@ -575,20 +665,28 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			]
 		);
 
-		const layoutAnimating =
-			editMode && ( isResizing || temporaryLayout !== undefined );
 		const layoutFingerprint = useMemo(
 			() => getLayoutFingerprint( [ ...resolvedItemMap.values() ] ),
 			[ resolvedItemMap ]
 		);
 		const excludeLayoutAnimationKey =
 			activeId ?? ( isResizing ? resizeSnapPreview?.id : null );
-		const { captureLayoutSnapshot } = useLayoutShiftAnimation( {
+		const { captureLayoutSnapshot, getPositionsBeforeLastChange } =
+			useLayoutShiftAnimation( {
+				container: gridRoot,
+				enabled: editMode,
+				layoutFingerprint,
+				excludeItemKey: excludeLayoutAnimationKey,
+			} );
+		const { exitingItems, clearExitingItem } = useItemExitAnimation( {
 			container: gridRoot,
-			enabled: layoutAnimating,
-			layoutFingerprint,
-			excludeItemKey: excludeLayoutAnimationKey,
+			enabled: editMode,
+			layoutKeys,
+			getPositionsBeforeLastChange,
+			childrenCacheRef,
 		} );
+		// Transform transitions on tiles for FLIP (drag, resize, removal).
+		const layoutAnimating = editMode;
 		useLayoutEffect( () => {
 			captureLayoutSnapshotRef.current = captureLayoutSnapshot;
 		}, [ captureLayoutSnapshot ] );
@@ -601,8 +699,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				onDragMove={ handleDragMove }
 				onDragEnd={ () => {
 					persistTemporaryLayout();
-					setActiveId( null );
 					lastReorderCursorRef.current = null;
+					setActiveId( null );
 				} }
 			>
 				{ /* No-op strategy: reorder comes from `temporaryLayout`
@@ -626,38 +724,75 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 						} }
 					>
 						{ gridOverlay }
-						{ items.map( ( id ) => (
-							<GridItem
-								key={ id }
-								item={
-									resolvedItemMap.get(
+						{ items.map( ( id ) => {
+							const limitsPx = resizeLimitsByKey.get( id );
+							return (
+								<GridItem
+									key={ id }
+									item={
+										resolvedItemMap.get(
+											id
+										) as DashboardGridLayoutItem
+									}
+									maxColumns={
+										spanBoundsByKey.get( id )?.maxWidth ??
+										effectiveColumns
+									}
+									disabled={ ! editMode }
+									draggable={
+										layoutMap.get( id )?.draggable !== false
+									}
+									resizable={
+										layoutMap.get( id )?.resizable !== false
+									}
+									verticalResizable={ rowHeight !== 'auto' }
+									interacting={
+										activeId !== null || isResizing
+									}
+									dragging={ activeId !== null }
+									onResize={ handleResize }
+									onResizeEnd={ persistTemporaryLayout }
+									resizeSnapPreview={
+										resizeSnapPreview?.id === id
+											? resizeSnapPreview.snap
+											: null
+									}
+									minResizeWidthPx={
+										limitsPx?.minWidthPx ?? minResizeWidthPx
+									}
+									minResizeHeightPx={
+										limitsPx?.minHeightPx ??
+										minResizeHeightPx
+									}
+									maxResizeWidthPx={ limitsPx?.maxWidthPx }
+									maxResizeHeightPx={
+										limitsPx?.maxHeightPx ?? undefined
+									}
+									actionableArea={ actionableAreaMap.get(
 										id
-									) as DashboardGridLayoutItem
-								}
-								maxColumns={ effectiveColumns }
-								disabled={ ! editMode }
-								verticalResizable={ rowHeight !== 'auto' }
-								interacting={ activeId !== null || isResizing }
-								dragging={ activeId !== null }
-								onResize={ handleResize }
-								onResizeEnd={ persistTemporaryLayout }
-								resizeSnapPreview={
-									resizeSnapPreview?.id === id
-										? resizeSnapPreview.snap
-										: null
-								}
-								minResizeWidthPx={ minResizeWidthPx }
-								minResizeHeightPx={ minResizeHeightPx }
-								actionableArea={ actionableAreaMap.get( id ) }
-								renderResizeHandle={ renderResizeHandle }
-							>
-								{ childrenMap.get( id ) }
-							</GridItem>
-						) ) }
+									) }
+									renderResizeHandle={ renderResizeHandle }
+								>
+									{ childrenMap.get( id ) }
+								</GridItem>
+							);
+						} ) }
 						{ remaining }
+						{ exitingItems.map( ( { key, rect, child } ) => (
+							<ItemExitOverlay
+								key={ `exiting-${ key }` }
+								itemKey={ key }
+								rect={ rect }
+								onAnimationEnd={ () => clearExitingItem( key ) }
+							>
+								{ child }
+							</ItemExitOverlay>
+						) ) }
 					</div>
 				</SortableContext>
-				<DragOverlay>{ dragOverlayContent }</DragOverlay>
+				<DragOverlay dropAnimation={ dashboardDragDropAnimation }>
+					{ dragOverlayContent }
+				</DragOverlay>
 			</DndContext>
 		);
 	}

@@ -5,15 +5,7 @@
  * context. The @wordpress/worker-threads library handles the RPC
  * communication with the main thread.
  */
-
-/**
- * External dependencies
- */
 import { expose } from '@wordpress/worker-threads';
-
-/**
- * Internal dependencies
- */
 import {
 	cancelOperations,
 	convertImageFormat,
@@ -21,7 +13,8 @@ import {
 	resizeImage,
 	rotateImage,
 	hasTransparency,
-} from './index';
+	getUltraHdrInfo,
+} from './index.ts';
 
 /**
  * The API object that exposes all vips functions to the main thread.
@@ -33,6 +26,7 @@ const api = {
 	resizeImage,
 	rotateImage,
 	hasTransparency,
+	getUltraHdrInfo,
 };
 
 expose( api );

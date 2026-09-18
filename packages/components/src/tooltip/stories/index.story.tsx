@@ -1,21 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { shortcutAriaLabel } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import Tooltip from '..';
 import Button from '../../button';
 
 const meta: Meta< typeof Tooltip > = {
-	tags: [ 'manifest' ],
 	title: 'Components/Overlays/Tooltip',
 	id: 'components-tooltip',
 	component: Tooltip,
@@ -38,8 +26,9 @@ const meta: Meta< typeof Tooltip > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'recommended',
+			status: 'not-recommended',
 			whereUsed: 'global',
+			notes: 'Use [`Tooltip`](?path=/docs/design-system-components-tooltip--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };

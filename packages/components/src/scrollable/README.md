@@ -1,10 +1,8 @@
 # Scrollable
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
-`Scrollable` is a layout component that content in a scrollable container.
+`Scrollable` is a layout component that puts content in a scrollable container.
 
 ## Usage
 

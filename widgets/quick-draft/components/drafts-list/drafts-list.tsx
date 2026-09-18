@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { DataViews, type Field, type View } from '@wordpress/dataviews';
@@ -8,13 +5,13 @@ import { dateI18n, getSettings, humanTimeDiff } from '@wordpress/date';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-import { postFeaturedImage, trash } from '@wordpress/icons';
-import { IconButton, Link, Stack, Text, Icon } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
+import {
+	drafts as draftsIcon,
+	postFeaturedImage,
+	trash,
+} from '@wordpress/icons';
+import { EmptyState, IconButton, Link, Stack, Text, Icon } from '@wordpress/ui';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import styles from './drafts-list.module.css';
 
 type FeaturedMedia = {
@@ -27,7 +24,12 @@ type FeaturedMedia = {
 type DraftPost = {
 	id: number;
 	title: { rendered: string };
-	date: string;
+	/*
+	 * The REST schema allows a null date. A draft created through the UI
+	 * always has one, but a record inserted without `post_date` does not, and
+	 * both date helpers below would render a bogus relative time for it.
+	 */
+	date: string | null;
 	_embedded?: {
 		'wp:featuredmedia'?: FeaturedMedia[];
 	};
@@ -84,7 +86,7 @@ function DraftThumbnail( { post }: { post: DraftPost } ) {
 	if ( url ) {
 		return (
 			<img
-				className={ styles.thumbImage }
+				className={ styles[ 'thumb-image' ] }
 				src={ url }
 				alt=""
 				loading="lazy"
@@ -93,7 +95,7 @@ function DraftThumbnail( { post }: { post: DraftPost } ) {
 	}
 
 	return (
-		<div className={ styles.thumbPlaceholder } aria-hidden="true">
+		<div className={ styles[ 'thumb-placeholder' ] } aria-hidden="true">
 			<Icon icon={ postFeaturedImage } />
 		</div>
 	);
@@ -115,12 +117,12 @@ function DraftTitle( {
 			align="center"
 			justify="space-between"
 			gap="sm"
-			className={ styles.titleRow }
+			className={ styles[ 'title-row' ] }
 		>
 			<Link
 				href={ getEditUrl( post.id ) }
 				openInNewTab
-				className={ styles.titleLink }
+				className={ styles[ 'title-link' ] }
 			>
 				{ title }
 			</Link>
@@ -137,6 +139,10 @@ function DraftTitle( {
 }
 
 function DraftDate( { post }: { post: DraftPost } ) {
+	if ( ! post.date ) {
+		return null;
+	}
+
 	const fullDate = dateI18n( getSettings().formats.datetime, post.date );
 
 	return (
@@ -161,9 +167,7 @@ export function DraftsList() {
 	const { drafts, isLoading } = useSelect( ( select ) => {
 		const { getEntityRecords, hasFinishedResolution } =
 			select( coreDataStore );
-		const records = getEntityRecords( 'postType', 'post', DRAFTS_QUERY ) as
-			| DraftPost[]
-			| null;
+		const records = getEntityRecords( 'postType', 'post', DRAFTS_QUERY );
 
 		return {
 			drafts: records ?? [],
@@ -216,7 +220,7 @@ export function DraftsList() {
 
 	return (
 		<Stack direction="column" className={ styles.root }>
-			<Text variant="heading-md" className={ styles.titleHeader }>
+			<Text variant="heading-md" className={ styles[ 'title-header' ] }>
 				{ __( 'Your recent drafts' ) }
 			</Text>
 
@@ -229,7 +233,14 @@ export function DraftsList() {
 				isLoading={ isLoading }
 				paginationInfo={ { totalItems: drafts.length, totalPages: 1 } }
 				defaultLayouts={ DEFAULT_LAYOUTS }
-				empty={ __( 'No drafts yet.' ) }
+				empty={
+					<EmptyState.Root>
+						<EmptyState.Icon icon={ draftsIcon } />
+						<EmptyState.Description>
+							{ __( 'No drafts yet.' ) }
+						</EmptyState.Description>
+					</EmptyState.Root>
+				}
 			>
 				<DataViews.Layout />
 			</DataViews>

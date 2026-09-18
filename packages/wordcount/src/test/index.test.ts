@@ -1,7 +1,4 @@
-/**
- * Internal dependencies
- */
-
+import { describe, expect, test } from 'vitest';
 import { count } from '../';
 import type { UserSettings, Strategy } from '../types';
 

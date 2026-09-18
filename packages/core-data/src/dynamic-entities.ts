@@ -1,12 +1,10 @@
-/**
- * Internal dependencies
- */
+import type { ThunkArgs } from '@wordpress/data';
 import type { GetRecordsHttpQuery, State } from './selectors';
 import type * as ET from './entity-types';
 
 export type WPEntityTypes< C extends ET.Context = 'edit' > = {
 	Comment: ET.Comment< C >;
-	GlobalStyles: ET.GlobalStylesRevision< C >;
+	GlobalStyles: ET.GlobalStyles< C >;
 	Media: ET.Attachment< C >;
 	Menu: ET.NavMenu< C >;
 	MenuItem: ET.NavMenuItem< C >;
@@ -39,12 +37,12 @@ export type WPEntityTypes< C extends ET.Context = 'edit' > = {
 type PluralizeEntity< T extends string > = T extends 'GlobalStyles'
 	? never
 	: T extends 'Media'
-	? 'MediaItems'
-	: T extends 'Status'
-	? 'Statuses'
-	: T extends `${ infer U }y`
-	? `${ U }ies`
-	: `${ T }s`;
+		? 'MediaItems'
+		: T extends 'Status'
+			? 'Statuses'
+			: T extends `${ infer U }y`
+				? `${ U }ies`
+				: `${ T }s`;
 
 /**
  * A simple utility that singularizes a string.
@@ -58,12 +56,12 @@ type PluralizeEntity< T extends string > = T extends 'GlobalStyles'
 type SingularizeEntity< T extends string > = T extends 'MediaItems'
 	? 'Media'
 	: T extends 'Statuses'
-	? 'Status'
-	: T extends `${ infer U }ies`
-	? `${ U }y`
-	: T extends `${ infer U }s`
-	? U
-	: T;
+		? 'Status'
+		: T extends `${ infer U }ies`
+			? `${ U }y`
+			: T extends `${ infer U }s`
+				? U
+				: T;
 
 export type SingularGetters = {
 	[ Key in `get${ keyof WPEntityTypes }` ]: (
@@ -90,13 +88,23 @@ type ActionOptions = {
 
 type DeleteRecordsHttpQuery = Record< string, any >;
 
+/**
+ * Typed as thunks, like the runtime wrappers in `index.js`, so dispatching
+ * resolves to a single Promise instead of `Promise< Promise< ... > >`.
+ */
 export type SaveActions = {
 	[ Key in `save${ keyof WPEntityTypes }` ]: (
-		data: Partial<
-			WPEntityTypes[ Key extends `save${ infer E }` ? E : never ]
-		>,
+		data: Key extends 'saveGlobalStyles'
+			? ET.GlobalStylesUpdate
+			: Partial<
+					WPEntityTypes[ Key extends `save${ infer E }` ? E : never ]
+				>,
 		options?: ActionOptions
-	) => Promise< void >;
+	) => (
+		thunkArgs: ThunkArgs
+	) => Promise<
+		WPEntityTypes[ Key extends `save${ infer E }` ? E : never ] | undefined
+	>;
 };
 
 export type DeleteActions = {
@@ -104,7 +112,17 @@ export type DeleteActions = {
 		id: number | string,
 		query?: DeleteRecordsHttpQuery,
 		options?: ActionOptions
-	) => Promise< void >;
+	) => ( thunkArgs: ThunkArgs ) => Promise<
+		| WPEntityTypes[ Key extends `delete${ infer E }` ? E : never ]
+		| {
+				deleted: true;
+				previous: WPEntityTypes[ Key extends `delete${ infer E }`
+					? E
+					: never ];
+		  }
+		| false
+		| undefined
+	>;
 };
 
 export let dynamicActions: SaveActions & DeleteActions;

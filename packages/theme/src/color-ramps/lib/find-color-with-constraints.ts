@@ -1,8 +1,8 @@
 import { get, OKLCH, type PlainColorObject } from 'colorjs.io/fn';
-import { solveWithBisect } from './utils';
-import { WHITE, BLACK, CONTRAST_EPSILON } from './constants';
-import { clampToGamut, getContrast } from './color-utils';
-import { type TaperChromaOptions, taperChroma } from './taper-chroma';
+import { solveWithBisect } from './utils.ts';
+import { WHITE, BLACK, CONTRAST_EPSILON } from './constants.ts';
+import { clampToGamut, getContrast } from './color-utils.ts';
+import { createChromaTaper, type TaperChromaOptions } from './taper-chroma.ts';
 
 /**
  * Difference of contrast values that grows linearly with the Y luminance.
@@ -60,13 +60,18 @@ export function findColorMeetingRequirements(
 			achieved: 1,
 		};
 	}
+	const seedChroma = get( seed, [ OKLCH, 'c' ] );
+	const seedHue = get( seed, [ OKLCH, 'h' ] );
+	const taperChromaAtLightness = taperChromaOptions
+		? createChromaTaper( seed, taperChromaOptions )
+		: undefined;
 
 	function getColorForL( l: number ): PlainColorObject {
 		let newL = l;
-		let newC = get( seed, [ OKLCH, 'c' ] );
+		let newC = seedChroma;
 
-		if ( taperChromaOptions ) {
-			const tapered = taperChroma( seed, newL, taperChromaOptions );
+		if ( taperChromaAtLightness ) {
+			const tapered = taperChromaAtLightness( newL );
 			// taperChroma returns either { l, c } or a ColorObject
 			if ( 'l' in tapered && 'c' in tapered ) {
 				newL = tapered.l;
@@ -79,7 +84,7 @@ export function findColorMeetingRequirements(
 
 		return clampToGamut( {
 			space: OKLCH,
-			coords: [ newL, newC, get( seed, [ OKLCH, 'h' ] ) ],
+			coords: [ newL, newC, seedHue ],
 			alpha: seed.alpha,
 		} );
 	}
