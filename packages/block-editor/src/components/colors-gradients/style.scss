@@ -215,7 +215,9 @@ $swatch-gap: 12px;
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	fill: $gray-700;
+	// The caution icon is stroked rather than filled, so it takes its colour
+	// from `currentColor`. Match the disabled toggle's label.
+	color: $gray-600;
 }
 
 // Icon-only "Low contrast" warning shown to the right of the color
