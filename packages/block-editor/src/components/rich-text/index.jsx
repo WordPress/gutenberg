@@ -204,14 +204,14 @@ function RichTextWrapper(
 						/* translators: %s: connected field label or source label */
 						__( 'Add %s' ),
 						bindingKey
-				  );
+					);
 			const _bindingsLabel = _disableBoundBlock
 				? relatedBinding?.args?.key || blockBindingsSource?.label
 				: sprintf(
 						/* translators: %s: source label or key */
 						__( 'Empty %s; start writing to edit its value' ),
 						relatedBinding?.args?.key || blockBindingsSource?.label
-				  );
+					);
 
 			return {
 				disableBoundBlock: _disableBoundBlock,
@@ -363,7 +363,10 @@ function RichTextWrapper(
 	useLayoutEffect( () => {
 		const element = anchorRef.current;
 
-		if ( ! isSelected || ! element ) {
+		// A pointer press outside the field makes it non editable until the
+		// release (see rich text's preventFocusCapture). Focusing it then
+		// makes the block focus handler drop the text selection.
+		if ( ! isSelected || element?.contentEditable !== 'true' ) {
 			return;
 		}
 
