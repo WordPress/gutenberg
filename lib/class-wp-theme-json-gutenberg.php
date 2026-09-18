@@ -3187,13 +3187,16 @@ class WP_Theme_JSON_Gutenberg {
 				'value' => $value,
 			);
 
-			// When background-clip is set, add vendor-prefixed properties for
-			// cross-browser support. For 'text', this clips the background to
-			// the text and makes it visible via transparent fill. For box-model
-			// values, only the fill color is reset, to cancel any inherited
-			// text gradient. `-webkit-background-clip` is an alias of
-			// `background-clip` in Chromium, so resetting it there would
-			// discard the value set above.
+			/*
+			 * When background-clip is set, add vendor-prefixed properties for
+			 * cross-browser support. For 'text', this clips the background to
+			 * the text and makes it visible via transparent fill. For box-model
+			 * values, only the fill color is reset, to cancel any inherited
+			 * text gradient. `-webkit-background-clip` is an alias of
+			 * `background-clip` in Chromium, so resetting it there would
+			 * discard the value set above. Values outside the set the style
+			 * engine accepts get neither, so a typo cannot reset the fill color.
+			 */
 			if ( 'background-clip' === $css_property ) {
 				if ( 'text' === $value ) {
 					$declarations[] = array(
@@ -3204,7 +3207,7 @@ class WP_Theme_JSON_Gutenberg {
 						'name'  => '-webkit-text-fill-color',
 						'value' => 'transparent',
 					);
-				} else {
+				} elseif ( in_array( $value, array( 'border-box', 'padding-box', 'content-box' ), true ) ) {
 					$declarations[] = array(
 						'name'  => '-webkit-text-fill-color',
 						'value' => 'currentColor',
