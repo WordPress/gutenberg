@@ -10,7 +10,8 @@
 		"gutenberg",
 		"monorepo",
 		"config",
-		"typescript"
+		"typescript",
+		"patches"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/monorepo",
 	"repository": {
@@ -36,6 +37,8 @@
 		"access": "public"
 	},
 	"scripts": {
-		"list-experimental-apis": "node scripts/list-experimental-apis.mts"
+		"apply-patches": "node ./patching/index.ts apply",
+		"list-experimental-apis": "node scripts/list-experimental-apis.mts",
+		"patch": "node ./patching/index.ts"
 	}
 }
