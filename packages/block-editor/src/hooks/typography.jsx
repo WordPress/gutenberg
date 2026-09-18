@@ -121,13 +121,24 @@ function attributesToStyle( attributes ) {
 				? 'var:preset|text-shadow|' + attributes.textShadow
 				: attributes.style?.typography?.textShadow,
 		},
+		// Read only, so the panel can tell a text gradient would clip the
+		// block's background away. A gradient has three homes: the `gradient`
+		// attribute for a preset, `color.gradient` for a custom one set before
+		// the background support existed, and `background.gradient` since.
+		// `onChange` puts back whatever the block actually had.
+		background: {
+			...attributes.style?.background,
+			gradient: attributes.gradient
+				? 'var:preset|gradient|' + attributes.gradient
+				: ( attributes.style?.background?.gradient ??
+					attributes.style?.color?.gradient ),
+		},
 		color: {
 			...attributes.style?.color,
 			text: attributes.textColor
 				? 'var:preset|color|' + attributes.textColor
 				: attributes.style?.color?.text,
-			// Read only, so the panel can tell a text gradient would clip the
-			// block's background away. `styleToAttributes` folds it back out.
+			// Read only. `styleToAttributes` folds it back out.
 			background: attributes.backgroundColor
 				? 'var:preset|color|' + attributes.backgroundColor
 				: attributes.style?.color?.background,
@@ -180,6 +191,7 @@ export function TypographyPanel( {
 		textShadow,
 		className,
 		backgroundColor,
+		gradient,
 	} = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled.
@@ -195,6 +207,7 @@ export function TypographyPanel( {
 				textColor: _textColor,
 				className: _className,
 				backgroundColor: _backgroundColor,
+				gradient: _gradient,
 			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
 			return {
 				style: _style,
@@ -205,6 +218,7 @@ export function TypographyPanel( {
 				textShadow: _textShadow,
 				className: _className,
 				backgroundColor: _backgroundColor,
+				gradient: _gradient,
 			};
 		},
 		[ clientId, isEnabled ]
@@ -228,8 +242,17 @@ export function TypographyPanel( {
 				textColor,
 				textShadow,
 				backgroundColor,
+				gradient,
 			} ),
-		[ style, fontSize, fontFamily, textColor, textShadow, backgroundColor ]
+		[
+			style,
+			fontSize,
+			fontFamily,
+			textColor,
+			textShadow,
+			backgroundColor,
+			gradient,
+		]
 	);
 
 	const value = useMemo(
@@ -248,6 +271,22 @@ export function TypographyPanel( {
 			}
 		: ( newStyle ) => {
 				const newAttributes = styleToAttributes( newStyle );
+
+				// Only a text gradient belongs to this panel, so any other
+				// gradient goes back exactly as the block had it.
+				if ( 'text' !== newStyle?.background?.backgroundClip ) {
+					newAttributes.style = cleanEmptyObject( {
+						...newAttributes.style,
+						background: {
+							...newAttributes.style?.background,
+							gradient: style?.background?.gradient,
+						},
+						color: {
+							...newAttributes.style?.color,
+							gradient: style?.color?.gradient,
+						},
+					} );
+				}
 
 				// If setting a font size and fitText is currently enabled, disable it.
 				const hasFontSize =
