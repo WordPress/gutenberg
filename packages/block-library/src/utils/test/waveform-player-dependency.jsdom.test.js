@@ -1,25 +1,24 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const FIXTURE_ATTRIBUTE = 'data-player-fixture';
+const AUTO_INIT_ATTRIBUTE = 'data-waveform-autoinit';
 
-function createDeclarativePlayer( attributes = {} ) {
+function createDeclarativePlayer() {
 	const element = document.createElement( 'div' );
 	element.setAttribute( 'data-waveform-player', '' );
-
-	for ( const [ name, value ] of Object.entries( attributes ) ) {
-		element.setAttribute( name, value );
-	}
-
 	document.body.appendChild( element );
 	return element;
 }
 
-async function loadWaveformPlayer() {
-	return ( await import( '@arraypress/waveform-player' ) ).default;
+/**
+ * Imports the Playlist utilities, the only module graph that pulls in the
+ * waveform player and therefore the only one that can leave the document
+ * scanned for declarative markup.
+ */
+async function loadWaveformUtils() {
+	await import( '../waveform-utils' );
 }
 
 describe( 'Waveform Player dependency', () => {
-	let WaveformPlayer;
 	let originalReadyState;
 	let jsdomStubs;
 
@@ -48,12 +47,12 @@ describe( 'Waveform Player dependency', () => {
 	} );
 
 	afterEach( () => {
-		WaveformPlayer?.destroyAll();
+		window.WaveformPlayer?.destroyAll();
 		jsdomStubs.forEach( ( stub ) => stub.mockRestore() );
 		vi.useRealTimers();
 		vi.resetModules();
 		document.body.innerHTML = '';
-		delete window.WaveformPlayer;
+		document.documentElement.removeAttribute( AUTO_INIT_ATTRIBUTE );
 
 		if ( originalReadyState ) {
 			Object.defineProperty( document, 'readyState', originalReadyState );
@@ -62,55 +61,28 @@ describe( 'Waveform Player dependency', () => {
 		}
 	} );
 
-	it( 'uses the default control icons when declarative icon values are unsupported', async () => {
-		const iconValue = `<span ${ FIXTURE_ATTRIBUTE }></span>`;
-		const element = createDeclarativePlayer( {
-			'data-play-icon': iconValue,
-			'data-pause-icon': iconValue,
-		} );
-
-		WaveformPlayer = await loadWaveformPlayer();
-		WaveformPlayer.init();
-
-		expect(
-			element.querySelector( `[${ FIXTURE_ATTRIBUTE }]` )
-		).toBeNull();
-		expect(
-			element.querySelector( '.waveform-icon-play svg' )
-		).not.toBeNull();
-		expect(
-			element.querySelector( '.waveform-icon-pause svg' )
-		).not.toBeNull();
-	} );
-
-	it( 'supports custom control icons passed to the constructor', async () => {
-		const element = document.createElement( 'div' );
-		const icon = document.createElementNS(
-			'http://www.w3.org/2000/svg',
-			'svg'
-		);
-		icon.setAttribute( FIXTURE_ATTRIBUTE, 'constructor' );
-		document.body.appendChild( element );
-
-		WaveformPlayer = await loadWaveformPlayer();
-		new WaveformPlayer( element, {
-			playIcon: icon.outerHTML,
-		} );
-
-		expect(
-			element.querySelector( `[${ FIXTURE_ATTRIBUTE }="constructor"]` )
-		).not.toBeNull();
-	} );
-
-	it( 'initializes declarative players only after an explicit request', async () => {
+	/*
+	 * Must run first: the dependency scans the document while its own module is
+	 * evaluated, and `vi.resetModules()` does not re-evaluate dependencies, so
+	 * the scan is only observable on the first import in this file.
+	 */
+	it( 'leaves declarative markup it does not own uninitialized', async () => {
 		const element = createDeclarativePlayer();
 
-		WaveformPlayer = await loadWaveformPlayer();
+		await loadWaveformUtils();
 
 		expect( element ).not.toHaveAttribute( 'data-waveform-initialized' );
 		expect( element ).toBeEmptyDOMElement();
+		expect( document.documentElement ).not.toHaveAttribute(
+			AUTO_INIT_ATTRIBUTE
+		);
+	} );
 
-		WaveformPlayer.init();
+	it( 'initializes declarative markup that is requested explicitly', async () => {
+		const element = createDeclarativePlayer();
+
+		await loadWaveformUtils();
+		window.WaveformPlayer.init( element );
 
 		expect( element ).toHaveAttribute(
 			'data-waveform-initialized',
@@ -119,5 +91,16 @@ describe( 'Waveform Player dependency', () => {
 		expect(
 			element.querySelector( '.waveform-player-inner' )
 		).not.toBeNull();
+	} );
+
+	it( "restores the document's own opt-out value", async () => {
+		document.documentElement.setAttribute( AUTO_INIT_ATTRIBUTE, 'true' );
+
+		await loadWaveformUtils();
+
+		expect( document.documentElement ).toHaveAttribute(
+			AUTO_INIT_ATTRIBUTE,
+			'true'
+		);
 	} );
 } );

@@ -29,6 +29,7 @@
 
 ### Internal
 
+-   Playlist: Replace the `@arraypress/waveform-player` patch with the dependency's own `data-waveform-autoinit` opt-out, applied around a single wrapped import site.
 -   Button: Replace deprecated `word-break: break-word` with `word-break: normal` and `overflow-wrap: anywhere` to clear the Stylelint suppression ([#82854](https://github.com/WordPress/gutenberg/pull/82854)).
 
 ## 11.0.0 (2026-09-10)

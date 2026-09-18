@@ -963,6 +963,28 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: block-library — the waveform player initializes every
+	// `[data-waveform-player]` element on the page when it is imported, so it
+	// has a single import site that opts the document out first.
+	{
+		files: [ 'packages/block-library/**' ],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						...restrictedImports,
+						{
+							name: '@arraypress/waveform-player',
+							message:
+								'Importing the waveform player initializes every `[data-waveform-player]` element on the page, including markup the Playlist block does not own. Import `utils/waveform-player-library` instead.',
+						},
+					],
+				},
+			],
+		},
+	},
+
 	// Override: bundled packages — restrict private-apis imports, both direct
 	// and via each package's local `lock-unlock` wrapper module.
 	// `packages/ui` is excluded because this entry would replace its more
