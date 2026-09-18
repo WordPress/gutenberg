@@ -58,6 +58,15 @@
 		&:hover {
 			color: var(--wp-admin-theme-color);
 		}
+
+		// This selector outranks the Button component's own disabled colour,
+		// so restore it here rather than leaving a disabled toggle looking
+		// active.
+		&:disabled,
+		&[aria-disabled="true"],
+		&[aria-disabled="true"]:hover {
+			color: $gray-600;
+		}
 	}
 
 	.block-editor-global-styles-background-panel__loading {
