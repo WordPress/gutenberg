@@ -286,7 +286,7 @@ describe( 'EmojiPicker search announcements', () => {
 										label: 'beaming face',
 										group: 0,
 									},
-							  ]
+								]
 							: {}
 					),
 			} as unknown as Response )

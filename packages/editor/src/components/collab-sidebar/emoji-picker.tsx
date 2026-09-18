@@ -328,7 +328,7 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 					/* translators: %d: number of emojis matching the search. */
 					_n( '%d emoji found.', '%d emojis found.', matchCount ),
 					matchCount
-			  )
+				)
 			: __( 'No emoji found.' );
 		debouncedSpeak( message );
 	}, [ query, matchCount, isLoading, debouncedSpeak ] );
