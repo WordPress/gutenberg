@@ -25,6 +25,7 @@ import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import PageVisibilityControl from './page-visibility-control';
 
 // We only show the detach option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
@@ -59,6 +60,7 @@ function BlockContent( {
 	blockList,
 	pages,
 	parentPageID,
+	hasPagesInScope,
 } ) {
 	if ( ! hasResolvedPages ) {
 		return (
@@ -86,6 +88,19 @@ function BlockContent( {
 				<Notice status="info" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
 				</Notice>
+			</div>
+		);
+	}
+
+	// The pages exist, so every one of them must be hidden.
+	if ( blockList.length === 0 && hasPagesInScope ) {
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __(
+						'Page List: All pages are hidden. Choose pages to show in the block settings.'
+					) }
+				</Warning>
 			</div>
 		);
 	}
@@ -129,7 +144,15 @@ export default function PageListEdit( {
 	attributes,
 	setAttributes,
 } ) {
-	const { parentPageID } = attributes;
+	const { parentPageID, excludedPageIDs: excludedPageIDsAttribute } =
+		attributes;
+	const excludedPageIDs = useMemo(
+		() =>
+			Array.isArray( excludedPageIDsAttribute )
+				? excludedPageIDsAttribute
+				: [],
+		[ excludedPageIDsAttribute ]
+	);
 	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -221,14 +244,17 @@ export default function PageListEdit( {
 
 	const blockList = useMemo(
 		function getBlockList( parentId = parentPageID ) {
-			const childPages = pagesByParentId.get( parentId );
+			const childPages = pagesByParentId
+				.get( parentId )
+				?.filter( ( page ) => ! excludedPageIDs.includes( page.id ) );
 
 			if ( ! childPages?.length ) {
 				return [];
 			}
 
 			return childPages.reduce( ( template, page ) => {
-				const hasChildren = pagesByParentId.has( page.id );
+				const children = getBlockList( page.id );
+				const hasChildren = children.length > 0;
 				const pageProps = {
 					id: page.id,
 					label:
@@ -244,9 +270,7 @@ export default function PageListEdit( {
 					link: page.url,
 					hasChildren,
 				};
-				let item = null;
-				const children = getBlockList( page.id );
-				item = createBlock(
+				const item = createBlock(
 					'core/page-list-item',
 					pageProps,
 					children
@@ -256,7 +280,7 @@ export default function PageListEdit( {
 				return template;
 			}, [] );
 		},
-		[ pagesByParentId, parentPageID ]
+		[ pagesByParentId, parentPageID, excludedPageIDs ]
 	);
 
 	const {
@@ -291,6 +315,7 @@ export default function PageListEdit( {
 		pages,
 		parentClientId,
 		parentPageID,
+		excludedPageIDs,
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
@@ -318,7 +343,10 @@ export default function PageListEdit( {
 					<ToolsPanel
 						label={ __( 'Settings' ) }
 						resetAll={ () => {
-							setAttributes( { parentPageID: 0 } );
+							setAttributes( {
+								parentPageID: 0,
+								excludedPageIDs: [],
+							} );
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
@@ -344,6 +372,27 @@ export default function PageListEdit( {
 									help={ __(
 										'Choose a page to show only its subpages.'
 									) }
+								/>
+							</ToolsPanelItem>
+						) }
+
+						{ pagesByParentId.has( parentPageID ) && (
+							<ToolsPanelItem
+								label={ __( 'Visible pages' ) }
+								hasValue={ () => excludedPageIDs.length > 0 }
+								onDeselect={ () =>
+									setAttributes( { excludedPageIDs: [] } )
+								}
+							>
+								<PageVisibilityControl
+									pagesByParentId={ pagesByParentId }
+									parentPageID={ parentPageID }
+									excludedPageIDs={ excludedPageIDs }
+									onChange={ ( value ) =>
+										setAttributes( {
+											excludedPageIDs: value,
+										} )
+									}
 								/>
 							</ToolsPanelItem>
 						) }
@@ -400,6 +449,7 @@ export default function PageListEdit( {
 				blockList={ blockList }
 				pages={ pages }
 				parentPageID={ parentPageID }
+				hasPagesInScope={ pagesByParentId.has( parentPageID ) }
 			/>
 		</>
 	);

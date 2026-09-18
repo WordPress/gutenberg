@@ -262,6 +262,11 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$parent_page_id      = is_scalar( $parent_page_id_attr ) ? (int) $parent_page_id_attr : 0;
 	$is_nested           = ! empty( $block->context['core/isInsideSubmenu'] );
 
+	$excluded_page_ids_attr = $attributes['excludedPageIDs'] ?? array();
+	$excluded_page_ids      = is_array( $excluded_page_ids_attr )
+		? array_map( 'intval', array_filter( $excluded_page_ids_attr, 'is_scalar' ) )
+		: array();
+
 	$all_pages = get_pages(
 		array(
 			'sort_column' => 'menu_order,post_title',
@@ -285,6 +290,15 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 		if ( $is_active ) {
 			$active_page_ancestor_ids = get_post_ancestors( $page->ID );
+		}
+
+		/*
+		 * Skipped after the active check, so a hidden page still marks its
+		 * visible ancestors as current. Its subpages are never nested, so
+		 * they are hidden too.
+		 */
+		if ( in_array( $page->ID, $excluded_page_ids, true ) ) {
+			continue;
 		}
 
 		if ( $page->post_parent ) {
@@ -314,6 +328,11 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$css_classes     = trim( implode( ' ', $classes ) );
 
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
+
+	// If every top-level page is hidden, there is nothing to show.
+	if ( 0 === $parent_page_id && empty( $nested_pages ) ) {
+		return;
+	}
 
 	if ( 0 !== $parent_page_id ) {
 		// If the parent page has no child pages, there is nothing to show.

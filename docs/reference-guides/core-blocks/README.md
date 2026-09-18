@@ -556,7 +556,7 @@ Display a list of all pages.
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
 -	**Allowed Blocks:** core/page-list-item
 -	**Supports:** anchor, color (background, gradients, link, text), contentRole, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** parentPageID
+-	**Attributes:** excludedPageIDs, parentPageID
 
 ## Page List Item
 

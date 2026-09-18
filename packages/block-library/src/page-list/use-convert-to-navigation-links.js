@@ -81,7 +81,33 @@ function findNavigationLinkById( navigationLinks, id ) {
 	return null;
 }
 
-export function convertToNavigationLinks( pages = [], parentPageID = null ) {
+/**
+ * Removes the links to excluded pages, along with their descendants.
+ *
+ * @param {Array}    navigationLinks An array of navigation link blocks.
+ * @param {number[]} excludedPageIDs The IDs of the pages to remove.
+ *
+ * @return {Array} The navigation link blocks without the excluded pages.
+ */
+function removeExcludedLinks( navigationLinks, excludedPageIDs ) {
+	return navigationLinks
+		.filter(
+			( { attributes } ) => ! excludedPageIDs.includes( attributes.id )
+		)
+		.map( ( navigationLink ) => {
+			navigationLink.innerBlocks = removeExcludedLinks(
+				navigationLink.innerBlocks,
+				excludedPageIDs
+			);
+			return navigationLink;
+		} );
+}
+
+export function convertToNavigationLinks(
+	pages = [],
+	parentPageID = null,
+	excludedPageIDs = []
+) {
 	let navigationLinks = createNavigationLinks( pages );
 
 	// If a parent page ID is provided, only return the children of that page.
@@ -94,6 +120,9 @@ export function convertToNavigationLinks( pages = [], parentPageID = null ) {
 			navigationLinks = parentPage.innerBlocks;
 		}
 	}
+
+	// Filter only after picking the parent page, which may itself be excluded.
+	navigationLinks = removeExcludedLinks( navigationLinks, excludedPageIDs );
 
 	// Transform all links with innerBlocks into Submenus. This can't be done
 	// sooner because page objects have no information on their children.
@@ -121,11 +150,16 @@ export function useConvertToNavigationLinks( {
 	pages,
 	parentClientId,
 	parentPageID,
+	excludedPageIDs,
 } ) {
 	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
 
 	return () => {
-		const navigationLinks = convertToNavigationLinks( pages, parentPageID );
+		const navigationLinks = convertToNavigationLinks(
+			pages,
+			parentPageID,
+			excludedPageIDs
+		);
 
 		// Replace the Page List block with the Navigation Links.
 		replaceBlock( clientId, navigationLinks );

@@ -84,4 +84,86 @@ test.describe( 'Page List block', () => {
 		expect( innerHTML ).not.toContain( '&lt;strong&gt;' );
 		expect( innerHTML ).not.toContain( '&lt;/strong&gt;' );
 	} );
+
+	test( 'can hide pages and their subpages', async ( {
+		editor,
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const legal = await requestUtils.createPage( {
+			title: 'Legal',
+			status: 'publish',
+		} );
+		await requestUtils.createPage( {
+			title: 'Privacy',
+			status: 'publish',
+			parent: legal.id,
+		} );
+		await requestUtils.createPage( {
+			title: 'About',
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/page-list' } );
+		const pageListBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Page List',
+		} );
+		// The editor renders page titles as anchors without an `href`, so
+		// they have no link role. Match their text, including hidden
+		// subpages, instead.
+		const getPageTitle = ( title ) =>
+			pageListBlock.getByText( title, { exact: true } );
+		await expect( getPageTitle( 'About' ) ).toBeVisible();
+		await expect( getPageTitle( 'Privacy' ) ).toHaveCount( 1 );
+
+		await editor.openDocumentSettingsSidebar();
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settings
+			.getByRole( 'button', { name: 'Settings options' } )
+			.click();
+		await page
+			.getByRole( 'menu', { name: 'Settings options' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Show Visible pages' } )
+			.click();
+		await page.keyboard.press( 'Escape' );
+
+		const visiblePages = settings.getByRole( 'group', {
+			name: 'Visible pages',
+		} );
+		await visiblePages.getByRole( 'checkbox', { name: 'Legal' } ).uncheck();
+
+		// A subpage can't be shown while its parent is hidden.
+		const privacyCheckbox = visiblePages.getByRole( 'checkbox', {
+			name: 'Privacy',
+		} );
+		await expect( privacyCheckbox ).not.toBeChecked();
+		await expect( privacyCheckbox ).toBeDisabled();
+
+		await expect( getPageTitle( 'Legal' ) ).toHaveCount( 0 );
+		await expect( getPageTitle( 'Privacy' ) ).toHaveCount( 0 );
+		await expect( getPageTitle( 'About' ) ).toBeVisible();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/page-list',
+				attributes: { excludedPageIDs: [ legal.id ] },
+			},
+		] );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		const list = page.locator( '.wp-block-page-list' );
+		await expect(
+			list.getByRole( 'link', { name: 'About' } )
+		).toBeVisible();
+		await expect( list.getByRole( 'link', { name: 'Legal' } ) ).toHaveCount(
+			0
+		);
+		await expect(
+			list.getByRole( 'link', { name: 'Privacy', includeHidden: true } )
+		).toHaveCount( 0 );
+	} );
 } );

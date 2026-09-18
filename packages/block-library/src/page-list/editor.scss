@@ -46,3 +46,18 @@
 .wp-block-page-list__loading-indicator-container {
 	padding: $grid-unit-10 $grid-unit-15;
 }
+
+.wp-block-page-list__visibility-options {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+
+	li {
+		margin: $grid-unit-10 0 0;
+	}
+
+	// Indent subpages under their parent.
+	.wp-block-page-list__visibility-options {
+		padding-inline-start: $grid-unit-30;
+	}
+}

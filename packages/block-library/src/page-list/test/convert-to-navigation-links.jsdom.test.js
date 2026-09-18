@@ -581,5 +581,51 @@ describe( 'page list convert to links', () => {
 				},
 			] );
 		} );
+
+		describe( 'with excluded pages', () => {
+			const makePage = ( id, parent ) => ( {
+				title: { raw: `Page ${ id }`, rendered: `Page ${ id }` },
+				id,
+				parent,
+				link: `http://wordpress.local/?page_id=${ id }`,
+				type: 'page',
+			} );
+			// 1 > 2 > 3, and 4 at the top level.
+			const pages = [
+				makePage( 1, 0 ),
+				makePage( 2, 1 ),
+				makePage( 3, 2 ),
+				makePage( 4, 0 ),
+			];
+			const getIds = ( links ) =>
+				links.map( ( { attributes, innerBlocks } ) => [
+					attributes.id,
+					getIds( innerBlocks ),
+				] );
+
+			it( 'removes an excluded page along with its subpages', () => {
+				expect(
+					getIds( convertToNavigationLinks( pages, null, [ 2 ] ) )
+				).toEqual( [
+					[ 1, [] ],
+					[ 4, [] ],
+				] );
+			} );
+
+			it( 'turns a parent with only excluded subpages into a link', () => {
+				const links = convertToNavigationLinks( pages, null, [ 2 ] );
+
+				expect( links[ 0 ].name ).toBe( 'core/navigation-link' );
+			} );
+
+			it( 'keeps the subpages of an excluded parent page', () => {
+				expect(
+					getIds( convertToNavigationLinks( pages, 2, [ 2 ] ) )
+				).toEqual( [ [ 3, [] ] ] );
+				expect(
+					getIds( convertToNavigationLinks( pages, 2, [ 1 ] ) )
+				).toEqual( [ [ 3, [] ] ] );
+			} );
+		} );
 	} );
 } );
