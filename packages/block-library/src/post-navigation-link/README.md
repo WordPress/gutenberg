@@ -36,6 +36,9 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`textAlign`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
+- [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - `margin`: `true`
+  - `padding`: `true`
 
 ## Context
 
@@ -44,6 +47,13 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 **Uses context:**
 
 - `postType`
+
+## CSS Selectors
+
+_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
+
+- **border**: `.wp-block-post-navigation-link:not(:empty)`
+- **spacing**: `.wp-block-post-navigation-link:not(:empty)`
 
 ## Block Markup
 
