@@ -25,7 +25,7 @@
 ### Enhancements
 
 -   The error shown when a HEIC file cannot be converted now explains the failure in terms of the browser and operating system in use, and points at the browsers that do decode HEIC there, since HEIC decoding depends on OS-provided codecs. Exposed as the new `getHeicUnsupportedMessage` and `getHeicConversionAdvice` exports ([#81123](https://github.com/WordPress/gutenberg/issues/81123)).
--   Honor the new `wp_generate_animated_image_subsizes` filter via the new `generateAnimatedImageSubsizes` setting: when opted in, uncropped sub-sizes of animated images keep their animation instead of flattening to the first frame ([#80383](https://github.com/WordPress/gutenberg/issues/80383)).
+-   Add a `generateAnimatedImageSubsizes` store setting, carried in the REST API root index from the new `wp_generate_animated_image_subsizes` filter, and a matching `preserveAnimation` option on `vipsResizeImage`. With the setting enabled, uncropped sub-sizes of animated images keep their animation instead of flattening to the first frame. It defaults to `false` ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
 
 ### Bug Fixes
 

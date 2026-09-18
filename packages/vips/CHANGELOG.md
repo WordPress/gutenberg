@@ -33,7 +33,7 @@
 ### Enhancements
 
 -   Add optional `stripMeta` and `maxBitdepth` options to `resizeImage`, `compressImage`, and `convertImageFormat`, so callers can keep all image metadata and cap the output bit depth, mirroring WordPress core's `image_strip_meta` and `image_max_bit_depth` filters ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
--   Add an optional `preserveAnimation` option to `resizeImage`, letting uncropped resizes of animated images keep their animation (with tuned, fast GIF encoding settings) instead of flattening to the first frame. Animations whose decoded frames would not fit the WASM heap still flatten, so the resize degrades instead of failing ([#80383](https://github.com/WordPress/gutenberg/issues/80383)).
+-   Add an optional `preserveAnimation` option to `resizeImage`. An uncropped resize of an animated image then keeps every frame, re-encoded with `gifsave` settings tuned for speed and size (`effort: 2`, `interframe_maxerror: 8`), instead of flattening to the first frame. Cropped resizes always flatten. An animation whose decoded frames would not fit the WASM heap flattens too, so the resize degrades rather than failing ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
 
 ### Bug Fixes
 
