@@ -14,28 +14,27 @@ export function useEditedPostContext() {
 	}, [] );
 }
 export function useAllowSwitchingTemplates() {
-	const { postType, postId } = useEditedPostContext();
-	const templates = useTemplates( postType, postId );
+	const { postId } = useEditedPostContext();
+	const templates = useTemplates( postId );
 	return templates?.length > 1;
 }
 
-function useTemplates( postType, postId ) {
+function useTemplates( postId ) {
 	return useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
 				per_page: -1,
-				post_type: postType,
 				post_id: Number( postId ),
 			} ),
-		[ postType, postId ]
+		[ postId ]
 	);
 }
 
 export function useAvailableTemplates() {
-	const { postType, postId } = useEditedPostContext();
+	const { postId } = useEditedPostContext();
 	const currentTemplateSlug = useCurrentTemplateSlug();
 	const allowSwitchingTemplate = useAllowSwitchingTemplates();
-	const templates = useTemplates( postType, postId );
+	const templates = useTemplates( postId );
 	const defaultTemplate = templates?.[ 0 ];
 	return useMemo(
 		() =>

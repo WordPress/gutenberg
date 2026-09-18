@@ -35,16 +35,6 @@ function gutenberg_modify_template_post_type_args_7_2( $args ) {
 add_filter( 'register_wp_template_post_type_args', 'gutenberg_modify_template_post_type_args_7_2' );
 add_filter( 'register_wp_template_part_post_type_args', 'gutenberg_modify_template_post_type_args_7_2' );
 
-// Core may have registered these post types before the plugin was loaded.
-foreach ( array( 'wp_template', 'wp_template_part' ) as $gutenberg_template_type ) {
-	$gutenberg_template_post_type = get_post_type_object( $gutenberg_template_type );
-	if ( $gutenberg_template_post_type && WP_REST_Templates_Controller::class === $gutenberg_template_post_type->rest_controller_class ) {
-		$gutenberg_template_post_type->rest_controller_class = Gutenberg_REST_Templates_Controller_7_2::class;
-		$gutenberg_template_post_type->rest_controller       = null;
-	}
-}
-unset( $gutenberg_template_type, $gutenberg_template_post_type );
-
 /**
  * Exposes the privacy policy page setting in the REST API.
  *

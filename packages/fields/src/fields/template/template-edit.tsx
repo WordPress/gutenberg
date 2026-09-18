@@ -69,7 +69,6 @@ function BlockThemeTemplateEdit( {
 	field,
 	onChange,
 }: TemplateEditComponentProps ) {
-	const postType = data.type;
 	const postId =
 		typeof data.id === 'number' ? data.id : parseInt( data.id, 10 );
 	const templates = useSelect(
@@ -79,11 +78,10 @@ function BlockThemeTemplateEdit( {
 				'wp_template',
 				{
 					per_page: -1,
-					post_type: postType,
 					post_id: postId,
 				}
 			) ?? EMPTY_ARRAY,
-		[ postId, postType ]
+		[ postId ]
 	);
 	const assignedSlug = field.getValue( { item: data } );
 	const assignedTemplate = templates.find(

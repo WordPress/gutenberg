@@ -193,7 +193,6 @@ export const getTemplateId = createRegistrySelector(
 		const core = select( STORE_NAME );
 		const templates = core.getEntityRecords( 'postType', 'wp_template', {
 			per_page: -1,
-			post_type: postType,
 			post_id: Number( postId ),
 		} );
 		if ( ! templates?.length ) {

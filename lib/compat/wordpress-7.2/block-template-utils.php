@@ -6,7 +6,7 @@
  */
 
 /**
- * Adds the default template and applies homepage rules to post-specific choices.
+ * Selects custom templates, adds the default, and applies homepage rules for a post.
  *
  * Runs before the usual filter priority so plugins can restrict the complete
  * list, including the default, through the existing get_block_templates filter.
@@ -26,6 +26,18 @@ function gutenberg_filter_post_templates( $templates, $query, $template_type ) {
 	if ( ! $post ) {
 		return $templates;
 	}
+
+	$templates = array_values(
+		array_filter(
+			$templates,
+			static function ( $template ) use ( $post ) {
+				return $template instanceof WP_Block_Template && $template->is_custom && (
+					! isset( $template->post_types ) ||
+					( is_array( $template->post_types ) && in_array( $post->post_type, $template->post_types, true ) )
+				);
+			}
+		)
+	);
 
 	$slug = 'page' === $post->post_type ? 'page' : 'single-' . $post->post_type;
 	if ( $post->post_name ) {

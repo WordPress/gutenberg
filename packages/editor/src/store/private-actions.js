@@ -48,7 +48,6 @@ export const createTemplate =
 			.resolveSelect( coreStore )
 			.getEntityRecords( 'postType', 'wp_template', {
 				per_page: -1,
-				post_type: postType,
 				post_id: Number( postId ),
 			} );
 		if ( templates?.some( ( { id } ) => id === savedTemplate.id ) ) {

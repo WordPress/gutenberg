@@ -27,7 +27,6 @@ function BlockThemeTemplateView( {
 	item,
 	field,
 }: DataViewRenderFieldProps< BasePost > ) {
-	const postType = item.type;
 	const postId = item.id;
 	const templateSlug = field.getValue( { item } );
 
@@ -37,7 +36,6 @@ function BlockThemeTemplateView( {
 				coreStore
 			).getEntityRecords< WpTemplate >( 'postType', 'wp_template', {
 				per_page: -1,
-				post_type: postType,
 				post_id: Number( postId ),
 			} );
 			if ( allTemplates?.length === 1 ) {
@@ -51,7 +49,7 @@ function BlockThemeTemplateView( {
 				? getItemTitle( effectiveTemplate )
 				: undefined;
 		},
-		[ postType, postId, templateSlug ]
+		[ postId, templateSlug ]
 	);
 
 	return <>{ templateLabel }</>;

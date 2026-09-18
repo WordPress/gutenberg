@@ -181,6 +181,38 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$this->assertNull( $data['modified'], 'The modified date should be null for a file-backed template.' );
 	}
 
+	public function test_post_templates_reject_post_type_with_post_id() {
+		wp_set_current_user( self::$admin_id );
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+
+		foreach ( array( 'GET', 'HEAD' ) as $method ) {
+			foreach ( array( 'page', 'post' ) as $post_type ) {
+				$request = new WP_REST_Request( $method, '/wp/v2/templates' );
+				$request->set_param( 'post_id', $page_id );
+				$request->set_param( 'post_type', $post_type );
+				$response = rest_get_server()->dispatch( $request );
+				$data     = $response->get_data();
+
+				$this->assertSame( 400, $response->get_status() );
+				$this->assertSame( 'rest_invalid_param', $data['code'] );
+				$this->assertSame( 'Use either post_id or post_type, not both.', $data['data']['params']['post_id'] );
+			}
+		}
+	}
+
+	public function test_templates_can_be_filtered_by_post_type_without_post_id() {
+		wp_set_current_user( self::$admin_id );
+		switch_theme( 'block-theme' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
+		$request->set_param( 'post_type', 'page' );
+		$response = rest_get_server()->dispatch( $request );
+		$ids      = wp_list_pluck( $response->get_data(), 'id' );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertContains( 'block-theme//custom-hero-template', $ids );
+		$this->assertNotContains( 'block-theme//page', $ids );
+	}
+
 	public function test_post_templates_include_the_default_before_filtering() {
 		wp_set_current_user( self::$admin_id );
 		switch_theme( 'block-theme' );
@@ -199,7 +231,6 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		);
 		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
 		$request->set_param( 'post_id', $page_id );
-		$request->set_param( 'post_type', 'post' );
 		$response = rest_get_server()->dispatch( $request );
 		$ids      = wp_list_pluck( $response->get_data(), 'id' );
 

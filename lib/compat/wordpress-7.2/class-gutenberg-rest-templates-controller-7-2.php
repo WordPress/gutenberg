@@ -23,9 +23,22 @@ class Gutenberg_REST_Templates_Controller_7_2 extends WP_REST_Templates_Controll
 		$params = parent::get_collection_params();
 		if ( 'wp_template' === $this->post_type ) {
 			$params['post_id'] = array(
-				'description' => __( 'Post to get the available templates for.', 'gutenberg' ),
-				'type'        => 'integer',
-				'minimum'     => 1,
+				'description'       => __( 'Post to get the available templates for.', 'gutenberg' ),
+				'type'              => 'integer',
+				'minimum'           => 1,
+				'validate_callback' => static function ( $value, $request, $param ) {
+					$valid = rest_validate_request_arg( $value, $request, $param );
+					if ( is_wp_error( $valid ) ) {
+						return $valid;
+					}
+					if ( isset( $request['post_type'] ) ) {
+						return new WP_Error(
+							'rest_invalid_param',
+							__( 'Use either post_id or post_type, not both.', 'gutenberg' )
+						);
+					}
+					return true;
+				},
 			);
 		}
 		return $params;
@@ -71,10 +84,8 @@ class Gutenberg_REST_Templates_Controller_7_2 extends WP_REST_Templates_Controll
 			return parent::get_items( $request );
 		}
 
-		$post  = get_post( $request['post_id'] );
 		$query = array(
-			'post_type' => $post->post_type,
-			'post_id'   => $post->ID,
+			'post_id' => $request['post_id'],
 		);
 		if ( isset( $request['wp_id'] ) ) {
 			$query['wp_id'] = $request['wp_id'];
