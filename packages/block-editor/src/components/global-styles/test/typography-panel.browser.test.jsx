@@ -1265,4 +1265,59 @@ describe( 'TypographyPanel text gradient', () => {
 		expect( result.background.gradient ).toBeUndefined();
 		expect( result.background.backgroundClip ).toBeUndefined();
 	} );
+	describe( 'at a non-default viewport', () => {
+		// What the block sets at the default viewport. The clip applies at
+		// every width, so it still governs what a breakpoint can paint.
+		const baseValue = {
+			background: {
+				gradient: 'var:preset|gradient|purple-blue',
+				backgroundClip: 'text',
+			},
+		};
+
+		it( 'disables the text color control while the default viewport clips to text', async () => {
+			await renderPanel( {
+				settings: gradientSettings,
+				blockName: TEST_BLOCK,
+				defaultControls: shownControls,
+				value: {},
+				baseValue,
+			} );
+
+			expect(
+				screen.getByRole( 'button', { name: /Color/ } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
+		} );
+
+		it( 'disables the gradient control, which only the default viewport can change', async () => {
+			await renderPanel( {
+				settings: gradientSettings,
+				blockName: TEST_BLOCK,
+				defaultControls: shownControls,
+				value: {},
+				baseValue,
+			} );
+
+			expect(
+				screen.getByRole( 'button', { name: /Gradient/ } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
+		} );
+
+		it( 'leaves both controls usable when the breakpoint overrides the clip', async () => {
+			await renderPanel( {
+				settings: gradientSettings,
+				blockName: TEST_BLOCK,
+				defaultControls: shownControls,
+				value: { background: { backgroundClip: 'border-box' } },
+				baseValue,
+			} );
+
+			expect(
+				screen.getByRole( 'button', { name: /Color/ } )
+			).not.toHaveAttribute( 'aria-disabled', 'true' );
+			expect(
+				screen.getByRole( 'button', { name: /Gradient/ } )
+			).not.toHaveAttribute( 'aria-disabled', 'true' );
+		} );
+	} );
 } );

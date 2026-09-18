@@ -840,3 +840,94 @@ describe( 'BackgroundPanel clip control ownership', () => {
 		).toBeInTheDocument();
 	} );
 } );
+
+describe( 'BackgroundPanel at a non-default viewport', () => {
+	const TEXT_GRADIENT = 'var:preset|gradient|purple-blue';
+	const colorSettings = {
+		...baseSettings,
+		color: {
+			...baseSettings.color,
+			background: true,
+			palette: {
+				theme: [ { name: 'Black', slug: 'black', color: '#000000' } ],
+			},
+		},
+	};
+	// What the block sets at the default viewport. The clip applies at every
+	// width, so it still governs what a breakpoint can paint.
+	const baseValue = {
+		background: {
+			gradient: TEXT_GRADIENT,
+			backgroundClip: 'text',
+		},
+	};
+
+	it( 'disables the color control while the default viewport clips to text', () => {
+		render(
+			<BackgroundPanel
+				value={ {} }
+				baseValue={ baseValue }
+				settings={ colorSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Color' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'disables the gradient control while the default viewport clips to text', () => {
+		render(
+			<BackgroundPanel
+				value={ {} }
+				baseValue={ baseValue }
+				settings={ colorSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Gradient' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'keeps the controls usable when the breakpoint overrides the clip', () => {
+		render(
+			<BackgroundPanel
+				value={ { background: { backgroundClip: 'border-box' } } }
+				baseValue={ baseValue }
+				settings={ colorSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Color' } )
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
+		expect(
+			screen.getByRole( 'button', { name: 'Gradient' } )
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( "leaves the controls alone when the default viewport doesn't clip to text", () => {
+		render(
+			<BackgroundPanel
+				value={ {} }
+				baseValue={ {
+					background: { gradient: TEXT_GRADIENT },
+				} }
+				settings={ colorSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Color' } )
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+} );
