@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Link: Flag a link whose URL doesn't look valid with a wavy underline and a tooltip, so the issue isn't only announced once at insertion time and then forgotten ([#83134](https://github.com/WordPress/gutenberg/pull/83134)).
+
 ## 5.55.0 (2026-09-10)
 
 ### Bug Fixes

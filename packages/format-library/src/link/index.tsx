@@ -86,6 +86,37 @@ function Edit( {
 		};
 	}, [ contentRef, isActive ] );
 
+	// Flags links whose URL doesn't look valid with a visual indicator, so
+	// the issue isn't only announced once at insertion time (see the `speak()`
+	// call in `InlineLinkUI`) and then forgotten. This is applied directly to
+	// the live DOM rather than stored as a format attribute, since it's
+	// recomputed from the link's own `href` on every change and must never
+	// be part of the saved content.
+	useLayoutEffect( () => {
+		const editableContentElement = contentRef.current;
+		if ( ! editableContentElement ) {
+			return;
+		}
+
+		const invalidLinkTitle = __(
+			'This link may not work. Please double-check the URL.'
+		);
+
+		editableContentElement
+			.querySelectorAll< HTMLAnchorElement >( 'a[href]' )
+			.forEach( ( linkElement ) => {
+				if ( isValidHref( linkElement.getAttribute( 'href' ) || '' ) ) {
+					linkElement.classList.remove( 'is-format-link-invalid' );
+					if ( linkElement.title === invalidLinkTitle ) {
+						linkElement.removeAttribute( 'title' );
+					}
+				} else {
+					linkElement.classList.add( 'is-format-link-invalid' );
+					linkElement.title = invalidLinkTitle;
+				}
+			} );
+	}, [ contentRef, value ] );
+
 	function addLink( target?: HTMLElement ) {
 		const text = getTextContent( slice( value ) );
 
