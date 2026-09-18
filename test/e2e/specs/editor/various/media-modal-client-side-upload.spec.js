@@ -32,6 +32,24 @@ const TEST_AVIF_PATH = path.join(
 // event a file dropped on the modal fires.
 const FILE_INPUT_SELECTOR = '.media-modal .moxie-shim-html5 input[type="file"]';
 
+/**
+ * Resolves once the client-side pipeline finalizes an upload, which is the
+ * last request it makes for a file.
+ *
+ * @param {import('@playwright/test').Page} page The page under test.
+ * @return {Promise<unknown>} A promise for the finalize request.
+ */
+function waitForFinalize( page ) {
+	return page.waitForRequest(
+		( request ) =>
+			request.method() === 'POST' &&
+			/\/wp\/v2\/media\/\d+\/finalize/.test(
+				decodeURIComponent( request.url() )
+			),
+		{ timeout: 60_000 }
+	);
+}
+
 test.describe( 'Media modal client-side uploads', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -89,12 +107,20 @@ test.describe( 'Media modal client-side uploads', () => {
 
 		const fileInput = page.locator( FILE_INPUT_SELECTOR ).first();
 		await fileInput.waitFor( { state: 'attached' } );
+
+		// A settled tile is not on its own proof that this upload finished:
+		// the modal leaves the upload tab for the library grid as soon as the
+		// file is queued, so anything already in the library renders one
+		// straight away. Wait for the pipeline's own last request instead.
+		const finalized = waitForFinalize( page );
 		await fileInput.setInputFiles( TEST_IMAGE_PATH );
+		await finalized;
 
 		// The finalized attachment resolves to a normal (non-uploading) tile.
-		await expect(
-			modal.locator( 'li.attachment:not(.uploading)' ).first()
-		).toBeVisible( { timeout: 60_000 } );
+		await expect( modal.locator( 'li.attachment.uploading' ) ).toHaveCount(
+			0,
+			{ timeout: 60_000 }
+		);
 
 		// The original upload and every sub-size go through the REST API, and
 		// the upload is finalized exactly once.
@@ -153,11 +179,15 @@ test.describe( 'Media modal client-side uploads', () => {
 
 		const fileInput = page.locator( FILE_INPUT_SELECTOR ).first();
 		await fileInput.waitFor( { state: 'attached' } );
-		await fileInput.setInputFiles( TEST_AVIF_PATH );
 
-		await expect(
-			modal.locator( 'li.attachment:not(.uploading)' ).first()
-		).toBeVisible( { timeout: 60_000 } );
+		const finalized = waitForFinalize( page );
+		await fileInput.setInputFiles( TEST_AVIF_PATH );
+		await finalized;
+
+		await expect( modal.locator( 'li.attachment.uploading' ) ).toHaveCount(
+			0,
+			{ timeout: 60_000 }
+		);
 
 		// No upload error is reported and nothing reached the classic
 		// endpoint that would have rejected the file.
