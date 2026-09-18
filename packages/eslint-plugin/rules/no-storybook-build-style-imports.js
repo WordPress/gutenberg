@@ -23,7 +23,7 @@ module.exports = {
 				return;
 			}
 
-			if ( classifyBuildStyleImport( sourceValue ).status === 'leak' ) {
+			if ( isBuildStyleLeak( sourceValue ) ) {
 				context.report( {
 					node,
 					messageId: 'usePackageStylesMatcher',
@@ -60,34 +60,24 @@ module.exports = {
 	},
 };
 
-function classifyBuildStyleImport( sourceValue ) {
+function isBuildStyleLeak( sourceValue ) {
 	const { pathname, queryKeys } = parseImportSource( sourceValue );
 
 	if ( ! STYLESHEET_EXTENSIONS.test( pathname ) ) {
-		return { status: 'not-this-rule' };
+		return false;
 	}
 
 	if ( MODULE_STYLESHEET_EXTENSIONS.test( pathname ) ) {
-		return { status: 'not-this-rule' };
+		return false;
 	}
 
 	if ( ! BUILD_STYLE_SEGMENT.test( pathname ) ) {
-		return { status: 'not-this-rule' };
+		return false;
 	}
 
-	if ( queryKeys.includes( 'inline' ) ) {
-		return { status: 'allowed-query', pathname, query: 'inline' };
-	}
-
-	if ( queryKeys.includes( 'raw' ) ) {
-		return { status: 'allowed-query', pathname, query: 'raw' };
-	}
-
-	if ( queryKeys.includes( 'url' ) ) {
-		return { status: 'allowed-query', pathname, query: 'url' };
-	}
-
-	return { status: 'leak', pathname };
+	return ! [ 'inline', 'raw', 'url' ].some( ( query ) =>
+		queryKeys.includes( query )
+	);
 }
 
 function getStaticModuleSpecifier( sourceNode ) {
