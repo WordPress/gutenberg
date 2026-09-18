@@ -89,7 +89,7 @@ function gutenberg_get_position_support_styles( $selector, $position, $allowed_p
 
 /**
  * Renders position styles to the block wrapper.
- * 
+ *
  * @since 6.2.0
  * @since 7.2.0 Added support for viewport states.
  *
