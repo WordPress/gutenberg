@@ -16,16 +16,15 @@ const mockWrap = vi.fn( () => ( {
 	setJxlWasm: mockSetJxlWasm,
 } ) );
 
-vi.mock( '@wordpress/worker-threads', () => ( {
-	wrap: ( ...args: unknown[] ) => mockWrap( ...( args as [] ) ),
-	terminate: ( ...args: unknown[] ) => mockTerminate( ...( args as [] ) ),
-} ) );
-
-// worker-code.ts is generated during a full build and is gitignored, so it
-// cannot be resolved from a unit test run.
-// The specifier has to match the one vips-worker.ts imports, extension and
-// all, or the virtual mock is not consulted and the resolve fails.
-vi.mock( '../worker-code.ts', () => ( { workerCode: '' } ) );
+vi.mock(
+	import( '@wordpress/worker-threads' ),
+	() =>
+		( {
+			wrap: ( ...args: unknown[] ) => mockWrap( ...( args as [] ) ),
+			terminate: ( ...args: unknown[] ) =>
+				mockTerminate( ...( args as [] ) ),
+		} ) as unknown as typeof import( '@wordpress/worker-threads' )
+);
 
 // Stands in for fetching the ~3 MB JXL chunk. Throwing from here is how a
 // failed chunk load surfaces, by way of the `default` getter below.

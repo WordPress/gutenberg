@@ -28,9 +28,14 @@ const mockVipsFactory = vi.fn( () => ( {
 	shutdown: mockShutdown,
 } ) );
 
-vi.mock( 'wasm-vips', () => ( {
-	default: ( ...args: unknown[] ) => mockVipsFactory( ...( args as [] ) ),
-} ) );
+vi.mock(
+	import( 'wasm-vips' ),
+	() =>
+		( {
+			default: ( ...args: unknown[] ) =>
+				mockVipsFactory( ...( args as [] ) ),
+		} ) as unknown as typeof import( 'wasm-vips' )
+);
 
 /**
  * Loads a fresh copy of the module.
