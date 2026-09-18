@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Font Library: Fix font face sorting for relative and unparseable weights ([#82856](https://github.com/WordPress/gutenberg/pull/82856))
 -   Preset groups: separate adjacent header action buttons so their focus rings and hit areas do not overlap. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
 
 ### Internal
