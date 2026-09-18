@@ -14,9 +14,45 @@ export function useEditedPostContext() {
 	}, [] );
 }
 export function useAllowSwitchingTemplates() {
-	const { postId } = useEditedPostContext();
-	const templates = useTemplates( postId );
-	return templates?.length > 1;
+	const { postType, postId } = useEditedPostContext();
+	return useSelect(
+		( select ) => {
+			const { canUser, getEntityRecord, getEntityRecords } =
+				select( coreStore );
+			const { __unstableIsBlockBasedTheme: isBlockTheme } =
+				select( editorStore ).getEditorSettings();
+			if ( isBlockTheme ) {
+				const templates = getEntityRecords( 'postType', 'wp_template', {
+					per_page: -1,
+					post_id: Number( postId ),
+				} );
+				return templates?.length > 1;
+			}
+
+			// Classic PHP template choices come from availableTemplates and are
+			// absent from the block template collection filtered in PHP. Keep
+			// their homepage and posts-page switching checks here.
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
+				? getEntityRecord( 'root', 'site' )
+				: undefined;
+			const isPostsPage = +postId === siteSettings?.page_for_posts;
+			const isFrontPage =
+				postType === 'page' && +postId === siteSettings?.page_on_front;
+			const templates = isFrontPage
+				? getEntityRecords( 'postType', 'wp_template', {
+						per_page: -1,
+					} )
+				: [];
+			const hasFrontPage =
+				isFrontPage &&
+				!! templates?.some( ( { slug } ) => slug === 'front-page' );
+			return ! isPostsPage && ! hasFrontPage;
+		},
+		[ postType, postId ]
+	);
 }
 
 function useTemplates( postId ) {
