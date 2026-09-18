@@ -13,8 +13,6 @@ import { cleanEmptyObject, useStyleOverride } from './utils';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
-	hasPseudoBlockStyleState,
-	hasViewportBlockStyleState,
 	setStyleForState,
 } from './block-style-state';
 import { store as blockEditorStore } from '../store';
@@ -303,8 +301,10 @@ export function PositionPanelPure( {
 
 	// Position styles only support viewport states; pseudo states don't apply.
 	const isViewportState =
-		hasViewportBlockStyleState( selectedState ) &&
-		! hasPseudoBlockStyleState( selectedState );
+		selectedState?.viewport &&
+		selectedState.viewport !== DEFAULT_BLOCK_STYLE_STATE.viewport &&
+		( ! selectedState.pseudo ||
+			selectedState.pseudo === DEFAULT_BLOCK_STYLE_STATE.pseudo );
 	const stateStyle = isViewportState
 		? getStyleForState( style, selectedState )
 		: undefined;

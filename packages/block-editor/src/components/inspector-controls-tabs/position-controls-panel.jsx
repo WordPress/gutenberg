@@ -53,11 +53,11 @@ const PositionControlsPanel = () => {
 		selectedStateViewports,
 		hasPositionAttribute,
 	} = useSelect( ( select ) => {
-		const { getBlocksByClientId, getSelectedBlockClientIds } =
-			select( blockEditorStore );
-		const { getSelectedBlockStyleState } = unlock(
-			select( blockEditorStore )
-		);
+		const {
+			getBlocksByClientId,
+			getSelectedBlockClientIds,
+			getSelectedBlockStyleState,
+		} = unlock( select( blockEditorStore ) );
 
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const _selectedBlocks = getBlocksByClientId( selectedBlockClientIds );
@@ -94,10 +94,7 @@ const PositionControlsPanel = () => {
 
 				if ( viewport ) {
 					/*
-					 * Deleting the viewport's position override would fall
-					 * back to the value inherited from the default state, so
-					 * an explicit empty type is needed to actually clear it
-					 * for this viewport.
+					 * Explicitly clear the position for this viewport.
 					 */
 					style[ viewport ] = {
 						...style[ viewport ],
