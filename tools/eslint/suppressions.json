@@ -8226,6 +8226,11 @@
 			"count": 1
 		}
 	},
+	"packages/ui/src/form/primitives/radio-group/radio-group.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
 	"packages/ui/src/form/primitives/radio/radio.tsx": {
 		"@typescript-eslint/no-shadow": {
 			"count": 1
