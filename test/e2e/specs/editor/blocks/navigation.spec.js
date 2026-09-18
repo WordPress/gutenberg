@@ -193,7 +193,7 @@ test.describe( 'Navigation block', () => {
 
 			const navBlockInserter = editor.canvas
 				.getByRole( 'document', { name: 'Block: Navigation' } )
-				.getByRole( 'button', { name: 'Add page' } );
+				.getByRole( 'button', { name: 'Add link' } );
 			await navBlockInserter.click();
 
 			await page.keyboard.type( 'https://example.com' );
@@ -458,7 +458,7 @@ test.describe( 'Navigation block', () => {
 				} );
 
 				const submenuBlockInserter =
-					submenuBlock.getByLabel( 'Add page' );
+					submenuBlock.getByLabel( 'Add link' );
 				await expect( submenuBlockInserter ).toBeVisible();
 				await expect( submenuBlockInserter ).toBeFocused();
 
@@ -821,7 +821,7 @@ test.describe( 'Navigation block', () => {
 				// Use the block inserter to add a new category link
 				await editor.canvas
 					.getByRole( 'document', { name: 'Block: Navigation' } )
-					.getByRole( 'button', { name: 'Add page' } )
+					.getByRole( 'button', { name: 'Add link' } )
 					.click();
 
 				// Verify the popover is visible (we want the invalid link click to have opened the popover)
@@ -1053,7 +1053,7 @@ test.describe( 'Navigation block', () => {
 
 		await editor.selectBlocks( navBlock );
 
-		await navBlock.getByRole( 'button', { name: 'Add page' } ).click();
+		await navBlock.getByRole( 'button', { name: 'Add link' } ).click();
 
 		// This relies on network so allow additional time for
 		// the request to complete.
@@ -2229,13 +2229,13 @@ class Navigation {
 	}
 
 	getNavBlockInserter() {
-		return this.getNavBlock().getByLabel( 'Add page' ).first();
+		return this.getNavBlock().getByLabel( 'Add link' ).first();
 	}
 
 	getSubmenuBlockInserter() {
 		return this.editor.canvas
 			.getByRole( 'document', { name: 'Block: Submenu' } )
-			.getByLabel( 'Add page' );
+			.getByLabel( 'Add link' );
 	}
 
 	getLinkControlSearch() {
