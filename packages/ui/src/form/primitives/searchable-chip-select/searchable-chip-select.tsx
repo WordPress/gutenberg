@@ -19,20 +19,9 @@ function getChipsToolbarLabel( selectedCount: number ): string | undefined {
 	return _n( 'Selected item', 'Selected items', selectedCount );
 }
 
-function getInputSelectionHint(
-	selectedCount: number,
-	canMoveToSelectedItems: boolean
-): string | undefined {
+function getInputSelectionHint( selectedCount: number ): string | undefined {
 	if ( selectedCount === 0 ) {
 		return undefined;
-	}
-
-	if ( ! canMoveToSelectedItems ) {
-		return sprintf(
-			/* translators: %d: number of selected items. */
-			_n( '%d item selected.', '%d items selected.', selectedCount ),
-			selectedCount
-		);
 	}
 
 	return sprintf(
@@ -90,10 +79,8 @@ export const SearchableChipSelect = forwardRef<
 				<Combobox.Value>
 					{ ( value: Item[] ) => {
 						const selectedCount = value.length;
-						const selectionHint = getInputSelectionHint(
-							selectedCount,
-							! disabled
-						);
+						const selectionHint =
+							getInputSelectionHint( selectedCount );
 
 						return (
 							<>

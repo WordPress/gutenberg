@@ -65,7 +65,6 @@ export const ChipWithRemove = forwardRef<
 							clsx( props[ 'aria-describedby' ], labelId ) ||
 							undefined
 						}
-						aria-hidden={ disabled || undefined }
 					/>
 				) }
 			/>

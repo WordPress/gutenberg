@@ -141,12 +141,12 @@ describe( 'Combobox', () => {
 	} );
 
 	describe( 'when disabled', () => {
-		it( 'hides the chip remove button from screen readers', () => {
+		it( 'disables the chip remove button', () => {
 			renderDisabledMultiSelect();
 
 			expect(
-				screen.queryByRole( 'button', { name: 'Remove' } )
-			).not.toBeInTheDocument();
+				screen.getByRole( 'button', { name: 'Remove' } )
+			).toBeDisabled();
 		} );
 
 		it( 'hides the clear button from screen readers', () => {
