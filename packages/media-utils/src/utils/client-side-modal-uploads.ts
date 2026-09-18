@@ -57,6 +57,8 @@ type UploadMediaGlobal = {
 type UploadStoreSelectors = {
 	getSettings: () => {
 		mediaUpload?: unknown;
+		mediaSideload?: unknown;
+		mediaFinalize?: unknown;
 		allImageSizes?: Record< string, unknown >;
 	};
 	getItems: () => any[];
@@ -78,8 +80,7 @@ type UploadStoreActions = {
  */
 function selectUploadStore(): UploadStoreSelectors | undefined {
 	return select( UPLOAD_STORE ) as unknown as
-		| UploadStoreSelectors
-		| undefined;
+		UploadStoreSelectors | undefined;
 }
 
 /**
@@ -161,7 +162,7 @@ function getUploadMedia(): UploadMediaGlobal | undefined {
 function isFullPipelineActive(): boolean {
 	return Boolean(
 		window.__clientSideMediaProcessing &&
-			getUploadMedia()?.detectClientSideMediaSupport?.()?.supported
+		getUploadMedia()?.detectClientSideMediaSupport?.()?.supported
 	);
 }
 
@@ -174,8 +175,8 @@ function isFullPipelineActive(): boolean {
 function isHeicOnlyPipelineActive(): boolean {
 	return Boolean(
 		window.__clientSideMediaProcessing &&
-			! isFullPipelineActive() &&
-			getUploadMedia()?.isHeicCanvasSupported?.()
+		! isFullPipelineActive() &&
+		getUploadMedia()?.isHeicCanvasSupported?.()
 	);
 }
 
@@ -187,6 +188,15 @@ function isHeicOnlyPipelineActive(): boolean {
  * registered its store - has to stay on the classic path: a degradation, never
  * data loss.
  *
+ * `mediaUpload` alone does not prove the store was configured: it defaults to
+ * a no-op that accepts a file and never calls back, so handing it one strands
+ * the modal's tile at "uploading" forever. That is what a screen carrying the
+ * media modal but no block editor looks like - the site editor's page list,
+ * where "Set featured image" opens the modal from a DataViews quick edit.
+ * `mediaSideload` and `mediaFinalize` have no defaults and are written by the
+ * same provider, in the same dispatch, as the real `mediaUpload`, so requiring
+ * them is what tells a configured store from an untouched one.
+ *
  * The store is read from the default registry, which is the one the block
  * editor provider writes to unless it was given a registry of its own. Under a
  * custom `RegistryProvider` this check simply fails and the modal keeps
@@ -196,7 +206,13 @@ function isHeicOnlyPipelineActive(): boolean {
  * @return True when the store is ready to accept files.
  */
 function isPipelineReady(): boolean {
-	return Boolean( selectUploadStore()?.getSettings()?.mediaUpload );
+	const settings = selectUploadStore()?.getSettings();
+
+	return Boolean(
+		settings?.mediaUpload &&
+		settings?.mediaSideload &&
+		settings?.mediaFinalize
+	);
 }
 
 /**
@@ -515,7 +531,7 @@ function toModelAttributes( attachment: any ): Record< string, unknown > {
 									: 'landscape',
 						},
 					] )
-			  )
+				)
 			: undefined,
 	};
 }

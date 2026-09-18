@@ -1,7 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const addItems = vi.fn();
-const getSettings = vi.fn( () => ( { mediaUpload: () => {} } ) );
+// The settings a block editor provider writes into the store. `mediaUpload`
+// alone is what an untouched store already reports, so the module only treats
+// the pipeline as usable once the whole set is there.
+const CONFIGURED_SETTINGS = {
+	mediaUpload: () => {},
+	mediaSideload: () => {},
+	mediaFinalize: () => {},
+};
+const getSettings = vi.fn( (): Record< string, unknown > => ( {
+	...CONFIGURED_SETTINGS,
+} ) );
 const getItems = vi.fn( (): any[] => [] );
 const detectClientSideMediaSupport = vi.fn( () => ( { supported: true } ) );
 const isHeicCanvasSupported = vi.fn( () => false );
@@ -163,6 +173,7 @@ describe( 'installClientSideModalUploads', () => {
 	afterEach( () => {
 		vi.clearAllMocks();
 		getItems.mockReturnValue( [] );
+		getSettings.mockReturnValue( { ...CONFIGURED_SETTINGS } );
 		notifyStoreChange = () => {};
 		delete ( window as any ).wp;
 		delete ( window as any ).plupload;
@@ -233,6 +244,24 @@ describe( 'installClientSideModalUploads', () => {
 		const { up, bindings } = createUploader( Uploader );
 
 		// Returning undefined lets the built-in handler run.
+		expect(
+			bindings[ 0 ].handler( up, [ createPluploadFile() ] )
+		).toBeUndefined();
+		expect( addItems ).not.toHaveBeenCalled();
+	} );
+
+	it( 'leaves the batch to plupload when only the default mediaUpload is set', async () => {
+		// An untouched store reports a no-op `mediaUpload` that accepts a file
+		// and never calls back, which would strand the modal's tile at
+		// "uploading" - the state of any screen carrying the media modal
+		// without a block editor behind it.
+		getSettings.mockReturnValue( { mediaUpload: () => {} } );
+		const { Uploader } = setUpGlobals();
+		const { installClientSideModalUploads } = await loadModule();
+
+		installClientSideModalUploads();
+		const { up, bindings } = createUploader( Uploader );
+
 		expect(
 			bindings[ 0 ].handler( up, [ createPluploadFile() ] )
 		).toBeUndefined();
