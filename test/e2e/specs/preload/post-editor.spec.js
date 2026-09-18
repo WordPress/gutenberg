@@ -85,6 +85,7 @@ test.describe( 'Preload', () => {
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
 				`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
+				`GET /wp/v2/templates?context=edit&per_page=100&post_id=${ postId }`,
 				'POST /wp-sync/v1/save',
 				'POST /wp-sync/v1/updates',
 				'POST /wp/v2/users/me',
