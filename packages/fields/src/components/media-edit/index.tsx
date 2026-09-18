@@ -355,7 +355,7 @@ function ExpandedMediaEditAttachments( {
 													attachment as Attachment< 'view' >
 												 ).title.rendered
 											)
-									  )
+										)
 									: __( 'Replace' )
 							}
 							showTooltip

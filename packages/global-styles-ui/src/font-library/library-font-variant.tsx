@@ -22,7 +22,7 @@ function LibraryFontVariant( {
 					face.fontStyle,
 					face.fontWeight,
 					font.source
-			  )
+				)
 			: isFontActivated( font.slug, undefined, undefined, font.source );
 
 	const handleToggleActivation = () => {

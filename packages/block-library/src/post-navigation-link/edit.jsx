@@ -4,7 +4,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -35,9 +35,9 @@ export default function PostNavigationLinkEdit( {
 	if ( showTitle ) {
 		placeholder = isNext
 			? /* translators: Label before for next and previous post. There is a space after the colon. */
-			  __( 'Next: ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
+				__( 'Next: ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
 			: /* translators: Label before for next and previous post. There is a space after the colon. */
-			  __( 'Previous: ' ); // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
+				__( 'Previous: ' ); // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
 	}
 
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
@@ -174,7 +174,7 @@ export default function PostNavigationLinkEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<SelectControl
+				<WCSelectControl
 					label={ __( 'Filter by taxonomy' ) }
 					value={ taxonomy }
 					options={ getTaxonomyOptions() }

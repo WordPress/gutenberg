@@ -37,24 +37,23 @@ const translationMap: TranslationMap = {
 	'styles.filter': __( 'Filter' ),
 	'styles.dimensions': __( 'Dimensions' ),
 };
-const getBlockNames = memoize(
-	(): BlockNamesMap =>
-		getBlockTypes().reduce< BlockNamesMap >(
-			(
-				accumulator: BlockNamesMap,
-				{
-					name,
-					title,
-				}: {
-					name: string;
-					title: string;
-				}
-			) => {
-				accumulator[ name ] = title;
-				return accumulator;
-			},
-			{}
-		)
+const getBlockNames = memoize( (): BlockNamesMap =>
+	getBlockTypes().reduce< BlockNamesMap >(
+		(
+			accumulator: BlockNamesMap,
+			{
+				name,
+				title,
+			}: {
+				name: string;
+				title: string;
+			}
+		) => {
+			accumulator[ name ] = title;
+			return accumulator;
+		},
+		{}
+	)
 );
 const isObject = ( obj: any ): obj is Record< string, any > =>
 	obj !== null && typeof obj === 'object';
