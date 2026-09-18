@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `DataViews.PageSelect`, `DataViewsPicker.PageSelect` and `DataViewsPicker.Actions` sub-components, so a picker can compose a footer from the page select and its actions ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
+
+### Enhancements
+
+-   DataViewsPicker: Footer action buttons now honor an action's `isEligible`, disabling the button when no selected item is eligible and passing only the eligible items to the callback. A `label` function still receives the whole selection ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
+
 ### Bug Fixes
 
 -   Grid layout: when the title is hidden (`showTitle: false`) and items are clickable, label each item's clickable media area with its title instead of the generic "Navigate to item" ([#82639](https://github.com/WordPress/gutenberg/pull/82639)).

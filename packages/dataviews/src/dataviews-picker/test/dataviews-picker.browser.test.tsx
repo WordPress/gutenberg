@@ -399,6 +399,46 @@ describe( 'DataViews Picker', () => {
 				] );
 			} );
 
+			it( 'honors `isEligible` in the footer action', async () => {
+				const callback = vi.fn();
+				const actions: ActionButton< Data >[] = [
+					{
+						id: 'confirm',
+						label: ( items ) => `Confirm ${ items.length }`,
+						supportsBulk: true,
+						isPrimary: true,
+						isEligible: ( item ) => item.id !== 1,
+						callback,
+					},
+				];
+				await render( <Picker actions={ actions } /> );
+
+				const user = userEvent.setup();
+				const options = screen.getAllByRole( 'option' );
+
+				// Only an ineligible item is selected: the button reflects the
+				// selection but cannot run on it.
+				await user.click( options[ 0 ] );
+				expect(
+					screen.getByRole( 'button', { name: 'Confirm 1' } )
+				).toHaveAttribute( 'aria-disabled', 'true' );
+
+				// An eligible item joins the selection: the label counts the
+				// whole selection, the callback receives the eligible part.
+				await user.click( options[ 1 ] );
+				const button = screen.getByRole( 'button', {
+					name: 'Confirm 2',
+				} );
+				expect( button ).not.toHaveAttribute( 'aria-disabled', 'true' );
+				await user.click( button );
+				expect( callback ).toHaveBeenCalledTimes( 1 );
+				expect(
+					callback.mock.calls[ 0 ][ 0 ].map(
+						( item: Data ) => item.id
+					)
+				).toEqual( [ 2 ] );
+			} );
+
 			it( 'calls the action callback when the action button is clicked', async () => {
 				await render( <Picker actions={ multiSelectActions } /> );
 
@@ -477,6 +517,11 @@ describe( 'DataViews Picker', () => {
 					name: /next/i,
 				} );
 				await user.click( nextButton );
+
+				// The selection lives on page 1; the action stays available.
+				expect(
+					screen.getByRole( 'button', { name: 'Confirm' } )
+				).not.toHaveAttribute( 'aria-disabled', 'true' );
 
 				// Page 2: Select another item
 				options = within( listbox ).getAllByRole( 'option' );
