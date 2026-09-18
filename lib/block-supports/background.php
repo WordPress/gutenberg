@@ -103,11 +103,17 @@ function gutenberg_render_background_support( $block_content, $block ) {
 			}
 
 			$tags->set_attribute( 'style', $updated_style );
-			// Skip has-background when the gradient is used as a text fill via
-			// background-clip: text, as the visual effect is on the text, not the background.
-			$is_text_gradient = isset( $block_attributes['style']['background']['backgroundClip'] )
-				&& 'text' === $block_attributes['style']['background']['backgroundClip'];
-			if ( ! $is_text_gradient ) {
+
+			/*
+			 * A background clipped to the text paints the glyphs rather than the
+			 * block's box, so there is no block background to announce. Read the
+			 * clip from the serialized styles so an unsupported or skipped value
+			 * left in the block's attributes cannot suppress the class.
+			 */
+			$background_clip = $background_styles['backgroundClip'] ?? null;
+			$has_background  = ! empty( $background_styles['backgroundImage'] ) || ! empty( $background_styles['gradient'] );
+
+			if ( $has_background && 'text' !== $background_clip ) {
 				$tags->add_class( 'has-background' );
 			}
 		}

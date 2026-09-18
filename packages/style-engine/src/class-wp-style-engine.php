@@ -118,14 +118,17 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 				),
 				'gradient'   => array(
-					'property_keys'   => array(
+					'property_keys' => array(
 						'default' => 'background',
 					),
-					'css_vars'        => array(
+					'css_vars'      => array(
 						'gradient' => '--wp--preset--gradient--$slug',
 					),
-					'path'            => array( 'color', 'gradient' ),
-					'classnames_func' => array( self::class, 'get_gradient_classnames' ),
+					'path'          => array( 'color', 'gradient' ),
+					'classnames'    => array(
+						'has-background'                => true,
+						'has-$slug-gradient-background' => 'gradient',
+					),
 				),
 			),
 			'border'     => array(
@@ -489,7 +492,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						continue;
 					}
 
-					$classnames = static::get_classnames( $style_value, $style_definition, $options );
+					$classnames = static::get_classnames( $style_value, $style_definition );
 					if ( ! empty( $classnames ) ) {
 						$parsed_styles['classnames'] = array_merge( $parsed_styles['classnames'], $classnames );
 					}
@@ -519,13 +522,9 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *
 		 * @return array|string[] An array of CSS classnames, or empty array.
 		 */
-		protected static function get_classnames( $style_value, $style_definition, $options = array() ) {
+		protected static function get_classnames( $style_value, $style_definition ) {
 			if ( empty( $style_value ) ) {
 				return array();
-			}
-
-			if ( isset( $style_definition['classnames_func'] ) && is_callable( $style_definition['classnames_func'] ) ) {
-				return call_user_func( $style_definition['classnames_func'], $style_value, $style_definition, $options );
 			}
 
 			$classnames = array();
@@ -751,31 +750,6 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			}
 
 			return $css_declarations;
-		}
-
-		/**
-		 * Returns classnames for a gradient color value.
-		 *
-		 * @param string $style_value      The gradient style value.
-		 * @param array  $style_definition The style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
-		 * @param array  $options          Optional. An array of options.
-		 *
-		 * @return string[] An array of CSS classnames.
-		 */
-		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- Required by classnames_func callback signature.
-		protected static function get_gradient_classnames( $style_value, $style_definition, $options = array() ) {
-			if ( empty( $style_value ) ) {
-				return array();
-			}
-
-			$classnames = array( 'has-background' );
-
-			$slug = static::get_slug_from_preset_value( $style_value, 'gradient' );
-			if ( $slug ) {
-				$classnames[] = "has-{$slug}-gradient-background";
-			}
-
-			return $classnames;
 		}
 
 		/**
