@@ -453,7 +453,8 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			targetIndex: number,
 			// Allows invokers to specify a custom function to generate the
 			// target composite item ID
-			generateCompositeId: ( idPrefix: string ) => string
+			generateCompositeId: ( idPrefix: string ) => string,
+			{ moveFocus = false }: { moveFocus?: boolean } = {}
 		) => {
 			// Clamping between 0 and data.length - 1 to avoid out of bounds.
 			const clampedIndex = Math.min(
@@ -472,8 +473,10 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			// The active composite item is controlled state that
 			// can update without needing a focus move (e.g., searching
 			// can trigger an active ID update). Only move DOM focus
-			// when it's already within the list.
+			// when it's already within the list, unless the caller asks
+			// to restore focus that was lost with a removed item.
 			if (
+				moveFocus ||
 				compositeRef.current?.contains(
 					compositeRef.current.ownerDocument.activeElement
 				)
@@ -495,9 +498,23 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			// basically picking the item that would have been after the deleted one.
 			// If the previously active (and removed) item was the last of the list,
 			// we will select the item before it — which is the new last item.
+			//
+			// The removed item is already unmounted when this effect runs, so the
+			// focus that sat on it has fallen back to the body. In that case the
+			// usual "only move focus when it's already within the list" rule skips
+			// the focus move, so we ask `selectCompositeItem` to restore focus
+			// explicitly. When focus is still somewhere real — e.g. the search
+			// input filtered the active item out, or a confirmation modal owns
+			// focus — we leave it alone.
+			const activeElement =
+				compositeRef.current?.ownerDocument.activeElement;
+			const focusWasOrphaned =
+				! activeElement ||
+				activeElement === compositeRef.current?.ownerDocument.body;
 			selectCompositeItem(
 				previousActiveItemIndex,
-				generateItemWrapperCompositeId
+				generateItemWrapperCompositeId,
+				{ moveFocus: focusWasOrphaned }
 			);
 		}
 	}, [ isActiveIdInList, selectCompositeItem, previousActiveItemIndex ] );
