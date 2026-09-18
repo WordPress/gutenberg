@@ -709,7 +709,7 @@ Displays the next or previous post link that is adjacent to the current post.
 
 -	**Name:** [core/post-navigation-link](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-navigation-link/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** anchor, color (background, link, text), interactivity (clientNavigation), typography (fontSize, lineHeight, textAlign), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, color (background, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~, ~~reusable~~
 -	**Attributes:** arrow, label, linkLabel, showTitle, taxonomy, type
 
 ## Post Template
