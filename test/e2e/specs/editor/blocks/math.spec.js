@@ -1,12 +1,16 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const ALIGNED = '\\begin{aligned} A &= 1 \\\\ AB + C &= 2 \\end{aligned}';
+// `cases` left-aligns both columns. temml writes no alignment attribute on
+// its table, so this only aligns because the converter writes it on the
+// cells, in every engine.
+const CASES = '\\begin{cases} x & x > 0 \\\\ -x & x \\le 0 \\end{cases}';
 
 // In `aligned`, cells before `&` are right-aligned and cells after
 // it are left-aligned, so that `A` and `AB + C` both sit against
-// their `=`. Returns, for every aligned cell, how far its content is
-// from the edge its `columnalign` names; nothing is misaligned when
-// all are within a pixel.
+// their `=`; in `cases` every cell is left-aligned. Returns, for every
+// aligned cell, how far its content is from the edge its `columnalign`
+// names; nothing is misaligned when all are within a pixel.
 async function getMisalignedCells( container ) {
 	const cells = container.locator(
 		'math mtd[columnalign="right"], math mtd[columnalign="left"]'
@@ -136,7 +140,7 @@ test.describe( 'Math Block', () => {
 		expect( await getMisalignedCells( page ) ).toEqual( [] );
 	} );
 
-	test( 'should align inline math without a Math block @webkit @firefox', async ( {
+	test( 'should align the entries of a cases environment in inline math @webkit @firefox', async ( {
 		editor,
 		page,
 	} ) => {
@@ -148,7 +152,7 @@ test.describe( 'Math Block', () => {
 		await page.getByRole( 'menuitem', { name: 'Math' } ).click();
 		await page
 			.getByRole( 'textbox', { name: 'LaTeX math syntax' } )
-			.fill( ALIGNED );
+			.fill( CASES );
 		expect( await getMisalignedCells( editor.canvas ) ).toEqual( [] );
 
 		const postId = await editor.publishPost();

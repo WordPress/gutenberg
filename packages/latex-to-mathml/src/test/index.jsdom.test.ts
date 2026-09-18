@@ -15,6 +15,19 @@ describe( 'latexToMathML', () => {
 		).toEqual( [ 'right', 'left', 'right', 'left' ] );
 	} );
 
+	it( 'writes columnalign on the cells of a cases environment', () => {
+		const doc = document.implementation.createHTMLDocument( '' );
+		doc.body.innerHTML = `<math>${ latexToMathML(
+			'\\begin{cases} x & x > 0 \\\\ -x & x \\le 0 \\end{cases}'
+		) }</math>`;
+
+		expect(
+			Array.from( doc.querySelectorAll( 'mtd' ), ( cell ) =>
+				cell.getAttribute( 'columnalign' )
+			)
+		).toEqual( [ 'left', 'left', 'left', 'left' ] );
+	} );
+
 	it( 'strips the classes temml adds for its stylesheet', () => {
 		expect(
 			latexToMathML( '\\overline{ab} \\begin{cases} a & b \\end{cases}' )
