@@ -319,7 +319,8 @@ describe( 'canvasConvertToJpeg', () => {
 					.mockRejectedValue( new Error( 'Unsupported format' ) );
 
 				// Strategy 2 claims the type, then the decode never settles,
-				// which is what a missing platform codec looks like (#81043).
+				// which is what a missing platform codec looks like.
+				// See https://github.com/WordPress/gutenberg/issues/81043.
 				const close = vi.fn();
 				( global as any ).ImageDecoder = vi.fn( function () {
 					return {

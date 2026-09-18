@@ -2,15 +2,9 @@
 
 ## Unreleased
 
-### Enhancements
-
--   New `isHeicFile` export, which recognizes a HEIC/HEIF image from its own file header rather than from the MIME type a browser infers from the file name ([#81707](https://github.com/WordPress/gutenberg/issues/81707)).
-
 ### Bug Fixes
 
--   A HEIC photo whose extension says `.jpg` or `.png` is now recognized from its own file header and converted like any other HEIC file, instead of being uploaded as undecodable bytes that leave the upload stuck without ever completing or reporting an error ([#81707](https://github.com/WordPress/gutenberg/issues/81707)).
--   A HEIC file the operating system cannot identify, which arrives with an empty MIME type on Windows without the HEVC extension, is now recognized the same way and either converted or reported as undecodable, instead of being uploaded as-is and left spinning ([#81043](https://github.com/WordPress/gutenberg/issues/81043)).
--   An `ImageDecoder` decode that never settles, which a browser claiming HEIC support without the platform codec can produce, is now abandoned after a timeout so the conversion moves on to the next strategy rather than hanging the upload ([#81043](https://github.com/WordPress/gutenberg/issues/81043)).
+-   Detect HEIC uploads from the file header rather than the file name, so a HEIC file with a wrong extension or an empty MIME type is converted instead of leaving the upload stuck. Adds the `isHeicFile` export and a timeout for a stalled `ImageDecoder` decode ([#81737](https://github.com/WordPress/gutenberg/pull/81737)).
 
 ## 0.40.0 (2026-09-10)
 

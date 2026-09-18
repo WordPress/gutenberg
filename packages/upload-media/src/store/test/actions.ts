@@ -425,7 +425,8 @@ describe( 'actions', () => {
 		 * The box has no meta box behind it, so it fails the container parse
 		 * rather than the codec lookup, and is reported as a processing error.
 		 * `HEIC_DECODE_ERROR` is reserved for the case where no decoding
-		 * strategy exists at all (#81123).
+		 * strategy exists at all.
+		 * See https://github.com/WordPress/gutenberg/issues/81123.
 		 *
 		 * @param name File name.
 		 * @param type MIME type the browser would report.
