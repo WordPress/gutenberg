@@ -4,7 +4,6 @@ import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Use the portal-based popup to avoid inspector clipping.
 import { SelectControl } from '@wordpress/ui';
 import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';

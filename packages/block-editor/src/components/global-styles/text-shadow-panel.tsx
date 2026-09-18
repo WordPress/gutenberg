@@ -3,7 +3,7 @@ import {
 	Button,
 	Composite,
 	Dropdown,
-	SelectControl,
+	SelectControl as WCSelectControl,
 } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { useRef, useMemo } from '@wordpress/element';
@@ -150,7 +150,7 @@ function TextShadowControl( { textShadow, onChange }: TextShadowProps ) {
 				{ __( 'Code is poetry' ) }
 			</div>
 			{ presets.length >= PRESETS_SELECT_THRESHOLD ? (
-				<SelectControl
+				<WCSelectControl
 					hideLabelFromVision
 					label={ __( 'Text shadow preset' ) }
 					value={ activeValue }
