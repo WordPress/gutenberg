@@ -140,6 +140,7 @@ $swatch-gap: 12px;
 	}
 
 	.block-editor-panel-color-gradient-settings__color-name {
+		min-width: 0;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -161,12 +162,22 @@ $swatch-gap: 12px;
 	}
 }
 
+.block-editor-panel-color-gradient-settings__labeled-indicators {
+	width: 100%;
+	min-width: 0;
+}
+
 .block-editor-panel-color-gradient-settings__color-indicators {
 	display: flex;
+	flex-shrink: 0;
 
 	> * + * {
 		margin-inline-start: -$grid-unit;
 	}
+}
+
+.block-editor-panel-color-gradient-settings__tablist {
+	width: 100%;
 }
 
 .block-editor-panel-color-gradient-settings__reset {
