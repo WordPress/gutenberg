@@ -9,8 +9,10 @@ const { name } = metadata;
 
 export { metadata, name };
 
+// The inner blocks a new accordion starts with: a single accordion item.
 const TEMPLATE = [ [ 'core/accordion-item' ] ];
 
+// demo 
 export const settings = {
 	icon,
 	example: {
