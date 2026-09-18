@@ -168,7 +168,7 @@ jobs:
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}
                   PR_NUMBER: ${{ github.event.number }}
               run: |
-                  changelogs=$(git diff --name-only "$BASE_SHA"...HEAD -- 'packages/*/CHANGELOG.md')
+                  changelogs=$(git diff --name-only --diff-filter=d "$BASE_SHA"...HEAD -- 'packages/*/CHANGELOG.md')
 
                   if [ -z "$changelogs" ]; then
                       echo "No package CHANGELOG.md files changed; skipping structure check."
