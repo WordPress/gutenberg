@@ -23,15 +23,16 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 
 	$query = $block->context['termQuery'];
 
-	// Markup written by hand or shipped in a pattern can leave out keys that the
-	// Terms Query block fills in by default. Fall back to the same defaults so the
-	// front end renders the terms the editor shows, without undefined key warnings.
+	// Markup written by hand or shipped in a pattern can leave out `termQuery`
+	// keys. Fall back to what the editor shows for such markup: its REST request
+	// omits the missing keys, so the terms endpoint defaults apply (ordered by
+	// name, ascending, empty terms included) and every term is listed.
 	$query_taxonomy = $query['taxonomy'] ?? 'category';
 	$query_args     = array(
-		'number'     => $query['perPage'] ?? 10,
+		'number'     => $query['perPage'] ?? 0,
 		'order'      => $query['order'] ?? 'asc',
 		'orderby'    => $query['orderBy'] ?? 'name',
-		'hide_empty' => $query['hideEmpty'] ?? true,
+		'hide_empty' => $query['hideEmpty'] ?? false,
 	);
 
 	$inherit_query = isset( $query['inherit'] )
