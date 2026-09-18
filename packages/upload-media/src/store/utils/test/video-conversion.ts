@@ -171,8 +171,8 @@ describe( 'convertGifToVideo', () => {
 } );
 
 describe( 'convertGifToVideo timeout', () => {
-	let worker: typeof import('@wordpress/video-conversion/worker');
-	let convertGifToVideo: typeof import('../video-conversion').convertGifToVideo;
+	let worker: typeof import( '@wordpress/video-conversion/worker' );
+	let convertGifToVideo: typeof import( '../video-conversion' ).convertGifToVideo;
 
 	beforeEach( async () => {
 		vi.resetModules();
@@ -208,7 +208,7 @@ describe( 'convertGifToVideo timeout', () => {
 	}
 
 	async function waitForWorkerCall(
-		workerModule: typeof import('@wordpress/video-conversion/worker')
+		workerModule: typeof import( '@wordpress/video-conversion/worker' )
 	) {
 		for (
 			let attempts = 0;
@@ -316,9 +316,8 @@ describe( 'cancelGifToVideoOperations', () => {
 
 	it( 'returns false when the worker module has not been loaded yet', async () => {
 		const worker = await import( '@wordpress/video-conversion/worker' );
-		const { cancelGifToVideoOperations } = await import(
-			'../video-conversion'
-		);
+		const { cancelGifToVideoOperations } =
+			await import( '../video-conversion' );
 
 		await expect( cancelGifToVideoOperations( 'item-1' ) ).resolves.toBe(
 			false
@@ -335,9 +334,8 @@ describe( 'cancelGifToVideoOperations', () => {
 			true
 		);
 
-		const { convertGifToVideo, cancelGifToVideoOperations } = await import(
-			'../video-conversion'
-		);
+		const { convertGifToVideo, cancelGifToVideoOperations } =
+			await import( '../video-conversion' );
 
 		// Trigger a conversion to lazily load (and cache) the worker module.
 		await convertGifToVideo(
@@ -365,9 +363,8 @@ describe( 'cancelGifToVideoOperations', () => {
 			true
 		);
 
-		const { convertGifToVideo, cancelGifToVideoOperations } = await import(
-			'../video-conversion'
-		);
+		const { convertGifToVideo, cancelGifToVideoOperations } =
+			await import( '../video-conversion' );
 
 		/*
 		 * Start a conversion but do NOT await it: the worker module is now
@@ -400,9 +397,8 @@ describe( 'terminateVideoConversionWorker', () => {
 
 	it( 'is a no-op when the worker module has not been loaded yet', async () => {
 		const worker = await import( '@wordpress/video-conversion/worker' );
-		const { terminateVideoConversionWorker } = await import(
-			'../video-conversion'
-		);
+		const { terminateVideoConversionWorker } =
+			await import( '../video-conversion' );
 
 		expect( () => terminateVideoConversionWorker() ).not.toThrow();
 		expect( worker.terminateVideoConversionWorker ).not.toHaveBeenCalled();

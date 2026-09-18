@@ -14,9 +14,9 @@ npm install @wordpress/video-conversion --save
 
 ## Requirements
 
--   **WebCodecs support**: the browser must expose `ImageDecoder` and `VideoEncoder` (available in Chromium-based browsers and Safari 16.4+).
--   **Web Workers support**: the browser must support Web Workers.
--   **TypeScript support**: TypeScript consumers require TypeScript 5 or newer.
+- **WebCodecs support**: the browser must expose `ImageDecoder` and `VideoEncoder` (available in Chromium-based browsers and Safari 16.4+).
+- **Web Workers support**: the browser must support Web Workers.
+- **TypeScript support**: TypeScript consumers require TypeScript 5 or newer.
 
 ## API Reference
 
@@ -30,11 +30,11 @@ Cancellation takes effect at async boundaries (waiting for the lock, encoder-sup
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
+- _id_ `ItemId`: Item ID.
 
 _Returns_
 
--   `Promise< boolean >`: Whether an operation was cancelled.
+- `Promise< boolean >`: Whether an operation was cancelled.
 
 ### convertGifToVideo
 
@@ -46,16 +46,16 @@ Accepts the GIF as a Blob so the bytes are read once, here in the worker, instea
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
--   _gifSource_ `ArrayBuffer | Blob`: GIF file as a Blob/File or ArrayBuffer.
--   _outputMimeType_ `string`: Output MIME type ('video/mp4' or 'video/webm').
--   _maxDimensions_ `number`: Optional maximum dimension for downscaling.
--   _maxTotalPixels_ `number`: Optional budget for total decoded pixels (width × height × frame count) beyond which the conversion is rejected with SIZE_LIMIT_ERROR_PREFIX. Defaults to DEFAULT_MAX_TOTAL_PIXELS; `0` disables.
--   _onProgress_ `( progress: number ) => void`: Optional callback reporting conversion progress as a fraction from 0 to 1. Throttled to whole-percent increments so a thousand-frame GIF does not flood the worker message channel. Must be a top-level argument: the worker RPC layer (comctx) only proxies functions in argument position, not ones nested in objects.
+- _id_ `ItemId`: Item ID.
+- _gifSource_ `ArrayBuffer | Blob`: GIF file as a Blob/File or ArrayBuffer.
+- _outputMimeType_ `string`: Output MIME type ('video/mp4' or 'video/webm').
+- _maxDimensions_ `number`: Optional maximum dimension for downscaling.
+- _maxTotalPixels_ `number`: Optional budget for total decoded pixels (width × height × frame count) beyond which the conversion is rejected with SIZE_LIMIT_ERROR_PREFIX. Defaults to DEFAULT_MAX_TOTAL_PIXELS; `0` disables.
+- _onProgress_ `( progress: number ) => void`: Optional callback reporting conversion progress as a fraction from 0 to 1. Throttled to whole-percent increments so a thousand-frame GIF does not flood the worker message channel. Must be a top-level argument: the worker RPC layer (comctx) only proxies functions in argument position, not ones nested in objects.
 
 _Returns_
 
--   `Promise< ArrayBuffer >`: Encoded video buffer.
+- `Promise< ArrayBuffer >`: Encoded video buffer.
 
 ### DEFAULT_MAX_TOTAL_PIXELS
 

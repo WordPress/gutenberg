@@ -646,7 +646,7 @@ describe( 'DataForm component', () => {
 										}: {
 											item: typeof data;
 										} ) => item.order === 1,
-								  }
+									}
 								: field
 						) }
 						form={ {
@@ -1075,7 +1075,7 @@ describe( 'DataForm component', () => {
 										? null
 										: 'Title is not allowed for this order.',
 							},
-					  }
+						}
 					: field
 			);
 

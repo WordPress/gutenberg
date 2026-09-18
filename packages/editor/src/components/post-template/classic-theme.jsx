@@ -1,5 +1,10 @@
 import { __ } from '@wordpress/i18n';
-import { SelectControl, Dropdown, Button, Notice } from '@wordpress/components';
+import {
+	SelectControl as WCSelectControl,
+	Dropdown,
+	Button,
+	Notice,
+} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
@@ -82,7 +87,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 							post_type:
 								select( editorStore ).getCurrentPostType(),
 							per_page: -1,
-					  } )
+						} )
 					: undefined,
 				selectedTemplateSlug:
 					select( editorStore ).getEditedPostAttribute( 'template' ),
@@ -141,7 +146,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 									label: __( 'Add template' ),
 									onClick: () => setIsCreateModalOpen( true ),
 								},
-						  ]
+							]
 						: []
 				}
 				onClose={ onClose }
@@ -151,7 +156,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 					{ __( 'The posts page template cannot be changed.' ) }
 				</Notice>
 			) : (
-				<SelectControl
+				<WCSelectControl
 					hideLabelFromVision
 					label={ __( 'Template' ) }
 					value={ selectedOption?.value ?? '' }

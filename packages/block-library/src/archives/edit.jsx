@@ -1,6 +1,6 @@
 import {
 	ToggleControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Spinner,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -108,7 +108,7 @@ export default function ArchivesEdit( { attributes, setAttributes, name } ) {
 							setAttributes( { type: 'monthly' } )
 						}
 					>
-						<SelectControl
+						<WCSelectControl
 							label={ __( 'Group by' ) }
 							options={ [
 								{ label: __( 'Year' ), value: 'yearly' },
