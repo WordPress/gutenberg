@@ -1,0 +1,37 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			/* Radio and label will be aligned correctly as far as the radio height
+			is less or equal than the label's line height */
+			--_wp-ui-radio-group-control-radio-height: 16px;
+
+			/* Use the highest number between the target line height for the label text,
+			and the radio height. This will ensure that the first line of the label
+			and the radio are always vertically centered. */
+			--_wp-ui-radio-group-control-label-line-height: max(var(--_wp-ui-radio-group-control-radio-height), var(--wpds-typography-line-height-xs));
+		}
+
+		.radio-wrapper {
+			display: flex;
+			align-items: center;
+			/* Size the wrapper to one label line so the radio centers on the first line. */
+			height: 1lh;
+			line-height: var(--_wp-ui-radio-group-control-label-line-height);
+			overflow: visible;
+		}
+
+		.radio {
+			--wp-ui-radio-input-size: var(--_wp-ui-radio-group-control-radio-height);
+		}
+
+		.label {
+			--wp-ui-field-label-line-height: var(--_wp-ui-radio-group-control-label-line-height);
+		}
+
+		.item:not(:has(.radio[data-disabled])) .label {
+			cursor: var(--wpds-cursor-control);
+		}
+	}
+}
