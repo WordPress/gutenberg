@@ -205,7 +205,7 @@ function PostFeaturedImage( {
 												? null
 												: __(
 														'Edit or replace the featured image'
-												  )
+													)
 										}
 										aria-describedby={
 											! featuredImageId
@@ -303,7 +303,7 @@ const applyWithSelect = withSelect( ( select ) => {
 		media: featuredImageId
 			? getEntityRecord( 'postType', 'attachment', featuredImageId, {
 					context: 'view',
-			  } )
+				} )
 			: null,
 		currentPostId: getCurrentPostId(),
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),
