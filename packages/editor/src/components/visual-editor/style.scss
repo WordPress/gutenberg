@@ -52,4 +52,15 @@
 			padding: 6px;
 		}
 	}
+
+	// Title-gap inserter only (`is-before-first-block`). Limit hit-testing to
+	// the "+" so the overlay does not steal clicks on the first block.
+	.block-editor-block-list__insertion-point.is-before-first-block {
+		pointer-events: none;
+
+		.block-editor-block-list__insertion-point-inserter,
+		.block-editor-block-list__insertion-point-inserter * {
+			pointer-events: all;
+		}
+	}
 }
