@@ -66,6 +66,11 @@ export const LayoutPanel = {
 			description: 'Chooses when the edit icon is visible.',
 			options: [ 'default', 'always', 'on-hover' ],
 		},
+		showPlaceholderIfEmpty: {
+			control: { type: 'boolean' },
+			description:
+				'Whether the summary shows the field placeholder when the value is empty.',
+		},
 		applyLabel: {
 			control: { type: 'text' },
 			description:
@@ -78,9 +83,15 @@ export const LayoutPanel = {
 				'Custom text for the modal cancel button. Defaults to "Cancel".',
 			if: { arg: 'openAs', eq: 'modal' },
 		},
+		disabled: {
+			control: { type: 'boolean' },
+			description: 'Disable all fields in the form.',
+		},
 	},
 	args: {
 		openAs: 'default',
+		showPlaceholderIfEmpty: false,
+		disabled: false,
 	},
 };
 

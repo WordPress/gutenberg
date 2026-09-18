@@ -4,6 +4,8 @@ import blockLibraryLtr from '../package-styles/block-library-ltr.lazy.scss?inlin
 import blockLibraryRtl from '../package-styles/block-library-rtl.lazy.scss?inline';
 import componentsLtr from '../package-styles/components-ltr.lazy.scss?inline';
 import componentsRtl from '../package-styles/components-rtl.lazy.scss?inline';
+import commandsLtr from '../package-styles/commands-ltr.lazy.scss?inline';
+import commandsRtl from '../package-styles/commands-rtl.lazy.scss?inline';
 import editorLtr from '../package-styles/editor-ltr.lazy.scss?inline';
 import editorRtl from '../package-styles/editor-rtl.lazy.scss?inline';
 import formatLibraryLtr from '../package-styles/format-library-ltr.lazy.scss?inline';
@@ -86,6 +88,12 @@ const CONFIG = [
 		componentIdMatcher: /^grid-/,
 		ltr: [ designTokens ],
 		rtl: [ designTokens ],
+	},
+	{
+		// Dashboard stories include form controls and the command palette.
+		componentIdMatcher: /^widget-dashboard-/,
+		ltr: [ componentsLtr, commandsLtr, dataviewsLtr ],
+		rtl: [ componentsRtl, commandsRtl, dataviewsRtl ],
 	},
 	{
 		componentIdMatcher: /^tokens-/,

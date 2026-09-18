@@ -182,6 +182,16 @@
 		box-shadow: none;
 	}
 
+	&.has-aspect-ratio {
+		// Safari clips overflowing content instead of growing the box when an
+		// aspect ratio is set. Floor the height to the content in WebKit only.
+		// `!important` is required because aspect-ratio covers serialize an
+		// inline `min-height: unset`, which outranks any stylesheet rule.
+		@supports (-webkit-hyphens: none) {
+			min-height: fit-content !important;
+		}
+	}
+
 	.wp-block-cover__embed-background {
 		position: absolute;
 		top: 0;

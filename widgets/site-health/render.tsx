@@ -3,7 +3,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
 import { Link, Stack, Text } from '@wordpress/ui';
-import { useWidgetHost } from '@wordpress/widget-primitives';
+import { HostLink } from '@wordpress/widget-primitives';
 import { CircleProgress, type HealthTone } from './components';
 import styles from './style.module.css';
 
@@ -104,7 +104,6 @@ function reviewHref( counts: IssueCounts ): string {
 export default function SiteHealth() {
 	const [ counts, setCounts ] = useState< IssueCounts | null >( null );
 	const [ isLoading, setIsLoading ] = useState( true );
-	const { links } = useWidgetHost();
 
 	useEffect( () => {
 		let ignore = false;
@@ -163,8 +162,6 @@ export default function SiteHealth() {
 	const tone = toneForPercentage( percentage );
 	const href = reviewHref( counts );
 
-	const path = links?.match( href ) ?? null;
-	const HostLink = links?.Link;
 	const reviewLabel = sprintf(
 		/* translators: %d: Number of issues to address. */
 		_n( 'Review %d item', 'Review %d items', issuesTotal ),
@@ -181,14 +178,11 @@ export default function SiteHealth() {
 		>
 			<CircleProgress percentage={ percentage } tone={ tone } />
 			<Text variant="body-lg">{ statusMessage( counts ) }</Text>
-			{ issuesTotal > 0 &&
-				( path !== null && HostLink ? (
-					<Link render={ <HostLink path={ path } /> }>
-						{ reviewLabel }
-					</Link>
-				) : (
-					<Link href={ href }>{ reviewLabel }</Link>
-				) ) }
+			{ issuesTotal > 0 && (
+				<Link render={ <HostLink href={ href } /> }>
+					{ reviewLabel }
+				</Link>
+			) }
 		</Stack>
 	);
 }

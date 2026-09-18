@@ -4,6 +4,8 @@ reviews:
     # Post the summary in CodeRabbit's own walkthrough comment rather than
     # editing the pull request description.
     high_level_summary_in_walkthrough: true
+    # Don't post the review status comment.
+    review_status: false
     auto_review:
         # Don't review every pull request. Reviews run when someone comments
         # `@coderabbitai review`, or when the keyword below is in the description.

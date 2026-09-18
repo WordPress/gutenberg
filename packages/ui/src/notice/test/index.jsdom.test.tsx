@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -65,7 +66,7 @@ describe( 'Notice', () => {
 	describe( 'dismissing via CloseIcon', () => {
 		it( 'renders dismiss button when CloseIcon included', async () => {
 			const user = userEvent.setup();
-			const handleDismiss = jest.fn();
+			const handleDismiss = vi.fn();
 
 			render(
 				<Notice.Root>
@@ -98,7 +99,7 @@ describe( 'Notice', () => {
 					<Notice.Description>Test</Notice.Description>
 					<Notice.CloseIcon
 						label="Close notification"
-						onClick={ jest.fn() }
+						onClick={ vi.fn() }
 					/>
 				</Notice.Root>
 			);
@@ -151,7 +152,7 @@ describe( 'Notice', () => {
 	describe( 'actions', () => {
 		it( 'renders ActionButton and ActionLink', async () => {
 			const user = userEvent.setup();
-			const handleClick = jest.fn();
+			const handleClick = vi.fn();
 
 			render(
 				<Notice.Root>

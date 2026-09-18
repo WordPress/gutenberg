@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { createRef } from '@wordpress/element';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -23,7 +24,7 @@ describe( 'Button', () => {
 	it( 'is accessible when disabled by default', async () => {
 		const user = userEvent.setup();
 
-		const onClickMock = jest.fn();
+		const onClickMock = vi.fn();
 		render(
 			<Button disabled onClick={ onClickMock }>
 				Click me

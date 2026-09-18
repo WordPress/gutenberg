@@ -1,11 +1,4 @@
-import {
-	describe,
-	expect,
-	test,
-	jest,
-	beforeEach,
-	afterEach,
-} from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { Y } from '@wordpress/sync';
 import { AwarenessState } from '../awareness-state';
 import type { EnhancedState, EqualityFieldCheck } from '../types';
@@ -58,13 +51,13 @@ describe( 'AwarenessState', () => {
 	let awareness: TestAwarenessState;
 
 	beforeEach( () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 		doc = new Y.Doc();
 		awareness = new TestAwarenessState( doc );
 	} );
 
 	afterEach( () => {
-		jest.useRealTimers();
+		vi.useRealTimers();
 		doc.destroy();
 	} );
 
@@ -96,7 +89,7 @@ describe( 'AwarenessState', () => {
 			awareness.setLocalStateField( 'count', 42 );
 
 			// Subscribe to trigger state update
-			const callback = jest.fn();
+			const callback = vi.fn();
 			awareness.onStateChange( callback );
 			awareness.testUpdateSubscribers( true );
 
@@ -120,7 +113,7 @@ describe( 'AwarenessState', () => {
 			awareness.setLocalStateField( 'count', 1 );
 
 			// Subscribe and update to trigger state tracking
-			const callback = jest.fn();
+			const callback = vi.fn();
 			awareness.onStateChange( callback );
 			awareness.testUpdateSubscribers( true );
 
@@ -135,7 +128,7 @@ describe( 'AwarenessState', () => {
 	describe( 'onStateChange', () => {
 		test( 'should register callback and receive updates', () => {
 			awareness.setUp();
-			const callback = jest.fn();
+			const callback = vi.fn();
 
 			awareness.onStateChange( callback );
 			awareness.setLocalStateField( 'name', 'Test' );
@@ -147,7 +140,7 @@ describe( 'AwarenessState', () => {
 
 		test( 'should return unsubscribe function', () => {
 			awareness.setUp();
-			const callback = jest.fn();
+			const callback = vi.fn();
 
 			const unsubscribe = awareness.onStateChange( callback );
 			awareness.setLocalStateField( 'name', 'Test' );
@@ -164,7 +157,7 @@ describe( 'AwarenessState', () => {
 
 		test( 'should not call callback when state has not changed', () => {
 			awareness.setUp();
-			const callback = jest.fn();
+			const callback = vi.fn();
 
 			awareness.onStateChange( callback );
 			awareness.setLocalStateField( 'name', 'Test' );
@@ -180,7 +173,7 @@ describe( 'AwarenessState', () => {
 
 		test( 'should call callback when forceUpdate is true', () => {
 			awareness.setUp();
-			const callback = jest.fn();
+			const callback = vi.fn();
 
 			awareness.onStateChange( callback );
 			awareness.setLocalStateField( 'name', 'Test' );
@@ -218,7 +211,7 @@ describe( 'AwarenessState', () => {
 			// Verify the value was updated
 			expect( awareness.getLocalStateField( 'name' ) ).toBe( 'Second' );
 
-			jest.advanceTimersByTime( 100 );
+			vi.advanceTimersByTime( 100 );
 
 			// After throttle period, the value should still be the last set value
 			expect( awareness.getLocalStateField( 'name' ) ).toBe( 'Second' );
@@ -228,7 +221,7 @@ describe( 'AwarenessState', () => {
 	describe( 'setConnectionStatus', () => {
 		test( 'should trigger subscriber update when connection changes', () => {
 			awareness.setUp();
-			const callback = jest.fn();
+			const callback = vi.fn();
 			awareness.onStateChange( callback );
 
 			awareness.setLocalStateField( 'name', 'Test' );
@@ -247,7 +240,7 @@ describe( 'AwarenessState', () => {
 			awareness.setUp();
 			awareness.setLocalStateField( 'name', 'Same' );
 
-			const callback = jest.fn();
+			const callback = vi.fn();
 			awareness.onStateChange( callback );
 			awareness.testUpdateSubscribers( true );
 			callback.mockClear();
@@ -263,7 +256,7 @@ describe( 'AwarenessState', () => {
 			awareness.setUp();
 			awareness.setLocalStateField( 'name', 'Original' );
 
-			const callback = jest.fn();
+			const callback = vi.fn();
 			awareness.onStateChange( callback );
 			awareness.testUpdateSubscribers( true );
 			callback.mockClear();
@@ -358,7 +351,7 @@ describe( 'AwarenessState', () => {
 	describe( 'change event handling', () => {
 		test( 'should update subscribers on awareness change', () => {
 			awareness.setUp();
-			const callback = jest.fn();
+			const callback = vi.fn();
 			awareness.onStateChange( callback );
 
 			awareness.setLocalStateField( 'name', 'Test' );
@@ -378,7 +371,7 @@ describe( 'AwarenessState', () => {
 
 		test( 'should handle user removal and delayed cleanup', () => {
 			awareness.setUp();
-			const callback = jest.fn();
+			const callback = vi.fn();
 			awareness.onStateChange( callback );
 
 			awareness.setLocalStateField( 'name', 'Test' );
@@ -399,7 +392,7 @@ describe( 'AwarenessState', () => {
 			callback.mockClear();
 
 			// After REMOVAL_DELAY_IN_MS, should trigger another update
-			jest.advanceTimersByTime( 5000 );
+			vi.advanceTimersByTime( 5000 );
 			expect( callback ).toHaveBeenCalled();
 		} );
 	} );
