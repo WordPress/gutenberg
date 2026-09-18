@@ -67,6 +67,7 @@
 			"__experimentalTextTransform": true,
 			"__experimentalWritingMode": true,
 			"textShadow": true,
+			"fontVariationSettings": true,
 			"fitText": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
