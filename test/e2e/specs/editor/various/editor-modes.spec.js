@@ -81,6 +81,45 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		);
 	} );
 
+	test( 'should follow the markup when an anchor is typed or deleted in HTML mode', async ( {
+		editor,
+	} ) => {
+		const paragraphHTML = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+			.getByRole( 'textbox' );
+
+		// `anchor` has no attribute source, so a hand-typed `id` is only kept if
+		// the built-in validation fixes recover it.
+		await editor.clickBlockOptionsMenuItem( 'Edit as HTML' );
+		await paragraphHTML.fill( '<p id="anchor-one">Hello world!</p>' );
+		await editor.clickBlockOptionsMenuItem( 'Edit visually' );
+
+		await expect
+			.poll( () => editor.getBlocks( { full: true } ) )
+			.toMatchObject( [
+				{
+					name: 'core/paragraph',
+					isValid: true,
+					attributes: { anchor: 'anchor-one' },
+				},
+			] );
+
+		// Deleting it has to drop the anchor rather than restore it from the
+		// comment delimiter, which would leave the block unable to validate.
+		await editor.clickBlockOptionsMenuItem( 'Edit as HTML' );
+		await paragraphHTML.fill( '<p>Hello world!</p>' );
+		await editor.clickBlockOptionsMenuItem( 'Edit visually' );
+
+		await expect
+			.poll( () => editor.getBlocks( { full: true } ) )
+			.toMatchObject( [ { name: 'core/paragraph', isValid: true } ] );
+
+		const [ paragraph ] = await editor.getBlocks( { full: true } );
+		expect( paragraph.attributes.anchor ).toBeUndefined();
+	} );
+
 	test( 'the code editor should unselect blocks and disable the inserter', async ( {
 		editor,
 		page,

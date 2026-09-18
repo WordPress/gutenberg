@@ -1,5 +1,6 @@
 import { createBlock, findTransform } from '../factory';
 import { getBlockAttributes } from '../parser/get-block-attributes';
+import { hasBlockSupport } from '../registration';
 import { getRawTransforms } from './get-raw-transforms';
 import type { Block, RawHandler } from '../../types';
 
@@ -36,22 +37,34 @@ export function htmlToBlocks( html: string, handler: RawHandler ): Block[] {
 		}
 
 		const { transform, blockName } = rawTransform;
+		let block: Block;
 
 		if ( transform ) {
 			// A raw transform may return several blocks, in which case it is
-			// unclear which of them the node's class belongs on, so only the
-			// single-block case is handled. No core raw transform returns an
-			// array today; one that did would already have thrown here.
-			const block = transform( node, handler ) as Block;
-			if ( node.hasAttribute( 'class' ) ) {
-				block.attributes.className = node.getAttribute( 'class' );
-			}
-			return block;
+			// unclear which of them the node's attributes belong on, so only
+			// the single-block case is handled. No core raw transform returns
+			// an array today; one that did would already have thrown here.
+			block = transform( node, handler ) as Block;
+		} else {
+			block = createBlock(
+				blockName,
+				getBlockAttributes( blockName, node.outerHTML )
+			);
 		}
 
-		return createBlock(
-			blockName,
-			getBlockAttributes( blockName, node.outerHTML )
-		);
+		// Neither `className` nor `anchor` has an attribute source, so
+		// `getBlockAttributes` cannot read them out of the markup.
+		if ( node.hasAttribute( 'class' ) ) {
+			block.attributes.className = node.getAttribute( 'class' );
+		}
+
+		if (
+			node.hasAttribute( 'id' ) &&
+			hasBlockSupport( block.name, 'anchor' )
+		) {
+			block.attributes.anchor = node.getAttribute( 'id' );
+		}
+
+		return block;
 	} );
 }

@@ -631,4 +631,26 @@ describe( 'rawHandler', () => {
 			expect( innerBlock.attributes.sizeSlug ).toBeUndefined();
 		} );
 	} );
+
+	it( 'should preserve anchors on headings and paragraphs', () => {
+		const HTML = `<h2 id="section-one">Section one</h2>
+<p id="intro">Intro text</p>`;
+		const blocks = rawHandler( { HTML } );
+
+		expect( blocks ).toHaveLength( 2 );
+		expect( blocks[ 0 ].name ).toBe( 'core/heading' );
+		expect( blocks[ 0 ].attributes.anchor ).toBe( 'section-one' );
+		expect( blocks[ 1 ].name ).toBe( 'core/paragraph' );
+		expect( blocks[ 1 ].attributes.anchor ).toBe( 'intro' );
+	} );
+
+	it( 'should preserve the anchor and class of a raw transform without a transform function', () => {
+		const HTML = '<hr id="divider" class="is-fancy">';
+		const blocks = rawHandler( { HTML } );
+
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].name ).toBe( 'core/separator' );
+		expect( blocks[ 0 ].attributes.anchor ).toBe( 'divider' );
+		expect( blocks[ 0 ].attributes.className ).toBe( 'is-fancy' );
+	} );
 } );
