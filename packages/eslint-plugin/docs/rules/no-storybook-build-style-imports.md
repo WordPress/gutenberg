@@ -1,9 +1,6 @@
 # No Storybook Build Style Imports (no-storybook-build-style-imports)
 
-Package `build-style` stylesheets imported from Storybook stories as a Vite
-side effect are injected into the preview document. Add a matcher in
-`storybook/package-styles/config.js` (and a `*.lazy.scss` wrapper if the
-package is missing), then drop this import.
+Package `build-style` stylesheets imported from Storybook stories as a Vite side effect are injected into the preview document. Add a matcher in `storybook/package-styles/config.js` (and a `*.lazy.scss` wrapper if the package is missing), then drop this import.
 
 ## Rule details
 
@@ -26,14 +23,6 @@ export * from '@wordpress/dataviews/build-style/style.css';
 ```
 
 Examples of **correct** code for this rule:
-
-```js
-{
-	componentIdMatcher: /^widget-dashboard-/,
-	ltr: [ componentsLtr, dataviewsLtr, commandsLtr ],
-	rtl: [ componentsRtl, dataviewsRtl, commandsRtl ],
-}
-```
 
 ```js
 import sheet from '@wordpress/block-library/build-style/style.css?raw';
