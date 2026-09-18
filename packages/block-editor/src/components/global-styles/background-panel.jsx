@@ -243,7 +243,7 @@ export default function BackgroundImagePanel( {
 					? {
 							gradient: previousValue?.background?.gradient,
 							backgroundClip: prevClip,
-					  }
+						}
 					: {};
 			if ( ! clearsColorBackground && ! clearsColorGradient ) {
 				return { ...previousValue, background };
@@ -371,7 +371,7 @@ export default function BackgroundImagePanel( {
 			: decodeValue(
 					inheritedValue?.background?.gradient ??
 						inheritedValue?.color?.gradient
-			  );
+				);
 
 	// Set gradient value, encoding preset matches as slug references.
 	// Also clear color.gradient to migrate from the legacy location,
