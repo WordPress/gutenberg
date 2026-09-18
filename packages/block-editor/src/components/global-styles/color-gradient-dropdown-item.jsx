@@ -56,7 +56,7 @@ function DropdownContent( {
 				) }
 				{ tabs.length > 1 && (
 					<Tabs.Root defaultValue={ defaultTabId }>
-						<Tabs.List className="block-editor-panel-color-gradient-settings__tablist">
+						<Tabs.List>
 							{ tabs.map( ( tab ) => (
 								<Tabs.Tab key={ tab.key } value={ tab.key }>
 									{ tab.label }
