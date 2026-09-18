@@ -72,11 +72,11 @@ Accepts the video as a Blob/File so the bytes are read here in the worker. An Ar
 
 _Parameters_
 
--   _source_ `ArrayBuffer | Blob`: Video file as a Blob/File or ArrayBuffer.
+- _source_ `ArrayBuffer | Blob`: Video file as a Blob/File or ArrayBuffer.
 
 _Returns_
 
--   `Promise< VideoMetadata >`: The primary video track's metadata.
+- `Promise< VideoMetadata >`: The primary video track's metadata.
 
 ### SIZE_LIMIT_ERROR_PREFIX
 
@@ -94,14 +94,14 @@ Accepts the video as a Blob/File so the bytes are read once, here in the worker,
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
--   _source_ `ArrayBuffer | Blob`: Video file as a Blob/File or ArrayBuffer.
--   _outputMimeType_ `string`: Output MIME type ('video/mp4' or 'video/webm').
--   _options_ `TranscodeVideoOptions`: Transcoding options (max dimension, frame rate, bitrate).
+- _id_ `ItemId`: Item ID.
+- _source_ `ArrayBuffer | Blob`: Video file as a Blob/File or ArrayBuffer.
+- _outputMimeType_ `string`: Output MIME type ('video/mp4' or 'video/webm').
+- _options_ `TranscodeVideoOptions`: Transcoding options (max dimension, frame rate, bitrate).
 
 _Returns_
 
--   `Promise< ArrayBuffer >`: Encoded video buffer.
+- `Promise< ArrayBuffer >`: Encoded video buffer.
 
 ### UNSUPPORTED_ERROR_PREFIX
 
