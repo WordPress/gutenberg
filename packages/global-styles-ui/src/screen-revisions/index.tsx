@@ -58,16 +58,14 @@ function ScreenRevisions() {
 
 	// The screen holds a single page of revisions, so the revision the path
 	// names is selected only while this page carries it. Paginating away from
-	// it selects nothing, rather than a stand-in the user never picked.
+	// it selects nothing, rather than a stand-in the user never picked. With
+	// no revision in the path, the active entry is selected.
 	const currentlySelectedRevision = useMemo( () => {
 		if ( revisionId ) {
 			return revisions.find(
 				( revision ) => String( revision.id ) === String( revisionId )
 			);
 		}
-		// With no revision in the path the editor shows its own styles, and
-		// only the first page carries an entry for those: the unsaved changes,
-		// or else the latest revision.
 		return query.page === 1 ? revisions[ 0 ] : undefined;
 	}, [ revisionId, revisions, query.page ] );
 
@@ -78,10 +76,8 @@ function ScreenRevisions() {
 	// A revision is applicable when it isn't the styles the editor already
 	// shows. The footer action's eligibility and the list's Active badge both
 	// read this, so the button and the badge can't contradict each other. The
-	// active entry is recognised by id as well as by payload: the revisions
-	// endpoint and the global styles endpoint need not serialize the same
-	// styles identically, and a payload comparison alone could then report a
-	// difference for the very revision the editor is showing.
+	// active entry is recognised by id as well as by payload, as the two
+	// endpoints need not serialize the same styles identically.
 	const isRevisionApplicable = useCallback(
 		( revision: Revision ) =>
 			'unsaved' !== revision.id &&
