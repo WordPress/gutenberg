@@ -7,7 +7,9 @@ function getSummaryDescription( selectedViewport, selectedPseudoState ) {
 	if ( selectedViewport && selectedPseudoState ) {
 		return sprintf(
 			/* translators: 1: viewport name, e.g. "Tablet". 2: pseudo state name, e.g. "Hover". */
-			__( 'Style changes apply to the %1$s viewport and the %2$s state.' ),
+			__(
+				'Style changes apply to the %1$s viewport and the %2$s state.'
+			),
 			selectedViewport.label,
 			selectedPseudoState.label
 		);
@@ -75,7 +77,7 @@ export default function StateControlBadges( {
 					/* translators: %s: state name, e.g. "Hover" or "Tablet". */
 					__( 'More information about %s' ),
 					activeStates[ 0 ].label
-			  )
+				)
 			: __( 'More information about style states' );
 
 	return (
