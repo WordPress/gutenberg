@@ -26,11 +26,11 @@ The onProgress callbacks check for an IDs existence in this list, killing the pr
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
+- _id_ `ItemId`: Item ID.
 
 _Returns_
 
--   boolean Whether any operation was cancelled.
+- boolean Whether any operation was cancelled.
 
 ### compressImage
 
@@ -38,14 +38,14 @@ Compresses an existing image using vips.
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
--   _buffer_ `ArrayBuffer`: Original file buffer.
--   _type_ `string`: Mime type.
--   _options_ `ConvertImageOptions`: Compression options.
+- _id_ `ItemId`: Item ID.
+- _buffer_ `ArrayBuffer`: Original file buffer.
+- _type_ `string`: Mime type.
+- _options_ `ConvertImageOptions`: Compression options.
 
 _Returns_
 
--   `Promise< ArrayBuffer | ArrayBufferLike >`: Compressed file data.
+- `Promise< ArrayBuffer | ArrayBufferLike >`: Compressed file data.
 
 ### convertImageFormat
 
@@ -53,11 +53,11 @@ Converts an image to a different format using vips.
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
--   _buffer_ `ArrayBuffer`: Original file buffer.
--   _inputType_ `string`: Input mime type.
--   _outputType_ `string`: Output mime type.
--   _options_ `ConvertImageOptions`: Conversion options.
+- _id_ `ItemId`: Item ID.
+- _buffer_ `ArrayBuffer`: Original file buffer.
+- _inputType_ `string`: Input mime type.
+- _outputType_ `string`: Output mime type.
+- _options_ `ConvertImageOptions`: Conversion options.
 
 ### getUltraHdrInfo
 
@@ -67,11 +67,11 @@ Returns dimensions and HDR headroom on success, or `null` if the buffer is not a
 
 _Parameters_
 
--   _buffer_ `ArrayBuffer`: Image buffer.
+- _buffer_ `ArrayBuffer`: Image buffer.
 
 _Returns_
 
--   `Promise< UltraHdrInfo | null >`: UltraHDR info, or null when the buffer is not UltraHDR.
+- `Promise< UltraHdrInfo | null >`: UltraHDR info, or null when the buffer is not UltraHDR.
 
 ### hasTransparency
 
@@ -81,11 +81,11 @@ Channel presence alone is not enough: PNG encoders often retain an alpha channel
 
 _Parameters_
 
--   _buffer_ `ArrayBuffer`: Original file object.
+- _buffer_ `ArrayBuffer`: Original file object.
 
 _Returns_
 
--   `Promise< boolean >`: Whether any pixel in the image is partially or fully transparent.
+- `Promise< boolean >`: Whether any pixel in the image is partially or fully transparent.
 
 ### resizeImage
 
@@ -99,15 +99,15 @@ Sites can opt into animated sub-sizes via the `wp_generate_animated_image_subsiz
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
--   _buffer_ `ArrayBuffer`: Original file buffer.
--   _type_ `string`: Mime type.
--   _resize_ `ImageSizeCrop`: Resize options.
--   _options_ `ResizeImageOptions`: Additional resize options.
+- _id_ `ItemId`: Item ID.
+- _buffer_ `ArrayBuffer`: Original file buffer.
+- _type_ `string`: Mime type.
+- _resize_ `ImageSizeCrop`: Resize options.
+- _options_ `ResizeImageOptions`: Additional resize options.
 
 _Returns_
 
--   `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; originalWidth: number; originalHeight: number; } >`: Processed file data plus the old and new dimensions.
+- `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; originalWidth: number; originalHeight: number; } >`: Processed file data plus the old and new dimensions.
 
 ### rotateImage
 
@@ -117,14 +117,14 @@ EXIF orientation values: 1 = Normal (no rotation needed) 2 = Flipped horizontall
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
--   _buffer_ `ArrayBuffer`: Original file buffer.
--   _type_ `string`: Mime type.
--   _orientation_ `number`: EXIF orientation value (1-8).
+- _id_ `ItemId`: Item ID.
+- _buffer_ `ArrayBuffer`: Original file buffer.
+- _type_ `string`: Mime type.
+- _orientation_ `number`: EXIF orientation value (1-8).
 
 _Returns_
 
--   `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; } >`: Rotated file data plus the new dimensions.
+- `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; } >`: Rotated file data plus the new dimensions.
 
 ### vipsCancelOperations
 
@@ -134,11 +134,11 @@ The onProgress callbacks check for an IDs existence in this list, killing the pr
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
+- _id_ `ItemId`: Item ID.
 
 _Returns_
 
--   boolean Whether any operation was cancelled.
+- boolean Whether any operation was cancelled.
 
 ### vipsCompressImage
 
@@ -146,14 +146,14 @@ Compresses an existing image using vips.
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
--   _buffer_ `ArrayBuffer`: Original file buffer.
--   _type_ `string`: Mime type.
--   _options_ `ConvertImageOptions`: Compression options.
+- _id_ `ItemId`: Item ID.
+- _buffer_ `ArrayBuffer`: Original file buffer.
+- _type_ `string`: Mime type.
+- _options_ `ConvertImageOptions`: Compression options.
 
 _Returns_
 
--   `Promise< ArrayBuffer | ArrayBufferLike >`: Compressed file data.
+- `Promise< ArrayBuffer | ArrayBufferLike >`: Compressed file data.
 
 ### vipsConvertImageFormat
 
@@ -161,11 +161,11 @@ Converts an image to a different format using vips.
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
--   _buffer_ `ArrayBuffer`: Original file buffer.
--   _inputType_ `string`: Input mime type.
--   _outputType_ `string`: Output mime type.
--   _options_ `ConvertImageOptions`: Conversion options.
+- _id_ `ItemId`: Item ID.
+- _buffer_ `ArrayBuffer`: Original file buffer.
+- _inputType_ `string`: Input mime type.
+- _outputType_ `string`: Output mime type.
+- _options_ `ConvertImageOptions`: Conversion options.
 
 ### vipsGetUltraHdrInfo
 
@@ -175,11 +175,11 @@ Returns dimensions and HDR headroom on success, or `null` if the buffer is not a
 
 _Parameters_
 
--   _buffer_ `ArrayBuffer`: Image buffer.
+- _buffer_ `ArrayBuffer`: Image buffer.
 
 _Returns_
 
--   `Promise< UltraHdrInfo | null >`: UltraHDR info, or null when the buffer is not UltraHDR.
+- `Promise< UltraHdrInfo | null >`: UltraHDR info, or null when the buffer is not UltraHDR.
 
 ### vipsHasTransparency
 
@@ -189,11 +189,11 @@ Channel presence alone is not enough: PNG encoders often retain an alpha channel
 
 _Parameters_
 
--   _buffer_ `ArrayBuffer`: Original file object.
+- _buffer_ `ArrayBuffer`: Original file object.
 
 _Returns_
 
--   `Promise< boolean >`: Whether any pixel in the image is partially or fully transparent.
+- `Promise< boolean >`: Whether any pixel in the image is partially or fully transparent.
 
 ### vipsResizeImage
 
@@ -207,15 +207,15 @@ Sites can opt into animated sub-sizes via the `wp_generate_animated_image_subsiz
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
--   _buffer_ `ArrayBuffer`: Original file buffer.
--   _type_ `string`: Mime type.
--   _resize_ `ImageSizeCrop`: Resize options.
--   _options_ `ResizeImageOptions`: Additional resize options.
+- _id_ `ItemId`: Item ID.
+- _buffer_ `ArrayBuffer`: Original file buffer.
+- _type_ `string`: Mime type.
+- _resize_ `ImageSizeCrop`: Resize options.
+- _options_ `ResizeImageOptions`: Additional resize options.
 
 _Returns_
 
--   `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; originalWidth: number; originalHeight: number; } >`: Processed file data plus the old and new dimensions.
+- `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; originalWidth: number; originalHeight: number; } >`: Processed file data plus the old and new dimensions.
 
 ### vipsRotateImage
 
@@ -225,13 +225,13 @@ EXIF orientation values: 1 = Normal (no rotation needed) 2 = Flipped horizontall
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
--   _buffer_ `ArrayBuffer`: Original file buffer.
--   _type_ `string`: Mime type.
--   _orientation_ `number`: EXIF orientation value (1-8).
+- _id_ `ItemId`: Item ID.
+- _buffer_ `ArrayBuffer`: Original file buffer.
+- _type_ `string`: Mime type.
+- _orientation_ `number`: EXIF orientation value (1-8).
 
 _Returns_
 
--   `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; } >`: Rotated file data plus the new dimensions.
+- `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; } >`: Rotated file data plus the new dimensions.
 
 <!-- END TOKEN(Autogenerated API docs) -->

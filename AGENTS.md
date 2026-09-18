@@ -40,6 +40,19 @@ Read only what your task needs, when it needs it:
 -   **User-facing copy**: before writing or changing a string a user reads, read `docs/contributors/documentation/copy-guide.md` — it covers terminology, capitalization, and how to word an error message.
 -   **Directory guides**: some directories carry their own `AGENTS.md` and `README.md` with rules for working there (e.g. `packages/components/AGENTS.md`) — read it before changing files in that directory.
 
+## Markdown files
+
+Markdown in this repository is soft-wrapped: a paragraph is one long line, and the editor wraps it on screen. Do not hard-wrap it.
+
+-   Keep each paragraph, list item, and table row on a single line, however long it gets. There is no line length limit; `MD013` is disabled in `.markdownlint.json`.
+-   This covers every `.md` file (docs, `README.md`, `CHANGELOG.md`, templates) and the Markdown written into pull request descriptions, issues, and comments.
+-   This is an accessibility rule, not only a tidiness one: a screen reader reads a plain `.md` file line by line and a braille display shows one line at a time, so a hard-wrapped sentence arrives as fragments. See [Write accessible documentation](https://developers.google.com/style/accessibility).
+-   When editing an existing paragraph, rewrite the line in place. Never re-flow or re-wrap lines the change does not otherwise touch: it turns a one-word edit into a diff over the whole paragraph and buries the real change.
+-   Line breaks still belong where Markdown needs them: between list items, between table rows, and inside fenced code blocks, which are never re-wrapped either.
+-   A few older files are still hard-wrapped. Leave them as they are unless the task is to reflow them; do not match their style in new prose.
+
+See [Documentation Contributions](docs/contributors/documentation/README.md) for the rest of the documentation conventions.
+
 ## Code quality
 
 Fix ESLint and Stylelint violations in the code whenever possible. Add entries or increase counts in `tools/eslint/suppressions.json` or `tools/stylelint/stylelint-suppressions.json` only as a last resort, and explain in the PR why a code fix is not practical. Keep suppressions limited to the specific violations that need them. After fixing suppressed violations, run `npm run lint:js:prune-suppressions` for ESLint. For Stylelint, first ensure `npm run lint:css` passes, then run `npm run lint:css:update-suppressions`. Review and commit the reductions.

@@ -4,8 +4,7 @@ export interface ImageSizeCrop {
 	width: number;
 	height: number;
 	crop?:
-		| boolean
-		| [ 'left' | 'center' | 'right', 'top' | 'center' | 'bottom' ];
+		boolean | [ 'left' | 'center' | 'right', 'top' | 'center' | 'bottom' ];
 }
 
 /**
@@ -74,13 +73,7 @@ export interface ResizeImageOptions {
  * all: Everything is interesting.
  */
 type Interesting =
-	| 'none'
-	| 'centre'
-	| 'entropy'
-	| 'attention'
-	| 'low'
-	| 'high'
-	| 'all';
+	'none' | 'centre' | 'entropy' | 'attention' | 'low' | 'high' | 'all';
 
 /**
  * none: Don't attach metadata.
@@ -95,14 +88,7 @@ type Interesting =
  * Multiple values can be combined with `|`, e.g. `'icc|gainmap'`.
  */
 type ForeignKeepValue =
-	| 'none'
-	| 'exif'
-	| 'xmp'
-	| 'iptc'
-	| 'icc'
-	| 'other'
-	| 'gainmap'
-	| 'all';
+	'none' | 'exif' | 'xmp' | 'iptc' | 'icc' | 'other' | 'gainmap' | 'all';
 type ForeignKeep = ForeignKeepValue | `${ ForeignKeepValue }|${ string }`;
 
 /**
@@ -149,8 +135,8 @@ export interface LoadOptions< T extends string > {
 	n?: T extends 'image/gif'
 		? number
 		: T extends 'image/webp'
-		? number
-		: never;
+			? number
+			: never;
 	/**
 	 * Required access pattern for this file.
 	 */
