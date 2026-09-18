@@ -2,9 +2,10 @@
 
 ## Unreleased
 
-## Enhancements
+### Enhancements
 
-- Optimized store listener registration and execution.
+-   Optimized store listener registration and execution ([#82842](https://github.com/WordPress/gutenberg/pull/82842)).
+-   Resolvers can define `getResolutionArgs` to derive the resolution arguments from the selector arguments, letting several selector calls share a single resolution ([#82638](https://github.com/WordPress/gutenberg/pull/82638)).
 
 ## 10.55.0 (2026-09-10)
 

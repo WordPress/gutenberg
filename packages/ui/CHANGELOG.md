@@ -13,6 +13,7 @@
 
 ### Enhancements
 
+-   `Select`, `SelectControl`: Mark as recommended for use in a WordPress environment ([#83030](https://github.com/WordPress/gutenberg/pull/83030)).
 -   `Select`, `SelectControl`: Add `ItemLabel` and `ItemDescription` subcomponents. Multiple descriptions contribute to `aria-describedby` in DOM order. `SelectControl` `items` may include an optional `description` string. ([#82369](https://github.com/WordPress/gutenberg/pull/82369))
 -   `Select`, `SelectControl`: Align the selected item with the trigger by default, and drop the popup max-height cap when that alignment is enabled ([#82043](https://github.com/WordPress/gutenberg/pull/82043)).
 -   `Select`, `Combobox`, `Autocomplete`: Allow browsing read-only controls while keeping their value unchanged ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
@@ -23,12 +24,20 @@
 ### Bug Fixes
 
 -   `Autocomplete`: Use valid grid and rowgroup semantics without local accessibility overrides ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
+-   `Menu`: Center labels, descriptions, suffixes, shortcuts, and submenu chevrons within items, including items with taller prefix or suffix content. ([#82847](https://github.com/WordPress/gutenberg/pull/82847))
 -   `Menu`: vertically center single-line item labels while preserving first-line alignment for wrapped content. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
+
+### Bug Fixes
+
+-   `Autocomplete`, `Combobox`, `Menu`, and `Select`: Restore the highlighted item indicator in forced-colors mode, which wp-admin's global CSS was suppressing. ([#82772](https://github.com/WordPress/gutenberg/pull/82772))
 
 ### Internal
 
+-   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
+-   Remove the obsolete Jest console test dependency and matcher types ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
 -   Update `@base-ui/react` from 1.7.0 to 1.8.0 ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
 -   Run UI interaction tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+- `VisuallyHidden`: Replace deprecated `word-wrap` with `overflow-wrap` and remove related Stylelint suppression ([#82970](https://github.com/WordPress/gutenberg/pull/82970)).
 
 ## 0.22.0 (2026-09-10)
 

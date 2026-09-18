@@ -147,7 +147,7 @@ function CoverEdit( {
 								{
 									context: 'view',
 								}
-						  )
+							)
 						: undefined,
 			};
 		},
@@ -208,7 +208,7 @@ function CoverEdit( {
 	const url = useFeaturedImage
 		? mediaUrl
 		: // Ensure the url is not malformed due to sanitization through `wp_kses`.
-		  originalUrl?.replaceAll( '&amp;', '&' );
+			originalUrl?.replaceAll( '&amp;', '&' );
 	const backgroundType = useFeaturedImage
 		? IMAGE_BACKGROUND_TYPE
 		: originalBackgroundType;

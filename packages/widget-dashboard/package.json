@@ -48,7 +48,6 @@
 	],
 	"dependencies": {
 		"@wordpress/commands": "file:../commands",
-		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/dataviews": "file:../dataviews",
