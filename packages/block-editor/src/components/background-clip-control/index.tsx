@@ -1,12 +1,10 @@
 import { CustomSelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { VALID_BACKGROUND_CLIP_VALUES } from '@wordpress/style-engine';
 
-export const ALL_BACKGROUND_CLIP_VALUES = [
-	'border-box',
-	'padding-box',
-	'content-box',
-	'text',
-];
+// Re-exported under the name the panels use. The style engine owns the list,
+// since it is what decides which values produce CSS.
+export const ALL_BACKGROUND_CLIP_VALUES = VALID_BACKGROUND_CLIP_VALUES;
 
 const BACKGROUND_CLIP_OPTIONS = [
 	{ key: 'border-box', name: __( 'Border box' ) },

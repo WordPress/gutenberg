@@ -11,6 +11,7 @@
 ### New Features
 
 -   Add a `background.backgroundClip` style rule that generates `background-clip`, along with the `-webkit-background-clip` and `-webkit-text-fill-color` declarations needed for the text clipping case ([#77141](https://github.com/WordPress/gutenberg/pull/77141)).
+-   Export `VALID_BACKGROUND_CLIP_VALUES`, the values `background-clip` accepts, so consumers stop keeping their own copy ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
 
 ## 2.56.0 (2026-09-23)
 

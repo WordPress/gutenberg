@@ -40,6 +40,13 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *
 		 * @var array
 		 */
+		/**
+		 * The values `background-clip` accepts.
+		 *
+		 * @var string[]
+		 */
+		const VALID_BACKGROUND_CLIP_VALUES = array( 'border-box', 'padding-box', 'content-box', 'text' );
+
 		const BLOCK_STYLE_DEFINITIONS_METADATA = array(
 			'background' => array(
 				'backgroundImage'      => array(
@@ -725,8 +732,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				return array();
 			}
 
-			$valid_values = array( 'border-box', 'padding-box', 'content-box', 'text' );
-			if ( ! in_array( $style_value, $valid_values, true ) ) {
+			if ( ! in_array( $style_value, static::VALID_BACKGROUND_CLIP_VALUES, true ) ) {
 				return array();
 			}
 
