@@ -19,5 +19,8 @@
 		"@wordpress/lazy-editor": "file:../../packages/lazy-editor",
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/views": "file:../../packages/views"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.27"
 	}
 }

@@ -60,6 +60,20 @@ function run( command, args, options = {} ) {
 	}
 }
 
+/*
+ * Under an isolated install layout, transitive deps are not hoisted to the root `node_modules/`.
+ * `@wordpress/scripts` shells out to webpack, eslint, etc. via `resolve-bin`,
+ * which calls `require.resolve` from its own location in the dep store and
+ * therefore can't see those sibling packages. Adding `packages/scripts/`'s
+ * own `node_modules/` as a `NODE_PATH` fallback lets Node find them.
+ */
+const NODE_PATH = [
+	path.join( ROOT, 'packages/scripts/node_modules' ),
+	process.env.NODE_PATH,
+]
+	.filter( Boolean )
+	.join( path.delimiter );
+
 /**
  * Resolve a bin via module resolution rather than a `node_modules/.bin` path,
  * whose location depends on the install layout.
@@ -99,7 +113,10 @@ function wpCreateBlock( args, options = {} ) {
  * @param {...string} args Command arguments forwarded to `wp-scripts`.
  */
 function wpScripts( ...args ) {
-	run( process.execPath, [ WP_SCRIPTS, ...args ], { cwd: STATIC_BLOCK } );
+	run( process.execPath, [ WP_SCRIPTS, ...args ], {
+		cwd: STATIC_BLOCK,
+		env: { ...process.env, NODE_PATH },
+	} );
 }
 
 /**
