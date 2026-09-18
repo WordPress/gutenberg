@@ -958,6 +958,7 @@ describe( 'BackgroundPanel at a non-default viewport', () => {
 			<BackgroundPanel
 				value={ {} }
 				baseValue={ baseValue }
+				styleState={ { viewport: '@mobile', pseudo: 'default' } }
 				settings={ {
 					...colorSettings,
 					background: {
@@ -972,8 +973,32 @@ describe( 'BackgroundPanel at a non-default viewport', () => {
 		);
 
 		expect(
-			screen.queryByRole( 'button', { name: /Clip/ } )
+			screen.queryByRole( 'combobox', { name: /clip/i } )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'keeps the clip control at a pseudo state, which scopes it to hover', async () => {
+		render(
+			<BackgroundPanel
+				value={ {} }
+				baseValue={ baseValue }
+				styleState={ { viewport: 'default', pseudo: ':hover' } }
+				settings={ {
+					...colorSettings,
+					background: {
+						...colorSettings.background,
+						backgroundClip: true,
+					},
+				} }
+				defaultControls={ { backgroundClip: true } }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			await screen.findByRole( 'combobox', { name: /clip/i } )
+		).toBeInTheDocument();
 	} );
 
 	it( "leaves the controls alone when the default viewport doesn't clip to text", () => {
