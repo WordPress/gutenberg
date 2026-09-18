@@ -15,7 +15,7 @@ import {
 } from './constants';
 import { Notes } from './notes';
 import { store as editorStore } from '../../store';
-import { AddNoteMenuItem } from './add-note-menu-item';
+import { AddNoteToolbarButton } from './add-note-toolbar-button';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
@@ -34,22 +34,32 @@ function NotesSidebar( { postId } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const sidebarRef = useRef( null );
 
-	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
-			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-		return {
-			clientId: _clientId,
-			noteId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId
-				: null,
-			isClassicBlock: _clientId
-				? getBlockName( _clientId ) === 'core/freeform'
-				: false,
-		};
-	}, [] );
+	const { clientId, noteId, isClassicBlock, canEditBlock } = useSelect(
+		( select ) => {
+			const {
+				getBlockAttributes,
+				getSelectedBlockClientId,
+				getBlockName,
+				canEditBlock: _canEditBlock,
+			} = select( blockEditorStore );
+			const _clientId = getSelectedBlockClientId();
+			return {
+				clientId: _clientId,
+				noteId: _clientId
+					? getBlockAttributes( _clientId )?.metadata?.noteId
+					: null,
+				isClassicBlock: _clientId
+					? getBlockName( _clientId ) === 'core/freeform'
+					: false,
+				// Adding a note writes `metadata.noteId` to the block, so the
+				// affordance follows the same permission as the menu item it
+				// replaced: blocks locked against editing do not offer it.
+				canEditBlock: _clientId ? _canEditBlock( _clientId ) : false,
+			};
+		},
+		[]
+	);
 
-	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 	const { isDistractionFree } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
@@ -125,6 +135,23 @@ function NotesSidebar( { postId } ) {
 		} );
 	}
 
+	/*
+	 * Opening the form widens the sidebar, which narrows the canvas and
+	 * re-centres the block toolbar out from under the pointer. A second click
+	 * therefore lands wherever the button used to be, so the button itself has
+	 * to stay predictable: toggle the form it owns rather than silently
+	 * re-opening the one already on screen.
+	 */
+	function toggleNewNoteForBlock( targetClientId ) {
+		if ( selectedNoteId === 'new' && targetClientId === clientId ) {
+			selectNote( undefined );
+			toggleBlockSpotlight( targetClientId, false );
+			return undefined;
+		}
+
+		return addNewNoteForBlock( targetClientId );
+	}
+
 	useShortcut(
 		'core/editor/new-note',
 		( event ) => {
@@ -140,16 +167,17 @@ function NotesSidebar( { postId } ) {
 	const { merged: GlobalStyles } = useGlobalStyles();
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
 
+	if ( isDistractionFree ) {
+		return null;
+	}
+
 	// Surface one thread for the avatar indicator.
+	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 	const currentThreads =
 		blockNoteIds.length > 0
 			? notes.filter( ( thread ) => blockNoteIds.includes( thread.id ) )
 			: [];
 	const currentThread = pickPrimaryNote( currentThreads );
-
-	if ( isDistractionFree ) {
-		return <AddNoteMenuItem isDistractionFree />;
-	}
 
 	return (
 		<>
@@ -163,11 +191,15 @@ function NotesSidebar( { postId } ) {
 					onClick={ () => openNoteForBlock( clientId ) }
 				/>
 			) }
-			<AddNoteMenuItem
-				onClick={ ( menuClientId ) =>
-					addNewNoteForBlock( menuClientId )
-				}
-			/>
+			{ !! clientId && canEditBlock && (
+				<AddNoteToolbarButton
+					clientId={ clientId }
+					isOpen={ selectedNoteId === 'new' }
+					onClick={ ( toolbarClientId ) =>
+						toggleNewNoteForBlock( toolbarClientId )
+					}
+				/>
+			) }
 			{ showAllNotesSidebar && (
 				<PluginSidebar
 					identifier={ ALL_NOTES_SIDEBAR }

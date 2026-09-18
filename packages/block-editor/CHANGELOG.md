@@ -28,6 +28,7 @@
 -   Block bindings and variation transforms: Use the public `Menu` from `@wordpress/ui` instead of the private Components API. ([#81925](https://github.com/WordPress/gutenberg/pull/81925))
 -   Layout hooks: Use `normalizeLegacyLayout` in `useLayoutClasses`, `useLayoutStyles`, the block layout styles wrapper and `isAxialBlockGapAllowed`, replacing four inline copies of the legacy `inherit` / size check ([#82710](https://github.com/WordPress/gutenberg/pull/82710)).
 -   Extract the populated pattern category computation from `usePatternCategories` into a `getPopulatedCategories` util, and expose it and `searchItems` through private APIs for reuse by the start page options modal ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
+-   Remove the private `NoteIconSlotFill` API and its slot in the block settings dropdown. The "Add note" action now renders as a dedicated block toolbar button through `NoteIconToolbarSlotFill` ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
 
 ## 17.1.0 (2026-09-10)
 
