@@ -60,11 +60,10 @@
 .block-editor-panel-duotone-settings__label-row {
 	width: 100%;
 	min-width: 0;
-}
 
-.block-editor-panel-duotone-settings__label {
-	display: block;
-	min-width: 0;
+	> * {
+		min-width: 0;
+	}
 }
 
 .block-editor-global-styles__shadow-editor__remove-button {
