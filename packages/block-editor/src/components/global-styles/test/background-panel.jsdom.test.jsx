@@ -507,6 +507,16 @@ describe( 'BackgroundPanel background clip', () => {
 		).toBeInTheDocument();
 	} );
 
+	it( 'hides the clip control when the setting names only the text value', () => {
+		// The Typography panel's gradient control already expresses a text
+		// clip, so there would be no box left to choose between.
+		renderPanel( withClipSetting( [ 'text' ] ) );
+
+		expect(
+			screen.queryByRole( 'combobox', { name: /clip/i } )
+		).not.toBeInTheDocument();
+	} );
+
 	it( 'shows the clip control when the setting names values', async () => {
 		renderPanel( withClipSetting( [ 'border-box', 'text' ] ) );
 

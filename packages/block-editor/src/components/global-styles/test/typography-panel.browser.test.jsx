@@ -1047,6 +1047,18 @@ describe( 'TypographyPanel text gradient', () => {
 		).toBeInTheDocument();
 	} );
 
+	it( 'shows the gradient control when the theme names only the text value', async () => {
+		await renderPanel( {
+			settings: withClip( [ 'text' ] ),
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+		} );
+
+		expect(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		).toBeInTheDocument();
+	} );
+
 	it( 'hides the gradient control when the theme turns the clip off', async () => {
 		await renderPanel( {
 			settings: withClip( false ),
