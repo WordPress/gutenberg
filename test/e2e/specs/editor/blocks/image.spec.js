@@ -24,6 +24,56 @@ test.describe( 'Image', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
+	test( 'keeps the block settings menu beneath the media modal', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.selectBlocks(
+			editor.canvas.locator( 'role=document[name="Block: Image"i]' )
+		);
+
+		// Open the block settings menu and leave it open.
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		const settingsMenu = page.locator(
+			'.block-editor-block-settings-menu__popover'
+		);
+		await expect( settingsMenu ).toBeVisible();
+
+		// Open the media library from the placeholder behind the menu.
+		await editor.canvas
+			.getByRole( 'button', { name: 'Media Library' } )
+			.click();
+		await expect( page.locator( '.media-modal' ) ).toBeVisible();
+
+		// The menu stays mounted, because Dropdown keeps a popover open while
+		// focus is inside a separate dialog, but it must not cover the modal.
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const menu = document.querySelector(
+						'.block-editor-block-settings-menu__popover'
+					);
+					if ( ! menu ) {
+						return false;
+					}
+					const { x, y, width, height } =
+						menu.getBoundingClientRect();
+					const topmost = document.elementFromPoint(
+						x + width / 2,
+						y + height / 2
+					);
+					return !! topmost?.closest(
+						'.block-editor-block-settings-menu__popover'
+					);
+				} )
+			)
+			.toBe( false );
+	} );
+
 	test( 'can be inserted via image upload', async ( {
 		editor,
 		imageBlockUtils,
