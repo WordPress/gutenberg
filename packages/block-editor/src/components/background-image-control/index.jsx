@@ -188,6 +188,7 @@ function BackgroundControlsPanel( {
 	hasLocalOverride,
 	containerRef,
 	disabled = false,
+	disabledHint,
 } ) {
 	if ( ! hasImageValue ) {
 		return;
@@ -203,13 +204,17 @@ function BackgroundControlsPanel( {
 					onClick: onToggle,
 					className:
 						'block-editor-global-styles-background-panel__dropdown-toggle',
-					'aria-expanded': isOpen,
+					// A disabled toggle cannot be expanded, so it should not
+					// say it can be.
+					'aria-expanded': disabled ? undefined : isOpen,
 					'aria-label': __(
 						'Background size, position and repeat options.'
 					),
 					isOpen,
 					disabled,
 					accessibleWhenDisabled: true,
+					// The other disabled controls explain themselves on hover.
+					label: disabled ? disabledHint : undefined,
 				};
 				return (
 					<>
@@ -221,7 +226,8 @@ function BackgroundControlsPanel( {
 							as="button"
 							onToggleCallback={ onToggleCallback }
 						/>
-						{ onReset &&
+						{ ! disabled &&
+							onReset &&
 							( hasLocalOverride ? (
 								<InheritanceResetButton
 									className="block-editor-global-styles-background-panel__reset"
@@ -804,6 +810,7 @@ export default function BackgroundImagePanel( {
 					filename={ title }
 					url={ url }
 					disabled={ disabled }
+					disabledHint={ disabledHint }
 					onToggle={ setIsDropDownOpen }
 					hasImageValue={ hasImageValue }
 					hasLocalOverride={ hasLocalOverride }

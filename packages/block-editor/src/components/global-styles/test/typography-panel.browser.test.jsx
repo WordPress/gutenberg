@@ -1059,6 +1059,26 @@ describe( 'TypographyPanel text gradient', () => {
 		).toBeInTheDocument();
 	} );
 
+	it( 'disables the gradient control for a gradient stored the legacy way', async () => {
+		// A preset gradient lives in the `gradient` attribute and a custom one
+		// in `color.gradient`. Either is a background a text gradient would
+		// clip away, so the hook folds them in and this control stands down.
+		await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			value: {
+				background: {
+					gradient: 'var:preset|gradient|purple-blue',
+				},
+			},
+		} );
+
+		expect(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
 	it( 'hides the gradient control when the theme turns the clip off', async () => {
 		await renderPanel( {
 			settings: withClip( false ),
