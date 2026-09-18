@@ -6,6 +6,12 @@
 
 -   Add support for the text shadow style property ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
 
+### Bug Fixes
+
+-   `applyBuiltInValidationFixes` removes an `anchor` or `ariaLabel` the block's markup no longer carries, where before it could only assign one. Deleting an `id` or `aria-label` by hand no longer leaves the block unable to validate ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+-   Raw HTML conversion keeps an element's `id` as the block's `anchor` where the block supports anchors. Converting a Classic block that contains `<h2 id="section-one">` no longer drops the anchor ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+-   Raw HTML conversion keeps an element's `class` for a block created from a raw transform that declares only a selector, such as `core/separator`. Previously only transforms with a `transform` function preserved it ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+
 ## 16.0.0 (2026-09-10)
 
 ### Breaking Changes

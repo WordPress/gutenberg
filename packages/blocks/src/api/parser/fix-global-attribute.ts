@@ -25,8 +25,9 @@ export function getHTMLRootElement(
 }
 
 /**
- * Given a parsed set of block attributes, if the block supports the specified attribute
- * and the attribute is found in the HTML, the attribute is assigned to the block attributes.
+ * Given a parsed set of block attributes, if the block supports the specified attribute,
+ * the attribute is synced with the block's markup: assigned when the markup carries it,
+ * and removed when the markup does not.
  *
  * @param blockAttributes Original block attributes.
  * @param blockType       Block type settings.
@@ -56,6 +57,11 @@ export function fixGlobalAttribute(
 	);
 	if ( attributeValue ) {
 		modifiedBlockAttributes[ supportKey ] = attributeValue;
+	} else if ( innerHTML ) {
+		// The markup is the source of truth, so an attribute absent from it has
+		// been removed. A block that saves no markup has nothing to compare
+		// against and keeps whatever the delimiter holds.
+		delete modifiedBlockAttributes[ supportKey ];
 	}
 	return modifiedBlockAttributes;
 }

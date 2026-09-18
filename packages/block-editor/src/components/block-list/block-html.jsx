@@ -61,8 +61,18 @@ function BlockHTML( { clientId } ) {
 			? updatedBlock
 			: applyBuiltInValidationFixes( updatedBlock, blockType );
 
+		// `updateBlock` merges attributes, so one the fixes dropped — an `id`,
+		// `class` or `aria-label` deleted by hand — only clears if it is sent
+		// explicitly as `undefined`.
+		const nextAttributes = { ...fixedBlock.attributes };
+		for ( const key of Object.keys( attributes ) ) {
+			if ( ! ( key in nextAttributes ) ) {
+				nextAttributes[ key ] = undefined;
+			}
+		}
+
 		updateBlock( clientId, {
-			attributes: fixedBlock.attributes,
+			attributes: nextAttributes,
 			originalContent: content,
 			isValid: isValid || validateBlock( fixedBlock )[ 0 ],
 		} );

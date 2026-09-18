@@ -19,7 +19,7 @@
 
 ### Bug Fixes
 
--   Edit as HTML: Recover an `id`, `class` or `aria-label` typed by hand, so the block no longer drops into recovery ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+-   Edit as HTML: Follow the markup when an `id`, `class` or `aria-label` is typed by hand or deleted, so the block no longer drops into recovery ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
 -   `InnerBlocks`: Resolve a container's legacy layout markup (`inherit: true`, or a bare `contentSize` / `wideSize` with no `type`) to a constrained layout for its inner blocks, so they are offered the wide and full alignments. Previously only the container's styles honoured the legacy form, and the inner blocks resolved to the flow layout ([#82637](https://github.com/WordPress/gutenberg/pull/82637)).
 -   Block Patterns, Block Visibility, and Block Lock: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
 -   Layout: Treat a missing `spacing.blockGap` setting as no block gap support, as the server does. A theme that does not opt into block gap has the setting stored as `null`, which the block settings resolve to `undefined`, so per-block layout styles applied block gap values the front end never renders. An editor that never provides the setting must set it to `true` to keep rendering block gap values ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
