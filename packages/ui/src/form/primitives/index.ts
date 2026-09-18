@@ -12,5 +12,6 @@ export { RadioGroup } from './radio-group';
 export * as Select from './select';
 export { SearchableChipSelect } from './searchable-chip-select';
 export { SearchableSelect } from './searchable-select';
+export { Switch } from './switch';
 export { Textarea } from './textarea';
 export { ValidityIndicator } from './validity-indicator';
