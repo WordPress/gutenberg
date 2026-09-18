@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Write `columnalign` on the cells of `aligned`, `cases` and tagged equations, so the alignment is part of the MathML, and ship a stylesheet, registered as `wp-latex-to-mathml`, that polyfills cell alignment and `menclose` notations in Chromium ([#83164](https://github.com/WordPress/gutenberg/pull/83164)).
+
 ## 1.23.0 (2026-09-10)
 
 ## 1.22.0 (2026-08-26)
