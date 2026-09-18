@@ -251,10 +251,7 @@ export function DataViewsPickerBulkActionToolbar() {
 }
 
 // The full picker footer: bulk-selection info, pagination, and actions — the
-// picker counterpart to `DataViews.Footer`, and structured like it so that the
-// footer stacks its rows in narrow containers, such as a sidebar. A picker
-// that wants a different footer composes one in a container of its own, for
-// instance from `DataViewsPicker.PageSelect` and `DataViewsPicker.Actions`.
+// picker counterpart to `DataViews.Footer`.
 export function DataViewsPickerFooter() {
 	const {
 		actions = EMPTY_ARRAY,
@@ -267,18 +264,16 @@ export function DataViewsPickerFooter() {
 	}
 
 	return (
-		<div className="dataviews-footer">
-			<Stack
-				direction="row"
-				justify="space-between"
-				align="center"
-				className="dataviews-footer__content"
-				gap="sm"
-			>
-				<PickerBulkSelectionInfo />
-				<DataViewsPagination />
-				<DataViewsPickerActions />
-			</Stack>
-		</div>
+		<Stack
+			direction="row"
+			justify="space-between"
+			align="center"
+			className="dataviews-footer"
+			gap="sm"
+		>
+			<PickerBulkSelectionInfo />
+			<DataViewsPagination />
+			<DataViewsPickerActions />
+		</Stack>
 	);
 }
