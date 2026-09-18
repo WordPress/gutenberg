@@ -60,7 +60,6 @@ const meta: Meta< typeof Composite > = {
 							fontStyle: 'italic',
 						} }
 					>
-						{ /* eslint-disable-next-line no-restricted-syntax */ }
 						<p id="list-title">Notes</p>
 						<ul aria-labelledby="list-title">
 							<li>

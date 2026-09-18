@@ -82,16 +82,16 @@ There is also `recommended-with-formatting` ruleset for projects that want to en
 
 Alternatively, you can opt-in to only the more granular rulesets offered by the plugin. These include:
 
--   `custom` – custom rules for WordPress development.
--   `es5` – rules for legacy ES5 environments.
--   `esnext` – rules for ES2015+ environments.
--   `i18n` – rules for internationalization.
--   `jsdoc` – rules for JSDoc comments.
--   `jsx-a11y` – rules for accessibility in JSX.
--   `react` – rules for React components.
--   `test-e2e` – rules for end-to-end tests written in Puppeteer.
--   `test-unit` – recommended rules for Vitest tests with explicit imports. This changes from Jest at the 27.0.0 major release boundary. Jest consumers can configure `eslint-plugin-jest` directly. See the [migration guide](../scripts/docs/vitest-migration.md).
--   `test-playwright` – rules for end-to-end tests written in Playwright.
+- `custom` – custom rules for WordPress development.
+- `es5` – rules for legacy ES5 environments.
+- `esnext` – rules for ES2015+ environments.
+- `i18n` – rules for internationalization.
+- `jsdoc` – rules for JSDoc comments.
+- `jsx-a11y` – rules for accessibility in JSX.
+- `react` – rules for React components.
+- `test-e2e` – rules for end-to-end tests written in Puppeteer.
+- `test-unit` – recommended rules for Vitest tests with explicit imports. This changes from Jest at the 27.0.0 major release boundary. Jest consumers can configure `eslint-plugin-jest` directly. See the [migration guide](../scripts/docs/vitest-migration.md).
+- `test-playwright` – rules for end-to-end tests written in Playwright.
 
 For example, if your project does not use React, you could use only the ESNext rules:
 

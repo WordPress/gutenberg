@@ -171,12 +171,12 @@ export function NoteThread( {
 				// translators: %s: note excerpt
 				__( 'Note: %s' ),
 				noteExcerpt
-		  )
+			)
 		: sprintf(
 				// translators: %s: note excerpt
 				__( 'Original block deleted. Note: %s' ),
 				noteExcerpt
-		  );
+			);
 
 	if ( isFloating && note.id === 'new' ) {
 		return (

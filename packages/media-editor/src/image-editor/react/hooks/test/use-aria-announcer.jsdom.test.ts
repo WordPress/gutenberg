@@ -18,7 +18,7 @@ vi.mock(
 	() =>
 		( {
 			speak: vi.fn(),
-		} ) as unknown as typeof import('@wordpress/a11y')
+		} ) as unknown as typeof import( '@wordpress/a11y' )
 );
 
 function makeState( overrides: Partial< CropperState > = {} ): CropperState {
