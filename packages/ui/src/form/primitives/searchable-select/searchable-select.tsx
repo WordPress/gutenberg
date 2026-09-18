@@ -59,6 +59,8 @@ function warnSearchableSelectProps(
 /**
  * A searchable single-selection component, with support for
  * a creatable footer action.
+ *
+ * Prefer `SearchableSelectControl` when using with a standard label and description.
  */
 export const SearchableSelect = forwardRef<
 	HTMLButtonElement,
