@@ -4,6 +4,11 @@ export {
 	useHasTypographyPanel,
 } from './typography-panel';
 export {
+	default as FontVariationsPanel,
+	getFontVariationAxes,
+	useHasFontVariationsPanel,
+} from './font-variations-panel';
+export {
 	default as DimensionsPanel,
 	useHasDimensionsPanel,
 } from './dimensions-panel';

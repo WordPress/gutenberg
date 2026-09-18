@@ -801,15 +801,20 @@ export default function TypographyPanel( {
 
 	const resetAllFilter = useCallback(
 		( previousValue ) => {
+			// Axis values belong to the Font variations panel.
+			const typography = {
+				fontVariationSettings:
+					previousValue?.typography?.fontVariationSettings,
+			};
 			if ( ! hasTextColorEnabled ) {
 				return {
 					...previousValue,
-					typography: {},
+					typography,
 				};
 			}
 			return {
 				...previousValue,
-				typography: {},
+				typography,
 				color: {
 					...previousValue?.color,
 					text: undefined,

@@ -110,6 +110,13 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
+		if ( ! supportedStyles.includes( 'fontVariationSettings' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				fontVariations: undefined,
+			};
+		}
+
 		// Text indent needs explicit handling since it may not be in parent settings.
 		if ( supportedStyles.includes( 'textIndent' ) ) {
 			updatedSettings.typography = {
