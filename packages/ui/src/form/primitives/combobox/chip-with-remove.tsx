@@ -22,6 +22,7 @@ export const ChipWithRemove = forwardRef<
 		prefix,
 		removeLabel = __( 'Remove' ),
 		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledby,
 		'aria-describedby': ariaDescribedby,
 		...restProps
 	},
@@ -29,15 +30,16 @@ export const ChipWithRemove = forwardRef<
 ) {
 	const labelId = useId();
 	const hintId = useId();
-	const chipAriaLabel =
-		ariaLabel ?? ( typeof children === 'string' ? children : undefined );
 
 	return (
 		<_Combobox.Chip
 			ref={ ref }
 			className={ clsx( styles.chip, className ) }
 			{ ...restProps }
-			aria-label={ chipAriaLabel }
+			aria-label={ ariaLabel }
+			aria-labelledby={
+				ariaLabelledby || ( ariaLabel ? undefined : labelId )
+			}
 			aria-describedby={ clsx( ariaDescribedby, hintId ) || undefined }
 		>
 			{ prefix && (

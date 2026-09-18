@@ -108,8 +108,8 @@ export type SearchableChipSelectProps = Omit<
 		/**
 		 * A render function for custom rendering the selected chips.
 		 *
-		 * When chip content is not a plain string, pass `aria-label` on each
-		 * `ChipWithRemove`.
+		 * The chip is named from its content. Pass `aria-label` when that
+		 * content is not a usable name.
 		 *
 		 * ```jsx
 		 * chipsContent={ ( value ) =>
