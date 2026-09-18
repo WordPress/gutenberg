@@ -169,6 +169,12 @@ $swatch-gap: 12px;
 	> button.has-contrast-warning .block-editor-panel-color-gradient-settings__color-name {
 		max-width: calc(100% - ($button-size-next-default-40px + $button-size-small + $grid-unit));
 	}
+
+	// Same for the caution icon on a disabled control. There is no reset
+	// button to sit beside in that state, so it only needs its own width.
+	> button.has-disabled-hint .block-editor-panel-color-gradient-settings__color-name {
+		max-width: calc(100% - ($button-size-small + $grid-unit-15));
+	}
 }
 
 .block-editor-panel-color-gradient-settings__dropdown {
@@ -224,6 +230,7 @@ $swatch-gap: 12px;
 	// from `currentColor`. Match the disabled toggle's label.
 	color: $gray-600;
 }
+
 
 // Icon-only "Low contrast" warning shown to the right of the color
 // control toggle whenever the selection has insufficient contrast.
