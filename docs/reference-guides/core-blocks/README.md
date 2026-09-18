@@ -430,7 +430,7 @@ Display a list of your most recent posts.
 
 -	**Name:** [core/latest-posts](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-latest-posts/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** align, anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** addLinkToFeaturedImage, categories, displayAuthor, displayFeaturedImage, displayPostContent, displayPostContentRadio, displayPostDate, excerptLength, featuredImageAlign, featuredImageSizeHeight, featuredImageSizeSlug, featuredImageSizeWidth, order, orderBy, postsToShow, selectedAuthor
 
 ## List
@@ -469,7 +469,7 @@ Display mathematical notation using LaTeX.
 
 -	**Name:** [core/math](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-math/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize), ~~html~~
+-	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize), ~~html~~
 -	**Attributes:** latex, mathML
 
 ## Media & Text
@@ -555,7 +555,7 @@ Display a list of all pages.
 -	**Name:** [core/page-list](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
 -	**Allowed Blocks:** core/page-list-item
--	**Supports:** anchor, color (background, gradients, link, text), contentRole, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, color (background, gradients, link, text), contentRole, interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** parentPageID
 
 ## Page List Item
@@ -593,7 +593,7 @@ Embed a simple playlist.
 -	**Name:** [core/playlist](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-playlist/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Allowed Blocks:** core/playlist-track
--	**Supports:** align, anchor, color (background, gradients, link, text), interactivity, spacing (margin, padding), typography (fontSize)
+-	**Supports:** align, anchor, color (background, gradients, link, text), interactivity, shadow, spacing (margin, padding), typography (fontSize)
 -	**Attributes:** caption, order, showArtists, showImages, showNumbers, showPlayButtonArtwork, showTrackLength, showTracklist, type, waveformBackgroundColor, waveformBackgroundGradient, waveformColor, waveformGradient, waveformStyle
 
 ## Playlist track
@@ -719,7 +719,7 @@ Contains the block elements used to render a post, like the title, date, feature
 -	**Name:** [core/post-template](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-template/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Ancestor:** core/query
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 
 ## Post Terms
 

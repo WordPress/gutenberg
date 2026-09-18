@@ -59,22 +59,6 @@ export function discoverTestFiles( rootDir ) {
 	].sort();
 }
 
-export function getVitestTests( discoveredTests, manifest ) {
-	const jestTests = new Set( manifest.jest.files );
-
-	return discoveredTests
-		.filter( ( testPath ) => ! jestTests.has( testPath ) )
-		.sort();
-}
-
-export function findAddedLegacyJestTests( currentTests, baselineTests ) {
-	const baselineTestSet = new Set( baselineTests );
-
-	return currentTests
-		.filter( ( testPath ) => ! baselineTestSet.has( testPath ) )
-		.sort();
-}
-
 export function getTestEnvironmentName( testPath ) {
 	if ( BROWSER_TEST_PATH_PATTERN.test( testPath ) ) {
 		return 'browser';
@@ -87,12 +71,12 @@ export function getTestEnvironmentName( testPath ) {
 	return 'node';
 }
 
-export function getVitestTestsByProject( discoveredTests, manifest ) {
+export function getVitestTestsByProject( discoveredTests ) {
 	const testsByProject = Object.fromEntries(
 		VITEST_PROJECT_NAMES.map( ( projectName ) => [ projectName, [] ] )
 	);
 
-	for ( const testPath of getVitestTests( discoveredTests, manifest ) ) {
+	for ( const testPath of discoveredTests ) {
 		testsByProject[ getTestEnvironmentName( testPath ) ].push( testPath );
 	}
 
