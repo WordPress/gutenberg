@@ -3,13 +3,7 @@
 
 	@layer components {
 		.root {
-			/* Switch and label will be aligned correctly as far as the switch height
-			is less or equal than the label's line height */
 			--_wp-ui-switch-control-switch-height: var(--wpds-dimension-size-2xs);
-
-			/* Use the highest number between the target line height for the label text,
-			and the switch height. This will ensure that the first line of the label
-			and the switch are always vertically centered. */
 			--_wp-ui-switch-control-label-line-height: max(var(--_wp-ui-switch-control-switch-height), var(--wpds-typography-line-height-xs));
 		}
 
@@ -20,10 +14,6 @@
 			height: 1lh;
 			line-height: var(--_wp-ui-switch-control-label-line-height);
 			overflow: visible;
-		}
-
-		.switch {
-			--wp-ui-switch-height: var(--_wp-ui-switch-control-switch-height);
 		}
 
 		.label {
