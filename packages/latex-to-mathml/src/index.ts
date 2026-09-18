@@ -45,7 +45,7 @@ export default function latexToMathML(
 
 	// temml marks the cells of `aligned`, `cases` and tagged equations with
 	// classes for its own stylesheet. Write the MathML `columnalign`
-	// attribute on the cell as well, so the alignment is part of the content:
+	// attribute on the cell instead, so the alignment is part of the content:
 	// Firefox and Safari honor it natively, and the polyfill in `style.scss`
 	// covers Chromium, which implements MathML Core only.
 	for ( const cell of math.querySelectorAll(
@@ -55,6 +55,13 @@ export default function latexToMathML(
 			'columnalign',
 			cell.classList.contains( 'tml-right' ) ? 'right' : 'left'
 		);
+	}
+
+	// The remaining classes are hooks for temml's stylesheet, which is not
+	// used. Drop them so the content is plain MathML and does not depend on
+	// the class names of a temml version.
+	for ( const element of math.querySelectorAll( '[class]' ) ) {
+		element.removeAttribute( 'class' );
 	}
 
 	return math.innerHTML;
