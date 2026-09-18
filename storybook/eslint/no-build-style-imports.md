@@ -1,4 +1,4 @@
-# No Storybook Build Style Imports (no-storybook-build-style-imports)
+# No Build Style Imports (no-build-style-imports)
 
 Package `build-style` stylesheets imported from Storybook stories as a Vite side effect are injected into the preview document. Add a matcher in `storybook/package-styles/config.js` (and a `*.lazy.scss` wrapper if the package is missing), then drop this import.
 

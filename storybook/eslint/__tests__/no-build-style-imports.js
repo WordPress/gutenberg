@@ -1,8 +1,10 @@
 import { describe, it } from 'vitest';
-import configureRuleTester from '../../test-utils/configure-rule-tester';
-import rule from '../no-storybook-build-style-imports';
+import { RuleTester } from 'eslint';
+import rule from '../no-build-style-imports';
 
-const RuleTester = configureRuleTester( { describe, it } );
+RuleTester.describe = describe;
+RuleTester.it = it;
+RuleTester.itOnly = it.only;
 
 const ruleTester = new RuleTester( {
 	languageOptions: {
@@ -11,7 +13,7 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-ruleTester.run( 'no-storybook-build-style-imports', rule, {
+ruleTester.run( 'no-build-style-imports', rule, {
 	valid: [
 		{ code: "import './style.css';" },
 		{ code: "import './style.scss';" },

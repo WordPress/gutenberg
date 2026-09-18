@@ -9,7 +9,7 @@ module.exports = {
 		docs: {
 			description:
 				'Disallow side-effect imports of package build-style stylesheets from Storybook stories.',
-			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-storybook-build-style-imports.md',
+			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/storybook/eslint/no-build-style-imports.md',
 		},
 		schema: [],
 		messages: {

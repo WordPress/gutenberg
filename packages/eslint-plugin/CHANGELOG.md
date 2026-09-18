@@ -6,10 +6,6 @@
 
 -   Switch `test-unit` from Jest to `@vitest/eslint-plugin` recommended rules with explicit imports at the 27.0.0 boundary. Jest consumers must configure `eslint-plugin-jest` directly. ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
 
-### New Features
-
--   Added [`no-storybook-build-style-imports`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-storybook-build-style-imports.md) rule to prevent importing package build-style stylesheets as Vite side effects from Storybook stories ([#82960](https://github.com/WordPress/gutenberg/pull/82960)).
-
 ### Enhancements
 
 -   Update `use-recommended-components` rule to mark `Select` and `SelectControl` from `@wordpress/ui` as recommended ([#83030](https://github.com/WordPress/gutenberg/pull/83030)).

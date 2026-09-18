@@ -10,6 +10,7 @@ import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
+import storybookEslintConfig from '../../storybook/eslint-overrides.cjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -722,13 +723,11 @@ export default dedupePlugins( [
 	// Override: Storybook story files — disable rules-of-hooks for the
 	// `render` method pattern (hooks in a lowercase function) and
 	// static-components for inline factories used in story setup.
-	// Flag side-effect imports of package build-style stylesheets.
 	{
 		files: [ `**/@(storybook|stories)/**/*.${ SCRIPT_EXT }` ],
 		rules: {
 			'react-hooks/rules-of-hooks': 'off',
 			'react-hooks/static-components': 'off',
-			'@wordpress/no-storybook-build-style-imports': 'error',
 		},
 	},
 
@@ -1106,6 +1105,7 @@ export default dedupePlugins( [
 
 	// Package-level configs (kept alongside the code they apply to).
 	...wpBuildConfig,
+	...storybookEslintConfig,
 
 	{
 		settings: { react: { version: reactVersion } },
