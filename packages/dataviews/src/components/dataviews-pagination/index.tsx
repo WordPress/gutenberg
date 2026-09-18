@@ -1,11 +1,9 @@
-import {
-	Button,
-	SelectControl as WCSelectControl,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { createInterpolateElement, memo, useContext } from '@wordpress/element';
 import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Select, pending WordPress/gutenberg#76135.
+import { Select, Stack } from '@wordpress/ui';
 import DataViewsContext from '../dataviews-context';
 import type { View } from '../../types';
 
@@ -75,19 +73,37 @@ export function DataViewsPagination() {
 						div: <div aria-hidden />,
 						// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
 						CurrentPage: (
-							<WCSelectControl
-								aria-label={ __( 'Current page' ) }
+							<Select.Root
 								value={ currentPage.toString() }
-								options={ pageSelectOptions }
-								onChange={ ( newValue ) => {
+								onValueChange={ ( newValue ) => {
 									onChangeView( {
 										...view,
 										page: +newValue,
 									} );
 								} }
-								size="small"
-								variant="minimal"
-							/>
+							>
+								<Select.Trigger
+									size="small"
+									variant="minimal"
+									aria-label={ __( 'Current page' ) }
+								/>
+								<Select.Popup width="content">
+									{ pageSelectOptions.map( ( option ) => (
+										<Select.Item
+											key={ option.value }
+											value={ option.value }
+											size="small"
+											aria-label={
+												option[ 'aria-label' ]
+											}
+										>
+											<Select.ItemLabel>
+												{ option.label }
+											</Select.ItemLabel>
+										</Select.Item>
+									) ) }
+								</Select.Popup>
+							</Select.Root>
 						),
 					}
 				) }
