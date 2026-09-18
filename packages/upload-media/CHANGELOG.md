@@ -6,6 +6,10 @@
 
 -   Support HEIC/HEIF image sequences (Apple Live Photos, Android bursts). The sequence's first frame is decoded to a JPEG and uploaded as the attachment, and its motion is re-encoded to a web-safe video (MP4/WebM) sideloaded as an `animated_video` companion — the same model animated GIFs use. Sequences are detected by sniffing the container, since exported Live Photos routinely arrive typed as ordinary `image/heic` stills. Falls back to uploading the original untouched when the platform cannot decode HEVC ([#79642](https://github.com/WordPress/gutenberg/issues/79642)).
 
+### Bug Fixes
+
+-   An upload step is no longer silently skipped when the same queue item is processed twice. `processItem` started the next operation without checking whether one was already running, so a re-entrant dispatch (a finishing child sideload pinging its parent, or `resumeQueue` walking the whole queue) ran the same handler a second time, and each run finished the operation, shifting two steps off the item's pipeline ([#83031](https://github.com/WordPress/gutenberg/pull/83031)).
+
 ## 0.40.0 (2026-09-10)
 
 ### Bug Fixes

@@ -349,7 +349,7 @@ export default function Image( {
 							'attachment',
 							id,
 							{ context: 'view' }
-					  )
+						)
 					: null;
 
 			// Check if the attachment resolution failed with a specific error.
@@ -366,7 +366,7 @@ export default function Image( {
 								id,
 								{ context: 'view' },
 							]
-					  )
+						)
 					: null;
 
 			return {
@@ -938,7 +938,7 @@ export default function Image( {
 							/* translators: %s: Label of the bindings source. */
 							__( 'Connected to %s' ),
 							altBindingSource.label
-					  )
+						)
 					: __( 'Connected to dynamic data' ),
 				lockTitleControls:
 					!! titleBinding &&
@@ -952,7 +952,7 @@ export default function Image( {
 							/* translators: %s: Label of the bindings source. */
 							__( 'Connected to %s' ),
 							titleBindingSource.label
-					  )
+						)
 					: __( 'Connected to dynamic data' ),
 			};
 		},
@@ -1281,7 +1281,7 @@ export default function Image( {
 						'This image has been marked as decorative; its file name is %s'
 					),
 					filename
-			  )
+				)
 			: __( 'This image has been marked as decorative.' );
 	} else if ( alt ) {
 		defaultedAlt = alt;
@@ -1334,7 +1334,7 @@ export default function Image( {
 										height:
 											pixelSize.height +
 											resizeDelta.height,
-								  }
+									}
 								: ( () => {
 										const style = {};
 										if ( width === 'auto' ) {
@@ -1367,7 +1367,7 @@ export default function Image( {
 											style.height = 'auto';
 										}
 										return style;
-								  } )() ),
+									} )() ),
 							objectFit: scale,
 							objectPosition:
 								focalPoint && scale
