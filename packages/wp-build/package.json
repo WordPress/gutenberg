@@ -56,6 +56,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^24.13.3",
+		"@wordpress/theme": "file:../theme",
 		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
