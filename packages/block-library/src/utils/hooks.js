@@ -165,7 +165,7 @@ export function useResumeUploadFromMarker( { uploadId, onChange, onError } ) {
 			uploadId
 				? unlock( select( uploadStore ) ).getResumableItemByUploadId(
 						uploadId
-				  )
+					)
 				: undefined,
 		[ uploadId ]
 	);

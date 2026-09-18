@@ -341,17 +341,15 @@ function reducer(
 		case Type.RegisterCallbacks: {
 			return {
 				...state,
-				queue: state.queue.map(
-					( item ): QueueItem =>
-						item.id === action.id
-							? {
-									...item,
-									onChange: action.onChange ?? item.onChange,
-									onSuccess:
-										action.onSuccess ?? item.onSuccess,
-									onError: action.onError ?? item.onError,
-							  }
-							: item
+				queue: state.queue.map( ( item ): QueueItem =>
+					item.id === action.id
+						? {
+								...item,
+								onChange: action.onChange ?? item.onChange,
+								onSuccess: action.onSuccess ?? item.onSuccess,
+								onError: action.onError ?? item.onError,
+							}
+						: item
 				),
 			};
 		}

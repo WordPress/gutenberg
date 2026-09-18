@@ -16,7 +16,7 @@ vi.mock(
 			createBlobURL: vi.fn( () => 'blob:foo' ),
 			isBlobURL: vi.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
 			revokeBlobURL: vi.fn(),
-		} ) as unknown as typeof import('@wordpress/blob')
+		} ) as unknown as typeof import( '@wordpress/blob' )
 );
 
 function flush() {
