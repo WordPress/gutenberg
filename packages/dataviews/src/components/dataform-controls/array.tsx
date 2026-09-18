@@ -32,7 +32,7 @@ export default function ArrayControl< Item >( {
 							( suggestion ) => suggestion.value === token
 						);
 						return element || { value: token, label: token };
-				  } )
+					} )
 				: [],
 		[ value, elements ]
 	);
