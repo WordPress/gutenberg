@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add a text shadow block support and its control in the typography panel ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+-   Typography: Variable fonts can use any weight within their declared range. Appearance separates the style selector from a weight picker, which offers both named presets and a direct numeric value ([#83141](https://github.com/WordPress/gutenberg/pull/83141)).
 
 ### Enhancements
 

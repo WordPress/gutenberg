@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
+import VariableFontAppearanceControl from '../variable-font-appearance-control';
 import LineHeightControl from '../line-height-control';
 import LetterSpacingControl from '../letter-spacing-control';
 import TextAlignmentControl from '../text-alignment-control';
@@ -32,6 +33,7 @@ import {
 	findNearestStyleAndWeight,
 } from './typography-utils';
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
+import { getFontWeightRange } from '../../utils/get-font-weight-range';
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
@@ -336,9 +338,18 @@ export default function TypographyPanel( {
 		const hasFontStyle = fontStyles?.some(
 			( { value: fs } ) => fs === fontStyle
 		);
-		const hasFontWeight = fontWeights?.some(
-			( { value: fw } ) => fw?.toString() === fontWeight?.toString()
-		);
+		// A variable font can draw any weight in its range, not only the
+		// hundreds listed as presets.
+		const newFontWeightRange = getFontWeightRange( newFontFamilyFaces );
+		const numericFontWeight = Number( fontWeight );
+		const hasFontWeight =
+			fontWeights?.some(
+				( { value: fw } ) => fw?.toString() === fontWeight?.toString()
+			) ||
+			( !! newFontWeightRange &&
+				hasValue( fontWeight ) &&
+				numericFontWeight >= newFontWeightRange.min &&
+				numericFontWeight <= newFontWeightRange.max );
 
 		// Find the nearest available font style/weight if not available.
 		if ( ! hasFontStyle || ! hasFontWeight ) {
@@ -457,6 +468,13 @@ export default function TypographyPanel( {
 	// Appearance
 	const hasAppearanceControl = useHasAppearanceControl( settings );
 	const appearanceControlLabel = useAppearanceControlLabel( settings );
+	// A family with a weight range is variable: Appearance shows a style
+	// select and a weight that can take any value in the range, instead of
+	// fixed style and weight combinations.
+	const isVariableFont = useMemo(
+		() => !! getFontWeightRange( fontFamilyFaces ),
+		[ fontFamilyFaces ]
+	);
 	const hasFontStyles = settings?.typography?.fontStyle;
 	const hasFontWeights = settings?.typography?.fontWeight;
 	// Render local-then-inherited; placeholder fires only when both
@@ -925,16 +943,29 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.fontAppearance }
 					panelId={ panelId }
 				>
-					<FontAppearanceControl
-						value={ {
-							fontStyle,
-							fontWeight,
-						} }
-						onChange={ setFontAppearanceWithInheritedCommit }
-						hasFontStyles={ hasFontStyles }
-						hasFontWeights={ hasFontWeights }
-						fontFamilyFaces={ fontFamilyFaces }
-					/>
+					{ isVariableFont ? (
+						<VariableFontAppearanceControl
+							value={ {
+								fontStyle,
+								fontWeight,
+							} }
+							onChange={ setFontAppearanceWithInheritedCommit }
+							hasFontStyles={ hasFontStyles }
+							hasFontWeights={ hasFontWeights }
+							fontFamilyFaces={ fontFamilyFaces }
+						/>
+					) : (
+						<FontAppearanceControl
+							value={ {
+								fontStyle,
+								fontWeight,
+							} }
+							onChange={ setFontAppearanceWithInheritedCommit }
+							hasFontStyles={ hasFontStyles }
+							hasFontWeights={ hasFontWeights }
+							fontFamilyFaces={ fontFamilyFaces }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
 			{ hasLineHeightEnabled && (
