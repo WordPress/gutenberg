@@ -30,7 +30,7 @@ export default function BackgroundClipControl( {
 		allowedValues
 			? BACKGROUND_CLIP_OPTIONS.filter( ( option ) =>
 					allowedValues.includes( option.key )
-			  )
+				)
 			: BACKGROUND_CLIP_OPTIONS
 	).map( ( option ) => ( {
 		...option,
