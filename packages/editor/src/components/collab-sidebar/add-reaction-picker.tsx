@@ -208,7 +208,8 @@ export function AddReactionButton( {
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<IconButton
 					size="small"
-					variant="outline"
+					// A plain glyph, per the design: no ring or fill at rest.
+					variant="minimal"
 					tone="neutral"
 					className="editor-collab-sidebar-panel__add-reaction-button"
 					icon={ smileyIcon }
