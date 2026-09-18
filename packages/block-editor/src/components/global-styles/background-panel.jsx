@@ -10,6 +10,7 @@ import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasBackgroundColorPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
+import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 import { setImmutably } from '../../utils/object';
 import {
 	extractPresetSlug,
@@ -167,6 +168,8 @@ export default function BackgroundImagePanel( {
 	// state is selected. That state layers over it, so a clip set there still
 	// governs what this one can paint.
 	baseValue,
+	// The selected style state, so a viewport can be told from a pseudo state.
+	styleState,
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -221,11 +224,16 @@ export default function BackgroundImagePanel( {
 	} else if ( Array.isArray( clipSetting ) ) {
 		allowedClipValues = clipSetting;
 	}
-	// Clipping belongs to the block's Default state: it is emitted without a
-	// media query, so it applies at every width whichever state sets it.
-	const isNonDefaultState = baseValue !== undefined;
+	/*
+	 * A viewport state's styles sit in a media query, but the clip is not
+	 * emitted in one, so it applies at every width whichever state set it.
+	 * It belongs to the Default state, and only that state can change it. A
+	 * pseudo state is different: its styles are scoped to the selector, so a
+	 * clip set there genuinely applies on hover alone.
+	 */
+	const isViewportState = hasViewportBlockStyleState( styleState );
 	const showBackgroundClipControl =
-		allowedClipValues.length > 0 && ! isNonDefaultState;
+		allowedClipValues.length > 0 && ! isViewportState;
 
 	const localClip = value?.background?.backgroundClip;
 	const baseClip = baseValue?.background?.backgroundClip;
@@ -656,6 +664,7 @@ export default function BackgroundImagePanel( {
 					<BackgroundClipControl
 						value={
 							value?.background?.backgroundClip ??
+							baseClip ??
 							inheritedBackgroundClip
 						}
 						onChange={ ( newClip ) =>
