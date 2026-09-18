@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   List each Global Styles change on its own line in the save confirmation panel, followed by badges for the style states it applies to (e.g. Default, Mobile, Tablet) ([#81027](https://github.com/WordPress/gutenberg/pull/81027)).
+
 ### Bug Fixes
 
 -   The `save<Entity>` and `delete<Entity>` shortcut actions resolve with their saved or deleted record types instead of `void` ([#77162](https://github.com/WordPress/gutenberg/pull/77162)).
