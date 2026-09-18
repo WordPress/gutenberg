@@ -52,22 +52,27 @@ export const createTemplate =
 					template: savedTemplate.slug,
 				}
 			);
+		const { defaultRenderingMode, renderingMode } =
+			select.getEditorSettings();
 		registry
 			.dispatch( noticesStore )
 			.createSuccessNotice(
 				__( "Custom template created. You're in template mode now." ),
 				{
 					type: 'snackbar',
-					actions: [
-						{
-							label: __( 'Go back' ),
-							onClick: () =>
-								dispatch.setRenderingMode(
-									select.getEditorSettings()
-										.defaultRenderingMode
-								),
-						},
-					],
+					// An editor with a fixed rendering mode has no other mode
+					// to go back to, so the action is not offered.
+					actions: renderingMode
+						? []
+						: [
+								{
+									label: __( 'Back' ),
+									onClick: () =>
+										dispatch.setRenderingMode(
+											defaultRenderingMode
+										),
+								},
+							],
 				}
 			);
 		return savedTemplate;
@@ -299,12 +304,12 @@ export const removeTemplates =
 							/* translators: %s: The template/part's name. */
 							__( '"%s" reset.' ),
 							decodeEntities( title )
-					  )
+						)
 					: sprintf(
 							/* translators: %s: The template/part's name. */
 							_x( '"%s" deleted.', 'template part' ),
 							decodeEntities( title )
-					  );
+						);
 			} else {
 				successMessage = isResetting
 					? __( 'Items reset.' )
@@ -352,14 +357,14 @@ export const removeTemplates =
 									'An error occurred while reverting the items: %s'
 								),
 								[ ...errorMessages ][ 0 ]
-						  )
+							)
 						: sprintf(
 								/* translators: %s: an error message */
 								__(
 									'An error occurred while deleting the items: %s'
 								),
 								[ ...errorMessages ][ 0 ]
-						  );
+							);
 				} else {
 					errorMessage = isResetting
 						? sprintf(
@@ -368,14 +373,14 @@ export const removeTemplates =
 									'Some errors occurred while reverting the items: %s'
 								),
 								[ ...errorMessages ].join( ',' )
-						  )
+							)
 						: sprintf(
 								/* translators: %s: a list of comma separated error messages */
 								__(
 									'Some errors occurred while deleting the items: %s'
 								),
 								[ ...errorMessages ].join( ',' )
-						  );
+							);
 				}
 			}
 			registry
@@ -689,8 +694,8 @@ export const restoreRevision =
 						'modified',
 						'author',
 						'meta',
-						'title.raw',
-						'excerpt.raw',
+						'title',
+						'excerpt',
 						'content.raw',
 						revisionKey,
 					] ),

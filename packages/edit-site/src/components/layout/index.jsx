@@ -41,12 +41,14 @@ const { useLocation } = unlock( routerPrivateApis );
 const { useStyle, UploadProgressSnackbar } = unlock( editorPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
-const CONTENT_COLOR = { background: '#ffffff' };
+// Reset to the default background color.
+const CONTENT_COLOR = { background: '#fcfcfc' };
 
 function Layout() {
 	const { query, name: routeKey, areas, widths } = useLocation();
 	// Force canvas to 'view' on notfound route to show the error message and allow navigation.
-	const canvas = routeKey === 'notfound' ? 'view' : query?.canvas ?? 'view';
+	const canvas =
+		routeKey === 'notfound' ? 'view' : ( query?.canvas ?? 'view' );
 	const showMobileSiteHub = !! areas.mobileContent;
 	const hasMobileAreas =
 		areas.mobileSidebar || areas.mobileContent || areas.preview;
@@ -79,7 +81,7 @@ function Layout() {
 		if ( previousCanvaMode === 'edit' ) {
 			const desktopToggle = sidebarRegionRef.current
 				? // We're typically expecting the `<DashboardBackButton />` component as the first tabbable element.
-				  focus.tabbable.find( sidebarRegionRef.current )[ 0 ]
+					focus.tabbable.find( sidebarRegionRef.current )[ 0 ]
 				: undefined;
 			( desktopToggle ?? mobileToggleRef.current )?.focus();
 		}
@@ -321,7 +323,9 @@ export default function LayoutWithGlobalStylesProvider( props ) {
 					} }
 				>
 					<ThemeProvider color={ themeColors }>
-						<Layout { ...props } />
+						<ErrorBoundary>
+							<Layout { ...props } />
+						</ErrorBoundary>
 					</ThemeProvider>
 				</ThemeProvider>
 			</Tooltip.Provider>

@@ -36,6 +36,8 @@ const ALLOWLIST = {
 			'RangeCalendar',
 			'SearchableChipSelect',
 			'SearchableChipSelectControl',
+			'Select',
+			'SelectControl',
 			'Skeleton',
 			'Spinner',
 			'Stack',
@@ -67,7 +69,8 @@ const DENYLIST = {
 	'@wordpress/components': {
 		ExternalLink:
 			'Use `Link` from `@wordpress/ui` with the `openInNewTab` prop instead.',
-		__experimentalDivider: '{{ name }} is planned for deprecation.',
+		__experimentalDivider:
+			'Use a Separator subcomponent such as `Menu.Separator` from `@wordpress/ui` when one exists. Otherwise write your own CSS, preferably using the design tokens available in `@wordpress/theme`.',
 		__experimentalElevation:
 			'Use elevation tokens from `@wordpress/base-styles` instead.',
 		__experimentalGrid:
@@ -85,6 +88,8 @@ const DENYLIST = {
 			'{{ name }} is planned for deprecation. Write your own CSS instead.',
 		Animate:
 			'Write your own CSS animations instead, preferably using the motion tokens available in `@wordpress/theme`.',
+		BaseControl:
+			'Use `Field` from `@wordpress/ui` instead. For a purely visual label, use `Field.VisualLabel`. For a group legend, use `Fieldset` and `Fieldset.Legend`.',
 		Card: 'Use `Card.Root` from `@wordpress/ui` instead.',
 		CardBody: 'Use `Card.Content` from `@wordpress/ui` instead.',
 		CardDivider: 'A divider is no longer a standard pattern for cards.',

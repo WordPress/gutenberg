@@ -97,25 +97,31 @@ class Tests_Blocks_Render_Tabs extends WP_UnitTestCase {
 			<!-- /wp:tabs -->
 		BLOCK_CONTENT;
 
-		// Another block on the page consumes the shared `wp_unique_id()` counter
-		// before each tabs block is rendered.
-		wp_unique_id( 'unrelated-' );
-		$first_block = do_blocks( $tabs_block );
-		wp_unique_id( 'unrelated-' );
+		$first_block  = do_blocks( $tabs_block );
 		$second_block = do_blocks( $tabs_block );
 
-		$processor = new WP_HTML_Tag_Processor( $first_block );
-		$processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
+		// Another block on the page consumes the shared `wp_unique_id()` counter.
+		wp_unique_id( 'unrelated-' );
 
-		$context = json_decode( (string) $processor->get_attribute( 'data-wp-context' ), true );
-		$tabs_id = $context['tabsId'] ?? '';
-		$this->assertStringStartsWith( 'tabs_', $tabs_id );
+		$third_block = do_blocks( $tabs_block );
 
-		$tabs_number = (int) substr( $tabs_id, strlen( 'tabs_' ) );
+		$first_number  = $this->get_tabs_number( $first_block );
+		$second_number = $this->get_tabs_number( $second_block );
+		$third_number  = $this->get_tabs_number( $third_block );
 
-		$processor = new WP_HTML_Tag_Processor( $first_block . $second_block );
+		/*
+		 * Rendering a tabs block advances the `tabs_` counter by a fixed amount,
+		 * so the unrelated ID must leave the gap between two blocks unchanged.
+		 */
+		$this->assertSame(
+			$second_number - $first_number,
+			$third_number - $second_number,
+			'The unrelated ID should not have advanced the tabs counter.'
+		);
 
-		foreach ( array( $tabs_number, $tabs_number + 1 ) as $number ) {
+		$processor = new WP_HTML_Tag_Processor( $first_block . $second_block . $third_block );
+
+		foreach ( array( $first_number, $second_number, $third_number ) as $number ) {
 			foreach ( array( 1, 2 ) as $tab_number ) {
 				$tab_id = "tabs_{$number}-tab-{$tab_number}";
 
@@ -132,6 +138,24 @@ class Tests_Blocks_Render_Tabs extends WP_UnitTestCase {
 				$this->assertSame( "tab__{$tab_id}", $processor->get_attribute( 'aria-labelledby' ) );
 			}
 		}
+	}
+
+	/**
+	 * Reads the instance number out of the `tabsId` a rendered tabs block was given.
+	 *
+	 * @param string $rendered_block Rendered tabs block.
+	 *
+	 * @return int Tabs instance number.
+	 */
+	private function get_tabs_number( string $rendered_block ): int {
+		$processor = new WP_HTML_Tag_Processor( $rendered_block );
+		$processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
+
+		$context = json_decode( (string) $processor->get_attribute( 'data-wp-context' ), true );
+		$tabs_id = $context['tabsId'] ?? '';
+		$this->assertStringStartsWith( 'tabs_', $tabs_id );
+
+		return (int) substr( $tabs_id, strlen( 'tabs_' ) );
 	}
 
 	/**

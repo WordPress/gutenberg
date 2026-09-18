@@ -136,6 +136,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels, draftKey } ) {
 				placeholder={ labels?.placeholder }
 				allowedFormats={ ALLOWED_NOTE_FORMATS }
 				completers={ NOTE_COMPLETERS }
+				focusOnMount={ !! note }
 			/>
 			<Stack
 				direction="row"

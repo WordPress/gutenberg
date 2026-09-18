@@ -29,7 +29,7 @@ const meta: Meta< typeof CheckboxControl > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by [`CheckboxControl`](?path=/docs/design-system-components-form-primitives-checkbox--docs) in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`CheckboxControl`](?path=/docs/design-system-components-form-checkboxcontrol--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };
@@ -140,8 +140,6 @@ export const WithCustomLabel: Story = {
 						setChecked( v );
 						onChange( v );
 					} }
-					// Disable reason: For simplicity of the code snippet.
-					// eslint-disable-next-line no-restricted-syntax
 					id="my-checkbox-with-custom-label"
 					aria-describedby="my-custom-description"
 				/>
@@ -149,7 +147,6 @@ export const WithCustomLabel: Story = {
 					<label htmlFor="my-checkbox-with-custom-label">
 						My custom label
 					</label>
-					{ /* eslint-disable-next-line no-restricted-syntax */ }
 					<div id="my-custom-description" style={ { fontSize: 13 } }>
 						A custom description.
 					</div>
