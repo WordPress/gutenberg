@@ -211,7 +211,8 @@ const AVIF_BRANDS = [ 'avif', 'avis' ];
  *
  * 1. Checks for the `ftyp` marker at offset 4.
  * 2. Collects the brands the box declares — the major brand at offset 8, then
- *    the compatible brands from offset 16 on, four ASCII characters each.
+ *    the compatible brands from offset 16 up to the box size, four ASCII
+ *    characters each.
  * 3. Returns true when a HEIC/HEIF brand is present and no AVIF brand is.
  *
  * The browser derives `File.type` from the file extension alone, so this is the
@@ -241,9 +242,15 @@ export function isHeicBuffer( buffer: ArrayBuffer ): boolean {
 		return false;
 	}
 
+	// Anything past the box size belongs to the next box, not to the brands.
+	const boxEnd = Math.min(
+		view.length,
+		new DataView( buffer ).getUint32( 0 )
+	);
+
 	// The major brand, then every compatible brand after the minor version.
 	const brands = [ readBrand( 8 ) ];
-	for ( let offset = 16; offset + 4 <= view.length; offset += 4 ) {
+	for ( let offset = 16; offset + 4 <= boxEnd; offset += 4 ) {
 		brands.push( readBrand( offset ) );
 	}
 

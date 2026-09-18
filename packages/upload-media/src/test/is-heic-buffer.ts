@@ -60,6 +60,20 @@ describe( 'isHeicBuffer', () => {
 			false
 		);
 	} );
+
+	it( 'reads brands only from inside the File Type Box', () => {
+		// A short box, then the start of the next one. Item types in the meta
+		// box are also four ASCII characters, so a word there can spell an
+		// AVIF brand without the file being one.
+		const ftyp = new Uint8Array( buildFtyp( 'heic', 'mif1' ) );
+		const next = [ ...'\0\0\0\x18metaavif' ].map( ( character ) =>
+			character.charCodeAt( 0 )
+		);
+
+		expect(
+			isHeicBuffer( new Uint8Array( [ ...ftyp, ...next ] ).buffer )
+		).toBe( true );
+	} );
 } );
 
 describe( 'isHeicFile', () => {
