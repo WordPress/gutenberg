@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Remove the unused experimental `ZStack` around the Duotone labeled swatch in the Filters panel ([#83061](https://github.com/WordPress/gutenberg/pull/83061)).
+-   Replace experimental `ZStack`, `HStack`, `Flex`, and `FlexItem` around the Duotone labeled swatch in the Filters panel ([#83061](https://github.com/WordPress/gutenberg/pull/83061)).
 -   Remove the `crossorigin` MutationObserver. Under `Document-Isolation-Policy: isolate-and-credentialless` cross-origin resources load without the attribute, and adding it broke any resource served without CORS headers ([#82614](https://github.com/WordPress/gutenberg/pull/82614)).
 
 ### New Features

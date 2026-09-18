@@ -57,6 +57,19 @@
 	}
 }
 
+.block-editor-panel-duotone-settings__label-row {
+	width: 100%;
+	min-width: 0;
+}
+
+.block-editor-panel-duotone-settings__label {
+	display: block;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 .block-editor-global-styles__shadow-editor__remove-button {
 	position: absolute;
 	right: 0;
