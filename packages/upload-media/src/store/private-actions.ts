@@ -1685,8 +1685,9 @@ export function generateThumbnails( id: QueueItemId ) {
 		}
 
 		// JXL companion original: preserve the user's uploaded .jxl alongside
-		// the JPEG derivative. Stored under the dedicated source_image metadata
-		// key (like the HEIC original) so it never collides with 'original_image'.
+		// the JPEG derivative. Sideloaded under the same `source_original` size
+		// as the HEIC original above, which stores the basename in the
+		// source_image metadata key so it never collides with 'original_image'.
 		// Cleanup on attachment delete is handled by a delete_attachment hook.
 		if ( item.originalJxlFile && attachment.id ) {
 			dispatch.addSideloadItem( {
@@ -1695,7 +1696,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				parentId: item.id,
 				additionalData: {
 					post: attachment.id,
-					image_size: 'original-jxl',
+					image_size: 'source_original',
 					convert_format: false,
 				},
 				operations: [ OperationType.Upload ],

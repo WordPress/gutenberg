@@ -1203,6 +1203,57 @@ describe( 'private actions', () => {
 		} );
 	} );
 
+	describe( 'generateThumbnails (source-format original sideload)', () => {
+		function runGenerate( item ) {
+			const dispatchFn = vi.fn();
+			dispatchFn.finishOperation = vi.fn();
+			dispatchFn.addSideloadItem = vi.fn();
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {} ),
+			};
+			return generateThumbnails( item.id )( {
+				select,
+				dispatch: dispatchFn,
+			} ).then( () => dispatchFn );
+		}
+
+		/*
+		 * The size name is a contract with the REST sideload endpoint, which
+		 * validates it against a fixed list. A JXL companion previously had its
+		 * own 'original-jxl' token; core settled on the one generic
+		 * 'source_original' shared with the HEIC original, and a client sending
+		 * anything else is rejected with rest_not_in_enum.
+		 */
+		it( 'sideloads the JXL original as source_original', async () => {
+			const jxl = new File( [ 'x' ], 'photo.jxl', {
+				type: 'image/jxl',
+			} );
+			const item = {
+				id: 'j',
+				sourceFile: jxl,
+				file: jxl,
+				originalJxlFile: jxl,
+				attachment: { id: 21 },
+			};
+
+			const dispatchFn = await runGenerate( item );
+
+			expect( dispatchFn.addSideloadItem ).toHaveBeenCalledTimes( 1 );
+			const sideload = dispatchFn.addSideloadItem.mock.calls[ 0 ][ 0 ];
+			expect( sideload.file ).toBe( jxl );
+			expect( sideload.parentId ).toBe( 'j' );
+			expect( sideload.additionalData ).toEqual(
+				expect.objectContaining( {
+					post: 21,
+					image_size: 'source_original',
+					convert_format: false,
+				} )
+			);
+			expect( sideload.operations ).toEqual( [ OperationType.Upload ] );
+		} );
+	} );
+
 	describe( 'generateThumbnails UltraHDR gain-map routing', () => {
 		const ULTRAHDR_INFO = { width: 1024, height: 768, hdrCapacity: 3 };
 
