@@ -885,7 +885,7 @@ export default function TypographyPanel( {
 						...previousValue?.background,
 						gradient: undefined,
 						backgroundClip: undefined,
-				  }
+					}
 				: previousValue?.background;
 
 			if ( ! hasTextColorEnabled ) {
@@ -973,10 +973,10 @@ export default function TypographyPanel( {
 						backgroundGradient
 							? __(
 									"A text gradient can't be set while the block has a background gradient."
-							  )
+								)
 							: __(
 									"A text gradient can't be set while the block has a background color."
-							  )
+								)
 					}
 					isShownByDefault={ defaultControls.textGradient }
 					indicators={ [ userTextGradient ?? textGradient ] }
