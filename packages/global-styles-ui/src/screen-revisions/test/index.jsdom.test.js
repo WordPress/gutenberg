@@ -437,6 +437,9 @@ describe( 'ScreenRevisions', () => {
 
 		renderScreen( { userConfig: { styles: STYLES_A, settings: {} } } );
 
+		expect( useGlobalStylesRevisions ).toHaveBeenLastCalledWith( {
+			query: { per_page: 10, page: 1 },
+		} );
 		expect( screen.getAllByRole( 'option' )[ 1 ] ).toHaveAttribute(
 			'aria-selected',
 			'true'
@@ -445,6 +448,9 @@ describe( 'ScreenRevisions', () => {
 		await userEvent.click(
 			screen.getByRole( 'button', { name: 'Next page' } )
 		);
+		expect( useGlobalStylesRevisions ).toHaveBeenLastCalledWith( {
+			query: { per_page: 10, page: 2 },
+		} );
 
 		// Revision 10 is not on this page, so nothing here is selected, no
 		// option claims to hold the editor styles, and there is nothing to
@@ -456,20 +462,5 @@ describe( 'ScreenRevisions', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Apply' } )
 		).toBeDisabled();
-	} );
-
-	it( 'queries the revisions page driven by the view', async () => {
-		renderScreen();
-
-		expect( useGlobalStylesRevisions ).toHaveBeenLastCalledWith( {
-			query: { per_page: 10, page: 1 },
-		} );
-
-		await userEvent.click(
-			screen.getByRole( 'button', { name: 'Next page' } )
-		);
-		expect( useGlobalStylesRevisions ).toHaveBeenLastCalledWith( {
-			query: { per_page: 10, page: 2 },
-		} );
 	} );
 } );
