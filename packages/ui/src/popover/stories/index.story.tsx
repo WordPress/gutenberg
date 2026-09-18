@@ -310,7 +310,6 @@ export const Modal: Story = {
 					>
 						Name
 						<input
-							// eslint-disable-next-line no-restricted-syntax
 							id="popover-test-name-id"
 							type="text"
 							placeholder="Enter your name"
@@ -327,7 +326,6 @@ export const Modal: Story = {
 					>
 						Email
 						<input
-							// eslint-disable-next-line no-restricted-syntax
 							id="popover-test-email-id"
 							type="email"
 							placeholder="Enter your email"
