@@ -48,7 +48,7 @@
 				}
 
 				&[data-disabled] {
-					background-color: var(--wpds-color-background-interactive-neutral-strong-disabled);
+					background-color: var(--wpds-color-background-interactive-brand-strong-disabled);
 
 					@media (forced-colors: active) {
 						background-color: GrayText;
@@ -108,7 +108,11 @@
 					background-color: var(--wpds-color-foreground-interactive-brand-strong-disabled);
 
 					@media (forced-colors: active) {
-						background-color: GrayText;
+						/*
+						 * GrayText on both track and thumb hides the thumb.
+						 * Canvas keeps the knob visible against the GrayText track.
+						 */
+						background-color: Canvas;
 					}
 				}
 			}
