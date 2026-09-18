@@ -13,7 +13,7 @@ import type { Action, SupportedLayouts, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 
 globalThis.wpVitest.mockMatchMedia();
-
+globalThis.wpVitest.mockPointerEvent();
 globalThis.wpVitest.mockCSSSupports();
 type Data = {
 	id: number;
@@ -143,6 +143,12 @@ function DataViewWrapper( {
 	return <DataViews { ...dataViewProps } />;
 }
 
+function getBulkActionToolbar() {
+	return screen
+		.getByText( /\d+ Items? selected/ )
+		.closest< HTMLDivElement >( '.dataviews-bulk-actions' )!;
+}
+
 // Tests run against a DataView which is 500px wide.
 const mockUseViewportMatch = vi.fn(
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -169,6 +175,107 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => {
 } );
 
 describe( 'DataViews component', () => {
+	it( 'preserves an explicit bulk toolbar in a custom table composition', () => {
+		render(
+			<DataViewWrapper
+				view={ { type: LAYOUT_TABLE } }
+				actions={ actions }
+				selection={ [ '1' ] }
+				onChangeSelection={ vi.fn() }
+			>
+				<DataViews.Layout />
+				<DataViews.BulkActionToolbar />
+				<DataViews.Pagination />
+			</DataViewWrapper>
+		);
+		expect( screen.getByText( '1 Item selected' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).not.toHaveClass( 'is-secondary' );
+	} );
+
+	it( 'preserves footer bulk actions in a custom grid composition', async () => {
+		render(
+			<DataViewWrapper view={ { type: LAYOUT_GRID } } actions={ actions }>
+				<DataViews.Layout />
+				<DataViews.Footer />
+			</DataViewWrapper>
+		);
+		const user = userEvent.setup();
+		await user.click(
+			screen.getAllByRole( 'checkbox', { name: 'Select all' } ).at( -1 )!
+		);
+		expect( screen.getByText( '3 Items selected' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).not.toHaveClass( 'is-secondary' );
+	} );
+
+	it( 'disabled desktop bulk action cannot run', async () => {
+		const callback = vi.fn();
+		render(
+			<DataViewWrapper
+				selection={ [ '1' ] }
+				onChangeSelection={ vi.fn() }
+				actions={ [
+					{
+						id: 'edit',
+						label: 'Edit',
+						supportsBulk: true,
+						disabled: true,
+						callback,
+					},
+				] }
+			/>
+		);
+		const action = screen.getByRole( 'button', { name: 'Edit' } );
+		expect( action ).toHaveAttribute( 'aria-disabled', 'true' );
+		const user = userEvent.setup();
+		await user.click( action );
+		expect( callback ).not.toHaveBeenCalled();
+	} );
+
+	it( 'moves default table bulk actions into the header and preserves focus', async () => {
+		render( <DataViewWrapper actions={ actions } /> );
+		expect( screen.getByText( '3 Items' ) ).toBeInTheDocument();
+		expect(
+			screen.getAllByRole( 'checkbox', { name: 'Select all' } )
+		).toHaveLength( 1 );
+
+		const user = userEvent.setup();
+		await user.click(
+			screen.getByRole( 'checkbox', { name: 'Select all' } )
+		);
+
+		const tableHeader = within( screen.getByRole( 'table' ) ).getAllByRole(
+			'rowgroup'
+		)[ 0 ];
+		const toolbarCell = within( tableHeader ).getByRole( 'cell', {
+			name: /3 Items selected/,
+		} );
+		const titleHeader = within( tableHeader ).getByRole( 'columnheader', {
+			name: 'Title',
+		} );
+		expect( tableHeader ).not.toHaveAttribute( 'inert' );
+		expect( within( titleHeader ).getByRole( 'button' ) ).toBeDisabled();
+		expect(
+			within( toolbarCell ).getByRole( 'checkbox', {
+				name: 'Deselect all',
+			} )
+		).toHaveFocus();
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).toBeInTheDocument();
+
+		await user.click(
+			within( toolbarCell ).getByRole( 'button', { name: 'Cancel' } )
+		);
+		expect( within( titleHeader ).getByRole( 'button' ) ).toBeEnabled();
+		expect(
+			screen.getByRole( 'checkbox', { name: 'Select all' } )
+		).toHaveFocus();
+	} );
+
 	it( 'should show "No results" if data is empty', () => {
 		render( <DataViewWrapper data={ [] } /> );
 		expect( screen.getByText( 'No results' ) ).toBeInTheDocument();
@@ -1019,6 +1126,10 @@ describe( 'DataViews component', () => {
 			await user.click( viewOptionsButton );
 
 			await user.tab();
+			expect(
+				screen.getByRole( 'checkbox', { name: 'Select all' } )
+			).toHaveFocus();
+			await user.tab();
 			await user.tab();
 
 			expect(
@@ -1063,6 +1174,10 @@ describe( 'DataViews component', () => {
 			// instead of a direct .focus() so that effects have time to complete.
 			await user.click( viewOptionsButton );
 			await user.click( viewOptionsButton );
+			await user.tab();
+			expect(
+				screen.getByRole( 'checkbox', { name: 'Select all' } )
+			).toHaveFocus();
 			await user.tab();
 			await user.tab();
 
@@ -1291,6 +1406,51 @@ describe( 'DataViews component', () => {
 
 		afterEach( () => {
 			mockUseViewportMatch.mockImplementation( () => false );
+		} );
+
+		it( 'supports iconless and disabled grid bulk actions without losing modal focus', async () => {
+			const callback = vi.fn();
+			render(
+				<DataViewWrapper
+					view={ { ...DEFAULT_VIEW, type: LAYOUT_GRID } }
+					selection={ [ '1' ] }
+					onChangeSelection={ vi.fn() }
+					actions={ [
+						{
+							id: 'edit',
+							label: 'Edit',
+							supportsBulk: true,
+							disabled: true,
+							callback,
+						},
+						actions[ 0 ],
+					] }
+				/>
+			);
+			const user = userEvent.setup();
+			const bulkActions = within( getBulkActionToolbar() ).getByRole(
+				'button',
+				{ name: 'Actions' }
+			);
+			await user.click( bulkActions );
+
+			const disabledAction = screen.getByRole( 'menuitem', {
+				name: 'Edit',
+			} );
+			expect( disabledAction ).toHaveAttribute( 'aria-disabled', 'true' );
+			await user.click( disabledAction );
+			expect( callback ).not.toHaveBeenCalled();
+
+			await user.click(
+				screen.getByRole( 'menuitem', { name: 'Delete' } )
+			);
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'dialog', { name: 'Delete' } )
+			).toHaveTextContent( 'Modal Content' );
+			await user.click( screen.getByRole( 'button', { name: 'Close' } ) );
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+			expect( bulkActions ).toHaveFocus();
 		} );
 
 		it( 'should show actions dropdown on mobile even when there is only one action in table layout', () => {

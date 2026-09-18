@@ -19,6 +19,7 @@ import {
 	useHasAPossibleBulkAction,
 	hasAPossibleBulkAction,
 	BulkSelectionCheckbox,
+	BulkActionToolbar,
 } from '../../dataviews-bulk-actions';
 import type {
 	Action,
@@ -272,7 +273,7 @@ function ViewTable< Item >( {
 	className,
 	empty,
 }: ViewTableProps< Item > ) {
-	const { containerRef } = useContext( DataViewsContext );
+	const { containerRef, isDefaultUI } = useContext( DataViewsContext );
 	const isDelayedLoading = useDelayedLoading( isLoading );
 	const groupField = view.groupBy?.field
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
@@ -310,6 +311,34 @@ function ViewTable< Item >( {
 	} );
 
 	const tableNoticeId = useId();
+	const tableHeaderRef = useRef< HTMLTableSectionElement >( null );
+	const tableSelectionRef = useRef< HTMLSpanElement >( null );
+	const bulkSelectionRef = useRef< HTMLSpanElement >( null );
+	const bulkActionsRef = useRef< HTMLDivElement >( null );
+	const hadSelectionRef = useRef( false );
+	useEffect( () => {
+		if ( ! isDefaultUI ) {
+			return;
+		}
+		const tableHead = tableHeaderRef.current;
+		const ownerDocument = tableHead?.ownerDocument;
+		if (
+			selection.length &&
+			tableHead?.contains( ownerDocument?.activeElement ?? null )
+		) {
+			bulkSelectionRef.current?.focus();
+		} else if (
+			hadSelectionRef.current &&
+			! selection.length &&
+			( ownerDocument?.activeElement === ownerDocument?.body ||
+				bulkActionsRef.current?.contains(
+					ownerDocument?.activeElement ?? null
+				) )
+		) {
+			tableSelectionRef.current?.focus();
+		}
+		hadSelectionRef.current = selection.length > 0;
+	}, [ selection.length, isDefaultUI ] );
 
 	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
 		scrollContainerRef: containerRef,
@@ -317,6 +346,8 @@ function ViewTable< Item >( {
 	} );
 
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	const disableHeaderControls =
+		!! isDefaultUI && hasBulkActions && selection.length > 0;
 
 	if ( nextHeaderMenuToFocus ) {
 		// If we need to force focus, we short-circuit rendering here
@@ -371,6 +402,11 @@ function ViewTable< Item >( {
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
 	const columns = getTableColumns( view, fields );
+	const columnCount =
+		columns.length +
+		( hasPrimaryColumn ? 1 : 0 ) +
+		( hasBulkActions ? 1 : 0 ) +
+		( actions?.length ? 1 : 0 );
 	const headerMenuRef =
 		( column: string, index: number ) => ( node: HTMLButtonElement ) => {
 			if ( node ) {
@@ -466,6 +502,7 @@ function ViewTable< Item >( {
 					</Popover>
 				) }
 				<thead
+					ref={ tableHeaderRef }
 					className={ clsx( {
 						'dataviews-view-table__thead--stuck':
 							isVerticallyScrolled,
@@ -479,19 +516,34 @@ function ViewTable< Item >( {
 								scope="col"
 								onContextMenu={ handleHeaderContextMenu }
 							>
-								<BulkSelectionCheckbox
-									selection={ selection }
-									onChangeSelection={ onChangeSelection }
-									data={ data }
-									actions={ actions }
-									getItemId={ getItemId }
-								/>
+								<span
+									// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+									inert={
+										disableHeaderControls
+											? 'true'
+											: undefined
+									}
+								>
+									<BulkSelectionCheckbox
+										checkboxRef={
+											isDefaultUI
+												? tableSelectionRef
+												: undefined
+										}
+										selection={ selection }
+										onChangeSelection={ onChangeSelection }
+										data={ data }
+										actions={ actions }
+										getItemId={ getItemId }
+									/>
+								</span>
 							</th>
 						) }
 						{ hasPrimaryColumn && (
 							<th scope="col">
 								{ titleField && (
 									<ColumnHeaderMenu
+										disabled={ disableHeaderControls }
 										ref={ headerMenuRef(
 											titleField.id,
 											0
@@ -550,6 +602,7 @@ function ViewTable< Item >( {
 									scope="col"
 								>
 									<ColumnHeaderMenu
+										disabled={ disableHeaderControls }
 										ref={ headerMenuRef( column, index ) }
 										fieldId={ column }
 										view={ view }
@@ -581,6 +634,27 @@ function ViewTable< Item >( {
 							</th>
 						) }
 					</tr>
+					{ isDefaultUI && hasBulkActions && (
+						<tr
+							className="dataviews-view-table__bulk-actions-row"
+							hidden={ ! selection.length }
+						>
+							<td colSpan={ columnCount }>
+								<div
+									className="dataviews-view-table__bulk-actions-overlay"
+									ref={ bulkActionsRef }
+									// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+									inert={ isLoading ? 'true' : undefined }
+								>
+									<BulkActionToolbar
+										selectionCheckboxRef={
+											bulkSelectionRef
+										}
+									/>
+								</div>
+							</td>
+						</tr>
+					) }
 				</thead>
 				{ /* Render grouped data if groupBy is specified */ }
 				{ hasData && groupField && dataByGroup ? (
@@ -589,12 +663,7 @@ function ViewTable< Item >( {
 							<tbody key={ `group-${ groupName }` }>
 								<tr className="dataviews-view-table__group-header-row">
 									<td
-										colSpan={
-											columns.length +
-											( hasPrimaryColumn ? 1 : 0 ) +
-											( hasBulkActions ? 1 : 0 ) +
-											( actions?.length ? 1 : 0 )
-										}
+										colSpan={ columnCount }
 										className="dataviews-view-table__group-header-cell"
 									>
 										{ view.groupBy?.showLabel === false

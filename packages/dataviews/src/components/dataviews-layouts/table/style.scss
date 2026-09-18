@@ -347,3 +347,26 @@
 .dataviews-view-table.is-refreshing {
 	@include dataviews-refreshing();
 }
+.dataviews-view-table .dataviews-view-table__bulk-actions-row {
+	height: 0;
+	border: 0;
+
+	> td {
+		height: 0;
+		padding: 0;
+	}
+}
+
+.dataviews-view-table__bulk-actions-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+
+	> .dataviews-bulk-actions {
+		position: sticky;
+		inset-inline-start: 0;
+		width: 100cqi;
+		height: 100%;
+		min-height: 0;
+	}
+}

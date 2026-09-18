@@ -19,7 +19,7 @@ import {
 import DataViewsLayout from '../components/dataviews-layout';
 import DataViewsFooter from '../components/dataviews-footer';
 import DataViewsSearch from '../components/dataviews-search';
-import { BulkActionsFooter } from '../components/dataviews-bulk-actions';
+import { BulkActionToolbar } from '../components/dataviews-bulk-actions';
 import { DataViewsPagination } from '../components/dataviews-pagination';
 import DataViewsViewConfig, {
 	DataviewsViewConfigDropdown,
@@ -255,6 +255,7 @@ function DataViews< Item >( {
 				hasInitiallyLoaded,
 				onReset,
 				intersectionObserver,
+				isDefaultUI: children === undefined || children === null,
 			} }
 		>
 			<div className="dataviews-wrapper">
@@ -277,7 +278,7 @@ function DataViews< Item >( {
  */
 // Populate the DataViews sub components
 const DataViewsSubComponents = DataViews as typeof DataViews & {
-	BulkActionToolbar: typeof BulkActionsFooter;
+	BulkActionToolbar: () => React.JSX.Element;
 	Filters: typeof Filters;
 	FiltersToggle: typeof FiltersToggle;
 	FiltersToggled: typeof FiltersToggled;
@@ -289,7 +290,7 @@ const DataViewsSubComponents = DataViews as typeof DataViews & {
 	Footer: typeof DataViewsFooter;
 };
 
-DataViewsSubComponents.BulkActionToolbar = BulkActionsFooter;
+DataViewsSubComponents.BulkActionToolbar = BulkActionToolbar;
 DataViewsSubComponents.Filters = Filters;
 DataViewsSubComponents.FiltersToggled = FiltersToggled;
 DataViewsSubComponents.FiltersToggle = FiltersToggle;

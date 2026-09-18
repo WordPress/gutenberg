@@ -1,5 +1,10 @@
 @use "../../dataviews/style" as *;
 
+.dataviews-footer__item-count {
+	color: var(--wpds-color-foreground-content-neutral);
+	margin-inline-end: auto;
+}
+
 .dataviews-footer {
 	position: sticky;
 	bottom: 0;
@@ -30,6 +35,10 @@
 		}
 
 		.dataviews-bulk-actions-footer__item-count {
+			flex-grow: 1;
+		}
+
+		.dataviews-footer__item-count {
 			flex-grow: 1;
 		}
 
