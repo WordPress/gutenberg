@@ -23,6 +23,7 @@ import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasTextPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
+import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 import { setImmutably } from '../../utils/object';
 import {
 	extractPresetSlug,
@@ -259,6 +260,8 @@ export default function TypographyPanel( {
 	// state is selected. That state layers over it, so a text gradient set
 	// there still paints here.
 	baseValue,
+	// The selected style state, so a viewport can be told from a pseudo state.
+	styleState,
 	settings,
 	blockName,
 	panelId,
@@ -322,15 +325,19 @@ export default function TypographyPanel( {
 	const blockSupportsBackgroundClip = blockName
 		? !! getBlockSupport( blockName, [ 'background', 'backgroundClip' ] )
 		: false;
-	// A text gradient is a clip, which is emitted without a media query and so
-	// applies at every width. It belongs to the block's Default state, and only
-	// that state can set or clear it.
-	const isNonDefaultState = baseValue !== undefined;
+	/*
+	 * A text gradient is a clip, which is not emitted in a media query, so it
+	 * applies at every width. It belongs to the block's Default state, and only
+	 * that state can set or clear it. A pseudo state is different: its styles
+	 * are scoped to the selector, so a text gradient set there genuinely
+	 * applies on hover alone.
+	 */
+	const isViewportState = hasViewportBlockStyleState( styleState );
 	const hasTextGradientEnabled =
 		( settingAllowsTextClip || blockSupportsBackgroundClip ) &&
 		!! settings?.background?.gradient &&
 		hasGradientColors &&
-		! isNonDefaultState;
+		! isViewportState;
 
 	const isTextGradient = value?.background?.backgroundClip === 'text';
 	const baseClip = baseValue?.background?.backgroundClip;
