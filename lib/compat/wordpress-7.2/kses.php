@@ -20,3 +20,19 @@ function gutenberg_add_text_shadow_to_safe_style_css( $attr ) {
 	return $attr;
 }
 add_filter( 'safe_style_css', 'gutenberg_add_text_shadow_to_safe_style_css' );
+
+/**
+ * Adds 'font-variation-settings' to the list of safe CSS properties.
+ * This is needed for the typography font variation settings style.
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ * @return string[] Modified array of allowed CSS attributes.
+ */
+function gutenberg_add_font_variation_settings_to_safe_style_css( $attr ) {
+	if ( ! in_array( 'font-variation-settings', $attr, true ) ) {
+		$attr[] = 'font-variation-settings';
+	}
+
+	return $attr;
+}
+add_filter( 'safe_style_css', 'gutenberg_add_font_variation_settings_to_safe_style_css' );
