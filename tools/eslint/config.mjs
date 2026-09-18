@@ -728,7 +728,9 @@ export default dedupePlugins( [
 	// `render` method pattern (hooks in a lowercase function) and
 	// static-components for inline factories used in story setup.
 	// Flag side-effect imports of package build-style stylesheets so they
-	// load through package-styles/config.js.
+	// load through package-styles/config.js. The production stylesheet
+	// import rule does not apply; Storybook loads package CSS through
+	// package-styles/config.js, not the enqueue path.
 	{
 		files: [ `**/@(storybook|stories)/**/*.${ SCRIPT_EXT }` ],
 		plugins: {
@@ -738,6 +740,7 @@ export default dedupePlugins( [
 			'react-hooks/rules-of-hooks': 'off',
 			'react-hooks/static-components': 'off',
 			'gutenberg-storybook/no-build-style-imports': 'error',
+			'@wordpress/no-non-module-stylesheet-imports': 'off',
 		},
 	},
 
