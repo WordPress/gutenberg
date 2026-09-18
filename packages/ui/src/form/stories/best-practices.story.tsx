@@ -26,6 +26,9 @@ export const LabelingComposedComponents: StoryObj = {
 		return (
 			<Fieldset.Root>
 				<Fieldset.Legend>Shipping weight</Fieldset.Legend>
+				<Fieldset.Description>
+					Enter the total weight of your shipment.
+				</Fieldset.Description>
 				<Stack direction="row" gap="sm">
 					<InputControl
 						label="lb, pounds"
@@ -44,9 +47,6 @@ export const LabelingComposedComponents: StoryObj = {
 						}
 					/>
 				</Stack>
-				<Fieldset.Description>
-					Enter the total weight of your shipment.
-				</Fieldset.Description>
 			</Fieldset.Root>
 		);
 	},
