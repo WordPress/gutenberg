@@ -20,9 +20,6 @@ export function hasPaginationControls(
 	);
 }
 
-// The "Page N of M" select, which paginates on its own. It is exposed as
-// `DataViews.PageSelect` for a footer with room for one pagination control
-// next to its actions.
 export function DataViewsPageSelect() {
 	const { view, onChangeView, paginationInfo } =
 		useContext( DataViewsContext );
