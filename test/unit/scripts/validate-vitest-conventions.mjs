@@ -56,7 +56,7 @@ const vitestInfrastructure = [
 			nodir: true,
 		}
 	),
-	...globSync( 'test/unit/scripts/*.mjs', {
+	...globSync( 'test/unit/scripts/*.{mjs,mts}', {
 		cwd: ROOT_DIR,
 		nodir: true,
 	} ),
@@ -218,7 +218,7 @@ function getTypecheckConfigPath( testFile ) {
 		directory = path.dirname( directory );
 	}
 
-	return path.join( ROOT_DIR, 'tools/monorepo/tsconfig/base.json' );
+	return path.join( ROOT_DIR, 'tools/monorepo/tsconfig/tsconfig.base.json' );
 }
 
 let typescriptTestCount = 0;

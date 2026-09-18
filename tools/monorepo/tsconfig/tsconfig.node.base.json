@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "./dev.base.json",
+	"extends": "./tsconfig.dev.base.json",
 	"compilerOptions": {
 		// Sources and tests alike import by their real extension, which is
 		// what Node's type stripping resolves when the script runs.

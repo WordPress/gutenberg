@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Use post-specific template choices for template field labels and assignment, disabling switching when only one template is available. ([#83083](https://github.com/WordPress/gutenberg/pull/83083))
+-   Excerpt field: render nothing when the excerpt is empty. ([#82423](https://github.com/WordPress/gutenberg/pull/82423))
 
 ### Bug Fixes
 

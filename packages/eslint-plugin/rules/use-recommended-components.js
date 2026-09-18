@@ -36,6 +36,8 @@ const ALLOWLIST = {
 			'RangeCalendar',
 			'SearchableChipSelect',
 			'SearchableChipSelectControl',
+			'Select',
+			'SelectControl',
 			'Skeleton',
 			'Spinner',
 			'Stack',
