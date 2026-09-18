@@ -23,9 +23,11 @@ function isNoConfigFoundError( err ) {
 async function hasResolvableConfig() {
 	const { default: stylelint } = await import( 'stylelint' );
 	try {
-		// index.css is a dummy anchor — it doesn't need to exist.
-		// resolveConfig walks up from cwd, so ancestor configs
-		// (monorepo root, $HOME) are found too, unlike the old
+		// index.css is a dummy anchor: it doesn't need to exist.
+		// resolveConfig uses cosmiconfig's global search strategy: it
+		// walks up from cwd to $HOME (or to / when cwd is outside $HOME)
+		// and then falls back to the global config dir (~/.config/stylelint).
+		// Any ancestor or global config is found this way, unlike the old
 		// hasProjectFile check which only looked at the project dir.
 		const config = await stylelint.resolveConfig( 'index.css', {
 			cwd: process.cwd(),

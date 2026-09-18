@@ -15,6 +15,7 @@
 ### Breaking Changes
 
 -   Require Node.js `^20.19.0 || >=22.13.0` and upgrade the bundled Stylelint to `^17.14.1` ([#80738](https://github.com/WordPress/gutenberg/pull/80738)).
+-   `lint-style`: Use stylelint's `resolveConfig` for config detection instead of a static extension list, supporting all current and future config file formats without manual maintenance overhead. Note that `resolveConfig` also searches ancestor directories and the global config directory (`~/.config/stylelint`), so a project with no local config may now pick up an unrelated config found there instead of the bundled default ([#79280](https://github.com/WordPress/gutenberg/pull/79280)).
 
 ### Bug Fixes
 
@@ -24,7 +25,6 @@
 ### Enhancements
 
 -   Include `.jsx` unit tests in the default lint configuration ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
--   `lint-style`: Use stylelint's `resolveConfig` for config detection instead of a static extension list, supporting all current and future config file formats without manual maintenance overhead ([#79280](https://github.com/WordPress/gutenberg/pull/79280)).
 
 ### Internal
 
