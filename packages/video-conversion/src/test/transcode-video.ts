@@ -94,7 +94,7 @@ vi.mock(
 			ALL_FORMATS: [],
 			canEncodeVideo: ( ...args: unknown[] ) =>
 				mockCanEncodeVideo( ...args ),
-		} ) as unknown as typeof import('mediabunny')
+		} ) as unknown as typeof import( 'mediabunny' )
 );
 
 beforeEach( () => {
