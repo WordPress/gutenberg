@@ -20,6 +20,7 @@ function useMediaUploadSettings( settings = {} ) {
 			bigImageSizeThreshold: settings.bigImageSizeThreshold,
 			imageStripMeta: settings.imageStripMeta,
 			imageMaxBitDepth: settings.imageMaxBitDepth,
+			videoKeepOriginal: settings.videoKeepOriginal,
 		} ),
 		[ settings ]
 	);

@@ -48,6 +48,7 @@ export const rootEntitiesConfig = [
 				'site_logo',
 				'timezone_string',
 				'url',
+				'video_keep_original',
 				'page_for_posts',
 				'page_on_front',
 				'show_on_front',

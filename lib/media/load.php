@@ -25,6 +25,14 @@ if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
 // render-time filtering is needed.
 require_once __DIR__ . '/animated-gif-to-video.php';
 
+/*
+ * Video transcoding: clean up the sideloaded web-safe companion when its
+ * video attachment is deleted, and expose the "keep original" opt-out filter.
+ * The swap to the optimized companion happens in the editor (the core/video
+ * block's src points at the companion), so no render-time filtering is needed.
+ */
+require_once __DIR__ . '/video-transcoding.php';
+
 // ── Tier 1: HEIC infrastructure (always loaded) ─────────────────────
 
 /**
@@ -191,6 +199,7 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 		$response->data['image_size_threshold'] = $image_size_threshold;
 		$response->data['image_strip_meta']     = $image_strip_meta;
 		$response->data['image_max_bit_depth']  = $image_max_bit_depth;
+		$response->data['video_keep_original']  = gutenberg_video_transcoding_keep_original();
 	}
 
 	return $response;
