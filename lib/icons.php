@@ -73,6 +73,10 @@ function gutenberg_register_default_icons() {
 			$icon_args['public'] = $icon_data['public'];
 		}
 
+		if ( isset( $icon_data['keywords'] ) ) {
+			$icon_args['keywords'] = $icon_data['keywords'];
+		}
+
 		wp_register_icon( 'core/' . $icon_name, $icon_args );
 	}
 }
