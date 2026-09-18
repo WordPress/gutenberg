@@ -41,7 +41,7 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Hello from User A' } )
+				.getByRole( 'listitem', { name: 'Note: Hello from User A' } )
 		).toBeVisible();
 
 		// Wait for sync to propagate the block metadata and the
@@ -65,7 +65,7 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await expect(
 			page2
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Hello from User A' } )
+				.getByRole( 'listitem', { name: 'Note: Hello from User A' } )
 		).toBeVisible( { timeout: 10000 } );
 	} );
 
@@ -115,7 +115,7 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await expect(
 			page2
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Note from User B' } )
+				.getByRole( 'listitem', { name: 'Note: Note from User B' } )
 		).toBeVisible();
 
 		// Wait for sync cycles.
@@ -136,7 +136,7 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Note from User B' } )
+				.getByRole( 'listitem', { name: 'Note: Note from User B' } )
 		).toBeVisible( { timeout: 10000 } );
 	} );
 
@@ -174,7 +174,7 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Main note' } )
+				.getByRole( 'listitem', { name: 'Note: Main note' } )
 		).toBeVisible();
 
 		/*
@@ -220,7 +220,7 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		// User B should see the main note.
 		const thread = page2
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'treeitem', { name: 'Note: Main note' } );
+			.getByRole( 'listitem', { name: 'Note: Main note' } );
 		await expect( thread ).toBeVisible( { timeout: 10000 } );
 
 		// Expand the thread to see the reply.
