@@ -479,7 +479,8 @@ describe( 'actions', () => {
 		it( 'routes a HEIC file named .jpg through the HEIC conversion path', async () => {
 			// A name that makes the browser report the file as a JPEG. Taking
 			// it at its word sends undecodable bytes down the vips path, where
-			// the upload strands (#81707).
+			// the upload strands.
+			// See https://github.com/WordPress/gutenberg/issues/81707.
 			const onError = vi.fn();
 
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
