@@ -122,7 +122,7 @@ describe( 'ReactionDisplay', () => {
 										label: 'thumbs up',
 										group: 0,
 									},
-							  ]
+								]
 							: { groups: [] }
 					),
 			} as unknown as Response )
@@ -377,7 +377,7 @@ describe( 'ReactionDisplay', () => {
 												label: 'thumbs up',
 												group: 0,
 											},
-									  ]
+										]
 									: { groups: [] }
 							),
 					} ) as unknown as Response

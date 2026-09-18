@@ -102,7 +102,7 @@ describe( 'AddReactionButton', () => {
 										label: 'thumbs up',
 										group: 0,
 									},
-							  ]
+								]
 							: {}
 					),
 			} as unknown as Response )
@@ -184,10 +184,10 @@ describe( 'AddReactionButton', () => {
 												label: 'thumbs up',
 												group: 0,
 											},
-									  ]
+										]
 									: {}
 							),
-				  } as unknown as Response )
+					} as unknown as Response )
 		);
 
 		try {
