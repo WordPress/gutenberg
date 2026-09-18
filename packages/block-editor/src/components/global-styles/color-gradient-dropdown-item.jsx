@@ -249,9 +249,11 @@ export default function ColorGradientDropdownItem( {
 							{
 								'is-open': isOpen,
 								'has-contrast-warning': !! contrastWarning,
+								'has-disabled-hint':
+									disabled && !! disabledHint,
 							}
 						),
-						'aria-expanded': isOpen,
+						'aria-expanded': disabled ? undefined : isOpen,
 						ref: colorGradientDropdownButtonRef,
 					};
 
