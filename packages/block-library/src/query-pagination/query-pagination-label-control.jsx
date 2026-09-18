@@ -5,7 +5,9 @@ export function QueryPaginationLabelControl( { value, onChange } ) {
 	return (
 		<ToggleControl
 			label={ __( 'Show label text' ) }
-			help={ __( 'Make label text visible, e.g. "Next Page".' ) }
+			help={ __(
+				'Make label text visible, e.g. "Next Page". When hidden, the label is still announced to screen reader users.'
+			) }
 			onChange={ onChange }
 			checked={ value === true }
 		/>
