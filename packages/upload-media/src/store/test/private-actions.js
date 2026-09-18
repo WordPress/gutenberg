@@ -798,9 +798,8 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'uploads the still frame as the attachment, through the image pipeline', async () => {
-			const { operations, dispatch } = await runPrepareItem(
-				createSequenceFile()
-			);
+			const { operations, dispatch } =
+				await runPrepareItem( createSequenceFile() );
 
 			expect( convertHeicSequenceToStillJpeg ).toHaveBeenCalled();
 			expect( flattenOperations( operations ) ).toEqual( [
@@ -842,9 +841,8 @@ describe( 'private actions', () => {
 		it( 'uploads the original untouched when WebCodecs is unavailable', async () => {
 			delete global.VideoDecoder;
 
-			const { operations, dispatch } = await runPrepareItem(
-				createSequenceFile()
-			);
+			const { operations, dispatch } =
+				await runPrepareItem( createSequenceFile() );
 
 			// The server collapses the sequence to a still; nothing is
 			// cancelled and no client-side decode is attempted.
@@ -868,9 +866,8 @@ describe( 'private actions', () => {
 				supported: false,
 			} ) );
 
-			const { operations, dispatch } = await runPrepareItem(
-				createSequenceFile()
-			);
+			const { operations, dispatch } =
+				await runPrepareItem( createSequenceFile() );
 
 			expect( convertHeicSequenceToStillJpeg ).not.toHaveBeenCalled();
 			expect( flattenOperations( operations ) ).toEqual( [
@@ -884,9 +881,8 @@ describe( 'private actions', () => {
 				new Error( 'decoder exploded' )
 			);
 
-			const { operations, dispatch } = await runPrepareItem(
-				createSequenceFile()
-			);
+			const { operations, dispatch } =
+				await runPrepareItem( createSequenceFile() );
 
 			// A hard decode failure must not fail the upload: the user still
 			// gets the photo the server can make of it.

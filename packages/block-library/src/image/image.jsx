@@ -1169,7 +1169,7 @@ export default function Image( {
 										value
 											? setAttributes( {
 													preserveStillImage: true,
-											  } )
+												} )
 											: playAsLivePhoto()
 									}
 									help={ __(

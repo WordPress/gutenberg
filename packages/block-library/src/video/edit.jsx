@@ -185,7 +185,7 @@ function VideoEdit( {
 						'attachment',
 						id,
 						{ context: 'view' }
-				  )
+					)
 				: null,
 		[ isLivePhoto, id, isSingleSelected ]
 	);
