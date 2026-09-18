@@ -119,6 +119,23 @@ test( 'rejects duplicate section titles', () => {
 	] );
 } );
 
+test( 'rejects Unreleased sections that are out of order', () => {
+	const errors = validateChangelog(
+		changelog( `### Bug Fixes
+
+-   Fixed something ([#1](https://github.com/WordPress/gutenberg/pull/1)).
+
+### Enhancements
+
+-   Improved something ([#2](https://github.com/WordPress/gutenberg/pull/2)).
+` ),
+		{ filePath: 'packages/ui/CHANGELOG.md' }
+	);
+	expect( errors ).toEqual( [
+		'packages/ui/CHANGELOG.md:9: Unreleased section "Enhancements" is out of order. Expected order: Stable Release, Breaking Changes, New Features, Enhancements, Deprecations, Bug Fixes, Internal, Documentation.',
+	] );
+} );
+
 test( 'rejects top-level entries without a Gutenberg pull request link', () => {
 	const errors = validateChangelog(
 		changelog( `### Bug Fixes

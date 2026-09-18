@@ -34,21 +34,19 @@ export function resolveChangelogPath(
 }
 
 /**
- * Section titles allowed under ## Unreleased, in the preferred order for docs.
+ * Section titles allowed under ## Unreleased, in required order.
  * Exact match is required by the validator.
  */
 export const ALLOWED_SECTIONS = [
+	'Stable Release',
 	'Breaking Changes',
 	'New Features',
 	'Enhancements',
 	'Deprecations',
 	'Bug Fixes',
-	'Documentation',
 	'Internal',
-	'Stable Release',
-] as const;
-
-const ALLOWED_SECTION_SET: ReadonlySet< string > = new Set( ALLOWED_SECTIONS );
+	'Documentation',
+];
 
 const GUTENBERG_PR_LINK =
 	/\[#\d+\]\(https:\/\/github\.com\/WordPress\/gutenberg\/pull\/\d+\)/;
@@ -153,7 +151,8 @@ function validateSubsectionHeadings(
 }
 
 /**
- * Requires Unreleased `###` titles to be from the known list and appear once.
+ * Requires Unreleased `###` titles to be from the known list, appear once, and
+ * follow `ALLOWED_SECTIONS` order.
  *
  * @param unreleased Unreleased section.
  * @param filePath   Path for error messages.
@@ -165,6 +164,7 @@ function validateSectionTitles(
 ): string[] {
 	const errors: string[] = [];
 	const seenSections = new Set< string >();
+	let previousIndex = -1;
 
 	for ( let i = 1; i < unreleased.lines.length; i++ ) {
 		const heading = unreleased.lines[ i ].match( /^### (.+)$/ );
@@ -174,8 +174,9 @@ function validateSectionTitles(
 
 		const title = heading[ 1 ].trim();
 		const lineNo = unreleased.start + i + 1;
+		const index = ALLOWED_SECTIONS.indexOf( title );
 
-		if ( ! ALLOWED_SECTION_SET.has( title ) ) {
+		if ( index === -1 ) {
 			errors.push(
 				`${ filePath }:${ lineNo }: unknown Unreleased section "${ title }". Allowed: ${ ALLOWED_SECTIONS.join(
 					', '
@@ -188,6 +189,17 @@ function validateSectionTitles(
 			);
 		}
 		seenSections.add( title );
+
+		if ( index !== -1 ) {
+			if ( index < previousIndex ) {
+				errors.push(
+					`${ filePath }:${ lineNo }: Unreleased section "${ title }" is out of order. Expected order: ${ ALLOWED_SECTIONS.join(
+						', '
+					) }.`
+				);
+			}
+			previousIndex = index;
+		}
 	}
 
 	return errors;
