@@ -112,7 +112,6 @@
 	"Select.Root>Select.Trigger",
 	"SelectControl:children",
 	"SelectControl:key",
-	"SelectControl:ref",
 	"SelectControl>SelectControl.Group:children",
 	"SelectControl>SelectControl.GroupLabel:children",
 	"SelectControl>SelectControl.Item",
