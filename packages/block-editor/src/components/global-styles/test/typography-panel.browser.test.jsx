@@ -1296,11 +1296,27 @@ describe( 'TypographyPanel text gradient', () => {
 				defaultControls: shownControls,
 				value: {},
 				baseValue,
+				styleState: { viewport: '@mobile', pseudo: 'default' },
 			} );
 
 			expect(
 				screen.queryByRole( 'button', { name: /Gradient/ } )
 			).not.toBeInTheDocument();
+		} );
+
+		it( 'keeps the gradient control at a pseudo state, which scopes it to hover', async () => {
+			await renderPanel( {
+				settings: gradientSettings,
+				blockName: TEST_BLOCK,
+				defaultControls: shownControls,
+				value: {},
+				baseValue,
+				styleState: { viewport: 'default', pseudo: ':hover' },
+			} );
+
+			expect(
+				screen.getByRole( 'button', { name: /Gradient/ } )
+			).toBeInTheDocument();
 		} );
 
 		it( 'leaves the text color usable when the breakpoint overrides the clip', async () => {
