@@ -7,51 +7,83 @@
  * @phpstan-return array<non-falsy-string, array<non-falsy-string, true>>
  */
 function gutenberg_get_allowed_icon_svg_tags(): array {
-	$stroke_attributes = array(
-		'style'             => true,
-		'stroke'            => true,
-		'stroke-width'      => true,
-		'stroke-linecap'    => true,
-		'stroke-linejoin'   => true,
-		'stroke-miterlimit' => true,
-		'vector-effect'     => true,
+	$allow_attributes = static function ( string ...$attribute_names ): array {
+		return array_fill_keys( $attribute_names, true );
+	};
+
+	$stroke_attributes = $allow_attributes(
+		'style',
+		'stroke',
+		'stroke-width',
+		'stroke-linecap',
+		'stroke-linejoin',
+		'stroke-miterlimit',
+		'vector-effect',
 	);
 
 	return array(
 		'svg'     => array_merge(
-			array(
-				'class'       => true,
-				'xmlns'       => true,
-				'width'       => true,
-				'height'      => true,
-				'viewbox'     => true,
-				'aria-hidden' => true,
-				'role'        => true,
-				'focusable'   => true,
-				'fill'        => true,
-				'fill-rule'   => true,
-				'clip-rule'   => true,
+			$allow_attributes(
+				'class',
+				'xmlns',
+				'width',
+				'height',
+				'viewbox',
+				'aria-hidden',
+				'role',
+				'focusable',
+				'fill',
+				'fill-rule',
+				'clip-rule',
 			),
 			$stroke_attributes
 		),
 		'path'    => array_merge(
-			array(
-				'fill'      => true,
-				'fill-rule' => true,
-				'clip-rule' => true,
-				'd'         => true,
-				'transform' => true,
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'd',
+				'opacity',
+				'transform',
 			),
 			$stroke_attributes
 		),
 		'polygon' => array_merge(
-			array(
-				'fill'      => true,
-				'fill-rule' => true,
-				'clip-rule' => true,
-				'points'    => true,
-				'transform' => true,
-				'focusable' => true,
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'points',
+				'transform',
+				'focusable',
+			),
+			$stroke_attributes
+		),
+		'rect'    => array_merge(
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'x',
+				'y',
+				'width',
+				'height',
+				'rx',
+				'ry',
+				'transform',
+			),
+			$stroke_attributes
+		),
+		'circle'  => array_merge(
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'cx',
+				'cy',
+				'r',
+				'transform',
 			),
 			$stroke_attributes
 		),
@@ -260,8 +292,8 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Sanitizes the icon SVG content.
 	 *
-	 * Overrides the base class to allow stroke-related attributes and inline
-	 * styles required by stroke-based icons.
+	 * Overrides the base class to allow the `rect` and `circle` shapes, plus the
+	 * stroke-related attributes and inline styles required by stroke-based icons.
 	 *
 	 * The signature is intentionally left without type declarations to stay
 	 * compatible with the parent WP_Icons_Registry::sanitize_icon_content()

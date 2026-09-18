@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	RangeControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -101,7 +101,7 @@ export default function FileBlockInspector( {
 						hasValue={ () => textLinkHref !== href }
 						onDeselect={ () => changeLinkDestinationOption( href ) }
 					>
-						<SelectControl
+						<WCSelectControl
 							label={ __( 'Link to' ) }
 							value={ textLinkHref }
 							options={ linkDestinationOptions }

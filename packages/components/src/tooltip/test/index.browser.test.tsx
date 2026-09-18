@@ -518,7 +518,6 @@ describe( 'Tooltip', () => {
 							Tooltip anchor
 						</button>
 					</Tooltip>
-					{ /* eslint-disable-next-line no-restricted-syntax */ }
 					<p id="tooltip-test-description">Tooltip description</p>
 					<button>focus trap outside</button>
 				</>
