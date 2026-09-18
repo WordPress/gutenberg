@@ -50,6 +50,29 @@ test( 'accepts nested list items when a child carries the PR link', () => {
 	expect( errors ).toEqual( [] );
 } );
 
+test( 'accepts a nested PR link after a blank line under the parent bullet', () => {
+	const errors = validateChangelog(
+		changelog( `### Breaking Changes
+
+-   Parent description:
+
+    -   \`Child\` ([#82570](https://github.com/WordPress/gutenberg/pull/82570))
+` )
+	);
+	expect( errors ).toEqual( [] );
+} );
+
+test( 'accepts a PR link on a soft-wrapped continuation line', () => {
+	const errors = validateChangelog(
+		changelog( `### Bug Fixes
+
+-   Fixed something that wraps onto the next line
+    ([#82570](https://github.com/WordPress/gutenberg/pull/82570)).
+` )
+	);
+	expect( errors ).toEqual( [] );
+} );
+
 test( 'rejects headings other than ### inside Unreleased', () => {
 	const errors = validateChangelog(
 		changelog( `## Enhancements

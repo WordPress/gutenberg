@@ -220,12 +220,14 @@ function validateEntryLinks(
 		i++;
 		while ( i < unreleased.lines.length ) {
 			const next = unreleased.lines[ i ];
-			if (
-				next === '' ||
-				/^#{1,6} /.test( next ) ||
-				/^-\s+/.test( next )
-			) {
+			if ( /^#{1,6} /.test( next ) || /^-\s+/.test( next ) ) {
 				break;
+			}
+			// Blank lines may sit between a parent bullet and nested children;
+			// skip them without ending the entry.
+			if ( next === '' ) {
+				i++;
+				continue;
 			}
 			if ( /^\s/.test( next ) ) {
 				blockLines.push( next );
