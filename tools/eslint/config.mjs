@@ -722,6 +722,7 @@ export default dedupePlugins( [
 	// Override: Storybook story files — disable rules-of-hooks for the
 	// `render` method pattern (hooks in a lowercase function) and
 	// static-components for inline factories used in story setup.
+	// Flag side-effect imports of package build-style stylesheets.
 	{
 		files: [ `**/@(storybook|stories)/**/*.${ SCRIPT_EXT }` ],
 		rules: {
