@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Video: Add a "Live photo" variation for uploaded HEIC/HEIF image sequences (Apple Live Photos, Android bursts). It shows the sequence's still frame and plays its motion on hover or focus, in the editor and on the front end. An uploaded sequence becomes one automatically once its companion video is ready, and "Display as still image" turns it back into an Image block ([#79642](https://github.com/WordPress/gutenberg/issues/79642), [#79647](https://github.com/WordPress/gutenberg/pull/79647)).
+
 ### Bug Fixes
 
 -   Math: Read the LaTeX source from the `<annotation>` inside the saved `<math>` instead of the block comment, so `&` and `<` survive `wp_kses` for users without `unfiltered_html`. Input that cannot be rendered is saved as an annotation-only `<semantics>`, which browsers display as the source text ([#82987](https://github.com/WordPress/gutenberg/pull/82987)).

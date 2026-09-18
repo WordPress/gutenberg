@@ -35,12 +35,19 @@ require_once __DIR__ . '/animated-gif-to-video.php';
  * includes them, preventing macOS from silently converting HEIC to JPEG
  * on selection.
  *
+ * The '-sequence' variants cover multi-frame captures (Apple Live Photos,
+ * Android bursts). The editor uploads a still frame of those as the
+ * attachment, but the original sequence is still stored alongside it as the
+ * attachment's source file, so its extension must be allowed too.
+ *
  * @param array $mimes Allowed MIME types (extension => type).
  * @return array Modified MIME types.
  */
 function gutenberg_add_heic_upload_mimes( array $mimes ): array {
-	$mimes['heic'] = 'image/heic';
-	$mimes['heif'] = 'image/heif';
+	$mimes['heic']  = 'image/heic';
+	$mimes['heif']  = 'image/heif';
+	$mimes['heics'] = 'image/heic-sequence';
+	$mimes['heifs'] = 'image/heif-sequence';
 	return $mimes;
 }
 

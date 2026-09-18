@@ -109,6 +109,9 @@
 		"isDecorative": {
 			"type": "boolean",
 			"default": false
+		},
+		"preserveStillImage": {
+			"type": "boolean"
 		}
 	},
 	"supports": {
