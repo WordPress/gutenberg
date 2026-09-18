@@ -5,7 +5,7 @@ import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { getItemTitle } from '../../actions/utils';
 import type { BasePost } from '../../types';
-import { useDefaultTemplateLabel, useTemplateFieldMode } from './hooks';
+import { useTemplateFieldMode } from './hooks';
 
 function ClassicTemplateView( {
 	item,
@@ -27,38 +27,32 @@ function BlockThemeTemplateView( {
 	item,
 	field,
 }: DataViewRenderFieldProps< BasePost > ) {
-	const postType = item.type;
-	const slug = item.slug;
 	const postId = item.id;
 	const templateSlug = field.getValue( { item } );
 
-	const defaultTemplateLabel = useDefaultTemplateLabel(
-		postType,
-		postId,
-		slug
-	);
-
 	const templateLabel = useSelect(
 		( select ) => {
-			if ( ! templateSlug ) {
-				return;
-			}
-
 			const allTemplates = select(
 				coreStore
 			).getEntityRecords< WpTemplate >( 'postType', 'wp_template', {
 				per_page: -1,
-				post_type: postType,
+				post_id: Number( postId ),
 			} );
+			if ( allTemplates?.length === 1 ) {
+				return getItemTitle( allTemplates[ 0 ] );
+			}
 			const match = allTemplates?.find(
 				( t ) => t.slug === templateSlug
 			);
-			return match ? getItemTitle( match ) : undefined;
+			const effectiveTemplate = match ?? allTemplates?.[ 0 ];
+			return effectiveTemplate
+				? getItemTitle( effectiveTemplate )
+				: undefined;
 		},
-		[ postType, templateSlug ]
+		[ postId, templateSlug ]
 	);
 
-	return <>{ templateLabel ?? defaultTemplateLabel }</>;
+	return <>{ templateLabel }</>;
 }
 
 export const TemplateView = ( {

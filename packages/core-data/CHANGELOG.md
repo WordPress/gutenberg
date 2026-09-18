@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Resolve post-specific template choices from PHP, including front-page and posts-page decisions, using a single result as the effective template and the first result as the default. ([#83083](https://github.com/WordPress/gutenberg/pull/83083))
+
 ### Bug Fixes
 
 -   `__experimentalFetchLinkSuggestions`: give each result a unique key when scoring instead of relying on its id, which could be a duplicate id from another table ([#83113](https://github.com/WordPress/gutenberg/pull/83113)).

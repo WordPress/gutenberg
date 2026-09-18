@@ -42,16 +42,21 @@ export const createTemplate =
 		const savedTemplate = await registry
 			.dispatch( coreStore )
 			.saveEntityRecord( 'postType', 'wp_template', template );
-		registry
-			.dispatch( coreStore )
-			.editEntityRecord(
-				'postType',
-				select.getCurrentPostType(),
-				select.getCurrentPostId(),
-				{
+		const postType = select.getCurrentPostType();
+		const postId = select.getCurrentPostId();
+		const templates = await registry
+			.resolveSelect( coreStore )
+			.getEntityRecords( 'postType', 'wp_template', {
+				per_page: -1,
+				post_id: Number( postId ),
+			} );
+		if ( templates?.some( ( { id } ) => id === savedTemplate.id ) ) {
+			registry
+				.dispatch( coreStore )
+				.editEntityRecord( 'postType', postType, postId, {
 					template: savedTemplate.slug,
-				}
-			);
+				} );
+		}
 		const { defaultRenderingMode, renderingMode } =
 			select.getEditorSettings();
 		registry
