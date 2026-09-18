@@ -350,7 +350,7 @@ Both extend shared base configurations (comments are not necessary):
 // tsconfig.build.json
 {
 	// Extends a base configuration common to most packages.
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 
 	// Dependencies that have opted in to TypeScript are referenced here: a
 	// split one by its build project, one on a single config by its
@@ -365,9 +365,9 @@ Both extend shared base configurations (comments are not necessary):
 ```jsonc
 // tsconfig.json
 {
-	// Extends the shared dev project configuration (noEmit, jest types,
+	// Extends the shared dev project configuration (noEmit, Vitest matcher types,
 	// test and story includes).
-	"extends": "../../tsconfig.dev.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 
 	// The dev project checks against the build project's declarations.
 	"references": [ { "path": "./tsconfig.build.json" } ]
@@ -376,14 +376,14 @@ Both extend shared base configurations (comments are not necessary):
 
 Register both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references. Route entry points under `routes/` with a `tsconfig.json` register it in the root `tsconfig.json` references only: their projects emit nothing and nothing else references them, so that registration is what puts them under `npm run typecheck`. A route with TypeScript test files pairs it with a `tsconfig.test.json` covering them, registered the same way.
 
-Packages whose components feed the Storybook components manifest (`components`, `dataviews`, `ui`) carry a third project, `tsconfig.stories.json`, registered in the root `tsconfig.json` only. It type checks the stories against component sources without jest types. Storybook's component meta extractor reads props through the closest `tsconfig.json` that lists a story, or through its own inferred project when none does; the inferred project produces the complete manifest and the dev project does not, so stories stay out of `tsconfig.json`. The dev project cannot reference this one either, because a referenced project may not disable emit (TS6310), which is why it is registered at the root only.
+Packages whose components feed the Storybook components manifest (`components`, `dataviews`, `ui`) carry a third project, `tsconfig.stories.json`, registered in the root `tsconfig.json` only. It type checks the stories against component sources without test types. Storybook's component meta extractor reads props through the closest `tsconfig.json` that lists a story, or through its own inferred project when none does; the inferred project produces the complete manifest and the dev project does not, so stories stay out of `tsconfig.json`. The dev project cannot reference this one either, because a referenced project may not disable emit (TS6310), which is why it is registered at the root only.
 
 Two rules keep the projects consistent, and `npm run lint:tsconfig` enforces both:
 
--   The build project excludes every dev file (`**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/stories/**`, `**/*.story.*`) and never lists a test type such as `jest` or `gutenberg-test-env` in `types`, so `src` cannot use test globals and no dev declaration is published. A package `exclude` replaces the inherited one, so list all of them.
--   The dev project's `types` starts from the build project's list and adds `jest`, so tests see every ambient type the sources see. Ambient types only dev files need (`@types/jest`, `@types/node`, `@testing-library/jest-dom`) belong in the package's own `devDependencies`.
+-   The build project excludes every dev file (`**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/stories/**`, `**/*.story.*`) and never lists a test type such as `gutenberg-vitest-test-env` or `vitest/globals` in `types`, so `src` cannot use test globals and no dev declaration is published. A package `exclude` replaces the inherited one, so list all of them.
+-   The dev project's `types` starts from the build project's list and adds `gutenberg-vitest-test-env`, so tests see every ambient type the sources see. Ambient types only dev files need (`@types/node`, `@testing-library/jest-dom`) belong in the package's own `devDependencies`.
 
-A few packages emit declarations through a different layout and keep only the parts of the split that apply. `jest-console` compiles nothing: a dev project checks its TypeScript sources and tests, and the package ships a handwritten `declarations.d.ts` instead of `build-types`. `interactivity-router` pairs its dev project with two specialized build projects (`tsconfig.main.json` and `tsconfig.full-page.json`), which take the standard build project's place in the root `tsconfig.build.json` references. The rules above still apply to whichever projects such a package has.
+A few packages emit declarations through a different layout and keep only the parts of the split that apply. `interactivity-router` pairs its dev project with two specialized build projects (`tsconfig.main.json` and `tsconfig.full-page.json`), which take the standard build project's place in the root `tsconfig.build.json` references. The rules above still apply to whichever projects such a package has.
 
 The build project inherits `rootDir`, `declarationDir`, and `include` from the base configuration, so a package only sets what differs. Test files that do not type check yet are listed in the dev project's `exclude` with a comment, so the debt stays visible per file.
 

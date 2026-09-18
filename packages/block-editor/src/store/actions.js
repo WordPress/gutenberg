@@ -12,6 +12,7 @@ import {
 	getBlockSupport,
 	isUnmodifiedDefaultBlock,
 	isUnmodifiedBlock,
+	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -29,8 +30,11 @@ import {
 	editContentOnlySection,
 } from './private-actions';
 import { getSiblingBlockAttributes } from '../utils/sibling-block-attributes';
+import { unlock } from '../lock-unlock';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
+
+const { editableRootKey } = unlock( blocksPrivateApis );
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -436,7 +440,7 @@ export const multiSelect =
 						),
 						blockCount,
 						blockCount + nestedBlockCount
-				  )
+					)
 				: sprintf(
 						/* translators: %s: number of selected blocks */
 						_n(
@@ -445,7 +449,7 @@ export const multiSelect =
 							blockCount
 						),
 						blockCount
-				  ),
+					),
 			'assertive'
 		);
 	};
@@ -821,6 +825,28 @@ export const insertBlocks =
 					blocksWithTemplates,
 					initialPosition
 				);
+				// Select the start of the inserted block's text when the block
+				// opts into the editable root, so its single field places the
+				// caret as it mounts. Focusing the field later would move focus
+				// off the host and back, which resets the iOS keyboard's
+				// capitalization.
+				if ( updateSelection && initialPosition === 0 ) {
+					const clientId = select.getSelectedBlockClientId();
+					const blockType =
+						clientId &&
+						getBlockType( select.getBlockName( clientId ) );
+					const attributeKey =
+						blockType?.[ editableRootKey ] &&
+						findRichTextAttributeKey( blockType );
+					if ( attributeKey ) {
+						dispatch.selectionChange(
+							clientId,
+							attributeKey,
+							0,
+							0
+						);
+					}
+				}
 			} );
 		}
 	};
@@ -1051,7 +1077,7 @@ export const __unstableDeleteSelection =
 			? getInnerBlocksAfterNestedSelection(
 					blockA.innerBlocks,
 					selectionB.clientId
-			  )
+				)
 			: blockB.innerBlocks;
 
 		const replacement = [
@@ -1290,10 +1316,24 @@ export const __unstableSplitSelection =
 		}
 
 		if ( ! blocks.length ) {
-			dispatch.replaceBlocks( select.getSelectedBlockClientIds(), [
-				head,
-				tail,
-			] );
+			registry.batch( () => {
+				dispatch.replaceBlocks( select.getSelectedBlockClientIds(), [
+					head,
+					tail,
+				] );
+				// Select the start of the tail field in the same batch, like
+				// the branches below, so the field places the caret as it
+				// mounts rather than being focused later. Only for blocks
+				// that opt into the editable root. The tail may have changed
+				// block type, so read the key from its type.
+				const tailType = getBlockType( tail.name );
+				const tailKey =
+					tailType?.[ editableRootKey ] &&
+					findRichTextAttributeKey( tailType );
+				if ( tailKey ) {
+					dispatch.selectionChange( tail.clientId, tailKey, 0, 0 );
+				}
+			} );
 			return;
 		}
 
@@ -2054,7 +2094,7 @@ export const insertBeforeBlock =
 
 		const blockIndex = select.getBlockIndex( clientId );
 		const { defaultBlock: directInsertBlock } = rootClientId
-			? select.getBlockListSettings( rootClientId ) ?? {}
+			? ( select.getBlockListSettings( rootClientId ) ?? {} )
 			: {};
 
 		if ( ! directInsertBlock ) {
@@ -2067,7 +2107,7 @@ export const insertBeforeBlock =
 				? getSiblingBlockAttributes(
 						directInsertBlock.name,
 						select.getBlockAttributes( clientId )
-				  )
+					)
 				: {} ),
 		} );
 		return dispatch.insertBlock( block, blockIndex, rootClientId );
@@ -2088,7 +2128,7 @@ export const insertAfterBlock =
 
 		const blockIndex = select.getBlockIndex( clientId );
 		const { defaultBlock: directInsertBlock } = rootClientId
-			? select.getBlockListSettings( rootClientId ) ?? {}
+			? ( select.getBlockListSettings( rootClientId ) ?? {} )
 			: {};
 
 		if ( ! directInsertBlock ) {
@@ -2105,7 +2145,7 @@ export const insertAfterBlock =
 				? getSiblingBlockAttributes(
 						directInsertBlock.name,
 						select.getBlockAttributes( clientId )
-				  )
+					)
 				: {} ),
 		} );
 		return dispatch.insertBlock( block, blockIndex + 1, rootClientId );
