@@ -452,7 +452,8 @@ describe( 'actions', () => {
 		it( 'routes a HEIC file the browser could not type through the HEIC conversion path', async () => {
 			// Windows without the HEVC extension reports no type at all for a
 			// .heic file. Going by the type alone uploads it as-is, to a server
-			// that cannot convert it either (#81043).
+			// that cannot convert it either.
+			// See https://github.com/WordPress/gutenberg/issues/81043.
 			const onError = vi.fn();
 
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
