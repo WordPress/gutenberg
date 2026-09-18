@@ -7,7 +7,7 @@ describe( 'StateControlBadges', () => {
 	const viewportStates = [ { value: '@tablet', label: 'Tablet' } ];
 	const pseudoStates = [ { value: ':hover', label: 'Hover' } ];
 
-	it( 'explains viewport badges with an infotip', async () => {
+	it( 'explains viewport badges with a shared infotip', async () => {
 		const user = userEvent.setup();
 
 		render(
@@ -32,7 +32,7 @@ describe( 'StateControlBadges', () => {
 		).toBeVisible();
 	} );
 
-	it( 'explains pseudo state badges with an infotip', async () => {
+	it( 'explains pseudo state badges with a shared infotip', async () => {
 		const user = userEvent.setup();
 
 		render(
@@ -52,6 +52,39 @@ describe( 'StateControlBadges', () => {
 
 		expect(
 			await screen.findByText( 'Style changes apply to the Hover state.' )
+		).toBeVisible();
+	} );
+
+	it( 'uses one summary infotip when multiple badges are active', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<StateControlBadges
+				viewportStates={ viewportStates }
+				pseudoStates={ pseudoStates }
+				viewportValue="@tablet"
+				pseudoStateValue=":hover"
+			/>
+		);
+
+		expect( screen.getByText( 'Tablet' ) ).toBeVisible();
+		expect( screen.getByText( 'Hover' ) ).toBeVisible();
+		expect(
+			screen.getAllByRole( 'button', {
+				name: /More information/,
+			} )
+		).toHaveLength( 1 );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'More information about style states',
+			} )
+		);
+
+		expect(
+			await screen.findByText(
+				'Style changes apply to the Tablet viewport and the Hover state.'
+			)
 		).toBeVisible();
 	} );
 } );
