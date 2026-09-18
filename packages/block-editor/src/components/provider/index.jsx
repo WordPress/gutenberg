@@ -440,10 +440,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		// the server.
 		if ( useUploadMediaPipeline && ! isMediaUploadIntercepted ) {
 			return (
-				<MediaUploadProvider
-					settings={ mediaUploadSettings }
-					useSubRegistry={ false }
-				>
+				<MediaUploadProvider settings={ mediaUploadSettings }>
 					{ content }
 				</MediaUploadProvider>
 			);
