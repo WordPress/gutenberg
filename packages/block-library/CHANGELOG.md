@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Cover: Allow video backgrounds to use the "Fixed background" (parallax) option, matching image backgrounds. Videos cannot use `background-attachment: fixed`, so the video is pinned to the viewport and clipped to the block's bounds, with fallbacks/preferences ([#74289](https://github.com/WordPress/gutenberg/pull/74289)).
+
 ### Bug Fixes
 
 -   Math: Read the LaTeX source from the `<annotation>` inside the saved `<math>` instead of the block comment, so `&` and `<` survive `wp_kses` for users without `unfiltered_html`. Input that cannot be rendered is saved as an annotation-only `<semantics>`, which browsers display as the source text ([#82987](https://github.com/WordPress/gutenberg/pull/82987)).
