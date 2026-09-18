@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Enable `custom-property-pattern` to disallow `--_gcd-*` (global CSS defense) custom properties, which are private to `@wordpress/ui`. Stylelint does not merge this rule, so projects that already set `custom-property-pattern` will not gain the new ban and need to include `(?!_gcd-)` in their own pattern if they want it. ([#83025](https://github.com/WordPress/gutenberg/pull/83025))
+-   Enable `custom-property-pattern` to disallow `--_gcd-*` and `--_wp-*` custom properties. Stylelint does not merge this rule, so projects that already set `custom-property-pattern` will not gain the ban and need to include `(?!_(?:gcd|wp)-)` in their own pattern if they want it. ([#83025](https://github.com/WordPress/gutenberg/pull/83025), [#83075](https://github.com/WordPress/gutenberg/pull/83075))
 
 ## 25.0.0 (2026-09-10)
 
