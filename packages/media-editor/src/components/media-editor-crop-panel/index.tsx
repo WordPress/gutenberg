@@ -1,4 +1,4 @@
-import { SelectControl } from '@wordpress/components';
+import { SelectControl as WCSelectControl } from '@wordpress/components';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
@@ -49,7 +49,7 @@ export default function MediaEditorCropPanel( {
 				{ __( 'Crop options' ) }
 			</VisuallyHidden>
 			<MediaEditorImageControls withLabels disabled={ disabled } />
-			<SelectControl
+			<WCSelectControl
 				label={ __( 'Aspect ratio' ) }
 				value={ aspectRatioValue }
 				onChange={ onAspectRatioChange }

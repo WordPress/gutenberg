@@ -38,7 +38,7 @@ export const Default: StoryObj< typeof ValidatedContentEditableControl > = {
 						? {
 								type: 'invalid',
 								message: 'The word "error" is not allowed.',
-						  }
+							}
 						: undefined
 				}
 			/>

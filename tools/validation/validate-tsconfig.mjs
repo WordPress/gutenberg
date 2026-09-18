@@ -62,18 +62,33 @@ if ( ! rootSolutionReferences.has( buildSolutionPath ) ) {
 	);
 }
 
-/* Ambient types only test files may use. */
-const TEST_TYPES = new Set( [ 'jest', 'gutenberg-test-env' ] );
+/*
+ * Ambient types only test files may use. Keep the retired Jest names here so
+ * build projects cannot reintroduce them.
+ */
+const TEST_TYPES = new Set( [
+	'jest',
+	'gutenberg-test-env',
+	'gutenberg-vitest-test-env',
+	'vitest/globals',
+] );
 
 /*
  * A package exclude replaces the inherited one, so a build project that sets
  * its own must keep every dev-file pattern the base config excludes.
  */
-const baseConfigPath = resolve( repoRoot, 'tsconfig.base.json' );
+const baseConfigPath = fileURLToPath(
+	import.meta.resolve( '@wordpress/monorepo-tools/tsconfig/base.json' )
+);
+/*
+ * The base config anchors its patterns with `${configDir}` so each project
+ * excludes its own files. Package projects spell the same patterns relative to
+ * themselves, so drop that prefix before comparing.
+ */
 const REQUIRED_BUILD_EXCLUDES = existsSync( baseConfigPath )
-	? ( readTsconfig( baseConfigPath ).exclude ?? [] ).filter( ( pattern ) =>
-			/test|stories|story/.test( pattern )
-	  )
+	? ( readTsconfig( baseConfigPath ).exclude ?? [] )
+			.map( ( pattern ) => pattern.replace( /^\$\{configDir\}\//, '' ) )
+			.filter( ( pattern ) => /test|stories|story/.test( pattern ) )
 	: [];
 
 const packagesWithTypes = globSync( 'packages/*/tsconfig.json', {
@@ -92,14 +107,13 @@ const packagesWithTypes = globSync( 'packages/*/tsconfig.json', {
 function isDevProject( tsconfigPath ) {
 	const extended = readTsconfig( tsconfigPath ).extends;
 	return (
-		typeof extended === 'string' &&
-		basename( extended ) === 'tsconfig.dev.base.json'
+		typeof extended === 'string' && basename( extended ) === 'dev.base.json'
 	);
 }
 
 /**
  * Returns the projects of a package: src, dev files, and, where stories are
- * type checked against sources without jest types, `tsconfig.stories.json`.
+ * type checked against sources without test types, `tsconfig.stories.json`.
  *
  * @param {string} packageName Package directory name.
  * @return {{srcProject: string|undefined, devProject: string|undefined, storiesProject: string|undefined}} Absolute paths.
@@ -178,11 +192,11 @@ function srcProjectReferences( srcProject, packageName ) {
  */
 function hasDevFiles( packageName ) {
 	return (
-		globSync( '**/{test,tests,__tests__,stories}/**/*.{ts,tsx}', {
+		globSync( '**/{test,tests,__tests__,stories}/**/*.{ts,tsx,mts,cts}', {
 			cwd: resolve( repoRoot, 'packages', packageName ),
 			ignore: [ 'node_modules/**', 'build/**', 'build-*/**' ],
 		} ).length > 0 ||
-		globSync( '**/*.story.{ts,tsx}', {
+		globSync( '**/*.story.{ts,tsx,mts,cts}', {
 			cwd: resolve( repoRoot, 'packages', packageName ),
 			ignore: [ 'node_modules/**', 'build/**', 'build-*/**' ],
 		} ).length > 0
@@ -250,7 +264,7 @@ for ( const packageName of packagesWithTypes ) {
 		const buildTypes =
 			readTsconfig( srcProject ).compilerOptions?.types ?? [];
 		const devTypes = readTsconfig( devProject ).compilerOptions?.types ?? [
-			'jest',
+			'gutenberg-vitest-test-env',
 		];
 		for ( const type of buildTypes ) {
 			if ( TEST_TYPES.has( type ) ) {
@@ -358,7 +372,7 @@ for ( const routeName of routeNames ) {
 		continue;
 	}
 	const hasTypeScriptFiles =
-		globSync( '**/*.{ts,tsx}', {
+		globSync( '**/*.{ts,tsx,mts,cts}', {
 			cwd: resolve( repoRoot, 'routes', routeName ),
 			ignore: [ 'node_modules/**', 'build/**' ],
 		} ).length > 0;
@@ -385,7 +399,7 @@ for ( const routeName of routesWithTypes ) {
 	 * are only checked when a registered test project covers them.
 	 */
 	const hasTestFiles =
-		globSync( '**/{test,tests,__tests__}/**/*.{ts,tsx}', {
+		globSync( '**/{test,tests,__tests__}/**/*.{ts,tsx,mts,cts}', {
 			cwd: routeDir,
 			ignore: [ 'node_modules/**', 'build/**' ],
 		} ).length > 0;

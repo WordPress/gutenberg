@@ -59,12 +59,14 @@ interface QuickEditModalProps {
 	postType: string;
 	postId: string[];
 	closeModal: () => void;
+	quickEditForm: Form | undefined;
 }
 
 export function QuickEditModal( {
 	postType,
 	postId,
 	closeModal,
+	quickEditForm,
 }: QuickEditModalProps ) {
 	const isBulk = postId.length > 1;
 
@@ -142,66 +144,22 @@ export function QuickEditModal( {
 		[ _fields, canSwitchTemplate ]
 	);
 
-	const form = useMemo( () => {
-		const allFields: Form[ 'fields' ] = [
-			{
-				id: 'featured_media',
-				layout: {
-					type: 'regular',
-					labelPosition: 'none',
-				},
-			},
-			{
-				id: 'status',
-				label: __( 'Status' ),
-				layout: {
-					type: 'panel',
-					summary: 'status',
-				},
-				children: [
-					{
-						id: 'status',
-						layout: { type: 'regular', labelPosition: 'none' },
-					},
-					'scheduled_date',
-					'password',
-				],
-			},
-			'author',
-			'date',
-			'slug',
-			'parent',
-			{
-				id: 'discussion',
-				label: __( 'Discussion' ),
-				layout: {
-					type: 'panel',
-					summary: 'discussion',
-				},
-				children: [
-					{
-						id: 'comment_status',
-						layout: { type: 'regular', labelPosition: 'none' },
-					},
-					'ping_status',
-				],
-			},
-			'template',
-		];
-
+	const form = useMemo( (): Form => {
+		if ( ! quickEditForm ) {
+			return { layout: { type: 'panel' }, fields: [] };
+		}
+		if ( ! isBulk ) {
+			return quickEditForm;
+		}
 		return {
-			layout: {
-				type: 'panel' as const,
-			},
-			fields: isBulk
-				? allFields.filter( ( field ) =>
-						fieldsWithBulkEditSupport.includes(
-							typeof field === 'string' ? field : field.id
-						)
-				  )
-				: allFields,
+			...quickEditForm,
+			fields: ( quickEditForm.fields ?? [] ).filter( ( field ) =>
+				fieldsWithBulkEditSupport.includes(
+					typeof field === 'string' ? field : field.id
+				)
+			),
 		};
-	}, [ isBulk ] );
+	}, [ isBulk, quickEditForm ] );
 
 	const onChange = ( edits: Record< string, any > ) => {
 		const currentData: Record< string, any > = {

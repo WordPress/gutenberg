@@ -53,15 +53,16 @@ describe( 'FocalPointPicker', () => {
 
 			const draggableArea = screen.getByRole( 'button' );
 
-			// `user-event` is not capable of testing drag interactions properly.
-			// we could consider using playwright instead.
+			// Start a gesture without releasing it so Tab can interrupt it.
 			fireEvent.mouseDown( draggableArea );
 
 			expect( mockOnDrag ).not.toHaveBeenCalled();
 			expect( mockOnDragEnd ).not.toHaveBeenCalled();
 
-			fireEvent.blur( draggableArea );
-			fireEvent.mouseMove( draggableArea );
+			expect( draggableArea ).toHaveFocus();
+			await userEvent.tab();
+			expect( draggableArea ).not.toHaveFocus();
+			await userEvent.hover( draggableArea );
 
 			expect( mockOnDrag ).not.toHaveBeenCalled();
 			expect( mockOnDragEnd ).toHaveBeenCalledTimes( 1 );
