@@ -727,22 +727,16 @@ export default dedupePlugins( [
 	// Override: Storybook story files — disable rules-of-hooks for the
 	// `render` method pattern (hooks in a lowercase function) and
 	// static-components for inline factories used in story setup.
-	{
-		files: [ `**/@(storybook|stories)/**/*.${ SCRIPT_EXT }` ],
-		rules: {
-			'react-hooks/rules-of-hooks': 'off',
-			'react-hooks/static-components': 'off',
-		},
-	},
-
-	// Override: Storybook story files — flag side-effect imports of package
-	// build-style stylesheets so they load through package-styles/config.js.
+	// Flag side-effect imports of package build-style stylesheets so they
+	// load through package-styles/config.js.
 	{
 		files: [ `**/@(storybook|stories)/**/*.${ SCRIPT_EXT }` ],
 		plugins: {
 			'gutenberg-storybook': gutenbergStorybookPlugin,
 		},
 		rules: {
+			'react-hooks/rules-of-hooks': 'off',
+			'react-hooks/static-components': 'off',
 			'gutenberg-storybook/no-build-style-imports': 'error',
 		},
 	},
