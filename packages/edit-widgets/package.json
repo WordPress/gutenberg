@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "6.53.0",
+	"version": "6.54.0",
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -72,7 +72,6 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/theme": "file:../theme",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",

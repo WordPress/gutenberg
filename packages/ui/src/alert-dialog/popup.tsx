@@ -13,7 +13,6 @@ import {
 	SCROLL_CONTAINER_ATTR,
 	useOverlayScrollStateAttributes,
 } from '../utils/use-overlay-scroll-state-attributes';
-import { ThemeProvider } from '../utils/theme-provider';
 import { Stack } from '../stack';
 import { Text } from '../text';
 import { AlertDialogContext } from './context';
@@ -125,43 +124,41 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 		const portalChildren = (
 			<>
 				<_AlertDialog.Backdrop className={ dialogStyles.backdrop } />
-				<ThemeProvider>
-					<_AlertDialog.Popup
-						ref={ mergedRef }
+				<_AlertDialog.Popup
+					ref={ mergedRef }
+					className={ clsx(
+						dialogStyles.popup,
+						className,
+						dialogStyles[ 'is-medium' ]
+					) }
+					initialFocus={ resolvedInitialFocus }
+					finalFocus={ finalFocus }
+					{ ...props }
+					data-wp-ui-overlay-modal=""
+				>
+					{ stickyHeader && headerElement }
+					<div
+						ref={ scrollStateRef }
 						className={ clsx(
-							dialogStyles.popup,
-							className,
-							dialogStyles[ 'is-medium' ]
+							overlayChromeStyles.content,
+							focusStyles[ 'outset-ring--focus-visible' ]
 						) }
-						initialFocus={ resolvedInitialFocus }
-						finalFocus={ finalFocus }
-						{ ...props }
-						data-wp-ui-overlay-modal=""
+						onScroll={ onScroll }
 					>
-						{ stickyHeader && headerElement }
-						<div
-							ref={ scrollStateRef }
-							className={ clsx(
-								overlayChromeStyles.content,
-								focusStyles[ 'outset-ring--focus-visible' ]
-							) }
-							onScroll={ onScroll }
-						>
-							{ ! stickyHeader && headerElement }
-							{ description && (
-								<Text
-									variant="body-md"
-									render={ <_AlertDialog.Description /> }
-								>
-									{ description }
-								</Text>
-							) }
-							{ children }
-							{ ! stickyFooter && footerElement }
-						</div>
-						{ stickyFooter && footerElement }
-					</_AlertDialog.Popup>
-				</ThemeProvider>
+						{ ! stickyHeader && headerElement }
+						{ description && (
+							<Text
+								variant="body-md"
+								render={ <_AlertDialog.Description /> }
+							>
+								{ description }
+							</Text>
+						) }
+						{ children }
+						{ ! stickyFooter && footerElement }
+					</div>
+					{ stickyFooter && footerElement }
+				</_AlertDialog.Popup>
 			</>
 		);
 

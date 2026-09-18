@@ -6,15 +6,15 @@
 		"checkJs": false
 	},
 	"references": [
-		{ "path": "../a11y" },
-		{ "path": "../compose" },
+		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../deprecated" },
+		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../dom" },
-		{ "path": "../element" },
-		{ "path": "../escape-html" },
-		{ "path": "../i18n" },
-		{ "path": "../keycodes" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../escape-html/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../private-apis" }
 	]
 }

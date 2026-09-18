@@ -6,7 +6,7 @@ import type { ConnectionError } from './errors';
 /* globalThis */
 declare global {
 	interface Window {
-		_wpCollaborationEnabled?: string;
+		__experimentalEnableRealTimeCollaboration?: boolean;
 	}
 }
 

@@ -13,14 +13,14 @@
 	overflow: hidden;
 }
 
-.urlBar {
+.url-bar {
 	flex-shrink: 0;
 	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
 	background: var(--wpds-color-background-surface-neutral-weak);
 	border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
-.urlField {
+.url-field {
 	min-width: 0;
 	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
 	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
@@ -28,19 +28,19 @@
 	background: var(--wpds-color-background-surface-neutral);
 }
 
-.urlFavicon {
+.url-favicon {
 	flex-shrink: 0;
 	width: var(--wpds-typography-font-size-xs);
 	height: var(--wpds-typography-font-size-xs);
 	object-fit: contain;
 }
 
-.urlIcon {
+.url-icon {
 	flex-shrink: 0;
 	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
-.urlText {
+.url-text {
 	flex: 1;
 	min-width: 0;
 	overflow: hidden;
@@ -51,7 +51,7 @@
 	white-space: nowrap;
 }
 
-.previewWrap {
+.preview-wrap {
 	position: relative;
 	flex: 1;
 	min-height: 0;
@@ -81,8 +81,8 @@
 	backdrop-filter: blur(1px);
 }
 
-.previewWrap:hover .overlay,
-.previewWrap:focus-within .overlay {
+.preview-wrap:hover .overlay,
+.preview-wrap:focus-within .overlay {
 	opacity: 1;
 }
 

@@ -18,13 +18,15 @@ type IssueCounts = {
 	critical: number;
 };
 
-// Async site health tests exposed via the REST API.
+// Async site health tests exposed via the REST API. The Site Health page
+// reads the same set; keep `routes/site-health/stage.tsx` in sync.
 const ASYNC_TEST_PATHS = [
 	'/wp-site-health/v1/tests/background-updates',
 	'/wp-site-health/v1/tests/loopback-requests',
 	'/wp-site-health/v1/tests/https-status',
 	'/wp-site-health/v1/tests/dotorg-communication',
 	'/wp-site-health/v1/tests/authorization-header',
+	'/wp-site-health/v1/tests/page-cache',
 ] as const;
 
 /**

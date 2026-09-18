@@ -2,9 +2,36 @@ import {
 	getLayoutStateOverrides,
 	getResetLayout,
 	getResponsiveLayoutStyles,
+	hasLayoutPanelControls,
 } from '../layout';
+import { getLayoutType } from '../../layouts';
 
 describe( 'layout', () => {
+	describe( 'hasLayoutPanelControls()', () => {
+		it( 'does not show the layout panel when every flex layout control is disabled', () => {
+			expect(
+				hasLayoutPanelControls( {
+					layoutType: getLayoutType( 'flex' ),
+					constrainedType: getLayoutType( 'constrained' ),
+					layoutBlockSupport: {
+						allowSwitching: false,
+						allowInheriting: false,
+						allowEditing: true,
+						allowOrientation: false,
+						allowJustification: false,
+						allowVerticalAlignment: false,
+						allowWrap: false,
+						allowSizingOnChildren: true,
+						default: { type: 'flex' },
+					},
+					showInheritToggle: false,
+					showLayoutTypeSwitcher: false,
+					displayControlsForLegacyLayouts: false,
+				} )
+			).toBe( false );
+		} );
+	} );
+
 	describe( 'getResetLayout()', () => {
 		it( 'should reset to variation layout defaults', () => {
 			const layout = getResetLayout(

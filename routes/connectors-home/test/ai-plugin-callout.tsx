@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -25,7 +26,7 @@ jest.mock( '@wordpress/components', () => {
 					onClick?: () => void;
 					disabled?: boolean;
 				},
-				ref
+				ref: unknown
 			) =>
 				href
 					? createElement( 'a', { ref, href }, children )
@@ -55,20 +56,23 @@ jest.mock( '@wordpress/data', () => ( {
 	createSelector: jest.fn( ( fn ) => fn ),
 	createRegistrySelector: jest.fn( ( fn ) => fn ),
 	createReduxStore: jest.fn( () => ( {} ) ),
-	combineReducers: jest.fn( ( reducers ) => ( state = {}, action ) => {
-		const newState: Record< string, unknown > = {};
+	combineReducers: jest.fn(
+		( reducers ) =>
+			( state = {}, action: unknown ) => {
+				const newState: Record< string, unknown > = {};
 
-		Object.keys( reducers ).forEach( ( key ) => {
-			newState[ key ] = reducers[ key ](
-				( state as Record< string, unknown > )[ key ],
-				action
-			);
-		} );
+				Object.keys( reducers ).forEach( ( key ) => {
+					newState[ key ] = reducers[ key ](
+						( state as Record< string, unknown > )[ key ],
+						action
+					);
+				} );
 
-		return newState;
-	} ),
+				return newState;
+			}
+	),
 	register: jest.fn(),
-	keyedReducer: jest.fn( () => ( reducer ) => reducer ),
+	keyedReducer: jest.fn( () => ( reducer: unknown ) => reducer ),
 } ) );
 
 jest.mock( '../default-connectors', () => ( {

@@ -483,6 +483,11 @@ export const RowHeight: Story = {
  * to drop.
  */
 export const EditMode: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		columns: 12,
 		rowHeight: 80,
@@ -723,6 +728,11 @@ function CustomDragPreview( { children }: DragPreviewRenderProps ) {
  * respond.
  */
 export const Customization: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		columns: 6,
 		rowHeight: 80,
@@ -866,6 +876,11 @@ function NumberedOverlay( { columns, isActive }: GridOverlayRenderProps ) {
  * on.
  */
 export const CustomGridOverlayStory: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	name: 'Custom Grid Overlay',
 	args: {
 		columns: 12,

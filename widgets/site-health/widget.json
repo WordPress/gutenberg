@@ -12,6 +12,13 @@
 	"textdomain": "default",
 	"actions": [
 		{
+			"id": "site-health-details",
+			"label": "Details",
+			"icon": "core/chart-bar",
+			"relevance": "high",
+			"href": "admin.php?page=dashboard-wp-admin&p=/site-health"
+		},
+		{
 			"id": "site-health-status",
 			"label": "Status",
 			"icon": "dashboard-widgets/seen",

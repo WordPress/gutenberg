@@ -81,7 +81,7 @@ function DraftThumbnail( { post }: { post: DraftPost } ) {
 	if ( url ) {
 		return (
 			<img
-				className={ styles.thumbImage }
+				className={ styles[ 'thumb-image' ] }
 				src={ url }
 				alt=""
 				loading="lazy"
@@ -90,7 +90,7 @@ function DraftThumbnail( { post }: { post: DraftPost } ) {
 	}
 
 	return (
-		<div className={ styles.thumbPlaceholder } aria-hidden="true">
+		<div className={ styles[ 'thumb-placeholder' ] } aria-hidden="true">
 			<Icon icon={ postFeaturedImage } />
 		</div>
 	);
@@ -112,12 +112,12 @@ function DraftTitle( {
 			align="center"
 			justify="space-between"
 			gap="sm"
-			className={ styles.titleRow }
+			className={ styles[ 'title-row' ] }
 		>
 			<Link
 				href={ getEditUrl( post.id ) }
 				openInNewTab
-				className={ styles.titleLink }
+				className={ styles[ 'title-link' ] }
 			>
 				{ title }
 			</Link>
@@ -213,7 +213,7 @@ export function DraftsList() {
 
 	return (
 		<Stack direction="column" className={ styles.root }>
-			<Text variant="heading-md" className={ styles.titleHeader }>
+			<Text variant="heading-md" className={ styles[ 'title-header' ] }>
 				{ __( 'Your recent drafts' ) }
 			</Text>
 

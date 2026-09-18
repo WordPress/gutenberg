@@ -1,13 +1,10 @@
 import type { ReactNode, Ref, PropsWithoutRef, RefAttributes } from 'react';
 import { __, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight, unseen, funnel } from '@wordpress/icons';
-import {
-	Button,
-	Icon as WCIcon,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { forwardRef, Children, Fragment, useContext } from '@wordpress/element';
-import { unlock } from '../../../lock-unlock';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Icon, Menu } from '@wordpress/ui';
 import { SORTING_DIRECTIONS, sortArrows, sortLabels } from '../../../constants';
 import type {
 	NormalizedField,
@@ -18,8 +15,6 @@ import type {
 } from '../../../types';
 import DataViewsContext from '../../dataviews-context';
 import getHideableFields from '../../../utils/get-hideable-fields';
-
-const { Menu } = unlock( componentsPrivateApis );
 
 interface HeaderMenuProps< Item > {
 	fieldId: string;
@@ -105,8 +100,8 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	const isRtl = isRTL();
 
 	return (
-		<Menu>
-			<Menu.TriggerButton
+		<Menu.Root>
+			<Menu.Trigger
 				render={
 					<Button
 						size="compact"
@@ -122,55 +117,45 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 						{ sortArrows[ view.sort.direction ] }
 					</span>
 				) }
-			</Menu.TriggerButton>
-			<Menu.Popover style={ { minWidth: '240px' } }>
+			</Menu.Trigger>
+			<Menu.Popup style={ { minWidth: '240px' } }>
 				<WithMenuSeparators>
 					{ isSortable && (
-						<Menu.Group>
+						<Menu.RadioGroup
+							value={
+								isSorted && view.sort
+									? view.sort.direction
+									: null
+							}
+							onValueChange={ ( direction: SortDirection ) => {
+								onChangeView( {
+									...view,
+									sort: {
+										field: fieldId,
+										direction,
+									},
+									showLevels: false,
+								} );
+							} }
+						>
 							{ SORTING_DIRECTIONS.map(
-								( direction: SortDirection ) => {
-									const isChecked =
-										view.sort &&
-										isSorted &&
-										view.sort.direction === direction;
-
-									const value = `${ fieldId }-${ direction }`;
-
-									return (
-										<Menu.RadioItem
-											key={ value }
-											// All sorting radio items share the same name, so that
-											// selecting a sorting option automatically deselects the
-											// previously selected one, even if it is displayed in
-											// another submenu. The field and direction are passed via
-											// the `value` prop.
-											name="view-table-sorting"
-											value={ value }
-											checked={ isChecked }
-											onChange={ () => {
-												onChangeView( {
-													...view,
-													sort: {
-														field: fieldId,
-														direction,
-													},
-													showLevels: false,
-												} );
-											} }
-										>
-											<Menu.ItemLabel>
-												{ sortLabels[ direction ] }
-											</Menu.ItemLabel>
-										</Menu.RadioItem>
-									);
-								}
+								( direction: SortDirection ) => (
+									<Menu.RadioItem
+										key={ direction }
+										value={ direction }
+									>
+										<Menu.ItemLabel>
+											{ sortLabels[ direction ] }
+										</Menu.ItemLabel>
+									</Menu.RadioItem>
+								)
 							) }
-						</Menu.Group>
+						</Menu.RadioGroup>
 					) }
 					{ canAddFilter && (
 						<Menu.Group>
 							<Menu.Item
-								prefix={ <WCIcon icon={ funnel } /> }
+								prefix={ <Icon icon={ funnel } /> }
 								onClick={ () => {
 									setOpenedFilter( fieldId );
 									setIsShowingFilter( true );
@@ -198,7 +183,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 						<Menu.Group>
 							{ canMove && (
 								<Menu.Item
-									prefix={ <WCIcon icon={ arrowLeft } /> }
+									prefix={ <Icon icon={ arrowLeft } /> }
 									disabled={
 										isRtl
 											? index >=
@@ -232,7 +217,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							) }
 							{ canMove && (
 								<Menu.Item
-									prefix={ <WCIcon icon={ arrowRight } /> }
+									prefix={ <Icon icon={ arrowRight } /> }
 									disabled={
 										isRtl
 											? index < 1
@@ -265,13 +250,13 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								</Menu.Item>
 							) }
 							{ canInsertLeft && !! hiddenFields.length && (
-								<Menu>
-									<Menu.SubmenuTriggerItem>
+								<Menu.SubmenuRoot>
+									<Menu.SubmenuTrigger>
 										<Menu.ItemLabel>
 											{ __( 'Insert left' ) }
 										</Menu.ItemLabel>
-									</Menu.SubmenuTriggerItem>
-									<Menu.Popover>
+									</Menu.SubmenuTrigger>
+									<Menu.Popup>
 										{ hiddenFields.map( ( hiddenField ) => {
 											const insertIndex = isRtl
 												? index + 1
@@ -301,17 +286,17 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 												</Menu.Item>
 											);
 										} ) }
-									</Menu.Popover>
-								</Menu>
+									</Menu.Popup>
+								</Menu.SubmenuRoot>
 							) }
 							{ canInsertRight && !! hiddenFields.length && (
-								<Menu>
-									<Menu.SubmenuTriggerItem>
+								<Menu.SubmenuRoot>
+									<Menu.SubmenuTrigger>
 										<Menu.ItemLabel>
 											{ __( 'Insert right' ) }
 										</Menu.ItemLabel>
-									</Menu.SubmenuTriggerItem>
-									<Menu.Popover>
+									</Menu.SubmenuTrigger>
+									<Menu.Popup>
 										{ hiddenFields.map( ( hiddenField ) => {
 											const insertIndex = isRtl
 												? index
@@ -341,12 +326,12 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 												</Menu.Item>
 											);
 										} ) }
-									</Menu.Popover>
-								</Menu>
+									</Menu.Popup>
+								</Menu.SubmenuRoot>
 							) }
 							{ isHidable && field && (
 								<Menu.Item
-									prefix={ <WCIcon icon={ unseen } /> }
+									prefix={ <Icon icon={ unseen } /> }
 									onClick={ () => {
 										onHide( field );
 										onChangeView( {
@@ -365,8 +350,8 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 						</Menu.Group>
 					) }
 				</WithMenuSeparators>
-			</Menu.Popover>
-		</Menu>
+			</Menu.Popup>
+		</Menu.Root>
 	);
 } );
 

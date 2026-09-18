@@ -1,5 +1,5 @@
 import { useSelect } from '@wordpress/data';
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import { store as viewportStore } from '@wordpress/viewport';
@@ -18,7 +18,8 @@ import styles from './actions.module.css';
  * triggers that flip the shared UI state the overlays react to.
  *
  * Returns `null` when mounted without `onEditChange`, so hosts that don't
- * expose edit mode can keep `Actions` in their tree unconditionally.
+ * expose edit mode can keep `Actions` in their tree unconditionally. The
+ * Customize button also needs the policy in effect to allow `customize`.
  */
 export function Actions(): React.ReactNode {
 	const {
@@ -28,7 +29,18 @@ export function Actions(): React.ReactNode {
 		commit,
 		cancel: cancelStaging,
 		hasUncommittedChanges,
+		canPerform,
+		widgetTypes,
 	} = useDashboardInternalContext();
+
+	// The trigger shows only while something can be inserted.
+	const canInsertAny = useMemo(
+		() =>
+			widgetTypes.some( ( widgetType ) =>
+				canPerform( { operation: 'insert', widgetType } )
+			),
+		[ widgetTypes, canPerform ]
+	);
 
 	const [ isEditActionsMounted, setIsEditActionsMounted ] =
 		useState( editMode );
@@ -90,6 +102,8 @@ export function Actions(): React.ReactNode {
 		return null;
 	}
 
+	const canCustomize = canPerform( { operation: 'customize' } );
+
 	return (
 		<Stack direction="row" gap="sm">
 			{ isEditActionsMounted ? (
@@ -102,20 +116,26 @@ export function Actions(): React.ReactNode {
 							: styles[ 'edit-actions-enter' ]
 					}
 				>
-					<Button
-						variant="minimal"
-						tone="brand"
-						size="compact"
-						onClick={ insert }
-					>
-						{ ! isMobileViewport && <Button.Icon icon={ plus } /> }
-						{ __( 'Add widget' ) }
-					</Button>
+					{ canInsertAny && (
+						<>
+							<Button
+								variant="minimal"
+								tone="brand"
+								size="compact"
+								onClick={ insert }
+							>
+								{ ! isMobileViewport && (
+									<Button.Icon icon={ plus } />
+								) }
+								{ __( 'Add widget' ) }
+							</Button>
 
-					<div
-						className={ styles[ 'edit-actions-divider' ] }
-						aria-hidden="true"
-					/>
+							<div
+								className={ styles[ 'edit-actions-divider' ] }
+								aria-hidden="true"
+							/>
+						</>
+					) }
 
 					<Button
 						variant="minimal"
@@ -137,14 +157,16 @@ export function Actions(): React.ReactNode {
 					</Button>
 				</Stack>
 			) : (
-				<Button
-					variant="minimal"
-					tone="brand"
-					size="compact"
-					onClick={ handleEditMode }
-				>
-					{ __( 'Customize' ) }
-				</Button>
+				canCustomize && (
+					<Button
+						variant="minimal"
+						tone="brand"
+						size="compact"
+						onClick={ handleEditMode }
+					>
+						{ __( 'Customize' ) }
+					</Button>
+				)
 			) }
 
 			<ActionsMenu items={ menuItems } />

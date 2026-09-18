@@ -2,12 +2,34 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
+import { getSettings, setSettings } from '@wordpress/date';
 import Dataform from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
 
 jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 
 const noop = () => {};
+
+// Applies the edits reported by `onChange` back to `data`, the way real
+// consumers do. Text controls are strictly controlled, so without this
+// feedback loop typed characters would not accumulate in the input.
+function StatefulDataform< Item extends object >( {
+	data: initialData,
+	onChange,
+	...props
+}: React.ComponentProps< typeof Dataform< Item > > ) {
+	const [ currentData, setCurrentData ] = useState( initialData );
+	return (
+		<Dataform< Item >
+			{ ...props }
+			data={ currentData }
+			onChange={ ( edits ) => {
+				setCurrentData( ( prev ) => ( { ...prev, ...edits } ) );
+				onChange( edits );
+			} }
+		/>
+	);
+}
 
 const fields = [
 	{
@@ -120,7 +142,7 @@ describe( 'DataForm component', () => {
 		it( 'should call onChange with the correct value for each typed character', async () => {
 			const onChange = jest.fn();
 			render(
-				<Dataform
+				<StatefulDataform
 					onChange={ onChange }
 					fields={ fields }
 					form={ form }
@@ -189,7 +211,7 @@ describe( 'DataForm component', () => {
 				},
 			];
 			render(
-				<Dataform
+				<StatefulDataform
 					onChange={ onChange }
 					fields={ fieldsWithTime }
 					form={ { ...form, fields: [ 'startTime' ] } }
@@ -496,7 +518,7 @@ describe( 'DataForm component', () => {
 		it( 'should call onChange with the correct value for each typed character', async () => {
 			const onChange = jest.fn();
 			render(
-				<Dataform
+				<StatefulDataform
 					onChange={ onChange }
 					fields={ fields }
 					form={ formPanelMode }
@@ -608,6 +630,76 @@ describe( 'DataForm component', () => {
 				'This is the Title Field'
 			);
 			expect( titleEditField ).toBeInTheDocument();
+		} );
+
+		it( 'should describe an invalid field trigger with its error message', async () => {
+			const user = userEvent.setup();
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ formPanelMode }
+					data={ { ...data, title: '' } }
+					validity={ {
+						title: {
+							required: {
+								type: 'invalid' as const,
+								message: 'Title is required.',
+							},
+						},
+					} }
+				/>
+			);
+
+			// The row only reveals the error after its flyout has been
+			// open once.
+			await user.click( fieldsSelector.title.view() );
+			await user.keyboard( '{Escape}' );
+			const titleButton = await screen.findByRole( 'button', {
+				name: 'Edit Title (has errors)',
+			} );
+			expect( titleButton ).toHaveAccessibleDescription(
+				/Title is required\./
+			);
+		} );
+
+		it( 'should describe an invalid field trigger when labels are hidden', async () => {
+			const user = userEvent.setup();
+			const formPanelNoLabel = {
+				...form,
+				layout: {
+					type: 'panel',
+					labelPosition: 'none',
+				} as const,
+			};
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ formPanelNoLabel }
+					data={ { ...data, title: '' } }
+					validity={ {
+						title: {
+							required: {
+								type: 'invalid' as const,
+								message: 'Title is required.',
+							},
+						},
+					} }
+				/>
+			);
+
+			// The row only reveals the error after its flyout has been
+			// open once.
+			await user.click( fieldsSelector.title.view() );
+			await user.keyboard( '{Escape}' );
+
+			const titleButton = await screen.findByRole( 'button', {
+				name: 'Edit Title (has errors)',
+			} );
+			expect( titleButton ).toHaveAccessibleDescription(
+				/Title is required\./
+			);
 		} );
 	} );
 
@@ -1002,6 +1094,22 @@ describe( 'DataForm component', () => {
 	} );
 
 	describe( 'datetime fields', () => {
+		const originalSettings = getSettings();
+
+		beforeEach( () => {
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					...originalSettings.timezone,
+					string: 'UTC',
+				},
+			} );
+		} );
+
+		afterEach( () => {
+			setSettings( originalSettings );
+		} );
+
 		const datetimeFields = [
 			{
 				id: 'date',

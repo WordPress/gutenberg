@@ -1,12 +1,12 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "node" ]
+		"types": [ "jest", "node" ]
 	},
-	"exclude": [ "src/y-utilities/y-multidoc-undomanager.js" ],
 	"references": [
-		{ "path": "../api-fetch" },
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../hooks" },
 		{ "path": "../private-apis" },
 		{ "path": "../undo-manager" }

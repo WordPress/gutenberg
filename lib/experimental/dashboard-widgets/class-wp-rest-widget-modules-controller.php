@@ -337,7 +337,7 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 								'icon'         => array( 'type' => 'string' ),
 								'relevance'    => array(
 									'type' => 'string',
-									'enum' => array( 'high', 'low' ),
+									'enum' => array( 'high', 'medium', 'low' ),
 								),
 								'href'         => array( 'type' => 'string' ),
 								'download'     => array( 'type' => array( 'string', 'boolean' ) ),

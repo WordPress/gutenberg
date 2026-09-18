@@ -146,23 +146,10 @@
 
 // Tabs, Inputs, Square buttons.
 @mixin input-style__neutral() {
-	box-shadow: 0 0 0 transparent;
-	border-radius: variables.$radius-small;
-	border: variables.$border-width solid colors.$gray-600;
-
-	@media not (prefers-reduced-motion) {
-		transition: box-shadow 0.1s linear;
-	}
+	border: wpds.var("--wpds-border-width-xs") solid wpds.var("--wpds-color-stroke-interactive-neutral");
+	border-radius: wpds.var("--wpds-border-radius-sm");
 }
 
-
-@mixin input-style__focus() {
-	border-color: var(--wp-admin-theme-color);
-	// Expand the default border focus style by .5px to be a total of 1.5px.
-	box-shadow: 0 0 0 0.5px var(--wp-admin-theme-color);
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-}
 
 @mixin button-style__focus() {
 	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
@@ -189,9 +176,7 @@
  */
 
 @mixin outset-ring__focus() {
-	--focus-color: #{ wpds.var("--wpds-color-stroke-focus") };
-
-	outline: wpds.var("--wpds-border-width-focus") solid var(--focus-color);
+	outline: wpds.var("--wpds-border-width-focus") solid var(--focus-color, #{ wpds.var("--wpds-color-stroke-focus") });
 	outline-offset: wpds.var("--wpds-border-width-focus");
 }
 
@@ -310,8 +295,17 @@
 		line-height: normal;
 	}
 
+	// TODO: Align `checkbox-control` hover styles with the design system, then drop `[type="checkbox"]` exclusion.
+	&:hover:not(:disabled, [aria-disabled="true"], [type="checkbox"]) {
+		border-color: wpds.var("--wpds-color-stroke-interactive-neutral-active");
+	}
+
 	&:focus {
-		@include input-style__focus();
+		@include outset-ring__focus();
+
+		// Neutralize wp-admin forms.css focus styles.
+		border-color: wpds.var("--wpds-color-stroke-interactive-neutral");
+		box-shadow: none;
 	}
 
 	// Use opacity to work in various editor styles.

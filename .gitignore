@@ -34,6 +34,7 @@ yarn.lock
 
 .eslintcache
 *.tsbuildinfo
+/test/unit/.vitest-*-typecheck.json
 
 # Generated native views of repository agent skills
 /.claude/skills/

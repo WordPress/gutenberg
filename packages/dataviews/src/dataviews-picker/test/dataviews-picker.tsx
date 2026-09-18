@@ -496,6 +496,67 @@ describe( 'DataViews Picker', () => {
 				);
 			} );
 		} );
+
+		describe( 'media fit', () => {
+			// Both the flat and grouped branches put the class on the listbox:
+			// the flat branch renders `GridItems` as the listbox itself, and
+			// the grouped one nests its per-group grids inside it.
+			it( 'crops previews by default', () => {
+				render( <Picker /> );
+				expect( screen.getByRole( 'listbox' ) ).not.toHaveClass(
+					'has-media-fit-contain'
+				);
+			} );
+
+			it( 'fits previews when configured to contain', () => {
+				render(
+					<Picker
+						view={
+							{
+								layout: { mediaFit: 'contain' },
+							} as Partial< ViewPickerGrid >
+						}
+					/>
+				);
+				expect( screen.getByRole( 'listbox' ) ).toHaveClass(
+					'has-media-fit-contain'
+				);
+			} );
+
+			it( 'ignores an unsupported value and falls back to cropping', () => {
+				render(
+					<Picker
+						view={
+							{
+								// Deliberately outside the `MediaFit` union.
+								layout: { mediaFit: 'fill' },
+							} as unknown as Partial< ViewPickerGrid >
+						}
+					/>
+				);
+				expect( screen.getByRole( 'listbox' ) ).not.toHaveClass(
+					'has-media-fit-contain'
+				);
+			} );
+
+			it( 'applies the fit when the data is grouped', () => {
+				render(
+					<Picker
+						fields={ groupingFields }
+						view={
+							{
+								groupBy: { field: 'parity', direction: 'asc' },
+								layout: { mediaFit: 'contain' },
+							} as Partial< ViewPickerGrid >
+						}
+					/>
+				);
+
+				expect( screen.getByRole( 'listbox' ) ).toHaveClass(
+					'has-media-fit-contain'
+				);
+			} );
+		} );
 	} );
 
 	describe.each( [
@@ -664,7 +725,7 @@ describe( 'DataViews Picker', () => {
 
 			// Both "Grid" and "Table" picker layout options must appear in the menu.
 			expect(
-				screen.getByRole( 'menuitemradio', { name: 'Grid' } )
+				await screen.findByRole( 'menuitemradio', { name: 'Grid' } )
 			).toBeInTheDocument();
 			expect(
 				screen.getByRole( 'menuitemradio', { name: 'Table' } )

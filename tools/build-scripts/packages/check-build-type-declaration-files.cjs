@@ -28,7 +28,16 @@ const chalk = require( 'chalk' );
  * @return {boolean} whether or not the package checksJs.
  */
 async function packageNeedsExtraCheck( packagePath ) {
-	const configPath = path.join( packagePath, 'tsconfig.json' );
+	/*
+	 * A split package compiles src from tsconfig.build.json; its default
+	 * tsconfig.json is the dev project.
+	 */
+	let configPath = path.join( packagePath, 'tsconfig.build.json' );
+	try {
+		await fs.access( configPath );
+	} catch {
+		configPath = path.join( packagePath, 'tsconfig.json' );
+	}
 
 	try {
 		const tsconfigRaw = await fs.readFile( configPath, 'utf-8' );

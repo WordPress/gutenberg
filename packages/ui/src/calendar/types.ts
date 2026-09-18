@@ -164,6 +164,21 @@ export interface BaseProps
 		'onSelect' | 'defaultValue' | 'role'
 	> {
 	/**
+	 * The ARIA role for the calendar's root element.
+	 *
+	 * The default `application` role helps assistive technologies pass calendar
+	 * navigation keys to the component. Its accessible name includes the current
+	 * month.
+	 *
+	 * Changing this role can affect screen-reader keyboard navigation. Only
+	 * override it for a tested composition. Apply roles that require additional
+	 * behavior, such as `dialog`, to a wrapper.
+	 *
+	 * @default 'application'
+	 */
+	role?: ComponentProps< 'div' >[ 'role' ];
+
+	/**
 	 * Whether the selection is required.
 	 * When `true`, there always needs to be a date selected.
 	 * @default false
@@ -225,7 +240,7 @@ export interface BaseProps
 	 * Use custom labels, useful for translating the component.
 	 *
 	 * For a correct localized experience, consumers should make sure the locale
-	 * used for the translated labels and `locale` prop are consistent.
+	 * used for translated labels and date text is consistent.
 	 */
 	labels?: {
 		/**
@@ -245,12 +260,12 @@ export interface BaseProps
 		labelGridcell?: ( date: Date, modifiers?: Modifiers ) => string;
 		/**
 		 * The label for the "next month" button.
-		 * @default "Go to the Next Month"
+		 * @default "Next month"
 		 */
 		labelNext?: ( month: Date | undefined ) => string;
 		/**
 		 * The label for the "previous month" button.
-		 * @default "Go to the Previous Month"
+		 * @default "Previous month"
 		 */
 		labelPrevious?: ( month: Date | undefined ) => string;
 		/**
@@ -266,19 +281,30 @@ export interface BaseProps
 	};
 
 	/**
-	 * The locale object used to localize dates. Pass a locale from
-	 * `date-fns/locale` to localize the calendar.
+	 * A BCP 47 locale code or date-fns locale object used to localize date text,
+	 * numerals, the default text direction, and the first day of the week.
+	 *
+	 * The locale code derives the first day of the week when the browser provides
+	 * that information, whether passed directly or through a date-fns locale
+	 * object. Use `weekStartsOn` to override this default.
+	 *
+	 * Invalid or unsupported locale codes fall back to `en-US` for date text.
+	 * A date-fns locale object with an unsupported code retains its own first-day
+	 * setting.
 	 *
 	 * For a correct localized experience, consumers should make sure the locale
-	 * used for the translated labels and `locale` prop are consistent.
+	 * used for translated labels and date text is consistent.
+	 *
+	 * The calendar always uses a Gregorian date grid. The locale does not change
+	 * the underlying calendar system.
 	 * @see https://github.com/date-fns/date-fns/tree/main/src/locale for a list of the supported locales
 	 * @default The `enUS` locale from `date-fns/locale`
 	 */
-	locale?: Locale;
+	locale?: Locale | string;
 	/**
 	 * The index of the first day of the week (0 - Sunday). Overrides the locale's
 	 * one.
-	 * @default Based on the `locale` prop
+	 * @default Based on the `locale` prop when available
 	 */
 	weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | undefined;
 	/**

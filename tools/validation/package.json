@@ -24,7 +24,7 @@
 		"wp-validate-package-contents": "./validate-package-contents.mjs"
 	},
 	"devDependencies": {
-		"@mawesome/dependency-audit": "^0.4.5",
+		"@mawesome/dependency-audit": "^0.4.6",
 		"@wordpress/create-block": "file:../../packages/create-block",
 		"@wordpress/scripts": "file:../../packages/scripts",
 		"chalk": "^4.1.1",

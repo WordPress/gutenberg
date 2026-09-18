@@ -1,0 +1,26 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"rootDir": ".",
+		"noEmit": true,
+		"emitDeclarationOnly": false,
+		"composite": false,
+		"types": [ "style-imports" ]
+	},
+	"references": [
+		{ "path": "../../packages/admin-ui/tsconfig.build.json" },
+		{ "path": "../../packages/api-fetch/tsconfig.build.json" },
+		{ "path": "../../packages/components/tsconfig.build.json" },
+		{ "path": "../../packages/core-data/tsconfig.build.json" },
+		{ "path": "../../packages/data" },
+		{ "path": "../../packages/dataviews/tsconfig.build.json" },
+		{ "path": "../../packages/element/tsconfig.build.json" },
+		{ "path": "../../packages/i18n/tsconfig.build.json" },
+		{ "path": "../../packages/notices/tsconfig.build.json" },
+		{ "path": "../../packages/ui/tsconfig.build.json" }
+	],
+	"include": [ "**/*.ts", "**/*.tsx" ],
+	"exclude": [ "build", "node_modules" ]
+}

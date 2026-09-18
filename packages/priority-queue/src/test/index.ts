@@ -10,11 +10,13 @@ jest.mock( '../request-idle-callback', () => {
 	const emitter = new ( jest.requireActual( 'events' ).EventEmitter )();
 
 	return Object.assign(
-		( callback ) =>
+		( callback: ( deadline: number ) => void ) =>
 			emitter.once( 'tick', ( deadline = Date.now() ) =>
 				callback( deadline )
 			),
-		{ tick: ( deadline ) => emitter.emit( 'tick', deadline ) }
+		{
+			tick: ( deadline?: number ) => emitter.emit( 'tick', deadline ),
+		}
 	);
 } );
 

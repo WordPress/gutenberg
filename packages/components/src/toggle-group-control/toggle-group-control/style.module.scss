@@ -52,8 +52,6 @@
 	&:focus-within {
 		z-index: 1;
 		@include mixins.outset-ring__focus();
-		// Preserve validated-control accent overrides.
-		outline-color: $components-color-focus;
 	}
 }
 

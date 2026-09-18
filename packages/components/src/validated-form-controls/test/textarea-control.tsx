@@ -2,6 +2,23 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ValidatedTextareaControl } from '../components';
 
+describe( 'Shows a deprecation warning', () => {
+	it( 'ValidatedTextareaControl', () => {
+		render(
+			<ValidatedTextareaControl
+				label="Bio"
+				help="A short bio."
+				onChange={ () => {} }
+				value=""
+			/>
+		);
+
+		expect( console ).toHaveWarnedWith(
+			'wp.components.privateApis.ValidatedTextareaControl is deprecated since version 7.2. Please use ValidatedTextareaControl from @wordpress/ui instead. Note: This private API will be completely removed within a few Gutenberg plugin releases.'
+		);
+	} );
+} );
+
 describe( 'ValidatedTextareaControl', () => {
 	it( 'should preserve the help description', () => {
 		render(

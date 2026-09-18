@@ -1,6 +1,57 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Dropdown from '..';
+import { DropdownContentWrapper } from '../dropdown-content-wrapper';
+import styles from '../style.module.scss';
+
+describe( 'DropdownContentWrapper', () => {
+	it( 'should apply the small padding class by default', () => {
+		render(
+			<DropdownContentWrapper>
+				<span>content</span>
+			</DropdownContentWrapper>
+		);
+
+		// Disable reason: Semantic queries can't reach the wrapper.
+		// eslint-disable-next-line testing-library/no-node-access
+		expect( screen.getByText( 'content' ).parentElement ).toHaveClass(
+			styles[ 'content-wrapper' ],
+			styles[ 'padding-small' ]
+		);
+	} );
+
+	it( 'should apply the medium padding class', () => {
+		render(
+			<DropdownContentWrapper paddingSize="medium">
+				<span>content</span>
+			</DropdownContentWrapper>
+		);
+
+		// Disable reason: Semantic queries can't reach the wrapper.
+		// eslint-disable-next-line testing-library/no-node-access
+		const wrapper = screen.getByText( 'content' ).parentElement;
+		expect( wrapper ).toHaveClass(
+			styles[ 'content-wrapper' ],
+			styles[ 'padding-medium' ]
+		);
+		expect( wrapper ).not.toHaveClass( styles[ 'padding-small' ] );
+	} );
+
+	it( 'should omit padding classes when paddingSize is none', () => {
+		render(
+			<DropdownContentWrapper paddingSize="none">
+				<span>content</span>
+			</DropdownContentWrapper>
+		);
+
+		// Disable reason: Semantic queries can't reach the wrapper.
+		// eslint-disable-next-line testing-library/no-node-access
+		const wrapper = screen.getByText( 'content' ).parentElement;
+		expect( wrapper ).toHaveClass( styles[ 'content-wrapper' ] );
+		expect( wrapper ).not.toHaveClass( styles[ 'padding-small' ] );
+		expect( wrapper ).not.toHaveClass( styles[ 'padding-medium' ] );
+	} );
+} );
 
 describe( 'Dropdown', () => {
 	it( 'should toggle the dropdown properly', async () => {

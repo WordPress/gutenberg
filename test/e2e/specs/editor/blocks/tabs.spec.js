@@ -279,6 +279,83 @@ test.describe( 'Tabs', () => {
 		} );
 	} );
 
-	// TODO: Add a `Frontend functionality` describe block for front-end
-	// interaction tests (e.g. switching tabs on the published post).
+	// TODO: Extend this with the remaining front-end interactions
+	// (e.g. switching tabs by click and by keyboard on the published post).
+	test.describe( 'Frontend functionality', () => {
+		test( 'keeps the content of inactive panels available to find-in-page', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			await admin.createNewPost();
+			await editor.insertBlock( {
+				name: 'core/tabs',
+				innerBlocks: [
+					{ name: 'core/tab-list' },
+					{
+						name: 'core/tab-panels',
+						innerBlocks: [
+							{
+								name: 'core/tab-panel',
+								attributes: { label: 'Tab 1' },
+								innerBlocks: [
+									{
+										name: 'core/paragraph',
+										attributes: { content: 'Panel 1' },
+									},
+								],
+							},
+							{
+								name: 'core/tab-panel',
+								attributes: { label: 'Tab 2' },
+								innerBlocks: [
+									{
+										name: 'core/paragraph',
+										attributes: { content: 'Panel 2' },
+									},
+								],
+							},
+						],
+					},
+				],
+			} );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const panels = page.locator( '.wp-block-tab-panel' );
+			const activePanel = panels.first();
+			const inactivePanel = panels.last();
+
+			// The inactive panel is hidden with `until-found` rather than
+			// outright, which is what leaves its text searchable.
+			await expect( inactivePanel ).toHaveAttribute(
+				'hidden',
+				'until-found'
+			);
+			await expect( activePanel ).not.toHaveAttribute( 'hidden' );
+
+			// It still occupies no space and stays out of the tab sequence.
+			await expect
+				.poll( () =>
+					inactivePanel.evaluate(
+						( el ) => el.getBoundingClientRect().height
+					)
+				)
+				.toBe( 0 );
+			await expect( inactivePanel ).toHaveAttribute( 'tabindex', '-1' );
+
+			// Revealing the panel, as find-in-page does, activates its tab.
+			await inactivePanel.dispatchEvent( 'beforematch' );
+
+			await expect( inactivePanel ).not.toHaveAttribute( 'hidden' );
+			await expect( activePanel ).toHaveAttribute(
+				'hidden',
+				'until-found'
+			);
+			await expect(
+				page.getByRole( 'tab', { name: 'Tab 2' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+		} );
+	} );
 } );

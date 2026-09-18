@@ -155,7 +155,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'wp-block-hidden-mobile', $result, 'Block should have the visibility class for the mobile viewport size.' );
 
-		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 
 		$this->assertSame(
 			'@media (width <= 480px){.wp-block-hidden-mobile{display:none !important;}}',
@@ -188,7 +188,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'class="existing-class wp-block-hidden-tablet"', $result, 'Block should have the existing class and the visibility class for the tablet viewport size in the class attribute.' );
 
-		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 
 		$this->assertSame(
 			'@media (480px < width <= 782px){.wp-block-hidden-tablet{display:none !important;}}',
@@ -222,7 +222,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'class="wp-block-hidden-desktop"', $result, 'Block should have the visibility class for the desktop viewport size in the class attribute.' );
 
-		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 
 		$this->assertSame(
 			'@media (width > 782px){.wp-block-hidden-desktop{display:none !important;}}',
@@ -260,7 +260,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 			'Block should have both visibility classes in the class attribute'
 		);
 
-		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 
 		$this->assertSame(
 			'@media (width > 782px){.wp-block-hidden-desktop{display:none !important;}}@media (width <= 480px){.wp-block-hidden-mobile{display:none !important;}}',

@@ -1,7 +1,7 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { CheckboxControl } from '@wordpress/components';
-import { ControlWithError } from './control-with-error';
+import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 
 type CheckboxControlProps = React.ComponentProps< typeof CheckboxControl >;
@@ -23,6 +23,7 @@ const UnforwardedValidatedCheckboxControl = (
 
 	return (
 		<ControlWithError
+			className="dataviews-validated-control"
 			required={ required }
 			markWhenOptional={ markWhenOptional }
 			ref={ mergedRefs }

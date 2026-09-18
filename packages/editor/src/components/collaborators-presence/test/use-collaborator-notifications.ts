@@ -97,8 +97,12 @@ function makeCollaborator(
 const me = makeCollaborator( 1, 'Me', BASE_ENTERED_AT + 5000, {
 	isMe: true,
 } );
-const alice = makeCollaborator( 100, 'Alice', BASE_ENTERED_AT + 1000 );
-const bob = makeCollaborator( 200, 'Bob', BASE_ENTERED_AT + 10000 );
+const alice = makeCollaborator( 100, 'Alice', BASE_ENTERED_AT + 1000, {
+	clientId: 1000,
+} );
+const bob = makeCollaborator( 200, 'Bob', BASE_ENTERED_AT + 10000, {
+	clientId: 2000,
+} );
 
 // --- Setup ---
 
@@ -182,6 +186,29 @@ describe( 'useCollaboratorNotifications', () => {
 					id: 'collab-user-entered-200',
 					type: 'snackbar',
 					isDismissible: false,
+				} )
+			);
+		} );
+
+		it( 'uses the session ID for a fallback collaborator notification', () => {
+			const fallbackCollaborator = {
+				...bob,
+				clientId: 321,
+				collaboratorInfo: {
+					...bob.collaboratorInfo,
+					id: null,
+					name: 'Anonymous User',
+				},
+			};
+			renderNotifications();
+
+			mockRegistered.join?.( fallbackCollaborator, me );
+
+			expect( mockCreateNotice ).toHaveBeenCalledWith(
+				'info',
+				'Anonymous User has joined the post.',
+				expect.objectContaining( {
+					id: 'collab-user-entered-321',
 				} )
 			);
 		} );

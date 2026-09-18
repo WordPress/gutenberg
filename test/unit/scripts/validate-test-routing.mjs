@@ -2,7 +2,6 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import {
 	discoverTestFiles,
@@ -11,8 +10,8 @@ import {
 	getVitestTestsByProject,
 	VITEST_PROJECT_NAMES,
 } from './discover-test-files.mjs';
+import { resolvePackageBin } from './resolve-package-bin.mjs';
 
-const require = createRequire( import.meta.url );
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../../..'
@@ -31,17 +30,6 @@ function normalizeTestPath( testPath ) {
 		.relative( ROOT_DIR, path.resolve( ROOT_DIR, testPath ) )
 		.split( path.sep )
 		.join( '/' );
-}
-
-function resolvePackageBin( packageName ) {
-	const packageJsonPath = require.resolve( `${ packageName }/package.json` );
-	const packageJson = JSON.parse( readFileSync( packageJsonPath, 'utf8' ) );
-	const binPath =
-		typeof packageJson.bin === 'string'
-			? packageJson.bin
-			: packageJson.bin[ packageName ];
-
-	return path.resolve( path.dirname( packageJsonPath ), binPath );
 }
 
 function listTests( packageName, args ) {

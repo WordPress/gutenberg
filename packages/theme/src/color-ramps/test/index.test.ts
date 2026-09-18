@@ -1,4 +1,5 @@
 import { serialize, to, HSL, sRGB } from 'colorjs.io/fn';
+import { buildAccentRamp, buildBgRamp, checkAccessibleCombinations } from '..';
 import { buildRamp } from '../lib';
 import { getColorString } from '../lib/color-utils';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
@@ -95,10 +96,10 @@ describe( 'buildRamps', () => {
 
 		const allPrimaryColors = [
 			...Object.values( DEFAULT_SEED_COLORS ),
-			'#52accc', // WP Admin "blue" theme accent
-			'#c7a589', // WP Admin "coffee" theme accent
-			'#a3b745', // WP Admin "ectoplasm" theme accent
-			'#dd823b', // WP Admin "sunrise" theme accent
+			'#437aa8', // WP Admin "blue" theme accent
+			'#916745', // WP Admin "coffee" theme accent
+			'#646c3e', // WP Admin "ectoplasm" theme accent
+			'#ad631e', // WP Admin "sunrise" theme accent
 		];
 
 		expect(
@@ -120,5 +121,26 @@ describe( 'buildRamps', () => {
 				} )
 			)
 		).toMatchSnapshot();
+	} );
+
+	it( 'does not return warnings resolved by seed rescaling', () => {
+		const result = buildBgRamp( '#3876a8' );
+
+		expect( result.warnings ).toBeUndefined();
+	} );
+
+	it( 'includes active fills when checking accessible combinations', () => {
+		const bgRamp = buildBgRamp( '#4f386e' );
+		const accentRamp = buildAccentRamp( '#608010', bgRamp );
+
+		expect( checkAccessibleCombinations( { bgRamp: accentRamp } ) ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					bgName: 'bgFill2',
+					fgName: 'fgFill',
+					unmetContrast: 4.5,
+				} ),
+			] )
+		);
 	} );
 } );

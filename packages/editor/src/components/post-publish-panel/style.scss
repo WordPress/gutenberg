@@ -81,10 +81,6 @@
 	padding-right: $grid-unit-05;
 }
 
-.editor-post-publish-panel__header-published {
-	flex-grow: 1;
-}
-
 .editor-post-publish-panel__footer {
 	padding: $grid-unit-20;
 }
@@ -118,10 +114,6 @@
 		background: $white;
 		margin-left: -$grid-unit-20;
 		margin-right: -$grid-unit-20;
-	}
-
-	.editor-post-visibility__dialog-legend {
-		display: none;
 	}
 
 	.components-panel__body-title .components-button {
@@ -187,19 +179,6 @@
 
 .post-publish-panel__postpublish-subheader {
 	margin: 0 0 $grid-unit-10;
-}
-
-.post-publish-panel__tip {
-	color: $alert-yellow;
-}
-
-@media screen and (max-width: 782px) {
-	.post-publish-panel__postpublish-post-address__button-wrap {
-		// match copy button height to the address field height in smaller screens
-		.components-button {
-			height: 40px;
-		}
-	}
 }
 
 .editor-post-publish-panel {

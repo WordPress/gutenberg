@@ -1,0 +1,59 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.indicator {
+			--_gcd-p-font-size: var(--wpds-typography-font-size-sm);
+			--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
+			--_gcd-p-margin: var(--wpds-dimension-gap-sm) 0 0;
+
+			display: flex;
+			align-items: flex-start;
+			gap: var(--wpds-dimension-gap-xs);
+			margin-block: var(--wpds-dimension-gap-sm) 0;
+			margin-inline: 0;
+			font-family: var(--wpds-typography-font-family-body);
+			font-size: var(--wpds-typography-font-size-sm);
+
+			/* Matches the icon size. */
+			line-height: var(--wpds-typography-line-height-xs);
+			color: var(--wpds-color-foreground-content-neutral-weak);
+
+			@media not (prefers-reduced-motion) {
+				animation:
+					indicator-jump var(--wpds-motion-duration-md)
+					cubic-bezier(0.68, -0.55, 0.27, 1.55);
+			}
+		}
+
+		.is-invalid {
+			color: var(--wpds-color-foreground-content-error-weak);
+		}
+
+		.is-valid {
+			color: var(--wpds-color-foreground-content-success-weak);
+		}
+
+		.indicator-icon {
+			flex-shrink: 0;
+		}
+
+		.indicator-spinner {
+			margin: 2px;
+			width: var(--wpds-dimension-size-3xs);
+			height: var(--wpds-dimension-size-3xs);
+		}
+
+		@keyframes indicator-jump {
+			0% {
+				transform: translateY(-4px);
+				opacity: 0;
+			}
+
+			100% {
+				transform: translateY(0);
+				opacity: 1;
+			}
+		}
+	}
+}

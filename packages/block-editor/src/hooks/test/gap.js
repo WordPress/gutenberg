@@ -1,6 +1,36 @@
-import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../gap';
+import {
+	getGapCSSValue,
+	getGapBoxControlValueFromStyle,
+	isAxialBlockGapAllowed,
+} from '../gap';
 
 describe( 'gap', () => {
+	describe( 'isAxialBlockGapAllowed()', () => {
+		it( 'should allow axial block gap for Flex layouts', () => {
+			expect( isAxialBlockGapAllowed( { type: 'flex' } ) ).toBe( true );
+		} );
+
+		it( 'should allow axial block gap for Grid layouts', () => {
+			expect( isAxialBlockGapAllowed( { type: 'grid' } ) ).toBe( true );
+		} );
+
+		it( 'should not allow axial block gap for Flow layouts', () => {
+			expect( isAxialBlockGapAllowed( { type: 'flow' } ) ).toBe( false );
+		} );
+
+		it( 'should not allow axial block gap for Constrained layouts', () => {
+			expect( isAxialBlockGapAllowed( { type: 'constrained' } ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should use the default layout when the block has no layout attribute', () => {
+			expect(
+				isAxialBlockGapAllowed( undefined, { type: 'flex' } )
+			).toBe( true );
+		} );
+	} );
+
 	describe( 'getGapBoxControlValueFromStyle()', () => {
 		it( 'should return `null` if argument is falsey', () => {
 			expect( getGapBoxControlValueFromStyle( undefined ) ).toBeNull();

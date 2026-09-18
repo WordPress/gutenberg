@@ -50,9 +50,21 @@ export function useSetActiveTemplateAction(): Action< Template > {
 			async callback( items: Template[] ) {
 				const deactivate = items.some( ( item ) => item._isActive );
 				// current active templates
-				const activeTemplates = {
-					...( ( await getEntityRecord( 'root', 'site' ) )
-						?.active_templates ?? {} ),
+				const siteRecord = ( await getEntityRecord(
+					'root',
+					'site'
+				) ) as
+					| {
+							/* Experimental option, absent from the
+							   `Settings` entity type. */
+							active_templates?: Record<
+								string,
+								Template[ 'id' ]
+							>;
+					  }
+					| undefined;
+				const activeTemplates: Record< string, Template[ 'id' ] > = {
+					...( siteRecord?.active_templates ?? {} ),
 				};
 				for ( const item of items ) {
 					if ( deactivate ) {
@@ -61,6 +73,7 @@ export function useSetActiveTemplateAction(): Action< Template > {
 						activeTemplates[ item.slug ] = item.id;
 					}
 				}
+				// The site entity is a singleton and has no record key.
 				await editEntityRecord( 'root', 'site', undefined, {
 					active_templates: activeTemplates,
 				} );

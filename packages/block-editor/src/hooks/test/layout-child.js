@@ -1,4 +1,9 @@
-import { getChildLayoutStyleRules } from '../layout-child';
+import {
+	getChildLayoutStyleRules,
+	getChildLayoutStyles,
+	getResponsiveChildLayoutStyles,
+	getUpdatedChildLayoutStyle,
+} from '../layout-child';
 
 describe( 'layout child', () => {
 	describe( 'getChildLayoutStyleRules()', () => {
@@ -157,6 +162,60 @@ describe( 'layout child', () => {
 					},
 				},
 			] );
+		} );
+	} );
+
+	describe( 'getUpdatedChildLayoutStyle()', () => {
+		it( 'stores resizer changes in the selected viewport when no default child layout exists', () => {
+			const style = getUpdatedChildLayoutStyle(
+				undefined,
+				{
+					columnSpan: 2,
+					rowSpan: 1,
+				},
+				{
+					viewport: '@mobile',
+					pseudo: 'default',
+				}
+			);
+
+			expect(
+				getChildLayoutStyles( {
+					selector: '.wp-container-content-test',
+					layout: style?.layout,
+				} )
+			).toBe( '' );
+			expect(
+				getResponsiveChildLayoutStyles( {
+					style,
+					selector: '.wp-container-content-test',
+				} )
+			).toBe(
+				'@media (width <= 480px){.wp-container-content-test {\n\t\tgrid-column: span 2; grid-row: span 1;\n\t}}'
+			);
+		} );
+
+		it( 'stores resizer changes in the selected viewport when a pseudo state is also selected', () => {
+			expect(
+				getUpdatedChildLayoutStyle(
+					undefined,
+					{
+						columnSpan: 2,
+						rowSpan: 1,
+					},
+					{
+						viewport: '@mobile',
+						pseudo: ':hover',
+					}
+				)
+			).toEqual( {
+				'@mobile': {
+					layout: {
+						columnSpan: 2,
+						rowSpan: 1,
+					},
+				},
+			} );
 		} );
 	} );
 } );

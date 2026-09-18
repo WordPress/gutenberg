@@ -29,6 +29,47 @@ describe( 'Confirm', () => {
 					expect( el ).toBeInTheDocument();
 				} );
 			} );
+			it( 'uses title as the dialog accessible name while the default header is hidden', () => {
+				const title = 'Delete item?';
+
+				render(
+					<ConfirmDialog
+						title={ title }
+						onConfirm={ noop }
+						onCancel={ noop }
+					>
+						Are you sure?
+					</ConfirmDialog>
+				);
+
+				expect(
+					screen.getByRole( 'dialog', { name: title } )
+				).toBeInTheDocument();
+				expect(
+					screen.queryByRole( 'heading', { name: title } )
+				).not.toBeInTheDocument();
+			} );
+			it( 'renders the title heading when __experimentalHideHeader is false', () => {
+				const title = 'Delete item?';
+
+				render(
+					<ConfirmDialog
+						title={ title }
+						__experimentalHideHeader={ false }
+						onConfirm={ noop }
+						onCancel={ noop }
+					>
+						Are you sure?
+					</ConfirmDialog>
+				);
+
+				expect(
+					screen.getByRole( 'dialog', { name: title } )
+				).toBeInTheDocument();
+				expect(
+					screen.getByRole( 'heading', { name: title } )
+				).toBeInTheDocument();
+			} );
 			it( 'should render correctly with custom button labels', () => {
 				const cancelButtonText = 'No thanks';
 				const confirmButtonText = 'Yes please!';

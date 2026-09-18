@@ -44,16 +44,8 @@ describe( 'MediaEditorCropPanel', () => {
 		).toBe( '0' );
 	} );
 
-	it( 'omits the image controls by default', () => {
+	it( 'renders rotate, flip and zoom controls', () => {
 		setupCropPanel();
-
-		expect( screen.queryByText( 'Rotate' ) ).not.toBeInTheDocument();
-		expect( screen.queryByText( 'Flip' ) ).not.toBeInTheDocument();
-		expect( screen.queryByText( 'Zoom' ) ).not.toBeInTheDocument();
-	} );
-
-	it( 'renders rotate, flip and zoom controls when showTransformControls is set', () => {
-		setupCropPanel( { showTransformControls: true } );
 
 		expect( screen.getByText( 'Rotate' ) ).toBeInTheDocument();
 		expect( screen.getByText( 'Flip' ) ).toBeInTheDocument();
@@ -67,7 +59,7 @@ describe( 'MediaEditorCropPanel', () => {
 	} );
 
 	it( 'renders the image controls above the aspect-ratio selector', () => {
-		setupCropPanel( { showTransformControls: true } );
+		setupCropPanel();
 
 		const rotate = screen.getByText( 'Rotate' );
 		const aspectRatio = screen.getByLabelText( 'Aspect ratio' );

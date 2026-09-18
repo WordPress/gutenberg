@@ -709,7 +709,7 @@ _Parameters_
 -   _props.href_ `[string]`: When `href` is provided then the menu item is represented as an anchor rather than button. It corresponds to the `href` attribute of the anchor.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
 -   _props.onClick_ `[Function]`: The callback function to be executed when the user clicks the menu item.
--   _props.other_ `[...*]`: Any additional props are passed through to the underlying [Button](/packages/components/src/button/README.md) component.
+-   _props.other_ `[...*]`: Any additional props are passed through to the underlying menu item component.
 
 _Returns_
 

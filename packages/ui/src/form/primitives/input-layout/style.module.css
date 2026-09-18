@@ -55,6 +55,21 @@
 			&:hover:not(.is-disabled, :has([data-can-disable-input-layout][data-disabled]), .is-borderless) {
 				border-color: var(--wpds-color-stroke-interactive-neutral-active);
 			}
+
+			/*
+			 * `data-validity-visible` is set by `ControlWithError` once the
+			 * control's validation state should be reported to the user.
+			 */
+			&:has(:invalid[data-validity-visible]) {
+				/* Read by the shared focus-ring mixin, so the ring matches the border. */
+				--focus-color: var(--wpds-color-stroke-interactive-error);
+
+				border-color: var(--wpds-color-stroke-interactive-error);
+
+				&:hover {
+					border-color: var(--wpds-color-stroke-interactive-error-active);
+				}
+			}
 		}
 
 		.slot-wrapper {

@@ -340,7 +340,7 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 
 		await editor.canvas
 			.getByRole( 'document', { name: 'Empty block' } )
-			.click();
+			.focus();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{ name: 'core/paragraph', attributes: { content: '' } },

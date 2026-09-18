@@ -243,7 +243,7 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'icon', $action_properties );
 		$this->assertArrayHasKey( 'relevance', $action_properties );
 		$this->assertSame(
-			array( 'high', 'low' ),
+			array( 'high', 'medium', 'low' ),
 			$action_properties['relevance']['enum']
 		);
 	}

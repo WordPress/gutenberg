@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/kebab-case",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "Convert strings to kebab-case, matching WordPress Core's `_wp_to_kebab_case()`.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

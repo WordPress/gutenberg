@@ -16,7 +16,12 @@ import type {
 import { DEFAULT_GRID } from '../utils/default-grid';
 import { normalizeGridSettings } from '../utils/normalize-grid-settings';
 import { DEFAULT_ROW_HEIGHT } from '../utils/row-height-presets';
-import type { WidgetGridSettings, DashboardWidget } from '../types';
+import { useDashboardPolicy } from '../components/dashboard-policy';
+import type {
+	CanPerformDashboardOperation,
+	WidgetGridSettings,
+	DashboardWidget,
+} from '../types';
 import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../types';
 
 type GridSettingsWithColumns = WidgetGridSettings & { columns: number };
@@ -113,7 +118,15 @@ interface InternalDashboardContextValue {
 	editMode: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	resolveWidgetModule: ResolveWidgetModule;
+
+	/**
+	 * Resolved policy. Every compound asks here, never the policy provider,
+	 * so further policy sources compose at this single point.
+	 */
+	canPerform: CanPerformDashboardOperation;
 }
+
+const ALLOW_EVERY_OPERATION: CanPerformDashboardOperation = () => true;
 
 interface CommitOptions {
 	exitEditMode?: boolean;
@@ -192,6 +205,54 @@ export function WidgetDashboardProvider( {
 	const [ stagingLayout, setStagingLayout ] =
 		useState< DashboardWidget[] >( committedLayout );
 
+	const policy = useDashboardPolicy();
+
+	// Normalized once, so every surface reads a boolean: an `undefined`
+	// answer denies everywhere instead of hiding the controls while the grid
+	// still lets the tile drag and resize.
+	const canPerform = useMemo< CanPerformDashboardOperation >(
+		() =>
+			policy
+				? ( request ) => !! policy( request )
+				: ALLOW_EVERY_OPERATION,
+		[ policy ]
+	);
+
+	// Every mutation stages through here. Instances the policy locks against
+	// removal are re-asserted right after the nearest preceding instance that
+	// survived, so no composed trigger can drop or displace them.
+	const stageLayout = useCallback(
+		( next: DashboardWidget[] ) => {
+			setStagingLayout( ( previous ) => {
+				const staged = [ ...next ];
+				let insertAt = 0;
+				previous.forEach( ( widget ) => {
+					const position = staged.findIndex(
+						( { uuid } ) => uuid === widget.uuid
+					);
+					if ( position !== -1 ) {
+						insertAt = position + 1;
+						return;
+					}
+					const removable = canPerform( {
+						operation: 'remove',
+						widget,
+						widgetType: widgetTypes.find(
+							( type ) => type.name === widget.type
+						),
+					} );
+					if ( removable ) {
+						return;
+					}
+					staged.splice( insertAt, 0, widget );
+					insertAt += 1;
+				} );
+				return staged.length === next.length ? next : staged;
+			} );
+		},
+		[ canPerform, widgetTypes ]
+	);
+
 	// External change in `layout` (consumer-side reset, cross-tab sync,
 	// websocket push, etc.) drops any in-flight staging edits without
 	// surfacing a warning. See the provider JSDoc for the trade-off.
@@ -264,7 +325,10 @@ export function WidgetDashboardProvider( {
 	}, [ committedLayout, onEditChange ] );
 
 	useEffect( () => {
-		if ( stagingLayout.length === 0 ) {
+		if (
+			stagingLayout.length === 0 &&
+			canPerform( { operation: 'customize' } )
+		) {
 			onEditChange?.( true );
 		}
 
@@ -279,7 +343,7 @@ export function WidgetDashboardProvider( {
 			widgetTypes,
 			isResolvingWidgetTypes,
 			layout: stagingLayout,
-			onLayoutChange: setStagingLayout,
+			onLayoutChange: stageLayout,
 			onLayoutReset,
 			gridSettings,
 			commit,
@@ -290,11 +354,13 @@ export function WidgetDashboardProvider( {
 			editMode,
 			onEditChange,
 			resolveWidgetModule,
+			canPerform,
 		} ),
 		[
 			widgetTypes,
 			isResolvingWidgetTypes,
 			stagingLayout,
+			stageLayout,
 			onLayoutReset,
 			gridSettings,
 			commit,
@@ -305,6 +371,7 @@ export function WidgetDashboardProvider( {
 			editMode,
 			onEditChange,
 			resolveWidgetModule,
+			canPerform,
 		]
 	);
 

@@ -5,12 +5,8 @@ import { cloneBlock } from '@wordpress/blocks';
 
 export default function useOutdentListItem() {
 	const registry = useRegistry();
-	const {
-		moveBlocksToPosition,
-		removeBlock,
-		insertBlock,
-		updateBlockListSettings,
-	} = useDispatch( blockEditorStore );
+	const { moveBlocksToPosition, removeBlock, removeBlocks, insertBlock } =
+		useDispatch( blockEditorStore );
 	const {
 		getBlockRootClientId,
 		getBlockName,
@@ -18,7 +14,6 @@ export default function useOutdentListItem() {
 		getBlockIndex,
 		getSelectedBlockClientIds,
 		getBlock,
-		getBlockListSettings,
 	} = useSelect( blockEditorStore );
 
 	function getParentListItemId( id ) {
@@ -65,29 +60,28 @@ export default function useOutdentListItem() {
 
 		registry.batch( () => {
 			if ( followingListItems.length ) {
-				let nestedListId = getBlockOrder( firstClientId )[ 0 ];
+				const nestedListId = getBlockOrder( firstClientId )[ 0 ];
 
-				if ( ! nestedListId ) {
+				if ( nestedListId ) {
+					moveBlocksToPosition(
+						followingListItems,
+						parentListId,
+						nestedListId
+					);
+				} else {
+					// Insert the list with the items already inside: an
+					// empty list would be scaffolded with the list block
+					// type's template at insertion. Removing the items
+					// first frees them to be reinserted with their client
+					// IDs kept.
 					const nestedListBlock = cloneBlock(
 						getBlock( parentListId ),
 						{},
-						[]
+						followingListItems.map( ( id ) => getBlock( id ) )
 					);
-					nestedListId = nestedListBlock.clientId;
+					removeBlocks( followingListItems, false );
 					insertBlock( nestedListBlock, 0, firstClientId, false );
-					// Immediately update the block list settings, otherwise
-					// blocks can't be moved here due to canInsert checks.
-					updateBlockListSettings(
-						nestedListId,
-						getBlockListSettings( parentListId )
-					);
 				}
-
-				moveBlocksToPosition(
-					followingListItems,
-					parentListId,
-					nestedListId
-				);
 			}
 			moveBlocksToPosition(
 				clientIds,

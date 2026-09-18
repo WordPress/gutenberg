@@ -1,0 +1,70 @@
+<svg viewBox="0 0 880 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The engine asks one question per operation, through a request that names the operation and its subject. The application, which owns the permission model, answers through the policy seam with a single callback. The engine resolves that answer once and every surface follows it: the Customize button and the command palette, the inserter, the tile controls, the drag and resize gestures. Widgets are never asked; without edit they render read-only. Without a policy, every operation is allowed.">
+  <defs>
+    <marker id="arrow-pol" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect x="6" y="6" width="868" height="448" rx="12" fill="#ffffff"/>
+
+  <text x="440" y="36" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#334155">The question flows out; the answer flows in.</text>
+
+  <!-- Application -->
+  <rect x="44" y="58" width="792" height="330" rx="9" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="64" y="84" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">application</text>
+  <text x="162" y="84" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">owns the permission model: users, roles, sections, plans</text>
+
+  <!-- Dashboard engine -->
+  <rect x="64" y="98" width="508" height="276" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="84" y="124" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">dashboard</text>
+  <text x="166" y="124" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">knows the operations · not the user</text>
+
+  <!-- Resolution point -->
+  <rect x="84" y="140" width="468" height="78" rx="5" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="96" y="160" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#475569">canPerform( { operation: 'customize' } )</text>
+  <text x="96" y="178" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#475569">canPerform( { operation: 'insert', widgetType } )</text>
+  <text x="96" y="196" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#475569">canPerform( { operation: 'remove', widget, widgetType } )</text>
+  <text x="540" y="210" text-anchor="end" font-family="-apple-system, system-ui, sans-serif" font-size="9" font-style="italic" fill="#94a3b8">resolved once, in the provider</text>
+
+  <!-- Surfaces -->
+  <line x1="318" y1="218" x2="318" y2="232" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-pol)"/>
+
+  <rect x="84" y="236" width="113" height="52" rx="5" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="140" y="257" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" font-weight="700" fill="#334155">Customize</text>
+  <text x="140" y="274" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" fill="#64748b">customize</text>
+
+  <rect x="202" y="236" width="113" height="52" rx="5" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="258" y="257" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" font-weight="700" fill="#334155">inserter</text>
+  <text x="258" y="274" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" fill="#64748b">insert · per type</text>
+
+  <rect x="320" y="236" width="113" height="52" rx="5" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="376" y="257" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" font-weight="700" fill="#334155">tile controls</text>
+  <text x="376" y="274" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8" fill="#64748b">remove · resize · edit</text>
+
+  <rect x="438" y="236" width="113" height="52" rx="5" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="494" y="257" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" font-weight="700" fill="#334155">gestures</text>
+  <text x="494" y="274" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" fill="#64748b">move · resize</text>
+
+  <text x="84" y="303" font-family="-apple-system, system-ui, sans-serif" font-size="9" font-style="italic" fill="#94a3b8">the Customize button and the command palette share the first answer</text>
+  <text x="84" y="315" font-family="-apple-system, system-ui, sans-serif" font-size="9" font-style="italic" fill="#94a3b8">a type the inserter rejects keeps rendering where already placed</text>
+
+  <!-- Widget: never asked -->
+  <rect x="84" y="324" width="468" height="40" rx="9" fill="#fff3d0" stroke="#b07020" stroke-width="1.5"/>
+  <text x="104" y="341" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#855317">widget</text>
+  <text x="104" y="356" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#855317">never asked · without edit it renders read-only: no setAttributes</text>
+
+  <!-- Answer flow -->
+  <line x1="600" y1="178" x2="576" y2="178" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-pol)"/>
+
+  <!-- The policy -->
+  <rect x="600" y="126" width="212" height="112" rx="9" fill="#ffffff" stroke="#1d6b5a" stroke-width="1.4"/>
+  <text x="616" y="150" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12" font-weight="700" fill="#1d6b5a">policy</text>
+  <text x="616" y="172" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#475569">canPerform( request ): boolean</text>
+  <text x="616" y="190" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#475569">true for what you do not govern</text>
+  <text x="616" y="220" font-family="-apple-system, system-ui, sans-serif" font-size="9" font-style="italic" fill="#94a3b8">only the application knows</text>
+  <text x="706" y="258" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" font-weight="700" fill="#64748b">provided through WidgetDashboard.Policy</text>
+  <text x="706" y="278" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="9" font-style="italic" fill="#94a3b8">nested policies only narrow</text>
+  <text x="706" y="296" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="9" font-style="italic" fill="#94a3b8">without a policy, every operation is allowed</text>
+
+  <text x="440" y="426" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12" font-weight="700" fill="#855317">the engine asks · the application answers · the surfaces follow</text>
+</svg>

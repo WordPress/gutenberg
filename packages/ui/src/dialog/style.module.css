@@ -108,7 +108,7 @@
 		 * across modal/non-modal — `box-sizing: border-box` absorbs the
 		 * 1px into the existing box.
 		 */
-		.backdrop ~ * .popup {
+		.backdrop ~ .popup {
 			border-color: transparent;
 		}
 

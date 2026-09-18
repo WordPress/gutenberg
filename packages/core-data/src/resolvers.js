@@ -15,10 +15,11 @@ import {
 	isNumericID,
 	normalizeQueryForResolution,
 	saveCRDTDoc,
+	getPaginationMeta,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
-import { parsedBlocksCache, getCacheKey } from './parsed-blocks-cache';
+import { setCachedBlocks } from './parsed-blocks-cache';
 
 /**
  * Requests authors from the REST API.
@@ -172,15 +173,20 @@ export const getEntityRecord =
 					} );
 
 				// Share the parsed blocks with `useEntityBlockEditor` so the
-				// editor doesn't re-parse the same `content` string.
+				// editor doesn't re-parse the same `content` string. The cache
+				// remembers which block types the parse ran against, so an
+				// entry computed before they register is discarded, not served.
 				if (
 					recordWithTransients.blocks &&
 					typeof recordWithTransients.content?.raw === 'string'
 				) {
-					parsedBlocksCache.set( getCacheKey( kind, name, key ), {
-						content: recordWithTransients.content.raw,
-						blocks: recordWithTransients.blocks,
-					} );
+					setCachedBlocks(
+						kind,
+						name,
+						key,
+						recordWithTransients.content.raw,
+						recordWithTransients.blocks
+					);
 				}
 
 				const syncManager =
@@ -189,6 +195,11 @@ export const getEntityRecord =
 						: getSyncManager();
 
 				// Load the entity record for syncing. Do not await promise.
+				// NOTE: when this resolver runs before block types register,
+				// `recordWithTransients.blocks` was parsed as empty. The cache
+				// above discards such an entry; the sync manager receives it
+				// as-is, and seeding a collaborative document from it is an
+				// open problem of the collaboration path.
 				void syncManager?.load(
 					entityConfig.syncConfig,
 					objectType,
@@ -436,14 +447,7 @@ export const getEntityRecords =
 			if ( entityConfig.supportsPagination && query.per_page !== -1 ) {
 				const response = await apiFetch( { path, parse: false } );
 				records = Object.values( await response.json() );
-				meta = {
-					totalItems: parseInt(
-						response.headers.get( 'X-WP-Total' )
-					),
-					totalPages: parseInt(
-						response.headers.get( 'X-WP-TotalPages' )
-					),
-				};
+				meta = getPaginationMeta( response.headers );
 			} else if (
 				query.per_page === -1 &&
 				query[ RECEIVE_INTERMEDIATE_RESULTS ] === true
@@ -458,15 +462,14 @@ export const getEntityRecords =
 					} );
 					const pageRecords = Object.values( await response.json() );
 
-					totalPages = parseInt(
-						response.headers.get( 'X-WP-TotalPages' )
-					);
+					const pageMeta = getPaginationMeta( response.headers );
+					// An endpoint that doesn't paginate answers the first
+					// request with the whole collection.
+					totalPages = pageMeta.totalPages ?? 1;
 
 					if ( ! meta ) {
 						meta = {
-							totalItems: parseInt(
-								response.headers.get( 'X-WP-Total' )
-							),
+							totalItems: pageMeta.totalItems,
 							totalPages: 1,
 						};
 					}
@@ -1109,9 +1112,9 @@ export const getRevisions =
 			if ( response ) {
 				if ( isPaginated ) {
 					records = Object.values( await response.json() );
-					meta.totalItems = parseInt(
-						response.headers.get( 'X-WP-Total' )
-					);
+					meta.totalItems = getPaginationMeta(
+						response.headers
+					).totalItems;
 				} else {
 					records = Object.values( response );
 				}

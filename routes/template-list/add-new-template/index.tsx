@@ -174,12 +174,14 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 
 	const homeUrl = useSelect( ( select ) => {
 		// Site index.
-		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
-			?.home;
+		return select( coreStore ).getEntityRecord< { home?: string } >(
+			'root',
+			'__unstableBase'
+		)?.home;
 	}, [] );
 
 	const TEMPLATE_SHORT_DESCRIPTIONS: Record< string, string > = {
-		'front-page': homeUrl,
+		'front-page': homeUrl ?? '',
 		date: sprintf(
 			// translators: %s: The homepage url.
 			__( 'E.g. %s' ),

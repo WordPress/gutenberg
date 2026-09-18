@@ -10,11 +10,11 @@
 	background: $white;
 	display: grid;
 	grid-auto-flow: row;
-	grid-template: auto / $button-size-compact minmax(0, max-content) minmax(min-content, 1fr) $header-height;
+	grid-template: auto / auto minmax(0, max-content) minmax(min-content, 1fr) $header-height;
 	&:has(> .editor-header__center) {
-		grid-template: auto / $button-size-compact min-content 1fr min-content $header-height;
+		grid-template: auto / auto min-content 1fr min-content $header-height;
 		@include break-medium {
-			grid-template: auto / $button-size-compact minmax(min-content, 2fr) 2.5fr minmax(min-content, 2fr) $header-height;
+			grid-template: auto / auto minmax(min-content, 2fr) 2.5fr minmax(min-content, 2fr) $header-height;
 		}
 	}
 	@include break-mobile {
@@ -32,7 +32,11 @@
 }
 
 .editor-header__back-button {
-	padding-left: $grid-unit;
+	margin: 0 (-$grid-unit) 0 $grid-unit;
+
+	.show-icon-labels & {
+		margin-right: 0;
+	}
 }
 
 .editor-header__toolbar {

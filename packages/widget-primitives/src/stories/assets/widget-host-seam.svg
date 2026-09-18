@@ -1,0 +1,56 @@
+<svg viewBox="0 0 880 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A widget declares a link action as a portable URL. The host renders the widget and materializes the affordance, but does not know which router owns the URL. The application, which owns the router and its routes, provides the links capability through the widget host seam: match recognizes its own routes, Link is its router's primitive. On a match the host mounts the route link and navigation is client-side; without the capability the same declaration mounts a plain anchor.">
+  <defs>
+    <marker id="arrow-wh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect x="6" y="6" width="868" height="408" rx="12" fill="#ffffff"/>
+
+  <text x="440" y="36" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#334155">The declaration flows out; the capability flows in.</text>
+
+  <!-- Application -->
+  <rect x="44" y="58" width="792" height="290" rx="9" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="64" y="84" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">application</text>
+  <text x="162" y="84" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">owns the router and its routes</text>
+
+  <!-- Host -->
+  <rect x="64" y="98" width="508" height="232" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="84" y="124" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">host</text>
+  <text x="130" y="124" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">renders widgets · materializes affordances</text>
+
+  <!-- Widget -->
+  <rect x="84" y="138" width="240" height="140" rx="9" fill="#fff3d0" stroke="#b07020" stroke-width="1.5"/>
+  <text x="104" y="164" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#855317">widget</text>
+  <rect x="100" y="176" width="208" height="64" rx="5" fill="#ffffff" stroke="#b07020" stroke-width="1.2"/>
+  <text x="110" y="194" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" font-weight="700" fill="#b07020" opacity="0.7">action</text>
+  <text x="110" y="212" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#855317">href: 'admin.php?page=analytics</text>
+  <text x="110" y="226" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#855317">&amp;p=/reports'</text>
+  <text x="104" y="262" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#94a3b8">declares where, as a portable URL</text>
+
+  <!-- Declaration flow -->
+  <line x1="324" y1="208" x2="340" y2="208" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-wh)"/>
+
+  <!-- Materialization -->
+  <rect x="344" y="160" width="208" height="118" rx="5" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="356" y="180" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#475569">useWidgetHost()</text>
+  <text x="356" y="198" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#475569">links.match( href )</text>
+  <line x1="352" y1="210" x2="544" y2="210" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="356" y="230" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" font-weight="700" fill="#1d6b5a">&lt;Link path='/reports' /&gt;</text>
+  <text x="356" y="248" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" fill="#94a3b8">a real anchor · navigates client-side</text>
+
+  <!-- Capability flow -->
+  <line x1="600" y1="195" x2="576" y2="195" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-wh)"/>
+
+  <!-- The links capability -->
+  <rect x="600" y="140" width="212" height="110" rx="9" fill="#ffffff" stroke="#1d6b5a" stroke-width="1.4"/>
+  <text x="616" y="164" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12" font-weight="700" fill="#1d6b5a">links</text>
+  <text x="616" y="186" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#475569">match( href ): '/reports' | null</text>
+  <text x="616" y="204" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#475569">Link: the router's primitive</text>
+  <text x="616" y="232" font-family="-apple-system, system-ui, sans-serif" font-size="9" font-style="italic" fill="#94a3b8">only the application knows</text>
+  <text x="706" y="268" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" font-weight="700" fill="#64748b">provided through WidgetHostProvider</text>
+
+  <text x="84" y="316" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#94a3b8">without the capability, the same declaration mounts a plain anchor</text>
+
+  <text x="440" y="384" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12" font-weight="700" fill="#855317">the widget declares where · the host materializes · the application knows how to get there</text>
+</svg>

@@ -1,0 +1,20 @@
+{
+	"name": "@wordpress/site-health-route",
+	"version": "1.0.0",
+	"private": true,
+	"route": {
+		"path": "/site-health",
+		"page": [
+			"dashboard"
+		]
+	},
+	"dependencies": {
+		"@wordpress/admin-ui": "file:../../packages/admin-ui",
+		"@wordpress/api-fetch": "file:../../packages/api-fetch",
+		"@wordpress/dataviews": "file:../../packages/dataviews",
+		"@wordpress/dom": "file:../../packages/dom",
+		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/ui": "file:../../packages/ui"
+	}
+}

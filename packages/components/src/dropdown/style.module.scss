@@ -1,0 +1,25 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.content-wrapper {
+	// Negative margin to reset (offset) the default padding on .components-popover__content.
+	/* stylelint-disable plugin/use-logical-properties-and-values -- Preserve the previous physical offsets against Popover padding. */
+	margin-left: -$grid-unit-10;
+	margin-right: -$grid-unit-10;
+
+	&:first-of-type {
+		margin-top: -$grid-unit-10;
+	}
+
+	&:last-of-type {
+		margin-bottom: -$grid-unit-10;
+	}
+	/* stylelint-enable plugin/use-logical-properties-and-values */
+}
+
+.padding-small {
+	padding: $grid-unit-10;
+}
+
+.padding-medium {
+	padding: $grid-unit-20;
+}

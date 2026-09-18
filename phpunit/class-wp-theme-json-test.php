@@ -2049,6 +2049,92 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_get_stylesheet_generates_layout_styles_with_axial_block_gap() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'blockGap' => true,
+					),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'core/group' => array(
+							'spacing' => array(
+								'blockGap' => array(
+									'top'  => '1em',
+									'left' => '2em',
+								),
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$this->assertSameCSS(
+			':root :where(.wp-block-group-is-layout-flow) > :first-child{margin-block-start: 0;}:root :where(.wp-block-group-is-layout-flow) > :last-child{margin-block-end: 0;}:root :where(.wp-block-group-is-layout-flow) > *{margin-block-start: 1em;margin-block-end: 0;}:root :where(.wp-block-group-is-layout-constrained) > :first-child{margin-block-start: 0;}:root :where(.wp-block-group-is-layout-constrained) > :last-child{margin-block-end: 0;}:root :where(.wp-block-group-is-layout-constrained) > *{margin-block-start: 1em;margin-block-end: 0;}:root :where(.wp-block-group-is-layout-flex){gap: 1em 2em;}:root :where(.wp-block-group-is-layout-grid){gap: 1em 2em;}',
+			$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) )
+		);
+	}
+
+	/**
+	 * @dataProvider data_get_stylesheet_with_single_axial_block_gap_value
+	 *
+	 * @param array  $block_gap Block gap value.
+	 * @param string $expected  Expected stylesheet.
+	 */
+	public function test_get_stylesheet_uses_zero_for_unset_axis_when_single_axial_block_gap_value_is_set( $block_gap, $expected ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'blockGap' => true,
+					),
+				),
+				'styles'   => array(
+					'spacing' => array(
+						'blockGap' => '3em',
+					),
+					'blocks'  => array(
+						'core/group' => array(
+							'spacing' => array(
+								'blockGap' => $block_gap,
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$this->assertSameCSS(
+			$expected,
+			$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) )
+		);
+	}
+
+	/**
+	 * Data provider for test_get_stylesheet_uses_zero_for_unset_axis_when_single_axial_block_gap_value_is_set().
+	 *
+	 * @return array[]
+	 */
+	public function data_get_stylesheet_with_single_axial_block_gap_value() {
+		return array(
+			'row gap only'    => array(
+				array( 'top' => '1em' ),
+				':root :where(.wp-block-group-is-layout-flow) > :first-child{margin-block-start: 0;}:root :where(.wp-block-group-is-layout-flow) > :last-child{margin-block-end: 0;}:root :where(.wp-block-group-is-layout-flow) > *{margin-block-start: 1em;margin-block-end: 0;}:root :where(.wp-block-group-is-layout-constrained) > :first-child{margin-block-start: 0;}:root :where(.wp-block-group-is-layout-constrained) > :last-child{margin-block-end: 0;}:root :where(.wp-block-group-is-layout-constrained) > *{margin-block-start: 1em;margin-block-end: 0;}:root :where(.wp-block-group-is-layout-flex){gap: 1em 0;}:root :where(.wp-block-group-is-layout-grid){gap: 1em 0;}',
+			),
+			'column gap only' => array(
+				array( 'left' => '2em' ),
+				':root :where(.wp-block-group-is-layout-flow) > :first-child{margin-block-start: 0;}:root :where(.wp-block-group-is-layout-flow) > :last-child{margin-block-end: 0;}:root :where(.wp-block-group-is-layout-flow) > *{margin-block-start: 0;margin-block-end: 0;}:root :where(.wp-block-group-is-layout-constrained) > :first-child{margin-block-start: 0;}:root :where(.wp-block-group-is-layout-constrained) > :last-child{margin-block-end: 0;}:root :where(.wp-block-group-is-layout-constrained) > *{margin-block-start: 0;margin-block-end: 0;}:root :where(.wp-block-group-is-layout-flex){gap: 0 2em;}:root :where(.wp-block-group-is-layout-grid){gap: 0 2em;}',
+			),
+		);
+	}
+
 	public function test_get_stylesheet_generates_layout_styles_with_spacing_presets() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

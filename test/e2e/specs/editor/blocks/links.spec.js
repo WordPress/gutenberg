@@ -1267,7 +1267,7 @@ test.describe( 'Links', () => {
 
 		// Verify validation error is shown
 		await expect(
-			page.locator( '.components-validated-control__indicator' )
+			page.getByText( 'Please enter a valid URL.' )
 		).toBeVisible();
 
 		// Verify focus is still on the input

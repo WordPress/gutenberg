@@ -5,6 +5,38 @@ test.describe( 'Buttons', () => {
 		await admin.createNewPost();
 	} );
 
+	test( 'adds a sibling after the selected button from the parent selector', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: [
+				{ name: 'core/button', attributes: { text: 'First' } },
+				{ name: 'core/button', attributes: { text: 'Second' } },
+			],
+		} );
+		await editor.canvas
+			.locator( '[data-type="core/button"]' )
+			.first()
+			.click();
+
+		await editor.showBlockToolbar();
+		await page.locator( 'role=button[name="Add button"]' ).click();
+		await page.keyboard.type( 'New' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{ name: 'core/button', attributes: { text: 'First' } },
+					{ name: 'core/button', attributes: { text: 'New' } },
+					{ name: 'core/button', attributes: { text: 'Second' } },
+				],
+			},
+		] );
+	} );
+
 	test( 'has focus on button content', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await expect(

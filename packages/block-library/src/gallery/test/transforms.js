@@ -1,6 +1,7 @@
 import {
 	createBlock,
 	getBlockTypes,
+	getPossibleBlockTransformations,
 	registerBlockType,
 	switchToBlockType,
 	unregisterBlockType,
@@ -13,6 +14,7 @@ import {
 	metadata as groupMetadata,
 	settings as groupSettings,
 } from '../../group';
+import { ATTACHED_MEDIA } from '../dynamic-source';
 
 describe( 'transforms', () => {
 	beforeAll( () => {
@@ -143,6 +145,61 @@ describe( 'transforms', () => {
 			attributes: {
 				layout: { type: 'grid', columnCount: 2 },
 			},
+		} );
+	} );
+	it( 'transforms an empty static Gallery to the Grid variation of Group', () => {
+		const block = createBlock( 'core/gallery', {}, [] );
+
+		const transformedBlocks = switchToBlockType(
+			block,
+			'core/group',
+			'group-grid'
+		);
+
+		expect( transformedBlocks[ 0 ] ).toMatchObject( {
+			name: 'core/group',
+			attributes: { layout: { type: 'grid' } },
+		} );
+	} );
+
+	describe( 'dynamic mode', () => {
+		const createDynamicGallery = () =>
+			createBlock(
+				'core/gallery',
+				{ dynamicContent: { source: ATTACHED_MEDIA } },
+				[]
+			);
+
+		it( 'does not transform a dynamic Gallery to the Grid variation of Group', () => {
+			expect(
+				switchToBlockType(
+					createDynamicGallery(),
+					'core/group',
+					'group-grid'
+				)
+			).toBeNull();
+		} );
+
+		it( 'does not transform a dynamic Gallery to Image', () => {
+			expect(
+				switchToBlockType( createDynamicGallery(), 'core/image' )
+			).toBeNull();
+		} );
+
+		it( 'does not offer the Image or Grid transforms for a dynamic Gallery', () => {
+			const transformations = getPossibleBlockTransformations( [
+				createDynamicGallery(),
+			] );
+
+			expect(
+				transformations.find( ( { name } ) => name === 'core/image' )
+			).toBeUndefined();
+			expect(
+				transformations.find(
+					( { name, variationName } ) =>
+						name === 'core/group' && variationName === 'group-grid'
+				)
+			).toBeUndefined();
 		} );
 	} );
 } );

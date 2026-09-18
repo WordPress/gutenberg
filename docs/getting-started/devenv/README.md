@@ -6,7 +6,7 @@ A block development environment includes the tools you need on your computer to 
 
 - [Block Development Environment](#block-development-environment)
   - [Code editor](#code-editor)
-  - [Node.js development tools](#nodejs-development-tools)
+  - [Node.js development tools](#node-js-development-tools)
   - [Local WordPress environment](#local-wordpress-environment)
 
 <div class="callout callout-info">

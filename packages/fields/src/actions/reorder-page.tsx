@@ -7,7 +7,7 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
 import type { CoreDataError, BasePost } from '../types';
 
@@ -85,7 +85,7 @@ function ReorderModal( {
 						'Determines the order of pages. Pages with the same order value are sorted alphabetically. Negative order values are supported.'
 					) }
 				</div>
-				<InputControl
+				<WCInputControl
 					label={ __( 'Order' ) }
 					type="number"
 					value={

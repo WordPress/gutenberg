@@ -9,7 +9,7 @@ import type {
 	WidgetType,
 } from '@wordpress/widget-primitives';
 import { WidgetDashboard } from '../widget-dashboard';
-import type { DashboardWidget } from '../types';
+import type { CanPerformDashboardOperation, DashboardWidget } from '../types';
 
 function PreviewWidget( {
 	attributes,
@@ -41,17 +41,19 @@ const resolveWidgetModule: ResolveWidgetModule = async () => ( {
 interface HarnessProps {
 	initialLayout?: DashboardWidget[];
 	onLayoutChange?: ( layout: DashboardWidget[] ) => void;
+	canPerform?: CanPerformDashboardOperation;
 }
 
 function Harness( {
 	initialLayout = [],
 	onLayoutChange: onChange,
+	canPerform,
 }: HarnessProps ) {
 	const [ layout, setLayout ] =
 		useState< DashboardWidget[] >( initialLayout );
 	const [ editMode, setEditMode ] = useState( true );
 
-	return (
+	const dashboard = (
 		<WidgetDashboard
 			layout={ layout }
 			onLayoutChange={ ( next ) => {
@@ -63,6 +65,14 @@ function Harness( {
 			onEditChange={ setEditMode }
 			resolveWidgetModule={ resolveWidgetModule }
 		/>
+	);
+
+	return canPerform ? (
+		<WidgetDashboard.Policy canPerform={ canPerform }>
+			{ dashboard }
+		</WidgetDashboard.Policy>
+	) : (
+		dashboard
 	);
 }
 
@@ -195,5 +205,215 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 		expect( updated ).toHaveLength( 2 );
 		expect( updated[ 0 ] ).toEqual( existing );
 		expect( updated[ 1 ] ).toMatchObject( { type: 'wordpress/notes' } );
+	} );
+
+	describe( 'policy', () => {
+		const insertOnly =
+			( allowed: string ): CanPerformDashboardOperation =>
+			( request ) =>
+				request.operation !== 'insert' ||
+				request.widgetType.name === allowed;
+
+		const notesOnly = insertOnly( 'wordpress/notes' );
+		const welcomeOnly = insertOnly( 'wordpress/welcome' );
+
+		it( 'offers only the types the policy allows to insert', async () => {
+			const user = userEvent.setup();
+			render( <Harness canPerform={ notesOnly } /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add widget' } )
+			);
+
+			const dialog = await screen.findByRole( 'dialog', {
+				name: 'Add widget',
+			} );
+			expect( within( dialog ).getAllByRole( 'option' ) ).toHaveLength(
+				1
+			);
+			// The title renders in the card and in the preview chrome.
+			expect(
+				within( dialog ).queryAllByText( 'Notes' ).length
+			).toBeGreaterThan( 0 );
+			expect(
+				within( dialog ).queryByText( 'Welcome' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'asks with the insert operation and the widget type', async () => {
+			const user = userEvent.setup();
+			const canPerform = jest.fn< boolean, [ unknown ] >( () => true );
+			render( <Harness canPerform={ canPerform } /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add widget' } )
+			);
+			await screen.findByRole( 'dialog', { name: 'Add widget' } );
+
+			expect( canPerform ).toHaveBeenCalledWith( {
+				operation: 'insert',
+				widgetType: widgetTypes[ 0 ],
+			} );
+			expect( canPerform ).toHaveBeenCalledWith( {
+				operation: 'insert',
+				widgetType: widgetTypes[ 1 ],
+			} );
+		} );
+
+		it( 'updates the open picker when the policy changes', async () => {
+			const user = userEvent.setup();
+			const { rerender } = render(
+				<Harness canPerform={ welcomeOnly } />
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add widget' } )
+			);
+			const dialog = await screen.findByRole( 'dialog', {
+				name: 'Add widget',
+			} );
+			expect(
+				within( dialog ).queryAllByText( 'Welcome' ).length
+			).toBeGreaterThan( 0 );
+
+			rerender( <Harness canPerform={ notesOnly } /> );
+
+			await waitFor( () =>
+				expect(
+					within( dialog ).queryByText( 'Welcome' )
+				).not.toBeInTheDocument()
+			);
+			expect(
+				within( dialog ).queryAllByText( 'Notes' ).length
+			).toBeGreaterThan( 0 );
+		} );
+
+		it( 'governs each dashboard through its own provider', async () => {
+			const user = userEvent.setup();
+			render(
+				<>
+					<Harness canPerform={ notesOnly } />
+					<Harness canPerform={ welcomeOnly } />
+				</>
+			);
+
+			const triggers = screen.getAllByRole( 'button', {
+				name: 'Add widget',
+			} );
+			expect( triggers ).toHaveLength( 2 );
+
+			await user.click( triggers[ 0 ] );
+			let dialog = await screen.findByRole( 'dialog', {
+				name: 'Add widget',
+			} );
+			expect(
+				within( dialog ).queryAllByText( 'Notes' ).length
+			).toBeGreaterThan( 0 );
+			expect(
+				within( dialog ).queryByText( 'Welcome' )
+			).not.toBeInTheDocument();
+
+			await user.keyboard( '{Escape}' );
+			await waitFor( () =>
+				expect(
+					screen.queryByRole( 'dialog', { name: 'Add widget' } )
+				).not.toBeInTheDocument()
+			);
+
+			await user.click( triggers[ 1 ] );
+			dialog = await screen.findByRole( 'dialog', {
+				name: 'Add widget',
+			} );
+			expect(
+				within( dialog ).queryAllByText( 'Welcome' ).length
+			).toBeGreaterThan( 0 );
+			expect(
+				within( dialog ).queryByText( 'Notes' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'leaves placed widgets of excluded types rendering', async () => {
+			const user = userEvent.setup();
+			const existing: DashboardWidget = {
+				uuid: 'existing-1',
+				type: 'wordpress/welcome',
+				attributes: { label: 'kept' },
+				placement: { width: 1, height: 1 },
+			};
+
+			render(
+				<Harness
+					canPerform={ notesOnly }
+					initialLayout={ [ existing ] }
+				/>
+			);
+
+			expect( await screen.findByText( 'kept' ) ).toBeInTheDocument();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add widget' } )
+			);
+			const dialog = await screen.findByRole( 'dialog', {
+				name: 'Add widget',
+			} );
+			expect( within( dialog ).getAllByRole( 'option' ) ).toHaveLength(
+				1
+			);
+			expect(
+				within( dialog ).queryByText( 'Welcome' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'composes nested policies restrictively', () => {
+			render(
+				<WidgetDashboard.Policy canPerform={ welcomeOnly }>
+					<Harness canPerform={ notesOnly } />
+				</WidgetDashboard.Policy>
+			);
+
+			// The outer policy allows Welcome, the inner one Notes: neither
+			// survives both, so there is nothing to insert.
+			expect(
+				screen.queryByRole( 'button', { name: 'Add widget' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'lets an enclosing policy narrow an inner permissive one', async () => {
+			const user = userEvent.setup();
+			render(
+				<WidgetDashboard.Policy canPerform={ notesOnly }>
+					<Harness canPerform={ () => true } />
+				</WidgetDashboard.Policy>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add widget' } )
+			);
+
+			const dialog = await screen.findByRole( 'dialog', {
+				name: 'Add widget',
+			} );
+			expect( within( dialog ).getAllByRole( 'option' ) ).toHaveLength(
+				1
+			);
+			expect(
+				within( dialog ).queryByText( 'Welcome' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'hides the Add widget trigger when the policy denies every insert', () => {
+			render(
+				<Harness
+					canPerform={ ( request ) => request.operation !== 'insert' }
+				/>
+			);
+
+			expect(
+				screen.queryByRole( 'button', { name: 'Add widget' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Done' } )
+			).toBeInTheDocument();
+		} );
 	} );
 } );

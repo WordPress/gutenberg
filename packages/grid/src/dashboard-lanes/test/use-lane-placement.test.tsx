@@ -77,9 +77,16 @@ function setNativeSupport( supported: boolean ) {
 		if ( property === 'display' && value === 'grid-lanes' ) {
 			return supported;
 		}
-		return originalSupports
-			? originalSupports.call( CSS, property, value as string )
-			: false;
+		if ( ! originalSupports ) {
+			return false;
+		}
+		/*
+		 * `call` on the overloaded `CSS.supports` resolves to the
+		 * single-argument signature, so pass equivalent condition text.
+		 */
+		return value === undefined
+			? originalSupports.call( CSS, property )
+			: originalSupports.call( CSS, `(${ property }: ${ value })` );
 	};
 }
 
