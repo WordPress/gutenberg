@@ -222,7 +222,11 @@ export default function BackgroundImagePanel( {
 	if ( true === clipSetting ) {
 		allowedClipValues = ALL_BACKGROUND_CLIP_VALUES;
 	} else if ( Array.isArray( clipSetting ) ) {
-		allowedClipValues = clipSetting;
+		// A value the control has no option for would leave a labelled but
+		// empty row, so only the ones it knows count.
+		allowedClipValues = clipSetting.filter( ( clipValue ) =>
+			ALL_BACKGROUND_CLIP_VALUES.includes( clipValue )
+		);
 	}
 	// The Typography panel's gradient control already expresses the text
 	// value, so this control needs a box to choose between to be worth
