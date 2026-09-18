@@ -163,9 +163,8 @@ export default function PageListEdit( {
 			return new Map();
 		}
 
-		// TODO: Once the REST API supports passing multiple values to
-		// 'orderby', this can be removed.
-		// https://core.trac.wordpress.org/ticket/39037
+		// Sort by menu order, then title, to match the order the front end
+		// renders (`get_pages()` sorted by `menu_order,post_title`).
 		const sortedPages = pages.sort( ( a, b ) => {
 			if ( a.menu_order === b.menu_order ) {
 				return a.title.rendered.localeCompare( b.title.rendered );
