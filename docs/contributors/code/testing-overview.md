@@ -56,9 +56,27 @@ npm run test:unit:debug -- packages/escape-html/src/test/index.ts
 
 Paths filter discovered files; `-t` filters test names. Use `--project=node`, `--project=jsdom`, or `--project=browser` to select an environment. These filters do not change the environment selected by the filename. For example, `npm run test:unit -- --project=browser` runs the Browser suite.
 
-`npm run test:unit:vitest` and its watch/update variants remain compatible aliases. The temporary `npm run test:unit:jest` command runs the empty legacy partition and exits with no tests. It is retained for compatibility checks until final retirement, not for new tests. No repository test is owned by Jest. See the [remaining migration checks](/test/unit/VITEST_MIGRATION.md).
+`npm run test:unit:vitest` and its watch/update variants remain compatible aliases. Gutenberg-owned tests run only through Vitest. External projects that keep Jest can use the public `wp-scripts test-unit-jest` adapter and follow the [consumer migration guide](/packages/scripts/docs/vitest-migration.md#keep-an-existing-jest-suite).
 
 Run `npm run lint` independently for code style checks. [ESLint](https://eslint.org/) enforces JavaScript rules; `npm run typecheck` checks TypeScript and checked JavaScript, including tests and stories. `npm run build` emits declarations but does not typecheck. Run `npm run test:unit:routing` and `npm run test:unit:conventions` to check discovery, imports, and environment conventions. Configure an [editor linting integration](/docs/contributors/code/getting-started-with-code-contribution.md) for feedback while editing.
+
+### Routing and infrastructure checks
+
+`npm run test:unit:routing` compares live Vitest discovery with the repository's test-file patterns. Each discovered test must belong to exactly one project, selected by its filename. The check rejects missing tests, duplicate ownership, per-file environment overrides, and obsolete Jest runner infrastructure. It does not depend on a fixed test count or migration metadata. The required `All` CI check runs it.
+
+`npm run test:unit:conventions` checks explicit Vitest imports, workspace dependencies, the TypeScript test graph, environment conventions, and isolation defaults. Keep the existing Node 24/26 matrix, four Node/jsdom shards per runtime, one Chromium job on Node 24, timezone checks, and Storybook smoke coverage when changing test infrastructure. `npm run test:unit:vitest:shuffled` shuffles files with the fixed seed `80855`. It does not shuffle tests inside each file.
+
+#### Public tooling consumers
+
+Run `npm run test:unit:consumers` to pack the public tooling, install it outside the workspace, and exercise the documented configuration and commands. The check covers Vitest and the maintenance-only Jest adapter independently of Gutenberg's unit-test runner. Preserve the dependencies that these isolated consumers install, including the published WordPress Jest preset and Babel transformer.
+
+-   `--vite=<version>` selects a supported Vite version.
+-   `--browser` includes Chromium and generated CSS coverage.
+-   `--node=/absolute/path/to/node` selects the consumer runtime.
+-   `--lockfile=/path/to/package-lock.json` replays an earlier consumer resolution while repacking the changed packages. Also verify fresh installs so a lockfile does not hide peer conflicts.
+-   `--scripts=<published-version>` and `--eslint-plugin=<published-version>` verify registry releases. Packed-source checks do not replace this release verification.
+
+The check reports the actual Node, Vite, Vitest, and build versions. Verify the supported Node/Vite combinations and record the released versions and results with the tooling change. The [package release guide](/docs/contributors/code/release/package-release-and-core-updates.md) describes the protected publication process. Remaining migration release and npm deprecation gates are tracked in [#80855](https://github.com/WordPress/gutenberg/issues/80855).
 
 ### Folder structure
 
@@ -66,11 +84,15 @@ Keep your tests in a `test` folder in your working directory. The test file shou
 
 Use `*.jsdom.test.*` for DOM structure, semantics, events, state, and other deterministic behavior that does not depend on browser rendering. Use `*.browser.test.*` for generated and computed styles, cascade, responsive behavior, layout, geometry, rendered visibility, animation, scrolling, native focusability and Tab order, pointer behavior, caret geometry, `ResizeObserver`, and media queries.
 
+In direct React Browser Mode tests, import and await `render` or `renderHook` from `vitest-browser-react`. Import `userEvent` from `vitest/browser` and prefer locators for asynchronous browser state. Testing Library query helpers can remain when Browser Mode has no equivalent, but use the Browser Mode React renderer. The shared `initializeEditor` integration helper is the existing renderer exception.
+
+Supplied rectangles, observer notifications, and timers can remain in jsdom when they are deliberate inputs to algorithm or lifecycle tests. A browser API in setup alone does not establish that the assertions need Browser Mode. Keep exceptions specific and remove them when no longer needed.
+
 Browser Mode loads only CSS imported by the test graph or its setup. Import a package's global Sass explicitly when the assertion depends on styles that WordPress normally enqueues separately. Keep deterministic browser API mocks local to nonvisual tests and restore them afterwards.
 
-Leave Node-compatible test names without an environment suffix. Every new test runs in Vitest automatically. The filename selects its environment. The retained migration manifest has an empty Jest list. Do not use per-file environment overrides.
+Leave Node-compatible test names without an environment suffix. Every new test runs in Vitest automatically. The filename selects its environment. Do not use per-file environment overrides.
 
-```
+```text
 +-- test
 |   +-- bar.test.js
 +-- bar.js
@@ -85,11 +107,11 @@ Only test files (with at least one test case) should live directly under `/test`
 
 Given the previous folder structure, try to use relative paths when importing of the **code you're testing**, as opposed to using project paths.
 
-**Good**
+Recommended:
 
 `import { bar } from '../bar';`
 
-**Not so good**
+Avoid this pattern:
 
 `import { bar } from 'components/foo/bar';`
 
@@ -101,7 +123,7 @@ Use a `describe` block to group test cases. Each test case should ideally descri
 
 In test cases, try to describe in plain words the expected behaviour. For UI components, this might entail describing expected behaviour from a user perspective rather than explaining code internals.
 
-**Good**
+Recommended:
 
 ```javascript
 import { describe, test } from 'vitest';
@@ -113,7 +135,7 @@ describe( 'CheckboxWithLabel', () => {
 } );
 ```
 
-**Not so good**
+Avoid this pattern:
 
 ```javascript
 import { describe, test } from 'vitest';
@@ -151,13 +173,17 @@ afterAll( () => {
 
 Avoid placing clean up code after assertions since, if any of those tests fail, the clean up won't take place and may cause failures in unrelated tests.
 
+Vitest resets mock implementations and call history, restores spies, resets stubbed globals and environment variables, and restores real timers between tests. Configure required mock implementations in each test's setup hooks. Imported module state is not reset automatically. Reset it explicitly or use `vi.resetModules()` when a fresh module instance is required. Do not disable module isolation or enable global Vitest APIs.
+
+`wpVitest` is an explicit opt-in for jsdom suites that need hoist-safe helpers inside `vi.hoisted()`.
+
 ### Mocking dependencies
 
 #### Dependency injection
 
 Passing dependencies to a function as arguments can often make your code simpler to test. Where possible, avoid referencing dependencies in a higher scope.
 
-**Not so good**
+Avoid this pattern:
 
 ```javascript
 import VALID_VALUES_LIST from './constants';
@@ -175,7 +201,7 @@ The above assertion is testing two behaviours: 1) that the function can detect a
 
 But what if we don't care what's stored in `VALID_VALUES_LIST`, or if the list is fetched via an HTTP request, and we only want to test whether `isValueValid` can detect an item in a list?
 
-**Good**
+Recommended:
 
 ```javascript
 function isValueValid( value, validValuesList = [] ) {
@@ -545,7 +571,7 @@ THROTTLE_CPU=4 npm run test:e2e
 
 See [Chrome docs: setCPUThrottlingRate](https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate)
 
-```
+```sh
 SLOW_NETWORK=true npm run test:e2e
 ```
 
@@ -553,7 +579,7 @@ SLOW_NETWORK=true npm run test:e2e
 
 See [Chrome docs: emulateNetworkConditions](https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions) and [NetworkManager.js](https://github.com/ChromeDevTools/devtools-frontend/blob/80c102878fd97a7a696572054007d40560dcdd21/front_end/sdk/NetworkManager.js#L252-L274)
 
-```
+```sh
 OFFLINE=true npm run test:e2e
 ```
 
@@ -579,7 +605,7 @@ npm run test:php
 
 To re-run tests automatically when files change (similar to Vitest), run:
 
-```
+```sh
 npm run test:php:watch
 ```
 
@@ -636,14 +662,14 @@ Performance tests are end-to-end tests running the editor and capturing these me
 
 To set up the e2e testing environment, checkout the Gutenberg repository and switch to the branch that you would like to test. Run the following command to prepare the environment.
 
-```
+```sh
 nvm use && npm install
 npm run build
 ```
 
 To run the tests run the following command:
 
-```
+```sh
 npm run test:performance
 ```
 

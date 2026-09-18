@@ -120,6 +120,7 @@ describe( 'test infrastructure policy', () => {
 					'@jest/globals': '^30.0.0',
 					'@testing-library/jest-dom': '^6.9.1',
 					'@types/jest': '^30.0.0',
+					'eslint-plugin-jest-dom': '^5.10.1',
 					'legacy-test': 'npm:@types/jest@^30.0.0',
 					'test-runner': 'npm:jest@^30.0.0',
 				},
@@ -146,6 +147,7 @@ describe( 'test infrastructure policy', () => {
 			'config:packages/example/package.json:jest',
 			'dependency:packages/example/package.json:devDependencies.@jest/globals',
 			'dependency:packages/example/package.json:devDependencies.@types/jest',
+			'dependency:packages/example/package.json:devDependencies.eslint-plugin-jest-dom',
 			'dependency:packages/example/package.json:devDependencies.legacy-test',
 			'dependency:packages/example/package.json:devDependencies.test-runner',
 		] );
