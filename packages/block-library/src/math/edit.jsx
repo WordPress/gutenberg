@@ -7,34 +7,40 @@ import { Popover } from '@wordpress/components';
 import { ValidatedTextareaControl, Link } from '@wordpress/ui';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { useEvent } from '@wordpress/compose';
 
 export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const { latex, mathML } = attributes;
 	const [ blockRef, setBlockRef ] = useState();
 	const [ error, setError ] = useState( null );
 	const [ latexToMathML, setLatexToMathML ] = useState();
-	const initialLatex = useRef( latex );
 	const formRef = useRef();
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
+	// Re-render once the converter loads, so MathML saved from a corrupted
+	// source is repaired and a source typed before the converter loaded is
+	// rendered. The converter loads asynchronously, and the user can type in
+	// the meantime, so read the source at that time rather than on mount.
+	const renderLatest = useEvent( ( convert ) => {
+		if ( ! latex ) {
+			return;
+		}
+		try {
+			const newMathML = convert( latex, { displayMode: true } );
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { mathML: newMathML } );
+		} catch ( err ) {
+			setError( err.message );
+		}
+	} );
+
 	useEffect( () => {
 		import( '@wordpress/latex-to-mathml' ).then( ( module ) => {
 			setLatexToMathML( () => module.default );
-			if ( initialLatex.current ) {
-				__unstableMarkNextChangeAsNotPersistent();
-				setAttributes( {
-					mathML: module.default( initialLatex.current, {
-						displayMode: true,
-					} ),
-				} );
-			}
+			renderLatest( module.default );
 		} );
-	}, [
-		initialLatex,
-		setAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
-	] );
+	}, [ renderLatest ] );
 
 	const blockProps = useBlockProps( {
 		ref: setBlockRef,
@@ -52,7 +58,15 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					dangerouslySetInnerHTML={ { __html: mathML } }
 				/>
 			) : (
-				'\u200B'
+				// Show the source until it renders, as the front end does.
+				<math display="block">
+					<semantics>
+						{ /* eslint-disable-next-line react/no-unknown-property -- MathML attribute. */ }
+						<annotation encoding="application/x-tex">
+							{ latex || '\u200B' }
+						</annotation>
+					</semantics>
+				</math>
 			) }
 			{ isSelected && (
 				<Popover
@@ -81,7 +95,12 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 							}
 							onValueChange={ ( newLatex ) => {
 								if ( ! latexToMathML ) {
-									setAttributes( { latex: newLatex } );
+									// The source is read back from the MathML,
+									// so clear a stale render along with it.
+									setAttributes( {
+										latex: newLatex,
+										mathML: '',
+									} );
 									return;
 								}
 								let newMathML = '';
