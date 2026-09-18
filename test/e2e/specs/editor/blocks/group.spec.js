@@ -26,7 +26,7 @@ test.describe( 'Group', () => {
 		// Select the default, selected Group layout from the variation picker.
 		await editor.canvas
 			.locator(
-				'role=button[name="Group: Gather blocks in a container."i]'
+				'role=button[name="Group: Gathers blocks in a container."i]'
 			)
 			.click();
 
@@ -49,7 +49,7 @@ test.describe( 'Group', () => {
 		// Select the default, selected Group layout from the variation picker.
 		await editor.canvas
 			.locator(
-				'role=button[name="Group: Gather blocks in a container."i]'
+				'role=button[name="Group: Gathers blocks in a container."i]'
 			)
 			.click();
 
@@ -63,7 +63,7 @@ test.describe( 'Group', () => {
 		await editor.insertBlock( { name: 'core/group' } );
 		await editor.canvas
 			.locator(
-				'button[aria-label="Group: Gather blocks in a container."]'
+				'button[aria-label="Group: Gathers blocks in a container."]'
 			)
 			.click();
 		await editor.canvas.locator( 'role=button[name="Add block"i]' ).click();

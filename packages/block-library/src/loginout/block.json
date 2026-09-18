@@ -4,7 +4,7 @@
 	"name": "core/loginout",
 	"title": "Login/out",
 	"category": "theme",
-	"description": "Show login & logout links.",
+	"description": "Shows a login & logout links.",
 	"keywords": [ "login", "logout", "form" ],
 	"textdomain": "default",
 	"attributes": {

@@ -4,7 +4,7 @@
 	"name": "core/freeform",
 	"title": "Classic",
 	"category": "text",
-	"description": "Use the classic WordPress editor.",
+	"description": "Uses the classic WordPress editor.",
 	"textdomain": "default",
 	"attributes": {
 		"content": {

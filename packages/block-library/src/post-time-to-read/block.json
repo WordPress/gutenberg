@@ -4,7 +4,7 @@
 	"name": "core/post-time-to-read",
 	"title": "Time to Read",
 	"category": "theme",
-	"description": "Show minutes required to finish reading the post. Can also show a word count.",
+	"description": "Shows minutes required to finish reading the post.",
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
 	"attributes": {

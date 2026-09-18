@@ -4,7 +4,7 @@
 	"name": "core/calendar",
 	"title": "Calendar",
 	"category": "widgets",
-	"description": "A calendar of your site’s posts.",
+	"description": "Displays a calendar of your site’s posts.",
 	"keywords": [ "posts", "archive" ],
 	"textdomain": "default",
 	"attributes": {

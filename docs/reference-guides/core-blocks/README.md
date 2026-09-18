@@ -61,7 +61,7 @@ Contains the hidden or revealed content beneath the heading.
 
 ## Archives
 
-Display a date archive of your posts.
+Displays a date archive of your posts.
 
 -	**Name:** [core/archives](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-archives/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -70,7 +70,7 @@ Display a date archive of your posts.
 
 ## Audio
 
-Embed a simple audio player.
+Embeds a simple audio player.
 
 -	**Name:** [core/audio](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-audio/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
@@ -79,7 +79,7 @@ Embed a simple audio player.
 
 ## Avatar
 
-Add a user’s avatar.
+Adds a user’s avatar.
 
 -	**Name:** [core/avatar](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-avatar/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -88,7 +88,7 @@ Add a user’s avatar.
 
 ## Pattern
 
-Reuse this design across your site.
+Reuses this design across your site.
 
 -	**Name:** [core/block](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-reusable/core-block-block/)
 -	**Category:** [reusable](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-reusable/)
@@ -106,7 +106,7 @@ Display a breadcrumb trail showing the path to the current page.
 
 ## Button
 
-Prompt visitors to take action with a button-style link.
+Prompts visitors to take action with a button-style link.
 
 -	**Name:** [core/button](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-button/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -116,7 +116,7 @@ Prompt visitors to take action with a button-style link.
 
 ## Buttons
 
-Prompt visitors to take action with a group of button-style links.
+Prompts visitors to take action with a group of button-style links.
 
 -	**Name:** [core/buttons](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-buttons/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -125,7 +125,7 @@ Prompt visitors to take action with a group of button-style links.
 
 ## Calendar
 
-A calendar of your site’s posts.
+Displays a calendar of your site’s posts.
 
 -	**Name:** [core/calendar](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-calendar/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -134,7 +134,7 @@ A calendar of your site’s posts.
 
 ## Terms List
 
-Display a list of all terms of a given taxonomy.
+Displays a list of all terms of a given taxonomy.
 
 -	**Name:** [core/categories](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-categories/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -143,7 +143,7 @@ Display a list of all terms of a given taxonomy.
 
 ## Code
 
-Display code snippets that respect your spacing and tabs.
+Displays code snippets that respects the spacing and tabs.
 
 -	**Name:** [core/code](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-code/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -152,7 +152,7 @@ Display code snippets that respect your spacing and tabs.
 
 ## Column
 
-A single column within a columns block.
+Displays a single column within a columns block.
 
 -	**Name:** [core/column](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-column/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -162,7 +162,7 @@ A single column within a columns block.
 
 ## Columns
 
-Display content in multiple columns, with blocks added to each column.
+Displays content in multiple columns, with blocks added to each column.
 
 -	**Name:** [core/columns](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-columns/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -299,7 +299,7 @@ Displays a title with the number of comments.
 
 ## Cover
 
-Add an image or video with a text overlay.
+Adds an image or video with a text overlay.
 
 -	**Name:** [core/cover](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-cover/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
@@ -317,7 +317,7 @@ Hide and show additional content.
 
 ## Embed
 
-Add a block that displays content pulled from other sites, like Twitter or YouTube.
+Adds a block that displays content pulled from other sites, like Twitter or YouTube.
 
 -	**Name:** [core/embed](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-embed/core-block-embed/)
 -	**Category:** [embed](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-embed/)
@@ -326,7 +326,7 @@ Add a block that displays content pulled from other sites, like Twitter or YouTu
 
 ## File
 
-Add a link to a downloadable file.
+Adds a link to a downloadable file.
 
 -	**Name:** [core/file](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-file/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
@@ -335,7 +335,7 @@ Add a link to a downloadable file.
 
 ## Footnotes
 
-Display footnotes added to the page.
+Displays footnotes added to the page.
 
 -	**Name:** [core/footnotes](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-footnotes/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -343,7 +343,7 @@ Display footnotes added to the page.
 
 ## Classic
 
-Use the classic WordPress editor.
+Uses the classic WordPress editor.
 
 -	**Name:** [core/freeform](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-freeform/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -352,7 +352,7 @@ Use the classic WordPress editor.
 
 ## Gallery
 
-Display multiple images in a rich gallery.
+Displays multiple images in a rich gallery.
 
 -	**Name:** [core/gallery](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-gallery/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
@@ -362,7 +362,7 @@ Display multiple images in a rich gallery.
 
 ## Group
 
-Gather blocks in a layout container.
+Gathers blocks in a layout container.
 
 -	**Name:** [core/group](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-group/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -371,7 +371,7 @@ Gather blocks in a layout container.
 
 ## Heading
 
-Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.
+Introduces new sections and organizes content to help visitors (and search engines) understand the structure of your content.
 
 -	**Name:** [core/heading](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-heading/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -380,7 +380,7 @@ Introduce new sections and organize content to help visitors (and search engines
 
 ## Home Link
 
-Create a link that always points to the homepage of the site. Usually not necessary if there is already a site title link present in the header.
+Creates a link that always points to the homepage of the site. Usually not necessary if there is already a site title link present in the header.
 
 -	**Name:** [core/home-link](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-home-link/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -390,7 +390,7 @@ Create a link that always points to the homepage of the site. Usually not necess
 
 ## Custom HTML
 
-Add custom HTML code and preview it as you edit.
+Adds custom HTML code and preview it as you edit.
 
 -	**Name:** [core/html](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-html/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -408,7 +408,7 @@ Insert an SVG icon.
 
 ## Image
 
-Insert an image to make a visual statement.
+Inserts an image to make a visual statement.
 
 -	**Name:** [core/image](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-image/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
@@ -417,7 +417,7 @@ Insert an image to make a visual statement.
 
 ## Latest Comments
 
-Display a list of your most recent comments.
+Displays a list of your most recent comments.
 
 -	**Name:** [core/latest-comments](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-latest-comments/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -426,7 +426,7 @@ Display a list of your most recent comments.
 
 ## Latest Posts
 
-Display a list of your most recent posts.
+Displays a list of your most recent posts.
 
 -	**Name:** [core/latest-posts](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-latest-posts/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -456,7 +456,7 @@ An individual item within a list.
 
 ## Login/out
 
-Show login & logout links.
+Shows a login & logout links.
 
 -	**Name:** [core/loginout](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-loginout/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -474,7 +474,7 @@ Display mathematical notation using LaTeX.
 
 ## Media & Text
 
-Set media and words side-by-side for a richer layout.
+Sets media and words side-by-side for a richer layout.
 
 -	**Name:** [core/media-text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-media-text/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
@@ -492,7 +492,7 @@ Your site doesn’t include support for this block.
 
 ## More
 
-Content before this block is shown in the excerpt on blog and archive pages. Where a theme shows the full content instead, visitors get a “Read more” link to the rest of the post.
+Displays content before this block in the excerpt on your archives page.
 
 -	**Name:** [core/more](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-more/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -511,7 +511,7 @@ A collection of blocks that allow visitors to get around your site.
 
 ## Navigation Link
 
-Add a page, link, or another item to your navigation.
+Adds a page, link, or another item to your navigation.
 
 -	**Name:** [core/navigation-link](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-link/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -531,7 +531,7 @@ A customizable button to close overlays.
 
 ## Submenu
 
-Add a submenu to your navigation.
+Adds a submenu to your navigation.
 
 -	**Name:** [core/navigation-submenu](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-submenu/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -541,7 +541,7 @@ Add a submenu to your navigation.
 
 ## Page Break
 
-Separate your content into a multi-page experience.
+Separates your content into a multi-page experience.
 
 -	**Name:** [core/nextpage](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-nextpage/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -550,7 +550,7 @@ Separate your content into a multi-page experience.
 
 ## Page List
 
-Display a list of all pages.
+Displays a list of all pages.
 
 -	**Name:** [core/page-list](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -579,7 +579,7 @@ Start with the basic building block of all narrative.
 
 ## Pattern Placeholder
 
-Show a block pattern.
+Shows a block pattern.
 
 -	**Name:** [core/pattern](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-pattern/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -645,7 +645,7 @@ This block is deprecated. Please use the Comments block instead.
 
 ## Comments Count
 
-Display a post's comments count.
+Displays a post's comments count.
 
 -	**Name:** [core/post-comments-count](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-comments-count/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -653,7 +653,7 @@ Display a post's comments count.
 
 ## Comments Form
 
-Display a post's comments form.
+Displays a post's comments form.
 
 -	**Name:** [core/post-comments-form](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-comments-form/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -678,7 +678,7 @@ Displays the contents of a post or page.
 
 ## Date
 
-Display a custom date.
+Displays the publish date for an entry such as a post or page.
 
 -	**Name:** [core/post-date](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-date/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -687,7 +687,7 @@ Display a custom date.
 
 ## Excerpt
 
-Display the excerpt.
+Displays the excerpt.
 
 -	**Name:** [core/post-excerpt](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-excerpt/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -696,7 +696,7 @@ Display the excerpt.
 
 ## Featured Image
 
-Display a post's featured image.
+Displays a post's featured image.
 
 -	**Name:** [core/post-featured-image](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-featured-image/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -723,7 +723,7 @@ Contains the block elements used to render a post, like the title, date, feature
 
 ## Post Terms
 
-Post terms.
+Displays post terms.
 
 -	**Name:** [core/post-terms](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-terms/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -732,7 +732,7 @@ Post terms.
 
 ## Time to Read
 
-Show minutes required to finish reading the post. Can also show a word count.
+Shows minutes required to finish reading the post.
 
 -	**Name:** [core/post-time-to-read](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-time-to-read/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -750,7 +750,7 @@ Displays the title of a post, page, or any other content-type.
 
 ## Preformatted
 
-Add text that respects your spacing and tabs, and also allows styling.
+Adds text that respects your spacing and tabs, and also allows styling.
 
 -	**Name:** [core/preformatted](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-preformatted/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -759,7 +759,7 @@ Add text that respects your spacing and tabs, and also allows styling.
 
 ## Pullquote
 
-Give special visual emphasis to a quote from your text.
+Gives a special visual emphasis to a quote from your text.
 
 -	**Name:** [core/pullquote](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-pullquote/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -827,7 +827,7 @@ Displays the previous posts page link.
 
 ## Query Title
 
-Display the query title.
+Displays the query title.
 
 -	**Name:** [core/query-title](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-title/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -836,7 +836,7 @@ Display the query title.
 
 ## Query Total
 
-Display the total number of results in a query.
+Displays the total number of results in a query.
 
 -	**Name:** [core/query-total](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-total/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -846,7 +846,7 @@ Display the total number of results in a query.
 
 ## Quote
 
-Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar
+Gives quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar
 
 -	**Name:** [core/quote](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-quote/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -864,7 +864,7 @@ Displays the link of a post, page, or any other content-type.
 
 ## RSS
 
-Display entries from any RSS or Atom feed.
+Displays entries from any RSS or Atom feed.
 
 -	**Name:** [core/rss](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-rss/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -873,7 +873,7 @@ Display entries from any RSS or Atom feed.
 
 ## Search
 
-Help visitors find your content.
+Helps visitors find your content.
 
 -	**Name:** [core/search](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-search/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -882,7 +882,7 @@ Help visitors find your content.
 
 ## Separator
 
-Create a break between ideas or sections with a horizontal separator.
+Creates a break between ideas or sections with a horizontal separator.
 
 -	**Name:** [core/separator](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-separator/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -891,7 +891,7 @@ Create a break between ideas or sections with a horizontal separator.
 
 ## Shortcode
 
-Insert additional custom elements with a WordPress shortcode.
+Inserts additional custom elements with a WordPress shortcode.
 
 -	**Name:** [core/shortcode](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-shortcode/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -900,7 +900,7 @@ Insert additional custom elements with a WordPress shortcode.
 
 ## Site Logo
 
-Display an image to represent this site. Update this block and the changes apply everywhere.
+Displays an image to represent this site. Update this block and the changes apply everywhere.
 
 -	**Name:** [core/site-logo](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-site-logo/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -909,7 +909,7 @@ Display an image to represent this site. Update this block and the changes apply
 
 ## Site Tagline
 
-Describe in a few words what this site is about. This is important for search results, sharing on social media, and gives overall clarity to visitors.
+Describes in a few words what the site is about. The tagline can be used in search results or when sharing on social networks even if it’s not displayed in the theme design.
 
 -	**Name:** [core/site-tagline](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-site-tagline/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -927,7 +927,7 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 
 ## Social Icon
 
-Display an icon linking to a social profile or site.
+Displays an icon linking to a social profile or site.
 
 -	**Name:** [core/social-link](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-social-link/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -937,7 +937,7 @@ Display an icon linking to a social profile or site.
 
 ## Social Icons
 
-Display icons linking to your social profiles or sites.
+Displays icons linking to your social profiles or sites.
 
 -	**Name:** [core/social-links](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-social-links/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -947,7 +947,7 @@ Display icons linking to your social profiles or sites.
 
 ## Spacer
 
-Add white space between blocks and customize its height.
+Adds a white space between blocks and customize its height.
 
 -	**Name:** [core/spacer](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-spacer/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -986,7 +986,7 @@ Container for tab panel content in a tabbed interface.
 
 ## Table
 
-Create structured content in rows and columns to display information.
+Creates structured content in rows and columns to display information.
 
 -	**Name:** [core/table](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-table/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -995,7 +995,7 @@ Create structured content in rows and columns to display information.
 
 ## Table of Contents
 
-Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here.
+Summarizes your post with a list of headings. Add HTML anchors to Heading blocks to link them here.
 
 -	**Name:** [core/table-of-contents](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-table-of-contents/)
 -	**Experimental:** true
@@ -1015,7 +1015,7 @@ Display content in a tabbed interface to help users navigate detailed content wi
 
 ## Tag Cloud
 
-A cloud of popular keywords, each sized by how often it appears.
+Displays a cloud of popular keywords, each sized by how often it appears.
 
 -	**Name:** [core/tag-cloud](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-tag-cloud/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -1024,7 +1024,7 @@ A cloud of popular keywords, each sized by how often it appears.
 
 ## Template Part
 
-Edit the different global regions of your site, like the header, footer, sidebar, or create your own.
+Edits the different global regions of your site, like the header, footer, sidebar, or create your own.
 
 -	**Name:** [core/template-part](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-template-part/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -1042,7 +1042,7 @@ Displays the post count of a taxonomy term.
 
 ## Term Description
 
-Display the description of categories, tags and custom taxonomies when viewing an archive.
+Displays the description of categories, tags and custom taxonomies when viewing an archive.
 
 -	**Name:** [core/term-description](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-term-description/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -1086,7 +1086,7 @@ This block is deprecated. Please use the Columns block instead.
 
 ## Poetry
 
-Insert poetry. Use special spacing formats. Or quote song lyrics.
+Inserts poetry. Use special spacing formats. Or quote song lyrics.
 
 -	**Name:** [core/verse](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-verse/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -1095,7 +1095,7 @@ Insert poetry. Use special spacing formats. Or quote song lyrics.
 
 ## Video
 
-Embed a video from your media library or upload a new one.
+Embeds a video from your media library or upload a new one.
 
 -	**Name:** [core/video](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-video/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)

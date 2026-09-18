@@ -4,7 +4,7 @@
 	"name": "core/video",
 	"title": "Video",
 	"category": "media",
-	"description": "Embed a video from your media library or upload a new one.",
+	"description": "Embeds a video from your media library or upload a new one.",
 	"keywords": [ "movie" ],
 	"textdomain": "default",
 	"attributes": {

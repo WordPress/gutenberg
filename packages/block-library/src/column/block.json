@@ -5,7 +5,7 @@
 	"title": "Column",
 	"category": "design",
 	"parent": [ "core/columns" ],
-	"description": "A single column within a columns block.",
+	"description": "Displays a single column within a columns block.",
 	"textdomain": "default",
 	"attributes": {
 		"verticalAlignment": {

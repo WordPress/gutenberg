@@ -5,7 +5,7 @@
 	"title": "Buttons",
 	"category": "design",
 	"allowedBlocks": [ "core/button" ],
-	"description": "Prompt visitors to take action with a group of button-style links.",
+	"description": "Prompts visitors to take action with a group of button-style links.",
 	"keywords": [ "link" ],
 	"textdomain": "default",
 	"supports": {

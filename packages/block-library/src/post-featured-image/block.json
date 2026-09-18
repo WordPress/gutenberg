@@ -4,7 +4,7 @@
 	"name": "core/post-featured-image",
 	"title": "Featured Image",
 	"category": "theme",
-	"description": "Display a post's featured image.",
+	"description": "Displays a post's featured image.",
 	"textdomain": "default",
 	"attributes": {
 		"isLink": {

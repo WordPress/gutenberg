@@ -5,7 +5,7 @@
 	"category": "design",
 	"parent": [ "core/navigation" ],
 	"title": "Home Link",
-	"description": "Create a link that always points to the homepage of the site. Usually not necessary if there is already a site title link present in the header.",
+	"description": "Creates a link that always points to the homepage of the site. Usually not necessary if there is already a site title link present in the header.",
 	"textdomain": "default",
 	"attributes": {
 		"label": {
