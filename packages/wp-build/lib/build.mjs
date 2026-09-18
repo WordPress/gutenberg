@@ -737,7 +737,7 @@ async function bundlePackage( packageName, options = {} ) {
 	}
 
 	let hasMainStyle = false;
-	if ( packageJson.wpScript ) {
+	if ( packageJson.wpScript || packageJson.wpScriptModuleExports ) {
 		const buildStyleDir = path.join( packageDir, 'build-style' );
 		const outputDir = path.join( BUILD_DIR, 'styles', packageName );
 
@@ -872,26 +872,29 @@ async function bundlePackage( packageName, options = {} ) {
 	// Collect style metadata after builds complete (so asset files exist)
 	// Only register the main style.css file - complex cases handled manually in lib/client-assets.php
 	if ( hasMainStyle ) {
-		// Read script asset file to get dependencies
-		const scriptAssetPath = path.join(
-			BUILD_DIR,
-			'scripts',
-			packageName,
-			'index.min.asset.php'
-		);
-
-		const assetContent = await readFile( scriptAssetPath, 'utf8' );
-		const depsMatch = assetContent.match(
-			/'dependencies' => array\((.*?)\)/s
-		);
-
+		// Read the script asset file to get dependencies. A script module
+		// package has no script asset file, and its style has no dependencies.
 		let scriptDependencies = [];
-		if ( depsMatch ) {
-			const depsString = depsMatch[ 1 ];
-			scriptDependencies =
-				depsString
-					.match( /'([^']+)'/g )
-					?.map( ( d ) => d.replace( /'/g, '' ) ) || [];
+		if ( packageJson.wpScript ) {
+			const scriptAssetPath = path.join(
+				BUILD_DIR,
+				'scripts',
+				packageName,
+				'index.min.asset.php'
+			);
+
+			const assetContent = await readFile( scriptAssetPath, 'utf8' );
+			const depsMatch = assetContent.match(
+				/'dependencies' => array\((.*?)\)/s
+			);
+
+			if ( depsMatch ) {
+				const depsString = depsMatch[ 1 ];
+				scriptDependencies =
+					depsString
+						.match( /'([^']+)'/g )
+						?.map( ( d ) => d.replace( /'/g, '' ) ) || [];
+			}
 		}
 
 		const styleDeps = await inferStyleDependencies(
