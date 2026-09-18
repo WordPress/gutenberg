@@ -11,8 +11,13 @@ import { createRegistry } from '@wordpress/data';
 import { store as uploadStore } from '..';
 import { ItemStatus, OperationType, type QueueItem } from '../types';
 import { unlock } from '../../lock-unlock';
-import { UploadError } from '../../upload-error';
-import { vipsCancelOperations, vipsResizeImage } from '../utils';
+import { ErrorCode, UploadError } from '../../upload-error';
+import {
+	vipsCancelOperations,
+	vipsConvertImageFormat,
+	vipsEnsureJxlSupport,
+	vipsResizeImage,
+} from '../utils';
 import { cancelGifToVideoOperations } from '../utils/video-conversion';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
@@ -41,7 +46,9 @@ vi.mock(
 			vipsRotateImage: vi.fn(),
 			vipsHasTransparency: vi.fn( () => Promise.resolve( false ) ),
 			vipsConvertImageFormat: vi.fn(),
+			vipsEnsureJxlSupport: vi.fn( () => Promise.resolve() ),
 			terminateVipsWorker: vi.fn(),
+			maybeRecycleVipsWorker: vi.fn(),
 		} ) as unknown as typeof import( '../utils' )
 );
 
@@ -60,8 +67,6 @@ vi.mock( import( '../utils/video-conversion' ), async ( importOriginal ) => {
 	};
 } );
 
-// Import the mocked modules to access the mock functions.
-
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
 	const registry = createRegistry();
@@ -77,6 +82,18 @@ const jpegFile = new File( [ 'foo' ], 'example.jpg', {
 const mp4File = new File( [ 'foo' ], 'amazing-video.mp4', {
 	lastModified: 1234567891,
 	type: 'video/mp4',
+} );
+
+const jxlFile = new File( [ 'foo' ], 'example.jxl', {
+	lastModified: 1234567891,
+	type: 'image/jxl',
+} );
+
+// Windows and most Linux distributions have no `.jxl` entry in their MIME
+// registry, so the browser hands back an empty `File.type`.
+const untypedJxlFile = new File( [ 'foo' ], 'example.jxl', {
+	lastModified: 1234567891,
+	type: '',
 } );
 
 describe( 'actions', () => {
@@ -224,6 +241,136 @@ describe( 'actions', () => {
 			// Server should not generate sub-sizes for vips-supported images.
 			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
 				false
+			);
+		} );
+
+		it( 'converts JPEG XL to JPEG and keeps sub-size generation on the client', async () => {
+			/*
+			 * Regression test: the JXL branch used to leave `additionalData`
+			 * untouched, so `generate_sub_sizes` kept its server-side default
+			 * of true. create_item then built every sub-size itself, the
+			 * response reported no missing_image_sizes, and generateThumbnails
+			 * sideloaded nothing - silently reverting JXL uploads to
+			 * server-side processing.
+			 */
+			const jpegDerivative = new File( [ 'jpeg' ], 'example.jpg', {
+				type: 'image/jpeg',
+			} );
+			( vipsConvertImageFormat as Mock ).mockResolvedValue(
+				jpegDerivative
+			);
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jxlFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// The JXL WASM chunk is only fetched when a JXL is processed.
+			expect( vipsEnsureJxlSupport ).toHaveBeenCalled();
+			expect( vipsConvertImageFormat ).toHaveBeenCalledWith(
+				item.id,
+				jxlFile,
+				'image/jpeg',
+				expect.anything()
+			);
+
+			// The JPEG derivative is uploaded, the original .jxl is kept for
+			// the companion sideload.
+			expect( updatedItem.file ).toBe( jpegDerivative );
+			expect( updatedItem.sourceFile ).toBe( jpegDerivative );
+			expect( updatedItem.originalJxlFile ).toBe( jxlFile );
+
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+				] )
+			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				false
+			);
+			expect( updatedItem.additionalData.convert_format ).toBe( true );
+		} );
+
+		it( 'detects JPEG XL by extension when the OS reports no mime type', async () => {
+			/*
+			 * Regression test: detection used to key off `File.type` alone.
+			 * On systems with no `.jxl` MIME mapping the type is an empty
+			 * string, so the file fell through to a plain upload - and since
+			 * the upload_mimes filter now registers image/jxl, the server
+			 * accepted and stored a raw .jxl it cannot read.
+			 */
+			const jpegDerivative = new File( [ 'jpeg' ], 'example.jpg', {
+				type: 'image/jpeg',
+			} );
+			( vipsConvertImageFormat as Mock ).mockResolvedValue(
+				jpegDerivative
+			);
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: untypedJxlFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			expect( vipsEnsureJxlSupport ).toHaveBeenCalled();
+			expect( updatedItem.file ).toBe( jpegDerivative );
+			expect( updatedItem.originalJxlFile ).toBe( untypedJxlFile );
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				false
+			);
+		} );
+
+		it( 'cancels with a JXL-specific error code when decoding fails', async () => {
+			/*
+			 * The code used to be the bare string 'JXL_DECODE_ERROR', which is
+			 * absent from the ErrorCode enum and from getErrorMessage()'s
+			 * table, so the user saw the generic "Upload failed / Please try
+			 * again" copy for a permanently unrecoverable failure.
+			 */
+			const onError = vi.fn();
+			( vipsConvertImageFormat as Mock ).mockRejectedValue(
+				new Error( 'unsupported JXL feature' )
+			);
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jxlFile,
+				onError,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					code: ErrorCode.JXL_DECODE_ERROR,
+				} )
 			);
 		} );
 

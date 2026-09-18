@@ -899,7 +899,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		return array(
 			'original',
 			'scaled',
-			// Source-format original (e.g. the HEIC kept alongside its JPEG derivative).
+			// Source-format original (e.g. the HEIC or JXL kept alongside its
+			// JPEG derivative).
 			self::IMAGE_SIZE_SOURCE_ORIGINAL,
 			// Converted-video companions for an animated GIF (the MP4/WebM and its poster).
 			self::IMAGE_SIZE_ANIMATED_VIDEO,
@@ -926,8 +927,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		// Source-format original companion file: no dimension constraint, and
-		// the caller passes (0, 0) because the source format (e.g. HEIC) may
-		// not be readable by wp_getimagesize() at all.
+		// the caller passes (0, 0) because the source format (e.g. HEIC, JXL)
+		// may not be readable by wp_getimagesize() at all.
 		if ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
 			return true;
 		}
@@ -1178,9 +1179,9 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// ('source_original', e.g. the HEIC kept next to its JPEG derivative)
 		// are exempt for the same reason: their dimensions are neither
 		// validated nor recorded, and wp_getimagesize() may not be able to
-		// read the source format at all on servers without HEIC/HEIF support.
-		// Skip the read for both cases; validate_image_dimensions() also
-		// short-circuits them below.
+		// read the source format at all on servers without HEIC/HEIF/JXL
+		// support. Skip the read for those cases; validate_image_dimensions()
+		// also short-circuits them below.
 		$skip_dimension_read =
 			self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ||
 			self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size;

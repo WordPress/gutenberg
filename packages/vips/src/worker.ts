@@ -13,6 +13,7 @@ import {
 	resizeImage,
 	rotateImage,
 	hasTransparency,
+	setJxlWasm,
 	getUltraHdrInfo,
 } from './index.ts';
 
@@ -26,6 +27,7 @@ const api = {
 	resizeImage,
 	rotateImage,
 	hasTransparency,
+	setJxlWasm,
 	getUltraHdrInfo,
 };
 
