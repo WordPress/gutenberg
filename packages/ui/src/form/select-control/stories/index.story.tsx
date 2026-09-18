@@ -11,11 +11,6 @@ const meta: Meta< typeof SelectControl > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/SelectControl',
 	component: SelectControl,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <SelectControl { ...args } />,
 	subcomponents: {
 		'SelectControl.Group': SelectControl.Group,
 		'SelectControl.GroupLabel': SelectControl.GroupLabel,
