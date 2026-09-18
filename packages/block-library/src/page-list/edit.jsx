@@ -137,12 +137,18 @@ export default function PageListEdit( {
 		'postType',
 		'page',
 		{
-			per_page: MAX_PAGE_COUNT,
+			// The front end lists every page, so fetch them all here too. The
+			// REST API caps `per_page` at 100; `-1` makes apiFetch page through
+			// the whole collection.
+			per_page: -1,
 			_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
-			// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
-			// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
-			// sort.
-			orderby: 'menu_order',
+			// The pages are sorted client side (see `pagesByParentId`) because
+			// the REST API can't order by menu order and title together
+			// (https://core.trac.wordpress.org/ticket/39037). Paging through
+			// the collection needs a unique sort key: with `menu_order`, which
+			// most pages share, the database may repeat rows on one request
+			// and skip them on the next.
+			orderby: 'id',
 			order: 'asc',
 		}
 	);
