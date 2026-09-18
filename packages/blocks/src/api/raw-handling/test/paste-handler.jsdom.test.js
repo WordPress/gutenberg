@@ -3,6 +3,8 @@ import { pasteHandler, serialize } from '@wordpress/blocks';
 import { init as initAndRegisterImageBlock } from '../../../../../block-library/src/image';
 import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';
 import { init as initAndRegisterVideoBlock } from '../../../../../block-library/src/video';
+import { init as initAndRegisterParagraphBlock } from '../../../../../block-library/src/paragraph';
+import { init as initAndRegisterMissingBlock } from '../../../../../block-library/src/missing';
 
 const tableWithHeaderFooterAndBodyUsingColspan = `
 <table>
@@ -81,6 +83,8 @@ describe( 'pasteHandler', () => {
 	beforeAll( () => {
 		initAndRegisterTableBlock();
 		initAndRegisterVideoBlock();
+		initAndRegisterParagraphBlock();
+		initAndRegisterMissingBlock();
 	} );
 
 	it( 'can handle a table with thead, tbody and tfoot using colspan', () => {
@@ -257,6 +261,38 @@ describe( 'pasteHandler', () => {
 			],
 			foot: [],
 		} );
+	} );
+
+	it( 'unwraps a single-cell layout table (e.g. from an HTML email) into a paragraph instead of a Table block', () => {
+		const result = pasteHandler( {
+			HTML: '<table><tr><td><p>Hello from an email</p></td></tr></table>',
+			tagName: 'p',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result ).toHaveLength( 1 );
+		expect( result[ 0 ].name ).toEqual( 'core/paragraph' );
+		expect( result[ 0 ].attributes.content.toString() ).toEqual(
+			'Hello from an email'
+		);
+	} );
+
+	it( 'unwraps nested single-column layout tables while still converting a real inner data table', () => {
+		const result = pasteHandler( {
+			HTML:
+				'<table><tr><td>' +
+				'<table><tr><td><p>Intro</p></td></tr></table>' +
+				tableWithCellAlignments +
+				'</td></tr></table>',
+			tagName: 'p',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result.map( ( block ) => block.name ) ).toEqual( [
+			'core/paragraph',
+			'core/table',
+		] );
 	} );
 
 	it( 'preserves <img> wrapped in <a> when source is plain text only', () => {
