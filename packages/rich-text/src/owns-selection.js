@@ -16,28 +16,30 @@ export function ownsSelection( element ) {
 		return true;
 	}
 
-	// Read the `contentEditable` attribute, not `isContentEditable`: the latter
-	// computes the effective editable state and forces a style and layout tree
-	// update. Since each editable element checks this on every keystroke, that
-	// forced update would scale with the number of blocks in the post. The
-	// editing host and the editable both set the attribute explicitly, so the
-	// attribute is equivalent here.
+	if ( ! activeElement ) {
+		return false;
+	}
+
+	// Check the selection before the editing host. When the host is the canvas
+	// wrapper it contains every editable element, so the host checks pass for
+	// all of them and only the selection tells them apart. Running the
+	// discriminating check first lets a non-owning instance bail before the
+	// host checks.
+	const selection = ownerDocument.defaultView.getSelection();
+	const { anchorNode, focusNode } = selection;
+
 	if (
-		! activeElement ||
-		activeElement.contentEditable !== 'true' ||
-		element.contentEditable !== 'true' ||
-		! activeElement.contains( element )
+		! anchorNode ||
+		! focusNode ||
+		! element.contains( anchorNode ) ||
+		! element.contains( focusNode )
 	) {
 		return false;
 	}
 
-	const selection = ownerDocument.defaultView.getSelection();
-	const { anchorNode, focusNode } = selection;
-
 	return (
-		!! anchorNode &&
-		!! focusNode &&
-		element.contains( anchorNode ) &&
-		element.contains( focusNode )
+		activeElement.contentEditable === 'true' &&
+		element.contentEditable === 'true' &&
+		activeElement.contains( element )
 	);
 }
