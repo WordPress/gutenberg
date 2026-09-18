@@ -5,11 +5,6 @@ const meta: Meta< typeof Select.Root > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Select',
 	component: Select.Root,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <Select.Root { ...args } />,
 	subcomponents: {
 		'Select.Trigger': Select.Trigger,
 		'Select.Portal': Select.Portal,
