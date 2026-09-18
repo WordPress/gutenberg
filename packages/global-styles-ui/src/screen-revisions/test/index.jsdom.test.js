@@ -124,7 +124,9 @@ vi.mock( import( '@wordpress/dataviews' ), async () => {
 					'button',
 					{
 						key: action.id,
-						disabled: ! selection.length || ! eligibleItems.length,
+						disabled:
+							! selection.length ||
+							( !! action.isEligible && ! eligibleItems.length ),
 						onClick: () => action.callback( eligibleItems ),
 					},
 					typeof action.label === 'string'
