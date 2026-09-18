@@ -559,8 +559,7 @@ test.describe( 'Style Revisions', () => {
 		}
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
-		// The page select is the screen's only pagination control: the
-		// sidebar has no room for the previous/next buttons next to Apply.
+		// The page select is the screen's only pagination control.
 		const currentPageSelect = page.getByLabel( 'Current page' );
 		await expect( currentPageSelect ).toHaveValue( '1' );
 		await currentPageSelect.selectOption( '2' );

@@ -300,8 +300,6 @@ function RevisionsList( {
 				actions={ actions }
 			>
 				<DataViewsPicker.Layout />
-				{ /* One pagination control fits next to the action in the
-				     sidebar, and a single selection needs no count. */ }
 				<Stack
 					direction="row"
 					justify="space-between"
