@@ -135,6 +135,12 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 }
 
+.block-editor-link-control__search-no-results {
+	margin: 0;
+	padding: $grid-unit-10 $grid-unit-15;
+	color: $gray-700;
+}
+
 .block-editor-link-control__search-item {
 
 	&.components-button.components-menu-item__button {

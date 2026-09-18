@@ -219,7 +219,7 @@ describe( 'URLInput', () => {
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 		} );
 
-		it( 'should fetch suggestions on focus when the previous search returned no results', async () => {
+		it( 'should show a "no results" message and fetch again on focus when the previous search returned no results', async () => {
 			let resolveMountRequest;
 			fetchLinkSuggestions
 				.mockImplementationOnce(
@@ -245,12 +245,24 @@ describe( 'URLInput', () => {
 				).not.toBeInTheDocument()
 			);
 
-			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+			// The listbox stays open to surface a "no results" message instead
+			// of silently vanishing, even though it contains no options.
+			expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
+			expect(
+				screen.getByText( 'No results found for "hello"' )
+			).toBeVisible();
 
 			await user.click( input );
 
-			expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
-			expect( fetchLinkSuggestions ).toHaveBeenCalledTimes( 2 );
+			// The listbox is already visible (showing the "no results"
+			// message), so wait on the actual refetch rather than on the
+			// listbox appearing.
+			await waitFor( () =>
+				expect( fetchLinkSuggestions ).toHaveBeenCalledTimes( 2 )
+			);
+			expect(
+				screen.queryByText( 'No results found for "hello"' )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'should not fetch suggestions again on refocus when suggestions are already displayed', async () => {

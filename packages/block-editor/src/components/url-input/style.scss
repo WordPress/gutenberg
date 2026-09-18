@@ -55,6 +55,13 @@ $input-size: 300px;
 	}
 }
 
+.block-editor-url-input__suggestions-no-results {
+	display: block;
+	padding: $grid-unit-10 $grid-unit-15;
+	color: $gray-700;
+	font-size: $default-font-size;
+}
+
 .block-editor-url-input__suggestion {
 	min-height: $button-size;
 	height: auto;

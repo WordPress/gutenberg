@@ -15,6 +15,7 @@ function LinkControlSearchResults( {
 	suggestions,
 	selectedSuggestion,
 	isLoading,
+	hasNoResults,
 	isInitialSuggestions,
 	createSuggestionButtonText,
 	suggestionsQuery,
@@ -51,6 +52,15 @@ function LinkControlSearchResults( {
 				className={ resultsListClasses }
 				aria-label={ labelText }
 			>
+				{ hasNoResults && (
+					<p className="block-editor-link-control__search-no-results">
+						{ sprintf(
+							/* translators: %s: search term. */
+							__( 'No results found for "%s"' ),
+							currentInputValue
+						) }
+					</p>
+				) }
 				<MenuGroup>
 					{ suggestions.map( ( suggestion, index ) => {
 						if (

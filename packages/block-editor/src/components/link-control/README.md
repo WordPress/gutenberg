@@ -369,6 +369,7 @@ The following properties are provided by URLInput:
 
 -   buildSuggestionItemProps
 -   handleSuggestionClick
+-   hasNoResults
 -   isInitialSuggestions
 -   isLoading
 -   suggestions
@@ -500,6 +501,13 @@ Whether the suggestions are being fetched at the moment. When this component is 
 -   Required: No
 
 Whether this component was rendered to show initial suggestions (the ones displayed right after mounting, before the user begins interacting with LinkControl).
+
+### hasNoResults
+
+-   Type: `boolean`
+-   Required: No
+
+Whether a real search (not the initial suggestions) resolved with zero results. When this component is used with `LinkControlSearchInput`, this property is provided by `URLInput`.
 
 ### selectedSuggestion
 
