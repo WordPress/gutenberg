@@ -19,6 +19,10 @@
 -   `Autocomplete`: Show focus ring with the design system's outline instead of previous box-shadow implementation ([#82766](https://github.com/WordPress/gutenberg/pull/82766)).
 -   `CustomGradientPicker`: Show the control point's focus ring with the design system's outline and a contrasting backing to separate it from the gradient ([#82834](https://github.com/WordPress/gutenberg/pull/82834)).
 
+### Deprecations
+
+-   `Divider`: Deprecate the component, planned for removal in WordPress 7.4 ([#83040](https://github.com/WordPress/gutenberg/pull/83040)).
+
 ### Bug Fixes
 
 -   `Card`: Keep shadow radii aligned with the Card's actual radius regardless of render order ([#82572](https://github.com/WordPress/gutenberg/pull/82572)).
