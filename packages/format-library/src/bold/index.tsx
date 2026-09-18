@@ -7,7 +7,9 @@ import {
 	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { formatBold } from '@wordpress/icons';
+import type { RichTextValue } from '@wordpress/rich-text';
 import type { FormatEditWithVisibilityProps } from '../types';
+import { applyMarkdownStyleFormat } from '../markdown-style-input-rule';
 
 const name = 'core/bold';
 const title = __( 'Bold' );
@@ -17,6 +19,9 @@ export const bold = {
 	title,
 	tagName: 'strong',
 	className: null,
+	__unstableInputRule( value: RichTextValue ): RichTextValue {
+		return applyMarkdownStyleFormat( value, name, [ '**', '__' ] );
+	},
 	edit( {
 		isActive,
 		value,

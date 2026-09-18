@@ -7,7 +7,9 @@ import {
 	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { formatItalic } from '@wordpress/icons';
+import type { RichTextValue } from '@wordpress/rich-text';
 import type { FormatEditWithVisibilityProps } from '../types';
+import { applyMarkdownStyleFormat } from '../markdown-style-input-rule';
 
 const name = 'core/italic';
 const title = __( 'Italic' );
@@ -17,6 +19,9 @@ export const italic = {
 	title,
 	tagName: 'em',
 	className: null,
+	__unstableInputRule( value: RichTextValue ): RichTextValue {
+		return applyMarkdownStyleFormat( value, name, [ '*', '_' ] );
+	},
 	edit( {
 		isActive,
 		value,
