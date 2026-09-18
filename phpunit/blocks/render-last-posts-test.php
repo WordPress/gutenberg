@@ -56,10 +56,13 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 		$action = new MockAction();
 		add_filter( 'update_post_metadata_cache', array( $action, 'filter' ), 10, 2 );
 		$attributes = array(
-			'displayFeaturedImage' => true,
-			'postsToShow'          => 5,
-			'orderBy'              => 'date',
-			'order'                => 'DESC',
+			'displayFeaturedImage'   => true,
+			'postsToShow'            => 5,
+			'orderBy'                => 'date',
+			'order'                  => 'DESC',
+			'excerptLength'          => 0,
+			'featuredImageSizeSlug'  => '',
+			'addLinkToFeaturedImage' => false,
 		);
 
 		gutenberg_render_block_core_latest_posts( $attributes );
@@ -75,10 +78,13 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 		$action = new MockAction();
 		add_filter( 'update_post_metadata_cache', array( $action, 'filter' ), 10, 2 );
 		$attributes = array(
-			'displayFeaturedImage' => false,
-			'postsToShow'          => 5,
-			'orderBy'              => 'date',
-			'order'                => 'DESC',
+			'displayFeaturedImage'   => false,
+			'postsToShow'            => 5,
+			'orderBy'                => 'date',
+			'order'                  => 'DESC',
+			'excerptLength'          => 0,
+			'featuredImageSizeSlug'  => '',
+			'addLinkToFeaturedImage' => false,
 		);
 
 		gutenberg_render_block_core_latest_posts( $attributes );
