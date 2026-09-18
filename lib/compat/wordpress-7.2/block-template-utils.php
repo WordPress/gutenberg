@@ -27,18 +27,6 @@ function gutenberg_filter_post_templates( $templates, $query, $template_type ) {
 		return $templates;
 	}
 
-	$templates = array_values(
-		array_filter(
-			$templates,
-			static function ( $template ) use ( $post ) {
-				return $template instanceof WP_Block_Template && $template->is_custom && (
-					! isset( $template->post_types ) ||
-					( is_array( $template->post_types ) && in_array( $post->post_type, $template->post_types, true ) )
-				);
-			}
-		)
-	);
-
 	$slug = 'page' === $post->post_type ? 'page' : 'single-' . $post->post_type;
 	if ( $post->post_name ) {
 		$slug .= '-' . $post->post_name;
@@ -55,18 +43,22 @@ function gutenberg_filter_post_templates( $templates, $query, $template_type ) {
 		}
 	}
 
-	$hierarchy = get_template_hierarchy( $slug );
-	do {
-		$default_template = resolve_block_template( $slug, $hierarchy, '' );
-		array_shift( $hierarchy );
-	} while ( ! empty( $hierarchy ) && empty( $default_template->content ) );
+	$default_template = resolve_block_template( $slug, get_template_hierarchy( $slug ), '' );
 
+	$post_templates = $default_template ? array( $default_template ) : array();
 	if ( 'home' === $slug ) {
-		return $default_template ? array( $default_template ) : array();
+		return $post_templates;
 	}
-	if ( $default_template ) {
-		array_unshift( $templates, $default_template );
+
+	foreach ( $templates as $template ) {
+		if ( ! $template instanceof WP_Block_Template || ! $template->is_custom ) {
+			continue;
+		}
+		if ( isset( $template->post_types ) && ( ! is_array( $template->post_types ) || ! in_array( $post->post_type, $template->post_types, true ) ) ) {
+			continue;
+		}
+		$post_templates[] = $template;
 	}
-	return $templates;
+	return $post_templates;
 }
 add_filter( 'get_block_templates', 'gutenberg_filter_post_templates', 9, 3 );
