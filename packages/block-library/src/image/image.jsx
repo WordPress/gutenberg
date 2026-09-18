@@ -1162,7 +1162,7 @@ export default function Image( {
 								hasValue={ () => !! preserveStillImage }
 								onDeselect={ () => playAsLivePhoto() }
 							>
-								<CheckboxControl
+								<WCCheckboxControl
 									label={ __( 'Display as still image' ) }
 									checked={ !! preserveStillImage }
 									onChange={ ( value ) =>
