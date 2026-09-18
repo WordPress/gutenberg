@@ -51,6 +51,7 @@ describe( 'Waveform Player dependency', () => {
 		jsdomStubs.forEach( ( stub ) => stub.mockRestore() );
 		vi.useRealTimers();
 		vi.resetModules();
+		vi.doUnmock( '@arraypress/waveform-player' );
 		document.body.innerHTML = '';
 		document.documentElement.removeAttribute( AUTO_INIT_ATTRIBUTE );
 
@@ -64,7 +65,8 @@ describe( 'Waveform Player dependency', () => {
 	/*
 	 * Must run first: the dependency scans the document while its own module is
 	 * evaluated, and `vi.resetModules()` does not re-evaluate dependencies, so
-	 * the scan is only observable on the first import in this file.
+	 * the real scan is only observable on the first import in this file. The
+	 * opt-out itself is covered order-independently below.
 	 */
 	it( 'leaves declarative markup it does not own uninitialized', async () => {
 		const element = createDeclarativePlayer();
@@ -91,6 +93,20 @@ describe( 'Waveform Player dependency', () => {
 		expect(
 			element.querySelector( '.waveform-player-inner' )
 		).not.toBeNull();
+	} );
+
+	it( 'applies the opt-out before the dependency is evaluated', async () => {
+		let attributeWhenEvaluated;
+
+		vi.doMock( '@arraypress/waveform-player', () => {
+			attributeWhenEvaluated =
+				document.documentElement.getAttribute( AUTO_INIT_ATTRIBUTE );
+			return { default: class WaveformPlayerStub {} };
+		} );
+
+		await loadWaveformUtils();
+
+		expect( attributeWhenEvaluated ).toBe( 'false' );
 	} );
 
 	it( "restores the document's own opt-out value", async () => {

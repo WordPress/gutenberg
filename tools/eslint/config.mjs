@@ -980,6 +980,13 @@ export default dedupePlugins( [
 								'Importing the waveform player initializes every `[data-waveform-player]` element on the page, including markup the Playlist block does not own. Import `utils/waveform-player-library` instead.',
 						},
 					],
+					patterns: [
+						{
+							group: [ '@arraypress/waveform-player/*' ],
+							message:
+								'Importing the waveform player initializes every `[data-waveform-player]` element on the page, including markup the Playlist block does not own. Import `utils/waveform-player-library` instead.',
+						},
+					],
 				},
 			],
 		},
