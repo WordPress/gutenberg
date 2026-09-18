@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
-import { RawHTML, useEffect, renderToString } from '@wordpress/element';
+import { RawHTML, useEffect, useRef } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 import { closeSmall } from '@wordpress/icons';
 import Button from '../button';
@@ -12,20 +12,54 @@ const noop = () => {};
 
 /**
  * Custom hook which announces the message with the given politeness, if a
- * valid message is provided.
+ * valid message is provided. Passing `null` or `undefined` as the message
+ * skips the announcement.
+ *
+ * A non-string message is read from the DOM node the returned ref is attached
+ * to, rather than serialized with `renderToString`. Serializing during render
+ * invokes the message components as plain functions, so any hooks they use
+ * would be registered against the component rendering the notice, crashing it
+ * when the message changes shape. See
+ * https://github.com/WordPress/gutenberg/issues/61199.
  */
 function useSpokenMessage(
 	message: NoticeProps[ 'spokenMessage' ],
 	politeness: NoticeProps[ 'politeness' ]
 ) {
-	const spokenMessage =
-		typeof message === 'string' ? message : renderToString( message );
+	const messageContainerRef = useRef< HTMLDivElement >( null );
+	const previouslySpokenRef = useRef< {
+		message: string;
+		politeness: NoticeProps[ 'politeness' ];
+	} >();
 
 	useEffect( () => {
-		if ( spokenMessage ) {
+		let spokenMessage;
+		if ( typeof message === 'string' ) {
+			spokenMessage = message;
+		} else if ( message !== null && message !== undefined ) {
+			spokenMessage = messageContainerRef.current?.innerHTML;
+		}
+
+		if ( ! spokenMessage ) {
+			// An empty message resets the deduplication, so that a
+			// subsequent identical message is announced again.
+			previouslySpokenRef.current = undefined;
+			return;
+		}
+
+		if (
+			spokenMessage !== previouslySpokenRef.current?.message ||
+			politeness !== previouslySpokenRef.current?.politeness
+		) {
+			previouslySpokenRef.current = {
+				message: spokenMessage,
+				politeness,
+			};
 			speak( spokenMessage, politeness );
 		}
-	}, [ spokenMessage, politeness ] );
+	} );
+
+	return messageContainerRef;
 }
 
 function getDefaultPoliteness( status: NoticeProps[ 'status' ] ) {
@@ -80,7 +114,16 @@ function Notice( {
 	// actually the function to call to remove the notice from the UI.
 	onDismiss = noop,
 }: NoticeProps ) {
-	useSpokenMessage( spokenMessage, politeness );
+	const spokenMessageRef = useSpokenMessage( spokenMessage, politeness );
+
+	// When `spokenMessage` is a distinct element (not the default `children`
+	// and not a string), it has no place in the rendered output to read the
+	// announcement from, so render it in a hidden container.
+	const isSpokenMessageDistinctElement =
+		typeof spokenMessage !== 'string' &&
+		spokenMessage !== children &&
+		spokenMessage !== null &&
+		spokenMessage !== undefined;
 
 	// Dismissibility is not a wrapper modifier; target `.components-notice__dismiss`
 	// or `.components-notice:has(.components-notice__dismiss)` from outside CSS.
@@ -98,7 +141,21 @@ function Notice( {
 	return (
 		<div className={ classes }>
 			<VisuallyHidden>{ getStatusLabel( status ) }</VisuallyHidden>
-			<div className="components-notice__content">{ children }</div>
+			<div
+				className="components-notice__content"
+				ref={
+					isSpokenMessageDistinctElement
+						? undefined
+						: spokenMessageRef
+				}
+			>
+				{ children }
+			</div>
+			{ isSpokenMessageDistinctElement && (
+				<div hidden ref={ spokenMessageRef }>
+					{ spokenMessage }
+				</div>
+			) }
 			{ actions.length > 0 && (
 				<div className="components-notice__actions">
 					{ actions.map(
