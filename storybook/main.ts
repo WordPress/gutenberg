@@ -132,6 +132,11 @@ const config: StorybookConfig = {
 	},
 	viteFinal: async ( viteConfig ) => {
 		return mergeConfig( viteConfig, {
+			/*
+			 * Storybook roots Vite at this config directory's parent, the
+			 * repository root, which owns none of the dependencies.
+			 */
+			root: import.meta.dirname,
 			resolve: {
 				alias: [
 					{

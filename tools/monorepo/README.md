@@ -28,3 +28,7 @@ See the TypeScript section of [`packages/README.md`](../../packages/README.md) f
 ## Experimental API audit
 
 `npm run --workspace @wordpress/monorepo-tools list-experimental-apis` prints a Markdown list of every `__experimental` API in `packages/` and `lib/`, each linked to a GitHub search for it. Release leads run it to audit experimental APIs ahead of a major WordPress release, as in [the WordPress 6.2 audit](https://github.com/WordPress/gutenberg/issues/47196).
+
+## Patching
+
+[`patching/`](./patching) creates and applies the dependency patches in [`patches/`](../../patches). `patch apply` runs from the repository root's `postinstall`.
