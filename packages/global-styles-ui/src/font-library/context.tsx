@@ -159,6 +159,12 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 			return;
 		}
 
+		// Provider fonts are listed as supplied; they have no installed copy to look up.
+		if ( font.source === 'plugin' ) {
+			setLibraryFontSelected( font );
+			return;
+		}
+
 		const fonts = font.source === 'theme' ? themeFonts : baseCustomFonts;
 
 		// Tries to find the font in the installed fonts

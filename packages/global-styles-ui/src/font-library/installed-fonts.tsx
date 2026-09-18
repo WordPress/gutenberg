@@ -26,6 +26,8 @@ import type { FontFamily } from '@wordpress/core-data';
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import LibraryFontVariant from './library-font-variant';
+import ProviderFontDetails from './provider-font-details';
+import { useFontProviders } from './font-providers';
 import { sortFontFaces } from './utils/sort-font-faces';
 import {
 	setUIValuesNeeded,
@@ -81,6 +83,15 @@ function InstalledFonts() {
 	const [ lastSelectedFontSlug, setLastSelectedFontSlug ] = useState<
 		string | undefined
 	>( undefined );
+
+	const providers = useFontProviders();
+	const [ selectedProviderSlug, setSelectedProviderSlug ] = useState<
+		string | undefined
+	>( undefined );
+	const isProviderFont = libraryFontSelected?.source === 'plugin';
+	const selectedProvider = isProviderFont
+		? providers.find( ( p ) => p.slug === selectedProviderSlug )
+		: undefined;
 
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] =
 		useState< boolean >( false );
@@ -267,7 +278,10 @@ function InstalledFonts() {
 		}
 	};
 
-	const hasFonts = baseThemeFonts.length > 0 || baseCustomFonts.length > 0;
+	const hasFonts =
+		baseThemeFonts.length > 0 ||
+		baseCustomFonts.length > 0 ||
+		providers.length > 0;
 	return (
 		<div className="font-library__tabpanel-layout">
 			{ isResolvingLibrary && (
@@ -342,6 +356,52 @@ function InstalledFonts() {
 										{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 									</VStack>
 								) }
+								{ providers.map( ( provider ) => (
+									<VStack key={ provider.slug }>
+										<h2 className="font-library__fonts-title">
+											{ provider.label }
+										</h2>
+										{ /*
+										 * Disable reason: The `list` ARIA role is redundant but
+										 * Safari+VoiceOver won't announce the list otherwise.
+										 */
+										/* eslint-disable jsx-a11y/no-redundant-roles */ }
+										<ul
+											role="list"
+											className="font-library__fonts-list"
+										>
+											{ provider.fontFamilies.map(
+												( font ) => (
+													<li
+														key={ font.slug }
+														className="font-library__fonts-list-item"
+													>
+														<FontCard
+															font={ font }
+															navigatorPath="/fontFamily"
+															shouldFocus={
+																font.slug ===
+																lastSelectedFontSlug
+															}
+															onClick={ () => {
+																setNotice(
+																	null
+																);
+																setSelectedProviderSlug(
+																	provider.slug
+																);
+																handleSetLibraryFontSelected(
+																	font
+																);
+															} }
+														/>
+													</li>
+												)
+											) }
+										</ul>
+										{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+									</VStack>
+								) ) }
 								{ baseCustomFonts.length > 0 && (
 									<VStack>
 										<h2 className="font-library__fonts-title">
@@ -442,48 +502,59 @@ function InstalledFonts() {
 								</>
 							) }
 							<Spacer margin={ 4 } />
-							<WCText>
-								{ __(
-									'Choose font variants. Keep in mind that too many variants could make your site slower.'
-								) }
-							</WCText>
-							<Spacer margin={ 4 } />
-							<VStack spacing={ 0 }>
-								<CheckboxControl
-									className="font-library__select-all"
-									label={ __( 'Select all' ) }
-									checked={ isSelectAllChecked }
-									onChange={ toggleSelectAll }
-									indeterminate={ isIndeterminate }
+							{ isProviderFont && libraryFontSelected ? (
+								<ProviderFontDetails
+									font={ libraryFontSelected }
+									provider={ selectedProvider }
 								/>
-								<Spacer margin={ 8 } />
-								{ /*
-								 * Disable reason: The `list` ARIA role is redundant but
-								 * Safari+VoiceOver won't announce the list otherwise.
-								 */
-								/* eslint-disable jsx-a11y/no-redundant-roles */ }
-								<ul
-									role="list"
-									className="font-library__fonts-list"
-								>
-									{ libraryFontSelected &&
-										getFontFacesToDisplay(
-											libraryFontSelected
-										).map( ( face, i ) => (
-											<li
-												key={ `face${ i }` }
-												className="font-library__fonts-list-item"
-											>
-												<LibraryFontVariant
-													font={ libraryFontSelected }
-													face={ face }
-													key={ `face${ i }` }
-												/>
-											</li>
-										) ) }
-								</ul>
-								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
-							</VStack>
+							) : (
+								<>
+									<WCText>
+										{ __(
+											'Choose font variants. Keep in mind that too many variants could make your site slower.'
+										) }
+									</WCText>
+									<Spacer margin={ 4 } />
+									<VStack spacing={ 0 }>
+										<CheckboxControl
+											className="font-library__select-all"
+											label={ __( 'Select all' ) }
+											checked={ isSelectAllChecked }
+											onChange={ toggleSelectAll }
+											indeterminate={ isIndeterminate }
+										/>
+										<Spacer margin={ 8 } />
+										{ /*
+										 * Disable reason: The `list` ARIA role is redundant but
+										 * Safari+VoiceOver won't announce the list otherwise.
+										 */
+										/* eslint-disable jsx-a11y/no-redundant-roles */ }
+										<ul
+											role="list"
+											className="font-library__fonts-list"
+										>
+											{ libraryFontSelected &&
+												getFontFacesToDisplay(
+													libraryFontSelected
+												).map( ( face, i ) => (
+													<li
+														key={ `face${ i }` }
+														className="font-library__fonts-list-item"
+													>
+														<LibraryFontVariant
+															font={
+																libraryFontSelected
+															}
+															face={ face }
+															key={ `face${ i }` }
+														/>
+													</li>
+												) ) }
+										</ul>
+										{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+									</VStack>
+								</>
+							) }
 						</Navigator.Screen>
 					</Navigator>
 
