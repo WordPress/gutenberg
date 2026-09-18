@@ -380,6 +380,7 @@ export default dedupePlugins( [
 						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
+						CheckboxControl: 'WCCheckboxControl',
 						Icon: 'WCIcon',
 						__experimentalInputControl: 'WCInputControl',
 						SelectControl: 'WCSelectControl',
