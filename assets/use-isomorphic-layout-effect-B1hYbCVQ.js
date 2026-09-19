@@ -1,0 +1,1 @@
+import{n as t}from"./rolldown-runtime-DiifJuVD.js";import{n as e,t as o}from"./react-jbyP5ryc.js";var i;function init_use_isomorphic_layout_effect(){return(init_use_isomorphic_layout_effect=t(()=>{e(),i="undefined"!=typeof window?o.useLayoutEffect:o.useEffect}))()}export{i as n,init_use_isomorphic_layout_effect as t};
