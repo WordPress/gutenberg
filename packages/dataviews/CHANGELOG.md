@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   DataForm card layout: Wrap the collapsible card header trigger in a heading (`<h2>`) and render it as a native button, following the W3C APG accordion pattern (heading wraps button), so the toggle gets a visible focus style ([#83010](https://github.com/WordPress/gutenberg/pull/83010)).
 -   Grid layout: when the title is hidden (`showTitle: false`) and items are clickable, label each item's clickable media area with its title instead of the generic "Navigate to item" ([#82639](https://github.com/WordPress/gutenberg/pull/82639)).
 -   DataForm: Hide the edit button of disabled fields in the panel layout, as it already is for read-only fields ([#82957](https://github.com/WordPress/gutenberg/pull/82957)).
 

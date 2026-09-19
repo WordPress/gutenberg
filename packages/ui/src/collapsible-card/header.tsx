@@ -23,11 +23,16 @@ import type { HeaderProps } from './types';
  * toggle trigger — clicking anywhere on it expands or collapses the
  * card's content.
  *
- * Defaults to a `<div>` wrapper around the trigger. Since the right heading
- * level depends on the surrounding document outline, the consumer is
- * expected to opt in to heading semantics. Pass `render` to wrap the
- * trigger in a heading (e.g. `render={ <h2 /> }`), following the W3C APG
- * accordion pattern (heading wraps button).
+ * The trigger renders as a native `<button>` so it is keyboard-focusable
+ * and exposed correctly to assistive technology. Defaults to a `<div>`
+ * wrapper around the trigger. Since the right heading level depends on the
+ * surrounding document outline, the consumer is expected to opt in to
+ * heading semantics. Pass `render` to wrap the trigger in a heading
+ * (e.g. `render={ <h2 /> }`), following the W3C APG accordion pattern
+ * (heading wraps button).
+ *
+ * To keep the non-native trigger (`role="button"`) used by some legacy
+ * consumers, pass `nativeButton={ false }`.
  *
  * Avoid placing interactive elements (buttons, links, inputs) inside the
  * header, since the entire area is clickable and their events will bubble
@@ -41,6 +46,7 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 			children,
 			className,
 			render,
+			nativeButton = true,
 			'aria-describedby': ariaDescribedByProp,
 			...restProps
 		},
@@ -123,9 +129,15 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 				children: (
 					<HeaderDescriptionIdContext.Provider value={ contextValue }>
 						<Collapsible.Trigger
-							className={ styles.header }
-							render={ <Card.Header /> }
-							nativeButton={ false }
+							className={ clsx(
+								styles.header,
+								defenseStyles.button,
+								focusStyles[ 'outset-ring--focus-visible' ]
+							) }
+							render={
+								nativeButton ? undefined : <Card.Header />
+							}
+							nativeButton={ nativeButton }
 							aria-describedby={ ariaDescribedBy }
 						>
 							<div
@@ -142,13 +154,7 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 								<div
 									className={ clsx(
 										styles[ 'header-trigger-wrapper' ],
-										defenseStyles.div,
-										// While the interactive trigger element is the whole header,
-										// the focus ring will be displayed only on the icon to visually
-										// emulate it being the button.
-										focusStyles[
-											'outset-ring--focus-parent-visible'
-										]
+										defenseStyles.div
 									) }
 								>
 									<Icon

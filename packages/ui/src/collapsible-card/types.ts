@@ -35,6 +35,14 @@ export interface HeaderProps extends ComponentProps< 'div' > {
 	 * The content to be rendered inside the header.
 	 */
 	children?: ReactNode;
+	/**
+	 * Whether the header trigger should render as a native `<button>` element.
+	 *
+	 * Set to `false` to render the trigger as a non-native element with
+	 * `role="button"` instead.
+	 * @default true
+	 */
+	nativeButton?: boolean;
 }
 
 export interface HeaderDescriptionProps extends ComponentProps< 'div' > {

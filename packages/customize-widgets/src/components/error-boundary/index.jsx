@@ -101,7 +101,7 @@ function ErrorReport( { error, componentStack } ) {
 function ErrorDetails( { error, componentStack } ) {
 	return (
 		<CollapsibleCard.Root className="customize-widgets-error-boundary__details">
-			<CollapsibleCard.Header>
+			<CollapsibleCard.Header render={ <h2 /> }>
 				<Card.Title>{ __( 'Error details' ) }</Card.Title>
 			</CollapsibleCard.Header>
 			<CollapsibleCard.Content>

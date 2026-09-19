@@ -162,6 +162,10 @@ test.describe( 'Connectors', () => {
 			const setupButton = testProviderCard.getByRole( 'button', {
 				name: 'Set up',
 			} );
+			await expect( setupButton ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
 			await setupButton.click();
 
 			// The form should now be visible with an API Key field and Save button.
@@ -172,10 +176,10 @@ test.describe( 'Connectors', () => {
 				testProviderCard.getByRole( 'button', { name: 'Save' } )
 			).toBeVisible();
 
-			// The button label should change to "Cancel".
+			// The button label should change to "Cancel" and expose the expanded state.
 			await expect(
 				testProviderCard.getByRole( 'button', { name: 'Cancel' } )
-			).toBeVisible();
+			).toHaveAttribute( 'aria-expanded', 'true' );
 		} );
 
 		test( 'should reject an invalid API key', async ( { page, admin } ) => {
