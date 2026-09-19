@@ -33,6 +33,8 @@ export function NoteThread( {
 	onEditNote,
 	onAddReply,
 	onDeleteNote,
+	onToggleReaction,
+	reactionsMap,
 	isSelected,
 	sidebarRef,
 	floating,
@@ -152,6 +154,10 @@ export function NoteThread( {
 	}
 
 	const allReplies = note?.reply || [];
+	// Resolving is a thread-level state: it lives on the root note, and a
+	// resolved thread is an archived conversation. Replies carry their own
+	// status, so reaction controls have to read the root's.
+	const isThreadResolved = 'approved' === note.status;
 	const lastReply =
 		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
 	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
@@ -239,6 +245,9 @@ export function NoteThread( {
 				onEditNote={ onEditNote }
 				onDeleteNote={ onDeleteNote }
 				onResolve={ handleResolve }
+				onToggleReaction={ onToggleReaction }
+				reactions={ reactionsMap?.[ note.id ] }
+				isThreadResolved={ isThreadResolved }
 			/>
 			{ isSelected &&
 				allReplies.map( ( reply ) => (
@@ -249,6 +258,9 @@ export function NoteThread( {
 						isSelected={ isSelected }
 						onEditNote={ onEditNote }
 						onDeleteNote={ onDeleteNote }
+						onToggleReaction={ onToggleReaction }
+						reactions={ reactionsMap?.[ reply.id ] }
+						isThreadResolved={ isThreadResolved }
 					/>
 				) ) }
 			{ ! isSelected && restReplies.length > 0 && (
@@ -286,6 +298,9 @@ export function NoteThread( {
 					isSelected={ false }
 					onEditNote={ onEditNote }
 					onDeleteNote={ onDeleteNote }
+					onToggleReaction={ onToggleReaction }
+					reactions={ reactionsMap?.[ lastReply.id ] }
+					isThreadResolved={ isThreadResolved }
 				/>
 			) }
 			{ isSelected && (
