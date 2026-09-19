@@ -65,6 +65,14 @@ if ( isset( $attributes['derivedStateClosure'] ) && $attributes['derivedStateClo
 		data-testid="router status"
 		data-wp-text="state.status"
 	>undefined</output>
+	<output
+		data-testid="core router navigating"
+		data-wp-text="core/router::state.navigating"
+	>undefined</output>
+	<output
+		data-testid="core router initiator"
+		data-wp-text="core/router::state.initiator"
+	>undefined</output>
 
 	<button
 		data-wp-on--click="actions.toggleTimeout"
@@ -90,6 +98,16 @@ if ( isset( $attributes['derivedStateClosure'] ) && $attributes['derivedStateClo
 					data-force-navigation="true"
 					href="$link#link-$i-with-hash"
 				>link $i with hash</a>
+				<a
+					data-testid="link $i with explicit initiator"
+					data-wp-on--click="actions.navigateWithExplicitInitiator"
+					href="$link"
+				>link $i with explicit initiator</a>
+				<a
+					data-testid="link $i with null initiator"
+					data-wp-on--click="actions.navigateWithNullInitiator"
+					href="$link"
+				>link $i with null initiator</a>
 HTML;
 			}
 		}

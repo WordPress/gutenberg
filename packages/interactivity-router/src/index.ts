@@ -6,6 +6,11 @@ import {
 	markScriptModuleAsResolved,
 	type ScriptModuleLoad,
 } from './assets/script-modules';
+import {
+	regionAttr,
+	parseRegionAttribute,
+	resolveInitiator,
+} from './initiator';
 
 const {
 	getRegionRootFragment,
@@ -24,7 +29,6 @@ const {
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
 
-const regionAttr = `data-wp-router-region`;
 const interactiveAttr = `data-wp-interactive`;
 const regionsSelector = `[${ interactiveAttr }][${ regionAttr }], [${ interactiveAttr }] [${ interactiveAttr }][${ regionAttr }]`;
 
@@ -35,6 +39,7 @@ export interface NavigateOptions {
 	timeout?: number;
 	loadingAnimation?: boolean;
 	screenReaderAnnouncement?: boolean;
+	initiator?: string | null;
 }
 
 export interface PrefetchOptions {
@@ -70,22 +75,6 @@ const pages = new Map< string, Promise< Page | false > >();
 const getPagePath = ( url: string ) => {
 	const u = new URL( url, window.location.href );
 	return u.pathname + u.search;
-};
-
-/**
- * Parses the given region's directive.
- *
- * @param region Region element.
- * @return Data contained in the region directive value.
- */
-const parseRegionAttribute = ( region: Element ) => {
-	const value = region.getAttribute( regionAttr );
-	try {
-		const { id, attachTo } = JSON.parse( value );
-		return { id, attachTo };
-	} catch {
-		return { id: value };
-	}
 };
 
 /**
@@ -328,12 +317,22 @@ const forcePageReload = ( href: string ) => {
 // Listen to the back and forward buttons and restore the page if it's in the
 // cache.
 window.addEventListener( 'popstate', async () => {
-	const pagePath = getPagePath( window.location.href ); // Remove hash.
+	const href = window.location.href;
+	// A back/forward restore has no directive scope to detect an initiator
+	// from, and is never declared as one either.
+	navigatingTo = href;
+	state.navigating = true;
+	state.initiator = null;
+
+	const pagePath = getPagePath( href ); // Remove hash.
 	const page = pages.has( pagePath ) && ( await pages.get( pagePath ) );
 	if ( page ) {
 		batch( () => {
-			state.url = window.location.href;
+			state.url = href;
 			renderPage( page );
+			if ( navigatingTo === href ) {
+				state.navigating = false;
+			}
 		} );
 	} else {
 		window.location.reload();
@@ -380,6 +379,21 @@ const navigationTexts = {
 interface Store {
 	state: {
 		url: string;
+		/**
+		 * Whether a client-side navigation is currently in flight, from the
+		 * moment it starts until the winning navigation's new content has been
+		 * committed to the DOM. Unlike the deprecated `navigation.hasStarted` /
+		 * `hasFinished` pair, this is not gated by the loading-animation delay
+		 * or option, and covers every navigation, including cached ones that
+		 * complete within a single frame.
+		 */
+		navigating: boolean;
+		/**
+		 * Identity of the most recent navigation's initiator, or `null` when
+		 * none was detected or declared (a full-page listener, a back/forward
+		 * restore, or a programmatic call with no active directive scope).
+		 */
+		initiator: string | null;
 		navigation: {
 			hasStarted: boolean;
 			hasFinished: boolean;
@@ -409,6 +423,8 @@ const { state: privateState } = store(
 
 export const { state, actions } = store< Store >( 'core/router', {
 	state: {
+		navigating: false,
+		initiator: null,
 		get navigation() {
 			if ( globalThis.SCRIPT_DEBUG ) {
 				warn(
@@ -438,6 +454,13 @@ export const { state, actions } = store< Store >( 'core/router', {
 		 * @return  Promise that resolves once the navigation is completed or aborted.
 		 */
 		*navigate( href: string, options: NavigateOptions = {} ) {
+			// Resolved from the calling scope, so it has to happen before any
+			// `yield`: every navigation is observable from this point on, even
+			// one that never finishes because it falls back to a full reload.
+			navigatingTo = href;
+			state.navigating = true;
+			state.initiator = resolveInitiator( options.initiator );
+
 			const { clientNavigationDisabled } = getConfig();
 			if ( clientNavigationDisabled ) {
 				yield forcePageReload( href );
@@ -451,7 +474,6 @@ export const { state, actions } = store< Store >( 'core/router', {
 				timeout = 10000,
 			} = options;
 
-			navigatingTo = href;
 			actions.prefetch( pagePath, options );
 
 			// Creates a promise that resolves when the specified timeout ends.
@@ -510,6 +532,15 @@ export const { state, actions } = store< Store >( 'core/router', {
 
 					// Renders the new page.
 					renderPage( page );
+
+					// Only the navigation that's still current when its content
+					// commits gets to publish the end of the cycle — a
+					// navigation superseded during the `yield` above (e.g. by a
+					// second click before this one finished) leaves `navigating`
+					// and `initiator` for the winner to clear instead.
+					if ( navigatingTo === href ) {
+						state.navigating = false;
+					}
 				} );
 
 				window.history[
