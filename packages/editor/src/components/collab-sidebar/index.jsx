@@ -18,6 +18,8 @@ import { NotesDisplayModeMenu } from './notes-display-mode-menu';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
+import { SelectedBlockReactionsToolbarButton } from './block-reactions-toolbar-button';
+import { isBlockReactionsEntry } from './block-reactions';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
 import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
@@ -114,7 +116,9 @@ function NotesSidebar( { postId } ) {
 	function openNoteForBlock( targetClientId ) {
 		// A block can carry multiple threads; surface the most relevant.
 		const blockThreads = notes.filter(
-			( thread ) => thread.blockClientId === targetClientId
+			( thread ) =>
+				thread.blockClientId === targetClientId &&
+				! isBlockReactionsEntry( thread )
 		);
 		const target = pickPrimaryNote( blockThreads );
 		return focusNote( {
@@ -161,7 +165,9 @@ function NotesSidebar( { postId } ) {
 	return (
 		<>
 			<NoteHighlightStyles
-				threads={ unresolvedNotes }
+				threads={ unresolvedNotes.filter(
+					( thread ) => ! isBlockReactionsEntry( thread )
+				) }
 				selectedId={ selectedNoteId }
 			/>
 			{ !! currentThread && (
@@ -169,6 +175,9 @@ function NotesSidebar( { postId } ) {
 					note={ currentThread }
 					onClick={ () => openNoteForBlock( clientId ) }
 				/>
+			) }
+			{ !! clientId && (
+				<SelectedBlockReactionsToolbarButton clientId={ clientId } />
 			) }
 			<AddNoteMenuItem
 				onClick={ ( menuClientId ) =>
