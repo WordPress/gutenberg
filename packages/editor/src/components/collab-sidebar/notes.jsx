@@ -8,6 +8,9 @@ import {
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
+import { BlockReactionsEntry } from './block-reactions-entry';
+import { isBlockReactionsEntry } from './block-reactions';
+import { useBlockReactionActions } from './use-block-reactions';
 import {
 	focusNoteThread,
 	getNoteIdsFromMetadata,
@@ -32,6 +35,7 @@ export function Notes( {
 		onDelete,
 		onToggleReaction,
 	} = useNoteActions( reactionsMap );
+	const { onToggleBlockReaction } = useBlockReactionActions();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
@@ -298,32 +302,66 @@ export function Notes( {
 									</Text>
 								</Stack>
 							) }
-							<NoteThread
-								note={ thread }
-								onAddReply={ onAddReply }
-								onDeleteNote={ handleDelete }
-								onEditNote={ onEditNote }
-								onToggleReaction={ onToggleReaction }
-								reactionsMap={ reactionsMap }
-								isSelected={ selectedNote === thread.id }
-								sidebarRef={ sidebarRef }
-								floating={
-									isFloating
-										? {
-												y: notePositions[ thread.id ],
-												registerThread,
-												unregisterThread,
-											}
-										: undefined
-								}
-								onKeyDown={ ( event ) =>
-									navigate(
-										event,
-										thread,
-										selectedNote === thread.id
-									)
-								}
-							/>
+							{ isBlockReactionsEntry( thread ) ? (
+								<BlockReactionsEntry
+									entry={ thread }
+									isSelected={ selectedNote === thread.id }
+									sidebarRef={ sidebarRef }
+									floating={
+										isFloating
+											? {
+													y: notePositions[
+														thread.id
+													],
+													registerThread,
+													unregisterThread,
+												}
+											: undefined
+									}
+									onKeyDown={ ( event ) =>
+										navigate(
+											event,
+											thread,
+											selectedNote === thread.id
+										)
+									}
+									onToggleBlockReaction={
+										onToggleBlockReaction
+									}
+								/>
+							) : (
+								<NoteThread
+									note={ thread }
+									onAddReply={ onAddReply }
+									onDeleteNote={ handleDelete }
+									onEditNote={ onEditNote }
+									onToggleReaction={ onToggleReaction }
+									onToggleBlockReaction={
+										onToggleBlockReaction
+									}
+									reactionsMap={ reactionsMap }
+									isSelected={ selectedNote === thread.id }
+									sidebarRef={ sidebarRef }
+									floating={
+										isFloating
+											? {
+													y: notePositions[
+														thread.id
+													],
+													registerThread,
+													unregisterThread,
+												}
+											: undefined
+									}
+									onKeyDown={ ( event ) =>
+										navigate(
+											event,
+											thread,
+											selectedNote === thread.id
+										)
+									}
+								/>
+							) }
 						</Fragment>
 					) ) }
 				</>
