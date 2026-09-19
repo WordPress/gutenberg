@@ -115,7 +115,7 @@
 			--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
 
 			display: flex;
-			align-items: center;
+			align-items: start;
 			justify-content: flex-start;
 			gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
@@ -175,7 +175,16 @@
 		}
 
 		.item-icon {
+			display: flex;
+			align-items: center;
+			justify-content: center;
 			flex-shrink: 0;
+			height: var(--wpds-typography-line-height-sm);
+			pointer-events: none;
+		}
+
+		.item-indicator-icon {
+			translate: 0 1px;
 		}
 
 		.item-text {
