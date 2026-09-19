@@ -347,6 +347,38 @@ The `wp-text` directive is executed:
 
 The returned value is used to change the inner content of the element: `<div>value</div>`.
 
+### `wp-html`
+
+It sets the inner HTML of an element, rendering markup instead of the plain text `wp-text` would produce. Plain strings, `null`, and any other value that isn't explicitly marked as trusted are ignored, leaving the element's existing content in place — this is what lets a derived-state getter return `null` while content is loading and keep the server-rendered fallback visible.
+
+Because rendering arbitrary HTML is a security concern, `wp-html` only accepts a value returned by `asDangerousHTML()`, exported from `@wordpress/interactivity`. Passing a plain string directly does nothing, by design: the plugin's JavaScript has to explicitly opt in to rendering that string as markup.
+
+```html
+<div data-wp-interactive="myPlugin">
+	<article data-wp-html="state.description">
+		<p>Loading description.</p>
+	</article>
+</div>
+```
+
+```js
+import { asDangerousHTML, store } from '@wordpress/interactivity';
+
+store( 'myPlugin', {
+	state: {
+		get description() {
+			return asDangerousHTML(
+				'<p>A <strong>formatted</strong> description.</p>'
+			);
+		},
+	},
+} );
+```
+
+`asDangerousHTML()` does not sanitize or otherwise process the HTML it's given — the same responsibility a developer takes on using React's `dangerouslySetInnerHTML`. Never pass raw, unescaped user input to it. Adding the value it returns to `data-wp-context`, or serializing it as JSON, does not carry the "trusted" marker along with it; only a `wp-html` reference that resolves directly to a value from `asDangerousHTML()` is rendered.
+
+The server leaves `wp-html` unprocessed, so the element's server-rendered content serves as a fallback until hydration runs (and stays visible if JavaScript never loads, or on a version of the Interactivity API that doesn't support this directive yet). Directives inside the HTML `wp-html` inserts are not processed, including after later updates — the content behaves as regular, non-interactive markup.
+
 ### `wp-on`
 
 <div class="callout callout-info">
