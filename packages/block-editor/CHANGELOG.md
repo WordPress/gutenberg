@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add a text shadow block support and its control in the typography panel ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+-   Typography: Variable fonts can use any weight within their declared range. Appearance separates the style selector from a weight picker, which offers both named presets and a direct numeric value ([#83141](https://github.com/WordPress/gutenberg/pull/83141)).
 
 ### Enhancements
 
@@ -16,6 +17,7 @@
 
 ### Bug Fixes
 
+-   Font appearance control: list only the weights inside a variable font's range, reading both ends of the range as whole numbers ([#83128](https://github.com/WordPress/gutenberg/pull/83128)).
 -   `LinkControl`: Only label pages as the front page or blog home. Posts, terms and media are separate tables and can share an id, so an unscoped search could label a term "Front page" ([#83082](https://github.com/WordPress/gutenberg/pull/83082)).
 -   `InnerBlocks`: Resolve a container's legacy layout markup (`inherit: true`, or a bare `contentSize` / `wideSize` with no `type`) to a constrained layout for its inner blocks, so they are offered the wide and full alignments. Previously only the container's styles honoured the legacy form, and the inner blocks resolved to the flow layout ([#82637](https://github.com/WordPress/gutenberg/pull/82637)).
 -   Block Patterns, Block Visibility, and Block Lock: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))

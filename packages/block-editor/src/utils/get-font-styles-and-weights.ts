@@ -85,11 +85,10 @@ export function getFontStylesAndWeights(
 		) {
 			isVariableFont = true;
 
-			// Find font weight start and end values.
-			const [ startStr, endStr ] = face.fontWeight.split( ' ' );
-			const startValue = parseInt( startStr.slice( 0, 1 ) );
-			const endValue =
-				endStr === '1000' ? 10 : parseInt( endStr.slice( 0, 1 ) );
+			// Find the hundreds inside the range, e.g. 300 to 700 for "250 750".
+			const [ startStr, endStr ] = face.fontWeight.trim().split( /\s+/ );
+			const startValue = Math.ceil( parseInt( startStr, 10 ) / 100 );
+			const endValue = Math.floor( parseInt( endStr, 10 ) / 100 );
 
 			// Create font weight options for available variable weights.
 			for ( let i = startValue; i <= endValue; i++ ) {
