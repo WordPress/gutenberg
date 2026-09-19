@@ -238,6 +238,7 @@ describe( 'setCollaborationSupported', () => {
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SET_COLLABORATION_SUPPORTED',
 			supported: false,
+			incompatiblePlugins: [],
 		} );
 		expect( syncManager.unloadAll ).toHaveBeenCalledTimes( 1 );
 		expect(
@@ -245,6 +246,21 @@ describe( 'setCollaborationSupported', () => {
 		).toHaveBeenCalledWith( {
 			hasUndo: false,
 			hasRedo: false,
+		} );
+	} );
+
+	it( 'carries the names of the plugins that make collaboration unsupported', () => {
+		const dispatch = Object.assign( vi.fn(), {
+			__unstableNotifySyncUndoManagerChange: vi.fn(),
+		} );
+		hasSyncManager.mockReturnValue( false );
+
+		setCollaborationSupported( false, [ 'Slim SEO' ] )( { dispatch } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'SET_COLLABORATION_SUPPORTED',
+			supported: false,
+			incompatiblePlugins: [ 'Slim SEO' ],
 		} );
 	} );
 } );
