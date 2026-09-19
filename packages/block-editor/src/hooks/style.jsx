@@ -84,7 +84,20 @@ export function getInlineStyles( styles = {} ) {
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
 	getCSSRules( styles ).forEach( ( rule ) => {
-		output[ rule.key ] = rule.value;
+		// Vendor-prefixed CSS properties start with a single dash (e.g.
+		// `-webkit-background-clip`). React style objects require camelCase
+		// keys without the leading dash (e.g. `WebkitBackgroundClip`), so
+		// convert those. Custom properties start with two and are passed
+		// through, since React writes them verbatim.
+		const isVendorPrefixed =
+			rule.key.startsWith( '-' ) && ! rule.key.startsWith( '--' );
+		const key = isVendorPrefixed
+			? rule.key
+					.slice( 1 )
+					.replace( /-([a-z])/g, ( _, c ) => c.toUpperCase() )
+					.replace( /^[a-z]/, ( c ) => c.toUpperCase() )
+			: rule.key;
+		output[ key ] = rule.value;
 	} );
 
 	return output;
