@@ -250,7 +250,7 @@ export function Note( {
 							 * thread is deselected.
 							 */ }
 							<ReactionDisplay
-								noteId={ note.id }
+								target={ { kind: 'note', id: note.id } }
 								reactions={ reactions }
 								disabled={ isThreadResolved }
 								onToggleReaction={ ( emoji ) =>
@@ -269,7 +269,7 @@ export function Note( {
 								 */ }
 								{ canReact && (
 									<AddReactionButton
-										noteId={ note.id }
+										target={ { kind: 'note', id: note.id } }
 										disabled={ isThreadResolved }
 										onToggleReaction={ ( emoji ) =>
 											onToggleReaction( {
