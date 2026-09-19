@@ -100,7 +100,8 @@ interface ToggleBlockReactionArgs {
 /**
  * Adds or removes the current user's reaction on a block.
  *
- * @return `onToggleBlockReaction`.
+ * @return `onToggleBlockReaction`, which resolves to `true` once the
+ *         reaction has been saved or removed, or `false` if that failed.
  */
 export function useBlockReactionActions() {
 	const { createNotice } = useDispatch( noticesStore );
@@ -112,10 +113,13 @@ export function useBlockReactionActions() {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const onToggleBlockReaction = useCallback(
-		async ( { clientId, emoji }: ToggleBlockReactionArgs ) => {
+		async ( {
+			clientId,
+			emoji,
+		}: ToggleBlockReactionArgs ): Promise< boolean > => {
 			const rawPostId = getCurrentPostId();
 			if ( typeof rawPostId !== 'number' ) {
-				return;
+				return false;
 			}
 			const postId: number = rawPostId;
 			const postType: string = getCurrentPostType();
@@ -185,7 +189,7 @@ export function useBlockReactionActions() {
 						: __( 'An error occurred while performing an update.' ),
 					{ type: 'snackbar', isDismissible: true }
 				);
-				return;
+				return false;
 			}
 
 			// The mutation has landed, so fold its known effect into the
@@ -215,7 +219,7 @@ export function useBlockReactionActions() {
 					postType
 				)?.baseURL;
 				if ( ! baseURL ) {
-					return;
+					return true;
 				}
 				const refreshed = await apiFetch< {
 					block_reaction_summary?: BlockReactionSummary | null;
@@ -239,6 +243,7 @@ export function useBlockReactionActions() {
 				// keeps this block's reactions consistent; the next load
 				// reconciles the rest.
 			}
+			return true;
 		},
 		[
 			createNotice,
