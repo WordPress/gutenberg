@@ -391,6 +391,24 @@ describe( 'global styles renderer', () => {
 			presets: false,
 			rootPadding: false,
 		};
+		const textInputSelectorWith = ( pseudoSelector: string ) =>
+			`textarea${ pseudoSelector }, input:where([type=email],[type=number],[type=password],[type=search],[type=tel],[type=text],[type=url])${ pseudoSelector }`;
+		const transformTextInputStyles = (
+			textInputStyles: Record< string, unknown >
+		) =>
+			transformToStyles(
+				Object.freeze( {
+					styles: {
+						elements: { textInput: textInputStyles },
+					},
+				} as unknown as GlobalStylesConfig ),
+				{},
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
 
 		it( 'uses the row value for Flow and Constrained layouts and both values for Flex and Grid layouts when block spacing is axial', () => {
 			const tree: GlobalStylesConfig = {
@@ -804,6 +822,62 @@ describe( 'global styles renderer', () => {
 
 			expect( result ).toEqual(
 				':root :where(.wp-block-button){color: red;}:root :where(.wp-block-button:hover){color: blue;}'
+			);
+		} );
+
+		it( 'renders text input focus color styles with capped specificity', () => {
+			const css = transformTextInputStyles( {
+				':focus': { color: { text: 'blue' } },
+			} );
+
+			expect( css ).toEqual(
+				`:root :where(${ textInputSelectorWith(
+					':focus'
+				) }){color: blue;}`
+			);
+		} );
+
+		it( 'renders text input invalid spacing styles with capped specificity', () => {
+			const css = transformTextInputStyles( {
+				':invalid': { spacing: { padding: { top: '1rem' } } },
+			} );
+
+			expect( css ).toEqual(
+				`:root :where(${ textInputSelectorWith(
+					':invalid'
+				) }){padding-top: 1rem;}`
+			);
+		} );
+
+		it( 'renders text input placeholder typography styles with the pseudo-element after :where()', () => {
+			const css = transformTextInputStyles( {
+				'::placeholder': { typography: { fontStyle: 'italic' } },
+			} );
+
+			expect( css ).toEqual(
+				`:root :where(${ textInputSelectorWith(
+					''
+				) })::placeholder{font-style: italic;}`
+			);
+		} );
+
+		it( 'outputs focus after validation states so focus color wins when both states match', () => {
+			const css = transformTextInputStyles( {
+				':focus': { color: { text: 'blue' } },
+				':valid': { color: { text: 'green' } },
+				':invalid': { color: { text: 'red' } },
+			} );
+
+			expect( css ).toEqual(
+				`:root :where(${ textInputSelectorWith(
+					':valid'
+				) }){color: green;}` +
+					`:root :where(${ textInputSelectorWith(
+						':invalid'
+					) }){color: red;}` +
+					`:root :where(${ textInputSelectorWith(
+						':focus'
+					) }){color: blue;}`
 			);
 		} );
 
@@ -1598,6 +1672,75 @@ describe( 'global styles renderer', () => {
 
 			expect( result ).toEqual(
 				':root :where(.is-style-foo.wp-block-button){color: green;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-button){color: yellow;}}'
+			);
+		} );
+
+		it( 'appends responsive style variation pseudo-element selectors after the :where() wrapper', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							variations: {
+								'section-1': {
+									'@mobile': {
+										elements: {
+											textInput: {
+												':focus': {
+													color: { text: 'blue' },
+												},
+												'::placeholder': {
+													color: { text: 'green' },
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					styleVariationSelectors: {
+						'section-1': '.wp-block-group.is-style-section-1',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					...minimalStyleOptions,
+					variationStyles: true,
+				}
+			);
+
+			const scoped = ( pseudoSelector: string ) =>
+				textInputSelectorWith( pseudoSelector )
+					.split( ', ' )
+					.map(
+						( part ) =>
+							`.wp-block-group.is-style-section-1 ${ part }`
+					)
+					.join( ', ' );
+
+			expect( result ).toContain(
+				`@media (width <= 480px){:root :where(${ scoped(
+					':focus'
+				) }){color: blue;}}`
+			);
+			expect( result ).toContain(
+				`@media (width <= 480px){:root :where(${ scoped(
+					''
+				) })::placeholder{color: green;}}`
 			);
 		} );
 
