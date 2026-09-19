@@ -595,11 +595,6 @@ describe( 'actions', () => {
 		} );
 
 		it( 'calls vipsCancelOperations when cancelling', async () => {
-			// Suppress console.error that fires when there's no onError callback.
-			const consoleErrorSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 			} );
@@ -612,17 +607,14 @@ describe( 'actions', () => {
 				.cancelItem( item.id, new Error( 'User cancelled' ) );
 
 			expect( vipsCancelOperations ).toHaveBeenCalledWith( item.id );
-			expect( consoleErrorSpy ).toHaveBeenCalled();
 
-			consoleErrorSpy.mockRestore();
+			expect( console ).toHaveErroredWith(
+				'Upload cancelled',
+				new Error( 'User cancelled' )
+			);
 		} );
 
 		it( 'cancels any in-flight GIF-to-video conversion when cancelling', async () => {
-			// Suppress console.error that fires when there's no onError callback.
-			const consoleErrorSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 			} );
@@ -638,15 +630,13 @@ describe( 'actions', () => {
 				item.id
 			);
 
-			consoleErrorSpy.mockRestore();
+			expect( console ).toHaveErroredWith(
+				'Upload cancelled',
+				new Error( 'User cancelled' )
+			);
 		} );
 
 		it( 'removes item from queue after cancelling', async () => {
-			// Suppress console.error that fires when there's no onError callback.
-			const consoleErrorSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 			} );
@@ -662,7 +652,10 @@ describe( 'actions', () => {
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
 
-			consoleErrorSpy.mockRestore();
+			expect( console ).toHaveErroredWith(
+				'Upload cancelled',
+				new Error( 'User cancelled' )
+			);
 		} );
 
 		it( 'calls onError callback when not silent', async () => {
@@ -848,9 +841,6 @@ describe( 'actions', () => {
 			};
 
 			it( 'deletes parent attachment and cancels parent for vips processing failures with no successful siblings', async () => {
-				const consoleErrorSpy = vi
-					.spyOn( console, 'error' )
-					.mockImplementation( () => {} );
 				const mediaDelete = vi.fn().mockResolvedValue( undefined );
 				const parentOnError = vi.fn();
 				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
@@ -890,7 +880,7 @@ describe( 'actions', () => {
 					)
 				).toBeUndefined();
 
-				consoleErrorSpy.mockRestore();
+				expect( console ).not.toHaveErrored();
 			} );
 
 			it( 'propagates the underlying error message for non-vips sideload failures', async () => {
@@ -1157,10 +1147,6 @@ describe( 'actions', () => {
 		} );
 
 		it( 'does NOT schedule retry for non-retryable errors', async () => {
-			const consoleErrorSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 			} );
@@ -1178,14 +1164,13 @@ describe( 'actions', () => {
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
 
-			consoleErrorSpy.mockRestore();
+			expect( console ).toHaveErroredWith(
+				'Upload cancelled',
+				new Error( 'File validation failed' )
+			);
 		} );
 
 		it( 'does NOT schedule retry when retry settings are undefined', async () => {
-			const consoleErrorSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-
 			// Disable retry settings.
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 				retry: undefined,
@@ -1208,7 +1193,10 @@ describe( 'actions', () => {
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
 
-			consoleErrorSpy.mockRestore();
+			expect( console ).toHaveErroredWith(
+				'Upload cancelled',
+				new Error( 'Network error' )
+			);
 		} );
 
 		it( 'clears pending retry timer on manual cancel', async () => {
