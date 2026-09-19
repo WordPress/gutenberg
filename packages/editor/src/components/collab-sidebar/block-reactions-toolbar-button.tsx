@@ -88,13 +88,17 @@ export function BlockReactionsToolbarButton( {
  * The toolbar button for the selected block, filled into the note toolbar
  * slot beside the note avatar indicator.
  *
- * @param props          Component props.
- * @param props.clientId The selected block's client id.
+ * @param props           Component props.
+ * @param props.clientId  The selected block's client id.
+ * @param props.onReacted Called once a reaction has been added or removed,
+ *                        so the host can bring the sidebar into view.
  */
 export function SelectedBlockReactionsToolbarButton( {
 	clientId,
+	onReacted,
 }: {
 	clientId: string;
+	onReacted?: () => void;
 } ) {
 	const { isAvailable, isClassic, reactionsId, canEdit } = useSelect(
 		( select ) => {
@@ -125,7 +129,11 @@ export function SelectedBlockReactionsToolbarButton( {
 				// A classic block has no block-level anchor to write, and a
 				// locked block cannot take a new one.
 				disabled={ isClassic || ( ! reactionsId && ! canEdit ) }
-				onToggleReaction={ onToggleBlockReaction }
+				onToggleReaction={ async ( args ) => {
+					if ( await onToggleBlockReaction( args ) ) {
+						onReacted?.();
+					}
+				} }
 			/>
 		</NoteIconToolbarSlotFill.Fill>
 	);

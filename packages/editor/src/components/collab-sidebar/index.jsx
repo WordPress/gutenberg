@@ -129,6 +129,19 @@ function NotesSidebar( { postId } ) {
 		} );
 	}
 
+	// A reaction from the toolbar lands in the sidebar, so bring that into
+	// view when it is not already showing. The floating sidebar only takes
+	// over on its own once the user closes whatever area is active.
+	async function revealBlockReactions() {
+		const currentArea = await getActiveComplementaryArea( 'core' );
+		if ( ! SIDEBARS.includes( currentArea ) ) {
+			enableComplementaryArea(
+				'core',
+				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
+			);
+		}
+	}
+
 	useShortcut(
 		'core/editor/new-note',
 		( event ) => {
@@ -170,7 +183,10 @@ function NotesSidebar( { postId } ) {
 				/>
 			) }
 			{ !! clientId && (
-				<SelectedBlockReactionsToolbarButton clientId={ clientId } />
+				<SelectedBlockReactionsToolbarButton
+					clientId={ clientId }
+					onReacted={ revealBlockReactions }
+				/>
 			) }
 			<AddNoteMenuItem
 				onClick={ ( menuClientId ) =>
