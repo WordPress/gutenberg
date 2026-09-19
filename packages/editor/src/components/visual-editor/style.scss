@@ -14,7 +14,7 @@
 	// It also prevents some style glitches if `editor-visual-editor`
 	// like when hovering the preview in the site editor.
 	iframe[name="editor-canvas"] {
-		background-color: transparent;
+		background-color: $white;
 	}
 
 	// Centralize the editor.
