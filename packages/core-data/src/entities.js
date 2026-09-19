@@ -34,8 +34,10 @@ export const rootEntitiesConfig = [
 		baseURLParams: {
 			// Please also change the preload path when changing this.
 			// @see lib/compat/wordpress-7.1/preload.php
+			// @see lib/compat/wordpress-7.2/preload.php
 			_fields: [
 				'description',
+				'generate_animated_image_subsizes',
 				'gmt_offset',
 				'home',
 				'image_max_bit_depth',
