@@ -14,6 +14,10 @@
 -   `TypographyPanel`: Setting a text color starts an unset link color tracking it whenever no link color is set on the block or inherited from Global Styles. Previously the link color was left alone ([#82840](https://github.com/WordPress/gutenberg/pull/82840)).
 -   `LinkControl`, `LinkPicker`: migrate the link preview badges from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82684](https://github.com/WordPress/gutenberg/pull/82684)).
 
+### Internal
+
+-   Block metadata: preserve `metadata.reactionsId`, the anchor for emoji reactions on a block, through one-to-one block transforms the way `noteId` already is ([#83169](https://github.com/WordPress/gutenberg/pull/83169)).
+
 ### Bug Fixes
 
 -   `LinkControl`: Only label pages as the front page or blog home. Posts, terms and media are separate tables and can share an id, so an unscoped search could label a term "Front page" ([#83082](https://github.com/WordPress/gutenberg/pull/83082)).
