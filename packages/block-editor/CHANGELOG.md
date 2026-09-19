@@ -24,6 +24,7 @@
 
 ### Internal
 
+-   Color/gradient dropdown: replace experimental `ZStack` overlapping indicators with CSS, use `Stack` from `@wordpress/ui` for the toggle row, and use public `Tabs` instead of the private Components API ([#83062](https://github.com/WordPress/gutenberg/pull/83062)).
 -   Remove the `crossorigin` MutationObserver. Under `Document-Isolation-Policy: isolate-and-credentialless` cross-origin resources load without the attribute, and adding it broke any resource served without CORS headers ([#82614](https://github.com/WordPress/gutenberg/pull/82614)).
 -   Block bindings and variation transforms: Use the public `Menu` from `@wordpress/ui` instead of the private Components API. ([#81925](https://github.com/WordPress/gutenberg/pull/81925))
 -   Layout hooks: Use `normalizeLegacyLayout` in `useLayoutClasses`, `useLayoutStyles`, the block layout styles wrapper and `isAxialBlockGapAllowed`, replacing four inline copies of the legacy `inherit` / size check ([#82710](https://github.com/WordPress/gutenberg/pull/82710)).
