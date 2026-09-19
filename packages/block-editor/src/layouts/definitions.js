@@ -34,7 +34,7 @@ export const LAYOUT_DEFINITIONS = {
 		],
 		spacingStyles: [
 			{
-				selector: ' > :first-child',
+				selector: ' > :nth-child(1 of .wp-block)',
 				rules: {
 					'margin-block-start': '0',
 				},
@@ -100,7 +100,7 @@ export const LAYOUT_DEFINITIONS = {
 		],
 		spacingStyles: [
 			{
-				selector: ' > :first-child',
+				selector: ' > :nth-child(1 of .wp-block)',
 				rules: {
 					'margin-block-start': '0',
 				},
