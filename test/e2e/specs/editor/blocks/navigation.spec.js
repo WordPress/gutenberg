@@ -2205,6 +2205,102 @@ test.describe( 'Navigation block', () => {
 			} );
 		} );
 	} );
+
+	test.describe( 'Navigation Link to a post type with a hyphen in its slug', () => {
+		const deleteAllEvents = async ( requestUtils ) => {
+			const events = await requestUtils.rest( {
+				path: '/wp/v2/event-series',
+				params: { per_page: 100, status: 'any' },
+			} );
+
+			await Promise.all(
+				events.map( ( { id } ) =>
+					requestUtils.rest( {
+						method: 'DELETE',
+						path: `/wp/v2/event-series/${ id }`,
+						params: { force: true },
+					} )
+				)
+			);
+		};
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-navigation-link-hyphenated-post-type'
+			);
+			await deleteAllEvents( requestUtils );
+			await requestUtils.rest( {
+				method: 'POST',
+				path: '/wp/v2/event-series',
+				data: { title: 'Summer Fair', status: 'publish' },
+			} );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await deleteAllEvents( requestUtils );
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-navigation-link-hyphenated-post-type'
+			);
+		} );
+
+		test( 'links to the post type as its own variation', async ( {
+			admin,
+			editor,
+			page,
+			navigation,
+			requestUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content:
+					'<!-- wp:navigation-link {"label":"wordpress.org","type":"custom","url":"https://wordpress.org","kind":"custom"} /-->',
+			} );
+
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: menu.id },
+			} );
+
+			await navigation
+				.getNavBlock()
+				.getByRole( 'document', { name: 'Block: Custom Link' } )
+				.click();
+
+			await editor.openDocumentSettingsSidebar();
+			const settingsControls = navigation.getContentControls();
+
+			await settingsControls
+				.getByRole( 'button', { name: /Link to:/ } )
+				.click();
+			await expect( navigation.getLinkControlSearch() ).toBeFocused();
+
+			await page.keyboard.type( 'Summer Fair', { delay: 50 } );
+			await page
+				.getByRole( 'listbox', { name: 'Search results' } )
+				.getByRole( 'option', { name: /Summer Fair/ } )
+				.click();
+			await expect( navigation.getLinkPopover() ).toBeHidden();
+
+			// The block is recognised as the post type's variation, which
+			// only happens when its type is the post type's slug.
+			await expect(
+				navigation.getNavBlock().getByRole( 'document', {
+					name: 'Block: Event Series link',
+				} )
+			).toBeVisible();
+
+			await expect(
+				settingsControls.getByText( 'This link is invalid' )
+			).toBeHidden();
+
+			// The Edit button only appears once the linked record is found.
+			await expect(
+				settingsControls.getByRole( 'button', { name: 'Edit' } )
+			).toBeVisible();
+		} );
+	} );
 } );
 
 class Navigation {

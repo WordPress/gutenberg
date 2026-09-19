@@ -1,5 +1,6 @@
 import { escapeHTML } from '@wordpress/escape-html';
 import { safeDecodeURI, getPath } from '@wordpress/url';
+import { toBlockType } from './link-types';
 
 /**
  * Determines if an entity link should be severed based on URL changes.
@@ -159,8 +160,7 @@ export const updateAttributes = (
 		? escapeHTML( finalNewLabel )
 		: originalLabel || escapeHTML( newUrlWithoutHttp );
 
-	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
-	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
+	const type = toBlockType( newType );
 
 	const isBuiltInType =
 		[ 'post', 'page', 'tag', 'category' ].indexOf( type ) > -1;

@@ -174,6 +174,45 @@ describe( 'updateAttributes', () => {
 		} );
 	} );
 
+	it.each( [ 'event-series', 'my-custom-type' ] )(
+		'stores the %s post type slug unchanged',
+		( type ) => {
+			const setAttributes = vi.fn();
+			updateAttributes(
+				{
+					id: 42,
+					kind: 'post-type',
+					title: 'Summer Fair',
+					type,
+					url: 'http://wordpress.local/summer-fair/',
+				},
+				setAttributes
+			);
+
+			expect( setAttributes ).toHaveBeenCalledWith(
+				expect.objectContaining( { type, kind: 'post-type', id: 42 } )
+			);
+		}
+	);
+
+	it( 'stores the post_tag taxonomy as tag', () => {
+		const setAttributes = vi.fn();
+		updateAttributes(
+			{
+				id: 5,
+				kind: 'taxonomy',
+				title: 'Holiday',
+				type: 'post_tag',
+				url: 'http://wordpress.local/tag/holiday/',
+			},
+			setAttributes
+		);
+
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( { type: 'tag' } )
+		);
+	} );
+
 	describe( 'various link protocols save as custom links', () => {
 		it( 'when typing a url, but not selecting a search suggestion', () => {
 			const setAttributes = vi.fn();
