@@ -1,6 +1,9 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block - List view editing', () => {
+	// WordPress always has this category, so nothing needs creating or removing.
+	const DEFAULT_CATEGORY_NAME = 'Uncategorized';
+
 	const navMenuBlocksFixture = {
 		title: 'Test Menu',
 		content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
@@ -21,6 +24,10 @@ test.describe( 'Navigation block - List view editing', () => {
 		} );
 		await requestUtils.createPage( {
 			title: 'Test Page 3',
+			status: 'publish',
+		} );
+		await requestUtils.createPost( {
+			title: 'Test Post 1',
 			status: 'publish',
 		} );
 	} );
@@ -189,30 +196,63 @@ test.describe( 'Navigation block - List view editing', () => {
 		const thirdResult = await linkControl.getNthSearchResult( 2 );
 
 		const firstResultType =
-			await linkControl.getSearchResultText( firstResult );
+			await linkControl.getSearchResultType( firstResult );
 
 		const secondResultType =
-			await linkControl.getSearchResultText( secondResult );
+			await linkControl.getSearchResultType( secondResult );
 
 		const thirdResultType =
-			await linkControl.getSearchResultText( thirdResult );
+			await linkControl.getSearchResultType( thirdResult );
 
-		expect( firstResultType ).toContain( 'Page' );
-		expect( secondResultType ).toContain( 'Page' );
-		expect( thirdResultType ).toContain( 'Page' );
+		expect( firstResultType ).toBe( 'Page' );
+		expect( secondResultType ).toBe( 'Page' );
+		expect( thirdResultType ).toBe( 'Page' );
 
-		// Grab the text from the first result so we can check (later on) that it was inserted.
-		const firstResultText =
-			await linkControl.getSearchResultText( firstResult );
+		// Searching reaches more than pages, and pages are still listed first
+		// because the appended item is a Page Link.
+		// See https://github.com/WordPress/gutenberg/issues/77072.
+		//
+		// A second request scoped to the link's own type runs alongside the
+		// unscoped one, so that pages appear even when other types would fill
+		// the results on their own.
+		const scopedRequest = page.waitForRequest( ( request ) =>
+			request.url().includes( 'subtype=page' )
+		);
+		await page.keyboard.type( 'Test', { delay: 50 } );
+		await scopedRequest;
+
+		const searchedResults = await linkControl.getSearchResults();
+
+		// The initial suggestions are pages, so wait for a result that can only
+		// come from the typed search before asserting on the order.
+		await expect(
+			searchedResults.filter( { hasText: 'Test Post 1' } )
+		).toBeVisible();
+
+		expect(
+			await linkControl.getSearchResultType( searchedResults.first() )
+		).toBe( 'Page' );
+
+		// Taxonomy terms are reachable from the same search field.
+		await linkUIInput.fill( '' );
+		await page.keyboard.type( DEFAULT_CATEGORY_NAME, { delay: 50 } );
+
+		const categoryResult = ( await linkControl.getSearchResults() ).filter(
+			{ hasText: DEFAULT_CATEGORY_NAME }
+		);
+		await expect( categoryResult ).toBeVisible();
+		expect( await linkControl.getSearchResultType( categoryResult ) ).toBe(
+			'Category'
+		);
 
 		// Create the link.
-		await firstResult.click();
+		await categoryResult.click();
 
 		// Check the new menu item was inserted at the end of the existing menu.
 		await expect(
 			listView
 				.getByRole( 'gridcell', {
-					name: firstResultText,
+					name: DEFAULT_CATEGORY_NAME,
 				} )
 				.filter( {
 					hasText: 'Block 3 of 3, Level 1.', // proxy for filtering by description.
@@ -646,5 +686,13 @@ class LinkControl {
 			.locator( '.components-menu-item__item' ) // this is the only way to get the label text without the URL.
 			.last()
 			.innerText();
+	}
+
+	async getSearchResultType( result ) {
+		await expect( result ).toBeVisible();
+
+		// The entity type renders as a sibling of the label, so it is not part
+		// of the text returned by getSearchResultText.
+		return result.locator( '.components-menu-item__shortcut' ).innerText();
 	}
 }

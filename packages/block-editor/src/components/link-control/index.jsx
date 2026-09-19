@@ -102,6 +102,10 @@ import normalizeUrl from './normalize-url';
  * @property {boolean=}                   showInitialSuggestions     Whether to present initial suggestions immediately.
  * @property {boolean=}                   withCreateSuggestion       Whether to allow creation of link value from suggestion.
  * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
+ * @property {Function=}                  transformSuggestions       Filters and orders the fetched suggestions before they are
+ *                                                                   shown. Called with the suggestions and
+ *                                                                   `{ isInitialSuggestions, searchTerm }`, and must return the
+ *                                                                   suggestions to display.
  * @property {boolean=}                   noURLSuggestion            Whether to add a fallback suggestion which treats the search query as a URL.
  * @property {boolean=}                   hasTextControl             Whether to add a text field to the UI to update the value.title.
  * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
@@ -168,6 +172,7 @@ function LinkControl( {
 	withCreateSuggestion,
 	inputValue: propInputValue = '',
 	suggestionsQuery = {},
+	transformSuggestions,
 	noURLSuggestion = false,
 	createSuggestionButtonText,
 	hasRichPreviews = false,
@@ -690,6 +695,7 @@ function LinkControl( {
 							allowDirectEntry={ ! noDirectEntry }
 							showSuggestions={ showSuggestions }
 							suggestionsQuery={ suggestionsQuery }
+							transformSuggestions={ transformSuggestions }
 							withURLSuggestion={ ! noURLSuggestion }
 							createSuggestionButtonText={
 								createSuggestionButtonText

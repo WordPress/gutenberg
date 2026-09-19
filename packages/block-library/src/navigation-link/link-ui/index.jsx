@@ -21,46 +21,67 @@ import { isURL } from '@wordpress/url';
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
 import { useEntityBinding, useLinkPreview } from '../shared';
+import { useTransformSuggestions } from './use-transform-suggestions';
+
+/**
+ * Given the Link block's type attribute, return the search query params that
+ * describe that one entity type, or undefined when the block is not bound to
+ * an entity type.
+ *
+ * @param {string} type Link block's type attribute.
+ * @param {string} kind Link block's entity of kind (post-type|taxonomy)
+ * @return {{ type: string, subtype?: string }|undefined} Entity search params.
+ */
+function getEntitySearchOptions( type, kind ) {
+	switch ( type ) {
+		case 'post':
+		case 'page':
+			return { type: 'post', subtype: type };
+		case 'category':
+			return { type: 'term', subtype: 'category' };
+		case 'tag':
+			return { type: 'term', subtype: 'post_tag' };
+		case 'post_format':
+			return { type: 'post-format' };
+		default:
+			if ( kind === 'taxonomy' ) {
+				return { type: 'term', subtype: type };
+			}
+			if ( kind === 'post-type' ) {
+				return { type: 'post', subtype: type };
+			}
+			return undefined;
+	}
+}
 
 /**
  * Given the Link block's type attribute, return the query params to give to
  * /wp/v2/search.
  *
+ * The search is deliberately unscoped so that every entity type is reachable
+ * from one search, matching the link UI used by RichText. The block's own type
+ * only decides which suggestions are shown before anything is typed; ordering
+ * of typed results is handled by `transformSuggestions`.
+ *
  * @param {string} type Link block's type attribute.
  * @param {string} kind Link block's entity of kind (post-type|taxonomy)
- * @return {{ type?: string, subtype?: string }} Search query params.
+ * @return {Object} Search query params.
  */
 export function getSuggestionsQuery( type, kind ) {
 	// How many results to show initially and per search.
 	const perPage = 20;
 
-	switch ( type ) {
-		case 'post':
-		case 'page':
-			return { type: 'post', subtype: type, perPage };
-		case 'category':
-			return { type: 'term', subtype: 'category', perPage };
-		case 'tag':
-			return { type: 'term', subtype: 'post_tag', perPage };
-		case 'post_format':
-			return { type: 'post-format', perPage };
-		default:
-			if ( kind === 'taxonomy' ) {
-				return { type: 'term', subtype: type, perPage };
-			}
-			if ( kind === 'post-type' ) {
-				return { type: 'post', subtype: type, perPage };
-			}
-			return {
-				// for custom link which has no type
-				// always show pages as initial suggestions
-				initialSuggestionsSearchOptions: {
-					type: 'post',
-					subtype: 'page',
-					perPage,
-				},
-			};
-	}
+	return {
+		perPage,
+		initialSuggestionsSearchOptions: {
+			// Without an entity type of its own, always show pages first.
+			...( getEntitySearchOptions( type, kind ) ?? {
+				type: 'post',
+				subtype: 'page',
+			} ),
+			perPage,
+		},
+	};
 }
 
 function UnforwardedLinkUI( props, ref ) {
@@ -180,6 +201,20 @@ function UnforwardedLinkUI( props, ref ) {
 
 	const blockEditingMode = useBlockEditingMode();
 
+	const suggestionsQuery = useMemo(
+		() => getSuggestionsQuery( type, kind ),
+		[ type, kind ]
+	);
+
+	// The search is unscoped, so results are balanced, filtered and ordered for
+	// the Navigation once they arrive.
+	const transformSuggestions = useTransformSuggestions( {
+		type,
+		kind,
+		preferredSearchOptions:
+			suggestionsQuery.initialSuggestionsSearchOptions,
+	} );
+
 	return (
 		<Popover
 			ref={ ref }
@@ -212,7 +247,8 @@ function UnforwardedLinkUI( props, ref ) {
 						withCreateSuggestion={ false }
 						noDirectEntry={ !! type }
 						noURLSuggestion={ !! type }
-						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
+						suggestionsQuery={ suggestionsQuery }
+						transformSuggestions={ transformSuggestions }
 						onChange={ props.onChange }
 						onInputChange={ ( value ) => {
 							// Observe the input value so we can pass the value to the page creator

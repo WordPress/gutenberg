@@ -13,12 +13,14 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { external } from '@wordpress/icons';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
 import { getSuggestionsQuery } from '../link-ui';
+import { useTransformSuggestions } from '../link-ui/use-transform-suggestions';
 import { useLinkPreview } from './use-link-preview';
 import { useIsInvalidLink } from './use-is-invalid-link';
 import { unlock } from '../../lock-unlock';
@@ -92,6 +94,20 @@ export function Controls( {
 		entityRecord?.id,
 		hasUrlBinding
 	);
+
+	const suggestionsQuery = useMemo(
+		() => getSuggestionsQuery( attributes.type, attributes.kind ),
+		[ attributes.type, attributes.kind ]
+	);
+
+	// The search is unscoped, so results are balanced, filtered and ordered for
+	// the Navigation once they arrive.
+	const transformSuggestionsForNavigation = useTransformSuggestions( {
+		type: attributes.type,
+		kind: attributes.kind,
+		preferredSearchOptions:
+			suggestionsQuery.initialSuggestionsSearchOptions,
+	} );
 
 	let helpText = '';
 
@@ -198,10 +214,10 @@ export function Controls( {
 						<LinkPicker
 							preview={ preview }
 							onSelect={ handleLinkChange }
-							suggestionsQuery={ getSuggestionsQuery(
-								attributes.type,
-								attributes.kind
-							) }
+							suggestionsQuery={ suggestionsQuery }
+							transformSuggestions={
+								transformSuggestionsForNavigation
+							}
 							label={ __( 'Link to' ) }
 							help={ helpText ? helpText : undefined }
 						/>

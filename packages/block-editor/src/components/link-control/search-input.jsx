@@ -1,4 +1,4 @@
-import { forwardRef, useState } from '@wordpress/element';
+import { forwardRef, useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import deprecated from '@wordpress/deprecated';
 import { URLInput } from '../';
@@ -34,6 +34,7 @@ const LinkControlSearchInput = forwardRef(
 			showInitialSuggestions = false,
 			suggestionsQuery = {},
 			withURLSuggestion = true,
+			transformSuggestions = null,
 			createSuggestionButtonText,
 			hideLabelFromVision = false,
 			suffix,
@@ -49,9 +50,24 @@ const LinkControlSearchInput = forwardRef(
 			withURLSuggestion
 		);
 
-		const searchHandler = showSuggestions
+		const baseSearchHandler = showSuggestions
 			? fetchSuggestions || genericSearchHandler
 			: noopSearchHandler;
+
+		// Let the consumer filter and order the results before they are shown.
+		const searchHandler = useCallback(
+			async ( val, args ) => {
+				const results = await baseSearchHandler( val, args );
+
+				return transformSuggestions
+					? transformSuggestions( results, {
+							isInitialSuggestions: !! args?.isInitialSuggestions,
+							searchTerm: val,
+						} )
+					: results;
+			},
+			[ baseSearchHandler, transformSuggestions ]
+		);
 
 		const [ focusedSuggestion, setFocusedSuggestion ] = useState();
 

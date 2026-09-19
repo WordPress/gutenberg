@@ -27,6 +27,7 @@ import {
 	uniqueId,
 } from './fixtures';
 import { expectValidatedInputControlDeprecationIfCalled } from '../../url-input/test/fixtures/validated-input-control-deprecation';
+import { CREATE_TYPE } from '../constants';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -3667,5 +3668,84 @@ describe( 'Front page and blog home labelling', () => {
 
 		expect( option ).toHaveTextContent( 'Category' );
 		expect( option ).not.toHaveTextContent( 'Front page' );
+	} );
+} );
+
+describe( 'Transforming suggestions', () => {
+	it( 'should render the suggestions returned by transformSuggestions', async () => {
+		const user = userEvent.setup();
+		const [ firstSuggestion ] = fauxEntitySuggestions;
+		const transformSuggestions = vi.fn( () => [ firstSuggestion ] );
+
+		render( <LinkControl transformSuggestions={ transformSuggestions } /> );
+
+		await user.type(
+			screen.getByRole( 'combobox', { name: 'Search or type URL' } ),
+			'Hello'
+		);
+
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
+
+		expect( transformSuggestions ).toHaveBeenCalledWith(
+			fauxEntitySuggestions,
+			expect.objectContaining( {
+				isInitialSuggestions: false,
+				searchTerm: 'Hello',
+			} )
+		);
+
+		const options = within( searchResults ).getAllByRole( 'option' );
+
+		expect( options ).toHaveLength( 1 );
+		expect( options[ 0 ] ).toHaveTextContent( firstSuggestion.title );
+	} );
+
+	it( 'should pass the create suggestion to transformSuggestions', async () => {
+		const user = userEvent.setup();
+		const transformSuggestions = vi.fn( ( suggestions ) => suggestions );
+
+		render(
+			<LinkControl
+				createSuggestion={ vi.fn() }
+				transformSuggestions={ transformSuggestions }
+			/>
+		);
+
+		await user.type(
+			screen.getByRole( 'combobox', { name: 'Search or type URL' } ),
+			'Hello'
+		);
+
+		await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
+
+		// The create option is a suggestion like any other, so a consumer sees
+		// it and decides where it belongs.
+		expect(
+			transformSuggestions.mock.calls[ 0 ][ 0 ].at( -1 )
+		).toMatchObject( { type: CREATE_TYPE } );
+	} );
+
+	it( 'should call transformSuggestions for initial suggestions too', async () => {
+		const transformSuggestions = vi.fn( ( suggestions ) => suggestions );
+
+		render(
+			<LinkControl
+				showInitialSuggestions
+				transformSuggestions={ transformSuggestions }
+			/>
+		);
+
+		await screen.findByRole( 'listbox', {
+			name: 'Suggestions',
+		} );
+
+		expect( transformSuggestions ).toHaveBeenCalledWith(
+			fauxEntitySuggestions.slice( 0, 3 ),
+			expect.objectContaining( { isInitialSuggestions: true } )
+		);
 	} );
 } );
