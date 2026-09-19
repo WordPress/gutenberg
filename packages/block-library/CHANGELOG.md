@@ -15,6 +15,10 @@
 
 -   Button: Replace deprecated `word-break: break-word` with `word-break: normal` and `overflow-wrap: anywhere` to clear the Stylelint suppression ([#82854](https://github.com/WordPress/gutenberg/pull/82854)).
 
+### Enhancements
+
+-   Site Tagline: Add Fit text support ([#83034](https://github.com/WordPress/gutenberg/pull/83034)).
+
 ## 11.0.0 (2026-09-10)
 
 ### Breaking Changes
