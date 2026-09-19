@@ -8,6 +8,7 @@
     -   `BoxControl` ([#82570](https://github.com/WordPress/gutenberg/pull/82570))
     -   `Grid` ([#82571](https://github.com/WordPress/gutenberg/pull/82571))
     -   `Elevation` ([#82572](https://github.com/WordPress/gutenberg/pull/82572))
+    -   `Card`, `CardBody`, `CardHeader`, `CardFooter`, `CardMedia`, `CardDivider` ([#82577](https://github.com/WordPress/gutenberg/pull/82577))
 
 ### Enhancements
 
@@ -25,6 +26,7 @@
 
 ### Bug Fixes
 
+-   `CardDivider`: Apply the Card's width, display, and border color consistently inside iframes ([#82577](https://github.com/WordPress/gutenberg/pull/82577)).
 -   `Card`: Keep shadow radii aligned with the Card's actual radius regardless of render order ([#82572](https://github.com/WordPress/gutenberg/pull/82572)).
 -   `SelectControl`: Stop forcing a fill on the chevron icon, so the stroke-based chevron renders as a line again instead of a filled shape ([#82949](https://github.com/WordPress/gutenberg/pull/82949)).
 -   `BorderBoxControl`: Restore the split borders layout. The top and bottom controls are centred across the row and the right control sits at the end of its column again, after `BorderControl`'s own `margin: 0` began overriding both ([#82939](https://github.com/WordPress/gutenberg/pull/82939)).
