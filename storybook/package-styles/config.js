@@ -115,6 +115,11 @@ const CONFIG = [
 		ltr: [ componentsLtr, dataviewsLtr ],
 		rtl: [ componentsRtl, dataviewsRtl ],
 	},
+	{
+		componentIdMatcher: /^widget-primitives-/,
+		ltr: [ componentsLtr, dataviewsLtr ],
+		rtl: [ componentsRtl, dataviewsRtl ],
+	},
 ];
 
 export default CONFIG;
