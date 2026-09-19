@@ -8,6 +8,7 @@
 	"references": [
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../admin-ui/tsconfig.build.json" },
+		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },
@@ -23,6 +24,7 @@
 		{ "path": "../lazy-editor" },
 		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../plugins" },
+		{ "path": "../preferences/tsconfig.build.json" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../route" },
