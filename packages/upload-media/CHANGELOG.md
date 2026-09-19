@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add an `addEditedImage` action that applies flip, rotate and crop edits to an image with vips and uploads the result as a new attachment through the regular pipeline, the client-side counterpart of the REST `media/<id>/edit` endpoint. An image past the client memory budget fails with `IMAGE_EDIT_ERROR` before any decode is attempted, so the caller can hand the edit to the server ([#82362](https://github.com/WordPress/gutenberg/pull/82362)).
+-   Export `exceedsClientProcessingMemory` and the `ImageDimensions` type, so a caller that already knows an image's dimensions can route it to the server without downloading it ([#82362](https://github.com/WordPress/gutenberg/pull/82362)).
+
 ### Bug Fixes
 
 -   An upload step is no longer silently skipped when the same queue item is processed twice. `processItem` started the next operation without checking whether one was already running, so a re-entrant dispatch (a finishing child sideload pinging its parent, or `resumeQueue` walking the whole queue) ran the same handler a second time, and each run finished the operation, shifting two steps off the item's pipeline ([#83031](https://github.com/WordPress/gutenberg/pull/83031)).
