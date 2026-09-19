@@ -106,6 +106,18 @@ describe( 'applyReactionSummaryDelta', () => {
 		).toEqual( { heart: { count: 3, reacted: true, my_reaction_id: 9 } } );
 	} );
 
+	it( 'counts a repeated reaction ID once', () => {
+		// Concurrent adds converge server-side on one surviving row and all
+		// return its ID.
+		expect(
+			applyReactionSummaryDelta(
+				{ heart: { count: 1, reacted: true, my_reaction_id: 9 } },
+				'heart',
+				9
+			)
+		).toEqual( { heart: { count: 1, reacted: true, my_reaction_id: 9 } } );
+	} );
+
 	it( 'decrements and clears reacted', () => {
 		expect(
 			applyReactionSummaryDelta(

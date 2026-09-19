@@ -175,6 +175,11 @@ export function applyReactionSummaryDelta(
 	const entry = next[ slug ];
 
 	if ( addedReactionId ) {
+		// Concurrent adds converge server-side on one surviving row, so a
+		// repeated ID is already counted.
+		if ( entry?.my_reaction_id === addedReactionId ) {
+			return next;
+		}
 		next[ slug ] = {
 			count: ( entry?.count || 0 ) + 1,
 			reacted: true,
