@@ -110,6 +110,20 @@ describe( 'getFontVariationAxes', () => {
 		).toEqual( [] );
 	} );
 
+	it( 'reads an axis sent as an empty list as having no options', () => {
+		const settings = getSettings( {
+			GRAD: { min: -50, max: 50 },
+			opsz: [],
+		} );
+
+		expect(
+			getFontVariationAxes(
+				settings,
+				'var:preset|font-family|roboto-flex'
+			).map( ( { tag, min, max } ) => `${ tag } ${ min }-${ max }` )
+		).toEqual( [ 'GRAD -50-50', 'opsz 8-144' ] );
+	} );
+
 	it( 'returns nothing without a policy or a font family', () => {
 		expect(
 			getFontVariationAxes(

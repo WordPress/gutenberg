@@ -212,6 +212,10 @@ export function getFontVariationAxes(
 	} );
 
 	return Object.entries( policy ).flatMap( ( [ tag, entry ] ) => {
+		// Each axis entry is an object: the server sends `"opsz": {}` as an
+		// object (gutenberg_prepare_font_variations_for_json()). An empty list,
+		// which PHP writes for an empty array, is still read as no options, so
+		// settings from a server without that step keep working.
 		const axis = capabilities.get( tag );
 		if (
 			! axis ||
