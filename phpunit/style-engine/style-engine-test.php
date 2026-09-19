@@ -210,6 +210,44 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'font_variation_settings_object'               => array(
+				'block_styles'    => array(
+					'typography' => array(
+						'fontVariationSettings' => array(
+							'GRAD' => 50,
+							'opsz' => 24,
+							'YOPQ' => '24',
+							'YTLC' => false,
+							'YTUC' => array(),
+							'wght' => 700,
+							'ital' => 1,
+							'XT;A' => 1,
+							'XTRA' => 'wide',
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'font-variation-settings:"GRAD" 50, "opsz" 24;',
+					'declarations' => array(
+						'font-variation-settings' => '"GRAD" 50, "opsz" 24',
+					),
+				),
+			),
+
+			'font_variation_settings_only_registered_axes' => array(
+				'block_styles'    => array(
+					'typography' => array(
+						'fontVariationSettings' => array(
+							'wght' => 700,
+							'wdth' => 90,
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
 			'inline_valid_typography_style'                => array(
 				'block_styles'    => array(
 					'typography' => array(

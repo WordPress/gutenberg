@@ -60,6 +60,7 @@ const VALID_SETTINGS = [
 	'typography.fontFamilies',
 	'typography.fontSizes',
 	'typography.fontStyle',
+	'typography.fontVariations',
 	'typography.fontWeight',
 	'typography.letterSpacing',
 	'typography.lineHeight',

@@ -201,6 +201,7 @@ Settings related to typography.
 | defaultFontSizes | Allow users to choose font sizes from the default font size presets. | `boolean` | `true` |
 | customFontSize | Allow users to set custom font sizes. | `boolean` | `true` |
 | fontStyle | Allow users to set custom font styles. | `boolean` | `true` |
+| fontVariations | Variable font axes that users can set, by font family slug, then by OpenType axis tag. Only axes listed here are offered, within the range the font declares and, when given, the narrower range set here. Keyed by tag so that theme.json origins merge per axis. `wght`, `wdth`, `slnt` and `ital` are set through font weight, width and style instead. |  |  |
 | fontWeight | Allow users to set custom font weights. | `boolean` | `true` |
 | fluid | Enables fluid typography and allows users to set global fluid typography parameters. | `boolean`, `{ minFontSize, maxViewportWidth, minViewportWidth }` | `false` |
 | letterSpacing | Allow users to set custom letter spacing. | `boolean` | `true` |
@@ -356,6 +357,7 @@ Typography styles.
 | fontFamily | Sets the `font-family` CSS property. | `string`, `{ ref }` |
 | fontSize | Sets the `font-size` CSS property. | `string`, `{ ref }` |
 | fontStyle | Sets the `font-style` CSS property. | `string`, `{ ref }` |
+| fontVariationSettings | Sets the `font-variation-settings` CSS property from axis values keyed by OpenType tag, such as `{ "GRAD": 50 }`. `wght`, `wdth`, `slnt` and `ital` are ignored: they belong to `font-weight`, `font-stretch` and `font-style`. |  |
 | fontWeight | Sets the `font-weight` CSS property. | `string`, `{ ref }` |
 | letterSpacing | Sets the `letter-spacing` CSS property. | `string`, `{ ref }` |
 | lineHeight | Sets the `line-height` CSS property. | `string`, `{ ref }` |

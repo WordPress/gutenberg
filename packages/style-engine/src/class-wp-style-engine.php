@@ -276,7 +276,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				),
 			),
 			'typography' => array(
-				'fontSize'       => array(
+				'fontSize'              => array(
 					'property_keys' => array(
 						'default' => 'font-size',
 					),
@@ -288,7 +288,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'has-$slug-font-size' => 'font-size',
 					),
 				),
-				'fontFamily'     => array(
+				'fontFamily'            => array(
 					'property_keys' => array(
 						'default' => 'font-family',
 					),
@@ -300,43 +300,50 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'has-$slug-font-family' => 'font-family',
 					),
 				),
-				'fontStyle'      => array(
+				'fontStyle'             => array(
 					'property_keys' => array(
 						'default' => 'font-style',
 					),
 					'path'          => array( 'typography', 'fontStyle' ),
 				),
-				'fontWeight'     => array(
+				'fontWeight'            => array(
 					'property_keys' => array(
 						'default' => 'font-weight',
 					),
 					'path'          => array( 'typography', 'fontWeight' ),
 				),
-				'lineHeight'     => array(
+				'fontVariationSettings' => array(
+					'property_keys' => array(
+						'default' => 'font-variation-settings',
+					),
+					'path'          => array( 'typography', 'fontVariationSettings' ),
+					'value_func'    => array( self::class, 'get_font_variation_settings_css_declaration' ),
+				),
+				'lineHeight'            => array(
 					'property_keys' => array(
 						'default' => 'line-height',
 					),
 					'path'          => array( 'typography', 'lineHeight' ),
 				),
-				'textColumns'    => array(
+				'textColumns'           => array(
 					'property_keys' => array(
 						'default' => 'column-count',
 					),
 					'path'          => array( 'typography', 'textColumns' ),
 				),
-				'textDecoration' => array(
+				'textDecoration'        => array(
 					'property_keys' => array(
 						'default' => 'text-decoration',
 					),
 					'path'          => array( 'typography', 'textDecoration' ),
 				),
-				'textIndent'     => array(
+				'textIndent'            => array(
 					'property_keys' => array(
 						'default' => 'text-indent',
 					),
 					'path'          => array( 'typography', 'textIndent' ),
 				),
-				'textShadow'     => array(
+				'textShadow'            => array(
 					'property_keys' => array(
 						'default' => 'text-shadow',
 					),
@@ -348,19 +355,19 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'has-$slug-text-shadow' => 'text-shadow',
 					),
 				),
-				'textTransform'  => array(
+				'textTransform'         => array(
 					'property_keys' => array(
 						'default' => 'text-transform',
 					),
 					'path'          => array( 'typography', 'textTransform' ),
 				),
-				'letterSpacing'  => array(
+				'letterSpacing'         => array(
 					'property_keys' => array(
 						'default' => 'letter-spacing',
 					),
 					'path'          => array( 'typography', 'letterSpacing' ),
 				),
-				'writingMode'    => array(
+				'writingMode'           => array(
 					'property_keys' => array(
 						'default' => 'writing-mode',
 					),
@@ -702,6 +709,49 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			}
 
 			return $css_declarations;
+		}
+
+		/**
+		 * Serializes font variation settings, stored as an object keyed by axis tag.
+		 *
+		 * `wght`, `wdth`, `slnt` and `ital` are skipped: they have high-level
+		 * properties (`font-weight`, `font-stretch`, `font-style`), and setting them
+		 * here would override those, for example keeping a `<strong>` from getting
+		 * bolder. `opsz` is kept, since `font-optical-sizing` only switches it on or
+		 * off. Tags must be four letters or digits, which covers registered and
+		 * custom OpenType axis tags and keeps quotes out of the output, and values must
+		 * be numbers.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param array $style_value      Axis values keyed by tag, e.g. `array( 'GRAD' => 50 )`.
+		 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * @return string[] An associative array of CSS definitions.
+		 */
+		protected static function get_font_variation_settings_css_declaration( $style_value, $style_definition ) {
+			if ( ! is_array( $style_value ) || empty( $style_definition['property_keys']['default'] ) ) {
+				return array();
+			}
+
+			$registered_axes = array( 'wght', 'wdth', 'slnt', 'ital' );
+			$settings        = array();
+			foreach ( $style_value as $tag => $value ) {
+				$tag = (string) $tag;
+				if ( ! preg_match( '/^[A-Za-z0-9]{4}$/', $tag ) || in_array( $tag, $registered_axes, true ) ) {
+					continue;
+				}
+				// Numbers only, as in the JS style engine: a numeric string is not an axis value.
+				if ( ! ( is_int( $value ) || is_float( $value ) ) || ! is_finite( $value ) ) {
+					continue;
+				}
+				$settings[] = sprintf( '"%s" %s', $tag, $value );
+			}
+
+			if ( empty( $settings ) ) {
+				return array();
+			}
+
+			return array( $style_definition['property_keys']['default'] => implode( ', ', $settings ) );
 		}
 
 		/**

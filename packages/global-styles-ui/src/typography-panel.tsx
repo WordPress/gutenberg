@@ -3,8 +3,11 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useStyle, useSetting } from './hooks';
 import { unlock } from './lock-unlock';
 
-const { useSettingsForBlockElement, TypographyPanel: StylesTypographyPanel } =
-	unlock( blockEditorPrivateApis );
+const {
+	useSettingsForBlockElement,
+	TypographyPanel: StylesTypographyPanel,
+	FontVariationsPanel: StylesFontVariationsPanel,
+} = unlock( blockEditorPrivateApis );
 
 interface TypographyPanelProps {
 	element: string;
@@ -39,12 +42,20 @@ export default function TypographyPanel( {
 	);
 
 	return (
-		<StylesTypographyPanel
-			inheritedValue={ inheritedStyle }
-			value={ style }
-			onChange={ setStyle }
-			settings={ settings }
-			showInheritanceLabelIndicators={ false }
-		/>
+		<>
+			<StylesTypographyPanel
+				inheritedValue={ inheritedStyle }
+				value={ style }
+				onChange={ setStyle }
+				settings={ settings }
+				showInheritanceLabelIndicators={ false }
+			/>
+			<StylesFontVariationsPanel
+				inheritedValue={ inheritedStyle }
+				value={ style }
+				onChange={ setStyle }
+				settings={ settings }
+			/>
+		</>
 	);
 }

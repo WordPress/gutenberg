@@ -622,6 +622,34 @@
 							"type": "boolean",
 							"default": true
 						},
+						"fontVariations": {
+							"description": "Variable font axes that users can set, by font family slug, then by OpenType axis tag. Only axes listed here are offered, within the range the font declares and, when given, the narrower range set here. Keyed by tag so that theme.json origins merge per axis. `wght`, `wdth`, `slnt` and `ital` are set through font weight, width and style instead.",
+							"type": "object",
+							"additionalProperties": {
+								"type": "object",
+								"propertyNames": {
+									"pattern": "^[A-Za-z0-9]{4}$"
+								},
+								"additionalProperties": {
+									"type": "object",
+									"properties": {
+										"name": {
+											"description": "Label shown for the axis.",
+											"type": "string"
+										},
+										"min": {
+											"description": "Lowest value users can set.",
+											"type": "number"
+										},
+										"max": {
+											"description": "Highest value users can set.",
+											"type": "number"
+										}
+									},
+									"additionalProperties": false
+								}
+							}
+						},
 						"fontWeight": {
 							"description": "Allow users to set custom font weights.",
 							"type": "boolean",
@@ -882,6 +910,37 @@
 												"fontVariationSettings": {
 													"description": "CSS font-variation-settings value.",
 													"type": "string"
+												},
+												"axes": {
+													"description": "Variation axes in the font file, as its `fvar` table lists them. Used to build controls; not printed as CSS.",
+													"type": "array",
+													"items": {
+														"type": "object",
+														"properties": {
+															"tag": {
+																"type": "string",
+																"pattern": "^[A-Za-z0-9]{4}$"
+															},
+															"name": {
+																"type": "string"
+															},
+															"min": {
+																"type": "number"
+															},
+															"default": {
+																"type": "number"
+															},
+															"max": {
+																"type": "number"
+															}
+														},
+														"required": [
+															"tag",
+															"min",
+															"max"
+														],
+														"additionalProperties": false
+													}
 												},
 												"lineGapOverride": {
 													"description": "CSS line-gap-override value.",
@@ -1857,6 +1916,14 @@
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }
 							]
+						},
+						"fontVariationSettings": {
+							"description": "Sets the `font-variation-settings` CSS property from axis values keyed by OpenType tag, such as `{ \"GRAD\": 50 }`. `wght`, `wdth`, `slnt` and `ital` are ignored: they belong to `font-weight`, `font-stretch` and `font-style`.",
+							"type": "object",
+							"patternProperties": {
+								"^[A-Za-z0-9]{4}$": { "type": "number" }
+							},
+							"additionalProperties": false
 						},
 						"fontWeight": {
 							"description": "Sets the `font-weight` CSS property.",

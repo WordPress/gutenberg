@@ -94,6 +94,37 @@ describe( 'generate', () => {
 		);
 	} );
 
+	it( 'should serialize font variation settings keyed by axis tag', () => {
+		expect(
+			compileCSS( {
+				typography: {
+					fontVariationSettings: {
+						GRAD: 50,
+						opsz: 24,
+						YOPQ: '24',
+						YTLC: false,
+						YTUC: [],
+						YTAS: Infinity,
+						wght: 700,
+						ital: 1,
+						'XT;A': 1,
+						XTRA: 'wide',
+					},
+				},
+			} )
+		).toEqual( 'font-variation-settings: "GRAD" 50, "opsz" 24;' );
+	} );
+
+	it( 'should skip font variation settings that only set registered axes', () => {
+		expect(
+			compileCSS( {
+				typography: {
+					fontVariationSettings: { wght: 700, wdth: 90 },
+				},
+			} )
+		).toEqual( '' );
+	} );
+
 	it( 'should parse preset values', () => {
 		expect(
 			compileCSS( {

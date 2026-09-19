@@ -67,6 +67,8 @@ export interface Style {
 		fontFamily?: CSSProperties[ 'fontFamily' ];
 		fontWeight?: CSSProperties[ 'fontWeight' ];
 		fontStyle?: CSSProperties[ 'fontStyle' ];
+		/** Axis values keyed by OpenType axis tag, e.g. `{ GRAD: 50 }`. */
+		fontVariationSettings?: Record< string, number >;
 		letterSpacing?: CSSProperties[ 'letterSpacing' ];
 		lineHeight?: CSSProperties[ 'lineHeight' ];
 		textColumns?: CSSProperties[ 'columnCount' ];

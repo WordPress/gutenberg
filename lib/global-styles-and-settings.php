@@ -131,6 +131,51 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 }
 
 /**
+ * Keeps font variation policies as objects when settings are sent to the editor.
+ *
+ * `settings.typography.fontVariations` is keyed by font family slug and then by
+ * axis tag, and an axis may have no options: `"opsz": {}`. PHP decodes that to
+ * an empty array, which `wp_json_encode()` writes as `[]`, so the editor would
+ * receive a list where theme.json declared an object. This turns each family's
+ * policy and each axis entry into an object, in the root settings and in each
+ * block's settings. Call it on settings just before they are encoded as JSON.
+ *
+ * @param array $settings Settings, as from WP_Theme_JSON_Gutenberg::get_settings().
+ * @return array The settings, with font variation policies as objects.
+ */
+function gutenberg_prepare_font_variations_for_json( $settings ) {
+	if ( ! is_array( $settings ) ) {
+		return $settings;
+	}
+
+	$prepare_node = static function ( $node ) {
+		if ( ! isset( $node['typography']['fontVariations'] ) || ! is_array( $node['typography']['fontVariations'] ) ) {
+			return $node;
+		}
+		foreach ( $node['typography']['fontVariations'] as $slug => $policy ) {
+			// A non-empty list is not a policy keyed by tag: leave it as it is.
+			if ( ! is_array( $policy ) || ( array() !== $policy && array_is_list( $policy ) ) ) {
+				continue;
+			}
+			$axes = new stdClass();
+			foreach ( $policy as $tag => $axis ) {
+				$axes->{$tag} = is_array( $axis ) ? (object) $axis : $axis;
+			}
+			$node['typography']['fontVariations'][ $slug ] = $axes;
+		}
+		return $node;
+	};
+
+	$settings = $prepare_node( $settings );
+	if ( isset( $settings['blocks'] ) && is_array( $settings['blocks'] ) ) {
+		foreach ( $settings['blocks'] as $block_name => $block_settings ) {
+			$settings['blocks'][ $block_name ] = $prepare_node( $block_settings );
+		}
+	}
+	return $settings;
+}
+
+/**
  * Gets the global styles custom css from theme.json.
  *
  * @deprecated Gutenberg 18.6.0 Use {@see 'gutenberg_get_global_stylesheet'} instead for top-level custom CSS, or {@see 'WP_Theme_JSON_Gutenberg::get_styles_for_block'} for block-level custom CSS.
