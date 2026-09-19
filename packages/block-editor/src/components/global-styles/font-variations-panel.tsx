@@ -29,7 +29,6 @@ type FontFaceAxis = {
 };
 
 type FontVariationPolicy = {
-	tag: string;
 	name?: string;
 	min?: number;
 	max?: number;
@@ -55,7 +54,10 @@ export type FontAppearance = {
 type Settings = {
 	typography?: {
 		fontFamilies?: Record< string, FontFamily[] | undefined >;
-		fontVariations?: Record< string, FontVariationPolicy[] | undefined >;
+		fontVariations?: Record<
+			string,
+			Record< string, FontVariationPolicy > | undefined
+		>;
 		[ key: string ]: unknown;
 	};
 	[ key: string ]: unknown;
@@ -175,8 +177,10 @@ export function getFontVariationAxes(
 	if ( ! slug ) {
 		return EMPTY_AXES;
 	}
+	// The policy is keyed by axis tag, so that theme.json origins merge it
+	// per axis; its key order is the order the axes are shown in.
 	const policy = settings?.typography?.fontVariations?.[ slug ];
-	if ( ! Array.isArray( policy ) || ! policy.length ) {
+	if ( ! policy || typeof policy !== 'object' || Array.isArray( policy ) ) {
 		return EMPTY_AXES;
 	}
 
@@ -207,9 +211,14 @@ export function getFontVariationAxes(
 		} );
 	} );
 
-	return policy.flatMap( ( entry ) => {
-		const axis = capabilities.get( entry?.tag );
-		if ( ! axis || REGISTERED_AXES_WITH_PROPERTIES.includes( axis.tag ) ) {
+	return Object.entries( policy ).flatMap( ( [ tag, entry ] ) => {
+		const axis = capabilities.get( tag );
+		if (
+			! axis ||
+			! entry ||
+			typeof entry !== 'object' ||
+			REGISTERED_AXES_WITH_PROPERTIES.includes( axis.tag )
+		) {
 			return [];
 		}
 		const min = Math.max( axis.min, entry.min ?? axis.min );

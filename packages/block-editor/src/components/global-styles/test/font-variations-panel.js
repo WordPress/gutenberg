@@ -30,10 +30,10 @@ function getSettings( policy ) {
 
 describe( 'getFontVariationAxes', () => {
 	it( 'returns the policy axes within the range the face declares', () => {
-		const settings = getSettings( [
-			{ tag: 'GRAD', min: -50, max: 50 },
-			{ tag: 'opsz' },
-		] );
+		const settings = getSettings( {
+			GRAD: { min: -50, max: 50 },
+			opsz: {},
+		} );
 
 		expect(
 			getFontVariationAxes(
@@ -47,7 +47,7 @@ describe( 'getFontVariationAxes', () => {
 	} );
 
 	it( 'resolves the font family from each value format', () => {
-		const settings = getSettings( [ { tag: 'GRAD' } ] );
+		const settings = getSettings( { GRAD: {} } );
 
 		[
 			'var:preset|font-family|roboto-flex',
@@ -61,11 +61,11 @@ describe( 'getFontVariationAxes', () => {
 	} );
 
 	it( 'ignores registered axes and axes the face does not have', () => {
-		const settings = getSettings( [
-			{ tag: 'wght', min: 300, max: 700 },
-			{ tag: 'FILL', min: 0, max: 1 },
-			{ tag: 'XTRA' },
-		] );
+		const settings = getSettings( {
+			wght: { min: 300, max: 700 },
+			FILL: { min: 0, max: 1 },
+			XTRA: {},
+		} );
 
 		expect(
 			getFontVariationAxes(
@@ -78,7 +78,29 @@ describe( 'getFontVariationAxes', () => {
 	} );
 
 	it( 'drops an axis whose ranges do not overlap', () => {
-		const settings = getSettings( [ { tag: 'GRAD', min: 200, max: 300 } ] );
+		const settings = getSettings( { GRAD: { min: 200, max: 300 } } );
+
+		expect(
+			getFontVariationAxes(
+				settings,
+				'var:preset|font-family|roboto-flex'
+			)
+		).toEqual( [] );
+	} );
+
+	it( 'shows axes in the order the policy lists them', () => {
+		const settings = getSettings( { opsz: {}, XTRA: {}, GRAD: {} } );
+
+		expect(
+			getFontVariationAxes(
+				settings,
+				'var:preset|font-family|roboto-flex'
+			).map( ( { tag } ) => tag )
+		).toEqual( [ 'opsz', 'XTRA', 'GRAD' ] );
+	} );
+
+	it( 'does not read a policy written as a list', () => {
+		const settings = getSettings( [ { tag: 'GRAD' } ] );
 
 		expect(
 			getFontVariationAxes(
@@ -96,10 +118,7 @@ describe( 'getFontVariationAxes', () => {
 			)
 		).toEqual( [] );
 		expect(
-			getFontVariationAxes(
-				getSettings( [ { tag: 'GRAD' } ] ),
-				undefined
-			)
+			getFontVariationAxes( getSettings( { GRAD: {} } ), undefined )
 		).toEqual( [] );
 	} );
 } );
@@ -127,7 +146,7 @@ describe( 'getFontVariationAxes with several faces', () => {
 	const settings = {
 		typography: {
 			fontFamilies: { theme: [ family ] },
-			fontVariations: { split: [ { tag: 'opsz' }, { tag: 'GRAD' } ] },
+			fontVariations: { split: { opsz: {}, GRAD: {} } },
 		},
 	};
 	const tags = ( axes ) =>

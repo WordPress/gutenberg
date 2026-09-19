@@ -806,8 +806,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'typography' => array(
 					'fontVariations' => array(
 						'roboto-flex' => array(
-							array(
-								'tag' => 'GRAD',
+							'GRAD' => array(
 								'min' => -50,
 								'max' => 50,
 							),
@@ -863,6 +862,60 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 		$sanitized = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $input );
 		$this->assertSame( array( 'GRAD' => 20 ), $sanitized['styles']['typography']['fontVariationSettings'], 'Registered axes, non-numeric values and invalid tags are dropped.' );
+	}
+
+	/**
+	 * The policy is keyed by axis tag, so that a child theme adding an axis
+	 * keeps the parent's axes and their ranges. A list would be merged by
+	 * index, and the added axis would take the range of the one it replaced.
+	 */
+	public function test_font_variation_policy_merges_per_axis() {
+		$parent = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'typography' => array(
+						'fontVariations' => array(
+							'roboto-flex' => array(
+								'GRAD' => array(
+									'min' => -50,
+									'max' => 50,
+								),
+								'opsz' => array(),
+							),
+						),
+					),
+				),
+			)
+		);
+		$child  = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'typography' => array(
+						'fontVariations' => array(
+							'roboto-flex' => array(
+								'XTRA' => array(),
+							),
+						),
+					),
+				),
+			)
+		);
+		$parent->merge( $child );
+		$settings = $parent->get_settings();
+
+		$this->assertSame(
+			array(
+				'GRAD' => array(
+					'min' => -50,
+					'max' => 50,
+				),
+				'opsz' => array(),
+				'XTRA' => array(),
+			),
+			$settings['typography']['fontVariations']['roboto-flex']
+		);
 	}
 
 	public function test_get_stylesheet_preset_classes_work_with_compounded_selectors() {

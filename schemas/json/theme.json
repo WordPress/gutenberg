@@ -623,18 +623,16 @@
 							"default": true
 						},
 						"fontVariations": {
-							"description": "Variable font axes that users can set, by font family slug. Only axes listed here are offered, within the range the font declares and, when given, the narrower range set here. `wght`, `wdth`, `slnt` and `ital` are set through font weight, width and style instead.",
+							"description": "Variable font axes that users can set, by font family slug, then by OpenType axis tag. Only axes listed here are offered, within the range the font declares and, when given, the narrower range set here. Keyed by tag so that theme.json origins merge per axis. `wght`, `wdth`, `slnt` and `ital` are set through font weight, width and style instead.",
 							"type": "object",
 							"additionalProperties": {
-								"type": "array",
-								"items": {
+								"type": "object",
+								"propertyNames": {
+									"pattern": "^[A-Za-z0-9]{4}$"
+								},
+								"additionalProperties": {
 									"type": "object",
 									"properties": {
-										"tag": {
-											"description": "OpenType axis tag, such as `GRAD` or `opsz`.",
-											"type": "string",
-											"pattern": "^[A-Za-z0-9]{4}$"
-										},
 										"name": {
 											"description": "Label shown for the axis.",
 											"type": "string"
@@ -648,7 +646,6 @@
 											"type": "number"
 										}
 									},
-									"required": [ "tag" ],
 									"additionalProperties": false
 								}
 							}
