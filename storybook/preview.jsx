@@ -140,11 +140,14 @@ export const parameters = {
 					'Deprecated',
 				],
 				'Tokens',
-				'BlockEditor',
-				'GlobalStylesUI',
-				'ImageCropper',
-				'MediaEditor',
 				'Editor',
+				[
+					'Block Editor',
+					'Global Styles',
+					'Image Cropper',
+					'Media Editor',
+					'Upload Progress Snackbar',
+				],
 				'Widgets',
 				[
 					'Primitives',
