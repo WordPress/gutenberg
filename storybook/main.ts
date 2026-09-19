@@ -16,6 +16,28 @@ function getAbsolutePath( packageName: string ) {
 	);
 }
 
+/**
+ * Serve the English Emojibase dataset for the Editor/EmojiPicker story,
+ * mirroring the `build/emojibase-data/<locale>/` layout. Only `en` is
+ * mapped, to keep the published Storybook artifact small.
+ *
+ * Resolved rather than hardcoded to `node_modules/`, since the package is
+ * declared by the `tools/build-scripts` workspace and a non-hoisted
+ * install would otherwise point at a missing directory.
+ */
+function emojibaseStaticDirs() {
+	try {
+		return [
+			{
+				from: path.join( getAbsolutePath( 'emojibase-data' ), 'en' ),
+				to: '/emojibase-data/en',
+			},
+		];
+	} catch {
+		return [];
+	}
+}
+
 const { NODE_ENV = 'development' } = process.env;
 
 const stories = [
@@ -51,7 +73,7 @@ const config: StorybookConfig = {
 		disableTelemetry: true,
 	},
 	stories,
-	staticDirs: [ './static' ],
+	staticDirs: [ './static', ...emojibaseStaticDirs() ],
 	addons: [
 		{
 			name: getAbsolutePath( '@storybook/addon-docs' ),
