@@ -17,5 +17,14 @@ describe( 'core/code', () => {
 			const text = escape( 'Text https://example.com/test/' );
 			expect( text ).toBe( 'Text https://example.com/test/' );
 		} );
+
+		it( 'should escape the protocol of every isolated url when there is more than one', () => {
+			const text = escape(
+				'https://example.com/one/\nhttps://example.com/two/'
+			);
+			expect( text ).toBe(
+				'https:&#47;&#47;example.com/one/\nhttps:&#47;&#47;example.com/two/'
+			);
+		} );
 	} );
 } );
