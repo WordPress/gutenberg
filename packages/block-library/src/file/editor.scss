@@ -10,16 +10,10 @@
 
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: space-between;
 	align-items: center;
 	margin-bottom: 0;
 
-	.components-resizable-box__container {
-		margin-bottom: 1em;
-	}
-
 	.wp-block-file__preview {
-		margin-bottom: 1em;
 		width: 100%;
 		height: 100%;
 	}
@@ -32,8 +26,9 @@
 		left: 0;
 	}
 
+	// Let the block's flex layout place the file name and button.
 	.wp-block-file__content-wrapper {
-		flex-grow: 1;
+		display: contents;
 	}
 
 	a {
@@ -46,6 +41,11 @@
 
 	.wp-block-file__button-richtext-wrapper {
 		display: inline-block;
-		margin-left: 0.75em;
 	}
+}
+
+// Classic themes center blocks with a `data-align` wrapper instead of
+// `.aligncenter`. Zero specificity, so a justification chosen in the editor wins.
+:where(.wp-block[data-align="center"] > .wp-block-file) {
+	justify-content: center;
 }

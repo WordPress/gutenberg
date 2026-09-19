@@ -51,7 +51,13 @@ function ClipboardToolbarButton( { text, disabled } ) {
 	);
 }
 
-function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
+function FileEdit( {
+	attributes,
+	isSelected,
+	setAttributes,
+	clientId,
+	__unstableLayoutClassNames: layoutClassNames,
+} ) {
 	const {
 		id,
 		fileName,
@@ -176,6 +182,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	const blockProps = useBlockProps( {
 		className: clsx(
+			layoutClassNames,
 			!! temporaryURL && getAnimateClassName( { type: 'loading' } ),
 			{
 				'is-transient': !! temporaryURL,
