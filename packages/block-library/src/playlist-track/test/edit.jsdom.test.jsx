@@ -4,6 +4,7 @@ import { useDispatch } from '@wordpress/data';
 import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
+import { queueTrackPeaks } from '../../utils/waveform-peaks';
 
 let mockMediaReplaceFlowProps;
 
@@ -52,9 +53,24 @@ vi.mock( '../../utils/hooks', () => ( {
 	useUploadMediaFromBlobURL: vi.fn(),
 } ) );
 
+vi.mock( '../../utils/waveform-peaks', () => ( {
+	queueTrackPeaks: vi.fn( () => Promise.resolve( null ) ),
+} ) );
+
 // The handler only forwards the message to a notice, so its text is
 // irrelevant to what these tests check.
 const UPLOAD_ERROR = 'Upload failed.';
+
+/**
+ * Let the queued waveform analysis settle.
+ *
+ * @return {Promise<void>} Resolves once pending promises have run.
+ */
+function flushAnalysis() {
+	return act( async () => {
+		await Promise.resolve();
+	} );
+}
 
 const defaultAttributes = {
 	id: 1,
@@ -293,6 +309,66 @@ describe( 'PlaylistTrackEdit', () => {
 		expect( setAttributes.mock.calls[ 0 ][ 0 ] ).not.toHaveProperty(
 			'src'
 		);
+	} );
+
+	it( 'stores the analysed waveform on the track', async () => {
+		queueTrackPeaks.mockResolvedValueOnce( 'QUFB' );
+
+		const { setAttributes } = renderEdit( {
+			attributes: { waveform: undefined },
+		} );
+
+		await flushAnalysis();
+
+		expect( queueTrackPeaks ).toHaveBeenCalledWith(
+			'https://example.com/song.mp3'
+		);
+		expect( setAttributes ).toHaveBeenCalledWith( { waveform: 'QUFB' } );
+	} );
+
+	it( 'does not re-analyse a track that already has a waveform', async () => {
+		renderEdit( { attributes: { waveform: 'QUFB' } } );
+
+		await flushAnalysis();
+
+		expect( queueTrackPeaks ).not.toHaveBeenCalled();
+	} );
+
+	it( 'leaves the track alone when the audio cannot be analysed', async () => {
+		// Cross-origin media without CORS headers cannot be read, so there are
+		// no peaks to store. The track still plays.
+		queueTrackPeaks.mockResolvedValueOnce( null );
+
+		const { setAttributes } = renderEdit( {
+			attributes: { waveform: undefined },
+		} );
+
+		await flushAnalysis();
+
+		expect( setAttributes ).not.toHaveBeenCalled();
+	} );
+
+	it( 'clears the stored waveform when the track media is replaced', async () => {
+		// getTrackAttributes() is spread over the existing attributes, so a
+		// waveform left out of it would stay behind and be drawn over the
+		// incoming audio.
+		const { setAttributes } = renderEdit( {
+			isSelected: true,
+			attributes: { waveform: 'QUFB' },
+		} );
+
+		await act( async () => {
+			mockMediaReplaceFlowProps.onSelect( {
+				id: 2,
+				source_url: 'https://example.com/replacement.mp3',
+				title: { raw: 'Replacement' },
+			} );
+		} );
+
+		const attributes = setAttributes.mock.calls[ 0 ][ 0 ];
+
+		expect( 'waveform' in attributes ).toBe( true );
+		expect( attributes.waveform ).toBeUndefined();
 	} );
 
 	it( 'accepts raw uploaded attachment data when replacing a track', () => {

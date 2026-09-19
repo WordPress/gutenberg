@@ -23,6 +23,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `blob` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `local` |
 | `id` | `number` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `src` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `waveform` | `string` | — | — |
 | `type` | `string` | `"audio"` | — |
 | `album` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `artist` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
