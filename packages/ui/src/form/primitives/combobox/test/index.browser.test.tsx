@@ -189,35 +189,43 @@ describe( 'Combobox', () => {
 		);
 	} );
 
-	it( 'uses a custom accessible label for chip remove buttons', async () => {
+	it( 'uses a custom tooltip label for chip remove buttons', async () => {
+		const user = userEvent;
+
 		await render(
-			<Combobox.Root< Item, true >
-				items={ ITEMS }
-				multiple
-				defaultValue={ [ ITEMS[ 0 ] ] }
-			>
-				<Combobox.Chips>
-					<Combobox.Value>
-						{ ( value: Item[] ) => (
-							<>
-								{ value.map( ( item ) => (
-									<Combobox.ChipWithRemove
-										key={ item.id }
-										removeLabel={ `Remove ${ item.value }` }
-									>
-										{ item.value }
-									</Combobox.ChipWithRemove>
-								) ) }
-							</>
-						) }
-					</Combobox.Value>
-				</Combobox.Chips>
-			</Combobox.Root>
+			<Tooltip.Provider delay={ 0 }>
+				<Combobox.Root< Item, true >
+					items={ ITEMS }
+					multiple
+					defaultValue={ [ ITEMS[ 0 ] ] }
+				>
+					<Combobox.Chips>
+						<Combobox.Value>
+							{ ( value: Item[] ) => (
+								<>
+									{ value.map( ( item ) => (
+										<Combobox.ChipWithRemove
+											key={ item.id }
+											removeLabel="Delete"
+										>
+											{ item.value }
+										</Combobox.ChipWithRemove>
+									) ) }
+								</>
+							) }
+						</Combobox.Value>
+					</Combobox.Chips>
+				</Combobox.Root>
+			</Tooltip.Provider>
 		);
 
-		await expect
-			.element( screen.getByRole( 'button', { name: 'Remove Item 1' } ) )
-			.toBeVisible();
+		await user.hover(
+			screen.getByLabelText( 'Delete', {
+				selector: 'button',
+			} )
+		);
+
+		await expect.element( screen.getByText( 'Delete' ) ).toBeVisible();
 	} );
 
 	it( 'allows selecting items when Empty is rendered after List', async () => {
