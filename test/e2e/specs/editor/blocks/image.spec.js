@@ -968,6 +968,69 @@ test.describe( 'Image - lightbox', () => {
 	} );
 
 	test.describe( 'should render as expected on front end', () => {
+		test( 'Caption remains accessible when navigating lightbox images', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent( `<!-- wp:gallery {"linkTo":"none"} -->
+			<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true},"caption":"First <strong>rich &amp; safe</strong> &lt;caption&gt;"} -->
+			<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="First landscape" class="wp-image-${ uploadedMedia.id }"/><figcaption class="wp-element-caption">First <strong>rich &amp; safe</strong> &lt;caption&gt;</figcaption></figure>
+			<!-- /wp:image -->
+			<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true},"caption":"Second <em>formatted</em> caption"} -->
+			<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/><figcaption class="wp-element-caption">Second <em>formatted</em> caption</figcaption></figure>
+			<!-- /wp:image -->
+			<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+			<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="Uncaptioned landscape" class="wp-image-${ uploadedMedia.id }"/></figure>
+			<!-- /wp:image --></figure>
+			<!-- /wp:gallery -->` );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			await page.locator( '.wp-block-gallery img' ).first().click();
+
+			const overlay = page.locator( '.wp-lightbox-overlay' );
+			const overlayFigures = overlay.locator(
+				'.lightbox-image-container figure'
+			);
+			const caption = overlay.locator( 'figcaption' );
+
+			await expect( overlay ).toHaveClass( /active/ );
+			await expect( overlayFigures ).toHaveCount( 2 );
+			await expect( overlayFigures.first() ).toHaveAttribute(
+				'aria-hidden',
+				'true'
+			);
+			await expect( caption ).toHaveCount( 1 );
+			await expect( caption ).toHaveText( 'First rich & safe <caption>' );
+			await expect(
+				overlay.getByRole( 'img', { name: 'First landscape' } )
+			).toHaveCount( 1 );
+			expect( await overlay.ariaSnapshot() ).toContain(
+				'First rich & safe <caption>'
+			);
+			await expect( caption ).toHaveCSS( 'display', 'block' );
+			expect( await caption.innerHTML() ).toBe(
+				'First rich &amp; safe &lt;caption&gt;'
+			);
+
+			await page.getByRole( 'button', { name: 'Next' } ).click();
+
+			await expect( caption ).toHaveText( 'Second formatted caption' );
+			await expect( caption.locator( 'em' ) ).toHaveCount( 0 );
+
+			await page.getByRole( 'button', { name: 'Next' } ).click();
+			await expect( caption ).toHaveJSProperty( 'hidden', true );
+			await expect( caption ).toHaveText( '' );
+			expect( await overlay.ariaSnapshot() ).not.toContain(
+				'Second formatted caption'
+			);
+
+			await page.getByRole( 'button', { name: 'Previous' } ).click();
+			await expect( caption ).toHaveJSProperty( 'hidden', false );
+			await expect( caption ).toHaveText( 'Second formatted caption' );
+		} );
+
 		test( "Overlay image should not inherit content image's margins", async ( {
 			editor,
 			page,
