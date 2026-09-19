@@ -14,6 +14,7 @@ import { store, stores, universalUnlock } from './store';
 import { warn, type SyncAwareFunction } from './utils';
 import { getScope, setScope, resetScope, type Scope } from './scopes';
 import { PENDING_GETTER } from './proxies/state';
+import { compileExpression } from './csp';
 export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
@@ -86,7 +87,7 @@ interface DirectiveOptions {
 }
 
 export interface Evaluate {
-	( entry: DirectiveEntry, ...args: any[] ): any;
+	( entry: DirectiveEntry, evt?: Event ): any;
 }
 
 interface GetEvaluate {
@@ -228,53 +229,157 @@ const resolve = ( path: string, namespace: string ) => {
 	}
 };
 
+/**
+ * Splits a ;-delimited expression into individual statements, respecting
+ * string literals, template literals, regex literals, and IIFEs so
+ * semicolons inside them are not treated as statement boundaries.
+ * Returns null when the string is empty or whitespace-only.
+ * When there are no semicolons, the whole expression is returned as a
+ * single statement.
+ *
+ * The IIFE support is intentionally limited, matching Datastar's genRx():
+ * only function(){} and ()=>{} syntax with no arguments and no nested
+ * IIFEs are recognised.
+ */
+export const splitStatements = ( expr: string ): string[] | null => {
+	if ( typeof expr !== 'string' || ! expr.trim() ) {
+		return null;
+	}
+	const re =
+		/(?:\/(?:\\\/|[^/])*\/|"(?:\\"|[^"])*"|'(?:\\'|[^'])*'|`(?:\\`|[^`])*`|\(\s*(?:(?:function)\s*\(\s*\)|(?:\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;){]*)\s*\)\s*\(\s*\)|[^;])+/gm;
+	return expr.trim().match( re );
+};
+
+// Cache for compiled full-expression functions, keyed by expression string.
+// The compiled functions are pure (all runtime data flows through arguments),
+// so the same Function object can be reused across all scopes and evaluations.
+const fnCache = new Map< string, Function >();
+
 // Generate the evaluate function.
 export const getEvaluate: GetEvaluate =
 	( { scope } ) =>
-	// TODO: When removing the temporarily remaining `value( ...args )` call below, remove the `...args` parameter too.
-	( entry, ...args ) => {
-		let { value: path, namespace } = entry;
+	( entry, evt ) => {
+		const { value: path, namespace } = entry;
 		if ( typeof path !== 'string' ) {
 			throw new Error( 'The `value` prop should be a string path' );
 		}
-		// If path starts with !, remove it and save a flag.
-		const hasNegationOperator =
-			path[ 0 ] === '!' && !! ( path = path.slice( 1 ) );
 		setScope( scope );
-		const value = resolve( path, namespace );
-		// Functions are returned without invoking them.
-		if ( typeof value === 'function' ) {
-			// Except if they have a negation operator present, for backward compatibility.
-			// This pattern is strongly discouraged and deprecated, and it will be removed in a near future release.
-			// TODO: Remove this condition to effectively ignore negation operator when provided with a function.
-			if ( hasNegationOperator ) {
-				warn(
-					'Using a function with a negation operator is deprecated and will stop working in WordPress 6.9. Please use derived state instead.'
-				);
-				const functionResult = ! value( ...args );
+
+		// Legacy path:
+		// match an optional leading `!` followed by a simple
+		// dotted path. Both the negation flag and the clean path are
+		// captured in one go, avoiding any mutation of the original `path`
+		// variable (which is used unchanged by the full-expression path).
+		const [ , hasNegationOperator, cleanPath ] =
+			path.match( /^(!)?\s*([a-zA-Z_$][\w.]*)$/ ) ?? [];
+		if ( cleanPath ) {
+			const firstSegment = cleanPath.split( '.' )[ 0 ];
+			// Skip legacy path for built-in expression parameters (el, evt)
+			// that should be resolved by the full-expression path instead.
+			if ( firstSegment !== 'el' && firstSegment !== 'evt' ) {
+				const value = resolve( cleanPath, namespace );
+				// Functions are returned without invoking them.
+				if ( typeof value === 'function' ) {
+					// When used with a negation operator, ignore the negation —
+					// using `!` on a function reference is an antipattern;
+					// use derived state instead.
+					if ( hasNegationOperator ) {
+						warn(
+							'Using a function with a negation operator is deprecated and will stop working in WordPress 7.1. Please use derived state instead.'
+						);
+					}
+					// Reset scope before return and wrap the function so it
+					// will still run within the correct scope.
+					resetScope();
+					const wrappedFunction: Function = (
+						...functionArgs: any[]
+					) => {
+						setScope( scope );
+						const functionResult = value( ...functionArgs );
+						resetScope();
+						return functionResult;
+					};
+					// Preserve the sync property from the original function
+					if ( value.sync ) {
+						const syncAwareFunction =
+							wrappedFunction as SyncAwareFunction;
+						syncAwareFunction.sync = true;
+					}
+					return wrappedFunction;
+				}
+				const result = value;
 				resetScope();
-				return functionResult;
+				return hasNegationOperator && value !== PENDING_GETTER
+					? ! result
+					: result;
 			}
-			// Reset scope before return and wrap the function so it will still run within the correct scope.
-			resetScope();
-			const wrappedFunction: Function = ( ...functionArgs: any[] ) => {
-				setScope( scope );
-				const functionResult = value( ...functionArgs );
-				resetScope();
-				return functionResult;
-			};
-			// Preserve the sync property from the original function
-			if ( value.sync ) {
-				const syncAwareFunction = wrappedFunction as SyncAwareFunction;
-				syncAwareFunction.sync = true;
-			}
-			return wrappedFunction;
 		}
-		const result = value;
-		resetScope();
-		return hasNegationOperator && value !== PENDING_GETTER
-			? ! result
-			: result;
+
+		// Full-expression path:
+		// Compiles arbitrary JavaScript expressions via compileExpression()
+		// (Function() fallback or nonced <script> when <html data-nonce> is
+		// present — see csp.ts, mirrors Datastar's csp.ts). Passes state,
+		// context, actions, callbacks, current element and triggering event
+		// as named parameters to be used in expressions.
+		//
+		// Supports ;-delimited multiple statements: the
+		// last statement's value is what the directive receives
+		// (needed for directives like data-wp-text).
+		try {
+			let resolvedStore = stores.get( namespace );
+			if ( typeof resolvedStore === 'undefined' ) {
+				resolvedStore = store(
+					namespace,
+					{},
+					{
+						lock: universalUnlock,
+					}
+				);
+			}
+			const state = resolvedStore ? resolvedStore.state : undefined;
+			const ctx = getScope().context[ namespace ];
+			const actions = resolvedStore ? resolvedStore.actions : undefined;
+			const callbacks = resolvedStore
+				? resolvedStore.callbacks
+				: undefined;
+			const statements = splitStatements( path );
+			let expression: string;
+			if ( statements ) {
+				const lastIdx = statements.length - 1;
+				const last = statements[ lastIdx ].trim();
+				if ( ! last.startsWith( 'return ' ) ) {
+					statements[ lastIdx ] = `return (${ last });`;
+				}
+				expression = statements.join( ';\n' );
+			} else {
+				expression = `return (${ path });`;
+			}
+			const el = scope.ref?.current ?? null;
+			let fn = fnCache.get( expression );
+			if ( ! fn ) {
+				fn = compileExpression(
+					[
+						'state',
+						'context',
+						'actions',
+						'callbacks',
+						'el',
+						'evt',
+					],
+					expression
+				);
+				fnCache.set( expression, fn );
+			}
+			const result = fn( state, ctx, actions, callbacks, el, evt );
+			resetScope();
+			return result;
+		} catch ( e ) {
+			resetScope();
+			if ( e === PENDING_GETTER ) {
+				return PENDING_GETTER;
+			}
+			return undefined;
+		}
 	};
 
 // Separate directives by priority. The resulting array contains objects
