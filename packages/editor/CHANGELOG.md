@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a session-scoped editor intent (`edit`, `suggest`, `view`), with a private `setEditorIntent` action and `getEditorIntent` selector - the intent API stays private while Suggest mode is experimental. It is surfaced as an Edit / Suggest / View menu in the editor options for post types that support notes, and announced on change with a snackbar. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit), +X (Suggest), +C (View) on Windows, ⌘⌥⇧Z/X/C on macOS ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
+
 ### Enhancements
 
 -   Remove the `react-autosize-textarea` dependency. The post editor's "Code editor" view now auto-grows with CSS `field-sizing: content`. Browsers without support use a scrollable field ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).
@@ -18,6 +22,10 @@
 -   `MediaUpload`: Coerce `multiple` to a boolean before passing it to the experimental media modal; callers such as the playlist block and the inserter media tab pass the legacy media frame's `'add'` mode. ([#82715](https://github.com/WordPress/gutenberg/pull/82715))
 -   Document bar: Preserve the subdued template-preview icon color after the icon became stroke-based. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
 -   `useGlobalStylesOutput`: Let the styles engine derive block gap support from the config it renders, instead of a separate check that treated a theme without block gap support as supporting it and so dropped the fallback gap styles the front end renders ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
+-   `DocumentTools`: Disable the Block Inserter toggle while the canvas is a preview, and close an inserter left open when the editor enters the `view` intent, so the control that adds blocks does not open onto a library the editor will refuse ([#80427](https://github.com/WordPress/gutenberg/pull/80427), [#81661](https://github.com/WordPress/gutenberg/pull/81661)).
+-   Close the editor-level mutation paths the read-only canvas does not cover while the editor is in the `view` intent: the code editor - a raw `post_content` textarea preview rendering leaves writable - is refused from the Options menu, the toggle-mode shortcut and the command palette, and undo and redo are declined by the store and stop advertising themselves in the header ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
+-   Register the editor intent keyboard shortcuts only where they can be used - the Suggestion Mode experiment and `editor.notes` support on the current post type - so the Keyboard Shortcuts help modal no longer advertises them on screens that cannot act on them ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
+-   Hide the keyboard shortcut on the selected choice in the editor intent menu, matching `ModeSwitcher` ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 
 ### Internal
 
