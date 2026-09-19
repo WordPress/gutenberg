@@ -7,6 +7,9 @@ import BackgroundPanel, {
 	hasBackgroundColorValue,
 	hasLegacyColorGradientValue,
 } from '../background-panel';
+import BackgroundClipControl, {
+	ALL_BACKGROUND_CLIP_VALUES,
+} from '../../background-clip-control';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -468,5 +471,569 @@ describe( 'hasLegacyColorGradientValue', () => {
 				background: { gradient: 'linear-gradient(red, blue)' },
 			} )
 		).toBe( false );
+	} );
+} );
+
+describe( 'BackgroundPanel background clip', () => {
+	const withClipSetting = ( backgroundClip ) => ( {
+		...baseSettings,
+		background: { ...baseSettings.background, backgroundClip },
+	} );
+
+	const renderPanel = ( settings ) =>
+		render(
+			<BackgroundPanel
+				value={ {} }
+				settings={ settings }
+				onChange={ () => {} }
+				defaultControls={ { backgroundClip: true } }
+				panelId="test-panel"
+			/>
+		);
+
+	it( 'hides the clip control until a theme opts in', () => {
+		renderPanel( baseSettings );
+
+		expect(
+			screen.queryByRole( 'combobox', { name: /clip/i } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'shows the clip control when the setting is true', async () => {
+		renderPanel( withClipSetting( true ) );
+
+		expect(
+			await screen.findByRole( 'combobox', { name: /clip/i } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'hides the clip control when the setting names only the text value', () => {
+		// The Typography panel's gradient control already expresses a text
+		// clip, so there would be no box left to choose between.
+		renderPanel( withClipSetting( [ 'text' ] ) );
+
+		expect(
+			screen.queryByRole( 'combobox', { name: /clip/i } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'hides the clip control when the setting names nothing it recognises', () => {
+		renderPanel( withClipSetting( [ 'padding_box' ] ) );
+
+		expect(
+			screen.queryByRole( 'combobox', { name: /clip/i } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'shows the clip control when the setting names values', async () => {
+		renderPanel( withClipSetting( [ 'border-box', 'text' ] ) );
+
+		expect(
+			await screen.findByRole( 'combobox', { name: /clip/i } )
+		).toBeInTheDocument();
+	} );
+} );
+
+describe( 'BackgroundClipControl', () => {
+	it( 'falls back to the first allowed value when nothing is set', async () => {
+		render(
+			<BackgroundClipControl
+				onChange={ () => {} }
+				allowedValues={ [ 'padding-box', 'text' ] }
+			/>
+		);
+
+		expect(
+			await screen.findByRole( 'combobox', { name: /clip/i } )
+		).toHaveTextContent( 'Padding box' );
+	} );
+
+	it( 'shows the current value', async () => {
+		render(
+			<BackgroundClipControl
+				value="text"
+				onChange={ () => {} }
+				allowedValues={ ALL_BACKGROUND_CLIP_VALUES }
+			/>
+		);
+
+		expect(
+			await screen.findByRole( 'combobox', { name: /clip/i } )
+		).toHaveTextContent( 'Text' );
+	} );
+
+	it( 'renders nothing when no values are allowed', () => {
+		const { container } = render(
+			<BackgroundClipControl onChange={ () => {} } allowedValues={ [] } />
+		);
+
+		expect( container ).toBeEmptyDOMElement();
+	} );
+} );
+
+describe( 'BackgroundPanel text gradient ownership', () => {
+	const TEXT_GRADIENT = 'var:preset|gradient|purple-blue';
+	// The background color control needs solid colors and the color panel's
+	// background support alongside the gradient settings.
+	const colorSettings = {
+		...baseSettings,
+		color: {
+			...baseSettings.color,
+			background: true,
+			palette: {
+				theme: [ { name: 'Black', slug: 'black', color: '#000000' } ],
+			},
+		},
+	};
+	// A text gradient alongside a value this panel does own, so "Reset all"
+	// has something of its own to clear.
+	const mixedValue = {
+		background: {
+			gradient: TEXT_GRADIENT,
+			backgroundClip: 'text',
+			backgroundImage: { url: 'https://example.com/image.jpg' },
+		},
+	};
+
+	const resetAll = async ( user ) => {
+		await user.click(
+			screen.getByRole( 'button', { name: 'Background options' } )
+		);
+		await user.click(
+			screen.getByRole( 'menuitem', { name: /reset all/i } )
+		);
+	};
+
+	it( 'does not count a text gradient as the panel gradient value', () => {
+		render(
+			<BackgroundPanel
+				value={ {
+					background: {
+						gradient: TEXT_GRADIENT,
+						backgroundClip: 'text',
+					},
+				} }
+				settings={ baseSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		// With no value of its own, the gradient item offers no reset control.
+		expect(
+			screen.queryByRole( 'button', { name: /^reset$/i } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'disables the gradient control while a text gradient is set', () => {
+		render(
+			<BackgroundPanel
+				value={ {
+					background: {
+						gradient: TEXT_GRADIENT,
+						backgroundClip: 'text',
+					},
+				} }
+				settings={ baseSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		// The control stays focusable so its tooltip remains reachable.
+		expect(
+			screen.getByRole( 'button', { name: 'Gradient' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'disables the gradient control while a text gradient is inherited', () => {
+		render(
+			<BackgroundPanel
+				value={ {} }
+				inheritedValue={ {
+					background: {
+						gradient: TEXT_GRADIENT,
+						backgroundClip: 'text',
+					},
+				} }
+				settings={ baseSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Gradient' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'disables the color control while a text gradient is set', () => {
+		render(
+			<BackgroundPanel
+				value={ {
+					background: {
+						gradient: TEXT_GRADIENT,
+						backgroundClip: 'text',
+					},
+				} }
+				settings={ colorSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Color' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'disables the image control while a text gradient is set', () => {
+		render(
+			<BackgroundPanel
+				value={ {
+					background: {
+						gradient: TEXT_GRADIENT,
+						backgroundClip: 'text',
+					},
+				} }
+				settings={ baseSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: /No background image selected/,
+			} )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'disables the color control with the clip control shown too', () => {
+		render(
+			<BackgroundPanel
+				value={ {
+					background: {
+						gradient: TEXT_GRADIENT,
+						backgroundClip: 'text',
+					},
+				} }
+				settings={ {
+					...colorSettings,
+					background: {
+						...colorSettings.background,
+						backgroundClip: true,
+					},
+				} }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Color' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'hands a gradient built here to the Typography panel once clipped to the text', async () => {
+		const user = userEvent.setup();
+		const clipSettings = {
+			...colorSettings,
+			background: { ...colorSettings.background, backgroundClip: true },
+		};
+		let current = {};
+		const onChange = ( next ) => {
+			current = next;
+		};
+		const panel = ( value ) => (
+			<BackgroundPanel
+				value={ value }
+				settings={ clipSettings }
+				onChange={ onChange }
+				panelId="test-panel"
+			/>
+		);
+		const { rerender } = render( panel( current ) );
+
+		const enable = async ( name ) => {
+			await user.click(
+				screen.getByRole( 'button', { name: 'Background options' } )
+			);
+			await user.click(
+				screen.getByRole( 'menuitemcheckbox', { name } )
+			);
+			await user.keyboard( '{Escape}' );
+		};
+		await enable( /gradient/i );
+		await enable( /clip/i );
+		await user.click( screen.getByRole( 'button', { name: 'Gradient' } ) );
+		await user.click( screen.getByRole( 'option', { name: /purple/i } ) );
+		await user.keyboard( '{Escape}' );
+		expect( current.background.gradient ).toBeTruthy();
+
+		// The clip select needs real layout to open, so the value it would
+		// write is applied directly.
+		rerender(
+			panel( {
+				...current,
+				background: { ...current.background, backgroundClip: 'text' },
+			} )
+		);
+
+		// The gradient is now a text gradient, which the Typography panel
+		// holds in a live control, so this panel stops offering it.
+		expect(
+			screen.getByRole( 'button', { name: 'Gradient' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+		// The clip control stays, so the block can be returned to a box value.
+		expect(
+			screen.getByRole( 'combobox', { name: /clip/i } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'preserves a text gradient through Reset all while the clip control is hidden', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<BackgroundPanel
+				value={ mixedValue }
+				settings={ baseSettings }
+				onChange={ onChange }
+				panelId="test-panel"
+			/>
+		);
+
+		await resetAll( user );
+
+		const result = onChange.mock.calls.at( -1 )[ 0 ];
+		expect( result.background.gradient ).toBe( TEXT_GRADIENT );
+		expect( result.background.backgroundClip ).toBe( 'text' );
+		expect( result.background.backgroundImage ).toBeUndefined();
+	} );
+
+	it( 'clears a text gradient through Reset all once the clip control is shown', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<BackgroundPanel
+				value={ mixedValue }
+				settings={ {
+					...baseSettings,
+					background: {
+						...baseSettings.background,
+						backgroundClip: true,
+					},
+				} }
+				onChange={ onChange }
+				panelId="test-panel"
+			/>
+		);
+
+		await resetAll( user );
+
+		const result = onChange.mock.calls.at( -1 )[ 0 ];
+		expect( result.background.gradient ).toBeUndefined();
+		expect( result.background.backgroundClip ).toBeUndefined();
+	} );
+} );
+
+describe( 'BackgroundPanel clip control ownership', () => {
+	const clipSettings = {
+		...baseSettings,
+		background: { ...baseSettings.background, backgroundClip: true },
+	};
+
+	it( 'does not surface the clip control for a text gradient set elsewhere', () => {
+		render(
+			<BackgroundPanel
+				value={ {
+					background: {
+						gradient: 'var:preset|gradient|purple-blue',
+						backgroundClip: 'text',
+					},
+				} }
+				settings={ clipSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		// The Typography panel owns a text clip, so this panel reports no
+		// value for it and the control stays behind the menu.
+		expect(
+			screen.queryByRole( 'combobox', { name: /clip/i } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'surfaces the clip control for a box value set here', async () => {
+		render(
+			<BackgroundPanel
+				value={ { background: { backgroundClip: 'content-box' } } }
+				settings={ clipSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			await screen.findByRole( 'combobox', { name: /clip/i } )
+		).toBeInTheDocument();
+	} );
+} );
+
+describe( 'BackgroundPanel at a non-default viewport', () => {
+	const TEXT_GRADIENT = 'var:preset|gradient|purple-blue';
+	const colorSettings = {
+		...baseSettings,
+		color: {
+			...baseSettings.color,
+			background: true,
+			palette: {
+				theme: [ { name: 'Black', slug: 'black', color: '#000000' } ],
+			},
+		},
+	};
+	// What the block sets at the default viewport. The clip applies at every
+	// width, so it still governs what a breakpoint can paint.
+	const baseValue = {
+		background: {
+			gradient: TEXT_GRADIENT,
+			backgroundClip: 'text',
+		},
+	};
+
+	it( 'disables the color control while the default viewport clips to text', () => {
+		render(
+			<BackgroundPanel
+				value={ {} }
+				baseValue={ baseValue }
+				settings={ colorSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Color' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'disables the gradient control while the default viewport clips to text', () => {
+		render(
+			<BackgroundPanel
+				value={ {} }
+				baseValue={ baseValue }
+				settings={ colorSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Gradient' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'keeps the controls usable when the breakpoint overrides the clip', () => {
+		render(
+			<BackgroundPanel
+				value={ { background: { backgroundClip: 'border-box' } } }
+				baseValue={ baseValue }
+				settings={ colorSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Color' } )
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
+		expect(
+			screen.getByRole( 'button', { name: 'Gradient' } )
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'disables the image control while the default viewport clips to text', () => {
+		render(
+			<BackgroundPanel
+				value={ {} }
+				baseValue={ baseValue }
+				settings={ colorSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: /No background image selected/,
+			} )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'hides the clip control, which belongs to the Default state', () => {
+		render(
+			<BackgroundPanel
+				value={ {} }
+				baseValue={ baseValue }
+				styleState={ { viewport: '@mobile', pseudo: 'default' } }
+				settings={ {
+					...colorSettings,
+					background: {
+						...colorSettings.background,
+						backgroundClip: true,
+					},
+				} }
+				defaultControls={ { backgroundClip: true } }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.queryByRole( 'combobox', { name: /clip/i } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'keeps the clip control at a pseudo state, which scopes it to hover', async () => {
+		render(
+			<BackgroundPanel
+				value={ {} }
+				baseValue={ baseValue }
+				styleState={ { viewport: 'default', pseudo: ':hover' } }
+				settings={ {
+					...colorSettings,
+					background: {
+						...colorSettings.background,
+						backgroundClip: true,
+					},
+				} }
+				defaultControls={ { backgroundClip: true } }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			await screen.findByRole( 'combobox', { name: /clip/i } )
+		).toBeInTheDocument();
+	} );
+
+	it( "leaves the controls alone when the default viewport doesn't clip to text", () => {
+		render(
+			<BackgroundPanel
+				value={ {} }
+				baseValue={ {
+					background: { gradient: TEXT_GRADIENT },
+				} }
+				settings={ colorSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Color' } )
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 } );
