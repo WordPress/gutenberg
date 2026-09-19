@@ -3,9 +3,9 @@
  *
  * 1. `withSuggestionOverlay` HOC — pass-through outside Suggest intent;
  *    in Suggest intent, diversion of `setAttributes` into the overlay,
- *    rendering the merged overlay-on-baseline value, writing through for
- *    pending-insert/deferred blocks, and surviving an overlay
- *    clear-and-re-edit cycle.
+ *    rendering the merged overlay-on-baseline value, surviving an overlay
+ *    clear-and-re-edit cycle, and handing text/format edits off to the
+ *    marker path instead of the overlay.
  * 2. `mergeOverlayAttributes` — replace-vs-deep-merge contract for
  *    overlapping overlay keys, including the `style`/`metadata` deep merge
  *    that keeps untouched fields alive.
@@ -14,9 +14,9 @@ import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { render, screen, act, fireEvent } from '@testing-library/react';
 import type { ReactElement, ReactNode } from 'react';
 import {
-	createRegistry,
-	createReduxStore,
 	RegistryProvider,
+	createReduxStore,
+	createRegistry,
 } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
@@ -24,6 +24,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { unregisterFormatType } from '@wordpress/rich-text';
 import withSuggestionOverlay, {
 	mergeOverlayAttributes,
 	structuralMarkerClass,
@@ -34,6 +35,10 @@ import {
 	SuggestionOverlayProvider,
 	useSuggestionOverlay,
 } from '../overlay-context';
+import {
+	registerSuggestionFormat,
+	SUGGESTION_FORMAT_NAME,
+} from '../../inline-suggestions';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -50,7 +55,7 @@ vi.hoisted( () => {
  */
 function createStubCoreStore() {
 	return createReduxStore( 'core', {
-		reducer: ( state = {} ) => state,
+		reducer: ( state: any = {} ) => state,
 		selectors: {
 			getRawEntityRecord: () => undefined,
 			getEntityRecordEdits: () => undefined,
@@ -66,15 +71,16 @@ function renderWithProviders(
 	}: { intent?: string; blocks?: any[] | null } = {}
 ) {
 	const registry = createRegistry();
-	registry.register( createStubCoreStore() );
 	// `setEditorIntent` dispatches a snackbar via the notices store when
 	// the intent actually changes, so the store needs to be registered even
 	// in tests that only care about the overlay HOC.
 	registry.register( noticesStore );
-	// `getEditorMode` reads the preference, so the store must be present
-	// whether or not the test supplies blocks.
+	// `setEditorIntent` compares the editor mode across the change so it can
+	// announce a canvas swap, and `getEditorMode` reads the preferences
+	// store.
 	registry.register( preferencesStore );
 	registry.register( editorStore );
+	registry.register( createStubCoreStore() );
 	// `blockEditorStore` is only registered when the test passes `blocks`.
 	// Registering it unconditionally activates the overlay provider's
 	// orphan-prune effect — it short-circuits when
@@ -107,11 +113,18 @@ function FakeBlock( { attributes, setAttributes }: any ) {
 	return (
 		<>
 			<div data-testid="content">{ attributes?.content ?? '' }</div>
+			<div data-testid="level">{ attributes?.level ?? '' }</div>
 			<button
 				type="button"
 				onClick={ () => setAttributes( { content: 'proposed' } ) }
 			>
 				edit
+			</button>
+			<button
+				type="button"
+				onClick={ () => setAttributes( { level: 3 } ) }
+			>
+				edit level
 			</button>
 		</>
 	);
@@ -159,6 +172,171 @@ describe( 'withSuggestionOverlay', () => {
 		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
 			'proposed'
 		);
+	} );
+
+	it( 'hands a text edit off to the content reconciler instead of the overlay', () => {
+		const setAttributes = vi.fn();
+		const handler = vi.fn();
+
+		// Registers a content handler so `requestContentSuggestion` takes
+		// ownership of the edit, standing in for the mounted reconciler.
+		function RegisterContentHandler() {
+			const { registerContentHandler } = useSuggestionOverlay();
+			useEffect(
+				() => registerContentHandler( handler ),
+				[ registerContentHandler ]
+			);
+			return null;
+		}
+
+		renderWithProviders(
+			<>
+				<RegisterContentHandler />
+				<Wrapped
+					clientId="a"
+					name="core/paragraph"
+					attributes={ { content: 'Hello' } }
+					setAttributes={ setAttributes }
+				/>
+			</>,
+			{ intent: 'suggest' }
+		);
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+
+		// The reconciler receives the block, the pre-edit value, and a marker
+		// plan whose actions all open a fresh note.
+		expect( handler ).toHaveBeenCalledTimes( 1 );
+		const request = handler.mock.calls[ 0 ][ 0 ];
+		expect( request ).toEqual(
+			expect.objectContaining( {
+				clientId: 'a',
+				blockName: 'core/paragraph',
+				prevContent: 'Hello',
+			} )
+		);
+		expect( request.plan.actions.length ).toBeGreaterThan( 0 );
+		expect(
+			request.plan.actions.every( ( action: any ) => action.newNote )
+		).toBe( true );
+
+		// The reconciler took ownership: the edit is neither written through
+		// nor diverted into the overlay, so the block still shows its original
+		// value (the reconciler writes the marker itself, out of band).
+		expect( setAttributes ).not.toHaveBeenCalled();
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent( 'Hello' );
+	} );
+
+	it( 'declines an edit that would bury a live marker under an overlay', () => {
+		// An overlay snapshot is marker-free by construction and renders in
+		// place of the block's live value, so capturing one for an attribute
+		// that still holds a marker hides that marker while its note keeps
+		// describing it - the block would carry both representations of a
+		// pending change at once (#73411, F-09). The edit is declined instead.
+		registerSuggestionFormat();
+		try {
+			const marked =
+				'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="del">doomed</mark>';
+			let overlayHandle;
+			function CaptureOverlay() {
+				const overlay = useSuggestionOverlay();
+				useEffect( () => {
+					overlayHandle = overlay;
+				}, [ overlay ] );
+				return null;
+			}
+
+			const setAttributes = vi.fn();
+			const { registry } = renderWithProviders(
+				<>
+					<CaptureOverlay />
+					<Wrapped
+						clientId="a"
+						name="core/paragraph"
+						attributes={ { content: marked } }
+						setAttributes={ setAttributes }
+					/>
+				</>,
+				{ intent: 'suggest' }
+			);
+
+			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+
+			// No overlay entry, and the block was not written through either:
+			// the marker and its note are left exactly as they were.
+			expect( overlayHandle!.entries.a ).toBeUndefined();
+			expect( setAttributes ).not.toHaveBeenCalled();
+			// The user is told why, rather than the edit vanishing silently.
+			// (The intent switch itself announces a snackbar, hence the find.)
+			const refusal = registry
+				.select( noticesStore )
+				.getNotices()
+				.find( ( notice ) =>
+					notice.content.includes( 'overlaps a pending suggestion' )
+				);
+			expect( refusal ).toBeDefined();
+			expect( refusal!.status ).toBe( 'warning' );
+		} finally {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+	} );
+
+	it( 'strips live suggestion markers from an attribute-only overlay baseline', () => {
+		// An attribute suggestion that leaves the marked attribute alone (a
+		// heading level change on a block whose content holds someone's
+		// marker) still goes to the overlay - it neither hides the marker nor
+		// competes with it. The baseline snapshot must still be marker-free:
+		// replaying it on accept would otherwise resurrect a marker whose
+		// suggestion was resolved in the interim.
+		registerSuggestionFormat();
+		try {
+			const marked =
+				'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="del">doomed</mark>';
+			let overlayHandle;
+			function CaptureOverlay() {
+				const overlay = useSuggestionOverlay();
+				useEffect( () => {
+					overlayHandle = overlay;
+				}, [ overlay ] );
+				return null;
+			}
+
+			renderWithProviders(
+				<>
+					<CaptureOverlay />
+					<Wrapped
+						clientId="a"
+						name="core/heading"
+						attributes={ { content: marked, level: 2 } }
+						setAttributes={ vi.fn() }
+					/>
+				</>,
+				{ intent: 'suggest' }
+			);
+
+			fireEvent.click(
+				screen.getByRole( 'button', { name: 'edit level' } )
+			);
+
+			const entry = overlayHandle!.entries.a;
+			expect( entry ).toBeDefined();
+			// Baseline keeps the marked run's text but not the marker.
+			expect( entry.baselineAttributes.content ).toBe( 'Hello doomed' );
+			expect( entry.baselineAttributes.content ).not.toContain(
+				'wp-suggestion'
+			);
+			// Only the attribute the user actually changed is proposed, so the
+			// marked content is never replayed on accept.
+			expect( entry.overlayAttributes ).toEqual( { level: 3 } );
+			// The block renders the proposed level over its still-marked
+			// content: the overlay covers one attribute, not the whole block.
+			expect( screen.getByTestId( 'level' ) ).toHaveTextContent( '3' );
+			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+				'wp-suggestion'
+			);
+		} finally {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
 	} );
 
 	it( 'writes setAttributes through (no overlay) for a pending-insert block in Suggest intent', () => {
@@ -533,11 +711,11 @@ describe( 'withSuggestionBlockClassName', () => {
 		metadata,
 	}: { intent?: string; metadata?: Record< string, any > } = {} ) {
 		const registry = createRegistry();
-		registry.register( createStubCoreStore() );
 		registry.register( noticesStore );
 		registry.register( preferencesStore );
 		registry.register( blockEditorStore );
 		registry.register( editorStore );
+		registry.register( createStubCoreStore() );
 		unlock( registry.dispatch( editorStore ) ).setEditorIntent( intent );
 
 		const block = createBlock( TEST_BLOCK_NAME, {
@@ -635,7 +813,6 @@ describe( 'withSuggestionBlockClassName', () => {
 
 	function setupMove( { withMove = true } = {} ) {
 		const registry = createRegistry();
-		registry.register( createStubCoreStore() );
 		registry.register( noticesStore );
 		registry.register( preferencesStore );
 		registry.register( blockEditorStore );
@@ -690,7 +867,6 @@ describe( 'withSuggestionBlockClassName', () => {
 
 	function setupOnlyChildMove() {
 		const registry = createRegistry();
-		registry.register( createStubCoreStore() );
 		registry.register( noticesStore );
 		registry.register( preferencesStore );
 		registry.register( blockEditorStore );
