@@ -161,6 +161,15 @@ function gutenberg_resolve_reaction_target( array $args ) {
 			);
 		}
 
+		// A reaction under a hidden note would escape the trash/restore cascade.
+		if ( in_array( $parent_comment->comment_approved, array( 'trash', 'spam' ), true ) ) {
+			return new WP_Error(
+				'rest_comment_invalid_parent',
+				__( 'A reaction cannot be added to a trashed or spam note.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
 		if ( $post_id > 0 && (int) $parent_comment->comment_post_ID !== $post_id ) {
 			return new WP_Error(
 				'rest_comment_invalid_parent',
