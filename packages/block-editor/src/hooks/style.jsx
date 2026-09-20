@@ -55,7 +55,12 @@ import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
 
-const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
+const { getResponsiveMediaQueries, getColumnFlexDeclarations } = unlock(
+	globalStylesEnginePrivateApis
+);
+
+// Blocks whose width must be serialized as flex sizing rather than `width`.
+const FLEX_WIDTH_BLOCKS = [ 'core/column' ];
 
 const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
 
@@ -226,6 +231,33 @@ function getStateTextAlignCSS( stateStyles, selector ) {
 }
 
 /**
+ * Returns CSS for a column block's width in a block instance state style object.
+ *
+ * The column block sizes itself with `flex-basis` rather than `width` because
+ * it lives in a flex container, so a state width needs its own declarations.
+ *
+ * @param {Object} stateStyles State style object.
+ * @param {string} selector    CSS selector for the generated style.
+ * @return {string|undefined} CSS string with the flex declarations.
+ */
+function getStateColumnWidthCSS( stateStyles, selector ) {
+	const width = stateStyles?.dimensions?.width;
+
+	if ( ! width ) {
+		return undefined;
+	}
+
+	const { flexBasis, flexGrow } = getColumnFlexDeclarations(
+		getCSSValueFromRawStyle( width )
+	);
+	const declarations = `flex-basis: ${ flexBasis } !important; flex-grow: ${ flexGrow } !important`;
+
+	return selector
+		? `${ selector } { ${ declarations }; }`
+		: `${ declarations };`;
+}
+
+/**
  * Generates CSS for a block instance state style object.
  *
  * State declarations need to win over preset utility classes, but fallback
@@ -234,14 +266,22 @@ function getStateTextAlignCSS( stateStyles, selector ) {
  *
  * @param {Object} stateStyles State style object.
  * @param {string} selector    CSS selector for the generated style.
+ * @param {string} [name]      Block name, for blocks whose width is flex sizing.
  * @return {string} Generated stylesheet.
  */
-export function getStateStylesCSS( stateStyles, selector ) {
-	const fallbackDimensionStyles =
-		getStateFallbackDimensionStyles( stateStyles );
-	const stylesWithDimensionFallbacks = fallbackDimensionStyles
-		? mergeStyleObjects( stateStyles, fallbackDimensionStyles )
+export function getStateStylesCSS( stateStyles, selector, name ) {
+	const usesFlexWidth = FLEX_WIDTH_BLOCKS.includes( name );
+	const columnWidthCSS = usesFlexWidth
+		? getStateColumnWidthCSS( stateStyles, selector )
+		: undefined;
+	const engineStyles = columnWidthCSS
+		? omitStyle( stateStyles, [ [ 'dimensions', 'width' ] ] )
 		: stateStyles;
+	const fallbackDimensionStyles =
+		getStateFallbackDimensionStyles( engineStyles );
+	const stylesWithDimensionFallbacks = fallbackDimensionStyles
+		? mergeStyleObjects( engineStyles, fallbackDimensionStyles )
+		: engineStyles;
 	const css = compileCSS( stylesWithDimensionFallbacks, { selector } );
 	const importantCSS = css ? css.replace( /;/g, ' !important;' ) : undefined;
 	const fallbackBorderStyles = getStateFallbackBorderStyles( stateStyles );
@@ -254,7 +294,13 @@ export function getStateStylesCSS( stateStyles, selector ) {
 		selector
 	);
 
-	return [ importantCSS, textAlignCSS, fallbackCSS, backgroundResetCSS ]
+	return [
+		importantCSS,
+		columnWidthCSS,
+		textAlignCSS,
+		fallbackCSS,
+		backgroundResetCSS,
+	]
 		.filter( Boolean )
 		.join( '\n' );
 }
@@ -363,7 +409,8 @@ export function getBlockStateStylesCSS( stateStyles, options ) {
 		.map( ( { selector: blockSelector, style } ) =>
 			getStateStylesCSS(
 				style,
-				buildScopedBlockSelector( baseSelector, blockSelector, state )
+				buildScopedBlockSelector( baseSelector, blockSelector, state ),
+				name
 			)
 		)
 		.filter( Boolean );

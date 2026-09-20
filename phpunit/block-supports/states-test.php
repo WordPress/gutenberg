@@ -367,6 +367,83 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a column's state width is output as flex sizing.
+	 *
+	 * The column block lives in a flex container, so `width` has no effect on it.
+	 *
+	 * @covers ::gutenberg_add_block_state_style_rule
+	 */
+	public function test_column_state_width_is_output_as_flex_sizing() {
+		$css_rules = array();
+
+		gutenberg_add_block_state_style_rule(
+			$css_rules,
+			'',
+			'.wp-states-abc12345',
+			array( 'dimensions' => array( 'width' => '25%' ) ),
+			null,
+			'core/column'
+		);
+
+		$this->assertSame(
+			array(
+				'flex-basis' => '25%',
+				'flex-grow'  => '0',
+			),
+			$css_rules[0]['declarations']
+		);
+	}
+
+	/**
+	 * Tests that a column set to the fill preset takes the remaining space.
+	 *
+	 * @covers ::gutenberg_add_block_state_style_rule
+	 */
+	public function test_column_state_fill_width_grows() {
+		$css_rules = array();
+
+		gutenberg_add_block_state_style_rule(
+			$css_rules,
+			'',
+			'.wp-states-abc12345',
+			array( 'dimensions' => array( 'width' => 'var:preset|dimension|fill' ) ),
+			null,
+			'core/column'
+		);
+
+		$this->assertSame(
+			array(
+				'flex-basis' => '0',
+				'flex-grow'  => '1',
+			),
+			$css_rules[0]['declarations']
+		);
+	}
+
+	/**
+	 * Tests that other blocks keep their state width as `width`.
+	 *
+	 * @covers ::gutenberg_add_block_state_style_rule
+	 */
+	public function test_other_blocks_keep_state_width() {
+		$css_rules = array();
+
+		gutenberg_add_block_state_style_rule(
+			$css_rules,
+			'',
+			'.wp-states-abc12345',
+			array( 'dimensions' => array( 'width' => '25%' ) ),
+			null,
+			'core/group'
+		);
+
+		$this->assertSame(
+			array( 'width' => '25%' ),
+			$css_rules[0]['declarations']
+		);
+	}
+
+	/**
 	 * Tests that block content is returned unchanged when the block name is missing.
 	 *
 	 * @covers ::gutenberg_render_block_states_support

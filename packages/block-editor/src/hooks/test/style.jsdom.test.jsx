@@ -454,6 +454,38 @@ describe( 'getResponsiveStateCSSRules', () => {
 		] );
 	} );
 
+	it( 'sizes a column with flex-basis rather than width for viewport states', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					'@mobile': {
+						dimensions: { width: '25%' },
+					},
+				},
+				'core/column',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { flex-basis: 25% !important; flex-grow: 0 !important; }}',
+		] );
+	} );
+
+	it( 'lets a column set to the fill preset take the remaining space in a viewport state', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					'@mobile': {
+						dimensions: { width: 'var:preset|dimension|fill' },
+					},
+				},
+				'core/column',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { flex-basis: 0 !important; flex-grow: 1 !important; }}',
+		] );
+	} );
+
 	it( 'outputs explicit fill object fit for viewport states', () => {
 		expect(
 			getResponsiveStateCSSRules(

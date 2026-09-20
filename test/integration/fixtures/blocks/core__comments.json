@@ -34,7 +34,11 @@
 								"name": "core/column",
 								"isValid": true,
 								"attributes": {
-									"width": "40px"
+									"style": {
+										"dimensions": {
+											"width": "40px"
+										}
+									}
 								},
 								"innerBlocks": [
 									{

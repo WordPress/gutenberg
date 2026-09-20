@@ -171,6 +171,124 @@ test.describe( 'Columns', () => {
 		] );
 	} );
 
+	test( 'sets a column width from the Dimensions panel', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [ { name: 'core/column' }, { name: 'core/column' } ],
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Column (1 of 2)' } )
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		const widthControl = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( 'fieldset' )
+			.filter( { has: page.getByRole( 'slider', { name: 'Width' } ) } );
+
+		// The width control shows presets by default, so switch to a custom value.
+		await widthControl
+			.getByRole( 'button', { name: 'Set custom value' } )
+			.click();
+
+		const widthInput = widthControl.getByRole( 'spinbutton', {
+			name: 'Width',
+		} );
+		await widthInput.fill( '40' );
+		await widthInput.press( 'Enter' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/columns',
+				innerBlocks: [
+					{
+						name: 'core/column',
+						attributes: {
+							style: { dimensions: { width: '40px' } },
+						},
+					},
+					{ name: 'core/column' },
+				],
+			},
+		] );
+	} );
+
+	test( 'sets a column to the Fill preset from the Dimensions panel', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [ { name: 'core/column' }, { name: 'core/column' } ],
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Column (1 of 2)' } )
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'slider', { name: 'Width' } )
+			.fill( '1' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/columns',
+				innerBlocks: [
+					{
+						name: 'core/column',
+						attributes: {
+							style: {
+								dimensions: {
+									width: 'var:preset|dimension|fill',
+								},
+							},
+						},
+					},
+					{ name: 'core/column' },
+				],
+			},
+		] );
+	} );
+
+	test( 'applies a column width set for a viewport state below the stacking breakpoint', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost( { title: 'Column viewport state width' } );
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					attributes: {
+						style: {
+							dimensions: { width: '25%' },
+							'@mobile': { dimensions: { width: '75%' } },
+						},
+					},
+				},
+				{ name: 'core/column' },
+			],
+		} );
+
+		const postId = await editor.publishPost();
+		await page.setViewportSize( { width: 400, height: 800 } );
+		await page.goto( `/?p=${ postId }` );
+
+		const column = page.locator( '.wp-block-column' ).first();
+
+		// Without the width to flex-basis conversion this is `auto`, and
+		// without the lowered stacking rule it is `100%`.
+		await expect( column ).toHaveCSS( 'flex-basis', '75%' );
+	} );
+
 	test.describe( 'should update the column widths correctly', () => {
 		const initialColumnWidths = [ '10%', '20%', '30%', '40%' ];
 
@@ -212,7 +330,9 @@ test.describe( 'Columns', () => {
 					},
 					innerBlocks: initialColumnWidths.map( ( width ) => ( {
 						name: 'core/column',
-						attributes: { width },
+						attributes: {
+							style: { dimensions: { width } },
+						},
 					} ) ),
 				} );
 
@@ -232,7 +352,9 @@ test.describe( 'Columns', () => {
 						name: 'core/columns',
 						innerBlocks: newColumnWidths.map( ( width ) => ( {
 							name: 'core/column',
-							attributes: { width },
+							attributes: {
+								style: { dimensions: { width } },
+							},
 						} ) ),
 					},
 				] );

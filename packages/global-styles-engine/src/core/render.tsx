@@ -8,6 +8,7 @@ import {
 import type { BlockType } from '@wordpress/blocks';
 import { getCSSRules, getCSSValueFromRawStyle } from '@wordpress/style-engine';
 import { select } from '@wordpress/data';
+import { getColumnFlexDeclarations } from '../utils/column-width';
 import {
 	PRESET_METADATA,
 	ROOT_BLOCK_SELECTOR,
@@ -733,6 +734,44 @@ export function getStylesDeclarations(
 	} );
 
 	return output;
+}
+
+/**
+ * Converts `width` declarations to the flex sizing a column block needs.
+ *
+ * The column block sizes itself with `flex-basis` rather than `width` because
+ * it lives in a flex container. This post-processes the computed declarations
+ * so the correct properties are output.
+ *
+ * @param declarations CSS declarations.
+ * @return The updated declarations.
+ */
+export function updateColumnWidthDeclarations(
+	declarations: string[]
+): string[] {
+	let flexGrow: string | undefined;
+
+	const updated = declarations.map( ( declaration ) => {
+		const separatorIndex = declaration.indexOf( ':' );
+		if (
+			separatorIndex === -1 ||
+			declaration.slice( 0, separatorIndex ).trim() !== 'width'
+		) {
+			return declaration;
+		}
+
+		const width = declaration.slice( separatorIndex + 1 ).trim();
+		const flex = getColumnFlexDeclarations( width );
+		flexGrow = flex.flexGrow;
+
+		return `flex-basis: ${ flex.flexBasis }`;
+	} );
+
+	if ( flexGrow !== undefined ) {
+		updated.push( `flex-grow: ${ flexGrow }` );
+	}
+
+	return updated;
 }
 
 /**
@@ -1709,13 +1748,18 @@ function renderStylesNode(
 	}
 
 	// Process the remaining block styles (they use either normal block class or __experimentalSelector).
-	const styleDeclarations = getStylesDeclarations(
+	let styleDeclarations = getStylesDeclarations(
 		styles,
 		effectiveSelector,
 		useRootPaddingAlign,
 		tree,
 		disableRootPadding
 	);
+
+	if ( name === 'core/column' ) {
+		styleDeclarations = updateColumnWidthDeclarations( styleDeclarations );
+	}
+
 	if ( styleDeclarations?.length ) {
 		const generalSelector = skipSelectorWrapper
 			? effectiveSelector

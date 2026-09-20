@@ -3936,6 +3936,10 @@ class WP_Theme_JSON_Gutenberg {
 				// Compute declarations for remaining styles not covered by feature level selectors.
 				$style_variation_declarations[ $style_variation['selector'] ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
 
+				if ( 'core/column' === ( $block_metadata['name'] ?? null ) ) {
+					$style_variation_declarations[ $style_variation['selector'] ] = gutenberg_update_column_width_declarations( $style_variation_declarations[ $style_variation['selector'] ] );
+				}
+
 				// Process pseudo-selectors for this variation (e.g., :hover, :focus).
 				$block_name                    = $block_metadata['name'] ?? ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? static::get_block_name_from_metadata_path( $block_metadata ) : null );
 				$variation_pseudo_declarations = $this->process_pseudo_selectors( $style_variation_node, $style_variation['selector'], $settings, $block_name, $block_metadata, $style_variation );
@@ -3993,6 +3997,11 @@ class WP_Theme_JSON_Gutenberg {
 
 					// Process base properties for this breakpoint.
 					$breakpoint_declarations = static::compute_style_properties( $breakpoint_node, $settings, null, $this->theme_json );
+
+					if ( 'core/column' === $block_name ) {
+						$breakpoint_declarations = gutenberg_update_column_width_declarations( $breakpoint_declarations );
+					}
+
 					if ( ! empty( $breakpoint_declarations ) ) {
 						$base_ruleset              = static::to_ruleset( ':root :where(' . $style_variation['selector'] . ')', $breakpoint_declarations );
 						$variation_responsive_css .= $breakpoint_media . '{' . $base_ruleset . '}';
@@ -4164,6 +4173,10 @@ class WP_Theme_JSON_Gutenberg {
 			if ( $is_root_selector && ( 'background-image' === $declaration['name'] || 'background' === $declaration['name'] ) ) {
 				$should_set_root_min_height = true;
 			}
+		}
+
+		if ( 'core/column' === $block_name ) {
+			$declarations = gutenberg_update_column_width_declarations( $declarations );
 		}
 
 		/*
