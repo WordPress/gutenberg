@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Navigation: Broaden the block appender's search to all link types instead of scoping it to pages, matching the Custom Link variation. Categories and tags can now be found directly from the appender instead of only through Custom Link ([#83110](https://github.com/WordPress/gutenberg/pull/83110)).
+
 ### Bug Fixes
 
 -   Math: Read the LaTeX source from the `<annotation>` inside the saved `<math>` instead of the block comment, so `&` and `<` survive `wp_kses` for users without `unfiltered_html`. Input that cannot be rendered is saved as an annotation-only `<semantics>`, which browsers display as the source text ([#82987](https://github.com/WordPress/gutenberg/pull/82987)).

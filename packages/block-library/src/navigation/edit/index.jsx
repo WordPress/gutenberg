@@ -87,10 +87,13 @@ function NavigationAddPageButton( { clientId } ) {
 		// Get the current number of blocks to insert at the end
 		const blockCount = getBlockCount( clientId );
 
-		// Create a new navigation link block (default block)
+		// Create a new navigation link block, explicitly scoped to pages:
+		// this button is labeled "Add page" and shows a page icon, so it
+		// should stay page-scoped regardless of what DEFAULT_BLOCK (used by
+		// the generic block appender) defaults to.
 		const newBlock = createBlock( DEFAULT_BLOCK.name, {
-			kind: DEFAULT_BLOCK.attributes.kind,
-			type: DEFAULT_BLOCK.attributes.type,
+			kind: 'post-type',
+			type: 'page',
 		} );
 
 		// Insert the block at the end of the navigation
