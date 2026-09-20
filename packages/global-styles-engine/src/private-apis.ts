@@ -8,6 +8,10 @@ import {
 	getDuotoneStylesheet,
 	getDuotoneUnsetStylesheet,
 } from './utils/duotone';
+import {
+	getColumnFlexDeclarations,
+	isColumnFillWidth,
+} from './utils/column-width';
 import { resolveStyle } from './resolve-style';
 import { getVariationStyle } from './variation';
 import { lock } from './lock-unlock';
@@ -22,4 +26,6 @@ lock( privateApis, {
 	getDuotoneUnsetStylesheet,
 	resolveStyle,
 	getVariationStyle,
+	getColumnFlexDeclarations,
+	isColumnFillWidth,
 } );
