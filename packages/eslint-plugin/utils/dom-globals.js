@@ -76,6 +76,80 @@ function shouldSkipReference( reference ) {
 }
 
 /**
+ * Returns the simple name of a class's superclass, if available.
+ *
+ * @param {import('estree').Node|null|undefined} superClass Superclass node.
+ * @return {string|null} Identifier name, or null when unknown.
+ */
+function getSuperClassName( superClass ) {
+	if ( ! superClass ) {
+		return null;
+	}
+
+	if ( superClass.type === 'Identifier' ) {
+		return superClass.name;
+	}
+
+	if (
+		superClass.type === 'MemberExpression' &&
+		! superClass.computed &&
+		superClass.property.type === 'Identifier'
+	) {
+		return superClass.property.name;
+	}
+
+	return null;
+}
+
+/**
+ * Returns true if the class looks like a React class component.
+ *
+ * Matches classes that extend `Component` / `PureComponent`, or that define a
+ * `render()` method returning JSX.
+ *
+ * @param {import('estree').Node|null|undefined} classNode Class AST node.
+ * @return {boolean} Whether the class is treated as a React class component.
+ */
+function isReactClassComponent( classNode ) {
+	if (
+		! classNode ||
+		( classNode.type !== 'ClassDeclaration' &&
+			classNode.type !== 'ClassExpression' )
+	) {
+		return false;
+	}
+
+	const superClassName = getSuperClassName( classNode.superClass );
+	if (
+		superClassName === 'Component' ||
+		superClassName === 'PureComponent'
+	) {
+		return true;
+	}
+
+	const body = classNode.body?.body;
+	if ( ! Array.isArray( body ) ) {
+		return false;
+	}
+
+	return body.some( ( member ) => {
+		if (
+			member.type !== 'MethodDefinition' ||
+			member.kind !== 'method' ||
+			member.key?.type !== 'Identifier' ||
+			member.key.name !== 'render'
+		) {
+			return false;
+		}
+
+		return isReturnValueJSX( {
+			type: 'function',
+			block: member.value,
+		} );
+	} );
+}
+
+/**
  * Creates an ESLint rule that reports DOM global usage based on a scope
  * predicate.
  *
@@ -152,6 +226,7 @@ function createDOMGlobalRule( { description, message, test } ) {
 module.exports = {
 	isDOMGlobal,
 	isReturnValueJSX,
+	isReactClassComponent,
 	shouldSkipReference,
 	createDOMGlobalRule,
 };
