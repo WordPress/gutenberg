@@ -13,6 +13,7 @@
 -   Inspector controls in the standard block-supports panels (Typography, Dimensions, Border, Color, Background, Filters) reflect the value a block inherits from Global Styles when nothing is set on the block. The `gutenberg-global-styles-inheritance-ui` experiment now gates only the indicators for that value: the dotted underline on an inherited label, and the dot that resets a local override ([#82840](https://github.com/WordPress/gutenberg/pull/82840)).
 -   `TypographyPanel`: Setting a text color starts an unset link color tracking it whenever no link color is set on the block or inherited from Global Styles. Previously the link color was left alone ([#82840](https://github.com/WordPress/gutenberg/pull/82840)).
 -   `LinkControl`, `LinkPicker`: migrate the link preview badges from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82684](https://github.com/WordPress/gutenberg/pull/82684)).
+-   Pass the `videoKeepOriginal` media upload setting through to the upload pipeline, so a site can opt out of keeping the original video file alongside its web-safe transcode ([#79375](https://github.com/WordPress/gutenberg/pull/79375)).
 
 ### Bug Fixes
 
