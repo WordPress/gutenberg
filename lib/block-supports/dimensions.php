@@ -173,6 +173,98 @@ function gutenberg_render_dimensions_support( $block_content, $block ) {
 	return $block_content;
 }
 
+/**
+ * Whether a column width asks the column to take the remaining space.
+ *
+ * Both the raw attribute value and the resolved custom property are matched,
+ * because the width reaches this code already resolved from the style engine
+ * and unresolved from a block's attributes.
+ *
+ * A zero length means the same thing. `flex-basis: 0` without `flex-grow` is
+ * never a usable column, and the width control's built-in "None" option
+ * stores `0`.
+ *
+ * Keep in sync with `packages/global-styles-engine/src/utils/column-width.ts`.
+ *
+ * @since 7.2.0
+ *
+ * @param string|int|float $width Column width.
+ * @return bool Whether the column should fill the remaining space.
+ */
+function gutenberg_is_column_fill_width( $width ) {
+	if ( 'var:preset|dimension|fill' === $width || 'var(--wp--preset--dimension--fill)' === $width ) {
+		return true;
+	}
+
+	if ( ! is_scalar( $width ) || ! preg_match( '/^\s*-?(\d+\.?\d*|\.\d+)/', (string) $width, $matches ) ) {
+		return false;
+	}
+
+	return 0.0 === (float) $matches[0];
+}
+
+/**
+ * Returns the flex declarations that size a column of the given width.
+ *
+ * The column block lives in a flex container, so it sizes itself with
+ * `flex-basis` rather than `width`. A column given a width keeps it instead of
+ * stretching, which is what `flex-grow: 0` is for.
+ *
+ * Keep in sync with `packages/global-styles-engine/src/utils/column-width.ts`.
+ *
+ * @since 7.2.0
+ *
+ * @param string $width Column width, resolved to a CSS value.
+ * @return array Map of CSS property to value.
+ */
+function gutenberg_get_column_flex_declarations( $width ) {
+	return gutenberg_is_column_fill_width( $width )
+		? array(
+			'flex-basis' => '0',
+			'flex-grow'  => '1',
+		)
+		: array(
+			'flex-basis' => $width,
+			'flex-grow'  => '0',
+		);
+}
+
+/**
+ * Converts `width` declarations to the flex sizing a column block needs.
+ *
+ * Accepts the style engine's `name`/`value` declaration list used by
+ * `WP_Theme_JSON_Gutenberg`.
+ *
+ * @since 7.2.0
+ *
+ * @param array $declarations An array of CSS declarations.
+ * @return array The updated declarations.
+ */
+function gutenberg_update_column_width_declarations( $declarations ) {
+	$flex_grow = null;
+
+	foreach ( $declarations as &$declaration ) {
+		if ( 'width' !== $declaration['name'] ) {
+			continue;
+		}
+
+		$flex                 = gutenberg_get_column_flex_declarations( $declaration['value'] );
+		$declaration['name']  = 'flex-basis';
+		$declaration['value'] = $flex['flex-basis'];
+		$flex_grow            = $flex['flex-grow'];
+	}
+	unset( $declaration );
+
+	if ( null !== $flex_grow ) {
+		$declarations[] = array(
+			'name'  => 'flex-grow',
+			'value' => $flex_grow,
+		);
+	}
+
+	return $declarations;
+}
+
 remove_filter( 'render_block', 'wp_render_dimensions_support', 10 );
 add_filter( 'render_block', 'gutenberg_render_dimensions_support', 10, 2 );
 
