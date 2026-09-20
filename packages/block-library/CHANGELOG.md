@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Post Title: Add Fit text support, so the title can resize to fill its container ([#83036](https://github.com/WordPress/gutenberg/pull/83036)).
+
 ### Bug Fixes
 
 -   Math: Read the LaTeX source from the `<annotation>` inside the saved `<math>` instead of the block comment, so `&` and `<` survive `wp_kses` for users without `unfiltered_html`. Input that cannot be rendered is saved as an annotation-only `<semantics>`, which browsers display as the source text ([#82987](https://github.com/WordPress/gutenberg/pull/82987)).
@@ -14,10 +18,6 @@
 ### Internal
 
 -   Button: Replace deprecated `word-break: break-word` with `word-break: normal` and `overflow-wrap: anywhere` to clear the Stylelint suppression ([#82854](https://github.com/WordPress/gutenberg/pull/82854)).
-
-### Enhancements
-
--   Post Title: Add Fit text support, so the title can resize to fill its container ([#83036](https://github.com/WordPress/gutenberg/pull/83036)).
 
 ## 11.0.0 (2026-09-10)
 
