@@ -199,6 +199,11 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/block-bindings/test/attribute-control.jsdom.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/components/block-breadcrumb/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -338,9 +343,6 @@
 		}
 	},
 	"packages/block-editor/src/components/block-inspector/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -760,6 +762,11 @@
 		}
 	},
 	"packages/block-editor/src/components/block-variation-transforms/index.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-variation-transforms/test/index.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4568,16 +4575,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/box-control/styles/box-control-icon-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
-	"packages/components/src/card/card/component.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/card/get-padding-by-size.ts": {
 		"no-restricted-imports": {
 			"count": 1
@@ -4635,16 +4632,6 @@
 	},
 	"packages/components/src/draggable/index.tsx": {
 		"react-hooks/refs": {
-			"count": 1
-		}
-	},
-	"packages/components/src/elevation/hook.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
-	"packages/components/src/elevation/styles.ts": {
-		"no-restricted-imports": {
 			"count": 1
 		}
 	},
@@ -5190,11 +5177,6 @@
 	"packages/dataviews/src/dataviews/stories/free-composition.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		}
-	},
-	"packages/dataviews/src/dataviews/stories/index.story.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
 		}
 	},
 	"packages/dataviews/src/dataviews/stories/layout-activity.tsx": {
@@ -7349,11 +7331,6 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/color-indicator-wrapper.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/color-palette-panel.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -7460,11 +7437,6 @@
 	"packages/global-styles-ui/src/pagination/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		}
-	},
-	"packages/global-styles-ui/src/palette.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 4
 		}
 	},
 	"packages/global-styles-ui/src/presets/dialogs/rename-dialog.tsx": {
@@ -7636,9 +7608,6 @@
 		}
 	},
 	"packages/image-cropper/src/stories/index.story.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		}
@@ -7658,11 +7627,6 @@
 			"count": 1
 		}
 	},
-	"packages/media-editor/src/components/rotation-ruler/stories/index.story.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"packages/media-editor/src/image-editor/react/components/stencils/rectangle-stencil.tsx": {
 		"react-hooks/refs": {
 			"count": 1
@@ -7674,9 +7638,6 @@
 		}
 	},
 	"packages/media-editor/src/image-editor/stories/rectangle-crop.story.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
@@ -7831,22 +7792,7 @@
 			"count": 1
 		}
 	},
-	"packages/widget-dashboard/src/components/actions-menu/actions-menu.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/widget-dashboard/src/components/commands/commands.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/widget-dashboard/src/components/widget-actions/widget-actions.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/widget-dashboard/src/components/widget-layout-controls/widget-layout-controls.tsx": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -8114,9 +8060,6 @@
 		}
 	},
 	"storybook/stories/playground/box/index.jsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -8142,9 +8085,6 @@
 		}
 	},
 	"storybook/stories/playground/with-undo-redo/index.jsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

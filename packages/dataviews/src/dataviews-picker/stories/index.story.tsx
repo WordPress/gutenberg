@@ -163,8 +163,8 @@ const DataViewsPickerContent = ( {
 			supportsBulk: isMultiselectable,
 			callback() {
 				const selectedItemNames = data
-					.filter(
-						( item ) => selection?.includes( String( item.id ) )
+					.filter( ( item ) =>
+						selection?.includes( String( item.id ) )
 					)
 					.map( ( item ) => item.name.title )
 					.join( ', ' );

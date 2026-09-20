@@ -195,7 +195,7 @@ export function FlatTermSelector( { slug } ) {
 							newTermName
 						),
 						creatable: true,
-				  }
+					}
 				: undefined,
 		[ newTermName, showCreatableItem ]
 	);

@@ -30,11 +30,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes .= " has-text-align-{$attributes['textAlign']}";
 	}
-	$wrapper_attributes = get_block_wrapper_attributes(
-		array(
-			'class' => $classes,
-		)
-	);
+
 	// Set default values.
 	$format = '%link';
 	$link   = 'next' === $navigation_type ? _x( 'Next', 'label for next post link' ) : _x( 'Previous', 'label for previous post link' );
@@ -115,6 +111,24 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	} else {
 		$content = $get_link_function( $format, $link );
 	}
+
+	/*
+	 * Shadow serialization is skipped for this block so the shadow can be
+	 * withheld from the empty wrapper rendered when there is no adjacent post.
+	 * The wrapper itself is kept for backward compatibility.
+	 */
+	$styles = '';
+	if ( '' !== $content && ! empty( $attributes['style']['shadow'] ) ) {
+		$shadow_styles = wp_style_engine_get_styles( array( 'shadow' => $attributes['style']['shadow'] ) );
+		$styles        = $shadow_styles['css'] ?? '';
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => $classes,
+			'style' => $styles,
+		)
+	);
 
 	return sprintf(
 		'<div %1$s>%2$s</div>',

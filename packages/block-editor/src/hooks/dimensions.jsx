@@ -107,12 +107,12 @@ export function DimensionsPanel( {
 				setAttributes( {
 					style: setStyleForState( style, selectedState, newStyle ),
 				} );
-		  }
+			}
 		: ( newStyle ) => {
 				setAttributes( {
 					style: cleanEmptyObject( newStyle ),
 				} );
-		  };
+			};
 
 	if ( ! isEnabled ) {
 		return null;

@@ -505,7 +505,7 @@ export function getSharedStyleSettings(
 								? sharedSettings.spacing[ key ]
 								: {} ),
 							sides,
-					  }
+						}
 					: false,
 			};
 		}
@@ -724,7 +724,7 @@ export function applySharedStyleAttributeChanges(
 	const targetStyleChanges = preserveTargetLinkColor
 		? styleChanges.filter(
 				( { path } ) => ! isSamePath( path, LINK_COLOR_PATH )
-		  )
+			)
 		: styleChanges;
 
 	if ( targetStyleChanges.length ) {

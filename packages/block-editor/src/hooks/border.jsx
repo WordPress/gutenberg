@@ -179,10 +179,10 @@ export function BorderPanel( {
 				setAttributes( {
 					style: setStyleForState( style, selectedState, newStyle ),
 				} );
-		  }
+			}
 		: ( newStyle ) => {
 				setAttributes( styleToAttributes( newStyle ) );
-		  };
+			};
 
 	if ( ! isEnabled ) {
 		return null;

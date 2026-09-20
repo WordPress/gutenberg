@@ -25,7 +25,7 @@ import {
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceEnabled,
+	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
@@ -349,7 +349,7 @@ export default function DimensionsPanel( {
 	includeLayoutControls = false,
 	allowAxialBlockGap = true,
 	styleState = DEFAULT_BLOCK_STYLE_STATE,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 } ) {
 	const { dimensions, spacing } = settings;
 
@@ -789,7 +789,7 @@ export default function DimensionsPanel( {
 							isContentSizePlaceholder
 								? getNumericPlaceholder(
 										inheritedContentSizeValue
-								  )
+									)
 								: undefined
 						}
 						onChange={ ( nextContentSize ) => {
@@ -832,7 +832,7 @@ export default function DimensionsPanel( {
 							isWideSizePlaceholder
 								? getNumericPlaceholder(
 										inheritedWideSizeValue
-								  )
+									)
 								: undefined
 						}
 						onChange={ ( nextWideSize ) => {
@@ -1069,7 +1069,7 @@ export default function DimensionsPanel( {
 							isMinHeightPlaceholder
 								? getNumericPlaceholder(
 										inheritedMinHeightValue
-								  )
+									)
 								: undefined
 						}
 						dimensionSizes={ dimensions?.dimensionSizes }
@@ -1103,7 +1103,7 @@ export default function DimensionsPanel( {
 							isMinWidthPlaceholder
 								? getNumericPlaceholder(
 										inheritedMinWidthValue
-								  )
+									)
 								: undefined
 						}
 						dimensionSizes={ dimensions?.dimensionSizes }

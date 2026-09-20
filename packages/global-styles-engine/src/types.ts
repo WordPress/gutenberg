@@ -6,12 +6,7 @@
  * Value that can be resolved from various sources (direct value, reference, or URL)
  */
 export type UnresolvedValue =
-	| string
-	| number
-	| { ref: string }
-	| { url: string }
-	| undefined
-	| null;
+	string | number | { ref: string } | { url: string } | undefined | null;
 
 /**
  * Origin of a preset (theme, user customizations, or WordPress defaults)
@@ -167,8 +162,7 @@ export interface TypographySettings {
 	defaultFontSizes?: boolean;
 	textShadow?: boolean;
 	textShadowPresets?:
-		| TextShadowPreset[]
-		| Record< string, TextShadowPreset[] >;
+		TextShadowPreset[] | Record< string, TextShadowPreset[] >;
 	defaultTextShadowPresets?: boolean;
 }
 
