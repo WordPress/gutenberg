@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `InspectorControls`: Remove the `__experimentalGroup` prop from the fill and the slot. It was deprecated in WordPress 6.2 in favour of `group`, with removal scheduled for 6.4 ([#83171](https://github.com/WordPress/gutenberg/pull/83171)).
+
 ### New Features
 
 -   Add a text shadow block support and its control in the typography panel ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
