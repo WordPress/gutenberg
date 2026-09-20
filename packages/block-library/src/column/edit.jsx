@@ -9,7 +9,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
-import { getColumnFlexBasis } from './utils';
+import { getColumnStyle } from './utils';
 
 /**
  * Renders the `core/column` block in the editor.
@@ -60,10 +60,10 @@ function ColumnEdit( {
 		} );
 	};
 
-	const flexBasis = getColumnFlexBasis( style?.dimensions?.width );
+	const columnStyle = getColumnStyle( style?.dimensions?.width );
 	const blockProps = useBlockProps( {
 		className: classes,
-		style: flexBasis ? { flexBasis } : undefined,
+		style: columnStyle,
 	} );
 
 	const columnsCount = columnsIds.length;

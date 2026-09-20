@@ -185,9 +185,19 @@ test.describe( 'Columns', () => {
 		);
 		await editor.openDocumentSettingsSidebar();
 
-		const widthInput = page
+		const widthControl = page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'spinbutton', { name: 'Width' } );
+			.locator( 'fieldset' )
+			.filter( { has: page.getByRole( 'slider', { name: 'Width' } ) } );
+
+		// The width control shows presets by default, so switch to a custom value.
+		await widthControl
+			.getByRole( 'button', { name: 'Set custom value' } )
+			.click();
+
+		const widthInput = widthControl.getByRole( 'spinbutton', {
+			name: 'Width',
+		} );
 		await widthInput.fill( '40' );
 		await widthInput.press( 'Enter' );
 
@@ -199,6 +209,45 @@ test.describe( 'Columns', () => {
 						name: 'core/column',
 						attributes: {
 							style: { dimensions: { width: '40px' } },
+						},
+					},
+					{ name: 'core/column' },
+				],
+			},
+		] );
+	} );
+
+	test( 'sets a column to the Fill preset from the Dimensions panel', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [ { name: 'core/column' }, { name: 'core/column' } ],
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Column (1 of 2)' } )
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'slider', { name: 'Width' } )
+			.fill( '1' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/columns',
+				innerBlocks: [
+					{
+						name: 'core/column',
+						attributes: {
+							style: {
+								dimensions: {
+									width: 'var:preset|dimension|fill',
+								},
+							},
 						},
 					},
 					{ name: 'core/column' },
